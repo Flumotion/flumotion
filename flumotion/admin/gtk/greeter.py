@@ -41,7 +41,7 @@ class Initial(wizard.WizardStep):
     text = 'Flumotion Admin needs to connect to a Flumotion manager.\nChoose' \
            + ' an option from the list and click "Forward" to begin.'
     connect_to_existing = None
-    next_pages = ['connect_to_existing', 'load_connection']
+    next_pages = ['load_connection', 'connect_to_existing']
 
     def on_next(self, state):
         radio_buttons = self.connect_to_existing.get_group()

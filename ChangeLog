@@ -1,5 +1,11 @@
 2005-02-09  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/greeter.py (Initial.next_pages): Fix the
+	order so that load_connection is first by default.
+
+	* flumotion/admin/gtk/wizard.py (Wizard.set_page): Disable the
+	back button as appropriate.
+
 	* flumotion/admin/gtk/wizard.py (WizardStep.next_pages): New class
 	member.
 	(WizardStep.__init__): Go ahead and load up the glade file here

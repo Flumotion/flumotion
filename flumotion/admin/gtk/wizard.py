@@ -185,6 +185,8 @@ class Wizard(gobject.GObject):
         available_pages = [p for p in page.next_pages
                                 if self.pages[p].is_available()]
 
+        self.button_prev.set_sensitive(bool(self.page_stack))
+
         self.page = page
         for w in self.page_bin.get_children():
             self.page_bin.remove(w)
