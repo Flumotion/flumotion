@@ -48,12 +48,12 @@ class Window(log.Loggable, gobject.GObject):
         self.__gobject_init__()
         
         self.admin = None
-        self._setAdminModel(model)
 
         self._create_ui()
         self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
-                                            # disconnected
+                                         # disconnected
+        self._setAdminModel(model)
 
     def _setAdminModel(self, model):
         'set the model to which we are a view/controller'
@@ -313,7 +313,8 @@ class Window(log.Loggable, gobject.GObject):
             self._disconnected_dialog.destroy()
             self._disconnected_dialog = None
 
-        self.window.set_title('%s:%d - Flumotion Administration')
+        self.window.set_title('%s:%d - Flumotion Administration'
+                              % (admin.host, admin.port))
 
         components = self.update_components()
 

@@ -1,3 +1,12 @@
+2005-02-02  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/client.py (Window.__init__): Set the model
+	after setting up the gui.
+	(Window.admin_connected_cb): Fix title.
+
+	* flumotion/admin/admin.py (AdminModel._connectedCallback): Set
+	the state properly.
+
 2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/managers/default/flows/ogg-test-theora.xml:

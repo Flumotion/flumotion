@@ -192,6 +192,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         
     def _connectedCallback(self, result):
         self.debug('Connected to manager and retrieved all state')
+        self.state = 'connected'
         self.emit('connected')
         
     # default Errback
