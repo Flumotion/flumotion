@@ -15,12 +15,13 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 """
-This module provides support for Twisted to interact with the PyGTK2 mainloop.
+This module provides support for Twisted to interact with the GStreamer
+mainloop.
 
 In order to use this support, simply do the following::
 
-    |  from twisted.internet import gtk2reactor
-    |  gtk2reactor.install()
+    |  from twisted.internet import gstreactor
+    |  gstreactor.install()
 
 Then use twisted.internet APIs as usual.  The other methods here are not
 intended to be called directly.
