@@ -38,8 +38,8 @@ from twisted.python import log
 from component import Component
 
 class Producer(Component):
+    name = 'producer'
     def __init__(self, name, host, port, pipeline):
-        name = 'producer_' + name 
         Component.__init__(self, name, None, host, port)
         
         self.pipeline_string = '%s ! tcpserversink name=sink' % pipeline

@@ -48,9 +48,9 @@ class Streamer(gobject.GObject, Component):
         'data-recieved': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
                           (gst.Buffer,)),
     }
+    name = 'streamer'
     def __init__(self, name, source, host, port):
         self.__gobject_init__()
-        name = 'streamer_' + name 
         Component.__init__(self, name, source, host, port)
         self.pipeline_string = 'tcpclientsrc name=source ! fakesink signal-handoffs=1 silent=1 name=sink'
         self.source = source
@@ -130,7 +130,7 @@ def main(args):
                       default=None,
                       help="Protocol to use")
     parser.add_option('-o', '--port',
-                      action="store", type="string", dest="port",
+                      action="store", type="int", dest="port",
                       default=None,
                       help="Port to bind to")
     parser.add_option('-s', '--source',
@@ -170,13 +170,15 @@ def main(args):
     else:
         host = options.host
 
+    component = Streamer(options.name, options.source, host, port)
+    
     if options.protocol == 'http':
         factory = server.Site(resource=StreamingResource(component))
     else:
         print 'Only http protcol supported right now'
 
     log.msg('Connect to controller %s on port %d' % (host, port))
-    component = Streamer(options.name, options.source, host, port)
+
     reactor.listenTCP(options.port, factory)
     reactor.run()
 

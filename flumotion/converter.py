@@ -43,8 +43,8 @@ from component import Component
 import gstutils
 
 class Converter(Component):
+    name = 'converter'
     def __init__(self, name, source, host, port, pipeline):
-        name = 'converter_' + name 
         Component.__init__(self, name, source, host, port)
         self.pipeline_string = 'tcpclientsrc name=source ! ' + \
                                '%s ! tcpserversink name=sink' % pipeline

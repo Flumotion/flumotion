@@ -39,9 +39,12 @@ class Component(pb.Referenceable):
         self.pipeline = None
         self.pipeline_signals = []
 
+        # Prefix our login name with the name of the component
+        username = '%s_%s' % (self.get_name(), name)
+
         factory = pb.PBClientFactory()
         reactor.connectTCP(host, port, factory)
-        defered = factory.login(pbutil.Username(name), client=self)
+        defered = factory.login(pbutil.Username(username), client=self)
         defered.addCallback(self.got_perspective_cb)
 
     def got_perspective_cb(self, persp):
@@ -51,6 +54,10 @@ class Component(pb.Referenceable):
     def has_perspective(self):
         return self.persp == None
 
+    def get_name(self):
+        assert hasattr(self, 'name')
+        return self.name
+    
     def get_ip(self):
         return socket.gethostbyname(self.host)
         
