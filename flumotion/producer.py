@@ -34,11 +34,11 @@ from twisted.spread import pb
 import pbutil
 import gstutils
 
-class Acquisition(pb.Referenceable):
+class Producer(pb.Referenceable):
     def __init__(self, username, host, port, pipeline_string):
         factory = pb.PBClientFactory()
         reactor.connectTCP(host, port, factory)
-        defered = factory.login(pbutil.Username('acq_%s' % username),
+        defered = factory.login(pbutil.Username('prod_%s' % username),
                                 client=self)
         defered.addCallback(self.got_perspective_cb)
         
@@ -143,13 +143,13 @@ if __name__ == '__main__':
         pipeline = sys.argv[1] 
         controller = sys.argv[2]
     else:
-        print 'Usage: acquisition.py pipeline [controller-host[:port]]'
+        print 'Usage: producer.py pipeline [controller-host[:port]]'
         sys.exit(2)
 
     name = 'johan'
     host = controller
     port = 8890
     log.msg('Connect to %s on port %d' % (host, port))
-    client = Acquisition(name, host, port, pipeline)
+    client = Producer(name, host, port, pipeline)
     reactor.run()
     

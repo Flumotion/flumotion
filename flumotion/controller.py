@@ -61,7 +61,7 @@ class Dispatcher:
         return (pb.IPerspective, p,
                 lambda p=p,mind=mind: p.detached(mind))
 
-class AcquisitionPerspective(pbutil.NewCredPerspective):
+class ProducerPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
@@ -69,7 +69,7 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
         self.ready = False
         
     def __repr__(self):
-        return '<AcquisitionPerspective for %s>' % self.username
+        return '<ProducerPerspective for %s>' % self.username
     
     def getPeer(self):
         return self.mind.broker.transport.getPeer()
@@ -99,7 +99,7 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
     def perspective_error(self, element, error):
         log.msg('%s.error element=%s string=%s' % (self.username, element, error))
 
-class TranscoderPerspective(pbutil.NewCredPerspective):
+class ConverterPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
@@ -108,7 +108,7 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
         self.remote_hostname = None
         
     def __repr__(self):
-        return '<TranscoderPerspective for %s>' % self.username
+        return '<ConverterPerspective for %s>' % self.username
 
     def getPeer(self):
         return self.mind.broker.transport.getPeer()
@@ -145,10 +145,10 @@ class Controller(pb.Root):
         self.components = {}
         
     def getPerspective(self, username):
-        if username.startswith('acq_'):
-            component = AcquisitionPerspective(self, username)
-        elif username.startswith('trans_'):
-            component = TranscoderPerspective(self, username)
+        if username.startswith('prod_'):
+            component = ProducerPerspective(self, username)
+        elif username.startswith('conv_'):
+            component = ConverterPerspective(self, username)
 
         self.addComponent(username, component)
 
@@ -161,7 +161,7 @@ class Controller(pb.Root):
         del self.components[component.username]
     
     def componentReady(self, component):
-        link = ['acq_johan', 'trans_johan']
+        link = ['prod_johan', 'conv_johan']
         component.ready = True
         
         log.msg('%r is ready' % component)
@@ -185,37 +185,37 @@ class Controller(pb.Root):
                 self.link(prev, curr)
                 prev = curr
 
-    def link(self, acq, trans):
-        acq_port = 5500
-        trans_port = 5501
-        proto, acq_hostname, port = acq.getPeer()
-        trans_hostname = trans.getPeer()[1]
+    def link(self, prod, conv):
+        prod_port = 5500
+        conv_port = 5501
+        proto, prod_hostname, port = prod.getPeer()
+        conv_hostname = conv.getPeer()[1]
 
-        if (acq_hostname == '127.0.0.1' and trans_hostname != '127.0.0.1'):
-            acq_hostname = trans.getControllerHostname()
+        if (prod_hostname == '127.0.0.1' and conv_hostname != '127.0.0.1'):
+            prod_hostname = conv.getControllerHostname()
             
         def listenDone(obj=None):
-            assert acq.state == gst.STATE_PLAYING, \
-                   gst.element_state_get_name(acq.state)
+            assert prod.state == gst.STATE_PLAYING, \
+                   gst.element_state_get_name(prod.state)
 
-            log.msg('calling %s.listen(%d, %s, %d)' % (trans.username,
-                                                       acq_port,
-                                                       acq_hostname,
-                                                       trans_port))
-            trans.mind.callRemote('start', acq_port, acq_hostname, trans_port)
+            log.msg('calling %s.listen(%d, %s, %d)' % (conv.username,
+                                                       prod_port,
+                                                       prod_hostname,
+                                                       conv_port))
+            conv.mind.callRemote('start', prod_port, prod_hostname, conv_port)
 
-        if acq.state != gst.STATE_PLAYING:
-            log.msg('calling %s.listen(%s, %d)' % (acq.username,
-                                                   acq_hostname,
-                                                   acq_port))
-            obj = acq.mind.callRemote('listen', acq_hostname, acq_port)
+        if prod.state != gst.STATE_PLAYING:
+            log.msg('calling %s.listen(%s, %d)' % (prod.username,
+                                                   prod_hostname,
+                                                   prod_port))
+            obj = prod.mind.callRemote('listen', prod_hostname, prod_port)
             obj.addCallback(listenDone)
         else:
-            log.msg('calling %s.listen(%d, %s, %d)' % (trans.username,
-                                                       acq_port,
-                                                       acq_hostname,
-                                                       trans_port))
-            trans.mind.callRemote('start', acq_port, acq_hostname, trans_port)
+            log.msg('calling %s.listen(%d, %s, %d)' % (conv.username,
+                                                       prod_port,
+                                                       prod_hostname,
+                                                       conv_port))
+            conv.mind.callRemote('start', prod_port, prod_hostname, conv_port)
             
 class ControllerMaster(pb.PBServerFactory):
     def __init__(self):

@@ -38,7 +38,7 @@ from twisted.spread import pb
 import pbutil
 import gstutils
 
-class Transcoder(gobject.GObject, pb.Referenceable):
+class Converter(gobject.GObject, pb.Referenceable):
     __gsignals__ = {
         'data-recieved': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
                           (gst.Buffer,)),
@@ -48,7 +48,7 @@ class Transcoder(gobject.GObject, pb.Referenceable):
         self.host = host
         factory = pb.PBClientFactory()
         reactor.connectTCP(host, port, factory)
-        defered = factory.login(pbutil.Username('trans_%s' % username),
+        defered = factory.login(pbutil.Username('conv_%s' % username),
                                 client=self)
         defered.addCallback(self.got_perspective_cb)
         self.pipeline_string = pipeline
@@ -127,11 +127,11 @@ if __name__ == '__main__':
         pipeline = sys.argv[1] 
         controller = sys.argv[2]
     else:
-        print 'Usage: transcoder.py pipeline [controller-host[:port]]'
+        print 'Usage: converter.py pipeline [controller-host[:port]]'
         sys.exit(2)
         
     name = 'johan'
     host, port = parseHostString(controller)
     log.msg('Connect to %s on port %d' % (host, port))
-    client = Transcoder(name, host, port, pipeline)
+    client = Converter(name, host, port, pipeline)
     reactor.run()
