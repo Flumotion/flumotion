@@ -619,6 +619,8 @@ class Wizard(gobject.GObject, log.Loggable):
         self.update_buttons(has_next)
 
     def update_buttons(self, has_next):
+        # update the forward and next buttons
+        # has_next: whether or not there is a next step
         if len(self.stack) == 1:
             self.button_prev.set_sensitive(False)
         else:
@@ -628,7 +630,8 @@ class Wizard(gobject.GObject, log.Loggable):
         if has_next:
             self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         else:
-            self.button_next.set_label(gtk.STOCK_QUIT)
+            # use APPLY, just like in gnomemeeting
+            self.button_next.set_label(gtk.STOCK_APPLY)
 
     def _sidebar_clean(self):
         # First remove the old the VBox if we can find one

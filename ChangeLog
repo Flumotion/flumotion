@@ -1,5 +1,10 @@
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/wizard/wizard.py:
+	  change quit to apply, fixes #71
+
+2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/wizard_webcam.glade:
 	* flumotion/wizard/steps.py:
 	  Show name of webcam in the UI
