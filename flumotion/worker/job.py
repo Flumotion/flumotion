@@ -31,7 +31,7 @@ from twisted.spread import pb
 from flumotion.common.registry import registry
 from flumotion.component import component
 from flumotion.worker import launcher
-from flumotion.twisted import pbutil
+from flumotion.twisted import cred
 from flumotion.utils import log
 
 def getComponent(dict, defs):
@@ -83,8 +83,6 @@ class JobView(pb.Referenceable, log.Loggable):
         self.launcher = launcher.Launcher(host, port)
         
     def remote_start(self, name, type, config):
-        print 'START NOW', type
-        
         defs = registry.getComponent(type)
         self.run_component(name, type, config, defs)
 
@@ -151,7 +149,7 @@ class JobFactory(pb.PBClientFactory, log.Loggable):
             
     def login(self, username):
         d = pb.PBClientFactory.login(self, 
-                                     pbutil.Username(username),
+                                     cred.Username(username),
                                      self.view)
         d.addCallbacks(self.cb_connected,
                        self.cb_failure)
