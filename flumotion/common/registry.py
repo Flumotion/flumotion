@@ -168,7 +168,7 @@ class RegistryXmlParser(log.Loggable):
                 component = self.parse_component(node)
                 self.components[component.getType()] = component
             else:
-                raise XmlParserError, "unexpected node: %s" % child
+                raise XmlParserError, "unexpected node: %s" % node
             
     def parse_component(self, node):
         # <component type="...">
@@ -282,9 +282,8 @@ class RegistryXmlParser(log.Loggable):
         return files
 
 class ComponentRegistry(log.Loggable):
-    logCategory = 'registry'
-
     """Registry, this is normally not instantiated."""
+    logCategory = 'registry'
     filename = os.path.join(config.registrydir, 'components.xml')
     def __init__(self):
         self.components = {}

@@ -42,16 +42,64 @@ class TestRegistry(unittest.TestCase):
         
         assert not reg.hasComponent('foo')
         assert reg.hasComponent('bar')
-        assert not reg.hasComponent('foobie')
-        assert reg.hasComponent('baz')
+        comp1 = reg.getComponent('bar')
+        assert isinstance(comp1, registry.RegistryEntryComponent)
 
+        assert not reg.hasComponent('foobie')
+
+        assert reg.hasComponent('baz')
+        comp2 = reg.getComponent('baz')
+        assert isinstance(comp2, registry.RegistryEntryComponent)
+
+        comps = reg.getComponents()
+        comps.sort()
+        assert len(comps) == 2
+        assert comp1 in comps
+        assert comp2 in comps
+            
     def testClean(self):
+        xml = """<components>
+          <component name="foo" type="bar"></component></components>"""
         reg = registry.ComponentRegistry()
-        reg.addFromString("""<components>
-          <component name="foo" type="bar"></component></components>""")
+        reg.addFromString(xml)
         reg.clean()
         assert reg.isEmpty()
 
+    def testAddTypeError(self):
+        reg = registry.ComponentRegistry()
+        xml = """<components>
+          <component name="foo" type="bar"></component></components>"""
+        reg.addFromString(xml)
+        self.assertRaises(TypeError, reg.addFromString, xml)
+        
+    def testAddXmlParseError(self):
+        reg = registry.ComponentRegistry()
+        xml = """<components>
+          <component name="unique"></component></components>"""
+        self.assertRaises(registry.XmlParserError, reg.addFromString, xml)
+        xml = """<components>
+          <foo></foo></components>"""
+        self.assertRaises(registry.XmlParserError, reg.addFromString, xml)
+        
+    def testDump(self):
+        xml = """<components>
+          <component name="foo" type="bar"></component></components>"""
+        reg = registry.ComponentRegistry()
+        reg.addFromString(xml)
+        import sys, StringIO
+        s = StringIO.StringIO()
+        reg.dump(s)
+        s.seek(0, 0)
+        data = s.read()
+        assert data == """<components>
+  <component type="bar">
+    <source location="None"/>
+    <properties>
+    </properties>
+  </component>
+</components>
+""", data
+        
 class TestComponentEntry(unittest.TestCase):
     def setUp(self):
         self.entry = registry.RegistryEntryComponent('filename', 'type', False,
