@@ -43,13 +43,13 @@ class ClientFactory(log.Loggable):
         for i in range(client.STOPPED_SUCCESS, client.STOPPED_LAST + 1):
             self.results[i] = 0
 
-    def _client_stopped_cb(self, client, result, i):
-        self.info("%4d: stopped: %d" % (i, result))
+    def _client_stopped_cb(self, client, id, result):
+        self.info("%4d: stopped: %d" % (id, result))
         if self.results.has_key(result):
             self.results[result] += 1
         else:
             self.results[result] = 1
-        del self.clients[i]
+        del self.clients[id]
         self.info("####: %d clients" % len(self.clients))
 
     def run(self):
@@ -66,7 +66,7 @@ class ClientFactory(log.Loggable):
             return False
         self.info("%4d: creating." % self.count)
         client = httpclient.HTTPClientStatic(self.count, self.url, 5.0, 51300 + self.count)
-        client.connect('stopped', self._client_stopped_cb, self.count)
+        client.connect('stopped', self._client_stopped_cb)
         client.set_stop_size(50000)
         self.clients[self.count] = client
         gobject.idle_add(client.open)

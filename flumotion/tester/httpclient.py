@@ -38,7 +38,7 @@ class HTTPClient(gobject.GObject, log.Loggable):
     """
     
     __gsignals__ = {
-        'stopped': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
+        'stopped': (gobject.SIGNAL_RUN_FIRST, None, (int, int)),
     }
     
     logCategory = "httpclient"
@@ -97,7 +97,7 @@ class HTTPClient(gobject.GObject, log.Loggable):
             self._fd = urllib2.urlopen(self._url)
         except urllib2.HTTPError, error:
             self.warning("%4d: HTTPError: code %s, msg %s" % (self._id, error.code, error.msg))
-            self.emit('stopped', client.STOPPED_CONNECT_ERROR)
+            self.emit('stopped', self._id, client.STOPPED_CONNECT_ERROR)
             return
         except urllib2.URLError, exception:
             code = None
@@ -110,25 +110,25 @@ class HTTPClient(gobject.GObject, log.Loggable):
 
             if code == 111:
                 self.warning("%4d: connection refused" % self._id)
-                self.emit('stopped', client.STOPPED_REFUSED)
+                self.emit('stopped', self._id, client.STOPPED_REFUSED)
                 return
             else:
                 self.warning("%4d: unhandled URLError with code %d" % (self._id, code))
-                self.emit('stopped', client.STOPPED_CONNECT_ERROR)
+                self.emit('stopped', self._id, client.STOPPED_CONNECT_ERROR)
                 return
         except socket.error, (code, msg):
             if code == 104:
                 # Connection reset by peer
                 self.warning("%4d: %s" % (self._id, msg))
-                self.emit('stopped', client.STOPPED_CONNECT_ERROR)
+                self.emit('stopped', self._id, client.STOPPED_CONNECT_ERROR)
                 return
             else:
                 self.warning("%4d: unhandled socket.error with code %d" % (self._id, code))
-                self.emit('stopped', self.stopped_CONNECT_ERROR)
+                self.emit('stopped', self._id, self.stopped_CONNECT_ERROR)
                 return
         if not self._fd:
            self.warning("%4d: didn't get fd from urlopen" % self._id)
-           self.emit('stopped', self.stopped_CONNECT_ERROR)
+           self.emit('stopped', self._id, self.stopped_CONNECT_ERROR)
            return
               
         delta = self.next_read_time() - self._start_time
@@ -144,8 +144,10 @@ class HTTPClient(gobject.GObject, log.Loggable):
             sys.exit(1)
 
         if len(data) == 0:
-            self.warning("zero bytes readm closing")
+            self.warning("zero bytes read, closing")
             self.close(client.STOPPED_READ_ERROR)
+            return False
+
         #print "%4d: %d bytes read" % (self._id, len(data))
         self._bytes += len(data)
         #if not self.verify(data):
@@ -183,7 +185,7 @@ class HTTPClient(gobject.GObject, log.Loggable):
 
     def close(self, reason):
         'close the connection'
-        self.emit('stopped', reason)
+        self.emit('stopped', self._id, reason)
 
 class HTTPClientStatic(HTTPClient):
     """

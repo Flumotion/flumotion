@@ -269,7 +269,9 @@ class AdminHeaven(pb.Root, log.Loggable):
         """
         self.vishnu = vishnu
         self.clients = [] # all AdminAvatars we instantiate
-        log.addLogHandler(self.logHandler)
+        #FIXME: don't add a log handler here until we have a good way
+        #of filtering client-side again
+        #log.addLogHandler(self.logHandler)
         self.logcache = []
 
     def logHandler(self, category, type, message):
