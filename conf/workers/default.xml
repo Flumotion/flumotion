@@ -1,0 +1,28 @@
+<worker>
+<!--
+You can override the name of the worker, which will typically be
+hostname:(xmlfilename)
+<worker name="default">
+-->
+
+    <manager>
+<!--
+      This specifies what manager to log in to.
+      Compare with command-line options.
+
+      <host></host>
+      <port></port>
+      <transport></transport>
+-->
+    </manager>
+
+    <authentication type="plaintext">
+<!--
+      This specifies what authentication to use to log in.
+      Compare with command-line options.
+-->
+      <username>test</username>
+      <password>test</password>
+    </authentication>
+
+</worker>
