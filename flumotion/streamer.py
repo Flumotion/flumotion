@@ -86,8 +86,11 @@ class StreamingResource(resource.Resource):
             caps = gst.caps_from_string(caps)
             structure = caps[0]
             # XXX: dict(structure) should work
-            self.caps = '%s;boundary=%s' % (structure.get_name(),
-                                            structure.get_string('boundary'))
+            if structure.has_field('boundary'):
+                self.caps = '%s;boundary=%s' % (structure.get_name(),
+                                                structure.get_string('boundary'))
+            else:
+                self.caps = structure.get_name()
             
         buf = str(buffer(gbuffer))
         for request in self.current_requests:
