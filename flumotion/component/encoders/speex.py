@@ -18,15 +18,13 @@
 from flumotion.component import feedcomponent
 
 class Speex(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, feeders, pipeline):
+    def __init__(self, name, eaters, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     eaters,
                                                     ['default'],
                                                     pipeline)
 
 def createComponent(config):
-    source = config['source']
-
     component = Speex(config['name'], [config['source']],
                        "speexenc name=encoder")
     

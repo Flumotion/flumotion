@@ -411,8 +411,8 @@ class Speex(AudioEncoder):
     icon = 'xiphfish.png'
     
     def setup(self):
-        self.spinbutton_bitrate.set_range(6000, 250001)
-        self.spinbutton_bitrate.set_value(64000)
+        self.spinbutton_bitrate.set_range(2150, 30000)
+        self.spinbutton_bitrate.set_value(11000)
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
         options['bitrate'] = int(self.spinbutton_bitrate.get_value())

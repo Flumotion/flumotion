@@ -1,3 +1,10 @@
+2004-10-18  Wim Taymans  <wim@fluendo.com>
+
+	* flumotion/component/encoders/speex.py:
+	* flumotion/wizard/steps.py:
+	Fix speex encoding.
+	Set bitrate property range to sane values.
+
 2004-10-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/main.py:
