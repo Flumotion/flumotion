@@ -21,6 +21,7 @@
 from twisted.spread import pb
 
 from flumotion.twisted import pbutil
+from flumotion.utils import log
 
 class ComponentView(pb.Copyable):
     def __init__(self, component):
@@ -31,6 +32,11 @@ class ComponentView(pb.Copyable):
         self.options = component.options.dict
 
 class RemoteComponentView(pb.RemoteCopy):
+    def __cmp__(self, other):
+        if not isinstance(other, RemoteComponentView):
+            return False
+        return cmp(self.name, other.name)
+    
     def __repr__(self):
         return '<RemoteComponentView %s>' % self.name
 pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
@@ -39,6 +45,9 @@ class AdminPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller):
         self.controller = controller
 
+    def msg(self, msg):
+        log.msg('admin', msg)
+        
     def getClients(self):
         return map(ComponentView,
                    self.controller.components.values())
@@ -51,11 +60,19 @@ class AdminPerspective(pbutil.NewCredPerspective):
 
     def attached(self, mind):
         self.mind = mind
+        ip = self.mind.broker.transport.getPeer()[1]
+        self.msg('Client from %s attached' % ip)
 
         self.mind.callRemote('initial', self.getClients())
 
     def detached(self, mind):
-        self.mind.callRemote('shutdown')
+        ip = self.mind.broker.transport.getPeer()[1]
+        self.msg('Client from %s detached' % ip)
+        
+        try:
+            self.mind.callRemote('shutdown')
+        except pb.DeadReferenceError:
+            pass
 
 class Admin(pb.Root):
     def __init__(self, controller):

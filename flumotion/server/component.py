@@ -110,7 +110,7 @@ class BaseComponent(pb.Referenceable):
     def feed_state_change_cb(self, element, old, state, feed):
         self.msg('state-changed %s %s' % (element.get_path_string(),
                                           gst.element_state_get_name(state)))
-        self.callRemote('stateChanged', feed, old, state)
+        self.callRemote('stateChanged', feed, state)
 
     def set_state_and_iterate(self, state):
         retval = self.pipeline.set_state(state)

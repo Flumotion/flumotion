@@ -239,8 +239,11 @@ class Launcher:
                 if protocol == 'http':
                     assert c.has_option(section, 'port')
                     port = c.getint(section, 'port')
+                    #component = streamer.MultifdSinkStreamer(name, sources)
+                    #factory = server.Site(resource=streamer.NewStreamingResource(component))
                     component = streamer.FakeSinkStreamer(name, sources)
                     factory = server.Site(resource=streamer.StreamingResource(component))
+                    self.msg('Starting http factory at port %d' % port)
                     self.start_streamer(component, factory, port)
                 elif protocol == 'file':
                     assert c.has_option(section, 'location')
@@ -417,8 +420,9 @@ def run_component(name, args):
         klass = Converter
         args = (options.name, options.sources, options.feeds, options.pipeline)
     elif name == 'streamer':
+        # IGNORE THIS
         if options.protocol == 'http':
-            web_factory = server.Site(resource=StreamingResource(component))
+            web_factory = server.Site(resource=streamer.StreamingResource(component))
             reactor.listenTCP(options.listen_port, web_factory)
             klass = streamer.FakeSinkStreamer
             args = (options.name, options.sources)

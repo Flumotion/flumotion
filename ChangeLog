@@ -1,3 +1,16 @@
+2004-06-25  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/streamer.py: New streamers and stuff
+
+	* flumotion/server/admin.py (RemoteComponentView.__cmp__):
+	Implement, check only name attribute for now
+
+	* flumotion/gui/adminclient.py
+	(AdminInterface.remote_componentAdded): Make it somewhat work to
+	reconnect component and add some new columns
+
+	* data/ui/admin.glade: Remove textview for now
+
 2004-06-24  Johan Dahlin  <johan@gnome.org>
 
 	* conf/complex.conf: New configuration, in preparation

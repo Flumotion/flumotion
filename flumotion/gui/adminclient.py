@@ -22,6 +22,7 @@ import os
 import sys
 
 import gobject
+import gst
 import gtk
 import gtk.glade
 
@@ -29,6 +30,7 @@ from twisted.internet import gtk2reactor
 gtk2reactor.install()
 
 from twisted.internet import reactor
+from twisted.python import log
 from twisted.spread import pb
 
 from flumotion.twisted import pbutil
@@ -52,11 +54,12 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
     def remote_componentAdded(self, component):
         print 'componentAdded', component
         print self.clients
-         self.clients.append(component)
+        self.clients.append(component)
         self.emit('update', self.clients)
         
     def remote_componentRemoved(self, component):
         print 'componentRemoved', component
+        print component
         print self.clients
         self.clients.remove(component)
         self.emit('update', self.clients)
@@ -71,9 +74,9 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
 gobject.type_register(AdminInterface)
 
 class Window:
-    def __init__(self, gladedir, port):
+    def __init__(self, gladedir, host, port):
         self.gladedir = gladedir
-        self.connect(port)
+        self.connect(host, port)
         self.create_ui()
         
     def create_ui(self):
@@ -82,31 +85,51 @@ class Window:
         window.connect('delete-event', self.close)
         window.show_all()
         self.component_view = self.wtree.get_widget('component_view')
-        self.component_model = gtk.ListStore(str)
+        self.component_model = gtk.ListStore(str, int, str, str)
         self.component_view.set_model(self.component_model)
 
-        col = gtk.TreeViewColumn('', gtk.CellRendererText(), text=0)
+        col = gtk.TreeViewColumn('Name', gtk.CellRendererText(), text=0)
         self.component_view.append_column(col)
         
+        col = gtk.TreeViewColumn('Pid', gtk.CellRendererText(), text=1)
+        self.component_view.append_column(col)
+
+        col = gtk.TreeViewColumn('Status', gtk.CellRendererText(), text=2)
+        self.component_view.append_column(col)
+
+        col = gtk.TreeViewColumn('IP', gtk.CellRendererText(), text=3)
+        self.component_view.append_column(col)
+
         self.wtree.signal_autoconnect(self)
 
     def connected_cb(self, admin):
-        for client in admin.clients:
-            iter = self.component_model.append()
-            self.component_model.set(iter, 0, client.name)
+        self.update(admin.clients)
 
     def update_cb(self, admin, clients):
+        self.update(clients)
+
+    def update(self, orig_clients):
         model = self.component_model
         model.clear()
+
+        # Make a copy
+        clients = orig_clients[:]
+        clients.sort()
+        
         for client in clients:
             iter = model.append()
             model.set(iter, 0, client.name)
-        
-    def connect(self, port):
+            pid = client.options.get('pid', -1)
+            model.set(iter, 1, pid)
+            state_name = gst.element_state_get_name(client.state)
+            model.set(iter, 2, state_name)
+            model.set(iter, 3, client.options.get('ip', '?'))
+            
+    def connect(self, host, port):
         self.admin = AdminInterface()
         self.admin.connect('connected', self.connected_cb)
         self.admin.connect('update', self.update_cb)
-        reactor.connectTCP('localhost', port, self.admin.factory)
+        reactor.connectTCP(host, port, self.admin.factory)
         
     def menu_quit_cb(self, button):
         self.close()
@@ -115,8 +138,11 @@ class Window:
         reactor.stop()
 
 def main(args, gladedir='../../data/ui'):
-    port = int(args[1])
-    win = Window(gladedir, port)
+    log.startLogging(sys.stdout)
+    
+    host = args[1]
+    port = int(args[2])
+    win = Window(gladedir, host, port)
     reactor.run()
     
 if __name__ == '__main__':

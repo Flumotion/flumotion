@@ -128,16 +128,16 @@ class ComponentPerspective(pbutil.NewCredPerspective):
     def callRemote(self, name, *args, **kwargs):
         self.msg('Calling remote method %s%r' % (name, args))
         try:
-            cb = self.mind.callRemote(name, *args, **kwargs)
+            return self.mind.callRemote(name, *args, **kwargs)
         except pb.DeadReferenceError :
             self.mind = None
             self.detached()
-
-        return cb
+            return
 
     def cb_register(self, options, cb):
         for key, value in options.items():
             setattr(self.options, key, value)
+            print self, key, '=', value
         self.options.dict = options
         
         self.controller.componentRegistered(self)
@@ -162,19 +162,21 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         cb.addErrback(self.cb_checkPipelineError)
         cb.addErrback(self.cb_checkAll)
         
-    def detached(self, mind):
+    def detached(self, mind=None):
         self.msg('detached')
         name = self.getName()
         if self.controller.hasComponent(name):
             self.controller.removeComponent(self)
 
-    def perspective_stateChanged(self, feed, old, state):
+    def perspective_stateChanged(self, feed, state):
         #self.msg('stateChanged :%s %s' % (feed,
         #                                  gst.element_state_get_name(state)))
         
         self.state = state
         if self.state == gst.STATE_PLAYING:
             self.msg('%s is now playing' % feed)
+
+        if self.getFeeds():
             self.controller.startPendingComponents(self, feed)
             
     def perspective_error(self, element, error):
@@ -392,7 +394,6 @@ class Controller(pb.Root):
             raise KeyError, component_name
             
         self.components[component_name] = component
-        self.admin.componentAdded(component)
         
     def removeComponent(self, component):
         """removes a component
@@ -505,6 +506,7 @@ class Controller(pb.Root):
     def componentRegistered(self, component):
         component.msg('in componentRegistered')
     
+        self.admin.componentAdded(component)
         self.feed_manager.addFeeds(component)
 
         sources = component.getSources()
@@ -535,6 +537,7 @@ class ControllerServerFactory(pb.PBServerFactory):
         self.portal = portal.Portal(self.dispatcher, [checker])
         pb.PBServerFactory.__init__(self, self.portal)
 
+    
     def __repr__(self):
         return '<ControllerServerFactory>'
 
