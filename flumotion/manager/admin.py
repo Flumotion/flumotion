@@ -254,27 +254,6 @@ class AdminHeaven(base.ManagerHeaven):
         
     ### my methods
 
-    # FIXME: all of these could be generalized instead of implementing them
-    # every step of the way
-    # FIXME: deprecated, using state now
-    def componentAdded(self, component):
-        """
-        Tell all created AdminAvatars that a component was added.
-
-        @type component: L{flumotion.manager.component.ComponentAvatar}
-        """
-        for avatar in self.getAvatars():
-            avatar.componentAdded(component)
-
-    def componentRemoved(self, component):
-        """
-        Tell all created AdminAvatars that a component was removed.
-
-        @type component: L{flumotion.manager.component.ComponentAvatar}
-        """
-        for avatar in self.getAvatars():
-            avatar.componentRemoved(component)
-            
 # FIXME: deprecated; use avatarsCallRemote and use moods
     def componentStateChanged(self, component, state):
         """
