@@ -42,6 +42,7 @@ epydoc
 
 ISSUES
 ------
+
 Some issues have been brought to our attention.  Please take note if you
 run into them:
 - locales with a comma as a decimal point trigger problems in the XML parsing.
@@ -112,6 +113,7 @@ https://core.fluendo.com/tracker/
 
 LICENSING
 ---------
+
 This version of the Flumotion Streaming Server is dual-licensed.
 
 The GPL applies to all code files shipped with this version.
