@@ -1,0 +1,64 @@
+<root>
+  <component name="cinema-camera" type="producer">
+    <pipeline>
+       dv1394src ! dvdec name=dec drop-factor=2 ! video/x-raw-yuv,format=(fourcc)YUY2 ! 
+         videorate ! videoscale ! video/x-raw-yuv,width=384,height=288 ! 
+         videoscale ! video/x-raw-yuv,width=384,height=268,framerate=12.5,format=(fourcc)YUY2 ! :video 
+       dec. ! audio/x-raw-int ! audiorate ! 
+         audioscale ! audio/x-raw-int,rate=24000 ! :audio
+    </pipeline>
+    <feed>video</feed>
+    <feed>audio</feed>
+  </component>
+    
+  <component name="cinema-with-overlay" type="converter">
+    <source>cinema-camera:video</source>
+    <pipeline>
+       filesrc location=cinema_384x268.png blocksize=10000 ! pngdec ! 
+         alphacolor ! videomixer name=mix ! :default
+       @cinema-camera:video ! video/x-raw-yuv,width=384,height=268,framerate=12.5 ! ffmpegcolorspace ! alpha ! mix. 
+    </pipeline>
+  </component>
+  
+  <component name="cinema-theora" type="converter">
+    <source>cinema-with-overlay</source>
+    <pipeline>ffmpegcolorspace ! theoraenc bitrate=300</pipeline>
+  </component>
+
+  <component name="cinema-vorbis" type="converter">
+    <source>cinema-camera:audio</source>
+    <pipeline>audioconvert ! rawvorbisenc bitrate=32000</pipeline>
+  </component>
+
+  <component name="cinema-vorbis-high" type="converter">
+    <source>cinema-camera:audio</source>
+    <pipeline>audioconvert ! rawvorbisenc bitrate=128000</pipeline>
+  </component>
+
+  <component name="cinema-ogg-vorbis-high" type="converter">
+    <source>cinema-vorbis-high</source>
+    <pipeline>oggmux</pipeline>
+  </component>
+
+  <component name="cinema-ogg-theora-vorbis" type="converter">
+    <source>cinema-theora</source>
+    <source>cinema-vorbis</source>
+    <pipeline>
+          { @cinema-vorbis } { @cinema-theora } 
+          cinema-vorbis. ! queue max-size-buffers=16 ! oggmux name=mux 
+          cinema-theora. ! queue max-size-buffers=16 ! mux. mux.
+    </pipeline>
+  </component>
+
+  <component name="cinema-file-ogg-theora-vorbis" type="file-dumper">
+    <source>cinema-ogg-theora-vorbis</source>
+    <auth-port>8900</auth-port>
+    <location>dump/theora_vorbis_%s.ogg</location>
+  </component>
+
+  <component name="cinema-file-ogg-vorbis-high" type="file-dumper">
+    <source>cinema-ogg-vorbis-high</source>
+    <auth-port>8901</auth-port>
+    <location>dump/vorbis_high_%s.ogg</location>
+  </component>
+</root>
