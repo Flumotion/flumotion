@@ -20,3 +20,7 @@
 
 class PipelineParseError(Exception):
     pass
+        
+class OptionError(Exception):
+    pass
+

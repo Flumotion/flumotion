@@ -19,9 +19,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import os
-import optik
 import socket
-import sys
 
 import gst
 import gobject
@@ -65,6 +63,9 @@ class BaseComponent(pb.Referenceable):
     def msg(self, *args):
         log.msg(self.kind, *args)
 
+    def warn(self, *args):
+        log.warning(self.kind, *args)
+        
     def get_pipeline(self, pipeline):
         sources = self.getSources()
         if pipeline == '' and not sources:
@@ -236,88 +237,3 @@ class BaseComponent(pb.Referenceable):
 
     def remote_pause(self):
         self.pipeline_pause()
-        
-class OptionError(Exception):
-    pass
-    
-def get_options_for(kind, args):
-    if kind == 'producer':
-        need_pipeline = True
-        need_sources = False
-    elif kind == 'converter':
-        need_pipeline = True
-        need_sources = True
-    elif kind == 'streamer':
-        need_pipeline = False
-        need_sources = True
-    else:
-        raise AssertionError
-    
-    parser = optik.OptionParser()
-    parser.add_option('-c', '--controller-host',
-                      action="store", type="string", dest="host",
-                      default="localhost",
-                      help="Controller to connect to [default localhost]")
-    parser.add_option('', '--controller-port',
-                      action="store", type="int", dest="port",
-                      default=8890,
-                      help="Controller port to connect to [default 8890]")
-    parser.add_option('-n', '--name',
-                      action="store", type="string", dest="name",
-                      default=None,
-                      help="Name of component")
-    if need_pipeline:
-        parser.add_option('-p', '--pipeline',
-                          action="store", type="string", dest="pipeline",
-                          default=None,
-                          help="Pipeline to run")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="Be verbose")
-
-    if need_sources:
-        parser.add_option('-s', '--sources',
-                          action="store", type="string", dest="sources",
-                          default="",
-                          help="Host sources to get data from, separated by ,")
-
-    if kind == 'streamer':
-        parser.add_option('-p', '--protocol',
-                          action="store", type="string", dest="protocol",
-                          default="http",
-                          help="Protocol to use [default http]")
-        parser.add_option('-o', '--listen-port',
-                          action="store", type="int", dest="listen_port",
-                          default=8080,
-                          help="Port to bind to [default 8080]")
-        
-    # Eek, strip out gst options
-    args = [arg for arg in args if not arg.startswith('--gst')]
-        
-    options, args = parser.parse_args(args)
-
-    if options.name is None:
-        raise OptionError, 'Need a name'
-    elif need_pipeline and options.pipeline is None:
-        raise OptionError, 'Need a pipeline'
-    elif need_sources and options.sources is None:
-        raise OptionError, 'Need a source'
-    elif kind == 'streamer':
-        if not options.protocol:
-            raise OptionError, 'Need a protocol'
-        elif not options.listen_port:
-            raise OptionError, 'Need a listen_port'
-            return 2
-        
-#    if options.verbose:
-#        log.startLogging(sys.stdout)
-
-    if need_sources:
-        if ',' in  options.sources:
-            options.sources = options.sources.split(',')
-        else:
-            options.sources = [options.sources]
-    else:
-        options.sources = []
-        
-    return options

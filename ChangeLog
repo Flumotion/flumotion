@@ -1,3 +1,10 @@
+2004-06-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/launcher.py (main): Merge in all command line
+	parsing from other files in here. Improve logging.
+
+	* flumotion/errors.py: Move OptionError here
+
 2004-06-11  Johan Dahlin  <johan@gnome.org>
 
 	* configure.ac (PYGTK_REQ): Require 2.0.0.

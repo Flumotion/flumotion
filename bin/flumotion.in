@@ -10,7 +10,7 @@ pygtk.require('2.0')
 
 import gobject
 
-if getattr(gobject, 'pygtk_version', (0, 0, 0)) < (2, 3, 93):
+if getattr(gobject, 'pygtk_version', ()) < (2, 3, 93):
     print "PyGTK 2.3.93 or higher required"
     raise SystemExit
 

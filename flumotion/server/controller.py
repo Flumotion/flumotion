@@ -231,6 +231,14 @@ class Controller(pb.Root):
         else:
             return False
 
+    def isComponentStarted(self, component_name):
+        if not self.hasComponent(component_name):
+            return False
+
+        component = self.components[component_name]
+
+        return component.started == True
+    
     def getFreePort(self):
         start = self.last_free_port
         fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -289,14 +297,6 @@ class Controller(pb.Root):
 
         del self.components[component_name]
 
-    def isComponentStarted(self, component_name):
-        if not self.hasComponent(component_name):
-            return False
-
-        component = self.components[component_name]
-
-        return component.started == True
-    
     def getSourceComponents(self, component):
         """Retrives the source components for component
 

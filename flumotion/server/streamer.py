@@ -22,24 +22,12 @@ import os
 import sys
 import string
 
-if __name__ == '__main__':
-    import gstreactor
-    gstreactor.install()
-
 import gobject
 import gst
 from twisted.web import server, resource
 from twisted.internet import reactor
 
 from flumotion.server import component
-from flumotion.utils import log
-from flumotion import errors
-
-def msg(*args):
-    log.msg('streamer', *args)
-    
-def warn(*args):
-    log.warning('streamer', *args)
 
 class Streamer(gobject.GObject, component.BaseComponent):
     __gsignals__ = {
@@ -59,12 +47,12 @@ class Streamer(gobject.GObject, component.BaseComponent):
         self.emit('data-received', buffer)
         
     def notify_caps_cb(self, element, pad, param):
-        msg('Got caps: %s' % pad.get_negotiated_caps())
+        self.msg('Got caps: %s' % pad.get_negotiated_caps())
         
         if not self.caps is None:
-            warn('Already had caps: %s, replacing' % self.caps)
+            self.warn('Already had caps: %s, replacing' % self.caps)
 
-        msg('Storing caps: %s' % pad.get_negotiated_caps())
+        self.msg('Storing caps: %s' % pad.get_negotiated_caps())
         self.caps = pad.get_negotiated_caps()
 
     # connect() is already taken by gobject.GObject
@@ -85,6 +73,7 @@ class StreamingResource(resource.Resource):
         resource.Resource.__init__(self)
         self.streamer = streamer
         self.streamer.connect('data-received', self.data_received_cb)
+        self.msg = streamer.msg
         
         self.current_requests = []
         self.buffer_queue = []
@@ -97,11 +86,11 @@ class StreamingResource(resource.Resource):
     def data_received_cb(self, transcoder, gbuffer):
         s = str(buffer(gbuffer))
         if gbuffer.flag_is_set(gst.BUFFER_IN_CAPS):
-            msg('Received a GST_BUFFER_IN_CAPS buffer')
+            self.msg('Received a GST_BUFFER_IN_CAPS buffer')
             self.caps_buffers.append(s)
         else:
             if not self.first_buffer:
-                msg('Received the first buffer')
+                self.msg('Received the first buffer')
                 self.first_buffer = gbuffer
             self.buffer_queue.append(s)
                                              
@@ -117,35 +106,35 @@ class StreamingResource(resource.Resource):
         return self
 
     def lost(self, obj, request):
-        msg('client from %s disconnected' % request.getClientIP()) 
+        self.msg('client from %s disconnected' % request.getClientIP()) 
         self.current_requests.remove(request)
 
     def isReady(self):
         if self.streamer.caps is None:
-            msg('We have no caps yet')
+            self.msg('We have no caps yet')
             return False
         
         if self.first_buffer is None:
-            msg('We still haven\'t received any buffers')
+            self.msg('We still haven\'t received any buffers')
             return False
 
         return True
         
     def render(self, request):
-        msg('client from %s connected' % request.getClientIP())   
+        self.msg('client from %s connected' % request.getClientIP())   
         if not self.isReady():
-            msg('Not sending data, it\'s not ready')
+            self.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
         mime = self.streamer.caps.get_structure(0).get_name()
         if mime == 'multipart/x-mixed-replace':
-            msg('setting Content-type to %s but with camserv hack' % mime)
+            self.msg('setting Content-type to %s but with camserv hack' % mime)
             # Stolen from camserv
             request.setHeader('Cache-Control', 'no-cache')
             request.setHeader('Cache-Control', 'private')
             request.setHeader("Content-type", "%s;boundary=ThisRandomString" % mime)
         else:
-            msg('setting Content-type to %s' % mime)
+            self.msg('setting Content-type to %s' % mime)
             request.setHeader('Content-type', mime)
         
         for buffer in self.caps_buffers:
@@ -155,24 +144,4 @@ class StreamingResource(resource.Resource):
         request.notifyFinish().addBoth(self.lost, request)
         
         return server.NOT_DONE_YET
-
-def main(args):
-    options = component.get_options_for('streamer', args)
-    try:
-        client = Streamer(options.name, options.sources)
-    except errors.PipelineParseError, e:
-        print 'Bad pipeline: %s' % e
-        raise SystemExit
-    
-    if options.protocol == 'http':
-        web_factory = server.Site(resource=StreamingResource(client))
-    else:
-        print 'Only http protcol supported right now'
-
-    reactor.connectTCP(options.host, options.port, client.factory)
-    reactor.listenTCP(options.listen_port, web_factory)
-    reactor.run()
-
-if __name__ == '__main__':
-    sys.exit(main(sys.argv))
 
