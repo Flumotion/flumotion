@@ -108,6 +108,11 @@ def gobject_set_property(object, property, value):
     object.set_property(property, value)
 
 def gsignal(name, *args):
+    """
+    Add a GObject signal to the current object.
+    @type name: string
+    @type args: mixed
+    """
     frame = sys._getframe(1)
     locals = frame.f_locals
     

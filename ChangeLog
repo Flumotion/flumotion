@@ -1,5 +1,12 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/server/manager.py:
+	* flumotion/utils/gstutils.py:
+	* flumotion/utils/log.py:
+	  documentation and method renaming/ordering
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/reference/Makefile.am:
 	  add check-local that lets us know what we forgot
 	* doc/reference/gendoc.py:

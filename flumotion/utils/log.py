@@ -26,7 +26,7 @@ This module provides logging to Flumotion components.
 Just like in GStreamer, five levels are defined.
 These are, in order of decreasing verbosity: log, debug, info, warning, error.
 
-API Stability: unstable
+API Stability: stabilizing
 
 Maintainer: U{Thomas Vander Stichele <thomas at apestaart dot org>}
 """
@@ -51,27 +51,27 @@ class Loggable:
     logCategory = 'default'
     
     def error(self, *args):
-        "Log an error.  By default this will also raise an exception."""
+        """Log an error.  By default this will also raise an exception."""
         error(self.logCategory, self.logFunction(*args))
         
     def warning(self, *args):
-        "Log a warning.  Used for non-fatal problems."
+        """Log a warning.  Used for non-fatal problems."""
         warning(self.logCategory, self.logFunction(*args))
         
     def info(self, *args):
-        "Log an informational message.  Used for normal operation."
+        """Log an informational message.  Used for normal operation."""
         info(self.logCategory, self.logFunction(*args))
 
     def debug(self, *args):
-        "Log a debug message.  Used for debugging."
+        """Log a debug message.  Used for debugging."""
         debug(self.logCategory, self.logFunction(*args))
 
     def log(self, *args):
-        "Log a log message.  Used for debugging recurring events."
+        """Log a log message.  Used for debugging recurring events."""
         log(self.logCategory, self.logFunction(*args))
 
     def logFunction(self, message):
-        "Overridable log function.  Default just returns passed message."
+        """Overridable log function.  Default just returns passed message."""
         return message
 
 # environment variables controlling levels for each category
@@ -123,13 +123,25 @@ def registerCategory(category):
     _categories[category] = level
 
 def stderrHandler(category, level, message):
+    """
+    A log handler that writes to stdout.
+
+    @type category: string
+    @type level: string
+    @type message: string
+    """
     sys.stderr.write('%s %-8s %-15s %s\n' % (time.strftime("%b %d %H:%M:%S"), level + ':', category + ':' , message))
     sys.stderr.flush()
 
 def stderrHandlerLimited(category, level, message):
     """
-    Logs the message only when the message's level is not more verbose
+    A log handler that writes to stdout only when the message's level is
+    not more verbose
     than the registered level for this category, as specified by FLU_DEBUG.
+
+    @type category: string
+    @type level: string
+    @type message: string
     """
     global _categories
     if not _categories.has_key(category):
@@ -155,21 +167,39 @@ def error(cat, *args):
     raise errors.SystemError(msg)
 
 def warning(cat, *args):
+    """
+    Log a warning message in the given category.
+    This is used for non-fatal problems.
+    """
     _handle(cat, 'WARNING', ' '.join(args))
 
 def info(cat, *args):
+    """
+    Log an informational message in the given category.
+    """
     _handle(cat, 'INFO', ' '.join(args))
 
 def debug(cat, *args):
+    """
+    Log a debug message in the given category.
+    """
     _handle(cat, 'DEBUG', ' '.join(args))
 
 def log(cat, *args):
+    """
+    Log a log message.  Used for debugging recurring events.
+    """
     _handle(cat, 'LOG', ' '.join(args))
 
 def addLogHandler(func):
+    """Add a custom log handler."""
     _log_handlers.append(func)
 
 def init():
+    """
+    Initialize the logging system and parse the FLU_DEBUG environment variable.
+    Needs to be called before starting the actual application.
+    """
     if os.environ.has_key('FLU_DEBUG'):
         # install a log handler that uses the value of FLU_DEBUG
         setFluDebug(os.environ['FLU_DEBUG'])

@@ -25,7 +25,7 @@ API Stability: semi-stable
 Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """
 
-__all__ = ['ComponentPerspective', 'Manager', 'ManagerServerFactory']
+__all__ = ['ComponentAvatar', 'Manager', 'ManagerServerFactory']
 
 import gst
 
@@ -94,7 +94,11 @@ class Options:
     """dummy class for storing manager side options of a component"""
 
 class ComponentAvatar(pb.Avatar, log.Loggable):
-    """Manager side avatar of component"""
+    """
+    Manager-side avatar for a component.
+    Each component that logs in to the manager gets an avatar created for it
+    in the manager.
+    """
 
     logCategory = 'comp-avatar'
 
@@ -107,15 +111,94 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         self.started = False
         self.starting = False
         
+    ### python methods
     def __repr__(self):
         return '<%s %s in state %s>' % (self.__class__.__name__,
                                         self.getName(),
                                         gst.element_state_get_name(self.state))
 
+    ### log.Loggable methods
     def logFunction(self, arg):
         return self.getName() + ': ' + arg
 
+    ### ComponentAvatar methods
+
+    # mind functions
+    def _mindCallRemote(self, name, *args, **kwargs):
+        self.debug('calling remote method %s%r' % (name, args))
+        try:
+            return self.mind.callRemote(name, *args, **kwargs)
+        except pb.DeadReferenceError:
+            self.mind = None
+            self.detached()
+            return
+
+    # general fallback for unhandled errors so we detect them
+    # FIXME: we can't use this since we want a PropertyError to fall through
+    # afger going through the PropertyErrback.
+    def _mindErrback(self, failure, ignores = None):
+        if ignores:
+            for ignore in ignores:
+                if isinstance(failure, ignore):
+                    return failure
+        self.warning("Unhandled remote call error: %s" % failure.getErrorMessage())
+        self.warning("raising '%s'" % str(failure.type))
+        return failure
+
+    # we create this errback just so we can interject a message inbetween
+    # to make it clear the Traceback line is fine.
+    # When this is fixed in Twisted we can just remove the errback and
+    # the error will still get sent back correctly to admin.
+    def _mindPropertyErrback(self, failure):
+        failure.trap(errors.PropertyError)
+        print "Ignore the following Traceback line, issue in Twisted"
+        return failure
+
+    def _mindRegisterCallback(self, options):
+        for key, value in options.items():
+            setattr(self.options, key, value)
+        self.options.dict = options
+        
+        self.manager.componentRegistered(self)
+                
+    def _mindPipelineErrback(self, failure):
+        failure.trap(errors.PipelineParseError)
+        self.error('Invalid pipeline for component')
+        self._mindCallRemote('stop')
+        return None
+
+    def attached(self, mind):
+        """
+        Tell the avatar that the given mind has been attached.
+        This gives the avatar a way to call remotely to the client that
+        requested this avatar.
+        This is scheduled by the portal after the client has logged in.
+
+        @type mind: L{twisted.spread.pb.RemoteReference}
+        """
+        self.debug('mind attached, calling remote register()')
+        self.mind = mind
+        
+        d = self._mindCallRemote('register')
+        d.addCallback(self._mindRegisterCallback)
+        d.addErrback(self._mindPipelineErrback)
+        d.addErrback(self._mindErrback)
+        
+    def detached(self, mind=None):
+        """
+        Tell the avatar that the given mind has been detached.
+
+        @type mind: L{twisted.spread.pb.RemoteReference}
+        """
+        self.debug('detached')
+        name = self.getName()
+        if self.manager.hasComponent(name):
+            self.manager.removeComponent(self)
+
     def getTransportPeer(self):
+        """
+        Get the IPv4 address of the machine the component runs on.
+        """
         return self.mind.broker.transport.getPeer()
 
     def getSources(self):
@@ -146,78 +229,37 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         assert self.listen_ports[feed] != -1, self.listen_ports
         return self.listen_ports[feed]
 
-    def _mindCallRemote(self, name, *args, **kwargs):
-        self.debug('calling remote method %s%r' % (name, args))
-        try:
-            return self.mind.callRemote(name, *args, **kwargs)
-        except pb.DeadReferenceError:
-            self.mind = None
-            self.detached()
-            return
-    # general fallback for unhandled errors so we detect them
-    # FIXME: we can't use this since we want a PropertyError to fall through
-    # afger going through the PropertyErrback.
-    def _mindErrback(self, failure, ignores = None):
-        if ignores:
-            for ignore in ignores:
-                if isinstance(failure, ignore):
-                    return failure
-        self.warning("Unhandled remote call error: %s" % failure.getErrorMessage())
-        self.warning("raising '%s'" % str(failure.type))
-        return failure
-
-    # we create this errback just so we can interject a message inbetween
-    # to make it clear the Traceback line is fine.
-    # When this is fixed in Twisted we can just remove the errback and
-    # the error will still get sent back correctly to admin.
-    def _mindPropertyErrback(self, failure):
-        failure.trap(errors.PropertyError)
-        print "Ignore the following Traceback line, issue in Twisted"
-        return failure
-
-    def cb_register(self, options, cb):
-        for key, value in options.items():
-            setattr(self.options, key, value)
-        self.options.dict = options
-        
-        self.manager.componentRegistered(self)
-
-    def cb_checkOther(self, failure):
-        try:
-            self.error(str(failure))
-        except errors.SystemError, e:
-            print 'ERROR:', e
-
-        raise failure
-        #self._mindCallRemote('stop')
-        return None
-                
-    def cb_checkPipelineError(self, failure):
-        failure.trap(errors.PipelineParseError)
-        self.error('Invalid pipeline for component')
-        self._mindCallRemote('stop')
-        return None
-
-    def attached(self, mind):
-        #debug('%s attached, calling register()' % self.getName())
-        self.mind = mind
-        
-        cb = self._mindCallRemote('register')
-        cb.addCallback(self.cb_register, cb)
-        cb.addErrback(self.cb_checkPipelineError)
-        cb.addErrback(self.cb_checkOther)
-        
-    def detached(self, mind=None):
-        self.debug('detached')
-        name = self.getName()
-        if self.manager.hasComponent(name):
-            self.manager.removeComponent(self)
-
     def stop(self):
-        cb = self._mindCallRemote('stop')
-        cb.addErrback(lambda x: None)
-        
+        """
+        Tell the avatar to stop the component.
+        """
+        d = self._mindCallRemote('stop')
+        d.addErrback(lambda x: None)
+            
+    def link(self, sources, feeds):
+        def _getFreePortsCallback((feeds, ports)):
+            self.listen_ports = ports
+            d = self._mindCallRemote('link', sources, feeds)
+            d.addErrback(self._mindErrback)
+
+        if feeds:
+            d = self._mindCallRemote('getFreePorts', feeds)
+            d.addCallbacks(_getFreePortsCallback, self._mindErrback)
+        else:
+            d = self._mindCallRemote('link', sources, [])
+            d.addErrback(self._mindErrback)
+    
     def setElementProperty(self, element, property, value):
+        """
+        Set a property on an element.
+
+        @type element: string
+        @param element: the element to set the property on
+        @type property: string
+        @param property: the property to set
+        @type value: mixed
+        @param value: the value to set the property to
+        """
         if not element:
             msg = "%s: no element specified" % self.getName()
             self.warning(msg)
@@ -238,6 +280,14 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return cb
         
     def getElementProperty(self, element, property):
+        """
+        Get a property of an element.
+
+        @type element: string
+        @param element: the element to get the property of
+        @type property: string
+        @param property: the property to get
+        """
         if not element:
             msg = "%s: no element specified" % self.getName()
             self.warning(msg)
@@ -256,9 +306,20 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         cb.addErrback(self._mindErrback, (errors.PropertyError, ))
         return cb
 
-    def callComponentRemote(self, method_name, *args, **kwargs):
-        self.debug("calling component method %s" % method_name)
-        cb = self._mindCallRemote('callMethod', method_name, *args, **kwargs)
+    def callComponentRemote(self, method, *args, **kwargs):
+        """
+        Call a remote method on the component.
+        This is used so that admin clients can call methods from the interface
+        to the component.
+
+        @type method: string
+        @param method: the method to call.  On the component, this calls
+         component_(method)
+        @type args: mixed
+        @type kwargs: mixed
+        """
+        self.debug("calling component method %s" % method)
+        cb = self._mindCallRemote('callMethod', method, *args, **kwargs)
         cb.addErrback(self._mindErrback, (Exception, ))
         return cb
         
@@ -269,17 +330,29 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return failure
 
     def reloadComponent(self):
+        """
+        Tell the component to reload itself.
+
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
         cb = self._mindCallRemote('reloadComponent')
         cb.addErrback(self._reloadComponentErrback)
         cb.addErrback(self._mindErrback, (errors.ReloadSyntaxError, ))
         return cb
 
     def getUIEntry(self):
+        """
+        Request the UI entry for the component's UI.
+        The deferred returned will receive the code to run the UI.
+
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
         self.debug('calling remote getUIEntry')
         cb = self._mindCallRemote('getUIEntry')
-        cb.addErrback(self.cb_checkOther)
+        cb.addErrback(self._mindErrback)
         return cb
     
+    ### IPerspective methods
     def perspective_log(self, *msg):
         log.debug(self.getName(), *msg)
         
@@ -299,19 +372,6 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
 
     def perspective_uiStateChanged(self, component_name, state):
         self.manager.admin.uiStateChanged(component_name, state)
-        
-    def link(self, sources, feeds):
-        def cb_getFreePorts((feeds, ports)):
-            self.listen_ports = ports
-            cb = self._mindCallRemote('link', sources, feeds)
-            cb.addErrback(self.cb_checkOther)
-
-        if feeds:
-            cb = self._mindCallRemote('getFreePorts', feeds)
-            cb.addCallbacks(cb_getFreePorts, self.cb_checkOther)
-        else:
-            cb = self._mindCallRemote('link', sources, [])
-            cb.addErrback(self.cb_checkOther)
 
 class Feed:
     def __init__(self, name):
@@ -429,9 +489,12 @@ class Manager(pb.Root):
         """
         Creates a new avatar for a component, raises
         an AlreadyConnectedError if the component is already found in the cache
+        
         @type avatarID:  string
+
         @rtype:          L{server.manager.ComponentAvatar}
-        @returns:        the avatar for the component"""
+        @returns:        the avatar for the component
+        """
 
         if self.hasComponent(avatarID):
             raise errors.AlreadyConnectedError(avatarID)
@@ -590,9 +653,12 @@ class Manager(pb.Root):
         self.feed_manager.feedReady(feedname)
 
     def stopComponent(self, name):
-        """stops a component
+        """
+        Stops a component.
+        
         @type name:  string
-        @param name: name of the component"""
+        @param name: name of the component
+        """
 
         component = self.components[name]
         component.stop()
