@@ -102,6 +102,8 @@ class Source(wizard.WizardStep):
     def get_next(self):
         if self.checkbutton_has_video:
             video_source = self.combobox_video.get_active()
+            if video_source == VideoDevice.Firewire:
+                return 'Overlay'
             return video_source.step
         elif self.checkbutton_has_audio:
             audio_source = self.combobox_audio.get_active()
