@@ -1,5 +1,9 @@
 2005-03-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/ui/glade.py (GladeWindow.__init__): Make the parent
+	argument optional, so toplevel windows can descend from this
+	class.
+
 	* flumotion/admin/gtk/client.py (Window.file_export_configuration_cb) 
 	(Window.on_export_response, Window.getConfiguration_cb) 
 	(Window.file_import_configuration_cb, Window.on_import_response):

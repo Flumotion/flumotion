@@ -85,14 +85,14 @@ class GladeWindow(gobject.GObject):
     convenience wrappers.
     """
 
+    glade_dir = configure.gladedir
     glade_file = None
 
     window = None
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         gobject.GObject.__init__(self)
-        wtree = gtk.glade.XML(os.path.join(configure.gladedir,
-                                           self.glade_file))
+        wtree = gtk.glade.XML(os.path.join(self.glade_dir, self.glade_file))
         self.widgets = {}
         for widget in wtree.get_widget_prefix(''):
             wname = widget.get_name()
@@ -106,7 +106,8 @@ class GladeWindow(gobject.GObject):
                                      % (wname, self.widgets[wname], widget))
             self.widgets[wname] = widget
 
-        self.window.set_transient_for(parent)
+        if parent:
+            self.window.set_transient_for(parent)
 
         wtree.signal_autoconnect(self)
 
