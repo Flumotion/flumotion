@@ -38,6 +38,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         """
         self.heaven = heaven
         self.avatarId = avatarId
+        self.logName = avatarId
         self.mind = None
         self.vishnu = heaven.vishnu
 
@@ -64,6 +65,9 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         # we can't do a .debug here, since it will trigger a resend of the
         # debug message as well, causing infinite recursion !
         # self.debug('Calling remote method %s%r' % (name, args))
+        if not hasattr(self.mind, 'callRemote'):
+            self.error("mind %r does not implement callRemote" % self.mind)
+            return
         try:
             d = self.mind.callRemote(name, *args, **kwargs)
         except pb.DeadReferenceError:
@@ -71,7 +75,8 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
             self.mind = None
             return
         except Exception, e:
-            self.warning("Exception trying to remote call %s: %r" % (name, e))
+            self.warning("Exception trying to remote call '%s': %s: %s" % (
+                name, str(e.__class__), ", ".join(e.args)))
             return
 
         d.addErrback(self._mindCallRemoteErrback, name)

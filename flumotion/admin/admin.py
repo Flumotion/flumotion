@@ -35,7 +35,7 @@ from twisted.python import rebuild, reflect
 from flumotion.common import bundle, common, errors, interfaces, log, keycards
 from flumotion.twisted import flavors
 # serializable worker and component state
-from flumotion.common import worker, component
+from flumotion.common import worker, planet
 
 from flumotion.configure import configure
 from flumotion.common import reload
@@ -223,10 +223,18 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         del self._components[component.get('name')]
         self.emit('update')
         
+    # FIXME: change this to take a planetState
     def remote_initial(self, components, workerHeavenState):
-        self.debug('remote_initial(components=%s)' % components)
+        self.debug('remote_initial: %d components' % len(components))
         for component in components:
-            self._components[component.get('name')] = component
+            self.debug(repr(component))
+            name = component.get('name')
+            self._components[name] = component
+            mood = component.get('mood')
+            self.debug('mood: %r' % mood)
+            if mood is None:
+                self.warning('got mood None for component %s' % name)
+
             # get notified of state changes on component
             component.addListener(self)
         # FIXME: rename var

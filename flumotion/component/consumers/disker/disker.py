@@ -31,7 +31,8 @@ from twisted.internet import reactor
 from flumotion.component import feedcomponent
 from flumotion.common import log, gstreamer
 
-from flumotion.common.component import moods
+# proxy import
+from flumotion.component.component import moods
 from flumotion.common.pygobject import gsignal
 
 __all__ = ['Disker']

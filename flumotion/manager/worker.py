@@ -47,29 +47,31 @@ class WorkerAvatar(base.ManagerAvatar):
         self.info('worker "%s" logged in' % self.getName())
         base.ManagerAvatar.attached(self, mind)
         self.heaven.workerAttached(self)
+        self.vishnu.workerAttached(self)
 
     def detached(self, mind):
         self.info('worker "%s" logged out' % self.getName())
         base.ManagerAvatar.detached(self, mind)
-        # FIXME: rename heaven methods to avatarDetached, move to base ?
         self.heaven.workerDetached(self)
+        self.vishnu.workerDetached(self)
     
-    def start(self, name, type, config):
+    def start(self, avatarId, type, config):
         """
         Start a component of the given type with the given config.
                                                                                 
-        @param name:   name of the component to start
-        @type name:    string
-        @param type:   type of the component to start
-        @type type:    string
-        @param config: a configuration dictionary for the component
-        @type config:  dict
+        @param avatarId: avatarId the component should use to log in
+        @type  avatarId: string
+        @param type:     type of the component to start
+        @type  type:     string
+        @param config:   a configuration dictionary for the component
+        @type  config:   dict
 
-        @returns: a deferred
+        @returns: a deferred that will give the avatarId the component
+                  will use to log in to the manager
         """
-        self.debug('starting %s on %s with config %r' % (name, self.avatarId,
-            config))
-        return self.mindCallRemote('start', name, type, config, self.avatarId)
+        self.debug('starting %s on worker %s with config %r' % (
+            avatarId, self.avatarId, config))
+        return self.mindCallRemote('start', avatarId, type, config)
 
 class WorkerHeaven(base.ManagerHeaven):
     """
@@ -126,68 +128,16 @@ class WorkerHeaven(base.ManagerHeaven):
 
         self.debug('getEntries: returning %r' % retval)
         return retval
-       
+
     def workerAttached(self, workerAvatar):
         # called when the mind is attached, ie the worker logged in
         workerName = workerAvatar.getName()
         if not workerName in self.state.get('names'):
             self.state.append('names', workerName)
-        
-        # get all components that are supposed to start on this worker
-        # FIXME: we start them one by one to make port assignment more
-        # deterministic
-        # FIXME: we should probably start them in the correct order,
-        # respecting the graph
-        d = defer.Deferred()
-        for entry in self.getEntries(workerAvatar):
-            componentName = entry.getName()
-            self.debug('workerAttached(): scheduling start of %s on %s' % (
-                componentName, workerName))
-            
-            d.addCallback(
-                lambda result, *args: self.workerStartComponent(*args),
-                workerName, componentName,
-                entry.getType(), entry.getConfigDict())
-
-        d.addCallback(lambda result: self.debug(
-            'workerAttached(): completed start chain'))
-
-        # now trigger the chain
-        self.debug('workerAttached(): triggering start chain')
-        d.callback(None)
-        #reactor.callLater(0, d.callback, None)
-        self.debug('workerAttached(): triggered start chain')
 
     def workerDetached(self, workerAvatar):
         workerName = workerAvatar.getName()
         names = self.state.get('names')
         if workerName in self.state.get('names'):
             self.state.remove('names', workerName)
-            
-    def workerStartComponent(self, workerName, componentName, type, config):
-        """
-        @param workerName:    name of the worker to start component on
-        @type  workerName:    string
-        @param componentName: name of the component to start
-        @type  componentName: string
-        @param type:          type of the component to start
-        @type  type:          string
-        @param config:        a configuration dictionary
-        @type  config:        dict
 
-        @returns: deferred
-        """
-
-        if not self.avatars:
-            raise AttributeError()
-
-        if workerName:
-            avatar = self.avatars[workerName]
-        else:
-            # XXX: Do we really want to keep this big hack?
-            # eg, if we don't select a worker, just pick the first one.
-            avatar = self.avatars.values()[0]
-
-        self.info('Starting component "%s" on worker "%s"' % (
-            componentName, workerName))
-        return avatar.start(componentName, type, config)

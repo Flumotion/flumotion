@@ -32,8 +32,8 @@ from twisted.internet import reactor, error
 from twisted.cred import error as crederror
 from twisted.spread import pb
 
-from flumotion.common import interfaces, errors, log, component
-from flumotion.common.component import moods
+from flumotion.common import interfaces, errors, log, planet
+from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
@@ -165,6 +165,9 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
 
     ### our methods
     def getIP(self):
+        """
+        Return our own IP as seen from the manager.
+        """
         assert self.remote
         peer = self.remote.broker.transport.getPeer()
         try:
@@ -182,9 +185,9 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
     def remote_getState(self):
         """
         Return the state of the component, which will be serialized to a
-        L{flumotion.common.component.ManagerComponentState} object.
+        L{flumotion.common.planet.ManagerJobState} object.
 
-        @rtype:   L{flumotion.common.component.JobComponentState}
+        @rtype:   L{flumotion.common.planet.WorkerJobState}
         @returns: state of component
         """
         # we can only get the IP after we have a remote reference, so add it
@@ -267,15 +270,17 @@ class BaseComponent(log.Loggable, gobject.GObject):
     _heartbeatInterval = configure.heartbeatInterval
     
     def __init__(self, name):
+        # FIXME: name is unique where ? only in flow, so not in worker
+        # need to use full path maybe ?
         """
         @param name: unique name of the component
         @type name: string
         """
         self.__gobject_init__()
 
-        self.state = component.JobComponentState()
+        self.state = planet.WorkerJobState()
         
-        self.state.set('name', name)
+        #self.state.set('name', name)
         self.state.set('mood', moods.sleeping.value)
         self.state.set('pid', os.getpid())
 
@@ -284,7 +289,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
 
         self._HeartbeatDC = None
         self.medium = None # the medium connecting us to the manager's avatar
-
  
     def updateMood(self):
         """

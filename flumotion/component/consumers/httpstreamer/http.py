@@ -33,7 +33,8 @@ from twisted.web import server
 from flumotion.component import feedcomponent
 from flumotion.common import bundle, common, gstreamer
 
-from flumotion.common.component import moods
+# proxy import
+from flumotion.component.component import moods
 from flumotion.common.pygobject import gsignal
 
 from flumotion.component.consumers.httpstreamer import resources

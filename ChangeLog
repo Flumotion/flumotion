@@ -1,3 +1,46 @@
+2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_manager.py:
+	  add test for component mappers
+	  add tests with fake components and workers logging in
+	* flumotion/common/planet.py:
+	  move moods here
+	  add JobStates
+	  add parent keys
+	  add emtpy() functions to atmosphere and flow
+	* flumotion/admin/admin.py:
+	  add some mood checking to initial
+	* flumotion/admin/gtk/parts.py:
+	  check values of state before setting them
+	  make the treeview a state listener
+	* flumotion/admin/gtk/client.py:
+	  add check for sleeping components on getting the UI
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/feedcomponent.py:
+	  change location of moods
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	* flumotion/manager/worker.py:
+	  use avatarId instead of name everywhere
+	  use avatarId assigned by manager to log in to workerbrain and
+	  manager
+	* flumotion/manager/admin.py:
+	  add perspective_getState()
+	* flumotion/manager/manager.py:
+	  add ComponentMapper
+	  create planetstate from config
+	  move functionality to Vishnu
+	  add emptyPlanet()
+	* flumotion/manager/base.py:
+	  add some checking
+	* flumotion/manager/component.py:
+	  separate between componentstate and jobstate
+	* flumotion/test/test_worker_heaven.py:
+	* flumotion/test/test_worker_worker.py:
+	  test fixing
+
 2005-02-01  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/wizard/wizard.py: Fix the ugly colors of the sidebar.

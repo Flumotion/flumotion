@@ -29,10 +29,10 @@ from twisted.internet import reactor
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs, parts
 from flumotion.configure import configure
-from flumotion.common import errors, log, worker, component
+from flumotion.common import errors, log, worker, planet
 from flumotion.manager import admin # Register types
 
-from flumotion.common.component import moods
+from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 
 class Window(log.Loggable, gobject.GObject):
@@ -284,11 +284,9 @@ class Window(log.Loggable, gobject.GObject):
 
     def stateSet(self, state, key, value):
         # called by model when state of something changes
-        if not isinstance(state, component.AdminComponentState):
+        if not isinstance(state, planet.AdminComponentState):
             return
 
-        if key == 'mood':
-            self.components_view.set_mood_value(state, value)
         if key == 'message':
             self.statusbar.set('main', value)
 
@@ -416,12 +414,26 @@ class Window(log.Loggable, gobject.GObject):
             sub = gtk.Label("")
             self.hpaned.add2(sub)
             sub.show()
-             
+
+        def gotEntrySleepingComponentErrback(failure):
+            failure.trap(errors.SleepingComponentError)
+
+            self.statusbar.set('main', "Component %s is still sleeping" % name)
+
+            # no ui, clear; FIXME: do this nicer
+            old = self.hpaned.get_child2()
+            self.hpaned.remove(old)
+            #sub = gtk.Label('%s does not have a UI yet' % name)
+            sub = gtk.Label("")
+            self.hpaned.add2(sub)
+            sub.show()
+                      
         self.statusbar.set('main', "Requesting UI for %s ..." % name)
 
         d = self.admin.getEntry(name, 'admin/gtk')
         d.addCallback(gotEntryCallback)
         d.addErrback(gotEntryNoBundleErrback)
+        d.addErrback(gotEntrySleepingComponentErrback)
 
     def _components_view_activated_cb(self, view, state, action):
         self.debug('action %s on component %s' % (action, state.get('name')))

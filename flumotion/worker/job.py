@@ -105,7 +105,8 @@ class JobMedium(pb.Referenceable, log.Loggable):
     def __init__(self, options):
         self.remote = None
         self.options = options
-        self.name = None
+        self.avatarId = None
+        self.logName = None
 
     ### pb.Referenceable remote methods called on by the WorkerBrain
     ### FIXME: arguments not needed anymore, Medium knows about options
@@ -114,12 +115,12 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.manager_port = port
         self.manager_transport = transport
         
-    def remote_start(self, name, type, configDict, feedPorts):
+    def remote_start(self, avatarId, type, configDict, feedPorts):
         """
         I am called on by the worker's JobAvatar to start a component.
         
-        @param name:       name of component to start
-        @type  name:       string
+        @param avatarId:   avatarId for component to log in to manager
+        @type  avatarId:   string
         @param type:       type of component to start
         @type  type:       string
         @param configDict: the configuration dictionary
@@ -127,12 +128,14 @@ class JobMedium(pb.Referenceable, log.Loggable):
         @param feedPorts:  feedName -> port
         @type  feedPorts:  dict
         """
-        self.name = name
+        self.avatarId = avatarId
+        self.logName = avatarId
+
         defs = registry.registry.getComponent(type)
-        self._runComponent(name, type, configDict, defs, feedPorts)
+        self._runComponent(avatarId, type, configDict, defs, feedPorts)
 
     def remote_stop(self):
-        self.debug('%s: remote_stop() called' % self.name)
+        self.debug('remote_stop() called')
         reactor.stop()
         #os._exit(0)
 
@@ -145,23 +148,23 @@ class JobMedium(pb.Referenceable, log.Loggable):
         return self.remote != None
 
     ### our methods
-    def set_nice(self, name, nice):
+    def _set_nice(self, nice):
         if not nice:
             return
         
         try:
             os.nice(nice)
         except OSError, e:
-            log.warning(name, 'Failed to set nice level: %s' % str(e))
+            self.warning('Failed to set nice level: %s' % str(e))
         else:
-            log.debug(name, 'Nice level set to %d' % nice)
+            self.debug('Nice level set to %d' % nice)
 
-    def enable_core_dumps(self, name):
+    def _enable_core_dumps(self):
         soft, hard = resource.getrlimit(resource.RLIMIT_CORE)
         if hard != resource.RLIM_INFINITY:
-            log.warning(name, 'Could not set ulimited core dump sizes, setting to %d instead' % hard)
+            self.warning('Could not set ulimited core dump sizes, setting to %d instead' % hard)
         else:
-            log.debug(name, 'Enabling core dumps of ulimited size')
+            self.debug('Enabling core dumps of ulimited size')
             
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
         
@@ -173,10 +176,10 @@ class JobMedium(pb.Referenceable, log.Loggable):
         except RuntimeError:
             self.warning('Old PyGTK with threading disabled detected')
     
-    def _runComponent(self, name, type, config, defs, feedPorts):
+    def _runComponent(self, avatarId, type, config, defs, feedPorts):
         """
-        @param name:      name of component to start
-        @type  name:      string
+        @param avatarId:  avatarId component will use to log in to manager
+        @type  avatarId:  string
         @param type:      type of component to start
         @type  type:      string
         @param config:    the configuration dictionary
@@ -187,20 +190,19 @@ class JobMedium(pb.Referenceable, log.Loggable):
         @type  feedPorts: dict
         """
         
-        self.info('Starting component "%s" of type "%s"' % (name, type))
+        self.info('Starting component "%s" of type "%s"' % (avatarId, type))
         #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()
 
-        log.debug(name, 'Starting on pid %d of type %s' %
-                  (os.getpid(), type))
+        self.debug('Starting on pid %d of type %s' % (os.getpid(), type))
 
-        self.set_nice(name, config.get('nice', 0))
-        self.enable_core_dumps(name)
+        self._set_nice(config.get('nice', 0))
+        self._enable_core_dumps()
         
-        log.debug(name, '_runComponent(): config dictionary is: %r' % config)
-        log.debug(name, '_runComponent(): feedPorts is: %r' % feedPorts)
-        log.debug(name, '_runComponent(): defs is: %r' % defs)
+        self.debug('_runComponent(): config dictionary is: %r' % config)
+        self.debug('_runComponent(): feedPorts is: %r' % feedPorts)
+        self.debug('_runComponent(): defs is: %r' % defs)
 
         comp = None
         try:
@@ -223,7 +225,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
         manager_client_factory = component.ComponentClientFactory(comp)
         keycard = keycards.KeycardUACPP(self.options.username,
             self.options.password, 'localhost')
-        keycard.avatarId = name
+        keycard.avatarId = avatarId
         d = manager_client_factory.login(keycard)
         d.addCallback(lambda result: self.info('Logged in to manager'))
 
@@ -283,7 +285,7 @@ def getSocketPath():
     # FIXME: better way of getting at a tmp dir ?
     return os.path.join('/tmp', "flumotion.worker.%d" % os.getpid())
 
-def run(componentName, options):
+def run(avatarId, options):
     """
     Called by the worker to start a job fork.
     """
@@ -300,7 +302,7 @@ def run(componentName, options):
 
     # the only usable object created for now in the child is the
     # JobClientFactory, so we throw the options at it
-    job_factory = JobClientFactory(componentName, options)
+    job_factory = JobClientFactory(avatarId, options)
     reactor.connectUNIX(workerSocket, job_factory)
     log.info('job', 'Started job on pid %d' % os.getpid())
     log.debug('job', 'Starting reactor')

@@ -34,7 +34,7 @@ from flumotion.component import component as basecomponent
 from flumotion.common import common, interfaces, errors, log
 from flumotion.common import gstreamer, pygobject
 
-from flumotion.common.component import moods
+from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 
 class FeedComponentMedium(basecomponent.BaseComponentMedium):
@@ -116,6 +116,9 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.comp.set_element_property(elementName, property, value)
 
     def remote_getState(self):
+        """
+        @rtype: L{flumotion.common.planet.WorkerJobState}
+        """
         state = basecomponent.BaseComponentMedium.remote_getState(self)
         if not state:
             return state

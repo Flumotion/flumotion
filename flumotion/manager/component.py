@@ -35,9 +35,9 @@ from twisted.internet import reactor
 from flumotion.configure import configure
 # rename to base
 from flumotion.manager import base
-from flumotion.common import errors, interfaces, keycards, log, config
+from flumotion.common import errors, interfaces, keycards, log, config, planet
 from flumotion.twisted import flavors
-from flumotion.common.component import moods
+from flumotion.common.planet import moods
 
 # abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
 class Feeder:
@@ -254,13 +254,14 @@ class ComponentAvatar(base.ManagerAvatar):
         self.ports = {} # feedName -> port
         self.started = False
         self.starting = False
-        self.lastHeartbeat = 0.0 # last time.time() of heartbeat
-        self.state = None # retrieved after mind attached
+        self.jobState = None # retrieved after mind attached
+        self.componentState = None # set by the vishnu by componentAttached
         self._gstState = None # FIXME: deprecate ?
 
-        self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
-            self._heartbeatCheck)
         self.logName = avatarId
+
+        self.lastHeartbeat = 0.0 # last time.time() of heartbeat
+        self._HeartbeatCheckDC = None # started when we have the state
         
     # make sure we don't have stray pendingTimedCalls
     def __del__(self):
@@ -268,8 +269,8 @@ class ComponentAvatar(base.ManagerAvatar):
         
     ### python methods
     def __repr__(self):
-        if self.state:
-            mood = self.state.get('mood')
+        if self.componentState:
+            mood = self.componentState.get('mood')
         else:
             mood = '(unknown)'
         return '<%s %s in mood %s>' % (self.__class__.__name__,
@@ -302,27 +303,27 @@ class ComponentAvatar(base.ManagerAvatar):
 
     # FIXME: this doesn't actually show up
     def _setMessage(self, message):
-        if not self.state:
+        if not self.componentState:
             return
 
-        self.state.set('message', message)
+        self.componentState.set('message', message)
 
     def _setMood(self, mood):
-        if not self.state:
+        if not self.componentState:
             return
 
-        if not self.state.get('mood') == mood.value:
+        if not self.componentState.get('mood') == mood.value:
             self.debug('Setting mood to %r' % mood)
-            self.state.set('mood', mood.value)
+            self.componentState.set('mood', mood.value)
 
     def _setMoodValue(self, moodValue):
         mood = moods.get(moodValue)
         self._setMood(mood)
 
     def _getMoodValue(self):
-        if not self.state:
+        if not self.componentState:
             return
-        return self.state.get('mood')
+        return self.componentState.get('mood')
 
     # general fallback for unhandled errors so we detect them
     # FIXME: we can't use this since we want a PropertyError to fall through
@@ -347,14 +348,12 @@ class ComponentAvatar(base.ManagerAvatar):
     def attached(self, mind):
         self.info('component "%s" logged in' % self.avatarId)
         base.ManagerAvatar.attached(self, mind) # sets self.mind
+        
+        self.vishnu.componentAttached(self)
+
         self.debug('mind %r attached, calling remote _getState()' % self.mind)
         self._getState()
 
-    def detached(self, mind):
-        self.heaven.unregisterComponent(self)
-        self.info('component "%s" logged out' % self.avatarId)
-        base.ManagerAvatar.detached(self, mind)
-        
     def _getState(self):
         d = self.mindCallRemote('getState')
         d.addCallback(self._mindGetStateCallback)
@@ -370,12 +369,24 @@ class ComponentAvatar(base.ManagerAvatar):
             return None
             
         self.debug('received state: %r' % state)
-        self.state = state
+        self.jobState = state
         # make the component avatar a listener to state changes
         state.addListener(self)
         # make heaven register component
         self.heaven.registerComponent(self)
+        self.vishnu.registerComponent(self)
 
+        # start scheduling callbacks for heartbeat
+        self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
+            self._heartbeatCheck)
+
+    def detached(self, mind):
+        self.vishnu.unregisterComponent(self)
+        self.heaven.unregisterComponent(self)
+
+        self.info('component "%s" logged out' % self.avatarId)
+        base.ManagerAvatar.detached(self, mind)
+ 
     # IStateListener methods
     def stateSet(self, state, key, value):
         self.debug("state set on %r: %s now %r" % (state, key, value))
@@ -395,12 +406,6 @@ class ComponentAvatar(base.ManagerAvatar):
         self.mindCallRemote('stop')
         return None
         
-    def stateGet(self, key, valueIfNotFound = None):
-        if not self.state:
-            return valueIfNotFound
-
-        return self.state.get(key)
-        
     # FIXME: rename to something like getEaterFeeders()
     def getEaters(self):
         """
@@ -408,7 +413,8 @@ class ComponentAvatar(base.ManagerAvatar):
 
         Returns: a list of eater names, or the empty list.
         """
-        return self.stateGet('eaterNames', [])
+        # this gets created and added by feedcomponent.py
+        return self.jobState.get('eaterNames', [])
     
     def getFeeders(self):
         """
@@ -416,7 +422,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
         Returns: a list of feeder names, or the empty list.
         """
-        return self.stateGet('feederNames', [])
+        return self.jobState.get('feederNames', [])
 
     def getFeedPort(self, feedName):
         """
@@ -425,33 +431,31 @@ class ComponentAvatar(base.ManagerAvatar):
         return self.ports[feedName]
  
     def getRemoteManagerIP(self):
-        return self.state.get('ip')
+        return self.jobState.get('ip')
 
     def getWorkerName(self):
         """
         Return the name of the worker.
         """
-        return self.state.get('workerName')
+        return self.componentState.get('workerName')
 
     def getPid(self):
-        return self.state.get('pid')
+        return self.jobState.get('pid')
 
     def getName(self):
         return self.avatarId
 
     def getType(self):
-        # use the config to check the type
-        if not self.avatarId in self.heaven._componentEntries.keys():
-            self.debug('component %s not found in entries' % self.avatarId)
-            return None
-        return self.heaven._componentEntries[self.avatarId].type
+        return self.componentState.get('type')
 
     def stop(self):
         """
         Tell the avatar to stop the component.
         """
         d = self.mindCallRemote('stop')
+        # FIXME: real error handling
         d.addErrback(lambda x: None)
+        return d
             
     # This function tells the component to start
     # feedcomponents will start consuming feeds and start its feeders
@@ -494,7 +498,7 @@ class ComponentAvatar(base.ManagerAvatar):
             msg = "%s: no element specified" % self.getName()
             self.warning(msg)
             raise errors.PropertyError(msg)
-        if not element in self.state.get('elements'):
+        if not element in self.jobState.get('elements'):
             msg = "%s: element '%s' does not exist" % (self.getName(), element)
             self.warning(msg)
             raise errors.PropertyError(msg)
@@ -526,7 +530,7 @@ class ComponentAvatar(base.ManagerAvatar):
         # renamed
         # this will work automatically though if the component updates its
         # state
-        if not element in self.state.get('elements'):
+        if not element in self.jobState.get('elements'):
             msg = "%s: element '%s' does not exist" % (self.getName(), element)
             self.warning(msg)
             raise errors.PropertyError(msg)
@@ -697,6 +701,7 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         base.ManagerHeaven.__init__(self, vishnu)
         self._feederSet = FeederSet()
+        # FIXME: deprecate componentEntries
         self._componentEntries = {} # configuration entries
         
    
@@ -749,6 +754,7 @@ class ComponentHeaven(base.ManagerHeaven):
         componentName = componentAvatar.getName()
         self.removeAvatar(componentName)
         
+    # FIXME: deprecate this completely
     def loadConfiguration(self, filename, string=None):
         conf = config.FlumotionConfigXML(filename, string)
         
@@ -772,6 +778,8 @@ class ComponentHeaven(base.ManagerHeaven):
         """
 
         eaterFeederNames = componentAvatar.getEaters()
+        self.debug('eaterFeederNames: %r' % eaterFeederNames)
+
         #feederName is componentName:feedName on the feeding component
         retval = []
         for feederName in eaterFeederNames:
@@ -841,7 +849,7 @@ class ComponentHeaven(base.ManagerHeaven):
         componentAvatar.debug('registering component')
 
         # tell the admin client
-        self.vishnu.adminHeaven.componentAdded(componentAvatar)
+        #self.vishnu.adminHeaven.registerComponent(componentAvatar)
         #componentName = componentAvatar.getName()
         #self.vishnu.adminHeaven.uiStateChanged(componentName, state)
 
@@ -896,11 +904,3 @@ class ComponentHeaven(base.ManagerHeaven):
             'setting feeder %s readiness to %s in feaderset' % (
                 feederName, readiness))
         self._feederSet.feederSetReadiness(feederName, readiness)
-
-    def shutdown(self):
-        """
-        Shut down the heaven, stopping all components.
-        """
-        for avatar in self.avatars.values():
-            avatar.stop()
-            

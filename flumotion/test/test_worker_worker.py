@@ -28,7 +28,7 @@ from flumotion.worker import worker
 class TestKid(unittest.TestCase):
     def testGetPid(self):
         kid = worker.Kid(1092, "kid", "http", {})
-        self.assertEquals(kid.name, "kid")
+        self.assertEquals(kid.avatarId, "kid")
         self.assertEquals(kid.type, "http")
         self.assertEquals(kid.config, {})
 

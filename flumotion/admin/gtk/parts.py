@@ -25,9 +25,10 @@ import gtk
 import gtk.glade
 
 from flumotion.configure import configure
-from flumotion.common import log, component
+from flumotion.common import log, planet
+from flumotion.twisted import flavors
 
-from flumotion.common.component import moods
+from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 
 COL_MOOD       = 0
@@ -124,7 +125,10 @@ class ComponentsView(log.Loggable, gobject.GObject):
     I present a view on the list of components logged in to the manager.
     """
     
+    __implements__ = flavors.IStateListener,
+
     logCategory = 'components'
+    
     gsignal('selected', object)       # state
     gsignal('activated', object, str) # state, action name
     #gsignal('right-clicked', object, int, float)
@@ -136,7 +140,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self.__gobject_init__()
         
         self._view = tree_widget
-        self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, int, object, int)
+        self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, str, object, int)
 
         self._view.connect('cursor-changed', self._view_cursor_changed_cb)
         self._view.connect('button-press-event',
@@ -257,13 +261,23 @@ class ComponentsView(log.Loggable, gobject.GObject):
         return model.get(iter, COL_STATE)[0]
 
 
+    def _removeListenerForeach(self, model, path, iter):
+        # remove the listener for each state object
+        state = model.get(iter, COL_STATE)[0]
+        state.removeListener(self)
+        
     def update(self, components):
         """
-        Update the components view.
+        Update the components view by removing all old components and
+        showing the new ones.
 
-        @param components: list of
+        @param components: dictionary of name -> 
                            L{flumotion.common.component.AdminComponentState}
         """
+        # remove all Listeners
+        self._model.foreach(self._removeListenerForeach)
+        
+        # clear and rebuild
         self._model.clear()
         self._iters = {}
 
@@ -273,23 +287,56 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         for name in names:
             component = components[name]
+            self.debug('adding component %r to listview' % component)
+            component.addListener(self)
+
             iter = self._model.append()
             self._iters[component] = iter
+            
             mood = component.get('mood')
-            self._model.set(iter, COL_MOOD, self._moodPixbufs[mood])
-            self._model.set(iter, COL_NAME, component.get('name'))
-            self._model.set(iter, COL_WORKER, component.get('workerName'))
-            self._model.set(iter, COL_PID, component.get('pid'))
-            self._model.set(iter, COL_STATE, component)
-            self._model.set(iter, COL_MOOD_VALUE, mood)
+            self.debug('component has mood %r' % mood)
+            workerName = component.get('workerName')
+            pid = component.get('pid')
+            
+            if mood is not None:
+                self._set_mood_value(iter, mood)
 
-    def set_mood_value(self, state, value):
+            self._model.set(iter, COL_STATE, component)
+
+            self._model.set(iter, COL_NAME, component.get('name'))
+            self._model.set(iter, COL_WORKER, workerName)
+            if pid:
+                self._model.set(iter, COL_PID, str(pid))
+            else:
+                self._model.set(iter, COL_PID, None)
+
+    def stateSet(self, state, key, value):
+        if not isinstance(state, planet.AdminComponentState):
+            self.warning('Got state change for unknown object %r' % state)
+            return
+            
+        iter = self._iters[state]
+        self.debug('stateSet: state %r, key %s, value %r' % (state, key, value))
+
+        if key == 'mood':
+            self._set_mood_value(iter, value)
+        elif key == 'pid':
+            if value:
+                self._model.set(iter, COL_PID, str(value))
+            else:
+                self._model.set(iter, COL_PID, None)
+        elif key == 'name':
+            if value:
+                self._model.set(iter, COL_NAME, value)
+        elif key == 'workerName':
+            self._model.set(iter, COL_WORKER, value)
+
+    def _set_mood_value(self, iter, value):
         """
         Set the mood value on the given component name.
-        @param state: L{flumotion.common.component.AdminComponentState}
-        @param value: int
+
+        @type  value: int
         """
-        iter = self._iters[state]
         self._model.set(iter, COL_MOOD, self._moodPixbufs[value])
         self._model.set(iter, COL_MOOD_VALUE, value)
 

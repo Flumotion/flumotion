@@ -49,6 +49,8 @@ class AdminAvatar(base.ManagerAvatar):
     def attached(self, mind):
         self.info('admin client "%s" logged in' % self.avatarId)
         base.ManagerAvatar.attached(self, mind)
+        # FIXME: remove this abomination, let the admin decide itself what
+        # it wants to do
         self.mindCallRemote('initial', self.getComponentStates(),
             self.vishnu.workerHeaven.state)
 
@@ -66,10 +68,7 @@ class AdminAvatar(base.ManagerAvatar):
         
         @rtype: C{list} of L{flumotion.common.component.ManagerComponentState}
         """
-        states = []
-        for avatar in self.vishnu.componentHeaven.avatars.values():
-            states.append(getattr(avatar, 'state', None))
-        return states
+        return self.vishnu.getComponentStates()
 
     def sendLog(self, category, type, message):
         """
@@ -80,21 +79,29 @@ class AdminAvatar(base.ManagerAvatar):
         if self.hasRemoteReference():
             self.mindCallRemote('log', category, type, message)
         
+    # FIXME: deprecated, using state now
     def componentAdded(self, component):
         """
         Tell the avatar that a component has been added.
         """
+        return
         self.debug("AdminAvatar.componentAdded: %s" % component)
         self.mindCallRemote('componentAdded', component.state)
         
+    # FIXME: deprecated, using state now
     def componentRemoved(self, component):
         """
         Tell the avatar that a component has been removed.
         """
+        return
         self.debug("AdminAvatar.componentRemoved: %s" % component)
         self.mindCallRemote('componentRemoved', component.state)
 
     ### pb.Avatar IPerspective methods
+    def perspective_getState(self):
+        self.debug("returning state %r" % self.vishnu.state)
+        return self.vishnu.state
+
     def perspective_shutdown(self):
         print 'SHUTTING DOWN'
         reactor.stop()
@@ -161,8 +168,13 @@ class AdminAvatar(base.ManagerAvatar):
         """
         Get the entry point for a piece of bundled code by the type.
 
-        Returns: a (filename, methodName) tuple, or None if not found.
+        Returns: a (filename, methodName) tuple, or raises a Failure.
         """
+        if not self.vishnu.componentHeaven.hasAvatar(componentName):
+            self.debug('component %s not logged in yet, no entry' %
+                componentName)
+            raise errors.SleepingComponentError(componentName)
+
         componentAvatar = self.vishnu.componentHeaven.getComponent(
             componentName)
         componentType = componentAvatar.getType()
@@ -209,12 +221,14 @@ class AdminAvatar(base.ManagerAvatar):
         self._reloaded()
 
     def perspective_loadConfiguration(self, xml):
+        """
+        @type  xml: string
+        """
         self.info('loadConfiguration ...')
-        self.vishnu.workerHeaven.loadConfiguration(None, xml)
-        self.vishnu.componentHeaven.loadConfiguration(None, xml)
+        self.vishnu.loadConfiguration(None, xml)
 
     def perspective_cleanComponents(self):
-        return self.vishnu.componentHeaven.shutdown()
+        return self.vishnu.emptyPlanet()
 
     # separate method so it runs the newly reloaded one :)
     def _reloaded(self):
@@ -261,6 +275,7 @@ class AdminHeaven(base.ManagerHeaven):
 
     # FIXME: all of these could be generalized instead of implementing them
     # every step of the way
+    # FIXME: deprecated, using state now
     def componentAdded(self, component):
         """
         Tell all created AdminAvatars that a component was added.
