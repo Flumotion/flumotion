@@ -24,10 +24,10 @@ import optparse
 import os
 import sys
 
-from twisted.internet import reactor
+from twisted.internet import reactor, error
 
 from flumotion.manager import manager
-from flumotion.common import log, config, common
+from flumotion.common import log, config, common, errors
 from flumotion.configure import configure
 
 class ServerContextFactory:
@@ -57,14 +57,12 @@ def _startSSL(vishnu, host, port, pemFile):
     if not host == "":
         log.info('manager', 'Listening as host %s' % host)
     reactor.listenSSL(port, vishnu.getFactory(), ctxFactory, interface=host)
-    reactor.run()
 
 def _startTCP(vishnu, host, port):
     log.info('manager', 'Starting on port %d using TCP' % port)
     if not host == "":
         log.info('manager', 'Listening as host %s' % host)
     reactor.listenTCP(port, vishnu.getFactory(), interface=host)
-    reactor.run()
 
 def _loadConfig(vishnu, filename):
     # FIXME: this might be used for loading additional config, so maybe
@@ -122,20 +120,21 @@ def main(args):
     defaultTCPPort = configure.defaultTCPManagerPort
     group.add_option('-H', '--hostname',
                      action="store", type="string", dest="host",
-                     default="",
-                     help="hostname to listen to [default ""]")
+                     help="hostname to listen as")
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      default=None,
                      help="port to listen on [default %d (ssl) or %d (tcp)]" % (defaultSSLPort, defaultTCPPort))
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
-                     default="ssl",
                      help="transport protocol to use (tcp/ssl) [default ssl]")
     group.add_option('-C', '--certificate',
                      action="store", type="string", dest="certificate",
                      default="default.pem",
                      help="specify PEM certificate file (for SSL)")
+    group.add_option('-n', '--name',
+                     action="store", type="string", dest="name",
+                     help="manager name")
     group.add_option('-D', '--daemonize',
                      action="store_true", dest="daemonize",
                      default=False,
@@ -145,43 +144,82 @@ def main(args):
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
-    if options.version:
-        print common.version("flumotion-manager")
-        return 0
+    # set default values for all unset options
+    if not options.host:
+        options.host = "" # needed for bind to work
+    if not options.transport:
+        options.transport = 'ssl'
+    if not options.port:
+        if options.transport == "tcp":
+            options.port = defaultTCPPort
+        elif options.transport == "ssl":
+            options.port = defaultSSLPort
+    if not options.name:
+        # FIXME: add config parsing for name, or check the directory
+        options.name = 'default'
 
+    # check for wrong options/arguments
     if len(args) <= 1:
         log.warning('manager', 'Please specify a planet configuration file')
         sys.stderr.write("Please specify a planet configuration file.\n")
         return -1
+
+    if not options.transport in ['ssl', 'tcp']:
+        sys.stderr.write('ERROR: wrong transport %s, must be ssl or tcp\n' %
+            options.transport)
+        return 1
+
+    # handle options
+    if options.version:
+        print common.version("flumotion-manager")
+        return 0
+
+    if options.verbose:
+        log.setFluDebug("*:3")
 
     vishnu = manager.Vishnu()
 
     paths = [os.path.abspath(filename) for filename in args[1:]]
     reactor.callLater(0, _initialLoadConfig, vishnu, paths)
     
-    if options.verbose:
-        log.setFluDebug("*:3")
+    # set up server based on transport
+    try:
+        if options.transport == "ssl":
+            _startSSL(vishnu, options.host, options.port, options.certificate)
+        elif options.transport == "tcp":
+            _startTCP(vishnu, options.host, options.port)
+    except error.CannotListenError, (interface, port, e):
+        # e is a socket.error()
+        message = "Could not listen on port %d: %s" % (port, e.args[1])
+        raise errors.SystemError, message
 
     if options.daemonize:
-        if not os.path.exists(configure.logdir):
-            try:
-                os.makedirs(configure.logdir)
-            except:
-                sys.stderr.write("Could not create log file directory %d.\n" % configure.logdir)
-                return -1
+        common.ensureDir(configure.logdir, "log file")
+        common.ensureDir(configure.rundir, "run file")
                 
-        logPath = os.path.join(configure.logdir, 'manager.log')
-        common.daemonize(stdout=logPath, stderr=logPath)
+        if common.getPid('manager', options.name):
+            raise errors.SystemError, \
+                'A manager with name %s is already running' % options.name
 
-    if options.transport == "ssl":
-        port = options.port or defaultSSLPort
-        _startSSL(vishnu, options.host, port, options.certificate)
-    elif options.transport == "tcp":
-        port = options.port or defaultTCPPort
-        _startTCP(vishnu, options.host, port)
-    else:
-        print >> sys.stderr, \
-              'ERROR: unsupported transport: %s, must be ssl or tcp' % options.transport
-        return 1
+        logPath = os.path.join(configure.logdir,
+            'manager.%s.log' % options.name)
+
+        # here we daemonize; so we also change our pid
+        common.daemonize(stdout=logPath, stderr=logPath)
+        log.info('manager', 'Started daemon')
+
+        # from now on I should keep running, whatever happens
+        log.debug('manager', 'writing pid file')
+        common.writePidFile('manager', options.name)
+
+    # go into the reactor main loop
+    reactor.run()
+
+    # we exited, so we're done
+    if options.daemonize:
+        log.debug('manager', 'deleting pid file')
+        common.deletePidFile('manager', options.name)
+
     log.info('manager', 'Stopping server')    
+
     return 0

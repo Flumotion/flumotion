@@ -1,0 +1,84 @@
+#!/bin/bash
+#
+# flumotion        Startup script for the Flumotion streaming server
+#
+# chkconfig: - 80 20
+# description: Flumotion is a streaming server for audio and video.
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# paths to files and variables
+service=flumotion
+prog=/usr/sbin/flumotion
+lockdir=/var/lock/subsys
+
+# The semantics of these two functions differ from the way apachectl does
+# things -- attempting to start while running is a failure, and shutdown
+# when not running is also a failure.  So we just do it the way init scripts
+# are expected to behave here.
+start() {
+	list=`$prog status | cut -f1,2 -d' ' | tr ' ' @`
+	for line in $list
+	do
+		type=`echo $line | cut -f1 -d'@'`
+		name=`echo $line | cut -f2 -d'@'`
+        	echo -n $"Starting $type $name: "
+        	daemon --user flumotion $prog start $type $name
+        	RETVAL=$?
+        	echo
+        	[ $RETVAL = 0 ] && touch ${lockdir}/flumotion.$type.$name.lock
+	done
+        return $RETVAL
+}
+stop() {
+	list=`$prog status | cut -f1,2 -d' ' | tr ' ' @`
+	for line in $list
+	do
+		type=`echo $line | cut -f1 -d'@'`
+		name=`echo $line | cut -f2 -d'@'`
+		lockfile=${lockdir}/flumotion.$type.$name.lock
+		if test -e ${lockfile}
+		then
+			echo -n $"Stopping $type $name: "
+			$prog stop $type $name
+        		RETVAL=$?
+        		[ $RETVAL = 0 ] && success || failure
+			echo
+        		[ $RETVAL = 0 ] && rm ${lockdir}/flumotion.$type.$name.lock
+		fi
+	done
+}
+
+status() {
+	$prog status
+}
+
+list() {
+	$prog list
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  status)
+        status
+	;;
+  list)
+        list
+	;;
+  restart)
+	stop
+	start
+	;;
+  *)
+	echo $"Usage: $service {start|stop|restart|list|status}"
+	exit 1
+esac
+
+exit $RETVAL

@@ -53,27 +53,18 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/workers
 # install service files
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
 install -m 755 \
-	doc/redhat/init.d/flu-manager \
+	doc/redhat/flumotion \
 	$RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
-install -m 755 \
-	doc/redhat/init.d/flu-worker \
-	$RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
-
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-install -m 644 \
-	doc/redhat/sysconfig/flumotion-manager \
-	$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-install -m 644 \
-	doc/redhat/sysconfig/flumotion-worker \
-	$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 
 # create a .flumotion in the new home
 # FIXME: needs to be done more gracefully
 
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/flumotion/.flumotion
 
-# create log directory
+# create log and run and cache directory
 install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
+install -d $RPM_BUILD_ROOT%{_localstatedir}/run/flumotion
+install -d $RPM_BUILD_ROOT%{_localstatedir}/cache/flumotion
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -108,6 +99,25 @@ user:PSfNpHTkpTx1M
  
 </planet>
 EOF
+fi
+
+# this is going to break when the admin decides to rename workers
+# this creates a worker config with user/test login account
+if ! test -e %{_sysconfdir}/flumotion/workers/default.xml
+then
+  cat > %{_sysconfdir}/flumotion/workers/default.xml <<EOF
+<worker>
+ 
+  <manager>
+  </manager>
+
+  <authentication type="plaintext">
+    <username>user</username>
+    <password>test</password>
+  </authentication>
+ 
+</worker>
+EOF
 
 fi
 
@@ -115,8 +125,7 @@ fi
 # if removal and not upgrade, stop the processes
 if [ $1 -eq 1 ]
 then
-  service flu-manager stop > /dev/null
-  service flu-worker stop > /dev/null
+  service flumotion stop > /dev/null
 fi
 
 %postun
@@ -144,15 +153,15 @@ fi
 %{_bindir}/flumotion-worker
 %{_bindir}/flumotion-admin
 %{_bindir}/flumotion-tester
+%{_sbindir}/flumotion
 %{_libdir}/flumotion
 %{_datadir}/flumotion
 %dir %attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
 %attr(750,flumotion,root) %{_sysconfdir}/flumotion
+%attr(750,flumotion,root) %{_localstatedir}/run/flumotion
 %attr(750,flumotion,root) %{_localstatedir}/log/flumotion
-%{_sysconfdir}/rc.d/init.d/flu-manager
-%{_sysconfdir}/rc.d/init.d/flu-worker
-%config(noreplace) %{_sysconfdir}/sysconfig/flumotion-manager
-%config(noreplace) %{_sysconfdir}/sysconfig/flumotion-worker
+%attr(750,flumotion,root) %{_localstatedir}/cache/flumotion
+%{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
 * Mon Jun 07 2004 Thomas Vander Stichele <thomas at apestaart dot org>

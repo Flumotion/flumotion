@@ -1,0 +1,50 @@
+#!/usr/bin/python
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# bin/flumotion: Flumotion streaming media server startup script
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2004 Fluendo (www.fluendo.com)
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# This program is also licensed under the Flumotion license.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+import os
+import sys
+sys.path.insert(0, '@PYGTK_DIR@')
+
+import pygtk
+pygtk.require('2.0')
+
+import gobject
+if gobject.pygtk_version < (2,3,96):
+    print 'PyGTK 2.3.96 or higher is required'
+    raise SystemExit
+os.environ['PYGTK_USE_GIL_STATE_API'] = ''
+gobject.threads_init()
+
+# This can't be removed, 
+dir = os.path.dirname(os.path.abspath(__file__))
+if os.path.exists(os.path.join(dir, '.svn')):
+    root = os.path.split(dir)[0]
+else:
+    root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
+sys.path.insert(0, root)
+
+from flumotion.common import errors, setup
+from flumotion.service.main import main
+
+if __name__ == '__main__':
+    setup.setup(root)
+
+    try:
+        sys.exit(main(sys.argv))
+    except errors.SystemError, e:
+        print 'ERROR:', e

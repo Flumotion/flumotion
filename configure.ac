@@ -74,10 +74,11 @@ sys.exit(0)
 dnl output stuff
 AC_OUTPUT(
 Makefile
-bin/flumotion-manager
+bin/flumotion
 bin/flumotion-admin
-bin/flumotion-worker
+bin/flumotion-manager
 bin/flumotion-tester
+bin/flumotion-worker
 bin/runtest
 bin/Makefile
 data/Makefile
@@ -109,6 +110,7 @@ flumotion/configure/Makefile
 flumotion/configure/installed.py
 flumotion/configure/uninstalled.py
 flumotion/manager/Makefile
+flumotion/service/Makefile
 flumotion/test/Makefile
 flumotion/tester/Makefile
 flumotion/twisted/Makefile

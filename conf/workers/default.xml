@@ -21,7 +21,7 @@ hostname:(xmlfilename)
       This specifies what authentication to use to log in.
       Compare with command-line options.
 -->
-      <username>test</username>
+      <username>user</username>
       <password>test</password>
     </authentication>
 

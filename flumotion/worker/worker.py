@@ -250,6 +250,7 @@ class WorkerBrain(log.Loggable):
         @type  options: an object with attributes
         """
         self._oldSIGCHLDHandler = None # stored by installSIGCHLDHandler
+        self._oldSIGTERMHandler = None # stored by installSIGTERMHandler
 
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
@@ -312,6 +313,7 @@ class WorkerBrain(log.Loggable):
         This will call the currently installed one first, then reap
         any leftover zombies.
         """
+        self.debug("Installing SIGCHLD handler")
         handler = signal.signal(signal.SIGCHLD, self._SIGCHLDHandler)
         if handler not in (signal.SIG_IGN, signal.SIG_DFL, None):
             self._oldSIGCHLDHandler = handler
@@ -361,7 +363,33 @@ class WorkerBrain(log.Loggable):
                 self.info("Reaped job child with pid %d and unhandled status %d" % (
                     pid, status))
 
-    
+    def installSIGTERMHandler(self):
+        """
+        Install our own signal handler for SIGTERM.
+        This will call the currently installed one first, then shut down
+        jobs.
+        """
+        self.debug("Installing SIGTERM handler")
+        handler = signal.signal(signal.SIGTERM, self._SIGTERMHandler)
+        if handler not in (signal.SIG_IGN, signal.SIG_DFL, None):
+            self._oldSIGTERMHandler = handler
+
+    def _SIGTERMHandler(self, signal, frame):
+        self.debug("handling SIGTERM")
+        reactor.killed = True
+        self.debug("_SIGTERMHandler: shutting down jobheaven")
+        d = self.job_heaven.shutdown()
+
+        if self._oldSIGTERMHandler:
+            if d:
+                self.debug("chaining Twisted handler")
+                d.addCallback(lambda result: self._oldSIGTERMHandler(signal, frame))
+            else:
+                self.debug("calling Twisted handler")
+                self._oldSIGTERMHandler(signal, frame)
+
+        self.debug("_SIGTERMHandler: done")
+ 
 
 class JobDispatcher:
     __implements__ = portal.IRealm
@@ -380,7 +408,7 @@ class JobDispatcher:
         if pb.IPerspective in interfaces:
             avatar = self.root.createAvatar(avatarId)
             reactor.callLater(0, avatar.attached, mind)
-            return pb.IPerspective, avatar, avatar.shutdown
+            return pb.IPerspective, avatar, avatar.logout
         else:
             raise NotImplementedError("no interface")
 
@@ -495,16 +523,20 @@ class JobAvatar(pb.Avatar, log.Loggable):
         d.addErrback(self._startErrback, kid.name, kid.type)
         d.addErrback(self._defaultErrback)
                                           
-    def shutdown(self):
-        self.log('%s disconnected' % self.name)
+    def logout(self):
+        self.log('logout called, %s disconnected' % self.name)
         self.mind = None
         for feed, port in self.feeds:
             port.free()
         self.feeds = []
         
     def stop(self):
+        """
+        returns: a deferred marking completed stop.
+        """
+        self.debug('stopping %s' % self.name)
         if not self.mind:
-            return
+            return defer.succeed(None)
         
         return self.mind.callRemote('stop')
         
@@ -532,6 +564,8 @@ class JobHeaven(pb.Root, log.Loggable):
         return avatar
 
     def shutdown(self):
-        for avatar in self.avatars.values():
-            avatar.stop()
+        self.debug('Shutting down JobHeaven')
+        d = None
 
+        dl = defer.DeferredList([x.stop() for x in self.avatars.values()])
+        return dl

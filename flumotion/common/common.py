@@ -25,9 +25,12 @@ A set of common functions.
 """
 
 import os 
+import signal
 import sys
+import time
 
 from twisted.python import reflect
+from flumotion.common import errors, log
 
 # Note: This module is loaded very early on, so
 #       don't add any extra flumotion imports unless you
@@ -180,6 +183,7 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     os.dup2(se.fileno(), sys.stderr.fileno())
 
 def argRepr(args=(), kwargs={}):
+    ### FIXME: Johan, please comment functions, this is meaningless
     assert (type(args) is tuple or
             type(args) is list)
     assert type(kwargs) is dict
@@ -290,3 +294,94 @@ def addPackagePath(packagePath):
                                packageName.replace('.', os.sep))
         package.__path__.insert(0, subPath)
 
+
+ def ensureDir(dir, description):
+     """
+     Ensure the given directory exists, creating it if not.
+     Raises a SystemError if this fails, including the given description.
+     """
+     if not os.path.exists(dir):
+         try:
+             os.makedirs(dir)
+         except:
+             raise errors.SystemError, "could not create %s directory %s" % (
+                 description, dir)
+ 
+ def writePidFile(type, name):
+     """
+     Write a pid file in the run directory, using the given process type
+     and process name for the filename.
+     """
+     pid = os.getpid()
+     pidPath = os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
+     file = open(pidPath, 'w')
+     file.write("%d\n" % pid)
+     file.close()
+ 
+ def deletePidFile(type, name):
+     """
+     Delete the pid file in the run directory, using the given process type
+     and process name for the filename.
+     """
+     pid = os.getpid()
+     pidPath = os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
+     os.unlink(pidPath)
+ 
+ def getPid(type, name):
+     """
+     Get the pid from the pid file in the run directory, using the given
+     process type and process name for the filename.
+ 
+     @returns: pid of the process, or None.
+     """
+     pidPath = os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
+     if not os.path.exists(pidPath):
+         return None
+ 
+     file = open(pidPath, 'r')
+     pid = file.readline()
+     file.close()
+     if not pid or int(pid) == 0:
+         return None
+ 
+     return int(pid)
+ 
+ def waitPidFile(type, name):
+     """
+     Wait for the given process type and name to have started.
+     Return the pid if it started successfully, or None if it didn't.
+     """
+     mtime = os.stat(configure.rundir)[8]
+     pid = getPid(type, name)
+     if pid:
+         return pid
+         
+     while os.stat(configure.rundir)[8] == mtime:
+         pid = getPid(type, name)
+         #if pid:
+         #    return pid
+         time.sleep(0.1)
+ 
+     pid = getPid(type, name)
+     return pid
+ 
+ def waitForKill():
+     """
+     Wait until we get killed by someone else.
+     """
+     class Waiter:
+         def __init__(self):
+             self.sleeping = True
+             self.oldhandler = signal.signal(signal.SIGTERM,
+                 self._SIGTERMHandler)
+ 
+         def _SIGTERMHandler(self, number, frame):
+             self.sleeping = False
+ 
+         def sleep(self):
+             while self.sleeping:
+                 time.sleep(0.1)
+ 
+     waiter = Waiter()
+     waiter.sleep()
+ 

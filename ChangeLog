@@ -1,3 +1,38 @@
+2004-11-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/Makefile.am:
+	* bin/flumotion-manager.in:
+	* bin/flumotion-worker.in:
+	* bin/flumotion.in:
+	* conf/Makefile.am:
+	* conf/managers/default/planet.xml:
+	* conf/workers/default.xml:
+	* configure.ac:
+	* doc/Makefile.am:
+	* doc/redhat/flumotion:
+	* doc/redhat/init.d/flu-manager:
+	* doc/redhat/init.d/flu-worker:
+	* doc/redhat/sysconfig/flumotion-manager:
+	* doc/redhat/sysconfig/flumotion-worker:
+	* flumotion.spec.in:
+	* flumotion/Makefile.am:
+	* flumotion/common/common.py:
+	* flumotion/configure/Makefile.am:
+	* flumotion/configure/configure.py:
+	* flumotion/configure/installed.py.in:
+	* flumotion/configure/uninstalled.py.in:
+	* flumotion/manager/main.py:
+	* flumotion/service/Makefile.am:
+	* flumotion/service/__init__.py:
+	* flumotion/service/main.py:
+	* flumotion/service/service.py:
+	* flumotion/worker/config.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  restructuring and adding code to support decent init scripts
+	  and correct daemon behaviour
+
 2004-11-02  Johan Dahlin  <johan@gnome.org>
 
 	* Makefile.am:

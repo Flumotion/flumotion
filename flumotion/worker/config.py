@@ -71,6 +71,7 @@ class WorkerConfigXML(log.Loggable):
             
         self.parse()
         
+    # FIXME: privatize, called from __init__
     def parse(self):
         # <worker name="default">
         #     <manager>

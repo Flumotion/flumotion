@@ -116,6 +116,7 @@ def _run_main(path):
         sys.exit(main(sys.argv))
     except errors.SystemError, e:
         print 'ERROR:', e
+        sys.exit(1)
     
 try:
     _setup_project_root()

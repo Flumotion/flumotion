@@ -1,6 +1,12 @@
 <planet>
 
   <manager>
+<!--
+    <host></host>
+    <port></port>
+    <transport></transport>
+-->
+
     <component name="manager-bouncer" type="htpasswdcrypt">
       <data><![CDATA[
 user:PSfNpHTkpTx1M

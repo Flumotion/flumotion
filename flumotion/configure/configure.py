@@ -44,6 +44,8 @@ and then access the variables from the configure module.  For example:
 @type pythondir:     string
 @var  registrydir:   directory where the registry files are stored
 @type registrydir:   string
+@var  rundir:        directory where the run/pid files are stored
+@type rundir:        string
 
 @var  defaultTCPManagerPort:  the default manager port for TCP communication
 @type defaultTCPManagerPort:  int

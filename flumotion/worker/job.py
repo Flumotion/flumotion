@@ -25,6 +25,7 @@ Worker-side objects to handle job processes.
 """
 
 import os
+import sys
 import resource
 import signal
 import gobject
@@ -84,6 +85,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
     def __init__(self, options):
         self.remote = None
         self.options = options
+        self.name = None
         
     ### pb.Referenceable remote methods called on by the WorkerBrain
     ### FIXME: arguments not needed anymore, Medium knows about options
@@ -105,13 +107,14 @@ class JobMedium(pb.Referenceable, log.Loggable):
         @param feedPorts:  feedName -> port
         @type  feedPorts:  dict
         """
+        self.name = name
         defs = registry.registry.getComponent(type)
         self._runComponent(name, type, configDict, defs, feedPorts)
 
     def remote_stop(self):
+        self.debug('%s: remote_stop() called' % self.name)
         reactor.stop()
-        print 'XXX: Quit cleanly'
-        os._exit(1)
+        #os._exit(0)
 
     ### IMedium methods
     def setRemoteReference(self, remoteReference):
@@ -273,11 +276,10 @@ def run(name, options):
                 
         reactor.stop()
             
-    reactor.callLater(0, _exitCb)
-    reactor.run()
+    #reactor.callLater(0, _exitCb)
+    #reactor.run()
     log.debug('job', 'Left reactor.run')
-    log.info('job', 'Job stopped, returning with exit value 1')
+    log.info('job', 'Job stopped, returning with exit value 0')
             
-    # FIXME: why return 1 ? this might have been a nice exit, no ?
-    os._exit(1)
+    os._exit(0)
     

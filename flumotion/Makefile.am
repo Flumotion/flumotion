@@ -4,6 +4,7 @@ SUBDIRS = \
 	component \
 	configure \
 	manager \
+	service \
 	test \
 	tester \
 	twisted \
