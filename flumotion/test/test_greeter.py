@@ -38,10 +38,9 @@ class WizardTest(unittest.TestCase):
     state = False
 
     def testMakeGreeter(self):
-        g = greeter.Greeter()
+        wiz = greeter.Greeter()
         ass = self.assert_
-        ass(isinstance(g.wiz, wizard.Wizard))
-        wiz = g.wiz
+        ass(isinstance(wiz, wizard.Wizard))
         ass(isinstance(wiz.name, str))
         ass(isinstance(wiz.page, wizard.WizardStep))
         ass(isinstance(wiz.pages, dict))
@@ -49,8 +48,10 @@ class WizardTest(unittest.TestCase):
         ass(isinstance(wiz.state, dict))
 
         # check a couple names that come from libglade..
-        ass(isinstance(wiz.button_next, gtk.Widget))
-        ass(isinstance(wiz.button_prev, gtk.Widget))
+        next = wiz.widgets['button_next']
+        prev = wiz.widgets['button_prev']
+        ass(isinstance(next, gtk.Widget))
+        ass(isinstance(prev, gtk.Widget))
         
         def ass(expr):
             if not expr:
@@ -59,9 +60,6 @@ class WizardTest(unittest.TestCase):
 
         def sensitive(w):
             return w.get_property('sensitive')
-
-        next = wiz.button_next
-        prev = wiz.button_prev
 
         # makes sure proc only gets called once
         def idle_add(proc):

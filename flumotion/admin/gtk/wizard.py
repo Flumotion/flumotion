@@ -38,43 +38,56 @@ from flumotion.ui.glade import GladeWidget, GladeWindow
 # wizard in flumotion.wizard, because it has a history-sensitive navigation bar
 # as well. For simple processes, this wizard is sufficient.
 #
-# To conjure up a new wizard, call Wizard(NAME, FIRST_PAGE). NAME is the name of
-# the wizard, for instance 'greeter'. FIRST_PAGE is the name of the first page
-# that should be shown, for instance 'initial'.
+# You will first have to define the steps in your wizard. They are defined by
+# subclassing WizardStep. You define the required class variables, the on_next
+# method, and optionally the other methods documented in then WizardStep class.
 #
-# The pages of the wizard are found by putting together the names of the wizard
-# and the page, e.g. greeter-initial.glade, and constructing the widget named
-# 'page' from that file. 'page' must not be a toplevel window.
+# class FirstStep(WizardStep):
+#     name = 'first-step'
+#     title = 'First step'
+#     text = 'Please fill in your bank details below.'
+#     next_pages = ['second-step']
 #
-# When instantiated, the wizard will reference the module dict of the calling
-# function. If there exists a class _in that module_ whose name begins with the
-# page name and ends with '_handlers', for instance initial_handlers, the signal
-# handlers defined in the glade file will be autoconnected to the handlers in
-# that class.
-# 
-# When the user presses the "next" button, the wizard will call a function whose
-# name begins with the page name and ends with '_cb', for instance initial_cb.
-# The wizard searches for the function from within the dict described above.
-# This function will be called with two arguments: the 'page' widget, and a
-# dictionary provided to hold the cumulative state of the wizard. The function
-# is expected to return the name of the next page, which might depend on what
-# the user chooses in the current page. A return value of '*finished*' indicates
-# that the wizard is finished.
+#     def on_next(self, state):
+#         state['bank-account'], self.bank_account_entry.get_text()
+#         return '*finished*'
+#
+# The on_next method is expected to save any relevant information to the state
+# object (a dict) and return the name of the next step, or '*finished*' if this
+# is the last step.
+#
+# Besides control flow, the name of the step is also used to load up a glade
+# file describing the step's contents. The wizard will look for it as
+# WNAME-SNAME.glade, where WNAME is the name of the wizard and SNAME is the name
+# of the step. The widget taken will be the direct child of the first toplevel
+# window. Each widget in the glade file will be set as an attribute on the
+# WizardStep, e.g. bank_account_entry in the example above.
+#
+# The "text" is shown above the widget created from the glade file. next_pages
+# is a list of possible next steps. Before the widget is shown, the is_available
+# method will be called on the steps listed in next_pages, and the names of
+# those steps that are actually available will be put in the available_pages
+# attribute on the current step. This is useful to allow early steps to show
+# if a later step is not available, perhaps by desensitizing an option.
+#
+# Methods other than on_next and is_available are documented in the WizardStep
+# class.
+#
+# To conjure up a new wizard, call Wizard(NAME, FIRST_PAGE_NAME, STEP1,
+# STEP2...). NAME is the name of the wizard, for instance 'greeter'. FIRST_PAGE
+# is the name of the first page that should be shown, for instance 'first-step'
+# in the example above. STEP1... are the WizardStep specialized classes (not
+# instances).
 #
 # The wizard is run with the run() method. It returns the state object
 # accumulated by the pages, or None if the user closes the wizard window.
 #
-# Example:
-#
-# def initial_cb(page, state):
-#     state['foo'] = 'bar'
-#     return '*finished*'
-#
-# w = Wizard('foo', 'initial')
+# w = Wizard('foo', 'first-step', FirstStep)
 # w.show()
-# w.run() => {'foo': 'bar'}
+# w.run() => {'bank-account': 'foo'}
 
 
+# fixme: doc vmethods
 class WizardStep(GladeWidget):
     # all values filled in by subclasses
     name = None
@@ -96,75 +109,61 @@ class WizardStep(GladeWidget):
         # vmethod
         pass
 
-class Wizard(gobject.GObject):
+class Wizard(GladeWindow):
     '''
-    A generic wizard, constructed from state procedures and a set of
-    corresponding glade files.
+    A generic wizard.
     '''
 
+    # should by filled by subclasses
     name = None
+    steps = []
+
+    # private
+    glade_file = 'admin-wizard.glade'
     page = None
     page_stack = []
     pages = {}
     state = {}
+
     gsignal('finished')
-    image_icon = textview_text = eventbox_top = label_title = None
-    eventbox_content = button_next = button_prev = None
 
-    def __init__(self, name, initial_page, *pages):
-        self.__gobject_init__()
+    def __init__(self, initial_page):
+        GladeWindow.__init__(self)
 
-        self.window = None
-        self.page_bin = None
-        for x in pages:
-            p = self.pages[x.name] = x(name+'-')
+        # these should be filled by subclasses
+        assert self.name
+        assert self.steps
+
+        for x in self.steps:
+            p = self.pages[x.name] = x(self.name+'-')
             p.show()
-        self.create_ui()
-        self.name = name
+
+        self._setup_ui()
         self.set_page(initial_page)
 
-    def create_ui(self):
-        # called from __init__
-        wtree = gtk.glade.XML(os.path.join(configure.gladedir,
-                                           'admin-wizard.glade'))
-
-        for widget in wtree.get_widget_prefix(''):
-            # So we can access the step from inside the widget
-            # widget.set_data('wizard-step', self)
-            if isinstance(widget, gtk.Window):
-                if widget.get_property('visible'):
-                    raise AssertionError('window for %r is visible' % self)
-            
-            name = widget.get_name()
-            if hasattr(self, name) and self.name:
-                raise AssertionError(
-                    "There is already an attribute called %s in %r" % (name,
-                                                                       self))
-            
-            setattr(self, name, widget)
+    def _setup_ui(self):
+        w = self.widgets
 
         iconfile = os.path.join(configure.imagedir, 'fluendo.png')
         self.window.set_icon_from_file(iconfile)
-        self.image_icon.set_from_file(iconfile)
+        w['image_icon'].set_from_file(iconfile)
 
         # have to get the style from the theme, but it's not really there until
         # it's realized
-        self.label_title.realize()
-        style = self.label_title.get_style()
+        w['label_title'].realize()
+        style = w['label_title'].get_style()
 
         title_bg = style.bg[gtk.STATE_SELECTED]
         title_fg = style.fg[gtk.STATE_SELECTED]
-        self.eventbox_top.modify_bg(gtk.STATE_NORMAL, title_bg)
-        self.eventbox_top.modify_bg(gtk.STATE_INSENSITIVE, title_bg)
-        self.label_title.modify_fg(gtk.STATE_NORMAL, title_fg)
-        self.label_title.modify_fg(gtk.STATE_INSENSITIVE, title_fg)
+        w['eventbox_top'].modify_bg(gtk.STATE_NORMAL, title_bg)
+        w['eventbox_top'].modify_bg(gtk.STATE_INSENSITIVE, title_bg)
+        w['label_title'].modify_fg(gtk.STATE_NORMAL, title_fg)
+        w['label_title'].modify_fg(gtk.STATE_INSENSITIVE, title_fg)
         normal_bg = style.bg[gtk.STATE_NORMAL]
-        self.textview_text.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
-        self.textview_text.modify_bg(gtk.STATE_INSENSITIVE, normal_bg)
-        self.eventbox_content.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
-        self.eventbox_content.modify_bg(gtk.STATE_INSENSITIVE, normal_bg)
-
-        wtree.signal_autoconnect(self)
+        w['textview_text'].modify_base(gtk.STATE_INSENSITIVE, normal_bg)
+        w['textview_text'].modify_bg(gtk.STATE_INSENSITIVE, normal_bg)
+        w['eventbox_content'].modify_base(gtk.STATE_INSENSITIVE, normal_bg)
+        w['eventbox_content'].modify_bg(gtk.STATE_INSENSITIVE, normal_bg)
 
     def set_page(self, name):
         try:
@@ -172,20 +171,21 @@ class Wizard(gobject.GObject):
         except KeyError:
             raise AssertionError ('No page named %s in %r' % (name, self.pages))
 
-        page.button_next = self.button_next
+        w = self.widgets
+        page.button_next = w['button_next']
             
         available_pages = [p for p in page.next_pages
                                 if self.pages[p].is_available()]
 
-        self.button_prev.set_sensitive(bool(self.page_stack))
+        w['button_prev'].set_sensitive(bool(self.page_stack))
 
         self.page = page
-        for w in self.page_bin.get_children():
-            self.page_bin.remove(w)
-        self.page_bin.add(page)
-        self.label_title.set_markup('<big><b>%s</b></big>' % page.title)
-        self.textview_text.get_buffer().set_text(page.text)
-        self.button_next.set_sensitive(True)
+        for x in w['page_bin'].get_children():
+            w['page_bin'].remove(x)
+        w['page_bin'].add(page)
+        w['label_title'].set_markup('<big><b>%s</b></big>' % page.title)
+        w['textview_text'].get_buffer().set_text(page.text)
+        w['button_next'].set_sensitive(True)
         page.setup(self.state, available_pages)
 
     def on_delete_event(self, *window):

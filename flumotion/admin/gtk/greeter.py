@@ -131,25 +131,9 @@ class LoadConnection(wizard.WizardStep):
         self.connections.grab_focus()
 
 
-class Greeter:
-    wiz = None
+class Greeter(wizard.Wizard):
+    name = 'greeter'
+    steps = [Initial, ConnectToExisting, Authenticate, LoadConnection]
+
     def __init__(self):
-        self.wiz = wizard.Wizard('greeter', 'initial',
-                                 Initial, ConnectToExisting, Authenticate,
-                                 LoadConnection)
-    def run(self):
-        self.wiz.show()
-        return self.wiz.run()
-
-    def destroy(self):
-        return self.wiz.destroy()
-
-    def hide(self):
-        return self.wiz.hide()
-
-    def show(self):
-        return self.wiz.show()
-
-    def set_sensitive(self, is_sensitive):
-        return self.wiz.set_sensitive(is_sensitive)
-
+        wizard.Wizard.__init__(self, 'initial')

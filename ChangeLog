@@ -1,5 +1,14 @@
 2005-03-23  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_greeter.py (WizardTest.testMakeGreeter):
+	Update for changes.
+
+	* flumotion/admin/gtk/greeter.py (Greeter): Derive from Wizard.
+
+	* flumotion/admin/gtk/wizard.py: Add docs.
+	(Wizard): Derive from GladeWindow. Take the name and list of steps
+	as class variables.
+
 	* tools/pycheckerhelp.py: Pacify pychecker?!?
 
 	* data/glade/Makefile.am (glade_DATA): Added authenticate.glade
