@@ -1,29 +1,28 @@
 <root>
-  <component name="videotest-producer" type="producer">
-    <pipeline>
-      videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
-    </pipeline>
+  
+  <component name="videotest-producer" type="videotest">
+    <width>320</width>
+    <height>240</height>
+    <framerate>5.0</framerate>
   </component>
 
-  <component name="videotest-producer-big" type="producer">
-    <pipeline>
-      videotestsrc ! video/x-raw-yuv,width=640,height=480,framerate=2.0,format=(fourcc)I420
-    </pipeline>
+  <component name="videotest-producer-big" type="videotest">
+    <width>640</width>
+    <height>480</height>
+    <framerate>5.0</framerate>
   </component>
 
   <component name="png-overlay" type="overlay">
     <source>videotest-producer</source>
     <location>/home/jdahlin/Pictures/alphacolors.png</location>
   </component>
-
-  <component name="jpeg+multipart" type="converter">
+  
+  <component name="jpeg+multipart" type="multipartjpeg">
     <source>png-overlay</source>
-    <pipeline>ffmpegcolorspace ! jpegenc ! multipartmux</pipeline>
   </component>
 
-  <component name="jpeg+multipart-big" type="converter">
+  <component name="jpeg+multipart" type="multipartjpeg">
     <source>videotest-producer-big</source>
-    <pipeline>ffmpegcolorspace ! jpegenc ! multipartmux</pipeline>
   </component>
 
   <component name="auth-1" type="htpasswd-auth">

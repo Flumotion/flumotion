@@ -132,13 +132,11 @@ class FlumotionConfigXML:
         
         return ConfigEntry(name, type, function, config)
 
-    def get_int_value(self, nodes):
-        values = []
-        for subnode in nodes:
-            data = subnode.childNodes[0].data
-            values.append(int(data))
+    def get_float_value(self, nodes):
+        return [float(subnode.childNodes[0].data) for subnode in nodes]
 
-        return values
+    def get_int_value(self, nodes):
+        return [int(subnode.childNodes[0].data) for subnode in nodes]
 
     def get_string_value(self, nodes):
         values = []
@@ -195,6 +193,8 @@ class FlumotionConfigXML:
                 value = self.get_string_value(nodes)
             elif type == 'int':
                 value = self.get_int_value(nodes)
+            elif type == 'float':
+                value = self.get_float_value(nodes)
             elif type == 'xml':
                 value = self.get_xml_value(nodes)
             else:

@@ -61,4 +61,20 @@
     </properties>
   </component>
 
+  <component type="videotest">
+    <source location="flumotion.components.videotest"/>
+    <properties>
+      <property name="height" type="int"/>
+      <property name="width" type="int"/>
+      <property name="framerate" type="float"/>
+    </properties>
+  </component>
+
+  <component type="multipartjpeg">
+    <source location="flumotion.components.multipartjpeg"/>
+    <properties>
+      <property name="source" type="string" multiple="no"/>
+    </properties>
+  </component>
+
 </components>

@@ -1,5 +1,10 @@
 2004-08-11  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/server/config.py (FlumotionConfigXML.parseProperties):
+	Add support for float values
+
+	* flumotion/components/multipartjpeg.py (createComponent): New component
+
 	* flumotion/server/config.py (FlumotionConfigXML.parse_entry):
 	Clean up
 
