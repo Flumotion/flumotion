@@ -180,16 +180,24 @@ class Window(log.Loggable):
         cb = self.admin.getUIEntry(name)
         cb.addCallback(cb_gotUI)
 
-    def error_dialog(self, message, parent=None):
+    def error_dialog(self, message, parent=None, response=True):
         """
         Show an error message dialog.
+
+        @arg message the message to display.
+        @arg parent the gtk.Window parent window.
+        @arg response whether the error dialog should go away after response.
+
+        returns: the error dialog.
         """
         if not parent:
             parent = self.window
         d = gtk.MessageDialog(parent, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
             gtk.BUTTONS_OK, message)
-        d.connect("response", lambda self, response: self.destroy())
+        if response:
+            d.connect("response", lambda self, response: self.destroy())
         d.show_all()
+        return d
 
     def admin_connected_cb(self, admin):
         self.update(admin.clients)
@@ -199,9 +207,8 @@ class Window(log.Loggable):
 
     def admin_connection_refused_later(self, host, port):
         message = "Connection to controller on %s:%d was refused." % (host, port)
-        d = self.error_dialog(message)
-        d.run()
-        self.close()
+        d = self.error_dialog(message, response = False)
+        d.connect('response', self.close)
 
     def admin_connection_refused_cb(self, admin, host, port):
         log.debug('adminclient', "handling connection-refused")
