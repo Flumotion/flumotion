@@ -43,15 +43,11 @@ from flumotion.twisted import pb as fpb
 from flumotion.worker import job
 from flumotion.configure import configure
 
-
-#factoryClass = fpb.ReconnectingPBClientFactory
-factoryClass = fpb.FPBClientFactory
+factoryClass = fpb.ReconnectingFPBClientFactory
 class WorkerClientFactory(factoryClass):
     """
     I am a client factory for the worker to log in to the manager.
     """
-    #__super_login = factoryClass.startLogin
-    __super_login = factoryClass.login
     def __init__(self, brain):
         """
         @type brain: L{flumotion.worker.worker.WorkerBrain}
@@ -59,14 +55,49 @@ class WorkerClientFactory(factoryClass):
         self.medium = brain.medium
         # doing this as a class method triggers a doc error
         factoryClass.__init__(self)
+        # maximum 10 second delay for workers to attempt to log in again
+        self.maxDelay = 10
         
-    def login(self, keycard):
-        return self.__super_login(keycard,
-                                  self.medium,
-                                  interfaces.IWorkerMedium)
+    def startLogin(self, keycard):
+        factoryClass.startLogin(self, keycard, self.medium,
+            interfaces.IWorkerMedium)
         
-    def gotPerspective(self, remoteReference):
+    def gotDeferredLogin(self, d):
+        d.addCallback(self._loginCallback)
+        d.addErrback(self._accessDeniedErrback)
+        d.addErrback(self._connectionRefusedErrback)
+        d.addErrback(self._loginFailedErrback)
+            
+    def _loginCallback(self, reference):
+        self.info("Logged in to manager")
+        self.debug("remote reference %r" % reference)
+        self.setRemoteReference(reference)
+
+    def setRemoteReference(self, remoteReference):
         self.medium.setRemoteReference(remoteReference)
+        remoteReference.notifyOnDisconnect(self._remoteDisconnected)
+
+    def _remoteDisconnected(self, remoteReference):
+        self.warning('Lost connection to manager, will attempt to reconnect')
+
+    def _accessDeniedErrback(self, failure):
+        failure.trap(twisted.cred.error.UnauthorizedLogin)
+        self.error('Access denied.')
+        
+    def _connectionRefusedErrback(self, failure):
+        failure.trap(twisted.internet.error.ConnectionRefusedError)
+        self.error('Connection to %s:%d refused.' % (self.manager_host,
+                                                     self.manager_port))
+                                                      
+    def _loginFailedErrback(self, failure):
+        self.error('Login failed, reason: %s' % str(failure))
+
+    # override log.Loggable method so we don't traceback
+    def error(self, message):
+        self.warning('Shutting down worker because of error:')
+        self.warning(message)
+        print >> sys.stderr, 'ERROR: %s' % message
+        reactor.stop()
 
 class WorkerMedium(pb.Referenceable, log.Loggable):
     """
@@ -288,12 +319,8 @@ class WorkerBrain(log.Loggable):
         self.worker_client_factory = WorkerClientFactory(self)
 
     def login(self, keycard):
-        d = self.worker_client_factory.login(keycard)
-        d.addCallback(self._loginCallback)
-        d.addErrback(self._cb_accessDenied)
-        d.addErrback(self._cb_connectionRefused)
-        d.addErrback(self._cb_loginFailed)
-                                 
+        self.worker_client_factory.startLogin(keycard)
+                             
     def setup(self):
         root = JobHeaven(self, self.options.feederports)
         dispatcher = JobDispatcher(root)
@@ -313,22 +340,6 @@ class WorkerBrain(log.Loggable):
         self.warning(message)
         print >> sys.stderr, 'ERROR: %s' % message
         reactor.stop()
-        
-    def _loginCallback(self, reference):
-        self.info("Logged in to manager")
-        self.debug("remote reference %r" % reference)
-
-    def _cb_accessDenied(self, failure):
-        failure.trap(twisted.cred.error.UnauthorizedLogin)
-        self.error('Access denied.')
-        
-    def _cb_connectionRefused(self, failure):
-        failure.trap(twisted.internet.error.ConnectionRefusedError)
-        self.error('Connection to %s:%d refused.' % (self.manager_host,
-                                                     self.manager_port))
-                                                      
-    def _cb_loginFailed(self, failure):
-        self.error('Login failed, reason: %s' % str(failure))
 
     def installSIGCHLDHandler(self):
         """
