@@ -101,6 +101,11 @@ class AdminAvatar(base.ManagerAvatar):
         m = self.vishnu.getComponentMapper(componentState)
         avatar = m.avatar
         
+        if not avatar:
+            self.warning('No avatar for %s, cannot call remote' %
+                componentState.get('name'))
+            raise errors.SleepingComponentError()
+
         # XXX: Maybe we need to have a prefix, so we can limit what an
         # admin interface can call on a component
         try:
@@ -108,7 +113,7 @@ class AdminAvatar(base.ManagerAvatar):
         except Exception, e:
             msg = "exception on remote call %s: %s" % (methodName, str(e))
             self.warning(msg)
-            return failure.Failure(errors.RemoteMethodError(str(e)))
+            raise errors.RemoteMethodError(str(e))
 
     def perspective_workerCallRemote(self, workerName, methodName,
                                      *args, **kwargs):

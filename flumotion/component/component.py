@@ -198,26 +198,13 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         return self.comp.state
         
     def remote_start(self, *args, **kwargs):
-        """
-        Tell the component to start.  This is called when all its dependencies
-        are already started.
-
-        Extended by subclasses.  Subclasses call this as the last method if
-        the start is successful.  Sets the mood to happy.
-        """
-        self.comp.updateMood()
-        self.comp.startHeartbeat()
-        
+        return self.comp.start(*args, **kwargs)
+       
     def remote_stop(self):
-        """
-        Tell the component to stop.
-        The connection to the manager will be closed.
-        The job process will also finish.
-        """
-        self.comp.stopHeartbeat()
-        self.comp.stop()
-        self.remote.broker.transport.loseConnection()
-        reactor.stop()
+        self.info('Stopping job')
+        reactor.callLater(0, self.remote.broker.transport.loseConnection)
+        reactor.callLater(0, reactor.stop)
+        return self.comp.stop()
 
     def remote_reloadComponent(self):
         """Reload modules in the component."""
@@ -377,5 +364,26 @@ class BaseComponent(log.Loggable, gobject.GObject):
         admin client model.
         """
         self.medium.callRemote("adminCallRemote", methodName, *args, **kwargs)
+
+    # mood change functions
+    def start(self, *args, **kwargs):
+        """
+        Tell the component to start.  This is called when all its dependencies
+        are already started.
+
+        Extended by subclasses.  Subclasses call this as the last method if
+        the start is successful.  Sets the mood to happy.
+        """
+        self.updateMood()
+        self.startHeartbeat()
+        
+    def stop(self):
+        """
+        Tell the component to stop.
+        The connection to the manager will be closed.
+        The job process will also finish.
+        """
+        self.stopHeartbeat()
+        self.stop()
 
 gobject.type_register(BaseComponent)

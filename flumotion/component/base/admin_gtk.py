@@ -37,7 +37,6 @@ class BaseAdminGtk(log.Loggable):
         """
         @param state: state of component this is a UI for
         @type  state: L{flumotion.common.planet.AdminComponentState}
-        @param name:  name of the component this is a UI for
         @type  admin: L{flumotion.admin.admin.AdminModel}
         @param admin: the admin model that interfaces with the manager for us
         @type  view:   

@@ -1,3 +1,11 @@
+2005-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/manager/admin.py:
+	  move _start/_stop functions around
+
 2005-02-08  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/wizard/wizard.py (Wizard.present): New proxy method.

@@ -78,31 +78,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.callRemote('notifyFeedPorts', component.feed_ports)
 
     ### Referenceable remote methods which can be called from manager
-    # FIXME: unambiguate eaters and feeders' meaning
-    def remote_start(self, eatersData, feedersData):
-        """
-        Tell the component to start, linking itself to other components.
-
-        @type eatersData: list of (feedername, host, port) tuples of elements
-                          feeding our eaters.
-        @type feedersData: list of (name, host) tuples of our feeding elements
-
-        @returns: list of (feedName, host, port)-tuples of feeds the component
-                  produces.
-        """
-        self.debug('remote_start with eaters data %s and feeders data %s' % (
-            eatersData, feedersData))
-        self.comp.setMood(moods.waking)
-
-        ret = self.comp.link(eatersData, feedersData)
-
-        self.debug('remote_start: returning value %s' % ret)
-
-        # chain to parent 
-        basecomponent.BaseComponentMedium.remote_start(self)
-        
-        return ret
-
     def remote_play(self):
         self.comp.play()
         
@@ -739,6 +714,32 @@ class ParseLaunchComponent(FeedComponent):
         
         return pipeline
 
+    # mood change/state functions
+    def start(self, eatersData, feedersData):
+        """
+        Tell the component to start, linking itself to other components.
+
+        @type eatersData: list of (feedername, host, port) tuples of elements
+                          feeding our eaters.
+        @type feedersData: list of (name, host) tuples of our feeding elements
+
+        @returns: list of (feedName, host, port)-tuples of feeds the component
+                  produces.
+        """
+        self.debug('start with eaters data %s and feeders data %s' % (
+            eatersData, feedersData))
+        self.setMood(moods.waking)
+
+        ret = self.link(eatersData, feedersData)
+
+        self.debug('start: returning value %s' % ret)
+
+        # chain to parent 
+        basecomponent.BaseComponent.start(self)
+        
+        return ret
+
+
 class Effect(log.Loggable):
     """
     I am a part of a feed component for a specific group
@@ -774,3 +775,4 @@ class Effect(log.Loggable):
         @rtype:  L{FeedComponent}
         """                               
         return self.component
+
