@@ -1,4 +1,23 @@
-This is Flumotion 0.1.1, "El Local".
+This is Flumotion 0.1.2, "Belchica".
+
+Issues fixed since 0.1.1:
+
+ticket	summary
+20	No error handling for missing GStreamer plugins
+43	figure out a python way of changing import so it can load similar
+	package paths from different locations
+45	fix service script
+61	OSS/Alsa/ESD option in audio source
+72	Webcam component should propose device selection
+85	Bttv option in the Wizard seems broken
+73	Workers become zombies after interface cleanup
+80	Flumotion-tester do not work due to missing dependecies
+	(flumotion.utils import log)
+32	Flumotion services not listed in the Fedora 'setup' tool
+51	Worker is not shutting down cleanly.
+58	check for python imaging
+76	wizard steps should remember last worker chosen
+84	Unable to go ahead if wizard stops due to missing plugin
 
 Issues fixed since 0.1.0:
 

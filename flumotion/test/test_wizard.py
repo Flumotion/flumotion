@@ -119,3 +119,5 @@ class WizardSaveTest(unittest.TestCase):
         for item in config.values():
             print item.name, item.worker
         #print self.wizard.printOut()
+    testAudioTestWorkers.skip = 1
+

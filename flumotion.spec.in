@@ -173,7 +173,7 @@ fi
 %changelog
 * Fri Nov 05 2004 Christian Schaller <christian at fluendo com>
 - Add call to chkconfig script in post and preun parts to get our service into 
-the service list
+  the service list
 
 * Fri Nov 05 2004 Thomas Vander Stichele <thomas at apestaart dot org>
 - use DESTDIR install to fix python compiles
