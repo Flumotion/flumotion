@@ -52,6 +52,8 @@ class WorkerClientFactory(factoryClass):
         """
         @type brain: L{flumotion.worker.worker.WorkerBrain}
         """
+        self.manager_host = brain.manager_host
+        self.manager_port = brain.manager_port
         self.medium = brain.medium
         # doing this as a class method triggers a doc error
         factoryClass.__init__(self)
