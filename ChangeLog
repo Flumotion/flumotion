@@ -3,6 +3,7 @@
 	* flumotion/server/streamer.py (HTTPStreamingResource.setHeader):
 	Rewrite most part of the HTTP server, handles simple
 	authentication now, ready for the new authentication framework.
+	(HTTPStreamingResource.render): Add simple authentication
 
 	* conf/videotest-jpeg.conf: Overlay an image.
 

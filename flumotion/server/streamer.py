@@ -123,6 +123,8 @@ class HTTPStreamingResource(resource.Resource):
     def isAuthenticated(self, request):
         if request.getClientIP() == '127.0.0.1':
             return True
+        if request.getUser() == 'fluendo' and request.getPassword() == 's3cr3t':
+            return True
         return False
     
     def getChild(self, path, request):
@@ -151,10 +153,14 @@ class HTTPStreamingResource(resource.Resource):
             setHeader('Content-type', mime)
 
         os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
+
+    def addClient(self, request):
+        fd = request.transport.fileno()
+        self.request_hash[fd] = request
+        self.streamer.add_client(fd)
         
     def render(self, request):
-        fd = request.transport.fileno()
-        self.msg('(%d) client from %s connected' % (fd, request.getClientIP()))
+        self.msg('client from %s connected' % (request.getClientIP()))
     
         if not self.isReady():
             self.msg('Not sending data, it\'s not ready')
@@ -162,14 +168,15 @@ class HTTPStreamingResource(resource.Resource):
 
         if self.isAuthenticated(request):
             self.setHeaders(request)
-            self.request_hash[fd] = request
-            self.streamer.add_client(fd)
+            self.addClient(request) 
             return server.NOT_DONE_YET
         else:
             error_code = http.UNAUTHORIZED
+            request.setResponseCode(error_code)
             request.setHeader('server', HTTP_VERSION)
             request.setHeader('content-type', 'text/html')
-            
+            request.setHeader('WWW-Authenticate', 'Basic realm="Restricted Access"')
+
             return ERROR_TEMPLATE % {'code': error_code,
                                      'error': http.RESPONSES[error_code]}
 
