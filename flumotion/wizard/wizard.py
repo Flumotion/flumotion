@@ -23,7 +23,7 @@ import gtk.gdk
 import gtk.glade
 
 from flumotion.configure import configure
-from flumotion.utils import log
+from flumotion.common import log
 from flumotion.wizard import enums
 
 def escape(text):

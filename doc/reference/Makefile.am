@@ -16,6 +16,7 @@ MODULE_FILES = \
         flumotion/common/config.py		\
 	flumotion/common/errors.py		\
 	flumotion/common/interfaces.py		\
+	flumotion/common/log.py			\
 	flumotion/common/registry.py		\
 	flumotion/component/__init__.py		\
 	flumotion/component/component.py	\
@@ -28,7 +29,6 @@ MODULE_FILES = \
 	flumotion/manager/worker.py		\
 	flumotion/twisted/gstreactor.py		\
 	flumotion/utils/gstutils.py		\
-	flumotion/utils/log.py			\
 	flumotion/worker/__init__.py		\
 	flumotion/worker/worker.py		\
 	flumotion/worker/job.py

@@ -16,7 +16,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # FIXME: moving this down causes errors
-import flumotion.utils.log
+from flumotion.common import log
 
 # johan says modules should not do this, only apps
 import pygtk
@@ -39,7 +39,7 @@ if gtk.pygtk_version < (2,3,96):
     raise SystemExit, "PyGTK 2.3.96 or higher required"
 
 def _debug(*args):
-    flumotion.utils.log.debug('videotest', ' '.join(args))
+    log.debug('videotest', ' '.join(args))
 
 # only Controller is to be shown in epydoc
 __all__ = ('Controller', )

@@ -30,9 +30,8 @@ from twisted.python import components
 from twisted.spread import pb
 
 from flumotion.manager import admin, component, worker
-from flumotion.common import errors, interfaces
+from flumotion.common import errors, interfaces, log
 from flumotion.twisted import cred, portal
-from flumotion.utils import log
 
 # an internal class
 class Dispatcher(log.Loggable):

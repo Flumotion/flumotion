@@ -29,8 +29,7 @@ from twisted.internet import reactor
 from flumotion import config
 from flumotion.admin.admin import AdminModel
 from flumotion.manager import admin   # Register types
-from flumotion.common import errors
-from flumotion.utils import log
+from flumotion.common import errors, log
 from flumotion.utils.gstutils import gsignal
 from flumotion.admin.gtk import dialogs
 

@@ -20,7 +20,7 @@ import common
 from twisted.trial import unittest
 
 from flumotion.manager import component, manager
-from flumotion.utils import log
+from flumotion.common import log
 
 class FakeComponentAvatar(log.Loggable):
     ### since we fake out componentavatar, eaters need to be specified fully

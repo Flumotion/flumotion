@@ -1,5 +1,37 @@
 2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/reference/Makefile.am:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/spyglass.py:
+	* flumotion/admin/gtk/videotest.py:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/config.py:
+	* flumotion/common/log.py:
+	* flumotion/common/registry.py:
+	* flumotion/common/setup.py:
+	* flumotion/component/component.py:
+	* flumotion/component/http/http.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_log.py:
+	* flumotion/test/test_manager.py:
+	* flumotion/tester/clientfactory.py:
+	* flumotion/tester/httpclient.py:
+	* flumotion/utils/Makefile.am:
+	* flumotion/utils/log.py:
+	* flumotion/utils/reload.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  utils.log -> common.log
+
+2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/Makefile.am:
 	* flumotion/common/launcher.py:
 	  remove common.launcher

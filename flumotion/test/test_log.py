@@ -17,8 +17,7 @@
 
 from twisted.trial import unittest
 
-from flumotion.common import errors
-from flumotion.utils import log
+from flumotion.common import errors, log
 
 class LogTester(log.Loggable):
     logCategory = 'testlog'

@@ -30,10 +30,9 @@ from twisted.python import reflect
 from twisted.spread import pb
 
 from flumotion.common.registry import registry
-from flumotion.common import interfaces
+from flumotion.common import interfaces, log
 from flumotion.component import component
 from flumotion.twisted import cred
-from flumotion.utils import log
 
 def getComponent(dict, defs):
     #FIXME: add setup of files to be transmitted over the wire.

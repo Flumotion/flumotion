@@ -28,8 +28,8 @@ __all__ = ['ComponentAvatar', 'ComponentHeaven']
 import gst
 from twisted.spread import pb
 
-from flumotion.common import errors, interfaces, keycards
-from flumotion.utils import gstutils, log
+from flumotion.common import errors, interfaces, keycards, log
+from flumotion.utils import gstutils
 
 class Options:
     """dummy class for storing manager side options of a component"""

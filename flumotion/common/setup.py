@@ -16,10 +16,10 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 import flumotion.common.registry
-import flumotion.utils.log
+import flumotion.common.log
 
 def setup(root=None):
-    flumotion.utils.log.init()
+    flumotion.common.log.init()
     if root:
         flumotion.common.registry.registry.verify(root)
 

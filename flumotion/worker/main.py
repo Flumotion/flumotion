@@ -20,7 +20,7 @@ import os
 
 from twisted.internet import reactor
 
-from flumotion.utils import log
+from flumotion.common import log
 from flumotion.worker import worker
 from flumotion.twisted import cred
 

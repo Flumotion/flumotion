@@ -30,8 +30,8 @@ from twisted.cred import credentials
 import twisted.internet.error
 
 from flumotion.component import feedcomponent
-from flumotion.common import auth, bundle, common, interfaces, keycards
-from flumotion.utils import gstutils, log
+from flumotion.common import auth, bundle, common, log, interfaces, keycards
+from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
 __all__ = ['HTTPStreamingAdminResource',

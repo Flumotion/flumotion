@@ -27,7 +27,7 @@ from xml.dom import minidom, Node
 from twisted.python import reflect
 
 from flumotion.configure import configure
-from flumotion.utils import log
+from flumotion.common import log
 
 __all__ = ['ComponentRegistry', 'registry']
 

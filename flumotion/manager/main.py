@@ -22,7 +22,7 @@ import os
 from twisted.internet import reactor
 
 from flumotion.manager import manager
-from flumotion.utils import log
+from flumotion.common import log
 from flumotion.configure import configure
 
 class ServerContextFactory:

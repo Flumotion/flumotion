@@ -27,9 +27,9 @@ import gobject
 from twisted.internet import reactor
 from twisted.spread import pb
 
-from flumotion.common import interfaces, errors
+from flumotion.common import interfaces, errors, log
 from flumotion.twisted import cred, pbutil
-from flumotion.utils import log, gstutils
+from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
 class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):

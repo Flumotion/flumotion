@@ -23,7 +23,7 @@ import time
 import sys
 import socket
 
-from flumotion.utils import log
+from flumotion.common import log
 from flumotion.tester import client
 
 class HTTPClient(gobject.GObject, log.Loggable):

@@ -22,8 +22,7 @@ Manager-side objects to handle administrative clients.
 from twisted.internet import reactor
 from twisted.spread import pb
 
-from flumotion.common import errors, interfaces
-from flumotion.utils import log
+from flumotion.common import errors, interfaces, log
 
 class ComponentView(pb.Copyable):
     """

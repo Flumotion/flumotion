@@ -221,7 +221,9 @@ def init():
     addLogHandler(stderrHandler, limited=True)
 
 def reset():
-    """Resets all log handles"""
+    """
+    Resets the logging system, removing all log handlers.
+    """
     global _log_handlers, _log_handlers_limited
     
     _log_handlers = []

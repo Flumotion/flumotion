@@ -21,7 +21,7 @@ import random
 import gobject
 
 from flumotion.tester import httpclient
-from flumotion.utils import log
+from flumotion.common import log
 
 from flumotion.tester import client
 

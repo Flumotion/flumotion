@@ -21,9 +21,8 @@ Manager-side objects to handle worker clients.
 
 from twisted.spread import pb
 
-from flumotion.common import errors, interfaces
+from flumotion.common import errors, interfaces, log
 from flumotion.common.config import FlumotionConfigXML
-from flumotion.utils import log
 
 class WorkerAvatar(pb.Avatar, log.Loggable):
     """

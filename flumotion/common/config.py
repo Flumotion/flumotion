@@ -25,7 +25,7 @@ from xml.dom import minidom, Node
 from twisted.python import reflect 
 
 from flumotion.common.registry import registry
-from flumotion.utils import log
+from flumotion.common import log
 
 class ConfigError(Exception):
     pass

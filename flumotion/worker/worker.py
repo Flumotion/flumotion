@@ -29,9 +29,8 @@ from twisted.spread import pb
 
 # We want to avoid importing gst, otherwise --help fails
 # so be very careful when adding imports
-from flumotion.common import errors, interfaces
+from flumotion.common import errors, interfaces, log
 from flumotion.twisted import cred, pbutil
-from flumotion.utils import log
 
 #factoryClass = pbutil.ReconnectingPBClientFactory
 factoryClass = pbutil.FMClientFactory

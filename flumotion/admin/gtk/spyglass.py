@@ -16,7 +16,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # FIXME: moving this down causes errors
-import flumotion.utils.log
+from flumotion.common import log
 
 import gobject
 import gst
@@ -33,7 +33,7 @@ if gtk.pygtk_version < (2,3,91):
     raise SystemExit, "PyGTK 2.3.91 or higher required"
 
 def _debug(*args):
-    flumotion.utils.log.debug('spyglass', ' '.join(args))
+    log.debug('spyglass', ' '.join(args))
 
 # only Controller is to be shown in epydoc
 __all__ = ('Controller', )
