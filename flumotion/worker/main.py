@@ -21,7 +21,7 @@ import os
 
 from twisted.internet import reactor
 
-from flumotion.common import log, keycards
+from flumotion.common import log, keycards, common
 from flumotion.worker import worker
 from flumotion.twisted import credentials
 
@@ -46,12 +46,16 @@ def main(args):
                      action="store", type="string", dest="transport",
                      default="ssl",
                      help="transport protocol to use (tcp/ssl)")
+    group.add_option('-D', '--daemonize',
+                     action="store_true", dest="daemonize",
+                     default=False,
+                     help="run in background as a daemon")
 
     group.add_option('-u', '--username',
                      action="store", type="string", dest="username",
                      default="",
                      help="username to use")
-    group.add_option('-d', '--password',
+    group.add_option('-p', '--password',
                      action="store", type="string", dest="password",
                      default="",
                      help="password to use, - for interactive")
@@ -62,9 +66,11 @@ def main(args):
     options, args = parser.parse_args(args)
 
     if options.version:
-        from flumotion.common import common
         print common.version("flumotion-worker")
         return 0
+
+    if options.daemonize:
+        common.daemonize()
 
     # create a brain and have it remember the manager to direct jobs to
     brain = worker.WorkerBrain(options)

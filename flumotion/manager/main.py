@@ -22,7 +22,7 @@ import sys
 from twisted.internet import reactor
 
 from flumotion.manager import manager
-from flumotion.common import log, config
+from flumotion.common import log, config, common
 from flumotion.configure import configure
 
 class ServerContextFactory:
@@ -65,7 +65,7 @@ def _loadConfig(vishnu, filename):
     conf = config.FlumotionConfigXML(filename)
 
     # XXX: Cleanup
-    vishnu.workerheaven.conf = conf
+    vishnu.workerHeaven.conf = conf
 
     # scan filename for a bouncer component in the manager
 
@@ -118,28 +118,35 @@ def main(args):
                      action="store", type="string", dest="certificate",
                      default="flumotion.pem",
                      help="specify PEM certificate file (for SSL)")
+    group.add_option('-D', '--daemonize',
+                     action="store_true", dest="daemonize",
+                     default=False,
+                     help="run in background as a daemon")
     parser.add_option_group(group)
     
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
     if options.version:
-        from flumotion.common import common
         print common.version("flumotion-manager")
         return 0
-
-    vishnu = manager.Vishnu()
 
     if len(args) <= 1:
         log.error('manager', 'Please specify a planet configuration file')
         return -1
+
+    vishnu = manager.Vishnu()
+
     if len(args) <= 2:
-        filename = args[1]
+        filename = os.path.abspath(args[1])
         log.debug('manager', 'Loading configuration file from (%s)' % filename)
         reactor.callLater(0, _initialLoadConfig, vishnu, filename)
     
     if options.verbose:
         log.setFluDebug("*:4")
+
+    if options.daemonize:
+        common.daemonize()
 
     if options.transport == "ssl":
         _startSSL(vishnu, options)

@@ -1,5 +1,14 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/worker/main.py:
+	  add options to -manager and -worker to daemonize
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/keycards.py:
 	* flumotion/manager/admin.py:
 	* flumotion/manager/component.py:

@@ -114,3 +114,49 @@ def mergeImplements(*classes):
         allYourBase += getattr(clazz, '__implements__', ())
     return tuple(allYourBase)
 
+
+import sys, os 
+def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
+    '''
+    This forks the current process into a daemon.
+    The stdin, stdout, and stderr arguments are file names that
+    will be opened and be used to replace the standard file descriptors
+    in sys.stdin, sys.stdout, and sys.stderr.
+    These arguments are optional and default to /dev/null.
+    Note that stderr is opened unbuffered, so
+    if it shares a file with stdout then interleaved output
+    may not appear in the order that you expect.
+    '''
+
+    # first fork
+    try: 
+        pid = os.fork() 
+        if pid > 0:
+            sys.exit(0)   # exit first parent
+    except OSError, e: 
+        sys.stderr.write("Failed to fork: (%d) %s\n" % (e.errno, e.strerror))
+        sys.exit(1)
+
+    # decouple from parent environment
+    os.chdir("/") 
+    os.umask(0) 
+    os.setsid() 
+
+    # do second fork
+    try: 
+        pid = os.fork() 
+        if pid > 0:
+            sys.exit(0)   # exit second parent
+    except OSError, e: 
+        sys.stderr.write("Failed to fork: (%d) %s\n" % (e.errno, e.strerror))
+        sys.exit(1)
+
+    # Now I am a daemon!
+    
+    # Redirect standard file descriptors.
+    si = open(stdin, 'r')
+    so = open(stdout, 'a+')
+    se = open(stderr, 'a+', 0)
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())

@@ -593,7 +593,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         self.heaven.removeComponent(self)
 
     def perspective_uiStateChanged(self, componentName, state):
-        self.vishnu.adminheaven.uiStateChanged(componentName, state)
+        self.vishnu.adminHeaven.uiStateChanged(componentName, state)
 
     def perspective_notifyFeedPorts(self, feedPorts):
         self.debug('received feed ports from component: %s' % feedPorts)
@@ -666,7 +666,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
 
         self._feederSet.removeFeeders(avatar)
         
-        self.vishnu.adminheaven.componentRemoved(avatar)
+        self.vishnu.adminHeaven.componentRemoved(avatar)
     
     ### our methods
     def _componentIsLocal(self, componentAvatar):
@@ -817,7 +817,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         componentAvatar.debug('registering component')
 
         # tell the admin client
-        self.vishnu.adminheaven.componentAdded(componentAvatar)
+        self.vishnu.adminHeaven.componentAdded(componentAvatar)
 
         # tell the feeder set
         self._feederSet.addFeeders(componentAvatar)

@@ -129,11 +129,11 @@ class Vishnu(log.Loggable):
         # connecting to me
         self.dispatcher = Dispatcher()
 
-        self.workerheaven = self._createHeaven(interfaces.IWorkerMedium,
+        self.workerHeaven = self._createHeaven(interfaces.IWorkerMedium,
                                                worker.WorkerHeaven)
-        self.componentheaven = self._createHeaven(interfaces.IComponentMedium,
+        self.componentHeaven = self._createHeaven(interfaces.IComponentMedium,
                                                   component.ComponentHeaven)
-        self.adminheaven = self._createHeaven(interfaces.IAdminMedium,
+        self.adminHeaven = self._createHeaven(interfaces.IAdminMedium,
                                               admin.AdminHeaven)
         self.bouncer = None # used by manager to authenticate worker/component
 
