@@ -29,10 +29,12 @@ from twisted.internet import reactor
 from twisted.cred import error
 from twisted.python import components, failure
 from twisted.spread import pb
+from twisted.cred import portal
 
 from flumotion.manager import admin, component, worker
 from flumotion.common import errors, interfaces, log
-from flumotion.twisted import checkers, portal
+from flumotion.twisted import checkers
+from flumotion.twisted import portal as fportal
 
 # an internal class
 class Dispatcher(log.Loggable):
@@ -145,7 +147,7 @@ class ManagerCredentialsChecker(checkers.FlexibleCredentialsChecker):
 
 class Vishnu(log.Loggable):
     """
-    I am the toplevel manager object that knows about all heavens and factories
+    I am the toplevel manager object that knows about all heavens and factories.
     """
     logCategory = "vishnu"
     def __init__(self):
@@ -168,7 +170,7 @@ class Vishnu(log.Loggable):
         # uses a password policy
         self.checker.allowAnonymous(True) # XXX: False
         
-        p = portal.FlumotionPortal(self.dispatcher, [self.checker])
+        p = fportal.FlumotionPortal(self.dispatcher, [self.checker])
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
         self.factory = pb.PBServerFactory(p)
 

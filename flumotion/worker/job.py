@@ -139,7 +139,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
         except RuntimeError:
             self.warning('Old PyGTK with threading disabled detected')
     
-    def _runComponent(self, componentName, type, config, defs, feedPorts):
+    def _runComponent(self, name, type, config, defs, feedPorts):
         """
         @param name:      name of component to start
         @type  name:      string
@@ -160,15 +160,15 @@ class JobMedium(pb.Referenceable, log.Loggable):
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()
 
-        log.debug(componentName, 'Starting on pid %d of type %s' %
+        log.debug(name, 'Starting on pid %d of type %s' %
                   (os.getpid(), type))
 
-        self.set_nice(componentName, config.get('nice', 0))
-        self.enable_core_dumps(componentName)
+        self.set_nice(name, config.get('nice', 0))
+        self.enable_core_dumps(name)
         
-        log.debug(componentName, 'run_component(): config: %r' % config)
-        log.debug(componentName, 'run_component(): feedPorts: %r' % feedPorts)
-        log.debug(componentName, 'run_component(): defs is: %r' % defs)
+        log.debug(name, 'run_component(): config: %r' % config)
+        log.debug(name, 'run_component(): feedPorts: %r' % feedPorts)
+        log.debug(name, 'run_component(): defs is: %r' % defs)
 
         comp = getComponent(config, defs)
 
@@ -180,7 +180,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
         # XXX: we should be getting credentials from somewhere and use them
         # first argument is username, needs fixing; second is avatarId we
         # want
-        manager_client_factory.login(componentName, componentName)
+        manager_client_factory.login(name, name)
 
         host = self.manager_host
         port = self.manager_port

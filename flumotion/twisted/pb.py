@@ -1,7 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/twisted/pbutil.py: Persistent broker utility functions
+# flumotion/twisted/pb.py: Persistent broker functions; see twisted.spread.pb
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -19,10 +19,13 @@
 Base classes handy for use with PB clients.
 """
 
+import md5
+
 from twisted.cred import checkers, credentials
+from twisted.cred.portal import IRealm, Portal
 from twisted.internet import protocol
 from twisted.python import log, reflect
-from twisted.spread import pb
+from twisted.spread import pb, flavors
 from twisted.spread.pb import PBClientFactory
 
 # TODO:
@@ -196,4 +199,111 @@ class FMClientFactory(pb.PBClientFactory):
                       client,
                       interfaces)
         return d
+### stolen from twisted.python.reflect and changed
+### the version in Twisted 1.3.0 checks length of backtrace as metric for
+### ImportError; for me this fails because two lines of ihooks.py are in
+### between
+### filed as http://www.twistedmatrix.com/users/roundup.twistd/twisted/issue698
+### remove this when fixed and depending on new upstream twisted
+def namedAny(name):
+    """Get a fully named package, module, module-global object, or attribute.
+    """
+    names = name.split('.')
+    topLevelPackage = None
+    moduleNames = names[:]
+    while not topLevelPackage:
+        try:
+            trialname = '.'.join(moduleNames)
+            topLevelPackage = __import__(trialname)
+        except ImportError:
+            import sys
+            # if the ImportError happened in the module being imported,
+            # this is a failure that should be handed to our caller.
+            shortname = trialname.split('.')[-1]
+            r = str(sys.exc_info()[1])
+            if not (r.startswith('No module named') and
+                    r.endswith(shortname)):
+                raise
+            
+            #if str(sys.exc_info()[1]) != "No module named %s" % trialname:
+            #    raise
+            moduleNames.pop()
+                                                                                
+    obj = topLevelPackage
+    for n in names[1:]:
+        obj = getattr(obj, n)
+                                                                                
+    return obj
+
+### FIXME: this code is an adaptation of twisted/spread/pb.py
+# it allows you to login to a PB server requesting interfaces other than
+# IPerspective.
+# in other terms, you can request different "kinds" of avatars from the same
+# PB server.
+# this code needs to be send upstream to Twisted
+class _PortalRoot:
+    """Root object, used to login to portal."""
+
+    __implements__ = flavors.IPBRoot,
     
+    def __init__(self, portal):
+        self.portal = portal
+
+    def rootObject(self, broker):
+        return _PortalWrapper(self.portal, broker)
+
+class _PortalWrapper(pb.Referenceable):
+    """Root Referenceable object, used to login to portal."""
+
+    def __init__(self, portal, broker):
+        self.portal = portal
+        self.broker = broker
+
+    def remote_login(self, username, avatarId, *interfaces):
+        # corresponds with FMClientFactory._cbSendUsername
+        """Start of username/password login."""
+        interfaces = [namedAny(interface) for interface in interfaces]
+        c = pb.challenge()
+        return c, _PortalAuthChallenger(self, username, avatarId, c, *interfaces)
+
+class _PortalAuthChallenger(pb.Referenceable):
+    # I am a credentials created pb.server side to be presented to the
+    # portal
+    """Called with response to password challenge."""
+
+    __implements__ = pb.IUsernameHashedPassword, pb.IUsernameMD5Password
+
+    def __init__(self, portalWrapper, username, avatarId, challenge, *interfaces):
+        self.portalWrapper = portalWrapper
+        self.username = username
+        self.challenge = challenge
+        self.interfaces = interfaces
+        self.avatarId = avatarId
+
+        self.componentName = "manager" # because we give this to a bouncer
+        
+    def remote_respond(self, response, mind):
+        self.response = response
+        # avatarId is now again a member of the credentials,
+        # so since we pass ourselves to the portal's login, which
+        # will use the checker, the checker can get our desired avatarId !
+        d = self.portalWrapper.portal.login(self, mind, *self.interfaces)
+        d.addCallback(self._loggedIn)
+        return d
+
+    def _loggedIn(self, (interface, perspective, logout)):
+        self.portalWrapper.broker.notifyOnDisconnect(logout)
+        return pb.AsReferenceable(perspective, "perspective")
+
+    # IUsernameHashedPassword:
+    def checkPassword(self, password):
+        return self.checkMD5Password(md5.md5(password).digest())
+
+    # IUsernameMD5Password
+    def checkMD5Password(self, md5Password):
+        md = md5.new()
+        md.update(md5Password)
+        md.update(self.challenge)
+        correct = md.digest()
+        return self.response == correct
+

@@ -1,5 +1,14 @@
 2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/manager.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/portal.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  merge back portal stuff that came from pb into pb
+
+2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/reference/Makefile.am:
 	* flumotion/admin/admin.py:
 	* flumotion/component/component.py:

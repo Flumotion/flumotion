@@ -30,7 +30,7 @@ from twisted.spread import pb
 # We want to avoid importing gst, otherwise --help fails
 # so be very careful when adding imports
 from flumotion.common import errors, interfaces, log
-from flumotion.twisted import credentials
+from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
 
 #factoryClass = fpb.ReconnectingPBClientFactory
@@ -180,7 +180,7 @@ class WorkerBrain:
     def setup(self):
         root = JobHeaven(self)
         dispatcher = JobDispatcher(root)
-        checker = credentials.FlexibleCredentialsChecker()
+        checker = checkers.FlexibleCredentialsChecker()
         checker.allowAnonymous(True)
         p = portal.Portal(dispatcher, [checker])
         job_server_factory = pb.PBServerFactory(p)
