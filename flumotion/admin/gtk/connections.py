@@ -227,6 +227,11 @@ class Authenticate(GladeWidget):
     gproperty(bool, 'can-activate', 'If the state of the widget is complete',
               False)
 
+    # pychecker sacrifices
+    auth_method_combo = None
+    user_entry = None
+    passwd_entry = None
+
     def __init__(self, *args):
         GladeWidget.__init__(self, *args)
         self.auth_method_combo.set_active(0)
