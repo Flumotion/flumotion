@@ -179,8 +179,8 @@ class ReallyAllowAnonymousAccess:
 
 class Username:
     __implements__ = credentials.IUsernamePassword,
-    def __init__(self, username):
+    def __init__(self, username, password=''):
         self.username = username
-        self.password = ''
+        self.password = password
         
 
