@@ -62,9 +62,9 @@ pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
 class AdminPerspective(pb.Avatar, log.Loggable):
     """
     I live in the controller.
-    I am a perspective/avatar created for an admin client (?).
-    A reference to me is given to L{gui/AdminInterface} when logging in
-    and requesting an "admin" avatar.
+    I am an avatar created for an administrative client interface.
+    A reference to me is given (for example, to gui.AdminInterface)
+    when logging in and requesting an "admin" avatar.
     """
     logCategory = 'admin-persp'
     # FIXME: should not be called with controller directly, should be
@@ -79,21 +79,23 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         
     # FIXME: maybe rename to hasReference ? We are already a Perspective
     # ourselves
-    def hasPerspective(self):
+    def hasRemoteReference(self):
         return self.mind != None
     
-    # FIXME: rename method to something else, callRemote is reserved for
-    # References
-    def callRemote(self, name, *args, **kwargs):
-        if not self.hasPerspective():
-            #self.warning("Can't call remote method %s, no perspective" % name)
+    def _mindCallRemote(self, name, *args, **kwargs):
+        if not self.hasRemoteReference():
+            self.warning("Can't call remote method %s, no mind" % name)
             return
         
-        #self.debug('Calling remote method %s%r' % (name, args))
+        # we can't do a .debug here, since it will trigger a resend of the
+        # debug message as well, causing infinite recursion !
+        # self.debug('Calling remote method %s%r' % (name, args))
         try:
             return self.mind.callRemote(name, *args, **kwargs)
         except pb.DeadReferenceError:
+            mind = self.mind
             self.mind = None
+            self.warning("mind %s is a dead reference, removing" % mind)
             return
         
     def getClients(self):
@@ -105,30 +107,46 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         return clients
 
     def sendLog(self, category, type, message):
-        self.callRemote('log', category, type, message)
+        # don't send if we don't have a remote reference yet.
+        # this avoids recursion from the remote caller trying to warn
+        if self.hasRemoteReference():
+            self._mindCallRemote('log', category, type, message)
         
     def componentAdded(self, component):
         self.debug("AdminPerspective.componentAdded: %s" % component)
-        self.callRemote('componentAdded', ComponentView(component))
+        self._mindCallRemote('componentAdded', ComponentView(component))
         
     def componentRemoved(self, component):
         self.debug("AdminPerspective.componentRemoved: %s" % component)
-        self.callRemote('componentRemoved', ComponentView(component))
+        self._mindCallRemote('componentRemoved', ComponentView(component))
 
     def attached(self, mind):
+        """
+        Give the avatar a remote reference to the
+        peer's client that logged in and requested the avatar.
+        Also make the avatar send the initial clients to the peer.
+
+        @type mind: L{twisted.spread.pb.RemoteReference}
+        """
         self.mind = mind
         ip = self.mind.broker.transport.getPeer()[1]
         self.debug('Client from %s attached, sending client components' % ip)
+        self.log('Client attached is mind %s' % mind)
 
-        self.callRemote('initial', self.getClients())
+        self._mindCallRemote('initial', self.getClients())
 
     def detached(self, mind):
+        """
+        Tell the avatar that the peer's client referenced by the mind
+        has detached.
+        """
+        assert(self.mind == mind)
         ip = self.mind.broker.transport.getPeer()[1]
+        self.mind = None
         self.debug('Client from %s detached' % ip)
-        
-        self.callRemote('shutdown')
+        self.log('Client detached is mind %s' % mind)
 
-    ### pb.NewCredPerspective (ie. Avatar) methods
+    ### pb.Avatar IPerspective methods
     def perspective_shutdown(self):
         print 'SHUTTING DOWN'
         reactor.stop()
@@ -164,7 +182,7 @@ class Admin(pb.Root):
             client.sendLog(category, type, message)
 
     def sendCache(self, client):
-        if not client.hasPerspective():
+        if not client.hasRemoteReference():
             reactor.callLater(0.25, self.sendCache, client)
             return
         

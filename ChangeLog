@@ -1,12 +1,20 @@
+2004-08-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/server/admin.py:
+	* flumotion/server/controller.py:
+	  clean up handling of mind
+	* flumotion/utils/log.py:
+	  fix functions for debug and log, duh.
+
 2004-08-30  Johan Dahlin  <johan@gnome.org>
 
-	* flumotion/server/interfaces.py (IBaseComponent)
+	* flumotion/server/interfaces.py (IBaseComponent):
 	* flumotion/server/controller.py (Dispatcher.requestAvatar): 
-	* flumotion/twisted/portal.py
+	* flumotion/twisted/portal.py:
 	* flumotion/twisted/pbutil.py:
-
-	Support different interfaces, also add a base interface
-	(IBaseComponent) which all components must inheirit from
+	Support different interfaces
+	also add a base interface (IBaseComponent)
+	which all components must inherit from
 	unfortunately this involves copying a little bit of code
 	from twisted, but what can we do?
 

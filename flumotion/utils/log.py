@@ -64,11 +64,11 @@ class Loggable:
 
     def debug(self, *args):
         "Log a debug message.  Used for debugging."
-        info(self.logCategory, self.logFunction(*args))
+        debug(self.logCategory, self.logFunction(*args))
 
     def log(self, *args):
         "Log a log message.  Used for debugging recurring events."
-        info(self.logCategory, self.logFunction(*args))
+        log(self.logCategory, self.logFunction(*args))
 
     def logFunction(self, message):
         "Overridable log function.  Default just returns passed message."
