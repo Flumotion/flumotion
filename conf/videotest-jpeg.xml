@@ -18,6 +18,7 @@
     <source>overlay</source>
     <pipeline>ffmpegcolorspace ! jpegenc ! multipartmux</pipeline>
   </component>
+
   <component name="http-video" type="http-streamer">
     <source>jpeg+multipart</source>
     <port>8803</port>

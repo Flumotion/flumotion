@@ -176,7 +176,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
         self.caps = None
 
     def __repr__(self):
-        return '<MultifdSinkStreamer (%s) object at 0x%x>' % (self.component_name, id(self))
+        return '<MultifdSinkStreamer (%s)>' % self.component_name
     
     def notify_caps_cb(self, element, pad, param):
         caps = pad.get_negotiated_caps()

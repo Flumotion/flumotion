@@ -227,13 +227,10 @@ class BaseComponent(pb.Referenceable):
         self.pipeline_play()
         
     def remote_stop(self):
-        print self, 'stop'
         self.msg('Stopping')
         self.pipeline_stop()
         self.remote.broker.transport.loseConnection()
-        print 'remote_stop, stopping reactor', self
         reactor.stop()
-        print 'remote_stop, after stopping reactor', self
         
     def remote_pause(self):
         self.pipeline_pause()
