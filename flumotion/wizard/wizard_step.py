@@ -255,8 +255,8 @@ class Encoding(wizard.WizardStep):
         
         format = self.combobox_format.get_active()
         if format == EncodingFormat.Ogg:
-            self.combobox_video.set_multi_active(EncodingVideo.Smoke,
-                                                 EncodingVideo.Theora)
+            # XXX: Smoke can't be put in ogg. Poke Wim to fix
+            self.combobox_video.set_multi_active(EncodingVideo.Theora)
             self.combobox_audio.set_multi_active(EncodingAudio.Speex,
                                                  EncodingAudio.Vorbis)
         elif format == EncodingFormat.Multipart:
