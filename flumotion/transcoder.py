@@ -90,7 +90,6 @@ class Transcoder(gobject.GObject, pb.Referenceable):
         gobject.idle_add(self.pipeline.iterate)
         
     def prepare(self, element_name):
-        
         log.msg('prepare called')
 
         #pipe = '%s name=source ! %s ! tcpclientsink name=sink'
@@ -142,8 +141,6 @@ class Transcoder(gobject.GObject, pb.Referenceable):
     def remote_prepare(self):
         return socket.gethostbyname(self.host)
     
-"tcpclientsrc host=foobar ! tcpclientsink"
-
 gobject.type_register(Transcoder)
 
 from twisted.web import server, resource

@@ -45,11 +45,15 @@ class Acquisition(pb.Referenceable):
         self.persp = None
         
     def got_perspective_cb(self, persp):
+        #reactor.callLater(2, setattr, self, 'persp', persp)
         self.persp = persp
         
     def pipeline_error_cb(self, object, element, error, arg):
         log.msg('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
-        self.persp.callRemote('error', element.get_path_string(), error.message)
+        if self.persp:
+            self.persp.callRemote('error', element.get_path_string(), error.message)
+        else:
+            print 'skipping remote-error, no perspective'
 
         self.pipeline.set_state(gst.STATE_NULL)
         self.prepare()
@@ -58,7 +62,10 @@ class Acquisition(pb.Referenceable):
         log.msg('pipeline state-changed %s %s -> %s' % (element.get_path_string(),
                                                         gst.element_state_get_name(old),
                                                         gst.element_state_get_name(state)))
-        self.persp.callRemote('stateChanged', old, state)
+        if self.persp:
+            self.persp.callRemote('stateChanged', old, state)
+        else:
+            print 'skipping state-changed, no perspective'
         
     def sink_pad_deep_notify_caps_cb(self, element, pad, param):
         caps = pad.get_negotiated_caps()
@@ -69,7 +76,11 @@ class Acquisition(pb.Referenceable):
         self.sink.disconnect(self.notify_id)
         self.pipeline_pause()
         
-        self.persp.callRemote('notifyCaps', str(caps))
+        if self.persp:
+            self.persp.callRemote('notifyCaps', str(caps))
+        else:
+            print 'skipping notify-caps, no perspective'
+            
         self.caps = caps
         
     def pipeline_deep_notify_cb(self, object, orig, pspec):
@@ -80,22 +91,22 @@ class Acquisition(pb.Referenceable):
     def pipeline_pause(self):
         retval = self.pipeline.set_state(gst.STATE_PAUSED)
         if not retval:
-            log.msg('Changing state to PLAYING failed')
+            log.msg('WARNING: Changing state to PLAYING failed')
         gobject.idle_add(self.pipeline.iterate)
         
     def pipeline_play(self):
         retval = self.pipeline.set_state(gst.STATE_PLAYING)
         if not retval:
-            log.msg('Changing state to PLAYING failed')
+            log.msg('WARNING: Changing state to PLAYING failed')
         gobject.idle_add(self.pipeline.iterate)
 
     def prepare(self):
-        log.msg('start called')
+        if not self.persp:
+            log.msg('WARNING: We are not ready yet, waiting 250 ms')
+            reactor.callLater(0.250, self.prepare)
+            return
         
-        #if not self.persp:
-        #    print 'We are not ready yet, waiting 100 ms'
-        #    reactor.callLater(0.100, self.remote_prepare)
-        #    return
+        log.msg('prepare called')
         
         full_pipeline = '%s ! fakesink silent=1 name=fakesink' % self.pipeline_string
         log.msg('going to run pipeline: %s' % full_pipeline)
