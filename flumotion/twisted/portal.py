@@ -42,9 +42,16 @@ class BouncerPortal(log.Loggable):
 
     def login(self, keycard, mind, *interfaces):
         self.debug("BouncerPortal._login(keycard=%r, mind=%r, interfaces=%r)" % (keycard, mind, interfaces))
-        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+        if not self.bouncer:
+            # FIXME: do we really want anonymous login when no bouncer is
+            # present ?
+            self.warning("BouncerPortal has no bouncer, allowing anonymous in")
+            keycard.state = keycards.AUTHENTICATED
+            d = defer.maybeDeferred(lambda x: x, keycard)
+        else:
+            d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+            
         d.addCallback(self._authenticateCallback, mind, *interfaces)
-        #d.addCallback(self.realm.requestAvatar, mind, *interfaces)
         return d
 
     def _authenticateCallback(self, result, mind, *interfaces):
@@ -60,5 +67,6 @@ class BouncerPortal(log.Loggable):
             return keycard
 
         self.debug("BouncerPortal._authenticateCallback(%r), chaining through to next callback to request AvatarId from realm with mind %r and interfaces %r" % (result, mind, interfaces))
+
         return self.realm.requestAvatar(keycard.avatarId, mind, *interfaces)
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)

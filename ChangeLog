@@ -1,6 +1,14 @@
-2004-10-17  Johan Dahlin  <johan@gnome.org>
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
-	reviewed by: <delete if not using a buddy>
+	* flumotion/manager/admin.py:
+	* flumotion/twisted/portal.py:
+	  The avatar was being removed twice, once by heaven, once by
+	  detached.
+	  Take opportunity to store avatarId's for admin and consistentify
+	  with other heavens.
+	  Still need to assign a unique id to admin clients.
+
+2004-10-17  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/http/Makefile.am:
 	* flumotion/component/http/http.py:
