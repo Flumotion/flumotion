@@ -18,7 +18,7 @@
 #
 
 import sys
-import time
+
 
 _sys_argv = sys.argv
 sys.argv = sys.argv[:1]
@@ -92,11 +92,9 @@ class StreamingResource(resource.Resource):
                 self.caps = structure.get_name()
 
         if self.current_requests:
-            t1 = time.time()
             buf = str(buffer(gbuffer))
             for request in self.current_requests:
-                gobject.idle_add(request.write, buf)
-            print 'Writing all buffers took: %2.4f seconds' % (time.time()-t1)
+                reactor.callLater(0, request.write, buf)
             
     def getChild(self, path, request):
         return self
