@@ -267,6 +267,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         try:
             return self.mind.callRemote(name, *args, **kwargs)
         except pb.DeadReferenceError:
+            self.warning('pb.DeadReferenceError on remote method %s' % name)
             self.mind = None
             self.detached()
             return
@@ -294,6 +295,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
     def _mindRegisterCallback(self, options): 
         # called after the mind has attached.  options is a dict passed in from
         # flumotion.component.component's remote_register
+        assert options
         for key, value in options.items():
             setattr(self.options, key, value)
         self.options.dict = options
@@ -566,6 +568,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return d
 
     def removeKeycard(self, keycardId):
+        self.debug('remotecalling removeKeycard with id %s' % keycardId)
         d = self._mindCallRemote('removeKeycard', keycardId)
         d.addErrback(self._mindErrback)
         return d
@@ -604,8 +607,9 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return bouncerAvatar.authenticate(keycard)
 
     def perspective_removeKeycard(self, bouncerName, keycardId):
-        self.debug('asked to remove keycard %s on bouncer %s' % (bouncerName, keycardId))
+        self.debug('asked to remove keycard %s on bouncer %s' % (keycardId, bouncerName))
         if not self.heaven.hasComponent(bouncerName):
+            self.warning('asked to remove keycard %s on bouncer %s, but no such component registered' % (keycardId, bouncerName))
             # FIXME: return failure object ?
             return False
 

@@ -29,7 +29,7 @@ from twisted.internet import reactor
 from twisted.python import reflect
 from twisted.spread import pb
 
-from flumotion.common import config, interfaces, log, registry
+from flumotion.common import config, interfaces, log, registry, keycards
 from flumotion.component import component
 from flumotion.twisted import credentials
 
@@ -176,11 +176,12 @@ class JobMedium(pb.Referenceable, log.Loggable):
         if feedPorts:
             comp.set_feed_ports(feedPorts)
 
+        # make component log in to manager
         manager_client_factory = component.ComponentClientFactory(comp)
-        # XXX: we should be getting credentials from somewhere and use them
-        # first argument is username, needs fixing; second is avatarId we
-        # want
-        manager_client_factory.login(name, name)
+        # XXX: we should be getting username and password from somewhere
+        keycard = keycards.KeycardUACPP('test', 'test', 'localhost')
+        keycard.avatarId = name
+        manager_client_factory.login(keycard)
 
         host = self.manager_host
         port = self.manager_port

@@ -20,6 +20,8 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 import crypt
+import md5
+import random
 
 from twisted.python import components
 from twisted.cred import error
@@ -65,11 +67,13 @@ class HTPasswdCrypt(bouncer.Bouncer):
         self.debug('parsed %s, %d lines' % (self._filename or '<memory>',
             len(lines)))
    
-    def _requestAvatarIdCallback(self, result, keycard):
+    def _requestAvatarIdCallback(self, PossibleAvatarId, keycard):
         # authenticated, so return the keycard with state authenticated
-        self.info('keycard %r authenticated' % keycard)
-        self._addKeycard(keycard)
         keycard.state = keycards.AUTHENTICATED
+        self._addKeycard(keycard)
+        if not keycard.avatarId:
+            keycard.avatarId = PossibleAvatarId
+        self.info('keycard %r authenticated, id %s, avatarId %s' % (keycard, keycard.id, keycard.avatarId))
         
         return keycard
 
@@ -99,7 +103,15 @@ class HTPasswdCrypt(bouncer.Bouncer):
                 self.debug('putting challenge on keycard %r' % keycard)
                 keycard.challenge = credentials.cryptChallenge()
                 # cheat: get the salt from the checker directly
-                keycard.salt = self._checker.users[keycard.username][:2]
+                if self._checker.users.has_key(keycard.username):
+                    keycard.salt = self._checker.users[keycard.username][:2]
+                else:
+                    # random-ish salt, otherwise it's too obvious
+                    string = str(random.randint(pow(10,10), pow(10, 11)))
+                    md = md5.new()
+                    md.update(string)
+                    keycard.salt = md.hexdigest()[:2]
+                    self.debug("user not found, inventing bogus salt")
                 self.debug("salt %s, storing challenge for id %s" % (keycard.salt, keycard.id))
                 # we store the challenge locally to verify against tampering
                 self._challenges[keycard.id] = keycard.challenge

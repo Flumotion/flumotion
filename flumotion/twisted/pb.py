@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_pb -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/twisted/pb.py: Persistent broker functions; see twisted.spread.pb
@@ -19,16 +19,21 @@
 Base classes handy for use with PB clients.
 """
 
+import crypt
 import md5
 
-from twisted.cred import checkers, credentials
+from twisted.cred import checkers, credentials, error
 from twisted.cred.portal import IRealm, Portal
-from twisted.internet import protocol
+from twisted.internet import protocol, defer
 from twisted.python import log, reflect
 from twisted.spread import pb, flavors
 from twisted.spread.pb import PBClientFactory
 
+from flumotion.common import keycards
+from flumotion.common import log as flog
 from flumotion.twisted import reflect as freflect
+from flumotion.twisted import credentials as fcredentials
+
 # TODO:
 #   subclass FMClientFactory
 #   merge FMCF back into twisted
@@ -94,28 +99,7 @@ class ReconnectingPBClientFactory(PBClientFactory,
         d['_callID'] = None
         return d
 
-    # oldcred methods
-
-    def getPerspective(self, *args):
-        raise RuntimeError, "getPerspective is one-shot: use startGettingPerspective instead"
-
-    def startGettingPerspective(self, username, password, serviceName,
-                                perspectiveName=None, client=None):
-        self._doingGetPerspective = True
-        if perspectiveName == None:
-            perspectiveName = username
-        self._oldcredArgs = (username, password, serviceName,
-                             perspectiveName, client)
-
-    def doGetPerspective(self, root):
-        # oldcred getPerspective()
-        (username, password,
-         serviceName, perspectiveName, client) = self._oldcredArgs
-        d = self._cbAuthIdentity(root, username, password)
-        d.addCallback(self._cbGetPerspective,
-                      serviceName, perspectiveName, client)
-        d.addCallbacks(self.gotPerspective, self.failedToGetPerspective)
-
+    # oldcred methods are removed
 
     # newcred methods
 
@@ -163,6 +147,8 @@ class ReconnectingPBClientFactory(PBClientFactory,
     def failedToGetPerspective(self, why):
         self.stopTrying() # logging in harder won't help
         log.err(why)
+
+### FIXME: deprecate FMClientFactory and friends
 
 # we made two changes to the standard PBClientFactory
 # first of all, you can request a specific interface for the avatar to
@@ -226,18 +212,32 @@ class _PortalWrapper(pb.Referenceable):
         self.broker = broker
 
     def remote_login(self, username, avatarId, *interfaces):
+        """
+        @type interfaces: 1..n string's
+        """
         # corresponds with FMClientFactory._cbSendUsername
         """Start of username/password login."""
         interfaces = [freflect.namedAny(interface) for interface in interfaces]
         c = pb.challenge()
         return c, _PortalAuthChallenger(self, username, avatarId, c, *interfaces)
 
+# some helper debug function that should move away
+def bytesToHex(string):
+    hexes = map(lambda l: str(hex(ord(l))), string)
+    return "".join(map(lambda l: l[2:], hexes))
+
+# changes from upstream pb's:
+# - add avatarId which we want to request
+# - support IUsernameCryptPassword
+
 class _PortalAuthChallenger(pb.Referenceable):
     # I am a credentials created pb.server side to be presented to the
-    # portal
+    # portal;
+    # the portal can register any checker that can do
+    # IUsernameHashedPassword or IUsernameCryptPassword
     """Called with response to password challenge."""
 
-    __implements__ = pb.IUsernameHashedPassword, pb.IUsernameMD5Password
+    __implements__ = pb.IUsernameHashedPassword, fcredentials.IUsernameCryptPassword
 
     def __init__(self, portalWrapper, username, avatarId, challenge, *interfaces):
         self.portalWrapper = portalWrapper
@@ -263,13 +263,211 @@ class _PortalAuthChallenger(pb.Referenceable):
 
     # IUsernameHashedPassword:
     def checkPassword(self, password):
-        return self.checkMD5Password(md5.md5(password).digest())
+        # instead of using the md5 test, we use the crypt test
+        salt = self.challenge[:2]
+        return self.checkCryptPassword(crypt.crypt(password, salt))
 
-    # IUsernameMD5Password
-    def checkMD5Password(self, md5Password):
+    # IUsernameCryptPassword
+    def checkCryptPassword(self, cryptPassword):
+        # we already have the crypted password
         md = md5.new()
-        md.update(md5Password)
+        md.update(cryptPassword)
         md.update(self.challenge)
-        correct = md.digest()
-        return self.response == correct
+        expected = md.digest()
 
+        expected = pb.respond(self.challenge, cryptPassword)
+
+        return expected == self.response
+ 
+
+##### NEW KEYCARD-BASED PB STUFF #####
+
+# we made two changes to the standard PBClientFactory
+
+# first of all, you can request a specific interface for the avatar to
+# implement, instead of only IPerspective
+
+# second, you send in a keycard, on which you can set a preference for
+# an avatarId
+# this way you can request a different avatarId than the user you authenticate
+# with, or you can login without a username
+class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
+    logcategory = "FPBClientFactory"
+
+    def _cbSendUsername(self, root, username, password, avatarId, client, interfaces):
+        self.warning("you really want to use cbSendKeycard")
+
+    def _cbSendKeycard(self, root, keycard, client, interfaces, count=0):
+        self.debug("_cbSendKeycard(root=%r, keycard=%r, client=%r, interfaces=%r, count=%d" % (root, keycard, client, interfaces, count))
+        count = count + 1
+        d = root.callRemote("login", keycard, client, *interfaces)
+        return d.addCallback(self._cbLoginCallback, root, client, interfaces, count)
+
+    # we can get either a keycard, None (?) or a remote reference
+    def _cbLoginCallback(self, result, root, client, interfaces, count):
+        if count > 5:
+            # too many recursions, server is h0rked
+            raise error.UnauthorizedLogin()
+        self.debug("FPBClientFactory(): result %r" % result)
+
+        if not result:
+            raise error.UnauthorizedLogin()
+
+        if isinstance(result, pb.RemoteReference):
+            # everything done, return reference
+            return result
+
+        # must be a keycard
+        keycard = result
+        if not keycard.state == keycards.AUTHENTICATED:
+            self.debug("FPBClientFactory(): requester needs to resend %r" % keycard)
+            return keycard
+            #return self._cbSendKeycard(root, keycard, client, interfaces, count)
+
+        self.debug("FPBClientFactory(): authenticated %r" % keycard)
+        return keycard
+        
+    def login(self, keycard, client=None, *interfaces):
+        """
+        Login and get perspective from remote PB server.
+
+        Currently only credentials implementing IUsernamePassword are
+        supported.
+
+        @return: Deferred of RemoteReference to the perspective.
+        """
+        
+        if not pb.IPerspective in interfaces:
+            interfaces += (pb.IPerspective,)
+        interfaces = [reflect.qual(interface)
+                          for interface in interfaces]
+            
+        d = self.getRootObject()
+        self.debug("FPBClientFactory: logging in with keycard %r" % keycard)
+        d.addCallback(self._cbSendKeycard, keycard, client, interfaces)
+        return d
+
+### FIXME: this code is an adaptation of twisted/spread/pb.py
+# it allows you to login to a FPB server requesting interfaces other than
+# IPerspective.
+# in other terms, you can request different "kinds" of avatars from the same
+# PB server.
+# this code needs to be send upstream to Twisted
+class _FPortalRoot:
+    """Root object, used to login to bouncer."""
+
+    __implements__ = flavors.IPBRoot,
+    
+    def __init__(self, bouncerPortal):
+        self.bouncerPortal = bouncerPortal
+
+    def rootObject(self, broker):
+        return _BouncerWrapper(self.bouncerPortal, broker)
+
+class _BouncerWrapper(pb.Referenceable):
+    def __init__(self, bouncerPortal, broker):
+        self.bouncerPortal = bouncerPortal
+        self.broker = broker
+
+    def remote_login(self, keycard, mind, *interfaces):
+        """
+        Start of keycard login.
+        @type interfaces: 1..n string's
+        """
+        # corresponds with FPBClientFactory._cbSendKeycard
+        #print "Bouncer.remote_login(keycard=%s, *interfaces=%r" % (keycard, interfaces)
+        interfaces = [freflect.namedAny(interface) for interface in interfaces]
+        d = self.bouncerPortal.login(keycard, mind, *interfaces)
+        d.addCallback(self._authenticateCallback, mind, *interfaces)
+        #d.addCallback(self._loggedIn)
+        return d
+
+    def _loggedIn(self, (interface, perspective, logout)):
+        self.broker.notifyOnDisconnect(logout)
+        return pb.AsReferenceable(perspective, "perspective")
+
+    def _authenticateCallback(self, result, mind, *interfaces):
+        #print "_BouncerWrapper._authenticateCallback(result=%r, mind=%r, interfaces=%r" % (result, mind, interfaces)
+        if not result:
+            raise error.UnauthorizedLogin()
+
+        # if the result is a keycard, we're not yet ready
+        if isinstance(result, keycards.Keycard):
+            return result
+
+        # authenticated, so the result is the tuple
+        # FIXME: our keycard should be stored higher up since it was authd
+        return self._loggedIn(result)
+        
+class _FPortalWrapper(pb.Referenceable):
+    """Root Referenceable object, used to login to portal."""
+
+    def __init__(self, portal, broker):
+        self.portal = portal
+        self.broker = broker
+
+    def remote_login(self, keycard, avatarId, *interfaces):
+        # corresponds with FPBClientFactory._cbSendKeycard
+        """Start of keycard login."""
+        #print "_FPortalWrapper.remote_login(keycard=%s, avatarId=%s, ...)" % (keycard, avatarId)
+        interfaces = [freflect.namedAny(interface) for interface in interfaces]
+        # hand the keycard to the checker somehow and then return it
+        # FIXME: don't set it authenticated here :)
+        keycard.state = keycards.AUTHENTICATED
+        return keycard
+
+### FIXME: deprecate, not used
+
+# changes from upstream pb's:
+# - add keycard
+# - support IUsernameCryptPassword
+
+class _FPortalAuthChallenger(pb.Referenceable):
+    # I am a credentials created pb.server side to be presented to the
+    # portal;
+    # the portal can register any checker that can do
+    # IUsernameHashedPassword or IUsernameCryptPassword
+    """Called with response to password challenge."""
+
+    __implements__ = pb.IUsernameHashedPassword, fcredentials.IUsernameCryptPassword
+
+    def __init__(self, portalWrapper, username, avatarId, challenge, *interfaces):
+        self.portalWrapper = portalWrapper
+        self.username = username
+        self.challenge = challenge
+        self.interfaces = interfaces
+        self.avatarId = avatarId
+
+        self.componentName = "manager" # because we give this to a bouncer
+        
+    def remote_respond(self, response, mind):
+        self.response = response
+        # avatarId is now again a member of the credentials,
+        # so since we pass ourselves to the portal's login, which
+        # will use the checker, the checker can get our desired avatarId !
+        d = self.portalWrapper.portal.login(self, mind, *self.interfaces)
+        d.addCallback(self._loggedIn)
+        return d
+
+    #def _loggedIn(self, (interface, perspective, logout)):
+    def _loggedIn(self, tuple):
+        self.portalWrapper.broker.notifyOnDisconnect(logout)
+        return pb.AsReferenceable(perspective, "perspective")
+
+    # IUsernameHashedPassword:
+    def checkPassword(self, password):
+        # instead of using the md5 test, we use the crypt test
+        salt = self.challenge[:2]
+        return self.checkCryptPassword(crypt.crypt(password, salt))
+
+    # IUsernameCryptPassword
+    def checkCryptPassword(self, cryptPassword):
+        # we already have the crypted password
+        md = md5.new()
+        md.update(cryptPassword)
+        md.update(self.challenge)
+        expected = md.digest()
+
+        expected = pb.respond(self.challenge, cryptPassword)
+
+        return expected == self.response

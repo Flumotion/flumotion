@@ -290,9 +290,12 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         Returns: a deferred returning a keycard or None
         """
-        keycard = keycards.HTTPClientKeycard(
-            self.streamer.get_name(), request.getUser(),
+        # for now, we're happy with a UACPP keycard; the password arrives
+        # plaintext anyway
+        keycard = keycards.KeycardUACPP(
+            request.getUser(),
             request.getPassword(), request.getClientIP())
+        keycard.requesterName = self.streamer.get_name(),
         keycard._fd = request.transport.fileno()
         
         if self.bouncerName is None:

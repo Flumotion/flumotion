@@ -27,9 +27,10 @@ import gobject
 
 from twisted.spread import pb
 from twisted.internet import error, defer
+from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
-from flumotion.common import bundle, errors, interfaces, log
+from flumotion.common import bundle, errors, interfaces, log, keycards
 from flumotion.utils import reload
 from flumotion.utils.gstutils import gsignal
 from flumotion.twisted import credentials
@@ -54,25 +55,53 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     __implements__ = interfaces.IAdminMedium,
 
-    def __init__(self):
+    def __init__(self, options):
         self.__gobject_init__()
-        self.clientFactory = fpb.FMClientFactory()
+        self.clientFactory = fpb.FPBClientFactory()
         self.debug("logging in to ClientFactory")
-        # FIXME: get from startup config
-        creds = credentials.Username('test')
-        creds.avatarId = 'admin'
-        d = self.clientFactory.login(creds, self,
-            pb.IPerspective,
-            interfaces.IAdminMedium)
+
+        # FIXME: one without address maybe ? or do we want manager to set it ?
+        # or do we set our guess and let manager correct ?
+        # FIXME: try both, one by one, and possibly others
+        #keycard = keycards.KeycardUACPP(options.username, options.password, 'localhost')
+        keycard = keycards.KeycardUACPCC(options.username, 'localhost')
+        # FIXME: decide on an admin name ?
+        keycard.avatarId = "admin"
+ 
+        d = self.clientFactory.login(keycard, self, interfaces.IAdminMedium)
+        # add a callback to respond to the challenge
+        d.addCallback(self._loginCallback, options.password)
         d.addCallback(self.setRemoteReference)
-        d.addErrback(self._loginErrback)
+        d.addErrback(self._accessDeniedErrback)
+        d.addErrback(self._connectionRefusedErrback)
+        d.addErrback(self._defaultErrback)
         self._components = {} # dict of components
 
         self.remote = None
 
     ### our methods
-    def _loginErrback(self, failure):
+    def _loginCallback(self, result, password):
+        self.log("_loginCallback(result=%r, password=%s)" % (result, password))
+        assert result
+        # if we have a reference, we're in
+        if isinstance(result, pb.RemoteReference):
+            return result
+        # else, we need to respond to the challenge
+        keycard = result
+        keycard.setPassword(password)
+        self.log("_loginCallback: responding to challenge")
+        d = self.clientFactory.login(keycard, self, interfaces.IAdminMedium)
+        return d
+        
+    def _connectionRefusedErrback(self, failure):
         r = failure.trap(error.ConnectionRefusedError)
+        self.debug("emitting connection-refused")
+        self.emit('connection-refused')
+        self.debug("emitted connection-refused")
+
+    def _accessDeniedErrback(self, failure):
+        r = failure.trap(crederror.UnauthorizedLogin)
+        # FIXME: unauthorized login emit !
         self.debug("emitting connection-refused")
         self.emit('connection-refused')
         self.debug("emitted connection-refused")
@@ -109,7 +138,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.emit('update')
         
     def remote_initial(self, components):
-        self.debug('remote_initial %s' % components)
+        self.debug('remote_initial(components=%s)' % components)
         for component in components:
             self._components[component.name] = component
         self.emit('connected')

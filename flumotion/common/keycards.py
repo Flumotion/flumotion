@@ -29,6 +29,7 @@ from flumotion.common import common
 REFUSED = 0
 REQUESTING = 1
 AUTHENTICATED = 2
+_statesEnum=['REFUSED', 'REQUESTING', 'AUTHENTICATED']
 
 class Keycard(pb.Copyable, pb.RemoteCopy):
     __implements__ = common.mergeImplements(pb.Copyable, pb.RemoteCopy) + (tcredentials.ICredentials, )
@@ -42,7 +43,8 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         self.state = REQUESTING
 
     def __repr__(self):
-        return "<%s in state %d>" % (self.__class__.__name__, self.state)
+        
+        return "<%s in state %s>" % (self.__class__.__name__, _statesEnum[self.state])
 
 # class KeycardUACCP: username, address, crypt password
 #       from UsernameCryptPasswordCrypt
@@ -58,6 +60,7 @@ class KeycardUACPP(Keycard, UCPP):
         UCPP.__init__(self, username, password)
         Keycard.__init__(self)
         self.address = address
+pb.setUnjellyableForClass(KeycardUACPP, KeycardUACPP)
 
 #: username, address, crypt password
 #       from UsernameCryptPasswordCrypt
@@ -74,8 +77,9 @@ class KeycardUACPCC(Keycard, UCPCC):
         Keycard.__init__(self)
         self.address = address
         dir(self)
+pb.setUnjellyableForClass(KeycardUACPCC, KeycardUACPCC)
 
-# FIXME: rewrite
+# FIXME: DEPRECATED, remove
 class HTTPClientKeycard(tcredentials.UsernamePassword, Keycard):
     def __init__(self, componentName, username, password, ip):
         tcredentials.UsernamePassword.__init__(self, username, password)

@@ -1,3 +1,39 @@
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/planet.xml:
+	  use htpasswdcrypt bouncer for manager and streamer
+	* flumotion/component/http/http_resources.py:
+	  use KeycarUACPP instead of deprecated HTTPClientKeycard
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	  return a random-ish salt when the username is not in the
+	  backend to pretend everything's fine
+	* flumotion/component/component.py:
+	  switch from reconnecting client factory to new FPBClientFactory
+	* flumotion/twisted/portal.py:
+	  add new BouncerPortal wrapping an IRealm and a Bouncer
+	* flumotion/twisted/pb.py:
+	  add new FPB Client and Server Factories
+	* flumotion/test/test_pb.py:
+	  added
+	* flumotion/admin/gtk/client.py:
+	  change password option to -d, pass on options to model
+	  for keycard
+	* flumotion/admin/admin.py:
+	  use FPBClientFactory
+	  log in with an actual keycard, using Challenge/Response, yay !
+	* flumotion/common/keycards.py:
+	  set unjellyable, change repr
+	* flumotion/worker/worker.py:
+	  use FPBClientFactory
+	* flumotion/worker/job.py:
+	  log in component using keycard (currently UACPP, change later ?)
+	* flumotion/worker/main.py:
+	  log in worker using keycard (currently UACPP, change later ?)
+	* flumotion/manager/manager.py:
+	  use the bouncer portal now
+	* flumotion/manager/component.py:
+	  some debugging
+
 2004-10-16  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_audio_encoder.glade:

@@ -91,7 +91,8 @@ class Dispatcher(log.Loggable):
         @type avatarId:  string
         @param avatarId: the name of the new avatar
         @type ifaces:    tuple of interfaces linked to heaven
-        @param ifaces:   a list of heaven interfaces to get avatar from
+        @param ifaces:   a list of heaven interfaces to get avatar from,
+                         including pb.IPerspective
 
         @returns:        an avatar from the heaven managing the given interface.
         """
@@ -165,14 +166,17 @@ class Vishnu(log.Loggable):
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
+
+        # FIXME: depcrecated
         self.checker = ManagerCredentialsChecker()
         # the WorkerHeaven sets this to True later on if the config file
         # uses a password policy
         self.checker.allowAnonymous(True) # XXX: False
         
-        p = fportal.FlumotionPortal(self.dispatcher, [self.checker])
+        # FIXME: decide if we allow anonymous login in this small (?) window
+        self.portal = fportal.BouncerPortal(self.dispatcher, None)
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
-        self.factory = pb.PBServerFactory(p)
+        self.factory = pb.PBServerFactory(self.portal)
 
     def _createHeaven(self, interface, klass):
         """
@@ -195,6 +199,7 @@ class Vishnu(log.Loggable):
         """
         self.bouncer = bouncer
         self.checker.bouncer = bouncer
+        self.portal.bouncer = bouncer
 
     def getFactory(self):
         return self.factory

@@ -273,7 +273,7 @@ class Window(log.Loggable):
         host = options.host
         port = options.port
         transport = options.transport
-        self.admin = AdminModel()
+        self.admin = AdminModel(options)
         self.admin.connect('connected', self.admin_connected_cb)
         self.admin.connect('connection-refused',
                            self.admin_connection_refused_cb, host, port)
@@ -418,7 +418,7 @@ def main(args):
                       action="store", type="string", dest="username",
                       default="",
                       help="username to use")
-    parser.add_option('-d', '--password',
+    parser.add_option('-p', '--password',
                       action="store", type="string", dest="password",
                       default="",
                       help="password to use, - for interactive")

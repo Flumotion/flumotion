@@ -1,20 +1,21 @@
 <planet>
 
   <manager>
-<!--    <component name="manager-bouncer" type="htpasswdcrypt"> -->
-    <component name="manager-bouncer" type="htpasswd">
-      <encryption>plaintext</encryption>
+    <component name="manager-bouncer" type="htpasswdcrypt">
       <data><![CDATA[
-test:test
-wim:PSfNpHTkpTx1M
+wim:test
+test:PSfNpHTkpTx1M
 ]]></data>
     </component>
   </manager>
 
   <atmosphere>
-    <component name="http-bouncer" type="htpasswd">
+    <component name="http-bouncer" type="htpasswdcrypt">
       <encryption>crypt</encryption>
-      <filename>/tmp/htpasswd</filename>
+      <data><![CDATA[
+wim:test
+test:PSfNpHTkpTx1M
+]]></data>
     </component>
   </atmosphere>
 

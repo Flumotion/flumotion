@@ -21,7 +21,7 @@ import os
 
 from twisted.internet import reactor
 
-from flumotion.common import log
+from flumotion.common import log, keycards
 from flumotion.worker import worker
 from flumotion.twisted import credentials
 
@@ -83,11 +83,12 @@ def main(args):
     else:
         log.error('worker', 'Unknown transport protocol: %s' % options.transport)
 
-    # FIXME: allow for different credentials types
-    creds = credentials.Username(options.username, options.password)
+    # FIXME: one without address maybe ? or do we want manager to set it ?
+    # or do we set our guess and let manager correct ?
+    keycard = keycards.KeycardUACPP(options.username, options.password, 'localhost')
     # FIXME: decide on a workername
-    creds.avatarId = "localhost"
-    brain.login(creds)
+    keycard.avatarId = "localhost"
+    brain.login(keycard)
 
     log.debug('worker', 'Starting reactor')
     reactor.run()

@@ -100,6 +100,5 @@ class TestHTPasswdCryptUACPCC(unittest.TestCase):
         result = unittest.deferredResult(d)
         self.failIf(result)
 
-
 if __name__ == '__main__':
     unittest.main()

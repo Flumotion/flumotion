@@ -37,7 +37,7 @@ from flumotion.twisted import pb as fpb
 from flumotion.worker import job
 
 #factoryClass = fpb.ReconnectingPBClientFactory
-factoryClass = fpb.FMClientFactory
+factoryClass = fpb.FPBClientFactory
 class WorkerClientFactory(factoryClass):
     """
     I am a client factory for the worker to log in to the manager.
@@ -52,8 +52,8 @@ class WorkerClientFactory(factoryClass):
         # doing this as a class method triggers a doc error
         factoryClass.__init__(self)
         
-    def login(self, creds):
-        return self.__super_login(creds,
+    def login(self, keycard):
+        return self.__super_login(keycard,
                                   self.medium,
                                   interfaces.IWorkerMedium)
         
@@ -147,7 +147,7 @@ class Kindergarten:
         return self.kids.values()
     
 # Similar to Vishnu, but for worker related classes
-class WorkerBrain:
+class WorkerBrain(log.Loggable):
     """
     I manage jobs and everything related.
     I live in the main worker process.
@@ -166,8 +166,9 @@ class WorkerBrain:
         self.medium = WorkerMedium(self)
         self.worker_client_factory = WorkerClientFactory(self)
 
-    def login(self, creds):
-        d = self.worker_client_factory.login(creds)
+    def login(self, keycard):
+        d = self.worker_client_factory.login(keycard)
+        d.addCallback(self._loginCallback)
         d.addErrback(self._cb_accessDenied)
         d.addErrback(self._cb_connectionRefused)
         d.addErrback(self._cb_loginFailed)
@@ -188,6 +189,9 @@ class WorkerBrain:
         print >> sys.stderr, 'ERROR: %s' % message
         reactor.stop()
         
+    def _loginCallback(self, reference):
+        self.info("logged in to manager, remote reference %r" % reference)
+
     def _cb_accessDenied(self, failure):
         failure.trap(twisted.cred.error.UnauthorizedLogin)
         self.error('Access denied.')

@@ -33,14 +33,17 @@ from flumotion.twisted import pb as fpb
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
-class ComponentClientFactory(fpb.ReconnectingPBClientFactory):
-    __super_login = fpb.ReconnectingPBClientFactory.startLogin
+# FIXME: make the superklass reconnecting ?
+superklass = fpb.FPBClientFactory
+# the client factory logging in to the manager
+class ComponentClientFactory(superklass):
+    __super_login = superklass.login
     def __init__(self, component):
         """
         @param component: L{flumotion.component.component.BaseComponent}
         """
         # doing this as a class method triggers a doc error
-        super_init = fpb.ReconnectingPBClientFactory.__init__
+        super_init = superklass.__init__
         super_init(self)
         
         # get the component's medium class, defaulting to the base one
@@ -52,12 +55,11 @@ class ComponentClientFactory(fpb.ReconnectingPBClientFactory):
         # get the interfaces implemented by the component medium class
         self.interfaces = getattr(klass, '__implements__', ())
         
-    def login(self, username, avatarId=None):
-        self.__super_login(credentials.Username(username),
-                           avatarId,
-                           self.medium,
-                           pb.IPerspective,
-                           *self.interfaces)
+    def login(self, keycard):
+        d = self.__super_login(keycard, self.medium,
+                               interfaces.IComponentMedium)
+        d.addCallback(self.gotPerspective)
+        return d
         
     # this method receives a RemoteReference
     # it can't tell if it's from an IPerspective implementor, Viewpoint or
