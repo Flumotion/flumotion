@@ -96,7 +96,9 @@ class WorkerHeaven(base.ManagerHeaven):
     def getEntries(self, worker):
         # get all components from the config for this worker
         workerName = worker.getName()
+        self.debug('getEntries: for worker %s' % workerName)
         if not self.conf:
+            self.debug('getEntries: no config, no entries')
             return []
 
         retval = []
@@ -104,9 +106,22 @@ class WorkerHeaven(base.ManagerHeaven):
         entries = self.conf.getComponentEntries()
 
         for entry in entries.values():
+            # if a worker name is specified, then respect it
             if entry.worker and entry.worker != workerName:
+                self.log('getEntries: component %s is for worker %s, skipping' %
+                    (entry.name, entry.worker))
                 continue
+            # if not, then only add if it is not currently running
+            if self.vishnu.componentHeaven.hasAvatar(entry.name):
+                self.log('getEntries: component %s already running, skipping' %
+                    entry.name)
+                continue
+
+            self.log('getEntries: adding component %s for worker %s' % (
+                entry.name, workerName))
             retval.append(entry)
+
+        self.debug('getEntries: returning %r' % retval)
         return retval
        
     def workerAttached(self, workerAvatar):

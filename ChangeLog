@@ -1,5 +1,13 @@
 2005-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/base.py:
+	  add a hasAvatar method
+	* flumotion/manager/worker.py:
+	  check to see if a component is already running before asking a
+	  worker to start.  avoids doubly starting components.
+
+2005-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  implement stop
 	* flumotion/component/component.py:

@@ -221,7 +221,28 @@ class ManagerHeaven(pb.Root, log.Loggable):
         del self.avatars[avatarId]
         
     def getAvatar(self, avatarId):
+        """
+        Get the avatar with the given id.
+
+        @type avatarId:  string
+        @param avatarId: id of the avatar to get
+
+        @rtype: L{ManagerAvatar}
+        """
         return self.avatars[avatarId]
 
     def getAvatars(self):
+        """
+        Get all avatars in this heaven.
+
+        @rtype: list of L{ManagerAvatar}
+        """
         return self.avatars.values()
+
+    def hasAvatar(self, avatarId):
+        """
+        Check if the heaven has the given avatar id registered.
+
+        @returns: whether the heaven has the given avatar registered.
+        """
+        return avatarId in self.avatars.keys()
