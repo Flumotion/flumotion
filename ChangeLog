@@ -1,5 +1,12 @@
 2004-10-16  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/manager/component.py (ComponentHeaven.shutdown):
+	Remove the avatar
+	(ComponentHeaven.createAvatar, ComponentHeaven.removeAvatar): Add
+	logging.
+	(ComponentHeaven.removeAvatar): Remove feeders too
+	(FeederSet.removeFeeders): New method.
+
 	* flumotion/manager/main.py (_loadConfig): Don't parse the
 	configuration twice.
 

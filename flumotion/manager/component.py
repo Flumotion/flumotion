@@ -170,6 +170,19 @@ class FeederSet(log.Loggable):
                 self.debug('setting component %r' % componentAvatar)
                 self.feeders[feederName].setComponentAvatar(componentAvatar)
             
+    def removeFeeders(self, componentAvatar):
+        """
+        Remove the feeders of the given component to the set.
+
+        @type componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        """
+        
+        feeders = componentAvatar.getFeeders()
+        
+        for feederName in feeders:
+            if self.hasFeeder(feederName):
+                del self.feeders[feederName]
+            
     def isFeederReady(self, feederName):
         if not self.hasFeeder(feederName):
             return False
@@ -630,7 +643,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         @rtype:          L{flumotion.manager.component.ComponentAvatar}
         @returns:        the avatar for the component
         """
-
+        self.log('createAvatar(%s)' % avatarId)
         if self.hasComponent(avatarId):
             raise errors.AlreadyConnectedError(avatarId)
 
@@ -639,12 +652,15 @@ class ComponentHeaven(pb.Root, log.Loggable):
         return avatar
 
     def removeAvatar(self, avatarId):
+        self.log('removeAvatar(%s)' % avatarId)
         if not self.hasComponent(avatarId):
             raise KeyError, avatarId
 
         avatar = self.avatars[avatarId]
         del self.avatars[avatarId]
-       
+
+        self._feederSet.removeFeeders(avatar)
+        
         self.vishnu.adminheaven.componentRemoved(avatar)
     
     ### our methods
@@ -836,3 +852,5 @@ class ComponentHeaven(pb.Root, log.Loggable):
         """
         for name in self.avatars.keys():
             self.avatars[name].stop()
+            del self.avatars[name]
+            
