@@ -71,7 +71,7 @@ class Dispatcher(log.Loggable):
         p = None
         if not pb.IPerspective in interfaces:
             raise errors.NoPerspectiveError(avatarID)
-        
+
         if IBaseComponent in interfaces:
             p = self.controller.getPerspective(avatarID)
         # FIXME: can we connect multiple admin clients this way ?

@@ -120,9 +120,9 @@ class FileStreamingResource(resource.Resource):
             return self.makeError(request, http.UNAUTHORIZED)
 
         filename = self.restart()
-        
+
         return 'b>Restarted</b><br>' + \
-               'Now saving to %s<br> <br>%s' % (filename,
+               'Now saving to %s<br><br>%s' % (filename,
                                                 self.restart_form(request))
     
     def render_GET(self, request):
