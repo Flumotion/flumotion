@@ -17,10 +17,15 @@ test:PSfNpHTkpTx1M
       <feed>video</feed>
       <feed>audio</feed>
       <pipeline>
+         <!-- read from firewire, decode video, drop every 2 frames -->
          dv1394src ! dvdec name=dec drop-factor=2 ! video/x-raw-yuv,format=(fourcc)YUY2 ! 
+	   <!-- normalize rate, scale down to get rid of interlace -->
            videorate ! videoscale ! video/x-raw-yuv,width=384,height=288 ! 
+	   <!-- scale down some more to correct aspect ratio -->
            videoscale ! video/x-raw-yuv,width=384,height=268,framerate=12.5,format=(fourcc)YUY2 ! @feeder::video@
+	 <!-- audio gets rate corrected -->
          dec. ! audio/x-raw-int ! audiorate ! 
+	   <!-- downsample audio to encode it at lower bitrate -->
            audioscale ! audio/x-raw-int,rate=24000 ! @feeder::audio@
       </pipeline>
     </component>
@@ -30,21 +35,26 @@ test:PSfNpHTkpTx1M
     <component name="dv-with-overlay" type="converter">
       <source>dv-camera:video</source>
       <pipeline>
+	 <!-- read png -->
          filesrc location=dv_384x268.png blocksize=100000 ! pngdec ! 
+	   <!-- convert RGBA to YUVA and send to videomixer -->
            alphacolor ! videomixer name=mix ! @feeder::video@
+	 <!-- take dv video, color convert and send to video mixer -->
          @eater:dv-camera:video@ ! video/x-raw-yuv,width=384,height=268,framerate=12.5 ! ffmpegcolorspace ! alpha ! mix. 
       </pipeline>
       <feed>video</feed>
     </component>
   
     <component name="dv-theora" type="converter">
-      <source>dv-with-overlay</source>
+      <source>dv-with-overlay:video</source>
+      <!-- colorspace convert and theora encode at 300kbps -->
       <pipeline>ffmpegcolorspace ! theoraenc bitrate=300</pipeline>
       <feed>video</feed>
     </component>
 
     <component name="dv-vorbis" type="converter">
       <source>dv-camera:audio</source>
+      <!-- audio convert and vorbis encode at 32kbps -->
       <pipeline>audioconvert ! rawvorbisenc bitrate=32000</pipeline>
       <feed>audio</feed>
     </component>
@@ -54,13 +64,15 @@ test:PSfNpHTkpTx1M
       <source>dv-vorbis:audio</source>
       <feed>ogg</feed>
       <pipeline>
-          { @eater:dv-vorbis:audio@ } { @eater:dv-theora:video@ } 
-          eater:dv-vorbis:audio. ! queue max-size-buffers=16 ! oggmux name=mux 
-          eater:dv-theora:video. ! queue max-size-buffers=16 ! mux. mux. ! @feeder::ogg@
+          <!-- take audio and send to the muxer -->
+          { @eater:dv-vorbis:audio@ } ! queue max-size-buffers=16 ! oggmux name=mux 
+          <!-- take video and send to the muxer -->
+	  { @eater:dv-theora:video@ } ! queue max-size-buffers=16 ! mux. mux. ! @feeder::ogg@
       </pipeline>
     </component>
 
     <component name="streamer-ogg-theora" type="http-streamer">
+      <!-- send muxed ogg to http streamer on port 8800 -->
       <source>dv-ogg-theora-vorbis:ogg</source>
       <port>8800</port>
       <logfile>/tmp/ogg-test-theora.access.log</logfile>
