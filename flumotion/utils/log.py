@@ -128,18 +128,15 @@ def stderrHandler(category, level, message):
 def stderrHandlerLimited(category, level, message):
     """
     Logs the message only when the message's level is not more verbose
-    than the registered level for this category.
+    than the registered level for this category, as specified by FLU_DEBUG.
     """
-    
-    'used when FLU_DEBUG is set; uses FLU_DEBUG to limit on category'
     global _categories
     if not _categories.has_key(category):
         registerCategory(category)
     global _levels
     if _levels[level] > _categories[category]:
         return
-    sys.stderr.write('%-8s %-15s %s\n' % (level + ':', category + ':' , message))
-    sys.stderr.flush()
+    stderrHandler(category, level, message)
 
 def _handle(category, level, message):
     global _log_handlers
@@ -168,22 +165,23 @@ def debug(cat, *args):
 def log(cat, *args):
     _handle(cat, 'LOG', ' '.join(args))
 
-def enableLogging():
-    global _log_handlers
-    if not stderrHandler in _log_handlers:
-        _log_handlers.append(stderrHandler)
-    
-def disableLogging():
-    if stderrHandler in _log_handlers:
-        _log_handlers.remove(stderrHandler)
-    
 def addLogHandler(func):
     _log_handlers.append(func)
 
 def init():
     if os.environ.has_key('FLU_DEBUG'):
         # install a log handler that uses the value of FLU_DEBUG
-        global _FLU_DEBUG
-        _FLU_DEBUG = os.environ['FLU_DEBUG']
+        setFluDebug(os.environ['FLU_DEBUG'])
         addLogHandler(stderrHandlerLimited)
-        debug('log', "FLU_DEBUG set to %s" % _FLU_DEBUG)
+
+def setFluDebug(string):
+    """Set the FLU_DEBUG string.  This controls the log output."""
+    global _FLU_DEBUG
+    global _categories
+    
+    _FLU_DEBUG = string
+    debug('log', "FLU_DEBUG set to %s" % _FLU_DEBUG)
+
+    # reparse all already registered category levels
+    for category in _categories:
+        registerCategory(category)

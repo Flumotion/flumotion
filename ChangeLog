@@ -1,5 +1,12 @@
 2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/server/launcher.py:
+	* flumotion/utils/log.py:
+	  remove enableLogging and disableLogging.  Use new method,
+	  setFluDebug.  Make that reset levels on the fly as well.
+
+2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/utils/log.py:
 	  fix up debugging system, FLU_DEBUG now works like in GStreamer,
 	  but with categories registered as they are encountered.

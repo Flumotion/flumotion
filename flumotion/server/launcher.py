@@ -78,7 +78,7 @@ class Launcher(log.Loggable):
             return
         
         if logging:
-            log.enableLogging()
+            log.setFluDebug("*:4")
             
         signal.signal(signal.SIGINT, signal.SIG_IGN)
                 
@@ -203,7 +203,7 @@ def run_launcher(args):
         return
     
     if options.verbose:
-        log.enableLogging()
+        log.setFluDebug("*:4")
 
     launcher.run()
 
@@ -224,7 +224,7 @@ def run_controller(args):
     options, args = parser.parse_args(args)
 
     if options.verbose:
-        log.enableLogging()
+        log.setFluDebug("*:4")
 
     factory = controller.ControllerServerFactory()
     
