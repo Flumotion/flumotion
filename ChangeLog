@@ -1,5 +1,12 @@
 2004-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/http/http.py:
+	  threading fixes, twisted now "sees" only on thread
+	  first pass at fixing race issues
+	  now needs gst-plugins 0.8.4.1 (cvs)
+
+2004-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-tester.in:
 	* flumotion/tester/client.py:
 	* flumotion/tester/httpclient.py:

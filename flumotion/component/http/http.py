@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_http -*-
+# -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a video streaming server
@@ -23,9 +23,11 @@
 import os
 import random
 import time
+import thread
 
 import gobject
 import gst
+
 from twisted.protocols import http
 from twisted.web import server, resource
 from twisted.internet import reactor
@@ -215,6 +217,7 @@ class Stats:
         else:
             self.average_client_number = (dc1 * dt1 / (dt1 + dt2) +
                                           dc2 * dt2 / (dt1 + dt2))
+
     def clientAdded(self):
         self.updateAverage()
 
@@ -300,13 +303,12 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
     def setLogfile(self, logfile):
         self.logfile = open(logfile, 'a')
         
-    def log(self, fd, ip, request):
+    def logWrite(self, fd, ip, request, stats):
         if not self.logfile:
             return
 
         headers = request.getAllHeaders()
 
-        stats = self.streamer.get_stats(fd)
         if stats:
             bytes_sent = stats[0]
             time_connected = int(stats[3] / gst.SECOND)
@@ -340,9 +342,12 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.logfile.write(msg)
         self.logfile.flush()
 
-    def streamer_client_removed_cb(self, streamer, sink, fd, reason):
-        request = self.request_hash[fd]
-        self.removeClient(request, fd)
+    def streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
+        try:
+            request = self.request_hash[fd]
+            self.removeClient(request, fd, stats)
+        except KeyError:
+            self.warning("fd %d not found in request_hash" % fd)
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -377,7 +382,12 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         setHeader('Content-type', self.streamer.get_content_type())
             
         #self.debug('setting Content-type to %s' % mime)
-        os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
+        ### FIXME: there's a window where Twisted could have removed the
+        # fd because the client disconnected.  Catch EBADF correctly here.
+        try:
+            os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
+        except OSError, e:
+            self.warning('client on fd %d gone before writing header')
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -417,16 +427,21 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         fd = request.transport.fileno()
         self.request_hash[fd] = request
 
-    def removeClient(self, request, fd):
-        """Removes a request and add logging. Note that it does not disconnect the client
+    def removeClient(self, request, fd, stats):
+        """
+        Removes a request and add logging.
+        Note that it does not disconnect the client
+        
         @param request: the request
         @type request: twisted.protocol.http.Request
         @param fd: the file descriptor for the client being removed
         @type fd: L{int}
+        @param stats: the statistics for the removed client
+        @type stats: GValueArray
         """
 
         ip = request.getClientIP()
-        self.log(fd, ip, request)
+        self.logWrite(fd, ip, request, stats)
         self.info('client from %s on fd %d disconnected' % (ip, fd))
         del self.request_hash[fd]
 
@@ -465,13 +480,20 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.setHeaders(request)
         self.addClient(request)
         fd = request.transport.fileno()
+        
+        # take over the file descriptor from Twisted by removing them from
+        # the reactor
+        # spiv told us to remove* on request.transport, and that works
+        reactor.removeReader(request.transport)
+        reactor.removeWriter(request.transport)
+    
+        # hand it to multifdsink
         self.streamer.add_client(fd)
         self.info('client from %s on fd %d accepted' % (request.getClientIP(), fd))
         return server.NOT_DONE_YET
         
     def render(self, request):
         self.debug('client from %s connected' % (request.getClientIP()))
-    
         if not self.isReady():
             return self.handleNotReady(request)
         elif self.reachedMaxClients():
@@ -506,7 +528,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
                                 'buffers-soft-max=250 ' + \
                                 'recover-policy=1'
 
-    gsignal('client-removed', object, int, int)
+    gsignal('client-removed', object, int, int, object)
     gsignal('ui-state-changed')
     
     component_view = HTTPView
@@ -555,8 +577,8 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
 
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
-
-        gobject.idle_add(self.emit, 'ui-state-changed')
+        
+        self.emit('ui-state-changed')
 
     def get_mime(self):
         if self.caps:
@@ -572,10 +594,6 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         sink = self.get_sink()
         stats = sink.emit('add', fd)
 
-    def get_stats(self, fd):
-        sink = self.get_sink()
-        return sink.emit('get-stats', fd)
-    
     def get_sink(self):
         assert self.pipeline, 'Pipeline not created'
         sink = self.pipeline.get_by_name('sink')
@@ -584,30 +602,54 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         return sink
 
     def update_ui_state(self):
-        gobject.idle_add(self.emit, 'ui-state-changed')
+        self.emit('ui-state-changed')
         
+    ### START OF THREAD-AWARE CODE
+
+    # this can be called from both application and streaming thread !
     def client_added_cb(self, sink, fd):
+        self.log('client_added_cb from thread %d' % thread.get_ident()) 
+        gobject.idle_add(self.client_added_idle)
+
+    # this can be called from both application and streaming thread !
+    def client_removed_cb(self, sink, fd, reason):
+        self.log('client_removed_cb from thread %d' % thread.get_ident()) 
+        self.log('client_removed_cb: fd %d, reason %s' % (fd, reason))
+        stats = sink.emit('get-stats', fd)
+        gobject.idle_add(self.client_removed_idle, sink, fd, reason, stats)
+
+    ### END OF THREAD-AWARE CODE
+
+    def client_added_idle(self):
         Stats.clientAdded(self)
         self.update_ui_state()
         
-    def client_removed_cb(self, sink, fd, reason):
-        self.emit('client-removed', sink, fd, reason)
+    def client_removed_idle(self, sink, fd, reason, stats):
+        # Johan will trap GST_CLIENT_STATUS_ERROR here someday
+        # because STATUS_ERROR seems to have already closed the fd somewhere
+        self.emit('client-removed', sink, fd, reason, stats)
         Stats.clientRemoved(self)
         self.update_ui_state()
+        # actually close it - needs gst-plugins 0.8.5 of multifdsink
+        self.log('client_removed_idle: fd %d, reason %s' % (fd, reason))
+        self.debug('closing fd %d' % fd)
+        try:
+            os.close(fd)
+        except OSError:
+            print "Johan will trap GST_CLIENT_STATUS_ERROR here someday"
 
-    def feeder_state_change_idle(self, element, old, state):
+    def feeder_state_change_cb(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
             self.debug('Ready to serve clients on %d' % self.port)
 
-    def feeder_state_change_cb(self, element, old, state):
-        gobject.idle_add(self.feeder_state_change_idle, element, old, state)
-        
     def link_setup(self, eaters, feeders):
         sink = self.get_sink()
+        # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self.notify_caps_cb)
         sink.connect('state-change', self.feeder_state_change_cb)
+        # these are made threadsafe using idle_add in the handler
         sink.connect('client-removed', self.client_removed_cb)
         sink.connect('client-added', self.client_added_cb)
 
