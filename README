@@ -5,7 +5,7 @@ WHAT IT IS
 
 Flumotion is a streaming media server based on GStreamer and Twisted.
 
-This is the first public release of Flumotion.
+This is the first public development series of Flumotion.
 It will probably still contain bugs, be difficult to install (since
 you need recent dependencies), and cause you some headaches.
 

@@ -1,3 +1,15 @@
-This is Flumotion 0.1.0, "Agua".
+This is Flumotion 0.1.1, "El Local".
 
-This is the first public release of the Flumotion Streaming Server.
+Issues fixed since 0.1.1:
+
+ticket	summary
+54	wizard pages should be able to run code on the worker to detect stuff
+57	No firewire video page to choose width and height on
+40	TV card in wizard gives problems
+41	After cleaning up from the admin interface the workers are staying as
+        workers turn into zombies after cleanup from admin
+42	cleanup and new config does not work in wizard
+55	TV card should allow choice of signal and channel
+56	traceback in wizard with webcam
+38	trac URL wrong
+46	check for twisted 1.3.0 in configure
