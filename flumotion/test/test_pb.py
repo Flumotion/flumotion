@@ -154,21 +154,22 @@ class Test_BouncerWrapper(unittest.TestCase):
         self.wrapper = pb._BouncerWrapper(self.bouncerPortal, None)
 
         
-    def FIXME_UACPPOk(self):
+    def testUACPPOk(self):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         d = self.wrapper.remote_login(keycard, "avatarId", 'twisted.spread.pb.IPerspective')
         keycard = unittest.deferredResult(d)
         self.assertEquals(keycard.state, keycards.REQUESTING)
         keycard = unittest.deferredResult(d)
         self.assertEquals(keycard.state, keycards.AUTHENTICATED)
-
+    testUACPPOk.skip = "FIXME"
+    
     def testUACPPWrongPassword(self):
         keycard = keycards.KeycardUACPP('user', 'tes', '127.0.0.1')
         d = self.wrapper.remote_login(keycard, "avatarId", 'twisted.spread.pb.IPerspective')
         failure = unittest.deferredError(d)
         failure.trap(error.UnauthorizedLogin)
 
-    def FIXME_UACPCCOk(self):
+    def testUACPCCOk(self):
         # create
         keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
 
@@ -182,7 +183,8 @@ class Test_BouncerWrapper(unittest.TestCase):
         d = self.wrapper.remote_login(keycard, None, 'twisted.spread.pb.IPerspective')
         keycard = unittest.deferredResult(d)
         self.assertEquals(keycard.state, keycards.AUTHENTICATED)
-
+    testUACPCCOk.skip = "FIXME"
+    
     def testUACPCCWrongUser(self):
         # create
         keycard = keycards.KeycardUACPCC('wronguser', '127.0.0.1')

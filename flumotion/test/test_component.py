@@ -160,9 +160,9 @@ class TestParser(unittest.TestCase):
                        '%s name=feeder:fake:feed1 ! %s name=feeder:fake:feed2' % \
                        (FEEDER, FEEDER))
 
-    # FIXME: what is this ???
-    #def testErrors(self):
-    #    self.assertRaises(TypeError, pipelineFactory, '')
-
+    def testErrors(self):
+        self.assertRaises(TypeError, pipelineFactory, '')
+    testErrors.skip = "Empty pipeline should raise TypeError"
+    
 if __name__ == '__main__':
     unittest.main()
