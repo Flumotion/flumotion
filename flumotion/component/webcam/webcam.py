@@ -15,6 +15,8 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+import gst
+
 from flumotion.component import feedcomponent
 
 class WebCamera(feedcomponent.ParseLaunchComponent):
@@ -24,11 +26,19 @@ class WebCamera(feedcomponent.ParseLaunchComponent):
                                                     ['default'],
                                                     pipeline)
                                        
+def setProp(struct, dict, name):
+    if dict.has_key(name):
+        struct[name] = dict[name]
+                                                                                
 def createComponent(config):
-    component = WebCamera(config['name'], 'v4lsrc name=camera autoprobe=false copy-mode=1')
-
-    # XXX: Width and height through filtered caps.
-    #element.set_property('width', config['width'])
-    #element.set_property('height', config['height'])
+    # Filtered caps
+    format = config.get('format', 'video/x-raw-yuv')
+    struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
+    setProp(struct, config, 'width')
+    setProp(struct, config, 'height')
+    setProp(struct, config, 'framerate')
+    caps = gst.Caps(struct)
+                                                                                
+    component = WebCamera(config['name'], 'v4lsrc name=camera autoprobe=false copy-mode=1 ! %s ! videorate ! %s' % (caps, caps))
 
     return component

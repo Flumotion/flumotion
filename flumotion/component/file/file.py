@@ -69,9 +69,10 @@ class FileSinkStreamer(feedcomponent.ParseLaunchComponent):
             sink.emit('remove', self.file_fd.fileno())
             self.file_fd = None
             
-        date = time.strftime('%Y%m%d-%H:%M:%S', time.localtime())
+        # FIXME: get the file extension from the muxer !
+        date = time.strftime('%Y%m%d-%H%M%S', time.localtime())
         self.location = os.path.join(self.directory,
-                                     self.get_name() + '_' + date)
+                                     self.get_name() + '.' + date)
 
         self.file_fd = open(self.location, 'a')
         sink.emit('add', self.file_fd.fileno())

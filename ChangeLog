@@ -1,3 +1,10 @@
+2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/file/file.py:
+	  make name slightly cleaner
+	* flumotion/component/webcam/webcam.py:
+	  more webcam fixing, use filtercaps
+
 2004-10-17  Wim Taymans  <wim@fluendo.com>
 
 	* data/glade/wizard_overlay.glade:
