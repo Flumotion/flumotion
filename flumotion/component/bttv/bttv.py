@@ -21,7 +21,7 @@
 import gst
 import gst.interfaces
 
-from flumotion.component import producer
+from flumotion.component.base import producer
 
 def state_changed_cb(element, old, new, channel):
     if old == gst.STATE_NULL and new == gst.STATE_READY:
