@@ -26,7 +26,7 @@ class Theora(feedcomponent.ParseLaunchComponent):
 
 def createComponent(config):
     component = Theora(config['name'], [config['source']],
-                       "theoraenc name=encoder")
+                       "ffmpegcolorspace ! theoraenc name=encoder")
     
     element = component.pipeline.get_by_name('encoder')
     if config.has_key('bitrate'):

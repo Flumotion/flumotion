@@ -15,6 +15,7 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+import errno
 import optparse
 import os
 
@@ -56,59 +57,31 @@ def main(args):
                      help="password to use, - for interactive")
      
     parser.add_option_group(group)
-    group = optparse.OptionGroup(parser, "job options")
-    group.add_option('-j', '--job',
-                     action="store", type="string", dest="job",
-                     help="run job")
-    group.add_option('-w', '--worker',
-                     action="store", type="string", dest="worker",
-                     help="worker unix socket to connect to")
-    parser.add_option_group(group)
     
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
+    log.debug('worker', 'Connecting to manager %s:%d' % (options.host, options.port))
+                     
     if options.version:
         from flumotion.common import common
         print common.version("flumotion-worker")
         return 0
-        
-    if options.job:
-        # we were started from the worker as a job
-        _startJob(options)
-    else:
-        # we are the main worker
-        _startWorker(options)
 
-def _startJob(options):
-    from flumotion.worker import job
-    job_client_factory = job.JobClientFactory(options.job)
-    reactor.connectUNIX(options.worker, job_client_factory)
-    log.debug('job', 'Starting reactor')
-    reactor.run()
-    log.debug('job', 'Reactor stopped')
-
-def _connectWorkerReactorTCP(options, brain):
-    log.info('worker',
-        'Connecting to manager %s:%d with TCP' % (options.host, options.port))
-    reactor.connectTCP(options.host, options.port, brain.worker_client_factory)
-
-def _connectWorkerReactorSSL(options, brain):
-    from twisted.internet import ssl
-    log.info('worker',
-        'Connecting to manager %s:%d with SSL' % (options.host, options.port))
-    reactor.connectSSL(options.host, options.port, brain.worker_client_factory,
-        ssl.ClientContextFactory())
-
-def _startWorker(options):
     # create a brain and have it remember the manager to direct jobs to
     brain = worker.WorkerBrain(options.host, options.port, options.transport)
 
     # connect the brain to the manager
+    log.info('worker',
+             'Connecting to manager %s:%d (using %s)' % (options.host,
+                                                         options.port,
+                                                         options.transport))
     if options.transport == "tcp":
-        _connectWorkerReactorTCP(options, brain)
+        reactor.connectTCP(options.host, options.port, brain.worker_client_factory)
     elif options.transport == "ssl":
-        _connectWorkerReactorSSL(options, brain)
+        from twisted.internet import ssl
+        reactor.connectSSL(options.host, options.port, brain.worker_client_factory,
+                           ssl.ClientContextFactory())
     else:
         log.error('worker', 'Unknown transport protocol: %s' % options.transport)
 
@@ -129,8 +102,13 @@ def _startWorker(options):
     
     log.debug('worker', 'Waiting for jobs to finish')
     while pids:
-        pid = os.wait()[0]
+        try:
+            pid = os.wait()[0]
 	# FIXME: properly catch OSError: [Errno 10] No child processes
+        except OSError, e:
+            if e.errno == errno.ECHILD:
+                continue
+        
         pids.remove(pid)
 
     log.debug('worker', 'All jobs finished, closing down')

@@ -102,9 +102,10 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         return self.remote != None
 
     # call function on remote perspective in manager
-    def callRemoteErrback(self, reason):
-            self.warning('callRemote failed because of %s' % reason)
-
+    def callRemoteErrback(self, failure):
+        self.warning('callRemote failed because of %r' % failure)
+        failure.trap(pb.PBConnectionLost)
+        
     def callRemote(self, name, *args, **kwargs):
         """
         @returns: a deferred

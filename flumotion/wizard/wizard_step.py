@@ -45,7 +45,7 @@ class Source(wizard.WizardStep):
                      'If you want to stream video')
         tips.set_tip(self.checkbutton_has_audio,
                      'If you want to stream audio')
-        # HACK HACK HACK
+        # XXX: Default to something else
         self.combobox_video.set_active(VideoDevice.Test)
         
     def on_checkbutton_has_video_toggled(self, button):
@@ -161,10 +161,18 @@ class Overlay(wizard.WizardStep):
     component_name = 'overlay'
 
     def setup(self):
-        # HACK HACK HACK
+        # XXX: Remove
         self.checkbutton_show_logo.set_active(False)
-        self.checkbutton_show_text.set_active(False)
-        
+        self.checkbutton_show_text.set_active(True)
+
+    def get_component_properties(self):
+        options = {}
+        if self.checkbutton_show_logo:
+            options['logo'] = True
+        if self.checkbutton_show_text:
+            options['text'] = self.entry_text.get_text()
+        return options
+
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has_audio'):
             audio_source = self.wizard.get_step_option('Source', 'audio')            

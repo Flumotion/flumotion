@@ -15,19 +15,60 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from flumotion.component.base import converter
+from flumotion.component import feedcomponent
+
+import os
+
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
+
+directory = os.path.split(os.path.abspath(__file__))[0]
+fontpath = os.path.join(directory, 'Vera.ttf')
+
+FILENAME = '/tmp/flumotion-overlay.png'
+
+class Overlay(feedcomponent.ParseLaunchComponent):
+    def __init__(self, name, eaters, pipeline):
+        feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    eaters,
+                                                    ['default'],
+                                                    pipeline)
+
+
+def generate_overlay(text, logo, width, height, size=22, x=4, y=4):
+    image = Image.new("RGBA", (width, height))
+    draw = ImageDraw.Draw(image)
+
+    if text:
+        font = ImageFont.truetype(fontpath, size)
+        draw.text((x+2, y+2), text, font=font, fill='black')
+        draw.text((x, y), text, font=font)
+
+    if logo:
+        print 'JOHAN: Add logo'
+
+    if os.path.exists(FILENAME):
+        os.unlink(FILENAME)
+        
+    image.save(FILENAME)
 
 def createComponent(config):
     source = config['source']
-    location = config['location']
+
+    eater = '@ eater:%s @' % source
+    component = Overlay(config['name'], [source],
+                        "filesrc name=source blocksize=100000 ! " + \
+                        "pngdec ! alphacolor ! videomixer name=mix ! @ feeder:: @ " + \
+                        "%s ! ffmpegcolorspace ! alpha ! mix." % eater)
     
-    # Since source in converter is a list, convert it to one
-    config['source'] = [source]
 
-    # Set pipeline from the template
-    pipeline = "filesrc location=%s blocksize=100000 ! " % location + \
-               "pngdec ! alphacolor ! videomixer name=mix ! @feeder::@ " + \
-               "@eater:%s@ ! ffmpegcolorspace ! alpha ! mix." % source
-    config['pipeline'] = pipeline
-
-    return converter.createComponent(config)
+    text = config.get('text', None)
+    logo = config.get('logo', None)
+    
+    generate_overlay(text, logo, config['width'], config['height'])
+    
+    source = component.get_element('source')
+    source.set_property('location', FILENAME)
+    
+    return component

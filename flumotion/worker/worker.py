@@ -26,12 +26,14 @@ import sys
 from twisted.cred import portal
 from twisted.internet import protocol, reactor
 from twisted.spread import pb
+import twisted.cred.error
 
 # We want to avoid importing gst, otherwise --help fails
 # so be very careful when adding imports
 from flumotion.common import errors, interfaces, log
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
+from flumotion.worker import job
 
 #factoryClass = fpb.ReconnectingPBClientFactory
 factoryClass = fpb.FMClientFactory
@@ -100,15 +102,15 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         self.brain.kindergarten.play(name, type, config)
         
 class Kid:
-    def __init__(self, protocol, name, type, config):
-        self.protocol = protocol 
+    def __init__(self, pid, name, type, config):
+        self.pid = pid 
         self.name = name
         self.type = type
         self.config = config
 
     # pid = protocol.transport.pid
     def getPid(self):
-        return self.protocol.pid
+        return self.pid
     
 class Kindergarten:
     """
@@ -131,20 +133,11 @@ class Kindergarten:
         @param type:      type of component to start
         @type  type:      string
         """
-        ### FIXME: move this to the worker brain, since this is the unix
-        ### domain socket
-        worker_filename = '/tmp/flumotion.%d' % os.getpid()
-        args = [self.program,
-                '--job', name,
-                '--worker', worker_filename]
-        log.debug('worker', 'Launching process %s' % name)
-        p = reactor.spawnProcess(protocol.ProcessProtocol(),
-                                 self.program, args,
-                                 env=os.environ,
-                                 childFDs={ 0: 0, 1: 1, 2: 2})
-        self.kids[name] = Kid(p, name, type, config)
-
-        return p
+        
+        # This forks and returns the pid
+        pid = job.run(name)
+        
+        self.kids[name] = Kid(pid, name, type, config)
 
     def getKid(self, name):
         return self.kids[name]
@@ -190,7 +183,7 @@ class WorkerBrain:
         return job_server_factory, root
 
     def _cb_accessDenied(self, failure):
-        failure.trap(cred.error.UnauthorizedLogin)
+        failure.trap(twisted.cred.error.UnauthorizedLogin)
         print 'ERROR: Access denied.'
         reactor.stop()
     

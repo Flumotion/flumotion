@@ -1,3 +1,27 @@
+2004-10-15  Johan Dahlin  <johan@gnome.org>
+
+	* conf/minimal.xml:
+	* conf/videotest-jpeg.xml:
+	* flumotion/common/config.py:
+	* flumotion/component/component.py:
+	* flumotion/component/encoders/theora.py:
+	* flumotion/component/http/http_resources.py:
+	* flumotion/component/overlay/overlay.py:
+	* flumotion/component/overlay/overlay.xml:
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/worker/worker.py
+	* flumotion/worker/job.py
+	* flumotion/worker/report.py
+	* flumotion/worker/main.py
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Update configuration for minimal and videotest. 
+	Fix some errors found by pychecker.
+	Make the overlay component generate an image on the fly.
+	Make the worker use fork() instead of ProcessProtocol.
+	
 2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:

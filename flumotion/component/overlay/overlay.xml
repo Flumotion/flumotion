@@ -2,8 +2,12 @@
   <component type="overlay">
     <source location="flumotion.component.overlay.overlay"/>
     <properties>
+      <property name="feed" type="string" required="yes" multiple="yes"/>
       <property name="source" type="string" multiple="no"/>
-      <property name="location" type="string" required="yes"/>
+      <property name="text" type="string"/>
+      <property name="logo" type="string"/>
+      <property name="width" type="int"/>
+      <property name="height" type="int"/>
     </properties>
   </component>
 </components>

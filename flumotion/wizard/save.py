@@ -27,23 +27,23 @@ class Component:
         component.addEater(self)
 
     def toXML(self):
-        s = '  <component name="%s" type="%s">\n' % (self.name, self.type)
+        s = '    <component name="%s" type="%s">\n' % (self.name, self.type)
 
         if len(self.eaters) == 1:
-            s += '    <feed>default</feed>\n'
+            s += '      <feed>default</feed>\n'
         else:
             for feed_name in self.eaters:
-                s += "    <feed>%s</feed>\n" % source.feed_name
+                s += "      <feed>%s</feed>\n" % source.feed_name
                 
         for source in self.feeders:
-            s += "    <source>%s</source>\n" % source.name
+            s += "      <source>%s</source>\n" % source.name
 
         if self.props:
-            s += "    <!-- properties -->\n"
+            s += "      <!-- properties -->\n"
             for name, value in self.props.items():
-                s += "    <%s>%s</%s>\n" % (name, value, name)
+                s += "      <%s>%s</%s>\n" % (name, value, name)
             
-        s += "  </component>"
+        s += "    </component>"
         return s
     
     def printTree(self, indent=1):
@@ -63,10 +63,13 @@ class WizardSaver:
         return Component('video-source', source.component_type,
                          video_step.get_component_properties())
 
-    def getVideoOverlay(self):
+    def getVideoOverlay(self, video_step):
         step = self.wizard['Overlay']
-        return Component('video-overlay', 'overlay',
-                         step.get_component_properties())
+        video_props = video_step.get_component_properties()
+        properties = step.get_component_properties()
+        properties['width'] = video_props['width']
+        properties['height'] = video_props['height']
+        return Component('video-overlay', 'overlay', properties)
         
     def getVideoEncoder(self):
         options = self.wizard.get_step_options('Encoding')
@@ -111,7 +114,7 @@ class WizardSaver:
         video_encoder = self.getVideoEncoder()
             
         if has_overlay:
-            video_overlay = self.getVideoOverlay()
+            video_overlay = self.getVideoOverlay(video_source)
             components.append(video_overlay)
                 
         if video_overlay is not None:
@@ -206,8 +209,11 @@ class WizardSaver:
 
         self.handleConsumers(muxer, components)
 
-        print '<component>'
+        print '<planet>'
+        
+        print '  <atmosphere>'
         for component in components:
             print component.toXML()
-        print '</component>'
+        print '  </atmosphere>'
+        print '</planet>'
         

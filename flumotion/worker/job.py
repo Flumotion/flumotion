@@ -29,8 +29,7 @@ from twisted.internet import reactor
 from twisted.python import reflect
 from twisted.spread import pb
 
-from flumotion.common.registry import registry
-from flumotion.common import interfaces, log
+from flumotion.common import config, interfaces, log, registry
 from flumotion.component import component
 from flumotion.twisted import credentials
 
@@ -41,7 +40,7 @@ def getComponent(dict, defs):
     try:
         module = reflect.namedAny(source)
     except ValueError:
-        raise ConfigError("%s source file could not be found" % source)
+        raise config.ConfigError("%s source file could not be found" % source)
         
     if not hasattr(module, 'createComponent'):
         log.warning('job', 'no createComponent() for %s' % source)
@@ -95,12 +94,13 @@ class JobMedium(pb.Referenceable, log.Loggable):
         @param feedPorts: feedName -> port
         @type  feedPorts: dict
         """
-        defs = registry.getComponent(type)
+        defs = registry.registry.getComponent(type)
         self._runComponent(name, type, config, defs, feedPorts)
 
     def remote_stop(self):
         reactor.stop()
-        raise SystemExit
+        print 'XXX: Quit cleanly'
+        os._exit(1)
 
     ### IMedium methods
     def setRemoteReference(self, remoteReference):
@@ -166,9 +166,9 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.set_nice(name, config.get('nice', 0))
         self.enable_core_dumps(name)
         
-        log.debug(name, 'run_component(): config: %r' % config)
-        log.debug(name, 'run_component(): feedPorts: %r' % feedPorts)
-        log.debug(name, 'run_component(): defs is: %r' % defs)
+        log.debug(name, '_runComponent(): config dictionary is: %r' % config)
+        log.debug(name, '_runComponent(): feedPorts is: %r' % feedPorts)
+        log.debug(name, '_runComponent(): defs is: %r' % defs)
 
         comp = getComponent(config, defs)
 
@@ -197,7 +197,9 @@ class JobMedium(pb.Referenceable, log.Loggable):
             reactor.connectTCP(host, port, manager_client_factory)
         else:
             self.error('Unknown transport protocol %s' % self.manager_transport)
-    
+
+        self.component_factory = manager_client_factory
+        
 class JobClientFactory(pb.PBClientFactory, log.Loggable):
     """
     I am a client factory that logs in to the WorkerBrain.
@@ -224,3 +226,31 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
 
     def _connectedErrback(self, error):
         print 'ERROR:' + str(error)
+
+def run(name):
+    worker_filename = '/tmp/flumotion.%d' % os.getpid()
+    
+    pid = os.fork()
+    if pid:
+        return pid
+
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    
+    reactor.removeAll()
+
+    job_factory = JobClientFactory(name)
+    reactor.connectUNIX(worker_filename, job_factory)
+    log.debug('job', 'Starting reactor')
+    reactor.run()
+
+    def _exitCb(*unused):
+        while reactor.iterate():
+            pass
+                
+        reactor.stop()
+            
+    reactor.callLater(0, _exitCb)
+    reactor.run()
+            
+    os._exit(1)
+    
