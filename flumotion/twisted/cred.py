@@ -31,6 +31,7 @@ class FlexibleCredentials(parent):
     def allowAnonymous(self, anon):
         self.anonymous = anon
                          
+    ### ICredentialsChecker interface methods
     def requestAvatarId(self, credentials):
         if self.anonymous:
             return credentials.username

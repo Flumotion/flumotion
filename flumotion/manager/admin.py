@@ -299,9 +299,10 @@ class AdminHeaven(pb.Root, log.Loggable):
         #for category, type, message in self.logcache:
         #    client.sendLog(category, type, message)
         
-    def getAvatar(self, avatarID):
+    # FIXME: we don't actually *use* avatarId
+    def createAvatar(self, avatarId):
         """
-        Creates a new administration avatar.
+        Create a new administration avatar and manage it.
         @rtype:   L{flumotion.manager.admin.AdminAvatar}
         @returns: a new avatar for the admin client.
         """
@@ -314,7 +315,7 @@ class AdminHeaven(pb.Root, log.Loggable):
 
     def removeAvatar(self, avatar):
         """
-        Removes the AdminAvatar from our list of avatars.
+        Stop managing the given avatar.
         @type avatar: L{flumotion.manager.admin.AdminAvatar}
         """
         self.debug('removing AdminAvatar %s' % avatar)

@@ -477,27 +477,29 @@ class ComponentHeaven(pb.Root, log.Loggable):
         
         self.last_free_port = 5500
 
-    def getAvatar(self, avatarID):
+    ### IHeaven methods
+
+    def createAvatar(self, avatarId):
         """
         Creates a new avatar for a component.
         Raises an AlreadyConnectedError if the component is already found
         in the cache.
         
-        @type avatarID:  string
+        @type avatarId:  string
 
         @rtype:          L{flumotion.manager.component.ComponentAvatar}
         @returns:        the avatar for the component
         """
 
-        if self.hasComponent(avatarID):
-            raise errors.AlreadyConnectedError(avatarID)
+        if self.hasComponent(avatarId):
+            raise errors.AlreadyConnectedError(avatarId)
 
-        avatar = ComponentAvatar(self, avatarID)
+        avatar = ComponentAvatar(self, avatarId)
         self.addComponent(avatar)
         return avatar
 
-    def removeAvatar(self, avatarID):
-        self.removeComponentByName(avatarID)
+    def removeAvatar(self, avatarId):
+        self.removeComponentByName(avatarId)
     
     def isLocalComponent(self, component):
         peer = component.getTransportPeer()

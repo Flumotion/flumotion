@@ -63,10 +63,20 @@ class IWorkerComponent(components.Interface):
     pass
 
 class IHeaven(components.Interface):
-    def getAvatar(self, avatarID):
+    def createAvatar(self, avatarId):
+        """
+        Creates a new avatar matching the type of heaven.
+
+        @type avatarId: string
+
+        @returns: the avatar from the matching heaven for a new object.
+        """
         pass
 
-    def removeAvatar(self, avatarID):
+    def removeAvatar(self, avatarId):
+        """
+        Remove the avatar with the given Id from the heaven.
+        """
         pass
     
 class INewCredPerspective(components.Interface):

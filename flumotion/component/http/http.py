@@ -562,8 +562,8 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         self.caps = None
         self.resource = None
         self.needsUpdate = False
-        # FIXME: call self._callLaterID.cancel() somewhere on shutdown
-        self._callLaterID = reactor.callLater(1, self.checkUpdate)
+        # FIXME: call self._callLaterId.cancel() somewhere on shutdown
+        self._callLaterId = reactor.callLater(1, self.checkUpdate)
         
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.component_name
@@ -573,7 +573,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         if self.needsUpdate == True:
             self.needsUpdate = False
             self.update_ui_state()
-        self._callLaterID = reactor.callLater(1, self.checkUpdate)
+        self._callLaterId = reactor.callLater(1, self.checkUpdate)
 
     ### FIXME: abstract this away nicely to the base class of components
     def getUIMD5Sum(self, style):

@@ -55,7 +55,7 @@ class TestComponentHeaven(unittest.TestCase):
         self.heaven = component.ComponentHeaven(manager.Vishnu())
 
     def testGetPerspective(self):
-        p = self.heaven.getAvatar('foo-bar-baz')
+        p = self.heaven.createAvatar('foo-bar-baz')
         assert isinstance(p, component.ComponentAvatar)
 
         #self.assertRaises(AssertionError,
@@ -67,17 +67,17 @@ class TestComponentHeaven(unittest.TestCase):
         assert self.heaven.isLocalComponent(c)
         
     def testIsStarted(self):
-        c = self.heaven.getAvatar('prod')
+        c = self.heaven.createAvatar('prod')
         assert not self.heaven.isComponentStarted('prod')
         c.started = True # XXX: Use heaven.componentStart
         assert self.heaven.isComponentStarted('prod')
 
     def testGetComponent(self):
-        c = self.heaven.getAvatar('prod')
+        c = self.heaven.createAvatar('prod')
         assert self.heaven.getComponent('prod') == c
 
     def testHasComponent(self):
-        c = self.heaven.getAvatar('prod')
+        c = self.heaven.createAvatar('prod')
         assert self.heaven.hasComponent('prod')
         self.heaven.removeComponent(c)
         assert not self.heaven.hasComponent('prod')

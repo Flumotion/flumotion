@@ -53,7 +53,7 @@ class Dispatcher(log.Loggable):
 
     def __init__(self):
         self.heavens = {} # registered heavens, keyed on interface
-        self.avatars = {} # avatarID -> heaven
+        self.avatars = {} # avatarId -> heaven
         
     ### IRealm methods
 
@@ -66,39 +66,39 @@ class Dispatcher(log.Loggable):
     # on the peer, allowing any object that has the mind to call back
     # to the piece that called login(),
     # which in our case is a component or an admin client.
-    def requestAvatar(self, avatarID, mind, *ifaces):
-        avatar = self.getAvatarFor(avatarID, ifaces)
+    def requestAvatar(self, avatarId, mind, *ifaces):
+        avatar = self.createAvatarFor(avatarId, ifaces)
 
-        self.debug("returning Avatar: id %s, avatar %s" % (avatarID, avatar))
+        self.debug("returning Avatar: id %s, avatar %s" % (avatarId, avatar))
 
         # schedule a perspective attached for after this function
         reactor.callLater(0, avatar.attached, mind)
 
         # return a tuple of interface, aspect, and logout function 
         return (pb.IPerspective, avatar,
-                lambda a=avatar, m=mind, i=avatarID: self.removeAvatar(i, a, m))
+                lambda a=avatar, m=mind, i=avatarId: self.removeAvatar(i, a, m))
 
     ### our methods
 
-    def removeAvatar(self, avatarID, avatar, mind):
-        heaven = self.avatars[avatarID]
-        del self.avatars[avatarID]
+    def removeAvatar(self, avatarId, avatar, mind):
+        heaven = self.avatars[avatarId]
+        del self.avatars[avatarId]
         
         avatar.detached(mind)
-        heaven.removeAvatar(avatarID)
+        heaven.removeAvatar(avatarId)
 
-    def getAvatarFor(self, avatarID, ifaces):
+    def getAvatarFor(self, avatarId, ifaces):
         if not pb.IPerspective in ifaces:
-            raise errors.NoPerspectiveError(avatarID)
+            raise errors.NoPerspectiveError(avatarId)
 
         for iface in ifaces:
             heaven = self.heavens.get(iface, None)
             if heaven:
-                avatar = heaven.getAvatar(avatarID)
-                self.avatars[avatarID] = heaven
+                avatar = heaven.getAvatar(avatarId)
+                self.avatars[avatarId] = heaven
                 return avatar
 
-        raise errors.NoPerspectiveError(avatarID)
+        raise errors.NoPerspectiveError(avatarId)
         
     def registerHeaven(self, interface, heaven):
         """

@@ -41,12 +41,12 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
 
     logCategory = 'worker-avatar'
 
-    def __init__(self, heaven, avatarID):
+    def __init__(self, heaven, avatarId):
         self.heaven = heaven
-        self.avatarID = avatarID
+        self.avatarId = avatarId
 
     def getName(self):
-        return self.avatarID
+        return self.avatarId
     
     def attached(self, mind):
         self.info('attached %r' % mind)
@@ -87,16 +87,20 @@ class WorkerHeaven(pb.Root):
         self.conf = None
         self.vishnu = vishnu
         
-    def getAvatar(self, avatarID):
-        if not self.conf.hasWorker(avatarID):
+    ### IHeaven methods
+
+    def createAvatar(self, avatarId):
+        if not self.conf.hasWorker(avatarId):
             raise AssertionError
             
-        avatar = WorkerAvatar(self, avatarID)
-        self.avatars[avatarID] = avatar
+        avatar = WorkerAvatar(self, avatarId)
+        self.avatars[avatarId] = avatar
         return avatar
 
-    def removeAvatar(self, avatarID):
-        del self.avatars[avatarID]
+    def removeAvatar(self, avatarId):
+        del self.avatars[avatarId]
+
+    ### my methods
 
     def loadConfiguration(self, filename):
         # XXX: Merge?

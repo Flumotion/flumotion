@@ -34,9 +34,9 @@ class Dispatcher:
     def __init__(self, root):
         self.root = root
         
-    def requestAvatar(self, avatarID, mind, *interfaces):
+    def requestAvatar(self, avatarId, mind, *interfaces):
         if pb.IPerspective in interfaces:
-            avatar = self.root.getAvatar(avatarID)
+            avatar = self.root.createAvatar(avatarId)
             reactor.callLater(0, avatar.attached, mind)
             return pb.IPerspective, avatar, avatar.shutdown
         else:
@@ -88,15 +88,16 @@ class ReportAvatar(pb.Avatar, log.Loggable):
     def remote_ready(self):
         pass
 
+### this is a different kind of heaven, not IHeaven, for now...
 class ReportHeaven(pb.Root, log.Loggable):
     logCategory = "report-root"
     def __init__(self, fabric):
         self.avatars = {}
         self.fabric = fabric
         
-    def getAvatar(self, avatarID):
-        avatar = ReportAvatar(self, avatarID)
-        self.avatars[avatarID] = avatar
+    def createAvatar(self, avatarId):
+        avatar = ReportAvatar(self, avatarId)
+        self.avatars[avatarId] = avatar
         return avatar
 
     def shutdown(self):
