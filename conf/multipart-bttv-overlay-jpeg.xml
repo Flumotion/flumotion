@@ -1,0 +1,28 @@
+<root>
+  <component name="producer-video-bttv" type="producer">
+    <pipeline>
+v4lsrc device=/dev/video0 copy-mode=true ! video/x-raw-yuv,width=384,height=288 ! videoscale ! video/x-raw-yuv,width=320,height=240 ! videorate ! video/x-raw-yuv,framerate=25.0
+    </pipeline>
+  </component>
+
+  <component name="converter-overlay" type="converter">
+    <source>producer-video-bttv</source>
+    <pipeline>
+filesrc location=/tmp/overlay.png blocksize=1000000 ! pngdec ! alphacolor ! videomixer name=mix ! :default
+@producer-video-bttv ! alpha ! mix.
+    </pipeline>
+  </component>
+
+  <component name="converter-multipart-jpeg" type="converter">
+    <source>converter-overlay</source>
+    <pipeline>
+ffmpegcolorspace ! jpegenc ! multipartmux
+    </pipeline>
+  </component>
+
+  <component name="streamer-multipart-jpeg" type="http-streamer">
+    <source>converter-multipart-jpeg</source>
+    <port>8800</port>
+    <logfile>/tmp/multipart-bttv-jpeg.access.log</logfile>
+  </component>
+</root>
