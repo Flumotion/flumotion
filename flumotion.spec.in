@@ -106,7 +106,7 @@ fi
 
 %preun
 # if removal and not upgrade, stop the processes
-if [ $1 -eq 1]
+if [ $1 -eq 1 ]
 then
   service flu-manager stop > /dev/null
   service flu-worker stop > /dev/null

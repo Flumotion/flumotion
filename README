@@ -28,7 +28,7 @@ This will set up everything except for Twisted for you from source.
 
 A FIRST TEST
 ------------
-Once everything is built and possibly installed, 
+Once everything is built,
 you can try this to start the server:
 
 terminal 1:
@@ -67,7 +67,7 @@ http://lists.fluendo.com/mailman/listinfo/flumotion-devel
 You can visit us on IRC: #fluendo on irc.freenode.org
 
 You can visit our issues tracker:
-http://core.fluendo.com/trac
+http://core.fluendo.com/trac/
 
 LICENSING
 ---------

@@ -81,14 +81,14 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         self.remote = None
         
     def cb_processFinished(self, *args):
-        self.info('processFinished %r' % args)
+        self.debug('processFinished %r' % args)
 
     def cb_processFailed(self, *args):
-        self.info('processFailed %r' % args)
+        self.debug('processFailed %r' % args)
 
     ### IMedium methods
     def setRemoteReference(self, remoteReference):
-        self.info('setRemoteReference: %r' % remoteReference)
+        self.debug('setRemoteReference: %r' % remoteReference)
         self.remote = remoteReference
 
     def hasRemoteReference(self):
@@ -106,7 +106,8 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         @param config: a configuration dictionary for the component
         @type config:  dict
         """
-        self.info('remote_start(): manager asked me to start, name %s, type %s, config %r' % (name, type, config))
+        self.info('Starting component "%s" of type "%s"' % (name, type))
+        self.debug('remote_start(): manager asked me to start, name %s, type %s, config %r' % (name, type, config))
         self.brain.kindergarten.play(name, type, config)
 
     def remote_checkElements(self, element_names):
@@ -217,12 +218,14 @@ class WorkerBrain(log.Loggable):
 
     # override log.Loggable method so we don't traceback
     def error(self, message):
-        self.warning('Shutting down because of %s' % message)
+        self.warning('Shutting down worker because of error:')
+        self.warning(message)
         print >> sys.stderr, 'ERROR: %s' % message
         reactor.stop()
         
     def _loginCallback(self, reference):
-        self.info("logged in to manager, remote reference %r" % reference)
+        self.info("Logged in to manager")
+        self.debug("remote reference %r" % reference)
 
     def _cb_accessDenied(self, failure):
         failure.trap(twisted.cred.error.UnauthorizedLogin)

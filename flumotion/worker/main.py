@@ -118,9 +118,9 @@ def main(args):
     else:
         log.error('worker', 'Unknown transport protocol: %s' % options.transport)
     log.info('worker',
-             'Connecting to manager %s:%d (using %s)' % (options.host,
-                                                         options.port,
-                                                         options.transport))
+             'Connecting to manager %s:%d using %s' % (options.host,
+                                                       options.port,
+                                                       options.transport.upper()))
 
     if options.workerName:
         workerName = options.workerName
@@ -157,4 +157,4 @@ def main(args):
         
         pids.remove(pid)
 
-    log.debug('worker', 'All jobs finished, closing down')
+    log.info('worker', 'All jobs finished, stopping worker')
