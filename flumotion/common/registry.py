@@ -542,7 +542,7 @@ class ComponentRegistry(log.Loggable):
         if not os.path.exists(dir):
             try:
                 os.makedirs(dir)
-            except IOError, e:
+            except OSError, e:
                 if e.errno == errno.EACCES:
                     self.error('Registry directory %s could not be created !' % dir)
                 else:
