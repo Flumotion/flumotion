@@ -593,35 +593,3 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
 class HTTPRoot(web_resource.Resource):
     pass
-
-def setup(component, port, mountPoint):
-    """I setup the HTTP interface and attaches a streamer to mount_point
-    
-    @param component  : MultifdSinkStreamer
-    @param port :       port to listen on
-    @type  port :       integer
-    @param mountPoint : mount point of stream
-    @type  mountPoint : string
-
-    @returns : the streaming resource
-    @rtype   : HTTPStreamingResource
-    """
-    
-    if mountPoint.startswith('/'):
-        mountPoint = mountPoint[1:]
-
-    streamingResource = HTTPStreamingResource(component)
-    adminResource = HTTPAdminResource(streamingResource)
-    
-    root = HTTPRoot()
-    root.putChild(mountPoint, streamingResource)
-    root.putChild('stats', adminResource)
-
-    component.debug('Listening on %d' % port)
-    try:
-        reactor.listenTCP(port, server.Site(resource=root))
-    except twisted.internet.error.CannotListenError:
-        component.error('Port %d is not available.' % port)
-
-    return streamingResource
-    

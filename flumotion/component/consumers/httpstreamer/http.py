@@ -27,7 +27,7 @@ import thread
 import gobject
 import gst
 
-from twisted.internet import reactor
+from twisted.internet import reactor, error
 from twisted.web import server
 
 from flumotion.component import feedcomponent
@@ -356,6 +356,19 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         sink.connect('client-removed', self._client_removed_cb)
         sink.connect('client-added', self._client_added_cb)
 
+    def start(self, *args, **kwargs):
+        root = resources.HTTPRoot()
+        root.putChild(self.mountPoint, self.resource)
+        
+        self.debug('Listening on %d' % self.port)
+        try:
+            reactor.listenTCP(self.port, server.Site(resource=root))
+            feedcomponent.ParseLaunchComponent.start(self, *args, **kwargs)
+        except error.CannotListenError:
+            self.warning('Port %d is not available.' % self.port)
+            self.setMood(moods.sad)
+            # FIXME: set message as well
+
 gobject.type_register(MultifdSinkStreamer)
 
 ### create the component based on the config file
@@ -364,14 +377,16 @@ def createComponent(config):
 
     name = config['name']
     source = config['source']
-    port = int(config['port'])
-    mount_point = config.get('mount_point', '')
-    
     component = MultifdSinkStreamer(name, source)
-    resource = resources.setup(component, port, mount_point)
+
+    component.port = int(config['port'])
+    mountPoint = config.get('mount_point', '')
+    if mountPoint.startswith('/'):
+        mountPoint = mountPoint[1:]
+    component.mountPoint = mountPoint
 
     # FIXME: tie these together more nicely
-    component.resource = resource
+    component.resource = resources.HTTPStreamingResource(component)
     
     if config.has_key('logfile'):
         component.debug('Logging to %s' % config['logfile'])

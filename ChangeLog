@@ -1,3 +1,10 @@
+2005-03-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  move setup to _start() method so a blocked port can be
+	  recovered from
+
 2005-03-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:
