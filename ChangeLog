@@ -1,3 +1,12 @@
+2004-09-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-tester.in:
+	* flumotion/tester/client.py:
+	* flumotion/tester/clientfactory.py:
+	* flumotion/tester/httpclient.py:
+	  provide a decent set of options to influence behaviour of static
+	  http clients
+
 2004-09-16  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/config.py: 
