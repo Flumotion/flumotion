@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
+
 from twisted.trial import unittest
 
 from flumotion.common import registry
