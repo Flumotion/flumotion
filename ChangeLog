@@ -1,5 +1,13 @@
 2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/ogg-test-theora-bouncer.xml:
+	* conf/ogg-test-theora.xml:
+	  add <feed>s
+	* flumotion/component/http/http.py:
+	  revert back to my last version to fix bugs one by one
+
+2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	* flumotion/component/Makefile.am:
 	* flumotion/component/bouncer.py:

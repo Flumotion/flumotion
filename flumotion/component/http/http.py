@@ -28,7 +28,6 @@ from twisted.web import server, resource
 from twisted.internet import reactor, defer
 from twisted.cred import credentials
 import twisted.internet.error
-import twisted.web.error
 
 from flumotion.component import feedcomponent
 from flumotion.common import auth, bundle, common, interfaces, keycards
@@ -67,13 +66,6 @@ STATS_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 
 HTTP_VERSION = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 
-class NotAllowed(twisted.web.error.ErrorPage):
-    def __init__(self, request):
-        twisted.web.error.ErrorPage.__init__(self,
-                                             http.NOT_ALLOWED, "Not allowed",
-                                             """%s methods are not allowed on this server."""
-                                             % (request.method))
-        
 # implements a Resource for the HTTP admin interface
 class HTTPStreamingAdminResource(resource.Resource):
     def __init__(self, parent):
@@ -433,7 +425,6 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         request.finish()
         del self._requests[fd]
         if self.bouncerName and self._fdToKeycard.has_key(fd):
-            # XXX: Assert not self._fdToKeycard.has_key(fd) ???
             id = self._fdToKeycard[fd].id
             del self._fdToKeycard[fd]
             del self._idToKeycard[id]
@@ -510,11 +501,6 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self._addClient(request)
         fd = request.transport.fileno()
         
-        # properly authenticated
-        if self.bouncerName:
-            self._fdToKeycard[fd] = keycard
-            self._idToKeycard[keycard.id] = keycard
-            
         # take over the file descriptor from Twisted by removing them from
         # the reactor
         # spiv told us to remove* on request.transport, and that works
@@ -526,44 +512,9 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         ip = request.getClientIP()
         self.info('[fd %5d] start streaming to %s' % (fd, ip))
 
-    def _authenticatedCallback(self, keycard, request):
-        self.debug('_authenticatedCallback: keycard %r' % keycard)
-        if not keycard:
-            self._handleUnauthorized(request)
-            return
-
-    def _checkAuthentication(self, request):
-        # If there are no bouncers specified, just fall back
-        self.debug('asked for authentication')
-        d = self.authenticate(request)
-        d.addCallback(self._authenticatedCallback, request)
-        
-        # FIXME
-        #d.addErrback()
-            
-        # we MUST return this from our _render.
-        # FIXME: check if this is true
-        # FIXME: check how we later handle not authorized
+    ### resource.Resource methods
 
     def _render(self, request):
-        if keycard.duration:
-            self.debug('new connection on %d will be expired in %f seconds' % (fd, keycard.duration))
-            self._fdToDurationCall[fd] = reactor.callLater(keycard.duration, self._durationCallLater, fd)
-
-        if request.method == 'GET':
-            self._handleNewClient(request)
-            return server.NOT_DONE_YET
-        elif request.method == 'HEAD':
-            self._writeHeaders(request)
-            # This tells twisteds server.Server not to
-            # write headers on top of ours
-            request.startedWriting = True
-            return http.OK
-        else:
-            raise AssertionError
-
-    # XXX: better name
-    def _prepare_render(self, request):
         fd = request.transport.fileno()
         self.debug('[fd %5d] render: client from %s connected, request %s' %
             (fd, request.getClientIP(), request))
@@ -573,20 +524,45 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         elif self.reachedMaxClients():
             return self._handleMaxClients(request)
 
-        if not self.bouncerName:
-            self._checkAuthentication(request)
-            return server.NOT_DONE_YET
-        
-        return self._render(request)
+        d = self.authenticate(request)
+        d.addCallback(self._authenticatedCallback, request)
+        self.debug('asked for authentication')
+        # FIXME
+        #d.addErrback()
 
-    ### resource.Resource methods
+        # we MUST return this from our _render.
+        # FIXME: check if this is true
+        # FIXME: check how we later handle not authorized
+        return server.NOT_DONE_YET
 
-    render_GET = _prepare_render
-    render_HEAD = _prepare_render
+    def _authenticatedCallback(self, keycard, request):
+        self.debug('_authenticatedCallback: keycard %r' % keycard)
+        if not keycard:
+            self._handleUnauthorized(request)
+            return
+
+        # properly authenticated
+        fd = request.transport.fileno()
+        if self.bouncerName:
+            self._fdToKeycard[fd] = keycard
+            self._idToKeycard[keycard.id] = keycard
+
+        if keycard.duration:
+            self.debug('new connection on %d will be expired in %f seconds' % (fd, keycard.duration))
+            self._fdToDurationCall[fd] = reactor.callLater(keycard.duration, self._durationCallLater, fd)
+
+        if request.method == 'GET':
+            self._handleNewClient(request)
+        elif request.method == 'HEAD':
+            self._writeHeaders(request)
+        else:
+            raise AssertionError
+
+    render_GET = _render
+    render_HEAD = _render
     
     def render_PROPFIND(self, request):
-        error = NotAllowed(request)
-        return error.render(request)
+        return http.NOT_ALLOWED
     
     def getChild(self, path, request):
         if path == 'stats':

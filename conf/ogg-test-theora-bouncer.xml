@@ -7,6 +7,8 @@
   </workers>
 
    <component name="http-bouncer" type="bouncer">
+<!--     <filename>/tmp/htpasswd</filename>
+-->
    </component>
 
    <component name="producer-video-test" type="producer">
