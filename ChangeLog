@@ -1,3 +1,25 @@
+2004-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	* flumotion/test/test_log.py:
+	  unfuck test
+
+2004-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/common/bundle.py:
+	* flumotion/common/launcher.py:
+	* flumotion/component/component.py:
+	* flumotion/component/http/gtk.py:
+	* flumotion/component/http/http.glade:
+	* flumotion/component/http/http.py:
+	* flumotion/component/http/http.xml:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	  make http statistics work.  Needs more cleanup and discussion.
+
 2004-09-15  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/worker/job.py:

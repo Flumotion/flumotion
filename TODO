@@ -3,6 +3,8 @@
 
 * MEDIUM	figure out conflict between two config modules
 
+* EASY		rename http to httpstreamer because we'll have a reader too
+
 - make an executable script/program that makes all required checks and
   outputs a report, has a proper zero or non-zero exit status and 
   can't run forever if things are stuck (times out properly)

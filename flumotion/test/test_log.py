@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_log -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
 # Flumotion - a video streaming server
@@ -62,9 +62,6 @@ class TestLog(unittest.TestCase):
         assert not self.level
         assert not self.message
 
-        raise unittest.SkipTest
-    testLimitInvisible.skip = True
-    
     def testLimitedVisible(self):
         log.setFluDebug("testlog:3")
         log.addLogHandler(self.handler)
@@ -117,6 +114,16 @@ class TestLog(unittest.TestCase):
         self.tester.warning("also visible")
         assert self.message == 'also visible'
 
+class TestOwnLogHandler(unittest.TestCase):
+    def setUp(self):
+        self.category = self.level = self.message = None
+        self.tester = LogFunctionTester()
+
+    def handler(self, category, level, message):
+        self.category = category
+        self.level = level
+        self.message = message
+
     # test if our own log handler correctly mangles the message
     def testOwnLogHandlerLimited(self):
         log.setFluDebug("testlog:3")
@@ -124,7 +131,6 @@ class TestLog(unittest.TestCase):
         
         self.tester.log("visible")
         assert self.message == 'override visible'
-    testOwnLogHandlerLimited.skip = True
   
     def testLogHandlerAssertion(self):
         self.assertRaises(TypeError, log.addLogHandler, None)
