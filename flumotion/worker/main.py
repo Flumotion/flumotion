@@ -61,8 +61,6 @@ def main(args):
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
-    log.debug('worker', 'Connecting to manager %s:%d' % (options.host, options.port))
-                     
     if options.version:
         from flumotion.common import common
         print common.version("flumotion-worker")
