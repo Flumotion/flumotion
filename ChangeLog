@@ -1,5 +1,9 @@
 2004-09-17  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/manager/worker.py: Make <workers> optional
+
+	* bin/flumotion-tester.in: Move imports down a little bit.
+
 	* flumotion/component/http/http.py
 	(MultifdSinkStreamer.client_removed_idle): Don't close the file
 	descriptor here.
