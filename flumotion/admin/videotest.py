@@ -78,15 +78,25 @@ class Controller(gobject.GObject):
         """
         # the view's prepare is synchronous for now
         self.view.prepare()
-        self.view.connect('width-changed', self.view_width_changed_cb)
-        self.view.connect('height-changed', self.view_height_changed_cb)
-        self.view.connect('framerate-changed', self.view_framerate_changed_cb)
-        self.view.connect('pattern-changed', self.view_pattern_changed_cb)
-        # the model doesn't currently have a prepare
+
+        # add possible patterns
         self.view.add_pattern("SMPTE")
         self.view.add_pattern("Snow")
         self.view.add_pattern("0% Black")
         self.view.set_pattern(1)
+
+        # add possible formats
+        self.view.add_format("RGB")
+        self.view.add_format("YUY2")
+        self.view.add_format("I420")
+        self.view.set_format(0)
+
+        self.view.connect('width-changed', self.view_width_changed_cb)
+        self.view.connect('height-changed', self.view_height_changed_cb)
+        self.view.connect('framerate-changed', self.view_framerate_changed_cb)
+        self.view.connect('format-changed', self.view_format_changed_cb)
+        self.view.connect('pattern-changed', self.view_pattern_changed_cb)
+        # the model doesn't currently have a prepare
 
     ### callbacks
     def view_width_changed_cb(self, view, width):
@@ -98,6 +108,9 @@ class Controller(gobject.GObject):
     def view_framerate_changed_cb(self, view, framerate):
         _debug("framerate changed to %f" % framerate)
         self.model.set_framerate(framerate)
+    def view_format_changed_cb(self, view, format):
+        _debug("format changed to %f" % format)
+        self.model.set_format(format)
     def view_pattern_changed_cb(self, view, index):
         _debug("pattern changed to index %d" % index)
         self.model.set_pattern(index)
@@ -107,8 +120,10 @@ class View(gobject.GObject):
         'width-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
         'height-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
         'framerate-changed': (gobject.SIGNAL_RUN_FIRST, None, (float, )),
+        'format-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
         'pattern-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
     }
+    latency = 100 # latency for timeouts on config changes
 
     def __init__(self):
         """
@@ -118,6 +133,10 @@ class View(gobject.GObject):
         self._gladefile = os.path.join(flumotion.config.uidir, 'videotest.glade')
         self._glade = gtk.glade.XML(self._gladefile, "videotest-widget")
         self._widget = self._glade.get_widget("videotest-widget")
+        self._width_timeout = 0
+        self._height_timeout = 0
+        self._framerate_timeout = 0
+        self._format_timeout = 0
 
     def prepare(self):
         # connect callbacks
@@ -132,6 +151,11 @@ class View(gobject.GObject):
         self._pattern_model = gtk.ListStore(str)
         w.set_model(self._pattern_model)
         w.connect("changed", self.pattern_changed_cb)
+        w = self._glade.get_widget("format-combo")
+        self._format_combo = w
+        self._format_model = gtk.ListStore(str)
+        w.set_model(self._format_model)
+        w.connect("changed", self.format_changed_cb)
 
     def get_widget(self):
         return self._widget
@@ -146,17 +170,55 @@ class View(gobject.GObject):
     def set_pattern(self, index):
         self._pattern_combo.set_active(index)
 
-    ### callbacks
+    def add_format(self, description):
+        'add a format description to the format combobox'
+        # FIXME: for now we don't even store enum keys, which we might want
+        # to do if they're added in a different order or not always start
+        # at 0
+        self._format_model.append((description, ))
 
-    def width_changed_cb(self, widget):
+    def set_format(self, index):
+        self._format_combo.set_active(index)
+
+    ### timeouts
+    def view_width_timeout(self, widget):
         width = widget.get_value()
         self.emit('width-changed', width)
-    def height_changed_cb(self, widget):
+        self._width_timeout = 0
+        return gtk.FALSE
+    def view_height_timeout(self, widget):
         height = widget.get_value()
         self.emit('height-changed', height)
-    def framerate_changed_cb(self, widget):
+        self._height_timeout = 0
+        return gtk.FALSE
+    def view_framerate_timeout(self, widget):
         framerate = widget.get_value()
         self.emit('framerate-changed', framerate)
+        self._framerate_timeout = 0
+        return gtk.FALSE
+    def view_format_timeout(self, widget):
+        format = widget.get_active()
+        self.emit('format-changed', format)
+        self._format_timeout = 0
+        return gtk.FALSE
+ 
+    ### callbacks
+    def width_changed_cb(self, widget):
+        if not self._width_timeout:
+            id = gobject.timeout_add(View.latency, self.view_width_timeout, widget)
+            self._width_timeout = id
+    def height_changed_cb(self, widget):
+        if not self._height_timeout:
+            id = gobject.timeout_add(View.latency, self.view_height_timeout, widget)
+            self._height_timeout = id
+    def framerate_changed_cb(self, widget):
+        if not self._framerate_timeout:
+            id = gobject.timeout_add(View.latency, self.view_framerate_timeout, widget)
+            self._framerate_timeout = id
+    def format_changed_cb(self, widget):
+        if not self._format_timeout:
+            id = gobject.timeout_add(View.latency, self.view_format_timeout, widget)
+            self._format_timeout = id
     def pattern_changed_cb(self, widget):
         index = widget.get_active()
         self.emit('pattern-changed', index)
@@ -166,6 +228,7 @@ class Model:
         self._src = gst.Element('videotestsrc')
         self._src.set_property('sync', gtk.TRUE)
         self._src.get_pad('src').connect("notify::caps", self.have_caps_cb)
+        self._caps = None
 
     def get_element(self):
         'Gets the element we should link and put in our main bin'
@@ -191,6 +254,33 @@ class Model:
         if not self._caps: return
         self._structure['framerate'] = framerate
         _debug("set_framerate,caps now %s" % self._caps)
+        self._relink()
+
+    # FIXME: use lookup table
+    # FIXME: setting 'format' fourcc's doesn't work yet
+    def set_format(self, format):
+        print "SET FORMAT"
+        if not self._caps: return
+        if format > 2: return
+        if format == 0:
+            # RGB
+            self._structure.set_name('video/x-raw-rgb')
+            del self._structure['format']
+        else:
+            # YUV
+            self._structure.set_name('video/x-raw-yuv')
+            del self._structure['blue_mask']
+            del self._structure['red_mask']
+            del self._structure['green_mask']
+            del self._structure['depth']
+            del self._structure['bpp']
+            del self._structure['endianness']
+            if format == 1:
+                self._structure['format'] = '(fourcc)YUY2'
+            #elif format == 2:
+            #    self._structure['format'] = 'I420'
+
+        print("set_format,caps now %s" % self._caps)
         self._relink()
 
     def set_pattern(self, pattern):
@@ -229,6 +319,8 @@ gobject.type_register(Controller)
 
 if __name__ == '__main__':
     exposed_cb_id = -1
+    width = 320
+    height = 240
     def area_exposed_cb(widget, event, thread, sink):
         'drawing area shown, get xid and start streaming'
         xid = widget.window.xid
@@ -248,6 +340,13 @@ if __name__ == '__main__':
 
     _debug("testing")
 
+    def view_width_changed_cb(widget, value, area):
+        width = value
+        area.set_size_request(width, height)
+    def view_height_changed_cb(widget, value, area):
+        height = value
+        area.set_size_request(width, height)
+
     # create fake toplevel model
     thread = gst.Thread()
     csp = gst.Element('ffmpegcolorspace')
@@ -264,7 +363,10 @@ if __name__ == '__main__':
     box = gtk.HBox(gtk.FALSE, 2)
     box.add(controller.view.get_widget())
     area = gtk.DrawingArea()
-    area.set_size_request(320, 240)
+    area.set_size_request(width, height)
+    # FIXME: changing the area's size request this way makes it flash a lot
+    controller.view.connect('width-changed', view_width_changed_cb, area)
+    controller.view.connect('height-changed', view_height_changed_cb, area)
     exposed_cb_id = area.connect('expose-event', area_exposed_cb, thread, sink)
     box.add(area)
     window.add(box)
