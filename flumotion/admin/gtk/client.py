@@ -730,7 +730,7 @@ class Window(log.Loggable, gobject.GObject):
         
     def _component_start(self, state):
         return self._component_do(state, 'start', 'Starting', 'Started')
-
+ 
     def _component_do(self, state, action, doing, done):
         name = state.get('name')
         if not name:
@@ -753,20 +753,8 @@ class Window(log.Loggable, gobject.GObject):
         d.addErrback(_actionErrback, self, mid)
 
         return d
-     
-        self.componentCallRemoteStatus(state,
-                                       'Stopping component %s...',
-                                       'Stopped component %s',
-                                       'Failed to stop component %s',
-                                       'stop')
-  
-    def _component_start(self, state):
-        self.componentCallRemoteStatus(state,
-                                       'Starting component %s...',
-                                       'Started component %s',
-                                       'Failed to start component %s',
-                                       'start')
-  
+ 
+ 
     # menubar/toolbar callbacks
     def on_have_connection(self, d, state):
         d.destroy()
