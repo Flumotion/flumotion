@@ -33,6 +33,8 @@ AC_SUBST(PYGTK_DIR)
 
 dnl check for gst-python
 PKG_CHECK_MODULES(PYGST, gst-python-0.8 >= $PYGST_REQ)
+PYGST_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
+AC_SUBST(PYGST_DIR)
 
 dnl check for epydoc
 AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
@@ -53,5 +55,7 @@ flumotion/twisted/Makefile
 flumotion/utils/Makefile
 m4/Makefile
 docs/Makefile
+tests/Makefile
+tests/common.py
 flumotion.spec
 )

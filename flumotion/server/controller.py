@@ -52,6 +52,10 @@ class Dispatcher:
         
     def requestAvatar(self, avatarID, mind, *interfaces):
         if avatarID == 'admin':
+            if not self.admin:
+                # XXX: Write something useful in the log
+                return
+            
             p = self.admin.getPerspective()
         else:
             component_type, avatarID = avatarID.split('_', 1)
@@ -350,23 +354,31 @@ class Controller(pb.Root):
     def setAdmin(self, admin):
         self.admin = admin
         
-    def getPerspective(self, component_type, username):
-        if component_type == 'producer':
+    def getPerspective(self, type, *args):
+        """Creates a new perspective for a component
+        @type type:      string
+        @param type:     type of the component, one of: producer, converter and streamer
+        @type args:      tuple
+        @param username: extra arguments sent to the perspective class
+        @rtype:          ComponentPerspective
+        @returns:        the perspective for the component"""
+
+        if type == 'producer':
             klass = ProducerPerspective
-        elif component_type == 'converter':
+        elif type == 'converter':
             klass = ConverterPerspective
-        elif component_type == 'streamer':
+        elif type == 'streamer':
             klass = StreamerPerspective
         else:
             raise AssertionError
 
-        component = klass(self, username)
+        component = klass(self, *args)
         self.addComponent(component)
         return component
 
     def isLocalComponent(self, component):
         # TODO: This could be a lot smarter
-        host = component.mind.broker.transport.getPeer()[1]
+        host = component.getTransportPeer()[1]
         if host == '127.0.0.1':
             return True
         else:
@@ -422,7 +434,8 @@ class Controller(pb.Root):
             raise KeyError, component_name
 
         del self.components[component_name]
-        self.admin.componentRemoved(component)
+        if self.admin:
+            self.admin.componentRemoved(component)
 
     def getSourceComponents(self, component):
         """Retrives the source components for component
@@ -443,13 +456,10 @@ class Controller(pb.Root):
                 feedname = feedname[:-8]
 
             host = feed.getListenHost()
-            if (not self.isLocalComponent(component) and
-                host == '127.0.0.1'):
+            if (not self.isLocalComponent(component) and host == '127.0.0.1'):
                 host = component.getRemoteControllerIP()
 
-            retval.append((feedname,
-                           host,
-                           feed.getListenPort()))
+            retval.append((feedname, host,feed.getListenPort()))
         return retval
 
     def getFeedsForComponent(self, component):
@@ -522,8 +532,8 @@ class Controller(pb.Root):
         
     def componentRegistered(self, component):
         component.msg('in componentRegistered')
-    
-        self.admin.componentAdded(component)
+        if self.admin:
+            self.admin.componentAdded(component)
         self.feed_manager.addFeeds(component)
 
         sources = component.getSources()

@@ -164,7 +164,6 @@ class NewStreamingResource(resource.Resource):
         return True
         
     def getChild(self, path, request):
-        print 'getChild'
         return self
 
     def render(self, request):
