@@ -175,6 +175,7 @@ class Window(log.Loggable, gobject.GObject):
         """
         sub = None
         instance = None
+
         if data:
             namespace = {}
             try:
@@ -189,12 +190,15 @@ class Window(log.Loggable, gobject.GObject):
                 # FIXME: we cheat by giving the view as second for now,
                 # but let's decide for either view or model
                 instance = klass(name, self.admin, self)
+                self.debug("Created entry instance %r" % instance)
                 sub = instance.render()
+                self.debug("Got sub widget %r" % sub)
 
         old = self.hpaned.get_child2()
         self.hpaned.remove(old)
         
         if not sub:
+            self.warning(".render() did not return an object")
             sub = gtk.Label('%s does not have a UI yet' % name)
         else:
             parent = sub.get_parent()
@@ -246,6 +250,7 @@ class Window(log.Loggable, gobject.GObject):
             data = handle.read()
             handle.close()
             # FIXME: is name (of component) needed ?
+            self.debug("showing admin UI for component")
             self.show_component(name, methodName, filepath, data)
 
         def gotEntryNoBundleErrback(failure):

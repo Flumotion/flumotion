@@ -246,6 +246,7 @@ class AdminAvatar(common.ManagerAvatar):
     def perspective_loadConfiguration(self, xml):
         self.info('loadConfiguration ...')
         self.vishnu.workerHeaven.loadConfiguration(None, xml)
+        self.vishnu.componentHeaven.loadConfiguration(None, xml)
 
     def perspective_cleanComponents(self):
         return self.vishnu.componentHeaven.shutdown()

@@ -28,7 +28,7 @@ from flumotion.common import errors
 from flumotion.configure import configure
 from flumotion.wizard import wizard
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
-     EncodingFormat, EncodingVideo, Enum, EnumClass, EnumMetaClass, \
+     EncodingFormat, EncodingVideo, \
      LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
      SoundcardChannels, SoundcardSystem, SoundcardAlsaDevice, SoundcardOSSDevice, \
      SoundcardInput, SoundcardSamplerate, AudioTestSamplerate, TVCardDevice, TVCardSignal, \

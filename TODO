@@ -54,6 +54,11 @@
 * MEDIUM	add runtime checks for plugin versions to provide decent
 		fallbacks for bugs like this
 
+* MEDIUM	all get/set properties should notify back to listening admin
+		UI pages so they can update their state
+
+* HARD		split up source code layout according to bundleability
+
 - API cleanup:
 
 - manager/component.py:
