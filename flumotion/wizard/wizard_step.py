@@ -15,55 +15,14 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-
+from flumotion.wizard.enums import * # XXX: fix later
 from flumotion.wizard import wizard
 
-class Enum:
-    def __init__(self, name, values=[]):
-        self.name = name
-        self.next = 0
-
-        self._values = {}
-        for value in values:
-            if type(value) == tuple:
-                if len(value) != 2:
-                    raise TypeError, 'must be a length of 2'
-                name = value[0]
-                value = value[1]
-            elif type(value) == str:
-                name = value
-                value = self.next
-                self.next += 1
-            else:
-                raise TypeError
-            
-            assert not hasattr(self, name)
-            assert not self._values.has_key(name)
-            setattr(self, name, value)
-            self._values[value] = name
-
-    def __len__(self):
-        return len(self._values)
-    
-    def __getitem__(self, item):
-        try:
-            name = self.get(item)
-        except KeyError:
-            raise StopIteration
-        return getattr(self, name), name
-        
-    def get(self, value):
-        return self._values[value]
-
-
-VideoDeviceType = Enum('VideoDeviceType',
-                       ('TVCard', 'Firewire', 'Webcam', 'Test'))
-AudioDeviceType = Enum('AudioDeviceType',
-                       ('Firewire', 'Sound card', 'Test'))
 class WizardStepSource(wizard.WizardStep):
     step_name = 'Source'
     glade_file = 'wizard_source.glade'
-
+    section = 'Production'
+    
     def setup(self):
         self.combobox_video.set_enum(VideoDeviceType)
         self.combobox_audio.set_enum(AudioDeviceType)
@@ -99,29 +58,63 @@ class WizardStepSource(wizard.WizardStep):
         raise AssertionError
 
 class WizardStepVideoSource(wizard.WizardStep):
+    section = 'Production'
+    component_name = 'video-source'
     def get_next(self):
         return 'Overlay'
 
 class WizardStepTVCard(WizardStepVideoSource):
     step_name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
+    component_type = 'bttv'
+
+    def setup(self):
+        self.combobox_device.set_enum(TVCardDeviceType)
+        self.combobox_signal.set_enum(TVCardSignalType)
+
+    def get_component_properties(self):
+        options = self.wizard.get_step_state(self)
+        options['device'] = TVCardDeviceType.get(options['device'])
+        options['signal'] = TVCardSignalType.get(options['signal'])
+        return options
 
 class WizardStepFireWirde(WizardStepVideoSource):
     step_name = 'Firewire'
     glade_file = 'wizard_firewire.glade'
+    component_type = 'firewire'
 
 class WizardStepWebcam(WizardStepVideoSource):
     step_name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
-
+    component_type = 'video4linux'
+    
 class WizardStepTestSource(WizardStepVideoSource):
     step_name = 'Test Source'
     glade_file = 'wizard_testsource.glade'
+    component_type = 'videotestsrc'
+
+    def setup(self):
+        self.combobox_pattern.set_enum(VideoTestPatternType)
+        self.combobox_format.set_enum(VideoTestFormatType)
+
+    def get_component_properties(self):
+        options = self.wizard.get_step_state(self)
+        format = options['format']
+        if format == VideoTestFormatType.YUV:
+            options['format'] = 'video/x-raw-yuv'
+        elif format == VideoTestFormatType.RGB:
+            options['format'] = 'video/x-raw-rgb'
+        else:
+            raise AssertionError
+        return options
 
 class WizardStepOverlay(wizard.WizardStep):
     step_name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
-
+    section = 'Production'
+    component_type = 'overlay'
+    component_name = 'overlay'
+    
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has_audio'):
             return 'Audio Source'
@@ -132,19 +125,20 @@ class WizardStepOverlay(wizard.WizardStep):
 class WizardStepAudioSource(wizard.WizardStep):
     step_name = 'Audio Source'
     glade_file = 'wizard_audiosource.glade'
-
+    section = 'Production'
+    component_name = 'audio-source'
+    component_type = 'osssrc'
+    
     def get_next(self):
         return 'Encoding'
-
-EncodingFormat = Enum('EncodingFormat', ('Ogg', 'Multipart'))
-EncodingVideo = Enum('EncodingVideo', ('Theora', 'Smoke', 'JPEG'))
-EncodingAudio = Enum('EncodingAudio', ('Vorbis', 'Speex', 'Mulaw'))
 
 class WizardStepEncoding(wizard.WizardStep):
     step_name = 'Encoding'
     glade_file = 'wizard_encoding.glade'
-    setup_finished = False
+    section = 'Conversion'
     
+    setup_finished = False
+
     def setup(self):
         self.combobox_format.set_enum(EncodingFormat)
         self.combobox_audio.set_enum(EncodingAudio)
@@ -155,7 +149,8 @@ class WizardStepEncoding(wizard.WizardStep):
         self.verify()
         
     def verify(self):
-        # XXX: block signal, it's called too early
+        # XXX: isn't there a better way of doing this, like blocking
+        #      the signal
         if not self.setup_finished:
             return
         
@@ -176,7 +171,6 @@ class WizardStepEncoding(wizard.WizardStep):
         has_video = self.wizard.get_step_option('Source', 'has_video')
         self.combobox_video.set_property('visible', has_video)
         self.label_video.set_property('visible', has_video)
-            
     
     def activated(self):
         self.verify()
@@ -185,9 +179,11 @@ class WizardStepEncoding(wizard.WizardStep):
         if self.wizard.get_step_option('Source', 'has_audio'):
             codec = self.combobox_audio.get_value()
             if codec == EncodingAudio.Vorbis:
-                return 'Audio Encoder'
+                return 'Vorbis'
             elif codec == EncodingAudio.Speex:
-                return 'Audio Encoder'
+                return 'Speex'
+            elif codec == EncodingAudio.Mulaw:
+                return 'Mulaw'
             
         return 'Consumption'
         
@@ -203,10 +199,15 @@ class WizardStepEncoding(wizard.WizardStep):
             
         return 'Consumption'
 
-class WizardStepTheora(wizard.WizardStep):
+class WizardStepVideoEncoder(wizard.WizardStep):
+    section = 'Conversion'
+    component_name = 'video-encoder'
+    
+class WizardStepTheora(WizardStepVideoEncoder):
     step_name = 'Theora'
     glade_file = 'wizard_theora.glade'
-
+    component_type = 'theora'
+    
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
         self.spinbutton_bitrate.set_sensitive(
@@ -216,32 +217,50 @@ class WizardStepTheora(wizard.WizardStep):
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
-    
-class WizardStepSmoke(wizard.WizardStep):
+
+class WizardStepSmoke(WizardStepVideoEncoder):
     step_name = 'Smoke'
     glade_file = 'wizard_smoke.glade'
+    section = 'Conversion'
+    component_type = 'smoke'
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
 
-class WizardStepJPEG(wizard.WizardStep):
+class WizardStepJPEG(WizardStepVideoEncoder):
     step_name = 'JPEG'
     glade_file = 'wizard_jpeg.glade'
+    section = 'Conversion'
+    component_type = 'jpeg'
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
 
 class WizardStepAudioEncoder(wizard.WizardStep):
-    step_name = 'Audio Encoder'
     glade_file = 'wizard_audio_encoder.glade'
-
+    section = 'Conversion'
+    component_name = 'audio-encoder'
+    
     def get_next(self):
         return 'Consumption'
+
+class WizardStepVorbis(WizardStepAudioEncoder):
+    step_name = 'Vorbis'
+    component_type = 'vorbis'
+
+class WizardStepSpeex(WizardStepAudioEncoder):
+    step_name = 'Speex'
+    component_type = 'speex'
+
+class WizardStepMulaw(WizardStepAudioEncoder):
+    step_name = 'Mulaw'
+    component_type = 'Mulaw'
 
 class WizardStepConsumption(wizard.WizardStep):
     step_name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
-
+    section = 'Consumption'
+    
     def on_checkbutton_http_toggled(self, button):
         value = self.checkbutton_http.get_active()
         self.checkbutton_http_audio_video.set_sensitive(value)
@@ -324,26 +343,41 @@ class WizardStepConsumption(wizard.WizardStep):
 
 class WizardStepHTTP(wizard.WizardStep):
     glade_file = 'wizard_http.glade'
+    section = 'Consumption'
+    component_type = 'http-streamer'
 
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
+
+    def get_component_properties(self):
+        options = self.wizard.get_step_state(self)
+        
+        # XXX: Why ?? spinbutton.get_value ??
+        options['bandwidth_limit'] = int(options['bandwidth_limit'])
+        options['user_limit'] = int(options['user_limit'])
+        options['port'] = int(options['port'])
+
+        # XXX: Hack
+        if options['worker'] == 0:
+            options['worker'] = 'Local'
+            
+        return options
     
 class WizardStepHTTPBoth(WizardStepHTTP):
     step_name = 'HTTP Streamer (audio & video)'
+    component_name = 'http-streamer-audio+video'
                     
 class WizardStepHTTPAudio(WizardStepHTTP):
     step_name = 'HTTP Streamer (audio only)'
+    component_name = 'http-streamer-audio'
 
 class WizardStepHTTPVideo(WizardStepHTTP):
     step_name = 'HTTP Streamer (video only)'
-
-RotateTimeType = Enum('RotateTimeType',
-                      ('minutes', 'hours', 'days', 'weeks', 'months'))
-RotateSizeType = Enum('RotateSizeType',
-                      ('kB', 'MB', 'GB', 'TB'))
+    component_name = 'http-streamer-video'
 
 class WizardStepDisk(wizard.WizardStep):
     glade_file = 'wizard_disk.glade'
+    section = 'Consumption'
 
     def setup(self):
         self.combobox_time_list.set_enum(RotateTimeType)
@@ -353,6 +387,7 @@ class WizardStepDisk(wizard.WizardStep):
     def on_button_browse_clicked(self, button):
         pass
     
+    # This is bound to both radiobutton_has_size and radiobutton_has_time
     def on_radiobutton_rotate_toggled(self, button):
         self.update_radio()
 
@@ -384,7 +419,6 @@ class WizardStepDisk(wizard.WizardStep):
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
-    
 class WizardStepDiskBoth(WizardStepDisk):
     step_name = 'Disk (audio & video)'
                     
@@ -394,3 +428,13 @@ class WizardStepDiskAudio(WizardStepDisk):
 class WizardStepDiskVideo(WizardStepDisk):
     step_name = 'Disk (video only)'
 
+class WizardStepLicence(wizard.WizardStep):
+    step_name = "Content License"
+    glade_file = "wizard_license.glade"
+    section = 'Licence'
+
+    def on_checkbutton_set_license_toggled(self, button):
+        self.combobox_license.set_sensitive(button.get_active())
+        
+    def get_next(self):
+        return # WOHO, Finished!
