@@ -51,6 +51,7 @@ class Launcher:
             component.pipeline_stop()
             raise SystemExit
 
+        signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         signal.signal(signal.SIGINT, exit_cb)
         reactor.connectTCP('localhost', 8890, component.factory)
         try:
