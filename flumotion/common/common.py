@@ -579,3 +579,10 @@ def addressGetPort(a):
     except AttributeError:
         port = a[2]
     return port
+
+def componentPath(componentName, parentName):
+    """
+    Create a path string out of the name of a component and its parent.
+    """
+    
+    return '/%s/%s' % (parentName, componentName)

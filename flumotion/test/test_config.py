@@ -187,7 +187,19 @@ class TestConfig(unittest.TestCase):
              </planet>
              """)
         entries = conf.getComponentEntries()
-        self.failUnless(entries.has_key('atmocomp'))
-        self.failUnless(entries.has_key('flowcomp'))
+        self.failUnless(entries.has_key('/atmosphere/atmocomp'))
+        self.failUnless(entries.has_key('/default/flowcomp'))
+
+    def testGetComponentEntriesWrong(self):
+        xml = """
+             <planet>
+               <flow name="atmosphere">
+                 <component name="flowcomp" type="test-component"/>
+               </flow>
+             </planet>
+             """
+        self.assertRaises(config.ConfigError, config.FlumotionConfigXML, None,
+            xml)
+
 
 

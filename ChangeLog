@@ -1,5 +1,16 @@
 2005-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	  add function to give a "path" for a component and its parent
+	* flumotion/common/config.py:
+	  add parent property to config entries for components
+	  make sure no flow is called manager or atmosphere
+	* flumotion/test/test_common.py:
+	* flumotion/test/test_config.py:
+	  tests for these
+
+2005-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/log.py:
 	  change output a little
 

@@ -29,7 +29,7 @@ from xml.parsers import expat
 from twisted.python import reflect 
 
 from flumotion.common.registry import registry
-from flumotion.common import log, errors
+from flumotion.common import log, errors, common
 
 class ConfigError(Exception):
     "Error during parsing of configuration"
@@ -38,8 +38,9 @@ class ConfigEntryComponent(log.Loggable):
     "I represent a <component> entry in a planet config file"
     nice = 0
     logCategory = 'config'
-    def __init__(self, name, type, config, defs, worker):
+    def __init__(self, name, parent, type, config, defs, worker):
         self.name = name
+        self.parent = parent
         self.type = type
         self.config = config
         self.defs = defs
@@ -50,6 +51,9 @@ class ConfigEntryComponent(log.Loggable):
     
     def getName(self):
         return self.name
+
+    def getParent(self):
+        return self.parent
 
     def getConfigDict(self):
         return self.config
@@ -153,14 +157,14 @@ class FlumotionConfigXML(log.Loggable):
                 continue
             
             if child.nodeName == "component":
-                component = self.parseComponent(child)
+                component = self.parseComponent(child, 'atmosphere')
             else:
                 raise ConfigError("unexpected 'atmosphere' node: %s" % child.nodeName)
 
             atmosphere.components[component.name] = component
         return atmosphere
      
-    def parseComponent(self, node):
+    def parseComponent(self, node, parent):
         """
         Parse a <component></component> block.
 
@@ -183,7 +187,8 @@ class FlumotionConfigXML(log.Loggable):
         try:
             defs = registry.getComponent(type)
         except KeyError:
-            raise errors.UnknownComponentError("unknown component type: %s" % type)
+            raise errors.UnknownComponentError(
+                "unknown component type: %s" % type)
         
         properties = defs.getProperties()
 
@@ -191,21 +196,28 @@ class FlumotionConfigXML(log.Loggable):
         options = self.parseProperties(node, type, properties)
 
         config = { 'name': name,
+                   'parent': parent,
                    'type': type }
         config.update(options)
 
-        return ConfigEntryComponent(name, type, config, defs, worker)
+        return ConfigEntryComponent(name, parent, type, config, defs, worker)
 
     def parseFlow(self, node):
         # <flow name="...">
         #   <component>
         #   ...
         # </flow>
+        # "name" cannot be atmosphere or manager
 
         if not node.hasAttribute('name'):
             raise ConfigError("<flow> must have a name attribute")
 
         name = str(node.getAttribute('name'))
+        if name == 'atmosphere':
+            raise ConfigError("<flow> cannot have 'atmosphere' as name")
+        if name == 'manager':
+            raise ConfigError("<flow> cannot have 'manager' as name")
+
         flow = ConfigEntryFlow(name)
 
         for child in node.childNodes:
@@ -214,7 +226,7 @@ class FlumotionConfigXML(log.Loggable):
                 continue
             
             if child.nodeName == "component":
-                component = self.parseComponent(child)
+                component = self.parseComponent(child, name)
             else:
                 raise ConfigError("unexpected 'flow' node: %s" % child.nodeName)
 
@@ -256,7 +268,7 @@ class FlumotionConfigXML(log.Loggable):
             elif child.nodeName == "component":
                 if bouncer:
                     raise ConfigError("<manager> section can only have one <component>")
-                bouncer = self.parseComponent(child)
+                bouncer = self.parseComponent(child, 'manager')
             elif child.nodeName == "debug":
                 fludebug = str(child.firstChild.nodeValue)
             else:
@@ -377,16 +389,17 @@ class FlumotionConfigXML(log.Loggable):
         Get all component entries from both atmosphere and all flows
         from the configuration.
 
-        @rtype: dictionary of string -> L{ConfigEntryComponent}
+        @rtype: dictionary of /parent/name -> L{ConfigEntryComponent}
         """
         entries = {}
         if self.atmosphere and self.atmosphere.components:
-            entries.update(self.atmosphere.components)
+            for c in self.atmosphere.components.values():
+                path = common.componentPath(c.name, 'atmosphere')
+                entries[path] = c
             
         for flowEntry in self.flows:
-            entries.update(flowEntry.components)
+            for c in flowEntry.components.values():
+                path = common.componentPath(c.name, c.parent)
+                entries[path] = c
 
         return entries
-
-    
-        

@@ -144,7 +144,19 @@ class TestArgRepr(unittest.TestCase):
     def testKwargs(self):
         self.assertEqual(common.argRepr((), dict(foo='bar')), "foo='bar'")
         self.assertEqual(common.argRepr(((1,)), dict(foo='bar')), "1, foo='bar'")
+
+class TestComponentPath(unittest.TestCase):
+    def testPath(self):
+        self.assertEqual(common.componentPath('Cain', 'Adam'), '/Adam/Cain')
         
+    def testArg(self):
+        self.assertEqual(common.argRepr((1, '2')), "1, '2'")
+        self.assertEqual(common.argRepr(((None,))), "None")
+
+    def testKwargs(self):
+        self.assertEqual(common.argRepr((), dict(foo='bar')), "foo='bar'")
+        self.assertEqual(common.argRepr(((1,)), dict(foo='bar')), "1, foo='bar'")
+         
 class TestEnsureDir(unittest.TestCase):
     def testNonExisting(self):
         self.tempdir = tempfile.mkdtemp()
