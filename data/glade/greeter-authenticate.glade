@@ -54,15 +54,15 @@
       <child>
 	<widget class="GtkEntry" id="user_entry">
 	  <property name="visible">True</property>
+	  <property name="can_default">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="has_focus">True</property>
 	  <property name="editable">True</property>
 	  <property name="visibility">True</property>
 	  <property name="max_length">0</property>
 	  <property name="text" translatable="yes"></property>
 	  <property name="has_frame">True</property>
 	  <property name="invisible_char">*</property>
-	  <property name="activates_default">False</property>
+	  <property name="activates_default">True</property>
 	  <signal name="changed" handler="on_entries_changed" last_modification_time="Fri, 21 Jan 2005 17:48:35 GMT"/>
 	</widget>
 	<packing>
@@ -77,6 +77,7 @@
       <child>
 	<widget class="GtkEntry" id="passwd_entry">
 	  <property name="visible">True</property>
+	  <property name="can_default">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="editable">True</property>
 	  <property name="visibility">False</property>
@@ -84,7 +85,7 @@
 	  <property name="text" translatable="yes"></property>
 	  <property name="has_frame">True</property>
 	  <property name="invisible_char">*</property>
-	  <property name="activates_default">False</property>
+	  <property name="activates_default">True</property>
 	  <signal name="changed" handler="on_entries_changed" last_modification_time="Fri, 21 Jan 2005 17:48:49 GMT"/>
 	</widget>
 	<packing>
@@ -111,6 +112,9 @@
 	  <child>
 	    <widget class="GtkComboBox" id="auth_method_combo">
 	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="has_focus">True</property>
 	      <property name="items" translatable="yes">Name and Password</property>
 	    </widget>
 	  </child>
