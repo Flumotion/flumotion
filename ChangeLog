@@ -1,5 +1,7 @@
 2004-06-11  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac (PYGTK_REQ): Require 2.0.0.
+
 	* scripts/: Remove, superseded by configuration files
 
 	* flumotion/gui/.svnignore: Adding some stuff I missed
