@@ -27,6 +27,12 @@
     </dependencies>
   </cvsmodule>
 
+  <cvsmodule id="gst-ffmpeg" cvsroot="gstreamer.freedesktop.org">
+    <dependencies>
+      <dep package="gstreamer" />
+    </dependencies>
+  </cvsmodule>
+
   <cvsmodule id="pygtk" cvsroot="gnome.org">
   </cvsmodule>
  
@@ -41,6 +47,7 @@
   <svnmodule id="flumotion" svnroot="svn.fluendo.com">
     <dependencies>
       <dep package="gst-python" />
+      <dep package="gst-ffmpeg" />
     </dependencies>
   </svnmodule>
 
