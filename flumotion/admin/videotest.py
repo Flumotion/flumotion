@@ -178,19 +178,19 @@ class Model:
     def set_width(self, width):
         if not self._caps: return
         self._structure['width'] = width
-        print "DEBUG: set_width, caps now %s" % self._caps
+        _debug("set_width, caps now %s" % self._caps)
         self._relink()
 
     def set_height(self, height):
         if not self._caps: return
         self._structure['height'] = height
-        print "DEBUG: caps now %s" % self._caps
+        _debug("set_height, caps now %s" % self._caps)
         self._relink()
 
     def set_framerate(self, framerate):
         if not self._caps: return
         self._structure['framerate'] = framerate
-        print "DEBUG: caps now %s" % self._caps
+        _debug("set_framerate,caps now %s" % self._caps)
         self._relink()
 
     def set_pattern(self, pattern):
@@ -199,7 +199,7 @@ class Model:
 
     def have_caps_cb(self, pad, dunno):
         caps = pad.get_negotiated_caps()
-        print "HAVE_CAPS: pad %s, caps %s" % (pad, caps)
+        _debug("HAVE_CAPS: pad %s, caps %s" % (pad, caps))
         self._caps = caps
         self._structure = self._caps.get_structure(0)
 
@@ -212,20 +212,17 @@ class Model:
         pad = self._src.get_pad('src')
         peer = pad.get_peer()
         if peer:
-            print "DEBUG: peer: %s" % peer
-            print "DEBUG: caps: %s" % self._caps
-            # we set on the peer so the src can call _link and adjust
-            # framerate
+            # we pause our parent so we can link and unlink
+            # normally we'd have relink_filtered do that for us if it worked.
             parent = self._src.get_parent()
             parent.set_state(gst.STATE_PAUSED)
             pad.unlink(peer)
-            ret = pad.link_filtered(peer, self._caps)
-            parent.set_state(gst.STATE_PLAYING)
-            print "DEBUG: ret of try_set_caps %s" % ret
-            #if not pad.try_relink_filtered(peer, self._caps):
-            #    print "ERROR: oops, could not relink filtered"
-        print "DEBUG: internal caps now %s" % self._caps
-        print "DEBUG: gst caps of pad now %s" % pad.get_negotiated_caps()
+            if not pad.link_filtered(peer, self._caps):
+                print "ERROR: could not link %s and %s with caps %s" % (pad, peer, self._caps)
+            if not parent.set_state(gst.STATE_PLAYING):
+                print "ERROR: could not set parent %s to playing" % parent
+        _debug("gst caps of pad now %s" % pad.get_negotiated_caps())
+
 # register our types globally
 gobject.type_register(View)
 gobject.type_register(Controller)
