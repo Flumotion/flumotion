@@ -1,5 +1,8 @@
 2004-09-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/manager/worker.py (WorkerHeaven): Clean up, almost
+	ready for general consumption
+
 	* flumotion/manager/component.py (ComponentAvatar.getListenHost):
 	Support new and old twisted code for getting the host
 

@@ -23,6 +23,7 @@
 from twisted.spread import pb
 
 from flumotion.common import interfaces
+from flumotion.common.config import FlumotionConfigXML
 from flumotion.utils import log
 
 class WorkerAvatar(pb.Avatar, log.Loggable):
@@ -31,23 +32,34 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
 
     logCategory = 'worker-avatar'
 
-    def __init__(self, avatarID):
+    def __init__(self, heaven, avatarID):
+        self.heaven = heaven
         self.avatarID = avatarID
 
+    def getName(self):
+        return self.avatarID
+    
     def attached(self, mind):
         self.info('attached %r' % mind)
         self.mind = mind
 
+        self.heaven.workerAttached(self)
+
+        return
+    
         name = 'testing'
         type = 'videotest'
         config = dict(width=320, height=240, framerate=5.0, name=name)
-
-        self.info('starting %s' % name)
-        self.mind.callRemote('start', name, type, config)
-                             
+        
+        self.start(name, type, config)
+        
     def detached(self, mind):
         self.info('detached %r' % mind)
-    
+
+    def start(self, name, type, config):
+        self.info('starting %s' % name)
+        return self.mind.callRemote('start', name, type, config)
+        
 class WorkerHeaven(pb.Root):
     
     __implements__ = interfaces.IHeaven
@@ -58,12 +70,53 @@ class WorkerHeaven(pb.Root):
         @param vishnu: the Vishnu object
         """
         self.avatars = {}
+        self.conf = None
         
     def getAvatar(self, avatarID):
-        avatar = WorkerAvatar(avatarID)
+        avatar = WorkerAvatar(self, avatarID)
         self.avatars[avatarID] = avatar
         return avatar
 
     def removeAvatar(self, avatarID):
         del self.avatars[avatarID]
 
+    def loadConfiguration(self, filename):
+        # XXX: Merge?
+        self.conf = FlumotionConfigXML(filename)
+
+    def getEntries(self, worker):
+        retval = []
+        if not self.conf:
+            return retval
+        
+        for entry in self.conf.entries.values():
+            entry_worker = entry.getWorker()
+            if entry_worker and entry_worker != worker.getName():
+                continue
+            retval.append(entry)
+        return retval
+    
+    def workerAttached(self, worker):
+        entries = self.getEntries(worker)
+        for entry in entries:
+            name = entry.getName()
+            log.debug('config', 'Starting component: %s' % name)
+            dict = entry.getConfigDict()
+            
+            if dict.has_key('config'):
+                del dict['config'] # HACK
+
+            worker.start(name, entry.getType(), dict)
+            
+    def start(self, name, type, config, worker=None):
+        if not self.avatars:
+            raise AttributeError
+
+        if worker:
+            avatar = self.avatars[worker]
+        else:
+            # XXX: Do we really want to keep this big hack?
+            # eg, if we don't select a worker, just pick the first one.
+            avatar = self.avatars.values()[0]
+
+        return avatar.start(name, type, config)
