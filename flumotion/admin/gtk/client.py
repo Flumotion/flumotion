@@ -20,6 +20,7 @@
 
 import os
 import md5
+import sys
 
 import gobject
 from gtk import gdk
@@ -919,7 +920,10 @@ class Window(log.Loggable, gobject.GObject):
         reactor.callLater(0.2, _callLater, self.admin, dialog)
  
     def debug_start_shell_cb(self, button):
-        from flumotion.common import code
+        if sys.version_info[1] >= 4:
+            from flumotion.common import code
+        else:
+            import code
         code.interact()
 
     def help_about_cb(self, button):

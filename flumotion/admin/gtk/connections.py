@@ -248,10 +248,13 @@ class Authenticate(GladeWidget):
         self.set_property('can-activate', can_act)
 
     def set_state(self, state):
-        if 'user' in state:
+        if state and 'user' in state:
             self.user_entry.set_text(state['user'])
             self.passwd_entry.set_text(state['passwd'])
-
+        else:
+            self.user_entry.set_text('')
+            self.passwd_entry.set_text('')
+            
     def get_state(self):
         return {'user': self.user_entry.get_text(),
                 'passwd': self.passwd_entry.get_text()}

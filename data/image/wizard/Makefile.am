@@ -1,6 +1,7 @@
 image_DATA = 		\
 	consumption.png \
 	firewire.png 	\
+	flow.png	\
 	licenses.png 	\
 	kcmdevices.png 	\
 	overlay.png 	\

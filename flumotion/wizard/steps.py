@@ -45,7 +45,7 @@ class Welcome(wizard.WizardStep):
     has_worker = False
     def get_next(self):
         return 'Source'
-wizard.register_step(Welcome)
+wizard.register_step(Welcome, initial=True)
 
 
 

@@ -47,6 +47,7 @@ class Stack(list):
 
 class WizardStep(object, log.Loggable):
     step_name = None # Subclass sets this
+    glade_dir = configure.gladedir
     glade_file = None # Subclass sets this
     icon = 'placeholder.png'
     has_worker = True
@@ -67,7 +68,7 @@ class WizardStep(object, log.Loggable):
         return '<WizardStep object %s>' % self.step_name
     
     def load_glade(self):
-        glade_filename = os.path.join(configure.gladedir, self.glade_file)
+        glade_filename = os.path.join(self.glade_dir, self.glade_file)
         
         self.wtree = gtk.glade.XML(glade_filename,
                                    typedict=fgtk.WidgetMapping())
@@ -206,15 +207,15 @@ class Wizard(gobject.GObject, log.Loggable):
 
     __implements__ = flavors.IStateListener,
 
-    def __init__(self, parent_widget=None, admin=None):
+    def __init__(self, parent_window=None, admin=None):
         self.__gobject_init__()
         self.wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'wizard.glade'))
         for widget in self.wtree.get_widget_prefix(''):
             setattr(self, widget.get_name(), widget)
         self.wtree.signal_autoconnect(self)
 
-        if parent_widget:
-            self.window.set_transient_for(parent_widget)
+        if parent_window:
+            self.window.set_transient_for(parent_window)
 
         # have to get the style from the theme, but it's not really there until
         # it's attached
@@ -691,12 +692,23 @@ class Wizard(gobject.GObject, log.Loggable):
 gobject.type_register(Wizard)
 
 _steps = []
+_steps_dict = {}
 
         
-def register_step(klass):
+def register_step(klass, initial=False):
     global _steps
+    global _steps_dict
 
-    _steps.append(klass)
+    # Make sure there's only one step of a given name
+    try:
+        _steps.remove(_steps_dict[klass.step_name])
+    except: pass
+        
+    _steps_dict[klass.step_name] = klass
+    if initial:
+        _steps.insert(0, klass)
+    else:
+        _steps.append(klass)
 
 def get_steps():
     global _steps

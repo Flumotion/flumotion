@@ -83,10 +83,10 @@ class WizardTest(unittest.TestCase):
         idle_add(lambda: prev.emit('clicked'))
         idle_add(lambda: next.emit('clicked'))
         idle_add(lambda: ass(not sensitive(next)))
-        idle_add(lambda: ass(wiz.page.auth_method_combo.get_active()==0))
-        idle_add(lambda: wiz.page.user_entry.set_text('bar'))
+        idle_add(lambda: ass(wiz.page.authenticate.auth_method_combo.get_active()==0))
+        idle_add(lambda: wiz.page.authenticate.user_entry.set_text('bar'))
         idle_add(lambda: ass(not sensitive(next)))
-        idle_add(lambda: wiz.page.passwd_entry.set_text('baz'))
+        idle_add(lambda: wiz.page.authenticate.passwd_entry.set_text('baz'))
         idle_add(lambda: ass(sensitive(next)))
         idle_add(lambda: next.emit('clicked'))
 

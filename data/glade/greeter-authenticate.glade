@@ -16,6 +16,7 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+  <property name="focus_on_map">True</property>
 
   <child>
     <widget class="Custom" id="authenticate">
@@ -24,6 +25,7 @@
       <property name="int1">0</property>
       <property name="int2">0</property>
       <property name="last_modification_time">Tue, 08 Mar 2005 17:09:38 GMT</property>
+      <signal name="notify::can-activate" handler="on_can_activate" last_modification_time="Fri, 11 Mar 2005 14:04:33 GMT"/>
     </widget>
   </child>
 </widget>

@@ -94,8 +94,9 @@ class Authenticate(wizard.WizardStep):
             oc_state = [(k, state[k]) for k in ('user', 'passwd')]
             self.authenticate.set_state(dict(oc_state))
         except KeyError:
-            pass
+            self.authenticate.set_state(None)
         self.authenticate.grab_focus()
+        self.on_can_activate(self.authenticate)
 
     def on_can_activate(self, obj, *args):
         self.button_next.set_sensitive(obj.get_property('can-activate'))

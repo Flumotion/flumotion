@@ -47,7 +47,16 @@ def flumotion_glade_custom_handler(xml, proc, name, *args):
         return '.'.join(modparts), '.'.join(parts)
 
     module, code = parse_proc(proc)
-    w = eval(code, sys.modules[module].__dict__)
+    try:
+        __import__(module)
+    except Exception, e:
+        raise RuntimeError('Failed to load module %s: %s' % (module, e))
+
+    try:
+        w = eval(code, sys.modules[module].__dict__)
+    except Exception, e:
+        raise RuntimeError('Failed call %s in module %s: %s'
+                           % (code, module, e))
     w.set_name(name)
     w.show()
     return w
@@ -67,12 +76,17 @@ class GladeWidget(gtk.VBox):
     Remember to chain up if you customize __init__().
     '''
         
+    glade_dir = configure.gladedir
     glade_file = None
 
     def __init__(self):
         gtk.VBox.__init__(self)
-        wtree = gtk.glade.XML(os.path.join(configure.gladedir,
-                                           self.glade_file))
+        try:
+            wtree = gtk.glade.XML(os.path.join(self.glade_dir, self.glade_file))
+        except RuntimeError, e:
+            raise RuntimeError('Failed to load file %s from directory %s: %s'
+                               % (self.glade_file, self.glade_dir, e))
+
         win = None
         for widget in wtree.get_widget_prefix(''):
             wname = widget.get_name()
@@ -118,7 +132,12 @@ class GladeWindow(gobject.GObject):
 
     def __init__(self, parent=None):
         gobject.GObject.__init__(self)
-        wtree = gtk.glade.XML(os.path.join(self.glade_dir, self.glade_file))
+        try:
+            wtree = gtk.glade.XML(os.path.join(self.glade_dir, self.glade_file))
+        except RuntimeError, e:
+            raise RuntimeError('Failed to load file %s from directory %s: %s'
+                               % (self.glade_file, self.glade_dir, e))
+
         self.widgets = {}
         for widget in wtree.get_widget_prefix(''):
             wname = widget.get_name()

@@ -1,3 +1,33 @@
+2005-03-11  Andy Wingo  <wingo@pobox.com>
+
+	* data/glade/greeter-authenticate.glade:
+	* flumotion/admin/gtk/greeter.py (Authenticate.setup):
+	* flumotion/admin/gtk/connections.py
+	(Authenticate.auth_method_combo): Fire and handle signals
+	appropriately.
+
+	* flumotion/test/test_greeter.py (WizardTest.testMakeGreeter): Fix
+	for changes in the auth widget.
+
+	* flumotion/ui/glade.py (flumotion_glade_custom_handler): Make
+	sure the module is loaded. Add some more informative errors.
+	(GladeWidget.__init__): More informative errors.
+	(GladeWindow.__init__): More informative errors.
+
+	* flumotion/wizard/wizard.py (WizardStep.glade_dir): New class
+	var, like GladeWindow.
+	(Wizard.__init__): s/parent_widget/parent_window/
+	(register_step): If there's already a step of the given name,
+	replace it. Add initial arg, if true the page will be prepended to
+	the list instead of appended.
+
+	* flumotion/admin/gtk/client.py (Window.debug_start_shell_cb):
+	Only use the spiffy console if we have python 2.4.
+
+	* data/image/wizard/consumption.png: New image, from the artwork
+	repository.
+	* data/image/wizard/flow.png: Moved here from consumption.png.
+
 2005-03-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/Makefile.am:
