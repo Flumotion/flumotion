@@ -224,10 +224,6 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
         sink = self.get_sink()
         stats = sink.emit('add', fd)
          
-    def remove_client(self, fd):
-        sink = self.get_sink()
-        sink.emit('remove', fd)
-        
     def get_sink(self):
         assert self.pipeline, 'Pipeline not created'
         sink = self.pipeline.get_by_name('sink')

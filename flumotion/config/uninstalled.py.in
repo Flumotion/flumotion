@@ -26,6 +26,6 @@ def get():
 
     return {
         'installed': 0,
-        'datadir': __toplevel,
-        'uidir':   os.path.join(__toplevel, 'ui')
+        'datadir': os.path.join(__toplevel, 'data'),
+        'uidir':   os.path.join(__toplevel, 'data', 'ui'),
     }

@@ -29,7 +29,9 @@ from twisted.internet import reactor
 from twisted.internet.protocol import ClientCreator, Factory
 from twisted.protocols.basic import NetstringReceiver
 
-from flumotion.server import config, controller
+from flumotion import config
+from flumotion.server import controller
+from flumotion.server.config import FlumotionConfigXML
 from flumotion.server.registry import registry
 from flumotion.utils import log, gstutils
 
@@ -150,7 +152,7 @@ class Launcher:
         raise SystemExit
 
     def load_config(self, filename):
-        conf = config.FlumotionConfigXML(filename)
+        conf = FlumotionConfigXML(filename)
 
         for name in conf.components.keys():
             self.msg('Starting component: %s' % name)
@@ -173,9 +175,9 @@ def run_launcher(args):
     if len(args) < 3:
         print 'Need a configuration file'
         return -1
-    
-    registry.addFromFile(os.path.join(DATA_DIR,
-                                      'registry', 'basecomponents.xml'))
+
+    filename = os.path.join(config.datadir, 'registry', 'basecomponents.xml')
+    registry.addFromFile(filename)
 
     launcher = Launcher(options.host, options.port)
 

@@ -18,11 +18,9 @@
 
 import os
 
-print "WARNING: running uninstalled configuration"
-
 def get():
     return {
         'installed': 1,
-        'datadir': os.path.join('@DATADIR@', 'flumotion'),
-        'uidir':   os.path.join('@DATADIR@', 'flumotion', 'ui')
+        'datadir': os.path.join('@DATADIR@', 'flumotion', 'data'),
+        'uidir':   os.path.join('@DATADIR@', 'flumotion', 'ui'),
     }

@@ -3,16 +3,14 @@ from common import unittest
 import flumotion.config
 
 class TestConfig(unittest.TestCase):
-    def testGetDatadir(self):
-        datadir = flumotion.config.datadir
-        print "datadir is " + datadir
-
-    def testGetUidir(self):
-        uidir = flumotion.config.uidir
-        print "uidir is " + uidir
+    def testVariables(self):
+        assert hasattr(flumotion.config, 'datadir')
+        assert isinstance(flumotion.config.datadir, str)
+        assert hasattr(flumotion.config, 'uidir')
+        assert isinstance(flumotion.config.uidir, str)
 
     def testUninstalled(self):
-        assert(flumotion.config.installed == 0)
+        assert flumotion.config.installed == 0
 
 if __name__ == '__main__':
      unittest.main()
