@@ -42,7 +42,7 @@ class ServerContextFactory:
 def _startSSL(vishnu, host, port, pemFile):
     # if no path in pemFile, then look for it in the config directory
     if not os.path.split(pemFile)[0]:
-        pemFile = os.path.join(configure.configdir, 'manager', pemFile)
+        pemFile = os.path.join(configure.configdir, 'managers', 'default', pemFile)
     if not os.path.exists(pemFile):
         log.error('manager', ".pem file %s does not exist" % pemFile)
     log.debug('manager', 'Using PEM certificate file %s' % pemFile)

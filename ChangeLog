@@ -1,5 +1,11 @@
 2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion.spec.in:
+	* flumotion/manager/main.py:
+	  moved pem, fixed an oops
+
+2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/Makefile.am:
 	* doc/redhat/flu-manager:
 	* flumotion.spec.in:

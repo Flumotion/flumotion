@@ -43,12 +43,16 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/managers/default/flows
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/workers
 
-
 # install service files
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
-install -m 755 doc/redhat/flu-manager %{_sysconfdir}/etc/rc.d/init.d
-install -m 755 doc/redhat/flu-worker %{_sysconfdir}/etc/rc.d/init.d
+install -m 755 doc/redhat/flu-manager $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
+install -m 755 doc/redhat/flu-worker $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
 #install -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+
+# create a .flumotion in the new home
+# FIXME: needs to be done more gracefully
+
+install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/.flumotion
 
 # create log directory
 install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
@@ -62,9 +66,9 @@ exit 0
 
 %post
 # generate a default .pem certificate ?
-if ! test -e %{_sysconfdir}/flumotion/managers/default.pem
+if ! test -e %{_sysconfdir}/flumotion/managers/default/default.pem
 then
-  bash %{_datadir}/ssl/certs/make-dummy-cert %{_sysconfdir}/flumotion/managers/default.pem
+  bash %{_datadir}/ssl/certs/make-dummy-cert %{_sysconfdir}/flumotion/managers/default/default.pem
 fi
 
 # this is going to break when the admin decides to rename planets
@@ -114,9 +118,10 @@ fi
 %{_bindir}/flumotion-tester
 %{_libdir}/flumotion
 %{_datadir}/flumotion
+%attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
 %{_sysconfdir}/flumotion
 
-%config(noreplace) %attr(600,root,flumotion) %{_sysconfdir}/flumotion/managers/default/default.pem
+#%ghost %config(noreplace) %attr(600,root,flumotion) %{_sysconfdir}/flumotion/managers/default/default.pem
 %attr(750,flumotion,root) %{_localstatedir}/log/flumotion
 %{_sysconfdir}/rc.d/init.d/flu-manager
 %{_sysconfdir}/rc.d/init.d/flu-worker
