@@ -1,3 +1,18 @@
+2004-10-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	* flumotion/admin/admin.py:
+	* flumotion/common/interfaces.py:
+	* flumotion/component/component.py:
+	* flumotion/component/http/http.py:
+	* flumotion/manager/manager.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  rename interfaces for the views that handle remote calls from
+	  manager
+	  split out FeedComponent from BaseComponent in preparation for
+	  other types of component
+
 2004-10-05  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard.glade:

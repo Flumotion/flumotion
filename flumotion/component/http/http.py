@@ -491,12 +491,12 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             return self.admin
         return self
 
-class HTTPView(component.ComponentView):
+class HTTPView(component.FeedComponentView):
     def __init__(self, comp):
         """
         @type comp: L{Stats}
         """
-        component.ComponentView.__init__(self, comp)
+        component.FeedComponentView.__init__(self, comp)
 
         self.comp.connect('ui-state-changed', self._comp_ui_state_changed_cb)
 
@@ -514,7 +514,8 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     pipe_template = 'multifdsink name=sink ' + \
                                 'buffers-max=500 ' + \
                                 'buffers-soft-max=250 ' + \
-                                'recover-policy=1'
+                                'sync-clients=TRUE ' + \
+                                'recover-policy=3'
 
     gsignal('client-removed', object, int, int, object)
     gsignal('ui-state-changed')
@@ -679,7 +680,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     # method; right now this is done so the manager knows it started.
     # fix this by implementing concept of "moods" for components
     def _sink_state_change_cb(self, element, old, state):
-        component.BaseComponent.feeder_state_change_cb(self, element,
+        component.FeedComponent.feeder_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
             self.debug('Ready to serve clients on %d' % self.port)

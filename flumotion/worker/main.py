@@ -79,6 +79,7 @@ def _start_worker(options):
     log.debug('worker', 'Waiting for jobs to finish')
     while pids:
         pid = os.wait()[0]
+	# FIXME: properly catch OSError: [Errno 10] No child processes
         pids.remove(pid)
 
     log.debug('worker', 'All jobs finished, closing down')

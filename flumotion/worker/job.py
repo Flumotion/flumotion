@@ -60,7 +60,6 @@ def getComponent(dict, defs):
     # be separated from the main process.
 
     component = module.createComponent(dict)
-    component.setFiles(files)
     return component
 
 class JobView(pb.Referenceable, log.Loggable):

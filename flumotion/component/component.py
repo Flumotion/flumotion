@@ -35,11 +35,11 @@ class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
         super_init = pbutil.ReconnectingPBClientFactory.__init__
         super_init(self)
         
-        # XXX: document
-        self.interfaces = getattr(component, '__remote_interfaces__', ())
-        # XXX: document
-        klass = getattr(component, 'component_view_class', ComponentView)
+        # get the component's view class, defaulting to the base one
+        klass = getattr(component, 'component_view_class', BaseComponentView)
         self.view = klass(component)
+        # get the interfaces implemented by the component view class
+        self.interfaces = getattr(klass, '__implements__', ())
         
     def login(self, username):
         self.__super_login(cred.Username(username),
@@ -49,25 +49,33 @@ class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
         
     def gotPerspective(self, perspective):
         self.view.cb_gotPerspective(perspective)
-
-class ComponentView(pb.Referenceable, log.Loggable):
-    'Implements a view on a local component for the managing ComponentAvatar'
-    logCategory = 'componentview'
+    
+# needs to be before BaseComponent because BaseComponent references it
+class BaseComponentView(pb.Referenceable, log.Loggable):
+    """
+    I implement a worker-side view on a BaseComponent for the managing
+    ComponentAvatar to call upon.
+    """
+    __implements__ = interfaces.IComponentView,
+    logCategory = 'basecomponentview'
 
     def __init__(self, component):
+        """
+        @param component: L{flumotion.component.component.BaseComponent}
+        """
         self.comp = component
-        self.comp.connect('state-changed', self._component_state_changed_cb)
-        self.comp.connect('error', self.component_error_cb)
-        self.comp.connect('log', self.component_log_cb)
-        self.comp.connect('notify-feed-ports', self._component_notify_feed_ports_cb)
+        self.comp.connect('log', self._component_log_cb)
         
         self.remote = None # the perspective we have on the other side (?)
         
-    ### Loggable methods
+    ### log.Loggable methods
     def logFunction(self, arg):
         return self.comp.get_name() + ':' + arg
 
     # call function on remote perspective in manager
+    def callRemoteErrback(self, reason):
+            self.warning('callRemote failed because of %s' % reason)
+
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
             self.debug('skipping %s, no perspective' % name)
@@ -82,7 +90,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
         except pb.DeadReferenceError:
             return
         
-        cb.addErrback(errback)
+        cb.addErrback(self.callRemoteErrback)
 
     def cb_gotPerspective(self, perspective):
         self.remote = perspective
@@ -103,6 +111,117 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def _component_log_cb(self, component, args):
         self.callRemote('log', *args)
         
+    ### Referenceable remote methods which can be called from manager
+    def remote_getUIZip(self, style):
+        return self.comp.getUIZip(style)
+    
+    def remote_getUIMD5Sum(self, style):
+        return self.comp.getUIMD5Sum(style)
+
+    def remote_register(self):
+        # FIXME: we need to properly document this; manager calls me to
+        # "get some info"
+        if not self.hasPerspective():
+            self.warning('We are not ready yet, waiting 250 ms')
+            reactor.callLater(0.250, self.remote_register)
+            return None
+
+        return {'ip' : self.getIP(),
+                'pid' :  os.getpid()}
+        
+    def remote_reloadComponent(self):
+        """Reload modules in the component."""
+        import sys
+        from twisted.python.rebuild import rebuild
+        from twisted.python.reflect import filenameToModuleName
+        name = filenameToModuleName(__file__)
+
+        # reload ourselves first
+        rebuild(sys.modules[name])
+
+        # now rebuild relevant modules
+        import flumotion.utils.reload
+        rebuild(sys.modules['flumotion.utils'])
+        try:
+            flumotion.utils.reload.reload()
+        except SyntaxError, msg:
+            raise errors.ReloadSyntaxError(msg)
+        self._reloaded()
+
+    # separate method so it runs the newly reloaded one :)
+    def _reloaded(self):
+        self.info('reloaded module code for %s' % __name__)
+
+    def remote_callMethod(self, method_name, *args, **kwargs):
+        method = getattr(self.comp, 'remote_' + method_name, None)
+        if method:
+            return method(*args, **kwargs)
+
+        # XXX: Raise
+
+class BaseComponent(log.Loggable, gobject.GObject):
+    """
+    I am the base class for all Flumotion components.
+    """
+
+    __remote_interfaces__ = interfaces.IComponentView,
+    logCategory = 'basecomponent'
+
+    gsignal('log', object)
+
+    component_view_class = BaseComponentView
+    
+    def __init__(self, name):
+        """
+        @param name: unique name of the component
+        @type name: string
+        """
+        self.__gobject_init__()
+        
+        # FIXME: rename to .name
+        self.component_name = name
+
+    ### Loggable methods
+    def logFunction(self, arg):
+        return self.get_name() + ' ' + arg
+
+    ### GObject methods
+    def emit(self, name, *args):
+        if 'uninitialized' in str(self):
+            self.warning('Uninitialized object!')
+            #self.__gobject_init__()
+        else:
+            gobject.GObject.emit(self, name, *args)
+        
+    ### BaseComponent methods
+    def get_name(self):
+        return self.component_name
+    
+gobject.type_register(BaseComponent)
+
+class FeedComponentView(BaseComponentView):
+    """
+    I implement a worker-side view on a FeedComponent for the managing
+    ComponentAvatar to call upon.
+    """
+    __implements__ = interfaces.IComponentView,
+    logCategory = 'basecomponentview'
+
+    def __init__(self, component):
+        """
+        @param component: L{flumotion.component.component.FeedComponent}
+        """
+        BaseComponentView.__init__(self, component)
+
+        self.comp.connect('state-changed', self._component_state_changed_cb)
+        self.comp.connect('error', self._component_error_cb)
+        self.comp.connect('notify-feed-ports', self._component_notify_feed_ports_cb)
+        
+        # override base Errback for callRemote to stop the pipeline
+        def callRemoteErrback(reason):
+            self.warning('stopping pipeline because of %s' % reason)
+            self.comp.pipeline_stop()
+
     def _component_error_cb(self, component, element_path, message):
         self.callRemote('error', element_path, message)
         
@@ -126,12 +245,6 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def remote_setElementProperty(self, element_name, property, value):
         self.comp.set_element_property(element_name, property, value)
 
-    def remote_getUIZip(self, style):
-        return self.comp.getUIZip(style)
-    
-    def remote_getUIMD5Sum(self, style):
-        return self.comp.getUIMD5Sum(style)
-    
     def remote_play(self):
         self.comp.play()
         
@@ -144,18 +257,13 @@ class ComponentView(pb.Referenceable, log.Loggable):
         self.comp.pause()
 
     def remote_register(self):
-        if not self.hasPerspective():
-            self.warning('We are not ready yet, waiting 250 ms')
-            reactor.callLater(0.250, self.remote_register)
-            return
+        options = BaseComponentView.remote_register(self)
+        if options:
+            options['eaters'] = self.comp.get_eater_names()
+            options['feeders'] = self.comp.get_feeder_names()
+            options['elements'] = self.comp.get_element_names()
 
-        return {'ip' : self.getIP(),
-                'pid' :  os.getpid(), 
-                # FIXME: rename to something like eaterFeeders
-                # also rename in flumotion.manager.component.py
-                'eaters' : self.comp.get_eater_names(),
-                'feeders' : self.comp.get_feeder_names(),
-                'elements': self.comp.get_element_names() }
+        return options
     
     def remote_getFreePorts(self, feeders):
         retval = []
@@ -170,47 +278,18 @@ class ComponentView(pb.Referenceable, log.Loggable):
             
         return retval, ports
 
-    def remote_reloadComponent(self):
-        """Reload modules in the component."""
-        import sys
-        from twisted.python.rebuild import rebuild
-        from twisted.python.reflect import filenameToModuleName
-        name = filenameToModuleName(__file__)
+class FeedComponent(BaseComponent):
+    """
+    I am a base class for all Flumotion feed components.
+    """
 
-        # reload ourselves first
-        rebuild(sys.modules[name])
-
-        # now rebuild relevant modules
-        import flumotion.utils.reload
-        rebuild(sys.modules['flumotion.utils'])
-        try:
-            flumotion.utils.reload.reload()
-        except SyntaxError, msg:
-            raise errors.ReloadSyntaxError(msg)
-        self._reloaded()
-
-    def remote_callMethod(self, method_name, *args, **kwargs):
-        method = getattr(self.comp, 'remote_' + method_name, None)
-        if method:
-            return method(*args, **kwargs)
-
-        # XXX: Raise
-                         
-    # separate method so it runs the newly reloaded one :)
-    def _reloaded(self):
-        self.info('reloaded module code for %s' % __name__)
-
-class BaseComponent(log.Loggable, gobject.GObject):
-    """I am the base class for all Flumotion components."""
+    logCategory = 'feedcomponent'
 
     gsignal('state-changed', str, object)
     gsignal('error', str, str)
-    gsignal('log', object)
     gsignal('notify-feed-ports')
-    
-    logCategory = 'basecomponent'
-    __remote_interfaces__ = interfaces.IBaseComponent,
-    component_view_class = ComponentView
+
+    component_view_class = FeedComponentView
     
     def __init__(self, name, eater_config, feeder_config):
         """
@@ -219,10 +298,8 @@ class BaseComponent(log.Loggable, gobject.GObject):
         @param eater_config: <source></source> entries from config
         @param feeder_config: <feed></feed> entries from config
         """
-        self.__gobject_init__()
+        BaseComponent.__init__(self, name)
         
-        self.component_name = name
-
         self.feed_ports = [] # feed_name -> port mapping
         self.pipeline = None
         self.pipeline_signals = []
@@ -232,19 +309,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.parseFeederConfig(feeder_config)
         self.setup_pipeline()
 
-    ### Loggable methods
-    def logFunction(self, arg):
-        return self.get_name() + ' ' + arg
-
-    ### GObject methods
-    def emit(self, name, *args):
-        if 'uninitialized' in str(self):
-            self.warning('Uninitialized object!')
-            #self.__gobject_init__()
-        else:
-            gobject.GObject.emit(self, name, *args)
-        
-    ### BaseComponent methods
     def parseEaterConfig(self, eater_config):
         # the source feeder names come from the config
         # they are specified under <component> as <source> elements in XML
@@ -270,9 +334,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
         name = self.component_name
         self.feeder_names = map(lambda n: name + ':' + n, self.feed_names)
 
-    def get_name(self):
-        return self.component_name
-    
     def get_eater_names(self):
         """
         Return the list of feeder names this component eats from.
@@ -506,9 +567,11 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.debug('setting property %s on element %r to %s' %
                    (property, element_name, value))
         gstutils.gobject_set_property(element, property, value)
-gobject.type_register(BaseComponent)
     
-class ParseLaunchComponent(BaseComponent):
+gobject.type_register(FeedComponent)
+
+
+class ParseLaunchComponent(FeedComponent):
     'A component using gst-launch syntax'
 
     # keep these as class variables for the tests
@@ -518,9 +581,9 @@ class ParseLaunchComponent(BaseComponent):
 
     def __init__(self, name, eaters, feeders, pipeline_string=''):
         self.pipeline_string = pipeline_string
-        BaseComponent.__init__(self, name, eaters, feeders)
+        FeedComponent.__init__(self, name, eaters, feeders)
 
-    ### BaseComponent methods
+    ### FeedComponent methods
     def setup_pipeline(self):
         pipeline = self.parse_pipeline(self.pipeline_string)
         try:
@@ -528,7 +591,7 @@ class ParseLaunchComponent(BaseComponent):
         except gobject.GError, e:
             raise errors.PipelineParseError(e)
 
-        BaseComponent.setup_pipeline(self)
+        FeedComponent.setup_pipeline(self)
 
     ### ParseLaunchComponent methods
     def _expandElementName(self, block):

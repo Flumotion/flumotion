@@ -45,7 +45,7 @@ class WorkerClientFactory(factoryClass):
     def login(self, username, password):
         return self.__super_login(cred.Username(username, password),
                                   self.view,
-                                  interfaces.IWorkerComponent)
+                                  interfaces.IWorkerView)
         
     def gotPerspective(self, perspective):
         self.view.cb_gotPerspective(perspective)

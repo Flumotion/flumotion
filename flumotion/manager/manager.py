@@ -122,8 +122,8 @@ class ManagerCredentials(cred.FlexibleCredentials):
         # XXX: If it's component or admin, allow anonymous access.
         #      This is a big hack, but it emulates the current behavior
         #      Do we need to authenticate components and workers?
-        if (interfaces.IBaseComponent in credentials.interfaces or
-            interfaces.IAdminComponent in credentials.interfaces):
+        if (interfaces.IComponentView in credentials.interfaces or
+            interfaces.IAdminView in credentials.interfaces):
             return credentials.username
 
         return cred.FlexibleCredentials.requestAvatarId(self, credentials)
@@ -137,11 +137,11 @@ class Vishnu:
         # connecting to me
         self.dispatcher = Dispatcher()
 
-        self.workerheaven = self._createHeaven(interfaces.IWorkerComponent,
+        self.workerheaven = self._createHeaven(interfaces.IWorkerView,
                                                worker.WorkerHeaven)
-        self.componentheaven = self._createHeaven(interfaces.IBaseComponent,
+        self.componentheaven = self._createHeaven(interfaces.IComponentView,
                                                   component.ComponentHeaven)
-        self.adminheaven = self._createHeaven(interfaces.IAdminComponent,
+        self.adminheaven = self._createHeaven(interfaces.IAdminView,
                                               admin.AdminHeaven)
 
         # create a portal so that I can be connected to, through our dispatcher

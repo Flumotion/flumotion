@@ -47,14 +47,22 @@ class IAuthenticate(components.Interface):
 
 # TODO: Common base?
 
-class IBaseComponent(components.Interface):
+class IComponentView(components.Interface):
+    """
+    I am an interface implemented by PB client-side views for component clients.
+    """
     pass
 
-class IAdminComponent(components.Interface):
+class IAdminView(components.Interface):
+    """
+    I am an interface implemented by PB client-side views for admin clients.
+    """
     pass
 
-
-class IWorkerComponent(components.Interface):
+class IWorkerView(components.Interface):
+    """
+    I am an interface implemented by PB client-side views for worker clients.
+    """
     pass
 
 class IHeaven(components.Interface):
