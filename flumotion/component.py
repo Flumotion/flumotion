@@ -124,7 +124,7 @@ class BaseComponent(pb.Referenceable):
             return
 
         def errback(reason):
-            self.stop()
+            self.pipeline_stop()
             
         cb = self.remote.callRemote(name, *args, **kwargs)
         cb.addErrback(errback)
