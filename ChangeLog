@@ -1,3 +1,9 @@
+2005-02-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	  make sure the registry doesn't get rebuilt all the time.
+	  Really, *all* the time.
+
 2005-02-15  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/client.py (Window.admin_connected_cb):

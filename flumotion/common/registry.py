@@ -429,8 +429,8 @@ class RegistryParser(log.Loggable):
                 bundles = self._parseBundles(node)
                 self._bundles.update(bundles)
             elif node.nodeName == 'directories':
-                directories = self._parseDirectories(node)
-                self._directories.update(directories)
+                # there should be no directories in partial registry bits
+                pass
             else:
                 raise XmlParserError("<registry> invalid node name: %s" % node.nodeName)
 
@@ -661,8 +661,10 @@ class RegistryDirectory:
     
 class ComponentRegistry(log.Loggable):
     """Registry, this is normally not instantiated."""
+    
     logCategory = 'registry'
     filename = os.path.join(configure.registrydir, 'registry.xml')
+
     def __init__(self):
         self._parser = RegistryParser()
 
@@ -700,7 +702,7 @@ class ComponentRegistry(log.Loggable):
         
         # registry path was either not watched or updated, or a force was
         # asked, so reparse
-        self.info('Parsing registry path %s' % path)
+        self.info('Scanning registry path %s' % path)
         registryPath = RegistryDirectory(path)
         files = registryPath.getFiles()
         self.debug('Found %d files' % len(files))
@@ -730,7 +732,7 @@ class ComponentRegistry(log.Loggable):
         """
         Dump the cache of components to the given opened file descriptor.
 
-        @type fd: integer
+        @type  fd: integer
         @param fd: open file descriptor to write to
         """
         
