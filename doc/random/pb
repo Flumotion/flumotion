@@ -1,0 +1,70 @@
+pb.PBServerFactory:
+ - initialized with a twisted.cred.portal.Portal,
+   or any object adaptable to an IPBRoot (e.g. twisted.spread.pb._PortalRoot
+ - IPBRoot implementors have a self.rootObject(broker) method,
+   returning a root referenceable
+ - twisted.spread.pb registers an adapter of Portal to IPBRoot using _PortalRoot
+ - this takes the Portal, and returns a pb._PortalWrapper as the root object
+ - pb._PortalWrapper has a remote_login object that the pb client calls into,
+   giving the username
+
+pb.PBClientFactory:
+ - gets .login(credentials, client) called
+ - calls self.getRootObject() and adds a deferred self._cbSendUsername to it
+ - returns the deferred it got, which will be called after completion of:
+   - _cbSendUsername
+   - _cbResponse
+   and this deferred will then receive a remote reference to the server's
+   perspective
+
+pb.PBServerFactory:
+ - the client's getRootObject triggers _PortalRoot's rootObject method,
+   returning the _PortalWrapper
+
+pb.PBClientFactory:
+ - _cbSendUsername receives
+   - a remote reference to _PortalWrapper, which is the root object
+   - the username and password of the client-side credentials
+ - _cbSendUsername calls the remote 'login' method *on the root reference*, 
+   with the username, password, and client,
+   and adds a _cbResponse callback
+
+pb.PBServerFactory:
+ - remote_login is called on _PortalWrapper
+ - pb._PortalWrapper creates a challenge and a _PortalAuthChallenger
+   (inited with the portalwrapper, username, and challenge)
+   remote_login returns (challenge, challenger)
+   which will be returned to the pb.client over the wire
+
+pb.PBClientFactory:
+ - _cbResponse is called with
+   - (challenge, remote reference), which is the remote method's return value
+     where remote reference is a ref to the _PortalAuthChallenger
+   - password
+   - client
+ - it creates a response
+ - it calls remote 'respond' method *on the challenger reference* 
+   with the response and the client
+
+pb.PBServerFactory:
+ - the server-side _PortalAuthChallenger gets a remote_respond method call
+   with (response, mind)
+ - it stores the response in itself
+ - it hands itself as credentials to the actual portal's login method:
+   (self, mind, IPerspective)
+   which returns a deferred returning (interface, avatarAspect, logout)
+ - it adds a _loggedIn callback to the login
+ - Portal.login() receives the credentials, which are now seeded with the
+   response
+ - so the Portal can pass the credentials to the credchecker
+ - the credchecker can call checkPassword on it
+ - the credchecker returns an avatarId, or raises an Unauthorized
+ - if an avatarId is returned, self._loggedIn gets called
+   with one argument, (interface, perspective, logout)
+   in the case of Unauthorized, the PB client gets the Unauthorized
+ - _loggedIn returns a referenceable perspective
+
+pb.PBClientFactory: (in case of success)
+ - gets _loggedIn called with the perspective
+ - whatever callback the client added to the login's deferred now gets
+   run with the reference to the perspective
