@@ -61,4 +61,6 @@ if __name__ == '__main__':
     try:
         sys.exit(main(sys.argv))
     except errors.SystemError, e:
-        print 'ERROR:', e
+        print 'ERROR:' + repr(e)
+    except KeyboardInterrupt:
+        print 'Ctrl-C received'
