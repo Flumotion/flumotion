@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip 1.8
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = bin conf data flumotion doc m4
+SUBDIRS = . bin conf data flumotion doc m4
 
 EXTRA_DIST = \
 	LICENSE.GPL \
@@ -13,6 +13,8 @@ EXTRA_DIST = \
 
 clean-local:
 	@rm -rf _trial_temp
+
+check-local: pychecker
 
 test:
 	@make check -C flumotion/test
@@ -25,7 +27,7 @@ coverage:
 	@$(PYTHON) tools/show-coverage.py _trial_temp/coverage/flumotion.*
 
 pychecker:
-	pychecker -F misc/pycheckerrc \
+	pychecker -Q -F misc/pycheckerrc \
 		flumotion/common/*.py \
 		flumotion/component/*.py \
 		flumotion/manager/*.py \
