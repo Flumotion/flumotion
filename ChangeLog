@@ -1,5 +1,14 @@
 2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/Makefile.am:
+	* flumotion/common/component.py:
+	  remove this file, everything merged in planet.py
+	* flumotion/twisted/flavors.py:
+	* flumotion/worker/worker.py:
+	  fix some doc errors
+
+2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/component.py:
 	* flumotion/manager/manager.py:
 	* flumotion/manager/worker.py:

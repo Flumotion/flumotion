@@ -35,7 +35,7 @@ class IStateListener(components.Interface):
     """
     def stateSet(self, object, key, value):
         """
-        @type  object: L{RemoteCache}
+        @type  object: L{StateRemoteCache}
         @param object: the state object having changed
         @type  key:    string
         @param key:    the key being set
@@ -46,7 +46,7 @@ class IStateListener(components.Interface):
 
     def stateAppend(self, object, key, value):
         """
-        @type  object: L{RemoteCache}
+        @type  object: L{StateRemoteCache}
         @param object: the state object having changed
         @type  key:    string
         @param key:    the key being appended to
@@ -57,7 +57,7 @@ class IStateListener(components.Interface):
 
     def stateRemove(self, object, key, value):
         """
-        @type  object: L{RemoteCache}
+        @type  object: L{StateRemoteCache}
         @param object: the state object having changed
         @type  key:    string
         @param key:    the key being removed from

@@ -7,7 +7,6 @@ flumotion_PYTHON = \
 	bundle.py \
 	bundleclient.py \
 	common.py \
-	component.py \
 	config.py \
 	enum.py \
 	errors.py \

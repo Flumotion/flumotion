@@ -521,8 +521,8 @@ class JobAvatar(pb.Avatar, log.Loggable):
 
     def __init__(self, heaven, avatarId):
         """
-        @type heaven: L{flumotion.worker.worker.JobHeaven}
-        @type name: string
+        @type  heaven:   L{flumotion.worker.worker.JobHeaven}
+        @type  avatarId: string
         """
         
         self.heaven = heaven
