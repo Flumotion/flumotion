@@ -29,7 +29,7 @@ from flumotion.common import bundle, common
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
-import http_resources
+from flumotion.component.http import resources
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
     
@@ -365,7 +365,7 @@ def createComponent(config):
     mount_point = config.get('mount_point', '')
     
     component = MultifdSinkStreamer(name, source)
-    resource = http_resources.setup(component, port, mount_point)
+    resource = resources.setup(component, port, mount_point)
 
     # FIXME: tie these together more nicely
     component.resource = resource

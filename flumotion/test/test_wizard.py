@@ -26,9 +26,10 @@ from flumotion.wizard import enums, wizard
 class WizardStepTest(unittest.TestCase):
     def setUpClass(self):
         import flumotion.wizard.steps
+        self.steps = wizard.wiz.steps
         
     def testLoadSteps(self):
-        for step in wizard.wiz.steps:
+        for step in self.steps:
             self.assert_(isinstance(step, wizard.WizardStep))
             self.assert_(hasattr(step, 'icon'))
             windows = [widget for widget in step.widgets
@@ -42,6 +43,9 @@ class WizardStepTest(unittest.TestCase):
             self.assert_(isinstance(step.get_state(), dict))
             self.assertIdentical(step.step_name, step.get_name())
 
+            if step.get_name() != 'Content License':
+                self.assert_(isinstance(step.get_next(), str))
+                
     def testStepWidgets(self):
         widgets = [widget for step in wizard.wiz.steps
                               for widget in step.widgets]
@@ -60,3 +64,13 @@ class WizardStepTest(unittest.TestCase):
                 else:
                     self.assert_(isinstance(state, int))
 
+    def testStepNext(self):
+        for step in self.steps:
+            if step.get_name() != 'Content License':
+                self.assert_(isinstance(step.get_next(), str))
+            else:
+                self.assertIdentical(step.get_next(), None)
+                
+    def testStepComponentProperties(self):
+        for step in self.steps:
+            self.assert_(isinstance(step.get_component_properties(), dict))

@@ -20,7 +20,7 @@ from twisted.python import components
 from twisted.trial import unittest
 from twisted.web import server
 
-from flumotion.component.http import http_resources
+from flumotion.component.http import resources
 from flumotion.common import interfaces
 
 # From twisted/test/proto_helpers.py
@@ -86,14 +86,14 @@ class FakeAuth:
 class TestHTTPStreamingResource(unittest.TestCase):
     def testRenderNotReady(self):
         streamer = FakeStreamer()
-        resource = http_resources.HTTPStreamingResource(streamer)
+        resource = resources.HTTPStreamingResource(streamer)
         assert not resource.isReady()
         status = resource.render(FakeRequest(ip=''))
         assert status == server.NOT_DONE_YET
 
     def testRenderReachedMaxClients(self):
         streamer = FakeStreamer()
-        resource = http_resources.HTTPStreamingResource(streamer)
+        resource = resources.HTTPStreamingResource(streamer)
         assert not resource.isReady()
         streamer.caps = True
         assert resource.isReady()
@@ -107,16 +107,16 @@ class TestHTTPStreamingResource(unittest.TestCase):
         data = resource.render(request)
         error_code = protocols.http.SERVICE_UNAVAILABLE
         assert request.headers.get('content-type', '') == 'text/html'
-        assert request.headers.get('server', '') == http_resources.HTTP_VERSION
+        assert request.headers.get('server', '') == resources.HTTP_VERSION
         assert request.response == error_code
 
-        expected = http_resources.ERROR_TEMPLATE % {'code': error_code,
-                                                    'error': protocols.http.RESPONSES[error_code]}
+        expected = resources.ERROR_TEMPLATE % {'code': error_code,
+                                               'error': protocols.http.RESPONSES[error_code]}
         assert data == expected
 
-    def FIXME_testRenderUnauthorized(self):
+    def testRenderUnauthorized(self):
         streamer = FakeStreamer()
-        resource = http_resources.HTTPStreamingResource(streamer)
+        resource = resources.HTTPStreamingResource(streamer)
         resource.setAuth(FakeAuth(False))
         
         streamer.caps = True
@@ -127,16 +127,17 @@ class TestHTTPStreamingResource(unittest.TestCase):
 
         error_code = protocols.http.UNAUTHORIZED
         assert request.headers.get('content-type', '') == 'text/html'
-        assert request.headers.get('server', '') == http.HTTP_VERSION
+        assert request.headers.get('server', '') == resources.HTTP_VERSION
         assert request.response == error_code
         
-        expected = http.ERROR_TEMPLATE % {'code': error_code,
-                                          'error': protocols.http.RESPONSES[error_code]}
+        expected = resources.ERROR_TEMPLATE % {'code': error_code,
+                                               'error': protocols.http.RESPONSES[error_code]}
         assert data == expected
-
+    testRenderUnauthorized.skip = "Thomas needs to update this"
+    
     def testRenderNew(self):
         streamer = FakeStreamer()
-        resource = http_resources.HTTPStreamingResource(streamer)
+        resource = resources.HTTPStreamingResource(streamer)
         streamer.caps = True
         streamer.mime = 'application/x-ogg'
         
