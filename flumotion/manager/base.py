@@ -34,7 +34,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
     """
     def __init__(self, heaven, avatarId):
         """
-        @type heaven: L{flumotion.manager.common.ManagerHeaven}
+        @type heaven: L{flumotion.manager.base.ManagerHeaven}
         """
         self.heaven = heaven
         self.avatarId = avatarId
