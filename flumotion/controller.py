@@ -234,7 +234,7 @@ class Controller(pb.Root):
         converter.start(source_host, source_port, listen_host)
             
     def streamerStart(self, streamer):
-        source = self.getSourceComponent(converter)
+        source = self.getSourceComponent(streamer)
         host = source.getListenHost()
         port = source.getListenPort()
         log.msg('Calling remote method connect')

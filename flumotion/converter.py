@@ -38,7 +38,6 @@ import gst
 
 from twisted.internet import reactor
 from twisted.python import log
-from twisted.spread import pb
 
 from component import Component
 import gstutils
@@ -63,7 +62,7 @@ class Converter(Component):
         sink.set_property('host', sink_host)
         sink.set_property('port', sink_port)
         
-        reactor.callLater(0, self.pipeline_play)
+        self.pipeline_play()
 
     def remote_start(self, source_host, source_port, sink_host, sink_port):
         self.start(source_host, source_port, sink_host, sink_port)

@@ -17,70 +17,82 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-import time
+import pygtk
+pygtk.require('2.0')
+
 import sys
     
-import gobject
-import gst
+# Workaround for non existent popt integration
+_sys_argv = sys.argv
+sys.argv = sys.argv[:1]
 
+# XXX: Why does this have to be done before the reactor import?
+#      Find out a better way
 if __name__ == '__main__':
     import gstreactor
     gstreactor.install()
 
+import optik
+import time
+
+import gobject
+import gst
 from twisted.web import server, resource
 from twisted.internet import reactor
+from twisted.python import log
 
-class Streamer(gobject.GObject):
+from component import Component
+
+class Streamer(gobject.GObject, Component):
     __gsignals__ = {
         'data-recieved': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
                           (gst.Buffer,)),
     }
-    def __init__(self, hostname, port):
-        self.hostname = hostname
-        self.port = port
+    def __init__(self, name, source, host, port):
+        self.__gobject_init__()
+        name = 'streamer_' + name 
+        Component.__init__(self, name, source, host, port)
+        self.pipeline_string = 'tcpclientsrc name=source ! fakesink signal-handoffs=1 silent=1 name=sink'
+        self.source = source
         
-        self.create_pipeline()
-
-    def pipeline_pause(self):
-        retval = self.pipeline.set_state(gst.STATE_PAUSED)
-        if not retval:
-            log.msg('WARNING: Changing state to PLAYING failed')
-        gobject.idle_add(self.pipeline.iterate)
-        
-    def pipeline_play(self):
-        retval = self.pipeline.set_state(gst.STATE_PLAYING)
-        if not retval:
-            log.msg('WARNING: Changing state to PLAYING failed')
-        gobject.idle_add(self.pipeline.iterate)
-
-    def create_pipeline(self):
-        pipeline = gst.parse_launch('tcpclientsrc name=source ! '
-                                    'fakesink name=sink signals-handoff=1 silent=1')
-        sink = pipeline.get_by_name('sink')
-        sink.connect('handoff', self.sink_handoff_cb)
-
     def sink_handoff_cb(self, element, buffer, pad):
-        print 'GOT DATA'
-    
-class StreamerResource(resource.Resource):
-    def __init__(self, client):
+        self.emit('data-recieved', buffer)
+        
+    def connect_to(self, host, port):
+        log.msg('Going to connect to %s:%d' % (host, port))
+        
+        source = self.pipeline.get_by_name('source')
+        source.set_property('host', host)
+        source.set_property('port', port)
+
+        sink = self.pipeline.get_by_name('sink')
+        sink.connect('handoff', self.sink_handoff_cb)
+        
+        self.pipeline_play()
+     
+    def remote_connect(self, host, port):
+        self.connect_to(host, port)
+        
+gobject.type_register(Streamer)
+
+class StreamingResource(resource.Resource):
+    def __init__(self, streamer):
         resource.Resource.__init__(self)
 
-        client = StreamerComponent()
-        client.connect('data-recieved', self.data_recieved_cb)
+        self.streamer = streamer
+        streamer.connect('data-recieved', self.data_recieved_cb)
+        
         self.current_requests = []
         
-    def data_recieved_cb(self, transcoder, gstbuffer):
-        data = str(buffer(gstbuffer))
-        #log.msg('Data of len %d coming in' % len(data))
-        
+    def data_recieved_cb(self, transcoder, gbuffer):
         for request in self.current_requests:
-            self.write(request, data)
+            self.write(request, str(buffer(gbuffer)))
         
     def getChild(self, path, request):
         return self
 
     def write(self, request, data):
+        # Stolen from camserv
         request.write('--ThisRandomString\n')
         request.write("Content-type: image/jpeg\n\n")
         request.write(data + '\n')
@@ -91,25 +103,60 @@ class StreamerResource(resource.Resource):
         
     def render(self, request):
         print 'client from', request.getClientIP(), 'connected'
+        
+        # Stolen from camserv
         request.setHeader('Cache-Control', 'no-cache')
         request.setHeader('Cache-Control', 'private')
         request.setHeader("Content-type", "multipart/x-mixed-replace;;boundary=ThisRandomString")
         request.setHeader('Pragma', 'no-cache')
+        
         self.current_requests.append(request)
         request.notifyFinish().addBoth(self.lost, request)
         
         return server.NOT_DONE_YET
     
-#         NO = 200
-#         DELAY = 0.500
-#         for i in range(NO):
-#             reactor.callLater(DELAY*i,     self.write, request, self.data)
-#             reactor.callLater(DELAY*(i+1), self.write, request, self.data2)
-#         reactor.callLater(DELAY*(NO+1), request.finish)
-        
-#         return server.NOT_DONE_YET
+def main(args):
+    parser = optik.OptionParser()
+    parser.add_option('-c', '--controller',
+                      action="store", type="string", dest="host",
+                      default="localhost:8890",
+                      help="Controller to connect to default localhost:8890]")
+    parser.add_option('-n', '--name',
+                      action="store", type="string", dest="name",
+                      default=None,
+                      help="Name of component")
+    parser.add_option('-s', '--source',
+                      action="store", type="string", dest="source",
+                      default=None,
+                      help="Host source to get data from")
+    parser.add_option('-v', '--verbose',
+                      action="store_true", dest="verbose",
+                      help="Be verbose")
+
+    options, args = parser.parse_args(args)
+
+    if options.name is None:
+        print 'Need a name'
+        return 2
+
+    if options.source is None:
+        print 'Need a source'
+        return 2
+
+    if options.verbose:
+        log.startLogging(sys.stdout)
+
+    if ':' in options.host:
+        host, port = options.split(options.host)
+    else:
+        host = options.host
+        port = 8890
+
+    log.msg('Connect to %s on port %d' % (host, port))
+    component = Streamer(options.name, options.source, host, port)
+    reactor.listenTCP(8806, server.Site(resource=StreamingResource(component)))
+    reactor.run()
 
 if __name__ == '__main__':
-    reactor.listenTCP(8804, server.Site(resource=SimpleResource()))
-    print 'Listening on *:8804'
-    reactor.run()
+    sys.exit(main(_sys_argv))
+

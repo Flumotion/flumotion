@@ -34,7 +34,6 @@ if __name__ == '__main__':
 import gst
 from twisted.internet import reactor
 from twisted.python import log
-from twisted.spread import pb
 
 from component import Component
 
