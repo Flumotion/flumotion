@@ -1,10 +1,12 @@
 <planet>
 
   <manager>
-    <component name="manager-bouncer" type="htpasswdcrypt">
+<!--    <component name="manager-bouncer" type="htpasswdcrypt"> -->
+    <component name="manager-bouncer" type="htpasswd">
       <encryption>plaintext</encryption>
       <data><![CDATA[
-test:PSfNpHTkpTx1M
+test:test
+wim:PSfNpHTkpTx1M
 ]]></data>
     </component>
   </manager>
