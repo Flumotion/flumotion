@@ -73,22 +73,24 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/cache/flumotion
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-/usr/sbin/useradd -s /sbin/nologin -r -d %{_datadir}/flumotion -M -r flumotion > /dev/null 2> /dev/null
-exit 0
+/usr/sbin/useradd -s /sbin/nologin -r -d %{_datadir}/flumotion -M -r \
+	flumotion > /dev/null 2> /dev/null || :
 
 %post
 /sbin/chkconfig --add flumotion
 # generate a default .pem certificate ?
-if ! test -e %{_sysconfdir}/flumotion/default.pem
+PEM_FILE="%{_sysconfdir}/flumotion/default.pem"
+if ! test -e ${PEM_FILE}
 then
-  bash %{_datadir}/ssl/certs/make-dummy-cert %{_sysconfdir}/flumotion/default.pem
-  chown :flumotion %{_sysconfdir}/flumotion/default.pem
-  chmod 640 %{_sysconfdir}/flumotion/default.pem
+  sh %{_datadir}/ssl/certs/make-dummy-cert ${PEM_FILE}
+  chown :flumotion ${PEM_FILE}
+  chmod 640 ${PEM_FILE}
 fi
 
-# this is going to break when the admin decides to rename planets
-# this creates a user/test login account
-if ! test -e %{_sysconfdir}/flumotion/managers/default/planet.xml
+# create a default planet config if no manager configs present
+# the default login will be user/test
+# FIXME: still need a way of specifying we really do not want a default manager
+if ! ls %{_sysconfdir}/flumotion/managers/*/*.xml >/dev/null 2>&1
 then
   cat > %{_sysconfdir}/flumotion/managers/default/planet.xml <<EOF
 <planet>
@@ -106,9 +108,10 @@ user:PSfNpHTkpTx1M
 EOF
 fi
 
-# this is going to break when the admin decides to rename workers
-# this creates a worker config with user/test login account
-if ! test -e %{_sysconfdir}/flumotion/workers/default.xml
+# create a default worker config if no worker configs present
+# the default login will be user/test
+# FIXME: still need a way of specifying we really do not want a default worker
+if ! test -e %{_sysconfdir}/flumotion/*/default.xml
 then
   cat > %{_sysconfdir}/flumotion/workers/default.xml <<EOF
 <worker>
@@ -128,27 +131,20 @@ fi
 
 %preun
 /sbin/chkconfig --del flumotion
-# if removal and not upgrade, stop the processes
-if [ $1 -eq 1 ]
-then
-  service flumotion stop > /dev/null
-fi
-
-%postun
-# if removal and not upgrade, clean up user and config
+# if removal and not upgrade, stop the processes, clean up locks
 if [ $1 -eq 0 ]
 then
-  /usr/sbin/userdel flumotion
+  /sbin/service flumotion stop > /dev/null
 
-  rm -rf %{_sysconfdir}/flumotion/*
-  rm -rf %{_localstatdir}/lock/flumotion*
-  rm -rf %{_localstatdir}/run/flumotion*
+  rm -rf %{_localstatedir}/lock/flumotion*
+  rm -rf %{_localstatedir}/run/flumotion*
 fi
 
 # Think about this first, we don't really want to stop everything
-#%post
-#service flu-manager condrestart
-#service flu-worker condrestart
+#%postun
+# if [ $1 -ge 1 ]; then
+#   /sbin/service flumotion condrestart
+# fi
 
 %files
 %defattr(-,root,root,-)
@@ -171,6 +167,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Thu Nov 11 2004 Thomas Vander Stichele <thomas at apestaart dot org>
+- Integreate changes from issue 86
+
 * Fri Nov 05 2004 Christian Schaller <christian at fluendo com>
 - Add call to chkconfig script in post and preun parts to get our service into 
   the service list
