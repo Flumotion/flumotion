@@ -138,9 +138,14 @@ class Launcher:
 
         self.set_nice(config.nice)
         self.restore_uid()
+
+        try:
+            gobject.threads_init()
+        except AttributeError:
+            print '** WARNING: OLD PyGTK detected **'
+        except RuntimeError:
+            print '** WARNING: PyGTK with threading disabled detected **'
             
-        gobject.threads_init()
-        
         self.msg('Starting %s (%s) on pid %d' %
                  (config.getName(), config.getType(), pid))
         self.spawn(component)
