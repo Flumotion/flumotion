@@ -1,3 +1,10 @@
+2005-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/client.py:
+	  implement stop
+	* flumotion/component/component.py:
+	  send only one heartbeat each time, duh
+
 2005-01-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/admin.glade:

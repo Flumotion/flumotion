@@ -305,8 +305,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
         Start sending heartbeats.
         """
         self._heartbeat()
-        self._HeartbeatDC = reactor.callLater(self._heartbeatInterval,
-            self._heartbeat)
 
     def stopHeartbeat(self):
         """

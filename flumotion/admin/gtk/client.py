@@ -511,7 +511,26 @@ class Window(log.Loggable, gobject.GObject):
         # add error
         d.addErrback(lambda failure, d: d.destroy(), dialog)
         dialog.start()
- 
+
+    def _component_stop(self, state):
+        name = state.get('name')
+        if not name:
+            return
+
+        mid = self.statusbar.push('main', "Stopping component %s" % name)
+        d = self.admin.componentCallRemote(name, "stop")
+
+        def _stopCallback(result, self, mid):
+            self.statusbar.remove('main', mid)
+            self.statusbar.push('main', "Stopped component %s" % name)
+        def _stopErrback(failure, self, mid):
+            self.statusbar.remove('main', mid)
+            self.warning("Failed to stop component %s: %s" % (name, failure))
+            self.statusbar.push('main', "Failed to stop component %s" % name)
+            
+        d.addCallback(_stopCallback, self, mid)
+        d.addErrback(_stopErrback, self, mid)
+  
     # menubar/toolbar callbacks
     def file_new_cb(self, button):
         self.runWizard()
