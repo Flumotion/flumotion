@@ -59,7 +59,8 @@ class ConfigEntryComponent(log.Loggable):
 
 class ConfigEntryFlow:
     "I represent a <flow> entry in a planet config file"
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.components = {}
 
 class ConfigEntryManager:
@@ -95,6 +96,7 @@ class FlumotionConfigXML(log.Loggable):
                 self.debug('Loading configuration file `%s\'' % filename)
                 self.doc = minidom.parse(filename)
             else:
+                self.debug('Loading string file `%s\'' % string)
                 self.doc = minidom.parseString(string)
         except expat.ExpatError, e:
             raise ConfigError("XML parser error: %s" % e)
@@ -195,12 +197,17 @@ class FlumotionConfigXML(log.Loggable):
         return ConfigEntryComponent(name, type, config, defs, worker)
 
     def parseFlow(self, node):
-        # <flow>
+        # <flow name="...">
         #   <component>
         #   ...
         # </flow>
 
-        flow = ConfigEntryFlow()
+        if not node.hasAttribute('name'):
+            raise ConfigError("<flow> must have a name attribute")
+
+        name = str(node.getAttribute('name'))
+        flow = ConfigEntryFlow(name)
+
         for child in node.childNodes:
             if (child.nodeType == Node.TEXT_NODE or
                 child.nodeType == Node.COMMENT_NODE):

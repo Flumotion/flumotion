@@ -38,7 +38,9 @@ class JobComponentState(flavors.StateCacheable):
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         self.addKey('name')
+        self.addKey('parent')
         self.addKey('mood')
+        self.addKey('moodPending')
         self.addKey('pid')
         self.addKey('workerName')
         self.addKey('ip')

@@ -325,10 +325,11 @@ class WizardSaver:
         return components
     
     def getXML(self):
+        # FIXME: allow for naming flows !
         components = self.getComponents()
         
         s = '<planet>\n'
-        s += '  <flow>\n'
+        s += '  <flow name="default">\n'
         for component in components:
             s += component.toXML()
         s += '  </flow>\n'

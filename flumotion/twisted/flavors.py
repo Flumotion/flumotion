@@ -94,6 +94,9 @@ class StateCacheable(pb.Cacheable):
             value = []
         self._dict[key] = value
 
+    def hasKey(self, key):
+        return key in self._dict.keys()
+
     def get(self, key):
         """
         Get the state cache value for the given key.
@@ -154,6 +157,9 @@ class StateRemoteCache(pb.RemoteCache):
         # pb.RemoteCache.__init__(self)
 
     # our methods
+    def hasKey(self, key):
+        return key in self._dict.keys()
+
     def get(self, key):
         """
         Get the state cache value for the given key.

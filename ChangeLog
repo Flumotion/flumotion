@@ -1,3 +1,14 @@
+2005-01-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/flavors.py:
+	  add hasKey method
+	* flumotion/wizard/save.py:
+	  give flow a default name
+	* flumotion/common/config.py:
+	  require names for flows
+	* flumotion/common/component.py:
+	  add parent and moodPending state keys
+
 2005-01-27  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/checks/video.py (check1394): New bundled
