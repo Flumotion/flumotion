@@ -1,5 +1,9 @@
 2005-01-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac: prerelease
+
+2005-01-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/log.py:
 	* flumotion/component/component.py:
 	* flumotion/manager/component.py:
