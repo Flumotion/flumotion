@@ -36,7 +36,7 @@
   </cvsmodule>
  
   <cvsmodule id="gst-python" cvsroot="gstreamer.freedesktop.org"
-             revision="RELEASE-0_7_93">
+             revision="RELEASE-0_7_94">
     <dependencies>
       <dep package="gstreamer" />
       <dep package="gst-plugins" />
@@ -45,7 +45,7 @@
   </cvsmodule>
 
   <svnmodule id="flumotion" svnroot="svn.fluendo.com" 
-   module="flumotion/tags/flumotion-0.1.0" checkoutdir="flumotion">
+   module="flumotion/tags/flumotion-0.1.2" checkoutdir="flumotion">
     <dependencies>
       <dep package="gst-python" />
     </dependencies>
