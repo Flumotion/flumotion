@@ -28,6 +28,7 @@
 
 * EASY		add version number to helps and friends
 
+* EASY		remove utils, split up gstutils
 - API cleanup:
 
 - manager/component.py:
