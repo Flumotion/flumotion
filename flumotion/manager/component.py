@@ -283,7 +283,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             setattr(self.options, key, value)
         self.options.dict = options
         
-        self.heaven.componentRegistered(self)
+        self.heaven.registerComponent(self)
                 
     def _mindPipelineErrback(self, failure):
         failure.trap(errors.PipelineParseError)
@@ -541,7 +541,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             return
 
         self.info('checkFeedReady: setting to ready')
-        self.heaven.setComponentFeedReady(self, feedName)
+        self.heaven.setFeederReady(self, feedName)
         self.log('checkFeedReady: set to ready')
 
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
@@ -573,8 +573,8 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         self.error('error element=%s string=%s' % (element, error))
         self.heaven.removeComponent(self)
 
-    def perspective_uiStateChanged(self, component_name, state):
-        self.vishnu.adminheaven.uiStateChanged(component_name, state)
+    def perspective_uiStateChanged(self, componentName, state):
+        self.vishnu.adminheaven.uiStateChanged(componentName, state)
 
     def perspective_notifyFeedPorts(self, feedPorts):
         self.debug('received feed ports from component: %s' % feedPorts)
@@ -610,16 +610,13 @@ class ComponentHeaven(pb.Root, log.Loggable):
     def __init__(self, vishnu):
         """
         @type vishnu:  L{flumotion.manager.manager.Vishnu}
-        @param vishnu: the Vishnu object
+        @param vishnu: the Vishnu object this heaven belongs to
         """
-        self.avatars = {} # dict of component avatars
-        self.feeder_set = FeederSet()
+        self.avatars = {} # componentName -> componentAvatar
+        self._feederSet = FeederSet()
         self.vishnu = vishnu
         
-        self.last_free_port = 5500
-
     ### IHeaven methods
-
     def createAvatar(self, avatarId):
         """
         Creates a new avatar for a component.
@@ -640,12 +637,17 @@ class ComponentHeaven(pb.Root, log.Loggable):
         return avatar
 
     def removeAvatar(self, avatarId):
-        self.removeComponentByName(avatarId)
+        if not self.hasComponent(avatarId):
+            raise KeyError, avatarId
+
+        avatar = self.avatars[avatarId]
+        del self.avatars[avatarId]
+       
+        self.vishnu.adminheaven.componentRemoved(avatar)
     
     ### our methods
-    
-    def isLocalComponent(self, component):
-        peer = component.getTransportPeer()
+    def _componentIsLocal(self, componentAvatar):
+        peer = componentAvatar.getTransportPeer()
         try:
             host = peer.host
         except AttributeError:
@@ -656,20 +658,13 @@ class ComponentHeaven(pb.Root, log.Loggable):
         else:
             return False
 
-    def isComponentStarted(self, component_name):
-        if not self.hasComponent(component_name):
-            return False
-
-        avatar = self.avatars[component_name]
-
-        return avatar.started == True
-    
     def getComponent(self, name):
         """
         Look up a ComponentAvatar by name.
 
         @type name:  string
         @param name: name of the component
+
         @rtype:      L{flumotion.manager.component.ComponentAvatar}
         @returns:    the component avatar
         """
@@ -681,7 +676,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
     
     def hasComponent(self, name):
         """
-        Checks if a component with that name is registered.
+        Check if a component with that name is registered.
 
         @type name:  string
         @param name: name of the component
@@ -700,145 +695,142 @@ class ComponentHeaven(pb.Root, log.Loggable):
         @param componentAvatar: the component avatar
         """
 
-        component_name = componentAvatar.getName()
-        if self.hasComponent(component_name):
-            raise KeyError, component_name
+        componentName = componentAvatar.getName()
+        if self.hasComponent(componentName):
+            raise KeyError, componentName
             
-        self.avatars[component_name] = componentAvatar
+        self.avatars[componentName] = componentAvatar
         
-    def removeComponent(self, component):
+    def removeComponent(self, componentAvatar):
         """
-        removes a component
+        Remove a component from the heaven.
 
-        @type component: L{flumotion.manager.component.ComponentAvatar}
-        @param component: the component
+        @type componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        @param componentAvatar: the component
         """
 
-        component_name = component.getName()
-        self.removeComponentByName(component_name)
+        componentName = componentAvatar.getName()
+        self.removeAvatar(componentName)
         
-    def removeComponentByName(self, component_name):
-        if not self.hasComponent(component_name):
-            raise KeyError, component_name
-
-        component = self.avatars[component_name]
-        del self.avatars[component_name]
-        
-        self.vishnu.adminheaven.componentRemoved(component)
-
-    def _getComponentEatersData(self, component):
+    def _getComponentEatersData(self, componentAvatar):
         """
         Retrieve the information about the feeders this component's eaters
         are eating from.
 
-        @type  component: L{flumotion.manager.component.ComponentAvatar}
-        @param component: the component
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        @param componentAvatar: the component
 
         @rtype:           tuple with 3 items
         @returns:         tuple of feeder name, host name and port, or None
         """
 
-        eaterFeederNames = component.getEaters()
+        eaterFeederNames = componentAvatar.getEaters()
         #feederName is componentName:feedName on the feeding component
         retval = []
         for feederName in eaterFeederNames:
-            feeder = self.feeder_set.getFeeder(feederName)
+            feeder = self._feederSet.getFeeder(feederName)
             self.debug('EatersData(): feeder %r' % feeder)
 
             host = feeder.getListenHost()
-            if (not self.isLocalComponent(component) and host == '127.0.0.1'):
-                host = component.getRemoteManagerIP()
+            if (not self._componentIsLocal(componentAvatar)
+                and host == '127.0.0.1'):
+                host = componentAvatar.getRemoteManagerIP()
 
             retval.append((feederName, host, feeder.getListenPort()))
         return retval
 
-    def _getComponentFeedersData(self, component):
+    def _getComponentFeedersData(self, componentAvatar):
         """
         Retrieves the data of feeders (feed producer elements) for a component.
 
-        @type  component: L{flumotion.manager.component.ComponentAvatar}
-        @param component: the component
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        @param componentAvatar: the component
         @rtype:           tuple of with 2 items
         @returns:         name and host
         """
 
-        host = component.getListenHost()
-        feeders = component.getFeeders()
+        host = componentAvatar.getListenHost()
+        feeders = componentAvatar.getFeeders()
         retval = []
         for feeder in feeders:
             retval.append((feeder, host))
         return retval
 
-    def componentStart(self, component):
-        component.debug('Starting, asking component to link')
-        eatersData = self._getComponentEatersData(component)
-        feedersData = self._getComponentFeedersData(component)
+    def _startComponent(self, componentAvatar):
+        componentAvatar.debug('Starting, asking component to link')
+        eatersData = self._getComponentEatersData(componentAvatar)
+        feedersData = self._getComponentFeedersData(componentAvatar)
 
-        component.debug('Starting, asking component to link with eatersData %s and feedersData %s' % (eatersData, feedersData))
-        component.link(eatersData, feedersData)
+        componentAvatar.debug('Starting, asking component to link with eatersData %s and feedersData %s' % (eatersData, feedersData))
+        componentAvatar.link(eatersData, feedersData)
 
-    def checkComponentStart(self, component):
+    def checkComponentStart(self, componentAvatar):
         """
-        Check if the component can start up.
+        Check if the component can start up, and start it if it can.
         This depends on whether the components and feeders it depends on have
         started.
         """
-        component.debug('checkComponentStart')
+        componentAvatar.debug('checkComponentStart')
         
-        for eaterFeeder in component.getEaters():
-            if not self.feeder_set.isFeederReady(eaterFeeder):
-                component.debug('feeder %s is not ready' % (eaterFeeder))
+        for eaterFeeder in componentAvatar.getEaters():
+            if not self._feederSet.isFeederReady(eaterFeeder):
+                componentAvatar.debug('feeder %s is not ready' % (eaterFeeder))
                 return
 
         # FIXME: change this to mood
-        if component.starting:
+        if componentAvatar.starting:
             return
         
-        component.starting = True
-        self.componentStart(component)
+        componentAvatar.starting = True
+        self._startComponent(componentAvatar)
         
-    def componentRegistered(self, component):
+    def registerComponent(self, componentAvatar):
         """
-        This function is triggered when the mind is attached.
+        This function registers a component in the heaven.
+        It is triggered when the mind is attached.
 
-        @type  component: L{flumotion.manager.component.ComponentAvatar}
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         """
-        component.debug('registering component')
-        self.vishnu.adminheaven.componentAdded(component)
-        self.feeder_set.addFeeders(component)
+        componentAvatar.debug('registering component')
+
+        # tell the admin client
+        self.vishnu.adminheaven.componentAdded(componentAvatar)
+
+        # tell the feeder set
+        self._feederSet.addFeeders(componentAvatar)
 
         # check if we eat feeds from other feeders
-        eaterFeeders = component.getEaters()
+        eaterFeeders = componentAvatar.getEaters()
         if not eaterFeeders:
-            component.debug('component does not take feeds, starting')
-            self.componentStart(component)
+            componentAvatar.debug('component does not take feeds, starting')
+            self._startComponent(componentAvatar)
             return
 
         # we do, so we need to make our eaters depend on other feeders
-        component.debug('need to wait for %s' % eaterFeeders)
+        componentAvatar.debug('need to wait for %s' % eaterFeeders)
         for feeder in eaterFeeders:
-            self.feeder_set.dependComponentOnFeeder(component, feeder,
+            self._feederSet.dependComponentOnFeeder(componentAvatar, feeder,
                 self.checkComponentStart)
                 
-    # FIXME: rename, since this doesn't start components, that's done by
-    # the feeder set
-    def setComponentFeedReady(self, component, feedName):
-        # tell the feeder set that the given feeder on that component is ready
-        feederName = component.getName() + ':' + feedName
-        component.debug('setting feeder %s to ready in feaderset' % feederName)
-        self.feeder_set.feederSetReady(feederName)
-        component.log('setComponentFeedReady done')
-
-    def stopComponent(self, name):
+    def setFeederReady(self, componentAvatar, feedName):
         """
-        Stops a component.
+        Tell the feeder set that the given feed on the given component is
+        ready.
         
-        @type name:  string
-        @param name: name of the component
+        @type  componentAvatar: string
+        @param componentAvatar: the component containing the feed
+        @type  feedName:        string
+        @param feedName:        the feed set to ready
         """
 
-        component = self.avatars[name]
-        component.stop()
-        
+        feederName = componentAvatar.getName() + ':' + feedName
+        componentAvatar.debug('setting feeder %s to ready in feaderset' % feederName)
+        self._feederSet.feederSetReady(feederName)
+        componentAvatar.log('setFeederReady done')
+
     def shutdown(self):
-        map(self.stopComponent, self.avatars)
+        """
+        Shut down the heaven, stopping all components.
+        """
+        for name in self.avatars.keys():
+            self.avatars[name].stop()

@@ -63,17 +63,11 @@ class TestComponentHeaven(unittest.TestCase):
         #self.assertRaises(AssertionError,
         #                  self.heaven.createAvatar, 'does-not-exist')
 
-    def testIsLocalComponent(self):
+    def testComponentIsLocal(self):
         a = FakeComponentAvatar()
         self.heaven._addComponentAvatar(a)
-        assert self.heaven.isLocalComponent(a)
+        assert self.heaven._componentIsLocal(a)
         
-    def testIsStarted(self):
-        a = self.heaven.createAvatar('prod')
-        assert not self.heaven.isComponentStarted('prod')
-        a.started = True # XXX: Use heaven.componentStart
-        assert self.heaven.isComponentStarted('prod')
-
     def testGetComponent(self):
         a = self.heaven.createAvatar('prod')
         assert self.heaven.getComponent('prod') == a
@@ -114,8 +108,8 @@ class TestComponentHeaven(unittest.TestCase):
         a3 = FakeComponentAvatar('baz', port=1001, listen_host='baz-host')
         self.heaven._addComponentAvatar(a3)
 
-        self.heaven.feeder_set.addFeeders(a2)
-        self.heaven.feeder_set.addFeeders(a3)
+        self.heaven._feederSet.addFeeders(a2)
+        self.heaven._feederSet.addFeeders(a3)
         
         eaters = self.heaven._getComponentEatersData(a)
         assert len(eaters) == 2
