@@ -17,8 +17,12 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+import socket
 import sys
     
+import pygtk
+pygtk.require('2.0')
+
 import gobject
 import gst
 
@@ -61,7 +65,6 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
-        self.caps = None
         self.state = gst.STATE_NULL
         self.ready = False
         
@@ -71,9 +74,6 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
     def getPeer(self):
         return self.mind.broker.transport.getPeer()
 
-    def getCaps(self):
-        return self.caps
-    
     def attached(self, mind):
         log.msg('%s attached, preparing' % self.username)
         mind.callRemote('prepare')
@@ -92,7 +92,6 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
         
     def perspective_notifyCaps(self, caps):
         log.msg('%s.notifyCaps %s' % (self.username, caps))
-        self.caps = caps
         self.controller.componentReady(self)
         
     def perspective_error(self, element, error):
@@ -104,6 +103,7 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
         self.username = username
         self.ready = False
         self.state = gst.STATE_NULL
+        self.remote_hostname = None
         
     def __repr__(self):
         return '<TranscoderPerspective for %s>' % self.username
@@ -111,6 +111,9 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
     def getPeer(self):
         return self.mind.broker.transport.getPeer()
 
+    def getControllerHostname(self):
+        return self.remote_hostname
+    
     def attached(self, mind):
         log.msg('%s attached, preparing' % self.username)
         defer = mind.callRemote('prepare')
@@ -121,7 +124,8 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
         log.msg('%r detached' % mind)
         self.controller.removeComponent(self)
         
-    def prepareDone(self, *args):
+    def prepareDone(self, hostname):
+        self.remote_hostname = hostname
         self.controller.componentReady(self)
 
     def perspective_stateChanged(self, old, state):
@@ -180,13 +184,18 @@ class Controller(pb.Root):
                 prev = curr
 
     def link(self, acq, trans):
-        obj = trans.mind.callRemote('listen', 5500, acq.getCaps())
-        proto, hostname, port = trans.getPeer()
-        def listenDone(obj=None):
-            assert trans.state != gst.STATE_PLAYING, \
-                   gst.element_state_get_name(trans.state)
+        obj = acq.mind.callRemote('listen', 5500)
+        proto, acq_hostname, port = acq.getPeer()
+        trans_hostname = trans.getPeer()[1]
+        
+        if (acq_hostname == '127.0.0.1' and trans_hostname != '127.0.0.1'):
+            acq_hostname = trans.getControllerHostname()
             
-            acq.mind.callRemote('connect', hostname, 5500)
+        def listenDone(obj=None):
+            assert acq.state != gst.STATE_PLAYING, \
+                   gst.element_state_get_name(acq.state)
+            
+            trans.mind.callRemote('connect', acq_hostname, 5500)
         obj.addCallback(listenDone)
             
 class ControllerMaster(pb.PBServerFactory):

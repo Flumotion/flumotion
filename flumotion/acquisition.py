@@ -39,18 +39,21 @@ class Acquisition(pb.Referenceable):
         reactor.connectTCP(host, port, factory)
         defered = factory.login(pbutil.Username('acq_%s' % username),
                                 client=self)
-        defered.addCallback(self.gotPerspective)
+        defered.addCallback(self.got_perspective_cb)
         
         self.pipeline_string = pipeline_string
         self.persp = None
         
-    def gotPerspective(self, persp):
+    def got_perspective_cb(self, persp):
         self.persp = persp
         
     def pipeline_error_cb(self, object, element, error, arg):
         log.msg('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
         self.persp.callRemote('error', element.get_path_string(), error.message)
 
+        self.pipeline.set_state(gst.STATE_NULL)
+        self.prepare()
+        
     def pipeline_state_change_cb(self, element, old, state):
         log.msg('pipeline state-changed %s %s -> %s' % (element.get_path_string(),
                                                         gst.element_state_get_name(old),
@@ -85,13 +88,14 @@ class Acquisition(pb.Referenceable):
         if not retval:
             log.msg('Changing state to PLAYING failed')
         gobject.idle_add(self.pipeline.iterate)
-        
-    def remote_prepare(self):
+
+    def prepare(self):
         log.msg('start called')
-        if not self.persp:
-            print 'We are not ready yet, waiting 100 ms'
-            reactor.callLater(0.100, self.remote_prepare)
-            return
+        
+        #if not self.persp:
+        #    print 'We are not ready yet, waiting 100 ms'
+        #    reactor.callLater(0.100, self.remote_prepare)
+        #    return
         
         full_pipeline = '%s ! fakesink silent=1 name=fakesink' % self.pipeline_string
         log.msg('going to run pipeline: %s' % full_pipeline)
@@ -104,37 +108,66 @@ class Acquisition(pb.Referenceable):
         
         self.sink = self.pipeline.get_by_name('fakesink')
         
-        # XXX: Disconnect signal?
         self.notify_id = self.sink.connect('deep-notify::caps',
                                            self.sink_pad_deep_notify_caps_cb)
 
         reactor.callLater(0, self.pipeline_play)
 
-    def remote_connect(self, hostname, port):
-        log.msg('Going to connect to %s:%d' % (hostname, port))
-        
-        # Pause
-        self.pipeline.set_state(gst.STATE_PAUSED)
-        
+    def rewind(self):
         # Stream back to the beginning
         event = gst.event_new_seek(gst.FORMAT_TIME |
                                    gst.SEEK_METHOD_SET |
                                    gst.SEEK_FLAG_FLUSH, 0)
         self.sink.send_event(event)
 
+    def relink(self, sink):
         # Unlink and remove
+        
         self.pipeline.remove(self.sink)
         assert not self.src.unlink(self.sink)
 
-        self.sink = gst.element_factory_make('tcpclientsink')
-        self.sink.set_property('host', hostname)
-        self.sink.set_property('port', port)
+        self.sink = sink
         
         self.pipeline.add(self.sink)
         self.src.link_filtered(self.sink, self.caps)
         
+    def connect(self, hostname, port):
+        log.msg('Going to connect to %s:%d' % (hostname, port))
+
+        self.pipeline_pause()
+        
+        element = gst.element_factory_make('tcpclientsink')
+        element.set_property('host', hostname)
+        element.set_property('port', port)
+        
+        self.rewind()
+        self.relink(element)
+        
         reactor.callLater(0, self.pipeline_play)
-    
+
+    def listen(self, port):
+        log.msg('Going to listen on port %d' % port)
+
+        self.pipeline_pause()
+        
+        element = gst.element_factory_make('tcpserversink')
+        element.set_property('port', port)
+        
+        self.rewind()
+        self.relink(element)
+        
+        reactor.callLater(0, self.pipeline_play)
+        
+    # Remote interface
+    def remote_prepare(self):
+        self.prepare()
+
+    def remote_connect(self, hostname, port):
+        self.connect(hostname, port)
+
+    def remote_listen(self, port):
+        self.listen(port)
+        
 def parseHostString(string, port=8890):
     if not string:
         return 'localhost', port
