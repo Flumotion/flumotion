@@ -4,8 +4,8 @@ flumotion_PYTHON = \
 	__init__.py \
 	enums.py \
 	save.py \
-	wizard.py \
-	wizard_step.py
+	steps.py \
+	wizard.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 

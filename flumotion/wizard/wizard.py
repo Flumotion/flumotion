@@ -568,7 +568,7 @@ def register_step(klass):
 def run(interactive=True):
     global wiz
     
-    import flumotion.wizard.wizard_step
+    import flumotion.wizard.steps
     wiz.run(interactive)
     
 
