@@ -101,8 +101,8 @@ class ControllerFactory(pb.Referenceable):
     def connectTranscoder(self, hostname, port):
         return self.trans_mgr.connect(hostname, port)
 
-    def transGetInfo(self, args, trans):
-        self.addrs[trans.processUniqueID()] = args
+    def transGetInfo(self, port, trans):
+        self.addrs[trans.processUniqueID()] = port
         return trans
     
     def link(self, acq, trans):
@@ -138,7 +138,7 @@ class ControllerFactory(pb.Referenceable):
         
         def whenCapsIsSet(obj, acq):
             print 'Transcoders caps is set, calling up to acq'
-            hostname, port = self.addrs[transcoder.processUniqueID()]
+            port = self.addrs[transcoder.processUniqueID()]
             acq.callRemote('assignRealSink', hostname, port)
             return acq
         

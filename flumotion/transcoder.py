@@ -56,8 +56,7 @@ class TranscoderFactory(pb.Root):
         self.reframer = gst.element_factory_make('videoreframer')
 
     def remote_getInfo(self):
-        return (socket.gethostname(),
-                self.src.get_property('port'))
+        return self.src.get_property('port')
     
     def remote_setController(self, controller):
         self.controller = controller
