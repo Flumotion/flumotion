@@ -163,7 +163,7 @@ class HTTPStreamingAdminResource(resource.Resource):
         }
 
 class HTTPStreamingResource(resource.Resource):
-    __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
+    __reserve_fds__ = 3 # number of fd's to reserve for non-streaming
     def __init__(self, streamer):
         self.logfile = None
             
@@ -416,7 +416,10 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
         self.caps = caps
 
     def get_mime(self):
-        return self.caps.get_structure(0).get_name()
+        if self.caps:
+            return self.caps.get_structure(0).get_name()
+        else:
+            return None
     
     def add_client(self, fd):
         sink = self.get_sink()
@@ -470,6 +473,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
 gobject.type_register(MultifdSinkStreamer)
 
 def createComponent(config):
+    reactor.debug = True
     name = config['name']
     port = int(config['port'])
     source = config['source']
