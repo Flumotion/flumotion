@@ -48,41 +48,67 @@ class Dispatcher:
         
         log.msg('requestAvatar (%s, %s, %s)' % (avatarID, mind, interface))
 
-        # if self.controller.hasComponent(avatarID) ...
+        # This could use some cleaning up
+        component_type, avatarID = avatarID.split('_', 1)
         
-        p = self.controller.getPerspective(avatarID)
+        if self.controller.hasComponent(avatarID):
+            # XXX: Raise exception/deny access
+            pass
+        
+        p = self.controller.getPerspective(component_type, avatarID)
 
         log.msg("returning Avatar(%s): %s" % (avatarID, p))
         if not p:
             raise ValueError, "no perspective for '%s'" % avatarID
-        
-        p.attached(mind) # perhaps .callLater(0) ?
+
+        reactor.callLater(0, p.attached, mind)
         
         return (pb.IPerspective, p,
                 lambda p=p,mind=mind: p.detached(mind))
 
-class ComponentPerspecetive(pbutil.NewCredPerspective):
+class Options:
+    pass
+
+class ComponentPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
         self.ready = False
         self.state = gst.STATE_NULL
-        self.remote_host = None
+        self.options = Options()
 
-    def getPeer(self):
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__.__name__, self.username)
+    
+    def getTransportPeer(self):
         return self.mind.broker.transport.getPeer()
 
-    # XXX: Rename
-    def getControllerHostname(self):
-        return self.remote_host
+    def getSource(self):
+        return self.options.source
     
-    def after_register_cb(self, host, cb):
-        if host == None:
+    def getRemoteControllerIP(self):
+        return self.options.ip
+
+    def getName(self):
+        return self.username
+
+    def getListenHost(self):
+        return self.getTransportPeer()[1]
+
+    # This method should ask the component if the port is free
+    def getListenPort(self):
+        raise NotImplementedError
+    
+    def after_register_cb(self, options, cb):
+        if options == None:
             cb = self.mind.callRemote('register')
             cb.addCallback(self.after_register_cb, cb)
             return
-        self.remote_host = host
+
+        for key, value in options.items():
+            setattr(self.options, key, value)
         
+        self.ready = True
         self.controller.componentReady(self)
         
     def attached(self, mind):
@@ -110,63 +136,148 @@ class ComponentPerspecetive(pbutil.NewCredPerspective):
         cb = self.mind.callRemote('register')
         cb.addCallback(self.after_register_cb)
 
+
+              
+class ProducerPerspective(ComponentPerspective):
+    kind = 'producer'
+    def getListenPort(self):
+        return 5500
+
+    def listen(self, host, port):
+        self.mind.callRemote('listen', host, port)
+        
+class ConverterPerspective(ComponentPerspective):
+    kind = 'converter'
+    def getListenPort(self):
+        return 5501
+    
+    def start(self, source_host, source_port, listen_host, listen_port):
+        self.mind.callRemote('start', source_host, source_port, listen_host, listen_port)
+
+class StreamerPerspective(ComponentPerspective):
+    kind = 'streamer'
+
+    def connect(self, host, port):
+        self.mind.callRemote('connect', host, port)
+
 class Controller(pb.Root):
     def __init__(self):
         self.components = {}
+        self.waitlists = {}
         
-    def getPerspective(self, username):
-        component = ComponentPerspective(self, username)
+    def getPerspective(self, component_type, username):
+        if component_type == 'producer':
+            klass = ProducerPerspective
+        elif component_type == 'converter':
+            klass = ConverterPerspective
+        elif component_type == 'streamer':
+            klass = StreamerPerspective
+        else:
+            raise AssertionError
+        
+        component = klass(self, username)
         self.addComponent(username, component)
         return component
 
+    def hasComponent(self, name):
+        return self.components.has_key(name)
+    
     def addComponent(self, name, component):
         self.components[name] = component
         
     def removeComponent(self, component):
         del self.components[component.username]
-    
-    def componentReady(self, component):
-        link = ['prod_johan', 'conv_johan']
-        component.ready = True
-        
-        log.msg('%r is ready' % component)
-        for component in self.components.values():
-            if component.ready == False:
-                break
-        else:
-            item = link[0]
-            if not self.components.has_key(item):
-                log.msg('%s is not yet connected' % item) 
-                return
-            
-            prev = self.components[link[0]]
-            for item in link[1:]:
-                if not self.components.has_key(item):
-                    log.msg('%s is not yet connected' % item) 
-                    return
-                curr = self.components[item]
-                
-                log.msg('going to connect %s with %s' % (prev, curr))
-                self.link(prev, curr)
-                prev = curr
 
+    def waitForComponent(self, name, component):
+        if not self.waitlists.has_key(name):
+            self.waitlists[name] = []
+
+        self.waitlists[name].append(component)
+
+    def startPendingComponentsFor(self, component):
+        name = component.getName()
+        if self.waitlists.has_key(name):
+            for component in self.waitlists[name]:
+                self.componentStart(component)
+            self.waitlists[name] = []
+    
+    def getSourceComponent(self, component):
+        peername = component.getSource()
+        assert self.components.has_key(peername)
+        return self.components[peername]
+
+    def producerStart(self, producer):
+        host = producer.getListenHost()
+        port = producer.getListenPort()
+        log.msg('Calling remote method listen (%s, %d)' % (host, port))
+        producer.listen(host, port)
+
+    def converterStart(self, converter):
+        source = self.getSourceComponent(converter)
+        source_host = source.getListenHost()
+        source_port = source.getListenPort()
+        listen_host = converter.getListenHost()
+        listen_port = converter.getListenPort()
+        log.msg('Calling remote method start (%s, %d, %s, %d)' % (source_host, source_port,
+                                                                  listen_host, listen_port))
+        converter.start(source_host, source_port, listen_host, listen_port)
+
+    def streamerStart(self, streamer):
+        source = self.getSourceComponent(converter)
+        host = source.getListenHost()
+        port = source.getListenPort()
+        log.msg('Calling remote method connect')
+        streamer.connect(host, port)
+        
+    def componentStart(self, component):
+        log.msg('Starting component %r (%s)' % (component, component.kind))
+        
+        if isinstance(component, ProducerPerspective):
+            self.producerStart(component)
+        elif isinstance(component, ConverterPerspective):
+            self.converterStart(component)
+        elif isinstance(component, StreamerPerspective):
+            self.streamerStart(component)
+
+        # Now when the component is up and running, 
+        self.startPendingComponentsFor(component)
+
+    def componentReady(self, component):
+        log.msg('%r is ready' % component)
+        
+        # The producer can just be started ...
+        if isinstance(component, ProducerPerspective):
+            self.componentStart(component)
+            return
+
+        source_name = component.getSource()
+        assert not source_name is None
+        
+        # ... while the others need the source running
+        if self.hasComponent(source_name):
+            log.msg('Source for %r (%s) is ready, so starting' % (component, source_name))
+            self.componentStart(component)
+        else:
+            log.msg('%r requires %s to be running, but its not so waiting' % (component, source_name))
+            self.waitForComponent(source_name, component)
+        
     def link(self, prod, conv):
         assert prod.ready
         assert conv.ready
-        
+    
         prod_port = 5500
         conv_port = 5501
-        proto, prod_hostname, port = prod.getPeer()
-        conv_hostname = conv.getPeer()[1]
+        proto, prod_hostname, port = prod.getTransportPeer()
+        conv_hostname = conv.getTransportPeer()[1]
 
         if (prod_hostname == '127.0.0.1' and conv_hostname != '127.0.0.1'):
-            prod_hostname = conv.getControllerHostname()
+            prod_hostname = conv.getRemoteControllerIP()
             
         def listenDone(obj=None):
             assert prod.state == gst.STATE_PLAYING, \
                    gst.element_state_get_name(prod.state)
 
-            log.msg('calling %s.listen(%d, %s, %d)' % (conv.username,
+            log.msg('calling %s.start(%d, %s, %d)' % (conv.username,
                                                        prod_port,
                                                        prod_hostname,
                                                        conv_port))
@@ -179,7 +290,7 @@ class Controller(pb.Root):
             obj = prod.mind.callRemote('listen', prod_hostname, prod_port)
             obj.addCallback(listenDone)
         else:
-            log.msg('calling %s.listen(%d, %s, %d)' % (conv.username,
+            log.msg('calling %s.start(%d, %s, %d)' % (conv.username,
                                                        prod_port,
                                                        prod_hostname,
                                                        conv_port))

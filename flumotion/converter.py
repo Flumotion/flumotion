@@ -44,28 +44,30 @@ from component import Component
 import gstutils
 
 class Converter(Component):
-    def __init__(self, name, host, port, pipeline, source):
-        Component.__init__(self, name, host, port)
+    def __init__(self, name, source, host, port, pipeline):
+        name = 'converter_' + name 
+        Component.__init__(self, name, source, host, port)
         self.pipeline_string = 'tcpclientsrc name=source ! ' + \
                                '%s ! tcpserversink name=sink' % pipeline
         self.source = source
         
-    def start(self, source_port, sink_host, sink_port):
-        log.msg('(source) Going to listen on port %d' % source_port)
+    def start(self, source_host, source_port, sink_host, sink_port):
+        log.msg('(source) Going to listen on port %s:%d' % (source_host, source_port))
         log.msg('(sink)   Going to connect to %s:%d' % (sink_host, sink_port))
         
         source = self.pipeline.get_by_name('source')
-        source.set_property('host', sink_host)
+        source.set_property('host', source_host)
         source.set_property('port', source_port)
 
         sink = self.pipeline.get_by_name('sink')
+        sink.set_property('host', sink_host)
         sink.set_property('port', sink_port)
         
         reactor.callLater(0, self.pipeline_play)
         log.msg('returning from start')
 
-    def remote_start(self, source_port, sink_host, sink_port):
-        self.start(source_port, sink_host, sink_port)
+    def remote_start(self, source_host, source_port, sink_host, sink_port):
+        self.start(source_host, source_port, sink_host, sink_port)
         
 def main(args):
     parser = optik.OptionParser()
@@ -113,8 +115,8 @@ def main(args):
         port = 8890
 
     log.msg('Connect to %s on port %d' % (host, port))
-    client = Converter(options.name, host, port,
-                       options.pipeline, options.source)
+    client = Converter(options.name, options.source, host, port,
+                       options.pipeline)
     reactor.run()
     
 if __name__ == '__main__':

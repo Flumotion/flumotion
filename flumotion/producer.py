@@ -40,7 +40,8 @@ from component import Component
 
 class Producer(Component):
     def __init__(self, name, host, port, pipeline):
-        Component.__init__(self, name, host, port)
+        name = 'producer_' + name 
+        Component.__init__(self, name, None, host, port)
         
         self.pipeline_string = '%s ! tcpserversink name=sink' % pipeline
         

@@ -30,8 +30,9 @@ import pbutil
 import gstutils
 
 class Component(pb.Referenceable):
-    def __init__(self, name, host, port):
+    def __init__(self, name, source, host, port):
         self.component_name = name
+        self.source = source
         self.host = host
         self.port = port
         self.persp = None
@@ -99,7 +100,7 @@ class Component(pb.Referenceable):
         self.pipeline_signals = []
         
     def register(self):
-        log.msg('creating pipeline: %s' % self.pipeline_string)
+        log.msg('register(): creating pipeline: %s' % self.pipeline_string)
         self.pipeline = gst.parse_launch(self.pipeline_string)
 
         sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
@@ -117,5 +118,6 @@ class Component(pb.Referenceable):
         
         self.register()
         
-        return self.get_ip()
+        return {'ip' : self.get_ip(),
+                'source' : self.source }
     
