@@ -77,7 +77,11 @@ class Feeder:
         @param func: a function to run when the feeder is ready
         @param args: arguments to the function
         """
-        self.dependencies[feederName] = (func, args)
+
+        if not self.dependencies.has_key(feederName):
+            self.dependencies[feederName] = []
+            
+        self.dependencies[feederName].append((func, args))
 
     def setComponentAvatar(self, componentAvatar):
         """
@@ -100,9 +104,10 @@ class Feeder:
         self.ready = True
 
         for eatername in self.dependencies.keys():
-            func, args = self.dependencies[eatername]
-            self.component.debug('running dependency function %r with args %r for eater from %s' % (func, args, eatername))
-            func(*args)
+            for func, args in self.dependencies[eatername]:
+                self.component.debug('running dependency function %r with args %r for eater from %s' % (func, args, eatername))
+                func(*args)
+                
         self.dependencies = {}
 
     def isReady(self):
@@ -139,16 +144,9 @@ class FeederSet(log.Loggable):
         self.feeders = {} # feederName -> Feeder
 
     def __getitem__(self, key):
-        # FIXME: feeders are now fully named, so remove this hack
-        #if key.find(':') == -1:
-        #    key += ':default'
         return self.feeders[key]
         
     def hasFeeder(self, feederName):
-        # FIXME: remove this hack and enforce
-        #if feederName.find(':') == -1:
-        #    feederName += ':default'
-
         return self.feeders.has_key(feederName)
     
     def getFeeder(self, feederName):

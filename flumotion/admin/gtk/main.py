@@ -32,8 +32,8 @@ def _write_default(configuration):
     if not os.path.exists(directory):
         os.makedirs(directory)
         
-    print 'Saving configuration to', filename
     filename = os.path.join(directory, 'default.xml')
+    print 'Saving configuration to', filename
     fd = file(filename, 'w')
     fd.write(configuration)
 
