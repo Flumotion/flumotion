@@ -334,6 +334,9 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.debug('calling remote getUIFileList %s' % component)
         return self.remote.callRemote('getUIFileList', component)
 
+    def cleanComponents(self):
+        return self.remote.callRemote('cleanComponents')
+        
     # FIXME: this should not be allowed to be called, move away
     # by abstracting callers further
     # returns a dict of name -> component

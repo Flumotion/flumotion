@@ -272,26 +272,47 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkToolItem" id="toolitem1">
+		<widget class="GtkToolButton" id="tool_clean">
 		  <property name="visible">True</property>
+		  <property name="label" translatable="yes"></property>
+		  <property name="use_underline">True</property>
+		  <property name="stock_id">gtk-clear</property>
 		  <property name="visible_horizontal">True</property>
 		  <property name="visible_vertical">True</property>
 		  <property name="is_important">False</property>
+		  <signal name="clicked" handler="on_tool_clean_clicked" last_modification_time="Tue, 19 Oct 2004 15:17:28 GMT"/>
+		</widget>
+		<packing>
+		  <property name="expand">False</property>
+		  <property name="homogeneous">True</property>
+		</packing>
+	      </child>
 
-		  <child>
-		    <widget class="GtkToolButton" id="tool_quit">
-		      <property name="visible">True</property>
-		      <property name="stock_id">gtk-quit</property>
-		      <property name="visible_horizontal">True</property>
-		      <property name="visible_vertical">True</property>
-		      <property name="is_important">False</property>
-		      <signal name="clicked" handler="on_tool_quit_clicked" last_modification_time="Tue, 19 Oct 2004 13:31:37 GMT"/>
-		    </widget>
-		  </child>
+	      <child>
+		<widget class="GtkSeparatorToolItem" id="separatortoolitem2">
+		  <property name="visible">True</property>
+		  <property name="draw">True</property>
+		  <property name="visible_horizontal">True</property>
+		  <property name="visible_vertical">True</property>
 		</widget>
 		<packing>
 		  <property name="expand">False</property>
 		  <property name="homogeneous">False</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkToolButton" id="tool_quit">
+		  <property name="visible">True</property>
+		  <property name="stock_id">gtk-quit</property>
+		  <property name="visible_horizontal">True</property>
+		  <property name="visible_vertical">True</property>
+		  <property name="is_important">False</property>
+		  <signal name="clicked" handler="on_tool_quit_clicked" last_modification_time="Tue, 19 Oct 2004 13:31:37 GMT"/>
+		</widget>
+		<packing>
+		  <property name="expand">False</property>
+		  <property name="homogeneous">True</property>
 		</packing>
 	      </child>
 	    </widget>

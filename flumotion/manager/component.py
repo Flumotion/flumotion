@@ -857,7 +857,6 @@ class ComponentHeaven(pb.Root, log.Loggable):
         """
         Shut down the heaven, stopping all components.
         """
-        for name in self.avatars.keys():
-            self.avatars[name].stop()
-            del self.avatars[name]
+        for avatar in self.avatars.values():
+            avatar.stop()
             

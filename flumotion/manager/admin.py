@@ -281,6 +281,9 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         workerAvatar = self.workerHeaven.getAvatar(workerId)
         return workerAvatar.checkElements(elements)
         
+    def perspective_cleanComponents(self):
+        return self.componentHeaven.shutdown()
+
     # separate method so it runs the newly reloaded one :)
     def _reloaded(self):
         self.info('reloaded manager code')

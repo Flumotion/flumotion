@@ -1,5 +1,16 @@
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/admin.glade:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+
+	Add a clean button in the interface and methods in the medium and
+	avatar.
+	
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/save.py:
 	Generate a runnable firewire configuration
 

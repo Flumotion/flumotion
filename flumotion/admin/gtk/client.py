@@ -326,15 +326,12 @@ class Window(log.Loggable, gobject.GObject):
     
     def file_open_cb(self, button):
         raise NotImplementedError
-    on_tool_open_clicked = file_open_cb
     
     def file_save_cb(self, button):
         raise NotImplementedError
-    on_tool_save_clicked = file_save_cb
     
     def file_quit_cb(self, button):
         self.close()
-    on_tool_quit_clicked = file_quit_cb
     
     def edit_properties_cb(self, button):
         raise NotImplementedError
@@ -439,6 +436,13 @@ class Window(log.Loggable, gobject.GObject):
         dialog.run()
         dialog.destroy()
 
+    on_tool_open_clicked = file_open_cb
+    on_tool_save_clicked = file_save_cb
+    on_tool_quit_clicked = file_quit_cb
+
+    def on_tool_clean_clicked(self, button):
+        self.admin.cleanComponents()
+        
     def show(self):
         # XXX: Use show()
         self.window.show_all()
