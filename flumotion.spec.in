@@ -61,7 +61,7 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-/usr/sbin/useradd -s /sbin/nologin -r -d %{_datadir}/flumotion -M -r flumotion
+/usr/sbin/useradd -s /sbin/nologin -r -d %{_datadir}/flumotion -M -r flumotion > /dev/null 2> /dev/null
 exit 0
 
 %post
@@ -69,6 +69,8 @@ exit 0
 if ! test -e %{_sysconfdir}/flumotion/managers/default/default.pem
 then
   bash %{_datadir}/ssl/certs/make-dummy-cert %{_sysconfdir}/flumotion/managers/default/default.pem
+  chown :flumotion %{_sysconfdir}/flumotion/managers/default/default.pem
+  chmod 640 %{_sysconfdir}/flumotion/managers/default/default.pem
 fi
 
 # this is going to break when the admin decides to rename planets
@@ -95,17 +97,19 @@ fi
 # if removal and not upgrade, clean up user and config
 if [ $1 -eq 0 ]
 then
-  service flumotion-manager stop > /dev/null
-  service flumotion-worker stop > /dev/null
+  service flu-manager stop > /dev/null
+  service flu-worker stop > /dev/null
   /usr/sbin/userdel flumotion
 
   rm -rf %{_sysconfdir}/flumotion/*
+  rm -rf %{_localstatdir}/lock/flumotion*
+  rm -rf %{_localstatdir}/run/flumotion*
 fi
 
 # Think about this first, we don't really want to stop everything
 #%post
-#service flumotion-manager condrestart
-#service flumotion-worker condrestart
+#service flu-manager condrestart
+#service flu-worker condrestart
 
 %files
 %defattr(-,root,root,-)
@@ -119,14 +123,10 @@ fi
 %{_libdir}/flumotion
 %{_datadir}/flumotion
 %dir %attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
-%{_sysconfdir}/flumotion
-
-#%ghost %config(noreplace) %attr(600,root,flumotion) %{_sysconfdir}/flumotion/managers/default/default.pem
+%attr(750,flumotion,root) %{_sysconfdir}/flumotion
 %attr(750,flumotion,root) %{_localstatedir}/log/flumotion
 %{_sysconfdir}/rc.d/init.d/flu-manager
 %{_sysconfdir}/rc.d/init.d/flu-worker
-#%ghost %{_sysconfdir}/flumotion/manager/default.pem
-#%ghost %{_sysconfdir}/flumotion/planets/default.xml
 
 %changelog
 * Mon Jun 07 2004 Thomas Vander Stichele <thomas at apestaart dot org>
