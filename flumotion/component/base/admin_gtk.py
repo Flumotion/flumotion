@@ -83,3 +83,9 @@ class BaseAdminGtk(log.Loggable):
         path = os.path.join(self.view.uidir, glade_file)
         wtree = gtk.glade.XML(path)
         return wtree
+
+    def propertyChanged(self, name, value):
+        """
+        I am meant to be overridden.
+        """
+        self.debug("pattern %s changed to %r" % (name, value))

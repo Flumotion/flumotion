@@ -121,16 +121,22 @@ class AdminAvatar(common.ManagerAvatar):
         self.debug("AdminAvatar.componentAdded: %s" % component)
         self.mindCallRemote('componentAdded', ComponentView(component))
         
-    def componentStateChanged(self, component, state):
-        self.debug("AdminAvatar.componentStateChanged: %s %s" % (component, state))
-        self.mindCallRemote('componentStateChanged', ComponentView(component), state)
-
     def componentRemoved(self, component):
         """
         Tell the avatar that a component has been removed.
         """
         self.debug("AdminAvatar.componentRemoved: %s" % component)
         self.mindCallRemote('componentRemoved', ComponentView(component))
+
+    def componentStateChanged(self, component, state):
+        self.debug("AdminAvatar.componentStateChanged: %s %s" % (component, state))
+        self.mindCallRemote('componentStateChanged', ComponentView(component), state)
+
+    def componentPropertyChanged(self, componentName, propertyName, value):
+        self.debug("AdminAvatar.componentPropertyChanged: %s.%s is %r" % (
+            componentName, propertyName, value))
+        self.mindCallRemote('componentPropertyChanged', componentName,
+            propertyName, value)
 
     def uiStateChanged(self, name, state):
         self.debug("AdminAvatar.uiStateChanged: %s %s" % (name, state))
@@ -296,6 +302,8 @@ class AdminHeaven(common.ManagerHeaven):
         
     ### my methods
 
+    # FIXME: all of these could be generalized instead of implementing them
+    # every step of the way
     def componentAdded(self, component):
         """
         Tell all created AdminAvatars that a component was added.
@@ -323,7 +331,19 @@ class AdminHeaven(common.ManagerHeaven):
         for avatar in self.getAvatars():
             avatar.componentStateChanged(component, state)
 
+    def componentPropertyChanged(self, componentName, propertyName, value):
+        """
+        Tell all created AdminAvatars that a property on a component has
+        changed.
 
+        @param componentName: name of the component
+        @param propertyName:  name of the property 
+        @param value:         new value
+        """
+        
+        for avatar in self.getAvatars():
+            avatar.componentPropertyChanged(componentName, propertyName, value)
+ 
     def uiStateChanged(self, name, state):
         """
         Tell all created AdminAvatars that an ui state for a component was changed

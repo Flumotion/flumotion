@@ -1,5 +1,19 @@
 2004-12-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* TODO:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	  allow components to notify their admin UI of changed property
+	  make videotest UI use this and properly block signals while
+	  updating UI
+
+2004-12-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/common/errors.py:

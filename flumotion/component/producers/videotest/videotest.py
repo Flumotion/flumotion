@@ -24,14 +24,31 @@ import gst
 
 from flumotion.component import feedcomponent
 
+class VideoTestMedium(feedcomponent.FeedComponentMedium):
+    def __init__(self, comp):
+        feedcomponent.FeedComponentMedium.__init__(self, comp)
+
+        # connect to pattern notify
+        source = self.comp.get_element('source')
+        source.connect('notify::pattern', self.cb_pattern_notify)
+
+    def cb_pattern_notify(self, object, pspec):
+        print "THOMAS: pspec %r" % pspec
+        pattern = object.get_property('pattern')
+        print "THOMAS: pattern %r" % pattern
+        self.callRemote('propertyChanged', self.comp.get_name(), 'pattern',
+            int(pattern))
+
 class VideoTest(feedcomponent.ParseLaunchComponent):
+
+    component_medium_class = VideoTestMedium
+    
     def __init__(self, name, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     [],
                                                     ['default'],
                                                     pipeline)
 
-# FIXME: connect to notify on pattern so we can send information to manager
 
 def setProp(struct, dict, name):
     if dict.has_key(name):

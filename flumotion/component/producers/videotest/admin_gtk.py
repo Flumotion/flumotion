@@ -60,7 +60,8 @@ class VideoTestAdminGtk(admin_gtk.BaseAdminGtk):
         self.combobox_pattern = fgtk.FComboBox()
         self.combobox_pattern.set_enum(enums.VideoTestPattern)
         self.combobox_pattern.set_active(result)
-        self.combobox_pattern.connect('changed', self.cb_pattern_changed)
+        self.pattern_changed_id = self.combobox_pattern.connect('changed',
+            self.cb_pattern_changed)
         self.widget.attach(self.combobox_pattern, 1, 2, 0, 1, 0, 0, 6, 6)
         self.combobox_pattern.show()
 
@@ -79,5 +80,14 @@ class VideoTestAdminGtk(admin_gtk.BaseAdminGtk):
         pattern = combobox.get_value()
         d = self.callRemote("setElementProperty", "source", "pattern", pattern)
         d.addErrback(_setPatternErrback)
+
+    def propertyChanged(self, name, value):
+        if name == "pattern":
+            self.debug("pattern changed to %r" % value)
+            c = self.combobox_pattern
+            id = self.pattern_changed_id
+            c.handler_block(id)
+            c.set_active(value)
+            c.handler_unblock(id)
 
 GUIClass = VideoTestAdminGtk

@@ -315,7 +315,17 @@ class Window(log.Loggable, gobject.GObject):
         comp = self.current_component
         if comp:
             comp.setUIState(state)
-        
+
+    def property_changed_cb(self, admin, componentName, propertyName, value):
+        # called when a property for that component has changed
+        current = self.get_selected_component_name()
+        if current != componentName:
+            return
+
+        comp = self.current_component
+        if comp:
+            comp.propertyChanged(propertyName, value)
+         
     def admin_update_cb(self, admin):
         self.update_components()
 
@@ -329,6 +339,8 @@ class Window(log.Loggable, gobject.GObject):
         self.admin.connect('connection-refused',
                            self.admin_connection_refused_cb, host, port)
         self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
+        self.admin.connect('component-property-changed',
+            self.property_changed_cb)
         self.admin.connect('update', self.admin_update_cb)
 
         if transport == "ssl":
