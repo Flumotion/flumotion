@@ -111,7 +111,7 @@ class WorkerHeaven(pb.Root, log.Loggable):
 
         # scan config for all atmosphere and flow component Entries
         entries = {}
-        if self.conf.atmosphere.components:
+        if self.conf.atmosphere and self.conf.atmosphere.components:
             entries.update(self.conf.atmosphere.components)
         for flowEntry in self.conf.flows:
             entries.update(flowEntry.components)

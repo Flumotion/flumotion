@@ -1,3 +1,21 @@
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/flows/ogg-test-theora.xml:
+	* conf/planets/default.xml:
+	  some changes for new structure
+	* flumotion.spec.in:
+	  some additions
+	* configure.ac:
+	* flumotion/configure/configure.py:
+	* flumotion/configure/installed.py.in:
+	* flumotion/configure/uninstalled.py.in:
+	* flumotion/test/test_configure.py:
+	  add logdir
+	* flumotion/manager/main.py:
+	* flumotion/manager/worker.py:
+	* flumotion/worker/main.py:
+	  use logdir when daemonizing
+
 2004-10-17  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/wizard/enums.py:
@@ -1239,7 +1257,6 @@
 	* flumotion/worker/worker.py:
 	  synchronize headers of source code
 
->>>>>>> .merge-right.r680
 2004-09-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/utils/Makefile.am:

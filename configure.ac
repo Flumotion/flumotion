@@ -21,8 +21,8 @@ AC_MSG_NOTICE(Storing data files in $DATADIR)
 AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
 AC_MSG_NOTICE(Storing configuration files in $SYSCONFDIR)
 
-dnl AS_AC_EXPAND(LOCALSTATEDIR, $localstatedir)
-dnl AC_MSG_NOTICE(Using localstatedir $LOCALSTATEDIR)
+AS_AC_EXPAND(LOCALSTATEDIR, $localstatedir)
+AC_MSG_NOTICE(Using localstatedir $LOCALSTATEDIR)
 
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL

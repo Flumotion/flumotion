@@ -27,6 +27,8 @@ class TestConfig(unittest.TestCase):
         assert isinstance(configure.gladedir, str)
         assert hasattr(configure, 'imagedir')
         assert isinstance(configure.imagedir, str)
+        assert hasattr(configure, 'logdir')
+        assert isinstance(configure.logdir, str)
         assert hasattr(configure, 'pythondir')
         assert isinstance(configure.pythondir, str)
         assert hasattr(configure, 'registrydir')

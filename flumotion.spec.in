@@ -13,10 +13,11 @@ Requires:	python >= 2.3
 Requires:	gstreamer >= 0.8.5
 Requires:	gstreamer-python
 Requires:	python-twisted >= 1.3.0
+Requires(post):	openssl
 
 BuildRequires:	gstreamer >= 0.8.5
 BuildRequires:	python >= 2.3
-#BuildRequires:	epydoc
+BuildRequires:	epydoc
 
 %description
 Fluendo Streaming Server.
@@ -33,20 +34,38 @@ make
 rm -rf $RPM_BUILD_ROOT
 
 %makeinstall
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/manager
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post
+# generate a default .pem certificate ?
+if ! test -e %{_datadir}/flumotion/flumotion.pem
+then
+  bash %{_datadir}/ssl/certs/make-dummy-cert %{_sysconfdir}/flumotion/manager/flumotion.pem
+fi
+
+# 
+%postun
+if [ $1 -e 0 ]
+then
+  # we are the last, so clean up
+  rm -rf %{_sysconfdir}/flumotion/*
+fi
+
 %files
 %defattr(-,root,root,-)
 %doc ChangeLog COPYING README AUTHORS
-#%doc doc/reference/html
+%doc doc/reference/html
 %doc conf
-%{_bindir}/flumotion
+%{_bindir}/flumotion-manager
+%{_bindir}/flumotion-worker
 %{_bindir}/flumotion-admin
 %{_bindir}/flumotion-tester
 %{_libdir}/flumotion
 %{_datadir}/flumotion
+%{_sysconfdir}/flumotion
 
 %changelog
 * Mon Jun 07 2004 Thomas Vander Stichele <thomas at apestaart dot org>

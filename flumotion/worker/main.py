@@ -21,12 +21,16 @@ import os
 
 from twisted.internet import reactor
 
+from flumotion.configure import configure
 from flumotion.common import log, keycards, common
 from flumotion.worker import worker
 from flumotion.twisted import credentials
 
 def main(args):
     parser = optparse.OptionParser()
+    parser.add_option('-v', '--verbose',
+                      action="store_true", dest="verbose",
+                      help="be verbose")
     parser.add_option('', '--version',
                       action="store_true", dest="version",
                       default=False,
@@ -69,8 +73,19 @@ def main(args):
         print common.version("flumotion-worker")
         return 0
 
+    if options.verbose:
+        log.setFluDebug("*:4")
+
     if options.daemonize:
-        common.daemonize()
+        if not os.path.exists(configure.logdir):
+            try:
+                os.makedirs(configure.logdir)
+            except:
+                sys.stderr.write("Could not create log file directory %d.\n" % configure.logdir)
+                return -1
+
+        logPath = os.path.join(configure.logdir, 'worker.log')
+        common.daemonize(stdout=logPath, stderr=logPath)
 
     # create a brain and have it remember the manager to direct jobs to
     brain = worker.WorkerBrain(options)

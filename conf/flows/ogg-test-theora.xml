@@ -1,8 +1,8 @@
 <planet>
 
-  <grids>
+  <flows>
 
-    <grid name="test">
+    <flow name="test">
       <component name="producer-video-test" type="producer">
         <feed>default</feed>
         <pipeline>
@@ -24,8 +24,8 @@
         <port>8800</port>
         <logfile>/tmp/ogg-test-theora.access.log</logfile>
       </component>
-    </grid>
+    </flow>
 
-  </grids>
+  </flows>
 
 </planet>

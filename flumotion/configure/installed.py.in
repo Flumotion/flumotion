@@ -20,10 +20,11 @@ import os
 def get():
     return {
         'isinstalled': True,
-        'configdir':   os.path.join('@SYSCONFDIR@', 'flumotion'),
-        'gladedir':    os.path.join('@DATADIR@', 'flumotion', 'glade'),
-        'imagedir':    os.path.join('@DATADIR@', 'flumotion', 'image'),
-        'pythondir':   os.path.join('@DATADIR@', 'flumotion'),
-        'registrydir': os.path.join(os.environ['HOME'], '.flumotion'),
-        'version':     '@VERSION@',
+        'configdir':     os.path.join('@SYSCONFDIR@', 'flumotion'),
+        'gladedir':      os.path.join('@DATADIR@', 'flumotion', 'glade'),
+        'imagedir':      os.path.join('@DATADIR@', 'flumotion', 'image'),
+        'logdir':        os.path.join('@LOCALSTATEDIR@', 'log', 'flumotion'),
+        'pythondir':     os.path.join('@DATADIR@', 'flumotion'),
+        'registrydir':   os.path.join(os.environ['HOME'], '.flumotion'),
+        'version':       '@VERSION@',
     }

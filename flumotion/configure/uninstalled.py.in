@@ -25,10 +25,11 @@ def get():
 
     return {
         'isinstalled': False,
-        'configdir':   os.path.join(__toplevel, 'conf'),
-        'gladedir':    os.path.join(__toplevel, 'data', 'glade'),
-        'imagedir':    os.path.join(__toplevel, 'data', 'image'),
-        'pythondir':   os.path.join(__toplevel),
-        'registrydir': os.path.join(__toplevel, 'data', 'registry'),
-        'version':     '@VERSION@',
+        'configdir':     os.path.join(__toplevel, 'conf'),
+        'gladedir':      os.path.join(__toplevel, 'data', 'glade'),
+        'imagedir':      os.path.join(__toplevel, 'data', 'image'),
+        'logdir':        os.path.join(__toplevel, 'log'),
+        'pythondir':     os.path.join(__toplevel),
+        'registrydir':   os.path.join(__toplevel, 'data', 'registry'),
+        'version':       '@VERSION@',
     }

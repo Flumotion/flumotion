@@ -133,7 +133,8 @@ def main(args):
         return 0
 
     if len(args) <= 1:
-        log.error('manager', 'Please specify a planet configuration file')
+        log.warning('manager', 'Please specify a planet configuration file')
+        sys.stderr.write("Please specify a planet configuration file.\n")
         return -1
 
     vishnu = manager.Vishnu()
@@ -147,7 +148,15 @@ def main(args):
         log.setFluDebug("*:4")
 
     if options.daemonize:
-        common.daemonize()
+        if not os.path.exists(configure.logdir):
+            try:
+                os.makedirs(configure.logdir)
+            except:
+                sys.stderr.write("Could not create log file directory %d.\n" % configure.logdir)
+                return -1
+                
+        logPath = os.path.join(configure.logdir, 'manager.log')
+        common.daemonize(stdout=logPath, stderr=logPath)
 
     if options.transport == "ssl":
         _startSSL(vishnu, options)

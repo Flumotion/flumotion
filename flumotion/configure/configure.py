@@ -27,16 +27,18 @@ and then access the variables from the configure module.  For example:
 @var  isinstalled: whether an installed version is being run
 @type isinstalled: boolean
 
-@var  configdir:   directory where configuration files are stored
-@type configdir:   string
-@var  gladedir:    directory where glade files are stored
-@type gladedir:    string
-@var  imagedir:    directory where image files are stored
-@type imagedir:    string
-@var  pythondir:   directory where the flumotion python files are stored
-@type pythondir:   string
-@var  registrydir: directory where the registry files are stored
-@type registrydir: string
+@var  configdir:     directory where configuration files are stored
+@type configdir:     string
+@var  gladedir:      directory where glade files are stored
+@type gladedir:      string
+@var  logdir:        directory where log files are stored
+@type logdir:        string
+@var  imagedir:      directory where image files are stored
+@type imagedir:      string
+@var  pythondir:     directory where the flumotion python files are stored
+@type pythondir:     string
+@var  registrydir:   directory where the registry files are stored
+@type registrydir:   string
 
 @var  version:     Flumotion version number
 @type version:     string
