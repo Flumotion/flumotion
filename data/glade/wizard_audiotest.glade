@@ -30,16 +30,17 @@
       <child>
 	<widget class="GtkLabel" id="label1">
 	  <property name="visible">True</property>
-	  <property name="label" translatable="yes">Volume:</property>
-	  <property name="use_underline">False</property>
+	  <property name="label" translatable="yes">_Volume:</property>
+	  <property name="use_underline">True</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">1</property>
+	  <property name="xalign">0</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
+	  <property name="mnemonic_widget">spinbutton_volume</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -54,16 +55,17 @@
       <child>
 	<widget class="GtkLabel" id="label2">
 	  <property name="visible">True</property>
-	  <property name="label" translatable="yes">Sample rate:</property>
-	  <property name="use_underline">False</property>
+	  <property name="label" translatable="yes">_Sample rate:</property>
+	  <property name="use_underline">True</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">1</property>
+	  <property name="xalign">0</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
+	  <property name="mnemonic_widget">combobox_samplerate</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -78,16 +80,17 @@
       <child>
 	<widget class="GtkLabel" id="label6">
 	  <property name="visible">True</property>
-	  <property name="label" translatable="yes">Frequency:</property>
-	  <property name="use_underline">False</property>
+	  <property name="label" translatable="yes">F_requency:</property>
+	  <property name="use_underline">True</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
 	  <property name="wrap">False</property>
 	  <property name="selectable">False</property>
-	  <property name="xalign">1</property>
+	  <property name="xalign">0</property>
 	  <property name="yalign">0.5</property>
 	  <property name="xpad">0</property>
 	  <property name="ypad">0</property>
+	  <property name="mnemonic_widget">spinbutton_freq</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
