@@ -64,6 +64,7 @@ flumotion/server/Makefile
 flumotion/twisted/Makefile
 flumotion/utils/Makefile
 m4/Makefile
+conf/Makefile
 doc/Makefile
 doc/reference/Makefile
 tests/Makefile
