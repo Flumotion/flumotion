@@ -403,6 +403,15 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         # 3 component states + avatarId's gotten from the config
         self.assertEqual(len(mappers.keys()), 6)
 
+        # verify dag edges
+        id = '/testflow/producer-video-test'
+        state = mappers[id].state
+        o = self.vishnu._dag.getOffspring(state)
+        names = [s.get('name') for s in o]
+        self.failIf('producer-video-test' in names)
+        self.failUnless('converter-ogg-theora' in names)
+        self.failUnless('streamer-ogg-theora' in names)
+        
         # log in a worker and verify components get started
         avatar = self._loginWorker('worker')
 

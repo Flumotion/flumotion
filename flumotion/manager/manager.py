@@ -35,7 +35,7 @@ from twisted.spread import pb
 from twisted.cred import portal
 
 from flumotion.common import bundle, config, errors, interfaces, log, registry
-from flumotion.common import planet, common
+from flumotion.common import planet, common, dag
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base
@@ -170,6 +170,8 @@ class Vishnu(log.Loggable):
         self.state = planet.ManagerPlanetState()
         self.state.set('name', name)
 
+        self._dag = dag.DAG() # component dependency graph
+        
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a bouncer
         # FIXME: decide if we allow anonymous login in this small (?) window
@@ -218,14 +220,23 @@ class Vishnu(log.Loggable):
 
         # now add stuff from the config that did not exist in self.state yet
         self.debug('syncing up planet state with config')
+        added = [] # added components while parsing
+        
         if conf.atmosphere:
             for c in conf.atmosphere.components:
-                self.debug('FIXME: checking config component %s' % c.name)
+                self.debug('checking atmosphere config component %s' % c.name)
+                isOurComponent = lambda x: x.get('name') == c.name
+                atmosphere = self.state.get('atmosphere')
+                l = filter(isOurComponent, atmosphere.get('components'))
+                if len(l) == 0:
+                    self.info('Adding component "%s" to atmosphere' % c.name)
+                    state = self._addComponent(c, atmosphere)
+                    added.append(state)
 
         if conf.flows:
             for f in conf.flows:
                 self.debug('checking flow %s' % f.name)
-                # check if we have this flow yet
+                # check if we have this flow yet and add if not
                 isOurFlow = lambda x: x.get('name') == f.name
                 l = filter(isOurFlow, self.state.get('flows'))
                 if len(l) == 0:
@@ -238,31 +249,40 @@ class Vishnu(log.Loggable):
                     flow = l[0]
                 
                 for c in f.components.values():
-                    self.info('Adding component "%s" to flow "%s"' % (
-                        c.name, f.name))
                     self.debug('checking config component %s' % c.name)
                     isOurComponent = lambda x: x.get('name') == c.name
                     l = filter(isOurComponent, flow.get('components'))
                     if len(l) == 0:
-                        self.debug('adding component %s' % c.name)
-                        comp = planet.ManagerComponentState()
-                        comp.set('name', c.name)
-                        comp.set('type', c.getType())
-                        comp.set('workerRequested', c.worker)
-                        comp.set('parent', flow)
-                        comp.set('mood', moods.sleeping.value)
-                        comp.set('config', c.getConfigDict())
-                        flow.append('components', comp)
+                        self.info('Adding component "%s" to flow "%s"' % (
+                            c.name, f.name))
+                        state = self._addComponent(c, flow)
+                        added.append(state)
 
-                        parentName = flow.get('name')
-                        avatarId = common.componentPath(c.name, parentName)
+        # register dependencies of added components
+        for state in added:
+            self.debug('registering dependencies of %r' % state)
+            dict = state.get('config')
 
-                        # add to mapper
-                        m = ComponentMapper()
-                        m.state = comp
-                        m.id = avatarId
-                        self._componentMappers[comp] = m
-                        self._componentMappers[avatarId] = m
+            if not dict.has_key('source'):
+                continue
+
+            list = dict['source']
+
+            # FIXME: there's a bug in config parsing - sometimes this gives us
+            # one string, and sometimes a list of one string, and sometimes
+            # a list
+            if isinstance(list, str):
+                list = [list, ]
+            for eater in list:
+                name = eater
+                if ':' in name:
+                    name = eater.split(':')[0]
+
+                flowName = state.get('parent').get('name')
+                avatarId = common.componentPath(name, flowName)
+                parentState = self._componentMappers[avatarId].state
+                self.debug('depending %r on %r' % (state, parentState))
+                self._dag.addEdge(parentState, state)
 
         # now start all components that need starting
         components = self._getComponentsToStart()
@@ -282,6 +302,40 @@ class Vishnu(log.Loggable):
             for c in ours:
                 components.remove(c)
  
+    def _addComponent(self, config, parent):
+        """
+        Add a component state for the given component config entry.
+
+        @returns: L{flumotion.common.planet.ManagerComponentState}
+        """
+
+        self.debug('adding component %s' % config.name)
+        
+        state = planet.ManagerComponentState()
+        state.set('name', config.name)
+        state.set('type', config.getType())
+        state.set('workerRequested', config.worker)
+        state.set('mood', moods.sleeping.value)
+        state.set('config', config.getConfigDict())
+
+        state.set('parent', parent)
+        parent.append('components', state)
+
+        parentName = parent.get('name')
+        avatarId = common.componentPath(config.name, parentName)
+
+        # add to mapper
+        m = ComponentMapper()
+        m.state = state
+        m.id = avatarId
+        self._componentMappers[state] = m
+        self._componentMappers[avatarId] = m
+
+        # add nodes to graph
+        self._dag.addNode(state)
+
+        return state
+
     def _setupBundleBasket(self):
         self.bundlerBasket = bundle.BundlerBasket()
 

@@ -2,6 +2,12 @@
 
 	* flumotion/manager/manager.py:
 	* flumotion/test/test_manager_manager.py:
+	  create a graph of component dependencies
+
+2005-02-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_manager_manager.py:
 	  revert change to emptyPlanet until we refactor manager code
 
 2005-02-15  Andy Wingo  <wingo@pobox.com>
