@@ -53,19 +53,16 @@ class FilenameNode(BaseAdminGtkNode):
         d.addErrback(self.changeFilenameErrback)
 
     def changeFilenameErrback(self,failure):
-        self.warning("Failure %s changing filename: %s" % (failure.type, failure.getErrorMessage()))
+        self.warning("Failure %s changing filename: %s" % (
+            failure.type, failure.getErrorMessage()))
         return None
 
     def filenameChanged(self, filename):
         self.currentFilenameLabel.set_text(filename)
     
-    
-
-
-
 class DiskerAdminGtk(BaseAdminGtk):
     def setup(self):
-        filename = FilenameNode(self.name, self.admin, self.view)
+        filename = FilenameNode(self.state, self.admin, self.view)
         self._nodes = {'Filename' : filename}
 
     def getNodes(self):
