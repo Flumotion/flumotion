@@ -1,5 +1,13 @@
 2004-10-25  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_firewire.glade:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/steps.py:
+
+	Add firewire to the wizard and add good defaults.
+	
+2004-10-25  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/producers/firewire/firewire.py:
 
 	Add width, height and framerate
