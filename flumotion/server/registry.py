@@ -30,7 +30,16 @@ class Property:
         self.type = type
         self.required = required
         self.multiple = multiple
-        
+
+    def __repr__(self):
+        return '<Property name=%s>' % self.name
+    
+    def getName(self):
+        return self.name
+    
+    def isRequired(self):
+        return self.required
+    
 class Component:
     def __init__(self, type, factory, source, properties):
         self.type = type
@@ -71,7 +80,7 @@ def check_node(node, tag):
 
 class RegistryXmlParser:
     def __init__(self, filename):
-        self.components = []
+        self.components = {}
     
         #debug('Parsing XML file: %s' % filename)
         self.doc = minidom.parse(filename)
@@ -82,8 +91,11 @@ class RegistryXmlParser:
         return self.path
 
     def getComponents(self):
-        return self.components
+        return self.components.values()
 
+    def getComponent(self, name):
+        return self.components[name]
+    
     def parse(self):
         # <components>
         #   <component>
@@ -97,21 +109,29 @@ class RegistryXmlParser:
             if node.nodeType != Node.ELEMENT_NODE:
                 continue
             if node.nodeName == 'component':
-                component = self.parse_components(node)
-                self.components.append(component)
+                component = self.parse_component(node)
+                self.components[component.getType()] = component
             else:
                 raise XmlParserError, "unexpected node: %s" % child
             
-    def parse_components(self, node):
+    def parse_component(self, node):
         # <component type="...">
         #   <source>
         #   <properties>
         # </component>
         if not node.hasAttribute('type'):
             raise XmlParserError, "<component> must have a type attribute"
+        type = str(node.getAttribute('type'))
+
+        properties = {}
+        # Merge in options for inherit
+        if node.hasAttribute('inherit'):
+            base_type = str(node.getAttribute('inherit'))
+            base = self.getComponent(base_type)
+            for prop in base.getProperties():
+                properties[prop.getName()] = prop
 
         source = None
-        properties = None
         for child in node.childNodes:
             if child.nodeType != Node.ELEMENT_NODE:
                 continue
@@ -119,19 +139,17 @@ class RegistryXmlParser:
             if child.nodeName == 'source':
                 source = self.parse_source(child)
             elif child.nodeName == 'properties':
-                properties = self.parse_properties(child)
+                child_properties = self.parse_properties(properties, child)
             else:
                 raise XmlParserError, "unexpected node: %s" % child
-
 
         factory = True
         if node.hasAttribute('factory'):
             factory = node.getAttribute('factory')
             if factory in ('false', 'no'):
                 factory = False
-            
-        return Component(str(node.getAttribute('type')),
-                         factory, source, properties)
+
+        return Component(type, factory, source, properties.values())
 
     def parse_source(self, node):
         # <source location="..."/>
@@ -140,12 +158,11 @@ class RegistryXmlParser:
 
         return str(node.getAttribute('location'))
 
-    def parse_properties(self, node):
+    def parse_properties(self, properties, node):
         # <properties>
         #   <property name="..." type="" required="yes/no" multiple="yes/bno"/>
         #  </properties>
         
-        properties = []
         for child in node.childNodes:
             if (child.nodeType == Node.TEXT_NODE or
                 child.nodeType == Node.COMMENT_NODE):
@@ -170,10 +187,8 @@ class RegistryXmlParser:
                 optional['multiple'] = child.getAttribute('multiple') == 'yes'
 
             property = Property(name, type, **optional)
-            
-            properties.append(property)
 
-        return properties
+            properties[name] = property
 
 class ComponentRegistry:
     def __init__(self):

@@ -24,7 +24,7 @@
       <property name="source" type="string" multiple="yes"/>
     </properties>
   </component>
-  
+
   <component type="http-streamer">
     <source location="flumotion.components.http" inherit="base"/>
     <properties>
@@ -50,6 +50,14 @@
       <property name="filename" type="string" required="yes"/>
       <property name="type" type="string"/>
       <property name="domain" type="string"/>
+    </properties>
+  </component>
+
+  <component type="overlay">
+    <source location="flumotion.components.overlay"/>
+    <properties>
+      <property name="source" type="string" multiple="no"/>
+      <property name="location" type="string" required="yes"/>
     </properties>
   </component>
 

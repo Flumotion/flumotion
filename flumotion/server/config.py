@@ -74,6 +74,15 @@ class FlumotionConfigXML:
         entry = self.entries[name]
         return entry.getType()
     
+    def getFunction(self, defs):
+        source = defs.getSource()
+        module = reflect.namedAny(source)
+        if not hasattr(module, 'createComponent'):
+            self.warn('no createComponent() for %s' % source)
+            return
+        
+        return module.createComponent
+    
     def parse(self):
         # <root>
         #     <component>
@@ -102,24 +111,26 @@ class FlumotionConfigXML:
         if not node.hasAttribute('type'):
             raise XmlParserError, "<component> must have a type attribute"
 
-        config = {}
-        config['name'] = name = str(node.getAttribute('name'))
-        config['type'] = type = str(node.getAttribute('type'))
-        config['config'] = self
+        type = str(node.getAttribute('type'))
+        name = str(node.getAttribute('name'))
         
         defs = registry.getComponent(type)
-        
-        config['start-factory'] = defs.isFactory()
-        
-        self.parse_property_def(type, defs.getProperties(), node, config)
-        
-        module = reflect.namedAny(defs.source)
-        if not hasattr(module, 'createComponent'):
-            self.warn('no createComponent() for %s' % defs.source)
+        properties = defs.getProperties()
+
+        self.msg('Parsing component: %s' % name)
+        options = self.parseProperties(node, type, properties)
+
+        function = self.getFunction(defs)
+        if not function:
             return
-        function = module.createComponent
-        entry = ConfigEntry(name, type, function, config)
-        return entry
+        
+        config = { 'name': name,
+                   'type': type,
+                   'config' : self,
+                   'start-factory': defs.isFactory() }
+        config.update(options)
+        
+        return ConfigEntry(name, type, function, config)
 
     def get_int_value(self, nodes):
         values = []
@@ -163,9 +174,9 @@ class FlumotionConfigXML:
 
         return values
 
-    def parse_property_def(self, type, defs, node, config):
-        self.msg('Parsing component: %s' % config['name'])
-        for definition in defs:
+    def parseProperties(self, node, type, properties):
+        config = {}
+        for definition in properties:
             name = definition.name
 
             nodes = []
@@ -173,7 +184,7 @@ class FlumotionConfigXML:
                 if subnode.nodeName == name:
                     nodes.append(subnode)
                 
-            if definition.required and not nodes:
+            if definition.isRequired() and not nodes:
                 raise ConfigError("%s is required but not specified" % name)
 
             if not definition.multiple and len(nodes) > 1:
@@ -195,7 +206,6 @@ class FlumotionConfigXML:
             if not definition.multiple:
                 value = value[0]
             
-            #print '%s=%r' % (name, value)
             config[name] = value
             
-        #raise SystemExit
+        return config

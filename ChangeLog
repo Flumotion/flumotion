@@ -1,5 +1,16 @@
 2004-08-11  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/server/config.py (FlumotionConfigXML.parse_entry):
+	Clean up
+
+	* flumotion/server/registry.py
+	(RegistryXmlParser.parse_component): Implement inheritence
+
+	* flumotion/components/http.py: Clean up
+	(HTTPStreamingResource.render): Refactor different results here
+
+	* flumotion/components/overlay.py: New component
+
 	* flumotion/server/config.py (ConfigEntry): Rename to sort out things
 
 	* flumotion/server/auth.py: Authentication helper functions

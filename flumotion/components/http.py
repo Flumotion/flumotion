@@ -243,25 +243,17 @@ class HTTPStreamingResource(resource.Resource):
         
     def isAuthenticated(self, request):
         if not self.auth:
-            # return True always until implemented nicely
             return True
 
         keycard = HTTPClientKeycard(request)
         return self.auth.authenticate(keycard)
     
-        #if request.getClientIP() == '127.0.0.1':
-        #    return True
-        #if request.getUser() == 'fluendo' and request.getPassword() == 's3cr3t':
-        #    return True
-        #return False
-    
     def getChild(self, path, request):
-        if path and path == 'stats':
+        if path == 'stats':
             return self.admin
         return self
 
     def setHeaders(self, request):
-        # XXX: Use request.setHeader/request.write
         fd = request.transport.fileno()
         headers = []
         def setHeader(field, name):
@@ -273,31 +265,29 @@ class HTTPStreamingResource(resource.Resource):
         
         mime = self.streamer.get_mime()
         if mime == 'multipart/x-mixed-replace':
-            self.msg('setting Content-type to %s but with camserv hack' % mime)
-            # Stolen from camserv
             setHeader('Cache-Control', 'no-cache')
             setHeader('Cache-Control', 'private')
             setHeader("Content-type", "%s;boundary=ThisRandomString" % mime)
         else:
-            self.msg('setting Content-type to %s' % mime)
             setHeader('Content-type', mime)
-
+            
+        self.msg('setting Content-type to %s' % mime)
         os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
         
     def update_average(self):
         # update running average of clients connected
-        now = time.time()
+        self.average_time = now = time.time()
         # calculate deltas
-        dt1 = self.average_time - self.start_time
-        dc1 = self.average_client_number
-        dt2 = now - self.average_time
-        dc2 = len(self.request_hash)
-        self.average_time = now
-        if dt1 == 0:
+        if self.average_time - self.start_time == 0:
             # first measurement
             self.average_client_number = 0
         else:
-            self.average_client_number = dc1 * dt1 / (dt1 + dt2) + dc2 * dt2 / (dt1 + dt2)
+            dt1 = self.average_time - self.start_time
+            dc1 = self.average_client_number
+            dt2 = now - self.average_time
+            dc2 = len(self.request_hash)
+            self.average_client_number = (dc1 * dt1 / (dt1 + dt2) +
+                                          dc2 * dt2 / (dt1 + dt2))
 
     def addClient(self, request):
         fd = request.transport.fileno()
@@ -307,42 +297,53 @@ class HTTPStreamingResource(resource.Resource):
             self.peak_client_number = len(self.request_hash)
         self.update_average()
         self.streamer.add_client(fd)
+
+    def handleNotReady(self, request):
+        self.msg('Not sending data, it\'s not ready')
+        return server.NOT_DONE_YET
         
-    def render(self, request):
-        self.msg('client from %s connected' % (request.getClientIP()))
-    
-        sink = self.streamer.get_sink()
-        if not self.isReady():
-            self.msg('Not sending data, it\'s not ready')
-            return server.NOT_DONE_YET
-
-        if len(self.request_hash) >= 1001:
-            self.msg('Refusing clients, already 1001 clients')
-            error_code = http.SERVICE_UNAVAILABLE
-            request.setResponseCode(error_code)
-            request.setHeader('server', HTTP_VERSION)
-            request.setHeader('content-type', 'text/html')
-            return ERROR_TEMPLATE % {'code': error_code,
-                                     'error': http.RESPONSES[error_code]}
+    def handleMaxclients(self, request):
+        self.msg('Refusing clients, already 1001 clients')
+        request.setHeader('content-type', 'text/html')
+        request.setHeader('server', HTTP_VERSION)
+        
+        error_code = http.SERVICE_UNAVAILABLE
+        request.setResponseCode(error_code)
+        
+        return ERROR_TEMPLATE % {'code': error_code,
+                                 'error': http.RESPONSES[error_code]}
+        
+    def handleUnauthorized(self, request):
+        self.msg('client from %s is unauthorized' % (request.getClientIP()))
+        request.setHeader('content-type', 'text/html')
+        request.setHeader('server', HTTP_VERSION)
+        if self.auth:
+            request.setHeader('WWW-Authenticate',
+                              'Basic realm="%s"' % self.auth.getDomain())
             
-        if not self.isAuthenticated(request):
-            self.msg('client from %s is unauthorized' % (request.getClientIP()))
-            error_code = http.UNAUTHORIZED
-            request.setResponseCode(error_code)
-            request.setHeader('server', HTTP_VERSION)
-            request.setHeader('content-type', 'text/html')
-            
-            if self.auth:
-                request.setHeader('WWW-Authenticate',
-                                  'Basic realm="%s"' % self.auth.getDomain())
+        error_code = http.UNAUTHORIZED
+        request.setResponseCode(error_code)
+        
+        return ERROR_TEMPLATE % {'code': error_code,
+                                 'error': http.RESPONSES[error_code]}
 
-            return ERROR_TEMPLATE % {'code': error_code,
-                                     'error': http.RESPONSES[error_code]}
-
+    def handleNewClient(self, request):
         # everything fulfilled, serve to client
         self.setHeaders(request)
         self.addClient(request)
         return server.NOT_DONE_YET
+        
+    def render(self, request):
+        self.msg('client from %s connected' % (request.getClientIP()))
+    
+        if not self.isReady():
+            return self.handleNotReady(request)
+        elif len(self.request_hash) >= 1001:
+            return self.handleMaxclients(request)
+        elif not self.isAuthenticated(request):
+            return self.handleUnauthorized(request)
+        else:
+            return self.handleNewClient(request)
 
 class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     pipe_template = 'multifdsink name=sink ' + \
