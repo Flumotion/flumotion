@@ -205,9 +205,9 @@ def argRepr(args=(), kwargs={}):
             
     return s
 
-def _listRecursivly(path):
+def _listRecursively(path):
     """
-    I'm similar to os.listdir, but I work recursivly
+    I'm similar to os.listdir, but I work recursively
     
     @param path: the path
     @type  path: string
@@ -224,7 +224,7 @@ def _listRecursivly(path):
         pass
     else:
         for f in files:
-            retval += _listRecursivly(os.path.join(path, f))
+            retval += _listRecursively(os.path.join(path, f))
 
     if os.path.exists(os.path.join(path, '__init__.py')):
         retval.append(path)
@@ -238,7 +238,7 @@ def _findPackages(path):
     @type  path: string
     """
 
-    dirs = _listRecursivly(path)
+    dirs = _listRecursively(path)
     if path in dirs:
         dirs.remove(path)
         
