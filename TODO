@@ -1,3 +1,7 @@
+* MEDIUM	decide on style for properties in xml:
+		mount-point, mountpoint or mountPoint
+		some of these are gotten from glade file !
+
 * MEDIUM	add api for admins to "subscribe" to admin methods in the
 		manager, so only relevant commands get sent
 
