@@ -26,11 +26,28 @@ import time
 
 import gobject
 import gst
+from twisted.protocols import http
 from twisted.web import server, resource
 from twisted.internet import reactor
 
 from flumotion.server import component
 from flumotion.utils import gstutils
+
+HTTP_NAME = 'FlumotionHTTPServer'
+HTTP_VERSION = '0.1.0'
+
+ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+  <title>%(code)d %(error)s</title>
+</head>
+<body>
+<h2>%(code)d %(error)s</h2>
+</body>
+</html>
+
+"""
+HTTP_VERSION = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 
 class HTTPStreamingResource(resource.Resource):
     def __init__(self, streamer, location):
@@ -63,7 +80,6 @@ class HTTPStreamingResource(resource.Resource):
             bytes_sent = -1
             time_connected = -1
 
-        print headers
         # ip address
         # ident
         # authenticated name (from http header)
@@ -76,16 +92,16 @@ class HTTPStreamingResource(resource.Resource):
         # time connected
         ident = '-'
         username = '-'
-        date = time.strftime('[%d/%b/%Y:%H:%M:%S %z]', time.localtime())
-        request = 'GET / HTTP/1.0'
-        response = 200
+        date = time.strftime('%d/%b/%Y:%H:%M:%S %z', time.localtime())
+        request_str = '%s %s %s' % (request.method, request.uri, request.clientproto)
+        response = request.code
         referer = headers.get('referer', '-')
         user_agent = headers.get('user-agent', '-')
-        msg = "%s %s %s %s \"%s\" %d %d %s \"%s\" %d\n" % (ip, ident, username,
-                                                           date, request,
-                                                           response, bytes_sent,
-                                                           referer, user_agent,
-                                                           time_connected)
+        msg = "%s %s %s [%s] \"%s\" %d %d %s \"%s\" %d\n" % (ip, ident, username,
+                                                             date, request_str,
+                                                             response, bytes_sent,
+                                                             referer, user_agent,
+                                                             time_connected)
         self.logfile.write(msg)
         self.logfile.flush()
 
@@ -103,38 +119,59 @@ class HTTPStreamingResource(resource.Resource):
             return False
         
         return True
-        
+
+    def isAuthenticated(self, request):
+        if request.getClientIP() == '127.0.0.1':
+            return True
+        return False
+    
     def getChild(self, path, request):
         return self
 
-    def render(self, request):
-        ip = request.getClientIP()
+    def setHeaders(self, request):
+        # XXX: Use request.setHeader/request.write
         fd = request.transport.fileno()
-        self.request_hash[fd] = request
-        self.msg('(%d) client from %s connected' % (fd, ip))
+        headers = []
+        def setHeader(field, name):
+            headers.append('%s: %s\r\n' % (field, name))
+
+        # Mimic Twisted as close as possible
+        setHeader('Server', HTTP_VERSION)
+        setHeader('Date', http.datetimeToString())
+        
+        mime = self.streamer.get_mime()
+        if mime == 'multipart/x-mixed-replace':
+            self.msg('setting Content-type to %s but with camserv hack' % mime)
+            # Stolen from camserv
+            setHeader('Cache-Control', 'no-cache')
+            setHeader('Cache-Control', 'private')
+            setHeader("Content-type", "%s;boundary=ThisRandomString" % mime)
+        else:
+            self.msg('setting Content-type to %s' % mime)
+            setHeader('Content-type', mime)
+
+        os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
+        
+    def render(self, request):
+        fd = request.transport.fileno()
+        self.msg('(%d) client from %s connected' % (fd, request.getClientIP()))
     
         if not self.isReady():
             self.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
-        mime = self.streamer.get_mime()
-        if mime == 'multipart/x-mixed-replace':
-            self.msg('setting Content-type to %s but with camserv hack' % mime)
-            # Stolen from camserv
-            request.setHeader('Cache-Control', 'no-cache')
-            request.setHeader('Cache-Control', 'private')
-            request.setHeader("Content-type", "%s;boundary=ThisRandomString" % mime)
+        if self.isAuthenticated(request):
+            self.setHeaders(request)
+            self.request_hash[fd] = request
+            self.streamer.add_client(fd)
+            return server.NOT_DONE_YET
         else:
-            self.msg('setting Content-type to %s' % mime)
-            request.setHeader('Content-type', mime)
-
-        self.streamer.add_client(fd)
-        # Noop to write headers, bad twisted
-        request.write('')
-        
-        #request.notifyFinish().addBoth(self.lost, fd, ip)
-        
-        return server.NOT_DONE_YET
+            error_code = http.UNAUTHORIZED
+            request.setHeader('server', HTTP_VERSION)
+            request.setHeader('content-type', 'text/html')
+            
+            return ERROR_TEMPLATE % {'code': error_code,
+                                     'error': http.RESPONSES[error_code]}
 
 class FileSinkStreamer(component.ParseLaunchComponent):
     kind = 'streamer'
@@ -204,7 +241,10 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
         self.__gobject_init__()
         component.ParseLaunchComponent.__init__(self, name, sources, [], self.pipe_template)
         self.caps = None
-        
+
+    def __repr__(self):
+        return '<MultifdSinkStreamer (%s) object at 0x%x>' % (self.component_name, id(self))
+    
     def notify_caps_cb(self, element, pad, param):
         caps = pad.get_negotiated_caps()
         if caps is None:
@@ -240,6 +280,9 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     def client_removed_cb(self, sink, fd):
         self.emit('client-removed', sink, fd)
         
+    def client_added_cb(self, sink, fd):
+        pass
+
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
         self.setup_sources(sources)
@@ -247,6 +290,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
         sink.connect('deep-notify::caps', self.notify_caps_cb)
         sink.connect('state-change', self.feed_state_change_cb, '')
         sink.connect('client-removed', self.client_removed_cb)
+        sink.connect('client-added', self.client_added_cb)
         
         self.pipeline_play()
 

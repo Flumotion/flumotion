@@ -1,5 +1,9 @@
 2004-07-27  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/server/streamer.py (HTTPStreamingResource.setHeader):
+	Rewrite most part of the HTTP server, handles simple
+	authentication now, ready for the new authentication framework.
+
 	* conf/videotest-jpeg.conf: Overlay an image.
 
 2004-07-23  Johan Dahlin  <johan@gnome.org>
