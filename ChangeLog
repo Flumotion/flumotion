@@ -1,3 +1,11 @@
+2004-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/admin.glade:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	  abstract tie between model and view further.
+	  add a reload of only one component to speed up debugging.
+
 2004-09-09  Johan Dahlin  <johan@gnome.org>
 
 	* bin/Makefile.am:

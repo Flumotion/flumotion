@@ -110,7 +110,7 @@ class Window(log.Loggable):
         self.imagedir = config.imagedir
         self.connect(host, port)
         self.create_ui()
-        self.current_component = None
+        self.current_component = None # the component we're showing UI for
         
     # default Errback
     def _defaultErrback(self, failure):
@@ -150,7 +150,7 @@ class Window(log.Loggable):
         self.icon_stopped = self.window.render_icon(gtk.STOCK_NO,
                                                     gtk.ICON_SIZE_MENU)
 
-    def get_selected_component(self):
+    def get_selected_component_name(self):
         selection = self.component_view.get_selection()
         sel = selection.get_selected()
         if not sel:
@@ -192,18 +192,6 @@ class Window(log.Loggable):
 
         self.current_component = instance
         
-    def component_view_row_activated_cb(self, *args):
-        name = self.get_selected_component()
-
-        if not name:
-            self.warning('Select a component')
-            return
-
-        def cb_gotUI(data):
-            self.show_component(name, data)
-            
-        cb = self.admin.getUIEntry(name)
-        cb.addCallback(cb_gotUI)
 
     def error_dialog(self, message, parent=None, response=True):
         """
@@ -226,9 +214,21 @@ class Window(log.Loggable):
 
     ### glade callbacks
 
+    def component_view_row_activated_cb(self, *args):
+        name = self.get_selected_component_name()
+
+        if not name:
+            self.warning('Select a component')
+            return
+
+        def cb_gotUI(data):
+            self.show_component(name, data)
+            
+        cb = self.admin.getUIEntry(name)
+        cb.addCallback(cb_gotUI)
+
     def admin_connected_cb(self, admin):
-        # FIXME: abstract away admin's clients
-        self.update(admin.components)
+        self.update_components()
 
     def admin_connection_refused_later(self, host, port):
         message = "Connection to manager on %s:%d was refused." % (host, port)
@@ -241,7 +241,7 @@ class Window(log.Loggable):
         log.debug('adminclient', "handled connection-refused")
 
     def admin_ui_state_changed_cb(self, admin, name, state):
-        current = self.get_selected_component()
+        current = self.get_selected_component_name()
         if current != name:
             return
 
@@ -249,8 +249,8 @@ class Window(log.Loggable):
         if comp:
             comp.setUIState(state)
         
-    def admin_update_cb(self, admin, components):
-        self.update(components)
+    def admin_update_cb(self, admin):
+        self.update_components()
 
     ### functions
 
@@ -264,15 +264,19 @@ class Window(log.Loggable):
         self.admin.connect('update', self.admin_update_cb)
         reactor.connectTCP(host, port, self.admin.factory)
         
-    def update(self, orig_components):
+    def update_components(self):
         model = self.component_model
         model.clear()
 
-        # Make a copy
-        components = orig_components[:]
-        components.sort()
+        # get a dictionary of components
+        components = self.admin.get_components()
+        names = components.keys()
+        names.sort()
 
-        for component in components:
+        # FIXME: this part should have abstractions so you can get state
+        # of components from admin instead of directly
+        for name in names:
+            component = components[name]
             iter = model.append()
             if component.state == gst.STATE_PLAYING:
                 pixbuf = self.icon_playing
@@ -300,7 +304,13 @@ class Window(log.Loggable):
     def debug_reload_manager_cb(self, button):
         deferred = self.admin.reloadManager()
 
+    def debug_reload_component_cb(self, button):
+        name = self.get_selected_component_name()
+        if name:
+            deferred = self.admin.reloadComponent(name)
+
     def debug_reload_all_cb(self, button):
+        # FIXME: move all of the reloads over to this dialog
         def _stop(dialog):
             dialog.stop()
             dialog.destroy()
@@ -324,7 +334,7 @@ class Window(log.Loggable):
         reactor.callLater(0.2, _callLater, self.admin, dialog)
  
     def debug_modify_cb(self, button):
-        name = self.get_selected_component()
+        name = self.get_selected_component_name()
         if not name:
             self.warning('Select a component')
             return

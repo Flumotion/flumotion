@@ -46,7 +46,7 @@
 		      <signal name="activate" handler="file_open_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image23">
+			<widget class="GtkImage" id="image29">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-open</property>
 			  <property name="icon_size">1</property>
@@ -67,7 +67,7 @@
 		      <signal name="activate" handler="file_save_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image24">
+			<widget class="GtkImage" id="image30">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save</property>
 			  <property name="icon_size">1</property>
@@ -94,7 +94,7 @@
 		      <signal name="activate" handler="file_quit_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image25">
+			<widget class="GtkImage" id="image31">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-quit</property>
 			  <property name="icon_size">1</property>
@@ -128,7 +128,7 @@
 		      <signal name="activate" handler="edit_properties_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image26">
+			<widget class="GtkImage" id="image32">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-properties</property>
 			  <property name="icon_size">1</property>
@@ -153,6 +153,15 @@
 
 	      <child>
 		<widget class="GtkMenu" id="debug1_menu">
+
+		  <child>
+		    <widget class="GtkMenuItem" id="reload_component">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Reload component</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="debug_reload_component_cb" last_modification_time="Thu, 09 Sep 2004 10:10:38 GMT"/>
+		    </widget>
+		  </child>
 
 		  <child>
 		    <widget class="GtkMenuItem" id="debug_reload_controller">

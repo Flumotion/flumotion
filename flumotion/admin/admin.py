@@ -36,13 +36,15 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     """
     I live in the admin client.
     I am a data model for any admin view implementing a UI.
+    I send signals when things happen.
+    I only communicate names of objects to views, not actual objects.
     Manager calls on us through L{flumotion.manager.admin.AdminAvatar}
     """
     gsignal('connected')
     gsignal('connection-refused')
     gsignal('ui-state-changed', str, object)
     gsignal('reloading', str)
-    gsignal('update', object)
+    gsignal('update')
     
     logCategory = 'adminmodel'
 
@@ -55,6 +57,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                                interfaces.IAdminComponent)
         d.addCallback(self._gotPerspective)
         d.addErrback(self._loginErrback)
+        self.components = {} # dict of components
 
     def _gotPerspective(self, perspective):
         self.debug("gotPerspective: %s" % perspective)
@@ -77,20 +80,21 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         
     def remote_componentAdded(self, component):
         self.debug('componentAdded %s' % component.name)
-        self.components.append(component)
-        self.emit('update', self.components)
+        self.components[component.name] = component
+        self.emit('update')
         
     def remote_componentRemoved(self, component):
         # FIXME: this asserts, no method, when server dies
         # component will be a RemoteComponentView, so we can only use a
         # member, not a method to get the name
         self.debug('componentRemoved %s' % component.name)
-        self.components.remove(component)
-        self.emit('update', self.components)
+        del self.components[component.name]
+        self.emit('update')
         
     def remote_initial(self, components):
         self.debug('remote_initial %s' % components)
-        self.components = components
+        for component in components:
+            self.components[component.name] = component
         self.emit('connected')
 
     def remote_shutdown(self):
@@ -135,8 +139,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addErrback(self._defaultErrback)
         # stack callbacks so that a new one only gets sent after the previous
         # one has completed
-        for component in self.components:
-            d = d.addCallback(lambda result, component: self.reloadComponent(component), component)
+        for name in self.components.keys():
+            d = d.addCallback(lambda result, name: self.reloadComponent(name), name)
             d.addErrback(self._defaultErrback)
         return d
 
@@ -156,7 +160,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addErrback(self._defaultErrback)
         return d
 
-    def reloadComponent(self, component):
+    def reloadComponent(self, name):
         """
         Tell the manager to reload code for a component.
 
@@ -168,9 +172,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         def _reloaded(result, self, component):
             self.info("reloaded component %s code" % component.name)
 
-        self.info("reloading component %s code" % component.name)
-        self.emit('reloading', component.name)
-        d = self.remote.callRemote('reloadComponent', component.name)
+        self.info("reloading component %s code" % name)
+        self.emit('reloading', name)
+        d = self.remote.callRemote('reloadComponent', name)
+        component = self.components[name]
         d.addCallback(_reloaded, self, component)
         d.addErrback(self._defaultErrback)
         return d
@@ -180,5 +185,11 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     def getUIEntry(self, component):
         self.info('calling remote getUIEntry %s' % component)
         return self.remote.callRemote('getUIEntry', component)
+
+    # FIXME: this should not be allowed to be called, move away
+    # by abstracting callers further
+    # returns a dict of name -> component
+    def get_components(self):
+        return self.components
     
 gobject.type_register(AdminModel)
