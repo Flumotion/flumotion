@@ -33,6 +33,9 @@ except RuntimeError:
 
 from flumotion.admin.gtk import greeter, wizard
 
+INTERVAL = 10 # in ms
+timeouts = 0
+
 class WizardTest(unittest.TestCase):
     _failed = False
     state = False
@@ -67,26 +70,35 @@ class WizardTest(unittest.TestCase):
                 proc()
                 return False
             gobject.idle_add(proc_star)
+
+        def timeout_add(proc):
+            def proc_star():
+                proc()
+                return False
+
+            global timeouts
+            gobject.timeout_add(timeouts * INTERVAL, proc_star)
+            timeouts += 1
         
-        idle_add(lambda: wiz.page.connect_to_existing.emit('clicked'))
-        idle_add(lambda: next.emit('clicked'))
-        idle_add(lambda: prev.emit('clicked'))
-        idle_add(lambda: next.emit('clicked'))
-        idle_add(lambda: ass(sensitive(next)))
-        idle_add(lambda: wiz.page.open_connection.host_entry.set_text('foo'))
-        idle_add(lambda: ass(sensitive(next)))
-        idle_add(lambda: wiz.page.open_connection.ssl_check.emit('clicked'))
-        idle_add(lambda: ass(wiz.page.open_connection.port_entry.get_text()=='8642'))
-        idle_add(lambda: next.emit('clicked'))
-        idle_add(lambda: prev.emit('clicked'))
-        idle_add(lambda: next.emit('clicked'))
-        idle_add(lambda: ass(not sensitive(next)))
-        idle_add(lambda: ass(wiz.page.authenticate.auth_method_combo.get_active()==0))
-        idle_add(lambda: wiz.page.authenticate.user_entry.set_text('bar'))
-        idle_add(lambda: ass(not sensitive(next)))
-        idle_add(lambda: wiz.page.authenticate.passwd_entry.set_text('baz'))
-        idle_add(lambda: ass(sensitive(next)))
-        idle_add(lambda: next.emit('clicked'))
+        timeout_add(lambda: wiz.page.connect_to_existing.emit('clicked'))
+        timeout_add(lambda: next.emit('clicked'))
+        timeout_add(lambda: prev.emit('clicked'))
+        timeout_add(lambda: next.emit('clicked'))
+        timeout_add(lambda: ass(sensitive(next)))
+        timeout_add(lambda: wiz.page.open_connection.host_entry.set_text('foo'))
+        timeout_add(lambda: ass(sensitive(next)))
+        timeout_add(lambda: wiz.page.open_connection.ssl_check.emit('clicked'))
+        timeout_add(lambda: ass(wiz.page.open_connection.port_entry.get_text()=='8642'))
+        timeout_add(lambda: next.emit('clicked'))
+        timeout_add(lambda: prev.emit('clicked'))
+        timeout_add(lambda: next.emit('clicked'))
+        timeout_add(lambda: ass(not sensitive(next)))
+        timeout_add(lambda: ass(wiz.page.authenticate.auth_method_combo.get_active()==0))
+        timeout_add(lambda: wiz.page.authenticate.user_entry.set_text('bar'))
+        timeout_add(lambda: ass(not sensitive(next)))
+        timeout_add(lambda: wiz.page.authenticate.passwd_entry.set_text('baz'))
+        timeout_add(lambda: ass(sensitive(next)))
+        timeout_add(lambda: next.emit('clicked'))
 
         state = wiz.run()
 
