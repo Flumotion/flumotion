@@ -1,5 +1,14 @@
 2004-10-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  a SIGCHLD handler can be called only once for multiple children,
+	  so loop as long as we can and only consider a call where no children
+	  were rept as a "special" (possibly wrong) case.  This should fix
+	  issue #73
+
+2004-10-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/wizard.py:
 	  Throw up an error dialog if a worker is missing elements needed
 	  for the step, and block going to the next one.

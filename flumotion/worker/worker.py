@@ -322,16 +322,33 @@ class WorkerBrain(log.Loggable):
             self.debug("calling Twisted handler")
             self._oldSIGCHLDHandler(signal, frame)
             
-        try:
-            pid, status = os.waitpid(-1, os.WNOHANG)
-        except OSError, e:
-            if e.errno == errno.ECHILD:
-                self.info('No children of mine to wait on')
+        # we could have been called for more than one kid, so handle all
+        reaped = False
+
+        while True:
+            # find a pid that needs reaping
+            # only allow ECHILD to pass, which means no children needed reaping
+            pid = 0
+            try:
+                self.debug('calling os.waitpid to reap children')
+                pid, status = os.waitpid(-1, os.WNOHANG)
+                self.debug('os.waitpid() returned pid %d' % pid)
+                reaped = True
+            except OSError, e:
+                if not e.errno == errno.ECHILD:
+                    raise
+                
+            # check if we reaped a child or not
+            # if we reaped none at all in this handling, something shady went
+            # on, so we info
+            if not pid:
+                if not reaped:
+                    self.info('No children of mine to wait on')
+                else:
+                    self.debug('Done reaping children')
                 return
-            else:
-                raise
-            
-        if pid:
+
+            # we reaped, so ...
             # remove from the kindergarten
             self.kindergarten.removeKidByPid(pid)
 
@@ -344,7 +361,7 @@ class WorkerBrain(log.Loggable):
                 self.info("Reaped job child with pid %d and unhandled status %d" % (
                     pid, status))
 
-        
+    
 
 class JobDispatcher:
     __implements__ = portal.IRealm

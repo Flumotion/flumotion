@@ -275,6 +275,8 @@ def run(name, options):
             
     reactor.callLater(0, _exitCb)
     reactor.run()
+    log.debug('job', 'Left reactor.run')
+    log.info('job', 'Job stopped, returning with exit value 1')
             
     os._exit(1)
     
