@@ -1,5 +1,11 @@
 2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/Makefile.am:
+	* flumotion/common/launcher.py:
+	  remove common.launcher
+
+2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/reference/Makefile.am:
 	* flumotion/common/config.py:
 	* flumotion/common/interfaces.py:

@@ -9,7 +9,6 @@ flumotion_PYTHON = \
 	errors.py \
 	interfaces.py \
 	keycards.py \
-	launcher.py \
 	registry.py \
 	setup.py
 
