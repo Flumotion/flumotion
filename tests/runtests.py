@@ -20,8 +20,16 @@ def gettestnames():
 suite = unittest.TestSuite()
 loader = unittest.TestLoader()
 
+try:
+    import gst.ltihooks
+    gst.ltihooks.uninstall()
+except:
+    pass
+
 for name in gettestnames():
     suite.addTest(loader.loadTestsFromName(name))
     
 testRunner = unittest.TextTestRunner()
-testRunner.run(suite)
+result = testRunner.run(suite)
+if not result.wasSuccessful():
+   sys.exit(1)
