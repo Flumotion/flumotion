@@ -26,7 +26,7 @@ import gtk
 import gtk.glade
 from twisted.internet import reactor
 
-from flumotion import config
+from flumotion.configure import configure
 from flumotion.admin.admin import AdminModel
 from flumotion.manager import admin   # Register types
 from flumotion.common import errors, log
@@ -103,8 +103,8 @@ class Window(log.Loggable):
     logCategory = 'adminview'
 
     def __init__(self, options):
-        self.gladedir = config.gladedir
-        self.imagedir = config.imagedir
+        self.gladedir = configure.gladedir
+        self.imagedir = configure.imagedir
         self._connectToManager(options)
         self.create_ui()
         self.current_component = None # the component we're showing UI for
