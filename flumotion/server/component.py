@@ -298,18 +298,28 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
             self.warning('Setting pipeline to NULL failed')
         
     def setup_sources(self, sources):
+        # FIXME: change "sources" to a dict from name to host, port
+        """
+        Set up the source GStreamer elements in our pipeline based on
+        information in the tuple.  For each source element in the tuple,
+        it sets the host and port on the source element.
+
+        @type sources: tuple
+        @param sources: a tuple of three-item tuples, containing element name,
+        host, and port.
+        """
         if not self.pipeline:
             raise NotReadyError('No pipeline')
         
         # Setup all sources
-        for source_name, source_host, source_port in sources:
-            self.debug('Going to connect to %s (%s:%d)' % (source_name, source_host, source_port))
-            source = self.pipeline.get_by_name(source_name)
-            assert source, 'No source element named %s in pipeline' % source_name
+        for name, host, port in sources:
+            self.debug('Going to connect to %s (%s:%d)' % (name, host, port))
+            source = self.pipeline.get_by_name(name)
+            assert source, 'No source element named %s in pipeline' % name
             assert isinstance(source, gst.Element)
             
-            source.set_property('host', source_host)
-            source.set_property('port', source_port)
+            source.set_property('host', host)
+            source.set_property('port', port)
             source.set_property('protocol', 'gdp')
             
     def feed_state_change_cb(self, element, old, state, feed):

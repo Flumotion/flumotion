@@ -195,6 +195,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         if self.manager.hasComponent(name):
             self.manager.removeComponent(self)
 
+    # functions
     def getTransportPeer(self):
         """
         Get the IPv4 address of the machine the component runs on.
