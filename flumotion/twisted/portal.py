@@ -34,6 +34,9 @@ class BouncerPortal(log.Loggable):
     I am a portal for an FPB server using a bouncer to decide on FPB client
     access.
     """
+
+    logCategory = "BouncerPortal"
+
     def __init__(self, realm, bouncer):
         """
         Create a BouncerPortal to a L{twisted.cred.portal.IRealm}.
@@ -57,15 +60,15 @@ class BouncerPortal(log.Loggable):
                            mind wishes to attach to
         
         @returns: a deferred which will fire a tuple of
-                  (interface, avatarAspect, logout)
+                  (interface, avatarAspect, logout), or a failure.
         """
-        self.debug("BouncerPortal._login(keycard=%r, mind=%r, interfaces=%r)" % (keycard, mind, interfaces))
+        self.debug("_login(keycard=%r, mind=%r, interfaces=%r)" % (keycard, mind, interfaces))
         if not self.bouncer:
             # FIXME: do we really want anonymous login when no bouncer is
             # present ?
-            self.warning("BouncerPortal has no bouncer, allowing anonymous in")
+            self.warning("no bouncer, allowing anonymous in")
             keycard.state = keycards.AUTHENTICATED
-            d = defer.maybeDeferred(lambda x: x, keycard)
+            d = defer.succeed(keycard)
         else:
             d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
             
@@ -73,19 +76,22 @@ class BouncerPortal(log.Loggable):
         return d
 
     def _authenticateCallback(self, result, mind, *interfaces):
-        self.debug("BouncerPortal._authenticateCallback(result=%r, mind=%r, interfaces=%r)" % (result, mind, interfaces))
+        # we either got a keycard as result, or None from the bouncer
+        self.debug("_authenticateCallback(result=%r, mind=%r, interfaces=%r)" % (result, mind, interfaces))
+
         if not result:
+            # just like a checker, we return a failure object
             f = failure.Failure(error.UnauthorizedLogin())
-            self.debug("BouncerPortal._authenticateCallback: returning deferred failure %r" % f)
-            return defer.fail(f)
+            self.debug("_authenticateCallback: returning failure %r" % f)
+            return f
 
         keycard = result
         if not keycard.state == keycards.AUTHENTICATED:
             # challenge
-            self.debug("BouncerPortal._authenticateCallback: returning keycard for further authentication")
+            self.debug("_authenticateCallback: returning keycard for further authentication")
             return keycard
 
-        self.debug("BouncerPortal._authenticateCallback(%r), chaining through to next callback to request AvatarId from realm with mind %r and interfaces %r" % (result, mind, interfaces))
+        self.debug("_authenticateCallback(%r), chaining through to next callback to request AvatarId from realm with mind %r and interfaces %r" % (result, mind, interfaces))
 
         return self.realm.requestAvatar(keycard.avatarId, mind, *interfaces)
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)

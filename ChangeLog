@@ -1,5 +1,14 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_pb.py:
+	  add a regression test for the complete FPBClientFactory
+	  and fix others
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/portal.py:
+	  commenting, documenting, fixing, logging
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/twisted/portal.py:
 	  cleanup
 	* flumotion/test/test_pb.py:

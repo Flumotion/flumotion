@@ -26,7 +26,7 @@ import md5
 from twisted.cred import checkers, credentials, error
 from twisted.cred.portal import IRealm, Portal
 from twisted.internet import protocol, defer
-from twisted.python import log, reflect
+from twisted.python import log, reflect, failure
 from twisted.spread import pb, flavors
 from twisted.spread.pb import PBClientFactory
 
@@ -166,6 +166,27 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     def _cbSendUsername(self, root, username, password, avatarId, client, interfaces):
         self.warning("you really want to use cbSendKeycard")
 
+        
+    def login(self, keycard, client=None, *interfaces):
+        """
+        Login and get perspective from remote PB server.
+
+        Currently only credentials implementing IUsernamePassword are
+        supported.
+
+        @return: Deferred of RemoteReference to the perspective.
+        """
+        
+        if not pb.IPerspective in interfaces:
+            interfaces += (pb.IPerspective,)
+        interfaces = [reflect.qual(interface)
+                          for interface in interfaces]
+            
+        d = self.getRootObject()
+        self.debug("FPBClientFactory: logging in with keycard %r" % keycard)
+        d.addCallback(self._cbSendKeycard, keycard, client, interfaces)
+        return d
+
     def _cbSendKeycard(self, root, keycard, client, interfaces, count=0):
         self.debug("_cbSendKeycard(root=%r, keycard=%r, client=%r, interfaces=%r, count=%d" % (root, keycard, client, interfaces, count))
         count = count + 1
@@ -195,35 +216,17 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
 
         self.debug("FPBClientFactory(): authenticated %r" % keycard)
         return keycard
-        
-    def login(self, keycard, client=None, *interfaces):
-        """
-        Login and get perspective from remote PB server.
-
-        Currently only credentials implementing IUsernamePassword are
-        supported.
-
-        @return: Deferred of RemoteReference to the perspective.
-        """
-        
-        if not pb.IPerspective in interfaces:
-            interfaces += (pb.IPerspective,)
-        interfaces = [reflect.qual(interface)
-                          for interface in interfaces]
-            
-        d = self.getRootObject()
-        self.debug("FPBClientFactory: logging in with keycard %r" % keycard)
-        d.addCallback(self._cbSendKeycard, keycard, client, interfaces)
-        return d
 
 ### FIXME: this code is an adaptation of twisted/spread/pb.py
 # it allows you to login to a FPB server requesting interfaces other than
 # IPerspective.
 # in other terms, you can request different "kinds" of avatars from the same
 # PB server.
-# this code needs to be send upstream to Twisted
+# this code needs to be sent upstream to Twisted
 class _FPortalRoot:
-    """Root object, used to login to bouncer."""
+    """
+    Root object, used to login to bouncer.
+    """
 
     __implements__ = flavors.IPBRoot,
     
@@ -233,7 +236,10 @@ class _FPortalRoot:
     def rootObject(self, broker):
         return _BouncerWrapper(self.bouncerPortal, broker)
 
-class _BouncerWrapper(pb.Referenceable):
+class _BouncerWrapper(pb.Referenceable, flog.Loggable):
+
+    logCategory = "_BouncerWrapper"
+
     def __init__(self, bouncerPortal, broker):
         self.bouncerPortal = bouncerPortal
         self.broker = broker
@@ -241,24 +247,31 @@ class _BouncerWrapper(pb.Referenceable):
     def remote_login(self, keycard, mind, *interfaces):
         """
         Start of keycard login.
-        @type interfaces: 1..n string's
+
+        @param interfaces: list of fully qualified names of interface objects
+
+        @returns: one of:
+                  a L{flumotion.common.keycards.Keycard} when more steps
+                  need to be performed
+                  a L{twisted.spread.pb.AsReferenceable} when authentication 
+                  has succeeded, which will turn into a
+                  L{twisted.spread.pb.RemoteReference on the client side
+                  a L{twisted.cred.error.UnauthorizedLogin} when authentication
+                  is denied
         """
         # corresponds with FPBClientFactory._cbSendKeycard
-        #print "Bouncer.remote_login(keycard=%s, *interfaces=%r" % (keycard, interfaces)
+        self.log("remote_login(keycard=%s, *interfaces=%r" % (keycard, interfaces))
         interfaces = [freflect.namedAny(interface) for interface in interfaces]
         d = self.bouncerPortal.login(keycard, mind, *interfaces)
         d.addCallback(self._authenticateCallback, mind, *interfaces)
-        #d.addCallback(self._loggedIn)
         return d
 
-    def _loggedIn(self, (interface, perspective, logout)):
-        self.broker.notifyOnDisconnect(logout)
-        return pb.AsReferenceable(perspective, "perspective")
-
     def _authenticateCallback(self, result, mind, *interfaces):
-        #print "_BouncerWrapper._authenticateCallback(result=%r, mind=%r, interfaces=%r" % (result, mind, interfaces)
+        self.log("_authenticateCallback(result=%r, mind=%r, interfaces=%r" % (result, mind, interfaces))
+        # FIXME: coverage indicates that "not result" does not happen,
+        # presumably because a Failure is triggered before us
         if not result:
-            raise error.UnauthorizedLogin()
+            return failure.Failure(error.UnauthorizedLogin())
 
         # if the result is a keycard, we're not yet ready
         if isinstance(result, keycards.Keycard):
@@ -266,21 +279,11 @@ class _BouncerWrapper(pb.Referenceable):
 
         # authenticated, so the result is the tuple
         # FIXME: our keycard should be stored higher up since it was authd
+        # then cleaned up sometime in the future
+        # for that we probably need to pass it along
         return self._loggedIn(result)
-        
-class _FPortalWrapper(pb.Referenceable):
-    """Root Referenceable object, used to login to portal."""
 
-    def __init__(self, portal, broker):
-        self.portal = portal
-        self.broker = broker
+    def _loggedIn(self, (interface, perspective, logout)):
+        self.broker.notifyOnDisconnect(logout)
+        return pb.AsReferenceable(perspective, "perspective")
 
-    def remote_login(self, keycard, avatarId, *interfaces):
-        # corresponds with FPBClientFactory._cbSendKeycard
-        """Start of keycard login."""
-        #print "_FPortalWrapper.remote_login(keycard=%s, avatarId=%s, ...)" % (keycard, avatarId)
-        interfaces = [freflect.namedAny(interface) for interface in interfaces]
-        # hand the keycard to the checker somehow and then return it
-        # FIXME: don't set it authenticated here :)
-        keycard.state = keycards.AUTHENTICATED
-        return keycard
