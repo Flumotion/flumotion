@@ -1,0 +1,20 @@
+gnome-vfs 2.6.0 broke the server because it was broken.
+
+To be able to get the content type of a stream it did the following
+
+	PROPFIND / HTTP/1.1
+	
+	HEAD / HTTP/1.1
+
+It can be tested by running
+ 
+  $ gnomevfs-info url
+
+However, this broke because we used to send all the data, despiteless of
+the request. So currently we support the following http commands:
+
+	GET		Prints headers and raw data
+	HEAD		Prints headers
+	PROPFIND	Set 405 error (Not allowed)	
+
+We need to investigate what other methods we'd like to support.
