@@ -1,3 +1,13 @@
+2005-03-30  Andy Wingo  <wingo@pobox.com>
+
+	* bin/flumotion-admin.in: Only use twisted's gtk2reactor if we
+	have version 2.
+
+	* flumotion/common/config.py
+	(FlumotionConfigXML.get_string_value): libxml always gives us
+	unicode, even when we encode values as strings. Try to make
+	normal strings again, unless that isn't possible. Fixes #18.
+
 2005-03-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/bundle.py:

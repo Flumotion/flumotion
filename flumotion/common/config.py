@@ -295,7 +295,14 @@ class FlumotionConfigXML(log.Loggable):
     def get_string_value(self, nodes):
         values = []
         for subnode in nodes:
-            data = str(subnode.childNodes[0].data)
+            data = subnode.childNodes[0].data
+            # libxml always gives us unicode, even when we encode values
+            # as strings. try to make normal strings again, unless that
+            # isn't possible.
+            try:
+                data = str(data)
+            except UnicodeEncodeError:
+                pass
             if '\n' in data:
                 parts = [x.strip() for x in data.split('\n')]
                 data = ' '.join(parts)
