@@ -16,6 +16,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 import os
+import sets
 
 import gobject
 import gtk
@@ -301,7 +302,7 @@ class Wizard(gobject.GObject):
     sidebar_active_color = gtk.gdk.color_parse('#79abed')
     gsignal('finished', str)
     
-    def __init__(self):
+    def __init__(self, admin=None):
         self.__gobject_init__()
         self.wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'wizard.glade'))
         for widget in self.wtree.get_widget_prefix(''):
@@ -312,6 +313,7 @@ class Wizard(gobject.GObject):
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))
 
+        self._admin = admin
         self._save = save.WizardSaver(self)
         self._use_main = True
         self._workers = []
@@ -394,6 +396,7 @@ class Wizard(gobject.GObject):
         
         self.update_sidebar(step)
         self.update_buttons(has_next=True)
+        self._setup_worker()
         
         # Finally show
         widget.show()
@@ -434,6 +437,27 @@ class Wizard(gobject.GObject):
 
         self.update_buttons(has_next=True)
 
+    def check_element(self, worker, *elements):
+        asked = sets.Set(elements)
+        def _responseCb(existing):
+            existing = sets.Set(existing)
+            unexisting = asked.difference(existing)
+            if unexisting:
+                print 'elements %s does not exist' % ', '.join(unexisting)
+            self.block_next(False)
+            
+        self.block_next(True)
+        d = self._admin.checkElements(worker, elements)
+        d.addCallback(_responseCb)
+    
+    def _setup_worker(self):
+        # get name of active worker
+        if self.combobox_worker:
+            iter = self.combobox_worker.get_active_iter()
+            model = self.combobox_worker.get_model()
+            text = model.get(iter, 0)[0]
+            self.current_step.worker = text
+        
     def show_next(self):
         next = self.current_step.get_next()
         if not next:
@@ -445,12 +469,6 @@ class Wizard(gobject.GObject):
         except KeyError:
             raise TypeError("Wizard step %s is missing" % `next`)
 
-        # get name of active worker
-        if self.combobox_worker:
-            iter = self.combobox_worker.get_active_iter()
-            model = self.combobox_worker.get_model()
-            text = model.get(iter, 0)[0]
-            self.current_step.worker = text
         
         next_step.visited = True
 

@@ -66,7 +66,10 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         """
         self.info('starting %s on %s with config %r' % (name, self.avatarId, config))
         return self.mind.callRemote('start', name, type, config)
-        
+
+    def checkElements(self, elements):
+        return self.mind.callRemote('checkElements', elements)
+    
 class WorkerHeaven(pb.Root, log.Loggable):
     """
     I interface between the Manager and worker clients.
@@ -103,7 +106,10 @@ class WorkerHeaven(pb.Root, log.Loggable):
     # XXX: Move to IHeaven?
     def getAvatars(self):
         return self._avatars.values()
-    
+
+    def getAvatar(self, avatarId):
+        return self._avatars[avatarId]
+        
     def loadConfiguration(self, filename, string=None):
         # XXX: Merge?
         self.conf = FlumotionConfigXML(filename, string)

@@ -1,3 +1,16 @@
+2004-10-18  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_audiotest.glade:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/main.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/worker.py:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/worker/worker.py:
+	add some checks for some elements, not using the result just yet.
+	
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/Makefile.am:

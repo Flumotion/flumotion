@@ -60,7 +60,7 @@ def _window_connected_cb(window, options):
             if not workers:
                 print >> sys.stderr, "ERROR: No workers connected"
                 reactor.stop()
-            wiz = wizard.Wizard()
+            wiz = wizard.Wizard(window.admin)
             wiz.connect('finished', _wizard_finished_cb, window)
             wiz.load_steps()
             wiz.run(not options.debug, workers, main=False)

@@ -232,6 +232,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addErrback(self._defaultErrback)
         return d
 
+    def checkElements(self, worker, elements):
+        self.info('calling remote checkElement(%s, %s)' % (worker, elements))
+        return self.remote.callRemote('checkElements', worker, elements)
+        
     # FIXME: this is the new method to get the UI, by getting a bundle
     # and an entry point
     def getUIZip(self, component, domain, style):

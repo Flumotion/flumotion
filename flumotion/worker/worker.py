@@ -23,6 +23,7 @@ import os
 import signal
 import sys
 
+import gst
 from twisted.cred import portal
 from twisted.internet import protocol, reactor
 from twisted.spread import pb
@@ -102,7 +103,18 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         """
         self.info('remote_start(): manager asked me to start, name %s, type %s, config %r' % (name, type, config))
         self.brain.kindergarten.play(name, type, config)
-        
+
+    def remote_checkElements(self, element_names):
+        """
+        Checks if one or more gstreamer elements are present and can be instantiated
+
+        @param element_names:   names of the gstreamer elements
+        @type element_names:    list of string
+        """
+
+        return [name for name in element_names
+                         if gst.element_factory_make(name) is not None]
+    
 class Kid:
     def __init__(self, pid, name, type, config):
         self.pid = pid 

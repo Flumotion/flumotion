@@ -99,10 +99,14 @@ VideoDevice = EnumClass('VideoDevice',
                         component_type=('web-camera',
                                         'tv-card',
                                         'firewire-video',
-                                        'videotest'))
+                                        'videotest'),
+                        element_names=(('v4lsrc',),
+                                       ('v4lsrc',),
+                                       ('videotestsrc',),
+                                       ('dvdec', 'gst1394src')))
 AudioDevice = EnumClass('AudioDevice',
                         ('Soundcard', 'Firewire', 'Test'),
-                        ('Sound card', 'Firewire Audio', 'Audio test'),
+                        ('Sound card', 'Firewire Audio', 'Test audio source'),
                         component_type=('soundcard',
                                         'firewire-audio',
                                         'audiotest'))

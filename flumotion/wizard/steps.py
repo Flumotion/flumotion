@@ -88,7 +88,10 @@ wizard.register_step(Source)
 class VideoSource(wizard.WizardStep):
     section = 'Production'
     icon = 'widget_doc.png'
-
+   
+    def deactivated(self):
+        self.wizard.check_element(self.worker, 'videotestsrc')
+        
     def get_next(self):
         return 'Overlay'
 
@@ -109,6 +112,7 @@ class TVCard(VideoSource):
         self.combobox_device.set_enum(TVCardDevice)
         self.combobox_signal.set_enum(TVCardSignal)
 
+        
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
         options['device'] = options['device'].name
@@ -132,6 +136,10 @@ class Webcam(VideoSource):
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
     icon = 'webcam.png'
+    
+    def activated(self):
+        self.wizard.check_element(self.worker, 'v4lsrc')
+        
 wizard.register_step(Webcam)
 
 
@@ -171,7 +179,11 @@ class Overlay(wizard.WizardStep):
     section = 'Production'
     component_type = 'overlay'
     icon = 'overlay.png'
-    
+
+    def deactivated(self):
+        self.wizard.check_element(self.worker, 'pngdec', 'alphacolor',
+                                  'videomixer', 'alpha')
+        
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())
 
@@ -245,6 +257,9 @@ class AudioTest(wizard.WizardStep):
     section = 'Production'
     icon = 'audiosrc.png'
     
+    def deactivated(self):
+        self.wizard.check_element(self.worker, 'sinesrc')
+
     def get_component_properties(self):
         return int(self.spinbutton_freq.get_value())
     
@@ -337,6 +352,9 @@ class Theora(VideoEncoder):
     component_type = 'theora'
     icon = 'xiphfish.png'
     
+    def deactivated(self):
+        self.wizard.check_element(self.worker, 'theoraenc')
+        
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
         self.spinbutton_bitrate.set_sensitive(
@@ -363,6 +381,9 @@ class Smoke(VideoEncoder):
     section = 'Conversion'
     component_type = 'smoke'
 
+    def deactivated(self):
+        self.wizard.check_element(self.worker, 'smokeenc')
+        
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
     
@@ -383,6 +404,9 @@ class JPEG(VideoEncoder):
     glade_file = 'wizard_jpeg.glade'
     section = 'Conversion'
     component_type = 'jpeg'
+
+    def deactivated(self):
+        self.wizard.check_element(self.worker, 'jpegenc')
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
@@ -405,10 +429,14 @@ class AudioEncoder(wizard.WizardStep):
 
 
 
+# Worker?
 class Vorbis(AudioEncoder):
     step_name = 'Vorbis'
     component_type = 'vorbis'
     icon = 'xiphfish.png'
+
+    def deactivated(self):
+        self.wizard.check_element(self.worker, 'rawvorbisenc')
 
     def setup(self):
         self.spinbutton_bitrate.set_range(6000, 250001)
@@ -427,9 +455,13 @@ class Speex(AudioEncoder):
     component_type = 'speex'
     icon = 'xiphfish.png'
     
+    def deactivated(self):
+        self.wizard.check_element(self.worker, 'speexenc')
+        
     def setup(self):
         self.spinbutton_bitrate.set_range(2150, 30000)
         self.spinbutton_bitrate.set_value(11000)
+        
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
         options['bitrate'] = int(self.spinbutton_bitrate.get_value())

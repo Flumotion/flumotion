@@ -272,6 +272,10 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     def perspective_loadConfiguration(self, xml):
         self.info('loadConfiguration ...')
         self.workerHeaven.loadConfiguration(None, xml)
+
+    def perspective_checkElements(self, workerId, elements):
+        workerAvatar = self.workerHeaven.getAvatar(workerId)
+        return workerAvatar.checkElements(elements)
         
     # separate method so it runs the newly reloaded one :)
     def _reloaded(self):
