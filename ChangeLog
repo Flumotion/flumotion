@@ -1,5 +1,10 @@
 2004-10-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_vorbis.glade:
+	  Fix quality setting, which is a float from 0.0 to 1.0
+
+2004-10-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	  Check for Twisted's version.  Fixes issue #46.
 
