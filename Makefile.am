@@ -14,6 +14,12 @@ EXTRA_DIST = \
 clean-local:
 	@rm -rf _trial_temp
 
+test:
+	@make check -C flumotion/test
+
+check-docs:
+	@make check -C doc/reference
+
 coverage:
 	@trial --coverage coverage -R flumotion.test
 	@$(PYTHON) tools/show-coverage.py _trial_temp/coverage/flumotion.*

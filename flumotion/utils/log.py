@@ -220,6 +220,13 @@ def init():
         setFluDebug(os.environ['FLU_DEBUG'])
     addLogHandler(stderrHandler, limited=True)
 
+def reset():
+    """Resets all log handles"""
+    global _log_handlers, _log_handlers_limited
+    
+    _log_handlers = []
+    _log_handlers_limited = []
+    
 def setFluDebug(string):
     """Set the FLU_DEBUG string.  This controls the log output."""
     global _FLU_DEBUG

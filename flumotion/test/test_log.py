@@ -20,6 +20,11 @@ from twisted.trial import unittest
 from flumotion.common import errors
 from flumotion.utils import log
 
+# XXX: Another test is installing log handlers,
+#      find out which one and move log.reset in its
+#      tearDown method
+log.reset()
+
 class LogTester(log.Loggable):
     logCategory = 'testlog'
 

@@ -1,5 +1,14 @@
 2004-10-13  Johan Dahlin  <johan@gnome.org>
 
+	* Makefile.am (test): New target
+
+	* flumotion/test/test_log.py (TestOwnLogHandler.setUp) 
+	(TestLog.setUp): Reset logging here, to avoid having unwanted
+	logging functions installed when running this test.
+
+	* flumotion/utils/log.py (reset): New method, to remove all
+	logging handlers
+
 	* data/glade/wizard_audio_encoder.glade:
 	* flumotion/component/base/producer.py:
 	* flumotion/component/encoders/encoders.xml:
