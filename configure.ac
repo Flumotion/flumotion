@@ -55,6 +55,7 @@ data/Makefile
 data/glade/Makefile
 data/image/Makefile
 flumotion/Makefile
+flumotion/admin/Makefile
 flumotion/common/Makefile
 flumotion/component/Makefile
 flumotion/component/base/Makefile

@@ -1,4 +1,4 @@
-SUBDIRS = common component config manager twisted utils
+SUBDIRS = admin common component config manager twisted utils
 flumotiondir = $(libdir)/flumotion/python/flumotion
 
 flumotion_PYTHON = \

@@ -41,9 +41,10 @@ sys.path.insert(0, root)
 from flumotion.admin import adminclient
 
 from flumotion.utils import log
-log.init()
+
 
 def main(args):
+    log.init()
     return adminclient.main(args)
 
 sys.exit(main(sys.argv))
