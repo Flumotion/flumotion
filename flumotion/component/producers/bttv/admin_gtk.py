@@ -41,11 +41,7 @@ class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
         return self.widget
         
     def getColorBalancePropertiesCallback(self, result):
-
         for i in result:
-            # create scale that uses 0 decimal places,
-            # and only updates after a little time after user
-            # finished moving scale
             scale_widgetname = 'scale-%s' % i[0]
             spinbutton_widgetname = 'spinbutton-%s' % i[0]
             scale = self.wtree.get_widget(scale_widgetname.lower())
@@ -80,12 +76,8 @@ class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
             if i[0] == 'Contrast':
                 self.scale_contrast = scale
                 self.spinbutton_contrast = spinbutton
-
                 self.contrast_scale_change_id = scale_change_id
                 self.contrast_spinbutton_change_id = spinbutton_change_id
-
-     
-        
 
     def getColorBalancePropertiesErrback(self, failure):
         self.warning("Failure %s getting color balance properties: %s" % (
@@ -136,7 +128,8 @@ class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
             scale_change_id = self.contrast_scale_change_id
             spinbutton_change_id = self.contrast_spinbutton_change_id
 
-
+        # if we had an actual property change, process it and block signal
+        # emission while doing so
         if scale_change_id != -1:
             scale.handler_block(scale_change_id)
             scale.set_value(value)
@@ -144,7 +137,5 @@ class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
             spinbutton.handler_block(spinbutton_change_id)
             spinbutton.set_value(value)
             spinbutton.handler_unblock(spinbutton_change_id)
-
-            
 
 GUIClass = BTTVAdminGtk
