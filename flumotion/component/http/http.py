@@ -648,6 +648,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
             (fd, thread.get_ident(), reason)) 
         # commented out to see if it solves GIL problems
         #stats = sink.emit('get-stats', fd)
+        stats = None
         self.log('[fd %5d] client_removed_cb, got stats' % fd)
         # FIXME: GIL problem, just call directly for now without remote calls
         #gobject.idle_add(self.client_removed_idle, sink, fd, reason, stats)
