@@ -24,6 +24,7 @@ class WizardStepSource(wizard.WizardStep):
     step_name = 'Source'
     glade_file = 'wizard_source.glade'
     section = 'Production'
+    section_name = 'Production'
     
     def setup(self):
         self.combobox_video.set_enum(VideoDevice)
@@ -175,6 +176,7 @@ class WizardStepEncoding(wizard.WizardStep):
     step_name = 'Encoding'
     glade_file = 'wizard_encoding.glade'
     section = 'Conversion'
+    section_name = 'Conversion'
     
     setup_finished = False
 
@@ -428,18 +430,20 @@ class WizardStepHTTP(wizard.WizardStep):
 class WizardStepHTTPBoth(WizardStepHTTP):
     step_name = 'HTTP Streamer (audio & video)'
     component_name = 'http-streamer-audio+video'
-
+    sidebar_name = 'HTTP audio/video'
 
                   
 class WizardStepHTTPAudio(WizardStepHTTP):
     step_name = 'HTTP Streamer (audio only)'
     component_name = 'http-streamer-audio'
+    sidebar_name = 'HTTP video'
 
 
 
 class WizardStepHTTPVideo(WizardStepHTTP):
     step_name = 'HTTP Streamer (video only)'
     component_name = 'http-streamer-video'
+    sidebar_name = 'HTTP audio'
 
     
 
@@ -491,16 +495,19 @@ class WizardStepDisk(wizard.WizardStep):
 
 class WizardStepDiskBoth(WizardStepDisk):
     step_name = 'Disk (audio & video)'
+    sidebar_name = 'Disk audio/video'
 
 
 
 class WizardStepDiskAudio(WizardStepDisk):
     step_name = 'Disk (audio only)'
+    sidebar_name = 'Disk audio'
 
 
 
 class WizardStepDiskVideo(WizardStepDisk):
     step_name = 'Disk (video only)'
+    sidebar_name = 'Disk video'
 
 
 

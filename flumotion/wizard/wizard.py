@@ -24,6 +24,7 @@ import os
 
 import gobject
 import gtk
+from gtk import gdk
 import gtk.glade
 
 from flumotion.config import gladedir
@@ -95,22 +96,28 @@ class WizardComboBox(gtk.ComboBox):
             self.set_sensitive(True)
 
     def set_active(self, item):
+        """Small wrapper around set_active() to support enums"""
         if isinstance(item, enums.Enum):
             gtk.ComboBox.set_active(self, item.value)
         else:
             gtk.ComboBox.set_active(self, item)
             
     def get_active(self):
+        """Small wrapper around get_active() to support enums"""
         value = gtk.ComboBox.get_active(self)
         if hasattr(self, 'enum_class'):
             value = self.enum_class.get(value)
         return value
 
-    def copy_model(self, old):
+    def setup(self):
+        "This copies the values from an old model to a new"
+        old_model = self.get_model()
+        
         model = gtk.ListStore(*self._column_types)
         value = 0
-        for item in old:
-            name = old.get(item.iter, 0)[0]
+        for item in old_model:
+            # Get the value from the first column
+            name = old_model.get(item.iter, 0)[0]
             iter = model.append()
             model.set(iter,
                       self.COLUMN_NAME, name,
@@ -159,15 +166,31 @@ gobject.type_register(WizardSpinButton)
 
 
 
+class WidgetMapping:
+    # In PyGTK 2.4.0 gtk.glade.XML type_dict parameter is buggy
+    # If it can't find the name it raises a silent KeyError which
+    # will be raised at random point later (as soon some code call
+    # PyErr_Occurred()), to avoid this, we reimplement the function
+    # as it is internally, eg failback to the real GType, by doing
+    # this PyMapping_GetItemString will never set the error.
+    
+    types = dict(GtkCheckButton=WizardCheckButton,
+                 GtkComboBox=WizardComboBox,
+                 GtkEntry=WizardEntry,
+                 GtkRadioButton=WizardRadioButton,
+                 GtkSpinButton=WizardSpinButton)
+    
+    def __getitem__(self, name):
+        if self.types.has_key(name):
+            return self.types[name]
+        else:
+            return gobject.type_from_name(name)
+        
+
 class WizardStep(object, log.Loggable):
     step_name = None # Subclass sets this
     glade_file = None # Subclass sets this
 
-    types = dict(GtkComboBox=WizardComboBox,
-                 GtkEntry=WizardEntry,
-                 GtkCheckButton=WizardCheckButton,
-                 GtkRadioButton=WizardRadioButton,
-                 GtkSpinButton=WizardSpinButton)
     widget_prefixes = { WizardComboBox    : 'combobox',
                         WizardCheckButton : 'checkbutton',
                         WizardEntry       : 'entry',
@@ -186,12 +209,8 @@ class WizardStep(object, log.Loggable):
     def load_glade(self):
         glade_filename = os.path.join(gladedir, self.glade_file)
         
-        # In PyGTK 2.4.0 this raises an AttributeError which
-        # is silently ignored. We need to find out a way to call
-        # PyErr_Clear() if we want to support it, otherwise things
-        # will go wrong in mysterious places later on.
         self.wtree = gtk.glade.XML(glade_filename,
-                                   typedict=self.types)
+                                   typedict=WidgetMapping())
         
         windows = []
         self.widgets = self.wtree.get_widget_prefix('')
@@ -203,8 +222,7 @@ class WizardStep(object, log.Loggable):
                 continue
             
             if isinstance(widget, WizardComboBox):
-                old = widget.get_model()
-                widget.copy_model(old)
+                widget.setup()
                 widget.set_active(0)
                     
             if hasattr(self, name):
@@ -340,6 +358,7 @@ class Wizard:
             self.current_step.deactivated()
 
         self.update_sidebar(step)
+        self.update_buttons(has_next=True)
         
         # Finally show
         widget.show()
@@ -379,7 +398,6 @@ class Wizard:
             self.button_prev.set_sensitive(True)
 
         # XXX: Use the current step, not the one on the top of the stack
-        current_step = self.stack.peek()
         if has_next:
             self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         else:
@@ -396,58 +414,96 @@ class Wizard:
             print '  <%s>%s</%s> ' % (key, value, key)
         print '</component>'
 
-    def add_sidebar_step(self, name, padding):
+    def _sidebar_clean(self):
+        # First remove the old the VBox if we can find one
+        parent = self.vbox_sidebar.get_parent()
+        if parent:
+            parent.remove(self.vbox_sidebar)
+        else:
+            parent = self.eventbox_sidebar
+
+        parent.modify_bg(gtk.STATE_NORMAL,
+                         gdk.color_parse('#82b8ff'))
+        self.vbox_sidebar = gtk.VBox()
+        self.vbox_sidebar.set_border_width(5)
+        self.vbox_sidebar.set_size_request(180, -1)
+        parent.add(self.vbox_sidebar)
+
+    def _sidebar_add_placeholder(self):
+        # Placeholder label, which expands vertically
+        ph = gtk.Label()
+        ph.show()
+        self.vbox_sidebar.pack_start(ph)
+        
+    def _sidebar_add_step(self, step, name, active, padding):
         hbox = gtk.HBox(0, False)
         hbox.show()
-        
-        label = gtk.Label()
-        label.set_markup(escape(name))
-        label.show()
-        hbox.pack_start(label, False, padding=padding)
-        self.vbox_sidebar.pack_start(hbox, False, False, 6)
 
-        return label
+        text = escape(name)
+        button = gtk.Button('')
+        button.modify_bg(gtk.STATE_PRELIGHT,
+                         gdk.color_parse('#79abed'))
+        button.modify_bg(gtk.STATE_ACTIVE,
+                         gdk.color_parse('#82b8ff'))
+        label = button.get_children()[0]
+        label.set_padding(padding, 0)
+        label.set_alignment(0, 0.5)
+        button.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(button, True, True)
+        self.vbox_sidebar.pack_start(hbox, False, False)
+
+        def button_clicked_cb(button):
+            print 'go to', step
+            self.set_step(step)
+            
+        if step:
+            button.connect('clicked', button_clicked_cb)
+
+        if step == self.current_step:
+            size = 'large'
+        else:
+            size = 'medium'
+            
+        if not active:
+            markup = '<span color="#7a7a7a">%s</span>' % name
+            button.set_sensitive(False)
+        else:
+            markup = '<span size="%s" color="black">%s</span>' % (size, name)
+            button.set_property('can_focus', False)
+            
+        label.set_markup(markup)
+
+        button.show()
+        return button
     
-    def add_sidebar_substeps(self, section):
+    def _sidebar_add_substeps(self, section):
         # Skip the last step, since that's what we're currently showing
-        stack = self.stack[:-1]
+        stack = self.stack #[:-1]
 
         # Filter out steps which is not the same category
         items = [item for item in stack
                           if item.section == section]
         for item in items:
-            self.add_sidebar_step(item.step_name, 20)
-            
+            label = getattr(item, 'sidebar_name', item.step_name)
+            self._sidebar_add_step(item, label, True, 20)
+
     def update_sidebar(self, step):
         current = step.section
 
-        # First remove the old the VBox if we can find one
-        parent = self.vbox_sidebar.get_parent()
-        if parent:
-            parent.remove(self.vbox_sidebar)
-        self.vbox_sidebar = gtk.VBox()
-        self.hbox_main.pack_start(self.vbox_sidebar)
-        self.hbox_main.reorder_child(self.vbox_sidebar, 0)
-
-        # Then, for each section step, add a VBox with a label in it
+        self._sidebar_clean()
+        
         sidebar_steps = ('Production', 'Conversion',
                          'Consumption', 'License')
+        active = True
         for stepname in sidebar_steps:
-            # If it's not the current step, just add it
-            if current != stepname:
-                markup = '<span color="grey">%s</span>' % stepname
-                self.add_sidebar_step(markup, 10)
-                continue
+            self._sidebar_add_step(None, stepname, active, 10)
             
-            markup = '<span color="black">%s</span>' % stepname                
-            self.add_sidebar_step(markup, 10)
-
-            self.add_sidebar_substeps(stepname)
-
-            # Placeholder label, which expands vertically
-            ph = gtk.Label()
-            ph.show()
-            self.vbox_sidebar.pack_start(ph)
+            if current == stepname:
+                self._sidebar_add_substeps(stepname)
+                self._sidebar_add_placeholder()
+                active = False
+            else:
+                continue
             
         self.vbox_sidebar.show()
         

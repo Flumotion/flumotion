@@ -35,9 +35,13 @@ class EnumMetaClass(type):
 
 class Enum(object):
     __metaclass__ = EnumMetaClass
-    def __init__(self, value, name, nick):
+    def __init__(self, value, name, nick=None):
         self.value = value
         self.name = name
+        
+        if nick is None:
+            nick = name
+            
         self.nick = nick
 
     def __repr__(self):
@@ -55,16 +59,16 @@ class Enum(object):
 
     
 class EnumClass(object):
-    def __new__(self, name, values=(), values_repr=()):
-        if values_repr:
-            if len(values) != len(values_repr):
-                raise TypeError("values_repr must have the same length as value")
+    def __new__(self, type_name, names=(), nicks=()):
+        if nicks:
+            if len(names) != len(nicks):
+                raise TypeError("nicks must have the same length as names")
         else:
-            values_repr = values
+            nicks = names
 
-        etype = EnumMetaClass(name, (Enum,), dict(__enums__={}))
-        for value, name in enumerate(values):
-            etype[value] = etype(value, name, values_repr[value])
+        etype = EnumMetaClass(type_name, (Enum,), dict(__enums__={}))
+        for value, name in enumerate(names):
+            etype[value] = etype(value, name, nicks[value])
             
         return etype
 
