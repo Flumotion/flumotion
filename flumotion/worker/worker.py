@@ -439,6 +439,7 @@ class WorkerBrain(log.Loggable):
             self._oldSIGTERMHandler = handler
 
     def _SIGTERMHandler(self, signal, frame):
+        print "handling SIGTERM"
         self.debug("handling SIGTERM")
         reactor.killed = True
         self.debug("_SIGTERMHandler: shutting down jobheaven")

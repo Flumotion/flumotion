@@ -43,9 +43,12 @@ class TestLog(unittest.TestCase):
         log.setFluDebug("5")
 
     # test for adding a log handler
-    def handler(self, category, level, message):
-        self.category = category
+    def handler(self, level, object, category, file, line, message):
         self.level = level
+        self.object = object
+        self.category = category
+        self.file = file
+        self.line = line
         self.message = message
 
     def testLimitInvisible(self):
@@ -120,9 +123,12 @@ class TestOwnLogHandler(unittest.TestCase):
         self.category = self.level = self.message = None
         self.tester = LogFunctionTester()
 
-    def handler(self, category, level, message):
-        self.category = category
+    def handler(self, level, object, category, file, line, message):
         self.level = level
+        self.object = object
+        self.category = category
+        self.file = file
+        self.line = line
         self.message = message
 
     # test if our own log handler correctly mangles the message

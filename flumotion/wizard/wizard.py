@@ -317,7 +317,7 @@ class Wizard(gobject.GObject, log.Loggable):
         self._setup_worker(step)
         step.before_show()
 
-        log.debug('showing step %r' % step)
+        self.debug('showing step %r' % step)
         widget.show()
         step.activated()
 
@@ -388,7 +388,7 @@ class Wizard(gobject.GObject, log.Loggable):
         @param elementNames: names of the elements to check
         """
         if not self._admin:
-            log.debug('No admin connected, not checking presents of elements')
+            self.debug('No admin connected, not checking presents of elements')
             return
         
         asked = sets.Set(elementNames)
@@ -397,7 +397,7 @@ class Wizard(gobject.GObject, log.Loggable):
             unexisting = asked.difference(existing)
             # if we're missing elements, we cannot unblock the next button
             if unexisting:
-                log.warning('elements %s does not exist' % ', '.join(unexisting))
+                self.warning('elements %s does not exist' % ', '.join(unexisting))
                 message = "Worker %s is missing GStreamer elements '%s'.  " % (
                     workerName, "', '".join(unexisting)) \
                         + "You will not be able to go forward."
@@ -419,11 +419,11 @@ class Wizard(gobject.GObject, log.Loggable):
             iter = self.combobox_worker.get_active_iter()
             if iter:
                 text = model.get(iter, 0)[0]
-                log.debug('%r setting worker to %s' % (step, text))
+                self.debug('%r setting worker to %s' % (step, text))
                 step.worker = text
                 return
 
-        log.debug('%r no worker set' % step)
+        self.debug('%r no worker set' % step)
             
     def _set_worker_from_step(self, step):
         if not hasattr(step, 'worker'):

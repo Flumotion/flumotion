@@ -48,27 +48,41 @@ class Loggable:
     
     def error(self, *args):
         """Log an error.  By default this will also raise an exception."""
-        error(self.logCategory, self.logFunction(*args))
+        errorObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
         
     def warning(self, *args):
         """Log a warning.  Used for non-fatal problems."""
-        warning(self.logCategory, self.logFunction(*args))
+        warningObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
         
     def info(self, *args):
         """Log an informational message.  Used for normal operation."""
-        info(self.logCategory, self.logFunction(*args))
+        infoObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
 
     def debug(self, *args):
         """Log a debug message.  Used for debugging."""
-        debug(self.logCategory, self.logFunction(*args))
+        debugObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
 
     def log(self, *args):
         """Log a log message.  Used for debugging recurring events."""
-        log(self.logCategory, self.logFunction(*args))
+        logObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
 
     def logFunction(self, message):
         """Overridable log function.  Default just returns passed message."""
         return message
+
+    def logObjectName(self):
+        """Overridable object name function."""
+        # cheat pychecker
+        for name in ['logName', 'name']:
+            if hasattr(self, name):
+                return getattr(self, name)
+
+        return None
 
 # environment variables controlling levels for each category
 _FLU_DEBUG = "*:1"
@@ -127,25 +141,38 @@ def registerCategory(category):
     # store it
     _categories[category] = level
 
-def stderrHandler(category, level, message):
+def stderrHandler(level, object, category, file, line, message):
     """
     A log handler that writes to stdout.
 
+    @type level:    string
+    @type object:   string (or None)
     @type category: string
-    @type level: string
-    @type message: string
+    @type message:  string
     """
-    sys.stderr.write('[%5d] %s %-5s %-15s %s\n' % (os.getpid(),
-                                             time.strftime("%b %d %H:%M:%S"),
-                                             level, category, message))
+
+    o = ""
+    if object:
+        o = '"' + object + '"'
+
+    where = "(%s:%d)" % (file, line)
+
+    # 5 + 1 + 16 + 1 + 16 + 1 + 32 + 1 + 7 == 80
+    sys.stderr.write('%-5s %-16s %-16s %-32s [%5d] %-4s %-15s %s\n' % (
+        level, o, category, where, os.getpid(),
+        "", time.strftime("%b %d %H:%M:%S"), message))
     sys.stderr.flush()
 
-def _handle(category, level, message):
+def _handle(level, object, category, message):
     global _log_handlers, _log_handlers_limited
 
     # first all the unlimited ones
+    (file, line) = getFileLine()
     for handler in _log_handlers:
-        handler(category, level, message)
+        try:
+            handler(level, object, category, file, line, message)
+        except TypeError:
+            raise SystemError, "handler %r raised a TypeError" % handler
 
     # the limited ones
     global _categories
@@ -156,55 +183,64 @@ def _handle(category, level, message):
     if _levels[level] > _categories[category]:
         return
     for handler in _log_handlers_limited:
-        handler(category, level, message)
+        try:
+            handler(level, object, category, file, line, message)
+        except TypeError:
+            raise SystemError, "handler %r raised a TypeError" % handler
     
-def error(cat, *args):
+def errorObject(object, cat, *args):
     """
     Log a fatal error message in the given category. \
     This will also raise a L{flumotion.common.errors.SystemError}.
     """
-    msg = ' '.join(args)
-    _handle(cat, 'ERROR', msg)
+    _handle('ERROR', object, cat, ' '.join(args))
 
     # we do the import here because having it globally causes weird import
     # errors if our gstreactor also imports .log, which brings in errors
     # and pb stuff
     from flumotion.common.errors import SystemError
-    raise SystemError(msg)
+    raise SystemError(' '.join(args))
 
-def warning(cat, *args):
+def warningObject(object, cat, *args):
     """
     Log a warning message in the given category.
     This is used for non-fatal problems.
     """
-    _handle(cat, 'WARN', ' '.join(args))
+    _handle('WARN', object, cat, ' '.join(args))
 
-def info(cat, *args):
+def infoObject(object, cat, *args):
     """
     Log an informational message in the given category.
     """
-    _handle(cat, 'INFO', ' '.join(args))
+    _handle('INFO', object, cat, ' '.join(args))
 
-def debug(cat, *args):
+def debugObject(object, cat, *args):
     """
     Log a debug message in the given category.
     """
-    _handle(cat, 'DEBUG', ' '.join(args))
+    _handle('DEBUG', object, cat, ' '.join(args))
 
-def log(cat, *args):
+def logObject(object, cat, *args):
     """
     Log a log message.  Used for debugging recurring events.
     """
-    _handle(cat, 'LOG', ' '.join(args))
+    _handle('LOG', object, cat, ' '.join(args))
+
+error = lambda cat, *args: errorObject(None, cat, *args)
+warning = lambda cat, *args: warningObject(None, cat, *args)
+info = lambda cat, *args: infoObject(None, cat, *args)
+debug = lambda cat, *args: debugObject(None, cat, *args)
+log = lambda cat, *args: logObject(None, cat, *args)
 
 def addLogHandler(func, limited=True):
     """
     Add a custom log handler.
 
-    @param func: a function object with prototype (category, level, message)
-    where all of them are strings.
-    @type func: a callable function
-    @type limited: boolean
+    @param func:    a function object
+                    with prototype (level, object, category, message)
+                    where all of them are strings or None.
+    @type func:     a callable function
+    @type limited:  boolean
     @param limited: whether to automatically filter based on FLU_DEBUG
     """
 
@@ -246,3 +282,22 @@ def setFluDebug(string):
     # reparse all already registered category levels
     for category in _categories:
         registerCategory(category)
+
+def getFileLine():
+    """
+    Return a tuple of (file, line) for the first stack entry outside of
+    log.py
+    """
+    import traceback
+    stack = traceback.extract_stack()
+    while stack:
+        entry = stack.pop()
+        if not entry[0].endswith('log.py'):
+            file = entry[0]
+            # strip everything before first occurence of flumotion/, inclusive
+            i = file.rfind('flumotion')
+            if i != -1:
+                file = file[i + len('flumotion') + 1:]
+            return file, entry[1]
+        
+    return "Not found", 0

@@ -92,35 +92,35 @@ class GstReactor(default.PosixReactorBase):
             # handle python objects
             def wrapper(source, condition, real_s=source, real_cb=callback):
                 return real_cb(real_s, condition)
-            fclog.log('reactor', "Adding python object %r with [fd %5d]" % (
-                source, self._get_fd(source)))
+            #fclog.log('reactor', "Adding python object %r with [fd %5d]" % (
+            #    source, self._get_fd(source)))
             return gobject.io_add_watch(source.fileno(), condition,
                                              wrapper)
         else:
-            fclog.log('reactor', "Adding source with [fd %5d]" % source)
+            #fclog.log('reactor', "Adding source with [fd %5d]" % source)
             return gobject.io_add_watch(source, condition, callback)
 
     def addReader(self, reader):
-        fclog.log('reactor', "Adding reader %r with [fd %5d]" % (reader,
-            self._get_fd(reader)))
+        #fclog.log('reactor', "Adding reader %r with [fd %5d]" % (reader,
+        #    self._get_fd(reader)))
         if not hasReader(reader):
             reads[reader] = self.input_add(reader, INFLAGS, self.callback)
-        else:
-            fclog.debug('reactor', "cannot add reader %r, already in reactor" % 
-                reader)
+        #else:
+        #    fclog.debug('reactor', "cannot add reader %r, already in reactor" % 
+        #        reader)
         try:
             self.simulate()
         except KeyboardInterrupt:
             pass
 
     def addWriter(self, writer):
-        fclog.log('reactor', "Adding writer %r with [fd %5d]" % (writer,
-            self._get_fd(writer)))
+        #fclog.log('reactor', "Adding writer %r with [fd %5d]" % (writer,
+        #    self._get_fd(writer)))
         if not hasWriter(writer):
             writes[writer] = self.input_add(writer, OUTFLAGS, self.callback)
-        else:
-            fclog.debug('reactor', "cannot add writer %r, already in reactor" % 
-                writer)
+        #else:
+        #    fclog.debug('reactor', "cannot add writer %r, already in reactor" % 
+        #        writer)
 
     def removeAll(self):
         v = reads.keys()
@@ -129,24 +129,24 @@ class GstReactor(default.PosixReactorBase):
         return v
 
     def removeReader(self, reader):
-        fclog.log('reactor', "Removing reader %r with [fd %5d]" % (reader,
-            self._get_fd(reader)))
+        #fclog.log('reactor', "Removing reader %r with [fd %5d]" % (reader,
+        #    self._get_fd(reader)))
         if hasReader(reader):
             gobject.source_remove(reads[reader])
             del reads[reader]
-        else:
-            fclog.debug('reactor',
-                "cannot remove reader %r, not in reactor" % reader)
+        #else:
+        #    fclog.debug('reactor',
+        #        "cannot remove reader %r, not in reactor" % reader)
 
     def removeWriter(self, writer):
-        fclog.log('reactor', "Removing writer %r with [fd %5d]" % (writer,
-            self._get_fd(writer)))
+        #fclog.log('reactor', "Removing writer %r with [fd %5d]" % (writer,
+        #    self._get_fd(writer)))
         if hasWriter(writer):
             gobject.source_remove(writes[writer])
             del writes[writer]
-        else:
-            fclog.debug('reactor',
-                "cannot remove writer %r, not in reactor" % writer)
+        #else:
+        #    fclog.debug('reactor',
+        #        "cannot remove writer %r, not in reactor" % writer)
 
     def _get_fd(self, source):
         # Thomas's helper function to print an fd for debugging

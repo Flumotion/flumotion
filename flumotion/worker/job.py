@@ -106,7 +106,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.remote = None
         self.options = options
         self.name = None
-        
+
     ### pb.Referenceable remote methods called on by the WorkerBrain
     ### FIXME: arguments not needed anymore, Medium knows about options
     def remote_initial(self, host, port, transport):
@@ -258,6 +258,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         
         # we pass the options to the medium
         self.medium = JobMedium(options)
+        self.logName = name
         self.login(name)
             
     ### pb.PBClientFactory methods

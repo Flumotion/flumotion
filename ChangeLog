@@ -1,3 +1,16 @@
+2005-01-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/component.py:
+	* flumotion/test/test_log.py:
+	* flumotion/twisted/gstreactor.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  add more crack to the logging module
+
 2005-01-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/common.py (version): Update to 2005.

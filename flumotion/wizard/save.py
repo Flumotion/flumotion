@@ -21,10 +21,10 @@
 from flumotion.common import log
 from flumotion.wizard import enums
 
-
 class Component:
     def __init__(self, name, type, properties={}, worker=None):
-        log.debug('Creating component %s (%s) worker=%r' % (name, type, worker))
+        log.debug('Creating component %s (%s) worker=%r' % (
+            name, type, worker))
         self.name = name
         self.type = type
         self.props = properties
@@ -97,7 +97,7 @@ class Component:
               tuple([f.name for f in self.feeders]) or ''
         for eater in self.eaters:
             eater.printTree(indent+1)
-            
+
 class WizardSaver:
     def __init__(self, wizard):
         self.wizard = wizard

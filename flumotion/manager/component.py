@@ -142,7 +142,9 @@ class FeederSet(log.Loggable):
     I represent a collection of L{Feeder}s.
     I know when a feeder is ready and I handle dependencies between feeders.
     """
+
     logCategory = 'feederset'
+
     def __init__(self):
         self.feeders = {} # feederName -> Feeder
 
@@ -258,6 +260,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
         self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
             self._heartbeatCheck)
+        self.logName = avatarId
         
     # make sure we don't have stray pendingTimedCalls
     def __del__(self):
@@ -271,10 +274,6 @@ class ComponentAvatar(base.ManagerAvatar):
             mood = '(unknown)'
         return '<%s %s in mood %s>' % (self.__class__.__name__,
                                         self.getName(), mood)
-
-    ### log.Loggable methods
-    def logFunction(self, arg):
-        return self.getName() + ': ' + arg
 
     ### ComponentAvatar methods
     def cleanup(self):

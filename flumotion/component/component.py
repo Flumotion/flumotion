@@ -65,6 +65,8 @@ class ComponentClientFactory(superklass):
 
         # get the interfaces implemented by the component medium class
         self.interfaces = getattr(klass, '__implements__', ())
+
+        self.logName = component.name
         
     # override log.Loggable method so we don't traceback
     def error(self, message):
@@ -126,11 +128,9 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         self.comp.connect('log', self._component_log_cb)
         
         self.remote = None # the perspective we have on the other side (?)
-        
-    ### log.Loggable methods
-    def logFunction(self, arg):
-        return self.comp.getName() + ':' + arg
 
+        self.logName = component.name
+        
     ### IMedium methods
     def setRemoteReference(self, remoteReference):
         self.remote = remoteReference
@@ -285,6 +285,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self._HeartbeatDC = None
         self.medium = None # the medium connecting us to the manager's avatar
 
+ 
     def updateMood(self):
         """
         Update the mood because a mood condition has changed.
@@ -318,15 +319,11 @@ class BaseComponent(log.Loggable, gobject.GObject):
         """
         Send heartbeat to manager and reschedule.
         """
-        self.log('Sending heartbeat')
+        #self.log('Sending heartbeat')
         if self.medium:
             self.medium.callRemote('heartbeat', self.state.get('mood'))
         self._HeartbeatDC = reactor.callLater(self._heartbeatInterval,
             self._heartbeat)
-
-    ### Loggable methods
-    def logFunction(self, arg):
-        return self.getName() + ' ' + arg
 
     ### GObject methods
     def emit(self, name, *args):
