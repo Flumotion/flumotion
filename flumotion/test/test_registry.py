@@ -1,3 +1,23 @@
+# -*- Mode: Python; test-case-name: flumotion.test.test_registry -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
+# Flumotion - a video streaming server
+# Copyright (C) 2004 Fluendo
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
+
 import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -22,7 +42,12 @@ class TestRegistry(unittest.TestCase):
         assert not istrue('0') 
         assert not istrue('no') 
         assert not istrue('I am a monkey') 
-       
+
+    def testgetMTime(self):
+        mtime = registry.getMTime(__file__)
+        assert mtime
+        assert isinstance(mtime, int)
+        
     def testParseBasic(self):
         reg = registry.ComponentRegistry()
         assert reg.isEmpty()
@@ -59,7 +84,51 @@ class TestRegistry(unittest.TestCase):
         assert len(comps) == 2
         assert comp1 in comps
         assert comp2 in comps
-            
+        
+    def testParseProperties(self):
+        reg = registry.ComponentRegistry()
+        assert reg.isEmpty()
+        reg.addFromString("""<components>
+          <component name="foobie" type="component">
+            <properties>
+              <property name="source" type="string" required="yes" multiple="yes"/>
+            </properties>
+          </component>
+        </components>""")
+
+        comp = reg.getComponent('component')
+        props = comp.getProperties()
+        assert props
+        assert len(props) == 1
+        prop = props[0]
+        assert prop.getName() == 'source'
+        assert prop.getType() == 'string'
+        assert prop.isRequired()
+        assert prop.isMultiple()
+
+    def testParsePropertiesErrors(self):
+        reg = registry.ComponentRegistry()
+        assert reg.isEmpty()
+        template = """<components>
+          <component name="foobie" type="component">
+            <properties>
+              %s
+            </properties>
+          </component>
+        </components>"""
+
+        property = "<base-name/>"
+        self.assertRaises(registry.XmlParserError,
+                          reg.addFromString, template % property)
+
+        property = '<property without-name=""/>'
+        self.assertRaises(registry.XmlParserError,
+                          reg.addFromString, template % property)
+
+        property = '<property name="bar" without-type=""/>'
+        self.assertRaises(registry.XmlParserError,
+                          reg.addFromString, template % property)
+
     def testClean(self):
         xml = """<components>
           <component name="foo" type="bar"></component></components>"""
@@ -105,12 +174,22 @@ class TestRegistry(unittest.TestCase):
         
 class TestComponentEntry(unittest.TestCase):
     def setUp(self):
+        self.file = registry.RegistryEntryFile('gui-filename', 'type')
         self.entry = registry.RegistryEntryComponent('filename', 'type', False,
                                                      'source', ['prop'],
-                                                     ['files'])
+                                                     [self.file])
+        self.empty_entry = registry.RegistryEntryComponent('filename', 'type', False,
+                                                           'source', ['prop'],
+                                                           [])
+        self.multiple_entry = registry.RegistryEntryComponent('filename', 'type', False,
+                                                              'source', ['prop'],
+                                                              [self.file, self.file])
     def testThings(self):
         assert self.entry.getType() == 'type'
         assert not self.entry.isFactory()
         assert self.entry.getSource() == 'source'
-        assert self.entry.getFiles() == ['files']
+        assert self.entry.getFiles() == [self.file]
+        assert self.entry.getGUIEntry() == 'gui-filename'
+        assert self.empty_entry.getGUIEntry() == None
+        assert self.multiple_entry.getGUIEntry() == None
         
