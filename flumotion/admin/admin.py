@@ -212,6 +212,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         Model will emit the 'component property-changed' signal and pass
         the arguments.
         """
+        self.debug("manager says property %s on component %s changed to %r" % (
+            componentName, propertyName, value))
         self.emit('component-property-changed', componentName, propertyName,
             value)
         

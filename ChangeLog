@@ -1,3 +1,39 @@
+2004-12-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/documenting:
+	  add some doc notes
+	* doc/reference/Makefile.am:
+	  add more stuff
+	* flumotion/test/test_component.py:
+	* flumotion/component/component.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  documenting and method renaming
+	  use "name" as member for component's name
+	  removing deprecated API
+	* flumotion/component/effects/colorbalance/admin_gtk.py:
+	* flumotion/admin/admin.py:
+	  debug changes
+	* flumotion/package.xml:
+	* flumotion/component/component.xml:
+	* flumotion/component/Makefile.am:
+	  sort out who owns package entry points
+	* flumotion/component/effects/colorbalance/colorbalance.xml:
+	* flumotion/component/producers/bttv/bttv.xml:
+	* flumotion/component/producers/webcam/webcam.xml:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  fix deps of bundles
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/producers/webcam/webcam.py:
+	* flumotion/component/producers/bttv/bttv.py:
+	* flumotion/component/effects/colorbalance/colorbalance.py:
+	  create effect base class and rework effect API
+	* flumotion/component/producers/webcam/admin_gtk.py:
+	* flumotion/component/producers/bttv/admin_gtk.py:
+	  act on changed properties on colorbalance
+	* flumotion/worker/job.py:
+	  fix doc
+
 2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/admin.glade:

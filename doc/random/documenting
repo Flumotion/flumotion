@@ -1,0 +1,13 @@
+Documenting Flumotion
+---------------------
+
+API
+---
+
+flumotion uses epydoc (http://epydoc.sf.net/)
+
+- all public methods should be documented, along with parameters and
+  return values
+  @param, @type, @returns, @rtype
+- public instance vars should be documented
+  @ivar, @type

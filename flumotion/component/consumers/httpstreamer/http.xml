@@ -27,8 +27,22 @@
   </components>
 
   <bundles>
-    <bundle name="http-streamer-admin-gtk">
+
+    <bundle name="httpstreamer-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/httpstreamer">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="httpstreamer-admin-gtk">
       <dependencies>
+        <dependency name="httpstreamer-base" />
         <dependency name="base-admin-gtk" />
       </dependencies>
 
@@ -39,5 +53,19 @@
         </directory>
       </directories>
     </bundle>
+
+    <bundle name="httpstreamer-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="httpstreamer-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/httpstreamer">
+                <filename location="http.py" />
+            </directory>
+        </directories>
+    </bundle>
+
   </bundles>
 </registry> 

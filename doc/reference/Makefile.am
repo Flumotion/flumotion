@@ -5,18 +5,20 @@ EPYDOC_ARGS=-q --no-frames --html --ignore-param-mismatch
 
 pypath=$(top_srcdir):@PYGTK_DIR@:$(PYTHONPATH)
 
-MODULE_FILES = $(shell cd $(top_srcdir) && ls	\
-	flumotion/admin/*.py			\
-	flumotion/common/*.py			\
-	flumotion/component/__init__.py		\
-	flumotion/component/component.py	\
-	flumotion/configure/__init__.py		\
-	flumotion/configure/configure.py	\
-	flumotion/manager/*.py			\
-	flumotion/twisted/*.py			\
-	flumotion/utils/__init__.py		\
-	flumotion/utils/gstutils.py		\
-	flumotion/worker/*.py			\
+MODULE_FILES = $(shell cd $(top_srcdir) && ls		\
+	flumotion/admin/*.py				\
+	flumotion/common/*.py				\
+	flumotion/component/*.py			\
+	flumotion/component/base/*.py			\
+	flumotion/component/bouncers/__init__.py	\
+	flumotion/component/bouncers/bouncer.py		\
+	flumotion/configure/__init__.py			\
+	flumotion/configure/configure.py		\
+	flumotion/manager/*.py				\
+	flumotion/twisted/*.py				\
+	flumotion/utils/__init__.py			\
+	flumotion/utils/gstutils.py			\
+	flumotion/worker/*.py				\
 	)
 
 MODULES = $(subst /,.,$(patsubst %.py,%, $(MODULE_FILES:/__init__.py=)))

@@ -95,6 +95,9 @@ class BaseAdminGtk(log.Loggable):
 
     def propertyChanged(self, name, value):
         """
+        Override this method to be notified of component's properties that
+        have changed.
+
         I am meant to be overridden.
         """
         self.debug("property %s changed to %r" % (name, value))
@@ -208,6 +211,10 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
     """
     I am a base class for all GTK+-based component effect Admin UI nodes.
     I am a view on a set of properties for an effect on a component.
+
+    @ivar widget: the main widget representing this node
+    @type widget: L{gtk.Widget}
+    @ivar wtree:  the widget tree representation for this node
     """
     def __init__(self, componentName, admin, view, effectName):
         """
@@ -220,6 +227,9 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
         """
         BaseAdminGtkNode.__init__(self, componentName, admin, view)
         self.effectName = effectName
+
+        self.wtree = None
+        self.widget = None
 
     def effectCallRemote(self, methodName, *args, **kwargs):
         return self.admin.componentCallRemote(self.componentName,

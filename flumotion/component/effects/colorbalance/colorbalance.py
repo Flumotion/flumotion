@@ -24,16 +24,19 @@
 import gst
 import gst.interfaces
 
-from flumotion.common import log
+from flumotion.component import feedcomponent
 
-class Colorbalance(log.Loggable):
+class Colorbalance(feedcomponent.Effect):
     logCategory = "colorbalance"
 
-    def __init__(self, element, hue, saturation, brightness, contrast):
+    def __init__(self, name, element, hue, saturation, brightness, contrast):
         """
         @param element: the GStreamer element supporting the colorbalance
                         interface
+        @param hue: the colorbalance hue, as a percentage
+        @type  hue: float
         """
+        feedcomponent.Effect.__init__(self, name)
         self._element = element
         element.connect('state-change', self._source_state_changed_cb,
             hue, saturation, brightness, contrast)
@@ -63,7 +66,16 @@ class Colorbalance(log.Loggable):
                     value, i.min_value, device_value, i.max_value))
                 percent = _value_to_percent(device_value,
                     i.min_value, i.max_value)
+                # notify all others too
+                if not self.component:
+                    self.warning("effect %s doesn't have a component" %
+                        self.name)
+                else:
+                    self.component.effectPropertyChanged(self.name, which,
+                        percent)
                 return percent
+
+        # didn't find it
         return value
 
     def effect_getColorBalanceProperties(self):

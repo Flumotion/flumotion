@@ -1,6 +1,7 @@
 include $(top_srcdir)/python.mk
                                                                                 
 componentdir = $(libdir)/flumotion/python/flumotion/component
+component_DATA = component.xml
 component_PYTHON = \
 	__init__.py \
 	feedcomponent.py \

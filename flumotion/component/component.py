@@ -224,16 +224,23 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
     def _reloaded(self):
         self.info('reloaded module code for %s' % __name__)
 
-    def remote_callMethod(self, method_name, *args, **kwargs):
-        method = getattr(self.comp, 'remote_' + method_name, None)
+    def remote_callMethod(self, methodName, *args, **kwargs):
+        method = getattr(self.comp, 'remote_' + methodName, None)
         if method:
             return method(*args, **kwargs)
-
-        # XXX: Raise
+        msg = "%r doesn't have method remote_%s" % (self.comp, methodName)
+        self.warning(msg)
+        raise errors.MoMethodError(msg)
 
 class BaseComponent(log.Loggable, gobject.GObject):
     """
     I am the base class for all Flumotion components.
+
+    @ivar name: the name of the component
+    @type name: string
+
+    @cvar component_medium_class: the medium class to use for this component
+    @type component_medium_class: child class of L{BaseComponentMedium}
     """
 
     __remote_interfaces__ = interfaces.IComponentMedium,
@@ -250,8 +257,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         """
         self.__gobject_init__()
         
-        # FIXME: rename to .name
-        self.component_name = name
+        self.name = name
         self.medium = None # the medium connecting us to the manager's avatar
         self._uiBundlers = {}
 
@@ -270,36 +276,10 @@ class BaseComponent(log.Loggable, gobject.GObject):
     ### BaseComponent methods
     # FIXME: rename to getName
     def get_name(self):
-        return self.component_name
+        return self.name
 
     def setMedium(self, medium):
         assert isinstance(medium, BaseComponentMedium)
         self.medium = medium
-
-    def addUIBundler(self, bundler, domain, style):
-        """
-        Add a bundler of UI files for the given domain and style.
-
-        @type bundler: L{flumotion.common.bundle.Bundler}
-        @type domain: string
-        @type style: string
-        """
-        if not self._uiBundlers.has_key(domain):
-            self._uiBundlers[domain] = {}
-        self._uiBundlers[domain][style] = bundler
-
-    def getUIMD5Sum(self, domain, style):
-        if not self._uiBundlers.has_key(domain):
-            return None
-        if not self._uiBundlers[domain].has_key(style):
-            return None
-        return self._uiBundlers[domain][style].bundle().md5sum
-
-    def getUIZip(self, domain, style):
-        if not self._uiBundlers.has_key(domain):
-            return None
-        if not self._uiBundlers[domain].has_key(style):
-            return None
-        return self._uiBundlers[domain][style].bundle().zip
 
 gobject.type_register(BaseComponent)

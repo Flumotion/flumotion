@@ -116,7 +116,8 @@ class ColorbalanceAdminGtkNode(admin_gtk.EffectAdminGtkNode):
             label, failure.getErrorMessage()))
 
     def colorbalanceChangeCallback(self, result, label):
-        self.debug("colorbalance %s changed to %f" % (label, result))
+        self.debug("remote replied colorbalance %s changed to %f" % (
+            label, result))
         # we do a second propertyChanged so both are synced to the result
         self.propertyChanged(label, result)
 

@@ -205,7 +205,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
         
     def __repr__(self):
-        return '<MultifdSinkStreamer (%s)>' % self.component_name
+        return '<MultifdSinkStreamer (%s)>' % self.name
 
     # UI code
     def _checkUpdate(self):

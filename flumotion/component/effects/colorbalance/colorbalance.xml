@@ -3,7 +3,7 @@
 
     <bundle name="colorbalance-base">
         <dependencies>
-            <dependency name="flumotion" />
+            <dependency name="component" />
         </dependencies>
 
         <directories>
@@ -27,8 +27,9 @@
         </directories>
     </bundle>
 
-    <bundle name="colorbalance-component">
+    <bundle name="colorbalance-effect">
         <dependencies>
+            <dependency name="component" />
             <dependency name="colorbalance-base" />
         </dependencies>
 

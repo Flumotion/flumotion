@@ -29,7 +29,7 @@ from twisted.spread import pb
 
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
-from flumotion.common import interfaces, errors
+from flumotion.common import interfaces, errors, log
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
@@ -142,8 +142,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.debug("effect: result: %r" % result)
         return result
 
-
-
 class FeedComponent(basecomponent.BaseComponent):
     """
     I am a base class for all Flumotion feed components.
@@ -171,13 +169,27 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline_signals = []
         self.files = []
         self.effects = {}
-        
+
+        self.feed_names = None # done by self.parse*
+        self.feeder_names = None
+
         self.parseEaterConfig(eater_config)
         self.parseFeederConfig(feeder_config)
         self.setup_pipeline()
 
-    def addEffect(self, name, effect):
-        self.effects[name] = effect
+    def addEffect(self, effect):
+        self.effects[effect.name] = effect
+        effect.setComponent(self)
+
+    def effectPropertyChanged(self, effectName, propertyName, value):
+        """
+        Notify the manager that an effect property has changed to a new value.
+        
+        Admin clients will receive it as a propertyChanged message for
+        effectName:propertyName.
+        """
+        self.medium.callRemote("propertyChanged", self.name,
+            "%s:%s" % (effectName, propertyName), value)
 
     def parseEaterConfig(self, eater_config):
         # the source feeder names come from the config
@@ -200,8 +212,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.feed_names = feeder_config
 
         # we create feeder names this component contains based on feed names
-        name = self.component_name
-        self.feeder_names = map(lambda n: name + ':' + n, self.feed_names)
+        self.feeder_names = map(lambda n: self.name + ':' + n, self.feed_names)
 
     def get_eater_names(self):
         """
@@ -499,7 +510,7 @@ class ParseLaunchComponent(FeedComponent):
         if not parts[1]:
             if parts[0] == 'eater':
                 raise TypeError, "'%s' should specify feeder component" % block
-            parts[1] = self.component_name
+            parts[1] = self.name
         if len(parts) == 2:
             parts.append('')
         if  not parts[2]:
@@ -591,3 +602,38 @@ class ParseLaunchComponent(FeedComponent):
         
         return pipeline
 
+class Effect(log.Loggable):
+    """
+    I am a part of a feed component for a specific group
+    of functionality.
+
+    @ivar name:      name of the effect
+    @type name:      string
+    @ivar component: component owning the effect
+    @type component: L{FeedComponent}
+    """
+    logCategory = "effect"
+
+    def __init__(self, name):
+        """
+        @param name: the name of the effect
+        """
+        self.name = name
+        self.component = None # component owning this effect
+
+    def setComponent(self, component):
+        """
+        Set the given component as the effect's owner.
+        
+        @param component: the component to set as an owner of this effect
+        @type  component: L{FeedComponent}
+        """                               
+        self.component = component
+
+    def getComponent(self):
+        """
+        Get the component owning this effect.
+        
+        @rtype:  L{FeedComponent}
+        """                               
+        return self.component

@@ -40,10 +40,10 @@ from flumotion.twisted import credentials
 
 def getComponent(dict, defs):
     """
-    @param config:    the configuration dictionary
-    @type  config:    dict
-    @param defs:      the registry entry for a component
-    @type  defs:      L{flumotion.common.registry.RegistryEntryComponent}
+    @param dict: the configuration dictionary
+    @type  dict: dict
+    @param defs: the registry entry for a component
+    @type  defs: L{flumotion.common.registry.RegistryEntryComponent}
     """
     log.debug('component', 'getting source for defs %r' % defs)
     try:

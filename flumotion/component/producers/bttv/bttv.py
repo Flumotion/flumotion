@@ -93,9 +93,9 @@ def createComponent(config):
     saturation = config.get('saturation', None)
     brightness = config.get('brightness', None)
     contrast = config.get('contrast', None)
-    cb = colorbalance.Colorbalance(source, hue, saturation, brightness,
-        contrast)
-    component.addEffect('outputColorbalance', cb)
+    cb = colorbalance.Colorbalance('outputColorbalance', source,
+        hue, saturation, brightness, contrast)
+    component.addEffect(cb)
 
     # register state change notify to set channel and norm
     element = component.get_pipeline().get_by_name('source')

@@ -34,4 +34,10 @@ class WebcamAdminGtk(BaseAdminGtk):
     def getNodes(self):
         return self._nodes
 
+    def propertyChanged(self, name, value):
+        if name.startswith('outputColorbalance:'):
+            cb = self._nodes['Colorbalance']
+            propertyName = name.split(':')[1]
+            cb.propertyChanged(propertyName, value)
+
 GUIClass = WebcamAdminGtk

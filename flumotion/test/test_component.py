@@ -31,7 +31,7 @@ from flumotion.component.feedcomponent import ParseLaunchComponent
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, eater_config, feeder_config):
         self.__gobject_init__()
-        self.component_name = 'fake'
+        self.name = 'fake'
         self.remote = None
 
         self.parseEaterConfig(eater_config)

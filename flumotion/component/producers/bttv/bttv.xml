@@ -30,10 +30,24 @@
   </components>
 
   <bundles>
+
+   <bundle name="bttv-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/bttv">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
     <bundle name="bttv-admin-gtk">
         <dependencies>
-            <dependency name="base-admin-gtk"/>
-            <dependency name="colorbalance-admin-gtk"/>
+            <dependency name="bttv-base" />
+            <dependency name="base-admin-gtk" />
+            <dependency name="colorbalance-admin-gtk" />
         </dependencies>
 
         <directories>
@@ -42,6 +56,20 @@
             </directory>
         </directories>
     </bundle>
+
+    <bundle name="bttv-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="bttv-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/bttv">
+                <filename location="bttv.py" />
+            </directory>
+        </directories>
+    </bundle>
+
   </bundles>
             
 </registry> 
