@@ -6,6 +6,11 @@
 
 2004-10-07  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/http/http.py
+	(HTTPStreamingResource._render): Fix HEAD and PROPFIND for
+	component, so gnome-vfs 2.6.0 can sniff the content-type without
+	barking. 
+	
 	* flumotion/common/registry.py (ComponentRegistry.getFileList):
 	Make it recursive
 

@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_http -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/component/http/http.py: a consumer that streams over HTTP
@@ -226,14 +226,12 @@ class Stats:
         return self.average_client_number
 
     def getState(self):
-       
         c = self
         s = {}
-
+ 
         bytes_sent      = c.getBytesSent()
         bytes_received  = c.getBytesReceived()
         uptime          = c.getUptime()
-
 
         s['stream-mime'] = c.get_mime()
         s['stream-uptime'] = common.formatTime(uptime)
@@ -252,7 +250,7 @@ class Stats:
         s['consumption-totalbytes'] = common.formatStorage(bytes_sent) + 'Byte'
 
         return s
- 
+
 ### the Twisted resource that handles the base URL
 class HTTPStreamingResource(resource.Resource, log.Loggable):
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
@@ -469,13 +467,14 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.streamer.add_client(fd)
         ip = request.getClientIP()
         self.info('[fd %5d] start streaming to %s' % (fd, ip))
-        
+
     ### resource.Resource methods
 
-    def render(self, request):
+    def _render(self, request):
         fd = request.transport.fileno()
         self.debug('[fd %5d] render: client from %s connected, request %s' %
             (fd, request.getClientIP(), request))
+
         if not self.isReady():
             return self._handleNotReady(request)
         elif self.reachedMaxClients():
@@ -483,9 +482,21 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         elif not self.isAuthenticated(request):
             return self._handleUnauthorized(request)
 
-        self._handleNewClient(request)
-        return server.NOT_DONE_YET
+        if request.method == 'GET':
+            self._handleNewClient(request)
+        elif request.method == 'HEAD':
+            self._writeHeaders(request)
+        else:
+            raise AssertionError
         
+        return server.NOT_DONE_YET
+
+    render_GET = _render
+    render_HEAD = _render
+    
+    def render_PROPFIND(self, request):
+        return http.NOT_ALLOWED
+    
     def getChild(self, path, request):
         if path == 'stats':
             return self.admin
