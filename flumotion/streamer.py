@@ -55,7 +55,7 @@ class Streamer(gobject.GObject, component.BaseComponent):
         self.caps = None
         
     def msg(self, *args):
-        log.msg('[launcher] %s' % string.join(args))
+        log.msg('[streamer] %s' % string.join(args))
 
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-received', buffer)
@@ -97,8 +97,7 @@ class StreamingResource(resource.Resource):
         reactor.callLater(0, self.bufferWrite)
 
     def msg(self, *args):
-        log.msg('[launcher] %s' % string.join(args))
-
+        log.msg('[streamer] %s' % string.join(args))
         
     def data_received_cb(self, transcoder, gbuffer):
         s = str(buffer(gbuffer))
@@ -143,12 +142,6 @@ class StreamingResource(resource.Resource):
             self.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
-        # Stolen from camserv
-	# FIXME: only for jpeg of course
-        #request.setHeader('Cache-Control', 'no-cache')
-        #request.setHeader('Cache-Control', 'private')
-        #request.setHeader("Content-type", "%s;boundary=ThisRandomString" % self.streamer.caps)
-        #request.setHeader('Pragma', 'no-cache')
         mime = self.streamer.caps.get_structure(0).get_name()
         if mime == 'multipart/x-mixed-replace':
             self.msg('setting Content-type to %s but with camserv hack' % mime)
