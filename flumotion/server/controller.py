@@ -323,7 +323,7 @@ class Controller(pb.Root):
 
     def isLocalComponent(self, component):
         # TODO: This could be a lot smarter
-        host = component.mind.broker.transport.getPeer()
+        host = component.mind.broker.transport.getPeer()[1]
         if host == '127.0.0.1':
             return True
         else:
