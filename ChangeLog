@@ -1,5 +1,29 @@
 2005-02-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/wizard.py: Set the bg/base on the whole
+	content area for INSENSITIVE so it doesn't look like krap.
+	(set_step): Make the sidebar text smaller.
+	
+	* flumotion/admin/gtk/client.py (Window._create_ui): Set PLAY and
+	PAUSED images from our own store instead of from stock, as they
+	are from GTK+ 2.6.
+
+	* data/glade/wizard.glade: Fool around with dimensions some more.
+
+	* data/glade/admin.glade: No handled toolbar -- that's a user
+	decision.
+
+	* data/glade/admin-wizard.glade: Fiddle with eventboxes so that
+	colors aren't nasty when setting INSENSITIVE.
+
+	* data/images/Makefile.am:
+	* data/images/16x16/Makefile.am:
+	* data/images/24x24/Makefile.am:
+	* data/images/16x16/play.png:
+	* data/images/24x24/play.png:
+	* data/images/16x16/pause.png
+	* data/images/24x24/pause.png: New images from GTK+ 2.6.
+
 	* flumotion/wizard/wizard.py: Try to grab focus when run. Doesn't
 	work yet.
 

@@ -109,17 +109,27 @@ class Window(log.Loggable, gobject.GObject):
         gtk.window_set_default_icon_from_file(iconfile)
         window.set_icon_from_file(iconfile)
         
+        def set_icon(proc, size, name):
+            f = os.path.join(configure.imagedir, '%dx%d' % (size,size), name)
+            i = gtk.Image()
+            i.set_from_file(f)
+            proc(i)
+            
+        def menu_set_icon(m, name):
+            set_icon(lambda f: m.set_property('image', f), 16, name)
+
+        def tool_set_icon(m, name):
+            set_icon(m.set_icon_widget, 24, name)
+
         iconfile = os.path.join(configure.imagedir, 'fluendo.png')
         gtk.window_set_default_icon_from_file(iconfile)
 
-        m = widgets['menuitem_manage_run_wizard']
-        iconfile = os.path.join(configure.imagedir, '16x16', 'wizard.png')
-        i = gtk.Image(); i.set_from_file(iconfile)
-        m.set_property('image', i)
-        iconfile = os.path.join(configure.imagedir, '24x24', 'wizard.png')
-        i = gtk.Image(); i.set_from_file(iconfile)
-        t = widgets['toolbutton_wizard']
-        t.set_icon_widget(i)
+        menu_set_icon(widgets['menuitem_manage_run_wizard'], 'wizard.png')
+        tool_set_icon(widgets['toolbutton_wizard'], 'wizard.png')
+        menu_set_icon(widgets['menuitem_manage_start_component'], 'play.png')
+        tool_set_icon(widgets['toolbutton_start_component'], 'play.png')
+        menu_set_icon(widgets['menuitem_manage_stop_component'], 'pause.png')
+        tool_set_icon(widgets['toolbutton_stop_component'], 'pause.png')
 
         self.hpaned = widgets['hpaned']
         # too blatant self-promotion ?

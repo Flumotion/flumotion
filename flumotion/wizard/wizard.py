@@ -549,10 +549,10 @@ class Wizard(gobject.GObject, log.Loggable):
 
         if active or step.visited:
             button.set_property('can_focus', False)
-            s = name
+            s = '<small>%s</small>' % name
         else:
             button.set_sensitive(False)
-            s = ('<span foreground="%s">%s</span>'
+            s = ('<small><span foreground="%s">%s</span></small>'
                  % (pc(self.sidebar_fgi), name))
             
         label.set_markup(s)
