@@ -259,11 +259,11 @@ class WizardSaver:
             consumer.link(muxer)
             components.append(consumer)
 
-        if not audio_muxer.eaters:
+        if not audio_muxer and audio_muxer.eaters:
             components.remove(audio_muxer)
-        if not video_muxer.eaters:
+        if not video_muxer and video_muxer.eaters:
             components.remove(video_muxer)
-        if not both_muxer.eaters:
+        if not both_muxer and both_muxer.eaters:
             components.remove(both_muxer)
             
     def getXML(self):
