@@ -90,7 +90,7 @@ class VideoTestAdminGtk(BaseAdminGtk):
     def getNodes(self):
         return self._nodes
 
-    def propertyChanged(self, name, value):
+    def component_propertyChanged(self, name, value):
         # FIXME: tie to correct node better
         self._nodes['pattern'].propertyChanged(name, value)
 

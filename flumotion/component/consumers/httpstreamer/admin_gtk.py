@@ -37,8 +37,8 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         label.set_text('Mime type: %s' % mime)
         label.show()
 
-    def setUIState(self, state):
-        self.updateLabels(state)
+    def setStats(self, stats):
+        self.updateLabels(stats)
         if not self.shown:
             self.shown = True
             self.statistics.show_all()
@@ -93,8 +93,9 @@ class HTTPStreamerAdminGtk(BaseAdminGtk):
         self._nodes['statistics'] = statistics
 
     # FIXME: tie this to the statistics node better
-    def setUIState(self, state):
-        self._nodes['statistics'].setUIState(state)
+    def component_statsChanged(self, stats):
+        # FIXME: decide on state/stats/statistics
+        self._nodes['statistics'].setStats(stats)
  
     def getNodes(self):
         return self._nodes

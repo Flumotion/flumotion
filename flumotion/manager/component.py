@@ -520,13 +520,6 @@ class ComponentAvatar(common.ManagerAvatar):
         self.error('error element=%s string=%s' % (element, error))
         self.heaven.removeComponent(self)
 
-    def perspective_uiStateChanged(self, componentName, state):
-        self.vishnu.adminHeaven.uiStateChanged(componentName, state)
-
-    def perspective_propertyChanged(self, componentName, propertyName, value):
-        self.vishnu.adminHeaven.componentPropertyChanged(componentName,
-            propertyName, value)
-
     def perspective_adminCallRemote(self, methodName, *args, **kwargs):
         # proxies admin remote call from component's medium to admin heaven
         componentName = self.avatarId

@@ -23,8 +23,22 @@
   </components>
 
   <bundles>
+
+    <bundle name="videotest-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/videotest">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
     <bundle name="videotest-admin-gtk">
       <dependencies>
+        <dependency name="videotest-base" />
         <dependency name="base-admin-gtk" />
       </dependencies>
 
@@ -34,6 +48,20 @@
         </directory>
       </directories>
     </bundle>
+
+    <bundle name="videotest-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="videotest-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/videotest">
+                <filename location="videotest.py" />
+            </directory>
+        </directories>
+    </bundle>
+
   </bundles>
 
 </registry> 

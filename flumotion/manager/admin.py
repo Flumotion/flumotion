@@ -129,19 +129,10 @@ class AdminAvatar(common.ManagerAvatar):
         self.debug("AdminAvatar.componentRemoved: %s" % component)
         self.mindCallRemote('componentRemoved', ComponentView(component))
 
+# FIXME: deprecated
     def componentStateChanged(self, component, state):
         self.debug("AdminAvatar.componentStateChanged: %s %s" % (component, state))
         self.mindCallRemote('componentStateChanged', ComponentView(component), state)
-
-    def componentPropertyChanged(self, componentName, propertyName, value):
-        self.debug("AdminAvatar.componentPropertyChanged: %s.%s is %r" % (
-            componentName, propertyName, value))
-        self.mindCallRemote('componentPropertyChanged', componentName,
-            propertyName, value)
-
-    def uiStateChanged(self, name, state):
-        self.debug("AdminAvatar.uiStateChanged: %s %s" % (name, state))
-        self.mindCallRemote('uiStateChanged', name, state)
 
     ### pb.Avatar IPerspective methods
     def perspective_shutdown(self):
@@ -187,6 +178,7 @@ class AdminAvatar(common.ManagerAvatar):
             self.warning("exception on remote call: %s" % str(e))
             return failure.Failure(errors.RemoteMethodError(str(e)))
         
+    # FIXME: deprecate both of these
     def perspective_setComponentElementProperty(self, componentName, element, property, value):
         """Set a property on an element in a component."""
         component = self.vishnu.componentHeaven.getComponent(componentName)
@@ -327,6 +319,7 @@ class AdminHeaven(common.ManagerHeaven):
         for avatar in self.getAvatars():
             avatar.componentRemoved(component)
             
+# FIXME: deprecated; use avatarsCallRemote and use moods
     def componentStateChanged(self, component, state):
         """
         Tell all created AdminAvatars that a component has changed state.
@@ -335,30 +328,6 @@ class AdminHeaven(common.ManagerHeaven):
         """
         for avatar in self.getAvatars():
             avatar.componentStateChanged(component, state)
-
-    def componentPropertyChanged(self, componentName, propertyName, value):
-        """
-        Tell all created AdminAvatars that a property on a component has
-        changed.
-
-        @param componentName: name of the component
-        @param propertyName:  name of the property 
-        @param value:         new value
-        """
-        
-        for avatar in self.getAvatars():
-            avatar.componentPropertyChanged(componentName, propertyName, value)
- 
-    def uiStateChanged(self, name, state):
-        """
-        Tell all created AdminAvatars that an ui state for a component was changed
-
-        @type name:      name of the component
-        @type state:     new ui state
-        """
-        
-        for avatar in self.getAvatars():
-            avatar.uiStateChanged(name, state)
 
     def avatarsCallRemote(self, methodName, *args, **kwargs):
         """

@@ -339,7 +339,8 @@ class Window(log.Loggable, gobject.GObject):
         localMethodName = "component_%s" % methodName
         if not hasattr(self.current_component, localMethodName):
             self.debug("... but does not have method %s" % localMethodName)
-            self.warning("Component %s does not implement %s" % localMethodName)
+            self.warning("Component view %s does not implement %s" % (
+                name, localMethodName))
             return
         self.debug("... and executing")
         method = getattr(self.current_component, localMethodName)
@@ -438,6 +439,7 @@ class Window(log.Loggable, gobject.GObject):
         if comp:
             comp.setUIState(state)
 
+    # FIXME: deprecated
     def property_changed_cb(self, admin, componentName, propertyName, value):
         # called when a property for that component has changed
         current = self.get_selected_component_name()

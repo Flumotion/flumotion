@@ -259,7 +259,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
         
         self.name = name
         self.medium = None # the medium connecting us to the manager's avatar
-        self._uiBundlers = {}
 
     ### Loggable methods
     def logFunction(self, arg):

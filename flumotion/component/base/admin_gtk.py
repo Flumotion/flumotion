@@ -40,7 +40,7 @@ class BaseAdminGtk(log.Loggable):
         """
         @type  name:  string
         @param name:  name of the component this is a UI for
-        @type  admin: L{flumotion.admin.AdminModel}
+        @type  admin: L{flumotion.admin.admin.AdminModel}
         @param admin: the admin model that interfaces with the manager for us
         @type  view:   
         @param view:  the toolkit view we are embedded in
@@ -134,7 +134,7 @@ class BaseAdminGtkNode(log.Loggable):
         """
         @type  componentName:  string
         @param componentName:  name of the component this is a UI for
-        @type  admin: L{flumotion.admin.AdminModel}
+        @type  admin: L{flumotion.admin.admin.AdminModel}
         @param admin: the admin model that interfaces with the manager for us
         @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
         @param view:  the GTK+ admin view we are embedded in
@@ -220,7 +220,7 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
         """
         @type  componentName:  string
         @param componentName:  name of the component this is a UI for
-        @type  admin: L{flumotion.admin.AdminModel}
+        @type  admin: L{flumotion.admin.admin.AdminModel}
         @param admin: the admin model that interfaces with the manager for us
         @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
         @param view:  the GTK+ admin view we are embedded in

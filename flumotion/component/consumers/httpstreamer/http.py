@@ -145,8 +145,9 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     def getState(self):
         return self.comp.getState()
 
+    # FIXME: decide on "state", "stats", or "statistics"
     def _comp_ui_state_changed_cb(self, comp):
-        self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
+        self.callRemote('adminCallRemote', 'statsChanged', self.getState())
 
     def authenticate(self, bouncerName, keycard):
         """
