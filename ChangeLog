@@ -1,5 +1,11 @@
 2004-09-14  Johan Dahlin  <johan@gnome.org>
 
+	* bin/runtest.in (olddir): script to run tests
+
+	* flumotion/component/http/http.py (MultifdSinkStreamer.notify_caps_cb) 
+	(MultifdSinkStreamer.update_ui_state): Use idle_add to emit
+	signals, to ensure that they are sent from the main thread
+
 	* flumotion/worker: Commit worker, still WIP
 
 	* flumotion/test/test_log.py:

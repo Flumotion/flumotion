@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_http -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a video streaming server
@@ -539,8 +539,8 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
 
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
-        
-        self.emit('ui-state-changed')
+
+        gobject.idle_add(self.emit, 'ui-state-changed')
 
     def get_mime(self):
         if self.caps:
@@ -568,7 +568,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         return sink
 
     def update_ui_state(self):
-        self.emit('ui-state-changed')
+        gobject.idle_add(self.emit, 'ui-state-changed')
         
     def client_added_cb(self, sink, fd):
         Stats.clientAdded(self)
@@ -579,12 +579,15 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         Stats.clientRemoved(self)
         self.update_ui_state()
 
-    def feeder_state_change_cb(self, element, old, state):
+    def feeder_state_change_idle(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
             self.debug('Ready to serve clients on %d' % self.port)
 
+    def feeder_state_change_cb(self, element, old, state):
+        gobject.idle_add(feeder_state_change_idle, element, old, state)
+        
     def link_setup(self, eaters, feeders):
         sink = self.get_sink()
         sink.connect('deep-notify::caps', self.notify_caps_cb)

@@ -51,6 +51,7 @@ Makefile
 bin/flumotion
 bin/flumotion-admin
 bin/flumotion-worker
+bin/runtest
 bin/Makefile
 data/Makefile
 data/glade/Makefile

@@ -53,17 +53,18 @@ class TestLog(unittest.TestCase):
         
         # log 2 we shouldn't get
         self.tester.log("not visible")
-        #assert not self.category
-        #assert not self.level
-        #assert not self.message
+        assert not self.category
+        assert not self.level
+        assert not self.message
         
         self.tester.debug("not visible")
-        #assert not self.category
-        #assert not self.level
-        #assert not self.message
+        assert not self.category
+        assert not self.level
+        assert not self.message
 
         raise unittest.SkipTest
-
+    testLimitInvisible.skip = True
+    
     def testLimitedVisible(self):
         log.setFluDebug("testlog:3")
         log.addLogHandler(self.handler)
@@ -122,9 +123,8 @@ class TestLog(unittest.TestCase):
         log.addLogHandler(self.handler, limited=False)
         
         self.tester.log("visible")
-        #assert self.message == 'override visible'
-        
-        raise unittest.SkipTest
+        assert self.message == 'override visible'
+    testOwnLogHandlerLimited.skip = True
   
     def testLogHandlerAssertion(self):
         self.assertRaises(TypeError, log.addLogHandler, None)
