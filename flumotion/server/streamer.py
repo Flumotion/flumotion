@@ -121,7 +121,7 @@ class StreamingResource(resource.Resource):
         else:
             self.msg('setting Content-type to %s' % mime)
             request.setHeader('Content-type', mime)
-        
+
         for buffer in self.caps_buffers:
             request.write(buffer)
             
@@ -203,7 +203,7 @@ class FileSinkStreamer(component.ParseLaunchComponent):
         pipeline = self.pipe_template % self.get_location()
         component.ParseLaunchComponent.__init__(self, name, sources,
                                                 [], pipeline)
-        
+
     def create_admin(self):
         from twisted.manhole.telnet import ShellFactory
         from flumotion.twisted.shell import Shell
@@ -216,9 +216,6 @@ class FileSinkStreamer(component.ParseLaunchComponent):
 
         return ts
     
-    def set_instance(self, shell):
-        print 'setting pipeline', self.pipeline == None, self.pipeline is None
-        
     def get_location(self):
         if self.location.find('%') != -1:
             timestamp = time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime())
@@ -242,6 +239,7 @@ class FileSinkStreamer(component.ParseLaunchComponent):
         sink.set_property('location', location)
         
         self.pipeline.set_state(gst.STATE_PLAYING)
+
         
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
@@ -277,6 +275,26 @@ class MultifdSinkStreamer(component.ParseLaunchComponent):
         self.caps = caps
 
     def add_client(self, fd):
+        if not self.caps:
+            self.msg('We have no caps yet')
+            return
+ 
+        os.write(fd, 'HTTP/1.0 200 OK\n')
+        os.write(fd, 'Server: FlumotionMultiFDSink/0.0.0.1\n')
+        
+        mime = self.caps.get_structure(0).get_name()
+        if mime == 'multipart/x-mixed-replace':
+            self.msg('setting Content-type to %s but with camserv hack' % mime)
+            # Stolen from camserv
+            os.write(fd, 'Cache-Control: no-cache\n')
+            os.write(fd, 'Cache-Control: private\n')
+            os.write(fd, "Content-type: %s;boundary=ThisRandomString\n" % mime)
+        else:
+            self.msg('setting Content-type to %s' % mime)
+            os.write(fd, 'Content-type: %s\n' % mime)
+
+        os.write(fd, '\n')
+        
         sink = self.get_sink()
         sink.emit('add', fd)
          
