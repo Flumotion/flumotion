@@ -39,7 +39,7 @@ import errors
 
 class Streamer(gobject.GObject, component.BaseComponent):
     __gsignals__ = {
-        'data-recieved': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
+        'data-received': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
                           (gst.Buffer, str)),
     }
 
@@ -54,7 +54,7 @@ class Streamer(gobject.GObject, component.BaseComponent):
         if pad.is_negotiated():
             caps = pad.get_negotiated_caps()
             
-        self.emit('data-recieved', buffer, caps)
+        self.emit('data-received', buffer, caps)
         
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
@@ -74,7 +74,7 @@ class StreamingResource(resource.Resource):
         resource.Resource.__init__(self)
 
         self.streamer = streamer
-        streamer.connect('data-recieved', self.data_recieved_cb)
+        streamer.connect('data-received', self.data_received_cb)
         #streamer.connect('get-caps', self.get_caps_cb)
         
         self.current_requests = []
@@ -83,7 +83,7 @@ class StreamingResource(resource.Resource):
 
         reactor.callLater(0, self.bufferWrite)
         
-    def data_recieved_cb(self, transcoder, gbuffer, caps):
+    def data_received_cb(self, transcoder, gbuffer, caps):
         if not self.caps:
             caps = gst.caps_from_string(caps)
             structure = caps[0]
