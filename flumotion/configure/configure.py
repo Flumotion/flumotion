@@ -77,7 +77,7 @@ else:
 config_dict['defaultTCPManagerPort'] = 8642
 config_dict['defaultSSLManagerPort'] = 7531
 config_dict['defaultStreamPortRange'] = range(8800, 8844 + 1)
-config_dict['defaultGstPortRange'] = range(8600, 8699 + 1)
+config_dict['defaultGstPortRange'] = range(8600, 8639 + 1)
 
 for key, value in config_dict.items():
     dictionary = locals()
