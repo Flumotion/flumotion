@@ -263,7 +263,7 @@ class Servicer(log.Loggable):
             
         self.info("Loading worker %s" % workerFile)
 
-        command = "flumotion-worker --debug 3 -D -n %s %s" % (name, workerFile)
+        command = "flumotion-worker -D -n %s %s" % (name, workerFile)
         retval = self.startProcess(command)
 
         if retval == 0:

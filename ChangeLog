@@ -1,5 +1,10 @@
 2005-03-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/service/service.py:
+	  have the worker start with the debug specified in the config instead
+
+2005-03-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/connections.py:
 	  sacrifice animals to the god of python checking
 
