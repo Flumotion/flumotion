@@ -113,11 +113,11 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         return self.remote.callRemote('reloadController')
 
     def reloadComponent(self, result, client):
-        print "Asking for reload of component %s" % client.name
+        self.info("Asking for reload of component %s" % client.name)
         return self.remote.callRemote('reloadComponent', client.name)
 
     def getUIEntry(self, component):
-        print 'calling remote getUIEntry %s' % component
+        self.info('calling remote getUIEntry %s' % component)
         return self.remote.callRemote('getUIEntry', component)
     
 gobject.type_register(AdminInterface)
