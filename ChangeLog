@@ -1,5 +1,10 @@
 2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	  make pkgAddPath only add stuff to __path__ if not already there
+
+2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/bouncers/bouncer.py:
 	* flumotion/component/bouncers/htpasswdcrypt.py:
 	  unprivatize Bouncer.addKeycard()

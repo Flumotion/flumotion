@@ -259,7 +259,9 @@ def addPackagePath(packagePath):
     # First add the root to sys.path, so we can import stuff from it,
     # probably a good idea to live it there, if we want to do
     # fancy stuff later on.
-    sys.path.append(os.path.abspath(packagePath))
+    abs = os.path.abspath(packagePath)
+    if not abs in sys.path:
+        sys.path.append(abs)
 
     # Find the packages in the path and sort them,
     # the following algorithm only works if they're sorted.
@@ -276,7 +278,9 @@ def addPackagePath(packagePath):
     
     # Append the bundle to the __path__ of the toplevel directory
     package = reflect.namedAny(toplevelName)
-    package.__path__.append(os.path.join(packagePath, toplevelName))
+    path = os.path.join(packagePath, toplevelName)
+    if not path in package.__path__:
+        package.__path__.append(path)
     
     for packageName in packageNames[1:]:
         package = sys.modules.get(packageName, None)
@@ -291,7 +295,10 @@ def addPackagePath(packagePath):
         # magic that's required
         subPath = os.path.join(packagePath,
                                packageName.replace('.', os.sep))
-        package.__path__.insert(0, subPath)
+        if not subPath in package.__path__:
+            # insert because FLU_REGISTRY_PATH paths should override
+            # base components
+            package.__path__.insert(0, subPath)
 
 
 def ensureDir(dir, description):
