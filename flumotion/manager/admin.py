@@ -224,7 +224,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         # XXX: Maybe we need to a prefix, so we can limit what an admin interface
         #      can call on a worker
         try:
-            return workerAvatar.callRemoteMethod(remoteMethod, *args, **kwargs)
+            return workerAvatar.callRemoteMethod(methodName, *args, **kwargs)
         except Exception, e:
             self.warning(str(e))
             raise
