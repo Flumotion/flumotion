@@ -52,7 +52,8 @@ class Streamer(gobject.GObject, component.BaseComponent):
         self.caps = None
         
     def sink_handoff_cb(self, element, buffer, pad):
-        self.emit('data-received', buffer)
+        pass
+        #self.emit('data-received', buffer)
 
     def notify_caps_cb(self, element, pad, param):
         if not self.caps and pad.is_negotiated():
@@ -84,8 +85,7 @@ class StreamingResource(resource.Resource):
         reactor.callLater(0, self.bufferWrite)
         
     def data_received_cb(self, transcoder, gbuffer):
-        pass
-        #self.buffer_queue.append(str(buffer(gbuffer)))
+        self.buffer_queue.append(str(buffer(gbuffer)))
         
     def bufferWrite(self, *args):
         for buffer in self.buffer_queue:
