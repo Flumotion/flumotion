@@ -1,3 +1,12 @@
+2004-08-17  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/component.py (ComponentView): New class with
+	twisted specific interfaces
+	(BaseComponent): remove twisted code and add signals for
+	communication with it
+
+	* conf/videotest-jpeg.xml: Change location of png file
+
 2004-08-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/components/http.py:

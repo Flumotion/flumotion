@@ -23,6 +23,8 @@ import socket
 import gobject
 import gst
 
+from flumotion.twisted import errors
+
 def caps_repr(caps):
     value = str(caps)
     pos = value.find('streamheader')
@@ -72,3 +74,27 @@ def get_free_port(start):
             return port
         port += 1
 
+
+def gobject_set_property(object, property, value):
+    for pspec in gobject.list_properties(object):
+        if pspec.name == property:
+            break
+    else:
+        raise errors.PropertyError("No property called: %s" % property)
+        
+    if pspec.value_type in (gobject.TYPE_INT, gobject.TYPE_UINT,
+                            gobject.TYPE_INT64, gobject.TYPE_UINT64):
+        value = int(value)
+    elif pspec.value_type == gobject.TYPE_BOOLEAN:
+        if value == 'False':
+            value = False
+        elif value == 'True':
+            value = True
+        else:
+            value = bool(value)
+    elif pspec.value_type in (gobject.TYPE_DOUBLE, gobject.TYPE_FLOAT):
+        value = float(value)
+    else:
+        raise errors.PropertyError('Unknown property type: %s' % pspec.value_type)
+
+    object.set_property(property, value)

@@ -41,10 +41,11 @@ class Property:
         return self.required
     
 class Component:
-    def __init__(self, type, factory, source, properties):
+    def __init__(self, type, factory, source, source_gui=None, properties={}):
         self.type = type
         self.factory = factory
         self.source = source
+        self.source_gui = source_gui
         self.properties = properties
 
     def getProperties(self):
@@ -132,11 +133,14 @@ class RegistryXmlParser:
                 properties[prop.getName()] = prop
 
         source = None
+        source_gui = None
         for child in node.childNodes:
             if child.nodeType != Node.ELEMENT_NODE:
                 continue
 
             if child.nodeName == 'source':
+                source = self.parse_source(child)
+            elif child.nodeName == 'source-gui':
                 source = self.parse_source(child)
             elif child.nodeName == 'properties':
                 child_properties = self.parse_properties(properties, child)
@@ -149,7 +153,8 @@ class RegistryXmlParser:
             if factory in ('false', 'no'):
                 factory = False
 
-        return Component(type, factory, source, properties.values())
+        return Component(type, factory, source, source_gui,
+                         properties.values())
 
     def parse_source(self, node):
         # <source location="..."/>

@@ -29,19 +29,29 @@ from flumotion.server import component
 __all__ = ['FileSinkStreamer']
 
 class FileSinkStreamer(component.ParseLaunchComponent):
-    pipe_template = 'filesink name=sink location="%s"'
+    pipe_template = 'multifdsink name=sink'
     def __init__(self, name, source, location):
-        self.location = location
-
-        pipeline = self.pipe_template % location
+        
+        pipeline = self.pipe_template
         component.ParseLaunchComponent.__init__(self, name, [source],
                                                 [], pipeline)
+        sink = self.pipeline.get_by_name('sink')
+        self.fd = open(location, 'w')
+        sink.emit('add', self.fd.fileno())
 
+    def change_filename(self, filename):
+        sink.emit('remove', self.fd.fileno())
+        self.fd.close() # XXX: Needed?
+        
+        self.fd = open(location, 'w')
+        sink.emit('add', self.fd.fileno())
+        
 def createComponent(config):
     name = config['name']
     source = config['source']
     location = config['location']
     
     component = FileSinkStreamer(name, source, location)
-
+    component.add_filename(location)
+    
     return component

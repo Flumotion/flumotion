@@ -29,49 +29,135 @@ from twisted.spread import pb
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
 
-class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
+class ComponentFactory(pbutil.ReconnectingPBClientFactory):
     __super_init = pbutil.ReconnectingPBClientFactory.__init__
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
-
+    def __init__(self, component):
+        self.__super_init()
+        self.view = ComponentView(component)
+        
     def login(self, username):
         
         self.__super_login(pbutil.Username(username),
-                           client=self.component)
+                           client=self.view)
         
     def gotPerspective(self, perspective):
-        self.component.cb_gotPerspective(perspective)
+        self.view.cb_gotPerspective(perspective)
 
-class BaseComponent(pb.Referenceable):
-    def __init__(self, name, sources, feeds):
-        self.component_name = name
-        self.sources = sources
-        self.feeds = feeds
-        self.remote = None # the perspective we have on the other side (?)
-        self.pipeline = None
-        self.pipeline_signals = []
-
-        self.setup_pipeline()
-
-        # Prefix our login name with the name of the component
-        self.username = name
-        self.factory = ComponentClientFactory()
-        self.factory.component = self
-        self.factory.login(self.username)
-
-    def debug(self, *args):
-        category = self.getName()
-        log.debug(category, *args)
-        # also log remotely
-        if self.hasPerspective():
-            self.callRemote('log', *args)
+class ComponentView(pb.Referenceable):
+    def __init__(self, component):
+        self.comp = component
+        self.comp.connect('state-changed', self.component_state_changed_cb)
+        self.comp.connect('error', self.component_error_cb)
+        self.comp.connect('log', self.component_log_cb)
         
-    warning = lambda s, *a: log.warning(s.getName(), *a)
+        self.remote = None # the perspective we have on the other side (?)
+        
+    warning = lambda s, *a: log.warning(s.comp.getName(), *a)
+    debug = lambda s, *a: log.debug(s.comp.getName(), *a)
+    
+    def callRemote(self, name, *args, **kwargs):
+        if not self.hasPerspective():
+            self.debug('skipping %s, no perspective' % name)
+            return
+
+        def errback(reason):
+            self.warning('stopping pipeline because of %s' % reason)
+            self.comp.pipeline_stop()
+            
+        cb = self.remote.callRemote(name, *args, **kwargs)
+        cb.addErrback(errback)
 
     def cb_gotPerspective(self, perspective):
         self.remote = perspective
         
     def hasPerspective(self):
         return self.remote != None
+
+    def getIP(self):
+        assert self.remote
+        peer = self.remote.broker.transport.getPeer()
+        return socket.gethostbyname(peer[1])
+
+    def component_log_cb(self, component, args):
+        self.callRemote('log', *args)
+        
+    def component_error_cb(self, component, element_path, message):
+        self.callRemote('error', element_path, message)
+        
+    def component_state_changed_cb(self, component, feed, state):
+        self.callRemote('stateChanged', feed, state)
+
+    #
+    # Remote methods
+    #
+    def remote_link(self, sources, feeds):
+        self.comp.link(sources, feeds)
+
+    def remote_getElementProperty(self, element_name, property):
+        return self.comp.get_element_property(element_name, property)
+        
+    def remote_setElementProperty(self, element_name, property, value):
+        self.comp.set_element_property(element_name, property, value)
+        
+    def remote_play(self):
+        self.comp.play()
+        
+    def remote_stop(self):
+        self.comp.stop()
+        self.remote.broker.transport.loseConnection()
+        reactor.stop()
+        
+    def remote_pause(self):
+        self.comp.pause()
+
+    def remote_register(self):
+        if not self.hasPerspective():
+            self.warning('We are not ready yet, waiting 250 ms')
+            reactor.callLater(0.250, self.remote_register)
+            return
+
+        return {'ip' : self.getIP(),
+                'pid' :  os.getpid(), 
+                'sources' : self.comp.getSources(),
+                'feeds' : self.comp.getFeeds(),
+                'elements': self.comp.get_element_names() }
+    
+    def remote_getFreePorts(self, feeds):
+        retval = []
+        ports = {}
+        free_port = gstutils.get_free_port(start=5500)
+        for name, host, port in feeds:
+            if port == None:
+                port = free_port
+                free_port += 1
+            ports[name] = port
+            retval.append((name, host, port))
+            
+        return retval, ports
+        
+class BaseComponent(gobject.GObject):
+    __gsignals__ = {
+        'state-changed': (gobject.SIGNAL_RUN_FIRST, None, (str, object)),
+        'error':         (gobject.SIGNAL_RUN_FIRST, None, (str, str)),
+        'log':         (gobject.SIGNAL_RUN_FIRST, None, (object,)),
+        }
+    def __init__(self, name, sources, feeds):
+        self.__gobject_init__()
+        self.component_name = name
+        self.sources = sources
+        self.feeds = feeds
+        self.pipeline = None
+        self.pipeline_signals = []
+
+        self.setup_pipeline()
+
+    def debug(self, *args):
+        category = self.getName()
+        log.debug(category, *args)
+        self.emit('log', args)
+        
+    warning = lambda s, *a: log.warning(s.getName(), *a)
 
     def getName(self):
         return self.component_name
@@ -82,23 +168,6 @@ class BaseComponent(pb.Referenceable):
     def getFeeds(self):
         return self.feeds
 
-    def getIP(self):
-        assert self.remote
-        peer = self.remote.broker.transport.getPeer()
-        return socket.gethostbyname(peer[1])
-
-    def callRemote(self, name, *args, **kwargs):
-        if not self.hasPerspective():
-            self.debug('skipping %s, no perspective' % name)
-            return
-
-        def errback(reason):
-            self.warning('stopping pipeline because of %s' % reason)
-            self.pipeline_stop()
-            
-        cb = self.remote.callRemote(name, *args, **kwargs)
-        cb.addErrback(errback)
-
     def restart(self):
         self.debug('restarting')
         self.cleanup()
@@ -106,15 +175,13 @@ class BaseComponent(pb.Referenceable):
         
     def pipeline_error_cb(self, object, element, error, arg):
         self.debug('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
-        self.callRemote('error', element.get_path_string(), error.message)
-
+        self.emit('error', element.get_path_string(), error.message)
         #self.restart()
         
     def feed_state_change_cb(self, element, old, state, feed):
-        #print element, feed, gst.element_state_get_name(old), '->', gst.element_state_get_name(state)
         self.debug('state-changed %s %s' % (element.get_path_string(),
-                                          gst.element_state_get_name(state)))
-        self.callRemote('stateChanged', feed, state)
+                                            gst.element_state_get_name(state)))
+        self.emit('state-changed', feed, state)
 
     def set_state_and_iterate(self, state):
         retval = self.pipeline.set_state(state)
@@ -123,8 +190,8 @@ class BaseComponent(pb.Referenceable):
                     gst.element_state_get_name(state))
         gobject.idle_add(self.pipeline.iterate)
 
-    # accessor
-    get_pipeline = lambda s: s.pipeline
+    def get_pipeline(self):
+        return self.pipeline
 
     def create_pipeline(self):
         raise NotImplementedError
@@ -198,50 +265,20 @@ class BaseComponent(pb.Referenceable):
         map(self.pipeline.disconnect, self.pipeline_signals)
         self.pipeline = None
         self.pipeline_signals = []
-        
-    def remote_register(self):
-        if not self.hasPerspective():
-            self.warning('We are not ready yet, waiting 250 ms')
-            reactor.callLater(0.250, self.remote_register)
-            return
 
-        pipeline = self.get_pipeline()
-        element_names = [element.get_name()
-                            for element in pipeline.get_list()]
-
-        return {'ip' : self.getIP(),
-                'pid' :  os.getpid(), 
-                'sources' : self.getSources(),
-                'feeds' : self.getFeeds(),
-                'elements': element_names }
-    
-    def remote_getFreePorts(self, feeds):
-        retval = []
-        ports = {}
-        free_port = gstutils.get_free_port(start=5500)
-        for name, host, port in feeds:
-            if port == None:
-                port = free_port
-                free_port += 1
-            ports[name] = port
-            retval.append((name, host, port))
-            
-        return retval, ports
-
-    def remote_play(self):
+    def play(self):
         self.debug('Playing')
         self.pipeline_play()
-        
-    def remote_stop(self):
+
+    def stop(self):
         self.debug('Stopping')
         self.pipeline_stop()
-        self.remote.broker.transport.loseConnection()
-        reactor.stop()
-        
-    def remote_pause(self):
-        self.pipeline_pause()
 
-    def remote_link(self, sources, feeds):
+    def pause(self):
+        self.debug('Pausing')
+        self.pipeline_pause()
+                
+    def link(self, sources, feeds):
         self.setup_sources(sources)
         self.setup_feeds(feeds)
         
@@ -250,8 +287,12 @@ class BaseComponent(pb.Referenceable):
             func(sources, feeds)
             
         self.pipeline_play()
+
+    def get_element_names(self):
+        pipeline = self.get_pipeline()
+        return [element.get_name() for element in pipeline.get_list()]
         
-    def remote_getElementProperty(self, element_name, property):
+    def get_element_property(self, element_name, property):
         element = self.pipeline.get_by_name(element_name)
         if not element:
             raise errors.PropertyError("No element called: %s" % element_name)
@@ -264,35 +305,16 @@ class BaseComponent(pb.Referenceable):
 
         return value
 
-    def remote_setElementProperty(self, element_name, property, value):
+    def set_element_property(self, element_name, property, value):
         element = self.pipeline.get_by_name(element_name)
         if not element:
             raise errors.PropertyError("No element called: %s" % element_name)
 
-        for pspec in gobject.list_properties(element):
-            if pspec.name == property:
-                break
-        else:
-            raise errors.PropertyError("No property called: %s" % property)
-        
-        if pspec.value_type in (gobject.TYPE_INT, gobject.TYPE_UINT,
-                                gobject.TYPE_INT64, gobject.TYPE_UINT64):
-            value = int(value)
-        elif pspec.value_type == gobject.TYPE_BOOLEAN:
-            if value == 'False':
-                value = False
-            elif value == 'True':
-                value = True
-            else:
-                value = bool(value)
-        elif pspec.value_type in (gobject.TYPE_DOUBLE, gobject.TYPE_FLOAT):
-            value = float(value)
-        else:
-            raise errors.PropertyError('Unknown property type: %s' % pspec.value_type)
-
-        self.debug('setting property %s on element %s to %s' % (property, element_name, value))
-        element.set_property(property, value)
-
+        self.debug('setting property %s on element %r to %s' %
+                   (property, element_name, value))
+        gstutils.gobject_set_property(element, property, value)
+gobject.type_register(BaseComponent)
+    
 class ParseLaunchComponent(BaseComponent):
     SOURCE_TMPL = 'tcpclientsrc'
     FEED_TMPL = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'
@@ -354,3 +376,4 @@ class ParseLaunchComponent(BaseComponent):
         self.debug('pipeline for %s is %s' % (self.getName(), pipeline))
         
         return pipeline
+

@@ -30,7 +30,7 @@ from twisted.internet.protocol import ClientCreator, Factory
 from twisted.protocols.basic import NetstringReceiver
 
 from flumotion import config
-from flumotion.server import controller
+from flumotion.server import controller, component
 from flumotion.server.config import FlumotionConfigXML
 from flumotion.server.registry import registry
 from flumotion.utils import log, gstutils
@@ -144,11 +144,14 @@ class Launcher:
         self.threads_init()
         self.set_nice(config.nice)
 
-        component = config.getComponent()
+        comp = config.getComponent()
+        component_name = config.getName()
         self.debug('Starting %s (%s) on pid %d' %
-                 (config.getName(), config.getType(), pid))
-        reactor.connectTCP(self.controller_host, self.controller_port,
-                           component.factory)
+                   (component_name, config.getType(), pid))
+        factory = component.ComponentFactory(comp)
+        factory.login(component_name)
+        
+        reactor.connectTCP(self.controller_host, self.controller_port, factory)
         
         reactor.run(False)
         raise SystemExit

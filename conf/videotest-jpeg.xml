@@ -14,7 +14,7 @@
 
   <component name="png-overlay" type="overlay">
     <source>videotest-producer</source>
-    <location>/home/jdahlin/Pictures/alphacolors.png</location>
+    <location>/tmp/overlay.png</location>
   </component>
   
   <component name="jpeg+multipart" type="multipartjpeg">
