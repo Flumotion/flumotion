@@ -13,8 +13,6 @@
 	
 2004-11-26  Johan Dahlin  <johan@gnome.org>
 
-	reviewed by: <delete if not using a buddy>
-
 	* flumotion/common/registry.py:
 	* flumotion/component/consumers/httpstreamer/http.xml:
 	* flumotion/manager/manager.py:
