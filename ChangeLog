@@ -1,5 +1,12 @@
 2004-09-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/components/http/http.py
+	(HTTPStreamingAdminResource.render_stats): Start cleaning up the
+	statistics so we eventually can move them to a separate class.
+
+	* flumotion/server/config.py (ConfigEntry.getComponent): Move back 
+	function and clean up slightly.
+	
 	* flumotion/components/http/http.py:
 	* flumotion/components/http/http_gui.py:
 	* flumotion/gui/admininterface.py:

@@ -80,7 +80,35 @@ class HTTPClientKeycard:
 
     def getIP(self):
         return self.request.getClientIP()
-        
+
+def format_bytes(bytes):
+    'nicely format number of bytes'
+    idx = ['P', 'T', 'G', 'M', 'K', '']
+    value = float(bytes)
+    l = idx.pop()
+    while idx and value >= 1024:
+        l = idx.pop()
+        value /= 1024
+    return "%.2f %sB" % (value, l)
+
+def format_time(time):
+    'nicely format time'
+    display = []
+    days = time / 86400
+    if days >= 7:
+        display.append('%d weeks' % days / 7)
+        days %= 7
+    if days >= 1:
+        display.append('%d days' % days)
+    time %= 86400
+    h = time / 3600
+    time %= 3600
+    m = time / 60
+    time %= 60
+    s = time
+    display.append('%02d:%02d:%02d' % (h, m, s))
+    return " ".join(display)
+    
 class HTTPStreamingAdminResource(resource.Resource):
     def __init__(self, streaming):
         'call with a HTTPStreamingResource to admin for'
@@ -92,34 +120,6 @@ class HTTPStreamingAdminResource(resource.Resource):
 
     def getChild(self, path, request):
         return self
-
-    def format_bytes(self, bytes):
-        'nicely format number of bytes'
-        idx = ['P', 'T', 'G', 'M', 'K', '']
-        value = float(bytes)
-        l = idx.pop()
-        while idx and value >= 1024:
-            l = idx.pop()
-            value /= 1024
-        return "%.2f %sB" % (value, l)
-
-    def format_time(self, time):
-        'nicely format time'
-        display = []
-        days = time / 86400
-        if days >= 7:
-            display.append('%d weeks' % days / 7)
-            days %= 7
-        if days >= 1:
-            display.append('%d days' % days)
-        time %= 86400
-        h = time / 3600
-        time %= 3600
-        m = time / 60
-        time %= 60
-        s = time
-        display.append('%02d:%02d:%02d' % (h, m, s))
-        return " ".join(display)
         
     def isAuthenticated(self, request):
         if request.getClientIP() == '127.0.0.1':
@@ -141,26 +141,38 @@ class HTTPStreamingAdminResource(resource.Resource):
             return ERROR_TEMPLATE % {'code': error_code,
                                      'error': http.RESPONSES[error_code]}
 
+        return self.render_stats(request)
+    
+    def render_stats(self, request):
+        mime = self.streaming.streamer.get_mime()
+        
         el = self.streaming.streamer.get_sink()
-        stats = {}
-        stats['Clients connected'] = str(len(self.streaming.request_hash))
-        stats['Flesh shown'] = random.choice(('too much', 'not enough', 'just about right'))
-        stats['Mime type'] = self.streaming.streamer.get_mime()
         bytes_sent = el.get_property('bytes-served')
-        stats['Total bytes sent'] = self.format_bytes(bytes_sent)
         bytes_received = el.get_property('bytes-to-serve')
-        stats['Bytes processed'] = self.format_bytes(bytes_received)
         uptime = time.time() - self.streaming.start_time
-        stats['Stream uptime'] = self.format_time(uptime)
-        stats['Stream bitrate'] = self.format_bytes(bytes_received / uptime) + '/sec'
-        stats['Total client bitrate'] = self.format_bytes(bytes_sent / uptime) + '/sec'
-        stats['Peak Client Number'] = self.streaming.peak_client_number
+        clients = str(len(self.streaming.request_hash))
+        peak_clients = self.streaming.peak_client_number
+        average_clients = int(self.streaming.average_client_number)
+        max_clients = int(self.streaming.maxAllowedClients())
+        
+        stats = {}
+        stats['Clients connected'] = clients
+        stats['Mime type'] = mime
+        stats['Total bytes sent'] = format_bytes(bytes_sent)
+        stats['Bytes processed'] = format_bytes(bytes_received)
+        stats['Stream uptime'] = format_time(uptime)
+        stats['Stream bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
+        stats['Total client bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
+        stats['Peak Client Number'] = peak_clients
+        
         self.streaming.updateAverage()
-        stats['Average Simultaneous Clients'] = int(self.streaming.average_client_number)
-        stats['Maximum allowed clients'] = int(self.streaming.maxAllowedClients())
+        stats['Average Simultaneous Clients'] = average_clients
+        stats['Maximum allowed clients'] = max_clients
+
         block = []
         for key in stats.keys():
             block.append('<tr><td>%s</td><td>%s</td></tr>' % (key, stats[key]))
+            
         return STATS_TEMPLATE % {
             'name': self.streaming.streamer.get_name(),
             'stats': "\n".join(block)

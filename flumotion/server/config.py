@@ -37,17 +37,16 @@ class ConfigEntry:
         self.func = func
         self.config = config
         self.defs = defs
-        self.component = self.func(self.config)
 
+        # Setup files to be transmitted over the wire. Must be a
+        # better way of doing this.
         mod = reflect.namedAny(self.defs.getSource())
         dir = os.path.split(mod.__file__)[0]
-        files = {}
-        for file in defs.getFiles():
+        self.files = {}
+        for file in self.defs.getFiles():
             filename = os.path.basename(file.getFilename())
             real = os.path.join(dir, filename)
-            files[real] = file
-
-        self.component.setFiles(files)
+            self.files[real] = file
         
     def getType(self):
         return self.type
@@ -59,7 +58,16 @@ class ConfigEntry:
         return self.config
     
     def getComponent(self):
-        return self.component
+        # Create the component which the specified configuration
+        # directives. Note that this can't really be moved from here
+        # since it gets called by the launcher from another process
+        # and we don't want to create it in the main process, since
+        # we're going to listen to ports and other stuff which should
+        # be separated from the main process.
+        
+        component = self.func(self.getConfigDict()
+        component.setFiles(self.files)
+        return component
 
     def startFactory(self):
         return self.config.get('start-factory', True)
