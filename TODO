@@ -98,6 +98,14 @@
 * EASY		add worker checks to all wizard steps now that infrastructure
 		is there
 
+* MEDIUM	refactor createComponent to be a real constructor
+
+* MEDIUM	make sure the entry point specified in xml is used instead
+
+* MEDIUM	when creating components in jobs, get the actual avatarId
+		in there in some other way than putting it in the config dict
+
+* EASY		change RequesterName to RequesterId
 - API cleanup:
 
 - manager/component.py:
