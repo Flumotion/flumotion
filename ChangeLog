@@ -1,5 +1,12 @@
 2005-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-admin.in:
+	* flumotion/twisted/gstreactor.py:
+	  add in some try/except stuff and various tweaks to make Flumotion
+	  also work with Twisted 2.0
+
+2005-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	* flumotion/wizard/steps.py:
 	* flumotion/worker/checks/video.py:

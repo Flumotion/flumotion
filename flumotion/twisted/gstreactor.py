@@ -47,10 +47,24 @@ from twisted.python import log, threadable, runtime, failure
 from twisted.internet.interfaces import IReactorFDSet
 
 # Sibling Imports
-from twisted.internet import main, default, error
+from twisted.internet import main, error
 
-reads = default.reads
-writes = default.writes
+# THOMAS: Twisted 1.3/2.0 compatibility piece
+
+reads = {}
+writes = {}
+
+posixbasemod = None
+try:
+    # 2.0
+    from twisted.internet import posixbase
+    posixbasemod = posixbase
+except:
+    from twisted.internet import default
+    posixbasemod = default
+    reads = default.reads
+    writes = default.writes
+
 #hasReader = reads.has_key
 #hasWriter = writes.has_key
 # Using direct function assignment triggers doc build errors, so we use a lambda
@@ -68,15 +82,15 @@ POLL_DISCONNECTED = gobject.IO_HUP | gobject.IO_ERR | \
 INFLAGS = gobject.IO_IN | POLL_DISCONNECTED
 OUTFLAGS = gobject.IO_OUT | POLL_DISCONNECTED
 
-class GstReactor(default.PosixReactorBase):
+class GstReactor(posixbasemod.PosixReactorBase):
     """GObject/Gst event loop reactor. """
 
-    __implements__ = (default.PosixReactorBase.__implements__, IReactorFDSet)
+    __implements__ = (posixbasemod.PosixReactorBase.__implements__, IReactorFDSet)
 
     def __init__(self):
         self.context = gobject.MainContext()
         
-        default.PosixReactorBase.__init__(self)
+        posixbasemod.PosixReactorBase.__init__(self)
         
     # The input_add function in pygtk1 checks for objects with a
     # 'fileno' method and, if present, uses the result of that method
