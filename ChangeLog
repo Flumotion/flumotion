@@ -1,3 +1,9 @@
+2005-02-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/client.py (Window.start_stop_notify_cb):
+	Move clear_all updating here from
+	_set_stop_start_component_sensitive.
+
 2005-02-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/manager.py:

@@ -592,6 +592,9 @@ class Window(log.Loggable, gobject.GObject):
         can_stop = self.components_view.get_property('can-stop-any')
         self.widgets['menuitem_manage_stop_all'].set_sensitive(can_stop)
         self.widgets['menuitem_manage_start_all'].set_sensitive(can_start)
+        # they're all in sleeping or lost
+        s = self.widgets['menuitem_manage_clear_all'].set_sensitive
+        s(can_start and not can_stop)
 
     def admin_update_cb(self, admin):
         self.update_components()
@@ -611,8 +614,6 @@ class Window(log.Loggable, gobject.GObject):
         can_stop = bool(moodname and moodname!='sleeping' and moodname!='lost')
         d['menuitem_manage_stop_component'].set_sensitive(can_stop)
         d['toolbutton_stop_component'].set_sensitive(can_stop)
-        # they're all in sleeping or lost
-        d['menuitem_manage_clear_all'].set_sensitive(can_start and not can_stop)
 
     ### ui callbacks
     def _components_view_has_selection_cb(self, view, state):
