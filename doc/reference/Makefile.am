@@ -16,7 +16,6 @@ MODULE_FILES = \
         flumotion/common/config.py		\
 	flumotion/common/errors.py		\
 	flumotion/common/interfaces.py		\
-	flumotion/common/launcher.py		\
 	flumotion/common/registry.py		\
 	flumotion/component/__init__.py		\
 	flumotion/component/component.py	\
