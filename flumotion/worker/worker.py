@@ -330,7 +330,7 @@ class Port:
         self.used = True
 
     def isFree(self):
-        return self.used == False
+        return self.used is False
 
     def getNumber(self):
         return self.number
@@ -457,11 +457,6 @@ class JobHeaven(pb.Root, log.Loggable):
         return avatar
 
     def shutdown(self):
-        cb = None
         for avatar in self.avatars.values():
-            new = avatar.stop()
-            if cb:
-                cb.chainDeferred(new)
-                cb = new
-        return cb
+            avatar.stop()
 
