@@ -35,7 +35,7 @@ terminal 1:
 terminal 2:
   FLU_DEBUG=*:3 flumotion-admin localhost 8890
 
-  Select the streamer-ogg-test-vorbis-theora component
+  Double-click the streamer-ogg-test-vorbis-theora component
 
 terminal 3:
   gst-launch gnomevfssrc location=http://localhost:8800 ! oggdemux name=mux
