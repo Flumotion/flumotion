@@ -196,6 +196,7 @@ class RegistryXmlParser:
             properties[name] = property
 
 class ComponentRegistry:
+    """Registry, this is normally not instantiated."""
     def __init__(self):
         self.components = {}
 
