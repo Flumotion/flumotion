@@ -42,7 +42,7 @@ class AcquisitionManager:
             interface = socket.gethostname()
         return interface, port
 
-    def onConnect(self, object, control, hostname, port):
+    def onConnect(self, object, control):
         d = object.callRemote('setController', control)
         def getRetval(object_id):
             self.objs[object_id] = object
@@ -55,7 +55,7 @@ class AcquisitionManager:
         reactor.connectTCP(hostname, port, factory)
 
         object = factory.getRootObject()
-        object.addCallback(self.onConnect, self.control, hostname, port)
+        object.addCallback(self.onConnect, self.control)
         return object
     
 class TranscoderManager:
@@ -93,7 +93,7 @@ class TranscoderManager:
     
 class ControllerFactory(pb.Referenceable):
     def __init__(self):
-        self.objs = {}
+        self.linked_objs = {}
         self.hostnames = {}
         self.ports = {}
         self.acq_mgr = AcquisitionManager(self)
@@ -109,32 +109,44 @@ class ControllerFactory(pb.Referenceable):
         return self.acq_mgr.connect(hostname, port)
 
     def connectTranscoder(self, hostname, port):
-        object = self.trans_mgr.connect(hostname, port)
-        return object
+        return self.trans_mgr.connect(hostname, port)
 
     def transGetInfo(self, port, obj):
         self.ports[obj.processUniqueID()] = port
         return obj
-    
+
+    def getLinkedObject(self, object):
+        object_id = object.processUniqueID()
+        if not self.linked_objs.has_key(object_id):
+            raise KeyError, "%r is not linked to an object yet" % object
+
+        other = self.linked_objs[object_id]
+        return other
+
+    def addLinkedObjects(self, object, other):
+        if not hasattr(other, 'result'):
+            return
+
+        other = other.result
+        
+        self.linked_objs[object.processUniqueID()] = other
+        self.linked_objs[other.processUniqueID()] = object
+        
     def link(self, acq, trans, port):
-        def onAcqConnect(obj, other):
-            if hasattr(other, 'result'):
-                self.objs[obj.processUniqueID()] = other.result
-                self.objs[other.result.processUniqueID()] = obj
-            obj.callRemote('start')
-            return obj
+        def onAcqConnect(object, other):
+            self.addLinkedObjects(object, other)
+            object.callRemote('start')
+            return object
 
         acq.addCallback(onAcqConnect, trans)
         
-        def onTransConnect(obj, other):
+        def onTransConnect(object, other):
             print 'Transcoder connected'
-            if hasattr(other, 'result'):
-                self.objs[obj.processUniqueID()] = other.result
-                self.objs[other.result.processUniqueID()] = obj
-            obj.callRemote('start', port)
-            retval = obj.callRemote('getInfo')
-            retval.addCallback(self.transGetInfo, obj)
-            return obj
+            self.addLinkedObjects(object, other)
+            object.callRemote('start', port)
+            retval = object.callRemote('getInfo')
+            retval.addCallback(self.transGetInfo, object)
+            return object
 
         trans.addCallback(onTransConnect, acq)
 
@@ -143,10 +155,8 @@ class ControllerFactory(pb.Referenceable):
 
     def remote_acqNotifyCaps(self, acq_id, caps):
         print 'Controller.acqNotifyCaps', caps
-
         acq = self.acq_mgr.objs[acq_id]
-        
-        transcoder = self.objs[acq.processUniqueID()]
+        transcoder = self.getLinkedObject(acq)
         retval = transcoder.callRemote('setCaps', caps)
         
         def whenCapsIsSet(obj, acq):
