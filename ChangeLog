@@ -1,5 +1,12 @@
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	  add a Gtk progress dialog
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	  change clients to components.

@@ -34,6 +34,7 @@ from flumotion.manager import admin   # Register types
 from flumotion.common import errors
 from flumotion.utils import log
 from flumotion.utils.gstutils import gsignal
+from flumotion.admin.gtk import dialogs
 
 COL_PIXBUF = 0
 COL_TEXT   = 1
@@ -46,7 +47,7 @@ class PropertyChangeDialog(gtk.Dialog):
     
     def __init__(self, name, parent):
         title = "Change element property on '%s'" % name
-        dialog = gtk.Dialog.__init__(self, title, parent,
+        gtk.Dialog.__init__(self, title, parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         self.connect('response', self.response_cb)
         self.add_button('Close', gtk.RESPONSE_CLOSE)
@@ -192,9 +193,9 @@ class Window(log.Loggable):
         """
         Show an error message dialog.
 
-        @arg message the message to display.
-        @arg parent the gtk.Window parent window.
-        @arg response whether the error dialog should go away after response.
+        @param message the message to display.
+        @param parent the gtk.Window parent window.
+        @param response whether the error dialog should go away after response.
 
         returns: the error dialog.
         """
@@ -277,10 +278,21 @@ class Window(log.Loggable):
         raise NotImplementedError
 
     def debug_reload_manager_cb(self, button):
-        cb = self.admin.reloadManager()
+        deferred = self.admin.reloadManager()
 
     def debug_reload_all_cb(self, button):
-        cb = self.admin.reload()
+        def _stop(dialog):
+            dialog.stop()
+            dialog.destroy()
+
+        def _callLater(admin, dialog):
+            deferred = self.admin.reload()
+            deferred.addCallback(lambda result: _stop(dialog))
+        
+        dialog = dialogs.ProgressDialog("Reloading ...", self.window)
+        dialog.message("Reloading manager")
+        dialog.start()
+        reactor.callLater(0.2, _callLater, self.admin, dialog)
  
     def debug_modify_cb(self, button):
         name = self.get_selected_component()
