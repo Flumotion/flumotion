@@ -20,10 +20,6 @@
 
 import sys
 
-# Workaround for non existent popt integration
-_sys_argv = sys.argv
-sys.argv = sys.argv[:1]
-
 if __name__ == '__main__':
     import gstreactor
     gstreactor.install()
@@ -64,4 +60,4 @@ def main(args):
     reactor.run()
 
 if __name__ == '__main__':
-    sys.exit(main(_sys_argv))
+    sys.exit(main(sys.argv))
