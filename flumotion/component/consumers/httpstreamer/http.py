@@ -397,9 +397,6 @@ def createComponent(config):
     if config.has_key('maxclients'):
         component.resource.setMaxClients(int(config['maxclients']))
         
-    if config.has_key('admin-password'):
-        component.resource.setAdminPassword(config['admin-password'])
-
     if config.has_key('bouncer'):
         component.resource.setBouncerName(config['bouncer'])
 

@@ -36,8 +36,7 @@ from flumotion.common import errors
 
 from flumotion.common import common, log, keycards
 
-__all__ = ['HTTPStreamingAdminResource',
-           'HTTPStreamingResource', 'MultifdSinkStreamer']
+__all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
 
 HTTP_NAME = 'FlumotionHTTPServer'
 HTTP_VERSION = configure.version
@@ -53,102 +52,7 @@ ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 </html>
 """
 
-STATS_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
-<html>
-<head>
-  <title>Statistics for %(name)s</title>
-</head>
-<body>
-<table>
-%(stats)s
-</table>
-</body>
-</html>
-"""
-
 HTTP_VERSION = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
-
-# implements a Resource for the HTTP admin interface
-class HTTPAdminResource(web_resource.Resource):
-    
-    # IResource interface variable; True means it will not chain requests
-    # further down the path to other resource providers through
-    # getChildWithDefault
-    isLeaf = True
-    
-    def __init__(self, parent):
-        'call with a HTTPStreamingResource to admin for'
-        self.parent = parent
-        self.debug = self.parent.debug
-        web_resource.Resource.__init__(self)
-
-    ### resource.Resource methods
-
-    def render(self, request):
-        self.debug('Request for admin page')
-        if not self.isAuthenticated(request):
-            self.debug('Unauthorized request for /admin from %s' % request.getClientIP())
-            error_code = http.UNAUTHORIZED
-            request.setResponseCode(error_code)
-            request.setHeader('server', HTTP_VERSION)
-            request.setHeader('content-type', 'text/html')
-            request.setHeader('WWW-Authenticate', 'Basic realm="Restricted Access"')
-
-            return ERROR_TEMPLATE % {'code': error_code,
-                                     'error': http.RESPONSES[error_code]}
-
-        return self._render_stats(request)
-
-    ### our methods
-
-    # FIXME: file has this too - move upperclass ?
-    def isAuthenticated(self, request):
-        if request.getClientIP() == '127.0.0.1':
-            return True
-        
-        if (request.getUser() == 'admin' and
-            request.getPassword() == self.parent.admin_password):
-            return True
-        return False
-     
-    def _render_stats(self, request):
-        streamer = self.parent.streamer
-        s = streamer.getState()
-        
-        def row(label, value):
-            return '<tr><td>%s</td><td>%s</td></tr>' % (label, value)
-        block = []
-
-        block.append('<tr><td colspan=2><b>Stream</b></td></tr>')
-        block.append('<tr>')
-        block.append(row('Mime type',   s['stream-mime']))
-        block.append(row('Uptime',      s['stream-uptime']))
-        block.append(row('Bit rate',    s['stream-bitrate']))
-        block.append(row('Total bytes', s['stream-totalbytes']))
-        block.append('</tr>')
-
-        block.append('<tr><td colspan=2><b>Clients</b></td></tr>')
-        block.append('<tr>')
-        current = s['clients-current']
-        max = s['clients-max']
-        block.append(row('Current', "%s (of %s) " % (current, max)))
-        block.append(row('Average', s['clients-average']))
-        peak = s['clients-peak']
-        time = s['clients-peak-time']
-        block.append(row('Peak',    "%s (at %s) " % (peak, time)))
-        block.append('</tr>')
-
-        block.append('<tr><td colspan=2><b>Client consumption</b></td></tr>')
-        block.append('<tr>')
-        block.append(row('Bit rate',    s['consumption-bitrate']))
-        block.append(row('Total bytes', s['consumption-totalbytes']))
-        block.append('</tr>')
-         
-        return STATS_TEMPLATE % {
-            'name': streamer.getName(),
-            'stats': "\n".join(block)
-        }
-
 
 ### the Twisted resource that handles the base URL
 class HTTPStreamingResource(web_resource.Resource, log.Loggable):
@@ -167,7 +71,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         @param streamer: L{MultifdSinkStreamer}
         """
         self.logfile = None
-        self.admin_password = None
             
         streamer.connect('client-removed', self._streamer_client_removed_cb)
         self.streamer = streamer
@@ -250,9 +153,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def setMaxClients(self, maxclients):
         self.info('setting maxclients to %d' % maxclients)
         self.maxclients = maxclients
-
-    def setAdminPassword(self, password):
-        self.admin_password = password
 
     def setBouncerName(self, bouncerName):
         self.bouncerName = bouncerName

@@ -43,3 +43,17 @@ class Caps(unittest.TestCase):
         caps = gst.caps_from_string('application/ogg,streamheader=abcd')
         self.assertEquals(gstreamer.caps_repr(caps),
             'streamheader=<...>')
+
+class FakeComponent:
+    def debug(self, string): pass
+
+class DeepNotify(unittest.TestCase):
+    def testDeepNotify(self):
+        component = FakeComponent()
+        pipeline = gst.parse_launch('fakesrc num-buffers=3 ! fakesink')
+        pipeline.connect('deep-notify', gstreamer.verbose_deep_notify_cb,
+            component)
+
+        for i in range(10):
+            pipeline.iterate()
+
