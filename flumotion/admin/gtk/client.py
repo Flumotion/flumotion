@@ -489,6 +489,8 @@ class Window(log.Loggable, gobject.GObject):
         model = self.component_model
         if key == 'mood':
             model.set(iter, COL_MOOD, self._moodPixbufs[value])
+        if key == 'message':
+            self.statusbar.set('main', value)
 
     def stateAppend(self, state, key, value):
         if not isinstance(state, worker.AdminWorkerHeavenState):

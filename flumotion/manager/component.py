@@ -294,20 +294,33 @@ class ComponentAvatar(base.ManagerAvatar):
         if self.lastHeartbeat > 0 \
             and time.time() - self.lastHeartbeat \
                 > self._heartbeatCheckInterval \
-            and self._getMood() != moods.lost:
+            and self._getMoodValue() != moods.lost.value:
                 self.warning('heartbeat missing, component is lost')
+                self._setMessage('Component %s is lost.' % self.avatarId)
                 self._setMood(moods.lost)
         self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
             self._heartbeatCheck)
 
+    # FIXME: this doesn't actually show up
+    def _setMessage(self, message):
+        if not self.state:
+            return
+
+        self.state.set('message', message)
+
     def _setMood(self, mood):
         if not self.state:
             return
-        if not self.state.get('mood') == mood:
-            self.debug('Setting mood to %s' % mood)
-            self.state.set('mood', mood)
 
-    def _getMood(self):
+        if not self.state.get('mood') == mood.value:
+            self.debug('Setting mood to %r' % mood)
+            self.state.set('mood', mood.value)
+
+    def _setMoodValue(self, moodValue):
+        mood = moods.get(moodValue)
+        self._setMood(mood)
+
+    def _getMoodValue(self):
         if not self.state:
             return
         return self.state.get('mood')
@@ -599,10 +612,10 @@ class ComponentAvatar(base.ManagerAvatar):
     def perspective_log(self, *msg):
         log.debug(self.getName(), *msg)
         
-    def perspective_heartbeat(self, mood):
+    def perspective_heartbeat(self, moodValue):
         self.lastHeartbeat = time.time()
         log.log(self.getName(), "got heartbeat at %d" % int(self.lastHeartbeat))
-        self._setMood(mood)
+        self._setMoodValue(moodValue)
 
     def perspective_feedStateChanged(self, feedName, state):
         self.debug('feedStateChanged: feed name %s, state %s' % (

@@ -42,6 +42,7 @@ class JobComponentState(flavors.StateCacheable):
         self.addKey('pid')
         self.addKey('workerName')
         self.addKey('ip')
+        self.addKey('message')
 
     def __repr__(self):
         return "%r" % self._dict

@@ -59,6 +59,9 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
     def _component_error_cb(self, component, element_path, message):
         self.comp.setMood(moods.sad)
+        self.comp.state.set('message',
+            "GStreamer error in component %s (%s)" % (self.comp.name,
+            message))
         self.callRemote('error', element_path, message)
         
     def _component_feed_state_changed_cb(self, component, feed_name, state):
@@ -380,6 +383,8 @@ class FeedComponent(basecomponent.BaseComponent):
         if old == gst.STATE_PLAYING and state == gst.STATE_PAUSED:
             self.debug('eater %s is now hungry' % element.get_name())
             self.eatersWaiting += 1
+            self.state.set('message',
+                "Component %s is now hungry" % self.name)
             self.updateMood()
         self.debug('%d eaters waiting' % self.eatersWaiting)
 
