@@ -1,5 +1,19 @@
 2005-02-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/parts.py (ComponentsView::has-selection):
+	Renamed from ::selected to indicate that we are fired when the
+	selection is None. Emitters adapted.
+
+	* flumotion/admin/gtk/client.py (Window._create_ui): Connect to
+	has-selection rather than selected on the components view, and
+	call _set_component_ops_sensitive() to set initial sensitivity
+	state.
+	(Window._set_component_ops_sensitive): New method, sets the
+	sensitivity of the start/stop toolbar and menu items.
+	(Window._components_view_has_selection_cb): Adapt to has-selection
+	signal, and call _set_component_ops_sensitive(). Renamed from
+	...selected_cb.
+
 	* flumotion/admin/gtk/Makefile.am (component_PYTHON): Add
 	connections.py to the list. Thanks to Christian Frederick Kalager
 	Schaller for the tip.

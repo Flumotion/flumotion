@@ -146,11 +146,12 @@ class Window(log.Loggable, gobject.GObject):
         window.connect('delete-event', self.close)
 
         self.components_view = parts.ComponentsView(widgets['component_view'])
-        self.components_view.connect('selected', 
-            self._components_view_selected_cb)
+        self.components_view.connect('has-selection', 
+            self._components_view_has_selection_cb)
         self.components_view.connect('activated',
             self._components_view_activated_cb)
         self.statusbar = parts.AdminStatusbar(widgets['statusbar'])
+        self._set_component_ops_sensitive(False)
         return window
 
     def open_connected_cb(self, model, ids):
@@ -583,11 +584,20 @@ class Window(log.Loggable, gobject.GObject):
     def update_components(self):
         self.components_view.update(self._components)
 
+    def _set_component_ops_sensitive(self, is_sensitive):
+        for i in 'stop', 'start':
+            w = self.widgets['menuitem_manage_'+i+'_component']
+            w.set_sensitive(is_sensitive)
+            w = self.widgets['toolbutton_'+i+'_component']
+            w.set_sensitive(is_sensitive)
+
     ### ui callbacks
-    def _components_view_selected_cb(self, view, state):
+    def _components_view_has_selection_cb(self, view, state):
+        self._set_component_ops_sensitive(bool(state))
+
         if not state:
-            self.warning('Select a component')
             return
+
         name = state.get('name')
 
         def gotEntryCallback(result):
