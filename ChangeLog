@@ -1,0 +1,19 @@
+2004-06-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile:
+	* Makefile.am:
+	* autogen.sh:
+	* configure.ac:
+	* docs/Makefile.am:
+	* flumotion/Makefile.am:
+	* m4/Makefile.am:
+	* m4/as-ac-expand.m4:
+	* m4/as-python.m4:
+	* m4/as-version.m4:
+	  adding autotools stuff
+
+2004-06-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* first post
+
+
