@@ -309,6 +309,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         if self.bouncerName is None:
             return defer.succeed(keycard)
 
+        self.debug('Asking for authentication, user %s, password %s, ip %s' % (
+            keycard.username, keycard.password, keycard.address))
         return self.streamer.medium.authenticate(self.bouncerName, keycard)
 
     def _addClient(self, request):
