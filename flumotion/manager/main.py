@@ -64,37 +64,12 @@ def _startTCP(vishnu, host, port):
         log.info('manager', 'Listening as host %s' % host)
     reactor.listenTCP(port, vishnu.getFactory(), interface=host)
 
-def _loadConfig(vishnu, filename):
-    # FIXME: this might be used for loading additional config, so maybe
-    # unprivatize and cleanup ?
-
-    # scan filename for a bouncer component in the manager
-
-    conf = config.FlumotionConfigXML(filename)
-
-    if conf.manager and conf.manager.bouncer:
-        if vishnu.bouncer:
-            vishnu.warning("manager already had a bouncer")
-
-        vishnu.debug('going to start manager bouncer %s of type %s' % (
-            conf.manager.bouncer.name, conf.manager.bouncer.type))
-        from flumotion.common.registry import registry
-        defs = registry.getComponent(conf.manager.bouncer.type)
-        configDict = conf.manager.bouncer.getConfigDict()
-        import flumotion.worker.job
-        vishnu.setBouncer(flumotion.worker.job.getComponent(configDict, defs))
-        vishnu.bouncer.debug('started')
-        log.info('manager', 'Started manager bouncer')
-
-    # make the workerheaven load the config
-    vishnu.workerHeaven.loadConfiguration(filename)
-
 def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
     for path in paths:
         log.debug('manager', 'Loading configuration file from (%s)' % path)
         try:
-            _loadConfig(vishnu, path)
+            vishnu.loadConfiguration(path)
         except config.ConfigError, reason:
             sys.stderr.write("ERROR: failed to load planet configuration '%s':\n" % path)
             sys.stderr.write("%s\n" % reason)

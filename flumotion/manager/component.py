@@ -34,7 +34,7 @@ import gst
 from twisted.spread import pb
 
 from flumotion.manager import common
-from flumotion.common import errors, interfaces, keycards, log
+from flumotion.common import errors, interfaces, keycards, log, config
 from flumotion.utils import gstutils
 
 class Options:
@@ -628,6 +628,7 @@ class ComponentHeaven(common.ManagerHeaven):
         """
         common.ManagerHeaven.__init__(self, vishnu)
         self._feederSet = FeederSet()
+        self._componentEntries = {} # configuration entries
         
     ### IHeaven methods
     def removeAvatar(self, avatarId):
@@ -686,6 +687,12 @@ class ComponentHeaven(common.ManagerHeaven):
         componentName = componentAvatar.getName()
         self.removeAvatar(componentName)
         
+    def loadConfiguration(self, filename, string=None):
+        conf = config.FlumotionConfigXML(filename, string)
+        # get atmosphere and flow entries
+        self._componentEntries.update(conf.getComponentEntries())
+            
+            
     def _getComponentEatersData(self, componentAvatar):
         """
         Retrieve the information about the feeders this component's eaters

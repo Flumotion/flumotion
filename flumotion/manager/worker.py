@@ -30,7 +30,7 @@ from twisted.spread import pb
 
 from flumotion.manager import common
 from flumotion.common import errors, interfaces, log
-from flumotion.common.config import FlumotionConfigXML
+from flumotion.common import config
 
 class WorkerAvatar(common.ManagerAvatar):
     """
@@ -84,8 +84,9 @@ class WorkerHeaven(common.ManagerHeaven):
 
     def loadConfiguration(self, filename, string=None):
         # XXX: Merge?
-        self.conf = FlumotionConfigXML(filename, string)
+        self.conf = config.FlumotionConfigXML(filename, string)
 
+        # trigger an update of config for all attached workers
         for worker in self.getAvatars():
             self.workerAttached(worker)
             
@@ -97,13 +98,7 @@ class WorkerHeaven(common.ManagerHeaven):
 
         retval = []
 
-        # scan config for all atmosphere and flow component Entries
-        entries = {}
-        if self.conf.atmosphere and self.conf.atmosphere.components:
-            entries.update(self.conf.atmosphere.components)
-            
-        for flowEntry in self.conf.flows:
-            entries.update(flowEntry.components)
+        entries = self.conf.getComponentEntries()
 
         for entry in entries.values():
             if entry.worker and entry.worker != workerName:

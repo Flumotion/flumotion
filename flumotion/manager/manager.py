@@ -38,7 +38,7 @@ from twisted.python import components, failure
 from twisted.spread import pb
 from twisted.cred import portal
 
-from flumotion.common import bundle, errors, interfaces, log, registry
+from flumotion.common import bundle, config, errors, interfaces, log, registry
 from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, common
 from flumotion.twisted import checkers
@@ -134,10 +134,10 @@ class Vishnu(log.Loggable):
     """
     logCategory = "vishnu"
     def __init__(self):
+        self._setupBundleBasket()
+
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
-        self._setupBundleBasket()
-                    
         self.dispatcher = Dispatcher()
 
         self.workerHeaven = self._createHeaven(interfaces.IWorkerMedium,
@@ -150,11 +150,46 @@ class Vishnu(log.Loggable):
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a bouncer
-
         # FIXME: decide if we allow anonymous login in this small (?) window
         self.portal = fportal.BouncerPortal(self.dispatcher, None)
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
         self.factory = pb.PBServerFactory(self.portal)
+
+        self.configuration = None
+
+    # FIXME: do we want a filename to load config, or data directly ?
+    def loadConfiguration(self, filename):
+        """
+        Load the configuration from the given filename, merging it on
+        top of the currently running configuration.
+        """
+        # FIXME: we should be able to create "wanted" config/state from
+        # something else than XML as well
+        conf = config.FlumotionConfigXML(filename)
+
+        # scan filename for a bouncer component in the manager
+        # FIXME: we should have a "running" state object layout similar
+        # to config that we can then merge somehow with an .update method
+        if conf.manager and conf.manager.bouncer:
+            if self.bouncer:
+                self.warning("manager already had a bouncer")
+
+            self.debug('going to start manager bouncer %s of type %s' % (
+                conf.manager.bouncer.name, conf.manager.bouncer.type))
+            from flumotion.common.registry import registry
+            defs = registry.getComponent(conf.manager.bouncer.type)
+            configDict = conf.manager.bouncer.getConfigDict()
+            import flumotion.worker.job
+            self.setBouncer(flumotion.worker.job.getComponent(configDict, defs))
+            self.bouncer.debug('started')
+            log.info('manager', 'Started manager bouncer')
+
+        # make the worker heaven and component heaven
+        # load the configuration as well
+        # FIXME: we should only handle the added conf, so we get the changes
+        # parsing should also be done only once
+        self.workerHeaven.loadConfiguration(filename)
+        self.componentHeaven.loadConfiguration(filename)
 
     def _setupBundleBasket(self):
         self.bundles = bundle.BundlerBasket()

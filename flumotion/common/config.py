@@ -183,6 +183,11 @@ class FlumotionConfigXML(log.Loggable):
         return atmosphere
      
     def parseComponent(self, node):
+        """
+        Parse a <component></component> block.
+
+        @rtype: L{ConfigEntryComponent}
+        """
         # <component name="..." type="..." worker="">
         
         if not node.hasAttribute('name'):
@@ -419,3 +424,23 @@ class FlumotionConfigXML(log.Loggable):
             config[name] = value
             
         return config
+
+    # FIXME: move to a config base class ?
+    def getComponentEntries(self):
+        """
+        Get all component entries from both atmosphere and all flows
+        from the configuration.
+
+        @rtype: dictionary of string -> L{ConfigEntryComponent}
+        """
+        entries = {}
+        if self.atmosphere and self.atmosphere.components:
+            entries.update(self.atmosphere.components)
+            
+        for flowEntry in self.flows:
+            entries.update(flowEntry.components)
+
+        return entries
+
+    
+        

@@ -1,3 +1,14 @@
+2004-11-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/config.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	  Rework loadConfiguration a little.  Make ComponentHeaven
+	  know about config as well.  Needs reworking so we
+	  can implement failover and friends.
+
 2004-11-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/Makefile.am:
