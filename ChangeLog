@@ -1,3 +1,14 @@
+2004-10-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/Makefile.am:
+	* flumotion/common/interfaces.py:
+	* flumotion/common/keycards.py:
+	* flumotion/component/bouncer.py:
+	* flumotion/component/http/http.py:
+	* flumotion/manager/component.py:
+	* flumotion/test/test_http.py:
+	  make keycards module.  bouncer now works.
+
 2004-10-11  Johan Dahlin  <johan@gnome.org>
 
 	* Makefile.am:

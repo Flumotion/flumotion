@@ -42,8 +42,8 @@ class IAuthenticate(components.Interface):
     def getDomain(self):
         "returns the domain"
         
-    def authenticate(self, keycard):
-        "authenticates a keycard, must be a IClientKeycard"
+    def authenticate(self, card):
+        "authenticates a card, must be a IClientKeycard implementor"
 
 
 # FIXME: create a base class that implements setRemoteReference

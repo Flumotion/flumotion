@@ -25,12 +25,12 @@ import gst
 
 from twisted.protocols import http
 from twisted.web import server, resource
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.cred import credentials
 import twisted.internet.error
 
 from flumotion.component import feedcomponent
-from flumotion.common import auth, bundle, common, interfaces, keycard
+from flumotion.common import auth, bundle, common, interfaces, keycards
 from flumotion.utils import gstutils, log
 from flumotion.utils.gstutils import gsignal
 
@@ -253,7 +253,10 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.streamer = streamer
         self.admin = HTTPStreamingAdminResource(self)
         
-        self.request_hash = {}
+        self._requests = {} # fd -> Request
+        self._fdToKeycard = {} # fd -> Keycard
+        self._idToKeycard = {} # id -> Keycard
+        self.bouncerName = None
         self.auth = None
         
         self.maxclients = -1
@@ -262,10 +265,10 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
 
     def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
         try:
-            request = self.request_hash[fd]
+            request = self._requests[fd]
             self._removeClient(request, fd, stats)
         except KeyError:
-            self.warning('[fd %5d] not found in request_hash' % fd)
+            self.warning('[fd %5d] not found in _requests' % fd)
 
         
     def setLogfile(self, logfile):
@@ -374,19 +377,19 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             return limit[0] - self.__reserve_fds__
 
     def reachedMaxClients(self):
-        return len(self.request_hash) >= self.maxAllowedClients()
+        return len(self._requests) >= self.maxAllowedClients()
     
     def authenticate(self, request):
         """
-        Returns: a deferred firing True or False
+        Returns: a deferred returning a keycard or None
         """
-        # ask for authentication of the request.  returns a deferred which will
-        # return True or False
+        keycard = keycards.HTTPClientKeycard(
+            self.streamer.get_name(), request.getUser(),
+            request.getPassword(), request.getClientIP())
         if self.bouncerName is None:
-            return True
+            return defer.succeed(keycard)
 
-        card = keycard.CopyHTTPClientKeycard(request.getUser(), request.getPassword(), request.getClientIP())
-        return self.streamer.medium.authenticate(self.bouncerName, card)
+        return self.streamer.medium.authenticate(self.bouncerName, keycard)
 
     def _addClient(self, request):
         """
@@ -397,7 +400,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         """
 
         fd = request.transport.fileno()
-        self.request_hash[fd] = request
+        self._requests[fd] = request
 
     def _removeClient(self, request, fd, stats):
         """
@@ -416,7 +419,12 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.logWrite(fd, ip, request, stats)
         self.info('[fd %5d] client from %s disconnected' % (fd, ip))
         request.finish()
-        del self.request_hash[fd]
+        del self._requests[fd]
+        if self.bouncerName and self._fdToKeycard.has_key(fd):
+            id = self._fdToKeycard[fd].id
+            del self._fdToKeycard[fd]
+            del self._idToKeycard[id]
+            self.streamer.medium.removeKeycard(self.bouncerName, id)
 
     def _handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')
@@ -445,8 +453,11 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         error_code = http.UNAUTHORIZED
         request.setResponseCode(error_code)
         
-        return ERROR_TEMPLATE % {'code': error_code,
+        # we have to write data ourselves, since we already returned NOT_DONE_YET
+        html = ERROR_TEMPLATE % {'code': error_code,
                                  'error': http.RESPONSES[error_code]}
+        request.write(html)
+        request.finish()
 
     def _handleNewClient(self, request):
         # everything fulfilled, serve to client
@@ -488,10 +499,17 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         # FIXME: check how we later handle not authorized
         return server.NOT_DONE_YET
 
-    def _authenticatedCallback(self, authenticated, request):
-        self.debug('_authenticatedCallback: %r' % authenticated)
-        if not authenticated:
-            return self._handleUnauthorized(request)
+    def _authenticatedCallback(self, keycard, request):
+        self.debug('_authenticatedCallback: keycard %r' % keycard)
+        if not keycard:
+            self._handleUnauthorized(request)
+            return
+
+        # properly authenticated
+        fd = request.transport.fileno()
+        if self.bouncerName:
+            self._fdToKeycard[fd] = keycard
+            self._idToKeycard[keycard.id] = keycard
 
         if request.method == 'GET':
             self._handleNewClient(request)
@@ -499,7 +517,6 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             self._writeHeaders(request)
         else:
             raise AssertionError
-        
 
     render_GET = _render
     render_HEAD = _render
@@ -527,9 +544,12 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     def _comp_ui_state_changed_cb(self, comp):
         self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
 
-    def authenticate(self, bouncerName, credentials):
-        d = self.callRemote('authenticate', bouncerName, credentials)
+    def authenticate(self, bouncerName, keycard):
+        d = self.callRemote('authenticate', bouncerName, keycard)
         return d
+
+    def removeKeycard(self, bouncerName, keycardId):
+        return self.callRemote('removeKeycard', bouncerName, keycardId)
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):

@@ -8,6 +8,7 @@ flumotion_PYTHON = \
 	config.py \
 	errors.py \
 	interfaces.py \
+	keycards.py \
 	launcher.py \
 	registry.py
 

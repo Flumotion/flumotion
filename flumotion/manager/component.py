@@ -28,7 +28,7 @@ __all__ = ['ComponentAvatar', 'ComponentHeaven']
 import gst
 from twisted.spread import pb
 
-from flumotion.common import errors, interfaces, keycard
+from flumotion.common import errors, interfaces, keycards
 from flumotion.utils import gstutils, log
 
 class Options:
@@ -214,6 +214,7 @@ class FeederSet(log.Loggable):
             self.debug('feeder %s is ready, executing function %r' % (feederName, func))
             func(componentAvatar)
 
+# FIXME: maybe add type to constructor ? or subclass ?
 class ComponentAvatar(pb.Avatar, log.Loggable):
     """
     Manager-side avatar for a component.
@@ -539,6 +540,17 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         self.heaven.setComponentFeedReady(self, feedName)
         self.log('checkFeedReady: set to ready')
 
+    # FIXME: maybe make a BouncerComponentAvatar subclass ?
+    def authenticate(self, keycard):
+        d = self._mindCallRemote('authenticate', keycard)
+        d.addErrback(self._mindErrback)
+        return d
+
+    def removeKeycard(self, keycardId):
+        d = self._mindCallRemote('removeKeycard', keycardId)
+        d.addErrback(self._mindErrback)
+        return d
+
     ### IPerspective methods, called by the worker's component
     def perspective_log(self, *msg):
         log.debug(self.getName(), *msg)
@@ -563,10 +575,25 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
     def perspective_notifyFeedPorts(self, feedPorts):
         self.debug('received feed ports from component: %s' % feedPorts)
 
-    def perspective_authenticate(self, bouncerName, credentials):
-        # FIXME: actually ask a bouncer
-        self.debug('asked to authenticate credentials %r using bouncer %s' % (credentials, bouncerName))
-        return True
+    def perspective_authenticate(self, bouncerName, keycard):
+        self.debug('asked to authenticate keycard %r using bouncer %s' % (keycard, bouncerName))
+        if not self.heaven.hasComponent(bouncerName):
+            # FIXME: return failure object ?
+            return False
+
+        bouncerAvatar = self.heaven.getComponent(bouncerName)
+        return bouncerAvatar.authenticate(keycard)
+
+    def perspective_removeKeycard(self, bouncerName, keycardId):
+        self.debug('asked to remove keycard %s on bouncer %s' % (bouncerName, keycardId))
+        if not self.heaven.hasComponent(bouncerName):
+            # FIXME: return failure object ?
+            return False
+
+        bouncerAvatar = self.heaven.getComponent(bouncerName)
+        return bouncerAvatar.removeKeycard(keycardId)
+
+
 
 class ComponentHeaven(pb.Root, log.Loggable):
     """
@@ -634,11 +661,14 @@ class ComponentHeaven(pb.Root, log.Loggable):
         return avatar.started == True
     
     def getComponent(self, name):
-        """retrieves a new component
+        """
+        Look up a ComponentAvatar by name.
+
         @type name:  string
         @param name: name of the component
-        @rtype:      component
-        @returns:    the component"""
+        @rtype:      L{flumotion.twisted.manager.ComponentAvatar}
+        @returns:    the component avatar
+        """
 
         if not self.hasComponent(name):
             raise KeyError, name
