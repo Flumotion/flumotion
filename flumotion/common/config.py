@@ -209,6 +209,7 @@ class FlumotionConfigXML(log.Loggable):
 
         config = { 'name': name,
                    'type': type,
+                    ### XXX kill this self when new auth system is there
                    'config' : self,
                    'start-factory': defs.isFactory() }
         config.update(options)

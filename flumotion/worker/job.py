@@ -128,7 +128,7 @@ class JobView(pb.Referenceable, log.Loggable):
     def run_component(self, name, type, config, defs, feed_ports):
         """
         @param feed_ports: feed_name -> port
-        @type feed_ports: dict
+        @type feed_ports: dict, or None
         """
         # XXX: Remove this hack
         if not config.get('start-factory', True):
@@ -144,10 +144,15 @@ class JobView(pb.Referenceable, log.Loggable):
         self.set_nice(name, config.get('nice', 0))
         self.enable_core_dumps(name)
         
-        log.debug(name, 'Configuration dictionary is: %r' % config)
+        log.debug(name, 'run_component(): config dictionary is: %r' % config)
+        log.debug(name, 'run_component(): feed_ports is: %r' % feed_ports)
 
         comp = getComponent(config, defs)
-        comp.set_feed_ports(feed_ports)
+
+        # we have components without feed ports, and without this function
+        if feed_ports:
+            comp.set_feed_ports(feed_ports)
+
         manager_client_factory = component.ComponentClientFactory(comp)
         # XXX: get username/password from parent
         manager_client_factory.login(name)

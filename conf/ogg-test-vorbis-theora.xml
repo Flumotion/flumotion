@@ -7,18 +7,21 @@
   </workers>
 
    <component name="producer-video-test" type="producer">
+    <feed>default</feed>
     <pipeline>
 videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
     </pipeline>
   </component>
 
   <component name="producer-audio-test" type="producer">
+    <feed>default</feed>
     <pipeline>
 sinesrc ! audio/x-raw-int,rate=8000 ! audiorate ! identity silent=true sync=true
     </pipeline>
   </component>
 
   <component name="converter-theora" type="converter">
+    <feed>default</feed>
     <source>producer-video-test</source>
     <pipeline>
 ffmpegcolorspace ! theoraenc keyframe-force=20 bitrate=20
@@ -26,6 +29,7 @@ ffmpegcolorspace ! theoraenc keyframe-force=20 bitrate=20
   </component>
 
   <component name="converter-vorbis" type="converter">
+    <feed>default</feed>
     <source>producer-audio-test</source>
     <pipeline>
 audioconvert ! rawvorbisenc bitrate=8000
@@ -33,6 +37,7 @@ audioconvert ! rawvorbisenc bitrate=8000
   </component>
 
   <component name="converter-ogg" type="converter">
+    <feed>default</feed>
     <source>converter-theora</source>
     <source>converter-vorbis</source>
     <pipeline>

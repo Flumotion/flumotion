@@ -1,5 +1,20 @@
 2004-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/ogg-test-vorbis-theora.xml:
+	* flumotion/common/config.py:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/http/http.py:
+	* flumotion/component/http/http.xml:
+	* flumotion/manager/component.py:
+	* flumotion/manager/worker.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  a bunch of changes allowing non-feed components to start up.
+	  still needs some work.
+
+2004-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/config/installed.py.in:
 	* flumotion/config/uninstalled.py.in:
 	  add version number

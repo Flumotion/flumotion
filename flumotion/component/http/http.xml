@@ -9,6 +9,7 @@
       <property name="auth" type="string"/>
       <property name="admin-password" type="string"/>
       <property name="maxclients" type="int"/>
+      <property name="bouncer" type="string"/>
     </properties>
 <!--
     <ui style="gtk" type="control">

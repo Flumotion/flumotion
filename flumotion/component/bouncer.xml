@@ -1,0 +1,8 @@
+<components>
+  <component type="bouncer">
+    <source location="flumotion.component.bouncer"/>
+    <properties>
+    </properties>
+  </component>
+</components>
+

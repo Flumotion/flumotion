@@ -33,6 +33,9 @@ from flumotion.utils import gstutils, log
 
 class Options:
     """dummy class for storing manager side options of a component"""
+    def __init__(self):
+        self.eaters = [] # list of eater names
+        self.feeders = [] # list of feeder names
 
 # abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
 class Feeder:
@@ -540,14 +543,15 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
     def perspective_log(self, *msg):
         log.debug(self.getName(), *msg)
         
-    def perspective_stateChanged(self, feeder, state):
-        self.debug('stateChanged: %s %s' % (feeder, gst.element_state_get_name(state)))
+    def perspective_stateChanged(self, feed_name, state):
+        self.debug('stateChanged: feed name %s, state %s' % (
+            feed_name, gst.element_state_get_name(state)))
         
         self.state = state
         if self.state == gst.STATE_PLAYING:
-            self.info('is now playing')
+            self.info('%r is now playing' % self)
 
-            self.checkFeedReady(feeder)
+            self.checkFeedReady(feed_name)
             
     def perspective_error(self, element, error):
         self.error('error element=%s string=%s' % (element, error))
@@ -692,7 +696,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         @param component: the component
 
         @rtype:           tuple with 3 items
-        @returns:         tuple of feeder name, host name and port
+        @returns:         tuple of feeder name, host name and port, or None
         """
 
         eaterFeederNames = component.getEaters()
@@ -799,6 +803,3 @@ class ComponentHeaven(pb.Root, log.Loggable):
         
     def shutdown(self):
         map(self.stopComponent, self.avatars)
-        
-
-

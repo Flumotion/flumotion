@@ -757,6 +757,9 @@ def createComponent(config):
         
     if config.has_key('admin-password'):
         resource.setAdminPassword(config['admin-password'])
+
+    if config.has_key('bouncer'):
+        print "THOMAS: WEEHEE: bouncer %s" % config['bouncer']
         
     # create bundlers for UI
     # FIXME: register ui types through base methods on component

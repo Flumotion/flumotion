@@ -70,7 +70,7 @@ class WorkerView(pb.Referenceable, log.Loggable):
     ### pb.Referenceable method for the manager's WorkerAvatar
     def remote_start(self, name, type, config):
         """
-	Start a component of the given type with the given config.
+        Start a component of the given type with the given config.
 
         @param name: name of the component to start
         @type name: string
@@ -79,7 +79,7 @@ class WorkerView(pb.Referenceable, log.Loggable):
         @param config: a configuration dictionary for the component
         @type config: dict
         """
-        self.info('manager asked me to start')
+        self.info('remote_start(): manager asked me to start, name %s, type %s, config %r' % (name, type, config))
         self.brain.kindergarten.play(name, type, config)
         
 class Kid:
@@ -244,7 +244,8 @@ class JobAvatar(pb.Avatar, log.Loggable):
 
     def attached(self, mind):
         """
-        @param mind: the reference on which we can call remote methods.
+        @param mind: reference to the job's JobView on which we can call
+        @type mind: L{twisted.spread.pb.RemoteReference}
         
         I am scheduled from the dispatcher's requestAvatar method.
         """
@@ -266,19 +267,23 @@ class JobAvatar(pb.Avatar, log.Loggable):
     
     def _cb_afterInitial(self, unused):
         kid = self.heaven.brain.kindergarten.getKid(self.name)
-        feedNames = kid.config.get('feeds', ['default'])
+        # we got kid.config through WorkerView.remote_start from the manager
+        feedNames = kid.config.get('feed', [])
+        self.log('_cb_afterInitial(): feedNames %r' % feedNames)
 
         # This is going to be sent to the component
-        feedports = {} # feedName -> port number
+        feedPorts = {} # feedName -> port number
         # This is saved, so we can unmark the ports when shutting down
         self.feeds = []
         for feedName in feedNames:
             port = self._getFreePort()
-            feedports[feedName] = port.getNumber()
+            feedPorts[feedName] = port.getNumber()
+            self.debug('reserving port %r for feed %s' % (port, feedName))
             self.feeds.append((feedName, port))
             
+        self.debug('asking job to start with config %r and feedPorts %r' % (kid.config, feedPorts))
         self.mind.callRemote('start', kid.name, kid.type,
-                             kid.config, feedports)
+                             kid.config, feedPorts)
                                           
     def shutdown(self):
         self.log('%s disconnected' % self.name)

@@ -48,20 +48,22 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         self.mind = mind
 
         self.heaven.workerAttached(self)
-
-        return
     
-        name = 'testing'
-        type = 'videotest'
-        config = dict(width=320, height=240, framerate=5.0, name=name)
-        
-        self.start(name, type, config)
-        
     def detached(self, mind):
         self.info('detached %r' % mind)
 
     def start(self, name, type, config):
-        self.info('starting %s on %s' % (name, self.avatarId))
+        """
+        Start a component of the given type with the given config.
+                                                                                
+        @param name: name of the component to start
+        @type name: string
+        @param type: type of the component
+        @type type: string
+        @param config: a configuration dictionary for the component
+        @type config: dict
+        """
+        self.info('starting %s on %s with config %r' % (name, self.avatarId, config))
         return self.mind.callRemote('start', name, type, config)
         
 class WorkerHeaven(pb.Root):
@@ -129,24 +131,26 @@ class WorkerHeaven(pb.Root):
                               if not worker or worker != worker.getName()]
         return workers
     
-    def workerAttached(self, worker):
-        entries = self.getEntries(worker)
-        worker_name = worker.getName()
+    def workerAttached(self, workerAvatar):
+        entries = self.getEntries(workerAvatar)
+        workerName = workerAvatar.getName()
         for entry in entries:
-            name = entry.getName()
-            log.debug('config', 'Starting component: %s on %s' % (name, worker_name))
+            componentName = entry.getName()
+            log.debug('config', 'Starting component: %s on %s' % (componentName, workerName))
+            # FIXME: we need to put default feeds in this dict
             dict = entry.getConfigDict()
             
             if dict.has_key('config'):
                 del dict['config'] # HACK
 
-            self.start(name, entry.getType(), dict, worker_name)
+            self.workerStartComponent(workerName, componentName,
+                entry.getType(), dict)
             
     # FIXME: move worker to second argument
     # FIXME: rename method to workerStart
-    def start(self, name, type, config, worker):
+    def workerStartComponent(self, workerName, componentName, type, config):
         """
-        @param name:
+        @param workerName: name of the worker to start component on
         @type name: string
         @param type:
         @type type: string
@@ -159,11 +163,11 @@ class WorkerHeaven(pb.Root):
         if not self.avatars:
             raise AttributeError
 
-        if worker:
-            avatar = self.avatars[worker]
+        if workerName:
+            avatar = self.avatars[workerName]
         else:
             # XXX: Do we really want to keep this big hack?
             # eg, if we don't select a worker, just pick the first one.
             avatar = self.avatars.values()[0]
 
-        return avatar.start(name, type, config)
+        return avatar.start(componentName, type, config)

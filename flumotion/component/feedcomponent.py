@@ -52,14 +52,22 @@ class FeedComponentView(basecomponent.BaseComponentView):
     def _component_error_cb(self, component, element_path, message):
         self.callRemote('error', element_path, message)
         
-    def _component_state_changed_cb(self, component, feeder, state):
-        self.callRemote('stateChanged', feeder, state)
+    def _component_state_changed_cb(self, component, feed_name, state):
+        self.callRemote('stateChanged', feed_name, state)
 
     def _component_notify_feed_ports_cb(self, component):
         self.callRemote('notifyFeedPorts', component.feed_ports)
 
     ### Referenceable remote methods which can be called from manager
     # FIXME: rename link, unambiguate eaters and feeders' meaning
+        """
+        Tell the component to link itself to other components.
+
+        @type eatersData: list of (feedername, host, port) tuples of elements feeding our eaters.
+        @type feedersData: list of (name, host) tuples of our feeding elements.
+
+        @returns: list of (feedName, host, port)-tuples of feeds the component produces.
+        """
     def remote_link(self, eatersData, feedersData):
         self.debug('remote_link with eaters data %s and feeders data %s' % (eatersData, feedersData))
         ret = self.comp.link(eatersData, feedersData)
@@ -127,7 +135,7 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         basecomponent.BaseComponent.__init__(self, name)
         
-        self.feed_ports = [] # feed_name -> port mapping
+        self.feed_ports = {} # feed_name -> port mapping
         self.pipeline = None
         self.pipeline_signals = []
         self.files = []
@@ -230,6 +238,7 @@ class FeedComponent(basecomponent.BaseComponent):
         @param feed_ports: feed_name -> port
         @type feed_ports: dict
         """
+        assert isinstance(feed_ports, dict)
         self.feed_ports = feed_ports
         
     def _setup_eaters(self, eatersData):
@@ -257,11 +266,12 @@ class FeedComponent(basecomponent.BaseComponent):
             eater.set_property('protocol', 'gdp')
             
     # FIXME: need to make a separate callback to implement "mood" of component
-    def feeder_state_change_cb(self, element, old, state, feeder):
+    def feeder_state_change_cb(self, element, old, state, feed_name):
         # also called by subclasses
-        self.debug('state-changed %s %s' % (element.get_path_string(),
-                                            gst.element_state_get_name(state)))
-        self.emit('state-changed', feeder, state)
+        self.debug('state-changed  on feed %s: element %s, state %s' % (
+            feed_name, element.get_path_string(),
+            gst.element_state_get_name(state)))
+        self.emit('state-changed', feed_name, state)
 
     def _setup_feeders(self, feedersData):
         """
@@ -282,6 +292,7 @@ class FeedComponent(basecomponent.BaseComponent):
         # Setup all feeders
         for feeder_name, host in feedersData:
             feed_name = feeder_name.split(':')[1]
+            print('THOMAS: feed_ports: %r' % self.feed_ports)
             assert self.feed_ports.has_key(feed_name)
             port = self.feed_ports[feed_name]
             self.debug('Going to listen on feeder %s (%s:%d)' % (feeder_name, host, port))
