@@ -348,15 +348,13 @@ class ComponentRegistry(log.Loggable):
     def getFileList(self, root):
         files = []
         for dir in os.listdir(root):
-            dir = os.path.join(root, dir)
-            if not os.path.isdir(dir):
-                continue
-            for filename in os.listdir(dir):
-                filename = os.path.join(dir, filename)
-                if not os.path.exists(filename):
-                    continue
+            filename = os.path.join(root, dir)
+            if not os.path.isdir(filename):
                 if filename.endswith('.xml'):
                     files.append(filename)
+            else:
+                files += self.getFileList(filename)
+                
         return files
     
     def update(self, root):

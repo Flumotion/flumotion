@@ -1,3 +1,11 @@
+2004-10-07  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/registry.py (ComponentRegistry.getFileList):
+	Make it recursive
+
+	* flumotion/test/test_registry.py (TestFindComponents): and add
+	some tests
+
 2004-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/Makefile.am:

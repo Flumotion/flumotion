@@ -15,6 +15,7 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+import os
 import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -189,4 +190,55 @@ class TestComponentEntry(unittest.TestCase):
         assert self.entry.getGUIEntry() == 'gui-filename'
         assert self.empty_entry.getGUIEntry() == None
         assert self.multiple_entry.getGUIEntry() == None
+        
+
+def rmdir(root):
+    for file in os.listdir(root):
+        filename = os.path.join(root, file)
+        if os.path.isdir(filename):
+            rmdir(filename)
+        else:
+            os.remove(filename)
+    os.rmdir(root)
+            
+class TestFindComponents(unittest.TestCase):
+    def setUp(self):
+        os.makedirs('subdir')
+        os.makedirs('subdir/foo')
+        os.makedirs('subdir/bar')
+        self.writeComponent('subdir/first.xml', 'first')
+        self.writeComponent('subdir/foo/second.xml', 'second')
+        self.writeComponent('subdir/bar/third.xml', 'third')
+        registry.registry.clean()
+
+    def writeComponent(self, filename, name):
+        open(filename, 'w').write("""<components>
+  <component type="%s">
+    <properties>
+    </properties>
+  </component>
+</components>
+""" % name)
+    
+    def testSimple(self):
+        registry.registry.update('.')
+        components = registry.registry.getComponents()
+        assert len(components) == 3, len(components)
+        types = [c.getType() for c in components]
+        types.sort()
+        assert types == ['first', 'second', 'third'] # alpha order
+
+    def testVerify(self):
+        os.makedirs('flumotion/component')
+        registry.registry.verify('.')
+        rmdir('flumotion/component')
+        
+    def testVerifyForce(self):
+        os.makedirs('flumotion/component')
+        registry.registry.verify('.', force=True)
+        rmdir('flumotion/component')
+
+    def tearDown(self):
+        registry.registry.clean()
+        rmdir('subdir')
         
