@@ -30,17 +30,24 @@
     <pipeline>ffmpegcolorspace ! jpegenc ! multipartmux</pipeline>
   </component>
 
+  <component name="auth-1" type="auth-htpasswd">
+    <filename>/home/jdahlin/htpasswd</filename>
+    <!-- <auth-type>crypt</auth-type> -->
+  </component>
+
   <component name="http-video" type="http-streamer">
     <source>jpeg+multipart</source>
     <port>8803</port>
     <logfile>/tmp/videotestsrc_access.log</logfile>
+    <auth>auth-1</auth>
   </component>
 
   <component name="http-video-big" type="http-streamer">
     <source>jpeg+multipart-big</source>
     <port>8804</port>
     <logfile>/tmp/videotestsrc_access_big.log</logfile>
-    <sink-property name="buffers-max" type="int">400</sink-property>
+    <gst-property element="sink" name="buffers-max" type="int">400</gst-property>
+    <auth>auth-1</auth>
   </component>
 
 </root>

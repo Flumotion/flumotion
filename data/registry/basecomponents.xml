@@ -31,7 +31,8 @@
       <property name="source" type="string" required="yes"/>
       <property name="port" type="int" required="yes"/>
       <property name="logfile" type="string"/>
-      <property name="sink-property" type="xml" multiple="yes"/>
+      <property name="gst-property" type="xml" multiple="yes"/>
+      <property name="auth" type="string"/>
     </properties>
   </component>
 
@@ -43,8 +44,13 @@
     </properties>
   </component>
 
-  <component type="auth-passwd" start-factory="false">
+  <component type="auth-htpasswd" factory="false">
     <source location="flumotion.components.passwd"/>
+    <properties>
+      <property name="filename" type="string" required="yes"/>
+      <property name="type" type="string"/>
+      <property name="domain" type="string"/>
+    </properties>
   </component>
 
 </components>

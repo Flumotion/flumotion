@@ -131,6 +131,9 @@ class Launcher:
             print '** WARNING: PyGTK with threading disabled detected **'
         
     def launch_component(self, config):
+        if not config.startFactory():
+            return
+        
         pid = os.fork()
         if pid:
             self.children.append(pid)
@@ -141,12 +144,11 @@ class Launcher:
         self.threads_init()
         self.set_nice(config.nice)
 
-        if config.startFactory():
-            component = config.getComponent()
-            self.msg('Starting %s (%s) on pid %d' %
-                     (config.getName(), config.getType(), pid))
-            reactor.connectTCP(self.controller_host, self.controller_port,
-                               component.factory)
+        component = config.getComponent()
+        self.msg('Starting %s (%s) on pid %d' %
+                 (config.getName(), config.getType(), pid))
+        reactor.connectTCP(self.controller_host, self.controller_port,
+                           component.factory)
         
         reactor.run(False)
         raise SystemExit
@@ -154,9 +156,9 @@ class Launcher:
     def load_config(self, filename):
         conf = FlumotionConfigXML(filename)
 
-        for name in conf.components.keys():
+        for name in conf.entries.keys():
             self.msg('Starting component: %s' % name)
-            self.launch_component(conf.components[name])
+            self.launch_component(conf.getEntry(name))
     
 def run_launcher(args):
     parser = optparse.OptionParser()

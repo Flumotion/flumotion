@@ -1,12 +1,14 @@
 flumotiondir = $(libdir)/flumotion/python/flumotion/server
 
 flumotion_DATA = \
+	__init__.py \
 	admin.py \
+	auth.py \
 	component.py \
 	config.py \
 	controller.py \
 	errors.py \
-	__init__.py \
+	interfaces.py \
 	launcher.py \
 	registry.py
 

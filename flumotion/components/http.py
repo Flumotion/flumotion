@@ -30,7 +30,7 @@ from twisted.protocols import http
 from twisted.web import server, resource
 from twisted.internet import reactor
 
-from flumotion.server import component
+from flumotion.server import auth, component, interfaces
 from flumotion.utils import gstutils, log
 
 __all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
@@ -64,6 +64,22 @@ STATS_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 
 HTTP_VERSION = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 
+class HTTPClientKeycard:
+    
+    __implements__ = interfaces.IClientKeycard,
+    
+    def __init__(self, request):
+        self.request = request
+        
+    def getUsername(self):
+        return self.request.getUser()
+
+    def getPassword(self):
+        return self.request.getPassword()
+
+    def getIP(self):
+        return self.request.getClientIP()
+        
 class HTTPStreamingAdminResource(resource.Resource):
     def __init__(self, streaming):
         'call with a HTTPStreamingResource to admin for'
@@ -154,6 +170,7 @@ class HTTPStreamingResource(resource.Resource):
         self.admin = HTTPStreamingAdminResource(self)
 
         self.request_hash = {}
+        self.auth = None
         self.start_time = time.time()
         self.peak_client_number = 0 # keep track of the highest number
         # keep track of average clients by tracking last average and its time
@@ -206,7 +223,7 @@ class HTTPStreamingResource(resource.Resource):
         self.logfile.write(msg)
         self.logfile.flush()
 
-    def streamer_client_removed_cb(self, streamer, sink, fd):
+    def streamer_client_removed_cb(self, streamer, sink, fd, reason):
         self.update_average()
         request = self.request_hash[fd]
         ip = request.getClientIP()
@@ -221,14 +238,22 @@ class HTTPStreamingResource(resource.Resource):
         
         return True
 
+    def setAuth(self, auth):
+        self.auth = auth
+        
     def isAuthenticated(self, request):
-        # return True always until implemented nicely
-        return True
-        if request.getClientIP() == '127.0.0.1':
+        if not self.auth:
+            # return True always until implemented nicely
             return True
-        if request.getUser() == 'fluendo' and request.getPassword() == 's3cr3t':
-            return True
-        return False
+
+        keycard = HTTPClientKeycard(request)
+        return self.auth.authenticate(keycard)
+    
+        #if request.getClientIP() == '127.0.0.1':
+        #    return True
+        #if request.getUser() == 'fluendo' and request.getPassword() == 's3cr3t':
+        #    return True
+        #return False
     
     def getChild(self, path, request):
         if path and path == 'stats':
@@ -307,7 +332,10 @@ class HTTPStreamingResource(resource.Resource):
             request.setResponseCode(error_code)
             request.setHeader('server', HTTP_VERSION)
             request.setHeader('content-type', 'text/html')
-            #request.setHeader('WWW-Authenticate', 'Basic realm="Restricted Access"')
+            
+            if self.auth:
+                request.setHeader('WWW-Authenticate',
+                                  'Basic realm="%s"' % self.auth.getDomain())
 
             return ERROR_TEMPLATE % {'code': error_code,
                                      'error': http.RESPONSES[error_code]}
@@ -323,7 +351,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
                                 'buffers-soft-max=250 ' + \
                                 'recover-policy=1'
     __gsignals__ = {
-        'client-removed': (gobject.SIGNAL_RUN_FIRST, None, (object, int))
+        'client-removed': (gobject.SIGNAL_RUN_FIRST, None, (object, int, int))
                    }
     
     def __init__(self, name, source, port):
@@ -364,8 +392,8 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
         assert isinstance(sink, gst.Element)
         return sink
 
-    def client_removed_cb(self, sink, fd):
-        self.emit('client-removed', sink, fd)
+    def client_removed_cb(self, sink, fd, reason):
+        self.emit('client-removed', sink, fd, reason)
         
     def client_added_cb(self, sink, fd):
         pass
@@ -383,7 +411,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
         sink.connect('client-removed', self.client_removed_cb)
         sink.connect('client-added', self.client_added_cb)
         
-        for prop in self.sink_properties:
+        for prop in self.gst_properties:
             type = prop.type
             if type == 'int':
                 value = int(prop.data)
@@ -391,9 +419,13 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
                 value = str(prop.data)
             else:
                 value = prop.data
-                
-            sink.set_property(prop.name, value)
 
+            element = self.pipeline.get_by_name(prop.element)
+            element.set_property(prop.name, value)
+
+    def setProperties(self, properties):
+        self.gst_properties = properties
+        
 gobject.type_register(MultifdSinkStreamer)
 
 def createComponent(config):
@@ -402,12 +434,18 @@ def createComponent(config):
     source = config['source']
 
     component = MultifdSinkStreamer(name, source, port)
-    component.sink_properties = config.get('sink-property', [])
-    
+    if config.has_key('gst-property'):
+        component.setProperties(config['gst-property'])
+
     resource = HTTPStreamingResource(component)
     if config.has_key('logfile'):
         component.msg('Logging to %s' % config['logfile'])
         resource.setLogfile(config['logfile'])
+
+    if config.has_key('auth'):
+        auth_component = auth.getAuth(config['config'],
+                                      config['auth'])
+        resource.setAuth(auth_component)
         
     factory = server.Site(resource=resource)
     component.msg('Listening on %d' % port)

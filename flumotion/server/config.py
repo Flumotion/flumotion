@@ -29,7 +29,7 @@ from flumotion.utils import log
 class ConfigError(Exception):
     pass
 
-class ConfigComponent:
+class ConfigEntry:
     nice = 0
     def __init__(self, name, type, func, config):
         self.name = name
@@ -47,11 +47,11 @@ class ConfigComponent:
         return self.func(self.config, *args)
 
     def startFactory(self):
-        return self.config.get('factory', True)
+        return self.config.get('start-factory', True)
     
 class FlumotionConfigXML:
     def __init__(self, filename):
-        self.components = {}
+        self.entries = {}
     
         self.msg('Loading configuration file `%s\'' % filename)
         self.doc = minidom.parse(filename)
@@ -64,9 +64,16 @@ class FlumotionConfigXML:
     def getPath(self):
         return self.path
 
-    def getComponents(self):
-        return self.components
+    def getEntries(self):
+        return self.entries
 
+    def getEntry(self, name):
+        return self.entries[name]
+
+    def getEntryType(self, name):
+        entry = self.entries[name]
+        return entry.getType()
+    
     def parse(self):
         # <root>
         #     <component>
@@ -80,13 +87,13 @@ class FlumotionConfigXML:
             if node.nodeType != Node.ELEMENT_NODE:
                 continue
             if node.nodeName == 'component':
-                component = self.parse_component(node)
-                if component is not None:
-                    self.components[component.getName()] = component
+                entry = self.parse_entry(node)
+                if entry is not None:
+                    self.entries[entry.getName()] = entry
             else:
                 raise XmlParserError, "unexpected node: %s" % child
             
-    def parse_component(self, node):
+    def parse_entry(self, node):
         # <component name="..." type="...">
         #     ...
         # </component>
@@ -98,11 +105,12 @@ class FlumotionConfigXML:
         config = {}
         config['name'] = name = str(node.getAttribute('name'))
         config['type'] = type = str(node.getAttribute('type'))
-        
-        if node.hasAttribute('start-factory'):
-            config['start-factory'] = str(node.getAttribute('start-factory'))
+        config['config'] = self
         
         defs = registry.getComponent(type)
+        
+        config['start-factory'] = defs.isFactory()
+        
         self.parse_property_def(type, defs.getProperties(), node, config)
         
         module = reflect.namedAny(defs.source)
@@ -110,8 +118,8 @@ class FlumotionConfigXML:
             self.warn('no createComponent() for %s' % defs.source)
             return
         function = module.createComponent
-        component = ConfigComponent(name, type, function, config)
-        return component
+        entry = ConfigEntry(name, type, function, config)
+        return entry
 
     def get_int_value(self, nodes):
         values = []
@@ -149,7 +157,6 @@ class FlumotionConfigXML:
             property.data = data
             for key in subnode.attributes.keys():
                 value = subnode.attributes[key].value
-                print '****', key, value
                 setattr(property, str(key), value)
 
             values.append(property)

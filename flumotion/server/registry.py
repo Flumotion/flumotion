@@ -32,8 +32,9 @@ class Property:
         self.multiple = multiple
         
 class Component:
-    def __init__(self, type, source, properties):
+    def __init__(self, type, factory, source, properties):
         self.type = type
+        self.factory = factory
         self.source = source
         self.properties = properties
 
@@ -42,6 +43,12 @@ class Component:
 
     def getType(self):
         return self.type
+
+    def getSource(self):
+        return self.source
+    
+    def isFactory(self):
+        return self.factory
     
 class XmlParserError(Exception):
     pass
@@ -116,15 +123,22 @@ class RegistryXmlParser:
             else:
                 raise XmlParserError, "unexpected node: %s" % child
 
-        
-        return Component(node.getAttribute('type'), source, properties)
+
+        factory = True
+        if node.hasAttribute('factory'):
+            factory = node.getAttribute('factory')
+            if factory in ('false', 'no'):
+                factory = False
+            
+        return Component(str(node.getAttribute('type')),
+                         factory, source, properties)
 
     def parse_source(self, node):
         # <source location="..."/>
         if not node.hasAttribute('location'):
             raise XmlParserError, "<source> must have a location attribute"
 
-        return node.getAttribute('location')
+        return str(node.getAttribute('location'))
 
     def parse_properties(self, node):
         # <properties>
@@ -145,8 +159,8 @@ class RegistryXmlParser:
             elif not child.hasAttribute('type'):
                 raise XmlParserError, "<property> must have a type attribute"
 
-            name = child.getAttribute('name')
-            type = child.getAttribute('type')
+            name = str(child.getAttribute('name'))
+            type = str(child.getAttribute('type'))
 
             optional = {}
             if child.hasAttribute('required'):

@@ -1,3 +1,20 @@
+2004-08-11  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/config.py (ConfigEntry): Rename to sort out things
+
+	* flumotion/server/auth.py: Authentication helper functions
+
+	* flumotion/components/passwd.py (HTTPGatekeeper): New gatekeeper,
+	for htpasswd (from apache), only supports crypt encryption right now
+
+	* flumotion/components/http.py (HTTPClientKeycard): New
+	IClientKeycard implementation for twisted http requests
+
+	* flumotion/server/interfaces.py (IClientKeycard) 
+	(IAuthenticate): New file with two interfaces
+
+	* conf/videotest-jpeg.xml: Add auth component
+
 2004-08-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/multipart-bttv-jpeg.xml:
