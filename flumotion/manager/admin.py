@@ -358,6 +358,7 @@ class AdminHeaven(pb.Root, log.Loggable):
     def createAvatar(self, avatarId):
         """
         Create a new administration avatar and manage it.
+
         @rtype:   L{flumotion.manager.admin.AdminAvatar}
         @returns: a new avatar for the admin client.
         """

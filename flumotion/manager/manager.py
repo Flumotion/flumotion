@@ -65,6 +65,7 @@ class Dispatcher(log.Loggable):
     # a L{twisted.spread.flavours.Referenceable}
     # A L{twisted.spread.pb.RemoteReference} to it is passed to
     # requestAvatar as mind.
+
     # So in short, the mind is a reference to the client passed in login()
     # on the peer, allowing any object that has the mind to call back
     # to the piece that called login(),

@@ -1,3 +1,11 @@
+2004-11-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/admin.py:
+	* flumotion/manager/manager.py:
+	* flumotion/twisted/portal.py:
+	  Multiple admin logins now work.  Don't annoy other people
+	  by cleaning out their state and stuff though. Fixes #36.
+
 2004-11-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/bundle.py:

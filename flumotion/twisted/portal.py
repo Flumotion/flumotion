@@ -27,7 +27,7 @@ from twisted.cred.portal import Portal
 from twisted.python import failure
 from twisted.python.components import registerAdapter
 
-from flumotion.common import keycards, log
+from flumotion.common import keycards, log, interfaces
 from flumotion.twisted.pb import _FPortalRoot
 
 """
@@ -52,8 +52,9 @@ class BouncerPortal(log.Loggable):
         """
         self.realm = realm
         self.bouncer = bouncer
+        self._adminCounter = 0
 
-    def login(self, keycard, mind, *interfaces):
+    def login(self, keycard, mind, *ifaces):
         """
         Log in the keycard to the portal using the bouncer.
 
@@ -61,13 +62,14 @@ class BouncerPortal(log.Loggable):
         @type  keycard:    L{flumotion.common.keycards.Keycard}
         @param mind:       a reference to the client-side requester
         @type  mind:       L{twisted.spread.pb.RemoteReference}
-        @param interfaces: a list of interfaces for the perspective that the
+        @param ifaces:     a list of interfaces for the perspective that the
                            mind wishes to attach to
         
         @returns: a deferred which will fire a tuple of
                   (interface, avatarAspect, logout), or a failure.
         """
-        self.debug("_login(keycard=%r, mind=%r, interfaces=%r)" % (keycard, mind, interfaces))
+        self.debug("_login(keycard=%r, mind=%r, ifaces=%r)" % (
+            keycard, mind, ifaces))
         if not self.bouncer:
             # FIXME: do we really want anonymous login when no bouncer is
             # present ?
@@ -77,12 +79,12 @@ class BouncerPortal(log.Loggable):
         else:
             d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
             
-        d.addCallback(self._authenticateCallback, mind, *interfaces)
+        d.addCallback(self._authenticateCallback, mind, *ifaces)
         return d
 
-    def _authenticateCallback(self, result, mind, *interfaces):
+    def _authenticateCallback(self, result, mind, *ifaces):
         # we either got a keycard as result, or None from the bouncer
-        self.debug("_authenticateCallback(result=%r, mind=%r, interfaces=%r)" % (result, mind, interfaces))
+        self.debug("_authenticateCallback(result=%r, mind=%r, ifaces=%r)" % (result, mind, ifaces))
 
         if not result:
             # just like a checker, we return a failure object
@@ -96,7 +98,14 @@ class BouncerPortal(log.Loggable):
             self.debug("_authenticateCallback: returning keycard for further authentication")
             return keycard
 
-        self.debug("_authenticateCallback(%r), chaining through to next callback to request AvatarId from realm with mind %r and interfaces %r" % (result, mind, interfaces))
+        self.debug("_authenticateCallback(%r), chaining through to next callback to request AvatarId from realm with mind %r and ifaces %r" % (result, mind, ifaces))
 
-        return self.realm.requestAvatar(keycard.avatarId, mind, *interfaces)
+        # this is where we request the Avatar and can influence naming
+        
+        if interfaces.IAdminMedium in ifaces:
+            # we decide on a unique name for admin clients here
+            keycard.avatarId = "admin-%06x" % self._adminCounter
+            self._adminCounter += 1
+
+        return self.realm.requestAvatar(keycard.avatarId, mind, *ifaces)
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)
