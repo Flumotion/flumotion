@@ -149,7 +149,7 @@ class JobView(pb.Referenceable, log.Loggable):
 
         comp = getComponent(config, defs)
         comp.set_feed_ports(feed_ports)
-        manager_client_factory = component.ComponentFactory(comp)
+        manager_client_factory = component.ComponentClientFactory(comp)
         # XXX: get username/password from parent
         manager_client_factory.login(name)
         reactor.connectTCP(self.manager_host,

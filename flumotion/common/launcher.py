@@ -169,7 +169,7 @@ class Launcher(log.Loggable):
         self.enable_core_dumps(component_name)
         
         log.debug(component_name, 'Configuration dictionary is: %r' % dict)
-        factory = component.ComponentFactory(comp)
+        factory = component.ComponentClientFactory(comp)
         factory.login(component_name)
         reactor.connectTCP(self.manager_host, self.manager_port, factory)
         

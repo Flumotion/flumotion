@@ -52,11 +52,11 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     def __init__(self):
         self.__gobject_init__()
-        self.factory = pbutil.FMClientFactory()
+        clientFactory = pbutil.FMClientFactory()
         self.debug("logging in to ClientFactory")
-        d = self.factory.login(cred.Username('admin'), self,
-                               pb.IPerspective,
-                               interfaces.IAdminComponent)
+        d = clientFactory.login(cred.Username('admin'), self,
+            pb.IPerspective,
+            interfaces.IAdminComponent)
         d.addCallback(self._gotPerspective)
         d.addErrback(self._loginErrback)
         self.components = {} # dict of components

@@ -81,7 +81,7 @@ class Launcher(log.Loggable):
         log.debug(name, 'Configuration dictionary is: %r' % dict)
         
         comp = config.getComponent()
-        factory = component.ComponentFactory(comp)
+        factory = component.ComponentClientFactory(comp)
         factory.login(name)
         reactor.connectTCP(self.manager_host, self.manager_port, factory)
 

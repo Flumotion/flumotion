@@ -152,7 +152,7 @@ class FeederSet(log.Loggable):
         """
         Add the feeders of the given component to the set.
 
-        @type component: L{flumotion.manager.component.ComponentAvatar}
+        @type componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         """
         name = componentAvatar.getName()
         feeders = componentAvatar.getFeeders()

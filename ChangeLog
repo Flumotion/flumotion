@@ -1,5 +1,15 @@
 2004-10-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/common/launcher.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/component.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/launcher.py:
+	  make server/client factory explicit
+
+2004-10-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	* TODO:
 	* bin/flumotion-worker.in:

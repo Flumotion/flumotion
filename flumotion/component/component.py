@@ -28,8 +28,7 @@ from flumotion.twisted import cred, pbutil
 from flumotion.utils import log, gstutils
 from flumotion.utils.gstutils import gsignal
 
-# FIXME: rename to client factory
-class ComponentFactory(pbutil.ReconnectingPBClientFactory):
+class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
     def __init__(self, component):
         # doing this as a class method triggers a doc error
