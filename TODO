@@ -1,4 +1,21 @@
 * MEDIUM	integration with monitoring tools:
 		big brother: either:
-- make an http URL return a 2xx code when it works or a 5xx code when it doesn't
-- make an executable script/program that makes all required checks and outputs a report, has a proper zero or non-zero exit status and can't run forever if things are stuck (times out properly)
+- make an executable script/program that makes all required checks and
+  outputs a report, has a proper zero or non-zero exit status and 
+  can't run forever if things are stuck (times out properly)
+
+
+http component
+
+- multiple sources, attach them to urls
+- rate limit
+- make an http URL return a 2xx code when it works or a 5xx code
+  when it doesn't
+- check for StringIO requests instances, which Twisted 1.3.0 implements
+
+launcher
+- connect to controller
+
+controller
+- accept launcher connections and add a protocol to communicate with
+  a launcher to start up components

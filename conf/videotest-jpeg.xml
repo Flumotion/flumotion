@@ -15,6 +15,10 @@
     <source>png-overlay</source>
   </component>
 
+  <component name="jpeg+multipart-clean" type="multipartjpeg">
+    <source>videotest-producer</source>
+  </component>
+
   <component name="auth-1" type="htpasswd-auth">
     <filename>/home/jdahlin/htpasswd</filename>
     <auth-type>crypt</auth-type>
@@ -22,6 +26,7 @@
 
   <component name="http-video" type="http-streamer">
     <source>jpeg+multipart</source>
+    <source path="/clean">jpeg+multipart-clean</source>
     <port>8803</port>
     <logfile>/tmp/videotestsrc_access.log</logfile>
     <auth>auth-1</auth>

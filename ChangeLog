@@ -1,3 +1,21 @@
+2004-08-27  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/controller.py (__all__): Don't export private
+	classes.
+	(Feed.setReady): Use a boolean for ready instead of state, so we
+	can remove silly enums.
+	(Feed.isReady): New method
+
+	* flumotion/server/error.py: Remove, since it was unused.
+
+	* TODO: Add some more items
+
+	* flumotion/components/http.py (HTTPStreamingAdminResource):
+	Implement maxclient support
+
+	* flumotion/components/file.py (FileStreamingResource): Show
+	filename when restarting the component
+
 2004-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/gui/adminclient.py:

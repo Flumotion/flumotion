@@ -7,7 +7,6 @@ flumotion_DATA = \
 	component.py \
 	config.py \
 	controller.py \
-	errors.py \
 	interfaces.py \
 	launcher.py \
 	registry.py

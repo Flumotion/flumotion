@@ -9,7 +9,7 @@ MODULE_FILES = \
 	flumotion/admin/__init__.py		\
 	flumotion/admin/spyglass.py		\
 	flumotion/components/converter.py	\
- 	flumotion/components/file.py		\
+	flumotion/components/file.py		\
 	flumotion/components/http.py		\
 	flumotion/components/producer.py	\
 	flumotion/components/passwd.py		\
@@ -20,7 +20,6 @@ MODULE_FILES = \
 	flumotion/server/component.py		\
         flumotion/server/config.py		\
 	flumotion/server/controller.py		\
-	flumotion/server/errors.py		\
 	flumotion/server/interfaces.py		\
 	flumotion/server/launcher.py		\
 	flumotion/server/registry.py		\

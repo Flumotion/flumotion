@@ -18,6 +18,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
+"""Controller implementation and related classes
+
+API Stability: semi-stable
+
+Maintainer: U{Johan Dahlin <johan@fluendo.com>}
+"""
+
+__all__ = ['ComponentPerspective', 'Controller', 'ControllerServerFactory']
+
 import gst
 
 from twisted.cred import portal
@@ -64,7 +73,10 @@ class Options:
     """dummy class for storing controller side options of a component"""
 
 class ComponentPerspective(pbutil.NewCredPerspective, log.Loggable):
-    """Perspective all components will have on the controller side"""
+    """Controller side perspective of components"""
+
+    logCategory = 'controller'
+
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
@@ -79,11 +91,8 @@ class ComponentPerspective(pbutil.NewCredPerspective, log.Loggable):
                                         self.getName(),
                                         gst.element_state_get_name(self.state))
 
-    # log.Loggable functions
-    logCategory = 'controller'
     def logFunction(self, arg):
-        return (self.getName() + ': ' + arg)
-
+        return self.getName() + ': ' + arg
 
     def getTransportPeer(self):
         return self.mind.broker.transport.getPeer()
@@ -205,15 +214,11 @@ class ComponentPerspective(pbutil.NewCredPerspective, log.Loggable):
             cb = self.callRemote('link', sources, [])
             cb.addErrback(self.cb_checkAll)
 
-STATE_NULL     = 0
-STATE_STARTING = 1
-STATE_READY    = 2
-
 class Feed:
     def __init__(self, name):
         self.name = name
         self.dependencies = []
-        self.state = STATE_NULL
+        self.ready = False
         self.component = None
 
     def setComponent(self, component):
@@ -223,11 +228,14 @@ class Feed:
         self.dependencies.append((func, args))
 
     def setReady(self):
-        self.state = STATE_READY
+        self.ready = True
         for func, args in self.dependencies:
             func(*args)
         self.dependencies = []
 
+    def isReady(self):
+        return self.ready
+    
     def getName(self):
         return self.name
 
@@ -238,7 +246,7 @@ class Feed:
         return self.component.getListenPort(self.name)
     
     def __repr__(self):
-        return '<Feed %s state=%d>' % (self.name, self.state)
+        return '<Feed %s ready=%r>' % (self.name, self.ready)
     
 class FeedManager:
     def __init__(self):
@@ -274,7 +282,7 @@ class FeedManager:
 
         feed = self[feedname]
 
-        return feed.state == STATE_READY
+        return feed.isReady()
     
     def feedReady(self, feedname): 
         # If we don't specify the feed
@@ -296,12 +304,17 @@ class FeedManager:
             self.feeds[feedname] = Feed(feedname)
             
         feed = self.feeds[feedname]
-        if feed.state != STATE_READY:
+        if not feed.isReady():
             feed.addDependency(func, *args)
         else:
             func(*args)
 
 class Controller(pb.Root):
+    """Controller, handles all registered components and provides perspectives
+for them
+
+The main function of this class is to handle components, tell the to start
+register and start up pending components."""
     def __init__(self):
         self.components = {}
         self.feed_manager = FeedManager()
@@ -388,7 +401,7 @@ class Controller(pb.Root):
 
         @type component:  component
         @param component: the component
-        @rtype:           tuple of with 3 items
+        @rtype:           tuple with 3 items
         @returns:         name, hostname and port"""
 
         peernames = component.getSources()
@@ -471,8 +484,12 @@ class Controller(pb.Root):
         feedname = component.getName() + ':' + feed
         self.feed_manager.feedReady(feedname)
 
-    def stopComponent(self, component_name):
-        component = self.components[component_name]
+    def stopComponent(self, name):
+        """stops a component
+        @type name:  string
+        @param name: name of the component"""
+
+        component = self.components[name]
         component.stop()
         
     def shutdown(self):
