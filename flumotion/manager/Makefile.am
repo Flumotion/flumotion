@@ -4,6 +4,7 @@ flumotion_PYTHON =	\
 	__init__.py	\
 	admin.py	\
 	component.py	\
+	main.py		\
 	manager.py	\
 	worker.py
 

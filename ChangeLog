@@ -1,5 +1,7 @@
 2004-09-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/manager/main.py: New file, currently unused
+
 	* flumotion/common/config.py (ConfigEntry.getWorker): 
 	Add dummy getWorker() method
 
