@@ -1,3 +1,15 @@
+2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/Makefile.am:
+	* flumotion/component/bouncers/Makefile.am:
+	* flumotion/component/bouncers/htpasswd.py:
+	* flumotion/component/bouncers/htpasswd.xml:
+	* flumotion/component/passwd/Makefile.am:
+	* flumotion/component/passwd/__init__.py:
+	* flumotion/component/passwd/passwd.py:
+	* flumotion/component/passwd/passwd.xml:
+	  remove two unused components
+
 2004-10-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/file/file.py:

@@ -20,7 +20,6 @@ SUBDIRS = \
 	http \
 	muxers \
 	overlay \
-	passwd \
 	soundcard \
 	videotest \
 	webcam

@@ -1,7 +1,7 @@
 componentdir = $(libdir)/flumotion/python/flumotion/component/bouncers
 component_PYTHON = \
 	__init__.py \
-	htpasswd.py \
+	htpasswdcrypt.py \
 	bouncer.py
 
 TAGS_FILES = $(component_PYTHON)
