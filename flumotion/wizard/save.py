@@ -15,7 +15,12 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from flumotion.wizard.enums import *
+from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
+     EncodingFormat, EncodingVideo, Enum, EnumClass, EnumMetaClass, \
+     LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
+     SoundcardChannels, SoundcardDevice, SoundcardInput, \
+     SoundcardSamplerate, TVCardDevice, TVCardSignal, VideoDevice, \
+     VideoTestFormat, VideoTestPattern
 
 
 class Component:

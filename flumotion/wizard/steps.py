@@ -17,7 +17,12 @@
 
 import gtk
         
-from flumotion.wizard.enums import * # XXX: fix later
+from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
+     EncodingFormat, EncodingVideo, Enum, EnumClass, EnumMetaClass, \
+     LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
+     SoundcardChannels, SoundcardDevice, SoundcardInput, \
+     SoundcardSamplerate, TVCardDevice, TVCardSignal, VideoDevice, \
+     VideoTestFormat, VideoTestPattern
 from flumotion.wizard import wizard
 from flumotion.configure import configure
 
