@@ -51,6 +51,8 @@ class Window(log.Loggable, gobject.GObject):
     def __init__(self, model):
         self.__gobject_init__()
         
+        self.current_component_state = None
+
         self.widgets = {}
         self.debug('creating UI')
         self._create_ui()
@@ -58,7 +60,6 @@ class Window(log.Loggable, gobject.GObject):
         self._append_recent_connections()
 
         self.current_component = None # the component we're showing UI for
-        self.current_component_state = None
         self._disconnected_dialog = None # set to a dialog if we're
                                          # disconnected
 
