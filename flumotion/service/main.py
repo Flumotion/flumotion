@@ -56,7 +56,10 @@ def main(args):
         return servicer.start(args[2:])
     elif command == "stop":
         return servicer.stop(args[2:])
+    elif command == "restart":
+        return servicer.stop(args[2:]) + servicer.start(args[2:])
     elif command == "status":
         return servicer.status(args[2:])
 
+    sys.stderr.write("No such command '%s'\n" % command)
     return 1

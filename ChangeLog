@@ -1,5 +1,11 @@
 2004-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/service/main.py:
+	  error on unknown commands
+	  implement restart
+
+2004-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/wizard_consumption.glade:
 	* data/glade/wizard_disk.glade:
 	* data/glade/wizard_http.glade:
