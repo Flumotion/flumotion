@@ -95,7 +95,7 @@ class TestRegistry(unittest.TestCase):
         assert comp1 in comps
         assert comp2 in comps
         
-    def testParseProperties(self):
+    def testParseComponentProperties(self):
         assert self.reg.isEmpty()
         self.reg.addFromString("""
 <registry>
@@ -118,7 +118,7 @@ class TestRegistry(unittest.TestCase):
         assert prop.isRequired()
         assert prop.isMultiple()
 
-    def testParsePropertiesErrors(self):
+    def testParseComponentPropertiesErrors(self):
         template = """
 <registry>
   <components>
@@ -155,7 +155,7 @@ class TestRegistry(unittest.TestCase):
         reg.clean()
         assert reg.isEmpty()
 
-    def testAddTypeError(self):
+    def testComponentTypeError(self):
         reg = registry.ComponentRegistry()
         xml = """
 <registry>
@@ -181,8 +181,30 @@ class TestRegistry(unittest.TestCase):
         xml = """
 <registry>
   <components>
-    <component name="foo" type="bar"></component>
+    <component name="foo" type="bar">
+      <entries>
+        <entry type="test/test" location="loc" function="main"/>
+      </entries>
+    </component>
   </components>
+  <bundles>
+    <bundle name="test-bundle">
+      <dependencies>
+        <dependency name="test-dependency"/>
+      </dependencies>
+      <directories>
+        <directory name="/tmp">
+          <filename location="loc"/>
+        </directory>
+        <directory name="foobie">
+          <filename location="barie"/>
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+  <directories>
+    <directory filename="test"/>
+  </directories>
 </registry>"""
         reg = registry.ComponentRegistry()
         reg.clean()
@@ -198,9 +220,28 @@ class TestRegistry(unittest.TestCase):
       <source location="None"/>
       <properties>
       </properties>
+      <entries>
+        <entry type="test/test" location="loc" function="main"/>
+      </entries>
     </component>
   </components>
+  <bundles>
+    <bundle name="test-bundle">
+      <dependencies>
+        <dependency name="test-dependency"/>
+      </dependencies>
+      <directories>
+        <directory name="/tmp">
+          <filename location="loc"/>
+        </directory>
+        <directory name="foobie">
+          <filename location="barie"/>
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
   <directories>
+    <directory filename="test"/>
   </directories>
 </registry>
 """, data
