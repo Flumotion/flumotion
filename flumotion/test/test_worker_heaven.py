@@ -28,15 +28,14 @@ class TestHeaven(unittest.TestCase):
         h = worker.WorkerHeaven(None)
         avatar = h.createAvatar('foo')
 
-        assert 'foo' in h.avatars
+        assert 'foo' in [a.getName() for a in h.getAvatars()]
         assert isinstance(avatar, worker.WorkerAvatar)
         h.removeAvatar('foo')
         
-        assert not 'foo' in h.avatars
+        assert not 'foo' in [a.getName() for a in h.getAvatars()]
 
     def testError(self):
         h = worker.WorkerHeaven(None)
-        self.assertRaises(KeyError, h.removeAvatar, 'unexistent')
 
     def testAttached(self):
         h = worker.WorkerHeaven(None)

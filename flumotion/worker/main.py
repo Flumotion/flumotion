@@ -64,6 +64,10 @@ def main(args):
                      action="store", type="string", dest="password",
                      default="",
                      help="password to use, - for interactive")
+    group.add_option('-w', '--worker-name',
+                     action="store", type="string", dest="workerName",
+                     default="",
+                     help="worker name to use in the manager")
      
     parser.add_option_group(group)
     
@@ -113,11 +117,19 @@ def main(args):
                                                          options.port,
                                                          options.transport))
 
-    # FIXME: one without address maybe ? or do we want manager to set it ?
-    # or do we set our guess and let manager correct ?
-    keycard = keycards.KeycardUACPP(options.username, options.password, 'localhost')
+    if options.workerName:
+        workerName = options.workerName
+    else:
+        if options.host == 'localhost':
+            workerName = 'localhost'
+        else:
+            import socket
+            workerName = socket.gethostname()
+
+    keycard = keycards.KeycardUACPP(options.username, options.password,
+                                    'localhost')
     # FIXME: decide on a workername
-    keycard.avatarId = "localhost"
+    keycard.avatarId = workerName
     brain.login(keycard)
 
     log.debug('worker', 'Starting reactor')

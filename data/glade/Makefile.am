@@ -1,6 +1,7 @@
-glade_DATA = \
+ glade_DATA = \
 	admin.glade 			\
 	wizard.glade 			\
+	wizard_audiotest.glade	\
 	wizard_audio_encoder.glade	\
 	wizard_audiosource.glade	\
 	wizard_consumption.glade	\

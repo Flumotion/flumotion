@@ -1,3 +1,24 @@
+2004-10-18  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/Makefile.am:
+	* data/glade/wizard.glade:
+	* data/glade/wizard_audio_encoder.glade:
+	* data/glade/wizard_audiotest.glade:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_welcome.glade:
+	* flumotion/admin/gtk/main.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_worker_heaven.py:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/worker/main.py:
+
+	Add audiotest component, add workers everywhere in the wizard and
+	save it properly. 
+	Fix wizard debugging again.
+	
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:

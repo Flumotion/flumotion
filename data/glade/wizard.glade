@@ -124,7 +124,7 @@
 	      <property name="above_child">False</property>
 
 	      <child>
-		<widget class="GtkFrame" id="content_area">
+		<widget class="GtkFrame" id="content_frame">
 		  <property name="width_request">400</property>
 		  <property name="height_request">240</property>
 		  <property name="visible">True</property>
@@ -133,7 +133,15 @@
 		  <property name="shadow_type">GTK_SHADOW_OUT</property>
 
 		  <child>
-		    <placeholder/>
+		    <widget class="GtkVBox" id="content_area">
+		      <property name="visible">True</property>
+		      <property name="homogeneous">False</property>
+		      <property name="spacing">0</property>
+
+		      <child>
+			<placeholder/>
+		      </child>
+		    </widget>
 		  </child>
 		</widget>
 	      </child>

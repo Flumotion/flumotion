@@ -1,18 +1,29 @@
+# -*- Mode: Python; test-case-name: flumotion.test.test_wizard -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# flumotion/wizard/wizard.py: the configuration wizard
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2004 Fluendo (www.fluendo.com)
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# This program is also licensed under the Flumotion license.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
 from flumotion.wizard.enums import *
 
-video_source_components = { VideoDevice.TVCard    : 'tv-card',
-                            VideoDevice.Firewire  : 'firewire',
-                            VideoDevice.Webcam    : 'webcam',
-                            VideoDevice.Test      : 'videotestsrc' }
-audio_source_components = { AudioDevice.Firewire  : 'audio-firewire',
-                            AudioDevice.Soundcard : 'alsasrc',
-                            AudioDevice.Test      : 'sinesrc' }
 
 class Component:
-    def __init__(self, name, type, properties={}):
+    def __init__(self, name, type, properties={}, worker=None):
         self.name = name
         self.type = type
         self.props = properties
+        self.worker = worker
         self.eaters = []
         self.feeders = []
         
@@ -30,7 +41,14 @@ class Component:
         component.addEater(self)
         
     def toXML(self):
-        s = '    <component name="%s" type="%s">\n' % (self.name, self.type)
+        if self.worker:
+            extra = ' worker="%s"' % self.worker
+        else:
+            extra = ''
+            
+        s = '    <component name="%s" type="%s"%s>\n' % (self.name,
+                                                         self.type,
+                                                         extra)
 
         # XXX: Handle eaters properly
         s += '      <feed>default</feed>\n'
@@ -65,7 +83,8 @@ class WizardSaver:
         source = options['video']
         video_step = self.wizard[source.step]
         return Component('video-source', source.component_type,
-                         video_step.get_component_properties())
+                         video_step.get_component_properties(),
+                         video_step.worker)
 
     def getVideoOverlay(self, show_logo):
         # At this point we already know that we should overlay something
@@ -82,25 +101,28 @@ class WizardSaver:
             if license_options['license'] == LicenseType.CC:
                 properties['cc_logo'] = True
     
-        return Component('video-overlay', 'overlay', properties)
+        return Component('video-overlay', 'overlay', properties, step.worker)
         
     def getVideoEncoder(self):
         options = self.wizard.get_step_options('Encoding')
         encoder = options['video']
         encoder_step = self.wizard[encoder.step]
         return Component('video-encoder', encoder.component_type,
-                         encoder_step.get_component_properties())
+                         encoder_step.get_component_properties(),
+                         encoder_step.worker)
 
     def getAudioSource(self):
         options = self.wizard.get_step_options('Source')
         source = options['audio']
         if source == AudioDevice.Test:
             props = {}
+            audio_step = self.wizard['Audio Test']
         else:
             audio_step = self.wizard['Audio Source']
             props = audio_step.get_component_properties()
         
-        return Component('audio-source', source.component_type, props)
+        return Component('audio-source', source.component_type, props,
+                         audio_step.worker)
 
     def getAudioEncoder(self):
         options = self.wizard.get_step_options('Encoding')
@@ -108,16 +130,22 @@ class WizardSaver:
         
         if encoder == EncodingAudio.Mulaw:
             props = {}
+            # FIXME
+            worker = None 
         else:
             encoder_step = self.wizard[encoder.step]
             props = encoder_step.get_component_properties()
+            worker = encoder_step.worker
             
-        return Component('audio-encoder', encoder.component_type, props)
+        return Component('audio-encoder', encoder.component_type, props,
+                         worker)
 
     def getMuxer(self, name):
         options = self.wizard.get_step_options('Encoding')
+        step = self.wizard['Encoding']
         muxer = options['format']
-        return Component('multiplexer-' + name, muxer.component_type)
+        return Component('multiplexer-' + name, muxer.component_type,
+                         worker=step.worker)
 
     def handleVideo(self, components):
         overlay_options = self.wizard.get_step_options('Overlay')
@@ -219,7 +247,8 @@ class WizardSaver:
             if not cons_options.has_key(key):
                 continue
             step = self.wizard[step_name]
-            consumer = Component(name, type, step.get_component_properties())
+            consumer = Component(name, type, step.get_component_properties(),
+                                 step.worker)
             consumer.link(muxer)
             components.append(consumer)
 
@@ -248,10 +277,10 @@ class WizardSaver:
         self.handleConsumers(components, audio_encoder, video_encoder)
         
         s = '<planet>\n'
-        s += '  <atmosphere>\n'
+        s += '  <flow>\n'
         for component in components:
             s += component.toXML()
-        s += '  </atmosphere>\n'
+        s += '  </flow>\n'
         s += '</planet>\n'
 
         return s

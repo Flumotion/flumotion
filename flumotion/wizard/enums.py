@@ -102,7 +102,7 @@ VideoDevice = EnumClass('VideoDevice',
                                         'videotest'))
 AudioDevice = EnumClass('AudioDevice',
                         ('Soundcard', 'Firewire', 'Test'),
-                        ('Sound card', 'Firewire Audio', 'Test audio source'),
+                        ('Sound card', 'Firewire Audio', 'Audio test'),
                         component_type=('soundcard',
                                         'firewire-audio',
                                         'audiotest'))

@@ -14,7 +14,7 @@
 
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
-
+
 import os
 
 import gobject
@@ -190,6 +190,7 @@ class WizardStep(object, log.Loggable):
     step_name = None # Subclass sets this
     glade_file = None # Subclass sets this
     icon = 'placeholder.png'
+    has_worker = True
     widget_prefixes = { WizardComboBox    : 'combobox',
                         WizardCheckButton : 'checkbutton',
                         WizardEntry       : 'entry',
@@ -378,7 +379,9 @@ class Wizard(gobject.GObject):
         # Add current
         widget = step.get_main_widget()
         self.content_area.add(widget)
+        self.content_area.set_child_packing(widget, False, False, 0, 0)
 
+        self._append_workers(step)
         icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
         self.image_icon.set_from_file(icon_filename)
             
@@ -396,6 +399,34 @@ class Wizard(gobject.GObject):
         widget.show()
         step.activated()
 
+    def _append_workers(self, step):
+        if not step.has_worker:
+            self.combobox_worker = None
+            return
+        
+        # Horizontal, under step
+        hbox = gtk.HBox()
+        self.content_area.pack_end(hbox, False, False)
+        hbox.set_border_width(6)
+        hbox.show()
+        
+        frame = gtk.Frame('Worker')
+        hbox.pack_end(frame, False, False, 0)
+        frame.show()
+
+        # Internal, so we can add border width
+        box = gtk.HBox()
+        frame.add(box)
+        box.set_border_width(6)
+        box.show()
+
+        self.combobox_worker = gtk.combo_box_new_text()
+        box.pack_start(self.combobox_worker, False, False, 6)
+        map(self.combobox_worker.append_text, self._workers)
+            
+        self.combobox_worker.set_active(0)
+        self.combobox_worker.show()
+        
     def show_previous(self):
         self.stack.pop()
         prev_step = self.stack.peek()
@@ -413,9 +444,16 @@ class Wizard(gobject.GObject):
             next_step = self[next]
         except KeyError:
             raise TypeError("Wizard step %s is missing" % `next`)
-    
-        next_step.visited = True
+
+        # get name of active worker
+        if self.combobox_worker:
+            iter = self.combobox_worker.get_active_iter()
+            model = self.combobox_worker.get_model()
+            text = model.get(iter, 0)[0]
+            self.current_step.worker = text
         
+        next_step.visited = True
+
         self.stack.push(next_step)
         self.set_step(next_step)
 
@@ -530,7 +568,7 @@ class Wizard(gobject.GObject):
         self.vbox_sidebar.show()
         
     def on_wizard_delete_event(self, wizard, event):
-        self.finish(self.use_main)
+        self.finish(self._use_main)
 
     def on_button_prev_clicked(self, button):
         self.show_previous()
@@ -543,7 +581,6 @@ class Wizard(gobject.GObject):
         self.emit('finished', configuration)
         
         if self._use_main:
-            print configuration[:-1]
             try:
                 gtk.main_quit()
             except RuntimeError:
@@ -551,29 +588,39 @@ class Wizard(gobject.GObject):
 
     def hide(self):
         self.window.hide()
-        
+
     def run(self, interactive, workers=[], main=True):
+        self._workers = workers
         self._use_main = main
         
-        self._workers = workers
         if not self.stack:
             raise TypeError("need an initial step")
 
         self.set_step(self.stack.peek())
-
+        
         if not interactive:
+            while self.current_step.get_next():
+                self.show_next()
+                
             return self.finish(False)
 
         self.window.show()
-        if self._use_main:
-            gtk.main()
+        if not self._use_main:
+            return
         
-        return self._save.getXML()
+        try:
+            gtk.main()
+        except KeyboardInterrupt:
+            pass
 
     def load_steps(self):
         # XXX: This is really ugly
         globals()['wiz'] = self
         import flumotion.wizard.steps
+
+    def printOut(self):
+        print self._save.getXML()[:-1]
+        
 gobject.type_register(Wizard)
 
         
@@ -585,15 +632,3 @@ def register_step(klass):
         wiz.add_step(klass, initial=True)
     else:
         wiz.add_step(klass)
-
-        
-
-def run(interactive=True, workers=[], main=True):
-    global wiz
-    
-    import flumotion.wizard.steps
-    return wiz.run(interactive, workers, main)
-
-
-if __name__ == '__main__':
-    run()

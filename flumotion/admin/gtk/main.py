@@ -59,7 +59,7 @@ def _window_connected_cb(window, options):
         wiz = wizard.Wizard()
         wiz.connect('finished', _wizard_finished_cb, window)
         wiz.load_steps()
-        wiz.run(options.debug, workers, main=False)
+        wiz.run(not options.debug, workers, main=False)
     elif not window.admin.getComponents():
         configuration = _read_default()
         window.admin.loadConfiguration(configuration)
@@ -71,9 +71,9 @@ def _window_connected_cb(window, options):
 def _runWizard(debug):
     wiz = wizard.Wizard()
     wiz.load_steps()
-    res = wiz.run(debug)
+    wiz.run(not debug, ['localhost'])
     if debug:
-        print res
+        wiz.printOut()
     
 def _runInterface(options):
     win = Window(options.host, options.port, options.transport,
@@ -121,8 +121,8 @@ def main(args):
                      action="store_true", dest="wizard",
                      help="run the wizard")
     parser.add_option('', '--debug',
-                      action="store_false", dest="debug",
-                      default=True,
+                      action="store_true", dest="debug",
+                      default=False,
                       help="run in debug")
 
     options, args = parser.parse_args(args)

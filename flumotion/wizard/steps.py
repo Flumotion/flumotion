@@ -28,6 +28,7 @@ class Welcome(wizard.WizardStep):
     section = 'Welcome'
     section_name = 'Welcome'
     icon = 'wizard.png'
+    has_worker = False
     def get_next(self):
         return 'Source'
 wizard.register_step(Welcome)
@@ -39,6 +40,7 @@ class Source(wizard.WizardStep):
     section = 'Production'
     section_name = 'Production'
     icon = 'source.png'
+    has_worker = False
     
     def setup(self):
         self.combobox_video.set_enum(VideoDevice)
@@ -197,6 +199,9 @@ class Overlay(wizard.WizardStep):
             audio_source = self.wizard.get_step_option('Source', 'audio')            
             if audio_source == AudioDevice.Soundcard:
                 return 'Audio Source'
+            elif audio_source == AudioDevice.Test:
+                return 'Audio Test'
+            
         return 'Encoding'
 wizard.register_step(Overlay)
 
@@ -234,6 +239,18 @@ class AudioSource(wizard.WizardStep):
         return 'Encoding'
 wizard.register_step(AudioSource)
 
+class AudioTest(wizard.WizardStep):
+    step_name = 'Audio Test'
+    glade_file = 'wizard_audiotest.glade'
+    section = 'Production'
+    icon = 'audiosrc.png'
+    
+    def get_component_properties(self):
+        return int(self.spinbutton_freq.get_value())
+    
+    def get_next(self):
+        return 'Encoding'
+wizard.register_step(AudioTest)
 
 
 class Encoding(wizard.WizardStep):
@@ -427,6 +444,7 @@ class Consumption(wizard.WizardStep):
     section = 'Consumption'
     section_name = 'Consumption'
     icon = 'consumption.png'
+    has_worker = False
 
     def setup(self):
         # XXX: remove
@@ -680,6 +698,7 @@ class Licence(wizard.WizardStep):
     section = 'License'
     section_name = 'License'
     icon = 'licenses.png'
+    has_worker = False
     def setup(self):
         self.combobox_license.set_enum(LicenseType)
         

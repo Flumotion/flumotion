@@ -19,6 +19,8 @@
 Manager-side objects to handle worker clients.
 """
 
+import socket
+
 from twisted.spread import pb
 
 from flumotion.common import errors, interfaces, log
@@ -41,16 +43,16 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
 
     def getName(self):
         return self.avatarId
-    
+
     def attached(self, mind):
-        self.info('attached %r' % mind)
+        self.debug('attached %r' % mind)
         self.mind = mind
 
         self.heaven.workerAttached(self)
     
     def detached(self, mind):
-        self.info('detached %r' % mind)
-
+        self.debug('detached %r' % mind)
+        
     def start(self, name, type, config):
         """
         Start a component of the given type with the given config.
@@ -80,7 +82,7 @@ class WorkerHeaven(pb.Root, log.Loggable):
         @type vishnu: L{flumotion.manager.manager.Vishnu}
         @param vishnu: the Vishnu object
         """
-        self.avatars = {} # avatarId -> WorkerAvatar
+        self._avatars = {} # avatarId -> WorkerAvatar
         self.conf = None
         self.vishnu = vishnu
         
@@ -88,17 +90,19 @@ class WorkerHeaven(pb.Root, log.Loggable):
 
     def createAvatar(self, avatarId):
         avatar = WorkerAvatar(self, avatarId)
-        self.avatars[avatarId] = avatar
+        self._avatars[avatarId] = avatar
+        self.info('WorkerAvatar %s created' % avatarId)
         return avatar
 
     def removeAvatar(self, avatarId):
-        del self.avatars[avatarId]
-        
+        if avatarId in self._avatars:
+            del self._avatars[avatarId]
+
     ### my methods
 
     # XXX: Move to IHeaven?
     def getAvatars(self):
-        return self.avatars.values()
+        return self._avatars.values()
     
     def loadConfiguration(self, filename, string=None):
         # XXX: Merge?
@@ -131,8 +135,8 @@ class WorkerHeaven(pb.Root, log.Loggable):
        
     def workerAttached(self, workerAvatar):
         # called when the mind is attached, ie the worker logged in
-        self.debug('workerAttached(): worker %r logged in' % workerAvatar)
-
+        self.info('worker %s logged in' % workerAvatar.getName())
+        
         # get all components that are supposed to start on this worker
         entries = self.getEntries(workerAvatar)
         workerName = workerAvatar.getName()
@@ -161,14 +165,14 @@ class WorkerHeaven(pb.Root, log.Loggable):
         @type  config:        dict
         """
         
-        if not self.avatars:
+        if not self._avatars:
             raise AttributeError
 
         if workerName:
-            avatar = self.avatars[workerName]
+            avatar = self._avatars[workerName]
         else:
             # XXX: Do we really want to keep this big hack?
             # eg, if we don't select a worker, just pick the first one.
-            avatar = self.avatars.values()[0]
+            avatar = self._avatars.values()[0]
 
         return avatar.start(componentName, type, config)
