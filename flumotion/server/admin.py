@@ -74,6 +74,18 @@ class AdminPerspective(pbutil.NewCredPerspective):
         except pb.DeadReferenceError:
             pass
 
+    def perspective_setState(self, component_name, element, property, value):
+        component = self.controller.getComponent(component_name)
+        try:
+            component.setState(element, property, value)
+        except TypeError, e:
+            print 'ERROR: %s' % str(e)
+        
+
+    def perspective_getState(self, component_name, element, property):
+        component = self.controller.getComponent(component_name)
+        return component.getState(element, property)
+
 class Admin(pb.Root):
     def __init__(self, controller):
         self.controller = controller

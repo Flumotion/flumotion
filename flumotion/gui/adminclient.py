@@ -53,14 +53,11 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
 
     def remote_componentAdded(self, component):
         print 'componentAdded', component
-        print self.clients
         self.clients.append(component)
         self.emit('update', self.clients)
         
     def remote_componentRemoved(self, component):
         print 'componentRemoved', component
-        print component
-        print self.clients
         self.clients.remove(component)
         self.emit('update', self.clients)
         
@@ -70,7 +67,16 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
 
     def remote_shutdown(self):
         print 'shutdown'
-        
+
+    def setState(self, component, element, property, value):
+        if not self.remote:
+            print 'Warning, no remote'
+            return
+        self.remote.callRemote('setState', component, element, property, value)
+
+    def getState(self, component, element, property):
+        return self.remote.callRemote('getState', component, element, property)
+    
 gobject.type_register(AdminInterface)
 
 class Window:
@@ -81,9 +87,12 @@ class Window:
         
     def create_ui(self):
         self.wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
-        window = self.wtree.get_widget('main_window')
-        window.connect('delete-event', self.close)
-        window.show_all()
+        self.window = self.wtree.get_widget('main_window')
+        self.button_change = self.wtree.get_widget('button_change')
+        self.button_change.connect('clicked', self.button_change_cb)
+        
+        self.window.connect('delete-event', self.close)
+        self.window.show_all()
         self.component_view = self.wtree.get_widget('component_view')
         self.component_model = gtk.ListStore(str, int, str, str)
         self.component_view.set_model(self.component_model)
@@ -102,6 +111,66 @@ class Window:
 
         self.wtree.signal_autoconnect(self)
 
+    def button_change_cb(self, button):
+        selection = self.component_view.get_selection()
+        sel = selection.get_selected()
+        if not sel:
+            return
+        model, iter = sel
+        name = model.get(iter, 0)[0]
+
+        dialog = gtk.Dialog("My dialog",
+                            self.window,
+                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+
+        hbox = gtk.HBox()
+        
+        label = gtk.Label('Element')
+        hbox.pack_start(label, False, False)
+        element_entry = gtk.Entry()
+        hbox.pack_start(element_entry, False, False)
+
+        label = gtk.Label('Property')
+        hbox.pack_start(label, False, False)
+        property_entry = gtk.Entry()
+        hbox.pack_start(property_entry, False, False)
+        
+        label = gtk.Label('Value')
+        hbox.pack_start(label, False, False)
+        value_entry = gtk.Entry()
+        hbox.pack_start(value_entry, False, False)
+
+        hbox.show_all()
+        
+        RESPONSE_FETCH = 0
+        
+        dialog.vbox.pack_start(hbox)
+        dialog.add_button('Close', gtk.RESPONSE_CLOSE)
+        dialog.add_button('Set', gtk.RESPONSE_APPLY)
+        dialog.add_button('Fetch current', RESPONSE_FETCH)
+
+        def response_cb(dialog, response):
+            if response == gtk.RESPONSE_APPLY:
+                element = element_entry.get_text()
+                property = property_entry.get_text()
+                value = value_entry.get_text()
+
+                print name, element, property, value
+                self.admin.setState(name, element, property, value)
+            elif response == RESPONSE_FETCH:
+                element = element_entry.get_text()
+                property = property_entry.get_text()
+                def after_getState(value):
+                    print 'got value', value
+                    value_entry.set_text(str(value))
+                cb = self.admin.getState(name, element, property)
+                cb.addCallback(after_getState)
+            elif response == gtk.RESPONSE_CLOSE:
+                dialog.destroy()
+                
+        dialog.connect('response', response_cb)
+        dialog.show_all()
+        
     def connected_cb(self, admin):
         self.update(admin.clients)
 

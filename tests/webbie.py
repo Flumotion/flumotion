@@ -88,5 +88,6 @@ class Streamer(resource.Resource):
 #log.startLogging(sys.stderr)
 
 s = Streamer(sys.argv[1], sys.argv[2])
+print 'Listening on 8080'
 reactor.listenTCP(8080, server.Site(resource=s))
 reactor.run()

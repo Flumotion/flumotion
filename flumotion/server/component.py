@@ -166,9 +166,7 @@ class BaseComponent(pb.Referenceable):
         
         # Setup all sources
         for source_name, source_host, source_port in sources:
-            self.msg('Going to connect to %s (%s:%d)' % (source_name,
-                                                         source_host,
-                                                         source_port))
+            self.msg('Going to connect to %s (%s:%d)' % (source_name, source_host, source_port))
             source = self.pipeline.get_by_name(source_name)
             assert source, 'No source element named %s in pipeline' % source_name
             assert isinstance(source, gst.Element)
@@ -184,7 +182,7 @@ class BaseComponent(pb.Referenceable):
 
         if self.pipeline.get_state() != gst.STATE_NULL:
             self.msg('Pipeline was in state %s, changing to NULL' %
-                    gst.element_state_get_name(self.pipeline.get_state()))
+                     gst.element_state_get_name(self.pipeline.get_state()))
             self.pipeline.set_state(gst.STATE_NULL)
                 
         # Disconnect signals
@@ -199,11 +197,14 @@ class BaseComponent(pb.Referenceable):
             return
         
         self.setup_pipeline()
-        
+
+        element_names = [element.get_name() for element in self.pipeline.get_list()]
+
         return {'ip' : self.getIP(),
                 'pid' :  os.getpid(), 
                 'sources' : self.getSources(),
-                'feeds' : self.getFeeds() }
+                'feeds' : self.getFeeds(),
+                'elements': element_names }
     
     def remote_get_free_ports(self, feeds):
         retval = []
@@ -231,6 +232,36 @@ class BaseComponent(pb.Referenceable):
     def remote_pause(self):
         self.pipeline_pause()
 
+    def remote_get_element_property(self, element_name, property):
+        element = self.pipeline.get_by_name(element_name)
+        self.msg('getting property %s on element %s' % (property, element_name))
+        return element.get_property(property)
+
+    def remote_set_element_property(self, element_name, property, value):
+        element = self.pipeline.get_by_name(element_name)
+
+        for pspec in gobject.list_properties(element):
+            if pspec.name == property:
+                break
+
+        if pspec.value_type in (gobject.TYPE_INT, gobject.TYPE_UINT, gobject.TYPE_INT,
+                                gobject.TYPE_INT64, gobject.TYPE_UINT64):
+            value = int(value)
+        elif pspec.value_type == gobject.TYPE_BOOLEAN:
+            if value == 'False':
+                value = False
+            elif value == 'True':
+                value = True
+            else:
+                value = bool(value)
+        elif pspec.value_type in (gobject.TYPE_DOUBLE, gobject.TYPE_FLOAT):
+            value = float(value)
+        else:
+            self.warn('Unknown property type: %s' % pspec.value_type)
+
+        self.msg('setting property %s on element %s to %s' % (property, element_name, value))
+        element.set_property(property, value)
+        
 class ParseLaunchComponent(BaseComponent):
     def __init__(self, name, sources, feeds, pipeline_string=''):
         self.pipeline_string = pipeline_string

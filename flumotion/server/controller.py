@@ -168,6 +168,20 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         if self.controller.hasComponent(name):
             self.controller.removeComponent(self)
 
+
+    def setState(self, element, property, value):
+        if not element in self.options.elements:
+            raise TypeError, 'not such an element: %s' % element
+        
+        # XXX: Check property name
+        # XXX: Check propery value
+        return self.callRemote('set_element_property', element, property, value)
+        
+    def getState(self, element, property):
+        # XXX: Check element name
+        # XXX: Check property name
+        return self.callRemote('get_element_property', element, property)
+        
     def perspective_stateChanged(self, feed, state):
         #self.msg('stateChanged :%s %s' % (feed,
         #                                  gst.element_state_get_name(state)))
