@@ -18,27 +18,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-import socket
-import sys
-    
-import pygtk
-pygtk.require('2.0')
-
-import gobject
 import gst
 
-if __name__ == '__main__':
-    import gstreactor
-    gstreactor.install()
-
-from twisted.application import service, internet
-from twisted.cred import portal, checkers, credentials
-from twisted.internet import reactor, error
-from twisted.manhole import telnet
+from twisted.cred import portal
+from twisted.internet import reactor
 from twisted.spread import pb
 
 from flumotion.server import admin
-from flumotion.twisted import errors, pbutil, shell
+from flumotion.twisted import errors, pbutil
 from flumotion.utils import gstutils, log
 
 class Dispatcher:
@@ -48,11 +35,8 @@ class Dispatcher:
         self.admin = admin
         
     def requestAvatar(self, avatarID, mind, *interfaces):
+        p = None
         if avatarID == 'admin':
-            if not self.admin:
-                # XXX: Write something useful in the log
-                return
-            
             p = self.admin.getPerspective()
         else:
             component_type, avatarID = avatarID.split('_', 1)
@@ -180,10 +164,13 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         # XXX: Check element name
         # XXX: Check property name
         return self.callRemote('get_element_property', element, property)
+
+    def perspective_log(self, *msg):
+        self.msg(*msg)
         
     def perspective_stateChanged(self, feed, state):
-        #self.msg('stateChanged :%s %s' % (feed,
-        #                                  gst.element_state_get_name(state)))
+        self.msg('stateChanged :%s %s' % (feed,
+                                          gst.element_state_get_name(state)))
         
         self.state = state
         if self.state == gst.STATE_PLAYING:
@@ -563,23 +550,3 @@ class ControllerServerFactory(pb.PBServerFactory):
     
     def __repr__(self):
         return '<ControllerServerFactory>'
-
-if __name__ == '__main__':
-    controller = ControllerServerFactory()
-
-    ts = telnet.ShellFactory()
-    ts.namespace.update(controller.controller.__dict__)
-    ts.namespace['dispatcher'] = controller.dispatcher
-    ts.namespace['portal'] = controller.portal
-
-    ts.protocol = twistedutils.Shell
-    try:
-        reactor.listenTCP(8890, controller)
-        reactor.listenTCP(4040, ts)
-    except error.CannotListenError, e:
-        print 'ERROR:', e
-        raise SystemExit
-
-    
-    reactor.run(False)
-

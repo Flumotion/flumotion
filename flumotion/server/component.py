@@ -57,7 +57,12 @@ class BaseComponent(pb.Referenceable):
         self.factory = ClientFactory(self)
         self.factory.login(self.username)
 
-    msg = lambda s, *a: log.msg(s.getName(), *a)
+    def msg(self, *args):
+        category = self.getName()
+        log.msg(category, *args)
+        if self.hasPerspective():
+            self.callRemote('log', *args)
+        
     warn = lambda s, *a: log.warn(s.getName(), *a)
 
     def cb_gotPerspective(self, perspective):
@@ -271,13 +276,13 @@ class ParseLaunchComponent(BaseComponent):
     def __init__(self, name, sources, feeds, pipeline_string=''):
         self.pipeline_string = pipeline_string
         BaseComponent.__init__(self, name, sources, feeds)
-        
+
     def setup_pipeline(self):
         pipeline = self.parse_pipeline(self.pipeline_string)
         try:
             self.pipeline = gst.parse_launch(pipeline)
         except gobject.GError, e:
-            raise errors.PipelineParseError('foo') #str(e))
+            raise errors.PipelineParseError('foo')
 
         BaseComponent.setup_pipeline(self)
 

@@ -30,11 +30,11 @@ from twisted.internet import gtk2reactor
 gtk2reactor.install()
 
 from twisted.internet import reactor
-from twisted.python import log
 from twisted.spread import pb
 
 from flumotion.twisted import pbutil
 from flumotion.server import admin   # Register types
+from flumotion.utils import log
 
 class AdminInterface(pb.Referenceable, gobject.GObject):
     __gsignals__ = {
@@ -51,13 +51,20 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
     def gotPerspective(self, perspective):
         self.remote = perspective
 
+    def msg(self, *args):
+        print args
+        #log.msg('adminclient', *args)
+        
+    def remote_log(self, category, type, message):
+        print category, type, message
+        
     def remote_componentAdded(self, component):
-        print 'componentAdded', component
+        self.msg( 'componentAdded %s' % component.getName())
         self.clients.append(component)
         self.emit('update', self.clients)
         
     def remote_componentRemoved(self, component):
-        print 'componentRemoved', component
+        self.msg( 'componentRemoved %s' % component.getName())
         self.clients.remove(component)
         self.emit('update', self.clients)
         
@@ -205,8 +212,7 @@ class Window:
         reactor.stop()
 
 def main(args, gladedir='../../data/ui'):
-    log.startLogging(sys.stdout)
-    
+    log.enableLogging()
     host = args[1]
     port = int(args[2])
     win = Window(gladedir, host, port)

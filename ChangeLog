@@ -1,7 +1,12 @@
+2004-07-23  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/controller.py (Dispatcher.requestAvatar): Clean
+	up, clean up imports as well
+	* flumotion/server/*: Futher logging cleanups
+
 2004-07-22  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/component.py (ParseLaunchComponent): Refactor stuff
-	
 
 	* tests/test_component_parse.py: Tests for pipeline parsing
 

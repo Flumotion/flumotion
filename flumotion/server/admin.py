@@ -18,6 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+from twisted.internet import reactor
 from twisted.spread import pb
 
 from flumotion.twisted import pbutil
@@ -44,34 +45,50 @@ pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
 class AdminPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller):
         self.controller = controller
-
+        self.mind = None
+        
     msg = lambda s, *a: log.msg('admin', *a)
+    warn = lambda s, *a: log.warn('admin', *a)
+
+    def hasPerspective(self):
+        return self.mind != None
+    
+    def callRemote(self, name, *args, **kwargs):
+        if not self.hasPerspective():
+            #self.warn("Can't call remote method %s, no perspective" % name)
+            return
+        
+        #self.msg('Calling remote method %s%r' % (name, args))
+        try:
+            return self.mind.callRemote(name, *args, **kwargs)
+        except pb.DeadReferenceError :
+            self.mind = None
+            return
         
     def getClients(self):
-        return map(ComponentView,
-                   self.controller.components.values())
+        return map(ComponentView, self.controller.components.values())
 
+    def sendLog(self, category, type, message):
+        self.callRemote('log', category, type, message)
+        
     def componentAdded(self, component):
-        self.mind.callRemote('componentAdded', ComponentView(component))
+        self.callRemote('componentAdded', ComponentView(component))
         
     def componentRemoved(self, component):
-        self.mind.callRemote('componentRemoved', ComponentView(component))
+        self.callRemote('componentRemoved', ComponentView(component))
 
     def attached(self, mind):
         self.mind = mind
         ip = self.mind.broker.transport.getPeer()[1]
         self.msg('Client from %s attached' % ip)
 
-        self.mind.callRemote('initial', self.getClients())
+        self.callRemote('initial', self.getClients())
 
     def detached(self, mind):
         ip = self.mind.broker.transport.getPeer()[1]
         self.msg('Client from %s detached' % ip)
         
-        try:
-            self.mind.callRemote('shutdown')
-        except pb.DeadReferenceError:
-            pass
+        self.callRemote('shutdown')
 
     def perspective_setState(self, component_name, element, property, value):
         component = self.controller.getComponent(component_name)
@@ -79,7 +96,6 @@ class AdminPerspective(pbutil.NewCredPerspective):
             component.setState(element, property, value)
         except TypeError, e:
             print 'ERROR: %s' % str(e)
-        
 
     def perspective_getState(self, component_name, element, property):
         component = self.controller.getComponent(component_name)
@@ -89,9 +105,31 @@ class Admin(pb.Root):
     def __init__(self, controller):
         self.controller = controller
         self.clients = []
+        log.addLogHandler(self.logHandler)
+        self.logcache = []
+
+    def msg(self, *args):
+        log.msg('admin', *args)
+        
+    def logHandler(self, category, type, message):
+        self.logcache.append((category, type, message))
+        for client in self.clients:
+            client.sendLog(category, type, message)
+
+    def sendCache(self, client):
+        if not client.hasPerspective():
+            reactor.callLater(0.25, self.sendCache, client)
+            return
+        
+        self.msg('sending logcache to client (%d messages)' % len(self.logcache))
+        for category, type, message in self.logcache:
+            client.sendLog(category, type, message)
         
     def getPerspective(self):
+        self.msg('creating new perspective')
         admin = AdminPerspective(self.controller)
+        reactor.callLater(0.25, self.sendCache, admin)
+        
         self.clients.append(admin)
         return admin
     

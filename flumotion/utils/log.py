@@ -20,7 +20,6 @@
 
 import sys
 
-_do_logging = False
 _log_handlers = []
 
 def stderrHandler(category, type, message):
@@ -28,12 +27,10 @@ def stderrHandler(category, type, message):
     sys.stderr.flush()
 
 def log(category, type, message):
-    global _do_logging, _log_handlers
-    if not _do_logging and type != 'ERROR':
-        return
+    global _log_handlers
 
-    for handler, args in _log_handlers:
-        handler(category, type, message, *args)
+    for handler in _log_handlers:
+        handler(category, type, message)
     
 def msg(cat, *args):
     log(cat, 'INFO', ' '.join(args))
@@ -46,14 +43,16 @@ def error(cat, *args):
     raise SystemExit
 
 def enableLogging():
-    global _do_logging
-    _do_logging = True
-
+    global _log_handlers
+    if not stderrHandler in _log_handlers:
+        _log_handlers.append(stderrHandler)
+    
 def disableLogging():
-    global _do_logging
+    if stderrHandler in _log_handlers:
+        _log_handlers.remove(stderrHandler)
+    
     _do_logging = False
     
-def addLogHandler(func, *args):
-    _log_handlers.append((func, args))
+def addLogHandler(func):
+    _log_handlers.append(func)
 
-_log_handlers.append((stderrHandler, ()))
