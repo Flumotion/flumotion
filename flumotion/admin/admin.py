@@ -224,7 +224,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         Check if the UI is current enough, and if not, update it.
 
         @rtype: deferred
-        @rparam: deferred returning the directory where the files are.
+        @return: deferred returning the directory where the files are.
         """
 
         # callback functions
