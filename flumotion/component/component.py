@@ -91,7 +91,12 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def getIP(self):
         assert self.remote
         peer = self.remote.broker.transport.getPeer()
-        return socket.gethostbyname(peer.host)
+        try:
+            host = peer.host
+        except AttributeError:
+            host = peer[1]
+
+        return socket.gethostbyname(host)
 
     def component_log_cb(self, component, args):
         self.callRemote('log', *args)

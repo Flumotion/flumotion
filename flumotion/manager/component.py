@@ -440,6 +440,10 @@ class ComponentHeaven(pb.Root, log.Loggable):
     logCategory = 'comp-heaven'
     
     def __init__(self, vishnu):
+        """
+        @type vishnu: L{flumotion.manager.manager.Vishnu}
+        @param vishnu: the Vishnu object
+        """
         self.components = {} # dict of component avatars
         self.feeder_set = FeederSet()
         self.vishnu = vishnu
@@ -468,8 +472,12 @@ class ComponentHeaven(pb.Root, log.Loggable):
         self.removeComponentByName(avatarID)
     
     def isLocalComponent(self, component):
-        # TODO: This could be a lot smarter
-        host = component.getTransportPeer().host
+        peer = component.getTransportPeer()
+        try:
+            host = peer.host
+        except AttributeError:
+            host = peer[1]
+
         if host == '127.0.0.1':
             return True
         else:

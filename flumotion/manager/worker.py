@@ -35,7 +35,7 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         self.avatarID = avatarID
 
     def attached(self, mind):
-        self.info('attached: %r' % mind)
+        self.info('attached %r' % mind)
         self.mind = mind
 
         name = 'testing'
@@ -46,13 +46,17 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         self.mind.callRemote('start', name, type, config)
                              
     def detached(self, mind):
-        pass
+        self.info('detached %r' % mind)
     
 class WorkerHeaven(pb.Root):
     
     __implements__ = interfaces.IHeaven
     
     def __init__(self, vishnu):
+        """
+        @type vishnu: L{flumotion.manager.manager.Vishnu}
+        @param vishnu: the Vishnu object
+        """
         self.avatars = {}
         
     def getAvatar(self, avatarID):

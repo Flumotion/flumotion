@@ -128,5 +128,3 @@ class Vishnu:
     
     def getFactory(self):
         return self.factory
-
-

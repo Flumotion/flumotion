@@ -47,7 +47,15 @@ class BaseUI:
         
     def setUIState(self, state):
         raise NotImplementedError
-    
+
+    def loadGladeFile(self, glade_file):
+        # ask the manager to get the bundle for component name
+        zipfile = self.getZipfile(self.name)
+
+        data = zipfile.readFile(glade_file)
+
+        wtree = gtk.glade.xml_ew_from_buffer(data)
+        
 class HTTPStreamerUI(BaseUI):
     def error_dialog(self, message):
         print 'ERROR:', message

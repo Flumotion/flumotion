@@ -29,6 +29,25 @@ import os
 import zipfile
 import StringIO
 
+__all__ = ['Bundle']
+
+# calculate the md5sum of the given file
+# returns a 32 character string of hex characters
+def _gen_md5sum(file):
+    data = open(file.filename, "r").read()
+    return md5.new(data).hexdigest()
+    
+# get the last changed timestamp of the given file
+def _fetch_timestamp(file):
+    return os.path.getmtime(file.filename)
+
+class BundledFile:
+    def __init__(self, filename, md5sum=None, timestamp=None):
+        self.filename = filename
+        self.md5sum = md5sum
+        self.timestamp = timestamp
+        self.zipped = False
+        
 class Bundle:
     """
     A bundle of files useful to handle network caching of a set of files.
@@ -49,8 +68,8 @@ class Bundle:
         """
         Add files to the bundle.  The path will be stripped.
         """
-        for file in files:
-            self._addone(file)
+        for filename in files:
+            self._files[filename] = BundledFile(filename)
                 
     def zip(self):
         """
@@ -76,18 +95,23 @@ class Bundle:
             return True
 
         update = False
-        for file in self._files.keys():
-            if not self._files[file]['zipped']:
+        for file in self._files.values():
+            if not file.zipped:
                 update = True
-            timestamp = self._get_timestamp(file)
-            if timestamp > self._files[file]['timestamp']:
-                self._files[file]['timestamp'] = self._get_timestamp(file)
-                if self._get_md5sum(file) != self._files[file]['md5sum']:
-                    update = True
-                    self._files[file]['md5sum'] = self._get_md5sum(file)
-
+            
+            timestamp = _fetch_timestamp(file)
+            if timestamp <= file.timestamp:
+                continue
+            file.timestamp = timestamp
+                
+            md5sum = _gen_md5sum(file)
+            if file.md5sum != md5sum:
+                file.md5sum = md5sum
+                update = True
+            
         if update:
             self._buildzip()
+            
         return update
             
     # build the zip file containing the files registered in the bundle
@@ -95,29 +119,10 @@ class Bundle:
         filelike = StringIO.StringIO()
         zip = zipfile.ZipFile(filelike, "w")
         for file in self._files.keys():
-            self._files[file]['zipped'] = True
+            self._files[file].zipped = True
             name = os.path.split(file)[1]
             zip.write(file, name)
         zip.close()    
         self._zip = filelike.getvalue()
         filelike.close()
     
-    # calculate the md5sum of the given file
-    # returns a 32 character string of hex characters
-    def _get_md5sum(self, file):
-        data = open(file, "r").read()
-        return md5.new(data).hexdigest()
-    
-    # get the last changed timestamp of the given file
-    def _get_timestamp(self, file):
-        return os.path.getmtime(file)
-    
-    # adds one file to the bundle
-    def _addone(self, file):
-        md5sum = self._get_md5sum(file)
-        timestamp = self._get_timestamp(file)
-        self._files[file] = {
-            "md5sum": md5sum, 
-            "timestamp": timestamp,
-            "zipped": False
-        }
