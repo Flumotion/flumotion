@@ -1,0 +1,17 @@
+<planet>
+
+  <manager>
+    <component name="manager-bouncer" type="htpasswd">
+      <data><![CDATA[
+test:PSfNpHTkpTx1M
+]]></data>
+    </component>
+  </manager>
+
+  <atmosphere>
+   <component name="http-bouncer" type="htpasswd">
+     <filename>/tmp/htpasswd</filename>
+   </component>
+  </atmosphere>
+
+</planet>
