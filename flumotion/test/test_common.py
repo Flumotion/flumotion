@@ -302,5 +302,109 @@ class TestPathToModule(unittest.TestCase):
         
         for (path, module) in tests.items():
             self.assertEquals(common.pathToModuleName(path), module)
-if __name__ == '__main__':
-    unittest.main()
+
+class TestRecursively(unittest.TestCase):
+    def testListDir(self):
+        self.tempdir = tempfile.mkdtemp()
+
+        # empty tree
+        a = os.path.join(self.tempdir, 'A')
+        common.ensureDir(a, "a description")
+        dirs = common._listDirRecursively(self.tempdir)
+        self.assertEquals(dirs, [])
+
+        # add a non-python file
+        os.system("touch %s" % os.path.join(a, 'test'))
+        dirs = common._listDirRecursively(self.tempdir)
+        self.assertEquals(dirs, [])
+
+        # add a python file; should now get returned
+        os.system("touch %s" % os.path.join(a, 'test.py'))
+        dirs = common._listDirRecursively(self.tempdir)
+        self.assertEquals(dirs, [a])
+
+        # add another level
+        b = os.path.join(self.tempdir, 'B')
+        b = os.path.join(self.tempdir, 'B')
+        common.ensureDir(b, "a description")
+        c = os.path.join(b, 'C')
+        common.ensureDir(c, "a description")
+        dirs = common._listDirRecursively(self.tempdir)
+        self.assertEquals(dirs, [a])
+
+        # add a non-python file
+        os.system("touch %s" % os.path.join(c, 'test'))
+        dirs = common._listDirRecursively(self.tempdir)
+        self.assertEquals(dirs, [a])
+
+        # add a python file; should now get returned
+        os.system("touch %s" % os.path.join(c, 'test.py'))
+        dirs = common._listDirRecursively(self.tempdir)
+        self.assertEquals(dirs, [a, c])
+
+        # cleanup
+        os.system("rm -r %s" % self.tempdir)
+
+    def testListPyfile(self):
+        self.tempdir = tempfile.mkdtemp()
+
+        # empty tree
+        a = os.path.join(self.tempdir, 'A')
+        common.ensureDir(a, "a description")
+        dirs = common._listPyFileRecursively(self.tempdir)
+        self.assertEquals(dirs, [])
+
+        # add a non-python file
+        os.system("touch %s" % os.path.join(a, 'test'))
+        dirs = common._listPyFileRecursively(self.tempdir)
+        self.assertEquals(dirs, [])
+
+        # add a __init__ file
+        os.system("touch %s" % os.path.join(a, '__init__.py'))
+        dirs = common._listPyFileRecursively(self.tempdir)
+        self.assertEquals(dirs, [])
+        os.system("touch %s" % os.path.join(a, '__init__.pyc'))
+        dirs = common._listPyFileRecursively(self.tempdir)
+        self.assertEquals(dirs, [])
+
+        # add a python file; should now get returned
+        test1 = os.path.join(a, 'test.py')
+        os.system("touch %s" % test1)
+        dirs = common._listPyFileRecursively(self.tempdir)
+        self.assertEquals(dirs, [test1])
+
+        # add another level
+        b = os.path.join(self.tempdir, 'B')
+        common.ensureDir(b, "a description")
+        c = os.path.join(b, 'C')
+        common.ensureDir(c, "a description")
+        dirs = common._listPyFileRecursively(self.tempdir)
+        self.assertEquals(dirs, [test1])
+
+        # add a non-python file
+        os.system("touch %s" % os.path.join(c, 'test'))
+        dirs = common._listPyFileRecursively(self.tempdir)
+        self.assertEquals(dirs, [test1])
+
+        # add a python file; should now get returned
+        test2 = os.path.join(c, 'test.py')
+        os.system("touch %s" % test2)
+        dirs = common._listPyFileRecursively(self.tempdir)
+        self.assertEquals(dirs, [test1, test2])
+        mods = common._findEndModuleCandidates(self.tempdir,
+            prefix='')
+        self.assertEquals(mods, ['B.C.test', 'A.test'])
+
+        # add a python file but with .c; should now get returned, but
+        # no new module candidate
+        test3 = os.path.join(c, 'test.pyc')
+        os.system("touch %s" % test3)
+        dirs = common._listPyFileRecursively(self.tempdir)
+        self.assertEquals(dirs, [test1, test2, test3])
+
+        mods = common._findEndModuleCandidates(self.tempdir,
+            prefix='')
+        self.assertEquals(mods, ['B.C.test', 'A.test'])
+
+        # cleanup
+        os.system("rm -r %s" % self.tempdir)

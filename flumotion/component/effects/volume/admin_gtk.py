@@ -50,7 +50,6 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         self.hscale = self.wtree.get_widget('volume-set-hscale')
         self.setvolume_signalid = self.hscale.connect('value_changed',
                 self.cb_volume_set)
-#        self.hscale.set_value(50)
 
         return self.volume
         

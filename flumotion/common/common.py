@@ -23,6 +23,7 @@ small common functions used by all processes
 """
 
 import errno
+import glob
 import os 
 import socket
 import sys
@@ -214,7 +215,7 @@ def argRepr(args=(), kwargs={}, max=-1):
             
     return s
 
-def _listRecursively(path):
+def _listDirRecursively(path):
     """
     I'm similar to os.listdir, but I work recursively and only return
     directories containing python code.
@@ -234,24 +235,52 @@ def _listRecursively(path):
     else:
         for f in files:
             # this only adds directories since files are not returned
-            retval += _listRecursively(os.path.join(path, f))
+            retval += _listDirRecursively(os.path.join(path, f))
 
-    import glob
     if glob.glob(os.path.join(path, '*.py*')):
         retval.append(path)
             
     return retval
 
+def _listPyFileRecursively(path):
+    """
+    I'm similar to os.listdir, but I work recursively and only return
+    files representing python non-package modules.
+    
+    @param path: the path
+    @type  path: string
+
+    @rtype:      list
+    @returns:    list of files underneath the given path containing python code
+    """
+    retval = []
+
+    # get all the dirs containing python code
+    dirs = _listDirRecursively(path)
+
+    for dir in dirs:
+        pyfiles = glob.glob(os.path.join(dir, '*.py*'))
+        dontkeep = glob.glob(os.path.join(dir, '*__init__.py*'))
+        for f in dontkeep:
+            if f in pyfiles:
+                pyfiles.remove(f)
+
+        retval.extend(pyfiles)
+
+    return retval
+
 def _findPackageCandidates(path, prefix='flumotion.'):
     """
     I take a directory and return a list of candidate python packages.
+    A package is a module containing modules; typically the directory
+    with the same name as the package contains __init__.py
 
     @param path: the path
     @type  path: string
     """
     # this function also "guesses" candidate packages when __init__ is missing
     # so a bundle with only a subpackage is also detected
-    dirs = _listRecursively(path)
+    dirs = _listDirRecursively(path)
     if path in dirs:
         dirs.remove(path)
 
@@ -275,6 +304,42 @@ def _findPackageCandidates(path, prefix='flumotion.'):
     bundlePackages.sort()
         
     return bundlePackages
+
+def _findEndModuleCandidates(path, prefix='flumotion.'):
+    """
+    I take a directory and return a list of candidate end python modules.
+    These are non-package modules.
+
+    @param path: the path
+    @type  path: string
+    """
+    files = _listPyFileRecursively(path)
+    #print "THOMAS: pyfiles in path %s: %r" % (path, files)
+
+    # chop off the base path to get a list of "relative" bundlespace paths
+    bundlePaths = [x[len(path) + 1:] for x in files]
+
+    # remove some common candidates, like .svn subdirs, or containing -
+    isNotSvn = lambda x: x.find('.svn') == -1
+    bundlePaths = filter(isNotSvn, bundlePaths)
+    isNotDashed = lambda x: x.find('-') == -1
+    bundlePaths = filter(isNotDashed, bundlePaths)
+
+    # convert paths to module namespace
+    bundleModules = [pathToModuleName(x) for x in bundlePaths]
+
+    # remove all not starting with prefix
+    isInPrefix = lambda x: x.startswith(prefix)
+    bundleModules = filter(isInPrefix, bundleModules)
+
+    # sort them so that depending packages are after higher-up packages
+    bundleModules.sort()
+
+    # make unique
+    res = {}
+    for b in bundleModules: res[b] = 1
+
+    return res.keys()
 
 # FIXME: an extra key argument (used for bundle) might help in keeping
 # track of old paths
@@ -330,7 +395,9 @@ def registerPackagePath(packagePath, prefix='flumotion'):
     # the following algorithm only works if they're sorted.
     # By sorting the list we can ensure that a parent package
     # is always processed before one of its children
+    print "THOMAS: packagePath: %s" % packagePath
     packageNames = _findPackageCandidates(packagePath, prefix)
+    print "THOMAS: modules: %r" % packageNames
     packageNames.sort()
 
     if not packageNames:
@@ -397,6 +464,16 @@ def registerPackagePath(packagePath, prefix='flumotion'):
             log.log('bundle', 'inserting subPath %s for package %r' % (
                 subPath, package))
             package.__path__.insert(0, subPath)
+
+    # now rebuild all non-package modules in this packagePath
+    print "THOMAS: packagePath: %s" % packagePath
+    moduleNames = _findEndModuleCandidates(packagePath)
+    print "THOMAS: modules: %r" % moduleNames
+    for name in moduleNames:
+        if name in sys.modules:
+            print "THOMAS: rebuilding %s" % name
+            module = reflect.namedAny(name)
+            rebuild.rebuild(module)
 
 def ensureDir(dir, description):
     """

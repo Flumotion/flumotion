@@ -18,28 +18,8 @@
 
 # Headers in this file shall remain intact.
 
-#import sys
-#print "THOMAS: sys.path: %r" % sys.path
-
 from flumotion.component.base import admin_gtk
 from flumotion.component.effects.volume import admin_gtk as vadmin_gtk
-
-# this reload makes stuff work; we should find out how to make
-# registerPackagePath do this properly
-reload(vadmin_gtk)
-
-#import flumotion.component
-#print "THOMAS: flumotion.component.__path__: %r" % flumotion.component.__path__
-
-#import flumotion.component.effects.volume
-
-#print "THOMAS: volume.admin_gtk: %r" % vadmin_gtk
-#if hasattr(vadmin_gtk, '__path__'):
-#	print "THOMAS: .... paths: %r" % vadmin_gtk.__path__
-#if hasattr(vadmin_gtk, '__file__'):
-#	print "THOMAS: .... __file__: %r" % vadmin_gtk.__file__
-
-#print "THOMAS: package's __path__: %r" % flumotion.component.effects.volume.__path__
 
 class SoundcardAdminGtk(admin_gtk.BaseAdminGtk):
     def setup(self):

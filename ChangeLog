@@ -1,5 +1,18 @@
 2005-04-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	  add _listPyFileRecursively
+	  add _findEndModuleCandidates
+	  use it in registerPackagePath to also rebuild all non-package
+	  modules under the packagePath.  This solves #192
+	* flumotion/test/test_common.py:
+	  add test for new functions
+	* flumotion/component/effects/volume/admin_gtk.py:
+	* flumotion/component/producers/soundcard/admin_gtk.py:
+	  clean up now that it works
+
+2005-04-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_common.py:
 	* flumotion/common/common.py:
 	  add pathToModuleName + test
