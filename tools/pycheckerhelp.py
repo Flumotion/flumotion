@@ -11,7 +11,7 @@ import gtk.gdk
 import gtk.glade
 
 #import gst
-import gst.interfaces
+#import gst.interfaces
 
 import pyexpat
 

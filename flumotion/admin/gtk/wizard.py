@@ -28,15 +28,15 @@ import gtk
 import gtk.glade
 
 from flumotion.configure import configure
-#from flumotion.common import log
 
 from flumotion.common.pygobject import gsignal
-from flumotion.ui.glade import GladeWidget
+from flumotion.ui.glade import GladeWidget, GladeWindow
 
 
-# FIXME FIXME: these docs are wrong.
-
-# This file implements a generic wizard framework.
+# This file implements a generic wizard framework suitable for processes with
+# few steps. Processes with 5 or more steps should use something more like the
+# wizard in flumotion.wizard, because it has a history-sensitive navigation bar
+# as well. For simple processes, this wizard is sufficient.
 #
 # To conjure up a new wizard, call Wizard(NAME, FIRST_PAGE). NAME is the name of
 # the wizard, for instance 'greeter'. FIRST_PAGE is the name of the first page
