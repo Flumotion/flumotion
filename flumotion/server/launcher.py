@@ -26,7 +26,10 @@ import sys
 import warnings
 import string
 
-warnings.filterwarnings('ignore', category=FutureWarning)
+try:
+    warnings.filterwarnings('ignore', category=FutureWarning)
+except:
+    pass
 
 sys_argv = sys.argv
 sys.argv = sys_argv[:1]
