@@ -527,7 +527,7 @@ class TestAudioSource(wizard.WizardStep):
     step_name = 'Test Audio Source'
     glade_file = 'wizard_audiotest.glade'
     section = 'Production'
-    icon = 'audiosrc.png'
+    icon = 'soundcard.png'
     
     def before_show(self):
         self.wizard.check_elements(self.worker, 'sinesrc')
