@@ -38,9 +38,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc ChangeLog COPYING README AUTHORS
 %doc docs/html
+%doc conf
 %{_bindir}/flumotion
 %dir %{_libdir}/flumotion
-%{_libdir}/flumotion
+%{_libdir}/flumotion/*
 
 %changelog
 * Mon Jun 07 2004 Thomas Vander Stichele <thomas at apestaart dot org>

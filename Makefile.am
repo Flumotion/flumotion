@@ -4,4 +4,4 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = bin flumotion docs m4
 
-EXTRA_DIST = flumotion.spec
+EXTRA_DIST = flumotion.spec conf/*.conf
