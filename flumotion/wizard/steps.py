@@ -322,8 +322,9 @@ class FireWire(VideoSource):
         return options
 
     def before_show(self):
+        self.textview_status.realize()
         normal_bg = self.textview_status.get_style().bg[gtk.STATE_NORMAL]
-        self.textview_status.modify_base(gtk.STATE_NORMAL, normal_bg)
+        self.textview_status.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
         buf = self.textview_status.get_buffer()
         buf.set_text('Detecting Firewire device...')
         self.set_sensitive(False)
@@ -1112,6 +1113,10 @@ class Summary(wizard.WizardStep):
     icon = 'summary.png'
     has_worker = False
     last_step = True
+    def before_show(self):
+        self.textview_message.realize()
+        normal_bg = self.textview_message.get_style().bg[gtk.STATE_NORMAL]
+        self.textview_message.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
     def get_next(self):
         return
     

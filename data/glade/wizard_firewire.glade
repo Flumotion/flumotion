@@ -530,6 +530,7 @@
       <child>
 	<widget class="GtkTextView" id="textview_status">
 	  <property name="visible">True</property>
+	  <property name="sensitive">False</property>
 	  <property name="can_focus">True</property>
 	  <property name="editable">False</property>
 	  <property name="overwrite">False</property>

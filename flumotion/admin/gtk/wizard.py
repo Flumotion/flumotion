@@ -138,8 +138,8 @@ class Wizard(gobject.GObject):
         title_fg = style.fg[gtk.STATE_SELECTED]
         self.eventbox_top.modify_bg(gtk.STATE_NORMAL, title_bg)
         self.label_title.modify_fg(gtk.STATE_NORMAL, title_fg)
-        normal_bg = self.textview_text.get_style().bg[gtk.STATE_NORMAL]
-        self.textview_text.modify_base(gtk.STATE_NORMAL, normal_bg)
+        normal_bg = style.bg[gtk.STATE_NORMAL]
+        self.textview_text.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
 
         wtree.signal_autoconnect(self)
 

@@ -219,7 +219,7 @@ class Wizard(gobject.GObject, log.Loggable):
 
         self.sidebar_bg = style.bg[gtk.STATE_SELECTED]
         self.sidebar_fg = style.fg[gtk.STATE_SELECTED]
-        self.sidebar_fgi = style.mid[gtk.STATE_SELECTED]
+        self.sidebar_fgi = style.light[gtk.STATE_SELECTED]
         self.sidebar_pre_bg = style.bg[gtk.STATE_ACTIVE]
         self.eventbox_top.modify_bg(gtk.STATE_NORMAL, self.sidebar_bg)
         self.label_title.modify_fg(gtk.STATE_NORMAL, self.sidebar_fg)
@@ -506,9 +506,14 @@ class Wizard(gobject.GObject, log.Loggable):
         button.modify_bg(gtk.STATE_PRELIGHT, self.sidebar_pre_bg)
         button.modify_bg(gtk.STATE_ACTIVE, self.sidebar_pre_bg)
 
+        # CZECH THIS SHIT. You *can* set the fg/text on a label, but it
+        # will still emboss the color in the INSENSITIVE state. The way
+        # to avoid embossing is to use pango attributes (e.g. via
+        # <span>), but then in INSENSITIVE you get stipple. Where is
+        # this documented? Grumble.
         label = button.get_children()[0]
         label.modify_fg(gtk.STATE_NORMAL, self.sidebar_fg)
-        label.modify_fg(gtk.STATE_INSENSITIVE, self.sidebar_fgi)
+        # label.modify_fg(gtk.STATE_INSENSITIVE, gtk.gdk.color_parse('red'))
         button.modify_bg(gtk.STATE_NORMAL, self.sidebar_bg)
         button.modify_bg(gtk.STATE_INSENSITIVE, self.sidebar_bg)
         label.set_padding(padding, 0)
@@ -532,15 +537,25 @@ class Wizard(gobject.GObject, log.Loggable):
             button.connect('clicked', button_clicked_cb, steps[0])
             
         current = self.current_step
-        if current == step:
-            button.set_sensitive(False)
+
+        # We want to mark what the current step is, but I don't think
+        # that using sensitivity is a good idea, because your text will
+        # either be embossed or stippled by pango.
+        #if current == step:
+        #    button.set_sensitive(False)
             
-        if not active and not step.visited:
-            button.set_sensitive(False)
-        else:
+        def pc(c):
+            return '#%02x%02x%02x' % (c.red>>8, c.green>>8, c.blue>>8)
+
+        if active or step.visited:
             button.set_property('can_focus', False)
+            s = name
+        else:
+            button.set_sensitive(False)
+            s = ('<span foreground="%s">%s</span>'
+                 % (pc(self.sidebar_fgi), name))
             
-        label.set_markup(name)
+        label.set_markup(s)
 
         button.show()
         return button

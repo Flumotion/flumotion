@@ -1,3 +1,20 @@
+2005-02-01  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/wizard.py: Fix the ugly colors of the sidebar.
+
+	* flumotion/wizard/steps.py: Set the insensitive base color after
+	realizing for Firewire. Same trick for Summary.
+
+	* flumotion/admin/gtk/wizard.py: Set the insensitive base, not the
+	normal base.
+
+	* data/glade/wizard_summary.py: Use a GtkTextView instead of a
+	label for the summary text -- allows the text to reflow according
+	to the window size.
+
+	* data/glade/wizard_firewire.py: Set to insensitive so as to
+	disallow selection.
+
 2005-02-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/twisted/flavors.py:
