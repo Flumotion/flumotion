@@ -15,7 +15,8 @@ clean-local:
 	@rm -rf _trial_temp
 
 coverage:
-	trial --coverage coverage -R flumotion.test
+	@trial --coverage coverage -R flumotion.test
+	@$(PYTHON) tools/show-coverage.py _trial_temp/coverage/flumotion.*
 
 release: dist
 	make $(PACKAGE)-$(VERSION).tar.bz2.md5

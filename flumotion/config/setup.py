@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
@@ -16,31 +15,27 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+# XXX: move this to flumotion.common.setup
+
+'''
+Exports configure-time variables for installed and uninstalled operation.
+\n
+defines datadir, gladedir
+'''
+
 import os
-import sys
-sys.path.insert(0, '@PYGTK_DIR@')
+import flumotion.config
 
-import pygtk
-pygtk.require('2.0')
+global datadir
 
-from twisted.internet import gtk2reactor
-gtk2reactor.install()
+# where am I on the disk ?
+__thisdir = os.path.dirname(os.path.abspath(__file__))
 
-dir = os.path.dirname(os.path.abspath(__file__))
-if os.path.exists(os.path.join(dir, '.svn')):
-    root = os.path.split(dir)[0]
+if os.path.exists(os.path.join(__thisdir, 'uninstalled.py')):
+    from flumotion.config import uninstalled as config
 else:
-    root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
-sys.path.insert(0, root)
+    from flumotion.config import installed as config
 
-from flumotion.common import errors, setup
-from flumotion.admin.gtk.client import main
-
-if __name__ == '__main__':
-    setup.setup(root)
-    
-    try:
-        sys.exit(main(sys.argv))
-    except errors.SystemError, e:
-        print 'ERROR:', e
-
+config_dict = config.get()
+for key, value in config_dict.items():
+    setattr(flumotion.config, key, value)

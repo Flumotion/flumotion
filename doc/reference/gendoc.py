@@ -1,12 +1,16 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
+
 import pygtk
 pygtk.require('2.0')
 
 # Install reactor, should move somewhere
 from flumotion.twisted import gstreactor
 gstreactor.install()
+
+# Make sure config works
+import flumotion.common.setup
 
 # monkey patching twisted doc errors
 from twisted.spread import pb

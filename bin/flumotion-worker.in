@@ -42,14 +42,11 @@ sys.path.insert(0, root)
 from flumotion.twisted import gstreactor
 gstreactor.install()
 
-from flumotion.common import errors
-from flumotion.utils import log
-from flumotion.common.registry import registry
+from flumotion.common import errors, setup
 from flumotion.worker.main import main
 
 if __name__ == '__main__':
-    log.init()
-    registry.verify(root)
+    setup.setup(root)
 
     try:
         sys.exit(main(sys.argv))

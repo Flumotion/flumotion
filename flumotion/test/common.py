@@ -19,6 +19,8 @@ import os
 import sys
 import unittest
 
+import flumotion.common.setup
+
 sys.path.insert(1, os.path.abspath('..'))
 
 import pygtk
@@ -34,6 +36,5 @@ ltihooks = sys.modules.get('gst.ltihooks')
 if ltihooks:
     ltihooks.uninstall()
 
-# make sure logging works
-from flumotion.utils import log
-log.init()
+# logging
+flumotion.common.setup.setup()
