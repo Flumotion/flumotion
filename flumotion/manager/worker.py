@@ -138,20 +138,16 @@ class WorkerHeaven(pb.Root, log.Loggable):
         self.info('worker %s logged in' % workerAvatar.getName())
         
         # get all components that are supposed to start on this worker
-        entries = self.getEntries(workerAvatar)
         workerName = workerAvatar.getName()
-        for entry in entries:
+        for entry in self.getEntries(workerAvatar):
             componentName = entry.getName()
             self.debug('workerAttached(): starting component: %s on %s' % (
                 componentName, workerName))
-            # FIXME: we need to put default feeds in this dict
-            dict = entry.getConfigDict()
             
-            if dict.has_key('config'):
-                del dict['config'] # HACK
-
-            self.workerStartComponent(workerName, componentName,
-                entry.getType(), dict)
+            self.workerStartComponent(workerName,
+                                      componentName,
+                                      entry.getType(),
+                                      entry.getConfigDict())
             
     def workerStartComponent(self, workerName, componentName, type, config):
         """
@@ -164,9 +160,9 @@ class WorkerHeaven(pb.Root, log.Loggable):
         @param config:        a configuration dictionary
         @type  config:        dict
         """
-        
+
         if not self._avatars:
-            raise AttributeError
+            raise AttributeError()
 
         if workerName:
             avatar = self._avatars[workerName]

@@ -49,24 +49,25 @@ def _wizard_finished_cb(wizard, configuration, window):
     _write_default(configuration)
     window.admin.loadConfiguration(configuration)
     window.show()
-
+    
 def _window_connected_cb(window, options):
-    if not os.path.exists(FIRST_TIME_FILE):
-        workers = window.admin.getWorkers()
-        if not workers:
-            print >> sys.stderr, "ERROR: No workers connected"
-            reactor.stop()
-        wiz = wizard.Wizard()
-        wiz.connect('finished', _wizard_finished_cb, window)
-        wiz.load_steps()
-        wiz.run(not options.debug, workers, main=False)
-    elif not window.admin.getComponents():
-        configuration = _read_default()
-        window.admin.loadConfiguration(configuration)
-        window.show()
-    else:
+    if window.admin.getComponents():
         print 'There are already components connected, not sending configuration'
         window.show()
+    else:
+        if not os.path.exists(FIRST_TIME_FILE):
+            workers = window.admin.getWorkers()
+            if not workers:
+                print >> sys.stderr, "ERROR: No workers connected"
+                reactor.stop()
+            wiz = wizard.Wizard()
+            wiz.connect('finished', _wizard_finished_cb, window)
+            wiz.load_steps()
+            wiz.run(not options.debug, workers, main=False)
+        else:
+            configuration = _read_default()
+            window.admin.loadConfiguration(configuration)
+            window.show()
         
 def _runWizard(debug):
     wiz = wizard.Wizard()

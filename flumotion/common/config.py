@@ -95,9 +95,6 @@ class ConfigEntryComponent(log.Loggable):
         component.setFiles(files)
         return component
 
-    def startFactory(self):
-        return self.config.get('start-factory', True)
-
 class ConfigEntryFlow:
     "I represent a <flow> entry in a planet config file"
     def __init__(self):
@@ -168,7 +165,7 @@ class FlumotionConfigXML(log.Loggable):
         #     <manager>
         #     <atmosphere>
         #     <flow>
-        #     <flow>
+        #     ...
         # </planet>
 
         root = self.doc.documentElement
@@ -192,10 +189,10 @@ class FlumotionConfigXML(log.Loggable):
                 raise ConfigError("unexpected node under 'planet': %s" % node.nodeName)
 
     def parseAtmosphere(self, node):
-        # <component name="..." type="...">
-        # </component>
-        # <component name="..." type="...">
-        # </component>
+        # <atmosphere>
+        #   <component>
+        #   ...
+        # </atmosphere>
 
         atmosphere = ConfigEntryAtmosphere()
         for child in node.childNodes:
@@ -203,16 +200,16 @@ class FlumotionConfigXML(log.Loggable):
                 child.nodeType == Node.COMMENT_NODE):
                 continue
             
-            if child.nodeName != "component":
+            if child.nodeName == "component":
+                component = self.parseComponent(child)
+            else:
                 raise ConfigError("unexpected 'atmosphere' node: %s" % child.nodeName)
-            component = self.parseComponent(child)
+
             atmosphere.components[component.name] = component
         return atmosphere
      
     def parseComponent(self, node):
         # <component name="..." type="..." worker="">
-        #     ...
-        # </component>
         
         if not node.hasAttribute('name'):
             raise ConfigError("<component> must have a name attribute")
@@ -223,7 +220,7 @@ class FlumotionConfigXML(log.Loggable):
         name = str(node.getAttribute('name'))
 
         worker = None
-        if not node.hasAttribute('worker'):
+        if node.hasAttribute('worker'):
             worker = str(node.getAttribute('worker'))
 
         try:
@@ -237,19 +234,16 @@ class FlumotionConfigXML(log.Loggable):
         options = self.parseProperties(node, type, properties)
 
         config = { 'name': name,
-                   'type': type,
-                    ### XXX kill this self when new auth system is there
-                   'config' : self,
-                   'start-factory': defs.isFactory() }
+                   'type': type }
         config.update(options)
 
         return ConfigEntryComponent(name, type, config, defs, worker)
 
     def parseFlow(self, node):
-        # <component name="..." type="...">
-        # </component>
-        # <component name="..." type="...">
-        # </component>
+        # <flow>
+        #   <component>
+        #   ...
+        # </flow>
 
         flow = ConfigEntryFlow()
         for child in node.childNodes:
@@ -257,16 +251,19 @@ class FlumotionConfigXML(log.Loggable):
                 child.nodeType == Node.COMMENT_NODE):
                 continue
             
-            if child.nodeName != "component":
+            if child.nodeName == "component":
+                component = self.parseComponent(child)
+            else:
                 raise ConfigError("unexpected 'flow' node: %s" % child.nodeName)
 
-            component = self.parseComponent(child)
             flow.components[component.name] = component
         return flow
 
     def parseManager(self, node):
-        # <component name="..." type="...">
-        # </component>
+        # <manager>
+        #   <component>
+        #   ...
+        # </manager>
 
         manager = ConfigEntryManager()
         for child in node.childNodes:

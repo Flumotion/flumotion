@@ -1,3 +1,16 @@
+2004-10-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/gtk/main.py:
+	* flumotion/common/config.py:
+	* flumotion/manager/worker.py:
+	* flumotion/worker/job.py:
+
+	Improve startup wizard logic, still not good
+	cleanup configuration parsing, set worker on the entry object if
+	its specified in the tag
+
+	Remove config and start-factory from dictionary, finally.
+	
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:

@@ -112,7 +112,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
     def setRemoteReference(self, remoteReference):
         self.remote = remoteReference
     
-    #FIXME: add to IMedium
+    # FIXME: add to IMedium
     def hasPerspective(self):
         return self.remote != None
 
@@ -158,9 +158,6 @@ class JobMedium(pb.Referenceable, log.Loggable):
         @param feedPorts: feedName -> port
         @type  feedPorts: dict
         """
-        # XXX: Remove this hack
-        if not config.get('start-factory', True):
-            return
         
         #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
