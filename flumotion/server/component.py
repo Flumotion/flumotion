@@ -57,8 +57,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
         
     ### Loggable methods
     def logFunction(self, arg):
-        return self.comp.get_name + ':' + arg
-    
+        return self.comp.get_name() + ':' + arg
 
     # call function on remote perspective in controller (?)
     def callRemote(self, name, *args, **kwargs):
@@ -159,7 +158,7 @@ class BaseComponent(gobject.GObject, log.Loggable):
 
     ### Loggable methods
     def logFunction(self, arg):
-        return (self.get_name() + ' ' + arg)
+        return self.get_name() + ' ' + arg
 
     ### GObject methods
     def emit(self, name, *args):
