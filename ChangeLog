@@ -1,5 +1,12 @@
 2004-10-22  Johan Dahlin  <johan@gnome.org>
 
+	* Makefile.am:
+	* misc/pycheckerrc:
+	Add pychecker target and a configuration file that disables
+	the most retarded checks.
+
+2004-10-22  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/worker/worker.py: Make sure that we send a tuple with
 	exactly one item.
 
