@@ -41,4 +41,3 @@ if os.path.exists(os.path.join(__thisdir, 'uninstalled.py')):
 else:
     import flumotion.config.installed
     globals().update(installed.get())
-

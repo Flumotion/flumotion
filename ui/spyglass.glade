@@ -4,7 +4,7 @@
 <glade-interface>
 <requires lib="gnome"/>
 
-<widget class="GtkWindow" id="view-window">
+<widget class="GtkWindow" id="spyglass-window">
   <property name="visible">True</property>
   <property name="title" translatable="yes">window1</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
@@ -19,7 +19,7 @@
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
 
   <child>
-    <widget class="GtkTable" id="view-widget">
+    <widget class="GtkTable" id="spyglass-widget">
       <property name="border_width">6</property>
       <property name="visible">True</property>
       <property name="n_rows">2</property>
@@ -29,7 +29,7 @@
       <property name="column_spacing">6</property>
 
       <child>
-	<widget class="GtkLabel" id="view-label">
+	<widget class="GtkLabel" id="spyglass-label">
 	  <property name="visible">True</property>
 	  <property name="label" translatable="yes">&lt;b&gt;Preview&lt;/b&gt;</property>
 	  <property name="use_underline">False</property>
@@ -53,7 +53,7 @@
       </child>
 
       <child>
-	<widget class="GtkDrawingArea" id="view-widget">
+	<widget class="GtkDrawingArea" id="spyglass-area">
 	  <property name="width_request">320</property>
 	  <property name="height_request">240</property>
 	  <property name="visible">True</property>
@@ -69,7 +69,7 @@
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="view-combo">
+	<widget class="GtkComboBox" id="spyglass-combo">
 	  <property name="visible">True</property>
 	  <property name="items" translatable="yes">Current Feed
 Source-Overlay
