@@ -2,6 +2,17 @@
 
 	* bin/flumotion-admin.in:
 	* configure.ac:
+	* flumotion/admin/__init__.py:
+	* flumotion/admin/adminclient.py:
+	* flumotion/admin/admininterface.py:
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/__init__.py:
+	  move actual client to gtk
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-admin.in:
+	* configure.ac:
 	* flumotion/Makefile.am:
 	* flumotion/admin/adminclient.py:
 	* flumotion/gui/adminclient.py:

@@ -38,13 +38,13 @@ else:
     root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
 sys.path.insert(0, root)
 
-from flumotion.admin import adminclient
+from flumotion.admin.gtk import client
 
 from flumotion.utils import log
 
 
 def main(args):
     log.init()
-    return adminclient.main(args)
+    return client.main(args)
 
 sys.exit(main(sys.argv))
