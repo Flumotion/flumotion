@@ -1,0 +1,34 @@
+* operations that could be triggered by user:
+  - add a component
+  - pause a component (go to mood WAKING ? same mood as right after _create)
+  - start a component (go to mood HAPPY)
+  - restart a component (stop and start)
+  - stop a component (go to mood SLEEPING)
+  - delete a component (disappears completely)
+
+  - same on flows
+
+  - stop worker
+  - start worker
+  - restart worker (stop without quit, start again)
+
+* user should be presented only with components and workers
+
+* operations triggered by user should be done in some order, and can need
+  handling of other components as well.
+
+* actions happen -> trigger a change in a graph node -> children get notified
+  -> children take action
+
+  - worker logs in -> component job gets notified -> has its worker -> starts
+    (worker.component_create -> component.create -> component logs in)
+
+  - component avatar logs in -> job has started -> notifies children
+    - eater: will check if feeder is ready
+    pipeline gets started through remote_start, which will start up
+
+* need an object that:
+  - has a graph of components and internal deps
+  - can answer questions like:
+    - to stop this component, what needs to happen to other components ?
+    - when this dep changes, what happens to its children ?
