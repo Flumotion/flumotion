@@ -1,0 +1,70 @@
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# tests/ComponentsView.py: Components View test program
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
+
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+import gobject
+import gtk
+
+from twisted.spread import jelly
+from flumotion.admin.gtk import parts
+from flumotion.common import component
+from flumotion.common.component import moods
+
+class TestComponentsView:
+    def setUp(self):
+        self.window = gtk.Window()
+        self.widget = gtk.TreeView()
+        self.window.add(self.widget)
+        self.window.show_all()
+        self.view = parts.ComponentsView(self.widget)
+        self.view.connect('selected', self.selected)
+
+    def _createComponent(self, dict):
+        jstate = component.JobComponentState()
+        for key in dict.keys():
+            jstate.set(key, dict[key]) 
+        mstate = jelly.unjelly(jelly.jelly(jstate))
+        astate = jelly.unjelly(jelly.jelly(mstate))
+        return astate
+
+    def tearDown(self):
+        self.window.destroy()
+
+    def update(self):
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.happy.value,
+             'workerName': 'R2D2', 'pid': 1})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.sad.value,
+             'workerName': 'R2D2', 'pid': 2})
+        components['two'] = c
+        self.view.update(components)
+
+    def selected(self, view, name):
+        print "Selected component %s" % name
+
+app = TestComponentsView()
+app.setUp()
+app.update()
+
+gtk.main()
