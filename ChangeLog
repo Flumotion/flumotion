@@ -1,5 +1,14 @@
 2005-02-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/bundle.py (BundlerBasket.getDependencies):
+	Rework to check if the argument is a valid bundle, and raise an
+	exception otherwise.
+
+	* flumotion/worker/checks/video.py (check1394): Go to PLAYING, not
+	READY. Bug introduced on 02-08.
+	(check1394.iterate): Whoops, actually return if the bin failed to
+	iterate.
+
 	* flumotion/test/test_parts.py (TestComponentsView.testSelected):
 	Connect to the right signal.
 

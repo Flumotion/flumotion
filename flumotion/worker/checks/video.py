@@ -149,6 +149,7 @@ def check1394():
 
         if not bin.iterate():
             res.errback('Failed to iterate bin')
+            return
         elif pad.get_negotiated_caps() == None:
             reactor.callLater(0, iterate, bin, res)
             return
@@ -172,4 +173,5 @@ def check1394():
         return res.d
 
     pipeline = 'dv1394src name=source ! dvdec name=dec ! fakesink'
-    return do_element_check(pipeline, 'source', do_check)
+    return do_element_check(pipeline, 'source', do_check,
+                            state=gst.STATE_PLAYING)

@@ -149,6 +149,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         self.debug('asked to get bundle sums for bundle %s' % bundleName)
         basket = self.vishnu.bundlerBasket
 
+        # will raise an error if bundleName not known
         deps = basket.getDependencies(bundleName)
         self.debug('dependencies of %s: %r' % (bundleName, deps))
         sums = []

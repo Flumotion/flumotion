@@ -294,14 +294,18 @@ class BundlerBasket:
         bundle itself.
         The dependencies are returned in a correct depending order.
         """
-        # FIXME: do we need to scrub duplicates at all ?
-        # It probably doesn't hurt that bad to include them more than once;
-        # worst problem is returning a zip file more than once in a request
-        deps = [bundlerName, ]
-        if self._dependencies.has_key(bundlerName):
-            for dep in self._dependencies[bundlerName]:
-                deps += self.getDependencies(dep)
-        return deps
+        def dep_helper(name, deps):
+            deps.append(name)
+            if self._dependencies.has_key(name):
+                for dep in self._dependencies[name]:
+                    dep_helper (dep, deps)
+            return deps
+            
+        if not bundlerName in self._bundlers:
+            raise Exception('Unknown bundle %s' % bundleName)
+        
+        print dep_helper(bundlerName, [])
+        return dep_helper(bundlerName, [])
 
     def getBundlerByName(self, bundlerName):
         """
