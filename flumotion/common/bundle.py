@@ -30,7 +30,7 @@ import errno
 import zipfile
 import StringIO
 
-__all__ = ['Bundle', 'Bundler', 'Unbundler']
+__all__ = ['Bundle', 'Bundler', 'Unbundler', 'BundlerBasket']
 
 class BundledFile:
     def __init__(self, source, destination):
@@ -62,16 +62,19 @@ class BundledFile:
         @rtype: boolean
         """
         
-        # if it wasn't zipped yet, it needs zipping
+        # if it wasn't zipped yet, it needs zipping, so we pretend it
+        # was changed
         # FIXME: move this out here
         if not self.zipped:
             return True
         
         timestamp = self.timestamp()
+        # if file still has an old timestamp, it hasn't changed
         if timestamp <= self._last_timestamp:
             return False
         self._last_timestamp = timestamp
             
+        # if the md5sum has changed, it has changed
         md5sum = self.md5sum()
         if self._last_md5sum != md5sum:
             self._last_md5sum = md5sum
@@ -158,10 +161,13 @@ class Bundler:
         @param source: the path to the file to add to the bundle.
         @param destination: a relative path to store this file in in the bundle.
         If unspecified, this will be stored in the top level.
+
+        @returns: the path the file got stored as
         """
         if destination == None:
             destination = os.path.split(source)[1]
         self._files[source] = BundledFile(source, destination)
+        return destination
                 
     def bundle(self):
         """
@@ -198,4 +204,104 @@ class Bundler:
         data = filelike.getvalue()
         filelike.close()
         return data
-    
+
+class BundlerBasket:
+    """
+    I manage bundlers that are registered through me.
+    """
+    def __init__(self):
+        """
+        Create a new bundler basket.
+        """
+        self._bundlers = {} # bundler name -> bundle
+        self._files = {} # filename -> bundle
+        self._imports = {} # import statements -> bundle
+        self._dependencies = {} # bundler name -> bundle names it depends on
+        
+    def add(self, bundleName, source, destination = None):
+        """
+        Add files to the bundler basket for the given bundle.
+        
+        @param bundleNmae: the name of the bundle this file is a part of
+        @param source: the path to the file to add to the bundle
+        @param destination: a relative path to store this file in in the bundle.
+        If unspecified, this will be stored in the top level
+        """
+        # get the bundler and create it if need be
+        if not bundleName in self._bundlers.keys():
+            bundler = Bundler()
+            self._bundlers[bundleName] = bundler
+        else:
+            bundler = self._bundlers[bundleName]
+
+        # add the file to the bundle and register
+        location = bundler.add(source, destination)
+        if self._files.has_key(location):
+            raise Exception("Bundler %s already has file %s" % (
+                bundleName, location))
+        self._files[location] = bundler
+
+        # add possible imports from this file
+        package = None
+        if location.endswith('.py'):
+            package = location[:-3]
+        elif location.endswith('.pyc'):
+            package = location[:-4]
+
+        if package:
+            if package.endswith('__init__'):
+                package = os.path.split(package)[0]
+                
+            package = ".".join(package.split(os.pathsep))
+            if self._imports.has_key(package):
+                raise Exception("Bundler %s already has import %s" % (
+                    bundleName, package))
+            self._imports[package] = bundler
+
+    def depend(self, depender, *dependencies):
+        """
+        Make the given bundle depend on the other given bundles.
+
+        @type depender: string
+        @type dependencies: list of strings
+        """
+        # note that a bundler doesn't necessarily need to be registered yet
+        if not depender in self._dependencies:
+            self._dependencies[depender] = []
+        for dep in dependencies:
+            self._dependencies[depender].append(dep)
+
+    def getDependencies(self, bundlerName):
+        """
+        Return names of all the dependencies of this bundle, including this
+        bundle itself.
+        """
+        deps = [bundlerName, ]
+        if self._dependencies.has_key(bundlerName):
+            for dep in self._dependencies[bundlerName]:
+                deps += self.getDependencies(dep)
+        return deps
+
+    def getBundlerByName(self, bundlerName):
+        """
+        Return the bundle by name, or None if not found.
+        """
+        if self._bundlers.has_key(bundlerName):
+            return self._bundlers[bundlerName]
+        return None
+
+    def getBundlerByImport(self, importString):
+        """
+        Return the bundle by import statement, or None if not found.
+        """
+        if self._imports.has_key(importString):
+            return self._imports[importString]
+        return None
+
+    def getBundlerByFile(self, filename):
+        """
+        Return the bundle by filename, or None if not found.
+        """
+        if self._files.has_key(filename):
+            return self._files[filename]
+        return None

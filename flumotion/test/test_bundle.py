@@ -64,7 +64,7 @@ class TestBundler(unittest.TestCase):
 
         b = self.bundler.bundle()
         newsum = b.md5sum
-        assert newsum != sum
+        self.assertNotEquals(newsum, sum)
         os.unlink(path)
 
     # create a bundle of one file then unpack and check if it's the same
@@ -79,10 +79,10 @@ class TestBundler(unittest.TestCase):
         filelike = StringIO.StringIO(zip)
         zip = zipfile.ZipFile(filelike, "r")
         # None means no files were broken
-        assert not zip.testzip()
+        self.failIf(zip.testzip())
         data = zip.read(name)
-        assert data
-        assert md5sum == md5.new(data).hexdigest()
+        self.failUnless(data)
+        self.assertEquals(md5sum, md5.new(data).hexdigest())
 
     # create a bundle of two files then update one of them and check
     # the md5sum changes
@@ -95,9 +95,16 @@ class TestBundler(unittest.TestCase):
         os.close(handle)
         self.bundler.add(path)
         b = self.bundler.bundle()
+
         sum = b.md5sum
 
         # change the test file
+        time.sleep(1) # ... or the timestamp doesn't change
+
+        # touch the file so the timestamp is updated, but file not changed
+        os.system("touch %s" % path)
+        b = self.bundler.bundle()
+
         time.sleep(1) # ... or the timestamp doesn't change
         handle = os.open(path, os.O_WRONLY)
         os.write(handle, "different bit of text")
@@ -105,7 +112,7 @@ class TestBundler(unittest.TestCase):
         b = self.bundler.bundle()
         newsum = b.md5sum
 
-        assert newsum != sum
+        self.assertNotEquals(newsum, sum)
         os.unlink(path)
 
 # we test the Unbundler using the Bundler, should be enough
@@ -133,12 +140,12 @@ class TestUnbundler(unittest.TestCase):
 
         # make sure it unpacked
         newfile = os.path.join(dir, self.filename)
-        assert os.path.exists(newfile)
+        self.failUnless(os.path.exists(newfile))
 
         # verify contents
         one = open(self.filename, "r").read()
         two = open(newfile, "r").read()
-        assert one == two
+        self.assertEquals(one, two)
 
     def testUnbundlerRelative(self):
         bundler = bundle.Bundler()
@@ -150,12 +157,106 @@ class TestUnbundler(unittest.TestCase):
 
         # make sure it unpacked
         newfile = os.path.join(dir, 'this/is/a/test.py')
-        assert os.path.exists(newfile)
+        self.failUnless(os.path.exists(newfile))
 
         # verify contents
         one = open(self.filename, "r").read()
         two = open(newfile, "r").read()
-        assert one == two
+        self.assertEquals(one, two)
+
+class TestBundlerBasket(unittest.TestCase):
+    # everything we need to set up the test environment
+    def setUp(self):
+        # create test files
+        self.tempdir = tempfile.mkdtemp()
+
+        
+        self.packagedir = os.path.join(self.tempdir, 'package')
+        os.mkdir(self.packagedir)
+        self.packagefile = os.path.join(self.packagedir, '__init__.py')
+        handle = open(self.packagefile, 'w')
+        handle.write("print 'I am a package'")
+        handle.close()
+
+        self.pythonfile = os.path.join(self.tempdir, 'test.py')
+        handle = open(self.pythonfile, 'w')
+        handle.write("print 'I am a bit of python'")
+        handle.close()
+        
+        self.pythoncfile = os.path.join(self.tempdir, 'test.pyc')
+        handle = open(self.pythoncfile, 'w')
+        handle.write("XXXX I am fake bytecode")
+        handle.close()
+
+        self.textfile = os.path.join(self.tempdir, 'text')
+        handle = open(self.textfile, 'w')
+        handle.write("I am a bit of text")
+        handle.close()
+
+    def testBundlerBasketAdd(self):
+        basket = bundle.BundlerBasket()
+        basket.add('test', self.pythonfile)
+        basket.add('test', self.textfile)
+
+    def testBundlerBasketAddUnique(self):
+        basket = bundle.BundlerBasket()
+        basket.add('test', self.pythonfile)
+        # FIXME: proper exceptions ?
+        self.assertRaises(Exception, basket.add, 'test', self.pythonfile)
+        self.assertRaises(Exception, basket.add, 'test', self.pythoncfile)
+
+    def testBundlerBasketPackage(self):
+        basket = bundle.BundlerBasket()
+        basket.add('package', self.packagefile, 'package/__init__.py')
+        bundler = basket.getBundlerByImport("package")
+        self.failUnless(bundler)
+        bundler2 = basket.getBundlerByFile("package/__init__.py")
+        self.failUnless(bundler2)
+        self.assertEquals(bundler, bundler2)
+
+    def testBundlerBasketName(self):
+        basket = bundle.BundlerBasket()
+        basket.add('test', self.pythonfile, "test.py")
+        bundler = basket.getBundlerByName("notexist")
+        self.failIf(bundler)
+        bundler = basket.getBundlerByName("test")
+        self.failUnless(bundler)
+
+    def testBundlerBasketFile(self):
+        basket = bundle.BundlerBasket()
+        basket.add('test', self.pythonfile, "test.py")
+        bundler = basket.getBundlerByFile("notexist.py")
+        self.failIf(bundler)
+        bundler = basket.getBundlerByFile("test.py")
+        self.failUnless(bundler)
+
+    def testBundlerBasketImport(self):
+        basket = bundle.BundlerBasket()
+        basket.add('test', self.pythonfile, "test.py")
+        bundler = basket.getBundlerByImport("notexist")
+        self.failIf(bundler)
+        bundler = basket.getBundlerByImport("test")
+        self.failUnless(bundler)
+
+    def testBundlerBasketDepend(self):
+        basket = bundle.BundlerBasket()
+        basket.depend('leg', 'foot')
+        basket.depend('arm', 'hand')
+        basket.depend('body', 'leg', 'arm')
+        deps = basket.getDependencies('body')
+        deps.sort()
+        list = ['leg', 'foot', 'arm', 'hand', 'body']
+        list.sort()
+        self.assertEquals(list, deps)
+
+    def tearDown(self):
+        os.unlink(self.packagefile)
+        os.rmdir(self.packagedir)
+
+        os.unlink(self.pythonfile)
+        os.unlink(self.pythoncfile)
+        os.unlink(self.textfile)
+        os.rmdir(self.tempdir)
  
 if __name__ == '__main__':
      unittest.main()

@@ -1,5 +1,11 @@
 2004-11-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/bundle.py:
+	* flumotion/test/test_bundle.py:
+	  add BundlerBasket and test code
+
+2004-11-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/steps.py:
 	  Do not list tracks if element doesn't support the interface.
 	  Fixes #115
