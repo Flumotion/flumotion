@@ -34,6 +34,13 @@ class TestStateRemoteCache(flavors.StateRemoteCache):
 pb.setUnjellyableForClass(TestStateCacheable, TestStateRemoteCache)
 
 class FakeObject: pass
+class FakeListener:
+    # listener interface
+    __implements__ = flavors.IStateListener,
+    
+    def stateSet(self, state, key, value): pass
+    def stateAppend(self, state, key, value): pass
+    def stateRemove(self, state, key, value): pass
 
 class TestRoot(pb.Root):
     def remote_getState(self):
@@ -50,7 +57,6 @@ class TestRoot(pb.Root):
 
     def remote_haveAdopted(self, name):
         self.state.remove('children', name)
-
 
 class TestStateSet(unittest.TestCase):
     def setUp(self):
@@ -88,6 +94,7 @@ class TestStateSet(unittest.TestCase):
 
         self.failUnless(state)
         self.failUnlessEqual(state.get('name'), 'lois')
+        self.assertRaises(KeyError, state.get, 'dad')
 
         # ask server to set the name
         d = self.perspective.callRemote('setStateName', 'clark')
@@ -143,6 +150,9 @@ class TestStateSet(unittest.TestCase):
         state = unittest.deferredResult(d)
 
         self.assertRaises(NotImplementedError, state.addListener, FakeObject())
+        self.assertRaises(NotImplementedError, state.removeListener,
+            FakeObject())
+        self.assertRaises(KeyError, state.removeListener, FakeListener())
 
     # listener interface
     __implements__ = flavors.IStateListener,
@@ -215,11 +225,13 @@ class TestStateSet(unittest.TestCase):
         c = self.changes.pop()
         self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
 
-class TestStateAddKey(unittest.TestCase):
+class TestState(unittest.TestCase):
     def testStateAddKey(self):
         c = flavors.StateCacheable()
 
         c.addListKey('list')
+        self.failUnless(c.hasKey('list'))
+        self.failIf(c.hasKey('randomkey'))
         l = c.get('list')
         self.failUnlessEqual(len(l), 0)
         c.append('list', 'item')
@@ -232,10 +244,30 @@ class TestStateAddKey(unittest.TestCase):
         self.failUnlessEqual(len(l), 0)
         c.append('two', 'B')
         l = c.get('two')
-        self.failUnlessEqual(len(l), 1)
-        self.failUnlessEqual(l[0], 'B')
+        self.assertEqual(len(l), 1)
+        self.assertEqual(l[0], 'B')
         
-        
- 
+    def testStateGet(self):
+        c = flavors.StateCacheable()
+
+        c.addKey('akey')
+        c.set('akey', 'avalue')
+        self.assertEquals(c.get('akey'), 'avalue')
+        self.assertRaises(KeyError, c.get, 'randomkey')
+  
+    def testStateAppendRemove(self):
+        c = flavors.StateCacheable()
+
+        c.addListKey('alist')
+
+        c.append('alist', 'avalue')
+        self.assertEquals(c.get('alist'), ['avalue', ])
+        self.assertRaises(KeyError, c.append, 'randomlistkey', 'value')
+
+        c.remove('alist', 'avalue')
+        self.assertEquals(c.get('alist'), [])
+        self.assertRaises(KeyError, c.remove, 'randomlistkey', 'value')
+        self.assertRaises(ValueError, c.remove, 'alist', 'value')
+  
 if __name__ == '__main__':
     unittest.main()

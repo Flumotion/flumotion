@@ -41,6 +41,16 @@ registry.registry.addFromString("""
 class TestConfig(unittest.TestCase):
     def testParseEmpty(self):
         conf = config.FlumotionConfigXML(None, '<planet/>')
+        self.failIf(conf.getPath())
+        self.failUnless(conf.export())
+
+    def testParseWrongConfig(self):
+        self.assertRaises(config.ConfigError,
+            config.FlumotionConfigXML, None, '<somethingorother/>')
+
+    def testParseWrongSyntax(self):
+        self.assertRaises(config.ConfigError,
+            config.FlumotionConfigXML, None, 'planet/>')
 
     def testParseAtmosphere(self):
         conf = config.FlumotionConfigXML(None,
@@ -50,12 +60,23 @@ class TestConfig(unittest.TestCase):
                  <component name="component-name" type="test-component"/>
                </atmosphere>
              </planet>""")
-        assert conf.atmosphere
-        assert conf.atmosphere.components
-        assert len(conf.atmosphere.components) == 1
-        assert conf.atmosphere.components['component-name']
-        assert conf.atmosphere.components['component-name'].name == "component-name"
+        self.failUnless(conf.atmosphere)
+        self.failUnless(conf.atmosphere.components)
+        self.assertEquals(len(conf.atmosphere.components), 1)
+        self.failUnless(conf.atmosphere.components['component-name'])
+        self.assertEquals(conf.atmosphere.components['component-name'].name,
+            "component-name")
 
+    def testParseWrongAtmosphere(self):
+        xml = """
+             <planet>
+               <atmosphere>
+                 <somethingwrong name="component-name" type="test-component"/>
+               </atmosphere>
+             </planet>"""
+        self.assertRaises(config.ConfigError,
+            config.FlumotionConfigXML, None, xml)
+ 
     def testParseComponent(self):
         conf = config.FlumotionConfigXML(None,
              """
@@ -67,43 +88,35 @@ class TestConfig(unittest.TestCase):
              """)
 
         flow = conf.flows[0]
-        assert flow.components.has_key('component-name')
+        self.failUnless(flow.components.has_key('component-name'))
         component = flow.components['component-name']
-        assert component.name == 'component-name'
-        assert component.type == 'test-component'
+        self.assertEquals(component.name, 'component-name')
+        self.assertEquals(component.getName(), 'component-name')
+        self.assertEquals(component.type, 'test-component')
+        self.assertEquals(component.getType(), 'test-component')
+        self.assertEquals(component.getParent(), 'default')
+        self.assertEquals(component.getWorker(), None)
         dict = component.getConfigDict()
-        assert dict.get('name') == 'component-name', dict['name']
-        assert dict.get('type') == 'test-component', dict['type']
+        self.assertEquals(dict.get('name'), 'component-name', dict['name'])
+        self.assertEquals(dict.get('type'), 'test-component', dict['type'])
         
     def testParseManager(self):
         conf = config.FlumotionConfigXML(None,
              """
              <planet>
-               <manager>
+               <manager name="aname">
+                 <host>mymachine</host>
+                 <port>7000</port>
+                 <transport>tcp</transport>
+                 <debug>5</debug>
                  <component name="component-name" type="test-component"/>
                </manager>
              </planet>""")
-        assert conf.manager
-        assert conf.manager.bouncer
-        assert conf.manager.bouncer.name
-        assert conf.manager.bouncer.name == "component-name"
+        self.failUnless(conf.manager)
+        self.failUnless(conf.manager.bouncer)
+        self.failUnless(conf.manager.bouncer.name)
+        self.assertEquals(conf.manager.bouncer.name, "component-name")
 
-    def obsolete_testParseWorkers(self):
-        conf = config.FlumotionConfigXML(None,
-             """<planet>
-             <workers policy="password">
-               <worker username="root" password="god"/>
-             </workers>
-             </planet>""")
-
-        workers = conf.getWorkers()
-        assert workers.getPolicy() == 'password'
-        assert len(workers) == 1
-        worker = iter(workers).next()
-        assert worker.getUsername() == 'root'
-        assert worker.getPassword() == 'god'
-        assert conf.hasWorker('root')
-        
     def testParseError(self):
         xml = '<planet><bad-node/></planet>'
         self.assertRaises(config.ConfigError,
@@ -116,13 +129,53 @@ class TestConfig(unittest.TestCase):
         self.assertRaises(errors.UnknownComponentError,
             config.FlumotionConfigXML, None, xml)
 
-        xml = '<planet><component/></planet>'
+        xml = """<planet>
+              <flow name="default">
+                <component type="not-named"/>
+              </flow>
+            </planet>"""
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
 
-        xml = '<planet><component name="without-type"/></planet>'
+        xml = """<planet>
+              <flow name="default">
+                <component name="not-typed"/>
+              </flow>
+            </planet>"""
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
+        
+    def testParseFlowError(self):
+        xml = """<planet>
+            <flow><component name="unused" type="not-existing"/></flow>
+            </planet>"""
+        self.assertRaises(config.ConfigError,
+            config.FlumotionConfigXML, None, xml)
+
+        xml = """<planet>
+              <flow name="manager">
+                <component name="unused" type="not-existing"/>
+              </flow>
+            </planet>"""
+        self.assertRaises(config.ConfigError,
+            config.FlumotionConfigXML, None, xml)
+
+        xml = """<planet>
+              <flow name="atmosphere">
+                <component name="unused" type="not-existing"/>
+              </flow>
+            </planet>"""
+        self.assertRaises(config.ConfigError,
+            config.FlumotionConfigXML, None, xml)
+
+        xml = """<planet>
+              <flow name="wrongcomponentnode">
+                <wrongnode name="unused" type="not-existing"/>
+              </flow>
+            </planet>"""
+        self.assertRaises(config.ConfigError,
+            config.FlumotionConfigXML, None, xml)
+
 
     def testParseManagerError(self):
         xml = """<planet><manager>
@@ -131,24 +184,31 @@ class TestConfig(unittest.TestCase):
             </manager></planet>"""
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
- 
-    def obsolete_testParseWorkersError(self):
-        xml = '<planet><workers/></planet>'
+
+        xml = """<planet>
+               <manager name="aname">
+                 <port>notanint</port>
+               </manager>
+             </planet>"""
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
 
-        xml = '<planet><workers policy="unknown-policy"/></planet>'
+        xml = """<planet>
+               <manager name="aname">
+                 <transport>notatransport</transport>
+               </manager>
+             </planet>"""
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
-
-        xml = '<planet><workers><worker/></workers></planet>'
+  
+        xml = """<planet>
+               <manager name="aname">
+                 <notanode/>
+               </manager>
+             </planet>"""
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
-
-        xml = '<planet><workers><worker username="without-password"/></workers></planet>'
-        self.assertRaises(config.ConfigError,
-                          config.FlumotionConfigXML, None, xml)
-
+   
     def testParseProperties(self):
         planet = config.FlumotionConfigXML(None,
              """<planet><flow name="default">
@@ -164,15 +224,15 @@ class TestConfig(unittest.TestCase):
         flow = planet.flows[0]
         component = flow.components['component-name']
         conf = component.getConfigDict()
-        assert conf.get('one') == 'string'
-        assert conf.get('two') == 1
-        assert conf.get('three') == 2.5
+        self.assertEquals(conf.get('one'), 'string')
+        self.assertEquals(conf.get('two'), 1)
+        self.assertEquals(conf.get('three'), 2.5)
         custom = conf.get('four')
-        assert custom
-        assert getattr(custom, 'data', None) == 'value'
-        assert getattr(custom, 'attr', None) == 'attr-value'
-        assert conf.get('five') == True
-        assert conf.get('six') == 3981391981389138998131389L
+        self.failUnless(custom)
+        self.assertEquals(getattr(custom, 'data', None), 'value')
+        self.assertEquals(getattr(custom, 'attr', None), 'attr-value')
+        self.failUnless(conf.get('five'))
+        self.assertEquals(conf.get('six'), 3981391981389138998131389L)
 
     def testGetComponentEntries(self):
         conf = config.FlumotionConfigXML(None,

@@ -29,6 +29,17 @@ CredCrypt = credentials.UsernameCryptPasswordCrypt
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext
 CredUCPCC = credentials.UsernameCryptPasswordCryptChallenger
 
+class TestUsername(unittest.TestCase):
+    def testWithPlaintext(self):
+        cred = credentials.Username('user', 'test')
+        self.failUnless(cred.checkPassword('test'))
+        self.failIf(cred.checkPassword('boohoowrong'))
+
+    def testWithPlaintextWrongPassword(self):
+        cred = CredPlaintext('user', 'tes')
+        self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
+        self.failIf(cred.checkCryptPassword('boohoowrong'))
+
 class TestUsernameCryptPasswordCrypt(unittest.TestCase):
     def testWithPlaintext(self):
         cred = CredCrypt('user')
@@ -72,6 +83,9 @@ class TestUsernameCryptPasswordCryptChallenger(unittest.TestCase):
         # authenticator sets salt and challenge
         cred.salt = 'qi'
         cred.challenge = credentials.cryptChallenge()
+
+        # not responding should fail
+        self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
 
         # requester responds
         cred.setPassword('test')
