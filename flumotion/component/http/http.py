@@ -125,18 +125,11 @@ class HTTPStreamingAdminResource(resource.Resource):
         self.debug = self.parent.debug
         resource.Resource.__init__(self)
 
+    ### resource.Resource methods
+
     def getChild(self, path, request):
         return self
-        
-    def isAuthenticated(self, request):
-        if request.getClientIP() == '127.0.0.1':
-            return True
-        
-        if (request.getUser() == 'admin' and
-            request.getPassword() == self.parent.admin_password):
-            return True
-        return False
-    
+   
     def render(self, request):
         self.debug('Request for admin page')
         if not self.isAuthenticated(request):
@@ -150,9 +143,21 @@ class HTTPStreamingAdminResource(resource.Resource):
             return ERROR_TEMPLATE % {'code': error_code,
                                      'error': http.RESPONSES[error_code]}
 
-        return self.render_stats(request)
-    
-    def render_stats(self, request):
+        return self._render_stats(request)
+
+    ### our methods
+
+    # FIXME: file has this too - move upperclass ?
+    def isAuthenticated(self, request):
+        if request.getClientIP() == '127.0.0.1':
+            return True
+        
+        if (request.getUser() == 'admin' and
+            request.getPassword() == self.parent.admin_password):
+            return True
+        return False
+     
+    def _render_stats(self, request):
         streamer = self.parent.streamer
         s = streamer.getState()
         
@@ -190,6 +195,7 @@ class HTTPStreamingAdminResource(resource.Resource):
             'stats': "\n".join(block)
         }
 
+# FIXME: generalize this class and move it out here ?
 class Stats:
     def __init__(self, sink):
         self.sink = sink
@@ -204,7 +210,7 @@ class Stats:
         self.average_client_number = 0
         self.average_time = self.start_time
         
-    def updateAverage(self):
+    def _updateAverage(self):
         # update running average of clients connected
         now = time.time()
         # calculate deltas
@@ -221,7 +227,7 @@ class Stats:
                                           dc2 * dt2 / (dt1 + dt2))
 
     def clientAdded(self):
-        self.updateAverage()
+        self._updateAverage()
 
         self.no_clients += 1
 
@@ -231,7 +237,7 @@ class Stats:
             self.peak_client_number = self.no_clients
     
     def clientRemoved(self):
-        self.updateAverage()
+        self._updateAverage()
         self.no_clients -= 1
 
     def getBytesSent(self):
@@ -280,7 +286,6 @@ class Stats:
         s['consumption-totalbytes'] = format_bytes(bytes_sent) + 'B'
 
         return s
-    
  
 ### the Twisted resource that handles the base URL
 class HTTPStreamingResource(resource.Resource, log.Loggable):
@@ -361,11 +366,6 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
 
     def setAdminPassword(self, password):
         self.admin_password = password
-        
-    def getChild(self, path, request):
-        if path == 'stats':
-            return self.admin
-        return self
 
     # FIXME: rename to writeHeaders
     """
@@ -503,7 +503,6 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.streamer.add_client(fd)
         ip = request.getClientIP()
         self.info('[fd %5d] start streaming to %s' % (fd, ip))
-        return server.NOT_DONE_YET
         
     ### resource.Resource methods
 
@@ -517,8 +516,14 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             return self._handleMaxClients(request)
         elif not self.isAuthenticated(request):
             return self._handleUnauthorized(request)
-        else:
-            return self._handleNewClient(request)
+
+        self._handleNewClient(request)
+        return server.NOT_DONE_YET
+        
+    def getChild(self, path, request):
+        if path == 'stats':
+            return self.admin
+        return self
 
 class HTTPView(component.ComponentView):
     def __init__(self, comp):
@@ -527,12 +532,12 @@ class HTTPView(component.ComponentView):
         """
         component.ComponentView.__init__(self, comp)
 
-        self.comp.connect('ui-state-changed', self.comp_ui_state_changed_cb)
+        self.comp.connect('ui-state-changed', self._comp_ui_state_changed_cb)
 
     def getState(self):
         return self.comp.getState()
 
-    def comp_ui_state_changed_cb(self, comp):
+    def _comp_ui_state_changed_cb(self, comp):
         self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
 
 ### the actual component is a streamer using multifdsink
@@ -599,7 +604,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     def remote_notifyState(self):
         self.update_ui_state()
 
-    def notify_caps_cb(self, element, pad, param):
+    def _notify_caps_cb(self, element, pad, param):
         caps = pad.get_negotiated_caps()
         if caps is None:
             return
@@ -713,7 +718,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     def link_setup(self, eaters, feeders):
         sink = self.get_sink()
         # FIXME: these should be made threadsafe if we use GstThreads
-        sink.connect('deep-notify::caps', self.notify_caps_cb)
+        sink.connect('deep-notify::caps', self._notify_caps_cb)
         sink.connect('state-change', self.feeder_state_change_cb)
         # these are made threadsafe using idle_add in the handler
         sink.connect('client-removed', self._client_removed_cb)
