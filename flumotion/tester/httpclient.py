@@ -21,13 +21,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
+import gobject
+
 import urllib2
 import time
-import gobject
+
 import sys
 import socket
 
 from flumotion.utils import log
+from flumotion.tester import client
 
 class HTTPClient(gobject.GObject, log.Loggable):
     """
@@ -38,14 +41,14 @@ class HTTPClient(gobject.GObject, log.Loggable):
         'stopped': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
     }
     
-    # enum for result of stopped
-    STOPPED_SUCCESS = 0
-    STOPPED_ERROR = 1
-    STOPPED_REFUSED = 2
-
     logCategory = "httpclient"
 
     def __init__(self, id, url):
+        """
+        @param id: id of the client.
+        @param url: URL to open.
+        @type url: string.
+        """
         self.__gobject_init__()
         self._url = url
         self._id = id
@@ -58,12 +61,19 @@ class HTTPClient(gobject.GObject, log.Loggable):
     #    raise "verify needs to be handed to me by the application"
 
     def next_read_time(self):
-	    'calculate and return the next epoch time point to read at'
+	    """
+        Calculate the next time to read.
+
+        @rtype: float
+        @returns: next read time in seconds since epoch.
+        """
         raise "next_read_time needs to be implemented by a subclass"
 
     def read_size(self):
-	    'calculate and return the size of the current read'
+	    """
+        calculate and return the size of the current read'
         raise "read_size needs to be implemented by a subclass"
+        """
 
     def set_stop_time(self, stop_time):
         """
@@ -87,7 +97,7 @@ class HTTPClient(gobject.GObject, log.Loggable):
             self._fd = urllib2.urlopen(self._url)
         except urllib2.HTTPError, error:
             self.warning("%4d: HTTPError: code %s, msg %s" % (self._id, error.code, error.msg))
-            self.emit('stopped', self.STOPPED_ERROR)
+            self.emit('stopped', client.STOPPED_CONNECT_ERROR)
             return
         except urllib2.URLError, exception:
             code = None
@@ -100,25 +110,25 @@ class HTTPClient(gobject.GObject, log.Loggable):
 
             if code == 111:
                 self.warning("%4d: connection refused" % self._id)
-                self.emit('stopped', self.STOPPED_REFUSED)
+                self.emit('stopped', client.STOPPED_REFUSED)
                 return
             else:
                 self.warning("%4d: unhandled URLError with code %d" % (self._id, code))
-                self.emit('stopped', self.STOPPED_ERROR)
+                self.emit('stopped', client.STOPPED_CONNECT_ERROR)
                 return
         except socket.error, (code, msg):
             if code == 104:
                 # Connection reset by peer
                 self.warning("%4d: %s" % (self._id, msg))
-                self.emit('stopped', self.STOPPED_ERROR)
+                self.emit('stopped', client.STOPPED_CONNECT_ERROR)
                 return
             else:
                 self.warning("%4d: unhandled socket.error with code %d" % (self._id, code))
-                self.emit('stopped', self.stopped_ERROR)
+                self.emit('stopped', self.stopped_CONNECT_ERROR)
                 return
         if not self._fd:
            self.warning("%4d: didn't get fd from urlopen" % self._id)
-           self.emit('stopped', self.stopped_ERROR)
+           self.emit('stopped', self.stopped_CONNECT_ERROR)
            return
               
         delta = self.next_read_time() - self._start_time
@@ -134,7 +144,8 @@ class HTTPClient(gobject.GObject, log.Loggable):
             sys.exit(1)
 
         if len(data) == 0:
-            self.warning("WOAH, zero bytes read")
+            self.warning("zero bytes readm closing")
+            self.close(client.STOPPED_READ_ERROR)
         #print "%4d: %d bytes read" % (self._id, len(data))
         self._bytes += len(data)
         #if not self.verify(data):
@@ -146,12 +157,14 @@ class HTTPClient(gobject.GObject, log.Loggable):
         if self._stop_time:
             if now - self._start_time > self._stop_time:
                 self.warning("%4d: stop time reached, closing" % self._id)
-                self.close(self.STOPPED_SUCCESS)
+                self._fd.close()
+                self.close(client.STOPPED_SUCCESS)
                 return False
         if self._stop_size:
             if self._bytes > self._stop_size:
                 self.info("%4d: stop size reached, closing" % self._id)
-                self.close(self.STOPPED_SUCCESS)
+                self._fd.close()
+                self.close(client.STOPPED_SUCCESS)
                 return False
 
         # schedule next read

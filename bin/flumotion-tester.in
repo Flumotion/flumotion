@@ -35,7 +35,7 @@ if gobject.pygtk_version < (2,3,96):
 gobject.threads_init()
 
 from flumotion.utils import log
-from flumotion.tester import client
+from flumotion.tester import clientfactory
 
 # This can't be removed, 
 dir = os.path.dirname(os.path.abspath(__file__))
@@ -55,7 +55,7 @@ def main(args):
         print "please give a URL to test"
         sys.exit(1)
 
-    factory = client.ClientFactory(loop, url, 200)
+    factory = clientfactory.ClientFactory(loop, url, 1000)
     gobject.idle_add(factory.run)
 
     log.log("going into main loop")
