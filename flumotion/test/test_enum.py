@@ -1,7 +1,7 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_enum -*-
+# -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/common/launcher.py: launch grids
+# flumotion/test/test_enum.py: enum tests
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -19,7 +19,7 @@ from twisted.trial import unittest
 
 from flumotion.wizard import enums
 
-class EnumTest(unittest.TestCase):
+class TestEnum(unittest.TestCase):
     def testEnumSimple(self):
         enum = enums.EnumClass('TestEnum')
         assert enum.__name__ == 'TestEnum'
@@ -93,3 +93,18 @@ class EnumTest(unittest.TestCase):
         assert BarType.Bar != FooType.Foobie
         assert BarType.Barrie != FooType.Foo
         assert BarType.Barrie != FooType.Foobie
+
+    def testEnumError(self):
+        self.assertRaises(TypeError, enums.EnumClass, 'Foo',
+                          ('a', 'b'), ('c',))
+        self.assertRaises(TypeError, enums.EnumClass, 'Bar',
+                          ('a',), ('b', 'c'))
+
+    def testEnumSet(self):
+        FooType = enums.EnumClass('FooType', ('Foo', 'Bar'))
+        FooType.set(0, FooType(3, 'Baz'))
+
+    def testRepr(self):
+        a = enums.EnumClass('FooType', ('Foo', 'Bar'))
+        assert repr(a.Foo)
+        assert isinstance(repr(a.Foo), str)
