@@ -204,6 +204,10 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.debug('_runComponent(): defs is: %r' % defs)
 
         comp = None
+
+        # FIXME: we put avatarId in the config for now
+        # but it'd be nicer to do this outside of config, so do this
+        config['avatarId'] = avatarId
         try:
             comp = getComponent(config, defs)
         except Exception, e:

@@ -34,6 +34,7 @@ from flumotion.common.registry import registry
 
 # make ComponentState proxyable
 from flumotion.twisted import flavors
+from flumotion.common import componentui
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?
 class AdminAvatar(base.ManagerAvatar):

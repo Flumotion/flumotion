@@ -178,6 +178,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self._fdToDurationCall = {} # request fd -> IDelayedCall for duration
         self._domain = None         # used for auth challenge and on keycard
         self.bouncerName = None
+        self.requesterName = streamer.getName() # avatarId of streamer component
         
         self.maxclients = -1
         
@@ -255,6 +256,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     def setBouncerName(self, bouncerName):
         self.bouncerName = bouncerName
+
+    def setRequesterName(self, requesterName):
+        self.requesterName = requesterName
 
     # FIXME: rename to writeHeaders
     """
@@ -338,7 +342,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         keycard = keycards.KeycardUACPP(
             request.getUser(),
             request.getPassword(), request.getClientIP())
-        keycard.requesterName = self.streamer.getName()
+        keycard.requesterName = self.requesterName
         keycard._fd = request.transport.fileno()
         
         if self.bouncerName == None:

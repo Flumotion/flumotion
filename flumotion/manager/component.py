@@ -728,13 +728,13 @@ class ComponentAvatar(base.ManagerAvatar):
         This is called by the bouncer component that authenticated the keycard.
         """
         # FIXME: we should also be able to expire manager bouncer keycards
-        if not self.heaven.hasComponent(requesterName):
+        if not self.heaven.hasAvatar(requesterName):
             self.warning('asked to expire keycard %s for requester %s, ' % (
                 keycardId, requesterName) +
                 'but no such component registered')
             raise errors.UnknownComponentError(requesterName)
 
-        componentAvatar = self.heaven.getComponent(requesterName)
+        componentAvatar = self.heaven.getAvatar(requesterName)
         return componentAvatar.expireKeycard(keycardId)
 
 class ComponentHeaven(base.ManagerHeaven):

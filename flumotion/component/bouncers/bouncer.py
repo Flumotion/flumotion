@@ -22,7 +22,10 @@ from twisted.python import components
 from twisted.cred import credentials
 
 from flumotion.common import interfaces, keycards
+from flumotion.common.componentui import WorkerComponentUIState
+
 from flumotion.component import component
+from flumotion.twisted import flavors
 
 __all__ = ['Bouncer']
 
@@ -37,14 +40,28 @@ class BouncerMedium(component.BaseComponentMedium):
         try:
             self.comp.removeKeycardId(keycardId)
         # FIXME: at least have an exception name please
-        except:
+        except KeyError:
             self.warning('Could not remove keycard id %s' % keycardId)
 
+    def remote_expireKeycardId(self, keycardId):
+        """
+        Called by bouncer views to expire keycards.
+        """
+        return self.comp.expireKeycardId(keycardId)
+
+       
     ### FIXME: having these methods means we need to properly separate
     # more component-related stuff
     def remote_link(self, eatersData, feadersData):
         self.warning("FIXME: remote_link should only be called for feedComponent")
         return []
+
+    # FIXME: use a method to get the keycards
+    def remote_getBouncerState(self):
+        self.debug('returning bouncer state %r with %d keycards' % (
+            self.comp._bouncerState,
+            len(self.comp._bouncerState.get('keycards'))))
+        return self.comp._bouncerState
 
 class Bouncer(component.BaseComponent):
     keycardClasses = ()
@@ -56,6 +73,9 @@ class Bouncer(component.BaseComponent):
         component.BaseComponent.__init__(self, name)
         self._idCounter = 0
         self._keycards = {} # keycard id -> Keycard
+        self._keycardDatas = {} # keycard id -> data in bouncerState
+        self._bouncerState = WorkerComponentUIState()
+        self._bouncerState.addListKey('keycards')
         
     def setDomain(self, name):
         self.domain = name
@@ -87,26 +107,53 @@ class Bouncer(component.BaseComponent):
         if self._keycards.has_key(keycard.id):
             # already in there
             return
-        id = self._idCounter
-        self._idCounter += 1
+            
         # FIXME: what if it already had one ?
         # FIXME: deal with wraparound ?
-        keycard.id = "%016x" % id
-        self._keycards[keycard.id] = keycard
-        self.log("added keycard with id %s" % keycard.id)
+        id = "%016x" % self._idCounter
+        self._idCounter += 1
+
+        keycard.id = id
+        self._keycards[id] = keycard
+        data = keycard.getData()
+        self._keycardDatas[id] = data
+
+        self._bouncerState.append('keycards', data)
+        self.debug("added keycard with id %s" % keycard.id)
 
     def removeKeycard(self, keycard):
         id = keycard.id
         if not self._keycards.has_key(id):
-            raise
+            raise KeyError
+
         del self._keycards[id]
-        self.log("removed keycard with id %s" % id)
+
+        data = self._keycardDatas[id]
+        self._bouncerState.remove('keycards', data)
+        del self._keycardDatas[id]
+        self.debug("removed keycard with id %s" % id)
 
     def removeKeycardId(self, id):
+        self.debug("removing keycard with id %s" % id)
         if not self._keycards.has_key(id):
-            raise
-        del self._keycards[id]
-        self.log("removed keycard with id %s" % id)
+            raise KeyError
 
+        keycard = self._keycards[id]
+        self.removeKeycard(keycard)
+
+    def expireKeycardId(self, id):
+        self.debug("expiring keycard with id %r" % id)
+        if not self._keycards.has_key(id):
+            raise KeyError
+
+        keycard = self._keycards[id]
+
+        d = self.medium.callRemote(
+            'expireKeycard', keycard.requesterName, keycard.id)
+        # we don't need to remove the keycard ourselves, since that's done
+        # by the requester when the client is definately gone
+
+        return d
+ 
 def createComponent(config):
     return Bouncer(config['name'])

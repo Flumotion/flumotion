@@ -1,5 +1,31 @@
 2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/bouncers/bouncer.py:
+	  implement remote_expireKeycardId for the admin ui to use
+	  do some refactoring
+	* flumotion/component/bouncers/bouncer.glade:
+	* flumotion/component/bouncers/admin_gtk.py:
+	  add a UI to bouncers allowing you to expire keycards
+	* flumotion/component/bouncers/htpasswdcrypt.xml:
+	  add admin GTK view
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  allow setting the requesterName and use it
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  set the avatarId as the requesterName;
+	  avatarId is passed through config dict, which needs fixing
+	* flumotion/worker/job.py:
+	  shoehorn the avatarId in the config dict when doing getComponent
+	  as a temporary measure for getting the requesters' full avatarId
+	  on the keycard
+	* flumotion/manager/admin.py:
+	  make componentuistates proxyable
+	* flumotion/manager/component.py:
+	  *Component -> *Avatar
+
+	  This commit fixes #186.
+
+2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/Makefile.am:
 	* flumotion/common/componentui.py:
 	  added objects for serializing ui state from component to view in admin

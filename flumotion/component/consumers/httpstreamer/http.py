@@ -406,4 +406,7 @@ def createComponent(config):
     if config.has_key('domain'):
         component.resource.setDomain(config['domain'])
 
+    # FIXME: get avatarId out of config, and have it as a real constructor arg
+    if config.has_key('avatarId'):
+        component.resource.setRequesterName(config['avatarId'])
     return component
