@@ -140,7 +140,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.info("rebuilding '%s'" % name)
         rebuild.rebuild(sys.modules[name])
 
-        d = defer.execute(reload)
+        d = defer.execute(reload.reload)
 
         d = d.addCallback(lambda result, self: self.reloadManager(), self)
         d.addErrback(self._defaultErrback)
