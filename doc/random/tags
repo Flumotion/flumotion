@@ -1,0 +1,5 @@
+LIST OF SOURCE CODE COMMENT TAGS
+--------------------------------
+
+T1.3: Twisted 1.3 backwards compatibility stuff;
+      remove/rework when 1.3 gets dropped
