@@ -10,3 +10,8 @@ config.status
 flumotion.spec
 install-sh
 missing
+depcomp
+config.guess
+config.sub
+libtool
+ltmain.sh
