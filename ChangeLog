@@ -1,5 +1,13 @@
 2005-01-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/parts.py:
+	  extract UI parts from the main file
+
+2005-01-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  fix errors
 

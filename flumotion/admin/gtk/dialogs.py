@@ -67,18 +67,6 @@ class ErrorDialog(gtk.MessageDialog):
         if close_on_response:
             self.connect("response", lambda self, response: self.hide())
 
-def show_error_dialog(message, parent, close_on_response=True):
-    """
-    Show an error message dialog.
-
-    @param message the message to display.
-    @param parent the gtk.Window parent window.
-    @param close_on_response whether the error dialog should go away after response.
-
-    returns: the error dialog.
-    """
-    return ErrorDialog(message, parent, close_on_response)
-
 class PropertyChangeDialog(gtk.Dialog):
     """
     I am a dialog to get and set GStreamer element properties on a component.

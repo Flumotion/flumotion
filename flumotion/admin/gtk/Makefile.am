@@ -5,6 +5,7 @@ component_PYTHON = \
 	__init__.py \
 	client.py \
 	dialogs.py \
+	parts.py \
 	main.py
 
 clean-local:

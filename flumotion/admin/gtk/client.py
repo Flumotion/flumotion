@@ -30,90 +30,12 @@ import gtk.glade
 from twisted.internet import reactor
 
 from flumotion.admin.admin import AdminModel
-from flumotion.admin.gtk import dialogs
+from flumotion.admin.gtk import dialogs, parts
 from flumotion.configure import configure
 from flumotion.common import errors, log, worker, component
 from flumotion.common.component import moods
 from flumotion.manager import admin # Register types
 from flumotion.utils.gstutils import gsignal
-
-COL_MOOD      = 0
-COL_COMPONENT = 1
-COL_WORKER    = 2
-COL_PID       = 3
-COL_STATE     = 4
-
-class AdminStatusbar:
-    """
-    I implement the status bar used in the admin UI.
-    """
-    def __init__(self, widget):
-        """
-        @param widget: a gtk.Statusbar to wrap.
-        """
-        self._widget = widget
-        
-        self._cids = {} # hash of context -> context id
-        self._mids = {} # hash of context -> message id lists
-        self._contexts = ['main', 'notebook']
-
-        for context in self._contexts:
-            self._cids[context] = widget.get_context_id(context)
-            self._mids[context] = []
-
-    def clear(self, context=None):
-        """
-        Clear the status bar for the given context, or for all contexts
-        if none specified.
-        """
-        if context:
-            self._clear_context(context)
-            return
-
-        for context in self._contexts:
-            self._clear_context(context)
-
-    def push(self, context, message):
-        """
-        Push the given message for the given context.
-
-        @returns: message id
-        """
-        mid = self._widget.push(self._cids[context], message)
-        self._mids[context].append(mid)
-        return mid
-
-    def pop(self, context):
-        """
-        Pop the last message for the given context.
-        """
-        if len(self._mids[context]):
-            mid = self._mids[context].pop()
-            self._widget.remove(self._cids[context], mid)
-
-    def set(self, context, message):
-        """
-        Replace the current top message for this context with this new one.
-        """
-        self.pop(context)
-        self.push(context, message)
-
-    def remove(self, context, mid):
-        """
-        Remove the message with the given id from the given context.
-        """
-        if not mid in self._mids[context]:
-            return
-
-        self._mids[context].remove(mid)
-        self._widget.remove(self._cids[context], mid)
-
-    def _clear_context(self, context):
-        if not context in self._cids.keys():
-            return
-
-        for mid in self._mids[context]:
-            self._widget.remove(self._cids[context], mid)
 
 class Window(log.Loggable, gobject.GObject):
     '''
@@ -130,11 +52,10 @@ class Window(log.Loggable, gobject.GObject):
         self.admin = None
         self._connectToManager(host, port, transport, username, password)
 
-        self.create_ui()
+        self._create_ui()
         self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
                                             # disconnected
-        self._iters = {} # componentState -> model iter
 
     ### connection to manager, called from constructor
     def _connectToManager(self, host, port, transport, username, password):
@@ -172,15 +93,8 @@ class Window(log.Loggable, gobject.GObject):
             failure.getErrorMessage())
         return failure
 
-    # UI helper functions
-    def show_error_dialog(self, message, parent=None, close_on_response=True):
-        if not parent:
-            parent = self.window
-        d = dialogs.ErrorDialog(message, parent, close_on_response)
-        d.show_all()
-        return d
-
-    def create_ui(self):
+    def _create_ui(self):
+        # called from __init__
         wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
         self.window = wtree.get_widget('main_window')
         iconfile = os.path.join(configure.imagedir, 'fluendo.png')
@@ -197,56 +111,22 @@ class Window(log.Loggable, gobject.GObject):
         #image.show()
  
         self.window.connect('delete-event', self.close)
-        
-        self.component_model = gtk.ListStore(gdk.Pixbuf, str, str, int, object)
-        self.component_view = wtree.get_widget('component_view')
-        self.component_view.connect('cursor-changed',
-                                    self.component_view_cursor_changed_cb)
-        self.component_view.set_model(self.component_model)
-        self.component_view.set_headers_visible(True)
 
-        col = gtk.TreeViewColumn('Mood', gtk.CellRendererPixbuf(),
-                                 pixbuf=COL_MOOD)
-        self.component_view.append_column(col)
-
-        col = gtk.TreeViewColumn('Component', gtk.CellRendererText(),
-                                 text=COL_COMPONENT)
-        self.component_view.append_column(col)
-
-        col = gtk.TreeViewColumn('Worker', gtk.CellRendererText(),
-                                 text=COL_WORKER)
-        self.component_view.append_column(col)
-        
-        col = gtk.TreeViewColumn('PID', gtk.CellRendererText(),
-                                 text=COL_PID)
-
-        self.component_view.append_column(col)
         wtree.signal_autoconnect(self)
 
-        self.statusbar = AdminStatusbar(wtree.get_widget('statusbar'))
+        self.components = parts.ComponentsView(
+            wtree.get_widget('component_view'))
+        self.components.connect('selected', self._components_view_selected_cb)
+        self.statusbar = parts.AdminStatusbar(wtree.get_widget('statusbar'))
 
-        self._moodPixbufs = self._getMoodPixbufs()
 
-    # load all pixbufs for the moods
-    def _getMoodPixbufs(self):
-        pixbufs = {}
-        for i in range(0, len(moods)):
-            name = moods.get(i).name
-            pixbufs[i] = gtk.gdk.pixbuf_new_from_file(os.path.join(
-                configure.imagedir, 'mood-%s.png' % name))
-
-        return pixbufs
-
-    def get_selected_component_name(self):
-        selection = self.component_view.get_selection()
-        sel = selection.get_selected()
-        if not sel:
-            return
-        model, iter = sel
-        if not iter:
-            return
-        
-        return model.get(iter, COL_COMPONENT)[0]
+    # UI helper functions
+    def show_error_dialog(self, message, parent=None, close_on_response=True):
+        if not parent:
+            parent = self.window
+        d = dialogs.ErrorDialog(message, parent, close_on_response)
+        d.show_all()
+        return d
 
     # FIXME: this method uses a file and a methodname as entries
     # FIXME: do we want to switch to imports instead so the whole file
@@ -390,7 +270,7 @@ class Window(log.Loggable, gobject.GObject):
         # to be processed, since they're here now anyway   
         self.debug("componentCall received for %s.%s ..." % (
             componentName, methodName))
-        name = self.get_selected_component_name()
+        name = self.component_view.get_selected_name()
         if not name:
             self.debug("... but no component selected")
             return
@@ -420,14 +300,11 @@ class Window(log.Loggable, gobject.GObject):
 
     def stateSet(self, state, key, value):
         # called by model when state of something changes
-        # look up the iter based on the state
         if not isinstance(state, component.AdminComponentState):
             return
 
-        iter = self._iters[state]
-        model = self.component_model
         if key == 'mood':
-            model.set(iter, COL_MOOD, self._moodPixbufs[value])
+            self.components.set_mood_value(state, value)
         if key == 'message':
             self.statusbar.set('main', value)
 
@@ -489,7 +366,7 @@ class Window(log.Loggable, gobject.GObject):
 
     def admin_ui_state_changed_cb(self, admin, name, state):
         # called when the admin UI for that component has changed
-        current = self.get_selected_component_name()
+        current = self.component_view.get_selected_name()
         if current != name:
             return
 
@@ -500,7 +377,7 @@ class Window(log.Loggable, gobject.GObject):
     # FIXME: deprecated
     def property_changed_cb(self, admin, componentName, propertyName, value):
         # called when a property for that component has changed
-        current = self.get_selected_component_name()
+        current = self.component_view.get_selected_name()
         if current != componentName:
             return
 
@@ -512,33 +389,11 @@ class Window(log.Loggable, gobject.GObject):
         self.update_components()
 
     def update_components(self):
-        model = self.component_model
-        model.clear()
-        self._iters = {}
-
-        # get a dictionary of components
         components = self.admin.get_components()
-        names = components.keys()
-        names.sort()
-
-        # FIXME: this part should have abstractions so you can get state
-        # of components from admin instead of directly
-        for name in names:
-            component = components[name]
-            iter = model.append()
-            self._iters[component] = iter
-            mood = component.get('mood')
-            model.set(iter, COL_MOOD, self._moodPixbufs[mood])
-            model.set(iter, COL_COMPONENT, component.get('name'))
-            model.set(iter, COL_WORKER, component.get('workerName'))
-            model.set(iter, COL_PID, component.get('pid'))
-            model.set(iter, COL_STATE, component)
+        self.components.update(components)
 
     ### ui callbacks
-    def component_view_cursor_changed_cb(self, *args):
-        # name needs to exist before being used in the child functions
-        name = self.get_selected_component_name()
-
+    def _components_view_selected_cb(self, name):
         if not name:
             self.warning('Select a component')
             return
@@ -675,7 +530,7 @@ class Window(log.Loggable, gobject.GObject):
         deferred = self.admin.reloadManager()
 
     def debug_reload_component_cb(self, button):
-        name = self.get_selected_component_name()
+        name = self.component_view.get_selected_name()
         if name:
             deferred = self.admin.reloadComponent(name)
 
@@ -707,7 +562,7 @@ class Window(log.Loggable, gobject.GObject):
         reactor.callLater(0.2, _callLater, self.admin, dialog)
  
     def debug_modify_cb(self, button):
-        name = self.get_selected_component_name()
+        name = self.component_view.get_selected_name()
         if not name:
             self.warning('Select a component')
             return
