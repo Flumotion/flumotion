@@ -87,6 +87,7 @@ class Launcher:
                 
         self.restore_uid()
         factory = controller.ControllerServerFactory()
+        log.debug('controller', 'listening on TCP port %d' % self.controller_port)
         reactor.listenTCP(self.controller_port, factory)
         f = Factory()
         f.protocol = MiniProtocol

@@ -106,6 +106,10 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
 gobject.type_register(AdminInterface)
 
 class Window:
+    '''
+    Creates the GtkWindow for the user interface.
+    Also connects to the controller on the given host and port.
+    '''
     def __init__(self, gladedir, host, port):
         self.gladedir = gladedir
         self.connect(host, port)
@@ -231,6 +235,7 @@ class Window:
             model.set(iter, 3, client.options['ip'])
 
     def connect(self, host, port):
+        'connect to controller on given host and port.  Called by __init__'
         self.admin = AdminInterface()
         self.admin.connect('connected', self.connected_cb)
         self.admin.connect('update', self.update_cb)

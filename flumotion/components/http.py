@@ -173,6 +173,7 @@ class HTTPStreamingResource(resource.Resource):
             
         streamer.connect('client-removed', self.streamer_client_removed_cb)
         self.debug = streamer.debug
+        self.info = streamer.info
         self.streamer = streamer
         self.admin = HTTPStreamingAdminResource(self)
 
@@ -329,7 +330,7 @@ class HTTPStreamingResource(resource.Resource):
         self.updateAverage()
         ip = request.getClientIP()
         self.log(fd, ip, request)
-        self.debug('(%d) client from %s disconnected' % (fd, ip))
+        self.info('client from %s on fd %d disconnected' % (ip, fd))
         del self.request_hash[fd]
 
     def handleNotReady(self, request):
@@ -368,6 +369,7 @@ class HTTPStreamingResource(resource.Resource):
         self.addClient(request)
         fd = request.transport.fileno()
         self.streamer.add_client(fd)
+        self.info('client from %s on fd %d accepted' % (request.getClientIP(), fd))
         return server.NOT_DONE_YET
         
     def render(self, request):

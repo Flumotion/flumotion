@@ -447,14 +447,14 @@ class Controller(pb.Root):
         self.componentStart(component)
         
     def componentRegistered(self, component):
-        component.debug('in componentRegistered')
+        component.debug('registering component')
         if self.admin:
             self.admin.componentAdded(component)
         self.feed_manager.addFeeds(component)
 
         sources = component.getSources()
         if not sources:
-            component.debug('no sources, starting immediatelly')
+            component.debug('component has no sources, starting')
             self.componentStart(component)
             return
         else:
@@ -487,6 +487,5 @@ class ControllerServerFactory(pb.PBServerFactory):
         self.portal = portal.Portal(self.dispatcher, [checker])
         pb.PBServerFactory.__init__(self, self.portal)
 
-    
     def __repr__(self):
         return '<ControllerServerFactory>'
