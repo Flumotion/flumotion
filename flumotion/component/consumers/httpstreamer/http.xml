@@ -17,6 +17,13 @@
         <file source="gtk.py">
         <file source="http.glade">
       </ui>
+
+      <bundle name="http-streamer-admin-gtk">
+        <directory name=flumotion/components/consumers/httpstreamer">
+          <filename location="http.glade" />
+          <filename location="gtk.py" />
+        </directory>
+      </bundle>
   -->
     </component>
   </components>
