@@ -134,7 +134,7 @@ def main(args):
         return 0
 
     if options.verbose:
-        log.setFluDebug("*:4")
+        log.setFluDebug("*:3")
 
     if not options.port:
         if options.transport == "tcp":
