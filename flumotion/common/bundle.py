@@ -286,17 +286,22 @@ class BundlerBasket:
         """
         Return the bundle by name, or None if not found.
         """
-        return self._bundlers.get(bundlerName, None)
+        if self._bundlers.has_key(bundlerName):
+            return self._bundlers[bundlerName]
+        return None
 
     def getBundlerByImport(self, importString):
         """
         Return the bundle by import statement, or None if not found.
         """
-        return self._imports.get(importString, None)
+        if self._imports.has_key(importString):
+            return self._imports[importString]
+        return None
 
     def getBundlerByFile(self, filename):
         """
         Return the bundle by filename, or None if not found.
         """
-        return self._files.get(filename, None)
-
+        if self._files.has_key(filename):
+            return self._files[filename]
+        return None

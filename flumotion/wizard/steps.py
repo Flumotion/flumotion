@@ -932,7 +932,7 @@ class Consumption(wizard.WizardStep):
                 if self.checkbutton_disk_audio:
                     items.append('Disk (audio only)')
                 if self.checkbutton_disk_video:
-                    items.append('Dsk (video only)')
+                    items.append('Disk (video only)')
         elif has_video and not has_audio:
             if self.checkbutton_http:
                 items.append('HTTP Streamer (video only)')

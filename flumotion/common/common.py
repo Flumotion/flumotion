@@ -181,35 +181,18 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     os.dup2(so.fileno(), sys.stdout.fileno())
     os.dup2(se.fileno(), sys.stderr.fileno())
 
-def argRepr(args=(), kwargs={}, max=0):
-    """
-    I take a list of arguments and/or a dictionary and converts
-    it to something that reassemble python code calling a function
-
-    @param args:   normal arguments
-    @type  args:   tuple or list
-    @param kwargs: keyword arguments
-    @type  kwargs: dict
-    @param max:    maximum number of characters 0 if unlimited
-    """
-
-    if not (type(args) is tuple or
-            type(args) is list):
-        raise TypeError("args must be a list or a tuple")
-    elif not type(kwargs) is dict:
-        raise TypeError("kwargs must be a dict")
+def argRepr(args=(), kwargs={}, max=-1):
+    ### FIXME: Johan, please comment functions, this is meaningless
+    assert (type(args) is tuple or
+            type(args) is list)
+    assert type(kwargs) is dict
     
     args = list(args)
 
     s = ''
     if args:
-        parts = []
-        for arg in args:
-            if max and len(arg) > max:
-                parts.append('..%s..' % arg[2:max-2])
-            else:
-                parts.append(str(arg))
-        s += ', '.join(parts)
+        args = map(repr, args)
+        s += ', '.join(args)
     
     if kwargs:
         

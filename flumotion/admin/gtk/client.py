@@ -97,99 +97,6 @@ class PropertyChangeDialog(gtk.Dialog):
     
 gobject.type_register(PropertyChangeDialog)
 
-admin_ui = """
-<ui>
-  <menubar name="AdminMenubar">
-    <menu name="FileMenu" action="FileAction">
-      <menuitem name="New" action="NewAction"/>
-      <menuitem name="Open" action="OpenAction"/>
-      <separator name="sep1"/>
-      <menuitem name="Quit" action="QuitAction"/>
-    </menu>
-    <menu name="DebugMenu" action="DebugAction">
-      <menuitem name="ReloadComponent" action="ReloadComponentAction"/>
-      <menuitem name="ReloadController" action="ReloadControllerAction"/>
-      <menuitem name="ReloadAll" action="ReloadAllAction"/>
-      <menuitem name="ModifyProperty" action="ModifyPropertyAction"/>
-    </menu>
-    <menu name="HelpMenu" action="HelpAction">
-      <menuitem name="About" action="AboutAction"/>
-    </menu>
-  </menubar>
-  <toolbar name="AdminToolbar">
-    <toolitem name="Open" action="OpenAction"/>
-    <toolitem name="Save" action="SaveAction"/>
-    <separator name="sep2"/>
-    <toolitem name="Clean" action="CleanAction"/>
-    <separator name="sep3"/>
-    <toolitem name="Quit" action="QuitAction"/>
-  </toolbar>
-</ui>
-"""
-
-window_actions = [
-    # File
-    ('FileAction',        None,               '_File'),
-    ('NewAction',         gtk.STOCK_NEW,      'New',
-     '<control>N',        'Create a new file',
-     'file_new_cb'),
-    ('OpenAction',        gtk.STOCK_OPEN,     'Open...',
-     '<control>O',        'Open a stored configuration',
-     'file_open_cb'),
-    ('SaveAction',        gtk.STOCK_SAVE,     'Save...',
-     '<control>S',        'Save the currently running',
-     'file_save_cb'),
-    ('QuitAction',        gtk.STOCK_QUIT,     'Quit',
-     '<control>Q',        'Quit the administration tool',
-     'file_quit_cb'),
-    # Debug
-    ('DebugAction',       None,               '_Debug'),
-    ('ReloadComponentAction', None,           'Reload component',
-     None,               'Reload component',
-     'debug_reload_component_cb'),
-    ('ReloadControllerAction', None,           'Reload controller',
-     None,               'Reload controller',
-     'debug_reload_manager_cb'),
-    ('ReloadAllAction',   None,                'Reload all',
-     None,               'Reload all',
-     'debug_reload_all_cb'),
-    ('ModifyPropertyAction', None,             'Modify element property',
-     None,               'Modify element property',
-     'debug_modify_cb'),
-
-    # Help
-    ('HelpAction',        None,               '_Help'),
-    ('AboutAction',       None,               '_About',
-     None,                'About application',
-     'help_about_cb'),
-
-    # Toolbar
-    ('CleanAction',       gtk.STOCK_CLEAR,     'Clean',
-     None,              'Stop and remove all components',
-     'action_clean_cb'),
-]
-
-def callback_stub(action):
-    name = action.get_name()
-    raise NotImplementedError, name
-
-def fix_actions(actions, instance):
-    retval = []
-    
-    for i in range(len(actions)):
-        curr = actions[i]
-        if len(curr) > 5:
-            curr = list(curr)
-            name = curr[5]
-            func = getattr(instance, name, None)
-            if not func:
-                func = callback_stub
-            curr[5] = func
-            curr = tuple(curr)
-            
-        retval.append(curr)
-    return retval
-
 class Window(log.Loggable, gobject.GObject):
     '''
     Creates the GtkWindow for the user interface.
@@ -216,7 +123,6 @@ class Window(log.Loggable, gobject.GObject):
     def create_ui(self):
         wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
         self.window = wtree.get_widget('main_window')
-        vbox = wtree.get_widget('vbox1')
         iconfile = os.path.join(configure.imagedir, 'fluendo.png')
         gtk.window_set_default_icon_from_file(iconfile)
         self.window.set_icon_from_file(iconfile)
@@ -245,20 +151,6 @@ class Window(log.Loggable, gobject.GObject):
                                                     gtk.ICON_SIZE_MENU)
         self.icon_stopped = self.window.render_icon(gtk.STOCK_NO,
                                                     gtk.ICON_SIZE_MENU)
-
-        self.window_group = gtk.ActionGroup('WindowActions')
-        self.window_group.add_actions(fix_actions(window_actions, self))
-        self.ui = gtk.UIManager()
-        self.ui.insert_action_group(self.window_group, 0)
-        self.ui.add_ui_from_string(admin_ui)
-        self.window.add_accel_group(self.ui.get_accel_group())
-        
-        menubar = self.ui.get_widget('/AdminMenubar')
-        vbox.pack_start(menubar, expand=False)
-        menubar.show()
-        toolbar = self.ui.get_widget('/AdminToolbar')
-        vbox.pack_start(toolbar, expand=False)
-        vbox.show()
 
     def get_selected_component_name(self):
         selection = self.component_view.get_selection()
@@ -475,8 +367,7 @@ class Window(log.Loggable, gobject.GObject):
             self._logConfig(configuration)
             self.admin.loadConfiguration(configuration)
             self.show()
-            wizard.printOut()
-            
+
         workers = self.admin.getWorkers()
         if not workers:
             self.error_dialog('Need at least one worker connected to run the wizard')
@@ -650,7 +541,7 @@ class Window(log.Loggable, gobject.GObject):
     on_tool_save_clicked = file_save_cb
     on_tool_quit_clicked = file_quit_cb
 
-    def action_clean_cb(self, button):
+    def on_tool_clean_clicked(self, button):
         self.admin.cleanComponents()
         
     def show(self):

@@ -26,7 +26,5 @@ def setup():
     
     from flumotion.common.registry import registry
     registry.verify()
-
-    from flumotion.twisted import patches
-    patches.install()
+    
         

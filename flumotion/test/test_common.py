@@ -134,7 +134,7 @@ class TestArgRepr(unittest.TestCase):
         self.assertEqual(common.argRepr(), '')
         
     def testArg(self):
-        self.assertEqual(common.argRepr((1, '2')), "1, 2")
+        self.assertEqual(common.argRepr((1, '2')), "1, '2'")
         self.assertEqual(common.argRepr(((None,))), "None")
 
     def testKwargs(self):
