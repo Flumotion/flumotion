@@ -34,51 +34,31 @@ from twisted.internet import reactor
 from twisted.python import log
 
 import component
+import errors
 
 class Streamer(gobject.GObject, component.BaseComponent):
     __gsignals__ = {
         'data-recieved': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
                           (gst.Buffer,)),
     }
-    name = 'streamer'
-    def __init__(self, name, sources, host, port):
+
+    kind = 'streamer'
+    def __init__(self, name, sources):
         self.__gobject_init__()
-        component.BaseComponent.__init__(self, name, sources, host, port)
+        component.BaseComponent.__init__(self, name, sources)
 
-    def get_pipeline(self, pipeline):
-        if len(self.sources) == 1:
-            return 'tcpclientsrc name=%s ! fakesink signal-handoffs=1 silent=1 name=sink' % self.sources[0]
-
-        pipeline = ''
-        for source in sources:
-            if ' ' in source:
-                raise TypeError, "spaces not allowed in sources"
-
-            source_name = '@%s' % source
-            if pipeline.find(source_name) == -1:
-                raise TypeError, "%s needs to be specified in the pipeline" % source_name
-            
-            pipeline = pipeline.replace(source_name, 'tcpclientsrc name=%s' % source)
-
-        return pipeline
-        
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-recieved', buffer)
-        
-    def connect_to(self, sources):
-        for name, host, port in sources:
-            log.msg('Going to connect to %s:%d' % (host, port))
-            source = self.pipeline.get_by_name(name)
-            source.set_property('host', host)
-            source.set_property('port', port)
 
-        sink = self.pipeline.get_by_name('sink')
+    # connect() is already taken by gobject.GObject
+    def connect_to(self, sources):
+        self.setup_sources(sources)
+        sink = self.get_sink()
         sink.connect('handoff', self.sink_handoff_cb)
         
         self.pipeline_play()
-     
-    def remote_connect(self, sources):
-        self.connect_to(sources)
+
+    remote_connect = connect_to
         
 gobject.type_register(Streamer)
 
@@ -124,15 +104,19 @@ class StreamingResource(resource.Resource):
     
 def main(args):
     options = component.get_options_for('streamer', args)
-    comp = Streamer(options.name, options.sources,
-                    options.host, options.port)
+    try:
+        client = Streamer(options.name, options.sources)
+    except errors.PipelineParseError, e:
+        print 'Bad pipeline: %s' % e
+        raise SystemExit
     
     if options.protocol == 'http':
-        factory = server.Site(resource=StreamingResource(comp))
+        web_factory = server.Site(resource=StreamingResource(client))
     else:
         print 'Only http protcol supported right now'
 
-    reactor.listenTCP(options.listen_port, factory)
+    reactor.connectTCP(options.host, options.port, client.factory)
+    reactor.listenTCP(options.listen_port, web_factory)
     reactor.run()
 
 if __name__ == '__main__':

@@ -31,6 +31,7 @@ from twisted.spread import pb
 
 import pbutil
 import gstutils
+import errors
 
 class ClientFactory(pbutil.ReconnectingPBClientFactory):
     __super_init = pbutil.ReconnectingPBClientFactory.__init__
@@ -47,36 +48,67 @@ class ClientFactory(pbutil.ReconnectingPBClientFactory):
         self.component.remote = perspective
         
 class BaseComponent(pb.Referenceable):
-    def __init__(self, name, sources, host, port, pipeline_string=''):
+    def __init__(self, name, sources, pipeline_string=''):
         self.component_name = name
         self.sources = sources
-        self.host = host
-        self.port = port
         self.remote = None
         self.pipeline = None
         self.pipeline_signals = []
         self.pipeline_string = self.get_pipeline(pipeline_string)
-        print 'pipeline: %s' % self.pipeline_string
 
-        username = '%s_%s' % (self.getName(), name)
-        factory = ClientFactory(self)
-        reactor.connectTCP(host, port, factory)
-        
         # Prefix our login name with the name of the component
-        factory.login(username)
+        self.username = '%s_%s' % (self.getKind(), name)
+        self.factory = ClientFactory(self)
+        self.factory.login(self.username)
+
+        self.setup_pipeline()
         
+    def get_pipeline(self, pipeline):
+        sources = self.getSources()
+        if pipeline == '' and not sources:
+            raise TypeError, "Need a pipeline or a source"
+
+        need_sink = True
+        if pipeline == '':
+            assert sources
+            pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
+            need_sink = False
+            
+        assert pipeline != ''
+        if len(sources) == 1:
+            pipeline = 'tcpclientsrc name=%s ! %s' % (sources[0], pipeline)
+        else:
+            for source in sources:
+                if ' ' in source:
+                    raise TypeError, "spaces not allowed in sources"
+            
+                source_name = '@%s' % source
+                if pipeline.find(source_name) == -1:
+                    raise TypeError, "%s needs to be specified in the pipeline" % source_name
+            
+                pipeline = pipeline.replace(source_name, 'tcpclientsrc name=%s' % source)
+
+        if need_sink:
+            pipeline = '%s ! tcpserversink name=sink' % pipeline
+
+        print 'pipeline: %s' % pipeline
+
+        return pipeline
+
     def hasPerspective(self):
         return self.remote != None
 
-    def getName(self):
-        assert hasattr(self, 'name')
-        return self.name
+    def getKind(self):
+        assert hasattr(self, 'kind')
+        return self.kind
 
     def getSources(self):
         return self.sources
     
     def getIP(self):
-        return socket.gethostbyname(self.host)
+        assert self.remote
+        peer = self.remote.broker.transport.getPeer()
+        return socket.gethostbyname(peer[1])
         
     def pipeline_error_cb(self, object, element, error, arg):
         log.msg('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
@@ -112,6 +144,32 @@ class BaseComponent(pb.Referenceable):
     def pipeline_stop(self):
         self.set_state_and_iterate(gst.STATE_NULL)
         
+    def get_sink(self):
+        print self.pipeline
+        assert self.pipeline, 'Pipeline not created'
+        sink = self.pipeline.get_by_name('sink')
+        assert sink, 'No sink element in pipeline'
+        assert isinstance(sink, gst.Element)
+        return sink
+
+    def set_sink_properties(self, **properties):
+        sink = self.get_sink()
+        for prop_name in properties.keys():
+            sink.set_property(prop_name, properties[prop_name])
+
+    def setup_sources(self, sources):
+        # Setup all sources
+        for source_name, source_host, source_port in sources:
+            log.msg('Going to connect to %s (%s:%d)' % (source_name,
+                                                        source_host,
+                                                        source_port))
+            source = self.pipeline.get_by_name(source_name)
+            assert source, 'No source element named %s in pipeline' % source_name
+            assert isinstance(source, gst.Element)
+            
+            source.set_property('host', source_host)
+            source.set_property('port', source_port)
+
     def cleanup(self):
         log.msg("cleaning up")
         
@@ -129,7 +187,10 @@ class BaseComponent(pb.Referenceable):
         
     def setup_pipeline(self):
         log.msg('register(): creating pipeline: %s' % self.pipeline_string)
-        self.pipeline = gst.parse_launch(self.pipeline_string)
+        try:
+            self.pipeline = gst.parse_launch(self.pipeline_string)
+        except gobject.GError, e:
+            raise errors.PipelineParseError, e
 
         sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
         self.pipeline_signals.append(sig_id)
@@ -144,7 +205,7 @@ class BaseComponent(pb.Referenceable):
             reactor.callLater(0.250, self.remote_register)
             return
         
-        self.setup_pipeline()
+        #self.setup_pipeline()
         
         return {'ip' : self.getIP(),
                 'sources' : self.getSources() }
@@ -160,7 +221,7 @@ class BaseComponent(pb.Referenceable):
                 continue
             break
         return start
-
+            
 class OptionError(Exception):
     pass
     
@@ -241,5 +302,7 @@ def get_options_for(kind, args):
             options.sources = options.sources.split(',')
         else:
             options.sources = [options.sources]
-
+    else:
+        options.sources = []
+        
     return options

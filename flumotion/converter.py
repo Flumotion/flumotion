@@ -33,50 +33,19 @@ from twisted.internet import reactor
 from twisted.python import log
 
 import component
-import gstutils
+import errors
 
 class Converter(component.BaseComponent):
-    name = 'converter'
-    def __init__(self, name, sources, host, port, pipeline):
-        component.BaseComponent.__init__(self, name, sources, host, port, pipeline)
-
-    def get_pipeline(self, pipeline):
-        if len(self.sources) == 1:
-            return 'tcpclientsrc name=%s ! %s ! tcpserversink name=sink' % (self.sources[0], pipeline)
-
-        for source in self.sources:
-            if ' ' in source:
-                raise TypeError, "spaces not allowed in sources"
-            
-            source_name = '@%s' % source
-            if pipeline.find(source_name) == -1:
-                raise TypeError, "%s needs to be specified in the pipeline" % source_name
-            
-            pipeline = pipeline.replace(source_name, 'tcpclientsrc name=%s' % source)
-
-        return pipeline + ' ! tcpserversink name=sink'
-
+    kind = 'converter'
     def start(self, sources, sink_host, sink_port):
-        log.msg('(source) Going to listen on port %s:%d' % (sink_host, sink_port))
-
-        # Setup all sources
-        for source_name, source_host, source_port in sources:
-            log.msg('(sink)   Going to connect to %s (%s:%d)' % (source_name,
-                                                                 source_host, source_port))
-            source = self.pipeline.get_by_name(source_name)
-            source.set_property('host', source_host)
-            source.set_property('port', source_port)
-
-        # Setup the sink
-        sink = self.pipeline.get_by_name('sink')
-        sink.set_property('host', sink_host)
-        sink.set_property('port', sink_port)
-
-        # Play
-        self.pipeline_play()
+        self.setup_sources(sources)
         
-    def remote_start(self, sources, sink_host, sink_port):
-        self.start(sources, sink_host, sink_port)
+        log.msg('Going to listen on %s:%d' % (sink_host, sink_port))
+        self.set_sink_properties(host=sink_host, port=sink_port)
+
+        self.pipeline_play()
+
+    remote_start = start
         
 def main(args):
     try:
@@ -85,8 +54,14 @@ def main(args):
         print 'ERROR:', e
         raise SystemExit
     
-    client = Converter(options.name, options.sources, options.host,
-                       options.port, options.pipeline)
+    try:
+        client = Converter(options.name, options.sources,
+                           options.pipeline)
+    except errors.PipelineParseError, e:
+        print 'Bad pipeline: %s' % e
+        raise SystemExit
+    
+    reactor.connectTCP(options.host, options.port, client.factory)
     reactor.run()
     
 if __name__ == '__main__':

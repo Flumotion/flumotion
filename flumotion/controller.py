@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
 from twisted.application import service, internet
 from twisted.cred import portal, checkers, credentials
-from twisted.internet import reactor
+from twisted.internet import reactor, error
 from twisted.python import log
 from twisted.spread import pb
 
@@ -332,7 +332,7 @@ class Controller(pb.Root):
         if sources_ready:
             log.msg('All sources for %r (%s) are ready, so starting' % (component, source_names))
             self.componentStart(component)
-            
+        
 class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):
@@ -348,5 +348,9 @@ class ControllerServerFactory(pb.PBServerFactory):
     
 if __name__ == '__main__':
     log.startLogging(sys.stdout)
-    reactor.listenTCP(8890, ControllerServerFactory())
+    try:
+        reactor.listenTCP(8890, ControllerServerFactory())
+    except error.CannotListenError, e:
+        print 'ERROR:', e
+        raise SystemExit
     reactor.run()

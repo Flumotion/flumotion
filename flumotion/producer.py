@@ -31,27 +31,19 @@ import gst
 from twisted.internet import reactor
 from twisted.python import log
 
+import errors
 import component
 
 class Producer(component.BaseComponent):
-    name = 'producer'
-    def __init__(self, name, host, port, pipeline):
-        component.BaseComponent.__init__(self, name, None, host, port, pipeline)
-
-    def get_pipeline(self, pipeline):
-        return '%s ! tcpserversink name=sink' % pipeline
-        
+    kind = 'producer'
+    
     def listen(self, host, port):
-        log.msg('Going to listen on port %d' % port)
-
-        sink = self.pipeline.get_by_name('sink')
-        sink.set_property('host', host)
-        sink.set_property('port', port)
+        log.msg('Going to listen on %s:%d' % (host, port))
+        self.set_sink_properties(host=host, port=port)
         
         self.pipeline_play()
         
-    def remote_listen(self, host, port):
-        self.listen(host, port)
+    remote_listen = listen
         
 def main(args):
     try:
@@ -60,7 +52,14 @@ def main(args):
         print 'ERROR:', e
         raise SystemExit
     
-    client = Producer(options.name, options.host, options.port, options.pipeline)
+    try:
+        client = Producer(options.name, options.sources,
+                          options.pipeline)
+    except errors.PipelineParseError, e:
+        print 'Bad pipeline: %s' % e
+        raise SystemExit
+    
+    reactor.connectTCP(options.host, options.port, client.factory)
     reactor.run()
 
 if __name__ == '__main__':
