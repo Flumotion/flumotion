@@ -407,7 +407,14 @@ class Webcam(VideoSource):
         d.addErrback(self._queryGstErrorErrback)
         d.addErrback(self._unknownDeviceErrback)
         d.addErrback(self._queryRemoteRunErrback)
-        
+
+    def get_state(self):
+        options = {}
+        options['device'] = self.combobox_device.get_string()
+        options['width'] = int(self.spinbutton_width.get_value())
+        options['height'] = int(self.spinbutton_height.get_value())
+        options['framerate'] = self.spinbutton_framerate.get_value()
+        return options
 wizard.register_step(Webcam)
 
 class TestVideoSource(VideoSource):

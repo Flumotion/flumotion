@@ -1,3 +1,14 @@
+2005-04-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/webcam/webcam.py:
+	  make sure we use the device from the config
+	* flumotion/component/producers/webcam/webcam.xml:
+	  make device required
+	* flumotion/wizard/steps.py:
+	  implement WebCam get_state instead of relying on base class
+
+	  Fixes issue #110 and #134.
+
 2005-04-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/firewire/admin_gtk.py:
