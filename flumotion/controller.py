@@ -143,8 +143,9 @@ class ComponentPerspective(pbutil.NewCredPerspective):
             #log.msg('%s is ready, starting pending components' % self.username)
 
             # Now when the component is up and running, 
+            self.started = True
             self.controller.startPendingComponentsFor(self)
-            
+
     def perspective_error(self, element, error):
         log.msg('%s.error element=%s string=%s' % (self.username, element, error))
         
@@ -380,7 +381,7 @@ class Controller(pb.Root):
         elif isinstance(component, StreamerPerspective):
             self.streamerStart(component)
 
-        component.started = True
+        #component.started = True
         
     def componentRegistered(self, component):
         #log.msg('%r is registered' % component)
