@@ -65,7 +65,7 @@ PYGST_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
 AC_SUBST(PYGST_DIR)
 
 dnl check for gst.interfaces
-AS_PYTHON_IMPORT(gst.interfaces,,
+AS_PYTHON_IMPORT([gst, gst.interfaces],,
                  AC_MSG_ERROR([You need to recompile gst-python with gst.interfaces support]))
 
 dnl check for epydoc
