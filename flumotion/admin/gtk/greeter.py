@@ -56,6 +56,7 @@ class ConnectToExisting(wizard.WizardStep):
 
     def setup(self, state):
         self.on_entries_changed()
+        self.host_entry.grab_focus()
 
     def on_entries_changed(self, *args):
         if self.host_entry.get_text() and self.port_entry.get_text():
@@ -92,6 +93,9 @@ class Authenticate(wizard.WizardStep):
         if not 'auth_method' in state:
             self.auth_method_combo.set_active(0)
         self.on_entries_changed()
+        self.user_entry.grab_focus()
+        self.user_entry.connect('activate',
+                                lambda *x: self.passwd_entry.grab_focus())
 
     def on_entries_changed(self, *args):
         if self.user_entry.get_text() and self.passwd_entry.get_text():
