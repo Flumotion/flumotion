@@ -1,5 +1,10 @@
 2004-12-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/bttv/colorbalance.glade:
+	  don't expand the separators
+
+2004-12-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
 
 	* flumotion/component/producers/bttv/Makefile.am:
