@@ -126,7 +126,8 @@ class ManagerComponentState(flavors.StateCacheable):
         self._jobState = None
 
     def __repr__(self):
-        return "%r" % self._dict
+        return "<ManagerComponentState %s>" % self._dict['name']
+        #return "%r" % self._dict
 
     def setJobState(self, jobState):
         """
