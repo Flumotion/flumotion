@@ -20,7 +20,7 @@ from twisted.python import components
 from twisted.trial import unittest
 from twisted.web import server
 
-from flumotion.component.http import resources
+from flumotion.component.consumers.httpstreamer import resources
 from flumotion.common import interfaces
 
 # From twisted/test/proto_helpers.py

@@ -1,7 +1,9 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_http -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/http/resources.py: web server part of http component
+# flumotion/component/consumers/httpstreamer/resources.py:
+# web server part of http streamer component
+#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
 

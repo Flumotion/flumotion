@@ -72,11 +72,11 @@ flumotion/component/bouncers/Makefile
 flumotion/component/bttv/Makefile
 flumotion/component/dv/Makefile
 flumotion/component/encoders/Makefile
-flumotion/component/file/Makefile
-flumotion/component/http/Makefile
+flumotion/component/consumers/Makefile
+flumotion/component/consumers/disker/Makefile
+flumotion/component/consumers/httpstreamer/Makefile
 flumotion/component/muxers/Makefile
 flumotion/component/overlay/Makefile
-flumotion/component/passwd/Makefile
 flumotion/component/soundcard/Makefile
 flumotion/component/videotest/Makefile
 flumotion/component/webcam/Makefile

@@ -316,10 +316,15 @@ class JobAvatar(pb.Avatar, log.Loggable):
         # XXX: Raise better error message
         raise AssertionError
     
-    def _startErrback(self, failure, name, type):
-        self.warning('could not start component %s of type %s: %s' % (
-            name, type, failure))
+    def _defaultErrback(self, failure):
+        self.warning('unhandled remote error: type %s, message %s' % (
+            failure.type, failure.getErrorMessage()))
         
+    def _startErrback(self, failure, name, type):
+        failure.trap(errors.ComponentStart)
+        self.warning('could not start component %s of type %s: %r' % (
+            name, type, failure.getErrorMessage()))
+
     def _cb_afterInitial(self, unused):
         kid = self.heaven.brain.kindergarten.getKid(self.name)
         # we got kid.config through WorkerMedium.remote_start from the manager
@@ -340,6 +345,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
         d = self.mind.callRemote('start', kid.name, kid.type,
                                  kid.config, feedPorts)
         d.addErrback(self._startErrback, kid.name, kid.type)
+        d.addErrback(self._defaultErrback)
                                           
     def shutdown(self):
         self.log('%s disconnected' % self.name)

@@ -43,6 +43,8 @@ def getComponent(dict, defs):
         raise config.ConfigError("%s source file could not be found" % source)
     except ImportError, e:
         raise config.ConfigError("%s source file could not be imported (%s)" % (source, e))
+    except exception, e:
+        raise config.ConfigError("Exception %s during import  of source %s (%s)" % (exception, source, e))
         
     if not hasattr(module, 'createComponent'):
         log.warning('job', 'no createComponent() for %s' % source)
@@ -99,10 +101,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
         @type  feedPorts:  dict
         """
         defs = registry.registry.getComponent(type)
-        try:
-            self._runComponent(name, type, configDict, defs, feedPorts)
-        except config.ConfigError, e:
-            raise errors.ComponentStart()
+        self._runComponent(name, type, configDict, defs, feedPorts)
 
     def remote_stop(self):
         reactor.stop()
@@ -177,7 +176,12 @@ class JobMedium(pb.Referenceable, log.Loggable):
         log.debug(name, '_runComponent(): feedPorts is: %r' % feedPorts)
         log.debug(name, '_runComponent(): defs is: %r' % defs)
 
-        comp = getComponent(config, defs)
+        comp = None
+        try:
+            comp = getComponent(config, defs)
+        except Exception, error:
+            self.warning("raising ComponentStart(%s)" % error)
+            raise errors.ComponentStart(error)
 
         # we have components without feed ports, and without this function
         if feedPorts:

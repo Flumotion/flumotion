@@ -1,7 +1,9 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_http -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/http/http.py: a consumer that streams over HTTP
+# flumotion/component/consumers/httpstreamer/httpstreamer.py
+# a consumer that streams over HTTP
+#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
 
@@ -29,7 +31,7 @@ from flumotion.common import bundle, common
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
-from flumotion.component.http import resources
+from flumotion.component.consumers.httpstreamer import resources
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
     

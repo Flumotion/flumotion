@@ -17,8 +17,6 @@ SUBDIRS = \
 	bttv \
 	dv \
 	encoders \
-	file \
-	http \
 	muxers \
 	overlay \
 	soundcard \

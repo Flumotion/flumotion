@@ -190,27 +190,27 @@ class WizardSaver:
             if cons_options['disk']:
                 if cons_options['disk_audio_video']:
                     steps.append(('disk_audio_video', 'disk-audio-video',
-                                  'file-dumper', 'Disk (audio & video)',
+                                  'disker', 'Disk (audio & video)',
                                   both_muxer))
                 if cons_options['disk_audio']:
-                    steps.append(('disk_audio', 'disk-audio', 'file-dumper',
+                    steps.append(('disk_audio', 'disk-audio', 'disker',
                                   'Disk (audio only)', audio_muxer))
                 if cons_options['disk_video']:
-                    steps.append(('disk_video', 'disk-video', 'file-dumper',
+                    steps.append(('disk_video', 'disk-video', 'disker',
                                   'Disk (video only)', video_muxer))
         elif has_video and not has_audio:
             if cons_options['http']:
                 steps.append(('http_video', 'http-video', 'http-streamer',
                               'HTTP Streamer (video only)', video_muxer))
             if cons_options['disk']:
-                steps.append(('disk_video', 'disk-video', 'file-dumper',
+                steps.append(('disk_video', 'disk-video', 'disker',
                               'Disk (video only)', video_muxer))
         elif has_audio and not has_video:
             if cons_options['http']:
                 steps.append(('http_audio', 'http-audio', 'http-streamer',
                               'HTTP Streamer (audio only)', audio_muxer))
             if cons_options['disk']:
-                steps.append(('disk_audio', 'disk-audio', 'file-dumper',
+                steps.append(('disk_audio', 'disk-audio', 'disker',
                               'Disk (audio only)', audio_muxer))
         else:
             raise AssertionError
