@@ -26,9 +26,8 @@ import gobject
 from twisted.internet import reactor
 from twisted.spread import pb
 
-from flumotion.twisted import pbutil
+from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
-from flumotion import errors
 
 class ClientFactory(pbutil.ReconnectingPBClientFactory):
     __super_init = pbutil.ReconnectingPBClientFactory.__init__
@@ -43,7 +42,7 @@ class ClientFactory(pbutil.ReconnectingPBClientFactory):
 
     def gotPerspective(self, perspective):
         self.component.gotPerspective(perspective)
-        
+
 class BaseComponent(pb.Referenceable):
     def __init__(self, name, sources, feeds):
         self.component_name = name
@@ -66,7 +65,6 @@ class BaseComponent(pb.Referenceable):
 
     def gotPerspective(self, perspective):
         self.remote = perspective
-        self.setup_pipeline()
         
     def hasPerspective(self):
         return self.remote != None
@@ -137,9 +135,15 @@ class BaseComponent(pb.Referenceable):
         self.set_state_and_iterate(gst.STATE_PLAYING)
 
     def pipeline_stop(self):
+        if not self.pipeline:
+            return
+        
         self.set_state_and_iterate(gst.STATE_NULL)
         
     def setup_feeds(self, feeds):
+        if not self.pipeline:
+            raise errors.NotReadyError('No pipeline')
+        
         # Setup all feeds sources
         for name, host, port in feeds:
             self.msg('Going to listen on %s (%s:%d)' % (name, host, port))
@@ -154,6 +158,9 @@ class BaseComponent(pb.Referenceable):
             feed.set_property('protocol', 'gdp')
 
     def setup_sources(self, sources):
+        if not self.pipeline:
+            raise NotReadyError('No pipeline')
+        
         # Setup all sources
         for source_name, source_host, source_port in sources:
             self.msg('Going to connect to %s (%s:%d)' % (source_name,
@@ -188,6 +195,8 @@ class BaseComponent(pb.Referenceable):
             reactor.callLater(0.250, self.remote_register)
             return
         
+        self.setup_pipeline()
+        
         return {'ip' : self.getIP(),
                 'pid' :  os.getpid(), 
                 'sources' : self.getSources(),
@@ -207,11 +216,15 @@ class BaseComponent(pb.Referenceable):
         return retval, ports
 
     def remote_play(self):
+        self.msg('Playing')
         self.pipeline_play()
         
     def remote_stop(self):
+        self.msg('Stopping')
         self.pipeline_stop()
-
+        self.remote.broker.transport.loseConnection()
+        reactor.stop()
+        
     def remote_pause(self):
         self.pipeline_pause()
 
@@ -292,4 +305,4 @@ class ParseLaunchComponent(BaseComponent):
         try:
             self.pipeline = gst.parse_launch(pipeline)
         except gobject.GError, e:
-            raise errors.PipelineParseError, e
+            raise errors.PipelineParseError('foo') #str(e))

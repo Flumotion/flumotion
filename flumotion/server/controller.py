@@ -37,7 +37,8 @@ from twisted.internet import reactor, error
 from twisted.manhole import telnet
 from twisted.spread import pb
 
-from flumotion.twisted import pbutil, shell
+from flumotion.server import admin
+from flumotion.twisted import errors, pbutil, shell
 from flumotion.utils import gstutils, log
 
 def msg(*args):
@@ -122,24 +123,42 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         assert self.listen_ports[feed] != -1, self.listen_ports
         return self.listen_ports[feed]
 
-    def after_register_cb(self, options, cb):
-        if options == None:
-            cb = self.mind.callRemote('register')
-            cb.addCallback(self.after_register_cb, cb)
-            return
+    def callRemote(self, name, *args, **kwargs):
+        self.msg('Calling remote method %s%r' % (name, args))
+        cb = self.mind.callRemote(name, *args, **kwargs)
+        return cb
 
+    def error_cb(self, *args):
+        print 'ERROR', args
+        self.msg('Error caught, disconnecting component')
+        self.callRemote('stop')
+        
+    def after_register_cb(self, options, cb):
+        log.msg('in callback after_register_cb %r %r' % (options, cb))
+        
         for key, value in options.items():
             setattr(self.options, key, value)
         self.options.dict = options
         
         self.controller.componentRegistered(self)
-            
+
+    def check_All(self, failure):
+        log.msg('ERROR:' + str(failure))
+        return None
+                
+    def check_PipelineError(self, failure):
+        failure.trap(errors.PipelineParseError)
+        self.msg('Invalid pipeline for component')
+        return None
+
     def attached(self, mind):
         #msg('%s attached, calling register()' % self.getName())
         self.mind = mind
         
-        cb = mind.callRemote('register')
+        cb = self.callRemote('register')
         cb.addCallback(self.after_register_cb, cb)
+        cb.addErrback(self.check_PipelineError)
+        cb.addErrback(self.check_All)
         
     def detached(self, mind):
         self.msg('detached')
@@ -166,16 +185,15 @@ class ProducerPerspective(ComponentPerspective):
     kind = 'producer'
     def after_get_free_ports_cb(self, (feeds, ports)):
         self.listen_ports = ports
-        self.msg('Calling remote method listen (%s)' % feeds)
-        self.mind.callRemote('listen', feeds)
-
+        cb = self.callRemote('listen', feeds)
+        cb.addErrback(self.error_cb)
+        
     def listen(self, feeds):
         """starts the remote methods listen"""
 
-        self.msg('Calling remote method get_free_ports()')
-        cb = self.mind.callRemote('get_free_ports', feeds)
-        cb.addCallback(self.after_get_free_ports_cb)
-            
+        cb = self.callRemote('get_free_ports', feeds)
+        cb.addCallbacks(self.after_get_free_ports_cb, self.error_cb)
+
 class ConverterPerspective(ComponentPerspective):
     """Perspective for converter components"""
     kind = 'converter'
@@ -183,14 +201,13 @@ class ConverterPerspective(ComponentPerspective):
     def start(self, sources, feeds):
         def after_get_free_ports_cb((feeds, ports)):
             self.listen_ports = ports
-            self.msg('Calling remote method start (%s %s)' % (sources, feeds))
-            self.mind.callRemote('start', sources, feeds)
+            cb = self.callRemote('start', sources, feeds)
+            cb.addErrback(self.error_cb, self.error_cb)
             
         """starts the remote methods start"""
-        self.msg('Calling remote method get_free_port()')
-        cb = self.mind.callRemote('get_free_ports', feeds)
-        cb.addCallback(after_get_free_ports_cb)
-            
+        cb = self.callRemote('get_free_ports', feeds)
+        cb.addCallbacks(after_get_free_ports_cb, self.error_cb)
+        
 class StreamerPerspective(ComponentPerspective):
     """Perspective for streamer components"""
     kind = 'streamer'
@@ -206,8 +223,9 @@ class StreamerPerspective(ComponentPerspective):
     def connect(self, sources):
         """starts the remote methods connect"""
         self.msg('Calling remote method connect(%s)' % sources)
-        self.mind.callRemote('connect', sources)
-
+        cb = self.mind.callRemote('connect', sources)
+        cb.addErrback(self.error_cb)
+        
 STATE_NULL     = 0
 STATE_STARTING = 1
 STATE_READY    = 2
@@ -500,8 +518,7 @@ class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):
         self.controller = Controller()
-        #from flumotion.server import admin
-        self.admin = None #Admin(self.controller)
+        self.admin = admin.Admin(self.controller)
         self.dispatcher = Dispatcher(self.controller, self.admin)
         checker = pbutil.ReallyAllowAnonymousAccess()
         

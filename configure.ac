@@ -6,8 +6,6 @@ AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
 
-AM_PROG_LIBTOOL
-
 AC_SUBST(PYGTK_REQ, 2.0.0)
 AC_SUBST(PYGST_REQ, 0.7.91)
 
@@ -20,12 +18,12 @@ dnl AC_MSG_NOTICE(Storing configuration files in $SYSCONFDIR)
 dnl AS_AC_EXPAND(LOCALSTATEDIR, $localstatedir)
 dnl AC_MSG_NOTICE(Using localstatedir $LOCALSTATEDIR)
 
+AC_DISABLE_STATIC
+AC_PROG_LIBTOOL
+
 dnl check for python
-AM_PATH_PYTHON
-#AS_PATH_PYTHON(2.2)
-if test "x$PYTHON" == "x"; then
-  AC_MSG_ERROR(No suitable python version found)
-fi
+AM_PATH_PYTHON(2.2)
+AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
 
 dnl check for pygtk
 PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_REQ)
@@ -45,6 +43,8 @@ AC_OUTPUT(
 Makefile
 bin/flumotion
 bin/Makefile
+data/Makefile
+data/ui/Makefile
 flumotion/Makefile
 flumotion/gui/Makefile
 flumotion/server/Makefile

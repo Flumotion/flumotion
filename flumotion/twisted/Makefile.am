@@ -1,8 +1,9 @@
 flumotiondir = $(libdir)/flumotion/python/flumotion/twisted
 
 flumotion_DATA = \
-	gstreactor.py \
 	__init__.py \
+	errors.py \
+	gstreactor.py \
 	pbutil.py \
 	shell.py
 

@@ -1,6 +1,7 @@
 flumotiondir = $(libdir)/flumotion/python/flumotion/server
 
 flumotion_DATA = \
+	admin.py \
 	component.py \
 	controller.py \
 	converter.py \

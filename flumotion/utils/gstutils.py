@@ -28,7 +28,7 @@ def caps_repr(caps):
     value = str(caps)
     pos = value.find('streamheader')
     if pos != -1:
-        return value[:pos+12] + '=<...>'
+        return 'streamheader=<...>'
     else:
         return value
         
@@ -45,9 +45,15 @@ def verbose_deep_notify_cb(object, orig, pspec):
     else:
         output = value
 
-    log.msg('deep-notify %s: %s = %s' % (orig.get_path_string(),
-                                         pspec.name,
-                                         output))
+    # Filters
+    if pspec.name == 'active':
+        return
+    if pspec.name == 'caps' and output == 'None':
+        return
+    
+    log.msg('%s: %s = %s' % (orig.get_path_string(),
+                             pspec.name,
+                             output))
 
 # XXX: move this to a separate file
 def is_port_free(port):
@@ -55,7 +61,8 @@ def is_port_free(port):
     fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         fd.bind(('', port))
-    except socket.error:
+    except socket.error, e:
+        print e
         return False
     
     return True

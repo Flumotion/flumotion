@@ -43,7 +43,7 @@ gstreactor.install()
 from twisted.internet import reactor
 from twisted.web import server, resource
 
-from flumotion import errors
+from flumotion import errors, twisted
 from flumotion.server.controller import ControllerServerFactory
 from flumotion.server.converter import Converter
 from flumotion.server.producer import Producer
@@ -410,7 +410,7 @@ def run_component(name, args):
     try:
         print klass, args
         component = klass(*args)
-    except errors.PipelineParseError, e:
+    except twisted.errors.PipelineParseError, e:
         print 'Bad pipeline: %s' % e
         raise SystemExit
     

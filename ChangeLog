@@ -1,3 +1,28 @@
+2004-06-20  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/utils/gstutils.py (verbose_deep_notify_cb): Filter out
+	active notifies and empty caps. Thomas will probably kill me for
+	this.
+
+	* flumotion/server/*: Better error checking, make exception be
+	sent over the wire and catch them so we can do stuff. I never.
+	Add errbacks for all callbacks, so we can catch eventual
+	exceptions. Add a stop method on component, so the controller can
+	shut down the controller if something bad happens.
+	
+	
+	* flumotion/utils/proctitle.py: 
+	* flumotion/utils/_proctitle.c: Import proctitle by Dave Cinege,
+	still ununsed though.
+
+	* data/ui/admin.glade, flumotion/gui/adminclient.py,
+	flumotion/server/admin.py: New files, beginning of an interface
+	for the server.
+
+	* configure.ac: Simplify python checks
+
+	* m4/as-python.m4 (else): Add AM_CHECK_PYTHON_HEADERS macro.
+
 2004-06-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/controller.py (Controller.isLocalComponent):
