@@ -257,15 +257,14 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                            remote_methodName on the worker
 
                            
-        @returns: deferred
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         r = common.argRepr(args, kwargs, max=20)
-        self.info('calling remote method %s(%s) on worker %s' % (methodName, r,
+        self.debug('calling remote method %s(%s) on worker %s' % (methodName, r,
                                                                  workerName))
         d = self.remote.callRemote('workerCallRemote', workerName,
             methodName, *args, **kwargs)
         d.addErrback(self._workerCallRemoteErrback, methodName)
-        d.addErrback(self._defaultErrback)
         return d
 
     def _workerCallRemoteErrback(self, failure, methodName):
@@ -276,9 +275,16 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     ## Worker methods
     def checkElements(self, workerName, elements):
-        return self.workerCallRemote(workerName, 'checkElements', elements)
+        d = self.workerCallRemote(workerName, 'checkElements', elements)
+        d.addErrback(self._defaultErrback)
+        return d
     
     def workerRun(self, workerName, function, *args, **kwargs):
+        """
+        Run the given function and args on the given worker.
+
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
         import inspect
         if not callable(function):
             raise TypeError, "need a callable"
@@ -286,7 +292,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         try:
             source = inspect.getsource(function)
         except IOError:
-            return defer.fail()
+            return defer.fail(errors.FlumotionError('Could not find source'))
         
         functionName = function.__name__
         return self.workerCallRemote(workerName, 'runCode', source,

@@ -136,14 +136,20 @@ class VideoSource(wizard.WizardStep):
 
 
 def _checkChannels(device):
+    # check channels on a v4lsrc element with the given device
+    # returns: a deferred returning a tuple of (deviceName, channels, norms)
+    # or a failure
     from twisted.internet import defer, reactor
     import gst
     import gst.interfaces
     
-    d = defer.Deferred()
-
+    class Result:
+        def __init__(self):
+            self.d = defer.Deferred()
+            self.returned = False
+    
     # gst, defer and errors are already in the namespace 
-    def state_changed_cb(pipeline, old, new):
+    def state_changed_cb(pipeline, old, new, res):
         if not (old == gst.STATE_NULL and new == gst.STATE_READY):
             return
         element = pipeline.get_by_name('source')
@@ -151,18 +157,23 @@ def _checkChannels(device):
         channels = [channel.label for channel in element.list_channels()]
         norms = [norm.label for norm in element.list_norms()]
         reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
-        d.callback((deviceName, channels, norms))
+        if not res.returned:
+            res.returned = True
+            res.d.callback((deviceName, channels, norms))
                 
-    def error_cb(pipeline, element, error, _):
-        d.errback(errors.UnknownDeviceError("The device does not exist"))
+    def error_cb(pipeline, element, error, _, res):
+        if not res.returned:
+            res.returned = True
+            res.d.errback(errors.GstError(error.message))
 
     pipeline = 'v4lsrc name=source device=%s ! fakesink' % device
     bin = gst.parse_launch(pipeline)
-    bin.connect('state-change', state_changed_cb)
-    bin.connect('error', error_cb)
+    result = Result()
+    bin.connect('state-change', state_changed_cb, result)
+    bin.connect('error', error_cb, result)
     bin.set_state(gst.STATE_PLAYING)
 
-    return d
+    return result.d
 
 
 class TVCard(VideoSource):
@@ -196,6 +207,11 @@ class TVCard(VideoSource):
         self.combobox_channel.set_list(channels)
         self.combobox_channel.set_sensitive(True)
 
+    def _queryGstErrorErrback(self, failure):
+        failure.trap(errors.GstError)
+        self.clear_combos()
+        self.wizard.error_dialog('GStreamer error: %s' % failure.value)
+
     def _unknownDeviceErrback(self, failure):
         failure.trap(errors.UnknownDeviceError)
         self.clear_combos()
@@ -204,8 +220,9 @@ class TVCard(VideoSource):
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
-        d = self.run_on_worker(_checkChannels, device)
+        d = self.workerRun(_checkChannels, device)
         d.addCallback(self._queryCallback)
+        d.addErrback(self._queryGstErrorErrback)
         d.addErrback(self._unknownDeviceErrback)
         
     def get_component_properties(self):
@@ -229,31 +246,42 @@ class FireWire(VideoSource):
 wizard.register_step(FireWire)
 
 
+# FIXME: rename, only for v4l stuff
 def _checkDeviceName(device):
+    # this function gets sent to and executed on the worker
+    # it will fire a deferred returning the deviceName, or a failure
     from twisted.internet import defer, reactor
     import gst
-    
-    d = defer.Deferred()
 
+    class Result:
+        def __init__(self):
+            self.d = defer.Deferred()
+            self.returned = False
+    
     # gst, defer and errors are already in the namespace 
-    def state_changed_cb(pipeline, old, new):
+    def state_changed_cb(pipeline, old, new, res):
         if not (old == gst.STATE_NULL and new == gst.STATE_READY):
             return
         element = pipeline.get_by_name('source')
-        deviceName = elementget_property('device-name')
+        deviceName = element.get_property('device-name')
         reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
-        d.callback(deviceName)
+        if not res.returned:
+            res.returned = True
+            res.d.callback(deviceName)
                 
-    def error_cb(pipeline, element, error, _):
-        d.errback(errors.UnknownDeviceError("The device does not exist"))
+    def error_cb(pipeline, element, error, _, res):
+        if not res.returned:
+            res.returned = True
+            res.d.errback(errors.GstError(error.message))
 
     pipeline = 'v4lsrc name=source device=%s autoprobe=false ! fakesink' % device
     bin = gst.parse_launch(pipeline)
-    bin.connect('state-change', state_changed_cb)
-    bin.connect('error', error_cb)
+    result = Result()
+    bin.connect('state-change', state_changed_cb, result)
+    bin.connect('error', error_cb, result)
     bin.set_state(gst.STATE_PLAYING)
 
-    return d
+    return result.d
 
 
 class Webcam(VideoSource):
@@ -267,7 +295,8 @@ class Webcam(VideoSource):
         self.in_setup = True
         self.combobox_device.set_list(('/dev/video0',
                                        '/dev/video1',
-                                       '/dev/video2'))
+                                       '/dev/video2',
+                                       '/dev/video3'))
         self.in_setup = False
 
     def on_combobox_device_changed(self, combo):
@@ -293,10 +322,15 @@ class Webcam(VideoSource):
         self.spinbutton_height.set_sensitive(True)
         self.spinbutton_framerate.set_sensitive(True)
 
+    def _queryGstErrorErrback(self, failure):
+        failure.trap(errors.GstError)
+        self.clear()
+        self.wizard.error_dialog('GStreamer error: %s' % failure.value)
+
     def _unknownDeviceErrback(self, failure):
         failure.trap(errors.UnknownDeviceError)
         self.clear()
-        
+
     def update(self):
         if self.in_setup:
             return
@@ -304,8 +338,9 @@ class Webcam(VideoSource):
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
-        d = self.run_on_worker(_checkDeviceName, device)
+        d = self.workerRun(_checkDeviceName, device)
         d.addCallback(self._queryCallback)
+        d.addErrback(self._queryGstErrorErrback)
         d.addErrback(self._unknownDeviceErrback)
         
 wizard.register_step(Webcam)
@@ -394,28 +429,36 @@ def _checkTracks(source_element, device):
     import gst
     import gst.interfaces
     
-    d = defer.Deferred()
-
+    class Result:
+        def __init__(self):
+            self.d = defer.Deferred()
+            self.returned = False
+    
     # gst, defer and errors are already in the namespace 
-    def state_changed_cb(pipeline, old, new):
+    def state_changed_cb(pipeline, old, new, res):
         if not (old == gst.STATE_NULL and new == gst.STATE_READY):
             return
         element = pipeline.get_by_name('source')
         deviceName = element.get_property('device-name')
         tracks = [track.label for track in element.list_tracks()]
         reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
-        d.callback((deviceName, tracks))
+        if not res.returned:
+            res.returned = True
+            res.d.callback((deviceName, tracks))
                 
-    def error_cb(pipeline, element, error, _):
-        d.errback(errors.GstError(error.message))
+    def error_cb(pipeline, element, error, _, res):
+        if not res.returned:
+            res.returned = True
+            res.d.errback(errors.GstError(error.message))
 
     pipeline = '%s name=source device=%s ! fakesink' % (source_element, device)
     bin = gst.parse_launch(pipeline)
-    bin.connect('state-change', state_changed_cb)
-    bin.connect('error', error_cb)
+    result = Result()
+    bin.connect('state-change', state_changed_cb, result)
+    bin.connect('error', error_cb, result)
     bin.set_state(gst.STATE_PLAYING)
 
-    return d
+    return result.d
 
 
 class Soundcard(wizard.WizardStep):
@@ -471,11 +514,6 @@ class Soundcard(wizard.WizardStep):
         self.combobox_input.set_list(tracks)
         self.combobox_input.set_sensitive(True)
 
-    def _gstErrback(self, failure):
-        failure.trap(errors.GstError)
-        self.clear_combos()
-        self.wizard.error_dialog('Gstreamer error: %s' % failure.value)
-
     def update_devices(self):
         self.block_update = True
         enum = self.combobox_system.get_enum()
@@ -487,6 +525,12 @@ class Soundcard(wizard.WizardStep):
             raise AssertionError
         self.block_update = False
 
+    # FIXME: move higher up in hierarchy
+    def _queryGstErrorErrback(self, failure):
+        failure.trap(errors.GstError)
+        self.clear_combos()
+        self.wizard.error_dialog('GStreamer error: %s' % failure.value)
+
     def update_inputs(self):
         if self.block_update:
             return
@@ -494,11 +538,11 @@ class Soundcard(wizard.WizardStep):
         
         enum = self.combobox_system.get_enum()
         device = self.combobox_device.get_string()
-        d = self.run_on_worker(_checkTracks, enum.element, device)
+        d = self.workerRun(_checkTracks, enum.element, device)
         d.addCallback(self._queryCallback)
+        d.addErrback(self._queryGstErrorErrback)
         #d.addErrback(self._unknownDeviceErrback)
         #d.addErrback(self._permissionDeniedErrback)
-        d.addErrback(self._gstErrback)
         
     def get_component_properties(self):
         channels = self.combobox_channels.get_enum()

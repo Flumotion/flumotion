@@ -1,3 +1,12 @@
+2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/common/errors.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	  cleanup of wizard code; better error checking, throw up
+	  error dialogs.  Fixes issue #92
+
 2004-11-09  Johan Dahlin  <johan@gnome.org>
 
 	* configure.ac: Check for the gst module before gst.interfaces and

@@ -59,9 +59,12 @@ class ComponentStart(pb.Error):
 class UnknownComponentError(pb.Error):
     "A given component or component type does not exist"
 
+class FlumotionError(pb.Error):
+    "Generic Flumotion error"
+
 # GStreamer errors
 class GstError(pb.Error):
-    "Generic Gstreamer error"
+    "Generic GStreamer error"
 
 class UnknownDeviceError(pb.Error):
     "The device does not exist"
@@ -70,4 +73,4 @@ class PermissionDeniedError(GstError):
     "Permission denied"
 
 class DeviceBusyError(GstError):
-    "Generic Gstreamer error"
+    "Generic GStreamer error"

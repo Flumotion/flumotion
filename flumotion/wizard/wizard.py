@@ -31,7 +31,7 @@ import gtk.glade
 from twisted.internet import defer
 
 from flumotion.configure import configure
-from flumotion.common import log
+from flumotion.common import log, errors
 from flumotion.utils.gstutils import gsignal
 from flumotion.wizard import enums, save
 
@@ -303,18 +303,24 @@ class WizardStep(object, log.Loggable):
     def get_section(self):
         return getattr(self, 'section', '')
         
-    def run_on_worker(self, function, *args):
+    def workerRun(self, function, *args):
+        """
+        Run the given function and arguments on the selected worker.
+
+        @returns: L{twisted.internet.defer.Deferred}
+        """
         admin = self.wizard.get_admin()
         worker = self.worker
-        d = defer.fail()
         
         if not admin:
-            print 'skipping query, no admin'
-        elif not worker:
-            print 'skipping query, no worker'
-        else:
-            d = admin.workerRun(worker, function, *args)
-        return d
+            self.warning('skipping workerRun, no admin')
+            return defer.fail(errors.FlumotionError('no admin'))
+
+        if not worker:
+            self.warning('skipping workerRun, no worker')
+            return defer.fail(errors.FlumotionError('no worker'))
+
+        return admin.workerRun(worker, function, *args)
         
     def get_next(self):
         """
@@ -353,7 +359,7 @@ class WizardStep(object, log.Loggable):
 
     def worker_changed(self):
         pass
-    
+
 
 class Wizard(gobject.GObject, log.Loggable):
     sidebar_color = gtk.gdk.color_parse('#9bc6ff')
@@ -511,13 +517,13 @@ class Wizard(gobject.GObject, log.Loggable):
         box.show()
 
         self.combobox_worker = gtk.combo_box_new_text()
-        self.combobox_worker.connect('changed',
-                                     self._combobox_worker_changed, step)
-        
         box.pack_start(self.combobox_worker, False, False, 6)
         map(self.combobox_worker.append_text, self._workers)
             
         self.combobox_worker.set_active(self._last_worker)
+        self.combobox_worker.connect('changed',
+                                     self._combobox_worker_changed, step)
+        
         self.combobox_worker.show()
         
     def show_previous(self):
