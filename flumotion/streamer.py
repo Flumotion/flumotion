@@ -1,5 +1,5 @@
 # -*- Mode: Python -*-
-# Flumotion - a video streaming server
+# Flumotion - a video streamer server
 # Copyright (C) 2004 Fluendo
 # 
 # This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 from twisted.web import server, resource
 from twisted.internet import reactor
 
-class Streaming(gobject.GObject):
+class Streamer(gobject.GObject):
     __gsignals__ = {
         'data-recieved': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
                           (gst.Buffer,)),
@@ -62,7 +62,7 @@ class Streaming(gobject.GObject):
     def sink_handoff_cb(self, element, buffer, pad):
         print 'GOT DATA'
     
-class StreamingResource(resource.Resource):
+class StreamerResource(resource.Resource):
     def __init__(self, client):
         resource.Resource.__init__(self)
 
