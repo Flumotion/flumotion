@@ -69,7 +69,8 @@ constant1 = 0
 stringIteration = 1
 
 # check improper use of string.find()
-stringFind = 1
+# This is new in pychecker 0.8.14 which is not installed everywhere 
+#stringFind = 1
 
 # Calling data members as functions
 callingAttribute = 0
