@@ -38,10 +38,18 @@ PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_REQ)
 PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
 AC_SUBST(PYGTK_DIR)
 
+dnl check for gtk.glade
+AS_PYTHON_IMPORT(gtk.glade,,
+                 [AC_MSG_ERROR([You need to recompile pygtk with libglade support])])
+
 dnl check for gst-python
 PKG_CHECK_MODULES(PYGST, gst-python-0.8 >= $PYGST_REQ)
 PYGST_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
 AC_SUBST(PYGST_DIR)
+
+dnl check for gst.interfaces
+AS_PYTHON_IMPORT(gst.interfaces,,
+                 AC_MSG_ERROR([You need to recompile gst-python with gst.interfaces support]))
 
 dnl check for epydoc
 AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
