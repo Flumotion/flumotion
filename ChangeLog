@@ -1,3 +1,10 @@
+=== release 0.1.7 ===
+
+2005-04-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	  releasing 0.1.7, "La Chacha"
+
 2005-04-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/webcam/webcam.py:
