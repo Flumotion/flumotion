@@ -278,6 +278,9 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         # callback functions
         # FIXME: check if it's ok to return either a deferred or a result    
         def _MD5SumCallback(result, self, component, domain, style):
+            if not result:
+                # no UI for this one
+                return None
             md5sum = result
             self.info("received UI MD5 sum")
             self.debug("got UI MD5 sum: %s" % md5sum)

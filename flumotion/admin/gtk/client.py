@@ -188,7 +188,6 @@ class Window(log.Loggable, gobject.GObject):
             parent = sub.get_parent()
             if parent:
                 parent.remove(sub)
-                
             
         self.hpaned.add2(sub)
         sub.show()
@@ -225,6 +224,15 @@ class Window(log.Loggable, gobject.GObject):
             return
 
         def cb_gotUI(dir):
+            if not dir:
+                # no ui, clear; FIXME: do this nicer
+                old = self.hpaned.get_child2()
+                self.hpaned.remove(old)
+                sub = gtk.Label('%s does not have a UI yet' % name)
+                self.hpaned.add2(sub)
+                sub.show()
+                return
+
             self.debug("Got the UI, lives in %s" % dir)
             self.uidir = dir
             path = os.path.join(dir, 'gtk.py')

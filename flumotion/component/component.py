@@ -276,20 +276,16 @@ class BaseComponent(log.Loggable, gobject.GObject):
 
     def getUIMD5Sum(self, domain, style):
         if not self._uiBundlers.has_key(domain):
-            #FIXME
-            raise
+            return None
         if not self._uiBundlers[domain].has_key(style):
-            #FIXME
-            raise
+            return None
         return self._uiBundlers[domain][style].bundle().md5sum
 
     def getUIZip(self, domain, style):
         if not self._uiBundlers.has_key(domain):
-            #FIXME
-            raise
+            return None
         if not self._uiBundlers[domain].has_key(style):
-            #FIXME
-            raise
+            return None
         return self._uiBundlers[domain][style].bundle().zip
 
 gobject.type_register(BaseComponent)
