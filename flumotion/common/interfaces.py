@@ -45,23 +45,59 @@ class IAuthenticate(components.Interface):
     def authenticate(self, keycard):
         "authenticates a keycard, must be a IClientKeycard"
 
-# TODO: Common base?
 
-class IComponentView(components.Interface):
+# FIXME: create a base class that implements setRemoteReference
+# since they're the same in all
+class IMedium(components.Interface):
     """
-    I am an interface implemented by PB client-side views for component clients.
+    I am a base interface for PB client-side mediums interfacing with
+    manager-side avatars.
+    """
+
+    def setRemoteReference(self, remoteReference):
+        """
+        Set the RemoteReference to the manager-side avatar.
+
+        @param remoteReference: L{twisted.spread.pb.RemoteReference}
+        """
+
+    def hasRemoteReference(self):
+        """
+        Check if we have a remote reference to the PB server's avatar.
+
+        @returns: True if we have a remote reference
+        """
+
+    def callRemote(self, name, *args, **kwargs):
+        """
+        Call a method through the remote reference to the manager-side avatar.
+        """
+
+class IComponentMedium(IMedium):
+    """
+    I am an interface for component-side mediums interfacing with server-side
+    avatars.
     """
     pass
 
-class IAdminView(components.Interface):
+class IAdminMedium(IMedium):
     """
-    I am an interface implemented by PB client-side views for admin clients.
+    I am an interface for admin-side mediums interfacing with manager-side
+    avatars.
     """
     pass
 
-class IWorkerView(components.Interface):
+class IWorkerMedium(IMedium):
     """
-    I am an interface implemented by PB client-side views for worker clients.
+    I am an interface for worker-side mediums interfacing with manager-side
+    avatars.
+    """
+    pass
+
+class IJobMedium(IMedium):
+    """
+    I am an interface for job-side mediums interfacing with worker-side
+    avatars.
     """
     pass
 

@@ -34,6 +34,7 @@ from flumotion.utils import log, reload
 from flumotion.utils.gstutils import gsignal
 from flumotion.twisted import cred, pbutil
 
+# FIXME: this is a Medium
 class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     """
     I live in the admin client.
@@ -50,6 +51,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     
     logCategory = 'adminmodel'
 
+    __implements__ = interfaces.IAdminMedium,
+
     def __init__(self):
         self.__gobject_init__()
         self.clientFactory = pbutil.FMClientFactory()
@@ -57,15 +60,14 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         # FIXME: remove old AdminComponent iface before 0.0.1
         d = self.clientFactory.login(cred.Username('admin'), self,
             pb.IPerspective,
-            interfaces.IAdminView)
-        d.addCallback(self._gotPerspective)
+            interfaces.IAdminMedium)
+        d.addCallback(self.setRemoteReference)
         d.addErrback(self._loginErrback)
         self._components = {} # dict of components
 
-    def _gotPerspective(self, perspective):
-        self.debug("gotPerspective: %s" % perspective)
-        self.remote = perspective
+        self.remote = None
 
+    ### our methods
     def _loginErrback(self, failure):
         r = failure.trap(error.ConnectionRefusedError)
         self.debug("emitting connection-refused")
@@ -76,6 +78,15 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     def _defaultErrback(self, failure):
         self.debug('received failure: %s' % failure.getErrorMessage())
         return failure
+
+    ### IMedium methods
+    def setRemoteReference(self, remoteReference):
+        self.debug("setRemoteReference: %s" % remoteReference)
+        self.remote = remoteReference
+
+    def hasRemoteReference(self):
+        return self.remote is not None
+
 
     ### pb.Referenceable methods
     def remote_log(self, category, type, message):

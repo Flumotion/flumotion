@@ -35,29 +35,39 @@ class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
         super_init = pbutil.ReconnectingPBClientFactory.__init__
         super_init(self)
         
-        # get the component's view class, defaulting to the base one
-        klass = getattr(component, 'component_view_class', BaseComponentView)
-        self.view = klass(component)
-        # get the interfaces implemented by the component view class
+        # get the component's medium class, defaulting to the base one
+        klass = getattr(component, 'component_medium_class', BaseComponentMedium)
+        self.medium = klass(component)
+        # get the interfaces implemented by the component medium class
         self.interfaces = getattr(klass, '__implements__', ())
         
     def login(self, username):
         self.__super_login(cred.Username(username),
-                           self.view,
+                           self.medium,
                            pb.IPerspective,
                            *self.interfaces)
         
-    def gotPerspective(self, perspective):
-        self.view.cb_gotPerspective(perspective)
+    # this method receives a RemoteReference
+    # it can't tell if it's from an IPerspective implementor, Viewpoint or
+    # Referenceable
+    def gotPerspective(self, remoteReference):
+        """
+        @param remoteReference: an object on which we can callRemote to the
+                                manager's avatar
+        @type remoteReference: L{twisted.spread.pb.RemoteReference}
+        """
+        self.medium.setRemoteReference(remoteReference)
     
 # needs to be before BaseComponent because BaseComponent references it
-class BaseComponentView(pb.Referenceable, log.Loggable):
+class BaseComponentMedium(pb.Referenceable, log.Loggable):
     """
-    I implement a worker-side view on a BaseComponent for the managing
-    ComponentAvatar to call upon.
+    I am a medium interfacing with a manager-side avatar.
+    I implement a Referenceable for the manager's avatar to call on me.
+    I have a remote reference to the manager's avatar to call upon.
     """
-    __implements__ = interfaces.IComponentView,
-    logCategory = 'basecomponentview'
+
+    __implements__ = interfaces.IComponentMedium,
+    logCategory = 'basecomponentmedium'
 
     def __init__(self, component):
         """
@@ -69,15 +79,24 @@ class BaseComponentView(pb.Referenceable, log.Loggable):
         self.remote = None # the perspective we have on the other side (?)
         
     ### log.Loggable methods
+
     def logFunction(self, arg):
         return self.comp.get_name() + ':' + arg
+
+    ### IMedium methods
+    
+    def setRemoteReference(self, remoteReference):
+        self.remote = remoteReference
+        
+    def hasRemoteReference(self):
+        return self.remote != None
 
     # call function on remote perspective in manager
     def callRemoteErrback(self, reason):
             self.warning('callRemote failed because of %s' % reason)
 
     def callRemote(self, name, *args, **kwargs):
-        if not self.hasPerspective():
+        if not self.hasRemoteReference():
             self.debug('skipping %s, no perspective' % name)
             return
 
@@ -92,11 +111,7 @@ class BaseComponentView(pb.Referenceable, log.Loggable):
         
         cb.addErrback(self.callRemoteErrback)
 
-    def cb_gotPerspective(self, perspective):
-        self.remote = perspective
-        
-    def hasPerspective(self):
-        return self.remote != None
+    ### our methods
 
     def getIP(self):
         assert self.remote
@@ -111,7 +126,8 @@ class BaseComponentView(pb.Referenceable, log.Loggable):
     def _component_log_cb(self, component, args):
         self.callRemote('log', *args)
         
-    ### Referenceable remote methods which can be called from manager
+    ### pb.Referenceable remote methods
+    ### called from manager by our avatar
     def remote_getUIZip(self, style):
         return self.comp.getUIZip(style)
     
@@ -121,7 +137,7 @@ class BaseComponentView(pb.Referenceable, log.Loggable):
     def remote_register(self):
         # FIXME: we need to properly document this; manager calls me to
         # "get some info"
-        if not self.hasPerspective():
+        if not self.hasRemoteReference():
             self.warning('We are not ready yet, waiting 250 ms')
             reactor.callLater(0.250, self.remote_register)
             return None
@@ -164,12 +180,12 @@ class BaseComponent(log.Loggable, gobject.GObject):
     I am the base class for all Flumotion components.
     """
 
-    __remote_interfaces__ = interfaces.IComponentView,
+    __remote_interfaces__ = interfaces.IComponentMedium,
     logCategory = 'basecomponent'
 
     gsignal('log', object)
 
-    component_view_class = BaseComponentView
+    component_medium_class = BaseComponentMedium
     
     def __init__(self, name):
         """

@@ -1,5 +1,19 @@
 2004-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/common/interfaces.py:
+	* flumotion/component/bouncer.py:
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/http/http.py:
+	* flumotion/manager/manager.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  We have a new name for an Avatar's sidekick: Medium
+	  use it everywhere
+
+2004-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/ogg-test-vorbis-theora.xml:
 	* flumotion/common/config.py:
 	* flumotion/component/base/base.xml:

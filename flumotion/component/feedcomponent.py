@@ -26,19 +26,19 @@ from flumotion.common import interfaces, errors
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
-class FeedComponentView(basecomponent.BaseComponentView):
+class FeedComponentMedium(basecomponent.BaseComponentMedium):
     """
-    I implement a worker-side view on a FeedComponent for the managing
-    ComponentAvatar to call upon.
+    I am a component-side medium for a FeedComponent to interface with
+    the manager-side ComponentAvatar.
     """
-    __implements__ = interfaces.IComponentView,
-    logCategory = 'basecomponentview'
+    __implements__ = interfaces.IComponentMedium,
+    logCategory = 'basecomponentmedium'
 
     def __init__(self, component):
         """
         @param component: L{flumotion.component.feedcomponent.FeedComponent}
         """
-        basecomponent.BaseComponentView.__init__(self, component)
+        basecomponent.BaseComponentMedium.__init__(self, component)
 
         self.comp.connect('state-changed', self._component_state_changed_cb)
         self.comp.connect('error', self._component_error_cb)
@@ -92,7 +92,7 @@ class FeedComponentView(basecomponent.BaseComponentView):
         self.comp.pause()
 
     def remote_register(self):
-        options = basecomponent.BaseComponentView.remote_register(self)
+        options = basecomponent.BaseComponentMedium.remote_register(self)
         if options:
             options['eaters'] = self.comp.get_eater_names()
             options['feeders'] = self.comp.get_feeder_names()
@@ -124,7 +124,7 @@ class FeedComponent(basecomponent.BaseComponent):
     gsignal('error', str, str)
     gsignal('notify-feed-ports')
 
-    component_view_class = FeedComponentView
+    component_medium_class = FeedComponentMedium
     
     def __init__(self, name, eater_config, feeder_config):
         """

@@ -258,6 +258,9 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
     logCategory = 'httpstreamer'
     
     def __init__(self, streamer):
+        """
+        @param streamer: L{MultifdSinkStreamer}
+        """
         self.logfile = None
         self.admin_password = None
             
@@ -271,6 +274,14 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.maxclients = -1
         
         resource.Resource.__init__(self)
+
+    def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
+        try:
+            request = self.request_hash[fd]
+            self._removeClient(request, fd, stats)
+        except KeyError:
+            self.warning('[fd %5d] not found in request_hash' % fd)
+
         
     def setLogfile(self, logfile):
         self.logfile = open(logfile, 'a')
@@ -314,13 +325,6 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.logfile.write(msg)
         self.logfile.flush()
 
-    def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
-        try:
-            request = self.request_hash[fd]
-            self._removeClient(request, fd, stats)
-        except KeyError:
-            self.warning('[fd %5d] not found in request_hash' % fd)
-
     def setAuth(self, auth):
         self.auth = auth
 
@@ -330,6 +334,9 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
 
     def setAdminPassword(self, password):
         self.admin_password = password
+
+    def setBouncerName(self, bouncerName):
+        self.bouncerName = bouncerName
 
     # FIXME: rename to writeHeaders
     """
@@ -385,11 +392,15 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         return len(self.request_hash) >= self.maxAllowedClients()
     
     def isAuthenticated(self, request):
-        if self.auth is None:
+    # ask for authentication of the request.  returns a deferred which will
+    # return True or False
+        if self.bouncerName is None:
             return True
 
-        keycard = HTTPClientKeycard(request)
-        return self.auth.authenticate(keycard)
+        # FIXME: implement authenticate on bouncer
+        return True
+        credentials = HTTPClientKeycard(request)
+        return self.auth.authenticate(credentials)
 
     def _addClient(self, request):
         """
@@ -502,12 +513,12 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             return self.admin
         return self
 
-class HTTPView(feedcomponent.FeedComponentView):
+class HTTPMedium(feedcomponent.FeedComponentMedium):
     def __init__(self, comp):
         """
         @type comp: L{Stats}
         """
-        feedcomponent.FeedComponentView.__init__(self, comp)
+        feedcomponent.FeedComponentMedium.__init__(self, comp)
 
         self.comp.connect('ui-state-changed', self._comp_ui_state_changed_cb)
 
@@ -519,7 +530,7 @@ class HTTPView(feedcomponent.FeedComponentView):
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
-    # this object is given to the HTTPView as comp
+    # this object is given to the HTTPMedium as comp
     logCategory = 'cons-http'
     # use select for test
     pipe_template = 'multifdsink name=sink ' + \
@@ -531,7 +542,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     gsignal('client-removed', object, int, int, object)
     gsignal('ui-state-changed')
     
-    component_view_class = HTTPView
+    component_medium_class = HTTPMedium
 
     def __init__(self, name, source, port):
         self.port = port
@@ -621,6 +632,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def update_ui_state(self):
         self.emit('ui-state-changed')
+
+    def authenticate(self, bouncerName, credentials):
+        # FIXME: call on manager
+        return True
 
     # handle the thread deserializing queues
     def _handleQueue(self):
@@ -759,7 +774,7 @@ def createComponent(config):
         resource.setAdminPassword(config['admin-password'])
 
     if config.has_key('bouncer'):
-        print "THOMAS: WEEHEE: bouncer %s" % config['bouncer']
+        resource.setBouncerName(config['bouncer'])
         
     # create bundlers for UI
     # FIXME: register ui types through base methods on component

@@ -26,6 +26,7 @@ from twisted.python import reflect
 from twisted.spread import pb
 
 from flumotion.common.registry import registry
+from flumotion.common import interfaces
 from flumotion.component import component
 from flumotion.worker import launcher
 from flumotion.twisted import cred
@@ -62,12 +63,15 @@ def getComponent(dict, defs):
     component = module.createComponent(dict)
     return component
 
-class JobView(pb.Referenceable, log.Loggable):
+class JobMedium(pb.Referenceable, log.Loggable):
     """
-    I present a View to the worker brain on a job.
+    I am a medium between the job and the worker's job avatar.
     I live in the job process.
     """
-    logCategory = 'job'
+    logCategory = 'jobmedium'
+
+    __implements__ = interfaces.IJobMedium,
+
     def __init__(self):
         self.remote = None
         
@@ -89,14 +93,15 @@ class JobView(pb.Referenceable, log.Loggable):
         reactor.stop()
         raise SystemExit
 
-    ### our methods
-
+    ### IMedium methods
+    def setRemoteReference(self, remoteReference):
+        self.remote = remoteReference
+    
+    #FIXME: add to IMedium
     def hasPerspective(self):
         return self.remote != None
 
-    def cb_gotPerspective(self, perspective):
-        self.remote = perspective
-    
+    ### our methods
     def set_nice(self, name, nice):
         if not nice:
             return
@@ -167,20 +172,21 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     def __init__(self, name):
         pb.PBClientFactory.__init__(self)
         
-        self.view = JobView()
+        self.medium = JobMedium()
         self.login(name)
             
+    ### pb.PBClientFactory methods
     def login(self, username):
         d = pb.PBClientFactory.login(self, 
                                      cred.Username(username),
-                                     self.view)
-        d.addCallbacks(self.cb_connected,
-                       self.cb_failure)
+                                     self.medium)
+        d.addCallbacks(self._connectedCallback,
+                       self._connectedErrback)
         return d
     
-    def cb_connected(self, perspective):
-        self.info('perspective %r connected' % perspective)
-        self.view.cb_gotPerspective(perspective)
+    def _connectedCallback(self, remoteReference):
+        self.info('perspective %r connected' % remoteReference)
+        self.medium.setRemoteReference(remoteReference)
 
-    def cb_failure(self, error):
+    def _connectedErrback(self, error):
         print 'ERROR:' + str(error)

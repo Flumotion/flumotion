@@ -122,8 +122,8 @@ class ManagerCredentialsChecker(cred.FlexibleCredentialsChecker):
         # XXX: If it's component or admin, allow anonymous access.
         #      This is a big hack, but it emulates the current behavior
         #      Do we need to authenticate components and workers?
-        if (interfaces.IComponentView in credentials.interfaces or
-            interfaces.IAdminView in credentials.interfaces):
+        if (interfaces.IComponentMedium in credentials.interfaces or
+            interfaces.IAdminMedium in credentials.interfaces):
             return credentials.username
 
         return cred.FlexibleCredentialsChecker.requestAvatarId(self, credentials)
@@ -137,11 +137,11 @@ class Vishnu:
         # connecting to me
         self.dispatcher = Dispatcher()
 
-        self.workerheaven = self._createHeaven(interfaces.IWorkerView,
+        self.workerheaven = self._createHeaven(interfaces.IWorkerMedium,
                                                worker.WorkerHeaven)
-        self.componentheaven = self._createHeaven(interfaces.IComponentView,
+        self.componentheaven = self._createHeaven(interfaces.IComponentMedium,
                                                   component.ComponentHeaven)
-        self.adminheaven = self._createHeaven(interfaces.IAdminView,
+        self.adminheaven = self._createHeaven(interfaces.IAdminMedium,
                                               admin.AdminHeaven)
 
         # create a portal so that I can be connected to, through our dispatcher
@@ -156,6 +156,16 @@ class Vishnu:
         self.factory = pb.PBServerFactory(p)
 
     def _createHeaven(self, interface, klass):
+        """
+        Create a heaven of the given klass that will send avatars to clients
+        implementing the given medium interface.
+
+        @param interface: the medium interface to create a heaven for
+        @type interface: L{flumotion.common.interfaces.IMedium}
+        @param klass: the type of heaven to create
+        @type klass: an implementor of L{flumotion.common.interfaces.IHeaven}
+        """
+        assert issubclass(interface, interfaces.IMedium)
         heaven = klass(self)
         self.dispatcher.registerHeaven(heaven, interface)
         return heaven

@@ -37,35 +37,48 @@ class WorkerClientFactory(factoryClass):
     """
     #__super_login = factoryClass.startLogin
     __super_login = factoryClass.login
-    def __init__(self, parent):
-        self.view = parent.worker_view
+    def __init__(self, brain):
+        """
+        @type brain: L{flumotion.worker.worker.WorkerBrain}
+        """
+        self.medium = brain.medium
         # doing this as a class method triggers a doc error
         factoryClass.__init__(self)
         
     def login(self, credentials):
         return self.__super_login(credentials,
-                                  self.view,
-                                  interfaces.IWorkerView)
+                                  self.medium,
+                                  interfaces.IWorkerMedium)
         
-    def gotPerspective(self, perspective):
-        self.view.cb_gotPerspective(perspective)
+    def gotPerspective(self, remoteReference):
+        self.medium.setRemoteReference(remoteReference)
 
-class WorkerView(pb.Referenceable, log.Loggable):
+class WorkerMedium(pb.Referenceable, log.Loggable):
     """
-    I present a view of the worker to the manager.
+    I am a medium interfacing with the manager-side WorkerAvatar.
     """
-    logCategory = 'worker-view'
+    
+    logCategory = 'workermedium'
+
+    __implements__ = interfaces.IWorkerMedium,
+    
     def __init__(self, brain):
         self.brain = brain
+        self.remote = None
         
-    def cb_gotPerspective(self, perspective):
-        self.info('got perspective: %s' % perspective)
-
     def cb_processFinished(self, *args):
         self.info('processFinished %r' % args)
 
     def cb_processFailed(self, *args):
         self.info('processFailed %r' % args)
+
+    ### IMedium methods
+    def setRemoteReference(self, remoteReference):
+        self.info('setRemoteReference: %r' % remoteReference)
+        self.remote = remoteReference
+
+    def hasRemoteReference(self):
+        return self.remote != None
 
     ### pb.Referenceable method for the manager's WorkerAvatar
     def remote_start(self, name, type, config):
@@ -141,7 +154,7 @@ class WorkerBrain:
         self.kindergarten = Kindergarten()
         self.job_server_factory, self.job_heaven = self.setup()
 
-        self.worker_view = WorkerView(self)
+        self.medium = WorkerMedium(self)
         self.worker_client_factory = WorkerClientFactory(self)
 
     def login(self, credentials):
@@ -244,7 +257,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
 
     def attached(self, mind):
         """
-        @param mind: reference to the job's JobView on which we can call
+        @param mind: reference to the job's JobMedium on which we can call
         @type mind: L{twisted.spread.pb.RemoteReference}
         
         I am scheduled from the dispatcher's requestAvatar method.
@@ -267,7 +280,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
     
     def _cb_afterInitial(self, unused):
         kid = self.heaven.brain.kindergarten.getKid(self.name)
-        # we got kid.config through WorkerView.remote_start from the manager
+        # we got kid.config through WorkerMedium.remote_start from the manager
         feedNames = kid.config.get('feed', [])
         self.log('_cb_afterInitial(): feedNames %r' % feedNames)
 

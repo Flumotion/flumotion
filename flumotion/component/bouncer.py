@@ -26,7 +26,7 @@ from flumotion.component import component
 
 __all__ = ['Bouncer']
 
-class BouncerView(component.BaseComponentView):
+class BouncerMedium(component.BaseComponentMedium):
     def remote_authenticate(self, credentials):
         return self.comp.authenticate(credentials)
 
@@ -40,7 +40,7 @@ class Bouncer(component.BaseComponent):
 
     __implements__ = interfaces.IAuthenticate,
 
-    component_view_class = BouncerView
+    component_medium_class = BouncerMedium
     
     logCategory = 'bouncer'
     def __init__(self, name):
