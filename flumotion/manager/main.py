@@ -27,8 +27,6 @@ import sys
 from twisted.internet import reactor, error
 
 from flumotion.manager import manager
-# FIXME: merge mconfig and config
-from flumotion.manager import config as mconfig
 from flumotion.common import log, config, common, errors
 from flumotion.configure import configure
 
