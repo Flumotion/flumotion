@@ -20,6 +20,7 @@
  
 import optparse
 import os
+import resource
 import signal
 import sys
 
@@ -52,23 +53,32 @@ class Launcher(log.Loggable):
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         
-    def restore_uid(self):
+    def restore_uid(self, name):
         if self.uid is not None:
             try:
                 os.setuid(self.uid)
-                self.debug('uid set to %d' % (self.uid))
+                log.debug(name, 'uid set to %d' % (self.uid))
             except OSError, e:
-                self.warning('failed to set uid: %s' % str(e))
+                log.warning(name, 'failed to set uid: %s' % str(e))
 
-    def set_nice(self, nice):
+    def set_nice(self, name, nice):
         if nice:
             try:
                 os.nice(nice)
             except OSError, e:
-                self.warning('Failed to set nice level: %s' % str(e))
+                log.warning(name, 'Failed to set nice level: %s' % str(e))
             else:
-                self.debug('Nice level set to %d' % nice)
+                log.debug(name, 'Nice level set to %d' % nice)
 
+    def enable_core_dumps(self, name):
+        soft, hard = resource.getrlimit(resource.RLIMIT_CORE)
+        if hard != resource.RLIM_INFINITY:
+            log.warning(name, 'Could not set ulimited core dump sizes, setting to %d instead' % hard)
+        else:
+            log.debug(name, 'Enabling core dumps of ulimited size')
+            
+        resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
+        
     def start_controller(self, logging=False):
         self.debug('Starting controller')
         
@@ -82,7 +92,7 @@ class Launcher(log.Loggable):
             
         signal.signal(signal.SIGINT, signal.SIG_IGN)
                 
-        self.restore_uid()
+        self.restore_uid('controller')
         factory = controller.ControllerServerFactory()
         log.debug('controller', 'listening on TCP port %d' % self.controller_port)
         reactor.listenTCP(self.controller_port, factory)
@@ -114,7 +124,7 @@ class Launcher(log.Loggable):
         reactor.run()
         
     def run(self):
-        self.restore_uid()
+        self.restore_uid('launcher')
 
         reactor.run() # don't fucking dare setting it to False.
 
@@ -136,18 +146,21 @@ class Launcher(log.Loggable):
         if pid:
             self.children.append(pid)
             return
+        
+        component_name = config.getName()
+
+        log.debug(component_name, 'Starting on pid %d of type %s' %
+                   (os.getpid(), config.getType()))
 
         signal.signal(signal.SIGINT, signal.SIG_IGN)
-        self.restore_uid()
         self.threads_init()
-        self.set_nice(config.nice)
-
-        component_name = config.getName()
-        self.debug('Configuration dictionary for %s is: %r' % (
-            component_name, config.getConfigDict()))
+        self.restore_uid(component_name)
+        self.set_nice(component_name, config.nice)
+        self.enable_core_dumps(component_name)
+        
+        log.debug(component_name, 'Configuration dictionary is: %r' % (
+            config.getConfigDict()))
         comp = config.getComponent()
-        self.debug('Starting %s (%s) on pid %d' %
-                   (component_name, config.getType(), pid))
         factory = component.ComponentFactory(comp)
         factory.login(component_name)
         
