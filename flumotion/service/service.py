@@ -72,8 +72,7 @@ class Servicer(log.Loggable):
         managers = {}
 
         if not os.path.exists(self.managersDir):
-            raise errors.SystemError, \
-                "Managers directory %s not found." % self.managersDir
+            return managers
 
         for managerDir in glob.glob(os.path.join(self.managersDir, '*')):
             flows = [] # names of flows
@@ -97,8 +96,7 @@ class Servicer(log.Loggable):
         workers = []
 
         if not os.path.exists(self.workersDir):
-            raise errors.SystemError, \
-                "Workers directory %s not found." % self.workersDir
+            return workers
 
         for workerFile in glob.glob(os.path.join(self.workersDir, '*.xml')):
             filename = os.path.split(workerFile)[1]
@@ -144,11 +142,11 @@ class Servicer(log.Loggable):
         (managers, workers) = self._parseManagersWorkers('stop', args)
         exitvalue = 0
 
-        for name in managers:
-            if not self.stopManager(name):
-                exitvalue += 1
         for name in workers:
             if not self.stopWorker(name):
+                exitvalue += 1
+        for name in managers:
+            if not self.stopManager(name):
                 exitvalue += 1
             
         return exitvalue

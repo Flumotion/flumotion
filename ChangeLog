@@ -1,5 +1,16 @@
 2004-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_tvcard.glade:
+	  add accessors
+	* flumotion/component/effects/colorbalance/colorbalance.glade:
+	  add spacing
+	* flumotion/service/service.py:
+	  stop workers before managers
+	  don't fatally fail when no managers or workers config dirs found,
+	  since that's ok.  Needs a prerelease test.
+
+2004-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/common/bundle.py:
 	* flumotion/test/test_bundle.py:
