@@ -278,5 +278,6 @@ def run(name, options):
     log.debug('job', 'Left reactor.run')
     log.info('job', 'Job stopped, returning with exit value 1')
             
+    # FIXME: why return 1 ? this might have been a nice exit, no ?
     os._exit(1)
     
