@@ -41,6 +41,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     gsignal('connected')
     gsignal('connection-refused')
     gsignal('ui-state-changed', str, object)
+    gsignal('reloading', str)
     gsignal('update', object)
     
     logCategory = 'adminclient'
@@ -66,8 +67,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.debug("emitted connection-refused")
 
     # default Errback
-    def _defaultErrback(failure):
-        self.warning('Errback failure: %s', failure.getErrorMessage())
+    def _defaultErrback(self, failure):
+        self.warning('Errback failure: %s' % failure.getErrorMessage())
 
     ### pb.Referenceable methods
     def remote_log(self, category, type, message):
@@ -140,6 +141,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         def _reloaded(result, self):
             self.info("reloaded manager code")
 
+        self.emit('reloading', 'manager')
         self.info("reloading manager code")
         d = self.remote.callRemote('reloadManager')
         d.addCallback(_reloaded, self)
@@ -159,6 +161,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             self.info("reloaded component %s code" % component.name)
 
         self.info("reloading component %s code" % component.name)
+        self.emit('reloading', component.name)
         d = self.remote.callRemote('reloadComponent', component.name)
         d.addCallback(_reloaded, self, component)
         d.addErrback(self._defaultErrback)

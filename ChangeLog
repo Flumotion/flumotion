@@ -1,5 +1,12 @@
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	  make progress dialog a bit better, with updates on what it's reloading
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/dialogs.py:
 	  change interface according to suggestions

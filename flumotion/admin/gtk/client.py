@@ -110,8 +110,8 @@ class Window(log.Loggable):
         self.current_component = None
         
     # default Errback
-    def _defaultErrback(failure):
-        self.warning('Errback failure: %s', failure.getErrorMessage())
+    def _defaultErrback(self, failure):
+        self.warning('Errback failure: %s' % failure.getErrorMessage())
 
     def create_ui(self):
         wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
@@ -298,7 +298,9 @@ class Window(log.Loggable):
             deferred.addCallback(lambda result: _stop(dialog))
             deferred.addErrback(self._defaultErrback)
         
-        dialog = dialogs.ProgressDialog("Reloading ...", "Reloading manager", self.window)
+        dialog = dialogs.ProgressDialog("Reloading ...", "Reloading client code", self.window)
+        l = lambda admin, text, dialog: dialog.message("Reloading %s code" % text)
+        self.admin.connect('reloading', l, dialog)
         dialog.start()
         reactor.callLater(0.2, _callLater, self.admin, dialog)
  

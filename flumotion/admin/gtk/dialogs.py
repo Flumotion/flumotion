@@ -29,12 +29,10 @@ class ProgressDialog(gtk.Dialog):
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
 
                                                                                
-        box = gtk.VBox()
-        self.action_area.add(box)
         self.label = gtk.Label(message)
-        box.add(self.label)
+        self.vbox.pack_start(self.label, True, True)
         self.bar = gtk.ProgressBar()
-        box.add(self.bar)
+        self.vbox.pack_end(self.bar, True, True)
         self.active = False
 
     def start(self):
@@ -69,6 +67,7 @@ if __name__ == '__main__':
         gtk.main_quit()
         
     gobject.timeout_add(1000, lambda dialog: dialog.message('Step 1'), dialog)
-    gobject.timeout_add(2000, lambda dialog: dialog.message('Step 2'), dialog)
-    gobject.timeout_add(4000, stop, dialog)
+    gobject.timeout_add(2000, lambda dialog: dialog.message('Step 2 but with a lot longer text so we test shrinking'), dialog)
+    gobject.timeout_add(3000, lambda dialog: dialog.message('Step 3'), dialog)
+    gobject.timeout_add(5000, stop, dialog)
     gtk.main()
