@@ -20,7 +20,7 @@ import os
 
 def get():
     return {
-        'installed': 1,
+        'isinstalled': 1,
         'pythondir':   os.path.join('@DATADIR@', 'flumotion'),
         'datadir':     os.path.join('@DATADIR@', 'flumotion'),
         'gladedir':    os.path.join('@DATADIR@', 'flumotion', 'glade'),
