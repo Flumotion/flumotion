@@ -69,6 +69,7 @@ def getComponent(dict, defs):
     # we're going to listen to ports and other stuff which should
     # be separated from the main process.
 
+    self.debug('calling createComponent for type %s' % source)
     try:
         component = module.createComponent(dict)
     except Exception, e:
