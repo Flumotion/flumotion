@@ -1,3 +1,4 @@
+import common
 import unittest
 
 from flumotion.server.component import ParseLaunchComponent

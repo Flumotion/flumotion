@@ -282,7 +282,7 @@ class HTTPStreamingResource(resource.Resource):
 
     def isReady(self):
         if self.streamer.caps is None:
-            self.msg('We have no caps yet')
+            self.debug('We have no caps yet')
             return False
         
         return True
