@@ -441,6 +441,9 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     def loadConfiguration(self, xml_string):
         return self.remote.callRemote('loadConfiguration', xml_string)
 
+    def getConfiguration(self):
+        return self.remote.callRemote('getConfiguration')
+
     def cleanComponents(self):
         return self.remote.callRemote('cleanComponents')
 

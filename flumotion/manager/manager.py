@@ -182,6 +182,15 @@ class Vishnu(log.Loggable):
 
         self.configuration = None
 
+    def getConfiguration(self):
+        """Returns the manager's configuration as a string suitable for
+        importing via loadConfiguration().
+        """
+        if self.configuration:
+            return self.configuration.export()
+        else:
+            return None
+
     # FIXME: do we want a filename to load config, or data directly ?
     # FIXME: well, I think we want to have an "object" with an "interface"
     # FIXME: that gives you "the config", instead of this broken piece
@@ -193,7 +202,7 @@ class Vishnu(log.Loggable):
         self.debug('loading configuration')
         # FIXME: we should be able to create "wanted" config/state from
         # something else than XML as well
-        conf = config.FlumotionConfigXML(filename, data)
+        self.configuration = conf = config.FlumotionConfigXML(filename, data)
 
         # scan filename for a bouncer component in the manager
         # FIXME: we should have a "running" state object layout similar

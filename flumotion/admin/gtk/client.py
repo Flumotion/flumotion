@@ -828,6 +828,43 @@ class Window(log.Loggable, gobject.GObject):
         d.show()
         d.connect('have-connection', self.on_have_connection)
     
+    def on_import_response(self, d, response):
+        if response==gtk.RESPONSE_ACCEPT:
+            name = d.get_filename()
+            conf_xml = open(name, 'r').read()
+            self.admin.loadConfiguration(conf_xml)
+        d.destroy()
+
+    def file_import_configuration_cb(self, button):
+        d = gtk.FileChooserDialog("Import Configuration...", self.window,
+                                  gtk.FILE_CHOOSER_ACTION_OPEN,
+                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        d.set_default_response(gtk.RESPONSE_ACCEPT)
+        d.show()
+        d.connect('response', self.on_import_response)
+    
+    def getConfiguration_cb(self, conf_xml, name):
+        f = open(name, 'w')
+        f.write(conf_xml)
+        f.close()
+
+    def on_export_response(self, d, response):
+        if response==gtk.RESPONSE_ACCEPT:
+            deferred = self.admin.getConfiguration()
+            name = d.get_filename()
+            deferred.addCallback(self.getConfiguration_cb, name)
+        d.destroy()
+
+    def file_export_configuration_cb(self, button):
+        d = gtk.FileChooserDialog("Export Configuration...", self.window,
+                                  gtk.FILE_CHOOSER_ACTION_SAVE,
+                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        d.set_default_response(gtk.RESPONSE_ACCEPT)
+        d.show()
+        d.connect('response', self.on_export_response)
+    
     def file_quit_cb(self, button):
         self.close()
     

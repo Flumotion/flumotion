@@ -208,6 +208,13 @@ class AdminAvatar(base.ManagerAvatar):
         flumotion.common.reload.reload()
         self._reloaded()
 
+    def perspective_getConfiguration(self):
+        """
+        Get the configuration of the manager as an XML string.
+        @return string
+        """
+        return self.vishnu.getConfiguration()
+
     def perspective_loadConfiguration(self, xml):
         """
         @type  xml: string

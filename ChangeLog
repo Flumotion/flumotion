@@ -1,5 +1,26 @@
 2005-03-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/client.py (Window.file_export_configuration_cb) 
+	(Window.on_export_response, Window.getConfiguration_cb) 
+	(Window.file_import_configuration_cb, Window.on_import_response):
+	Implement import/export of configurations.
+
+	* data/glade/admin.glade: Add menu items to import and export
+	configurations.
+
+	* flumotion/admin/admin.py (AdminModel.getConfiguration): New
+	method, foo.
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspective_getConfiguration): New method, bla bla.
+	So many levels of encapsulation, eh.
+
+	* flumotion/manager/manager.py (Vishnu.getConfiguration): New
+	method, gets the configuration of the manager as an XML string.
+
+	* flumotion/common/config.py (FlumotionConfigXML.export): Added
+	method, exports the configuration as a pretty-printed xml string.
+
 	* configure.ac: 
 	* Makefile.am (EXTRA_DIST): 
 	* env.in: New script, sets up a dev environment for

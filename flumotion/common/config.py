@@ -115,7 +115,9 @@ class FlumotionConfigXML(log.Loggable):
     def getPath(self):
         return self.path
 
-   
+    def export(self):
+        return self.doc.toxml()
+
     def parse(self):
         # <planet>
         #     <manager>
