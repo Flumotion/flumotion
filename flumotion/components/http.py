@@ -85,6 +85,8 @@ class HTTPStreamingAdminResource(resource.Resource):
     def __init__(self, streaming):
         'call with a HTTPStreamingResource to admin for'
         self.streaming = streaming
+        self.debug = self.streaming.debug
+        #self.info = lambda msg: log.info('HTTP admin', msg)
 
         resource.Resource.__init__(self)
 
@@ -127,7 +129,9 @@ class HTTPStreamingAdminResource(resource.Resource):
         return False
 
     def render(self, request):
+        self.debug('Request for admin page')
         if not self.isAuthenticated(request):
+            self.debug('Unauthorized request for /admin from %s' % request.getClientIP())
             error_code = http.UNAUTHORIZED
             request.setResponseCode(error_code)
             request.setHeader('server', HTTP_VERSION)
