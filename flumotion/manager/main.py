@@ -64,7 +64,6 @@ def _loadConfig(vishnu, filename):
 
     # scan filename for a bouncer component in the manager
 
-    print filename
     conf = config.FlumotionConfigXML(filename)
 
     if conf.manager and conf.manager.bouncer:

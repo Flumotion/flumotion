@@ -1,5 +1,4 @@
 bin_SCRIPTS = \
-	flumotion \
 	flumotion-manager \
 	flumotion-admin \
 	flumotion-worker \

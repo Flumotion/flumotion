@@ -51,7 +51,6 @@ AM_CONDITIONAL(HAVE_EPYDOC, test "x$EPYDOC" = "xyes")
 dnl output stuff
 AC_OUTPUT(
 Makefile
-bin/flumotion
 bin/flumotion-manager
 bin/flumotion-admin
 bin/flumotion-worker
