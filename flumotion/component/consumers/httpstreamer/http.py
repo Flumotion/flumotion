@@ -21,7 +21,6 @@
 
 # Headers in this file shall remain intact.
 
-import os
 import time
 import thread
 
@@ -35,7 +34,7 @@ from flumotion.component import feedcomponent
 from flumotion.common import bundle, common, gstreamer
 
 from flumotion.common.component import moods
-from flumotion.common.pygtk import gsignal
+from flumotion.common.pygobject import gsignal
 
 from flumotion.component.consumers.httpstreamer import resources
 
@@ -69,8 +68,9 @@ class Stats:
             # first measurement
             self.average_client_number = 0
         else:
-            before = (dc1 * dt1) / (dt1 + dt2)
-            after =  dc2 * dt2 / (dt1 + dt2)
+            dt = dt1 + dt2
+            before = (dc1 * dt1) / dt
+            after =  dc2 * dt2 / dt
             self.average_client_number = before + after
 
     def clientAdded(self):

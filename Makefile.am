@@ -51,7 +51,6 @@ PYCHECKER_WHITELIST = \
 	    flumotion/component/*/*/*.py
 
 PYCHECKER_BLACKLIST = \
-	flumotion/component/consumers/httpstreamer/http.py \
 	flumotion/component/converters/overlay/overlay.py \
 	flumotion/component/producers/firewire/firewire.py
 

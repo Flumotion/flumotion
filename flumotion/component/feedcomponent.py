@@ -31,10 +31,11 @@ from twisted.spread import pb
 
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
-from flumotion.common import common, interfaces, errors, log, gstreamer, pygtk
+from flumotion.common import common, interfaces, errors, log
+from flumotion.common import gstreamer, pygobject
 
 from flumotion.common.component import moods
-from flumotion.common.pygtk import gsignal
+from flumotion.common.pygobject import gsignal
 
 class FeedComponentMedium(basecomponent.BaseComponentMedium):
     """
@@ -561,10 +562,9 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.debug('setting property %s on element %r to %s' %
                    (property, element_name, value))
-        pygtk.gobject_set_property(element, property, value)
+        pygobject.gobject_set_property(element, property, value)
     
 gobject.type_register(FeedComponent)
-
 
 class ParseLaunchComponent(FeedComponent):
     'A component using gst-launch syntax'

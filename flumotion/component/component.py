@@ -37,7 +37,7 @@ from flumotion.common.component import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
-from flumotion.common.pygtk import gsignal
+from flumotion.common.pygobject import gsignal
 
 # FIXME: make the superklass reconnecting ?
 superklass = fpb.FPBClientFactory

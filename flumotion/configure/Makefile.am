@@ -11,9 +11,8 @@ flumotion_PYTHON = \
 
 noinst_PYTHON = uninstalled.py
 
-TAGS_FILES = installed.py.in uninstalled.py.in
+BUILT_SOURCES = installed.py uninstalled.py
 
-clean-local:
-	rm -rf *.pyc *.pyo installed.py uninstalled.py
+TAGS_FILES = installed.py.in uninstalled.py.in
 
 EXTRA_DIST = $(flumotion_PYTHON) installed.py.in uninstalled.py.in
