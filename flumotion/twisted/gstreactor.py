@@ -103,7 +103,6 @@ class GstReactor(default.PosixReactorBase):
             self.simulate()
         except KeyboardInterrupt:
             print "KeyboardInterrupt (gstreactor.addReader())"
-            pass
 
     def addWriter(self, writer):
         if not hasWriter(writer):
@@ -163,8 +162,8 @@ class GstReactor(default.PosixReactorBase):
             self.simulate()
             gst.main()
         except KeyboardInterrupt:
-            print "KeyboardInterrupt (gstreactor.run())"
-            pass
+            from flumotion.common import log as flog
+            flog.info('gstreactor', "KeyboardInterrupt in run()")
 
     def _doReadOrWrite(self, source, condition, faildict={
         error.ConnectionDone: failure.Failure(error.ConnectionDone()),
@@ -186,8 +185,8 @@ class GstReactor(default.PosixReactorBase):
                         if not source.disconnected and source.doWrite != didRead:
                             why = source.doWrite()
                 except KeyboardInterrupt:
-                    print "KeyboardInterrupt (gstreactor._doReadOrWrite())"
-                    pass
+                    from flumotion.common import log as flog
+                    flog.info('gstreactor', "KeyboardInterrupt in _doReadOrWrite")
             except:
                 why = sys.exc_info()[1]
                 log.msg('Error In %s' % source)
@@ -207,7 +206,8 @@ class GstReactor(default.PosixReactorBase):
             log.callWithLogger(source, self._doReadOrWrite, source, condition)
             self.simulate() # fire Twisted timers
         except KeyboardInterrupt:
-            print "KeyboardInterrupt (gstreactor.callback())"
+            from flumotion.common import log as flog
+            flog.info('gstreactor', "KeyboardInterrupt in callback")
             return 0
         
         return 1 # 1=don't auto-remove the source

@@ -171,7 +171,7 @@ class Overlay(wizard.WizardStep):
     
     def setup(self):
         # XXX: Remove
-        self.checkbutton_show_logo.set_active(False)
+        self.checkbutton_show_logo.set_active(True)
         self.checkbutton_show_text.set_active(True)
 
     def get_component_properties(self):

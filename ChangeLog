@@ -1,3 +1,15 @@
+2004-10-16  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/overlay/Makefile.am:
+	* flumotion/component/overlay/cc_24x24.png:
+	* flumotion/component/overlay/fluendo_24x24.png:
+	* flumotion/component/overlay/overlay.py:
+	* flumotion/component/overlay/xiph_24x24.png:
+	* flumotion/twisted/gstreactor.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Add logos to overlay component, remove some prints in gstreactor
+
 2004-10-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:

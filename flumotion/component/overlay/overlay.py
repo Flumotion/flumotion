@@ -25,6 +25,11 @@ from PIL import ImageDraw
 
 directory = os.path.split(os.path.abspath(__file__))[0]
 fontpath = os.path.join(directory, 'Vera.ttf')
+logopath = directory
+
+fluendoLogoPath = os.path.join(logopath, 'fluendo_24x24.png')
+ccLogoPath = os.path.join(logopath, 'cc_24x24.png')
+xiphLogoPath = os.path.join(logopath, 'xiph_24x24.png')
 
 FILENAME = '/tmp/flumotion-overlay.png'
 
@@ -40,13 +45,19 @@ def generate_overlay(text, logo, width, height, size=22, x=4, y=4):
     image = Image.new("RGBA", (width, height))
     draw = ImageDraw.Draw(image)
 
+    if logo:
+        print 'JOHAN: fix colors'
+        fluendo = Image.open(fluendoLogoPath)
+        cc = Image.open(ccLogoPath)
+        xiph = Image.open(xiphLogoPath)
+        draw.bitmap((width-24, height-24), fluendo)
+        draw.bitmap((width-48, height-24), cc)
+        draw.bitmap((width-72, height-24), xiph)
+        
     if text:
         font = ImageFont.truetype(fontpath, size)
         draw.text((x+2, y+2), text, font=font, fill='black')
         draw.text((x, y), text, font=font)
-
-    if logo:
-        print 'JOHAN: Add logo'
 
     if os.path.exists(FILENAME):
         os.unlink(FILENAME)
