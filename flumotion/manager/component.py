@@ -346,6 +346,15 @@ class ComponentAvatar(common.ManagerAvatar):
             return None
         return self.heaven._componentEntries[self.avatarId].type
 
+    def getWorkerName(self):
+        """
+        Return the name of the worker.
+        """
+        return self.options.worker
+
+    def getPid(self):
+        return self.options.pid
+
     def stop(self):
         """
         Tell the avatar to stop the component.

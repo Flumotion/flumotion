@@ -153,6 +153,7 @@ def main(args):
         elif options.transport == "ssl":
             options.port = defaultSSLPort
 
+    # set a default name if none is given
     if not options.name:
         if options.host == 'localhost':
             options.name = 'localhost'

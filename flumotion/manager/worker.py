@@ -61,7 +61,7 @@ class WorkerAvatar(common.ManagerAvatar):
         """
         self.debug('starting %s on %s with config %r' % (name, self.avatarId,
             config))
-        return self.mindCallRemote('start', name, type, config)
+        return self.mindCallRemote('start', name, type, config, self.avatarId)
 
 class WorkerHeaven(common.ManagerHeaven):
     """

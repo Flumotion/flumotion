@@ -1,5 +1,17 @@
 2004-12-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/worker.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  Show worker name and pid for components
+
+2004-12-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/workers/default.xml:
 	* doc/redhat/flumotion:
 	* flumotion/manager/main.py:

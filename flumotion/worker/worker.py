@@ -131,7 +131,7 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         return self.remote != None
 
     ### pb.Referenceable method for the manager's WorkerAvatar
-    def remote_start(self, name, type, config):
+    def remote_start(self, name, type, config, workerName):
         """
         Start a component of the given type with the given config.
 
@@ -252,7 +252,7 @@ class Kindergarten(log.Loggable):
         
     def play(self, name, type, config):
         """
-        Make a kid play.
+        Create a kid and make it "play" by starting a job.
         Starts a component with the given name, of the given type, and
         the given config dictionary.
 
@@ -317,6 +317,8 @@ class WorkerBrain(log.Loggable):
         self.manager_host = options.host
         self.manager_port = options.port
         self.manager_transport = options.transport
+
+        self.workerName = options.name
         
         self.kindergarten = Kindergarten(options)
         self.job_server_factory, self.job_heaven = self.setup()

@@ -196,8 +196,9 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
             reactor.callLater(0.250, self.remote_register)
             return None
 
-        options = {'ip' : self.getIP(),
-                   'pid' :  os.getpid()}
+        options = {'ip'    : self.getIP(),
+                   'pid'   : os.getpid(),
+                   'worker': self.comp.getWorkerName()}
 
         return options
         
@@ -259,6 +260,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         
         self.name = name
         self.medium = None # the medium connecting us to the manager's avatar
+        self._workerName = None
 
     ### Loggable methods
     def logFunction(self, arg):
@@ -276,6 +278,12 @@ class BaseComponent(log.Loggable, gobject.GObject):
     # FIXME: rename to getName
     def get_name(self):
         return self.name
+
+    def setWorkerName(self, workerName):
+        self._workerName = workerName
+
+    def getWorkerName(self):
+        return self._workerName
 
     def setMedium(self, medium):
         assert isinstance(medium, BaseComponentMedium)

@@ -219,6 +219,8 @@ class JobMedium(pb.Referenceable, log.Loggable):
         if feedPorts:
             comp.set_feed_ports(feedPorts)
 
+        comp.setWorkerName(self.options.name)
+
         # make component log in to manager
         manager_client_factory = component.ComponentClientFactory(comp)
         keycard = keycards.KeycardUACPP(self.options.username,
@@ -282,6 +284,7 @@ def run(name, options):
     """
     Called by the worker to start a job fork.
     """
+    # FIXME: rename and cleanup
     worker_filename = '/tmp/flumotion.%d' % os.getpid()
 
     pid = os.fork()

@@ -36,8 +36,10 @@ from flumotion.common import errors, log
 from flumotion.manager import admin # Register types
 from flumotion.utils.gstutils import gsignal
 
-COL_PIXBUF = 0
-COL_TEXT   = 1
+COL_PIXBUF    = 0
+COL_COMPONENT = 1
+COL_WORKER    = 2
+COL_PID       = 3
 
 RESPONSE_FETCH = 0
 
@@ -162,7 +164,7 @@ class Window(log.Loggable, gobject.GObject):
         self.hpaned = wtree.get_widget('hpaned')
         self.window.connect('delete-event', self.close)
         
-        self.component_model = gtk.ListStore(gdk.Pixbuf, str)
+        self.component_model = gtk.ListStore(gdk.Pixbuf, str, str, int)
         self.component_view = wtree.get_widget('component_view')
         self.component_view.connect('row-activated',
                                     self.component_view_row_activated_cb)
@@ -174,9 +176,16 @@ class Window(log.Loggable, gobject.GObject):
         self.component_view.append_column(col)
 
         col = gtk.TreeViewColumn('Component', gtk.CellRendererText(),
-                                 text=COL_TEXT)
+                                 text=COL_COMPONENT)
+        self.component_view.append_column(col)
+
+        col = gtk.TreeViewColumn('Worker', gtk.CellRendererText(),
+                                 text=COL_WORKER)
         self.component_view.append_column(col)
         
+        col = gtk.TreeViewColumn('PID', gtk.CellRendererText(),
+                                 text=COL_PID)
+        self.component_view.append_column(col)
         wtree.signal_autoconnect(self)
 
         self.icon_playing = self.window.render_icon(gtk.STOCK_YES,
@@ -193,7 +202,7 @@ class Window(log.Loggable, gobject.GObject):
         if not iter:
             return
         
-        return model.get(iter, COL_TEXT)[0]
+        return model.get(iter, COL_COMPONENT)[0]
 
     # FIXME: this method uses a file and a methodname as entries
     # FIXME: do we want to switch to imports instead so the whole file
@@ -495,7 +504,9 @@ class Window(log.Loggable, gobject.GObject):
             else:
                 pixbuf = self.icon_stopped
             model.set(iter, COL_PIXBUF, pixbuf)
-            model.set(iter, COL_TEXT, component.name)
+            model.set(iter, COL_COMPONENT, component.name)
+            model.set(iter, COL_WORKER, component.worker)
+            model.set(iter, COL_PID, component.pid)
 
     def close(self, *args):
         reactor.stop()

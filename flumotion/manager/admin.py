@@ -52,6 +52,8 @@ class ComponentView(pb.Copyable):
         self.eaters = component.getEaters()
         self.feeders = component.getFeeders()
         self.options = component.options.dict
+        self.worker = component.getWorkerName()
+        self.pid = component.getPid()
 
 # FIXME: move this out to flumotion.admin
 class RemoteComponentView(pb.RemoteCopy):
