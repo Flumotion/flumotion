@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_bundle -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
 # Flumotion - a video streaming server
@@ -28,7 +28,7 @@ import zipfile
 import md5
 import time
 
-class TestBundle(unittest.TestCase):
+class TestBundler(unittest.TestCase):
     # everything we need to set up the test environment
     def setUp(self):
         self.filename = __file__
@@ -36,12 +36,12 @@ class TestBundle(unittest.TestCase):
 
     # create a bundle of one file and check whether we get the correct
     # md5sum
-    def testBundleOneSum(self):
+    def testBundlerOneSum(self):
         bundle = self.bundler.bundle()
         sum = bundle.md5sum
 
     # create a bundle of two files and check the md5sum changed
-    def testBundleTwoSum(self):
+    def testBundlerTwoSum(self):
         bundle = self.bundler.bundle()
         sum = bundle.md5sum
         
@@ -56,7 +56,7 @@ class TestBundle(unittest.TestCase):
         os.unlink(path)
 
     # create a bundle of one file then unpack and check if it's the same
-    def testBundleOneFile(self):
+    def testBundlerOneFile(self):
         data = open(self.filename, "r").read()
         md5sum = md5.new(data).hexdigest()
         name = os.path.split(self.filename)[1]
@@ -74,7 +74,7 @@ class TestBundle(unittest.TestCase):
 
     # create a bundle of two files then update one of them and check
     # the md5sum changes
-    def testBundleTwoFiles(self):
+    def testBundlerTwoFiles(self):
         data = open(self.filename, "r").read()
 
         # create test file
@@ -95,6 +95,29 @@ class TestBundle(unittest.TestCase):
 
         assert newsum != sum
         os.unlink(path)
+
+# we test the Unbundler using the Bundler, should be enough
+class TestUnbundler(unittest.TestCase):
+    # everything we need to set up the test environment
+    def setUp(self):
+        self.filename = __file__
+        self.bundler = bundle.Bundler(self.filename)
+        self.bundle = self.bundler.bundle()
+
+    def testUnbundler(self):
+        path = tempfile.mkdtemp()
+        unbundler = bundle.Unbundler(path)
+        
+        unbundler.unbundle(self.bundle)
+
+        # make sure it unpacked
+        newfile = os.path.join(path, self.filename)
+        assert os.path.exists(newfile)
+
+        # verify contents
+        one = open(self.filename, "r").read()
+        two = open(newfile, "r").read()
+        assert one == two
         
 if __name__ == '__main__':
      unittest.main()

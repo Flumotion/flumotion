@@ -67,7 +67,7 @@ class Bundle:
         """
         Get the bundle's zip data.
         """
-        return zip
+        return self.zip
         
 class Unbundler:
     """
@@ -86,9 +86,9 @@ class Unbundler:
         @rtype: string
         @rparam: the full path to the directory where it was unpacked
         """
-        md5sum = bundle.getMD5Sum()
+        md5sum = bundle.md5sum
+        print "THOMAS: unbundling bundle with md5sum %s" % md5sum
         dir = os.path.join(self._undir, md5sum)
-        os.path.mkdir(dir)
 
         filelike = StringIO.StringIO(bundle.getZip())
         zip = zipfile.ZipFile(filelike, "r")
@@ -97,7 +97,7 @@ class Unbundler:
         filepaths = zip.namelist()
         for filepath in filepaths:
             path = os.path.join(dir, filepath)
-            parent = os.path.split(path)
+            parent = os.path.split(path)[0]
             try:
                 os.makedirs(parent)
             except OSError, err:
@@ -105,7 +105,9 @@ class Unbundler:
                 if err.errno != errno.EEXIST or not os.path.isdir(parent):
                     raise
             data = zip.read(filepath)
-            open(path, 'wb').write(data).close()
+            handle = open(path, 'wb')
+            handle.write(data)
+            handle.close()
         return dir
         
 class Bundler:
