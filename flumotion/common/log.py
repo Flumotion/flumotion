@@ -36,8 +36,6 @@ import os
 import fnmatch
 import time
 
-from flumotion.common import errors
-
 class Loggable:
     """
     Base class for objects that want to be able to log messages with
@@ -169,7 +167,12 @@ def error(cat, *args):
     """
     msg = ' '.join(args)
     _handle(cat, 'ERROR', msg)
-    raise errors.SystemError(msg)
+
+    # we do the import here because having it globally causes weird import
+    # errors if our gstreactor also imports .log, which brings in errors
+    # and pb stuff
+    from flumotion.common.errors import SystemError
+    raise SystemError(msg)
 
 def warning(cat, *args):
     """

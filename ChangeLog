@@ -1,3 +1,15 @@
+2004-12-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/streaming:
+	  some additional notes
+	* flumotion/common/log.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  (hopefully) fix file descriptor leakage by making sure the socket
+	  closes.  Document some more.  Fix some error cases as well.
+	* flumotion/twisted/gstreactor.py:
+	  debug the reactor a little
+
 2004-12-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:

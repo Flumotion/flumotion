@@ -266,7 +266,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     # handle the thread deserializing queues
     def _handleQueue(self):
 
-        # handle added clients
+        # handle added clients; added first because otherwise removed fd's
+        # are re-used before we handle added
         self._added_lock.acquire()
 
         while self._added_queue:
@@ -291,7 +292,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
 
     def _client_added_handler(self, sink, fd):
-        self.log('[%5d] client_added_handler from thread %d' % 
+        self.log('[fd %5d] client_added_handler from thread %d' % 
             (fd, thread.get_ident())) 
         Stats.clientAdded(self)
         # FIXME: GIL problem, don't update UI for now
@@ -301,6 +302,15 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def _client_removed_handler(self, sink, fd, reason, stats):
         self.log('[fd %5d] client_removed_handler from thread %d, reason %s' %
             (fd, thread.get_ident(), reason)) 
+        if reason.value_name == 'GST_CLIENT_STATUS_ERROR':
+            self.warning('[fd %5d] Client removed because of write error' % fd)
+        if reason.value_name == 'GST_CLIENT_STATUS_DUPLICATE':
+            # a _removed because of DUPLICATE never had the _added signaled
+            # in the first place, so we shouldn't update stats for it and just
+            # fughedaboudit
+            self.warning('[fd %5d] Client refused because the same fd is already registered' % fd)
+            return
+
         # Johan will trap GST_CLIENT_STATUS_ERROR here someday
         # because STATUS_ERROR seems to have already closed the fd somewhere
         self.emit('client-removed', sink, fd, reason, stats)

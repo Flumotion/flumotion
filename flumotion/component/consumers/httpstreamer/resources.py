@@ -71,6 +71,9 @@ HTTP_VERSION = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 # implements a Resource for the HTTP admin interface
 class HTTPAdminResource(web_resource.Resource):
     
+    # IResource interface variable; True means it will not chain requests
+    # further down the path to other resource providers through
+    # getChildWithDefault
     isLeaf = True
     
     def __init__(self, parent):
@@ -151,7 +154,12 @@ class HTTPAdminResource(web_resource.Resource):
 class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
+
     logCategory = 'httpstreamer'
+
+    # IResource interface variable; True means it will not chain requests
+    # further down the path to other resource providers through
+    # getChildWithDefault
     isLeaf = True
     
     def __init__(self, streamer):
@@ -265,6 +273,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # fd because the client disconnected.  Catch EBADF correctly here.
         try:
             os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
+            # tell Twisted we already wrote headers ourselves
+            request.startedWriting = True
             return True
         except OSError, (no, s):
             if no == errno.EBADF:
@@ -273,7 +283,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 self.warning('[fd %5d] client reset connection writing header' % fd)
             else:
                 self.warning('[fd %5d] unhandled write error when writing header: %s' % (fd, s))
-            return False
+        # trigger cleanup of request
+        del request
+        return False
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -334,7 +346,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         It also removes the keycard if one was created.
         
         @param request: the request
-        @type request: twisted.protocol.http.Request
+        @type request: L{twisted.protocols.http.Request}
         @param fd: the file descriptor for the client being removed
         @type fd: L{int}
         @param stats: the statistics for the removed client
@@ -344,8 +356,20 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         ip = request.getClientIP()
         self.logWrite(fd, ip, request, stats)
         self.info('[fd %5d] client from %s disconnected' % (fd, ip))
-        request.finish()
-        del self._requests[fd]
+
+        #self.debug('calling request.finish() on [fd %5d]' % fd)
+        #request.finish()
+        #self.debug('called request.finish() on [fd %5d]' % fd)
+        
+        # alternative method of finishing the request; since we already
+        # "stole" the fd, we don't rely on Twisted's Request anymore,
+        # we just loseConnection on the transport,
+        # and delete the Request object,
+        # hopefully triggering garbage collection on all its objects too
+
+        # by doing a callLater we hope to avoid any new clients getting
+        # this fd before we actually purged it completely, since this
+        # code is called from a signal handler.
         if self.bouncerName and self._fdToKeycard.has_key(fd):
             id = self._fdToKeycard[fd].id
             del self._fdToKeycard[fd]
@@ -355,6 +379,25 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             self.debug("canceling later expiration on fd %d" % fd)
             self._fdToDurationCall[fd].cancel()
             del self._fdToDurationCall[fd]
+
+        self.debug('[fd %5d] closing transport %r' % (fd, request.transport))
+        request.transport.loseConnection()
+        self.debug('[fd %5d] closed transport %r' % (fd, request.transport))
+
+        # FIXME: os.close is certainly wrong, since the actual socket
+        # will os.close the fd again during its garbage collection
+        #try:
+            #request.transport.close()
+        #except OSError, e:
+        #    if e.errno == errno.EBADF:
+        #        self.warning("Tried to close [fd %5d] which was not open" % fd)
+        #    else:
+        #        self.warning("Error closing [fd %5d]" % fd)
+        #        self.debug("error: %s (%d)" % (e.strerror, e.errno))
+
+        #del request
+
+        del self._requests[fd]
 
     def _durationCallLater(self, fd):
         """
@@ -420,16 +463,33 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     def _handleNewClient(self, request):
         # everything fulfilled, serve to client
-        self._writeHeaders(request)
-        self._addClient(request)
         fd = request.transport.fileno()
+        if not self._writeHeaders(request):
+            self.debug("[fd %5d] not adding as a client" % fd)
+            return
+        self._addClient(request)
         
         # take over the file descriptor from Twisted by removing them from
         # the reactor
         # spiv told us to remove* on request.transport, and that works
+        # then we figured out that a new request is only a Reader, so we
+        # remove the removedWriter
+        self.debug("taking away [fd %5d] from Twisted" % fd)
         reactor.removeReader(request.transport)
-        reactor.removeWriter(request.transport)
+        #reactor.removeWriter(request.transport)
     
+        # check if it's really an open fd
+        import fcntl
+        try:
+            fcntl.fcntl(fd, fcntl.F_GETFL)
+        except IOError, e:
+            if e.errno == errno.EBADF:
+                self.warning("[fd %5d] is not actually open, ignoring" % fd)
+            else:
+                self.warning("[fd %5d] error during check: %s (%d)" % (
+                    fd, e.strerror, e.errno))
+            return
+
         # hand it to multifdsink
         self.streamer.add_client(fd)
         ip = request.getClientIP()
@@ -481,8 +541,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         elif request.method == 'HEAD':
             self.debug('handling HEAD request')
             self._writeHeaders(request)
-            # tell Twisted we already wrote headers ourselves
-            request.startedWriting = True
             request.finish()
         else:
             raise AssertionError

@@ -35,6 +35,12 @@ What happens on every level ?
 - idler emits client-removed signal
 - HTTPStreamingResource catches and callbacks
 - callback calls _removeClient
-- _removeClient does a request.finish()
-- Twisted CLOSES THE FILE DESCRIPTOR
+- _removeClient does a request.transport.loseConnection()
+- Twisted somewhere closes the underlying socket
+- THIS CLOSES THE FILE DESCRIPTOR
 
+
+* TRICKY STUFF
+- python socket objects close the fd using close(fd) during garbage collection
+  IFF the fd was closed with os.close(fd), ie without invoking the socket
+  object's close
