@@ -19,10 +19,6 @@
 # Headers in this file shall remain intact.
 
 
-import os
-from xml.dom import minidom, Node
-
-import gtk
 import gtk.glade
 
 from flumotion.configure import configure
@@ -125,7 +121,7 @@ class LoadConnection(wizard.WizardStep):
     name = 'load_connection'
     title = 'Load connection'
     text = 'Please choose a connection from the box below.'
-    treeview_connections = None
+    connections = None
 
     def __init__(self, *args):
         def cust_handler(xml, proc, name, *args):

@@ -85,6 +85,8 @@ class Connections(GladeWidget):
     model = None
     gsignal('has-selection', bool)
 
+    treeview_connections = None
+
     def __init__(self):
         GladeWidget.__init__(self)
         print 'totally initializing dude'
@@ -134,7 +136,7 @@ class Connections(GladeWidget):
         except OSError, e:
             print 'Error: %s: %s' % (e.strerror, e.filename)
 
-    def _clear_iter(i):
+    def _clear_iter(self, i):
         os.unlink(self.model.get_value(i, self.FILE_COL))
         self.model.remove(i)
 
@@ -142,7 +144,7 @@ class Connections(GladeWidget):
         m = self.model
         i = m.get_iter_first()
         while i:
-            _clear_iter(m, i)
+            self._clear_iter(i)
             i = m.get_iter_first()
         self.emit('has-selection', False)
 
@@ -150,12 +152,11 @@ class Connections(GladeWidget):
         s = self.treeview_connections.get_selection()
         model, i = s.get_selected()
         if i:
-            _clear_iter(model, i)
+            self._clear_iter(i)
             if model.get_iter_first():
                 s.select_path((0,))
             else:
                 self.emit('has-selection', False)
-                self.button_next.set_sensitive(False)
 
     def get_selected(self):
         s = self.treeview_connections.get_selection()

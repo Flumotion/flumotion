@@ -99,5 +99,3 @@ class WizardTest(unittest.TestCase):
         refstate = {'passwd': 'baz', 'host': 'foo', 'port': 8642,
                     'use_insecure': True, 'user': 'bar'}
         self.assert_(state == refstate)
-
-WizardTest().testMakeGreeter()
