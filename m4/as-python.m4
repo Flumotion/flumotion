@@ -1,9 +1,12 @@
-## ------------------------
-## Python file handling
-## From Andrew Dalke
-## Updated by James Henstridge
-## Updated by Andy Wingo to loop through possible pythons
-## ------------------------
+dnl as-python.m4 0.1.0
+dnl autostars m4 macro for python checks
+
+dnl From Andrew Dalke
+dnl Updated by James Henstridge
+dnl Updated by Andy Wingo to loop through possible pythons
+dnl Updated by Thomas Vander Stichele to check for presence of packages/modules
+
+dnl $Id: as-python.m4,v 1.1 2004/10/25 13:40:39 thomasvs Exp $
 
 # AS_PATH_PYTHON([MINIMUM-VERSION])
 
@@ -30,7 +33,6 @@
 
 # Updated to loop over all possible python binaries by Andy Wingo
 # <wingo@pobox.com>
-# Updated to only warn and unset PYTHON if no good one is found
 
 AC_DEFUN([AS_PATH_PYTHON],
  [
@@ -40,27 +42,27 @@ AC_DEFUN([AS_PATH_PYTHON],
   dnl in 1.5, and I don't want to maintain that logic.
 
   dnl should we do the version check?
-  PYTHON_CANDIDATES="python python2.2 python2.1 python2.0 python2 \
-                     python1.6 python1.5"
   ifelse([$1],[],
-         [AC_PATH_PROG(PYTHON, $PYTHON_CANDIDATES)],
+         [AC_PATH_PROG(PYTHON, python python2.1 python2.0 python1.6 python1.5)],
          [
      AC_MSG_NOTICE(Looking for Python version >= $1)
     changequote(<<, >>)dnl
     prog="
 import sys, string
 minver = '$1'
-# split string by '.' and convert to numeric
-minver_info = map(string.atoi, string.split(minver, '.'))
+pyver = string.split(sys.version)[0]  # first word is version string
+# split strings by '.' and convert to numeric
+minver = map(string.atoi, string.split(minver, '.'))
+pyver = map(string.atoi, string.split(pyver, '.'))
 # we can now do comparisons on the two lists:
-if sys.version_info >= tuple(minver_info):
+if pyver >= minver:
 	sys.exit(0)
 else:
 	sys.exit(1)"
     changequote([, ])dnl
 
     python_good=false
-    for python_candidate in $PYTHON_CANDIDATES; do
+    for python_candidate in python python2.2 python2.1 python2.0 python2 python1.6 python1.5; do
       unset PYTHON
       AC_PATH_PROG(PYTHON, $python_candidate) 1> /dev/null 2> /dev/null
 
@@ -79,9 +81,8 @@ else:
   ])
 
   if test "$python_good" != "true"; then
-    AC_MSG_WARN([No suitable version of python found])
-    PYTHON=
-  else
+    AC_MSG_ERROR([No suitable version of python found])
+  fi
 
   AC_MSG_CHECKING([local Python configuration])
 
@@ -147,35 +148,36 @@ else:
   pkgpyexecdir=\${pyexecdir}/$PACKAGE
 
   AC_MSG_RESULT([looks good])
-
-  fi
 ])
 
-dnl a macro to check for ability to create python extensions
-dnl  AM_CHECK_PYTHON_HEADERS([ACTION-IF-POSSIBLE], [ACTION-IF-NOT-POSSIBLE])
-dnl function also defines PYTHON_INCLUDES
-AC_DEFUN([AM_CHECK_PYTHON_HEADERS],
- [
-  AC_REQUIRE([AM_PATH_PYTHON])
-  AC_MSG_CHECKING(for headers required to compile python extensions)
+dnl AS_PYTHON_IMPORT(PACKAGE/MODULE, [ACTION-IF-FOUND, [ACTION-IF-NOT-FOUND]])
+dnl Try to import the given PACKAGE/MODULE
 
-  dnl deduce PYTHON_INCLUDES
-  py_prefix=`$PYTHON -c "import sys; print sys.prefix"`
-  py_exec_prefix=`$PYTHON -c "import sys; print sys.exec_prefix"`
-  PYTHON_INCLUDES="-I${py_prefix}/include/python${PYTHON_VERSION}"
+AC_DEFUN([AS_PYTHON_IMPORT],
+[
+  dnl Check if we can import a given module.
+  dnl Requires AS_PATH_PYTHON to be called before.
 
-  if test "$py_prefix" != "$py_exec_prefix"; then
-    PYTHON_INCLUDES="$PYTHON_INCLUDES -I${py_exec_prefix}/include/python${PYTHON_VERSION}"
-  fi
-  AC_SUBST(PYTHON_INCLUDES)
+  AC_MSG_CHECKING([for python module $1])
 
-  dnl check if the headers exist:
-  save_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
-AC_TRY_CPP([#include <Python.h>],dnl
-[AC_MSG_RESULT(found)
-$1],dnl
-[AC_MSG_RESULT(not found)
-$2])
-CPPFLAGS="$save_CPPFLAGS"
+  prog="
+import sys
+
+try:
+    import $1
+    sys.exit(0)
+    print 'yes'
+except ImportError:
+    sys.exit(1)"
+
+if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
+then
+    AC_MSG_RESULT(found)
+    ifelse([$2], , :, [$2])
+else
+    AC_MSG_RESULT(not found)
+    ifelse([$3], , :, [$3])
+fi
 ])
+
+ 

@@ -1,10 +1,15 @@
+2004-10-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* m4/as-python.m4:
+          new upstream version, check for python module
+
 2004-10-25  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/admin.py:
 	* flumotion/worker/worker.py: 
-	Change runCode to execute the paramater and make the admin
+	Change runCode to execute the parameter and make the admin
 	interface to it take a object, which it uses inspect.getsource to
-	retrevie the source. This allows us to just send in a function
+	retrieve the source. This allows us to just send in a function
 	instead of a string.
 
 2004-10-22  Johan Dahlin  <johan@gnome.org>
