@@ -25,6 +25,6 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
 
 def createComponent(config):
-    component = AudioTest(config['name'], 'sinesrc name=source')
+    component = AudioTest(config['name'], 'sinesrc name=source sync=1')
     return component
 

@@ -35,6 +35,9 @@
 
 2004-10-17  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/audiotest/audiotest.py (createComponent):
+	Set sync to true for sinesrc, to avoid eating up all CPU.
+
 	* flumotion/wizard/enums.py:
 	* flumotion/wizard/save.py:
 	* flumotion/wizard/steps.py:
