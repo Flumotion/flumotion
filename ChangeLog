@@ -1,3 +1,9 @@
+2004-12-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/component.py:
+	* flumotion/test/test_worker_worker.py:
+	  fix testsuite
+
 2004-12-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/client.py:

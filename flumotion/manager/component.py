@@ -43,6 +43,8 @@ class Options:
         self.eaters = [] # list of eater names
         self.feeders = [] # list of feeder names
         self.dict = None
+        self.worker = None
+        self.pid = None
 
 # abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
 class Feeder:
