@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 '''
-Exports configure-time variables for installed or uninstalled operation.
+configure-time variables for installed or uninstalled operation
 
 Code should run
     >>> from flumotion.configure import configure
