@@ -19,7 +19,6 @@
 # Headers in this file shall remain intact.
 
 
-import gtk
 import gtk.glade
 
 from flumotion.admin.gtk import wizard
@@ -79,8 +78,8 @@ class ConnectToExisting(wizard.WizardStep):
 
         # fixme: check these values here
         state['host'] = host
-        state['port'] = port
-        state['ssl_check'] = ssl_check
+        state['port'] = int(port)
+        state['use_insecure'] = not ssl_check
 
         return 'authenticate'
 
@@ -113,7 +112,7 @@ class Authenticate(wizard.WizardStep):
         return '*finished*'
 
 
-class Greeter(wizard.Wizard):
+class Greeter:
     wiz = None
     def __init__(self):
         self.wiz = wizard.Wizard('greeter', 'initial',

@@ -28,7 +28,7 @@ import sys
 import gobject
 
 from twisted.spread import pb
-from twisted.internet import error, defer
+from twisted.internet import error, defer, reactor
 from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
@@ -59,7 +59,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     """
     gsignal('connected')
     gsignal('disconnected')
-    gsignal('connection-refused')
+    gsignal('connection-refused', str, int, bool)
     gsignal('ui-state-changed', str, object)
     gsignal('component-property-changed', str, str, object)
     gsignal('reloading', str)
@@ -79,9 +79,14 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     _views = []
     _unbundler = None
 
+    username = password = host = port = use_insecure = None
+
     def __init__(self, username, password):
         self.__gobject_init__()
         
+        self.username = username
+        self.password = password
+
         self.clientFactory = fpb.ReconnectingFPBClientFactory()
         # 20 secs max for an admin to reconnect
         self.clientFactory.maxDelay = 20
@@ -120,6 +125,21 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         # if this ever breaks, do real subclassing
         self.clientFactory.gotDeferredLogin = gotDeferredLogin
 
+    def connectToHost(self, host, port, use_insecure=False):
+        'Connect to a host.'
+        self.host = host
+        self.port = port
+        self.use_insecure = use_insecure
+
+        if use_insecure:
+            self.info('Connecting to manager %s:%d with TCP' % (host, port))
+            reactor.connectTCP(host, port, self.clientFactory)
+        else:
+            from twisted.internet import ssl
+            self.info('Connecting to manager %s:%d with SSL' % (host, port))
+            reactor.connectSSL(host, port, self.clientFactory,
+                               ssl.ClientContextFactory())
+
     ### our methods
     def _loginCallback(self, result, password):
         self.log("_loginCallback(result=%r, password=%s)" % (result, password))
@@ -137,14 +157,14 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     def _connectionRefusedErrback(self, failure):
         failure.trap(error.ConnectionRefusedError)
         self.debug("emitting connection-refused")
-        self.emit('connection-refused')
+        self.emit('connection-refused', self.host, self.port, self.use_insecure)
         self.debug("emitted connection-refused")
 
     def _accessDeniedErrback(self, failure):
         failure.trap(crederror.UnauthorizedLogin)
         # FIXME: unauthorized login emit !
         self.debug("emitting connection-refused")
-        self.emit('connection-refused')
+        self.emit('connection-refused', self.host, self.port, self.use_insecure)
         self.debug("emitted connection-refused")
 
     # default Errback

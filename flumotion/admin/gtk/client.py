@@ -44,28 +44,26 @@ class Window(log.Loggable, gobject.GObject):
     logCategory = 'adminview'
     gsignal('connected')
     
-    def __init__(self, host, port, transport, username, password):
+    def __init__(self, model):
         self.__gobject_init__()
         
         self.admin = None
-        self._connectToManager(host, port, transport, username, password)
+        self._setAdminModel(model)
 
         self._create_ui()
         self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
                                             # disconnected
 
-    ### connection to manager, called from constructor
-    def _connectToManager(self, host, port, transport, username, password):
-        'connect to manager using given options.  Called by __init__'
-        
-        # FIXME: someone else should create the model and then set us as a
-        # view on it
-        self.admin = AdminModel(username, password)
+    def _setAdminModel(self, model):
+        'set the model to which we are a view/controller'
+        assert not self.admin
+
+        self.admin = model
         self.admin.connect('connected', self.admin_connected_cb)
         self.admin.connect('disconnected', self.admin_disconnected_cb)
         self.admin.connect('connection-refused',
-                           self.admin_connection_refused_cb, host, port)
+                           self.admin_connection_refused_cb)
         self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
         self.admin.connect('component-property-changed',
             self.property_changed_cb)
@@ -74,17 +72,6 @@ class Window(log.Loggable, gobject.GObject):
         # set ourselves as a view for the admin model
         self.admin.addView(self)
 
-        if transport == "ssl":
-            from twisted.internet import ssl
-            self.info('Connecting to manager %s:%d with SSL' % (host, port))
-            reactor.connectSSL(host, port, self.admin.clientFactory,
-                               ssl.ClientContextFactory())
-        elif transport == "tcp":
-            self.info('Connecting to manager %s:%d with TCP' % (host, port))
-            reactor.connectTCP(host, port, self.admin.clientFactory)
-        else:
-            self.error("Unknown transport protocol %s" % transport)
-        
     # default Errback
     def _defaultErrback(self, failure):
         self.warning('Errback: unhandled failure: %s' %
@@ -348,16 +335,18 @@ class Window(log.Loggable, gobject.GObject):
         elif id == 1:
             self.admin.reconnect()
         
-    def admin_connection_refused_later(self, host, port):
-        message = "Connection to manager on %s:%d was refused." % (host, port)
+    def admin_connection_refused_later(self, host, port, use_insecure):
+        message = "Connection to manager on %s:%d (%s) was refused." \
+                  % (host, port, use_insecure and 'http' or 'https')
         self.info(message)
         d = dialogs.ErrorDialog(message, self)
         d.show_all()
         d.connect('response', self.close)
 
-    def admin_connection_refused_cb(self, admin, host, port):
+    def admin_connection_refused_cb(self, admin, host, port, use_insecure):
         log.debug('adminclient', "handling connection-refused")
-        reactor.callLater(0, self.admin_connection_refused_later, host, port)
+        reactor.callLater(0, self.admin_connection_refused_later,
+                          host, port, use_insecure)
         log.debug('adminclient', "handled connection-refused")
 
     def admin_ui_state_changed_cb(self, admin, name, state):

@@ -25,6 +25,8 @@ import sys
 import gtk
 from twisted.internet import reactor
 
+from flumotion.admin.admin import AdminModel
+from flumotion.admin.gtk import greeter
 from flumotion.admin.gtk.client import Window
 from flumotion.configure import configure
 from flumotion.common import log
@@ -54,7 +56,7 @@ def _wizard_finished_cb(wizard, configuration, window):
     window.admin.loadConfiguration(configuration)
     window.show()
     
-def _window_connected_cb(window, options):
+def _window_connected_cb(window):
     if not window.admin.getComponents() and not os.path.exists(FIRST_TIME_FILE):
         workers = window.admin.getWorkerHeavenState()
         if not workers:
@@ -66,7 +68,7 @@ def _window_connected_cb(window, options):
         wiz.run(not options.debug, workers, main=False)
         return
 
-    if not options.wizard:
+    if True:
         window.show()
     else:
         wiz = window.runWizard()
@@ -79,11 +81,20 @@ def _runWizardAndDump():
     wiz.run(True, ['localhost'], False)
     wiz.printOut()
 
-def _runInterface(options):
-    win = Window(options.host, options.port, options.transport,
-                 options.username, options.password)
+def _runInterface(conf_file):
+    if conf_file:
+        # load the conf file here
+        raise NotImplementedError()
 
-    win.connect('connected', _window_connected_cb, options)
+    state = greeter.Greeter().run()
+    if not state:
+        exit (0)
+
+    model = AdminModel(state['user'], state['passwd'])
+    model.connectToHost(state['host'], state['port'], state['use_insecure'])
+    win = Window(model)
+
+    win.connect('connected', _window_connected_cb)
     reactor.run()
 
 def main(args):
@@ -102,36 +113,6 @@ def main(args):
                       default=False,
                       help="show version information")
     
-    parser.add_option('-H', '--host',
-                     action="store", type="string", dest="host",
-                     default='localhost',
-                     help="manager host to connect to [default localhost]")
-    parser.add_option('-P', '--port',
-                     action="store", type="int", dest="port",
-                     default=None,
-                     help="port to listen on [default %d (ssl) or %d (tcp)]" % (defaultSSLPort,
-                                                                                defaultTCPPort))
-    parser.add_option('-T', '--transport',
-                      action="store", type="string", dest="transport",
-                      default="ssl",
-                      help="transport protocol to use (tcp/ssl) [default: ssl]")
-    parser.add_option('-u', '--username',
-                      action="store", type="string", dest="username",
-                      default="",
-                      help="username to use")
-    parser.add_option('-p', '--password',
-                      action="store", type="string", dest="password",
-                      default="",
-                      help="password to use, - for interactive")
-
-    parser.add_option('', '--wizard',
-                     action="store_true", dest="wizard",
-                     help="run the wizard")
-    parser.add_option('', '--wizard-debug',
-                      action="store_true", dest="wizarddebug",
-                      default=False,
-                      help="run wizard in debug")
-
     options, args = parser.parse_args(args)
 
     if options.version:
@@ -145,13 +126,12 @@ def main(args):
     if options.debug:
         log.setFluDebug(options.debug)
 
-    if not options.port:
-        if options.transport == "tcp":
-            options.port = defaultTCPPort
-        elif options.transport == "ssl":
-            options.port = defaultSSLPort
+    conf_files = args[1:]
 
-    if options.wizard and options.wizarddebug:
-        _runWizardAndDump()
+    if conf_files and len(conf_files) > 1:
+        w = sys.stderr.write
+        w('flumotion-admin: too many configuration files: %r' % conf_files)
+    elif conf_files:
+        _runInterface(conf_files[0])
     else:
-        _runInterface(options)
+        _runInterface(None)

@@ -1,3 +1,37 @@
+2005-01-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/greeter.py: gtk is not used.
+
+	* flumotion/admin/gtk/wizard.py: Appease pychecker.
+
+	* flumotion/admin/gtk/main.py (main): Remove host, port, user,
+	ssl, password options. (The greeter handles this now.) Allow a
+	config file to be passed on the command line.
+	(_runInterface): If there's no conf file, run the greeter to get
+	the host, etc. Make the AdminModel ourselves, then set it on a
+	Window.
+
+	* flumotion/admin/gtk/wizard.py (Wizard.run): Destroy the window
+	when the run is finished. Make sure we aren't run twice.
+
+	* flumotion/admin/gtk/greeter.py (Greeter): No longer derived from
+	Wizard, just proxies a Wizard object.
+
+	* flumotion/admin/admin.py (AdminModel.connectToHost): New method,
+	will connect to a manager at a host/port/protocol.
+	(username, password, host, port, use_insecure): New attributes on
+	the model.
+	(AdminModel::connection-refused): Pass the host, port, and
+	protocol when emitting the signal. Emitters in admin.py and
+	callers in client.py changed.
+
+	* flumotion/admin/gtk/client.py (Window._connectToManager):
+	Removed, now we receive manager already-constructed.
+	(Window._setAdminModel): Private method to set the model on the
+	window.
+	(Window.__init__): Instead of receiving host, user, passwd, etc.
+	just receive the model fully-built.
+
 2005-01-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/wizard.py (Wizard.set_page): Fix stupid

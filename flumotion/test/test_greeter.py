@@ -69,6 +69,6 @@ class WizardTest(unittest.TestCase):
         gobject.idle_add(lambda: ass(next.flags() & gtk.SENSITIVE))
         gobject.idle_add(lambda: next.emit('clicked'))
         state = wiz.run()
-        refstate = {'passwd': 'baz', 'host': 'foo', 'port': '8642',
-                    'ssl_check': False, 'user': 'bar'}
+        refstate = {'passwd': 'baz', 'host': 'foo', 'port': 8642,
+                    'use_insecure': True, 'user': 'bar'}
         self.assert_(state == refstate)

@@ -93,6 +93,7 @@ class Wizard(gobject.GObject):
     pages = {}
     state = {}
     gsignal('finished')
+    image_icon = textview_text = eventbox_top = label_title = button_next = None
 
     def __init__(self, name, initial_page, *pages):
         self.__gobject_init__()
@@ -190,10 +191,13 @@ class Wizard(gobject.GObject):
         self.window.show()
 
     def run(self):
+        assert self.window
         def on_finished(self):
             gtk.main_quit()
         self.connect('finished', on_finished)
         gtk.main()
+        self.window.destroy()
+        del self.window
         return self.state
 
 gobject.type_register(Wizard)
