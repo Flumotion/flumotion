@@ -58,13 +58,13 @@ Once everything is built and installed,
 you can try this to start the server:
 
 terminal 1:
-  flumotion-manager -v conf/managers/default/planet.xml
+  flumotion-manager -v -T tcp conf/managers/default/planet.xml
 
 terminal 2:
-  flumotion-worker -v -u user -p test
+  flumotion-worker -v -T tcp -u user -p test
 
 terminal 3:
-  flumotion-admin -v -u user -p test
+  flumotion-admin -v -T tcp -u user -p test
 
   Go through the wizard, choosing defaults.
 
@@ -88,7 +88,8 @@ terminal 5:
 DOCUMENTATION
 -------------
 
-A manual is being written.
+A manual is being written.  You can access the current work in progress at
+http://www.flumotion.net/doc/flumotion/manual/html/
 
 Flumotion also comes with API documentation.  You need epydoc to build them.
 
@@ -99,6 +100,24 @@ You can use jhbuild with the flu.modules and jhbuildrc file provided in misc/
 
 This will set up everything except for Twisted for you from source.
 
+SECURITY
+--------
+
+Read the security chapter in the aforementioned manual to get started.
+
+Flumotion uses SSL transport by default.  For this you need a PEM certificate
+file.  For security reasons you should generate this yourself when installing
+from source.
+
+The sample configuration file for the manager contains some htpasswd-style
+crypted credentials, for a user named "user" and a password "test".  Use
+these only for testing; make sure you change them before putting Flumotion
+into production.
+
+The sample configuration also only allows localhost connections, to make
+sure you change the configuration before moving it into production.
+Remove the host entry from the sample planet.xml file to allow other hosts
+to connect.
 
 ABOVE AND BEYOND
 ----------------
