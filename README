@@ -2,6 +2,7 @@ Flumotion - your streaming media server
 
 WHAT IT IS
 ----------
+
 Flumotion is a streaming media server based on GStreamer and Twisted.
 
 This is the first public release of Flumotion.
@@ -34,6 +35,10 @@ And depending on what codecs you want to use:
 libvorbis 1.0.1 or higher
 libogg 1.1 or higher
 libtheora 1.0alpha3 or higher
+
+And if you want to build documentation:
+
+epydoc
 
 A FIRST TEST
 ------------
@@ -68,6 +73,13 @@ terminal 5:
 
   This will throw 10 processes with 100 clients each at the server.  Hopefully,
   all of them will return success at the end of their run !
+
+DOCUMENTATION
+-------------
+
+A manual is being written.
+
+Flumotion also comes with API documentation.  You need epydoc to build them.
 
 HACKING
 -------
