@@ -207,6 +207,12 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             raise
 
     def perspective_getUIZip(self, component_name, style):
+        """
+        Get the zip data of the bundle for the user interface.
+
+        @type style:  string
+        @param style: the style of the user interface to get the zip for.
+        """
         component = self.componentheaven.getComponent(component_name)
         try:
             return component.getUIZip(style)
@@ -215,13 +221,18 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             raise
 
     def perspective_getUIMD5Sum(self, component_name, style):
+        """
+        Get the MD5 sum of the bundle for the user interface.
+
+        @type style:  string
+        @param style: the style of the user interface to get MD5 sum for.
+        """
         component = self.componentheaven.getComponent(component_name)
         try:
             return component.getUIMD5Sum(style)
         except Exception, e:
             self.warning(str(e))
             raise
-
 
     def perspective_reloadComponent(self, component_name):
         """Reload modules in the given component."""
