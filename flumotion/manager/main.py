@@ -90,7 +90,7 @@ def _initialLoadConfig(vishnu, paths):
         try:
             _loadConfig(vishnu, path)
         except config.ConfigError, reason:
-            sys.stderr.write("ERROR: failed to load planet configuration '%s':\n" % filename)
+            sys.stderr.write("ERROR: failed to load planet configuration '%s':\n" % path)
             sys.stderr.write("%s\n" % reason)
             # bypass reactor, because sys.exit gets trapped
             os._exit(-1)

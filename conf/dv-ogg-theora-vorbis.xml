@@ -1,0 +1,69 @@
+<planet>
+  <!-- the manager and the bouncer with user/password test/test 
+       This bouncer is user to authenticate other components in the
+       system, but not client connecting to the stream. -->
+  <manager>
+    <component name="manager-bouncer" type="htpasswdcrypt">
+<data><![CDATA[
+test:PSfNpHTkpTx1M
+]]></data>
+    </component>
+  </manager>
+
+  <flow name="dv-example">
+    <!-- a component that reads from a firewire port, decodes the dv audio/video, resizes
+         and resamples and corrects for dropouts -->
+    <component name="dv-camera" type="producer">
+      <feed>video</feed>
+      <feed>audio</feed>
+      <pipeline>
+         dv1394src ! dvdec name=dec drop-factor=2 ! video/x-raw-yuv,format=(fourcc)YUY2 ! 
+           videorate ! videoscale ! video/x-raw-yuv,width=384,height=288 ! 
+           videoscale ! video/x-raw-yuv,width=384,height=268,framerate=12.5,format=(fourcc)YUY2 ! @feeder::video@
+         dec. ! audio/x-raw-int ! audiorate ! 
+           audioscale ! audio/x-raw-int,rate=24000 ! @feeder::audio@
+      </pipeline>
+    </component>
+    
+    <!-- add an overlay to the raw video stream, make sure to have a png image in
+         the directory where you start the server. -->
+    <component name="dv-with-overlay" type="converter">
+      <source>dv-camera:video</source>
+      <pipeline>
+         filesrc location=dv_384x268.png blocksize=100000 ! pngdec ! 
+           alphacolor ! videomixer name=mix ! @feeder::video@
+         @eater:dv-camera:video@ ! video/x-raw-yuv,width=384,height=268,framerate=12.5 ! ffmpegcolorspace ! alpha ! mix. 
+      </pipeline>
+      <feed>video</feed>
+    </component>
+  
+    <component name="dv-theora" type="converter">
+      <source>dv-with-overlay</source>
+      <pipeline>ffmpegcolorspace ! theoraenc bitrate=300</pipeline>
+      <feed>video</feed>
+    </component>
+
+    <component name="dv-vorbis" type="converter">
+      <source>dv-camera:audio</source>
+      <pipeline>audioconvert ! rawvorbisenc bitrate=32000</pipeline>
+      <feed>audio</feed>
+    </component>
+
+    <component name="dv-ogg-theora-vorbis" type="converter">
+      <source>dv-theora:video</source>
+      <source>dv-vorbis:audio</source>
+      <feed>ogg</feed>
+      <pipeline>
+          { @eater:dv-vorbis:audio@ } { @eater:dv-theora:video@ } 
+          eater:dv-vorbis:audio. ! queue max-size-buffers=16 ! oggmux name=mux 
+          eater:dv-theora:video. ! queue max-size-buffers=16 ! mux. mux. ! @feeder::ogg@
+      </pipeline>
+    </component>
+
+    <component name="streamer-ogg-theora" type="http-streamer">
+      <source>dv-ogg-theora-vorbis:ogg</source>
+      <port>8800</port>
+      <logfile>/tmp/ogg-test-theora.access.log</logfile>
+    </component>
+  </flow>
+</planet>

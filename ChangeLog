@@ -1,3 +1,10 @@
+2004-10-18  Wim Taymans  <wim@fluendo.com>
+
+	* conf/dv-ogg-theora-vorbis.xml:
+	* flumotion/manager/main.py:
+	Added ogg theora vorbis example
+	Fix correct var for the filename.
+
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/Makefile.am:
