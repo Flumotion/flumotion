@@ -35,7 +35,7 @@ from twisted.internet import error, defer
 from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
-from flumotion.common import bundle, errors, interfaces, log, keycards
+from flumotion.common import bundle, common, errors, interfaces, log, keycards
 from flumotion.utils import reload
 from flumotion.utils.gstutils import gsignal
 from flumotion.twisted import credentials
@@ -185,6 +185,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         return self.remote.callRemote('getComponentElementProperty',
                                       component, element, property)
 
+    # XXX: make this consistent with the newly added worker call remote
     def callComponentRemote(self, component_name, method_name, *args, **kwargs):
         return self.remote.callRemote('callComponentRemote',
                                       component_name, method_name, *args, **kwargs)
@@ -246,10 +247,18 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addErrback(self._defaultErrback)
         return d
 
-    def checkElements(self, worker, elements):
-        self.info('calling remote checkElement(%s, %s)' % (worker, elements))
-        return self.remote.callRemote('checkElements', worker, elements)
-        
+    def workerCallRemote(self, workerName, methodName, *args, **kwargs):
+        r = common.argRepr(args, kwargs)
+        self.info('calling remote method %s(%s) on worker %s' % (methodName, r,
+                                                                 workerName))
+        return self.remote.callRemote('workerCallRemote', workerName,
+                                      methodName, *args, **kwargs)
+
+    ## Worker methods
+    def checkElements(self, workerName, elements):
+        return self.workerCallRemote(workerName, 'checkElements', elements)
+    
+    
     # FIXME: this is the new method to get the UI, by getting a bundle
     # and an entry point
     def getUIZip(self, component, domain, style):

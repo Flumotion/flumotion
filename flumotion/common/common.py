@@ -24,6 +24,11 @@
 A set of common functions.
 """
 
+import os 
+import sys
+
+from flumotion.configure import configure
+
 def formatStorage(units, precision = 2):
     """
     Nicely formats a storage size using SI units.
@@ -107,7 +112,6 @@ def version(binary):
     @arg binary: name of the binary
     @type binary: string
     """
-    from flumotion.configure import configure
 
     block = []
     block.append("%s %s" % (binary, configure.version))
@@ -125,7 +129,6 @@ def mergeImplements(*classes):
     return tuple(allYourBase)
 
 
-import sys, os 
 def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     '''
     This forks the current process into a daemon.
@@ -170,3 +173,26 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     os.dup2(si.fileno(), sys.stdin.fileno())
     os.dup2(so.fileno(), sys.stdout.fileno())
     os.dup2(se.fileno(), sys.stderr.fileno())
+
+def argRepr(args=(), kwargs={}):
+    assert (type(args) is tuple or
+            type(args) is list)
+    assert type(kwargs) is dict
+    
+    args = list(args)
+
+    s = ''
+    if args:
+        args = map(repr, args)
+        s += ', '.join(args)
+    
+    if kwargs:
+        
+        r = [(key + '=' + repr(item))
+                for key, item in kwargs.items()]
+
+        if s:
+            s += ', '
+        s += ', '.join(r)
+            
+    return s

@@ -197,8 +197,34 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     def perspective_callComponentRemote(self, componentName, method_name,
                                         *args, **kwargs):
         component = self.componentHeaven.getComponent(componentName)
+        
+        # XXX: Maybe we need to a prefix, so we can limit what an admin interface
+        #      can call on a component
+        
         try:
             return component.callComponentRemote(method_name, *args, **kwargs)
+        except Exception, e:
+            self.warning(str(e))
+            raise
+
+    def perspective_workerCallRemote(self, workerName, remoteMethod, *args, **kwargs):
+        """
+        Call a remote method on the worker.
+        This is used so that admin clients can call methods from the interface
+        to the worker.
+
+        @type  workerName: string
+        @param workerName: the worker to call.
+        @type  methodName: string
+        @param methodName: the method to call on the worker.
+        """
+        
+        workerAvatar = self.workerHeaven.getAvatar(workerName)
+        
+        # XXX: Maybe we need to a prefix, so we can limit what an admin interface
+        #      can call on a worker
+        try:
+            return workerAvatar.callRemoteMethod(remoteMethod, *args, **kwargs)
         except Exception, e:
             self.warning(str(e))
             raise
@@ -282,10 +308,6 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         self.info('loadConfiguration ...')
         self.workerHeaven.loadConfiguration(None, xml)
 
-    def perspective_checkElements(self, workerId, elements):
-        workerAvatar = self.workerHeaven.getAvatar(workerId)
-        return workerAvatar.checkElements(elements)
-        
     def perspective_cleanComponents(self):
         return self.componentHeaven.shutdown()
 

@@ -72,8 +72,8 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         self.debug('starting %s on %s with config %r' % (name, self.avatarId, config))
         return self.mind.callRemote('start', name, type, config)
 
-    def checkElements(self, elements):
-        return self.mind.callRemote('checkElements', elements)
+    def callRemoteMethod(self, remoteMethod, *args, **kwargs):
+        return self.mind.callRemote(remoteMethod, *args, **kwargs)
     
 class WorkerHeaven(pb.Root, log.Loggable):
     """

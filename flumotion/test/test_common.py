@@ -128,5 +128,18 @@ class TestMergeImplements(unittest.TestCase):
 class TestVersion(unittest.TestCase):
     def testVersion(self):
         self.assert_(common.version('abinary'))
+
+class TestArgRepr(unittest.TestCase):
+    def testEmpty(self):
+        self.assertEqual(common.argRepr(), '')
+        
+    def testArg(self):
+        self.assertEqual(common.argRepr((1, '2')), "1, '2'")
+        self.assertEqual(common.argRepr(((None,))), "None")
+
+    def testKwargs(self):
+        self.assertEqual(common.argRepr((), dict(foo='bar')), "foo='bar'")
+        self.assertEqual(common.argRepr(((1,)), dict(foo='bar')), "1, foo='bar'")
+        
 if __name__ == '__main__':
     unittest.main()

@@ -1,3 +1,15 @@
+2004-10-21  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/common/common.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_common.py:
+
+	Make a generic interface to call from the admin interface into the
+	worker. Add a method in common with regression tests to print a
+	repr for args/kwargs.
+
 2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:
