@@ -94,6 +94,7 @@ def _initialLoadConfig(vishnu, filename):
         os._exit(-1)
     
 def main(args):
+    # XXX: gst_init should remove all options, like gtk_init
     args = [arg for arg in args if not arg.startswith('--gst')]
     
     parser = optparse.OptionParser()
@@ -153,6 +154,7 @@ def main(args):
     elif options.transport == "tcp":
         _startTCP(vishnu, options)
     else:
-        # FIXME
-        raise
+        print >> sys.stderr, \
+              'ERROR: unsupported transport: %s, must be ssl or tcp' % options.transport
+        return 1
     return 0
