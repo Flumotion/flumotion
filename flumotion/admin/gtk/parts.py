@@ -80,34 +80,44 @@ class AdminStatusbar:
     def pop(self, context):
         """
         Pop the last message for the given context.
+
+        @returns: message id popped, or None
         """
         if len(self._mids[context]):
             mid = self._mids[context].pop()
             self._widget.remove(self._cids[context], mid)
+            return mid
+
+        return None
 
     def set(self, context, message):
         """
         Replace the current top message for this context with this new one.
+
+        @returns: the message id of the message pushed
         """
         self.pop(context)
-        self.push(context, message)
+        return self.push(context, message)
 
     def remove(self, context, mid):
         """
         Remove the message with the given id from the given context.
+
+        @returns: whether or not the given mid was valid.
         """
         if not mid in self._mids[context]:
-            return
+            return False
 
         self._mids[context].remove(mid)
         self._widget.remove(self._cids[context], mid)
+        return True
 
     def _clear_context(self, context):
         if not context in self._cids.keys():
             return
 
         for mid in self._mids[context]:
-            self._widget.remove(self._cids[context], mid)
+            self.remove(context, mid)
 
 class ComponentsView(log.Loggable, gobject.GObject):
     """
@@ -163,7 +173,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
     def _view_cursor_changed_cb(self, *args):
         # name needs to exist before being used in the child functions
-        name = self.component_view.get_selected_name()
+        name = self.get_selected_name()
 
         if not name:
             self.debug('no component selected')
