@@ -30,7 +30,7 @@ from flumotion.server.registry import registry
 from flumotion.twisted import errors
 
 def main(args):
-    registry.verify()
+    registry.verify(root)
         
     return launcher.main(args)
     

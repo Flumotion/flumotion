@@ -1,6 +1,6 @@
 <components>
   <component type="file-dumper">
-    <source location="file.py"/>
+    <source location="flumotion.components.file.file"/>
     <properties>
       <property name="source" type="string" required="yes"/>
       <property name="location" type="string" required="yes"/>

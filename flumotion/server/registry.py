@@ -78,11 +78,6 @@ class Component:
     def isFactory(self):
         return self.factory
 
-    def getSourceLocation(self):
-        dir = os.path.split(self.filename)[0]
-        filename = os.path.join(dir, self.source)
-        return reflect.filenameToModuleName(filename) 
-    
 class XmlParserError(Exception):
     pass
 
@@ -252,7 +247,7 @@ class ComponentRegistry:
                 data += ' factory="false"'
                 
             print >> fd, '  <component type="%s"%s>' % (component.getType(), data)
-            print >> fd, '    <source location="%s"/>' % component.getSourceLocation()
+            print >> fd, '    <source location="%s"/>' % component.getSource()
             print >> fd, '    <properties>'
             
             for prop in component.getProperties():
@@ -280,17 +275,18 @@ class ComponentRegistry:
                 filename = os.path.join(dir, filename)
                 if filename.endswith('.xml'):
                     files.append(filename)
-        return file
+        return files
     
     def update(self, root):
-        for file in self.getFileList(root):
+        for filename in self.getFileList(root):
             registry.addFromFile(filename)
-                    
+
         fd = open(self.filename, 'w')
         registry.dump(fd)
 
-    def verify(self):
-        registry.addFromFile(self.filename)
+    def verify(self, root):
+        if os.path.exists(self.filename):
+            registry.addFromFile(self.filename)
 
         if registry.isEmpty():
             dir = os.path.join(root, 'flumotion', 'components')

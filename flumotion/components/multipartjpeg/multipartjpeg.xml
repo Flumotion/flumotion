@@ -1,6 +1,6 @@
 <components>
   <component type="multipartjpeg">
-    <source location="multipartjpeg.py"/>
+    <source location="flumotion.components.multipartjpeg.multipartjpeg"/>
     <properties>
       <property name="source" type="string" required="yes"/>
       <property name="quality" type="int"/>

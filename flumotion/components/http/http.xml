@@ -1,6 +1,6 @@
 <components>
   <component type="http-streamer">
-    <source location="http.py"/>
+    <source location="flumotion.components.http.http"/>
     <properties>
       <property name="source" type="string" required="yes"/>
       <property name="port" type="int" required="yes"/>

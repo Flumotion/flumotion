@@ -11,7 +11,7 @@
 -->
 
   <component type="producer">
-    <source location="producer.py"/>
+    <source location="flumotion.components.base.producer"/>
     <properties>
       <property name="pipeline" type="string" required="yes"/>
       <property name="feed" type="string" multiple="yes"/>
@@ -19,7 +19,7 @@
   </component>
 
   <component type="converter">
-    <source location="converter.py"/>
+    <source location="flumotion.components.base.converter"/>
     <properties>
       <property name="pipeline" type="string" required="yes"/>
       <property name="feed" type="string" multiple="yes"/>
