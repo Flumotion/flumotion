@@ -17,8 +17,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+import os
 import sys
-
 
 _sys_argv = sys.argv
 sys.argv = sys.argv[:1]
@@ -39,8 +39,8 @@ import errors
 
 class Streamer(gobject.GObject, component.BaseComponent):
     __gsignals__ = {
-        'data-received': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
-                          (gst.Buffer, str)),
+        'data-received' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
+                          (gst.Buffer,)),
     }
 
     kind = 'streamer'
@@ -49,12 +49,13 @@ class Streamer(gobject.GObject, component.BaseComponent):
     def __init__(self, name, sources):
         self.__gobject_init__()
         component.BaseComponent.__init__(self, name, sources, self.pipe_template)
-
+        self.caps = None
+        
     def sink_handoff_cb(self, element, buffer, pad):
-        if pad.is_negotiated():
-            caps = pad.get_negotiated_caps()
+        if not self.caps and pad.is_negotiated():
+            self.caps = pad.get_negotiated_caps()
             
-        self.emit('data-received', buffer, caps)
+        self.emit('data-received', buffer)
         
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
@@ -72,34 +73,26 @@ gobject.type_register(Streamer)
 class StreamingResource(resource.Resource):
     def __init__(self, streamer):
         resource.Resource.__init__(self)
-
         self.streamer = streamer
-        streamer.connect('data-received', self.data_received_cb)
-        #streamer.connect('get-caps', self.get_caps_cb)
+        self.streamer.connect('data-received', self.data_received_cb)
         
         self.current_requests = []
-        self.caps = None
         self.buffer_queue = []
 
         reactor.callLater(0, self.bufferWrite)
         
-    def data_received_cb(self, transcoder, gbuffer, caps):
-        if not self.caps:
-            caps = gst.caps_from_string(caps)
-            structure = caps[0]
-            # XXX: dict(structure) should work
-            if structure.has_field('boundary'):
-                self.caps = '%s;boundary=%s' % (structure.get_name(),
-                                                structure.get_string('boundary'))
-            else:
-                self.caps = structure.get_name()
-
+    def data_received_cb(self, transcoder, gbuffer):
         self.buffer_queue.append(str(buffer(gbuffer)))
         
     def bufferWrite(self, *args):
         for buffer in self.buffer_queue:
             for request in self.current_requests:
-                request.write(buffer)
+                fd = request.transport.fileno()
+                try:
+                    os.write(fd, buffer)
+                except OSError:
+                    pass
+                #import code; code.interact(local=locals())
         self.buffer_queue = []
             
         reactor.callLater(0.01, self.bufferWrite)
@@ -113,14 +106,14 @@ class StreamingResource(resource.Resource):
         
     def render(self, request):
         print 'client from', request.getClientIP(), 'connected'
-        if not self.caps:
+        if not self.streamer.caps:
             print 'No caps, skipping'
             return server.NOT_DONE_YET
 
         # Stolen from camserv
         request.setHeader('Cache-Control', 'no-cache')
         request.setHeader('Cache-Control', 'private')
-        request.setHeader("Content-type", "%s;boundary=ThisRandomString" % self.caps)
+        request.setHeader("Content-type", "%s;boundary=ThisRandomString" % self.streamer.caps)
         request.setHeader('Pragma', 'no-cache')
         
         self.current_requests.append(request)
