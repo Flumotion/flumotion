@@ -23,15 +23,15 @@ from twisted.cred import credentials as tcredentials
 from twisted.spread import pb
 
 from flumotion.twisted import credentials
+from flumotion.common import common
 
 # state enum values
 REFUSED = 0
 REQUESTING = 1
-ACCEPTED = 2
+AUTHENTICATED = 2
 
 class Keycard(pb.Copyable, pb.RemoteCopy):
-
-    __implements__ = tcredentials.ICredentials,
+    __implements__ = common.mergeImplements(pb.Copyable, pb.RemoteCopy) + (tcredentials.ICredentials, )
 
     def __init__(self):
         self.bouncerName = None         # set by requester,decides which bouncer
@@ -41,22 +41,39 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         self.duration = 0               # means unlimited
         self.state = REQUESTING
 
-# class KeycardUAPP: username, address, plaintext password;
-#       from UsernameCryptPasswordPlaintext
-# class KeycardUACP: username, address, crypt password
+    def __repr__(self):
+        return "<%s in state %d>" % (self.__class__.__name__, self.state)
+
+# class KeycardUACCP: username, address, crypt password
 #       from UsernameCryptPasswordCrypt
 
-credParent = credentials.UsernameCryptPasswordCryptChallenger
-class KeycardUACPC(Keycard, credParent):
+UCPP = credentials.UsernameCryptPasswordPlaintext
+class KeycardUACPP(Keycard, UCPP):
+    """
+    I am a keycard with a username, plaintext password and IP address.
+    I get authenticated against a crypt password.
+    """
+    __implements__ = common.mergeImplements(Keycard, UCPP)
+    def __init__(self, username, password, address):
+        UCPP.__init__(self, username, password)
+        Keycard.__init__(self)
+        self.address = address
 
+#: username, address, crypt password
+#       from UsernameCryptPasswordCrypt
+
+UCPCC = credentials.UsernameCryptPasswordCryptChallenger
+class KeycardUACPCC(Keycard, UCPCC):
     """
     I am a keycard with a username and IP address.
     I get authenticated through challenge/response on a crypt password.
     """
+    __implements__ = common.mergeImplements(Keycard, UCPCC)
     def __init__(self, username, address):
+        UCPCC.__init__(self, username)
         Keycard.__init__(self)
-        credParent.__init__(self, username)
         self.address = address
+        dir(self)
 
 # FIXME: rewrite
 class HTTPClientKeycard(tcredentials.UsernamePassword, Keycard):

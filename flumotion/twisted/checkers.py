@@ -48,20 +48,25 @@ class FlexibleCredentialsChecker(parent, log.Loggable):
         
         return parent.requestAvatarId(self, credentials)
 
-class CryptChecker:
-    __implements__ = checkers.ICredentialsChecker
-    credentialInterfaces = ( credentials.IUsernameCryptPassword, )
+class CryptChecker(log.Loggable):
+    __implements__ = (checkers.ICredentialsChecker, )
+    credentialInterfaces = (credentials.IUsernameCryptPassword, )
+
+    logCategory = 'cryptchecker'
 
     def __init__(self, **users):
         self.users = users
 
     def addUser(self, username, cryptPassword):
+        self.debug('added user %s' % username)
         self.users[username] = cryptPassword
 
     def _cbCryptPasswordMatch(self, matched, username):
         if matched:
+            self.debug('user %s authenticated' % username)
             return username
         else:
+            self.debug('user %s refused, password not matched' % username)
             return failure.Failure(error.UnauthorizedLogin())
 
     def requestAvatarId(self, credentials):
@@ -71,4 +76,5 @@ class CryptChecker:
                 self.users[credentials.username]).addCallback(
                 self._cbCryptPasswordMatch, credentials.username)
         else:
-            return failure.Failure(error.UnauthorizedLogin())
+            self.debug('user %s refused, not in database' % credentials.username)
+            return defer.fail(error.UnauthorizedLogin())

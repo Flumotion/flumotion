@@ -1,3 +1,30 @@
+2004-10-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_common.py:
+	* flumotion/common/common.py:
+	  write a mergeImplements function to merge __implements__ class
+	  attributes
+	* flumotion/common/keycard.py:
+	  removed
+	* flumotion/common/keycards.py:
+	  additions
+	* flumotion/component/bouncers/bouncer.py:
+	  verify that the bouncer can prime the given keycard
+	* flumotion/twisted/checkers.py:
+	* flumotion/test/test_checkers.py:
+	  return a deferred failure when the user is not in the database,
+	  so it looks the same as a wrong password and can't be exploited
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/htpasswdcrypt.xml:
+	  implement actual functionality
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_htpasswdcrypt.py:
+	  added
+	* flumotion/test/test_keycards.py:
+	  test initing of keycard
+	* flumotion/twisted/credentials.py:
+	  fix __implements__
+
 2004-10-16  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/worker/worker.py: Clean up error

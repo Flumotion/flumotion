@@ -58,8 +58,8 @@ class TestCryptCheckerAddUser(unittest.TestCase):
 
     def testCredPlaintextWrongUser(self):
         cred = CredPlaintext('wrong', 'test')
-        # returns a failure immediately
-        failure = self.checker.requestAvatarId(cred)
+        d = self.checker.requestAvatarId(cred)
+        failure = unittest.deferredError(d)
         failure.trap(error.UnauthorizedLogin)
 
     def testCredCrypt(self):
@@ -86,8 +86,8 @@ class TestCryptCheckerAddUser(unittest.TestCase):
     def testCredCryptWrongUser(self):
         crypted = crypt.crypt('test', 'qi')
         cred = CredCrypt('wronguser', crypted)
-        # this returns a failure immediately
-        failure = self.checker.requestAvatarId(cred)
+        d = self.checker.requestAvatarId(cred)
+        failure = unittest.deferredError(d)
         failure.trap(error.UnauthorizedLogin)
 
 if __name__ == '__main__':

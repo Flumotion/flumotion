@@ -96,6 +96,29 @@ class TestFormatTime(unittest.TestCase):
         
         value = week * 291 + day * 5 + hour * 13 + minute * 5
         assert common.formatTime(value) == "291 weeks 5 days 13:05"
+
+class I1: pass
+class I2: pass
+
+class A:
+    __implements__ = (I1, )
+
+class B:
+    __implements__ = (I2, )
+    
+class C: pass
+class TestMergeImplements(unittest.TestCase):
+    def testTwoImplements(self):
+        self.assertEquals(common.mergeImplements(A, B), (I1, I2))
+        
+    def testFirstWithout(self):
+        self.assertEquals(common.mergeImplements(B, C), (I2, ))
+
+    def testSecondWithout(self):
+        self.assertEquals(common.mergeImplements(A, C), (I1, ))
+
+    def testBothWithout(self):
+        self.assertEquals(common.mergeImplements(C, C), ( ))
      
 if __name__ == '__main__':
     unittest.main()

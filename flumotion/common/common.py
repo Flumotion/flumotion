@@ -105,3 +105,12 @@ def version(binary):
     block.append("(C) Copyright 2004 Fluendo")
     return "\n".join(block)
              
+def mergeImplements(*classes):
+    """
+    Merge the __implements__ tuples of the given classes into one tuple.
+    """
+    allYourBase = []
+    for clazz in classes:
+        allYourBase += getattr(clazz, '__implements__', ())
+    return tuple(allYourBase)
+

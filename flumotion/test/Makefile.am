@@ -6,6 +6,7 @@ EXTRA_DIST = \
 	test_config.py \
 	test_credentials.py \
 	test_enum.py \
+	test_htpasswdcrypt.py \
 	test_http.py \
 	test_keycards.py \
 	test_log.py \

@@ -30,8 +30,9 @@ class BouncerMedium(component.BaseComponentMedium):
     def remote_authenticate(self, keycard):
         return self.comp.authenticate(keycard)
 
+    # FIXME: rename to ...Id
     def remote_removeKeycard(self, keycardId):
-        self.comp.removeKeycard(keycardId)
+        self.comp.removeKeycardId(keycardId)
 
     ### FIXME: having these methods means we need to properly separate
     # more component-related stuff
@@ -42,6 +43,7 @@ class BouncerMedium(component.BaseComponentMedium):
 class Bouncer(component.BaseComponent):
 
     __implements__ = interfaces.IAuthenticate,
+    keycardClasses = ()
 
     component_medium_class = BouncerMedium
     
@@ -57,6 +59,14 @@ class Bouncer(component.BaseComponent):
     def getDomain(self):
         return self.domain
     
+    def typeAllowed(self, keycard):
+        """
+        Verify if the keycard is an instance of a Keycard class specified
+        in the bouncer's keycardClasses variable.
+        """
+        return isinstance(keycard, self.keycardClasses)
+         
+    # FIXME: do we need this at all in the base class ?
     def authenticate(self, keycard):
         if not components.implements(keycard, credentials.ICredentials):
             self.warn('keycard %r does not implement ICredentials', keycard)
@@ -76,15 +86,25 @@ class Bouncer(component.BaseComponent):
 
     def _addKeycard(self, keycard):
         # give keycard an id and store it in our hash
+        if self._keycards.has_key(keycard.id):
+            # already in there
+            return
         id = self._idCounter
         self._idCounter += 1
         # FIXME: what if it already had one ?
         # FIXME: deal with wraparound ?
-        keycard.id = keycard.componentName + ":%016x" % self._idCounter
+        keycard.id = "%016x" % self._idCounter
         self._keycards[keycard.id] = keycard
         self.log("added keycard with id %s" % keycard.id)
 
-    def removeKeycard(self, id):
+    def removeKeycard(self, keycard):
+        id = keycard.id
+        if not self._keycards.has_key(id):
+            raise
+        del self._keycards[id]
+        self.log("removed keycard with id %s" % id)
+
+    def removeKeycardId(self, id):
         if not self._keycards.has_key(id):
             raise
         del self._keycards[id]

@@ -24,7 +24,7 @@ from flumotion.common import log
 from twisted.cred import credentials
 
 class Username:
-    __implements__ = credentials.IUsernamePassword,
+    __implements__ = (credentials.IUsernamePassword, )
     def __init__(self, username, password=''):
         self.username = username
         self.password = password
@@ -59,7 +59,7 @@ class UsernameCryptPasswordPlaintext:
     I implement IUsernameCryptPassword.
     """
     
-    __implements__ = IUsernameCryptPassword
+    __implements__ = (IUsernameCryptPassword, )
     def __init__(self, username, password):
         self.username = username
         self.password = password
@@ -80,7 +80,7 @@ class UsernameCryptPasswordCrypt:
     I implement IUsernameCryptPassword.
     """
     
-    __implements__ = IUsernameCryptPassword
+    __implements__ = (IUsernameCryptPassword, )
     def __init__(self, username, cryptPassword=None):
         self.username = username
         self.cryptPassword = cryptPassword
@@ -134,7 +134,7 @@ class UsernameCryptPasswordCryptChallenger:
     I implement IUsernameCryptPassword.
     """
     
-    __implements__ = IUsernameCryptPassword
+    __implements__ = (IUsernameCryptPassword, )
 
     def __init__(self, username):
         self.username = username

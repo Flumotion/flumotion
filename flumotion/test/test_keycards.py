@@ -19,12 +19,22 @@
 import common
 from twisted.trial import unittest
 
+from twisted.python import components
+
+from flumotion.twisted import credentials
 from flumotion.common import keycards
 
-class TestKeycardUACPC(unittest.TestCase):
+class TestKeycardUACPP(unittest.TestCase):
     def testInit(self):
-        keycard = keycards.KeycardUACPC('user', '127.0.0.1')
+        keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
+        self.assert_(components.implements(keycard, credentials.IUsernameCryptPassword))
+
+class TestKeycardUACPCC(unittest.TestCase):
+    def testInit(self):
+        keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
+        self.assertEquals(keycard.state, keycards.REQUESTING)
+        self.assert_(components.implements(keycard, credentials.IUsernameCryptPassword))
         
 if __name__ == '__main__':
      unittest.main()

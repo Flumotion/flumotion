@@ -1,10 +1,11 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_htpasswdcrypt -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
 # Flumotion - a video streamer server
 # Copyright (C) 2004 Fluendo
 #
-# flumotion/component/bouncers/htpasswd.py: an htpasswd-based bouncer
+# flumotion/component/bouncers/htpasswdcrypt.py:
+# an htpasswd-backed bouncer with crypt passwords
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -21,23 +22,26 @@
 import crypt
 
 from twisted.python import components
-from twisted.cred import credentials
+from twisted.cred import error
 
 from flumotion.common import interfaces, keycards, log
 from flumotion.component import component
 from flumotion.component.bouncers import bouncer
+from flumotion.twisted import credentials, checkers
 
-__all__ = ['HTPasswd']
+__all__ = ['HTPasswdCrypt']
 
-class HTPasswd(bouncer.Bouncer):
+class HTPasswdCrypt(bouncer.Bouncer):
 
-    logCategory = 'htpasswd'
+    logCategory = 'htpasswdcrypt'
+    keycardClasses = (keycards.KeycardUACPP, keycards.KeycardUACPCC)
 
-    def __init__(self, name, filename, data, type):
+    def __init__(self, name, filename, data):
         bouncer.Bouncer.__init__(self, name)
         self._filename = filename
         self._data = data
-        self._type = type
+        self._checker = checkers.CryptChecker()
+        self._challenges = {} # for UACPCC
 
         # FIXME: done through state/mood change ?
         self._setup()
@@ -54,51 +58,66 @@ class HTPasswd(bouncer.Bouncer):
             if not ':' in line: continue
             # when coming from a file, it ends in \n, so strip.
             # for data, we already splitted, so no \n, but strip is fine.
-            name, password = line.strip().split(':')
-            self._db[name] = password
+            name, cryptPassword = line.strip().split(':')
+            self._db[name] = cryptPassword
+            self._checker.addUser(name, cryptPassword)
 
         self.debug('parsed %s, %d lines' % (self._filename or '<memory>',
             len(lines)))
    
-    def authenticate(self, keycard):
-        if not components.implements(keycard, credentials.ICredentials):
-            self.warn('keycard %r does not implement ICredentials', keycard)
-            raise AssertionError
-
-        if not self._db.has_key(keycard.username):
-            self.info('keycard %r refused, no username %s found' % (
-                keycard, keycard.username))
-            return None
-                                                                                
-        entry = self._db[keycard.username]
-        if self._type == 'crypt':
-            salt = entry[:2]
-            encrypted = crypt.crypt(keycard.password, salt)
-            if entry == encrypted:
-                return self._authenticated(keycard, "crypt accepted")
-            else:
-                return self._refused(keycard, "crypt refused")
-        elif self._type == 'plaintext':
-            # if it has this method, like for pb auth, use it
-            if hasattr(keycard, 'checkPassword'):
-                if keycard.checkPassword(entry):
-                    return self._authenticated(keycard, "plaintext accepted")
-                else:
-                    return self._refused(keycard, "plaintext refused")
-            raise NotImplementedError
-        elif self._type == 'md5':
-            raise NotImplementedError
-        else:
-            raise AssertionError("unsupported method: %s" % self._type)
-                                                                                
-
-    def _authenticated(self, keycard, reason):
-        self.info('keycard %r authenticated (%s)' % (keycard, reason))
+    def _requestAvatarIdCallback(self, result, keycard):
+        # authenticated, so return the keycard with state authenticated
+        self.info('keycard %r authenticated' % keycard)
         self._addKeycard(keycard)
+        keycard.state = keycards.AUTHENTICATED
+        
         return keycard
-    def _refused(self, keycard, reason):
-        self.info('keycard %r refused (%s)' % (keycard, reason))
+
+    def _requestAvatarIdErrback(self, failure, keycard):
+        failure.trap(error.UnauthorizedLogin)
+        # FIXME: we want to make sure the "None" we return is returned
+        # as coming from a callback, ie the deferred
+        self.removeKeycard(keycard)
+        self.info('keycard %r refused, Unauthorized' % keycard)
         return None
+    
+    def authenticate(self, keycard):
+        # FIXME: move checks up in the base class ?
+        if not components.implements(keycard, credentials.IUsernameCryptPassword):
+            self.warning('keycard %r does not implement IUsernameCryptPassword' % keycard)
+        if not self.typeAllowed(keycard):
+            self.warning('keycard %r not in type list %r' % (keycard, self.keycardClasses))
+            return None
+
+        # at this point we add it so there's an ID for challenge-response
+        self._addKeycard(keycard)
+
+        # check if the keycard is ready for the checker, based on the type
+        if isinstance(keycard, keycards.KeycardUACPCC):
+            # Check if we need to challenge it
+            if not keycard.challenge:
+                self.debug('putting challenge on keycard %r' % keycard)
+                keycard.challenge = credentials.cryptChallenge()
+                # cheat: get the salt from the checker directly
+                keycard.salt = self._checker.users[keycard.username][:2]
+                self.debug("salt %s, storing challenge for id %s" % (keycard.salt, keycard.id))
+                # we store the challenge locally to verify against tampering
+                self._challenges[keycard.id] = keycard.challenge
+                return keycard
+
+            if keycard.response:
+                # Check if the challenge has been tampered with
+                if self._challenges[keycard.id] != keycard.challenge:
+                    self.removeKeycard(keycard)
+                    self.info('keycard %r refused, challenge tampered with' % keycard)
+                    return None
+                del self._challenges[keycard.id]
+
+        # use the checker
+        d = self._checker.requestAvatarId(keycard)
+        d.addCallback(self._requestAvatarIdCallback, keycard)
+        d.addErrback(self._requestAvatarIdErrback, keycard)
+        return d
 
 def createComponent(config):
     # we need either a filename or data
@@ -114,7 +133,6 @@ def createComponent(config):
         # FIXME
         raise
 
-    # FIXME: use checker, get type correctly too
-    type = config.get('encryption', 'crypt')
-    comp = HTPasswd(config['name'], filename, data, type)
+    # FIXME: use checker
+    comp = HTPasswdCrypt(config['name'], filename, data)
     return comp
