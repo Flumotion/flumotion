@@ -110,11 +110,13 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
 
     def perspective_getBundleSumsByFile(self, filename):
         """
-        Get the name of the bundle, and a dictionary of md5sums of all
-        dependency bundles, including this bundle.
+        Get a list of (bundleName, md5sum) of all dependency bundles,
+        starting with this bundle, in the correct order.
 
         @type  filename: string
         @param filename: the name of the file in a bundle
+
+        @rtype: list of (string, string) tuples
         """
         self.debug('asked to get bundle sums for %s' % filename)
         basket = self.vishnu.bundlerBasket
@@ -124,14 +126,17 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
 
         deps = basket.getDependencies(bundleName)
         self.debug('dependencies of %s: %r' % (bundleName, deps))
-        sums = {}
+        sums = []
         for dep in deps:
             bundler = basket.getBundlerByName(dep)
-            sums[dep] = bundler.bundle().md5sum
+            if not bundler:
+                self.warning('Did not find bundle with name %s' % dep)
+            else:
+                sums.append((dep, bundler.bundle().md5sum))
 
-        self.debug('returning bundle Name %s and %d sums' % (
-            bundleName, len(sums)))
-        return bundleName, sums
+        self.debug('requested bundle is %s' % sums[0][0])
+        self.debug('returning %d sums' % len(sums))
+        return sums
 
     def perspective_getBundleZips(self, bundles):
         """

@@ -24,45 +24,11 @@
 import gtk
 
 from flumotion.common import errors
+import flumotion.component
 
-### this will probably end up being shared
-### maybe rename to Gtk instead of UI ?
-class BaseUI:
-    def __init__(self, name, admin, view):
-        self.name = name
-        self.admin = admin
-        self.view = view
-        
-    def propertyErrback(self, failure, window):
-        failure.trap(errors.PropertyError)
-        window.error_dialog("%s." % failure.getErrorMessage())
-        return None
+from flumotion.component.base import admin_gtk
 
-    def setElementProperty(self, element, property, value):
-        cb = self.admin.setProperty(self.name, element, property, value)
-        cb.addErrback(self.propertyErrback, self)
-    
-    def getElementProperty(self, func, element, property):
-        cb = self.admin.getProperty(self.name, element, property)
-        cb.addCallback(func)
-        cb.addErrback(self.propertyErrback, self)
-
-    def callRemote(self, method_name, *args, **kwargs):
-        return self.admin.callComponentRemote(self.name, method_name,
-                                              *args, **kwargs)
-        
-    def setUIState(self, state):
-        raise NotImplementedError
-
-    # FIXME: abstract this method so it loads file with the relative
-    # flumotion/ path as put together in bundles,
-    # and it looks for the right bundle for this file
-    def loadGladeFile(self, glade_file):
-        path = os.path.join(self.view.uidir, glade_file)
-        wtree = gtk.glade.XML(path)
-        return wtree
-        
-class HTTPStreamerUI(BaseUI):
+class HTTPStreamerUI(admin_gtk.BaseAdminGtk):
     #def __init__(self, name, admin, view):
     #    self.labels = {}
         # FIXME: Johan, this doesn't work, BaseUI is not defined

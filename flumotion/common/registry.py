@@ -671,7 +671,7 @@ class ComponentRegistry(log.Loggable):
         if not os.path.exists(filename):
             return
 
-        common.addPackagePath(filename)
+        common.registerPackagePath(filename)
 
         directory = self._parser._directories.get(filename, None)
         if not force:
@@ -840,7 +840,7 @@ class ComponentRegistry(log.Loggable):
     def verify(self):
         path_directories = []
         path_directories.append(os.path.join(configure.pythondir,
-                                             'flumotion', 'component'))
+                                             'flumotion'))
     
         if os.environ.has_key('FLU_REGISTRY_PATH'):
             paths = os.environ['FLU_REGISTRY_PATH']

@@ -65,6 +65,9 @@ class RemoteRunError(pb.Error):
 class FlumotionError(pb.Error):
     "Generic Flumotion error"
 
+class NoBundleError(pb.Error):
+    "The requested bundle was not found"
+
 # GStreamer errors
 class GstError(pb.Error):
     "Generic GStreamer error"

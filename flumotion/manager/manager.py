@@ -206,6 +206,10 @@ class Vishnu(log.Loggable):
                     self.log('Adding path %s as %s to bundle %s' % (
                         fullpath, relative, bundleName))
                     self.bundlerBasket.add(bundleName, fullpath, relative)
+
+            for d in b.getDependencies():
+                self.log('Adding dependency of %s on %s' % (bundleName, d))
+                self.bundlerBasket.depend(bundleName, d)
         
     def _createHeaven(self, interface, klass):
         """

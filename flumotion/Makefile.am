@@ -22,4 +22,4 @@ flumotion_PYTHON = \
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(flumotion_PYTHON)
+EXTRA_DIST = $(flumotion_PYTHON) package.xml

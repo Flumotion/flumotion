@@ -277,7 +277,11 @@ class BundlerBasket:
         """
         Return names of all the dependencies of this bundle, including this
         bundle itself.
+        The dependencies are returned in a correct depending order.
         """
+        # FIXME: do we need to scrub duplicates at all ?
+        # It probably doesn't hurt that bad to include them more than once;
+        # worst problem is returning a zip file more than once in a request
         deps = [bundlerName, ]
         if self._dependencies.has_key(bundlerName):
             for dep in self._dependencies[bundlerName]:

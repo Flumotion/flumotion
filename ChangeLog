@@ -1,3 +1,37 @@
+2004-12-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-admin.in:
+	  remove flumotion.component from import path to be sure we use
+	  the bundled code
+	* bin/flumotion-manager.in:
+	  only update registry here ...
+	* flumotion/common/setup.py:
+	  ... and not all other binaries
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/manager/common.py:
+	  Use new bundle code
+	* flumotion/common/common.py:
+	  Fix up code to register package paths
+	* flumotion/common/registry.py:
+	  search in flumotion/ for registry .xml files, to catch the one
+	  for the base flumotion package
+	* flumotion/common/errors.py:
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/base/admin_gtk.py:
+	  added base admin_gtk class
+	* flumotion/component/base/base.xml:
+	* flumotion/component/consumers/httpstreamer/gtk.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  make HTTP streamer use base gtk admin UI
+	* flumotion/manager/admin.py:
+	  raise an error if entry point not found
+	* flumotion/manager/manager.py:
+	  add dependencies correctly
+	* flumotion/package.xml:
+	* flumotion/Makefile.am:
+	  make base flumotion bundle
+
 2004-11-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:

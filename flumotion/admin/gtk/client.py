@@ -163,7 +163,7 @@ class Window(log.Loggable, gobject.GObject):
         
         return model.get(iter, COL_TEXT)[0]
 
-    def show_component(self, name, methodName, data):
+    def show_component(self, name, methodName, filepath, data):
         """
         Show the user interface for this component.
         Searches data for the given methodName global,
@@ -177,7 +177,11 @@ class Window(log.Loggable, gobject.GObject):
         instance = None
         if data:
             namespace = {}
-            exec (data, globals(), namespace)
+            try:
+                exec (data, globals(), namespace)
+            except SyntaxError, e:
+                self.warning('Syntax Error on file %s, line %d' % (
+                    filepath, e.lineno))
             klass = namespace.get(methodName) # most likely GUIClass
 
             if klass:
@@ -231,17 +235,8 @@ class Window(log.Loggable, gobject.GObject):
             self.warning('Select a component')
             return
 
-        def cb_gotEntry(result):
+        def gotEntryCallback(result):
             entryPath, filename, methodName = result
-            if not entryPath or not filename:
-                # no ui, clear; FIXME: do this nicer
-                old = self.hpaned.get_child2()
-                self.hpaned.remove(old)
-                sub = gtk.Label('%s does not have a UI yet' % name)
-                self.hpaned.add2(sub)
-                sub.show()
-                return
-
             filepath = os.path.join(entryPath, filename)
             self.debug("Got the UI, lives in %s" % filepath)
             # FIXME: this is a silent assumption that the glade file
@@ -251,10 +246,20 @@ class Window(log.Loggable, gobject.GObject):
             data = handle.read()
             handle.close()
             # FIXME: is name (of component) needed ?
-            self.show_component(name, methodName, data)
+            self.show_component(name, methodName, filepath, data)
+
+        def gotEntryNoBundleErrback(failure):
+            failure.trap(errors.NoBundleError)
+            # no ui, clear; FIXME: do this nicer
+            old = self.hpaned.get_child2()
+            self.hpaned.remove(old)
+            sub = gtk.Label('%s does not have a UI yet' % name)
+            self.hpaned.add2(sub)
+            sub.show()
              
         d = self.admin.getEntry(name, 'admin/gtk')
-        d.addCallback(cb_gotEntry)
+        d.addCallback(gotEntryCallback)
+        d.addErrback(gotEntryNoBundleErrback)
 
     def admin_connected_cb(self, admin):
         if self._disconnected_dialog:

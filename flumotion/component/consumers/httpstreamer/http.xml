@@ -28,6 +28,10 @@
 
   <bundles>
     <bundle name="http-streamer-admin-gtk">
+      <dependencies>
+        <dependency name="base-admin-gtk" />
+      </dependencies>
+
       <directories>
         <directory name="flumotion/component/consumers/httpstreamer">
           <filename location="http.glade" />

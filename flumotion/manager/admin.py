@@ -199,7 +199,7 @@ class AdminAvatar(common.ManagerAvatar):
         """
         Get the entry point for a piece of bundled code by the type.
 
-        Returns: a (filename, methodName) tuple
+        Returns: a (filename, methodName) tuple, or None if not found.
         """
         self.debug('asked to get entry for component %s and type %s' % (
             componentName, type))
@@ -210,7 +210,8 @@ class AdminAvatar(common.ManagerAvatar):
             # FIXME: add logic here for default entry points and functions
             entry = componentRegistryEntry.getEntryByType(type)
         except KeyError:
-            return (None, None)
+            raise errors.NoBundleError("entry type %s in component type %s" %
+                (type, componentType))
 
         filename = os.path.join(componentRegistryEntry.base, entry.location)
         self.debug('entry point is in file %s and function %s' % (

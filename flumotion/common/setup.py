@@ -23,8 +23,3 @@
 def setup():
     from flumotion.common import log
     log.init()
-    
-    from flumotion.common.registry import registry
-    registry.verify()
-    
-        

@@ -41,6 +41,11 @@ else:
     root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
 sys.path.insert(0, root)
 
+# remove flumotion.component from our namespace and import,
+# since it should be handled by bundles completely
+import flumotion.component
+flumotion.component.__path__ = []
+
 from flumotion.common import errors, setup
 from flumotion.admin.gtk.main import main
 

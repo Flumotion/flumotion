@@ -109,6 +109,10 @@ def _run_main(path):
     from flumotion.common import errors
     from flumotion.common import setup
     setup.setup()
+
+    # verify registry
+    from flumotion.common.registry import registry
+    registry.verify()
     
     main = reflect.namedAny(path)
     

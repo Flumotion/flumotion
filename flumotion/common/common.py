@@ -207,7 +207,8 @@ def argRepr(args=(), kwargs={}, max=-1):
 
 def _listRecursively(path):
     """
-    I'm similar to os.listdir, but I work recursively
+    I'm similar to os.listdir, but I work recursively and only return
+    directories containing __init__.py
     
     @param path: the path
     @type  path: string
@@ -231,30 +232,41 @@ def _listRecursively(path):
             
     return retval
 
-def _findPackages(path):
+def _findPackageCandidates(path):
     """
-    I take a directory and returns a list of python packages
+    I take a directory and returns a list of candidate python packages.
+
     @param path: the path
     @type  path: string
     """
-
+    # this function also "guesses" candidate packages when __init__ is missing
+    # so a bundle with only a subpackage is also detected
     dirs = _listRecursively(path)
     if path in dirs:
         dirs.remove(path)
-        
-    packageNames = map(reflect.filenameToModuleName, dirs)
-    
-    # if os.path.exists(os.path.join(path, '__init__.py'))
-    #    packageNames = map(lambda n: '.'.join(n.split('.')[1:]), packageNames)
-    
-    return packageNames
 
-def addPackagePath(packagePath):
+    # chop off the base path to get a list of "relative" bundlespace paths
+    bundlePaths = [x[len(path) + 1:] for x in dirs]
+    bundlePackages = [".".join(x.split(os.path.sep)) for x in bundlePaths]
+
+    # sort them so that depending packages are after higher-up packages
+    bundlePackages.sort()
+        
+    return bundlePackages
+
+def registerPackagePath(packagePath):
     """
-    Add a package path so we can import stuff that's already partly present
+    Register a given path as a path that can be imported from.
+    Used to support partition of bundled code.
+
     @param packagePath: path to add
-    @type packagePath:  string
+    @type  packagePath: string
     """
+
+    # FIXME: this should potentially also clean up older registered package
+    # paths for the same bundle ?
+    # This would involve us keeping track of what has been registered before,
+    # and would probably involve creating an object to keep track of this state
 
     # First add the root to sys.path, so we can import stuff from it,
     # probably a good idea to live it there, if we want to do
@@ -267,7 +279,7 @@ def addPackagePath(packagePath):
     # the following algorithm only works if they're sorted.
     # By sorting the list we can ensure that a parent package
     # is always processed before one of its childrens
-    packageNames = _findPackages(packagePath)
+    packageNames = _findPackageCandidates(packagePath)
     packageNames.sort()
 
     if not packageNames:
@@ -276,12 +288,21 @@ def addPackagePath(packagePath):
     # Since the list is sorted, the top module is the first item
     toplevelName = packageNames[0]
     
-    # Append the bundle to the __path__ of the toplevel directory
-    package = reflect.namedAny(toplevelName)
-    path = os.path.join(packagePath, toplevelName)
-    if not path in package.__path__:
-        package.__path__.append(path)
-    
+    # Append the bundle's absolute path to the __path__ of
+    # each of its higher-level packages
+    partials = []
+    for partial in toplevelName.split("."):
+        partials.append(partial)
+        name = ".".join(partials)
+        try:
+            package = reflect.namedAny(name)
+        except:
+            print "ERROR: could not reflect name %s" % name
+            raise
+        path = os.path.join(packagePath, name.replace('.', os.sep))
+        if not path in package.__path__:
+            package.__path__.append(path)
+        
     for packageName in packageNames[1:]:
         package = sys.modules.get(packageName, None)
         
@@ -299,7 +320,6 @@ def addPackagePath(packagePath):
             # insert because FLU_REGISTRY_PATH paths should override
             # base components
             package.__path__.insert(0, subPath)
-
 
 def ensureDir(dir, description):
     """

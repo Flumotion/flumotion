@@ -338,9 +338,6 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             # callback for getting the entry.  Will request bundle sums
             # based on filename given to me
             self.debug('_getEntryCallback: result %r' % (result, ))
-            if not result:
-                # no UI for this one
-                return (None, None, None)
 
             filename, methodName = result
             self.debug("entry point for %s of type %s is in file %s and method %s" % (componentName, type, filename, methodName))
@@ -353,18 +350,25 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         def _getBundleSumsCallback(result, filename, methodName):
             # callback receiving bundle sums.  Will remote call to get
             # all missing zip files
-            entryName, sums = result
-            self.debug('_getBundleSumsCallback: entry bundle %s, sums %d' % (
-                entryName, len(sums)))
+            sums = result
+            entryName, entrySum = sums[0]
+            self.debug('_getBundleSumsCallback: %d sums received' % len(sums))
 
             # get path where entry bundle is stored
-            entryPath = os.path.join(configure.cachedir, sums[entryName])
+            entryPath = os.path.join(configure.cachedir, entrySum)
 
             # check which zips to request from manager
-            for name in sums.keys():
-                sum = sums[name]
+            missing = [] # list of missing bundles
+
+            # for registerPackagePath to work, we need to reverse the order
+            sums.reverse()
+            for name, sum in sums:
                 dir = os.path.join(configure.cachedir, sum)
-                missing = [] # list of missing bundles
+
+                # add package paths, yay
+                self.debug("registering PackagePath %s for bundle %s" % (
+                    dir, name))
+                common.registerPackagePath(dir)
                 if not os.path.exists(dir):
                     missing.append(name)
 
@@ -374,6 +378,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                 d = self.callRemote('getBundleZips', missing)
                 d.addCallback(_getBundleZipsCallback, entryPath, filename, methodName)
                 d.addErrback(self._defaultErrback)
+                return d
             else:
                 retval = (entryPath, filename, methodName)
                 self.debug('_getBundleSumsCallback: returning %r' % (
@@ -383,6 +388,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         def _getBundleZipsCallback(result, entryPath, filename, methodName):
             # callback to receive zips.  Will set up zips and finally
             # return physical location of entry file and method
+            self.debug('_getBundleZipsCallback: received %d zips' % len(result))
             for name in result.keys():
                 zip = result[name]
                 b = bundle.Bundle()
@@ -391,7 +397,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                 dir = unbundler.unbundle(b)
                 self.debug("unpacked %s to dir %s" % (name, dir))
 
-            return entryPath, filename, methodName
+            retval = (entryPath, filename, methodName)
+            self.debug('_getBundleSumsCallback: returning %r' % (
+                retval, ))
+            return retval
 
         # start chain
         d = self.callRemote('getEntryByType', componentName, type)
