@@ -1,5 +1,11 @@
 2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	  call a .cleanup() on the old AdminGtk objects if they implement it
+	  when showing a new component
+
+2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/common.py:
 	  add infrastructure to start test worker/admin/manager
 	* flumotion/common/keycards.py:

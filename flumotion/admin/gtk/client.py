@@ -241,6 +241,13 @@ class Window(log.Loggable, gobject.GObject):
         # methodName has historically been GUIClass
         instance = None
 
+        # if there's a current component being shown, give it a chance
+        # to clean up
+        if self.current_component:
+            if hasattr(self.current_component, 'cleanup'):
+                self.debug('Cleaning up current component view')
+                self.current_component.cleanup()
+
         name = state.get('name')
         self.statusbar.set('main', "Loading UI for %s ..." % name)
         if data:
