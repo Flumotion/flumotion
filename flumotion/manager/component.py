@@ -266,7 +266,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return self.username
 
     def getListenHost(self):
-        return self.getTransportPeer()[1]
+        return self.getTransportPeer().host
 
     # This method should ask the component if the port is free
     def getListenPort(self, feeder):
@@ -469,7 +469,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
     
     def isLocalComponent(self, component):
         # TODO: This could be a lot smarter
-        host = component.getTransportPeer()[1]
+        host = component.getTransportPeer().host
         if host == '127.0.0.1':
             return True
         else:
