@@ -44,7 +44,6 @@ except:
 names = gettestnames(srcdir)
 
 for name in names:
-    print os.getcwd()
     suite.addTest(loader.loadTestsFromName(name))
     
 testRunner = unittest.TextTestRunner()
