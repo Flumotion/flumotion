@@ -87,14 +87,14 @@ class Dispatcher(log.Loggable):
         avatar.detached(mind)
         heaven.removeAvatar(avatarId)
 
-    def getAvatarFor(self, avatarId, ifaces):
+    def createAvatarFor(self, avatarId, ifaces):
         if not pb.IPerspective in ifaces:
             raise errors.NoPerspectiveError(avatarId)
 
         for iface in ifaces:
             heaven = self.heavens.get(iface, None)
             if heaven:
-                avatar = heaven.getAvatar(avatarId)
+                avatar = heaven.createAvatar(avatarId)
                 self.avatars[avatarId] = heaven
                 return avatar
 

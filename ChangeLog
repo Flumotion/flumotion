@@ -1,5 +1,15 @@
 2004-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/component.py:
+	  components -> avatars
+	  rename and privatize addComponent to _addAvatar
+	* flumotion/manager/manager.py:
+	  getAvatarFor -> createAvatarFor
+	* flumotion/test/test_manager.py:
+	  rename Perspective to Avatar
+
+2004-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/manager.py:
 	  commenting some more, privatize a function
 

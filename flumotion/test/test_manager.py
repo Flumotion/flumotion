@@ -22,7 +22,7 @@ from twisted.trial import unittest
 
 from flumotion.manager import component, manager
 
-class FakeComponentPerspective:
+class FakeComponentAvatar:
     def __init__(self, name='fake', eaters=[], port=-1, listen_host='listen-host'):
         self.name = name
         self.eaters = eaters
@@ -54,67 +54,67 @@ class TestComponentHeaven(unittest.TestCase):
     def setUp(self):
         self.heaven = component.ComponentHeaven(manager.Vishnu())
 
-    def testGetPerspective(self):
+    def testCreateAvatar(self):
         p = self.heaven.createAvatar('foo-bar-baz')
         assert isinstance(p, component.ComponentAvatar)
 
         #self.assertRaises(AssertionError,
-        #                  self.heaven.getPerspective, 'does-not-exist')
+        #                  self.heaven.createAvatar, 'does-not-exist')
 
     def testIsLocalComponent(self):
-        c = FakeComponentPerspective()
-        self.heaven.addComponent(c)
-        assert self.heaven.isLocalComponent(c)
+        a = FakeComponentAvatar()
+        self.heaven._addAvatar(a)
+        assert self.heaven.isLocalComponent(a)
         
     def testIsStarted(self):
-        c = self.heaven.createAvatar('prod')
+        a = self.heaven.createAvatar('prod')
         assert not self.heaven.isComponentStarted('prod')
-        c.started = True # XXX: Use heaven.componentStart
+        a.started = True # XXX: Use heaven.componentStart
         assert self.heaven.isComponentStarted('prod')
 
     def testGetComponent(self):
-        c = self.heaven.createAvatar('prod')
-        assert self.heaven.getComponent('prod') == c
+        a = self.heaven.createAvatar('prod')
+        assert self.heaven.getComponent('prod') == a
 
     def testHasComponent(self):
-        c = self.heaven.createAvatar('prod')
+        a = self.heaven.createAvatar('prod')
         assert self.heaven.hasComponent('prod')
-        self.heaven.removeComponent(c)
+        self.heaven.removeComponent(a)
         assert not self.heaven.hasComponent('prod')
-        self.assertRaises(KeyError, self.heaven.removeComponent, c)
+        self.assertRaises(KeyError, self.heaven.removeComponent, a)
         
     def testAddComponent(self):
-        c = FakeComponentPerspective('fake')
-        self.heaven.addComponent(c)
+        a = FakeComponentAvatar('fake')
+        self.heaven._addAvatar(a)
         assert self.heaven.hasComponent('fake')
-        self.assertRaises(KeyError, self.heaven.addComponent, c)
+        self.assertRaises(KeyError, self.heaven._addAvatar, a)
         
     def testRemoveComponent(self):
         assert not self.heaven.hasComponent('fake')
-        c = FakeComponentPerspective('fake')
-        self.assertRaises(KeyError, self.heaven.removeComponent, c)
-        self.heaven.addComponent(c)
+        a = FakeComponentAvatar('fake')
+        self.assertRaises(KeyError, self.heaven.removeComponent, a)
+        self.heaven._addAvatar(a)
         assert self.heaven.hasComponent('fake')
-        self.heaven.removeComponent(c)
+        self.heaven.removeComponent(a)
         assert not self.heaven.hasComponent('fake')
-        self.assertRaises(KeyError, self.heaven.removeComponent, c)
+        self.assertRaises(KeyError, self.heaven.removeComponent, a)
 
     def testComponentEatersEmpty(self):
-        c = FakeComponentPerspective('fake')
-        self.heaven.addComponent(c)
-        assert self.heaven.getComponentEaters(c) == []
+        a = FakeComponentAvatar('fake')
+        self.heaven._addAvatar(a)
+        assert self.heaven.getComponentEaters(a) == []
         
     def testComponentsEaters(self):
-        c = FakeComponentPerspective('foo', ['bar', 'baz'])
-        self.heaven.addComponent(c)
-        c2 = FakeComponentPerspective('bar', port=1000, listen_host='bar-host')
-        self.heaven.addComponent(c2)
-        c3 = FakeComponentPerspective('baz', port=1001, listen_host='baz-host')
-        self.heaven.addComponent(c3)
-        self.heaven.feeder_set.addFeeders(c2)
-        self.heaven.feeder_set.addFeeders(c3)
+        a = FakeComponentAvatar('foo', ['bar', 'baz'])
+        self.heaven._addAvatar(a)
+        a2 = FakeComponentAvatar('bar', port=1000, listen_host='bar-host')
+        self.heaven._addAvatar(a2)
+        a3 = FakeComponentAvatar('baz', port=1001, listen_host='baz-host')
+        self.heaven._addAvatar(a3)
+        self.heaven.feeder_set.addFeeders(a2)
+        self.heaven.feeder_set.addFeeders(a3)
         
-        eaters = self.heaven.getComponentEaters(c)
+        eaters = self.heaven.getComponentEaters(a)
         assert len(eaters) == 2
         assert ('bar', 'bar-host', 1000) in eaters
         assert ('baz', 'baz-host', 1001) in eaters        

@@ -471,7 +471,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         @type vishnu:  L{flumotion.manager.manager.Vishnu}
         @param vishnu: the Vishnu object
         """
-        self.components = {} # dict of component avatars
+        self.avatars = {} # dict of component avatars
         self.feeder_set = FeederSet()
         self.vishnu = vishnu
         
@@ -495,7 +495,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
             raise errors.AlreadyConnectedError(avatarId)
 
         avatar = ComponentAvatar(self, avatarId)
-        self.addComponent(avatar)
+        self._addAvatar(avatar)
         return avatar
 
     def removeAvatar(self, avatarId):
@@ -517,9 +517,9 @@ class ComponentHeaven(pb.Root, log.Loggable):
         if not self.hasComponent(component_name):
             return False
 
-        component = self.components[component_name]
+        avatar = self.avatars[component_name]
 
-        return component.started == True
+        return avatar.started == True
     
     def getComponent(self, name):
         """retrieves a new component
@@ -531,7 +531,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         if not self.hasComponent(name):
             raise KeyError, name
         
-        return self.components[name]
+        return self.avatars[name]
     
     def hasComponent(self, name):
         """
@@ -544,21 +544,21 @@ class ComponentHeaven(pb.Root, log.Loggable):
         @returns:    True if a component with that name is registered
         """
         
-        return self.components.has_key(name)
+        return self.avatars.has_key(name)
     
-    def addComponent(self, component):
+    def _addAvatar(self, avatar):
         """
-        Adds a component.
+        Adds a component avatar.
 
-        @type component: L{flumotion.manager.component.ComponentAvatar}
-        @param component: the component
+        @type avatar: L{flumotion.manager.component.ComponentAvatar}
+        @param avatar: the component avatar
         """
 
-        component_name = component.getName()
+        component_name = avatar.getName()
         if self.hasComponent(component_name):
             raise KeyError, component_name
             
-        self.components[component_name] = component
+        self.avatars[component_name] = avatar
         
     def removeComponent(self, component):
         """
@@ -575,8 +575,8 @@ class ComponentHeaven(pb.Root, log.Loggable):
         if not self.hasComponent(component_name):
             raise KeyError, component_name
 
-        component = self.components[component_name]
-        del self.components[component_name]
+        component = self.avatars[component_name]
+        del self.avatars[component_name]
         
         self.vishnu.adminheaven.componentRemoved(component)
 
@@ -683,11 +683,11 @@ class ComponentHeaven(pb.Root, log.Loggable):
         @param name: name of the component
         """
 
-        component = self.components[name]
+        component = self.avatars[name]
         component.stop()
         
     def shutdown(self):
-        map(self.stopComponent, self.components)
+        map(self.stopComponent, self.avatars)
         
 
 
