@@ -1,5 +1,7 @@
 2004-06-11  Johan Dahlin  <johan@gnome.org>
 
+	* scripts/: Remove, superseded by configuration files
+
 	* flumotion/gui/.svnignore: Adding some stuff I missed
 
 	* .svnignore: 
