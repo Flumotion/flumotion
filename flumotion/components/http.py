@@ -188,7 +188,7 @@ class HTTPStreamingResource(resource.Resource):
         resource.Resource.__init__(self)
 
     def setLogfile(self, logfile):
-        self.logfile = open(logfile, 'w')
+        self.logfile = open(logfile, 'a')
         
     def log(self, fd, ip, request):
         if not self.logfile:
@@ -312,7 +312,7 @@ class HTTPStreamingResource(resource.Resource):
         @param request: the request
         @type request: twisted.protocol.http.Request
         """
-        
+
         self.updateAverage()
         fd = request.transport.fileno()
         self.request_hash[fd] = request

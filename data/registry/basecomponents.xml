@@ -41,6 +41,7 @@
     <properties>
       <property name="source" type="string" required="yes"/>
       <property name="location" type="string" required="yes"/>
+      <property name="auth-port" type="int"/>
     </properties>
   </component>
 

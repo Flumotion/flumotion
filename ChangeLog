@@ -1,3 +1,15 @@
+2004-08-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/components/file.py (FileSinkStreamer.__init__):
+	Implement changing of filename
+	(FileStreamingResource.__init__): New resource for auth interface
+	(why is it called auth??)
+
+	* flumotion/components/http.py (HTTPStreamingResource.setLogfile):
+	Append logfile
+
+	* data/registry/basecomponents.xml: Add auth-port to http-streamer
+
 2004-08-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/server/component.py:
