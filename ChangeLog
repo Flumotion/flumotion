@@ -1,3 +1,7 @@
+2004-10-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/: Add a few new unittests.
+
 2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_checkers.py:
@@ -25,6 +29,8 @@
 	  reworded header after call with the lawyer
 
 2004-10-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/test/Makefile.am: Add more unittests
 
 	* flumotion/component/encoders/encoders.xml:
 	* flumotion/component/encoders/jpeg.py:

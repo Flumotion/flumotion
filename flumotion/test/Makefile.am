@@ -1,16 +1,17 @@
 EXTRA_DIST = \
 	test_bundle.py \
+	test_checkers.py \
 	test_common.py \
 	test_component.py \
 	test_config.py \
-	test_checkers.py \
 	test_credentials.py \
 	test_enum.py \
-	test_configure.py \
 	test_http.py \
 	test_log.py \
 	test_manager.py \
-	test_registry.py
+	test_reflect.py \
+	test_registry.py \
+	test_worker_heaven.py
 
 check-local:
 	@if PYTHONPATH=$(top_srcdir):$(PYTHONPATH) trial -R flumotion.test; \

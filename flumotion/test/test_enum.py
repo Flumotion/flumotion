@@ -95,10 +95,16 @@ class TestEnum(unittest.TestCase):
         assert BarType.Barrie != FooType.Foobie
 
     def testEnumError(self):
+        # nicks of incorrect length
         self.assertRaises(TypeError, enums.EnumClass, 'Foo',
                           ('a', 'b'), ('c',))
         self.assertRaises(TypeError, enums.EnumClass, 'Bar',
                           ('a',), ('b', 'c'))
+        # extra of invalid type
+        self.assertRaises(TypeError, enums.EnumClass, 'Baz',
+                          ('a', 'b'), ('b', 'c'), extra=None)
+        self.assertRaises(TypeError, enums.EnumClass, 'Boz',
+                          ('a', 'b'), ('b', 'c'), extra=('e',))
 
     def testEnumSet(self):
         FooType = enums.EnumClass('FooType', ('Foo', 'Bar'))
