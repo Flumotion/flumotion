@@ -37,6 +37,7 @@
         <directories>
             <directory name="flumotion/component/producers/bttv">
                 <filename location="admin_gtk.py"/>
+                <filename location="colorbalance.glade"/>
             </directory>
         </directories>
     </bundle>

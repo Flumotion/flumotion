@@ -48,16 +48,20 @@ class BTTVMedium(feedcomponent.FeedComponentMedium):
         if channel:
             pipeline = self.comp.get_pipeline()
             element = pipeline.get_by_name('source')
-            self.cb_colorbalance_changed(element, channel, value)
+            device_value = int(channel.min_value + value/100.0 * \
+                               (channel.max_value - channel.min_value))
+
+            self.cb_colorbalance_changed(element, channel, device_value)
 
     def remote_getColorBalanceProperties(self):
         return self.comp.getColorBalanceProperties()
 
     def cb_colorbalance_changed(self, element, channel, value):
-        self.debug('ColorBalance property: %s changed to value: %d' % (
-            channel.label, value))
+        percent_value = float(value - channel.min_value) / float(channel.max_value - channel.min_value) * 100.0
+        self.debug('ColorBalance property: %s changed to value: %f (device value: %d)' % (
+            channel.label, percent_value, value))
         self.callRemote('propertyChanged', self.comp.get_name(), channel.label,
-            value)
+            percent_value)
         
 class BTTV(feedcomponent.ParseLaunchComponent):
     component_medium_class = BTTVMedium
@@ -72,23 +76,23 @@ class BTTV(feedcomponent.ParseLaunchComponent):
         Set a color balance property.
 
         @param which: which property to change
-        @param value: what value to set it to
+        @param value: what value to set it to (float between 0.0 and 100.0)
         """
         pipeline = self.get_pipeline() 
         element = pipeline.get_by_name('source')
 
         if self.cb_channels:
             for i in self.cb_channels:
-                log.debug('colorbalance %s: %d <= %d <= %d' % (
-                    i.label, i.min_value, element.get_value(i), i.max_value))
-                if i.label == which and value >= i.min_value \
-                                    and value <= i.max_value:
-                    element.set_value(i, value)
+                if i.label == which:
+                    device_value = int(i.min_value + value/100.0 * \
+                                       (i.max_value - i.min_value))
+                    log.debug('Percent value: %f Device value: %d min: %d max: %d' % (value, device_value, i.min_value, i.max_value))               
+                    element.set_value(i, device_value)
                     return i
 
     def getColorBalanceProperties(self):
         """
-        Returns: a list of (label, min, max, value) tuples.
+        Returns: a list of (label, value) tuples.
         """
         pipeline = self.get_pipeline() 
         element = pipeline.get_by_name('source')
@@ -99,8 +103,11 @@ class BTTV(feedcomponent.ParseLaunchComponent):
         for i in self.cb_channels:
             log.debug('colorbalance %s: %d <= %d <= %d' % (
                 i.label, i.min_value, element.get_value(i), i.max_value))
-            retval.append([i.label, i.min_value, i.max_value,
-                element.get_value(i)])
+            percent_value = float(element.get_value(i) - i.min_value) / \
+                            float(i.max_value - i.min_value) \
+                            * 100.0
+            log.debug('colorbalance value: %f' % percent_value)
+            retval.append([i.label, percent_value])
 
         return retval
 

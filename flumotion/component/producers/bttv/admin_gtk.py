@@ -1,7 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/producers/videotest/admin_gtk.py:
+# flumotion/component/producers/bttv/admin_gtk.py:
 # admin client-side code for bttv
 # 
 # Flumotion - a streaming media server
@@ -30,21 +30,10 @@ from flumotion.component.base import admin_gtk
 
 class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
     def render(self):
-        # FIXME: gladify
-        self.widget = gtk.Table(4,2)
-        huelabel = gtk.Label("Hue:")
-        self.widget.attach(huelabel, 0, 1, 0, 1, 0, 0, 6, 6)
-        huelabel.show()
-        saturationlabel = gtk.Label("Saturation:")
-        self.widget.attach(saturationlabel, 0, 1, 1, 2, 0, 0, 6, 6)
-        saturationlabel.show()
-        brightnesslabel = gtk.Label("Brightness:")
-        self.widget.attach(brightnesslabel, 0, 1, 2, 3, 0, 0, 6, 6)
-        brightnesslabel.show()
-        contrastlabel = gtk.Label("Contrast:")
-        self.widget.attach(contrastlabel, 0, 1, 3, 4, 0, 0, 6, 6)
-        contrastlabel.show()
-        
+        self.wtree = self.loadGladeFile('colorbalance.glade')
+
+        self.widget = self.wtree.get_widget('widget-colorbalance')
+
         d = self.callRemote("getColorBalanceProperties")
         d.addCallback(self.getColorBalancePropertiesCallback)
         d.addErrback(self.getColorBalancePropertiesErrback)
@@ -52,48 +41,50 @@ class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
         return self.widget
         
     def getColorBalancePropertiesCallback(self, result):
-        self.debug("%s: minimum: %d maximum: %d value: %d" % (
-            result[0][0], result[0][1], result[0][2], result[0][3]))
 
         for i in result:
             # create scale that uses 0 decimal places,
             # and only updates after a little time after user
             # finished moving scale
-            scale = gtk.HScale()
-            scale.set_range(i[1], i[2])
-            scale.set_value(i[3])
-            scale.set_increments(1,100)
-            scale.set_digits(0)
-            scale.set_update_policy(gtk.UPDATE_DELAYED)
-            change_id = scale.connect('value-changed',
+            scale_widgetname = 'scale-%s' % i[0]
+            spinbutton_widgetname = 'spinbutton-%s' % i[0]
+            scale = self.wtree.get_widget(scale_widgetname.lower())
+            spinbutton = self.wtree.get_widget(spinbutton_widgetname.lower())
+
+            scale.set_value(i[1])
+            spinbutton.set_value(i[1])
+
+            scale_change_id = scale.connect('value-changed',
+                self.cb_colorbalance_change)
+            spinbutton_change_id = spinbutton.connect('value-changed',
                 self.cb_colorbalance_change)
 
             if i[0] == 'Hue':
                 self.scale_hue = scale
-                self.hue_changed_id = change_id
+                self.spinbutton_hue = spinbutton
+                self.hue_scale_change_id = scale_change_id
+                self.hue_spinbutton_change_id = spinbutton_change_id
+                
             if i[0] == 'Saturation':
                 self.scale_saturation = scale
-                self.saturation_changed_id = change_id
+                self.spinbutton_saturation = spinbutton
+                self.saturation_scale_change_id = scale_change_id
+                self.saturation_spinbutton_change_id = spinbutton_change_id
+               
             if i[0] == 'Brightness':
                 self.scale_brightness = scale
-                self.brightness_changed_id = change_id
+                self.spinbutton_brightness = spinbutton
+                self.brightness_scale_change_id = scale_change_id
+                self.brightness_spinbutton_change_id = spinbutton_change_id
+
             if i[0] == 'Contrast':
                 self.scale_contrast = scale
-                self.contrast_changed_id = change_id
+                self.spinbutton_contrast = spinbutton
 
-        
+                self.contrast_scale_change_id = scale_change_id
+                self.contrast_spinbutton_change_id = spinbutton_change_id
 
-        self.widget.attach(self.scale_hue, 1, 2, 0, 1, gtk.EXPAND|gtk.FILL, 0, 6, 6)
-        self.scale_hue.show()
-        
-        self.widget.attach(self.scale_saturation, 1, 2, 1, 2, gtk.EXPAND|gtk.FILL, 0, 6, 6)
-        self.scale_saturation.show()
-
-        self.widget.attach(self.scale_brightness, 1, 2, 2, 3, gtk.EXPAND|gtk.FILL, 0, 6, 6)
-        self.scale_brightness.show()
-
-        self.widget.attach(self.scale_contrast, 1, 2, 3, 4, gtk.EXPAND|gtk.FILL, 0, 6, 6)
-        self.scale_contrast.show()
+     
         
 
     def getColorBalancePropertiesErrback(self, failure):
@@ -101,19 +92,19 @@ class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
             failure.type, failure.getErrorMessage()))
         return None
     
-    def cb_colorbalance_change(self, scale):
-        value = scale.get_value()
+    def cb_colorbalance_change(self, widget):
+        value = widget.get_value()
         label = ""
-        if scale == self.scale_hue:
+        if widget == self.scale_hue or widget == self.spinbutton_hue:
             label = "Hue"
-        if scale == self.scale_saturation:
+        if widget == self.scale_saturation or widget == self.spinbutton_saturation: 
             label = "Saturation"
-        if scale == self.scale_brightness:
+        if widget == self.scale_brightness or widget == self.spinbutton_brightness:
             label = "Brightness"
-        if scale == self.scale_contrast:
+        if widget == self.scale_contrast or widget == self.spinbutton_contrast:
             label = "Contrast"
-        log.debug('changing colorbalance %s to %d' % (label, value))
-        d = self.callRemote("setColorBalanceProperty", label, int(value))
+        log.debug('changing colorbalance %s to %f' % (label, value))
+        d = self.callRemote("setColorBalanceProperty", label, value)
         d.addErrback(self.colorbalanceChangeErrback)
 
     def colorbalanceChangeErrback(self,failure):
@@ -121,26 +112,39 @@ class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
             failure.getErrorMessage()))
 
     def propertyChanged(self, name, value):
-        self.debug('property %s changed to %d' % (name, value))
+        self.debug('property %s changed to %f' % (name, value))
 
-        change_id = -1
+        scale_change_id = -1
         if name == 'Hue':
             scale = self.scale_hue
-            change_id = self.hue_changed_id
+            spinbutton = self.spinbutton_hue
+            scale_change_id = self.hue_scale_change_id
+            spinbutton_change_id = self.hue_spinbutton_change_id
         if name == 'Saturation':
             scale = self.scale_saturation
-            change_id = self.saturation_changed_id
+            spinbutton = self.spinbutton_saturation
+            scale_change_id = self.saturation_scale_change_id
+            spinbutton_change_id = self.saturation_spinbutton_change_id
         if name == 'Brightness':
             scale = self.scale_brightness
-            change_id = self.brightness_changed_id
+            spinbutton = self.spinbutton_brightness
+            scale_change_id = self.brightness_scale_change_id
+            spinbutton_change_id = self.brightness_spinbutton_change_id
         if name == 'Contrast':
             scale = self.scale_contrast
-            change_id = self.contrast_changed_id
+            spinbutton = self.spinbutton_contrast
+            scale_change_id = self.contrast_scale_change_id
+            spinbutton_change_id = self.contrast_spinbutton_change_id
 
-        if change_id != -1:
-            scale.handler_block(change_id)
+
+        if scale_change_id != -1:
+            scale.handler_block(scale_change_id)
             scale.set_value(value)
-            scale.handler_unblock(change_id)
+            scale.handler_unblock(scale_change_id)
+            spinbutton.handler_block(spinbutton_change_id)
+            spinbutton.set_value(value)
+            spinbutton.handler_unblock(spinbutton_change_id)
+
             
 
 GUIClass = BTTVAdminGtk
