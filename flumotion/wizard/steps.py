@@ -171,6 +171,7 @@ class TVCard(VideoSource):
     component_type = 'bttv'
     icon = 'tv.png'
 
+        
     def on_combobox_device_changed(self, combo):
         self.update_channels()
 
@@ -227,6 +228,32 @@ class FireWire(VideoSource):
     icon = 'firewire.png'
 wizard.register_step(FireWire)
 
+
+def _checkDeviceName(device):
+    from twisted.internet import defer, reactor
+    import gst
+    
+    d = defer.Deferred()
+
+    # gst, defer and errors are already in the namespace 
+    def state_changed_cb(pipeline, old, new):
+        if not (old == gst.STATE_NULL and new == gst.STATE_READY):
+            return
+        element = pipeline.get_by_name('source')
+        deviceName = element.get_property('device-name')
+        reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
+        d.callback(deviceName)
+                
+    def error_cb(pipeline, element, error, _):
+        d.errback(errors.UnknownDeviceError("The device does not exist"))
+
+    pipeline = 'v4lsrc name=source device=%s autoprobe=false ! fakesink' % device
+    bin = gst.parse_launch(pipeline)
+    bin.connect('state-change', state_changed_cb)
+    bin.connect('error', error_cb)
+    bin.set_state(gst.STATE_PLAYING)
+
+    return d
 
 
 class Webcam(VideoSource):
@@ -235,8 +262,51 @@ class Webcam(VideoSource):
     component_type = 'video4linux'
     icon = 'webcam.png'
     
+    in_setup = False
+    def setup(self):
+        self.in_setup = True
+        self.combobox_device.set_list(('/dev/video0',
+                                       '/dev/video1',
+                                       '/dev/video2'))
+        self.in_setup = False
+
+    def on_combobox_device_changed(self, combo):
+        self.update()
+
+    def worker_changed(self):
+        self.clear()
+        self.update()
+        
     def before_show(self):
-        self.wizard.check_elements(self.worker, 'v4lsrc')
+        self.clear()
+        self.update()
+        
+    def clear(self):
+        self.spinbutton_width.set_sensitive(False)
+        self.spinbutton_height.set_sensitive(False)
+        self.spinbutton_framerate.set_sensitive(False)
+        
+    def _queryCallback(self, deviceName):
+        print 'got device', deviceName
+        self.wizard.block_next(False)
+        self.spinbutton_width.set_sensitive(True)
+        self.spinbutton_height.set_sensitive(True)
+        self.spinbutton_framerate.set_sensitive(True)
+
+    def _unknownDeviceErrback(self, failure):
+        failure.trap(errors.UnknownDeviceError)
+        self.clear()
+        
+    def update(self):
+        if self.in_setup:
+            return
+        
+        self.wizard.block_next(True)
+        
+        device = self.combobox_device.get_string()
+        d = self.run_on_worker(_checkDeviceName, device)
+        d.addCallback(self._queryCallback)
+        d.addErrback(self._unknownDeviceErrback)
         
 wizard.register_step(Webcam)
 
@@ -323,7 +393,7 @@ def _checkTracks(source_element, device):
     from twisted.internet import defer, reactor
     import gst
     import gst.interfaces
-
+    
     d = defer.Deferred()
 
     # gst, defer and errors are already in the namespace 
@@ -398,7 +468,6 @@ class Soundcard(wizard.WizardStep):
         
     def _queryCallback(self, (deviceName, tracks)):
         self.wizard.block_next(False)
-        
         self.combobox_channels.set_enum(SoundcardChannels)
         self.combobox_channels.set_sensitive(True)
         self.combobox_samplerate.set_enum(SoundcardSamplerate)
@@ -421,8 +490,8 @@ class Soundcard(wizard.WizardStep):
             self.combobox_device.set_enum(SoundcardAlsaDevice)
         elif enum == SoundcardSource.OSS:
             self.combobox_device.set_enum(SoundcardOSSDevice)
-        #else:
-        #    raise AssertionError
+        else:
+            raise AssertionError
         self.in_update_devices = False
 
     def update_inputs(self):
