@@ -31,7 +31,11 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
 
 def createComponent(config):
-    component = AudioTest(config['name'], 'sinesrc name=source sync=1')
+    rate = config.get('samplerate', 8000)
+    volume = config.get('volume', 1.0)
+
+    component = AudioTest(config['name'],
+        'sinesrc name=source sync=1 ! audio/x-raw-int,rate=%d ! volume volume=%f' % (rate, volume))
     element = component.get_element('source')
     if config.has_key('freq'):
         element.set_property('freq', config['freq'])

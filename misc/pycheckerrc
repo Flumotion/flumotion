@@ -178,7 +178,7 @@ unusedNames = ['_', 'empty', 'unused', 'dummy']
 deprecated = 1
 
 # maximum lines in a function
-maxLines = 200
+maxLines = 250
 
 # maximum branches in a function
 maxBranches = 50

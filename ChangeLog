@@ -1,3 +1,19 @@
+2004-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/wizard_audiotest.glade:
+	  add volume
+	* data/glade/wizard_vorbis.glade:
+	  make quality the default - but didn't work
+	* flumotion/wizard/steps.py:
+	  really make quality the default for vorbis
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/wizard.py:
+	  add volume
+	* misc/pycheckerrc:
+	  increase maxsize of functions
+
 2004-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/wizard_tvcard.glade:

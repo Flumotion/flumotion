@@ -31,7 +31,7 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, Enum, EnumClass, EnumMetaClass, \
      LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
      SoundcardChannels, SoundcardSystem, SoundcardAlsaDevice, SoundcardOSSDevice, \
-     SoundcardInput, SoundcardSamplerate, TVCardDevice, TVCardSignal, \
+     SoundcardInput, SoundcardSamplerate, AudioTestSamplerate, TVCardDevice, TVCardSignal, \
      VideoDevice, VideoTestFormat, VideoTestPattern
 
 
@@ -565,7 +565,13 @@ class Soundcard(wizard.WizardStep):
         #d.addErrback(self._permissionDeniedErrback)
         
     def get_component_properties(self):
-        channels = self.combobox_channels.get_enum().intvalue
+        # FIXME: this can't be called if the soundcard hasn't been proped yet
+        # for example, when going through the testsuite
+        try:
+            channels = self.combobox_channels.get_enum().intvalue
+        except AttributeError:
+            # when called without enum setup
+            channels = 0
         element = self.combobox_system.get_enum().element
 
         d = dict(device=self.combobox_device.get_string(),
@@ -589,9 +595,15 @@ class TestAudioSource(wizard.WizardStep):
     
     def before_show(self):
         self.wizard.check_elements(self.worker, 'sinesrc')
+        self.combobox_samplerate.set_enum(AudioTestSamplerate)
+        self.combobox_samplerate.set_sensitive(True)
 
     def get_component_properties(self):
-        return {'freq': int(self.spinbutton_freq.get_value()) }
+        return {
+            'freq': int(self.spinbutton_freq.get_value()),
+            'volume': float(self.spinbutton_volume.get_value()),
+            'rate': int(self.combobox_samplerate.get_string())
+        }
     
     def get_next(self):
         return 'Encoding'
@@ -781,6 +793,10 @@ class Vorbis(AudioEncoder):
     def setup(self):
         self.spinbutton_bitrate.set_range(6, 250)
         self.spinbutton_bitrate.set_value(64)
+        # By choosing quality as a default, we avoid samplerate/bitrate
+        # mismatch
+        self.radiobutton_bitrate.set_active(False)
+        self.radiobutton_quality.set_active(True)
         
     def before_show(self):
         self.wizard.check_elements(self.worker, 'rawvorbisenc')

@@ -132,6 +132,11 @@ VideoTestPattern = EnumClass('VideoTestPattern',
 
 VideoTestFormat = EnumClass('VideoTestFormat', ('YUV', 'RGB'))
 
+AudioTestSamplerate = EnumClass('AudioTestSamplerate', ('8000',
+                                                        '16000',
+                                                        '32000',
+                                                        '44100'))
+
 # Sound card
 SoundcardSystem = EnumClass('SoundcardSystem', ('OSS',
                                                 'Alsa'),

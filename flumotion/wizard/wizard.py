@@ -71,6 +71,8 @@ class WizardComboBox(gtk.ComboBox):
         return self.get_column_content(self.COLUMN_VALUE)
 
     def get_enum(self):
+        # FIXME: EVIL, this should not return an integer as a fallback,
+        # because you can't call enum methods on it then
         if hasattr(self, 'enum_class'):
             return self.enum_class.get(self.get_value())
         else:
