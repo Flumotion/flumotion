@@ -78,11 +78,12 @@ def set_proc_text(text):
     #proc[4] = '\0'
     
 class Launcher:
-    def __init__(self, controller_port):
+    def __init__(self, host, port):
         self.children = []
         self.controller_pid = None
-        self.controller_port = controller_port
         self.uid = None
+        self.controller_host = host
+        self.controller_port = port
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         signal.signal(signal.SIGSEGV, self.segv_handler)
@@ -95,7 +96,7 @@ class Launcher:
                 os.setuid(self.uid)
                 self.msg('uid set to %d for %s' % (self.uid, name))
             except OSError, e:
-                self.msg('failed to set gid: %s' % str(e))
+                self.msg('failed to set uid: %s' % str(e))
 
     def msg(self, *args):
         log.msg('launcher', *args)
@@ -111,14 +112,15 @@ class Launcher:
 
         self.setup_uid(name)
         
-    def start_controller(self, port):
+    def start_controller(self):
         pid = os.fork()
         self.msg('Starting controller')
         if not pid:
             self.setup_uid('controller')
             set_proc_text('flumotion [controller]')
             factory = ControllerServerFactory()
-            self.controller = reactor.listenTCP(port, factory)
+            self.controller = reactor.listenTCP(self.controller_port,
+                                                factory)
             try:
                 reactor.run(False)
             except KeyboardInterrupt:
@@ -126,7 +128,7 @@ class Launcher:
             
             raise SystemExit
         self.controller_pid = pid
-
+        
     def signal_handler(self, *args):
         for pid in self.children:
             try:
@@ -147,7 +149,8 @@ class Launcher:
 
         signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         signal.signal(signal.SIGINT, exit_cb)
-        reactor.connectTCP('localhost', self.controller_port,
+        reactor.connectTCP(self.controller_host,
+                           self.controller_port,
                            component.factory)
         
         try:
@@ -403,9 +406,12 @@ def run_launcher(args):
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="Be verbose")
-    parser.add_option('-c', '--controller-port',
+    parser.add_option('-c', '--port',
                       action="store", type="int", dest="port",
                       help="Controller port", default=8890)
+    parser.add_option('', '--host',
+                      action="store", type="string", dest="host",
+                      help="Controller host", default="localhost")
 
     options, args = parser.parse_args(args)
 
@@ -416,13 +422,14 @@ def run_launcher(args):
     if options.verbose:
         log.enableLogging()
 
-    launcher = Launcher(options.port)
+    launcher = Launcher(options.host, options.port)
     launcher.load_config(args[2])
-        
-    if not gstutils.is_port_free(options.port):
-        launcher.msg('Controller is already started')
-    else:
-        launcher.start_controller(options.port)
+
+    if options.host == 'localhost':
+        if not gstutils.is_port_free(options.port):
+            launcher.msg('Controller is already started')
+        else:
+            launcher.start_controller()
 
     launcher.run()
 

@@ -2,6 +2,7 @@
 
 	* flumotion/server/launcher.py (main): Add support for setuid to a
 	username and renice.
+	(Launcher): Add support to connect to another controller.
 
 	* conf/sine-disc.conf (sine): Add nice for testing
 
