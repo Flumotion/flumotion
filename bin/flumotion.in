@@ -12,7 +12,6 @@ import gobject
 if gobject.pygtk_version < (2,3,96):
     print 'PyGTK 2.3.96 or higher is required'
     raise SystemExit
-gobject.threads_init()
 
 dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.exists(os.path.join(dir, '.svn')):
