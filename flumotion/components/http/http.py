@@ -110,10 +110,10 @@ def format_time(time):
     return " ".join(display)
     
 class HTTPStreamingAdminResource(resource.Resource):
-    def __init__(self, streaming):
+    def __init__(self, parent):
         'call with a HTTPStreamingResource to admin for'
-        self.streaming = streaming
-        self.debug = self.streaming.debug
+        self.parent = parent
+        self.debug = self.parent.debug
         #self.info = lambda msg: log.info('HTTP admin', msg)
 
         resource.Resource.__init__(self)
@@ -144,40 +144,91 @@ class HTTPStreamingAdminResource(resource.Resource):
         return self.render_stats(request)
     
     def render_stats(self, request):
-        mime = self.streaming.streamer.get_mime()
+        stats = self.parent.streamer
         
-        el = self.streaming.streamer.get_sink()
-        bytes_sent = el.get_property('bytes-served')
-        bytes_received = el.get_property('bytes-to-serve')
-        uptime = time.time() - self.streaming.start_time
-        clients = str(len(self.streaming.request_hash))
-        peak_clients = self.streaming.peak_client_number
-        average_clients = int(self.streaming.average_client_number)
-        max_clients = int(self.streaming.maxAllowedClients())
+        bytes_sent      = stats.getBytesSent()
+        bytes_received  = stats.getBytesReceived()
+        uptime          = stats.getUptime()
         
-        stats = {}
-        stats['Clients connected'] = clients
-        stats['Mime type'] = mime
-        stats['Total bytes sent'] = format_bytes(bytes_sent)
-        stats['Bytes processed'] = format_bytes(bytes_received)
-        stats['Stream uptime'] = format_time(uptime)
-        stats['Stream bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
-        stats['Total client bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
-        stats['Peak Client Number'] = peak_clients
+        s = {}
+        s['Clients connected'] = stats.getClients()
+        s['Mime type'] = self.parent.streamer.get_mime()
+        s['Total bytes sent'] = format_bytes(bytes_sent)
+        s['Bytes processed'] = format_bytes(bytes_received)
+        s['Stream uptime'] = format_time(uptime)
+        s['Stream bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
+        s['Total client bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
+        s['Peak Client Number'] = stats.getPeakClients()
         
-        self.streaming.updateAverage()
-        stats['Average Simultaneous Clients'] = average_clients
-        stats['Maximum allowed clients'] = max_clients
+        stats.updateAverage()
+        s['Average Simultaneous Clients'] = int(stats.getAverageClients())
+        s['Maximum allowed clients'] = int(self.parent.maxAllowedClients())
 
         block = []
-        for key in stats.keys():
-            block.append('<tr><td>%s</td><td>%s</td></tr>' % (key, stats[key]))
+        for key, value in s.items():
+            block.append('<tr><td>%s</td><td>%s</td></tr>' % (key, value))
             
         return STATS_TEMPLATE % {
-            'name': self.streaming.streamer.get_name(),
-            'stats': "\n".join(block)
-        }
+            'name': self.parent.streamer.get_name(),
+            'stats': "\n".join(block)}
 
+class Stats:
+    def __init__(self, sink):
+        self.sink = sink
+        
+        self.no_clients = 0        
+        self.start_time = time.time()
+        # keep track of the highest number
+        self.peak_client_number = 0 
+        # keep track of average clients by tracking last average and its time
+        self.average_client_number = 0
+        self.average_time = self.start_time
+        
+    def updateAverage(self):
+        # update running average of clients connected
+        now = time.time()
+        # calculate deltas
+        dt1 = self.average_time - self.start_time
+        dc1 = self.average_client_number
+        dt2 = now - self.average_time
+        dc2 = self.no_clients
+        self.average_time = now # we can update now that we used self.av
+        if dt1 == 0:
+            # first measurement
+            self.average_client_number = 0
+        else:
+            self.average_client_number = (dc1 * dt1 / (dt1 + dt2) +
+                                          dc2 * dt2 / (dt1 + dt2))
+    def clientAdded(self):
+        self.updateAverage()
+
+        self.no_clients += 1
+
+        if self.no_clients > self.peak_client_number:
+            self.peak_client_number = self.no_clients
+    
+    def clientRemoved(self):
+        self.updateAverage()
+        self.no_clients -= 1
+
+    def getBytesSent(self):
+        return self.sink.get_property('bytes-served')
+    
+    def getBytesReceived(self):
+        return self.sink.get_property('bytes-to-serve')
+    
+    def getUptime(self):
+        return time.time() - self.start_time
+    
+    def getClients(self):
+        return self.no_clients
+    
+    def getPeakClients(self):
+        return self.peak_client_number
+    
+    def getAverageClients(self):
+        return self.average_client_number
+    
 class HTTPStreamingResource(resource.Resource, log.Loggable):
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
     logCategory = 'httpstreamer'
@@ -190,6 +241,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
 
         self.request_hash = {}
         self.auth = None
+        
         self.start_time = time.time()
         self.peak_client_number = 0 # keep track of the highest number
         # keep track of average clients by tracking last average and its time
@@ -280,22 +332,6 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             
         #self.debug('setting Content-type to %s' % mime)
         os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
-        
-    def updateAverage(self):
-        # update running average of clients connected
-        now = time.time()
-        # calculate deltas
-        dt1 = self.average_time - self.start_time
-        dc1 = self.average_client_number
-        dt2 = now - self.average_time
-        dc2 = len(self.request_hash)
-        self.average_time = now # we can update now that we used self.av
-        if dt1 == 0:
-            # first measurement
-            self.average_client_number = 0
-        else:
-           self.average_client_number = (dc1 * dt1 / (dt1 + dt2) +
-                                          dc2 * dt2 / (dt1 + dt2))
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -332,12 +368,8 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         @type request: twisted.protocol.http.Request
         """
 
-        self.updateAverage()
         fd = request.transport.fileno()
         self.request_hash[fd] = request
-        # update peak client number
-        if len(self.request_hash) > self.peak_client_number:
-            self.peak_client_number = len(self.request_hash)
 
     def removeClient(self, request, fd):
         """Removes a request and add logging. Note that it does not disconnect the client
@@ -346,7 +378,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         @param fd: the file descriptor for the client being removed
         @type fd: L{int}
         """
-        self.updateAverage()
+
         ip = request.getClientIP()
         self.log(fd, ip, request)
         self.info('client from %s on fd %d disconnected' % (ip, fd))
@@ -403,7 +435,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         else:
             return self.handleNewClient(request)
 
-class MultifdSinkStreamer(component.ParseLaunchComponent):
+class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     logCategory = 'cons-http'
     # use select for test
     pipe_template = 'multifdsink name=sink ' + \
@@ -419,6 +451,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent):
         self.gst_properties = []
         component.ParseLaunchComponent.__init__(self, name, [source], [],
                                                 self.pipe_template)
+        Stats.__init__(self, sink=self.get_sink())
         self.caps = None
         
     def __repr__(self):
@@ -466,11 +499,12 @@ class MultifdSinkStreamer(component.ParseLaunchComponent):
         assert isinstance(sink, gst.Element)
         return sink
 
+    def client_added_cb(self, sink, fd):
+        Stats.clientAdded(self)
+
     def client_removed_cb(self, sink, fd, reason):
         self.emit('client-removed', sink, fd, reason)
-        
-    def client_added_cb(self, sink, fd):
-        pass
+        Stats.clientRemoved(self)
 
     def feed_state_change_cb(self, element, old, state):
         component.BaseComponent.feed_state_change_cb(self, element,
@@ -511,6 +545,7 @@ def createComponent(config):
 
     component = MultifdSinkStreamer(name, source, port)
     resource = HTTPStreamingResource(component)
+    
     factory = server.Site(resource=resource)
     
     if config.has_key('gst-property'):

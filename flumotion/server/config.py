@@ -65,7 +65,7 @@ class ConfigEntry:
         # we're going to listen to ports and other stuff which should
         # be separated from the main process.
         
-        component = self.func(self.getConfigDict()
+        component = self.func(self.getConfigDict())
         component.setFiles(self.files)
         return component
 
