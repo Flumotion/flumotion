@@ -25,9 +25,14 @@ def namedAny(name):
             import sys
             # if the ImportError happened in the module being imported,
             # this is a failure that should be handed to our caller.
-
-            if str(sys.exc_info()[1]) != "No module named %s" % trialname:
+            shortname = trialname.split('.')[-1]
+            r = str(sys.exc_info()[1])
+            if not (r.startswith('No module named') and
+                    r.endswith(shortname)):
                 raise
+            
+            #if str(sys.exc_info()[1]) != "No module named %s" % trialname:
+            #    raise
             moduleNames.pop()
                                                                                 
     obj = topLevelPackage
@@ -35,8 +40,6 @@ def namedAny(name):
         obj = getattr(obj, n)
                                                                                 
     return obj
-
-
 
 class FlumotionPortal(Portal):
     pass
