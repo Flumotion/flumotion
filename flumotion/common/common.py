@@ -314,7 +314,6 @@ def _findEndModuleCandidates(path, prefix='flumotion.'):
     @type  path: string
     """
     files = _listPyFileRecursively(path)
-    #print "THOMAS: pyfiles in path %s: %r" % (path, files)
 
     # chop off the base path to get a list of "relative" bundlespace paths
     bundlePaths = [x[len(path) + 1:] for x in files]
@@ -395,9 +394,7 @@ def registerPackagePath(packagePath, prefix='flumotion'):
     # the following algorithm only works if they're sorted.
     # By sorting the list we can ensure that a parent package
     # is always processed before one of its children
-    print "THOMAS: packagePath: %s" % packagePath
     packageNames = _findPackageCandidates(packagePath, prefix)
-    print "THOMAS: modules: %r" % packageNames
     packageNames.sort()
 
     if not packageNames:
@@ -466,12 +463,10 @@ def registerPackagePath(packagePath, prefix='flumotion'):
             package.__path__.insert(0, subPath)
 
     # now rebuild all non-package modules in this packagePath
-    print "THOMAS: packagePath: %s" % packagePath
     moduleNames = _findEndModuleCandidates(packagePath)
-    print "THOMAS: modules: %r" % moduleNames
     for name in moduleNames:
         if name in sys.modules:
-            print "THOMAS: rebuilding %s" % name
+            log.log('bundle', "rebuilding non-package module %s" % name)
             module = reflect.namedAny(name)
             rebuild.rebuild(module)
 

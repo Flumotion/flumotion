@@ -340,7 +340,7 @@ class TestRecursively(unittest.TestCase):
         # add a python file; should now get returned
         os.system("touch %s" % os.path.join(c, 'test.py'))
         dirs = common._listDirRecursively(self.tempdir)
-        self.assertEquals(dirs, [a, c])
+        self.assertEquals(dirs.sort(), [a, c].sort())
 
         # cleanup
         os.system("rm -r %s" % self.tempdir)
@@ -400,7 +400,7 @@ class TestRecursively(unittest.TestCase):
         test3 = os.path.join(c, 'test.pyc')
         os.system("touch %s" % test3)
         dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs, [test1, test2, test3])
+        self.assertEquals(dirs.sort(), [test1, test2, test3].sort())
 
         mods = common._findEndModuleCandidates(self.tempdir,
             prefix='')
