@@ -83,8 +83,12 @@ class StreamingResource(resource.Resource):
         
     def data_recieved_cb(self, transcoder, gbuffer, caps):
         if not self.caps:
-            self.caps = caps
-
+            caps = gst.caps_from_string(caps)
+            structure = caps[0]
+            # XXX: dict(structure) should work
+            self.caps = '%s;boundary=%s' % (structure.get_name(),
+                                            structure.get_string('boundary'))
+            
         buf = str(buffer(gbuffer))
         for request in self.current_requests:
             request.write(buf)
