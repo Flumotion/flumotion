@@ -1,5 +1,14 @@
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/Makefile.am:
+	* conf/flows/ogg-test-theora.xml:
+	* configure.ac:
+	* doc/random/service:
+	* flumotion/manager/main.py:
+	  make manager start up multiple xml files
+
+2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	* flumotion/component/Makefile.am:
 	* flumotion/component/converters/Makefile.am:

@@ -62,12 +62,10 @@ def _loadConfig(vishnu, filename):
     # FIXME: this might be used for loading additional config, so maybe
     # unprivatize and cleanup ?
 
-    conf = config.FlumotionConfigXML(filename)
-
-    # XXX: Cleanup
-    vishnu.workerHeaven.conf = conf
-
     # scan filename for a bouncer component in the manager
+
+    print filename
+    conf = config.FlumotionConfigXML(filename)
 
     if conf.manager and conf.manager.bouncer:
         if vishnu.bouncer:
@@ -82,16 +80,21 @@ def _loadConfig(vishnu, filename):
         vishnu.setBouncer(flumotion.worker.job.getComponent(configDict, defs))
         vishnu.bouncer.debug('started')
 
+    # make the workerheaven load the config
+    vishnu.workerHeaven.loadConfiguration(filename)
 
-def _initialLoadConfig(vishnu, filename):
+
+def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
-    try:
-        _loadConfig(vishnu, filename)
-    except config.ConfigError, reason:
-        sys.stderr.write("ERROR: failed to load planet configuration '%s':\n" % filename)
-        sys.stderr.write("%s\n" % reason)
-        # bypass reactor, because sys.exit gets trapped
-        os._exit(-1)
+    for path in paths:
+        log.debug('manager', 'Loading configuration file from (%s)' % path)
+        try:
+            _loadConfig(vishnu, path)
+        except config.ConfigError, reason:
+            sys.stderr.write("ERROR: failed to load planet configuration '%s':\n" % filename)
+            sys.stderr.write("%s\n" % reason)
+            # bypass reactor, because sys.exit gets trapped
+            os._exit(-1)
     
 def main(args):
     # XXX: gst_init should remove all options, like gtk_init
@@ -141,10 +144,8 @@ def main(args):
 
     vishnu = manager.Vishnu()
 
-    if len(args) <= 2:
-        filename = os.path.abspath(args[1])
-        log.debug('manager', 'Loading configuration file from (%s)' % filename)
-        reactor.callLater(0, _initialLoadConfig, vishnu, filename)
+    paths = [os.path.abspath(filename) for filename in args[1:]]
+    reactor.callLater(0, _initialLoadConfig, vishnu, paths)
     
     if options.verbose:
         log.setFluDebug("*:4")

@@ -1,3 +1,33 @@
 RUNNING FLUMOTION AS A SERVICE
 ------------------------------
 
+* a launcher script called flumotion
+* used by the rc.d service script
+* parses the flumotion sysconfdir
+* which contains
+  manager/
+    flumotion.pem, SSL PEM file for communication
+     FIXME: rename to correspond with "default" in planets ?
+    htpasswd, crypt passwords for logging in to manager
+  planets/
+    default.xml: a planet with only a manager and bouncer
+  flows/
+    *.xml: a planet with a flow, and possibly atmosphere
+
+(FIXME: workers don't really have a config concept, nor should they be
+ in a planet since they're outside
+  workers/
+    mirroring files in planets/ by default
+
+  planetarium/
+    when they are here, they link managers to flows
+
+* launcher flumotion script:
+  - check for planetarium/
+    (not supported yet),
+    get list of managers
+  - for each manager in planets/:
+    - take all flows from flows/ belonging to it
+     - start up manager with planets/default.xml and all flows/*.xml files,
+      which will be merged on the fly
+     - start up a worker as well if the sysconf file allows it
