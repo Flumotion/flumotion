@@ -268,7 +268,7 @@ class AudioTest(wizard.WizardStep):
         self.wizard.check_element(self.worker, 'sinesrc')
 
     def get_component_properties(self):
-        return int(self.spinbutton_freq.get_value())
+        return {'freq': int(self.spinbutton_freq.get_value()) }
     
     def get_next(self):
         return 'Encoding'
@@ -748,6 +748,7 @@ wizard.register_step(Licence)
 class Summary(wizard.WizardStep):
     step_name = "Summary"
     glade_file = "wizard_summary.glade"
+    icon = 'summary.png'
     has_worker = False
     last_step = True
     def get_next(self):

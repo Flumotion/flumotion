@@ -7,6 +7,7 @@ image_DATA = 		\
 	overlay.png 	\
 	placeholder.png \
 	source.png 	\
+	summary.png	\
 	testsource.png 	\
 	tv.png		\
 	webcam.png 	\
