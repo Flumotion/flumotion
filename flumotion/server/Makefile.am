@@ -1,6 +1,6 @@
 flumotiondir = $(libdir)/flumotion/python/flumotion/server
 
-flumotion_DATA = \
+flumotion_PYTHON = \
 	__init__.py \
 	admin.py \
 	auth.py \

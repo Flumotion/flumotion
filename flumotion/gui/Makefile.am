@@ -1,6 +1,6 @@
 flumotiondir = $(libdir)/flumotion/python/flumotion/gui
 
-flumotion_DATA = \
+flumotion_PYTHON = \
 	__init__.py \
 	adminclient.py \
 	streamclient.py
