@@ -185,7 +185,16 @@ class TVCard(VideoSource):
     component_type = 'bttv'
     icon = 'tv.png'
 
-        
+    in_setup = False
+
+    def setup(self):
+        self.in_setup = True
+        self.combobox_device.set_list(('/dev/video0',
+                                       '/dev/video1',
+                                       '/dev/video2',
+                                       '/dev/video3'))
+        self.in_setup = False
+    
     def on_combobox_device_changed(self, combo):
         self.update_sources()
 
@@ -224,9 +233,15 @@ class TVCard(VideoSource):
         self.wizard.error_dialog('General error: %s' % failure.value)
         
     def update_sources(self):
+        if self.in_setup:
+            return
+
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
+        print "THOMAS: device %s" % device
+        if not device:
+            print "ERROR: no device selected"
         d = self.workerRun(_checkChannels, device)
         d.addCallback(self._queryCallback)
         d.addErrback(self._queryGstErrorErrback)
@@ -299,6 +314,7 @@ class Webcam(VideoSource):
     icon = 'webcam.png'
     
     in_setup = False
+
     def setup(self):
         self.in_setup = True
         self.combobox_device.set_list(('/dev/video0',

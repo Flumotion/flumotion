@@ -1,5 +1,10 @@
 2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/wizard/steps.py:
+	  make bttv one like webcam one
+
+2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/main.py:
 	* misc/flu.unstable.stable.modules:
 	  guard against no manager config
