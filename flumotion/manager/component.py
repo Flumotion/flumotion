@@ -834,8 +834,9 @@ class ComponentHeaven(base.ManagerHeaven):
 
         @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         @param componentAvatar: the component
-        @rtype:           tuple of with 2 items
-        @returns:         name and host
+
+        @rtype:   tuple of doubles
+        @returns: tuple of (name, host) for each feeder
         """
 
         host = componentAvatar.getClientAddress()

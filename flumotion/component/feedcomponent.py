@@ -161,10 +161,13 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         @param name: name of the component
         @type  name: string
-        @param eater_config: entry between <source>...</source> from config
-        @param feeder_config: entry between <feed>...</feed> from config
+        @param eater_config: entries between <source>...</source> from config
+        @param feeder_config: entries between <feed>...</feed> from config
         """
         basecomponent.BaseComponent.__init__(self, name)
+
+        self.debug("feedcomponent.__init__: eater_config %r" % eater_config)
+        self.debug("feedcomponent.__init__: feeder_config %r" % feeder_config)
         
         self.feed_ports = {} # feed_name -> port mapping
         self.pipeline = None
@@ -255,6 +258,7 @@ class FeedComponent(basecomponent.BaseComponent):
         # the feed names come from the config
         # they are specified under <component> as <feed> elements in XML
         self.feed_names = feeder_config
+        #self.debug("parseFeederConfig: feed_names: %r" % self.feed_names)
 
         # we create feeder names this component contains based on feed names
         self.feeder_names = map(lambda n: self.name + ':' + n, self.feed_names)
@@ -417,7 +421,7 @@ class FeedComponent(basecomponent.BaseComponent):
         information in the tuple.  For each feeding element in the tuple,
         it sets the host it will listen as.
 
-        @type feedersData: tuple
+        @type  feedersData: tuple
         @param feedersData: a list of (feederName, host) tuples.
 
         @returns: a list of (feedName, host, port) tuples for our feeders.
@@ -426,10 +430,13 @@ class FeedComponent(basecomponent.BaseComponent):
         if not self.pipeline:
             raise errors.NotReadyError('No pipeline')
 
+        self.debug("_setup_feeders: feedersData %r" % feedersData)
+
         retval = []
         # Setup all feeders
         for feeder_name, host in feedersData:
             feed_name = feeder_name.split(':')[1]
+            self.debug("_setup_feeders: self.feed_ports: %r" % self.feed_ports)
             assert self.feed_ports.has_key(feed_name), feed_name
             port = self.feed_ports[feed_name]
             self.debug('Going to listen on feeder %s (%s:%d)' % (
@@ -729,8 +736,8 @@ class ParseLaunchComponent(FeedComponent):
         """
         Tell the component to start, linking itself to other components.
 
-        @type eatersData: list of (feedername, host, port) tuples of elements
-                          feeding our eaters.
+        @type eatersData:  list of (feedername, host, port) tuples of elements
+                           feeding our eaters.
         @type feedersData: list of (name, host) tuples of our feeding elements
 
         @returns: list of (feedName, host, port)-tuples of feeds the component
