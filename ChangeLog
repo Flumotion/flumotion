@@ -1,5 +1,11 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/server/Makefile.am:
+	* flumotion/server/controller.py:
+	  rename to manager
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/gui/admininterface.py:
 	* flumotion/server/admin.py:
 	* flumotion/server/controller.py:
