@@ -51,6 +51,7 @@ Makefile
 bin/flumotion
 bin/flumotion-admin
 bin/flumotion-worker
+bin/flumotion-tester
 bin/runtest
 bin/Makefile
 data/Makefile
@@ -75,6 +76,7 @@ flumotion/config/installed.py
 flumotion/config/uninstalled.py
 flumotion/manager/Makefile
 flumotion/test/Makefile
+flumotion/tester/Makefile
 flumotion/twisted/Makefile
 flumotion/utils/Makefile
 flumotion/worker/Makefile

@@ -1,3 +1,14 @@
+2004-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/Makefile.am:
+	* bin/flumotion-tester.in:
+	* configure.ac:
+	* flumotion/Makefile.am:
+	* flumotion/tester/__init__.py:
+	* flumotion/tester/client.py:
+	* flumotion/tester/httpclient.py:
+	  add tester classes and application, also needs cleanup
+
 2004-09-15  Johan Dahlin  <johan@gnome.org>
 
 	* bin/runtest.in: make it a little bit smarter

@@ -5,6 +5,7 @@ SUBDIRS = \
 	config \
 	manager \
 	test \
+	tester \
 	twisted \
 	utils \
 	worker

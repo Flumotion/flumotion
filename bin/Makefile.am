@@ -3,7 +3,7 @@ bin_SCRIPTS = \
 	flumotion-admin \
 	flumotion-worker
 
-noinst_SCRIPTS = runtest
+noinst_SCRIPTS = runtest flumotion-tester
 
 CLEANFILES = $(bin_SCRIPTS)
 
