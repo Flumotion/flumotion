@@ -1,3 +1,12 @@
+2005-03-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/minimal.xml:
+	  fix config to have flow name
+	* flumotion/manager/component.py:
+	  solve KeyError bugs for non-feed components
+	* flumotion/manager/main.py:
+	  fix debug for when no manager section is present
+
 2005-03-30  Andy Wingo  <wingo@pobox.com>
 
 	* bin/flumotion-admin.in: Only use twisted's gtk2reactor if we

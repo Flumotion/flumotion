@@ -430,6 +430,9 @@ class ComponentAvatar(base.ManagerAvatar):
 
         Returns: a list of eater names, or the empty list.
         """
+        if not self.jobState.hasKey('eaterNames'):
+            return []
+
         # this gets created and added by feedcomponent.py
         return self.jobState.get('eaterNames', [])
     
@@ -439,6 +442,10 @@ class ComponentAvatar(base.ManagerAvatar):
 
         Returns: a list of feeder names, or the empty list.
         """
+        # non-feed components don't have these keys
+        if not self.jobState.hasKey('feederNames'):
+            return []
+
         return self.jobState.get('feederNames', [])
 
     def getFeedPort(self, feedName):
@@ -488,13 +495,16 @@ class ComponentAvatar(base.ManagerAvatar):
         @type feedersData: tuple of (name, host) tuples of our feeding elements
         """
         def startCallback(feedData):
-            for feedName, host, port in feedData:
-                self.debug('feed %s (%s:%d) is ready' % (feedName, host, port))
-                self.host = host
-                self.ports[feedName] = port
-                
+            if feedData:
+                for feedName, host, port in feedData:
+                    self.debug('feed %s (%s:%d) is ready' % (
+                        feedName, host, port))
+                    self.host = host
+                    self.ports[feedName] = port
+                    
                 self.checkFeedReady(feedName)
-                self.debug('startCallback: done starting')
+
+            self.debug('startCallback: done starting')
 
         def startErrback(reason):
             self.error("Could not make component start, reason %s" % reason)

@@ -1,5 +1,5 @@
 <planet>
-  <flow>
+  <flow name="default">
     <component name="videotest-producer" type="videotest">
       <feed>default</feed>
       <width>320</width>
