@@ -23,20 +23,20 @@ from flumotion.components import producer
 def createComponent(config):
     device = config['device']
     device_width = config['device-width']
-    device_height = config['device-width']
+    device_height = config['device-height']
 
     width = config.get('width', 320)
     height = config.get('height', 240)
     framerate = config.get('framerate', 25.0)
     
     pipeline = ('v4lsrc device=%s copy-mode=true ! '
-                ' video/x-raw-yuv,width=%s,height=%s ! videoscale ! '
+                'video/x-raw-yuv,width=%d,height=%d ! videoscale ! '
                 'video/x-raw-yuv,width=%d,height=%d ! videorate ! '
-                'video/x-raw-yuv,framerate=10.0') % (device,
-                                                     device_width,
-                                                     device_height
-                                                     width, height,
-                                                     framerate)
+                'video/x-raw-yuv,framerate=%d') % (device,
+                                                   device_width,
+                                                   device_height,
+                                                   width, height,
+                                                   framerate)
     config['pipeline'] = pipeline
     
     return producer.createComponent(config)
