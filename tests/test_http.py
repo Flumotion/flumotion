@@ -61,7 +61,6 @@ class FakeStreamer:
     def add_client(self, fd): pass
     def connect(self, *args): pass
     def debug(self, *args): pass
-    def msg(self, *args): pass
 
 class FakeAuth:
     def __init__(self, response):
