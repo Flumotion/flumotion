@@ -199,7 +199,6 @@
 			  <property name="label">gtk-go-back</property>
 			  <property name="use_stock">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
-			  <property name="focus_on_click">True</property>
 			  <signal name="clicked" handler="on_prev" last_modification_time="Thu, 20 Jan 2005 16:28:02 GMT"/>
 			</widget>
 		      </child>
@@ -213,7 +212,6 @@
 			  <property name="label">gtk-go-forward</property>
 			  <property name="use_stock">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
-			  <property name="focus_on_click">True</property>
 			  <signal name="clicked" handler="on_next" last_modification_time="Wed, 19 Jan 2005 18:54:53 GMT"/>
 			</widget>
 		      </child>

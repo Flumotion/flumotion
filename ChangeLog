@@ -1,5 +1,25 @@
 2005-03-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/admin-wizard.glade:
+	* data/glade/authenticate.glade:
+	* data/glade/connection-dialog.glade:
+	* data/glade/connections.glade:
+	* data/glade/greeter-initial.glade:
+	* data/glade/open-connection.glade:
+	* data/glade/wizard.glade:
+	* data/glade/wizard_consumption.glade:
+	* data/glade/wizard_disk.glade:
+	* data/glade/wizard_firewire.glade:
+	* data/glade/wizard_license.glade:
+	* data/glade/wizard_overlay.glade:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_theora.glade:
+	* data/glade/wizard_vorbis.glade:
+	* tools/gtk-2.4-ify-glade-files:
+	  remove focus_on_click and add_tearoffs
+
+2005-03-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/authenticate.glade:
 	* data/glade/connection-dialog.glade:
 	* data/glade/greeter-authenticate.glade:

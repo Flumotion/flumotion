@@ -8,6 +8,8 @@ fi
 for f in $@; do
    echo "* $f"
    grep -v '<property name="width_chars"' $f \
+   | grep -v '<property name="add_tearoffs"' \
+   | grep -v '<property name="focus_on_click"' \
    | grep -v '<property name="ellipsize"' \
    | grep -v '<property name="focus_on_map"' \
    | grep -v '<property name="hover_selection"' \

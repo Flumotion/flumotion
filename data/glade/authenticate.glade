@@ -115,8 +115,6 @@
 	      <property name="can_focus">True</property>
 	      <property name="has_focus">True</property>
 	      <property name="items" translatable="yes">Name and Password</property>
-	      <property name="add_tearoffs">False</property>
-	      <property name="focus_on_click">True</property>
 	    </widget>
 	  </child>
 	</widget>
