@@ -31,6 +31,9 @@ MODULE_FILES = \
 	flumotion/twisted/checkers.py		\
 	flumotion/twisted/credentials.py	\
 	flumotion/twisted/pb.py			\
+	flumotion/twisted/portal.py		\
+	flumotion/twisted/reflect.py		\
+	flumotion/utils/__init__.py		\
 	flumotion/utils/gstutils.py		\
 	flumotion/worker/__init__.py		\
 	flumotion/worker/worker.py		\

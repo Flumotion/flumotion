@@ -7,6 +7,7 @@ flumotion_PYTHON = \
 	gstreactor.py \
 	pb.py \
 	portal.py \
+	reflect.py \
 	shell.py
 
 TAGS_FILES = $(flumotion_PYTHON)
