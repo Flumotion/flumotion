@@ -3,33 +3,29 @@
 
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
- 
+# 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
- 
+# 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
- 
+# 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import os
-import time
 import optik
 import socket
 import sys
-import string
 
 import gst
 import gobject
-
 from twisted.internet import reactor
-from twisted.python import log
 from twisted.spread import pb
 
 import pbutil
@@ -67,7 +63,7 @@ class BaseComponent(pb.Referenceable):
         self.setup_pipeline()
         
     def msg(self, *args):
-        log.msg('[%s] %s' % (self.component_name, string.join(args)))
+        msg('[%s] %s' % (self.kind, ''.join(args))
 
     def get_pipeline(self, pipeline):
         sources = self.getSources()
@@ -313,8 +309,8 @@ def get_options_for(kind, args):
             raise OptionError, 'Need a listen_port'
             return 2
         
-    if options.verbose:
-        log.startLogging(sys.stdout)
+#    if options.verbose:
+#        log.startLogging(sys.stdout)
 
     if need_sources:
         if ',' in  options.sources:

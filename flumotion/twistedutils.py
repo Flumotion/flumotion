@@ -1,94 +1,39 @@
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
+# Flumotion - a video streaming server
+# Copyright (C) 2004 Fluendo
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
 import sys
-import string
-from cStringIO import StringIO
 
-from twisted.internet import reactor, protocol
-from twisted.manhole.telnet import ShellFactory
-from twisted.protocols import telnet
-from twisted.python import log, failure
+from twisted.internet import reactor
+from twisted.manhole import telnet
+from twisted.python import log
 
-class Shell(telnet.Telnet):
-    """A Python command-line shell."""
-    
-    def connectionMade(self):
-        telnet.Telnet.connectionMade(self)
-        self.lineBuffer = []
-    
-    def loggedIn(self):
-        self.transport.write(">>> ")
-    
-    def checkUserAndPass(self, username, password):
-        return ((self.factory.username == username) and (password == self.factory.password))
-
-    def write(self, data):
-        """Write some data to the transport.
-        """
-        self.transport.write(data)
-
+class Shell(telnet.Shell):
     def telnet_Command(self, cmd):
         if cmd == '\x04' or cmd == 'exit':
             self.transport.loseConnection()
             return
-        
-        if self.lineBuffer:
-            if not cmd:
-                cmd = string.join(self.lineBuffer, '\n') + '\n\n\n'
-                self.doCommand(cmd)
-                self.lineBuffer = []
-                return "Command"
-            else:
-                self.lineBuffer.append(cmd)
-                self.transport.write("... ")
-                return "Command"
-        else:
-            self.doCommand(cmd)
-            return "Command"
-    
-    def doCommand(self, cmd):
-
-        # TODO -- refactor this, Reality.author.Author, and the manhole shell
-        #to use common functionality (perhaps a twisted.python.code module?)
-        fn = '$telnet$'
-        result = None
-        try:
-            out = sys.stdout
-            sys.stdout = self
-            try:
-                code = compile(cmd,fn,'eval')
-                result = eval(code, self.factory.namespace)
-            except:
-                try:
-                    code = compile(cmd, fn, 'exec')
-                    exec code in self.factory.namespace
-                except SyntaxError, e:
-                    if not self.lineBuffer and str(e)[:14] == "unexpected EOF":
-                        self.lineBuffer.append(cmd)
-                        self.transport.write("... ")
-                        return
-                    else:
-                        failure.Failure().printTraceback(file=self)
-                        #log.deferr()
-                        self.write('\r\n>>> ')
-                        return
-                except:
-                    io = StringIO()
-                    failure.Failure().printTraceback(file=self)
-                    #log.deferr()
-                    self.write('\r\n>>> ')
-                    return
-        finally:
-            sys.stdout = out
-        
-        self.factory.namespace['_'] = result
-        if result is not None:
-            self.transport.write(repr(result))
-            self.transport.write('\r\n')
-        self.transport.write(">>> ")
-
+        telnet.Shell.telnet_Command(self, cmd)
 
 if __name__ == '__main__':
     log.startLogging(sys.stdout)
-    ts = ShellFactory()
+    ts = telnet.ShellFactory()
     ts.protocol = Shell
     reactor.listenTCP(4040, ts)
     reactor.run()
