@@ -66,7 +66,7 @@ class FakeComponentAvatar(log.Loggable):
 class TestComponentMapper(unittest.TestCase):
     def setUp(self):
         self._mappers = {}
-        self.heaven = component.ComponentHeaven(manager.Vishnu())
+        self.heaven = component.ComponentHeaven(manager.Vishnu('test'))
 
     def testOneComponent(self):
         # create state and initial mapper and store it
@@ -137,7 +137,7 @@ class TestComponentMapper(unittest.TestCase):
         
 class TestComponentHeaven(unittest.TestCase):
     def setUp(self):
-        self.heaven = component.ComponentHeaven(manager.Vishnu())
+        self.heaven = component.ComponentHeaven(manager.Vishnu('test'))
 
     def testCreateAvatar(self):
         p = self.heaven.createAvatar('foo-bar-baz')
@@ -273,7 +273,7 @@ class TestVishnu(unittest.TestCase):
         from flumotion.common.registry import registry
         registry.verify()
 
-        self.vishnu = manager.Vishnu(unsafeTracebacks=1)
+        self.vishnu = manager.Vishnu('test', unsafeTracebacks=1)
         self._workers = {}    # id -> avatar
         self._components = {} # id -> avatar
 

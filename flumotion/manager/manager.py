@@ -148,7 +148,7 @@ class Vishnu(log.Loggable):
     I am the toplevel manager object that knows about all heavens and factories.
     """
     logCategory = "vishnu"
-    def __init__(self, unsafeTracebacks=0):
+    def __init__(self, name, unsafeTracebacks=0):
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
         self.dispatcher = Dispatcher()
@@ -169,7 +169,7 @@ class Vishnu(log.Loggable):
 
         self.state = planet.ManagerPlanetState()
         # FIXME: name
-        self.state.set('name', 'gimmeaname')
+        self.state.set('name', name)
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a bouncer

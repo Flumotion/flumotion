@@ -1,5 +1,12 @@
 2005-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_manager_manager.py:
+	  give the manager the right name
+
+2005-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/manager/admin.py:
 	  change more functions to act on state instead of name

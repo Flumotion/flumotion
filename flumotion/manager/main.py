@@ -195,7 +195,7 @@ def main(args):
     if options.debug:
         log.setFluDebug(options.debug)
 
-    vishnu = manager.Vishnu()
+    vishnu = manager.Vishnu(options.name)
 
     paths = [os.path.abspath(filename) for filename in args[1:]]
     reactor.callLater(0, _initialLoadConfig, vishnu, paths)
