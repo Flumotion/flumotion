@@ -1,5 +1,7 @@
 2004-08-02  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac: Require Python 2.3
+
 	* flumotion/server/config.py (FlumotionConfig.parse_component):
 	Rework kind and logging, should be much more generic now and allow
 	us to extend components much easier. Cleans up a lot aswell!

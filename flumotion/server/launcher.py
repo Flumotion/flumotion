@@ -22,27 +22,18 @@ import optparse
 import os
 import signal
 import sys
-import warnings
-
-try:
-    warnings.filterwarnings('ignore', category=FutureWarning)
-except:
-    pass
 
 import gst
 
 from flumotion.twisted import gstreactor
 gstreactor.install()
 from twisted.internet import reactor
-
-from flumotion import errors, twisted
-from flumotion.server.config import FlumotionConfig
-from flumotion.server.controller import ControllerServerFactory
-from flumotion.server.registry import registry
-from flumotion.utils import log, gstutils
-
 from twisted.internet.protocol import ClientCreator, Factory
 from twisted.protocols.basic import NetstringReceiver
+
+from flumotion.server import config, controller
+from flumotion.server.registry import registry
+from flumotion.utils import log, gstutils
 
 class MiniProtocol(NetstringReceiver):
     def stringReceived(self, line):
@@ -94,7 +85,7 @@ class Launcher:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
                 
         self.restore_uid()
-        factory = ControllerServerFactory()
+        factory = controller.ControllerServerFactory()
         reactor.listenTCP(self.controller_port, factory)
         f = Factory()
         f.protocol = MiniProtocol
@@ -158,7 +149,7 @@ class Launcher:
             self.children.append(pid)
 
     def load_config(self, filename):
-        conf = FlumotionConfig(filename)
+        conf = config.FlumotionConfig(filename)
 
         for name in conf.components.keys():
             self.msg('Starting component: %s' % name)
@@ -219,7 +210,7 @@ def run_controller(args):
     if options.verbose:
         log.enableLogging()
 
-    factory = ControllerServerFactory()
+    factory = controller.ControllerServerFactory()
     
     log.msg('controller', 'Starting at port %d' % options.port)
     reactor.listenTCP(options.port, factory)
