@@ -298,7 +298,6 @@ class HTTPStreamingResource(resource.Resource):
             self.average_client_number = 0
         else:
             self.average_client_number = dc1 * dt1 / (dt1 + dt2) + dc2 * dt2 / (dt1 + dt2)
-        print "new average clients: %d" % self.average_client_number
 
     def addClient(self, request):
         fd = request.transport.fileno()
