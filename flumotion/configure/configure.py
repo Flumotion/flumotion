@@ -46,8 +46,8 @@ and then access the variables from the configure module.  For example:
 @type defaultSSLManagerPort:  int
 @var  defaultStreamPortRange: the default range of external streaming ports
 @type defaultStreamPortRange: list of ints
-@var  defaultGStPortRange:    the default range of internal GStreamer ports
-@type defaultGStPortRange:    list of ints
+@var  defaultGstPortRange:    the default range of internal GStreamer ports
+@type defaultGstPortRange:    list of ints
 
 @var  version:     Flumotion version number
 @type version:     string
@@ -72,7 +72,7 @@ else:
 config_dict['defaultTCPManagerPort'] = 8642
 config_dict['defaultSSLManagerPort'] = 7531
 config_dict['defaultStreamPortRange'] = range(8800, 8844 + 1)
-config_dict['defaultGStPortRange'] = range(8600, 8699 + 1)
+config_dict['defaultGstPortRange'] = range(8600, 8699 + 1)
 
 for key, value in config_dict.items():
     dictionary = locals()

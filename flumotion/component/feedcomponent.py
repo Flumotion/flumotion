@@ -103,7 +103,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     def remote_getFreePorts(self, feeders):
         retval = []
         ports = {}
-        free_port = gstutils.get_free_port(start=5500)
+        startPort = configure.defaultGstPortRange[0]
+        free_port = gstutils.get_free_port(startPort)
         for name, host, port in feeders:
             if port == None:
                 port = free_port

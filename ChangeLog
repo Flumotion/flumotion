@@ -1,5 +1,13 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent.py:
+	* flumotion/configure/configure.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/worker/worker.py:
+	  also use default ports for streaming and GStreamer ports
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/configure/configure.py:
 	* flumotion/manager/main.py:

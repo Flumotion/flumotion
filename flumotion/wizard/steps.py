@@ -19,6 +19,7 @@ import gtk
         
 from flumotion.wizard.enums import * # XXX: fix later
 from flumotion.wizard import wizard
+from flumotion.configure import configure
 
 
 class Welcome(wizard.WizardStep):
@@ -540,22 +541,21 @@ class HTTP(wizard.WizardStep):
 class HTTPBoth(HTTP):
     step_name = 'HTTP Streamer (audio & video)'
     sidebar_name = 'HTTP audio/video'
-    port = 8800
+    port = configure.defaultStreamPortRange[0]
 wizard.register_step(HTTPBoth)
     
                   
 class HTTPAudio(HTTP):
     step_name = 'HTTP Streamer (audio only)'
     sidebar_name = 'HTTP video'
-    port = 8801
+    port = configure.defaultStreamPortRange[1]
 wizard.register_step(HTTPAudio)
-
 
 
 class HTTPVideo(HTTP):
     step_name = 'HTTP Streamer (video only)'
     sidebar_name = 'HTTP audio'
-    port = 8802
+    port = configure.defaultStreamPortRange[2]
 wizard.register_step(HTTPVideo)
 
     

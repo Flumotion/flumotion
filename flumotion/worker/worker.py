@@ -35,6 +35,7 @@ from flumotion.common import errors, interfaces, log
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
 from flumotion.worker import job
+from flumotion.configure import configure
 
 #factoryClass = fpb.ReconnectingPBClientFactory
 factoryClass = fpb.FPBClientFactory
@@ -359,10 +360,9 @@ class JobHeaven(pb.Root, log.Loggable):
         self.brain = brain
 
         # Allocate ports
-        start = 5500
         self.ports = []
-        for i in range(50):
-            self.ports.append(Port(start+i))
+        for port in configure.defaultGstPortRange:
+            self.ports.append(Port(port))
         
     def createAvatar(self, avatarId):
         avatar = JobAvatar(self, avatarId)
