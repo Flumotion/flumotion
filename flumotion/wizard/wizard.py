@@ -30,6 +30,8 @@ from flumotion.config import gladedir
 from flumotion.utils import log
 from flumotion.wizard import enums
 
+def escape(text):
+    return text.replace('&', '&amp;')
 
 class Stack(list):
     push = list.append
@@ -47,22 +49,21 @@ class WizardComboBox(gtk.ComboBox):
         model = self.get_model()
         iter = model.get_iter((0,))
         return model.iter_n_children(iter)
-        
-    def get_text(self):
-        iter = self.get_active_iter()
-        model = self.get_model()
-        return model.get(iter, self.COLUMN_NICK)[0]
 
-    def get_string(self):
-        iter = self.get_active_iter()
-        model = self.get_model()
-        return model.get(iter, self.COLUMN_NAME)[0]
-
-    def get_value(self):
+    def get_column_content(self, column):
         iter = self.get_active_iter()
         if iter:
             model = self.get_model()
-            return model.get(iter, self.COLUMN_VALUE)[0]
+            return model.get(iter, column)[0]
+        
+    def get_text(self):
+        return self.get_column_content(self.COLUMN_NICK)
+    
+    def get_string(self):
+        return self.get_column_content(self.COLUMN_NAME)
+
+    def get_value(self):
+        return self.get_column_content(self.COLUMN_VALUE)
 
     def get_enum(self):
         return self.enum_class.get(self.get_value())
@@ -71,7 +72,7 @@ class WizardComboBox(gtk.ComboBox):
         model = self.get_model()
         model.clear()
         for enum in enum_class:
-            # If values are specified
+            # If values are specified, filter them out
             if value_filter and not enum in value_filter:
                 continue
             iter = model.append()
@@ -178,7 +179,10 @@ class WizardStep(object, log.Loggable):
         self.widget = None
         
         self.load_glade()
-        
+
+    def __repr__(self):
+        return '<WizardStep %s>' % self.step_name
+    
     def load_glade(self):
         glade_filename = os.path.join(gladedir, self.glade_file)
         self.wtree = gtk.glade.XML(glade_filename, typedict=self.types)
@@ -270,7 +274,10 @@ class Wizard:
         self.steps = {}
         self.stack = Stack()
         self.current_step = None
-        
+
+    def __getitem__(self, stepname):
+        return self.steps[stepname]
+    
     def get_step_option(self, stepname, option):
         state = self.get_step_options(stepname)
         return state[option]
@@ -278,9 +285,6 @@ class Wizard:
     def get_step_options(self, stepname):
         step = self[stepname]
         return self.get_step_state(step)
-
-    def __getitem__(self, stepname):
-        return self.steps[stepname]
     
     def add_step(self, step_class, initial=False):
         # If we don't have step_name set, count it as a base class
@@ -307,19 +311,17 @@ class Wizard:
         for child in self.content_area.get_children():
             self.content_area.remove(child)
 
-        self.select_section(step)
-        
         # Add current
         widget = step.get_main_widget()
         self.content_area.add(widget)
 
-        title = step.step_name
-        title = title.replace('&', '&amp;')
-        self.label_title.set_markup('<span size="large">' + title + '</span>')
+        self.label_title.set_markup('<span size="large">' + escape(step.step_name) + '</span>')
 
         if self.current_step:
             self.current_step.deactivated()
 
+        self.update_sidebar(step)
+        
         # Finally show
         widget.show()
         step.activated()
@@ -361,18 +363,6 @@ class Wizard:
 
         self.update_buttons(next)
 
-    def select_section(self, step):
-        active = step.section
-        print 'selection', active
-        self.label_production.set_sensitive(active == 'Production')
-        self.label_consumption.set_sensitive(active == 'Consumption')
-        self.label_conversion.set_sensitive(active == 'Conversion')
-        self.label_license.set_sensitive(active == 'License')
-        self.label_arrow_production.set_property('visible', active == 'Production')
-        self.label_arrow_consumption.set_property('visible', active == 'Consumption')
-        self.label_arrow_conversion.set_property('visible', active == 'Conversion')
-        self.label_arrow_license.set_property('visible', active == 'License')
-
     def update_buttons(self, has_next):
         if len(self.stack) == 1:
             self.button_prev.set_sensitive(False)
@@ -400,6 +390,60 @@ class Wizard:
         for key, value in options.items():
             print '  <%s>%s</%s> ' % (key, value, key)
         print '</component>'
+
+    def add_sidebar_step(self, name, padding):
+        hbox = gtk.HBox(0, False)
+        hbox.show()
+        
+        label = gtk.Label()
+        label.set_markup(escape(name))
+        label.show()
+        hbox.pack_start(label, False, padding=padding)
+        self.vbox_sidebar.pack_start(hbox, False, False, 6)
+
+        return label
+    
+    def add_sidebar_substeps(self, section):
+        # Skip the last step, since that's whats we currently showing
+        stack = self.stack[:-1]
+
+        # Filter out steps which is not the same category
+        items = [item for item in stack
+                          if item.section == section]
+        for item in items:
+            self.add_sidebar_step(item.step_name, 20)
+            
+    def update_sidebar(self, step):
+        current = step.section
+
+        # First remove the old the VBox if we can find one
+        parent = self.vbox_sidebar.get_parent()
+        if parent:
+            parent.remove(self.vbox_sidebar)
+        self.vbox_sidebar = gtk.VBox()
+        self.hbox_main.pack_start(self.vbox_sidebar)
+        self.hbox_main.reorder_child(self.vbox_sidebar, 0)
+
+        # Then, for each section step, add a VBox with a label in it
+        sidebar_steps = ('Production', 'Conversion',
+                         'Consumption', 'License')
+        for stepname in sidebar_steps:
+            # If it's not the current step, just add it
+            if current != stepname:
+                markup = '<span color="grey">%s</span>' % stepname
+                self.add_sidebar_step(markup, 10)
+                continue
+            
+            markup = '<span color="black">%s</span>' % stepname                
+            self.add_sidebar_step(markup, 10)
+
+            self.add_sidebar_substeps(stepname)
+                    
+            ph = gtk.Label()
+            ph.show()
+            self.vbox_sidebar.pack_start(ph, True, True, 6)
+            
+        self.vbox_sidebar.show()
         
     def finish(self):
         gtk.main_quit()
@@ -407,8 +451,10 @@ class Wizard:
     def run(self):
         if not self.stack:
             raise TypeError("need an initial step")
-        
-        self.set_step(self.stack.peek())
+
+        step = self.stack.peek()
+        self.set_step(step)
+        self.update_sidebar(step)
         
         self.window.show()
         gtk.main()

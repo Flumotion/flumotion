@@ -3,6 +3,7 @@ EXTRA_DIST = \
 	test_common.py \
 	test_component.py \
 	test_config.py \
+	test_enum.py \
 	test_flumotion_config.py \
 	test_http.py \
 	test_log.py \

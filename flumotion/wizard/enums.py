@@ -19,6 +19,9 @@
 
 
 class EnumMetaClass(type):
+    def __len__(self):
+        return len(self.__enums__)
+
     def __getitem__(self, value):
         try:
             return self.__enums__[value]
@@ -95,7 +98,8 @@ SoundcardSamplerate = EnumClass('SoundcardSamplerate', ('44100',
                                                         '22050',
                                                         '11025',
                                                         '8000'))
-SoundcardBitdepth = EnumClass('SoundcardBitdepth', ('16', '8'))
+SoundcardBitdepth = EnumClass('SoundcardBitdepth', ('16', '8'),
+                              ('16-bit', '8-bit'))
 
 # Encoding format
 EncodingFormat = EnumClass('EncodingFormat', ('Ogg', 'Multipart'))
@@ -104,7 +108,8 @@ EncodingAudio = EnumClass('EncodingAudio', ('Vorbis', 'Speex', 'Mulaw'))
 
 # Disk writer
 RotateTime = EnumClass('RotateTime',
-                      ('minutes', 'hours', 'days', 'weeks', 'months'))
+                       ('Minutes', 'Hours', 'Days', 'Weeks', 'Months'),
+                       ('minute(s)', 'hour(s)', 'day(s)', 'week(s)', 'month(s)'))
 RotateSize = EnumClass('RotateSize',
                       ('kB', 'MB', 'GB', 'TB'))
  

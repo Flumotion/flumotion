@@ -195,9 +195,10 @@ class WizardStepEncoding(wizard.WizardStep):
         
         format = self.combobox_format.get_active()
         if format == EncodingFormat.Ogg:
-            self.combobox_video.set_multi_active(EncodingVideo.Theora)
-            self.combobox_audio.set_multi_active(EncodingAudio.Vorbis,
-                                                 EncodingAudio.Speex)
+            self.combobox_video.set_multi_active(EncodingVideo.Smoke,
+                                                 EncodingVideo.Theora)
+            self.combobox_audio.set_multi_active(EncodingAudio.Speex,
+                                                 EncodingAudio.Vorbis)
         elif format == EncodingFormat.Multipart:
             self.combobox_video.set_multi_active(EncodingVideo.Smoke,
                                                  EncodingVideo.JPEG)
