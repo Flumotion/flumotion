@@ -68,6 +68,13 @@ def _window_connected_cb(window, options):
         print 'There are already components connected, not sending configuration'
         window.show()
         
+def _runWizard(debug):
+    wiz = wizard.Wizard()
+    wiz.load_steps()
+    res = wiz.run(debug)
+    if debug:
+        print res
+    
 def _runInterface(options):
     win = Window(options.host, options.port, options.transport,
                  options.username, options.password)
@@ -134,4 +141,7 @@ def main(args):
         elif options.transport == "ssl":
             options.port = defaultSSLPort
 
-    _runInterface(options)
+    if options.wizard:
+        _runWizard(options.debug)
+    else:
+        _runInterface(options)

@@ -543,18 +543,17 @@ class Wizard(gobject.GObject):
         self.emit('finished', configuration)
         
         if self._use_main:
+            print configuration[:-1]
             try:
                 gtk.main_quit()
             except RuntimeError:
                 pass
-            
-        return configuration
 
     def hide(self):
         self.window.hide()
         
-    def run(self, interactive, workers, main):
-        self._use_main = False
+    def run(self, interactive, workers=[], main=True):
+        self._use_main = main
         
         self._workers = workers
         if not self.stack:
@@ -563,7 +562,7 @@ class Wizard(gobject.GObject):
         self.set_step(self.stack.peek())
 
         if not interactive:
-            return self.finish(main)
+            return self.finish(False)
 
         self.window.show()
         if self._use_main:

@@ -24,8 +24,11 @@ class Component:
         
     def addFeeder(self, component):
         self.feeders.append(component)
-        component.addEater(self)
 
+    def link(self, component):
+        self.feeders.append(component)
+        component.addEater(self)
+        
     def toXML(self):
         s = '    <component name="%s" type="%s">\n' % (self.name, self.type)
 
@@ -44,7 +47,7 @@ class Component:
                 value = self.props[name]
                 s += "      <%s>%s</%s>\n" % (name, value, name)
             
-        s += "    </component>"
+        s += "    </component>\n"
         return s
     
     def printTree(self, indent=1):
@@ -111,12 +114,12 @@ class WizardSaver:
             
         return Component('audio-encoder', encoder.component_type, props)
 
-    def getMuxer(self):
+    def getMuxer(self, name):
         options = self.wizard.get_step_options('Encoding')
         muxer = options['format']
-        return Component('multiplexer', muxer.component_type)
+        return Component('multiplexer-' + name, muxer.component_type)
 
-    def handleVideo(self, muxer, components):
+    def handleVideo(self, components):
         overlay_options = self.wizard.get_step_options('Overlay')
         has_overlay = overlay_options['show_logo'] or \
                       overlay_options['show_text']
@@ -132,76 +135,101 @@ class WizardSaver:
             components.append(video_overlay)
                 
         if video_overlay is not None:
-            video_overlay.addFeeder(video_source)
-            video_encoder.addFeeder(video_overlay)
+            video_overlay.link(video_source)
+            video_encoder.link(video_overlay)
         else:
-            video_encoder.addFeeder(video_source)
-
+            video_encoder.link(video_source)
         components.append(video_encoder)
-        muxer.addFeeder(video_encoder)
+        return video_encoder
             
-    def handleAudio(self, muxer, components):
+    def handleAudio(self, components):
         audio_source = self.getAudioSource()
         components.append(audio_source)
 
-        audio_decoder = self.getAudioEncoder()
-        components.append(audio_decoder)
-        audio_decoder.addFeeder(audio_source)
-            
-        muxer.addFeeder(audio_decoder)
+        audio_encoder = self.getAudioEncoder()
+        components.append(audio_encoder)
+        audio_encoder.link(audio_source)
 
-    def handleConsumers(self, muxer, components):
+        return audio_encoder
+    
+    def handleConsumers(self, components, audio_encoder, video_encoder):
         cons_options = self.wizard.get_step_options('Consumption')
         has_audio = self.wizard.get_step_option('Source', 'has_audio')
         has_video = self.wizard.get_step_option('Source', 'has_video')
-        
+
+        audio_muxer = None
+        if has_audio:
+            audio_muxer = self.getMuxer('audio')
+            components.append(audio_muxer)
+            audio_muxer.link(audio_encoder)
+            
+        video_muxer = None
+        if has_video:
+            video_muxer = self.getMuxer('video')
+            components.append(video_muxer)
+            video_muxer.link(video_encoder)
+
         steps = []
         if has_audio and has_video:
+            both_muxer = self.getMuxer('audio-video')
+            components.append(both_muxer)
+            both_muxer.link(video_encoder)
+            both_muxer.link(audio_encoder)
+            
             if cons_options['http']:
                 if cons_options['http_audio_video']:
                     steps.append(('http_audio_video', 'http-audio-video',
-                          'http-streamer', 'HTTP Streamer (audio & video)'))
+                                  'http-streamer',
+                                  'HTTP Streamer (audio & video)', both_muxer))
                 if cons_options['http_audio']:
                     steps.append(('http_audio', 'http-audio', 'http-streamer',
-                                  'HTTP Streamer (audio only)'))
+                                  'HTTP Streamer (audio only)', audio_muxer))
                 if cons_options['http_video']:
                     steps.append(('http_video', 'http-video', 'http-streamer',
-                                  'HTTP Streamer (video only)'))
+                                  'HTTP Streamer (video only)', video_muxer))
             if cons_options['disk']:
                 if cons_options['disk_audio_video']:
                     steps.append(('disk_audio_video', 'disk-audio-video',
-                                  'file-dumper', 'Disk (audio & video)'))
+                                  'file-dumper', 'Disk (audio & video)',
+                                  both_muxer))
                 if cons_options['disk_audio']:
                     steps.append(('disk_audio', 'disk-audio', 'file-dumper',
-                                  'Disk (audio only)'))
+                                  'Disk (audio only)', audio_muxer))
                 if cons_options['disk_video']:
                     steps.append(('disk_video', 'disk-video', 'file-dumper',
-                                  'Disk (video only)'))
+                                  'Disk (video only)', video_muxer))
         elif has_video and not has_audio:
             if cons_options['http']:
                 steps.append(('http_video', 'http-video', 'http-streamer',
-                              'HTTP Streamer (video only)'))
+                              'HTTP Streamer (video only)', video_muxer))
             if cons_options['disk']:
                 steps.append(('disk_video', 'disk-video', 'file-dumper',
-                              'Disk (video only)'))
+                              'Disk (video only)', video_muxer))
         elif has_audio and not has_video:
             if cons_options['http']:
                 steps.append(('http_audio', 'http-audio', 'http-streamer',
-                              'HTTP Streamer (audio only)'))
+                              'HTTP Streamer (audio only)', audio_muxer))
             if cons_options['disk']:
                 steps.append(('disk_audio', 'disk-audio', 'file-dumper',
-                              'Disk (audio only)'))
+                              'Disk (audio only)', audio_muxer))
         else:
             raise AssertionError
 
-        for key, name, type, step_name in steps:
+        for key, name, type, step_name, muxer in steps:
             if not cons_options.has_key(key):
                 continue
             step = self.wizard[step_name]
-            comp = Component(name, type, step.get_component_properties())
-            comp.addFeeder(muxer)
-            components.append(comp)
-        
+            consumer = Component(name, type, step.get_component_properties())
+            consumer.link(muxer)
+            components.append(consumer)
+
+        if not audio_muxer.eaters:
+            components.remove(audio_muxer)
+        if not video_muxer.eaters:
+            components.remove(video_muxer)
+        if not both_muxer.eaters:
+            components.remove(both_muxer)
+            
     def getXML(self):
         source_options = self.wizard.get_step_options('Source')
         has_video = source_options['has_video']
@@ -209,20 +237,16 @@ class WizardSaver:
 
         components = []
         
-        muxer = self.getMuxer()
-
-        if has_video:
-            self.handleVideo(muxer, components)
-
+        audio_encoder = None
         if has_audio:
-            self.handleAudio(muxer, components)
-
-        # Append muxer here, so we get them in "correct" order, in the
-        # gstreamer pipeline point of view, left to right.
-        components.append(muxer)
-
-        self.handleConsumers(muxer, components)
-
+            audio_encoder = self.handleAudio(components)
+            
+        video_encoder = None
+        if has_video:
+            video_encoder = self.handleVideo(components)
+            
+        self.handleConsumers(components, audio_encoder, video_encoder)
+        
         s = '<planet>\n'
         s += '  <atmosphere>\n'
         for component in components:
