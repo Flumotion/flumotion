@@ -64,9 +64,9 @@ class AdminAvatar(base.ManagerAvatar):
         """
         Return all component states logged in to the manager.
         The list gets serialized to a list of
-        L{flumotion.base.component.AdminComponentState}
+        L{flumotion.common.component.AdminComponentState}
         
-        @rtype: C{list} of L{flumotion.base.component.ManagerComponentState}
+        @rtype: C{list} of L{flumotion.common.component.ManagerComponentState}
         """
         states = []
         for avatar in self.vishnu.componentHeaven.avatars.values():

@@ -16,7 +16,7 @@
       </pipeline>
     </component>
   
-    <component name="streamer-ogg-theora" type="http-streamer">
+    <component name="streamer-ogg-theora" type="http-streamer" worker="streamer">
       <source>converter-ogg-theora</source>
       <port>8800</port>
       <logfile>/tmp/ogg-test-theora.access.log</logfile>

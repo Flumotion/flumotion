@@ -1,3 +1,15 @@
+2004-12-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/disker/disker.py:
+	  fix moods
+	* conf/managers/default/flows/ogg-test-theora.xml:
+	  spread over two workers
+	* data/glade/admin.glade:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	  move some dialogs around
+	* flumotion/manager/admin.py:
+
 2004-12-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/client.py:

@@ -43,8 +43,6 @@ COL_WORKER    = 2
 COL_PID       = 3
 COL_STATE     = 4
 
-RESPONSE_FETCH = 0
-
 class AdminStatusbar:
     """
     I implement the status bar used in the admin UI.
@@ -117,62 +115,6 @@ class AdminStatusbar:
         for mid in self._mids[context]:
             self._widget.remove(self._cids[context], mid)
 
-class PropertyChangeDialog(gtk.Dialog):
-    gsignal('set', str, str, object)
-    gsignal('get', str, str)
-    
-    def __init__(self, name, parent):
-        title = "Change element property on '%s'" % name
-        gtk.Dialog.__init__(self, title, parent,
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-        self.connect('response', self.response_cb)
-        self.add_button('Close', gtk.RESPONSE_CLOSE)
-        self.add_button('Set', gtk.RESPONSE_APPLY)
-        self.add_button('Fetch current', RESPONSE_FETCH)
-
-        hbox = gtk.HBox()
-        hbox.show()
-        
-        label = gtk.Label('Element')
-        label.show()
-        hbox.pack_start(label, False, False)
-        self.element_combo = gtk.ComboBox()
-        self.element_entry = gtk.Entry()
-        self.element_entry.show()
-        hbox.pack_start(self.element_entry, False, False)
-
-        label = gtk.Label('Property')
-        label.show()
-        hbox.pack_start(label, False, False)
-        self.property_entry = gtk.Entry()
-        self.property_entry.show()
-        hbox.pack_start(self.property_entry, False, False)
-        
-        label = gtk.Label('Value')
-        label.show()
-        hbox.pack_start(label, False, False)
-        self.value_entry = gtk.Entry()
-        self.value_entry.show()
-        hbox.pack_start(self.value_entry, False, False)
-
-        self.vbox.pack_start(hbox)
-        
-    def response_cb(self, dialog, response):
-        if response == gtk.RESPONSE_APPLY:
-            self.emit('set', self.element_entry.get_text(),
-                      self.property_entry.get_text(),
-                      self.value_entry.get_text())
-        elif response == RESPONSE_FETCH:
-            self.emit('get', self.element_entry.get_text(),
-                      self.property_entry.get_text())
-        elif response == gtk.RESPONSE_CLOSE:
-            dialog.destroy()
-
-    def update_value_entry(self, value):
-        self.value_entry.set_text(str(value))
-    
-gobject.type_register(PropertyChangeDialog)
-
 class Window(log.Loggable, gobject.GObject):
     '''
     Creates the GtkWindow for the user interface.
@@ -229,6 +171,12 @@ class Window(log.Loggable, gobject.GObject):
         self.warning('Errback: unhandled failure: %s' %
             failure.getErrorMessage())
         return failure
+
+    # UI helper functions
+    def show_error_dialog(self, message, parent=None, response=True):
+        if not parent:
+            parent = self.window
+        return dialogs.show_error_dialog(message, parent, response)
 
     def create_ui(self):
         wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
@@ -432,25 +380,6 @@ class Window(log.Loggable, gobject.GObject):
 
         self.current_component = gtkAdminInstance
 
-    def error_dialog(self, message, parent=None, response=True):
-        """
-        Show an error message dialog.
-
-        @param message the message to display.
-        @param parent the gtk.Window parent window.
-        @param response whether the error dialog should go away after response.
-
-        returns: the error dialog.
-        """
-        if not parent:
-            parent = self.window
-        d = gtk.MessageDialog(parent, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
-            gtk.BUTTONS_OK, message)
-        if response:
-            d.connect("response", lambda self, response: self.destroy())
-        d.show_all()
-        return d
-
     ### IAdminView interface methods: FIXME: create interface somewhere
     def componentCall(self, componentName, methodName, *args, **kwargs):
         # FIXME: for now, we only allow calls to go through that have
@@ -547,7 +476,7 @@ class Window(log.Loggable, gobject.GObject):
     def admin_connection_refused_later(self, host, port):
         message = "Connection to manager on %s:%d was refused." % (host, port)
         self.info(message)
-        d = self.error_dialog(message, response = False)
+        d = self.show_error_dialog(message, response = False)
         d.connect('response', self.close)
 
     def admin_connection_refused_cb(self, admin, host, port):
@@ -671,7 +600,7 @@ class Window(log.Loggable, gobject.GObject):
 
         state = self.admin.getWorkerHeavenState()
         if not state.get('names'):
-            self.error_dialog(
+            self.show_error_dialog(
                 'Need at least one worker connected to run the wizard')
             return
         
@@ -756,7 +685,8 @@ class Window(log.Loggable, gobject.GObject):
         def _syntaxErrback(failure, self, progress):
             failure.trap(errors.ReloadSyntaxError)
             _stop(progress)
-            self.error_dialog("Could not reload component:\n%s." % failure.getErrorMessage())
+            self.show_error_dialog(
+                "Could not reload component:\n%s." % failure.getErrorMessage())
             return None
             
         def _callLater(admin, dialog):
@@ -765,8 +695,10 @@ class Window(log.Loggable, gobject.GObject):
             deferred.addErrback(_syntaxErrback, self, dialog)
             deferred.addErrback(self._defaultErrback)
         
-        dialog = dialogs.ProgressDialog("Reloading ...", "Reloading client code", self.window)
-        l = lambda admin, text, dialog: dialog.message("Reloading %s code" % text)
+        dialog = dialogs.ProgressDialog("Reloading ...",
+            "Reloading client code", self.window)
+        l = lambda admin, text, dialog: dialog.message(
+            "Reloading %s code" % text)
         self.admin.connect('reloading', l, dialog)
         dialog.start()
         reactor.callLater(0.2, _callLater, self.admin, dialog)
@@ -779,7 +711,7 @@ class Window(log.Loggable, gobject.GObject):
 
         def propertyErrback(failure):
             failure.trap(errors.PropertyError)
-            self.error_dialog("%s." % failure.getErrorMessage())
+            self.show_error_dialog("%s." % failure.getErrorMessage())
             return None
 
         def after_getProperty(value, dialog):
@@ -794,7 +726,7 @@ class Window(log.Loggable, gobject.GObject):
             cb.addCallback(after_getProperty, dialog)
             cb.addErrback(propertyErrback)
         
-        d = PropertyChangeDialog(name, self.window)
+        d = dialogs.PropertyChangeDialog(name, self.window)
         d.connect('get', dialog_get_cb)
         d.connect('set', dialog_set_cb)
         d.run()
