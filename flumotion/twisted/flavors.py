@@ -97,14 +97,21 @@ class StateCacheable(pb.Cacheable):
     def hasKey(self, key):
         return key in self._dict.keys()
 
-    def get(self, key):
+    def get(self, key, otherwise=None):
         """
         Get the state cache value for the given key.
+
+        Return otherwise in case where key is present but value None.
         """
         if not key in self._dict.keys():
             raise KeyError('%s in %r' % (key, self))
 
-        return self._dict[key]
+        v = self._dict[key]
+        # not v would also trigger empty lists
+        if v is None:
+            return otherwise
+
+        return v
 
     def set(self, key, value):
         """
@@ -160,14 +167,21 @@ class StateRemoteCache(pb.RemoteCache):
     def hasKey(self, key):
         return key in self._dict.keys()
 
-    def get(self, key):
+    def get(self, key, otherwise=None):
         """
         Get the state cache value for the given key.
+
+        Return otherwise in case where key is present but value None.
         """
         if not key in self._dict.keys():
             raise KeyError('%s in %r' % (key, self))
 
-        return self._dict[key]
+        v = self._dict[key]
+        # compare to actual None, otherwise we also get zero-like values
+        if v is None:
+            return otherwise
+
+        return v
 
     def _ensureListeners(self):
         # when this is created through serialization from a JobCS,
@@ -182,6 +196,17 @@ class StateRemoteCache(pb.RemoteCache):
 
         self._ensureListeners()
         self._listeners.append(listener)
+
+    def removeListener(self, listener):
+        if not components.implements(listener, IStateListener):
+            raise NotImplementedError(
+                '%r instance does not implement IStateListener' % listener)
+
+        self._ensureListeners()
+        if listener not in self._listeners:
+            raise KeyError(
+                '%r instance not registered as a listener' % listener)
+        self._listeners.remove(listener)
 
     # pb.RemoteCache methods
     def setCopyableState(self, dict):

@@ -1,5 +1,11 @@
 2005-02-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/flavors.py:
+	  add default values for get when a key is None
+	  add removeListener()
+
+2005-02-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	  add some errors for future use
 	* flumotion/common/log.py:
