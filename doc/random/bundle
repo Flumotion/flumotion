@@ -10,10 +10,22 @@ the main (only?) usage will be running code on a connected worker.
 I'd suggest that a bundle is specified in the xml file, for instance:
 <registry>
   <components>
-    <component name="video-test">
-<!-- maybe function is not needed, and we keep createComponent -->
-      <entry location="flumotion.component.producers.videotest.videotest"
+    <component name="video-test"
+               base="flumotion/component/producers/videotest">
+<!-- base will make the manager look for functionality code in agreed-on paths
+     e.g. admin/gtk.py will be looked for under this base for the GTK
+     admin code -->
+      <!-- additionally, entry points can be overridden, both path and
+           entry function 
+           location is relative to base -->
+    
+      <entry type="admin/gtk"
+             location="admin/gtk.py"
              function="..." />
+
+      <entry type="component"
+             location="videotest.py"
+             function="createComponent />
      ...
     </component>
   </components>
