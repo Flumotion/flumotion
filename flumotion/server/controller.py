@@ -36,7 +36,6 @@ class Dispatcher:
         
     def requestAvatar(self, avatarID, mind, *interfaces):
         p = None
-        print avatarID, mind, interfaces
         if not pb.IPerspective in interfaces:
             raise errors.NoPerspectiveError(avatarID)
         

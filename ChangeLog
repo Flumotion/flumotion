@@ -1,3 +1,7 @@
+2004-07-27  Johan Dahlin  <johan@gnome.org>
+
+	* conf/videotest-jpeg.conf: Overlay an image.
+
 2004-07-23  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/controller.py (Dispatcher.requestAvatar): Clean
