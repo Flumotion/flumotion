@@ -1,6 +1,6 @@
 <components>
   <component type="videotest">
-    <source location="flumotion.component.videotest.videotest"/>
+    <source location="flumotion.component.producers.videotest.videotest"/>
     <properties>
       <property name="feed" type="string" multiple="yes"/>
       <property name="height" type="int"/>

@@ -1,5 +1,5 @@
 component_PYTHON = __init__.py videotest.py
-componentdir = $(libdir)/flumotion/python/flumotion/component/videotest
+componentdir = $(libdir)/flumotion/python/flumotion/component/producers/videotest
 component_DATA = videotest.xml
 
 clean-local:

@@ -20,5 +20,4 @@ SUBDIRS = \
 	muxers \
 	overlay \
 	soundcard \
-	videotest \
 	webcam

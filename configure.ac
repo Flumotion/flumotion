@@ -77,8 +77,9 @@ flumotion/component/consumers/disker/Makefile
 flumotion/component/consumers/httpstreamer/Makefile
 flumotion/component/muxers/Makefile
 flumotion/component/overlay/Makefile
+flumotion/component/producers/Makefile
+flumotion/component/producers/videotest/Makefile
 flumotion/component/soundcard/Makefile
-flumotion/component/videotest/Makefile
 flumotion/component/webcam/Makefile
 flumotion/configure/Makefile
 flumotion/configure/installed.py
