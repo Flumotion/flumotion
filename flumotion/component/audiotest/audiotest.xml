@@ -1,0 +1,8 @@
+<components>
+  <component type="audiotest">
+    <source location="flumotion.component.audiotest.audiotest"/>
+    <properties>
+      <property name="feed" type="string" multiple="yes"/>
+    </properties>
+  </component>
+</components>

@@ -47,8 +47,10 @@ class Source(wizard.WizardStep):
                      'If you want to stream video')
         tips.set_tip(self.checkbutton_has_audio,
                      'If you want to stream audio')
+        
         # XXX: Default to something else
         self.combobox_video.set_active(VideoDevice.Test)
+        self.combobox_audio.set_active(AudioDevice.Test)
         
     def on_checkbutton_has_video_toggled(self, button):
         self.combobox_video.set_sensitive(button.get_active())

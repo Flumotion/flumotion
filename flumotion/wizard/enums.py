@@ -101,15 +101,11 @@ VideoDevice = EnumClass('VideoDevice',
                                         'firewire-video',
                                         'videotest'))
 AudioDevice = EnumClass('AudioDevice',
-                        ('Soundcard',
-                         'Firewire',
-                         'Test'),
-                        ('Sound card',
-                         'Firewire Audio',
-                         'Test audio source'),
-                        component_type=('soundcard',
+                        ('Soundcard', 'Firewire', 'Test'),
+                        ('Sound card', 'Firewire Audio', 'Test audio source'),
+                        component_type=('audiotest',
                                         'firewire-audio',
-                                        'sinesrc'))
+                                        'audiotest'))
 # TVCard
 TVCardDevice = EnumClass('TVCardDevice', ('/dev/video0',
                                           '/dev/video1',

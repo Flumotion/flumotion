@@ -86,9 +86,13 @@ class WizardSaver:
     def getAudioSource(self):
         options = self.wizard.get_step_options('Source')
         source = options['audio']
-        audio_step = self.wizard['Audio Source']
-        return Component('audio-source', source.component_type,
-                         audio_step.get_component_properties())
+        if source == AudioDevice.Test:
+            props = {}
+        else:
+            audio_step = self.wizard['Audio Source']
+            props = audio_step.get_component_properties()
+        
+        return Component('audio-source', source.component_type, props)
 
     def getAudioEncoder(self):
         options = self.wizard.get_step_options('Encoding')

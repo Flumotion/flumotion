@@ -1,5 +1,18 @@
 2004-10-16  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/Makefile.am:
+	* flumotion/component/audiotest/Makefile.am:
+	* flumotion/component/audiotest/__init__.py:
+	* flumotion/component/audiotest/audiotest.py:
+	* flumotion/component/audiotest/audiotest.xml:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Add an audiotest step (sinesrc)
+	
+2004-10-16  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/overlay/Makefile.am:
 	* flumotion/component/overlay/cc_24x24.png:
 	* flumotion/component/overlay/fluendo_24x24.png:
