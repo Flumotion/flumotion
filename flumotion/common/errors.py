@@ -19,6 +19,8 @@
 # Flumotion Advanced Streaming Server Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+# Headers in this file shall remain intact.
+
 """
 Flumotion exceptions and pb.Error objects.
 

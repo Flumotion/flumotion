@@ -18,6 +18,8 @@
 # Flumotion Advanced Streaming Server Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+# Headers in this file shall remain intact.
+
 from twisted.cred import checkers, error
 from twisted.internet import defer
 from twisted.python import failure

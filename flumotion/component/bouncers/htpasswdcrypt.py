@@ -22,6 +22,8 @@
 # Flumotion Advanced Streaming Server Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+# Headers in this file shall remain intact.
+
 import crypt
 import md5
 import random

@@ -19,6 +19,8 @@
 # Flumotion Advanced Streaming Server Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+# Headers in this file shall remain intact.
+
 from flumotion.component import feedcomponent
 
 class AudioTest(feedcomponent.ParseLaunchComponent):

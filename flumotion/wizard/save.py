@@ -18,6 +18,8 @@
 # Flumotion Advanced Streaming Server Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+# Headers in this file shall remain intact.
+
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, Enum, EnumClass, EnumMetaClass, \
      LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
