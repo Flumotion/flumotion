@@ -33,7 +33,6 @@ from twisted.web import server, resource as web_resource
 from twisted.internet import reactor, defer
 from flumotion.configure import configure
 from flumotion.common import errors
-import twisted.internet.error
 
 from flumotion.common import common, log, keycards
 

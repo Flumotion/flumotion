@@ -198,6 +198,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         Stats.__init__(self, sink=self.get_element('sink'))
         self.caps = None
         self.resource = None
+        self.mountPoint = None
+        self.port = None
 
         # handled regular updating
         self.needsUpdate = False
@@ -390,18 +392,18 @@ def createComponent(config):
     
     if config.has_key('logfile'):
         component.debug('Logging to %s' % config['logfile'])
-        resource.setLogfile(config['logfile'])
+        component.resource.setLogfile(config['logfile'])
 
     if config.has_key('maxclients'):
-        resource.setMaxClients(int(config['maxclients']))
+        component.resource.setMaxClients(int(config['maxclients']))
         
     if config.has_key('admin-password'):
-        resource.setAdminPassword(config['admin-password'])
+        component.resource.setAdminPassword(config['admin-password'])
 
     if config.has_key('bouncer'):
-        resource.setBouncerName(config['bouncer'])
+        component.resource.setBouncerName(config['bouncer'])
 
     if config.has_key('domain'):
-        resource.setDomain(config['domain'])
+        component.resource.setDomain(config['domain'])
 
     return component
