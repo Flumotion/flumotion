@@ -1,5 +1,5 @@
 EXTRA_DIST = 				\
-	grids/ogg-test-theora.xml	\
+	flows/ogg-test-theora.xml	\
 	planets/default.xml		\
 	complex.xml 			\
 	multipart-bttv-jpeg.xml 	\
