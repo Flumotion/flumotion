@@ -1,5 +1,11 @@
 2004-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_tvcard.glade:
+	* flumotion/wizard/steps.py:
+	  clear up confusion between v4l channels and TV channels
+
+2004-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/worker.py:
 	  log better error
 

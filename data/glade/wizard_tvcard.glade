@@ -34,12 +34,12 @@
 	  <property name="column_spacing">6</property>
 
 	  <child>
-	    <widget class="GtkComboBox" id="combobox_channel">
+	    <widget class="GtkComboBox" id="combobox_source">
 	      <property name="visible">True</property>
-	      <property name="items" translatable="yes">Weather Channel
-CNN
-Eurosport
-Flumotion TV</property>
+	      <property name="items" translatable="yes">Television
+Composite1
+S-Video
+Composite3</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>
@@ -71,7 +71,7 @@ Flumotion TV</property>
 	  </child>
 
 	  <child>
-	    <widget class="GtkComboBox" id="combobox_signal">
+	    <widget class="GtkComboBox" id="combobox_tvnorm">
 	      <property name="visible">True</property>
 	      <property name="items" translatable="yes">Composite
 RCA</property>
@@ -114,7 +114,7 @@ RCA</property>
 	  <child>
 	    <widget class="GtkLabel" id="label2">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Signal:</property>
+	      <property name="label" translatable="yes">TV Norm:</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -139,7 +139,7 @@ RCA</property>
 	  <child>
 	    <widget class="GtkLabel" id="label3">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Channel:</property>
+	      <property name="label" translatable="yes">Video source:</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -219,7 +219,7 @@ RCA</property>
 	      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 	      <property name="snap_to_ticks">False</property>
 	      <property name="wrap">False</property>
-	      <property name="adjustment">352 0 8192 1 10 10</property>
+	      <property name="adjustment">352 0 8192 8 32 8</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>
@@ -241,7 +241,7 @@ RCA</property>
 	      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 	      <property name="snap_to_ticks">False</property>
 	      <property name="wrap">False</property>
-	      <property name="adjustment">288 0 8192 1 10 10</property>
+	      <property name="adjustment">288 0 8192 8 32 8</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>
@@ -304,10 +304,6 @@ RCA</property>
 	  <property name="expand">True</property>
 	  <property name="fill">True</property>
 	</packing>
-      </child>
-
-      <child>
-	<placeholder/>
       </child>
     </widget>
   </child>

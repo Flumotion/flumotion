@@ -137,6 +137,7 @@ class VideoSource(wizard.WizardStep):
 
 def _checkChannels(device):
     # check channels on a v4lsrc element with the given device
+    # (which are the video sources in appspace)
     # returns: a deferred returning a tuple of (deviceName, channels, norms)
     # or a failure
     from twisted.internet import defer, reactor
@@ -176,6 +177,10 @@ def _checkChannels(device):
     return result.d
 
 
+# note:
+# v4l talks about "signal" (PAL/...) and "channel" (TV/Composite/...)
+# apps talk about "TV Norm" and "source",
+# and "channel" is what you tune the TV to (corresponding to frequency)
 class TVCard(VideoSource):
     step_name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
@@ -184,28 +189,28 @@ class TVCard(VideoSource):
 
         
     def on_combobox_device_changed(self, combo):
-        self.update_channels()
+        self.update_sources()
 
     def worker_changed(self):
         self.clear_combos()
-        self.update_channels()
+        self.update_sources()
         
     def before_show(self):
         self.clear_combos()
-        self.update_channels()
+        self.update_sources()
         
     def clear_combos(self):
-        self.combobox_signal.clear()
-        self.combobox_signal.set_sensitive(False)
-        self.combobox_channel.clear()
-        self.combobox_channel.set_sensitive(False)
+        self.combobox_tvnorm.clear()
+        self.combobox_tvnorm.set_sensitive(False)
+        self.combobox_source.clear()
+        self.combobox_source.set_sensitive(False)
         
     def _queryCallback(self, (deviceName, channels, norms)):
         self.wizard.block_next(False)
-        self.combobox_signal.set_list(norms)
-        self.combobox_signal.set_sensitive(True)
-        self.combobox_channel.set_list(channels)
-        self.combobox_channel.set_sensitive(True)
+        self.combobox_tvnorm.set_list(norms)
+        self.combobox_tvnorm.set_sensitive(True)
+        self.combobox_source.set_list(channels)
+        self.combobox_source.set_sensitive(True)
 
     def _queryGstErrorErrback(self, failure):
         failure.trap(errors.GstError)
@@ -216,7 +221,7 @@ class TVCard(VideoSource):
         failure.trap(errors.UnknownDeviceError)
         self.clear_combos()
         
-    def update_channels(self):
+    def update_sources(self):
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
@@ -228,8 +233,8 @@ class TVCard(VideoSource):
     def get_component_properties(self):
         options = {}
         options['device'] = self.combobox_device.get_string()
-        options['signal'] = self.combobox_signal.get_string()
-        options['channel'] = self.combobox_channel.get_string()
+        options['signal'] = self.combobox_tvnorm.get_string()
+        options['channel'] = self.combobox_source.get_string()
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
         options['framerate'] = self.spinbutton_framerate.get_value()
