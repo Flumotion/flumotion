@@ -25,4 +25,6 @@ hostname:(xmlfilename)
       <password>test</password>
     </authentication>
 
+    <feederports>8650-8659</feederports>
+
 </worker>

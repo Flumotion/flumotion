@@ -1,5 +1,13 @@
 2004-11-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/workers/default.xml:
+	* flumotion/worker/config.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  adding feederport ranges to worker config
+
+2004-11-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-manager.in:
 	* bin/flumotion-worker.in:
 	* bin/flumotion.in:

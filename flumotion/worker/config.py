@@ -54,6 +54,7 @@ class WorkerConfigXML(log.Loggable):
         self.name = 'default'
         self.manager = None
         self.authentication = None
+        self.ports = None
 
         try:
             if filename is not None:
@@ -95,6 +96,8 @@ class WorkerConfigXML(log.Loggable):
                 self.manager = self.parseManager(node)
             elif node.nodeName == 'authentication':
                 self.authentication = self.parseAuthentication(node)
+            elif node.nodeName == 'feederports':
+                self.feederports = self.parseFeederports(node)
             else:
                 raise ConfigError("unexpected node under '%s': %s" % (root.nodeName, node.nodeName))
 
@@ -151,4 +154,13 @@ class WorkerConfigXML(log.Loggable):
                 raise ConfigError("unexpected '%s' node: %s" % (node.nodeName, child.nodeName))
 
         return ConfigEntryAuthentication(username, password)
+        
+    def parseFeederports(self, node):
+        # <feederports>[lower]-[upper]</feederports>
 
+        value = str(node.firstChild.nodeValue)
+        if not '-' in value:
+            raise ConfigError("feederports '%s' does not contain '-'" % value)
+        (lower, upper) = value.split('-')
+        ports = range(int(lower), int(upper) + 1)
+        return ports

@@ -251,6 +251,7 @@ class WorkerBrain(log.Loggable):
         """
         self._oldSIGCHLDHandler = None # stored by installSIGCHLDHandler
         self._oldSIGTERMHandler = None # stored by installSIGTERMHandler
+        self.options = options
 
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
@@ -272,7 +273,7 @@ class WorkerBrain(log.Loggable):
         d.addErrback(self._cb_loginFailed)
                                  
     def setup(self):
-        root = JobHeaven(self)
+        root = JobHeaven(self, self.options.feederports)
         dispatcher = JobDispatcher(root)
         checker = checkers.FlexibleCredentialsChecker()
         checker.allowAnonymous(True)
@@ -548,14 +549,15 @@ class JobAvatar(pb.Avatar, log.Loggable):
 ### this is a different kind of heaven, not IHeaven, for now...
 class JobHeaven(pb.Root, log.Loggable):
     logCategory = "job-heaven"
-    def __init__(self, brain):
+    def __init__(self, brain, feederports):
         self.avatars = {}
         self.brain = brain
+        self.feederports = feederports
 
         # FIXME: use and option from the command line for port range
         # Allocate ports
         self.ports = []
-        for port in configure.defaultGstPortRange:
+        for port in self.feederports:
             self.ports.append(Port(port))
         
     def createAvatar(self, avatarId):
@@ -565,7 +567,5 @@ class JobHeaven(pb.Root, log.Loggable):
 
     def shutdown(self):
         self.debug('Shutting down JobHeaven')
-        d = None
-
         dl = defer.DeferredList([x.stop() for x in self.avatars.values()])
         return dl

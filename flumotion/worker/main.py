@@ -78,6 +78,8 @@ def main(args):
     
     log.debug('worker', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
+    # FIXME: add an option for feederports
+    options.feederports = None
     
     # check if a config file was specified; if so, parse config and copy over
     if len(args) > 1:
@@ -110,6 +112,9 @@ def main(args):
             options.password = cfg.authentication.password
             log.debug('worker',
                 'Setting password [%s]' % ("*" * len(options.password)))
+        if not options.feederports and cfg.feederports:
+            options.feederports = cfg.feederports
+            log.debug('worker', 'Setting feederports %r' % options.feederports)
         
     # set default values for all unset options
     if not options.host:
@@ -128,6 +133,9 @@ def main(args):
         else:
             import socket
             options.name = socket.gethostname()
+
+    if not options.feederports:
+        options.feederports = configure.defaultGstPortRange
 
     # check for wrong options/arguments
     if not options.transport in ['ssl', 'tcp']:
