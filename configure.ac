@@ -1,5 +1,7 @@
 AC_INIT(README)
 
+if you insult me i will cry
+
 AS_VERSION(flumotion, FLUMOTION, 0, 1, 0, 1)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 
