@@ -1,5 +1,12 @@
 2004-11-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/main.py:
+	  fixing pychecker warnings
+
+2004-11-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/Makefile.am:
 	* bin/flumotion-manager.in:
 	* bin/flumotion-worker.in:

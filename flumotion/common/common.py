@@ -25,7 +25,6 @@ A set of common functions.
 """
 
 import os 
-import signal
 import sys
 import time
 
@@ -326,7 +325,6 @@ def deletePidFile(type, name):
     and process name for the filename.
     """
     
-    pid = os.getpid()
     pidPath = os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
     os.unlink(pidPath)
  
@@ -378,6 +376,7 @@ def waitForKill():
     class Waiter:
         def __init__(self):
             self.sleeping = True
+            import signal
             self.oldhandler = signal.signal(signal.SIGTERM,
                                             self._SIGTERMHandler)
  

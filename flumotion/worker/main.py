@@ -197,7 +197,6 @@ def main(args):
     # obviously it'd be nicer to handle error conditions that involve startup
     # better, or be reconnecting, or something, instead of sleeping forever.
     if options.daemonize and not reactor.killed:
-        sleeping = True
         log.info('worker', 'Since I am a daemon, I will sleep until killed')
         common.waitForKill()
         log.info('worker', 'I was killed so I wake up')

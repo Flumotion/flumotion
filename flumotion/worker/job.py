@@ -25,7 +25,6 @@ Worker-side objects to handle job processes.
 """
 
 import os
-import sys
 import resource
 import signal
 import gobject
@@ -270,14 +269,6 @@ def run(name, options):
     log.debug('job', 'Starting reactor')
     reactor.run()
 
-    def _exitCb(*unused):
-        while reactor.iterate():
-            pass
-                
-        reactor.stop()
-            
-    #reactor.callLater(0, _exitCb)
-    #reactor.run()
     log.debug('job', 'Left reactor.run')
     log.info('job', 'Job stopped, returning with exit value 0')
             
