@@ -314,9 +314,10 @@ class Webcam(VideoSource):
         self.spinbutton_width.set_sensitive(False)
         self.spinbutton_height.set_sensitive(False)
         self.spinbutton_framerate.set_sensitive(False)
+        self.label_name.set_label("")
         
     def _queryCallback(self, deviceName):
-        print 'got device', deviceName
+        self.label_name.set_label(deviceName)
         self.wizard.block_next(False)
         self.spinbutton_width.set_sensitive(True)
         self.spinbutton_height.set_sensitive(True)

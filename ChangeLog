@@ -1,5 +1,11 @@
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_webcam.glade:
+	* flumotion/wizard/steps.py:
+	  Show name of webcam in the UI
+
+2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/managers/default/planet.xml:
 	* conf/workers/default.xml:
 	* flumotion/admin/gtk/main.py:
