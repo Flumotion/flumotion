@@ -64,42 +64,6 @@ class ConfigEntryComponent(log.Loggable):
     def getWorker(self):
         return self.worker
 
-    # XXX: kill this code
-    def getComponent(self):
-        defs = self.defs
-        dict = self.config
-        
-        # Setup files to be transmitted over the wire. Must be a
-        # better way of doing this.
-        source = defs.getSource()
-        self.info('Loading %s' % source)
-        try:
-            module = reflect.namedAny(source)
-        except ValueError:
-            raise ConfigError("%s source file could not be found" % source)
-        
-        if not hasattr(module, 'createComponent'):
-            self.warning('no createComponent() for %s' % source)
-            return
-        
-        dir = os.path.split(module.__file__)[0]
-        files = {}
-        for file in defs.getFiles():
-            filename = os.path.basename(file.getFilename())
-            real = os.path.join(dir, filename)
-            files[real] = file
-        
-        # Create the component which the specified configuration
-        # directives. Note that this can't really be moved from here
-        # since it gets called by the launcher from another process
-        # and we don't want to create it in the main process, since
-        # we're going to listen to ports and other stuff which should
-        # be separated from the main process.
-
-        component = module.createComponent(dict)
-        component.setFiles(files)
-        return component
-
 class ConfigEntryFlow:
     "I represent a <flow> entry in a planet config file"
     def __init__(self):
