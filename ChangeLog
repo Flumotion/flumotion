@@ -1,5 +1,9 @@
 2004-08-05  Johan Dahlin  <johan@gnome.org>
 
+	* conf/*.conf: Move to conf/historic
+
+	* flumotion/server/config.py (FlumotionConfig): Kill
+
 	* flumotion/server/launcher.py (Launcher.start): Clean up.
 
 2004-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>

@@ -147,10 +147,7 @@ class Launcher:
         raise SystemExit
 
     def load_config(self, filename):
-        if filename.endswith('conf'):
-            conf = config.FlumotionConfig(filename)
-        else:
-            conf = config.FlumotionConfigXML(filename)
+        conf = config.FlumotionConfigXML(filename)
 
         for name in conf.components.keys():
             self.msg('Starting component: %s' % name)

@@ -18,7 +18,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
-from ConfigParser import ConfigParser
+import os
+from xml.dom import minidom, Node
 
 from twisted.python import reflect 
 
@@ -44,103 +45,6 @@ class ConfigComponent:
     
     def getComponent(self, *args):
         return self.func(self.config, *args)
-    
-class FlumotionConfig(ConfigParser):
-    def __init__(self, filename):
-        ConfigParser.__init__(self)
-
-        self.components = {}
-        self.msg('Loading configuration file `%s\'' % filename)
-        self.read(filename)
-        self.parse()
-
-    msg = lambda s, *a: log.msg('config', *a)
-        
-    def get_pipeline(self, section):
-        assert self.has_option(section, 'pipeline')
-        return self.get(section, 'pipeline')
-
-    def get_feeds(self, section):
-        if self.has_option(section, 'feeds'):
-            return self.get(section, 'feeds').split(',')
-        else:
-            return ['default']
-
-    def get_sources(self, section):
-        if self.has_option(section, 'source'):
-            return [self.get(section, 'source')]
-        elif self.has_option(section, 'sources'):
-            return self.get(section, 'sources').split(',')
-        else:
-            return []
-        
-    def get_protocol(self, section):
-        assert self.has_option(section, 'protocol')
-        return self.get(section, 'protocol')
-
-    def parse_globals(self):
-        if not self.has_option('global', 'username'):
-            return
-        
-        username = conf.get('global', 'username')
-        entry = pwd.getpwnam(username)
-        self.uid = entry[2]
-
-    def parse(self):
-        sections = self.sections()
-        if not sections:
-            raise ConfigError("Need at least one section")
-            
-        for section in sections:
-            if section == 'global':
-                self.parse_globals(c)
-            else:
-                self.parse_component(section)
-
-    def parse_component(self, section):
-        kwargs = {}
-        kwargs['name'] = section
-        if self.has_option(section, 'nice'):
-            kwargs['nice'] = self.getint(section, 'nice')
-
-        if self.has_option(section, 'pipeline'):
-            kwargs['pipeline'] = self.get_pipeline(section)
-            
-        kwargs['sources'] = self.get_sources(section)
-        
-        if self.has_option(section, 'port'):
-            kwargs['port'] = self.get(section, 'port')
-        if self.has_option(section, 'protocol'):
-            kwargs['protocol'] = self.get(section, 'protocol')
-        if self.has_option(section, 'location'):
-            kwargs['location'] = self.get(section, 'location')
-        if self.has_option(section, 'source'):
-            kwargs['source'] = self.get(section, 'source')
-
-        feeds = 'default'
-        if self.has_option(section, 'feeds'):
-            feeds = self.get(section, 'feeds')
-        if ',' in feeds:
-            kwargs['feeds'] = feeds.split(',')
-        else:
-            kwargs['feeds'] = [feeds]
-
-        type = self.get(section, 'kind')
-        config = registry.getComponent(type)
-        module = reflect.namedAny(config.source)
-        if not hasattr(module, 'createComponent'):
-            print 'WARNING: no createComponent() for %s' % config.source
-            print 'XXX: Throw an error'
-            return
-
-        name = section
-
-        function = module.createComponent
-        component = ConfigComponent(name, type, function, kwargs)
-        self.components[name] = component
-
-import os
-from xml.dom import minidom, Node
 
 class FlumotionConfigXML:
     def __init__(self, filename):
