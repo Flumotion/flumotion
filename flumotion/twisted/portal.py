@@ -49,7 +49,6 @@ class _PortalAuthChallenger(pb.Referenceable):
         
     def remote_respond(self, response, mind):
         self.response = response
-        print 'logging in', self.interfaces
         d = self.portalWrapper.portal.login(self, mind, *self.interfaces)
         d.addCallback(self._loggedIn)
         return d

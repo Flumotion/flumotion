@@ -55,7 +55,7 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
 
     def __init__(self):
         self.__gobject_init__()
-        self.factory = pb.PBClientFactory()
+        self.factory = pbutil.FMClientFactory()
         self.debug("logging in to ClientFactory")
         cb = self.factory.login(pbutil.Username('admin'), client=self)
         cb.addCallback(self._gotPerspective)

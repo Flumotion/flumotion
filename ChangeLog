@@ -1,3 +1,18 @@
+2004-08-31  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/twisted/pbutil.py (FMClientFactory): New factory, to
+	be used instead PBClientFactory
+
+	* flumotion/gui/adminclient.py (AdminInterface.__init__): Use it here
+
+	* flumotion/server/component.py (ComponentFactory.login): 
+
+	* flumotion/twisted/pbutil.py
+	(ReconnectingPBClientFactory.startLogin): 
+
+	Make sure that all PBClientFactories that connect sends in
+	IPerspective
+
 2004-08-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/server/admin.py:

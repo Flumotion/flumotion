@@ -25,7 +25,6 @@ import gst
 import gobject
 from twisted.internet import reactor
 from twisted.spread import pb
-from twisted.python.reflect import qual
 
 from flumotion.server import interfaces
 from flumotion.twisted import errors, pbutil
@@ -37,17 +36,14 @@ class ComponentFactory(pbutil.ReconnectingPBClientFactory):
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
     def __init__(self, component):
         self.__super_init()
-        self.component = component
+        self.interfaces = getattr(component, '__remote_interfaces__', ())
         self.view = ComponentView(component)
         
     def login(self, username):
-        interfaces = getattr(self.component, '__remote_interfaces__', ())
-        interfaces = (pb.IPerspective,) + interfaces
-        interfaces = [qual(interface) for interface in interfaces]
-
         self.__super_login(pbutil.Username(username),
                            self.view,
-                           *interfaces)
+                           pb.IPerspective,
+                           *self.interfaces)
         
     def gotPerspective(self, perspective):
         self.view.cb_gotPerspective(perspective)

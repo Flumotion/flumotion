@@ -4,7 +4,7 @@
 
 from twisted.cred import checkers, credentials
 from twisted.internet import protocol
-from twisted.python import log
+from twisted.python import log, reflect
 from twisted.spread import pb
 from twisted.spread.pb import PBClientFactory
 
@@ -98,7 +98,10 @@ class ReconnectingPBClientFactory(PBClientFactory,
         raise RuntimeError, "login is one-shot: use startLogin instead"
 
     def startLogin(self, credentials, client, *interfaces):
-        self._interfaces = interfaces
+        if not pb.IPerspective in interfaces:
+            interfaces += (pb.IPerspective,)
+        self._interfaces = [reflect.qual(interface)
+                               for interface in interfaces]
         self._credentials = credentials
         self._client = client
         
@@ -134,6 +137,33 @@ class ReconnectingPBClientFactory(PBClientFactory,
         self.stopTrying() # logging in harder won't help
         log.err(why)
 
+class FMClientFactory(pb.PBClientFactory):
+    def _cbSendUsername(self, root, username, password, client, interfaces):
+        d = root.callRemote("login", username, *interfaces)
+        return d.addCallback(self._cbResponse, password, client)
+
+    def login(self, credentials, client=None, *interfaces):
+        """Login and get perspective from remote PB server.
+
+        Currently only credentials implementing IUsernamePassword are
+        supported.
+
+        @return Deferred of RemoteReference to the perspective.
+        """
+        
+        if not pb.IPerspective in interfaces:
+            interfaces += (pb.IPerspective,)
+        interfaces = [reflect.qual(interface)
+                          for interface in interfaces]
+            
+        d = self.getRootObject()
+        d.addCallback(self._cbSendUsername,
+                      credentials.username,
+                      credentials.password,
+                      client,
+                      interfaces)
+        return d
+    
 class ReallyAllowAnonymousAccess:
     __implements__ = checkers.ICredentialsChecker
 
@@ -144,7 +174,7 @@ class ReallyAllowAnonymousAccess:
         return credentials.username
 
 class Username:
-    __implements__ = (credentials.IUsernamePassword,)
+    __implements__ = credentials.IUsernamePassword,
     def __init__(self, username):
         self.username = username
         self.password = ''
