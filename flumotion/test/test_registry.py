@@ -32,6 +32,10 @@ from flumotion.common import registry
 from flumotion.common.registry import istrue
 
 class TestRegistry(unittest.TestCase):
+    def setUp(self):
+        self.reg = registry.ComponentRegistry()
+        self.reg.clean()
+        
     def testDefault(self):
         assert hasattr(registry, 'registry')
         reg = registry.registry
@@ -54,46 +58,43 @@ class TestRegistry(unittest.TestCase):
         assert isinstance(mtime, int)
         
     def testParseBasic(self):
-        reg = registry.ComponentRegistry()
-        assert reg.isEmpty()
-        reg.addFromString('<components></components>')
-        assert reg.isEmpty()
+        assert self.reg.isEmpty()
+        self.reg.addFromString('<components></components>')
+        assert self.reg.isEmpty()
         self.assertRaises(registry.XmlParserError,
-                          reg.addFromString, '<root></root>')
+                          self.reg.addFromString, '<root></root>')
         
     def testParseComponents(self):
-        reg = registry.ComponentRegistry()
-        assert reg.isEmpty()
-        reg.addFromString("""<components>
+        assert self.reg.isEmpty()
+        self.reg.addFromString("""<components>
           <component name="foo" type="bar">
           </component>
           <component name="foobie" type="baz">
           </component>
         </components>""")
 
-        assert not reg.isEmpty()
+        assert not self.reg.isEmpty()
         
-        assert not reg.hasComponent('foo')
-        assert reg.hasComponent('bar')
-        comp1 = reg.getComponent('bar')
+        assert not self.reg.hasComponent('foo')
+        assert self.reg.hasComponent('bar')
+        comp1 = self.reg.getComponent('bar')
         assert isinstance(comp1, registry.RegistryEntryComponent)
 
-        assert not reg.hasComponent('foobie')
+        assert not self.reg.hasComponent('foobie')
 
-        assert reg.hasComponent('baz')
-        comp2 = reg.getComponent('baz')
+        assert self.reg.hasComponent('baz')
+        comp2 = self.reg.getComponent('baz')
         assert isinstance(comp2, registry.RegistryEntryComponent)
 
-        comps = reg.getComponents()
+        comps = self.reg.getComponents()
         comps.sort()
         assert len(comps) == 2
         assert comp1 in comps
         assert comp2 in comps
         
     def testParseProperties(self):
-        reg = registry.ComponentRegistry()
-        assert reg.isEmpty()
-        reg.addFromString("""<components>
+        assert self.reg.isEmpty()
+        self.reg.addFromString("""<components>
           <component name="foobie" type="component">
             <properties>
               <property name="source" type="string" required="yes" multiple="yes"/>
@@ -101,7 +102,7 @@ class TestRegistry(unittest.TestCase):
           </component>
         </components>""")
 
-        comp = reg.getComponent('component')
+        comp = self.reg.getComponent('component')
         props = comp.getProperties()
         assert props
         assert len(props) == 1
@@ -112,8 +113,6 @@ class TestRegistry(unittest.TestCase):
         assert prop.isMultiple()
 
     def testParsePropertiesErrors(self):
-        reg = registry.ComponentRegistry()
-        assert reg.isEmpty()
         template = """<components>
           <component name="foobie" type="component">
             <properties>
@@ -124,15 +123,15 @@ class TestRegistry(unittest.TestCase):
 
         property = "<base-name/>"
         self.assertRaises(registry.XmlParserError,
-                          reg.addFromString, template % property)
+                          self.reg.addFromString, template % property)
 
         property = '<property without-name=""/>'
         self.assertRaises(registry.XmlParserError,
-                          reg.addFromString, template % property)
+                          self.reg.addFromString, template % property)
 
         property = '<property name="bar" without-type=""/>'
         self.assertRaises(registry.XmlParserError,
-                          reg.addFromString, template % property)
+                          self.reg.addFromString, template % property)
 
     def testClean(self):
         xml = """<components>
@@ -146,9 +145,8 @@ class TestRegistry(unittest.TestCase):
         reg = registry.ComponentRegistry()
         xml = """<components>
           <component name="foo" type="bar"></component></components>"""
-        reg.addFromString(xml)
-        self.assertRaises(TypeError, reg.addFromString, xml)
-        
+        reg.addFromString(xml) 
+       
     def testAddXmlParseError(self):
         reg = registry.ComponentRegistry()
         xml = """<components>
@@ -162,36 +160,40 @@ class TestRegistry(unittest.TestCase):
         xml = """<components>
           <component name="foo" type="bar"></component></components>"""
         reg = registry.ComponentRegistry()
+        reg.clean()
         reg.addFromString(xml)
         import sys, StringIO
         s = StringIO.StringIO()
         reg.dump(s)
         s.seek(0, 0)
         data = s.read()
-        assert data == """<components>
-  <component type="bar">
-    <source location="None"/>
-    <properties>
-    </properties>
-  </component>
-</components>
+        assert data == """<registry>
+  <components>
+    <component type="bar">
+      <source location="None"/>
+      <properties>
+      </properties>
+    </component>
+  </components>
+  <directories>
+  </directories>
+</registry>
 """, data
         
 class TestComponentEntry(unittest.TestCase):
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
-        self.entry = registry.RegistryEntryComponent('filename', 'type', False,
+        self.entry = registry.RegistryEntryComponent('filename', 'type',
                                                      'source', ['prop'],
                                                      [self.file])
-        self.empty_entry = registry.RegistryEntryComponent('filename', 'type', False,
+        self.empty_entry = registry.RegistryEntryComponent('filename', 'type',
                                                            'source', ['prop'],
                                                            [])
-        self.multiple_entry = registry.RegistryEntryComponent('filename', 'type', False,
+        self.multiple_entry = registry.RegistryEntryComponent('filename', 'type', 
                                                               'source', ['prop'],
                                                               [self.file, self.file])
     def testThings(self):
         assert self.entry.getType() == 'type'
-        assert not self.entry.isFactory()
         assert self.entry.getSource() == 'source'
         assert self.entry.getFiles() == [self.file]
         assert self.entry.getGUIEntry() == 'gui-filename'
@@ -210,10 +212,13 @@ def rmdir(root):
             
 class TestFindComponents(unittest.TestCase):
     def setUp(self):
+        self.reg = registry.ComponentRegistry()
+        self.reg.clean()
+
         # override the registry's filename so make distcheck works
-        (fd, registry.registry.filename) = tempfile.mkstemp()
+        fd, self.reg.filename = tempfile.mkstemp()
         os.close(fd)
-        os.unlink(registry.registry.filename)
+        os.unlink(self.reg.filename)
 
         self.tempdir = tempfile.mkdtemp()
         self.cwd = os.getcwd()
@@ -224,15 +229,15 @@ class TestFindComponents(unittest.TestCase):
         self.writeComponent('subdir/first.xml', 'first')
         self.writeComponent('subdir/foo/second.xml', 'second')
         self.writeComponent('subdir/bar/third.xml', 'third')
-        registry.registry.clean()
 
     def tearDown(self):
         rmdir('subdir')
         os.chdir(self.cwd)
-        registry.registry.clean()
+        self.reg.clean()
         rmdir(self.tempdir)
 
-        os.unlink(registry.registry.filename)
+        if os.path.exists(self.reg.filename):
+            os.unlink(self.reg.filename)
 
     def writeComponent(self, filename, name):
         open(filename, 'w').write("""<components>
@@ -244,20 +249,9 @@ class TestFindComponents(unittest.TestCase):
 """ % name)
     
     def testSimple(self):
-        registry.registry.update('.')
-        components = registry.registry.getComponents()
+        self.reg.addDirectory('.')
+        components = self.reg.getComponents()
         assert len(components) == 3, len(components)
         types = [c.getType() for c in components]
         types.sort()
         assert types == ['first', 'second', 'third'] # alpha order
-
-    def testVerify(self):
-        os.makedirs('flumotion/component')
-        registry.registry.verify('.')
-        rmdir('flumotion/component')
-        
-    def testVerifyForce(self):
-        os.makedirs('flumotion/component')
-        registry.registry.verify('.', force=True)
-        rmdir('flumotion/component')
-
