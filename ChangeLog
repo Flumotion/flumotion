@@ -1,3 +1,7 @@
+2005-02-14  Christian Schaller <christian at fluendo dot com>
+
+	* Add desktop file with icon for admin tool
+
 2005-02-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent.py:

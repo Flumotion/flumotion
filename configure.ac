@@ -131,6 +131,7 @@ data/image/Makefile
 data/image/16x16/Makefile
 data/image/24x24/Makefile
 data/image/wizard/Makefile
+data/flu-admin.desktop
 flumotion/Makefile
 flumotion/admin/Makefile
 flumotion/admin/gtk/Makefile

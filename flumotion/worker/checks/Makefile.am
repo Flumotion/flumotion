@@ -4,7 +4,8 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/worker/checks
 
 flumotion_PYTHON = \
 	__init__.py 	\
-	video.py
+	video.py	\
+	package.xml
 
 TAGS_FILES = $(flumotion_PYTHON)
 

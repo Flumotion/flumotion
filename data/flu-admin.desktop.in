@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Flumotion Streaming Server Administration
+Comment=Lets you configure and manage the Flumotion streaming server
+Exec=flumotion-admin
+Terminal=false
+Type=Application
+Icon=flumotion.png
+Categories=GNOME;Application;AudioVideo;Player;X-Ximian-Main;X-Red-Hat-Base;

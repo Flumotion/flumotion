@@ -159,6 +159,8 @@ fi
 %{_libdir}/flumotion
 %{_libdir}/pkgconfig/flumotion.pc
 %{_datadir}/flumotion
+%{_datadir}/applications
+%{_datadir}/pixmaps
 %dir %attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
 %attr(750,flumotion,root) %{_sysconfdir}/flumotion
 %attr(750,flumotion,root) %{_localstatedir}/run/flumotion
@@ -167,6 +169,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Mon Feb 14 2005 Christian Schaller <christian at fluendo dot com>
+- Add desktop file for admin tool and icon
+
 * Thu Nov 11 2004 Thomas Vander Stichele <thomas at apestaart dot org>
 - Integrate changes from issue 86
 
