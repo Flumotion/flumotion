@@ -127,7 +127,12 @@ class ComponentPerspective(pbutil.NewCredPerspective):
 
     def callRemote(self, name, *args, **kwargs):
         self.msg('Calling remote method %s%r' % (name, args))
-        cb = self.mind.callRemote(name, *args, **kwargs)
+        try:
+            cb = self.mind.callRemote(name, *args, **kwargs)
+        except pb.DeadReferenceError :
+            self.mind = None
+            self.detached()
+
         return cb
 
     def cb_register(self, options, cb):
@@ -319,8 +324,12 @@ class Controller(pb.Root):
     def __init__(self):
         self.components = {}
         self.feed_manager = FeedManager()
+        self.admin = None
         
         self.last_free_port = 5500
+
+    def setAdmin(self, admin):
+        self.admin = admin
         
     def getPerspective(self, component_type, username):
         if component_type == 'producer':
@@ -383,7 +392,8 @@ class Controller(pb.Root):
             raise KeyError, component_name
             
         self.components[component_name] = component
-
+        self.admin.componentAdded(component)
+        
     def removeComponent(self, component):
         """removes a component
         @type component: component
@@ -394,6 +404,7 @@ class Controller(pb.Root):
             raise KeyError, component_name
 
         del self.components[component_name]
+        self.admin.componentRemoved(component)
 
     def getSourceComponents(self, component):
         """Retrives the source components for component
@@ -516,6 +527,8 @@ class ControllerServerFactory(pb.PBServerFactory):
     def __init__(self):
         self.controller = Controller()
         self.admin = admin.Admin(self.controller)
+        self.controller.setAdmin(self.admin)
+        
         self.dispatcher = Dispatcher(self.controller, self.admin)
         checker = pbutil.ReallyAllowAnonymousAccess()
         

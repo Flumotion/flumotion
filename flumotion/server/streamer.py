@@ -30,7 +30,7 @@ from twisted.internet import reactor
 from flumotion.server import component
 from flumotion.utils import gstutils
 
-class Streamer(gobject.GObject, component.ParseLaunchComponent):
+class FakeSinkStreamer(gobject.GObject, component.ParseLaunchComponent):
     __gsignals__ = {
         'data-received' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
                           (gst.Buffer,)),
@@ -79,7 +79,7 @@ class Streamer(gobject.GObject, component.ParseLaunchComponent):
 
     remote_connect = connect_to
         
-gobject.type_register(Streamer)
+gobject.type_register(FakeSinkStreamer)
 
 class StreamingResource(resource.Resource):
     def __init__(self, streamer):
@@ -158,3 +158,20 @@ class StreamingResource(resource.Resource):
         
         return server.NOT_DONE_YET
 
+class FileSinkStreamer(component.ParseLaunchComponent):
+    kind = 'streamer'
+    pipe_template = 'filesink name=sink location="%s"'
+
+    def __init__(self, name, sources, location):
+        self.location = location
+        pipeline = self.pipe_template % location
+        component.ParseLaunchComponent.__init__(self, name, sources, [], pipeline)
+                                                
+
+    # connect() is already taken by gobject.GObject
+    def connect_to(self, sources):
+        self.setup_sources(sources)
+
+        self.pipeline_play()
+
+    remote_connect = connect_to

@@ -61,7 +61,6 @@ def is_port_free(port):
     try:
         fd.bind(('', port))
     except socket.error, e:
-        print e
         return False
     
     return True

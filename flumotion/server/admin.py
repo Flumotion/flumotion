@@ -42,19 +42,37 @@ class AdminPerspective(pbutil.NewCredPerspective):
     def getClients(self):
         return map(ComponentView,
                    self.controller.components.values())
-    
+
+    def componentAdded(self, component):
+        self.mind.callRemote('componentAdded', ComponentView(component))
+        
+    def componentRemoved(self, component):
+        self.mind.callRemote('componentRemoved', ComponentView(component))
+
     def attached(self, mind):
         self.mind = mind
 
         self.mind.callRemote('initial', self.getClients())
 
-    def perspective_hello(self):
-        print 'hello from client'
+    def detached(self, mind):
+        self.mind.callRemote('shutdown')
 
 class Admin(pb.Root):
     def __init__(self, controller):
         self.controller = controller
-
+        self.clients = []
+        
     def getPerspective(self):
-        return AdminPerspective(self.controller)
+        admin = AdminPerspective(self.controller)
+        self.clients.append(admin)
+        return admin
     
+    def componentAdded(self, component):
+        for client in self.clients:
+            client.componentAdded(component)
+
+    def componentRemoved(self, component):
+        for client in self.clients:
+            client.componentRemoved(component)
+
+        

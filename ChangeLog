@@ -1,3 +1,26 @@
+2004-06-24  Johan Dahlin  <johan@gnome.org>
+
+	* conf/complex.conf: New configuration, in preparation
+	for guadec.
+
+	* conf/ogg-test-theora-vorbis.conf: Move encoding of audio and
+	video to separate components.
+
+	* conf/camserv-relay.conf: Add a file streamer
+
+	* flumotion/server/controller.py
+	(ComponentPerspective.callRemote): Catch DeadReferenceError's
+
+	* flumotion/server/launcher.py: updates for file/http streaming
+
+	* flumotion/server/streamer.py (FileSinkStreamer): New streamer
+	(FakeSinkStremaer): Old, renamed.
+
+	* flumotion/gui/adminclient.py: Small updates
+
+	* flumotion/utils/gstutils.py (is_port_free): Don't print socket
+	errors which makes us all very nervous. 
+
 2004-06-22  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/utils/gstutils.py (verbose_deep_notify_cb): Log the

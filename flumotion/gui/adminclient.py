@@ -37,6 +37,7 @@ from flumotion.server import admin   # Register types
 class AdminInterface(pb.Referenceable, gobject.GObject):
     __gsignals__ = {
         'connected' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
+        'update'    : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (object,))
     }
 
     def __init__(self):
@@ -48,9 +49,25 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
     def gotPerspective(self, perspective):
         self.remote = perspective
 
+    def remote_componentAdded(self, component):
+        print 'componentAdded', component
+        print self.clients
+         self.clients.append(component)
+        self.emit('update', self.clients)
+        
+    def remote_componentRemoved(self, component):
+        print 'componentRemoved', component
+        print self.clients
+        self.clients.remove(component)
+        self.emit('update', self.clients)
+        
     def remote_initial(self, clients):
         self.clients = clients
         self.emit('connected')
+
+    def remote_shutdown(self):
+        print 'shutdown'
+        
 gobject.type_register(AdminInterface)
 
 class Window:
@@ -77,10 +94,18 @@ class Window:
         for client in admin.clients:
             iter = self.component_model.append()
             self.component_model.set(iter, 0, client.name)
-            
+
+    def update_cb(self, admin, clients):
+        model = self.component_model
+        model.clear()
+        for client in clients:
+            iter = model.append()
+            model.set(iter, 0, client.name)
+        
     def connect(self, port):
         self.admin = AdminInterface()
         self.admin.connect('connected', self.connected_cb)
+        self.admin.connect('update', self.update_cb)
         reactor.connectTCP('localhost', port, self.admin.factory)
         
     def menu_quit_cb(self, button):

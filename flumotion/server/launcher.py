@@ -47,7 +47,7 @@ from flumotion import errors, twisted
 from flumotion.server.controller import ControllerServerFactory
 from flumotion.server.converter import Converter
 from flumotion.server.producer import Producer
-from flumotion.server.streamer import Streamer, StreamingResource
+from flumotion.server import streamer
 from flumotion.utils import log, gstutils
 
 def set_proc_text(text):
@@ -225,21 +225,28 @@ class Launcher:
             else:
                 sources = []
                 
-            if kind == 'streamer':
-                assert c.has_option(section, 'port')
-                port = c.getint(section, 'port')
-
             if kind == 'producer':
                 self.start(Producer(name, sources, feeds, pipeline))
             elif kind == 'converter':
                 self.start(Converter(name, sources, feeds, pipeline))
             elif kind == 'streamer':
-                component = Streamer(name, sources)
-                resource = StreamingResource(component)
-                factory = server.Site(resource=resource)
-                self.start_streamer(component, factory, port)
+                assert c.has_option(section, 'protocol')
+                protocol = c.get(section, 'protocol')
+                
+                if protocol == 'http':
+                    assert c.has_option(section, 'port')
+                    port = c.getint(section, 'port')
+                    component = streamer.FakeSinkStreamer(name, sources)
+                    factory = server.Site(resource=streamer.StreamingResource(component))
+                    self.start_streamer(component, factory, port)
+                elif protocol == 'file':
+                    assert c.has_option(section, 'location')
+                    location = c.get(section, 'location')
+                    self.start(streamer.FileSinkStreamer(name, sources, location))
+                else:
+                    raise AssertionError, "unknown protocol: %s" % protocol
             else:
-                raise AssertionError
+                raise AssertionError, "unknown component kind: %s" % kind
     
 def get_options_for(kind, args):
     if kind == 'producer':
@@ -323,7 +330,7 @@ def get_options_for(kind, args):
         elif not options.listen_port:
             raise errors.OptionError, 'Need a listen_port'
             return 2
-        
+
     if options.verbose:
         log.enableLogging()
 
@@ -407,8 +414,17 @@ def run_component(name, args):
         klass = Converter
         args = (options.name, options.sources, options.feeds, options.pipeline)
     elif name == 'streamer':
-        klass = Streamer
-        args = (options.name, options.sources)
+        if options.protocol == 'http':
+            web_factory = server.Site(resource=StreamingResource(component))
+            reactor.listenTCP(options.listen_port, web_factory)
+            klass = streamer.FakeSinkStreamer
+            args = (options.name, options.sources)
+        elif options.protocol == 'file':
+            klass = streamer.FileStreamer
+            args = (options.name, options.sources, options.location)
+        else:
+            print 'Only http and file protcol supported right now'
+            return
     else:
         raise AssertionError
         
@@ -420,15 +436,6 @@ def run_component(name, args):
         raise SystemExit
     
     reactor.connectTCP(options.host, options.port, component.factory)
-    
-    if name == 'streamer':
-        if options.protocol == 'http':
-            web_factory = server.Site(resource=StreamingResource(component))
-        else:
-            print 'Only http protcol supported right now'
-            return
-        
-        reactor.listenTCP(options.listen_port, web_factory)
     
     reactor.run()
 
