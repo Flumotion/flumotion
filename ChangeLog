@@ -1,3 +1,21 @@
+2004-10-11  Johan Dahlin  <johan@gnome.org>
+
+	* Makefile.am:
+	* bin/flumotion-admin.in:
+	* bin/flumotion-worker.in:
+	* bin/flumotion.in:
+	* doc/reference/gendoc.py:
+	* flumotion/common/setup.py:
+	* flumotion/config/__init__.py:
+	* flumotion/config/setup.py:
+	* flumotion/test/common.py:
+	* flumotion/tools/show-coverage:
+	
+	Add tool to show coverage. Clean up flumotion.config a little
+	bit. There is now a common function (flumotion.config.setup.setup)
+	to initialize parts, it should probably be made a little bit more
+	flexible, but that's for later
+
 2004-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/ogg-test-theora-bouncer.xml:
