@@ -1,5 +1,11 @@
 2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_checkers.py:
+	* flumotion/twisted/checkers.py:
+	  cred checkers tests and fixes
+
+2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_checkers.py:
 	* flumotion/twisted/checkers.py:

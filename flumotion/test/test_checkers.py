@@ -17,8 +17,11 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 import common
-
 from twisted.trial import unittest
+
+import crypt
+
+from twisted.cred import error
 
 from flumotion.twisted import credentials, checkers
 
@@ -26,10 +29,19 @@ from flumotion.twisted import credentials, checkers
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext
 CredCrypt = credentials.UsernameCryptPasswordCrypt
 
-class TestCryptCheckerAuth(unittest.TestCase):
+class TestCryptCheckerInit(unittest.TestCase):
+    def setUp(self):
+        self.checker = checkers.CryptChecker(user='qi1Lftt0GZC0o')
+
+    def testCredPlaintext(self):
+        cred = CredPlaintext('user', 'test')
+        d = self.checker.requestAvatarId(cred)
+        assert unittest.deferredResult(d) == 'user'
+
+class TestCryptCheckerAddUser(unittest.TestCase):
     def setUp(self):
         username = 'user'
-        cryptPassword = 'qi1Lftt0GZC0o'
+        cryptPassword = crypt.crypt('test', 'qi')
         self.checker = checkers.CryptChecker()
         self.checker.addUser(username, cryptPassword)
 
@@ -37,6 +49,46 @@ class TestCryptCheckerAuth(unittest.TestCase):
         cred = CredPlaintext('user', 'test')
         d = self.checker.requestAvatarId(cred)
         assert unittest.deferredResult(d) == 'user'
+
+    def testCredPlaintextWrongPassword(self):
+        cred = CredPlaintext('user', 'tes')
+        d = self.checker.requestAvatarId(cred)
+        failure = unittest.deferredError(d)
+        failure.trap(error.UnauthorizedLogin)
+
+    def testCredPlaintextWrongUser(self):
+        cred = CredPlaintext('wrong', 'test')
+        # returns a failure immediately
+        failure = self.checker.requestAvatarId(cred)
+        failure.trap(error.UnauthorizedLogin)
+
+    def testCredCrypt(self):
+        crypted = crypt.crypt('test', 'qi')
+        assert crypted == 'qi1Lftt0GZC0o'
+        cred = CredCrypt('user', crypted)
+        d = self.checker.requestAvatarId(cred)
+        assert unittest.deferredResult(d) == 'user'
+
+    def testCredCryptWrongSalt(self):
+        crypted = crypt.crypt('test', 'aa')
+        cred = CredCrypt('user', crypted)
+        d = self.checker.requestAvatarId(cred)
+        failure = unittest.deferredError(d)
+        failure.trap(error.UnauthorizedLogin)
+
+    def testCredCryptWrongPassword(self):
+        crypted = crypt.crypt('wrong', 'qi')
+        cred = CredCrypt('user', crypted)
+        d = self.checker.requestAvatarId(cred)
+        failure = unittest.deferredError(d)
+        failure.trap(error.UnauthorizedLogin)
+
+    def testCredCryptWrongUser(self):
+        crypted = crypt.crypt('test', 'qi')
+        cred = CredCrypt('wronguser', crypted)
+        # this returns a failure immediately
+        failure = self.checker.requestAvatarId(cred)
+        failure.trap(error.UnauthorizedLogin)
 
 if __name__ == '__main__':
      unittest.main()

@@ -15,8 +15,9 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from twisted.cred import checkers
+from twisted.cred import checkers, error
 from twisted.internet import defer
+from twisted.python import failure
 
 from flumotion.common import log
 from flumotion.twisted import credentials
