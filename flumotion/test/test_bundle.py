@@ -20,7 +20,7 @@
 
 from twisted.trial import unittest
 
-from flumotion.common.bundle import Bundle
+from flumotion.common import bundle
 import tempfile
 import os
 import StringIO
@@ -32,23 +32,26 @@ class TestBundle(unittest.TestCase):
     # everything we need to set up the test environment
     def setUp(self):
         self.filename = __file__
-        self.bundle = Bundle(self.filename)
+        self.bundler = bundle.Bundler(self.filename)
 
     # create a bundle of one file and check whether we get the correct
     # md5sum
     def testBundleOneSum(self):
-        sum = self.bundle.md5sum()
+        bundle = self.bundler.bundle()
+        sum = bundle.md5sum
 
     # create a bundle of two files and check the md5sum changed
     def testBundleTwoSum(self):
-        sum = self.bundle.md5sum()
+        bundle = self.bundler.bundle()
+        sum = bundle.md5sum
         
         (handle, path) = tempfile.mkstemp()
         os.write(handle, "a bit of text to test")
         os.close(handle)
-        self.bundle.add(path)
+        self.bundler.add(path)
 
-        newsum = self.bundle.md5sum()
+        bundle = self.bundler.bundle()
+        newsum = bundle.md5sum
         assert newsum != sum
         os.unlink(path)
 
@@ -57,8 +60,9 @@ class TestBundle(unittest.TestCase):
         data = open(self.filename, "r").read()
         md5sum = md5.new(data).hexdigest()
         name = os.path.split(self.filename)[1]
-        sum = self.bundle.md5sum()
-        zip = self.bundle.zip()
+        bundle = self.bundler.bundle()
+        sum = bundle.md5sum
+        zip = bundle.zip
 
         filelike = StringIO.StringIO(zip)
         zip = zipfile.ZipFile(filelike, "r")
@@ -73,17 +77,22 @@ class TestBundle(unittest.TestCase):
     def testBundleTwoFiles(self):
         data = open(self.filename, "r").read()
 
+        # create test file
         (handle, path) = tempfile.mkstemp()
         os.write(handle, "a bit of text to test")
         os.close(handle)
-        self.bundle.add(path)
-        sum = self.bundle.md5sum()
+        self.bundler.add(path)
+        bundle = self.bundler.bundle()
+        sum = bundle.md5sum
 
+        # change the test file
         time.sleep(1) # ... or the timestamp doesn't change
         handle = os.open(path, os.O_WRONLY)
         os.write(handle, "different bit of text")
         os.close(handle)
-        newsum = self.bundle.md5sum()
+        bundle = self.bundler.bundle()
+        newsum = bundle.md5sum
+
         assert newsum != sum
         os.unlink(path)
         

@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_bundle -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
 # Flumotion - a video streaming server
@@ -50,6 +50,66 @@ class BundledFile:
         
 class Bundle:
     """
+    The bundle, which is a zip file with md5sum.
+    """
+    def __init__(self):
+        self.zip = None
+        self.md5sum = None
+
+    def setZip(self, zip):
+        """
+        Set the bundle to the given data representation of the zip file.
+        """
+        self.zip = zip
+        self.md5sum = md5.new(self.zip).hexdigest()
+
+    def getZip(self):
+        """
+        Get the bundle's zip data.
+        """
+        return zip
+        
+class Unbundler:
+    """
+    I unbundle bundles by unpacking them in the given directory
+    under directories with the bundle's md5sum.
+    """
+    def __init__(self, directory):
+        self._undir = directory
+
+    def unbundle(self, bundle):
+        """
+        Unbundle the given bundle.
+
+        @type bundle: L{flumotion.common.bundle.Bundle}
+
+        @rtype: string
+        @rparam: the full path to the directory where it was unpacked
+        """
+        md5sum = bundle.getMD5Sum()
+        dir = os.path.join(self._undir, md5sum)
+        os.path.mkdir(dir)
+
+        filelike = StringIO.StringIO(bundle.getZip())
+        zip = zipfile.ZipFile(filelike, "r")
+        zip.testzip()
+
+        filepaths = zip.namelist()
+        for filepath in filepaths:
+            path = os.path.join(dir, filepath)
+            parent = os.path.split(path)
+            try:
+                os.makedirs(parent)
+            except OSError, err:
+                # Reraise error unless if it's an already existing
+                if err.errno != errno.EEXIST or not os.path.isdir(parent):
+                    raise
+            data = zip.read(filepath)
+            open(path, 'wb').write(data).close()
+        return dir
+        
+class Bundler:
+    """
     A bundle of files useful to handle network caching of a set of files.
     """
     def __init__(self, *files):
@@ -59,8 +119,7 @@ class Bundle:
         @param files: list of files to register in the bundle.
         """
         self._files = {} # dictionary of files registered and md5sum/timestamp
-        self._zip = None # contents of the zip file for this bundle
-        self._md5sum = None # md5sum for the bundle
+        self._bundle = Bundle()
         
         self.add(*files)
 
@@ -71,28 +130,17 @@ class Bundle:
         for filename in files:
             self._files[filename] = BundledFile(filename)
                 
-    def zip(self):
+    def bundle(self):
         """
-        Return the contents of a zip file representing this bundle.
-        """
-        self._update()
-        return self._zip
+        Bundle the files registered with the bundler.
 
-    def md5sum(self):
+        @rtype: L{flumotion.common.bundle.Bundle}
         """
-        Return the 32 character hex md5sum of the zip file for this bundle.
-        """
-        self._update()
-        return md5.new(self._zip).hexdigest()
-
-    ### private methods
-    
-    # rescan files registered in the bundle, and check if we need to
-    # rebuild the internal zip, returns True if it was updated
-    def _update(self):
-        if not self._zip:
-            self._buildzip()
-            return True
+        # rescan files registered in the bundle, and check if we need to
+        # rebuild the internal zip
+        if not self._bundle.getZip():
+            self._bundle.setZip(self._buildzip())
+            return self._bundle
 
         update = False
         for file in self._files.values():
@@ -110,11 +158,12 @@ class Bundle:
                 update = True
             
         if update:
-            self._buildzip()
-            
-        return update
+            self._bundle.setZip(self._buildzip())
+
+        return self._bundle
             
     # build the zip file containing the files registered in the bundle
+    # and return the zip file data
     def _buildzip(self):
         filelike = StringIO.StringIO()
         zip = zipfile.ZipFile(filelike, "w")
@@ -123,6 +172,7 @@ class Bundle:
             name = os.path.split(file)[1]
             zip.write(file, name)
         zip.close()    
-        self._zip = filelike.getvalue()
+        data = filelike.getvalue()
         filelike.close()
+        return data
     

@@ -1,3 +1,9 @@
+2004-09-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/bundle.py:
+	* flumotion/test/test_bundle.py:
+	  rework bundle to also have unbundler
+
 2004-09-14  Johan Dahlin  <johan@gnome.org>
 
 	* bin/runtest.in (olddir): script to run tests
