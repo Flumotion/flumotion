@@ -89,9 +89,10 @@ class Bundle:
     """
     I am a bundle of files, represented by a zip file and md5sum.
     """
-    def __init__(self):
+    def __init__(self, name):
         self.zip = None
         self.md5sum = None
+        self.name = name
 
     def setZip(self, zip):
         """
@@ -114,6 +115,19 @@ class Unbundler:
     def __init__(self, directory):
         self._undir = directory
 
+    def unbundlePathByInfo(self, name, md5sum):
+        """
+        Return the full path where a bundle with the given name and md5sum
+        would be unbundled to.
+        """
+        return os.path.join(self._undir, name, md5sum)
+
+    def unbundlePath(self, bundle):
+        """
+        Return the full path where this bundle will/would be unbundled to.
+        """
+        return self.unbundlePathByInfo(bundle.name, bundle.md5sum)
+
     def unbundle(self, bundle):
         """
         Unbundle the given bundle.
@@ -123,8 +137,7 @@ class Unbundler:
         @rtype: string
         @returns: the full path to the directory where it was unpacked
         """
-        md5sum = bundle.md5sum
-        dir = os.path.join(self._undir, md5sum)
+        dir = self.unbundlePath(bundle)
 
         filelike = StringIO.StringIO(bundle.getZip())
         zip = zipfile.ZipFile(filelike, "r")
@@ -150,12 +163,13 @@ class Bundler:
     """
     I bundle files into a bundle so they can be cached remotely easily.
     """
-    def __init__(self):
+    def __init__(self, name):
         """
         Create a new bundle.
         """
         self._files = {} # dictionary of BundledFile's indexed on path
-        self._bundle = Bundle()
+        self.name = name
+        self._bundle = Bundle(name)
         
     def add(self, source, destination = None):
         """
@@ -234,7 +248,7 @@ class BundlerBasket:
         """
         # get the bundler and create it if need be
         if not bundleName in self._bundlers.keys():
-            bundler = Bundler()
+            bundler = Bundler(bundleName)
             self._bundlers[bundleName] = bundler
         else:
             bundler = self._bundlers[bundleName]

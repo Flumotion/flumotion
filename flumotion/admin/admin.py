@@ -75,6 +75,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.remote = None
 
         self._views = [] # all UI views I am serving
+        self._unbundler = bundle.Unbundler(configure.cachedir)
 
         self.clientFactory = fpb.ReconnectingFPBClientFactory()
         self.__gobject_init__()
@@ -379,7 +380,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             self.debug('_getBundleSumsCallback: %d sums received' % len(sums))
 
             # get path where entry bundle is stored
-            entryPath = os.path.join(configure.cachedir, entrySum)
+            entryPath = self._unbundler.unbundlePathByInfo(entryName, entrySum)
 
             # check which zips to request from manager
             cachedPaths = [] # list of cached paths to register later
@@ -419,6 +420,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             # list of dependencies from lowest to highest and register
             # package paths in the correct order; since we need to
             # register package paths one by one for the namedAny's
+            # FIXME: missing can contain duplicate entries, remove ?
             for name in missing:
                 if name not in result.keys():
                     msg = "Missing bundle %s was not received" % name
@@ -426,10 +428,9 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                     raise errors.NoBundleError(msg)
 
                 zip = result[name]
-                b = bundle.Bundle()
+                b = bundle.Bundle(name)
                 b.setZip(zip)
-                unbundler = bundle.Unbundler(configure.cachedir)
-                dir = unbundler.unbundle(b)
+                dir = self._unbundler.unbundle(b)
                 self.debug("unpacked bundle %s to dir %s" % (name, dir))
                 self.debug("unpacked bundle %s, registering PackagePath %s" % (
                     dir, name))
@@ -470,7 +471,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                 bundleName))
 
             # get path where this bundle is cached
-            cachePath = os.path.join(configure.cachedir, bundleSum)
+            cachePath = self._unbundler.unbundlePathByInfo(bundleName,
+                bundleSum)
 
             if not os.path.exists(cachePath):
                 self.debug('_getBundleSumsCallback: requesting zip %s' %
@@ -490,8 +492,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             zip = result[bundleName]
             b = bundle.Bundle()
             b.setZip(zip)
-            unbundler = bundle.Unbundler(configure.cachedir)
-            dir = unbundler.unbundle(b)
+            dir = self._unbundler.unbundle(b)
             self.debug("unpacked %s to dir %s" % (name, dir))
 
             return os.path.join(dir, bundledPath)

@@ -40,7 +40,7 @@ class TestBundler(unittest.TestCase):
 
         # create a bundle for it
         name = os.path.split(self.filename)[1]
-        self.bundler = bundle.Bundler()
+        self.bundler = bundle.Bundler("test")
         self.bundler.add(self.filename, name)
 
     def tearDown(self):
@@ -130,7 +130,7 @@ class TestUnbundler(unittest.TestCase):
         os.system("rm -r %s" % self.tempdir)
 
     def testUnbundler(self):
-        bundler = bundle.Bundler()
+        bundler = bundle.Bundler("test")
         bundler.add(self.filename)
         b = bundler.bundle()
 
@@ -148,7 +148,7 @@ class TestUnbundler(unittest.TestCase):
         self.assertEquals(one, two)
 
     def testUnbundlerRelative(self):
-        bundler = bundle.Bundler()
+        bundler = bundle.Bundler("test")
         bundler.add(self.filename, 'this/is/a/test.py')
         b = bundler.bundle()
         unbundler = bundle.Unbundler(self.tempdir)
