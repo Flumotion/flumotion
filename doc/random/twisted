@@ -1,0 +1,16 @@
+Twisted programming notes
+-------------------------
+
+Failures
+--------
+- errbacks that "handle" the failure and don't want further errbacks should
+  return None
+- errbacks that want to reraise the failure just return failure;
+  a failure that gets returned from a remote server to a different remote
+  client will print a superfluous twisted line:
+  Traceback from remote host -- Traceback unavailable
+- use which = failure.trap(list of exceptions) to catch multiple known
+- use failure.check() to switch on the type and have a general fallback
+- use failure.getErrorMessage() to print a readable message
+- use failure.value to get the value the original exception was created with
+- use failure.type to get the class of exception this failure wraps

@@ -3,9 +3,24 @@ Writing a component
 
 - the actual component
   - create registry .xml file for this component
+  - create a component
+  - if you create a medium, set the component's component_medium_class attr
 
 - admin UI pages
   - create admin_gtk.py
   - subclass from base AdminGtk
   - possibly add entry point to <component> entry in registry file
   - add a bundle for it with this entry point, adding all dependencies
+
+
+How communication works
+-----------------------
+- an admin client asks for a bundle with the entrypoint (e.g. 'admin/gtk')
+- admin loads the bundle and creates an object given the entry constructor
+- this object should get .setup() called to prepare nodes
+- this object supports getNodes() which returns a dict of node names -> nodes
+- a node has a .render() method which asks the widget to render itself
+  and returns a deferred widget
+
+- a node can call remote methods to the component using self.callRemote()
+- a node can call on effects in the component using self.callRemote('effect'
