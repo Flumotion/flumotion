@@ -322,6 +322,7 @@ class Window(log.Loggable, gobject.GObject):
 
     # menubar/toolbar callbacks
     def file_new_cb(self, button):
+        from flumotion.wizard import wizard
         # XXX: This need to be able to run twice
         def _wizard_finished_cb(wizard, configuration):
             wizard.hide()
@@ -330,6 +331,7 @@ class Window(log.Loggable, gobject.GObject):
 
         wiz = wizard.Wizard(self.admin)
         wiz.connect('finished', _wizard_finished_cb)
+        wiz.load_steps()
         wiz.run(True, self.admin.getWorkers(), main=False)
     
     def file_open_cb(self, button):
