@@ -4,6 +4,7 @@ EXTRA_DIST = 				\
 	test.xml			\
 	__init__.py			\
 	common.py			\
+	gtkunit.py			\
 	test_bundle.py 			\
 	test_checkers.py 		\
 	test_common.py 			\
