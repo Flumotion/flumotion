@@ -74,11 +74,15 @@ class Acquisition(pb.Referenceable):
                                              orig.get_property(pspec.name)))
 
     def pipeline_pause(self):
-        self.pipeline.set_state(gst.STATE_PAUSED)
+        retval = self.pipeline.set_state(gst.STATE_PAUSED)
+        if not retval:
+            log.msg('Changing state to PLAYING failed')
         gobject.idle_add(self.pipeline_iterate)
         
     def pipeline_play(self):
-        self.pipeline.set_state(gst.STATE_PLAYING)
+        retval = self.pipeline.set_state(gst.STATE_PLAYING)
+        if not retval:
+            log.msg('Changing state to PLAYING failed')
         gobject.idle_add(self.pipeline_iterate)
         
     def pipeline_iterate(self):

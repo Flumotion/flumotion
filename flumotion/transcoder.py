@@ -87,15 +87,15 @@ class Transcoder(pb.Referenceable):
         self.reframer = gst.element_factory_make('videoreframer')
 
     def remote_listen(self, port, caps):
-        log.msg('listen called with %d %s' % (port, caps))
-
+        log.msg('listen called with port=%d caps=%s' % (port, caps))
         self.src.set_property('port', port)
         self.pipeline.add_many(self.src, self.reframer, self.sink)
         self.src.link(self.reframer)
         self.reframer.link_filtered(self.sink, gst.caps_from_string(caps))
 
         reactor.callLater(0, self.pipeline_play)
-    
+        log.msg('returning from listen')
+        
 def parseHostString(string, port=8890):
     if not string:
         return 'localhost', port

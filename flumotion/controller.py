@@ -62,6 +62,7 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
         self.controller = controller
         self.username = username
         self.caps = None
+        self.state = gst.STATE_NULL
         
     def __repr__(self):
         return '<AcquisitionPerspective for %s>' % self.username
@@ -86,7 +87,8 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
                 (self.username,
                  gst.element_state_get_name(old),
                  gst.element_state_get_name(state)))
-
+        self.state = state
+        
     def perspective_notifyCaps(self, caps):
         log.msg('%s.notifyCaps %s' % (self.username, caps))
         self.caps = caps
@@ -99,6 +101,7 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
+        self.state = gst.STATE_NULL
         
     def __repr__(self):
         return '<TranscoderPerspective for %s>' % self.username
@@ -124,7 +127,8 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
                 (self.username,
                  gst.element_state_get_name(old),
                  gst.element_state_get_name(state)))
-
+        self.state = state
+        
     def perspective_error(self, element, error):
         log.msg('%s.error element=%s string=%s' % (self.username, element, error))
         
@@ -176,7 +180,10 @@ class Controller(pb.Root):
     def link(self, acq, trans):
         obj = trans.mind.callRemote('listen', 5500, acq.getCaps())
         proto, hostname, port = trans.getPeer()
-        def listenDone(obj):
+        def listenDone(obj=None):
+            assert trans.state != gst.STATE_PLAYING, \
+                   gst.element_state_get_name(trans.state)
+            
             acq.mind.callRemote('connect', hostname, 5500)
         obj.addCallback(listenDone)
             
