@@ -525,13 +525,9 @@ class ParseLaunchComponent(FeedComponent):
         if pipeline == '' and not eater_names:
             raise TypeError, "Need a pipeline or a eater"
 
-        need_sink = True
         if pipeline == '':
             assert eater_names
             pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
-            need_sink = False
-        elif pipeline.find('name=sink') != -1:
-            need_sink = False
             
         # we expand the pipeline based on the templates and eater/feeder names
         # elements are named eater:(source_component_name):(feed_name)
