@@ -38,6 +38,7 @@
 	  <property name="active">True</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
+	  <signal name="toggled" handler="on_checkbutton_show_text_toggled" last_modification_time="Sun, 17 Oct 2004 09:37:33 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>
@@ -74,7 +75,6 @@
       <child>
 	<widget class="GtkEntry" id="entry_text">
 	  <property name="visible">True</property>
-	  <property name="sensitive">False</property>
 	  <property name="can_focus">True</property>
 	  <property name="editable">True</property>
 	  <property name="visibility">True</property>

@@ -169,10 +169,8 @@ class Overlay(wizard.WizardStep):
     component_type = 'overlay'
     icon = 'overlay.png'
     
-    def setup(self):
-        # XXX: Remove
-        self.checkbutton_show_logo.set_active(True)
-        self.checkbutton_show_text.set_active(True)
+    def on_checkbutton_show_text_toggled(self, button):
+        self.entry_text.set_sensitive(button.get_active())
 
     def get_component_properties(self):
         options = {}
@@ -638,6 +636,7 @@ class Licence(wizard.WizardStep):
     step_name = "Content License"
     glade_file = "wizard_license.glade"
     section = 'License'
+    section_name = 'License'
     icon = 'licenses.png'
     def setup(self):
         self.combobox_license.set_enum(LicenseType)

@@ -59,6 +59,7 @@ class Component:
 class WizardSaver:
     def __init__(self, wizard):
         self.wizard = wizard
+
     def getVideoSource(self):
         options = self.wizard.get_step_options('Source')
         source = options['video']
@@ -66,21 +67,22 @@ class WizardSaver:
         return Component('video-source', source.component_type,
                          video_step.get_component_properties())
 
-    def getVideoOverlay(self):
+    def getVideoOverlay(self, show_logo):
         # At this point we already know that we should overlay something
         step = self.wizard['Overlay']
-        properties = step.get_component_properties()
-        properties['fluendo_logo'] = True
-        encoding_options = self.wizard.get_step_options('Encoding')
-        if (encoding_options['format'] == EncodingFormat.Ogg or
-            encoding_options['video'] == EncodingVideo.Theora or
-            encoding_options['audio'] in (EncodingAudio.Vorbis,
-                                          EncodingAudio.Speex)):
-            properties['xiph_logo'] = True
-            
-        license_options = self.wizard.get_step_options('Content License')
-        if license_options['license'] == LicenseType.CC:
-            properties['cc_logo'] = True
+        if show_logo:
+            properties = step.get_component_properties()
+            properties['fluendo_logo'] = True
+            encoding_options = self.wizard.get_step_options('Encoding')
+            if (encoding_options['format'] == EncodingFormat.Ogg or
+                encoding_options['video'] == EncodingVideo.Theora or
+                encoding_options['audio'] in (EncodingAudio.Vorbis,
+                                              EncodingAudio.Speex)):
+                properties['xiph_logo'] = True
+
+            license_options = self.wizard.get_step_options('Content License')
+            if license_options['license'] == LicenseType.CC:
+                properties['cc_logo'] = True
     
         return Component('video-overlay', 'overlay', properties)
         
@@ -131,7 +133,7 @@ class WizardSaver:
         video_encoder = self.getVideoEncoder()
             
         if has_overlay:
-            video_overlay = self.getVideoOverlay()
+            video_overlay = self.getVideoOverlay(overlay_options['show_logo'])
             components.append(video_overlay)
                 
         if video_overlay is not None:
