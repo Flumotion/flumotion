@@ -330,9 +330,14 @@ class ComponentAvatar(common.ManagerAvatar):
         return failure
 
     def attached(self, mind):
+        self.info('component "%s" logged in' % self.avatarId)
         common.ManagerAvatar.attached(self, mind) # sets self.mind
         self.debug('mind %r attached, calling remote _getState()' % self.mind)
         self._getState()
+
+    def detached(self, mind):
+        self.info('component "%s" logged out' % self.avatarId)
+        common.ManagerAvatar.detached(self, mind)
         
     def _getState(self):
         d = self.mindCallRemote('getState')
@@ -358,6 +363,17 @@ class ComponentAvatar(common.ManagerAvatar):
     # state change listener
     def stateChanged(self, state, key, value):
         self.debug("state change on %r: %s now %r" % (state, key, value))
+        if key == 'mood':
+            # FIXME: proper enum
+            names = {
+                moods.HAPPY:    'happy',
+                moods.SAD:      'sad',
+                moods.HUNGRY:   'hungry',
+                moods.WAKING:   'waking',
+                moods.SLEEPING: 'sleeping',
+                moods.LOST:     'lost',
+            }
+            self.info('Mood changed to %s' % names[value])
                 
     def _mindPipelineErrback(self, failure):
         failure.trap(errors.PipelineParseError)
@@ -593,7 +609,7 @@ class ComponentAvatar(common.ManagerAvatar):
         self._gstState = state
         
         if state == gst.STATE_PLAYING:
-            self.info('%r is now playing' % self)
+            self.debug('%r is now playing' % self)
             self.checkFeedReady(feedName)
             
     def perspective_error(self, element, error):

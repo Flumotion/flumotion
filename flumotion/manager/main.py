@@ -230,6 +230,7 @@ def main(args):
         common.writePidFile('manager', options.name)
 
     # go into the reactor main loop
+    log.info('manager', 'Started manager "%s"' % options.name)
     reactor.run()
 
     # we exited, so we're done

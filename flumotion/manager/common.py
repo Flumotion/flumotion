@@ -110,6 +110,9 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         """
         Tell the avatar that the peer's client referenced by the mind
         has detached.
+
+        Called through the manager's PB logout trigger calling
+        L{flumotion.manager.manager.Dispatcher.removeAvatar}
         """
         assert(self.mind == mind)
         self.debug('Client from %s detached' % self.getClientAddress())

@@ -87,6 +87,11 @@ class Dispatcher(log.Loggable):
     ### our methods
 
     def removeAvatar(self, avatarId, avatar, mind):
+        """
+        Remove an avatar because it logged out of the manager.
+        
+        This function is registered by requestAvatar.
+        """
         heaven = self._avatarHeavens[avatarId]
         del self._avatarHeavens[avatarId]
         
@@ -182,7 +187,7 @@ class Vishnu(log.Loggable):
             import flumotion.worker.job
             self.setBouncer(flumotion.worker.job.getComponent(configDict, defs))
             self.bouncer.debug('started')
-            log.info('manager', 'Started manager bouncer')
+            log.info('manager', "Started manager's bouncer")
 
         # make the worker heaven and component heaven
         # load the configuration as well

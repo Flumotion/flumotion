@@ -44,9 +44,15 @@ class WorkerAvatar(common.ManagerAvatar):
         return self.avatarId
 
     def attached(self, mind):
+        self.info('worker "%s" logged in' % self.getName())
         common.ManagerAvatar.attached(self, mind)
-
         self.heaven.workerAttached(self)
+
+    def detached(self, mind):
+        self.info('worker "%s" logged out' % self.getName())
+        common.ManagerAvatar.detached(self, mind)
+        # FIXME: heaven.workerDetached ?
+        # FIXME: rename heaven methods to avatarDetached, move to base ?
     
     def start(self, name, type, config):
         """
@@ -105,7 +111,6 @@ class WorkerHeaven(common.ManagerHeaven):
        
     def workerAttached(self, workerAvatar):
         # called when the mind is attached, ie the worker logged in
-        self.info('worker "%s" logged in' % workerAvatar.getName())
         
         # get all components that are supposed to start on this worker
         workerName = workerAvatar.getName()

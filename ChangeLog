@@ -1,5 +1,17 @@
 2004-12-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_testsource.glade:
+	  don't use F for key access
+	* flumotion/manager/admin.py:
+	* flumotion/manager/common.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	  cleanup of INFO level
+
+2004-12-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/image/Makefile.am:
 	* data/image/mood-happy.png:
 	* data/image/mood-hungry.png:
