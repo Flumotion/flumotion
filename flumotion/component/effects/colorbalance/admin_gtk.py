@@ -104,9 +104,10 @@ class ColorbalanceAdminGtkNode(admin_gtk.EffectAdminGtkNode):
             label = "Brightness"
         if widget == self.scale_contrast or widget == self.spinbutton_contrast:
             label = "Contrast"
-        log.debug('changing colorbalance %s to %f' % (label, value))
+        self.debug('changing colorbalance %s to %f' % (label, value))
         # we do a first propertyChanged so the spinbutton and scale are synced
         self.propertyChanged(label, value)
+        self.debug('informing effect of change')
         d = self.effectCallRemote("setColorBalanceProperty", label, value)
         d.addErrback(self.colorbalanceChangeErrback, label)
         d.addCallback(self.colorbalanceChangeCallback, label)
@@ -118,8 +119,9 @@ class ColorbalanceAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     def colorbalanceChangeCallback(self, result, label):
         self.debug("remote replied colorbalance %s changed to %f" % (
             label, result))
-        # we do a second propertyChanged so both are synced to the result
-        self.propertyChanged(label, result)
+        # a notify from the effect through the manager will already set it
+        # for us, so we can leave it as handled
+        # self.propertyChanged(label, result)
 
     def propertyChanged(self, name, value):
         self.debug('syncing colorbance property %s to %f' % (name, value))

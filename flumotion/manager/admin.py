@@ -34,6 +34,7 @@ from flumotion.manager import common
 from flumotion.common import errors, interfaces, log
 from flumotion.common.registry import registry
 
+# FIXME: do this with remote cache or something similar
 class ComponentView(pb.Copyable):
     """
     I present state of a component through a L{RemoteComponentView} in the peer.
@@ -149,7 +150,7 @@ class AdminAvatar(common.ManagerAvatar):
         raise SystemExit
 
     # Generic interface to call into a component
-    def perspective_componentCallRemote(self, componentName, method_name,
+    def perspective_componentCallRemote(self, componentName, methodName,
                                         *args, **kwargs):
         component = self.vishnu.componentHeaven.getComponent(componentName)
         
@@ -157,9 +158,10 @@ class AdminAvatar(common.ManagerAvatar):
         # admin interface can call on a component
         
         try:
-            return component.mindCallRemote(method_name, *args, **kwargs)
+            return component.mindCallRemote(methodName, *args, **kwargs)
         except Exception, e:
-            self.warning("exception on remote call: %s" % str(e))
+            msg = "exception on remote call %s: %s" % (methodName, str(e))
+            self.warning(msg)
             return failure.Failure(errors.RemoteMethodError(str(e)))
 
     def perspective_workerCallRemote(self, workerName, methodName,
@@ -357,4 +359,13 @@ class AdminHeaven(common.ManagerHeaven):
         
         for avatar in self.getAvatars():
             avatar.uiStateChanged(name, state)
-        
+
+    def avatarsCallRemote(self, methodName, *args, **kwargs):
+        """
+        Call a remote method on all AdminAvatars in this heaven.
+
+        @type methodName: string
+        """
+        for avatar in self.getAvatars():
+            avatar.mindCallRemote(methodName, *args, **kwargs)
+  

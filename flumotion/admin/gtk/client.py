@@ -116,7 +116,36 @@ class Window(log.Loggable, gobject.GObject):
         self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
                                             # disconnected
+
+    ### connection to manager, called from constructor
+    def _connectToManager(self, host, port, transport, username, password):
+        'connect to manager using given options.  Called by __init__'
         
+        # FIXME: someone else should create the model and then set us as a
+        # view on it
+        self.admin = AdminModel(username, password)
+        self.admin.connect('connected', self.admin_connected_cb)
+        self.admin.connect('disconnected', self.admin_disconnected_cb)
+        self.admin.connect('connection-refused',
+                           self.admin_connection_refused_cb, host, port)
+        self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
+        self.admin.connect('component-property-changed',
+            self.property_changed_cb)
+        self.admin.connect('update', self.admin_update_cb)
+        self.admin.addView(self)
+
+        if transport == "ssl":
+            from twisted.internet import ssl
+            self.info('Connecting to manager %s:%d with SSL' % (host, port))
+            reactor.connectSSL(host, port, self.admin.clientFactory,
+                               ssl.ClientContextFactory())
+        elif transport == "tcp":
+            self.info('Connecting to manager %s:%d with TCP' % (host, port))
+            reactor.connectTCP(host, port, self.admin.clientFactory)
+        else:
+            self.error("Unknown transport protocol %s" % transport)
+        
+    
     # default Errback
     def _defaultErrback(self, failure):
         self.warning('Errback: unhandled failure: %s' % failure.getErrorMessage())
@@ -291,8 +320,42 @@ class Window(log.Loggable, gobject.GObject):
         d.show_all()
         return d
 
-    ### glade callbacks
+    ### IAdminView interface methods: FIXME: create interface somewhere
+    def componentCall(self, componentName, methodName, *args, **kwargs):
+        # FIXME: for now, we only allow calls to go through that have
+        # their UI currently displayed.  In the future, maybe we want
+        # to create all UI's at startup regardless and allow all messages
+        # to be processed, since they're here now anyway   
+        self.debug("componentCall received for %s.%s ..." % (
+            componentName, methodName))
+        name = self.get_selected_component_name()
+        if not name:
+            self.debug("... but no component selected")
+            return
+        if componentName != name:
+            self.debug("... but component is not displayed")
+            return
+        
+        localMethodName = "component_%s" % methodName
+        if not hasattr(self.current_component, localMethodName):
+            self.debug("... but does not have method %s" % localMethodName)
+            self.warning("Component %s does not implement %s" % localMethodName)
+            return
+        self.debug("... and executing")
+        method = getattr(self.current_component, localMethodName)
 
+        # call the method, catching all sorts of stuff
+        try:
+            result = method(*args, **kwargs)
+        except TypeError:
+            msg = "component method %s did not accept %s and %s" % (
+                methodName, args, kwargs)
+            self.debug(msg)
+            raise errors.RemoteRunError(msg)
+        self.debug("component: returning result: %r to caller" % result)
+        return result
+
+    ### glade callbacks
     def component_view_row_activated_cb(self, *args):
         name = self.get_selected_component_name()
 
@@ -388,31 +451,6 @@ class Window(log.Loggable, gobject.GObject):
     def admin_update_cb(self, admin):
         self.update_components()
 
-    ### functions
-
-    def _connectToManager(self, host, port, transport, username, password):
-        'connect to manager using given options.  Called by __init__'
-        self.admin = AdminModel(username, password)
-        self.admin.connect('connected', self.admin_connected_cb)
-        self.admin.connect('disconnected', self.admin_disconnected_cb)
-        self.admin.connect('connection-refused',
-                           self.admin_connection_refused_cb, host, port)
-        self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
-        self.admin.connect('component-property-changed',
-            self.property_changed_cb)
-        self.admin.connect('update', self.admin_update_cb)
-
-        if transport == "ssl":
-            from twisted.internet import ssl
-            self.info('Connecting to manager %s:%d with SSL' % (host, port))
-            reactor.connectSSL(host, port, self.admin.clientFactory,
-                               ssl.ClientContextFactory())
-        elif transport == "tcp":
-            self.info('Connecting to manager %s:%d with TCP' % (host, port))
-            reactor.connectTCP(host, port, self.admin.clientFactory)
-        else:
-            self.error("Unknown transport protocol %s" % transport)
-        
     def update_components(self):
         model = self.component_model
         model.clear()

@@ -1,5 +1,19 @@
 2004-12-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/component.py:
+	* flumotion/component/effects/colorbalance/admin_gtk.py:
+	* flumotion/component/effects/colorbalance/colorbalance.py:
+	* flumotion/component/producers/bttv/admin_gtk.py:
+	* flumotion/component/producers/webcam/admin_gtk.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	  proxy methods generically from a component or effect to the
+	  admin-side views representing them
+
+2004-12-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/documenting:
 	  add some doc notes
 	* doc/reference/Makefile.am:

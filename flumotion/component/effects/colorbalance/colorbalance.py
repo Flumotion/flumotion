@@ -71,8 +71,8 @@ class Colorbalance(feedcomponent.Effect):
                     self.warning("effect %s doesn't have a component" %
                         self.name)
                 else:
-                    self.component.effectPropertyChanged(self.name, which,
-                        percent)
+                    self.component.adminCallRemote("effectPropertyChanged",
+                        self.name, which, percent)
                 return percent
 
         # didn't find it

@@ -74,6 +74,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         
         self.remote = None
 
+        self._views = [] # all UI views I am serving
+
         self.clientFactory = fpb.ReconnectingFPBClientFactory()
         self.__gobject_init__()
         # 20 secs max for an admin to reconnect
@@ -161,6 +163,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     def remote_log(self, category, type, message):
         self.log('remote: %s: %s: %s' % (type, category, message))
         
+    def remote_componentCall(self, componentName, methodName, *args, **kwargs):
+        for view in self._views:
+            view.componentCall(componentName, methodName, *args, **kwargs)
+
     def remote_componentAdded(self, component):
         self.debug('componentAdded %s' % component.name)
         self._components[component.name] = component
@@ -219,6 +225,23 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         
     ### model functions; called by UI's to send requests to manager or comp
 
+    ## view management functions
+    def addView(self, view):
+        # FIXME: implement an IAdminView interface
+        """
+        Add a view as a client to the model.
+        """
+        if not view in self._views:
+            self._views.append(view)
+
+    def removeView(self, view):
+        # FIXME: implement an IAdminView interface
+        """
+        Remove a view as a client to the model.
+        """
+        if view in self._views:
+            self._views.remove(view)
+        
     ## generic remote call methods
     def callRemote(self, methodName, *args, **kwargs):
         """

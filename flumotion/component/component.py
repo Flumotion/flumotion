@@ -282,4 +282,14 @@ class BaseComponent(log.Loggable, gobject.GObject):
         assert isinstance(medium, BaseComponentMedium)
         self.medium = medium
 
+    def adminCallRemote(self, methodName, *args, **kwargs):
+        """
+        Call a remote method on all admin client views on this component.
+
+        This gets serialized through the manager and multiplexed to all
+        admin clients, and from there on to all views connected to each
+        admin client model.
+        """
+        self.medium.callRemote("adminCallRemote", methodName, *args, **kwargs)
+
 gobject.type_register(BaseComponent)
