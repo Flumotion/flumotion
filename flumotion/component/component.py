@@ -32,7 +32,7 @@ class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
     def __init__(self, component):
         """
-        @param component: L{flumotion.twisted.component.component.BaseComponent}
+        @param component: L{flumotion.component.component.BaseComponent}
         """
         # doing this as a class method triggers a doc error
         super_init = pbutil.ReconnectingPBClientFactory.__init__

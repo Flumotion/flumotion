@@ -670,7 +670,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
 
         @type name:  string
         @param name: name of the component
-        @rtype:      L{flumotion.twisted.manager.ComponentAvatar}
+        @rtype:      L{flumotion.manager.component.ComponentAvatar}
         @returns:    the component avatar
         """
 
