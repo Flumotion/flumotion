@@ -26,31 +26,6 @@ Interfaces used in Flumotion.
 
 from twisted.python import components
 
-# TODO: Hash types (MD5, crypt, SHA)
-
-class IClientKeycard(components.Interface):
-
-    def getUsername(self):
-        "returns the username"
-
-    def getPassword(self):
-        "returns the password"
-
-    def getIP(self):
-        "returns the client ip"
-
-class IAuthenticate(components.Interface):
-    
-    def setDomain(self, domain):
-        "sets the domain of the authenticator"
-
-    def getDomain(self):
-        "returns the domain"
-        
-    def authenticate(self, card):
-        "authenticates a card, must be a IClientKeycard implementor"
-
-
 # FIXME: create a base class that implements setRemoteReference
 # since they're the same in all
 class IMedium(components.Interface):
@@ -107,6 +82,9 @@ class IJobMedium(IMedium):
     pass
 
 class IHeaven(components.Interface):
+    """
+    My implementors manage avatars logging in to the manager.
+    """
     def createAvatar(self, avatarId):
         """
         Creates a new avatar matching the type of heaven.
@@ -120,19 +98,3 @@ class IHeaven(components.Interface):
         """
         Remove the avatar with the given Id from the heaven.
         """
-    
-class INewCredPerspective(components.Interface):
-    def attached(self, mind):
-        """
-        Attaches a mind
-
-        @type mind: PB Broker
-        """
-
-    def detached(self, mind):
-        """
-        Detaches a mind
-
-        @type mind: PB Broker
-        """
-

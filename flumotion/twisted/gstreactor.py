@@ -230,7 +230,8 @@ class GstReactor(default.PosixReactorBase):
 
 
 def install():
-    """Configure the twisted mainloop to be run inside the gtk mainloop.
+    """
+    Configure the twisted mainloop to be run inside the gtk mainloop.
     """
     reactor = GstReactor()
     from twisted.internet.main import installReactor

@@ -53,6 +53,10 @@ from flumotion.twisted import credentials as fcredentials
 # with, or you can login without a username
 
 class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
+    """
+    I am an extended Perspective Broker client factory using generic
+    keycards for login.
+    """
     logcategory = "FPBClientFactory"
 
     def login(self, keycard, client=None, *interfaces):

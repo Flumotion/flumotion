@@ -182,20 +182,25 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     os.dup2(se.fileno(), sys.stderr.fileno())
 
 def argRepr(args=(), kwargs={}, max=-1):
-    ### FIXME: Johan, please comment functions, this is meaningless
+    """
+    Return a string representing the given args.
+    """
+    # FIXME: rename function
+    # FIXME: implement max
+    
+    # check validity of input
     assert (type(args) is tuple or
             type(args) is list)
     assert type(kwargs) is dict
     
+    s = ''
     args = list(args)
 
-    s = ''
     if args:
         args = map(repr, args)
         s += ', '.join(args)
     
     if kwargs:
-        
         r = [(key + '=' + repr(item))
                 for key, item in kwargs.items()]
 
@@ -213,8 +218,6 @@ def _listRecursively(path):
     @param path: the path
     @type  path: string
     """
-
-    
     retval = []
     if not os.path.isdir(path):
         return retval
@@ -416,4 +419,3 @@ def waitForKill():
  
     waiter = Waiter()
     waiter.sleep()
- 

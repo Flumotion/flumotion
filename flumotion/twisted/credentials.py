@@ -21,6 +21,10 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Flumotion Twisted credentials
+"""
+
 import crypt
 import md5
 import random
@@ -29,6 +33,9 @@ from flumotion.common import log
 from twisted.cred import credentials
 
 class Username:
+    """
+    I am your average username and password credentials.
+    """
     __implements__ = (credentials.IUsernamePassword, )
     def __init__(self, username, password=''):
         self.username = username

@@ -409,7 +409,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         error_code = http.UNAUTHORIZED
         request.setResponseCode(error_code)
         
-        # we have to write data ourselves, since we already returned NOT_DONE_YET
+        # we have to write data ourselves,
+        # since we already returned NOT_DONE_YET
         html = ERROR_TEMPLATE % {'code': error_code,
                                  'error': http.RESPONSES[error_code]}
         request.write(html)

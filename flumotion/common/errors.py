@@ -29,7 +29,7 @@ Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 from twisted.spread import pb
 
 class OptionError(Exception):
-    pass
+    "Error in options"
 
 # connection errors
 class ConnectionError(pb.Error):

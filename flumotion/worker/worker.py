@@ -215,8 +215,10 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         self.debug('remote_runCode: returning deferred')
         return deferred
 
-    
 class Kid:
+    """
+    I am an abstraction of a job process started by the worker.
+    """
     def __init__(self, pid, name, type, config):
         self.pid = pid 
         self.name = name
@@ -427,8 +429,10 @@ class WorkerBrain(log.Loggable):
 
         self.debug("_SIGTERMHandler: done")
  
-
 class JobDispatcher:
+    """
+    I am a Realm inside the worker for forked jobs to log in to.
+    """
     __implements__ = portal.IRealm
     
     def __init__(self, root):
@@ -449,8 +453,6 @@ class JobDispatcher:
         else:
             raise NotImplementedError("no interface")
 
-
-
 class Port:
     """
     I am an abstraction of a local TCP port which will be used by GStreamer.
@@ -477,8 +479,6 @@ class Port:
         else:
             return '<Port %d (used)>' % self.getNumber()
 
-        
-            
 class JobAvatar(pb.Avatar, log.Loggable):
     """
     I am an avatar for the job living in the worker.
@@ -580,10 +580,12 @@ class JobAvatar(pb.Avatar, log.Loggable):
     def remote_ready(self):
         pass
 
-
-
 ### this is a different kind of heaven, not IHeaven, for now...
 class JobHeaven(pb.Root, log.Loggable):
+    """
+    I am similar to but not quite the same as a manager-side Heaven.
+    I manage avatars inside the worker for job processes forked by the worker.
+    """
     logCategory = "job-heaven"
     def __init__(self, brain, feederports):
         self.avatars = {}

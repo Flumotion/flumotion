@@ -20,6 +20,10 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Flumotion Twisted credential checkers
+"""
+
 from twisted.cred import checkers, error
 from twisted.internet import defer
 from twisted.python import failure
@@ -31,6 +35,10 @@ from flumotion.twisted import credentials
 # and forward to it
 parent = checkers.InMemoryUsernamePasswordDatabaseDontUse
 class FlexibleCredentialsChecker(parent, log.Loggable):
+    """
+    I am an in-memory username/password credentials checker that also
+    allows anonymous logins if instructed to do so.
+    """
     logCategory = 'credchecker'
     def __init__(self, **users):
         parent.__init__(self, **users)
@@ -54,6 +62,9 @@ class FlexibleCredentialsChecker(parent, log.Loggable):
         return parent.requestAvatarId(self, credentials)
 
 class CryptChecker(log.Loggable):
+    """
+    I check credentials using a crypt-based backend.
+    """
     __implements__ = (checkers.ICredentialsChecker, )
     credentialInterfaces = (credentials.IUsernameCryptPassword, )
 
@@ -63,6 +74,14 @@ class CryptChecker(log.Loggable):
         self.users = users
 
     def addUser(self, username, cryptPassword):
+        """
+        Add the given username and password.
+
+        @param username:      name of the user to add
+        @type  username:      string
+        @param cryptPassword: the crypted password for this user
+        @type  cryptPassword: string
+        """
         self.debug('added user %s' % username)
         self.users[username] = cryptPassword
 
@@ -74,6 +93,7 @@ class CryptChecker(log.Loggable):
             self.debug('user %s refused, password not matched' % username)
             return failure.Failure(error.UnauthorizedLogin())
 
+    ### ICredentialsChecker methods
     def requestAvatarId(self, credentials):
         if credentials.username in self.users:
             return defer.maybeDeferred(
@@ -81,5 +101,6 @@ class CryptChecker(log.Loggable):
                 self.users[credentials.username]).addCallback(
                 self._cbCryptPasswordMatch, credentials.username)
         else:
-            self.debug('user %s refused, not in database' % credentials.username)
+            self.debug('user %s refused, not in database' %
+                credentials.username)
             return defer.fail(error.UnauthorizedLogin())

@@ -20,6 +20,10 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Portal-related functionality inspired by twisted.cred.portal
+"""
+
 from twisted.spread import flavors
 from twisted.internet import defer
 from twisted.cred import error
@@ -29,10 +33,6 @@ from twisted.python.components import registerAdapter
 
 from flumotion.common import keycards, log, interfaces
 from flumotion.twisted.pb import _FPortalRoot
-
-"""
-Portal-related functionality inspired by twisted.cred.portal
-"""
 
 class BouncerPortal(log.Loggable):
     """

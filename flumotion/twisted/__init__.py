@@ -19,3 +19,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
+
+"""
+flumotion.twisted - Twisted-like base code written for Flumotion
+"""

@@ -52,8 +52,6 @@ class BouncerMedium(component.BaseComponentMedium):
         return []
 
 class Bouncer(component.BaseComponent):
-
-    __implements__ = interfaces.IAuthenticate,
     keycardClasses = ()
 
     component_medium_class = BouncerMedium

@@ -38,9 +38,6 @@ class WorkerAvatar(common.ManagerAvatar):
     A reference to me is given when logging in and requesting a worker avatar.
     I live in the manager.
     """
-    
-    __implements__ = interfaces.INewCredPerspective
-
     logCategory = 'worker-avatar'
 
     def getName(self):

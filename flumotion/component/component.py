@@ -44,6 +44,9 @@ from flumotion.utils.gstutils import gsignal
 superklass = fpb.FPBClientFactory
 # the client factory logging in to the manager
 class ComponentClientFactory(superklass):
+    """
+    I am a client factory for a component logging in to the manager.
+    """
     logCategory = 'component'
     __super_login = superklass.login
     def __init__(self, component):

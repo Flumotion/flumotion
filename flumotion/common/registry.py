@@ -38,13 +38,13 @@ from flumotion.configure import configure
 
 __all__ = ['ComponentRegistry', 'registry']
 
-def istrue(value):
+def _istrue(value):
     if value in ('True', 'true', '1', 'yes'):
         return True
 
     return False
 
-def getMTime(file):
+def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
 
 class RegistryEntryComponent:
@@ -191,11 +191,10 @@ class RegistryEntryEntry:
         return self.function
     
 class XmlParserError(Exception):
-    pass
+    "Error during parsing of XML."
 
 class XmlDeprecatedError(Exception):
-    pass
-
+    "The given XML is for an older version."
 
 # TODO
 # Bundles
@@ -334,10 +333,10 @@ class RegistryParser(log.Loggable):
 
             optional = {}
             if child.hasAttribute('required'):
-                optional['required'] = istrue(child.getAttribute('required'))
+                optional['required'] = _istrue(child.getAttribute('required'))
 
             if child.hasAttribute('multiple'):
-                optional['multiple'] = istrue(child.getAttribute('multiple'))
+                optional['multiple'] = _istrue(child.getAttribute('multiple'))
 
             property = RegistryEntryProperty(name, type, **optional)
 
@@ -601,7 +600,11 @@ class RegistryParser(log.Loggable):
         return RegistryDirectory(filename)
 
     
+# FIXME: filename -> path
 class RegistryDirectory:
+    """
+    I represent a directory under the registry path.
+    """
     def __init__(self, filename):
         self._filename = filename
         self._files = self._getFileList(self._filename)
@@ -640,7 +643,7 @@ class RegistryDirectory:
         return files
 
     def lastModified(self):
-        return max(map(getMTime, self._files))
+        return max(map(_getMTime, self._files))
 
     def getFiles(self):
         return self._files
@@ -675,7 +678,8 @@ class ComponentRegistry(log.Loggable):
 
         directory = self._parser._directories.get(filename, None)
         if not force:
-            if directory and directory.lastModified() < getMTime(self.filename):
+            if directory \
+                and directory.lastModified() < _getMTime(self.filename):
                 return
         
         self.debug('Adding directory: %s' % filename)
@@ -802,7 +806,7 @@ class ComponentRegistry(log.Loggable):
         if not os.path.exists(self.filename):
             return True
         
-        registry_modified = getMTime(self.filename)
+        registry_modified = _getMTime(self.filename)
         for d in self._parser.getDirectories():
             if d.lastModified() > registry_modified:
                 return True

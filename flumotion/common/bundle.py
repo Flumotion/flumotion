@@ -33,6 +33,9 @@ import StringIO
 __all__ = ['Bundle', 'Bundler', 'Unbundler', 'BundlerBasket']
 
 class BundledFile:
+    """
+    I represent one file as managed by a bundler.
+    """
     def __init__(self, source, destination):
         self.source = source
         self.destination = destination

@@ -20,3 +20,6 @@
 
 # Headers in this file shall remain intact.
 
+"""
+flumotion.configure - configure-time information
+"""

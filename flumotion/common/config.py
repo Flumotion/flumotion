@@ -34,7 +34,7 @@ from flumotion.common.registry import registry
 from flumotion.common import log, errors
 
 class ConfigError(Exception):
-    pass
+    "Error during parsing of configuration"
 
 class ConfigEntryAtmosphere:
     "I represent a <atmosphere> entry in a planet config file"
@@ -106,7 +106,11 @@ class ConfigEntryWorkers:
     def getPolicy(self):
         return self.policy
 
+# FIXME: rename
 class FlumotionConfigXML(log.Loggable):
+    """
+    I represent a planet configuration file for Flumotion.
+    """
     logCategory = 'config'
 
     def __init__(self, filename, string=None):
