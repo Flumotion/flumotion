@@ -1,6 +1,6 @@
 This is Flumotion 0.1.1, "El Local".
 
-Issues fixed since 0.1.1:
+Issues fixed since 0.1.0:
 
 ticket	summary
 54	wizard pages should be able to run code on the worker to detect stuff
