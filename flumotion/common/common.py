@@ -276,13 +276,20 @@ def _findPackageCandidates(path, prefix='flumotion.'):
         
     return bundlePackages
 
+# FIXME: an extra key argument (used for bundle) might help in keeping
+# track of old paths
+# ie, it would ensure that only one packagePath per key is registered
 def registerPackagePath(packagePath, prefix='flumotion'):
     """
     Register a given path as a path that can be imported from.
     Used to support partition of bundled code or import code from various
     uninstalled location.
 
-    @param packagePath: path to add under which the module namespaces live.
+    sys.path will also be changed to include this, and remove references
+    to older packagePath's for the same bundle.
+
+    @param packagePath: path to add under which the module namespaces live,
+                        (ending in an md5sum, for flumotion purposes)
     @type  packagePath: string
     @param prefix:      prefix of the packages to be considered
     @type  prefix:      string
@@ -297,11 +304,27 @@ def registerPackagePath(packagePath, prefix='flumotion'):
     # probably a good idea to live it there, if we want to do
     # fancy stuff later on.
     packagePath = os.path.abspath(packagePath)
+    if not os.path.exists(packagePath):
+        log.warning('bundle', 'registering a non-existing package path %s' %
+            packagePath)
+
     log.log('bundle', 'registering packagePath %s' % packagePath)
 
+    # check if a packagePath for this bundle was already registered
+    # by stripping off the last part, which is the md5sum
+    oneup = os.path.split(packagePath)[0]
+    if oneup:
+        paths = sys.path
+        targets = [x for x in paths if x.startswith(oneup) and x != packagePath]
+
+    for path in targets:
+        log.log('bundle', 'removing old packagePath %s from sys.path' % path)
+        sys.path.remove(path)
+
+    # put packagePath at the top of sys.path if not in there
     if not packagePath in sys.path:
         log.log('bundle', 'adding packagePath %s to sys.path' % packagePath)
-        sys.path.append(packagePath)
+        sys.path.insert(0, packagePath)
 
     # Find the packages in the path and sort them,
     # the following algorithm only works if they're sorted.
@@ -322,8 +345,11 @@ def registerPackagePath(packagePath, prefix='flumotion'):
 
     toplevelName = packageNames[0]
     
-    # Append the bundle's absolute path to the __path__ of
-    # each of its higher-level packages
+    # Insert or move the bundle's absolute path to the top of __path__ of
+    # each of its higher-level packages, so reload() will take the new path
+
+    # FIXME: for complete correctness, it'd be good to remove the path
+    # for the previous bundle if there is a previous bundle
     partials = []
     for partial in toplevelName.split("."):
         partials.append(partial)
@@ -336,8 +362,9 @@ def registerPackagePath(packagePath, prefix='flumotion'):
             print "ERROR: could not reflect name %s" % name
             raise
         path = os.path.join(packagePath, name.replace('.', os.sep))
-        if not path in package.__path__:
-            package.__path__.append(path)
+        if path in package.__path__:
+            package.__path__.remove(path)
+        package.__path__.insert(0, path)
         
     for packageName in packageNames[1:]:
         package = sys.modules.get(packageName, None)
@@ -356,9 +383,17 @@ def registerPackagePath(packagePath, prefix='flumotion'):
         # rebuild the package
         rebuild.rebuild(package)
 
-        if not subPath in package.__path__:
-            # insert at front because FLU_REGISTRY_PATH paths should override
-            # base components
+        # insert at front because FLU_REGISTRY_PATH paths should override
+        # base components, and because subsequent reload() should prefer
+        # the latest registered path
+        # FIXME: we might eventually want to remove old paths for the same
+        # bundle   
+        if subPath in package.__path__:
+            log.log('bundle', 'moving subPath %s to top for package %r' % (
+                subPath, package))
+            package.__path__.remove(subPath)
+            package.__path__.insert(0, subPath)
+        else:
             log.log('bundle', 'inserting subPath %s for package %r' % (
                 subPath, package))
             package.__path__.insert(0, subPath)
@@ -593,4 +628,16 @@ def objRepr(object):
     """ 
     c = object.__class__
     return "%s.%s" % (c.__module__, c.__name__)
+
+def pathToModuleName(path):
+    """
+    Convert the given (relative) path to the python module it would have to
+    be imported as.
+    """
+    if path.endswith('.pyc'): path = path[:-4]
+    if path.endswith('.py'): path = path[:-3]
+    if path.endswith('__init__'): path = path[:-9]
+
+    return ".".join(path.split(os.path.sep))
+
 

@@ -26,14 +26,16 @@ import gobject
 from gtk import gdk
 import gtk
 import gtk.glade
+
 from twisted.internet import reactor
+from twisted.python import rebuild
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs, parts, connections
 from flumotion.configure import configure
-from flumotion.common import errors, log, worker, planet
+from flumotion.common import errors, log, worker, planet, common
 from flumotion.manager import admin # Register types
-from flumotion.twisted import flavors
+from flumotion.twisted import flavors, reflect
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
@@ -228,15 +230,19 @@ class Window(log.Loggable, gobject.GObject):
     # FIXME: this method uses a file and a methodname as entries
     # FIXME: do we want to switch to imports instead so the whole file
     # is available in its namespace ?
-    def show_component(self, state, methodName, filepath, data):
+    def show_component(self, state, entryPath, fileName, methodName, data):
         """
         Show the user interface for this component.
         Searches data for the given methodName global,
         then instantiates an object from that class,
         and calls the render() method.
 
-        @type  state: L{flumotion.common.planet.AdminComponentState}
-        @param data:  the python code to load.
+        @type  state:      L{flumotion.common.planet.AdminComponentState}
+        @param entryPath:  absolute path to the cached base directory
+        @param fileName:   path to the file with the entry point, under
+                           entryPath
+        @param methodName: name of the method to instantiate the UI view
+        @param data:       the python code to load
         """
         # methodName has historically been GUIClass
         instance = None
@@ -247,97 +253,87 @@ class Window(log.Loggable, gobject.GObject):
             if hasattr(self.current_component, 'cleanup'):
                 self.debug('Cleaning up current component view')
                 self.current_component.cleanup()
+        self.current_component = None
 
         name = state.get('name')
         self.statusbar.set('main', "Loading UI for %s ..." % name)
-        if data:
-            # we create a temporary module that we import from so code
-            # inside the module can trust its full namespace to be local
-            import imp
-            tempmod = imp.new_module('tempmod')
-            try:
-                exec data in tempmod.__dict__
-                #exec(data, globals(), tempmod.__dict__)
-            except SyntaxError, e:
-                # the syntax error can happen in the entry file, or any import
-                where = "<entry file>"
-                if e.filename:
-                    where = e.filename
-                msg = "Syntax Error at %s:%d while executing %s" % (
-                    where, e.lineno, filepath)
-                self.warning(msg)
-                raise errors.EntrySyntaxError(msg)
-            except NameError, e:
-                # the syntax error can happen in the entry file, or any import
-                msg = "NameError while executing %s: %s" % (filepath,
-                    " ".join(e.args))
-                self.warning(msg)
-                raise errors.EntrySyntaxError(msg)
-            except ImportError, e:
-                msg = "ImportError while executing %s: %s" % (filepath,
-                    " ".join(e.args))
-                self.warning(msg)
-                raise errors.EntrySyntaxError(msg)
 
-            # put it in sys.modules so we can import it
-            import sys
-            sys.modules['tempmod'] = tempmod
+        moduleName = common.pathToModuleName(fileName)
+        statement = 'import %s' % moduleName
+        self.debug('running %s' % statement)
+        try:
+            exec(statement)
+        except SyntaxError, e:
+            # the syntax error can happen in the entry file, or any import
+            where = "<entry file>"
+            if e.filename:
+                where = e.filename
+            msg = "Syntax Error at %s:%d while executing %s" % (
+                where, e.lineno, fileName)
+            self.warning(msg)
+            raise errors.EntrySyntaxError(msg)
+        except NameError, e:
+            # the syntax error can happen in the entry file, or any import
+            msg = "NameError while executing %s: %s" % (fileName,
+                " ".join(e.args))
+            self.warning(msg)
+            raise errors.EntrySyntaxError(msg)
+        except ImportError, e:
+            msg = "ImportError while executing %s: %s" % (fileName,
+                " ".join(e.args))
+            self.warning(msg)
+            raise errors.EntrySyntaxError(msg)
 
-            # import it
-            import tempmod
+        # make sure we're running the latest version
+        module = reflect.namedAny(moduleName)
+        rebuild.rebuild(module)
 
-            # check if we have the method
-            if not hasattr(tempmod, methodName):
-                self.warning('method %s not found in file %s' % (
-                    methodName, filepath))
-                raise #FIXME: something appropriate
-            klass = getattr(tempmod, methodName)
- 
-            # clean up temporary module
-            #del sys.modules['tempmod']
-            # FIXME: don't delete tempmod just yet, or the class doesn't
-            # actually work ! clean it up when the view is changed
-            #del tempmod
+        # check if we have the method
+        if not hasattr(module, methodName):
+            self.warning('method %s not found in file %s' % (
+                methodName, fileName))
+            raise #FIXME: something appropriate
+        klass = getattr(module, methodName)
 
-            # instantiate the GUIClass, giving ourself as the first argument
-            # FIXME: we cheat by giving the view as second for now,
-            # but let's decide for either view or model
-            instance = klass(state, self.admin, self)
-            self.debug("Created entry instance %r" % instance)
-            instance.setup()
-            nodes = instance.getNodes()
-            notebook = gtk.Notebook()
-            nodeWidgets = {}
+        # instantiate the GUIClass, giving ourself as the first argument
+        # FIXME: we cheat by giving the view as second for now,
+        # but let's decide for either view or model
+        instance = klass(state, self.admin, self)
+        self.debug("Created entry instance %r" % instance)
+        instance.setup()
+        nodes = instance.getNodes()
+        notebook = gtk.Notebook()
+        nodeWidgets = {}
 
-            self.statusbar.clear('main')
-            # create pages for all nodes, and just show a loading label for
-            # now
-            for nodeName in nodes.keys():
-                self.debug("Creating node for %s" % nodeName)
-                label = gtk.Label('Loading UI for %s ...' % nodeName)
-                table = gtk.Table(1, 1)
-                table.add(label)
-                nodeWidgets[nodeName] = table
+        self.statusbar.clear('main')
+        # create pages for all nodes, and just show a loading label for
+        # now
+        for nodeName in nodes.keys():
+            self.debug("Creating node for %s" % nodeName)
+            label = gtk.Label('Loading UI for %s ...' % nodeName)
+            table = gtk.Table(1, 1)
+            table.add(label)
+            nodeWidgets[nodeName] = table
 
-                notebook.append_page(table, gtk.Label(nodeName))
-                
-            # put "loading" widget in
-            old = self.hpaned.get_child2()
-            self.hpaned.remove(old)
-            self.hpaned.add2(notebook)
-            notebook.show_all()
+            notebook.append_page(table, gtk.Label(nodeName))
+            
+        # put "loading" widget in
+        old = self.hpaned.get_child2()
+        self.hpaned.remove(old)
+        self.hpaned.add2(notebook)
+        notebook.show_all()
 
-            # trigger node rendering
-            # FIXME: might be better to do these one by one, in order,
-            # so the status bar can show what happens
-            for nodeName in nodes.keys():
-                mid = self.statusbar.push('notebook',
-                    "Loading tab %s for %s ..." % (nodeName, name))
-                node = nodes[nodeName]
-                d = node.render()
-                d.addCallback(self._nodeRenderCallback, nodeName,
-                    instance, nodeWidgets, mid)
-                # FIXME: errback
+        # trigger node rendering
+        # FIXME: might be better to do these one by one, in order,
+        # so the status bar can show what happens
+        for nodeName in nodes.keys():
+            mid = self.statusbar.push('notebook',
+                "Loading tab %s for %s ..." % (nodeName, name))
+            node = nodes[nodeName]
+            d = node.render()
+            d.addCallback(self._nodeRenderCallback, nodeName,
+                instance, nodeWidgets, mid)
+            # FIXME: errback
 
     def _nodeRenderCallback(self, widget, nodeName, gtkAdminInstance,
         nodeWidgets, mid):
@@ -378,7 +374,10 @@ class Window(log.Loggable, gobject.GObject):
             self.log("... but no component selected")
             return
         if componentState != state:
-            self.log("... but component is not displayed")
+            self.log("... but component is different from displayed")
+            return
+        if not self.current_component:
+            self.log("... but component is not yet shown")
             return
         
         name = state.get('name')
@@ -665,7 +664,7 @@ class Window(log.Loggable, gobject.GObject):
             self.debug("showing admin UI for component %s" % name)
             # callLater to avoid any errors going to our errback
             reactor.callLater(0, self.show_component,
-                state, methodName, filepath, data)
+                state, entryPath, filename, methodName, data)
 
         def gotEntryNoBundleErrback(failure):
             failure.trap(errors.NoBundleError)

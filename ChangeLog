@@ -1,3 +1,31 @@
+2005-04-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_common.py:
+	* flumotion/common/common.py:
+	  add pathToModuleName + test
+	  document registerPackagePath
+	  fix several subtle problems in registerPackagePath:
+	  - warn on non-existing paths
+	  - remove previously registered packagePaths for the same bundle
+	    (which is a flumotion-specific hack, so needs fixing better)
+	  - make sure the new packagePath is at the top everywhere,
+	    because reload/rebuild.rebuild take the first valid one
+
+	* flumotion/admin/admin.py:
+	  check correctly for locally cached paths (bundle name was missing),
+	  so it again only downloads missing bundles
+
+	* flumotion/admin/gtk/client.py:
+	  change show_component to not use a tempmod module, so rebuilding
+	  works nicely everywhere
+	  clear self.current_component so it can be used to check if
+	  something's shown yet
+	  check if it's set when doing outside ui change notifications
+
+	* flumotion/component/effects/volume/admin_gtk.py:
+	* flumotion/component/producers/soundcard/admin_gtk.py:
+	  use as test bed for registerPackagePath fixing
+
 2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>

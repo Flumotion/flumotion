@@ -292,5 +292,15 @@ class TestObjRepr(unittest.TestCase):
         self.assertEquals(common.objRepr(t),
             'flumotion.test.test_common.TestObjRepr')
     
+class TestPathToModule(unittest.TestCase):
+    def testPaths(self):
+        tests = {
+            'flumotion/common/common.py': 'flumotion.common.common',
+            'flumotion/common/__init__.pyc': 'flumotion.common',
+            'flumotion/common': 'flumotion.common',
+        }
+        
+        for (path, module) in tests.items():
+            self.assertEquals(common.pathToModuleName(path), module)
 if __name__ == '__main__':
     unittest.main()

@@ -1,9 +1,6 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/effects/volume/admin_gtk.py:
-# admin client-side code for volume effects
-# 
 # Flumotion - a streaming media server
 # Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
@@ -25,7 +22,6 @@ import gtk
 import os
 
 from flumotion.common import errors, log
-
 
 from flumotion.component.base import admin_gtk
 
@@ -54,6 +50,7 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         self.hscale = self.wtree.get_widget('volume-set-hscale')
         self.setvolume_signalid = self.hscale.connect('value_changed',
                 self.cb_volume_set)
+#        self.hscale.set_value(50)
 
         return self.volume
         

@@ -487,14 +487,17 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
             missing = [] # list of missing bundles
 
             for name, sum in sums:
-                dir = os.path.join(configure.cachedir, sum)
-                cachedPaths.append(dir)
+                dir = os.path.join(configure.cachedir, name, sum)
                 if not os.path.exists(dir):
                     missing.append(name)
+                else:
+                    cachedPaths.append(dir)
 
             cachedPaths.reverse()
             missing.reverse()
 
+            self.debug('_getBundleSumsCallback: %d bundles missing' %
+                len(missing))
             if missing:
                 self.debug('_getBundleSumsCallback: requesting zips %r' %
                     missing)
@@ -554,6 +557,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
 
     def _registerCachedPaths(self, paths):
         for dir in paths:
+            self.debug("registering cached PackagePath %s" % dir)
             common.registerPackagePath(dir)
 
     def getBundledFile(self, bundledPath):
