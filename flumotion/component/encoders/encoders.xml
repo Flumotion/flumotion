@@ -24,4 +24,24 @@
       <property name="quality" type="int"/>
     </properties>
   </component>
+  <component type="vorbis-encoder">
+    <source location="flumotion.component.encoders.vorbis"/>
+    <properties>
+      <property name="source" type="string" multiple="no"/>
+      <property name="bitrate" type="int"/>
+    </properties>
+  </component>
+  <component type="speex-encoder">
+    <source location="flumotion.component.encoders.speex"/>
+    <properties>
+      <property name="source" type="string" multiple="no"/>
+      <property name="bitrate" type="int"/>
+    </properties>
+  </component>
+  <component type="mulaw-encoder">
+    <source location="flumotion.component.encoders.mulaw"/>
+    <properties>
+      <property name="source" type="string" multiple="no"/>
+    </properties>
+  </component>
 </components>

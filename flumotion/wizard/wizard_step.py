@@ -213,7 +213,7 @@ class Encoding(wizard.WizardStep):
         self.setup_finished = True
         
     def on_combobox_format_changed(self, combo):
-        self.verify()
+        self.verify()g
         
     def verify(self):
         # XXX: isn't there a better way of doing this, like blocking
@@ -251,7 +251,7 @@ class Encoding(wizard.WizardStep):
             elif codec == EncodingAudio.Speex:
                 return 'Speex'
             elif codec == EncodingAudio.Mulaw:
-                return 'Mulaw'
+                return 'Consumption'
             
         return 'Consumption'
         
@@ -345,7 +345,6 @@ class AudioEncoder(wizard.WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
     component_name = 'audio-encoder'
-    
     def get_next(self):
         return 'Consumption'
 
@@ -362,13 +361,6 @@ class Speex(AudioEncoder):
     step_name = 'Speex'
     component_type = 'speex'
 wizard.register_step(Speex)
-
-
-
-class Mulaw(AudioEncoder):
-    step_name = 'Mulaw'
-    component_type = 'Mulaw'
-wizard.register_step(Mulaw)
 
 
 

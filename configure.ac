@@ -69,6 +69,7 @@ flumotion/component/base/Makefile
 flumotion/component/bouncers/Makefile
 flumotion/component/bttv/Makefile
 flumotion/component/dv/Makefile
+flumotion/component/encoders/Makefile
 flumotion/component/file/Makefile
 flumotion/component/http/Makefile
 flumotion/component/multipartjpeg/Makefile

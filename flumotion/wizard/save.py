@@ -85,9 +85,14 @@ class WizardSaver:
     def getAudioEncoder(self):
         options = self.wizard.get_step_options('Encoding')
         encoder = options['audio']
-        encoder_step = self.wizard[encoder.step]
-        return Component('audio-encoder', encoder.component_type,
-                         encoder_step.get_component_properties())
+        
+        if encoder == EncodingAudio.Mulaw:
+            props = {}
+        else:
+            encoder_step = self.wizard[encoder.step]
+            props = encoder_step.get_component_properties()
+            
+        return Component('audio-encoder', encoder.component_type, props)
 
     def getMuxer(self):
         options = self.wizard.get_step_options('Encoding')

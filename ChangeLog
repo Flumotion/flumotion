@@ -1,5 +1,18 @@
 2004-10-12  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac:
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/component/encoders/mulaw.py:
+	* flumotion/component/encoders/speex.py:
+	* flumotion/component/encoders/vorbis.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard_step.py:
+
+	And audio encoders.
+	
+2004-10-12  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/Makefile.am:
 	* flumotion/component/encoders/Makefile.am:
 	* flumotion/component/encoders/__init__.py:
