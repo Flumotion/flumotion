@@ -6,12 +6,6 @@
     <framerate>5.0</framerate>
   </component>
 
-  <component name="videotest-producer-big" type="videotest">
-    <width>640</width>
-    <height>480</height>
-    <framerate>5.0</framerate>
-  </component>
-
   <component name="png-overlay" type="overlay">
     <source>videotest-producer</source>
     <location>/tmp/overlay.png</location>
@@ -19,10 +13,6 @@
   
   <component name="jpeg+multipart" type="multipartjpeg">
     <source>png-overlay</source>
-  </component>
-
-  <component name="jpeg+multipart-big" type="multipartjpeg">
-    <source>videotest-producer-big</source>
   </component>
 
   <component name="auth-1" type="htpasswd-auth">
@@ -34,14 +24,6 @@
     <source>jpeg+multipart</source>
     <port>8803</port>
     <logfile>/tmp/videotestsrc_access.log</logfile>
-    <auth>auth-1</auth>
-  </component>
-
-  <component name="http-video-big" type="http-streamer">
-    <source>jpeg+multipart-big</source>
-    <port>8804</port>
-    <logfile>/tmp/videotestsrc_access_big.log</logfile>
-    <gst-property element="sink" name="buffers-max" type="int">400</gst-property>
     <auth>auth-1</auth>
   </component>
 

@@ -73,7 +73,8 @@
   <component type="multipartjpeg">
     <source location="flumotion.components.multipartjpeg"/>
     <properties>
-      <property name="source" type="string" multiple="no"/>
+      <property name="source" type="string" required="yes"/>
+      <property name="quality" type="int"/>
     </properties>
   </component>
 

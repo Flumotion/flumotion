@@ -384,7 +384,6 @@ class HTTPStreamingResource(resource.Resource):
 
 class MultifdSinkStreamer(component.ParseLaunchComponent):
     # use select for test
-#                                'mode=0 ' + \
     pipe_template = 'multifdsink name=sink ' + \
                                 'buffers-max=500 ' + \
                                 'buffers-soft-max=250 ' + \

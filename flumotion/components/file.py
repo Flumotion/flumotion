@@ -41,17 +41,15 @@ class FileSinkStreamer(component.ParseLaunchComponent):
 
     def change_filename(self, filename):
         sink.emit('remove', self.fd.fileno())
-        self.fd.close() # XXX: Needed?
+        self.fd.close() # XXX: Needed ?
         
         self.fd = open(location, 'w')
         sink.emit('add', self.fd.fileno())
-        
+
 def createComponent(config):
     name = config['name']
     source = config['source']
     location = config['location']
     
     component = FileSinkStreamer(name, source, location)
-    component.add_filename(location)
-    
     return component

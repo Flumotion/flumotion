@@ -53,8 +53,8 @@ class ComponentView(pb.Referenceable):
         
         self.remote = None # the perspective we have on the other side (?)
         
-    warning = lambda s, *a: log.warning(s.comp.getName(), *a)
-    debug = lambda s, *a: log.debug(s.comp.getName(), *a)
+    warning = lambda s, *a: log.warning(s.comp.get_name(), *a)
+    debug = lambda s, *a: log.debug(s.comp.get_name(), *a)
     
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
@@ -119,8 +119,8 @@ class ComponentView(pb.Referenceable):
 
         return {'ip' : self.getIP(),
                 'pid' :  os.getpid(), 
-                'sources' : self.comp.getSources(),
-                'feeds' : self.comp.getFeeds(),
+                'sources' : self.comp.get_sources(),
+                'feeds' : self.comp.get_feeds(),
                 'elements': self.comp.get_element_names() }
     
     def remote_getFreePorts(self, feeds):
@@ -153,19 +153,19 @@ class BaseComponent(gobject.GObject):
         self.setup_pipeline()
 
     def debug(self, *args):
-        category = self.getName()
+        category = self.get_name()
         log.debug(category, *args)
         self.emit('log', args)
         
-    warning = lambda s, *a: log.warning(s.getName(), *a)
+    warning = lambda s, *a: log.warning(s.get_name(), *a)
 
-    def getName(self):
+    def get_name(self):
         return self.component_name
     
-    def getSources(self):
+    def get_sources(self):
         return self.sources
     
-    def getFeeds(self):
+    def get_feeds(self):
         return self.feeds
 
     def restart(self):
@@ -197,7 +197,7 @@ class BaseComponent(gobject.GObject):
         raise NotImplementedError
     
     def setup_pipeline(self):
-        self.pipeline.set_name('pipeline-' + self.getName())
+        self.pipeline.set_name('pipeline-' + self.get_name())
         sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
         self.pipeline_signals.append(sig_id)
         
@@ -353,7 +353,8 @@ class ParseLaunchComponent(BaseComponent):
         
     def parse_pipeline(self, pipeline):
         self.debug('Creating pipeline, template is %s' % pipeline)
-        sources = self.getSources()
+        
+        sources = self.get_sources()
         if pipeline == '' and not sources:
             raise TypeError, "Need a pipeline or a source"
 
@@ -365,7 +366,7 @@ class ParseLaunchComponent(BaseComponent):
         elif pipeline.find('name=sink') != -1:
             need_sink = False
             
-        feeds = self.getFeeds()
+        feeds = self.get_feeds()
 
         self.debug('sources=%s, feeds=%s' % (sources, feeds))
         pipeline = self.parse_tmpl(pipeline, sources, self.SOURCE_TMPL, '@',
@@ -373,7 +374,7 @@ class ParseLaunchComponent(BaseComponent):
         pipeline = self.parse_tmpl(pipeline, feeds, self.FEED_TMPL, ':',
                                  '%(pipeline)s ! %(tmpl)s name=%(name)s') 
         
-        self.debug('pipeline for %s is %s' % (self.getName(), pipeline))
+        self.debug('pipeline for %s is %s' % (self.get_name(), pipeline))
         
         return pipeline
 

@@ -1,3 +1,12 @@
+2004-08-17  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/components/multipartjpeg.py (createComponent): Add quality
+
+	* flumotion/server/component.py (BaseComponent.debug): Rename gst
+	only functions to use gtk style
+
+	* conf/videotest-jpeg.xml: remove big
+
 2004-08-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/components/http.py:

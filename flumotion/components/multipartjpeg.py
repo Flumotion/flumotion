@@ -23,10 +23,15 @@ from flumotion.components import converter
 def createComponent(config):
     # Since source in converter is a list, convert it to one
     config['source'] = [config['source']]
-
+    
     # Set pipeline from the template
-    config['pipeline'] = 'ffmpegcolorspace ! jpegenc ! multipartmux'
+    config['pipeline'] = 'ffmpegcolorspace ! jpegenc name=jpegenc ! multipartmux'
 
-    return converter.createComponent(config)
+    component = converter.createComponent(config)
+    pipeline = component.get_pipeline()
+    if config.has_key('quality'):
+        jpeg = pipeline.get_by_name('jpegenc')
+        jpeg.set_property('quality', int(config['quality']))
+    return component
 
 
