@@ -154,10 +154,18 @@ EncodingAudio = EnumClass('EncodingAudio', ('Vorbis', 'Speex', 'Mulaw'),
 
 # Disk writer
 RotateTime = EnumClass('RotateTime',
-                       ('Minutes', 'Hours', 'Days', 'Weeks', 'Months'),
-                       ('minute(s)', 'hour(s)', 'day(s)', 'week(s)', 'month(s)'))
+                       ('Minutes', 'Hours', 'Days', 'Weeks'),
+                       ('minute(s)', 'hour(s)', 'day(s)', 'week(s)'),
+                       unit=(60,
+                              60*60,
+                              60*60*24,
+                              60*60*25*7))
 RotateSize = EnumClass('RotateSize',
-                      ('kB', 'MB', 'GB', 'TB'))
+                      ('kB', 'MB', 'GB', 'TB'),
+                       unit=(1 << 10L,
+                              1 << 20L,
+                              1 << 30L,
+                              1 << 40L))
  
 LicenseType = EnumClass('LicenseType',
                         ('CC', 'Commercial'),

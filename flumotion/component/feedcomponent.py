@@ -266,6 +266,7 @@ class FeedComponent(basecomponent.BaseComponent):
             eater.set_property('protocol', 'gdp')
             
     # FIXME: need to make a separate callback to implement "mood" of component
+    #        This is used by file/file.py, so make sure to syncronize them
     def feeder_state_change_cb(self, element, old, state, feed_name):
         # also called by subclasses
         self.debug('state-changed  on feed %s: element %s, state %s' % (

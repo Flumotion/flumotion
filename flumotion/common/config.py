@@ -325,6 +325,9 @@ class FlumotionConfigXML(log.Loggable):
     def get_int_value(self, nodes):
         return [int(subnode.childNodes[0].data) for subnode in nodes]
 
+    def get_long_value(self, nodes):
+        return [long(subnode.childNodes[0].data) for subnode in nodes]
+
     def get_bool_value(self, nodes):
         valid = ['True', 'true', '1', 'Yes', 'yes']
         return [subnode.childNodes[0].data in valid for subnode in nodes]
@@ -395,6 +398,8 @@ class FlumotionConfigXML(log.Loggable):
                 value = self.get_raw_string_value(nodes)
             elif type == 'int':
                 value = self.get_int_value(nodes)
+            elif type == 'long':
+                value = self.get_long_value(nodes)
             elif type == 'bool':
                 value = self.get_bool_value(nodes)
             elif type == 'float':

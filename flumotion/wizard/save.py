@@ -29,11 +29,8 @@ class Component:
     def toXML(self):
         s = '    <component name="%s" type="%s">\n' % (self.name, self.type)
 
-        if len(self.eaters) == 1:
-            s += '      <feed>default</feed>\n'
-        else:
-            for feed in self.eaters:
-                s += "      <feed>%s</feed>\n" % feed.name
+        # XXX: Handle eaters
+        s += '      <feed>default</feed>\n'
                 
         for source in self.feeders:
             s += "      <source>%s</source>\n" % source.name

@@ -426,7 +426,11 @@ class Consumption(wizard.WizardStep):
     section = 'Consumption'
     section_name = 'Consumption'
     icon = 'consumption.png'
-    
+
+    def setup(self):
+        # XXX: remove
+        self.checkbutton_disk.set_active(True)
+        
     def on_checkbutton_http_toggled(self, button):
         value = self.checkbutton_http.get_active()
         self.checkbutton_http_audio_video.set_sensitive(value)
@@ -525,15 +529,10 @@ class HTTP(wizard.WizardStep):
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
 
-        # XXX: Why ?? spinbutton.get_value ??
         options['bandwidth_limit'] = int(options['bandwidth_limit'])
         options['user_limit'] = int(options['user_limit'])
         options['port'] = int(options['port'])
 
-        # XXX: Hack
-        if options['worker'] == 0:
-            options['worker'] = 'Local'
-            
         return options
 
 
@@ -567,12 +566,40 @@ class Disk(wizard.WizardStep):
     icon = 'kcmdevices.png'
     
     def setup(self):
+        self.directory = '/tmp'
+        
+        self.tool_tip = gtk.Tooltips()
+        self.tool_tip.set_tip(self.button_browse, 'Select a folder')
+        
         self.combobox_time_list.set_enum(RotateTime)
         self.combobox_size_list.set_enum(RotateSize)
-        self.combobox_size_list.set_active(RotateSize.MB)
-        
+        self.radiobutton_has_time.set_active(True)
+        self.spinbutton_time.set_value(12)
+        self.combobox_time_list.set_active(RotateTime.Hours)
+
+
     def on_button_browse_clicked(self, button):
-        pass
+        fc = gtk.FileChooserDialog("Open..",
+                                   None,
+                                   gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                    gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        fc.set_default_response(gtk.RESPONSE_OK)
+
+        response = fc.run()
+        if response == gtk.RESPONSE_OK:
+            self.directory = fc.get_filename()
+            if len(self.directory) >= 23:
+                cut_filename = '...' + self.directory[-20:]
+            else:
+                cut_filename = self.directory
+                
+            self.tool_tip.set_tip(self.button_browse, self.directory)
+            self.button_browse.set_label(cut_filename)
+        else:
+            self.tool_tip.set_tip(self.button_browse, 'Select a folder')
+            
+        fc.destroy()
     
     # This is bound to both radiobutton_has_size and radiobutton_has_time
     def on_radiobutton_rotate_toggled(self, button):
@@ -602,7 +629,25 @@ class Disk(wizard.WizardStep):
             self.radiobutton_has_time.set_sensitive(False)
             self.spinbutton_time.set_sensitive(False)
             self.combobox_time_list.set_sensitive(False)
+
+    def get_component_properties(self):
+        options = {}
+        if not self.checkbutton_rotate:
+            options['rotate_type'] = 'none'
+        else:
+            if self.radiobutton_has_time:
+                options['rotate_type'] = 'time'
+                unit = self.combobox_time_list.get_enum().unit
+                options['time'] = long(self.spinbutton_time.get_value() * unit)
+            elif self.radiobutton.has_size:
+                options['rotate_type'] = 'size'
+                unit = self.combobox_size_list.get_enum().unit
+                options['size'] = long(self.spinbutton_size.get_value() * unit)
+
+        options['directory'] = self.directory
         
+        return options
+    
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 

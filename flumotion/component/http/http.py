@@ -172,9 +172,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     component_medium_class = HTTPMedium
 
     def __init__(self, name, source):
-        self.gst_properties = []
         feedcomponent.ParseLaunchComponent.__init__(self, name, [source], [],
-                                                self.pipe_template)
+                                                    self.pipe_template)
         Stats.__init__(self, sink=self.get_sink())
         self.caps = None
         self.resource = None
@@ -335,24 +334,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         sink.connect('client-removed', self._client_removed_cb)
         sink.connect('client-added', self._client_added_cb)
 
-        self.setGstProperties()
-
-    def setGstProperties(self):
-        for prop in self.gst_properties:
-            type = prop.type
-            if type == 'int':
-                value = int(prop.data)
-            elif type == 'str':
-                value = str(prop.data)
-            else:
-                value = prop.data
-
-            element = self.pipeline.get_by_name(prop.element)
-            element.set_property(prop.name, value)
-
-    def setProperties(self, properties):
-        self.gst_properties = properties
-        
 gobject.type_register(MultifdSinkStreamer)
 
 ### create the component based on the config file
@@ -370,10 +351,6 @@ def createComponent(config):
     # FIXME: tie these together more nicely
     component.resource = resource
     
-    # XXX: Remove
-    if config.has_key('gst-property'):
-        component.setProperties(config['gst-property'])
-
     if config.has_key('logfile'):
         component.debug('Logging to %s' % config['logfile'])
         resource.setLogfile(config['logfile'])

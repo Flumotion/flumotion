@@ -15,9 +15,12 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+import os
 import time
 
 import gst
+
+from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
 
@@ -25,15 +28,39 @@ __all__ = ['FileSinkStreamer']
 
 class FileSinkStreamer(feedcomponent.ParseLaunchComponent):
     pipe_template = 'multifdsink sync-clients=1 name=fdsink mode=1'
-    def __init__(self, name, source, location):
-        feedcomponent.ParseLaunchComponent.__init__(self, name, [source],
-                                                [], self.pipe_template)
+    def __init__(self, name, source, directory):
+        feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    [source],
+                                                    [],
+                                                    self.pipe_template)
         self.file_fd = None
-        self.location = location
+        self.directory = directory
+        self.location = None
+        
+        # Set initial filename
         self.change_filename()
 
+    def setTimeRotate(self, time):
+        reactor.callLater(time, self._rotateTimeCallback, time)
+
+    def setSizeRotate(self, size):
+        reactor.callLater(5, self._rotateSizeCallback, size)
+        
+    def _rotateTimeCallback(self, time):
+        self.change_filename()
+        
+        # Add a new one
+        reactor.callLater(time, self._rotateTimeCallback, time)
+
+    def _rotateSizeCallback(self, size):
+        if os.stat(self.location).st_size > size:
+            self.change_filename()
+        
+        # Add a new one
+        reactor.callLater(5, self._rotateTimeCallback, size)
+        
     def change_filename(self):
-        sink = self.pipeline.get_by_name('fdsink')
+        sink = self.get_element('fdsink')
         if sink.get_state() == gst.STATE_NULL:
             sink.set_state(gst.STATE_READY)
 
@@ -43,99 +70,33 @@ class FileSinkStreamer(feedcomponent.ParseLaunchComponent):
             self.file_fd = None
             
         date = time.strftime('%Y%m%d-%H:%M:%S', time.localtime())
-        if '%s' in self.location:
-            location = self.location.replace('%s', date)
-        else:
-            location = self.location + '.' + date
-            
-        self.file_fd = open(location, 'a')
-        fno = self.file_fd.fileno()
-        sink.emit('add', fno)
+        self.location = os.path.join(self.directory,
+                                     self.get_name() + '_' + date)
 
-        return location
+        self.file_fd = open(self.location, 'a')
+        sink.emit('add', self.file_fd.fileno())
     
     def feeder_state_change_cb(self, element, old, state):
-        feedcomponent.BaseComponent.feeder_state_change_cb(self, element,
-                                                     old, state, '')
+        feedcomponent.FeedComponent.feeder_state_change_cb(self, element,
+                                                           old, state, '')
         if state == gst.STATE_PLAYING:
             self.debug('Ready')
             
     def link_setup(self, eaters, feeders):
-        sink = self.pipeline.get_by_name('fdsink')
+        sink = self.get_element('fdsink')
         sink.connect('state-change', self.feeder_state_change_cb)
         
-from twisted.protocols import http
-from twisted.web import server, resource
-from twisted.internet import reactor
-
-ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
-<html>
-<head>
-  <title>%(code)d %(error)s</title>
-</head>
-<body>
-<h2>%(code)d %(error)s</h2>
-</body>
-</html>
-"""
-
-class FileStreamingResource(resource.Resource):
-    def __init__(self, streamer):
-        self.streamer = streamer
-
-        resource.Resource.__init__(self)
-
-    def isAuthenticated(self, request):
-        if (request.getUser() == 'fluendo' and
-            request.getPassword() == 's3kr3t'):
-            return True
-        return False
-
-    def getChild(self, path, request):
-        return self
-
-    def makeError(self, request, error_code):
-        request.setResponseCode(error_code)
-        request.setHeader('content-type', 'text/html')
-        request.setHeader('WWW-Authenticate', 'Basic realm="Restricted Access"')
-        
-        return ERROR_TEMPLATE % dict(code=error_code,
-                                     error=http.RESPONSES[error_code])
-
-    def restart(self):
-        return self.streamer.change_filename()
-        
-    def restart_form(self, request):
-        return '''<form action="/" method="POST">
-  <input type=submit value="Restart">
-</form>'''
-    
-    def render_POST(self, request):
-        if not self.isAuthenticated(request):
-            return self.makeError(request, http.UNAUTHORIZED)
-
-        filename = self.restart()
-
-        return 'b>Restarted</b><br>' + \
-               'Now saving to %s<br><br>%s' % (filename,
-                                                self.restart_form(request))
-    
-    def render_GET(self, request):
-        if not self.isAuthenticated(request):
-            return self.makeError(request, http.UNAUTHORIZED)
-
-        return self.restart_form(request)
-    
 def createComponent(config):
     name = config['name']
     source = config['source']
-    location = config['location']
-    port = int(config.get('auth-port', 9999))
-    component = FileSinkStreamer(name, source, location)
-
-    resource = FileStreamingResource(component)
-    factory = server.Site(resource=resource)
-    component.debug('Listening on %d' % port)
-    reactor.listenTCP(port, factory)
+    directory = config['directory']
     
+    component = FileSinkStreamer(name, source, directory)
+
+    rotate_type = config['rotate_type']
+    if rotate_type == 'size':
+        component.setSizeRotate(config['size'])
+    elif rotate_type == 'time':
+        component.setTimeRotate(config['time'])
+        
     return component

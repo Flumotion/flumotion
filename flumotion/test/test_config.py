@@ -27,6 +27,7 @@ registry.registry.addFromString("""<components>
     <property name="three" type="float"/>
     <property name="four" type="xml"/>
     <property name="five" type="bool"/>
+    <property name="six" type="long"/>
   </properties>
 </component>
 </components>""")
@@ -151,6 +152,7 @@ class TestConfig(unittest.TestCase):
                <three>2.5</three>
                <four attr="attr-value">value</four>
                <five>True</five>
+               <six>3981391981389138998131389L</six>
              </component></flow>
              </planet>""")
         flow = planet.flows[0]
@@ -164,4 +166,4 @@ class TestConfig(unittest.TestCase):
         assert getattr(custom, 'data', None) == 'value'
         assert getattr(custom, 'attr', None) == 'attr-value'
         assert conf.get('five') == True
-        
+        assert conf.get('six') == 3981391981389138998131389L
