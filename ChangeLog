@@ -1,5 +1,10 @@
 2004-07-22  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/server/component.py (ParseLaunchComponent): Refactor stuff
+	
+
+	* tests/test_component_parse.py: Tests for pipeline parsing
+
 	* flumotion/utils/log.py (log): Rework, add support for message
 	handlers, so we can send stuff over the wire at a later point
 

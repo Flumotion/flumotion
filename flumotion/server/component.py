@@ -266,58 +266,42 @@ class BaseComponent(pb.Referenceable):
         element.set_property(property, value)
         
 class ParseLaunchComponent(BaseComponent):
+    SOURCE_TMPL = 'tcpclientsrc'
+    FEED_TMPL = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'
     def __init__(self, name, sources, feeds, pipeline_string=''):
         self.pipeline_string = pipeline_string
         BaseComponent.__init__(self, name, sources, feeds)
         
     def setup_pipeline(self):
-        self.create_pipeline()
+        pipeline = self.parse_pipeline(self.pipeline_string)
+        try:
+            self.pipeline = gst.parse_launch(pipeline)
+        except gobject.GError, e:
+            raise errors.PipelineParseError('foo') #str(e))
+
         BaseComponent.setup_pipeline(self)
 
-    def do_sources(self, sources, pipeline):
+    def parse_tmpl(self, pipeline, parts, template, sign, format):
         assert pipeline != ''
-        if len(sources) == 1:
-            source_name = sources[0]
-            if pipeline.find(source_name) != -1:
-                pipeline = pipeline.replace('@' + source_name, 'tcpclientsrc name=%s' % source_name)
+        if len(parts) == 1:
+            part_name = parts[0]
+            if pipeline.find(part_name) != -1:
+                pipeline = pipeline.replace(sign + part_name, '%s name=%s' % (template, part_name))
             else:
-                pipeline = 'tcpclientsrc name=%s ! %s' % (source_name, pipeline)
+                pipeline = format % {'tmpl': template, 'name': part_name, 'pipeline': pipeline}
         else:
-            for source in sources:
-                if ' ' in source:
-                    raise TypeError, "spaces not allowed in sources"
+            for part in parts:
+                if ' ' in part:
+                    raise TypeError, "spaces not allowed in parts"
             
-                source_name = '@%s' % source
-                if pipeline.find(source_name) == -1:
-                    raise TypeError, "%s needs to be specified in the pipeline" % source_name
+                part_name = sign + part
+                if pipeline.find(part_name) == -1:
+                    raise TypeError, "%s needs to be specified in the pipeline" % part_name
             
-                pipeline = pipeline.replace(source_name, 'tcpclientsrc name=%s' % source)
-        return pipeline
-
-    def do_feeds(self, feeds, pipeline):
-        element = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'
-        sign = ':'
-        
-        if len(feeds) == 1:
-            feed_name = feeds[0]
-            if pipeline.find(feed_name) != -1:
-                pipeline = pipeline.replace(sign + feed_name, '%s name=%s' % (element, feed_name))
-            else:
-                pipeline = '%s ! %s name=%s' % (pipeline, element, feed_name)
-        else:
-            for feed in self.feeds:
-                if ' ' in feed:
-                    raise TypeError, "spaces not allowed in sources"
-            
-                feed_name = sign + feed
-                if pipeline.find(feed_name) == -1:
-                    raise TypeError, "%s needs to be specified in the pipeline" % feed_name
-            
-                pipeline = pipeline.replace(feed_name, '%s name=%s' % (element, feed))
+                pipeline = pipeline.replace(part_name, '%s name=%s' % (template, part))
         return pipeline
         
-    def create_pipeline(self):
-        pipeline = self.pipeline_string
+    def parse_pipeline(self, pipeline):
         self.msg('Creating pipeline, template is %s' % pipeline)
         sources = self.getSources()
         if pipeline == '' and not sources:
@@ -334,12 +318,11 @@ class ParseLaunchComponent(BaseComponent):
         feeds = self.getFeeds()
 
         self.msg('sources=%s, feeds=%s' % (sources, feeds))
-        pipeline = self.do_sources(sources, pipeline)
-        pipeline = self.do_feeds(feeds, pipeline)
-
+        pipeline = self.parse_tmpl(pipeline, sources, self.SOURCE_TMPL, '@',
+                                 '%(tmpl)s name=%(name)s ! %(pipeline)s') 
+        pipeline = self.parse_tmpl(pipeline, feeds, self.FEED_TMPL, ':',
+                                 '%(pipeline)s ! %(tmpl)s name=%(name)s') 
+        
         self.msg('pipeline for %s is %s' % (self.getName(), pipeline))
         
-        try:
-            self.pipeline = gst.parse_launch(pipeline)
-        except gobject.GError, e:
-            raise errors.PipelineParseError('foo') #str(e))
+        return pipeline

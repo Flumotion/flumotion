@@ -184,10 +184,9 @@ class Launcher:
             self.msg('Starting http factory on port %d' % c.port)
             reactor.listenTCP(port, factory)
         component = streamer.MultifdSinkStreamer(c.name, c.sources)
-        callback = setup_cb
         callback_args = (c.port, component)
 
-        return component, callback, callback_args
+        return component, setup_cb, callback_args
 
     def setup_file_streamer(self, c):
         def setup_cb(port, component):
