@@ -32,7 +32,7 @@ from twisted.protocols.basic import NetstringReceiver
 
 from flumotion import config
 from flumotion.manager import manager
-from flumotion.manager.config import FlumotionConfigXML
+from flumotion.common.config import FlumotionConfigXML
 from flumotion.manager.registry import registry
 from flumotion.component import component
 from flumotion.utils import log, gstutils

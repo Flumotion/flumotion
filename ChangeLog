@@ -1,5 +1,15 @@
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* TODO:
+	* doc/reference/Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/launcher.py:
+	* flumotion/manager/Makefile.am:
+	* flumotion/manager/config.py:
+	  move manager.config to common
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion.in:
 	* flumotion/manager/registry.py:
 	  put registry in homedir.  create higher-level directories.

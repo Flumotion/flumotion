@@ -11,6 +11,7 @@ MODULE_FILES = \
 	flumotion/admin/spyglass.py		\
 	flumotion/config/__init__.py		\
 	flumotion/common/auth.py		\
+        flumotion/common/config.py		\
 	flumotion/common/errors.py		\
 	flumotion/common/interfaces.py		\
 	flumotion/common/launcher.py		\
@@ -21,7 +22,6 @@ MODULE_FILES = \
 	flumotion/component/http/http.py	\
 	flumotion/component/passwd/passwd.py	\
 	flumotion/manager/admin.py		\
-        flumotion/manager/config.py		\
 	flumotion/manager/manager.py		\
 	flumotion/manager/registry.py		\
 	flumotion/twisted/gstreactor.py		\

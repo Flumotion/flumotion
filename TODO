@@ -2,6 +2,7 @@
 		big brother: either:
 
 * EASY		add test suite for logging and FLU_DEBUG variables
+* MEDIUM	figure out conflict between two config modules
 
 - make an executable script/program that makes all required checks and
   outputs a report, has a proper zero or non-zero exit status and 
