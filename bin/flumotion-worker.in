@@ -2,7 +2,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# bin/flumotion-manager: Flumotion streaming media server manager
+# bin/flumotion-worker: Flumotion streaming media server worker
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
@@ -103,7 +103,7 @@ def _install_reactor():
     gstreactor.install()
 
 def _run_main(path):
-    from twisted.python import reflect
+    from flumotion.twisted import reflect
     
     # Import errors first, otherwise the exception fails
     from flumotion.common import errors

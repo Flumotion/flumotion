@@ -1,5 +1,15 @@
 2004-11-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-manager.in:
+	* bin/flumotion-worker.in:
+	* bin/flumotion.in:
+	  copy stuff over from other binaries
+	* flumotion/common/config.py:
+	* flumotion/manager/main.py:
+	  add options for manager host and port
+
+2004-11-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	* flumotion/worker/job.py:
 	* flumotion/worker/main.py:

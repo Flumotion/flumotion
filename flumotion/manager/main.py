@@ -27,6 +27,8 @@ import sys
 from twisted.internet import reactor, error
 
 from flumotion.manager import manager
+# FIXME: merge mconfig and config
+from flumotion.manager import config as mconfig
 from flumotion.common import log, config, common, errors
 from flumotion.configure import configure
 
@@ -89,7 +91,6 @@ def _loadConfig(vishnu, filename):
     # make the workerheaven load the config
     vishnu.workerHeaven.loadConfiguration(filename)
 
-
 def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
     for path in paths:
@@ -144,6 +145,30 @@ def main(args):
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
+    # parse planet config file
+    if len(args) <= 1:
+        log.warning('manager', 'Please specify a planet configuration file')
+        sys.stderr.write("Please specify a planet configuration file.\n")
+        return -1
+
+    planetFile = args[1]
+    cfg = config.FlumotionConfigXML(planetFile)
+
+    # now copy over stuff from config that is not set yet
+    if not options.host and cfg.manager.host:
+        options.host = cfg.manager.host
+        log.debug('manager', 'Setting manager host to %s' % options.host)
+    if not options.port and cfg.manager.port:
+        options.port = cfg.manager.port
+        log.debug('manager', 'Setting manager port to %s' % options.port)
+    if not options.transport and cfg.manager.transport:
+        options.transport = cfg.manager.transport
+        log.debug('manager', 'Setting manager transport to %s' %
+            options.transport)
+    if not options.name and cfg.manager.name:
+        options.name = cfg.manager.name
+        log.debug('manager', 'Setting manager name to %s' % options.name)
+
     # set default values for all unset options
     if not options.host:
         options.host = "" # needed for bind to work
@@ -155,15 +180,16 @@ def main(args):
         elif options.transport == "ssl":
             options.port = defaultSSLPort
     if not options.name:
-        # FIXME: add config parsing for name, or check the directory
-        options.name = 'default'
+        try:
+            head, filename = os.path.split(planetFile)
+            head, name = os.path.split(head)
+            options.name = name
+            log.debug('manager', 'Setting name to %s based on path' % name)
+        except:
+            options.name = 'default'
+            log.debug('manager', 'Setting name to default')
 
     # check for wrong options/arguments
-    if len(args) <= 1:
-        log.warning('manager', 'Please specify a planet configuration file')
-        sys.stderr.write("Please specify a planet configuration file.\n")
-        return -1
-
     if not options.transport in ['ssl', 'tcp']:
         sys.stderr.write('ERROR: wrong transport %s, must be ssl or tcp\n' %
             options.transport)

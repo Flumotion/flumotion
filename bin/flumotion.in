@@ -2,49 +2,127 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# bin/flumotion: Flumotion streaming media server startup script
+# bin/flumotion: Flumotion service script helper
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004 Fluendo (www.fluendo.com)
+# Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
 # See "LICENSE.GPL" in the source distribution for more information.
 
-# This program is also licensed under the Flumotion license.
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+# Headers in this file shall remain intact.
+
+
+# Be very careful about adding new imports here, we want to catch
+# Ctrl-C, so we must be able to enter the try/except for KeyboardInterrupt
+# as quick as possible
 import os
 import sys
-sys.path.insert(0, '@PYGTK_DIR@')
 
-import pygtk
-pygtk.require('2.0')
+# Variable templates 
+PREFIX = '@prefix@'
+PYGTK_DIR = '@PYGTK_DIR@'
+PYGST_DIR = '@PYGST_DIR@'
+PYGTK_VERSION = '@PYGTK_REQ@'
+PROGRAM_PATH = 'flumotion.service.main.main'
 
-import gobject
-if gobject.pygtk_version < (2,3,96):
-    print 'PyGTK 2.3.96 or higher is required'
-    raise SystemExit
-os.environ['PYGTK_USE_GIL_STATE_API'] = ''
-gobject.threads_init()
+def _init_gobject():
+    """
+    I setup paths for pygtk from configure and
+    make sure that the installed version of pygtk
+    is sane enough to be usable by us
+    """
+    
+    sys.path.insert(0, PYGTK_DIR)
 
-# This can't be removed, 
-dir = os.path.dirname(os.path.abspath(__file__))
-if os.path.exists(os.path.join(dir, '.svn')):
-    root = os.path.split(dir)[0]
-else:
-    root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
-sys.path.insert(0, root)
+    try:
+        import pygtk
+        pygtk.require('2.0')
 
-from flumotion.common import errors, setup
-from flumotion.service.main import main
+        import gobject
+    except ImportError:
+        raise SystemExit('ERROR: PyGTK could not be found')
 
-if __name__ == '__main__':
-    setup.setup(root)
+    if gobject.pygtk_version < PYGTK_VERSION.split('.'):
+        raise SystemExit('ERROR: PyGTKPyGTK %s or higher is required' % PYGTK_VERSION)
 
+    # To be able to have other threads emitting signals connected
+    # python callbacks we need to use the new PyGILThread_STATE API
+    # Which in PyGTK 2.4.0 only can be turned on by using an
+    # environment variable
+    os.environ['PYGTK_USE_GIL_STATE_API'] = ''
+    gobject.threads_init()
+
+def _init_gst():
+    """
+    I setup paths for gst-python from configure and
+    make sure that the installed version of gst-python
+    is sane enough to be usable by us
+    """
+
+    if PYGST_DIR != PYGTK_DIR:
+        sys.path.insert(0, PYGTK_DIR)
+        
+    try:
+        import gst
+    except ImportError:
+        raise SystemExit('ERROR: gst-python could not be found')
+    
+def _setup_project_root():
+    dir = os.path.dirname(os.path.abspath(__file__))
+    if os.path.exists(os.path.join(dir, '.svn')):
+        root = os.path.split(dir)[0]
+    else:
+        root = os.path.join(PREFIX, 'lib', 'flumotion', 'python')
+    sys.path.insert(0, root)
+
+def _install_reactor():
+    """
+    Installs our reactor, so we can use twisted.internet from the
+    whole code base without caring about the default reactor
+    """
+    
+    try:
+        from twisted.copyright import version
+    except ImportError:
+        raise SystemExit('ERROR: Twisted could not be found')
+        
+    #if version < TWISTED_VERSION:
+    #    print >> sys.stderr, 'Twisted 1.3.0 or higher required'
+        
+    from flumotion.twisted import gstreactor
+    gstreactor.install()
+
+def _run_main(path):
+    from flumotion.twisted import reflect
+    
+    # Import errors first, otherwise the exception fails
+    from flumotion.common import errors
+    from flumotion.common import setup
+    setup.setup()
+    
+    main = reflect.namedAny(path)
+    
     try:
         sys.exit(main(sys.argv))
     except errors.SystemError, e:
         print 'ERROR:', e
+        sys.exit(1)
+    
+try:
+    _setup_project_root()
+    _init_gobject()
+    _init_gst()
+    _install_reactor()
+    _run_main(PROGRAM_PATH)
+except KeyboardInterrupt:
+    print 'Interrupted'

@@ -71,8 +71,12 @@ class ConfigEntryFlow:
 
 class ConfigEntryManager:
     "I represent a <manager> entry in a planet config file"
-    def __init__(self):
-        self.bouncer = None
+    def __init__(self, name, host, port, transport, bouncer):
+        self.name = name
+        self.host = host
+        self.port = port
+        self.transport = transport
+        self.bouncer = bouncer
 
 class ConfigEntryWorker:
     "I represent a <worker> entry in a registry file"
@@ -234,19 +238,42 @@ class FlumotionConfigXML(log.Loggable):
         #   ...
         # </manager>
 
-        manager = ConfigEntryManager()
+        name = None
+        host = None
+        port = None
+        transport = None
+        bouncer = None
+
+        if node.hasAttribute('name'):
+            name = str(node.getAttribute('name'))
+
         for child in node.childNodes:
             if (child.nodeType == Node.TEXT_NODE or
                 child.nodeType == Node.COMMENT_NODE):
                 continue
             
-            if child.nodeName != "component":
-                raise ConfigError("unexpected 'manager' node: %s" % child.nodeName)
-            if manager.bouncer:
-                raise ConfigError("<manager> section can only have one <component>")
-            manager.bouncer = self.parseComponent(child)
+            if child.nodeName == "host":
+                host = str(child.firstChild.nodeValue)
+            elif child.nodeName == "port":
+                try:
+                    port = int(child.firstChild.nodeValue)
+                except ValueError:
+                    raise ConfigError("<port> value must be an integer")
+            elif child.nodeName == "transport":
+                transport = str(child.firstChild.nodeValue)
+                if not transport in ('tcp', 'ssl'):
+                    raise ConfigError("<transport> must be ssl or tcp")
+            elif child.nodeName == "component":
+                if bouncer:
+                    raise ConfigError("<manager> section can only have one <component>")
+                bouncer = self.parseComponent(child)
+                    
+            else:
+                raise ConfigError("unexpected '%s' node: %s" % (node.nodeName, child.nodeName))
+
             # FIXME: assert that it is a bouncer !
-        return manager
+
+        return ConfigEntryManager(name, host, port, transport, bouncer)
      
     def DEPRECATED_parse_workers(self, node):
         # <workers policy="password/anonymous">

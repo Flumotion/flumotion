@@ -103,7 +103,7 @@ def _install_reactor():
     gstreactor.install()
 
 def _run_main(path):
-    from twisted.python import reflect
+    from flumotion.twisted import reflect
     
     # Import errors first, otherwise the exception fails
     from flumotion.common import errors
