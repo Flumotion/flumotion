@@ -2,6 +2,16 @@
 
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
+	* flumotion/component/component.py:
+	* flumotion/component/http/http.py:
+	* flumotion/component/http/http_gui.py:
+	* flumotion/manager/component.py:
+	  layout statistics more nicely.  Add peak time.
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/dialogs.py:
 	  make progress dialog a bit better, with updates on what it's reloading
 

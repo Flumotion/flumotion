@@ -44,7 +44,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     gsignal('reloading', str)
     gsignal('update', object)
     
-    logCategory = 'adminclient'
+    logCategory = 'adminmodel'
 
     def __init__(self):
         self.__gobject_init__()
@@ -68,7 +68,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     # default Errback
     def _defaultErrback(self, failure):
-        self.warning('Errback failure: %s' % failure.getErrorMessage())
+        self.debug('received failure: %s' % failure.getErrorMessage())
+        return failure
 
     ### pb.Referenceable methods
     def remote_log(self, category, type, message):

@@ -167,7 +167,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
         try:
             flumotion.utils.reload()
         except SyntaxError, msg:
-            raise flumotion.twisted.errors.ReloadSyntaxError(msg)
+            raise errors.ReloadSyntaxError(msg)
         self._reloaded()
 
     def remote_callMethod(self, method_name, *args, **kwargs):

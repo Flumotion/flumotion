@@ -102,6 +102,9 @@ class Window(log.Loggable):
     Creates the GtkWindow for the user interface.
     Also connects to the manager on the given host and port.
     '''
+
+    logCategory = 'adminview'
+
     def __init__(self, host, port):
         self.gladedir = config.gladedir
         self.imagedir = config.imagedir
@@ -111,7 +114,8 @@ class Window(log.Loggable):
         
     # default Errback
     def _defaultErrback(self, failure):
-        self.warning('Errback failure: %s' % failure.getErrorMessage())
+        self.warning('Errback: unhandled failure: %s' % failure.getErrorMessage())
+        return failure
 
     def create_ui(self):
         wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
@@ -293,9 +297,16 @@ class Window(log.Loggable):
             dialog.stop()
             dialog.destroy()
 
+        def _syntaxErrback(failure, self, progress):
+            failure.trap(errors.ReloadSyntaxError)
+            _stop(progress)
+            self.error_dialog("Could not reload component:\n%s." % failure.getErrorMessage())
+            return None
+            
         def _callLater(admin, dialog):
             deferred = self.admin.reload()
             deferred.addCallback(lambda result: _stop(dialog))
+            deferred.addErrback(_syntaxErrback, self, dialog)
             deferred.addErrback(self._defaultErrback)
         
         dialog = dialogs.ProgressDialog("Reloading ...", "Reloading client code", self.window)

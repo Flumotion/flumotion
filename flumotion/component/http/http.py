@@ -155,24 +155,38 @@ class HTTPStreamingAdminResource(resource.Resource):
         bytes_received  = stats.getBytesReceived()
         uptime          = stats.getUptime()
         
-        s = {}
-        s['Clients connected'] = stats.getClients()
-        s['Mime type'] = self.parent.streamer.get_mime()
-        s['Total bytes sent'] = format_bytes(bytes_sent)
-        s['Bytes processed'] = format_bytes(bytes_received)
-        s['Stream uptime'] = format_time(uptime)
-        s['Stream bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
-        s['Total client bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
-        s['Peak Client Number'] = stats.getPeakClients()
-        
-        stats.updateAverage()
-        s['Average Simultaneous Clients'] = int(stats.getAverageClients())
-        s['Maximum allowed clients'] = int(self.parent.maxAllowedClients())
-
+        def row(label, value):
+            return '<tr><td>%s</td><td>%s</td></tr>' % (label, value)
         block = []
-        for key, value in s.items():
-            block.append('<tr><td>%s</td><td>%s</td></tr>' % (key, value))
-            
+
+        block.append('<tr><td colspan=2><b>Stream</b></td></tr>')
+        block.append('<tr>')
+        block.append(row('Mime type', self.parent.streamer.get_mime()))
+        block.append(row('Uptime', format_time(uptime)))
+        bitrate = format_bytes(bytes_received / uptime) + '/sec'
+        block.append(row('Bit rate', bitrate))
+        block.append(row('Total bytes', format_bytes(bytes_received)))
+        block.append('</tr>')
+
+        block.append('<tr><td colspan=2><b>Clients</b></td></tr>')
+        block.append('<tr>')
+        clients = stats.getClients()
+        max = int(self.parent.maxAllowedClients())
+        block.append(row('Current Connections', "%d of %d" % (clients, max)))
+        peak = stats.getPeakClients()
+        peak_time = time.ctime(stats.getPeakEpoch())
+        block.append(row('Peak Connections', "%d (%s)" % (peak, peak_time)))
+        stats.updateAverage()
+        block.append(row('Average Connections', int(stats.getAverageClients())))
+        block.append('</tr>')
+
+        block.append('<tr><td colspan=2><b>Client consumption</b></td></tr>')
+        block.append('<tr>')
+        bitrate = format_bytes(bytes_sent / uptime) + '/sec'
+        block.append(row('Bit rate', bitrate))
+        block.append(row('Total bytes', format_bytes(bytes_sent)))
+        block.append('</tr>')
+         
         return STATS_TEMPLATE % {
             'name': self.parent.streamer.get_name(),
             'stats': "\n".join(block)}
@@ -183,8 +197,10 @@ class Stats:
         
         self.no_clients = 0        
         self.start_time = time.time()
-        # keep track of the highest number
+        # keep track of the highest number and the last epoch this was reached
         self.peak_client_number = 0 
+        self.peak_epoch = self.start_time
+
         # keep track of average clients by tracking last average and its time
         self.average_client_number = 0
         self.average_time = self.start_time
@@ -209,7 +225,9 @@ class Stats:
 
         self.no_clients += 1
 
-        if self.no_clients > self.peak_client_number:
+        # >= so we get the last epoch this peak was achieved
+        if self.no_clients >= self.peak_client_number:
+            self.peak_epoch = time.time()
             self.peak_client_number = self.no_clients
     
     def clientRemoved(self):
@@ -230,6 +248,9 @@ class Stats:
     
     def getPeakClients(self):
         return self.peak_client_number
+
+    def getPeakEpoch(self):
+        return self.peak_epoch
     
     def getAverageClients(self):
         return self.average_client_number
@@ -249,11 +270,6 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.request_hash = {}
         self.auth = None
         
-        self.start_time = time.time()
-        self.peak_client_number = 0 # keep track of the highest number
-        # keep track of average clients by tracking last average and its time
-        self.average_client_number = 0
-        self.average_time = self.start_time
         self.maxclients = -1
         
         resource.Resource.__init__(self)
@@ -442,6 +458,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         else:
             return self.handleNewClient(request)
 
+# FIXME: this is not used, what does it want to do ?
 class HTTPView(component.ComponentView):
     def __init__(self, comp):
         component.ComponentView.__init__(self, comp)

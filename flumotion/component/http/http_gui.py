@@ -20,7 +20,7 @@
 
 import gtk
 
-from flumotion.twisted import errors
+from flumotion.common import errors
 
 class BaseUI:
     def __init__(self, name, admin):

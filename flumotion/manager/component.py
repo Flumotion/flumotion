@@ -180,11 +180,10 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
     # general fallback for unhandled errors so we detect them
     # FIXME: we can't use this since we want a PropertyError to fall through
     # afger going through the PropertyErrback.
-    def _mindErrback(self, failure, ignores = None):
+    def _mindErrback(self, failure, *ignores):
         if ignores:
-            for ignore in ignores:
-                if isinstance(failure, ignore):
-                    return failure
+            if failure.check(*ignores):
+               return failure
         self.warning("Unhandled remote call error: %s" % failure.getErrorMessage())
         self.warning("raising '%s'" % str(failure.type))
         return failure
@@ -333,7 +332,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         
         cb = self._mindCallRemote('setElementProperty', element, property, value)
         cb.addErrback(self._mindPropertyErrback)
-        cb.addErrback(self._mindErrback, (errors.PropertyError, ))
+        cb.addErrback(self._mindErrback, errors.PropertyError)
         return cb
         
     def getElementProperty(self, element, property):
@@ -360,7 +359,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         self.debug("getting property %s on element %s" % (element, property))
         cb = self._mindCallRemote('getElementProperty', element, property)
         cb.addErrback(self._mindPropertyErrback)
-        cb.addErrback(self._mindErrback, (errors.PropertyError, ))
+        cb.addErrback(self._mindErrback, errors.PropertyError)
         return cb
 
     def callComponentRemote(self, method, *args, **kwargs):
@@ -377,13 +376,14 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         """
         self.debug("calling component method %s" % method)
         cb = self._mindCallRemote('callMethod', method, *args, **kwargs)
-        cb.addErrback(self._mindErrback, (Exception, ))
+        cb.addErrback(self._mindErrback, Exception)
         return cb
         
     def _reloadComponentErrback(self, failure):
         import exceptions
         failure.trap(errors.ReloadSyntaxError)
         self.warning(failure.getErrorMessage())
+        print "Ignore the following Traceback line, issue in Twisted"
         return failure
 
     def reloadComponent(self):
@@ -394,7 +394,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         """
         cb = self._mindCallRemote('reloadComponent')
         cb.addErrback(self._reloadComponentErrback)
-        cb.addErrback(self._mindErrback, (errors.ReloadSyntaxError, ))
+        cb.addErrback(self._mindErrback, errors.ReloadSyntaxError)
         return cb
 
     def getUIEntry(self):
