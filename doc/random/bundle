@@ -56,7 +56,11 @@ Notes:
 * i' should not in any ways be tied to python code, eg glade or images can
   also be included
 
-Admin, sending over a bundle
+TODO:
+  Markers for wizard steps, currently hard coded to gtk/wizard.
+  Name of wizard step mapped to a file in a bundle
+
+Sending over a bundle
 ============================
 
 1. Requests for flumotion/components/producers/videotest/gtk/admin.py
@@ -126,17 +130,49 @@ remote_getBundle(name, filename, pythonName)
 getBundle does the dependency checking and fetches all bundles that
 the request bundle depends on.
 
-pseudo code:
 
-def getBundle(self, name=None, filename=None, pythonName=None):
-  if name:
-    return self.bundleManager.getByName(name)
-  elif filename:
-    return self.bundleManager.getByFilename(filename)
-  elif pythonName:
-    return self.bundleManager.getByPythonName(pythonName)
+Public API
+==========
 
-Running a component (in the worker)
+## Manager side ##
+class BaseHeaven:
+  # Used from registry
+  def addBundle(name, deps, files)
+  def getBundleName(filename, pythonName)
+  def getBundle(bundleName, filename, pythonName)
+     return (bundle, deps) or (None, None)
+  def remote_getBundle(name, filename, pythonName)
+
+## Client side ##
+class BaseMedium:
+  # XXX: public or private?
+  def getBundle(name, filename, pythonName)
+  def remote_runBundle(bundleName, filename, objectName, *args, **kwargs)
+    # to implement, base it on flumotion.worker.worker.remote_runCode
+  def runBundle(bundleName, filename, objectName, *args, **kwargs):
+
+   XXX: Perhaps remote_runCode, currently in worker (move to Base) should 
+        take an additional filename argument, so tracebacks can contain
+        the name of the loaded module
+        now we're always been run string segments, but in the future we
+        will mostly run files (filename is passed when using execfile
+        instead of exec)
+	Otherwise we need a way of running a filename instead of a piece of
+	code, maybe even deprecate the current method.
+
+    Current definition:
+      def remote_runCode(self, codeSegment, objectName, *args, **kwargs):
+    Proposed new:
+      def remote_runCode(self, filename, objectName, *args, **kwargs):
+    Or maybe just make it internal to runBundle
+
+This covers the two use cases:
+
+1. Run a bundle locally
+2. Run a bundle remotely (combined with workerCallRemote or
+   componentCallRemote)
+
+Running a component
 ===================
 
 (manager)
@@ -147,23 +183,32 @@ Running a component (in the worker)
 
 (worker)
 
-3. Request the bundle (if it's not up to date), by calling getBundle
-   name is fetched from the registry
+3. In the worker, spawn a new job, fork etc
 
-4. Run the file from the bundle (using reflect.namedAny)
-   FIXME: not sure if reflect.namedAny makes any sense at all to use here.
-   Why be fancy when we aren't in other cases for the same sort of thing ?
+4. call runBundle on the BaseMedium
 
-BundleManager
-=============
+5. runBundle requests the bundle and all dependencies
 
-public API
+6. it runs the bundle inside the job
 
-class BundleManager:
-  def addBundle(bundle)                  # Used by registry
-	# FIXME: I think bundlemanager should manage bundlers,
-        # an intermediary object that knows about contents of bundles
-	# and calculates md5sums and creates zip files
-  def getByName(name)
-  def getByFilename(filename)
-  def getByPythonName(pythonName)
+Running probe code
+==================
+
+1. Name for the bundle is hard coded in the wizard step itself,
+   say probe-soundcard and a hard coded entry point
+
+2. WizardStep calls (through Wizard or directly) remote_runBundle, through
+   workerCallRemote
+
+Running wizard step
+===================
+
+1. take python name (eg, flumotion.component.producer.videotest) and
+   add gtk.wizard, run that code with a specific entry code
+
+2. Send it to remote_runBundle
+
+Running admin configuration
+===========================
+
+TODO

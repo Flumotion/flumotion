@@ -101,3 +101,16 @@ component that saves it to xml (or any other format).
 WizarSaver should therefor probably only save the final state to xml and not
 anything else.
 
+
+Queryies
+
+1. audio producers
+2. video produces
+3. filters (eg image overlays)
+4. muxers
+5. video encoders
+6. audio encoders
+7. bouncers
+
+Add a list of elements, and don't do the checkin in the wizard step, it
+should be done in the wizard or the scenario

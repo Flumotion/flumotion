@@ -1,0 +1,64 @@
+A scenario sits between wizard and its wizard steps
+It takes care of fetching the state of the steps and doing something
+useful to it, eg present next step in case of wizards.
+
+Basic scenario
+
+Welcome
+  -> Source
+
+Source
+  if has_video
+     get step from combobox_video
+   else if has_audio
+     get step from combobox_audio
+
+VideoSource (for TVCard, FireWire, Webcam, TestVideoSource)
+  -> Overlay
+
+Overlay
+  if Source option has_video is true
+    get Source option audio
+    if Soundcard is selected
+      -> Soundcard
+    else
+      -> Test Audio Source
+
+Soundcard
+  -> Encoding
+
+Encoding
+  # video "algorithm"
+  if Source option has_video is true
+    if combobox_video is theora
+      -> Theora
+    else if it is smoke
+      -> Smoke
+    else if it is JPEG
+      -> JPEG
+  # audio "algorithm"
+  else if Source option has_audio is true
+    if combobox_audio is vorbis
+      -> Vorbis
+    else if it is Speex
+      -> Speex
+    else if it is Mulaw
+      -> Consumption
+  else
+    -> Consumption
+
+VideoEncoding (for Theora, Smoke, JPEG)
+  -> Use audio algorithm from Encoding
+    
+AudioEncoder (for Vorbis, Speex)
+  -> Consumption
+
+Consumption (for all HTTP and Disk)
+  Very complex algorithm, see flumotion/wizard/steps.py
+  ends up with:
+  -> License
+
+License
+  -> Summary
+
+
