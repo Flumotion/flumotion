@@ -153,6 +153,7 @@ class HTTPStreamingAdminResource(resource.Resource):
         stats['Peak Client Number'] = self.streaming.peak_client_number
         self.streaming.updateAverage()
         stats['Average Simultaneous Clients'] = int(self.streaming.average_client_number)
+        stats['Maximum allowed clients'] = int(self.streaming.maxAllowedClients())
         block = []
         for key in stats.keys():
             block.append('<tr><td>%s</td><td>%s</td></tr>' % (key, stats[key]))
@@ -162,7 +163,8 @@ class HTTPStreamingAdminResource(resource.Resource):
         }
 
 class HTTPStreamingResource(resource.Resource):
-    def __init__(self, streamer, maxclients=1000):
+    __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
+    def __init__(self, streamer):
         self.logfile = None
             
         streamer.connect('client-removed', self.streamer_client_removed_cb)
@@ -178,7 +180,6 @@ class HTTPStreamingResource(resource.Resource):
         self.average_client_number = 0
         self.average_time = self.start_time
         
-        self.maxclients = maxclients
         resource.Resource.__init__(self)
 
     def setLogfile(self, logfile):
@@ -286,9 +287,17 @@ class HTTPStreamingResource(resource.Resource):
         
         return True
 
+    def maxAllowedClients(self):
+        """
+        maximum number of allowed clients based on soft limit for number of
+        open file descriptors and fd reservation
+        """
+        from resource import getrlimit, RLIMIT_NOFILE
+        limit = getrlimit(RLIMIT_NOFILE)
+        return limit[0] - self.__reserve_fds__
+
     def reachedMaxClients(self):
-        # TODO: Use an integer value
-        return len(self.request_hash) >= (self.maxclients + 1)
+        return len(self.request_hash) >=  self.maxAllowedClients()
     
     def isAuthenticated(self, request):
         if self.auth is None:
@@ -325,8 +334,8 @@ class HTTPStreamingResource(resource.Resource):
         self.debug('Not sending data, it\'s not ready')
         return server.NOT_DONE_YET
         
-    def handleMaxclients(self, request):
-        self.debug('Refusing clients, already %s clients' % self.maxclients)
+    def handleMaxClients(self, request):
+        self.debug('Refusing clients, client limit %d reached' % self.maxAllowedClients())
 
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_VERSION)
@@ -355,6 +364,7 @@ class HTTPStreamingResource(resource.Resource):
         # everything fulfilled, serve to client
         self.setHeaders(request)
         self.addClient(request)
+        fd = request.transport.fileno()
         self.streamer.add_client(fd)
         return server.NOT_DONE_YET
         
@@ -364,7 +374,7 @@ class HTTPStreamingResource(resource.Resource):
         if not self.isReady():
             return self.handleNotReady(request)
         elif self.reachedMaxClients():
-            return self.handleMaxclients(request)
+            return self.handleMaxClients(request)
         elif not self.isAuthenticated(request):
             return self.handleUnauthorized(request)
         else:
