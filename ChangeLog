@@ -1,3 +1,8 @@
+2005-02-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/client.py (Window.admin_connected_cb):
+	Actually run the wizard, yo.
+
 2005-02-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/client.py:

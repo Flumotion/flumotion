@@ -540,6 +540,7 @@ class Window(log.Loggable, gobject.GObject):
 
         if not self._components:
             self.debug('no components detected, running wizard')
+            self.runWizard()
     
     def admin_disconnected_cb(self, admin):
         message = "Lost connection to manager, reconnecting ..."
