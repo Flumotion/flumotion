@@ -1,0 +1,4 @@
+* MEDIUM	integration with monitoring tools:
+		big brother: either:
+- make an http URL return a 2xx code when it works or a 5xx code when it doesn't
+- make an executable script/program that makes all required checks and outputs a report, has a proper zero or non-zero exit status and can't run forever if things are stuck (times out properly)
