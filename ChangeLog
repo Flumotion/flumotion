@@ -1,3 +1,29 @@
+2005-02-09  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/wizard.py (WizardStep.next_pages): New class
+	member.
+	(WizardStep.__init__): Go ahead and load up the glade file here
+	instead of in Wizard.set_page.
+	(WizardStep.is_available): New method. By default just returns
+	True.
+	(WizardStep.setup): Provide default implementation so we don't
+	have to hasattr(foo,'setup').
+	(WizardStep.__init__): Take an extra arg, glade_prefix, the prefix
+	when looking for glade files.
+	(Wizard.__init__): Pass a glade_prefix to the pages.
+	(Wizard.set_page): Glade init moved to the pages. Compute
+	available pages to pass to WizardStep.setup().
+
+	* flumotion/admin/gtk/greeter.py (Initial, ConnectToExisting)
+	(Authenticate, LoadConnection): Add next_pages, indicating the set
+	of possible next steps. Change setup() to take an extra argument,
+	available_pages, the subset of next_pages that are actually
+	available.
+	(Initial.setup): New method, will desensitize unavailable next
+	steps.
+	(LoadConnection.is_available): New method, returns True only if
+	there are connections available to choose.
+
 2005-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/component.py:

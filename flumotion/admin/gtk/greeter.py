@@ -41,6 +41,7 @@ class Initial(wizard.WizardStep):
     text = 'Flumotion Admin needs to connect to a Flumotion manager.\nChoose' \
            + ' an option from the list and click "Forward" to begin.'
     connect_to_existing = None
+    next_pages = ['connect_to_existing', 'load_connection']
 
     def on_next(self, state):
         radio_buttons = self.connect_to_existing.get_group()
@@ -50,14 +51,20 @@ class Initial(wizard.WizardStep):
                 return radio_buttons[i].get_name()
         raise AssertionError
     
+    def setup(self, state, available_pages):
+        for wname in self.next_pages:
+            getattr(self,wname).set_sensitive(wname in available_pages)
+        getattr(self,available_pages[0]).set_active(True)
+
 
 class ConnectToExisting(wizard.WizardStep):
     name='connect_to_existing'
     title='Host information'
     text = 'Please enter the address where the manager is running.'
     host_entry = port_entry = ssl_check = None
+    next_pages = ['authenticate']
 
-    def setup(self, state):
+    def setup(self, state, available_pages):
         self.on_entries_changed()
         self.host_entry.grab_focus()
 
@@ -91,8 +98,9 @@ class Authenticate(wizard.WizardStep):
     title = 'Authentication'
     text = 'Please select among the following authentication methods.'
     auth_method_combo = user_entry = passwd_entry = None
+    next_pages = []
 
-    def setup(self, state):
+    def setup(self, state, available_pages):
         if not 'auth_method' in state:
             self.auth_method_combo.set_active(0)
         self.on_entries_changed()
@@ -122,6 +130,7 @@ class LoadConnection(wizard.WizardStep):
     title = 'Load connection'
     text = 'Please choose a connection from the box below.'
     connections = None
+    next_pages = []
 
     def __init__(self, *args):
         def cust_handler(xml, proc, name, *args):
@@ -131,6 +140,9 @@ class LoadConnection(wizard.WizardStep):
             return w
         gtk.glade.set_custom_handler(cust_handler)
         wizard.WizardStep.__init__(self, *args)
+
+    def is_available(self):
+        return self.connections.get_selected()
 
     def on_has_selection(self, widget, has_selection):
         self.button_next.set_sensitive(has_selection)
@@ -142,7 +154,7 @@ class LoadConnection(wizard.WizardStep):
         state.update(self.connections.get_selected())
         return '*finished*'
 
-    def setup(self, state):
+    def setup(self, state, available_pages):
         self.connections.grab_focus()
 
 

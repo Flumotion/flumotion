@@ -33,6 +33,8 @@ from flumotion.configure import configure
 from flumotion.common.pygobject import gsignal
 
 
+# FIXME FIXME: these docs are wrong.
+
 # This file implements a generic wizard framework.
 #
 # To conjure up a new wizard, call Wizard(NAME, FIRST_PAGE). NAME is the name of
@@ -78,10 +80,28 @@ class WizardStep:
     title = None
     on_next = None
     button_next = None
+    next_pages = None
     # also, all widgets from the glade file will become attributes
     page = None # filled from glade
 
-    def __init__(self, *args):
+    def __init__(self, glade_prefix=''):
+        wtree = gtk.glade.XML(os.path.join(configure.gladedir,
+                                           glade_prefix+self.name+'.glade'),
+                              'page')
+        for widget in wtree.get_widget_prefix(''):
+            wname = widget.get_name()
+            if hasattr(self, wname) and getattr(self, wname):
+                raise AssertionError (
+                    "There is already an attribute called %s in %r" %
+                    (wname, self))
+            setattr(self, wname, widget)
+            wtree.signal_autoconnect(self)
+
+    def is_available(self):
+        return True
+
+    def setup(self, state, available_pages):
+        # vmethod
         pass
 
 class Wizard(gobject.GObject):
@@ -104,7 +124,7 @@ class Wizard(gobject.GObject):
 
         self.window = None
         self.page_bin = None
-        for x in pages: self.pages[x.name] = x()
+        for x in pages: self.pages[x.name] = x(name+'-')
         self.create_ui()
         self.name = name
         self.set_page(initial_page)
@@ -158,21 +178,13 @@ class Wizard(gobject.GObject):
         except KeyError:
             raise AssertionError ('No page named %s in %r' % (name, self.pages))
 
-        if not page.page:
-            wtree = gtk.glade.XML(os.path.join(configure.gladedir,
-                                               self.name+'-'+name+'.glade'),
-                                  'page')
-            for widget in wtree.get_widget_prefix(''):
-                wname = widget.get_name()
-                if hasattr(page, wname) and getattr(page, wname):
-                    raise AssertionError (
-                        "There is already an attribute called %s in %r" %
-                        (wname, page))
-                setattr(page, wname, widget)
-                wtree.signal_autoconnect(page)
+        assert page.page
 
         page.button_next = self.button_next
             
+        available_pages = [p for p in page.next_pages
+                                if self.pages[p].is_available()]
+
         self.page = page
         for w in self.page_bin.get_children():
             self.page_bin.remove(w)
@@ -180,8 +192,7 @@ class Wizard(gobject.GObject):
         self.label_title.set_markup('<big><b>%s</b></big>' % page.title)
         self.textview_text.get_buffer().set_text(page.text)
         self.button_next.set_sensitive(True)
-        if hasattr(page, 'setup'):
-            page.setup(self.state)
+        page.setup(self.state, available_pages)
 
     def on_delete_event(self, *window):
         self.state = None
