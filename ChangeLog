@@ -1,5 +1,14 @@
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
+	reviewed by: <delete if not using a buddy>
+
+	* flumotion/admin/gtk/client.py:
+	* flumotion/common/common.py:
+	* flumotion/common/config.py:
+	* flumotion/wizard/wizard.py:
+
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/wizard.py:
 
 	Make the selecting of worker for a component actually work as

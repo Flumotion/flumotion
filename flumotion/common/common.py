@@ -41,6 +41,11 @@ def formatStorage(units, precision = 2):
     @returns: value of units, formatted using SI scale and the given precision
     """
 
+    # XXX: We might end up calling float(), which breaks
+    #      when using LC_NUMERIC when it is not C
+    import locale
+    locale.setlocale(locale.LC_NUMERIC, "C")
+
     prefixes = ['E', 'P', 'T', 'G', 'M', 'k', '']
 
     value = float(units)

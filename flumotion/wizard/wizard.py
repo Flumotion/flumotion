@@ -465,8 +465,8 @@ class Wizard(gobject.GObject):
     def _setup_worker(self, step):
         # get name of active worker
         if self.combobox_worker:
-            iter = self.combobox_worker.get_active_iter()
             model = self.combobox_worker.get_model()
+            iter = self.combobox_worker.get_active_iter()
             text = model.get(iter, 0)[0]
             step.worker = text
 

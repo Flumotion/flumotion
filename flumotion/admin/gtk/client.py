@@ -334,10 +334,15 @@ class Window(log.Loggable, gobject.GObject):
             self.admin.loadConfiguration(configuration)
             self.show()
 
+        workers = self.admin.getWorkers()
+        if not workers:
+            self.error_dialog('Need at least one worker connected to run the wizard')
+            return
+        
         wiz = wizard.Wizard(self.admin)
         wiz.connect('finished', _wizard_finished_cb)
         wiz.load_steps()
-        wiz.run(True, self.admin.getWorkers(), main=False)
+        wiz.run(True, workers, main=False)
     
     def file_open_cb(self, button):
         dialog = gtk.FileChooserDialog("Open..",

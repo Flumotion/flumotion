@@ -378,6 +378,11 @@ class FlumotionConfigXML(log.Loggable):
         return values
 
     def parseProperties(self, node, type, properties):
+        # XXX: We might end up calling float(), which breaks
+        #      when using LC_NUMERIC when it is not C
+        import locale
+        locale.setlocale(locale.LC_NUMERIC, "C")
+
         config = {}
         for definition in properties:
             name = definition.name
