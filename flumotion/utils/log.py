@@ -19,6 +19,10 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import sys
+
+def log(m):
+    sys.stderr.write(m)
+    sys.stderr.flush()
     
 def msg(category, *args):
     log('[%s] %s\n' % (category, ' '.join(args)))
@@ -30,4 +34,3 @@ def error(category, *args):
     log('[%s] ERROR: %s\n' % (category, ' '.join(args)))
     raise SystemExit
 
-log = sys.stdout.write

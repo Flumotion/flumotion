@@ -37,9 +37,8 @@ from twisted.internet import reactor, error
 from twisted.manhole import telnet
 from twisted.spread import pb
 
-import pbutil
-import log
-import twistedutils
+from flumotion.twisted import pbutil, shell
+from flumotion.utils import log
 
 def msg(*args):
     log.msg('controller', *args)

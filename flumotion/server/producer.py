@@ -28,14 +28,18 @@ import gst
 from twisted.internet import reactor
 from twisted.python import log
 
-import errors
-import component
+from flumotion.server import component
+from flumotion.utils import log
+from flumotion import errors
 
+def msg(*args):
+    log.msg('producer', *args)
+    
 class Producer(component.BaseComponent):
     kind = 'producer'
     
     def listen(self, host, port):
-        log.msg('Going to listen on %s:%d' % (host, port))
+        msg('Going to listen on %s:%d' % (host, port))
         self.set_sink_properties(host=host, port=port)
         
         self.pipeline_play()

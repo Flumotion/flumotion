@@ -1,0 +1,30 @@
+#!/usr/bin/python
+# -*- Mode: Python -*-
+
+import os
+import sys
+sys.path.insert(0, '@PYGTK_DIR@')
+
+import pygtk
+pygtk.require('2.0')
+
+import gobject
+
+if getattr(gobject, 'pygtk_version', (0, 0, 0)) < (2, 3, 93):
+    print "PyGTK 2.3.93 or higher required"
+    raise SystemExit
+
+dir = os.path.dirname(os.path.abspath(__file__))
+if os.path.exists(os.path.join(dir, '.svn')):
+    root = os.path.split(dir)[0]
+else:
+    root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
+sys.path.insert(0, root)
+
+from flumotion.server import launcher
+
+def main(args):
+    return launcher.main(args)
+    
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

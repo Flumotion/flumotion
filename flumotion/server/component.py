@@ -28,10 +28,9 @@ import gobject
 from twisted.internet import reactor
 from twisted.spread import pb
 
-import pbutil
-import gstutils
-import errors
-import log
+from flumotion.twisted import pbutil
+from flumotion.utils import log, gstutils
+from flumotion import errors
 
 class ClientFactory(pbutil.ReconnectingPBClientFactory):
     __super_init = pbutil.ReconnectingPBClientFactory.__init__

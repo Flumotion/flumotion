@@ -31,9 +31,9 @@ import gst
 from twisted.web import server, resource
 from twisted.internet import reactor
 
-import component
-import errors
-import log
+from flumotion.server import component
+from flumotion.utils import log
+from flumotion import errors
 
 def msg(*args):
     log.msg('streamer', *args)

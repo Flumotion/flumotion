@@ -1,19 +1,8 @@
-# johan prefers a private lib dir
-# flumotiondir = $(pkgpyexecdir)
-flumotiondir = $(libdir)/flumotion
+SUBDIRS = gui server twisted utils
+flumotiondir = $(libdir)/flumotion/python/flumotion
 
 flumotion_DATA = \
-	__init__.py \
-	component.py \
-	converter.py \
-	controller.py \
 	errors.py \
-	launcher.py \
-	gstreactor.py \
-	gstutils.py \
-	pbutil.py \
-	producer.py \
-	streamer.py \
-	twistedutils.py
+	__init__.py
 
 EXTRA_DIST = $(flumotion_DATA)

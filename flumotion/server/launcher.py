@@ -28,15 +28,14 @@ import string
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 
-if __name__ == '__main__':
-    import gstreactor
-    gstreactor.install()
+from flumotion.twisted import gstreactor
+gstreactor.install()
 
 from twisted.internet import reactor
 from twisted.python import log
 from twisted.web import server, resource
 
-import gstutils
+from flumotion.utils import gstutils
 
 class Launcher:
     def __init__(self, controller_port):
@@ -58,6 +57,7 @@ class Launcher:
                 reactor.run(False)
             except KeyboardInterrupt:
                 pass
+            
             raise SystemExit
         self.controller_pid = pid
 

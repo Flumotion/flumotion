@@ -6,6 +6,8 @@ AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
 
+AC_SUBST(PYGTK_REQ,     2.3.90)
+
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")
 
@@ -22,6 +24,12 @@ if test "x$PYTHON" == "x"; then
   AC_MSG_ERROR(No suitable python version found)
 fi
 
+dnl check for pygtk
+PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_REQ)
+
+PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
+AC_SUBST(PYGTK_DIR)
+
 dnl check for epydoc
 AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
 AM_CONDITIONAL(HAVE_EPYDOC, test "x$EPYDOC" = "xyes")
@@ -29,7 +37,13 @@ AM_CONDITIONAL(HAVE_EPYDOC, test "x$EPYDOC" = "xyes")
 dnl output stuff
 AC_OUTPUT(
 Makefile
+bin/flumotion
+bin/Makefile
 flumotion/Makefile
+flumotion/gui/Makefile
+flumotion/server/Makefile
+flumotion/twisted/Makefile
+flumotion/utils/Makefile
 m4/Makefile
 docs/Makefile
 flumotion.spec
