@@ -49,7 +49,7 @@ class Streamer(resource.Resource):
         return sink
 
     def lost(self, obj, fd, ip):
-        self.add_client(fd)
+        self.remove_client(fd)
         self.msg('client from %s disconnected' % ip)
 
     def isReady(self):
