@@ -1,3 +1,13 @@
+2004-09-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/reference/Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/common.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common.py:
+	  A slight case of overengineering.
+	  At least we follow SI units correctly now.
+
 2004-09-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/reference/Makefile.am:

@@ -1,5 +1,6 @@
 EXTRA_DIST = \
 	test_bundle.py \
+	test_common.py \
 	test_component.py \
 	test_config.py \
 	test_flumotion_config.py \

@@ -12,6 +12,7 @@ MODULE_FILES = \
 	flumotion/config/__init__.py		\
 	flumotion/common/auth.py		\
         flumotion/common/bundle.py		\
+        flumotion/common/common.py		\
         flumotion/common/config.py		\
 	flumotion/common/errors.py		\
 	flumotion/common/interfaces.py		\

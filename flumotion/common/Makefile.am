@@ -4,6 +4,7 @@ flumotion_PYTHON = \
 	__init__.py \
 	auth.py \
 	bundle.py \
+	common.py \
 	config.py \
 	errors.py \
 	interfaces.py \
