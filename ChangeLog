@@ -1,5 +1,10 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* TODO:
+	  clean up todo, some things are already done, yay
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/planet.xml:
 	* flumotion/common/config.py:
 	* flumotion/manager/worker.py:

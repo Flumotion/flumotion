@@ -1,10 +1,5 @@
-* EASY		make log test not print stuff now that we made common init
-		log; or alternatively move it to each test
-
 * MEDIUM	integration with monitoring tools:
 		big brother: either:
-
-* MEDIUM	figure out conflict between two config modules
 
 * EASY		rename http to httpstreamer because we'll have a reader too
 
@@ -24,17 +19,9 @@
 
 * MEDIUM	allow expression of "test component depends on streamer component"
 
-* EASY		- remove IAdminComponent before 0.1.0
-
-* EASY		add version number to helps and friends
-
 * EASY		remove utils, split up gstutils
 
 * EASY:		change rawstring regentry type to string, and make pipelinestring for pipelines which need \n translated to space
-
-* MEDIUM:	change keycard/bouncer so there's an authenticated boolean on
-                the keycard, and return the keycard for challenge/response
-		type of auth
 
 * EASY:		fix all code files to have the new header
 
@@ -42,7 +29,12 @@
 
 * EASY:		write .pc and -uninstalled.pc
 
-* MEDIUM:	rename grid to flow ? rhymes with planet and atmosphere
+* EASY:		make relative attribute work on filename properties in xml
+	        so that they are relative to a given var from configure;
+		might need to make a type "path" for that in registry code ?
+
+* MEDIUM:	add import hooks so that when there is a.b in one pythonpathdir
+	        and a.c in another, programs can import both a.b and a.c
 
 - API cleanup:
 
@@ -64,13 +56,3 @@ http component
 - make an http URL return a 2xx code when it works or a 5xx code
   when it doesn't
 - check for StringIO requests instances, which Twisted 1.3.0 implements
-
-launcher
-- connect to controller
-
-controller
-- accept launcher connections and add a protocol to communicate with
-  a launcher to start up components
-- authentication between components
-
-

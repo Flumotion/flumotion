@@ -30,14 +30,17 @@ A FIRST TEST
 Once everything is installed, You can try this to start the server:
 
 terminal 1:
-  FLU_DEBUG=*:3 flumotion launcher conf/ogg-test-vorbis-theora.xml
+  FLU_DEBUG=*:3 flumotion-manager conf/planet.xml
 
 terminal 2:
-  FLU_DEBUG=*:3 flumotion-admin localhost 8890
+  FLU_DEBUG=*:3 flumotion-worker
+
+terminal 3:
+  FLU_DEBUG=*:3 flumotion-admin
 
   Double-click the streamer-ogg-test-vorbis-theora component
 
-terminal 3:
+terminal 4:
   gst-launch gnomevfssrc location=http://localhost:8800 ! oggdemux name=mux
              mux. ! { queue ! vorbisdec ! audioconvert ! alsasink }
              mux. ! { queue ! theoradec ! ffmpegcolorspace ! ximagesink }
@@ -46,7 +49,7 @@ terminal 3:
 
 Alternatively, you can use any theora-enabled network player to see the stream.
 
-terminal 4:
+terminal 6:
   for a in `seq 1 10`; do ( flumotion-tester http://localhost:8800 & ); done
 
   This will throw 10 processes with 100 clients each at the server.  Hopefully,
@@ -54,5 +57,11 @@ terminal 4:
 
 ABOVE AND BEYOND
 ----------------
-You're on your own for now.  Hey, what do you expect ? This is not a public
-release !
+You can subscribe to our development list.  Information is at
+http://lists.fluendo.com/mailman/listinfo/flumotion-devel
+
+You can visit us on IRC: #fluendo on irc.freenode.org
+
+You can visit our issues tracker:
+http://core.fluendo.com/trac
+
