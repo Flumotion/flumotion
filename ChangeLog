@@ -1,5 +1,12 @@
 2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/pygobject.py:
+	* flumotion/test/test_common_pygobject.py:
+	* flumotion/test/Makefile.am:
+	  add tests for flumotion.common.pygobject
+
+2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/bouncers/bouncer.py:
 	  implement remote_expireKeycardId for the admin ui to use
 	  do some refactoring
@@ -6883,5 +6890,4 @@
 2004-06-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* first post
-
 
