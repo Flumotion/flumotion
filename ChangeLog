@@ -1,5 +1,17 @@
 2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/reference/Makefile.am:
+	* flumotion/common/config.py:
+	* flumotion/common/interfaces.py:
+	* flumotion/common/registry.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  fix doc class hierarchy, fill in module descriptions
+
+2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	* doc/reference/Makefile.am:
 	* flumotion/Makefile.am:

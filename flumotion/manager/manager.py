@@ -16,7 +16,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 """
-Manager implementation and related classes
+Manager implementation and related classes.
 
 API Stability: semi-stable
 

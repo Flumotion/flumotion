@@ -15,6 +15,10 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+"""
+Parsing of configuration files.
+"""
+
 import os
 from xml.dom import minidom, Node
 

@@ -15,6 +15,10 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+"""
+Worker-side objects to handle job processes.
+"""
+
 import os
 import resource
 import signal

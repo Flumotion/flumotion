@@ -16,7 +16,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 """
-Interfaces used in Flumotion
+Interfaces used in Flumotion.
 """
 
 from twisted.python import components

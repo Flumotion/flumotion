@@ -15,6 +15,10 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+"""
+Worker-side objects for components.
+"""
+
 import os
 import socket
 
