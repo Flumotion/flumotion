@@ -4,6 +4,7 @@ componentdir = $(libdir)/flumotion/python/flumotion/admin/gtk
 component_PYTHON = \
 	__init__.py \
 	client.py \
+	connections.py \
 	dialogs.py \
 	greeter.py \
 	parts.py \

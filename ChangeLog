@@ -1,3 +1,9 @@
+2005-02-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/Makefile.am (component_PYTHON): Add
+	connections.py to the list. Thanks to Christian Frederick Kalager
+	Schaller for the tip.
+
 2005-02-09  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/client.py (Window.componentCallRemote): Fix
