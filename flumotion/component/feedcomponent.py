@@ -51,9 +51,11 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         basecomponent.BaseComponentMedium.__init__(self, component)
 
-        self.comp.connect('feed-state-changed', self._component_feed_state_changed_cb)
+        self.comp.connect('feed-state-changed',
+            self._component_feed_state_changed_cb)
         self.comp.connect('error', self._component_error_cb)
-        self.comp.connect('notify-feed-ports', self._component_notify_feed_ports_cb)
+        self.comp.connect('notify-feed-ports',
+            self._component_notify_feed_ports_cb)
         
         # override base Errback for callRemote to stop the pipeline
         #def callRemoteErrback(reason):
@@ -67,8 +69,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             message))
         self.callRemote('error', element_path, message)
         
-    def _component_feed_state_changed_cb(self, component, feed_name, state):
-        self.callRemote('feedStateChanged', feed_name, state)
+    def _component_feed_state_changed_cb(self, component, feed_name, old, state):
+        self.callRemote('feedStateChanged', feed_name, old, state)
         # FIXME: everything heeds to be playing, not just one !
         if state == gst.STATE_PLAYING:
             self.info('component is HAPPY')
@@ -79,9 +81,11 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
     ### Referenceable remote methods which can be called from manager
     def remote_play(self):
+        self.debug('manager asked to play')
         self.comp.play()
         
     def remote_pause(self):
+        self.debug('manager asked to pause')
         self.comp.pause()
 
     def remote_getElementProperty(self, elementName, property):
@@ -146,7 +150,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     logCategory = 'feedcomponent'
 
-    gsignal('feed-state-changed', str, object)
+    gsignal('feed-state-changed', str, object, object)
     gsignal('error', str, str)
     gsignal('notify-feed-ports')
 
@@ -155,8 +159,8 @@ class FeedComponent(basecomponent.BaseComponent):
     
     def __init__(self, name, eater_config, feeder_config):
         """
-        @param name: unique name of the component
-        @type name: string
+        @param name: name of the component
+        @type  name: string
         @param eater_config: entry between <source>...</source> from config
         @param feeder_config: entry between <feed>...</feed> from config
         """
@@ -377,7 +381,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self.debug('eater %s is now hungry' % name)
             self.eatersWaiting += 1
             self.state.set('message',
-                "Component %s is now hungry" % self.name)
+                "Component %s is now hungry, starting reconnect" % self.name)
             self.updateMood()
             self._eaterReconnectDC[name] = reactor.callLater(
                 self._reconnectInterval, self._eaterReconnect, element)
@@ -396,8 +400,11 @@ class FeedComponent(basecomponent.BaseComponent):
             # currently, we need to make sure all other elements go to PLAYING
             # as well, so we PAUSE then PLAY the complete pipeline
             #element.set_state(gst.STATE_PLAYING)
+            self.debug('pausing and iterating')
             self.set_state_and_iterate(gst.STATE_PAUSED)
+            self.debug('playing and iterating')
             self.set_state_and_iterate(gst.STATE_PLAYING)
+            self.debug('reconnected')
         else:
             self.debug('%s:%d not accepting connections, trying later' % (
                 host, port))
@@ -460,7 +467,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self.updateMood()
 
         self.debug('%d feeders waiting' % self.feedersWaiting)
-        self.emit('feed-state-changed', feed_name, state)
+        self.emit('feed-state-changed', feed_name, old, state)
 
     
     def cleanup(self):

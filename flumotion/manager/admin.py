@@ -88,6 +88,13 @@ class AdminAvatar(base.ManagerAvatar):
         reactor.stop()
         raise SystemExit
 
+    def perspective_componentStart(self, componentState):
+        """
+        Start the given component.  The component should be sleeping before
+        this.
+        """
+        return self.vishnu.componentStart(componentState)
+        
     # Generic interface to call into a component
     def perspective_componentCallRemote(self, componentState, methodName,
                                         *args, **kwargs):
@@ -97,6 +104,10 @@ class AdminAvatar(base.ManagerAvatar):
         @type componentState: L{flumotion.common.planet.ManagerComponentState}
         """
         assert isinstance(componentState, planet.ManagerComponentState)
+
+        if methodName == "start":
+            self.debug('forwarding "start" to perspective_componentStart')
+            return self.perspective_componentStart(componentState)
 
         m = self.vishnu.getComponentMapper(componentState)
         avatar = m.avatar

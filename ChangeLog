@@ -1,5 +1,16 @@
 2005-02-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent.py:
+	  notify both old and new state
+	* flumotion/manager/admin.py:
+	  add componentStart perspective method
+	* flumotion/manager/component.py:
+	  manage feeder's readiness correctly
+	* flumotion/manager/manager.py:
+	  implement componentStart for one component
+
+2005-02-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	  add some errors
 	* flumotion/common/log.py:

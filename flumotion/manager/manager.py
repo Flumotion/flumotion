@@ -327,6 +327,55 @@ class Vishnu(log.Loggable):
     def getFactory(self):
         return self.factory
        
+    def componentStart(self, componentState):
+        """
+        Start the given component.
+
+        The component should be sleeping.
+        The worker it should be started on should be present.
+        """
+        m = componentState.get('mood')
+        if m != moods.sleeping.value:
+            raise errors.ComponentMoodError("%r not sleeping" % componentState)
+
+        p = componentState.get('moodPending')
+        if p != None:
+            raise errors.ComponentMoodError(
+                "%r already has a pending mood %s" % moods.get(p).name)
+
+        # find a worker this component can start on
+        worker = None
+
+        # prefer the worker name in the state if it's there - it's the name
+        # of the worker it last ran on
+        w = componentState.get('workerName')
+        if w:
+            if not self.workerHeaven.hasAvatar(w):
+                raise errors.ComponentNoWorkerError(
+                    "worker %s is not logged in" % w)
+            worker = self.workerHeaven.getAvatar(w)
+
+        # otherwise, check workerRequested, and find a matching worker
+        if not worker:
+            r = componentState.get('workerRequested')
+            if r:
+                if not self.workerHeaven.hasAvatar(r):
+                    raise errors.ComponentNoWorkerError(
+                        "worker %s is not logged in" % r)
+                worker = self.workerHeaven.getAvatar(r)
+            else:
+                # any worker will do
+                list = self.workerHeaven.getAvatars()
+                if list:
+                    worker = list[0]
+
+        if not worker:
+            raise errors.ComponentNoWorkerError(
+                "Could not find any worker to start on")
+
+        # now that we have a worker, get started
+        return self._workerStartComponents(worker, [componentState])
+
     # FIXME: unify naming of stuff like this
     def workerAttached(self, workerAvatar):
         # called when a worker logs in
@@ -372,24 +421,18 @@ class Vishnu(log.Loggable):
             self.debug('_workerStartComponents(): scheduling start of /%s/%s on %s' % (
                 parentName, componentName, workerAvatar.avatarId))
             
-            # FIXME: put in parent when we use it everywhere
-            #d.addCallback(self._workerStartComponentDelay,
-            #    workerName, componentName, parentName,
-            #    entry.getType(), entry.getConfigDict())
             d.addCallback(self._workerStartComponentDelayed,
                 workerAvatar, c, type, config)
 
         d.addCallback(lambda result: self.debug(
-            'workerAttached(): completed start chain'))
+            '_workerStartComponents(): completed start chain'))
 
         # now trigger the chain
-        self.debug('workerAttached(): triggering start chain')
+        self.debug('_workerStartComponents(): triggering start chain')
         d.callback(None)
         #reactor.callLater(0, d.callback, None)
+        return d
 
-        #def _workerStartComponentDelay(self, result, worker, component, parent,
-        #type, config):
-        #    d = self.workerStartComponent(worker, component, parent, type, config)
     def _workerStartComponentDelayed(self, result, workerAvatar,
             componentState, type, config):
 
@@ -510,6 +553,7 @@ class Vishnu(log.Loggable):
         self.debug('need to stop %d components: %r' % (
             len(components), components))
 
+        # FIXME: this is where we need some order
         for c in components:
             avatar = self._componentMappers[c].avatar
             d.addCallback(lambda result, a: a.stop(), avatar)

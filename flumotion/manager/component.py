@@ -100,8 +100,9 @@ class Feeder:
         Set the feeder to ready, triggering dependency functions.
         """
         if self._ready == readiness:
-            self.component.warning('readiness already is %r !' % readiness)
-            raise
+            msg = 'readiness already is %r !' % readiness
+            self.component.warning(msg)
+            raise errors.FlumotionError(msg)
 
         assert self.component
 
@@ -264,7 +265,8 @@ class ComponentAvatar(base.ManagerAvatar):
         self.starting = False
         self.jobState = None # retrieved after mind attached
         self.componentState = None # set by the vishnu by componentAttached
-        self._gstState = None # FIXME: deprecate ?
+        self._gstState = gst.STATE_NULL # FIXME: deprecate ?
+        self._gstOldState = gst.STATE_NULL # FIXME: deprecate ?
 
         self.logName = avatarId
 
@@ -591,18 +593,21 @@ class ComponentAvatar(base.ManagerAvatar):
             self.debug('checkFeedReady: no remote options yet')
             return
 
-        if self._gstState != gst.STATE_PLAYING:
-            self.debug('checkFeedReady: feed not playing yet (%s)' %
-                      gst.element_state_get_name(self._gstState))
-            return
-        #if self.state.mood != moods.happy:
-        #    self.debug('checkFeedReady: not happy yet (%s)' %
-        #              self.state.mood)
-        #    return
+        if self._gstState == gst.STATE_PLAYING:
+            self.debug('checkFeedReady: setting to ready')
+            self.heaven.setFeederReadiness(self, feedName, True)
+            self.debug('checkFeedReady: set to ready')
 
-        self.debug('checkFeedReady: setting to ready')
-        self.heaven.setFeederReadiness(self, feedName, True)
-        self.debug('checkFeedReady: set to ready')
+        elif self._gstState == gst.STATE_PAUSED and \
+            self._gstOldState == gst.STATE_PLAYING:
+            self.debug('checkFeedReady: setting to not ready')
+            self.heaven.setFeederReadiness(self, feedName, False)
+            self.debug('checkFeedReady: set to not ready')
+        else:
+            self.debug('checkFeedReady: no play/pause trans (%s to %s)' % (
+                      gst.element_state_get_name(self._gstState),
+                      gst.element_state_get_name(self._gstOldState)))
+        return
 
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
     def authenticate(self, keycard):
@@ -640,13 +645,18 @@ class ComponentAvatar(base.ManagerAvatar):
         #    "got heartbeat at %d" % int(self.lastHeartbeat))
         self._setMoodValue(moodValue)
 
-    def perspective_feedStateChanged(self, feedName, state):
-        self.debug('feedStateChanged: feed name %s, state %s' % (
-            feedName, gst.element_state_get_name(state)))
-        self._gstState = state
+    def perspective_feedStateChanged(self, feedName, oldState, newState):
+        self.debug('feedStateChanged: feed name %s, old %s, new %s' % (
+            feedName, gst.element_state_get_name(oldState),
+            gst.element_state_get_name(newState)))
+        self._gstState = newState
+        self._gstOldState = oldState
         
-        if state == gst.STATE_PLAYING:
+        if newState == gst.STATE_PLAYING:
             self.debug('%r is now playing' % self)
+            self.checkFeedReady(feedName)
+        if oldState == gst.STATE_PLAYING:
+            self.debug('%r was playing' % self)
             self.checkFeedReady(feedName)
             
     def perspective_error(self, element, error):
