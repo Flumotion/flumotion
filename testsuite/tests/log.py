@@ -123,6 +123,10 @@ class TestLog(unittest.TestCase):
         self.tester.log("visible")
         assert self.message == 'override visible'
   
+    def testLogHandlerAssertion(self):
+        self.category = self.level = self.message = None
+        self.tester = LogTester()
+        self.assertRaises(TypeError, log.addLogHandler, None)
   
 if __name__ == '__main__':
      unittest.main()

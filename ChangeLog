@@ -1,3 +1,10 @@
+2004-09-14  Johan Dahlin  <johan@gnome.org>
+
+	* testsuite/tests/log.py (TestLog.testLogHandlerAssertion): Add test
+
+	* flumotion/utils/log.py (addLogHandler): Doc fix, add pedantic
+	assertion.
+
 2004-09-13  Johan Dahlin  <johan@gnome.org>
 
 	* conf/minmal.xml: add a minimal configuration for testing purposes.

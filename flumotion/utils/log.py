@@ -195,15 +195,20 @@ def log(cat, *args):
     """
     _handle(cat, 'LOG', ' '.join(args))
 
-def addLogHandler(func, limited = True):
+def addLogHandler(func, limited=True):
     """
     Add a custom log handler.
 
-    @param function: a function object with prototype (category, level, message)
+    @param func: a function object with prototype (category, level, message)
     where all of them are strings.
+    @type func: a callable function
     @type limited: boolean
     @param limited: whether to automatically filter based on FLU_DEBUG
     """
+
+    if not callable(func):
+        raise TypeError, "func must be callable"
+    
     if limited:
         _log_handlers_limited.append(func)
     else:
@@ -217,7 +222,7 @@ def init():
     if os.environ.has_key('FLU_DEBUG'):
         # install a log handler that uses the value of FLU_DEBUG
         setFluDebug(os.environ['FLU_DEBUG'])
-    addLogHandler(stderrHandler, limited = True)
+    addLogHandler(stderrHandler, limited=True)
 
 def setFluDebug(string):
     """Set the FLU_DEBUG string.  This controls the log output."""
