@@ -22,7 +22,6 @@ import optparse
 import os
 import signal
 import sys
-import traceback
 
 import gobject
 
@@ -111,28 +110,21 @@ class Launcher:
 
         # We need to run the reactor again, so we can process
         # the last events, need to tell the controller to shutdown
-        reactor.run(False)
+        reactor.run()
         
     def spawn(self, component, function=None, args=None):
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         reactor.connectTCP(self.controller_host, self.controller_port,
                            component.factory)
-
-        print component, 'before reactor.run()'
+        
         reactor.run(False)
-        print component, 'after reactor.run()'
         
     def run(self):
         self.restore_uid()
 
-        # Run the reactor until its interrupted (eg KeyboardInterrupt)
-        # Need to investigate why we don't need to catch the exception here
-        reactor.run()
+        reactor.run() # don't fucking dare setting it to False.
 
-        self.shutdown()
-
-    def shutdown(self):
         self.stop_controller()
 
     def launch_component(self, config):
@@ -143,12 +135,12 @@ class Launcher:
             return
         
         component = config.getComponent()
-                
+
         self.set_nice(config.nice)
         self.restore_uid()
             
         gobject.threads_init()
-
+        
         self.msg('Starting %s (%s) on pid %d' %
                  (config.getName(), config.getType(), pid))
         self.spawn(component)
@@ -186,27 +178,30 @@ def run_launcher(args):
                                       'registry', 'basecomponents.xml'))
 
     launcher = Launcher(options.host, options.port)
-    
+
     if options.host == 'localhost':
         if not gstutils.is_port_free(options.port):
             launcher.error('Controller is already started')
         else:
             launcher.start_controller(options.verbose)
 
-    try:
-        launcher.load_config(args[2])
-    except Exception, e:
-        if not isinstance(e, SystemExit):
-            print 'Traceback caught during configuration loading:'
-            print '='*79
-            traceback.print_exc(file=sys.stdout)
-            print '='*79
-        launcher.shutdown()
-        return
-    
+    launcher.load_config(args[2])
+
+    # This needs to be seriously debugged.
+#    try:
+#        launcher.load_config(args[2])
+#    except Exception, e:
+#        if not isinstance(e, SystemExit):
+#            print 'Traceback caught during configuration loading:'
+#            print '='*79
+#            traceback.print_exc(file=sys.stdout)
+#            print '='*79
+#        launcher.shutdown()
+#        return
+
     if options.verbose:
         log.enableLogging()
-    
+
     launcher.run()
 
     return 0
