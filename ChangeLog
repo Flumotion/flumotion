@@ -1,5 +1,8 @@
 2004-10-16  Johan Dahlin  <johan@gnome.org>
 
+	* data/image/wizard/Makefile.am (image_DATA): Add a few more icons
+	for the wizard
+
 	* flumotion/manager/component.py (ComponentHeaven.shutdown):
 	Remove the avatar
 	(ComponentHeaven.createAvatar, ComponentHeaven.removeAvatar): Add
