@@ -1,3 +1,9 @@
+2004-10-29  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_firewire.glade:
+
+	Set 384 as default width and 576 as max height.
+	
 2004-10-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:
