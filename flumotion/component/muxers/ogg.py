@@ -1,7 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/encoders/vorbis.py: vorbis encoder
+# flumotion/component/muxers/ogg.py: ogg multiplexer
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -17,21 +17,18 @@
 
 from flumotion.component import feedcomponent
 
-class Vorbis(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, feeders, pipeline):
+class Ogg(feedcomponent.ParseLaunchComponent):
+    def __init__(self, name, sources, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    sources,
                                                     ['default'],
-                                                    feeders,
                                                     pipeline)
 
 def createComponent(config):
-    source = config['source']
-
-    component = Vorbis(config['name'], [config['source']],
-                       "rawvorbisenc name=encoder")
+    pipeline = 'oggmux name=muxer '
+    for eater in config['sources']:
+        pipeline += '{ @ eater:%s @ ! mux. } ' % name
+        
+    component = Ogg(config['name'], sources, pipeline)
     
-    element = component.pipeline.get_by_name('encoder')
-    if config.has_key('bitrate'):
-        element.set_property('bitrate', config['bitrate'])
-
     return component

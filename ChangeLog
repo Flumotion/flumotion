@@ -1,3 +1,34 @@
+2004-10-13  Johan Dahlin  <johan@gnome.org>
+
+	* configure.ac:
+	* data/glade/wizard_overlay.glade:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/encoders/jpeg.py:
+	* flumotion/component/encoders/mulaw.py:
+	* flumotion/component/encoders/smoke.py:
+	* flumotion/component/encoders/speex.py:
+	* flumotion/component/encoders/theora.py:
+	* flumotion/component/encoders/vorbis.py:
+	* flumotion/component/muxers/Makefile.am:
+	* flumotion/component/muxers/__init__.py:
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/component/muxers/ogg.py:
+	* flumotion/component/soundcard/Makefile.am:
+	* flumotion/component/soundcard/__init__.py:
+	* flumotion/component/soundcard/soundcard.py:
+	* flumotion/component/soundcard/soundcard.xml:
+	* flumotion/component/webcam/Makefile.am:
+	* flumotion/component/webcam/__init__.py:
+	* flumotion/component/webcam/webcam.py:
+	* flumotion/component/webcam/webcam.xml:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Fix headers for encoders. Add ogg muxer, soundcard and webcam
+	component.
+	We can now actually parse the default output of the wizard.
+	
 2004-10-12  Johan Dahlin  <johan@gnome.org>
 
 	* configure.ac:

@@ -1,7 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/encoders/vorbis.py: vorbis encoder
+# flumotion/component/webcam/webcam.py: webcam producer
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -15,23 +15,22 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from flumotion.component import feedcomponent
+from flumotion.component.base import producer
 
-class Vorbis(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, feeders, pipeline):
+class WebCamera(feedcomponent.ParseLaunchComponent):
+    def __init__(self, name, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    [],
                                                     ['default'],
-                                                    feeders,
                                                     pipeline)
-
+                                       
 def createComponent(config):
-    source = config['source']
+    component = WebCamera(config['name'], 'v4lsrc name=camera')
 
-    component = Vorbis(config['name'], [config['source']],
-                       "rawvorbisenc name=encoder")
-    
-    element = component.pipeline.get_by_name('encoder')
-    if config.has_key('bitrate'):
-        element.set_property('bitrate', config['bitrate'])
+    element = component.pipeline.get_by_name('camera')
+    element.set_property('copy-mode', True)
+    element.set_property('device', config['device'])
+    element.set_property('width', config['width'])
+    element.set_property('height', config['height'])
 
     return component

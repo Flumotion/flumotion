@@ -73,9 +73,12 @@ flumotion/component/encoders/Makefile
 flumotion/component/file/Makefile
 flumotion/component/http/Makefile
 flumotion/component/multipartjpeg/Makefile
+flumotion/component/muxers/Makefile
 flumotion/component/overlay/Makefile
 flumotion/component/passwd/Makefile
+flumotion/component/soundcard/Makefile
 flumotion/component/videotest/Makefile
+flumotion/component/webcam/Makefile
 flumotion/config/Makefile
 flumotion/config/installed.py
 flumotion/config/uninstalled.py

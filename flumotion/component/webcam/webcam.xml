@@ -1,0 +1,10 @@
+<components>
+  <component type="web-camera">
+    <source location="flumotion.component.webcam.webcam"/>
+    <properties>
+      <property name="height" type="int"/>
+      <property name="width" type="int"/>
+      <property name="framerate" type="float"/>
+    </properties>
+  </component>
+</components>

@@ -13,11 +13,14 @@ SUBDIRS = \
 	base \
 	bouncers \
 	bttv \
-	encoders \
 	dv \
+	encoders \
 	file \
 	http \
 	multipartjpeg \
+	muxers \
 	overlay \
 	passwd \
-	videotest
+	soundcard \
+	videotest \
+	webcam

@@ -65,18 +65,12 @@ class Source(wizard.WizardStep):
         if self.checkbutton_has_video:
             video_source = self.combobox_video.get_active()
             return video_source.step
-        
-            if video_source == VideoDevice.TVCard:
-                return 'TV Card'
-            elif video_source == VideoDevice.Firewire:
-                return 'Firewire'
-            elif video_source == VideoDevice.Webcam:
-                return 'Webcam'
-            elif video_source == VideoDevice.Test:
-                return 'Test Source'
-            raise AssertionError
         elif self.checkbutton_has_audio:
-            return 'Audio Source'
+            audio_source = self.combobox_video.get_active()
+            if audio_source == AudioDevice.Soundcard:
+                return 'Audio Source'
+            else:
+                return 'Consumption'
         raise AssertionError
 wizard.register_step(Source)
 
@@ -88,6 +82,11 @@ class VideoSource(wizard.WizardStep):
     def get_next(self):
         return 'Overlay'
 
+    def get_component_properties(self):
+        options = self.wizard.get_step_state(self)
+        options['width'] = int(options['width'])
+        options['height'] = int(options['height'])
+        return options
 
 
 class TVCard(VideoSource):
@@ -154,10 +153,19 @@ class Overlay(wizard.WizardStep):
     section = 'Production'
     component_type = 'overlay'
     component_name = 'overlay'
-    
+
+    def setup(self):
+        # HACK HACK HACK
+        self.checkbutton_show_logo.set_active(False)
+        self.checkbutton_show_text.set_active(False)
+        
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has_audio'):
-            return 'Audio Source'
+            audio_source = self.wizard.get_step_option('Source', 'audio')            
+            if audio_source == AudioDevice.Soundcard:
+                return 'Audio Source'
+            else:
+                return 'Consumption'
         else:
             return 'Encoding'
 wizard.register_step(Overlay)
@@ -187,8 +195,8 @@ class AudioSource(wizard.WizardStep):
             channels = 'stereo'
             
         return dict(device=self.combobox_device.get_string(),
-                    bitdepth=self.combobox_bitdepth.get_string(),
-                    samplerate=self.combobox_samplerate.get_string(),
+                    bitdepth=int(self.combobox_bitdepth.get_string()),
+                    samplerate=int(self.combobox_samplerate.get_string()),
                     channels=channels,
                     input=self.combobox_input.get_string())
 
@@ -213,7 +221,7 @@ class Encoding(wizard.WizardStep):
         self.setup_finished = True
         
     def on_combobox_format_changed(self, combo):
-        self.verify()g
+        self.verify()
         
     def verify(self):
         # XXX: isn't there a better way of doing this, like blocking
@@ -353,6 +361,10 @@ class AudioEncoder(wizard.WizardStep):
 class Vorbis(AudioEncoder):
     step_name = 'Vorbis'
     component_type = 'vorbis'
+    def get_component_properties(self):
+        options = self.wizard.get_step_state(self)
+        options['bitrate'] = int(options['bitrate'])
+        return options
 wizard.register_step(Vorbis)
 
 
@@ -452,6 +464,7 @@ wizard.register_step(Consumption)
 
 
 
+# XXX: If audio codec is speex, disable java applet option
 class HTTP(wizard.WizardStep):
     glade_file = 'wizard_http.glade'
     section = 'Consumption'
@@ -471,7 +484,7 @@ class HTTP(wizard.WizardStep):
 
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
-        
+
         # XXX: Why ?? spinbutton.get_value ??
         options['bandwidth_limit'] = int(options['bandwidth_limit'])
         options['user_limit'] = int(options['user_limit'])

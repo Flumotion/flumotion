@@ -87,28 +87,28 @@ class EnumClass(object):
 
 # Sources
 VideoDevice = EnumClass('VideoDevice',
-                        ('TVCard', 'Firewire', 'Webcam', 'Test'),
-                        ('TV Card',
+                        ('Webcam', 'TVCard', 'Firewire', 'Test'),
+                        ('Web camera',
+                         'TV Card',
                          'Firewire video',
-                         'Web camera',
                          'Test video source'),
-                        step=('TV Card',
+                        step=('Webcam',
+                              'TV Card',
                               'Firewire',
-                              'Webcam',
                               'Test Source'),
-                        component_type=('tv-card',
+                        component_type=('web-camera',
+                                        'tv-card',
                                         'firewire-video',
-                                        'webcam',
-                                        'videotestsrc'))
+                                        'videotest'))
 AudioDevice = EnumClass('AudioDevice',
-                        ('Firewire',
-                         'Soundcard',
+                        ('Soundcard',
+                         'Firewire',
                          'Test'),
-                        ('Firewire Audio',
-                         'Sound card',
+                        ('Sound card',
+                         'Firewire Audio',
                          'Test audio source'),
-                        component_type=('firewire-audio',
-                                        'alsasrc',
+                        component_type=('soundcard',
+                                        'firewire-audio',
                                         'sinesrc'))
 # TVCard
 TVCardDevice = EnumClass('TVCardDevice', ('/dev/video0',
