@@ -582,6 +582,10 @@ class Window(log.Loggable, gobject.GObject):
         d.connect('set', dialog_set_cb)
         d.run()
 
+    def debug_start_shell_cb(self, button):
+        import code
+        code.interact(local=locals())
+
     def help_about_cb(self, button):
         dialog = gtk.Dialog('About Flumotion', self.window,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,

@@ -47,7 +47,7 @@
 		      <accelerator key="N" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image42">
+			<widget class="GtkImage" id="image44">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-new</property>
 			  <property name="icon_size">1</property>
@@ -68,7 +68,7 @@
 		      <signal name="activate" handler="file_open_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image43">
+			<widget class="GtkImage" id="image45">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-open</property>
 			  <property name="icon_size">1</property>
@@ -96,7 +96,7 @@
 		      <accelerator key="Q" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image44">
+			<widget class="GtkImage" id="image46">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-quit</property>
 			  <property name="icon_size">1</property>
@@ -155,6 +155,15 @@
 		      <property name="label" translatable="yes">Modify element property...</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="debug_modify_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkMenuItem" id="start_shell1">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Start shell</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="debug_start_shell_cb" last_modification_time="Wed, 08 Dec 2004 17:42:07 GMT"/>
 		    </widget>
 		  </child>
 		</widget>

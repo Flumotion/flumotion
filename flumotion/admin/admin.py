@@ -380,37 +380,43 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             entryPath = os.path.join(configure.cachedir, entrySum)
 
             # check which zips to request from manager
+            cachedPaths = [] # list of cached paths to register later
             missing = [] # list of missing bundles
 
             for name, sum in sums:
                 dir = os.path.join(configure.cachedir, sum)
+                cachedPaths.append(dir)
                 if not os.path.exists(dir):
                     missing.append(name)
+
+            cachedPaths.reverse()
+            missing.reverse()
 
             if missing:
                 self.debug('_getBundleSumsCallback: requesting zips %r' %
                     missing)
                 d = self.callRemote('getBundleZips', missing)
                 d.addCallback(_getBundleZipsCallback, entryPath, missing,
-                    filename, methodName)
+                    cachedPaths, filename, methodName)
                 d.addErrback(self._defaultErrback)
                 return d
             else:
                 retval = (entryPath, filename, methodName)
                 self.debug('_getBundleSumsCallback: returning %r' % (
                     retval, ))
+                self._registerCachedPaths(cachedPaths)
                 return retval
 
-        def _getBundleZipsCallback(result, entryPath, missing,
+        def _getBundleZipsCallback(result, entryPath, missing, cachedPaths,
             filename, methodName):
             # callback to receive zips.  Will set up zips, register package
             # paths and finally
             # return physical location of entry file and method
             self.debug('_getBundleZipsCallback: received %d zips' % len(result))
-            # we use "missing" and reverse it because that way we get the
+            # we use missing because that way we get the
             # list of dependencies from lowest to highest and register
-            # package paths in the correct order
-            missing.reverse()
+            # package paths in the correct order; since we need to
+            # register package paths one by one for the namedAny's
             for name in missing:
                 if name not in result.keys():
                     msg = "Missing bundle %s was not received" % name
@@ -427,6 +433,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                     dir, name))
                 common.registerPackagePath(dir)
 
+            # now make sure all cachedPaths are registered
+            # FIXME: does it matter we already did some before ?
+            self._registerCachedPaths(cachedPaths)
+
             retval = (entryPath, filename, methodName)
             self.debug('_getBundleSumsCallback: returning %r' % (
                 retval, ))
@@ -437,6 +447,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addCallback(_getEntryCallback, componentName, type)
         d.addErrback(self._defaultErrback)
         return d
+
+    def _registerCachedPaths(self, paths):
+        for dir in paths:
+            common.registerPackagePath(dir)
 
     def getBundledFile(self, bundledPath):
         """

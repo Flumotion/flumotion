@@ -1,5 +1,14 @@
 2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/admin.glade:
+	* flumotion/admin/gtk/client.py:
+	  add shell for fun debugging
+	* flumotion/admin/admin.py:
+	  properly register paths even though we didn't actually unbundle
+	  since if they're already in the cache they should work too
+
+2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	  only registerPackagePath when a bundle got unpacked, and
 	  in the right order.  Should fix all lingering "works on second
