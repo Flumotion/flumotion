@@ -153,8 +153,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type mind: L{twisted.spread.pb.RemoteReference}
         """
         self.mind = mind
-        # FIXME: fix deprec warning with accessor
-        ip = self.mind.broker.transport.getPeer()[1]
+        ip = self.mind.broker.transport.getPeer().host
         self.debug('Client from %s attached, sending client components' % ip)
         self.log('Client attached is mind %s' % mind)
 
@@ -166,7 +165,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         has detached.
         """
         assert(self.mind == mind)
-        ip = self.mind.broker.transport.getPeer()[1]
+        ip = self.mind.broker.transport.getPeer().host
         self.mind = None
         self.debug('Client from %s detached' % ip)
         self.log('Client detached is mind %s' % mind)
