@@ -84,14 +84,13 @@ class StreamingResource(resource.Resource):
         reactor.callLater(0, self.bufferWrite)
         
     def data_received_cb(self, transcoder, gbuffer):
-        self.buffer_queue.append(str(buffer(gbuffer)))
-        self.buffer_queue = []
+        pass
+        #self.buffer_queue.append(str(buffer(gbuffer)))
         
     def bufferWrite(self, *args):
         for buffer in self.buffer_queue:
             for request in self.current_requests:
                 request.write(buffer)
-                #import code; code.interact(local=locals())
         self.buffer_queue = []
             
         reactor.callLater(0.01, self.bufferWrite)
