@@ -272,7 +272,6 @@ def _findPackageCandidates(path, prefix='flumotion'):
     # sort them so that depending packages are after higher-up packages
     bundlePackages.sort()
         
-    print "returning %r" % bundlePackages
     return bundlePackages
 
 def registerPackagePath(packagePath, prefix='flumotion'):
