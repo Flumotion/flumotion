@@ -18,11 +18,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
-import common
-import unittest
-
-from twisted.protocols import http as twisted_http
+from twisted import protocols
 from twisted.python import components
+from twisted.trial import unittest
 from twisted.web import server
 
 from flumotion.component.http import http
@@ -119,13 +117,13 @@ class TestHTTPStreamingResource(unittest.TestCase):
         
         request = FakeRequest(ip='127.0.0.1')
         data = resource.render(request)
-        error_code = twisted_http.SERVICE_UNAVAILABLE
+        error_code = protocols.http.SERVICE_UNAVAILABLE
         assert request.headers.get('content-type', '') == 'text/html'
         assert request.headers.get('server', '') == http.HTTP_VERSION
         assert request.response == error_code
 
         expected = http.ERROR_TEMPLATE % {'code': error_code,
-                                          'error': twisted_http.RESPONSES[error_code]}
+                                          'error': protocols.http.RESPONSES[error_code]}
         assert data == expected
 
     def testRenderUnauthorized(self):
@@ -139,13 +137,13 @@ class TestHTTPStreamingResource(unittest.TestCase):
         request = FakeRequest(ip='127.0.0.1')
         data = resource.render(request)
 
-        error_code = twisted_http.UNAUTHORIZED
+        error_code = protocols.http.UNAUTHORIZED
         assert request.headers.get('content-type', '') == 'text/html'
         assert request.headers.get('server', '') == http.HTTP_VERSION
         assert request.response == error_code
         
         expected = http.ERROR_TEMPLATE % {'code': error_code,
-                                          'error': twisted_http.RESPONSES[error_code]}
+                                          'error': protocols.http.RESPONSES[error_code]}
         assert data == expected
 
     def testRenderNew(self):

@@ -73,6 +73,7 @@ flumotion/config/Makefile
 flumotion/config/installed.py
 flumotion/config/uninstalled.py
 flumotion/manager/Makefile
+flumotion/test/Makefile
 flumotion/twisted/Makefile
 flumotion/utils/Makefile
 flumotion/worker/Makefile
@@ -80,8 +81,5 @@ m4/Makefile
 conf/Makefile
 doc/Makefile
 doc/reference/Makefile
-testsuite/Makefile
-testsuite/tests/Makefile
-testsuite/common.py
 flumotion.spec
 )
