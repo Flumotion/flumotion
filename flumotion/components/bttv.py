@@ -32,7 +32,7 @@ def createComponent(config):
     pipeline = ('v4lsrc device=%s copy-mode=true ! '
                 'video/x-raw-yuv,width=%d,height=%d ! videoscale ! '
                 'video/x-raw-yuv,width=%d,height=%d ! videorate ! '
-                'video/x-raw-yuv,framerate=%d') % (device,
+                'video/x-raw-yuv,framerate=%f') % (device,
                                                    device_width,
                                                    device_height,
                                                    width, height,
