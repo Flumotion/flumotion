@@ -1,5 +1,12 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_webcam.glade:
+	* flumotion/component/webcam/webcam.py:
+	  turn off autoprobe
+	  lock spinbutton's values to what webcams can actually do
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	  fix Johan's bug
 

@@ -25,7 +25,7 @@ class WebCamera(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
                                        
 def createComponent(config):
-    component = WebCamera(config['name'], 'v4lsrc name=camera copy-mode=1')
+    component = WebCamera(config['name'], 'v4lsrc name=camera autoprobe=false copy-mode=1')
 
     # XXX: Width and height through filtered caps.
     #element.set_property('width', config['width'])
