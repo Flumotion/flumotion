@@ -66,6 +66,9 @@ class Bouncer(component.BaseComponent):
         if keycard.username == 'thomas' and keycard.password == 'plasmatv':
             self.info('keycard %r authenticated' % keycard)
             self._addKeycard(keycard)
+
+            # FIXME: of course we don't want to expire, just a test
+            keycard.duration = 10 # 10 whole seconds of streaming love
             return keycard
         else:
             self.info('keycard %r refused' % keycard)

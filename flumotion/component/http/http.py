@@ -253,9 +253,10 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.streamer = streamer
         self.admin = HTTPStreamingAdminResource(self)
         
-        self._requests = {} # fd -> Request
-        self._fdToKeycard = {} # fd -> Keycard
-        self._idToKeycard = {} # id -> Keycard
+        self._requests = {}         # request fd -> Request
+        self._fdToKeycard = {}      # request fd -> Keycard
+        self._idToKeycard = {}      # keycard id -> Keycard
+        self._fdToDurationCall = {} # request fd -> IDelayedCall for duration
         self.bouncerName = None
         self.auth = None
         
@@ -386,6 +387,8 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         keycard = keycards.HTTPClientKeycard(
             self.streamer.get_name(), request.getUser(),
             request.getPassword(), request.getClientIP())
+        keycard._fd = request.transport.fileno()
+        
         if self.bouncerName is None:
             return defer.succeed(keycard)
 
@@ -405,7 +408,8 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
     def _removeClient(self, request, fd, stats):
         """
         Removes a request and add logging.
-        Note that it does not disconnect the client
+        Note that it does not disconnect the client; it is called in reaction
+        to a client disconnecting.
         
         @param request: the request
         @type request: twisted.protocol.http.Request
@@ -425,6 +429,38 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             del self._fdToKeycard[fd]
             del self._idToKeycard[id]
             self.streamer.medium.removeKeycard(self.bouncerName, id)
+        if self._fdToDurationCall.has_key(fd):
+            self.debug("canceling later expiration on fd %d" % fd)
+            self._fdToDurationCall[fd].cancel()
+            del self._fdToDurationCall[fd]
+
+    def _durationCallLater(self, fd):
+        """
+        Expire a client due to a duration expiration.
+        """
+        self.debug("duration exceeded, expiring client on fd %d" % fd)
+
+        # we're called from a callLater, so we've already run; just delete
+        if self._fdToDurationCall.has_key(fd):
+            del self._fdToDurationCall[fd]
+            
+        self.streamer.remove_client(fd)
+
+    def expireKeycard(self, keycardId):
+        """
+        Expire a client's connection associated with the keycard Id.
+        """
+        self.debug("expiring client with keycard Id" % keycardId)
+
+        keycard = self._idToKeycard[keycardId]
+        fd = keycard._fd
+
+        if self._fdToDurationCall.has_key(fd):
+            self.debug("canceling later expiration on fd %d" % fd)
+            self._fdToDurationCall[fd].cancel()
+            del self._fdToDurationCall[fd]
+
+        self.streamer.remove_client(fd)
 
     def _handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')
@@ -511,6 +547,10 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             self._fdToKeycard[fd] = keycard
             self._idToKeycard[keycard.id] = keycard
 
+        if keycard.duration:
+            self.debug('new connection on %d will be expired in %f seconds' % (fd, keycard.duration))
+            self._fdToDurationCall[fd] = reactor.callLater(keycard.duration, self._durationCallLater, fd)
+
         if request.method == 'GET':
             self._handleNewClient(request)
         elif request.method == 'HEAD':
@@ -545,11 +585,19 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
 
     def authenticate(self, bouncerName, keycard):
-        d = self.callRemote('authenticate', bouncerName, keycard)
-        return d
+        """
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        return self.callRemote('authenticate', bouncerName, keycard)
 
     def removeKeycard(self, bouncerName, keycardId):
+        """
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
         return self.callRemote('removeKeycard', bouncerName, keycardId)
+
+    def remote_expireKeycard(self, keycardId):
+        self.comp.expireKeycard(keycardId)
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
@@ -634,6 +682,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def add_client(self, fd):
         sink = self.get_sink()
         stats = sink.emit('add', fd)
+
+    def remove_client(self, fd):
+        sink = self.get_sink()
+        stats = sink.emit('remove', fd)
 
     def get_sink(self):
         assert self.pipeline, 'Pipeline not created'

@@ -1,5 +1,12 @@
 2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/keycards.py:
+	* flumotion/component/bouncer.py:
+	* flumotion/component/http/http.py:
+	  implement duration and expire
+
+2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/component.py:
 	* flumotion/test/test_manager.py:
 	  uniformize, privatize, rewrite, remove, restructure

@@ -29,6 +29,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
     def __init__(self, componentName):
         self.componentName = componentName
         self.id = None # set by bouncer when authenticated
+        self.duration = 0 # means unlimited
 
 
 class HTTPClientKeycard(credentials.UsernamePassword, Keycard):
