@@ -316,7 +316,9 @@ class AdminHeaven(pb.Root, log.Loggable):
     def removeAvatar(self, avatarId):
         """
         Stop managing the given avatar.
-        @type avatar: string
+
+        @type avatarId:  string
+        @param avatarId: id of the avatar to remove
         """
         self.debug('removing AdminAvatar with id %s' % avatarId)
         print "avatars: %r" % self.avatars

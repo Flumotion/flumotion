@@ -156,14 +156,15 @@ class WorkerBrain(log.Loggable):
     """
     I manage jobs and everything related.
     I live in the main worker process.
-
-    @param options: the optparsed dictionary of command-line options.
-    @type  options: dict
     """
 
     logCategory = 'workerbrain'
 
     def __init__(self, options):
+        """
+        @param options: the optparsed dictionary of command-line options.
+        @type  options: dict
+        """
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 

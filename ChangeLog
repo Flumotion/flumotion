@@ -1,5 +1,13 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/admin.py:
+	* flumotion/worker/worker.py:
+	  doc fixes
+	* flumotion/twisted/portal.py:
+	  document, remove FlumotionPortal
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/manager.py:
 	  Remove ManagerCredentialsChecker which was deprecated.
 

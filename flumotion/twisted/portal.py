@@ -25,22 +25,40 @@ from twisted.python.components import registerAdapter
 from flumotion.common import keycards, log
 from flumotion.twisted.pb import _FPortalRoot
 
-### FIXME: deprecate FlumotionPortal
-# we create a dummy subclass because there is already an adapter registered
-# for Portal in twisted.spread.pb
-class FlumotionPortal(Portal):
-    pass
-registerAdapter(_FPortalRoot, FlumotionPortal, flavors.IPBRoot)
+"""
+Portal-related functionality inspired by twisted.cred.portal.
+"""
 
-# FIXME: rename
 class BouncerPortal(log.Loggable):
+    """
+    I am a portal for an FPB server using a bouncer to decide on FPB client
+    access.
+    """
     def __init__(self, realm, bouncer):
-        """Create a BouncerPortal to a L{IRealm}.
+        """
+        Create a BouncerPortal to a L{twisted.cred.portal.IRealm}.
+
+        @param realm:   an implementor of L{twisted.cred.portal.IRealm}
+        @param bouncer: a bouncer to use for authentication
+        @type  bouncer: L{flumotion.component.bouncers.bouncer.Bouncer}
         """
         self.realm = realm
         self.bouncer = bouncer
 
     def login(self, keycard, mind, *interfaces):
+        """
+        Log in the keycard to the portal using the bouncer.
+
+        @param keycard:    the keycard used to login
+        @type  keycard:    L{flumotion.common.keycards.Keycard}
+        @param mind:       a reference to the client-side requester
+        @type  mind:       L{twisted.spread.pb.RemoteReference}
+        @param interfaces: a list of interfaces for the perspective that the
+                           mind wishes to attach to
+        
+        @returns: a deferred which will fire a tuple of
+                  (interface, avatarAspect, logout)
+        """
         self.debug("BouncerPortal._login(keycard=%r, mind=%r, interfaces=%r)" % (keycard, mind, interfaces))
         if not self.bouncer:
             # FIXME: do we really want anonymous login when no bouncer is
@@ -64,6 +82,7 @@ class BouncerPortal(log.Loggable):
         keycard = result
         if not keycard.state == keycards.AUTHENTICATED:
             # challenge
+            self.debug("BouncerPortal._authenticateCallback: returning keycard for further authentication")
             return keycard
 
         self.debug("BouncerPortal._authenticateCallback(%r), chaining through to next callback to request AvatarId from realm with mind %r and interfaces %r" % (result, mind, interfaces))
