@@ -49,7 +49,7 @@ def _startSSL(vishnu, host, port, pemFile):
     ctxFactory = ServerContextFactory(pemFile)
     
     log.info('manager', 'Starting on port %d using SSL' % port)
-    reactor.listenSSL(port, vishnu.getFactory(), ctxFactory, interace=host)
+    reactor.listenSSL(port, vishnu.getFactory(), ctxFactory, interface=host)
     reactor.run()
 
 def _startTCP(vishnu, host, port):
@@ -150,7 +150,7 @@ def main(args):
     reactor.callLater(0, _initialLoadConfig, vishnu, paths)
     
     if options.verbose:
-        log.setFluDebug("*:4")
+        log.setFluDebug("*:3")
 
     if options.daemonize:
         if not os.path.exists(configure.logdir):
