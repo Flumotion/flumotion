@@ -146,15 +146,30 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
         assert self.listen_ports[feed] != -1, self.listen_ports
         return self.listen_ports[feed]
 
-    #FIXME: this is not a referenceable so rename callRemote
-    def callRemote(self, name, *args, **kwargs):
-        self.debug('Calling remote method %s%r' % (name, args))
+    def _mindCallRemote(self, name, *args, **kwargs):
+        self.debug('calling remote method %s%r' % (name, args))
         try:
             return self.mind.callRemote(name, *args, **kwargs)
-        except pb.DeadReferenceError :
+        except pb.DeadReferenceError:
             self.mind = None
             self.detached()
             return
+    # general fallback for unhandled errors so we detect them
+    # FIXME: we can't use this since we want a PropertyError to fall through
+    # afger going through the PropertyErrback.
+    def _mindErrback(self, failure):
+        self.warning("Unhandled remote call error: %s" % failure.getErrorMessage())
+        self.warning("raising '%s'" % str(failure.type))
+        return failure
+
+    # we create this errback just so we can interject a message inbetween
+    # to make it clear the Traceback line is fine.
+    # When this is fixed in Twisted we can just remove the errback and
+    # the error will still get sent back correctly to admin.
+    def _mindPropertyErrback(self, failure):
+        failure.trap(errors.PropertyError)
+        print "Ignore the following Traceback line, issue in Twisted"
+        return failure
 
     def cb_register(self, options, cb):
         for key, value in options.items():
@@ -163,29 +178,30 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
         
         self.controller.componentRegistered(self)
 
-    def cb_checkAll(self, failure):
+    def cb_checkOther(self, failure):
         try:
             self.error(str(failure))
         except errors.SystemError, e:
             print 'ERROR:', e
 
-        self.callRemote('stop')
+        raise failure
+        #self._mindCallRemote('stop')
         return None
                 
     def cb_checkPipelineError(self, failure):
         failure.trap(errors.PipelineParseError)
         self.error('Invalid pipeline for component')
-        self.callRemote('stop')
+        self._mindCallRemote('stop')
         return None
 
     def attached(self, mind):
         #debug('%s attached, calling register()' % self.getName())
         self.mind = mind
         
-        cb = self.callRemote('register')
+        cb = self._mindCallRemote('register')
         cb.addCallback(self.cb_register, cb)
         cb.addErrback(self.cb_checkPipelineError)
-        cb.addErrback(self.cb_checkAll)
+        cb.addErrback(self.cb_checkOther)
         
     def detached(self, mind=None):
         self.debug('detached')
@@ -194,16 +210,45 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
             self.controller.removeComponent(self)
 
     def stop(self):
-        cb = self.callRemote('stop')
+        cb = self._mindCallRemote('stop')
         cb.addErrback(lambda x: None)
         
-    def setState(self, element, property, value):
+    def setElementProperty(self, element, property, value):
+        if not element:
+            msg = "%s: no element specified" % self.getName()
+            self.warning(msg)
+            raise errors.PropertyError(msg)
         if not element in self.options.elements:
-            raise errors.PropertyError('not such an element: %s' % element)
-        return self.callRemote('setElementProperty', element, property, value)
+            msg = "%s: element '%s' does not exist" % (self.getName(), element)
+            self.warning(msg)
+            raise errors.PropertyError(msg)
+        if not property:
+            msg = "%s: no property specified" % self.getName()
+            self.warning(msg)
+            raise errors.PropertyError(msg)
+        self.debug("setting property '%s' on element '%s'" % (property, element))
         
-    def getState(self, element, property):
-        return self.callRemote('getElementProperty', element, property)
+        cb = self._mindCallRemote('setElementProperty', element, property, value)
+        cb.addErrback(self._mindPropertyErrback)
+        return cb
+        
+    def getElementProperty(self, element, property):
+        if not element:
+            msg = "%s: no element specified" % self.getName()
+            self.warning(msg)
+            raise errors.PropertyError(msg)
+        if not element in self.options.elements:
+            msg = "%s: element '%s' does not exist" % (self.getName(), element)
+            self.warning(msg)
+            raise errors.PropertyError(msg)
+        if not property:
+            msg = "%s: no property specified" % self.getName()
+            self.warning(msg)
+            raise errors.PropertyError(msg)
+        self.debug("getting property %s on element %s" % (element, property))
+        cb = self._mindCallRemote('getElementProperty', element, property)
+        cb.addErrback(self._mindPropertyErrback)
+        return cb
 
     def perspective_log(self, *msg):
         log.debug(self.getName(), *msg)
@@ -226,15 +271,15 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
     def link(self, sources, feeds):
         def cb_getFreePorts((feeds, ports)):
             self.listen_ports = ports
-            cb = self.callRemote('link', sources, feeds)
-            cb.addErrback(self.cb_checkAll)
+            cb = self._mindCallRemote('link', sources, feeds)
+            cb.addErrback(self.cb_checkOther)
 
         if feeds:
-            cb = self.callRemote('getFreePorts', feeds)
-            cb.addCallbacks(cb_getFreePorts, self.cb_checkAll)
+            cb = self._mindCallRemote('getFreePorts', feeds)
+            cb.addCallbacks(cb_getFreePorts, self.cb_checkOther)
         else:
-            cb = self.callRemote('link', sources, [])
-            cb.addErrback(self.cb_checkAll)
+            cb = self._mindCallRemote('link', sources, [])
+            cb.addErrback(self.cb_checkOther)
 
 class Feed:
     def __init__(self, name):
@@ -542,6 +587,7 @@ class ControllerServerFactory(pb.PBServerFactory):
         self.portal = portal.FlumotionPortal(self.dispatcher, [checker])
         # call the parent constructor with this portal for access
         pb.PBServerFactory.__init__(self, self.portal)
+        #self.unsafeTracebacks = 1 # for debugging tracebacks to clients
 
     def __repr__(self):
         return '<ControllerServerFactory>'

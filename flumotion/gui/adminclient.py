@@ -35,7 +35,7 @@ from twisted.internet import reactor
 from twisted.internet import error
 from twisted.spread import pb
 
-from flumotion.twisted import pbutil
+from flumotion.twisted import errors, pbutil
 from flumotion.server import admin   # Register types
 from flumotion.server import interfaces
 from flumotion.utils import log
@@ -78,13 +78,15 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         self.log('remote: %s: %s: %s' % (type, category, message))
         
     def remote_componentAdded(self, component):
-        self.debug('componentAdded %s' % component.getName())
+        self.debug('componentAdded %s' % component.name)
         self.clients.append(component)
         self.emit('update', self.clients)
         
     def remote_componentRemoved(self, component):
         # FIXME: this asserts, no method, when server dies
-        self.debug('componentRemoved %s' % component.getName())
+        # component will be a RemoteComponentView, so we can only use a
+        # member, not a method to get the name
+        self.debug('componentRemoved %s' % component.name)
         self.clients.remove(component)
         self.emit('update', self.clients)
         
@@ -96,14 +98,14 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     def remote_shutdown(self):
         print 'shutdown'
 
-    def setState(self, component, element, property, value):
+    def setProperty(self, component, element, property, value):
         if not self.remote:
             print 'Warning, no remote'
             return
-        self.remote.callRemote('setState', component, element, property, value)
+        return self.remote.callRemote('setComponentElementProperty', component, element, property, value)
 
-    def getState(self, component, element, property):
-        return self.remote.callRemote('getState', component, element, property)
+    def getProperty(self, component, element, property):
+        return self.remote.callRemote('getComponentElementProperty', component, element, property)
     
 gobject.type_register(AdminInterface)
 
@@ -143,6 +145,17 @@ class Window:
 
         self.wtree.signal_autoconnect(self)
 
+    def error_dialog(self, message, parent = None):
+        """
+        Show an error message dialog.
+        """
+        if not parent:
+            parent = self.window
+        d = gtk.MessageDialog(parent, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
+            gtk.BUTTONS_OK, message)
+        d.connect("response", lambda self, response: self.destroy())
+        d.show_all()
+
     def button_change_cb(self, button):
         selection = self.component_view.get_selection()
         sel = selection.get_selected()
@@ -151,7 +164,7 @@ class Window:
         model, iter = sel
         name = model.get(iter, 0)[0]
 
-        dialog = gtk.Dialog("My dialog",
+        dialog = gtk.Dialog("Change element property on '%s'" % name,
                             self.window,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
 
@@ -182,21 +195,31 @@ class Window:
         dialog.add_button('Fetch current', RESPONSE_FETCH)
 
         def response_cb(dialog, response):
+            def propertyErrback(failure, window):
+                failure.trap(errors.PropertyError)
+                window.error_dialog("%s." % failure.getErrorMessage())
+                return None
+
             if response == gtk.RESPONSE_APPLY:
                 element = element_entry.get_text()
                 property = property_entry.get_text()
                 value = value_entry.get_text()
 
-                print name, element, property, value
-                self.admin.setState(name, element, property, value)
+                print "FIXME: applying ", name, element, property, value
+                cb = self.admin.setProperty(name, element, property, value)
+                cb.addErrback(propertyErrback, self)
             elif response == RESPONSE_FETCH:
                 element = element_entry.get_text()
                 property = property_entry.get_text()
-                def after_getState(value):
+                
+                def after_getProperty(value):
                     print 'got value', value
                     value_entry.set_text(str(value))
-                cb = self.admin.getState(name, element, property)
-                cb.addCallback(after_getState)
+                    
+                cb = self.admin.getProperty(name, element, property)
+                cb.addCallback(after_getProperty)
+                cb.addErrback(propertyErrback, self)
+                cb.addErrback(lambda failure: self.error_dialog("Controller error: %s" % failure.getErrorMessage()))
             elif response == gtk.RESPONSE_CLOSE:
                 dialog.destroy()
                 

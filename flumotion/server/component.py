@@ -316,23 +316,31 @@ class BaseComponent(gobject.GObject, log.Loggable):
         
     def get_element_property(self, element_name, property):
         'Gets a property of an element in the GStreamer pipeline.'
+        self.debug("%s: getting property %s of element %s" % (self.get_name(), property, element_name))
         element = self.pipeline.get_by_name(element_name)
         if not element:
-            raise errors.PropertyError("No element called: %s" % element_name)
+            msg = "Element '%s' does not exist" % element_name
+            self.warning(msg)
+            raise errors.PropertyError(msg)
         
         self.debug('getting property %s on element %s' % (property, element_name))
         try:
             value = element.get_property(property)
-        except ValueError:
-            raise errors.PropertyError("No property called: %s" % property)
+        except (ValueError, TypeError):
+            msg = "Property '%s' on element '%s' does not exist" % (property, element_name)
+            self.warning(msg)
+            raise errors.PropertyError(msg)
 
         return value
 
     def set_element_property(self, element_name, property, value):
         'Sets a property on an element in the GStreamer pipeline.'
+        self.debug("%s: setting property %s of element %s to %s" % (self.get_name(), property, element_name, value))
         element = self.pipeline.get_by_name(element_name)
         if not element:
-            raise errors.PropertyError("No element called: %s" % element_name)
+            msg = "Element '%s' does not exist" % element_name
+            self.warning(msg)
+            raise errors.PropertyError(msg)
 
         self.debug('setting property %s on element %r to %s' %
                    (property, element_name, value))

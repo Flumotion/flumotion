@@ -34,6 +34,7 @@ class NotReadyError(pb.Error):
 
 class PropertyError(pb.Error):
     "An error occurred while setting a property on the component"
+    pass
 
 class AlreadyConnectedError(pb.Error):
     "The component is already connected to the controller"

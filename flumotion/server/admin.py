@@ -23,7 +23,7 @@
 from twisted.internet import reactor
 from twisted.spread import pb
 
-from flumotion.twisted import pbutil
+from flumotion.twisted import errors, pbutil
 from flumotion.utils import log
 
 class ComponentView(pb.Copyable):
@@ -170,16 +170,21 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         reactor.stop()
         raise SystemExit
     
-    def perspective_setState(self, component_name, element, property, value):
+    def perspective_setComponentElementProperty(self, component_name, element, property, value):
         component = self.controller.getComponent(component_name)
         try:
-            component.setState(element, property, value)
-        except TypeError, e:
-            print 'ERROR: %s' % str(e)
+            return component.setElementProperty(element, property, value)
+        except errors.PropertyError, exception:
+            self.warning(str(exception))
+            raise
 
-    def perspective_getState(self, component_name, element, property):
+    def perspective_getComponentElementProperty(self, component_name, element, property):
         component = self.controller.getComponent(component_name)
-        return component.getState(element, property)
+        try:
+            return component.getElementProperty(element, property)
+        except errors.PropertyError, exception:
+            self.warning(str(exception))
+            raise
 
 class Admin(pb.Root):
     """

@@ -80,11 +80,16 @@ def gobject_set_property(object, property, value):
         if pspec.name == property:
             break
     else:
-        raise errors.PropertyError("No property called: %s" % property)
+        raise errors.PropertyError("Property '%s' in element '%s' does not exist" % (property, object.get_property('name')))
         
     if pspec.value_type in (gobject.TYPE_INT, gobject.TYPE_UINT,
                             gobject.TYPE_INT64, gobject.TYPE_UINT64):
-        value = int(value)
+        try:
+            value = int(value)
+        except ValueError:
+            msg = "Invalid value given for property '%s' in element '%s'" % (property, object.get_property('name'))
+            raise errors.PropertyError(msg)
+        
     elif pspec.value_type == gobject.TYPE_BOOLEAN:
         if value == 'False':
             value = False
@@ -94,6 +99,8 @@ def gobject_set_property(object, property, value):
             value = bool(value)
     elif pspec.value_type in (gobject.TYPE_DOUBLE, gobject.TYPE_FLOAT):
         value = float(value)
+    elif pspec.value_type == gobject.TYPE_STRING:
+        value = str(value)
     else:
         raise errors.PropertyError('Unknown property type: %s' % pspec.value_type)
 
