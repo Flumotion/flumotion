@@ -6,6 +6,7 @@ flumotion_PYTHON = \
 	__init__.py \
 	bundle.py \
 	bundleclient.py \
+	code.py \
 	common.py \
 	config.py \
 	dag.py \

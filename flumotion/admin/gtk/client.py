@@ -919,7 +919,7 @@ class Window(log.Loggable, gobject.GObject):
         reactor.callLater(0.2, _callLater, self.admin, dialog)
  
     def debug_start_shell_cb(self, button):
-        import code
+        from flumotion.common import code
         code.interact(local=locals())
 
     def help_about_cb(self, button):
