@@ -636,7 +636,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         try:
             os.close(fd)
         except OSError:
-            print "fd %d, Johan will trap GST_CLIENT_STATUS_ERROR here someday to get rid of OSError" % d
+            print "fd %d, Johan will trap GST_CLIENT_STATUS_ERROR here someday to get rid of OSError" % fd
 
     def feeder_state_change_cb(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,
