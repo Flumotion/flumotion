@@ -1,4 +1,7 @@
 EXTRA_DIST = 			\
+	__init__.py		\
+	common.py		\
+	test.py			\
 	test_bundle.py 		\
 	test_checkers.py 	\
 	test_common.py 		\
