@@ -69,13 +69,13 @@ def getComponent(dict, defs):
     # we're going to listen to ports and other stuff which should
     # be separated from the main process.
 
-    self.debug('calling createComponent for type %s' % source)
+    log.debug('job', 'calling createComponent for type %s' % source)
     try:
         component = module.createComponent(dict)
     except Exception, e:
         msg = "Exception %s during createComponent of type %s: %s" % (
-            e.__class__.__name__, source, " ".join(e.args)))
-        self.warning('raising config.ConfigError(%s)' % msg)
+            e.__class__.__name__, source, " ".join(e.args))
+        log.warning('job', 'raising config.ConfigError(%s)' % msg)
         raise config.ConfigError(msg)
         
     return component

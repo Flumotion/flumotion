@@ -1,6 +1,12 @@
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/job.py:
+	  woah, scary how syntax errors going unnoticed can screw up
+	  the whole flumotion system.  This fixes soundcards for me.
+
+2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/job.py:
 	  add another error raise
 
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
