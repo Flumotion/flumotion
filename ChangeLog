@@ -1,3 +1,13 @@
+2004-10-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/Makefile.am:
+	* bin/flumotion.in:
+	* configure.ac:
+	  rename flumotion to flumotion-manager
+
+	* flumotion/test/Makefile.am:
+	  fix test
+
 2004-10-14  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/feedcomponent.py:

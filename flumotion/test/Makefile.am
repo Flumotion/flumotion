@@ -4,7 +4,7 @@ EXTRA_DIST = \
 	test_component.py \
 	test_config.py \
 	test_enum.py \
-	test_flumotion_config.py \
+	test_configure.py \
 	test_http.py \
 	test_log.py \
 	test_manager.py \
