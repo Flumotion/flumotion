@@ -22,14 +22,15 @@
 
 import gtk
         
+from flumotion.common import errors
+from flumotion.configure import configure
+from flumotion.wizard import wizard
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, Enum, EnumClass, EnumMetaClass, \
      LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
      SoundcardChannels, SoundcardDevice, SoundcardInput, \
      SoundcardSamplerate, TVCardDevice, TVCardSignal, VideoDevice, \
      VideoTestFormat, VideoTestPattern
-from flumotion.wizard import wizard
-from flumotion.configure import configure
 
 
 
@@ -140,17 +141,72 @@ class TVCard(VideoSource):
     component_type = 'bttv'
     icon = 'tv.png'
 
-    def setup(self):
-        self.combobox_device.set_enum(TVCardDevice)
-        self.combobox_signal.set_enum(TVCardSignal)
+    code = """
+from twisted.internet import defer
+from flumotion.common import errors
+import gst
+import gst.interfaces
+
+def state_changed_cb(pipeline, old, new, d):
+    if old == gst.STATE_NULL and new == gst.STATE_READY:
+        element = pipeline.get_by_name('source')
+        channels = [channel.label for channel in element.list_channels()]
+        norms = [norm.label for norm in element.list_norms()]
+        reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
+        d.callback((channels, norms))
+def error_cb(pipeline, element, error, _, d):
+    d.errback(errors.UnknownDeviceError("The device does not exist"))
+d = defer.Deferred()        
+pipeline = gst.parse_launch('v4lsrc name=source device=%s ! fakesink')
+pipeline.connect('state-change', state_changed_cb, d)
+pipeline.connect('error', error_cb, d)
+pipeline.set_state(gst.STATE_PLAYING)
+"""
+    def on_combobox_device_changed(self, combo):
+        self.update_channels()
+
+    def before_show(self):
+        self.clear_combos()
+        self.update_channels()
+        
+    def _queryCallback(self, (channels, norms)):
+        self.wizard.block_next(False)
+        self.combobox_signal.set_list(norms)
+        self.combobox_signal.set_sensitive(True)
+        self.combobox_channel.set_list(channels)
+        self.combobox_channel.set_sensitive(True)
+
+    def _unknownDeviceErrback(self, failure):
+        failure.trap(errors.UnknownDeviceError)
+        self.clear_combos()
+        
+    def clear_combos(self):
+        self.combobox_signal.clear()
+        self.combobox_signal.set_sensitive(False)
+        self.combobox_channel.clear()
+        self.combobox_channel.set_sensitive(False)
+        
+    def update_channels(self):
+        self.wizard.block_next(True)
+        admin = self.wizard.get_admin()
+        if not admin:
+            print 'skipping query'
+            return
+        
+        device = self.combobox_device.get_string()
+        code = self.code % device
+        d = admin.runCode(self.worker, code, 'd')
+        d.addCallback(self._queryCallback)
+        d.addErrback(self._unknownDeviceErrback)
         
     def get_component_properties(self):
-        options = self.wizard.get_step_state(self)
-        options['device'] = options['device'].name
-        options['signal'] = options['signal'].name
-        options['width'] = int(options['width'])
-        options['height'] = int(options['height'])
-        options['framerate'] = options['framerate']
+        options = {}
+        options['device'] = self.combobox_device.get_string()
+        options['signal'] = self.combobox_signal.get_string()
+        options['channel'] = self.combobox_channel.get_string()
+        options['width'] = int(self.spinbutton_width.get_value())
+        options['height'] = int(self.spinbutton_height.get_value())
+        options['framerate'] = self.spinbutton_framerate.get_value()
         return options
 wizard.register_step(TVCard)
 

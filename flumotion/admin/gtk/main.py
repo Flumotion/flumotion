@@ -72,6 +72,7 @@ def _window_connected_cb(window, options):
         window.show()
     else:
         wiz = window.runWizard()
+        wiz.connect('finished', lambda w, c: sys.stdout.write(c))
         wiz.window.connect('delete-event', gtk.main_quit)
         
 def _runWizardAndDump():

@@ -1,5 +1,18 @@
 2004-10-22  Johan Dahlin  <johan@gnome.org>
 
+	* data/glade/wizard_tvcard.glade:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/main.py:
+	* flumotion/common/errors.py:
+	* flumotion/component/producers/bttv/bttv.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+
+	Query the tv-card for information and use it in the wizard.
+	Fixes Issue #54
+	
+2004-10-22  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/wizard.py:
 	Don't use a global instance of the wizard, only save the steps
 	globally. Fixes Ticket #42

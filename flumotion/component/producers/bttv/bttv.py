@@ -25,17 +25,26 @@ import gst.interfaces
 
 from flumotion.component.base import producer
 
-def state_changed_cb(element, old, new, channel):
-    if old == gst.STATE_NULL and new == gst.STATE_READY:
+def state_changed_cb(element, old, new, channel, norm):
+    if not (old == gst.STATE_NULL and new == gst.STATE_READY):
+        return
+    
+    if channel:
         c = element.find_channel_by_name(channel)
         if c:
             element.set_channel(c)
-    
+    if norm:
+        c = element.find_norm_by_name(norm)
+        if c:
+            element.set_norm(c)
+        
+     
 def createComponent(config):
     device = config['device']
     width = config.get('width', 320)
     height = config.get('height', 240)
     channel = config['channel']
+    norm = config['signal']
 
     # This needs to be done properly
     device_width = width
@@ -58,6 +67,7 @@ def createComponent(config):
     component = producer.createComponent(config)
     pipeline = component.get_pipeline() 
     element = pipeline.get_by_name('src')
-    element.connect('state-change', state_changed_cb, channel)
+    element.connect('state-change', state_changed_cb,
+                    channel, norm)
     
     return component

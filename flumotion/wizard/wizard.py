@@ -89,7 +89,24 @@ class WizardComboBox(gtk.ComboBox):
 
         self.set_active(0)
         self.enum_class = enum_class
-        
+
+    def set_list(self, list):
+        if hasattr(self, 'enum_class'):
+            delattr(self, 'enum_class')
+            
+        model = self.get_model()
+        model.clear()
+        for value in list:
+            iter = model.append()
+            model.set(iter,
+                      0, value,
+                      1, value)
+        self.set_active(0)
+
+    def clear(self):
+        model = self.get_model()
+        model.clear()
+
     def set_multi_active(self, *values): 
         if not hasattr(self, 'enum_class'):
             raise TypeError
@@ -457,6 +474,9 @@ class Wizard(gobject.GObject, log.Loggable):
 
         self.update_buttons(has_next=True)
 
+    def get_admin(self):
+        return self._admin
+    
     def check_elements(self, worker, *elements):
         if not self._admin:
             log.debug('No admin connected, not checking presents of elements')
@@ -475,7 +495,7 @@ class Wizard(gobject.GObject, log.Loggable):
         d = self._admin.checkElements(worker, elements)
         d.addCallback(_responseCb)
         return d
-    
+
     def _setup_worker(self, step):
         # get name of active worker
         if self.combobox_worker:

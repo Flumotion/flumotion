@@ -276,6 +276,9 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     def checkElements(self, workerName, elements):
         return self.workerCallRemote(workerName, 'checkElements', elements)
     
+    def runCode(self, workerName, codeSegment, variableName):
+        return self.workerCallRemote(workerName, 'runCode',
+                                     codeSegment, variableName)
     
     # FIXME: this is the new method to get the UI, by getting a bundle
     # and an entry point
