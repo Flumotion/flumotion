@@ -146,7 +146,7 @@ class Vorbis(feedcomponent.FeedComponent):
         return retval
         
     def have_caps(self, arg1, arg2):
-        as = self.pipeline.get_by_name('as')
+        as = self.pipeline.get_by_name('audioscale')
         as_pad = as.get_pad('sink')
         caps = as_pad.get_negotiated_caps()
         if caps == None:
