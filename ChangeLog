@@ -1,5 +1,21 @@
 2005-02-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/main.py (_runInterface): Don't write the
+	connection, admin.py does it for us.
+
+	* flumotion/admin/gtk/client.py
+	(Window._append_recent_connections): Clean the list of recent
+	connections before adding anything.
+	(Window.__init__): Don't cache the Connections object.
+
+	* flumotion/admin/admin.py (AdminModel.user, AdminModel.passwd):
+	Changed from username and passwd so as to reflect the fields in
+	the greeter state structure and the connections xml file.
+	(AdminModel._writeConnection): New method, taken out from main.py.
+	Writes a xml representation of the connection to a file at every
+	connect. As a side effect, this allows us to keep time ordering
+	for the connections regardless of how they were opened.
+
 	* flumotion/wizard/wizard.py (Wizard.destroy): New method, will
 	proxy the destroy to the gtk-window and also free some resources.
 	(::destroy): New signal, fired if the wizard gets destroyed

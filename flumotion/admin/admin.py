@@ -24,6 +24,7 @@ model abstraction for administration clients supporting different views
 
 import os
 import sys
+import md5
 
 import gobject
 
@@ -79,13 +80,13 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     _unbundler = None
     state = 'disconnected'
 
-    username = password = host = port = use_insecure = None
+    user = passwd = host = port = use_insecure = None
 
     def __init__(self, username, password):
         self.__gobject_init__()
         
-        self.username = username
-        self.password = password
+        self.user = username
+        self.passwd = password
 
         self.clientFactory = fpb.ReconnectingFPBClientFactory()
         # 20 secs max for an admin to reconnect
@@ -189,9 +190,26 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         d.addCallback(lambda result, s: s.debug('got worker state'), self)
         return d
         
+    def _writeConnection(self):
+        s = ''.join(['<connection>',
+                     '<host>%s</host>' % self.host,
+                     '<port>%d</port>' % self.port,
+                     '<use_insecure>%d</use_insecure>' 
+                     % (self.use_insecure and 1 or 0),
+                     '<user>%s</user>' % self.user,
+                     '<passwd>%s</passwd>' % self.passwd,
+                     '</connection>'])
+        
+        sum = md5.new(s).hexdigest()
+        f = os.path.join(configure.registrydir, '%s.connection' % sum)
+        h = open(f, 'w')
+        h.write(s)
+        h.close()
+
     def _connectedCallback(self, result):
         self.debug('Connected to manager and retrieved all state')
         self.state = 'connected'
+        self._writeConnection()
         self.emit('connected')
         
     # default Errback

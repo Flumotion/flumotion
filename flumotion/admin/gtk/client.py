@@ -19,6 +19,7 @@
 # Headers in this file shall remain intact.
 
 import os
+import md5
 
 import gobject
 from gtk import gdk
@@ -54,7 +55,6 @@ class Window(log.Loggable, gobject.GObject):
         self.debug('creating UI')
         self._create_ui()
 
-        self._connections = connections.Connections()
         self._append_recent_connections()
 
         self.current_component = None # the component we're showing UI for
@@ -157,6 +157,7 @@ class Window(log.Loggable, gobject.GObject):
         map(model.disconnect, ids)
         self.window.set_sensitive(True)
         self._setAdminModel(model)
+        self._append_recent_connections()
 
     def open_refused_cb(self, model, host, port, use_insecure, ids):
         map(model.disconnect, ids)
@@ -178,7 +179,17 @@ class Window(log.Loggable, gobject.GObject):
 
     def _append_recent_connections(self):
         menu = self.widgets['connection_menu'].get_submenu()
-        clist = self._connections.get_recent_connections()
+
+        # first clean any old entries
+        kids = menu.get_children()
+        while True:
+            w = kids.pop()
+            if w.get_name() == 'file_quit':
+                break
+            else:
+                menu.remove(w)
+
+        clist = connections.Connections().get_recent_connections()
         if len(clist) < 2:
             return
 

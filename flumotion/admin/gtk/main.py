@@ -20,8 +20,6 @@
 
 import optparse
 import sys
-import md5
-import os
 
 from twisted.internet import reactor
 
@@ -53,21 +51,6 @@ def _runInterface(conf_file, options, greeter=None, run=True):
     if not state:
         sys.exit(0)
     g.set_sensitive(False)
-
-    s = ''.join(['<connection>',
-                 '<host>%s</host>' % state['host'],
-                 '<port>%d</port>' % state['port'],
-                 '<use_insecure>%d</use_insecure>' 
-                 % (state['use_insecure'] and 1 or 0),
-                 '<user>%s</user>' % state['user'],
-                 '<passwd>%s</passwd>' % state['passwd'],
-                 '</connection>'])
-
-    sum = md5.new(s).hexdigest()
-    f = os.path.join(configure.registrydir, '%s.connection' % sum)
-    h = open(f, 'w')
-    h.write(s)
-    h.close()
 
     model = AdminModel(state['user'], state['passwd'])
     model.connectToHost(state['host'], state['port'], state['use_insecure'])
