@@ -1,3 +1,9 @@
+2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_manager_admin.py:
+	  adding test
+
 2004-10-18  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/Makefile.am:
