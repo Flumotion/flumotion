@@ -120,5 +120,8 @@ class TestMergeImplements(unittest.TestCase):
     def testBothWithout(self):
         self.assertEquals(common.mergeImplements(C, C), ( ))
      
+class TestVersion(unittest.TestCase):
+    def testVersion(self):
+        self.assert_(common.version('abinary'))
 if __name__ == '__main__':
     unittest.main()
