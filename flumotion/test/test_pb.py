@@ -84,67 +84,6 @@ class TestTwisted_PortalAuthChallenger(unittest.TestCase):
         failure = unittest.deferredError(d)
         failure.trap(error.UnauthorizedLogin)
 
-class TestFlumotion_PortalAuthChallenger(unittest.TestCase):
-    def setUp(self):
-        # our PB server creates a salty challenge
-        self.challenge = tpb.challenge()
-        self.challenge = 'is' + 'thesalt'
-        # and a challenger to send to the client
-        self.challenger = pb._PortalAuthChallenger(FakePortalWrapperPlaintext(), 
-            'username', 'avatarId',
-            self.challenge, None)
-
-    def testRightPassword(self):
-        # client is asked to respond, so generate the response
-        salt = self.challenge[:2]
-        import crypt
-        cryptPassword = crypt.crypt('password', salt)
-        response = tpb.respond(self.challenge, cryptPassword)
-
-        self.challenger.remote_respond(response, None)
-
-    def testWrongPassword(self):
-        # client is asked to respond, so generate the response
-        response = tpb.respond(self.challenge, 'wrong')
-
-        d = self.challenger.remote_respond(response, None)
-        failure = unittest.deferredError(d)
-        failure.trap(error.UnauthorizedLogin)
-
-class TestFlumotion_PortalAuthChallengerCrypt(unittest.TestCase):
-    def setUp(self):
-        # PB server receives login request with username
-        username = "username"
-        
-        # our PB server creates a salty challenge for the given username
-        portal = FakePortalWrapperCrypt()
-        checker = portal.checker
-        cryptPassword = checker.users[username]
-        salt = cryptPassword[:2]
-        self.challenge = salt + tpb.challenge()
-        
-        # and a challenger to send to the client
-        self.challenger = pb._PortalAuthChallenger(portal, 
-            username, 'avatarId',
-            self.challenge, None)
-
-    def testRightPassword(self):
-        # client is asked to respond, so generate the response
-        salt = self.challenge[:2]
-        cryptPassword = crypt.crypt('password', salt)
-        response = tpb.respond(self.challenge, cryptPassword)
-
-        # client sends response to the server
-        self.challenger.remote_respond(response, None)
-
-    def testWrongPassword(self):
-        # client is asked to respond, so generate the response
-        response = tpb.respond(self.challenge, 'wrong')
-
-        d = self.challenger.remote_respond(response, None)
-        failure = unittest.deferredError(d)
-        failure.trap(error.UnauthorizedLogin)
-
 ### SHINY NEW FPB
 class Test_BouncerWrapper(unittest.TestCase):
     def setUp(self):
@@ -152,7 +91,6 @@ class Test_BouncerWrapper(unittest.TestCase):
         self.bouncer = htpasswdcrypt.HTPasswdCrypt('testbouncer', None, data)
         self.bouncerPortal = fportal.BouncerPortal(FakeRealm(), self.bouncer)
         self.wrapper = pb._BouncerWrapper(self.bouncerPortal, None)
-
         
     def testUACPPOk(self):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')

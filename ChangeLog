@@ -1,5 +1,14 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/portal.py:
+	  cleanup
+	* flumotion/test/test_pb.py:
+	* flumotion/twisted/pb.py:
+	  remove deprecated stuff:
+	  FMClientFactory, _PortalRoot, _FPortalAuthChallenger
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/admin.py:
 	* flumotion/worker/worker.py:
 	  doc fixes

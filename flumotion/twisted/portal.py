@@ -26,7 +26,7 @@ from flumotion.common import keycards, log
 from flumotion.twisted.pb import _FPortalRoot
 
 """
-Portal-related functionality inspired by twisted.cred.portal.
+Portal-related functionality inspired by twisted.cred.portal
 """
 
 class BouncerPortal(log.Loggable):
