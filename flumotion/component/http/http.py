@@ -31,8 +31,9 @@ from twisted.web import server, resource
 from twisted.internet import reactor
 
 from flumotion.component import component
-# FIXME: these two need to move away from manager !
-from flumotion.manager import auth, interfaces
+from flumotion.common import interfaces
+# FIXME: this need to move away from manager !
+from flumotion.manager import auth
 from flumotion.utils import gstutils, log
 from flumotion.utils.gstutils import gsignal
 

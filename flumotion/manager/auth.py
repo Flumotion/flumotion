@@ -22,7 +22,7 @@
 
 from twisted.python import components
 
-from flumotion.manager import interfaces
+from flumotion.common import interfaces
 
 def getAuth(config, name):
     entry = config.getEntry(name)

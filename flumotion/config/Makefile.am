@@ -7,4 +7,7 @@ flumotion_PYTHON = \
 	installed.py
 noinst_PYTHON = uninstalled.py
 
+clean-local:
+	rm -rf *.pyc *.pyo
+
 EXTRA_DIST = $(flumotion_DATA) installed.py.in uninstalled.py.in

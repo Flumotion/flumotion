@@ -6,9 +6,11 @@ flumotion_PYTHON = \
 	auth.py \
 	component.py \
 	config.py \
-	interfaces.py \
 	launcher.py \
 	manager.py \
 	registry.py
+
+clean-local:
+	rm -rf *.pyc *.pyo
 
 EXTRA_DIST = $(flumotion_DATA)

@@ -47,7 +47,7 @@ gstreactor.install()
 
 from flumotion.manager import launcher
 from flumotion.manager.registry import registry
-from flumotion.twisted import errors
+from flumotion.common import errors
 from flumotion.utils import log
 
 def main(args):

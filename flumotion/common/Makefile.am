@@ -1,9 +1,9 @@
-flumotiondir = $(libdir)/flumotion/python/flumotion/gui
+flumotiondir = $(libdir)/flumotion/python/flumotion/common
 
 flumotion_PYTHON = \
 	__init__.py \
-	adminclient.py \
-	streamclient.py
+	errors.py \
+	interfaces.py
 
 clean-local:
 	rm -rf *.pyc *.pyo

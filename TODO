@@ -1,5 +1,8 @@
 * MEDIUM	integration with monitoring tools:
 		big brother: either:
+
+* EASY		add test suite for logging and FLU_DEBUG variables
+
 - make an executable script/program that makes all required checks and
   outputs a report, has a proper zero or non-zero exit status and 
   can't run forever if things are stuck (times out properly)
@@ -20,3 +23,5 @@ controller
 - accept launcher connections and add a protocol to communicate with
   a launcher to start up components
 - authentication between components
+
+

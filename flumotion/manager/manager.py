@@ -35,8 +35,9 @@ from twisted.internet import reactor
 from twisted.python import components
 from twisted.spread import pb
 
-from flumotion.manager import admin, interfaces, component
-from flumotion.twisted import errors, pbutil, portal
+from flumotion.manager import admin, component
+from flumotion.common import interfaces, errors
+from flumotion.twisted import pbutil, portal
 from flumotion.utils import gstutils, log
 
 # an internal class

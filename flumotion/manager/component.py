@@ -36,7 +36,8 @@ from twisted.internet import reactor
 from twisted.python import components
 from twisted.spread import pb
 
-from flumotion.twisted import errors, pbutil
+from flumotion.common import errors
+from flumotion.twisted import pbutil
 from flumotion.utils import gstutils, log
 
 class Options:

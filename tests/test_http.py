@@ -6,7 +6,7 @@ from twisted.python import components
 from twisted.web import server
 
 from flumotion.component.http import http
-from flumotion.manager import interfaces
+from flumotion.common import interfaces
 
 # From twisted/test/proto_helpers.py
 import fcntl

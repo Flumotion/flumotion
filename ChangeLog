@@ -1,3 +1,47 @@
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	* bin/flumotion.in:
+	* configure.ac:
+	* doc/reference/Makefile.am:
+	* flumotion/Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/bttv/Makefile.am:
+	* flumotion/component/component.py:
+	* flumotion/component/dv/Makefile.am:
+	* flumotion/component/file/Makefile.am:
+	* flumotion/component/http/Makefile.am:
+	* flumotion/component/http/http.py:
+	* flumotion/component/multipartjpeg/Makefile.am:
+	* flumotion/component/overlay/Makefile.am:
+	* flumotion/component/passwd/Makefile.am:
+	* flumotion/component/passwd/passwd.py:
+	* flumotion/component/videotest/Makefile.am:
+	* flumotion/config/Makefile.am:
+	* flumotion/errors.py:
+	* flumotion/gui/Makefile.am:
+	* flumotion/gui/adminclient.py:
+	* flumotion/gui/admininterface.py:
+	* flumotion/interfaces.py:
+	* flumotion/manager/Makefile.am:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/auth.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/interfaces.py:
+	* flumotion/manager/manager.py:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/errors.py:
+	* flumotion/utils/Makefile.am:
+	* flumotion/utils/gstutils.py:
+	* flumotion/utils/log.py:
+	* flumotion/utils/proctitle.py:
+	* tests/test_http.py:
+	  create flumotion.common and put errors and interfaces there
+	  remove proctitle
+	  add a clean-local rule everywhere for .pyc and .pyo
+
 2004-09-08  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/manager/launcher.py (Launcher.launch_component): Clean

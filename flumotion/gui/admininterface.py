@@ -25,10 +25,10 @@ from twisted.spread import pb
 from twisted.internet import error
 from twisted.python import rebuild, reflect
 
-from flumotion.manager import interfaces
-from flumotion.twisted import errors, pbutil
+from flumotion.common import interfaces, errors
 from flumotion.utils import log, reload
 from flumotion.utils.gstutils import gsignal
+from flumotion.twisted import pbutil
 
 class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     """Lives in the admin client.

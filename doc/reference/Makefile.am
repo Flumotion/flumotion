@@ -10,22 +10,21 @@ MODULE_FILES = \
 	flumotion/admin/__init__.py		\
 	flumotion/admin/spyglass.py		\
 	flumotion/config/__init__.py		\
+	flumotion/common/errors.py		\
+	flumotion/common/interfaces.py		\
 	flumotion/component/component.py	\
 	flumotion/component/base/producer.py	\
 	flumotion/component/base/converter.py	\
 	flumotion/component/file/file.py	\
 	flumotion/component/http/http.py	\
 	flumotion/component/passwd/passwd.py	\
-	flumotion/errors.py			\
 	flumotion/manager/admin.py		\
 	flumotion/manager/auth.py		\
         flumotion/manager/config.py		\
 	flumotion/manager/manager.py		\
-	flumotion/manager/interfaces.py		\
 	flumotion/manager/launcher.py		\
 	flumotion/manager/registry.py		\
 	flumotion/twisted/gstreactor.py		\
-	flumotion/twisted/errors.py		\
 	flumotion/utils/gstutils.py		\
 	flumotion/utils/log.py
 

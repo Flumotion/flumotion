@@ -24,7 +24,7 @@ import sys
 import gobject
 import gst
 
-from flumotion.twisted import errors
+from flumotion.common import errors
 
 def caps_repr(caps):
     value = str(caps)

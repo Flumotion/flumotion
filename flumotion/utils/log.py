@@ -36,7 +36,7 @@ import os
 import fnmatch
 import time
 
-from flumotion.twisted import errors
+from flumotion.common import errors
 
 class Loggable:
     """
@@ -160,7 +160,7 @@ def _handle(category, level, message):
 def error(cat, *args):
     """
     Log a fatal error message in the given category. \
-    This will also raise a L{flumotion.twisted.errors.SystemError}.
+    This will also raise a L{flumotion.common.errors.SystemError}.
     """
     msg = ' '.join(args)
     _handle(cat, 'ERROR', msg)

@@ -23,7 +23,8 @@
 from twisted.internet import reactor
 from twisted.spread import pb
 
-from flumotion.twisted import errors, pbutil
+from flumotion.twisted import pbutil
+from flumotion.common import errors
 from flumotion.utils import log
 
 class ComponentView(pb.Copyable):
