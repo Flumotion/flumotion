@@ -164,16 +164,6 @@ class ConnectionsDialog(GladeWindow):
 
     gsignal('have-connection', object)
 
-    def __init__(self, parent):
-        def cust_handler(xml, proc, name, *args):
-            w = eval(proc)
-            w.set_name(name)
-            w.show()
-            return w
-        gtk.glade.set_custom_handler(cust_handler)
-
-        GladeWindow.__init__(self, parent)
-
     def on_has_selection(self, widget, has_selection):
         self.widgets['button_ok'].set_sensitive(has_selection)
 

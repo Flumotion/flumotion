@@ -18,6 +18,7 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+  <property name="focus_on_map">True</property>
   <property name="has_separator">False</property>
   <signal name="delete_event" handler="destroy" last_modification_time="Mon, 07 Feb 2005 15:33:12 GMT"/>
 
@@ -93,6 +94,10 @@
 	      <property name="yalign">0.5</property>
 	      <property name="xpad">24</property>
 	      <property name="ypad">0</property>
+	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+	      <property name="width_chars">-1</property>
+	      <property name="single_line_mode">False</property>
+	      <property name="angle">0</property>
 	    </widget>
 	  </child>
 	</widget>
@@ -119,10 +124,10 @@
 	  <child>
 	    <widget class="Custom" id="connections">
 	      <property name="visible">True</property>
-	      <property name="creation_function">Connections()</property>
+	      <property name="creation_function">flumotion.admin.gtk.connections.Connections()</property>
 	      <property name="int1">0</property>
 	      <property name="int2">0</property>
-	      <property name="last_modification_time">Mon, 07 Feb 2005 15:50:30 GMT</property>
+	      <property name="last_modification_time">Tue, 08 Mar 2005 16:39:13 GMT</property>
 	      <signal name="has_selection" handler="on_has_selection" last_modification_time="Mon, 07 Feb 2005 15:25:00 GMT"/>
 	      <signal name="connection-activated" handler="on_connection_activated" last_modification_time="Tue, 08 Feb 2005 16:12:56 GMT"/>
 	    </widget>

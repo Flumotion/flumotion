@@ -64,16 +64,7 @@ class ConnectToExisting(wizard.WizardStep):
     title='Host information'
     text = 'Please enter the address where the manager is running.'
     next_pages = ['authenticate']
-
-    def __init__(self, *args):
-        self.open_connection = None
-        def cust_handler(xml, proc, name, *args):
-            w = eval(proc)
-            w.set_name(name)
-            w.show()
-            return w
-        gtk.glade.set_custom_handler(cust_handler)
-        wizard.WizardStep.__init__(self, *args)
+    open_connection = None
 
     def setup(self, state, available_pages):
         try:
@@ -130,15 +121,6 @@ class LoadConnection(wizard.WizardStep):
     text = 'Please choose a connection from the box below.'
     connections = None
     next_pages = []
-
-    def __init__(self, *args):
-        def cust_handler(xml, proc, name, *args):
-            w = eval(proc)
-            w.set_name(name)
-            w.show()
-            return w
-        gtk.glade.set_custom_handler(cust_handler)
-        wizard.WizardStep.__init__(self, *args)
 
     def is_available(self):
         return self.connections.get_selected()

@@ -20,12 +20,38 @@
 
 
 import os
+import sys
 
 import gtk
 import gtk.glade
 import gobject
 
 from flumotion.configure import configure
+
+
+# proc := module1.module2.moduleN.proc1().maybe_another_proc()
+#  -> eval proc1().maybe_another_proc() in module1.module2.moduleN
+def flumotion_glade_custom_handler(xml, proc, name, *args):
+    def takewhile(proc, l):
+        ret = []
+        while l and proc(l[0]):
+            ret.append(l[0])
+            l.remove(l[0])
+        return ret
+
+    def parse_proc(proc):
+        parts = proc.split('.')
+        assert len(parts) > 1
+        modparts = takewhile(str.isalnum, parts)
+        assert modparts and parts
+        return '.'.join(modparts), '.'.join(parts)
+
+    module, code = parse_proc(proc)
+    w = eval(code, sys.modules[module].__dict__)
+    w.set_name(name)
+    w.show()
+    return w
+gtk.glade.set_custom_handler(flumotion_glade_custom_handler)
 
 
 class GladeWidget(gtk.VBox):

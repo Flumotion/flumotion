@@ -31,6 +31,7 @@ from flumotion.configure import configure
 #from flumotion.common import log
 
 from flumotion.common.pygobject import gsignal
+from flumotion.ui.glade import GladeWidget
 
 
 # FIXME FIXME: these docs are wrong.
@@ -74,7 +75,7 @@ from flumotion.common.pygobject import gsignal
 # w.run() => {'foo': 'bar'}
 
 
-class WizardStep:
+class WizardStep(GladeWidget):
     # all values filled in by subclasses
     name = None
     title = None
@@ -85,17 +86,8 @@ class WizardStep:
     page = None # filled from glade
 
     def __init__(self, glade_prefix=''):
-        wtree = gtk.glade.XML(os.path.join(configure.gladedir,
-                                           glade_prefix+self.name+'.glade'),
-                              'page')
-        for widget in wtree.get_widget_prefix(''):
-            wname = widget.get_name()
-            if hasattr(self, wname) and getattr(self, wname):
-                raise AssertionError (
-                    "There is already an attribute called %s in %r" %
-                    (wname, self))
-            setattr(self, wname, widget)
-            wtree.signal_autoconnect(self)
+        self.glade_file = glade_prefix + self.name + '.glade'
+        GladeWidget.__init__(self)
 
     def is_available(self):
         return True
@@ -124,7 +116,9 @@ class Wizard(gobject.GObject):
 
         self.window = None
         self.page_bin = None
-        for x in pages: self.pages[x.name] = x(name+'-')
+        for x in pages:
+            p = self.pages[x.name] = x(name+'-')
+            p.show()
         self.create_ui()
         self.name = name
         self.set_page(initial_page)
@@ -190,7 +184,7 @@ class Wizard(gobject.GObject):
         self.page = page
         for w in self.page_bin.get_children():
             self.page_bin.remove(w)
-        self.page_bin.add(page.page)
+        self.page_bin.add(page)
         self.label_title.set_markup('<big><b>%s</b></big>' % page.title)
         self.textview_text.get_buffer().set_text(page.text)
         self.button_next.set_sensitive(True)

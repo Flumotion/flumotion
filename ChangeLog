@@ -1,3 +1,25 @@
+2005-03-08  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/ui/glade.py (flumotion_glade_custom_handler): New
+	custom glade handler, set when the module is loaded.
+
+	* flumotion/admin/gtk/wizard.py (WizardStep.next_pages): Derive
+	from GladeWidget, ditch our own glade-like code. Same behaviour
+	tho.
+	(Wizard.__init__): Show pages when creating them.
+	(Wizard.set_page): `page' itself is a widget now.
+
+	* flumotion/admin/gtk/connections.py (ConnectionsDialog.glade_file): 
+	* flumotion/admin/gtk/greeter.py
+	(ConnectToExisting.open_connection)
+	(LoadConnection.title): No need for custom glade handlers, thus no
+	need for __init__.
+
+	* data/glade/greeter-load-connection.glade:
+	* data/glade/connection-dialog.glade:
+	* data/glade/greeter-connect_to_existing.glade: Construct custom
+	widgets with fully qualified module names.
+
 2005-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:
