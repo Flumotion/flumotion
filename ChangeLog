@@ -1,5 +1,11 @@
 2005-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/admin.glade:
+	* flumotion/admin/gtk/connections.py:
+	  fixes for gtk 2.4 and python 2.3
+
+2005-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  provide both stop and start
 

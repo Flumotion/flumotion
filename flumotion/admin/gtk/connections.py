@@ -88,7 +88,8 @@ class Connections(GladeWidget):
             files = [os.path.join(configure.registrydir, f) for f in files]
             files = [(os.stat(f).st_mtime, f) for f in files
                                               if f.endswith('.connection')]
-            files.sort(reverse=True)
+            files.sort()
+            files.reverse()
             l = self.model
             for f in [x[1] for x in files]:
                 try:
