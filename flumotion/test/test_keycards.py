@@ -28,7 +28,6 @@ from flumotion.common import keycards
 
 class TestKeycardUACPP(unittest.TestCase):
     def testInit(self):
-        assert False
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
         self.assert_(components.implements(keycard, credentials.IUsernameCryptPassword))
