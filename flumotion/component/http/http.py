@@ -663,13 +663,14 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     def client_removed_idle(self, sink, fd, reason, stats):
         # Johan will trap GST_CLIENT_STATUS_ERROR here someday
         # because STATUS_ERROR seems to have already closed the fd somewhere
-        self.emit('client-removed', sink, fd, reason, stats)
+        # commented out to see if it solves GIL problems
+        # self.emit('client-removed', sink, fd, reason, stats)
         Stats.clientRemoved(self)
         # FIXME: GIL problem, don't update UI for now
         self.needsUpdate = True
         #self.update_ui_state()
         # actually close it - needs gst-plugins 0.8.5 of multifdsink
-        self.debug('[fd %5d] closing' % fd)
+        # self.debug('[fd %5d] closing' % fd)
 
     def feeder_state_change_cb(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,

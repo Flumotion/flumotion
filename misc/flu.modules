@@ -33,7 +33,10 @@
     </dependencies>
   </cvsmodule>
 
+<!--
   <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_3_96">
+-->
+  <cvsmodule id="pygtk" cvsroot="gnome.org">
   </cvsmodule>
  
   <cvsmodule id="gst-python" cvsroot="gstreamer.freedesktop.org">

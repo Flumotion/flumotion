@@ -1,3 +1,8 @@
+2004-09-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/http/http.py:
+	  disable a signal emission to see if it keeps the server going
+
 2004-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:
