@@ -274,9 +274,10 @@ class AdminHeaven(pb.Root, log.Loggable):
             reactor.callLater(0.25, self.sendCache, client)
             return
         
-        self.debug('sending logcache to client (%d messages)' % len(self.logcache))
-        for category, type, message in self.logcache:
-            client.sendLog(category, type, message)
+        # FIXME: do this on request only
+        #self.debug('sending logcache to client (%d messages)' % len(self.logcache))
+        #for category, type, message in self.logcache:
+        #    client.sendLog(category, type, message)
         
     def getAvatar(self, avatarID):
         """
