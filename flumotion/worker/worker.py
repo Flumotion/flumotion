@@ -148,8 +148,8 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         try:
             exec (codeSegment, globals(), namespace)
         except Exception, e:
-            msg = 'runCode exec failed: %s raised: %r' % (
-                e.__class__.__name__, e)
+            msg = 'runCode exec failed: %s raised: %s' % (
+                e.__class__.__name__, " ".join(e.args))
             self.warning(msg)
             raise errors.RemoteRunError(msg)
 
@@ -168,8 +168,8 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         try:
             deferred = function(*args)
         except Exception, e:
-            msg = 'runCode function failed: %s raised: %r' % (
-                e.__class__.__name__, e)
+            msg = 'runCode function failed: %s raised: %s' % (
+                e.__class__.__name__, " ".join(e.args))
             self.warning(msg)
             raise errors.RemoteRunError(msg)
         except:
