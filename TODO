@@ -1,12 +1,5 @@
 0.1.0:
 
-* MEDIUM	give useful error messages when there is no network !
-		(service network stop and start flumotion and see hang)
-
-* EASY		rename http to httpstreamer because we'll have a reader too
-
-* EASY		rename other components, compare with manual
-
 * EASY		remove utils, split up gstutils
 
 * EASY:		doublecheck spec
@@ -19,11 +12,12 @@
 
 * MEDIUM:	write startup "flumotion" script
 
-* MEDIUM:	decide who chooses the "name" of a worker; either the worker's
-		hostname (changed to localhost if manager is on localhost)
-		or the manager's name for it
+* MEDIUM	give useful error messages when there is no network !
+		(service network stop and start flumotion and see hang)
 
 LATER:
+
+* EASY		move muxers in their own dir ?
 
 * MEDIUM:	provide login dialog in flumotion-admin, with user/pass or
 		other types,
