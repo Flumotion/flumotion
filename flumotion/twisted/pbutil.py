@@ -8,12 +8,6 @@ from twisted.python import log
 from twisted.spread import pb
 from twisted.spread.pb import PBClientFactory
 
-class NewCredPerspective(pb.Avatar):
-    def attached(self, mind):
-        pass
-    def detached(self, mind):
-        pass
-
 class ReconnectingPBClientFactory(PBClientFactory,
                                   protocol.ReconnectingClientFactory):
     """Reconnecting client factory for PB brokers.

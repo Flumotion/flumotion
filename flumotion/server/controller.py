@@ -59,9 +59,10 @@ class Dispatcher(log.Loggable):
     ### IRealm method
     def requestAvatar(self, avatarID, mind, *interfaces):
         # requestAvatar gets called through pb.PBClientFactory.login()
-        # an optional second argument can be passed to login.
-        # This should be a Referenceable.
-        # A reference to it is passed to requestAvatar as mind.
+        # An optional second argument can be passed to login, which should be
+        # a L{twisted.spread.flavours.Referenceable}
+        # A L{twisted.spread.pb.RemoteReference} to it is passed to
+        # requestAvatar as mind.
         # So in short, the mind is a reference to the client passed in login()
         # on the peer, allowing any object that has the mind to call back
         # to the piece that called login(),
@@ -95,7 +96,7 @@ class Dispatcher(log.Loggable):
 class Options:
     """dummy class for storing controller side options of a component"""
 
-class ComponentPerspective(pbutil.NewCredPerspective, log.Loggable):
+class ComponentPerspective(pb.Avatar, log.Loggable):
     """Controller side perspective of components"""
 
     logCategory = 'controller'

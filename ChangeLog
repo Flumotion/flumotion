@@ -1,3 +1,11 @@
+2004-08-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/server/admin.py:
+	* flumotion/server/controller.py:
+	* flumotion/twisted/pbutil.py:
+	  remove NewCredPerspective since it's a pb.Avatar and we override
+	  attached and detached anyway
+
 2004-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/gui/adminclient.py:

@@ -29,7 +29,7 @@ from flumotion.utils import log
 class ComponentView(pb.Copyable):
     """
     I live in the controller.
-    I present state of a component through a L{RemoteComponentView} to the peer.
+    I present state of a component through a L{RemoteComponentView} in the peer.
     I get the state I present from a L{controller.ComponentPerspective}.
     """
     def __init__(self, component):
@@ -44,6 +44,11 @@ class ComponentView(pb.Copyable):
         self.options = component.options.dict
 
 class RemoteComponentView(pb.RemoteCopy):
+    """
+    I live in an admin client.
+    I represent state of a component.
+    I am a copy of a controll-side L{ComponentView}
+    """
     def __cmp__(self, other):
         if not isinstance(other, RemoteComponentView):
             return False
@@ -53,9 +58,14 @@ class RemoteComponentView(pb.RemoteCopy):
         return '<RemoteComponentView %s>' % self.name
 pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
 
-class AdminPerspective(pbutil.NewCredPerspective, log.Loggable):
-    """Perspective on the local controller created locally on behalf of
-    a remote AdminInterface"""
+# FIXME: rename to AdminAvatar
+class AdminPerspective(pb.Avatar, log.Loggable):
+    """
+    I live in the controller.
+    I am a perspective/avatar created for an admin client (?).
+    A reference to me is given to L{gui/AdminInterface} when logging in
+    and requesting an "admin" avatar.
+    """
     logCategory = 'admin-persp'
     # FIXME: should not be called with controller directly, should be
     # called with the Admin through which controller can be gotten.
@@ -118,6 +128,7 @@ class AdminPerspective(pbutil.NewCredPerspective, log.Loggable):
         
         self.callRemote('shutdown')
 
+    ### pb.NewCredPerspective (ie. Avatar) methods
     def perspective_shutdown(self):
         print 'SHUTTING DOWN'
         reactor.stop()
