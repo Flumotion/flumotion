@@ -73,3 +73,24 @@ class WizardStepTest(unittest.TestCase):
     def testStepComponentProperties(self):
         for step in self.steps:
             self.assert_(isinstance(step.get_component_properties(), dict))
+
+
+class WizardSaveTest(unittest.TestCase):
+    def setUp(self):
+        self.wizard = wizard.Wizard()
+        self.wizard.load_steps()
+
+    def testFirewireAudioAndVideo(self):
+        source = self.wizard['Source']
+        source.combobox_video.set_active(enums.VideoDevice.Firewire)
+        source.combobox_audio.set_active(enums.AudioDevice.Firewire)
+
+        self.wizard.run(False, ['localhost'], True)
+        config = self.wizard.getConfig()
+        self.assert_(config.has_key('video-source'))
+        self.assert_(not config.has_key('audio-source'))
+        videoSource = config['video-source']
+        self.failUnlessEqual(videoSource.type, 'firewire')
+        
+        self.failUnlessEqual(config['audio-encoder'].getFeeders(), ['video-source:audio'])
+        self.failUnlessEqual(config['video-overlay'].getFeeders(), ['video-source:video'])

@@ -717,7 +717,13 @@ class Wizard(gobject.GObject, log.Loggable):
             
     def printOut(self):
         print self._save.getXML()[:-1]
-        
+
+    def getConfig(self):
+        dict = {}
+        for component in self._save.getComponents():
+            dict[component.name] = component
+
+        return dict
 gobject.type_register(Wizard)
 
 _steps = []

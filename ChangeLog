@@ -1,5 +1,20 @@
 2004-10-26  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_wizard.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard.py:
+
+	Don't output firewire-audio if we have firewire-video
+	Add a test for this too.
+	
+2004-10-26  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/save.py:
+
+	Don't add firewire audio component twice.
+
+2004-10-26  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/save.py:
 
 	Ensure width and height always is set.

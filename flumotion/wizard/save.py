@@ -49,7 +49,21 @@ class Component:
     def link(self, component):
         self.feeders.append(component)
         component.addEater(self)
-        
+
+    def getFeeders(self):
+        s = []
+        for source in self.feeders:
+            if source.type == 'firewire':
+                if self.name in ('video-encoder', 'video-overlay'):
+                    feed = 'video'
+                else:
+                    feed = 'audio'
+                s.append('%s:%s' % (source.name, feed))
+            else:
+                s.append(source.name)
+                
+        return s
+    
     def toXML(self):
         if self.worker:
             extra = ' worker="%s"' % self.worker
@@ -67,15 +81,8 @@ class Component:
         else:
             s += '      <feed>default</feed>\n'
 
-            for source in self.feeders:
-                if source.type == 'firewire':
-                    if self.name in ('video-encoder', 'video-overlay'):
-                        feed = 'video'
-                    else:
-                        feed = 'audio'
-                    s += "      <source>%s:%s</source>\n" % (source.name, feed)
-                else:
-                    s += "      <source>%s</source>\n" % source.name
+        for sourceName in self.getFeeders():
+            s += "      <source>%s</source>\n" % sourceName
                     
                 
         if self.props:
@@ -142,6 +149,13 @@ class WizardSaver:
     def getAudioSource(self, video_source):
         options = self.wizard.get_step_options('Source')
         source = options['audio']
+        # If we selected firewire and have selected video
+        # and the selected video is Firewire,
+        #   return the source
+        if (source == AudioDevice.Firewire and video_source and
+            options['video'] == VideoDevice.Firewire):
+            return video_source
+        
         props = {}
         
         audio_step = self.wizard['Audio Source']
@@ -291,8 +305,8 @@ class WizardSaver:
             components.remove(video_muxer)
         if both_muxer and not both_muxer.eaters:
             components.remove(both_muxer)
-            
-    def getXML(self):
+
+    def getComponents(self):
         source_options = self.wizard.get_step_options('Source')
         has_video = source_options['has_video']
         has_audio = source_options['has_audio']
@@ -311,6 +325,11 @@ class WizardSaver:
             audio_encoder = self.handleAudio(components, video_source)
             
         self.handleConsumers(components, audio_encoder, video_encoder)
+
+        return components
+    
+    def getXML(self):
+        components = self.getComponents()
         
         s = '<planet>\n'
         s += '  <flow>\n'
