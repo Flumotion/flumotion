@@ -53,7 +53,7 @@ class BaseComponent(pb.Referenceable):
         self.pipeline_signals = []
 
         # Prefix our login name with the name of the component
-        self.username = '%s_%s' % (self.getKind(), name)
+        self.username = name
         self.factory = ClientFactory(self)
         self.factory.login(self.username)
 
@@ -74,10 +74,6 @@ class BaseComponent(pb.Referenceable):
     def getName(self):
         return self.component_name
     
-    def getKind(self):
-        assert hasattr(self, 'kind')
-        return self.kind
-
     def getSources(self):
         return self.sources
     
@@ -151,23 +147,6 @@ class BaseComponent(pb.Referenceable):
         if not retval:
             self.warn('Setting pipeline to NULL failed')
         
-    def setup_feeds(self, feeds):
-        if not self.pipeline:
-            raise errors.NotReadyError('No pipeline')
-        
-        # Setup all feeds sources
-        for name, host, port in feeds:
-            self.msg('Going to listen on %s (%s:%d)' % (name, host, port))
-            feed = self.pipeline.get_by_name(name)
-            feed.connect('state-change', self.feed_state_change_cb, name)
-            
-            assert feed, 'No feed element named %s in pipeline' % name
-            assert isinstance(feed, gst.Element)
-            
-            feed.set_property('host', host)
-            feed.set_property('port', port)
-            feed.set_property('protocol', 'gdp')
-
     def setup_sources(self, sources):
         if not self.pipeline:
             raise NotReadyError('No pipeline')
@@ -183,6 +162,23 @@ class BaseComponent(pb.Referenceable):
             source.set_property('port', source_port)
             source.set_property('protocol', 'gdp')
             
+    def setup_feeds(self, feeds):
+        if not self.pipeline:
+            raise errors.NotReadyError('No pipeline')
+        
+        # Setup all feeds
+        for name, host, port in feeds:
+            self.msg('Going to listen on %s (%s:%d)' % (name, host, port))
+            feed = self.pipeline.get_by_name(name)
+            feed.connect('state-change', self.feed_state_change_cb, name)
+            
+            assert feed, 'No feed element named %s in pipeline' % name
+            assert isinstance(feed, gst.Element)
+            
+            feed.set_property('host', host)
+            feed.set_property('port', port)
+            feed.set_property('protocol', 'gdp')
+
     def cleanup(self):
         self.msg("cleaning up")
         
@@ -241,6 +237,16 @@ class BaseComponent(pb.Referenceable):
     def remote_pause(self):
         self.pipeline_pause()
 
+    def remote_link(self, sources, feeds):
+        self.setup_sources(sources)
+        self.setup_feeds(feeds)
+        
+        func = getattr(self, 'link_setup', None)
+        if func:
+            func(sources, feeds)
+            
+        self.pipeline_play()
+        
     def remote_getElementProperty(self, element_name, property):
         element = self.pipeline.get_by_name(element_name)
         if not element:
@@ -282,7 +288,7 @@ class BaseComponent(pb.Referenceable):
 
         self.msg('setting property %s on element %s to %s' % (property, element_name, value))
         element.set_property(property, value)
-        
+
 class ParseLaunchComponent(BaseComponent):
     SOURCE_TMPL = 'tcpclientsrc'
     FEED_TMPL = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'

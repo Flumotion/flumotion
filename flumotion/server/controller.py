@@ -42,11 +42,10 @@ class Dispatcher:
         if avatarID == 'admin':
             p = self.admin.getPerspective()
         else:
-            component_type, avatarID = avatarID.split('_', 1)
             if self.controller.hasComponent(avatarID):
                 raise errors.AlreadyConnectedError(avatarID)
         
-            p = self.controller.getPerspective(component_type, avatarID)
+            p = self.controller.getPerspective(avatarID)
 
         #msg("returning Avatar(%s): %s" % (avatarID, p))
         if not p:
@@ -175,8 +174,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         log.msg(self.getName(), *msg)
         
     def perspective_stateChanged(self, feed, state):
-        self.msg('stateChanged :%s %s' % (feed,
-                                          gst.element_state_get_name(state)))
+        self.msg('stateChanged :%s %s' % (feed, gst.element_state_get_name(state)))
         
         self.state = state
         if self.state == gst.STATE_PLAYING:
@@ -190,52 +188,19 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         
         self.controller.removeComponent(self)
 
-class ProducerPerspective(ComponentPerspective):
-    """Perspective for producer components"""
-    kind = 'producer'
-    def cb_getFreePorts(self, (feeds, ports)):
-        self.listen_ports = ports
-        cb = self.callRemote('listen', feeds)
-        cb.addErrback(self.cb_checkAll)
-        
-    def listen(self, feeds):
-        """starts the remote methods listen"""
-
-        cb = self.callRemote('getFreePorts', feeds)
-        cb.addCallbacks(self.cb_getFreePorts, self.cb_checkAll)
-
-class ConverterPerspective(ComponentPerspective):
-    """Perspective for converter components"""
-    kind = 'converter'
-
-    def start(self, sources, feeds):
+    def link(self, sources, feeds):
         def cb_getFreePorts((feeds, ports)):
             self.listen_ports = ports
-            cb = self.callRemote('start', sources, feeds)
+            cb = self.callRemote('link', sources, feeds)
             cb.addErrback(self.cb_checkAll)
-            
-        """starts the remote methods start"""
-        cb = self.callRemote('getFreePorts', feeds)
-        cb.addCallbacks(cb_getFreePorts, self.cb_checkAll)
-        
-class StreamerPerspective(ComponentPerspective):
-    """Perspective for streamer components"""
-    kind = 'streamer'
-            
-    def getListenHost(self):
-        "Should never be called, a Streamer does not accept incoming components"
-        raise AssertionError
-    
-    def getListenPort(self):
-        "Should never be called, a Streamer does not accept incoming components"
-        raise AssertionError
 
-    def connect(self, sources):
-        """starts the remote methods connect"""
-        self.msg('Calling remote method connect(%s)' % sources)
-        cb = self.mind.callRemote('connect', sources)
-        cb.addErrback(self.cb_checkAll)
-        
+        if feeds:
+            cb = self.callRemote('getFreePorts', feeds)
+            cb.addCallbacks(cb_getFreePorts, self.cb_checkAll)
+        else:
+            cb = self.callRemote('link', sources, [])
+            cb.addErrback(self.cb_checkAll)
+
 STATE_NULL     = 0
 STATE_STARTING = 1
 STATE_READY    = 2
@@ -343,25 +308,14 @@ class Controller(pb.Root):
     def setAdmin(self, admin):
         self.admin = admin
         
-    def getPerspective(self, type, *args):
+    def getPerspective(self, *args):
         """Creates a new perspective for a component
-        @type type:      string
-        @param type:     type of the component, one of: producer, converter and streamer
         @type args:      tuple
         @param username: extra arguments sent to the perspective class
         @rtype:          ComponentPerspective
         @returns:        the perspective for the component"""
 
-        if type == 'producer':
-            klass = ProducerPerspective
-        elif type == 'converter':
-            klass = ConverterPerspective
-        elif type == 'streamer':
-            klass = StreamerPerspective
-        else:
-            raise AssertionError
-
-        component = klass(self, *args)
+        component = ComponentPerspective(self, *args)
         self.addComponent(component)
         return component
 
@@ -427,14 +381,12 @@ class Controller(pb.Root):
             self.admin.componentRemoved(component)
 
     def getSourceComponents(self, component):
-        """Retrives the source components for component
+        """Retrives the sources for a component
 
         @type component:  component
         @param component: the component
         @rtype:           tuple of with 3 items
         @returns:         name, hostname and port"""
-
-        assert not isinstance(component, ProducerPerspective)
 
         peernames = component.getSources()
         retval = []
@@ -452,14 +404,12 @@ class Controller(pb.Root):
         return retval
 
     def getFeedsForComponent(self, component):
-        """Retrives the source components for component
+        """Retrives the feeds for a component
 
         @type component:  component
         @param component: the component
         @rtype:           tuple of with 3 items
         @returns:         name, hostname and port"""
-
-        assert isinstance(component, ComponentPerspective), component
 
         host = component.getListenHost()
         feednames = component.getFeeds()
@@ -474,36 +424,14 @@ class Controller(pb.Root):
             retval.append((feedname, host, port))
         return retval
 
-    def producerStart(self, producer):
-        assert isinstance(producer, ProducerPerspective)
-
-        feeds = self.getFeedsForComponent(producer)
-        producer.listen(feeds)
-
-    def converterStart(self, converter):
-        assert isinstance(converter, ConverterPerspective)
-        
-        sources = self.getSourceComponents(converter)
-        feeds = self.getFeedsForComponent(converter)
-        converter.start(sources, feeds)
-            
-    def streamerStart(self, streamer):
-        assert isinstance(streamer, StreamerPerspective)
-        
-        sources = self.getSourceComponents(streamer)
-        streamer.connect(sources)
-        
     def componentStart(self, component):
         component.msg('Starting')
-        assert isinstance(component, ComponentPerspective)
-        assert component != ComponentPerspective
+        #assert isinstance(component, ComponentPerspective)
+        #assert component != ComponentPerspective
 
-        if isinstance(component, ProducerPerspective):
-            self.producerStart(component)
-        elif isinstance(component, ConverterPerspective):
-            self.converterStart(component)
-        elif isinstance(component, StreamerPerspective):
-            self.streamerStart(component)
+        sources = self.getSourceComponents(component)
+        feeds = self.getFeedsForComponent(component)
+        component.link(sources, feeds)
 
     def maybeComponentStart(self, component):
         component.msg('maybeComponentStart')

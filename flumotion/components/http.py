@@ -214,18 +214,13 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     def client_added_cb(self, sink, fd):
         pass
 
-    # connect() is already taken by gobject.GObject
-    def connect_to(self, sources):
-        self.setup_sources(sources)
+    def link_setup(self, sources, feeds):
         sink = self.get_sink()
         sink.connect('deep-notify::caps', self.notify_caps_cb)
         sink.connect('state-change', self.feed_state_change_cb, '')
         sink.connect('client-removed', self.client_removed_cb)
         sink.connect('client-added', self.client_added_cb)
         
-        self.pipeline_play()
-
-    remote_connect = connect_to
 gobject.type_register(MultifdSinkStreamer)
 
 def createComponent(config):
@@ -234,16 +229,14 @@ def createComponent(config):
     sources = config.get('sources', [])
 
     # XXX: How can we do this properly?
-    MultifdSinkStreamer.kind = 'streamer'
-
     component = MultifdSinkStreamer(name, sources)
     resource = HTTPStreamingResource(component)
     if config.has_key('logfile'):
-        log.msg(config['kind'], 'Logging to %s' % config['logfile'])
+        log.msg(config['name'], 'Logging to %s' % config['logfile'])
         resource.setLogfile(config['logfile'])
         
     factory = server.Site(resource=resource)
-    log.msg(config['kind'], 'Listening on %d' % port)
+    log.msg(config['name'], 'Listening on %d' % port)
     reactor.listenTCP(port, factory)
 
     return component

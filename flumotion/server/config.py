@@ -108,30 +108,6 @@ class FlumotionConfig(ConfigParser):
         entry = pwd.getpwnam(username)
         self.uid = entry[2]
 
-    def parse_component(self, kind, section):
-        kwargs = {}
-        kwargs['kind'] = kind
-        if self.has_option(section, 'nice'):
-            kwargs['nice'] = self.getint(section, 'nice')
-
-        registry.getComponent(kind)
-        if kind == 'producer':
-            pipeline = self.get_pipeline(section)
-            feeds = self.get_feeds(section)
-            self.add_component(section, pipeline=pipeline, 
-                               feeds=feeds,
-                               **kwargs)
-        elif kind == 'converter':
-            pipeline = self.get_pipeline(section)
-            feeds = self.get_feeds(section)
-            sources = self.get_sources(section)
-            self.add_component(section, pipeline=pipeline,
-                               feeds=feeds,
-                               sources=sources,
-                               **kwargs)
-        elif kind == 'streamer':
-            self.parse_streamer(section, **kwargs)
-            
     def parse(self):
         sections = self.sections()
         if not sections:
@@ -141,15 +117,10 @@ class FlumotionConfig(ConfigParser):
             if section == 'global':
                 self.parse_globals(c)
             else:
-                if not self.has_option(section, 'kind'):
-                    raise ConfigError("section %s needs a kind field" % section)
-            
-                kind = self.get(section, 'kind')
-                self.parse_component2(kind, section)
+                self.parse_component(section)
 
-    def parse_component2(self, kind, section):
+    def parse_component(self, section):
         kwargs = {}
-        kwargs['kind'] = kind
         kwargs['name'] = section
         if self.has_option(section, 'nice'):
             kwargs['nice'] = self.getint(section, 'nice')
@@ -159,9 +130,6 @@ class FlumotionConfig(ConfigParser):
             
         kwargs['sources'] = self.get_sources(section)
         
-        if kind == 'producer' or kind == 'converter':
-            kwargs['feeds'] = self.get_feeds(section)
-            
         if self.has_option(section, 'port'):
             kwargs['port'] = self.get(section, 'port')
         if self.has_option(section, 'protocol'):
@@ -170,7 +138,16 @@ class FlumotionConfig(ConfigParser):
             kwargs['location'] = self.get(section, 'location')
         if self.has_option(section, 'source'):
             kwargs['source'] = self.get(section, 'source')
-            
+
+        feeds = 'default'
+        if self.has_option(section, 'feeds'):
+            feeds = self.get(section, 'feeds')
+        if ',' in feeds:
+            kwargs['feeds'] = feeds.split(',')
+        else:
+            kwargs['feeds'] = [feeds]
+
+        kind = self.get(section, 'kind')
         config = registry.getComponent(kind)
         module = reflect.namedAny(config.source)
         if not hasattr(module, 'createComponent'):

@@ -21,23 +21,13 @@
 from flumotion.server import component
 
 class Producer(component.ParseLaunchComponent):
-    kind = 'producer'
-    
-    def listen(self, feeds):
-        self.setup_feeds(feeds)
-        
-        self.pipeline_play()
-        
-    remote_listen = listen
+    pass
 
 def createComponent(config):
     name = config['name']
     feeds = config.get('feeds', [])
     pipeline = config['pipeline']
 
-    # XXX: How can we do this properly?
-    Producer.kind = config['kind']
-    
     component = Producer(name, [], feeds, pipeline)
 
     return component

@@ -1,5 +1,9 @@
 2004-08-02  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/server/config.py (FlumotionConfig.parse_component):
+	Rework kind and logging, should be much more generic now and allow
+	us to extend components much easier. Cleans up a lot aswell!
+
 	* flumotion/server/launcher.py: Kill command line options for
 	individual components
 

@@ -21,15 +21,7 @@
 from flumotion.server import component
 
 class Converter(component.ParseLaunchComponent):
-    kind = 'converter'
-
-    def start(self, sources, feeds):
-        self.setup_sources(sources)
-        self.setup_feeds(feeds)
-        
-        self.pipeline_play()
-
-    remote_start = start
+    pass
 
 def createComponent(config):
     name = config['name']
@@ -37,9 +29,6 @@ def createComponent(config):
     sources = config.get('sources', [])
     pipeline = config['pipeline']
 
-    # XXX: How can we do this properly?
-    Converter.kind = config['kind']
-    
     component = Converter(name, sources, feeds, pipeline)
 
     return component

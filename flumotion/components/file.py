@@ -25,7 +25,6 @@ import gst
 from flumotion.server import component
 
 class FileSinkStreamer(component.ParseLaunchComponent):
-    kind = 'streamer'
     pipe_template = 'filesink name=sink location="%s"'
     def __init__(self, name, sources, location):
         self.location = location
@@ -70,24 +69,11 @@ class FileSinkStreamer(component.ParseLaunchComponent):
         
         self.pipeline.set_state(gst.STATE_PLAYING)
 
-    # connect() is already taken by gobject.GObject
-    def connect_to(self, sources):
-        self.setup_sources(sources)
-        sink = self.pipeline.get_by_name('sink')
-        sink.connect('state-change', self.feed_state_change_cb, '')
-
-        self.pipeline_play()
-
-    remote_connect = connect_to
-
 def createComponent(config):
     name = config['name']
     source = config['source']
     location = config['location']
     
-    # XXX: How can we do this properly?
-    FileSinkStreamer.kind = 'streamer'
-
     component = FileSinkStreamer(name, [source], location)
 
     # Administrative interface
