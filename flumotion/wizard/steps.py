@@ -112,7 +112,7 @@ class Source(wizard.WizardStep):
         elif self.checkbutton_has_audio:
             audio_source = self.combobox_audio.get_active()
             if audio_source == AudioDevice.Soundcard:
-                return 'Audio Source'
+                return 'Soundcard'
             else:
                 return 'Encoding'
         raise AssertionError
@@ -323,7 +323,7 @@ class Overlay(wizard.WizardStep):
         if self.wizard.get_step_option('Source', 'has_audio'):
             audio_source = self.wizard.get_step_option('Source', 'audio')            
             if audio_source == AudioDevice.Soundcard:
-                return 'Audio Source'
+                return 'Soundcard'
             elif audio_source == AudioDevice.Test:
                 return 'Test Audio Source'
             
@@ -332,13 +332,12 @@ wizard.register_step(Overlay)
 
 
 
-# XXX: Rename to Soundcard
-class AudioSource(wizard.WizardStep):
-    step_name = 'Audio Source'
-    glade_file = 'wizard_audiosource.glade'
+class Soundcard(wizard.WizardStep):
+    step_name = 'Soundcard'
+    glade_file = 'wizard_soundcard.glade'
     section = 'Production'
     component_type = 'osssrc'
-    icon = 'audiosrc.png'
+    icon = 'soundcard.png'
     
     def setup(self):
         self.combobox_device.set_enum(SoundcardDevice)
@@ -362,7 +361,7 @@ class AudioSource(wizard.WizardStep):
 
     def get_next(self):
         return 'Encoding'
-wizard.register_step(AudioSource)
+wizard.register_step(Soundcard)
 
 class TestAudioSource(wizard.WizardStep):
     step_name = 'Test Audio Source'

@@ -45,7 +45,7 @@ from flumotion.common import errors, setup
 from flumotion.admin.gtk.main import main
 
 if __name__ == '__main__':
-    setup.setup(root)
+    setup.setup()
     
     try:
         sys.exit(main(sys.argv))

@@ -1,11 +1,11 @@
 image_DATA = 		\
-	audiosrc.png 	\
 	consumption.png \
 	firewire.png 	\
 	licenses.png 	\
 	kcmdevices.png 	\
 	overlay.png 	\
 	placeholder.png \
+	soundcard.png 	\
 	source.png 	\
 	summary.png	\
 	testsource.png 	\

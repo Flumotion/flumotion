@@ -1,5 +1,19 @@
 2004-11-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-admin.in:
+	  make it work again
+	* data/glade/Makefile.am:
+	* data/glade/wizard_audiosource.glade:
+	* data/image/wizard/Makefile.am:
+	* data/image/wizard/audiosrc.png:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/steps.py:
+	  fix bug with audio test source being started on wrong worker
+	  rename audiosrc to Sound Card step since that's what it is
+
+2004-11-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/workers/default.xml:
 	* flumotion/worker/config.py:
 	* flumotion/worker/main.py:

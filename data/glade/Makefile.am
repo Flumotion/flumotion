@@ -3,7 +3,6 @@
 	wizard.glade 			\
 	wizard_audiotest.glade		\
 	wizard_audio_encoder.glade	\
-	wizard_audiosource.glade	\
 	wizard_consumption.glade	\
 	wizard_disk.glade		\
 	wizard_encoding.glade		\
@@ -13,6 +12,7 @@
 	wizard_license.glade		\
 	wizard_overlay.glade		\
 	wizard_smoke.glade		\
+	wizard_soundcard.glade		\
 	wizard_source.glade		\
 	wizard_summary.glade		\
 	wizard_testsource.glade		\

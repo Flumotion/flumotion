@@ -158,7 +158,7 @@ class WizardSaver:
         
         props = {}
         
-        audio_step = self.wizard['Audio Source']
+        audio_step = self.wizard[source.step]
         
         if hasattr(audio_step, 'worker'):
             props = audio_step.get_component_properties()
