@@ -10,7 +10,8 @@
      root=":pserver:anoncvs@cvs.freedesktop.org:/cvs/gstreamer"
      password="" />
   <svnroot name="svn.fluendo.com" default="yes"
-     root="https://svn.fluendo.com:/home/svn"
+     root="https://svn.fluendo.com:/home/svn/flumotion/trunk"
+     checkoutdir="flumotion"
      password="" />
 
   <tarball id="python" version="2.3.3" autogenargs="--enable-shared --with-pydebug">
