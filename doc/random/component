@@ -11,6 +11,8 @@ Writing a component
   - subclass from base AdminGtk
   - possibly add entry point to <component> entry in registry file
   - add a bundle for it with this entry point, adding all dependencies
+  - in your AdminGtk class:
+    - implement a setup method and getNodes method
 
 
 How communication works

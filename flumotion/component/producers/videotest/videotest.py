@@ -33,9 +33,7 @@ class VideoTestMedium(feedcomponent.FeedComponentMedium):
         source.connect('notify::pattern', self.cb_pattern_notify)
 
     def cb_pattern_notify(self, object, pspec):
-        print "THOMAS: pspec %r" % pspec
         pattern = object.get_property('pattern')
-        print "THOMAS: pattern %r" % pattern
         self.callRemote('propertyChanged', self.comp.get_name(), 'pattern',
             int(pattern))
 

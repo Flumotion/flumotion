@@ -1,10 +1,8 @@
 include $(top_srcdir)/python.mk
                                                                                 
-componentdir = $(libdir)/flumotion/python/flumotion/component
+componentdir = $(libdir)/flumotion/python/flumotion/component/effects
 component_PYTHON = \
-	__init__.py \
-	feedcomponent.py \
-	component.py
+	__init__.py
 
 TAGS_FILES = $(component_PYTHON)
 
@@ -12,11 +10,4 @@ clean-local:
 	rm -rf *.pyc *.pyo
 
 SUBDIRS = \
-	base \
-	bouncers \
-	consumers \
-	converters \
-	effects \
-	encoders \
-	muxers \
-	producers
+	colorbalance

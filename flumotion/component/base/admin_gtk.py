@@ -1,7 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/base/admin/gtk.py
+# flumotion/component/base/admin/gtk.py:
 # base component admin client-side code
 # 
 # Flumotion - a streaming media server
@@ -30,7 +30,8 @@ from flumotion.common import errors, log
 
 class BaseAdminGtk(log.Loggable):
     """
-    I am a base class for all GTK+-based Admin UI parts.
+    I am a base class for all GTK+-based Admin views.
+    I am a view on one component's properties.
     """
 
     logCategory = "admingtk"
@@ -55,13 +56,16 @@ class BaseAdminGtk(log.Loggable):
         return None
 
     def setElementProperty(self, elementName, propertyName, value):
+        """
+        Set the given property on the element with the given name.
+        """
         d = self.admin.setProperty(self.name, elementName, propertyName, value)
         d.addErrback(self.propertyErrback, self)
         return d
     
     def getElementProperty(self, elementName, propertyName):
         """
-        Get the value given property of the element with the given name.
+        Get the value of the given property of the element with the given name.
         
         Returns: L{twisted.internet.defer.Deferred} returning the value.
         """
@@ -73,19 +77,151 @@ class BaseAdminGtk(log.Loggable):
         return self.admin.componentCallRemote(self.name, method_name,
                                               *args, **kwargs)
         
-    def setUIState(self, state):
-        raise NotImplementedError
-
+    # FIXME: deprecated, moved to node
     # FIXME: abstract this method so it loads file with the relative
     # flumotion/ path as put together in bundles,
     # and it looks for the right bundle for this file
-    def loadGladeFile(self, glade_file):
-        path = os.path.join(self.view.uidir, glade_file)
+    def loadGladeFile(self, gladeFile):
+        path = os.path.join(self.view.uidir, gladeFile)
+        if not os.path.exists(path):
+            self.warning ("Glade file %s not found in path %s" % (
+                gladeFile, path))
         wtree = gtk.glade.XML(path)
         return wtree
+
+    ### child class methods to be overridden
+    def setUIState(self, state):
+        raise NotImplementedError
 
     def propertyChanged(self, name, value):
         """
         I am meant to be overridden.
         """
-        self.debug("pattern %s changed to %r" % (name, value))
+        self.debug("property %s changed to %r" % (name, value))
+
+    def setup(self):
+        """
+        Set up the admin view so it can display nodes.
+        """
+        raise NotImplementedError("Child class needs to implement setup")
+
+    def getNodes(self):
+        """
+        Return a dictionary of node names to admin UI nodes.
+        """
+        raise NotImplementedError("Child class needs to implement getNodes")
+
+    # FIXME: deprecated
+    def render(self):
+        """
+        Render the GTK+ admin view for this component and return the
+        main widget for embedding.
+        """
+        raise NotImplementedError
+
+class BaseAdminGtkNode(log.Loggable):
+    """
+    I am a base class for all GTK+-based Admin UI nodes.
+    I am a view on a set of properties for a component.
+    """
+
+    logCategory = "admingtk"
+
+    def __init__(self, componentName, admin, view):
+        """
+        @type  componentName:  string
+        @param componentName:  name of the component this is a UI for
+        @type  admin: L{flumotion.admin.AdminModel}
+        @param admin: the admin model that interfaces with the manager for us
+        @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
+        @param view:  the GTK+ admin view we are embedded in
+        """
+        self.componentName = componentName
+        self.admin = admin
+        self.view = view
+        
+    def propertyErrback(self, failure, window):
+        failure.trap(errors.PropertyError)
+        self.warning("%s." % failure.getErrorMessage())
+        #window.error_dialog("%s." % failure.getErrorMessage())
+        return None
+
+    def setElementProperty(self, elementName, propertyName, value):
+        """
+        Set the given property on the element with the given name."
+        """
+        d = self.admin.setProperty(self.componentName, elementName, propertyName, value)
+        d.addErrback(self.propertyErrback, self)
+        return d
+    
+    def getElementProperty(self, elementName, propertyName):
+        """
+        Get the value of the given property of the element with the given name.
+        
+        Returns: L{twisted.internet.defer.Deferred} returning the value.
+        """
+        d = self.admin.getProperty(self.componentName, elementName, propertyName)
+        d.addErrback(self.propertyErrback, self)
+        return d
+
+    def callRemote(self, method_name, *args, **kwargs):
+        return self.admin.componentCallRemote(self.componentName, method_name,
+                                              *args, **kwargs)
+       
+        
+    def loadGladeFile(self, gladeFile):
+        """
+        Returns: a deferred returning the widget tree from the glade file.
+        """
+        def _getBundledFileCallback(result, gladeFile):
+            path = result
+            if not os.path.exists(path):
+                self.warning("Glade file %s not found in path %s" % (
+                    gladeFile, path))
+            wtree = gtk.glade.XML(path)
+            return wtree
+
+        self.debug("requesting bundle for glade file %s" % gladeFile)
+        d = self.admin.getBundledFile(gladeFile)
+        d.addCallback(_getBundledFileCallback, gladeFile)
+        return d
+
+    ### child class methods to be overridden
+    def setUIState(self, state):
+        raise NotImplementedError
+
+    def propertyChanged(self, name, value):
+        """
+        I am meant to be overridden.
+        """
+        self.debug("property %s changed to %r" % (name, value))
+
+    def render(self):
+        """
+        Render the GTK+ admin view for this component.
+        
+        Returns: a deferred returning the main widget for embedding
+        """
+        raise NotImplementedError
+
+class EffectAdminGtkNode(BaseAdminGtkNode):
+    """
+    I am a base class for all GTK+-based component effect Admin UI nodes.
+    I am a view on a set of properties for an effect on a component.
+    """
+    def __init__(self, componentName, admin, view, effectName):
+        """
+        @type  componentName:  string
+        @param componentName:  name of the component this is a UI for
+        @type  admin: L{flumotion.admin.AdminModel}
+        @param admin: the admin model that interfaces with the manager for us
+        @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
+        @param view:  the GTK+ admin view we are embedded in
+        """
+        BaseAdminGtkNode.__init__(self, componentName, admin, view)
+        self.effectName = effectName
+
+    def effectCallRemote(self, methodName, *args, **kwargs):
+        return self.admin.componentCallRemote(self.componentName,
+            "effect", self.effectName, methodName, *args, **kwargs)
+ 

@@ -5,6 +5,7 @@
         <directory name="flumotion">
           <filename location="__init__.py" />
           <filename location="component/__init__.py" />
+          <filename location="component/effects/__init__.py" />
         </directory>
       </directories>
     </bundle>

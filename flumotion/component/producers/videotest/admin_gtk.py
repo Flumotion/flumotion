@@ -25,10 +25,9 @@ import gtk
 
 from flumotion.common import errors
 
-#import flumotion.component
-from flumotion.component.base import admin_gtk
+from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
-class VideoTestAdminGtk(admin_gtk.BaseAdminGtk):
+class PatternNode(BaseAdminGtkNode):
     def render(self):
         # FIXME: gladify
         self.widget = gtk.Table(1, 2)
@@ -38,10 +37,8 @@ class VideoTestAdminGtk(admin_gtk.BaseAdminGtk):
         d = self.callRemote("getElementProperty", "source", "pattern")
         d.addCallback(self.getPatternCallback)
         d.addErrback(self.getPatternErrback)
-        
-        #self.shown = False
-
-        return self.widget
+        d.addCallback(lambda result: self.widget)
+        return d
 
     def getPatternCallback(self, result):
         # FIXME: these need to be done there because only this piece of
@@ -82,5 +79,19 @@ class VideoTestAdminGtk(admin_gtk.BaseAdminGtk):
             c.handler_block(id)
             c.set_active(value)
             c.handler_unblock(id)
+
+class VideoTestAdminGtk(BaseAdminGtk):
+    def setup(self):
+        # FIXME: have constructor take self instead ?
+        pattern = PatternNode(self.name, self.admin, self.view)
+        self._nodes = {'pattern': pattern}
+
+    # FIXME: move to base class, make _nodes a public member
+    def getNodes(self):
+        return self._nodes
+
+    def propertyChanged(self, name, value):
+        # FIXME: tie to correct node better
+        self._nodes['pattern'].propertyChanged(name, value)
 
 GUIClass = VideoTestAdminGtk

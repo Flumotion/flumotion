@@ -165,6 +165,9 @@ class Window(log.Loggable, gobject.GObject):
         
         return model.get(iter, COL_TEXT)[0]
 
+    # FIXME: this method uses a file and a methodname as entries
+    # FIXME: do we want to switch to imports instead so the whole file
+    # is available in its namespace ?
     def show_component(self, name, methodName, filepath, data):
         """
         Show the user interface for this component.
@@ -175,43 +178,88 @@ class Window(log.Loggable, gobject.GObject):
         @param name: name to give to the instantiated object.
         @param data: the python code to load.
         """
+        # methodName has historically been GUIClass
         sub = None
         instance = None
 
         if data:
-            namespace = {}
+            # we create a temporary module that we import from so code
+            # inside the module can trust its full namespace to be local
+            import imp
+            tempmod = imp.new_module('tempmod')
             try:
-                exec (data, globals(), namespace)
+                exec data in tempmod.__dict__
+                #exec(data, globals(), tempmod.__dict__)
             except SyntaxError, e:
-                self.warning('Syntax Error on file %s, line %d' % (
-                    filepath, e.lineno))
-            klass = namespace.get(methodName) # most likely GUIClass
+                # the syntax error can happen in the entry file, or any import
+                where = "<entry file>"
+                if e.filename:
+                    where = e.filename
+                msg = "Syntax Error at %s:%d while importing %s" % (
+                    where, e.lineno, filepath)
+                self.warning(msg)
+                raise errors.EntrySyntaxError(msg)
 
-            if klass:
-                # instantiate the GUIClass, giving ourself as the first argument
-                # FIXME: we cheat by giving the view as second for now,
-                # but let's decide for either view or model
-                instance = klass(name, self.admin, self)
-                self.debug("Created entry instance %r" % instance)
-                sub = instance.render()
-                self.debug("Got sub widget %r" % sub)
+            # put it in sys.modules so we can import it
+            import sys
+            sys.modules['tempmod'] = tempmod
+
+            # import it
+            import tempmod
+
+            # check if we have the method
+            if not hasattr(tempmod, methodName):
+                self.warning('method %s not found in file %s' % (
+                    methodName, filepath))
+                raise #FIXME: something appropriate
+            klass = getattr(tempmod, methodName)
+ 
+            # clean up temporary module
+            #del sys.modules['tempmod']
+            # FIXME: don't delete tempmod just yet, or the class doesn't
+            # actually work ! clean it up when the view is changed
+            #del tempmod
+
+            # instantiate the GUIClass, giving ourself as the first argument
+            # FIXME: we cheat by giving the view as second for now,
+            # but let's decide for either view or model
+            instance = klass(name, self.admin, self)
+            self.debug("Created entry instance %r" % instance)
+            instance.setup()
+            nodes = instance.getNodes()
+
+            # FIXME: we'd want to embed in a notebook with tabs
+            firstNode = nodes[nodes.keys()[0]]
+
+            # put "loading" widget in
+            old = self.hpaned.get_child2()
+            self.hpaned.remove(old)
+            label = gtk.Label('Loading UI for %s ...' % name)
+            self.hpaned.add(label)
+            
+            # trigger render of first node
+            d = firstNode.render()
+            d.addCallback(self._firstNodeRenderCallback, instance)
+
+    def _firstNodeRenderCallback(self, widget, gtkAdminInstance):
+        # used by show_component
+        self.debug("Got sub widget %r" % widget)
 
         old = self.hpaned.get_child2()
         self.hpaned.remove(old)
         
-        if not sub:
+        if not widget:
             self.warning(".render() did not return an object")
-            sub = gtk.Label('%s does not have a UI yet' % name)
+            widget = gtk.Label('%s does not have a UI yet' % name)
         else:
-            parent = sub.get_parent()
+            parent = widget.get_parent()
             if parent:
-                parent.remove(sub)
+                parent.remove(widget)
             
-        self.hpaned.add2(sub)
-        sub.show()
+        self.hpaned.add2(widget)
+        widget.show()
 
-        self.current_component = instance
-        
+        self.current_component = gtkAdminInstance
 
     def error_dialog(self, message, parent=None, response=True):
         """

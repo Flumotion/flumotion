@@ -131,6 +131,8 @@ flumotion/common/Makefile
 flumotion/component/Makefile
 flumotion/component/base/Makefile
 flumotion/component/bouncers/Makefile
+flumotion/component/effects/Makefile
+flumotion/component/effects/colorbalance/Makefile
 flumotion/component/encoders/Makefile
 flumotion/component/consumers/Makefile
 flumotion/component/consumers/disker/Makefile

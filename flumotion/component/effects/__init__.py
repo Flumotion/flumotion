@@ -1,9 +1,8 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/producers/bttv/admin_gtk.py:
-# admin client-side code for bttv
-# 
+# flumotion/component/effects/__init__.py: flumotion.component.effects package
+#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
@@ -21,17 +20,6 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.component.base import admin_gtk
-from flumotion.component.effects.colorbalance.admin_gtk import ColorbalanceAdminGtkNode
-
-class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
-    def setup(self):
-        self._nodes = {}
-        colorbalance = ColorbalanceAdminGtkNode(self.name, self.admin,
-            self.view, 'outputColorbalance')
-        self._nodes['Colorbalance'] = colorbalance
-
-    def getNodes(self):
-        return self._nodes
-
-GUIClass = BTTVAdminGtk
+"""
+code shared between components to implement effects
+"""

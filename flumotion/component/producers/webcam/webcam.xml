@@ -1,13 +1,45 @@
 <registry>
   <components>
-    <component type="web-camera">
+    <component type="web-camera"
+               base="flumotion/component/producers/webcam">
       <source location="flumotion.component.producers.webcam.webcam"/>
+
+      <entries>
+        <entry type="component" location="webcam.py"
+               function="createComponent"/>
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass"/>
+      </entries>
+
       <properties>
         <property name="feed" type="string" required="yes" multiple="yes"/>
         <property name="height" type="int"/>
         <property name="width" type="int"/>
         <property name="framerate" type="float"/>
+
+<!-- FIXME: get these into an effect namespace ? -->
+        <property name="hue" type="int" required="no"/>
+        <property name="saturation" type="int" required="no"/>
+        <property name="brightness" type="int" required="no"/>
+        <property name="contrast" type="int" required="no"/>
+
       </properties>
     </component>
   </components>
+
+  <bundles>
+    <bundle name="webcam-admin-gtk">
+        <dependencies>
+            <dependency name="base-admin-gtk"/>
+            <dependency name="colorbalance-admin-gtk"/>
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/webcam">
+                <filename location="admin_gtk.py"/>
+            </directory>
+        </directories>
+    </bundle>
+  </bundles>
+
 </registry> 

@@ -1,5 +1,40 @@
 2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	* flumotion/component/effects/Makefile.am:
+	* flumotion/component/effects/__init__.py:
+	* flumotion/component/effects/colorbalance/Makefile.am:
+	* flumotion/component/effects/colorbalance/__init__.py:
+	* flumotion/component/effects/colorbalance/admin_gtk.py:
+	* flumotion/component/effects/colorbalance/colorbalance.glade:
+	* flumotion/component/effects/colorbalance/colorbalance.py:
+	* flumotion/component/effects/colorbalance/colorbalance.xml:
+	  add colorbalance effect
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_webcam.glade:
+	  small glade fixes
+	* doc/random/component:
+	  some more docs
+	* flumotion/admin/gtk/client.py:
+	  use an import trick to show components instead
+	* flumotion/common/errors.py:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/producers/bttv/admin_gtk.py:
+	* flumotion/component/producers/bttv/bttv.py:
+	* flumotion/component/producers/bttv/bttv.xml:
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/component/producers/webcam/admin_gtk.py:
+	* flumotion/component/producers/webcam/webcam.py:
+	* flumotion/component/producers/webcam/webcam.xml:
+	* flumotion/package.xml:
+	* flumotion/wizard/steps.py:
+
+2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* TODO:
 	  some more stuff to do
 	* flumotion/common/common.py:

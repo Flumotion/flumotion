@@ -22,15 +22,20 @@
 
 import gst
 
-from flumotion.component import feedcomponent
+from flumotion.utils import gstutils
 
+from flumotion.component import feedcomponent
+from flumotion.component.effects.colorbalance import colorbalance
+
+# FIXME: rename to Webcam
 class WebCamera(feedcomponent.ParseLaunchComponent):
+
     def __init__(self, name, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     [],
                                                     ['default'],
                                                     pipeline)
-                                       
+
 def setProp(struct, dict, name):
     if dict.has_key(name):
         struct[name] = dict[name]
@@ -43,7 +48,25 @@ def createComponent(config):
     setProp(struct, config, 'height')
     setProp(struct, config, 'framerate')
     caps = gst.Caps(struct)
-                                                                                
-    component = WebCamera(config['name'], 'v4lsrc name=camera autoprobe=false copy-mode=1 ! %s ! videorate ! %s' % (caps, caps))
+   
+    # create component
+    autoprobe = "autoprobe=false"
+    # added in gst-plugins 0.8.6
+    if gstutils.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
+        autoprobe += " autoprobe-fps=false"
+    
+    pipeline = 'v4lsrc name=source %s copy-mode=1 ! ' \
+               '%s ! videorate ! %s' % (autoprobe, caps, caps)
+    component = WebCamera(config['name'], pipeline)
+
+    # create and add colorbalance effect
+    source = component.get_pipeline().get_by_name('source')
+    hue = config.get('hue', None)
+    saturation = config.get('saturation', None)
+    brightness = config.get('brightness', None)
+    contrast = config.get('contrast', None)
+    cb = colorbalance.Colorbalance(source, hue, saturation, brightness,
+        contrast)
+    component.addEffect('outputColorbalance', cb)
 
     return component

@@ -239,7 +239,6 @@ class TVCard(VideoSource):
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
-        print "THOMAS: device %s" % device
         if not device:
             print "ERROR: no device selected"
         d = self.workerRun(_checkChannels, device)

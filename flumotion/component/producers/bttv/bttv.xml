@@ -33,12 +33,12 @@
     <bundle name="bttv-admin-gtk">
         <dependencies>
             <dependency name="base-admin-gtk"/>
+            <dependency name="colorbalance-admin-gtk"/>
         </dependencies>
 
         <directories>
             <directory name="flumotion/component/producers/bttv">
                 <filename location="admin_gtk.py"/>
-                <filename location="colorbalance.glade"/>
             </directory>
         </directories>
     </bundle>

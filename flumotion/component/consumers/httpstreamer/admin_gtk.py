@@ -21,19 +21,14 @@
 
 # Headers in this file shall remain intact.
 
+import os
 import gtk
 
 from flumotion.common import errors
-import flumotion.component
 
-from flumotion.component.base import admin_gtk
+from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
-class HTTPStreamerUI(admin_gtk.BaseAdminGtk):
-    #def __init__(self, name, admin, view):
-    #    self.labels = {}
-        # FIXME: Johan, this doesn't work, BaseUI is not defined
-        #BaseUI.__init__(self, name, admin, view)
-        
+class StatisticsAdminGtkNode(BaseAdminGtkNode):
     def error_dialog(self, message):
         # FIXME: dialogize
         print 'ERROR:', message
@@ -47,7 +42,7 @@ class HTTPStreamerUI(admin_gtk.BaseAdminGtk):
         if not self.shown:
             self.shown = True
             self.statistics.show_all()
-        
+       
     def registerLabel(self, name):
         #widgetname = name.replace('-', '_')
         #FIXME: make object member directly
@@ -69,7 +64,14 @@ class HTTPStreamerUI(admin_gtk.BaseAdminGtk):
             self.labels[name].set_text(text)
         
     def render(self):
-        self.wtree = self.loadGladeFile('http.glade')
+        gladeFile = os.path.join('flumotion', 'component', 'consumers',
+            'httpstreamer', 'http.glade')
+        d = self.loadGladeFile(gladeFile)
+        d.addCallback(self._loadGladeFileCallback)
+        return d
+
+    def _loadGladeFileCallback(self, widgetTree):
+        self.wtree = widgetTree
         self.labels = {}
         self.statistics = self.wtree.get_widget('statistics-widget')
         for type in ('uptime', 'mime', 'bitrate', 'totalbytes'):
@@ -83,4 +85,18 @@ class HTTPStreamerUI(admin_gtk.BaseAdminGtk):
         self.shown = False
         return self.statistics
 
-GUIClass = HTTPStreamerUI
+class HTTPStreamerAdminGtk(BaseAdminGtk):
+    def setup(self):
+        self._nodes = {}
+        statistics = StatisticsAdminGtkNode(self.name, self.admin,
+            self.view)
+        self._nodes['statistics'] = statistics
+
+    # FIXME: tie this to the statistics node better
+    def setUIState(self, state):
+        self._nodes['statistics'].setUIState(state)
+ 
+    def getNodes(self):
+        return self._nodes
+
+GUIClass = HTTPStreamerAdminGtk

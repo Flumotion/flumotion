@@ -57,6 +57,11 @@ class RemoteRunError(RemoteMethodError):
 class NoMethodError(RemoteMethodError):
     "The remote method does not exist"
 
+# FIXME: subclass from both entry/bundle and syntax errors ?
+# FIXME: name ?
+class EntrySyntaxError(pb.Error):
+    "Syntax error while getting entry point in a bundle"
+
 # other errors
 class NotReadyError(pb.Error):
     "The component is not ready yet"

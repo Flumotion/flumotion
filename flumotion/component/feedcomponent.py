@@ -21,6 +21,7 @@
 # Headers in this file shall remain intact.
 
 import gst
+import gst.interfaces
 import gobject
 
 from twisted.internet import reactor
@@ -122,6 +123,27 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             
         return retval, ports
 
+    def remote_effect(self, effectName, methodName, *args, **kwargs):
+        self.debug("calling %s on effect %s" % (methodName, effectName))
+        if not effectName in self.comp.effects:
+            raise errors.UnknownEffectError(effectName)
+        effect = self.comp.effects[effectName]
+        if not hasattr(effect, "effect_%s" % methodName):
+            raise errors.NoMethodError("%s on effect %s" % (methodName,
+                effectName))
+        method = getattr(effect, "effect_%s" % methodName)
+        try:
+            result = method(*args, **kwargs)
+        except TypeError:
+            msg = "effect method %s did not accept %s and %s" % (
+                methodName, args, kwargs)
+            self.debug(msg)
+            raise errors.RemoteRunError(msg)
+        self.debug("effect: result: %r" % result)
+        return result
+
+
+
 class FeedComponent(basecomponent.BaseComponent):
     """
     I am a base class for all Flumotion feed components.
@@ -148,10 +170,14 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline = None
         self.pipeline_signals = []
         self.files = []
+        self.effects = {}
         
         self.parseEaterConfig(eater_config)
         self.parseFeederConfig(feeder_config)
         self.setup_pipeline()
+
+    def addEffect(self, name, effect):
+        self.effects[name] = effect
 
     def parseEaterConfig(self, eater_config):
         # the source feeder names come from the config
