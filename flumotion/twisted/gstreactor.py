@@ -67,6 +67,7 @@ INFLAGS = gobject.IO_IN | POLL_DISCONNECTED
 OUTFLAGS = gobject.IO_OUT | POLL_DISCONNECTED
 
 
+
 class GstReactor(default.PosixReactorBase):
     """GObject/Gst event loop reactor. """
 
@@ -226,10 +227,11 @@ class GstReactor(default.PosixReactorBase):
             # grumble
             _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
         except KeyboardInterrupt:
-            print "KeyboardInterrupt (gstreactor.simulate())"
-            pass
-            
-   
+            from flumotion.common import log as flog
+            flog.info('gstreactor', "KeyboardInterrupt in simulate()")
+
+
+
 def install():
     """Configure the twisted mainloop to be run inside the gtk mainloop.
     """
