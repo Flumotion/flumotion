@@ -441,7 +441,16 @@ def _checkTracks(source_element, device):
             return
         element = pipeline.get_by_name('source')
         deviceName = element.get_property('device-name')
-        tracks = [track.label for track in element.list_tracks()]
+        try:
+            tracks = [track.label for track in element.list_tracks()]
+        except AttributeError:
+            # I've had osssrc and alsasrc miss list_tracks, probably
+            # a gst.interfaces issue
+            if not res.returned:
+                res.returned = True
+                res.d.errback(errors.GstError(
+                    'Cannot list tracks on the soundcard.'))
+            
         reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
         if not res.returned:
             res.returned = True

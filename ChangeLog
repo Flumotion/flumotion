@@ -1,3 +1,8 @@
+2004-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/steps.py:
+	  throw an error when list_tracks doesn't work (interface issues ?)
+
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/job.py:
