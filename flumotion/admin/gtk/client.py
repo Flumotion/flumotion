@@ -47,12 +47,14 @@ class Window(log.Loggable, gobject.GObject):
     def __init__(self, model):
         self.__gobject_init__()
         
-        self.admin = None
-
-        self._create_ui()
         self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
                                          # disconnected
+
+        self.window = self._create_ui()
+
+        self.admin = None
+
         self._setAdminModel(model)
 
     def _setAdminModel(self, model):
@@ -81,12 +83,13 @@ class Window(log.Loggable, gobject.GObject):
         return failure
 
     def _create_ui(self):
+        # returns the window
         # called from __init__
         wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
-        self.window = wtree.get_widget('main_window')
+        window = wtree.get_widget('main_window')
         iconfile = os.path.join(configure.imagedir, 'fluendo.png')
         gtk.window_set_default_icon_from_file(iconfile)
-        self.window.set_icon_from_file(iconfile)
+        window.set_icon_from_file(iconfile)
         
         self.hpaned = wtree.get_widget('hpaned')
         # too blatant self-promotion ?
@@ -97,7 +100,7 @@ class Window(log.Loggable, gobject.GObject):
         #self.hpaned.add2(image)
         #image.show()
  
-        self.window.connect('delete-event', self.close)
+        window.connect('delete-event', self.close)
 
         wtree.signal_autoconnect(self)
 
@@ -108,6 +111,7 @@ class Window(log.Loggable, gobject.GObject):
         self.components_view.connect('activated',
             self._components_view_activated_cb)
         self.statusbar = parts.AdminStatusbar(wtree.get_widget('statusbar'))
+        return window
 
 
     # UI helper functions

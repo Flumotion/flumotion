@@ -368,7 +368,9 @@ class TestVishnu(unittest.TestCase):
 
         self.vishnu.loadConfiguration(file)
 
-    def testConfigComponentWorker(self):
+    def testConfigBeforeWorker(self):
+        # test a config with three components being loaded before the worker
+        # logs in
         mappers = self.vishnu._componentMappers
 
         # test loading of a config, logging in the component and worker,
@@ -384,10 +386,77 @@ class TestVishnu(unittest.TestCase):
 
         # log in a worker and verify components get started
         avatar = self._loginWorker('worker')
-        self.runReactor(100)
+
+        self._verifyConfigAndOneWorker()
+
+        # log out the producer and verify the mapper
+        id = 'producer-video-test'
+        avatar = self._components[id]
+        m = mappers[avatar]
+
+        self._logoutAvatar(avatar)
+
+        #import pprint
+        #pprint.pprint(mappers.keys())
+        self.assertEqual(len(mappers.keys()), 8)
+
+        self._verifyComponentIdGone(id)
+
+        # log out the converter and verify
+        id = 'converter-ogg-theora'
+        m = mappers[id]
+        avatar = self._components[id]
+        self._logoutAvatar(avatar)
+
+        self._verifyConfigAndNoWorker()
+
+    def testConfigAfterWorker(self):
+        # test a config with three components being loaded after the worker
+        # logs in
+        mappers = self.vishnu._componentMappers
+
+        __thisdir = os.path.dirname(os.path.abspath(__file__))
+        file = os.path.join(__thisdir, 'test.xml')
+
+        # log in worker
+        avatar = self._loginWorker('worker')
         self.failUnlessEqual(len(self._workers), 1)
-        self.failUnlessEqual(len(self._components), 2)
+        self.failUnlessEqual(len(self._components), 0)
         
+        # load configuration
+        self.vishnu.loadConfiguration(file)
+
+        self._verifyConfigAndOneWorker()
+        
+        # log out the producer and verify the mapper
+        id = 'producer-video-test'
+        avatar = self._components[id]
+        m = mappers[avatar]
+
+        self._logoutAvatar(avatar)
+
+        #import pprint
+        #pprint.pprint(mappers.keys())
+        self.assertEqual(len(mappers.keys()), 8)
+
+        self._verifyComponentIdGone(id)
+        
+        # log out the converter and verify
+        id = 'converter-ogg-theora'
+        m = mappers[id]
+        avatar = self._components[id]
+        self._logoutAvatar(avatar)
+
+        self._verifyConfigAndNoWorker()
+
+    def _verifyConfigAndOneWorker(self):
+        mappers = self.vishnu._componentMappers
+
+        # verify component mapper
+        # all components should have gotten started, and logged in
+        self.failUnlessEqual(len(self._components), 2)
+        self.assertEqual(len(mappers.keys()), 10)
+
         self.failUnless('producer-video-test' in self._components.keys())
         self.failUnless('converter-ogg-theora' in self._components.keys())
 
@@ -415,38 +484,20 @@ class TestVishnu(unittest.TestCase):
         self.failUnless(avatar.jobState)
         self.failUnless(avatar.componentState)
 
-        # log out the producer and verify the mapper
-        id = 'producer-video-test'
-        avatar = self._components[id]
-        m = mappers[avatar]
-
-        self._logoutAvatar(avatar)
-
-        #import pprint
-        #pprint.pprint(mappers.keys())
-        self.assertEqual(len(mappers.keys()), 8)
-        self.failUnless(id in mappers.keys())
-        self.assertEqual(m.id, id)
-        self.failIf(avatar in mappers.keys())
-        
-        self.assertEqual(m.avatar, None)
-        self.failUnless(m.state)
-        state = m.state
-        self.assertEqual(state.get('mood'), moods.sleeping.value,
-            'mood is %s instead of sleeping' % moods.get(state.get('mood')))
-
-        # verify avatar state
-        self.failIf(avatar.jobState)
-        self.failIf(avatar.componentState)
-
-        # log out the converter and verify
-        id = 'converter-ogg-theora'
-        m = mappers[id]
-        avatar = self._components[id]
-        self._logoutAvatar(avatar)
+    def _verifyConfigAndNoWorker(self):
+        mappers = self.vishnu._componentMappers
 
         # verify mapper
         self.assertEqual(len(mappers.keys()), 6)
+        self._verifyComponentIdGone('converter-ogg-theora')
+        self._verifyComponentIdGone('producer-video-test')
+
+    def _verifyComponentIdGone(self, id):
+        # verify logged out components
+        mappers = self.vishnu._componentMappers
+        m = mappers[id]
+        avatar = self._components[id]
+  
         self.failUnless(id in mappers.keys())
         self.assertEqual(m.id, id)
         self.failIf(avatar in mappers.keys())
@@ -460,3 +511,4 @@ class TestVishnu(unittest.TestCase):
         # verify avatar state
         self.failIf(avatar.jobState)
         self.failIf(avatar.componentState)
+

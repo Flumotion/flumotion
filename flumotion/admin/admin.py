@@ -275,8 +275,9 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     ### model functions; called by UI's to send requests to manager or comp
 
     ## view management functions
+    # FIXME: what is this crap ? strings as enums ?
     def isConnected(self):
-        return self.state=='connected'
+        return self.state == 'connected'
 
     def addView(self, view):
         # FIXME: implement an IAdminView interface

@@ -267,6 +267,24 @@ class Vishnu(log.Loggable):
                         self._componentMappers[comp] = m
                         self._componentMappers[avatarId] = m
 
+        # now start all components that need starting
+        components = self._getComponentsToStart()
+        for workerId in self.workerHeaven.avatars.keys():
+            # filter the ones that have no worker requested or a match
+            isRightWorker = lambda c: not (c.get('workerRequested') and
+            c.get('workerRequested') != workerId)
+            ours = filter(isRightWorker, components)
+
+            if not ours:
+                self.debug('no components scheduled for worker %s' % workerId)
+            else:
+                avatar = self.workerHeaven.avatars[workerId]
+                self._workerStartComponents(avatar, ours)
+            # make sure components with no worker specified don't get started
+            # on all different workers
+            for c in ours:
+                components.remove(c)
+ 
     def _setupBundleBasket(self):
         self.bundlerBasket = bundle.BundlerBasket()
 
@@ -323,15 +341,7 @@ class Vishnu(log.Loggable):
         # deterministic
         # FIXME: we should probably start them in the correct order,
         # respecting the graph
-
-        # get all components from our state
-        components = self.state.getComponents()
-
-        # filter the ones that are sleeping and not pending
-        isSleeping = lambda c: c.get('mood') == moods.sleeping.value
-        components = filter(isSleeping, components)
-        isNotPending = lambda c: c.get('moodPending') == None
-        components = filter(isNotPending, components)
+        components = self._getComponentsToStart()
 
         # filter the ones that have no worker requested or a match
         isRightWorker = lambda c: not (c.get('workerRequested') and
@@ -341,7 +351,17 @@ class Vishnu(log.Loggable):
         if not components:
             self.debug('vishnu.workerAttached(): no components for this worker')
             return
+
+        self._workerStartComponents(workerAvatar, components)
             
+    def _workerStartComponents(self, workerAvatar, components):
+        """
+        Start the list of components on the given worker, sequentially.
+
+        @type  workerAvatar: L{flumotion.manager.worker.WorkerAvatar}
+        @type  components:   list of
+                             L{flumotion.common.planet.ManagerComponentState}
+        """
         names = [c.get('name') for c in components]
         self.debug('starting components %r' % names)
         
@@ -353,7 +373,7 @@ class Vishnu(log.Loggable):
             type = c.get('type')
             config = c.get('config')
             self.debug('workerAttached(): scheduling start of /%s/%s on %s' % (
-                parentName, componentName, workerId))
+                parentName, componentName, workerAvatar.avatarId))
             
             # FIXME: put in parent when we use it everywhere
             #d.addCallback(self._workerStartComponentDelay,
@@ -517,4 +537,17 @@ class Vishnu(log.Loggable):
         for f in self.state.get('flows'):
             f.empty()
             self.state.remove('flows', f)
-        
+       
+    def _getComponentsToStart(self):
+        # return a list of components that are sleeping and not pending
+        components = self.state.getComponents()
+
+        # filter the ones that are sleeping and not pending
+        isSleeping = lambda c: c.get('mood') == moods.sleeping.value
+        components = filter(isSleeping, components)
+        isNotPending = lambda c: c.get('moodPending') == None
+        components = filter(isNotPending, components)
+
+        return components
+
+ 

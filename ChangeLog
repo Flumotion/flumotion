@@ -1,3 +1,16 @@
+2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	  use crap string for connected state, sigh
+	* flumotion/admin/gtk/client.py:
+	  _createUI() now returns a window
+	* flumotion/manager/manager.py:
+	  start components when a config gets loaded and workers are logged
+	  in
+	* flumotion/test/test_manager_manager.py:
+	  refactor test to use common functions
+	  add test for config loaded after workers log in
+
 2005-02-02  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/client.py (Window.__init__): Set the model
