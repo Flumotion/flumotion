@@ -142,7 +142,7 @@ class Kindergarten(log.Loggable):
 
     def __init__(self, options):
         """
-        @param options: the optparsed dictionary of command-line options
+        @param options: the optparse option instance of command-line options
         @type  options: dict
         """
         dirname = os.path.split(os.path.abspath(sys.argv[0]))[0]
