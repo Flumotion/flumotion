@@ -35,9 +35,6 @@ if gobject.pygtk_version < (2,3,96):
     raise SystemExit
 gobject.threads_init()
 
-from flumotion.utils import log
-from flumotion.tester import clientfactory
-
 # This can't be removed, 
 dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.exists(os.path.join(dir, '.svn')):
@@ -45,6 +42,9 @@ if os.path.exists(os.path.join(dir, '.svn')):
 else:
     root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
 sys.path.insert(0, root)
+
+from flumotion.utils import log
+from flumotion.tester import clientfactory
 
 def main(args):
     log.init()
