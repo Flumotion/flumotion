@@ -726,6 +726,34 @@ class Window(log.Loggable, gobject.GObject):
         dialog.start()
 
     def _component_stop(self, state):
+        return self._component_do(state, 'stop', 'Stopping', 'Stopped')
+        
+    def _component_start(self, state):
+        return self._component_do(state, 'start', 'Starting', 'Started')
+
+    def _component_do(self, state, action, doing, done):
+        name = state.get('name')
+        if not name:
+            return None
+
+        mid = self.statusbar.push('main', "%s component %s" % (doing, name))
+        d = self.admin.componentCallRemote(state, action)
+
+        def _actionCallback(result, self, mid):
+            self.statusbar.remove('main', mid)
+            self.statusbar.push('main', "%s component %s" % (done, name))
+        def _actionErrback(failure, self, mid):
+            self.statusbar.remove('main', mid)
+            self.warning("Failed to %s component %s: %s" % (
+                action, name, failure))
+            self.statusbar.push('main', "Failed to %s component %s" % (
+                action, name))
+            
+        d.addCallback(_actionCallback, self, mid)
+        d.addErrback(_actionErrback, self, mid)
+
+        return d
+     
         self.componentCallRemoteStatus(state,
                                        'Stopping component %s...',
                                        'Stopped component %s',
