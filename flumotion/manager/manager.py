@@ -52,8 +52,8 @@ class Dispatcher(log.Loggable):
     logCategory = 'dispatcher'
 
     def __init__(self):
-        self.heavens = {} # registered heavens, keyed on interface
-        self.avatars = {} # avatarId -> heaven
+        self._interfaceHeavens = {} # interface -> heaven
+        self._avatarHeavens = {} # avatarId -> heaven
         
     ### IRealm methods
 
@@ -81,8 +81,8 @@ class Dispatcher(log.Loggable):
     ### our methods
 
     def removeAvatar(self, avatarId, avatar, mind):
-        heaven = self.avatars[avatarId]
-        del self.avatars[avatarId]
+        heaven = self._avatarHeavens[avatarId]
+        del self._avatarHeavens[avatarId]
         
         avatar.detached(mind)
         heaven.removeAvatar(avatarId)
@@ -102,10 +102,10 @@ class Dispatcher(log.Loggable):
             raise errors.NoPerspectiveError(avatarId)
 
         for iface in ifaces:
-            heaven = self.heavens.get(iface, None)
+            heaven = self._interfaceHeavens.get(iface, None)
             if heaven:
                 avatar = heaven.createAvatar(avatarId)
-                self.avatars[avatarId] = heaven
+                self._avatarHeavens[avatarId] = heaven
                 return avatar
 
         raise errors.NoPerspectiveError(avatarId)
@@ -119,7 +119,7 @@ class Dispatcher(log.Loggable):
         """
         assert components.implements(heaven, interfaces.IHeaven)
         
-        self.heavens[interface] = heaven
+        self._interfaceHeavens[interface] = heaven
 
 class ManagerCredentials(cred.FlexibleCredentials):
     def requestAvatarId(self, credentials):
