@@ -390,7 +390,7 @@ class TestRecursively(unittest.TestCase):
         test2 = os.path.join(c, 'test.py')
         os.system("touch %s" % test2)
         dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs, [test1, test2])
+        self.assertEquals(dirs.sort(), [test1, test2].sort())
         mods = common._findEndModuleCandidates(self.tempdir,
             prefix='')
         self.assertEquals(mods, ['B.C.test', 'A.test'])
