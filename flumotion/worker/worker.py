@@ -92,6 +92,9 @@ class Kindergarten:
         self.kids[name] = Kid(p, name, type, config)
 
         return p
+
+    def getKid(self, name):
+        return self.kids[name]
     
     def getKids(self):
         return self.kids.values()

@@ -23,6 +23,7 @@
 
 import os
 import sys
+sys.path.insert(0, '@PYGTK_DIR@')
 
 import pygtk
 pygtk.require('2.0')
@@ -45,19 +46,16 @@ sys.path.insert(0, root)
 from flumotion.twisted import gstreactor
 gstreactor.install()
 
-from flumotion.common import launcher
+from flumotion.manager.main import main
+from flumotion.common.errors import SystemError
 from flumotion.common.registry import registry
-from flumotion.common import errors
 from flumotion.utils import log
 
-def main(args):
+if __name__ == '__main__':
     log.init()
     registry.verify(root)
-        
-    return launcher.main(args)
     
-if __name__ == '__main__':
     try:
         sys.exit(main(sys.argv))
-    except errors.SystemError, e:
+    except SystemError, e:
         print 'ERROR:', e

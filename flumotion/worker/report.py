@@ -72,7 +72,7 @@ class ReportAvatar(pb.Avatar, log.Loggable):
         cb.addCallback(self.cb_afterInitial)
 
     def cb_afterInitial(self, unused):
-        kid = self.heaven.fabric.kindergarten.getExtra(self.name)
+        kid = self.heaven.fabric.kindergarten.getKid(self.name)
         self.mind.callRemote('start', kid.name, kid.type, kid.config)
                                           
     def shutdown(self):

@@ -29,6 +29,7 @@ import gst
 from twisted.protocols import http
 from twisted.web import server, resource
 from twisted.internet import reactor
+import twisted.internet.error
 
 from flumotion.component import component
 from flumotion.common import interfaces
@@ -36,8 +37,6 @@ from flumotion.common import auth
 from flumotion.common import bundle
 from flumotion.utils import gstutils, log
 from flumotion.utils.gstutils import gsignal
-
-import twisted.internet.error
 
 __all__ = ['HTTPClientKeycard', 'HTTPStreamingAdminResource',
            'HTTPStreamingResource', 'MultifdSinkStreamer']
@@ -535,7 +534,6 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
             raise
         return self.gtk.bundle().zip
 
-
     def getMaxClients(self):
         return self.resource.maxAllowedClients()
 
@@ -556,7 +554,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
 
-        gobject.idle_add(self.emit, 'ui-state-changed')
+        self.update_ui_state()
 
     def get_mime(self):
         if self.caps:
