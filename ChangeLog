@@ -1,5 +1,11 @@
 2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	  unprivatize Bouncer.addKeycard()
+
+2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	* configure.ac:
 	* pkgconfig/Makefile.am:

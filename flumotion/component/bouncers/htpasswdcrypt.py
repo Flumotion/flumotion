@@ -75,7 +75,7 @@ class HTPasswdCrypt(bouncer.Bouncer):
     def _requestAvatarIdCallback(self, PossibleAvatarId, keycard):
         # authenticated, so return the keycard with state authenticated
         keycard.state = keycards.AUTHENTICATED
-        self._addKeycard(keycard)
+        self.addKeycard(keycard)
         if not keycard.avatarId:
             keycard.avatarId = PossibleAvatarId
         self.info('authenticated login of "%s"' % keycard.avatarId)
@@ -100,7 +100,7 @@ class HTPasswdCrypt(bouncer.Bouncer):
             return None
 
         # at this point we add it so there's an ID for challenge-response
-        self._addKeycard(keycard)
+        self.addKeycard(keycard)
 
         # check if the keycard is ready for the checker, based on the type
         if isinstance(keycard, keycards.KeycardUACPCC):

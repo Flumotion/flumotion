@@ -80,7 +80,7 @@ class Bouncer(component.BaseComponent):
         self.info('keycard %r refused because the base authenticate() should be overridden' % keycard)
         return None
 
-    def _addKeycard(self, keycard):
+    def addKeycard(self, keycard):
         # give keycard an id and store it in our hash
         if self._keycards.has_key(keycard.id):
             # already in there
