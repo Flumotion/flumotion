@@ -20,6 +20,9 @@
 
 # Headers in this file shall remain intact.
 
+import os
+import tempfile
+
 from twisted.trial import unittest
 
 from flumotion.common import common
@@ -141,5 +144,36 @@ class TestArgRepr(unittest.TestCase):
         self.assertEqual(common.argRepr((), dict(foo='bar')), "foo='bar'")
         self.assertEqual(common.argRepr(((1,)), dict(foo='bar')), "1, foo='bar'")
         
+class TestEnsureDir(unittest.TestCase):
+    def testNonExisting(self):
+        self.tempdir = tempfile.mkdtemp()
+        os.system("rm -r %s" % self.tempdir)
+        common.ensureDir(self.tempdir, "a description")
+        os.system("rm -r %s" % self.tempdir)
+    def testExisting(self):
+        self.tempdir = tempfile.mkdtemp()
+        common.ensureDir(self.tempdir, "a description")
+        os.system("rm -r %s" % self.tempdir)
+
+class TestPid(unittest.TestCase):
+    def testAll(self):
+        pid = common.getPid('test', 'default')
+        self.failIf(pid)
+        common.writePidFile('test', 'default')
+        common.waitPidFile('test', 'default')
+        pid = common.getPid('test', 'default')
+        self.assertEquals(os.getpid(), pid)
+        common.deletePidFile('test', 'default')
+
+class TestPackagePath(unittest.TestCase):
+    def testCurrent(self):
+        self.tempdir = tempfile.mkdtemp()
+        packagedir = os.path.join(self.tempdir, "package")
+        os.mkdir(packagedir)
+        handle = open(os.path.join(packagedir, "__init__.py"), "w")
+        handle.close()
+        common.registerPackagePath(self.tempdir)
+        os.system("rm -r %s" % self.tempdir)
+          
 if __name__ == '__main__':
     unittest.main()
