@@ -14,4 +14,4 @@ TAGS_FILES = installed.py.in uninstalled.py.in
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(flumotion_DATA) installed.py.in uninstalled.py.in
+EXTRA_DIST = $(flumotion_PYTHON) installed.py.in uninstalled.py.in

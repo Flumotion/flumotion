@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip
+AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip 1.8
 
 ACLOCAL_AMFLAGS = -I m4
 

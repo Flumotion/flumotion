@@ -19,4 +19,4 @@ flumotion_PYTHON = \
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(flumotion_DATA)
+EXTRA_DIST = $(flumotion_PYTHON)

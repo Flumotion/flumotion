@@ -2,6 +2,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/worker
 
 flumotion_PYTHON = \
 	__init__.py \
+	job.py \
 	main.py \
 	worker.py
 	
@@ -10,4 +11,4 @@ TAGS_FILES = $(flumotion_PYTHON)
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(flumotion_DATA)
+EXTRA_DIST = $(flumotion_PYTHON)

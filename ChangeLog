@@ -1,5 +1,19 @@
 2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* flumotion/Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/configure/Makefile.am:
+	* flumotion/manager/Makefile.am:
+	* flumotion/tester/Makefile.am:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/utils/Makefile.am:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/worker/Makefile.am:
+	  dist fixes
+
+2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/manager.py:
 	* flumotion/twisted/pb.py:
 	* flumotion/twisted/portal.py:
