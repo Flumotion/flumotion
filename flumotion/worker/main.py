@@ -24,6 +24,7 @@ import errno
 import optparse
 import os
 import signal
+import sys
 
 from twisted.internet import reactor
 
