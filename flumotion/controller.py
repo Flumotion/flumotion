@@ -125,8 +125,10 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         cb.addCallback(self.after_register_cb, cb)
         
     def detached(self, mind):
-        log.msg('%r detached' % mind)
-        self.controller.removeComponent(self)
+        name = self.getName()
+        log.msg('%s detached' % name)
+        if self.controller.hasComponent(name):
+            self.controller.removeComponent(self)
 
     def perspective_stateChanged(self, old, state):
 #        log.msg('%s.stateChanged %s' %
@@ -135,7 +137,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.state = state
 
         if state == gst.STATE_PLAYING:
-            log.msg('%s is ready, starting pending components' % self.username)
+            #log.msg('%s is ready, starting pending components' % self.username)
 
             # Now when the component is up and running, 
             self.controller.startPendingComponentsFor(self)
@@ -143,9 +145,9 @@ class ComponentPerspective(pbutil.NewCredPerspective):
     def perspective_error(self, element, error):
         log.msg('%s.error element=%s string=%s' % (self.username, element, error))
         
-        cb = self.mind.callRemote('register')
-        cb.addCallback(self.after_register_cb, cb)
-              
+        #print dir(self.mind.perspective)
+        self.controller.removeComponent(self)
+        
 class ProducerPerspective(ComponentPerspective):
     """Perspective for producer components"""
     kind = 'producer'
@@ -250,9 +252,10 @@ class Controller(pb.Root):
         @param name: name of the component
         @rtype:      component
         @returns:    the component"""
-        
+
         if not self.hasComponent(name):
             raise KeyError, name
+        
         return self.components[name]
     
     def hasComponent(self, name):
@@ -270,7 +273,9 @@ class Controller(pb.Root):
         @param component: the component"""
 
         component_name = component.getName()
-        log.msg('Adding component %s' % component_name)
+        if self.hasComponent(component_name):
+            raise KeyError, component_name
+            
         self.components[component_name] = component
 
     def removeComponent(self, component):
@@ -279,6 +284,9 @@ class Controller(pb.Root):
         @param component: the component"""
 
         component_name = component.getName()
+        if not self.hasComponent(component_name):
+            raise KeyError, component_name
+
         del self.components[component_name]
 
     def waitForComponent(self, name, component):
@@ -302,7 +310,7 @@ class Controller(pb.Root):
 
         name = component.getName()
         if not self.waitlists.has_key(name):
-            log.msg('%s does not have any pending components' % name)
+            #log.msg('%s does not have any pending components' % name)
             return
             
         for component in self.waitlists[name]:
@@ -358,7 +366,7 @@ class Controller(pb.Root):
         streamer.connect(sources)
         
     def componentStart(self, component):
-        log.msg('Starting component %r of type %s' % (component, component.kind))
+        log.msg('Starting component %s of type %s' % (component.getName(), component.kind))
         assert isinstance(component, ComponentPerspective)
         assert component != ComponentPerspective
 
@@ -372,7 +380,7 @@ class Controller(pb.Root):
         component.started = True
         
     def componentRegistered(self, component):
-        log.msg('%r is registered' % component)
+        #log.msg('%r is registered' % component)
         
         sources = component.getSources()
         if not sources:
