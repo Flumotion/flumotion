@@ -60,6 +60,7 @@ bin/Makefile
 data/Makefile
 data/glade/Makefile
 data/image/Makefile
+data/image/wizard/Makefile
 flumotion/Makefile
 flumotion/admin/Makefile
 flumotion/admin/gtk/Makefile

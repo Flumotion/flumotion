@@ -1,3 +1,5 @@
+SUBDIRS = wizard
+
 image_DATA = fluendo.png
 imagedir = $(pkgdatadir)/image
 

@@ -20,8 +20,8 @@ from flumotion.component import feedcomponent
 class Speex(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, feeders, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    eaters,
                                                     ['default'],
-                                                    feeders,
                                                     pipeline)
 
 def createComponent(config):

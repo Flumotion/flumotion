@@ -26,6 +26,7 @@ class Welcome(wizard.WizardStep):
     glade_file = 'wizard_welcome.glade'
     section = 'Production'
     section_name = 'Production'
+    icon = 'wizard.png'
     def get_next(self):
         return 'Source'
 wizard.register_step(Welcome)
@@ -36,6 +37,7 @@ class Source(wizard.WizardStep):
     glade_file = 'wizard_source.glade'
     section = 'Production'
     section_name = 'Production'
+    icon = 'source.png'
     
     def setup(self):
         self.combobox_video.set_enum(VideoDevice)
@@ -81,6 +83,8 @@ wizard.register_step(Source)
 class VideoSource(wizard.WizardStep):
     section = 'Production'
     component_name = 'video-source'
+    icon = 'widget_doc.png'
+
     def get_next(self):
         return 'Overlay'
 
@@ -95,7 +99,8 @@ class TVCard(VideoSource):
     step_name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
-
+    icon = 'tv.png'
+    
     def setup(self):
         self.combobox_device.set_enum(TVCardDevice)
         self.combobox_signal.set_enum(TVCardSignal)
@@ -113,6 +118,7 @@ class FireWire(VideoSource):
     step_name = 'Firewire'
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
+    icon = 'firewire.png'
 wizard.register_step(FireWire)
 
 
@@ -121,6 +127,7 @@ class Webcam(VideoSource):
     step_name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
+    icon = 'webcam.png'
 wizard.register_step(Webcam)
 
 
@@ -129,7 +136,8 @@ class TestSource(VideoSource):
     step_name = 'Test Source'
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
-
+    icon = 'testsource.png'
+    
     def setup(self):
         self.combobox_pattern.set_enum(VideoTestPattern)
         self.combobox_format.set_enum(VideoTestFormat)
@@ -159,7 +167,8 @@ class Overlay(wizard.WizardStep):
     section = 'Production'
     component_type = 'overlay'
     component_name = 'overlay'
-
+    icon = 'overlay.png'
+    
     def setup(self):
         # XXX: Remove
         self.checkbutton_show_logo.set_active(False)
@@ -193,7 +202,8 @@ class AudioSource(wizard.WizardStep):
     section = 'Production'
     component_name = 'audio-source'
     component_type = 'osssrc'
-
+    icon = 'audiosrc.png'
+    
     def setup(self):
         self.combobox_device.set_enum(SoundcardDevice)
         self.combobox_input.set_enum(SoundcardInput)
@@ -303,6 +313,7 @@ class Theora(VideoEncoder):
     step_name = 'Theora'
     glade_file = 'wizard_theora.glade'
     component_type = 'theora'
+    icon = 'xiphfish.png'
     
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
@@ -367,6 +378,7 @@ class AudioEncoder(wizard.WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
     component_name = 'audio-encoder'
+    
     def get_next(self):
         return 'Consumption'
 
@@ -375,6 +387,7 @@ class AudioEncoder(wizard.WizardStep):
 class Vorbis(AudioEncoder):
     step_name = 'Vorbis'
     component_type = 'vorbis'
+    icon = 'xiphfish.png'
 
     def setup(self):
         self.spinbutton_bitrate.set_range(6000, 250001)
@@ -391,6 +404,15 @@ wizard.register_step(Vorbis)
 class Speex(AudioEncoder):
     step_name = 'Speex'
     component_type = 'speex'
+    icon = 'xiphfish.png'
+    
+    def setup(self):
+        self.spinbutton_bitrate.set_range(6000, 250001)
+        self.spinbutton_bitrate.set_value(64000)
+    def get_component_properties(self):
+        options = self.wizard.get_step_state(self)
+        options['bitrate'] = int(self.spinbutton_bitrate.get_value())
+        return options
 wizard.register_step(Speex)
 
 
@@ -399,6 +421,7 @@ class Consumption(wizard.WizardStep):
     step_name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
     section = 'Consumption'
+    icon = 'consumption.png'
     
     def on_checkbutton_http_toggled(self, button):
         value = self.checkbutton_http.get_active()
@@ -543,7 +566,8 @@ wizard.register_step(HTTPVideo)
 class Disk(wizard.WizardStep):
     glade_file = 'wizard_disk.glade'
     section = 'Consumption'
-
+    icon = 'kcmdevices.png'
+    
     def setup(self):
         self.combobox_time_list.set_enum(RotateTime)
         self.combobox_size_list.set_enum(RotateSize)
@@ -611,7 +635,8 @@ class Licence(wizard.WizardStep):
     step_name = "Content License"
     glade_file = "wizard_license.glade"
     section = 'License'
-
+    icon = 'licenses.png'
+    
     def on_checkbutton_set_license_toggled(self, button):
         self.combobox_license.set_sensitive(button.get_active())
         

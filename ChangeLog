@@ -1,5 +1,26 @@
 2004-10-15  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac:
+	* data/glade/wizard.glade:
+	* data/image/wizard/audiosrc.png:
+	* data/image/wizard/consumption.png:
+	* data/image/wizard/firewire.png:
+	* data/image/wizard/licenses.png:
+	* data/image/wizard/overlay.png:
+	* data/image/wizard/source.png:
+	* data/image/wizard/testsource.png:
+	* data/image/wizard/webcam.png:
+	* data/image/wizard/wizard.png:
+	* data/image/wizard/xiphfish.png:
+	* flumotion/component/encoders/smoke.py:
+	* flumotion/component/encoders/speex.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Wizard work, commit some icons.
+	
+2004-10-15  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/test/: Add a few new unittests.
 
 2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>

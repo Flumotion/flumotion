@@ -18,17 +18,15 @@
 from flumotion.component import feedcomponent
 
 class Smoke(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, feeders, pipeline):
+    def __init__(self, name, eaters, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    eaters,
                                                     ['default'],
-                                                    feeders,
                                                     pipeline)
 
 def createComponent(config):
-    source = config['source']
-
     component = Smoke(config['name'], [config['source']],
-                      "smokeenc name=encoder")
+                      "ffmpegcolorspace ! smokeenc name=encoder")
     
     element = component.pipeline.get_by_name('encoder')
     if config.has_key('qmin'):

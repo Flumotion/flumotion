@@ -358,6 +358,13 @@ class Wizard:
         widget = step.get_main_widget()
         self.content_area.add(widget)
 
+        if hasattr(step, 'icon'):
+            icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
+            self.image_icon.set_from_file(icon_filename)
+            self.image_icon.show()
+        else:
+            self.image_icon.hide()
+            
         self.label_title.set_markup('<span size="large">' + escape(step.step_name) + '</span>')
 
         if self.current_step:
@@ -380,8 +387,6 @@ class Wizard:
         self.update_buttons(has_next=True)
 
     def show_next(self):
-        self.show_info(self.current_step)
-        
         next = self.current_step.get_next()
         if not next:
             self.finish()
@@ -408,17 +413,6 @@ class Wizard:
             self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         else:
             self.button_next.set_label(gtk.STOCK_QUIT)
-
-    def show_info(self, step):
-        if not hasattr(step, 'component_name'):
-            return
-        
-        print '<component name="%s" type="%s">' % (step.component_name,
-                                                   step.component_type)
-        options = step.get_component_properties()
-        for key, value in options.items():
-            print '  <%s>%s</%s> ' % (key, value, key)
-        print '</component>'
 
     def _sidebar_clean(self):
         # First remove the old the VBox if we can find one
