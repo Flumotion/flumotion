@@ -114,9 +114,10 @@ class Window(log.Loggable, gobject.GObject):
 
         wtree.signal_autoconnect(self)
 
-        self.components = parts.ComponentsView(
+        self.components_view = parts.ComponentsView(
             wtree.get_widget('component_view'))
-        self.components.connect('selected', self._components_view_selected_cb)
+        self.components_view.connect('selected',
+            self._components_view_selected_cb)
         self.statusbar = parts.AdminStatusbar(wtree.get_widget('statusbar'))
 
 
@@ -270,7 +271,7 @@ class Window(log.Loggable, gobject.GObject):
         # to be processed, since they're here now anyway   
         self.debug("componentCall received for %s.%s ..." % (
             componentName, methodName))
-        name = self.component_view.get_selected_name()
+        name = self.components_view.get_selected_name()
         if not name:
             self.debug("... but no component selected")
             return
@@ -304,7 +305,7 @@ class Window(log.Loggable, gobject.GObject):
             return
 
         if key == 'mood':
-            self.components.set_mood_value(state, value)
+            self.components_view.set_mood_value(state, value)
         if key == 'message':
             self.statusbar.set('main', value)
 
@@ -390,7 +391,7 @@ class Window(log.Loggable, gobject.GObject):
 
     def update_components(self):
         components = self.admin.get_components()
-        self.components.update(components)
+        self.components_view.update(components)
 
     ### ui callbacks
     def _components_view_selected_cb(self, name):
