@@ -1,5 +1,14 @@
 2004-10-21  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/bttv/bttv.py:
+	* flumotion/component/producers/bttv/bttv.xml:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+
+	TV-Card producer should work better now.
+	
+2004-10-21  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/common/common.py:
 	* flumotion/manager/admin.py:

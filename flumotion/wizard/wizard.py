@@ -256,7 +256,11 @@ class WizardStep(object, log.Loggable):
             prefix = self.widget_prefixes.get(widget.__class__, None)
             if not prefix:
                 continue
-            key = name.split('_', 1)[1]
+            try:
+                key = name.split('_', 1)[1]
+            except IndexError:
+                continue
+            
             state_dict[key] = widget
 
         return state_dict

@@ -146,12 +146,14 @@ class TVCard(VideoSource):
     def setup(self):
         self.combobox_device.set_enum(TVCardDevice)
         self.combobox_signal.set_enum(TVCardSignal)
-
         
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
         options['device'] = options['device'].name
         options['signal'] = options['signal'].name
+        options['width'] = int(options['width'])
+        options['height'] = int(options['height'])
+        options['framerate'] = options['framerate']
         return options
 wizard.register_step(TVCard)
 

@@ -33,12 +33,16 @@ def state_changed_cb(element, old, new, channel):
     
 def createComponent(config):
     device = config['device']
-    device_width = config['device-width']
-    device_height = config['device-height']
-    device_channel = config['channel']
-
     width = config.get('width', 320)
     height = config.get('height', 240)
+    channel = config['channel']
+
+    # This needs to be done properly
+    device_width = width
+    device_height = height
+    #device_width = config['device-width']
+    #device_height = config['device-height']
+
     framerate = config.get('framerate', 25.0)
     
     pipeline = ('v4lsrc name=src device=%s copy-mode=true ! '
@@ -54,6 +58,6 @@ def createComponent(config):
     component = producer.createComponent(config)
     pipeline = component.get_pipeline() 
     element = pipeline.get_by_name('src')
-    element.connect('state-change', state_changed_cb, device_channel)
+    element.connect('state-change', state_changed_cb, channel)
     
     return component

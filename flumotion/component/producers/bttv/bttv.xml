@@ -1,10 +1,9 @@
 <components>
-  <component type="bttv">
+  <component type="tv-card">
     <source location="flumotion.component.producers.bttv.bttv"/>
     <properties>
+      <property name="feed" type="string" multiple="yes"/>
       <property name="device" type="string" required="yes"/>
-      <property name="device-height" type="int" required="yes"/>
-      <property name="device-width" type="int" required="yes"/>
       <property name="channel" type="string" required="no"/>
       <property name="height" type="int"/>
       <property name="width" type="int"/>
