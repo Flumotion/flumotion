@@ -254,7 +254,7 @@ class FileSinkStreamer(component.ParseLaunchComponent):
 
 class MultifdSinkStreamer(component.ParseLaunchComponent):
     kind = 'streamer'
-    pipe_template = 'multifdsink name=sink'
+    pipe_template = 'multifdsink buffers-soft-max=1 recover-policy=1 name=sink'
     
     def __init__(self, name, sources):
         component.ParseLaunchComponent.__init__(self, name, sources, [], self.pipe_template)
