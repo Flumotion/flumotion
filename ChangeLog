@@ -1,3 +1,12 @@
+2004-12-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/admin.glade:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	  create a status bar class wrapping the GTK widget
+	  use the status bar for showing info about the UI
+
 2004-12-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/wizard_testsource.glade:

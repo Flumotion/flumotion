@@ -45,6 +45,78 @@ COL_STATE     = 4
 
 RESPONSE_FETCH = 0
 
+class AdminStatusbar:
+    """
+    I implement the status bar used in the admin UI.
+    """
+    def __init__(self, widget):
+        """
+        @param widget: a gtk.Statusbar to wrap.
+        """
+        self._widget = widget
+        
+        self._cids = {} # hash of context -> context id
+        self._mids = {} # hash of context -> message id lists
+        self._contexts = ['main', 'notebook']
+
+        for context in self._contexts:
+            self._cids[context] = widget.get_context_id(context)
+            self._mids[context] = []
+
+    def clear(self, context=None):
+        """
+        Clear the status bar for the given context, or for all contexts
+        if none specified.
+        """
+        if context:
+            self._clear_context(context)
+            return
+
+        for context in self._contexts:
+            self._clear_context(context)
+
+    def push(self, context, message):
+        """
+        Push the given message for the given context.
+
+        @returns: message id
+        """
+        mid = self._widget.push(self._cids[context], message)
+        self._mids[context].append(mid)
+        return mid
+
+    def pop(self, context):
+        """
+        Pop the last message for the given context.
+        """
+        if len(self._mids[context]):
+            mid = self._mids[context].pop()
+            self._widget.remove(self._cids[context], mid)
+
+    def set(self, context, message):
+        """
+        Replace the current top message for this context with this new one.
+        """
+        self.pop(context)
+        self.push(context, message)
+
+    def remove(self, context, mid):
+        """
+        Remove the message with the given id from the given context.
+        """
+        if not mid in self._mids[context]:
+            return
+
+        self._mids[context].remove(mid)
+        self._widget.remove(self._cids[context], mid)
+
+    def _clear_context(self, context):
+        if not context in self._cids.keys():
+            return
+
+        for mid in self._mids[context]:
+            self._widget.remove(self._cids[context], mid)
+
 class PropertyChangeDialog(gtk.Dialog):
     gsignal('set', str, str, object)
     gsignal('get', str, str)
@@ -170,8 +242,8 @@ class Window(log.Loggable, gobject.GObject):
         
         self.component_model = gtk.ListStore(gdk.Pixbuf, str, str, int, object)
         self.component_view = wtree.get_widget('component_view')
-        self.component_view.connect('row-activated',
-                                    self.component_view_row_activated_cb)
+        self.component_view.connect('cursor-changed',
+                                    self.component_view_cursor_changed_cb)
         self.component_view.set_model(self.component_model)
         self.component_view.set_headers_visible(True)
 
@@ -193,14 +265,12 @@ class Window(log.Loggable, gobject.GObject):
         self.component_view.append_column(col)
         wtree.signal_autoconnect(self)
 
-        # gtk.gdk.Pixbuf's
-        #self.icon_playing = self.window.render_icon(gtk.STOCK_YES,
-        #                                            gtk.ICON_SIZE_MENU)
-        #self.icon_stopped = self.window.render_icon(gtk.STOCK_NO,
-        #                                            gtk.ICON_SIZE_MENU)
+        self.statusbar = AdminStatusbar(wtree.get_widget('statusbar'))
 
         self._moodPixbufs = self._getMoodPixbufs()
 
+    # load all pixbufs for the moods
+    # FIXME: enumize
     def _getMoodPixbufs(self):
         pixbufs = {}
         items = (
@@ -247,6 +317,7 @@ class Window(log.Loggable, gobject.GObject):
         sub = None
         instance = None
 
+        self.statusbar.set('main', "Loading UI for %s ..." % name)
         if data:
             # we create a temporary module that we import from so code
             # inside the module can trust its full namespace to be local
@@ -306,6 +377,7 @@ class Window(log.Loggable, gobject.GObject):
             notebook = gtk.Notebook()
             nodeWidgets = {}
 
+            self.statusbar.clear('main')
             # create pages for all nodes, and just show a loading label for
             # now
             for nodeName in nodes.keys():
@@ -328,17 +400,22 @@ class Window(log.Loggable, gobject.GObject):
             notebook.show_all()
 
             # trigger node rendering
+            # FIXME: might be better to do these one by one, in order,
+            # so the status bar can show what happens
             for nodeName in nodes.keys():
+                mid = self.statusbar.push('notebook',
+                    "Loading tab %s for %s ..." % (nodeName, name))
                 node = nodes[nodeName]
                 d = node.render()
                 d.addCallback(self._nodeRenderCallback, nodeName,
-                    instance, nodeWidgets)
+                    instance, nodeWidgets, mid)
                 # FIXME: errback
 
     def _nodeRenderCallback(self, widget, nodeName, gtkAdminInstance,
-        nodeWidgets):
+        nodeWidgets, mid):
         # used by show_component
         self.debug("Got sub widget %r" % widget)
+        self.statusbar.remove('notebook', mid)
 
         table = nodeWidgets[nodeName]
         for w in table.get_children():
@@ -420,41 +497,7 @@ class Window(log.Loggable, gobject.GObject):
         if key == 'mood':
             model.set(iter, COL_MOOD, self._moodPixbufs[value])
 
-    ### glade callbacks
-    def component_view_row_activated_cb(self, *args):
-        name = self.get_selected_component_name()
-
-        if not name:
-            self.warning('Select a component')
-            return
-
-        def gotEntryCallback(result):
-            entryPath, filename, methodName = result
-            filepath = os.path.join(entryPath, filename)
-            self.debug("Got the UI, lives in %s" % filepath)
-            # FIXME: this is a silent assumption that the glade file
-            # lives in the same directory as the entry point
-            self.uidir = os.path.split(filepath)[0]
-            handle = open(filepath, "r")
-            data = handle.read()
-            handle.close()
-            # FIXME: is name (of component) needed ?
-            self.debug("showing admin UI for component")
-            self.show_component(name, methodName, filepath, data)
-
-        def gotEntryNoBundleErrback(failure):
-            failure.trap(errors.NoBundleError)
-            # no ui, clear; FIXME: do this nicer
-            old = self.hpaned.get_child2()
-            self.hpaned.remove(old)
-            sub = gtk.Label('%s does not have a UI yet' % name)
-            self.hpaned.add2(sub)
-            sub.show()
-             
-        d = self.admin.getEntry(name, 'admin/gtk')
-        d.addCallback(gotEntryCallback)
-        d.addErrback(gotEntryNoBundleErrback)
-
+    ### admin model callbacks
     def admin_connected_cb(self, admin):
         self.info('Connected to manager')
         if self._disconnected_dialog:
@@ -542,6 +585,54 @@ class Window(log.Loggable, gobject.GObject):
             model.set(iter, COL_PID, component.get('pid'))
             model.set(iter, COL_STATE, component)
 
+    ### ui callbacks
+    def component_view_cursor_changed_cb(self, *args):
+        # name needs to exist before being used in the child functions
+        name = self.get_selected_component_name()
+
+        if not name:
+            self.warning('Select a component')
+            return
+
+        def gotEntryCallback(result):
+            entryPath, filename, methodName = result
+
+            self.statusbar.set('main', 'Showing UI for %s' % name)
+
+            filepath = os.path.join(entryPath, filename)
+            self.debug("Got the UI, lives in %s" % filepath)
+            # FIXME: this is a silent assumption that the glade file
+            # lives in the same directory as the entry point
+            self.uidir = os.path.split(filepath)[0]
+            handle = open(filepath, "r")
+            data = handle.read()
+            handle.close()
+            # FIXME: is name (of component) needed ?
+            self.debug("showing admin UI for component")
+            # callLater to avoid any errors going to our errback
+            reactor.callLater(0, self.show_component,
+                name, methodName, filepath, data)
+
+        def gotEntryNoBundleErrback(failure):
+            failure.trap(errors.NoBundleError)
+
+            self.statusbar.set('main', "No UI for component %s" % name)
+
+            # no ui, clear; FIXME: do this nicer
+            old = self.hpaned.get_child2()
+            self.hpaned.remove(old)
+            #sub = gtk.Label('%s does not have a UI yet' % name)
+            sub = gtk.Label("")
+            self.hpaned.add2(sub)
+            sub.show()
+             
+        self.statusbar.set('main', "Requesting UI for %s ..." % name)
+
+        d = self.admin.getEntry(name, 'admin/gtk')
+        d.addCallback(gotEntryCallback)
+        d.addErrback(gotEntryNoBundleErrback)
+
+    ### glade callbacks
     def close(self, *args):
         reactor.stop()
 
@@ -573,7 +664,7 @@ class Window(log.Loggable, gobject.GObject):
 
         return wiz
 
-    # menubar/toolbar callbacksw
+    # menubar/toolbar callbacks
     def file_new_cb(self, button):
         self.runWizard()
 
@@ -714,7 +805,7 @@ class Window(log.Loggable, gobject.GObject):
         version.set_use_markup(True)
         version.show()
 
-        text = 'Flumotion is a streaming video server\n\n(C) 2004 Fluendo S.L.'
+        text = 'Flumotion is a streaming media server\n\n(C) 2004-2005 Fluendo S.L.'
         authors = ('Johan Dahlin &lt;johan@fluendo.com&gt;',
                    'Thomas V. Stichele &lt;thomas@fluendo.com&gt;',
                    'Wim Taymans &lt;wim@fluendo.com&gt;')

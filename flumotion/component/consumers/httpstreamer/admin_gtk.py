@@ -32,6 +32,10 @@ from twisted.internet import defer
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
+    def __init__(self, *args, **kwargs):
+        BaseAdminGtkNode.__init__(self, *args, **kwargs)
+        self.shown = False
+
     def error_dialog(self, message):
         # FIXME: dialogize
         print 'ERROR:', message
@@ -86,7 +90,10 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         for type in ('bitrate', 'totalbytes'):
             self.registerLabel('consumption-' + type)
 
-        self.callRemote('notifyState')
+        mid = self.view.statusbar.push('notebook', 'Getting statistics ...')
+        d = self.callRemote('notifyState')
+        d.addCallback(lambda result, self, mid:
+            self.view.statusbar.remove('notebook', mid), self, mid) 
         self.shown = False
         return self.statistics
 

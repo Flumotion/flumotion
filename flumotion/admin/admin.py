@@ -363,6 +363,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         Do everything needed to set up the entry point for the given
         component and type, including transferring and setting up bundles.
 
+        Caller is responsible for adding errbacks to the deferred.
+
         Returns: a deferred returning (entryPath, filename, methodName)
         """
         
@@ -455,7 +457,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         # start chain
         d = self.callRemote('getEntryByType', componentName, type)
         d.addCallback(_getEntryCallback, componentName, type)
-        d.addErrback(self._defaultErrback)
+        # our caller should handle errbacks
+        # d.addErrback(self._defaultErrback)
         return d
 
     def _registerCachedPaths(self, paths):
