@@ -54,7 +54,7 @@ class BaseUI:
 
         data = zipfile.readFile(glade_file)
 
-        wtree = gtk.glade.xml_ew_from_buffer(data)
+        wtree = gtk.glade.xml_new_from_buffer(data)
         
 class HTTPStreamerUI(BaseUI):
     def error_dialog(self, message):
