@@ -444,12 +444,11 @@ def _checkTracks(source_element, device):
         try:
             tracks = [track.label for track in element.list_tracks()]
         except AttributeError:
-            # I've had osssrc and alsasrc miss list_tracks, probably
-            # a gst.interfaces issue
+            # list_tracks was added in gst-python 0.7.94
             if not res.returned:
                 res.returned = True
                 res.d.errback(errors.GstError(
-                    'Cannot list tracks on the soundcard.'))
+                    'Please upgrade gstreamer-python to 0.7.94 or higher.'))
             
         reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
         if not res.returned:
