@@ -1,3 +1,9 @@
+2004-12-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/enum.py:
+	* flumotion/test/test_enum.py:
+	  make pychecker happy
+
 2004-12-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/Makefile.am:

@@ -22,6 +22,9 @@
 
 
 class EnumMetaClass(type):
+    # pychecker likes this attribute to be there since we use it in this class
+    __enums__ = {}
+    
     def __len__(self):
         return len(self.__enums__)
 
@@ -50,16 +53,16 @@ class Enum(object):
         return '<enum %s of type %s>' % (self.name,
                                          self.__class__.__name__)
 
-    def get(self, value):
-        return self.__enums__[value]
+    def get(klass, value):
+        return klass.__enums__[value]
     get = classmethod(get)
 
-    def set(self, value, item):
-        self[value] = item
+    def set(klass, value, item):
+        klass[value] = item
     set = classmethod(set)
 
 class EnumClass(object):
-    def __new__(self, type_name, names=(), nicks=(), **extras):
+    def __new__(klass, type_name, names=(), nicks=(), **extras):
         if nicks:
             if len(names) != len(nicks):
                 raise TypeError("nicks must have the same length as names")
@@ -74,7 +77,9 @@ class EnumClass(object):
                 raise TypeError("extra items must have a length of %d" %
                                 len(names))
             
-        etype = EnumMetaClass(type_name, (Enum,), dict(__enums__={}))
+        # we reset __enums__ to {} otherwise it retains the other registered
+        # ones
+        etype = EnumMetaClass(type_name, (Enum,), {'__enums__': {}})
         for value, name in enumerate(names):
             enum = etype(value, name, nicks[value])
             for extra_key, extra_values in extras.items():
