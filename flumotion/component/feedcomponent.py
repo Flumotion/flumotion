@@ -158,9 +158,8 @@ class FeedComponent(basecomponent.BaseComponent):
             self.eater_names.append(eater_name)
             
     def parseFeederConfig(self, feeder_config):
-        ### FIXME: for pipeline components, in the case there is only one
-        ### feeder, it's not explicitly listed currently as a <feed></feed>.
-        ### that sucks, maybe we want to force this to be there ?
+        # for pipeline components, in the case there is only one
+        # feeder, <feed></feed> still needs to be listed explicitly
 
         # the feed names come from the config
         # they are specified under <component> as <feed> elements in XML

@@ -1,43 +1,72 @@
-* MEDIUM	integration with monitoring tools:
-		big brother: either:
+0.1.0:
 
-* EASY		rename http to httpstreamer because we'll have a reader too
-
-* EASY		remove seconds from uptime, and force update every minute,
-		or when stats are different from last
+* EASY		remove HTTPGateKeeper, HTPasswd
 
 * MEDIUM	give useful error messages when there is no network !
 		(service network stop and start flumotion and see hang)
 
-* MEDIUM	create a common.heaven.Heaven base class, and subclass others
-	        involves making admin use same system for managing avatars
+* EASY		rename http to httpstreamer because we'll have a reader too
+
+* EASY		rename other components, compare with manual
+
+* EASY		remove utils, split up gstutils
+
+* EASY:		doublecheck spec
+
+* EASY:		write .pc and -uninstalled.pc
+
+* EASY:		have a FLU_MODULES env var to scan for other flu module .xml
+
+* EASY:		fix all code files to have the new header
+
+* MEDIUM:	write startup "flumotion" script
+
+* MEDIUM:	decide who chooses the "name" of a worker; either the worker's
+		hostname (changed to localhost if manager is on localhost)
+		or the manager's name for it
+
+LATER:
+
+* MEDIUM:	provide login dialog in flumotion-admin, with user/pass or
+		other types,
+		and sessions saved
+
+* MEDIUM:	component.component overrides .error and calls reactor.stop(),
+	  	this is dangerous, figure that out
+
+* MEDIUM:	make all factories reconnecting and test
+
+* MEDIUM:	add import hooks so that when there is a.b in one pythonpathdir
+	        and a.c in another, programs can import both a.b and a.c
+
+* EASY:		make relative attribute work on filename properties in xml
+	        so that they are relative to a given var from configure;
+		might need to make a type "path" for that in registry code ?
+
+* MEDIUM	allow expression of "test component depends on streamer component"
 
 * MEDIUM	implement moods of component:
 		- angry: error
 		- happy: running
 		- hungry/bored: waiting for feeds to start
 
-* MEDIUM	allow expression of "test component depends on streamer component"
-
-* EASY		remove utils, split up gstutils
-
 * EASY:		change rawstring regentry type to string, and make pipelinestring for pipelines which need \n translated to space
+* EASY		and force update every minute,
+		or when stats are different from last,
+	 	in http streamer UI
 
-* EASY:		fix all code files to have the new header
+* MEDIUM	create a common.heaven.Heaven base class, and subclass others
+	        involves making admin use same system for managing avatars
 
-* EASY:		doublecheck spec
+* MEDIUM	integration with monitoring tools:
+		big brother: either:
 
-* EASY:		write .pc and -uninstalled.pc
+* HARD		transfer ALL code from manager
 
-* EASY:		make relative attribute work on filename properties in xml
-	        so that they are relative to a given var from configure;
-		might need to make a type "path" for that in registry code ?
+* EASY		add simple api to add files to bundler from current tree/dir
 
-* MEDIUM:	add import hooks so that when there is a.b in one pythonpathdir
-	        and a.c in another, programs can import both a.b and a.c
-
-* MEDIUM:	daemonize worker and manager, write startup "flumotion" script
-
+* EASY		decide if bouncer's base authenticate method should always
+		be overridden and thus raise
 - API cleanup:
 
 - manager/component.py:

@@ -133,7 +133,7 @@ def main(args):
     while pids:
         try:
             pid = os.wait()[0]
-	# FIXME: properly catch OSError: [Errno 10] No child processes
+	# FIXME: test if this properly catches OSError: [Errno 10] No child processes
         except OSError, e:
             if e.errno == errno.ECHILD:
                 continue

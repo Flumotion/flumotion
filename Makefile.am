@@ -24,6 +24,9 @@ coverage:
 	@trial --coverage coverage -R flumotion.test
 	@$(PYTHON) tools/show-coverage.py _trial_temp/coverage/flumotion.*
 
+fixme:
+	tools/fixme | less -R
+
 release: dist
 	make $(PACKAGE)-$(VERSION).tar.bz2.md5
 

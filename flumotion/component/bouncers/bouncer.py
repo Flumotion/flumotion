@@ -72,17 +72,8 @@ class Bouncer(component.BaseComponent):
             self.warn('keycard %r does not implement ICredentials', keycard)
             raise AssertionError
 
-        # FIXME: make configurable
-        if keycard.username == 'thomas' and keycard.password == 'plasmatv':
-            self.info('keycard %r authenticated' % keycard)
-            self._addKeycard(keycard)
-
-            # FIXME: of course we don't want to expire, just a test
-            keycard.duration = 10 # 10 whole seconds of streaming love
-            return keycard
-        else:
-            self.info('keycard %r refused' % keycard)
-            return None
+        self.info('keycard %r refused because the base authenticate() should be overridden' % keycard)
+        return None
 
     def _addKeycard(self, keycard):
         # give keycard an id and store it in our hash
