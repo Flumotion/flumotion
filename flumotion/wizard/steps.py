@@ -30,12 +30,11 @@ from flumotion.wizard import wizard
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, \
      LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
-     SoundcardChannels, SoundcardSystem, SoundcardAlsaDevice, SoundcardOSSDevice, \
-     SoundcardInput, SoundcardSamplerate, AudioTestSamplerate, TVCardDevice, TVCardSignal, \
+     SoundcardChannels, SoundcardSystem, SoundcardAlsaDevice, \
+     SoundcardOSSDevice, SoundcardInput, SoundcardSamplerate, \
+     AudioTestSamplerate, TVCardDevice, TVCardSignal, \
      VideoDevice, VideoTestFormat, VideoTestPattern
 
-
-
 class Welcome(wizard.WizardStep):
     step_name = 'Welcome'
     glade_file = 'wizard_welcome.glade'
@@ -47,8 +46,6 @@ class Welcome(wizard.WizardStep):
         return 'Source'
 wizard.register_step(Welcome, initial=True)
 
-
-
 class Source(wizard.WizardStep):
     step_name = 'Source'
     glade_file = 'wizard_source.glade'
@@ -117,8 +114,6 @@ class Source(wizard.WizardStep):
         raise AssertionError
 wizard.register_step(Source)
 
-
-
 class VideoSource(wizard.WizardStep):
     section = 'Production'
     icon = 'widget_doc.png'
@@ -132,11 +127,13 @@ class VideoSource(wizard.WizardStep):
         options['height'] = int(options['height'])
         return options
 
-
 # note:
 # v4l talks about "signal" (PAL/...) and "channel" (TV/Composite/...)
-# apps talk about "TV Norm" and "source",
-# and "channel" is what you tune the TV to (corresponding to frequency)
+# and frequency
+# gst talks about "norm" and "channel"
+# and frequency
+# apps (and flumotion) talk about "TV Norm" and "source",
+# and channel (corresponding to frequency)
 class TVCard(VideoSource):
     step_name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
@@ -199,7 +196,7 @@ class TVCard(VideoSource):
         device = self.combobox_device.get_string()
         if not device:
             print "ERROR: no device selected"
-        d = self.workerRun('flumotion.worker.checks.video', 'checkChannels',
+        d = self.workerRun('flumotion.worker.checks.video', 'checkTVCard',
                            device)
         d.addCallback(self._queryCallback)
         d.addErrback(self._queryGstErrorErrback)
@@ -217,8 +214,6 @@ class TVCard(VideoSource):
         return options
 wizard.register_step(TVCard)
 
-
-
 class FireWire(VideoSource):
     step_name = 'Firewire'
     glade_file = 'wizard_firewire.glade'
@@ -334,8 +329,6 @@ class FireWire(VideoSource):
 
 wizard.register_step(FireWire)
 
-
-
 class Webcam(VideoSource):
     step_name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
@@ -396,7 +389,7 @@ class Webcam(VideoSource):
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
-        d = self.workerRun('flumotion.worker.checks.video', 'checkDeviceName',
+        d = self.workerRun('flumotion.worker.checks.video', 'checkWebcam',
                            device)
         d.addCallback(self._queryCallback)
         d.addErrback(self._queryGstErrorErrback)
@@ -405,8 +398,6 @@ class Webcam(VideoSource):
         
 wizard.register_step(Webcam)
 
-
-    
 class TestVideoSource(VideoSource):
     step_name = 'Test Video Source'
     glade_file = 'wizard_testsource.glade'
@@ -437,8 +428,6 @@ class TestVideoSource(VideoSource):
         return options
 wizard.register_step(TestVideoSource)
 
-
-
 class Overlay(wizard.WizardStep):
     step_name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
@@ -483,8 +472,6 @@ class Overlay(wizard.WizardStep):
         return 'Encoding'
 wizard.register_step(Overlay)
 
-
-
 class Soundcard(wizard.WizardStep):
     step_name = 'Soundcard'
     glade_file = 'wizard_soundcard.glade'
@@ -569,7 +556,7 @@ class Soundcard(wizard.WizardStep):
         
         enum = self.combobox_system.get_enum()
         device = self.combobox_device.get_string()
-        d = self.workerRun('flumotion.worker.checks.video', 'checkTracks',
+        d = self.workerRun('flumotion.worker.checks.video', 'checkMixerTracks',
                            enum.element, device)
         d.addCallback(self._queryCallback)
         d.addErrback(self._queryGstErrorErrback)
@@ -627,7 +614,6 @@ class TestAudioSource(wizard.WizardStep):
         return 'Encoding'
 wizard.register_step(TestAudioSource)
 
-
 class Encoding(wizard.WizardStep):
     step_name = 'Encoding'
     glade_file = 'wizard_encoding.glade'
@@ -700,14 +686,10 @@ class Encoding(wizard.WizardStep):
             return 'Consumption'
 wizard.register_step(Encoding)
 
-
-
 class VideoEncoder(wizard.WizardStep):
     section = 'Conversion'
 wizard.register_step(VideoEncoder)
 
-
-
 class Theora(VideoEncoder):
     step_name = 'Theora'
     glade_file = 'wizard_theora.glade'
@@ -745,8 +727,6 @@ class Theora(VideoEncoder):
     
 wizard.register_step(Theora)
 
-
-
 class Smoke(VideoEncoder):
     step_name = 'Smoke'
     glade_file = 'wizard_smoke.glade'
@@ -769,8 +749,6 @@ class Smoke(VideoEncoder):
 
 wizard.register_step(Smoke)
 
-
-
 class JPEG(VideoEncoder):
     step_name = 'JPEG'
     glade_file = 'wizard_jpeg.glade'
@@ -791,8 +769,6 @@ class JPEG(VideoEncoder):
     
 wizard.register_step(JPEG)
 
-
-
 class AudioEncoder(wizard.WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
@@ -800,8 +776,6 @@ class AudioEncoder(wizard.WizardStep):
     def get_next(self):
         return 'Consumption'
 
-
-
 # Worker?
 class Vorbis(AudioEncoder):
     glade_file = 'wizard_vorbis.glade'
@@ -836,8 +810,6 @@ class Vorbis(AudioEncoder):
         return options
 wizard.register_step(Vorbis)
 
-
-
 class Speex(AudioEncoder):
     step_name = 'Speex'
     component_type = 'speex'
@@ -857,8 +829,6 @@ class Speex(AudioEncoder):
         return options
 wizard.register_step(Speex)
 
-
-
 class Consumption(wizard.WizardStep):
     step_name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
@@ -951,8 +921,6 @@ class Consumption(wizard.WizardStep):
                 return 'Content License'
 wizard.register_step(Consumption)
 
-
-
 # XXX: If audio codec is speex, disable java applet option
 class HTTP(wizard.WizardStep):
     glade_file = 'wizard_http.glade'
@@ -977,32 +945,24 @@ class HTTP(wizard.WizardStep):
 
         return options
 
-
-    
 class HTTPBoth(HTTP):
     step_name = 'HTTP Streamer (audio & video)'
     sidebar_name = 'HTTP audio/video'
     port = configure.defaultStreamPortRange[0]
 wizard.register_step(HTTPBoth)
 
-
-                  
 class HTTPAudio(HTTP):
     step_name = 'HTTP Streamer (audio only)'
     sidebar_name = 'HTTP audio'
     port = configure.defaultStreamPortRange[1]
 wizard.register_step(HTTPAudio)
 
-
-
 class HTTPVideo(HTTP):
     step_name = 'HTTP Streamer (video only)'
     sidebar_name = 'HTTP video'
     port = configure.defaultStreamPortRange[2]
 wizard.register_step(HTTPVideo)
 
-    
-
 class Disk(wizard.WizardStep):
     glade_file = 'wizard_disk.glade'
     section = 'Consumption'
@@ -1065,29 +1025,21 @@ class Disk(wizard.WizardStep):
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
-
-
 class DiskBoth(Disk):
     step_name = 'Disk (audio & video)'
     sidebar_name = 'Disk audio/video'
 wizard.register_step(DiskBoth)
 
-
-
 class DiskAudio(Disk):
     step_name = 'Disk (audio only)'
     sidebar_name = 'Disk audio'
 wizard.register_step(DiskAudio)
 
-
-
 class DiskVideo(Disk):
     step_name = 'Disk (video only)'
     sidebar_name = 'Disk video'
 wizard.register_step(DiskVideo)
 
-
-
 class Licence(wizard.WizardStep):
     step_name = "Content License"
     glade_file = "wizard_license.glade"
@@ -1105,8 +1057,6 @@ class Licence(wizard.WizardStep):
         return 'Summary'
 wizard.register_step(Licence)
 
-
-
 class Summary(wizard.WizardStep):
     step_name = "Summary"
     glade_file = "wizard_summary.glade"
@@ -1119,7 +1069,4 @@ class Summary(wizard.WizardStep):
         self.textview_message.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
     def get_next(self):
         return
-    
 wizard.register_step(Summary)
-
-

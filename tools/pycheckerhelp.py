@@ -10,6 +10,9 @@ import gtk
 import gtk.gdk
 import gtk.glade
 
+import gst
+import gst.interfaces
+
 import pyexpat
 
 # fake out pychecker

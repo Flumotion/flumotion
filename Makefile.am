@@ -49,6 +49,7 @@ PYCHECKER_WHITELIST = \
 	    flumotion/manager/*.py 		\
 	    flumotion/service/*.py		\
 	    flumotion/worker/*.py 		\
+	    flumotion/worker/checks/*.py 	\
 	    flumotion/twisted/*.py		\
 	    flumotion/ui/*.py			\
 	    flumotion/component/*/*.py		\
@@ -58,7 +59,8 @@ PYCHECKER_WHITELIST = \
 
 PYCHECKER_BLACKLIST = \
 	flumotion/component/converters/overlay/overlay.py \
-	flumotion/component/producers/firewire/firewire.py
+	flumotion/component/producers/firewire/firewire.py \
+	flumotion/worker/checks/video.py
 
 pychecker:
 	@echo running pychecker ...

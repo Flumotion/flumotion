@@ -1,5 +1,15 @@
 2005-03-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* doc/reference/Makefile.am:
+	* tools/pycheckerhelp.py:
+	  update for checks.video
+	* flumotion/wizard/steps.py:
+	* flumotion/worker/checks/video.py:
+	  cleanup and document
+
+2005-03-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/checks/video.py:
 	* flumotion/worker/worker.py:
 	  Fix the TV card __call__ error

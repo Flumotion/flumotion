@@ -17,6 +17,7 @@ MODULE_FILES = $(shell cd $(top_srcdir) && ls		\
 	flumotion/manager/*.py				\
 	flumotion/twisted/*.py				\
 	flumotion/worker/*.py				\
+	flumotion/worker/checks/*.py			\
 	)
 
 MODULES = $(subst /,.,$(patsubst %.py,%, $(MODULE_FILES:/__init__.py=)))
