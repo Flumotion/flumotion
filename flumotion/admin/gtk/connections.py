@@ -81,6 +81,9 @@ class Connections(GladeWidget):
             self.emit('has-selection', False)
 
     def _populate_liststore(self):
+        def human_readable(state):
+            return '%s@%s:%d' % (state['user'], state['host'], state['port'])
+
         self.model = gtk.ListStore(str, str, object)
         try:
             # DSU, or as perl folks call it, a Schwartz Transform
@@ -95,9 +98,7 @@ class Connections(GladeWidget):
                 try:
                     state = parse_connection(f)
                     i = l.append()
-                    l.set_value(i, self.STR_COL,
-                                '%s:%d/%s' % (state['host'], state['port'],
-                                              state['manager']))
+                    l.set_value(i, self.STR_COL, human_readable(state))
                     l.set_value(i, self.FILE_COL, f)
                     l.set_value(i, self.STATE_COL, state)
                 except Exception, e:
@@ -111,12 +112,13 @@ class Connections(GladeWidget):
         self.model.remove(i)
 
     def get_recent_connections(self):
-        'used to get connections to add to a menu'
+        'Returns a list of (string, state) tuples of recent manager connections'
         connections = []
         m = self.model
         i = m.get_iter_first()
         while i:
-            connections.append(m.get_value(i, self.STATE_COL))
+            t = [m.get_value(i, c) for c in self.STR_COL, self.STATE_COL]
+            connections.append(t)
             i = m.iter_next(i)
         return connections
         

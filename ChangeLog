@@ -1,3 +1,25 @@
+2005-03-21  Andy Wingo  <wingo@pobox.com>
+
+	* data/glade/wizard.glade:
+	* data/glade/connection-dialog.glade: Center on parent.
+
+	* flumotion/admin/gtk/client.py
+	(Window._append_recent_connections): Show all recent connections,
+	including the current one. Use the human-readable string supplied
+	by get_recent_connections(). Limit the number of recent
+	connections to 4.
+	(Window.admin_connected_cb): Hackily repeat the new human-readable
+	code here.
+
+	* flumotion/admin/gtk/connections.py
+	(Connections.get_recent_connections): Return the human-readable
+	strings as well.
+	(Connections._populate_liststore.human_readable): New
+	string representation for connections.
+
+	* flumotion/ui/fgtk.py (FComboBox._init_enum_model): Avoid
+	deprecated gtk.TRUE.
+
 2005-03-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/config.py:

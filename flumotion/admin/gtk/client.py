@@ -202,21 +202,19 @@ class Window(log.Loggable, gobject.GObject):
                 menu.remove(w)
 
         clist = connections.Connections().get_recent_connections()
-        if len(clist) < 2:
+        if not clist:
             return
 
         def append(i):
             i.show()
             gtk.MenuShell.append(menu, i) # $%^&* pychecker
         def append_txt(c, n):
-            s = '_%d: %s:%d/%s' % (n, c['host'], c['port'], c['manager'])
-            i = gtk.MenuItem(s)
-            i.connect('activate', self.on_recent_activate, c)
+            i = gtk.MenuItem(c[0])
+            i.connect('activate', self.on_recent_activate, c[1])
             append(i)
             
         append(gtk.SeparatorMenuItem())
-        # the first one is the current one, don't show it
-        map(append_txt, clist[1:], range(1,len(clist)))
+        map(append_txt, clist[:4], range(1,len(clist[:4])+1))
 
     # UI helper functions
     def show_error_dialog(self, message, parent=None, close_on_response=True):
@@ -531,8 +529,8 @@ class Window(log.Loggable, gobject.GObject):
             self._disconnected_dialog.destroy()
             self._disconnected_dialog = None
 
-        self.window.set_title('%s:%d - Flumotion Administration'
-                              % (admin.host, admin.port))
+        self.window.set_title('%s@%s:%d - Flumotion Administration'
+                              % (admin.user, admin.host, admin.port))
 
         self.emit('connected')
 

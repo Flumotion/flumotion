@@ -142,7 +142,7 @@ class FComboBox(gtk.ComboBox):
         self.set_model(model)
         self.clear()
         cell = gtk.CellRendererText()
-        self.pack_start(cell, gtk.TRUE)
+        self.pack_start(cell, True)
         self.add_attribute(cell, 'text', 0)
         return model
 
