@@ -30,6 +30,9 @@ import zipfile
 import StringIO
 
 class Bundle:
+    """
+    A bundle of files useful to handle network caching of a set of files.
+    """
     def __init__(self, *files):
         """
         Create a new bundle.
