@@ -28,7 +28,11 @@ class Ogg(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
 
 def createComponent(config):
-    pipeline = 'oggmux name=muxer '
+    maxDelay = 500 * 1000 * 1000
+    maxPageDelay = 500 * 1000 * 1000
+    pipeline = 'oggmux name=muxer max-delay=%d max-page-delay=%d ' % (
+        maxDelay, maxPageDelay)
+
     for eater in config['source']:
         pipeline += '{ @ eater:%s @ ! queue max-size-buffers=16 } ! muxer. ' % eater
     pipeline += 'muxer.'

@@ -1,5 +1,15 @@
 2005-02-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/managers/default/planet.xml:
+	  remove debug
+	* data/glade/admin.glade:
+	  fixify glade stuff for 2.4
+	* flumotion/component/muxers/ogg.py:
+	  add a huge improvement for stream muxing stability by setting
+	  max delay and max page delay to 0.5 secs instead of 5 secs
+
+2005-02-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_registry.py:
 	  partial registry files should not have <directory> root entries
 
