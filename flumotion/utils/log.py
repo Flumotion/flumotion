@@ -32,6 +32,7 @@ Maintainer: U{Thomas Vander Stichele <thomas at apestaart dot org>}
 """
 
 import sys
+import os
 
 from flumotion.twisted import errors
 
@@ -126,9 +127,9 @@ def disableLogging():
 def addLogHandler(func):
     _log_handlers.append(func)
 
-import os
-if os.environ.has_key('FLU_DEBUG'):
-    # install a log handler that uses the value of FLU_DEBUG
-    FLU_DEBUG = os.environ['FLU_DEBUG']
-    addLogHandler(stderrHandlerLimited)
-    debug('log', "FLU_DEBUG set to %s" % FLU_DEBUG)
+def init():
+    if os.environ.has_key('FLU_DEBUG'):
+        # install a log handler that uses the value of FLU_DEBUG
+        FLU_DEBUG = os.environ['FLU_DEBUG']
+        addLogHandler(stderrHandlerLimited)
+        debug('log', "FLU_DEBUG set to %s" % FLU_DEBUG)

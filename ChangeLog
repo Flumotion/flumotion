@@ -1,6 +1,21 @@
 2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/flumotion-admin.in:
+	* bin/flumotion.in:
+	  trigger FLU_DEBUG parsing with debug.init
+	* data/glade/admin.glade:
+	  change name
+	* flumotion/gui/adminclient.py:
+	* flumotion/server/component.py:
+	* flumotion/server/controller.py:
+	* flumotion/utils/__init__.py:
+	  add flumotion.utils.log to blacklist
+	* flumotion/utils/log.py:
+	  
+
+2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-admin.in:
 	* flumotion/config/installed.py.in:
 	* flumotion/config/uninstalled.py.in:
 	  fix locations properly

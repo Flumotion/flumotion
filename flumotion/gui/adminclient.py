@@ -37,7 +37,7 @@ from flumotion.utils import log
 
 import flumotion.config
 
-class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
+class AdminInterface(log.Loggable, pb.Referenceable, gobject.GObject):
     """Lives in the admin client.
        Controller calls on us through admin.Admin.
        I can call on controller admin.Admin objects.
@@ -109,7 +109,7 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         from twisted.python.reflect import filenameToModuleName
         name = filenameToModuleName(__file__)
 
-        #self.log("rebuilding '%s'" % name)
+        self.log("rebuilding '%s'" % name)
         print("rebuilding '%s'" % name)
         rebuild(sys.modules[name])
 

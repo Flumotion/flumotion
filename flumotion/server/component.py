@@ -149,8 +149,11 @@ class ComponentView(pb.Referenceable, log.Loggable):
         """Reload modules in the component."""
         import sys
         from twisted.python.rebuild import rebuild
+        from twisted.python.reflect import filenameToModuleName
+        name = filenameToModuleName(__file__)
+
         # reload ourselves first
-        rebuild(sys.modules[__name__])
+        rebuild(sys.modules[name])
 
         # now rebuild relevant modules
         import flumotion.utils
@@ -190,7 +193,7 @@ class DirectoryProvider:
 
         return data
 
-class BaseComponent(gobject.GObject, log.Loggable, DirectoryProvider):
+class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
     """I am the base class for all Flumotion components."""
     __gsignals__ = {
         'state-changed': (gobject.SIGNAL_RUN_FIRST, None, (str, object)),
@@ -363,6 +366,7 @@ class BaseComponent(gobject.GObject, log.Loggable, DirectoryProvider):
         
     def get_element_property(self, element_name, property):
         'Gets a property of an element in the GStreamer pipeline.'
+        print dir(self)
         self.debug("%s: getting property %s of element %s" % (self.get_name(), property, element_name))
         element = self.pipeline.get_by_name(element_name)
         if not element:
