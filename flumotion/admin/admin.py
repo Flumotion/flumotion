@@ -52,14 +52,14 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     def __init__(self):
         self.__gobject_init__()
-        clientFactory = pbutil.FMClientFactory()
+        self.clientFactory = pbutil.FMClientFactory()
         self.debug("logging in to ClientFactory")
-        d = clientFactory.login(cred.Username('admin'), self,
+        d = self.clientFactory.login(cred.Username('admin'), self,
             pb.IPerspective,
             interfaces.IAdminComponent)
         d.addCallback(self._gotPerspective)
         d.addErrback(self._loginErrback)
-        self.components = {} # dict of components
+        self._components = {} # dict of components
 
     def _gotPerspective(self, perspective):
         self.debug("gotPerspective: %s" % perspective)
@@ -82,7 +82,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         
     def remote_componentAdded(self, component):
         self.debug('componentAdded %s' % component.name)
-        self.components[component.name] = component
+        self._components[component.name] = component
         self.emit('update')
         
     def remote_componentRemoved(self, component):
@@ -90,13 +90,13 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         # component will be a RemoteComponentView, so we can only use a
         # member, not a method to get the name
         self.debug('componentRemoved %s' % component.name)
-        del self.components[component.name]
+        del self._components[component.name]
         self.emit('update')
         
     def remote_initial(self, components):
         self.debug('remote_initial %s' % components)
         for component in components:
-            self.components[component.name] = component
+            self._components[component.name] = component
         self.emit('connected')
 
     def remote_shutdown(self):
@@ -141,7 +141,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addErrback(self._defaultErrback)
         # stack callbacks so that a new one only gets sent after the previous
         # one has completed
-        for name in self.components.keys():
+        for name in self._components.keys():
             d = d.addCallback(lambda result, name: self.reloadComponent(name), name)
             d.addErrback(self._defaultErrback)
         return d
@@ -177,7 +177,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.info("reloading component %s code" % name)
         self.emit('reloading', name)
         d = self.remote.callRemote('reloadComponent', name)
-        component = self.components[name]
+        component = self._components[name]
         d.addCallback(_reloaded, self, component)
         d.addErrback(self._defaultErrback)
         return d
@@ -269,6 +269,6 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     # by abstracting callers further
     # returns a dict of name -> component
     def get_components(self):
-        return self.components
+        return self._components
     
 gobject.type_register(AdminModel)

@@ -276,7 +276,7 @@ class Window(log.Loggable):
                            self.admin_connection_refused_cb, host, port)
         self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
         self.admin.connect('update', self.admin_update_cb)
-        reactor.connectTCP(host, port, self.admin.factory)
+        reactor.connectTCP(host, port, self.admin.clientFactory)
         
     def update_components(self):
         model = self.component_model
