@@ -18,9 +18,8 @@
 	* flumotion/manager/manager.py:
 	* flumotion/manager/worker.py:
 	* testsuite/tests/bundle.py:
-	  I forgot to type a reason for changing all of these, spank me.
-
-	Documentation updates. Bundle fixes. 
+	
+	Documentation updates. Bundle fixes.
 	
 2004-09-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
