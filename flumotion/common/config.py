@@ -31,7 +31,7 @@ from xml.parsers import expat
 from twisted.python import reflect 
 
 from flumotion.common.registry import registry
-from flumotion.common import log
+from flumotion.common import log, errors
 
 class ConfigError(Exception):
     pass
@@ -199,7 +199,7 @@ class FlumotionConfigXML(log.Loggable):
         try:
             defs = registry.getComponent(type)
         except KeyError:
-            raise KeyError("unknown component type: %s" % type)
+            raise errors.UnknownComponentError("unknown component type: %s" % type)
         
         properties = defs.getProperties()
 

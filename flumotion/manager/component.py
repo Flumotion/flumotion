@@ -630,8 +630,9 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         self.debug('asked to remove keycard %s on bouncer %s' % (
             keycardId, bouncerName))
         if not self.heaven.hasComponent(bouncerName):
-            self.warning('asked to remove keycard %s on bouncer %s, ' + \
-                'but no such component registered' % (keycardId, bouncerName))
+            self.warning('asked to remove keycard %s on bouncer %s' % (
+                (keycardId, bouncerName)) + \
+                'but no such component registered')
             # FIXME: return failure object ?
             return False
 
@@ -648,7 +649,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             self.warning('asked to expire keycard %s for requester %s, ' % (
                 keycardId, requesterName) +
                 'but no such component registered')
-            raise errors.NoSuchComponentError(requesterName)
+            raise errors.UnknownComponentError(requesterName)
 
         componentAvatar = self.heaven.getComponent(requesterName)
         return componentAvatar.expireKeycard(keycardId)

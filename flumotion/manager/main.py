@@ -100,7 +100,12 @@ def _initialLoadConfig(vishnu, paths):
             sys.stderr.write("%s\n" % reason)
             # bypass reactor, because sys.exit gets trapped
             os._exit(-1)
-    
+        except errors.UnknownComponentError, reason:
+            sys.stderr.write("ERROR: failed to load planet configuration '%s':\n" % path)
+            sys.stderr.write("%s\n" % reason)
+            # bypass reactor, because sys.exit gets trapped
+            os._exit(-1)
+     
 def main(args):
     # XXX: gst_init should remove all options, like gtk_init
     args = [arg for arg in args if not arg.startswith('--gst')]

@@ -56,8 +56,8 @@ class ReloadSyntaxError(pb.Error):
 class ComponentStart(pb.Error):
     "An error during starting of a component"
 
-class NoSuchComponentError(pb.Error):
-    "A given component does not exist"
+class UnknownComponentError(pb.Error):
+    "A given component or component type does not exist"
 
 class UnknownDeviceError(pb.Error):
     "The device does not exist"

@@ -28,8 +28,7 @@ start() {
 	do
 		type=`echo $line | cut -f1 -d'@'`
 		name=`echo $line | cut -f2 -d'@'`
-		startone $type $name
-		$? && RETVAL=1
+		startone $type $name || RETVAL=1
 	done
         return $RETVAL
 }
@@ -59,8 +58,7 @@ stop() {
 	do
 		type=`echo $line | cut -f1 -d'@'`
 		name=`echo $line | cut -f2 -d'@'`
-		startone $type $name
-		$? && RETVAL=1
+		stopone $type $name || RETVAL=1
 	done
 	return $RETVAL
 }

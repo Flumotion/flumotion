@@ -22,7 +22,7 @@
 
 from twisted.trial import unittest
 
-from flumotion.common import config, registry
+from flumotion.common import config, registry, errors
 
 registry.registry.addFromString("""
 <registry>
@@ -115,7 +115,8 @@ class TestConfig(unittest.TestCase):
         xml = """<planet>
             <flow><component name="unused" type="not-existing"/></flow>
             </planet>"""
-        self.assertRaises(KeyError, config.FlumotionConfigXML, None, xml)
+        self.assertRaises(errors.UnknownComponentError,
+            config.FlumotionConfigXML, None, xml)
 
         xml = '<planet><component/></planet>'
         self.assertRaises(config.ConfigError,
