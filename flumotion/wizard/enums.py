@@ -94,7 +94,7 @@ class EnumClass(object):
 VideoDevice = EnumClass('VideoDevice',
                         ('Webcam', 'TVCard', 'Firewire', 'Test'),
                         ('Web camera',
-                         'TV Card',
+                         'TV card',
                          'Firewire video',
                          'Test video source'),
                         step=('Webcam',
@@ -111,7 +111,7 @@ VideoDevice = EnumClass('VideoDevice',
                                        ('dvdec', 'gst1394src')))
 AudioDevice = EnumClass('AudioDevice',
                         ('Soundcard', 'Firewire', 'Test'),
-                        ('Sound card', 'Firewire Audio', 'Test audio source'),
+                        ('Sound card', 'Firewire audio', 'Test audio source'),
                         component_type=('soundcard',
                                         'firewire',
                                         'audiotest'))
@@ -127,7 +127,7 @@ VideoTestPattern = EnumClass('VideoTestPattern',
                              ('Bars', 'Snow', 'Black'),
                              ('SMPTE Color bars',
                               'Random (television snow)',
-                              'Totaly black'))
+                              'Totally black'))
 
 VideoTestFormat = EnumClass('VideoTestFormat', ('YUV', 'RGB'))
 
