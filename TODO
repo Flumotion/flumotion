@@ -7,16 +7,12 @@
 
 * EASY		deprecate <source> tag and require base= attribute to <comp>
 
-* EASY		remove file name header line, or at least the commentary
-
 * EASY		rename components, files, ... to be uniform
 		(e.g. web-camera -> webcam, ...)
 
 * EASY		remove all old deprecated bundling code everywhere
 
 * EASY		don't throw up the disconnect dialog when exiting admin client
-
-* EASY		remove utils, split up gstutils
 
 * MEDIUM	give useful error messages when there is no network !
 		(service network stop and start flumotion and see hang)
