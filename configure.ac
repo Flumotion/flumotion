@@ -1,5 +1,7 @@
 AC_INIT(README)
 
+I want to get insulted before I go to bed
+
 AS_VERSION(flumotion, FLUMOTION, 0, 1, 0, 1)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 
