@@ -37,7 +37,7 @@ class Streamer(gobject.GObject, component.ParseLaunchComponent):
     }
 
     kind = 'streamer'
-    pipe_template = 'fakesink signal-handoffs=1 silent=0 name=sink'
+    pipe_template = 'fakesink signal-handoffs=1 silent=1 name=sink'
     
     def __init__(self, name, sources):
         self.__gobject_init__()
