@@ -43,10 +43,12 @@ class Dispatcher:
         assert interface == pb.IPerspective
         
         log.msg('requestAvatar (%s, %s, %s)' % (avatarID, mind, interface))
+
+        # if self.controller.hasComponent(avatarID) ...
         
         p = self.controller.getPerspective(avatarID)
 
-        print "returning Avatar(%s): %s" % (avatarID, p)
+        log.msg("returning Avatar(%s): %s" % (avatarID, p))
         if not p:
             raise ValueError, "no perspective for '%s'" % avatarID
         
@@ -76,7 +78,8 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
         self.mind = mind
         
     def detached(self, mind):
-        print mind, 'detached'
+        log.msg('%r detached' % mind)
+        self.controller.removeComponent(self)
 
     def perspective_stateChanged(self, old, state):
         log.msg('%s.stateChanged %s -> %s' %
@@ -110,8 +113,9 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
         self.mind = mind
         
     def detached(self, mind):
-        print mind, 'detached'
-
+        log.msg('%r detached' % mind)
+        self.controller.removeComponent(self)
+        
     def prepareDone(self, *args):
         self.controller.componentReady(self)
 
@@ -134,32 +138,38 @@ class Controller(pb.Root):
         elif username.startswith('trans_'):
             component = TranscoderPerspective(self, username)
 
-        self.components[username] = component
+        self.addComponent(username, component)
 
         return component
 
+    def addComponent(self, name, component):
+        self.components[name] = component
+        
+    def removeComponent(self, component):
+        del self.components[component.username]
+    
     def componentReady(self, component):
         link = ['acq_johan', 'trans_johan']
         component.ready = True
         
-        print component, 'is ready'
+        log.msg('%r is ready' % component)
         for component in self.components.values():
             if component.ready == False:
                 break
         else:
             item = link[0]
             if not self.components.has_key(item):
-                print item, 'is not yet connected'
+                log.msg('%s is not yet connected' % item) 
                 return
             
             prev = self.components[link[0]]
             for item in link[1:]:
                 if not self.components.has_key(item):
-                    print item, 'is not yet connected'
+                    log.msg('%s is not yet connected' % item) 
                     return
                 curr = self.components[item]
                 
-                print 'going to connect %s with %s' % (prev, curr)
+                log.msg('going to connect %s with %s' % (prev, curr))
                 self.link(prev, curr)
                 prev = curr
 
