@@ -1,5 +1,8 @@
 2004-09-17  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/http/http.py: Implement admin-password,
+	fixes Ticket #10 
+
 	* flumotion/manager/worker.py: Make <workers> optional
 
 	* bin/flumotion-tester.in: Move imports down a little bit.

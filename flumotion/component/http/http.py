@@ -131,7 +131,9 @@ class HTTPStreamingAdminResource(resource.Resource):
     def isAuthenticated(self, request):
         if request.getClientIP() == '127.0.0.1':
             return True
-        if request.getUser() == 'fluendo' and request.getPassword() == 's3kr3t':
+        
+        if (request.getUser() == 'admin' and
+            request.getPassword() == self.parent.admin_password):
             return True
         return False
     
@@ -288,18 +290,19 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
     
     def __init__(self, streamer):
         self.logfile = None
+        self.admin_password = None
             
         streamer.connect('client-removed', self.streamer_client_removed_cb)
         self.streamer = streamer
         self.admin = HTTPStreamingAdminResource(self)
-
+        
         self.request_hash = {}
         self.auth = None
         
         self.maxclients = -1
         
         resource.Resource.__init__(self)
-
+        
     def setLogfile(self, logfile):
         self.logfile = open(logfile, 'a')
         
@@ -362,6 +365,9 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
     def setMaxClients(self, maxclients):
         self.info('setting maxclients to %d' % maxclients)
         self.maxclients = maxclients
+
+    def setAdminPassword(self, password):
+        self.admin_password = password
         
     def getChild(self, path, request):
         if path == 'stats':
@@ -730,7 +736,9 @@ def createComponent(config):
     if config.has_key('maxclients'):
         resource.setMaxClients(int(config['maxclients']))
         
-
+    if config.has_key('admin-password'):
+        resource.setAdminPassword(config['admin-password'])
+        
     # create bundlers for UI
     # FIXME: register ui types through base methods on component
     # FIXME: make it so the bundles extract in the full path

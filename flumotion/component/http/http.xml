@@ -7,6 +7,7 @@
       <property name="logfile" type="string"/>
       <property name="gst-property" type="xml" multiple="yes"/>
       <property name="auth" type="string"/>
+      <property name="admin-password" type="string"/>
       <property name="maxclients" type="int"/>
     </properties>
 <!--
