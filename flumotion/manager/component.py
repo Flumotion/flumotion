@@ -405,15 +405,35 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         cb.addErrback(self._mindErrback, errors.ReloadSyntaxError)
         return cb
 
-    def getUIEntry(self):
+    def getUIZip(self, style):
         """
-        Request the UI entry for the component's UI.
+        Request the UI zip for the component's UI in the given style.
+
         The deferred returned will receive the code to run the UI.
+
+        @type style: string
+        @param style: the UI style to get
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        self.debug('calling remote getUIEntry')
-        cb = self._mindCallRemote('getUIEntry')
+        self.debug('calling remote getUIZip(%s)' % style)
+        cb = self._mindCallRemote('getUIZip', style)
+        cb.addErrback(self._mindErrback)
+        return cb
+
+    def getUIMD5Sum(self, style):
+        """
+        Request the UI md5sum for the component's UI in the given style.
+
+        The deferred returned will receive the md5sum of the UI zip.
+
+        @type style: string
+        @param style: the UI style to get
+
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        self.debug('calling remote getUIMD5Sum(%s)' % style)
+        cb = self._mindCallRemote('getUIMD5Sum', style)
         cb.addErrback(self._mindErrback)
         return cb
     

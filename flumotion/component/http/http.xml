@@ -9,8 +9,11 @@
       <property name="auth" type="string"/>
       <property name="maxclients" type="int"/>
     </properties>
-    <files>
-      <file name="http_gui.py" type="GUI"/>
-    </files>
+<!--
+    <ui style="gtk" type="control">
+      <file source="gtk.py">
+      <file source="http.glade">
+    </ui>
+-->
   </component>
 </components>

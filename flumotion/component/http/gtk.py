@@ -3,6 +3,8 @@
 
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
+#
+# flumotion/component/http/gtk.py: admin client-side code for http
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,12 +22,16 @@
 
 import gtk
 
+
 from flumotion.common import errors
 
+### this will probably end up being shared
+### maybe rename to Gtk instead of UI ?
 class BaseUI:
-    def __init__(self, name, admin):
+    def __init__(self, name, admin, view):
         self.name = name
         self.admin = admin
+        self.view = view
         
     def propertyErrback(self, failure, window):
         failure.trap(errors.PropertyError)
@@ -49,15 +55,18 @@ class BaseUI:
         raise NotImplementedError
 
     def loadGladeFile(self, glade_file):
-        # ask the manager to get the bundle for component name
-        zipfile = self.getZipfile(self.name)
-
-        data = zipfile.readFile(glade_file)
-
-        wtree = gtk.glade.xml_new_from_buffer(data)
+        path = os.path.join(self.view.uidir, glade_file)
+        wtree = gtk.glade.XML(path)
+        return wtree
         
 class HTTPStreamerUI(BaseUI):
+    #def __init__(self, name, admin, view):
+    #    self.labels = {}
+        # FIXME: Johan, this doesn't work, BaseUI is not defined
+        #BaseUI.__init__(self, name, admin, view)
+        
     def error_dialog(self, message):
+        # FIXME: dialogize
         print 'ERROR:', message
         
     def cb_getMimeType(self, mime, label):
@@ -65,41 +74,41 @@ class HTTPStreamerUI(BaseUI):
         label.show()
 
     def setUIState(self, state):
-        print state
-        self.label_uptime.set_text(str(state['stream-uptime']))
-        self.label_mime.set_text(state['stream-mime'])
-        self.label_clients.set_text(str(state['clients-current']))
-        self.label_clients_average.set_text(str(state['clients-average']))
+        self.updateLabels(state)
+        if not self.shown:
+            self.shown = True
+            self.statistics.show_all()
+        
+    def registerLabel(self, name):
+        #widgetname = name.replace('-', '_')
+        #FIXME: make object member directly
+        widget = self.wtree.get_widget('label-' + name)
+        if widget:
+            self.labels[name] = widget
+        else:
+            print "FIXME: no widget %s" % name
+
+    def hideLabels(self):
+        for name in self.labels.keys():
+            self.labels[name].hide()
+
+    def updateLabels(self, state):
+        for name in self.labels.keys():
+            self.labels[name].set_text(state[name])
         
     def render(self):
-        def newRow(name):
-            hbox = gtk.HBox()
-            label = gtk.Label(name + ':')
-            label.show()
-            hbox.pack_start(label)
-            label = gtk.Label()
-            label.show()
-            hbox.pack_start(label)
-            hbox.show()
-            return hbox, label
-        
-        vbox = gtk.VBox()
-        hbox, self.label_mime = newRow('Mime')
-        vbox.pack_start(hbox)
-        
-        hbox, self.label_clients = newRow('Clients')
-        vbox.pack_start(hbox)
-
-        hbox, self.label_clients_average = newRow('Average Clients')
-        vbox.pack_start(hbox)
-
-        hbox, self.label_uptime = newRow('Uptime')
-        vbox.pack_start(hbox)
-
-        vbox.show()
+        self.wtree = self.loadGladeFile('http.glade')
+        self.labels = {}
+        self.statistics = self.wtree.get_widget('statistics-widget')
+        for type in ('uptime', 'mime', 'bitrate', 'totalbytes'):
+            self.registerLabel('stream-' + type)
+        for type in ('current', 'average', 'max', 'peak', 'peak-time'):
+            self.registerLabel('clients-' + type)
+        for type in ('bitrate', 'totalbytes'):
+            self.registerLabel('consumption-' + type)
 
         self.callRemote('notifyState')
-        
-        return vbox
+        self.shown = False
+        return self.statistics
 
 GUIClass = HTTPStreamerUI

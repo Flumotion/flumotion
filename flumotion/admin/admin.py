@@ -25,14 +25,16 @@ Model abstraction for admin clients.
 The model can support different views.
 """
 
+import os
 import sys
 
 import gobject
+
 from twisted.spread import pb
 from twisted.internet import error, defer
 from twisted.python import rebuild, reflect
 
-from flumotion.common import interfaces, errors
+from flumotion.common import interfaces, errors, bundle
 from flumotion.utils import log, reload
 from flumotion.utils.gstutils import gsignal
 from flumotion.twisted import pbutil
@@ -185,6 +187,77 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addErrback(self._defaultErrback)
         return d
 
+    # FIXME: this is the new method to get the UI, by getting a bundle
+    # and an entry point
+    def getUIZip(self, component, style):
+        """
+        Get the zip containing the given user interface from the manager.
+
+        @type component: string
+        @param component: name of the component to get the user interface for.
+        @type style: string
+        @param style: style of the UI to get.
+
+        @rtype: deferred
+        """
+        self.info('calling remote getUIZip %s, %s' % (component, style))
+        return self.remote.callRemote('getUIZip', component, style)
+
+    def getUIMD5Sum(self, component, style):
+        """
+        Get the md5sum of the given user interface from the manager.
+
+        @type component: string
+        @param component: name of the component to get the user interface for.
+        @type style: string
+        @param style: style of the UI to get.
+
+        @rtype: deferred
+        """
+        self.info('calling remote getUIMD5Sum %s, %s' % (component, style))
+        return self.remote.callRemote('getUIMD5Sum', component, style)
+
+    # FIXME: we probably want to return something else than the cache dir,
+    # but for now this will do
+    def getUI(self, component, style):
+        """
+        Check if the UI is current enough, and if not, update it.
+
+        @rtype: deferred
+        @rparam: deferred returning the directory where the files are.
+        """
+
+        # callback functions
+        # FIXME: check if it's ok to return either a deferred or a result    
+        def _MD5SumCallback(result, self, component, style):
+            md5sum = result
+            self.debug("got UI MD5 sum: %s" % md5sum)
+            dir = os.path.join(os.environ['HOME'], '.flumotion', 'cache', md5sum)
+            if not os.path.exists(dir):
+                d = self.getUIZip(component, style)
+                d.addErrback(self._defaultErrback)
+                d.addCallback(_ZipCallback, self, component, style)
+                return d
+            self.debug("UI is in dir %s" % dir)
+            return dir
+
+        def _ZipCallback(result, self, component, style):
+            # the result is the zip data
+            b = bundle.Bundle()
+            b.setZip(result)
+            cachedir = os.path.join(os.environ['HOME'], ".flumotion", "cache")
+            unbundler = bundle.Unbundler(cachedir)
+            dir = unbundler.unbundle(b)
+            self.debug("UI is in dir %s" % dir)
+            return dir
+
+        self.debug("getting UI MD5 sum")
+        d = self.getUIMD5Sum(component, style)
+        d.addErrback(self._defaultErrback)
+        d.addCallback(_MD5SumCallback, self, component, style)
+
+        return d
+        
     # FIXME: add a second argument to get the type of UI;
     # gtk or http for example
     def getUIEntry(self, component):

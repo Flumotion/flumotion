@@ -121,8 +121,11 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def remote_setElementProperty(self, element_name, property, value):
         self.comp.set_element_property(element_name, property, value)
 
-    def remote_getUIEntry(self):
-        return self.comp.getUIEntry()
+    def remote_getUIZip(self, style):
+        return self.comp.getUIZip(style)
+    
+    def remote_getUIMD5Sum(self, style):
+        return self.comp.getUIMD5Sum(style)
     
     def remote_play(self):
         self.comp.play()

@@ -206,13 +206,22 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             self.warning(str(exception))
             raise
 
-    def perspective_getUIEntry(self, component_name):
+    def perspective_getUIZip(self, component_name, style):
         component = self.componentheaven.getComponent(component_name)
         try:
-            return component.getUIEntry()
+            return component.getUIZip(style)
         except Exception, e:
             self.warning(str(e))
             raise
+
+    def perspective_getUIMD5Sum(self, component_name, style):
+        component = self.componentheaven.getComponent(component_name)
+        try:
+            return component.getUIMD5Sum(style)
+        except Exception, e:
+            self.warning(str(e))
+            raise
+
 
     def perspective_reloadComponent(self, component_name):
         """Reload modules in the given component."""

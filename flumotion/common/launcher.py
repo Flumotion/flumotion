@@ -82,12 +82,12 @@ class Launcher(log.Loggable):
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
         
     def start_manager(self):
-        self.debug('starting manager')
+        self.debug('starting manager from pid %d' % os.getpid())
         
         pid = os.fork()
         if pid:
             # the main thread
-            self.debug('child started with pid %d' % pid)
+            self.debug('manager child started with pid %d' % pid)
             self.manager_pid = pid
             return
         
@@ -110,8 +110,9 @@ class Launcher(log.Loggable):
         raise SystemExit
         
     def stop_manager(self):
-        self.debug("stop_manager")
+        self.debug("stop_manager called in pid %d, stopping" % os.getpid())
         if not self.manager_pid:
+            self.debug("stop_manager called from something else than manager")
             return
         
         filename = '/tmp/flumotion.%d' % self.manager_pid
@@ -133,6 +134,7 @@ class Launcher(log.Loggable):
 
         reactor.run() # don't fucking dare setting it to False.
 
+        self.debug("reactor.run() done")
         self.stop_manager()
 
     def threads_init(self):
@@ -207,7 +209,7 @@ def run_launcher(args):
         if not gstutils.is_port_free(options.port):
             launcher.error('Manager is already started')
         else:
-            launcher.start_manager(options.verbose)
+            launcher.start_manager()
 
     try:
         launcher.load_config(args[2])

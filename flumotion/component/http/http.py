@@ -33,6 +33,7 @@ from twisted.internet import reactor
 from flumotion.component import component
 from flumotion.common import interfaces
 from flumotion.common import auth
+from flumotion.common import bundle
 from flumotion.utils import gstutils, log
 from flumotion.utils.gstutils import gsignal
 
@@ -276,6 +277,7 @@ class Stats:
         return s
     
  
+### the Twisted resource that handles the base URL
 class HTTPStreamingResource(resource.Resource, log.Loggable):
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
 
@@ -494,6 +496,7 @@ class HTTPView(component.ComponentView):
     def comp_ui_state_changed_cb(self, comp):
         self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
 
+### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     # this object is given to the HTTPView as comp
     logCategory = 'cons-http'
@@ -519,6 +522,19 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.component_name
+
+    # UI code
+    ### FIXME: abstract this away nicely to the base class of components
+    def getUIMD5Sum(self, style):
+        if not style == 'gtk':
+            raise
+        return self.gtk.bundle().md5sum
+
+    def getUIZip(self, style):
+        if not style == 'gtk':
+            raise
+        return self.gtk.bundle().zip
+
 
     def getMaxClients(self):
         return self.resource.maxAllowedClients()
@@ -615,6 +631,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         
 gobject.type_register(MultifdSinkStreamer)
 
+### create the component based on the config file
 def createComponent(config):
     reactor.debug = True
 
@@ -644,6 +661,17 @@ def createComponent(config):
     if config.has_key('maxclients'):
         resource.setMaxClients(int(config['maxclients']))
         
+
+    # create bundlers for UI
+    # FIXME: register ui types through base methods on component
+    # FIXME: make it so the bundles extract in the full path
+    # for later when we transmit everything they depend on
+    component.gtk = bundle.Bundler()
+    # where do we live ?
+    dir = os.path.split(__file__)[0]
+    component.gtk.add(os.path.join(dir, 'gtk.py'))
+    component.gtk.add(os.path.join(dir, 'http.glade'))
+    
     component.debug('Listening on %d' % port)
     try:
         reactor.listenTCP(port, factory)

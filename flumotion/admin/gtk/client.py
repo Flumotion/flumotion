@@ -178,7 +178,10 @@ class Window(log.Loggable):
             klass = namespace.get('GUIClass')
 
             if klass:
-                instance = klass(name, self.admin)
+                # instantiate the GUIClass, giving ourself as the first argument
+                # FIXME: we cheat by giving the view as second for now,
+                # but let's decide for either view or model
+                instance = klass(name, self.admin, self)
                 sub = instance.render()
 
         old = self.hpaned.get_child2()
@@ -186,6 +189,11 @@ class Window(log.Loggable):
         
         if not sub:
             sub = gtk.Label('%s does not have a UI yet' % name)
+        else:
+            parent = sub.get_parent()
+            if parent:
+                parent.remove(sub)
+                
             
         self.hpaned.add2(sub)
         sub.show()
@@ -221,11 +229,20 @@ class Window(log.Loggable):
             self.warning('Select a component')
             return
 
-        def cb_gotUI(data):
+        def cb_gotUI(dir):
+            self.debug("Got the UI, lives in %s" % dir)
+            self.uidir = dir
+            path = os.path.join(dir, 'gtk.py')
+            handle = open(path, "r")
+            data = handle.read()
+            handle.close()
             self.show_component(name, data)
             
-        cb = self.admin.getUIEntry(name)
-        cb.addCallback(cb_gotUI)
+        # FIXME: old code, looking for replacement with bundles
+        #cb = self.admin.getUIEntry(name)
+        #cb.addCallback(cb_gotUI)
+        d = self.admin.getUI(name, 'gtk')
+        d.addCallback(cb_gotUI)
 
     def admin_connected_cb(self, admin):
         self.update_components()

@@ -81,7 +81,7 @@ class BundledFile:
      
 class Bundle:
     """
-    The bundle, which is a zip file with md5sum.
+    I am a bundle of files, represented by a zip file and md5sum.
     """
     def __init__(self):
         self.zip = None
@@ -115,7 +115,7 @@ class Unbundler:
         @type bundle: L{flumotion.common.bundle.Bundle}
 
         @rtype: string
-        @rparam: the full path to the directory where it was unpacked
+        @returns: the full path to the directory where it was unpacked
         """
         md5sum = bundle.md5sum
         dir = os.path.join(self._undir, md5sum)
@@ -142,7 +142,7 @@ class Unbundler:
         
 class Bundler:
     """
-    A bundle of files useful to handle network caching of a set of files.
+    I bundle files into a bundle so they can be cached remotely easily.
     """
     def __init__(self):
         """
@@ -157,9 +157,10 @@ class Bundler:
         
         @param source: the path to the file to add to the bundle.
         @param destination: a relative path to store this file in in the bundle.
+        If unspecified, this will be stored in the top level.
         """
-        if source == None:
-            source = destination
+        if destination == None:
+            destination = os.path.split(source)[1]
         self._files[source] = BundledFile(source, destination)
                 
     def bundle(self):
