@@ -213,12 +213,13 @@ def argRepr(args=(), kwargs={}, max=-1):
 def _listRecursively(path):
     """
     I'm similar to os.listdir, but I work recursively and only return
-    directories containing __init__.py
+    directories containing python code.
     
     @param path: the path
     @type  path: string
     """
     retval = []
+    # files are never returned, only directories
     if not os.path.isdir(path):
         return retval
 
@@ -228,9 +229,11 @@ def _listRecursively(path):
         pass
     else:
         for f in files:
+            # this only adds directories since files are not returned
             retval += _listRecursively(os.path.join(path, f))
 
-    if os.path.exists(os.path.join(path, '__init__.py')):
+    import glob
+    if glob.glob(os.path.join(path, '*.py*')):
         retval.append(path)
             
     return retval
@@ -289,6 +292,9 @@ def registerPackagePath(packagePath):
         return
 
     # Since the list is sorted, the top module is the first item
+    log.log('bundle', 'packagePath %s has packageNames %r' % (
+        packagePath, packageNames)) 
+
     toplevelName = packageNames[0]
     
     # Append the bundle's absolute path to the __path__ of

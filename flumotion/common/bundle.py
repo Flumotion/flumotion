@@ -242,8 +242,8 @@ class BundlerBasket:
         # add the file to the bundle and register
         location = bundler.add(source, destination)
         if self._files.has_key(location):
-            raise Exception("Bundler %s already has file %s" % (
-                bundleName, location))
+            raise Exception("Cannot add %s to bundle %s, already in %s" % (
+                location, bundleName, self._files[location]))
         self._files[location] = bundleName
 
         # add possible imports from this file

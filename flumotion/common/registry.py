@@ -554,7 +554,12 @@ class RegistryParser(log.Loggable):
         return self._directories[name]
 
     def addDirectory(self, directory):
-        self._directories[directory.getFilename()] = directory
+        """
+        Add a registry path object to the parser.
+
+        @type directory: {RegistryDirectory}
+        """
+        self._directories[directory.getPath()] = directory
 
     def _parseRoot(self, node):
         try:
@@ -585,7 +590,7 @@ class RegistryParser(log.Loggable):
         for child in self._getChildNodes(node, 'directories'):
             if child.nodeName == 'directory':
                 directory = self._parseDirectory(child)
-                directories[directory.getFilename()] = directory
+                directories[directory.getPath()] = directory
             else:
                 raise XmlParserError("unexpected node: %s" % child)
 
@@ -603,17 +608,17 @@ class RegistryParser(log.Loggable):
 # FIXME: filename -> path
 class RegistryDirectory:
     """
-    I represent a directory under the registry path.
+    I represent a directory under a registry path.
     """
-    def __init__(self, filename):
-        self._filename = filename
-        self._files = self._getFileList(self._filename)
+    def __init__(self, path):
+        self._path = path
+        self._files = self._getFileList(self._path)
         
     def _getFileList(self, root):
         """
         Get all files ending in .xml from all directories under the given root.
 
-        @type root: string
+        @type  root: string
         @param root: the root directory under which to search
         
         @returns: a list of .xml files, relative to the given root directory
@@ -646,10 +651,14 @@ class RegistryDirectory:
         return max(map(_getMTime, self._files))
 
     def getFiles(self):
+        """
+        Return a list of all .xml registry files underneath this registry
+        path.
+        """
         return self._files
 
-    def getFilename(self):
-        return self._filename
+    def getPath(self):
+        return self._path
     
 class ComponentRegistry(log.Loggable):
     """Registry, this is normally not instantiated."""
@@ -670,25 +679,35 @@ class ComponentRegistry(log.Loggable):
     def addFromString(self, string):
         self.addFile('<string>', string)
         
-    def addDirectory(self, filename, force=False):
-        if not os.path.exists(filename):
+    def addRegistryPath(self, path, force=False):
+        """
+        Add a registry path to this registry.
+
+        If force is False, the registry path will only be re-scanned
+        if the directory has been modified since the last scan.
+        If force is True, then the registry path will be parsed regardless
+        of the modification time.
+        """
+        if not os.path.exists(path):
             return
 
-        common.registerPackagePath(filename)
-
-        directory = self._parser._directories.get(filename, None)
+        directory = self._parser._directories.get(path, None)
         if not force:
+            # if directory is watched in the registry, and it hasn't been
+            # updated, everything's fine
             if directory \
                 and directory.lastModified() < _getMTime(self.filename):
                 return
         
-        self.debug('Adding directory: %s' % filename)
-        directory = RegistryDirectory(filename)
-        files = directory.getFiles()
+        # registry path was either not watched or updated, or a force was
+        # asked, so reparse
+        self.info('Parsing registry path %s' % path)
+        registryPath = RegistryDirectory(path)
+        files = registryPath.getFiles()
         self.debug('Found %d files' % len(files))
         map(self.addFile, files)
         
-        self._parser.addDirectory(directory)
+        self._parser.addDirectory(registryPath)
         
     def isEmpty(self):
         return len(self._parser._components) == 0
@@ -777,8 +796,8 @@ class ComponentRegistry(log.Loggable):
                 for dir in dirs:
                     w(8, '<directory name="%s">' % dir.getName())
                     for filename in dir.getFiles():
-                        w(10, '<filename location="%s" relative="%s"/>' % (filename.getLocation(),
-                                                                           filename.getRelative()))
+                        w(10, '<filename location="%s" relative="%s"/>' % (
+                            filename.getLocation(), filename.getRelative()))
                     w(8, '</directory>')
                 w(6, '</directories>')
                 
@@ -791,7 +810,7 @@ class ComponentRegistry(log.Loggable):
         if directories:
             w(2, '<directories>')
             for d in directories:
-                w(4, '<directory filename="%s"/>' % d.getFilename())
+                w(4, '<directory filename="%s"/>' % d.getPath())
             w(2, '</directories>')
         
         w(0, '</registry>')
@@ -826,7 +845,8 @@ class ComponentRegistry(log.Loggable):
                 os.makedirs(dir)
             except OSError, e:
                 if e.errno == errno.EACCES:
-                    self.error('Registry directory %s could not be created !' % dir)
+                    self.error('Registry directory %s could not be created !' %
+                        dir)
                 else:
                     raise
                 
@@ -837,41 +857,45 @@ class ComponentRegistry(log.Loggable):
             self.dump(fd)
         except IOError, e:
             if e.errno == errno.EACCES:
-                self.error('Registry file %s could not be created !' % self.filename)
+                self.error('Registry file %s could not be created !' %
+                    self.filename)
             else:
                 raise
 
     def verify(self):
-        path_directories = []
-        path_directories.append(os.path.join(configure.pythondir,
-                                             'flumotion'))
-    
+        """
+        Verify if the registry is uptodate and rebuild if it is not.
+        """
+        force = False # set to True if needs rebuilding
+        
+        # construct a list of all paths to scan for registry .xml files
+        registryPaths = [os.path.join(configure.pythondir, 'flumotion'), ]
         if os.environ.has_key('FLU_REGISTRY_PATH'):
             paths = os.environ['FLU_REGISTRY_PATH']
-            path_directories += paths.split(':')
+            registryPaths += paths.split(':')
         
-        self.debug('scanning %r for registry entries' % path_directories)
-        force = False
-        registry_directories = [dir.getFilename()
-                                  for dir in self.getDirectories()]
+        self.debug('registry paths: %s' % ", ".join(registryPaths))
 
-        # A path was removed from the environment variable
-        for directory in registry_directories:
-            if not directory in path_directories:
-                force = True
-            
-        # A path was added from the environment variable
-        for directory in path_directories:
-            if not directory in registry_directories:
-                force = True
+        # get the list of all paths used to construct the old registry
+        oldRegistryPaths = [dir.getPath()
+                                  for dir in self.getDirectories()]
+        self.debug('previously scanned registry paths: %s' % 
+            ", ".join(oldRegistryPaths))
+
+        # if the lists are not equal, then a path was added or removed and
+        # we need to rebuild
+        registryPaths.sort()
+        oldRegistryPaths.sort()
+        if registryPaths != oldRegistryPaths:
+            self.info('Rescanning registry paths')
+            force = True
 
         if force:
             self.clean()
         
-        for directory in path_directories:
-            self.addDirectory(directory, force)
-        
+        for directory in registryPaths:
+            self.addRegistryPath(directory, force)
+
         self.save(force)
 
 registry = ComponentRegistry()
-

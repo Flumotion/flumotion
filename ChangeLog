@@ -1,5 +1,23 @@
 2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	  more error handling
+	* flumotion/common/bundle.py:
+	  some debug
+	* flumotion/common/common.py:
+	  return ALL possible candidates for packages, not just the
+	  directories that hold an __init__.  This way a bundle depending
+	  on another bundle having the package's __init__ can have imports
+	  for modules in that directory.
+	* flumotion/common/registry.py:
+	  clean up, document, rename.  Don't register REGISTRY_PATHs as
+	  package paths.
+	* flumotion/component/effects/colorbalance/colorbalance.xml:
+	* flumotion/component/producers/webcam/admin_gtk.py:
+	  some cleanups and fixes
+
+2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	* flumotion/component/Makefile.am:
 	* flumotion/component/effects/Makefile.am:

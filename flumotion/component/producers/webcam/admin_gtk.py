@@ -22,11 +22,10 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component.base.admin_gtk import BaseAdminGtk
+from flumotion.component.effects.colorbalance.admin_gtk import ColorbalanceAdminGtkNode
 
 class WebcamAdminGtk(BaseAdminGtk):
     def setup(self):
-        from flumotion.component.effects.colorbalance.admin_gtk \
-            import ColorbalanceAdminGtkNode
         self._nodes = {}
         colorbalance = ColorbalanceAdminGtkNode(self.name, self.admin,
             self.view, 'outputColorbalance')

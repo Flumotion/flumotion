@@ -195,8 +195,19 @@ class Window(log.Loggable, gobject.GObject):
                 where = "<entry file>"
                 if e.filename:
                     where = e.filename
-                msg = "Syntax Error at %s:%d while importing %s" % (
+                msg = "Syntax Error at %s:%d while executing %s" % (
                     where, e.lineno, filepath)
+                self.warning(msg)
+                raise errors.EntrySyntaxError(msg)
+            except NameError, e:
+                # the syntax error can happen in the entry file, or any import
+                msg = "NameError while executing %s: %s" % (filepath,
+                    " ".join(e.args))
+                self.warning(msg)
+                raise errors.EntrySyntaxError(msg)
+            except ImportError, e:
+                msg = "ImportError while executing %s: %s" % (filepath,
+                    " ".join(e.args))
                 self.warning(msg)
                 raise errors.EntrySyntaxError(msg)
 
