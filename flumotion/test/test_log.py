@@ -20,11 +20,6 @@ from twisted.trial import unittest
 from flumotion.common import errors
 from flumotion.utils import log
 
-# XXX: Another test is installing log handlers,
-#      find out which one and move log.reset in its
-#      tearDown method
-log.reset()
-
 class LogTester(log.Loggable):
     logCategory = 'testlog'
 
@@ -36,6 +31,8 @@ class TestLog(unittest.TestCase):
     def setUp(self):
         self.category = self.level = self.message = None
         self.tester = LogTester()
+        # we want to remove the default handler so it doesn't show up stuff
+        log.reset()
 
     # just test for parsing semi- or non-valid FLU_DEBUG variables
     def testFluDebug(self):

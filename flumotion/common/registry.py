@@ -22,7 +22,7 @@ from xml.dom import minidom, Node
 
 from twisted.python import reflect
 
-from flumotion import config
+from flumotion.configure import configure
 from flumotion.utils import log
 
 __all__ = ['ComponentRegistry', 'registry']
@@ -282,7 +282,7 @@ class RegistryXmlParser(log.Loggable):
 class ComponentRegistry(log.Loggable):
     """Registry, this is normally not instantiated."""
     logCategory = 'registry'
-    filename = os.path.join(config.registrydir, 'components.xml')
+    filename = os.path.join(configure.registrydir, 'components.xml')
     def __init__(self):
         self.components = {}
 

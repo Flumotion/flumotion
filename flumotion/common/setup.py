@@ -15,9 +15,6 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-# First, setup environment variables, the registry depends on this
-import flumotion.config.setup
-
 import flumotion.common.registry
 import flumotion.utils.log
 

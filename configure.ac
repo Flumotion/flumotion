@@ -79,9 +79,9 @@ flumotion/component/passwd/Makefile
 flumotion/component/soundcard/Makefile
 flumotion/component/videotest/Makefile
 flumotion/component/webcam/Makefile
-flumotion/config/Makefile
-flumotion/config/installed.py
-flumotion/config/uninstalled.py
+flumotion/configure/Makefile
+flumotion/configure/installed.py
+flumotion/configure/uninstalled.py
 flumotion/manager/Makefile
 flumotion/test/Makefile
 flumotion/tester/Makefile

@@ -1,10 +1,12 @@
 INCLUDES = $(PYTHON_INCLUDES)
 
-flumotiondir = $(libdir)/flumotion/python/flumotion/config
+flumotiondir = $(libdir)/flumotion/python/flumotion/configure
 
 flumotion_PYTHON = \
 	__init__.py \
+	configure.py \
 	installed.py
+
 noinst_PYTHON = uninstalled.py
 
 TAGS_FILES = installed.py.in uninstalled.py.in

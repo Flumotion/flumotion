@@ -9,7 +9,8 @@ pypath=$(top_srcdir):@PYGTK_DIR@:$(PYTHONPATH)
 MODULE_FILES = \
 	flumotion/admin/__init__.py		\
 	flumotion/admin/admin.py		\
-	flumotion/config/__init__.py		\
+	flumotion/configure/__init__.py		\
+	flumotion/common/__init__.py		\
 	flumotion/common/auth.py		\
         flumotion/common/bundle.py		\
         flumotion/common/common.py		\
@@ -24,6 +25,8 @@ MODULE_FILES = \
 	flumotion/component/file/file.py	\
 	flumotion/component/http/http.py	\
 	flumotion/component/passwd/passwd.py	\
+	flumotion/configure/__init__.py		\
+	flumotion/configure/configure.py	\
 	flumotion/manager/admin.py		\
 	flumotion/manager/component.py		\
 	flumotion/manager/manager.py		\

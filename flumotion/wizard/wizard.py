@@ -22,7 +22,7 @@ import gtk
 import gtk.gdk
 import gtk.glade
 
-from flumotion.config import gladedir
+from flumotion.configure import configure
 from flumotion.utils import log
 from flumotion.wizard import enums
 
@@ -205,7 +205,7 @@ class WizardStep(object, log.Loggable):
         return '<WizardStep object %s>' % self.step_name
     
     def load_glade(self):
-        glade_filename = os.path.join(gladedir, self.glade_file)
+        glade_filename = os.path.join(configure.gladedir, self.glade_file)
         
         self.wtree = gtk.glade.XML(glade_filename,
                                    typedict=WidgetMapping())
@@ -291,7 +291,7 @@ class Wizard:
     sidebar_active_color = gtk.gdk.color_parse('#79abed')
 
     def __init__(self):
-        self.wtree = gtk.glade.XML(os.path.join(gladedir, 'wizard.glade'))
+        self.wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'wizard.glade'))
         for widget in self.wtree.get_widget_prefix(''):
             setattr(self, widget.get_name(), widget)
         self.wtree.signal_autoconnect(self)

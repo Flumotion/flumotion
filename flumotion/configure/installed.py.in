@@ -1,7 +1,7 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_flumotion_config -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/test/test_flumotion_config.py: test for flumotion.config
+# flumotion/configure/installed.py: configure-time options for installed use
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -15,19 +15,15 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from twisted.trial import unittest
+import os
 
-import flumotion.config
-
-class TestConfig(unittest.TestCase):
-    def testVariables(self):
-        assert hasattr(flumotion.config, 'datadir')
-        assert isinstance(flumotion.config.datadir, str)
-        assert hasattr(flumotion.config, 'gladedir')
-        assert isinstance(flumotion.config.gladedir, str)
-
-    def testUninstalled(self):
-        assert flumotion.config.isinstalled == 0
-
-if __name__ == '__main__':
-     unittest.main()
+def get():
+    return {
+        'isinstalled': True,
+        'configdir':   os.path.join('@SYSCONFDIR@', 'flumotion'),
+        'gladedir':    os.path.join('@DATADIR@', 'flumotion', 'glade'),
+        'imagedir':    os.path.join('@DATADIR@', 'flumotion', 'image'),
+        'pythondir':   os.path.join('@DATADIR@', 'flumotion'),
+        'registrydir': os.path.join(os.environ['HOME'], '.flumotion'),
+        'version':     '@VERSION@',
+    }

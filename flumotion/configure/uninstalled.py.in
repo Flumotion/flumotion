@@ -1,7 +1,7 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_flumotion_config -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/config/installed.py: compile-time configuration for installed use
+# flumotion/configure/uninstalled.py: configure-time options for uninstalled
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -18,13 +18,17 @@
 import os
 
 def get():
+    # where am I on the disk ?
+    __thisdir = os.path.dirname(os.path.abspath(__file__))
+    # toplevel dir
+    __toplevel = os.path.normpath(os.path.join(__thisdir, '..', '..'))
+
     return {
-        'isinstalled': 1,
-        'configdir':   os.path.join('@SYSCONFDIR@', 'flumotion'),
-        'datadir':     os.path.join('@DATADIR@', 'flumotion'),
-        'gladedir':    os.path.join('@DATADIR@', 'flumotion', 'glade'),
-        'imagedir':    os.path.join('@DATADIR@', 'flumotion', 'image'),
-        'pythondir':   os.path.join('@DATADIR@', 'flumotion'),
-        'registrydir': os.path.join(os.environ['HOME'], '.flumotion'),
+        'isinstalled': False,
+        'configdir':   os.path.join(__toplevel, 'conf'),
+        'gladedir':    os.path.join(__toplevel, 'data', 'glade'),
+        'imagedir':    os.path.join(__toplevel, 'data', 'image'),
+        'pythondir':   os.path.join(__toplevel),
+        'registrydir': os.path.join(__toplevel, 'data', 'registry'),
         'version':     '@VERSION@',
     }

@@ -1,3 +1,29 @@
+2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* doc/reference/Makefile.am:
+	* flumotion/Makefile.am:
+	* flumotion/admin/gtk/spyglass.py:
+	* flumotion/admin/gtk/videotest.py:
+	* flumotion/common/registry.py:
+	* flumotion/common/setup.py:
+	* flumotion/config/Makefile.am:
+	* flumotion/config/__init__.py:
+	* flumotion/config/installed.py.in:
+	* flumotion/config/setup.py:
+	* flumotion/config/uninstalled.py.in:
+	* flumotion/configure/Makefile.am:
+	* flumotion/configure/__init__.py:
+	* flumotion/configure/configure.py:
+	* flumotion/configure/installed.py.in:
+	* flumotion/configure/uninstalled.py.in:
+	* flumotion/manager/main.py:
+	* flumotion/test/test_configure.py:
+	* flumotion/test/test_flumotion_config.py:
+	* flumotion/test/test_log.py:
+	* flumotion/wizard/wizard.py:
+	  put all configure-time stuff in flumotion.configure package
+
 2004-10-13  Johan Dahlin  <johan@gnome.org>
 
 	* Makefile.am (test): New target

@@ -2,7 +2,7 @@ SUBDIRS = \
 	admin \
 	common \
 	component \
-	config \
+	configure \
 	manager \
 	test \
 	tester \
