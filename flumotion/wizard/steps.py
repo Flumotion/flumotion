@@ -30,7 +30,7 @@ from flumotion.wizard import wizard
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, Enum, EnumClass, EnumMetaClass, \
      LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
-     SoundcardChannels, SoundcardSource, SoundcardAlsaDevice, SoundcardOSSDevice, \
+     SoundcardChannels, SoundcardSystem, SoundcardAlsaDevice, SoundcardOSSDevice, \
      SoundcardInput, SoundcardSamplerate, TVCardDevice, TVCardSignal, \
      VideoDevice, VideoTestFormat, VideoTestPattern
 
@@ -472,8 +472,9 @@ class Soundcard(wizard.WizardStep):
     block_update = False
 
     def on_combobox_system_changed(self, combo):
-        self.update_devices()
-        self.update_inputs()
+        if not self.block_update:
+            self.update_devices()
+            self.update_inputs()
 
     def on_combobox_device_changed(self, combo):
         self.update_inputs()
@@ -484,11 +485,13 @@ class Soundcard(wizard.WizardStep):
         self.update_inputs()
 
     def before_show(self):
-        self.clear_combos()
-
+        # block updates, because populating a shown combobox will of course
+        # trigger the callback
         self.block_update = True
-        self.combobox_system.set_enum(SoundcardSource)
+        self.combobox_system.set_enum(SoundcardSystem)
         self.block_update = False
+        
+        self.clear_combos()
         
         self.update_devices()
         self.update_inputs()
@@ -518,9 +521,9 @@ class Soundcard(wizard.WizardStep):
     def update_devices(self):
         self.block_update = True
         enum = self.combobox_system.get_enum()
-        if enum == SoundcardSource.Alsa:
+        if enum == SoundcardSystem.Alsa:
             self.combobox_device.set_enum(SoundcardAlsaDevice)
-        elif enum == SoundcardSource.OSS:
+        elif enum == SoundcardSystem.OSS:
             self.combobox_device.set_enum(SoundcardOSSDevice)
         else:
             raise AssertionError

@@ -77,6 +77,10 @@ class WizardComboBox(gtk.ComboBox):
             return self.get_value()
     
     def set_enum(self, enum_class, value_filter=()):
+        """
+        Set the given enum_class on the combobox.
+        This also sets the combobox to the first enum value.
+        """
         model = self.get_model()
         model.clear()
         for enum in enum_class:

@@ -1,5 +1,14 @@
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_soundcard.glade:
+	  fix typo
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	  block updates when asked.  fixes #98
+
+2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/wizard.py:
 	  change quit to apply, fixes #71
 
