@@ -1,5 +1,11 @@
 2004-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/utils/log.py:
+	  allow FLU_DEBUG env var to influence debugging, still needs
+	  category and level filtering implementation
+
+2004-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	  require latest release of pygtk
 	* flumotion/server/Makefile.am:

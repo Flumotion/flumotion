@@ -22,10 +22,20 @@ import sys
 
 from flumotion.twisted import errors
 
+# environment variables controlling levels for each category
+global FLU_DEBUG
+
 _log_handlers = []
 
 def stderrHandler(category, type, message):
-    sys.stderr.write('[%s] %s %s\n' % (category, type, message))
+    sys.stderr.write('[%s:%s] %s\n' % (category, type, message))
+    sys.stderr.flush()
+
+def stderrHandlerLimited(category, type, message):
+    'used when FLU_DEBUG is set; uses FLU_DEBUG to limit on category'
+    # FIXME: we should parse FLU_DEBUG into a hash so we can look up
+    # if the given category matches  
+    sys.stderr.write('[%s:%s] %s\n' % (category, type, message))
     sys.stderr.flush()
 
 def log(category, type, message):
@@ -34,6 +44,9 @@ def log(category, type, message):
     for handler in _log_handlers:
         handler(category, type, message)
     
+def debug(cat, *args):
+    log(cat, 'DEBUG', ' '.join(args))
+
 def msg(cat, *args):
     log(cat, 'INFO', ' '.join(args))
 
@@ -59,3 +72,9 @@ def disableLogging():
 def addLogHandler(func):
     _log_handlers.append(func)
 
+import os
+if os.environ.has_key('FLU_DEBUG'):
+    # install a log handler that uses the value of FLU_DEBUG
+    FLU_DEBUG = os.environ['FLU_DEBUG']
+    addLogHandler(stderrHandlerLimited)
+    debug('log', "FLU_DEBUG set to %s" % FLU_DEBUG)
