@@ -1,0 +1,67 @@
+Computer johan
+======================
+
+controller
+
+Computer thomas
+======================
+
+producer --controller=johan
+         --name=webcam
+         --pipeline="v4lsrc device=/dev/video0"
+
+producer --controller=johan 
+         --name=testsrc
+         --pipeline="videotestsrc"
+
+Computer encoder-host
+======================
+
+converter --controller=johan 
+          --name=webcam-jpeg
+          --source=webcam
+          --pipeline="ffmpegcolorspace ! jpegenc quality=40"
+
+converter --controller=johan
+          --name=webcam-mpeg
+          --source=webcam
+          --pipeline="mplex ! mpeg2enc"
+
+converter --controller=johan 
+          --name=webcam+videotestsrc
+          --source=webcam,testsrc
+          --pipeline="webcam. ! smpte testsrc. ! smpte ! ffmpegcolorspace ! jpegenc quality=40"
+
+Computer streamer-host
+======================
+
+streamer --controller=johan
+         --source=webcam-jpeg
+	 --protocol=http
+         --port=8804
+
+streamer --controller=johan
+         --source=webcam-mpeg
+         --protocol=rtp
+         --port=8805
+
+* components should not be required to start up in any particular order
+* logic should only be per device, not in the controller
+
+producer methods
+   listen (host, port) 
+
+converter methods
+   start (source_host, source_port
+          listen_host, listen_port)
+
+streamer methods
+   connect (host, port)
+
+common methods
+   register  -- register the component
+     returns, dict with information:
+        controller_ip = ip number used to connect to the controller
+
+   prepare   -- do as much as possible without playing
+    
