@@ -269,6 +269,7 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
         cb.addErrback(self._mindErrback, (errors.ReloadSyntaxError, ))
 
     def getUIEntry(self):
+        self.debug('calling remote getUIEntry')
         cb = self._mindCallRemote('getUIEntry')
         cb.addErrback(self.cb_checkOther)
         return cb

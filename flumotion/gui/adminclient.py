@@ -21,116 +21,20 @@
 import os
 import sys
 
-import gobject
 import gst
+from gtk import gdk
 import gtk
 import gtk.glade
-
 from twisted.internet import reactor
-from twisted.internet import error
-from twisted.spread import pb
 
-from flumotion.twisted import errors, pbutil
+from flumotion import config
+from flumotion.gui.admininterface import AdminInterface
 from flumotion.server import admin   # Register types
-from flumotion.server import interfaces
+from flumotion.twisted import errors
 from flumotion.utils import log
 
-import flumotion.config
-
-class AdminInterface(log.Loggable, pb.Referenceable, gobject.GObject):
-    """Lives in the admin client.
-       Controller calls on us through admin.Admin.
-       I can call on controller admin.Admin objects.
-    """
-    __gsignals__ = {
-        'connected' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
-        'connection-refused' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
-        'update'    : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (object,))
-    }
-    logCategory = 'adminclient'
-
-    def __init__(self):
-        self.__gobject_init__()
-        self.factory = pbutil.FMClientFactory()
-        self.debug("logging in to ClientFactory")
-        cb = self.factory.login(pbutil.Username('admin'), self,
-                                pb.IPerspective,
-                                interfaces.IAdminComponent)
-        cb.addCallback(self._gotPerspective)
-        cb.addErrback(self._gotError)
-
-    def _gotPerspective(self, perspective):
-        self.debug("gotPerspective: %s" % perspective)
-        self.remote = perspective
-
-    def _gotError(self, failure):
-        r = failure.trap(error.ConnectionRefusedError)
-        self.debug("emitting connection-refused")
-        self.emit('connection-refused')
-        self.debug("emitted connection-refused")
-
-    def remote_log(self, category, type, message):
-        self.log('remote: %s: %s: %s' % (type, category, message))
-        
-    def remote_componentAdded(self, component):
-        self.debug('componentAdded %s' % component.name)
-        self.clients.append(component)
-        self.emit('update', self.clients)
-        
-    def remote_componentRemoved(self, component):
-        # FIXME: this asserts, no method, when server dies
-        # component will be a RemoteComponentView, so we can only use a
-        # member, not a method to get the name
-        self.debug('componentRemoved %s' % component.name)
-        self.clients.remove(component)
-        self.emit('update', self.clients)
-        
-    def remote_initial(self, clients):
-        self.debug('remote_initial %s' % clients)
-        self.clients = clients
-        self.emit('connected')
-
-    def remote_shutdown(self):
-        print 'shutdown'
-
-    def setProperty(self, component, element, property, value):
-        if not self.remote:
-            print 'Warning, no remote'
-            return
-        return self.remote.callRemote('setComponentElementProperty', component, element, property, value)
-
-    def getProperty(self, component, element, property):
-        return self.remote.callRemote('getComponentElementProperty', component, element, property)
-
-    def reload(self):
-        # first reload ourselves
-        import sys
-        from twisted.python.rebuild import rebuild
-        from twisted.python.reflect import filenameToModuleName
-        name = filenameToModuleName(__file__)
-
-        self.log("rebuilding '%s'" % name)
-        print("rebuilding '%s'" % name)
-        rebuild(sys.modules[name])
-
-        import flumotion.utils
-        flumotion.utils.reload()
-
-        cb = self.reloadController()
-        for client in self.clients:
-            cb = cb.addCallback(self.reloadComponent, client)
-
-    def reloadController(self):
-        return self.remote.callRemote('reloadController')
-
-    def reloadComponent(self, result, client):
-        print("Asking for reload of component %s" % client.name)
-        return self.remote.callRemote('reloadComponent', client.name)
-
-    def getUIEntry(self, component):
-        return self.remote.callRemote('getUIEntry', component)
-    
-gobject.type_register(AdminInterface)
+COL_PIXBUF = 0
+COL_TEXT   = 1
 
 class Window(log.Loggable):
     '''
@@ -138,8 +42,8 @@ class Window(log.Loggable):
     Also connects to the controller on the given host and port.
     '''
     def __init__(self, host, port):
-        self.gladedir = flumotion.config.gladedir
-        self.imagedir = flumotion.config.imagedir
+        self.gladedir = config.gladedir
+        self.imagedir = config.imagedir
         self.connect(host, port)
         self.create_ui()
         
@@ -149,30 +53,23 @@ class Window(log.Loggable):
         iconfile = os.path.join(self.imagedir, 'fluendo.png')
         gtk.window_set_default_icon_from_file(iconfile)
         self.window.set_icon_from_file(iconfile)
-        self.button_change = self.wtree.get_widget('button_change')
-        self.button_change.connect('clicked', self._button_change_cb)
-        self.button_reload = self.wtree.get_widget('button_reload')
-        self.button_reload.connect('clicked', self._button_reload_cb)
         
+        self.hpaned = self.wtree.get_widget('hpaned')
         self.window.connect('delete-event', self.close)
         self.window.show_all()
+        
+        self.component_model = gtk.ListStore(gdk.Pixbuf, str)
         self.component_view = self.wtree.get_widget('component_view')
         self.component_view.connect('row-activated', self.component_view_row_activated_cb)
-        self.component_model = gtk.ListStore(str, int, str, str)
         self.component_view.set_model(self.component_model)
+        self.component_view.set_headers_visible(True)
 
-        col = gtk.TreeViewColumn('Name', gtk.CellRendererText(), text=0)
+        col = gtk.TreeViewColumn(' ', gtk.CellRendererPixbuf(), pixbuf=COL_PIXBUF)
+        self.component_view.append_column(col)
+
+        col = gtk.TreeViewColumn('Component', gtk.CellRendererText(), text=COL_TEXT)
         self.component_view.append_column(col)
         
-        col = gtk.TreeViewColumn('Pid', gtk.CellRendererText(), text=1)
-        self.component_view.append_column(col)
-
-        col = gtk.TreeViewColumn('Status', gtk.CellRendererText(), text=2)
-        self.component_view.append_column(col)
-
-        col = gtk.TreeViewColumn('IP', gtk.CellRendererText(), text=3)
-        self.component_view.append_column(col)
-
         self.wtree.signal_autoconnect(self)
 
     def get_selected_component(self):
@@ -181,23 +78,27 @@ class Window(log.Loggable):
         if not sel:
             return
         model, iter = sel
-        return model.get(iter, 0)[0]
+        return model.get(iter, COL_TEXT)[0]
 
     def show_component(self, name, data):
-        dict_globals = globals()
-        dict_locals = {}
-        exec(data, dict_globals, dict_locals)
-        if not dict_locals.has_key('GUIClass'):
-            return
+        sub = None
+        if data:
+            namespace = {}
+            exec (data, globals(), namespace)
+            klass = namespace.get('GUIClass')
 
-        klass = dict_locals['GUIClass']
-        instance = klass()
-        sub = instance.render()
+            if klass:
+                instance = klass(name, self.admin)
+                sub = instance.render()
 
-        w = gtk.Window()
-        w.add(sub)
-        w.show_all()
+        old = self.hpaned.get_child2()
+        self.hpaned.remove(old)
         
+        if not sub:
+            sub = gtk.Label('%s does not have a UI yet' % name)
+            
+        self.hpaned.add2(sub)
+        sub.show()
         
     def component_view_row_activated_cb(self, *args):
         name = self.get_selected_component()
@@ -273,7 +174,8 @@ class Window(log.Loggable):
                 cb = self.admin.getProperty(name, element, property)
                 cb.addCallback(after_getProperty)
                 cb.addErrback(propertyErrback, self)
-                cb.addErrback(lambda failure: self.error_dialog("Controller error: %s" % failure.getErrorMessage()))
+                msg = "Controller error: %s" % failure.getErrorMessage()
+                cb.addErrback(lambda failure: self.error_dialog(msg))
             elif response == gtk.RESPONSE_CLOSE:
                 dialog.destroy()
                 
@@ -324,10 +226,11 @@ class Window(log.Loggable):
         
         for client in clients:
             iter = model.append()
-            model.set(iter, 0, client.name)
-            model.set(iter, 1, client.options['pid'])
-            model.set(iter, 2, gst.element_state_get_name(client.state))
-            model.set(iter, 3, client.options['ip'])
+            #model.set(iter, 0, client.name)
+            model.set(iter, 1, client.name)
+            #model.set(iter, 1, client.options['pid'])
+            #model.set(iter, 2, gst.element_state_get_name(client.state))
+            #model.set(iter, 3, client.options['ip'])
 
     def connect(self, host, port):
         'connect to controller on given host and port.  Called by __init__'
@@ -350,6 +253,7 @@ def main(args):
     except IndexError:
         print "Please specify a host and a port number"
         sys.exit(1)
+
     win = Window(host, port)
     reactor.run()
     
