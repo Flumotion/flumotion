@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_config -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
 # Flumotion - a video streaming server
@@ -52,7 +52,7 @@ class ConfigEntryComponent(log.Loggable):
     def getWorker(self):
         return self.worker
 
-    # XXX: kill this codex
+    # XXX: kill this code
     def getComponent(self):
         defs = self.defs
         dict = self.config
@@ -109,8 +109,11 @@ class ConfigEntryWorkers:
         self.workers = workers
         self.policy = policy
 
-    def getWorkers(self):
-        return self.workers
+    def __iter__(self):
+        return iter(self.workers)
+    
+    def __len__(self):
+        return len(self.workers)
     
     def getPolicy(self):
         return self.policy
@@ -118,13 +121,17 @@ class ConfigEntryWorkers:
 class FlumotionConfigXML(log.Loggable):
     logCategory = 'config'
 
-    def __init__(self, filename):
+    def __init__(self, filename, string=None):
         self.entries = {}
         self.workers = None
-        
-        self.debug('Loading configuration file `%s\'' % filename)
-        self.doc = minidom.parse(filename)
-        self.path = os.path.split(filename)[0]
+
+        if filename is not None:
+            self.debug('Loading configuration file `%s\'' % filename)
+            self.doc = minidom.parse(filename)
+            self.path = os.path.split(filename)[0]
+        else:
+            self.doc = minidom.parseString(string)
+            self.path = None
         self.parse()
         
     def getPath(self):
@@ -174,7 +181,7 @@ class FlumotionConfigXML(log.Loggable):
                 entry = self.parse_workers(node)
                 self.workers = entry
             else:
-                raise ConfigError, "unexpected node: %s" % child
+                raise ConfigError, "unexpected node: %s" % node.nodeName
             
     def parse_component(self, node):
         # <component name="..." type="..." worker="">
@@ -220,6 +227,10 @@ class FlumotionConfigXML(log.Loggable):
             raise ConfigError, "<workers> must have a policy attribute"
 
         policy = str(node.getAttribute('policy'))
+
+        if policy not in ['password', 'anonymous']:
+            raise ConfigError, "policy for <workers> must be password or anonymous"
+            
         
         workers = []
         for child in node.childNodes:

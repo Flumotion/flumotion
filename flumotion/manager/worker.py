@@ -126,7 +126,7 @@ class WorkerHeaven(pb.Root):
             retval.append(entry)
         return retval
        
-        workers = [worker for worker in self.conf.getWorkers()
+        workers = [worker for worker in self.conf
                               if not worker or worker != worker.getName()]
         return workers
     

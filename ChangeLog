@@ -1,5 +1,19 @@
 2004-09-17  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/common/config.py:
+	* flumotion/common/registry.py:
+	* flumotion/config/__init__.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_config.py:
+	* flumotion/utils/log.py:
+
+	Move test_config to test_flumotion_config and add test_config for
+	common/config. Write test suite for test_config and fix a couple
+	of bugs meanwhile.
+	
+2004-09-17  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/http/http.py: Implement admin-password,
 	fixes Ticket #10 
 

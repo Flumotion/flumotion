@@ -41,7 +41,8 @@ def getMTime(file):
 
 class RegistryEntryComponent:
     "This class represents a <component> entry in the registry"
-    def __init__(self, filename, type, factory, source, properties, files):
+    def __init__(self, filename, type, factory=False,
+                 source='', properties=[], files=[]):
         self.filename = filename
         self.type = type
         self.factory = factory
