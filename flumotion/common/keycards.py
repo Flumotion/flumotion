@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Keycards used for authentication.  Jellyable over PB connections.
+serializable keycards used for authentication inside Flumotion
 """
 
 from twisted.cred import credentials as tcredentials
@@ -37,6 +37,10 @@ AUTHENTICATED = 2
 _statesEnum=['REFUSED', 'REQUESTING', 'AUTHENTICATED']
 
 class Keycard(pb.Copyable, pb.RemoteCopy):
+    """
+    I am the base class for keycards which together with credentials are
+    a serializable object used in authentication inside Flumotion.
+    """
     __implements__ = common.mergeImplements(pb.Copyable, pb.RemoteCopy) + (tcredentials.ICredentials, )
 
     def __init__(self):
