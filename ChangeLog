@@ -1,5 +1,13 @@
 2004-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/__init__.py:
+	* flumotion/admin/spyglass.py:
+	* flumotion/admin/videotest.py:
+	* ui/videotest.glade:
+	  adding videotest UI component, not done yet.
+
+2004-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* docs/Makefile.am:
 	* flumotion/admin/spyglass.py:
 	* ui/spyglass.glade:

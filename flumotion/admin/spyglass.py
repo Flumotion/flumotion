@@ -46,6 +46,7 @@ __all__ = ('Controller', )
 class Controller(gobject.GObject):
     '''
     Controller for a spyglass, used for viewing a video feed.
+    The controller's model takes a raw video feed as accepted by ximagesink.
     '''
 # FIXME: decide on a good name for prepared that says "you can do stuff with me
 # now"

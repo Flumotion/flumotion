@@ -19,7 +19,7 @@
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
 
   <child>
-    <widget class="GtkVBox" id="options-widget">
+    <widget class="GtkVBox" id="videotest-widget">
       <property name="border_width">12</property>
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
