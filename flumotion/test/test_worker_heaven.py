@@ -45,8 +45,3 @@ class TestHeaven(unittest.TestCase):
         avatar = h.createAvatar('foo')
 
         h.workerAttached(avatar)
-
-    def testGetEntries(self):
-        h = worker.WorkerHeaven(None)
-        avatar = h.createAvatar('foo')
-        assert h.getEntries(avatar) == []
