@@ -1,3 +1,11 @@
+2005-04-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/firewire/admin_gtk.py:
+	  make sure volume increase changes get shown
+	* flumotion/manager/component.py:
+	  fix a very stupid bug related to indentation and for loops.
+	  Fixes issue #198
+
 2005-04-05  Andy Wingo  <wingo@pobox.com>
 	
 	* flumotion/component/converters/overlay/genimg.py
