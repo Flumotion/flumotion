@@ -87,24 +87,6 @@ class HTTPClientKeycard:
     def getIP(self):
         return self.request.getClientIP()
 
-def format_time(time):
-    'nicely format time'
-    display = []
-    days = time / 86400
-    if days >= 7:
-        display.append('%d weeks' % days / 7)
-        days %= 7
-    if days >= 1:
-        display.append('%d days' % days)
-    time %= 86400
-    h = time / 3600
-    time %= 3600
-    m = time / 60
-    time %= 60
-    s = time
-    display.append('%02d:%02d' % (h, m))
-    return " ".join(display)
-    
 # implements a Resource for the HTTP admin interface
 class HTTPStreamingAdminResource(resource.Resource):
     def __init__(self, parent):
@@ -260,7 +242,7 @@ class Stats:
 
 
         s['stream-mime'] = c.get_mime()
-        s['stream-uptime'] = format_time(uptime)
+        s['stream-uptime'] = common.formatTime(uptime)
         bitspeed = bytes_received * 8 / uptime
         s['stream-bitrate'] = common.formatStorage(bitspeed) + 'bit/s'
         s['stream-totalbytes'] = common.formatStorage(bytes_received) + 'Byte'
