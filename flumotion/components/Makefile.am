@@ -2,7 +2,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/components
 
 flumotion_DATA = \
 	__init__.py \
-	bttv.py 
+	bttv.py \
 	converter.py \
 	file.py \
 	http.py \
