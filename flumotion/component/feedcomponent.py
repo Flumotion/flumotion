@@ -173,6 +173,7 @@ class FeedComponent(basecomponent.BaseComponent):
     gsignal('notify-feed-ports')
 
     component_medium_class = FeedComponentMedium
+    _reconnectInterval = 3
     
     def __init__(self, name, eater_config, feeder_config):
         """
@@ -197,9 +198,12 @@ class FeedComponent(basecomponent.BaseComponent):
         self.feed_names = None # done by self.parse*
         self.feeder_names = None
 
-        self.eater_names = []
+        self.eater_names = [] # componentName:feedName list
         self.parseEaterConfig(eater_config)
         self.eatersWaiting = len(self.eater_names)
+        self._eaterReconnectDC = {} 
+        for name in self.eater_names:
+            self._eaterReconnectDC['eater:' + name] = None
 
         self.feedersFeeding = 0
         self.feed_names = []
@@ -374,23 +378,51 @@ class FeedComponent(basecomponent.BaseComponent):
         Called when the eater element changes state.
         """
         # also called by subclasses
-        self.debug('eater-state-changed: element %s, state %s' % (
+        name = element.get_name()
+        self.debug('eater-state-changed: eater %s, element %s, state %s' % (
+            name,
             element.get_path_string(),
             gst.element_state_get_name(state)))
 
         # update eatersWaiting count
         if old == gst.STATE_PAUSED and state == gst.STATE_PLAYING:
-            self.debug('eater %s is now eating' % element.get_name())
+            self.debug('eater %s is now eating' % name)
             self.eatersWaiting -= 1
             self.updateMood()
+            if self._eaterReconnectDC[name]:
+                self._eaterReconnectDC[name].cancel()
+                self._eaterReconnectDC[name] = None
+                
         if old == gst.STATE_PLAYING and state == gst.STATE_PAUSED:
-            self.debug('eater %s is now hungry' % element.get_name())
+            self.debug('eater %s is now hungry' % name)
             self.eatersWaiting += 1
             self.state.set('message',
                 "Component %s is now hungry" % self.name)
             self.updateMood()
+            self._eaterReconnectDC[name] = reactor.callLater(
+                self._reconnectInterval, self._eaterReconnect, element)
+            
         self.debug('%d eaters waiting' % self.eatersWaiting)
 
+    def _eaterReconnect(self, element):
+        name = element.get_name()
+        self.debug('Trying to reconnect eater %s' % name)
+        host = element.get_property('host')
+        port = element.get_property('port')
+        if common.checkRemotePort(host, port):
+            self.debug('%s:%d accepting connections, setting to PLAYING' % (
+                host, port))
+            self._eaterReconnectDC[name] = None
+            # currently, we need to make sure all other elements go to PLAYING
+            # as well, so we PAUSE then PLAY the complete pipeline
+            #element.set_state(gst.STATE_PLAYING)
+            self.set_state_and_iterate(gst.STATE_PAUSED)
+            self.set_state_and_iterate(gst.STATE_PLAYING)
+        else:
+            self.debug('%s:%d not accepting connections, trying later' % (
+                host, port))
+            self._eaterReconnectDC[name] = reactor.callLater(
+                self._reconnectInterval, self._eaterReconnect, element)
             
     def _setup_feeders(self, feedersData):
         """

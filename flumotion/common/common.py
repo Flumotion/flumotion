@@ -522,9 +522,11 @@ def checkRemotePort(host, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         s.connect((host, port))
-    except socket.error, e:
+    except socket.error:
+        s.close()
         return False
     
+    s.close()
     return True
 
 def addressGetHost(a):

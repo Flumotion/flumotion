@@ -25,6 +25,7 @@ manager-side objects to handle worker clients
 import socket
 
 from twisted.spread import pb
+from twisted.internet import defer
 
 # FIXME: rename to base
 from flumotion.manager import base
@@ -63,6 +64,8 @@ class WorkerAvatar(base.ManagerAvatar):
         @type type:    string
         @param config: a configuration dictionary for the component
         @type config:  dict
+
+        @returns: a deferred
         """
         self.debug('starting %s on %s with config %r' % (name, self.avatarId,
             config))
@@ -131,15 +134,29 @@ class WorkerHeaven(base.ManagerHeaven):
             self.state.append('names', workerName)
         
         # get all components that are supposed to start on this worker
+        # FIXME: we start them one by one to make port assignment more
+        # deterministic
+        # FIXME: we should probably start them in the correct order,
+        # respecting the graph
+        d = defer.Deferred()
         for entry in self.getEntries(workerAvatar):
             componentName = entry.getName()
-            self.debug('workerAttached(): starting component: %s on %s' % (
+            self.debug('workerAttached(): scheduling start of %s on %s' % (
                 componentName, workerName))
             
-            self.workerStartComponent(workerName,
-                                      componentName,
-                                      entry.getType(),
-                                      entry.getConfigDict())
+            d.addCallback(
+                lambda result, *args: self.workerStartComponent(*args),
+                workerName, componentName,
+                entry.getType(), entry.getConfigDict())
+
+        d.addCallback(lambda result: self.debug(
+            'workerAttached(): completed start chain'))
+
+        # now trigger the chain
+        self.debug('workerAttached(): triggering start chain')
+        d.callback(None)
+        #reactor.callLater(0, d.callback, None)
+        self.debug('workerAttached(): triggered start chain')
 
     def workerDetached(self, workerAvatar):
         workerName = workerAvatar.getName()
@@ -157,6 +174,8 @@ class WorkerHeaven(base.ManagerHeaven):
         @type  type:          string
         @param config:        a configuration dictionary
         @type  config:        dict
+
+        @returns: deferred
         """
 
         if not self.avatars:

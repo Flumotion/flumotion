@@ -1,6 +1,17 @@
 2005-01-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:
+	* flumotion/component/feedcomponent.py:
+	  attempt to reconnect when a feeder has gone away
+	* flumotion/manager/worker.py:
+	* flumotion/worker/worker.py:
+	  serialize startup of jobs so that jobs start one after another,
+	  not all at the same time.  This makes port allocations more
+	  deterministic
+
+2005-01-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
 	* flumotion/test/test_common.py:
 	  add some common port functions
 

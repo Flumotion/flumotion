@@ -139,10 +139,22 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         @type type:    string
         @param config: a configuration dictionary for the component
         @type config:  dict
+
+        @returns: a deferred fired when the process has started
         """
         self.info('Starting component "%s" of type "%s"' % (name, type))
         self.debug('remote_start(): manager asked me to start, name %s, type %s, config %r' % (name, type, config))
+
+        # create a d deferred that will be triggered when the jobavatar
+        # instructs the job to start a component
+        d = self.brain.deferredStartCreate(name)
+        d.addCallback(
+            lambda result, n: self.debug('deferred start fired for %s' % n),
+                name)
+
         self.brain.kindergarten.play(name, type, config)
+        
+        return d
 
     def remote_checkElements(self, elementNames):
         """
@@ -289,9 +301,6 @@ class Kindergarten(log.Loggable):
         self.warning('Asked to remove kid with pid %d but not found' % pid)
         return False
 
-
-    
-
 # Similar to Vishnu, but for worker related classes
 class WorkerBrain(log.Loggable):
     """
@@ -323,6 +332,8 @@ class WorkerBrain(log.Loggable):
 
         self.medium = WorkerMedium(self)
         self.worker_client_factory = WorkerClientFactory(self)
+
+        self._startDeferreds = {}
 
     def login(self, keycard):
         self.worker_client_factory.startLogin(keycard)
@@ -443,6 +454,35 @@ class WorkerBrain(log.Loggable):
                 self._oldSIGTERMHandler(signal, frame)
 
         self.debug("_SIGTERMHandler: done")
+
+    def deferredStartCreate(self, name):
+        """
+        Create and register a deferred for starting up the given component.
+        This deferred will be fired when the JobAvatar has instructed the
+        job to start the component.
+        """
+        self.debug('creating start deferred for %s' % name)
+        if name in self._startDeferreds.keys():
+            self.warning('Already a start deferred registered for %s' % name)
+            return None
+
+        d = defer.Deferred()
+        self._startDeferreds[name] = d
+        return d
+
+    def deferredStartTrigger(self, name):
+        """
+        Trigger a previously registered deferred for starting up the given
+        component.
+        """
+        self.debug('triggering start deferred for %s' % name)
+        if not name in self._startDeferreds.keys():
+            self.warning('No deferred start registered for %s' % name)
+            return
+
+        d = self._startDeferreds[name]
+        del self._startDeferreds[name]
+        d.callback(None)
  
 class JobDispatcher:
     """
@@ -499,6 +539,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
     I am an avatar for the job living in the worker.
     """
     logCategory = 'job-avatar'
+
     def __init__(self, heaven, name):
         """
         @type heaven: L{flumotion.worker.worker.JobHeaven}
@@ -569,9 +610,15 @@ class JobAvatar(pb.Avatar, log.Loggable):
             self.debug('reserving port %r for feed %s' % (port, feedName))
             self.feeds.append((feedName, port))
             
-        self.debug('asking job to start with config %r and feedPorts %r' % (kid.config, feedPorts))
+        self.debug('asking job to start with config %r and feedPorts %r' % (
+            kid.config, feedPorts))
         d = self.mind.callRemote('start', kid.name, kid.type,
                                  kid.config, feedPorts)
+
+        # make sure that we trigger the start deferred after this
+        d.addCallback(
+            lambda result, n: self.heaven.brain.deferredStartTrigger(n),
+                kid.name)
         d.addErrback(self._startErrback, kid.name, kid.type)
         d.addErrback(self._defaultErrback)
                                           
