@@ -18,21 +18,263 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.component import feedcomponent
+import gst
+import gobject
 
-class Vorbis(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, eaters, pipeline):
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    eaters,
-                                                    ['default'],
-                                                    pipeline)
+from flumotion.component import feedcomponent, component as basecomponent
+from flumotion.common import common, interfaces, errors, log
+from twisted.internet import reactor, defer
+from flumotion.common.planet import moods
+
+class Vorbis(feedcomponent.FeedComponent):
+    # keep these as class variables for the tests
+    EATER_TMPL = 'tcpclientsrc'
+    FEEDER_TMPL = 'tcpserversink'
+    # feeder properties: buffers-max=500 buffers-soft-max=450 recover-policy=1
+    
+    def __init__(self, name, eaters, bitrate, quality, numChannels):
+    	"""
+        @param name:        name of the component
+        @param eaters:      entry between <source>...</source> from config
+        @param feeders:     entry between <feed>...</feed> from config
+        @param bitrate:     bitrate of the vorbis stream (-1 if quality is used)
+        @param quality:     quality of the vorbis stream (used if bitrate=-1)
+        @param numChannels: number of channels of output stream
+        """
+        self._numChannels = numChannels
+        self._bitrate = bitrate
+        self._quality = quality
+        feedcomponent.FeedComponent.__init__(self, name, eaters, ['default'])
+    
+    ### FeedComponent methods
+    def setup_pipeline(self):
+        eater_names = self.get_eater_names()
+        if not eater_names:
+            raise TypeError, "Need an eater"
+        
+        # we expand the pipeline based on the templates and eater/feeder names
+        # elements are named eater:(source_component_name):(feed_name)
+        # or feeder:(component_name):(feed_name)
+        eater_element_names = map(lambda n: "eater:" + n, eater_names)
+        feeder_element_names = map(lambda n: "feeder:" + n, self.feeder_names)
+        self.debug('we eat with eater elements %s' % eater_element_names)
+        self.debug('we feed with feeder elements %s' % feeder_element_names)
+
+        # We should only have one eater and one feeder
+        # create element's eater ! audioscale
+        # the rest we create once we have the caps
+
+        self.pipeline = gst.Pipeline(self.name)
+        eater_element = gst.element_factory_make(self.EATER_TMPL, 
+                                                 eater_element_names[0])
+        as_element = gst.element_factory_make("audioscale", "audioscale")
+        fake_element = gst.element_factory_make("fakesink", "fakesink")
+        fake_element.set_property("silent", 1)
+
+        self.pipeline.add_many(eater_element, as_element, fake_element)
+        eater_element.link(as_element)
+        as_element.link(fake_element)
+        
+        # connect to notify::caps
+        self.debug("Adding notify::caps handler to audioscale's sink pad")
+        as_pad = as_element.get_pad('sink')
+
+        self.have_caps_handler = as_pad.connect_after('notify::caps', 
+            self.have_caps)
+
+        feedcomponent.FeedComponent.setup_pipeline(self)
+
+    ### BaseComponent methods
+    def start(self, eatersData, feedersData):
+        """
+        Tell the component to start, linking itself to other components.
+
+        @type eatersData: list of (feedername, host, port) tuples of elements
+                          feeding our eaters.
+        @type feedersData: list of (name, host) tuples of our feeding elements
+
+        @returns: a deferrer
+        """
+        self.debug('start with eaters data %s and feeders data %s' % (
+            eatersData, feedersData))
+        self.feed_def = defer.Deferred()
+        self.setMood(moods.waking)
+        self.feedersData = feedersData
+        
+        # we'll first start eating, so we can figure out caps from the incoming
+        # stream and make decisions before starting to feed
+        self._start_eaters(eatersData)
+
+        # chain to parent 
+        basecomponent.BaseComponent.start(self)
+        
+        return self.feed_def
+    
+    # start eaters
+    def _start_eaters(self, eatersData):
+        """
+        Make the component eat from the feeds it depends on and NOT start
+        producing feeds itself.
+
+        @param eatersData: list of (feederName, host, port) tuples to eat from
+
+        """
+        # if we have eaters waiting, we start out hungry, else waking
+        if self.eatersWaiting:
+            self.setMood(moods.hungry)
+        else:
+            self.setMood(moods.waking)
+
+        self.debug('setting up eaters')
+        self._setup_eaters(eatersData)
+
+        self.debug('setting pipeline to play')
+        self.pipeline_play()
+    
+    def _start_feeders(self, feedersData):
+        """
+        Make the component start producing feeds
+
+        @params feedersData: list of (feederName, host) tuples to feed to
+        """
+        retval = self._setup_feeders(feedersData)
+        # pipeline is in paused state when in this function
+        self.pipeline_play()
+        self.emit('notify-feed-ports')
+        self.debug('_start_feeders() returning %s' % retval)
+
+        return retval
+        
+    def have_caps(self, arg1, arg2):
+        as = self.pipeline.get_by_name('as')
+        as_pad = as.get_pad('sink')
+        caps = as_pad.get_negotiated_caps()
+        if caps == None:
+            self.debug('have_caps called but caps not negotiated yet')
+            return
+        self.debug('have_caps called')
+        caps_struct = caps.get_structure(0)
+        samplerate = caps_struct.get_int('rate')
+        
+        self.debug('sample rate %d' % (samplerate))
+        as_pad.disconnect(self.have_caps_handler)
+        # need to defer because shouldnt modify pipeline in signal
+        # handler
+        reactor.callLater(0, self._create_rest_pipeline, samplerate)
+    
+    def _create_rest_pipeline(self, samplerate):
+        # Now need to create rest of pipeline as incoming caps is known
+        self.pause()
+        audioscale = self.pipeline.get_by_name('audioscale')
+        fakesink = self.pipeline.get_by_name('fakesink')
+        audioconvert = gst.element_factory_make('audioconvert', 'audioconvert')
+        enc = gst.element_factory_make('rawvorbisenc', 'enc')
+        if self._bitrate > -1:
+            enc.set_property('bitrate', self._bitrate)
+        else:
+            enc.set_property('quality', self._quality)
+        
+        # create feeder
+        feeder_element_names = map(lambda n: "feeder:" + n, self.feeder_names)
+        feeder = gst.element_factory_make(self.FEEDER_TMPL,
+            feeder_element_names[0])
+        feeder.set_property('buffers-max', 500)
+        feeder.set_property('buffers-soft-max', 450)
+        feeder.set_property('recover-policy', 1)
+
+        self.pipeline.add_many(audioconvert, enc, feeder)
+        audioscale.unlink(fakesink)
+        self.pipeline.remove(fakesink)
+        
+        # now do necessary filtercaps
+        if self._bitrate > -1:
+            maxsamplerate = self._get_max_sample_rate(self._bitrate, 
+                                                      self._numChannels)
+            if samplerate > maxsamplerate:
+                self.debug(
+                    'rate %d > max rate %d (for %d kbit/sec), clamping' % (
+                        samplerate, maxsamplerate, self._bitrate))
+                samplerate = maxsamplerate
+
+            # link audio scale filtered with this rate because of gst caps
+            # nego problems
+            audioscale.link_filtered(audioconvert, gst.caps_from_string(
+                'audio/x-raw-int, rate=%d' % (samplerate)))
+
+        # link audioconvert to rawvorbisenc with the number of channels
+        # from config
+        audioconvert.link_filtered(enc, gst.caps_from_string(
+            'audio/x-raw-float, channels=%d' % (self._numChannels)))
+
+        enc.link(feeder)
+
+        retval = self._start_feeders(self.feedersData)
+        
+        self.pipeline_play()
+        self.debug('emitting feed port notify')
+        self.emit('notify-feed-ports')
+
+        self.feed_def.callback(retval)
+
+    def _get_max_sample_rate(self, bitrate, channels):
+        # maybe better in a hashtable/associative array?
+        # ZAHEER: these really are "magic" limits that i found by trial and
+        # error used
+        # by libvorbis's encoder to determine what maximum samplerate it
+        # accepts for a bitrate, numchannels combo
+        # THOMAS: strangely enough they don't seem to be easily extractable from
+        # vorbis/lib/modes/setup_*.h
+        # might make sense to figure this out once and for all and verify
+        # GStreamer's behaviour as well
+        if channels == 2:
+            if bitrate >= 45000:
+                retval = 50000
+            elif bitrate >= 40000:
+                retval = 40000
+            elif bitrate >= 30000:
+                retval = 26000
+            elif bitrate >= 24000:
+                retval = 19000
+            elif bitrate >= 16000:
+                retval = 15000
+            elif bitrate >= 12000:
+                retval = 9000
+            else:
+                retval = -1
+            
+        elif channels == 1:
+            if bitrate >= 32000:
+                retval = 50000
+            elif bitrate >= 24000:
+                retval = 40000
+            elif bitrate >= 16000:
+                retval = 26000
+            elif bitrate >= 12000:
+                retval = 15000
+            elif bitrate >= 8000:
+                retval = 9000
+            else:
+                retval = -1
+        
+        return retval
 
 def createComponent(config):
-    component = Vorbis(config['name'], [config['source']],
-                       "audioconvert ! audio/x-raw-float ! rawvorbisenc name=encoder")
-    
-    element = component.pipeline.get_by_name('encoder')
-    if config.has_key('bitrate'):
-        element.set_property('bitrate', config['bitrate'])
+    if config.has_key('channels'):
+        channels = config['channels']
+    else:
+        channels = 2
 
+    if config.has_key('bitrate'):
+        bitrate = config['bitrate']
+    else:
+        bitrate = -1
+    
+    if config.has_key('quality'):
+        quality = config['quality']
+    else:
+        quality = 0.3
+            
+    component = Vorbis(config['name'], [config['source']], bitrate,
+                    quality, channels)
+              
     return component

@@ -1,5 +1,14 @@
 2005-04-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
+
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/component/encoders/vorbis.py:
+	  downsample audio based on chosen bitrate
+	  fixes issue #183
+
+2005-04-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  clarify other error condition
 	* flumotion/component/effects/volume/volume.glade:

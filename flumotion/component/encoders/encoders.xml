@@ -39,6 +39,8 @@
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
         <property name="bitrate" type="int"/>
+	<property name="quality" type="int"/>
+	<property name="channels" type="int"/>
       </properties>
     </component>
   
