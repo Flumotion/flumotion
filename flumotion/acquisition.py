@@ -105,4 +105,5 @@ class AcquisitionFactory(pb.Root):
 if __name__ == '__main__':
     factory = pb.PBServerFactory(AcquisitionFactory(sys.argv[1]))
     reactor.listenTCP(8802, factory)
+    print 'Listening on *:8802'
     reactor.run()

@@ -36,7 +36,7 @@ class TranscoderFactory(pb.Root):
         return True
 
     def pipeline_play(self):
-        print 'Is playing'
+        print 'Setting state to playing'
         self.pipeline.set_state(gst.STATE_PLAYING)
 
     def pipeline_state_change_cb(self, *args):
@@ -76,4 +76,5 @@ class TranscoderFactory(pb.Root):
 if __name__ == '__main__':
     factory = pb.PBServerFactory(TranscoderFactory())
     reactor.listenTCP(8803, factory)
+    print 'Listening on *:8803'
     reactor.run()
