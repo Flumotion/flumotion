@@ -67,8 +67,7 @@ class Feeder:
             print "ERROR: cannot create feeder without full name"
             raise
         
-        componentName, feedName = feederName.split(':')
-        self.feedName = feedName
+        self.feedName = feederName.split(':')[1]
 
         
     def addDependency(self, feederName, func, *args):
@@ -498,14 +497,13 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         @rtype: L{twisted.internet.defer.Deferred}
         """
         def _reloadComponentErrback(self, failure):
-            import exceptions
             failure.trap(errors.ReloadSyntaxError)
             self.warning(failure.getErrorMessage())
             print "Ignore the following Traceback line, issue in Twisted"
             return failure
 
         cb = self._mindCallRemote('reloadComponent')
-        cb.addErrback(self._reloadComponentErrback)
+        cb.addErrback(_reloadComponentErrback)
         cb.addErrback(self._mindErrback, errors.ReloadSyntaxError)
         return cb
 
@@ -823,7 +821,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
 
         # tell the admin client
         self.vishnu.adminHeaven.componentAdded(componentAvatar)
-        componentName = componentAvatar.getName()
+        #componentName = componentAvatar.getName()
         #self.vishnu.adminHeaven.uiStateChanged(componentName, state)
 
         # tell the feeder set
