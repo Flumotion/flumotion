@@ -249,6 +249,8 @@ class TestBundlerBasket(unittest.TestCase):
         basket.depend('leg', 'foot')
         basket.depend('arm', 'hand')
         basket.depend('body', 'leg', 'arm')
+        for i in 'leg', 'foot', 'arm', 'hand', 'body':
+            basket._bundlers[i] = True
         deps = basket.getDependencies('body')
         deps.sort()
         list = ['leg', 'foot', 'arm', 'hand', 'body']
