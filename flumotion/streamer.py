@@ -52,9 +52,7 @@ class Streamer(gobject.GObject, component.BaseComponent):
     def sink_handoff_cb(self, element, buffer, pad):
         if pad.is_negotiated():
             caps = pad.get_negotiated_caps()
-#        print dir(pad)
-#        raise SystemExit
-
+            
         self.emit('data-recieved', buffer, caps)
         
     # connect() is already taken by gobject.GObject
@@ -91,11 +89,13 @@ class StreamingResource(resource.Resource):
                                                 structure.get_string('boundary'))
             else:
                 self.caps = structure.get_name()
-            
-        buf = str(buffer(gbuffer))
-        for request in self.current_requests:
-            request.write(buf)
-        
+
+        if self.current_requests:
+            t1 = time.time()
+            buf = str(buffer(gbuffer))
+            for request in self.current_requests:
+                request.write(buf)
+            print 'Writing all buffers took: %2.4f seconds' % (time.time()-1)
     def getChild(self, path, request):
         return self
 
