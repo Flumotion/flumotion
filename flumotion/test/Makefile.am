@@ -15,7 +15,7 @@ EXTRA_DIST = 			\
 	test_reflect.py 	\
 	test_registry.py 	\
 	test_wizard.py 		\
-	test_worker_config.py 	\
+	test_workerconfig.py 	\
 	test_worker_heaven.py
 
 check-local:
