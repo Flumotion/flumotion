@@ -1,6 +1,5 @@
 #!/bin/sh
 set -x
-
 exit 1
 
 aclocal -I m4 || exit 1
