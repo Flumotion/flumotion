@@ -6,7 +6,7 @@
         <property name="feed" type="string" required="yes" multiple="yes"/>
         <property name="source-element" type="string"/>
        <property name="device" type="string"/>
-        <property name="channels" type="string"/>
+        <property name="channels" type="int"/>
         <property name="depth" type="int"/>
         <property name="rate" type="int"/>
      </properties>

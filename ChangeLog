@@ -1,5 +1,14 @@
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/steps.py:
+	  channels should be serialized as int until there is a good
+	  representation of them, because setting channels=stereo in
+	  GStreamer doesn't work
+
+2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/job.py:
 	* flumotion/worker/worker.py:
 	  fix some prints and raises

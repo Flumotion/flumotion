@@ -549,17 +549,17 @@ class Soundcard(wizard.WizardStep):
         #d.addErrback(self._permissionDeniedErrback)
         
     def get_component_properties(self):
-        channels = self.combobox_channels.get_enum()
-        if channels == SoundcardChannels.Mono:
-            channels = 'mono'
-        elif channels == SoundcardChannels.Stereo:
-            channels = 'stereo'
-            
-        return dict(device=self.combobox_device.get_string(),
+        channels = self.combobox_channels.get_enum().intvalue
+        element = self.combobox_system.get_enum().element
+
+        d = dict(device=self.combobox_device.get_string(),
                     bitdepth=int(self.combobox_bitdepth.get_string()),
                     samplerate=int(self.combobox_samplerate.get_string()),
                     channels=channels,
                     input=self.combobox_input.get_string())
+        # FIXME: can a key with a dash be specified ?
+        d['source-element'] = element
+        return d
 
     def get_next(self):
         return 'Encoding'

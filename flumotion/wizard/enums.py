@@ -145,7 +145,8 @@ SoundcardAlsaDevice = EnumClass('SoundcardAlsaDevice', ('hw:0',
                                                         'hw:2'))
 SoundcardInput = EnumClass('SoundcardInput',
                            ('Line in', 'Microphone', 'CD'))
-SoundcardChannels = EnumClass('SoundcardChannels', ('Stereo', 'Mono'))
+SoundcardChannels = EnumClass('SoundcardChannels', ('Stereo', 'Mono'),
+                              intvalue=(2, 1))
 SoundcardSamplerate = EnumClass('SoundcardSamplerate', ('44100',
                                                         '22050',
                                                         '11025',
