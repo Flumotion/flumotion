@@ -12,4 +12,5 @@ SUBDIRS = \
 	bttv \
 	dv \
 	soundcard \
-	videotest
+	videotest \
+	webcam

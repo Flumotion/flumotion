@@ -1,7 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/overlay/overlay.py: overlay converter
+# flumotion/component/converters/overlay/overlay.py: overlay converter
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)

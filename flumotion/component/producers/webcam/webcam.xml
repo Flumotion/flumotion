@@ -1,6 +1,6 @@
 <components>
   <component type="web-camera">
-    <source location="flumotion.component.webcam.webcam"/>
+    <source location="flumotion.component.producers.webcam.webcam"/>
     <properties>
       <property name="feed" type="string" required="yes" multiple="yes"/>
       <property name="height" type="int"/>

@@ -1,7 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/webcam/webcam.py: webcam producer
+# flumotion/component/producers/webcam/webcam.py: webcam producer
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)

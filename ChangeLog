@@ -1,3 +1,35 @@
+2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/converters/Makefile.am:
+	* flumotion/component/converters/__init__.py:
+	* flumotion/component/converters/overlay/Makefile.am:
+	* flumotion/component/converters/overlay/__init__.py:
+	* flumotion/component/converters/overlay/genimg.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	* flumotion/component/converters/overlay/overlay.xml:
+	* flumotion/component/overlay/Makefile.am:
+	* flumotion/component/overlay/Vera.ttf:
+	* flumotion/component/overlay/__init__.py:
+	* flumotion/component/overlay/cc.24x24.png:
+	* flumotion/component/overlay/fluendo.24x24.png:
+	* flumotion/component/overlay/genimg.py:
+	* flumotion/component/overlay/overlay.py:
+	* flumotion/component/overlay/overlay.xml:
+	* flumotion/component/overlay/xiph.24x24.png:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/__init__.py:
+	* flumotion/component/producers/webcam/Makefile.am:
+	* flumotion/component/producers/webcam/__init__.py:
+	* flumotion/component/producers/webcam/webcam.py:
+	* flumotion/component/producers/webcam/webcam.xml:
+	* flumotion/component/webcam/Makefile.am:
+	* flumotion/component/webcam/__init__.py:
+	* flumotion/component/webcam/webcam.py:
+	* flumotion/component/webcam/webcam.xml:
+	  this should do the trick
+
 2004-10-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/main.py:

@@ -11,10 +11,9 @@ clean-local:
 
 SUBDIRS = \
 	consumers \
+	converters \
 	base \
 	bouncers \
 	encoders \
 	muxers \
-	producers \
-	overlay \
-	webcam
+	producers

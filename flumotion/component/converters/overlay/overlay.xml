@@ -1,6 +1,6 @@
 <components>
   <component type="overlay">
-    <source location="flumotion.component.overlay.overlay"/>
+    <source location="flumotion.component.converters.overlay.overlay"/>
     <properties>
       <property name="feed" type="string" required="yes" multiple="yes"/>
       <property name="source" type="string" multiple="no"/>

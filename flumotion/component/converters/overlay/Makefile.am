@@ -1,5 +1,5 @@
 component_PYTHON = __init__.py genimg.py overlay.py
-componentdir = $(libdir)/flumotion/python/flumotion/component/overlay
+componentdir = $(libdir)/flumotion/python/flumotion/component/converters/overlay
 component_DATA = \
 	overlay.xml \
 	cc.24x24.png \

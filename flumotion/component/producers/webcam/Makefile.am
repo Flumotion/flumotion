@@ -1,5 +1,5 @@
 component_PYTHON = __init__.py webcam.py
-componentdir = $(libdir)/flumotion/python/flumotion/component/webcam
+componentdir = $(libdir)/flumotion/python/flumotion/component/producers/webcam
 component_DATA = webcam.xml
 
 clean-local:
