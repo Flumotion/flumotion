@@ -236,12 +236,15 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     def _reloaded(self):
         self.info('reloaded manager code')
 
-class Admin(pb.Root):
+class Admin(pb.Root, log.Loggable):
     """
     I interface between the Manager and administrative clients.
     For each client I create an L{AdminAvatar} to handle requests.
     I live in the manager.
     """
+
+    logCategory = "admin"
+
     def __init__(self, manager):
         """
         @type manager: L{server.manager.Manager}
@@ -251,9 +254,6 @@ class Admin(pb.Root):
         log.addLogHandler(self.logHandler)
         self.logcache = []
 
-    # FIXME: Loggable
-    debug = lambda s, *a: log.debug('admin', *a)
-        
     def logHandler(self, category, type, message):
         self.logcache.append((category, type, message))
         for client in self.clients:

@@ -1,5 +1,10 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/server/admin.py:
+	  subclass log.Loggable
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/reference/Makefile.am:
 	  hide line
 	* flumotion/server/manager.py:
