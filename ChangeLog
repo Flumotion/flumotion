@@ -1,3 +1,15 @@
+2004-06-17  Johan Dahlin  <johan@gnome.org>
+
+	* bin/flumotion.in (dir): Remove silly require.
+
+	* flumotion/utils/gstutils.py (caps_repr): Refactor out from
+	verbose_deep_notify_cb
+
+	* flumotion/server/launcher.py: Improve command line parsing, we
+	now have an interface similar to cvs.
+
+	* flumotion/utils/log.py (enableLogging, disableLogging): New functions
+
 2004-06-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in: update
