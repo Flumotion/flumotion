@@ -77,6 +77,7 @@ rm -rf $RPM_BUILD_ROOT
 exit 0
 
 %post
+/sbin/chkconfig --add flumotion
 # generate a default .pem certificate ?
 if ! test -e %{_sysconfdir}/flumotion/managers/default/default.pem
 then
@@ -126,6 +127,7 @@ EOF
 fi
 
 %preun
+/sbin/chkconfig --del flumotion
 # if removal and not upgrade, stop the processes
 if [ $1 -eq 1 ]
 then
@@ -169,6 +171,10 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Fri Nov 05 2004 Christian Schaller <christian at fluendo com>
+- Add call to chkconfig script in post and preun parts to get our service into 
+the service list
+
 * Fri Nov 05 2004 Thomas Vander Stichele <thomas at apestaart dot org>
 - use DESTDIR install to fix python compiles
 
