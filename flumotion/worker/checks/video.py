@@ -19,6 +19,8 @@
 # Headers in this file shall remain intact.
 
 
+import os
+
 import gst
 import gst.interfaces
 
@@ -187,7 +189,7 @@ def checkMixerTracks(source_factory, device):
 def check1394():
     """
     Probe the firewire device.
-    mixer tracks.
+
     Return a deferred firing a dictionary with width, height,
     and a pixel aspect ratio pair.
     
@@ -220,6 +222,11 @@ def check1394():
         resolution = Resolution()
         reactor.callLater(0, iterate, bin, resolution)
         return resolution.d
+
+    # first check if the obvious device node exists
+    if not os.path.exists('/dev/raw1394'):
+        return defer.fail(errors.DeviceNotFoundError(
+            'device node /dev/raw1394 does not exist'))
 
     pipeline = 'dv1394src name=source ! dvdec name=dec ! fakesink'
     return do_element_check(pipeline, 'source', do_check,

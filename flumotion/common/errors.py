@@ -117,5 +117,8 @@ class UnknownDeviceError(pb.Error):
 class PermissionDeniedError(GstError):
     "Permission denied"
 
+class DeviceNotFoundError(GstError):
+    "Device could not be found"
+
 class DeviceBusyError(GstError):
     "Generic GStreamer error"

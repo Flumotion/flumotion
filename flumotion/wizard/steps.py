@@ -316,7 +316,19 @@ class FireWire(VideoSource):
         options['framerate'] = self.spinbutton_framerate.get_value()
         return options
 
+    def worker_changed(self):
+        self.clear()
+        self.update()
+        
     def before_show(self):
+        self.clear()
+        self.update()
+
+    def clear(self):
+        buf = self.textview_status.get_buffer()
+        buf.set_text('')
+ 
+    def update(self):
         self.textview_status.realize()
         normal_bg = self.textview_status.get_style().bg[gtk.STATE_NORMAL]
         self.textview_status.modify_base(gtk.STATE_INSENSITIVE, normal_bg)

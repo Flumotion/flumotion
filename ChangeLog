@@ -1,5 +1,13 @@
 2005-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/worker/checks/video.py:
+	  Make firewire wizard step react on changed workers
+	  Add additional check for whether the device node is actually present
+
+2005-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/main.py:
 	  log versions we are and are using
 
