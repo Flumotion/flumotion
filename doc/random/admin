@@ -1,0 +1,20 @@
+* UI pieces for components are sent from the component through the manager
+  to the admin client.
+
+* admin client:
+  - asks for the md5sum of the UI zipfile.
+  - checks if it has it
+  - requests the zipfile if it doesn't
+  - unpacks in (md5sum)/
+  - runs code in it
+
+* component:
+  - gets request for md5sum of UI zipfile
+  - checks timestamp on each of the files to go into the zipfile
+  - if any outdated, rebuild zipfile, and load it in memory
+  - md5sum it
+  - send md5sum
+
+  - gets request for zipfile
+  - sends zipfile
+
