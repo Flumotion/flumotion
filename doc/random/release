@@ -9,4 +9,4 @@
 * commit to SVN
 * create release tag:
   svn cp https://svn.fluendo.com/svn/flumotion/trunk https://svn.fluendo.com/svn/flumotion/tags/flumotion-0.1.2
-  
+* fix up ticket list to do and milestone  
