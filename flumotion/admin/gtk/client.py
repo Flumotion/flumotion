@@ -289,8 +289,7 @@ class Window(log.Loggable):
             deferred = self.admin.reload()
             deferred.addCallback(lambda result: _stop(dialog))
         
-        dialog = dialogs.ProgressDialog("Reloading ...", self.window)
-        dialog.message("Reloading manager")
+        dialog = dialogs.ProgressDialog("Reloading ...", "Reloading manager", self.window)
         dialog.start()
         reactor.callLater(0.2, _callLater, self.admin, dialog)
  

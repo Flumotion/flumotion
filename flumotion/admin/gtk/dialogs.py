@@ -24,14 +24,14 @@ import gtk
 import gobject
 
 class ProgressDialog(gtk.Dialog):
-    def __init__(self, name, parent):
-        dialog = gtk.Dialog.__init__(self, name, parent,
+    def __init__(self, title, message, parent = None):
+        gtk.Dialog.__init__(self, title, parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
 
                                                                                
         box = gtk.VBox()
         self.action_area.add(box)
-        self.label = gtk.Label(name)
+        self.label = gtk.Label(message)
         box.add(self.label)
         self.bar = gtk.ProgressBar()
         box.add(self.bar)
@@ -61,8 +61,7 @@ class ProgressDialog(gtk.Dialog):
 
 if __name__ == '__main__':
     window = gtk.Window()
-    dialog = ProgressDialog("progress", window)
-    dialog.message('Doing lots of complicated stuff')
+    dialog = ProgressDialog("I am busy", 'Doing lots of complicated stuff', window)
     dialog.start()
 
     def stop(dialog):
