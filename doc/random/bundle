@@ -80,19 +80,48 @@ needed.
 Requesting bundles
 ==================
 
-In AdminHeaven, possible to move to an abstract base class at some point.
+In BaseHeaven: (which does not exist yet)
 
-remote_getBundle(name=None, file=None pythonName=None)
+remote_getBundle(name, filename, pythonName)
 
-(and getBundle in AdminMedium)
+(and getBundle in BaseMedium)
 
-XXX: How should components in workers be instantiated?
+getBundle does the dependency checking and fetches all bundles that
+the request bundle depends on.
 
+pseudo code:
 
+def getBundle(self, name=None, filename=None, pythonName=None):
+  if name:
+    return self.bundleManager.getByName(name)
+  elif filename:
+    return self.bundleManager.getByFilename(filename)
+  elif pythonName:
+    return self.bundleManager.getByPythonName(pythonName)
 
+Running a component (in the worker)
+===================
 
+(manager)
 
+1. When all dependencies are started, call WorkerHeaven.startComponent
 
+2. It calls workerAvatar.start(name, type, config)
 
-  
+(worker)
 
+3. Request the bundle (if its not up to date), by calling getBundle
+   name is fetched from the registry
+
+4. Run the file from the bundle (using reflect.namedAny)
+
+BundleManager
+=============
+
+public API
+
+class BundleManager:
+  def addBundle(bundle)                  # Used by registry
+  def getByName(name)
+  def getByFilename(filename)
+  def getByPythonName(pythonName)
