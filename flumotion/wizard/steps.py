@@ -452,20 +452,29 @@ def _checkTracks(source_element, device):
     def state_changed_cb(pipeline, old, new, res):
         if not (old == gst.STATE_NULL and new == gst.STATE_READY):
             return
+
         element = pipeline.get_by_name('source')
         deviceName = element.get_property('device-name')
-        try:
-            tracks = [track.label for track in element.list_tracks()]
-        except AttributeError:
-            # list_tracks was added in gst-python 0.7.94
-            if not res.returned:
-                res.returned = True
-                version = " ".join([str(number) for number in gst.pygst_version])
-                message = 'Your version of gstreamer-python is %d.%d.%d. ' % \
-                    gst.pygst_version + \
-                    'Please upgrade gstreamer-python to 0.7.94 or higher.'
-                res.d.errback(errors.GstError(message))
-            
+        # for safety, first check if element implements the mixer interface
+        # should be fixed definately in gst 0.9
+        if not element.implements_interface(gst.interfaces.Mixer):
+            res.returned = True
+            message = 'Cannot get mixer tracks from the device.  ' + \
+                      'Check permissions on the mixer device.'
+            res.d.errback(errors.GstError(message))
+        else:
+            try:
+                tracks = [track.label for track in element.list_tracks()]
+            except AttributeError:
+                # list_tracks was added in gst-python 0.7.94
+                if not res.returned:
+                    res.returned = True
+                    version = " ".join([str(number) for number in gst.pygst_version])
+                    message = 'Your version of gstreamer-python is %d.%d.%d. ' % \
+                        gst.pygst_version + \
+                        'Please upgrade gstreamer-python to 0.7.94 or higher.'
+                    res.d.errback(errors.GstError(message))
+                
         reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
         if not res.returned:
             res.returned = True
