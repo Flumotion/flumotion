@@ -355,6 +355,7 @@ def writePidFile(type, name):
     and process name for the filename.
     """
     
+    ensureDir(configure.rundir, "rundir")
     pid = os.getpid()
     pidPath = os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
     file = open(pidPath, 'w')
