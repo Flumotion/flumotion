@@ -99,12 +99,12 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def component_error_cb(self, component, element_path, message):
         self.callRemote('error', element_path, message)
         
-    def component_state_changed_cb(self, component, feed, state):
-        self.callRemote('stateChanged', feed, state)
+    def component_state_changed_cb(self, component, feeder, state):
+        self.callRemote('stateChanged', feeder, state)
 
     ### Referenceable remote methods which can be called from manager
-    def remote_link(self, sources, feeds):
-        self.comp.link(sources, feeds)
+    def remote_link(self, eaters, feeders):
+        self.comp.link(eaters, feeders)
 
     def remote_getElementProperty(self, element_name, property):
         return self.comp.get_element_property(element_name, property)
@@ -134,15 +134,15 @@ class ComponentView(pb.Referenceable, log.Loggable):
 
         return {'ip' : self.getIP(),
                 'pid' :  os.getpid(), 
-                'sources' : self.comp.get_sources(),
-                'feeds' : self.comp.get_feeds(),
+                'eaters' : self.comp.get_eaters(),
+                'feeders' : self.comp.get_feeders(),
                 'elements': self.comp.get_element_names() }
     
-    def remote_getFreePorts(self, feeds):
+    def remote_getFreePorts(self, feeders):
         retval = []
         ports = {}
         free_port = gstutils.get_free_port(start=5500)
-        for name, host, port in feeds:
+        for name, host, port in feeders:
             if port == None:
                 port = free_port
                 free_port += 1
@@ -216,13 +216,13 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
     __remote_interfaces__ = interfaces.IBaseComponent,
     component_view = ComponentView
     
-    def __init__(self, name, sources, feeds):
+    def __init__(self, name, eaters, feeders):
         self.__gobject_init__()
         DirectoryProvider.__init__(self)
         
         self.component_name = name
-        self.sources = sources
-        self.feeds = feeds
+        self.eaters = eaters
+        self.feeders = feeders
         self.pipeline = None
         self.pipeline_signals = []
         self.files = []
@@ -245,11 +245,11 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
     def get_name(self):
         return self.component_name
     
-    def get_sources(self):
-        return self.sources
+    def get_eaters(self):
+        return self.eaters
     
-    def get_feeds(self):
-        return self.feeds
+    def get_feeders(self):
+        return self.feeders
 
     def restart(self):
         self.debug('restarting')
@@ -297,53 +297,51 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
         if not retval:
             self.warning('Setting pipeline to NULL failed')
         
-    def setup_sources(self, sources):
-        # FIXME: change "sources" to a dict from name to host, port
+    def setup_eaters(self, eaters):
         """
-        Set up the source GStreamer elements in our pipeline based on
-        information in the tuple.  For each source element in the tuple,
-        it sets the host and port on the source element.
+        Set up the feeded GStreamer elements in our pipeline based on
+        information in the tuple.  For each feeded element in the tuple,
+        it sets the host and port on the feeded element.
 
-        @type sources: tuple
-        @param sources: a tuple of three-item tuples, containing element name,
-        host, and port.
+        @type eaters: tuple
+        @param eaters: a tuple of (name, host, port) tuples.
         """
         if not self.pipeline:
             raise NotReadyError('No pipeline')
         
-        # Setup all sources
-        for name, host, port in sources:
+        # Setup all eaters
+        for name, host, port in eaters:
             self.debug('Going to connect to %s (%s:%d)' % (name, host, port))
-            source = self.pipeline.get_by_name(name)
-            assert source, 'No source element named %s in pipeline' % name
-            assert isinstance(source, gst.Element)
+            eater = self.pipeline.get_by_name(name)
+            assert eater, 'No eater element named %s in pipeline' % name
+            assert isinstance(eater, gst.Element)
             
-            source.set_property('host', host)
-            source.set_property('port', port)
-            source.set_property('protocol', 'gdp')
+            eater.set_property('host', host)
+            eater.set_property('port', port)
+            eater.set_property('protocol', 'gdp')
             
-    def feed_state_change_cb(self, element, old, state, feed):
+    def feeder_state_change_cb(self, element, old, state, feeder):
         # also called by subclasses
         self.debug('state-changed %s %s' % (element.get_path_string(),
                                             gst.element_state_get_name(state)))
-        self.emit('state-changed', feed, state)
+        self.emit('state-changed', feeder, state)
 
-    def setup_feeds(self, feeds):
+    def setup_feeders(self, feeders):
         if not self.pipeline:
             raise errors.NotReadyError('No pipeline')
         
-        # Setup all feeds
-        for name, host, port in feeds:
+        # Setup all feeders
+        for name, host, port in feeders:
             self.debug('Going to listen on %s (%s:%d)' % (name, host, port))
-            feed = self.pipeline.get_by_name(name)
-            feed.connect('state-change', self.feed_state_change_cb, name)
+            feeder = self.pipeline.get_by_name(name)
+            feeder.connect('state-change', self.feeder_state_change_cb, name)
             
-            assert feed, 'No feed element named %s in pipeline' % name
-            assert isinstance(feed, gst.Element)
+            assert feeder, 'No feeder element named %s in pipeline' % name
+            assert isinstance(feeder, gst.Element)
             
-            feed.set_property('host', host)
-            feed.set_property('port', port)
-            feed.set_property('protocol', 'gdp')
+            feeder.set_property('host', host)
+            feeder.set_property('port', port)
+            feeder.set_property('protocol', 'gdp')
 
     def cleanup(self):
         self.debug("cleaning up")
@@ -372,13 +370,13 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
         self.debug('Pausing')
         self.pipeline_pause()
                 
-    def link(self, sources, feeds):
-        self.setup_sources(sources)
-        self.setup_feeds(feeds)
+    def link(self, eaters, feeders):
+        self.setup_eaters(eaters)
+        self.setup_feeders(feeders)
         
         func = getattr(self, 'link_setup', None)
         if func:
-            func(sources, feeds)
+            func(eaters, feeders)
             
         self.pipeline_play()
 
@@ -423,11 +421,11 @@ gobject.type_register(BaseComponent)
     
 class ParseLaunchComponent(BaseComponent):
     'A component using gst-launch syntax'
-    SOURCE_TMPL = 'tcpclientsrc'
-    FEED_TMPL = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'
-    def __init__(self, name, sources, feeds, pipeline_string=''):
+    EATER_TMPL = 'tcpclientsrc'
+    FEEDER_TMPL = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'
+    def __init__(self, name, eaters, feeders, pipeline_string=''):
         self.pipeline_string = pipeline_string
-        BaseComponent.__init__(self, name, sources, feeds)
+        BaseComponent.__init__(self, name, eaters, feeders)
 
     ### BaseComponent methods
     def setup_pipeline(self):
@@ -463,24 +461,24 @@ class ParseLaunchComponent(BaseComponent):
     def parse_pipeline(self, pipeline):
         self.debug('Creating pipeline, template is %s' % pipeline)
         
-        sources = self.get_sources()
-        if pipeline == '' and not sources:
-            raise TypeError, "Need a pipeline or a source"
+        eaters = self.get_eaters()
+        if pipeline == '' and not eaters:
+            raise TypeError, "Need a pipeline or a eater"
 
         need_sink = True
         if pipeline == '':
-            assert sources
+            assert eaters
             pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
             need_sink = False
         elif pipeline.find('name=sink') != -1:
             need_sink = False
             
-        feeds = self.get_feeds()
+        feeders = self.get_feeders()
 
-        self.debug('sources=%s, feeds=%s' % (sources, feeds))
-        pipeline = self.parse_tmpl(pipeline, sources, self.SOURCE_TMPL, '@',
+        self.debug('eaters=%s, feeders=%s' % (eaters, feeders))
+        pipeline = self.parse_tmpl(pipeline, eaters, self.EATER_TMPL, '@',
                                  '%(tmpl)s name=%(name)s ! %(pipeline)s') 
-        pipeline = self.parse_tmpl(pipeline, feeds, self.FEED_TMPL, ':',
+        pipeline = self.parse_tmpl(pipeline, feeders, self.FEEDER_TMPL, ':',
                                  '%(pipeline)s ! %(tmpl)s name=%(name)s') 
         
         self.debug('pipeline for %s is %s' % (self.get_name(), pipeline))

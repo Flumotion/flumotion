@@ -202,15 +202,21 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         """
         return self.mind.broker.transport.getPeer()
 
-    def getSources(self):
-        return self.options.sources
+    def getEaters(self):
+        """
+        Returns a list of names of feeded elements.
+        """
+        return self.options.eaters
     
-    def getFeeds(self, longname=False):
+    def getFeeders(self, longname=False):
+        """
+        Returns a list of names of feeding elements.
+        """
         if longname:
-            return map(lambda feed:
-                       self.getName() + ':' + feed, self.options.feeds)
+            return map(lambda feeder:
+                       self.getName() + ':' + feeder, self.options.feeders)
         else:
-            return self.options.feeds
+            return self.options.feeders
 
     def getRemoteManagerIP(self):
         return self.options.ip
@@ -222,13 +228,13 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return self.getTransportPeer()[1]
 
     # This method should ask the component if the port is free
-    def getListenPort(self, feed):
-        if feed.find(':') != -1:
-            feed = feed.split(':')[1]
+    def getListenPort(self, feeder):
+        if feeder.find(':') != -1:
+            feeder = feeder.split(':')[1]
 
-        assert self.listen_ports.has_key(feed), self.listen_ports
-        assert self.listen_ports[feed] != -1, self.listen_ports
-        return self.listen_ports[feed]
+        assert self.listen_ports.has_key(feeder), self.listen_ports
+        assert self.listen_ports[feeder] != -1, self.listen_ports
+        return self.listen_ports[feeder]
 
     def stop(self):
         """
@@ -237,17 +243,23 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         d = self._mindCallRemote('stop')
         d.addErrback(lambda x: None)
             
-    def link(self, sources, feeds):
-        def _getFreePortsCallback((feeds, ports)):
+    def link(self, eaters, feeders):
+        """
+        Tell the component to link itself to other components.
+
+        @type eaters: tuple of (name, host, port) tuples of feeded elements.
+        @type feeders: tuple of (name, host, port) tuples of feeding elements.
+        """
+        def _getFreePortsCallback((feeders, ports)):
             self.listen_ports = ports
-            d = self._mindCallRemote('link', sources, feeds)
+            d = self._mindCallRemote('link', eaters, feeders)
             d.addErrback(self._mindErrback)
 
-        if feeds:
-            d = self._mindCallRemote('getFreePorts', feeds)
+        if feeders:
+            d = self._mindCallRemote('getFreePorts', feeders)
             d.addCallbacks(_getFreePortsCallback, self._mindErrback)
         else:
-            d = self._mindCallRemote('link', sources, [])
+            d = self._mindCallRemote('link', eaters, [])
             d.addErrback(self._mindErrback)
     
     def setElementProperty(self, element, property, value):
@@ -357,15 +369,15 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
     def perspective_log(self, *msg):
         log.debug(self.getName(), *msg)
         
-    def perspective_stateChanged(self, feed, state):
-        self.debug('stateChanged: %s %s' % (feed, gst.element_state_get_name(state)))
+    def perspective_stateChanged(self, feeder, state):
+        self.debug('stateChanged: %s %s' % (feeder, gst.element_state_get_name(state)))
         
         self.state = state
         if self.state == gst.STATE_PLAYING:
             self.info('is now playing')
 
-        if self.getFeeds():
-            self.manager.startPendingComponents(self, feed)
+        if self.getFeeders():
+            self.manager.startPendingComponents(self, feeder)
             
     def perspective_error(self, element, error):
         self.error('error element=%s string=%s' % (element, error))
@@ -374,7 +386,8 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
     def perspective_uiStateChanged(self, component_name, state):
         self.manager.admin.uiStateChanged(component_name, state)
 
-class Feed:
+# abstracts the concept of a GStreamer tcpserversink producing a feeder
+class Feeder:
     def __init__(self, name):
         self.name = name
         self.dependencies = []
@@ -406,66 +419,68 @@ class Feed:
         return self.component.getListenPort(self.name)
     
     def __repr__(self):
-        return '<Feed %s ready=%r>' % (self.name, self.ready)
+        return '<Feeder %s ready=%r>' % (self.name, self.ready)
     
-class FeedManager:
+class FeederManager:
     def __init__(self):
-        self.feeds = {}
+        self.feeders = {}
 
-    def hasFeed(self, feedname):
-        if feedname.find(':') == -1:
-            feedname += ':default'
-
-        return self.feeds.has_key(feedname)
-    
     def __getitem__(self, key):
         if key.find(':') == -1:
             key += ':default'
-
-        return self.feeds[key]
+        return self.feeders[key]
         
-    def getFeed(self, feedname):
-        return self[feedname]
+    def hasFeeder(self, name):
+        if name.find(':') == -1:
+            name += ':default'
+
+        return self.feeders.has_key(name)
     
-    def addFeeds(self, component):
+    def getFeeder(self, name):
+        return self[name]
+    
+    def addFeeders(self, component):
+        # add the component's feeders
         name = component.getName()
-        feeds = component.getFeeds(True)
-        for feedname in feeds:
-            longname = name + ':' + feedname
-            if not self.feeds.has_key(feedname):
-                self.feeds[feedname] = Feed(feedname)
-            self.feeds[feedname].setComponent(component)
+        feeders = component.getFeeders(True)
+        for feedername in feeders:
+            longname = name + ':' + feedername
+            if not self.feeders.has_key(feedername):
+                self.feeders[feedername] = Feeder(feedername)
+            self.feeders[feedername].setComponent(component)
             
-    def isFeedReady(self, feedname):
-        if not self.hasFeed(feedname):
+    def isFeederReady(self, feedername):
+        if not self.hasFeeder(feedername):
             return False
 
-        feed = self[feedname]
+        feeder = self[feedername]
 
-        return feed.isReady()
+        return feeder.isReady()
     
-    def feedReady(self, feedname): 
-        # If we don't specify the feed
-        log.debug('manager', 'feed %s ready' % (feedname))
+    def feederReady(self, feedername): 
+        # set the feeder to ready
+        # If we don't specify the feeder
+        log.debug('manager', 'feeder %s ready' % (feedername))
 
-        if not self.feeds.has_key(feedname):
-            self.warning('FIXME: no feed called: %s' % feedname)
+        if not self.feeders.has_key(feedername):
+            self.warning('FIXME: no feeder called: %s' % feedername)
             return
         
-        feed = self.feeds[feedname]
-        feed.setReady()
+        feeder = self.feeders[feedername]
+        feeder.setReady()
             
-    def dependOnFeed(self, feedname, func, *args):
-        # If we don't specify the feed
-        if feedname.find(':') == -1:
-            feedname += ':default'
+    def dependOnFeeder(self, feedername, func, *args):
+        # make this feeder depend on another feeder
+        # If we don't specify the feeder
+        if feedername.find(':') == -1:
+            feedername += ':default'
 
-        if not self.feeds.has_key(feedname):
-            self.feeds[feedname] = Feed(feedname)
+        if not self.feeders.has_key(feedername):
+            self.feeders[feedername] = Feeder(feedername)
             
-        feed = self.feeds[feedname]
-        if not feed.isReady():
-            feed.addDependency(func, *args)
+        feeder = self.feeders[feedername]
+        if not feeder.isReady():
+            feeder.addDependency(func, *args)
         else:
             func(*args)
 
@@ -478,7 +493,7 @@ class Manager(pb.Root):
     """
     def __init__(self):
         self.components = {} # dict of component avatars
-        self.feed_manager = FeedManager()
+        self.feeder_manager = FeederManager()
         self.admin = None
         
         self.last_free_port = 5500
@@ -565,48 +580,52 @@ class Manager(pb.Root):
         if self.admin:
             self.admin.componentRemoved(component)
 
-    def getSourceComponents(self, component):
-        """Retrives the sources for a component
+    def getComponentEaters(self, component):
+        """
+        Retrieves the eaters (feed consumer elements) of a component.
 
         @type component:  component
         @param component: the component
         @rtype:           tuple with 3 items
-        @returns:         name, hostname and port"""
+        @returns:         name, hostname and port
+        """
 
-        peernames = component.getSources()
+        peernames = component.getEaters()
         retval = []
         for peername in peernames:
-            feed = self.feed_manager.getFeed(peername)
-            feedname = feed.getName()
-            if feedname.endswith(':default'):
-                feedname = feedname[:-8]
+            feeder = self.feeder_manager.getFeeder(peername)
+            feedername = feeder.getName()
+            if feedername.endswith(':default'):
+                feedername = feedername[:-8]
 
-            host = feed.getListenHost()
+            host = feeder.getListenHost()
             if (not self.isLocalComponent(component) and host == '127.0.0.1'):
                 host = component.getRemoteManagerIP()
 
-            retval.append((feedname, host,feed.getListenPort()))
+            retval.append((feedername, host,feeder.getListenPort()))
         return retval
 
-    def getFeedsForComponent(self, component):
-        """Retrives the feeds for a component
+    def getComponentFeeders(self, component):
+        """
+        Retrieves the feeders (feed producer elements) for a component.
 
         @type component:  component
         @param component: the component
         @rtype:           tuple of with 3 items
-        @returns:         name, hostname and port"""
+        @returns:         name, host and port
+        """
 
         host = component.getListenHost()
-        feednames = component.getFeeds()
+        feedernames = component.getFeeders()
         retval = []
-        for feedname in feednames:
+        for feedername in feedernames:
             if self.isLocalComponent(component):
                 port = gstutils.get_free_port(self.last_free_port)
                 self.last_free_port = port + 1
             else:
                 port = None
 
-            retval.append((feedname, host, port))
+            retval.append((feedername, host, port))
         return retval
 
     def componentStart(self, component):
@@ -614,16 +633,18 @@ class Manager(pb.Root):
         #assert isinstance(component, ComponentPerspective)
         #assert component != ComponentPerspective
 
-        sources = self.getSourceComponents(component)
-        feeds = self.getFeedsForComponent(component)
-        component.link(sources, feeds)
+        eaters = self.getComponentEaters(component)
+        feeders = self.getComponentFeeders(component)
+        component.link(eaters, feeders)
 
     def maybeComponentStart(self, component):
         component.debug('maybeComponentStart')
         
-        for source in component.getSources():
-            if not self.feed_manager.isFeedReady(source):
-                component.debug('source %s is not ready' % (source))
+        for eater in component.getEaters():
+            # eater and feeder elements are named with the feed name
+            # on the GObject level
+            if not self.feeder_manager.isFeederReady(eater):
+                component.debug('feeder %s is not ready' % (eater))
                 return
 
         if component.starting:
@@ -636,22 +657,22 @@ class Manager(pb.Root):
         component.debug('registering component')
         if self.admin:
             self.admin.componentAdded(component)
-        self.feed_manager.addFeeds(component)
+        self.feeder_manager.addFeeders(component)
 
-        sources = component.getSources()
-        if not sources:
-            component.debug('component has no sources, starting')
+        eaters = component.getEaters()
+        if not eaters:
+            component.debug('component does not take feeds, starting')
             self.componentStart(component)
             return
         else:
-            for source in sources:
-                self.feed_manager.dependOnFeed(source,
+            for eater in eaters:
+                self.feeder_manager.dependOnFeeder(eater,
                                                self.maybeComponentStart,
                                                component)
                 
-    def startPendingComponents(self, component, feed):
-        feedname = component.getName() + ':' + feed
-        self.feed_manager.feedReady(feedname)
+    def startPendingComponents(self, component, feeder):
+        feedername = component.getName() + ':' + feeder
+        self.feeder_manager.feederReady(feedername)
 
     def stopComponent(self, name):
         """

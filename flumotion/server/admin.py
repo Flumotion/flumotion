@@ -39,8 +39,8 @@ class ComponentView(pb.Copyable):
         self.name = component.getName()
         # forced to int so it's jellyable
         self.state = int(component.state)
-        self.sources = component.getSources()
-        self.feeds = component.getFeeds()
+        self.eaters = component.getEaters()
+        self.feeders = component.getFeeders()
         self.options = component.options.dict
 
 class RemoteComponentView(pb.RemoteCopy):

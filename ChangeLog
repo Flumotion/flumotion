@@ -1,5 +1,18 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/components/base/converter.py:
+	* flumotion/components/base/producer.py:
+	* flumotion/components/file/file.py:
+	* flumotion/components/http/http.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/component.py:
+	* flumotion/server/manager.py:
+	* tests/manager.py:
+	* tests/test_component_parse.py:
+	  use eaters and feeders as names for feeded and feeding elements
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/server/manager.py:
 	* flumotion/utils/gstutils.py:
 	* flumotion/utils/log.py:

@@ -59,15 +59,15 @@ class FileSinkStreamer(component.ParseLaunchComponent):
 
         return location
     
-    def feed_state_change_cb(self, element, old, state):
-        component.BaseComponent.feed_state_change_cb(self, element,
+    def feeder_state_change_cb(self, element, old, state):
+        component.BaseComponent.feeder_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
             self.debug('Ready')
             
-    def link_setup(self, sources, feeds):
+    def link_setup(self, eaters, feeders):
         sink = self.pipeline.get_by_name('fdsink')
-        sink.connect('state-change', self.feed_state_change_cb)
+        sink.connect('state-change', self.feeder_state_change_cb)
         
 from twisted.protocols import http
 from twisted.web import server, resource

@@ -3,18 +3,21 @@ from common import unittest
 from flumotion.server import manager
 
 class FakeComponentPerspective:
-    def __init__(self, name='fake', sources=[], port=-1, listen_host='listen-host'):
+    def __init__(self, name='fake', eaters=[], port=-1, listen_host='listen-host'):
         self.name = name
-        self.sources = sources
+        self.eaters = eaters
         self.port = port
         self.listen_host = listen_host
         
-    def getFeeds(self, long):
+    def getFeeders(self, long):
         if long:
             return [self.name + ':default']
         else:
             return ['default']
 
+    def getEaters(self):
+        return self.eaters
+    
     def getListenHost(self):
         return self.listen_host
 
@@ -27,9 +30,6 @@ class FakeComponentPerspective:
     def getName(self):
         return self.name
 
-    def getSources(self):
-        return self.sources
-    
 class TestManager(unittest.TestCase):
     def setUp(self):
         self.manager = manager.Manager()
@@ -79,25 +79,25 @@ class TestManager(unittest.TestCase):
         assert not self.manager.hasComponent('fake')
         self.assertRaises(KeyError, self.manager.removeComponent, c)
 
-    def testSourceComponentsEmpty(self):
+    def testComponentEatersEmpty(self):
         c = FakeComponentPerspective('fake')
         self.manager.addComponent(c)
-        assert self.manager.getSourceComponents(c) == []
+        assert self.manager.getComponentEaters(c) == []
         
-    def testSourceComponents(self):
+    def testComponentsEaters(self):
         c = FakeComponentPerspective('foo', ['bar', 'baz'])
         self.manager.addComponent(c)
         c2 = FakeComponentPerspective('bar', port=1000, listen_host='bar-host')
         self.manager.addComponent(c2)
         c3 = FakeComponentPerspective('baz', port=1001, listen_host='baz-host')
         self.manager.addComponent(c3)
-        self.manager.feed_manager.addFeeds(c2)
-        self.manager.feed_manager.addFeeds(c3)
+        self.manager.feeder_manager.addFeeders(c2)
+        self.manager.feeder_manager.addFeeders(c3)
         
-        sources = self.manager.getSourceComponents(c)
-        assert len(sources) == 2
-        assert ('bar', 'bar-host', 1000) in sources
-        assert ('baz', 'baz-host', 1001) in sources        
+        eaters = self.manager.getComponentEaters(c)
+        assert len(eaters) == 2
+        assert ('bar', 'bar-host', 1000) in eaters
+        assert ('baz', 'baz-host', 1001) in eaters        
 
 if __name__ == '__main__':
      unittest.main()

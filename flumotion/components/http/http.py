@@ -551,16 +551,16 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         Stats.clientRemoved(self)
         self.update_ui_state()
 
-    def feed_state_change_cb(self, element, old, state):
-        component.BaseComponent.feed_state_change_cb(self, element,
+    def feeder_state_change_cb(self, element, old, state):
+        component.BaseComponent.feeder_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
             self.debug('Ready to serve clients on %d' % self.port)
 
-    def link_setup(self, sources, feeds):
+    def link_setup(self, eaters, feeders):
         sink = self.get_sink()
         sink.connect('deep-notify::caps', self.notify_caps_cb)
-        sink.connect('state-change', self.feed_state_change_cb)
+        sink.connect('state-change', self.feeder_state_change_cb)
         sink.connect('client-removed', self.client_removed_cb)
         sink.connect('client-added', self.client_added_cb)
 

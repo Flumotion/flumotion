@@ -29,10 +29,10 @@ class Converter(component.ParseLaunchComponent):
 
 def createComponent(config):
     name = config['name']
-    feeds = config.get('feed', ['default'])
-    sources = config.get('source', [])
+    feeders = config.get('feed', ['default'])
+    eaters = config.get('source', [])
     pipeline = config['pipeline']
 
-    component = Converter(name, sources, feeds, pipeline)
+    component = Converter(name, eaters, feeders, pipeline)
 
     return component
