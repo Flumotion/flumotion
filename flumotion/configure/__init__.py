@@ -21,5 +21,5 @@
 # Headers in this file shall remain intact.
 
 """
-flumotion.configure - configure-time information
+configure-time information and settings
 """

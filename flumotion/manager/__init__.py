@@ -21,5 +21,5 @@
 # Headers in this file shall remain intact.
 
 """
-flumotion.manager - manager-side code
+manager-side code
 """

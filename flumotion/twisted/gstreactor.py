@@ -21,8 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-This module provides support for Twisted to interact with the GStreamer
-mainloop.
+a GStreamer mainloop-based Twistedreactor
 
 In order to use this support, simply do the following::
 

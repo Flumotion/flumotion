@@ -21,5 +21,5 @@
 # Headers in this file shall remain intact.
 
 """
-flumotion.admin - admin client code
+client-side code for administration clients
 """

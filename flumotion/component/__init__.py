@@ -21,5 +21,5 @@
 # Headers in this file shall remain intact.
 
 """
-flumotion.component - code executed by components inside jobs in workers
+code executed by components in workers and for components in admin clients
 """

@@ -1,5 +1,37 @@
 2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/reference/Makefile.am:
+	* flumotion/admin/__init__.py:
+	* flumotion/admin/admin.py:
+	* flumotion/common/__init__.py:
+	* flumotion/common/bundle.py:
+	* flumotion/common/common.py:
+	* flumotion/common/config.py:
+	* flumotion/common/errors.py:
+	* flumotion/common/interfaces.py:
+	* flumotion/common/log.py:
+	* flumotion/common/registry.py:
+	* flumotion/component/__init__.py:
+	* flumotion/component/component.py:
+	* flumotion/configure/__init__.py:
+	* flumotion/manager/__init__.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/common.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/twisted/__init__.py:
+	* flumotion/twisted/gstreactor.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/portal.py:
+	* flumotion/twisted/reflect.py:
+	* flumotion/worker/__init__.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  more doc fixing and uniformizing
+
+2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/__init__.py:
 	* flumotion/common/__init__.py:
 	* flumotion/common/bundle.py:

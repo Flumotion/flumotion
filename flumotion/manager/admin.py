@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Manager-side objects to handle administrative clients.
+manager-side objects to handle administrative clients
 """
 
 import os

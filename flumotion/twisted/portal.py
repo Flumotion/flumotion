@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Portal-related functionality inspired by twisted.cred.portal
+portal-related functionality inspired by twisted.cred.portal
 """
 
 from twisted.spread import flavors

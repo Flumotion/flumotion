@@ -21,7 +21,8 @@
 # Headers in this file shall remain intact.
 
 """
-FPB Client Factory using keycards to log in.
+Flumotion Perspective Broker using keycards
+
 Inspired by L{twisted.spread.pb}
 """
 

@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Manager-side objects for components.
+manager-side objects for components
 
 API Stability: semi-stable
 

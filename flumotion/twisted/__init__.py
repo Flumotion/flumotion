@@ -21,5 +21,5 @@
 # Headers in this file shall remain intact.
 
 """
-flumotion.twisted - Twisted-like base code written for Flumotion
+Twisted-like base code written for Flumotion
 """

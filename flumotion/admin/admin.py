@@ -21,8 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Model abstraction for admin clients.
-The model can support different views.
+model abstraction for administration clients supporting different views
 """
 
 import os

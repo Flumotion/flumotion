@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Worker-side objects to handle worker clients.
+worker-side objects to handle worker clients
 """
 
 import errno

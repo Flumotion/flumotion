@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Common classes and code to support manager-side objects.
+common classes and code to support manager-side objects
 """
 
 from twisted.internet import reactor

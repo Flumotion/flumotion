@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Manager-side objects to handle worker clients.
+manager-side objects to handle worker clients
 """
 
 import socket

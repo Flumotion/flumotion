@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Parsing of configuration files.
+parsing of configuration files
 """
 
 import os

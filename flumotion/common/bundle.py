@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-A class for a bundle of files used to implement caching over the network.
+bundles of files used to implement caching over the network
 """
 
 import md5

@@ -21,9 +21,9 @@
 # Headers in this file shall remain intact.
 
 """
-This module provides logging to Flumotion components.
+Flumotion logging
 
-Just like in GStreamer, five levels are defined.
+Just like in GStreamer, five levels of log information are defined.
 These are, in order of decreasing verbosity: log, debug, info, warning, error.
 
 API Stability: stabilizing

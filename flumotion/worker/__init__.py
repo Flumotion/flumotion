@@ -21,5 +21,5 @@
 # Headers in this file shall remain intact.
 
 """
-flumotion.worker - code for workers executing jobs for the manager
+code for workers executing jobs for the manager
 """

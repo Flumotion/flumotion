@@ -5,39 +5,19 @@ EPYDOC_ARGS=-q --no-frames --html --ignore-param-mismatch
 
 pypath=$(top_srcdir):@PYGTK_DIR@:$(PYTHONPATH)
 
-
-MODULE_FILES = \
-	flumotion/admin/__init__.py		\
-	flumotion/admin/admin.py		\
-	flumotion/common/__init__.py		\
-        flumotion/common/bundle.py		\
-        flumotion/common/common.py		\
-        flumotion/common/config.py		\
-	flumotion/common/errors.py		\
-	flumotion/common/interfaces.py		\
-	flumotion/common/log.py			\
-	flumotion/common/registry.py		\
+MODULE_FILES = $(shell cd $(top_srcdir) && ls	\
+	flumotion/admin/*.py			\
+	flumotion/common/*.py			\
 	flumotion/component/__init__.py		\
 	flumotion/component/component.py	\
 	flumotion/configure/__init__.py		\
 	flumotion/configure/configure.py	\
-	flumotion/manager/__init__.py		\
-	flumotion/manager/admin.py		\
-	flumotion/manager/component.py		\
-	flumotion/manager/manager.py		\
-	flumotion/manager/worker.py		\
-	flumotion/twisted/__init__.py		\
-	flumotion/twisted/gstreactor.py		\
-	flumotion/twisted/checkers.py		\
-	flumotion/twisted/credentials.py	\
-	flumotion/twisted/pb.py			\
-	flumotion/twisted/portal.py		\
-	flumotion/twisted/reflect.py		\
+	flumotion/manager/*.py			\
+	flumotion/twisted/*.py			\
 	flumotion/utils/__init__.py		\
 	flumotion/utils/gstutils.py		\
-	flumotion/worker/__init__.py		\
-	flumotion/worker/worker.py		\
-	flumotion/worker/job.py
+	flumotion/worker/*.py			\
+	)
 
 MODULES = $(subst /,.,$(patsubst %.py,%, $(MODULE_FILES:/__init__.py=)))
 

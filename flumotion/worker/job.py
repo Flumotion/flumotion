@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Worker-side objects to handle job processes.
+worker-side objects to handle job processes
 """
 
 import os

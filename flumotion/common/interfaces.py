@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Interfaces used in Flumotion.
+Flumotion interfaces
 """
 
 from twisted.python import components

@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Flumotion exceptions and pb.Error objects.
+serializable Flumotion exceptions
 
 Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """

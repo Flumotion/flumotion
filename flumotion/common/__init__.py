@@ -21,5 +21,5 @@
 # Headers in this file shall remain intact.
 
 """
-flumotion.common - common code used by all flumotion processes
+common code used by all flumotion processes
 """

@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Worker-side objects for components.
+worker-side objects for components
 """
 
 import os

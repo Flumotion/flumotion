@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Manager implementation and related classes.
+manager implementation and related classes
 
 API Stability: semi-stable
 

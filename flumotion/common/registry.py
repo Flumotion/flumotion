@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-Parsing of registry.
+parsing of registry, which holds component and bundle information
 """
 
 import os

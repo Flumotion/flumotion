@@ -21,7 +21,7 @@
 # Headers in this file shall remain intact.
 
 """
-A set of common functions.
+small common functions used by all processes
 """
 
 import os 
