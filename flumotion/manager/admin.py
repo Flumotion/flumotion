@@ -333,26 +333,7 @@ class AdminHeaven(pb.Root, log.Loggable):
         """
         self.vishnu = vishnu
         self.avatars = {} # adminName -> adminAvatar
-        #FIXME: don't add a log handler here until we have a good way
-        #of filtering client-side again
-        #log.addLogHandler(self.logHandler)
-        self.logcache = []
 
-    def logHandler(self, category, type, message):
-        self.logcache.append((category, type, message))
-        for avatar in self.avatars.values():
-            avatar.sendLog(category, type, message)
-
-    def sendCache(self, avatar):
-        if not avatar.hasRemoteReference():
-            reactor.callLater(0.25, self.sendCache, avatar)
-            return
-        
-        # FIXME: do this on request only
-        #self.debug('sending logcache to client (%d messages)' % len(self.logcache))
-        #for category, type, message in self.logcache:
-        #    avatar.sendLog(category, type, message)
-        
     ### IHeaven methods
 
     def createAvatar(self, avatarId):
@@ -364,7 +345,6 @@ class AdminHeaven(pb.Root, log.Loggable):
         """
         self.debug('creating new AdminAvatar')
         avatar = AdminAvatar(self, avatarId)
-        reactor.callLater(0.25, self.sendCache, avatar)
         
         self.avatars[avatarId] = avatar
         return avatar
