@@ -21,6 +21,7 @@
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
 import os
+import random
 import time
 
 import gobject
@@ -46,9 +47,102 @@ ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 <h2>%(code)d %(error)s</h2>
 </body>
 </html>
-
 """
+
+STATS_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+  <title>Statistics for %(name)s</title>
+</head>
+<body>
+<table>
+%(stats)s
+</table>
+</body>
+</html>
+"""
+
 HTTP_VERSION = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
+
+class HTTPStreamingAdminResource(resource.Resource):
+    def __init__(self, streaming):
+        'call with a HTTPStreamingResource to admin for'
+        self.streaming = streaming
+
+        resource.Resource.__init__(self)
+
+    def getChild(self, path, request):
+        return self
+
+    def format_bytes(self, bytes):
+        'nicely format number of bytes'
+        idx = ['P', 'T', 'G', 'M', 'K', '']
+        value = float(bytes)
+        l = idx.pop()
+        while idx and value >= 1024:
+            l = idx.pop()
+            value /= 1024
+        return "%.2f %sB" % (value, l)
+
+    def format_time(self, time):
+        'nicely format time'
+        display = []
+        days = time / (3600 * 24)
+        if days >= 7:
+            display.append('%d weeks' % days / 7)
+            days %= 7
+        if days >= 1:
+            display.append('%d days' % days)
+        time %= (3600 * 24)
+        h = time / 24
+        time %= 24
+        m = time / 60
+        time %= 60
+        s = time
+        display.append('%02d:%02d:%02d' % (h, m, s))
+        return " ".join(display)
+        
+    def isAuthenticated(self, request):
+        if request.getClientIP() == '127.0.0.1':
+            return True
+        if request.getUser() == 'fluendo' and request.getPassword() == 's3kr3t':
+            return True
+        return False
+
+    def render(self, request):
+        if not self.isAuthenticated(request):
+            error_code = http.UNAUTHORIZED
+            request.setResponseCode(error_code)
+            request.setHeader('server', HTTP_VERSION)
+            request.setHeader('content-type', 'text/html')
+            request.setHeader('WWW-Authenticate', 'Basic realm="Restricted Access"')
+
+            return ERROR_TEMPLATE % {'code': error_code,
+                                     'error': http.RESPONSES[error_code]}
+
+        el = self.streaming.streamer.get_sink()
+        stats = {}
+        stats['Clients connected'] = str(len(self.streaming.request_hash))
+        stats['Flesh shown'] = random.choice(('too much', 'not enough', 'just about right'))
+        stats['Mime type'] = self.streaming.streamer.get_mime()
+        bytes_sent = el.get_property('bytes-served')
+        stats['Total bytes sent'] = self.format_bytes(bytes_sent)
+        bytes_received = el.get_property('bytes-to-serve')
+        stats['Bytes processed'] = self.format_bytes(bytes_received)
+        uptime = time.time() - self.streaming.start_time
+        stats['Stream uptime'] = self.format_time(uptime)
+        stats['Stream bitrate'] = self.format_bytes(bytes_received / uptime) + '/sec'
+        stats['Total client bitrate'] = self.format_bytes(bytes_sent / uptime) + '/sec'
+        stats['Peak Client Number'] = self.streaming.peak_client_number
+        self.streaming.update_average()
+        stats['Average Simultaneous Clients'] = int(self.streaming.average_client_number)
+        block = []
+        for key in stats.keys():
+            block.append('<tr><td>%s</td><td>%s</td></tr>' % (key, stats[key]))
+        return STATS_TEMPLATE % {
+            'name': self.streaming.streamer.getName(),
+            'stats': "\n".join(block)
+        }
 
 class HTTPStreamingResource(resource.Resource):
     def __init__(self, streamer):
@@ -57,8 +151,14 @@ class HTTPStreamingResource(resource.Resource):
         streamer.connect('client-removed', self.streamer_client_removed_cb)
         self.msg = streamer.msg
         self.streamer = streamer
+        self.admin = HTTPStreamingAdminResource(self)
 
         self.request_hash = {}
+        self.start_time = time.time()
+        self.peak_client_number = 0 # keep track of the highest number
+        # keep track of average clients by tracking last average and its time
+        self.average_client_number = 0
+        self.average_time = self.start_time
         
         resource.Resource.__init__(self)
 
@@ -107,6 +207,7 @@ class HTTPStreamingResource(resource.Resource):
         self.logfile.flush()
 
     def streamer_client_removed_cb(self, streamer, sink, fd):
+        self.update_average()
         request = self.request_hash[fd]
         ip = request.getClientIP()
         self.log(fd, ip, request)
@@ -130,6 +231,8 @@ class HTTPStreamingResource(resource.Resource):
         return False
     
     def getChild(self, path, request):
+        if path and path == 'stats':
+            return self.admin
         return self
 
     def setHeaders(self, request):
@@ -156,9 +259,29 @@ class HTTPStreamingResource(resource.Resource):
 
         os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
         
+    def update_average(self):
+        # update running average of clients connected
+        now = time.time()
+        # calculate deltas
+        dt1 = self.average_time - self.start_time
+        dc1 = self.average_client_number
+        dt2 = now - self.average_time
+        dc2 = len(self.request_hash)
+        self.average_time = now
+        if dt1 == 0:
+            # first measurement
+            self.average_client_number = 0
+        else:
+            self.average_client_number = dc1 * dt1 / (dt1 + dt2) + dc2 * dt2 / (dt1 + dt2)
+        print "new average clients: %d" % self.average_client_number
+
     def addClient(self, request):
         fd = request.transport.fileno()
         self.request_hash[fd] = request
+        # update peak client number
+        if len(self.request_hash) > self.peak_client_number:
+            self.peak_client_number = len(self.request_hash)
+        self.update_average()
         self.streamer.add_client(fd)
         
     def render(self, request):
@@ -277,7 +400,7 @@ def createComponent(config):
         resource.setLogfile(config['logfile'])
         
     factory = server.Site(resource=resource)
-    component.msg( 'Listening on %d' % port)
+    component.msg('Listening on %d' % port)
     reactor.listenTCP(port, factory)
 
     return component

@@ -1,3 +1,13 @@
+2004-08-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion.in:
+	  remove jdahlin hack
+	* flumotion/components/http.py:
+	  add admin page on /stats protected by password.
+	  show lots of useful info
+	* flumotion/server/config.py:
+	  translate unicode from xml
+
 2004-08-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/components/http.py:

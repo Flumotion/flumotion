@@ -96,11 +96,11 @@ class FlumotionConfigXML:
             raise XmlParserError, "<component> must have a type attribute"
 
         config = {}
-        config['name'] = name = node.getAttribute('name')
-        config['type'] = type = node.getAttribute('type')
+        config['name'] = name = str(node.getAttribute('name'))
+        config['type'] = type = str(node.getAttribute('type'))
         
         if node.hasAttribute('start-factory'):
-            config['start-factory'] = node.getAttribute('start-factory')
+            config['start-factory'] = str(node.getAttribute('start-factory'))
         
         defs = registry.getComponent(type)
         self.parse_property_def(type, defs.getProperties(), node, config)
