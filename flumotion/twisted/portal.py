@@ -64,10 +64,8 @@ class _PortalWrapper(pb.Referenceable):
     def remote_login(self, username, *interfaces):
         """Start of username/password login."""
         interfaces = [namedAny(interface) for interface in interfaces]
-	print "DEBUG: interfaces:", interfaces
         c = pb.challenge()
         return c, _PortalAuthChallenger(self, username, c, *interfaces)
-
 
 class _PortalAuthChallenger(pb.Referenceable):
     """Called with response to password challenge."""

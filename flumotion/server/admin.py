@@ -71,6 +71,7 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         """
         @type admin: L{server.admin.Admin}
         """
+        self.admin = admin
         # FIXME: use accessor to get controller ?
         self.controller = admin.controller
         self.mind = None
@@ -161,6 +162,7 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         self.mind = None
         self.debug('Client from %s detached' % ip)
         self.log('Client detached is mind %s' % mind)
+        self.admin.removePerspective(self)
 
     ### pb.Avatar IPerspective methods
     def perspective_shutdown(self):
@@ -180,6 +182,11 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         return component.getState(element, property)
 
 class Admin(pb.Root):
+    """
+    I live in the controller.
+    I interface between the Controller and administrative clients.
+    For each client I create an L{AdminPerspective} to handle requests.
+    """
     def __init__(self, controller):
         """
         @type controller: L{server.controller.Controller}
@@ -218,6 +225,14 @@ class Admin(pb.Root):
         
         self.clients.append(adminp)
         return adminp
+
+    def removePerspective(self, adminp):
+        """
+        Removes the AdminPerspective from our list of perspectives.
+        @type adminp: L{server.admin.AdminPerspective}
+        """
+        self.debug('removing perspective %s' % adminp)
+        self.clients.remove(adminp)
     
     def componentAdded(self, component):
         """

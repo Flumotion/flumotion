@@ -1,5 +1,12 @@
 2004-08-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/server/admin.py:
+	  clean up detached admin clients' perspective from Admin
+	* flumotion/twisted/portal.py:
+	  remove DEBUG print
+
+2004-08-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/twisted/portal.py:
 	  Copy and adapt namedAny to check for the actual textual message
 	  instead of length of backtrace.  Issue filed in twisted as
