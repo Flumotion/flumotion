@@ -1,5 +1,11 @@
 2004-10-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/wizard/wizard.py:
+	  Throw up an error dialog if a worker is missing elements needed
+	  for the step, and block going to the next one.
+
+2004-10-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/steps.py:
 	  Don't activate save to disk by default.  If stuff like this
 	  ever needs to be done, do it in the glade file instead.

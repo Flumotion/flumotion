@@ -336,6 +336,7 @@ class Wizard(gobject.GObject, log.Loggable):
     sidebar_active_color = gtk.gdk.color_parse('#79abed')
     gsignal('finished', str)
     logCategory = 'wizard'
+
     def __init__(self, admin=None):
         self.__gobject_init__()
         self.wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'wizard.glade'))
@@ -364,6 +365,24 @@ class Wizard(gobject.GObject, log.Loggable):
     def __len__(self):
         return len(self.steps)
             
+    def error_dialog(self, message, parent=None, response=True):
+        """
+        Show an error message dialog.
+                                                                                
+        @param message the message to display.
+        @param parent the gtk.Window parent window.
+        @param response whether the error dialog should go away after response.
+                                                                                         returns: the error dialog.
+        """
+        if not parent:
+            parent = self.window
+        d = gtk.MessageDialog(parent, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
+            gtk.BUTTONS_OK, message)
+        if response:
+            d.connect("response", lambda self, response: self.destroy())
+        d.show_all()
+        return d
+
     def get_step_option(self, stepname, option):
         state = self.get_step_options(stepname)
         return state[option]
@@ -487,23 +506,36 @@ class Wizard(gobject.GObject, log.Loggable):
     def get_admin(self):
         return self._admin
     
-    def check_elements(self, worker, *elements):
+    def check_elements(self, workerName, *elementNames):
+        """
+        Check if the given list of GStreamer elements exist on the given worker.
+
+        @param workerName: name of the worker to check on
+        @param elementNames: names of the elements to check
+        """
         if not self._admin:
             log.debug('No admin connected, not checking presents of elements')
             return
         
-        asked = sets.Set(elements)
-        def _responseCb(existing):
+        asked = sets.Set(elementNames)
+        def _checkElementsCallback(existing, workerName):
             existing = sets.Set(existing)
             unexisting = asked.difference(existing)
+            # if we're missing elements, we cannot unblock the next button
             if unexisting:
                 log.warning('elements %s does not exist' % ', '.join(unexisting))
-            self.block_next(False)
+                message = "Worker %s is missing GStreamer elements '%s'.  " % (
+                    workerName, "', '".join(unexisting)) \
+                        + "You will not be able to go forward."
+                # FIXME: parent
+                self.error_dialog(message)
+            else:
+                self.block_next(False)
             return tuple(existing)
         
         self.block_next(True)
-        d = self._admin.checkElements(worker, elements)
-        d.addCallback(_responseCb)
+        d = self._admin.checkElements(workerName, elementNames)
+        d.addCallback(_checkElementsCallback, workerName)
         return d
 
     def _setup_worker(self, step):
