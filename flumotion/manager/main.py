@@ -17,13 +17,50 @@
 
 import optparse
 import sys
+import os
 
 from twisted.internet import reactor
 
 from flumotion.manager import manager
 from flumotion.utils import log
+import flumotion.config
 
-def load_config(vishnu, filename):
+class ServerContextFactory:
+    def __init__(self, pemFile):
+        self._pemFile = pemFile
+
+    def getContext(self):
+        """
+        Create an SSL context.
+        """
+        from OpenSSL import SSL
+        ctx = SSL.Context(SSL.SSLv23_METHOD)
+        ctx.use_certificate_file(self._pemFile)
+        ctx.use_privatekey_file(self._pemFile)
+        return ctx
+
+def _startSSL(vishnu, options):
+    from twisted.internet import ssl
+
+    pemFile = options.certificate
+    # if no path in pemFile, then look for it in the config directory
+    if not os.path.split(pemFile)[0]:
+        pemFile = os.path.join(flumotion.config.configdir, 'manager', pemFile)
+    if not os.path.exists(pemFile):
+        log.error('manager', ".pem file %s does not exist" % pemFile)
+    log.debug('manager', 'Using PEM certificate file %s' % pemFile)
+    ctxFactory = ServerContextFactory(pemFile)
+    
+    log.info('manager', 'Starting on port %d using SSL' % options.port)
+    reactor.listenSSL(options.port, vishnu.getFactory(), ctxFactory)
+    reactor.run()
+
+def _startTCP(vishnu, options):
+    log.info('manager', 'Starting on port %d using TCP' % options.port)
+    reactor.listenTCP(options.port, vishnu.getFactory())
+    reactor.run()
+
+def _loadConfig(vishnu, filename):
     vishnu.workerheaven.loadConfiguration(filename)
     
 def main(args):
@@ -38,6 +75,14 @@ def main(args):
                      action="store", type="int", dest="port",
                      default=8890,
                      help="Port to listen on [default 8890]")
+    group.add_option('-t', '--transport',
+                     action="store", type="string", dest="transport",
+                     default="ssl",
+                     help="Transport protocol to use (tcp/ssl)")
+    group.add_option('-C', '--certificate',
+                     action="store", type="string", dest="certificate",
+                     default="flumotion.pem",
+                     help="specify PEM certificate file (for SSL)")
     parser.add_option_group(group)
     
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
@@ -48,13 +93,16 @@ def main(args):
     if len(args) <= 2:
         filename = args[1]
         log.debug('manager', 'Loading configuration file from (%s)' % filename)
-        reactor.callLater(0, load_config, vishnu, filename)
+        reactor.callLater(0, _loadConfig, vishnu, filename)
     
     if options.verbose:
         log.setFluDebug("*:4")
 
-    log.debug('manager', 'Starting at port %d' % options.port)
-    reactor.listenTCP(options.port, vishnu.getFactory())
-    reactor.run()
-
+    if options.transport == "ssl":
+        _startSSL(vishnu, options)
+    elif options.transport == "tcp":
+        _startTCP(vishnu, options)
+    else:
+        # FIXME
+        raise
     return 0

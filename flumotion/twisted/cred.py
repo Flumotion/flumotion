@@ -39,3 +39,19 @@ class Username:
         self.username = username
         self.password = password
 
+
+class IUsernameCryptedPassword(credentials.ICredentials):
+    def checkCrypted(self, crypted):
+        pass
+        
+class UsernameCryptedPassword:
+    __implements__ = (IUsernameCryptedPassword,)
+
+    def __init__(self, username, password, salt):
+        assert len(salt) == 2
+
+        self.username = username
+        self.crypted = crypt.crypt(password, salt)
+
+    def checkCrypted(self, crypted):
+        return self.crypted == crypted

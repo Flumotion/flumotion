@@ -44,7 +44,11 @@ def main(args):
                      action="store", type="string", dest="password",
                      default="",
                      help="Password to use, - for interactive")
-    
+    group.add_option('-t', '--transport',
+                     action="store", type="string", dest="transport",
+                     default="ssl",
+                     help="Transport protocol to use (tcp/ssl)")
+     
     parser.add_option_group(group)
     group = optparse.OptionGroup(parser, "Job options")
     group.add_option('-j', '--job',
@@ -60,12 +64,12 @@ def main(args):
 
     if options.job:
         # we were started from the worker as a job
-        _start_job(options)
+        _startJob(options)
     else:
         # we are the main worker
-        _start_worker(options)
+        _startWorker(options)
 
-def _start_job(options):
+def _startJob(options):
     from flumotion.worker import job
     job_client_factory = job.JobClientFactory(options.job)
     reactor.connectUNIX(options.worker, job_client_factory)
@@ -73,14 +77,29 @@ def _start_job(options):
     reactor.run()
     log.debug('job', 'Reactor stopped')
 
-def _start_worker(options):
-    log.debug('worker', 'Connecting to manager %s:%d' % (options.host, options.port))
+def _connectWorkerReactorTCP(options, brain):
+    log.info('worker',
+        'Connecting to manager %s:%d with TCP' % (options.host, options.port))
+    reactor.connectTCP(options.host, options.port, brain.worker_client_factory)
 
+def _connectWorkerReactorSSL(options, brain):
+    from twisted.internet import ssl
+    log.info('worker',
+        'Connecting to manager %s:%d with SSL' % (options.host, options.port))
+    reactor.connectSSL(options.host, options.port, brain.worker_client_factory,
+        ssl.ClientContextFactory())
+
+def _startWorker(options):
     # create a brain and have it remember the manager to direct jobs to
-    brain = worker.WorkerBrain(options.host, options.port)
+    brain = worker.WorkerBrain(options.host, options.port, options.transport)
 
     # connect the brain to the manager
-    reactor.connectTCP(options.host, options.port, brain.worker_client_factory)
+    if options.transport == "tcp":
+        _connectWorkerReactorTCP(options, brain)
+    elif options.transport == "ssl":
+        _connectWorkerReactorSSL(options, brain)
+    else:
+        log.error('worker', 'Unknown transport protocol: %s' % options.transport)
 
     # FIXME: allow for different credentials types
     credentials = cred.Username(options.username, options.password)

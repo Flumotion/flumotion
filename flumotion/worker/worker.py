@@ -144,12 +144,13 @@ class WorkerBrain:
     I manage jobs and everything related.
     I live in the main worker process.
     """
-    def __init__(self, host, port):
+    def __init__(self, host, port, transport):
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
         self.manager_host = host
         self.manager_port = port
+        self.manager_transport = transport
         
         self.kindergarten = Kindergarten()
         self.job_server_factory, self.job_heaven = self.setup()
@@ -266,7 +267,8 @@ class JobAvatar(pb.Avatar, log.Loggable):
         self.log('Client attached mind %s' % mind)
         host = self.heaven.brain.manager_host
         port = self.heaven.brain.manager_port
-        cb = self.mind.callRemote('initial', host, port)
+        transport = self.heaven.brain.manager_transport
+        cb = self.mind.callRemote('initial', host, port, transport)
         cb.addCallback(self._cb_afterInitial)
 
     def _getFreePort(self):

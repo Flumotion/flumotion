@@ -28,7 +28,6 @@ from twisted.spread import pb
 from flumotion.common.registry import registry
 from flumotion.common import interfaces
 from flumotion.component import component
-from flumotion.worker import launcher
 from flumotion.twisted import cred
 from flumotion.utils import log
 
@@ -75,10 +74,10 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.remote = None
         
     ### pb.Referenceable remote methods called on by the WorkerBrain
-    def remote_initial(self, host, port):
+    def remote_initial(self, host, port, transport):
         self.manager_host = host
         self.manager_port = port
-        self.launcher = launcher.Launcher(host, port)
+        self.manager_transport = transport
         
     def remote_start(self, name, type, config, feedPorts):
         """
@@ -160,8 +159,22 @@ class JobMedium(pb.Referenceable, log.Loggable):
         manager_client_factory = component.ComponentClientFactory(comp)
         # XXX: get username/password from parent
         manager_client_factory.login(name)
-        reactor.connectTCP(self.manager_host,
-                           self.manager_port, manager_client_factory)
+
+        host = self.manager_host
+        port = self.manager_port
+        transport = self.manager_transport
+        if transport == "ssl":
+            from twisted.internet import ssl
+            log.info('job',
+                'Connecting to manager %s:%d with SSL' % (host, port))
+            reactor.connectSSL(host, port, manager_client_factory,
+                ssl.ClientContextFactory())
+        elif self.manager_transport == "tcp":
+            log.info('job',
+                'Connecting to manager %s:%d with TCP' % (host, port))
+            reactor.connectTCP(host, port, manager_client_factory)
+        else:
+            self.error('Unknown transport protocol %s' % self.manager_transport)
     
 class JobClientFactory(pb.PBClientFactory, log.Loggable):
     """

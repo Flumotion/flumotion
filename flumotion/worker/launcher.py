@@ -29,10 +29,11 @@ from twisted.internet import protocol
 
 class Launcher(log.Loggable):
     logCategory = 'launcher'
-    def __init__(self, host, port):
+    def __init__(self, host, port, transport):
         self.children = []
         self.manager_host = host
         self.manager_port = port
+        self.manager_transport = transport
         
     def set_nice(self, name, nice):
         if not nice:

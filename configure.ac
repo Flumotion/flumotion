@@ -18,8 +18,8 @@ AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")
 AS_AC_EXPAND(DATADIR, $datadir)
 AC_MSG_NOTICE(Storing data files in $DATADIR)
 
-dnl AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
-dnl AC_MSG_NOTICE(Storing configuration files in $SYSCONFDIR)
+AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
+AC_MSG_NOTICE(Storing configuration files in $SYSCONFDIR)
 
 dnl AS_AC_EXPAND(LOCALSTATEDIR, $localstatedir)
 dnl AC_MSG_NOTICE(Using localstatedir $LOCALSTATEDIR)
