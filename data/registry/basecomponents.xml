@@ -1,0 +1,45 @@
+<components>
+
+  <component type="base">
+    <source location="flumotion.server.component"/>
+    <properties>
+      <property name="nice" type="int"/>
+      <property name="username" type="string"/>
+    </properties>
+  </component>
+
+  <component type="producer" inherit="base">
+    <source location="flumotion.server.producer"/>
+    <properties>
+      <property name="pipeline" type="string" required="yes"/>
+      <property name="feeds" type="list"/>
+    </properties>
+  </component>
+
+  <component type="converter" inherit="base">
+    <source location="flumotion.server.converter"/>
+    <properties>
+      <property name="pipeline" type="string" required="yes"/>
+      <property name="feeds" type="list"/>
+      <property name="sources" type="list"/>
+    </properties>
+  </component>
+  
+  <component type="http-streamer">
+    <source location="flumotion.components.http"/>
+    <properties>
+      <property name="source" type="str" required="yes"/>
+      <property name="port" type="int" required="yes"/>
+      <property name="logfile" type="string"/>
+    </properties>
+  </component>
+
+  <component type="file-streamer">
+    <source location="flumotion.components.file"/>
+    <properties>
+      <property name="sources" type="list" required="yes"/>
+      <property name="location" type="string" required="yes"/>
+    </properties>
+  </component>
+
+</components>

@@ -1,0 +1,128 @@
+<root>
+  <components>
+    <component name="video+sine" type="producer">
+       <property name="nice" value="-10"/>
+       <feeds>
+         <feed name="video"/>
+         <feed name="audio/>
+       </feeds>
+       <pipeline>
+           videotestsrc sync=1 ! video/x-raw-yuv,width=64,height=64,framerate=5.0 ! :video 
+           { sinesrc sync=1 ! :audio }
+       </pipeline>
+    </component>
+
+    <component name="vorbis" type="converter">
+       <property name="nice" value="-5"/>
+       <sources>
+         <source name="video+sine:audio"/>
+       </sources>
+       <pipeline>audioconvert ! rawvorbisenc bitrate=32000</pipeline>
+    </component>
+
+    <component name="vorbis-high" type="converter">
+       <property name="nice" value="-5"/>
+       <sources>
+         <source name="video+sine:audio"/>
+       </sources>
+       <pipeline>audioconvert ! rawvorbisenc bitrate=128000</pipeline>
+    </component>
+
+    <!-- Ideally:
+      <component name="vorbis-high" type="vorbis-encoder">
+        <property name="bitrate" value="128000"/>
+      </component>
+    -->
+
+    <component name="theora" type="converter">
+       <property name="nice" value="-5"/>
+       <sources>
+         <source name="video+sine:video"/>
+       </sources>
+       <pipeline>ffcolorspace ! theoraenc</pipeline>
+    </component>
+
+    <component name="ogg+vorbis" type="converter">
+       <property name="nice" value="-5"/>
+       <sources>
+         <source name="vorbis"/>
+       </sources>
+       <pipeline>oggmux</pipeline>
+    </component>
+
+    <component name="ogg+vorbis-high" type="converter">
+       <property name="nice" value="-5"/>
+       <sources>
+         <source name="vorbis-high"/>
+       </sources>
+       <pipeline>oggmux</pipeline>
+    </component>
+
+    <component name="ogg+vorbis+theora" type="converter">
+       <property name="nice" value="-5"/>
+       <sources>
+         <source name="vorbis"/>
+         <source name="theora"/>
+       </sources>
+       <pipeline>
+          @vorbis ! oggmux name=mux max-delay=10000000 max-page-delay=10000000 
+          @theora ! mux. mux.
+       </pipeline>
+    </component>
+
+    <component name="ogg+vorbis+theora-high" type="converter">
+       <property name="nice" value="-5"/>
+       <sources>
+         <source name="vorbis-high"/>
+         <source name="theora"/>
+       </sources>
+       <pipeline>
+          @vorbis-high ! oggmux name=mux max-delay=10000000 max-page-delay=10000000 
+          @theora ! mux. mux.
+       </pipeline>
+    </component>
+
+    <component name="mulaw+smokey" type="converter">
+       <property name="nice" value="-5"/>
+       <sources>
+         <source name="video+sine:audio"/>
+         <source name="video+sine:video"/>
+       </sources>
+       <pipeline>
+          { @video+sine:audio ! audioscale ! audioconvert ! 
+             audio/x-raw-int,rate=8000,channels=1 ! mulawenc name=aenc } 
+          { @video+sine:video ! smokeenc name=venc } 
+             aenc. ! queue max-size-bytes=1000000 ! multipartmux name=mux venc. ! 
+                     queue max-size-bytes=1000000 ! mux. mux.
+       </pipeline>
+    </component>
+
+    <component name="http-java" type="http-streamer"> 
+       <source name="mulaw+smokey"/>
+       <port>8801</port>
+    </component>
+
+    <component name="http-audio" type="http-streamer">
+       <source name="ogg+vorbis"/>
+       <port>8802</port>
+       <logfile>/tmp/clients-audio.log</logfile>
+    </component>
+
+    <component name="http-video" type="http-streamer">
+       <source name="ogg+vorbis+theora"/>
+       <port>8803</port>
+       <logfile>/tmp/clients-video.log</logfile>
+    </component>
+
+    <component name="http-all" type="http-streamer"> 
+       <port>8800</port>
+       <logfile>/tmp/all-clients.log</logfile>
+       <sources>
+         <source name="mulaw+smokey" url="java"/>
+         <source name="ogg+vorbis" url="vorbis/>
+         <source name="ogg+vorbis+theora" url="theora"/>
+       </sources>
+    </component>
+
+  </components>
+</root>

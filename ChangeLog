@@ -1,3 +1,30 @@
+2004-07-30  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/config.py: More cleaning up, work in progress
+
+	* flumotion/server/launcher.py: Attempting to clean up shutdown,
+	slightly better now but far from perfect
+
+	* flumotion/server/registry.py: New file to handle registry
+	parsing and management
+
+	* flumotion/server/admin.py
+	(AdminPerspective.perspective_shutdown): New method to shutdown
+	the reactor
+
+	* bin/flumotion.in: add DATA_DIR
+
+	* flumotion/components/http.py: Move out http streamer from
+	streamer.py
+
+	* data/registry/basecomponents.xml: A list of all components
+	included in the base flumotion package.
+
+	* conf/complex.xml: ditto
+
+	* conf/videotest-jpeg.xml: xml version of videotest-jpeg.conf,
+	unused so far
+
 2004-07-27  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/streamer.py (HTTPStreamingResource.setHeader):

@@ -45,7 +45,6 @@ class ClientFactory(pbutil.ReconnectingPBClientFactory):
         self.component.cb_gotPerspective(perspective)
 
 class BaseComponent(pb.Referenceable):
-    __implements__ = interfaces.IBaseComponent,
     def __init__(self, name, sources, feeds):
         self.component_name = name
         self.sources = sources
@@ -294,7 +293,7 @@ class ParseLaunchComponent(BaseComponent):
         try:
             self.pipeline = gst.parse_launch(pipeline)
         except gobject.GError, e:
-            raise errors.PipelineParseError('foo')
+            raise errors.PipelineParseError(pipeline)
 
         BaseComponent.setup_pipeline(self)
 

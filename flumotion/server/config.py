@@ -20,23 +20,21 @@
 
 from ConfigParser import ConfigParser
 
+from twisted.python import reflect 
+
+from flumotion.server.registry import registry
 from flumotion.utils import log
 
 class ConfigError(Exception):
     pass
 
 class ConfigComponent:
-    nice = None
-    logfile = None
-    port = None
-    def __init__(self, name):
+    nice = 0
+    def __init__(self, name, func, config):
         self.name = name
+        self.func = func
+        self.config = config
 
-    def set(self, arg, kwargs):
-        if arg == 'name':
-            raise AssertionError
-        setattr(self, arg, kwargs)
-        
 class FlumotionConfig(ConfigParser):
     def __init__(self, filename):
         ConfigParser.__init__(self)
@@ -65,13 +63,13 @@ class FlumotionConfig(ConfigParser):
             return ['default']
 
     def get_sources(self, section):
-        assert (self.has_option(section, 'source') or
-                self.has_option(section, 'sources'))
         if self.has_option(section, 'source'):
             return [self.get(section, 'source')]
-        else:
+        elif self.has_option(section, 'sources'):
             return self.get(section, 'sources').split(',')
-
+        else:
+            return []
+        
     def get_protocol(self, section):
         assert self.has_option(section, 'protocol')
         return self.get(section, 'protocol')
@@ -116,14 +114,20 @@ class FlumotionConfig(ConfigParser):
         if self.has_option(section, 'nice'):
             kwargs['nice'] = self.getint(section, 'nice')
 
+        registry.getComponent(kind)
         if kind == 'producer':
-            self.add_component(section, pipeline=self.get_pipeline(section),
-                               feeds=self.get_feeds(section),
+            pipeline = self.get_pipeline(section)
+            feeds = self.get_feeds(section)
+            self.add_component(section, pipeline=pipeline, 
+                               feeds=feeds,
                                **kwargs)
         elif kind == 'converter':
-            self.add_component(section, pipeline=self.get_pipeline(section),
-                               feeds=self.get_feeds(section),
-                               sources=self.get_sources(section),
+            pipeline = self.get_pipeline(section)
+            feeds = self.get_feeds(section)
+            sources = self.get_sources(section)
+            self.add_component(section, pipeline=pipeline,
+                               feeds=feeds,
+                               sources=sources,
                                **kwargs)
         elif kind == 'streamer':
             self.parse_streamer(section, **kwargs)
@@ -141,6 +145,41 @@ class FlumotionConfig(ConfigParser):
                     raise ConfigError("section %s needs a kind field" % section)
             
                 kind = self.get(section, 'kind')
-                if not kind in ('producer', 'converter', 'streamer'):
-                    raise ConfigError("Unsupported component kind: %s" % kind)
-                self.parse_component(kind, section)
+                self.parse_component2(kind, section)
+
+    def parse_component2(self, kind, section):
+        kwargs = {}
+        kwargs['kind'] = kind
+        kwargs['name'] = section
+        if self.has_option(section, 'nice'):
+            kwargs['nice'] = self.getint(section, 'nice')
+
+        if self.has_option(section, 'pipeline'):
+            kwargs['pipeline'] = self.get_pipeline(section)
+            
+        kwargs['sources'] = self.get_sources(section)
+        
+        if kind == 'producer' or kind == 'converter':
+            kwargs['feeds'] = self.get_feeds(section)
+            
+        if self.has_option(section, 'port'):
+            kwargs['port'] = self.get(section, 'port')
+        if self.has_option(section, 'protocol'):
+            kwargs['protocol'] = self.get(section, 'protocol')
+        if self.has_option(section, 'location'):
+            kwargs['location'] = self.get(section, 'location')
+            
+        print kwargs
+        
+        config = registry.getComponent(kind)
+        module = reflect.namedAny(config.source)
+        if not hasattr(module, 'createComponent'):
+            print 'WARNING: no createComponent() for %s' % config.source
+            print 'XXX: Throw an error'
+            return
+
+        name = section
+
+        function = module.createComponent
+        component = ConfigComponent(name, function, kwargs)
+        self.components[name] = component

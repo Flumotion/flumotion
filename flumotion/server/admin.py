@@ -90,6 +90,11 @@ class AdminPerspective(pbutil.NewCredPerspective):
         
         self.callRemote('shutdown')
 
+    def perspective_shutdown(self):
+        print 'SHUTTING DOWN'
+        reactor.stop()
+        raise SystemExit
+    
     def perspective_setState(self, component_name, element, property, value):
         component = self.controller.getComponent(component_name)
         try:

@@ -12,13 +12,17 @@ dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.exists(os.path.join(dir, '.svn')):
     root = os.path.split(dir)[0]
     gladedir = os.path.join(root, 'data', 'ui')
+    datadir = os.path.join(root, 'data')
 else:
     root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
     gladedir = os.path.join('@prefix@', 'share', 'flumotion', 'glade')
+    datadir = os.path.join('@prefix@', 'share', 'flumotion')
 sys.path.insert(0, root)
 
+# This should probably go away
 import __builtin__
-__builtin__.GLADE_ROOT = gladedir # This should probably go away
+__builtin__.GLADE_ROOT = gladedir 
+__builtin__.DATA_DIR = datadir
 
 from flumotion.server import launcher
 from flumotion.twisted import errors

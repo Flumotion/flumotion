@@ -30,3 +30,16 @@ class Converter(component.ParseLaunchComponent):
         self.pipeline_play()
 
     remote_start = start
+
+def createComponent(config):
+    name = config['name']
+    feeds = config.get('feeds', [])
+    sources = config.get('sources', [])
+    pipeline = config['pipeline']
+
+    # XXX: How can we do this properly?
+    Converter.kind = config['kind']
+    
+    component = Converter(name, sources, feeds, pipeline)
+
+    return component

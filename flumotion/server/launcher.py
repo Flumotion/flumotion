@@ -42,8 +42,17 @@ from flumotion.server.config import FlumotionConfig
 from flumotion.server.controller import ControllerServerFactory
 from flumotion.server.converter import Converter
 from flumotion.server.producer import Producer
+from flumotion.server.registry import registry
 from flumotion.server import streamer
 from flumotion.utils import log, gstutils
+
+from twisted.internet.protocol import ClientCreator, Factory
+from twisted.protocols.basic import NetstringReceiver
+
+class MiniProtocol(NetstringReceiver):
+    def stringReceived(self, line):
+        if line == 'STOP':
+            reactor.stop()
 
 class Launcher:
     def __init__(self, host, port):
@@ -54,7 +63,6 @@ class Launcher:
         self.controller_port = port
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-        signal.signal(signal.SIGSEGV, self.segv_handler)
         
     def restore_uid(self):
         if self.uid is not None:
@@ -79,14 +87,20 @@ class Launcher:
 
     def start_controller(self, logging=False):
         self.msg('Starting controller')
+        
         pid = os.fork()
         if not pid:
             if logging:
                 log.enableLogging()
+            signal.signal(signal.SIGINT, signal.SIG_IGN)
+                
             self.restore_uid()
             factory = ControllerServerFactory()
-            self.controller = reactor.listenTCP(self.controller_port,
-                                                factory)
+            reactor.listenTCP(self.controller_port, factory)
+            f = Factory()
+            f.protocol = MiniProtocol
+            reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(), f)
+
             try:
                 reactor.run(False)
             except KeyboardInterrupt:
@@ -95,26 +109,15 @@ class Launcher:
             raise SystemExit
         self.controller_pid = pid
         
-    def signal_handler(self, *args):
-        for pid in self.children:
-            try:
-                os.kill(0, pid)
-                os.waitpid(pid, 0)
-            except OSError:
-                pass
-
-    def segv_handler(self, *args):
-        print args
-        
-    def spawn(self, component):
+    def spawn(self, component, function=None, args=None):
         pid = os.getpid()
         def exit_cb(*args):
             self.msg('Stopping pipeline')
             component.pipeline_stop()
             raise SystemExit
-
-        signal.signal(signal.SIGCHLD, signal.SIG_DFL)
-        signal.signal(signal.SIGINT, exit_cb)
+        
+        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        #signal.signal(signal.SIGINT, exit_cb)
         reactor.connectTCP(self.controller_host,
                            self.controller_port,
                            component.factory)
@@ -126,50 +129,42 @@ class Launcher:
         component.pipeline_stop()
 
     def run(self):
+        filename = '/tmp/flumotion.%d' % self.controller_pid
         self.restore_uid()
-        
-        while self.children:
-            for pid in self.children:
-                try:
-                    os.kill(pid, 0)
-                except OSError:
-                    self.children.remove(pid)
-                    
-            if not self.children:
-                continue
-            
-            try:
-                pid = os.waitpid(self.children[0], 0)
-                self.children.remove(pid)
-                self.msg('%d is dead pid' % pid)
-            except (KeyboardInterrupt, OSError):
-                pass
-            
-        if self.controller_pid:
-            try:
-                os.kill(self.controller_pid, signal.SIGINT)
-            except OSError:
-                pass
-        
-        self.msg('Shutting down reactor')
-        reactor.stop()
 
+        reactor.run()
+        
+        c = ClientCreator(reactor, MiniProtocol)
+        defered = c.connectUNIX(filename)
+        def cb_Stop(protocol):
+            self.msg('Telling controller to shutdown')
+            protocol.sendString('STOP')
+            self.msg('Shutting down launcher')
+            reactor.callLater(0, reactor.stop)
+        defered.addCallback(cb_Stop)
+        
+        reactor.run()
+        
         raise SystemExit
 
-    def start(self, component, nice=0, func=None, *args):
+    def start(self, component=None, nice=0, func=None, *args):
         pid = os.fork()
         if not pid:
+            retval = None
             if func:
-                func(*args)
+                retval = func(*args)
+                
+            if not component:
+                component = retval
+                
             self.set_nice(nice)
             self.restore_uid()
+            
             self.spawn(component)
             raise SystemExit
         else:
-            self.msg('Starting %s (%s) on pid %d' %
-                    (component.getName(),
-                     component.getKind(),
-                     pid))
+#            self.msg('Starting %s (%s) on pid %d' %
+#                    (component.getName(),component.getKind(), pid))
             self.children.append(pid)
 
     def setup_http_streamer(self, c):
@@ -203,6 +198,12 @@ class Launcher:
     def load_config(self, filename):
         config = FlumotionConfig(filename)
 
+        for name in config.components.keys():
+            c = config.components[name]
+            print 'Starting', name
+            self.start(None, c.nice, c.func, c.config)
+        return
+    
         for c in config.components.values():
             cb = None
             args = ()
@@ -331,6 +332,9 @@ def run_launcher(args):
         print 'Need a configuration file'
         return -1
     
+    registry.addFromFile(os.path.join(DATA_DIR,
+                                      'registry', 'basecomponents.xml'))
+
     launcher = Launcher(options.host, options.port)
 
     if options.host == 'localhost':
@@ -432,7 +436,7 @@ def main(args):
         return -1
 
     args = [arg for arg in args if not arg.startswith('--gst')]
-        
+    
     name = args[1]
     if name == 'controller':
         return run_controller(args)
