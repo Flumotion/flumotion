@@ -134,40 +134,20 @@ class Launcher:
 
     def shutdown(self):
         self.stop_controller()
-<<<<<<< .mine
 
-    def start(self, config):
-=======
-        
     def launch_component(self, config):
->>>>>>> .r240
         pid = os.fork()
-<<<<<<< .mine
+
         if pid:
             self.children.append(pid)
             return
         
         component = config.getComponent()
-=======
-        if pid:
-            self.children.append(pid)
-            self.msg('Starting %s (%s) on pid %d' %
-                    (config.getName(),
-                     config.getType(), pid))
-            return
-        
-        component = config.getComponent()
->>>>>>> .r240
                 
         self.set_nice(config.nice)
         self.restore_uid()
             
-<<<<<<< .mine
         gobject.threads_init()
-=======
-        self.spawn(component)
-        raise SystemExit
->>>>>>> .r240
 
         self.msg('Starting %s (%s) on pid %d' %
                  (config.getName(), config.getType(), pid))
