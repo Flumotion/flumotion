@@ -1,4 +1,11 @@
 2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/main.py:
+	* misc/flu.unstable.stable.modules:
+	  guard against no manager config
+	  update modules
+
+2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 	
 	* patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
 

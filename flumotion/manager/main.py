@@ -136,17 +136,17 @@ def main(args):
     cfg = config.FlumotionConfigXML(planetFile)
 
     # now copy over stuff from config that is not set yet
-    if not options.host and cfg.manager.host:
+    if not options.host and cfg.manager and cfg.manager.host:
         options.host = cfg.manager.host
         log.debug('manager', 'Setting manager host to %s' % options.host)
-    if not options.port and cfg.manager.port:
+    if not options.port and cfg.manager and cfg.manager.port:
         options.port = cfg.manager.port
         log.debug('manager', 'Setting manager port to %s' % options.port)
-    if not options.transport and cfg.manager.transport:
+    if not options.transport and cfg.manager and cfg.manager.transport:
         options.transport = cfg.manager.transport
         log.debug('manager', 'Setting manager transport to %s' %
             options.transport)
-    if not options.name and cfg.manager.name:
+    if not options.name and cfg.manager and cfg.manager.name:
         options.name = cfg.manager.name
         log.debug('manager', 'Setting manager name to %s' % options.name)
 
