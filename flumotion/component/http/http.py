@@ -347,7 +347,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             request = self.request_hash[fd]
             self.removeClient(request, fd, stats)
         except KeyError:
-            self.warning("fd %d not found in request_hash" % fd)
+            self.warning('[fd %5d] not found in request_hash' % fd)
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -387,7 +387,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         try:
             os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
         except OSError, e:
-            self.warning('client on fd %d gone before writing header' % fd)
+            self.warning('[fd %5d] client gone before writing header' % fd)
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -442,7 +442,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
 
         ip = request.getClientIP()
         self.logWrite(fd, ip, request, stats)
-        self.info('client from %s on fd %d disconnected' % (ip, fd))
+        self.info('[fd %5d] client from %s disconnected' % (fd, ip))
         del self.request_hash[fd]
 
     def handleNotReady(self, request):
@@ -489,7 +489,8 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
     
         # hand it to multifdsink
         self.streamer.add_client(fd)
-        self.info('client from %s on fd %d accepted' % (request.getClientIP(), fd))
+        ip = request.getClientIP()
+        self.info('[fd %5d] client from %s accepted' % (fd, ip))
         return server.NOT_DONE_YET
         
     def render(self, request):
@@ -614,7 +615,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     # this can be called from both application and streaming thread !
     def client_removed_cb(self, sink, fd, reason):
         self.log('client_removed_cb from thread %d' % thread.get_ident()) 
-        self.log('client_removed_cb: fd %d, reason %s' % (fd, reason))
+        self.log('[fd %5d] client_removed_cb, reason %s' % (fd, reason))
         stats = sink.emit('get-stats', fd)
         gobject.idle_add(self.client_removed_idle, sink, fd, reason, stats)
 
@@ -631,12 +632,12 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         Stats.clientRemoved(self)
         self.update_ui_state()
         # actually close it - needs gst-plugins 0.8.5 of multifdsink
-        self.log('client_removed_idle: fd %d, reason %s' % (fd, reason))
-        self.debug('closing fd %d' % fd)
+        self.log('[fd %5d] client_removed_idle, reason %s' % (fd, reason))
+        self.debug('[fd %5d] closing' % fd)
         try:
             os.close(fd)
         except OSError:
-            print "fd %d, Johan will trap GST_CLIENT_STATUS_ERROR here someday to get rid of OSError" % fd
+            print "[fd %5d] Johan will trap GST_CLIENT_STATUS_ERROR here someday to get rid of OSError" % fd
 
     def feeder_state_change_cb(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,
