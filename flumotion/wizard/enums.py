@@ -1,7 +1,7 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_enum -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/common/launcher.py: launch grids
+# flumotion/wizard/enums.py: python enum implementation
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -28,6 +28,10 @@ class EnumMetaClass(type):
         except KeyError:
             raise StopIteration
 
+    def __setitem__(self, value, enum):
+        self.__enums__[value] = enum
+        setattr(self, enum.name, enum)
+        
 
 class Enum(object):
     __metaclass__ = EnumMetaClass
@@ -39,30 +43,30 @@ class Enum(object):
     def __repr__(self):
         return '<enum %s of type %s>' % (self.name,
                                          self.__class__.__name__)
-    
+
     def get(self, value):
         return self.__enums__[value]
     get = classmethod(get)
 
-    
+    def set(self, value, item):
+        self[value] = item
+    set = classmethod(set)
+
+
     
 class EnumClass(object):
     def __new__(self, name, values=(), values_repr=()):
         if values_repr:
             if len(values) != len(values_repr):
-                raise TypeError("values_repr must be same length as value")
+                raise TypeError("values_repr must have the same length as value")
         else:
             values_repr = values
 
-        enums = {}
-        enum_type = EnumMetaClass(name, (Enum,),
-                                  dict(__enums__=enums))
+        etype = EnumMetaClass(name, (Enum,), dict(__enums__={}))
         for value, name in enumerate(values):
-            nick = values_repr[value]
-            enum = enum_type(value, name, nick)
-            enums[value] = enum
-            setattr(enum_type, name, enum)
-        return enum_type
+            etype[value] = etype(value, name, values_repr[value])
+            
+        return etype
 
 
 # Sources

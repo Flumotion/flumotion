@@ -43,7 +43,7 @@ class WizardComboBox(gtk.ComboBox):
     COLUMN_NAME = 1
     COLUMN_VALUE = 2
 
-    _column_types = (str, str, gobject.TYPE_UINT)
+    _column_types = str, str, int
     
     def __len__(self):
         model = self.get_model()
@@ -114,8 +114,8 @@ class WizardComboBox(gtk.ComboBox):
             iter = model.append()
             model.set(iter,
                       self.COLUMN_NAME, name,
-                      self.COLUMN_VALUE, value,
-                      self.COLUMN_NICK, name)
+                      self.COLUMN_NICK, name,
+                      self.COLUMN_VALUE, value)
             value += 1
         self.set_model(model)
         
@@ -181,11 +181,17 @@ class WizardStep(object, log.Loggable):
         self.load_glade()
 
     def __repr__(self):
-        return '<WizardStep %s>' % self.step_name
+        return '<WizardStep object %s>' % self.step_name
     
     def load_glade(self):
         glade_filename = os.path.join(gladedir, self.glade_file)
-        self.wtree = gtk.glade.XML(glade_filename, typedict=self.types)
+        
+        # In PyGTK 2.4.0 this raises an AttributeError which
+        # is silently ignored. We need to find out a way to call
+        # PyErr_Clear() if we want to support it, otherwise things
+        # will go wrong in mysterious places later on.
+        self.wtree = gtk.glade.XML(glade_filename,
+                                   typedict=self.types)
         
         windows = []
         self.widgets = self.wtree.get_widget_prefix('')
@@ -286,6 +292,19 @@ class Wizard:
         step = self[stepname]
         return self.get_step_state(step)
     
+    def get_step_state(self, step):
+        state = step.get_state()
+        dict = {}
+        for key, widget in state.items():
+            dict[key] = widget.get_state()
+        return dict
+    
+    def block_next(self, block):
+        self.button_next.set_sensitive(not block)
+
+    def block_prev(self, block):
+        self.button_prev.set_sensitive(not block)
+
     def add_step(self, step_class, initial=False):
         # If we don't have step_name set, count it as a base class
         name = step_class.step_name
@@ -328,24 +347,14 @@ class Wizard:
         
         self.current_step = step
 
-    def on_wizard_delete_event(self, wizard, event):
-        gtk.main_quit()
-
-    def on_button_prev_clicked(self, button):
+    def show_previous(self):
         self.stack.pop()
         prev_step = self.stack.peek()
         self.set_step(prev_step)
 
         self.update_buttons(has_next=True)
 
-    def get_step_state(self, step):
-        state = step.get_state()
-        dict = {}
-        for key, widget in state.items():
-            dict[key] = widget.get_state()
-        return dict
-    
-    def on_button_next_clicked(self, button):
+    def show_next(self):
         self.show_info(self.current_step)
         
         next = self.current_step.get_next()
@@ -369,23 +378,19 @@ class Wizard:
         else:
             self.button_prev.set_sensitive(True)
 
+        # XXX: Use the current step, not the one on the top of the stack
         current_step = self.stack.peek()
         if has_next:
             self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         else:
             self.button_next.set_label(gtk.STOCK_QUIT)
 
-    def block_next(self, block):
-        self.button_next.set_sensitive(not block)
-
-    def block_prev(self, block):
-        self.button_prev.set_sensitive(not block)
-
     def show_info(self, step):
         if not hasattr(step, 'component_name'):
             return
         
-        print '<component name="%s" type="%s">' % (step.component_name, step.component_type)
+        print '<component name="%s" type="%s">' % (step.component_name,
+                                                   step.component_type)
         options = step.get_component_properties()
         for key, value in options.items():
             print '  <%s>%s</%s> ' % (key, value, key)
@@ -404,7 +409,7 @@ class Wizard:
         return label
     
     def add_sidebar_substeps(self, section):
-        # Skip the last step, since that's whats we currently showing
+        # Skip the last step, since that's what we're currently showing
         stack = self.stack[:-1]
 
         # Filter out steps which is not the same category
@@ -438,13 +443,23 @@ class Wizard:
             self.add_sidebar_step(markup, 10)
 
             self.add_sidebar_substeps(stepname)
-                    
+
+            # Placeholder label, which expands vertically
             ph = gtk.Label()
             ph.show()
-            self.vbox_sidebar.pack_start(ph, True, True, 6)
+            self.vbox_sidebar.pack_start(ph)
             
         self.vbox_sidebar.show()
         
+    def on_wizard_delete_event(self, wizard, event):
+        self.finish()
+
+    def on_button_prev_clicked(self, button):
+        self.show_previous()
+
+    def on_button_next_clicked(self, button):
+        self.show_next()
+
     def finish(self):
         gtk.main_quit()
         
@@ -452,9 +467,7 @@ class Wizard:
         if not self.stack:
             raise TypeError("need an initial step")
 
-        step = self.stack.peek()
-        self.set_step(step)
-        self.update_sidebar(step)
+        self.set_step(self.stack.peek())
         
         self.window.show()
         gtk.main()
@@ -481,3 +494,4 @@ if __name__ == '__main__':
             if 'WizardStep' in attr.__bases__[0].__name__:
                 wiz.add_step(attr, initial)
     wiz.run()
+
