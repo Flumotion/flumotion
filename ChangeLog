@@ -1,3 +1,10 @@
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/wizard.py:
+
+	Make the selecting of worker for a component actually work as
+	intented. Also load the previous steps when clicking back.	
+
 2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/bouncers/htpasswdcrypt.py:

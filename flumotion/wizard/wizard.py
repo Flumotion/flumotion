@@ -400,8 +400,7 @@ class Wizard(gobject.GObject):
         
         self.update_sidebar(step)
         self.update_buttons(has_next=True)
-        self._setup_worker()
-        
+
         # Finally show
         widget.show()
         step.activated()
@@ -435,9 +434,14 @@ class Wizard(gobject.GObject):
         self.combobox_worker.show()
         
     def show_previous(self):
-        self.stack.pop()
+        step = self.stack.pop()
+
+        self._setup_worker(step)
+
         prev_step = self.stack.peek()
+        
         self.set_step(prev_step)
+        self._set_worker_from_step(prev_step)
 
         self.update_buttons(has_next=True)
 
@@ -458,19 +462,33 @@ class Wizard(gobject.GObject):
         d = self._admin.checkElements(worker, elements)
         d.addCallback(_responseCb)
     
-    def _setup_worker(self):
+    def _setup_worker(self, step):
         # get name of active worker
         if self.combobox_worker:
             iter = self.combobox_worker.get_active_iter()
             model = self.combobox_worker.get_model()
             text = model.get(iter, 0)[0]
-            self.current_step.worker = text
-        
+            step.worker = text
+
+    def _set_worker_from_step(self, step):
+        if not hasattr(step, 'worker'):
+            return
+
+        model = self.combobox_worker.get_model()
+        current_text = step.worker
+        for row in model:
+            text = model.get(row.iter, 0)[0]
+            if current_text == text:
+                self.combobox_worker.set_active_iter(row.iter)
+                break
+
     def show_next(self):
         next = self.current_step.get_next()
         if not next:
             self.finish(save=True)
             return
+
+        self._setup_worker(self.current_step)
 
         try:
             next_step = self[next]
