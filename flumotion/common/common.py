@@ -257,16 +257,22 @@ def _findPackageCandidates(path, prefix='flumotion'):
 
     # chop off the base path to get a list of "relative" bundlespace paths
     bundlePaths = [x[len(path) + 1:] for x in dirs]
+
+    # remove some common candidates, like .svn subdirs
+    isNotSvn = lambda x: x.find('.svn') == -1
+    bundlePaths = filter(isNotSvn, bundlePaths)
+
     # convert paths to module namespace
     bundlePackages = [".".join(x.split(os.path.sep)) for x in bundlePaths]
+
     # remove all not starting with prefix
-    for p in bundlePackages:
-        if not p.startswith(prefix):
-            bundlePackages.remove(p)
+    isInPrefix = lambda x: x.startswith(prefix)
+    bundlePackages = filter(isInPrefix, bundlePackages)
 
     # sort them so that depending packages are after higher-up packages
     bundlePackages.sort()
         
+    print "returning %r" % bundlePackages
     return bundlePackages
 
 def registerPackagePath(packagePath, prefix='flumotion'):
@@ -289,10 +295,12 @@ def registerPackagePath(packagePath, prefix='flumotion'):
     # First add the root to sys.path, so we can import stuff from it,
     # probably a good idea to live it there, if we want to do
     # fancy stuff later on.
-    abs = os.path.abspath(packagePath)
-    if not abs in sys.path:
+    packagePath = os.path.abspath(packagePath)
+    log.log('bundle', 'registering packagePath %s' % packagePath)
+
+    if not packagePath in sys.path:
         log.log('bundle', 'adding packagePath %s to sys.path' % packagePath)
-        sys.path.append(abs)
+        sys.path.append(packagePath)
 
     # Find the packages in the path and sort them,
     # the following algorithm only works if they're sorted.

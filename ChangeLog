@@ -1,6 +1,11 @@
 2005-01-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:
+	  scrub some paths like .svn stuff for package candidates
+
+2005-01-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
 	* flumotion/configure/Makefile.am:
 	  add prefix when looking for package candidates.  Fixes some issues
 	  when trying to registerPackagePaths from outside flumotion.
