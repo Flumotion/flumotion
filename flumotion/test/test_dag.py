@@ -149,3 +149,101 @@ class TestDAG(unittest.TestCase):
         # add an edge that introduces a cycle
         graph.addEdge(5, 4)
         self.assertRaises(dag.CycleError, graph.sort)
+
+class FakeDep:
+    def __init__(self, name):
+        self.name = name
+
+class FakeFeeder(FakeDep): pass
+class FakeEater(FakeDep): pass
+class FakeWorker(FakeDep): pass
+class FakeKid(FakeDep): pass
+class FakeComponent(FakeDep): pass
+
+(feeder, eater, worker, kid, component) = range(0, 5)
+
+class TestPlanet(unittest.TestCase):
+    def testPlanet(self):
+        graph = dag.DAG()
+        
+        weu = FakeWorker('europe')
+        wus = FakeWorker('america')
+        
+        graph.addNode(weu, worker)
+        graph.addNode(wus, worker)
+        
+        # producer
+        kpr = FakeKid('producer')
+        cpr = FakeComponent('producer')
+        fau = FakeFeeder('audio')
+        fvi = FakeFeeder('video')
+
+        graph.addNode(kpr, kid)
+        graph.addNode(cpr, component)
+        graph.addNode(fau, feeder)
+        graph.addNode(fvi, feeder)
+
+        graph.addEdge(weu, kpr)
+        graph.addEdge(kpr, fau)
+        graph.addEdge(kpr, fvi)
+        graph.addEdge(fau, cpr)
+        graph.addEdge(fvi, cpr)
+
+        kcv = FakeKid('converter')
+        ccv = FakeComponent('converter')
+        fen = FakeFeeder('encoded')
+        evi = FakeEater('video')
+
+        graph.addNode(kcv, kid)
+        graph.addNode(ccv, component)
+        graph.addNode(evi, eater)
+        graph.addNode(fen, feeder)
+
+        graph.addEdge(weu, kcv)
+        graph.addEdge(kcv, fen)
+        graph.addEdge(kcv, evi)
+        graph.addEdge(fen, ccv)
+        graph.addEdge(evi, ccv)
+
+        # link from producer to converter
+        graph.addEdge(fvi, evi)
+
+        # consumer
+        kcs = FakeKid('consumer')
+        ccs = FakeComponent('consumer')
+        een = FakeEater('encoded')
+
+        graph.addNode(kcs, kid)
+        graph.addNode(ccs, component)
+        graph.addNode(een, feeder)
+
+        graph.addEdge(wus, kcs)
+        graph.addEdge(kcs, een)
+        graph.addEdge(een, ccs)
+
+        # link from converter to consumer
+        graph.addEdge(fen, een)
+
+        # tester
+        kte = FakeKid('tester')
+        cte = FakeComponent('tester')
+
+        graph.addNode(kte, kid)
+        graph.addNode(cte, component)
+
+        graph.addEdge(ccs, cte)
+
+        # test offspring filtered
+        
+        # all components depend on the european worker
+        list = graph.getOffspring(weu, component)
+        self.assertEquals(len(list), 4)
+        for c in [cpr, ccv, ccs, cte]:
+            self.failUnless(c in list)
+
+        # only streamer and tester depend on the us worker
+        list = graph.getOffspring(wus, component)
+        self.assertEquals(len(list), 2)
+        for c in [ccs, cte]:
+            self.failUnless(c in list)
+

@@ -113,7 +113,7 @@ class DAG:
         np.children.remove(nc)
         nc.parents.remove(np)
 
-    def getChildren(self, object):
+    def getChildren(self, object, types=None):
         """
         Return a list of objects that are direct children of this object.
 
@@ -122,15 +122,23 @@ class DAG:
         self._assertExists(object)
         node = self.nodes[object]
 
-        return [n.object for n in node.children]
+        l = node.children
+        if types:
+            l = filter(lambda n: n.type in types, l)
 
-    def getParents(self, object):
+        return [n.object for n in l]
+
+    def getParents(self, object, types=None):
         self._assertExists(object)
         node = self.nodes[object]
         
-        return [n.object for n in node.parents]
+        l = node.parents
+        if types:
+            l = filter(lambda n: n.type in types, l)
+
+        return [n.object for n in l]
         
-    def getOffspring(self, object):
+    def getOffspring(self, object, *types):
         self._assertExists(object)
         node = self.nodes[object]
 
@@ -156,6 +164,10 @@ class DAG:
                     list.remove(n)
                     list.extend(n.children)
                     offspring.extend(n.children)
+
+        # filter offspring by types
+        if types:
+            offspring = filter(lambda n: n.type in types, offspring)
 
         # now that we have all offspring, return a sorted list of them
         ret = []

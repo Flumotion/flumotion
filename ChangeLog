@@ -1,3 +1,9 @@
+2005-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/dag.py:
+	* flumotion/test/test_dag.py:
+	  some more DAG fun
+
 2005-02-08  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/client.py (Window.manage_stop_component_cb) 
