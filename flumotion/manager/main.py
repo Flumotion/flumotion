@@ -39,8 +39,7 @@ class ServerContextFactory:
         ctx.use_privatekey_file(self._pemFile)
         return ctx
 
-def _startSSL(vishnu, options):
-    pemFile = options.certificate
+def _startSSL(vishnu, host, port, pemFile):
     # if no path in pemFile, then look for it in the config directory
     if not os.path.split(pemFile)[0]:
         pemFile = os.path.join(configure.configdir, 'manager', pemFile)
@@ -49,13 +48,13 @@ def _startSSL(vishnu, options):
     log.debug('manager', 'Using PEM certificate file %s' % pemFile)
     ctxFactory = ServerContextFactory(pemFile)
     
-    log.info('manager', 'Starting on port %d using SSL' % options.port)
-    reactor.listenSSL(options.port, vishnu.getFactory(), ctxFactory)
+    log.info('manager', 'Starting on port %d using SSL' % port)
+    reactor.listenSSL(port, vishnu.getFactory(), ctxFactory, interace=host)
     reactor.run()
 
-def _startTCP(vishnu, options):
-    log.info('manager', 'Starting on port %d using TCP' % options.port)
-    reactor.listenTCP(options.port, vishnu.getFactory())
+def _startTCP(vishnu, host, port):
+    log.info('manager', 'Starting on port %d using TCP' % port)
+    reactor.listenTCP(port, vishnu.getFactory(), interface=host)
     reactor.run()
 
 def _loadConfig(vishnu, filename):
@@ -111,6 +110,10 @@ def main(args):
     group = optparse.OptionGroup(parser, "manager options")
     defaultSSLPort = configure.defaultSSLManagerPort
     defaultTCPPort = configure.defaultTCPManagerPort
+    group.add_option('-H', '--hostname',
+                     action="store", type="string", dest="port",
+                     default="",
+                     help="hostname to listen to [default ""]")
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      default=None,
@@ -118,7 +121,7 @@ def main(args):
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
                      default="ssl",
-                     help="transport protocol to use (tcp/ssl)")
+                     help="transport protocol to use (tcp/ssl) [default ssl]")
     group.add_option('-C', '--certificate',
                      action="store", type="string", dest="certificate",
                      default="default.pem",
@@ -161,13 +164,11 @@ def main(args):
         common.daemonize(stdout=logPath, stderr=logPath)
 
     if options.transport == "ssl":
-        if not options.port:
-            options.port = defaultSSLPort
-        _startSSL(vishnu, options)
+        port = options.port or defaultSSLPort
+        _startSSL(vishnu, options.host, port, options.certificate)
     elif options.transport == "tcp":
-        if not options.port:
-            options.port = defaultTCPPort
-        _startTCP(vishnu, options)
+        port = options.port or defaultTCPPort
+        _startTCP(vishnu, options.host, port)
     else:
         print >> sys.stderr, \
               'ERROR: unsupported transport: %s, must be ssl or tcp' % options.transport

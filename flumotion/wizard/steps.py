@@ -359,6 +359,13 @@ class Theora(VideoEncoder):
     component_type = 'theora'
     icon = 'xiphfish.png'
     
+    def setup(self):
+        # XXX: move to glade file
+        self.spinbutton_bitrate.set_range(0, 4000)
+        self.spinbutton_bitrate.set_value(400)
+        self.spinbutton_quality.set_range(0, 63)
+        self.spinbutton_quality.set_value(16)
+
     def deactivated(self):
         self.wizard.check_element(self.worker, 'theoraenc')
         
@@ -373,9 +380,12 @@ class Theora(VideoEncoder):
         return self.wizard['Encoding'].get_audio_page()
     
     def get_component_properties(self):
-        options = self.wizard.get_step_state(self)
-        options['bitrate'] = int(self.spinbutton_bitrate.get_value())
-        options['quality'] = int(options['quality'])
+        options = {}
+        if self.radiobutton_bitrate:
+            options['bitrate'] = int(self.spinbutton_bitrate.get_value())
+        elif self.radiobutton_quality:
+            options['quality'] = int(self.spinbutton_quality.get_value())
+
         return options
     
 wizard.register_step(Theora)
@@ -438,25 +448,31 @@ class AudioEncoder(wizard.WizardStep):
 
 # Worker?
 class Vorbis(AudioEncoder):
+    glade_file = 'wizard_vorbis.glade'
     step_name = 'Vorbis'
     component_type = 'vorbis'
     icon = 'xiphfish.png'
 
-    def activated(self):
-        self.label_quality.show()
-        self.spinbutton_quality.show()
-        
-    def deactivated(self):
-        self.wizard.check_element(self.worker, 'rawvorbisenc')
-        
     def setup(self):
         self.spinbutton_bitrate.set_range(6, 250)
         self.spinbutton_bitrate.set_value(64)
         
+    def deactivated(self):
+        self.wizard.check_element(self.worker, 'rawvorbisenc')
+        
+    # This is bound to both radiobutton_bitrate and radiobutton_quality
+    def on_radiobutton_toggled(self, button):
+        self.spinbutton_bitrate.set_sensitive(
+            self.radiobutton_bitrate.get_active())
+        self.spinbutton_quality.set_sensitive(
+            self.radiobutton_quality.get_active())
+        
     def get_component_properties(self):
-        options = self.wizard.get_step_state(self)
-        options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
-        options['quality'] = int(self.spinbutton_quality.get_value())
+        options = {}
+        if self.radiobutton_bitrate:
+            options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
+        elif self.radiobutton_quality:
+            options['quality'] = int(self.spinbutton_quality.get_value())
         return options
 wizard.register_step(Vorbis)
 
@@ -675,7 +691,7 @@ class Disk(wizard.WizardStep):
                 options['rotateType'] = 'time'
                 unit = self.combobox_time_list.get_enum().unit
                 options['time'] = long(self.spinbutton_time.get_value() * unit)
-            elif self.radiobutton.has_size:
+            elif self.radiobutton_has_size:
                 options['rotateType'] = 'size'
                 unit = self.combobox_size_list.get_enum().unit
                 options['size'] = long(self.spinbutton_size.get_value() * unit)

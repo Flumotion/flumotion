@@ -1,5 +1,15 @@
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
+	reviewed by: <delete if not using a buddy>
+
+	* data/glade/Makefile.am:
+	* data/glade/wizard_audio_encoder.glade:
+	* data/glade/wizard_vorbis.glade:
+	* flumotion/manager/main.py:
+	* flumotion/wizard/steps.py:
+
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/Makefile.am:
 	* data/glade/wizard.glade:
 	* data/glade/wizard_audio_encoder.glade:

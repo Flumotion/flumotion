@@ -19,7 +19,8 @@
 	wizard_theora.glade		\
 	wizard_tvcard.glade		\
 	wizard_webcam.glade		\
-	wizard_welcome.glade		
+	wizard_welcome.glade		\
+	wizard_vorbis.glade
 
 gladedir = $(pkgdatadir)/glade
 
