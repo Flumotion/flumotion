@@ -1,7 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/soundcard/soundcard.py: soundcard producer
+# flumotion/component/producers/soundcard/soundcard.py: soundcard producer
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -26,7 +26,7 @@ def state_changed_cb(element, old, new, channel):
         if c:
             element.set_channel(c)
     
-class Soundcard(feedcomponent.ParseLaunchComponent):
+class SoundcardProducer(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, feeders, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     [],
@@ -37,7 +37,7 @@ def createComponent(config):
     kind = 'alsasrc'
     config['device'] = 'hw:0'
     
-    component = Soundcard(config['name'], config['feed'],
+    component = SoundcardProducer(config['name'], config['feed'],
                           '%s name=source' % kind)
 
     element = component.pipeline.get_by_name('source')

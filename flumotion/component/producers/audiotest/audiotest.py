@@ -1,7 +1,8 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/videotest/videotest.py: videotest producer
+# flumotion/component/producers/audiotest/audiotest.py
+# a test audio producer
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)

@@ -1,5 +1,28 @@
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/audiotest/Makefile.am:
+	* flumotion/component/audiotest/__init__.py:
+	* flumotion/component/audiotest/audiotest.py:
+	* flumotion/component/audiotest/audiotest.xml:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/audiotest/Makefile.am:
+	* flumotion/component/producers/audiotest/__init__.py:
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/soundcard/Makefile.am:
+	* flumotion/component/producers/soundcard/__init__.py:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/component/soundcard/Makefile.am:
+	* flumotion/component/soundcard/__init__.py:
+	* flumotion/component/soundcard/soundcard.py:
+	* flumotion/component/soundcard/soundcard.xml:
+	  move audiotest and souncard
+
+2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_manager_admin.py:
 	  adding test

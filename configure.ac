@@ -66,7 +66,6 @@ flumotion/admin/Makefile
 flumotion/admin/gtk/Makefile
 flumotion/common/Makefile
 flumotion/component/Makefile
-flumotion/component/audiotest/Makefile
 flumotion/component/base/Makefile
 flumotion/component/bouncers/Makefile
 flumotion/component/bttv/Makefile
@@ -78,8 +77,9 @@ flumotion/component/consumers/httpstreamer/Makefile
 flumotion/component/muxers/Makefile
 flumotion/component/overlay/Makefile
 flumotion/component/producers/Makefile
+flumotion/component/producers/audiotest/Makefile
+flumotion/component/producers/soundcard/Makefile
 flumotion/component/producers/videotest/Makefile
-flumotion/component/soundcard/Makefile
 flumotion/component/webcam/Makefile
 flumotion/configure/Makefile
 flumotion/configure/installed.py

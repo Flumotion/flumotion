@@ -11,13 +11,12 @@ clean-local:
 
 SUBDIRS = \
 	consumers \
-	audiotest \
 	base \
 	bouncers \
 	bttv \
 	dv \
 	encoders \
 	muxers \
+	producers \
 	overlay \
-	soundcard \
 	webcam

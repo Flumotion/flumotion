@@ -8,4 +8,6 @@ clean-local:
 	rm -rf *.pyc *.pyo
 
 SUBDIRS = \
+	audiotest \
+	soundcard \
 	videotest
