@@ -409,16 +409,21 @@ class Vishnu(log.Loggable):
         # called when the jobstate is retrieved
         self.debug('registering component %r' % componentAvatar)
 
+        #if not componentAvatar in self._componentMappers.keys():
+        #    self.warning('avatar %r not found' % componentAvatar)
+        #    return
+
+        # map jobState
         jobState = componentAvatar.jobState
         m = self._componentMappers[componentAvatar]
-        if not componentAvatar in self._componentMappers.keys():
-            self.warning('avatar %r not found' % componentAvatar)
-            return
         m.jobState = jobState
         self._componentMappers[jobState] = m
 
         # attach jobState to state
         m.state.setJobState(jobState)
+
+        # attach componentstate to avatar
+        componentAvatar.componentState = m.state
         
     def unregisterComponent(self, componentAvatar):
         # called when the component has logged out
@@ -428,6 +433,7 @@ class Vishnu(log.Loggable):
 
         m = self._componentMappers[componentAvatar]
 
+        # unmap jobstate
         del self._componentMappers[m.jobState]
         m.jobState = None
         
@@ -437,6 +443,10 @@ class Vishnu(log.Loggable):
         m.state.set('message', 'Component "%s" logged out' %
             m.state.get('name'))
 
+        # detach componentstate from avatar
+        componentAvatar.componentState = None
+
+        # unmap avatar
         del self._componentMappers[m.avatar]
         m.avatar = None
         

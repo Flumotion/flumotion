@@ -279,11 +279,13 @@ class ComponentAvatar(base.ManagerAvatar):
     ### ComponentAvatar methods
     def cleanup(self):
         """
-        Clean up before being destroyed."
+        Clean up when detaching."
         """
         if self._HeartbeatCheckDC:
             self._HeartbeatCheckDC.cancel()
         self._HeartbeatCheckDC = None
+
+        self.jobState = None
 
     def _heartbeatCheck(self):
         """
@@ -381,12 +383,13 @@ class ComponentAvatar(base.ManagerAvatar):
             self._heartbeatCheck)
 
     def detached(self, mind):
-        self.cleanup() # callback
         self.vishnu.unregisterComponent(self)
         self.heaven.unregisterComponent(self)
 
         self.info('component "%s" logged out' % self.avatarId)
         base.ManagerAvatar.detached(self, mind)
+
+        self.cleanup() # callback and state done at end
  
     # IStateListener methods
     def stateSet(self, state, key, value):

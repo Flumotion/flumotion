@@ -1,6 +1,14 @@
 2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_manager_manager.py:
+	  more cleanup and tests
+
+2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/component.py:
 	  cleanup heartbeat when logging out
 	* flumotion/manager/manager.py:
 	* flumotion/test/test_manager_manager.py:

@@ -58,7 +58,7 @@ class WorkerAvatar(base.ManagerAvatar):
     def start(self, avatarId, type, config):
         """
         Start a component of the given type with the given config.
-                                                                                
+
         @param avatarId: avatarId the component should use to log in
         @type  avatarId: string
         @param type:     type of the component to start
@@ -100,4 +100,3 @@ class WorkerHeaven(base.ManagerHeaven):
         names = self.state.get('names')
         if workerName in self.state.get('names'):
             self.state.remove('names', workerName)
-

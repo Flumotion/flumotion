@@ -411,6 +411,10 @@ class TestVishnu(unittest.TestCase):
         state = m.state
         self.assertEqual(state.get('mood'), moods.happy.value)
  
+        # verify the component avatars
+        self.failUnless(avatar.jobState)
+        self.failUnless(avatar.componentState)
+
         # log out the producer and verify the mapper
         id = 'producer-video-test'
         avatar = self._components[id]
@@ -431,12 +435,17 @@ class TestVishnu(unittest.TestCase):
         self.assertEqual(state.get('mood'), moods.sleeping.value,
             'mood is %s instead of sleeping' % moods.get(state.get('mood')))
 
+        # verify avatar state
+        self.failIf(avatar.jobState)
+        self.failIf(avatar.componentState)
+
         # log out the converter and verify
         id = 'converter-ogg-theora'
         m = mappers[id]
         avatar = self._components[id]
         self._logoutAvatar(avatar)
 
+        # verify mapper
         self.assertEqual(len(mappers.keys()), 6)
         self.failUnless(id in mappers.keys())
         self.assertEqual(m.id, id)
@@ -447,3 +456,7 @@ class TestVishnu(unittest.TestCase):
         state = m.state
         self.assertEqual(state.get('mood'), moods.sleeping.value,
             'mood is %s instead of sleeping' % moods.get(state.get('mood')))
+
+        # verify avatar state
+        self.failIf(avatar.jobState)
+        self.failIf(avatar.componentState)
