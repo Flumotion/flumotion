@@ -6,7 +6,7 @@ import unittest
 
 SKIP_FILES = ['common', 'runtests', 'webbie']
 
-dir = os.path.split(os.path.abspath(__file__))[0]
+dir = os.path.join(os.path.split(os.path.abspath(__file__))[0], 'tests')
 os.chdir(dir)
 
 def gettestnames():

@@ -1,5 +1,16 @@
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	* tests/Makefile.am:
+	* tests/config.py:
+	* tests/manager.py:
+	* tests/runtests.py:
+	* tests/test_component_parse.py:
+	* tests/test_http.py:
+	  move actual tests to a subdir
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion.in:
 	* doc/reference/Makefile.am:
 	* flumotion/common/Makefile.am:

@@ -79,6 +79,7 @@ conf/Makefile
 doc/Makefile
 doc/reference/Makefile
 tests/Makefile
+tests/tests/Makefile
 tests/common.py
 flumotion.spec
 )
