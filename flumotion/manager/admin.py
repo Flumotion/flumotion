@@ -74,7 +74,6 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     I live in the manager.
     """
     logCategory = 'admin-avatar'
-    __implements__ = interfaces.IHeaven
     def __init__(self, heaven):
         """
         @type heaven: L{flumotion.manager.admin.AdminHeaven}
