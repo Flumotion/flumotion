@@ -55,7 +55,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
         self.remote = None # the perspective we have on the other side (?)
         
     def logFunction(self, arg):
-        return self.comp.get_name + ':' + arg)
+        return self.comp.get_name + ':' + arg
     
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
