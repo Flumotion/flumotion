@@ -36,7 +36,7 @@ from twisted.spread import pb
 import twisted.cred.error
 import twisted.internet.error
 
-from flumotion.common import errors, interfaces, log
+from flumotion.common import errors, interfaces, log, bundleclient
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
 from flumotion.worker import job
@@ -113,6 +113,7 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
     def __init__(self, brain):
         self.brain = brain
         self.remote = None
+        self.bundleLoader = None
         
     def cb_processFinished(self, *args):
         self.debug('processFinished %r' % args)
@@ -124,6 +125,7 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
     def setRemoteReference(self, remoteReference):
         self.debug('setRemoteReference: %r' % remoteReference)
         self.remote = remoteReference
+        self.bundleLoader = bundleclient.BundleLoader(self.remote)
 
     def hasRemoteReference(self):
         return self.remote != None
@@ -175,56 +177,25 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         self.debug('remote_checkElements: returning elements names %r' % list)
         return list
 
-    def remote_runCode(self, codeSegment, objectName, *args, **kwargs):
-        """
-        Run a segment of code and an entry point from its namespace.
-        The function should eventually return a deferred with the result.
+    def remote_runProc(self, module, function, *args, **kwargs):
+        def got_module(result):
+            try:
+                proc = getattr(result, function)
+                return proc(*args, **kwargs)
+            except Exception, e:
+                msg = 'runCode function failed: %s raised: %s' % (
+                    e.__class__.__name__, " ".join(e.args))
+                self.warning(msg)
+                raise errors.RemoteRunError(msg)
+            except:
+                msg = 'runCode function failed: Unknown exception'
+                self.warning(msg)
+                raise errors.RemoteRunError(msg)
 
-        @param codeSegment:   a piece of code
-        @type codeSegment:    string
-        @param objectName:    object to call from the source
-        @type objectName:     string
-        @param args:          arguments to function
-        @param kwargs:        keyword arguments to function
-        """
-        
-        self.debug('remote_runCode: received code with entry %s' % objectName)
-        namespace = {}
-        try:
-            exec (codeSegment, globals(), namespace)
-        except Exception, e:
-            msg = 'runCode exec failed: %s raised: %s' % (
-                e.__class__.__name__, " ".join(getattr(e, 'args', ())))
-            self.warning(msg)
-            raise errors.RemoteRunError(msg)
-
-        self.debug('remote_runCode: retrieving entry point %s' % objectName)
-        function = namespace.get(objectName, None)
-        
-        deferred = None
-        if not callable(function):
-            msg = 'runCode exec failed: %s not callable' % objectName
-            self.warning(msg)
-            raise errors.RemoteRunError(msg)
-
-        self.debug('remote_runCode: calling entry point %s' % objectName)
-        # FIXME: for some reason this can raise asserts that do not get
-        # caught by the except handlers !
-        try:
-            deferred = function(*args)
-        except Exception, e:
-            msg = 'runCode function failed: %s raised: %s' % (
-                e.__class__.__name__, " ".join(e.args))
-            self.warning(msg)
-            raise errors.RemoteRunError(msg)
-        except:
-            msg = 'runCode function failed: Unknown exception'
-            self.warning(msg)
-            raise errors.RemoteRunError(msg)
-
-        # code got executed and now returns the deferred
-        self.debug('remote_runCode: returning deferred')
-        return deferred
+        print 'loading %s' % module
+        d = self.bundleLoader.load(module)
+        d.addCallback(got_module)
+        return d
 
 class Kid:
     """

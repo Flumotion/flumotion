@@ -164,6 +164,7 @@ flumotion/twisted/Makefile
 flumotion/ui/Makefile
 flumotion/wizard/Makefile
 flumotion/worker/Makefile
+flumotion/worker/checks/Makefile
 m4/Makefile
 conf/Makefile
 doc/Makefile

@@ -242,9 +242,10 @@ class RegistryParser(log.Loggable):
             raise XmlParserError(
                 'expected <%s>, but <%s> found' % (tag, node.nodeName))
 
-        return [child for child in node.childNodes
-                          if (child.nodeType != Node.TEXT_NODE and
-                              child.nodeType != Node.COMMENT_NODE)]
+        ret = [child for child in node.childNodes
+                     if (child.nodeType != Node.TEXT_NODE and
+                         child.nodeType != Node.COMMENT_NODE)]
+        return ret
         
     def _parseComponents(self, node):
         # <components>

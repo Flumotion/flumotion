@@ -1,0 +1,12 @@
+<registry>
+  <bundles>
+    <bundle name="flumotion.worker.checks.video">
+      <directories>
+        <directory name="flumotion/worker/checks">
+          <filename location="video.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+
+</registry> 

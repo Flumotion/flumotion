@@ -564,23 +564,15 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         d.addErrback(self._defaultErrback)
         return d
     
-    def workerRun(self, workerName, function, *args, **kwargs):
+    def workerRun(self, workerName, moduleName, functionName, *args, **kwargs):
         """
-        Run the given function and args on the given worker.
+        Run the given function and args on the given worker. If the
+        worker does not already have the module, or it is out of date,
+        it will be retrieved from the manager.
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        import inspect
-        if not callable(function):
-            raise TypeError, "need a callable"
-
-        try:
-            source = inspect.getsource(function)
-        except IOError:
-            return defer.fail(errors.FlumotionError('Could not find source'))
-        
-        functionName = function.__name__
-        return self.workerCallRemote(workerName, 'runCode', source,
+        return self.workerCallRemote(workerName, 'runProc', moduleName,
                                      functionName, *args, **kwargs)
     
     # FIXME: this should not be allowed to be called, move away

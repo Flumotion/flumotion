@@ -116,6 +116,7 @@ class Window(log.Loggable, gobject.GObject):
         d.show_all()
         return d
 
+    # FIXME(wingo): use common.bundleclient
     # FIXME: this method uses a file and a methodname as entries
     # FIXME: do we want to switch to imports instead so the whole file
     # is available in its namespace ?

@@ -98,7 +98,7 @@ def main(args):
                       action="store_true", dest="version",
                       default=False,
                       help="show version information")
-  
+    
     group = optparse.OptionGroup(parser, "manager options")
     defaultSSLPort = configure.defaultSSLManagerPort
     defaultTCPPort = configure.defaultTCPManagerPort

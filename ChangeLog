@@ -1,3 +1,45 @@
+2005-01-26  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/base.py:
+	(ManagerAvatar.perspective_getBundleSums): New function, gets the
+	sums of a bundle and dependencies.
+	(ManagerAvatar.perspective_getBundleSumsByFile): First get the
+	bundle name, then call getBundleSums.
+
+	* flumotion/worker/checks/video.py: New file, contains the
+	gstreamer checks that used to be in wizard.steps. Uses a nifty
+	procedural abstraction, make_element_checker.
+
+	* flumotion/worker/checks/package.xml: New file, registers
+	flumotion.worker.checks.video as a bundle.
+	
+	* flumotion/worker/checks/__init__.py: New file, placates python.
+
+	* flumotion/worker/worker.py:
+	(WorkerMedium.setRemoteReference): Make a bundleloader when we get
+	a remote reference.
+	(WorkerMedium.remote_runCode): Removed, we don't run code
+	fragments any more.
+	(WorkerMedium.remote_runProc): New remoted procedure. Runs a
+	function in a module, fetching the module from the manager as
+	necessary.
+
+	* flumotion/wizard/wizard.py (WizardStep.workerRun): Update to
+	AdminModel's workerRun.
+
+	* flumotion/wizard/steps.py: Move gstreamer checks to
+	flumotion.worker.checks.video, and change to the new workerRun
+	api so that workers fetch the necessary code to run the checks.
+
+	* flumotion/common/bundleclient.py: New file.
+	(BundleLoader): New class, implements a module loader that makes
+	sure we run the latest version of a module. Will fetch and install
+	bundles as needed.
+
+	* flumotion/admin/admin.py (AdminModel.workerRun): Instead of
+	taking a function object, and passing the source of the function
+	to the worker, pass a module name and function name to the worker.
+	
 2005-01-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/Makefile.am:
@@ -13,8 +55,6 @@
 	  fix pychecker warnings
 
 2005-01-24  Andy Wingo  <wingo@pobox.com>
-
-	* flumotion/admin/gtk/greeter.py: gtk is not used.
 
 	* flumotion/admin/gtk/wizard.py: Appease pychecker.
 

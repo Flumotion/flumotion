@@ -98,9 +98,6 @@ def _runInterface(conf_file, options):
     reactor.run()
 
 def main(args):
-    #defaultSSLPort = configure.defaultSSLManagerPort
-    #defaultTCPPort = configure.defaultTCPManagerPort
-    
     parser = optparse.OptionParser()
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",

@@ -5,6 +5,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/common
 flumotion_PYTHON = \
 	__init__.py \
 	bundle.py \
+	bundleclient.py \
 	common.py \
 	component.py \
 	config.py \

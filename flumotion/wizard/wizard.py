@@ -134,7 +134,7 @@ class WizardStep(object, log.Loggable):
     def get_section(self):
         return getattr(self, 'section', '')
         
-    def workerRun(self, function, *args):
+    def workerRun(self, module, function, *args):
         """
         Run the given function and arguments on the selected worker.
 
@@ -151,7 +151,7 @@ class WizardStep(object, log.Loggable):
             self.warning('skipping workerRun, no worker')
             return defer.fail(errors.FlumotionError('no worker'))
 
-        return admin.workerRun(worker, function, *args)
+        return admin.workerRun(worker, module, function, *args)
         
     def get_next(self):
         """

@@ -131,22 +131,18 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
                 
         return None
 
-    def perspective_getBundleSumsByFile(self, filename):
+    def perspective_getBundleSums(self, bundleName):
         """
         Get a list of (bundleName, md5sum) of all dependency bundles,
         starting with this bundle, in the correct order.
 
-        @type  filename: string
-        @param filename: the name of the file in a bundle
+        @type  bundleName: string
+        @param bundleName: the name of the bundle
 
         @rtype: list of (string, string) tuples
         """
-        self.debug('asked to get bundle sums for %s' % filename)
+        self.debug('asked to get bundle sums for bundle %s' % bundleName)
         basket = self.vishnu.bundlerBasket
-        bundleName = basket.getBundlerNameByFile(filename)
-        if not bundleName:
-            self.warning('Did not find a bundle for file %s' % filename)
-            raise errors.NoBundleError("for file %s" % filename)
 
         deps = basket.getDependencies(bundleName)
         self.debug('dependencies of %s: %r' % (bundleName, deps))
@@ -162,6 +158,25 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         self.debug('returning %d sums' % len(sums))
         return sums
 
+    def perspective_getBundleSumsByFile(self, filename):
+        """
+        Get a list of (bundleName, md5sum) of all dependency bundles,
+        starting with this bundle, in the correct order.
+
+        @type  filename: string
+        @param filename: the name of the file in a bundle
+
+        @rtype: list of (string, string) tuples
+        """
+        self.debug('asked to get bundle sums for file %s' % filename)
+        basket = self.vishnu.bundlerBasket
+        bundleName = basket.getBundlerNameByFile(filename)
+        if not bundleName:
+            self.warning('Did not find a bundle for file %s' % filename)
+            raise errors.NoBundleError("for file %s" % filename)
+
+        return self.perspective_getBundleSums(bundleName)
+
     def perspective_getBundleZips(self, bundles):
         """
         Get the zip files for the given list of bundles.
@@ -175,6 +190,9 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         zips = {}
         for name in bundles:
             bundler = basket.getBundlerByName(name)
+            if not bundler:
+                raise errors.NoBundleError('The bundle named "%s" was not found'
+                                           % (name,))
             zips[name] = bundler.bundle().getZip()
         return zips
 
