@@ -25,6 +25,7 @@ import signal
 import sys
 import warnings
 import string
+import pwd
 
 try:
     warnings.filterwarnings('ignore', category=FutureWarning)
@@ -81,29 +82,40 @@ class Launcher:
         self.children = []
         self.controller_pid = None
         self.controller_port = controller_port
+        self.uid = None
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         signal.signal(signal.SIGSEGV, self.segv_handler)
         
         set_proc_text('flumotion [launcher]')
         
+    def setup_uid(self, name):
+        if self.uid is not None:
+            try:
+                os.setuid(self.uid)
+                self.msg('uid set to %d for %s' % (self.uid, name))
+            except OSError, e:
+                self.msg('failed to set gid: %s' % str(e))
+
     def msg(self, *args):
         log.msg('launcher', *args)
 
-    def set_nice(self, nice):
-        if not nice:
-            return
+    def set_nice(self, nice, name):
+        if nice:
+            try:
+                os.nice(nice)
+            except OSError, e:
+                self.msg('Failed to set nice level: %s' % str(e))
+            else:
+                self.msg('Nice level set to %d' % nice)
 
-        try:
-            os.nice(nice)
-        except OSError, e:
-            self.msg('Failed to set nice level: %s' % str(e))
-        else:
-            self.msg('Nice level set to %d' % nice)
+        self.setup_uid(name)
         
     def start_controller(self, port):
         pid = os.fork()
+        self.msg('Starting controller')
         if not pid:
+            self.setup_uid('controller')
             set_proc_text('flumotion [controller]')
             factory = ControllerServerFactory()
             self.controller = reactor.listenTCP(port, factory)
@@ -147,7 +159,7 @@ class Launcher:
     def start(self, component, nice):
         pid = os.fork()
         if not pid:
-            self.set_nice(nice)
+            self.set_nice(nice, component.component_name)
             set_proc_text('flumotion [%s]' % component.component_name)
             self.spawn(component)
             raise SystemExit
@@ -161,7 +173,7 @@ class Launcher:
     def start_streamer(self, component, factory, port, nice):
         pid = os.fork()
         if not pid:
-            self.set_nice(nice)
+            self.set_nice(nice, component.component_name)
             set_proc_text('flumotion [%s]' % component.component_name)
             reactor.listenTCP(port, factory)
             self.spawn(component)
@@ -174,6 +186,8 @@ class Launcher:
             self.children.append(pid)
         
     def run(self):
+        self.setup_uid('launcher')
+        
         while self.children:
             for pid in self.children:
                 try:
@@ -202,6 +216,12 @@ class Launcher:
 
         raise SystemExit
 
+    def parse_globals(self, conf):
+        if conf.has_option('global', 'username'):
+            username = conf.get('global', 'username')
+            entry = pwd.getpwnam(username)
+            self.uid = entry[2]
+        
     def load_config(self, filename):
         c = ConfigParser.ConfigParser()
         self.msg('Loading configuration file `%s\'' % filename)
@@ -209,6 +229,10 @@ class Launcher:
 
         components = {}
         for section in c.sections():
+            if section == 'global':
+                self.parse_globals(c)
+                continue
+            
             name = section
             if not c.has_option(section, 'kind'):
                 raise AssertionError
@@ -393,14 +417,13 @@ def run_launcher(args):
         log.enableLogging()
 
     launcher = Launcher(options.port)
-
+    launcher.load_config(args[2])
+        
     if not gstutils.is_port_free(options.port):
         launcher.msg('Controller is already started')
     else:
         launcher.start_controller(options.port)
 
-    launcher.load_config(args[2])
-        
     launcher.run()
 
     return 0
