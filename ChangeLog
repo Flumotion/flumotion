@@ -1,3 +1,27 @@
+2005-02-16  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu._startErrback): Add an
+	errback if the component could not be started.
+	(Vishnu._workerStartComponentDelayed): Connect to the errback.
+
+	* flumotion/worker/worker.py (WorkerMedium.remote_start): If
+	deferredStartCreate returns None, then there's already a start in
+	progress. Handle that.
+	(WorkerBrain.deferredStartFailed): New handler, removes the
+	deferred start from the list if the start failed, calling the
+	deferred's errback.
+	(JobAvatar._startErrback): Call deferredStartFailed.
+
+	* flumotion/admin/gtk/client.py (Window.runWizard): Pass our
+	window as the parent.
+	(Window.admin_connected_cb): Make sure the parent window is
+	realized before setting it as the transient parent, avoids some
+	gtk criticals.
+
+	* flumotion/wizard/wizard.py (Wizard.__init__): Add new initarg,
+	parent_widget. Really should be parent_window, but anyway it is
+	used in set-transient-for.
+
 2005-02-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:

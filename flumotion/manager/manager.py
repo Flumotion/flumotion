@@ -498,12 +498,18 @@ class Vishnu(log.Loggable):
         # FIXME: here we get the avatar Id of the component we wanted
         # started, so now attach it to the planetState's component state
         d.addCallback(self._startCallback, componentState)
+        d.addErrback(self._startErrback, componentState)
 
     def _startCallback(self, result, componentState):
         self.debug('got avatarId %s for state %s' % (result, componentState))
         m = self._componentMappers[componentState]
         assert result == m.id, "received id %s is not the expected id %s" % (
             result, m.id)
+
+    def _startErrback(self, error, state):
+        self.info('failed to start component %s: %s'
+                  % (state.get('name'), error.getErrorMessage()))
+        return None
 
     def workerDetached(self, workerAvatar):
         # called when a worker logs out

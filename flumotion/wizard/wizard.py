@@ -206,12 +206,15 @@ class Wizard(gobject.GObject, log.Loggable):
 
     __implements__ = flavors.IStateListener,
 
-    def __init__(self, admin=None):
+    def __init__(self, parent_widget=None, admin=None):
         self.__gobject_init__()
         self.wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'wizard.glade'))
         for widget in self.wtree.get_widget_prefix(''):
             setattr(self, widget.get_name(), widget)
         self.wtree.signal_autoconnect(self)
+
+        if parent_widget:
+            self.window.set_transient_for(parent_widget)
 
         # have to get the style from the theme, but it's not really there until
         # it's attached

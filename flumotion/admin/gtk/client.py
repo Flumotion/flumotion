@@ -540,6 +540,8 @@ class Window(log.Loggable, gobject.GObject):
 
         if not self._components:
             self.debug('no components detected, running wizard')
+            # ensure our window is shown
+            self.show()
             self.runWizard()
     
     def admin_disconnected_cb(self, admin):
@@ -734,7 +736,7 @@ class Window(log.Loggable, gobject.GObject):
                 'The wizard cannot be run because no workers are logged in.')
             return
         
-        wiz = wizard.Wizard(self.admin)
+        wiz = wizard.Wizard(self.window, self.admin)
         wiz.connect('finished', _wizard_finished_cb)
         wiz.load_steps()
         wiz.run(True, state, False)

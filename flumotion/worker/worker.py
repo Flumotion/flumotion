@@ -151,11 +151,15 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         # create a deferred that will be triggered when the jobavatar
         # instructs the job to start a component
         d = self.brain.deferredStartCreate(avatarId)
-        d.addCallback(self._deferredStartCallback, avatarId)
 
-        self.brain.kindergarten.play(avatarId, type, config)
-        
-        return d
+        if d:
+            d.addCallback(self._deferredStartCallback, avatarId)
+            self.brain.kindergarten.play(avatarId, type, config)
+            return d
+        else:
+            msg = ('Component "%s" has already received a start request'
+                   % avatarId)
+            raise errors.ComponentStart(msg)
 
     def _deferredStartCallback(self, result, avatarId):
         self.debug('deferred start for %s fired, remote_start returns %s' % (
@@ -461,6 +465,18 @@ class WorkerBrain(log.Loggable):
         # return the avatarId the component will use to the original caller
         d.callback(avatarId)
  
+    def deferredStartFailed(self, avatarId, failure):
+        """
+        Notify the caller that a start has failed, and remove the start
+        from the list of pending starts.
+        """
+        self.debug('deferred start failed for %s' % avatarId)
+        assert avatarId in self._startDeferreds.keys()
+
+        d = self._startDeferreds[avatarId]
+        del self._startDeferreds[avatarId]
+        d.errback(failure)
+ 
 class JobDispatcher:
     """
     I am a Realm inside the worker for forked jobs to log in to.
@@ -569,8 +585,10 @@ class JobAvatar(pb.Avatar, log.Loggable):
         
     def _startErrback(self, failure, avatarId, type):
         failure.trap(errors.ComponentStart)
+        
         self.warning('could not start component %s of type %s: %r' % (
             avatarId, type, failure.getErrorMessage()))
+        self.heaven.brain.deferredStartFailed(avatarId, failure)
 
     def _cb_afterInitial(self, unused):
         kid = self.heaven.brain.kindergarten.getKid(self.avatarId)
