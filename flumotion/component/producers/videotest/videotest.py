@@ -37,9 +37,11 @@ def setProp(struct, dict, name):
         
 def createComponent(config):
     format = config.get('format', 'video/x-raw-yuv')
-    
+
+    if format == 'video/x-raw-yuv':
+        format = '%s,format=(fourcc)I420' % format
     # Filtered caps
-    struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
+    struct = gst.structure_from_string(format)
     setProp(struct, config, 'width')
     setProp(struct, config, 'height')
     setProp(struct, config, 'framerate')
