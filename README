@@ -69,3 +69,19 @@ You can visit us on IRC: #fluendo on irc.freenode.org
 You can visit our issues tracker:
 http://core.fluendo.com/trac
 
+LICENSING
+---------
+This version of the Flumotion Streaming Server is dual-licensed.
+
+The GPL applies to all code files shipped with this version.
+See LICENSE.GPL
+
+The files may only be used together with or as part of the Flumotion
+Advanced Streaming Server:
+- under the terms of the Flumotion Advanced Streaming Server Commercial
+  License Agreement; and
+- when you have purchased or hold a valid Flumotion Advanced Streaming Server
+  license.
+
+If the conditions of this licensing strategy are not clear to you, please
+contact Christian Schaller (christian@fluendo.com) or call +34-933-17.51.53

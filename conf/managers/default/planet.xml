@@ -3,7 +3,7 @@
   <manager>
     <component name="manager-bouncer" type="htpasswdcrypt">
       <data><![CDATA[
-test:PSfNpHTkpTx1M
+user:PSfNpHTkpTx1M
 ]]></data>
     </component>
   </manager>

@@ -1,3 +1,14 @@
+2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* README:
+	  add notes about licensing
+	* conf/managers/default/planet.xml:
+	  change default username to user
+	* configure.ac:
+	  update deps
+	* doc/random/header.py:
+	  update default header
+
 2004-10-19  Wim Taymans  <wim@fluendo.com>
 
 	* flumotion/component/producers/firewire/firewire.py:

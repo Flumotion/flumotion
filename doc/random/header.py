@@ -14,6 +14,9 @@
 # See "LICENSE.GPL" in the source distribution for more information.
 
 # Licensees having purchased or holding a valid Flumotion Advanced
-# Streaming Server license may use this file in accordance with the
+# Streaming Server license and using this file together with a Flumotion
+# Advanced Streaming Server may only use this file in accordance with the
 # Flumotion Advanced Streaming Server Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
