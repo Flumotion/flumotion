@@ -56,10 +56,10 @@ class ComponentView(pb.Referenceable, log.Loggable):
 
     def __init__(self, component):
         self.comp = component
-        self.comp.connect('state-changed', self.component_state_changed_cb)
+        self.comp.connect('state-changed', self._component_state_changed_cb)
         self.comp.connect('error', self.component_error_cb)
         self.comp.connect('log', self.component_log_cb)
-        self.comp.connect('notify-feed-ports', self.notify_feed_ports_cb)
+        self.comp.connect('notify-feed-ports', self._component_notify_feed_ports_cb)
         
         self.remote = None # the perspective we have on the other side (?)
         
@@ -100,19 +100,16 @@ class ComponentView(pb.Referenceable, log.Loggable):
 
         return socket.gethostbyname(host)
 
-    def component_log_cb(self, component, args):
+    def _component_log_cb(self, component, args):
         self.callRemote('log', *args)
         
-    def component_error_cb(self, component, element_path, message):
+    def _component_error_cb(self, component, element_path, message):
         self.callRemote('error', element_path, message)
         
-    def component_state_changed_cb(self, component, feeder, state):
+    def _component_state_changed_cb(self, component, feeder, state):
         self.callRemote('stateChanged', feeder, state)
 
-    def notify_feed_ports_cb(self, component):
-        """
-        @param feed_ports: feedName -> port
-        """
+    def _component_notify_feed_ports_cb(self, component):
         self.callRemote('notifyFeedPorts', component.feed_ports)
 
     ### Referenceable remote methods which can be called from manager

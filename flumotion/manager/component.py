@@ -69,7 +69,7 @@ class Feeder:
         @type  feederName: string
         @param feederName: the name of the feeder (componentName:feedName).
         @param func: a function to run when the feeder is ready
-        @param *args: arguments to the function
+        @param args: arguments to the function
         """
         self.dependencies[feederName] = (func, args)
 
