@@ -251,7 +251,7 @@ class FeedComponent(basecomponent.BaseComponent):
         @param eatersData: list of (feederName, host, port) tuples
         """
         if not self.pipeline:
-            raise NotReadyError('No pipeline')
+            raise errors.NotReadyError('No pipeline')
         
         # Setup all eaters
         for feederName, host, port in eatersData:
