@@ -159,7 +159,7 @@ class FeederSet(log.Loggable):
 
         @type componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         """
-        name = componentAvatar.getName()
+
         feeders = componentAvatar.getFeeders()
 
         for feederName in feeders:
