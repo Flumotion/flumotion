@@ -192,14 +192,14 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     __gsignals__ = {
         'client-removed': (gobject.SIGNAL_RUN_FIRST, None, (object, int))
                    }
-                                       
     
-    def __init__(self, name, source):
+    def __init__(self, name, source, port):
         self.__gobject_init__()
+        self.port = port
         component.ParseLaunchComponent.__init__(self, name, [source], [],
                                                 self.pipe_template)
         self.caps = None
-
+        
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.component_name
     
@@ -241,13 +241,30 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     def client_added_cb(self, sink, fd):
         pass
 
+    def feed_state_change_cb(self, element, old, state):
+        component.BaseComponent.feed_state_change_cb(self, element,
+                                                     old, state, '')
+        if state == gst.STATE_PLAYING:
+            self.msg('Ready to serve clients on %d' % self.port)
+            
     def link_setup(self, sources, feeds):
         sink = self.get_sink()
         sink.connect('deep-notify::caps', self.notify_caps_cb)
-        sink.connect('state-change', self.feed_state_change_cb, '')
+        sink.connect('state-change', self.feed_state_change_cb)
         sink.connect('client-removed', self.client_removed_cb)
         sink.connect('client-added', self.client_added_cb)
         
+        for prop in self.sink_properties:
+            type = prop.type
+            if type == 'int':
+                value = int(prop.data)
+            elif type == 'str':
+                value = str(prop.data)
+            else:
+                value = prop.data
+                
+            sink.set_property(prop.name, value)
+
 gobject.type_register(MultifdSinkStreamer)
 
 def createComponent(config):
@@ -255,7 +272,9 @@ def createComponent(config):
     port = int(config['port'])
     source = config['source']
 
-    component = MultifdSinkStreamer(name, source)
+    component = MultifdSinkStreamer(name, source, port)
+    component.sink_properties = config.get('sink-property', [])
+    
     resource = HTTPStreamingResource(component)
     if config.has_key('logfile'):
         component.msg('Logging to %s' % config['logfile'])

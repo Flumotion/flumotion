@@ -31,7 +31,7 @@
       <property name="source" type="string" required="yes"/>
       <property name="port" type="int" required="yes"/>
       <property name="logfile" type="string"/>
-      <property name="auth" type="string" multiple="yes"/>
+      <property name="sink-property" type="xml" multiple="yes"/>
     </properties>
   </component>
 

@@ -132,6 +132,30 @@ class FlumotionConfigXML:
 
         return values
     
+    def get_xml_value(self, nodes):
+        class XMLProperty:
+            pass
+        
+        values = []
+        for subnode in nodes:
+            # XXX: Child nodes recursively
+            
+            data = subnode.childNodes[0].data
+            if '\n' in data:
+                parts = [x.strip() for x in data.split('\n')]
+                data = ' '.join(parts)
+                
+            property = XMLProperty()
+            property.data = data
+            for key in subnode.attributes.keys():
+                value = subnode.attributes[key].value
+                print '****', key, value
+                setattr(property, str(key), value)
+
+            values.append(property)
+
+        return values
+
     def parse_property_def(self, type, defs, node, config):
         self.msg('Parsing component: %s' % config['name'])
         for definition in defs:
@@ -153,6 +177,8 @@ class FlumotionConfigXML:
                 value = self.get_string_value(nodes)
             elif type == 'int':
                 value = self.get_int_value(nodes)
+            elif type == 'xml':
+                value = self.get_xml_value(nodes)
             else:
                 raise ConfigError, "invalid property type: %s" % type
 

@@ -40,6 +40,7 @@
     <source>jpeg+multipart-big</source>
     <port>8804</port>
     <logfile>/tmp/videotestsrc_access_big.log</logfile>
+    <sink-property name="buffers-max" type="int">400</sink-property>
   </component>
 
 </root>
