@@ -323,7 +323,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     # returns a dict of name -> component
     def get_components(self):
         return self._components
-
+    getComponents = get_components
+    
     def getWorkers(self):
         return self._workers
 

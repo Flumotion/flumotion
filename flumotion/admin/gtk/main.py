@@ -31,17 +31,21 @@ def _write_default(configuration):
     directory = os.path.split(FIRST_TIME_FILE)[0]
     if not os.path.exists(directory):
         os.makedirs(directory)
-    fd = file(os.path.join(directory, 'default.xml'), 'w')
+        
+    print 'Saving configuration to', filename
+    filename = os.path.join(directory, 'default.xml')
+    fd = file(filename, 'w')
     fd.write(configuration)
 
 def _read_default():
     directory = os.path.split(FIRST_TIME_FILE)[0]
-    fd = file(os.path.join(directory, 'default.xml'))
+    filename = os.path.join(directory, 'default.xml')
+    print 'Loading configuration from', filename
+    fd = file(filename)
     return fd.read()
 
 def _wizard_finished_cb(wizard, configuration, window):
     wizard.hide()
-    
     _write_default(configuration)
     window.admin.loadConfiguration(configuration)
     window.show()
@@ -56,13 +60,14 @@ def _window_connected_cb(window, options):
         wiz.connect('finished', _wizard_finished_cb, window)
         wiz.load_steps()
         wiz.run(options.debug, workers, main=False)
-
-    else:
-        # XXX: When should I load it?
+    elif not window.admin.getComponents():
         configuration = _read_default()
         window.admin.loadConfiguration(configuration)
         window.show()
-
+    else:
+        print 'There are already components connected, not sending configuration'
+        window.show()
+        
 def _runInterface(options):
     win = Window(options.host, options.port, options.transport,
                  options.username, options.password)
