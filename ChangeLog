@@ -1,5 +1,13 @@
 2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/componentui.py:
+	  remove all of the commented-out code
+	* flumotion/test/test_common_componentui.py:
+	* flumotion/test/test_flavors.py:
+	  use common's pb fake stuff
+
+2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/manager.py:
 	  warn on failure of removing jobState, but continue anyway
 

@@ -30,31 +30,10 @@ from flumotion.common import componentui
 
 class FakeObject: pass
 
-class FakeAdmin(pb.Referenceable):
-    def run(self, port):
-        self.perspective = None # perspective on the manager's PB server
-        f = pb.PBClientFactory()
-        reactor.connectTCP("127.0.0.1", port, f)
-        d = f.getRootObject()
-        d.addCallback(self._gotRootObject)
-        return d
+class FakeAdmin(common.TestAdmin):
+    pass
 
-    def _gotRootObject(self, perspective):
-        self.perspective = perspective
-        return perspective.callRemote('identify', 'admin', self)
-
-class FakeWorker(pb.Referenceable):
-    def run(self, port):
-        f = pb.PBClientFactory()
-        reactor.connectTCP("127.0.0.1", port, f)
-        d = f.getRootObject()
-        d.addCallback(self._gotRootObject)
-        return d
-
-    def _gotRootObject(self, perspective):
-        self.perspective = perspective
-        return perspective.callRemote('identify', 'worker', self)
-
+class FakeWorker(common.TestWorker):
     def remote_getState(self):
         if not hasattr(self, 'state'):
             self.state = componentui.WorkerComponentUIState()
@@ -72,11 +51,7 @@ class FakeWorker(pb.Referenceable):
     def remote_haveAdopted(self, name):
         self.state.remove('children', name)
 
-class TestRoot(pb.Root):
-    def remote_identify(self, who, reference):
-        key = who + 'Reference'
-        setattr(self, key, reference)
-
+class TestRoot(common.TestManagerRoot):
     def remote_workerGetState(self):
         d = self.workerReference.callRemote('getState')
         d.addCallback(self._workerGotState)
@@ -99,25 +74,19 @@ class TestRoot(pb.Root):
     def remote_workerHaveAdopted(self, name):
         return self.workerReference.callRemote('haveAdopted', name)
 
-
 class TestStateSet(unittest.TestCase):
     def setUp(self):
         self.changes = []
         
-    def runManager(self):
-        factory = pb.PBServerFactory(TestRoot())
-        factory.unsafeTracebacks = 1
-        p = reactor.listenTCP(0, factory, interface="127.0.0.1")
-        self.port = p.getHost().port
-
     def runAll(self):
-        # start everything
-        self.runManager()
+        m = common.TestManager()
+        port = m.run(TestRoot)
+
         self.admin = FakeAdmin()
-        d = self.admin.run(self.port)
+        d = self.admin.run(port)
         unittest.deferredResult(d)
         self.worker = FakeWorker()
-        d = self.worker.run(self.port)
+        d = self.worker.run(port)
         unittest.deferredResult(d)
         
     def testStateSet(self):
@@ -248,7 +217,6 @@ class TestStateSet(unittest.TestCase):
         self.failIf(self.changes, self.changes)
         state.removeListener(self)
         del state
-
 
     def testStateSaveReference(self):
         # show that we need to keep the state reference around for listener
