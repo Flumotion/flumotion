@@ -177,6 +177,10 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         return self.comp.getUIMD5Sum(domain, style)
 
     def remote_register(self):
+        """
+        @rtype:   dict
+        @returns: options
+        """
         # FIXME: we need to properly document this; manager calls me to
         # "get some info"
         if not self.hasRemoteReference():
@@ -184,8 +188,10 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
             reactor.callLater(0.250, self.remote_register)
             return None
 
-        return {'ip' : self.getIP(),
-                'pid' :  os.getpid()}
+        options = {'ip' : self.getIP(),
+                   'pid' :  os.getpid()}
+
+        return options
         
     def remote_reloadComponent(self):
         """Reload modules in the component."""

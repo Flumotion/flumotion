@@ -130,6 +130,15 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self._components[component.name] = component
         self.emit('update')
         
+    def remote_componentStateChanged(self, component, state):
+        """
+        @param component: component that changed state.
+        @param state: new state of component.
+        """
+        self.debug('componentStateChanged %s' % component.name)
+        self._components[component.name] = component
+        self.emit('update')
+         
     def remote_componentRemoved(self, component):
         # FIXME: this asserts, no method, when server dies
         # component will be a RemoteComponentView, so we can only use a
@@ -154,8 +163,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         Called when the component's UI needs to be updated with new state.
         Model will emit the 'ui-state-changed' signal.
 
-        @param name: name of component whose state has changed.
-        @param state: new state of component.
+        @param name: name of component whose state has changed
+        @param state: new state of component
         """
         self.emit('ui-state-changed', name, state)
         

@@ -584,7 +584,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         self.state = state
         if self.state == gst.STATE_PLAYING:
             self.info('%r is now playing' % self)
-
+            self.vishnu.adminHeaven.componentStateChanged(self, state)
             self.checkFeedReady(feed_name)
             
     def perspective_error(self, element, error):
@@ -818,6 +818,8 @@ class ComponentHeaven(pb.Root, log.Loggable):
 
         # tell the admin client
         self.vishnu.adminHeaven.componentAdded(componentAvatar)
+        componentName = componentAvatar.getName()
+        #self.vishnu.adminHeaven.uiStateChanged(componentName, state)
 
         # tell the feeder set
         self._feederSet.addFeeders(componentAvatar)

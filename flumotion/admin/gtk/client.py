@@ -262,6 +262,7 @@ class Window(log.Loggable, gobject.GObject):
         log.debug('adminclient', "handled connection-refused")
 
     def admin_ui_state_changed_cb(self, admin, name, state):
+        # called when the admin UI for that component has changed
         current = self.get_selected_component_name()
         if current != name:
             return

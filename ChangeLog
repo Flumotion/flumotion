@@ -1,5 +1,16 @@
 2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	  update state in admin of components properly.  Still hacky
+	  since we say a component is ready when the first *feed* on it
+	  is, but we'll fix that with moods !
+
+2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/header.py:
 	semi-final header
 

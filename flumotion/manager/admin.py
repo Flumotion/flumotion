@@ -139,6 +139,10 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         self.debug("AdminAvatar.componentAdded: %s" % component)
         self._mindCallRemote('componentAdded', ComponentView(component))
         
+    def componentStateChanged(self, component, state):
+        self.debug("AdminAvatar.componentStateChanged: %s %s" % (component, state))
+        self._mindCallRemote('componentStateChanged', ComponentView(component), state)
+
     def componentRemoved(self, component):
         """
         Tell the avatar that a component has been removed.
@@ -362,6 +366,16 @@ class AdminHeaven(pb.Root, log.Loggable):
         """
         for avatar in self.avatars.values():
             avatar.componentRemoved(component)
+            
+    def componentStateChanged(self, component, state):
+        """
+        Tell all created AdminAvatars that a component has changed state.
+
+        @type component: L{flumotion.manager.component.ComponentAvatar}
+        """
+        for avatar in self.avatars.values():
+            avatar.componentStateChanged(component, state)
+
 
     def uiStateChanged(self, name, state):
         """
