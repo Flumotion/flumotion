@@ -920,7 +920,7 @@ class Window(log.Loggable, gobject.GObject):
  
     def debug_start_shell_cb(self, button):
         from flumotion.common import code
-        code.interact(local=locals())
+        code.interact()
 
     def help_about_cb(self, button):
         dialog = gtk.Dialog('About Flumotion', self.window,

@@ -21,12 +21,10 @@ import __builtin__
 import __main__
 import codeop
 import keyword
-import os
 import re
 import readline
 import threading
 import traceback
-import signal
 import sys
 import string
 

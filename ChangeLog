@@ -1,5 +1,19 @@
 2005-03-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/authenticate.glade:
+	* data/glade/connection-dialog.glade:
+	* data/glade/greeter-authenticate.glade:
+	* data/glade/greeter-connect_to_existing.glade:
+	* data/glade/greeter-initial.glade:
+	* data/glade/greeter-load_connection.glade:
+	  2.4-ify
+	* flumotion/admin/gtk/client.py:
+	  fix an AP
+	* flumotion/common/code.py:
+	  remove some unused imports
+
+2005-03-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_checkers.py:
 	* flumotion/twisted/checkers.py:
 	* flumotion/twisted/credentials.py:
