@@ -49,7 +49,7 @@ def getComponent(dict, defs):
     except ImportError, e:
         raise config.ConfigError("%s source file could not be imported (%s)" % (source, e))
     except Exception, e:
-        raise config.ConfigError("Exception %s during import of source %s (%s)" % (e.__class__.__name__, source, e))
+        raise config.ConfigError("Exception %s during import of source %s (%s)" % (e.__class__.__name__, source, " ".join(e.args)))
         
     if not hasattr(module, 'createComponent'):
         log.warning('job', 'no createComponent() for %s' % source)
@@ -185,8 +185,8 @@ class JobMedium(pb.Referenceable, log.Loggable):
         try:
             comp = getComponent(config, defs)
         except Exception, e:
-            msg = "Exception %s during getComponent: %r" % (
-                e.__class__.__name__, e)
+            msg = "Exception %s during getComponent: %s" % (
+                e.__class__.__name__, " ".join(e.args))
             self.warning("raising ComponentStart(%s)" % msg)
             raise errors.ComponentStart(msg)
 
