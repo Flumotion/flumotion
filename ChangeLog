@@ -1,5 +1,7 @@
 2005-03-23  Andy Wingo  <wingo@pobox.com>
 
+	* tools/pycheckerhelp.py: Pacify pychecker?!?
+
 	* data/glade/Makefile.am (glade_DATA): Added authenticate.glade
 	and open-connection.glade. Thanks to Zaheer Merali for the tip.
 
