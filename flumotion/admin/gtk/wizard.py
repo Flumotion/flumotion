@@ -81,6 +81,9 @@ class WizardStep:
     # also, all widgets from the glade file will become attributes
     page = None # filled from glade
 
+    def __init__(self, *args):
+        pass
+
 class Wizard(gobject.GObject):
     '''
     A generic wizard, constructed from state procedures and a set of
@@ -210,12 +213,13 @@ class Wizard(gobject.GObject):
     def set_sensitive(self, is_sensitive):
         self.window.set_sensitive(is_sensitive)
 
+
     def run(self):
+        def on_finished(self):
+            gtk.main_quit()
         assert self.window
         self.set_sensitive(True)
         self.show()
-        def on_finished(self):
-            gtk.main_quit()
         self.connect('finished', on_finished)
         gtk.main()
         return self.state

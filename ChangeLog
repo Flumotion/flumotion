@@ -1,3 +1,21 @@
+2005-02-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/greeter.py: Moved connections code out to
+	connections.py.
+
+	* flumotion/test/test_greeter.py (WizardTest.testMakeGreeter):
+	Fixed so that (1) assertions actually cause the test to fail, and
+	(2) that the tests actually pass.
+
+	* flumotion/admin/gtk/connections.py: Code for the connections
+	widget.
+
+	* data/glade/connections.glade: New file, glade interface for the
+	connections manager widget.
+
+	* data/glade/greeter-load_connection.glade: Embed a custom widget
+	connections.Connections().
+
 2005-02-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/Makefile.am:

@@ -22,6 +22,7 @@ import common
 
 from twisted.spread import jelly
 from twisted.trial import unittest
+from twisted.internet import reactor
 
 try:
     import gobject
@@ -33,6 +34,9 @@ except RuntimeError:
 from flumotion.admin.gtk import greeter, wizard
 
 class WizardTest(unittest.TestCase):
+    _failed = False
+    state = False
+
     def testMakeGreeter(self):
         g = greeter.Greeter()
         ass = self.assert_
@@ -48,27 +52,52 @@ class WizardTest(unittest.TestCase):
         ass(isinstance(wiz.button_next, gtk.Widget))
         ass(isinstance(wiz.button_prev, gtk.Widget))
         
+        def ass(expr):
+            if not expr:
+                raise # to show the backtrace
+                self._failed = True
+
+        def sensitive(w):
+            return w.get_property('sensitive')
+
         next = wiz.button_next
         prev = wiz.button_prev
-        gobject.idle_add(lambda: next.emit('clicked'))
-        gobject.idle_add(lambda: prev.emit('clicked'))
-        gobject.idle_add(lambda: next.emit('clicked'))
-        gobject.idle_add(lambda: ass(not next.get_property('sensitive'))
-        gobject.idle_add(lambda: wiz.page.host_entry.set_text('foo'))
-        gobject.idle_add(lambda: ass(next.flags() & gtk.SENSITIVE))
-        gobject.idle_add(lambda: wiz.page.ssl_check.emit('clicked'))
-        gobject.idle_add(lambda: ass(wiz.page.port_entry.get_text()=='8642'))
-        gobject.idle_add(lambda: next.emit('clicked'))
-        gobject.idle_add(lambda: prev.emit('clicked'))
-        gobject.idle_add(lambda: next.emit('clicked'))
-        gobject.idle_add(lambda: ass(not next.flags() & gtk.SENSITIVE))
-        gobject.idle_add(lambda: ass(wiz.page.auth_method_combo.get_active()==0))
-        gobject.idle_add(lambda: wiz.page.user_entry.set_text('bar'))
-        gobject.idle_add(lambda: ass(not next.flags() & gtk.SENSITIVE))
-        gobject.idle_add(lambda: wiz.page.passwd_entry.set_text('baz'))
-        gobject.idle_add(lambda: ass(next.flags() & gtk.SENSITIVE))
-        gobject.idle_add(lambda: next.emit('clicked'))
+
+        # makes sure proc only gets called once
+        def idle_add(proc):
+            def proc_star():
+                proc()
+                return False
+            gobject.idle_add(proc_star)
+        
+        idle_add(lambda: next.emit('clicked'))
+        idle_add(lambda: prev.emit('clicked'))
+        idle_add(lambda: next.emit('clicked'))
+        idle_add(lambda: ass(sensitive(next)))
+        idle_add(lambda: wiz.page.host_entry.set_text('foo'))
+        idle_add(lambda: ass(sensitive(next)))
+        idle_add(lambda: wiz.page.ssl_check.emit('clicked'))
+        idle_add(lambda: ass(wiz.page.port_entry.get_text()=='8642'))
+        idle_add(lambda: next.emit('clicked'))
+        idle_add(lambda: prev.emit('clicked'))
+        idle_add(lambda: next.emit('clicked'))
+        idle_add(lambda: ass(not sensitive(next)))
+        idle_add(lambda: ass(wiz.page.auth_method_combo.get_active()==0))
+        idle_add(lambda: wiz.page.user_entry.set_text('bar'))
+        idle_add(lambda: ass(not sensitive(next)))
+        idle_add(lambda: wiz.page.passwd_entry.set_text('baz'))
+        idle_add(lambda: ass(sensitive(next)))
+        idle_add(lambda: next.emit('clicked'))
+
         state = wiz.run()
+
+        try:
+            assert not self._failed
+        finally:
+            wiz.destroy()
+
         refstate = {'passwd': 'baz', 'host': 'foo', 'port': 8642,
                     'use_insecure': True, 'user': 'bar'}
         self.assert_(state == refstate)
+
+WizardTest().testMakeGreeter()
