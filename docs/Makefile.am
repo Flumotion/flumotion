@@ -4,9 +4,11 @@ pypath=$(PYTHONPATH):@PYGTK_DIR@:$(top_srcdir):.
 EPYDOC_ARGS=-q --no-frames --html --ignore-param-mismatch
 MODULES = \
 	flumotion.config \
-	flumotion.server.config \
-	flumotion.server.controller \
+	flumotion.admin \
+	flumotion.admin.spyglass \
 	flumotion.server.component \
+        flumotion.server.config \
+	flumotion.server.controller \
 	flumotion.server.launcher \
 	flumotion.components.http
 all-local:
