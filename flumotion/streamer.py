@@ -149,11 +149,16 @@ class StreamingResource(resource.Resource):
         #request.setHeader('Cache-Control', 'private')
         #request.setHeader("Content-type", "%s;boundary=ThisRandomString" % self.streamer.caps)
         #request.setHeader('Pragma', 'no-cache')
-        #FIXME: get the mime type from the caps correctly, but figure out the
-        # gst python caps api first.  this is a temp hack
         mime = self.streamer.caps.get_structure(0).get_name()
-        self.msg('setting Content-type to %s' % mime)
-        request.setHeader('Content-type', mime)
+        if mime == 'multipart/x-mixed-replace':
+            self.msg('setting Content-type to %s but with camserv hack' % mime)
+            # Stolen from camserv
+            request.setHeader('Cache-Control', 'no-cache')
+            request.setHeader('Cache-Control', 'private')
+            request.setHeader("Content-type", "%s;boundary=ThisRandomString" % mime)
+        else:
+            self.msg('setting Content-type to %s' % mime)
+            request.setHeader('Content-type', mime)
         
         for buffer in self.caps_buffers:
             request.write(buffer)
