@@ -90,10 +90,6 @@ class WizardComboBox(gtk.ComboBox):
             raise TypeError
         
         self.set_enum(self.enum_class, values)
-        if len(values) == 1:
-            self.set_sensitive(False)
-        else:
-            self.set_sensitive(True)
 
     def set_active(self, item):
         """Small wrapper around set_active() to support enums"""
