@@ -39,19 +39,27 @@ import errors
 class Streamer(gobject.GObject, component.BaseComponent):
     __gsignals__ = {
         'data-recieved': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
-                          (gst.Buffer,)),
+                          (gst.Buffer, str)),
     }
 
     kind = 'streamer'
+    pipe_template = 'multipartmux ! fakesink signal-handoffs=1 silent=1 name=sink'
+    
     def __init__(self, name, sources):
         self.__gobject_init__()
-        component.BaseComponent.__init__(self, name, sources)
+        component.BaseComponent.__init__(self, name, sources, self.pipe_template)
 
     def sink_handoff_cb(self, element, buffer, pad):
-        self.emit('data-recieved', buffer)
+        if pad.is_negotiated():
+            caps = pad.get_negotiated_caps()
+#        print dir(pad)
+#        raise SystemExit
+
+        self.emit('data-recieved', buffer, caps)
         
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
+        print 'connect', sources
         self.setup_sources(sources)
         sink = self.get_sink()
         sink.connect('handoff', self.sink_handoff_cb)
@@ -68,21 +76,21 @@ class StreamingResource(resource.Resource):
 
         self.streamer = streamer
         streamer.connect('data-recieved', self.data_recieved_cb)
+        #streamer.connect('get-caps', self.get_caps_cb)
         
         self.current_requests = []
+        self.caps = None
         
-    def data_recieved_cb(self, transcoder, gbuffer):
+    def data_recieved_cb(self, transcoder, gbuffer, caps):
+        if not self.caps:
+            self.caps = caps
+
+        buf = str(buffer(gbuffer))
         for request in self.current_requests:
-            self.write(request, str(buffer(gbuffer)))
+            request.write(buf)
         
     def getChild(self, path, request):
         return self
-
-    def write(self, request, data):
-        # Stolen from camserv
-        request.write('--ThisRandomString\n')
-        request.write("Content-type: image/jpeg\n\n")
-        request.write(data + '\n')
 
     def lost(self, obj, request):
         print 'client from', request.getClientIP(), 'disconnected'
@@ -90,11 +98,14 @@ class StreamingResource(resource.Resource):
         
     def render(self, request):
         print 'client from', request.getClientIP(), 'connected'
-        
+        if not self.caps:
+            print 'No caps, skipping'
+            return server.NOT_DONE_YET
+
         # Stolen from camserv
         request.setHeader('Cache-Control', 'no-cache')
         request.setHeader('Cache-Control', 'private')
-        request.setHeader("Content-type", "multipart/x-mixed-replace;;boundary=ThisRandomString")
+        request.setHeader("Content-type", "%s;boundary=ThisRandomString" % self.caps)
         request.setHeader('Pragma', 'no-cache')
         
         self.current_requests.append(request)

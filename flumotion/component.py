@@ -73,6 +73,8 @@ class BaseComponent(pb.Referenceable):
             assert sources
             pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
             need_sink = False
+        elif pipeline.find('sink') != -1:
+            need_sink = False
             
         assert pipeline != ''
         if len(sources) == 1:
@@ -91,7 +93,7 @@ class BaseComponent(pb.Referenceable):
         if need_sink:
             pipeline = '%s ! tcpserversink name=sink' % pipeline
 
-        pipeline = '{ %s } ' % pipeline
+        #pipeline = '{ %s } ' % pipeline
         print 'pipeline: %s' % pipeline
         
         return pipeline
