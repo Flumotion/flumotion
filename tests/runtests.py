@@ -12,7 +12,9 @@ os.chdir(dir)
 def gettestnames():
     files = glob.glob('*.py')
     names = map(lambda x: x[:-3], files)
-    map(names.remove, SKIP_FILES)
+    for f in SKIP_FILES:
+        if f in names:
+             names.remove(f)
     return names
         
 suite = unittest.TestSuite()

@@ -32,7 +32,7 @@ MODULES = $(subst /,.,$(patsubst %.py,%, $(MODULE_FILES:/__init__.py=)))
 
 html/index.html: $(patsubst %, $(top_srcdir)/%, $(MODULE_FILES))
 	@echo Generating HTML documentation...
-	@PYTHONPATH=$(pypath) $(PYTHON) gendoc.py $(EPYDOC_ARGS) $(MODULES)
+	@PYTHONPATH=$(pypath) $(PYTHON) $(srcdir)/gendoc.py $(EPYDOC_ARGS) $(MODULES)
 
 all-local: html/index.html
 
@@ -41,3 +41,5 @@ distclean-local:
 else
 EPYDOC_HTML =
 endif
+
+EXTRA_DIST = gendoc.py

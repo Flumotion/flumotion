@@ -1,5 +1,11 @@
 2004-08-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/reference/Makefile.am:
+	* tests/runtests.py:
+	  fix distcheck
+
+2004-08-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	* doc/Makefile.am:
 	* doc/coding-style.txt:
