@@ -31,6 +31,8 @@ import signal
 
 from twisted.python import reflect, rebuild, components
 from twisted.spread import pb
+from twisted.internet import address
+
 from flumotion.common import errors, log
 
 # Note: This module is loaded very early on, so
@@ -507,3 +509,46 @@ def getFirstFreePort(startPort):
         if checkPortFree(port):
             return port
         port += 1
+
+def checkRemotePort(host, port):
+    """
+    Check if the given remote host/port is accepting connections.
+
+    @type port: int
+
+    @rtype: boolean
+    """
+    assert type(port) == int
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.connect((host, port))
+    except socket.error, e:
+        return False
+    
+    return True
+
+def addressGetHost(a):
+    """
+    Get the port number of an IPv4 address.
+
+    @type a: L{twisted.internet.address.IPv4Address}
+    """
+    assert(isinstance(a, address.IPv4Address))
+    try:
+        host = a.host
+    except AttributeError:
+        host = a[1]
+    return host
+        
+def addressGetPort(a):
+    """
+    Get the port number of an IPv4 address.
+
+    @type a: L{twisted.internet.address.IPv4Address}
+    """
+    assert(isinstance(a, address.IPv4Address))
+    try:
+        port = a.port
+    except AttributeError:
+        port = a[2]
+    return port

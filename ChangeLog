@@ -1,3 +1,9 @@
+2005-01-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
+	* flumotion/test/test_common.py:
+	  add some common port functions
+
 2005-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/base.py:

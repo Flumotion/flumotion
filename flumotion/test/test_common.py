@@ -22,6 +22,8 @@ import os
 import tempfile
 
 from twisted.trial import unittest
+from twisted.spread import pb
+from twisted.internet import reactor, address
 
 from flumotion.common import common
 
@@ -195,5 +197,38 @@ class TestState:#unittest.TestCase):
         self.runClient()
         reactor.run()
 
+class TestAddress(unittest.TestCase):
+    def setUp(self):
+        self.address = address.IPv4Address('TCP', 'localhost', '8000')
+        
+    def testGetHost(self):
+        self.failUnlessEqual(common.addressGetHost(self.address), 'localhost')
+
+    def testGetPort(self):
+        self.failUnlessEqual(common.addressGetPort(self.address), '8000')
+
+class TestPort(unittest.TestCase):
+    def testCheckPortFree(self):
+       factory = pb.PBServerFactory(pb.Root())
+       p = reactor.listenTCP(0, factory, interface="127.0.0.1")
+       port = common.addressGetPort(p.getHost())
+       #reactor.callLater(0, self._print, p)
+       #reactor.run()
+       self.failIf(common.checkPortFree(port))
+       self.failUnless(common.checkRemotePort('127.0.0.1', port))
+       self.failUnless(common.checkRemotePort('localhost', port))
+       self.failIf(common.getFirstFreePort(port) <= port)
+
+       # run reactor and schedule the stop, which would stop the factory
+       reactor.callLater(0, lambda: reactor.stop())
+       reactor.run()
+       self.failUnless(common.checkPortFree(port))
+       self.failIf(common.checkRemotePort('127.0.0.1', port))
+       self.failIf(common.checkRemotePort('localhost', port))
+       self.failUnlessEqual(common.getFirstFreePort(port), port)
+
+    def _print(self, p):
+        print p, p.getHost()
+        
 if __name__ == '__main__':
     unittest.main()
