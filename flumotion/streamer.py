@@ -100,7 +100,7 @@ class StreamingResource(resource.Resource):
         for buffer in self.buffer_queue[:]:
             for request in self.current_requests:
                 request.write(buffer)
-            self.buffer.remove(buffer)
+            self.buffer_queue.remove(buffer)
             
         reactor.callLater(0.01, self.bufferWrite)
         
