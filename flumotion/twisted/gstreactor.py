@@ -116,7 +116,7 @@ class GstReactor(default.PosixReactorBase):
             writes[writer] = self.input_add(writer, OUTFLAGS, self.callback)
         else:
             # FIXME
-            print "ERROR: adding a writer on fd %d that was already here" % reader.fileno()
+            print "ERROR: adding a writer on fd %d that was already here" % writer.fileno()
 
     def removeAll(self):
         v = reads.keys()
