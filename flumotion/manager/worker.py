@@ -131,7 +131,7 @@ class WorkerHeaven(base.ManagerHeaven):
         # called when the mind is attached, ie the worker logged in
         workerName = workerAvatar.getName()
         if not workerName in self.state.get('names'):
-            self.state.append('names', workerName)
+            self.state.add('names', workerName)
         
         # get all components that are supposed to start on this worker
         # FIXME: we start them one by one to make port assignment more

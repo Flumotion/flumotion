@@ -383,7 +383,7 @@ class ComponentAvatar(base.ManagerAvatar):
         if key == 'mood':
             self.info('Mood changed to %s' % moods.get(value).name)
 
-    def stateAppend(self, state, key, value):
+    def stateAdd(self, state, key, value):
         pass
 
     def stateRemove(self, state, key, value):

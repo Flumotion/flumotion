@@ -38,7 +38,7 @@ class IStateListener(components.Interface):
         The given key has been set to the given value.
         """
 
-    def stateAppend(self, key, value):
+    def stateAdd(self, key, value):
         """
         The given value has been added to the list given by the key.
         """
@@ -92,16 +92,16 @@ class StateCacheable(pb.Cacheable):
         self._dict[key] = value
         for o in self._observers: o.callRemote('set', key, value)
         
-    def append(self, key, value):
+    def add(self, key, value):
         """
-        Append the given object to the given list.
-        Notifies observers of this Cacheable through observe_append.
+        Add the given object to the given list.
+        Notifies observers of this Cacheable through observe_add.
         """
         if not key in self._dict.keys():
             raise KeyError('%s in %r' % (key, self))
 
         self._dict[key].append(value)
-        for o in self._observers: o.callRemote('append', key, value)
+        for o in self._observers: o.callRemote('add', key, value)
  
     def remove(self, key, value):
         """
@@ -170,16 +170,16 @@ class StateRemoteCache(pb.RemoteCache):
         for l in self._listeners:
             l.stateSet(self, key, value)
 
-    def observe_append(self, key, value):
+    def observe_add(self, key, value):
         self._dict[key].append(value)
         # if we also subclass from Cacheable, then we're a proxy, so proxy
-        if hasattr(self, 'append'):
-            StateCacheable.append(self, key, value)
+        if hasattr(self, 'add'):
+            StateCacheable.add(self, key, value)
 
         # notify our local listeners
         self._ensureListeners()
         for l in self._listeners:
-            l.stateAppend(self, key, value)
+            l.stateAdd(self, key, value)
 
     def observe_remove(self, key, value):
         self._dict[key].remove(value)
