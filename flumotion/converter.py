@@ -31,17 +31,20 @@ if __name__ == '__main__':
 import gst
 
 from twisted.internet import reactor
-from twisted.python import log
 
 import component
 import errors
+import log
 
+def msg(*args):
+    log.msg('converter', *args)
+    
 class Converter(component.BaseComponent):
     kind = 'converter'
     def start(self, sources, sink_host, sink_port):
         self.setup_sources(sources)
         
-        log.msg('Going to listen on %s:%d' % (sink_host, sink_port))
+        msg('Going to listen on %s:%d' % (sink_host, sink_port))
         self.set_sink_properties(host=sink_host, port=sink_port)
 
         self.pipeline_play()

@@ -31,6 +31,7 @@ from twisted.spread import pb
 import pbutil
 import gstutils
 import errors
+import log
 
 class ClientFactory(pbutil.ReconnectingPBClientFactory):
     __super_init = pbutil.ReconnectingPBClientFactory.__init__
@@ -63,7 +64,7 @@ class BaseComponent(pb.Referenceable):
         self.setup_pipeline()
         
     def msg(self, *args):
-        msg('[%s] %s' % (self.kind, ''.join(args))
+        log.msg(self.kind, *args)
 
     def get_pipeline(self, pipeline):
         sources = self.getSources()

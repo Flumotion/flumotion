@@ -33,10 +33,16 @@ import gobject
 import gst
 from twisted.web import server, resource
 from twisted.internet import reactor
-from twisted.python import log
 
 import component
 import errors
+import log
+
+def msg(*args):
+    log.msg('streamer', *args)
+    
+def warn(*args):
+    log.warning('streamer', *args)
 
 class Streamer(gobject.GObject, component.BaseComponent):
     __gsignals__ = {
@@ -52,19 +58,16 @@ class Streamer(gobject.GObject, component.BaseComponent):
         component.BaseComponent.__init__(self, name, sources, self.pipe_template)
         self.caps = None
         
-    def msg(self, *args):
-        log.msg('[streamer] %s' % string.join(args))
-
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-received', buffer)
         
     def notify_caps_cb(self, element, pad, param):
-        self.msg('Got caps: %s' % pad.get_negotiated_caps())
+        msg('Got caps: %s' % pad.get_negotiated_caps())
         
         if not self.caps is None:
-            self.msg('WARNING: Already had caps: %s, replacing' % self.caps)
+            warn('Already had caps: %s, replacing' % self.caps)
 
-        self.msg('Storing caps: %s' % pad.get_negotiated_caps())
+        msg('Storing caps: %s' % pad.get_negotiated_caps())
         self.caps = pad.get_negotiated_caps()
 
     # connect() is already taken by gobject.GObject
@@ -94,17 +97,14 @@ class StreamingResource(resource.Resource):
         
         reactor.callLater(0, self.bufferWrite)
 
-    def msg(self, *args):
-        log.msg('[streamer] %s' % string.join(args))
-        
     def data_received_cb(self, transcoder, gbuffer):
         s = str(buffer(gbuffer))
         if gbuffer.flag_is_set(gst.BUFFER_IN_CAPS):
-            self.msg('Received a GST_BUFFER_IN_CAPS buffer')
+            msg('Received a GST_BUFFER_IN_CAPS buffer')
             self.caps_buffers.append(s)
         else:
             if not self.first_buffer:
-                self.msg('Received the first buffer')
+                msg('Received the first buffer')
                 self.first_buffer = gbuffer
             self.buffer_queue.append(s)
                                              
@@ -120,35 +120,35 @@ class StreamingResource(resource.Resource):
         return self
 
     def lost(self, obj, request):
-        self.msg('client from %s disconnected' % request.getClientIP()) 
+        msg('client from %s disconnected' % request.getClientIP()) 
         self.current_requests.remove(request)
 
     def isReady(self):
         if self.streamer.caps is None:
-            self.msg('We have no caps yet')
+            msg('We have no caps yet')
             return False
         
         if self.first_buffer is None:
-            self.msg('We still haven\'t received any buffers')
+            msg('We still haven\'t received any buffers')
             return False
 
         return True
         
     def render(self, request):
-        self.msg('client from %s connected' % request.getClientIP())   
+        msg('client from %s connected' % request.getClientIP())   
         if not self.isReady():
-            self.msg('Not sending data, it\'s not ready')
+            msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
         mime = self.streamer.caps.get_structure(0).get_name()
         if mime == 'multipart/x-mixed-replace':
-            self.msg('setting Content-type to %s but with camserv hack' % mime)
+            msg('setting Content-type to %s but with camserv hack' % mime)
             # Stolen from camserv
             request.setHeader('Cache-Control', 'no-cache')
             request.setHeader('Cache-Control', 'private')
             request.setHeader("Content-type", "%s;boundary=ThisRandomString" % mime)
         else:
-            self.msg('setting Content-type to %s' % mime)
+            msg('setting Content-type to %s' % mime)
             request.setHeader('Content-type', mime)
         
         for buffer in self.caps_buffers:

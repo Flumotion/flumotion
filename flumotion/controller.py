@@ -34,15 +34,15 @@ if __name__ == '__main__':
 from twisted.application import service, internet
 from twisted.cred import portal, checkers, credentials
 from twisted.internet import reactor, error
-from twisted.python import log
+from twisted.manhole import telnet
 from twisted.spread import pb
 
-from twistedutils import ShellFactory, Shell
-
 import pbutil
+import log
+import twistedutils
 
 def msg(*args):
-    print '[controller] %s' % args
+    log.msg('controller', *args)
 
 class Dispatcher:
     __implements__ = portal.IRealm
@@ -416,15 +416,14 @@ class ControllerServerFactory(pb.PBServerFactory):
         return '<ControllerServerFactory>'
 
 if __name__ == '__main__':
-    #log.startLogging(sys.stdout)
     controller = ControllerServerFactory()
 
-    ts = ShellFactory()
+    ts = telnet.ShellFactory()
     ts.namespace.update(controller.controller.__dict__)
     ts.namespace['dispatcher'] = controller.dispatcher
     ts.namespace['portal'] = controller.portal
 
-    ts.protocol = Shell
+    ts.protocol = twistedutils.Shell
     try:
         reactor.listenTCP(8890, controller)
         reactor.listenTCP(4040, ts)
