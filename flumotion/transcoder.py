@@ -49,7 +49,7 @@ class TranscoderFactory(pb.Root):
 
     def remote_start(self, port):
         print 'Transcoder.start'
-        self.pipeline = gst.Pipeline('acquisition-thread')
+        self.pipeline = gst.Pipeline('acquisition-pipeline')
         self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         self.pipeline.connect('error', self.error_cb)
         

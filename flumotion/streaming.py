@@ -39,26 +39,28 @@ class SimpleResource(resource.Resource):
     def getChild(self, path, request):
         return self
 
-    def writeOne(self, request):
+    def write(self, request, data):
         request.write('--ThisRandomString\n')
         request.write("Content-type: image/jpeg\n\n")
-        request.write(self.data + '\n')
+        request.write(data + '\n')
 
-    def writeTwo(self, request):
-        request.write('--ThisRandomString\n')
-        request.write("Content-type: image/jpeg\n\n")
-        request.write(self.data2 + '\n')
-    
+    def lost(self, request, failure):
+        print 'client from', request.getClientIP(), 'disconnected'
+        print hash(request)
+        
     def render(self, request):
-        request.setHeader("Content-type", "multipart/x-mixed-replace;;boundary=ThisRandomString")
         request.setHeader('Cache-Control', 'no-cache')
         request.setHeader('Cache-Control', 'private')
+        request.setHeader("Content-type", "multipart/x-mixed-replace;;boundary=ThisRandomString")
         request.setHeader('Pragma', 'no-cache')
 
-        for i in range(20):
-            reactor.callLater(0.250 + 0.250*i, self.writeOne, request)
-            reactor.callLater(0.250*i, self.writeTwo, request)
-        reactor.callLater(105*0.250, request.finish)
+        request.connectionLost = lambda err: self.lost(request, err)
+        NO = 2000
+        DELAY = 0.250
+        for i in range(NO):
+            reactor.callLater(DELAY*i,     self.write, request, self.data)
+            reactor.callLater(DELAY*(i+1), self.write, request, self.data2)
+        reactor.callLater(DELAY*(NO+1), request.finish)
         
         return server.NOT_DONE_YET
 
