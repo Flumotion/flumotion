@@ -1,5 +1,11 @@
 2004-12-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/utils/gstutils.py:
+	  add evil hack so we can set GParamEnum values.  Needs to be fixed !
+	  Issue #119.
+
+2004-12-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-admin.in:
 	  remove flumotion.component from import path to be sure we use
 	  the bundled code

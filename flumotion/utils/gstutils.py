@@ -104,6 +104,11 @@ def gobject_set_property(object, property, value):
         value = float(value)
     elif pspec.value_type == gobject.TYPE_STRING:
         value = str(value)
+    # FIXME: this is superevil ! we really need to find a better way
+    # of checking if this property is a param enum  
+    # also, we only allow int for now
+    elif repr(pspec.__gtype__).startswith("<GType GParamEnum"):
+        value = int(value)
     else:
         raise errors.PropertyError('Unknown property type: %s' % pspec.value_type)
 
