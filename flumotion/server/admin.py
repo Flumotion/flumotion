@@ -27,7 +27,8 @@ from flumotion.utils import log
 class ComponentView(pb.Copyable):
     def __init__(self, component):
         self.name = component.getName()
-        self.state = component.state
+        # forced to int so it's jellyable
+        self.state = int(component.state)
         self.sources = component.getSources()
         self.feeds = component.getFeeds()
         self.options = component.options.dict
