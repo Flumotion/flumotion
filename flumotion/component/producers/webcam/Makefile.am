@@ -1,6 +1,6 @@
 include $(top_srcdir)/python.mk
 
-component_PYTHON = __init__.py webcam.py
+component_PYTHON = __init__.py webcam.py admin_gtk.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/producers/webcam
 component_DATA = webcam.xml
 
