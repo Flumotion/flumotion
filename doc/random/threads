@@ -1,0 +1,19 @@
+Threads in Flumotion are very simple - they don't exist as far as flumotion
+is concerned.
+
+Every component should ensure they run Twisted code from only one thread.
+
+Components that use more than one thread (e.g. because the GStreamer pipeline
+uses threads) should make sure themselves that those threads are abstracted
+away inside the component itself or lock properly.
+
+For example, multifdsink uses idle_add to react on signals coming from the
+streaming thread of multifdsink
+
+The consequence is that a component should do everything it can to handle
+the signal directly, including directly emitting response signal to the
+element to collect data.
+
+The only exception is using the logging system; this can be run from any
+thread.  If someone registers a log handler, it's his job to make sure it
+can be called safely from different threads.
