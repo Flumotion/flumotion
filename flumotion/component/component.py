@@ -174,7 +174,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
         rebuild(sys.modules[name])
 
         # now rebuild relevant modules
-        import flumotion.utils
+        import flumotion.utils.reload
         rebuild(sys.modules['flumotion.utils'])
         try:
             flumotion.utils.reload.reload()
