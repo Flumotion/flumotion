@@ -15,6 +15,7 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+import optparse
 import os
 import sys
 
@@ -379,15 +380,33 @@ class Window(log.Loggable):
         raise NotImplementedError
     
 def main(args):
-    # FIXME: use real options
-    try:
-        host = args[1]
-        port = int(args[2])
-    except IndexError:
-        print "Please specify a host and a port number"
-        sys.exit(1)
+    parser = optparse.OptionParser()
+    parser.add_option('-v', '--verbose',
+                      action="store_true", dest="verbose",
+                      help="Be verbose")
+    parser.add_option('', '--host',
+                     action="store", type="string", dest="host",
+                     default='localhost',
+                     help="Port to listen on [default localhost]")
+    parser.add_option('', '--port',
+                     action="store", type="int", dest="port",
+                     default=8890,
+                     help="Port to listen on [default 8890]")
+    parser.add_option('', '--wizard',
+                     action="store_true", dest="wizard",
+                     help="Run the wizard")
 
-    win = Window(host, port)
+    options, args = parser.parse_args(args)
+
+    if options.verbose:
+        log.setFluDebug("*:4")
+
+    if options.wizard:
+        from flumotion.wizard import wizard
+        wizard.run()
+        return
+    
+    win = Window(options.host, options.port)
     reactor.run()
     
 if __name__ == '__main__':

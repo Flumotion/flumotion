@@ -18,17 +18,33 @@
 from flumotion.wizard.enums import * # XXX: fix later
 from flumotion.wizard import wizard
 
+
+class Welcome(wizard.WizardStep):
+    step_name = 'Welcome'
+    glade_file = 'wizard_welcome.glade'
+    section = 'Production'
+    section_name = 'Production'
+    def get_next(self):
+        return 'Source'
+wizard.register_step(Welcome)
 
 
-class WizardStepSource(wizard.WizardStep):
+class Source(wizard.WizardStep):
     step_name = 'Source'
     glade_file = 'wizard_source.glade'
     section = 'Production'
     section_name = 'Production'
     
     def setup(self):
+        import gtk
+        
         self.combobox_video.set_enum(VideoDevice)
         self.combobox_audio.set_enum(AudioDevice)
+        tips = gtk.Tooltips()
+        tips.set_tip(self.checkbutton_has_video,
+                     'If you want to stream video')
+        tips.set_tip(self.checkbutton_has_audio,
+                     'If you want to stream audio')
         
     def on_checkbutton_has_video_toggled(self, button):
         self.combobox_video.set_sensitive(button.get_active())
@@ -39,7 +55,8 @@ class WizardStepSource(wizard.WizardStep):
         self.verify()
 
     def verify(self):
-        if (not self.checkbutton_has_audio and not self.checkbutton_has_video):
+        if (not self.checkbutton_has_audio and
+            not self.checkbutton_has_video):
             self.wizard.block_next(True)
         else:
             self.wizard.block_next(False)
@@ -59,10 +76,11 @@ class WizardStepSource(wizard.WizardStep):
         elif self.checkbutton_has_audio:
             return 'Audio Source'
         raise AssertionError
+wizard.register_step(Source)
 
 
 
-class WizardStepVideoSource(wizard.WizardStep):
+class VideoSource(wizard.WizardStep):
     section = 'Production'
     component_name = 'video-source'
     def get_next(self):
@@ -70,7 +88,7 @@ class WizardStepVideoSource(wizard.WizardStep):
 
 
 
-class WizardStepTVCard(WizardStepVideoSource):
+class TVCard(VideoSource):
     step_name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
@@ -84,24 +102,27 @@ class WizardStepTVCard(WizardStepVideoSource):
         options['device'] = TVCardDevice.get(options['device']).name
         options['signal'] = TVCardSignal.get(options['signal']).name
         return options
+wizard.register_step(TVCard)
 
 
 
-class WizardStepFireWirde(WizardStepVideoSource):
+class FireWire(VideoSource):
     step_name = 'Firewire'
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
+wizard.register_step(FireWire)
 
 
 
-class WizardStepWebcam(WizardStepVideoSource):
+class Webcam(VideoSource):
     step_name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
+wizard.register_step(Webcam)
 
 
     
-class WizardStepTestSource(WizardStepVideoSource):
+class TestSource(VideoSource):
     step_name = 'Test Source'
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
@@ -121,10 +142,11 @@ class WizardStepTestSource(WizardStepVideoSource):
             raise AssertionError
         options['pattern'] = self.combobox_pattern.get_string()
         return options
+wizard.register_step(TestSource)
 
 
 
-class WizardStepOverlay(wizard.WizardStep):
+class Overlay(wizard.WizardStep):
     step_name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
     section = 'Production'
@@ -136,11 +158,12 @@ class WizardStepOverlay(wizard.WizardStep):
             return 'Audio Source'
         else:
             return 'Encoding'
+wizard.register_step(Overlay)
 
 
 
 # XXX: Rename to Soundcard
-class WizardStepAudioSource(wizard.WizardStep):
+class AudioSource(wizard.WizardStep):
     step_name = 'Audio Source'
     glade_file = 'wizard_audiosource.glade'
     section = 'Production'
@@ -169,10 +192,11 @@ class WizardStepAudioSource(wizard.WizardStep):
 
     def get_next(self):
         return 'Encoding'
+wizard.register_step(AudioSource)
 
 
 
-class WizardStepEncoding(wizard.WizardStep):
+class Encoding(wizard.WizardStep):
     step_name = 'Encoding'
     glade_file = 'wizard_encoding.glade'
     section = 'Conversion'
@@ -240,16 +264,18 @@ class WizardStepEncoding(wizard.WizardStep):
                 return 'JPEG'
             
         return 'Consumption'
+wizard.register_step(Encoding)
 
 
 
-class WizardStepVideoEncoder(wizard.WizardStep):
+class VideoEncoder(wizard.WizardStep):
     section = 'Conversion'
     component_name = 'video-encoder'
+wizard.register_step(VideoEncoder)
 
 
 
-class WizardStepTheora(WizardStepVideoEncoder):
+class Theora(VideoEncoder):
     step_name = 'Theora'
     glade_file = 'wizard_theora.glade'
     component_type = 'theora'
@@ -263,10 +289,11 @@ class WizardStepTheora(WizardStepVideoEncoder):
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
+wizard.register_step(Theora)
 
 
 
-class WizardStepSmoke(WizardStepVideoEncoder):
+class Smoke(VideoEncoder):
     step_name = 'Smoke'
     glade_file = 'wizard_smoke.glade'
     section = 'Conversion'
@@ -274,10 +301,11 @@ class WizardStepSmoke(WizardStepVideoEncoder):
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
+wizard.register_step(Smoke)
 
 
 
-class WizardStepJPEG(WizardStepVideoEncoder):
+class JPEG(VideoEncoder):
     step_name = 'JPEG'
     glade_file = 'wizard_jpeg.glade'
     section = 'Conversion'
@@ -285,10 +313,11 @@ class WizardStepJPEG(WizardStepVideoEncoder):
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
+wizard.register_step(JPEG)
 
 
 
-class WizardStepAudioEncoder(wizard.WizardStep):
+class AudioEncoder(wizard.WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
     component_name = 'audio-encoder'
@@ -298,25 +327,28 @@ class WizardStepAudioEncoder(wizard.WizardStep):
 
 
 
-class WizardStepVorbis(WizardStepAudioEncoder):
+class Vorbis(AudioEncoder):
     step_name = 'Vorbis'
     component_type = 'vorbis'
+wizard.register_step(Vorbis)
 
 
 
-class WizardStepSpeex(WizardStepAudioEncoder):
+class Speex(AudioEncoder):
     step_name = 'Speex'
     component_type = 'speex'
+wizard.register_step(Speex)
 
 
 
-class WizardStepMulaw(WizardStepAudioEncoder):
+class Mulaw(AudioEncoder):
     step_name = 'Mulaw'
     component_type = 'Mulaw'
+wizard.register_step(Mulaw)
 
 
 
-class WizardStepConsumption(wizard.WizardStep):
+class Consumption(wizard.WizardStep):
     step_name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
     section = 'Consumption'
@@ -400,14 +432,24 @@ class WizardStepConsumption(wizard.WizardStep):
                 return items[items.index(stepname)+1]
             else:
                 return 'Content License'
+wizard.register_step(Consumption)
 
 
 
-class WizardStepHTTP(wizard.WizardStep):
+class HTTP(wizard.WizardStep):
     glade_file = 'wizard_http.glade'
     section = 'Consumption'
     component_type = 'http-streamer'
 
+    start_port = 8800
+    ports = range(start_port+6, start_port, -1)
+
+    def setup(self):
+        self.spinbutton_port.set_value(self.get_port())
+        
+    def get_port(self):
+        return self.ports.pop()
+    
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
@@ -427,27 +469,30 @@ class WizardStepHTTP(wizard.WizardStep):
 
 
     
-class WizardStepHTTPBoth(WizardStepHTTP):
+class HTTPBoth(HTTP):
     step_name = 'HTTP Streamer (audio & video)'
     component_name = 'http-streamer-audio+video'
     sidebar_name = 'HTTP audio/video'
-
+wizard.register_step(HTTPBoth)
+    
                   
-class WizardStepHTTPAudio(WizardStepHTTP):
+class HTTPAudio(HTTP):
     step_name = 'HTTP Streamer (audio only)'
     component_name = 'http-streamer-audio'
     sidebar_name = 'HTTP video'
+wizard.register_step(HTTPAudio)
 
 
 
-class WizardStepHTTPVideo(WizardStepHTTP):
+class HTTPVideo(HTTP):
     step_name = 'HTTP Streamer (video only)'
     component_name = 'http-streamer-video'
     sidebar_name = 'HTTP audio'
+wizard.register_step(HTTPVideo)
 
     
 
-class WizardStepDisk(wizard.WizardStep):
+class Disk(wizard.WizardStep):
     glade_file = 'wizard_disk.glade'
     section = 'Consumption'
 
@@ -493,25 +538,28 @@ class WizardStepDisk(wizard.WizardStep):
 
 
 
-class WizardStepDiskBoth(WizardStepDisk):
+class DiskBoth(Disk):
     step_name = 'Disk (audio & video)'
     sidebar_name = 'Disk audio/video'
+wizard.register_step(DiskBoth)
 
 
 
-class WizardStepDiskAudio(WizardStepDisk):
+class DiskAudio(Disk):
     step_name = 'Disk (audio only)'
     sidebar_name = 'Disk audio'
+wizard.register_step(DiskAudio)
 
 
 
-class WizardStepDiskVideo(WizardStepDisk):
+class DiskVideo(Disk):
     step_name = 'Disk (video only)'
     sidebar_name = 'Disk video'
+wizard.register_step(DiskVideo)
 
 
 
-class WizardStepLicence(wizard.WizardStep):
+class Licence(wizard.WizardStep):
     step_name = "Content License"
     glade_file = "wizard_license.glade"
     section = 'License'
@@ -521,3 +569,4 @@ class WizardStepLicence(wizard.WizardStep):
         
     def get_next(self):
         return # WOHO, Finished!
+wizard.register_step(Licence)

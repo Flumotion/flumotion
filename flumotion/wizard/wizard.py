@@ -15,16 +15,11 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-import sys
-sys.path.insert(0, '../..')
-import pygtk
-pygtk.require('2.0')
-
 import os
 
 import gobject
 import gtk
-from gtk import gdk
+import gtk.gdk
 import gtk.glade
 
 from flumotion.config import gladedir
@@ -289,11 +284,15 @@ class WizardStep(object, log.Loggable):
         
 
 class Wizard:
+    sidebar_color = gtk.gdk.color_parse('#82b8ff')
+    sidebar_active_color = gtk.gdk.color_parse('#79abed')
+
     def __init__(self):
         self.wtree = gtk.glade.XML(os.path.join(gladedir, 'wizard.glade'))
         for widget in self.wtree.get_widget_prefix(''):
             setattr(self, widget.get_name(), widget)
         self.wtree.signal_autoconnect(self)
+        self.eventbox1.modify_bg(gtk.STATE_NORMAL, self.sidebar_color)
         
         self.steps = {}
         self.stack = Stack()
@@ -301,7 +300,10 @@ class Wizard:
 
     def __getitem__(self, stepname):
         return self.steps[stepname]
-    
+
+    def __len__(self):
+        return len(self.steps)
+            
     def get_step_option(self, stepname, option):
         state = self.get_step_options(stepname)
         return state[option]
@@ -334,12 +336,13 @@ class Wizard:
         
         self.steps[name] = step = step_class(self)
 
-        state = self.get_step_state(step)
-        assert type(state) == dict
-        assert state, state
+        if step.__dict__.has_key('get_state'):
+            state = self.get_step_state(step)
+            assert type(state) == dict
+            assert state, state
         
         step.setup()
-        
+
         if initial:
             self.stack.push(step)
 
@@ -357,14 +360,14 @@ class Wizard:
         if self.current_step:
             self.current_step.deactivated()
 
+        self.current_step = step
+        
         self.update_sidebar(step)
         self.update_buttons(has_next=True)
         
         # Finally show
         widget.show()
         step.activated()
-        
-        self.current_step = step
 
     def show_previous(self):
         self.stack.pop()
@@ -422,8 +425,7 @@ class Wizard:
         else:
             parent = self.eventbox_sidebar
 
-        parent.modify_bg(gtk.STATE_NORMAL,
-                         gdk.color_parse('#82b8ff'))
+        parent.modify_bg(gtk.STATE_NORMAL, self.sidebar_color)
         self.vbox_sidebar = gtk.VBox()
         self.vbox_sidebar.set_border_width(5)
         self.vbox_sidebar.set_size_request(180, -1)
@@ -441,10 +443,9 @@ class Wizard:
 
         text = escape(name)
         button = gtk.Button('')
-        button.modify_bg(gtk.STATE_PRELIGHT,
-                         gdk.color_parse('#79abed'))
-        button.modify_bg(gtk.STATE_ACTIVE,
-                         gdk.color_parse('#82b8ff'))
+        button.modify_bg(gtk.STATE_PRELIGHT, self.sidebar_active_color)
+        button.modify_bg(gtk.STATE_ACTIVE, self.sidebar_active_color)
+
         label = button.get_children()[0]
         label.set_padding(padding, 0)
         label.set_alignment(0, 0.5)
@@ -461,6 +462,7 @@ class Wizard:
 
         if step == self.current_step:
             size = 'large'
+            button.set_sensitive(False)
         else:
             size = 'medium'
             
@@ -527,27 +529,24 @@ class Wizard:
         
         self.window.show()
         gtk.main()
+        
+wiz = None
+def register_step(klass):
+    global wiz
+    if not wiz:
+        wiz = Wizard()
 
+    if not len(wiz):
+        wiz.add_step(klass, initial=True)
+    else:
+        wiz.add_step(klass)
+
+def run():
+    global wiz
+    
+    import flumotion.wizard.wizard_step
+    wiz.run()
+    
 
 if __name__ == '__main__':
-    INITIAL_STEP = 'WizardStepSource'
-    #INITIAL_STEP = 'WizardStepConsumption'
-
-    from flumotion.wizard import wizard_step as ws
-    wiz = Wizard()
-    for attrname in dir(ws):
-        if attrname.startswith('__'):
-            continue
-
-        initial = False
-        if attrname == INITIAL_STEP:
-            initial = True
-        
-        attr = getattr(ws, attrname)
-        if type(attr) == type:
-            # EEEEEEEVIL
-            # Can probably be fixed once we use another file to start from
-            if 'WizardStep' in attr.__bases__[0].__name__:
-                wiz.add_step(attr, initial)
-    wiz.run()
-
+    run()

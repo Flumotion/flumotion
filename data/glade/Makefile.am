@@ -15,7 +15,8 @@ glade_DATA = \
 	wizard_testsource.glade		\
 	wizard_theora.glade		\
 	wizard_tvcard.glade		\
-	wizard_webcam.glade		
+	wizard_webcam.glade		\
+	wizard_welcome.glade		
 
 gladedir = $(pkgdatadir)/glade
 
