@@ -147,9 +147,9 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
             self.debug('skipping %s, no perspective' % name)
             return
 
-        def errback(reason):
-            self.warning('stopping pipeline because of %s' % reason)
-            self.comp.pipeline_stop()
+        #def errback(reason):
+        #    self.warning('stopping pipeline because of %s' % reason)
+        #    self.comp.pipeline_stop()
 
         try:
             d = self.remote.callRemote(name, *args, **kwargs)
