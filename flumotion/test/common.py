@@ -36,6 +36,7 @@ if not gstdir in sys.path:
     sys.path.append(gstdir)
 
 import gst
+import gst.interfaces
 
 ltihooks = sys.modules.get('gst.ltihooks')
 if ltihooks:

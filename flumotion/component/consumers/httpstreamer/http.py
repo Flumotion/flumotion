@@ -159,8 +159,13 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         """
         return self.callRemote('removeKeycard', bouncerName, keycardId)
 
+    ### remote methods for manager to call on
     def remote_expireKeycard(self, keycardId):
         self.comp.resource.expireKeycard(keycardId)
+
+    def remote_notifyState(self):
+        self.comp.update_ui_state()
+
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
@@ -210,9 +215,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def getMaxClients(self):
         return self.resource.maxAllowedClients()
-
-    def remote_notifyState(self):
-        self.update_ui_state()
 
     def _notify_caps_cb(self, element, pad, param):
         caps = pad.get_negotiated_caps()

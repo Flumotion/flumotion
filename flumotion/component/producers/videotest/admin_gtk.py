@@ -42,8 +42,9 @@ class VideoTestAdminGtk(admin_gtk.BaseAdminGtk):
         label = gtk.Label("Pattern:")
         self.widget.attach(label, 0, 1, 0, 1, 0, 0, 6, 6)
         label.show()
-        d = self.getElementProperty("source", "pattern")
+        d = self.callRemote("getElementProperty", "source", "pattern")
         d.addCallback(self.getPatternCallback)
+        d.addErrback(self.getPatternErrback)
         
         #self.shown = False
 
@@ -63,9 +64,20 @@ class VideoTestAdminGtk(admin_gtk.BaseAdminGtk):
         self.widget.attach(self.combobox_pattern, 1, 2, 0, 1, 0, 0, 6, 6)
         self.combobox_pattern.show()
 
+    def getPatternErrback(self, failure):
+        # FIXME: this should throw up a nice error dialog with debug info
+        self.warning("Failure %s getting pattern: %s" % (
+            failure.type, failure.getErrorMessage()))
+        return None
+
     def cb_pattern_changed(self, combobox):
+        def _setPatternErrback(failure):
+            self.warning("Failure %s getting pattern: %s" % (
+                failure.type, failure.getErrorMessage()))
+            return None
+
         pattern = combobox.get_value()
-        d = self.setElementProperty("source", "pattern", pattern)
-        # FIXME: insensitivize until we get the deferred result
+        d = self.callRemote("setElementProperty", "source", "pattern", pattern)
+        d.addErrback(_setPatternErrback)
 
 GUIClass = VideoTestAdminGtk

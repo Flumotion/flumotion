@@ -28,6 +28,7 @@ import os
 
 from twisted.internet import reactor
 from twisted.spread import pb
+from twisted.python import failure
 
 from flumotion.manager import common
 from flumotion.common import errors, interfaces, log
@@ -142,20 +143,21 @@ class AdminAvatar(common.ManagerAvatar):
         raise SystemExit
 
     # Generic interface to call into a component
-    def perspective_callComponentRemote(self, componentName, method_name,
+    def perspective_componentCallRemote(self, componentName, method_name,
                                         *args, **kwargs):
         component = self.vishnu.componentHeaven.getComponent(componentName)
         
-        # XXX: Maybe we need to a prefix, so we can limit what an admin interface
-        #      can call on a component
+        # XXX: Maybe we need to have a prefix, so we can limit what an
+        # admin interface can call on a component
         
         try:
-            return component.callComponentRemote(method_name, *args, **kwargs)
+            return component.mindCallRemote(method_name, *args, **kwargs)
         except Exception, e:
-            self.warning(str(e))
-            raise
+            self.warning("exception on remote call: %s" % str(e))
+            return failure.Failure(errors.RemoteMethodError(str(e)))
 
-    def perspective_workerCallRemote(self, workerName, methodName, *args, **kwargs):
+    def perspective_workerCallRemote(self, workerName, methodName,
+                                     *args, **kwargs):
         """
         Call a remote method on the worker.
         This is used so that admin clients can call methods from the interface
@@ -169,13 +171,13 @@ class AdminAvatar(common.ManagerAvatar):
         
         workerAvatar = self.vishnu.workerHeaven.getAvatar(workerName)
         
-        # XXX: Maybe we need to a prefix, so we can limit what an admin interface
-        #      can call on a worker
+        # XXX: Maybe we need to a prefix, so we can limit what an admin
+        # interface can call on a worker
         try:
             return workerAvatar.mindCallRemote(methodName, *args, **kwargs)
         except Exception, e:
-            self.warning(str(e))
-            raise
+            self.warning("exception on remote call: %s" % str(e))
+            return failure.Failure(errors.RemoteMethodError(str(e)))
         
     def perspective_setComponentElementProperty(self, componentName, element, property, value):
         """Set a property on an element in a component."""

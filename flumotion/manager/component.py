@@ -422,6 +422,8 @@ class ComponentAvatar(common.ManagerAvatar):
             msg = "%s: no element specified" % self.getName()
             self.warning(msg)
             raise errors.PropertyError(msg)
+        # FIXME: this is wrong, since it's not dynamic.  Elements can be
+        # renamed
         if not element in self.options.elements:
             msg = "%s: element '%s' does not exist" % (self.getName(), element)
             self.warning(msg)
@@ -434,23 +436,6 @@ class ComponentAvatar(common.ManagerAvatar):
         d = self.mindCallRemote('getElementProperty', element, property)
         d.addErrback(self._mindPropertyErrback)
         d.addErrback(self._mindErrback, errors.PropertyError)
-        return d
-
-    def callComponentRemote(self, method, *args, **kwargs):
-        """
-        Call a remote method on the component.
-        This is used so that admin clients can call methods from the interface
-        to the component.
-
-        @type method: string
-        @param method: the method to call.  On the component, this calls
-         component_(method)
-        @type args: mixed
-        @type kwargs: mixed
-        """
-        self.debug("calling component method %s" % method)
-        d = self.mindCallRemote('callMethod', method, *args, **kwargs)
-        d.addErrback(self._mindErrback, Exception)
         return d
 
     def reloadComponent(self):

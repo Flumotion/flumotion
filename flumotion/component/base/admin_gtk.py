@@ -29,10 +29,21 @@ import gtk.glade
 from flumotion.common import errors, log
 
 class BaseAdminGtk(log.Loggable):
+    """
+    I am a base class for all GTK+-based Admin UI parts.
+    """
 
     logCategory = "admingtk"
     
     def __init__(self, name, admin, view):
+        """
+        @type  name:  string
+        @param name:  name of the component this is a UI for
+        @type  admin: L{flumotion.admin.AdminModel}
+        @param admin: the admin model that interfaces with the manager for us
+        @type  view:   
+        @param view:  the toolkit view we are embedded in
+        """
         self.name = name
         self.admin = admin
         self.view = view
@@ -59,7 +70,7 @@ class BaseAdminGtk(log.Loggable):
         return d
 
     def callRemote(self, method_name, *args, **kwargs):
-        return self.admin.callComponentRemote(self.name, method_name,
+        return self.admin.componentCallRemote(self.name, method_name,
                                               *args, **kwargs)
         
     def setUIState(self, state):

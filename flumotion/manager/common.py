@@ -26,6 +26,7 @@ Common classes and code to support manager-side objects.
 
 from twisted.internet import reactor
 from twisted.spread import pb
+from twisted.python import failure
 
 from flumotion.common import errors, interfaces, log
 
@@ -64,11 +65,30 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         # debug message as well, causing infinite recursion !
         # self.debug('Calling remote method %s%r' % (name, args))
         try:
-            return self.mind.callRemote(name, *args, **kwargs)
+            d = self.mind.callRemote(name, *args, **kwargs)
         except pb.DeadReferenceError:
             self.warning("mind %s is a dead reference, removing" % self.mind)
             self.mind = None
             return
+        except Exception, e:
+            self.warning("Exception trying to remote call %s: %r" % (name, e))
+            return
+
+        d.addErrback(self._mindCallRemoteErrback, name)
+        # FIXME: is there some way we can register an errback as the
+        # LAST to call as a general fallback ?
+        return d
+
+    def _mindCallRemoteErrback(self, f, name):
+        if f.check(AttributeError):
+            # FIXME: what if the code raised an actual AttributeError ?
+            # file an issue for twisted
+            self.warning("No such remote method '%s'" % name)
+            return failure.Failure(errors.NoMethodError(name))
+
+        self.debug("Failure on remote call %s: %s" % (name,
+             f.getErrorMessage()))
+        return f
 
     def attached(self, mind):
         """
@@ -201,6 +221,3 @@ class ManagerHeaven(pb.Root, log.Loggable):
 
     def getAvatars(self):
         return self.avatars.values()
-
-
-

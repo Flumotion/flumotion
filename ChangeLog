@@ -1,5 +1,20 @@
 2004-12-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/common/errors.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/common.py:
+	* flumotion/manager/component.py:
+	  remove some of the proxy methods in the manager
+	  add some better error handling for remote call failures
+	  uniformize and reorder methods
+
+2004-12-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	* flumotion/ui/fgtk.py:
 	  fix up pychecker warnings and add to check

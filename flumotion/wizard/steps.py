@@ -589,19 +589,23 @@ class Soundcard(wizard.WizardStep):
         #d.addErrback(self._permissionDeniedErrback)
         
     def get_component_properties(self):
-        # FIXME: this can't be called if the soundcard hasn't been proped yet
+        # FIXME: this can't be called if the soundcard hasn't been probed yet
         # for example, when going through the testsuite
         try:
             channels = self.combobox_channels.get_enum().intvalue
             element = self.combobox_system.get_enum().element
+            bitdepth = self.combobox_bitdepth.get_string()
+            samplerate = self.combobox_samplerate.get_string()
         except AttributeError:
             # when called without enum setup
             channels = 0
             element = "fakesrc"
+            bitdepth = "9"
+            samplerate = "12345"
 
         d = dict(device=self.combobox_device.get_string(),
-                    depth=int(self.combobox_bitdepth.get_string()),
-                    rate=int(self.combobox_samplerate.get_string()),
+                    depth=int(bitdepth),
+                    rate=int(samplerate),
                     channels=channels,
                     input=self.combobox_input.get_string())
         # FIXME: can a key with a dash be specified ?
@@ -627,7 +631,7 @@ class TestAudioSource(wizard.WizardStep):
         return {
             'freq': int(self.spinbutton_freq.get_value()),
             'volume': float(self.spinbutton_volume.get_value()),
-            'rate': int(self.combobox_samplerate.get_string())
+            'rate': self.combobox_samplerate.get_int()
         }
     
     def get_next(self):

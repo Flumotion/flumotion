@@ -134,6 +134,11 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             failure.type, failure.getErrorMessage()))
         return failure
 
+    def reconnect(self):
+        self.debug('asked to log in again')
+        self.clientFactory.resetDelay()
+        #self.clientFactory.retry(self.clientFactory.connector)
+
     ### IMedium methods
     def setRemoteReference(self, remoteReference):
         self.debug("setRemoteReference: %s" % remoteReference)
@@ -147,7 +152,6 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     def hasRemoteReference(self):
         return self.remote is not None
-
 
     ### pb.Referenceable methods
     def remote_log(self, category, type, message):
@@ -196,31 +200,76 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         """
         self.emit('ui-state-changed', name, state)
         
-    ### model functions
-    def reconnect(self):
-        self.debug('asked to log in again')
-        self.clientFactory.resetDelay()
-        #self.clientFactory.retry(self.clientFactory.connector)
-        
-    def setProperty(self, component, element, property, value):
+    ### model functions; called by UI's to send requests to manager or comp
+
+    ## generic remote call methods
+    def callRemote(self, methodName, *args, **kwargs):
+        """
+        Call the given remote method on the manager-side AdminAvatar.
+        """
         if not self.remote:
-            self.warning('No remote object')
-            return
-        return self.remote.callRemote('setComponentElementProperty',
-                                      component, element, property, value)
+            raise errors.ManagerNotConnectedError
+        return self.remote.callRemote(methodName, *args, **kwargs)
+
+    def componentCallRemote(self, componentName, methodName, *args, **kwargs):
+        """
+        Call the the given method on the given component with the given args.
+
+        @param componentName: name of the component to call the method on
+        @param methodName:    name of method to call; serialized to a
+                              remote_methodName on the worker's medium
+                           
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        self.debug('Calling remote method %s on component %s' % (
+            methodName, componentName))
+        d = self.callRemote('componentCallRemote',
+                            componentName, methodName,
+                            *args, **kwargs)
+        d.addErrback(self._callRemoteErrback, "component",
+                     componentName, methodName)
+        return d
+
+    def workerCallRemote(self, workerName, methodName, *args, **kwargs):
+        """
+        Call the the given method on the given worker with the given args.
+
+        @param workerName: name of the worker to call the method on
+        @param methodName: name of method to call; serialized to a
+                           remote_methodName on the worker's medium
+                           
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        r = common.argRepr(args, kwargs, max=20)
+        self.debug('calling remote method %s(%s) on worker %s' % (methodName, r,
+                                                                 workerName))
+        d = self.callRemote('workerCallRemote', workerName,
+                            methodName, *args, **kwargs)
+        d.addErrback(self._callRemoteErrback, "worker",
+                     workerName, methodName)
+        return d
+
+    def _callRemoteErrback(self, failure, type, name, methodName):
+        if failure.check(errors.NoMethodError):
+            self.warning("method %s on %s does not exist, component bug" % (
+                methodName, name))
+        else:
+            self.debug("unhandled failure on remote call to %s(%s): %r" % (
+                name, methodName, failure))
+
+        # FIXME: throw up some sort of dialog with debug info
+        return failure
+
+    ## component remote methods
+    def setProperty(self, component, element, property, value):
+        return self.componentCallRemote('setElementProperty',
+                                        element, property, value)
 
     def getProperty(self, component, element, property):
-        return self.remote.callRemote('getComponentElementProperty',
-                                      component, element, property)
+        return self.componentCallRemote('getElementProperty',
+                                        component, element, property)
 
-    # XXX: make this consistent with the newly added worker call remote
-    def callComponentRemote(self, component_name, method_name, *args, **kwargs):
-        return self.remote.callRemote('callComponentRemote',
-                                      component_name, method_name, *args, **kwargs)
-
-    def loadConfiguration(self, xml_string):
-        return self.remote.callRemote('loadConfiguration', xml_string)
-    
+    ## reload methods for everything
     def reload(self):
         # XXX: reload admin.py too
         name = reflect.filenameToModuleName(__file__)
@@ -275,57 +324,15 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addErrback(self._defaultErrback)
         return d
 
-    def workerCallRemote(self, workerName, methodName, *args, **kwargs):
-        """
-        Call the the given method on the given worker with the given args.
+    ## manager remote methods
+    def loadConfiguration(self, xml_string):
+        return self.remote.callRemote('loadConfiguration', xml_string)
 
-        @param workerName: name of the worker to call the method on
-        @param methodName: name of method to call; serialized to a
-                           remote_methodName on the worker
+    def cleanComponents(self):
+        return self.remote.callRemote('cleanComponents')
 
-                           
-        @rtype: L{twisted.internet.defer.Deferred}
-        """
-        r = common.argRepr(args, kwargs, max=20)
-        self.debug('calling remote method %s(%s) on worker %s' % (methodName, r,
-                                                                 workerName))
-        d = self.remote.callRemote('workerCallRemote', workerName,
-            methodName, *args, **kwargs)
-        d.addErrback(self._workerCallRemoteErrback, methodName)
-        return d
-
-    def _workerCallRemoteErrback(self, failure, methodName):
-        # XXX: We should have a real error for this, since
-        #      AttributeErrors can also happen inside the code we run
-        failure.trap(AttributeError)
-        self.debug('No remote method "%s"' % methodName)
-
-    ## Worker methods
-    def checkElements(self, workerName, elements):
-        d = self.workerCallRemote(workerName, 'checkElements', elements)
-        d.addErrback(self._defaultErrback)
-        return d
-    
-    def workerRun(self, workerName, function, *args, **kwargs):
-        """
-        Run the given function and args on the given worker.
-
-        @rtype: L{twisted.internet.defer.Deferred}
-        """
-        import inspect
-        if not callable(function):
-            raise TypeError, "need a callable"
-
-        try:
-            source = inspect.getsource(function)
-        except IOError:
-            return defer.fail(errors.FlumotionError('Could not find source'))
-        
-        functionName = function.__name__
-        return self.workerCallRemote(workerName, 'runCode', source,
-                                     functionName, *args, **kwargs)
-    
-    # functions to get remote code for admin parts
+    # function to get remote code for admin parts
+    # FIXME: rename slightly ?
     def getEntry(self, componentName, type):
         """
         Do everything needed to set up the entry point for the given
@@ -408,13 +415,31 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addErrback(self._defaultErrback)
         return d
 
-    def callRemote(self, name, *args, **kwargs):
-        self.debug('Calling remote method %s' % name)
-        return self.remote.callRemote(name, *args, **kwargs)
+    ## worker remote methods
+    def checkElements(self, workerName, elements):
+        d = self.workerCallRemote(workerName, 'checkElements', elements)
+        d.addErrback(self._defaultErrback)
+        return d
+    
+    def workerRun(self, workerName, function, *args, **kwargs):
+        """
+        Run the given function and args on the given worker.
 
-    def cleanComponents(self):
-        return self.remote.callRemote('cleanComponents')
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        import inspect
+        if not callable(function):
+            raise TypeError, "need a callable"
+
+        try:
+            source = inspect.getsource(function)
+        except IOError:
+            return defer.fail(errors.FlumotionError('Could not find source'))
         
+        functionName = function.__name__
+        return self.workerCallRemote(workerName, 'runCode', source,
+                                     functionName, *args, **kwargs)
+    
     # FIXME: this should not be allowed to be called, move away
     # by abstracting callers further
     # returns a dict of name -> component
@@ -425,5 +450,4 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     def getWorkers(self):
         return self._workers
 
-    
 gobject.type_register(AdminModel)

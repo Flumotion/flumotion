@@ -31,6 +31,8 @@ except RuntimeError:
     import os
     os._exit(0)
 
+from flumotion.ui import fgtk
+from flumotion.common import enum
 from flumotion.wizard import enums, wizard
 
 class WizardStepTest(unittest.TestCase):
@@ -61,19 +63,22 @@ class WizardStepTest(unittest.TestCase):
         widgets = [widget for step in self.steps
                               for widget in step.widgets]
         for widget in widgets:
-            if isinstance(widget, wizard.WizardSpinButton):
+            if isinstance(widget, fgtk.FSpinButton):
                 self.assert_(isinstance(widget.get_state(), float))
-            elif isinstance(widget, (wizard.WizardRadioButton,
-                                     wizard.WizardCheckButton)):
+            elif isinstance(widget, (fgtk.FRadioButton,
+                                     fgtk.FCheckButton)):
                 self.assert_(isinstance(widget.get_state(), bool))
-            elif isinstance(widget, wizard.WizardEntry):
+            elif isinstance(widget, fgtk.FEntry):
                 self.assert_(isinstance(widget.get_state(), str))
-            elif isinstance(widget, wizard.WizardComboBox):
+            elif isinstance(widget, fgtk.FComboBox):
                 state = widget.get_state()
                 if hasattr(widget, 'enum_class'):
-                    self.assert_(isinstance(state, enums.Enum))
+                    self.failUnless(isinstance(state, enum.Enum))
                 else:
-                    self.assert_(isinstance(state, int))
+                    # state can be None in the testsuite as well
+                    self.failUnless(not state or isinstance(state, int),
+                        "state %r is not an instance of int on widget %r" % (
+                            state, widget))
 
     def testStepComponentProperties(self):
         for step in self.steps:

@@ -109,7 +109,9 @@ class Window(log.Loggable, gobject.GObject):
     def __init__(self, host, port, transport, username, password):
         self.__gobject_init__()
         
+        self.admin = None
         self._connectToManager(host, port, transport, username, password)
+
         self.create_ui()
         self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
@@ -493,7 +495,7 @@ class Window(log.Loggable, gobject.GObject):
             return None
 
         def after_getProperty(value, dialog):
-            print 'got value', value
+            self.debug('got value %r' % value)
             dialog.update_value_entry(value)
             
         def dialog_set_cb(dialog, element, property, value):

@@ -57,6 +57,15 @@ class FComboBox(gtk.ComboBox):
     def get_string(self):
         return self.get_column_content(self.COLUMN_NAME)
 
+    def get_int(self):
+        """
+        Get name as integer.
+        """
+        s = self.get_string()
+        if s:
+            return int(s)
+        return -1
+
     def get_value(self):
         return self.get_column_content(self.COLUMN_VALUE)
 

@@ -32,17 +32,38 @@ from twisted.spread import pb
 class OptionError(Exception):
     pass
 
+# connection errors
+class ConnectionError(pb.Error):
+    "General connection error"
+
+class NotConnectedError(ConnectionError):
+    "Not connected"
+
+class ManagerNotConnectedError(NotConnectedError):
+    "Manager not connected"
+
+class AlreadyConnectedError(ConnectionError):
+    "Already connected"
+
 class PipelineParseError(pb.Error):
     "An error occurred while trying to parse the pipeline"
 
+# remote method errors
+class RemoteMethodError(pb.Error):
+    "Generic remote method error"
+
+class RemoteRunError(RemoteMethodError):
+    "Error while running remote code"
+
+class NoMethodError(RemoteMethodError):
+    "The remote method does not exist"
+
+# other errors
 class NotReadyError(pb.Error):
     "The component is not ready yet"
 
 class PropertyError(pb.Error):
     "An error occurred while setting a property on the component"
-
-class AlreadyConnectedError(pb.Error):
-    "The component is already connected to the manager"
 
 class NoPerspectiveError(pb.Error):
     "The component does not have a perspective"
@@ -58,9 +79,6 @@ class ComponentStart(pb.Error):
 
 class UnknownComponentError(pb.Error):
     "A given component or component type does not exist"
-
-class RemoteRunError(pb.Error):
-    "Error while running remote code"
 
 class FlumotionError(pb.Error):
     "Generic Flumotion error"
