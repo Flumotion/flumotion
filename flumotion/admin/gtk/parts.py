@@ -29,8 +29,8 @@ from flumotion.common import log, planet
 from flumotion.twisted import flavors
 
 from flumotion.common.planet import moods
-from flumotion.common.pygobject import (gsignal, gproperty,
-                                        with_construct_properties)
+from flumotion.common.pygobject import gsignal, gproperty
+from flumotion.common.pygobject import with_construct_properties
 
 COL_MOOD       = 0
 COL_NAME       = 1

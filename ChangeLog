@@ -1,4 +1,10 @@
-<<<<<<< .mine
+2005-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/open-connection.glade:
+	  work with gtk 2.4
+	* flumotion/admin/gtk/parts.py:
+	  work with py 2.3
+
 2005-03-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/pygobject.py (with_construct_properties): New
@@ -25,14 +31,12 @@
 	* tests/construct-properties-do-not-work.py: New file,
 	demonstrates that construct properties don't work in pygtk.
 
-=======
 2005-03-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/bundleclient.py:
 	* flumotion/worker/worker.py:
 	  doc and debug changes
 
->>>>>>> .r1478
 2005-03-02  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/ui/glade.py (GladeWindow.__init__): Make the parent
