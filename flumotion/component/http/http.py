@@ -292,7 +292,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.logfile = None
         self.admin_password = None
             
-        streamer.connect('client-removed', self.streamer_client_removed_cb)
+        streamer.connect('client-removed', self._streamer_client_removed_cb)
         self.streamer = streamer
         self.admin = HTTPStreamingAdminResource(self)
         
@@ -345,19 +345,12 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.logfile.write(msg)
         self.logfile.flush()
 
-    def streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
+    def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
         try:
             request = self.request_hash[fd]
-            self.removeClient(request, fd, stats)
+            self._removeClient(request, fd, stats)
         except KeyError:
             self.warning('[fd %5d] not found in request_hash' % fd)
-
-    def isReady(self):
-        if self.streamer.caps is None:
-            self.debug('We have no caps yet')
-            return False
-        
-        return True
 
     def setAuth(self, auth):
         self.auth = auth
@@ -379,7 +372,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
     @rtype: boolean
     @returns: whether or not the file descriptor can be used further.
     """
-    def setHeaders(self, request):
+    def _writeHeaders(self, request):
         fd = request.transport.fileno()
         headers = []
         def setHeader(field, name):
@@ -434,8 +427,10 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         keycard = HTTPClientKeycard(request)
         return self.auth.authenticate(keycard)
 
-    def addClient(self, request):
-        """Add a request, so it can be used for statistics
+    def _addClient(self, request):
+        """
+        Add a request, so it can be used for statistics.
+
         @param request: the request
         @type request: twisted.protocol.http.Request
         """
@@ -443,7 +438,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         fd = request.transport.fileno()
         self.request_hash[fd] = request
 
-    def removeClient(self, request, fd, stats):
+    def _removeClient(self, request, fd, stats):
         """
         Removes a request and add logging.
         Note that it does not disconnect the client
@@ -462,11 +457,11 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         request.finish()
         del self.request_hash[fd]
 
-    def handleNotReady(self, request):
+    def _handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')
         return server.NOT_DONE_YET
         
-    def handleMaxClients(self, request):
+    def _handleMaxClients(self, request):
         self.debug('Refusing clients, client limit %d reached' % self.maxAllowedClients())
 
         request.setHeader('content-type', 'text/html')
@@ -478,7 +473,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         return ERROR_TEMPLATE % {'code': error_code,
                                  'error': http.RESPONSES[error_code]}
         
-    def handleUnauthorized(self, request):
+    def _handleUnauthorized(self, request):
         self.debug('client from %s is unauthorized' % (request.getClientIP()))
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_VERSION)
@@ -492,10 +487,10 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         return ERROR_TEMPLATE % {'code': error_code,
                                  'error': http.RESPONSES[error_code]}
 
-    def handleNewClient(self, request):
+    def _handleNewClient(self, request):
         # everything fulfilled, serve to client
-        self.setHeaders(request)
-        self.addClient(request)
+        self._writeHeaders(request)
+        self._addClient(request)
         fd = request.transport.fileno()
         
         # take over the file descriptor from Twisted by removing them from
@@ -510,18 +505,20 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.info('[fd %5d] start streaming to %s' % (fd, ip))
         return server.NOT_DONE_YET
         
+    ### resource.Resource methods
+
     def render(self, request):
         fd = request.transport.fileno()
         self.debug('[fd %5d] render: client from %s connected, request %s' %
             (fd, request.getClientIP(), request))
         if not self.isReady():
-            return self.handleNotReady(request)
+            return self._handleNotReady(request)
         elif self.reachedMaxClients():
-            return self.handleMaxClients(request)
+            return self._handleMaxClients(request)
         elif not self.isAuthenticated(request):
-            return self.handleUnauthorized(request)
+            return self._handleUnauthorized(request)
         else:
-            return self.handleNewClient(request)
+            return self._handleNewClient(request)
 
 class HTTPView(component.ComponentView):
     def __init__(self, comp):
@@ -565,7 +562,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         # handled regular updating
         self.needsUpdate = False
         # FIXME: call self._callLaterId.cancel() somewhere on shutdown
-        self._callLaterId = reactor.callLater(1, self.checkUpdate)
+        self._callLaterId = reactor.callLater(1, self._checkUpdate)
 
         # handle added and removed queue
         self._added_lock = thread.allocate_lock()
@@ -579,11 +576,11 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         return '<MultifdSinkStreamer (%s)>' % self.component_name
 
     # UI code
-    def checkUpdate(self):
+    def _checkUpdate(self):
         if self.needsUpdate == True:
             self.needsUpdate = False
             self.update_ui_state()
-        self._callLaterId = reactor.callLater(1, self.checkUpdate)
+        self._callLaterId = reactor.callLater(1, self._checkUpdate)
 
     ### FIXME: abstract this away nicely to the base class of components
     def getUIMD5Sum(self, style):
@@ -651,7 +648,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         while self._added_queue:
             (sink, fd) = self._added_queue.pop()
             self._added_lock.release()
-            self.client_added_handler(sink, fd)
+            self._client_added_handler(sink, fd)
             self._added_lock.acquire()
 
         self._added_lock.release()
@@ -662,32 +659,14 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         while self._removed_queue:
             (sink, fd, reason, stats) = self._removed_queue.pop()
             self._removed_lock.release()
-            self.client_removed_handler(sink, fd, reason, stats)
+            self._client_removed_handler(sink, fd, reason, stats)
             self._removed_lock.acquire()
 
         self._removed_lock.release()
          
         self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
 
-    ### START OF THREAD-AWARE CODE
-
-    # this can be called from both application and streaming thread !
-    def client_added_cb(self, sink, fd):
-        self._added_lock.acquire()
-        self._added_queue.append((sink, fd))
-        self._added_lock.release()
-
-    # this can be called from both application and streaming thread !
-    def client_removed_cb(self, sink, fd, reason):
-        self._removed_lock.acquire()
-        # commented out to see if it solves GIL problems
-        #stats = sink.emit('get-stats', fd)
-        stats = None
-        self._removed_queue.append((sink, fd, reason, stats))
-        self._removed_lock.release()
-    ### END OF THREAD-AWARE CODE
-
-    def client_added_handler(self, sink, fd):
+    def _client_added_handler(self, sink, fd):
         self.log('[%5d] client_added_handler from thread %d' % 
             (fd, thread.get_ident())) 
         Stats.clientAdded(self)
@@ -695,7 +674,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         self.needsUpdate = True
         #self.update_ui_state()
         
-    def client_removed_handler(self, sink, fd, reason, stats):
+    def _client_removed_handler(self, sink, fd, reason, stats):
         self.log('[fd %5d] client_removed_handler from thread %d, reason %s' %
             (fd, thread.get_ident(), reason)) 
         # Johan will trap GST_CLIENT_STATUS_ERROR here someday
@@ -705,6 +684,25 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         # FIXME: GIL problem, don't update UI for now
         self.needsUpdate = True
         #self.update_ui_state()
+
+    ### START OF THREAD-AWARE CODE
+
+    # this can be called from both application and streaming thread !
+    def _client_added_cb(self, sink, fd):
+        self._added_lock.acquire()
+        self._added_queue.append((sink, fd))
+        self._added_lock.release()
+
+    # this can be called from both application and streaming thread !
+    def _client_removed_cb(self, sink, fd, reason):
+        self._removed_lock.acquire()
+        # commented out to see if it solves GIL problems
+        #stats = sink.emit('get-stats', fd)
+        stats = None
+        self._removed_queue.append((sink, fd, reason, stats))
+        self._removed_lock.release()
+
+    ### END OF THREAD-AWARE CODE
 
     def feeder_state_change_cb(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,
@@ -718,8 +716,8 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         sink.connect('deep-notify::caps', self.notify_caps_cb)
         sink.connect('state-change', self.feeder_state_change_cb)
         # these are made threadsafe using idle_add in the handler
-        sink.connect('client-removed', self.client_removed_cb)
-        sink.connect('client-added', self.client_added_cb)
+        sink.connect('client-removed', self._client_removed_cb)
+        sink.connect('client-added', self._client_added_cb)
 
         self.setGstProperties()
 
