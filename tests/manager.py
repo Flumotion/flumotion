@@ -1,6 +1,6 @@
 from common import unittest
 
-from flumotion.server import manager
+from flumotion.manager import manager
 
 class FakeComponentPerspective:
     def __init__(self, name='fake', eaters=[], port=-1, listen_host='listen-host'):

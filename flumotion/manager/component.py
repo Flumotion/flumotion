@@ -26,7 +26,7 @@ import gobject
 from twisted.internet import reactor
 from twisted.spread import pb
 
-from flumotion.server import interfaces
+from flumotion.manager import interfaces
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
 from flumotion.utils.gstutils import gsignal

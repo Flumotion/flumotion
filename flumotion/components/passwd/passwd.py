@@ -23,8 +23,8 @@
 import crypt
 
 from twisted.python import components
-from flumotion.server import interfaces
-from flumotion.server import component
+from flumotion.manager import interfaces
+from flumotion.manager import component
 
 __all__ = ['HTTPGatekeeper']
 

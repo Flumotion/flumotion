@@ -24,7 +24,8 @@ import time
 
 import gst
 
-from flumotion.server import component
+# FIXME: component needs to move to flumotion.component
+from flumotion.manager import component
 
 __all__ = ['FileSinkStreamer']
 

@@ -30,7 +30,7 @@ from twisted.internet import reactor
 
 from flumotion import config
 from flumotion.gui.admininterface import AdminInterface
-from flumotion.server import admin   # Register types
+from flumotion.manager import admin   # Register types
 from flumotion.twisted import errors
 from flumotion.utils import log
 from flumotion.utils.gstutils import gsignal

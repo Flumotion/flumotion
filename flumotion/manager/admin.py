@@ -33,8 +33,9 @@ class ComponentView(pb.Copyable):
     I live in the manager.
     """
     def __init__(self, component):
+        # FIXME: move ComponentAvatar to manager.component
         """
-        @type component: L{server.manager.ComponentAvatar}
+        @type component: L{flumotion.manager.manager.ComponentAvatar}
         """
         self.name = component.getName()
         # forced to int so it's jellyable
@@ -67,6 +68,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     """
     logCategory = 'admin-avatar'
     def __init__(self, admin):
+        # FIXME: change Admin to manager.admin.AdminHeaven
         """
         @type admin: L{server.admin.Admin}
         """

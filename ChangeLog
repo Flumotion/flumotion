@@ -1,5 +1,41 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion.in:
+	* configure.ac:
+	* doc/reference/Makefile.am:
+	* flumotion/Makefile.am:
+	* flumotion/components/base/converter.py:
+	* flumotion/components/base/producer.py:
+	* flumotion/components/file/file.py:
+	* flumotion/components/http/http.py:
+	* flumotion/components/passwd/passwd.py:
+	* flumotion/gui/adminclient.py:
+	* flumotion/gui/admininterface.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/auth.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/config.py:
+	* flumotion/manager/launcher.py:
+	* flumotion/manager/manager.py:
+	* flumotion/server/Makefile.am:
+	* flumotion/server/__init__.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/auth.py:
+	* flumotion/server/component.py:
+	* flumotion/server/config.py:
+	* flumotion/server/interfaces.py:
+	* flumotion/server/launcher.py:
+	* flumotion/server/manager.py:
+	* flumotion/server/registry.py:
+	* tests/manager.py:
+	* tests/test_component_parse.py:
+	* tests/test_http.py:
+
+	  move server to manager.  First stab, now need to move parts
+	  not related to manager out.
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/server/admin.py:
 	  subclass log.Loggable
 

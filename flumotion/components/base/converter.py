@@ -20,7 +20,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
-from flumotion.server import component
+# FIXME: move away from manager
+from flumotion.manager import component
 
 __all__ = ['Converter']
 

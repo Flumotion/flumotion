@@ -45,8 +45,8 @@ sys.path.insert(0, root)
 from flumotion.twisted import gstreactor
 gstreactor.install()
 
-from flumotion.server import launcher
-from flumotion.server.registry import registry
+from flumotion.manager import launcher
+from flumotion.manager.registry import registry
 from flumotion.twisted import errors
 from flumotion.utils import log
 

@@ -16,14 +16,14 @@ MODULE_FILES = \
 	flumotion/components/http/http.py	\
 	flumotion/components/passwd/passwd.py	\
 	flumotion/errors.py			\
-	flumotion/server/admin.py		\
-	flumotion/server/auth.py		\
-	flumotion/server/component.py		\
-        flumotion/server/config.py		\
-	flumotion/server/manager.py		\
-	flumotion/server/interfaces.py		\
-	flumotion/server/launcher.py		\
-	flumotion/server/registry.py		\
+	flumotion/manager/admin.py		\
+	flumotion/manager/auth.py		\
+	flumotion/manager/component.py		\
+        flumotion/manager/config.py		\
+	flumotion/manager/manager.py		\
+	flumotion/manager/interfaces.py		\
+	flumotion/manager/launcher.py		\
+	flumotion/manager/registry.py		\
 	flumotion/twisted/gstreactor.py		\
 	flumotion/twisted/errors.py		\
 	flumotion/utils/gstutils.py		\

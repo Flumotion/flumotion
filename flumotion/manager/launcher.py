@@ -31,9 +31,9 @@ from twisted.internet.protocol import ClientCreator, Factory
 from twisted.protocols.basic import NetstringReceiver
 
 from flumotion import config
-from flumotion.server import manager, component
-from flumotion.server.config import FlumotionConfigXML
-from flumotion.server.registry import registry
+from flumotion.manager import manager, component
+from flumotion.manager.config import FlumotionConfigXML
+from flumotion.manager.registry import registry
 from flumotion.utils import log, gstutils
 
 class MiniProtocol(NetstringReceiver):

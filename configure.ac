@@ -70,7 +70,7 @@ flumotion/config/Makefile
 flumotion/config/installed.py
 flumotion/config/uninstalled.py
 flumotion/gui/Makefile
-flumotion/server/Makefile
+flumotion/manager/Makefile
 flumotion/twisted/Makefile
 flumotion/utils/Makefile
 m4/Makefile

@@ -25,7 +25,7 @@ from twisted.spread import pb
 from twisted.internet import error
 from twisted.python import rebuild, reflect
 
-from flumotion.server import interfaces
+from flumotion.manager import interfaces
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, reload
 from flumotion.utils.gstutils import gsignal

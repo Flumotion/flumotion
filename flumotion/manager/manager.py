@@ -33,7 +33,7 @@ from twisted.internet import reactor
 from twisted.python import components
 from twisted.spread import pb
 
-from flumotion.server import admin, interfaces
+from flumotion.manager import admin, interfaces
 from flumotion.twisted import errors, pbutil, portal
 from flumotion.utils import gstutils, log
 
@@ -51,9 +51,10 @@ class Dispatcher(log.Loggable):
     logCategory = 'dispatcher'
 
     def __init__(self, manager, admin):
+        # FIXME: change Admin to AdminHeaven
         """
-        @type manager: L{server.manager.Manager}
-        @type admin:      L{server.admin.Admin}
+        @type manager: L{manager.manager.Manager}
+        @type admin:      L{manager.admin.Admin}
         """
         self.manager = manager
         self.admin = admin
