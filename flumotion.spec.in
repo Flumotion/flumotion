@@ -79,11 +79,11 @@ exit 0
 %post
 /sbin/chkconfig --add flumotion
 # generate a default .pem certificate ?
-if ! test -e %{_sysconfdir}/flumotion/managers/default/default.pem
+if ! test -e %{_sysconfdir}/flumotion/default.pem
 then
   bash %{_datadir}/ssl/certs/make-dummy-cert %{_sysconfdir}/flumotion/managers/default/default.pem
-  chown :flumotion %{_sysconfdir}/flumotion/managers/default/default.pem
-  chmod 640 %{_sysconfdir}/flumotion/managers/default/default.pem
+  chown :flumotion %{_sysconfdir}/flumotion/default.pem
+  chmod 640 %{_sysconfdir}/flumotion/default.pem
 fi
 
 # this is going to break when the admin decides to rename planets
