@@ -1,3 +1,8 @@
+2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/gstreactor.py:
+	  removing logging to unbreak reactor
+
 2004-12-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:

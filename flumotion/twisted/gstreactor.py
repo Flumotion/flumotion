@@ -52,9 +52,6 @@ from twisted.internet.interfaces import IReactorFDSet
 # Sibling Imports
 from twisted.internet import main, default, error
 
-# log import
-from flumotion.common import log as flog
-
 reads = default.reads
 writes = default.writes
 #hasReader = reads.has_key
@@ -74,8 +71,6 @@ POLL_DISCONNECTED = gobject.IO_HUP | gobject.IO_ERR | \
 INFLAGS = gobject.IO_IN | POLL_DISCONNECTED
 OUTFLAGS = gobject.IO_OUT | POLL_DISCONNECTED
 
-
-
 class GstReactor(default.PosixReactorBase):
     """GObject/Gst event loop reactor. """
 
@@ -111,7 +106,7 @@ class GstReactor(default.PosixReactorBase):
         try:
             self.simulate()
         except KeyboardInterrupt:
-            flog.debug('gstreactor', "KeyboardInterrupt in addReader()")
+            pass
 
     def addWriter(self, writer):
         if not hasWriter(writer):
@@ -171,7 +166,7 @@ class GstReactor(default.PosixReactorBase):
             self.simulate()
             gst.main()
         except KeyboardInterrupt:
-            flog.debug('gstreactor', "KeyboardInterrupt in run()")
+            pass
 
     def _doReadOrWrite(self, source, condition, faildict={
         error.ConnectionDone: failure.Failure(error.ConnectionDone()),
@@ -193,7 +188,7 @@ class GstReactor(default.PosixReactorBase):
                         if not source.disconnected and source.doWrite != didRead:
                             why = source.doWrite()
                 except KeyboardInterrupt:
-                    flog.info('gstreactor', "KeyboardInterrupt in _doReadOrWrite")
+                    pass
             except:
                 why = sys.exc_info()[1]
                 log.msg('Error In %s' % source)
@@ -213,7 +208,6 @@ class GstReactor(default.PosixReactorBase):
             log.callWithLogger(source, self._doReadOrWrite, source, condition)
             self.simulate() # fire Twisted timers
         except KeyboardInterrupt:
-            flog.info('gstreactor', "KeyboardInterrupt in callback")
             return 0
         
         return 1 # 1=don't auto-remove the source
@@ -232,10 +226,9 @@ class GstReactor(default.PosixReactorBase):
             # grumble
             _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
         except KeyboardInterrupt:
-            flog.info('gstreactor', "KeyboardInterrupt in simulate()")
+            pass
 
 
-
 def install():
     """Configure the twisted mainloop to be run inside the gtk mainloop.
     """
