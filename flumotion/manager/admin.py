@@ -278,7 +278,7 @@ class AdminHeaven(pb.Root, log.Loggable):
         @param vishnu: the Vishnu in control of all the heavens
         """
         self.vishnu = vishnu
-        self.clients = [] # all AdminAvatars we instantiate
+        self.avatars = [] # all AdminAvatars we instantiate
         #FIXME: don't add a log handler here until we have a good way
         #of filtering client-side again
         #log.addLogHandler(self.logHandler)
@@ -286,19 +286,21 @@ class AdminHeaven(pb.Root, log.Loggable):
 
     def logHandler(self, category, type, message):
         self.logcache.append((category, type, message))
-        for client in self.clients:
-            client.sendLog(category, type, message)
+        for avatar in self.avatars:
+            avatar.sendLog(category, type, message)
 
-    def sendCache(self, client):
-        if not client.hasRemoteReference():
-            reactor.callLater(0.25, self.sendCache, client)
+    def sendCache(self, avatar):
+        if not avatar.hasRemoteReference():
+            reactor.callLater(0.25, self.sendCache, avatar)
             return
         
         # FIXME: do this on request only
         #self.debug('sending logcache to client (%d messages)' % len(self.logcache))
         #for category, type, message in self.logcache:
-        #    client.sendLog(category, type, message)
+        #    avatar.sendLog(category, type, message)
         
+    ### IHeaven methods
+
     # FIXME: we don't actually *use* avatarId
     def createAvatar(self, avatarId):
         """
@@ -310,7 +312,7 @@ class AdminHeaven(pb.Root, log.Loggable):
         avatar = AdminAvatar(self)
         reactor.callLater(0.25, self.sendCache, avatar)
         
-        self.clients.append(avatar)
+        self.avatars.append(avatar)
         return avatar
 
     def removeAvatar(self, avatar):
@@ -319,16 +321,18 @@ class AdminHeaven(pb.Root, log.Loggable):
         @type avatar: L{flumotion.manager.admin.AdminAvatar}
         """
         self.debug('removing AdminAvatar %s' % avatar)
-        self.clients.remove(avatar)
+        self.avatars.remove(avatar)
     
+    ### my methods
+
     def componentAdded(self, component):
         """
         Tell all created AdminAvatars that a component was added.
 
         @type component: L{flumotion.manager.component.ComponentAvatar}
         """
-        for client in self.clients:
-            client.componentAdded(component)
+        for avatar in self.avatars:
+            avatar.componentAdded(component)
 
     def componentRemoved(self, component):
         """
@@ -336,8 +340,8 @@ class AdminHeaven(pb.Root, log.Loggable):
 
         @type component: L{flumotion.manager.component.ComponentAvatar}
         """
-        for client in self.clients:
-            client.componentRemoved(component)
+        for avatar in self.avatars:
+            avatar.componentRemoved(component)
 
     def uiStateChanged(self, name, state):
         """
@@ -347,6 +351,6 @@ class AdminHeaven(pb.Root, log.Loggable):
         @type state:     new ui state
         """
         
-        for client in self.clients:
-            client.uiStateChanged(name, state)
+        for avatar in self.avatars:
+            avatar.uiStateChanged(name, state)
         
