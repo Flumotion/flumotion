@@ -18,22 +18,28 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
+"""
+Twisted related exceptions, mostly for the broker.
+
+Maintainer: U{Johan Dahlin <johan@fluendo.com>}"""
+
 from twisted.spread import pb
 
 class PipelineParseError(pb.Error):
-    pass
+    "An error occurred while trying to parse the pipeline"
 
 class NotReadyError(pb.Error):
+    "The component is not ready yet"
     pass
 
 class PropertyError(pb.Error):
-    pass
+    "An error occurred while setting a property on the component"
 
 class AlreadyConnectedError(pb.Error):
-    pass
+    "The component is already connected to the controller"
 
 class NoPerspectiveError(pb.Error):
-    pass
-
+    "The component does not have a perspective"
+    
 class SystemError(pb.Error):
-    pass
+    "A system error, is usually fatal"

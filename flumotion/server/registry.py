@@ -22,7 +22,7 @@ import os
 
 from xml.dom import minidom, Node
 
-__all__ = ['Property', 'Component', 'ComponentRegistry', 'registry']
+__all__ = ['ComponentRegistry', 'registry']
 
 class Property:
     def __init__(self, name, type, required=False, multiple=False):
@@ -215,3 +215,4 @@ class ComponentRegistry:
         return self.component.has_key(name)
 
 registry = ComponentRegistry()
+
