@@ -5,6 +5,12 @@
     </pipeline>
   </component>
 
+  <component name="videotest-producer-big" type="producer">
+    <pipeline>
+      videotestsrc ! video/x-raw-yuv,width=640,height=480,framerate=2.0,format=(fourcc)I420
+    </pipeline>
+  </component>
+
   <component name="overlay" type="converter">
     <source>videotest-producer</source>
     <pipeline>
@@ -19,9 +25,21 @@
     <pipeline>ffmpegcolorspace ! jpegenc ! multipartmux</pipeline>
   </component>
 
+  <component name="jpeg+multipart-big" type="converter">
+    <source>videotest-producer-big</source>
+    <pipeline>ffmpegcolorspace ! jpegenc ! multipartmux</pipeline>
+  </component>
+
   <component name="http-video" type="http-streamer">
     <source>jpeg+multipart</source>
     <port>8803</port>
     <logfile>/tmp/videotestsrc_access.log</logfile>
   </component>
+
+  <component name="http-video-big" type="http-streamer">
+    <source>jpeg+multipart-big</source>
+    <port>8804</port>
+    <logfile>/tmp/videotestsrc_access_big.log</logfile>
+  </component>
+
 </root>

@@ -80,6 +80,7 @@ class Launcher:
         
         if logging:
             log.enableLogging()
+            
         signal.signal(signal.SIGINT, signal.SIG_IGN)
                 
         self.restore_uid()
@@ -112,14 +113,6 @@ class Launcher:
         # the last events, need to tell the controller to shutdown
         reactor.run()
         
-    def spawn(self, component, function=None, args=None):
-        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
-        reactor.connectTCP(self.controller_host, self.controller_port,
-                           component.factory)
-        
-        reactor.run(False)
-        
     def run(self):
         self.restore_uid()
 
@@ -127,28 +120,33 @@ class Launcher:
 
         self.stop_controller()
 
-    def launch_component(self, config):
-        pid = os.fork()
-
-        if pid:
-            self.children.append(pid)
-            return
-        
-        component = config.getComponent()
-
-        self.set_nice(config.nice)
-        self.restore_uid()
-
+    def threads_init(self):
         try:
             gobject.threads_init()
         except AttributeError:
             print '** WARNING: OLD PyGTK detected **'
         except RuntimeError:
             print '** WARNING: PyGTK with threading disabled detected **'
-            
-        self.msg('Starting %s (%s) on pid %d' %
-                 (config.getName(), config.getType(), pid))
-        self.spawn(component)
+        
+    def launch_component(self, config):
+        pid = os.fork()
+        if pid:
+            self.children.append(pid)
+            return
+
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        self.restore_uid()
+        self.threads_init()
+        self.set_nice(config.nice)
+
+        if config.startFactory():
+            component = config.getComponent()
+            self.msg('Starting %s (%s) on pid %d' %
+                     (config.getName(), config.getType(), pid))
+            reactor.connectTCP(self.controller_host, self.controller_port,
+                               component.factory)
+        
+        reactor.run(False)
         raise SystemExit
 
     def load_config(self, filename):
@@ -187,20 +185,19 @@ def run_launcher(args):
         else:
             launcher.start_controller(options.verbose)
 
-    launcher.load_config(args[2])
-
-    # This needs to be seriously debugged.
-#    try:
-#        launcher.load_config(args[2])
-#    except Exception, e:
-#        if not isinstance(e, SystemExit):
-#            print 'Traceback caught during configuration loading:'
-#            print '='*79
-#            traceback.print_exc(file=sys.stdout)
-#            print '='*79
-#        launcher.shutdown()
-#        return
-
+    try:
+        launcher.load_config(args[2])
+    except SystemExit:
+        return
+    except Exception, e:
+        import traceback
+        print 'Traceback caught during configuration loading:'
+        print '='*79
+        traceback.print_exc(file=sys.stdout)
+        print '='*79
+        launcher.stop_controller()
+        return
+    
     if options.verbose:
         log.enableLogging()
 

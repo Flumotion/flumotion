@@ -31,7 +31,7 @@ class FileSinkStreamer(component.ParseLaunchComponent):
     def __init__(self, name, source, location):
         self.location = location
 
-        pipeline = self.pipe_template % self.get_location()
+        pipeline = self.pipe_template % location
         component.ParseLaunchComponent.__init__(self, name, [source],
                                                 [], pipeline)
 

@@ -34,6 +34,7 @@ class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
 
     def login(self, username):
+        
         self.__super_login(pbutil.Username(username),
                            client=self.component)
         

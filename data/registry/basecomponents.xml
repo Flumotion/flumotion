@@ -31,15 +31,20 @@
       <property name="source" type="string" required="yes"/>
       <property name="port" type="int" required="yes"/>
       <property name="logfile" type="string"/>
+      <property name="auth" type="string" multiple="yes"/>
     </properties>
   </component>
 
-  <component type="file-streamer">
+  <component type="file-dumper">
     <source location="flumotion.components.file" inherit="base"/>
     <properties>
       <property name="source" type="string" required="yes"/>
       <property name="location" type="string" required="yes"/>
     </properties>
+  </component>
+
+  <component type="auth-passwd" start-factory="false">
+    <source location="flumotion.components.passwd"/>
   </component>
 
 </components>

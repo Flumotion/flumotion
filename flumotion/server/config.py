@@ -46,6 +46,9 @@ class ConfigComponent:
     def getComponent(self, *args):
         return self.func(self.config, *args)
 
+    def startFactory(self):
+        return self.config.get('factory', True)
+    
 class FlumotionConfigXML:
     def __init__(self, filename):
         self.components = {}
@@ -78,7 +81,8 @@ class FlumotionConfigXML:
                 continue
             if node.nodeName == 'component':
                 component = self.parse_component(node)
-                self.components[component.getName()] = component
+                if component is not None:
+                    self.components[component.getName()] = component
             else:
                 raise XmlParserError, "unexpected node: %s" % child
             
@@ -91,21 +95,20 @@ class FlumotionConfigXML:
         if not node.hasAttribute('type'):
             raise XmlParserError, "<component> must have a type attribute"
 
-        type = node.getAttribute('type')
-        name = node.getAttribute('name')
-        defs = registry.getComponent(type)
-        module = reflect.namedAny(defs.source)
-        if not hasattr(module, 'createComponent'):
-            # XXX: Throw an error
-            self.warn('no createComponent() for %s' % defs.source)
-            return
-
         config = {}
-        config['name'] = name
-        config['type'] = type
-
+        config['name'] = name = node.getAttribute('name')
+        config['type'] = type = node.getAttribute('type')
+        
+        if node.hasAttribute('start-factory'):
+            config['start-factory'] = node.getAttribute('start-factory')
+        
+        defs = registry.getComponent(type)
         self.parse_property_def(type, defs.getProperties(), node, config)
         
+        module = reflect.namedAny(defs.source)
+        if not hasattr(module, 'createComponent'):
+            self.warn('no createComponent() for %s' % defs.source)
+            return
         function = module.createComponent
         component = ConfigComponent(name, type, function, config)
         return component
