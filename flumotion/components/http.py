@@ -309,7 +309,7 @@ class HTTPStreamingResource(resource.Resource):
     def addClient(self, request):
         """Add a request, so it can be used for statistics
         @param request: the request
-        @type request: L{twisted.protocol.http.Request}"""
+        @type request: twisted.protocol.http.Request"""
         
         fd = request.transport.fileno()
         self.request_hash[fd] = request
@@ -321,9 +321,9 @@ class HTTPStreamingResource(resource.Resource):
     def removeClient(self, request, fd):
         """Removes a request and add logging. Note that it does not disconnect the client
         @param request: the request
-        @type request: L{twisted.protocol.http.Request}
+        @type request: twisted.protocol.http.Request
         @param fd: the file descriptor for the client being removed
-        @type request: L{int}
+        @type fd: L{int}
         """
         ip = request.getClientIP()
         self.log(fd, ip, request)

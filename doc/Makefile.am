@@ -33,7 +33,7 @@ html/index.html: $(patsubst %, $(top_srcdir)/%, $(MODULE_FILES))
 
 all-local: html/index.html
 
-distclean-local:
+clean-local:
 	rm -rf html
 else
 EPYDOC_HTML =
