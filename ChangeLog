@@ -1,6 +1,17 @@
 2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/reference/Makefile.am:
+	* flumotion/admin/admin.py:
+	* flumotion/component/component.py:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/pbutil.py:
+	* flumotion/worker/worker.py:
+	  move pbutil.py to pb.py
+
+2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/reference/Makefile.am:
 	  add twisted stuff
 	* flumotion/admin/admin.py:
 	* flumotion/component/component.py:

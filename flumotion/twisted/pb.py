@@ -173,12 +173,13 @@ class FMClientFactory(pb.PBClientFactory):
         return d.addCallback(self._cbResponse, password, client)
 
     def login(self, credentials, client=None, *interfaces):
-        """Login and get perspective from remote PB server.
+        """
+        Login and get perspective from remote PB server.
 
         Currently only credentials implementing IUsernamePassword are
         supported.
 
-        @return Deferred of RemoteReference to the perspective.
+        @return: Deferred of RemoteReference to the perspective.
         """
         
         if not pb.IPerspective in interfaces:

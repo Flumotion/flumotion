@@ -30,6 +30,7 @@ MODULE_FILES = \
 	flumotion/twisted/gstreactor.py		\
 	flumotion/twisted/checkers.py		\
 	flumotion/twisted/credentials.py	\
+	flumotion/twisted/pb.py			\
 	flumotion/utils/gstutils.py		\
 	flumotion/worker/__init__.py		\
 	flumotion/worker/worker.py		\

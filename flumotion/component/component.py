@@ -28,18 +28,19 @@ from twisted.internet import reactor
 from twisted.spread import pb
 
 from flumotion.common import interfaces, errors, log
-from flumotion.twisted import credentials, pbutil
+from flumotion.twisted import credentials
+from flumotion.twisted import pb as fpb
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
-class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
-    __super_login = pbutil.ReconnectingPBClientFactory.startLogin
+class ComponentClientFactory(fpb.ReconnectingPBClientFactory):
+    __super_login = fpb.ReconnectingPBClientFactory.startLogin
     def __init__(self, component):
         """
         @param component: L{flumotion.component.component.BaseComponent}
         """
         # doing this as a class method triggers a doc error
-        super_init = pbutil.ReconnectingPBClientFactory.__init__
+        super_init = fpb.ReconnectingPBClientFactory.__init__
         super_init(self)
         
         # get the component's medium class, defaulting to the base one

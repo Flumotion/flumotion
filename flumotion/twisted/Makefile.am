@@ -5,7 +5,7 @@ flumotion_PYTHON = \
 	checkers.py \
 	credentials.py \
 	gstreactor.py \
-	pbutil.py \
+	pb.py \
 	portal.py \
 	shell.py
 
