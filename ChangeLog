@@ -1,5 +1,21 @@
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
+	* configure.ac:
+	* flumotion/component/muxers/ogg.py:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/dv/Makefile.am:
+	* flumotion/component/producers/dv/__init__.py:
+	* flumotion/component/producers/dv/dv.py:
+	* flumotion/component/producers/dv/dv.xml:
+	* flumotion/component/producers/firewire/Makefile.am:
+	* flumotion/component/producers/firewire/__init__.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/firewire/firewire.xml:
+
+	Remove dv component and add firewire
+	
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/producers/audiotest/audiotest.py:
 	* flumotion/component/producers/audiotest/audiotest.xml:
 

@@ -10,7 +10,7 @@ clean-local:
 SUBDIRS = \
 	audiotest \
 	bttv \
-	dv \
+	firewire \
 	soundcard \
 	videotest \
 	webcam

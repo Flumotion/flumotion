@@ -78,7 +78,7 @@ flumotion/component/muxers/Makefile
 flumotion/component/producers/Makefile
 flumotion/component/producers/audiotest/Makefile
 flumotion/component/producers/bttv/Makefile
-flumotion/component/producers/dv/Makefile
+flumotion/component/producers/firewire/Makefile
 flumotion/component/producers/soundcard/Makefile
 flumotion/component/producers/videotest/Makefile
 flumotion/component/producers/webcam/Makefile
