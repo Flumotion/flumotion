@@ -1,46 +1,51 @@
-# -*- Mode: Python -*-
-# vi:si:et:sw=4:sts=4:ts=4
+# Twisted, the Framework of Your Internet
+# Copyright (C) 2001 Matthew W. Lefkowitz
 #
-# Flumotion - a streaming media server
-# Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
-
-# This file may be distributed and/or modified under the terms of
-# the GNU General Public License version 2 as published by
-# the Free Software Foundation.
-# This file is distributed without any warranty; without even the implied
-# warranty of merchantability or fitness for a particular purpose.
-# See "LICENSE.GPL" in the source distribution for more information.
-
-# Licensees having purchased or holding a valid Flumotion Advanced
-# Streaming Server license may use this file in accordance with the
-# Flumotion Advanced Streaming Server Commercial License Agreement.
-# See "LICENSE.Flumotion" in the source distribution for more information.
-
-# Headers in this file shall remain intact.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of version 2.1 of the GNU Lesser General Public
+# License as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 """
-a GStreamer mainloop-based Twisted reactor
+This module provides support for Twisted to interact with the PyGTK2 mainloop.
 
 In order to use this support, simply do the following::
 
-    |  from twisted.internet import gstreactor
-    |  gstreactor.install()
+    |  from twisted.internet import gtk2reactor
+    |  gtk2reactor.install()
 
 Then use twisted.internet APIs as usual.  The other methods here are not
 intended to be called directly.
 
-API Stability: unstable
+API Stability: stable
+
+Modified on 31 Jan 2005 by Andy Wingo <wingo at pobox.com>, so as not to
+use deprecated functions.
+
+Maintainer: U{Itamar Shtull-Trauring<mailto:twisted@itamarst.org>}
 """
-
-from flumotion.common import log as fclog
-
-import pygtk
-pygtk.require('2.0')
 
 __all__ = ['install']
 
-import gobject
+# System Imports
 import sys
+try:
+    if not hasattr(sys, 'frozen'):
+        # Don't want to check this for py2exe
+        import pygtk
+        pygtk.require('2.0')
+except (ImportError, AttributeError):
+    pass # maybe we're using pygtk before this hack existed.
+import gobject
+import gtk
 
 # Twisted Imports
 from twisted.python import log, threadable, runtime, failure
@@ -51,16 +56,12 @@ from twisted.internet import main, default, error
 
 reads = default.reads
 writes = default.writes
-#hasReader = reads.has_key
-#hasWriter = writes.has_key
-# Using direct function assignment triggers doc build errors, so we use a lambda
-hasReader = lambda key: reads.has_key(key)
-hasWriter = lambda key: writes.has_key(key)
+hasReader = reads.has_key
+hasWriter = writes.has_key
 
 # the next callback
 _simtag = None
-POLL_DISCONNECTED = gobject.IO_HUP | gobject.IO_ERR | \
-                    gobject.IO_NVAL
+POLL_DISCONNECTED = gobject.IO_HUP | gobject.IO_ERR | gobject.IO_NVAL
 
 # gtk's iochannel sources won't tell us about any events that we haven't
 # asked for, even if those events aren't sensible inputs to the poll()
@@ -68,16 +69,13 @@ POLL_DISCONNECTED = gobject.IO_HUP | gobject.IO_ERR | \
 INFLAGS = gobject.IO_IN | POLL_DISCONNECTED
 OUTFLAGS = gobject.IO_OUT | POLL_DISCONNECTED
 
-class GstReactor(default.PosixReactorBase):
-    """GObject/Gst event loop reactor. """
+
+class Gtk2Reactor(default.PosixReactorBase):
+    """GTK+-2 event loop reactor.
+    """
 
     __implements__ = (default.PosixReactorBase.__implements__, IReactorFDSet)
 
-    def __init__(self):
-        self.context = gobject.MainContext()
-        
-        default.PosixReactorBase.__init__(self)
-        
     # The input_add function in pygtk1 checks for objects with a
     # 'fileno' method and, if present, uses the result of that method
     # as the input source. The pygtk2 input_add does not do this. The
@@ -92,35 +90,18 @@ class GstReactor(default.PosixReactorBase):
             # handle python objects
             def wrapper(source, condition, real_s=source, real_cb=callback):
                 return real_cb(real_s, condition)
-            #fclog.log('reactor', "Adding python object %r with [fd %5d]" % (
-            #    source, self._get_fd(source)))
             return gobject.io_add_watch(source.fileno(), condition,
                                              wrapper)
         else:
-            #fclog.log('reactor', "Adding source with [fd %5d]" % source)
             return gobject.io_add_watch(source, condition, callback)
 
     def addReader(self, reader):
-        #fclog.log('reactor', "Adding reader %r with [fd %5d]" % (reader,
-        #    self._get_fd(reader)))
         if not hasReader(reader):
             reads[reader] = self.input_add(reader, INFLAGS, self.callback)
-        #else:
-        #    fclog.debug('reactor', "cannot add reader %r, already in reactor" % 
-        #        reader)
-        try:
-            self.simulate()
-        except KeyboardInterrupt:
-            pass
 
     def addWriter(self, writer):
-        #fclog.log('reactor', "Adding writer %r with [fd %5d]" % (writer,
-        #    self._get_fd(writer)))
         if not hasWriter(writer):
             writes[writer] = self.input_add(writer, OUTFLAGS, self.callback)
-        #else:
-        #    fclog.debug('reactor', "cannot add writer %r, already in reactor" % 
-        #        writer)
 
     def removeAll(self):
         v = reads.keys()
@@ -129,32 +110,15 @@ class GstReactor(default.PosixReactorBase):
         return v
 
     def removeReader(self, reader):
-        #fclog.log('reactor', "Removing reader %r with [fd %5d]" % (reader,
-        #    self._get_fd(reader)))
         if hasReader(reader):
             gobject.source_remove(reads[reader])
             del reads[reader]
-        #else:
-        #    fclog.debug('reactor',
-        #        "cannot remove reader %r, not in reactor" % reader)
 
     def removeWriter(self, writer):
-        #fclog.log('reactor', "Removing writer %r with [fd %5d]" % (writer,
-        #    self._get_fd(writer)))
         if hasWriter(writer):
             gobject.source_remove(writes[writer])
             del writes[writer]
-        #else:
-        #    fclog.debug('reactor',
-        #        "cannot remove writer %r, not in reactor" % writer)
 
-    def _get_fd(self, source):
-        # Thomas's helper function to print an fd for debugging
-        if hasattr(source, 'fileno'):
-            return source.fileno()
-        else:
-            return source
- 
     doIterationTimer = None
 
     def doIterationTimeout(self, *args):
@@ -165,8 +129,9 @@ class GstReactor(default.PosixReactorBase):
         # don't use the usual "while gtk.events_pending(): mainiteration()"
         # idiom because lots of IO (in particular test_tcp's
         # ProperlyCloseFilesTestCase) can keep us from ever exiting.
-        if self.context.pending():
-            self.context.iteration(0)
+        log.msg(channel='system', event='iteration', reactor=self)
+        if gtk.events_pending():
+            gtk.main_iteration(0)
             return
         # nothing to do, must delay
         if delay == 0:
@@ -174,7 +139,7 @@ class GstReactor(default.PosixReactorBase):
         self.doIterationTimer = gobject.timeout_add(int(delay * 1000),
                                                     self.doIterationTimeout)
         # This will either wake up from IO or from a timeout.
-        self.context.iteration(1) # block
+        gtk.main_iteration(1) # block
         # note: with the .simulate timer below, delays > 0.1 will always be
         # woken up by the .simulate timer
         if self.doIterationTimer:
@@ -183,24 +148,18 @@ class GstReactor(default.PosixReactorBase):
             self.doIterationTimer = None
 
     def crash(self):
-        import gst
-        gst.main_quit()
+        gtk.main_quit()
 
     def run(self, installSignalHandlers=1):
-        import gst
-        try:
-            self.startRunning(installSignalHandlers=installSignalHandlers)
-            self.simulate()
-            gst.main()
-        except KeyboardInterrupt:
-            pass
+        self.startRunning(installSignalHandlers=installSignalHandlers)
+        self.simulate()
+        gtk.main()
 
     def _doReadOrWrite(self, source, condition, faildict={
         error.ConnectionDone: failure.Failure(error.ConnectionDone()),
         error.ConnectionLost: failure.Failure(error.ConnectionLost())  }):
         why = None
-        if condition & POLL_DISCONNECTED and \
-               not (condition & gobject.IO_IN):
+        if condition & POLL_DISCONNECTED and not (condition & gobject.IO_IN):
             why = main.CONNECTION_LOST
         else:
             try:
@@ -208,14 +167,11 @@ class GstReactor(default.PosixReactorBase):
                 if condition & gobject.IO_IN:
                     why = source.doRead()
                     didRead = source.doRead
-                try:
-                    if not why and condition & gobject.IO_OUT:
-                        # if doRead caused connectionLost, don't call doWrite
-                        # if doRead is doWrite, don't call it again.
-                        if not source.disconnected and source.doWrite != didRead:
-                            why = source.doWrite()
-                except KeyboardInterrupt:
-                    pass
+                if not why and condition & gobject.IO_OUT:
+                    # if doRead caused connectionLost, don't call doWrite
+                    # if doRead is doWrite, don't call it again.
+                    if not source.disconnected and source.doWrite != didRead:
+                        why = source.doWrite()
             except:
                 why = sys.exc_info()[1]
                 log.msg('Error In %s' % source)
@@ -230,13 +186,10 @@ class GstReactor(default.PosixReactorBase):
             else:
                 source.connectionLost(failure.Failure(why))
 
+
     def callback(self, source, condition):
-        try:
-            log.callWithLogger(source, self._doReadOrWrite, source, condition)
-            self.simulate() # fire Twisted timers
-        except KeyboardInterrupt:
-            return 0
-        
+        log.callWithLogger(source, self._doReadOrWrite, source, condition)
+        self.simulate() # fire Twisted timers
         return 1 # 1=don't auto-remove the source
 
     def simulate(self):
@@ -245,22 +198,57 @@ class GstReactor(default.PosixReactorBase):
         global _simtag
         if _simtag != None:
             gobject.source_remove(_simtag)
-        try:
-            self.runUntilCurrent()
-            timeout = min(self.timeout(), 0.1)
-            if timeout == None:
-                timeout = 0.1
-            # grumble
-            _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
-        except KeyboardInterrupt:
-            pass
+        self.runUntilCurrent()
+        timeout = min(self.timeout(), 0.1)
+        if timeout == None:
+            timeout = 0.1
+        # grumble
+        _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
+
+
+class PortableGtkReactor(default.SelectReactor):
+    """Reactor that works on Windows.
+
+    input_add is not supported on GTK+ for Win32, apparently.
+    """
+
+    def crash(self):
+        gtk.mainquit()
+
+    def run(self, installSignalHandlers=1):
+        self.startRunning(installSignalHandlers=installSignalHandlers)
+        self.simulate()
+        gtk.mainloop()
+
+    def simulate(self):
+        """Run simulation loops and reschedule callbacks.
+        """
+        global _simtag
+        if _simtag != None:
+            gobject.source_remove(_simtag)
+        self.iterate()
+        timeout = min(self.timeout(), 0.1)
+        if timeout == None:
+            timeout = 0.1
+        # grumble
+        _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
 
 
 def install():
+    """Configure the twisted mainloop to be run inside the gtk mainloop.
     """
-    Configure the twisted mainloop to be run inside the gtk mainloop.
-    """
-    reactor = GstReactor()
+    reactor = Gtk2Reactor()
     from twisted.internet.main import installReactor
     installReactor(reactor)
     return reactor
+
+def portableInstall():
+    """Configure the twisted mainloop to be run inside the gtk mainloop.
+    """
+    reactor = PortableGtkReactor()
+    from twisted.internet.main import installReactor
+    installReactor(reactor)
+    return reactor
+
+if runtime.platform.getType() != 'posix':
+    install = portableInstall

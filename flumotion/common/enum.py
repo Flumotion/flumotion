@@ -46,7 +46,7 @@ class Enum(object):
         self.value = value
         self.name = name
         
-        if nick is None:
+        if nick == None:
             nick = name
             
         self.nick = nick

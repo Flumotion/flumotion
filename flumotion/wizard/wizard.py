@@ -104,11 +104,12 @@ class WizardStep(object, log.Loggable):
         self.wtree.signal_autoconnect(self)
         
     def get_component_properties(self):
-        return self.wizard.get_step_state(self)
+        return self.get_state()
     
     def get_main_widget(self):
         return self.widget
 
+    # returns a new dict. is this necessary?
     def get_state(self):
         state_dict = {}
         for widget in self.widgets:
@@ -121,7 +122,8 @@ class WizardStep(object, log.Loggable):
             except IndexError:
                 continue
             
-            state_dict[key] = widget
+            # only fgtk widgets implement get_state
+            state_dict[key] = widget.get_state()
 
         return state_dict
 
@@ -250,7 +252,8 @@ class Wizard(gobject.GObject, log.Loggable):
         @param message the message to display.
         @param parent the gtk.Window parent window.
         @param response whether the error dialog should go away after response.
-                                                                                         returns: the error dialog.
+
+        returns: the error dialog.
         """
         d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
                               gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
@@ -265,14 +268,7 @@ class Wizard(gobject.GObject, log.Loggable):
 
     def get_step_options(self, stepname):
         step = self[stepname]
-        return self.get_step_state(step)
-    
-    def get_step_state(self, step):
-        state = step.get_state()
-        dict = {}
-        for key, widget in state.items():
-            dict[key] = widget.get_state()
-        return dict
+        return step.get_state()
     
     def block_next(self, block):
         self.button_next.set_sensitive(not block)
@@ -289,14 +285,11 @@ class Wizard(gobject.GObject, log.Loggable):
         #if self.steps.has_key(name):
         #    raise TypeError("%s added twice" % name)
 
+        # FIXME: document why steps need to ref their parent. otherwise
+        # remove this
         step = step_class(self)
         self.steps.append(step)
 
-        if step.__dict__.has_key('get_state'):
-            state = self.get_step_state(step)
-            assert type(state) == dict
-            assert state, state
-        
         step.setup()
 
         if initial:
@@ -495,7 +488,6 @@ class Wizard(gobject.GObject, log.Loggable):
         parent.modify_bg(gtk.STATE_NORMAL, self.sidebar_bg)
         self.vbox_sidebar = gtk.VBox()
         self.vbox_sidebar.set_border_width(5)
-        self.vbox_sidebar.set_size_request(200, -1)
         parent.add(self.vbox_sidebar)
 
     def _sidebar_add_placeholder(self):

@@ -54,30 +54,40 @@ class CheckProcError(Exception):
         self.data = data
 
 
-def make_element_checker(pipeline_str, element_name, check_proc):
+# If check_proc returns a Deferred, it is resposible for eventually
+# setting the bin state to NULL.
+def do_element_check(pipeline_str, element_name, check_proc,
+                     state=gst.STATE_READY):
+    assert state > gst.STATE_NULL
     def state_changed_cb(pipeline, old, new, res):
-        if not (old == gst.STATE_NULL and new == gst.STATE_READY):
+        # if we're not climbing the state ladder
+        if not (old == state>>1 and new == state):
             return
         element = pipeline.get_by_name(element_name)
-        reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
         try:
-            res.callback(check_proc(element))
+            newres = check_proc(element)
+            if isinstance(newres,defer.Deferred):
+                def ret(x):
+                    res.callback(x)
+                newres.addCallback(ret)
+                return res
+            else:
+                reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
+                return newres
         except CheckProcError, e:
             res.errback(e.data)
+        except Exception, e:
+            res.errback(e)
 
     def error_cb(pipeline, element, error, _, res):
         res.errback(errors.GstError(error.message))
 
-    def element_checker(*args):
-        bin = gst.parse_launch(pipeline_str)
-        result = Result()
-        bin.connect('state-change', state_changed_cb, result)
-        bin.connect('error', error_cb, result)
-        bin.set_state(gst.STATE_PLAYING)
-
-        return result.d
-
-    return element_checker
+    bin = gst.parse_launch(pipeline_str)
+    result = Result()
+    bin.connect('state-change', state_changed_cb, result)
+    bin.connect('error', error_cb, result)
+    bin.set_state(gst.STATE_PLAYING)
+    return result.d
 
                     
 def checkChannels(device):
@@ -90,7 +100,7 @@ def checkChannels(device):
     pipeline = 'v4lsrc name=source device=%s ! fakesink' % device
 
     # make a checker and call it
-    return make_element_checker(pipeline, 'source', get_channels_norms)()
+    return do_element_check(pipeline, 'source', get_channels_norms)()
 
 
 # FIXME: rename, only for v4l stuff
@@ -106,7 +116,7 @@ def checkDeviceName(device):
     pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,
         autoprobe)
 
-    return make_element_checker(pipeline, 'source', get_device_name)()
+    return do_element_check(pipeline, 'source', get_device_name)
 
 
 def checkTracks(source_element, device):
@@ -127,19 +137,40 @@ def checkTracks(source_element, device):
             raise CheckProcError(msg)
                 
     def error_cb(pipeline, element, error, _, res):
-        if not res.returned:
-            res.returned = True
-            res.d.errback(errors.GstError(error.message))
+        res.errback(errors.GstError(error.message))
 
     pipeline = '%s name=source device=%s ! fakesink' % (source_element, device)
 
-    return make_element_checker(pipeline, 'source', get_tracks)()
+    return do_element_check(pipeline, 'source', get_tracks)
 
 
 def check1394():
-    def do_check(element):
-        # if we made it into ready, we're golden
-        return True
+    def iterate(bin, res):
+        pad = bin.get_by_name('dec').get_pad('video')
 
-    pipeline = 'dv1394src name=source ! dvdec ! fakesink'
-    return make_element_checker(pipeline, 'source', do_check)()
+        if not bin.iterate():
+            res.errback('Failed to iterate bin')
+        elif pad.get_negotiated_caps() == None:
+            reactor.callLater(0, iterate, bin, res)
+            return
+
+        caps = pad.get_negotiated_caps()
+        s = caps.get_structure(0)
+        width = s.get_int('width')
+        height = s.get_int('height')
+        # from the height we can know the aspect ratio, because pal has
+        # one height and ntsc the other. but, we don't know if it's wide
+        # or not, because we haven't wrapped gststructure properly. yet.
+        # so, assume it's 4/3.
+        par = height==576 and (59,54) or (10,11)
+        reactor.callLater(0, bin.set_state, gst.STATE_NULL)
+        res.callback(dict(width=width, height=height, par=par))
+        
+    def do_check(element):
+        bin = element.get_parent()
+        res = Result()
+        reactor.callLater(0, iterate, bin, res)
+        return res.d
+
+    pipeline = 'dv1394src name=source ! dvdec name=dec ! fakesink'
+    return do_element_check(pipeline, 'source', do_check)

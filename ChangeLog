@@ -1,3 +1,76 @@
+2005-02-01  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_wizard.py: Make sure Firewire is ready to be
+	tested, and avoid the fgtk tests with it -- we don't use them yet.
+	All in all, an evil patch.
+
+	* flumotion/worker/checks/video.py (do_element_check): Reworked so
+	as to go ahead and do the check instead of returning a thunk.
+	Optionally go to a state higher than READY. If the check_proc
+	returns a Deferred, don't set the pipeline to NULL (the check_proc
+	becomes responsible for it). Handle Deferred returns properly.
+	(check1394): Adapted to check the width and height of the video.
+	An interesting example, because it uses twisted's scheduling to
+	iterate the pipeline until it has caps.
+
+	* flumotion/component/feedcomponent.py (FeedComponent.__init__):
+	Add some debugging.
+	(ParseLaunchComponent.setup_pipeline): Raise an error with the
+	proper arg.
+
+	* flumotion/component/producers/firewire/firewire.xml: Add
+	scaled_width and is_square component properties.
+
+	* flumotion/component/producers/firewire/firewire.py
+	(createComponent): Adapt to allow for setting the pixel aspect
+	ratio and padding the video size.
+
+	* flumotion/wizard/steps.py (FireWire): Reworked to detect the
+	size of the output, add option for setting square pixels, contrain
+	the aspect ratio, and provide a width correction method.
+
+	* flumotion/wizard/wizard.py (Wizard.error_dialog): fixed long
+	line.
+	(Wizard.get_step_state): Removed, just use step::get_state().
+	(Wizard._sidebar_clean): Don't set the default size of the vbox,
+	we set it in the glade file.
+
+	* flumotion/wizard/steps.py
+	* flumotion/wizard/wizard.py
+	(WizardStep.get_component_properties): Made to be a simple wrapper
+	around ::get_state(). All steps changed to implement get_state().
+
+	* flumotion/twisted/Makefile.am: Added gtk2reactor.py.
+
+	* flumotion/twisted/gtk2reactor.py: New file, branched from
+	twisted's gtk2reactor. Avoids deprecated functions, and some
+	pychecker errors fixed. To remove when twisted 2.0 comes out.
+
+	* flumotion/worker/worker.py
+	* flumotion/worker/config.py
+	* flumotion/manager/component.py
+	* flumotion/component/consumers/disker/disker.py
+	* flumotion/component/consumers/httpstreamer/resources.py
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py
+	* flumotion/component/consumers/httpstreamer/http.py
+	* flumotion/common/config.py
+	* flumotion/common/reload.py
+	* flumotion/common/enum.py
+	* flumotion/wizard/save.py
+	* flumotion/twisted/gstreactor.py: s/is None/== None/,
+	s/is not None/!= None/ to avoid pychecker warnings with python
+	2.4.
+	
+	* data/glade/wizard.glade: Instead of restricting the content area
+	to a certain size, give the window a default size. This allows it
+	to expand as necessary.
+	
+	* data/glade/wizard_firewire.glade: UI rework. I'm still not
+	happy. The width correction should be factored out into a filter.
+	
+	* bin/flumotion-admin.in: Use flumotion.twisted.gtk2reactor so as
+	to avoid deprecated code.
+
 2005-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:

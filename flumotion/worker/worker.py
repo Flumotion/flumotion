@@ -173,7 +173,7 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
             elementNames,))
 
         list = [name for name in elementNames
-                         if gst.element_factory_make(name) is not None]
+                         if gst.element_factory_make(name) != None]
         self.debug('remote_checkElements: returning elements names %r' % list)
         return list
 

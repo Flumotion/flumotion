@@ -215,6 +215,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # FIXME: maybe this should move to a callLater ?
         self.setup_pipeline()
+        self.debug('__init__ finished')
 
     ### base class overrides
     def updateMood(self):
@@ -617,8 +618,7 @@ class ParseLaunchComponent(FeedComponent):
         try:
             self.pipeline = gst.parse_launch(pipeline)
         except gobject.GError, e:
-            print pipeline
-            raise errors.PipelineParseError(e)
+            raise errors.PipelineParseError(e.message)
         FeedComponent.setup_pipeline(self)
 
     ### ParseLaunchComponent methods

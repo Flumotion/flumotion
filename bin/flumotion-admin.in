@@ -29,15 +29,15 @@ pygtk.require('2.0')
 import warnings
 warnings.filterwarnings('ignore', category=UserWarning)
 
-from twisted.internet import gtk2reactor
-gtk2reactor.install()
-
 dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.exists(os.path.join(dir, '.svn')):
     root = os.path.split(dir)[0]
 else:
     root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
 sys.path.insert(0, root)
+
+from flumotion.twisted import gtk2reactor
+gtk2reactor.install()
 
 # remove flumotion.component and flumotion.ui from our namespace and import,
 # since it should be handled by bundles completely

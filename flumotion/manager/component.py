@@ -117,7 +117,7 @@ class Feeder:
         return self._ready
 
     def hasComponentAvatar(self):
-        return self.component is not None
+        return self.component != None
     
     def getFeedName(self):
         return self.feedName

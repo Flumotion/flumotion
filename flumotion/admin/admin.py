@@ -190,7 +190,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         self.debug("emitted disconnected")
 
     def hasRemoteReference(self):
-        return self.remote is not None
+        return self.remote != None
 
     ### pb.Referenceable methods
     def remote_log(self, category, type, message):

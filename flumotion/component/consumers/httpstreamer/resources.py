@@ -288,7 +288,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         return False
 
     def isReady(self):
-        if self.streamer.caps is None:
+        if self.streamer.caps == None:
             self.debug('We have no caps yet')
             return False
         
@@ -320,7 +320,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         keycard.requesterName = self.streamer.getName()
         keycard._fd = request.transport.fileno()
         
-        if self.bouncerName is None:
+        if self.bouncerName == None:
             return defer.succeed(keycard)
 
         self.debug('Asking for authentication, user %s, password %s, ip %s' % (

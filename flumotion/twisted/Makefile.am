@@ -8,6 +8,7 @@ flumotion_PYTHON = \
 	credentials.py \
 	flavors.py \
 	gstreactor.py \
+	gtk2reactor.py \
 	pb.py \
 	portal.py \
 	reflect.py

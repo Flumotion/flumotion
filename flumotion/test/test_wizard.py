@@ -53,6 +53,8 @@ class WizardStepTest(unittest.TestCase):
             self.assert_(hasattr(step, 'icon'))
             self.assert_(hasattr(step, 'glade_file'))
             self.assert_(hasattr(step, 'step_name'))
+            if step.get_name() == 'Firewire':
+                step._queryCallback(dict(height=576, width=720, par=(59,54)))
             self.assert_(isinstance(step.get_state(), dict))
             self.assertIdentical(step.step_name, step.get_name())
 
@@ -60,7 +62,7 @@ class WizardStepTest(unittest.TestCase):
                 self.assert_(isinstance(step.get_next(), str))
                 
     def testStepWidgets(self):
-        widgets = [widget for step in self.steps
+        widgets = [widget for step in self.steps if step.get_name() != 'Firewire'
                               for widget in step.widgets]
         for widget in widgets:
             if isinstance(widget, fgtk.FSpinButton):
@@ -82,6 +84,8 @@ class WizardStepTest(unittest.TestCase):
 
     def testStepComponentProperties(self):
         for step in self.steps:
+            if step.get_name() == 'Firewire':
+                step._queryCallback(dict(height=576, width=720, par=(59,54)))
             self.assert_(isinstance(step.get_component_properties(), dict))
 
 
@@ -98,7 +102,11 @@ class WizardSaveTest(unittest.TestCase):
         source.combobox_video.set_active(enums.VideoDevice.Firewire)
         source.combobox_audio.set_active(enums.AudioDevice.Firewire)
 
+        self.wizard['Firewire']._queryCallback(dict(height=576,
+                                                    width=720,
+                                                    par=(59,54)))
         self.wizard.run(False, self.workerHeavenState, True)
+
         config = self.wizard.getConfig()
         self.assert_(config.has_key('video-source'))
         self.assert_(not config.has_key('audio-source'))

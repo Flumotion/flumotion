@@ -18,6 +18,8 @@
 
 # Headers in this file shall remain intact.
 
+import math
+
 import gtk
         
 from twisted.internet import defer
@@ -124,8 +126,8 @@ class VideoSource(wizard.WizardStep):
     def get_next(self):
         return 'Overlay'
 
-    def get_component_properties(self):
-        options = self.wizard.get_step_state(self)
+    def get_state(self):
+        options = wizard.WizardStep.get_state(self)
         options['width'] = int(options['width'])
         options['height'] = int(options['height'])
         return options
@@ -204,7 +206,7 @@ class TVCard(VideoSource):
         d.addErrback(self._unknownDeviceErrback)
         d.addErrback(self._queryRemoteRunErrback)
         
-    def get_component_properties(self):
+    def get_state(self):
         options = {}
         options['device'] = self.combobox_device.get_string()
         options['signal'] = self.combobox_tvnorm.get_string()
@@ -222,29 +224,109 @@ class FireWire(VideoSource):
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
     icon = 'firewire.png'
+    width_corrections = ['none', 'pad', 'stretch']
 
-    def _queryCallback(self, x):
+    # options detected from the device:
+    dims = None
+    factors = (1,2,3,4,6,8)
+    heights = None
+    widths = None
+    par = None
+
+    # these are instance state variables:
+    is_square = None
+    factor_i = None
+    width_correction = None
+    
+    def set_sensitive(self, is_sensitive):
+        if is_sensitive:
+            self.vbox_controls.show()
+            self.textview_status.hide()
+        else:
+            self.vbox_controls.hide()
+            self.textview_status.show()
+        self.wizard.block_next(not is_sensitive)
+        
+    def _queryCallback(self, options):
         # if we are here, then it was successful
-        buf = self.textview_status.get_buffer()
-        buf.set_text('Firewire device detected.')
-        for i in 'width', 'height', 'framerate':
-            but = getattr(self, 'spinbutton_'+i)
-            but.set_property('sensitive', True)
-        self.wizard.block_next(False)
+        self.dims = (options['width'], options['height'])
+        self.par = options['par']
+        self.heights = [self.dims[1]/i for i in self.factors]
+        self.widths = [self.dims[0]/i for i in self.factors]
+        store = gtk.ListStore(str)
+        for i in self.heights:
+            store.set(store.append(), 0, '%d pixels' % i)
+        self.combobox_scaled_height.set_model(store)
+        self.combobox_scaled_height.set_active(1)
+        self.set_sensitive(True)
+        self.on_update_output_format()
 
     def _queryErrback(self, failure):
         buf = self.textview_status.get_buffer()
         buf.set_text('No Firewire device detected.\n(%s)' % failure.value)
+
+    def on_update_output_format(self, *args):
+        # factor is a double
+        self.factor_i = self.combobox_scaled_height.get_active()
+        self.is_square = self.checkbutton_square_pixels.get_active()
+
+        self.width_correction = None
+        for i in self.width_corrections:
+            if getattr(self,'radiobutton_width_'+i).get_active():
+                self.width_correction = i
+                break
+        assert self.width_correction
+
+        self.update_output_format()
+
+    def update_output_format(self):
+        h = self.heights[self.factor_i]
+        w = self.widths[self.factor_i]
+        par = 1.*self.par[0]/self.par[1]
+        self.frame_width_correction.set_sensitive(w%8 != 0)
+
+        if self.is_square:
+            w = int(math.ceil(w * par))
+        if self.width_correction != 'none':
+            w = w + (8-(w%8))%8
+
+        if self.is_square:
+            msg = ('<i>%dx%d, 1/1 pixel aspect ratio</i>' % (w, h))
+        else:
+            msg = ('<i>%dx%d, %d/%d pixel aspect ratio</i>'
+                   % (w, h, self.par[0], self.par[1]))
+        self.label_output_format.set_markup(msg)
+        
+    def get_state(self):
+        options = {} # VideoSource.get_state(self)
+        options['height'] = self.heights[self.factor_i]
+        width = self.widths[self.factor_i]
+        if self.is_square:
+            width = int(math.ceil(width * self.par[0]/self.par[1]))
+
+        if self.width_correction == 'none' or width%8 == 0:
+            scaled_width = width
+        else:
+            w = width + (8-width%8) % 8
+            if self.width_correction == 'pad':
+                scaled_width = width
+            elif self.width_correction == 'stretch':
+                scaled_width = w
+            else:
+                assert False
+            width = w
+        options['scaled_width'] = scaled_width
+        options['width'] = width
+        options['is_square'] = self.is_square
+        options['framerate'] = self.spinbutton_framerate.get_value()
+        return options
 
     def before_show(self):
         normal_bg = self.textview_status.get_style().bg[gtk.STATE_NORMAL]
         self.textview_status.modify_base(gtk.STATE_NORMAL, normal_bg)
         buf = self.textview_status.get_buffer()
         buf.set_text('Detecting Firewire device...')
-        for i in 'width', 'height', 'framerate':
-            but = getattr(self, 'spinbutton_'+i)
-            but.set_property('sensitive', False)
-        self.wizard.block_next(True)
+        self.set_sensitive(False)
         d = self.workerRun('flumotion.worker.checks.video', 'check1394')
         d.addCallback(self._queryCallback)
         d.addErrback(self._queryErrback)
@@ -337,7 +419,7 @@ class TestVideoSource(VideoSource):
         self.combobox_pattern.set_enum(VideoTestPattern)
         self.combobox_format.set_enum(VideoTestFormat)
 
-    def get_component_properties(self):
+    def get_state(self):
         format = self.combobox_format.get_enum()
         options = {}
         if format == VideoTestFormat.YUV:
@@ -370,8 +452,8 @@ class Overlay(wizard.WizardStep):
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())
 
-    def get_component_properties(self):
-        options = {}
+    def get_state(self):
+        options = wizard.WizardStep.get_state(self)
         if self.checkbutton_show_logo:
             options['logo'] = True
             
@@ -382,7 +464,7 @@ class Overlay(wizard.WizardStep):
         video_options = self.wizard.get_step_options('Source')
         video_source = video_options['video']
         video_step = self.wizard[video_source.step]
-        video_props = video_step.get_component_properties()
+        video_props = video_step.get_state()
         
         options['width'] = video_props['width']
         options['height'] = video_props['height']
@@ -494,7 +576,7 @@ class Soundcard(wizard.WizardStep):
         #d.addErrback(self._unknownDeviceErrback)
         #d.addErrback(self._permissionDeniedErrback)
         
-    def get_component_properties(self):
+    def get_state(self):
         # FIXME: this can't be called if the soundcard hasn't been probed yet
         # for example, when going through the testsuite
         try:
@@ -533,7 +615,7 @@ class TestAudioSource(wizard.WizardStep):
         self.combobox_samplerate.set_enum(AudioTestSamplerate)
         self.combobox_samplerate.set_sensitive(True)
 
-    def get_component_properties(self):
+    def get_state(self):
         return {
             'freq': int(self.spinbutton_freq.get_value()),
             'volume': float(self.spinbutton_volume.get_value()),
@@ -651,7 +733,7 @@ class Theora(VideoEncoder):
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
     
-    def get_component_properties(self):
+    def get_state(self):
         options = {}
         if self.radiobutton_bitrate:
             options['bitrate'] = int(self.spinbutton_bitrate.get_value())
@@ -676,8 +758,8 @@ class Smoke(VideoEncoder):
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
     
-    def get_component_properties(self):
-        options = self.wizard.get_step_state(self)
+    def get_state(self):
+        options = VideoEncoder.get_state(self)
         options['qmin'] = int(options['qmin'])
         options['qmax'] = int(options['qmax'])
         options['threshold'] = int(options['threshold'])
@@ -700,8 +782,8 @@ class JPEG(VideoEncoder):
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
     
-    def get_component_properties(self):
-        options = self.wizard.get_step_state(self)
+    def get_state(self):
+        options = VideoEncoder.get_state(self)
         options['quality'] = int(options['quality'])
         options['framerate'] = float(options['framerate'])
         return options
@@ -744,7 +826,7 @@ class Vorbis(AudioEncoder):
         self.spinbutton_quality.set_sensitive(
             self.radiobutton_quality.get_active())
         
-    def get_component_properties(self):
+    def get_state(self):
         options = {}
         if self.radiobutton_bitrate:
             options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
@@ -768,8 +850,8 @@ class Speex(AudioEncoder):
         self.spinbutton_bitrate.set_range(3, 30)
         self.spinbutton_bitrate.set_value(11)
         
-    def get_component_properties(self):
-        options = self.wizard.get_step_state(self)
+    def get_state(self):
+        options = AudioEncoder.get_state(self)
         options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
         return options
 wizard.register_step(Speex)
@@ -885,8 +967,8 @@ class HTTP(wizard.WizardStep):
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
-    def get_component_properties(self):
-        options = self.wizard.get_step_state(self)
+    def get_state(self):
+        options = wizard.WizardStep.get_state(self)
 
         options['bandwidth_limit'] = int(options['bandwidth_limit'])
         options['user_limit'] = int(options['user_limit'])
@@ -961,7 +1043,7 @@ class Disk(wizard.WizardStep):
             self.spinbutton_time.set_sensitive(False)
             self.combobox_time_list.set_sensitive(False)
 
-    def get_component_properties(self):
+    def get_state(self):
         options = {}
         if not self.checkbutton_rotate:
             options['rotateType'] = 'none'

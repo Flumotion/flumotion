@@ -229,13 +229,13 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def _notify_caps_cb(self, element, pad, param):
         caps = pad.get_negotiated_caps()
-        if caps is None:
+        if caps == None:
             return
         
         caps_str = gstreamer.caps_repr(caps)
         self.debug('Got caps: %s' % caps_str)
         
-        if not self.caps is None:
+        if not self.caps == None:
             self.warning('Already had caps: %s, replacing' % caps_str)
 
         self.debug('Storing caps: %s' % caps_str)

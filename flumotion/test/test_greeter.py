@@ -53,7 +53,7 @@ class WizardTest(unittest.TestCase):
         gobject.idle_add(lambda: next.emit('clicked'))
         gobject.idle_add(lambda: prev.emit('clicked'))
         gobject.idle_add(lambda: next.emit('clicked'))
-        gobject.idle_add(lambda: ass(not next.flags() & gtk.SENSITIVE))
+        gobject.idle_add(lambda: ass(not next.get_property('sensitive'))
         gobject.idle_add(lambda: wiz.page.host_entry.set_text('foo'))
         gobject.idle_add(lambda: ass(next.flags() & gtk.SENSITIVE))
         gobject.idle_add(lambda: wiz.page.ssl_check.emit('clicked'))

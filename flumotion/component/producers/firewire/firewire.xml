@@ -6,6 +6,8 @@
         <property name="feed" type="string" required="yes" multiple="yes"/>
         <property name="height" type="int"/>
         <property name="width" type="int"/>
+        <property name="scaled_width" type="int"/>
+        <property name="is_square" type="bool"/>
         <property name="framerate" type="float"/>
       </properties>
     </component>

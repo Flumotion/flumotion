@@ -201,7 +201,7 @@ class WizardSaver:
             video_overlay = self.getVideoOverlay(overlay_options['show_logo'])
             components.append(video_overlay)
                 
-        if video_overlay is not None:
+        if video_overlay != None:
             video_overlay.link(video_source)
             video_encoder.link(video_overlay)
         else:

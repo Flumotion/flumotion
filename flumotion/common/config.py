@@ -96,7 +96,7 @@ class FlumotionConfigXML(log.Loggable):
         self.atmosphere = None
 
         try:
-            if filename is not None:
+            if filename != None:
                 self.debug('Loading configuration file `%s\'' % filename)
                 self.doc = minidom.parse(filename)
             else:
@@ -105,7 +105,7 @@ class FlumotionConfigXML(log.Loggable):
         except expat.ExpatError, e:
             raise ConfigError("XML parser error: %s" % e)
         
-        if filename is not None:
+        if filename != None:
             self.path = os.path.split(filename)[0]
         else:
             self.path = None

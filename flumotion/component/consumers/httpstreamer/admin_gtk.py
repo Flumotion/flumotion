@@ -68,7 +68,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             return
         for name in self.labels.keys():
             text = state[name]
-            if text is None:
+            if text == None:
                 text = ''
             self.labels[name].set_text(text)
         

@@ -47,7 +47,7 @@ def reload():
             continue
         module = sys.modules[name]
         if not module:
-            log.log("reload", "hm, module '%s' is None" % name)
+            log.log("reload", "hm, module '%s' == None" % name)
             continue
         log.log("reload", "rebuilding %s" % module)
         rebuild(module, doLog=0)
