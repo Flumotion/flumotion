@@ -168,19 +168,3 @@ class FMClientFactory(pb.PBClientFactory):
                       interfaces)
         return d
     
-class ReallyAllowAnonymousAccess:
-    __implements__ = checkers.ICredentialsChecker
-
-    credentialInterfaces = (credentials.IUsernamePassword,
-                            credentials.IUsernameHashedPassword)
-
-    def requestAvatarId(self, credentials):
-        return credentials.username
-
-class Username:
-    __implements__ = credentials.IUsernamePassword,
-    def __init__(self, username, password=''):
-        self.username = username
-        self.password = password
-        
-

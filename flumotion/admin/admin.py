@@ -34,10 +34,10 @@ from twisted.spread import pb
 from twisted.internet import error, defer
 from twisted.python import rebuild, reflect
 
-from flumotion.common import interfaces, errors, bundle
+from flumotion.common import bundle, errors, interfaces
 from flumotion.utils import log, reload
 from flumotion.utils.gstutils import gsignal
-from flumotion.twisted import pbutil
+from flumotion.twisted import cred, pbutil
 
 class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     """
@@ -59,7 +59,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.__gobject_init__()
         self.factory = pbutil.FMClientFactory()
         self.debug("logging in to ClientFactory")
-        d = self.factory.login(pbutil.Username('admin'), self,
+        d = self.factory.login(cred.Username('admin'), self,
                                pb.IPerspective,
                                interfaces.IAdminComponent)
         d.addCallback(self._gotPerspective)

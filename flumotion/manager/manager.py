@@ -35,7 +35,7 @@ from twisted.spread import pb
 
 from flumotion.manager import admin, component, worker
 from flumotion.common import errors, interfaces
-from flumotion.twisted import pbutil, portal
+from flumotion.twisted import cred, portal
 from flumotion.utils import log
 
 # an internal class
@@ -119,7 +119,9 @@ class Vishnu:
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
-        checker = pbutil.ReallyAllowAnonymousAccess()
+        checker = cred.FlexibleCredentials()
+        checker.allowAnonymous(True)
+        
         p = portal.FlumotionPortal(self.dispatcher, [checker])
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
         self.factory = pb.PBServerFactory(p)

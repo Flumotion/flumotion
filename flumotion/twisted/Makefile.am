@@ -2,6 +2,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/twisted
 
 flumotion_PYTHON = \
 	__init__.py \
+	cred.py \
 	gstreactor.py \
 	pbutil.py \
 	portal.py \
