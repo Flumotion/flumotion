@@ -4,15 +4,18 @@
 # bin/flumotion-worker: Flumotion worker
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004 Fluendo (www.fluendo.com)
+# Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
 # See "LICENSE.GPL" in the source distribution for more information.
 
-# This program is also licensed under the Flumotion license.
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 import flumotion.common.registry
