@@ -35,48 +35,6 @@ PYGST_DIR = '@PYGST_DIR@'
 PYGTK_VERSION = '@PYGTK_REQ@'
 PROGRAM_PATH = 'flumotion.service.main.main'
 
-def _init_gobject():
-    """
-    I setup paths for pygtk from configure and
-    make sure that the installed version of pygtk
-    is sane enough to be usable by us
-    """
-    
-    sys.path.insert(0, PYGTK_DIR)
-
-    try:
-        import pygtk
-        pygtk.require('2.0')
-
-        import gobject
-    except ImportError:
-        raise SystemExit('ERROR: PyGTK could not be found')
-
-    if gobject.pygtk_version < PYGTK_VERSION.split('.'):
-        raise SystemExit('ERROR: PyGTKPyGTK %s or higher is required' % PYGTK_VERSION)
-
-    # To be able to have other threads emitting signals connected
-    # python callbacks we need to use the new PyGILThread_STATE API
-    # Which in PyGTK 2.4.0 only can be turned on by using an
-    # environment variable
-    os.environ['PYGTK_USE_GIL_STATE_API'] = ''
-    gobject.threads_init()
-
-def _init_gst():
-    """
-    I setup paths for gst-python from configure and
-    make sure that the installed version of gst-python
-    is sane enough to be usable by us
-    """
-
-    if PYGST_DIR != PYGTK_DIR:
-        sys.path.insert(0, PYGTK_DIR)
-        
-    try:
-        import gst
-    except ImportError:
-        raise SystemExit('ERROR: gst-python could not be found')
-    
 def _setup_project_root():
     dir = os.path.dirname(os.path.abspath(__file__))
     if os.path.exists(os.path.join(dir, '.svn')):
@@ -84,23 +42,6 @@ def _setup_project_root():
     else:
         root = os.path.join(PREFIX, 'lib', 'flumotion', 'python')
     sys.path.insert(0, root)
-
-def _install_reactor():
-    """
-    Installs our reactor, so we can use twisted.internet from the
-    whole code base without caring about the default reactor
-    """
-    
-    try:
-        from twisted.copyright import version
-    except ImportError:
-        raise SystemExit('ERROR: Twisted could not be found')
-        
-    #if version < TWISTED_VERSION:
-    #    print >> sys.stderr, 'Twisted 1.3.0 or higher required'
-        
-    from flumotion.twisted import gstreactor
-    gstreactor.install()
 
 def _run_main(path):
     from flumotion.twisted import reflect
@@ -120,9 +61,6 @@ def _run_main(path):
     
 try:
     _setup_project_root()
-    _init_gobject()
-    _init_gst()
-    _install_reactor()
     _run_main(PROGRAM_PATH)
 except KeyboardInterrupt:
     print 'Interrupted'

@@ -168,14 +168,10 @@ class Servicer(log.Loggable):
                 if not pid:
                     print "%s %s not running" % (type, name)
                     continue
-                try:
-                    os.kill(pid, 0)
-                except OSError, e:
-                    if e.errno is not errno.ESRCH:
-                        raise
+                if common.checkPidRunning(pid):
+                    print "%s %s is running with pid %d" % (type, name, pid)
+                else:
                     print "%s %s dead (stale pid %d)" % (type, name, pid)
-                    continue
-                print "%s %s is running with pid %d" % (type, name, pid)
      
     def startManager(self, name, flowNames):
         """
@@ -203,8 +199,12 @@ class Servicer(log.Loggable):
 
         pid = common.getPid('manager', name)
         if pid:
-            raise errors.SystemError, \
-                "Manager %s is already running (with pid %d)" % (name, pid)
+            if common.checkPidRunning(pid):
+                raise errors.SystemError, \
+                    "Manager %s is already running (with pid %d)" % (name, pid)
+            else:
+                raise errors.SystemError, \
+                    "Manager %s is dead (stale pid %d)" % (name, pid)
             
         command = "flumotion-manager --debug 3 -D -n %s %s %s" % (
             name, planetFile, " ".join(flowFiles))
@@ -236,8 +236,12 @@ class Servicer(log.Loggable):
 
         pid = common.getPid('worker', name)
         if pid:
-            raise errors.SystemError, \
-                "Worker %s is already running (with pid %d)" % (name, pid)
+            if common.checkPidRunning(pid):
+                raise errors.SystemError, \
+                    "Worker %s is already running (with pid %d)" % (name, pid)
+            else:
+                raise errors.SystemError, \
+                    "Worker %s is dead (stale pid %d)" % (name, pid)
             
         self.info("Loading worker %s" % workerFile)
 

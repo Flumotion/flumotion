@@ -1,5 +1,14 @@
 2004-12-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion.in:
+	  remove all sorts of stuff we don't need for the service script
+	* flumotion/common/common.py:
+	  new function
+	* flumotion/service/service.py:
+	  check for dead pids
+
+2004-12-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:

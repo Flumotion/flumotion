@@ -24,6 +24,7 @@
 small common functions used by all processes
 """
 
+import errno
 import os 
 import sys
 import time
@@ -387,6 +388,20 @@ def getPid(type, name):
         return
  
     return int(pid)
+
+def checkPidRunning(pid):
+    """
+    Check if the given pid is currently running.
+    
+    @returns: whether or not a process with that pid is active.
+    """
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError, e:
+        if e.errno is not errno.ESRCH:
+            raise
+    return False
  
 def waitPidFile(type, name):
     """
