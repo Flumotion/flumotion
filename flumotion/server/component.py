@@ -29,6 +29,7 @@ from twisted.spread import pb
 from flumotion.server import interfaces
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
+from flumotion.utils.gstutils import gsignal
 
 class ComponentFactory(pbutil.ReconnectingPBClientFactory):
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
@@ -36,7 +37,10 @@ class ComponentFactory(pbutil.ReconnectingPBClientFactory):
         # doing this as a class method triggers a doc error
         super_init = pbutil.ReconnectingPBClientFactory.__init__
         super_init(self)
+        
+        # XXX: document
         self.interfaces = getattr(component, '__remote_interfaces__', ())
+        # XXX: document
         klass = getattr(component, 'component_view', ComponentView)
         self.view = klass(component)
         
@@ -203,13 +207,20 @@ class DirectoryProvider:
 
 class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
     """I am the base class for all Flumotion components."""
-    __gsignals__ = {
-        'state-changed': (gobject.SIGNAL_RUN_FIRST, None, (str, object)),
-        'error':         (gobject.SIGNAL_RUN_FIRST, None, (str, str)),
-        'log':         (gobject.SIGNAL_RUN_FIRST, None, (object,)),
-        }
+
+    gsignal('state-changed', str, object)
+    gsignal('error', str, str)
+    gsignal('log', object)
+    
+    #__gsignals__ = {
+    #    'state-changed': (gobject.SIGNAL_RUN_FIRST, None, (str, object)),
+    #    'error':         (gobject.SIGNAL_RUN_FIRST, None, (str, str)),
+    #    'log':         (gobject.SIGNAL_RUN_FIRST, None, (object,)),
+    #    }
+    
     logCategory = 'basecomponent'
     __remote_interfaces__ = interfaces.IBaseComponent,
+    component_view = ComponentView
     
     def __init__(self, name, sources, feeds):
         self.__gobject_init__()

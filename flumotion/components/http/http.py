@@ -32,6 +32,7 @@ from twisted.internet import reactor
 
 from flumotion.server import auth, component, interfaces
 from flumotion.utils import gstutils, log
+from flumotion.utils.gstutils import gsignal
 
 import twisted.internet.error
 
@@ -477,10 +478,9 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
                                 'buffers-max=500 ' + \
                                 'buffers-soft-max=250 ' + \
                                 'recover-policy=1'
-    __gsignals__ = {
-        'client-removed': (gobject.SIGNAL_RUN_FIRST, None, (object, int, int)),
-        'ui-state-changed': (gobject.SIGNAL_RUN_FIRST, None, ())
-        }
+
+    gsignal('client-removed', object, int, int)
+    gsignal('ui-state-changed')
     
     component_view = HTTPView
 

@@ -19,6 +19,7 @@
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
 import socket
+import sys
 
 import gobject
 import gst
@@ -105,3 +106,16 @@ def gobject_set_property(object, property, value):
         raise errors.PropertyError('Unknown property type: %s' % pspec.value_type)
 
     object.set_property(property, value)
+
+def gsignal(name, *args):
+    frame = sys._getframe(1)
+    locals = frame.f_locals
+    
+    if not '__gsignals__' in locals:
+        dict = locals['__gsignals__'] = {}
+    else:
+        dict = locals['__gsignals__']
+
+    dict[name] = (gobject.SIGNAL_RUN_FIRST, None, args)
+
+    

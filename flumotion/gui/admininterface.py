@@ -28,18 +28,18 @@ from twisted.python import rebuild, reflect
 from flumotion.server import interfaces
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, reload
+from flumotion.utils.gstutils import gsignal
 
 class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     """Lives in the admin client.
        Controller calls on us through admin.Admin.
        I can call on controller admin.Admin objects.
     """
-    __gsignals__ = {
-        'connected' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
-        'connection-refused' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
-        'ui-state-changed'    : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (str, object)),
-        'update'    : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (object,))
-    }
+    gsignal('connected')
+    gsignal('connection-refused')
+    gsignal('ui-state-changed', str, object)
+    gsignal('update', object)
+    
     logCategory = 'adminclient'
 
     def __init__(self):

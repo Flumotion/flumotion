@@ -1,3 +1,14 @@
+2004-09-07  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/components/http/http.py:
+	* flumotion/gui/adminclient.py:
+	* flumotion/gui/admininterface.py:
+	* flumotion/server/component.py:
+	* flumotion/utils/gstutils.py:
+
+	Added gsignal function to help install simple signals, use it over
+	the code. Clean up component_view property slightly too.
+
 2004-09-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/utils/log.py:

@@ -33,6 +33,7 @@ from flumotion.gui.admininterface import AdminInterface
 from flumotion.server import admin   # Register types
 from flumotion.twisted import errors
 from flumotion.utils import log
+from flumotion.utils.gstutils import gsignal
 
 COL_PIXBUF = 0
 COL_TEXT   = 1
@@ -40,10 +41,9 @@ COL_TEXT   = 1
 RESPONSE_FETCH = 0
 
 class PropertyChangeDialog(gtk.Dialog):
-    __gsignals__ = {
-        'set': (gobject.SIGNAL_RUN_FIRST, None, (str, str, object)),
-        'get': (gobject.SIGNAL_RUN_FIRST, None, (str, str)),
-    }
+    gsignal('set', str, str, object)
+    gsignal('get', str, str)
+    
     def __init__(self, name, parent):
         title = "Change element property on '%s'" % name
         dialog = gtk.Dialog.__init__(self, title, parent,
