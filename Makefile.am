@@ -33,14 +33,14 @@ coverage:
 # which can't be turned off in pychecker
 
 pychecker:
-	pychecker -Q -F misc/pycheckerrc 	\
-		flumotion/common/*.py 		\
-		flumotion/configure/*.py 	\
-		flumotion/component/*.py 	\
-		flumotion/component/*/*.py 	\
-		flumotion/manager/*.py 		\
-		flumotion/worker/*.py 		\
-		flumotion/utils/*.py		\
+	pychecker -Q -F misc/pycheckerrc	\
+	    flumotion/common/*.py		\
+	    flumotion/configure/*.py		\
+	    flumotion/component/*.py 		\
+	    flumotion/component/*/*.py 		\
+	    flumotion/manager/*.py 		\
+	    flumotion/worker/*.py 		\
+	    flumotion/utils/*.py		\
 	2> /dev/null
 
 fixme:
