@@ -88,7 +88,8 @@ def main(args):
         log.startLogging(sys.stdout)
 
     if ':' in options.host:
-        host, port = options.split(options.host)
+        host, port = options.host.split(':', 2)
+        port = int(port)
     else:
         host = options.host
         port = 8890

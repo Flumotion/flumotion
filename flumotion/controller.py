@@ -85,8 +85,8 @@ class ComponentPerspective(pbutil.NewCredPerspective):
     def getTransportPeer(self):
         return self.mind.broker.transport.getPeer()
 
-    def getSource(self):
-        return self.options.source
+    def getSources(self):
+        return self.options.sources
     
     def getRemoteControllerIP(self):
         return self.options.ip
@@ -136,7 +136,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         
         self.ready = False
         cb = self.mind.callRemote('register')
-        cb.addCallback(self.after_register_cb)
+        cb.addCallback(self.after_register_cb, cb)
               
 class ProducerPerspective(ComponentPerspective):
     """Perspective for producer components"""
@@ -151,22 +151,20 @@ class ProducerPerspective(ComponentPerspective):
         cb = self.mind.callRemote('get_free_port')
         cb.addCallback(after_get_free_port_cb)
  
-    def getSource(self):
-        "Should never be called, a Producer does not have a source"
+    def getSources(self):
+        "Should never be called, a Producer does not have any sources"
         raise AssertionError
        
 class ConverterPerspective(ComponentPerspective):
     """Perspective for converter components"""
     kind = 'converter'
-    def start(self, source_host, source_port, listen_host):
+    def start(self, sources, listen_host):
         """starts the remote methods start"""
         def after_get_free_port_cb(listen_port):
             self.listen_port = listen_port
-            log.msg('Calling remote method start (%s, %d, %s, %d)' % (source_host, source_port,
-                                                                      listen_host, listen_port))
-            self.mind.callRemote('start',
-                                 source_host, source_port,
-                                 listen_host, listen_port)
+            log.msg('Calling remote method start (%s, %s, %d)' % (sources,
+                                                                  listen_host, listen_port))
+            self.mind.callRemote('start', sources,  listen_host, listen_port)
 
         log.msg('Calling remote method get_free_port()')
         cb = self.mind.callRemote('get_free_port')
@@ -183,9 +181,9 @@ class StreamerPerspective(ComponentPerspective):
         "Should never be called, a Streamer does not accept incoming components"
         raise AssertionError
 
-    def connect(self, host, port):
+    def connect(self, name, host, port):
         """starts the remote methods connect"""
-        self.mind.callRemote('connect', host, port)
+        self.mind.callRemote('connect', name, host, port)
 
 class Controller(pb.Root):
     def __init__(self):
@@ -256,44 +254,53 @@ class Controller(pb.Root):
                 self.componentStart(component)
             self.waitlists[name] = []
     
-    def getSourceComponent(self, component):
-        """Retrives the source component for component
+    def getSourceComponents(self, component):
+        """Retrives the source components for component
 
         @type component:  component
         @param component: the component
-        @rtype:           string
-        @returns:         name of source component"""
+        @rtype:           list of string
+        @returns:         name of source components"""
 
-        #assert not isinstance(component, ProducerPerspective)
+        assert not isinstance(component, ProducerPerspective)
         
-        peername = component.getSource()
-        assert self.components.has_key(peername)
-        return self.components[peername]
+        peernames = component.getSources()
+        retval = []
+        for peername in peernames:
+            assert self.components.has_key(peername)
+            retval.append(self.components[peername])
+        return retval
 
     def producerStart(self, producer):
-        #assert isinstance(producer, ProducerPerspective)
+        assert isinstance(producer, ProducerPerspective)
+        
         host = producer.getListenHost()
         log.msg('Calling remote method listen (%s)' % host)
         producer.listen(host)
 
     def converterStart(self, converter):
         #assert isinstance(converter, ConverterPerspective)
-        source = self.getSourceComponent(converter)
-        source_host = source.getListenHost()
-        source_port = source.getListenPort()
+        
+        sources = [(source.getName(),
+                    source.getListenHost(),
+                    source.getListenPort()) for source in self.getSourceComponents(converter)]
         listen_host = converter.getListenHost()
-        converter.start(source_host, source_port, listen_host)
             
+        converter.start(sources, listen_host)
+        
     def streamerStart(self, streamer):
         #assert isinstance(streamer, StreamerPerspective)
-        source = self.getSourceComponent(streamer)
-        host = source.getListenHost()
-        port = source.getListenPort()
-        log.msg('Calling remote method connect')
-        streamer.connect(host, port)
+        
+        sources = self.getSourceComponents(streamer)
+        for source in sources:
+            name = source.getName()
+            host = source.getListenHost()
+            port = source.getListenPort()
+            log.msg('Calling remote method connect')
+            streamer.connect(name, host, port)
         
     def componentStart(self, component):
-        log.msg('Starting component %r (%s)' % (component, component.kind))
+        log.msg('Starting component %r of type %s' % (component, component.kind))
         
         if isinstance(component, ProducerPerspective):
             self.producerStart(component)
@@ -308,22 +315,27 @@ class Controller(pb.Root):
     def componentReady(self, component):
         log.msg('%r is ready' % component)
         
-        # The producer can just be started ...
+        # A producer can just be started ...
         if isinstance(component, ProducerPerspective):
             self.componentStart(component)
             return
 
-        source_name = component.getSource()
-        assert not source_name is None
-        
-        # ... while the others need the source running
-        if self.hasComponent(source_name):
-            log.msg('Source for %r (%s) is ready, so starting' % (component, source_name))
-            self.componentStart(component)
-        else:
-            log.msg('%r requires %s to be running, but its not so waiting' % (component, source_name))
+        source_names = component.getSources()
+        assert source_names != []
+
+        sources_ready = True
+        for source_name in source_names:
+            if self.hasComponent(source_name):
+                continue
+            
+            log.msg("%r will be waiting for source %s" % (component, source_name))
             self.waitForComponent(source_name, component)
-        
+            sources_ready = False
+
+        if sources_ready:
+            log.msg('All sources for %r (%s) are ready, so starting' % (component, source_names))
+            self.componentStart(component)
+            
 class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):

@@ -44,28 +44,43 @@ import gstutils
 
 class Converter(Component):
     name = 'converter'
-    def __init__(self, name, source, host, port, pipeline):
-        Component.__init__(self, name, source, host, port)
-        self.pipeline_string = 'tcpclientsrc name=source ! ' + \
-                               '%s ! tcpserversink name=sink' % pipeline
-        self.source = source
-        
-    def start(self, source_host, source_port, sink_host, sink_port):
-        log.msg('(source) Going to listen on port %s:%d' % (source_host, source_port))
-        log.msg('(sink)   Going to connect to %s:%d' % (sink_host, sink_port))
-        
-        source = self.pipeline.get_by_name('source')
-        source.set_property('host', source_host)
-        source.set_property('port', source_port)
+    def __init__(self, name, sources, host, port, pipeline):
+        Component.__init__(self, name, sources, host, port)
 
+        for source in sources:
+            if ' ' in source:
+                raise TypeError, "spaces not allowed in sources"
+            
+            source_name = '@%s' % source
+            print pipeline
+            if pipeline.find(source_name) == -1:
+                raise TypeError, "%s needs to be specified in the pipeline" % source_name
+            
+            pipeline = pipeline.replace(source_name, 'tcpclientsrc name=%s' % source)
+            
+        self.pipeline_string = pipeline + ' ! tcpserversink name=sink'
+
+    def start(self, sources, sink_host, sink_port):
+        log.msg('(source) Going to listen on port %s:%d' % (sink_host, sink_port))
+
+        # Setup all sources
+        for source_name, source_host, source_port in sources:
+            log.msg('(sink)   Going to connect to %s (%s:%d)' % (source_name,
+                                                                 source_host, source_port))
+            source = self.pipeline.get_by_name(source_name)
+            source.set_property('host', source_host)
+            source.set_property('port', source_port)
+
+        # Setup the sink
         sink = self.pipeline.get_by_name('sink')
         sink.set_property('host', sink_host)
         sink.set_property('port', sink_port)
-        
-        self.pipeline_play()
 
-    def remote_start(self, source_host, source_port, sink_host, sink_port):
-        self.start(source_host, source_port, sink_host, sink_port)
+        # Play
+        self.pipeline_play()
+        
+    def remote_start(self, sources, sink_host, sink_port):
+        self.start(sources, sink_host, sink_port)
         
 def main(args):
     parser = optik.OptionParser()
@@ -81,10 +96,10 @@ def main(args):
                       action="store", type="string", dest="pipeline",
                       default=None,
                       help="Pipeline to run")
-    parser.add_option('-s', '--source',
+    parser.add_option('-s', '--sources',
                       action="store", type="string", dest="source",
                       default=None,
-                      help="Host source to get data from")
+                      help="Host sources to get data from, separated by ,")
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="Be verbose")
@@ -107,13 +122,19 @@ def main(args):
         log.startLogging(sys.stdout)
 
     if ':' in options.host:
-        host, port = options.split(options.host)
+        host, port = options.host.split(':', 2)
+        port = int(port)
     else:
         host = options.host
         port = 8890
 
+    if ',' in  options.source:
+        sources = options.source.split(',')
+    else:
+        sources = [options.source]
+        
     log.msg('Connect to %s on port %d' % (host, port))
-    client = Converter(options.name, options.source, host, port,
+    client = Converter(options.name, sources, host, port,
                        options.pipeline)
     reactor.run()
     

@@ -49,19 +49,22 @@ class Streamer(gobject.GObject, Component):
                           (gst.Buffer,)),
     }
     name = 'streamer'
-    def __init__(self, name, source, host, port):
+    def __init__(self, name, sources, host, port):
         self.__gobject_init__()
-        Component.__init__(self, name, source, host, port)
-        self.pipeline_string = 'tcpclientsrc name=source ! fakesink signal-handoffs=1 silent=1 name=sink'
-        self.source = source
+        Component.__init__(self, name, sources, host, port)
+        self.pipeline_string = 'fakesink signal-handoffs=1 silent=1 name=sink'
+        for source in sources:
+            self.pipeline_string.replace(source, 'identify name=%s_placeholder' % source)
         
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-recieved', buffer)
         
-    def connect_to(self, host, port):
+    def connect_to(self, name, host, port):
         log.msg('Going to connect to %s:%d' % (host, port))
-        
-        source = self.pipeline.get_by_name('source')
+
+        old = self.pipeline.get_by_name('%s_placeholder' % name)
+
+        source = gst.element_factory_make('tcpclientsrc', source)
         source.set_property('host', host)
         source.set_property('port', port)
 
