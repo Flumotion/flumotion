@@ -23,13 +23,6 @@
 * MEDIUM:	component.component overrides .error and calls reactor.stop(),
 	  	this is dangerous, figure that out
 
-* MEDIUM:	add import hooks so that when there is a.b in one pythonpathdir
-	        and a.c in another, programs can import both a.b and a.c
-
-* EASY:		make relative attribute work on filename properties in xml
-	        so that they are relative to a given var from configure;
-		might need to make a type "path" for that in registry code ?
-
 * MEDIUM	allow expression of "test component depends on streamer component"
 
 * MEDIUM	implement moods of component:
@@ -64,9 +57,6 @@
 
 * MEDIUM	add runtime checks for plugin versions to provide decent
 		fallbacks for bugs like this
-
-* MEDIUM	all get/set properties should notify back to listening admin
-		UI pages so they can update their state
 
 * HARD		split up source code layout according to bundleability
 
