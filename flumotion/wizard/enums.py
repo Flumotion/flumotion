@@ -116,9 +116,14 @@ TVCardDevice = EnumClass('TVCardDevice', ('/dev/video0',
                                           '/dev/video2'))
 TVCardSignal = EnumClass('TVCardSignal', ('Composite', 'RCA'))
 
-# Videotestsrc
-VideoTestPattern = EnumClass('VideoTestPattern', ('Bars', 'Snow',
-                                                  'Black'))
+# Videotestsrc, order is important here, since it maps to
+#               GstVideotestsrcPattern
+VideoTestPattern = EnumClass('VideoTestPattern',
+                             ('Bars', 'Snow', 'Black'),
+                             ('SMPTE Color bars',
+                              'Random (television snow',
+                              'Totaly black'))
+
 VideoTestFormat = EnumClass('VideoTestFormat', ('YUV', 'RGB'))
 
 # Sound card

@@ -257,7 +257,7 @@ class FeedComponent(basecomponent.BaseComponent):
         for feederName, host, port in eatersData:
             self.debug('Going to connect to feeder %s (%s:%d)' % (feederName, host, port))
             name = 'eater:' + feederName
-            eater = self.pipeline.get_by_name(name)
+            eater = self.get_element(name)
             assert eater, 'No eater element named %s in pipeline' % name
             assert isinstance(eater, gst.Element)
             
@@ -296,7 +296,7 @@ class FeedComponent(basecomponent.BaseComponent):
             port = self.feed_ports[feed_name]
             self.debug('Going to listen on feeder %s (%s:%d)' % (feeder_name, host, port))
             name = 'feeder:' + feeder_name
-            feeder = self.pipeline.get_by_name(name)
+            feeder = self.get_element(name)
             assert feeder
             feeder.connect('state-change', self.feeder_state_change_cb, feed_name)
             
@@ -367,6 +367,11 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('.link() returning %s' % retval)
 
         return retval
+
+    def get_element(self, element_name):
+        assert self.pipeline
+        element = self.pipeline.get_by_name(element_name)
+        return element
     
     def get_element_names(self):
         'Return the names of all elements in the GStreamer pipeline.'
@@ -376,7 +381,7 @@ class FeedComponent(basecomponent.BaseComponent):
     def get_element_property(self, element_name, property):
         'Gets a property of an element in the GStreamer pipeline.'
         self.debug("%s: getting property %s of element %s" % (self.get_name(), property, element_name))
-        element = self.pipeline.get_by_name(element_name)
+        element = self.get_element(element_name)
         if not element:
             msg = "Element '%s' does not exist" % element_name
             self.warning(msg)
@@ -395,7 +400,7 @@ class FeedComponent(basecomponent.BaseComponent):
     def set_element_property(self, element_name, property, value):
         'Sets a property on an element in the GStreamer pipeline.'
         self.debug("%s: setting property %s of element %s to %s" % (self.get_name(), property, element_name, value))
-        element = self.pipeline.get_by_name(element_name)
+        element = self.get_element(element_name)
         if not element:
             msg = "Element '%s' does not exist" % element_name
             self.warning(msg)

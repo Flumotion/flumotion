@@ -25,17 +25,27 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
                                                     [],
                                                     ['default'],
                                                     pipeline)
-                                       
-def createComponent(config):
-    format = 'video/x-raw-yuv' #config['format']    
-    struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
 
-    struct['width'] = config['width']
-    struct['height'] = config['height']
-    struct['framerate'] = config['framerate']
+def setProp(struct, dict, name):
+    if dict.has_key(name):
+        struct[name] = dict[name]
+        
+def createComponent(config):
+    format = config.get('format', 'video/x-raw-yuv')
+    
+    # Filtered caps
+    struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
+    setProp(struct, config, 'width')
+    setProp(struct, config, 'height')
+    setProp(struct, config, 'framerate')
     caps = gst.Caps(struct)
     
-    component = VideoTest(config['name'], 'videotestsrc ! %s' % caps)
+    component = VideoTest(config['name'], 'videotestsrc name=source ! %s' % caps)
 
+    # Set properties
+    source = component.get_element('source')
+    if config.has_key('pattern'):
+        source.set_property('pattern', config['pattern'])
+                            
     return component
 

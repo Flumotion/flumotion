@@ -7,6 +7,7 @@
       <property name="width" type="int"/>
       <property name="framerate" type="float"/>
       <property name="format" type="string"/>
+      <property name="pattern" type="int"/>
     </properties>
   </component>
 </components>

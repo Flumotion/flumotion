@@ -143,7 +143,8 @@ class TestSource(VideoSource):
             options['format'] = 'video/x-raw-rgb'
         else:
             raise AssertionError
-        options['pattern'] = self.combobox_pattern.get_string()
+        
+        options['pattern'] = self.combobox_pattern.get_value()
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
         options['framerate'] = self.spinbutton_framerate.get_value()
