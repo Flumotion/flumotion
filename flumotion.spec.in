@@ -46,8 +46,8 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/workers
 
 # install service files
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
-install -m 755 doc/random/redhat/flu-manager %{_sysconfdir}/etc/rc.d/init.d
-install -m 755 doc/random/redhat/flu-worker %{_sysconfdir}/etc/rc.d/init.d
+install -m 755 doc/redhat/flu-manager %{_sysconfdir}/etc/rc.d/init.d
+install -m 755 doc/redhat/flu-worker %{_sysconfdir}/etc/rc.d/init.d
 #install -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 
 # create log directory
