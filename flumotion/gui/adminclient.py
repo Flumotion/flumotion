@@ -81,15 +81,12 @@ class PropertyChangeDialog(gtk.Dialog):
         
     def response_cb(self, dialog, response):
         if response == gtk.RESPONSE_APPLY:
-            element = self.element_entry.get_text()
-            property = self.property_entry.get_text()
-            value = self.value_entry.get_text()
-            self.emit('set', element, property, value)
+            self.emit('set', self.element_entry.get_text(),
+                      self.property_entry.get_text(),
+                      value = self.value_entry.get_text())
         elif response == RESPONSE_FETCH:
-            element = self.element_entry.get_text()
-            property = self.property_entry.get_text()
-
-            self.emit('get', element, property)
+            self.emit('get', self.element_entry.get_text(),
+                      self.property_entry.get_text())
         elif response == gtk.RESPONSE_CLOSE:
             dialog.destroy()
 
@@ -136,6 +133,11 @@ class Window(log.Loggable):
         self.component_view.append_column(col)
         
         wtree.signal_autoconnect(self)
+
+        self.icon_playing = self.window.render_icon(gtk.STOCK_YES,
+                                                    gtk.ICON_SIZE_MENU)
+        self.icon_stopped = self.window.render_icon(gtk.STOCK_NO,
+                                                    gtk.ICON_SIZE_MENU)
 
     def get_selected_component(self):
         selection = self.component_view.get_selection()
@@ -222,14 +224,15 @@ class Window(log.Loggable):
         # Make a copy
         clients = orig_clients[:]
         clients.sort()
-        
+
         for client in clients:
             iter = model.append()
-            #model.set(iter, 0, client.name)
-            model.set(iter, 1, client.name)
-            #model.set(iter, 1, client.options['pid'])
-            #model.set(iter, 2, gst.element_state_get_name(client.state))
-            #model.set(iter, 3, client.options['ip'])
+            if client.state == gst.STATE_PLAYING:
+                pixbuf = self.icon_playing
+            else:
+                pixbuf = self.icon_stopped
+            model.set(iter, COL_PIXBUF, pixbuf)
+            model.set(iter, COL_TEXT, client.name)
 
     def close(self, *args):
         reactor.stop()

@@ -10,6 +10,9 @@
 
 2004-09-03  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/gui/adminclient.py: Add an green icon for playing and
+	a red one otherwise.
+
 	* flumotion/server/controller.py: Make user interface work again
 
 2004-09-02  Johan Dahlin  <johan@gnome.org>

@@ -370,6 +370,10 @@ class ComponentRegistry(log.Loggable):
             return True
 
         files = self.getFileList(root)
+        if not files:
+            self.warning('Empty registry')
+            return True
+        
         max_mtime = max(map(getMTime, files))
         if max_mtime > getMTime(self.filename):
             return True
