@@ -69,7 +69,6 @@ flumotion/component/videotest/Makefile
 flumotion/config/Makefile
 flumotion/config/installed.py
 flumotion/config/uninstalled.py
-flumotion/gui/Makefile
 flumotion/manager/Makefile
 flumotion/twisted/Makefile
 flumotion/utils/Makefile

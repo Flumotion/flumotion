@@ -1,5 +1,17 @@
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-admin.in:
+	* configure.ac:
+	* flumotion/Makefile.am:
+	* flumotion/admin/adminclient.py:
+	* flumotion/gui/adminclient.py:
+	* flumotion/gui/admininterface.py:
+	* flumotion/gui/streamclient.py:
+	* flumotion/manager/manager.py:
+	  move gui to admin
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* TODO:
 	* doc/reference/Makefile.am:
 	* flumotion/common/Makefile.am:

@@ -29,7 +29,7 @@ import gtk.glade
 from twisted.internet import reactor
 
 from flumotion import config
-from flumotion.gui.admininterface import AdminInterface
+from flumotion.admin.admininterface import AdminInterface
 from flumotion.manager import admin   # Register types
 from flumotion.common import errors
 from flumotion.utils import log

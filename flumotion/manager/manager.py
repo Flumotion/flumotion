@@ -78,7 +78,7 @@ class Dispatcher(log.Loggable):
         if interfaces.IBaseComponent in ifaces:
             avatar = self.manager.getAvatar(avatarID)
         elif interfaces.IAdminComponent in ifaces:
-            avatar = self.adminheaven.getAvatar()
+            avatar = self.adminheaven.getAvatar(avatarID)
 
         if not avatar:
             raise errors.NoPerspectiveError(avatarID)
