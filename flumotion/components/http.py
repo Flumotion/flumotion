@@ -167,7 +167,7 @@ class HTTPStreamingAdminResource(resource.Resource):
         }
 
 class HTTPStreamingResource(resource.Resource):
-    __reserve_fds__ = 1000 # number of fd's to reserve for non-streaming
+    __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
     def __init__(self, streamer):
         self.logfile = None
             
@@ -381,6 +381,8 @@ class HTTPStreamingResource(resource.Resource):
             return self.handleNewClient(request)
 
 class MultifdSinkStreamer(component.ParseLaunchComponent):
+    # use select for test
+#                                'mode=0 ' + \
     pipe_template = 'multifdsink name=sink ' + \
                                 'buffers-max=500 ' + \
                                 'buffers-soft-max=250 ' + \
