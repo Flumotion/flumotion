@@ -117,6 +117,18 @@ class RegistryEntryBundleDirectory:
     def getFiles(self):
         return self.files
     
+class RegistryEntryBundleFilename:
+    "This class represents a <filename> entry in the registry"
+    def __init__(self, location, relative):
+        self.location = location
+        self.relative = relative
+
+    def getLocation(self):
+        return self.location
+
+    def getRelative(self):
+        return self.relative
+
 class RegistryEntryProperty:
     "This class represents a <property> entry in the registry"
     def __init__(self, name, type, required=False, multiple=False):
@@ -508,10 +520,15 @@ class RegistryParser(log.Loggable):
         
             if not child.hasAttribute('location'):
                 raise XmlParserError("<filename> must have a location attribute")
-
+            
             location = str(child.getAttribute('location'))
-
-            filenames.append(location)
+            
+            if child.hasAttribute('relative'):
+                relative = str(child.getAttribute('relative'))
+            else:
+                relative = location
+                
+            filenames.append(RegistryEntryBundleFilename(location, relative))
 
         return RegistryEntryBundleDirectory(name, filenames)
 
@@ -637,6 +654,7 @@ class ComponentRegistry(log.Loggable):
     def addFile(self, filename, string=None):
         self.debug('Adding file: %s' % filename)
         self._parser.parseRegistryFile(filename, string)
+        print self._parser._bundles
         
     def addFromString(self, string):
         self.addFile('<string>', string)
@@ -746,7 +764,8 @@ class ComponentRegistry(log.Loggable):
                 for dir in dirs:
                     w(8, '<directory name="%s">' % dir.getName())
                     for filename in dir.getFiles():
-                        w(10, '<filename location="%s"/>' % filename)
+                        w(10, '<filename location="%s" relative="%s"/>' % (filename.getLocation(),
+                                                                           filename.getRelative()))
                     w(8, '</directory>')
                 w(6, '</directories>')
                 

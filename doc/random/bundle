@@ -43,7 +43,7 @@ I'd suggest that a bundle is specified in the xml file, for instance:
     <bundle name="glade-videotest">
       <directoies>
         <directory name="flumotion/components/producers/videotest">
-          <filename location="gtk/videotest.glade/>
+          <filename location="gtk/videotest.glade" relative="gtk/videotest.glade"/>
         </directory>
       </directoies>
     </bundle>

@@ -1,5 +1,26 @@
 2004-11-26  Johan Dahlin  <johan@gnome.org>
 
+	* doc/random/bundle:
+	* flumotion/common/registry.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_registry.py:
+
+	Add relative paths. (and add tests for this)
+	Add an example bundle to the http streamer.
+	Add a bundle basket in the vishnu that reads all bundles
+	from the registry
+	
+2004-11-26  Johan Dahlin  <johan@gnome.org>
+
+	reviewed by: <delete if not using a buddy>
+
+	* flumotion/common/registry.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/manager/manager.py:
+
+2004-11-26  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/common/registry.py:
 	* flumotion/test/test_registry.py:
 	* doc/random/bundle: 

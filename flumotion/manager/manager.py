@@ -30,14 +30,17 @@ Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 
 __all__ = ['ManagerServerFactory', 'Vishnu']
 
+import os
+
 from twisted.internet import reactor
 from twisted.cred import error
 from twisted.python import components, failure
 from twisted.spread import pb
 from twisted.cred import portal
 
+from flumotion.common import bundle, errors, interfaces, log, registry
+from flumotion.configure import configure
 from flumotion.manager import admin, component, worker
-from flumotion.common import errors, interfaces, log
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 
@@ -133,6 +136,8 @@ class Vishnu(log.Loggable):
     def __init__(self):
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
+        self._setupBundleBasket()
+                    
         self.dispatcher = Dispatcher()
 
         self.workerHeaven = self._createHeaven(interfaces.IWorkerMedium,
@@ -151,6 +156,20 @@ class Vishnu(log.Loggable):
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
         self.factory = pb.PBServerFactory(self.portal)
 
+    def _setupBundleBasket(self):
+        self.bundles = bundle.BundlerBasket()
+
+        for b in registry.registry.getBundles():
+            bundleName = b.getName()
+            self.debug('Adding bundle %s' % bundleName)
+            for d in b.getDirectories():
+                directory = d.getName()
+                for filename in d.getFiles():
+                    fullpath = os.path.join(configure.pythondir, directory,
+                                            filename.getLocation())
+                    relative = filename.getRelative()
+                    self.bundles.add(bundleName, fullpath, relative)
+        
     def _createHeaven(self, interface, klass):
         """
         Create a heaven of the given klass that will send avatars to clients

@@ -12,19 +12,16 @@
         <property name="bouncer" type="string"/>
         <property name="mount_point" type="string"/>
       </properties>
-  <!--
-      <ui style="gtk" type="control">
-        <file source="gtk.py">
-        <file source="http.glade">
-      </ui>
-
-      <bundle name="http-streamer-admin-gtk">
-        <directory name=flumotion/components/consumers/httpstreamer">
-          <filename location="http.glade" />
-          <filename location="gtk.py" />
-        </directory>
-      </bundle>
-  -->
     </component>
   </components>
+  <bundles>
+    <bundle name="http-streamer-admin-gtk">
+      <directories>
+        <directory name="flumotion/component/consumers/httpstreamer">
+          <filename location="http.glade" />
+          <filename location="gtk.py" relative="foo/gtk.py"/>
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
 </registry> 

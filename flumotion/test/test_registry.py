@@ -194,7 +194,7 @@ class TestRegistry(unittest.TestCase):
       </dependencies>
       <directories>
         <directory name="/tmp">
-          <filename location="loc"/>
+          <filename location="loc" relative="lob"/>
         </directory>
         <directory name="foobie">
           <filename location="barie"/>
@@ -232,10 +232,10 @@ class TestRegistry(unittest.TestCase):
       </dependencies>
       <directories>
         <directory name="/tmp">
-          <filename location="loc"/>
+          <filename location="loc" relative="lob"/>
         </directory>
         <directory name="foobie">
-          <filename location="barie"/>
+          <filename location="barie" relative="barie"/>
         </directory>
       </directories>
     </bundle>
