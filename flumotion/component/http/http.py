@@ -90,14 +90,14 @@ class HTTPClientKeycard:
         return self.request.getClientIP()
 
 def format_bytes(bytes):
-    'nicely format number of bytes'
+    'nicely format number of bytes or bits'
     idx = ['P', 'T', 'G', 'M', 'K', '']
     value = float(bytes)
     l = idx.pop()
     while idx and value >= 1024:
         l = idx.pop()
         value /= 1024
-    return "%.2f %sB" % (value, l)
+    return "%.2f %s" % (value, l)
 
 def format_time(time):
     'nicely format time'
@@ -114,7 +114,7 @@ def format_time(time):
     m = time / 60
     time %= 60
     s = time
-    display.append('%02d:%02d:%02d' % (h, m, s))
+    display.append('%02d:%02d' % (h, m))
     return " ".join(display)
     
 # implements a Resource for the HTTP admin interface
@@ -267,8 +267,8 @@ class Stats:
 
         s['stream-mime'] = c.get_mime()
         s['stream-uptime'] = format_time(uptime)
-        s['stream-bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
-        s['stream-totalbytes'] = format_bytes(bytes_received)
+        s['stream-bitrate'] = format_bytes(bytes_received  * 8 / uptime) + 'b/sec'
+        s['stream-totalbytes'] = format_bytes(bytes_received) + 'B'
 
         s['clients-current'] = str(c.getClients())
         s['clients-max'] = str(c.getMaxClients())
@@ -276,8 +276,8 @@ class Stats:
         s['clients-peak-time'] = time.ctime(c.getPeakEpoch())
         s['clients-average'] = str(int(c.getAverageClients()))
 
-        s['consumption-bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
-        s['consumption-totalbytes'] = format_bytes(bytes_sent)
+        s['consumption-bitrate'] = format_bytes(bytes_sent  * 8 / uptime) + 'b/sec'
+        s['consumption-totalbytes'] = format_bytes(bytes_sent) + 'B'
 
         return s
     

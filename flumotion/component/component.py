@@ -177,7 +177,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
         import flumotion.utils
         rebuild(sys.modules['flumotion.utils'])
         try:
-            flumotion.utils.reload()
+            flumotion.utils.reload.reload()
         except SyntaxError, msg:
             raise errors.ReloadSyntaxError(msg)
         self._reloaded()

@@ -27,6 +27,7 @@ This module provides utility functions for Flumotion.
 import sys
 from twisted.python.rebuild import rebuild
 from flumotion.utils import log
+
 def reload():
     """Properly reload all flumotion-related modules currently loaded."""
     _ignore = (
