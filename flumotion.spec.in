@@ -156,6 +156,7 @@ fi
 %{_bindir}/flumotion-tester
 %{_sbindir}/flumotion
 %{_libdir}/flumotion
+%{_libdir}/pkgconfig/flumotion.pc
 %{_datadir}/flumotion
 %dir %attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
 %attr(750,flumotion,root) %{_sysconfdir}/flumotion
