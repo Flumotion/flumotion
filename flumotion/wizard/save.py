@@ -225,13 +225,12 @@ class WizardSaver:
 
         self.handleConsumers(muxer, components)
 
-        s = '<planet>'
-        
-        s += '  <atmosphere>'
+        s = '<planet>\n'
+        s += '  <atmosphere>\n'
         for component in components:
             s += component.toXML()
-        s += '  </atmosphere>'
-        s += '</planet>'
+        s += '  </atmosphere>\n'
+        s += '</planet>\n'
 
         return s
 
