@@ -1,3 +1,10 @@
+2005-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/manager/admin.py:
+	  change more functions to act on state instead of name
+	  remove deprecated functions
+
 2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:

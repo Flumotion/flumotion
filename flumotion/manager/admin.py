@@ -133,25 +133,6 @@ class AdminAvatar(base.ManagerAvatar):
             self.warning("exception on remote call: %s" % str(e))
             return failure.Failure(errors.RemoteMethodError(str(e)))
         
-    # FIXME: deprecate both of these
-    def perspective_setComponentElementProperty(self, componentName, element, property, value):
-        """Set a property on an element in a component."""
-        component = self.vishnu.componentHeaven.getComponent(componentName)
-        try:
-            return component.setElementProperty(element, property, value)
-        except errors.PropertyError, exception:
-            self.warning(str(exception))
-            raise
-
-    def perspective_getComponentElementProperty(self, componentName, element, property):
-        """Get a property on an element in a component."""
-        component = self.vishnu.componentHeaven.getComponent(componentName)
-        try:
-            return component.getElementProperty(element, property)
-        except errors.PropertyError, exception:
-            self.warning(str(exception))
-            raise
-
     def perspective_getEntryByType(self, componentState, type):
         """
         Get the entry point for a piece of bundled code by the type.
@@ -184,15 +165,17 @@ class AdminAvatar(base.ManagerAvatar):
             filename, entry.function))
         return (filename, entry.function)
 
-    def perspective_reloadComponent(self, componentName):
+    def perspective_reloadComponent(self, componentState):
         """Reload modules in the given component."""
         def _reloaded(result, self, name):
             self.info("reloaded component %s code" % name)
 
-        self.info("reloading component %s code" % componentName)
-        avatar = self.vishnu.componentHeaven.getComponent(componentName)
+        name = componentState.get('name')
+        self.info("reloading component %s code" % name)
+        m = self.vishnu.getComponentMapper(componentState)
+        avatar = m.avatar
         d = avatar.reloadComponent()
-        d.addCallback(_reloaded, self, componentName)
+        d.addCallback(_reloaded, self, name)
         return d
 
     def perspective_reloadManager(self):

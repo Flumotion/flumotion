@@ -350,18 +350,18 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         return failure
 
     ## component remote methods
-    def setProperty(self, component, element, property, value):
+    def setProperty(self, componentState, element, property, value):
         """
-        @type  component: L{flumotion.common.planet.AdminComponentState}
+        @type  componentState: L{flumotion.common.planet.AdminComponentState}
         """
-        return self.componentCallRemote(component, 'setElementProperty',
+        return self.componentCallRemote(componentState, 'setElementProperty',
                                         element, property, value)
 
-    def getProperty(self, component, element, property):
+    def getProperty(self, componentState, element, property):
         """
-        @type  component: L{flumotion.common.planet.AdminComponentState}
+        @type  componentState: L{flumotion.common.planet.AdminComponentState}
         """
-        return self.componentCallRemote(component, 'getElementProperty',
+        return self.componentCallRemote(componentState, 'getElementProperty',
                                         element, property)
 
     ## reload methods for everything
@@ -399,23 +399,22 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         d.addErrback(self._defaultErrback)
         return d
 
-    def reloadComponent(self, name):
+    def reloadComponent(self, componentState):
         """
         Tell the manager to reload code for a component.
 
-        @type name: string
-        @param name: name of the component to reload.
+        @type  componentState: L{flumotion.common.planet.AdminComponentState}
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        def _reloaded(result, self, component):
-            self.info("reloaded component %s code" % component.get('name'))
+        def _reloaded(result, self, state):
+            self.info("reloaded component %s code" % state.get('name'))
 
+        name = componentState.get('name')
         self.info("reloading component %s code" % name)
         self.emit('reloading', name)
-        d = self.remote.callRemote('reloadComponent', name)
-        component = self._components[name]
-        d.addCallback(_reloaded, self, component)
+        d = self.remote.callRemote('reloadComponent', componentState)
+        d.addCallback(_reloaded, self, componentState)
         d.addErrback(self._defaultErrback)
         return d
 
