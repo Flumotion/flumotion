@@ -30,7 +30,7 @@ from flumotion.common import log
 class FakeComponentAvatar(log.Loggable):
     ### since we fake out componentavatar, eaters need to be specified fully
     ### for the tests, ie sourceComponentName:feedName
-    def __init__(self, name='fake', eaters=[], port=-1, listen_host='listen-host'):
+    def __init__(self, name='fake', eaters=[], port=-1, listen_host='127.0.0.1'):
         self.name = name
         self.eaters = eaters
         self.port = port
@@ -45,15 +45,12 @@ class FakeComponentAvatar(log.Loggable):
     def getEaters(self):
         return self.eaters
     
-    def getListenHost(self):
+    def getClientAddress(self):
         return self.listen_host
 
     def getListenPort(self, *args):
         return self.port
     
-    def getTransportPeer(self):
-        return 0, '127.0.0.1', 0
-
     def getName(self):
         return self.name
 
@@ -70,7 +67,7 @@ class TestComponentHeaven(unittest.TestCase):
 
     def testComponentIsLocal(self):
         a = FakeComponentAvatar()
-        self.heaven._addComponentAvatar(a)
+        self.heaven.avatars['test'] = a
         assert self.heaven._componentIsLocal(a)
         
     def testGetComponent(self):
@@ -84,17 +81,11 @@ class TestComponentHeaven(unittest.TestCase):
         assert not self.heaven.hasComponent('prod')
         self.assertRaises(KeyError, self.heaven.removeComponent, a)
         
-    def testAddComponent(self):
-        a = FakeComponentAvatar('fake')
-        self.heaven._addComponentAvatar(a)
-        assert self.heaven.hasComponent('fake')
-        self.assertRaises(KeyError, self.heaven._addComponentAvatar, a)
-        
     def testRemoveComponent(self):
         assert not self.heaven.hasComponent('fake')
         a = FakeComponentAvatar('fake')
         self.assertRaises(KeyError, self.heaven.removeComponent, a)
-        self.heaven._addComponentAvatar(a)
+        self.heaven.avatars['fake'] = a
         assert self.heaven.hasComponent('fake')
         self.heaven.removeComponent(a)
         assert not self.heaven.hasComponent('fake')
@@ -102,16 +93,16 @@ class TestComponentHeaven(unittest.TestCase):
 
     def testComponentEatersEmpty(self):
         a = FakeComponentAvatar('fake')
-        self.heaven._addComponentAvatar(a)
+        self.heaven.avatars['fake'] = a
         assert self.heaven._getComponentEatersData(a) == []
         
     def testComponentsEaters(self):
         a = FakeComponentAvatar('foo', ['bar:default', 'baz:default'])
-        self.heaven._addComponentAvatar(a)
+        self.heaven.avatars['foo'] = a
         a2 = FakeComponentAvatar('bar', port=1000, listen_host='bar-host')
-        self.heaven._addComponentAvatar(a2)
+        self.heaven.avatars['bar'] = a2
         a3 = FakeComponentAvatar('baz', port=1001, listen_host='baz-host')
-        self.heaven._addComponentAvatar(a3)
+        self.heaven.avatars['baz'] = a3
 
         self.heaven._feederSet.addFeeders(a2)
         self.heaven._feederSet.addFeeders(a3)

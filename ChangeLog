@@ -1,3 +1,15 @@
+2004-11-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/bundle.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_manager.py:
+	* flumotion/worker/config.py:
+	* flumotion/worker/main.py:
+	  Common base class for heaven and avatar.  Fixes #13
+
 2004-11-26  Johan Dahlin  <johan@gnome.org>
 
 	* doc/random/bundle:

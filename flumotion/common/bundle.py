@@ -222,7 +222,7 @@ class BundlerBasket:
         """
         Add files to the bundler basket for the given bundle.
         
-        @param bundleNmae: the name of the bundle this file is a part of
+        @param bundleName: the name of the bundle this file is a part of
         @param source: the path to the file to add to the bundle
         @param destination: a relative path to store this file in in the bundle.
         If unspecified, this will be stored in the top level

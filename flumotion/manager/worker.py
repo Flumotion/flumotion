@@ -28,13 +28,14 @@ import socket
 
 from twisted.spread import pb
 
+from flumotion.manager import common
 from flumotion.common import errors, interfaces, log
 from flumotion.common.config import FlumotionConfigXML
 
-class WorkerAvatar(pb.Avatar, log.Loggable):
+class WorkerAvatar(common.ManagerAvatar):
     """
     I am an avatar created for a worker.
-    A reference to me is given when logging in and requesting an "worker" avatar.
+    A reference to me is given when logging in and requesting a worker avatar.
     I live in the manager.
     """
     
@@ -42,22 +43,14 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
 
     logCategory = 'worker-avatar'
 
-    def __init__(self, heaven, avatarId):
-        self.heaven = heaven
-        self.avatarId = avatarId
-
     def getName(self):
         return self.avatarId
 
     def attached(self, mind):
-        self.debug('attached %r' % mind)
-        self.mind = mind
+        common.ManagerAvatar.attached(self, mind)
 
         self.heaven.workerAttached(self)
     
-    def detached(self, mind):
-        self.debug('detached %r' % mind)
-        
     def start(self, name, type, config):
         """
         Start a component of the given type with the given config.
@@ -69,13 +62,11 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         @param config: a configuration dictionary for the component
         @type config:  dict
         """
-        self.debug('starting %s on %s with config %r' % (name, self.avatarId, config))
-        return self.mind.callRemote('start', name, type, config)
+        self.debug('starting %s on %s with config %r' % (name, self.avatarId,
+            config))
+        return self.mindCallRemote('start', name, type, config)
 
-    def callRemoteMethod(self, remoteMethod, *args, **kwargs):
-        return self.mind.callRemote(remoteMethod, *args, **kwargs)
-    
-class WorkerHeaven(pb.Root, log.Loggable):
+class WorkerHeaven(common.ManagerHeaven):
     """
     I interface between the Manager and worker clients.
     For each worker client I create an L{WorkerAvatar} to handle requests.
@@ -83,38 +74,14 @@ class WorkerHeaven(pb.Root, log.Loggable):
     """
     
     logCategory = "workerheaven"
-    __implements__ = interfaces.IHeaven
+    avatarClass = WorkerAvatar
     
     def __init__(self, vishnu):
-        """
-        @type vishnu: L{flumotion.manager.manager.Vishnu}
-        @param vishnu: the Vishnu object
-        """
-        self._avatars = {} # avatarId -> WorkerAvatar
+        common.ManagerHeaven.__init__(self, vishnu)
         self.conf = None
-        self.vishnu = vishnu
         
-    ### IHeaven methods
-
-    def createAvatar(self, avatarId):
-        avatar = WorkerAvatar(self, avatarId)
-        self._avatars[avatarId] = avatar
-        self.debug('WorkerAvatar %s created' % avatarId)
-        return avatar
-
-    def removeAvatar(self, avatarId):
-        if avatarId in self._avatars:
-            del self._avatars[avatarId]
-
     ### my methods
 
-    # XXX: Move to IHeaven?
-    def getAvatars(self):
-        return self._avatars.values()
-
-    def getAvatar(self, avatarId):
-        return self._avatars[avatarId]
-        
     def loadConfiguration(self, filename, string=None):
         # XXX: Merge?
         self.conf = FlumotionConfigXML(filename, string)
@@ -172,15 +139,15 @@ class WorkerHeaven(pb.Root, log.Loggable):
         @type  config:        dict
         """
 
-        if not self._avatars:
+        if not self.avatars:
             raise AttributeError()
 
         if workerName:
-            avatar = self._avatars[workerName]
+            avatar = self.avatars[workerName]
         else:
             # XXX: Do we really want to keep this big hack?
             # eg, if we don't select a worker, just pick the first one.
-            avatar = self._avatars.values()[0]
+            avatar = self.avatars.values()[0]
 
         self.info('Starting component "%s" on worker "%s"' % (
             componentName, workerName))

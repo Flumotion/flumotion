@@ -33,6 +33,7 @@ __all__ = ['ComponentAvatar', 'ComponentHeaven']
 import gst
 from twisted.spread import pb
 
+from flumotion.manager import common
 from flumotion.common import errors, interfaces, keycards, log
 from flumotion.utils import gstutils
 
@@ -107,9 +108,9 @@ class Feeder:
         self.component.debug('Feeder.setReady() on feeder %s' % self.getName())
         self.ready = True
 
-        for eatername in self.dependencies.keys():
-            for func, args in self.dependencies[eatername]:
-                self.component.debug('running dependency function %r with args %r for eater from %s' % (func, args, eatername))
+        for eaterName in self.dependencies.keys():
+            for func, args in self.dependencies[eaterName]:
+                self.component.debug('running dependency function %r with args %r for eater from %s' % (func, args, eaterName))
                 func(*args)
                 
         self.dependencies = {}
@@ -128,7 +129,7 @@ class Feeder:
 
     def getListenHost(self):
         assert self.component
-        return self.component.getListenHost()
+        return self.component.getClientAddress()
 
     def getListenPort(self):
         assert self.component
@@ -232,8 +233,7 @@ class FeederSet(log.Loggable):
             self.debug('feeder %s is ready, executing function %r' % (feederName, func))
             func(componentAvatar)
 
-# FIXME: maybe add type to constructor ? or subclass ?
-class ComponentAvatar(pb.Avatar, log.Loggable):
+class ComponentAvatar(common.ManagerAvatar):
     """
     Manager-side avatar for a component.
     Each component that logs in to the manager gets an avatar created for it
@@ -242,10 +242,9 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
 
     logCategory = 'comp-avatar'
 
-    def __init__(self, heaven, username):
-        self.heaven = heaven
-        self.vishnu = heaven.vishnu
-        self.username = username
+    def __init__(self, heaven, avatarId):
+        common.ManagerAvatar.__init__(self, heaven, avatarId)
+        
         self.state = gst.STATE_NULL
         self.options = Options()
         self.ports = {} # feedName -> port
@@ -263,17 +262,6 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return self.getName() + ': ' + arg
 
     ### ComponentAvatar methods
-
-    # mind functions
-    def _mindCallRemote(self, name, *args, **kwargs):
-        self.debug('calling remote method %s%r' % (name, args))
-        try:
-            return self.mind.callRemote(name, *args, **kwargs)
-        except pb.DeadReferenceError:
-            self.warning('pb.DeadReferenceError on remote method %s' % name)
-            self.mind = None
-            self.detached()
-            return
 
     # general fallback for unhandled errors so we detect them
     # FIXME: we can't use this since we want a PropertyError to fall through
@@ -295,6 +283,15 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         print "Ignore the following Traceback line, issue in Twisted"
         return failure
 
+    def attached(self, mind):
+        common.ManagerAvatar.attached(self, mind)
+        self.debug('mind %r attached, calling remote register()' % mind)
+        
+        d = self.mindCallRemote('register')
+        d.addCallback(self._mindRegisterCallback)
+        d.addErrback(self._mindPipelineErrback)
+        d.addErrback(self._mindErrback)
+
     def _mindRegisterCallback(self, options): 
         # called after the mind has attached.  options is a dict passed in from
         # flumotion.component.component's remote_register
@@ -308,42 +305,10 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
     def _mindPipelineErrback(self, failure):
         failure.trap(errors.PipelineParseError)
         self.error('Invalid pipeline for component')
-        self._mindCallRemote('stop')
+        self.mindCallRemote('stop')
         return None
 
-    def attached(self, mind):
-        """
-        Tell the avatar that the given mind has been attached.
-        This gives the avatar a way to call remotely to the client that
-        requested this avatar.
-        This is scheduled by the portal after the client has logged in.
-
-        @type mind: L{twisted.spread.pb.RemoteReference}
-        @param mind: a remote reference into the component
-        """
-        self.debug('mind %r attached, calling remote register()' % mind)
-        self.mind = mind
         
-        d = self._mindCallRemote('register')
-        d.addCallback(self._mindRegisterCallback)
-        d.addErrback(self._mindPipelineErrback)
-        d.addErrback(self._mindErrback)
-        
-    def detached(self, mind=None):
-        """
-        Tell the avatar that the given mind has been detached.
-
-        @type mind: L{twisted.spread.pb.RemoteReference}
-        """
-        self.debug('detached')
-
-    # functions
-    def getTransportPeer(self):
-        """
-        Get the IPv4 address of the machine the component runs on.
-        """
-        return self.mind.broker.transport.getPeer()
-
     # FIXME: rename to something like getEaterFeeders()
     def getEaters(self):
         """
@@ -373,21 +338,13 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return self.options.ip
 
     def getName(self):
-        return self.username
+        return self.avatarId
 
-    def getListenHost(self):
-        peer = self.getTransportPeer()
-        try:
-            return peer.host
-        except AttributeError:
-            return peer[1]
-        return self.getTransportPeer()
-   
     def stop(self):
         """
         Tell the avatar to stop the component.
         """
-        d = self._mindCallRemote('stop')
+        d = self.mindCallRemote('stop')
         d.addErrback(lambda x: None)
             
     # FIXME: rename, since it's not GStreamer linking.
@@ -412,7 +369,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         def linkErrback(reason):
             self.error("Could not make component link, reason %s" % reason)
                 
-        d = self._mindCallRemote('link', eatersData, feedersData)
+        d = self.mindCallRemote('link', eatersData, feedersData)
         d.addCallback(linkCallback)
         d.addErrback(linkErrback)
     
@@ -441,10 +398,10 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             raise errors.PropertyError(msg)
         self.debug("setting property '%s' on element '%s'" % (property, element))
         
-        cb = self._mindCallRemote('setElementProperty', element, property, value)
-        cb.addErrback(self._mindPropertyErrback)
-        cb.addErrback(self._mindErrback, errors.PropertyError)
-        return cb
+        d = self.mindCallRemote('setElementProperty', element, property, value)
+        d.addErrback(self._mindPropertyErrback)
+        d.addErrback(self._mindErrback, errors.PropertyError)
+        return d
         
     def getElementProperty(self, element, property):
         """
@@ -468,10 +425,10 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             self.warning(msg)
             raise errors.PropertyError(msg)
         self.debug("getting property %s on element %s" % (element, property))
-        cb = self._mindCallRemote('getElementProperty', element, property)
-        cb.addErrback(self._mindPropertyErrback)
-        cb.addErrback(self._mindErrback, errors.PropertyError)
-        return cb
+        d = self.mindCallRemote('getElementProperty', element, property)
+        d.addErrback(self._mindPropertyErrback)
+        d.addErrback(self._mindErrback, errors.PropertyError)
+        return d
 
     def callComponentRemote(self, method, *args, **kwargs):
         """
@@ -486,9 +443,9 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         @type kwargs: mixed
         """
         self.debug("calling component method %s" % method)
-        cb = self._mindCallRemote('callMethod', method, *args, **kwargs)
-        cb.addErrback(self._mindErrback, Exception)
-        return cb
+        d = self.mindCallRemote('callMethod', method, *args, **kwargs)
+        d.addErrback(self._mindErrback, Exception)
+        return d
 
     def reloadComponent(self):
         """
@@ -502,10 +459,10 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             print "Ignore the following Traceback line, issue in Twisted"
             return failure
 
-        cb = self._mindCallRemote('reloadComponent')
-        cb.addErrback(_reloadComponentErrback)
-        cb.addErrback(self._mindErrback, errors.ReloadSyntaxError)
-        return cb
+        d = self.mindCallRemote('reloadComponent')
+        d.addErrback(_reloadComponentErrback)
+        d.addErrback(self._mindErrback, errors.ReloadSyntaxError)
+        return d
 
     def getUIZip(self, domain, style):
         """
@@ -521,7 +478,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         @rtype: L{twisted.internet.defer.Deferred}
         """
         self.debug('calling remote getUIZip(%s, %s)' % (domain, style))
-        d = self._mindCallRemote('getUIZip', domain, style)
+        d = self.mindCallRemote('getUIZip', domain, style)
         d.addErrback(self._mindErrback)
         return d
 
@@ -539,9 +496,9 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         @rtype: L{twisted.internet.defer.Deferred}
         """
         self.debug('calling remote getUIMD5Sum(%s, %s)' % (domain, style))
-        cb = self._mindCallRemote('getUIMD5Sum', domain, style)
-        cb.addErrback(self._mindErrback)
-        return cb
+        d = self.mindCallRemote('getUIMD5Sum', domain, style)
+        d.addErrback(self._mindErrback)
+        return d
     
     # FIXME rename to something that reflects an action, like startFeedIfReady
     def checkFeedReady(self, feedName):
@@ -566,7 +523,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
 
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
     def authenticate(self, keycard):
-        d = self._mindCallRemote('authenticate', keycard)
+        d = self.mindCallRemote('authenticate', keycard)
         d.addErrback(self._mindErrback)
         return d
 
@@ -576,7 +533,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         has gone.
         """
         self.debug('remotecalling removeKeycard with id %s' % keycardId)
-        d = self._mindCallRemote('removeKeycard', keycardId)
+        d = self.mindCallRemote('removeKeycard', keycardId)
         d.addErrback(self._mindErrback)
         return d
 
@@ -586,7 +543,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         to.
         """
         self.debug('remotecalling expireKeycard with id %s' % keycardId)
-        d = self._mindCallRemote('expireKeycard', keycardId)
+        d = self.mindCallRemote('expireKeycard', keycardId)
         d.addErrback(self._mindErrback)
         return d
 
@@ -654,12 +611,14 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         componentAvatar = self.heaven.getComponent(requesterName)
         return componentAvatar.expireKeycard(keycardId)
 
-class ComponentHeaven(pb.Root, log.Loggable):
+class ComponentHeaven(common.ManagerHeaven):
     """
     I handle all registered components and provide avatars for them.
     """
 
     __implements__ = interfaces.IHeaven
+    avatarClass = ComponentAvatar
+
     logCategory = 'comp-heaven'
     
     def __init__(self, vishnu):
@@ -667,55 +626,26 @@ class ComponentHeaven(pb.Root, log.Loggable):
         @type vishnu:  L{flumotion.manager.manager.Vishnu}
         @param vishnu: the Vishnu object this heaven belongs to
         """
-        self.avatars = {} # componentName -> componentAvatar
+        common.ManagerHeaven.__init__(self, vishnu)
         self._feederSet = FeederSet()
-        self.vishnu = vishnu
         
     ### IHeaven methods
-    def createAvatar(self, avatarId):
-        """
-        Creates a new avatar for a component.
-        Raises an AlreadyConnectedError if the component is already found
-        in the cache.
-        
-        @type avatarId:  string
-
-        @rtype:          L{flumotion.manager.component.ComponentAvatar}
-        @returns:        the avatar for the component
-        """
-        self.log('createAvatar(%s)' % avatarId)
-        if self.hasComponent(avatarId):
-            raise errors.AlreadyConnectedError(avatarId)
-
-        avatar = ComponentAvatar(self, avatarId)
-        self._addComponentAvatar(avatar)
-        return avatar
-
     def removeAvatar(self, avatarId):
-        self.log('removeAvatar(%s)' % avatarId)
-        if not self.hasComponent(avatarId):
-            raise KeyError, avatarId
-
         avatar = self.avatars[avatarId]
-        del self.avatars[avatarId]
-
         self._feederSet.removeFeeders(avatar)
-        
         self.vishnu.adminHeaven.componentRemoved(avatar)
+        
+        common.ManagerHeaven.removeAvatar(self, avatarId)
     
     ### our methods
     def _componentIsLocal(self, componentAvatar):
-        peer = componentAvatar.getTransportPeer()
-        try:
-            host = peer.host
-        except AttributeError:
-            host = peer[1]
-
+        host = componentAvatar.getClientAddress()
         if host == '127.0.0.1':
             return True
         else:
             return False
 
+    # FIXME: move to base class ?
     def getComponent(self, name):
         """
         Look up a ComponentAvatar by name.
@@ -745,20 +675,6 @@ class ComponentHeaven(pb.Root, log.Loggable):
         
         return self.avatars.has_key(name)
     
-    def _addComponentAvatar(self, componentAvatar):
-        """
-        Adds a component avatar.
-
-        @type componentAvatar: L{flumotion.manager.component.ComponentAvatar}
-        @param componentAvatar: the component avatar
-        """
-
-        componentName = componentAvatar.getName()
-        if self.hasComponent(componentName):
-            raise KeyError, componentName
-            
-        self.avatars[componentName] = componentAvatar
-        
     def removeComponent(self, componentAvatar):
         """
         Remove a component from the heaven.
@@ -807,7 +723,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         @returns:         name and host
         """
 
-        host = componentAvatar.getListenHost()
+        host = componentAvatar.getClientAddress()
         feeders = componentAvatar.getFeeders()
         retval = []
         for feeder in feeders:

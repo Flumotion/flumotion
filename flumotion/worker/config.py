@@ -159,6 +159,7 @@ class WorkerConfigXML(log.Loggable):
         return ConfigEntryAuthentication(username, password)
         
     def parseFeederports(self, node):
+        # returns a list of allowed port numbers
         # <feederports>[lower]-[upper]</feederports>
 
         value = str(node.firstChild.nodeValue)

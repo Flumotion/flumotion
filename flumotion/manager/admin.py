@@ -27,6 +27,7 @@ Manager-side objects to handle administrative clients.
 from twisted.internet import reactor
 from twisted.spread import pb
 
+from flumotion.manager import common
 from flumotion.common import errors, interfaces, log
 
 class ComponentView(pb.Copyable):
@@ -65,7 +66,7 @@ class RemoteComponentView(pb.RemoteCopy):
 pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?
-class AdminAvatar(pb.Avatar, log.Loggable):
+class AdminAvatar(common.ManagerAvatar):
     """
     I am an avatar created for an administrative client interface.
     A reference to me is given (for example, to gui.AdminInterface)
@@ -73,42 +74,13 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     I live in the manager.
     """
     logCategory = 'admin-avatar'
-    def __init__(self, heaven, avatarId):
-        """
-        @type heaven: L{flumotion.manager.admin.AdminHeaven}
-        """
-        self.heaven = heaven
-        self.workerHeaven = heaven.vishnu.workerHeaven
-        self.componentHeaven = heaven.vishnu.componentHeaven
+       
+    # override base methods
+    def attached(self, mind):
+        common.ManagerAvatar.attached(self, mind)
+        self.mindCallRemote('initial', self.getComponents(), self.getWorkers())
 
-        self.mind = None
-        self.avatarId = avatarId
-        self.debug("created new AdminAvatar with id %s" % avatarId)
-        
-    def hasRemoteReference(self):
-        """
-        Check if the avatar has a remote reference to the peer.
-
-        @rtype: boolean
-        """
-        return self.mind != None
-    
-    def _mindCallRemote(self, name, *args, **kwargs):
-        if not self.hasRemoteReference():
-            self.warning("Can't call remote method %s, no mind" % name)
-            return
-        
-        # we can't do a .debug here, since it will trigger a resend of the
-        # debug message as well, causing infinite recursion !
-        # self.debug('Calling remote method %s%r' % (name, args))
-        try:
-            return self.mind.callRemote(name, *args, **kwargs)
-        except pb.DeadReferenceError:
-            mind = self.mind
-            self.mind = None
-            self.warning("mind %s is a dead reference, removing" % mind)
-            return
-        
+    # my methods
     def getComponents(self):
         """
         Return all components logged in to the manager.
@@ -116,7 +88,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @rtype: C{list} of L{flumotion.manager.admin.ComponentView}
         """
         # FIXME: should we use an accessor to get at components from c ?
-        components = map(ComponentView, self.componentHeaven.avatars.values())
+        components = map(ComponentView, self.vishnu.componentHeaven.avatars.values())
         return components
 
     def getWorkers(self):
@@ -127,7 +99,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         """
 
         return [worker.getName()
-                    for worker in self.workerHeaven.getAvatars()]
+                    for worker in self.vishnu.workerHeaven.getAvatars()]
 
     def sendLog(self, category, type, message):
         """
@@ -136,57 +108,29 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         # don't send if we don't have a remote reference yet.
         # this avoids recursion from the remote caller trying to warn
         if self.hasRemoteReference():
-            self._mindCallRemote('log', category, type, message)
+            self.mindCallRemote('log', category, type, message)
         
     def componentAdded(self, component):
         """
         Tell the avatar that a component has been added.
         """
         self.debug("AdminAvatar.componentAdded: %s" % component)
-        self._mindCallRemote('componentAdded', ComponentView(component))
+        self.mindCallRemote('componentAdded', ComponentView(component))
         
     def componentStateChanged(self, component, state):
         self.debug("AdminAvatar.componentStateChanged: %s %s" % (component, state))
-        self._mindCallRemote('componentStateChanged', ComponentView(component), state)
+        self.mindCallRemote('componentStateChanged', ComponentView(component), state)
 
     def componentRemoved(self, component):
         """
         Tell the avatar that a component has been removed.
         """
         self.debug("AdminAvatar.componentRemoved: %s" % component)
-        self._mindCallRemote('componentRemoved', ComponentView(component))
+        self.mindCallRemote('componentRemoved', ComponentView(component))
 
     def uiStateChanged(self, name, state):
         self.debug("AdminAvatar.uiStateChanged: %s %s" % (name, state))
-        self._mindCallRemote('uiStateChanged', name, state)
-
-    def attached(self, mind):
-        """
-        Give the avatar a remote reference to the
-        peer's client that logged in and requested the avatar.
-        Also make the avatar send the initial clients to the peer.
-
-        @type mind: L{twisted.spread.pb.RemoteReference}
-        """
-        self.mind = mind
-        ip = self.mind.broker.transport.getPeer().host
-        self.debug('Client from %s attached, sending client components' % ip)
-        self.log('Client attached is mind %s' % mind)
-
-        self._mindCallRemote('initial',
-                             self.getComponents(),
-                             self.getWorkers())
-
-    def detached(self, mind):
-        """
-        Tell the avatar that the peer's client referenced by the mind
-        has detached.
-        """
-        assert(self.mind == mind)
-        ip = self.mind.broker.transport.getPeer().host
-        self.mind = None
-        self.debug('Client from %s detached' % ip)
-        self.log('Client detached is mind %s' % mind)
+        self.mindCallRemote('uiStateChanged', name, state)
 
     ### pb.Avatar IPerspective methods
     def perspective_shutdown(self):
@@ -197,7 +141,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     # Generic interface to call into a component
     def perspective_callComponentRemote(self, componentName, method_name,
                                         *args, **kwargs):
-        component = self.componentHeaven.getComponent(componentName)
+        component = self.vishnu.componentHeaven.getComponent(componentName)
         
         # XXX: Maybe we need to a prefix, so we can limit what an admin interface
         #      can call on a component
@@ -220,19 +164,19 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @param methodName: the method to call on the worker.
         """
         
-        workerAvatar = self.workerHeaven.getAvatar(workerName)
+        workerAvatar = self.vishnu.workerHeaven.getAvatar(workerName)
         
         # XXX: Maybe we need to a prefix, so we can limit what an admin interface
         #      can call on a worker
         try:
-            return workerAvatar.callRemoteMethod(methodName, *args, **kwargs)
+            return workerAvatar.mindCallRemote(methodName, *args, **kwargs)
         except Exception, e:
             self.warning(str(e))
             raise
         
     def perspective_setComponentElementProperty(self, componentName, element, property, value):
         """Set a property on an element in a component."""
-        component = self.componentHeaven.getComponent(componentName)
+        component = self.vishnu.componentHeaven.getComponent(componentName)
         try:
             return component.setElementProperty(element, property, value)
         except errors.PropertyError, exception:
@@ -241,7 +185,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
 
     def perspective_getComponentElementProperty(self, componentName, element, property):
         """Get a property on an element in a component."""
-        component = self.componentHeaven.getComponent(componentName)
+        component = self.vishnu.componentHeaven.getComponent(componentName)
         try:
             return component.getElementProperty(element, property)
         except errors.PropertyError, exception:
@@ -257,7 +201,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type  style:  string
         @param style:  the style of the user interface to get the zip for
         """
-        component = self.componentHeaven.getComponent(componentName)
+        component = self.vishnu.componentHeaven.getComponent(componentName)
         try:
             return component.getUIZip(domain, style)
         except Exception, e:
@@ -273,7 +217,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type style:  string
         @param style: the style of the user interface to get MD5 sum for
         """
-        component = self.componentHeaven.getComponent(componentName)
+        component = self.vishnu.componentHeaven.getComponent(componentName)
         try:
             return component.getUIMD5Sum(domain, style)
         except Exception, e:
@@ -286,10 +230,10 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             self.info("reloaded component %s code" % name)
 
         self.info("reloading component %s code" % componentName)
-        avatar = self.componentHeaven.getComponent(componentName)
-        cb = avatar.reloadComponent()
-        cb.addCallback(_reloaded, self, componentName)
-        return cb
+        avatar = self.vishnu.componentHeaven.getComponent(componentName)
+        d = avatar.reloadComponent()
+        d.addCallback(_reloaded, self, componentName)
+        return d
 
     def perspective_reloadManager(self):
         """Reload modules in the manager."""
@@ -307,16 +251,16 @@ class AdminAvatar(pb.Avatar, log.Loggable):
 
     def perspective_loadConfiguration(self, xml):
         self.info('loadConfiguration ...')
-        self.workerHeaven.loadConfiguration(None, xml)
+        self.vishnu.workerHeaven.loadConfiguration(None, xml)
 
     def perspective_cleanComponents(self):
-        return self.componentHeaven.shutdown()
+        return self.vishnu.componentHeaven.shutdown()
 
     # separate method so it runs the newly reloaded one :)
     def _reloaded(self):
         self.info('reloaded manager code')
 
-class AdminHeaven(pb.Root, log.Loggable):
+class AdminHeaven(common.ManagerHeaven):
     """
     I interface between the Manager and administrative clients.
     For each client I create an L{AdminAvatar} to handle requests.
@@ -325,14 +269,14 @@ class AdminHeaven(pb.Root, log.Loggable):
 
     logCategory = "admin-heaven"
     __implements__ = interfaces.IHeaven
+    avatarClass = AdminAvatar
 
     def __init__(self, vishnu):
         """
         @type vishnu: L{flumotion.manager.manager.Vishnu}
         @param vishnu: the Vishnu in control of all the heavens
         """
-        self.vishnu = vishnu
-        self.avatars = {} # adminName -> adminAvatar
+        common.ManagerHeaven.__init__(self, vishnu)
         #FIXME: don't add a log handler here until we have a good way
         #of filtering client-side again
         #log.addLogHandler(self.logHandler)
@@ -340,7 +284,7 @@ class AdminHeaven(pb.Root, log.Loggable):
 
     def logHandler(self, category, type, message):
         self.logcache.append((category, type, message))
-        for avatar in self.avatars.values():
+        for avatar in self.getAvatars():
             avatar.sendLog(category, type, message)
 
     def sendCache(self, avatar):
@@ -353,32 +297,6 @@ class AdminHeaven(pb.Root, log.Loggable):
         #for category, type, message in self.logcache:
         #    avatar.sendLog(category, type, message)
         
-    ### IHeaven methods
-
-    def createAvatar(self, avatarId):
-        """
-        Create a new administration avatar and manage it.
-
-        @rtype:   L{flumotion.manager.admin.AdminAvatar}
-        @returns: a new avatar for the admin client.
-        """
-        self.debug('creating new AdminAvatar')
-        avatar = AdminAvatar(self, avatarId)
-        reactor.callLater(0.25, self.sendCache, avatar)
-        
-        self.avatars[avatarId] = avatar
-        return avatar
-
-    def removeAvatar(self, avatarId):
-        """
-        Stop managing the given avatar.
-
-        @type avatarId:  string
-        @param avatarId: id of the avatar to remove
-        """
-        self.debug('removing AdminAvatar with id %s' % avatarId)
-        del self.avatars[avatarId]
-    
     ### my methods
 
     def componentAdded(self, component):
@@ -387,7 +305,7 @@ class AdminHeaven(pb.Root, log.Loggable):
 
         @type component: L{flumotion.manager.component.ComponentAvatar}
         """
-        for avatar in self.avatars.values():
+        for avatar in self.getAvatars():
             avatar.componentAdded(component)
 
     def componentRemoved(self, component):
@@ -396,7 +314,7 @@ class AdminHeaven(pb.Root, log.Loggable):
 
         @type component: L{flumotion.manager.component.ComponentAvatar}
         """
-        for avatar in self.avatars.values():
+        for avatar in self.getAvatars():
             avatar.componentRemoved(component)
             
     def componentStateChanged(self, component, state):
@@ -405,7 +323,7 @@ class AdminHeaven(pb.Root, log.Loggable):
 
         @type component: L{flumotion.manager.component.ComponentAvatar}
         """
-        for avatar in self.avatars.values():
+        for avatar in self.getAvatars():
             avatar.componentStateChanged(component, state)
 
 
@@ -417,6 +335,6 @@ class AdminHeaven(pb.Root, log.Loggable):
         @type state:     new ui state
         """
         
-        for avatar in self.avatars.values():
+        for avatar in self.getAvatars():
             avatar.uiStateChanged(name, state)
         

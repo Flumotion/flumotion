@@ -30,7 +30,7 @@ import time
 from twisted.internet import reactor
 
 from flumotion.configure import configure
-from flumotion.common import log, keycards, common
+from flumotion.common import log, keycards, common, errors
 from flumotion.worker import worker, config
 from flumotion.twisted import credentials
 
@@ -77,13 +77,26 @@ def main(args):
                      default="",
                      help="password to use, - for interactive")
 
+    group.add_option('-F', '--feederports',
+                     action="store", type="string", dest="feederports",
+                     default=None,
+                     help="range of feeder ports to use")
+
     parser.add_option_group(group)
     
     log.debug('worker', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
-    # FIXME: add an option for feederports
-    options.feederports = None
-    
+
+    # translate feederports string to range
+    if options.feederports:
+        if not '-' in options.feederports:
+            raise errors.OptionError("feederports '%s' does not contain '-'" %
+                options.feederports)
+        (lower, upper) = options.feederports.split('-')
+        options.feederports = range(int(lower), int(upper) + 1)
+        log.debug('worker', 'Setting feederports %r' % options.feederports)
+
+ 
     # check if a config file was specified; if so, parse config and copy over
     if len(args) > 1:
         workerFile = args[1]
@@ -115,6 +128,8 @@ def main(args):
             options.password = cfg.authentication.password
             log.debug('worker',
                 'Setting password [%s]' % ("*" * len(options.password)))
+
+        # feederports: list of allowed ports
         if not options.feederports and cfg.feederports:
             options.feederports = cfg.feederports
             log.debug('worker', 'Setting feederports %r' % options.feederports)

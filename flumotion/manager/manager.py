@@ -40,7 +40,7 @@ from twisted.cred import portal
 
 from flumotion.common import bundle, errors, interfaces, log, registry
 from flumotion.configure import configure
-from flumotion.manager import admin, component, worker
+from flumotion.manager import admin, component, worker, common
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 
@@ -124,7 +124,7 @@ class Dispatcher(log.Loggable):
         @type interface:  L{twisted.python.components.Interface}
         @param interface: a component interface to register the heaven with.
         """
-        assert components.implements(heaven, interfaces.IHeaven)
+        assert isinstance(heaven, common.ManagerHeaven)
        
         self._interfaceHeavens[interface] = heaven
 
