@@ -49,7 +49,7 @@ dnl output stuff
 AC_OUTPUT(
 Makefile
 bin/flumotion
-bin/video-server-admin
+bin/flumotion-admin
 bin/Makefile
 data/Makefile
 data/glade/Makefile

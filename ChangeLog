@@ -1,5 +1,12 @@
 2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/Makefile.am:
+	* bin/video-server-admin.in:
+	* configure.ac:
+	  rename video-server-admin to flumotion-admin
+
+2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	* data/Makefile.am:
 	* data/image/fluendo.png:

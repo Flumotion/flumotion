@@ -1,4 +1,4 @@
-bin_SCRIPTS = flumotion video-server-admin
+bin_SCRIPTS = flumotion flumotion-admin
 CLEANFILES = $(bin_SCRIPTS)
 
 all: $(bin_SCRIPTS)
