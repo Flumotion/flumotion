@@ -1,5 +1,11 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/admin.py:
+	* flumotion/manager/manager.py:
+	  change doc crosslinks to match
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/reference/Makefile.am:
 	* flumotion/component/Makefile.am:
 	* flumotion/component/base/converter.py:

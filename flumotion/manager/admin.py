@@ -4,7 +4,7 @@
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
 #
-# admin.py
+# manager/admin.py: manager-side objects to handle administration clients
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ class ComponentView(pb.Copyable):
         self.feeders = component.getFeeders()
         self.options = component.options.dict
 
+# FIXME: move this out to flumotion.admin
 class RemoteComponentView(pb.RemoteCopy):
     """
     I represent state of a component.
@@ -59,6 +60,7 @@ class RemoteComponentView(pb.RemoteCopy):
         return '<RemoteComponentView %s>' % self.name
 pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
 
+# FIXME: rename to Avatar since we are in the admin. namespace ?
 class AdminAvatar(pb.Avatar, log.Loggable):
     """
     I am an avatar created for an administrative client interface.
@@ -67,14 +69,13 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     I live in the manager.
     """
     logCategory = 'admin-avatar'
-    def __init__(self, admin):
-        # FIXME: change Admin to manager.admin.AdminHeaven
+    def __init__(self, heaven):
         """
-        @type admin: L{server.admin.Admin}
+        @type heaven: L{flumotion.manager.admin.AdminHeaven}
         """
-        self.admin = admin
+        self.heaven = heaven
         # FIXME: use accessor to get manager ?
-        self.manager = admin.manager
+        self.manager = heaven.manager
         self.mind = None
         self.debug("created new AdminAvatar")
         
@@ -107,7 +108,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         """
         Return all components logged in to the manager.
         
-        @rtype: C{list} of L{server.admin.ComponentView}
+        @rtype: C{list} of L{flumotion.manager.admin.ComponentView}
         """
         # FIXME: should we use an accessor to get at components from c ?
         clients = map(ComponentView, self.manager.components.values())
@@ -165,7 +166,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         self.mind = None
         self.debug('Client from %s detached' % ip)
         self.log('Client detached is mind %s' % mind)
-        self.admin.removeAvatar(self)
+        self.heaven.removeAvatar(self)
 
     ### pb.Avatar IPerspective methods
     def perspective_shutdown(self):
@@ -238,18 +239,18 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     def _reloaded(self):
         self.info('reloaded manager code')
 
-class Admin(pb.Root, log.Loggable):
+class AdminHeaven(pb.Root, log.Loggable):
     """
     I interface between the Manager and administrative clients.
     For each client I create an L{AdminAvatar} to handle requests.
     I live in the manager.
     """
 
-    logCategory = "admin"
+    logCategory = "admin-heaven"
 
     def __init__(self, manager):
         """
-        @type manager: L{server.manager.Manager}
+        @type manager: L{flumotion.manager.manager.Manager}
         """
         self.manager = manager
         self.clients = [] # all AdminAvatars we instantiate
@@ -273,7 +274,7 @@ class Admin(pb.Root, log.Loggable):
     def getAvatar(self):
         """
         Creates a new administration avatar.
-        @rtype:   L{server.admin.AdminAvatar}
+        @rtype:   L{flumotion.manager.admin.AdminAvatar}
         @returns: a new avatar for the admin client.
         """
         self.debug('creating new AdminAvatar')
@@ -286,7 +287,7 @@ class Admin(pb.Root, log.Loggable):
     def removeAvatar(self, avatar):
         """
         Removes the AdminAvatar from our list of avatars.
-        @type avatar: L{server.admin.AdminAvatar}
+        @type avatar: L{flumotion.manager.admin.AdminAvatar}
         """
         self.debug('removing AdminAvatar %s' % avatar)
         self.clients.remove(avatar)
@@ -295,7 +296,7 @@ class Admin(pb.Root, log.Loggable):
         """
         Tell all created AdminAvatars that a component was added.
 
-        @type component: L{server.manager.ComponentAvatar}
+        @type component: L{flumotion.manager.manager.ComponentAvatar}
         """
         for client in self.clients:
             client.componentAdded(component)
@@ -304,7 +305,7 @@ class Admin(pb.Root, log.Loggable):
         """
         Tell all created AdminAvatars that a component was removed.
 
-        @type component: L{server.manager.ComponentAvatar}
+        @type component: L{flumotion.manager.manager.ComponentAvatar}
         """
         for client in self.clients:
             client.componentRemoved(component)

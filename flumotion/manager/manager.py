@@ -50,14 +50,13 @@ class Dispatcher(log.Loggable):
 
     logCategory = 'dispatcher'
 
-    def __init__(self, manager, admin):
-        # FIXME: change Admin to AdminHeaven
+    def __init__(self, manager, adminheaven):
         """
         @type manager: L{manager.manager.Manager}
-        @type admin:      L{manager.admin.Admin}
+        @type adminheaven:      L{manager.admin.AdminHeaven}
         """
         self.manager = manager
-        self.admin = admin
+        self.adminheaven = adminheaven
 
     # requestAvatar gets called through ClientFactory.login()
     # An optional second argument can be passed to login, which should be
@@ -67,7 +66,7 @@ class Dispatcher(log.Loggable):
     # So in short, the mind is a reference to the client passed in login()
     # on the peer, allowing any object that has the mind to call back
     # to the piece that called login(),
-    # which in our case is a component or an admin.
+    # which in our case is a component or an admin client.
     def requestAvatar(self, avatarID, mind, *ifaces):
 
         if not pb.IPerspective in ifaces:
@@ -77,7 +76,7 @@ class Dispatcher(log.Loggable):
         if interfaces.IBaseComponent in ifaces:
             avatar = self.manager.getAvatar(avatarID)
         elif interfaces.IAdminComponent in ifaces:
-            avatar = self.admin.getAvatar()
+            avatar = self.adminheaven.getAvatar()
 
         if not avatar:
             raise errors.NoPerspectiveError(avatarID)
@@ -385,7 +384,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         self.manager.removeComponent(self)
 
     def perspective_uiStateChanged(self, component_name, state):
-        self.manager.admin.uiStateChanged(component_name, state)
+        self.manager.adminheaven.uiStateChanged(component_name, state)
 
 # abstracts the concept of a GStreamer tcpserversink producing a feeder
 class Feeder:
@@ -495,12 +494,12 @@ class Manager(pb.Root):
     def __init__(self):
         self.components = {} # dict of component avatars
         self.feeder_set = FeederSet()
-        self.admin = None
+        self.adminheaven = None
         
         self.last_free_port = 5500
 
-    def setAdmin(self, admin):
-        self.admin = admin
+    def setAdminHeaven(self, adminheaven):
+        self.adminheaven = adminheaven
         
     def getAvatar(self, avatarID):
         """
@@ -509,7 +508,7 @@ class Manager(pb.Root):
         
         @type avatarID:  string
 
-        @rtype:          L{server.manager.ComponentAvatar}
+        @rtype:          L{flumotion.manager.manager.ComponentAvatar}
         @returns:        the avatar for the component
         """
 
@@ -558,9 +557,12 @@ class Manager(pb.Root):
         return self.components.has_key(name)
     
     def addComponent(self, component):
-        """adds a component
-        @type component: L{server.manager.ComponentAvatar}
-        @param component: the component"""
+        """
+        adds a component
+
+        @type component: L{flumotion.manager.manager.ComponentAvatar}
+        @param component: the component
+        """
 
         component_name = component.getName()
         if self.hasComponent(component_name):
@@ -569,17 +571,20 @@ class Manager(pb.Root):
         self.components[component_name] = component
         
     def removeComponent(self, component):
-        """removes a component
-        @type component: L{server.manager.ComponentAvatar}
-        @param component: the component"""
+        """
+        removes a component
+
+        @type component: L{flumotion.manager.manager.ComponentAvatar}
+        @param component: the component
+        """
 
         component_name = component.getName()
         if not self.hasComponent(component_name):
             raise KeyError, component_name
 
         del self.components[component_name]
-        if self.admin:
-            self.admin.componentRemoved(component)
+        if self.adminheaven:
+            self.adminheaven.componentRemoved(component)
 
     def getComponentEaters(self, component):
         """
@@ -656,8 +661,8 @@ class Manager(pb.Root):
         
     def componentRegistered(self, component):
         component.debug('registering component')
-        if self.admin:
-            self.admin.componentAdded(component)
+        if self.adminheaven:
+            self.adminheaven.componentAdded(component)
         self.feeder_set.addFeeders(component)
 
         eaters = component.getEaters()
@@ -694,14 +699,12 @@ class ManagerServerFactory(pb.PBServerFactory):
     def __init__(self):
         self.manager = Manager()
         
-        # create an admin object for the manager
-        # FIXME: find a better name for admin
-        self.admin = admin.Admin(self.manager)
-        self.manager.setAdmin(self.admin)
+        self.adminheaven = admin.AdminHeaven(self.manager)
+        self.manager.setAdminHeaven(self.adminheaven)
         
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
-        self.dispatcher = Dispatcher(self.manager, self.admin)
+        self.dispatcher = Dispatcher(self.manager, self.adminheaven)
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
