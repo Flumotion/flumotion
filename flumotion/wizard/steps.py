@@ -651,7 +651,7 @@ wizard.register_step(HTTPBoth)
                   
 class HTTPAudio(HTTP):
     step_name = 'HTTP Streamer (audio only)'
-    sidebar_name = 'HTTP video'
+    sidebar_name = 'HTTP audio'
     port = configure.defaultStreamPortRange[1]
 wizard.register_step(HTTPAudio)
 
@@ -659,7 +659,7 @@ wizard.register_step(HTTPAudio)
 
 class HTTPVideo(HTTP):
     step_name = 'HTTP Streamer (video only)'
-    sidebar_name = 'HTTP audio'
+    sidebar_name = 'HTTP video'
     port = configure.defaultStreamPortRange[2]
 wizard.register_step(HTTPVideo)
 
