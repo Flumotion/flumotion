@@ -18,28 +18,38 @@
 
 # Headers in this file shall remain intact.
 
-import common
 
-from twisted.spread import jelly
 from twisted.trial import unittest
-from twisted.internet import reactor
 
-try:
-    import gobject
-    import gtk
-except RuntimeError:
-    import os
-    os._exit(0)
+from flumotion.test.gtkunit import *
+import gobject
+import gtk
 
 from flumotion.admin.gtk import greeter, wizard
 
-INTERVAL = 10 # in ms
-timeouts = 0
+
+def click(name):
+    call(name, 'emit', 'clicked')
+
+def set_text(name, text):
+    call(name, 'set_text', text)
+
+def check_text(name, text):
+    assert_call_returns(name, 'get_text', text)
+
+def prev():
+    click('button_prev')
+def next():
+    click('button_next')
+        
+def check_prev_next(can_prev, can_next):
+    def assert_sensitive(name, s):
+        assert_call_returns(name, 'get_property', s, 'sensitive')
+    assert_sensitive('button_prev', can_prev)
+    assert_sensitive('button_next', can_next)
+            
 
 class WizardTest(unittest.TestCase):
-    _failed = False
-    state = False
-
     def testMakeGreeter(self):
         wiz = greeter.Greeter()
         ass = self.assert_
@@ -50,66 +60,34 @@ class WizardTest(unittest.TestCase):
         ass(isinstance(wiz.page_stack, list))
         ass(isinstance(wiz.state, dict))
 
-        # check a couple names that come from libglade..
-        next = wiz.widgets['button_next']
-        prev = wiz.widgets['button_prev']
-        ass(isinstance(next, gtk.Widget))
-        ass(isinstance(prev, gtk.Widget))
-        
-        def ass(expr):
-            if not expr:
-                raise # to show the backtrace
-                self._failed = True
+        set_window(wiz.window)
 
-        def sensitive(w):
-            return w.get_property('sensitive')
-
-        # makes sure proc only gets called once
-        def idle_add(proc):
-            def proc_star():
-                proc()
-                return False
-            gobject.idle_add(proc_star)
-
-        def timeout_add(proc):
-            def proc_star():
-                proc()
-                return False
-
-            global timeouts
-            gobject.timeout_add(timeouts * INTERVAL, proc_star)
-            timeouts += 1
-        
-        timeout_add(lambda: wiz.page.connect_to_existing.emit('clicked'))
-        timeout_add(lambda: next.emit('clicked'))
-        timeout_add(lambda: prev.emit('clicked'))
-        timeout_add(lambda: next.emit('clicked'))
-        timeout_add(lambda: ass(sensitive(next)))
-        timeout_add(lambda: wiz.page.open_connection.host_entry.set_text('foo'))
-        timeout_add(lambda: ass(sensitive(next)))
-        timeout_add(lambda: wiz.page.open_connection.ssl_check.emit('clicked'))
-        timeout_add(lambda: ass(wiz.page.open_connection.port_entry.get_text()=='8642'))
-        timeout_add(lambda: next.emit('clicked'))
-        timeout_add(lambda: prev.emit('clicked'))
-        timeout_add(lambda: next.emit('clicked'))
-        timeout_add(lambda: ass(not sensitive(next)))
-        timeout_add(lambda: ass(wiz.page.authenticate.auth_method_combo.get_active()==0))
-        timeout_add(lambda: wiz.page.authenticate.user_entry.set_text('bar'))
-        timeout_add(lambda: ass(not sensitive(next)))
-        timeout_add(lambda: wiz.page.authenticate.passwd_entry.set_text('baz'))
-        timeout_add(lambda: ass(sensitive(next)))
-        timeout_add(lambda: next.emit('clicked'))
+        check_prev_next(False, True)
+        click('connect_to_existing')
+        next()
+        prev()
+        next()
+        check_prev_next(True, True)
+        set_text('host_entry', 'foo')
+        check_prev_next(True, True)
+        click('ssl_check')
+        check_text('port_entry', '8642')
+        next()
+        prev()
+        next()
+        check_prev_next(True, False)
+        assert_call_returns('auth_method_combo', 'get_active', 0)
+        set_text('user_entry', 'bar')
+        check_prev_next(True, False)
+        set_text('passwd_entry', 'baz')
+        check_prev_next(True, True)
+        next()
 
         state = wiz.run()
 
-        assert not self._failed
+        assert_not_failed()
         wiz.destroy()
         
         refstate = {'passwd': 'baz', 'host': 'foo', 'port': 8642,
                     'use_insecure': True, 'user': 'bar'}
-        self.assert_(state == refstate)
-
-        # getto getto getto hack to make the window go away
-        lp = gobject.MainLoop()
-        gobject.timeout_add(100,lambda:lp.quit())
-        lp.run()
+        assert state == refstate
