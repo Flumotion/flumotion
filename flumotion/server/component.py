@@ -121,6 +121,9 @@ class BaseComponent(pb.Referenceable):
                     gst.element_state_get_name(state))
         gobject.idle_add(self.pipeline.iterate)
 
+    # accessor
+    get_pipeline = lambda s: s.pipeline
+
     def create_pipeline(self):
         raise NotImplementedError
     
