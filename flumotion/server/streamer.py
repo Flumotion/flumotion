@@ -231,7 +231,6 @@ class FileSinkStreamer(component.ParseLaunchComponent):
             self.msg('Not started yet, skipping')
             return
 
-
         self.pipeline.set_state(gst.STATE_PAUSED)
 
         # Save and close file

@@ -267,7 +267,7 @@ class Launcher:
                 
                 if protocol == 'http':
                     assert c.has_option(section, 'port')
-                    shell_port = c.getint(section, 'port')
+                    port = c.getint(section, 'port')
                     if c.has_option(section, 'logfile'):
                         logfile = c.get(section, 'logfile')
                     else:
@@ -277,9 +277,10 @@ class Launcher:
                         factory = server.Site(resource=streamer.StreamingResource(component, logfile))
                         reactor.listenTCP(port, factory)
                         
+                    #component = streamer.MultifdSinkStreamer(name, sources)
                     component = streamer.FakeSinkStreamer(name, sources)
                     self.msg('Starting http factory at port %d' % port)
-                    self.start(component, nice, port, component)
+                    self.start(component, nice, setup, port, component)
                 elif protocol == 'file':
                     assert c.has_option(section, 'location')
                     location = c.get(section, 'location')
@@ -295,7 +296,6 @@ class Launcher:
                     self.start(component, nice, setup, port, component)
                 else:
                     raise AssertionError, "unknown protocol: %s" % protocol
-                
             else:
                 raise AssertionError, "unknown component kind: %s" % kind
     
