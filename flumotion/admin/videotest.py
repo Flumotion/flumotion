@@ -24,7 +24,12 @@
 # FIXME: moving this down causes errors
 import flumotion.utils.log
 
+# johan says modules should not do this, only apps
+import pygtk
+pygtk.require('2.0')
+
 import gobject
+gobject.threads_init()
 import gst
 import gst.interfaces
 import gtk
@@ -33,9 +38,10 @@ import gtk.glade
 import flumotion.config
 
 import os
+import string
 
-if gtk.pygtk_version < (2,3,91):
-   raise SystemExit, "PyGTK 2.3.91 or higher required"
+if gtk.pygtk_version < (2,3,96):
+   raise SystemExit, "PyGTK 2.3.96 or higher required"
 
 def _debug(*args):
     flumotion.utils.log.debug('videotest', ' '.join(args))
@@ -72,6 +78,9 @@ class Controller(gobject.GObject):
         """
         # the view's prepare is synchronous for now
         self.view.prepare()
+        self.view.connect('width-changed', self.view_width_changed_cb)
+        self.view.connect('height-changed', self.view_height_changed_cb)
+        self.view.connect('framerate-changed', self.view_framerate_changed_cb)
         self.view.connect('pattern-changed', self.view_pattern_changed_cb)
         # the model doesn't currently have a prepare
         self.view.add_pattern("SMPTE")
@@ -80,6 +89,15 @@ class Controller(gobject.GObject):
         self.view.set_pattern(1)
 
     ### callbacks
+    def view_width_changed_cb(self, view, width):
+        _debug("width changed to %d" % width)
+        self.model.set_width(width)
+    def view_height_changed_cb(self, view, height):
+        _debug("height changed to %d" % height)
+        self.model.set_height(height)
+    def view_framerate_changed_cb(self, view, framerate):
+        _debug("framerate changed to %f" % framerate)
+        self.model.set_framerate(framerate)
     def view_pattern_changed_cb(self, view, index):
         _debug("pattern changed to index %d" % index)
         self.model.set_pattern(index)
@@ -88,6 +106,7 @@ class View(gobject.GObject):
     __gsignals__ = {
         'width-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
         'height-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
+        'framerate-changed': (gobject.SIGNAL_RUN_FIRST, None, (float, )),
         'pattern-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
     }
 
@@ -106,6 +125,8 @@ class View(gobject.GObject):
         w.connect("value-changed", self.width_changed_cb)
         w = self._glade.get_widget("height-button")
         w.connect("value-changed", self.height_changed_cb)
+        w = self._glade.get_widget("framerate-button")
+        w.connect("value-changed", self.framerate_changed_cb)
         w = self._glade.get_widget("pattern-combo")
         self._pattern_combo = w
         self._pattern_model = gtk.ListStore(str)
@@ -133,6 +154,9 @@ class View(gobject.GObject):
     def height_changed_cb(self, widget):
         height = widget.get_value()
         self.emit('height-changed', height)
+    def framerate_changed_cb(self, widget):
+        framerate = widget.get_value()
+        self.emit('framerate-changed', framerate)
     def pattern_changed_cb(self, widget):
         index = widget.get_active()
         self.emit('pattern-changed', index)
@@ -140,18 +164,68 @@ class View(gobject.GObject):
 class Model:
     def __init__(self):
         self._src = gst.Element('videotestsrc')
-        self._caps = gst.caps_from_string('video/x-raw-rgb,width=320,height=240,framerate=25.0')
+        self._src.set_property('sync', gtk.TRUE)
+        self._src.get_pad('src').connect("notify::caps", self.have_caps_cb)
 
     def get_element(self):
         'Gets the element we should link and put in our main bin'
         return self._src
+        
     def get_caps(self):
         'Gets the caps that should be used as filter'
         return self._caps
+
+    def set_width(self, width):
+        if not self._caps: return
+        self._structure['width'] = width
+        print "DEBUG: set_width, caps now %s" % self._caps
+        self._relink()
+
+    def set_height(self, height):
+        if not self._caps: return
+        self._structure['height'] = height
+        print "DEBUG: caps now %s" % self._caps
+        self._relink()
+
+    def set_framerate(self, framerate):
+        if not self._caps: return
+        self._structure['framerate'] = framerate
+        print "DEBUG: caps now %s" % self._caps
+        self._relink()
+
     def set_pattern(self, pattern):
         'Sets the pattern enum on videotestsrc to the given pattern enum value'
         self._src.set_property("pattern", pattern)
 
+    def have_caps_cb(self, pad, dunno):
+        caps = pad.get_negotiated_caps()
+        print "HAVE_CAPS: pad %s, caps %s" % (pad, caps)
+        self._caps = caps
+        self._structure = self._caps.get_structure(0)
+
+    def _relink(self):
+        'try a relink of our pad with our caps'
+        'if no caps, or no peer, then just return'
+        if not self._caps:
+            print "ERROR: don't have caps"
+            return
+        pad = self._src.get_pad('src')
+        peer = pad.get_peer()
+        if peer:
+            print "DEBUG: peer: %s" % peer
+            print "DEBUG: caps: %s" % self._caps
+            # we set on the peer so the src can call _link and adjust
+            # framerate
+            parent = self._src.get_parent()
+            parent.set_state(gst.STATE_PAUSED)
+            pad.unlink(peer)
+            ret = pad.link_filtered(peer, self._caps)
+            parent.set_state(gst.STATE_PLAYING)
+            print "DEBUG: ret of try_set_caps %s" % ret
+            #if not pad.try_relink_filtered(peer, self._caps):
+            #    print "ERROR: oops, could not relink filtered"
+        print "DEBUG: internal caps now %s" % self._caps
+        print "DEBUG: gst caps of pad now %s" % pad.get_negotiated_caps()
 # register our types globally
 gobject.type_register(View)
 gobject.type_register(Controller)
@@ -202,10 +276,9 @@ if __name__ == '__main__':
     # embed the model in our fake toplevel model
     src = controller.model.get_element()
     prev = None
-    for e in (src, csp, sink):
-        thread.add(e)
-        if prev: prev.link(e)
-        prev = e
+    thread.add_many(src, csp, sink)
+    src.link(csp)
+    csp.link(sink)
 
     _debug("going into gtk.main")
     gtk.main()
