@@ -128,3 +128,12 @@ Advanced Streaming Server:
 
 If the conditions of this licensing strategy are not clear to you, please
 contact Christian Schaller (christian@fluendo.com) or call +34-933-17.51.53
+
+TESTING
+-------
+For testing purposes of your streams, you can run some GStreamer pipelines
+to verify if things work as they should.
+
+- multipart/jpeg stream (video only):
+  gst-launch -v gnomevfssrc location=http://localhost:8802 ! multipartdemux ! jpegdec ! xvimagesink
+

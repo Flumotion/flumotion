@@ -18,15 +18,17 @@
 
   <child>
     <widget class="GtkTable" id="table1">
+      <property name="border_width">6</property>
       <property name="visible">True</property>
       <property name="n_rows">1</property>
       <property name="n_columns">2</property>
       <property name="homogeneous">False</property>
-      <property name="row_spacing">0</property>
-      <property name="column_spacing">0</property>
+      <property name="row_spacing">6</property>
+      <property name="column_spacing">6</property>
 
       <child>
 	<widget class="GtkLabel" id="label1">
+	  <property name="visible">True</property>
 	  <property name="label" translatable="yes">Quality:</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>
