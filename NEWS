@@ -1,4 +1,20 @@
-This is Flumotion 0.1.3, "Belchica Reloaded".
+This is Flumotion 0.1.4, "NH Hoteles".
+
+Issues fixed since 0.1.3:
+
+36	need to have multiple admin logins working
+123	changes to gstreactor.py in changeset 1206 breaks flumotion
+13	make common Heaven baseclass
+91	flumotion-admin should handle flumotion-manager restart
+112	being able to tune brightness and contrast on v4l devices
+118	overlaying does not work on mandrake
+120	[PATCH] add admin_gtk.py to Makefile.am in videotest
+121	[PATCH] flumotion ui mdoule not installed with make install
+122	[PATCH] make disker have a ui component with a button to change file manually
+132	Workers can be started again and again
+133	[PATCH] addition of volume effect (and its implementation in soundcard producer) with cool new vumeter
+136	flumomtion wizard do not warn about missing libdv plugin
+139	Unable to start Flumotion on Fedora 3
 
 Issues fixed since 0.1.2:
 

@@ -29,7 +29,7 @@ import tempfile
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 from flumotion.common import registry
-from flumotion.common.registry import istrue
+from flumotion.common.registry import _istrue
 
 class TestRegistry(unittest.TestCase):
     def setUp(self):
@@ -42,18 +42,18 @@ class TestRegistry(unittest.TestCase):
         assert isinstance(reg, registry.ComponentRegistry)
         
     def testIsTrue(self):
-        assert istrue('True')
-        assert istrue('true')
-        assert istrue('1')
-        assert istrue('yes')
-        assert not istrue('False') 
-        assert not istrue('false') 
-        assert not istrue('0') 
-        assert not istrue('no') 
-        assert not istrue('I am a monkey') 
+        assert _istrue('True')
+        assert _istrue('true')
+        assert _istrue('1')
+        assert _istrue('yes')
+        assert not _istrue('False') 
+        assert not _istrue('false') 
+        assert not _istrue('0') 
+        assert not _istrue('no') 
+        assert not _istrue('I am a monkey') 
 
     def testgetMTime(self):
-        mtime = registry.getMTime(__file__)
+        mtime = registry._getMTime(__file__)
         assert mtime
         assert isinstance(mtime, int)
         
@@ -317,7 +317,7 @@ class TestFindComponents(unittest.TestCase):
 </registry>""" % name)
     
     def testSimple(self):
-        self.reg.addDirectory('.')
+        self.reg.addRegistryPath('.')
         components = self.reg.getComponents()
         assert len(components) == 3, len(components)
         types = [c.getType() for c in components]
