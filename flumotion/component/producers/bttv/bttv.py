@@ -81,8 +81,8 @@ class BTTV(feedcomponent.ParseLaunchComponent):
             for i in self.cb_channels:
                 log.debug('colorbalance %s: %d <= %d <= %d' % (
                     i.label, i.min_value, element.get_value(i), i.max_value))
-                if i.label == which and value >= i.min_value
-                                   and value <= i.max_value:
+                if i.label == which and value >= i.min_value \
+                                    and value <= i.max_value:
                     element.set_value(i, value)
                     return i
 
@@ -122,13 +122,13 @@ class BTTV(feedcomponent.ParseLaunchComponent):
         self.cb_channels = element.list_colorbalance_channels()
 
         if hue:
-            self.change_colorbalance('Hue', hue)
+            self.setColorBalanceProperty('Hue', hue)
         if saturation:
-            self.change_colorbalance('Saturation', saturation)
+            self.setColorBalanceProperty('Saturation', saturation)
         if brightness:
-            self.change_colorbalance('Brightness', brightness)
+            self.setColorBalanceProperty('Brightness', brightness)
         if contrast:
-            self.change_colorbalance('Contrast', contrast)
+            self.setColorBalanceProperty('Contrast', contrast)
         
      
 def createComponent(config):

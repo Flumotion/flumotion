@@ -1,5 +1,29 @@
 2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	  implement black/white list for pychecker stuff
+	* flumotion/common/errors.py:
+	  remove extra line
+	* flumotion/service/service.py:
+	* flumotion/component/producers/bttv/admin_gtk.py:
+	  fix pychecker warning
+	* flumotion/component/producers/bttv/bttv.py:
+	  fix my syntax errors
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  (try to) fix up warnings
+	* flumotion/ui/fgtk.py:
+	  import glade as well for testing error
+	* flumotion/utils/gstutils.py:
+	  rearrange imports
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	  remove junk
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/producers/bttv/Makefile.am:
+	* python.mk:
+	  if we ever want to do per-dir pychecks ...
+
+2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	  check for pychecker
 

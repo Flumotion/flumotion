@@ -7,4 +7,6 @@ component_DATA = bttv.xml
 clean-local:
 	rm -rf *.pyc *.pyo
 
+# PYCHECKER_FILES = $(component_PYTHON)
+
 EXTRA_DIST = $(component_DATA)

@@ -23,10 +23,12 @@
 import socket
 import sys
 
+# moving this down causes havoc when running this file directly for some reason
+from flumotion.common import errors
+
 import gobject
 import gst
 
-from flumotion.common import errors
 
 def caps_repr(caps):
     value = str(caps)

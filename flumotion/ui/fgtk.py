@@ -26,6 +26,9 @@ I am a collection of extended GTK widgets for use in Flumotion.
 
 import gtk
 import gtk.gdk
+# FIXME: done for pychecker; apparently these imports before make
+# import gtk; import gtk.glade in later files in the checking fail
+import gtk.glade
 
 import gobject
 

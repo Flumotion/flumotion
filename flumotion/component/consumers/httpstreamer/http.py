@@ -68,8 +68,9 @@ class Stats:
             # first measurement
             self.average_client_number = 0
         else:
-            self.average_client_number = (dc1 * dt1 / (dt1 + dt2) +
-                                          dc2 * dt2 / (dt1 + dt2))
+            before = (dc1 * dt1) / (dt1 + dt2)
+            after =  dc2 * dt2 / (dt1 + dt2)
+            self.average_client_number = before + after
 
     def clientAdded(self):
         self._updateAverage()
@@ -208,7 +209,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     # UI code
     def _checkUpdate(self):
-        if self.needsUpdate == True:
+        if self.needsUpdate:
             self.needsUpdate = False
             self.update_ui_state()
         self._callLaterId = reactor.callLater(1, self._checkUpdate)

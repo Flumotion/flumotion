@@ -207,7 +207,7 @@ class Servicer(log.Loggable):
             name, planetFile, " ".join(flowFiles))
         retval = self.startProcess(command)
 
-        if retval is 0:
+        if retval == 0:
             self.debug("Waiting for pid for manager %s" % name)
             pid = common.waitPidFile('manager', name)
             if pid:
@@ -235,7 +235,7 @@ class Servicer(log.Loggable):
         command = "flumotion-worker --debug 5 -D -n %s %s" % (name, workerFile)
         retval = self.startProcess(command)
 
-        if retval is 0:
+        if retval == 0:
             self.debug("Waiting for pid for worker %s" % name)
             pid = common.waitPidFile('worker', name)
             if pid:

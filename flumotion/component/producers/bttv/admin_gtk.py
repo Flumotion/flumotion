@@ -23,7 +23,7 @@
 
 import gtk
 
-from flumotion.common import errors
+from flumotion.common import errors, log
 
 #import flumotion.component
 from flumotion.component.base import admin_gtk

@@ -16,7 +16,9 @@ EXTRA_DIST = \
 clean-local:
 	@rm -rf _trial_temp
 
+if HAVE_PYCHECKER
 check-local: pychecker
+endif
 
 test:
 	@make check -C flumotion/test
@@ -32,20 +34,40 @@ coverage:
 # warning: couldn't find real module for class SSL.Error (module name: SSL)
 # which can't be turned off in pychecker
 
-#	    flumotion/component/*/*.py 		
-
-pychecker:
-	PYTHONPATH=`pwd`			\
-	pychecker -Q -F misc/pycheckerrc	\
+# for some reason, the run is *completely* different if the last set of
+# components is moved up.  So keep it low
+PYCHECKER_WHITELIST = \
 	    flumotion/component/*.py 		\
 	    flumotion/admin/*.py		\
 	    flumotion/common/*.py		\
 	    flumotion/configure/*.py		\
 	    flumotion/manager/*.py 		\
-	    flumotion/twisted/*.py 		\
+	    flumotion/service/*.py		\
 	    flumotion/worker/*.py 		\
+	    flumotion/twisted/*.py		\
 	    flumotion/ui/*.py			\
-	    flumotion/utils/*.py 2> /dev/null
+	    flumotion/utils/*.py		\
+	    flumotion/component/*/*.py		\
+	    flumotion/component/*/*/*.py
+
+PYCHECKER_BLACKLIST = \
+	flumotion/component/consumers/httpstreamer/http.py \
+	flumotion/component/converters/overlay/overlay.py \
+	flumotion/component/producers/firewire/firewire.py
+
+pychecker:
+	@echo running pychecker ...
+	@PYTHONPATH=`pwd`			\
+	pychecker -Q -F misc/pycheckerrc	\
+	$(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))\
+		2> /dev/null
+
+pycheckerverbose:
+	@echo running pychecker ...
+	PYTHONPATH=`pwd`			\
+	pychecker -F misc/pycheckerrc		\
+	$(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))
+
 
 fixme:
 	tools/fixme | less -R

@@ -29,13 +29,6 @@ from flumotion.common import errors
 from flumotion.component.base import admin_gtk
 
 class VideoTestAdminGtk(admin_gtk.BaseAdminGtk):
-    # FIXME: do something with this
-    def setUIState(self, state):
-        self.updateLabels(state)
-        if not self.shown:
-            self.shown = True
-            self.statistics.show_all()
-        
     def render(self):
         # FIXME: gladify
         self.widget = gtk.Table(1, 2)

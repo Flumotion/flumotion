@@ -12,4 +12,6 @@ component_DATA = http.xml http.glade
 clean-local:
 	rm -rf *.pyc *.pyo
 
+# PYCHECKER_FILES = $(component_PYTHON)
+
 EXTRA_DIST = $(component_PYTHON) $(component_DATA)
