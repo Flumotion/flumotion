@@ -1,3 +1,17 @@
+2004-08-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* docs/Makefile.am:
+	* flumotion/Makefile.am:
+	* flumotion/config/Makefile.am:
+	* flumotion/config/__init__.py:
+	* flumotion/config/installed.py.in:
+	* flumotion/config/uninstalled.py.in:
+	* tests/config.py:
+	  add a module containing configure-time variables.
+	  add to epydoc to please myself.
+	  add test for config to please Johan.
+
 2004-08-03  Johan Dahlin  <johan@gnome.org>
 
 	* bin/flumotion.in: 

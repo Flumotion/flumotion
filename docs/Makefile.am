@@ -1,7 +1,8 @@
 if HAVE_EPYDOC
 EPYDOC_HTML = html
 all-local:
-	export PYTHONPATH=$(PYTHONPATH):$(top_srcdir); epydoc -q --no-frames --html flumotion
+	PYTHONPATH=$(PYTHONPATH):$(top_srcdir) epydoc \
+            -q --no-frames --html flumotion flumotion.config
 distclean-local:
 	rm -rf html
 else

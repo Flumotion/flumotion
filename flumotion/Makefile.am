@@ -1,4 +1,4 @@
-SUBDIRS = gui server twisted utils
+SUBDIRS = config gui server twisted utils
 flumotiondir = $(libdir)/flumotion/python/flumotion
 
 flumotion_DATA = \

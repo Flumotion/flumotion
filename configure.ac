@@ -14,6 +14,9 @@ AC_SUBST(PYGST_REQ, 0.7.91)
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")
 
+AS_AC_EXPAND(DATADIR, $datadir)
+AC_MSG_NOTICE(Storing data files in $DATADIR)
+
 dnl AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
 dnl AC_MSG_NOTICE(Storing configuration files in $SYSCONFDIR)
 
@@ -51,6 +54,9 @@ bin/Makefile
 data/Makefile
 data/ui/Makefile
 flumotion/Makefile
+flumotion/config/Makefile
+flumotion/config/installed.py
+flumotion/config/uninstalled.py
 flumotion/gui/Makefile
 flumotion/server/Makefile
 flumotion/twisted/Makefile
