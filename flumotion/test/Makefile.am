@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+                                                                                
 EXTRA_DIST = 			\
 	__init__.py		\
 	common.py		\

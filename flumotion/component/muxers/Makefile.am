@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+                                                                                
 component_PYTHON = \
 	__init__.py \
 	multipart.py \

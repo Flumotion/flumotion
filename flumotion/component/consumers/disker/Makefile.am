@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+
 componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/disker
 
 component_PYTHON = \

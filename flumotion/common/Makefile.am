@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+                                                                                
 flumotiondir = $(libdir)/flumotion/python/flumotion/common
 
 flumotion_PYTHON = \

@@ -46,7 +46,10 @@ make
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%makeinstall
+# use DESTDIR so compiled python files get tagged correctly with their
+# final location
+make DESTDIR=$RPM_BUILD_ROOT install
+
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/managers/default/flows
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/workers
 
@@ -166,5 +169,8 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Fri Nov 05 2004 Thomas Vander Stichele <thomas at apestaart dot org>
+- use DESTDIR install to fix python compiles
+
 * Mon Jun 07 2004 Thomas Vander Stichele <thomas at apestaart dot org>
 - first package

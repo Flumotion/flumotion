@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+                                                                                
 componentdir = $(libdir)/flumotion/python/flumotion/component
 component_PYTHON = \
 	__init__.py \

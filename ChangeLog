@@ -1,3 +1,43 @@
+2004-11-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
+	* flumotion.spec.in:
+	* flumotion/Makefile.am:
+	* flumotion/admin/Makefile.am:
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/bouncers/Makefile.am:
+	* flumotion/component/consumers/Makefile.am:
+	* flumotion/component/consumers/disker/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/converters/Makefile.am:
+	* flumotion/component/converters/overlay/Makefile.am:
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/muxers/Makefile.am:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/audiotest/Makefile.am:
+	* flumotion/component/producers/bttv/Makefile.am:
+	* flumotion/component/producers/firewire/Makefile.am:
+	* flumotion/component/producers/soundcard/Makefile.am:
+	* flumotion/component/producers/videotest/Makefile.am:
+	* flumotion/component/producers/webcam/Makefile.am:
+	* flumotion/configure/Makefile.am:
+	* flumotion/manager/Makefile.am:
+	* flumotion/service/Makefile.am:
+	* flumotion/test/Makefile.am:
+	* flumotion/tester/Makefile.am:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/utils/Makefile.am:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/worker/Makefile.am:
+	* py-compile:
+	* python.mk:
+
+	Fix py-compile to support DESTDIR, so the rpm can tag compiled python
+	code with the final on-disk location
+
 2004-11-05  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_webcam.glade:

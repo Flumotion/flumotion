@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+                                                                                
 consumersdir = $(libdir)/flumotion/python/flumotion/component/converters
 consumers_PYTHON = \
 	__init__.py

@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+
 component_PYTHON = __init__.py videotest.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/producers/videotest
 component_DATA = videotest.xml

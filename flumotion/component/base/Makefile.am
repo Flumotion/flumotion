@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+                                                                                
 component_PYTHON = __init__.py converter.py producer.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/base
 component_DATA = base.xml

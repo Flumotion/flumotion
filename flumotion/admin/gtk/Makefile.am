@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+                                                                                
 componentdir = $(libdir)/flumotion/python/flumotion/admin/gtk
 component_PYTHON = \
 	__init__.py \

@@ -1,3 +1,5 @@
+include $(top_srcdir)/python.mk
+
 SUBDIRS = \
 	admin \
 	common \
