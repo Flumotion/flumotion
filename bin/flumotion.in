@@ -27,6 +27,7 @@ import gobject
 if gobject.pygtk_version < (2,3,96):
     print 'PyGTK 2.3.96 or higher is required'
     raise SystemExit
+os.environ['PYGTK_USE_GIL_STATE_API'] = ''
 gobject.threads_init()
 
 # This can't be removed, 

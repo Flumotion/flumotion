@@ -135,6 +135,7 @@ class Launcher(log.Loggable):
         self.stop_manager()
 
     def threads_init(self):
+        os.environ['PYGTK_USE_GIL_STATE_API'] = ''
         try:
             gobject.threads_init()
         except AttributeError:
