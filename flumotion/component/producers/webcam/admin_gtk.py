@@ -27,7 +27,7 @@ from flumotion.component.effects.colorbalance.admin_gtk import ColorbalanceAdmin
 class WebcamAdminGtk(BaseAdminGtk):
     def setup(self):
         self._nodes = {}
-        colorbalance = ColorbalanceAdminGtkNode(self.name, self.admin,
+        colorbalance = ColorbalanceAdminGtkNode(self.state, self.admin,
             self.view, 'outputColorbalance')
         self._nodes['Colorbalance'] = colorbalance
 
