@@ -31,7 +31,7 @@ from twisted.spread import pb
 # We want to avoid importing gst, otherwise --help fails
 # so be very careful when adding imports
 from flumotion.common import errors, interfaces
-from flumotion.twisted import pbutil
+from flumotion.twisted import cred, pbutil
 from flumotion.utils import log
 
 #factory = pbutil.ReconnectingPBClientFactory
@@ -45,7 +45,7 @@ class WorkerFactory(factory):
         factory.__init__(self)
         
     def login(self, username, password):
-        return self.__super_login(pbutil.Username(username, password),
+        return self.__super_login(cred.Username(username, password),
                                   self.view,
                                   interfaces.IWorkerComponent)
         
@@ -126,11 +126,16 @@ class WorkerFabric:
     def login(self, username, password):
         d = self.worker_factory.login(username, password)
         d.addErrback(self.cb_accessDenied)
+        d.addErrback(self.cb_loginFailed)
 
     def cb_accessDenied(self, failure):
-        failure.trap(errors.AccessDeniedError)
-        print 'ACCESS DENIED, GOOD LUCK'
+        failure.trap(cred.error.UnauthorizedLogin)
+        print 'ERROR: Access denied.'
+        reactor.stop()
     
+    def cb_loginFailed(self, failure):
+        print 'Login failed, reason: %s' % str(failure)
+
 def main(args):
     parser = optparse.OptionParser()
     group = optparse.OptionGroup(parser, "Worker options")
@@ -168,20 +173,22 @@ def main(args):
         from flumotion.worker import job
         job_factory = job.JobFactory(options.job)
         reactor.connectUNIX(options.worker, job_factory)
+        category = 'job'
     else:
         log.debug('Connectiong to %s:%d' % (options.host, options.port))
     
         fabric = WorkerFabric(options.host, options.port)
         fabric.login(options.username, options.password or '')
         reactor.connectTCP(options.host, options.port, fabric.worker_factory)
-        
-    log.debug('worker', 'Starting reactor')
-    reactor.run()
-    log.debug('worker', 'Reactor stopped')
 
-    log.debug('worker', 'Shutting down jobs')
+        category = 'worker'
+        
+    log.debug(category, 'Starting reactor')
+    reactor.run()
+    log.debug(category, 'Reactor stopped')
 
     if not options.job:
+        log.debug('worker', 'Shutting down jobs')
         # XXX: Is this really necessary
         fabric.report_heaven.shutdown()
 
