@@ -475,3 +475,13 @@ def waitForKill():
  
     waiter = Waiter()
     waiter.sleep()
+
+# moods
+class Moods: pass
+moods = Moods()
+moods.HAPPY = 0
+moods.SAD = 1
+moods.LOST = 2
+moods.HUNGRY = 3
+moods.WAKING = 4
+moods.SLEEPING = 5

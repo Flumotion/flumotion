@@ -6,6 +6,7 @@ flumotion_PYTHON = \
 	__init__.py \
 	bundle.py \
 	common.py \
+	component.py \
 	config.py \
 	enum.py \
 	errors.py \

@@ -34,43 +34,8 @@ from flumotion.manager import common
 from flumotion.common import errors, interfaces, log
 from flumotion.common.registry import registry
 
-# FIXME: do this with remote cache or something similar
-class ComponentView(pb.Copyable):
-    """
-    I present state of a component through a L{RemoteComponentView} in the peer.
-    I get the state I present from a
-    L{flumotion.manager.component.ComponentAvatar}.
-    I live in the manager.
-    """
-    def __init__(self, component):
-        """
-        @type component: L{flumotion.manager.component.ComponentAvatar}
-        """
-        self.name = component.getName()
-        # forced to int so it's jellyable
-        self.state = int(component.state)
-        self.eaters = component.getEaters()
-        self.feeders = component.getFeeders()
-        self.options = component.options.dict
-        self.worker = component.getWorkerName()
-        self.pid = component.getPid()
-
-# FIXME: move this out to flumotion.admin
-class RemoteComponentView(pb.RemoteCopy):
-    """
-    I represent state of a component.
-    I am a copy of a manager-side L{ComponentView}
-    I live in an admin client.
-    """
-    name = None # shuts up pychecker
-    def __cmp__(self, other):
-        if not isinstance(other, RemoteComponentView):
-            return False
-        return cmp(self.name, other.name)
-    
-    def __repr__(self):
-        return '<RemoteComponentView %s>' % self.name
-pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
+# make ComponentState proxyable
+from flumotion.common import component
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?
 class AdminAvatar(common.ManagerAvatar):
@@ -85,18 +50,22 @@ class AdminAvatar(common.ManagerAvatar):
     # override base methods
     def attached(self, mind):
         common.ManagerAvatar.attached(self, mind)
-        self.mindCallRemote('initial', self.getComponents(), self.getWorkers())
+        self.mindCallRemote('initial', self.getComponentStates(),
+            self.getWorkers())
 
-    # my methods
-    def getComponents(self):
+    # FIXME: instead of doing this, give a RemoteCache of the heaven state ?
+    def getComponentStates(self):
         """
-        Return all components logged in to the manager.
+        Return all component states logged in to the manager.
+        The list gets serialized to a list of
+        L{flumotion.common.component.AdminComponentState}
         
-        @rtype: C{list} of L{flumotion.manager.admin.ComponentView}
+        @rtype: C{list} of L{flumotion.common.component.ManagerComponentState}
         """
-        # FIXME: should we use an accessor to get at components from c ?
-        components = map(ComponentView, self.vishnu.componentHeaven.avatars.values())
-        return components
+        states = []
+        for avatar in self.vishnu.componentHeaven.avatars.values():
+            states.append(getattr(avatar, 'state', None))
+        return states
 
     def getWorkers(self):
         """
@@ -122,19 +91,14 @@ class AdminAvatar(common.ManagerAvatar):
         Tell the avatar that a component has been added.
         """
         self.debug("AdminAvatar.componentAdded: %s" % component)
-        self.mindCallRemote('componentAdded', ComponentView(component))
+        self.mindCallRemote('componentAdded', component.state)
         
     def componentRemoved(self, component):
         """
         Tell the avatar that a component has been removed.
         """
         self.debug("AdminAvatar.componentRemoved: %s" % component)
-        self.mindCallRemote('componentRemoved', ComponentView(component))
-
-# FIXME: deprecated
-    def componentStateChanged(self, component, state):
-        self.debug("AdminAvatar.componentStateChanged: %s %s" % (component, state))
-        self.mindCallRemote('componentStateChanged', ComponentView(component), state)
+        self.mindCallRemote('componentRemoved', component.state)
 
     ### pb.Avatar IPerspective methods
     def perspective_shutdown(self):

@@ -1,3 +1,36 @@
+2004-12-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/image/Makefile.am:
+	* data/image/mood-happy.png:
+	* data/image/mood-hungry.png:
+	* data/image/mood-lost.png:
+	* data/image/mood-sad.png:
+	* data/image/mood-sleeping.png:
+	* data/image/mood-waking.png:
+	* doc/random/componentstate:
+	* doc/random/moods:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/common.py:
+	* flumotion/common/component.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/configure/configure.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/common.py:
+	* flumotion/manager/component.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common_component.py:
+	* flumotion/test/test_htpasswdcrypt.py:
+	* flumotion/test/test_manager.py:
+	* flumotion/test/test_manager_admin.py:
+	* flumotion/worker/worker.py:
+	* tools/fixme:
+	  A big commit to implement moods, yay !
+
 2004-12-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/Makefile.am:

@@ -30,21 +30,17 @@ Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 
 __all__ = ['ComponentAvatar', 'ComponentHeaven']
 
+import time
+
 import gst
 from twisted.spread import pb
+from twisted.internet import reactor
 
+from flumotion.configure import configure
 from flumotion.manager import common
 from flumotion.common import errors, interfaces, keycards, log, config
+from flumotion.common.common import moods
 from flumotion.utils import gstutils
-
-class Options:
-    """dummy class for storing manager side options of a component"""
-    def __init__(self):
-        self.eaters = [] # list of eater names
-        self.feeders = [] # list of feeder names
-        self.dict = None
-        self.worker = None
-        self.pid = None
 
 # abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
 class Feeder:
@@ -167,6 +163,7 @@ class FeederSet(log.Loggable):
         """
 
         feeders = componentAvatar.getFeeders()
+        self.debug('addFeeders: feeders %r' % feeders)
 
         for feederName in feeders:
             if not self.hasFeeder(feederName):
@@ -244,26 +241,73 @@ class ComponentAvatar(common.ManagerAvatar):
 
     logCategory = 'comp-avatar'
 
+    _heartbeatCheckInterval = configure.heartbeatInterval * 2.5
+
     def __init__(self, heaven, avatarId):
         common.ManagerAvatar.__init__(self, heaven, avatarId)
         
-        self.state = gst.STATE_NULL
-        self.options = Options()
         self.ports = {} # feedName -> port
         self.started = False
         self.starting = False
+        self.lastHeartbeat = 0.0 # last time.time() of heartbeat
+        self.state = None # retrieved after mind attached
+        self._gstState = None # FIXME: deprecate ?
+
+        self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
+            self._heartbeatCheck)
+        
+    # make sure we don't have stray pendingTimedCalls
+    def __del__(self):
+        self.cleanup()
         
     ### python methods
     def __repr__(self):
-        return '<%s %s in state %s>' % (self.__class__.__name__,
-                                        self.getName(),
-                                        gst.element_state_get_name(self.state))
+        if self.state:
+            mood = self.state.get('mood')
+        else:
+            mood = '(unknown)'
+        return '<%s %s in mood %s>' % (self.__class__.__name__,
+                                        self.getName(), mood)
 
     ### log.Loggable methods
     def logFunction(self, arg):
         return self.getName() + ': ' + arg
 
     ### ComponentAvatar methods
+    def cleanup(self):
+        """
+        Clean up before being destroyed."
+        """
+        if self._HeartbeatCheckDC:
+            self._HeartbeatCheckDC.cancel()
+        self._HeartbeatCheckDC = None
+
+    def _heartbeatCheck(self):
+        """
+        Check if we received the heartbeat lately.  Set mood to LOST if not.
+        """
+        self.log('checking heartbeat')
+        # FIXME: only notify of LOST mood once !
+        if self.lastHeartbeat > 0 \
+            and time.time() - self.lastHeartbeat \
+                > self._heartbeatCheckInterval \
+            and self._getMood() != moods.LOST:
+                self.warning('heartbeat missing, component is lost')
+                self._setMood(moods.LOST)
+        self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
+            self._heartbeatCheck)
+
+    def _setMood(self, mood):
+        if not self.state:
+            return
+        if not self.state.get('mood') == mood:
+            self.debug('Setting mood to %s' % mood)
+            self.state.set('mood', mood)
+
+    def _getMood(self):
+        if not self.state:
+            return
+        return self.state.get('mood')
 
     # general fallback for unhandled errors so we detect them
     # FIXME: we can't use this since we want a PropertyError to fall through
@@ -286,23 +330,34 @@ class ComponentAvatar(common.ManagerAvatar):
         return failure
 
     def attached(self, mind):
-        common.ManagerAvatar.attached(self, mind)
-        self.debug('mind %r attached, calling remote register()' % mind)
+        common.ManagerAvatar.attached(self, mind) # sets self.mind
+        self.debug('mind %r attached, calling remote _getState()' % self.mind)
+        self._getState()
         
-        d = self.mindCallRemote('register')
-        d.addCallback(self._mindRegisterCallback)
+    def _getState(self):
+        d = self.mindCallRemote('getState')
+        d.addCallback(self._mindGetStateCallback)
         d.addErrback(self._mindPipelineErrback)
-        d.addErrback(self._mindErrback)
+        #d.addErrback(self._mindErrback)
 
-    def _mindRegisterCallback(self, options): 
-        # called after the mind has attached.  options is a dict passed in from
-        # flumotion.component.component's remote_register
-        assert options
-        for key, value in options.items():
-            setattr(self.options, key, value)
-        self.options.dict = options
-        
+    def _mindGetStateCallback(self, state): 
+        # called after the mind has attached.
+        # state: L{flumotion.common.component.ManagerComponentState}
+        if not state:
+            self.debug('no state received yet, rescheduling')
+            reactor.callLater(1, self._getState)
+            return None
+            
+        self.debug('received state: %r' % state)
+        self.state = state
+        # make the component avatar a listener to state changes
+        state.addListener(self)
+        # make heaven register component
         self.heaven.registerComponent(self)
+
+    # state change listener
+    def stateChanged(self, state, key, value):
+        self.debug("state change on %r: %s now %r" % (state, key, value))
                 
     def _mindPipelineErrback(self, failure):
         failure.trap(errors.PipelineParseError)
@@ -310,24 +365,28 @@ class ComponentAvatar(common.ManagerAvatar):
         self.mindCallRemote('stop')
         return None
         
+    def stateGet(self, key, valueIfNotFound = None):
+        if not self.state:
+            return valueIfNotFound
+
+        return self.state.get(key)
+        
     # FIXME: rename to something like getEaterFeeders()
     def getEaters(self):
         """
         Get a list of feeder names feeding this component.
+
+        Returns: a list of eater names, or the empty list.
         """
-        # FIXME: rename this when flumotion.component.component renames it
-        return self.options.eaters
+        return self.stateGet('eaterNames', [])
     
     def getFeeders(self):
         """
         Get a list of feeder names (componentName:feedName) in this component.
+
+        Returns: a list of feeder names, or the empty list.
         """
-        ### FIXME: rename self.options.feeders to e.g. feederConfig
-        #if longName:
-        #    return map(lambda feeder:
-        #               self.getName() + ':' + feeder, self.options.feeders)
-        #else:
-        return self.options.feeders
+        return self.stateGet('feederNames', [])
 
     def getFeedPort(self, feedName):
         """
@@ -336,7 +395,16 @@ class ComponentAvatar(common.ManagerAvatar):
         return self.ports[feedName]
  
     def getRemoteManagerIP(self):
-        return self.options.ip
+        return self.state.get('ip')
+
+    def getWorkerName(self):
+        """
+        Return the name of the worker.
+        """
+        return self.state.get('workerName')
+
+    def getPid(self):
+        return self.state.get('pid')
 
     def getName(self):
         return self.avatarId
@@ -348,15 +416,6 @@ class ComponentAvatar(common.ManagerAvatar):
             return None
         return self.heaven._componentEntries[self.avatarId].type
 
-    def getWorkerName(self):
-        """
-        Return the name of the worker.
-        """
-        return self.options.worker
-
-    def getPid(self):
-        return self.options.pid
-
     def stop(self):
         """
         Tell the avatar to stop the component.
@@ -364,31 +423,31 @@ class ComponentAvatar(common.ManagerAvatar):
         d = self.mindCallRemote('stop')
         d.addErrback(lambda x: None)
             
-    # FIXME: rename, since it's not GStreamer linking.
-    # This function tells the component to start consuming feeds and start
-    # its feeders
-    def link(self, eatersData, feedersData):
+    # This function tells the component to start
+    # feedcomponents will start consuming feeds and start its feeders
+    def start(self, eatersData, feedersData):
         """
-        Tell the component to link itself to other components.
+        Tell the component to start, possibly linking to other components.
 
-        @type eatersData: tuple of (feedername, host, port) tuples of elements feeding our eaters.
-        @type feedersData: tuple of (name, host) tuples of our feeding elements.
+        @type eatersData:  tuple of (feedername, host, port) tuples
+                           of elements feeding our eaters
+        @type feedersData: tuple of (name, host) tuples of our feeding elements
         """
-        def linkCallback(feedData):
+        def startCallback(feedData):
             for feedName, host, port in feedData:
                 self.debug('feed %s (%s:%d) is ready' % (feedName, host, port))
                 self.host = host
                 self.ports[feedName] = port
                 
                 self.checkFeedReady(feedName)
-                self.debug('linkCallback: done linking')
+                self.debug('startCallback: done starting')
 
-        def linkErrback(reason):
-            self.error("Could not make component link, reason %s" % reason)
+        def startErrback(reason):
+            self.error("Could not make component start, reason %s" % reason)
                 
-        d = self.mindCallRemote('link', eatersData, feedersData)
-        d.addCallback(linkCallback)
-        d.addErrback(linkErrback)
+        d = self.mindCallRemote('start', eatersData, feedersData)
+        d.addCallback(startCallback)
+        d.addErrback(startErrback)
     
     def setElementProperty(self, element, property, value):
         """
@@ -405,7 +464,7 @@ class ComponentAvatar(common.ManagerAvatar):
             msg = "%s: no element specified" % self.getName()
             self.warning(msg)
             raise errors.PropertyError(msg)
-        if not element in self.options.elements:
+        if not element in self.state.get('elements'):
             msg = "%s: element '%s' does not exist" % (self.getName(), element)
             self.warning(msg)
             raise errors.PropertyError(msg)
@@ -435,7 +494,9 @@ class ComponentAvatar(common.ManagerAvatar):
             raise errors.PropertyError(msg)
         # FIXME: this is wrong, since it's not dynamic.  Elements can be
         # renamed
-        if not element in self.options.elements:
+        # this will work automatically though if the component updates its
+        # state
+        if not element in self.state.get('elements'):
             msg = "%s: element '%s' does not exist" % (self.getName(), element)
             self.warning(msg)
             raise errors.PropertyError(msg)
@@ -469,7 +530,7 @@ class ComponentAvatar(common.ManagerAvatar):
     # FIXME rename to something that reflects an action, like startFeedIfReady
     def checkFeedReady(self, feedName):
         # check if the given feed is ready to start, and start it if it is
-        self.info('checkFeedReady: feedName %s' % feedName)
+        self.debug('checkFeedReady: feedName %s' % feedName)
         if not self.ports.has_key(feedName):
             self.debug('checkFeedReady: no port yet')
             return
@@ -478,10 +539,14 @@ class ComponentAvatar(common.ManagerAvatar):
             self.debug('checkFeedReady: no remote options yet')
             return
 
-        if self.state != gst.STATE_PLAYING:
-            self.debug('checkFeedReady: not playing yet (%s)' %
-                      gst.element_state_get_name(self.state))
+        if self._gstState != gst.STATE_PLAYING:
+            self.debug('checkFeedReady: feed not playing yet (%s)' %
+                      gst.element_state_get_name(self._gstState))
             return
+        #if self.state.mood != moods.HAPPY:
+        #    self.debug('checkFeedReady: not happy yet (%s)' %
+        #              self.state.mood)
+        #    return
 
         self.debug('checkFeedReady: setting to ready')
         self.heaven.setFeederReady(self, feedName)
@@ -517,15 +582,19 @@ class ComponentAvatar(common.ManagerAvatar):
     def perspective_log(self, *msg):
         log.debug(self.getName(), *msg)
         
-    def perspective_stateChanged(self, feed_name, state):
-        self.debug('stateChanged: feed name %s, state %s' % (
-            feed_name, gst.element_state_get_name(state)))
+    def perspective_heartbeat(self, mood):
+        self.lastHeartbeat = time.time()
+        log.log(self.getName(), "got heartbeat at %d" % int(self.lastHeartbeat))
+        self._setMood(mood)
+
+    def perspective_feedStateChanged(self, feedName, state):
+        self.debug('feedStateChanged: feed name %s, state %s' % (
+            feedName, gst.element_state_get_name(state)))
+        self._gstState = state
         
-        self.state = state
-        if self.state == gst.STATE_PLAYING:
+        if state == gst.STATE_PLAYING:
             self.info('%r is now playing' % self)
-            self.vishnu.adminHeaven.componentStateChanged(self, state)
-            self.checkFeedReady(feed_name)
+            self.checkFeedReady(feedName)
             
     def perspective_error(self, element, error):
         self.error('error element=%s string=%s' % (element, error))
@@ -602,6 +671,7 @@ class ComponentHeaven(common.ManagerHeaven):
     ### IHeaven methods
     def removeAvatar(self, avatarId):
         avatar = self.avatars[avatarId]
+        avatar.cleanup()
         self._feederSet.removeFeeders(avatar)
         self.vishnu.adminHeaven.componentRemoved(avatar)
         
@@ -711,12 +781,11 @@ class ComponentHeaven(common.ManagerHeaven):
         return retval
 
     def _startComponent(self, componentAvatar):
-        componentAvatar.debug('Starting, asking component to link')
         eatersData = self._getComponentEatersData(componentAvatar)
         feedersData = self._getComponentFeedersData(componentAvatar)
 
-        componentAvatar.debug('Starting, asking component to link with eatersData %s and feedersData %s' % (eatersData, feedersData))
-        componentAvatar.link(eatersData, feedersData)
+        componentAvatar.debug('asking component to start with eatersData %s and feedersData %s' % (eatersData, feedersData))
+        componentAvatar.start(eatersData, feedersData)
 
     # FIXME: better name startComponentIfReady
     def checkComponentStart(self, componentAvatar):

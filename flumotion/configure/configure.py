@@ -91,6 +91,9 @@ config_dict['defaultGstPortRange'] = range(8600, 8639 + 1)
 config_dict['processTermWait'] = 2
 config_dict['processKillWait'] = 2
 
+# default value for component heartbeat interval, in seconds
+config_dict['heartbeatInterval'] = 5
+
 for key, value in config_dict.items():
     dictionary = locals()
     dictionary[key] = value

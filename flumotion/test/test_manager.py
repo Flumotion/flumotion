@@ -54,6 +54,9 @@ class FakeComponentAvatar(log.Loggable):
     def getName(self):
         return self.name
 
+    def cleanup(self):
+        pass
+
 class TestComponentHeaven(unittest.TestCase):
     def setUp(self):
         self.heaven = component.ComponentHeaven(manager.Vishnu())
@@ -64,6 +67,7 @@ class TestComponentHeaven(unittest.TestCase):
 
         #self.assertRaises(AssertionError,
         #                  self.heaven.createAvatar, 'does-not-exist')
+        p.cleanup()
 
     def testComponentIsLocal(self):
         a = FakeComponentAvatar()
@@ -73,6 +77,7 @@ class TestComponentHeaven(unittest.TestCase):
     def testGetComponent(self):
         a = self.heaven.createAvatar('prod')
         assert self.heaven.getComponent('prod') == a
+        a.cleanup()
 
     def testHasComponent(self):
         a = self.heaven.createAvatar('prod')

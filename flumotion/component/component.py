@@ -34,7 +34,9 @@ from twisted.internet import reactor, error
 from twisted.cred import error as crederror
 from twisted.spread import pb
 
-from flumotion.common import interfaces, errors, log
+from flumotion.common import interfaces, errors, log, component
+from flumotion.common.common import moods
+from flumotion.configure import configure
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 from flumotion.utils import gstutils
@@ -57,6 +59,7 @@ class ComponentClientFactory(superklass):
         super_init = superklass.__init__
         super_init(self)
         
+        self.component = component
         # get the component's medium class, defaulting to the base one
         klass = getattr(component, 'component_medium_class', BaseComponentMedium)
         # instantiate the medium, giving it the component it's a medium for
@@ -73,6 +76,7 @@ class ComponentClientFactory(superklass):
         # FIXME: do we need to make sure that this cannot shut down the
         # manager if it's the manager's bouncer ?
         reactor.stop()
+        self.component.setMood(moods.SAD)
 
     def login(self, keycard):
         d = self.__super_login(keycard, self.medium,
@@ -178,30 +182,43 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         
     ### pb.Referenceable remote methods
     ### called from manager by our avatar
-    def remote_getUIZip(self, domain, style):
-        return self.comp.getUIZip(domain, style)
-    
-    def remote_getUIMD5Sum(self, domain, style):
-        return self.comp.getUIMD5Sum(domain, style)
-
-    def remote_register(self):
+    def remote_getState(self):
         """
-        @rtype:   dict
-        @returns: options
+        Return the state of the component, which will be serialized to a
+        L{flumotion.common.component.ManagerComponentState} object.
+
+        @rtype:   L{flumotion.common.component.JobComponentState}
+        @returns: state of component
         """
-        # FIXME: we need to properly document this; manager calls me to
-        # "get some info"
-        if not self.hasRemoteReference():
-            self.warning('We are not ready yet, waiting 250 ms')
-            reactor.callLater(0.250, self.remote_register)
-            return None
+        # we can only get the IP after we have a remote reference, so add it
+        # here
+        self.comp.state.set('ip', self.getIP())
+        self.debug('remote_getState of f: returning %r' % self.comp.state)
 
-        options = {'ip'    : self.getIP(),
-                   'pid'   : os.getpid(),
-                   'worker': self.comp.getWorkerName()}
-
-        return options
+        return self.comp.state
         
+    def remote_start(self, *args, **kwargs):
+        """
+        Tell the component to start.  This is called when all its dependencies
+        are already started.
+
+        Extended by subclasses.  Subclasses call this as the last method if
+        the start is successful.  Sets the mood to happy.
+        """
+        self.comp.updateMood()
+        self.comp.startHeartbeat()
+        
+    def remote_stop(self):
+        """
+        Tell the component to stop.
+        The connection to the manager will be closed.
+        The job process will also finish.
+        """
+        self.comp.stopHeartbeat()
+        self.comp.stop()
+        self.remote.broker.transport.loseConnection()
+        reactor.stop()
+
     def remote_reloadComponent(self):
         """Reload modules in the component."""
         import sys
@@ -250,6 +267,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
     gsignal('log', object)
 
     component_medium_class = BaseComponentMedium
+    _heartbeatInterval = configure.heartbeatInterval
     
     def __init__(self, name):
         """
@@ -257,10 +275,59 @@ class BaseComponent(log.Loggable, gobject.GObject):
         @type name: string
         """
         self.__gobject_init__()
+
+        self.state = component.JobComponentState()
         
+        self.state.set('name', name)
+        self.state.set('mood', moods.SLEEPING)
+        self.state.set('pid', os.getpid())
+
+        # FIXME: remove stuff in state
         self.name = name
+
+        self._HeartbeatDC = None
         self.medium = None # the medium connecting us to the manager's avatar
-        self._workerName = None
+
+    def updateMood(self):
+        """
+        Update the mood because a mood condition has changed.
+        Will not change the mood if it's sad - sad needs to be explicitly
+        fixed.
+
+        See the mood transition diagram.
+        """
+        mood = self.state.get('mood')
+        if mood == moods.SAD:
+            return
+
+        # FIXME: probably could use a state where it's still starting ?
+        self.setMood(moods.HAPPY)
+    
+    def startHeartbeat(self):
+        """
+        Start sending heartbeats.
+        """
+        self._heartbeat()
+        self._HeartbeatDC = reactor.callLater(self._heartbeatInterval,
+            self._heartbeat)
+
+    def stopHeartbeat(self):
+        """
+        Stop sending heartbeats.
+        """
+        if self._HeartbeatDC:
+            self._HeartbeatDC.cancel()
+        self._HeartbeatDC = None
+         
+    def _heartbeat(self):
+        """
+        Send heartbeat to manager and reschedule.
+        """
+        self.log('Sending heartbeat')
+        if self.medium:
+            self.medium.callRemote('heartbeat', self.state.get('mood'))
+        self._HeartbeatDC = reactor.callLater(self._heartbeatInterval,
+            self._heartbeat)
 
     ### Loggable methods
     def logFunction(self, arg):
@@ -279,15 +346,32 @@ class BaseComponent(log.Loggable, gobject.GObject):
         return self.name
 
     def setWorkerName(self, workerName):
-        self._workerName = workerName
+        self.state.set('workerName', workerName)
 
     def getWorkerName(self):
-        return self._workerName
+        return self.state.get('workerName')
 
     def setMedium(self, medium):
         assert isinstance(medium, BaseComponentMedium)
         self.medium = medium
+        # send a heartbeat right now
+        if self._HeartbeatDC:
+            self._HeartbeatDC.reset(0)
 
+    def setMood(self, mood):
+        """
+        Set the given mood on the component if it's different from the current
+        one.
+        """
+        if self.state.get('mood') == mood:
+            return
+
+        self.debug('MOOD changed to %r' % mood)
+        self.state.set('mood', mood)
+        # send a heartbeat right now
+        if self._HeartbeatDC:
+            self._HeartbeatDC.reset(0)
+        
     def adminCallRemote(self, methodName, *args, **kwargs):
         """
         Call a remote method on all admin client views on this component.

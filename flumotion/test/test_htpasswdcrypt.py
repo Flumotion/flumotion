@@ -43,6 +43,9 @@ class TestHTPasswdCryptUACPP(unittest.TestCase):
     def setUp(self):
         data = """user:qi1Lftt0GZC0o"""
         self.bouncer = htpasswdcrypt.HTPasswdCrypt('testbouncer', None, data)
+
+    def tearDown(self):
+        del self.bouncer
         
     def testInit(self):
         self.assert_(self.bouncer._checker)

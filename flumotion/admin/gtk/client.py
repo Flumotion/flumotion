@@ -33,13 +33,15 @@ from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs
 from flumotion.configure import configure
 from flumotion.common import errors, log
+from flumotion.common.common import moods
 from flumotion.manager import admin # Register types
 from flumotion.utils.gstutils import gsignal
 
-COL_PIXBUF    = 0
+COL_MOOD      = 0
 COL_COMPONENT = 1
 COL_WORKER    = 2
 COL_PID       = 3
+COL_STATE     = 4
 
 RESPONSE_FETCH = 0
 
@@ -118,6 +120,7 @@ class Window(log.Loggable, gobject.GObject):
         self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
                                             # disconnected
+        self._iters = {} # componentState -> model iter
 
     ### connection to manager, called from constructor
     def _connectToManager(self, host, port, transport, username, password):
@@ -134,6 +137,8 @@ class Window(log.Loggable, gobject.GObject):
         self.admin.connect('component-property-changed',
             self.property_changed_cb)
         self.admin.connect('update', self.admin_update_cb)
+
+        # set ourselves as a view for the admin model
         self.admin.addView(self)
 
         if transport == "ssl":
@@ -147,7 +152,6 @@ class Window(log.Loggable, gobject.GObject):
         else:
             self.error("Unknown transport protocol %s" % transport)
         
-    
     # default Errback
     def _defaultErrback(self, failure):
         self.warning('Errback: unhandled failure: %s' %
@@ -164,15 +168,15 @@ class Window(log.Loggable, gobject.GObject):
         self.hpaned = wtree.get_widget('hpaned')
         self.window.connect('delete-event', self.close)
         
-        self.component_model = gtk.ListStore(gdk.Pixbuf, str, str, int)
+        self.component_model = gtk.ListStore(gdk.Pixbuf, str, str, int, object)
         self.component_view = wtree.get_widget('component_view')
         self.component_view.connect('row-activated',
                                     self.component_view_row_activated_cb)
         self.component_view.set_model(self.component_model)
         self.component_view.set_headers_visible(True)
 
-        col = gtk.TreeViewColumn(' ', gtk.CellRendererPixbuf(),
-                                 pixbuf=COL_PIXBUF)
+        col = gtk.TreeViewColumn('Mood', gtk.CellRendererPixbuf(),
+                                 pixbuf=COL_MOOD)
         self.component_view.append_column(col)
 
         col = gtk.TreeViewColumn('Component', gtk.CellRendererText(),
@@ -185,13 +189,35 @@ class Window(log.Loggable, gobject.GObject):
         
         col = gtk.TreeViewColumn('PID', gtk.CellRendererText(),
                                  text=COL_PID)
+
         self.component_view.append_column(col)
         wtree.signal_autoconnect(self)
 
-        self.icon_playing = self.window.render_icon(gtk.STOCK_YES,
-                                                    gtk.ICON_SIZE_MENU)
-        self.icon_stopped = self.window.render_icon(gtk.STOCK_NO,
-                                                    gtk.ICON_SIZE_MENU)
+        # gtk.gdk.Pixbuf's
+        #self.icon_playing = self.window.render_icon(gtk.STOCK_YES,
+        #                                            gtk.ICON_SIZE_MENU)
+        #self.icon_stopped = self.window.render_icon(gtk.STOCK_NO,
+        #                                            gtk.ICON_SIZE_MENU)
+
+        self._moodPixbufs = self._getMoodPixbufs()
+
+    def _getMoodPixbufs(self):
+        pixbufs = {}
+        items = (
+            (moods.HAPPY, "happy"),
+            (moods.SAD, "sad"),
+            (moods.HUNGRY, "hungry"),
+            (moods.LOST, "lost"),
+            (moods.WAKING, "waking"),
+            (moods.SLEEPING, "sleeping"),
+            )
+
+        for item in items:
+            (m, name) = item
+            pixbufs[m] = gtk.gdk.pixbuf_new_from_file(os.path.join(
+                configure.imagedir, 'mood-%s.png' % name))
+
+        return pixbufs
 
     def get_selected_component_name(self):
         selection = self.component_view.get_selection()
@@ -386,6 +412,14 @@ class Window(log.Loggable, gobject.GObject):
         self.debug("component: returning result: %r to caller" % result)
         return result
 
+    def stateChanged(self, state, key, value):
+        # called by model when state of a component changes
+        # look up the iter based on the state
+        iter = self._iters[state]
+        model = self.component_model
+        if key == 'mood':
+            model.set(iter, COL_MOOD, self._moodPixbufs[value])
+
     ### glade callbacks
     def component_view_row_activated_cb(self, *args):
         name = self.get_selected_component_name()
@@ -488,6 +522,7 @@ class Window(log.Loggable, gobject.GObject):
     def update_components(self):
         model = self.component_model
         model.clear()
+        self._iters = {}
 
         # get a dictionary of components
         components = self.admin.get_components()
@@ -499,14 +534,13 @@ class Window(log.Loggable, gobject.GObject):
         for name in names:
             component = components[name]
             iter = model.append()
-            if component.state == gst.STATE_PLAYING:
-                pixbuf = self.icon_playing
-            else:
-                pixbuf = self.icon_stopped
-            model.set(iter, COL_PIXBUF, pixbuf)
-            model.set(iter, COL_COMPONENT, component.name)
-            model.set(iter, COL_WORKER, component.worker)
-            model.set(iter, COL_PID, component.pid)
+            self._iters[component] = iter
+            mood = component.get('mood')
+            model.set(iter, COL_MOOD, self._moodPixbufs[mood])
+            model.set(iter, COL_COMPONENT, component.get('name'))
+            model.set(iter, COL_WORKER, component.get('workerName'))
+            model.set(iter, COL_PID, component.get('pid'))
+            model.set(iter, COL_STATE, component)
 
     def close(self, *args):
         reactor.stop()

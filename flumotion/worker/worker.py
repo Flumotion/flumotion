@@ -396,14 +396,28 @@ class WorkerBrain(log.Loggable):
             # remove from the kindergarten
             self.kindergarten.removeKidByPid(pid)
 
-            # check if it exited nicely
+            # check if it exited nicely; see Stevens
             if os.WIFEXITED(status):
                 retval = os.WEXITSTATUS(status)
                 self.info("Reaped child job with pid %d, exit value %d" % (
                     pid, retval))
+            elif os.WIFSIGNALED(status):
+                signal = os.WTERMSIG(status)
+                self.info(
+                    "Reaped job child with pid %d signaled by signal %d" % (
+                        pid, signal))
+                if os.WCOREDUMP(status):
+                    self.info("Core dumped")
+                    
+            elif os.WIFSTOPPED(status):
+                signal = os.WSTOPSIG(status)
+                self.info(
+                    "Reaped job child with pid %d stopped by signal %d" % (
+                        pid, signal))
             else:
-                self.info("Reaped job child with pid %d and unhandled status %d" % (
-                    pid, status))
+                self.info(
+                    "Reaped job child with pid %d and unhandled status %d" % (
+                        pid, status))
 
     def installSIGTERMHandler(self):
         """

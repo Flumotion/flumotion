@@ -30,6 +30,7 @@ from twisted.spread import pb
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
 from flumotion.common import interfaces, errors, log
+from flumotion.common.common import moods
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
@@ -47,7 +48,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         basecomponent.BaseComponentMedium.__init__(self, component)
 
-        self.comp.connect('state-changed', self._component_state_changed_cb)
+        self.comp.connect('feed-state-changed', self._component_feed_state_changed_cb)
         self.comp.connect('error', self._component_error_cb)
         self.comp.connect('notify-feed-ports', self._component_notify_feed_ports_cb)
         
@@ -57,18 +58,24 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         #    self.comp.pipeline_stop()
 
     def _component_error_cb(self, component, element_path, message):
+        self.comp.setMood(moods.SAD)
         self.callRemote('error', element_path, message)
         
-    def _component_state_changed_cb(self, component, feed_name, state):
-        self.callRemote('stateChanged', feed_name, state)
+    def _component_feed_state_changed_cb(self, component, feed_name, state):
+        self.callRemote('feedStateChanged', feed_name, state)
+        # FIXME: everything heeds to be playing, not just one !
+        if state == gst.STATE_PLAYING:
+            self.info('component is HAPPY')
+            self.comp.setMood(moods.HAPPY)
 
     def _component_notify_feed_ports_cb(self, component):
         self.callRemote('notifyFeedPorts', component.feed_ports)
 
     ### Referenceable remote methods which can be called from manager
-    # FIXME: rename link, unambiguate eaters and feeders' meaning
+    # FIXME: unambiguate eaters and feeders' meaning
+    def remote_start(self, eatersData, feedersData):
         """
-        Tell the component to link itself to other components.
+        Tell the component to start, linking itself to other components.
 
         @type eatersData: list of (feedername, host, port) tuples of elements
                           feeding our eaters.
@@ -77,11 +84,24 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         @returns: list of (feedName, host, port)-tuples of feeds the component
                   produces.
         """
-    def remote_link(self, eatersData, feedersData):
-        self.debug('remote_link with eaters data %s and feeders data %s' % (eatersData, feedersData))
+        self.debug('remote_start with eaters data %s and feeders data %s' % (
+            eatersData, feedersData))
+        self.comp.setMood(moods.WAKING)
+
         ret = self.comp.link(eatersData, feedersData)
-        self.debug('remote_link: returning value %s' % ret)
+
+        self.debug('remote_start: returning value %s' % ret)
+
+        # chain to parent 
+        basecomponent.BaseComponentMedium.remote_start(self)
+        
         return ret
+
+    def remote_play(self):
+        self.comp.play()
+        
+    def remote_pause(self):
+        self.comp.pause()
 
     def remote_getElementProperty(self, elementName, property):
         return self.comp.get_element_property(elementName, property)
@@ -89,25 +109,18 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     def remote_setElementProperty(self, elementName, property, value):
         self.comp.set_element_property(elementName, property, value)
 
-    def remote_play(self):
-        self.comp.play()
-        
-    def remote_stop(self):
-        self.comp.stop()
-        self.remote.broker.transport.loseConnection()
-        reactor.stop()
-        
-    def remote_pause(self):
-        self.comp.pause()
+    def remote_getState(self):
+        state = basecomponent.BaseComponentMedium.remote_getState(self)
+        if not state:
+            return state
 
-    def remote_register(self):
-        options = basecomponent.BaseComponentMedium.remote_register(self)
-        if options:
-            options['eaters'] = self.comp.get_eater_names()
-            options['feeders'] = self.comp.get_feeder_names()
-            options['elements'] = self.comp.get_element_names()
+        # FIXME: rename functions to Twisted style
+        state.set('eaterNames', self.comp.get_eater_names())
+        state.set('feederNames', self.comp.get_feeder_names())
+        state.set('elementNames', self.comp.get_element_names())
+        self.debug('remote_getState of fc: returning state %r' % state)
 
-        return options
+        return state
     
     def remote_getFreePorts(self, feeders):
         retval = []
@@ -149,7 +162,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     logCategory = 'feedcomponent'
 
-    gsignal('state-changed', str, object)
+    gsignal('feed-state-changed', str, object)
     gsignal('error', str, str)
     gsignal('notify-feed-ports')
 
@@ -159,8 +172,8 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         @param name: unique name of the component
         @type name: string
-        @param eater_config: <source></source> entries from config
-        @param feeder_config: <feed></feed> entries from config
+        @param eater_config: entry between <source>...</source> from config
+        @param feeder_config: entry between <feed>...</feed> from config
         """
         basecomponent.BaseComponent.__init__(self, name)
         
@@ -170,12 +183,51 @@ class FeedComponent(basecomponent.BaseComponent):
         self.files = []
         self.effects = {}
 
+        # add extra keys to state
+        self.state.addKey('eaterNames')
+        self.state.addKey('feederNames')
+        self.state.addKey('elementNames')
+
         self.feed_names = None # done by self.parse*
         self.feeder_names = None
 
+        self.eater_names = []
         self.parseEaterConfig(eater_config)
+        self.eatersWaiting = len(self.eater_names)
+
+        self.feedersFeeding = 0
+        self.feed_names = []
+        self.feeder_names = []
         self.parseFeederConfig(feeder_config)
+        self.feedersWaiting = len(self.feeder_names)
+        self.debug('__init__ with %d eaters and %d feeders waiting' % (
+            self.eatersWaiting, self.feedersWaiting))
+
+        # FIXME: maybe this should move to a callLater ?
         self.setup_pipeline()
+
+    ### base class overrides
+    def updateMood(self):
+        """
+        Update the mood because a mood condition has changed.
+        Will not change the mood if it's sad - sad needs to be explicitly
+        fixed.
+
+        See the mood transition diagram.
+        """
+        mood = self.state.get('mood')
+        if mood == moods.SAD:
+            return
+
+        if self.eatersWaiting == 0 and self.feedersWaiting == 0:
+            self.setMood(moods.HAPPY)
+            return
+
+        if self.eatersWaiting == 0:
+            self.setMood(moods.WAKING)
+        else:
+            self.setMood(moods.HUNGRY)
+        return
 
     def addEffect(self, effect):
         self.effects[effect.name] = effect
@@ -195,13 +247,13 @@ class FeedComponent(basecomponent.BaseComponent):
         # the source feeder names come from the config
         # they are specified under <component> as <source> elements in XML
         # so if they don't specify a feed name, use "default" as the feed name
-        self.eater_names = []
-
+        eater_names = []
         for block in eater_config:
             eater_name = block
             if block.find(':') == -1:
                 eater_name = block + ':default'
-            self.eater_names.append(eater_name)
+            eater_names.append(eater_name)
+        self.eater_names = eater_names
             
     def parseFeederConfig(self, feeder_config):
         # for pipeline components, in the case there is only one
@@ -309,16 +361,29 @@ class FeedComponent(basecomponent.BaseComponent):
             eater.set_property('host', host)
             eater.set_property('port', port)
             eater.set_property('protocol', 'gdp')
-            
-    # FIXME: need to make a separate callback to implement "mood" of component
-    #        This is used by file/file.py, so make sure to syncronize them
-    def feeder_state_change_cb(self, element, old, state, feed_name):
-        # also called by subclasses
-        self.debug('state-changed  on feed %s: element %s, state %s' % (
-            feed_name, element.get_path_string(),
-            gst.element_state_get_name(state)))
-        self.emit('state-changed', feed_name, state)
+            eater.connect('state-change', self.eater_state_change_cb)
 
+    def eater_state_change_cb(self, element, old, state):
+        """
+        Called when the eater element changes state.
+        """
+        # also called by subclasses
+        self.debug('eater-state-changed: element %s, state %s' % (
+            element.get_path_string(),
+            gst.element_state_get_name(state)))
+
+        # update eatersWaiting count
+        if old == gst.STATE_PAUSED and state == gst.STATE_PLAYING:
+            self.debug('eater %s is now eating' % element.get_name())
+            self.eatersWaiting -= 1
+            self.updateMood()
+        if old == gst.STATE_PLAYING and state == gst.STATE_PAUSED:
+            self.debug('eater %s is now hungry' % element.get_name())
+            self.eatersWaiting += 1
+            self.updateMood()
+        self.debug('%d eaters waiting' % self.eatersWaiting)
+
+            
     def _setup_feeders(self, feedersData):
         """
         Set up the feeding GStreamer elements in our pipeline based on
@@ -340,15 +405,14 @@ class FeedComponent(basecomponent.BaseComponent):
             feed_name = feeder_name.split(':')[1]
             assert self.feed_ports.has_key(feed_name), feed_name
             port = self.feed_ports[feed_name]
-            self.debug('Going to listen on feeder %s (%s:%d)' % (feeder_name, host, port))
+            self.debug('Going to listen on feeder %s (%s:%d)' % (
+                feeder_name, host, port))
             name = 'feeder:' + feeder_name
             feeder = self.get_element(name)
-            assert feeder
-            feeder.connect('state-change', self.feeder_state_change_cb, feed_name)
-            
             assert feeder, 'No feeder element named %s in pipeline' % feed_name
             assert isinstance(feeder, gst.Element)
-            
+
+            feeder.connect('state-change', self.feeder_state_change_cb, feed_name)
             feeder.set_property('host', host)
             feeder.set_property('port', port)
             feeder.set_property('protocol', 'gdp')
@@ -356,6 +420,28 @@ class FeedComponent(basecomponent.BaseComponent):
             retval.append((feed_name, host, port))
 
         return retval
+
+    # FIXME: need to make a separate callback to implement "mood" of component
+    #        This is used by file/file.py, so make sure to syncronize them
+    def feeder_state_change_cb(self, element, old, state, feed_name):
+        # also called by subclasses
+        self.debug('feed-state-changed on feed %s: element %s, state %s' % (
+            feed_name, element.get_path_string(),
+            gst.element_state_get_name(state)))
+
+        # update feedersWaiting count
+        if old == gst.STATE_PAUSED and state == gst.STATE_PLAYING:
+            self.debug('feeder %s is now feeding' % element.get_name())
+            self.feedersWaiting -= 1
+            self.updateMood()
+        if old == gst.STATE_PLAYING and state == gst.STATE_PAUSED:
+            self.debug('feeder %s is now waiting' % element.get_name())
+            self.feedersWaiting += 1
+            self.updateMood()
+
+        self.debug('%d feeders waiting' % self.feedersWaiting)
+        self.emit('feed-state-changed', feed_name, state)
+
     
     def cleanup(self):
         self.debug("cleaning up")
@@ -387,11 +473,20 @@ class FeedComponent(basecomponent.BaseComponent):
     # FIXME: rename, unambiguate and comment
     def link(self, eatersData, feedersData):
         """
+        Make the component eat from the feeds it depends on and start
+        producing feeds itself.
+
         @param eatersData: list of (feederName, host, port) tuples to eat from
         @param feedersData: list of (feederName, host) tuples to use as feeders
 
-        @returns: a list of (feedName,  host, port) tuples for our feeders
+        @returns: a list of (feedName, host, port) tuples for our feeders
         """
+        # if we have eaters waiting, we start out hungry, else waking
+        if self.eatersWaiting:
+            self.setMood(moods.HUNGRY)
+        else:
+            self.setMood(moods.WAKING)
+
         self.debug('manager asks us to link')
         self.debug('setting up eaters')
         self._setup_eaters(eatersData)

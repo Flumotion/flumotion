@@ -1,0 +1,19 @@
+- components have moods
+- moods reflect a "state" the component is in
+- examples:
+  - LOST:     no heartbeat received lately; component locked up, died, or
+              network problem
+  - HUNGRY:   waiting for a dependency to start (e.g., a feed, or other comp)
+  - HAPPY:    everything fine, component working, received heartbeats
+  - SAD:      an error happened (we wanted to use ANGRY, but the difference
+              between ANGRY and HUNGRY is close to non-existent in French)
+  - WAKING:   a component started up and is preparing
+  - SLEEPING: exists but not yet asked to do something
+ 
+- the "mood" is decided in the manager; for example, a component that is LOST
+  could be locked up and doesn't know itself that it is lost !
+- connected admins use a remotecacheable object for the component that has
+  the mood 
+- component lifecycle:
+  - gets created -> "WAKING"
+  - manager calls "start" -> component goes to HUNGRY, SAD, or HAPPY

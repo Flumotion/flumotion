@@ -2,7 +2,7 @@
 
 for SCANS in FIXME XXX TODO;
 do
-  find * -name *.py \
+  find flumotion -name '*.py' \
 	-exec grep --files-with-matches $SCANS {} \; \
 	-exec grep --line-number --color=always -C 5 $SCANS {} \;
 done

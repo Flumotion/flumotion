@@ -30,6 +30,7 @@ from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
 from flumotion.common import log
+from flumotion.common.common import moods
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
@@ -150,10 +151,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             reactor.callLater(0, self.change_filename)
 
     def _feeder_state_change_cb(self, element, old, state):
-        feedcomponent.FeedComponent.feeder_state_change_cb(self, element,
-                                                           old, state, '')
+        # FIXME: add more states
         if state == gst.STATE_PLAYING:
-            self.debug('Ready')
+            self.setMood(moods.HAPPY)
             
     def link_setup(self, eaters, feeders):
         sink = self.get_element('fdsink')

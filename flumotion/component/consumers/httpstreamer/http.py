@@ -33,6 +33,7 @@ from twisted.web import server
 
 from flumotion.component import feedcomponent
 from flumotion.common import bundle, common
+from flumotion.common.common import moods
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
@@ -338,14 +339,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     ### END OF THREAD-AWARE CODE
 
-    # FIXME: a streamer doesn't have feeders, so shouldn't call the base
-    # method; right now this is done so the manager knows it started.
-    # fix this by implementing concept of "moods" for components
     def _sink_state_change_cb(self, element, old, state):
-        feedcomponent.FeedComponent.feeder_state_change_cb(self, element,
-                                                     old, state, '')
+        # when our sink is PLAYING, then we are HAPPY
+        # FIXME: add more moods
         if state == gst.STATE_PLAYING:
             self.debug('Ready to serve clients')
+            self.setMood(moods.HAPPY)
 
     def link_setup(self, eaters, feeders):
         sink = self.get_element('sink')

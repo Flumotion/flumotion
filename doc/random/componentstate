@@ -1,0 +1,17 @@
+- state of component is a concept existing in all of manager, component,
+  and admin
+- state of component should be centrally managed (in manager)
+
+- admins are only "readers" on the state
+- component client can set some stuff on the state
+
+- manager can override mood (for example, for LOST)
+
+PARTS OF STATE and who decides them:
+
+- mood:
+  - 
+
+- name:
+- worker:
+- pid:       component

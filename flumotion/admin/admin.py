@@ -107,7 +107,6 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         # if this ever breaks, do real subclassing
         self.clientFactory.gotDeferredLogin = gotDeferredLogin
 
-
     ### our methods
     def _loginCallback(self, result, password):
         self.log("_loginCallback(result=%r, password=%s)" % (result, password))
@@ -169,8 +168,9 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             view.componentCall(componentName, methodName, *args, **kwargs)
 
     def remote_componentAdded(self, component):
-        self.debug('componentAdded %s' % component.name)
-        self._components[component.name] = component
+        self.debug('componentAdded %s' % component.get('name'))
+        self._components[component.get('name')] = component
+        component.addListener(self)
         self.emit('update')
         
     def remote_componentStateChanged(self, component, state):
@@ -178,25 +178,32 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         @param component: component that changed state.
         @param state: new state of component.
         """
-        self.debug('componentStateChanged %s' % component.name)
-        self._components[component.name] = component
+        self.debug('componentStateChanged %s' % component.get('name'))
+        self._components[component.get('name')] = component
         self.emit('update')
          
     def remote_componentRemoved(self, component):
         # FIXME: this asserts, no method, when server dies
         # component will be a RemoteComponentView, so we can only use a
         # member, not a method to get the name
-        self.debug('componentRemoved %s' % component.name)
-        del self._components[component.name]
+        self.debug('componentRemoved %s' % component.get('name'))
+        del self._components[component.get('name')]
         self.emit('update')
         
     def remote_initial(self, components, workers):
         self.debug('remote_initial(components=%s)' % components)
         for component in components:
-            self._components[component.name] = component
+            self._components[component.get('name')] = component
+            # get notified of state changes on component
+            component.addListener(self)
         self._workers = workers
-        
         self.emit('connected')
+
+    # state listener "interface"
+    def stateChanged(self, state, key, value):
+        self.debug("state changed on %r: key %s" % (state, key))
+        for view in self._views:
+            view.stateChanged(state, key, value)
 
     def remote_shutdown(self):
         self.debug('shutting down')
@@ -332,7 +339,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         @rtype: L{twisted.internet.defer.Deferred}
         """
         def _reloaded(result, self, component):
-            self.info("reloaded component %s code" % component.name)
+            self.info("reloaded component %s code" % component.get('name'))
 
         self.info("reloading component %s code" % name)
         self.emit('reloading', name)
