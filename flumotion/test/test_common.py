@@ -29,7 +29,7 @@ from flumotion.common import common
 
 class TestFormatStorage(unittest.TestCase):
     def testBytes(self):
-        value = 4
+        value = 5
         assert common.formatStorage(value) == "4.00 "
 
     def testKibibyte(self):
