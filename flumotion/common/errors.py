@@ -74,18 +74,30 @@ class SystemError(pb.Error):
 class ReloadSyntaxError(pb.Error):
     "A syntax error during a reload of a module"
 
-class SleepingComponentError(pb.Error):
+# component errors
+class ComponentError(pb.Error):
+    "Error while doing something to a component"
+    
+# FIXME: rename, component first
+class SleepingComponentError(ComponentError):
     "Component is sleeping, cannot handle request"
 
-class BusyComponentError(pb.Error):
+class ComponentMoodError(ComponentError):
+    "Component is in the wrong mood to perform the given function"
+
+class ComponentNoWorkerError(ComponentError):
+    "Component does not have its worker available"
+
+class BusyComponentError(ComponentError):
     "Component is busy doing something"
 
-class ComponentStart(pb.Error):
+class ComponentStart(ComponentError):
     "An error during starting of a component"
 
-class UnknownComponentError(pb.Error):
+class UnknownComponentError(ComponentError):
     "A given component or component type does not exist"
 
+# effect errors
 class UnknownEffectError(pb.Error):
     "A given effect or effect type does not exist"
 

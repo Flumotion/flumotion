@@ -1,3 +1,10 @@
+2005-02-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/errors.py:
+	  add some errors
+	* flumotion/common/log.py:
+	  change logging some more
+
 2005-02-14  Andy Wingo  <wingo@pobox.com>
 
 	* data/glade/admin.glade: Remove "Stop all" toolbar button. It
