@@ -654,7 +654,6 @@ class ComponentRegistry(log.Loggable):
     def addFile(self, filename, string=None):
         self.debug('Adding file: %s' % filename)
         self._parser.parseRegistryFile(filename, string)
-        print self._parser._bundles
         
     def addFromString(self, string):
         self.addFile('<string>', string)
