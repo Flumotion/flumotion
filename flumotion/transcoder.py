@@ -40,18 +40,21 @@ class TranscoderFactory(pb.Root):
         self.pipeline.set_state(gst.STATE_PLAYING)
 
     def pipeline_state_change_cb(self, *args):
-        print 'state-changed', args
+        pass
+    
+#        print 'state-changed', args
         
     def error_cb(self, object, element, error, arg):
         print element.get_name(), str(error)
 
-    def remote_start(self):
+    def remote_start(self, port):
         print 'Transcoder.start'
         self.pipeline = gst.Pipeline('acquisition-thread')
         self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         self.pipeline.connect('error', self.error_cb)
         
         self.src = gst.element_factory_make('tcpserversrc')
+        self.src.set_property('port', port)
         self.sink = gst.element_factory_make('xvimagesink')
         self.reframer = gst.element_factory_make('videoreframer')
 
@@ -68,7 +71,6 @@ class TranscoderFactory(pb.Root):
         self.reframer.link_filtered(self.sink, gst.caps_from_string(caps))
 
         gobject.idle_add(self.pipeline_iterate)
-        #self.pipeline_play()
         reactor.callLater(0, self.pipeline_play)
         
 if __name__ == '__main__':

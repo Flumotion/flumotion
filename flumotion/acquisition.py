@@ -79,9 +79,6 @@ class AcquisitionFactory(pb.Root):
         self.controller = object
         return hash(self)
     
-    def remote_setTranscoder(self, object):
-        self.transcoder = object
-        
     def pipeline_iterate(self):
         self.pipeline.iterate()
         return True

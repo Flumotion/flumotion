@@ -45,7 +45,7 @@ class AcquisitionManager:
     def onConnect(self, object, control, hostname, port):
         d = object.callRemote('setController', control)
         def getRetval(object_id):
-            self.objs[object_id] = object, hostname, port
+            self.objs[object_id] = object
             return object
         d.addCallback(getRetval)
         return object
@@ -62,7 +62,15 @@ class TranscoderManager:
     def __init__(self, control):
         self.control = control
         self.objs = {}
-        
+        self.hostnames = {}
+
+    def getHostnameFor(self, obj):
+        obj_id = obj.processUniqueID()
+        if not self.hostnames.has_key(obj_id):
+            raise KeyError, "No hostname found for object: %r" % obj
+
+        return self.hostnames[obj_id]
+    
     def create(self, port=8800, interface=''):
         factory = pb.PBServerFactory(TranscoderFactory())
         f = reactor.listenTCP(port, factory, 5, interface)
@@ -77,6 +85,7 @@ class TranscoderManager:
         
         object = factory.getRootObject()
         def onConnect(obj, control):
+            self.hostnames[obj.processUniqueID()] = hostname
             d = obj.callRemote('setController', control)
             return obj
         object.addCallback(onConnect, self.control)
@@ -85,7 +94,8 @@ class TranscoderManager:
 class ControllerFactory(pb.Referenceable):
     def __init__(self):
         self.objs = {}
-        self.addrs = {}
+        self.hostnames = {}
+        self.ports = {}
         self.acq_mgr = AcquisitionManager(self)
         self.trans_mgr = TranscoderManager(self)
         
@@ -99,13 +109,14 @@ class ControllerFactory(pb.Referenceable):
         return self.acq_mgr.connect(hostname, port)
 
     def connectTranscoder(self, hostname, port):
-        return self.trans_mgr.connect(hostname, port)
+        object = self.trans_mgr.connect(hostname, port)
+        return object
 
-    def transGetInfo(self, port, trans):
-        self.addrs[trans.processUniqueID()] = port
-        return trans
+    def transGetInfo(self, port, obj):
+        self.ports[obj.processUniqueID()] = port
+        return obj
     
-    def link(self, acq, trans):
+    def link(self, acq, trans, port):
         def onAcqConnect(obj, other):
             if hasattr(other, 'result'):
                 self.objs[obj.processUniqueID()] = other.result
@@ -116,10 +127,11 @@ class ControllerFactory(pb.Referenceable):
         acq.addCallback(onAcqConnect, trans)
         
         def onTransConnect(obj, other):
+            print 'Transcoder connected'
             if hasattr(other, 'result'):
                 self.objs[obj.processUniqueID()] = other.result
                 self.objs[other.result.processUniqueID()] = obj
-            obj.callRemote('start')
+            obj.callRemote('start', port)
             retval = obj.callRemote('getInfo')
             retval.addCallback(self.transGetInfo, obj)
             return obj
@@ -132,13 +144,16 @@ class ControllerFactory(pb.Referenceable):
     def remote_acqNotifyCaps(self, acq_id, caps):
         print 'Controller.acqNotifyCaps', caps
 
-        acq, hostname, port = self.acq_mgr.objs[acq_id]
+        acq = self.acq_mgr.objs[acq_id]
+        
         transcoder = self.objs[acq.processUniqueID()]
         retval = transcoder.callRemote('setCaps', caps)
         
         def whenCapsIsSet(obj, acq):
             print 'Transcoders caps is set, calling up to acq'
-            port = self.addrs[transcoder.processUniqueID()]
+            obj_id = transcoder.processUniqueID()
+            hostname = self.trans_mgr.getHostnameFor(transcoder)
+            port = self.ports[obj_id]
             acq.callRemote('assignRealSink', hostname, port)
             return acq
         
@@ -165,6 +180,6 @@ if __name__ == '__main__':
     hostname, port = sys.argv[2].split(':')
     trans = controller.connectTranscoder(hostname, int(port))
 
-    controller.link(acq, trans)
+    controller.link(acq, trans, 5500)
     
     reactor.run()
