@@ -17,7 +17,6 @@ SUBDIRS = \
 	encoders \
 	file \
 	http \
-	multipartjpeg \
 	muxers \
 	overlay \
 	passwd \
