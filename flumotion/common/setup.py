@@ -20,12 +20,11 @@
 
 # Headers in this file shall remain intact.
 
-import flumotion.common.registry
-import flumotion.common.log
+from flumotion.common import log, registry
 
 def setup(root=None):
-    flumotion.common.log.init()
+    log.init()
     if root:
-        flumotion.common.registry.registry.verify(root)
+        registry.registry.verify(root)
 
     
