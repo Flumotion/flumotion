@@ -16,7 +16,6 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 import optparse
-import sys
 import os
 
 from twisted.internet import reactor
@@ -40,8 +39,6 @@ class ServerContextFactory:
         return ctx
 
 def _startSSL(vishnu, options):
-    from twisted.internet import ssl
-
     pemFile = options.certificate
     # if no path in pemFile, then look for it in the config directory
     if not os.path.split(pemFile)[0]:
