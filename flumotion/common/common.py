@@ -127,7 +127,7 @@ def version(binary):
     block = []
     block.append("%s %s" % (binary, configure.version))
     block.append("part of Flumotion - a streaming media server")
-    block.append("(C) Copyright 2004 Fluendo")
+    block.append("(C) Copyright 2004,2005 Fluendo")
     return "\n".join(block)
              
 def mergeImplements(*classes):
