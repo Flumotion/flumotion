@@ -1,3 +1,18 @@
+2004-08-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/utils/log.py:
+	  create Loggable class, to be subclassed, to handle logging
+	* flumotion/components/converter.py:
+	* flumotion/components/http.py:
+	* flumotion/components/producer.py:
+	* flumotion/gui/adminclient.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/component.py:
+	* flumotion/server/config.py:
+	* flumotion/server/controller.py:
+	* flumotion/server/launcher.py:
+	  subclass Loggable where-ever
+
 2004-08-18  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/components/file.py (FileSinkStreamer.__init__):

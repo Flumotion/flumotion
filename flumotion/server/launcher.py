@@ -41,7 +41,8 @@ class MiniProtocol(NetstringReceiver):
             reactor.stop()
             self.controller.shutdown()
             
-class Launcher:
+class Launcher(log.Loggable):
+    logCategory = 'launcher'
     def __init__(self, host, port):
         self.children = []
         self.controller_pid = None
@@ -51,10 +52,6 @@ class Launcher:
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         
-    debug = lambda s, *a: log.debug('launcher', *a)
-    warning = lambda s, *a: log.warning('launcher', *a)
-    error = lambda s, *a: log.error('launcher', *a)
-
     def restore_uid(self):
         if self.uid is not None:
             try:

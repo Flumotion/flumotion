@@ -166,14 +166,13 @@ class HTTPStreamingAdminResource(resource.Resource):
             'stats': "\n".join(block)
         }
 
-class HTTPStreamingResource(resource.Resource):
+class HTTPStreamingResource(resource.Resource, log.Loggable):
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
+    logCategory = 'httpstreamer'
     def __init__(self, streamer):
         self.logfile = None
             
         streamer.connect('client-removed', self.streamer_client_removed_cb)
-        self.debug = streamer.debug
-        self.info = streamer.info
         self.streamer = streamer
         self.admin = HTTPStreamingAdminResource(self)
 
@@ -385,6 +384,7 @@ class HTTPStreamingResource(resource.Resource):
             return self.handleNewClient(request)
 
 class MultifdSinkStreamer(component.ParseLaunchComponent):
+    logCategory = 'cons-http'
     # use select for test
     pipe_template = 'multifdsink name=sink ' + \
                                 'buffers-max=500 ' + \

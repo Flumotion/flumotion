@@ -61,7 +61,7 @@ class Dispatcher:
 class Options:
     """dummy class for storing controller side options of a component"""
 
-class ComponentPerspective(pbutil.NewCredPerspective):
+class ComponentPerspective(pbutil.NewCredPerspective, log.Loggable):
     """Perspective all components will have on the controller side"""
     def __init__(self, controller, username):
         self.controller = controller
@@ -77,9 +77,11 @@ class ComponentPerspective(pbutil.NewCredPerspective):
                                         self.getName(),
                                         gst.element_state_get_name(self.state))
 
-    debug = lambda s, *a: log.debug('controller', *(s.getName(),) + a)
-    warning = lambda s, *a: log.warning('controller', *(s.getName(),) + a)
-    error = lambda s, *a: log.error('controller', *(s.getName(),) + a)
+    # log.Loggable functions
+    logCategory = 'controller'
+    def logFunction(self, arg):
+        return (self.getName() + ': ' + arg)
+
 
     def getTransportPeer(self):
         return self.mind.broker.transport.getPeer()
@@ -174,11 +176,11 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         log.debug(self.getName(), *msg)
         
     def perspective_stateChanged(self, feed, state):
-        self.debug('stateChanged :%s %s' % (feed, gst.element_state_get_name(state)))
+        self.debug('stateChanged: %s %s' % (feed, gst.element_state_get_name(state)))
         
         self.state = state
         if self.state == gst.STATE_PLAYING:
-            self.debug('is now playing')
+            self.info('is now playing')
 
         if self.getFeeds():
             self.controller.startPendingComponents(self, feed)

@@ -43,14 +43,12 @@ class RemoteComponentView(pb.RemoteCopy):
         return '<RemoteComponentView %s>' % self.name
 pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
 
-class AdminPerspective(pbutil.NewCredPerspective):
+class AdminPerspective(pbutil.NewCredPerspective, log.Loggable):
+    logCategory = 'admin'
     def __init__(self, controller):
         self.controller = controller
         self.mind = None
         
-    debug = lambda s, *a: log.debug('admin', *a)
-    warning = lambda s, *a: log.warning('admin', *a)
-
     def hasPerspective(self):
         return self.mind != None
     

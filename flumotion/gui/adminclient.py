@@ -41,12 +41,13 @@ from flumotion.utils import log
 
 import flumotion.config
 
-class AdminInterface(pb.Referenceable, gobject.GObject):
+class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     __gsignals__ = {
         'connected' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
         'connection-refused' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
         'update'    : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (object,))
     }
+    logCategory = 'adminclient'
 
     def __init__(self):
         self.__gobject_init__()
@@ -66,15 +67,8 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
         self.emit('connection-refused')
         self.debug("emitted connection-refused")
 
-    def info(self, *args):
-        log.info('adminclient', *args)
-    def debug(self, *args):
-        log.debug('adminclient', *args)
-    def log(self, *args):
-        log.log('adminclient', *args)
-        
     def remote_log(self, category, type, message):
-        self.log(category, type, message)
+        self.log('remote: %s: %s: %s' % (category, type, message))
         
     def remote_componentAdded(self, component):
         self.debug('componentAdded %s' % component.getName())

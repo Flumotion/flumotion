@@ -26,7 +26,7 @@ This module provides logging to Flumotion components.
 Just like in GStreamer, five levels are defined.
 These are, in order of decreasing verbosity: log, debug, info, warning, error.
 
-API Stability: freezing
+API Stability: unstable
 
 Maintainer: U{Thomas Vander Stichele <thomas at apestaart dot org>}
 """
@@ -38,17 +38,30 @@ from flumotion.twisted import errors
 # environment variables controlling levels for each category
 global FLU_DEBUG
 
+class Loggable:
+    logCategory = 'default'
+    
+    error = lambda self, *a: error(self.logCategory, self.logFunction(*a))
+    warning = lambda self, *a: warning(self.logCategory, self.logFunction(*a))
+    info = lambda self, *a: info(self.logCategory, self.logFunction(*a))
+    debug = lambda self, *a: debug(self.logCategory, self.logFunction(*a))
+    log = lambda self, *a: log(self.logCategory, self.logFunction(*a))
+
+    def logFunction(self, a):
+        'default implementation just returns the one passed argument'
+        return a
+
 _log_handlers = []
 
 def stderrHandler(category, type, message):
-    sys.stderr.write('[%s:%s] %s\n' % (category, type, message))
+    sys.stderr.write('%-8s %-15s %s\n' % (type + ':', category + ':' , message))
     sys.stderr.flush()
 
 def stderrHandlerLimited(category, type, message):
     'used when FLU_DEBUG is set; uses FLU_DEBUG to limit on category'
     # FIXME: we should parse FLU_DEBUG into a hash so we can look up
     # if the given category matches  
-    sys.stderr.write('[%s:%s] %s\n' % (category, type, message))
+    sys.stderr.write('%-8s %-15s %s\n' % (type + ':', category + ':' , message))
     sys.stderr.flush()
 
 def _handle(category, type, message):

@@ -49,7 +49,9 @@ class ConfigEntry:
     def startFactory(self):
         return self.config.get('start-factory', True)
     
-class FlumotionConfigXML:
+class FlumotionConfigXML(log.Loggable):
+    logCategory = 'config'
+
     def __init__(self, filename):
         self.entries = {}
     
@@ -58,9 +60,6 @@ class FlumotionConfigXML:
         self.path = os.path.split(filename)[0]
         self.parse()
         
-    debug = lambda s, *a: log.debug('config', *a)
-    warning = lambda s, *a: log.warning('config', *a)
-
     def getPath(self):
         return self.path
 

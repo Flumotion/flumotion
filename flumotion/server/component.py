@@ -43,7 +43,9 @@ class ComponentFactory(pbutil.ReconnectingPBClientFactory):
     def gotPerspective(self, perspective):
         self.view.cb_gotPerspective(perspective)
 
-class ComponentView(pb.Referenceable):
+class ComponentView(pb.Referenceable, log.Loggable):
+    logCategory = 'componentview'
+    
     def __init__(self, component):
         self.comp = component
         self.comp.connect('state-changed', self.component_state_changed_cb)
@@ -52,8 +54,8 @@ class ComponentView(pb.Referenceable):
         
         self.remote = None # the perspective we have on the other side (?)
         
-    warning = lambda s, *a: log.warning(s.comp.get_name(), *a)
-    debug = lambda s, *a: log.debug(s.comp.get_name(), *a)
+    def logFunction(self, arg):
+        return self.comp.get_name + ':' + arg)
     
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
@@ -135,12 +137,13 @@ class ComponentView(pb.Referenceable):
             
         return retval, ports
         
-class BaseComponent(gobject.GObject):
+class BaseComponent(gobject.GObject, log.Loggable):
     __gsignals__ = {
         'state-changed': (gobject.SIGNAL_RUN_FIRST, None, (str, object)),
         'error':         (gobject.SIGNAL_RUN_FIRST, None, (str, str)),
         'log':         (gobject.SIGNAL_RUN_FIRST, None, (object,)),
         }
+    logCategory = 'basecomponent'
     def __init__(self, name, sources, feeds):
         self.__gobject_init__()
         self.component_name = name
@@ -151,11 +154,8 @@ class BaseComponent(gobject.GObject):
 
         self.setup_pipeline()
 
-    error = lambda s, *a: log.error(s.get_name(), *a)
-    warning = lambda s, *a: log.warning(s.get_name(), *a)
-    info = lambda s, *a: log.info(s.get_name(), *a)
-    debug = lambda s, *a: log.debug(s.get_name(), *a)
-    log = lambda s, *a: log.log(s.get_name(), *a)
+    def logFunction(self, arg):
+        return (self.get_name() + ' ' + arg)
 
     def emit(self, name, *args):
         if 'uninitialized' in str(self):
