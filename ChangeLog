@@ -1,3 +1,12 @@
+2004-08-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* autogen.sh:
+	* configure.ac:
+	  use config.h
+	* ui/spyglass.glade:
+	* ui/videotest.glade:
+	  adding glade files for UI components
+
 2004-08-02  Johan Dahlin  <johan@gnome.org>
 
 	* configure.ac: Require Python 2.3
