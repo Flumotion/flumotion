@@ -95,6 +95,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         self.remote = None
 
         self._components = {} # dict of components
+        self._planetState = None
         self._workerHeavenState = None
         
         self._views = [] # all UI views I am serving
@@ -118,9 +119,14 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         def gotDeferredLogin(d):
             # add a callback to respond to the challenge
             d.addCallback(self._loginCallback, password)
-            d.addCallback(self.setRemoteReference)
             d.addErrback(self._accessDeniedErrback)
             d.addErrback(self._connectionRefusedErrback)
+            # when the loginCallback finally succeeds, we are logged in
+            # and get a remote reference
+            d.addCallback(self.setRemoteReference)
+            d.addCallback(self._getPlanetState)
+            d.addCallback(self._getWorkerHeavenState)
+            d.addCallback(self._connectedCallback)
             d.addErrback(self._defaultErrback)
 
         # if this ever breaks, do real subclassing
@@ -168,6 +174,26 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         self.emit('connection-refused', self.host, self.port, self.use_insecure)
         self.debug("emitted connection-refused")
 
+    def _getPlanetState(self, result):
+        # called after logging in and getting a reference
+        d = self.callRemote('getPlanetState')
+        d.addCallback(lambda result: self._setPlanetState(result))
+        d.addCallback(lambda result, s: s.debug('got planet state'), self)
+
+        # if you don't return the deferred, they don't chain properly !       
+        return d
+
+    def _getWorkerHeavenState(self, result):
+        # called after logging in and getting a reference
+        d = self.callRemote('getWorkerHeavenState')
+        d.addCallback(lambda result: self._setWorkerHeavenState(result))
+        d.addCallback(lambda result, s: s.debug('got worker state'), self)
+        return d
+        
+    def _connectedCallback(self, result):
+        self.debug('Connected to manager and retrieved all state')
+        self.emit('connected')
+        
     # default Errback
     def _defaultErrback(self, failure):
         self.debug('Unhandled deferred failure: %r (%s)' % (
@@ -181,6 +207,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
 
     ### IMedium methods
     def setRemoteReference(self, remoteReference):
+        # we get called when we managed to log in to a manager
         self.debug("setRemoteReference: %s" % remoteReference)
         self.remote = remoteReference
         self.remote.notifyOnDisconnect(self._remoteDisconnected)
@@ -225,26 +252,6 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         del self._components[component.get('name')]
         self.emit('update')
         
-    # FIXME: change this to take a planetState
-    def remote_initial(self, components, workerHeavenState):
-        self.debug('remote_initial: %d components' % len(components))
-        for component in components:
-            self.debug(repr(component))
-            name = component.get('name')
-            self._components[name] = component
-            mood = component.get('mood')
-            self.debug('mood: %r' % mood)
-            if mood == None:
-                self.warning('got mood None for component %s' % name)
-
-            # get notified of state changes on component
-            component.addListener(self)
-        # FIXME: rename var
-        self._workerHeavenState = workerHeavenState
-        self._workerHeavenState.addListener(self)
-        self.state = 'disconnected'
-        self.emit('connected')
-
     # IStateListener interface
     def stateSet(self, state, key, value):
         self.debug("state set on %r: key %s" % (state, key))
@@ -591,11 +598,30 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     
     # FIXME: this should not be allowed to be called, move away
     # by abstracting callers further
-    # returns a dict of name -> component
     def get_components(self):
+        # returns a dict of name -> component
         return self._components
     getComponents = get_components
     
+    def _setPlanetState(self, planetState):
+        self.debug('parsing planetState %r' % planetState)
+        self._planetState = planetState
+        self._components = {}
+        for c in planetState.get('atmosphere').get('components'):
+            name = c.get('name')
+            self.debug('adding atmosphere component "%s"' % name)
+            self._components[name] = c
+        for f in planetState.get('flows'):
+            if f.get('name') != 'default':
+                continue
+            for c in f.get('components'):
+                name = c.get('name')
+                self.debug('adding default flow component "%s"' % name)
+                self._components[name] = c
+            
+    def _setWorkerHeavenState(self, state):
+        self._workerHeavenState = state
+
     def getWorkerHeavenState(self):
         return self._workerHeavenState
 

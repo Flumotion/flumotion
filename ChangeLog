@@ -1,3 +1,13 @@
+2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/managers/default/flows/ogg-test-theora.xml:
+	  change flow to default
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/manager/admin.py:
+	  remove remote_initial, and make admin request state of
+	  workerheaven and planet
+
 2005-02-02  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/main.py: Prune of dead code. Re-present the
@@ -30,7 +40,7 @@
 	* flumotion/twisted/flavors.py: s/is None/== None/,
 	s/is not None/!= None/ to avoid pychecker warnings with python
 	2.4.
-	
+
 2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/Makefile.am:

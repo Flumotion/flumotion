@@ -49,15 +49,10 @@ class AdminAvatar(base.ManagerAvatar):
     def attached(self, mind):
         self.info('admin client "%s" logged in' % self.avatarId)
         base.ManagerAvatar.attached(self, mind)
-        # FIXME: remove this abomination, let the admin decide itself what
-        # it wants to do
-        self.mindCallRemote('initial', self.getComponentStates(),
-            self.vishnu.workerHeaven.state)
 
     def detached(self, mind):
         self.info('admin client "%s" logged out' % self.avatarId)
         base.ManagerAvatar.detached(self, mind)
-    
 
     # FIXME: instead of doing this, give a RemoteCache of the heaven state ?
     def getComponentStates(self):
@@ -98,9 +93,13 @@ class AdminAvatar(base.ManagerAvatar):
         self.mindCallRemote('componentRemoved', component.state)
 
     ### pb.Avatar IPerspective methods
-    def perspective_getState(self):
-        self.debug("returning state %r" % self.vishnu.state)
+    def perspective_getPlanetState(self):
+        self.debug("returning planet state %r" % self.vishnu.state)
         return self.vishnu.state
+
+    def perspective_getWorkerHeavenState(self):
+        self.debug("returning worker heaven state %r" % self.vishnu.state)
+        return self.vishnu.workerHeaven.state
 
     def perspective_shutdown(self):
         print 'SHUTTING DOWN'
