@@ -1,7 +1,16 @@
 <registry>
   <components>
-    <component type="disker">
+    <component type="disker"
+               base="flumotion/component/consumers/disker">
       <source location="flumotion.component.consumers.disker.disker"/>
+
+      <entries>
+        <entry type="component" location="disker.py"
+               function="createComponent"/>
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass"/>
+      </entries>
+      
       <properties>
         <property name="source" type="string" required="yes"/>
         <property name="directory" type="string" required="yes"/>
@@ -11,5 +20,47 @@
       </properties>
     </component>
   </components>
+
+  <bundles>
+    <bundle name="disker-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/disker">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="disker-admin-gtk">
+        <dependencies>
+            <dependency name="base-admin-gtk"/>
+	        <dependency name="disker-base"/>
+        </dependencies>
+        
+        <directories>
+            <directory name="flumotion/component/consumers/disker">
+                <filename location="admin_gtk.py"/>
+                <filename location="disker.glade"/>
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="disker-component">
+        <dependencies>
+            <dependency name="component"/>
+            <dependency name="disker-base"/>
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/disker">
+                <filename location="disker.py"/>
+            </directory>
+        </directories>
+     </bundle>
+  </bundles>
+
 </registry> 
   

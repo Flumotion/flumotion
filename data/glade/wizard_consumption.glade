@@ -4,7 +4,6 @@
 <glade-interface>
 
 <widget class="GtkWindow" id="window1">
-  <property name="visible">False</property>
   <property name="title" translatable="yes">window1</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
@@ -28,7 +27,7 @@
 	<widget class="GtkCheckButton" id="checkbutton_http">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Stream over HTTP</property>
+	  <property name="label" translatable="yes">S_tream over HTTP</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>
@@ -131,7 +130,7 @@
 	<widget class="GtkCheckButton" id="checkbutton_disk">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Save to disk</property>
+	  <property name="label" translatable="yes">S_ave to disk</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>

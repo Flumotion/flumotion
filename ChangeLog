@@ -1,5 +1,22 @@
 2004-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_consumption.glade:
+	* data/glade/wizard_disk.glade:
+	* data/glade/wizard_http.glade:
+	  various accessors
+
+	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
+	* flumotion/component/consumers/disker/Makefile.am:
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	* flumotion/component/consumers/disker/disker.glade:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/disker/disker.xml:
+	  Add button to move to new archive file.
+	  Fixes issue #122
+	 
+
+2004-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/wizard_tvcard.glade:
 	  add accessors
 	* flumotion/component/effects/colorbalance/colorbalance.glade:
