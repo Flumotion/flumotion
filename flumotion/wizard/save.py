@@ -204,7 +204,7 @@ class WizardSaver:
             comp.addFeeder(muxer)
             components.append(comp)
         
-    def save(self):
+    def getXML(self):
         source_options = self.wizard.get_step_options('Source')
         has_video = source_options['has_video']
         has_audio = source_options['has_audio']
@@ -225,11 +225,13 @@ class WizardSaver:
 
         self.handleConsumers(muxer, components)
 
-        print '<planet>'
+        s = '<planet>'
         
-        print '  <atmosphere>'
+        s += '  <atmosphere>'
         for component in components:
-            print component.toXML()
-        print '  </atmosphere>'
-        print '</planet>'
-        
+            s += component.toXML()
+        s += '  </atmosphere>'
+        s += '</planet>'
+
+        return s
+

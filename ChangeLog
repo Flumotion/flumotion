@@ -1,3 +1,13 @@
+2004-10-17  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+
+	Make it optional to specifiy the mainloop, so we can run it from
+	the administration interface.
+
 2004-10-17  Wim Taymans  <wim@fluendo.com>
 
 	* doc/random/authentication:

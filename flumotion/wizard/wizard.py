@@ -24,7 +24,7 @@ import gtk.glade
 
 from flumotion.configure import configure
 from flumotion.common import log
-from flumotion.wizard import enums
+from flumotion.wizard import enums, save
 
 def escape(text):
     return text.replace('&', '&amp;')
@@ -307,7 +307,11 @@ class Wizard:
         self.eventbox_main.modify_bg(gtk.STATE_NORMAL, self.main_color)
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))
+
+        self._save = save.WizardSaver(self)
         
+        
+        self._workers = []
         self.steps = []
         self.stack = Stack()
         self.current_step = None
@@ -367,8 +371,7 @@ class Wizard:
 
     def set_step(self, step):
         # Remove previous step
-        for child in self.content_area.get_children():
-            self.content_area.remove(child)
+        map(self.content_area.remove, self.content_area.get_children())
 
         # Add current
         widget = step.get_main_widget()
@@ -533,29 +536,33 @@ class Wizard:
     def on_button_next_clicked(self, button):
         self.show_next()
 
-    def finish(self):
-        from flumotion.wizard import save
-        s = save.WizardSaver(self)
-        s.save()
-        
-        try:
-            gtk.main_quit()
-        except RuntimeError:
-            pass
-        
-    def run(self, interactive):
+    def finish(self, main):
+        if main:
+            try:
+                gtk.main_quit()
+            except RuntimeError:
+                pass
+
+        return self._save.getXML()
+    
+    def run(self, interactive, workers, main):
+        self._workers = workers
         if not self.stack:
             raise TypeError("need an initial step")
 
         self.set_step(self.stack.peek())
 
         if not interactive:
-            self.finish()
-            return
-        
+            return self.finish(main)
+
         self.window.show()
-        gtk.main()
+        if main:
+            gtk.main()
         
+        return self._save.getXML()
+
+    
+        
 wiz = None
 def register_step(klass):
     global wiz
@@ -567,11 +574,14 @@ def register_step(klass):
     else:
         wiz.add_step(klass)
 
-def run(interactive=True):
+        
+
+def run(interactive=True, workers=[], main=True):
     global wiz
     
     import flumotion.wizard.steps
-    wiz.run(interactive)
+    return wiz.run(interactive, workers, main)
+
 
 if __name__ == '__main__':
     run()
