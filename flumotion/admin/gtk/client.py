@@ -395,39 +395,48 @@ def main(args):
     parser = optparse.OptionParser()
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
-                      help="Be verbose")
+                      help="be verbose")
+    parser.add_option('', '--version',
+                      action="store_true", dest="version",
+                      default=False,
+                      help="show version information")
     
     parser.add_option('-H', '--host',
                      action="store", type="string", dest="host",
                      default='localhost',
-                     help="Manager host to connect to [default localhost]")
+                     help="manager host to connect to [default localhost]")
     parser.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      default=8890,
-                     help="Manager port to connect to [default 8890]")
+                     help="manager port to connect to [default 8890]")
     parser.add_option('-T', '--transport',
                       action="store", type="string", dest="transport",
                       default="ssl",
-                      help="Transport protocol to use (tcp/ssl)")
+                      help="transport protocol to use (tcp/ssl)")
 
     parser.add_option('-u', '--username',
                       action="store", type="string", dest="username",
                       default="",
-                      help="Username to use")
+                      help="username to use")
     parser.add_option('-d', '--password',
                       action="store", type="string", dest="password",
                       default="",
-                      help="Password to use, - for interactive")
+                      help="password to use, - for interactive")
 
     parser.add_option('', '--wizard',
                      action="store_true", dest="wizard",
-                     help="Run the wizard")
+                     help="run the wizard")
     parser.add_option('', '--debug',
                       action="store_false", dest="debug",
                       default=True,
-                      help="Run in debug")
+                      help="run in debug")
 
     options, args = parser.parse_args(args)
+
+    if options.version:
+        from flumotion.common import common
+        print common.version("flumotion-admin")
+        return 0
 
     if options.verbose:
         log.setFluDebug("*:4")

@@ -69,16 +69,21 @@ def main(args):
     parser = optparse.OptionParser()
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
-                      help="Be verbose")
-    group = optparse.OptionGroup(parser, "Manager options")
+                      help="be verbose")
+    parser.add_option('', '--version',
+                      action="store_true", dest="version",
+                      default=False,
+                      help="show version information")
+  
+    group = optparse.OptionGroup(parser, "manager options")
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      default=8890,
-                     help="Port to listen on [default 8890]")
+                     help="port to listen on [default 8890]")
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
                      default="ssl",
-                     help="Transport protocol to use (tcp/ssl)")
+                     help="transport protocol to use (tcp/ssl)")
     group.add_option('-C', '--certificate',
                      action="store", type="string", dest="certificate",
                      default="flumotion.pem",
@@ -87,6 +92,11 @@ def main(args):
     
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
+
+    if options.version:
+        from flumotion.common import common
+        print common.version("flumotion-manager")
+        return 0
 
     vishnu = manager.Vishnu()
 

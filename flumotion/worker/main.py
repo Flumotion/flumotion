@@ -26,43 +26,53 @@ from flumotion.twisted import cred
 
 def main(args):
     parser = optparse.OptionParser()
+    parser.add_option('', '--version',
+                      action="store_true", dest="version",
+                      default=False,
+                      help="show version information")
 
-    group = optparse.OptionGroup(parser, "Worker options")
+    group = optparse.OptionGroup(parser, "worker options")
+
     group.add_option('-H', '--host',
                      action="store", type="string", dest="host",
                      default="localhost",
-                     help="Manager to connect to [default localhost]")
+                     help="manager to connect to [default localhost]")
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      default=8890,
-                     help="Manager port to connect to [default 8890]")
+                     help="manager port to connect to [default 8890]")
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
                      default="ssl",
-                     help="Transport protocol to use (tcp/ssl)")
+                     help="transport protocol to use (tcp/ssl)")
 
     group.add_option('-u', '--username',
                      action="store", type="string", dest="username",
                      default="",
-                     help="Username to use")
+                     help="username to use")
     group.add_option('-d', '--password',
                      action="store", type="string", dest="password",
                      default="",
-                     help="Password to use, - for interactive")
+                     help="password to use, - for interactive")
      
     parser.add_option_group(group)
-    group = optparse.OptionGroup(parser, "Job options")
+    group = optparse.OptionGroup(parser, "job options")
     group.add_option('-j', '--job',
                      action="store", type="string", dest="job",
-                     help="Run job")
+                     help="run job")
     group.add_option('-w', '--worker',
                      action="store", type="string", dest="worker",
-                     help="Worker unix socket to connect to")
+                     help="worker unix socket to connect to")
     parser.add_option_group(group)
     
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
+    if options.version:
+        from flumotion.common import common
+        print common.version("flumotion-worker")
+        return 0
+        
     if options.job:
         # we were started from the worker as a job
         _startJob(options)

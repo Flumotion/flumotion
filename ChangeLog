@@ -1,5 +1,13 @@
 2004-10-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/common/common.py:
+	* flumotion/manager/main.py:
+	* flumotion/worker/main.py:
+	  put in --version, synchronize options, use lowercase
+
+2004-10-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/Makefile.am:
 	* bin/flumotion.in:
 	* configure.ac:

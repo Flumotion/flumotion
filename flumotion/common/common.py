@@ -89,3 +89,19 @@ def formatTime(seconds):
     chunks.append('%02d:%02d' % (hours, minutes))
 
     return " ".join(chunks)
+
+def version(binary):
+    """
+    Print a version block for the flumotion binaries.
+
+    @arg binary: name of the binary
+    @type binary: string
+    """
+    from flumotion.configure import configure
+
+    block = []
+    block.append("%s %s" % (binary, configure.version))
+    block.append("part of Flumotion - a streaming media server")
+    block.append("(C) Copyright 2004 Fluendo")
+    return "\n".join(block)
+             
