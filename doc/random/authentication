@@ -102,7 +102,7 @@ Keycard (flumotion):
       values
     - avatarId (which is a preferred avatarId suggested by requester,
       used for authentication of admin/workers/components to manager)
-    - componentName (which is the name of the component requesting
+    - requesterName (which is the name of the component requesting
       authentication, or the manager)
     - bouncerName (which is the name of the component performing
       authentication)
@@ -190,3 +190,9 @@ ADVANTAGES
 - internal authentication is very flexible too
   example: we can expire an admin client's connection, or a producer's
   which runs on the machine of a customer of an ISP
+
+CAVEATS
+-------
+- provide the requester with as little info as possible; ie. allow him to
+  think the challenge/response is going through even though the username
+  provided was not even in the database

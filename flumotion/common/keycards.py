@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_keycards -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/common/keycards.py: keycard stuff
@@ -19,27 +19,56 @@
 Keycards used for authentication.  Jellyable over PB connections.
 """
 
-from twisted.cred import credentials
+from twisted.cred import credentials as tcredentials
 from twisted.spread import pb
+
+from flumotion.twisted import credentials
+
+# state enum values
+REFUSED = 0
+REQUESTING = 1
+ACCEPTED = 2
 
 class Keycard(pb.Copyable, pb.RemoteCopy):
 
-    __implements__ = credentials.ICredentials,
+    __implements__ = tcredentials.ICredentials,
 
-    def __init__(self, componentName):
-        self.componentName = componentName
-        self.id = None # set by bouncer when authenticated
-        self.duration = 0 # means unlimited
+    def __init__(self):
+        self.bouncerName = None         # set by requester,decides which bouncer
+        self.requesterName = None       # who is requesting auth ?
+        self.avatarId = None            # avatarId prefered by requester
+        self.id = None                  # set by bouncer when authenticated
+        self.duration = 0               # means unlimited
+        self.state = REQUESTING
 
+# class KeycardUAPP: username, address, plaintext password;
+#       from UsernameCryptPasswordPlaintext
+# class KeycardUACP: username, address, crypt password
+#       from UsernameCryptPasswordCrypt
 
-class HTTPClientKeycard(credentials.UsernamePassword, Keycard):
+credParent = credentials.UsernameCryptPasswordCryptChallenger
+class KeycardUACPC(Keycard, credParent):
+
+    """
+    I am a keycard with a username and IP address.
+    I get authenticated through challenge/response on a crypt password.
+    """
+    def __init__(self, username, address):
+        Keycard.__init__(self)
+        credParent.__init__(self, username)
+        self.address = address
+
+# FIXME: rewrite
+class HTTPClientKeycard(tcredentials.UsernamePassword, Keycard):
     def __init__(self, componentName, username, password, ip):
-        credentials.UsernamePassword.__init__(self, username, password)
-        Keycard.__init__(self, componentName)
+        tcredentials.UsernamePassword.__init__(self, username, password)
+        Keycard.__init__(self)
+        self.requesterName = componentName
         self.username = username
         self.password = password
         self.ip = ip
         
+# fixme: remove methods
     def getUsername(self):
         return self.username
 

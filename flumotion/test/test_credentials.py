@@ -25,42 +25,72 @@ from flumotion.twisted import credentials
 # use some shorter names
 CredCrypt = credentials.UsernameCryptPasswordCrypt
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext
+CredUCPCC = credentials.UsernameCryptPasswordCryptChallenger
 
 class TestUsernameCryptPasswordCrypt(unittest.TestCase):
     def testWithPlaintext(self):
         cred = CredCrypt('user')
         cred.setPasswordSalt('test', 'qi')
-        assert cred.checkCryptPassword('qi1Lftt0GZC0o')
-        assert not cred.checkCryptPassword('boohoowrong')
+        self.assert_(cred.checkCryptPassword('qi1Lftt0GZC0o'))
+        self.failIf(cred.checkCryptPassword('boohoowrong'))
 
     def testWithPlaintextWrongSalt(self):
         cred = CredCrypt('user')
         cred.setPasswordSalt('test', 'as')
-        assert not cred.checkCryptPassword('qi1Lftt0GZC0o')
-        assert not cred.checkCryptPassword('boohoowrong')
+        self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
+        self.failIf(cred.checkCryptPassword('boohoowrong'))
 
     def testWithPlaintextWrongPassword(self):
         cred = CredCrypt('user')
         cred.setPasswordSalt('wrong', 'qi')
-        assert not cred.checkCryptPassword('qi1Lftt0GZC0o')
-        assert not cred.checkCryptPassword('boohoowrong')
+        self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
+        self.failIf(cred.checkCryptPassword('boohoowrong'))
 
     def testWithCrypt(self):
         # sort of silly, since this does a straight comparison, but hey
         cred = CredCrypt('user', 'qi1Lftt0GZC0o') # password is test
-        assert cred.checkCryptPassword('qi1Lftt0GZC0o')
-        assert not cred.checkCryptPassword('boohoowrong')
+        self.assert_(cred.checkCryptPassword('qi1Lftt0GZC0o'))
+        self.failIf(cred.checkCryptPassword('boohoowrong'))
 
 class TestUsernameCryptPasswordPlaintext(unittest.TestCase):
     def testWithPlaintext(self):
         cred = CredPlaintext('user', 'test')
-        assert cred.checkCryptPassword('qi1Lftt0GZC0o')
-        assert not cred.checkCryptPassword('boohoowrong')
+        self.assert_(cred.checkCryptPassword('qi1Lftt0GZC0o'))
+        self.failIf(cred.checkCryptPassword('boohoowrong'))
 
     def testWithPlaintextWrongPassword(self):
         cred = CredPlaintext('user', 'tes')
-        assert not cred.checkCryptPassword('qi1Lftt0GZC0o')
-        assert not cred.checkCryptPassword('boohoowrong')
+        self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
+        self.failIf(cred.checkCryptPassword('boohoowrong'))
+
+class TestUsernameCryptPasswordCryptChallenger(unittest.TestCase):
+    def testWithPlaintext(self):
+        cred = CredUCPCC('user')
+
+        # authenticator sets salt and challenge
+        cred.salt = 'qi'
+        cred.challenge = credentials.cryptChallenge()
+
+        # requester responds
+        cred.setPassword('test')
+
+        # authenticator verifies against the known good password
+        self.assert_(cred.checkCryptPassword('qi1Lftt0GZC0o'))
+        self.failIf(cred.checkCryptPassword('boohoowrong'))
+
+    def testWithPlaintextWrongPassword(self):
+        cred = CredUCPCC('user')
+
+        # authenticator sets salt and challenge
+        cred.salt = 'qi'
+        cred.challenge = credentials.cryptChallenge()
+
+        # requester responds with wrong password
+        cred.setPassword('wrong')
+
+        # authenticator verifies against the known good password
+        self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
+        self.failIf(cred.checkCryptPassword('boohoowrong'))
 
 if __name__ == '__main__':
      unittest.main()

@@ -42,6 +42,8 @@
 
 * EASY:		write .pc and -uninstalled.pc
 
+* MEDIUM:	rename grid to flow ? rhymes with planet and atmosphere
+
 - API cleanup:
 
 - manager/component.py:

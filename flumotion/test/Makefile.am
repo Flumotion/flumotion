@@ -7,6 +7,7 @@ EXTRA_DIST = \
 	test_credentials.py \
 	test_enum.py \
 	test_http.py \
+	test_keycards.py \
 	test_log.py \
 	test_manager.py \
 	test_reflect.py \

@@ -17,6 +17,8 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 import crypt
+import md5
+import random
 
 from flumotion.common import log
 from twisted.cred import credentials
@@ -97,3 +99,66 @@ class UsernameCryptPasswordCrypt:
         Check credentials against the given cryptPassword.
         """
         return self.cryptPassword == cryptPassword
+
+def cryptRespond(challenge, cryptPassword):
+    """
+    Respond to a given crypt challenge with our cryptPassword.
+    """
+    import md5
+    md = md5.new()
+    md.update(cryptPassword)
+    md.update(challenge)
+    return md.digest()
+
+# copied from twisted.spread.pb.challenge()
+def cryptChallenge():
+    """
+    I return some random data.
+    """
+    crap = ''
+    for x in range(random.randrange(15,25)):
+        crap = crap + chr(random.randint(65,90))
+    crap = md5.new(crap).digest()
+    return crap
+    
+class UsernameCryptPasswordCryptChallenger:
+    """
+    I take a username.
+    
+    Authenticator will give me a salt and challenge me.
+    Requester will respond to the challenge.
+    At that point I'm ready to be used by a checker.
+    The response function used is
+    L{flumotion.twisted.credentials.cryptRespond()}
+
+    I implement IUsernameCryptPassword.
+    """
+    
+    __implements__ = IUsernameCryptPassword
+
+    def __init__(self, username):
+        self.username = username
+        self.salt = None       # set by authenticator
+        self.challenge = None  # set by authenticator
+        self.response = None   # set by requester
+
+    def setPassword(self, password):
+        """
+        I encode a given plaintext password using the salt, and respond
+        to the challenge.
+        """
+        assert self.salt
+        assert self.challenge
+        assert len(self.salt) == 2
+        cryptPassword = crypt.crypt(password, self.salt)
+        self.response = cryptRespond(self.challenge, cryptPassword)
+
+    def checkCryptPassword(self, cryptPassword):
+        """
+        Check credentials against the given cryptPassword.
+        """
+        if not self.response:
+            return False
+
+        expected = cryptRespond(self.challenge, cryptPassword)
+        return self.response == expected
