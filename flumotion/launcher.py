@@ -44,7 +44,6 @@ class Launcher:
         self.controller_pid = None
         self.controller_port = controller_port
         
-        #signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
     def msg(self, *args):
@@ -58,7 +57,7 @@ class Launcher:
             try:
                 reactor.run(False)
             except KeyboardInterrupt:
-                reactor.stop()
+                pass
             raise SystemExit
         self.controller_pid = pid
 
@@ -198,7 +197,7 @@ def main(args):
                       help="Be verbose")
     parser.add_option('-c', '--controller-port',
                       action="store", type="int", dest="port",
-                      help="Controller port")
+                      help="Controller port", default=8890)
 
     options, args = parser.parse_args(args)
     if len(args) < 2:
