@@ -354,8 +354,10 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         except OSError, (no, s):
             if no == errno.EBADF:
                 self.warning('[fd %5d] client gone before writing header' % fd)
+            elif no == errno.ECONNRESET:
+                self.warning('[fd %5d] client reset connection writing header' % fd)
             else:
-                self.warning('[fd %5d] unhandled write error: %s' % (fd, s))
+                self.warning('[fd %5d] unhandled write error when writing header: %s' % (fd, s))
             return False
 
     def isReady(self):
