@@ -1,5 +1,26 @@
 2004-12-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
+
+	* TODO:
+	* configure.ac:
+	* flumotion/component/effects/Makefile.am:
+	* flumotion/component/effects/volume/Makefile.am:
+	* flumotion/component/effects/volume/__init__.py:
+	* flumotion/component/effects/volume/admin_gtk.py:
+	* flumotion/component/effects/volume/volume.glade:
+	* flumotion/component/effects/volume/volume.py:
+	* flumotion/component/effects/volume/volume.xml:
+	* flumotion/component/producers/soundcard/Makefile.am:
+	* flumotion/component/producers/soundcard/admin_gtk.py:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/ui/fgtk.py:
+	  Adding a volume effect for level display, and use it in soundcard.
+	  Fixes #133.
+
+2004-12-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	* flumotion/configure/configure.py:
 	* flumotion/service/main.py:

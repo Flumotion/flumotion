@@ -24,11 +24,8 @@ import gst
 import gst.interfaces
 
 from flumotion.component import feedcomponent
+from flumotion.component.effects.volume import volume
 
-def state_changed_cb(element, old, new, trackLabel):
-    if old == gst.STATE_NULL and new == gst.STATE_READY:
-        for track in element.list_tracks():
-            element.set_record(track, track.label == trackLabel)
     
 class SoundcardProducer(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, feeders, pipeline):
@@ -36,6 +33,12 @@ class SoundcardProducer(feedcomponent.ParseLaunchComponent):
                                                     [],
                                                     feeders,
                                                     pipeline)
+    
+    def state_changed_cb(self, element, old, new, trackLabel):
+        if old == gst.STATE_NULL and new == gst.STATE_READY:
+            for track in element.list_tracks():
+                element.set_record(track, track.label == trackLabel)
+
                                        
 def createComponent(config):
     element = config['source-element']
@@ -44,12 +47,20 @@ def createComponent(config):
     depth = config.get('depth', 16)
     channels = config.get('channels', 1)
 
+    # FIXME: why do we not connect to state_changed_cb so correct
+    # soundcard input is used?
+    
     # FIXME: we should find a way to figure out what the card supports,
     # so we can add in correct elements on the fly
     # just adding audioscale and audioconvert always makes the soundcard
     # open in 1000 Hz, mono
     caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d,width=%d,signed=(boolean)TRUE,endianness=1234' % (rate, depth, channels, depth)
-    pipeline = '%s device=%s ! %s' % (element, device, caps)
+    pipeline = '%s device=%s ! %s ! level name=volumelevel signal=true' % (element, device, caps)
     component = SoundcardProducer(config['name'], config['feed'],  pipeline)
+
+    # add volume effect
+    comp_level = component.get_pipeline().get_by_name('volumelevel')
+    vol = volume.Volume('inputVolume', comp_level)
+    component.addEffect(vol)
 
     return component

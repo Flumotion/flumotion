@@ -1,7 +1,15 @@
 <registry>
   <components>
-    <component type="soundcard">
+    <component type="soundcard"
+    	       base="flumotion/component/producers/soundcard">
       <source location="flumotion.component.producers.soundcard.soundcard"/>
+
+      <entries>
+        <entry type="component" location="soundcard.py"
+               function="createComponent"/>
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass"/>
+      </entries>
       <properties>
         <property name="feed" type="string" required="yes" multiple="yes"/>
         <property name="source-element" type="string"/>
@@ -12,4 +20,32 @@
      </properties>
     </component>
  </components>
+
+ <bundles>
+    <bundle name="soundcard-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/soundcard">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+     </bundle>
+
+     <bundle name="soundcard-admin-gtk">
+        <dependencies>
+            <dependency name="soundcard-base" />
+            <dependency name="base-admin-gtk" />
+            <dependency name="volume-admin-gtk" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/soundcard">
+                <filename location="admin_gtk.py"/>
+            </directory>
+        </directories>
+      </bundle>
+    </bundles>
 </registry> 

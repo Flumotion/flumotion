@@ -1,3 +1,6 @@
+* MEDIUM	add api for admins to "subscribe" to admin methods in the
+		manager, so only relevant commands get sent
+
 * EASY		deprecate <source> tag and require base= attribute to <comp>
 
 * EASY		remove file name header line, or at least the commentary

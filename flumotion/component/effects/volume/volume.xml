@@ -1,0 +1,44 @@
+<registry>
+  <bundles>
+
+    <bundle name="volume-base">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/volume">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="volume-admin-gtk">
+        <dependencies>
+            <dependency name="base-admin-gtk" />
+            <dependency name="volume-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/volume">
+                <filename location="admin_gtk.py" />
+                <filename location="volume.glade" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="volume-effect">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="volume-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/volume">
+                <filename location="volume.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry> 
