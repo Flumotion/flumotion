@@ -119,33 +119,6 @@ class Dispatcher(log.Loggable):
         
         self._interfaceHeavens[interface] = heaven
 
-class ManagerCredentialsChecker(checkers.FlexibleCredentialsChecker):
-    # FIXME: maybe we should get the actual checker used by bouncer
-    def __init__(self):
-        checkers.FlexibleCredentialsChecker.__init__(self)
-        self.bouncer = None
-
-    def requestAvatarId(self, creds):
-        # until we figure out component auth, we pass components freely
-        if interfaces.IComponentMedium in creds.interfaces:
-            return creds.avatarId
-
-        # if we have a bouncer, we make workers and admin authenticate
-        if self.bouncer:
-            result = self.bouncer.authenticate(creds)
-            if not result:
-                self.log('refusing credentials %r' % creds)
-                return failure.Failure(error.UnauthorizedLogin())
-                
-        # XXX: If it's component or admin, allow anonymous access.
-        #      This is a big hack, but it emulates the current behavior
-        #      Do we need to authenticate components and workers?
-        if (interfaces.IComponentMedium in creds.interfaces or
-            interfaces.IAdminMedium in creds.interfaces):
-            return creds.username
-
-        return checkers.FlexibleCredentialsChecker.requestAvatarId(self, creds)
-
 class Vishnu(log.Loggable):
     """
     I am the toplevel manager object that knows about all heavens and factories.
@@ -165,14 +138,8 @@ class Vishnu(log.Loggable):
         self.bouncer = None # used by manager to authenticate worker/component
 
         # create a portal so that I can be connected to, through our dispatcher
-        # implementing the IRealm and a checker that allows anonymous access
+        # implementing the IRealm and a bouncer
 
-        # FIXME: depcrecated
-        self.checker = ManagerCredentialsChecker()
-        # the WorkerHeaven sets this to True later on if the config file
-        # uses a password policy
-        self.checker.allowAnonymous(True) # XXX: False
-        
         # FIXME: decide if we allow anonymous login in this small (?) window
         self.portal = fportal.BouncerPortal(self.dispatcher, None)
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
@@ -198,7 +165,6 @@ class Vishnu(log.Loggable):
         @type bouncer: L{flumotion.component.bouncers.bouncer.Bouncer}
         """
         self.bouncer = bouncer
-        self.checker.bouncer = bouncer
         self.portal.bouncer = bouncer
 
     def getFactory(self):

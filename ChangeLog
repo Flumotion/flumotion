@@ -1,5 +1,10 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/manager.py:
+	  Remove ManagerCredentialsChecker which was deprecated.
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/admin.py:
 	* flumotion/twisted/portal.py:
 	  The avatar was being removed twice, once by heaven, once by
@@ -16,6 +21,7 @@
 	* flumotion/component/http/resources.py:
 	* flumotion/test/test_http.py:
 	* flumotion/test/test_wizard.py:
+	  Johan needs to update this
 
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
