@@ -1,0 +1,184 @@
+Design focus for all of Flumotion
+
+- easy UI
+- distributed architecture
+- run-time checking of dependencies
+- minimal administration burden
+- high availability
+- upgradability
+- unit-tested and documented
+- multiple possible UI's
+- continuous attention to design
+- rapid implementation of features
+
+Planned features for flumotion and what's needed to implement it
+
+- automatically serve minimal cortado applet
+  - cortado .class files installed as a discoverable package
+  - wizard provides option in streamer and checks presence of these files
+  - streamer component provides 
+    - URL for download of cortado jar, which is generated whenever .class files
+      change (like bundles), and with only code needed to show the stream
+    - URL with .html page linking to the applet and stream, with correct
+      settings
+
+- automatically serve activex installer for Windows components
+  - .exe installed as a discoverable package
+  - wizard provides option and checks presence
+
+- component code transmitted before create
+  - rearranging of code layout
+  - divide into modules
+  - test
+
+- high-res slides in ogg streams
+  - establish standard for media mapping for image format into ogg stream
+  - implement GStreamer elements
+  - write a component that can take image input
+  - think of/write ways of getting images in there:
+    - snapshot applet for desktop shots
+    - python plugin for openoffice when changing slides
+  - player support:
+    - cortado
+    - totem
+
+- annodex support in live streams
+  - annodex provides media linkability like the web
+  - CMML track can be generated as a separate ogg stream
+  - <clip> items can be inserted by a cmmlsrc element wrapped in a component
+  - the UI for this component can provide easy ways of preparing and inserting
+    links live
+  - player support:
+    - cortado
+    - totem
+
+- splitting up wizard
+  - needed to implement multiple scenarios
+  - clean up code
+  - just do it
+
+- correct handling of dependencies of components
+  - to allow correctly stopping components when feeders stop, etc.
+  - needs expression/coding of direct acyclic graph code
+
+- make it easy for programmer to work with bundles
+  - write a bundlespace viewer/DAG viewer
+
+- merging of components in one process
+  - improves audiocard + videocard/webcam sync
+
+- jukebox component for audio and video
+  - should act as if it were a live stream
+
+- migrate managers
+  - a new manager can take over an older one
+  - helps to upgrade code without stopping
+  - needs clear definition of "state" of a manager and everything in it
+  - make this state serializable over the wire and persistent to disk
+
+- wizard remembering choices
+  - allow people to bring back the wizard with all choices made remembered
+  - wizard and widgets should remember their "states" in all cases
+  - this state should be serializable to an intermediate format
+  - from this intermediate format of choices an actual planet config file
+    or part gets generated
+
+- configuration file handling
+  - should allow management of local config files, planets, workers, ...
+  - should allow management of manager-side planet config files
+
+- flumotion-admin helps set up manager and worker
+  - should allow you to create configs for manager and worker
+  - should allow you to start a manager and worker as the current user
+  - should allow you to set up authentication
+
+- flumotion-admin has login dialog
+  - allowing you to choose previous connection parameters
+
+- link help to manual
+  - yelp can now read docbook raw
+  - install our manual's docbook into a discoverable path
+  - link to it from UI for explanation of concepts
+
+- unittest actual server setups
+
+- firewall
+  - write a pitcher and catcher component to punch through firewalls
+  - by reversing order and using tcpserversrc to a tcpclientsink
+  - figure out how this changes the DAG of the flow
+
+- network errors: feedcomponent losing connection to feeder
+  - feedcomponent can regularly poll currently known connection parameters
+  - can ask manager if the component is still working correctly
+  - should try and pick up stream without changing streamheaders if they
+    are still the same (ie, the feeding component didn't actually stop,
+    it was just a network problem)
+
+- network errors: connection with manager lost
+  - component should keep doing what it was doing as long as it can
+  - component can log in to backup managers
+  - component should try to get back to manager that is "master"
+
+- network errors: manager down
+  - state should have been replicated to a backup manager
+  - this backup manager takes over master status, realizing the other manager
+    is down.  planet is unstable.
+  - one by one workers and components log back in because they lost the main
+    one
+  - needs state definitions finished
+
+- correct implementation of moods
+  - state transition diagrams and verification
+
+- worker monitoring and reporting state of job processes
+  - allows manager to clean up state for components that did not exit
+    properly (e.g. SEGV)
+
+- 24/7 testing
+  - finish testing components
+  - rework component dependency info in manager to use a DAG and
+    have test components depend on stream components
+  - involve all office machines in these tests
+
+- better worker checking from wizard
+  - all checking code should be in bundles as well
+
+- better hardware detection in wizard
+  - finish halogen
+  - this allows all webcams to be used
+
+- bug reporting tool
+  - gathers information on system
+  - gathers config files and logs
+  - files an issue in our trac database with all info
+
+- more secure authentication
+  - implement bouncers and keycard types
+
+- add security to code transfer mechanism
+  - sign bundles
+
+- lower latency
+  - lower internal buffer in multifdsink everywhere
+  - make it settable in time, not size/number
+  - allow setting keyframe of theora more often
+
+- burst-on-connect
+  - multifdsink already supports this
+  - needs implementation in streamer component
+
+- stream preview: snapshots
+  - components can provide "magnifiers" at various places in itself
+  - ui can take snapshots at these locations
+  - this allows "before" and "after" settings shots
+  - needs libcolorspace finished
+  - could be done with tee too
+
+- stream preview: live stream
+  - magnifiers could be done with live stream
+  - might need transporting the stream through the manager using a tcp
+    trick
+  - or through a worker on the same machine as the manager, using the
+    firewall pitcher and catcher ?
+  - needs to use adaptable codecs that don't use too much bandwidth
+
