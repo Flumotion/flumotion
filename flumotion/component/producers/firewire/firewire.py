@@ -21,7 +21,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     [],
-                                                    ['feeder::video', 'feeder::audio'],
+                                                    ['video', 'audio'],
                                                     pipeline)
                                        
 def createComponent(config):
