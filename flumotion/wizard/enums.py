@@ -31,7 +31,7 @@ class EnumMetaClass(type):
     def __setitem__(self, value, enum):
         self.__enums__[value] = enum
         setattr(self, enum.name, enum)
-        
+
 
 class Enum(object):
     __metaclass__ = EnumMetaClass
@@ -59,16 +59,28 @@ class Enum(object):
 
     
 class EnumClass(object):
-    def __new__(self, type_name, names=(), nicks=()):
+    def __new__(self, type_name, names=(), nicks=(), **extras):
         if nicks:
             if len(names) != len(nicks):
                 raise TypeError("nicks must have the same length as names")
         else:
             nicks = names
 
+        for extra in extras.values():
+            if not isinstance(extra, tuple):
+                raise TypeError('extra must be a tuple, not %s' % type(extra))
+                
+            if len(extra) != len(names):
+                raise TypeError("extra items must have a length of %d" %
+                                len(names))
+            
         etype = EnumMetaClass(type_name, (Enum,), dict(__enums__={}))
         for value, name in enumerate(names):
-            etype[value] = etype(value, name, nicks[value])
+            enum = etype(value, name, nicks[value])
+            for extra_key, extra_values in extras.items():
+                assert not hasattr(enum, extra_key)
+                setattr(enum, extra_key, extra_values[value])
+            etype[value] = enum
             
         return etype
 
@@ -79,11 +91,25 @@ VideoDevice = EnumClass('VideoDevice',
                         ('TV Card',
                          'Firewire video',
                          'Web camera',
-                         'Test video source'))
+                         'Test video source'),
+                        step=('TV Card',
+                              'Firewire',
+                              'Webcam',
+                              'Test Source'),
+                        component_type=('tv-card',
+                                        'firewire-video',
+                                        'webcam',
+                                        'videotestsrc'))
 AudioDevice = EnumClass('AudioDevice',
-                        ('Firewire', 'Soundcard', 'Test'),
-                        ('Firewire Audio', 'Sound card',
-                         'Test audio source'))
+                        ('Firewire',
+                         'Soundcard',
+                         'Test'),
+                        ('Firewire Audio',
+                         'Sound card',
+                         'Test audio source'),
+                        component_type=('firewire-audio',
+                                        'alsasrc',
+                                        'sinesrc'))
 # TVCard
 TVCardDevice = EnumClass('TVCardDevice', ('/dev/video0',
                                           '/dev/video1',
@@ -110,9 +136,20 @@ SoundcardBitdepth = EnumClass('SoundcardBitdepth', ('16', '8'),
                               ('16-bit', '8-bit'))
 
 # Encoding format
-EncodingFormat = EnumClass('EncodingFormat', ('Ogg', 'Multipart'))
-EncodingVideo = EnumClass('EncodingVideo', ('Theora', 'Smoke', 'JPEG'))
-EncodingAudio = EnumClass('EncodingAudio', ('Vorbis', 'Speex', 'Mulaw'))
+EncodingFormat = EnumClass('EncodingFormat', ('Ogg', 'Multipart'),
+                           component_type=('ogg-muxer',
+                                           'multimpart-muxer'))
+EncodingVideo = EnumClass('EncodingVideo',
+                          ('Theora', 'Smoke', 'JPEG'),
+                          component_type=('theora-encoder',
+                                          'smoke-encoder',
+                                          'jpeg-encoder'),
+                          step=('Theora', 'Smoke', 'JPEG'))
+EncodingAudio = EnumClass('EncodingAudio', ('Vorbis', 'Speex', 'Mulaw'),
+                          component_type=('vorbis-encoder',
+                                          'speex-encoder',
+                                          'mulaw-encoder'),
+                          step=('Vorbis', 'Speex', 'Mulaw'))
 
 # Disk writer
 RotateTime = EnumClass('RotateTime',

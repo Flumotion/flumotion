@@ -395,6 +395,10 @@ def main(args):
     parser.add_option('', '--wizard',
                      action="store_true", dest="wizard",
                      help="Run the wizard")
+    parser.add_option('', '--debug',
+                      action="store_false", dest="debug",
+                      default=True,
+                      help="Run in debug")
 
     options, args = parser.parse_args(args)
 
@@ -403,7 +407,7 @@ def main(args):
 
     if options.wizard:
         from flumotion.wizard import wizard
-        wizard.run()
+        wizard.run(interactive=options.debug)
         return
     
     win = Window(options.host, options.port)

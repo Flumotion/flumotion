@@ -15,6 +15,8 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+import gtk
+        
 from flumotion.wizard.enums import * # XXX: fix later
 from flumotion.wizard import wizard
 
@@ -36,8 +38,6 @@ class Source(wizard.WizardStep):
     section_name = 'Production'
     
     def setup(self):
-        import gtk
-        
         self.combobox_video.set_enum(VideoDevice)
         self.combobox_audio.set_enum(AudioDevice)
         tips = gtk.Tooltips()
@@ -64,6 +64,8 @@ class Source(wizard.WizardStep):
     def get_next(self):
         if self.checkbutton_has_video:
             video_source = self.combobox_video.get_active()
+            return video_source.step
+        
             if video_source == VideoDevice.TVCard:
                 return 'TV Card'
             elif video_source == VideoDevice.Firewire:
@@ -99,8 +101,8 @@ class TVCard(VideoSource):
 
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
-        options['device'] = TVCardDevice.get(options['device']).name
-        options['signal'] = TVCardSignal.get(options['signal']).name
+        options['device'] = options['device'].name
+        options['signal'] = options['signal'].name
         return options
 wizard.register_step(TVCard)
 

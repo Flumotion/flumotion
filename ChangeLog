@@ -1,3 +1,18 @@
+2004-10-12  Johan Dahlin  <johan@gnome.org>
+
+	* bin/flumotion-admin.in:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Make the wizard spit out proper configuration files. Now we just
+	need to write all these components. Ignore all UserWarnings,
+	perhaps this is the wrong workaround for broken gtk2reactor.
+	
+	
 2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/http/http.py:

@@ -23,6 +23,9 @@ sys.path.insert(0, '@PYGTK_DIR@')
 import pygtk
 pygtk.require('2.0')
 
+import warnings
+warnings.filterwarnings('ignore', category=UserWarning)
+
 from twisted.internet import gtk2reactor
 gtk2reactor.install()
 

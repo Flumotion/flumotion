@@ -62,7 +62,10 @@ class WizardComboBox(gtk.ComboBox):
         return self.get_column_content(self.COLUMN_VALUE)
 
     def get_enum(self):
-        return self.enum_class.get(self.get_value())
+        if hasattr(self, 'enum_class'):
+            return self.enum_class.get(self.get_value())
+        else:
+            return self.get_value()
     
     def set_enum(self, enum_class, value_filter=()):
         model = self.get_model()
@@ -122,7 +125,7 @@ class WizardComboBox(gtk.ComboBox):
         self.set_model(model)
         
     def get_state(self):
-        return int(self.get_value())
+        return self.get_enum()
 gobject.type_register(WizardComboBox)
 
 
@@ -519,13 +522,24 @@ class Wizard:
         self.show_next()
 
     def finish(self):
-        gtk.main_quit()
+        from flumotion.wizard import save
+        s = save.WizardSaver(self)
+        s.save()
         
-    def run(self):
+        try:
+            gtk.main_quit()
+        except RuntimeError:
+            pass
+        
+    def run(self, interactive):
         if not self.stack:
             raise TypeError("need an initial step")
 
         self.set_step(self.stack.peek())
+
+        if not interactive:
+            self.finish()
+            return
         
         self.window.show()
         gtk.main()
@@ -541,11 +555,11 @@ def register_step(klass):
     else:
         wiz.add_step(klass)
 
-def run():
+def run(interactive=True):
     global wiz
     
     import flumotion.wizard.wizard_step
-    wiz.run()
+    wiz.run(interactive)
     
 
 if __name__ == '__main__':
