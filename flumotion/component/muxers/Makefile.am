@@ -1,5 +1,6 @@
 component_PYTHON = \
 	__init__.py \
+	multipart.py \
 	ogg.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/muxers
