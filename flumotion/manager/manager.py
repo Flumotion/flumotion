@@ -88,6 +88,16 @@ class Dispatcher(log.Loggable):
         heaven.removeAvatar(avatarId)
 
     def createAvatarFor(self, avatarId, ifaces):
+        """
+        Create an avatar from the heaven implementing the given interface.
+
+        @type avatarId:  string
+        @param avatarId: the name of the new avatar
+        @type ifaces:    tuple of interfaces linked to heaven
+        @param ifaces:   a list of heaven interfaces to get avatar from
+
+        @returns:        an avatar from the heaven managing the given interface.
+        """
         if not pb.IPerspective in ifaces:
             raise errors.NoPerspectiveError(avatarId)
 
@@ -100,9 +110,12 @@ class Dispatcher(log.Loggable):
 
         raise errors.NoPerspectiveError(avatarId)
         
-    def registerHeaven(self, interface, heaven):
+    def registerHeaven(self, heaven, interface):
         """
-        register a Heaven implementing the given interface.
+        Register a Heaven as managing components with the given interface.
+
+        @type interface:  L{twisted.python.components.Interface}
+        @param interface: a component interface to register the heaven with.
         """
         assert components.implements(heaven, interfaces.IHeaven)
         
@@ -145,7 +158,7 @@ class Vishnu:
 
     def _createHeaven(self, interface, klass):
         heaven = klass(self)
-        self.dispatcher.registerHeaven(interface, heaven)
+        self.dispatcher.registerHeaven(heaven, interface)
         return heaven
     
     def getFactory(self):

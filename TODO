@@ -14,8 +14,7 @@
 - API cleanup:
 
 - manager/component.py:
-  - getAvatar -> createAvatar or similar, and good opposition to removeAvatar
-  - removeAvatar renamed similarly
+  - create/remove Avatar -> summon/expel
   - work on only name or only component, so there is a clear API distinction
   - name all arguments used in functions that are the same, with the same name
   - rename components to avatars, and rename functions accordingly

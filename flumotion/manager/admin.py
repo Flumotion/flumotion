@@ -114,7 +114,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @rtype: C{list} of L{flumotion.manager.admin.ComponentView}
         """
         # FIXME: should we use an accessor to get at components from c ?
-        components = map(ComponentView, self.componentheaven.components.values())
+        components = map(ComponentView, self.componentheaven.avatars.values())
         return components
 
     def sendLog(self, category, type, message):
