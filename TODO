@@ -14,6 +14,8 @@
 * MEDIUM	create a common.heaven.Heaven base class, and subclass others
 	        involves making admin use same system for managing avatars
 
+* EASY		make all pb. factories called Client or Server so it's obvious
+
 - API cleanup:
 
 - manager/component.py:
