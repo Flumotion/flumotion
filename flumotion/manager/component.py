@@ -36,6 +36,7 @@ class Options:
     def __init__(self):
         self.eaters = [] # list of eater names
         self.feeders = [] # list of feeder names
+        self.dict = None
 
 # abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
 class Feeder:

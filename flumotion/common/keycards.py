@@ -78,25 +78,3 @@ class KeycardUACPCC(Keycard, UCPCC):
         self.address = address
         dir(self)
 pb.setUnjellyableForClass(KeycardUACPCC, KeycardUACPCC)
-
-# FIXME: DEPRECATED, remove
-class HTTPClientKeycard(tcredentials.UsernamePassword, Keycard):
-    def __init__(self, componentName, username, password, ip):
-        tcredentials.UsernamePassword.__init__(self, username, password)
-        Keycard.__init__(self)
-        self.requesterName = componentName
-        self.username = username
-        self.password = password
-        self.ip = ip
-        
-# fixme: remove methods
-    def getUsername(self):
-        return self.username
-
-    def getPassword(self):
-        return self.password
-
-    def getIP(self):
-        return self.ip
-
-pb.setUnjellyableForClass(HTTPClientKeycard, HTTPClientKeycard)

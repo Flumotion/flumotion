@@ -1,3 +1,12 @@
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/keycards.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/main.py:
+	* flumotion/twisted/pb.py:
+	  60% coverage !
+
 2004-10-17  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_disk.glade:

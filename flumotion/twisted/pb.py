@@ -250,14 +250,14 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
 
         @param interfaces: list of fully qualified names of interface objects
 
-        @returns: one of:
-                  a L{flumotion.common.keycards.Keycard} when more steps
-                  need to be performed
-                  a L{twisted.spread.pb.AsReferenceable} when authentication 
-                  has succeeded, which will turn into a
-                  L{twisted.spread.pb.RemoteReference on the client side
-                  a L{twisted.cred.error.UnauthorizedLogin} when authentication
-                  is denied
+        @returns: one of
+            - a L{flumotion.common.keycards.Keycard} when more steps
+              need to be performed
+            - a L{twisted.spread.pb.AsReferenceable} when authentication 
+              has succeeded, which will turn into a
+              L{twisted.spread.pb.RemoteReference} on the client side
+            - a L{twisted.cred.error.UnauthorizedLogin} when authentication
+              is denied
         """
         # corresponds with FPBClientFactory._cbSendKeycard
         self.log("remote_login(keycard=%s, *interfaces=%r" % (keycard, interfaces))

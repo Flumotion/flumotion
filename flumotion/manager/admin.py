@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_manager_admin -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/manager/admin.py: manager-side objects to handle admin clients
@@ -72,7 +72,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type heaven: L{flumotion.manager.admin.AdminHeaven}
         """
         self.heaven = heaven
-        self.componentheaven = heaven.vishnu.componentheaven
+        self.componentHeaven = heaven.vishnu.componentHeaven
         self.mind = None
         self.avatarId = avatarId
         self.debug("created new AdminAvatar with id %s" % avatarId)
@@ -109,7 +109,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @rtype: C{list} of L{flumotion.manager.admin.ComponentView}
         """
         # FIXME: should we use an accessor to get at components from c ?
-        components = map(ComponentView, self.componentheaven.avatars.values())
+        components = map(ComponentView, self.componentHeaven.avatars.values())
         return components
 
     def sendLog(self, category, type, message):
@@ -174,7 +174,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     # Generic interface to call into a component
     def perspective_callComponentRemote(self, componentName, method_name,
                                         *args, **kwargs):
-        component = self.componentheaven.getComponent(componentName)
+        component = self.componentHeaven.getComponent(componentName)
         try:
             return component.callComponentRemote(method_name, *args, **kwargs)
         except Exception, e:
@@ -183,7 +183,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         
     def perspective_setComponentElementProperty(self, componentName, element, property, value):
         """Set a property on an element in a component."""
-        component = self.componentheaven.getComponent(componentName)
+        component = self.componentHeaven.getComponent(componentName)
         try:
             return component.setElementProperty(element, property, value)
         except errors.PropertyError, exception:
@@ -192,7 +192,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
 
     def perspective_getComponentElementProperty(self, componentName, element, property):
         """Get a property on an element in a component."""
-        component = self.componentheaven.getComponent(componentName)
+        component = self.componentHeaven.getComponent(componentName)
         try:
             return component.getElementProperty(element, property)
         except errors.PropertyError, exception:
@@ -208,7 +208,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type  style:  string
         @param style:  the style of the user interface to get the zip for
         """
-        component = self.componentheaven.getComponent(componentName)
+        component = self.componentHeaven.getComponent(componentName)
         try:
             return component.getUIZip(domain, style)
         except Exception, e:
@@ -224,7 +224,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type style:  string
         @param style: the style of the user interface to get MD5 sum for
         """
-        component = self.componentheaven.getComponent(componentName)
+        component = self.componentHeaven.getComponent(componentName)
         try:
             return component.getUIMD5Sum(domain, style)
         except Exception, e:
@@ -237,7 +237,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             self.info("reloaded component %s code" % name)
 
         self.info("reloading component %s code" % componentName)
-        avatar = self.componentheaven.getComponent(componentName)
+        avatar = self.componentHeaven.getComponent(componentName)
         cb = avatar.reloadComponent()
         cb.addCallback(_reloaded, self, componentName)
         return cb

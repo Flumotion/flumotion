@@ -80,10 +80,7 @@ def _loadConfig(vishnu, filename):
         configDict = conf.manager.bouncer.getConfigDict()
         import flumotion.worker.job
         vishnu.setBouncer(flumotion.worker.job.getComponent(configDict, defs))
-        vishnu.bouncer.debug('I AM ALIVE !')
-        # this is a test
-        # from flumotion.common import keycards
-        # print bouncer.authenticate(keycards.HTTPClientKeycard('manager', 'test', 'test', '127.0.0.1'))
+        vishnu.bouncer.debug('started')
 
 
 def _initialLoadConfig(vishnu, filename):
