@@ -1,3 +1,18 @@
+2004-09-01  Johan Dahlin  <johan@gnome.org>
+
+	* data/registry/basecomponents.xml:
+	* flumotion/components/http/http.py:
+	* flumotion/components/http/http.xml:
+	* flumotion/components/http/http_gui.py:
+	* flumotion/components/passwd/passwd.py:
+	* flumotion/gui/adminclient.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/component.py:
+	* flumotion/server/config.py:
+	* flumotion/server/controller.py:
+	* flumotion/server/registry.py: Add *very* basic support for transmitting
+	user interface over the wire. Still full of hacks.
+
 2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/ui/admin.glade:

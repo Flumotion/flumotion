@@ -31,12 +31,24 @@ class ConfigError(Exception):
 
 class ConfigEntry:
     nice = 0
-    def __init__(self, name, type, func, config):
+    def __init__(self, name, type, func, config, defs):
         self.name = name
         self.type = type
         self.func = func
         self.config = config
+        self.defs = defs
+        self.component = self.func(self.config)
 
+        mod = reflect.namedAny(self.defs.getSource())
+        dir = os.path.split(mod.__file__)[0]
+        files = {}
+        for file in defs.getFiles():
+            filename = os.path.basename(file.getFilename())
+            real = os.path.join(dir, filename)
+            files[real] = file
+
+        self.component.setFiles(files)
+        
     def getType(self):
         return self.type
     
@@ -46,8 +58,8 @@ class ConfigEntry:
     def getConfigDict(self):
         return self.config
     
-    def getComponent(self, *args):
-        return self.func(self.config, *args)
+    def getComponent(self):
+        return self.component
 
     def startFactory(self):
         return self.config.get('start-factory', True)
@@ -141,7 +153,7 @@ class FlumotionConfigXML(log.Loggable):
                    'start-factory': defs.isFactory() }
         config.update(options)
 
-        return ConfigEntry(name, type, function, config)
+        return ConfigEntry(name, type, function, config, defs)
 
     def get_float_value(self, nodes):
         return [float(subnode.childNodes[0].data) for subnode in nodes]

@@ -39,6 +39,9 @@
       <property name="gst-property" type="xml" required="False" multiple="True"/>
       <property name="port" type="int" required="True" multiple="False"/>
     </properties>
+    <files>
+      <file name="http_gui.py" type="GUI"/>
+    </files>
   </component>
   <component type="bttv">
     <source location="flumotion.components.bttv.bttv"/>

@@ -107,12 +107,15 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     def getProperty(self, component, element, property):
         return self.remote.callRemote('getComponentElementProperty', component, element, property)
 
+    def getUIEntry(self, component):
+        return self.remote.callRemote('getUIEntry', component)
+        
     def reloadController(self):
         return self.remote.callRemote('reloadController')
     
 gobject.type_register(AdminInterface)
 
-class Window:
+class Window(log.Loggable):
     '''
     Creates the GtkWindow for the user interface.
     Also connects to the controller on the given host and port.
@@ -133,6 +136,7 @@ class Window:
         self.window.connect('delete-event', self.close)
         self.window.show_all()
         self.component_view = self.wtree.get_widget('component_view')
+        self.component_view.connect('row-activated', self.component_view_row_activated_cb)
         self.component_model = gtk.ListStore(str, int, str, str)
         self.component_view.set_model(self.component_model)
 
@@ -150,13 +154,48 @@ class Window:
 
         self.wtree.signal_autoconnect(self)
 
-    def _button_change_cb(self, button):
+    def get_selected_component(self):
         selection = self.component_view.get_selection()
         sel = selection.get_selected()
         if not sel:
             return
         model, iter = sel
-        name = model.get(iter, 0)[0]
+        return model.get(iter, 0)[0]
+
+    def show_component(self, name, data):
+        dict_globals = globals()
+        dict_locals = {}
+        exec(data, dict_globals, dict_locals)
+        if not dict_locals.has_key('GUIClass'):
+            return
+
+        klass = dict_locals['GUIClass']
+        instance = klass()
+        sub = instance.render()
+
+        w = gtk.Window()
+        w.add(sub)
+        w.show_all()
+        
+        
+    def component_view_row_activated_cb(self, *args):
+        name = self.get_selected_component()
+
+        if not name:
+            self.warning('Select a component')
+            return
+
+        def cb_gotUI(data):
+            self.show_component(name, data)
+            
+        cb = self.admin.getUIEntry(name)
+        cb.addCallback(cb_gotUI)
+
+    def _button_change_cb(self, button):
+        name = self.get_selected_component()
+        if not name:
+            self.warning('Select a component')
+            return
 
         dialog = gtk.Dialog("Change element property on '%s'" % name,
                             self.window,

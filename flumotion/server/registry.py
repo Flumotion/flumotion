@@ -19,12 +19,14 @@
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
 import os
+import stat
 import sys
 from xml.dom import minidom, Node
 
 from twisted.python import reflect
 
 from flumotion import config
+from flumotion.utils import log
 
 __all__ = ['ComponentRegistry', 'registry']
 
@@ -34,7 +36,48 @@ def istrue(value):
 
     return False
 
-class Property:
+def getMTime(file):
+    return os.stat(file)[stat.ST_MTIME]
+
+class RegistryEntryComponent:
+    "This class represents a <component> entry in the registry"
+    def __init__(self, filename, type, factory, source,
+                 source_gui, properties, files):
+        self.filename = filename
+        self.type = type
+        self.factory = factory
+        self.source = source
+        self.source_gui = source_gui
+        self.properties = properties
+        self.files = files
+        
+    def getProperties(self):
+        return self.properties
+
+    def getFiles(self):
+        return self.files
+
+    def getGUIEntry(self):
+        if not self.files:
+            return
+        
+        # FIXME: Handle multiple files
+        if len(self.files) > 1:
+            return
+        
+        return self.files[0].getFilename()
+    
+    def getType(self):
+        return self.type
+
+    def getSource(self):
+        return self.source
+    
+    def isFactory(self):
+        return self.factory
+
+class RegistryEntryProperty:
+    "This class represents a <property> entry in the registry"
     def __init__(self, name, type, required=False, multiple=False):
         self.name = name
         self.type = type
@@ -55,29 +98,25 @@ class Property:
 
     def isMultiple(self):
         return self.multiple
-    
-class Component:
-    def __init__(self, filename, type, factory, source,
-                 source_gui=None, properties={}):
+
+class RegistryEntryFile:
+    "This class represents a <file> entry in the registry"
+    def __init__(self, filename, type):
         self.filename = filename
         self.type = type
-        self.factory = factory
-        self.source = source
-        self.source_gui = source_gui
-        self.properties = properties
 
-    def getProperties(self):
-        return self.properties
+    def getName(self):
+        return os.path.basename(self.filename)
 
     def getType(self):
         return self.type
-
-    def getSource(self):
-        return self.source
     
-    def isFactory(self):
-        return self.factory
+    def getFilename(self):
+        return self.filename
 
+    def isType(self, type):
+        return self.type == type
+    
 class XmlParserError(Exception):
     pass
 
@@ -89,12 +128,7 @@ def check_node(node, tag):
           'expected <%s>, but <%s> found' % (tag, node.nodeName)
 
 # TODO
-# ====
-#
-# Properties (required, type)
-# Inherit or interfaces?
 # Proper description
-# Read and merge other files
 # Links to other files (glade, python, png)
 
 class RegistryXmlParser:
@@ -150,7 +184,8 @@ class RegistryXmlParser:
             base = self.getComponent(base_type)
             for prop in base.getProperties():
                 properties[prop.getName()] = prop
-
+                
+        files = []
         source = None
         source_gui = None
         for child in node.childNodes:
@@ -163,6 +198,8 @@ class RegistryXmlParser:
                 source = self.parse_source(child)
             elif child.nodeName == 'properties':
                 child_properties = self.parse_properties(properties, child)
+            elif child.nodeName == 'files':
+                files = self.parse_files(child)
             else:
                 raise XmlParserError, "unexpected node: %s" % child
 
@@ -172,9 +209,9 @@ class RegistryXmlParser:
             if not istrue(factory):
                 factory = False
 
-        return Component(self.filename,
-                         type, factory, source, source_gui,
-                         properties.values())
+        return RegistryEntryComponent(self.filename,
+                                      type, factory, source, source_gui,
+                                      properties.values(), files)
 
     def parse_source(self, node):
         # <source location="..."/>
@@ -185,7 +222,7 @@ class RegistryXmlParser:
 
     def parse_properties(self, properties, node):
         # <properties>
-        #   <property name="..." type="" required="yes/no" multiple="yes/bno"/>
+        #   <property name="..." type="" required="yes/no" multiple="yes/no"/>
         #  </properties>
         
         for child in node.childNodes:
@@ -211,17 +248,50 @@ class RegistryXmlParser:
             if child.hasAttribute('multiple'):
                 optional['multiple'] = istrue(child.getAttribute('multiple'))
 
-            property = Property(name, type, **optional)
+            property = RegistryEntryProperty(name, type, **optional)
 
             properties[name] = property
 
-class ComponentRegistry:
+    def parse_files(self, node):
+        # <files>
+        #   <file name="..." type=""/>
+        #  </files>
+
+        files = []
+        for child in node.childNodes:
+            if (child.nodeType == Node.TEXT_NODE or
+                child.nodeType == Node.COMMENT_NODE):
+                continue
+            
+            if child.nodeName != "file":
+                raise XmlParserError, "unexpected node: %s" % child
+        
+            if not child.hasAttribute('name'):
+                raise XmlParserError, "<file> must have a name attribute"
+
+            if not child.hasAttribute('type'):
+                raise XmlParserError, "<file> must have a type attribute"
+
+            name = str(child.getAttribute('name'))
+            type = str(child.getAttribute('type'))
+
+            dir = os.path.split(self.filename)[0]
+            filename = os.path.join(dir, name)
+            file = RegistryEntryFile(filename, type)
+            files.append(file)
+            
+        return files
+
+class ComponentRegistry(log.Loggable):
+    logCategory = 'registry'
+
     """Registry, this is normally not instantiated."""
     filename = os.path.join(config.datadir, 'registry', 'basecomponents.xml')
     def __init__(self):
         self.components = {}
 
     def addFromFile(self, filename):
+        self.info('Merging registry from %s' % filename)
         parser = RegistryXmlParser(filename)
         for component in parser.getComponents():
             type = component.getType()
@@ -248,16 +318,25 @@ class ComponentRegistry:
                 
             print >> fd, '  <component type="%s"%s>' % (component.getType(), data)
             print >> fd, '    <source location="%s"/>' % component.getSource()
+
             print >> fd, '    <properties>'
-            
             for prop in component.getProperties():
                 print >> fd, '      <property name="%s" type="%s" required="%s" multiple="%s"/>' % (
                     prop.getName(),
                     prop.getType(),
                     prop.isRequired(),
                     prop.isMultiple())
-                
             print >> fd, '    </properties>'
+
+            files = component.getFiles()
+            if files:
+                print >> fd, '    <files>'
+                for file in files:
+                    print >> fd, '      <file name="%s" type="%s"/>' % (
+                        file.getName(),
+                        file.getType())
+                print >> fd, '    </files>'
+
             print >> fd, '  </component>'
         print >> fd, '</components>'
 
@@ -270,9 +349,10 @@ class ComponentRegistry:
             dir = os.path.join(root, dir)
             if not os.path.isdir(dir):
                 continue
-
             for filename in os.listdir(dir):
                 filename = os.path.join(dir, filename)
+                if not os.path.exists(filename):
+                    continue
                 if filename.endswith('.xml'):
                     files.append(filename)
         return files
@@ -281,17 +361,33 @@ class ComponentRegistry:
         for filename in self.getFileList(root):
             registry.addFromFile(filename)
 
+        self.info('Saving registry to %s' % self.filename)
         fd = open(self.filename, 'w')
         registry.dump(fd)
 
-    def verify(self, root):
-        if os.path.exists(self.filename):
+    def isDirty(self, root):
+        if registry.isEmpty():
+            return True
+
+        files = self.getFileList(root)
+        max_mtime = max(map(getMTime, files))
+        if max_mtime > getMTime(self.filename):
+            return True
+
+        return False
+    
+    def verify(self, root, force=False):
+        dir = os.path.join(root, 'flumotion', 'components')
+        
+        if not os.path.exists(self.filename):
+            force = True
+        else:
             registry.addFromFile(self.filename)
 
-        if registry.isEmpty():
-            dir = os.path.join(root, 'flumotion', 'components')
+        if force or self.isDirty(dir):
+            self.info('Rebuilding registry')
             registry.clean()
             registry.update(dir)
-    
+            
 registry = ComponentRegistry()
 

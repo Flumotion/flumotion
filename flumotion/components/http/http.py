@@ -245,7 +245,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         self.auth = auth
 
     def setMaxClients(self, maxclients):
-        print 'setting maxclients to', maxclients
+        self.info('setting maxclients to %d' % maxclients)
         self.maxclients = maxclients
         
     def getChild(self, path, request):

@@ -24,14 +24,16 @@ import crypt
 
 from twisted.python import components
 from flumotion.server import interfaces
+from flumotion.server import component
 
 __all__ = ['HTTPGatekeeper']
 
-class HTTPGatekeeper:
+class HTTPGatekeeper(component.DirectoryProvider):
 
     __implements__ = interfaces.IAuthenticate,
     
     def __init__(self, filename, type):
+        component.DirectoryProvider.__init__(self)
         self.filename = filename
         self.type = type
 

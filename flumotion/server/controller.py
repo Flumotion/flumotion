@@ -252,6 +252,11 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
         cb.addErrback(self._mindPropertyErrback)
         return cb
 
+    def getUIEntry(self):
+        cb = self._mindCallRemote('getUIEntry')
+        cb.addErrback(self.cb_checkOther)
+        return cb
+    
     def perspective_log(self, *msg):
         log.debug(self.getName(), *msg)
         

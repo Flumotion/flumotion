@@ -9,5 +9,8 @@
       <property name="auth" type="string"/>
       <property name="maxclients" type="int"/>
     </properties>
+    <files>
+      <file name="http_gui.py" type="GUI"/>
+    </files>
   </component>
 </components>

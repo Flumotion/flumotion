@@ -188,6 +188,14 @@ class AdminPerspective(pb.Avatar, log.Loggable):
             self.warning(str(exception))
             raise
 
+    def perspective_getUIEntry(self, component_name):
+        component = self.controller.getComponent(component_name)
+        try:
+            return component.getUIEntry()
+        except Exception, e:
+            self.warning(str(e))
+            raise
+
     def perspective_reloadController(self):
         """Reload modules in the controller."""
         import sys

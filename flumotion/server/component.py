@@ -30,7 +30,6 @@ from flumotion.server import interfaces
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
 
-
 class ComponentFactory(pbutil.ReconnectingPBClientFactory):
     __super_init = pbutil.ReconnectingPBClientFactory.__init__
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
@@ -106,7 +105,10 @@ class ComponentView(pb.Referenceable, log.Loggable):
         
     def remote_setElementProperty(self, element_name, property, value):
         self.comp.set_element_property(element_name, property, value)
-        
+
+    def remote_getUIEntry(self):
+        return self.comp.getUIEntry()
+    
     def remote_play(self):
         self.comp.play()
         
@@ -146,7 +148,28 @@ class ComponentView(pb.Referenceable, log.Loggable):
 class IFlumotionComponent:
     pass
 
-class BaseComponent(gobject.GObject, log.Loggable):
+class DirectoryProvider:
+    def __init__(self):
+        self.files = []
+        
+    def setFiles(self, files):
+        self.files = files
+
+    def getFiles(self, filename):
+        return self.files[filename]
+
+    def getUIEntry(self):
+        for filename, file in self.files.items():
+            if file.isType('GUI'):
+                break
+        else:
+            return
+
+        data = open(filename).read()
+
+        return data
+
+class BaseComponent(gobject.GObject, log.Loggable, DirectoryProvider):
     """I am the base class for all Flumotion components."""
     __gsignals__ = {
         'state-changed': (gobject.SIGNAL_RUN_FIRST, None, (str, object)),
@@ -158,12 +181,15 @@ class BaseComponent(gobject.GObject, log.Loggable):
     
     def __init__(self, name, sources, feeds):
         self.__gobject_init__()
+        DirectoryProvider.__init__(self)
+        
         self.component_name = name
         self.sources = sources
         self.feeds = feeds
         self.pipeline = None
         self.pipeline_signals = []
-
+        self.files = []
+        
         self.setup_pipeline()
 
     ### Loggable methods
