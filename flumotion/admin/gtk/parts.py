@@ -292,6 +292,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         # remove all Listeners
         self._model.foreach(self._removeListenerForeach)
         
+        self.debug('updating components view')
         # clear and rebuild
         self._model.clear()
         self._iters = {}
@@ -324,6 +325,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
                 self._model.set(iter, COL_PID, str(pid))
             else:
                 self._model.set(iter, COL_PID, None)
+        self.debug('updated components view')
 
         self.update_start_stop_props()
 

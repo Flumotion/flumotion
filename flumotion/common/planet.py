@@ -19,6 +19,8 @@
 # Headers in this file shall remain intact.
 
 from twisted.spread import pb
+from twisted.internet import defer
+
 from flumotion.twisted import flavors
 from flumotion.common import enum
 
@@ -67,10 +69,12 @@ class ManagerAtmosphereState(flavors.StateCacheable):
 
     def empty(self):
         """
-        Clear out all component entries
+        Clear out all component entries.
+
+        @returns: a DeferredList that will fire when all notifications are done.
         """
-        for c in self.get('components'):
-            self.remove('components', c)
+        list = [self.remove('components', c) for c in self.get('components')]
+        return defer.DeferredList(list)
 
 class AdminAtmosphereState(flavors.StateRemoteCache):
     pass
@@ -88,9 +92,11 @@ class ManagerFlowState(flavors.StateCacheable):
         """
         Clear out all component entries
         """
-        for c in self.get('components'):
-            self.remove('components', c)
+        # take a copy of the list because we're modifying while running
+        components = self.get('components')[:]
 
+        list = [self.remove('components', c) for c in components]
+        return defer.DeferredList(list)
 
 class AdminFlowState(flavors.StateRemoteCache):
     pass

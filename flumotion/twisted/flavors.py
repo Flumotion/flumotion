@@ -24,6 +24,7 @@ Flumotion Twisted-like flavors
 Inspired by L{twisted.spread.flavors}
 """
 
+from twisted.internet import defer
 from twisted.python import components
 from twisted.spread import pb
 
@@ -122,7 +123,8 @@ class StateCacheable(pb.Cacheable):
             raise KeyError('%s in %r' % (key, self))
 
         self._dict[key] = value
-        for o in self._observers: o.callRemote('set', key, value)
+        list = [o.callRemote('set', key, value) for o in self._observers]
+        return defer.DeferredList(list)
         
     def append(self, key, value):
         """
@@ -133,7 +135,8 @@ class StateCacheable(pb.Cacheable):
             raise KeyError('%s in %r' % (key, self))
 
         self._dict[key].append(value)
-        for o in self._observers: o.callRemote('append', key, value)
+        list = [o.callRemote('append', key, value) for o in self._observers]
+        return defer.DeferredList(list)
  
     def remove(self, key, value):
         """
@@ -144,7 +147,9 @@ class StateCacheable(pb.Cacheable):
             raise KeyError('%s in %r' % (key, self))
 
         self._dict[key].remove(value)
-        for o in self._observers: o.callRemote('remove', key, value)
+        list = [o.callRemote('remove', key, value) for o in self._observers]
+        dl = defer.DeferredList(list)
+        return dl
  
     # pb.Cacheable methods
     def getStateToCacheAndObserveFor(self, perspective, observer):

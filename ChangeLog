@@ -1,3 +1,16 @@
+2005-02-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/parts.py:
+	  some debug
+	* flumotion/common/planet.py:
+	  return a deferred list for empty() of state
+	* flumotion/manager/manager.py:
+	  order emptying correctly
+	* flumotion/twisted/flavors.py:
+	  return a deferred list for all observer updates on state
+	  make a copy of list when removing
+
 2005-02-15  Andy Wingo  <wingo@pobox.com>
 
 	* data/glade/greeter-initial.glade: Reword some things.

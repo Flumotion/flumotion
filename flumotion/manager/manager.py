@@ -623,6 +623,8 @@ class Vishnu(log.Loggable):
         # gets called after all components have stopped
         # cleans up the rest of the planet state
         components = self.getComponentStates()
+        self.debug('_emptyPlanetCallback: need to delete %d components' %
+            len(components))
 
         for c in components:
             if c.get('mood') is not moods.sleeping.value:
@@ -637,11 +639,19 @@ class Vishnu(log.Loggable):
         if len(l) > 0:
             self.warning('mappers still has keys %r' % (repr(l)))
 
-        self.state.get('atmosphere').empty()
+        list = []
+
+        list.append(self.state.get('atmosphere').empty())
 
         for f in self.state.get('flows'):
-            f.empty()
-            self.state.remove('flows', f)
+            self.debug('appending deferred for emptying flow %r' % f)
+            list.append(f.empty())
+            self.debug('appending deferred for removing flow %r' % f)
+            list.append(self.state.remove('flows', f))
+            self.debug('appended deferreds')
+
+        dl = defer.DeferredList(list)
+        self.debug('emptyPlanetCallback: returning deferred list %r' % dl)
        
     def _getComponentsToStart(self):
         # return a list of components that are sleeping and not pending

@@ -496,6 +496,8 @@ class Window(log.Loggable, gobject.GObject):
             self.warning('stateAppend on unknown object %r' % state)
 
     def stateRemove(self, state, key, value):
+        self.debug('stateRemove on %r for key %s and value %r' % (
+            state, key, value))
         if isinstance(state, worker.AdminWorkerHeavenState):
             if key == 'names':
                 self.statusbar.set('main', 'Worker %s logged out.' % value)
@@ -503,16 +505,23 @@ class Window(log.Loggable, gobject.GObject):
             if state.get('name') != 'default':
                 return
             if key == 'components':
-                del self._components[value.get('name')]
+                name = value.get('name')
+                self.debug('removing component %s' % name)
+                del self._components[name]
                 # FIXME: would be nicer to do this incrementally instead
                 self.update_components()
         elif isinstance(state, planet.AdminAtmosphereState):
             if key == 'components':
-                del self._components[value.get('name')]
+                name = value.get('name')
+                self.debug('removing component %s' % name)
+                del self._components[name]
                 # FIXME: would be nicer to do this incrementally instead
                 self.update_components()
+        elif isinstance(state, planet.AdminPlanetState):
+            self.debug('something got removed from the planet')
+            pass
         else:
-            self.warning('stateAppend on unknown object %r' % state)
+            self.warning('stateRemove of key %s and value %r on unknown object %r' % (key, value, state))
 
     ### admin model callbacks
     def admin_connected_cb(self, admin):
