@@ -214,8 +214,10 @@ class BundlerBasket:
         Create a new bundler basket.
         """
         self._bundlers = {} # bundler name -> bundle
-        self._files = {} # filename -> bundle
-        self._imports = {} # import statements -> bundle
+        
+        self._files = {}        # filename          -> bundle name
+        self._imports = {}      # import statements -> bundle name
+
         self._dependencies = {} # bundler name -> bundle names it depends on
         
     def add(self, bundleName, source, destination = None):
@@ -239,7 +241,7 @@ class BundlerBasket:
         if self._files.has_key(location):
             raise Exception("Bundler %s already has file %s" % (
                 bundleName, location))
-        self._files[location] = bundler
+        self._files[location] = bundleName
 
         # add possible imports from this file
         package = None
@@ -256,7 +258,7 @@ class BundlerBasket:
             if self._imports.has_key(package):
                 raise Exception("Bundler %s already has import %s" % (
                     bundleName, package))
-            self._imports[package] = bundler
+            self._imports[package] = bundleName
 
     def depend(self, depender, *dependencies):
         """
@@ -290,17 +292,17 @@ class BundlerBasket:
             return self._bundlers[bundlerName]
         return None
 
-    def getBundlerByImport(self, importString):
+    def getBundlerNameByImport(self, importString):
         """
-        Return the bundle by import statement, or None if not found.
+        Return the bundler name by import statement, or None if not found.
         """
         if self._imports.has_key(importString):
             return self._imports[importString]
         return None
 
-    def getBundlerByFile(self, filename):
+    def getBundlerNameByFile(self, filename):
         """
-        Return the bundle by filename, or None if not found.
+        Return the bundler name by filename, or None if not found.
         """
         if self._files.has_key(filename):
             return self._files[filename]

@@ -24,12 +24,16 @@ import os
 
 def get():
     try:
-        registrydir = os.path.join(os.environ['HOME'], '.flumotion')
+        homedir = os.environ['HOME']
+        registrydir = os.path.join(homedir, '.flumotion')
+        cachedir = os.path.join(homedir, '.flumotion')
     except KeyError:
         registrydir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion')
+        cachedir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion')
 
     return {
-        'isinstalled': True,
+        'isinstalled':   True,
+        'cachedir':      cachedir,
         'configdir':     os.path.join('@SYSCONFDIR@', 'flumotion'),
         'gladedir':      os.path.join('@DATADIR@', 'flumotion', 'glade'),
         'imagedir':      os.path.join('@DATADIR@', 'flumotion', 'image'),

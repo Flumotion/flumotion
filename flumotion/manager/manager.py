@@ -134,8 +134,6 @@ class Vishnu(log.Loggable):
     """
     logCategory = "vishnu"
     def __init__(self):
-        self._setupBundleBasket()
-
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
         self.dispatcher = Dispatcher()
@@ -147,6 +145,8 @@ class Vishnu(log.Loggable):
         self.adminHeaven = self._createHeaven(interfaces.IAdminMedium,
                                               admin.AdminHeaven)
         self.bouncer = None # used by manager to authenticate worker/component
+        self.bundlerBasket = None
+        self._setupBundleBasket()
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a bouncer
@@ -192,7 +192,7 @@ class Vishnu(log.Loggable):
         self.componentHeaven.loadConfiguration(filename)
 
     def _setupBundleBasket(self):
-        self.bundles = bundle.BundlerBasket()
+        self.bundlerBasket = bundle.BundlerBasket()
 
         for b in registry.registry.getBundles():
             bundleName = b.getName()
@@ -203,7 +203,9 @@ class Vishnu(log.Loggable):
                     fullpath = os.path.join(configure.pythondir, directory,
                                             filename.getLocation())
                     relative = filename.getRelative()
-                    self.bundles.add(bundleName, fullpath, relative)
+                    self.log('Adding path %s as %s to bundle %s' % (
+                        fullpath, relative, bundleName))
+                    self.bundlerBasket.add(bundleName, fullpath, relative)
         
     def _createHeaven(self, interface, klass):
         """

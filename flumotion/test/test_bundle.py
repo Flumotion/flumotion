@@ -208,9 +208,11 @@ class TestBundlerBasket(unittest.TestCase):
     def testBundlerBasketPackage(self):
         basket = bundle.BundlerBasket()
         basket.add('package', self.packagefile, 'package/__init__.py')
-        bundler = basket.getBundlerByImport("package")
+        bundlerName = basket.getBundlerNameByImport("package")
+        bundler = basket.getBundlerByName(bundlerName)
         self.failUnless(bundler)
-        bundler2 = basket.getBundlerByFile("package/__init__.py")
+        bundlerName = basket.getBundlerNameByFile("package/__init__.py")
+        bundler2 = basket.getBundlerByName(bundlerName)
         self.failUnless(bundler2)
         self.assertEquals(bundler, bundler2)
 
@@ -225,17 +227,23 @@ class TestBundlerBasket(unittest.TestCase):
     def testBundlerBasketFile(self):
         basket = bundle.BundlerBasket()
         basket.add('test', self.pythonfile, "test.py")
-        bundler = basket.getBundlerByFile("notexist.py")
+        bundlerName = basket.getBundlerNameByFile("notexist.py")
+        self.failIf(bundlerName)
+        bundler = basket.getBundlerByName(bundlerName)
         self.failIf(bundler)
-        bundler = basket.getBundlerByFile("test.py")
+        bundlerName = basket.getBundlerNameByFile("test.py")
+        bundler = basket.getBundlerByName(bundlerName)
         self.failUnless(bundler)
 
     def testBundlerBasketImport(self):
         basket = bundle.BundlerBasket()
         basket.add('test', self.pythonfile, "test.py")
-        bundler = basket.getBundlerByImport("notexist")
+        bundlerName = basket.getBundlerNameByImport("notexist")
+        self.failIf(bundlerName)
+        bundler = basket.getBundlerByName(bundlerName)
         self.failIf(bundler)
-        bundler = basket.getBundlerByImport("test")
+        bundlerName = basket.getBundlerNameByImport("test")
+        bundler = basket.getBundlerByName(bundlerName)
         self.failUnless(bundler)
 
     def testBundlerBasketDepend(self):

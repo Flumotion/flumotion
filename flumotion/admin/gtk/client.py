@@ -163,11 +163,12 @@ class Window(log.Loggable, gobject.GObject):
         
         return model.get(iter, COL_TEXT)[0]
 
-    def show_component(self, name, data):
+    def show_component(self, name, methodName, data):
         """
         Show the user interface for this component.
-        Searches data for the GUIClass global, then instantiates an object
-        from that class, and calls the render() method.
+        Searches data for the given methodName global,
+        then instantiates an object from that class,
+        and calls the render() method.
 
         @param name: name to give to the instantiated object.
         @param data: the python code to load.
@@ -177,7 +178,7 @@ class Window(log.Loggable, gobject.GObject):
         if data:
             namespace = {}
             exec (data, globals(), namespace)
-            klass = namespace.get('GUIClass')
+            klass = namespace.get(methodName) # most likely GUIClass
 
             if klass:
                 # instantiate the GUIClass, giving ourself as the first argument
@@ -230,8 +231,9 @@ class Window(log.Loggable, gobject.GObject):
             self.warning('Select a component')
             return
 
-        def cb_gotUI(dir):
-            if not dir:
+        def cb_gotEntry(result):
+            entryPath, filename, methodName = result
+            if not entryPath or not filename:
                 # no ui, clear; FIXME: do this nicer
                 old = self.hpaned.get_child2()
                 self.hpaned.remove(old)
@@ -240,19 +242,19 @@ class Window(log.Loggable, gobject.GObject):
                 sub.show()
                 return
 
-            self.debug("Got the UI, lives in %s" % dir)
-            self.uidir = dir
-            path = os.path.join(dir, 'gtk.py')
-            handle = open(path, "r")
+            filepath = os.path.join(entryPath, filename)
+            self.debug("Got the UI, lives in %s" % filepath)
+            # FIXME: this is a silent assumption that the glade file
+            # lives in the same directory as the entry point
+            self.uidir = os.path.split(filepath)[0]
+            handle = open(filepath, "r")
             data = handle.read()
             handle.close()
-            self.show_component(name, data)
-            
-        # FIXME: old code, looking for replacement with bundles
-        #cb = self.admin.getUIEntry(name)
-        #cb.addCallback(cb_gotUI)
-        d = self.admin.getUI(name, 'admin', 'gtk')
-        d.addCallback(cb_gotUI)
+            # FIXME: is name (of component) needed ?
+            self.show_component(name, methodName, data)
+             
+        d = self.admin.getEntry(name, 'admin/gtk')
+        d.addCallback(cb_gotEntry)
 
     def admin_connected_cb(self, admin):
         if self._disconnected_dialog:

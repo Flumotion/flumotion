@@ -1,5 +1,5 @@
 <planet>
-  <atmosphere>
+  <flow>
     <component name="videotest-producer" type="videotest">
       <feed>default</feed>
       <width>320</width>
@@ -12,5 +12,5 @@
       <port>8803</port>
       <mount_point>/foo</mount_point>
     </component>
-  </atmosphere>
+  </flow>
 </planet>

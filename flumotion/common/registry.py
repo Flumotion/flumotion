@@ -50,10 +50,11 @@ def getMTime(file):
 class RegistryEntryComponent:
     "This class represents a <component> entry in the registry"
     def __init__(self, filename, type, 
-                 source='', properties=[], files=[], entries=[]):
+                 source='', base='', properties=[], files=[], entries=[]):
         self.filename = filename
         self.type = type
         self.source = source
+        self.base = base
         self.properties = properties
         self.files = files
         self.entries = entries
@@ -82,6 +83,9 @@ class RegistryEntryComponent:
     
     def getType(self):
         return self.type
+
+    def getBase(self):
+        return self.base
 
     def getSource(self):
         return self.source
@@ -262,7 +266,7 @@ class RegistryParser(log.Loggable):
         return components
     
     def _parseComponent(self, node):
-        # <component type="...">
+        # <component type="..." base="...">
         #   <source>
         #   <properties>
         #   <entry>
@@ -271,15 +275,20 @@ class RegistryParser(log.Loggable):
         if not node.hasAttribute('type'):
             raise XmlParserError, "<component> must have a type attribute"
         type = str(node.getAttribute('type'))
+        #FIXME: do in all components
+        #if not node.hasAttribute('base'):
+        #    raise XmlParserError, "<component> must have a base attribute"
+        baseDir = str(node.getAttribute('base'))
 
         properties = {}
+
         # Merge in options for inherit
         if node.hasAttribute('inherit'):
             base_type = str(node.getAttribute('inherit'))
             base = self.getComponent(base_type)
             for prop in base.getProperties():
                 properties[prop.getName()] = prop
-                
+
         files = []
         source = None
         entries = {}
@@ -296,7 +305,7 @@ class RegistryParser(log.Loggable):
                 raise XmlParserError("unexpected node: %s" % child)
 
         return RegistryEntryComponent(self.filename,
-                                      type, source, 
+                                      type, source, baseDir,
                                       properties.values(), files, entries)
 
     def _parseSource(self, node):
@@ -373,9 +382,9 @@ class RegistryParser(log.Loggable):
             if not child.hasAttribute('type'):
                 raise XmlParserError("<entry> must have a type attribute")
             if not child.hasAttribute('location'):
-                raise XmlParserError("<file> must have a location attribute")
+                raise XmlParserError("<entry> must have a location attribute")
             if not child.hasAttribute('function'):
-                raise XmlParserError("<file> must have a function attribute")
+                raise XmlParserError("<entry> must have a function attribute")
 
             type = str(child.getAttribute('type'))
             location = str(child.getAttribute('location'))
@@ -526,7 +535,7 @@ class RegistryParser(log.Loggable):
             if child.hasAttribute('relative'):
                 relative = str(child.getAttribute('relative'))
             else:
-                relative = location
+                relative = os.path.join(name, location)
                 
             filenames.append(RegistryEntryBundleFilename(location, relative))
 
@@ -711,7 +720,8 @@ class ComponentRegistry(log.Loggable):
         # Write components
         w(2, '<components>')
         for component in self.getComponents():
-            w(4, '<component type="%s">' % (component.getType()))
+            w(4, '<component type="%s" base="%s">' % (component.getType(),
+                component.getBase()))
 
             w(6, '<source location="%s"/>' % component.getSource())
             w(6, '<properties>')

@@ -1,5 +1,30 @@
 2004-11-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/minimal.xml:
+	* doc/random/bundle:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/common/bundle.py:
+	* flumotion/common/registry.py:
+	* flumotion/component/consumers/httpstreamer/gtk.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/configure/configure.py:
+	* flumotion/configure/installed.py.in:
+	* flumotion/configure/uninstalled.py.in:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/common.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_bundle.py:
+	* flumotion/test/test_config.py:
+	* flumotion/test/test_registry.py:
+	  rework bundling and admin UI retrieving to the new system.
+	  Still need to update all other components, and make admin ui stuff
+	  subclass properly.
+
+2004-11-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/config.py:
 	* flumotion/manager/component.py:
 	* flumotion/manager/main.py:

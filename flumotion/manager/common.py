@@ -108,7 +108,6 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
                 
         return None
 
-### FIXME: rework bundler requester stuff
     def perspective_getBundleSumsByFile(self, filename):
         """
         Get the name of the bundle, and a dictionary of md5sums of all
@@ -117,7 +116,38 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         @type  filename: string
         @param filename: the name of the file in a bundle
         """
-        pass
+        self.debug('asked to get bundle sums for %s' % filename)
+        basket = self.vishnu.bundlerBasket
+        bundleName = basket.getBundlerNameByFile(filename)
+        if not bundleName:
+            self.warning('Did not find a bundle for file %s' % filename)
+
+        deps = basket.getDependencies(bundleName)
+        self.debug('dependencies of %s: %r' % (bundleName, deps))
+        sums = {}
+        for dep in deps:
+            bundler = basket.getBundlerByName(dep)
+            sums[dep] = bundler.bundle().md5sum
+
+        self.debug('returning bundle Name %s and %d sums' % (
+            bundleName, len(sums)))
+        return bundleName, sums
+
+    def perspective_getBundleZips(self, bundles):
+        """
+        Get the zip files for the given list of bundles.
+
+        @type  bundles: list of string
+        @param bundles: the names of the bundles to get
+
+        @returns: a dictionary of name -> zip data
+        """
+        basket = self.vishnu.bundlerBasket
+        zips = {}
+        for name in bundles:
+            bundler = basket.getBundlerByName(name)
+            zips[name] = bundler.bundle().getZip()
+        return zips
 
 class ManagerHeaven(pb.Root, log.Loggable):
     """

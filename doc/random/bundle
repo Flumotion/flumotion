@@ -10,7 +10,7 @@ the main (only?) usage will be running code on a connected worker.
 I'd suggest that a bundle is specified in the xml file, for instance:
 <registry>
   <components>
-    <component name="video-test"
+    <component type="video-test"
                base="flumotion/component/producers/videotest">
 <!-- base will make the manager look for functionality code in agreed-on paths
      e.g. admin/gtk.py will be looked for under this base for the GTK
@@ -29,12 +29,13 @@ I'd suggest that a bundle is specified in the xml file, for instance:
        </entries>
     </component>
   </components>
+
   <bundles>
     <bundle name="component-videotest">
       <dependencies>
         <dependency name="component"/>
       </dependencies>
-      <directoies>
+      <directories>
         <directory name="flumotion/components/producers/videotest">
           <filename location="videotest.py"/>
         </directory>
@@ -47,6 +48,7 @@ I'd suggest that a bundle is specified in the xml file, for instance:
         </directory>
       </directories>
     </bundle>
+
     <bundle name="admin-gtk-videotest">
       <dependencies>
         <dependency name="base"/>
@@ -58,6 +60,7 @@ I'd suggest that a bundle is specified in the xml file, for instance:
         </directory>
       </directories>
     </bundle>
+
     <bundle name="wizard-gtk-videotest">
       <dependencies>
         <dependency name="base"/>

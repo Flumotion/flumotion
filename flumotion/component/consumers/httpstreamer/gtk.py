@@ -54,6 +54,9 @@ class BaseUI:
     def setUIState(self, state):
         raise NotImplementedError
 
+    # FIXME: abstract this method so it loads file with the relative
+    # flumotion/ path as put together in bundles,
+    # and it looks for the right bundle for this file
     def loadGladeFile(self, glade_file):
         path = os.path.join(self.view.uidir, glade_file)
         wtree = gtk.glade.XML(path)

@@ -36,6 +36,7 @@ from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
 from flumotion.common import bundle, common, errors, interfaces, log, keycards
+from flumotion.configure import configure
 from flumotion.utils import reload
 from flumotion.utils.gstutils import gsignal
 from flumotion.twisted import credentials
@@ -45,9 +46,11 @@ from flumotion.twisted import pb as fpb
 class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     """
     I live in the admin client.
-    I am a data model for any admin view implementing a UI.
+    I am a data model for any admin view implementing a UI to
+    communicate with one manager.
     I send signals when things happen.
     I only communicate names of objects to views, not actual objects.
+
     Manager calls on us through L{flumotion.manager.admin.AdminAvatar}
     """
     gsignal('connected')
@@ -322,94 +325,83 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         return self.workerCallRemote(workerName, 'runCode', source,
                                      functionName, *args, **kwargs)
     
-    # FIXME: this is the new method to get the UI, by getting a bundle
-    # and an entry point
-    def getUIZip(self, component, domain, style):
+    # functions to get remote code for admin parts
+    def getEntry(self, componentName, type):
         """
-        Get the zip containing the given user interface from the manager.
+        Do everything needed to set up the entry point for the given
+        component and type, including transferring and setting up bundles.
 
-        @type component: string
-        @param component: name of the component to get the user interface for.
-        @type style: string
-        @param style: style of the UI to get.
-
-        @rtype: deferred
+        Returns: a deferred returning (entryPath, filename, methodName)
         """
-        self.info('calling remote getUIZip %s, %s, %s' % (component, domain, style))
-        return self.remote.callRemote('getUIZip', component, domain, style)
-
-    def getUIMD5Sum(self, component, domain, style):
-        """
-        Get the md5sum of the given user interface from the manager.
-
-        @type component: string
-        @param component: name of the component to get the user interface for
-        @type domain: string
-        @param domain: domain of the UI to get
-        @type style: string
-        @param style: style of the UI to get
-
-        @rtype: deferred
-        """
-        self.info('calling remote getUIMD5Sum(%s, %s, %s)' % (
-            component, domain, style))
-        return self.remote.callRemote('getUIMD5Sum', component, domain, style)
-
-    # FIXME: we probably want to return something else than the cache dir,
-    # but for now this will do
-    def getUI(self, component, domain, style):
-        """
-        Check if the UI is current enough, and if not, update it.
-
-        @rtype: deferred
-        @return: deferred returning the directory where the files are.
-        """
-
-        # callback functions
-        # FIXME: check if it's ok to return either a deferred or a result    
-        def _MD5SumCallback(result, self, component, domain, style):
+        
+        def _getEntryCallback(result, componentName, type):
+            # callback for getting the entry.  Will request bundle sums
+            # based on filename given to me
+            self.debug('_getEntryCallback: result %r' % (result, ))
             if not result:
                 # no UI for this one
-                return None
-            md5sum = result
-            self.info("received UI MD5 sum")
-            self.debug("got UI MD5 sum: %s" % md5sum)
-            dir = os.path.join(os.environ['HOME'], '.flumotion', 'cache', md5sum)
-            if not os.path.exists(dir):
-                d = self.getUIZip(component, domain, style)
+                return (None, None, None)
+
+            filename, methodName = result
+            self.debug("entry point for %s of type %s is in file %s and method %s" % (componentName, type, filename, methodName))
+            # request bundle sums
+            d = self.callRemote('getBundleSumsByFile', filename)
+            d.addCallback(_getBundleSumsCallback, filename, methodName)
+            d.addErrback(self._defaultErrback)
+            return d
+
+        def _getBundleSumsCallback(result, filename, methodName):
+            # callback receiving bundle sums.  Will remote call to get
+            # all missing zip files
+            entryName, sums = result
+            self.debug('_getBundleSumsCallback: entry bundle %s, sums %d' % (
+                entryName, len(sums)))
+
+            # get path where entry bundle is stored
+            entryPath = os.path.join(configure.cachedir, sums[entryName])
+
+            # check which zips to request from manager
+            for name in sums.keys():
+                sum = sums[name]
+                dir = os.path.join(configure.cachedir, sum)
+                missing = [] # list of missing bundles
+                if not os.path.exists(dir):
+                    missing.append(name)
+
+            if missing:
+                self.debug('_getBundleSumsCallback: requesting zips %r' %
+                    missing)
+                d = self.callRemote('getBundleZips', missing)
+                d.addCallback(_getBundleZipsCallback, entryPath, filename, methodName)
                 d.addErrback(self._defaultErrback)
-                d.addCallback(_ZipCallback, self, component, domain, style)
-                return d
-            self.debug("UI is in dir %s" % dir)
-            return dir
+            else:
+                retval = (entryPath, filename, methodName)
+                self.debug('_getBundleSumsCallback: returning %r' % (
+                    retval, ))
+                return retval
 
-        def _ZipCallback(result, self, component, domain, style):
-            # the result is the zip data
-            self.info("received UI Zip")
-            b = bundle.Bundle()
-            b.setZip(result)
-            cachedir = os.path.join(os.environ['HOME'], ".flumotion", "cache")
-            unbundler = bundle.Unbundler(cachedir)
-            dir = unbundler.unbundle(b)
-            self.debug("UI is in dir %s" % dir)
-            return dir
+        def _getBundleZipsCallback(result, entryPath, filename, methodName):
+            # callback to receive zips.  Will set up zips and finally
+            # return physical location of entry file and method
+            for name in result.keys():
+                zip = result[name]
+                b = bundle.Bundle()
+                b.setZip(zip)
+                unbundler = bundle.Unbundler(configure.cachedir)
+                dir = unbundler.unbundle(b)
+                self.debug("unpacked %s to dir %s" % (name, dir))
 
-        self.debug("getting UI MD5 sum")
-        d = self.getUIMD5Sum(component, domain, style)
+            return entryPath, filename, methodName
+
+        # start chain
+        d = self.callRemote('getEntryByType', componentName, type)
+        d.addCallback(_getEntryCallback, componentName, type)
         d.addErrback(self._defaultErrback)
-        d.addCallback(_MD5SumCallback, self, component, domain, style)
-
         return d
-        
-    # FIXME: add a second argument to get the type of UI;
-    # gtk or http for example
-    def getUIEntry(self, component):
-        self.info('calling remote getUIEntry %s' % component)
-        return self.remote.callRemote('getUIEntry', component)
 
-    def getUIFileList(self, component):
-        self.debug('calling remote getUIFileList %s' % component)
-        return self.remote.callRemote('getUIFileList', component)
+    def callRemote(self, name, *args, **kwargs):
+        self.debug('Calling remote method %s' % name)
+        return self.remote.callRemote(name, *args, **kwargs)
 
     def cleanComponents(self):
         return self.remote.callRemote('cleanComponents')

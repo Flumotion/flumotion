@@ -32,6 +32,8 @@ and then access the variables from the configure module.  For example:
 @var  isinstalled: whether an installed version is being run
 @type isinstalled: boolean
 
+@var  cachedir:      directory where cached code is stored
+@type cachedir:      string
 @var  configdir:     directory where configuration files are stored
 @type configdir:     string
 @var  gladedir:      directory where glade files are stored

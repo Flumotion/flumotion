@@ -175,3 +175,21 @@ class TestConfig(unittest.TestCase):
         assert getattr(custom, 'attr', None) == 'attr-value'
         assert conf.get('five') == True
         assert conf.get('six') == 3981391981389138998131389L
+
+    def testGetComponentEntries(self):
+        conf = config.FlumotionConfigXML(None,
+             """
+             <planet>
+               <atmosphere>
+                 <component name="atmocomp" type="test-component"/>
+               </atmosphere>
+               <flow>
+                 <component name="flowcomp" type="test-component"/>
+               </flow>
+             </planet>
+             """)
+        entries = conf.getComponentEntries()
+        self.failUnless(entries.has_key('atmocomp'))
+        self.failUnless(entries.has_key('flowcomp'))
+
+

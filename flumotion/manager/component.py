@@ -307,7 +307,6 @@ class ComponentAvatar(common.ManagerAvatar):
         self.error('Invalid pipeline for component')
         self.mindCallRemote('stop')
         return None
-
         
     # FIXME: rename to something like getEaterFeeders()
     def getEaters(self):
@@ -339,6 +338,13 @@ class ComponentAvatar(common.ManagerAvatar):
 
     def getName(self):
         return self.avatarId
+
+    def getType(self):
+        # use the config to check the type
+        if not self.avatarId in self.heaven._componentEntries.keys():
+            self.debug('component %s not found in entries' % self.avatarId)
+            return None
+        return self.heaven._componentEntries[self.avatarId].type
 
     def stop(self):
         """
@@ -464,42 +470,6 @@ class ComponentAvatar(common.ManagerAvatar):
         d.addErrback(self._mindErrback, errors.ReloadSyntaxError)
         return d
 
-    def getUIZip(self, domain, style):
-        """
-        Request the zip for the component's UI in the given domain and style.
-
-        The deferred returned will receive the code to run the UI.
-
-        @type  domain: string
-        @param domain: the UI domain to get
-        @type  style:  string
-        @param style:  the UI style to get
-
-        @rtype: L{twisted.internet.defer.Deferred}
-        """
-        self.debug('calling remote getUIZip(%s, %s)' % (domain, style))
-        d = self.mindCallRemote('getUIZip', domain, style)
-        d.addErrback(self._mindErrback)
-        return d
-
-    def getUIMD5Sum(self, domain, style):
-        """
-        Request the md5sum for the component's UI in the given domain and style.
-
-        The deferred returned will receive the md5sum of the UI zip.
-
-        @type  domain: string
-        @param domain: the UI domain to get
-        @type  style:  string
-        @param style:  the UI style to get
-
-        @rtype: L{twisted.internet.defer.Deferred}
-        """
-        self.debug('calling remote getUIMD5Sum(%s, %s)' % (domain, style))
-        d = self.mindCallRemote('getUIMD5Sum', domain, style)
-        d.addErrback(self._mindErrback)
-        return d
-    
     # FIXME rename to something that reflects an action, like startFeedIfReady
     def checkFeedReady(self, feedName):
         # check if the given feed is ready to start, and start it if it is
@@ -689,9 +659,13 @@ class ComponentHeaven(common.ManagerHeaven):
         
     def loadConfiguration(self, filename, string=None):
         conf = config.FlumotionConfigXML(filename, string)
+        
         # get atmosphere and flow entries
-        self._componentEntries.update(conf.getComponentEntries())
-            
+        entries = conf.getComponentEntries()
+        self.debug('got entries %r from conf %r' % (entries, conf))
+        self._componentEntries.update(entries)
+        self.debug("added entries for components %r" %
+            self._componentEntries.keys())
             
     def _getComponentEatersData(self, componentAvatar):
         """

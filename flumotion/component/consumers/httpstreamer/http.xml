@@ -1,7 +1,17 @@
 <registry>
   <components>
-    <component type="http-streamer">
-      <source location="flumotion.component.consumers.httpstreamer.http"/>
+    <component type="http-streamer"
+               base="flumotion/component/consumers/httpstreamer">
+<!-- old way of specifying component source -->
+    <source location="flumotion.component.consumers.httpstreamer.http"/>
+
+      <entries>
+        <entry type="component" location="http.py"
+               function="createComponent"/>
+        <entry type="admin/gtk" location="gtk.py"
+               function="GUIClass"/>
+      </entries>
+
       <properties>
         <property name="source" type="string" required="yes"/>
         <property name="port" type="int" required="yes"/>
@@ -14,12 +24,13 @@
       </properties>
     </component>
   </components>
+
   <bundles>
     <bundle name="http-streamer-admin-gtk">
       <directories>
         <directory name="flumotion/component/consumers/httpstreamer">
           <filename location="http.glade" />
-          <filename location="gtk.py" relative="foo/gtk.py"/>
+          <filename location="gtk.py" />
         </directory>
       </directories>
     </bundle>

@@ -181,7 +181,7 @@ class TestRegistry(unittest.TestCase):
         xml = """
 <registry>
   <components>
-    <component name="foo" type="bar">
+    <component type="bar" base="base/dir">
       <entries>
         <entry type="test/test" location="loc" function="main"/>
       </entries>
@@ -214,9 +214,9 @@ class TestRegistry(unittest.TestCase):
         reg.dump(s)
         s.seek(0, 0)
         data = s.read()
-        assert data == """<registry>
+        self.assertEquals("""<registry>
   <components>
-    <component type="bar">
+    <component type="bar" base="base/dir">
       <source location="None"/>
       <properties>
       </properties>
@@ -235,7 +235,7 @@ class TestRegistry(unittest.TestCase):
           <filename location="loc" relative="lob"/>
         </directory>
         <directory name="foobie">
-          <filename location="barie" relative="barie"/>
+          <filename location="barie" relative="foobie/barie"/>
         </directory>
       </directories>
     </bundle>
@@ -244,28 +244,28 @@ class TestRegistry(unittest.TestCase):
     <directory filename="test"/>
   </directories>
 </registry>
-""", data
+""", data)
         
 class TestComponentEntry(unittest.TestCase):
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
         self.entry = registry.RegistryEntryComponent('filename', 'type',
-                                                     'source', ['prop'],
+                                                     'source', 'base', 
+                                                     ['prop'],
                                                      [self.file])
         self.empty_entry = registry.RegistryEntryComponent('filename', 'type',
-                                                           'source', ['prop'],
+                                                           'source', 'base', ['prop'],
                                                            [])
         self.multiple_entry = registry.RegistryEntryComponent('filename', 'type', 
-                                                              'source', ['prop'],
+                                                              'source', 'base', ['prop'],
                                                               [self.file, self.file])
     def testThings(self):
-        assert self.entry.getType() == 'type'
-        assert self.entry.getSource() == 'source'
-        assert self.entry.getFiles() == [self.file]
-        assert self.entry.getGUIEntry() == 'gui-filename'
-        assert self.empty_entry.getGUIEntry() == None
-        assert self.multiple_entry.getGUIEntry() == None
-        
+        self.assertEquals(self.entry.getType(), 'type')
+        self.assertEquals(self.entry.getSource(), 'source')
+        self.assertEquals(self.entry.getFiles(), [self.file])
+        self.assertEquals(self.entry.getGUIEntry(), 'gui-filename')
+        self.assertEquals(self.empty_entry.getGUIEntry(), None)
+        self.assertEquals(self.multiple_entry.getGUIEntry(), None)
 
 def rmdir(root):
     for file in os.listdir(root):

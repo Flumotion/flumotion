@@ -365,6 +365,7 @@ def createComponent(config):
         resource.setBouncerName(config['bouncer'])
 
     # create bundlers for UI
+    # DEPRECATED
     # FIXME: make it so the bundles extract in the full path
     # for later when we transmit everything they depend on
     bundler = bundle.Bundler()

@@ -24,11 +24,14 @@
 Manager-side objects to handle administrative clients.
 """
 
+import os
+
 from twisted.internet import reactor
 from twisted.spread import pb
 
 from flumotion.manager import common
 from flumotion.common import errors, interfaces, log
+from flumotion.common.registry import registry
 
 class ComponentView(pb.Copyable):
     """
@@ -192,37 +195,27 @@ class AdminAvatar(common.ManagerAvatar):
             self.warning(str(exception))
             raise
 
-    def perspective_getUIZip(self, componentName, domain, style):
+    def perspective_getEntryByType(self, componentName, type):
         """
-        Get the zip data of the bundle for the user interface.
+        Get the entry point for a piece of bundled code by the type.
 
-        @type  domain: string
-        @param domain: the domain of the user interface to get the zip for
-        @type  style:  string
-        @param style:  the style of the user interface to get the zip for
+        Returns: a (filename, methodName) tuple
         """
-        component = self.vishnu.componentHeaven.getComponent(componentName)
+        self.debug('asked to get entry for component %s and type %s' % (
+            componentName, type))
+        componentAvatar = self.vishnu.componentHeaven.getComponent(componentName)
+        componentType = componentAvatar.getType()
         try:
-            return component.getUIZip(domain, style)
-        except Exception, e:
-            self.warning(str(e))
-            raise
+            componentRegistryEntry = registry.getComponent(componentType)
+            # FIXME: add logic here for default entry points and functions
+            entry = componentRegistryEntry.getEntryByType(type)
+        except KeyError:
+            return (None, None)
 
-    def perspective_getUIMD5Sum(self, componentName, domain, style):
-        """
-        Get the MD5 sum of the bundle for the user interface.
-
-        @type  domain: string
-        @param domain: the domain of the user interface to get the MD5 sum for
-        @type style:  string
-        @param style: the style of the user interface to get MD5 sum for
-        """
-        component = self.vishnu.componentHeaven.getComponent(componentName)
-        try:
-            return component.getUIMD5Sum(domain, style)
-        except Exception, e:
-            self.warning(str(e))
-            raise
+        filename = os.path.join(componentRegistryEntry.base, entry.location)
+        self.debug('entry point is in file %s and function %s' % (
+            filename, entry.function))
+        return (filename, entry.function)
 
     def perspective_reloadComponent(self, componentName):
         """Reload modules in the given component."""
