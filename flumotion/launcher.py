@@ -45,7 +45,7 @@ def enable_stderr(fd, suffix):
 
     return [line for line in data.split('\n')]
 
-CONTROLLER_PORT = 9802
+CONTROLLER_PORT = 8900
 class Launcher:
     streaming_port = 8080
     def __init__(self):
@@ -135,10 +135,10 @@ class Launcher:
 
         raise SystemExit
     
-PRODUCER_PIPELINE = 'videotestsrc ! video/x-raw-yuv,width=160,height=120,framerate=15.0,format=(fourcc)I420'
-PRODUCER2_PIPELINE = 'sinesrc'
-CONVERTER_PIPELINE = '{ @producer1 ! ffmpegcolorspace ! jpegenc quality=50 ! queue name=video max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
-                     '{ @producer2 ! audioconvert ! queue name=audio max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
+PRODUCER_PIPELINE = 'tcpclientsrc host=core port=5502' #'videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=9.375,format=(fourcc)I420'
+PRODUCER2_PIPELINE = 'tcpclientsrc host=core port=5504'
+CONVERTER_PIPELINE = '{ @producer1 ! jpegenc quality=50 ! queue name=video max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
+                     '{ @producer2 ! mulawenc ! queue name=audio max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
                      'video.src ! multipartmux name=muxer audio.src ! muxer. muxer.'
 
 def is_port_free(port):

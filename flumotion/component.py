@@ -168,6 +168,7 @@ class BaseComponent(pb.Referenceable):
         sink = self.get_sink()
         for prop_name in properties.keys():
             sink.set_property(prop_name, properties[prop_name])
+        sink.set_property('protocol', 'gdp')
 
     def setup_sources(self, sources):
         # Setup all sources
@@ -181,7 +182,8 @@ class BaseComponent(pb.Referenceable):
             
             source.set_property('host', source_host)
             source.set_property('port', source_port)
-
+            source.set_property('protocol', 'gdp')
+            
     def cleanup(self):
         log.msg("cleaning up")
         
@@ -209,8 +211,8 @@ class BaseComponent(pb.Referenceable):
         self.pipeline_signals.append(sig_id)
         sig_id = self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         self.pipeline_signals.append(sig_id)
-        #sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
-        #self.pipeline_signals.append(sig_id)
+        sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
+        self.pipeline_signals.append(sig_id)
         
     def remote_register(self):
         if not self.hasPerspective():

@@ -63,8 +63,8 @@ class Streamer(gobject.GObject, component.BaseComponent):
         print 'connect', sources
         self.setup_sources(sources)
         sink = self.get_sink()
-        #sink.connect('handoff', self.sink_handoff_cb)
-        #sink.connect('deep-notify::caps', self.notify_caps_cb)
+        sink.connect('handoff', self.sink_handoff_cb)
+        sink.connect('deep-notify::caps', self.notify_caps_cb)
         
         self.pipeline_play()
 
