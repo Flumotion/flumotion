@@ -90,6 +90,7 @@ then
 <planet>
  
   <manager>
+    <host>localhost</host>
     <component name="manager-bouncer" type="htpasswdcrypt">
       <data><![CDATA[
 user:PSfNpHTkpTx1M
