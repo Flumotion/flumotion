@@ -162,7 +162,7 @@ class HTTPStreamingAdminResource(resource.Resource):
         for key in stats.keys():
             block.append('<tr><td>%s</td><td>%s</td></tr>' % (key, stats[key]))
         return STATS_TEMPLATE % {
-            'name': self.streaming.streamer.getName(),
+            'name': self.streaming.streamer.get_name(),
             'stats': "\n".join(block)
         }
 
