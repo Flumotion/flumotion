@@ -74,17 +74,24 @@ class IHeaven(components.Interface):
 
         @returns: the avatar from the matching heaven for a new object.
         """
-        pass
 
     def removeAvatar(self, avatarId):
         """
         Remove the avatar with the given Id from the heaven.
         """
-        pass
     
 class INewCredPerspective(components.Interface):
     def attached(self, mind):
-        pass
+        """
+        Attaches a mind
+
+        @type mind: PB Broker
+        """
 
     def detached(self, mind):
-        pass
+        """
+        Detaches a mind
+
+        @type mind: PB Broker
+        """
+
