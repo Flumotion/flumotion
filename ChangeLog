@@ -1,3 +1,14 @@
+2004-10-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/component/encoders/jpeg.py:
+	* flumotion/component/encoders/mulaw.py:
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+
+	Multipart/Mulaw/JPEG now works.
+	
 2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/planet.xml:

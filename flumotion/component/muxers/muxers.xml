@@ -1,4 +1,5 @@
 <components>
+
   <component type="ogg-muxer">
     <source location="flumotion.component.muxers.ogg"/>
     <properties>
@@ -6,7 +7,7 @@
       <property name="source" type="string" multiple="yes"/>
     </properties>
   </component>
-<!--
+
   <component type="multipart-muxer">
     <source location="flumotion.component.muxers.multipart"/>
     <properties>
@@ -14,5 +15,5 @@
       <property name="source" type="string" multiple="yes"/>
     </properties>
   </component>
--->
+
 </components>

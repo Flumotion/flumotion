@@ -143,7 +143,7 @@ SoundcardBitdepth = EnumClass('SoundcardBitdepth', ('16', '8'),
 # Encoding format
 EncodingFormat = EnumClass('EncodingFormat', ('Ogg', 'Multipart'),
                            component_type=('ogg-muxer',
-                                           'multimpart-muxer'))
+                                           'multipart-muxer'))
 EncodingVideo = EnumClass('EncodingVideo',
                           ('Theora', 'Smoke', 'JPEG'),
                           component_type=('theora-encoder',

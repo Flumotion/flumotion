@@ -18,17 +18,18 @@
 from flumotion.component import feedcomponent
 
 class JPEG(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, feeders, pipeline):
+    def __init__(self, name, eaters, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    eaters,
                                                     ['default'],
-                                                    feeders,
                                                     pipeline)
+
 
 def createComponent(config):
     source = config['source']
 
     component = JPEG(config['name'], [config['source']],
-                       "jpegenc name=encoder")
+                       "ffmpegcolorspace ! jpegenc name=encoder")
     
     element = component.pipeline.get_by_name('encoder')
     if config.has_key('quality'):

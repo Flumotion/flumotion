@@ -1,4 +1,5 @@
 <components>
+
   <component type="theora-encoder">
     <source location="flumotion.component.encoders.theora"/>
     <properties>
@@ -8,6 +9,7 @@
       <property name="quality" type="int"/>
     </properties>
   </component>
+
   <component type="smoke-encoder">
     <source location="flumotion.component.encoders.smoke"/>
     <properties>
@@ -19,6 +21,7 @@
       <property name="keyframe" type="int"/>
     </properties>
   </component>
+
   <component type="jpeg-encoder">
     <source location="flumotion.component.encoders.jpeg"/>
     <properties>
@@ -27,6 +30,7 @@
       <property name="quality" type="int"/>
     </properties>
   </component>
+
   <component type="vorbis-encoder">
     <source location="flumotion.component.encoders.vorbis"/>
     <properties>
@@ -35,6 +39,7 @@
       <property name="bitrate" type="int"/>
     </properties>
   </component>
+
   <component type="speex-encoder">
     <source location="flumotion.component.encoders.speex"/>
     <properties>
@@ -43,6 +48,7 @@
       <property name="bitrate" type="int"/>
     </properties>
   </component>
+
   <component type="mulaw-encoder">
     <source location="flumotion.component.encoders.mulaw"/>
     <properties>
@@ -50,4 +56,5 @@
       <property name="source" type="string" multiple="no"/>
     </properties>
   </component>
+
 </components>

@@ -55,7 +55,6 @@ class Component:
 class WizardSaver:
     def __init__(self, wizard):
         self.wizard = wizard
-
     def getVideoSource(self):
         options = self.wizard.get_step_options('Source')
         source = options['video']
@@ -63,9 +62,15 @@ class WizardSaver:
         return Component('video-source', source.component_type,
                          video_step.get_component_properties())
 
-    def getVideoOverlay(self, video_step):
+    def getVideoOverlay(self):
         step = self.wizard['Overlay']
+
+        # XXX: Serious refactoring needed.
+        video_options = self.wizard.get_step_options('Source')
+        video_source = video_options['video']
+        video_step = self.wizard[video_source.step]
         video_props = video_step.get_component_properties()
+        
         properties = step.get_component_properties()
         properties['width'] = video_props['width']
         properties['height'] = video_props['height']
@@ -114,7 +119,7 @@ class WizardSaver:
         video_encoder = self.getVideoEncoder()
             
         if has_overlay:
-            video_overlay = self.getVideoOverlay(video_source)
+            video_overlay = self.getVideoOverlay()
             components.append(video_overlay)
                 
         if video_overlay is not None:
