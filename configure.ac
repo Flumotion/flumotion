@@ -82,6 +82,10 @@ dnl check for epydoc
 AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
 AM_CONDITIONAL(HAVE_EPYDOC, test "x$EPYDOC" = "xyes")
 
+dnl check for pychecker
+AC_CHECK_PROG(PYCHECKER, pychecker, yes, no)
+AM_CONDITIONAL(HAVE_PYCHECKER, test "x$PYCHECKER" = "xyes")
+
 dnl check for Twisted
 AS_PYTHON_IMPORT(twisted,
   [
