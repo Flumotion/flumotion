@@ -23,6 +23,7 @@
 import errno
 import optparse
 import os
+import signal
 
 from twisted.internet import reactor
 
@@ -137,6 +138,11 @@ def main(args):
     keycard.avatarId = workerName
     brain.login(keycard)
 
+    # the reactor needs to be able to reap its own children
+    # but we also want ours reaped
+    # so we install our own signal handler that first chains to twisted's,
+    # then reaps children
+    reactor.addSystemEventTrigger('after', 'startup', brain.installSIGCHLDHandler)
     log.debug('worker', 'Starting reactor')
     reactor.run()
 
@@ -146,15 +152,16 @@ def main(args):
 
     pids = [kid.getPid() for kid in brain.kindergarten.getKids()]
     
-    log.debug('worker', 'Waiting for jobs to finish')
+    log.debug('worker', 'Waiting for jobs to finish (pids %r)' % pids)
     while pids:
         try:
             pid = os.wait()[0]
-	# FIXME: test if this properly catches OSError: [Errno 10] No child processes
         except OSError, e:
             if e.errno == errno.ECHILD:
-                continue
+                log.warning('No children left, but list of pids is %r' % pids)
+                break
         
+        log.debug('worker', 'Job with pid %d finished' % pid)
         pids.remove(pid)
 
     log.info('worker', 'All jobs finished, stopping worker')

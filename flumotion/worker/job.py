@@ -247,8 +247,11 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         print 'ERROR:' + str(error)
 
 def run(name, options):
+    """
+    Called by the worker to start a job fork.
+    """
     worker_filename = '/tmp/flumotion.%d' % os.getpid()
-    
+
     pid = os.fork()
     if pid:
         return pid

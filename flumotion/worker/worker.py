@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name:flumotion.test.test_worker_worker -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/worker/worker.py: flumotion-worker objects handling component jobs
@@ -132,11 +132,14 @@ class Kid:
     def getPid(self):
         return self.pid
     
-class Kindergarten:
+class Kindergarten(log.Loggable):
     """
     I spawn job processes.
     I live in the worker brain.
     """
+
+    logCategory = 'workerbrain' # thomas: I don't like Kindergarten
+
     def __init__(self, options):
         """
         @param options: the optparsed dictionary of command-line options
@@ -169,6 +172,24 @@ class Kindergarten:
     
     def getKids(self):
         return self.kids.values()
+
+    def removeKidByPid(self, pid):
+        """
+        Remove the kid from the kindergarten based on the pid.
+        Called by the signal handler in the brain.
+
+        @returns: whether or not a kid with that pid was removed
+        @rtype: boolean
+        """
+        for name, kid in self.kids.items():
+            if kid.getPid() == pid:
+                self.debug('Removing kid with name %s and pid %d' % (
+                    name, pid))
+                del self.kids[name]
+                return True
+
+        self.warning('Asked to remove kid with pid %d but not found' % pid)
+        return False
     
 # Similar to Vishnu, but for worker related classes
 class WorkerBrain(log.Loggable):
@@ -181,10 +202,11 @@ class WorkerBrain(log.Loggable):
 
     def __init__(self, options):
         """
-        @param options: the optparsed dictionary of command-line options.
-        @type  options: dict
+        @param options: the optparsed dictionary of command-line options
+        @type  options: an object with attributes
         """
-        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        self._oldSIGCHLDHandler = None # stored by installSIGCHLDHandler
+
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
         self.manager_host = options.host
@@ -211,6 +233,7 @@ class WorkerBrain(log.Loggable):
         checker.allowAnonymous(True)
         p = portal.Portal(dispatcher, [checker])
         job_server_factory = pb.PBServerFactory(p)
+        # FIXME: this is too ugly for words, and doesn't get cleaned up nicely
         reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(),
                            job_server_factory)
 
@@ -238,6 +261,36 @@ class WorkerBrain(log.Loggable):
                                                       
     def _cb_loginFailed(self, failure):
         self.error('Login failed, reason: %s' % str(failure))
+
+    def installSIGCHLDHandler(self):
+        """
+        Install our own signal handler for SIGCHLD.
+        This will call the currently installed one first, then reap
+        any leftover zombies.
+        """
+        handler = signal.signal(signal.SIGCHLD, self._SIGCHLDHandler)
+        if handler not in (signal.SIG_IGN, signal.SIG_DFL, None):
+            self._oldSIGCHLDHandler = handler
+
+    def _SIGCHLDHandler(self, signal, frame):
+        self.debug("handling SIGCHLD")
+        if self._oldSIGCHLDHandler:
+            self.debug("calling Twisted handler")
+            self._oldSIGCHLDHandler(signal, frame)
+        (pid, status) = os.waitpid(-1, os.WNOHANG)
+        if pid:
+            # remove from the kindergarten
+            self.kindergarten.removeKidByPid(pid)
+
+            # check if it exited nicely
+            if os.WIFEXITED(status):
+                retval = os.WEXITSTATUS(status)
+                self.info("Reaped child job with pid %d, exit value %d" % (
+                    pid, retval))
+            else:
+                self.info("Reaped job child with pid %d and unhandled status %d" % (
+                    pid, status))
+        
 
 class JobDispatcher:
     __implements__ = portal.IRealm

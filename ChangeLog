@@ -1,3 +1,13 @@
+2004-10-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_worker_worker.py:
+	  add regression tests
+	* flumotion/worker/job.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  install a signal handler correctly, tying into twisted's SIGCHLD
+	  handler.  This cleans up zombie workers nicely and closes #41
+
 2004-10-21  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/producers/bttv/bttv.py:
