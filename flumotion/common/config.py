@@ -244,6 +244,7 @@ class FlumotionConfigXML(log.Loggable):
         port = None
         transport = None
         bouncer = None
+        fludebug = None
 
         if node.hasAttribute('name'):
             name = str(node.getAttribute('name'))
