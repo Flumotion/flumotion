@@ -33,11 +33,9 @@ Maintainer: U{Thomas Vander Stichele <thomas at apestaart dot org>}
 
 import sys
 import os
+import fnmatch
 
 from flumotion.twisted import errors
-
-# environment variables controlling levels for each category
-global FLU_DEBUG
 
 class Loggable:
     """
@@ -75,24 +73,79 @@ class Loggable:
         "Overridable log function.  Default just returns passed message."
         return message
 
+# environment variables controlling levels for each category
+_FLU_DEBUG="*:1"
+
+# dynamic dictionary of categories already seen and their level
+_categories = {}
+
+# log handlers registered
 _log_handlers = []
 
-def stderrHandler(category, type, message):
-    sys.stderr.write('%-8s %-15s %s\n' % (type + ':', category + ':' , message))
+# level -> number dict
+_levels = {
+    "ERROR": 1,
+    "WARNING": 2,
+    "INFO": 3,
+    "DEBUG": 4,
+    "LOG": 5
+}
+
+def registerCategory(category):
+    """
+    Register a given category in the debug system.
+    A level will be assigned to it based on the setting of FLU_DEBUG.
+    """
+    # parse what level it is set to based on FLU_DEBUG
+    # example: *:2,admin:4
+    global _FLU_DEBUG
+    global _levels
+    global _categories
+
+    level = 0
+    chunks = _FLU_DEBUG.split(',')
+    for chunk in chunks:
+        if not chunk:
+            continue
+        (spec, value) = chunk.split(':')
+        # our glob is unix filename style globbing, so cheat with fnmatch
+        # fnmatch.fnmatch didn't work for this, so don't use it
+        if category in fnmatch.filter((category, ), spec):
+            # we have a match, so set level based on string or int
+            if not value:
+                continue
+            if _levels.has_key(value):
+                level = _levels[value]
+            else:
+                level = int(value)
+    # store it
+    _categories[category] = level
+
+def stderrHandler(category, level, message):
+    sys.stderr.write('%-8s %-15s %s\n' % (level + ':', category + ':' , message))
     sys.stderr.flush()
 
-def stderrHandlerLimited(category, type, message):
+def stderrHandlerLimited(category, level, message):
+    """
+    Logs the message only when the message's level is not more verbose
+    than the registered level for this category.
+    """
+    
     'used when FLU_DEBUG is set; uses FLU_DEBUG to limit on category'
-    # FIXME: we should parse FLU_DEBUG into a hash so we can look up
-    # if the given category matches  
-    sys.stderr.write('%-8s %-15s %s\n' % (type + ':', category + ':' , message))
+    global _categories
+    if not _categories.has_key(category):
+        registerCategory(category)
+    global _levels
+    if _levels[level] > _categories[category]:
+        return
+    sys.stderr.write('%-8s %-15s %s\n' % (level + ':', category + ':' , message))
     sys.stderr.flush()
 
-def _handle(category, type, message):
+def _handle(category, level, message):
     global _log_handlers
 
     for handler in _log_handlers:
-        handler(category, type, message)
+        handler(category, level, message)
     
 def error(cat, *args):
     """
@@ -130,6 +183,7 @@ def addLogHandler(func):
 def init():
     if os.environ.has_key('FLU_DEBUG'):
         # install a log handler that uses the value of FLU_DEBUG
-        FLU_DEBUG = os.environ['FLU_DEBUG']
+        global _FLU_DEBUG
+        _FLU_DEBUG = os.environ['FLU_DEBUG']
         addLogHandler(stderrHandlerLimited)
-        debug('log', "FLU_DEBUG set to %s" % FLU_DEBUG)
+        debug('log', "FLU_DEBUG set to %s" % _FLU_DEBUG)

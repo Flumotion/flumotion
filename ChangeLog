@@ -1,5 +1,11 @@
 2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/utils/log.py:
+	  fix up debugging system, FLU_DEBUG now works like in GStreamer,
+	  but with categories registered as they are encountered.
+
+2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-admin.in:
 	* bin/flumotion.in:
 	  trigger FLU_DEBUG parsing with debug.init
