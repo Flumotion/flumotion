@@ -89,7 +89,10 @@ class HTTPStreamerUI(BaseUI):
 
     def updateLabels(self, state):
         for name in self.labels.keys():
-            self.labels[name].set_text(state[name])
+            text = state[name]
+            if text is None:
+                text = ''
+            self.labels[name].set_text(text)
         
     def render(self):
         self.wtree = self.loadGladeFile('http.glade')
