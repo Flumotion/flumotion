@@ -26,6 +26,7 @@ import gobject
 from twisted.internet import reactor
 from twisted.spread import pb
 
+from flumotion.configure import configure
 from flumotion.component import component as basecomponent
 from flumotion.common import interfaces, errors
 from flumotion.utils import gstutils
@@ -50,9 +51,9 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.comp.connect('notify-feed-ports', self._component_notify_feed_ports_cb)
         
         # override base Errback for callRemote to stop the pipeline
-        def callRemoteErrback(reason):
-            self.warning('stopping pipeline because of %s' % reason)
-            self.comp.pipeline_stop()
+        #def callRemoteErrback(reason):
+        #    self.warning('stopping pipeline because of %s' % reason)
+        #    self.comp.pipeline_stop()
 
     def _component_error_cb(self, component, element_path, message):
         self.callRemote('error', element_path, message)
