@@ -40,7 +40,7 @@ class HTTPStreamingResource(resource.Resource):
         else:
             self.logfile = None
             
-        streamer.connect('streamer-client-removed', self.client_removed_cb)
+        streamer.connect('client-removed', self.streamer_client_removed_cb)
         self.msg = streamer.msg
         self.streamer = streamer
 

@@ -1,3 +1,8 @@
+2004-07-21  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/config.py: Move out
+	stuff from launcher.py to here, to prepare for further user interface changes
+
 2004-07-16  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/controller.py: Clean up a little bit and add

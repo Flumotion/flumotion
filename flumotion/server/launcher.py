@@ -45,6 +45,7 @@ from twisted.internet import reactor
 from twisted.web import server, resource
 
 from flumotion import errors, twisted
+from flumotion.server.config import FlumotionConfig
 from flumotion.server.controller import ControllerServerFactory
 from flumotion.server.converter import Converter
 from flumotion.server.producer import Producer
@@ -205,99 +206,33 @@ class Launcher:
         reactor.stop()
 
         raise SystemExit
-
-    def parse_globals(self, conf):
-        if conf.has_option('global', 'username'):
-            username = conf.get('global', 'username')
-            entry = pwd.getpwnam(username)
-            self.uid = entry[2]
         
     def load_config(self, filename):
-        c = ConfigParser.ConfigParser()
-        self.msg('Loading configuration file `%s\'' % filename)
-        c.read(filename)
+        config = FlumotionConfig(filename)
 
-        components = {}
-        for section in c.sections():
-            if section == 'global':
-                self.parse_globals(c)
-                continue
-            
-            name = section
-            if not c.has_option(section, 'kind'):
-                raise AssertionError
-            kind = c.get(section, 'kind')
-            if not kind in ('producer', 'converter', 'streamer'):
-                raise AssertionError
-            
-            # XXX: Throw nice warnings
-            if kind == 'producer' or kind == 'converter':
-                assert c.has_option(section, 'pipeline')
-                pipeline = c.get(section, 'pipeline')
-                if c.has_option(section, 'feeds'):
-                    feeds = c.get(section, 'feeds').split(',')
-                else:
-                    feeds = ['default']
-            else:
-                feeds = []
-                pipeline = ''
-                
-            if kind == 'converter' or kind == 'streamer':
-                assert (c.has_option(section, 'source') or
-                        c.has_option(section, 'sources'))
-                if c.has_option(section, 'source'):
-                    sources = [c.get(section, 'source')]
-                else:
-                    sources = c.get(section, 'sources').split(',')
-            else:
-                sources = []
-
-            if c.has_option(section, 'nice'):
-                nice = c.getint(section, 'nice')
-            else:
-                nice = 0
-                
-            if kind == 'producer':
-                self.start(Producer(name, sources, feeds, pipeline), nice)
-            elif kind == 'converter':
-                self.start(Converter(name, sources, feeds, pipeline), nice)
-            elif kind == 'streamer':
-                assert c.has_option(section, 'protocol')
-                protocol = c.get(section, 'protocol')
-                
-                if protocol == 'http':
-                    assert c.has_option(section, 'port')
-                    port = c.getint(section, 'port')
-                    if c.has_option(section, 'logfile'):
-                        logfile = c.get(section, 'logfile')
-                    else:
-                        logfile = None
-
-                    def setup(port, component):
-                        resource = streamer.HTTPStreamingResource(component, logfile)
+        for c in config.components.values():
+            if c.kind == 'producer':
+                self.start(Producer(c.name, [],
+                                    c.feeds, c.pipeline), c.nice)
+            elif c.kind == 'converter':
+                self.start(Converter(c.name, c.sources, c.feeds, c.pipeline), c.nice)
+            elif c.kind == 'streamer':
+                if c.protocol == 'http':
+                    def setup_cb(port, component):
+                        resource = streamer.HTTPStreamingResource(component, c.logfile)
                         factory = server.Site(resource=resource)
                         reactor.listenTCP(port, factory)
                         
-                    component = streamer.MultifdSinkStreamer(name, sources)
-                    self.msg('Starting http factory at port %d' % port)
-                    self.start(component, nice, setup, port, component)
-                elif protocol == 'file':
-                    assert c.has_option(section, 'location')
-                    location = c.get(section, 'location')
-                    if c.has_option(section, 'port'):
-                        port = c.getint(section, 'port')
-                    else:
-                        port = None
-                    def setup(port, component):
+                    component = streamer.MultifdSinkStreamer(c.name, c.sources)
+                    self.msg('Starting http factory at port %d' % c.port)
+                    self.start(component, c.nice, setup_cb, c.port, component)
+                elif c.protocol == 'file':
+                    def setup_cb(port, component):
                         factory = component.create_admin()
                         reactor.listenTCP(port, factory)
                         
-                    component = streamer.FileSinkStreamer(name, sources, location)
-                    self.start(component, nice, setup, port, component)
-                else:
-                    raise AssertionError, "unknown protocol: %s" % protocol
-            else:
-                raise AssertionError, "unknown component kind: %s" % kind
+                    component = streamer.FileSinkStreamer(c.name, c.sources, location)
+                    self.start(component, c.nice, setup_cb, c.port, c.component)
     
 def get_options_for(kind, args):
     if kind == 'producer':
