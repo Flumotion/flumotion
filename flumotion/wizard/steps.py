@@ -273,6 +273,7 @@ wizard.register_step(FireWire)
 def _checkDeviceName(device):
     # this function gets sent to and executed on the worker
     # it will fire a deferred returning the deviceName, or a failure
+    from flumotion.utils import gstutils
     from twisted.internet import defer, reactor
     import gst
 
@@ -297,7 +298,13 @@ def _checkDeviceName(device):
             res.returned = True
             res.d.errback(errors.GstError(error.message))
 
-    pipeline = 'v4lsrc name=source device=%s autoprobe=false ! fakesink' % device
+    autoprobe = "autoprobe=false"
+    # added in gst-plugins 0.8.6
+    if gstutils.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
+        autoprobe += " autoprobe-fps=false"
+
+    pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,
+        autoprobe)
     bin = gst.parse_launch(pipeline)
     result = Result()
     bin.connect('state-change', state_changed_cb, result)

@@ -19,6 +19,7 @@
         <property name="height" type="int"/>
         <property name="width" type="int"/>
         <property name="framerate" type="float"/>
+<!-- FIXME: get these into an effect namespace ? -->
         <property name="hue" type="int" required="no"/>
         <property name="saturation" type="int" required="no"/>
         <property name="brightness" type="int" required="no"/>

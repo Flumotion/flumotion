@@ -143,6 +143,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         bundleName = basket.getBundlerNameByFile(filename)
         if not bundleName:
             self.warning('Did not find a bundle for file %s' % filename)
+            raise errors.NoBundleError("for file %s" % filename)
 
         deps = basket.getDependencies(bundleName)
         self.debug('dependencies of %s: %r' % (bundleName, deps))

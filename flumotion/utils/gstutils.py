@@ -132,4 +132,15 @@ def gsignal(name, *args):
 
     dict[name] = (gobject.SIGNAL_RUN_FIRST, None, args)
 
-    
+def element_factory_has_property(element_factory, property_name):
+    """
+    Check if the given element factory has the given property.
+    """
+    # FIXME: find a better way than instantiating one
+    # FIXME: add simple unit test
+    e = gst.element_factory_make(element_factory)
+    for pspec in gobject.list_properties(e):
+        if pspec.name == property_name:
+            return True
+    return False
+  

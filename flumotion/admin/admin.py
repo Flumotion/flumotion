@@ -430,6 +430,54 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         d.addErrback(self._defaultErrback)
         return d
 
+    def getBundledFile(self, bundledPath):
+        """
+        Do everything needed to get the given bundled file.
+
+        Returns: a deferred returning the absolute path to a local copy
+        of the given file.
+        """
+        def _getBundleSumsCallback(result, bundledPath):
+            # callback receiving bundle sums.  Will remote call to get
+            # the zip if it's missing
+            sums = result
+            bundleName, bundleSum = sums[0]
+            self.debug('bundledPath %s is in bundle %s' % (bundledPath,
+                bundleName))
+
+            # get path where this bundle is cached
+            cachePath = os.path.join(configure.cachedir, bundleSum)
+
+            if not os.path.exists(cachePath):
+                self.debug('_getBundleSumsCallback: requesting zip %s' %
+                    bundleName)
+                d = self.callRemote('getBundleZips', (bundleName, ))
+                d.addCallback(_getBundleZipsCallback, bundleName, bundledPath)
+                d.addErrback(self._defaultErrback)
+                self.debug("found %s in dir %s" % (bundleName, cachePath))
+                return d
+            else:
+                return os.path.join(cachePath, bundledPath)
+
+        def _getBundleZipsCallback(result, bundleName, bundledPath):
+            # callback to receive zip.  Will set up zips and finally
+            # return physical location of bundledPath
+            self.debug('_getBundleZipsCallback: received %d zips' % len(result))
+            zip = result[bundleName]
+            b = bundle.Bundle()
+            b.setZip(zip)
+            unbundler = bundle.Unbundler(configure.cachedir)
+            dir = unbundler.unbundle(b)
+            self.debug("unpacked %s to dir %s" % (name, dir))
+
+            return os.path.join(dir, bundledPath)
+
+        # start chain
+        d = self.callRemote('getBundleSumsByFile', bundledPath)
+        d.addCallback(_getBundleSumsCallback, bundledPath)
+        d.addErrback(self._defaultErrback)
+        return d
+
     ## worker remote methods
     def checkElements(self, workerName, elements):
         d = self.workerCallRemote(workerName, 'checkElements', elements)

@@ -79,6 +79,9 @@ class ComponentStart(pb.Error):
 class UnknownComponentError(pb.Error):
     "A given component or component type does not exist"
 
+class UnknownEffectError(pb.Error):
+    "A given effect or effect type does not exist"
+
 class FlumotionError(pb.Error):
     "Generic Flumotion error"
 

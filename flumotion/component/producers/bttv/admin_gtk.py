@@ -25,13 +25,11 @@ import gtk
 
 from flumotion.common import errors, log
 
-#import flumotion.component
 from flumotion.component.base import admin_gtk
 
 class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
     def render(self):
         self.wtree = self.loadGladeFile('colorbalance.glade')
-
         self.widget = self.wtree.get_widget('widget-colorbalance')
 
         d = self.callRemote("getColorBalanceProperties")

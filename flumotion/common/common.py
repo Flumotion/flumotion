@@ -28,7 +28,7 @@ import os
 import sys
 import time
 
-from twisted.python import reflect
+from twisted.python import reflect, rebuild
 from flumotion.common import errors, log
 
 # Note: This module is loaded very early on, so
@@ -310,7 +310,7 @@ def registerPackagePath(packagePath):
         package = sys.modules.get(packageName, None)
         
         # If the package fails to import from our bundle, it means
-        # That its funknown at the moment, import it from the package dir
+        # that it's unknown at the moment, import it from the package dir
         # (eg non bundle)
         if not package:
             package = reflect.namedAny(packageName)
@@ -319,6 +319,10 @@ def registerPackagePath(packagePath):
         # magic that's required
         subPath = os.path.join(packagePath,
                                packageName.replace('.', os.sep))
+
+        # rebuild the package
+        rebuild.rebuild(package)
+
         if not subPath in package.__path__:
             # insert because FLU_REGISTRY_PATH paths should override
             # base components

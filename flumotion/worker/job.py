@@ -39,8 +39,20 @@ from flumotion.component import component
 from flumotion.twisted import credentials
 
 def getComponent(dict, defs):
-    #FIXME: add setup of files to be transmitted over the wire.
-    source = defs.getSource()
+    """
+    @param config:    the configuration dictionary
+    @type  config:    dict
+    @param defs:      the registry entry for a component
+    @type  defs:      L{flumotion.common.registry.RegistryEntryComponent}
+    """
+    log.debug('component', 'getting source for defs %r' % defs)
+    try:
+        source = defs.getSource()
+    except TypeError, e:
+        raise config.ConfigError("could not get source for defs %r (%s)" % (defs, e))
+    except Exception, e:
+        raise config.ConfigError("Exception %s while getting source  for defs %r (%s)" % (e.__class__.__name__, defs, " ".join(e.args)))
+        
     log.debug('component', 'Loading source %s' % source)
     try:
         module = reflect.namedAny(source)
@@ -48,8 +60,11 @@ def getComponent(dict, defs):
         raise config.ConfigError("%s source file could not be found" % source)
     except ImportError, e:
         raise config.ConfigError("%s source file could not be imported (%s)" % (source, e))
+    except SyntaxError, e:
+        raise config.ConfigError("syntax error in %s:%d" % (
+            e.filename, e.lineno))
     except Exception, e:
-        raise config.ConfigError("Exception %s during import of source %s (%s)" % (e.__class__.__name__, source, " ".join(e.args)))
+        raise config.ConfigError("Exception %r during import of source %s (%r)" % (e.__class__.__name__, source, e.args))
         
     if not hasattr(module, 'createComponent'):
         log.warning('job', 'no createComponent() for %s' % source)
@@ -77,7 +92,7 @@ def getComponent(dict, defs):
             e.__class__.__name__, source, " ".join(e.args))
         log.warning('job', 'raising config.ConfigError(%s)' % msg)
         raise config.ConfigError(msg)
-        
+    log.debug('job', 'returning component %r' % component)
     return component
 
 class JobMedium(pb.Referenceable, log.Loggable):
@@ -195,6 +210,8 @@ class JobMedium(pb.Referenceable, log.Loggable):
         except Exception, e:
             msg = "Exception %s during getComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))
+            import traceback
+            traceback.print_exc()
             self.warning("raising ComponentStart(%s)" % msg)
             raise errors.ComponentStart(msg)
 

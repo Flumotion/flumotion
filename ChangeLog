@@ -1,3 +1,30 @@
+2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	  some more stuff to do
+	* flumotion/common/common.py:
+	  rebuild a package that's been re-added.  Needs testing
+	* flumotion/common/errors.py:
+	  add an effect error
+	* flumotion/admin/admin.py:
+	  add method to get the full local cached path for a bundled file
+	* flumotion/utils/gstutils.py:
+	  add method to check if an element factory has a given property
+	* flumotion/wizard/steps.py:
+	  verify if we can set autoprobe-fps to false to speed up detection
+	* flumotion/component/producers/bttv/admin_gtk.py:
+	  remove line
+	* flumotion/component/producers/bttv/bttv.xml:
+	  add comment
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  remove deprecated bundle stuff
+	* flumotion/worker/job.py:
+	  add some more debugging for when stuff goes wrong
+	* flumotion/manager/admin.py:
+	  add more debugging
+	* flumotion/manager/common.py:
+	  raise appropriate error on unfound bundle
+
 2004-12-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/bttv/colorbalance.glade:

@@ -367,15 +367,4 @@ def createComponent(config):
     if config.has_key('bouncer'):
         resource.setBouncerName(config['bouncer'])
 
-    # create bundlers for UI
-    # DEPRECATED
-    # FIXME: make it so the bundles extract in the full path
-    # for later when we transmit everything they depend on
-    bundler = bundle.Bundler()
-    # where do we live ?
-    directory = os.path.split(__file__)[0]
-    bundler.add(os.path.join(directory, 'gtk.py'))
-    bundler.add(os.path.join(directory, 'http.glade'))
-    component.addUIBundler(bundler, "admin", "gtk")
-    
     return component

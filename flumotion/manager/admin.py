@@ -209,20 +209,23 @@ class AdminAvatar(common.ManagerAvatar):
 
         Returns: a (filename, methodName) tuple, or None if not found.
         """
-        self.debug('asked to get entry for component %s and type %s' % (
-            componentName, type))
-        componentAvatar = self.vishnu.componentHeaven.getComponent(componentName)
+        componentAvatar = self.vishnu.componentHeaven.getComponent(
+            componentName)
         componentType = componentAvatar.getType()
+        self.debug('getting entry of type %s for component %s of type %s' % (
+            type, componentName, componentType))
         try:
             componentRegistryEntry = registry.getComponent(componentType)
             # FIXME: add logic here for default entry points and functions
             entry = componentRegistryEntry.getEntryByType(type)
         except KeyError:
+            self.warning("Could not find bundle for %s(%s)" % (
+                componentType, type))
             raise errors.NoBundleError("entry type %s in component type %s" %
                 (type, componentType))
 
         filename = os.path.join(componentRegistryEntry.base, entry.location)
-        self.debug('entry point is in file %s and function %s' % (
+        self.debug('entry point is in file path %s and function %s' % (
             filename, entry.function))
         return (filename, entry.function)
 
