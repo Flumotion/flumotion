@@ -1,3 +1,13 @@
+2004-09-17  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/http/http.py
+	(MultifdSinkStreamer.client_removed_idle): Don't close the file
+	descriptor here.
+	(HTTPStreamingResource.removeClient): Call request.finish() and
+	let python/twisted take care of closing the fd. Fixes a number of
+	bugs. Together with latest version of multifdsink we have a much
+	more stable server.
+
 2004-09-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:

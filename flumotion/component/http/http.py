@@ -453,6 +453,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         ip = request.getClientIP()
         self.logWrite(fd, ip, request, stats)
         self.info('[fd %5d] client from %s disconnected' % (fd, ip))
+        request.finish()
         del self.request_hash[fd]
 
     def handleNotReady(self, request):
@@ -663,10 +664,6 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         #self.update_ui_state()
         # actually close it - needs gst-plugins 0.8.5 of multifdsink
         self.debug('[fd %5d] closing' % fd)
-        try:
-            os.close(fd)
-        except OSError:
-            print "[fd %5d] Johan will trap GST_CLIENT_STATUS_ERROR here someday to get rid of OSError" % fd
 
     def feeder_state_change_cb(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,
