@@ -1,4 +1,4 @@
-component_PYTHON = __init__.py http.py
+component_PYTHON = __init__.py http.py http_gui.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/http
 component_DATA = http.xml
 
