@@ -25,6 +25,6 @@ def get():
         'gladedir':    os.path.join('@DATADIR@', 'flumotion', 'glade'),
         'imagedir':    os.path.join('@DATADIR@', 'flumotion', 'image'),
         'pythondir':   os.path.join('@DATADIR@', 'flumotion'),
-        'registrydir': os.path.join(os.environ['HOME'], '.flumotion')
+        'registrydir': os.path.join(os.environ['HOME'], '.flumotion'),
         'version':     '@VERSION@',
     }
