@@ -122,6 +122,21 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
 
         return [name for name in elementNames
                          if gst.element_factory_make(name) is not None]
+
+    def remote_runCode(self, codeSegment, variableName):
+        """
+        runs a segment of code and returns a variable from its namespace
+
+        @param codeSegment:   a piece of code
+        @type codeSegment:    string
+        @param variableName:  name of variable to return from code executed
+        @type variableName:   string
+        """
+        
+        namespace = {}
+        exec (codeSegment, globals(), namespace)
+        return namespace.get(variableName, None)
+        
     
 class Kid:
     def __init__(self, pid, name, type, config):
