@@ -1,0 +1,45 @@
+<root>
+  <component name="producer-video-test" type="producer">
+    <pipeline>
+videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=10.0,format=(fourcc)I420
+    </pipeline>
+  </component>
+
+  <component name="producer-audio-test" type="producer">
+    <pipeline>
+sinesrc ! audio/x-raw-int,rate=8000 ! audiorate ! identity sync=true
+    </pipeline>
+  </component>
+ 
+  <component name="converter-theora" type="converter">
+    <source>producer-video-test</source>
+    <pipeline>
+ffmpegcolorspace ! theoraenc keyframe-force=20 bitrate=20
+    </pipeline>
+  </component>
+
+  <component name="converter-vorbis" type="converter">
+    <source>producer-audio-test</source>
+    <pipeline>
+audioconvert ! rawvorbisenc bitrate=8000
+    </pipeline>
+  </component>
+
+  <component name="converter-ogg" type="converter">
+    <source>converter-theora</source>
+    <source>converter-vorbis</source>
+    <pipeline>
+      { @converter-theora ! queue } !
+        oggmux name=mux max-delay=10000000 max-page-delay=10000000
+      { @converter-vorbis ! queue } ! mux.
+      mux.
+    </pipeline>
+  </component>
+
+  <component name="streamer-ogg-test-vorbis-theora" type="http-streamer">
+    <source>converter-ogg</source>
+    <port>8800</port>
+    <logfile>/tmp/ogg-test-vorbis-theora.access.log</logfile>
+  </component>
+
+</root>
