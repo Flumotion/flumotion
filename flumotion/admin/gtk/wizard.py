@@ -149,7 +149,7 @@ class Wizard(gobject.GObject):
                                   'page')
             for widget in wtree.get_widget_prefix(''):
                 wname = widget.get_name()
-                if hasattr(page, wname) and page[wname]:
+                if hasattr(page, wname) and getattr(page, wname):
                     raise AssertionError (
                         "There is already an attribute called %s in %r" %
                         (wname, page))
