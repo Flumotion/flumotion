@@ -36,6 +36,7 @@ import gtk
 import gtk.glade
 
 import flumotion.config
+from flumotion.utils.gstutils import gsignal
 
 import os
 import string
