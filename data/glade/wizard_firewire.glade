@@ -2,6 +2,7 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
+<requires lib="gnome"/>
 
 <widget class="GtkWindow" id="window1">
   <property name="title" translatable="yes">window1</property>
@@ -155,7 +156,7 @@
 	  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 	  <property name="snap_to_ticks">False</property>
 	  <property name="wrap">False</property>
-	  <property name="adjustment">10 1 25 0.1 1 10</property>
+	  <property name="adjustment">12.5 1 60 0.1 1 10</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
