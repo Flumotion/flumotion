@@ -7,7 +7,7 @@ EXTRA_DIST = 				\
 	test_bundle.py 			\
 	test_checkers.py 		\
 	test_common.py 			\
-	test_common_component.py 	\
+	test_common_planet.py	 	\
 	test_component.py 		\
 	test_config.py 			\
 	test_credentials.py 		\
