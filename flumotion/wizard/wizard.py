@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_wizard -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/wizard/wizard.py: the configuration wizard
@@ -570,7 +570,6 @@ def run(interactive=True):
     
     import flumotion.wizard.steps
     wiz.run(interactive)
-    
 
 if __name__ == '__main__':
     run()

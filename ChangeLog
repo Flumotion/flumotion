@@ -10,6 +10,9 @@
 
 2004-10-17  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/wizard.py: Add very simple unittest for wizard
+	and its steps
+
 	* flumotion/wizard/steps.py: Rename from wizard_step to make
 	thomas happy
 
