@@ -50,7 +50,9 @@ class BouncerPortal(log.Loggable):
     def _authenticateCallback(self, result, mind, *interfaces):
         self.debug("BouncerPortal._authenticateCallback(result=%r, mind=%r, interfaces=%r)" % (result, mind, interfaces))
         if not result:
-            return failure.Failure(error.UnauthorizedLogin())
+            f = failure.Failure(error.UnauthorizedLogin())
+            self.debug("BouncerPortal._authenticateCallback: returning deferred failure %r" % f)
+            return defer.fail(f)
 
         keycard = result
         if not keycard.state == keycards.AUTHENTICATED:

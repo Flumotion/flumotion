@@ -20,11 +20,13 @@ Worker-side objects for components.
 """
 
 import os
+import sys
 import socket
 
 import gobject
 
-from twisted.internet import reactor
+from twisted.internet import reactor, error
+from twisted.cred import error as crederror
 from twisted.spread import pb
 
 from flumotion.common import interfaces, errors, log
@@ -37,6 +39,7 @@ from flumotion.utils.gstutils import gsignal
 superklass = fpb.FPBClientFactory
 # the client factory logging in to the manager
 class ComponentClientFactory(superklass):
+    logCategory = 'component'
     __super_login = superklass.login
     def __init__(self, component):
         """
@@ -55,22 +58,45 @@ class ComponentClientFactory(superklass):
         # get the interfaces implemented by the component medium class
         self.interfaces = getattr(klass, '__implements__', ())
         
+    # override log.Loggable method so we don't traceback
+    def error(self, message):
+        self.warning('Shutting down because of %s' % message)
+        print >> sys.stderr, 'ERROR: %s' % message
+        # FIXME: do we need to make sure that this cannot shut down the
+        # manager if it's the manager's bouncer ?
+        reactor.stop()
+
     def login(self, keycard):
         d = self.__super_login(keycard, self.medium,
                                interfaces.IComponentMedium)
-        d.addCallback(self.gotPerspective)
+        d.addCallback(self._loginCallback)
+        d.addErrback(self._unauthorizedLoginErrback)
+        d.addErrback(self._connectionRefusedErrback)
+        d.addErrback(self._loginErrback)
         return d
         
     # this method receives a RemoteReference
     # it can't tell if it's from an IPerspective implementor, Viewpoint or
     # Referenceable
-    def gotPerspective(self, remoteReference):
+    def _loginCallback(self, remoteReference):
         """
         @param remoteReference: an object on which we can callRemote to the
                                 manager's avatar
         @type remoteReference: L{twisted.spread.pb.RemoteReference}
         """
         self.medium.setRemoteReference(remoteReference)
+
+    def _unauthorizedLoginErrback(self, failure):
+        failure.trap(crederror.UnauthorizedLogin)
+        self.error('Unauthorized login.')
+                                                                                
+    def _connectionRefusedErrback(self, failure):
+        failure.trap(error.ConnectionRefusedError)
+        self.error('Connection to %s:%d refused.' % (self.manager_host,
+                                                     self.manager_port))
+                                                                                
+    def _loginErrback(self, failure):
+        self.error('Login failed, reason: %r' % failure)
     
 # needs to be before BaseComponent because BaseComponent references it
 class BaseComponentMedium(pb.Referenceable, log.Loggable):

@@ -67,7 +67,7 @@ def main(args):
         return 0
 
     # create a brain and have it remember the manager to direct jobs to
-    brain = worker.WorkerBrain(options.host, options.port, options.transport)
+    brain = worker.WorkerBrain(options)
 
     # connect the brain to the manager
     log.info('worker',

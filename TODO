@@ -36,6 +36,8 @@
 * MEDIUM:	add import hooks so that when there is a.b in one pythonpathdir
 	        and a.c in another, programs can import both a.b and a.c
 
+* MEDIUM:	daemonize worker and manager, write startup "flumotion" script
+
 - API cleanup:
 
 - manager/component.py:

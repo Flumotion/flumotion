@@ -72,10 +72,12 @@ class JobMedium(pb.Referenceable, log.Loggable):
 
     __implements__ = interfaces.IJobMedium,
 
-    def __init__(self):
+    def __init__(self, options):
         self.remote = None
+        self.options = options
         
     ### pb.Referenceable remote methods called on by the WorkerBrain
+    ### FIXME: arguments not needed anymore, Medium knows about options
     def remote_initial(self, host, port, transport):
         self.manager_host = host
         self.manager_port = port
@@ -178,8 +180,8 @@ class JobMedium(pb.Referenceable, log.Loggable):
 
         # make component log in to manager
         manager_client_factory = component.ComponentClientFactory(comp)
-        # XXX: we should be getting username and password from somewhere
-        keycard = keycards.KeycardUACPP('test', 'test', 'localhost')
+        keycard = keycards.KeycardUACPP(self.options.username,
+            self.options.password, 'localhost')
         keycard.avatarId = name
         manager_client_factory.login(keycard)
 
@@ -206,10 +208,14 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     I am a client factory that logs in to the WorkerBrain.
     I live in the flumotion-worker job process.
     """
-    def __init__(self, name):
+    def __init__(self, name, options):
+        """
+        @param options: the command-line options the worker was started with
+        """
         pb.PBClientFactory.__init__(self)
         
-        self.medium = JobMedium()
+        # we pass the options to the medium
+        self.medium = JobMedium(options)
         self.login(name)
             
     ### pb.PBClientFactory methods
@@ -228,7 +234,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     def _connectedErrback(self, error):
         print 'ERROR:' + str(error)
 
-def run(name):
+def run(name, options):
     worker_filename = '/tmp/flumotion.%d' % os.getpid()
     
     pid = os.fork()
@@ -239,7 +245,9 @@ def run(name):
     
     reactor.removeAll()
 
-    job_factory = JobClientFactory(name)
+    # the only usable object created for now in the child is the
+    # JobClientFactory, so we throw the options at it
+    job_factory = JobClientFactory(name, options)
     reactor.connectUNIX(worker_filename, job_factory)
     log.debug('job', 'Starting reactor')
     reactor.run()

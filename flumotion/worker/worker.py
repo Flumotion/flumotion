@@ -118,10 +118,15 @@ class Kindergarten:
     I spawn job processes.
     I live in the worker brain.
     """
-    def __init__(self):
+    def __init__(self, options):
+        """
+        @param options: the optparsed dictionary of command-line options
+        @type  options: dict
+        """
         dirname = os.path.split(os.path.abspath(sys.argv[0]))[0]
         self.program = os.path.join(dirname, 'flumotion-worker')
         self.kids = {}
+        self.options = options
         
     def play(self, name, type, config):
         """
@@ -136,7 +141,7 @@ class Kindergarten:
         """
         
         # This forks and returns the pid
-        pid = job.run(name)
+        pid = job.run(name, self.options)
         
         self.kids[name] = Kid(pid, name, type, config)
 
@@ -151,16 +156,22 @@ class WorkerBrain(log.Loggable):
     """
     I manage jobs and everything related.
     I live in the main worker process.
+
+    @param options: the optparsed dictionary of command-line options.
+    @type  options: dict
     """
-    def __init__(self, host, port, transport):
+
+    logCategory = 'workerbrain'
+
+    def __init__(self, options):
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-        self.manager_host = host
-        self.manager_port = port
-        self.manager_transport = transport
+        self.manager_host = options.host
+        self.manager_port = options.port
+        self.manager_transport = options.transport
         
-        self.kindergarten = Kindergarten()
+        self.kindergarten = Kindergarten(options)
         self.job_server_factory, self.job_heaven = self.setup()
 
         self.medium = WorkerMedium(self)
@@ -185,7 +196,9 @@ class WorkerBrain(log.Loggable):
 
         return job_server_factory, root
 
+    # override log.Loggable method so we don't traceback
     def error(self, message):
+        self.warning('Shutting down because of %s' % message)
         print >> sys.stderr, 'ERROR: %s' % message
         reactor.stop()
         
