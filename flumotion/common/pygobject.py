@@ -94,6 +94,31 @@ def gsignal(name, *args):
 
     _dict[name] = (gobject.SIGNAL_RUN_FIRST, None, args)
 
+PARAM_CONSTRUCT = 1<<9
+
+def with_construct_properties(__init__):
+    """
+    Wrap a class' __init__ method in a procedure that will construct
+    gobject properties. This is necessary because pygtk's object
+    construction is a bit broken.
+    Usage:
+
+    class Foo(GObject):
+        def __init__(self):
+            GObject.__init(self)
+        __init__ = with_construct_properties(__init__)
+    """
+    frame = sys._getframe(1)
+    _locals = frame.f_locals
+    gproperties = _locals['__gproperties__']
+    def hacked_init(self, *args, **kwargs):
+        __init__(self, *args, **kwargs)
+        self.__gproperty_values = {}
+        for p, v in gproperties.items():
+            if v[-1] & PARAM_CONSTRUCT:
+                self.set_property(p, v[3])
+    return hacked_init
+
 def gproperty(type_, name, desc, *args, **kwargs):
     """
     Add a GObject property to the current object.
@@ -109,17 +134,18 @@ def gproperty(type_, name, desc, *args, **kwargs):
     flags = 0
     
     def _do_get_property(self, prop):
-        return self.__gproperties[prop]
+        try:
+            return self._gproperty_values[prop.name]
+        except (AttributeError, KeyError):
+            raise AttributeError('Property was never set', self, prop)
 
     def _do_set_property(self, prop, value):
-        self.__gproperties[prop] = value
-        
-    if not 'do_get_property' in _locals:
-        _locals['do_get_property'] = _do_get_property
-        _locals['__gproperties'] = {}
-    if not 'do_set_property' in _locals:
-        _locals['do_set_property'] = _do_set_property
-        _locals['__gproperties'] = {}
+        if not getattr(self, '_gproperty_values', None):
+            self._gproperty_values = {}
+        self._gproperty_values[prop.name] = value
+    
+    _locals['do_get_property'] = _do_get_property
+    _locals['do_set_property'] = _do_set_property
     
     if not '__gproperties__' in _locals:
         _dict = _locals['__gproperties__'] = {}
@@ -132,7 +158,7 @@ def gproperty(type_, name, desc, *args, **kwargs):
 
     for k, v in kwargs.items():
         if k == 'construct':
-            flags |= gobject.PARAM_CONSTRUCT
+            flags |= PARAM_CONSTRUCT
         elif k == 'construct_only':
             flags |= gobject.PARAM_CONSTRUCT_ONLY
         elif k == 'readable':

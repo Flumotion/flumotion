@@ -1,9 +1,38 @@
+<<<<<<< .mine
+2005-03-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/pygobject.py (with_construct_properties): New
+	decorator, takes care of G_PARAM_CONSTRUCT properties. Make it
+	work with gproperty(). Fix a bug whereby all instance of the same
+	class share the same gproperty dict, exposing the construct bug.
+
+	* flumotion/admin/gtk/parts.py (ComponentsView): Use
+	with_construct_properties.
+
+	* flumotion/test/test_pygobject: Test the
+	with_construct_properties decorator.
+
+	* flumotion/test/test_greeter.py (WizardTest.testMakeGreeter):
+	Update to work with refactored connections widget, "fix" the
+	hanging-window problem.
+
+	* data/glade/greeter-connect_to_existing.glade:
+	* data/glade/open-connection.glade:
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/admin/gtk/connections.py: "Connect to existing"
+	factored out into a GladeWidget.
+
+	* tests/construct-properties-do-not-work.py: New file,
+	demonstrates that construct properties don't work in pygtk.
+
+=======
 2005-03-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/bundleclient.py:
 	* flumotion/worker/worker.py:
 	  doc and debug changes
 
+>>>>>>> .r1478
 2005-03-02  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/ui/glade.py (GladeWindow.__init__): Make the parent

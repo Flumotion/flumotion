@@ -29,7 +29,8 @@ from flumotion.common import log, planet
 from flumotion.twisted import flavors
 
 from flumotion.common.planet import moods
-from flumotion.common.pygobject import gsignal, gproperty
+from flumotion.common.pygobject import (gsignal, gproperty,
+                                        with_construct_properties)
 
 COL_MOOD       = 0
 COL_NAME       = 1
@@ -157,6 +158,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self._moodPixbufs = self._getMoodPixbufs()
         self._iters = {} # componentState -> model iter
         self._last_state = None
+    __init__ = with_construct_properties (__init__)
 
     def _add_columns(self):
         # put in all the columns

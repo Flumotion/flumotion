@@ -28,7 +28,7 @@ import gobject
 
 from flumotion.ui.glade import GladeWidget, GladeWindow
 from flumotion.configure import configure
-from flumotion.common.pygobject import gsignal
+from flumotion.common.pygobject import gsignal, gproperty
 
 
 def parse_connection(f):
@@ -187,3 +187,45 @@ class ConnectionsDialog(GladeWindow):
         self.emit('have-connection',
                   self.widgets['connections'].get_selected())
 gobject.type_register(ConnectionsDialog)
+
+
+class OpenConnection(GladeWidget):
+    glade_file = 'open-connection.glade'
+
+    gproperty(bool, 'can-activate', 'If the state of the widget is complete',
+              False)
+
+    def __init__(self):
+        self.host_entry = self.port_entry = self.ssl_check = None
+        GladeWidget.__init__(self)
+        self.set_property('can-activate', False)
+        self.on_entries_changed()
+        self.connect('grab-focus', self.on_grab_focus)
+
+    def on_grab_focus(self, *args):
+        self.host_entry.grab_focus()
+        return True
+
+    def on_entries_changed(self, *args):
+        old_can_act = self.get_property('can-activate')
+        can_act = self.host_entry.get_text() and self.port_entry.get_text()
+        # fixme: validate input
+        if old_can_act != can_act:
+            self.set_property('can-activate', can_act)
+
+    def on_ssl_check_toggled(self, button):
+        if button.get_active():
+            self.port_entry.set_text('7531')
+        else:
+            self.port_entry.set_text('8642')
+
+    def set_state(self, state):
+        self.host_entry.set_text(state['host'])
+        self.port_entry.set_text(str(state['port']))
+        self.ssl_check.set_active(not state['use_insecure'])
+
+    def get_state(self):
+        return {'host': self.host_entry.get_text(),
+                'port': int(self.port_entry.get_text()),
+                'use_insecure': not self.ssl_check.get_active()}
+gobject.type_register(OpenConnection)

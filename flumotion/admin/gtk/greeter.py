@@ -52,44 +52,43 @@ class Initial(wizard.WizardStep):
         raise AssertionError
     
     def setup(self, state, available_pages):
-        for wname in self.next_pages:
-            getattr(self,wname).set_sensitive(wname in available_pages)
-        getattr(self,available_pages[0]).set_active(True)
+        radio_buttons = self.connect_to_existing.get_group()
+        for w in radio_buttons:
+            w.set_sensitive(w.get_name() in available_pages)
+            if w.get_active() and not w.get_property('sensitive'):
+                getattr(self,available_pages[0]).set_active(True)
 
 
 class ConnectToExisting(wizard.WizardStep):
     name='connect_to_existing'
     title='Host information'
     text = 'Please enter the address where the manager is running.'
-    host_entry = port_entry = ssl_check = None
     next_pages = ['authenticate']
 
+    def __init__(self, *args):
+        self.open_connection = None
+        def cust_handler(xml, proc, name, *args):
+            w = eval(proc)
+            w.set_name(name)
+            w.show()
+            return w
+        gtk.glade.set_custom_handler(cust_handler)
+        wizard.WizardStep.__init__(self, *args)
+
     def setup(self, state, available_pages):
-        self.on_entries_changed()
-        self.host_entry.grab_focus()
+        try:
+            oc_state = [(k, state[k]) for k in ('host', 'port', 'use_insecure')]
+            self.open_connection.set_state(dict(oc_state))
+        except KeyError:
+            pass
+        self.open_connection.grab_focus()
 
-    def on_entries_changed(self, *args):
-        if self.host_entry.get_text() and self.port_entry.get_text():
-            self.button_next.set_sensitive(True)
-        else:
-            self.button_next.set_sensitive(False)
-
-    def on_ssl_check_toggled(self, button):
-        if button.get_active():
-            self.port_entry.set_text('7531')
-        else:
-            self.port_entry.set_text('8642')
+    def on_can_activate(self, obj, *args):
+        self.button_next.set_sensitive(obj.get_property('can-activate'))
 
     def on_next(self, state):
-        host = self.host_entry.get_text()
-        port = self.port_entry.get_text()
-        ssl_check = self.ssl_check.get_active()
-
-        # fixme: check these values here
-        state['host'] = host
-        state['port'] = int(port)
-        state['use_insecure'] = not ssl_check
-
+        for k, v in self.open_connection.get_state().items():
+            state[k] = v
         return 'authenticate'
 
 

@@ -75,10 +75,10 @@ class WizardTest(unittest.TestCase):
         idle_add(lambda: prev.emit('clicked'))
         idle_add(lambda: next.emit('clicked'))
         idle_add(lambda: ass(sensitive(next)))
-        idle_add(lambda: wiz.page.host_entry.set_text('foo'))
+        idle_add(lambda: wiz.page.open_connection.host_entry.set_text('foo'))
         idle_add(lambda: ass(sensitive(next)))
-        idle_add(lambda: wiz.page.ssl_check.emit('clicked'))
-        idle_add(lambda: ass(wiz.page.port_entry.get_text()=='8642'))
+        idle_add(lambda: wiz.page.open_connection.ssl_check.emit('clicked'))
+        idle_add(lambda: ass(wiz.page.open_connection.port_entry.get_text()=='8642'))
         idle_add(lambda: next.emit('clicked'))
         idle_add(lambda: prev.emit('clicked'))
         idle_add(lambda: next.emit('clicked'))
@@ -92,11 +92,14 @@ class WizardTest(unittest.TestCase):
 
         state = wiz.run()
 
-        try:
-            assert not self._failed
-        finally:
-            wiz.destroy()
-
+        assert not self._failed
+        wiz.destroy()
+        
         refstate = {'passwd': 'baz', 'host': 'foo', 'port': 8642,
                     'use_insecure': True, 'user': 'bar'}
         self.assert_(state == refstate)
+
+        # getto getto getto hack to make the window go away
+        lp = gobject.MainLoop()
+        gobject.timeout_add(100,lambda:lp.quit())
+        lp.run()
