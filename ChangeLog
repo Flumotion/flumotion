@@ -1,11 +1,10 @@
 2004-10-18  Johan Dahlin  <johan@gnome.org>
 
-	reviewed by: <delete if not using a buddy>
-
 	* doc/reference/gendoc.py:
 	* flumotion/admin/gtk/main.py:
 	* flumotion/wizard/save.py:
 	* flumotion/wizard/wizard.py:
+	  Johan needs to write an entry
 
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
