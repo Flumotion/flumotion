@@ -71,7 +71,7 @@ class Dispatcher:
         return (pb.IPerspective, p,
                 lambda p=p,mind=mind: p.detached(mind))
 
-class Options(pb.Copyable):
+class Options:
     """dummy class for storing controller side options of a component"""
 
 class ComponentPerspective(pbutil.NewCredPerspective):
@@ -167,7 +167,6 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         name = self.getName()
         if self.controller.hasComponent(name):
             self.controller.removeComponent(self)
-
 
     def setState(self, element, property, value):
         if not element in self.options.elements:
