@@ -200,8 +200,13 @@ class Servicer(log.Loggable):
                     "Flow file %s does not exist" % flowFile
             flowFiles.append(flowFile)
             self.info("Loading flow %s" % flowFile)
+
+        pid = common.getPid('manager', name)
+        if pid:
+            raise errors.SystemError, \
+                "Manager %s is already running (with pid %d)" % (name, pid)
             
-        command = "flumotion-manager --debug 5 -D -n %s %s %s" % (
+        command = "flumotion-manager --debug 3 -D -n %s %s %s" % (
             name, planetFile, " ".join(flowFiles))
         retval = self.startProcess(command)
 
@@ -228,9 +233,15 @@ class Servicer(log.Loggable):
         if not os.path.exists(workerFile):
             raise errors.SystemError, \
                 "Worker file %s does not exist" % workerFile
+
+        pid = common.getPid('worker', name)
+        if pid:
+            raise errors.SystemError, \
+                "Worker %s is already running (with pid %d)" % (name, pid)
+            
         self.info("Loading worker %s" % workerFile)
 
-        command = "flumotion-worker --debug 5 -D -n %s %s" % (name, workerFile)
+        command = "flumotion-worker --debug 3 -D -n %s %s" % (name, workerFile)
         retval = self.startProcess(command)
 
         if retval == 0:

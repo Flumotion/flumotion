@@ -1,5 +1,11 @@
 2004-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/service/service.py:
+	  do not start manager/worker if one is already running.
+	  Fixes issue #132
+
+2004-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/service/main.py:
 	  error on unknown commands
 	  implement restart
