@@ -59,13 +59,21 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
+        self.caps = None
         
     def __repr__(self):
-        return '<ClientPerspective for %s>' % self.username
+        return '<AcquisitionPerspective for %s>' % self.username
+    
+    def getPeer(self):
+        return self.mind.broker.transport.getPeer()
+
+    def getCaps(self):
+        return self.caps
     
     def attached(self, mind):
         log.msg('%s attached, preparing' % self.username)
         mind.callRemote('prepare')
+        self.mind = mind
         
     def detached(self, mind):
         print mind, 'detached'
@@ -78,7 +86,9 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
 
     def perspective_notifyCaps(self, caps):
         log.msg('%s.notifyCaps %s' % (self.username, caps))
-
+        self.caps = caps
+        self.controller.componentReady(self)
+        
     def perspective_error(self, element, error):
         log.msg('%s.error element=%s string=%s' % (self.username, element, error))
 
@@ -88,31 +98,78 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
         self.username = username
         
     def __repr__(self):
-        return '<ClientPerspective for %s>' % self.username
-    
+        return '<TranscoderPerspective for %s>' % self.username
+
+    def getPeer(self):
+        return self.mind.broker.transport.getPeer()
+
     def attached(self, mind):
         log.msg('%s attached, preparing' % self.username)
-        mind.callRemote('prepare')
+        defer = mind.callRemote('prepare')
+        defer.addCallback(self.prepareDone)
+        self.mind = mind
         
     def detached(self, mind):
         print mind, 'detached'
+
+    def prepareDone(self, *args):
+        self.controller.componentReady(self)
+
+    def perspective_stateChanged(self, old, state):
+        log.msg('%s.stateChanged %s -> %s' %
+                (self.username,
+                 gst.element_state_get_name(old),
+                 gst.element_state_get_name(state)))
+
+    def perspective_error(self, element, error):
+        log.msg('%s.error element=%s string=%s' % (self.username, element, error))
         
 class Controller(pb.Root):
     def __init__(self):
-        self.components = []
-        
+        self.components = {}
+
     def getPerspective(self, username):
         if username.startswith('acq_'):
             component = AcquisitionPerspective(self, username)
         elif username.startswith('trans_'):
             component = TranscoderPerspective(self, username)
 
-        self.components.append(component)
+        self.components[username] = component
 
         return component
 
     def componentReady(self, component):
+        link = ['acq_johan', 'trans_johan']
+        component.ready = True
         
+        print component, 'is ready'
+        for component in self.components.values():
+            if component.ready == False:
+                break
+        else:
+            item = link[0]
+            if not self.components.has_key(item):
+                print item, 'is not yet connected'
+                return
+            
+            prev = self.components[link[0]]
+            for item in link[1:]:
+                if not self.components.has_key(item):
+                    print item, 'is not yet connected'
+                    return
+                curr = self.components[item]
+                
+                print 'going to connect %s with %s' % (prev, curr)
+                self.link(prev, curr)
+                prev = curr
+
+    def link(self, acq, trans):
+        obj = trans.mind.callRemote('listen', 5500, acq.getCaps())
+        proto, hostname, port = trans.getPeer()
+        def listenDone(obj):
+            acq.mind.callRemote('connect', hostname, 5500)
+        obj.addCallback(listenDone)
+            
 class ControllerMaster(pb.PBServerFactory):
     def __init__(self):
         controller = Controller()

@@ -33,15 +33,13 @@ from twisted.spread import pb
 
 import pbutil
 
-class Acquisition(pb.Referenceable):
-    def __init__(self, username, host, port, pipeline_string):
+class Transcoder(pb.Referenceable):
+    def __init__(self, username, host, port):
         factory = pb.PBClientFactory()
         reactor.connectTCP(host, port, factory)
-        defered = factory.login(pbutil.Username('acq_%s' % username),
+        defered = factory.login(pbutil.Username('trans_%s' % username),
                                 client=self)
         defered.addCallback(self.gotPerspective)
-        
-        self.pipeline_string = pipeline_string
 
     def gotPerspective(self, persp):
         self.persp = persp
@@ -56,73 +54,46 @@ class Acquisition(pb.Referenceable):
                                                         gst.element_state_get_name(state)))
         self.persp.callRemote('stateChanged', old, state)
         
-    def sink_pad_deep_notify_caps_cb(self, element, pad, param):
-        caps = pad.get_negotiated_caps()
-        log.msg('notify-caps %s::%s is %s' % (element.get_path_string(),
-                                              pad.get_name(),
-                                              str(caps)))
-
-        self.sink.disconnect(self.notify_id)
-        self.pipeline_pause()
-        
-        self.persp.callRemote('notifyCaps', str(caps))
-        self.caps = caps
-        
     def pipeline_deep_notify_cb(self, object, orig, pspec):
         log.msg('deep-notify %s: %s = %s' % (orig.get_path_string(),
                                              pspec.name,
                                              orig.get_property(pspec.name)))
 
     def pipeline_pause(self):
-        self.pipeline.set_state(gst.STATE_PAUSED)
+        retval = self.pipeline.set_state(gst.STATE_PAUSED)
+        if not retval:
+            log.msg('Changing state to PAUSED failed')
         gobject.idle_add(self.pipeline_iterate)
         
     def pipeline_play(self):
-        self.pipeline.set_state(gst.STATE_PLAYING)
+        retval = self.pipeline.set_state(gst.STATE_PLAYING)
+        if not retval:
+            log.msg('Changing state to PLAYING failed')
         gobject.idle_add(self.pipeline_iterate)
         
     def pipeline_iterate(self):
         return self.pipeline.iterate()
     
     def remote_prepare(self):
-        log.msg('start called')
+        log.msg('prepare called')
         
-        self.pipeline = gst.parse_launch('%s ! video/x-raw-yuv ! fakesink name=fakesink' % self.pipeline_string)
+        self.pipeline = gst.Pipeline('transcoder-pipeline')
         self.pipeline.connect('error', self.pipeline_error_cb)
         self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         self.pipeline.connect('deep-notify', self.pipeline_deep_notify_cb)
         
-        self.src = self.pipeline.get_list()[-2]
-        
-        self.sink = self.pipeline.get_by_name('fakesink')
-        
-        # XXX: Disconnect signal?
-        self.notify_id = self.sink.connect('deep-notify::caps',
-                                           self.sink_pad_deep_notify_caps_cb)
+        self.src = gst.element_factory_make('tcpserversrc')
+        self.sink = gst.element_factory_make('xvimagesink')
+        self.reframer = gst.element_factory_make('videoreframer')
 
-        reactor.callLater(0, self.pipeline_play)
+    def remote_listen(self, port, caps):
+        log.msg('listen called with %d %s' % (port, caps))
 
-    def remote_connect(self, hostname, port):
-        # Pause
-        self.pipeline.set_state(gst.STATE_PAUSED)
-        
-        # Stream back to the beginning
-        event = gst.event_new_seek(gst.FORMAT_TIME |
-                                   gst.SEEK_METHOD_SET |
-                                   gst.SEEK_FLAG_FLUSH, 0)
-        self.sink.send_event(event)
+        self.src.set_property('port', port)
+        self.pipeline.add_many(self.src, self.reframer, self.sink)
+        self.src.link(self.reframer)
+        self.reframer.link_filtered(self.sink, gst.caps_from_string(caps))
 
-        # Unlink and remove
-        self.pipeline.remove(self.sink)
-        assert not self.src.unlink(self.sink)
-
-        self.sink = gst.element_factory_make('tcpclientsink')
-        self.sink.set_property('host', hostname)
-        self.sink.set_property('port', port)
-        
-        self.pipeline.add(self.sink)
-        self.src.link_filtered(self.sink, self.caps)
-        
         reactor.callLater(0, self.pipeline_play)
     
 def parseHostString(string, port=8890):
@@ -139,19 +110,13 @@ def parseHostString(string, port=8890):
 if __name__ == '__main__':
     log.startLogging(sys.stdout)
 
-    if len(sys.argv) > 3:
+    if len(sys.argv) == 2:
         controller = sys.argv[1]
-        pipeline = sys.argv[2]
-    elif len(sys.argv) == 2:
-        controller = ''
-        pipeline = sys.argv[1]
     else:
-        print 'Usage: client [controller] pipeline'
-        sys.exit(1)
-
+        controller = ''
+        
     name = 'johan'
     host, port = parseHostString(controller)
     log.msg('Connect to %s on port %d' % (host, port))
-    client = Acquisition(name, host, port, pipeline)
+    client = Transcoder(name, host, port)
     reactor.run()
-    
