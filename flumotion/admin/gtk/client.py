@@ -62,6 +62,7 @@ class Window(log.Loggable, gobject.GObject):
         self._components = None # name -> default flow + atmosphere
 
         self.debug('setting model')
+        self.admin = None
         self._setAdminModel(model)
 
     def _setAdminModel(self, model):
