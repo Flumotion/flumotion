@@ -1,5 +1,22 @@
 2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/reference/Makefile.am:
+	  add twisted stuff
+	* flumotion/admin/admin.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/checkers.py:
+	* flumotion/twisted/cred.py:
+	* flumotion/twisted/credentials.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  split out cred.py to credentials.py and checkers.py so they
+	  match twisted's .py names
+
+2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* TODO:
 	  some more notes
 	* flumotion/component/http/http_resources.py:

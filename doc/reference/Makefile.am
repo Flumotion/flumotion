@@ -26,7 +26,10 @@ MODULE_FILES = \
 	flumotion/manager/component.py		\
 	flumotion/manager/manager.py		\
 	flumotion/manager/worker.py		\
+	flumotion/twisted/__init__.py		\
 	flumotion/twisted/gstreactor.py		\
+	flumotion/twisted/checkers.py		\
+	flumotion/twisted/credentials.py	\
 	flumotion/utils/gstutils.py		\
 	flumotion/worker/__init__.py		\
 	flumotion/worker/worker.py		\

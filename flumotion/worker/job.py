@@ -32,7 +32,7 @@ from twisted.spread import pb
 from flumotion.common.registry import registry
 from flumotion.common import interfaces, log
 from flumotion.component import component
-from flumotion.twisted import cred
+from flumotion.twisted import credentials
 
 def getComponent(dict, defs):
     #FIXME: add setup of files to be transmitted over the wire.
@@ -212,7 +212,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     ### pb.PBClientFactory methods
     def login(self, username):
         d = pb.PBClientFactory.login(self, 
-                                     cred.Username(username),
+                                     credentials.Username(username),
                                      self.medium)
         d.addCallbacks(self._connectedCallback,
                        self._connectedErrback)

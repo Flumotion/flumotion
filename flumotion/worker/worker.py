@@ -30,7 +30,7 @@ from twisted.spread import pb
 # We want to avoid importing gst, otherwise --help fails
 # so be very careful when adding imports
 from flumotion.common import errors, interfaces, log
-from flumotion.twisted import cred, pbutil
+from flumotion.twisted import credentials, pbutil
 
 #factoryClass = pbutil.ReconnectingPBClientFactory
 factoryClass = pbutil.FMClientFactory
@@ -48,8 +48,8 @@ class WorkerClientFactory(factoryClass):
         # doing this as a class method triggers a doc error
         factoryClass.__init__(self)
         
-    def login(self, credentials):
-        return self.__super_login(credentials,
+    def login(self, creds):
+        return self.__super_login(creds,
                                   self.medium,
                                   interfaces.IWorkerMedium)
         
@@ -171,15 +171,15 @@ class WorkerBrain:
         self.medium = WorkerMedium(self)
         self.worker_client_factory = WorkerClientFactory(self)
 
-    def login(self, credentials):
-        d = self.worker_client_factory.login(credentials)
+    def login(self, creds):
+        d = self.worker_client_factory.login(creds)
         d.addErrback(self._cb_accessDenied)
         d.addErrback(self._cb_loginFailed)
                                  
     def setup(self):
         root = JobHeaven(self)
         dispatcher = JobDispatcher(root)
-        checker = cred.FlexibleCredentialsChecker()
+        checker = credentials.FlexibleCredentialsChecker()
         checker.allowAnonymous(True)
         p = portal.Portal(dispatcher, [checker])
         job_server_factory = pb.PBServerFactory(p)

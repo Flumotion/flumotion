@@ -28,7 +28,7 @@ from twisted.internet import reactor
 from twisted.spread import pb
 
 from flumotion.common import interfaces, errors, log
-from flumotion.twisted import cred, pbutil
+from flumotion.twisted import credentials, pbutil
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
@@ -52,7 +52,7 @@ class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
         self.interfaces = getattr(klass, '__implements__', ())
         
     def login(self, username, avatarId=None):
-        self.__super_login(cred.Username(username),
+        self.__super_login(credentials.Username(username),
                            avatarId,
                            self.medium,
                            pb.IPerspective,

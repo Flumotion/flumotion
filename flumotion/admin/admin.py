@@ -32,7 +32,7 @@ from twisted.python import rebuild, reflect
 from flumotion.common import bundle, errors, interfaces, log
 from flumotion.utils import reload
 from flumotion.utils.gstutils import gsignal
-from flumotion.twisted import cred, pbutil
+from flumotion.twisted import credentials, pbutil
 
 # FIXME: this is a Medium
 class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
@@ -58,9 +58,9 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.clientFactory = pbutil.FMClientFactory()
         self.debug("logging in to ClientFactory")
         # FIXME: get from startup config
-        credentials = cred.Username('test')
-        credentials.avatarId = 'admin'
-        d = self.clientFactory.login(credentials, self,
+        creds = credentials.Username('test')
+        creds.avatarId = 'admin'
+        d = self.clientFactory.login(creds, self,
             pb.IPerspective,
             interfaces.IAdminMedium)
         d.addCallback(self.setRemoteReference)

@@ -22,7 +22,7 @@ from twisted.internet import reactor
 
 from flumotion.common import log
 from flumotion.worker import worker
-from flumotion.twisted import cred
+from flumotion.twisted import credentials
 
 def main(args):
     parser = optparse.OptionParser()
@@ -113,10 +113,10 @@ def _startWorker(options):
         log.error('worker', 'Unknown transport protocol: %s' % options.transport)
 
     # FIXME: allow for different credentials types
-    credentials = cred.Username(options.username, options.password)
+    creds = credentials.Username(options.username, options.password)
     # FIXME: decide on a workername
-    credentials.avatarId = "localhost"
-    brain.login(credentials)
+    creds.avatarId = "localhost"
+    brain.login(creds)
 
     log.debug('worker', 'Starting reactor')
     reactor.run()

@@ -32,7 +32,7 @@ from twisted.spread import pb
 
 from flumotion.manager import admin, component, worker
 from flumotion.common import errors, interfaces, log
-from flumotion.twisted import cred, portal
+from flumotion.twisted import checkers, portal
 
 # an internal class
 class Dispatcher(log.Loggable):
@@ -116,32 +116,32 @@ class Dispatcher(log.Loggable):
         
         self._interfaceHeavens[interface] = heaven
 
-class ManagerCredentialsChecker(cred.FlexibleCredentialsChecker):
+class ManagerCredentialsChecker(checkers.FlexibleCredentialsChecker):
     # FIXME: maybe we should get the actual checker used by bouncer
     def __init__(self):
-        cred.FlexibleCredentialsChecker.__init__(self)
+        checkers.FlexibleCredentialsChecker.__init__(self)
         self.bouncer = None
 
-    def requestAvatarId(self, credentials):
+    def requestAvatarId(self, creds):
         # until we figure out component auth, we pass components freely
-        if interfaces.IComponentMedium in credentials.interfaces:
-            return credentials.avatarId
+        if interfaces.IComponentMedium in creds.interfaces:
+            return creds.avatarId
 
         # if we have a bouncer, we make workers and admin authenticate
         if self.bouncer:
-            result = self.bouncer.authenticate(credentials)
+            result = self.bouncer.authenticate(creds)
             if not result:
-                self.log('refusing credentials %r' % credentials)
+                self.log('refusing credentials %r' % creds)
                 return failure.Failure(error.UnauthorizedLogin())
                 
         # XXX: If it's component or admin, allow anonymous access.
         #      This is a big hack, but it emulates the current behavior
         #      Do we need to authenticate components and workers?
-        if (interfaces.IComponentMedium in credentials.interfaces or
-            interfaces.IAdminMedium in credentials.interfaces):
-            return credentials.username
+        if (interfaces.IComponentMedium in creds.interfaces or
+            interfaces.IAdminMedium in creds.interfaces):
+            return creds.username
 
-        return cred.FlexibleCredentialsChecker.requestAvatarId(self, credentials)
+        return checkers.FlexibleCredentialsChecker.requestAvatarId(self, creds)
 
 class Vishnu(log.Loggable):
     """
