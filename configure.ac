@@ -1,6 +1,6 @@
 AC_INIT(README)
 
-justatest
+justateststill
 
 AS_VERSION(flumotion, FLUMOTION, 0, 1, 6, 1)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
