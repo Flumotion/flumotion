@@ -784,6 +784,7 @@ class JPEG(VideoEncoder):
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
         options['quality'] = int(options['quality'])
+        options['framerate'] = float(options['framerate'])
         return options
     
 wizard.register_step(JPEG)

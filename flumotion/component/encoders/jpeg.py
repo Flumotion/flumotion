@@ -31,8 +31,12 @@ class JPEG(feedcomponent.ParseLaunchComponent):
 
 
 def createComponent(config):
-    component = JPEG(config['name'], [config['source']],
-                       "ffmpegcolorspace ! jpegenc name=encoder")
+    pipeline = "ffmpegcolorspace ! "
+    if config.has_key('framerate'):
+        pipeline = pipeline + "videorate ! video/x-raw-yuv,framerate=(double)%f ! " % config['framerate']
+    pipeline = pipeline + "jpegenc name=encoder"
+
+    component = JPEG(config['name'], [config['source']], pipeline)
     
     element = component.pipeline.get_by_name('encoder')
     if config.has_key('quality'):

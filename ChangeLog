@@ -1,3 +1,12 @@
+2004-11-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/wizard_jpeg.glade:
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/component/encoders/jpeg.py:
+	* flumotion/wizard/steps.py:
+	  Implement framerate changing on JPEG encoding.
+	  Should eventually be generalized as a "filter".
+
 2004-11-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* README:
