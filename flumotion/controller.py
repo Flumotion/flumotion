@@ -67,9 +67,10 @@ class Dispatcher:
                 lambda p=p,mind=mind: p.detached(mind))
 
 class Options:
-    pass
+    """dummy class for storing controller side options of a component"""
 
 class ComponentPerspective(pbutil.NewCredPerspective):
+    """Perspective all components will have on the controller side"""
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
@@ -138,8 +139,10 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         cb.addCallback(self.after_register_cb)
               
 class ProducerPerspective(ComponentPerspective):
+    """Perspective for producer components"""
     kind = 'producer'
     def listen(self, host):
+        """starts the remote methods listen"""
         def after_get_free_port_cb(port):
             self.listen_port = port
             self.mind.callRemote('listen', host, port)
@@ -149,8 +152,10 @@ class ProducerPerspective(ComponentPerspective):
         cb.addCallback(after_get_free_port_cb)
         
 class ConverterPerspective(ComponentPerspective):
+    """Perspective for converter components"""
     kind = 'converter'
     def start(self, source_host, source_port, listen_host):
+        """starts the remote methods start"""
         def after_get_free_port_cb(listen_port):
             self.listen_port = listen_port
             log.msg('Calling remote method start (%s, %d, %s, %d)' % (source_host, source_port,
@@ -164,8 +169,8 @@ class ConverterPerspective(ComponentPerspective):
         cb.addCallback(after_get_free_port_cb)
 
 class StreamerPerspective(ComponentPerspective):
+    """Perspective for streamer components"""
     kind = 'streamer'
-
     def getListenHost(self):
         raise AssertionError
     
@@ -173,6 +178,7 @@ class StreamerPerspective(ComponentPerspective):
         raise AssertionError
 
     def connect(self, host, port):
+        """starts the remote methods connect"""
         self.mind.callRemote('connect', host, port)
 
 class Controller(pb.Root):
@@ -191,16 +197,27 @@ class Controller(pb.Root):
             raise AssertionError
         
         component = klass(self, username)
-        self.addComponent(username, component)
+        self.addComponent(component)
         return component
 
     def hasComponent(self, name):
+        """adds a new component
+        @type name:  string
+        @param name: name of the component
+        @rtype:      boolean
+        @returns:    True if a component with that name is registered, otherwise False"""
         return self.components.has_key(name)
     
-    def addComponent(self, name, component):
-        self.components[name] = component
+    def addComponent(self, component):
+        """adds a component
+        @type component: component
+        @param component: the component"""
+        self.components[component.username] = component
         
     def removeComponent(self, component):
+        """removes a component
+        @type component: component
+        @param component: the component"""
         del self.components[component.username]
 
     def waitForComponent(self, name, component):
@@ -273,6 +290,7 @@ class Controller(pb.Root):
             self.waitForComponent(source_name, component)
         
 class ControllerServerFactory(pb.PBServerFactory):
+    """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):
         controller = Controller()
         disp = Dispatcher(controller)
@@ -284,6 +302,7 @@ class ControllerServerFactory(pb.PBServerFactory):
     def __repr__(self):
         return '<ControllerServerFactory>'
     
-log.startLogging(sys.stdout)
-reactor.listenTCP(8890, ControllerServerFactory())
-reactor.run()
+if __name__ == '__main__':
+    log.startLogging(sys.stdout)
+    reactor.listenTCP(8890, ControllerServerFactory())
+    reactor.run()

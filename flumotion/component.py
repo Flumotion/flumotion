@@ -67,7 +67,10 @@ class Component(pb.Referenceable):
             self.persp.callRemote('error', element.get_path_string(), error.message)
         else:
             print 'skipping remote-error, no perspective'
-
+            
+        self.cleanup()
+        self.setup_pipeline()
+        
     def pipeline_state_change_cb(self, element, old, state):
         log.msg('pipeline state-changed %s %s ' % (element.get_path_string(),
                                                    gst.element_state_get_name(state)))
@@ -93,7 +96,9 @@ class Component(pb.Referenceable):
         self.set_state_and_iterate(gst.STATE_NULL)
         
     def cleanup(self):
-        assert self.pipeline == None
+        log.msg("cleaning up")
+        
+        assert self.pipeline != None
 
         if self.pipeline.get_state() != gst.STATE_NULL:
             log.msg('Pipeline was in state %s, changing to NULL' %
@@ -105,7 +110,7 @@ class Component(pb.Referenceable):
         self.pipeline = None
         self.pipeline_signals = []
         
-    def register(self):
+    def setup_pipeline(self):
         log.msg('register(): creating pipeline: %s' % self.pipeline_string)
         self.pipeline = gst.parse_launch(self.pipeline_string)
 
@@ -122,7 +127,7 @@ class Component(pb.Referenceable):
             reactor.callLater(0.250, self.register)
             return
         
-        self.register()
+        self.setup_pipeline()
         
         return {'ip' : self.get_ip(),
                 'source' : self.source }
