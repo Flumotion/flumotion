@@ -1,7 +1,7 @@
 ideas on authentication
 -----------------------
 
-current:
+old system:
 
 workers:
 - worker creates a brain
@@ -17,58 +17,176 @@ workers:
   - others are chained to the parent's (FlexibleCredentialsChecker)
     requestAvatarId, which currently allows anonymous 
 
-future:
-
-worker:
-  - manager has a bouncer in its own loop (ie, a fixed component)
-    this bouncer authenticates worker, component and admin connections
-
-streamer component:
-- http streamer is configured to authenticate new connections against a
-  given bouncer in the grid
-- http streamer creates credentials for new connection, consisting of
-  username, password and IP address (password hashed)
-  or
-  only IP address
-- http streamer calls remote method on manager to authenticate these
-  using the given bouncer (by name)
-- manager forwards the call to the bouncer
-- bouncer calls authenticate on the credentials
-- bouncer returns an accepted or denied
-
-FIXME: would be good if
-- streamer would generate a unique id for the new connection and put it
-  in credentials
-- bouncer can call back through manager to component to tell it that
-  the connection should be terminated
-
-
-
 IMPLEMENTATION
 --------------
+Credentials(twisted):
+- is an object implementing an ICredential-subclass interface
+- has a check... method, to be called with some data by the checker,
+  where the credential interface is the "contract" deciding how this data
+  should be "calculated" by the checker, given its information backend
+  example: checkCryptPassword(self, cryptPassword) will be called by the
+           checker on the keycard with the stored cryptPassword to verify
+           if the credentials are correct
+- depending on the implementation of this interface, credentials might need
+  to be "primed" before the checker can call the check... method.  This
+  needs to be done by some other object.
+  example: the PortalWrapper in PB server does a challenge/response with the
+           PB client. When it receives the response, the credentials have
+           all the info to be able to have the check... method called, since
+           the challenge/response sent to the client can be replayed with 
+           the password tried by the credentials checker.
+  example: credentials(username, plaintextPassword) is
+           already trivially primed for a plaintext-backed credential checker,
+           since checkPassword just compares the two
+  example: credentials(username, cryptPassword) is primed for a
+           plaintext-backed credchecker, since the credchecker can
+           call checkPassword on the creds, which will use the salt from its
+           own cryptPassword to encrypt the plaintext pw and compare
+  example: credentials(username, plaintextPassword) is
+           already trivially primed for a crypt-backed credential checker,
+           since checkCryptPassword on the credentials can take the salt,
+           encrypt the plaintext password, and compare with the provided
+           cryptPassword
 
-a Keycard is an object exchanged between a Bouncer and something needing auth.
-e.g. a client connects to an HTTP streamer
-Keycard is subclass of pb.RemoteCopy and pb.Copyable so we can send it over
-the manager to the bouncer
-Keycard implements ICredentials
+- credentials could implement more than one ICredentialInterface
+  example: a credentials(username, cryptPassword) can have a
+           checkPassword and a checkCryptPassword method;
+           the first it can provide by crypt'ing the received plaintext;
+           the second it can provide by comparing with its own cryptPassword
+  example: a credentials(username, cryptPassword, md5Password)
+           can have three methods;
+           the checkCrypt and checkMD5 against the respective hashed pw,
+           and the checkPassword by applying either hashing to the
+           plaintext password and comparing against the respective hashed pw
+           In this case of course the credentials should provide both
+           hashes from the *same* password :)
 
-Keycard base class has:
-- componentName: component requesting auth
-- ip address ?
-- streamer creates a Keycard, and sends it to the manager together with
-  the bouncerName
-- manager forwards to bouncer
-- bouncer checks if it can authenticate it
-- if it can, it generates a unique ID and gives it to the keycard, so it can
-  ask for stuff to be done on it (so it needs a format containing component,
-  e.g. streamer-000000)
-- bouncer can set a duration on the keycard to specify how long it is allowed
-  to live
-- bouncer returns the keycard if allowed, and None if not
-- manager returns the keycard or None to the original requester
-- original requester stores keycard in a hash with the id
-- bouncer can at some point call expire() on the KeycardId and componentName,
-  which will be forwarded to the component
-- requester is responsible for telling the bouncer that the keycard can
-  be removed
+Checker(twisted):
+- is an object implementing an ICredentialChecker-subclass interface
+- is an object that can verify credentials of the interfaces that it has
+  listed in credentialInterfaces
+- uses an information backend containing "secrets" it can use in checking
+  example: a checker with a list of username/plaintextPasswords can
+           authenticate all IUsernamePassword credentials by calling
+           checkPassword on them
+  example: a checker with username/cryptPasswords can authenticate all
+           IUsernameCryptPassword credentials by calling
+           checkCryptPassword on them; regardless of whether the credentials
+           store the plaintext password, the cryptPassword, or even
+           some challenge/response
+  
+Keycard (flumotion):
+- an object exchanged between a Bouncer and something needing authentication
+  as a way to exchange information during the authentication setup process
+  example: client connecting to an HTTP streamer
+  example: a component logging in to the manager
+- it contains only state info used during the auth setup process
+  example: challenge/response data
+- keycard can be sent everywhere because it subclasses both pb.RemoteCopy
+  and pb.Copyable
+- keycard can eventually be given to a checker because it implements
+  a subclass of ICredentials
+- the keycard implements a subclass of IKeycard, which is the "contract"
+  between a bouncer and a requester which decides the mechanism of
+  data exchange in the auth setup process
+  example: a KeycardAddressUsernameCryptPasswordChallenger (KeycardAUCPC)
+           stores a username and ip address,
+           and will get a salt and challenge set on it by the bouncer.
+           The requester sets a response on it by crypting the password
+           using the given salt, then performing the response transformation
+           on challenge + cryptPassword.
+
+- Keycard base class:
+  - has:
+    - state, as an enum, with REQUESTING and ACCEPTED as the first two global
+      values
+    - avatarId (which is a preferred avatarId suggested by requester,
+      used for authentication of admin/workers/components to manager)
+    - componentName (which is the name of the component requesting
+      authentication, or the manager)
+    - bouncerName (which is the name of the component performing
+      authentication)
+    - id, which is issued by the bouncer
+    - duration, which is possibly set by the bouncer
+
+Bouncer(flumotion):
+- an object that can accept keycards and "primes" the credentials part
+   for verification by a credentials checker
+- is an object that can verify keycards of the classes that it has
+  listed in keycardClasses
+- bouncer checks if the keycard it receives is of a type it can process;
+  if it is, it sets a bouncer-unique id on the keycard
+  example use: a bouncer can revoke a keycard based on the unique id
+               and the componentName that requested it
+- is the keycard primed ?
+  - no: it needs priming.  based on the keycard class, the bouncer knows
+    how to prime it, stores some things in the keycard, and returns the
+    keycard.  It could use the "state" variable with class-specific meaning
+    as a state machine.  Later on it will get the keycard with response
+    to the challenge on the keycard.
+    ! the bouncer should store the challenge data locally, to protect against
+      in-flight tampering of the keycard by something/someone else.
+  - yes, or eventually: it hands the keycard to the checker
+    - if this fails, it returns None, meaning authentication failed,
+      and possibly removes it from the local state for that Id, since
+      the keycard was never authenticated
+    - if this succeeds, it sets the state to AUTHENTICATED, and returns
+      the keycard.  It stores the id on a list of issued keycardId's
+      - it can set a duration as well, after which it will be called
+        back to say the requester has removed the client
+
+- requester should tell the bouncer when a given keycardId has been
+  used up, so the bouncer can clean up its state 
+
+Requester:
+- can be:
+  - the manager, who receives a client login request from a
+    worker/component/admin
+  - a streamer, trying to log in to a streaming component
+- creates a keycard (or receives it from the client logging in) of a
+  specific class
+- sends it on towards the bouncer
+- if it gets it back, but with a state still not AUTHENTICATED, it performs
+  some steps as agreed in the keycard class "contract", then sends it back
+- if it gets None back, it was refused
+- if it gets the keycard back with state AUTHENTICATED, it was accepted
+- when it is accepted:
+  - it should check if a duration is set
+  - the requester should store the unique id in a hash so it can respond to a
+    bouncer's request to expire
+- when the client that triggered the request goes away for any reason:
+  - requester should clean up the state of that client and keycards
+  - requester should inform the bouncer that the keycardId for that client
+    can be dropped and reused
+
+Manager:
+  - creates a bouncer component and calls methods on it directly, to
+    provide bootstrapping of other components logging in to the system.
+    * This is the only exception to the rule that components are started
+      from workers ! *
+    without a bouncer, it allows anonymous logins ?
+    after that, it can call on additional bouncers implemented in components
+    on workers if it wants to.
+
+ADVANTAGES
+----------
+- the manager can allow different types of keycards in; ie the manager
+  doesn't need to be changed when admin/components/workers use a different
+  credential system
+- a client component/worker/admin can try a list of Keycards that it
+  knows how to generate and send them one by one to the manager
+  example: admin user types in password in the UI when logging in.
+           the admin client can now put this info in a CryptPassword keycard,
+           or a CryptPasswordChallenge, or a PlaintextChallenge, or anything,
+           and try them one by one.
+           ! Avoid ever sending a plaintext password please.  don't
+             allow a keycard with plaintext password to be created.
+- idea: the manager could respond to login with a list of Keycard classes
+  it can authenticate, giving the client a choice.  (Is this insecure
+  because it provides info on the manager's authentication ?)
+- a bouncer can expire keycards and thus throw out outside clients, or
+  components/admin/workers
+- same mechanism used for both outside and inside authentication
+- internal authentication is very flexible too
+  example: we can expire an admin client's connection, or a producer's
+  which runs on the machine of a customer of an ISP
