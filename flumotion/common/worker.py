@@ -30,7 +30,7 @@ class ManagerWorkerHeavenState(flavors.StateCacheable):
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         # FIXME: later on we would want a dict of names -> cacheables ?
-        self.addKey('names', [])
+        self.addListKey('names', [])
 
     def __repr__(self):
         return "%r" % self._dict

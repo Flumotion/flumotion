@@ -205,20 +205,24 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             component.addListener(self)
         # FIXME: rename var
         self._workerHeavenState = workerHeavenState
+        self._workerHeavenState.addListener(self)
         self.emit('connected')
 
     # IStateListener interface
     def stateSet(self, state, key, value):
-        self.debug("state changed on %r: key %s" % (state, key))
+        self.debug("state set on %r: key %s" % (state, key))
         for view in self._views:
-            # FIXME: rename
-            view.stateChanged(state, key, value)
+            view.stateSet(state, key, value)
 
     def stateAppend(self, state, key, value):
-        pass
+        self.debug("state append on %r: key %s" % (state, key))
+        for view in self._views:
+            view.stateAppend(state, key, value)
 
     def stateRemove(self, state, key, value):
-        pass
+        self.debug("state remove on %r: key %s" % (state, key))
+        for view in self._views:
+            view.stateRemove(state, key, value)
 
     def remote_shutdown(self):
         self.debug('shutting down')

@@ -1,5 +1,14 @@
 2004-12-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/common/worker.py:
+	* flumotion/manager/worker.py:
+	* flumotion/wizard/wizard.py:
+	  make admin client notice when workers log in or out
+
+2004-12-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/Makefile.am:
 	* flumotion/manager/admin.py:
 	* flumotion/manager/common.py:

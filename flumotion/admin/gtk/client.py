@@ -32,7 +32,7 @@ from twisted.internet import reactor
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs
 from flumotion.configure import configure
-from flumotion.common import errors, log
+from flumotion.common import errors, log, worker, component
 from flumotion.common.common import moods
 from flumotion.manager import admin # Register types
 from flumotion.utils.gstutils import gsignal
@@ -489,13 +489,30 @@ class Window(log.Loggable, gobject.GObject):
         self.debug("component: returning result: %r to caller" % result)
         return result
 
-    def stateChanged(self, state, key, value):
-        # called by model when state of a component changes
+    def stateSet(self, state, key, value):
+        # called by model when state of something changes
         # look up the iter based on the state
+        if not isinstance(state, component.AdminComponentState):
+            return
+
         iter = self._iters[state]
         model = self.component_model
         if key == 'mood':
             model.set(iter, COL_MOOD, self._moodPixbufs[value])
+
+    def stateAppend(self, state, key, value):
+        if not isinstance(state, worker.AdminWorkerHeavenState):
+            return
+
+        if key == 'names':
+            self.statusbar.set('main', 'Worker %s logged in.' % value)
+
+    def stateRemove(self, state, key, value):
+        if not isinstance(state, worker.AdminWorkerHeavenState):
+            return
+
+        if key == 'names':
+            self.statusbar.set('main', 'Worker %s logged out.' % value)
 
     ### admin model callbacks
     def admin_connected_cb(self, admin):
@@ -653,8 +670,7 @@ class Window(log.Loggable, gobject.GObject):
             self.show()
 
         state = self.admin.getWorkerHeavenState()
-        names = state.get('names')
-        if not names:
+        if not state.get('names'):
             self.error_dialog(
                 'Need at least one worker connected to run the wizard')
             return

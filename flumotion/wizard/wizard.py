@@ -31,10 +31,11 @@ import gtk.glade
 from twisted.internet import defer
 
 from flumotion.configure import configure
-from flumotion.common import log, errors
+from flumotion.common import log, errors, worker
 from flumotion.utils.gstutils import gsignal
 from flumotion.wizard import enums, save
 from flumotion.ui import fgtk
+from flumotion.twisted import flavors
 
 def escape(text):
     return text.replace('&', '&amp;')
@@ -191,7 +192,6 @@ class WizardStep(object, log.Loggable):
     def worker_changed(self):
         pass
 
-
 class Wizard(gobject.GObject, log.Loggable):
     sidebar_color = gtk.gdk.color_parse('#9bc6ff')
     main_color = gtk.gdk.color_parse('white')
@@ -200,6 +200,8 @@ class Wizard(gobject.GObject, log.Loggable):
     gsignal('finished', str)
     
     logCategory = 'wizard'
+
+    __implements__ = flavors.IStateListener,
 
     def __init__(self, admin=None):
         self.__gobject_init__()
@@ -219,6 +221,7 @@ class Wizard(gobject.GObject, log.Loggable):
         self.stack = Stack()
         self.current_step = None
         self._last_worker = 0 # combo id last worker from step to step
+        self._worker_box = None # gtk.Widget containing worker combobox
 
     def __getitem__(self, stepname):
         for item in self.steps:
@@ -346,21 +349,22 @@ class Wizard(gobject.GObject, log.Loggable):
         frame.add(box)
         box.set_border_width(6)
         box.show()
-
-        # FIXME: create this method, so we can use it for listening to
-        # added/removed on the names list
-        #self._rebuild_combobox_worker()
-
         self.combobox_worker = gtk.combo_box_new_text()
         box.pack_start(self.combobox_worker, False, False, 6)
-        map(self.combobox_worker.append_text,
-            self._workerHeavenState.get('names'))
-            
-        self.combobox_worker.set_active(self._last_worker)
+        self._rebuild_worker_combobox()
         self.combobox_worker.connect('changed',
                                      self._combobox_worker_changed, step)
-        
         self.combobox_worker.show()
+
+    def _rebuild_worker_combobox(self):
+        model = self.combobox_worker.get_model()
+        model.clear()
+
+        # re-add all worker names
+        names = self._workerHeavenState.get('names')
+        for name in names:
+            model.append((name,))
+        self.combobox_worker.set_active(self._last_worker)
         
     def show_previous(self):
         step = self.stack.pop()
@@ -414,11 +418,13 @@ class Wizard(gobject.GObject, log.Loggable):
         if self.combobox_worker:
             model = self.combobox_worker.get_model()
             iter = self.combobox_worker.get_active_iter()
-            text = model.get(iter, 0)[0]
-            log.debug('%r setting worker to %s' % (step, text))
-            step.worker = text
-        else:
-            log.debug('%r no worker set' % step)
+            if iter:
+                text = model.get(iter, 0)[0]
+                log.debug('%r setting worker to %s' % (step, text))
+                step.worker = text
+                return
+
+        log.debug('%r no worker set' % step)
             
     def _set_worker_from_step(self, step):
         if not hasattr(step, 'worker'):
@@ -591,6 +597,7 @@ class Wizard(gobject.GObject, log.Loggable):
     def run(self, interactive, workerHeavenState, main=True):
         self._workerHeavenState = workerHeavenState
         self._use_main = main
+        workerHeavenState.addListener(self)
         
         if not self.stack:
             raise TypeError("need an initial step")
@@ -611,6 +618,21 @@ class Wizard(gobject.GObject, log.Loggable):
             gtk.main()
         except KeyboardInterrupt:
             pass
+
+    ### IStateListener methods
+    def stateAppend(self, state, key, value):
+        if not isinstance(state, worker.AdminWorkerHeavenState):
+            return
+        self.info('worker %s logged in to manager' % value)
+        #FIXME: make this work correctly
+        #self._rebuild_worker_combobox()
+        
+    def stateRemove(self, state, key, value):
+        if not isinstance(state, worker.AdminWorkerHeavenState):
+            return
+        self.info('worker %s logged out of manager' % value)
+        #FIXME: make this work correctly
+        #self._rebuild_worker_combobox()
 
     def load_steps(self):
         global _steps

@@ -114,10 +114,8 @@ class WorkerHeaven(base.ManagerHeaven):
     def workerAttached(self, workerAvatar):
         # called when the mind is attached, ie the worker logged in
         workerName = workerAvatar.getName()
-        names = self.state.get('names')
-        if not workerName in names:
-            names.append(workerName)
-            self.state.set('names', names)
+        if not workerName in self.state.get('names'):
+            self.state.append('names', workerName)
         
         # get all components that are supposed to start on this worker
         for entry in self.getEntries(workerAvatar):
@@ -133,9 +131,8 @@ class WorkerHeaven(base.ManagerHeaven):
     def workerDetached(self, workerAvatar):
         workerName = workerAvatar.getName()
         names = self.state.get('names')
-        if workerName in names:
-            names.remove(workerName)
-            self.state.set('names', names)
+        if workerName in self.state.get('names'):
+            self.state.remove('names', workerName)
             
     def workerStartComponent(self, workerName, componentName, type, config):
         """
