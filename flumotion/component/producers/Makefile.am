@@ -9,5 +9,7 @@ clean-local:
 
 SUBDIRS = \
 	audiotest \
+	bttv \
+	dv \
 	soundcard \
 	videotest

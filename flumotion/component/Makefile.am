@@ -13,8 +13,6 @@ SUBDIRS = \
 	consumers \
 	base \
 	bouncers \
-	bttv \
-	dv \
 	encoders \
 	muxers \
 	producers \

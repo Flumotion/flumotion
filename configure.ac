@@ -68,8 +68,6 @@ flumotion/common/Makefile
 flumotion/component/Makefile
 flumotion/component/base/Makefile
 flumotion/component/bouncers/Makefile
-flumotion/component/bttv/Makefile
-flumotion/component/dv/Makefile
 flumotion/component/encoders/Makefile
 flumotion/component/consumers/Makefile
 flumotion/component/consumers/disker/Makefile
@@ -78,6 +76,8 @@ flumotion/component/muxers/Makefile
 flumotion/component/overlay/Makefile
 flumotion/component/producers/Makefile
 flumotion/component/producers/audiotest/Makefile
+flumotion/component/producers/bttv/Makefile
+flumotion/component/producers/dv/Makefile
 flumotion/component/producers/soundcard/Makefile
 flumotion/component/producers/videotest/Makefile
 flumotion/component/webcam/Makefile
