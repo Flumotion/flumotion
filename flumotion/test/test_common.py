@@ -115,6 +115,7 @@ class B:
     __implements__ = (I2, )
     
 class C: pass
+
 class TestMergeImplements(unittest.TestCase):
     def testTwoImplements(self):
         self.assertEquals(common.mergeImplements(A, B), (I1, I2))
@@ -175,5 +176,26 @@ class TestPackagePath(unittest.TestCase):
         common.registerPackagePath(self.tempdir)
         os.system("rm -r %s" % self.tempdir)
           
+# FIXME: move to a separate module
+#class TestRoot (pb.Root):
+#    pass
+
+class TestState:#unittest.TestCase):
+    def runClient(self):
+        f = pb.PBClientFactory()
+        reactor.connectTCP("127.0.0.1", self.port, f)
+        f.getRootObject().addCallbacks(self.connected, self.notConnected)
+        self.id = reactor.callLater(10, self.timeOut)
+
+    def runServer(self):
+        factory = pb.PBServerFactory(TestRoot())
+        factory.unsafeTracebacks = self.unsafeTracebacks
+        p = reactor.listenTCP(0, factory, interface="127.0.0.1")
+
+    def testState(self):
+        self.runServer()
+        self.runClient()
+        reactor.run()
+
 if __name__ == '__main__':
     unittest.main()

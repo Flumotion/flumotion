@@ -35,6 +35,8 @@ from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
 from flumotion.common import bundle, common, errors, interfaces, log, keycards
+# serializable worker state
+from flumotion.common import worker
 from flumotion.configure import configure
 from flumotion.utils import reload
 from flumotion.utils.gstutils import gsignal
@@ -42,6 +44,8 @@ from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 
 # FIXME: this is a Medium
+# FIXME: stop using signals, we can provide a richer interface with actual
+# objects and real interfaces for the views a model communicates with
 class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     """
     I live in the admin client.
@@ -58,11 +62,12 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     gsignal('ui-state-changed', str, object)
     gsignal('component-property-changed', str, str, object)
     gsignal('reloading', str)
+    gsignal('message', str)
     gsignal('update')
     
     logCategory = 'adminmodel'
 
-    __implements__ = interfaces.IAdminMedium,
+    __implements__ = interfaces.IAdminMedium, common.IStateListener,
 
     # appease pychecker
     _components = {}
@@ -70,7 +75,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     def __init__(self, username, password):
         self._components = {} # dict of components
-        self._workers = []
+        self._workerHeavenState = None
         
         self.remote = None
 
@@ -190,20 +195,28 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         del self._components[component.get('name')]
         self.emit('update')
         
-    def remote_initial(self, components, workers):
+    def remote_initial(self, components, workerHeavenState):
         self.debug('remote_initial(components=%s)' % components)
         for component in components:
             self._components[component.get('name')] = component
             # get notified of state changes on component
             component.addListener(self)
-        self._workers = workers
+        # FIXME: rename var
+        self._workerHeavenState = workerHeavenState
         self.emit('connected')
 
-    # state listener "interface"
-    def stateChanged(self, state, key, value):
+    # IStateListener interface
+    def stateSet(self, state, key, value):
         self.debug("state changed on %r: key %s" % (state, key))
         for view in self._views:
+            # FIXME: rename
             view.stateChanged(state, key, value)
+
+    def stateAppend(self, state, key, value):
+        pass
+
+    def stateRemove(self, state, key, value):
+        pass
 
     def remote_shutdown(self):
         self.debug('shutting down')
@@ -545,7 +558,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         return self._components
     getComponents = get_components
     
-    def getWorkers(self):
-        return self._workers
+    def getWorkerHeavenState(self):
+        return self._workerHeavenState
 
 gobject.type_register(AdminModel)

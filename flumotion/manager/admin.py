@@ -52,7 +52,7 @@ class AdminAvatar(common.ManagerAvatar):
         self.info('admin client "%s" logged in' % self.avatarId)
         common.ManagerAvatar.attached(self, mind)
         self.mindCallRemote('initial', self.getComponentStates(),
-            self.getWorkers())
+            self.vishnu.workerHeaven.state)
 
     def detached(self, mind):
         self.info('admin client "%s" logged out' % self.avatarId)
@@ -72,16 +72,6 @@ class AdminAvatar(common.ManagerAvatar):
         for avatar in self.vishnu.componentHeaven.avatars.values():
             states.append(getattr(avatar, 'state', None))
         return states
-
-    def getWorkers(self):
-        """
-        Return all workers logged in to the manager.
-        
-        @rtype: C{list} of workers
-        """
-
-        return [worker.getName()
-                    for worker in self.vishnu.workerHeaven.getAvatars()]
 
     def sendLog(self, category, type, message):
         """

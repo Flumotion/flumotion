@@ -214,7 +214,7 @@ class Wizard(gobject.GObject, log.Loggable):
         self._admin = admin
         self._save = save.WizardSaver(self)
         self._use_main = True
-        self._workers = []
+        self._workerHeavenState = None
         self.steps = []
         self.stack = Stack()
         self.current_step = None
@@ -347,9 +347,14 @@ class Wizard(gobject.GObject, log.Loggable):
         box.set_border_width(6)
         box.show()
 
+        # FIXME: create this method, so we can use it for listening to
+        # added/removed on the names list
+        #self._rebuild_combobox_worker()
+
         self.combobox_worker = gtk.combo_box_new_text()
         box.pack_start(self.combobox_worker, False, False, 6)
-        map(self.combobox_worker.append_text, self._workers)
+        map(self.combobox_worker.append_text,
+            self._workerHeavenState.get('names'))
             
         self.combobox_worker.set_active(self._last_worker)
         self.combobox_worker.connect('changed',
@@ -583,8 +588,8 @@ class Wizard(gobject.GObject, log.Loggable):
     def hide(self):
         self.window.hide()
 
-    def run(self, interactive, workers=[], main=True):
-        self._workers = workers
+    def run(self, interactive, workerHeavenState, main=True):
+        self._workerHeavenState = workerHeavenState
         self._use_main = main
         
         if not self.stack:

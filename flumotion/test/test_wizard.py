@@ -23,7 +23,10 @@
 
 import common
 
+from twisted.spread import jelly
 from twisted.trial import unittest
+
+from flumotion.common import worker
 
 try:
     import gtk
@@ -89,13 +92,16 @@ class WizardSaveTest(unittest.TestCase):
     def setUp(self):
         self.wizard = wizard.Wizard()
         self.wizard.load_steps()
+        s = worker.ManagerWorkerHeavenState()
+        s.set('names', ['localhost'])
+        self.workerHeavenState = jelly.unjelly(jelly.jelly(s))
 
     def testFirewireAudioAndVideo(self):
         source = self.wizard['Source']
         source.combobox_video.set_active(enums.VideoDevice.Firewire)
         source.combobox_audio.set_active(enums.AudioDevice.Firewire)
 
-        self.wizard.run(False, ['localhost'], True)
+        self.wizard.run(False, self.workerHeavenState, True)
         config = self.wizard.getConfig()
         self.assert_(config.has_key('video-source'))
         self.assert_(not config.has_key('audio-source'))

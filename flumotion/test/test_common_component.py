@@ -25,9 +25,9 @@ from twisted.trial import unittest
 from twisted.spread import jelly
 from twisted.internet import reactor
 
-import common
+import common as mcommon
 
-from flumotion.common import component
+from flumotion.common import component, common
 from flumotion.common.common import moods
 
 class JobComponentStateTest(unittest.TestCase):
@@ -89,17 +89,19 @@ class AllComponentStateTest(unittest.TestCase):
 # new one, instead of updating the old one.  Find a way to make the old
 # serialized object update first
 class ListenerTest(unittest.TestCase):
+    __implements__ = common.IStateListener
+
     def setUp(self):
         self.jstate = component.JobComponentState()
         self.mstate = jelly.unjelly(jelly.jelly(self.jstate))
         self.astate = jelly.unjelly(jelly.jelly(self.mstate))
-        self.mstate.addListener(self.stateChanged)
-        self.astate.addListener(self.stateChanged)
+        self.mstate.addListener(self)
+        self.astate.addListener(self)
         self.changes = []
 
-    def stateChanged(self, state, key, value):
+    def stateSet(self, state, key, value):
         # listener "interface" function
-        print "state changed !"
+        print "state set !"
         self.changes.append((state, key, value))
         
     def jset(self, key, value):
@@ -127,7 +129,6 @@ class ListenerTest(unittest.TestCase):
         self.failUnlessEqual(self.jstate.get('mood'), moods.HAPPY)
         self.failUnlessEqual(self.mstate.get('mood'), moods.LOST)
         self.failUnlessEqual(self.astate.get('mood'), moods.LOST)
-
 
 if __name__ == '__main__':
     unittest.main()

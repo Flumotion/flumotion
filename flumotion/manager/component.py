@@ -37,8 +37,9 @@ from twisted.spread import pb
 from twisted.internet import reactor
 
 from flumotion.configure import configure
-from flumotion.manager import common
-from flumotion.common import errors, interfaces, keycards, log, config
+# rename to base
+from flumotion.manager import common as mcommon
+from flumotion.common import errors, interfaces, keycards, log, config, common
 from flumotion.common.common import moods
 from flumotion.utils import gstutils
 
@@ -232,7 +233,7 @@ class FeederSet(log.Loggable):
             self.debug('feeder %s is ready, executing function %r' % (feederName, func))
             func(componentAvatar)
 
-class ComponentAvatar(common.ManagerAvatar):
+class ComponentAvatar(mcommon.ManagerAvatar):
     """
     Manager-side avatar for a component.
     Each component that logs in to the manager gets an avatar created for it
@@ -240,11 +241,12 @@ class ComponentAvatar(common.ManagerAvatar):
     """
 
     logCategory = 'comp-avatar'
+    __implements__ = common.IStateListener
 
     _heartbeatCheckInterval = configure.heartbeatInterval * 2.5
 
     def __init__(self, heaven, avatarId):
-        common.ManagerAvatar.__init__(self, heaven, avatarId)
+        mcommon.ManagerAvatar.__init__(self, heaven, avatarId)
         
         self.ports = {} # feedName -> port
         self.started = False
@@ -331,13 +333,13 @@ class ComponentAvatar(common.ManagerAvatar):
 
     def attached(self, mind):
         self.info('component "%s" logged in' % self.avatarId)
-        common.ManagerAvatar.attached(self, mind) # sets self.mind
+        mcommon.ManagerAvatar.attached(self, mind) # sets self.mind
         self.debug('mind %r attached, calling remote _getState()' % self.mind)
         self._getState()
 
     def detached(self, mind):
         self.info('component "%s" logged out' % self.avatarId)
-        common.ManagerAvatar.detached(self, mind)
+        mcommon.ManagerAvatar.detached(self, mind)
         
     def _getState(self):
         d = self.mindCallRemote('getState')
@@ -360,9 +362,9 @@ class ComponentAvatar(common.ManagerAvatar):
         # make heaven register component
         self.heaven.registerComponent(self)
 
-    # state change listener
-    def stateChanged(self, state, key, value):
-        self.debug("state change on %r: %s now %r" % (state, key, value))
+    # IStateListener methods
+    def stateSet(self, state, key, value):
+        self.debug("state set on %r: %s now %r" % (state, key, value))
         if key == 'mood':
             # FIXME: proper enum
             names = {
@@ -374,7 +376,14 @@ class ComponentAvatar(common.ManagerAvatar):
                 moods.LOST:     'lost',
             }
             self.info('Mood changed to %s' % names[value])
+
+    def stateAppend(self, state, key, value):
+        pass
+
+    def stateRemove(self, state, key, value):
+        pass
                 
+    # my methods
     def _mindPipelineErrback(self, failure):
         failure.trap(errors.PipelineParseError)
         self.error('Invalid pipeline for component')
@@ -665,7 +674,7 @@ class ComponentAvatar(common.ManagerAvatar):
         componentAvatar = self.heaven.getComponent(requesterName)
         return componentAvatar.expireKeycard(keycardId)
 
-class ComponentHeaven(common.ManagerHeaven):
+class ComponentHeaven(mcommon.ManagerHeaven):
     """
     I handle all registered components and provide avatars for them.
     """
@@ -680,7 +689,7 @@ class ComponentHeaven(common.ManagerHeaven):
         @type vishnu:  L{flumotion.manager.manager.Vishnu}
         @param vishnu: the Vishnu object this heaven belongs to
         """
-        common.ManagerHeaven.__init__(self, vishnu)
+        mcommon.ManagerHeaven.__init__(self, vishnu)
         self._feederSet = FeederSet()
         self._componentEntries = {} # configuration entries
         
@@ -691,7 +700,7 @@ class ComponentHeaven(common.ManagerHeaven):
         self._feederSet.removeFeeders(avatar)
         self.vishnu.adminHeaven.componentRemoved(avatar)
         
-        common.ManagerHeaven.removeAvatar(self, avatarId)
+        mcommon.ManagerHeaven.removeAvatar(self, avatarId)
     
     ### our methods
     def _componentIsLocal(self, componentAvatar):

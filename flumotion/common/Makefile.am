@@ -14,7 +14,8 @@ flumotion_PYTHON = \
 	log.py \
 	keycards.py \
 	registry.py \
-	setup.py
+	setup.py \
+	worker.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 

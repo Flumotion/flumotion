@@ -21,100 +21,14 @@
 
 # Headers in this file shall remain intact.
 
+
 from twisted.spread import pb
-
-### Generice Cacheable/RemoteCache for state objects
-class StateCacheable(pb.Cacheable):
-    """
-    I am a cacheable state object.
-    """
-    def __init__(self):
-        self._observers = []
-        self._dict = {}
-
-    # our methods
-    def addKey(self, key, value=None):
-        """
-        Add a key to the state cache so it can be used with set.
-        """
-        self._dict[key] = value
-
-    def get(self, key):
-        """
-        Get the state cache value for the given key.
-        """
-        if not key in self._dict.keys():
-            raise KeyError('%s in %r' % (key, self))
-
-        return self._dict[key]
-
-    def set(self, key, value):
-        """
-        Set a given state key to the given value.
-        Notifies observers of this Cacheable.
-        """
-        if not key in self._dict.keys():
-            raise KeyError('%s in %r' % (key, self))
-
-        self._dict[key] = value
-        for o in self._observers: o.callRemote('set', key, value)
-        
-    # pb.Cacheable methods
-    def getStateToCacheAndObserveFor(self, perspective, observer):
-        self._observers.append(observer)
-        return self._dict
-
-    def stoppedObserving(self, perspective, observer):
-        self._observers.remove(observer)
-
-class StateRemoteCache(pb.RemoteCache):
-    """
-    I am a remote cache of a state object.
-    """
-    def __init__(self):
-        self._listeners = []
-        # no constructor
-        # pb.RemoteCache.__init__(self)
-
-    # our methods
-    def get(self, key):
-        """
-        Get the state cache value for the given key.
-        """
-        if not key in self._dict.keys():
-            raise KeyError('%s in %r' % (key, self))
-
-        return self._dict[key]
-
-    def _ensureListeners(self):
-        # when this is created through serialization from a JobCS,
-        # __init__ does not seem to get called, so create self._listeners
-        if not hasattr(self, '_listeners'):
-                self._listeners = []
-
-    def addListener(self, listener):
-        self._ensureListeners()
-        self._listeners.append(listener)
-
-    # pb.RemoteCache methods
-    def setCopyableState(self, dict):
-        self._dict = dict
-        
-    def observe_set(self, key, value):
-        self._dict[key] = value
-        # if we also subclass from Cacheable, then we're a proxy, so proxy
-        if hasattr(self, 'set'):
-            getattr(self, 'set')(key, value)
-
-        # notify our local listeners
-        self._ensureListeners()
-        for l in self._listeners:
-            l.stateChanged(self, key, value)
+from flumotion.common import common
 
 # component state proxy objects
-class JobComponentState(StateCacheable):
+class JobComponentState(common.StateCacheable):
     def __init__(self):
-        StateCacheable.__init__(self)
+        common.StateCacheable.__init__(self)
         self.addKey('name')
         self.addKey('mood')
         self.addKey('pid')
@@ -130,15 +44,15 @@ class JobComponentState(StateCacheable):
     def setMood(self, mood):
         self.set('mood', mood)
 
-class ManagerComponentState(StateCacheable, StateRemoteCache):
+class ManagerComponentState(common.StateCacheable, common.StateRemoteCache):
     #def __init__(self):
-    #    StateCacheable.__init__(self)
-    #    StateRemoteCache.__init__(self)
+    #    common.StateCacheable.__init__(self)
+    #    common.StateRemoteCache.__init__(self)
 
     def __repr__(self):
         return "%r" % self._dict
 
-class AdminComponentState(StateRemoteCache):
+class AdminComponentState(common.StateRemoteCache):
     pass
 
 pb.setUnjellyableForClass(JobComponentState, ManagerComponentState)

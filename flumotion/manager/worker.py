@@ -28,11 +28,12 @@ import socket
 
 from twisted.spread import pb
 
-from flumotion.manager import common
+# FIXME: rename to base
+from flumotion.manager import common as mcommon
 from flumotion.common import errors, interfaces, log
-from flumotion.common import config
+from flumotion.common import config, worker
 
-class WorkerAvatar(common.ManagerAvatar):
+class WorkerAvatar(mcommon.ManagerAvatar):
     """
     I am an avatar created for a worker.
     A reference to me is given when logging in and requesting a worker avatar.
@@ -45,14 +46,14 @@ class WorkerAvatar(common.ManagerAvatar):
 
     def attached(self, mind):
         self.info('worker "%s" logged in' % self.getName())
-        common.ManagerAvatar.attached(self, mind)
+        mcommon.ManagerAvatar.attached(self, mind)
         self.heaven.workerAttached(self)
 
     def detached(self, mind):
         self.info('worker "%s" logged out' % self.getName())
-        common.ManagerAvatar.detached(self, mind)
-        # FIXME: heaven.workerDetached ?
+        mcommon.ManagerAvatar.detached(self, mind)
         # FIXME: rename heaven methods to avatarDetached, move to base ?
+        self.heaven.workerDetached(self)
     
     def start(self, name, type, config):
         """
@@ -69,7 +70,7 @@ class WorkerAvatar(common.ManagerAvatar):
             config))
         return self.mindCallRemote('start', name, type, config, self.avatarId)
 
-class WorkerHeaven(common.ManagerHeaven):
+class WorkerHeaven(mcommon.ManagerHeaven):
     """
     I interface between the Manager and worker clients.
     For each worker client I create an L{WorkerAvatar} to handle requests.
@@ -80,8 +81,9 @@ class WorkerHeaven(common.ManagerHeaven):
     avatarClass = WorkerAvatar
     
     def __init__(self, vishnu):
-        common.ManagerHeaven.__init__(self, vishnu)
+        mcommon.ManagerHeaven.__init__(self, vishnu)
         self.conf = None
+        self.state = worker.ManagerWorkerHeavenState()
         
     ### my methods
 
@@ -111,9 +113,13 @@ class WorkerHeaven(common.ManagerHeaven):
        
     def workerAttached(self, workerAvatar):
         # called when the mind is attached, ie the worker logged in
+        workerName = workerAvatar.getName()
+        names = self.state.get('names')
+        if not workerName in names:
+            names.append(workerName)
+            self.state.set('names', names)
         
         # get all components that are supposed to start on this worker
-        workerName = workerAvatar.getName()
         for entry in self.getEntries(workerAvatar):
             componentName = entry.getName()
             self.debug('workerAttached(): starting component: %s on %s' % (
@@ -123,6 +129,13 @@ class WorkerHeaven(common.ManagerHeaven):
                                       componentName,
                                       entry.getType(),
                                       entry.getConfigDict())
+
+    def workerDetached(self, workerAvatar):
+        workerName = workerAvatar.getName()
+        names = self.state.get('names')
+        if workerName in names:
+            names.remove(workerName)
+            self.state.set('names', names)
             
     def workerStartComponent(self, workerName, componentName, type, config):
         """
