@@ -26,7 +26,7 @@ Manager-side objects to handle worker clients.
 
 from twisted.spread import pb
 
-from flumotion.common import interfaces
+from flumotion.common import errors, interfaces
 from flumotion.common.config import FlumotionConfigXML
 from flumotion.utils import log
 
@@ -85,8 +85,12 @@ class WorkerHeaven(pb.Root):
         """
         self.avatars = {}
         self.conf = None
+        self.vishnu = vishnu
         
     def getAvatar(self, avatarID):
+        if not self.conf.hasWorker(avatarID):
+            raise AssertionError
+            
         avatar = WorkerAvatar(self, avatarID)
         self.avatars[avatarID] = avatar
         return avatar
@@ -98,31 +102,44 @@ class WorkerHeaven(pb.Root):
         # XXX: Merge?
         self.conf = FlumotionConfigXML(filename)
 
+        workers = self.conf.getWorkers()
+        if workers.getPolicy() == 'password':
+            self.vishnu.checker.allowAnonymous(False)
+
+        for worker in workers.workers:
+            self.vishnu.checker.addUser(worker.getUsername(),
+                                        worker.getPassword())
+            
     def getEntries(self, worker):
-        retval = []
         if not self.conf:
-            return retval
-        
+            return []
+
+        retval = []
         for entry in self.conf.entries.values():
             entry_worker = entry.getWorker()
             if entry_worker and entry_worker != worker.getName():
                 continue
             retval.append(entry)
         return retval
+       
+        workers = [worker for worker in self.conf.getWorkers()
+                              if not worker or worker != worker.getName()]
+        return workers
     
     def workerAttached(self, worker):
         entries = self.getEntries(worker)
+        worker_name = worker.getName()
         for entry in entries:
             name = entry.getName()
-            log.debug('config', 'Starting component: %s' % name)
+            log.debug('config', 'Starting component: %s on %s' % (name, worker_name))
             dict = entry.getConfigDict()
             
             if dict.has_key('config'):
                 del dict['config'] # HACK
 
-            worker.start(name, entry.getType(), dict)
+            self.start(name, entry.getType(), dict, worker_name)
             
-    def start(self, name, type, config, worker=None):
+    def start(self, name, type, config, worker):
         if not self.avatars:
             raise AttributeError
 
