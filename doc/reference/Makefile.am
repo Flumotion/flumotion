@@ -15,6 +15,7 @@ MODULE_FILES = \
 	flumotion/common/errors.py		\
 	flumotion/common/interfaces.py		\
 	flumotion/common/launcher.py		\
+	flumotion/common/registry.py		\
 	flumotion/component/component.py	\
 	flumotion/component/base/producer.py	\
 	flumotion/component/base/converter.py	\
@@ -23,7 +24,6 @@ MODULE_FILES = \
 	flumotion/component/passwd/passwd.py	\
 	flumotion/manager/admin.py		\
 	flumotion/manager/manager.py		\
-	flumotion/manager/registry.py		\
 	flumotion/twisted/gstreactor.py		\
 	flumotion/utils/gstutils.py		\
 	flumotion/utils/log.py

@@ -6,7 +6,8 @@ flumotion_PYTHON = \
 	config.py \
 	errors.py \
 	interfaces.py \
-	launcher.py
+	launcher.py \
+	registry.py
 
 clean-local:
 	rm -rf *.pyc *.pyo

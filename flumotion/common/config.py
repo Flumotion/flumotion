@@ -23,7 +23,7 @@ from xml.dom import minidom, Node
 
 from twisted.python import reflect 
 
-from flumotion.manager.registry import registry
+from flumotion.common.registry import registry
 from flumotion.utils import log
 
 class ConfigError(Exception):

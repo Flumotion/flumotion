@@ -4,8 +4,7 @@ flumotion_PYTHON = \
 	__init__.py \
 	admin.py \
 	component.py \
-	manager.py \
-	registry.py
+	manager.py
 
 clean-local:
 	rm -rf *.pyc *.pyo
