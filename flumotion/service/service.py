@@ -115,13 +115,21 @@ class Servicer(log.Loggable):
         or all if none specified.
         If first argument is "worker", start given worker,
         or all if none specified.
+
+        Returns: an exit value
         """
         (managers, workers) = self._parseManagersWorkers('start', args)
         managersDict = self.getManagers()
+        exitvalue = 0
+
         for name in managers:
-            self.startManager(name, managersDict[name])
+            if not self.startManager(name, managersDict[name]):
+                exitvalue += 1
         for name in workers:
-            self.startWorker(name)
+            if not self.startWorker(name):
+                exitvalue += 1
+
+        return exitvalue
 
     def stop(self, args):
         """
@@ -134,10 +142,16 @@ class Servicer(log.Loggable):
         or all if none specified.
         """
         (managers, workers) = self._parseManagersWorkers('stop', args)
+        exitvalue = 0
+
         for name in managers:
-            self.stopManager(name)
+            if not self.stopManager(name):
+                exitvalue += 1
         for name in workers:
-            self.stopWorker(name)
+            if not self.stopWorker(name):
+                exitvalue += 1
+            
+        return exitvalue
 
     def status(self, args):
         """
@@ -252,7 +266,7 @@ class Servicer(log.Loggable):
         """
         pid = common.getPid('manager', name)
         if not pid:
-            return
+            return True
 
         # FIXME: ensure a correct process is running this pid
         self.debug('Killing manager %s with pid %d' % (name, pid))
@@ -263,6 +277,9 @@ class Servicer(log.Loggable):
                 raise
             self.warning('No process with pid %d' % pid)
             common.deletePidFile('manager', name)
+            return False
+
+        return True
 
     def stopWorker(self, name):
         """
@@ -270,7 +287,7 @@ class Servicer(log.Loggable):
         """
         pid = common.getPid('worker', name)
         if not pid:
-            return
+            return True
 
         # FIXME: ensure a correct process is running this pid
         self.debug('Killing worker %s with pid %d' % (name, pid))
@@ -281,6 +298,8 @@ class Servicer(log.Loggable):
                 raise
             self.warning('No process with pid %d' % pid)
             common.deletePidFile('worker', name)
+            return False
+        return True
   
     def list(self):
         """

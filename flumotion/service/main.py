@@ -40,12 +40,12 @@ def main(args):
         sys.exit(0)
     
     if command == "list":
-        servicer.list()
+        return servicer.list()
     elif command == "start":
-        servicer.start(args[2:])
+        return servicer.start(args[2:])
     elif command == "stop":
-        servicer.stop(args[2:])
+        return servicer.stop(args[2:])
     elif command == "status":
-        servicer.status(args[2:])
+        return servicer.status(args[2:])
 
-    return
+    return 1

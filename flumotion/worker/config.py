@@ -54,7 +54,7 @@ class WorkerConfigXML(log.Loggable):
         self.name = 'default'
         self.manager = None
         self.authentication = None
-        self.ports = None
+        self.feederports = None
 
         try:
             if filename is not None:
