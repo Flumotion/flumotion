@@ -10,6 +10,7 @@ MODULE_FILES = \
 	flumotion/admin/__init__.py		\
 	flumotion/admin/spyglass.py		\
 	flumotion/config/__init__.py		\
+	flumotion/component/component.py	\
 	flumotion/component/base/producer.py	\
 	flumotion/component/base/converter.py	\
 	flumotion/component/file/file.py	\
@@ -18,7 +19,6 @@ MODULE_FILES = \
 	flumotion/errors.py			\
 	flumotion/manager/admin.py		\
 	flumotion/manager/auth.py		\
-	flumotion/manager/component.py		\
         flumotion/manager/config.py		\
 	flumotion/manager/manager.py		\
 	flumotion/manager/interfaces.py		\

@@ -1,7 +1,7 @@
 import common
 import unittest
 
-from flumotion.manager.component import ParseLaunchComponent
+from flumotion.component.component import ParseLaunchComponent
 
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, eaters, feeders):

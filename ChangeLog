@@ -1,5 +1,20 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/reference/Makefile.am:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/base/converter.py:
+	* flumotion/component/base/producer.py:
+	* flumotion/component/file/file.py:
+	* flumotion/component/http/http.py:
+	* flumotion/component/passwd/passwd.py:
+	* flumotion/manager/Makefile.am:
+	* flumotion/manager/component.py:
+	* flumotion/manager/launcher.py:
+	* tests/test_component_parse.py:
+	  move server.component to component.component, yay
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	* data/registry/basecomponents.xml:
 	* doc/reference/Makefile.am:
