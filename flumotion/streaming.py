@@ -20,8 +20,8 @@
 import time
 import sys
     
-import gobject
-import gst
+#import gobject
+#import gst
 
 if __name__ == '__main__':
     import gstreactor
@@ -55,8 +55,8 @@ class SimpleResource(resource.Resource):
         request.setHeader('Pragma', 'no-cache')
 
         request.connectionLost = lambda err: self.lost(request, err)
-        NO = 2000
-        DELAY = 0.250
+        NO = 200
+        DELAY = 0.500
         for i in range(NO):
             reactor.callLater(DELAY*i,     self.write, request, self.data)
             reactor.callLater(DELAY*(i+1), self.write, request, self.data2)
