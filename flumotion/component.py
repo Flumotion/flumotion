@@ -227,10 +227,14 @@ class BaseComponent(pb.Referenceable):
     def remote_get_free_port(self):
         return gstutils.get_free_port(start=5500)
 
-    def stop(self):
-        if (self.pipeline and
-            self.pipeline.get_state() == gst.STATE_PLAYING):
-            assert self.pipeline.set_state(gst.STATE_NULL)
+    def remote_play(self):
+        self.pipeline_play()
+        
+    def remote_stop(self):
+        self.pipeline_stop()
+
+    def remote_pause(self):
+        self.pipeline_pause()
         
 class OptionError(Exception):
     pass

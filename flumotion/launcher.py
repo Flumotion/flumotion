@@ -29,8 +29,7 @@ class Launcher:
         pid = os.fork()
         if not pid:
             from controller import ControllerServerFactory
-            self.controller = reactor.listenTCP(port,
-                                                ControllerServerFactory())
+            self.controller = reactor.listenTCP(port, ControllerServerFactory())
             try:
                 reactor.run(False)
             except KeyboardInterrupt:
@@ -49,27 +48,33 @@ class Launcher:
     def spawn(self, component):
         pid = os.getpid()
         def exit_cb(*args):
-            #fd = disable_stderr(pid)
-            #for line in enable_stderr(fd, pid):
-            #    if line.find('(null)') != -1:
-            #        continue
-            #    if line.find('Interrupted system call') != -1:
-            #        continue
-            component.stop()
+            component.pipeline_stop()
             raise SystemExit
 
-        #fd = disable_stderr(pid)
         signal.signal(signal.SIGINT, exit_cb)
         reactor.connectTCP('localhost', 8890, component.factory)
         try:
             reactor.run(False)
         except KeyboardInterrupt:
             pass
-        component.stop()
+        component.pipeline_stop()
 
     def start(self, component):
         pid = os.fork()
         if not pid:
+            self.spawn(component)
+            raise SystemExit
+        else:
+            log.msg('Starting %s (%s) on pid %d' %
+                    (component.component_name,
+                     component.getKind(),
+                     pid))
+            self.children.append(pid)
+
+    def start_streamer(self, component, factory, port):
+        pid = os.fork()
+        if not pid:
+            reactor.listenTCP(port, factory)
             self.spawn(component)
             raise SystemExit
         else:
@@ -97,7 +102,6 @@ class Launcher:
             except (KeyboardInterrupt, OSError):
                 pass
             
-        #print >> sys.stderr, '**** WAITING FOR CONTROLLER'
         if self.controller_pid:
             try:
                 os.kill(self.controller_pid, signal.SIGINT)
@@ -148,18 +152,16 @@ class Launcher:
                 port = c.getint(section, 'port')
 
             if kind == 'producer':
-                component = Producer(name, sources, pipeline)
+                self.start(Producer(name, sources, pipeline))
             elif kind == 'converter':
-                component = Converter(name, sources, pipeline)
+                self.start(Converter(name, sources, pipeline))
             elif kind == 'streamer':
                 component = Streamer(name, sources)
                 resource = StreamingResource(component)
                 factory = server.Site(resource=resource)
-                reactor.listenTCP(port, factory)
+                self.start_streamer(component, factory, port)
             else:
                 raise AssertionError
-
-            self.start(component)
     
 def main(args):
     parser = optik.OptionParser()

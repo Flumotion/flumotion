@@ -55,7 +55,9 @@ class Streamer(gobject.GObject, component.BaseComponent):
         self.emit('data-received', buffer)
         
     def notify_caps_cb(self, element, pad, param):
-        if not self.caps and pad.is_negotiated():
+        log.msg('Got caps: %s' % pad.get_negotiated_caps())
+        
+        if self.caps is None:
             self.caps = pad.get_negotiated_caps()
 
     # connect() is already taken by gobject.GObject
@@ -88,9 +90,11 @@ class StreamingResource(resource.Resource):
     def data_received_cb(self, transcoder, gbuffer):
         s = str(buffer(gbuffer))
         if gbuffer.flag_is_set(gst.BUFFER_IN_CAPS):
+            log.msg('Received a GST_BUFFER_IN_CAPS buffer')
             self.caps_buffers.append(s)
         else:
             if not self.first_buffer:
+                log.msg('Received the first buffer')
                 self.first_buffer = gbuffer
             self.buffer_queue.append(s)
                                              
@@ -106,21 +110,24 @@ class StreamingResource(resource.Resource):
         return self
 
     def lost(self, obj, request):
-        print 'client from', request.getClientIP(), 'disconnected'
+        log.msg('client from %s disconnected' % request.getClientIP()) 
         self.current_requests.remove(request)
 
     def isReady(self):
-        if not self.streamer.caps:
+        if self.streamer.caps is None:
+            log.msg('We have no caps yet')
             return False
         
         if self.first_buffer is None:
+            log.msg('We still haven\'t received any buffers')
             return False
 
         return True
         
     def render(self, request):
-        print 'client from', request.getClientIP(), 'connected'
+        log.msg('client from %s connected' % request.getClientIP())   
         if not self.isReady():
+            log.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
         # Stolen from camserv
@@ -136,7 +143,7 @@ class StreamingResource(resource.Resource):
         request.notifyFinish().addBoth(self.lost, request)
         
         return server.NOT_DONE_YET
-    
+
 def main(args):
     options = component.get_options_for('streamer', args)
     try:

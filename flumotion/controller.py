@@ -36,6 +36,8 @@ from twisted.internet import reactor, error
 from twisted.python import log
 from twisted.spread import pb
 
+from twistedutils import ShellFactory, Shell
+
 import pbutil
 
 class Dispatcher:
@@ -80,7 +82,9 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.started = False
         
     def __repr__(self):
-        return '<%s %s>' % (self.__class__.__name__, self.username)
+        return '<%s %s in state %s>' % (self.__class__.__name__,
+                                        self.username,
+                                        gst.element_state_get_name(self.state))
     
     def getTransportPeer(self):
         return self.mind.broker.transport.getPeer()
@@ -410,12 +414,23 @@ class ControllerServerFactory(pb.PBServerFactory):
 
     def __repr__(self):
         return '<ControllerServerFactory>'
-    
+
 if __name__ == '__main__':
     log.startLogging(sys.stdout)
+    controller = ControllerServerFactory()
+
+    ts = ShellFactory()
+    ts.namespace.update(controller.controller.__dict__)
+    ts.namespace['dispatcher'] = controller.dispatcher
+    ts.namespace['portal'] = controller.portal
+
+    ts.protocol = Shell
     try:
-        reactor.listenTCP(8890, ControllerServerFactory())
+        reactor.listenTCP(8890, controller)
+        reactor.listenTCP(4040, ts)
     except error.CannotListenError, e:
         print 'ERROR:', e
         raise SystemExit
+
+    
     reactor.run(False)
