@@ -99,7 +99,6 @@ class LogAdminGtkNode(BaseAdminGtkNode):
         return defer.succeed(w)
 
     def logMessage(self, message):
-        print "THOMAS: logging %s" % message
         self._buffer.insert_at_cursor(message)
 
 class HTTPStreamerAdminGtk(BaseAdminGtk):

@@ -1,3 +1,10 @@
+2004-12-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	  remove debug line
+	* flumotion/wizard/enums.py:
+	  make sure "Test" choices are first in the enum
+
 2004-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/service/service.py:

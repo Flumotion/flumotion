@@ -28,30 +28,48 @@ from flumotion.common import enum
 
 # Sources
 VideoDevice = enum.EnumClass('VideoDevice',
-                        ('Webcam', 'TVCard', 'Firewire', 'Test'),
-                        ('Web camera',
+                        ('Test', 'Webcam', 'TVCard', 'Firewire'),
+                        (
+                         'Test video source',
+                         'Web camera',
                          'TV card',
-                         'Firewire video',
-                         'Test video source'),
-                        step=('Webcam',
+                         'Firewire video'
+                        ),
+                        step=(
+                              'Test Video Source',
+                              'Webcam',
                               'TV Card',
-                              'Firewire',
-                              'Test Video Source'),
-                        component_type=('web-camera',
+                              'Firewire'
+                             ),
+                        component_type=(
+                                        'videotest',
+                                        'web-camera',
                                         'tv-card',
-                                        'firewire',
-                                        'videotest'),
-                        element_names=(('v4lsrc',),
-                                       ('v4lsrc',),
+                                        'firewire'
+                                        ),
+                        element_names=(
                                        ('videotestsrc',),
-                                       ('dvdec', 'gst1394src')))
+                                       ('v4lsrc',),
+                                       ('v4lsrc',),
+                                       ('dvdec', 'gst1394src')
+                                      ))
 AudioDevice = enum.EnumClass('AudioDevice',
-                        ('Soundcard', 'Firewire', 'Test'),
-                        ('Sound card', 'Firewire audio', 'Test audio source'),
-                        step=('Soundcard', 'Unused', 'Test Audio Source'),
-                        component_type=('soundcard',
-                                        'firewire',
-                                        'audiotest'))
+                        ('Test', 'Soundcard', 'Firewire'),
+                        (
+                         'Test audio source',
+                         'Sound card',
+                         'Firewire audio'
+                        ),
+                        step=(
+                              'Test Audio Source',
+                              'Soundcard',
+                              'Unused'
+                             ),
+                        component_type=(
+                                        'audiotest',
+                                        'soundcard',
+                                        'firewire'
+                                        ))
 # TVCard
 TVCardDevice = enum.EnumClass('TVCardDevice', ('/dev/video0',
                                           '/dev/video1',
