@@ -1,5 +1,11 @@
 2005-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  handle clients that have gone away before headers (fd == -1)
+	  rearrange code more logically
+
+2005-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/main.py:
 	* flumotion/worker/worker.py:
 	  improve logging

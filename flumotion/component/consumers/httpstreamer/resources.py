@@ -259,12 +259,27 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     # FIXME: rename to writeHeaders
     """
-    @rtype: boolean
+    Write out the HTTP headers for the incoming HTTP request.
+    
+    @rtype:   boolean
     @returns: whether or not the file descriptor can be used further.
     """
     def _writeHeaders(self, request):
         fd = request.transport.fileno()
+        fdi = request.fdIncoming
+
+        # the fd could have been closed, in which case it will be -1
+        if fd == -1:
+            self.info('[fd %5d] Client gone before writing header' % fdi)
+            # FIXME: do this ? del request
+            return False
+        if fd != request.fdIncoming:
+            self.warning('[fd %5d] does not match current fd %d' % (fdi, fd))
+            # FIXME: do this ? del request
+            return False
+
         headers = []
+
         def setHeader(field, name):
             headers.append('%s: %s\r\n' % (field, name))
 
@@ -363,7 +378,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         ip = request.getClientIP()
         self.logWrite(fd, ip, request, stats)
-        self.info('[fd %5d] client from %s disconnected' % (fd, ip))
+        self.info('[fd %5d] Client from %s disconnected' % (fd, ip))
 
         #self.debug('calling request.finish() on [fd %5d]' % fd)
         #request.finish()
@@ -435,81 +450,19 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         self.streamer.remove_client(fd)
 
-    def _handleNotReady(self, request):
-        self.debug('Not sending data, it\'s not ready')
-        return server.NOT_DONE_YET
-        
-    def _handleMaxClients(self, request):
-        self.debug('Refusing clients, client limit %d reached' % self.maxAllowedClients())
-
-        request.setHeader('content-type', 'text/html')
-        request.setHeader('server', HTTP_VERSION)
-        
-        error_code = http.SERVICE_UNAVAILABLE
-        request.setResponseCode(error_code)
-        
-        return ERROR_TEMPLATE % {'code': error_code,
-                                 'error': http.RESPONSES[error_code]}
-        
-    def _handleUnauthorized(self, request):
-        self.debug('client from %s is unauthorized' % (request.getClientIP()))
-        request.setHeader('content-type', 'text/html')
-        request.setHeader('server', HTTP_VERSION)
-        # FIXME: let domain be specifiable from config
-        if self._domain:
-            request.setHeader('WWW-Authenticate',
-                              'Basic realm="%s"' % self._domain)
-            
-        error_code = http.UNAUTHORIZED
-        request.setResponseCode(error_code)
-        
-        # we have to write data ourselves,
-        # since we already returned NOT_DONE_YET
-        html = ERROR_TEMPLATE % {'code': error_code,
-                                 'error': http.RESPONSES[error_code]}
-        request.write(html)
-        request.finish()
-
-    def _handleNewClient(self, request):
-        # everything fulfilled, serve to client
-        fd = request.transport.fileno()
-        if not self._writeHeaders(request):
-            self.debug("[fd %5d] not adding as a client" % fd)
-            return
-        self._addClient(request)
-        
-        # take over the file descriptor from Twisted by removing them from
-        # the reactor
-        # spiv told us to remove* on request.transport, and that works
-        # then we figured out that a new request is only a Reader, so we
-        # remove the removedWriter
-        self.debug("taking away [fd %5d] from Twisted" % fd)
-        reactor.removeReader(request.transport)
-        #reactor.removeWriter(request.transport)
-    
-        # check if it's really an open fd
-        import fcntl
-        try:
-            fcntl.fcntl(fd, fcntl.F_GETFL)
-        except IOError, e:
-            if e.errno == errno.EBADF:
-                self.warning("[fd %5d] is not actually open, ignoring" % fd)
-            else:
-                self.warning("[fd %5d] error during check: %s (%d)" % (
-                    fd, e.strerror, e.errno))
-            return
-
-        # hand it to multifdsink
-        self.streamer.add_client(fd)
-        ip = request.getClientIP()
-        self.info('[fd %5d] start streaming to %s' % (fd, ip))
-
     ### resource.Resource methods
 
+    # this is the callback receiving the request initially
     def _render(self, request):
         fd = request.transport.fileno()
-        self.debug('[fd %5d] _render(): client from %s connected, request %s' %
-            (fd, request.getClientIP(), request))
+        # we store the fd again in the request using it as an id for later
+        # on, so we can check when an fd went away (being -1) inbetween
+        request.fdIncoming = fd
+
+        self.info('[fd %5d] Incoming client connection from %s' % (
+            fd, request.getClientIP()))
+        self.debug('[fd %5d] _render(): request %s' % (
+            fd, request))
 
         if not self.isReady():
             return self._handleNotReady(request)
@@ -528,7 +481,26 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # FIXME: check how we later handle not authorized
         return server.NOT_DONE_YET
 
+    def _handleNotReady(self, request):
+        self.debug('Not sending data, it\'s not ready')
+        return server.NOT_DONE_YET
+        
+    def _handleMaxClients(self, request):
+        self.debug('Refusing clients, client limit %d reached' %
+            self.maxAllowedClients())
+
+        request.setHeader('content-type', 'text/html')
+        request.setHeader('server', HTTP_VERSION)
+        
+        error_code = http.SERVICE_UNAVAILABLE
+        request.setResponseCode(error_code)
+        
+        return ERROR_TEMPLATE % {'code': error_code,
+                                 'error': http.RESPONSES[error_code]}
+
     def _authenticatedCallback(self, keycard, request):
+        # !: since we are a callback, the incoming fd might have gone away
+        # and closed
         self.debug('_authenticatedCallback: keycard %r' % keycard)
         if not keycard:
             self._handleUnauthorized(request)
@@ -560,6 +532,61 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def _authenticatedErrback(self, failure, request):
         failure.trap(errors.UnknownComponentError)
         self._handleUnauthorized(request)
+        
+    def _handleUnauthorized(self, request):
+        self.debug('client from %s is unauthorized' % (request.getClientIP()))
+        request.setHeader('content-type', 'text/html')
+        request.setHeader('server', HTTP_VERSION)
+        if self._domain:
+            request.setHeader('WWW-Authenticate',
+                              'Basic realm="%s"' % self._domain)
+            
+        error_code = http.UNAUTHORIZED
+        request.setResponseCode(error_code)
+        
+        # we have to write data ourselves,
+        # since we already returned NOT_DONE_YET
+        html = ERROR_TEMPLATE % {'code': error_code,
+                                 'error': http.RESPONSES[error_code]}
+        request.write(html)
+        request.finish()
+
+    def _handleNewClient(self, request):
+        # everything fulfilled, serve to client
+        fdi = request.fdIncoming
+        if not self._writeHeaders(request):
+            self.debug("[fd %5d] not adding as a client" % fdi)
+            return
+        self._addClient(request)
+        
+        # take over the file descriptor from Twisted by removing them from
+        # the reactor
+        # spiv told us to remove* on request.transport, and that works
+        # then we figured out that a new request is only a Reader, so we
+        # remove the removedWriter
+        fd = fdi
+        self.debug("taking away [fd %5d] from Twisted" % fd)
+        reactor.removeReader(request.transport)
+        #reactor.removeWriter(request.transport)
+    
+        # check if it's really an open fd
+        import fcntl
+        try:
+            fcntl.fcntl(fd, fcntl.F_GETFL)
+        except IOError, e:
+            if e.errno == errno.EBADF:
+                self.warning("[fd %5d] is not actually open, ignoring" % fd)
+            else:
+                self.warning("[fd %5d] error during check: %s (%d)" % (
+                    fd, e.strerror, e.errno))
+            return
+
+        # hand it to multifdsink
+        self.streamer.add_client(fd)
+        ip = request.getClientIP()
+
+        self.info('[fd %5d] Started streaming to %s' % (fd, ip))
+
  
     render_GET = _render
     render_HEAD = _render
