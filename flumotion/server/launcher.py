@@ -83,6 +83,7 @@ class Launcher:
         self.controller_port = controller_port
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        signal.signal(signal.SIGSEGV, self.segv_handler)
         
         set_proc_text('flumotion [launcher]')
         
@@ -111,9 +112,13 @@ class Launcher:
             except OSError:
                 pass
 
+    def segv_handler(self, *args):
+        print args
+        
     def spawn(self, component):
         pid = os.getpid()
         def exit_cb(*args):
+            print 'EXIT'
             component.pipeline_stop()
             raise SystemExit
 

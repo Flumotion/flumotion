@@ -1,5 +1,5 @@
-bin_SCRIPTS = flumotion
-CLEANFILES = flumotion
+bin_SCRIPTS = flumotion video-server-admin
+CLEANFILES = $(bin_SCRIPTS)
 
-all: flumotion
-	@chmod +x flumotion
+all: $(bin_SCRIPTS)
+	@chmod +x $(bin_SCRIPTS)

@@ -64,8 +64,9 @@ class Dispatcher:
         if not p:
             raise ValueError, "no perspective for '%s'" % avatarID
 
-        # schedule an immediate perspective attached
+        # schedule a perspective attached
         reactor.callLater(0, p.attached, mind)
+        
         # return a deferred with interface, aspect, and logout function 
         return (pb.IPerspective, p,
                 lambda p=p,mind=mind: p.detached(mind))
@@ -129,27 +130,22 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         cb = self.mind.callRemote(name, *args, **kwargs)
         return cb
 
-    def error_cb(self, *args):
-        print 'ERROR', args
-        self.msg('Error caught, disconnecting component')
-        self.callRemote('stop')
-        
-    def after_register_cb(self, options, cb):
-        log.msg('in callback after_register_cb %r %r' % (options, cb))
-        
+    def cb_register(self, options, cb):
         for key, value in options.items():
             setattr(self.options, key, value)
         self.options.dict = options
         
         self.controller.componentRegistered(self)
 
-    def check_All(self, failure):
+    def cb_checkAll(self, failure):
         log.msg('ERROR:' + str(failure))
+        self.callRemote('stop')
         return None
                 
-    def check_PipelineError(self, failure):
+    def cb_checkPipelineError(self, failure):
         failure.trap(errors.PipelineParseError)
         self.msg('Invalid pipeline for component')
+        self.callRemote('stop')
         return None
 
     def attached(self, mind):
@@ -157,9 +153,9 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.mind = mind
         
         cb = self.callRemote('register')
-        cb.addCallback(self.after_register_cb, cb)
-        cb.addErrback(self.check_PipelineError)
-        cb.addErrback(self.check_All)
+        cb.addCallback(self.cb_register, cb)
+        cb.addErrback(self.cb_checkPipelineError)
+        cb.addErrback(self.cb_checkAll)
         
     def detached(self, mind):
         self.msg('detached')
@@ -184,30 +180,30 @@ class ComponentPerspective(pbutil.NewCredPerspective):
 class ProducerPerspective(ComponentPerspective):
     """Perspective for producer components"""
     kind = 'producer'
-    def after_get_free_ports_cb(self, (feeds, ports)):
+    def cb_getFreePorts(self, (feeds, ports)):
         self.listen_ports = ports
         cb = self.callRemote('listen', feeds)
-        cb.addErrback(self.error_cb)
+        cb.addErrback(self.cb_checkAll)
         
     def listen(self, feeds):
         """starts the remote methods listen"""
 
         cb = self.callRemote('get_free_ports', feeds)
-        cb.addCallbacks(self.after_get_free_ports_cb, self.error_cb)
+        cb.addCallbacks(self.cb_getFreePorts, self.cb_checkAll)
 
 class ConverterPerspective(ComponentPerspective):
     """Perspective for converter components"""
     kind = 'converter'
 
     def start(self, sources, feeds):
-        def after_get_free_ports_cb((feeds, ports)):
+        def cb_getFreePorts((feeds, ports)):
             self.listen_ports = ports
             cb = self.callRemote('start', sources, feeds)
-            cb.addErrback(self.error_cb, self.error_cb)
+            cb.addErrback(self.cb_checkAll)
             
         """starts the remote methods start"""
         cb = self.callRemote('get_free_ports', feeds)
-        cb.addCallbacks(after_get_free_ports_cb, self.error_cb)
+        cb.addCallbacks(cb_getFreePorts, self.cb_checkAll)
         
 class StreamerPerspective(ComponentPerspective):
     """Perspective for streamer components"""
@@ -225,7 +221,7 @@ class StreamerPerspective(ComponentPerspective):
         """starts the remote methods connect"""
         self.msg('Calling remote method connect(%s)' % sources)
         cb = self.mind.callRemote('connect', sources)
-        cb.addErrback(self.error_cb)
+        cb.addErrback(self.cb_checkAll)
         
 STATE_NULL     = 0
 STATE_STARTING = 1

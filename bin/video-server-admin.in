@@ -1,0 +1,24 @@
+#!/usr/bin/python
+# -*- Mode: Python -*-
+import os
+import sys
+sys.path.insert(0, '@PYGTK_DIR@')
+
+import pygtk
+pygtk.require('2.0')
+
+dir = os.path.dirname(os.path.abspath(__file__))
+if os.path.exists(os.path.join(dir, '.svn')):
+    root = os.path.split(dir)[0]
+    gladedir = os.path.join(root, 'data', 'ui')
+else:
+    root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
+    gladedir = os.path.join('@prefix@', 'share', 'flumotion', 'glade')
+sys.path.insert(0, root)
+
+from flumotion.gui import adminclient
+
+def main(args):
+    return adminclient.main(args, gladedir)
+
+sys.exit(main(sys.argv))

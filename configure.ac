@@ -42,6 +42,7 @@ dnl output stuff
 AC_OUTPUT(
 Makefile
 bin/flumotion
+bin/video-server-admin
 bin/Makefile
 data/Makefile
 data/ui/Makefile

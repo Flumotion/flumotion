@@ -152,7 +152,6 @@ class GstReactor(default.PosixReactorBase):
             self.doIterationTimer = None
 
     def crash(self):
-        print "DEBUG: gstreactor.py: crash"
         gst.main_quit()
 
     def run(self, installSignalHandlers=1):
@@ -161,7 +160,6 @@ class GstReactor(default.PosixReactorBase):
             self.simulate()
             gst.main()
         except KeyboardInterrupt:
-            print "DEBUG: gstreactor.py: Keyboard Interrupt, passing"
             pass
 
     def _doReadOrWrite(self, source, condition, faildict={

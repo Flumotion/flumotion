@@ -1,8 +1,25 @@
-import sys
-sys.path.insert(0, '../..')
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
 
-import pygtk
-pygtk.require('2.0')
+# Flumotion - a video streaming server
+# Copyright (C) 2004 Fluendo
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+import os
+import sys
 
 import gobject
 import gtk
@@ -37,12 +54,13 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
 gobject.type_register(AdminInterface)
 
 class Window:
-    def __init__(self, port):
+    def __init__(self, gladedir, port):
+        self.gladedir = gladedir
         self.connect(port)
         self.create_ui()
         
     def create_ui(self):
-        self.wtree = gtk.glade.XML('../../data/ui/admin.glade')
+        self.wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
         window = self.wtree.get_widget('main_window')
         window.connect('delete-event', self.close)
         window.show_all()
@@ -70,9 +88,11 @@ class Window:
 
     def close(self, *args):
         reactor.stop()
-        
-if __name__ == '__main__':
-    port = int(sys.argv[1])
-    win = Window(port)
-    
+
+def main(args, gladedir='../../data/ui'):
+    port = int(args[1])
+    win = Window(gladedir, port)
     reactor.run()
+    
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

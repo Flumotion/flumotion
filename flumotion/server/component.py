@@ -127,7 +127,8 @@ class BaseComponent(pb.Referenceable):
         sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
         self.pipeline_signals.append(sig_id)
         
-        sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
+        sig_id = self.pipeline.connect('deep-notify',
+                                       gstutils.verbose_deep_notify_cb, self)
         self.pipeline_signals.append(sig_id)
 
     def pipeline_pause(self):

@@ -22,7 +22,6 @@ import socket
 
 import gobject
 import gst
-from flumotion.utils import log
 
 def caps_repr(caps):
     value = str(caps)
@@ -32,7 +31,7 @@ def caps_repr(caps):
     else:
         return value
         
-def verbose_deep_notify_cb(object, orig, pspec):
+def verbose_deep_notify_cb(object, orig, pspec, component):
     value = orig.get_property(pspec.name)
     if pspec.value_type == gobject.TYPE_BOOLEAN:
         if value:
@@ -51,9 +50,9 @@ def verbose_deep_notify_cb(object, orig, pspec):
     if pspec.name == 'caps' and output == 'None':
         return
     
-    log.msg('%s: %s = %s' % (orig.get_path_string(),
-                             pspec.name,
-                             output))
+    component.msg('%s: %s = %s' % (orig.get_path_string(),
+                                   pspec.name,
+                                   output))
 
 # XXX: move this to a separate file
 def is_port_free(port):
