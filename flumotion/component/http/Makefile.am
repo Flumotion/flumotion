@@ -1,6 +1,7 @@
 component_PYTHON = \
 	__init__.py \
 	http.py \
+	http_resources.py \
 	gtk.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/http

@@ -10,6 +10,7 @@
       <property name="admin-password" type="string"/>
       <property name="maxclients" type="int"/>
       <property name="bouncer" type="string"/>
+      <property name="mount_point" type="string"/>
     </properties>
 <!--
     <ui style="gtk" type="control">
