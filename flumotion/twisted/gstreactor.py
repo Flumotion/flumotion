@@ -43,7 +43,7 @@ pygtk.require('2.0')
 __all__ = ['install']
 
 import gobject
-import sys, time
+import sys
 
 # Twisted Imports
 from twisted.python import log, threadable, runtime, failure
@@ -51,6 +51,9 @@ from twisted.internet.interfaces import IReactorFDSet
 
 # Sibling Imports
 from twisted.internet import main, default, error
+
+# log import
+from flumotion.common import log as flog
 
 reads = default.reads
 writes = default.writes
@@ -168,7 +171,6 @@ class GstReactor(default.PosixReactorBase):
             self.simulate()
             gst.main()
         except KeyboardInterrupt:
-            from flumotion.common import log as flog
             flog.debug('gstreactor', "KeyboardInterrupt in run()")
 
     def _doReadOrWrite(self, source, condition, faildict={
@@ -191,7 +193,6 @@ class GstReactor(default.PosixReactorBase):
                         if not source.disconnected and source.doWrite != didRead:
                             why = source.doWrite()
                 except KeyboardInterrupt:
-                    from flumotion.common import log as flog
                     flog.info('gstreactor', "KeyboardInterrupt in _doReadOrWrite")
             except:
                 why = sys.exc_info()[1]
@@ -212,7 +213,6 @@ class GstReactor(default.PosixReactorBase):
             log.callWithLogger(source, self._doReadOrWrite, source, condition)
             self.simulate() # fire Twisted timers
         except KeyboardInterrupt:
-            from flumotion.common import log as flog
             flog.info('gstreactor', "KeyboardInterrupt in callback")
             return 0
         
@@ -232,7 +232,6 @@ class GstReactor(default.PosixReactorBase):
             # grumble
             _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
         except KeyboardInterrupt:
-            from flumotion.common import log as flog
             flog.info('gstreactor', "KeyboardInterrupt in simulate()")
 
 

@@ -24,8 +24,6 @@
 Functions based on twisted.python.reflect
 """
 
-import md5
-
 from twisted.cred import checkers, credentials
 from twisted.cred.portal import IRealm, Portal
 from twisted.internet import protocol

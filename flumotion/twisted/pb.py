@@ -25,9 +25,6 @@ FPB Client Factory using keycards to log in.
 Inspired by L{twisted.spread.pb}
 """
 
-import crypt
-import md5
-
 from twisted.cred import checkers, credentials, error
 from twisted.cred.portal import IRealm, Portal
 from twisted.internet import protocol, defer

@@ -26,7 +26,7 @@ I am a collection of extended GTK widgets for use in Flumotion.
 
 import gtk
 import gtk.gdk
-import gtk.glade
+
 import gobject
 
 from flumotion.common import enum

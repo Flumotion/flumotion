@@ -122,7 +122,7 @@ def cryptChallenge():
     """
     crap = ''
     for x in range(random.randrange(15,25)):
-        crap = crap + chr(random.randint(65,90))
+        crap = crap + chr(random.randint(65,90) + x - x) # pychecker madness
     crap = md5.new(crap).digest()
     return crap
     

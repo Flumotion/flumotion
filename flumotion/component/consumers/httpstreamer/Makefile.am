@@ -4,7 +4,7 @@ component_PYTHON = \
 	__init__.py \
 	http.py \
 	resources.py \
-	gtk.py
+	admin_gtk.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/httpstreamer
 component_DATA = http.xml http.glade

@@ -32,17 +32,20 @@ coverage:
 # warning: couldn't find real module for class SSL.Error (module name: SSL)
 # which can't be turned off in pychecker
 
+#	    flumotion/component/*/*.py 		
+
 pychecker:
+	PYTHONPATH=`pwd`			\
 	pychecker -Q -F misc/pycheckerrc	\
+	    flumotion/component/*.py 		\
+	    flumotion/admin/*.py		\
 	    flumotion/common/*.py		\
 	    flumotion/configure/*.py		\
-	    flumotion/component/*.py 		\
-	    flumotion/component/*/*.py 		\
 	    flumotion/manager/*.py 		\
+	    flumotion/twisted/*.py 		\
 	    flumotion/worker/*.py 		\
 	    flumotion/ui/*.py			\
-	    flumotion/utils/*.py		\
-	2> /dev/null
+	    flumotion/utils/*.py 2> /dev/null
 
 fixme:
 	tools/fixme | less -R

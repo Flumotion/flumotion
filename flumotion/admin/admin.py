@@ -65,14 +65,18 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     __implements__ = interfaces.IAdminMedium,
 
+    # appease pychecker
+    _components = {}
+    clientFactory = None
+
     def __init__(self, username, password):
         self._components = {} # dict of components
         self._workers = []
         
         self.remote = None
 
-        self.__gobject_init__()
         self.clientFactory = fpb.ReconnectingFPBClientFactory()
+        self.__gobject_init__()
         # 20 secs max for an admin to reconnect
         self.clientFactory.maxDelay = 20
 
@@ -117,13 +121,13 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         return d
         
     def _connectionRefusedErrback(self, failure):
-        r = failure.trap(error.ConnectionRefusedError)
+        failure.trap(error.ConnectionRefusedError)
         self.debug("emitting connection-refused")
         self.emit('connection-refused')
         self.debug("emitted connection-refused")
 
     def _accessDeniedErrback(self, failure):
-        r = failure.trap(crederror.UnauthorizedLogin)
+        failure.trap(crederror.UnauthorizedLogin)
         # FIXME: unauthorized login emit !
         self.debug("emitting connection-refused")
         self.emit('connection-refused')
@@ -199,7 +203,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         @param componentName: name of component whose state has changed
         @param state:         new state of component
         """
-        self.emit('ui-state-changed', name, state)
+        self.emit('ui-state-changed', componentName, state)
         
     def remote_componentPropertyChanged(self, componentName, propertyName,
             value):

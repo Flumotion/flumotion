@@ -9,7 +9,7 @@
       <entries>
         <entry type="component" location="http.py"
                function="createComponent"/>
-        <entry type="admin/gtk" location="gtk.py"
+        <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass"/>
       </entries>
 
@@ -35,7 +35,7 @@
       <directories>
         <directory name="flumotion/component/consumers/httpstreamer">
           <filename location="http.glade" />
-          <filename location="gtk.py" />
+          <filename location="admin_gtk.py" />
         </directory>
       </directories>
     </bundle>

@@ -1,3 +1,18 @@
+2004-12-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
+	* flumotion/admin/admin.py:
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/gtk.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/twisted/credentials.py:
+	* flumotion/twisted/gstreactor.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/reflect.py:
+	* flumotion/ui/fgtk.py:
+	* misc/pycheckerrc:
+	  various error fixing and pychecker stuff
+
 2004-12-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:
