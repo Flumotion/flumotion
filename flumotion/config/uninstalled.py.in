@@ -26,8 +26,9 @@ def get():
 
     return {
         'installed': 0,
-        'pythondir': os.path.join(__toplevel),
-        'datadir': os.path.join(__toplevel, 'data'),
-        'gladedir':   os.path.join(__toplevel, 'data', 'glade'),
-        'imagedir':   os.path.join(__toplevel, 'data', 'image'),
+        'pythondir':   os.path.join(__toplevel),
+        'datadir':     os.path.join(__toplevel, 'data'),
+        'gladedir':    os.path.join(__toplevel, 'data', 'glade'),
+        'imagedir':    os.path.join(__toplevel, 'data', 'image'),
+        'registrydir': os.path.join(__toplevel, 'data', 'registry'),
     }

@@ -1,3 +1,19 @@
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* autogen.sh:
+	* configure.ac:
+	  remove autoheader and related things
+	* data/Makefile.am:
+	* data/registry/Makefile.am:
+	  remove
+	* data/registry/basecomponents.xml:
+	* flumotion/config/installed.py.in:
+	* flumotion/config/uninstalled.py.in:
+	  add registrydir config setting
+	  put installed version in homedir
+	* flumotion/manager/registry.py:
+	  change to components.xml
+
 2004-09-08  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/manager/admin.py (AdminHeaven): 

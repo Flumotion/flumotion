@@ -286,7 +286,7 @@ class ComponentRegistry(log.Loggable):
     logCategory = 'registry'
 
     """Registry, this is normally not instantiated."""
-    filename = os.path.join(config.datadir, 'registry', 'basecomponents.xml')
+    filename = os.path.join(config.registrydir, 'components.xml')
     def __init__(self):
         self.components = {}
 

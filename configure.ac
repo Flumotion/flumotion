@@ -3,7 +3,7 @@ AC_INIT(README)
 AS_VERSION(flumotion, FLUMOTION, 0, 0, 0, 1)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 
-AM_CONFIG_HEADER(config.h)
+dnl AM_CONFIG_HEADER(config.h)
 
 AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
@@ -54,7 +54,6 @@ bin/Makefile
 data/Makefile
 data/glade/Makefile
 data/image/Makefile
-data/registry/Makefile
 flumotion/Makefile
 flumotion/common/Makefile
 flumotion/component/Makefile

@@ -21,8 +21,9 @@ import os
 def get():
     return {
         'installed': 1,
-        'pythondir': os.path.join('@DATADIR@', 'flumotion'),
-        'datadir': os.path.join('@DATADIR@', 'flumotion'),
-        'gladedir':   os.path.join('@DATADIR@', 'flumotion', 'glade'),
-        'imagedir':   os.path.join('@DATADIR@', 'flumotion', 'image'),
+        'pythondir':   os.path.join('@DATADIR@', 'flumotion'),
+        'datadir':     os.path.join('@DATADIR@', 'flumotion'),
+        'gladedir':    os.path.join('@DATADIR@', 'flumotion', 'glade'),
+        'imagedir':    os.path.join('@DATADIR@', 'flumotion', 'image'),
+        'registrydir': os.path.join(os.environ['HOME'], '.flumotion')
     }
