@@ -20,6 +20,7 @@
 import sys
 import optik
 import socket
+import time
 
 import gst
 import gobject
@@ -31,6 +32,20 @@ from twisted.spread import pb
 import pbutil
 import gstutils
 
+class ClientFactory(pbutil.ReconnectingPBClientFactory):
+    __super_init = pbutil.ReconnectingPBClientFactory.__init__
+    __super_login = pbutil.ReconnectingPBClientFactory.startLogin
+    def __init__(self, component):
+        self.__super_init()
+        self.component = component
+        
+    def login(self, username):
+        self.__super_login(pbutil.Username(username),
+                           client=self.component)
+
+    def gotPerspective(self, perspective):
+        self.component.remote = perspective
+        
 class BaseComponent(pb.Referenceable):
     def __init__(self, name, sources, host, port, pipeline_string=''):
         self.component_name = name
@@ -42,20 +57,14 @@ class BaseComponent(pb.Referenceable):
         self.pipeline_signals = []
         self.pipeline_string = self.get_pipeline(pipeline_string)
         print 'pipeline: %s' % self.pipeline_string
+
+        username = '%s_%s' % (self.getName(), name)
+        factory = ClientFactory(self)
+        reactor.connectTCP(host, port, factory)
         
         # Prefix our login name with the name of the component
-        username = '%s_%s' % (self.getName(), name)
-
-        log.msg('Connecting to controller %s:%d' % (host, port))
-        factory = pb.PBClientFactory()
-        reactor.connectTCP(host, port, factory)
-        defered = factory.login(pbutil.Username(username), client=self)
-        defered.addCallback(self.got_perspective_cb)
-
-    def got_perspective_cb(self, perspective):
-        #reactor.callLater(2, setattr, self, 'persp', persp)
-        self.remote = perspective
-
+        factory.login(username)
+        
     def hasPerspective(self):
         return self.remote != None
 
