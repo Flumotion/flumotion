@@ -1,3 +1,11 @@
+2004-09-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/http/http.py:
+	  disable idle_add from other threads for now; we run into GIL
+	  lock stalls.  An idea might be to just set a self.changed boolean
+	  and have a callLater from the main thread repeatedly check and
+	  signal ui changed.
+
 2004-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/http/http.py:

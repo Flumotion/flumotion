@@ -610,7 +610,9 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     # this can be called from both application and streaming thread !
     def client_added_cb(self, sink, fd):
         self.log('client_added_cb from thread %d' % thread.get_ident()) 
-        gobject.idle_add(self.client_added_idle)
+        # FIXME: GIL problem, just call directly for now without remote calls
+        #gobject.idle_add(self.client_added_idle)
+        self.client_added_idle()
 
     # this can be called from both application and streaming thread !
     def client_removed_cb(self, sink, fd, reason):
@@ -618,13 +620,16 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         self.log('[fd %5d] client_removed_cb, reason %s' % (fd, reason))
         stats = sink.emit('get-stats', fd)
         self.log('[fd %5d] client_removed_cb, got stats' % fd)
-        gobject.idle_add(self.client_removed_idle, sink, fd, reason, stats)
+        # FIXME: GIL problem, just call directly for now without remote calls
+        #gobject.idle_add(self.client_removed_idle, sink, fd, reason, stats)
+        self.client_removed_idle(sink, fd, reason, stats)
 
     ### END OF THREAD-AWARE CODE
 
     def client_added_idle(self):
         Stats.clientAdded(self)
-        self.update_ui_state()
+        # FIXME: GIL problem, don't update UI for now
+        #self.update_ui_state()
         
     def client_removed_idle(self, sink, fd, reason, stats):
         # Johan will trap GST_CLIENT_STATUS_ERROR here someday
@@ -632,7 +637,8 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         self.log('[fd %5d] client_removed_idle, reason %s' % (fd, reason))
         self.emit('client-removed', sink, fd, reason, stats)
         Stats.clientRemoved(self)
-        self.update_ui_state()
+        # FIXME: GIL problem, don't update UI for now
+        #self.update_ui_state()
         # actually close it - needs gst-plugins 0.8.5 of multifdsink
         self.debug('[fd %5d] closing' % fd)
         try:
