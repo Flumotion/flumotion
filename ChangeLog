@@ -1,3 +1,12 @@
+2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
+	* configure.ac:
+	* pkgconfig/Makefile.am:
+	* pkgconfig/flumotion-uninstalled.pc.in:
+	* pkgconfig/flumotion.pc.in:
+	  adding .pc files
+
 2004-11-04  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_soundcard.glade:

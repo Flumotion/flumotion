@@ -1,0 +1,9 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+flumotiondir=${libdir}/flumotion/python/flumotion
+
+Name: Flumotion
+Description: Streaming media server
+Requires: gstreamer-0.8 >= @GST_REQ@
+Version: @VERSION@

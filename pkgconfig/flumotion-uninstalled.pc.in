@@ -1,0 +1,9 @@
+# the standard variables don't make sense for an uninstalled copy
+prefix=
+exec_prefix=
+flumotiondir=${pcfiledir}/../flumotion
+
+Name: Flumotion Uninstalled
+Description: Streaming media server, Not Installed
+Version: @VERSION@
+Requires: gstreamer-0.8 >= @GST_REQ@

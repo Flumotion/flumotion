@@ -146,5 +146,8 @@ m4/Makefile
 conf/Makefile
 doc/Makefile
 doc/reference/Makefile
+pkgconfig/Makefile
+pkgconfig/flumotion.pc
+pkgconfig/flumotion-uninstalled.pc
 flumotion.spec
 )

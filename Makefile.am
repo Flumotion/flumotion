@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip 1.8
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = . bin conf data flumotion doc m4
+SUBDIRS = . bin conf data flumotion doc m4 pkgconfig
 
 EXTRA_DIST = \
 	LICENSE.GPL \
