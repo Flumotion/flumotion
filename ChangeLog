@@ -1,6 +1,12 @@
-2004-10-19  Johan Dahlin  <johan@gnome.org>
+2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
-	reviewed by: <delete if not using a buddy>
+	* NEWS:
+	* README:
+	* data/glade/wizard_summary.glade:
+	  adding README
+	  changing ending
+
+2004-10-19  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:
 	* flumotion/common/common.py:

@@ -1,6 +1,21 @@
-Flumotion - a video streaming server.
+Flumotion - your streaming media server
 
-0.1.0 - "Agua"
+WHAT IT IS
+----------
+Flumotion is a streaming media server based on GStreamer and Twisted.
+
+This is the first public release of Flumotion.
+It will probably still contain bugs, be difficult to install (since
+you need recent dependencies), and cause you some headaches.
+
+On the other hand, when it works and you are capturing your Firewire camera
+on one machine, encoding to Theora on a second (with an overlay, of course), 
+encoding the audio to Vorbis on a third, muxing to Ogg on a fourth, and then
+streaming both audio and video from a fifth, audio only from a sixth,
+video only from a seventh, and capturing all three streams to disk from
+an eigth, you feel very good about yourself.
+
+And you also have too many computers.
 
 REQUIREMENTS
 ------------
@@ -20,14 +35,9 @@ libvorbis 1.0.1 or higher
 libogg 1.1 or higher
 libtheora 1.0alpha3 or higher
 
-HACKING
--------
-You can use jhbuild with the flu.modules and jhbuildrc file provided in misc/
-
-This will set up everything except for Twisted for you from source.
-
 A FIRST TEST
 ------------
+
 Once everything is built,
 you can try this to start the server:
 
@@ -59,8 +69,17 @@ terminal 5:
   This will throw 10 processes with 100 clients each at the server.  Hopefully,
   all of them will return success at the end of their run !
 
+HACKING
+-------
+
+You can use jhbuild with the flu.modules and jhbuildrc file provided in misc/
+
+This will set up everything except for Twisted for you from source.
+
+
 ABOVE AND BEYOND
 ----------------
+
 You can subscribe to our development list.  Information is at
 http://lists.fluendo.com/mailman/listinfo/flumotion-devel
 
