@@ -1,3 +1,12 @@
+2004-11-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/pb.py:
+	  make reconnecting client factory
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	  use reconnecting client factory and add a dialog for when the
+	  manager goes away
+
 2004-11-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/wizard_jpeg.glade:

@@ -112,6 +112,8 @@ class Window(log.Loggable, gobject.GObject):
         self._connectToManager(host, port, transport, username, password)
         self.create_ui()
         self.current_component = None # the component we're showing UI for
+        self._disconnected_dialog = None # set to a dialog if we're
+                                            # disconnected
         
     # default Errback
     def _defaultErrback(self, failure):
@@ -253,8 +255,32 @@ class Window(log.Loggable, gobject.GObject):
         d.addCallback(cb_gotUI)
 
     def admin_connected_cb(self, admin):
+        if self._disconnected_dialog:
+            self._disconnected_dialog.destroy()
+            self._disconnected_dialog = None
+
         self.update_components()
         self.emit('connected')
+
+    def admin_disconnected_cb(self, admin):
+        message = "Lost connection to manager, reconnecting ..."
+        d = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT,
+            gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, message)
+        # FIXME: move this somewhere
+        RESPONSE_REFRESH = 1
+        d.add_button(gtk.STOCK_REFRESH, RESPONSE_REFRESH)
+        d.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        d.connect("response", self._dialog_disconnected_response_cb)
+        d.show_all()
+        self._disconnected_dialog = d
+
+    def _dialog_disconnected_response_cb(self, dialog, id):
+        if id == gtk.RESPONSE_CANCEL:
+            # FIXME: notify admin of cancel
+            dialog.destroy()
+            return
+        elif id == 1:
+            self.admin.reconnect()
         
     def admin_connection_refused_later(self, host, port):
         message = "Connection to manager on %s:%d was refused." % (host, port)
@@ -285,6 +311,7 @@ class Window(log.Loggable, gobject.GObject):
         'connect to manager using given options.  Called by __init__'
         self.admin = AdminModel(username, password)
         self.admin.connect('connected', self.admin_connected_cb)
+        self.admin.connect('disconnected', self.admin_disconnected_cb)
         self.admin.connect('connection-refused',
                            self.admin_connection_refused_cb, host, port)
         self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)

@@ -41,118 +41,7 @@ from flumotion.twisted import reflect as freflect
 from flumotion.twisted import credentials as fcredentials
 
 # TODO:
-#   subclass FPBClientFactory
 #   merge FMCF back into twisted
-#
-class ReconnectingPBClientFactory(PBClientFactory,
-                                  protocol.ReconnectingClientFactory):
-    """Reconnecting client factory for PB brokers.
-
-    Like PBClientFactory, but if the connection fails or is lost, the factory
-    will attempt to reconnect.
-
-    Instead of using f.getRootObject (which gives a Deferred that can only
-    be fired once), override the gotRootObject method.
-
-    Instead of using the newcred f.login (which is also one-shot), call
-    f.startLogin() with the credentials and client, and override the
-    gotPerspective method.
-
-    Instead of using the oldcred f.getPerspective (also one-shot), call
-    f.startGettingPerspective() with the same arguments, and override
-    gotPerspective.
-
-    gotRootObject and gotPerspective will be called each time the object is
-    received (once per successful connection attempt). You will probably want
-    to use obj.notifyOnDisconnect to find out when the connection is lost.
-
-    If an authorization error occurs, failedToGetPerspective() will be
-    invoked.
-
-    To use me, subclass, then hand an instance to a connector (like
-    TCPClient).
-    """
-
-    def __init__(self):
-        PBClientFactory.__init__(self)
-        self._doingLogin = False
-        self._doingGetPerspective = False
-        
-    def clientConnectionFailed(self, connector, reason):
-        PBClientFactory.clientConnectionFailed(self, connector, reason)
-        RCF = protocol.ReconnectingClientFactory
-        RCF.clientConnectionFailed(self, connector, reason)
-
-    def clientConnectionLost(self, connector, reason):
-        PBClientFactory.clientConnectionLost(self, connector, reason,
-                                             reconnecting=True)
-        RCF = protocol.ReconnectingClientFactory
-        RCF.clientConnectionLost(self, connector, reason)
-
-    def clientConnectionMade(self, broker):
-        self.resetDelay()
-        PBClientFactory.clientConnectionMade(self, broker)
-        if self._doingLogin:
-            self.doLogin(self._root)
-        if self._doingGetPerspective:
-            self.doGetPerspective(self._root)
-        self.gotRootObject(self._root)
-
-    def __getstate__(self):
-        # this should get folded into ReconnectingClientFactory
-        d = self.__dict__.copy()
-        d['connector'] = None
-        d['_callID'] = None
-        return d
-
-    # oldcred methods are removed
-
-    # newcred methods
-
-    def login(self, *args):
-        raise RuntimeError, "login is one-shot: use startLogin instead"
-
-    def startLogin(self, credentials, avatarId, client, *interfaces):
-        if not pb.IPerspective in interfaces:
-            interfaces += (pb.IPerspective,)
-        self._interfaces = [reflect.qual(interface)
-                               for interface in interfaces]
-        self._credentials = credentials
-        self._avatarId = avatarId
-        self._client = client
-        
-        self._doingLogin = True
-        
-    def doLogin(self, root):
-        # newcred login()
-        d = self._cbSendUsername(root,
-                                 self._credentials.username,
-                                 self._credentials.password,
-                                 self._avatarId,
-                                 self._client,
-                                 self._interfaces)
-        d.addCallbacks(self.gotPerspective, self.failedToGetPerspective)
-
-    def _cbSendUsername(self, root, username, password, avatarId, client, interfaces):
-        return root.callRemote("login", username, avatarId, *interfaces).addCallback(
-            self._cbResponse, password, client)
-
-    # methods to override
-
-    def gotPerspective(self, perspective):
-        """The remote avatar or perspective (obtained each time this factory
-        connects) is now available."""
-        pass
-
-    def gotRootObject(self, root):
-        """The remote root object (obtained each time this factory connects)
-        is now available. This method will be called each time the connection
-        is established and the object reference is retrieved."""
-        pass
-
-    def failedToGetPerspective(self, why):
-        self.stopTrying() # logging in harder won't help
-        log.err(why)
 
 ### Keycard-based FPB objects
 
@@ -165,16 +54,14 @@ class ReconnectingPBClientFactory(PBClientFactory,
 # an avatarId
 # this way you can request a different avatarId than the user you authenticate
 # with, or you can login without a username
+
 class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     logcategory = "FPBClientFactory"
 
-    def _cbSendUsername(self, root, username, password, avatarId, client, interfaces):
-        self.warning("you really want to use cbSendKeycard")
-
-        
     def login(self, keycard, client=None, *interfaces):
         """
-        Login and get perspective from remote PB server.
+        Login, respond to challenges, and eventually get perspective
+        from remote PB server.
 
         Currently only credentials implementing IUsernamePassword are
         supported.
@@ -192,11 +79,17 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         d.addCallback(self._cbSendKeycard, keycard, client, interfaces)
         return d
 
+    # we are a different kind of PB client, so warn
+    def _cbSendUsername(self, root, username, password, avatarId, client, interfaces):
+        self.warning("you really want to use cbSendKeycard")
+
+        
     def _cbSendKeycard(self, root, keycard, client, interfaces, count=0):
         self.debug("_cbSendKeycard(root=%r, keycard=%r, client=%r, interfaces=%r, count=%d" % (root, keycard, client, interfaces, count))
         count = count + 1
         d = root.callRemote("login", keycard, client, *interfaces)
-        return d.addCallback(self._cbLoginCallback, root, client, interfaces, count)
+        return d.addCallback(self._cbLoginCallback, root, client, interfaces,
+            count)
 
     # we can get either a keycard, None (?) or a remote reference
     def _cbLoginCallback(self, result, root, client, interfaces, count):
@@ -215,12 +108,65 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         # must be a keycard
         keycard = result
         if not keycard.state == keycards.AUTHENTICATED:
-            self.debug("FPBClientFactory(): requester needs to resend %r" % keycard)
+            self.debug("FPBClientFactory(): requester needs to resend %r" %
+                keycard)
             return keycard
-            #return self._cbSendKeycard(root, keycard, client, interfaces, count)
 
         self.debug("FPBClientFactory(): authenticated %r" % keycard)
         return keycard
+
+class ReconnectingFPBClientFactory(FPBClientFactory,
+                                   protocol.ReconnectingClientFactory):
+    """
+    Reconnecting client factory for FPB brokers.
+
+    Users of this factory call startLogin to start logging in.
+    Override getLoginDeferred to get a handle to the deferred returned
+    from the PB server.
+    """
+
+    def __init__(self):
+        FPBClientFactory.__init__(self)
+        self._doingLogin = False
+        self._doingGetPerspective = False
+        
+    def clientConnectionFailed(self, connector, reason):
+        FPBClientFactory.clientConnectionFailed(self, connector, reason)
+        RCF = protocol.ReconnectingClientFactory
+        RCF.clientConnectionFailed(self, connector, reason)
+
+    def clientConnectionLost(self, connector, reason):
+        FPBClientFactory.clientConnectionLost(self, connector, reason,
+                                             reconnecting=True)
+        RCF = protocol.ReconnectingClientFactory
+        RCF.clientConnectionLost(self, connector, reason)
+
+    def clientConnectionMade(self, broker):
+        self.resetDelay()
+        FPBClientFactory.clientConnectionMade(self, broker)
+        if self._doingLogin:
+            d = self.login(self._keycard, self._client, *self._interfaces)
+            self.gotDeferredLogin(d)
+
+    def startLogin(self, keycard, client=None, *interfaces):
+        # store login info
+        self._keycard = keycard
+        self._client = client
+        self._interfaces = interfaces
+
+        self._doingLogin = True
+        
+    # methods to override
+
+    def gotDeferredLogin(self, deferred):
+        """
+        The deferred from login is now available.
+        """
+        raise NotImplementedError
+
+    #def failedToGetPerspective(self, why):
+    #    self.stopTrying() # logging in harder won't help
+
 
 ### FIXME: this code is an adaptation of twisted/spread/pb.py
 # it allows you to login to a FPB server requesting interfaces other than

@@ -51,6 +51,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     Manager calls on us through L{flumotion.manager.admin.AdminAvatar}
     """
     gsignal('connected')
+    gsignal('disconnected')
     gsignal('connection-refused')
     gsignal('ui-state-changed', str, object)
     gsignal('reloading', str)
@@ -61,8 +62,16 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     __implements__ = interfaces.IAdminMedium,
 
     def __init__(self, username, password):
+        self._components = {} # dict of components
+        self._workers = []
+        
+        self.remote = None
+
         self.__gobject_init__()
-        self.clientFactory = fpb.FPBClientFactory()
+        self.clientFactory = fpb.ReconnectingFPBClientFactory()
+        # 20 secs max for an admin to reconnect
+        self.clientFactory.maxDelay = 20
+
         self.debug("logging in to ClientFactory")
 
         # FIXME: one without address maybe ? or do we want manager to set it ?
@@ -73,17 +82,21 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         # FIXME: decide on an admin name ?
         keycard.avatarId = "admin"
  
-        d = self.clientFactory.login(keycard, self, interfaces.IAdminMedium)
-        # add a callback to respond to the challenge
-        d.addCallback(self._loginCallback, password)
-        d.addCallback(self.setRemoteReference)
-        d.addErrback(self._accessDeniedErrback)
-        d.addErrback(self._connectionRefusedErrback)
-        d.addErrback(self._defaultErrback)
-        self._components = {} # dict of components
-        self._workers = []
-        
-        self.remote = None
+        # start logging in
+        self.clientFactory.startLogin(keycard, self, interfaces.IAdminMedium)
+
+        # override gotDeferredLogin so we can add callbacks.
+        def gotDeferredLogin(d):
+            # add a callback to respond to the challenge
+            d.addCallback(self._loginCallback, password)
+            d.addCallback(self.setRemoteReference)
+            d.addErrback(self._accessDeniedErrback)
+            d.addErrback(self._connectionRefusedErrback)
+            d.addErrback(self._defaultErrback)
+
+        # if this ever breaks, do real subclassing
+        self.clientFactory.gotDeferredLogin = gotDeferredLogin
+
 
     ### our methods
     def _loginCallback(self, result, password):
@@ -122,6 +135,12 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     def setRemoteReference(self, remoteReference):
         self.debug("setRemoteReference: %s" % remoteReference)
         self.remote = remoteReference
+        self.remote.notifyOnDisconnect(self._remoteDisconnected)
+
+    def _remoteDisconnected(self, remoteReference):
+        self.debug("emitting disconnected")
+        self.emit('disconnected')
+        self.debug("emitted disconnected")
 
     def hasRemoteReference(self):
         return self.remote is not None
@@ -175,6 +194,11 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.emit('ui-state-changed', name, state)
         
     ### model functions
+    def reconnect(self):
+        self.debug('asked to log in again')
+        self.clientFactory.resetDelay()
+        #self.clientFactory.retry(self.clientFactory.connector)
+        
     def setProperty(self, component, element, property, value):
         if not self.remote:
             self.warning('No remote object')
