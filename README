@@ -40,6 +40,16 @@ And if you want to build documentation:
 
 epydoc
 
+ISSUES
+------
+Some issues have been brought to our attention.  Please take note if you
+run into them:
+- locales with a comma as a decimal point trigger problems in the XML parsing.
+  Run with LANG=C if you run into this
+- When encoding to Vorbis, prefer to use quality instead of absolute bitrate.
+  For absolute bitrate, for each sample rate a limited range of bitrates is
+  allowed.
+
 A FIRST TEST
 ------------
 

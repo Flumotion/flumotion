@@ -1,4 +1,13 @@
-This is Flumotion 0.1.2, "Belchica".
+This is Flumotion 0.1.3, "Belchica Reloaded".
+
+Issues fixed since 0.1.2:
+
+ticket  summary
+71      Final button in wizard should be "Done" instead of "Quit"
+92      Worker hangs/crash on sound device selection
+98      Getting assertion error when selecting bttv card on thread as its gives 
+	me soundcard
+101     soundcard producer was broken
 
 Issues fixed since 0.1.1:
 
