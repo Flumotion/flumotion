@@ -1,0 +1,6 @@
+Managing state of the planet inside the manager
+
+- "planet" object is a "tree" object
+- mirroring the planet config format
+- planet contains manager and atmosphere objects and a flows dict
+- flows dict contains flow lists
