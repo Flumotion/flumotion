@@ -517,7 +517,7 @@ class HTTP(wizard.WizardStep):
     component_type = 'http-streamer'
 
     start_port = 8800
-    ports = range(start_port+6, start_port, -1)
+    ports = range(start_port+2, start_port-1, -1)
 
     def setup(self):
         self.spinbutton_port.set_value(self.get_port())

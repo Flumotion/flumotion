@@ -32,8 +32,8 @@ class Component:
         if len(self.eaters) == 1:
             s += '      <feed>default</feed>\n'
         else:
-            for feed_name in self.eaters:
-                s += "      <feed>%s</feed>\n" % source.feed_name
+            for feed in self.eaters:
+                s += "      <feed>%s</feed>\n" % feed.name
                 
         for source in self.feeders:
             s += "      <source>%s</source>\n" % source.name
