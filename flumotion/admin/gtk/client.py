@@ -165,19 +165,20 @@ class Window(log.Loggable, gobject.GObject):
     # FIXME: this method uses a file and a methodname as entries
     # FIXME: do we want to switch to imports instead so the whole file
     # is available in its namespace ?
-    def show_component(self, name, methodName, filepath, data):
+    def show_component(self, state, methodName, filepath, data):
         """
         Show the user interface for this component.
         Searches data for the given methodName global,
         then instantiates an object from that class,
         and calls the render() method.
 
-        @param name: name to give to the instantiated object.
-        @param data: the python code to load.
+        @type  state: L{flumotion.common.planet.AdminComponentState}
+        @param data:  the python code to load.
         """
         # methodName has historically been GUIClass
         instance = None
 
+        name = state.get('name')
         self.statusbar.set('main', "Loading UI for %s ..." % name)
         if data:
             # we create a temporary module that we import from so code
@@ -231,7 +232,7 @@ class Window(log.Loggable, gobject.GObject):
             # instantiate the GUIClass, giving ourself as the first argument
             # FIXME: we cheat by giving the view as second for now,
             # but let's decide for either view or model
-            instance = klass(name, self.admin, self)
+            instance = klass(state, self.admin, self)
             self.debug("Created entry instance %r" % instance)
             instance.setup()
             nodes = instance.getNodes()
@@ -509,10 +510,10 @@ class Window(log.Loggable, gobject.GObject):
             data = handle.read()
             handle.close()
             # FIXME: is name (of component) needed ?
-            self.debug("showing admin UI for component")
+            self.debug("showing admin UI for component %s" % name)
             # callLater to avoid any errors going to our errback
             reactor.callLater(0, self.show_component,
-                name, methodName, filepath, data)
+                state, methodName, filepath, data)
 
         def gotEntryNoBundleErrback(failure):
             failure.trap(errors.NoBundleError)
@@ -542,7 +543,7 @@ class Window(log.Loggable, gobject.GObject):
                       
         self.statusbar.set('main', "Requesting UI for %s ..." % name)
 
-        d = self.admin.getEntry(name, 'admin/gtk')
+        d = self.admin.getEntry(state, 'admin/gtk')
         d.addCallback(gotEntryCallback)
         d.addErrback(gotEntryNoBundleErrback)
         d.addErrback(gotEntrySleepingComponentErrback)
@@ -599,18 +600,18 @@ class Window(log.Loggable, gobject.GObject):
             self.debug('got value %r' % value)
             dialog.update_value_entry(value)
             
-        def dialog_set_cb(dialog, element, property, value):
-            cb = self.admin.setProperty(name, element, property, value)
+        def dialog_set_cb(dialog, element, property, value, state):
+            cb = self.admin.setProperty(state, element, property, value)
             cb.addErrback(propertyErrback)
-        def dialog_get_cb(dialog, element, property):
-            cb = self.admin.getProperty(name, element, property)
+        def dialog_get_cb(dialog, element, property, state):
+            cb = self.admin.getProperty(state, element, property)
             cb.addCallback(after_getProperty, dialog)
             cb.addErrback(propertyErrback)
         
         name = state.get('name')
         d = dialogs.PropertyChangeDialog(name, self.window)
-        d.connect('get', dialog_get_cb)
-        d.connect('set', dialog_set_cb)
+        d.connect('get', dialog_get_cb, state)
+        d.connect('set', dialog_set_cb, state)
         d.run()
 
     def _component_reload(self, state):

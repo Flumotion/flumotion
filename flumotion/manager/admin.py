@@ -29,7 +29,7 @@ from twisted.spread import pb
 from twisted.python import failure
 
 from flumotion.manager import base
-from flumotion.common import errors, interfaces, log
+from flumotion.common import errors, interfaces, log, planet
 from flumotion.common.registry import registry
 
 # make ComponentState proxyable
@@ -89,15 +89,22 @@ class AdminAvatar(base.ManagerAvatar):
         raise SystemExit
 
     # Generic interface to call into a component
-    def perspective_componentCallRemote(self, componentName, methodName,
+    def perspective_componentCallRemote(self, componentState, methodName,
                                         *args, **kwargs):
-        component = self.vishnu.componentHeaven.getComponent(componentName)
+        """
+        Call a method on the given component on behalf of an admin client.
+        
+        @type componentState: L{flumotion.common.planet.ManagerComponentState}
+        """
+        assert isinstance(componentState, planet.ManagerComponentState)
+
+        m = self.vishnu.getComponentMapper(componentState)
+        avatar = m.avatar
         
         # XXX: Maybe we need to have a prefix, so we can limit what an
         # admin interface can call on a component
-        
         try:
-            return component.mindCallRemote(methodName, *args, **kwargs)
+            return avatar.mindCallRemote(methodName, *args, **kwargs)
         except Exception, e:
             msg = "exception on remote call %s: %s" % (methodName, str(e))
             self.warning(msg)
@@ -145,20 +152,21 @@ class AdminAvatar(base.ManagerAvatar):
             self.warning(str(exception))
             raise
 
-    def perspective_getEntryByType(self, componentName, type):
+    def perspective_getEntryByType(self, componentState, type):
         """
         Get the entry point for a piece of bundled code by the type.
 
         Returns: a (filename, methodName) tuple, or raises a Failure.
         """
-        if not self.vishnu.componentHeaven.hasAvatar(componentName):
+        m = self.vishnu.getComponentMapper(componentState)
+        componentName = componentState.get('name')
+
+        if not m.avatar:
             self.debug('component %s not logged in yet, no entry' %
                 componentName)
             raise errors.SleepingComponentError(componentName)
 
-        componentAvatar = self.vishnu.componentHeaven.getComponent(
-            componentName)
-        componentType = componentAvatar.getType()
+        componentType = m.avatar.getType()
         self.debug('getting entry of type %s for component %s of type %s' % (
             type, componentName, componentType))
         try:

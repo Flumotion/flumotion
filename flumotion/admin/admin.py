@@ -297,25 +297,37 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
             raise errors.ManagerNotConnectedError
         return self.remote.callRemote(methodName, *args, **kwargs)
 
-    def componentCallRemote(self, componentName, methodName, *args, **kwargs):
+    def componentCallRemote(self, componentState, methodName, *args, **kwargs):
         """
-        Call the the given method on the given component with the given args.
+        Call the given method on the given component with the given args.
 
-        @param componentName: name of the component to call the method on
-        @param methodName:    name of method to call; serialized to a
-                              remote_methodName on the worker's medium
+        @param componentState: component to call the method on
+        @type  componentState: L{flumotion.common.planet.AdminComponentState}
+        @param methodName:     name of method to call; serialized to a
+                               remote_methodName on the worker's medium
                            
         @rtype: L{twisted.internet.defer.Deferred}
         """
+        assert isinstance(componentState, planet.AdminComponentState), \
+            "componentState %r is of the wrong type calling %s" % (
+                componentState, methodName)
+        componentName = componentState.get('name')
+
         self.debug('Calling remote method %s on component %s' % (
             methodName, componentName))
         d = self.callRemote('componentCallRemote',
-                            componentName, methodName,
+                            componentState, methodName,
                             *args, **kwargs)
+        d.addCallback(self._callRemoteCallback, methodName, componentName)
         d.addErrback(self._callRemoteErrback, "component",
                      componentName, methodName)
         return d
 
+    def _callRemoteCallback(self, result, methodName, componentName):
+        self.debug('Called remote method %s on component %s successfully' % (
+            methodName, componentName))
+        return result
+    
     def workerCallRemote(self, workerName, methodName, *args, **kwargs):
         """
         Call the the given method on the given worker with the given args.
@@ -348,10 +360,16 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
 
     ## component remote methods
     def setProperty(self, component, element, property, value):
+        """
+        @type  component: L{flumotion.common.planet.AdminComponentState}
+        """
         return self.componentCallRemote(component, 'setElementProperty',
                                         element, property, value)
 
     def getProperty(self, component, element, property):
+        """
+        @type  component: L{flumotion.common.planet.AdminComponentState}
+        """
         return self.componentCallRemote(component, 'getElementProperty',
                                         element, property)
 
@@ -419,7 +437,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
 
     # function to get remote code for admin parts
     # FIXME: rename slightly ?
-    def getEntry(self, componentName, type):
+    def getEntry(self, componentState, type):
         """
         Do everything needed to set up the entry point for the given
         component and type, including transferring and setting up bundles.
@@ -429,13 +447,13 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         Returns: a deferred returning (entryPath, filename, methodName)
         """
         
-        def _getEntryCallback(result, componentName, type):
+        def _getEntryCallback(result, componentState, type):
             # callback for getting the entry.  Will request bundle sums
             # based on filename given to me
             self.debug('_getEntryCallback: result %r' % (result, ))
 
             filename, methodName = result
-            self.debug("entry point for %s of type %s is in file %s and method %s" % (componentName, type, filename, methodName))
+            self.debug("entry point for %r of type %s is in file %s and method %s" % (componentState, type, filename, methodName))
             # request bundle sums
             d = self.callRemote('getBundleSumsByFile', filename)
             d.addCallback(_getBundleSumsCallback, filename, methodName)
@@ -516,8 +534,8 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
             return retval
 
         # start chain
-        d = self.callRemote('getEntryByType', componentName, type)
-        d.addCallback(_getEntryCallback, componentName, type)
+        d = self.callRemote('getEntryByType', componentState, type)
+        d.addCallback(_getEntryCallback, componentState, type)
         # our caller should handle errbacks
         # d.addErrback(self._defaultErrback)
         return d

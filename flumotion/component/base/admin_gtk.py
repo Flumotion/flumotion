@@ -33,18 +33,21 @@ class BaseAdminGtk(log.Loggable):
 
     logCategory = "admingtk"
     
-    def __init__(self, name, admin, view):
+    def __init__(self, state, admin, view):
         """
-        @type  name:  string
+        @param state: state of component this is a UI for
+        @type  state: L{flumotion.common.planet.AdminComponentState}
         @param name:  name of the component this is a UI for
         @type  admin: L{flumotion.admin.admin.AdminModel}
         @param admin: the admin model that interfaces with the manager for us
         @type  view:   
         @param view:  the toolkit view we are embedded in
         """
-        self.name = name
+        self.state = state
+        self.name = state.get('name')
         self.admin = admin
         self.view = view
+        self.debug('creating admin gtk for state %r' % state)
         
     def propertyErrback(self, failure, window):
         failure.trap(errors.PropertyError)
@@ -56,7 +59,7 @@ class BaseAdminGtk(log.Loggable):
         """
         Set the given property on the element with the given name.
         """
-        d = self.admin.setProperty(self.name, elementName, propertyName, value)
+        d = self.admin.setProperty(self.state, elementName, propertyName, value)
         d.addErrback(self.propertyErrback, self)
         return d
     
@@ -66,12 +69,12 @@ class BaseAdminGtk(log.Loggable):
         
         Returns: L{twisted.internet.defer.Deferred} returning the value.
         """
-        d = self.admin.getProperty(self.name, elementName, propertyName)
+        d = self.admin.getProperty(self.state, elementName, propertyName)
         d.addErrback(self.propertyErrback, self)
         return d
 
-    def callRemote(self, method_name, *args, **kwargs):
-        return self.admin.componentCallRemote(self.name, method_name,
+    def callRemote(self, methodName, *args, **kwargs):
+        return self.admin.componentCallRemote(self.state, methodName,
                                               *args, **kwargs)
         
     # FIXME: deprecated, moved to node
@@ -127,16 +130,16 @@ class BaseAdminGtkNode(log.Loggable):
 
     logCategory = "admingtk"
 
-    def __init__(self, componentName, admin, view):
+    def __init__(self, state, admin, view):
         """
-        @type  componentName:  string
-        @param componentName:  name of the component this is a UI for
-        @type  admin: L{flumotion.admin.admin.AdminModel}
+        @param state: state of component this is a UI node for
+        @type  state: L{flumotion.common.planet.AdminComponentState}
         @param admin: the admin model that interfaces with the manager for us
-        @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
+        @type  admin: L{flumotion.admin.admin.AdminModel}
         @param view:  the GTK+ admin view we are embedded in
+        @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
         """
-        self.componentName = componentName
+        self.state = state
         self.admin = admin
         self.view = view
         
@@ -150,7 +153,7 @@ class BaseAdminGtkNode(log.Loggable):
         """
         Set the given property on the element with the given name."
         """
-        d = self.admin.setProperty(self.componentName, elementName, propertyName, value)
+        d = self.admin.setProperty(self.state, elementName, propertyName, value)
         d.addErrback(self.propertyErrback, self)
         return d
     
@@ -160,12 +163,12 @@ class BaseAdminGtkNode(log.Loggable):
         
         Returns: L{twisted.internet.defer.Deferred} returning the value.
         """
-        d = self.admin.getProperty(self.componentName, elementName, propertyName)
+        d = self.admin.getProperty(self.state, elementName, propertyName)
         d.addErrback(self.propertyErrback, self)
         return d
 
     def callRemote(self, method_name, *args, **kwargs):
-        return self.admin.componentCallRemote(self.componentName, method_name,
+        return self.admin.componentCallRemote(self.state, method_name,
                                               *args, **kwargs)
        
         
@@ -213,22 +216,22 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
     @type widget: L{gtk.Widget}
     @ivar wtree:  the widget tree representation for this node
     """
-    def __init__(self, componentName, admin, view, effectName):
+    def __init__(self, state, admin, view, effectName):
         """
-        @type  componentName:  string
-        @param componentName:  name of the component this is a UI for
-        @type  admin: L{flumotion.admin.admin.AdminModel}
+        @param state: state of component this is a UI for
+        @type  state: L{flumotion.common.planet.AdminComponentState}
         @param admin: the admin model that interfaces with the manager for us
-        @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
+        @type  admin: L{flumotion.admin.admin.AdminModel}
         @param view:  the GTK+ admin view we are embedded in
+        @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
         """
-        BaseAdminGtkNode.__init__(self, componentName, admin, view)
+        BaseAdminGtkNode.__init__(self, state, admin, view)
         self.effectName = effectName
 
         self.wtree = None
         self.widget = None
 
     def effectCallRemote(self, methodName, *args, **kwargs):
-        return self.admin.componentCallRemote(self.componentName,
+        return self.admin.componentCallRemote(self.state,
             "effect", self.effectName, methodName, *args, **kwargs)
  

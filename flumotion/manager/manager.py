@@ -555,3 +555,13 @@ class Vishnu(log.Loggable):
         return components
 
  
+    def getComponentMapper(self, object):
+        """
+        Look up an object mapper given the object.
+
+        @rtype: L{ComponentMapper} or None
+        """
+        if object in self._componentMappers.keys():
+            return self._componentMappers[object]
+
+        return None

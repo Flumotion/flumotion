@@ -113,9 +113,9 @@ class LogAdminGtkNode(BaseAdminGtkNode):
 class HTTPStreamerAdminGtk(BaseAdminGtk):
     def setup(self):
         self._nodes = {}
-        statistics = StatisticsAdminGtkNode(self.name, self.admin,
+        statistics = StatisticsAdminGtkNode(self.state, self.admin,
             self.view)
-        log = LogAdminGtkNode(self.name, self.admin, self.view)
+        log = LogAdminGtkNode(self.state, self.admin, self.view)
         self._nodes['Statistics'] = statistics
         self._nodes['Log'] = log
 

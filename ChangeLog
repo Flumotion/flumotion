@@ -1,3 +1,17 @@
+2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/producers/bttv/admin_gtk.py:
+	* flumotion/component/producers/soundcard/admin_gtk.py:
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/manager.py:
+	  move a bunch of functions to use component state instead of component
+	  name
+
 2005-02-02  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/wizard.py: Set the bg/base on the whole

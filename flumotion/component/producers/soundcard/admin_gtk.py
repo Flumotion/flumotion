@@ -20,7 +20,7 @@ from flumotion.component.effects.volume.admin_gtk import VolumeAdminGtkNode
 class SoundcardAdminGtk(admin_gtk.BaseAdminGtk):
     def setup(self):
         self._nodes = {}
-        volume = VolumeAdminGtkNode(self.name, self.admin,
+        volume = VolumeAdminGtkNode(self.state, self.admin,
             self.view, 'inputVolume')
         self._nodes['Volume'] = volume
 
