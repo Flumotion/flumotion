@@ -110,15 +110,17 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         self.debug('remote_start(): manager asked me to start, name %s, type %s, config %r' % (name, type, config))
         self.brain.kindergarten.play(name, type, config)
 
-    def remote_checkElements(self, element_names):
+    def remote_checkElements(self, elementNames):
         """
-        Checks if one or more gstreamer elements are present and can be instantiated
+        Checks if one or more GStreamer elements are present and can be
+        instantiated.
 
-        @param element_names:   names of the gstreamer elements
-        @type element_names:    list of string
+        @param elementNames:   names of the Gstreamer elements
+        @type elementNames:    list of strings
         """
+        self.debug('remote_checkElements: names %r' % elementNames)
 
-        return [name for name in element_names
+        return [name for name in elementNames
                          if gst.element_factory_make(name) is not None]
     
 class Kid:

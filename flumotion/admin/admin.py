@@ -114,7 +114,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     # default Errback
     def _defaultErrback(self, failure):
-        self.debug('received failure: %s' % failure.getErrorMessage())
+        self.debug('Unhandled deferred failure: %r (%s)' % (
+            failure.type, failure.getErrorMessage()))
         return failure
 
     ### IMedium methods
@@ -248,11 +249,28 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         return d
 
     def workerCallRemote(self, workerName, methodName, *args, **kwargs):
+        """
+        Call the the given method on the given worker with the given args.
+
+        @param workerName: name of the worker to call the method on
+        @param methodName: name of method to call; serialized to a
+                           remote_methodName on the worker
+
+                           
+        @returns: deferred
+        """
         r = common.argRepr(args, kwargs)
         self.info('calling remote method %s(%s) on worker %s' % (methodName, r,
                                                                  workerName))
-        return self.remote.callRemote('workerCallRemote', workerName,
-                                      methodName, *args, **kwargs)
+        d = self.remote.callRemote('workerCallRemote', workerName,
+            methodName, *args, **kwargs)
+        d.addErrback(self._workerCallRemoteErrback, methodName)
+        d.addErrback(self._defaultErrback)
+        return d
+
+    def _workerCallRemoteErrback(self, failure, methodName):
+        failure.trap(AttributeError)
+        self.debug('No remote method "%s"' % methodName)
 
     ## Worker methods
     def checkElements(self, workerName, elements):

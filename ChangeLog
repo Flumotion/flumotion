@@ -1,3 +1,10 @@
+2004-10-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	  add errback handling to remote methods
+	* flumotion/worker/worker.py:
+	  fix docs
+
 2004-10-21  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/client.py:
