@@ -1,8 +1,14 @@
+2004-10-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/steps.py:
+	  Don't activate save to disk by default.  If stuff like this
+	  ever needs to be done, do it in the glade file instead.
+
 2004-10-26  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/producers/firewire/firewire.py:
 
-	proper width and height in here, avoids unnessacary and ugly scaling.
+	proper width and height in here, avoids unnecessary and ugly scaling.
 
 2004-10-26  Johan Dahlin  <johan@gnome.org>
 

@@ -616,7 +616,7 @@ class Consumption(wizard.WizardStep):
     has_worker = False
 
     def setup(self):
-        self.checkbutton_disk.set_active(True)
+        pass
         
     def on_checkbutton_http_toggled(self, button):
         value = self.checkbutton_http.get_active()
