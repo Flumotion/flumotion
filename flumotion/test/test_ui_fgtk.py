@@ -1,0 +1,70 @@
+# -*- Mode: Python; test-case-name: flumotion.test.test_ui_fgtk -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
+
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+import common
+
+from twisted.spread import jelly
+from twisted.trial import unittest
+from twisted.internet import reactor
+
+try:
+    import gobject
+    import gtk
+except RuntimeError:
+    import os
+    os._exit(0)
+
+from flumotion.ui import fgtk
+
+class VUTest(unittest.TestCase):
+    def testScale(self):
+        w = fgtk.FVUMeter()
+
+        self.assertEquals(w.iec_scale(-80.0), 0.0)
+        self.assertEquals(w.iec_scale(-70.0), 0.0)
+        self.assertEquals(w.iec_scale(-60.0), 2.5)
+        self.assertEquals(w.iec_scale(-50.0), 7.5)
+        self.assertEquals(w.iec_scale(-40.0), 15)
+        self.assertEquals(w.iec_scale(-30.0), 30)
+        self.assertEquals(w.iec_scale(-20.0), 50)
+        self.assertEquals(w.iec_scale(-10.0), 75)
+        self.assertEquals(w.iec_scale(0.0), 100)
+
+    def testGetSet(self):
+        w = fgtk.FVUMeter()
+        w.set_property('peak', -50.0)
+        self.assertEquals(w.get_property('peak'), -50.0)
+        w.set_property('decay', -50.0)
+        self.assertEquals(w.get_property('decay'), -50.0)
+        w.set_property('orange-threshold', -50.0)
+        self.assertEquals(w.get_property('orange-threshold'), -50.0)
+        w.set_property('red-threshold', -50.0)
+        self.assertEquals(w.get_property('red-threshold'), -50.0)
+
+    def testWidget(self):
+        w = fgtk.FVUMeter()
+        window = gtk.Window()
+        window.add(w)
+        window.show_all()
+        gobject.timeout_add(0, w.set_property, 'peak', -50.0)
+        gobject.timeout_add(1, w.set_property, 'peak', -5.0)
+        gobject.timeout_add(2, gtk.main_quit)
+        gtk.main()
+        window.destroy()

@@ -1,5 +1,12 @@
 2005-03-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/random/vumeter:
+	* flumotion/test/test_ui_fgtk.py:
+	* flumotion/ui/fgtk.py:
+	  fix the vu meter in the low range; increase coverage
+	  
+2005-03-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/service/service.py:
 	  have the worker start with the debug specified in the config instead
 

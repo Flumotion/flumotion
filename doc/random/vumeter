@@ -1,0 +1,14 @@
+The return time is the time interval between the
+removal of a steady-state input signal (normally
+corresponding to the reference indication) and the
+moment when the indication passes a specified
+lower threshold of the scale. The return time shall
+be 1,7 s ± 0,3 s if the lower point is 20 dB below
+reference indication. The return speed should be
+approximately constant. On instruments intended
+for monitoring multichannel programmes, the
+difference in return time should be less than 0,1 s.
+When the maximum level is indicated on a
+numerical indicator or in a special mode of the
+incremental display, the hold time shall
+be 1,0 s ± 0,5 s.

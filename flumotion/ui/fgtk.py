@@ -176,6 +176,10 @@ class FSpinButton(gtk.SpinButton):
         return self.get_value()
 gobject.type_register(FSpinButton)
 
+# this VUMeter respects IEC standard
+# BS 6840-18:1996/IEC-268-18
+# and is inspired by JACK's meterbridge dpm_meters.c
+
 class FVUMeter(gtk.DrawingArea):
     __gsignals__ = { 'expose-event' : 'override',
                      'size-allocate': 'override',
@@ -236,7 +240,7 @@ class FVUMeter(gtk.DrawingArea):
         elif db < -60.0:
             pct = (db + 70.0) * 0.25
         elif db < -50.0:
-            pct = (db + 60.0) * 0.5 + 5.0
+            pct = (db + 60.0) * 0.5 + 2.5
         elif db < -40.0:
             pct = (db + 50.0) * 0.75 + 7.5
         elif db < -30.0:
