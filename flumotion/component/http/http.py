@@ -561,9 +561,19 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         Stats.__init__(self, sink=self.get_sink())
         self.caps = None
         self.resource = None
+
+        # handled regular updating
         self.needsUpdate = False
         # FIXME: call self._callLaterId.cancel() somewhere on shutdown
         self._callLaterId = reactor.callLater(1, self.checkUpdate)
+
+        # handle added and removed queue
+        self._added_lock = thread.allocate_lock()
+        self._added_queue = []
+        self._removed_lock = thread.allocate_lock()
+        self._removed_queue = []
+        # FIXME: do a .cancel on this Id somewhere
+        self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
         
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.component_name
@@ -631,38 +641,65 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
 
     def update_ui_state(self):
         self.emit('ui-state-changed')
-        
+
+    # handle the thread deserializing queues
+    def _handleQueue(self):
+
+        print "handling added queue"
+        # handle added clients
+        self._added_lock.acquire()
+
+        while len(self._added_queue):
+            print "handling and add"
+            (sink, fd) = self._added_queue.pop()
+            self._added_lock.release()
+            self.client_added_handler(sink, fd)
+            self._added_lock.acquire()
+
+        self._added_lock.release()
+
+        # handle removed clients
+        self._removed_lock.acquire()
+
+        while len(self._removed_queue):
+            (sink, fd, reason, stats) = self._removed_queue.pop()
+            self._removed_lock.release()
+            self.client_removed_handler(sink, fd, reason, stats)
+            self._removed_lock.acquire()
+
+        self._removed_lock.release()
+         
+        self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
+
     ### START OF THREAD-AWARE CODE
 
     # this can be called from both application and streaming thread !
     def client_added_cb(self, sink, fd):
-        self.log('[%5d] client_added_cb from thread %d' % 
-            (fd, thread.get_ident())) 
-        # FIXME: GIL problem, just call directly for now without remote calls
-        #gobject.idle_add(self.client_added_idle)
-        self.client_added_idle()
+        self._added_lock.acquire()
+        self._added_queue.append((sink, fd))
+        self._added_lock.release()
 
     # this can be called from both application and streaming thread !
     def client_removed_cb(self, sink, fd, reason):
-        self.log('[fd %5d] client_removed_cb from thread %d, reason %s' %
-            (fd, thread.get_ident(), reason)) 
+        self._removed_lock.acquire()
         # commented out to see if it solves GIL problems
         #stats = sink.emit('get-stats', fd)
         stats = None
-        self.log('[fd %5d] client_removed_cb, got stats' % fd)
-        # FIXME: GIL problem, just call directly for now without remote calls
-        #gobject.idle_add(self.client_removed_idle, sink, fd, reason, stats)
-        self.client_removed_idle(sink, fd, reason, stats)
-
+        self._removed_queue.append((sink, fd, reason, stats))
+        self._removed_lock.release()
     ### END OF THREAD-AWARE CODE
 
-    def client_added_idle(self):
+    def client_added_handler(self, sink, fd):
+        self.log('[%5d] client_added_handler from thread %d' % 
+            (fd, thread.get_ident())) 
         Stats.clientAdded(self)
         # FIXME: GIL problem, don't update UI for now
         self.needsUpdate = True
         #self.update_ui_state()
         
-    def client_removed_idle(self, sink, fd, reason, stats):
+    def client_removed_handler(self, sink, fd, reason, stats):
+        self.log('[fd %5d] client_removed_handler from thread %d, reason %s' %
+            (fd, thread.get_ident(), reason)) 
         # Johan will trap GST_CLIENT_STATUS_ERROR here someday
         # because STATUS_ERROR seems to have already closed the fd somewhere
         self.emit('client-removed', sink, fd, reason, stats)

@@ -1,6 +1,12 @@
 2004-09-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/http/http.py:
+	  handle add and remove by putting them on a lock-protected queue
+	  instead of using gobject-y stuff.
+
+2004-09-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/http/http.py:
 	  comment out the right signal emission to see if it fixes problems
 
 2004-09-23  Thomas Vander Stichele  <thomas at apestaart dot org>
