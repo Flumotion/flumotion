@@ -86,7 +86,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         
     def __repr__(self):
         return '<%s %s in state %s>' % (self.__class__.__name__,
-                                        self.username,
+                                        self.getName(),
                                         gst.element_state_get_name(self.state))
     
     def getTransportPeer(self):
@@ -121,7 +121,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.controller.componentRegistered(self)
             
     def attached(self, mind):
-        msg('%s attached, calling register()' % self.username)
+        #msg('%s attached, calling register()' % self.getName())
         self.mind = mind
         
         cb = mind.callRemote('register')
@@ -134,15 +134,17 @@ class ComponentPerspective(pbutil.NewCredPerspective):
             self.controller.removeComponent(self)
 
     def perspective_stateChanged(self, old, state):
-        msg('%s.stateChanged %s' % (self.username,
-                                        gst.element_state_get_name(state)))
+        #msg('%s.stateChanged %s' % (self.getName(),
+        #                            gst.element_state_get_name(state)))
+        
         self.state = state
         if self.state == gst.STATE_PLAYING:
+            msg('%s is now playing' % self.getName())
             self.started = True
             self.controller.startPendingComponents(self)
             
     def perspective_error(self, element, error):
-        msg('%s.error element=%s string=%s' % (self.username, element, error))
+        msg('%s.error element=%s string=%s' % (self.getName(), element, error))
         
         self.controller.removeComponent(self)
 
@@ -354,7 +356,7 @@ class Controller(pb.Root):
             self.streamerStart(component)
 
     def componentRegistered(self, component):
-        msg('%r is registered' % component)
+        msg('%s is registered' % component.getName())
 
         sources = component.getSources()
         if not sources:
@@ -365,7 +367,7 @@ class Controller(pb.Root):
         name = component.getName()
         for source in sources:
             if self.isComponentStarted(source):
-                msg('%s is already started' % source)
+                #msg('%s is already started' % source)
                 continue
 
             can_start = False
@@ -390,10 +392,14 @@ class Controller(pb.Root):
                     if not self.isComponentStarted(source):
                         return
                     
-                msg('starting %s' % name)
                 self.componentStart(child)
-        else:
-            msg('%s does not have any deps' % component_name)
+            return
+
+        for component_name in self.components:
+            if not self.isComponentStarted(component_name):
+                return
+
+        msg('Server started up correctly')
             
 class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
