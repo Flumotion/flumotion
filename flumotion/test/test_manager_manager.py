@@ -469,7 +469,8 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         self._verifyConfigAndNoWorker()
 
         # clear out the complete planet
-        self.vishnu.emptyPlanet()
+        d = self.vishnu.emptyPlanet()
+        unittest.deferredResult(d)
 
         self.assertEqual(len(mappers.keys()), 0)
 
