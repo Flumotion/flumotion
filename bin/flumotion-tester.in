@@ -23,8 +23,9 @@
 
 import os
 import sys
-sys.path.insert(0, '@PYGTK_DIR@')
+import optparse
 
+sys.path.insert(0, '@PYGTK_DIR@')
 import pygtk
 pygtk.require('2.0')
 
@@ -49,13 +50,33 @@ def main(args):
     log.init()
 
     loop = gobject.MainLoop()
+
+    parser = optparse.OptionParser()
+    parser.add_option('-c', '--clients', action="store",
+        type="int", dest="clients", help="Number of clients to start")
+    parser.add_option('-m', '--max-clients', action="store",
+        type="int", dest="maxclients", help="Maximum number of active clients")
+
+    parser.add_option('-s', '--readsize', action="store",
+        type="string", dest="readsize", help="Size of each read, or range")
+    parser.add_option('-r', '--readrate', action="store",
+        type="string", dest="readrate", help="Rate of reads in bytes/sec")
+    parser.add_option('-b', '--bytes', action="store",
+        type="string", dest="bytes", help="Number of bytes to read")
+    parser.add_option('-t', '--time', action="store",
+        type="string", dest="time", help="Time to live in seconds")
+    
+    options, args = parser.parse_args(args)
     try:
-        url = sys.argv[1]
+        options.url = args[1]
     except IndexError:
         print "please give a URL to test"
         sys.exit(1)
 
-    factory = clientfactory.ClientFactory(loop, url, 1000)
+    if not options.clients:
+        options.clients = 100
+
+    factory = clientfactory.ClientFactory(loop, options)
     gobject.idle_add(factory.run)
 
     log.log("going into main loop")

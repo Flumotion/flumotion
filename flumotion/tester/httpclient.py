@@ -52,7 +52,7 @@ class HTTPClient(gobject.GObject, log.Loggable):
         self.__gobject_init__()
         self._url = url
         self._id = id
-        self._fd = None
+        self._handle = None
         self._stop_time = 0 # delta to start time
         self._stop_size = 0
 
@@ -94,9 +94,13 @@ class HTTPClient(gobject.GObject, log.Loggable):
         self._start_time = time.time()
         self._bytes = 0
         try:
-            self._fd = urllib2.urlopen(self._url)
+            self._handle = urllib2.urlopen(self._url)
         except urllib2.HTTPError, error:
-            self.warning("%4d: HTTPError: code %s, msg %s" % (self._id, error.code, error.msg))
+            self.warning("%4d: connect: HTTPError: code %s, msg %s" %
+                (self._id, error.code, error.msg))
+            if error.code == -1:
+                self.emit('stopped', self._id, client.STOPPED_INTERNAL_ERROR)
+                return
             self.emit('stopped', self._id, client.STOPPED_CONNECT_ERROR)
             return
         except urllib2.URLError, exception:
@@ -126,9 +130,9 @@ class HTTPClient(gobject.GObject, log.Loggable):
                 self.warning("%4d: unhandled socket.error with code %d" % (self._id, code))
                 self.emit('stopped', self._id, self.stopped_CONNECT_ERROR)
                 return
-        if not self._fd:
+        if not self._handle:
            self.warning("%4d: didn't get fd from urlopen" % self._id)
-           self.emit('stopped', self._id, self.stopped_CONNECT_ERROR)
+           self.emit('stopped', self._id, self.stopped_INTERNAL_ERROR)
            return
               
         delta = self.next_read_time() - self._start_time
@@ -137,11 +141,22 @@ class HTTPClient(gobject.GObject, log.Loggable):
 
     def read(self):
         size = self.read_size()
+        if size == 0:
+            self.warning("%4d: read_size returns 0, wrong scheduling")
+            self.close(client.STOPPED_INTERNAL_ERROR)
+            return False
+
         self.log("%4d: read(%d)" % (self._id, size))
         try:
-            data = self._fd.read(size)
+            data = self._handle.read(size)
         except KeyboardInterrupt:
             sys.exit(1)
+        # possible AssertionError in httplib.py, line 1180, in read
+        # assert not self._line_consumed and self._line_left
+        except AssertionError:
+            self.warning("httplib assertion error, closing")
+            self.close(client.STOPPED_INTERNAL_ERROR)
+            return False
 
         if len(data) == 0:
             self.warning("zero bytes read, closing")
@@ -159,13 +174,13 @@ class HTTPClient(gobject.GObject, log.Loggable):
         if self._stop_time:
             if now - self._start_time > self._stop_time:
                 self.warning("%4d: stop time reached, closing" % self._id)
-                self._fd.close()
+                self._handle.close()
                 self.close(client.STOPPED_SUCCESS)
                 return False
         if self._stop_size:
             if self._bytes > self._stop_size:
                 self.info("%4d: stop size reached, closing" % self._id)
-                self._fd.close()
+                self._handle.close()
                 self.close(client.STOPPED_SUCCESS)
                 return False
 
@@ -194,10 +209,12 @@ class HTTPClientStatic(HTTPClient):
     """
 
     logCategory = "h-c-s"
-    def __init__(self, id, url, rate = 5.0, readsize = 1024):
+    def __init__(self, id, url, rate = 5000, readsize = 1024):
         self._rate = rate
         self._readsize = readsize
         HTTPClient.__init__(self, id, url)
+        self.debug("Creating client %s with rate %d and readsize %d" %
+            (id, rate, readsize))
 
     def next_read_time(self):
         'calculate the next time we want to read.  Could be in the past.'
@@ -205,9 +222,11 @@ class HTTPClientStatic(HTTPClient):
         next_byte_count = self._bytes + self._readsize
  
         # calculate the elapsed time corresponding to this read moment
-        time_delta = next_byte_count / (self._rate * 1024.0)
+        time_delta = next_byte_count / (float(self._rate))
 
-        return self._start_time + time_delta
+        ret = self._start_time + time_delta
+        self.log("%4d: next read time in %f secs" % (self._id, time_delta))
+        return ret
 
     def read_size(self):
         return self._readsize
