@@ -41,7 +41,7 @@ class ReconnectingPBClientFactory(PBClientFactory,
         PBClientFactory.__init__(self)
         self._doingLogin = False
         self._doingGetPerspective = False
-
+        
     def clientConnectionFailed(self, connector, reason):
         PBClientFactory.clientConnectionFailed(self, connector, reason)
         RCF = protocol.ReconnectingClientFactory
@@ -97,17 +97,25 @@ class ReconnectingPBClientFactory(PBClientFactory,
     def login(self, *args):
         raise RuntimeError, "login is one-shot: use startLogin instead"
 
-    def startLogin(self, credentials, client=None):
+    def startLogin(self, credentials, client, *interfaces):
+        self._interfaces = interfaces
         self._credentials = credentials
         self._client = client
+        
         self._doingLogin = True
-
+        
     def doLogin(self, root):
         # newcred login()
-        d = self._cbSendUsername(root, self._credentials.username,
-                                 self._credentials.password, self._client)
+        d = self._cbSendUsername(root,
+                                 self._credentials.username,
+                                 self._credentials.password,
+                                 self._client,
+                                 self._interfaces)
         d.addCallbacks(self.gotPerspective, self.failedToGetPerspective)
 
+    def _cbSendUsername(self, root, username, password, client, interfaces):
+        return root.callRemote("login", username, *interfaces).addCallback(
+            self._cbResponse, password, client)
 
     # methods to override
 

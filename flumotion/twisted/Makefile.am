@@ -5,6 +5,7 @@ flumotion_DATA = \
 	errors.py \
 	gstreactor.py \
 	pbutil.py \
+	portal.py \
 	shell.py
 
 EXTRA_DIST = $(flumotion_DATA)

@@ -46,3 +46,5 @@ class IAuthenticate(components.Interface):
     def authenticate(self, keycard):
         "authenticates a keycard, must be a IClientKeycard"
     
+class IBaseComponent(components.Interface):
+    pass

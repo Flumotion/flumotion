@@ -25,20 +25,29 @@ import gst
 import gobject
 from twisted.internet import reactor
 from twisted.spread import pb
+from twisted.python.reflect import qual
 
+from flumotion.server import interfaces
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
+
 
 class ComponentFactory(pbutil.ReconnectingPBClientFactory):
     __super_init = pbutil.ReconnectingPBClientFactory.__init__
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
     def __init__(self, component):
         self.__super_init()
+        self.component = component
         self.view = ComponentView(component)
         
     def login(self, username):
+        interfaces = getattr(self.component, '__remote_interfaces__', ())
+        interfaces = (pb.IPerspective,) + interfaces
+        interfaces = [qual(interface) for interface in interfaces]
+
         self.__super_login(pbutil.Username(username),
-                           client=self.view)
+                           self.view,
+                           *interfaces)
         
     def gotPerspective(self, perspective):
         self.view.cb_gotPerspective(perspective)
@@ -46,7 +55,7 @@ class ComponentFactory(pbutil.ReconnectingPBClientFactory):
 class ComponentView(pb.Referenceable, log.Loggable):
     'Implements a view on a local component'
     logCategory = 'componentview'
-    
+
     def __init__(self, component):
         self.comp = component
         self.comp.connect('state-changed', self.component_state_changed_cb)
@@ -137,7 +146,10 @@ class ComponentView(pb.Referenceable, log.Loggable):
             retval.append((name, host, port))
             
         return retval, ports
-        
+
+class IFlumotionComponent:
+    pass
+
 class BaseComponent(gobject.GObject, log.Loggable):
     """I am the base class for all Flumotion components."""
     __gsignals__ = {
@@ -146,6 +158,8 @@ class BaseComponent(gobject.GObject, log.Loggable):
         'log':         (gobject.SIGNAL_RUN_FIRST, None, (object,)),
         }
     logCategory = 'basecomponent'
+    __remote_interfaces__ = interfaces.IBaseComponent,
+    
     def __init__(self, name, sources, feeds):
         self.__gobject_init__()
         self.component_name = name

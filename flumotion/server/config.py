@@ -116,7 +116,7 @@ class FlumotionConfigXML(log.Loggable):
 
         type = str(node.getAttribute('type'))
         name = str(node.getAttribute('name'))
-        
+
         defs = registry.getComponent(type)
         properties = defs.getProperties()
 

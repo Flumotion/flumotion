@@ -29,12 +29,12 @@ __all__ = ['ComponentPerspective', 'Controller', 'ControllerServerFactory']
 
 import gst
 
-from twisted.cred import portal
 from twisted.internet import reactor
 from twisted.spread import pb
 
 from flumotion.server import admin
-from flumotion.twisted import errors, pbutil
+from flumotion.server.interfaces import IBaseComponent
+from flumotion.twisted import errors, pbutil, portal
 from flumotion.utils import gstutils, log
 
 # an internal class
@@ -67,20 +67,18 @@ class Dispatcher(log.Loggable):
         # on the peer, allowing any object that has the mind to call back
         # to the piece that called login(),
         # which in our case is a component or an admin.
+
         p = None
         if not pb.IPerspective in interfaces:
             raise errors.NoPerspectiveError(avatarID)
-        
-        # FIXME: if avatarID maps to component names, then we need to add
-        # checks for name uniqueness and for components not named admin
-        # FIXME: can we connect multiple admin clients this way ?
-        if avatarID == 'admin':
-            p = self.admin.getPerspective()
-        else:
+        elif IBaseComponent in interfaces:
             if self.controller.hasComponent(avatarID):
                 raise errors.AlreadyConnectedError(avatarID)
         
             p = self.controller.getPerspective(avatarID)
+        # FIXME: can we connect multiple admin clients this way ?
+        elif avatarID == 'admin':
+            p = self.admin.getPerspective()
 
         self.debug("returning Avatar: id %s, perspective %s" % (avatarID, p))
         if not p:
@@ -537,7 +535,7 @@ class ControllerServerFactory(pb.PBServerFactory):
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
         checker = pbutil.ReallyAllowAnonymousAccess()
-        self.portal = portal.Portal(self.dispatcher, [checker])
+        self.portal = portal.FlumotionPortal(self.dispatcher, [checker])
         # call the parent constructor with this portal for access
         pb.PBServerFactory.__init__(self, self.portal)
 
