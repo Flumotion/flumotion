@@ -1,0 +1,45 @@
+ideas on authentication
+-----------------------
+
+current:
+
+workers:
+- worker creates a brain
+- worker tells reactor to use brain's client factory when connecting to manager
+- worker creates credentials
+- brain logs in to worker with those credentials
+- portal passes the credentials to the registered checker, which is
+  ManagerCredentialsChecker
+- requestAvatarId in the checker checks the credentials and returns deferred
+  which will return an avatarId, checkers.ANONYMOUS or raise a
+  Failure(UnauthorizedLogin)
+  - currently, components and admin interfaces are allowed anonymous
+  - others are chained to the parent's (FlexibleCredentialsChecker)
+    requestAvatarId, which currently allows anonymous 
+
+future:
+
+worker:
+  - manager has a bouncer in its own loop (ie, a fixed component)
+    this bouncer authenticates worker, component and admin connections
+
+streamer component:
+- http streamer is configured to authenticate new connections against a
+  given bouncer in the grid
+- http streamer creates credentials for new connection, consisting of
+  username, password and IP address (password hashed)
+  or
+  only IP address
+- http streamer calls remote method on manager to authenticate these
+  using the given bouncer (by name)
+- manager forwards the call to the bouncer
+- bouncer calls authenticate on the credentials
+- bouncer returns an accepted or denied
+
+FIXME: would be good if
+- streamer would generate a unique id for the new connection and put it
+  in credentials
+- bouncer can call back through manager to component to tell it that
+  the connection should be terminated
+
+

@@ -147,6 +147,8 @@ class Vishnu:
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
         self.checker = ManagerCredentialsChecker()
+        # the WorkerHeaven sets this to True later on if the config file
+        # uses a password policy
         self.checker.allowAnonymous(True) # XXX: False
         
         p = portal.FlumotionPortal(self.dispatcher, [self.checker])
