@@ -1,3 +1,14 @@
+2005-02-08  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/checks/video.py
+	(do_element_check.state_changed_cb): Yikes, fixed some bugs. When
+	the check_proc does not return a deferred, callback on the
+	deferred that we were given. Don't bother returning a value from a
+	state-changed cb.
+	(do_element_check): Only set the pipeline to the requested state,
+	READY by default. Avoids spurious errors when PLAYING is not
+	necessary.
+
 2005-02-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/client.py:

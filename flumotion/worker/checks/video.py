@@ -70,10 +70,9 @@ def do_element_check(pipeline_str, element_name, check_proc,
                 def ret(x):
                     res.callback(x)
                 newres.addCallback(ret)
-                return res
             else:
                 reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
-                return newres
+                res.callback(newres)
         except CheckProcError, e:
             res.errback(e.data)
         except Exception, e:
@@ -86,7 +85,7 @@ def do_element_check(pipeline_str, element_name, check_proc,
     result = Result()
     bin.connect('state-change', state_changed_cb, result)
     bin.connect('error', error_cb, result)
-    bin.set_state(gst.STATE_PLAYING)
+    bin.set_state(state)
     return result.d
 
                     
