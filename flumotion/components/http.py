@@ -168,9 +168,10 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
                    }
                                        
     
-    def __init__(self, name, sources):
+    def __init__(self, name, source):
         self.__gobject_init__()
-        component.ParseLaunchComponent.__init__(self, name, sources, [], self.pipe_template)
+        component.ParseLaunchComponent.__init__(self, name, [source], [],
+                                                self.pipe_template)
         self.caps = None
 
     def __repr__(self):
@@ -224,11 +225,14 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
 gobject.type_register(MultifdSinkStreamer)
 
 def createComponent(config):
+    import os
+    print os.getpid()
+    
     name = config['name']
     port = int(config['port'])
-    sources = config.get('sources', [])
+    source = config['source']
 
-    component = MultifdSinkStreamer(name, sources)
+    component = MultifdSinkStreamer(name, source)
     resource = HTTPStreamingResource(component)
     if config.has_key('logfile'):
         component.msg('Logging to %s' % config['logfile'])

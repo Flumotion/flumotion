@@ -22,13 +22,13 @@ import optparse
 import os
 import signal
 import sys
+import traceback
 
 import gobject
-gobject.thread_init()
+gobject.threads_init()
+
 import gst
 
-from flumotion.twisted import gstreactor
-gstreactor.install()
 from twisted.internet import reactor
 from twisted.internet.protocol import ClientCreator, Factory
 from twisted.protocols.basic import NetstringReceiver
@@ -98,14 +98,6 @@ class Launcher:
             
         raise SystemExit
         
-    def spawn(self, component, function=None, args=None):
-        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
-        reactor.connectTCP(self.controller_host, self.controller_port,
-                           component.factory)
-        
-        reactor.run(False)
-        
     def stop_controller(self):
         if not self.controller_pid:
             return
@@ -122,7 +114,17 @@ class Launcher:
 
         # We need to run the reactor again, so we can process
         # the last events, need to tell the controller to shutdown
-        reactor.run()
+        reactor.run(False)
+        
+    def spawn(self, component, function=None, args=None):
+        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        reactor.connectTCP(self.controller_host, self.controller_port,
+                           component.factory)
+
+        print component, 'before reactor.run()'
+        reactor.run(False)
+        print component, 'after reactor.run()'
         
     def run(self):
         self.restore_uid()
@@ -131,31 +133,37 @@ class Launcher:
         # Need to investigate why we don't need to catch the exception here
         reactor.run()
 
-        self.stop_controller()
+        self.shutdown()
 
-    def start(self, config):
-        assert config.func
+    def shutdown(self):
+        self.stop_controller()
+        
+    def launch_component(self, config):
         pid = os.fork()
-        if not pid:
-            retval = None
-            component = config.func(config.config) # config.dict ?
-                
-            self.set_nice(config.nice)
-            self.restore_uid()
-            
-            self.spawn(component)
-            raise SystemExit
-        else:
-#            self.msg('Starting %s (%s) on pid %d' %
-#                    (component.getName(),component.getKind(), pid))
+        if pid:
             self.children.append(pid)
+            self.msg('Starting %s (%s) on pid %d' %
+                    (config.getName(),
+                     config.getType(), pid))
+            return
+        
+        component = config.getComponent()
+                
+        self.set_nice(config.nice)
+        self.restore_uid()
+            
+        self.spawn(component)
+        raise SystemExit
 
     def load_config(self, filename):
-        conf = config.FlumotionConfig(filename)
+        if filename.endswith('conf'):
+            conf = config.FlumotionConfig(filename)
+        else:
+            conf = config.FlumotionConfigXML(filename)
 
         for name in conf.components.keys():
             self.msg('Starting component: %s' % name)
-            self.start(conf.components[name])
+            self.launch_component(conf.components[name])
     
 def run_launcher(args):
     parser = optparse.OptionParser()
@@ -179,18 +187,27 @@ def run_launcher(args):
                                       'registry', 'basecomponents.xml'))
 
     launcher = Launcher(options.host, options.port)
-
+    
     if options.host == 'localhost':
         if not gstutils.is_port_free(options.port):
             launcher.error('Controller is already started')
         else:
             launcher.start_controller(options.verbose)
 
-    launcher.load_config(args[2])
-
+    try:
+        launcher.load_config(args[2])
+    except Exception, e:
+        if not isinstance(e, SystemExit):
+            print 'Traceback caught during configuration loading:'
+            print '='*79
+            traceback.print_exc(file=sys.stdout)
+            print '='*79
+        launcher.shutdown()
+        return
+    
     if options.verbose:
         log.enableLogging()
-
+    
     launcher.run()
 
     return 0

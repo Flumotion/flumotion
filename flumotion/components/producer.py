@@ -27,7 +27,7 @@ class Producer(component.ParseLaunchComponent):
 
 def createComponent(config):
     name = config['name']
-    feeds = config.get('feeds', [])
+    feeds = config.get('feed', ['default'])
     pipeline = config['pipeline']
 
     component = Producer(name, feeds, pipeline)

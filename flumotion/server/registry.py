@@ -22,12 +22,22 @@ import os
 
 from xml.dom import minidom, Node
 
+class Property:
+    def __init__(self, name, type, required=False, multiple=False):
+        self.name = name
+        self.type = type
+        self.required = required
+        self.multiple = multiple
+        
 class Component:
     def __init__(self, type, source, properties):
         self.type = type
         self.source = source
         self.properties = properties
-        
+
+    def getProperties(self):
+        return self.properties
+
     def getType(self):
         return self.type
     
@@ -116,7 +126,7 @@ class RegistryXmlParser:
 
     def parse_properties(self, node):
         """<properties>
-             <property name="..." type="" required="..."/>
+             <property name="..." type="" required="yes/no" multiple="yes/bno"/>
            </properties>"""
         
         properties = []
@@ -132,15 +142,18 @@ class RegistryXmlParser:
                 raise XmlParserError, "<property> must have a name attribute"
             elif not child.hasAttribute('type'):
                 raise XmlParserError, "<property> must have a type attribute"
-            
-            if child.hasAttribute('required'):
-                required = child.getAttribute('required')
-            else:
-                required = None
 
-            property = (child.getAttribute('name'),
-                        child.getAttribute('type'),
-                        required)
+            name = child.getAttribute('name')
+            type = child.getAttribute('type')
+
+            optional = {}
+            if child.hasAttribute('required'):
+                optional['required'] = child.getAttribute('required') == 'yes'
+
+            if child.hasAttribute('multiple'):
+                optional['multiple'] = child.getAttribute('multiple') == 'yes'
+
+            property = Property(name, type, **optional)
             
             properties.append(property)
 
@@ -151,7 +164,6 @@ class ComponentRegistry:
         self.components = {}
 
     def addFromFile(self, filename):
-        print filename
         parser = RegistryXmlParser(filename)
         for component in parser.getComponents():
             type = component.getType()

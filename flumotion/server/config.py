@@ -30,11 +30,21 @@ class ConfigError(Exception):
 
 class ConfigComponent:
     nice = 0
-    def __init__(self, name, func, config):
+    def __init__(self, name, type, func, config):
         self.name = name
+        self.type = type
         self.func = func
         self.config = config
 
+    def getType(self):
+        return self.type
+    
+    def getName(self):
+        return self.name
+    
+    def getComponent(self, *args):
+        return self.func(self.config, *args)
+    
 class FlumotionConfig(ConfigParser):
     def __init__(self, filename):
         ConfigParser.__init__(self)
@@ -46,12 +56,6 @@ class FlumotionConfig(ConfigParser):
 
     msg = lambda s, *a: log.msg('config', *a)
         
-    def add_component(self, name, **kwargs):
-        component = ConfigComponent(name)
-        for kwarg in kwargs:
-            component.set(kwarg, kwargs[kwarg])
-        self.components[name] = component
-
     def get_pipeline(self, section):
         assert self.has_option(section, 'pipeline')
         return self.get(section, 'pipeline')
@@ -74,32 +78,6 @@ class FlumotionConfig(ConfigParser):
         assert self.has_option(section, 'protocol')
         return self.get(section, 'protocol')
 
-    def parse_streamer(self, section, **kwargs):
-        protocol = self.get_protocol(section)
-        if not protocol in ('http', 'file'):
-            raise AssertionError, "unknown protocol: %s" % protocol
-        kwargs['protocol'] = protocol
-        if protocol == 'http':
-            if self.has_option(section, 'port'):
-                kwargs['port'] = self.getint(section, 'port')
-            if self.has_option(section, 'logfile'):
-                kwargs['logfile'] = self.get(section, 'logfile')
-
-            self.add_component(section,
-                               feeds=self.get_feeds(section),
-                               sources=self.get_sources(section),
-                               **kwargs)
-        elif protocol == 'file':
-            if self.has_option(section, 'location'):
-                kwargs['location'] = self.get(section, 'location')
-            if self.has_option(section, 'port'):
-                kwargs['port'] = self.getint(section, 'port')
-
-            self.add_component(section,
-                               feeds=self.get_feeds(section),
-                               sources=self.get_sources(section),
-                               **kwargs)
-        
     def parse_globals(self):
         if not self.has_option('global', 'username'):
             return
@@ -147,8 +125,8 @@ class FlumotionConfig(ConfigParser):
         else:
             kwargs['feeds'] = [feeds]
 
-        kind = self.get(section, 'kind')
-        config = registry.getComponent(kind)
+        type = self.get(section, 'kind')
+        config = registry.getComponent(type)
         module = reflect.namedAny(config.source)
         if not hasattr(module, 'createComponent'):
             print 'WARNING: no createComponent() for %s' % config.source
@@ -158,5 +136,126 @@ class FlumotionConfig(ConfigParser):
         name = section
 
         function = module.createComponent
-        component = ConfigComponent(name, function, kwargs)
+        component = ConfigComponent(name, type, function, kwargs)
         self.components[name] = component
+
+import os
+from xml.dom import minidom, Node
+
+class FlumotionConfigXML:
+    def __init__(self, filename):
+        self.components = {}
+    
+        self.msg('Loading configuration file `%s\'' % filename)
+        self.doc = minidom.parse(filename)
+        self.path = os.path.split(filename)[0]
+        self.parse()
+        
+    msg = lambda s, *a: log.msg('config', *a)
+    warn = lambda s, *a: log.warn('config', *a)
+
+    def getPath(self):
+        return self.path
+
+    def getComponents(self):
+        return self.components
+
+    def parse(self):
+        """<root>
+             <component>
+           </root>"""
+
+        root = self.doc.documentElement
+        
+        #check_node(root, 'root')
+        
+        for node in root.childNodes:
+            if node.nodeType != Node.ELEMENT_NODE:
+                continue
+            if node.nodeName == 'component':
+                component = self.parse_component(node)
+                self.components[component.getName()] = component
+            else:
+                raise XmlParserError, "unexpected node: %s" % child
+            
+    def parse_component(self, node):
+        """<component name="..." type="...">
+             ...
+           </component>"""    
+        if not node.hasAttribute('name'):
+            raise XmlParserError, "<component> must have a name attribute"
+        if not node.hasAttribute('type'):
+            raise XmlParserError, "<component> must have a type attribute"
+
+        type = node.getAttribute('type')
+        name = node.getAttribute('name')
+        defs = registry.getComponent(type)
+        module = reflect.namedAny(defs.source)
+        if not hasattr(module, 'createComponent'):
+            # XXX: Throw an error
+            self.warn('no createComponent() for %s' % defs.source)
+            return
+
+        config = {}
+        config['name'] = name
+        config['type'] = type
+
+        self.parse_property_def(type, defs.getProperties(), node, config)
+        
+        function = module.createComponent
+        component = ConfigComponent(name, type, function, config)
+        return component
+
+    def get_int_value(self, nodes):
+        values = []
+        for subnode in nodes:
+            data = subnode.childNodes[0].data
+            values.append(int(data))
+
+        return values
+
+    def get_string_value(self, nodes):
+        values = []
+        for subnode in nodes:
+            data = str(subnode.childNodes[0].data)
+            if '\n' in data:
+                parts = [x.strip() for x in data.split('\n')]
+                data = ' '.join(parts)
+            values.append(data)
+
+        return values
+    
+    def parse_property_def(self, type, defs, node, config):
+        self.msg('Parsing component: %s' % config['name'])
+        for definition in defs:
+            name = definition.name
+
+            nodes = []
+            for subnode in node.childNodes:
+                if subnode.nodeName == name:
+                    nodes.append(subnode)
+                
+            if definition.required and not nodes:
+                raise ConfigError("%s is required but not specified" % name)
+
+            if not definition.multiple and len(nodes) > 1:
+                raise ConfigError("multiple value specified but not allowed")
+
+            type = definition.type
+            if type == 'string':
+                value = self.get_string_value(nodes)
+            elif type == 'int':
+                value = self.get_int_value(nodes)
+            else:
+                raise ConfigError, "invalid property type: %s" % type
+
+            if value == []:
+                continue
+            
+            if not definition.multiple:
+                value = value[0]
+            
+            #print '%s=%r' % (name, value)
+            config[name] = value
+            
+        #raise SystemExit

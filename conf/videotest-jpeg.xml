@@ -1,35 +1,26 @@
 <root>
-  <componenets>
-    <component name="videotest-producer" type="producer">
-      <pipeline>
-        videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
-      </pipeline>
-    </component>
+  <component name="videotest-producer" type="producer">
+    <pipeline>
+      videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
+    </pipeline>
+  </component>
 
-    <component name="overlay" type="converter">
-       <sources>
-         <source name="videotest-producer"/>
-       </sources>
-      <pipeline>
-        filesrc location=/home/jdahlin/Pictures/alphacolors.png blocksize=100000 ! 
-        pngdec ! alphacolor ! videomixer name=mix ! :default 
-        @videotest-producer ! alpha ! mix.
-      </pipeline>
-    </component>
+  <component name="overlay" type="converter">
+    <source>videotest-producer</source>
+    <pipeline>
+      filesrc location=/home/jdahlin/Pictures/alphacolors.png blocksize=100000 ! 
+      pngdec ! alphacolor ! videomixer name=mix ! :default 
+      @videotest-producer ! alpha ! mix.
+    </pipeline>
+  </component>
 
-    <component name="jpeg+multipart" type="converter">
-       <sources>
-         <source name="overlay"/>
-       </sources>
-      <pipeline>ffmpegcolorspace ! jpegenc ! multipartdemux</pipeline>
-    </component>
-
-    <component name="http-video" type="http-streamer">
-       <source name="jpeg+multipart"/>
-       <port>8803</port>
-       <logfile>/tmp/videotestsrc_access.log</logfile>
-    </component>
-
-  </components>
-
+  <component name="jpeg+multipart" type="converter">
+    <source>overlay</source>
+    <pipeline>ffmpegcolorspace ! jpegenc ! multipartmux</pipeline>
+  </component>
+  <component name="http-video" type="http-streamer">
+    <source>jpeg+multipart</source>
+    <port>8803</port>
+    <logfile>/tmp/videotestsrc_access.log</logfile>
+  </component>
 </root>

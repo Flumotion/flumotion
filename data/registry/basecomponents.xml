@@ -12,7 +12,7 @@
     <source location="flumotion.components.producer"/>
     <properties>
       <property name="pipeline" type="string" required="yes"/>
-      <property name="feeds" type="list"/>
+      <property name="feeds" type="string" multiple="yes"/>
     </properties>
   </component>
 
@@ -20,8 +20,8 @@
     <source location="flumotion.components.converter"/>
     <properties>
       <property name="pipeline" type="string" required="yes"/>
-      <property name="feeds" type="list"/>
-      <property name="sources" type="list"/>
+      <property name="feeds" type="string" multiple="yes"/>
+      <property name="source" type="string" multiple="yes"/>
     </properties>
   </component>
   
