@@ -17,9 +17,8 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
-<!--
   <property name="focus_on_map">True</property>
--->
+
   <child>
     <widget class="GtkVBox" id="vbox1">
       <property name="visible">True</property>
@@ -347,35 +346,6 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkToolButton" id="tool_clean">
-	      <property name="visible">True</property>
-	      <property name="tooltip" translatable="yes">Stop and remove all components</property>
-	      <property name="stock_id">gtk-stop</property>
-	      <property name="visible_horizontal">True</property>
-	      <property name="visible_vertical">True</property>
-	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="manage_stop_all_cb" last_modification_time="Tue, 08 Feb 2005 11:41:01 GMT"/>
-	    </widget>
-	    <packing>
-	      <property name="expand">False</property>
-	      <property name="homogeneous">True</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkSeparatorToolItem" id="separatortoolitem2">
-	      <property name="visible">True</property>
-	      <property name="draw">True</property>
-	      <property name="visible_horizontal">True</property>
-	      <property name="visible_vertical">True</property>
-	    </widget>
-	    <packing>
-	      <property name="expand">False</property>
-	      <property name="homogeneous">False</property>
-	    </packing>
-	  </child>
-
-	  <child>
 	    <widget class="GtkToolButton" id="toolbutton_wizard">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes"></property>
@@ -431,10 +401,8 @@
 		      <property name="reorderable">False</property>
 		      <property name="enable_search">True</property>
 		      <property name="fixed_height_mode">False</property>
-<!--
 		      <property name="hover_selection">False</property>
 		      <property name="hover_expand">False</property>
--->
 		    </widget>
 		  </child>
 		</widget>

@@ -1,5 +1,8 @@
 2005-02-14  Andy Wingo  <wingo@pobox.com>
 
+	* data/glade/admin.glade: Remove "Stop all" toolbar button. It
+	doesn't work right now.
+
 	* flumotion/common/bundle.py (BundlerBasket.getDependencies):
 	Rework to check if the argument is a valid bundle, and raise an
 	exception otherwise.
