@@ -1,5 +1,8 @@
 #!/bin/sh
 set -x
+
+exit 1
+
 aclocal -I m4 || exit 1
 libtoolize --force || exit 1
 # autoheader || exit 1
