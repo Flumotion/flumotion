@@ -1,5 +1,11 @@
 2005-02-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/configure/uninstalled.py.in:
+	  Do not create _build by making sure we check correctly for
+	  presence of _build
+
+2005-02-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  make sure the registry doesn't get rebuilt all the time.
 	  Really, *all* the time.

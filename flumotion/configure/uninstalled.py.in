@@ -32,7 +32,7 @@ def get():
     # distcheck hack: if we live in a path containing _build, it means
     # we're running in distcheck mode and we should write everything
     # under the writable builddir
-    if os.getcwd().find('_build'):
+    if os.getcwd().find('_build') > -1:
         srcdir = os.getcwd().split('_build')[0]
         top_builddir = os.path.join(srcdir, '_build')
 
