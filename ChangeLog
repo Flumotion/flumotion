@@ -1,3 +1,7 @@
+2004-09-13  Johan Dahlin  <johan@gnome.org>
+
+	* conf/minmal.xml: add a minimal configuration for testing purposes.
+
 2004-09-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:
@@ -16,6 +20,8 @@
 	* testsuite/tests/bundle.py:
 	  I forgot to type a reason for changing all of these, spank me.
 
+	Documentation updates. Bundle fixes. 
+	
 2004-09-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/Makefile.am:
