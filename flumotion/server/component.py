@@ -261,7 +261,7 @@ class ParseLaunchComponent(BaseComponent):
         return pipeline
 
     def do_feeds(self, feeds, pipeline):
-        element = 'tcpserversink buffers-max=500 buffers-soft-max=450'
+        element = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'
         sign = ':'
         
         if len(feeds) == 1:
