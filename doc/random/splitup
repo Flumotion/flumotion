@@ -1,0 +1,34 @@
+The various chunks of code need to be split up a little differently to
+support the bundle-ability of flumotion.
+
+There are four kinds of code files:
+- base: used by more than one flumotion process, not bundle-able
+  (ie. code to distribute and unpack bundles, ...)
+  this contains bootstrap code
+- manager/admin/worker: process-specific code, not bundle-able
+
+- common: code used both by manager "as-is" and bundle-able to others
+  (ie keycards, ...)
+
+- everything else: bundle-able code 
+
+FIXME: maybe shared and bundled can go in the same directory; stuff from
+       shared can also be bundled so bundled is not a good name
+
+-> base, private, shared, bundled
+
+On the file system, these should be four different subtrees, each containing
+"flumotion" as the base entry directory.
+
+Inside these subtrees, they should also go in separate packages completely.
+
+In a development tree, they should also be separate.
+- manager would put base, shared, and private on its import path
+- worker, admin would put base and private on its import path,
+  and have shared and bundled through bundles
+
+Installed:
+- under libdir/flumotion
+- three/four different subdirs
+- partitioned tree under them
+- remove python from path
