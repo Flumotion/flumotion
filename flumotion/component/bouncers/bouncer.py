@@ -74,7 +74,7 @@ class Bouncer(component.BaseComponent):
     # FIXME: do we need this at all in the base class ?
     def authenticate(self, keycard):
         if not components.implements(keycard, credentials.ICredentials):
-            self.warn('keycard %r does not implement ICredentials', keycard)
+            self.warning('keycard %r does not implement ICredentials', keycard)
             raise AssertionError
 
         self.info('keycard %r refused because the base authenticate() should be overridden' % keycard)
@@ -89,7 +89,7 @@ class Bouncer(component.BaseComponent):
         self._idCounter += 1
         # FIXME: what if it already had one ?
         # FIXME: deal with wraparound ?
-        keycard.id = "%016x" % self._idCounter
+        keycard.id = "%016x" % id
         self._keycards[keycard.id] = keycard
         self.log("added keycard with id %s" % keycard.id)
 

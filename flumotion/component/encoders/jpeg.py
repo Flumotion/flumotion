@@ -31,8 +31,6 @@ class JPEG(feedcomponent.ParseLaunchComponent):
 
 
 def createComponent(config):
-    source = config['source']
-
     component = JPEG(config['name'], [config['source']],
                        "ffmpegcolorspace ! jpegenc name=encoder")
     

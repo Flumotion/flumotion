@@ -1,5 +1,14 @@
 2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/encoders/jpeg.py:
+	* flumotion/component/encoders/mulaw.py:
+	  add more components to pychecker checking and fix warnings
+
+2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	  make pkgAddPath only add stuff to __path__ if not already there
 

@@ -24,7 +24,6 @@
 
 # Headers in this file shall remain intact.
 
-import crypt
 import md5
 import random
 

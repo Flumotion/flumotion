@@ -26,14 +26,20 @@ coverage:
 	@trial --coverage coverage -R flumotion.test
 	@$(PYTHON) tools/show-coverage.py _trial_temp/coverage/flumotion.*
 
+# we redirect stderr so we don't get messages like
+# warning: couldn't find real module for class SSL.Error (module name: SSL)
+# which can't be turned off in pychecker
+
 pychecker:
 	pychecker -Q -F misc/pycheckerrc 	\
 		flumotion/common/*.py 		\
 		flumotion/configure/*.py 	\
 		flumotion/component/*.py 	\
+		flumotion/component/*/*.py 	\
 		flumotion/manager/*.py 		\
 		flumotion/worker/*.py 		\
-		flumotion/utils/*.py
+		flumotion/utils/*.py		\
+	2> /dev/null
 
 fixme:
 	tools/fixme | less -R
