@@ -1,9 +1,7 @@
 # -*- Mode: Python -*-
-# vi:si:et:sw=4:sts=4:ts=4
-
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
-  
+# 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -17,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
 
 import socket
 import sys
@@ -41,6 +40,9 @@ from twistedutils import ShellFactory, Shell
 
 import pbutil
 
+def msg(*args):
+    print '[controller] %s' % args
+
 class Dispatcher:
     __implements__ = portal.IRealm
     def __init__(self, controller):
@@ -49,7 +51,7 @@ class Dispatcher:
     def requestAvatar(self, avatarID, mind, interface):
         assert interface == pb.IPerspective
         
-        #log.msg('requestAvatar (%s, %s, %s)' % (avatarID, mind, interface))
+        #msg('requestAvatar (%s, %s, %s)' % (avatarID, mind, interface))
 
         # This could use some cleaning up
         component_type, avatarID = avatarID.split('_', 1)
@@ -60,7 +62,7 @@ class Dispatcher:
         
         p = self.controller.getPerspective(component_type, avatarID)
 
-        #log.msg("returning Avatar(%s): %s" % (avatarID, p))
+        #msg("returning Avatar(%s): %s" % (avatarID, p))
         if not p:
             raise ValueError, "no perspective for '%s'" % avatarID
 
@@ -87,9 +89,6 @@ class ComponentPerspective(pbutil.NewCredPerspective):
                                         self.username,
                                         gst.element_state_get_name(self.state))
     
-    def msg(self, *args):
-        log.msg('[comp %s] %s' % (self.username, args))
-
     def getTransportPeer(self):
         return self.mind.broker.transport.getPeer()
 
@@ -107,11 +106,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
 
     # This method should ask the component if the port is free
     def getListenPort(self):
-        #assert self.listen_port != -1
-        if self.listen_port == -1:
-            log.msg('----- Stopping reactor, replace with asserting error')
-            reactor.stop()
-            
+        assert self.listen_port != -1
         return self.listen_port
 
     def after_register_cb(self, options, cb):
@@ -126,7 +121,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.controller.componentRegistered(self)
             
     def attached(self, mind):
-        self.msg('attached, registering')
+        msg('%s attached, calling register()' % self.username)
         self.mind = mind
         
         cb = mind.callRemote('register')
@@ -134,26 +129,21 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         
     def detached(self, mind):
         name = self.getName()
-        self.msg('detached')
+        msg('%s detached' % name)
         if self.controller.hasComponent(name):
             self.controller.removeComponent(self)
 
     def perspective_stateChanged(self, old, state):
-        log.msg('%s.stateChanged %s' % (self.username,
+        msg('%s.stateChanged %s' % (self.username,
                                         gst.element_state_get_name(state)))
         self.state = state
-
-        if state == gst.STATE_PLAYING:
-            #log.msg('%s is ready, starting pending components' % self.username)
-
-            # Now when the component is up and running, 
+        if self.state == gst.STATE_PLAYING:
             self.started = True
-            self.controller.startPendingComponentsFor(self)
-
+            self.controller.startPendingComponents(self)
+            
     def perspective_error(self, element, error):
-        log.msg('%s.error element=%s string=%s' % (self.username, element, error))
+        msg('%s.error element=%s string=%s' % (self.username, element, error))
         
-        #print dir(self.mind.perspective)
         self.controller.removeComponent(self)
 
 class ProducerPerspective(ComponentPerspective):
@@ -164,15 +154,15 @@ class ProducerPerspective(ComponentPerspective):
         if port == None:
             def after_get_free_port_cb(port):
                 self.listen_port = port
-                log.msg('Calling remote method listen (%s, %d)' % (host, port))
+                msg('Calling remote method listen (%s, %d)' % (host, port))
                 self.mind.callRemote('listen', host, port)
 
-            log.msg('Calling remote method get_free_port()')
+            msg('Calling remote method get_free_port()')
             cb = self.mind.callRemote('get_free_port')
             cb.addCallback(after_get_free_port_cb)
         else:
             self.listen_port = port
-            log.msg('Calling remote method listen (%s, %d)' % (host, port))
+            msg('Calling remote method listen (%s, %d)' % (host, port))
             self.mind.callRemote('listen', host, port)
             
 class ConverterPerspective(ComponentPerspective):
@@ -184,15 +174,15 @@ class ConverterPerspective(ComponentPerspective):
         if port == None:
             def after_get_free_port_cb(port):
                 self.listen_port = port
-                log.msg('Calling remote method start (%s, %s, %d)' % (sources, host, port))
+                msg('Calling remote method start (%s, %s, %d)' % (sources, host, port))
                 self.mind.callRemote('start', sources,  host, port)
 
-            log.msg('Calling remote method get_free_port()')
+            msg('Calling remote method get_free_port()')
             cb = self.mind.callRemote('get_free_port')
             cb.addCallback(after_get_free_port_cb)
         else:
             self.listen_port = port
-            log.msg('Calling remote method start (%s, %s, %d)' % (sources, host, port))
+            msg('Calling remote method start (%s, %s, %d)' % (sources, host, port))
             self.mind.callRemote('start', sources,  host, port)
             
 class StreamerPerspective(ComponentPerspective):
@@ -209,18 +199,15 @@ class StreamerPerspective(ComponentPerspective):
 
     def connect(self, sources):
         """starts the remote methods connect"""
-        log.msg('Calling remote method connect(%s)' % sources)
+        msg('Calling remote method connect(%s)' % sources)
         self.mind.callRemote('connect', sources)
 
 class Controller(pb.Root):
     def __init__(self):
         self.components = {}
-        self.waitlists = {}
+        self.deps = {}
         self.last_free_port = 5500
         
-    def msg(self, *args):
-        log.msg('[controller] %s' % args)
-
     def getPerspective(self, component_type, username):
         if component_type == 'producer':
             klass = ProducerPerspective
@@ -300,36 +287,14 @@ class Controller(pb.Root):
 
         del self.components[component_name]
 
-    def waitForComponent(self, name, component):
-        """adds a component to another components waitlist. Eg wait until
-        the other component has started up before starting it
-        
-        @type name:      string
-        @param name:     name of the other component
-        @type component: component
-        @param component: the component"""
-        
-        if not self.waitlists.has_key(name):
-            self.waitlists[name] = []
+    def isComponentStarted(self, component_name):
+        if not self.hasComponent(component_name):
+            return False
 
-        self.waitlists[name].append(component)
+        component = self.components[component_name]
 
-    def startPendingComponentsFor(self, component):
-        """Starts all components that requires L{Component} to be started
-        @type component: component
-        @param component: the component"""
-
-        name = component.getName()
-        if not self.waitlists.has_key(name):
-            #self.msg('%s does not have any pending components' % name)
-            return
-            
-        for component in self.waitlists[name]:
-            self.componentStart(component)
-            self.waitlists[name] = []
-
-        del self.waitlists[name]
-        
+        return component.started == True
+    
     def getSourceComponents(self, component):
         """Retrives the source components for component
 
@@ -377,7 +342,7 @@ class Controller(pb.Root):
         streamer.connect(sources)
         
     def componentStart(self, component):
-        self.msg('Starting component %s of type %s' % (component.getName(), component.kind))
+        msg('Starting component %s of type %s' % (component.getName(), component.kind))
         assert isinstance(component, ComponentPerspective)
         assert component != ComponentPerspective
 
@@ -388,28 +353,48 @@ class Controller(pb.Root):
         elif isinstance(component, StreamerPerspective):
             self.streamerStart(component)
 
-        #component.started = True
-        
     def componentRegistered(self, component):
-        #self.msg('%r is registered' % component)
-        
+        msg('%r is registered' % component)
+
         sources = component.getSources()
         if not sources:
             self.componentStart(component)
             return
-        
-        sources_ready = True
-        for source_name in sources:
-            if not self.hasComponent(source_name) or self.components[source_name].started == False:
-                self.msg("%r will be waiting for source %s" % (component, source_name))
-                #import code;code.interact(local=locals())
-                self.waitForComponent(source_name, component)
-                sources_ready = False
 
-        if sources_ready:
-            self.msg('All sources for %r (%s) are ready, so starting' % (component, sources))
+        can_start = True
+        name = component.getName()
+        for source in sources:
+            if self.isComponentStarted(source):
+                msg('%s is already started' % source)
+                continue
+
+            can_start = False
+            msg('%s will wait for %s' % (name, source))
+                    
+            if not self.deps.has_key(source):
+                self.deps[source] = []
+                
+            self.deps[source].append(name)
+
+        if can_start:
             self.componentStart(component)
-        
+            
+    def startPendingComponents(self, component):
+        component_name = component.getName()
+        if self.deps.has_key(component_name):
+            msg('starting pending components for %s' % component_name)
+            comps = self.deps[component_name]
+            for name in comps[:]:
+                child = self.components[name]
+                for source in child.getSources():
+                    if not self.isComponentStarted(source):
+                        return
+                    
+                msg('starting %s' % name)
+                self.componentStart(child)
+        else:
+            msg('%s does not have any deps' % component_name)
+            
 class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):
@@ -424,7 +409,7 @@ class ControllerServerFactory(pb.PBServerFactory):
         return '<ControllerServerFactory>'
 
 if __name__ == '__main__':
-    log.startLogging(sys.stdout)
+    #log.startLogging(sys.stdout)
     controller = ControllerServerFactory()
 
     ts = ShellFactory()
