@@ -39,8 +39,6 @@ class Launcher(log.Loggable):
         self.manager_host = host
         self.manager_port = port
         
-        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-    
     def set_nice(self, name, nice):
         if not nice:
             return
@@ -70,7 +68,7 @@ class Launcher(log.Loggable):
             self.warning('Old PyGTK with threading disabled detected')
     
     def run_component(self, config):
-        self.info('setting up signals')
+        #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()
 

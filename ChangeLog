@@ -1,3 +1,12 @@
+2004-09-15  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/worker/job.py:
+	* flumotion/worker/launcher.py:
+	* flumotion/worker/report.py:
+	* flumotion/worker/worker.py:
+
+	Shutdown cleanly.
+
 2004-09-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/bundle.py:

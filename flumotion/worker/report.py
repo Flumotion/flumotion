@@ -43,7 +43,7 @@ class Dispatcher:
             raise NotImplementedError("no interface")
 
 class ReportAvatar(pb.Avatar, log.Loggable):
-    logCategory = 'admin-avatar'
+    logCategory = 'report-avatar'
     def __init__(self, heaven, name):
         """
         @type heaven: L{flumotion.worker.report.ReportHeaven}
@@ -76,9 +76,15 @@ class ReportAvatar(pb.Avatar, log.Loggable):
         self.mind.callRemote('start', kid.name, kid.type, kid.config)
                                           
     def shutdown(self):
-        self.log('Client shutdown')
+        self.log('%s disconnected' % self.name)
         self.mind = None
 
+    def stop(self):
+        if not self.mind:
+            return
+        
+        return self.mind.callRemote('stop')
+        
     def remote_ready(self):
         pass
 
@@ -92,7 +98,16 @@ class ReportHeaven(pb.Root, log.Loggable):
         avatar = ReportAvatar(self, avatarID)
         self.avatars[avatarID] = avatar
         return avatar
-        
+
+    def shutdown(self):
+        cb = None
+        for avatar in self.avatars.values():
+            new = avatar.stop()
+            if cb:
+                cb.chainDeferred(new)
+                cb = new
+        return cb
+                                 
 def setup(fabric):
     root = ReportHeaven(fabric)
     dispatcher = Dispatcher(root)
@@ -102,4 +117,4 @@ def setup(fabric):
     reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(),
                        report_factory)
 
-    return report_factory
+    return report_factory, root

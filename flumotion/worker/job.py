@@ -57,6 +57,10 @@ class JobView(pb.Referenceable, log.Loggable):
         entry = ConfigEntry(name, type, config, defs)
         self.run_component(entry)
 
+    def remote_stop(self):
+        reactor.stop()
+        raise SystemExit
+    
     def set_nice(self, name, nice):
         if not nice:
             return
@@ -86,6 +90,9 @@ class JobView(pb.Referenceable, log.Loggable):
             self.warning('Old PyGTK with threading disabled detected')
     
     def run_component(self, config):
+        if not config.startFactory():
+            return
+        
         self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()
@@ -107,8 +114,6 @@ class JobView(pb.Referenceable, log.Loggable):
         factory.login(name)
         reactor.connectTCP(self.manager_host,
                            self.manager_port, factory)
-
-        reactor.run(False)
     
 class JobFactory(pb.PBClientFactory, log.Loggable):
     def __init__(self, name):

@@ -21,6 +21,7 @@
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
 import os
+import signal
 import sys
 
 from twisted.internet import protocol, reactor
@@ -29,7 +30,7 @@ from twisted.spread import pb
 from flumotion.common import interfaces
 from flumotion.twisted import pbutil
 from flumotion.utils import log
-from flumotion.worker import launcher, report
+from flumotion.worker import job, report
 
 class WorkerFactory(pbutil.ReconnectingPBClientFactory):
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
@@ -72,27 +73,29 @@ class Kid:
         self.config = config
 
     # pid = protocol.transport.pid
+    def getPid(self):
+        return self.protocol.pid
     
 class Kindergarten:
     def __init__(self):
         dirname = os.path.split(os.path.abspath(sys.argv[0]))[0]
         self.program = os.path.join(dirname, 'flumotion-worker')
-        self.extra = {}
+        self.kids = {}
         
     def play(self, name, type, config):
         args = [self.program, name, '/tmp/flumotion.%d' % os.getpid()]
-
+        log.debug('worker', 'Launching process %s' % name)
         p = reactor.spawnProcess(protocol.ProcessProtocol(),
                                  self.program, args,
                                  env=os.environ,
                                  childFDs={ 0: 0, 1: 1, 2: 2})
-        self.extra[name] = Kid(p, name, type, config)
+        self.kids[name] = Kid(p, name, type, config)
 
         return p
     
-    def getExtra(self, name):
-        return self.extra[name]
-
+    def getKids(self):
+        return self.kids.values()
+    
 # Similar to Vishnu, but for worker related classes
 class WorkerFabric:
     def __init__(self, host, port):
@@ -100,28 +103,55 @@ class WorkerFabric:
         self.manager_port = port
         
         self.kindergarten = Kindergarten()
-        self.report_factory = report.setup(self)
+        self.report_factory, self.report_heaven = report.setup(self)
 
         self.worker_view = WorkerView(self)
         self.worker_factory = WorkerFactory(self)
         self.worker_factory.login('Worker')
+
+def run_job(args):
+    name = args[1]
+    filename = args[2]
         
+    job_factory = job.JobFactory(name)
+    reactor.connectUNIX(filename, job_factory)
+
+    log.debug('job', 'Starting reactor')
+    reactor.run()
+    log.debug('job', 'Reactor stopped')
+    
+def run_worker(args):
+    host = 'localhost'
+    port = 8890
+    
+    fabric = WorkerFabric(host, port)
+    
+    reactor.connectTCP(host, port, fabric.worker_factory)
+    log.debug('worker', 'Starting reactor')
+    reactor.run()
+    log.debug('worker', 'Reactor stopped')
+
+    log.debug('worker', 'Shutting down jobs')
+
+    # Is this really necessary
+    fabric.report_heaven.shutdown()
+
+    pids = [kid.getPid() for kid in fabric.kindergarten.getKids()]
+    
+    log.debug('worker', 'Waiting for jobs to finish')
+    while pids:
+        pid = os.wait()[0]
+        pids.remove(pid)
+
+    log.debug('worker', 'All jobs finished, closing down')
+
 def main(args):
     # run-job
     if args[1:]:
-        from flumotion.worker import job
-        print 'Starting worker job', repr(args)
-        name = args[1]
-        filename = args[2]
-        
-        job_factory = job.JobFactory(name)
-        reactor.connectUNIX(filename, job_factory)
-        reactor.run()
+        log.debug('launching job with args %r' % args)
+        run_job(args)
     else:
-        host = 'localhost'
-        port = 8890
-
-        fabric = WorkerFabric(host, port)
-        
-        reactor.connectTCP(host, port, fabric.worker_factory)
-        reactor.run()
+        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        log.debug('launching worker with args %r' % args)
+        run_worker(args)
