@@ -18,9 +18,6 @@
 
 # Headers in this file shall remain intact.
 
-
-import gtk.glade
-
 from flumotion.configure import configure
 from flumotion.admin.gtk import wizard, connections
 
