@@ -175,8 +175,8 @@ wizard.register_step(Webcam)
 
 
     
-class TestSource(VideoSource):
-    step_name = 'Test Source'
+class TestVideoSource(VideoSource):
+    step_name = 'Test Video Source'
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
     icon = 'testsource.png'
@@ -200,7 +200,7 @@ class TestSource(VideoSource):
         options['height'] = int(self.spinbutton_height.get_value())
         options['framerate'] = self.spinbutton_framerate.get_value()
         return options
-wizard.register_step(TestSource)
+wizard.register_step(TestVideoSource)
 
 
 
@@ -243,7 +243,7 @@ class Overlay(wizard.WizardStep):
             if audio_source == AudioDevice.Soundcard:
                 return 'Audio Source'
             elif audio_source == AudioDevice.Test:
-                return 'Audio Test'
+                return 'Test Audio Source'
             
         return 'Encoding'
 wizard.register_step(Overlay)
@@ -282,8 +282,8 @@ class AudioSource(wizard.WizardStep):
         return 'Encoding'
 wizard.register_step(AudioSource)
 
-class AudioTest(wizard.WizardStep):
-    step_name = 'Audio Test'
+class TestAudioSource(wizard.WizardStep):
+    step_name = 'Test Audio Source'
     glade_file = 'wizard_audiotest.glade'
     section = 'Production'
     icon = 'audiosrc.png'
@@ -296,7 +296,7 @@ class AudioTest(wizard.WizardStep):
     
     def get_next(self):
         return 'Encoding'
-wizard.register_step(AudioTest)
+wizard.register_step(TestAudioSource)
 
 
 class Encoding(wizard.WizardStep):

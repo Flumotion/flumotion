@@ -11,6 +11,12 @@
 
 2004-10-19  Wim Taymans  <wim@fluendo.com>
 
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/steps.py:
+	Fix naming of the steps (bug #28, #29).
+
+2004-10-19  Wim Taymans  <wim@fluendo.com>
+
 	* flumotion/component/producers/firewire/firewire.py:
 	Change the names of the feeds
 
