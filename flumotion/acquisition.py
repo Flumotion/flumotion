@@ -91,7 +91,8 @@ class Acquisition(pb.Referenceable):
         if not self.persp:
             print 'We are not ready yet, waiting 100 ms'
             reactor.callLater(0.100, self.remote_prepare)
-            
+            return
+        
         full_pipeline = '%s ! fakesink silent=1 name=fakesink' % self.pipeline_string
         log.msg('going to run pipeline: %s' % full_pipeline)
         self.pipeline = gst.parse_launch(full_pipeline)
