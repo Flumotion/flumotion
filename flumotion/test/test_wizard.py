@@ -25,8 +25,9 @@ from flumotion.wizard import enums, wizard
 
 class WizardStepTest(unittest.TestCase):
     def setUpClass(self):
-        import flumotion.wizard.steps
-        self.steps = wizard.wiz.steps
+        wiz = wizard.Wizard()
+        wiz.load_steps()
+        self.steps = wiz.steps
         
     def testLoadSteps(self):
         for step in self.steps:
