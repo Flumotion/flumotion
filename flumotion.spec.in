@@ -14,7 +14,6 @@ Requires:	gstreamer-python
 Requires:	python-Twisted
 
 BuildRequires:	python
-BuildArch:	noarch
 
 %description
 Fluendo Streaming Server.
@@ -29,6 +28,7 @@ make
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 %makeinstall
 
 %clean
@@ -42,6 +42,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/flumotion
 %dir %{_libdir}/flumotion
 %{_libdir}/flumotion/*
+%dir %{_datadir}/flumotion
+%{_datadir}/flumotion/glade/*
 
 %changelog
 * Mon Jun 07 2004 Thomas Vander Stichele <thomas at apestaart dot org>
