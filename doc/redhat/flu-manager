@@ -17,13 +17,11 @@ fi
 
 # paths to files and variables
 service=flu-manager
-manager=${HTTPD-/usr/bin/flumotion-manager}
+manager=/usr/bin/flumotion-manager
 prog=flumotion-manager
 pidfile=${PIDFILE-/var/run/flumotion-manager.pid}
 lockfile=${LOCKFILE-/var/lock/subsys/flumotion-manager}
-PLANET=/etc/flumotion/conf/planets/default.xml
-RETVAL=0
-
+PLANET=/etc/flumotion/conf/managers/default/planet.xml
 
 # The semantics of these two functions differ from the way apachectl does
 # things -- attempting to start while running is a failure, and shutdown

@@ -1,4 +1,4 @@
 EXTRA_DIST = 				\
-	manager/default.pem		\
-	flows/ogg-test-theora.xml	\
-	planets/default.xml
+	managers/default/default.pem	\
+	managers/default/flows/ogg-test-theora.xml	\
+	managers/default/planet.xml

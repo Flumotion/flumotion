@@ -40,25 +40,38 @@ make
 rm -rf $RPM_BUILD_ROOT
 
 %makeinstall
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/manager
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/planets
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/flows
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/managers/default/flows
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/workers
+
+
+# install service files
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
+install -m 755 doc/random/redhat/flu-manager %{_sysconfdir}/etc/rc.d/init.d
+install -m 755 doc/random/redhat/flu-worker %{_sysconfdir}/etc/rc.d/init.d
+#install -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+
+# create log directory
+install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%pre
+/usr/sbin/useradd -s /sbin/nologin -r -d %{_datadir}/flumotion -M -r flumotion
+exit 0
+
 %post
 # generate a default .pem certificate ?
-if ! test -e %{_sysconfdir}/flumotion/manager/default.pem
+if ! test -e %{_sysconfdir}/flumotion/managers/default.pem
 then
-  bash %{_datadir}/ssl/certs/make-dummy-cert %{_sysconfdir}/flumotion/manager/default.pem
+  bash %{_datadir}/ssl/certs/make-dummy-cert %{_sysconfdir}/flumotion/managers/default.pem
 fi
 
 # this is going to break when the admin decides to rename planets
 # this creates a user/test login account
-if ! test -e %{_sysconfdir}/flumotion/planets/default.xml
+if ! test -e %{_sysconfdir}/flumotion/managers/default/planet.xml
 then
-  cat > %{_sysconfdir}/flumotion/planets/default.xml <<EOF
+  cat > %{_sysconfdir}/flumotion/managers/default/planet.xml <<EOF
 <planet>
  
   <manager>
@@ -75,11 +88,20 @@ EOF
 fi
 
 %postun
+# if removal and not upgrade, clean up user and config
 if [ $1 -eq 0 ]
 then
-  # we are the last, so clean up
+  service flumotion-manager stop > /dev/null
+  service flumotion-worker stop > /dev/null
+  /usr/sbin/userdel flumotion
+
   rm -rf %{_sysconfdir}/flumotion/*
 fi
+
+# Think about this first, we don't really want to stop everything
+#%post
+#service flumotion-manager condrestart
+#service flumotion-worker condrestart
 
 %files
 %defattr(-,root,root,-)
@@ -93,6 +115,11 @@ fi
 %{_libdir}/flumotion
 %{_datadir}/flumotion
 %{_sysconfdir}/flumotion
+
+%config(noreplace) %attr(600,root,flumotion) %{_sysconfdir}/flumotion/managers/default/default.pem
+%attr(750,flumotion,root) %{_localstatedir}/log/flumotion
+%{_sysconfdir}/rc.d/init.d/flu-manager
+%{_sysconfdir}/rc.d/init.d/flu-worker
 #%ghost %{_sysconfdir}/flumotion/manager/default.pem
 #%ghost %{_sysconfdir}/flumotion/planets/default.xml
 
