@@ -79,6 +79,9 @@ class StreamingResource(resource.Resource):
         
         self.current_requests = []
         self.caps = None
+        self.buffer_queue = []
+
+        reactor.callLater(0, self.bufferWrite)
         
     def data_recieved_cb(self, transcoder, gbuffer, caps):
         if not self.caps:
@@ -91,11 +94,16 @@ class StreamingResource(resource.Resource):
             else:
                 self.caps = structure.get_name()
 
-        if self.current_requests:
-            buf = str(buffer(gbuffer))
+        self.buffer_queue.append(str(buffer(gbuffer)))
+        
+    def bufferWrite(self, *args):
+        for buffer in self.buffer_queue[:]:
             for request in self.current_requests:
-                reactor.callLater(0, request.write, buf)
+                request.write(buffer)
+            self.buffer.remove(buffer)
             
+        reactor.callLater(0.01, self.bufferWrite)
+        
     def getChild(self, path, request):
         return self
 
