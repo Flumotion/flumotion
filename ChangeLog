@@ -1,5 +1,10 @@
 2004-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/server/admin.py:
+	  reorganize doc strings
+
+2004-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/components/http/http.py:
 	  self.error on blocked port
 	* flumotion/server/admin.py:

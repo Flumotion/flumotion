@@ -28,9 +28,9 @@ from flumotion.utils import log
 
 class ComponentView(pb.Copyable):
     """
-    I live in the controller.
     I present state of a component through a L{RemoteComponentView} in the peer.
     I get the state I present from a L{controller.ComponentPerspective}.
+    I live in the controller.
     """
     def __init__(self, component):
         """
@@ -45,9 +45,9 @@ class ComponentView(pb.Copyable):
 
 class RemoteComponentView(pb.RemoteCopy):
     """
-    I live in an admin client.
     I represent state of a component.
     I am a copy of a controller-side L{ComponentView}
+    I live in an admin client.
     """
     def __cmp__(self, other):
         if not isinstance(other, RemoteComponentView):
@@ -60,10 +60,10 @@ pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
 
 class AdminAvatar(pb.Avatar, log.Loggable):
     """
-    I live in the controller.
     I am an avatar created for an administrative client interface.
     A reference to me is given (for example, to gui.AdminInterface)
     when logging in and requesting an "admin" avatar.
+    I live in the controller.
     """
     logCategory = 'admin-avatar'
     def __init__(self, admin):
@@ -227,9 +227,9 @@ class AdminAvatar(pb.Avatar, log.Loggable):
 
 class Admin(pb.Root):
     """
-    I live in the controller.
     I interface between the Controller and administrative clients.
     For each client I create an L{AdminAvatar} to handle requests.
+    I live in the controller.
     """
     def __init__(self, controller):
         """
