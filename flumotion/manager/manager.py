@@ -573,7 +573,10 @@ class Vishnu(log.Loggable):
         m = self._componentMappers[componentAvatar]
 
         # unmap jobstate
-        del self._componentMappers[m.jobState]
+        try:
+            del self._componentMappers[m.jobState]
+        except KeyError:
+            self.warning('Could not remove jobState for %r' % componentAvatar)
         m.jobState = None
         
         m.state.set('mood', moods.sleeping.value)

@@ -1,5 +1,10 @@
 2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/manager.py:
+	  warn on failure of removing jobState, but continue anyway
+
+2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	* flumotion/test/test_common.py:
 	  add objRepr method and test
