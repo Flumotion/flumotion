@@ -41,6 +41,9 @@ class Converter(component.BaseComponent):
         component.BaseComponent.__init__(self, name, sources, host, port, pipeline)
 
     def get_pipeline(self, pipeline):
+        if len(self.sources) == 1:
+            return 'tcpclientsrc name=%s ! %s ! tcpserversink name=sink' % (self.sources[0], pipeline)
+
         for source in self.sources:
             if ' ' in source:
                 raise TypeError, "spaces not allowed in sources"
