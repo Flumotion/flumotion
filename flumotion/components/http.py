@@ -167,7 +167,7 @@ class HTTPStreamingAdminResource(resource.Resource):
         }
 
 class HTTPStreamingResource(resource.Resource):
-    __reserve_fds__ = 3 # number of fd's to reserve for non-streaming
+    __reserve_fds__ = 1000 # number of fd's to reserve for non-streaming
     def __init__(self, streamer):
         self.logfile = None
             
@@ -257,16 +257,11 @@ class HTTPStreamingResource(resource.Resource):
         # Mimic Twisted as close as possible
         setHeader('Server', HTTP_VERSION)
         setHeader('Date', http.datetimeToString())
-        
-        mime = self.streamer.get_mime()
-        if mime == 'multipart/x-mixed-replace':
-            setHeader('Cache-Control', 'no-cache')
-            setHeader('Cache-Control', 'private')
-            setHeader("Content-type", "%s;boundary=ThisRandomString" % mime)
-        else:
-            setHeader('Content-type', mime)
+        setHeader('Cache-Control', 'no-cache')
+        setHeader('Cache-Control', 'private')
+        setHeader('Content-type', self.streamer.get_content_type())
             
-        self.debug('setting Content-type to %s' % mime)
+        #self.debug('setting Content-type to %s' % mime)
         os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
         
     def updateAverage(self):
@@ -424,6 +419,12 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
             return self.caps.get_structure(0).get_name()
         else:
             return None
+
+    def get_content_type(self):
+        mime = self.get_mime()
+        if mime == 'multipart/x-mixed-replace':
+            mime = "%s;boundary=ThisRandomString" % mime
+        return mime
     
     def add_client(self, fd):
         sink = self.get_sink()
@@ -478,6 +479,7 @@ gobject.type_register(MultifdSinkStreamer)
 
 def createComponent(config):
     reactor.debug = True
+
     name = config['name']
     port = int(config['port'])
     source = config['source']

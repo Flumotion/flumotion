@@ -89,4 +89,13 @@
     </properties>
   </component>
 
+  <component type="dv">
+    <source location="flumotion.components.dv"/>
+    <properties>
+      <property name="height" type="int"/>
+      <property name="width" type="int"/>
+      <property name="drop-factor" type="int"/>
+    </properties>
+  </component>
+
 </components>
