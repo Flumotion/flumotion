@@ -1,5 +1,19 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/reference/Makefile.am:
+	  add check-local that lets us know what we forgot
+	* doc/reference/gendoc.py:
+	* flumotion/gui/adminclient.py:
+	* flumotion/gui/admininterface.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/component.py:
+	* flumotion/server/launcher.py:
+	* flumotion/server/manager.py:
+	* flumotion/twisted/errors.py:
+	  rename controller to manager
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/server/Makefile.am:
 	* flumotion/server/controller.py:
 	  rename to manager

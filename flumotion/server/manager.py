@@ -18,14 +18,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
-"""Controller implementation and related classes
+"""Manager implementation and related classes
 
 API Stability: semi-stable
 
 Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """
 
-__all__ = ['ComponentPerspective', 'Controller', 'ControllerServerFactory']
+__all__ = ['ComponentPerspective', 'Manager', 'ManagerServerFactory']
 
 import gst
 
@@ -50,12 +50,12 @@ class Dispatcher(log.Loggable):
 
     logCategory = 'dispatcher'
 
-    def __init__(self, controller, admin):
+    def __init__(self, manager, admin):
         """
-        @type controller: L{server.controller.Controller}
+        @type manager: L{server.manager.Manager}
         @type admin:      L{server.admin.Admin}
         """
-        self.controller = controller
+        self.manager = manager
         self.admin = admin
 
     # requestAvatar gets called through ClientFactory.login()
@@ -74,7 +74,7 @@ class Dispatcher(log.Loggable):
 
         avatar = None
         if interfaces.IBaseComponent in ifaces:
-            avatar = self.controller.getAvatar(avatarID)
+            avatar = self.manager.getAvatar(avatarID)
         elif interfaces.IAdminComponent in ifaces:
             avatar = self.admin.getAvatar()
 
@@ -91,15 +91,15 @@ class Dispatcher(log.Loggable):
                 lambda avatar=avatar,mind=mind: avatar.detached(mind))
 
 class Options:
-    """dummy class for storing controller side options of a component"""
+    """dummy class for storing manager side options of a component"""
 
 class ComponentAvatar(pb.Avatar, log.Loggable):
-    """Controller side avatar of component"""
+    """Manager side avatar of component"""
 
     logCategory = 'comp-avatar'
 
-    def __init__(self, controller, username):
-        self.controller = controller
+    def __init__(self, manager, username):
+        self.manager = manager
         self.username = username
         self.state = gst.STATE_NULL
         self.options = Options()
@@ -128,7 +128,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         else:
             return self.options.feeds
 
-    def getRemoteControllerIP(self):
+    def getRemoteManagerIP(self):
         return self.options.ip
 
     def getName(self):
@@ -180,7 +180,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             setattr(self.options, key, value)
         self.options.dict = options
         
-        self.controller.componentRegistered(self)
+        self.manager.componentRegistered(self)
 
     def cb_checkOther(self, failure):
         try:
@@ -210,8 +210,8 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
     def detached(self, mind=None):
         self.debug('detached')
         name = self.getName()
-        if self.controller.hasComponent(name):
-            self.controller.removeComponent(self)
+        if self.manager.hasComponent(name):
+            self.manager.removeComponent(self)
 
     def stop(self):
         cb = self._mindCallRemote('stop')
@@ -291,14 +291,14 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             self.info('is now playing')
 
         if self.getFeeds():
-            self.controller.startPendingComponents(self, feed)
+            self.manager.startPendingComponents(self, feed)
             
     def perspective_error(self, element, error):
         self.error('error element=%s string=%s' % (element, error))
-        self.controller.removeComponent(self)
+        self.manager.removeComponent(self)
 
     def perspective_uiStateChanged(self, component_name, state):
-        self.controller.admin.uiStateChanged(component_name, state)
+        self.manager.admin.uiStateChanged(component_name, state)
         
     def link(self, sources, feeds):
         def cb_getFreePorts((feeds, ports)):
@@ -385,7 +385,7 @@ class FeedManager:
     
     def feedReady(self, feedname): 
         # If we don't specify the feed
-        log.debug('controller', 'feed %s ready' % (feedname))
+        log.debug('manager', 'feed %s ready' % (feedname))
 
         if not self.feeds.has_key(feedname):
             self.warning('FIXME: no feed called: %s' % feedname)
@@ -408,9 +408,9 @@ class FeedManager:
         else:
             func(*args)
 
-class Controller(pb.Root):
+class Manager(pb.Root):
     """
-    Controller, handles all registered components and provides avatars
+    Manager, handles all registered components and provides avatars
     for them.
     The main function of this class is to handle components, tell them
     to start register and start up pending components.
@@ -430,7 +430,7 @@ class Controller(pb.Root):
         Creates a new avatar for a component, raises
         an AlreadyConnectedError if the component is already found in the cache
         @type avatarID:  string
-        @rtype:          L{server.controller.ComponentAvatar}
+        @rtype:          L{server.manager.ComponentAvatar}
         @returns:        the avatar for the component"""
 
         if self.hasComponent(avatarID):
@@ -479,7 +479,7 @@ class Controller(pb.Root):
     
     def addComponent(self, component):
         """adds a component
-        @type component: L{server.controller.ComponentAvatar}
+        @type component: L{server.manager.ComponentAvatar}
         @param component: the component"""
 
         component_name = component.getName()
@@ -490,7 +490,7 @@ class Controller(pb.Root):
         
     def removeComponent(self, component):
         """removes a component
-        @type component: L{server.controller.ComponentAvatar}
+        @type component: L{server.manager.ComponentAvatar}
         @param component: the component"""
 
         component_name = component.getName()
@@ -519,7 +519,7 @@ class Controller(pb.Root):
 
             host = feed.getListenHost()
             if (not self.isLocalComponent(component) and host == '127.0.0.1'):
-                host = component.getRemoteControllerIP()
+                host = component.getRemoteManagerIP()
 
             retval.append((feedname, host,feed.getListenPort()))
         return retval
@@ -600,19 +600,19 @@ class Controller(pb.Root):
     def shutdown(self):
         map(self.stopComponent, self.components)
         
-class ControllerServerFactory(pb.PBServerFactory):
+class ManagerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):
-        self.controller = Controller()
+        self.manager = Manager()
         
-        # create an admin object for the controller
+        # create an admin object for the manager
         # FIXME: find a better name for admin
-        self.admin = admin.Admin(self.controller)
-        self.controller.setAdmin(self.admin)
+        self.admin = admin.Admin(self.manager)
+        self.manager.setAdmin(self.admin)
         
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
-        self.dispatcher = Dispatcher(self.controller, self.admin)
+        self.dispatcher = Dispatcher(self.manager, self.admin)
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
@@ -623,4 +623,4 @@ class ControllerServerFactory(pb.PBServerFactory):
         #self.unsafeTracebacks = 1 # for debugging tracebacks to clients
 
     def __repr__(self):
-        return '<ControllerServerFactory>'
+        return '<ManagerServerFactory>'

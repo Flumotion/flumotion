@@ -29,12 +29,12 @@ from flumotion.utils import log
 class ComponentView(pb.Copyable):
     """
     I present state of a component through a L{RemoteComponentView} in the peer.
-    I get the state I present from a L{controller.ComponentAvatar}.
-    I live in the controller.
+    I get the state I present from a L{manager.ComponentAvatar}.
+    I live in the manager.
     """
     def __init__(self, component):
         """
-        @type component: L{server.controller.ComponentAvatar}
+        @type component: L{server.manager.ComponentAvatar}
         """
         self.name = component.getName()
         # forced to int so it's jellyable
@@ -46,7 +46,7 @@ class ComponentView(pb.Copyable):
 class RemoteComponentView(pb.RemoteCopy):
     """
     I represent state of a component.
-    I am a copy of a controller-side L{ComponentView}
+    I am a copy of a manager-side L{ComponentView}
     I live in an admin client.
     """
     def __cmp__(self, other):
@@ -63,7 +63,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     I am an avatar created for an administrative client interface.
     A reference to me is given (for example, to gui.AdminInterface)
     when logging in and requesting an "admin" avatar.
-    I live in the controller.
+    I live in the manager.
     """
     logCategory = 'admin-avatar'
     def __init__(self, admin):
@@ -71,8 +71,8 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type admin: L{server.admin.Admin}
         """
         self.admin = admin
-        # FIXME: use accessor to get controller ?
-        self.controller = admin.controller
+        # FIXME: use accessor to get manager ?
+        self.manager = admin.manager
         self.mind = None
         self.debug("created new AdminAvatar")
         
@@ -103,12 +103,12 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     # FIXME: this should probably be renamed to getComponents ?
     def getClients(self):
         """
-        Return all components logged in to the controller.
+        Return all components logged in to the manager.
         
         @rtype: C{list} of L{server.admin.ComponentView}
         """
         # FIXME: should we use an accessor to get at components from c ?
-        clients = map(ComponentView, self.controller.components.values())
+        clients = map(ComponentView, self.manager.components.values())
         return clients
 
     def sendLog(self, category, type, message):
@@ -174,7 +174,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     # Generic interface to call into a component
     def perspective_callComponentRemote(self, component_name, method_name,
                                         *args, **kwargs):
-        component = self.controller.getComponent(component_name)
+        component = self.manager.getComponent(component_name)
         try:
             return component.callComponentRemote(method_name, *args, **kwargs)
         except Exception, e:
@@ -183,7 +183,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         
     def perspective_setComponentElementProperty(self, component_name, element, property, value):
         """Set a property on an element in a component."""
-        component = self.controller.getComponent(component_name)
+        component = self.manager.getComponent(component_name)
         try:
             return component.setElementProperty(element, property, value)
         except errors.PropertyError, exception:
@@ -192,7 +192,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
 
     def perspective_getComponentElementProperty(self, component_name, element, property):
         """Get a property on an element in a component."""
-        component = self.controller.getComponent(component_name)
+        component = self.manager.getComponent(component_name)
         try:
             return component.getElementProperty(element, property)
         except errors.PropertyError, exception:
@@ -200,7 +200,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             raise
 
     def perspective_getUIEntry(self, component_name):
-        component = self.controller.getComponent(component_name)
+        component = self.manager.getComponent(component_name)
         try:
             return component.getUIEntry()
         except Exception, e:
@@ -213,16 +213,16 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             self.info("reloaded component %s code" % name)
 
         self.info("reloading component %s code" % component_name)
-        avatar = self.controller.getComponent(component_name)
+        avatar = self.manager.getComponent(component_name)
         cb = avatar.reloadComponent()
         cb.addCallback(_reloaded, self, component_name)
         return cb
 
-    def perspective_reloadController(self):
-        """Reload modules in the controller."""
+    def perspective_reloadManager(self):
+        """Reload modules in the manager."""
         import sys
         from twisted.python.rebuild import rebuild
-        self.info('reloading controller code')
+        self.info('reloading manager code')
         # reload ourselves first
         rebuild(sys.modules[__name__])
 
@@ -234,19 +234,19 @@ class AdminAvatar(pb.Avatar, log.Loggable):
 
     # separate method so it runs the newly reloaded one :)
     def _reloaded(self):
-        self.info('reloaded controller code')
+        self.info('reloaded manager code')
 
 class Admin(pb.Root):
     """
-    I interface between the Controller and administrative clients.
+    I interface between the Manager and administrative clients.
     For each client I create an L{AdminAvatar} to handle requests.
-    I live in the controller.
+    I live in the manager.
     """
-    def __init__(self, controller):
+    def __init__(self, manager):
         """
-        @type controller: L{server.controller.Controller}
+        @type manager: L{server.manager.Manager}
         """
-        self.controller = controller
+        self.manager = manager
         self.clients = [] # all AdminAvatars we instantiate
         log.addLogHandler(self.logHandler)
         self.logcache = []
@@ -293,7 +293,7 @@ class Admin(pb.Root):
         """
         Tell all created AdminAvatars that a component was added.
 
-        @type component: L{server.controller.ComponentAvatar}
+        @type component: L{server.manager.ComponentAvatar}
         """
         for client in self.clients:
             client.componentAdded(component)
@@ -302,7 +302,7 @@ class Admin(pb.Root):
         """
         Tell all created AdminAvatars that a component was removed.
 
-        @type component: L{server.controller.ComponentAvatar}
+        @type component: L{server.manager.ComponentAvatar}
         """
         for client in self.clients:
             client.componentRemoved(component)

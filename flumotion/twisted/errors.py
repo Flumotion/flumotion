@@ -35,7 +35,7 @@ class PropertyError(pb.Error):
     "An error occurred while setting a property on the component"
 
 class AlreadyConnectedError(pb.Error):
-    "The component is already connected to the controller"
+    "The component is already connected to the manager"
 
 class NoPerspectiveError(pb.Error):
     "The component does not have a perspective"

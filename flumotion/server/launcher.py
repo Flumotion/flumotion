@@ -31,7 +31,7 @@ from twisted.internet.protocol import ClientCreator, Factory
 from twisted.protocols.basic import NetstringReceiver
 
 from flumotion import config
-from flumotion.server import controller, component
+from flumotion.server import manager, component
 from flumotion.server.config import FlumotionConfigXML
 from flumotion.server.registry import registry
 from flumotion.utils import log, gstutils
@@ -40,15 +40,15 @@ class MiniProtocol(NetstringReceiver):
     def stringReceived(self, line):
         if line == 'STOP':
             reactor.stop()
-            self.controller.shutdown()
+            self.manager.shutdown()
             
 class Launcher(log.Loggable):
     logCategory = 'launcher'
     def __init__(self, host, port):
         self.children = []
-        self.controller_pid = None
-        self.controller_host = host
-        self.controller_port = port
+        self.manager_pid = None
+        self.manager_host = host
+        self.manager_port = port
         self.uid = None
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
@@ -79,12 +79,12 @@ class Launcher(log.Loggable):
             
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
         
-    def start_controller(self, logging=False):
-        self.debug('Starting controller')
+    def start_manager(self, logging=False):
+        self.debug('Starting manager')
         
         pid = os.fork()
         if pid:
-            self.controller_pid = pid
+            self.manager_pid = pid
             return
         
         if logging:
@@ -92,35 +92,35 @@ class Launcher(log.Loggable):
             
         signal.signal(signal.SIGINT, signal.SIG_IGN)
                 
-        self.restore_uid('controller')
-        factory = controller.ControllerServerFactory()
-        log.debug('controller', 'listening on TCP port %d' % self.controller_port)
-        reactor.listenTCP(self.controller_port, factory)
+        self.restore_uid('manager')
+        factory = manager.ManagerServerFactory()
+        log.debug('manager', 'listening on TCP port %d' % self.manager_port)
+        reactor.listenTCP(self.manager_port, factory)
         f = Factory()
         f.protocol = MiniProtocol
-        f.protocol.controller = factory.controller
+        f.protocol.manager = factory.manager
         reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(), f)
 
         reactor.run(False)
             
         raise SystemExit
         
-    def stop_controller(self):
-        if not self.controller_pid:
+    def stop_manager(self):
+        if not self.manager_pid:
             return
         
-        filename = '/tmp/flumotion.%d' % self.controller_pid
+        filename = '/tmp/flumotion.%d' % self.manager_pid
         c = ClientCreator(reactor, MiniProtocol)
         defered = c.connectUNIX(filename)
         def cb_Stop(protocol):
-            self.debug('Telling controller to shutdown')
+            self.debug('Telling manager to shutdown')
             protocol.sendString('STOP')
             self.debug('Shutting down launcher')
             reactor.callLater(0, reactor.stop)
         defered.addCallback(cb_Stop)
 
         # We need to run the reactor again, so we can process
-        # the last events, need to tell the controller to shutdown
+        # the last events, need to tell the manager to shutdown
         reactor.run()
         
     def run(self):
@@ -128,7 +128,7 @@ class Launcher(log.Loggable):
 
         reactor.run() # don't fucking dare setting it to False.
 
-        self.stop_controller()
+        self.stop_manager()
 
     def threads_init(self):
         try:
@@ -164,7 +164,7 @@ class Launcher(log.Loggable):
         factory = component.ComponentFactory(comp)
         factory.login(component_name)
         
-        reactor.connectTCP(self.controller_host, self.controller_port, factory)
+        reactor.connectTCP(self.manager_host, self.manager_port, factory)
         
         reactor.run(False)
         raise SystemExit
@@ -183,10 +183,10 @@ def run_launcher(args):
                       help="Be verbose")
     parser.add_option('-c', '--port',
                       action="store", type="int", dest="port",
-                      help="Controller port", default=8890)
+                      help="Manager port", default=8890)
     parser.add_option('', '--host',
                       action="store", type="string", dest="host",
-                      help="Controller host", default="localhost")
+                      help="Manager host", default="localhost")
 
     options, args = parser.parse_args(args)
 
@@ -198,9 +198,9 @@ def run_launcher(args):
 
     if options.host == 'localhost':
         if not gstutils.is_port_free(options.port):
-            launcher.error('Controller is already started')
+            launcher.error('Manager is already started')
         else:
-            launcher.start_controller(options.verbose)
+            launcher.start_manager(options.verbose)
 
     try:
         launcher.load_config(args[2])
@@ -212,7 +212,7 @@ def run_launcher(args):
         print '='*79
         traceback.print_exc(file=sys.stdout)
         print '='*79
-        launcher.stop_controller()
+        launcher.stop_manager()
         return
     
     if options.verbose:
@@ -222,12 +222,12 @@ def run_launcher(args):
 
     return 0
 
-def run_controller(args):
+def run_manager(args):
     parser = optparse.OptionParser()
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="Be verbose")
-    group = optparse.OptionGroup(parser, "Controller options")
+    group = optparse.OptionGroup(parser, "Manager options")
     group.add_option('-p', '--port',
                      action="store", type="int", dest="port",
                      default=8890,
@@ -239,9 +239,9 @@ def run_controller(args):
     if options.verbose:
         log.setFluDebug("*:4")
 
-    factory = controller.ControllerServerFactory()
+    factory = manager.ManagerServerFactory()
     
-    log.debug('controller', 'Starting at port %d' % options.port)
+    log.debug('manager', 'Starting at port %d' % options.port)
     reactor.listenTCP(options.port, factory)
     reactor.run()
 
@@ -253,7 +253,7 @@ def usage():
 def show_commands():
     print 'Flumotion commands are:'
     print '\tlauncher      Component launcher'
-    print '\tcontroller    Component controller'
+    print '\tmanager    Component manager'
     print
     print '(Specify the --help option for a list of other help options)'
 
@@ -265,8 +265,8 @@ def main(args):
     args = [arg for arg in args if not arg.startswith('--gst')]
     
     name = args[1]
-    if name == 'controller':
-        return run_controller(args)
+    if name == 'manager':
+        return run_manager(args)
     elif name == 'launcher':
         return run_launcher(args)
     else:

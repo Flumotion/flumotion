@@ -99,7 +99,7 @@ gobject.type_register(PropertyChangeDialog)
 class Window(log.Loggable):
     '''
     Creates the GtkWindow for the user interface.
-    Also connects to the controller on the given host and port.
+    Also connects to the manager on the given host and port.
     '''
     def __init__(self, host, port):
         self.gladedir = config.gladedir
@@ -211,7 +211,7 @@ class Window(log.Loggable):
         self.update(admin.clients)
 
     def admin_connection_refused_later(self, host, port):
-        message = "Connection to controller on %s:%d was refused." % (host, port)
+        message = "Connection to manager on %s:%d was refused." % (host, port)
         d = self.error_dialog(message, response = False)
         d.connect('response', self.close)
 
@@ -233,7 +233,7 @@ class Window(log.Loggable):
         self.update(clients)
 
     def connect(self, host, port):
-        'connect to controller on given host and port.  Called by __init__'
+        'connect to manager on given host and port.  Called by __init__'
         self.admin = AdminInterface()
         self.admin.connect('connected', self.admin_connected_cb)
         self.admin.connect('connection-refused',
@@ -275,8 +275,8 @@ class Window(log.Loggable):
     def edit_properties_cb(self, button):
         raise NotImplementedError
 
-    def debug_reload_controller_cb(self, button):
-        cb = self.admin.reloadController()
+    def debug_reload_manager_cb(self, button):
+        cb = self.admin.reloadManager()
 
     def debug_reload_all_cb(self, button):
         cb = self.admin.reload()

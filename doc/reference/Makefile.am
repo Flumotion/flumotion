@@ -20,7 +20,7 @@ MODULE_FILES = \
 	flumotion/server/auth.py		\
 	flumotion/server/component.py		\
         flumotion/server/config.py		\
-	flumotion/server/controller.py		\
+	flumotion/server/manager.py		\
 	flumotion/server/interfaces.py		\
 	flumotion/server/launcher.py		\
 	flumotion/server/registry.py		\
@@ -31,10 +31,13 @@ MODULE_FILES = \
 
 MODULES = $(subst /,.,$(patsubst %.py,%, $(MODULE_FILES:/__init__.py=)))
 
-html/index.html: $(patsubst %, $(top_srcdir)/%, $(MODULE_FILES))
+html/index.html: $(patsubst %, $(top_srcdir)/%, $(MODULE_FILES)) gendoc.py
 	@echo Generating HTML documentation...
 	@PYTHONPATH=$(pypath) $(PYTHON) $(srcdir)/gendoc.py $(EPYDOC_ARGS) $(MODULES)
 
+check-local:
+	PYTHONPATH=$(pypath) $(PYTHON) $(srcdir)/gendoc.py --check $(MODULES)
+	
 all-local: html/index.html
 
 clean-local:

@@ -32,8 +32,8 @@ from flumotion.utils.gstutils import gsignal
 
 class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     """Lives in the admin client.
-       Controller calls on us through admin.Admin.
-       I can call on controller admin.Admin objects.
+       Manager calls on us through admin.Admin.
+       I can call on manager admin.Admin objects.
     """
     gsignal('connected')
     gsignal('connection-refused')
@@ -115,19 +115,19 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
 
         reload()
 
-        cb = self.reloadController()
+        cb = self.reloadManager()
         # stack callbacks so that a new one only gets sent after the previous
         # one has completed
         for client in self.clients:
             cb = cb.addCallback(self.reloadComponent, client)
         return cb
 
-    def reloadController(self):
+    def reloadManager(self):
         def _reloaded(result, self):
-            self.info("reloaded controller code")
+            self.info("reloaded manager code")
 
-        self.info("reloading controller code")
-        cb = self.remote.callRemote('reloadController')
+        self.info("reloading manager code")
+        cb = self.remote.callRemote('reloadManager')
         cb.addCallback(_reloaded, self)
         return cb
 

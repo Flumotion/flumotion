@@ -52,7 +52,6 @@ def connectUDP(self, remotehost, remoteport, protocol, localport=0,
     EXPERIMENTAL.
     """
 
-
 PosixReactorBase.listenUDP = listenUDP
 PosixReactorBase.listenUNIXDatagram = listenUDP
 PosixReactorBase.connectUDP = connectUDP

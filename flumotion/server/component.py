@@ -69,7 +69,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def logFunction(self, arg):
         return self.comp.get_name() + ':' + arg
 
-    # call function on remote perspective in controller (?)
+    # call function on remote perspective in manager
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
             self.debug('skipping %s, no perspective' % name)
@@ -102,7 +102,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def component_state_changed_cb(self, component, feed, state):
         self.callRemote('stateChanged', feed, state)
 
-    ### Referenceable remote methods which can be called from controller
+    ### Referenceable remote methods which can be called from manager
     def remote_link(self, sources, feeds):
         self.comp.link(sources, feeds)
 
