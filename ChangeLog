@@ -1,3 +1,8 @@
+2004-08-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/server/component.py:
+	  add all handlers
+
 2004-08-17  Johan Dahlin  <johan@gnome.org>
 
 	* tests/test_component_parse.py (PipelineTest.__init__): Call

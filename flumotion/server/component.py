@@ -151,13 +151,11 @@ class BaseComponent(gobject.GObject):
 
         self.setup_pipeline()
 
-    def debug(self, *args):
-        category = self.get_name()
-        log.debug(category, *args)
-        self.emit('log', args)
-        
+    error = lambda s, *a: log.error(s.get_name(), *a)
     warning = lambda s, *a: log.warning(s.get_name(), *a)
+    info = lambda s, *a: log.info(s.get_name(), *a)
     debug = lambda s, *a: log.debug(s.get_name(), *a)
+    log = lambda s, *a: log.log(s.get_name(), *a)
 
     def emit(self, name, *args):
         if 'uninitialized' in str(self):
