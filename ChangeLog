@@ -1,3 +1,11 @@
+2004-10-18  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/file/file.py:
+	* flumotion/component/http/http.py:
+
+	file: append an extension to the type
+	http: use get_element('sink') instead of get_sink()
+
 2004-10-18  Wim Taymans  <wim@fluendo.com>
 
 	* flumotion/component/encoders/speex.py:

@@ -174,7 +174,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def __init__(self, name, source):
         feedcomponent.ParseLaunchComponent.__init__(self, name, [source], [],
                                                     self.pipe_template)
-        Stats.__init__(self, sink=self.get_sink())
+        Stats.__init__(self, sink=self.get_element('sink'))
         self.caps = None
         self.resource = None
 
@@ -234,19 +234,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return mime
     
     def add_client(self, fd):
-        sink = self.get_sink()
+        sink = self.get_element('sink')
         sink.emit('add', fd)
 
     def remove_client(self, fd):
-        sink = self.get_sink()
+        sink = self.get_element('sink')
         sink.emit('remove', fd)
-
-    def get_sink(self):
-        assert self.pipeline, 'Pipeline not created'
-        sink = self.pipeline.get_by_name('sink')
-        assert sink, 'No sink element in pipeline'
-        assert isinstance(sink, gst.Element)
-        return sink
 
     def update_ui_state(self):
         self.emit('ui-state-changed')
@@ -326,7 +319,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self.debug('Ready to serve clients')
 
     def link_setup(self, eaters, feeders):
-        sink = self.get_sink()
+        sink = self.get_element('sink')
         # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self._notify_caps_cb)
         sink.connect('state-change', self._sink_state_change_cb)
