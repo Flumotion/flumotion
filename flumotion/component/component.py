@@ -458,7 +458,7 @@ class ParseLaunchComponent(BaseComponent):
             
                 part_name = sign + part
                 if pipeline.find(part_name) == -1:
-                    raise TypeError, "%s needs to be specified in the pipeline" % part_name
+                    raise TypeError, "%s needs to be specified in the pipeline for %s" % (part_name, self.name)
             
                 pipeline = pipeline.replace(part_name, '%s name=%s' % (template, part))
         return pipeline

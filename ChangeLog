@@ -1,5 +1,12 @@
 2004-09-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/Makefile.am:
+	  getting ready for release, disable nonworking stuff from install
+	* flumotion/component/component.py:
+	  give more info in a warning
+
+2004-09-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-admin.in:
 	* bin/flumotion-tester.in:
 	* bin/flumotion-worker.in:

@@ -1,10 +1,9 @@
 bin_SCRIPTS = \
 	flumotion \
 	flumotion-admin \
-	flumotion-tester \
-	flumotion-worker
+	flumotion-tester
 
-noinst_SCRIPTS = runtest
+noinst_SCRIPTS = runtest flumotion-worker
 
 CLEANFILES = $(bin_SCRIPTS)
 
