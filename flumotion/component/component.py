@@ -193,9 +193,6 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def _reloaded(self):
         self.info('reloaded module code for %s' % __name__)
 
-class IFlumotionComponent:
-    pass
-
 class DirectoryProvider:
     def __init__(self):
         self.files = []
