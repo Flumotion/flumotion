@@ -95,7 +95,10 @@ class GstReactor(default.PosixReactorBase):
     def addReader(self, reader):
         if not hasReader(reader):
             reads[reader] = self.input_add(reader, INFLAGS, self.callback)
-        self.simulate()
+        try:
+            self.simulate()
+        except KeyboardInterrupt:
+            pass
 
     def addWriter(self, writer):
         if not hasWriter(writer):
@@ -148,9 +151,12 @@ class GstReactor(default.PosixReactorBase):
         gst.main_quit()
 
     def run(self, installSignalHandlers=1):
-        self.startRunning(installSignalHandlers=installSignalHandlers)
-        self.simulate()
-        gst.main()
+        try:
+            self.startRunning(installSignalHandlers=installSignalHandlers)
+            self.simulate()
+            gst.main()
+        except KeyboardInterrupt:
+            pass
 
     def _doReadOrWrite(self, source, condition, faildict={
         error.ConnectionDone: failure.Failure(error.ConnectionDone()),
@@ -165,11 +171,14 @@ class GstReactor(default.PosixReactorBase):
                 if condition & gobject.IO_IN:
                     why = source.doRead()
                     didRead = source.doRead
-                if not why and condition & gobject.IO_OUT:
-                    # if doRead caused connectionLost, don't call doWrite
-                    # if doRead is doWrite, don't call it again.
-                    if not source.disconnected and source.doWrite != didRead:
-                        why = source.doWrite()
+                try:
+                    if not why and condition & gobject.IO_OUT:
+                        # if doRead caused connectionLost, don't call doWrite
+                        # if doRead is doWrite, don't call it again.
+                        if not source.disconnected and source.doWrite != didRead:
+                            why = source.doWrite()
+                except KeyboardInterrupt:
+                    pass
             except:
                 why = sys.exc_info()[1]
                 log.msg('Error In %s' % source)
@@ -184,10 +193,13 @@ class GstReactor(default.PosixReactorBase):
             else:
                 source.connectionLost(failure.Failure(why))
 
-
     def callback(self, source, condition):
-        log.callWithLogger(source, self._doReadOrWrite, source, condition)
-        self.simulate() # fire Twisted timers
+        try:
+            log.callWithLogger(source, self._doReadOrWrite, source, condition)
+            self.simulate() # fire Twisted timers
+        except KeyboardInterrupt:
+            return 0
+        
         return 1 # 1=don't auto-remove the source
 
     def simulate(self):
@@ -197,12 +209,16 @@ class GstReactor(default.PosixReactorBase):
         if _simtag is not None:
             gobject.source_remove(_simtag)
         self.runUntilCurrent()
-        timeout = min(self.timeout(), 0.1)
-        if timeout is None:
-            timeout = 0.1
-        # grumble
-        _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
-
+        try:
+            timeout = min(self.timeout(), 0.1)
+            if timeout is None:
+                timeout = 0.1
+            # grumble
+            _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
+        except KeyboardInterrupt:
+            pass
+            
+   
 def install():
     """Configure the twisted mainloop to be run inside the gtk mainloop.
     """

@@ -53,7 +53,7 @@ class Dispatcher:
         
         if self.controller.hasComponent(avatarID):
             # XXX: Raise exception/deny access
-            pass
+            return
         
         p = self.controller.getPerspective(component_type, avatarID)
 
@@ -131,9 +131,8 @@ class ComponentPerspective(pbutil.NewCredPerspective):
             self.controller.removeComponent(self)
 
     def perspective_stateChanged(self, old, state):
-#        log.msg('%s.stateChanged %s' %
-#                (self.username,
-#                 gst.element_state_get_name(state)))
+        log.msg('%s.stateChanged %s' % (self.username,
+                                        gst.element_state_get_name(state)))
         self.state = state
 
         if state == gst.STATE_PLAYING:
@@ -147,7 +146,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         
         #print dir(self.mind.perspective)
         self.controller.removeComponent(self)
-        
+
 class ProducerPerspective(ComponentPerspective):
     """Perspective for producer components"""
     kind = 'producer'
@@ -332,7 +331,7 @@ class Controller(pb.Root):
         peernames = component.getSources()
         retval = []
         for peername in peernames:
-            assert self.components.has_key(peername)
+            assert self.components.has_key(peername), peername
             source = self.components[peername]
             retval.append((source.getName(),
                            source.getListenHost(),
@@ -391,6 +390,7 @@ class Controller(pb.Root):
         for source_name in sources:
             if not self.hasComponent(source_name) or self.components[source_name].started == False:
                 log.msg("%r will be waiting for source %s" % (component, source_name))
+                #import code;code.interact(local=locals())
                 self.waitForComponent(source_name, component)
                 sources_ready = False
 
@@ -401,12 +401,12 @@ class Controller(pb.Root):
 class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):
-        controller = Controller()
-        disp = Dispatcher(controller)
+        self.controller = Controller()
+        self.dispatcher = Dispatcher(self.controller)
         checker = pbutil.ReallyAllowAnonymousAccess()
         
-        port = portal.Portal(disp, [checker])
-        pb.PBServerFactory.__init__(self, port)
+        self.portal = portal.Portal(self.dispatcher, [checker])
+        pb.PBServerFactory.__init__(self, self.portal)
 
     def __repr__(self):
         return '<ControllerServerFactory>'

@@ -17,10 +17,11 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-import sys
+import os
+import time
 import optik
 import socket
-import time
+import sys
 
 import gst
 import gobject
@@ -78,7 +79,11 @@ class BaseComponent(pb.Referenceable):
             
         assert pipeline != ''
         if len(sources) == 1:
-            pipeline = 'tcpclientsrc name=%s ! %s' % (sources[0], pipeline)
+            source_name = sources[0]
+            if pipeline.find(source_name) != -1:
+                pipeline = pipeline.replace('@' + source_name, 'tcpclientsrc name=%s' % source_name)
+            else:
+                pipeline = 'tcpclientsrc name=%s ! %s' % (source_name, pipeline)
         else:
             for source in sources:
                 if ' ' in source:
@@ -112,13 +117,21 @@ class BaseComponent(pb.Referenceable):
         assert self.remote
         peer = self.remote.broker.transport.getPeer()
         return socket.gethostbyname(peer[1])
+
+    def callRemote(self, name, *args, **kwargs):
+        if not self.hasPerspective():
+            print 'skipping %s, no perspective' % name
+            return
+
+        def errback(reason):
+            self.stop()
+            
+        cb = self.remote.callRemote(name, *args, **kwargs)
+        cb.addErrback(errback)
         
     def pipeline_error_cb(self, object, element, error, arg):
         log.msg('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
-        if self.hasPerspective():
-            self.remote.callRemote('error', element.get_path_string(), error.message)
-        else:
-            print 'skipping remote-error, no perspective'
+        self.callRemote('error', element.get_path_string(), error.message)
             
         self.cleanup()
         self.setup_pipeline()
@@ -126,10 +139,7 @@ class BaseComponent(pb.Referenceable):
     def pipeline_state_change_cb(self, element, old, state):
         log.msg('pipeline state-changed %s %s ' % (element.get_path_string(),
                                                    gst.element_state_get_name(state)))
-        if self.hasPerspective():
-            self.remote.callRemote('stateChanged', old, state)
-        else:
-            print 'skipping state-changed, no perspective'
+        self.callRemote('stateChanged', old, state)
 
     def set_state_and_iterate(self, state):
         retval = self.pipeline.set_state(state)
@@ -199,8 +209,8 @@ class BaseComponent(pb.Referenceable):
         self.pipeline_signals.append(sig_id)
         sig_id = self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         self.pipeline_signals.append(sig_id)
-        sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
-        self.pipeline_signals.append(sig_id)
+        #sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
+        #self.pipeline_signals.append(sig_id)
         
     def remote_register(self):
         if not self.hasPerspective():
@@ -211,6 +221,7 @@ class BaseComponent(pb.Referenceable):
         #self.setup_pipeline()
         
         return {'ip' : self.getIP(),
+                'pid' :  os.getpid(), 
                 'sources' : self.getSources() }
     
     def remote_get_free_port(self):
@@ -224,7 +235,12 @@ class BaseComponent(pb.Referenceable):
                 continue
             break
         return start
-            
+
+    def stop(self):
+        if (self.pipeline and
+            self.pipeline.get_state() == gst.STATE_PLAYING):
+            assert self.pipeline.set_state(gst.STATE_NULL)
+        
 class OptionError(Exception):
     pass
     
