@@ -15,17 +15,11 @@ import os
 class PipeTransport:
     def __init__(self):
         self.rfd, self.wfd = os.pipe()
-
         fcntl.fcntl(self.rfd, fcntl.F_SETFL, os.O_NONBLOCK)
 
-    def fileno(self):
-        return self.wfd
-    
-    def write(self, data):
-        os.write(self.wfd, data)
-
-    def read(self, len=4096):
-        return os.read(self.rfd, len)
+    def fileno(self): return self.wfd
+    def write(self, data): os.write(self.wfd, data)
+    def read(self, len=4096): return os.read(self.rfd, len)
 
     def readall(self):
         data = ''
@@ -65,10 +59,7 @@ class FakeStreamer:
 class FakeAuth:
     def __init__(self, response):
         self.response = response
-        
-    def authenticate(self, *args):
-        return self.response
-
+    def authenticate(self, *args): return self.response
     def getDomain(self): return 'FakeDomain'
     
 class TestHTTPClientKeycard(unittest.TestCase):
