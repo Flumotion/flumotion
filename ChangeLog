@@ -1,5 +1,12 @@
 2004-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* docs/Makefile.am:
+	* flumotion/admin/spyglass.py:
+	* ui/spyglass.glade:
+	  spyglass now works and is documented.
+
+2004-08-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/utils/log.py:
 	  allow FLU_DEBUG env var to influence debugging, still needs
 	  category and level filtering implementation

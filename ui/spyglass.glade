@@ -71,9 +71,7 @@
       <child>
 	<widget class="GtkComboBox" id="spyglass-combo">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="yes">Current Feed
-Source-Overlay
-After Overlay</property>
+	  <property name="items" translatable="yes"></property>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
