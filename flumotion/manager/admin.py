@@ -23,8 +23,8 @@
 from twisted.internet import reactor
 from twisted.spread import pb
 
+from flumotion.common import errors, interfaces
 from flumotion.twisted import pbutil
-from flumotion.common import errors
 from flumotion.utils import log
 
 class ComponentView(pb.Copyable):
@@ -69,6 +69,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     I live in the manager.
     """
     logCategory = 'admin-avatar'
+    __implements__ = interfaces.IHeaven
     def __init__(self, heaven):
         """
         @type heaven: L{flumotion.manager.admin.AdminHeaven}
@@ -247,6 +248,7 @@ class AdminHeaven(pb.Root, log.Loggable):
     """
 
     logCategory = "admin-heaven"
+    __implements__ = interfaces.IHeaven
 
     def __init__(self, manager):
         """
@@ -271,7 +273,7 @@ class AdminHeaven(pb.Root, log.Loggable):
         for category, type, message in self.logcache:
             client.sendLog(category, type, message)
         
-    def getAvatar(self):
+    def getAvatar(self, avatarID):
         """
         Creates a new administration avatar.
         @rtype:   L{flumotion.manager.admin.AdminAvatar}

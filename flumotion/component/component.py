@@ -387,7 +387,6 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
         
     def get_element_property(self, element_name, property):
         'Gets a property of an element in the GStreamer pipeline.'
-        print dir(self)
         self.debug("%s: getting property %s of element %s" % (self.get_name(), property, element_name))
         element = self.pipeline.get_by_name(element_name)
         if not element:

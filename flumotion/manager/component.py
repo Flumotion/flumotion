@@ -33,7 +33,7 @@ __all__ = ['ComponentAvatar', 'ComponentHeaven']
 import gst
 from twisted.spread import pb
 
-from flumotion.common import errors
+from flumotion.common import errors, interfaces
 from flumotion.utils import gstutils, log
 
 class Options:
@@ -430,13 +430,17 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
     def perspective_uiStateChanged(self, component_name, state):
         self.manager.adminheaven.uiStateChanged(component_name, state)
 
-class ComponentHeaven(pb.Root):
+class ComponentHeaven(pb.Root, log.Loggable):
     """
     Manager, handles all registered components and provides avatars
     for them.
     The main function of this class is to handle components, tell them
     to start register and start up pending components.
     """
+
+    __implements__ = interfaces.IHeaven
+    logCategory = 'comp-heaven'
+    
     def __init__(self):
         self.components = {} # dict of component avatars
         self.feeder_set = FeederSet()
@@ -465,6 +469,9 @@ class ComponentHeaven(pb.Root):
         self.addComponent(avatar)
         return avatar
 
+    def removeAvatar(self, avatar, mind):
+        self.warning('NotImplemented')
+    
     def isLocalComponent(self, component):
         # TODO: This could be a lot smarter
         host = component.getTransportPeer()[1]

@@ -53,3 +53,21 @@ class IBaseComponent(components.Interface):
 
 class IAdminComponent(components.Interface):
     pass
+
+
+class IWorkerComponent(components.Interface):
+    pass
+
+class IHeaven(components.Interface):
+    def getAvatar(self, name):
+        pass
+
+    def removeAvatar(self, avatar, mind):
+        pass
+    
+class INewCredPerspective(components.Interface):
+    def attached(self, mind):
+        pass
+
+    def detached(self, mind):
+        pass
