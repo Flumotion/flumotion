@@ -219,3 +219,35 @@ class OpenConnection(GladeWidget):
                 'port': int(self.port_entry.get_text()),
                 'use_insecure': not self.ssl_check.get_active()}
 gobject.type_register(OpenConnection)
+
+
+class Authenticate(GladeWidget):
+    glade_file = 'authenticate.glade'
+
+    gproperty(bool, 'can-activate', 'If the state of the widget is complete',
+              False)
+
+    def __init__(self, *args):
+        GladeWidget.__init__(self, *args)
+        self.auth_method_combo.set_active(0)
+        self.set_property('can-activate', False)
+        self.user_entry.connect('activate',
+                                lambda *x: self.passwd_entry.grab_focus())
+        self.connect('grab-focus', self.on_grab_focus)
+
+    def on_grab_focus(self, *args):
+        self.user_entry.grab_focus()
+
+    def on_entries_changed(self, *args):
+        can_act = self.user_entry.get_text() and self.passwd_entry.get_text()
+        self.set_property('can-activate', can_act)
+
+    def set_state(self, state):
+        if 'user' in state:
+            self.user_entry.set_text(state['user'])
+            self.passwd_entry.set_text(state['passwd'])
+
+    def get_state(self):
+        return {'user': self.user_entry.get_text(),
+                'passwd': self.passwd_entry.get_text()}
+gobject.type_register(Authenticate)

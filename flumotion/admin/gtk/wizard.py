@@ -172,8 +172,6 @@ class Wizard(gobject.GObject):
         except KeyError:
             raise AssertionError ('No page named %s in %r' % (name, self.pages))
 
-        assert page.page
-
         page.button_next = self.button_next
             
         available_pages = [p for p in page.next_pages

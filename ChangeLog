@@ -1,5 +1,16 @@
 2005-03-08  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/wizard.py (Wizard.set_page): Remove the
+	requirement that there be a widget named 'page' in a wizard step.
+
+	* data/glade/authenticate.glade:
+	* flumotion/admin/gtk/connections.py (Authenticate): New widget,
+	factored out of the greeter.
+
+	* data/glade/greeter-authenticate.glade: 
+	* flumotion/admin/gtk/greeter.py (Authenticate): Change to use new
+	connections.Authenticate widget.
+
 	* flumotion/ui/glade.py (flumotion_glade_custom_handler): New
 	custom glade handler, set when the module is loaded.
 

@@ -90,28 +90,22 @@ class Authenticate(wizard.WizardStep):
     auth_method_combo = user_entry = passwd_entry = None
     next_pages = []
 
-    def setup(self, state, available_pages):
-        if not 'auth_method' in state:
-            self.auth_method_combo.set_active(0)
-        self.on_entries_changed()
-        self.user_entry.grab_focus()
-        self.user_entry.connect('activate',
-                                lambda *x: self.passwd_entry.grab_focus())
+    authenticate = None
 
-    def on_entries_changed(self, *args):
-        if self.user_entry.get_text() and self.passwd_entry.get_text():
-            self.button_next.set_sensitive(True)
-        else:
-            self.button_next.set_sensitive(False)
+    def setup(self, state, available_pages):
+        try:
+            oc_state = [(k, state[k]) for k in ('user', 'passwd')]
+            self.authenticate.set_state(dict(oc_state))
+        except KeyError:
+            pass
+        self.authenticate.grab_focus()
+
+    def on_can_activate(self, obj, *args):
+        self.button_next.set_sensitive(obj.get_property('can-activate'))
 
     def on_next(self, state):
-        user = self.user_entry.get_text()
-        passwd = self.passwd_entry.get_text()
-
-        # fixme: check these values here
-        state['user'] = user
-        state['passwd'] = passwd
-
+        for k, v in self.authenticate.get_state().items():
+            state[k] = v
         return '*finished*'
 
 
