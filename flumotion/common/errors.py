@@ -47,3 +47,6 @@ class SystemError(pb.Error):
 
 class ReloadSyntaxError(pb.Error):
     "A syntax error during a reload of a module"
+
+class ComponentStart(pb.Error):
+    "An error during starting of a component"

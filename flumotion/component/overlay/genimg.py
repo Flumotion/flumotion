@@ -27,9 +27,9 @@ directory = os.path.split(os.path.abspath(__file__))[0]
 fontpath = os.path.join(directory, 'Vera.ttf')
 logopath = directory
 
-fluendoLogoPath = os.path.join(logopath, 'fluendo_24x24.png')
-ccLogoPath = os.path.join(logopath, 'cc_24x24.png')
-xiphLogoPath = os.path.join(logopath, 'xiph_24x24.png')
+fluendoLogoPath = os.path.join(logopath, 'fluendo.24x24.png')
+ccLogoPath = os.path.join(logopath, 'cc.24x24.png')
+xiphLogoPath = os.path.join(logopath, 'xiph.24x24.png')
 
 TEXT_XOFFSET = 4
 TEXT_YOFFSET = 4

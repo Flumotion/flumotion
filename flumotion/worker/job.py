@@ -26,10 +26,10 @@ import gobject
 
 from twisted.cred.credentials import UsernamePassword
 from twisted.internet import reactor
-from twisted.python import reflect
+from twisted.python import reflect, failure
 from twisted.spread import pb
 
-from flumotion.common import config, interfaces, log, registry, keycards
+from flumotion.common import config, errors, interfaces, log, registry, keycards
 from flumotion.component import component
 from flumotion.twisted import credentials
 
@@ -41,6 +41,8 @@ def getComponent(dict, defs):
         module = reflect.namedAny(source)
     except ValueError:
         raise config.ConfigError("%s source file could not be found" % source)
+    except ImportError, e:
+        raise config.ConfigError("%s source file could not be imported (%s)" % (source, e))
         
     if not hasattr(module, 'createComponent'):
         log.warning('job', 'no createComponent() for %s' % source)
@@ -83,21 +85,24 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.manager_port = port
         self.manager_transport = transport
         
-    def remote_start(self, name, type, config, feedPorts):
+    def remote_start(self, name, type, configDict, feedPorts):
         """
         I am called on by the worker's JobAvatar to start a component.
         
-        @param name:      name of component to start
-        @type  name:      string
-        @param type:      type of component to start
-        @type  type:      string
-        @param config:    the configuration dictionary
-        @type  config:    dict
-        @param feedPorts: feedName -> port
-        @type  feedPorts: dict
+        @param name:       name of component to start
+        @type  name:       string
+        @param type:       type of component to start
+        @type  type:       string
+        @param configDict: the configuration dictionary
+        @type  configDict: dict
+        @param feedPorts:  feedName -> port
+        @type  feedPorts:  dict
         """
         defs = registry.registry.getComponent(type)
-        self._runComponent(name, type, config, defs, feedPorts)
+        try:
+            self._runComponent(name, type, configDict, defs, feedPorts)
+        except config.ConfigError, e:
+            raise errors.ComponentStart()
 
     def remote_stop(self):
         reactor.stop()

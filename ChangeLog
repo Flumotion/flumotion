@@ -1,5 +1,18 @@
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	* flumotion/component/overlay/Makefile.am:
+	* flumotion/component/overlay/cc_24x24.png:
+	* flumotion/component/overlay/fluendo_24x24.png:
+	* flumotion/component/overlay/genimg.py:
+	* flumotion/component/overlay/xiph_24x24.png:
+	  rename a little
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  handle failed imports more gracefully than before
+
+2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/component/component.py:
