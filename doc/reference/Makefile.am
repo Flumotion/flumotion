@@ -13,6 +13,7 @@ MODULE_FILES = \
 	flumotion/common/auth.py		\
 	flumotion/common/errors.py		\
 	flumotion/common/interfaces.py		\
+	flumotion/common/launcher.py		\
 	flumotion/component/component.py	\
 	flumotion/component/base/producer.py	\
 	flumotion/component/base/converter.py	\
@@ -22,7 +23,6 @@ MODULE_FILES = \
 	flumotion/manager/admin.py		\
         flumotion/manager/config.py		\
 	flumotion/manager/manager.py		\
-	flumotion/manager/launcher.py		\
 	flumotion/manager/registry.py		\
 	flumotion/twisted/gstreactor.py		\
 	flumotion/utils/gstutils.py		\

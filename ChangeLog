@@ -1,5 +1,14 @@
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion.in:
+	* doc/reference/Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/manager/Makefile.am:
+	* flumotion/manager/launcher.py:
+	  move launcher to common
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/reference/Makefile.am:
 	* flumotion/common/Makefile.am:
 	* flumotion/component/http/http.py:

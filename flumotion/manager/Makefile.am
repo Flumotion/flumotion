@@ -5,7 +5,6 @@ flumotion_PYTHON = \
 	admin.py \
 	component.py \
 	config.py \
-	launcher.py \
 	manager.py \
 	registry.py
 

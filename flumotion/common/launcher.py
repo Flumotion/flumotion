@@ -148,25 +148,23 @@ class Launcher(log.Loggable):
             self.children.append(pid)
             return
         
+        component_name = config.getName()
+
+        log.debug(component_name, 'Starting on pid %d of type %s' %
+                   (os.getpid(), config.getType()))
+
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()
-
-        component_name = config.getName()
-        component_type = config.getType()
-        nice = config.nice
-        dict = config.getConfigDict()
-        comp = config.getComponent()
-        
-        log.debug(component_name, 'Starting on pid %d of type %s' %
-                  (os.getpid(), component_type))
-
         self.restore_uid(component_name)
-        self.set_nice(component_name, nice)
+        self.set_nice(component_name, config.nice)
         self.enable_core_dumps(component_name)
         
-        log.debug(component_name, 'Configuration dictionary is: %r' % dict)
+        log.debug(component_name, 'Configuration dictionary is: %r' % (
+            config.getConfigDict()))
+        comp = config.getComponent()
         factory = component.ComponentFactory(comp)
         factory.login(component_name)
+        
         reactor.connectTCP(self.manager_host, self.manager_port, factory)
         
         reactor.run(False)
