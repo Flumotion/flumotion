@@ -292,11 +292,16 @@ class HTTPStreamingResource(resource.Resource):
             self.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
-        if self.isAuthenticated(request):
-            self.setHeaders(request)
-            self.addClient(request)
-            return server.NOT_DONE_YET
-        else:
+        if len(self.request_hash) >= 1:
+            self.msg('Refusing clients, already 1001 clients')
+            error_code = http.SERVICE_UNAVAILABLE
+            request.setResponseCode(error_code)
+            request.setHeader('server', HTTP_VERSION)
+            request.setHeader('content-type', 'text/html')
+            return ERROR_TEMPLATE % {'code': error_code,
+                                     'error': http.RESPONSES[error_code]}
+            
+        if not self.isAuthenticated(request):
             self.msg('client from %s is unauthorized' % (request.getClientIP()))
             error_code = http.UNAUTHORIZED
             request.setResponseCode(error_code)
@@ -306,6 +311,11 @@ class HTTPStreamingResource(resource.Resource):
 
             return ERROR_TEMPLATE % {'code': error_code,
                                      'error': http.RESPONSES[error_code]}
+
+        # everything fulfilled, serve to client
+        self.setHeaders(request)
+        self.addClient(request)
+        return server.NOT_DONE_YET
 
 class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     pipe_template = 'multifdsink name=sink ' + \
