@@ -13,6 +13,7 @@ SUBDIRS = \
 	base \
 	bouncers \
 	bttv \
+	encoders \
 	dv \
 	file \
 	http \

@@ -1,5 +1,19 @@
 2004-10-12  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/Makefile.am:
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/__init__.py:
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/component/encoders/jpeg.py:
+	* flumotion/component/encoders/smoke.py:
+	* flumotion/component/encoders/theora.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Add video encoders.
+	
+2004-10-12  Johan Dahlin  <johan@gnome.org>
+
 	* bin/flumotion-admin.in:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/wizard/Makefile.am:

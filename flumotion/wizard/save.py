@@ -7,7 +7,7 @@ video_source_components = { VideoDevice.TVCard    : 'tv-card',
 audio_source_components = { AudioDevice.Firewire  : 'audio-firewire',
                             AudioDevice.Soundcard : 'alsasrc',
                             AudioDevice.Test      : 'sinesrc' }
-
+
 class Component:
     def __init__(self, name, type, properties={}):
         self.name = name
@@ -27,7 +27,7 @@ class Component:
         component.addEater(self)
 
     def toXML(self):
-        s = '  <component name="%s" type="%s"/>\n' % (self.name, self.type)
+        s = '  <component name="%s" type="%s">\n' % (self.name, self.type)
 
         if len(self.eaters) == 1:
             s += '    <feed>default</feed>\n'
@@ -51,7 +51,7 @@ class Component:
               tuple([f.name for f in self.feeders]) or ''
         for eater in self.eaters:
             eater.printTree(indent+1)
-            
+            
 class WizardSaver:
     def __init__(self, wizard):
         self.wizard = wizard

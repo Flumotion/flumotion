@@ -1,0 +1,27 @@
+<components>
+  <component type="theora-encoder">
+    <source location="flumotion.component.encoders.theora"/>
+    <properties>
+      <property name="source" type="string" multiple="no"/>
+      <property name="bitrate" type="int"/>
+      <property name="quality" type="int"/>
+    </properties>
+  </component>
+  <component type="smoke-encoder">
+    <source location="flumotion.component.encoders.smoke"/>
+    <properties>
+      <property name="source" type="string" multiple="no"/>
+      <property name="qmin" type="int"/>
+      <property name="qmax" type="int"/>
+      <property name="threshold" type="int"/>
+      <property name="keyframe" type="int"/>
+    </properties>
+  </component>
+  <component type="jpeg-encoder">
+    <source location="flumotion.component.encoders.jpeg"/>
+    <properties>
+      <property name="source" type="string" multiple="no"/>
+      <property name="quality" type="int"/>
+    </properties>
+  </component>
+</components>

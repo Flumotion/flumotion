@@ -245,7 +245,7 @@ class Encoding(wizard.WizardStep):
 
     def get_audio_page(self):
         if self.wizard.get_step_option('Source', 'has_audio'):
-            codec = self.combobox_audio.get_value()
+            codec = self.combobox_audio.get_enum()
             if codec == EncodingAudio.Vorbis:
                 return 'Vorbis'
             elif codec == EncodingAudio.Speex:
@@ -257,7 +257,7 @@ class Encoding(wizard.WizardStep):
         
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has_video'):
-            codec = self.combobox_video.get_value()
+            codec = self.combobox_video.get_enum()
             if codec == EncodingVideo.Theora:
                 return 'Theora'
             elif codec == EncodingVideo.Smoke:
@@ -291,6 +291,13 @@ class Theora(VideoEncoder):
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
+    
+    def get_component_properties(self):
+        options = self.wizard.get_step_state(self)
+        options['bitrate'] = int(options['bitrate'])
+        options['quality'] = int(options['quality'])
+        return options
+    
 wizard.register_step(Theora)
 
 
@@ -303,6 +310,15 @@ class Smoke(VideoEncoder):
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
+    
+    def get_component_properties(self):
+        options = self.wizard.get_step_state(self)
+        options['qmin'] = int(options['qmin'])
+        options['qmax'] = int(options['qmax'])
+        options['threshold'] = int(options['threshold'])
+        options['keyframe'] = int(options['keyframe'])
+        return options
+
 wizard.register_step(Smoke)
 
 
@@ -315,6 +331,12 @@ class JPEG(VideoEncoder):
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
+    
+    def get_component_properties(self):
+        options = self.wizard.get_step_state(self)
+        options['quality'] = int(options['quality'])
+        return options
+    
 wizard.register_step(JPEG)
 
 
