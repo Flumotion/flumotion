@@ -1,5 +1,11 @@
 2005-03-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common_gstreamer.py:
+	  add a gstreamer test
+
+2005-03-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/vumeter:
 	* flumotion/test/test_ui_fgtk.py:
 	* flumotion/ui/fgtk.py:

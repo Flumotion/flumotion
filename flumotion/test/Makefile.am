@@ -7,6 +7,7 @@ EXTRA_DIST = 				\
 	test_bundle.py 			\
 	test_checkers.py 		\
 	test_common.py 			\
+	test_common_gstreamer.py 	\
 	test_common_planet.py	 	\
 	test_component.py 		\
 	test_config.py 			\
@@ -28,6 +29,7 @@ EXTRA_DIST = 				\
 	test_pygobject.py		\
 	test_reflect.py 		\
 	test_registry.py 		\
+	test_ui_fgtk.py 		\
 	test_wizard.py 			\
 	test_workerconfig.py
 
