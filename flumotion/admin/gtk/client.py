@@ -265,11 +265,10 @@ class Window(log.Loggable, gobject.GObject):
             exec(statement)
         except SyntaxError, e:
             # the syntax error can happen in the entry file, or any import
-            where = "<entry file>"
-            if e.filename:
-                where = e.filename
+            where = getattr(e, 'filename', "<entry file>")
+            lineno = getattr(e, 'lineno', 0)
             msg = "Syntax Error at %s:%d while executing %s" % (
-                where, e.lineno, fileName)
+                where, lineno, fileName)
             self.warning(msg)
             raise errors.EntrySyntaxError(msg)
         except NameError, e:
