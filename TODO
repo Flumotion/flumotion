@@ -40,6 +40,8 @@
 
 * EASY:		doublecheck spec
 
+* EASY:		write .pc and -uninstalled.pc
+
 - API cleanup:
 
 - manager/component.py:
