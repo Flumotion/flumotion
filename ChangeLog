@@ -1,3 +1,9 @@
+2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/component.py:
+	* flumotion/test/test_manager.py:
+	  uniformize and privatize getComponent(Eaters/Feeders)Data
+
 2004-10-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:

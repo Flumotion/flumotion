@@ -104,7 +104,7 @@ class TestComponentHeaven(unittest.TestCase):
     def testComponentEatersEmpty(self):
         a = FakeComponentAvatar('fake')
         self.heaven._addComponentAvatar(a)
-        assert self.heaven.getComponentEatersData(a) == []
+        assert self.heaven._getComponentEatersData(a) == []
         
     def testComponentsEaters(self):
         a = FakeComponentAvatar('foo', ['bar:default', 'baz:default'])
@@ -117,7 +117,7 @@ class TestComponentHeaven(unittest.TestCase):
         self.heaven.feeder_set.addFeeders(a2)
         self.heaven.feeder_set.addFeeders(a3)
         
-        eaters = self.heaven.getComponentEatersData(a)
+        eaters = self.heaven._getComponentEatersData(a)
         assert len(eaters) == 2
         assert ('bar:default', 'bar-host', 1000) in eaters
         assert ('baz:default', 'baz-host', 1001) in eaters        

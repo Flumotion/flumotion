@@ -726,7 +726,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         
         self.vishnu.adminheaven.componentRemoved(component)
 
-    def getComponentEatersData(self, component):
+    def _getComponentEatersData(self, component):
         """
         Retrieve the information about the feeders this component's eaters
         are eating from.
@@ -752,9 +752,9 @@ class ComponentHeaven(pb.Root, log.Loggable):
             retval.append((feederName, host, feeder.getListenPort()))
         return retval
 
-    def getComponentFeeders(self, component):
+    def _getComponentFeedersData(self, component):
         """
-        Retrieves the feeders (feed producer elements) for a component.
+        Retrieves the data of feeders (feed producer elements) for a component.
 
         @type  component: L{flumotion.manager.component.ComponentAvatar}
         @param component: the component
@@ -771,11 +771,11 @@ class ComponentHeaven(pb.Root, log.Loggable):
 
     def componentStart(self, component):
         component.debug('Starting, asking component to link')
-        eatersData = self.getComponentEatersData(component)
-        feeders = self.getComponentFeeders(component)
+        eatersData = self._getComponentEatersData(component)
+        feedersData = self._getComponentFeedersData(component)
 
-        component.debug('Starting, asking component to link with eatersData %s and feedersData %s' % (eatersData, feeders))
-        component.link(eatersData, feeders)
+        component.debug('Starting, asking component to link with eatersData %s and feedersData %s' % (eatersData, feedersData))
+        component.link(eatersData, feedersData)
 
     def checkComponentStart(self, component):
         """
