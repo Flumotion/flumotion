@@ -44,6 +44,7 @@ class ComponentFactory(pbutil.ReconnectingPBClientFactory):
         self.view.cb_gotPerspective(perspective)
 
 class ComponentView(pb.Referenceable, log.Loggable):
+    'Implements a view on a local component'
     logCategory = 'componentview'
     
     def __init__(self, component):
@@ -54,9 +55,12 @@ class ComponentView(pb.Referenceable, log.Loggable):
         
         self.remote = None # the perspective we have on the other side (?)
         
+    ### Loggable methods
     def logFunction(self, arg):
         return self.comp.get_name + ':' + arg
     
+
+    # call function on remote perspective in controller (?)
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
             self.debug('skipping %s, no perspective' % name)
@@ -89,9 +93,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def component_state_changed_cb(self, component, feed, state):
         self.callRemote('stateChanged', feed, state)
 
-    #
-    # Remote methods
-    #
+    ### Referenceable remote methods which can be called from controller
     def remote_link(self, sources, feeds):
         self.comp.link(sources, feeds)
 
@@ -138,6 +140,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
         return retval, ports
         
 class BaseComponent(gobject.GObject, log.Loggable):
+    """I am the base class for all Flumotion components."""
     __gsignals__ = {
         'state-changed': (gobject.SIGNAL_RUN_FIRST, None, (str, object)),
         'error':         (gobject.SIGNAL_RUN_FIRST, None, (str, str)),
@@ -154,9 +157,11 @@ class BaseComponent(gobject.GObject, log.Loggable):
 
         self.setup_pipeline()
 
+    ### Loggable methods
     def logFunction(self, arg):
         return (self.get_name() + ' ' + arg)
 
+    ### GObject methods
     def emit(self, name, *args):
         if 'uninitialized' in str(self):
             self.warning('Uninitialized object!')
@@ -164,6 +169,7 @@ class BaseComponent(gobject.GObject, log.Loggable):
         else:
             gobject.GObject.emit(self, name, *args)
         
+    ### BaseComponent methods
     def get_name(self):
         return self.component_name
     
@@ -177,17 +183,7 @@ class BaseComponent(gobject.GObject, log.Loggable):
         self.debug('restarting')
         self.cleanup()
         self.setup_pipeline()
-        
-    def pipeline_error_cb(self, object, element, error, arg):
-        self.debug('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
-        self.emit('error', element.get_path_string(), error.message)
-        #self.restart()
-        
-    def feed_state_change_cb(self, element, old, state, feed):
-        self.debug('state-changed %s %s' % (element.get_path_string(),
-                                            gst.element_state_get_name(state)))
-        self.emit('state-changed', feed, state)
-
+       
     def set_state_and_iterate(self, state):
         retval = self.pipeline.set_state(state)
         if not retval:
@@ -199,11 +195,16 @@ class BaseComponent(gobject.GObject, log.Loggable):
         return self.pipeline
 
     def create_pipeline(self):
-        raise NotImplementedError
-    
+        raise NotImplementedError, "subclass must implement create_pipeline"
+        
+    def _pipeline_error_cb(self, object, element, error, arg):
+        self.debug('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
+        self.emit('error', element.get_path_string(), error.message)
+        #self.restart()
+     
     def setup_pipeline(self):
         self.pipeline.set_name('pipeline-' + self.get_name())
-        sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
+        sig_id = self.pipeline.connect('error', self._pipeline_error_cb)
         self.pipeline_signals.append(sig_id)
         
         sig_id = self.pipeline.connect('deep-notify',
@@ -239,6 +240,12 @@ class BaseComponent(gobject.GObject, log.Loggable):
             source.set_property('port', source_port)
             source.set_property('protocol', 'gdp')
             
+    def feed_state_change_cb(self, element, old, state, feed):
+        # also called by subclasses
+        self.debug('state-changed %s %s' % (element.get_path_string(),
+                                            gst.element_state_get_name(state)))
+        self.emit('state-changed', feed, state)
+
     def setup_feeds(self, feeds):
         if not self.pipeline:
             raise errors.NotReadyError('No pipeline')
@@ -294,10 +301,12 @@ class BaseComponent(gobject.GObject, log.Loggable):
         self.pipeline_play()
 
     def get_element_names(self):
+        'Return the names of all elements in the GStreamer pipeline.'
         pipeline = self.get_pipeline()
         return [element.get_name() for element in pipeline.get_list()]
         
     def get_element_property(self, element_name, property):
+        'Gets a property of an element in the GStreamer pipeline.'
         element = self.pipeline.get_by_name(element_name)
         if not element:
             raise errors.PropertyError("No element called: %s" % element_name)
@@ -311,6 +320,7 @@ class BaseComponent(gobject.GObject, log.Loggable):
         return value
 
     def set_element_property(self, element_name, property, value):
+        'Sets a property on an element in the GStreamer pipeline.'
         element = self.pipeline.get_by_name(element_name)
         if not element:
             raise errors.PropertyError("No element called: %s" % element_name)
@@ -321,12 +331,14 @@ class BaseComponent(gobject.GObject, log.Loggable):
 gobject.type_register(BaseComponent)
     
 class ParseLaunchComponent(BaseComponent):
+    'A component using gst-launch syntax'
     SOURCE_TMPL = 'tcpclientsrc'
     FEED_TMPL = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'
     def __init__(self, name, sources, feeds, pipeline_string=''):
         self.pipeline_string = pipeline_string
         BaseComponent.__init__(self, name, sources, feeds)
 
+    ### BaseComponent methods
     def setup_pipeline(self):
         pipeline = self.parse_pipeline(self.pipeline_string)
         try:
@@ -336,6 +348,7 @@ class ParseLaunchComponent(BaseComponent):
 
         BaseComponent.setup_pipeline(self)
 
+    ### ParseLaunchComponent methods
     def parse_tmpl(self, pipeline, parts, template, sign, format):
         assert pipeline != ''
         if len(parts) == 1:

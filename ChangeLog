@@ -1,3 +1,12 @@
+2004-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/gui/adminclient.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/component.py:
+	* flumotion/server/controller.py:
+	* flumotion/utils/log.py:
+	  various logging and commenting
+
 2004-08-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/utils/log.py:

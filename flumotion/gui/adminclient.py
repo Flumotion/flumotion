@@ -54,21 +54,21 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         self.factory = pb.PBClientFactory()
         self.debug("logging in to ClientFactory")
         cb = self.factory.login(pbutil.Username('admin'), client=self)
-        cb.addCallback(self.gotPerspective)
-        cb.addErrback(self.gotError)
+        cb.addCallback(self._gotPerspective)
+        cb.addErrback(self._gotError)
 
-    def gotPerspective(self, perspective):
-        self.debug("gotPerspective")
+    def _gotPerspective(self, perspective):
+        self.debug("gotPerspective: %s" % perspective)
         self.remote = perspective
 
-    def gotError(self, failure):
+    def _gotError(self, failure):
         r = failure.trap(error.ConnectionRefusedError)
         self.debug("emitting connection-refused")
         self.emit('connection-refused')
         self.debug("emitted connection-refused")
 
     def remote_log(self, category, type, message):
-        self.log('remote: %s: %s: %s' % (category, type, message))
+        self.log('remote: %s: %s: %s' % (type, category, message))
         
     def remote_componentAdded(self, component):
         self.debug('componentAdded %s' % component.getName())
@@ -76,6 +76,7 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         self.emit('update', self.clients)
         
     def remote_componentRemoved(self, component):
+        # FIXME: this asserts, no method, when server dies
         self.debug('componentRemoved %s' % component.getName())
         self.clients.remove(component)
         self.emit('update', self.clients)

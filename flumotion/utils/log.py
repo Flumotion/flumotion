@@ -39,17 +39,40 @@ from flumotion.twisted import errors
 global FLU_DEBUG
 
 class Loggable:
+    """
+    Base class for objects that want to be able to log messages with
+    different level of severity.  The levels are, in order from least
+    to most: log, debug, info, warning, error.
+
+    @cvar logCategory: Implementors can provide a category to log their
+       messages under.
+    """
+
     logCategory = 'default'
     
-    error = lambda self, *a: error(self.logCategory, self.logFunction(*a))
-    warning = lambda self, *a: warning(self.logCategory, self.logFunction(*a))
-    info = lambda self, *a: info(self.logCategory, self.logFunction(*a))
-    debug = lambda self, *a: debug(self.logCategory, self.logFunction(*a))
-    log = lambda self, *a: log(self.logCategory, self.logFunction(*a))
+    def error(self, *args):
+        "Log an error.  By default this will also raise an exception."""
+        error(self.logCategory, self.logFunction(*args))
+        
+    def warning(self, *args):
+        "Log a warning.  Used for non-fatal problems."
+        warning(self.logCategory, self.logFunction(*args))
+        
+    def info(self, *args):
+        "Log an informational message.  Used for normal operation."
+        info(self.logCategory, self.logFunction(*args))
 
-    def logFunction(self, a):
-        'default implementation just returns the one passed argument'
-        return a
+    def debug(self, *args):
+        "Log a debug message.  Used for debugging."
+        info(self.logCategory, self.logFunction(*args))
+
+    def log(self, *args):
+        "Log a log message.  Used for debugging recurring events."
+        info(self.logCategory, self.logFunction(*args))
+
+    def logFunction(self, message):
+        "Overridable log function.  Default just returns passed message."
+        return message
 
 _log_handlers = []
 

@@ -28,12 +28,14 @@ from flumotion.server import admin
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import gstutils, log
 
-class Dispatcher:
+class Dispatcher(log.Loggable):
     __implements__ = portal.IRealm
+    logCategory = 'dispatcher'
     def __init__(self, controller, admin):
         self.controller = controller
         self.admin = admin
         
+    ### IRealm method
     def requestAvatar(self, avatarID, mind, *interfaces):
         p = None
         if not pb.IPerspective in interfaces:
@@ -47,14 +49,14 @@ class Dispatcher:
         
             p = self.controller.getPerspective(avatarID)
 
-        #debug("returning Avatar(%s): %s" % (avatarID, p))
+        self.debug("returning Avatar: id %s, perspective %s" % (avatarID, p))
         if not p:
             raise errors.NoPerspectiveError(avatarID)
 
-        # schedule a perspective attached
+        # schedule a perspective attached for after this function
         reactor.callLater(0, p.attached, mind)
         
-        # return a deferred with interface, aspect, and logout function 
+        # return a tuple of interface, aspect, and logout function 
         return (pb.IPerspective, p,
                 lambda p=p,mind=mind: p.detached(mind))
 

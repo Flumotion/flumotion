@@ -1,8 +1,10 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
-
+#
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
+#
+# admin.py
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +27,7 @@ from flumotion.twisted import pbutil
 from flumotion.utils import log
 
 class ComponentView(pb.Copyable):
+    """View on a controller.ComponentPerspective"""
     def __init__(self, component):
         self.name = component.getName()
         # forced to int so it's jellyable
@@ -44,10 +47,13 @@ class RemoteComponentView(pb.RemoteCopy):
 pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
 
 class AdminPerspective(pbutil.NewCredPerspective, log.Loggable):
-    logCategory = 'admin'
+    """Perspective on the local controller created locally on behalf of
+    a remote AdminInterface"""
+    logCategory = 'admin-persp'
     def __init__(self, controller):
         self.controller = controller
         self.mind = None
+        self.debug("created new AdminPerspective")
         
     def hasPerspective(self):
         return self.mind != None
@@ -66,23 +72,23 @@ class AdminPerspective(pbutil.NewCredPerspective, log.Loggable):
         
     def getClients(self):
         clients = map(ComponentView, self.controller.components.values())
-        print "clients:"
-        print clients
         return clients
 
     def sendLog(self, category, type, message):
         self.callRemote('log', category, type, message)
         
     def componentAdded(self, component):
+        self.debug("AdminPerspective.componentAdded: %s" % component)
         self.callRemote('componentAdded', ComponentView(component))
         
     def componentRemoved(self, component):
+        self.debug("AdminPerspective.componentRemoved: %s" % component)
         self.callRemote('componentRemoved', ComponentView(component))
 
     def attached(self, mind):
         self.mind = mind
         ip = self.mind.broker.transport.getPeer()[1]
-        self.debug('Client from %s attached' % ip)
+        self.debug('Client from %s attached, sending client components' % ip)
 
         self.callRemote('initial', self.getClients())
 
@@ -115,6 +121,7 @@ class Admin(pb.Root):
         log.addLogHandler(self.logHandler)
         self.logcache = []
 
+    # FIXME: Loggable
     debug = lambda s, *a: log.debug('admin', *a)
         
     def logHandler(self, category, type, message):
@@ -146,5 +153,3 @@ class Admin(pb.Root):
     def componentRemoved(self, component):
         for client in self.clients:
             client.componentRemoved(component)
-
-        
