@@ -437,7 +437,7 @@ class ParseLaunchComponent(BaseComponent):
         try:
             self.pipeline = gst.parse_launch(pipeline)
         except gobject.GError, e:
-            raise errors.PipelineParseError(pipeline)
+            raise errors.PipelineParseError(e)
 
         BaseComponent.setup_pipeline(self)
 

@@ -34,6 +34,7 @@ from flumotion import config
 from flumotion.manager import manager
 from flumotion.common.config import FlumotionConfigXML
 from flumotion.common.registry import registry
+from flumotion.common import errors
 from flumotion.component import component
 from flumotion.utils import log, gstutils
 
@@ -80,17 +81,19 @@ class Launcher(log.Loggable):
             
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
         
-    def start_manager(self, logging=False):
-        self.debug('Starting manager')
+    def start_manager(self):
+        self.debug('starting manager')
         
         pid = os.fork()
         if pid:
+            # the main thread
+            self.debug('child started with pid %d' % pid)
             self.manager_pid = pid
             return
         
-        if logging:
-            log.setFluDebug("*:4")
-            
+        # the child
+
+        # ignore ctrl-c - it should be handled by the main launching process
         signal.signal(signal.SIGINT, signal.SIG_IGN)
                 
         self.restore_uid('manager')
@@ -107,6 +110,7 @@ class Launcher(log.Loggable):
         raise SystemExit
         
     def stop_manager(self):
+        self.debug("stop_manager")
         if not self.manager_pid:
             return
         
@@ -208,6 +212,10 @@ def run_launcher(args):
     try:
         launcher.load_config(args[2])
     except SystemExit:
+        return
+    except errors.PipelineParseError, e:
+        sys.stderr.write("Error: %s\n" % e)
+        launcher.stop_manager()
         return
     except Exception, e:
         import traceback
