@@ -1,5 +1,10 @@
 2004-08-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/components/http.py:
+	  fix average client code
+
+2004-08-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/multipart-bttv-overlay-jpeg.xml:
 	* data/registry/basecomponents.xml:
 	* flumotion/components/bttv.py:

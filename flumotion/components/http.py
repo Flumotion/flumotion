@@ -266,17 +266,18 @@ class HTTPStreamingResource(resource.Resource):
         
     def updateAverage(self):
         # update running average of clients connected
-        self.average_time = now = time.time()
+        now = time.time()
         # calculate deltas
-        if self.average_time - self.start_time == 0:
+        dt1 = self.average_time - self.start_time
+        dc1 = self.average_client_number
+        dt2 = now - self.average_time
+        dc2 = len(self.request_hash)
+        self.average_time = now # we can update now that we used self.av
+         if dt1 == 0:
             # first measurement
             self.average_client_number = 0
         else:
-            dt1 = self.average_time - self.start_time
-            dc1 = self.average_client_number
-            dt2 = now - self.average_time
-            dc2 = len(self.request_hash)
-            self.average_client_number = (dc1 * dt1 / (dt1 + dt2) +
+           self.average_client_number = (dc1 * dt1 / (dt1 + dt2) +
                                           dc2 * dt2 / (dt1 + dt2))
 
     def isReady(self):
@@ -308,14 +309,15 @@ class HTTPStreamingResource(resource.Resource):
     def addClient(self, request):
         """Add a request, so it can be used for statistics
         @param request: the request
-        @type request: twisted.protocol.http.Request"""
+        @type request: twisted.protocol.http.Request
+        """
         
+        self.updateAverage()
         fd = request.transport.fileno()
         self.request_hash[fd] = request
         # update peak client number
         if len(self.request_hash) > self.peak_client_number:
             self.peak_client_number = len(self.request_hash)
-        self.updateAverage()
 
     def removeClient(self, request, fd):
         """Removes a request and add logging. Note that it does not disconnect the client
@@ -324,11 +326,11 @@ class HTTPStreamingResource(resource.Resource):
         @param fd: the file descriptor for the client being removed
         @type fd: L{int}
         """
+        self.updateAverage()
         ip = request.getClientIP()
         self.log(fd, ip, request)
         self.debug('(%d) client from %s disconnected' % (fd, ip))
         del self.request_hash[fd]
-        self.updateAverage()
 
     def handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')
