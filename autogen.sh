@@ -1,7 +1,7 @@
 #!/bin/sh
 set -x
 aclocal -I m4 || exit 1
-# libtoolize --force
+libtoolize --force || exit 1
 # autoheader
 autoconf || exit 1
 automake -a || exit 1
