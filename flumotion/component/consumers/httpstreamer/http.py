@@ -160,7 +160,7 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         return self.callRemote('removeKeycard', bouncerName, keycardId)
 
     def remote_expireKeycard(self, keycardId):
-        self.comp.expireKeycard(keycardId)
+        self.comp.resource.expireKeycard(keycardId)
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):

@@ -571,8 +571,22 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return d
 
     def removeKeycard(self, keycardId):
+        """
+        Remove a keycard managed by this bouncer because the requester
+        has gone.
+        """
         self.debug('remotecalling removeKeycard with id %s' % keycardId)
         d = self._mindCallRemote('removeKeycard', keycardId)
+        d.addErrback(self._mindErrback)
+        return d
+
+    def expireKeycard(self, keycardId):
+        """
+        Expire a keycard issued to this component because the bouncer decided
+        to.
+        """
+        self.debug('remotecalling expireKeycard with id %s' % keycardId)
+        d = self._mindCallRemote('expireKeycard', keycardId)
         d.addErrback(self._mindErrback)
         return d
 
@@ -610,16 +624,34 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return bouncerAvatar.authenticate(keycard)
 
     def perspective_removeKeycard(self, bouncerName, keycardId):
-        self.debug('asked to remove keycard %s on bouncer %s' % (keycardId, bouncerName))
+        """
+        Remove a keycard on the given bouncer on behalf of a component's medium.
+        """
+        self.debug('asked to remove keycard %s on bouncer %s' % (
+            keycardId, bouncerName))
         if not self.heaven.hasComponent(bouncerName):
-            self.warning('asked to remove keycard %s on bouncer %s, but no such component registered' % (keycardId, bouncerName))
+            self.warning('asked to remove keycard %s on bouncer %s, ' + \
+                'but no such component registered' % (keycardId, bouncerName))
             # FIXME: return failure object ?
             return False
 
         bouncerAvatar = self.heaven.getComponent(bouncerName)
         return bouncerAvatar.removeKeycard(keycardId)
 
+    def perspective_expireKeycard(self, requesterName, keycardId):
+        """
+        Expire a keycard (and thus the requester's connection)
+        issued to the given requester.
+        """
+        # FIXME: we should also be able to expire manager bouncer keycards
+        if not self.heaven.hasComponent(requesterName):
+            self.warning('asked to expire keycard %s for requester %s, ' % (
+                keycardId, requesterName) +
+                'but no such component registered')
+            raise errors.NoSuchComponentError(requesterName)
 
+        componentAvatar = self.heaven.getComponent(requesterName)
+        return componentAvatar.expireKeycard(keycardId)
 
 class ComponentHeaven(pb.Root, log.Loggable):
     """

@@ -32,12 +32,18 @@ from flumotion.component import component
 __all__ = ['Bouncer']
 
 class BouncerMedium(component.BaseComponentMedium):
+
+    logCategory = 'bouncermedium'
     def remote_authenticate(self, keycard):
         return self.comp.authenticate(keycard)
 
     # FIXME: rename to ...Id
     def remote_removeKeycard(self, keycardId):
-        self.comp.removeKeycardId(keycardId)
+        try:
+            self.comp.removeKeycardId(keycardId)
+        # FIXME: at least have an exception name please
+        except:
+            self.warning('Could not remove keycard id %s' % keycardId)
 
     ### FIXME: having these methods means we need to properly separate
     # more component-related stuff
@@ -79,6 +85,9 @@ class Bouncer(component.BaseComponent):
 
         self.info('keycard %r refused because the base authenticate() should be overridden' % keycard)
         return None
+
+    def hasKeycard(self, keycard):
+        return keycard in self._keycards.values()
 
     def addKeycard(self, keycard):
         # give keycard an id and store it in our hash

@@ -303,7 +303,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         keycard = keycards.KeycardUACPP(
             request.getUser(),
             request.getPassword(), request.getClientIP())
-        keycard.requesterName = self.streamer.get_name(),
+        keycard.requesterName = self.streamer.get_name()
         keycard._fd = request.transport.fileno()
         
         if self.bouncerName is None:
@@ -327,6 +327,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         Removes a request and add logging.
         Note that it does not disconnect the client; it is called in reaction
         to a client disconnecting.
+        It also removes the keycard if one was created.
         
         @param request: the request
         @type request: twisted.protocol.http.Request
@@ -367,7 +368,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         Expire a client's connection associated with the keycard Id.
         """
-        self.debug("expiring client with keycard Id" % keycardId)
+        self.debug("expiring client with keycard id %s" % keycardId)
 
         keycard = self._idToKeycard[keycardId]
         fd = keycard._fd
