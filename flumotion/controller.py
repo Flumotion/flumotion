@@ -150,7 +150,11 @@ class ProducerPerspective(ComponentPerspective):
         log.msg('Calling remote method get_free_port()')
         cb = self.mind.callRemote('get_free_port')
         cb.addCallback(after_get_free_port_cb)
-        
+ 
+    def getSource(self):
+        "Should never be called, a Producer does not have a source"
+        raise AssertionError
+       
 class ConverterPerspective(ComponentPerspective):
     """Perspective for converter components"""
     kind = 'converter'
@@ -172,9 +176,11 @@ class StreamerPerspective(ComponentPerspective):
     """Perspective for streamer components"""
     kind = 'streamer'
     def getListenHost(self):
+        "Should never be called, a Streamer does not accept incoming components"
         raise AssertionError
     
     def getListenPort(self):
+        "Should never be called, a Streamer does not accept incoming components"
         raise AssertionError
 
     def connect(self, host, port):
@@ -206,19 +212,24 @@ class Controller(pb.Root):
         @param name: name of the component
         @rtype:      boolean
         @returns:    True if a component with that name is registered, otherwise False"""
+        
         return self.components.has_key(name)
     
     def addComponent(self, component):
         """adds a component
         @type component: component
         @param component: the component"""
-        self.components[component.username] = component
+
+        component_name = component.getName()
+        self.components[component_name] = component
         
     def removeComponent(self, component):
         """removes a component
         @type component: component
         @param component: the component"""
-        del self.components[component.username]
+
+        component_name = component.getName()
+        del self.components[component_name]
 
     def waitForComponent(self, name, component):
         """adds a component to another components waitlist. Eg wait until
@@ -235,7 +246,7 @@ class Controller(pb.Root):
         self.waitlists[name].append(component)
 
     def startPendingComponentsFor(self, component):
-        """Starts all components that requires {component} to be started
+        """Starts all components that requires L{Component} to be started
         @type component: component
         @param component: the component"""
         
@@ -246,16 +257,27 @@ class Controller(pb.Root):
             self.waitlists[name] = []
     
     def getSourceComponent(self, component):
+        """Retrives the source component for component
+
+        @type component:  component
+        @param component: the component
+        @rtype:           string
+        @returns:         name of source component"""
+
+        #assert not isinstance(component, ProducerPerspective)
+        
         peername = component.getSource()
         assert self.components.has_key(peername)
         return self.components[peername]
 
     def producerStart(self, producer):
+        #assert isinstance(producer, ProducerPerspective)
         host = producer.getListenHost()
         log.msg('Calling remote method listen (%s)' % host)
         producer.listen(host)
 
     def converterStart(self, converter):
+        #assert isinstance(converter, ConverterPerspective)
         source = self.getSourceComponent(converter)
         source_host = source.getListenHost()
         source_port = source.getListenPort()
@@ -263,6 +285,7 @@ class Controller(pb.Root):
         converter.start(source_host, source_port, listen_host)
             
     def streamerStart(self, streamer):
+        #assert isinstance(streamer, StreamerPerspective)
         source = self.getSourceComponent(streamer)
         host = source.getListenHost()
         port = source.getListenPort()
