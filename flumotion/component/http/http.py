@@ -646,7 +646,8 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     def client_removed_cb(self, sink, fd, reason):
         self.log('[fd %5d] client_removed_cb from thread %d, reason %s' %
             (fd, thread.get_ident(), reason)) 
-        stats = sink.emit('get-stats', fd)
+        # commented out to see if it solves GIL problems
+        #stats = sink.emit('get-stats', fd)
         self.log('[fd %5d] client_removed_cb, got stats' % fd)
         # FIXME: GIL problem, just call directly for now without remote calls
         #gobject.idle_add(self.client_removed_idle, sink, fd, reason, stats)
@@ -663,8 +664,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     def client_removed_idle(self, sink, fd, reason, stats):
         # Johan will trap GST_CLIENT_STATUS_ERROR here someday
         # because STATUS_ERROR seems to have already closed the fd somewhere
-        # commented out to see if it solves GIL problems
-        # self.emit('client-removed', sink, fd, reason, stats)
+         self.emit('client-removed', sink, fd, reason, stats)
         Stats.clientRemoved(self)
         # FIXME: GIL problem, don't update UI for now
         self.needsUpdate = True
