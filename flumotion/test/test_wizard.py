@@ -21,12 +21,13 @@ import gtk
 
 from twisted.trial import unittest
 
-from flumotion.wizard import wizard
+from flumotion.wizard import enums, wizard
 
 class WizardStepTest(unittest.TestCase):
-    def testLoadSteps(self):
+    def setUpClass(self):
         import flumotion.wizard.steps
         
+    def testLoadSteps(self):
         for step in wizard.wiz.steps:
             self.assert_(isinstance(step, wizard.WizardStep))
             self.assert_(hasattr(step, 'icon'))
@@ -34,9 +35,28 @@ class WizardStepTest(unittest.TestCase):
                                   if isinstance(widget, gtk.Window)]
             self.assert_(len(windows) == 1)
             window = windows[0]
-            self.assert_(window.get_property('visible') == False)
+            self.failIfEqual(window.get_property('visible'), True)
             self.assert_(hasattr(step, 'icon'))
             self.assert_(hasattr(step, 'glade_file'))
             self.assert_(hasattr(step, 'step_name'))
             self.assert_(isinstance(step.get_state(), dict))
-            
+            self.assertIdentical(step.step_name, step.get_name())
+
+    def testStepWidgets(self):
+        widgets = [widget for step in wizard.wiz.steps
+                              for widget in step.widgets]
+        for widget in widgets:
+            if isinstance(widget, wizard.WizardSpinButton):
+                self.assert_(isinstance(widget.get_state(), float))
+            elif isinstance(widget, (wizard.WizardRadioButton,
+                                     wizard.WizardCheckButton)):
+                self.assert_(isinstance(widget.get_state(), bool))
+            elif isinstance(widget, wizard.WizardEntry):
+                self.assert_(isinstance(widget.get_state(), str))
+            elif isinstance(widget, wizard.WizardComboBox):
+                state = widget.get_state()
+                if hasattr(widget, 'enum_class'):
+                    self.assert_(isinstance(state, enums.Enum))
+                else:
+                    self.assert_(isinstance(state, int))
+
