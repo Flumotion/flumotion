@@ -2,6 +2,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/worker
 
 flumotion_PYTHON = \
 	__init__.py \
+	main.py \
 	launcher.py \
 	worker.py
 	

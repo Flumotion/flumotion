@@ -13,5 +13,7 @@ check-local:
 	@if PYTHONPATH=$(top_srcdir):$(PYTHONPATH) trial -R flumotion.test; \
 	then \
 	    rm -fr $(top_builddir)/flumotion/test/_trial_temp; \
+	else \
+	    exit 1; \
 	fi
 	@rm -fr $(top_builddir)/flumotion/test/*.pyc

@@ -28,6 +28,7 @@ from flumotion.twisted import cred, pbutil
 from flumotion.utils import log, gstutils
 from flumotion.utils.gstutils import gsignal
 
+# FIXME: rename to client factory
 class ComponentFactory(pbutil.ReconnectingPBClientFactory):
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
     def __init__(self, component):
@@ -38,7 +39,7 @@ class ComponentFactory(pbutil.ReconnectingPBClientFactory):
         # XXX: document
         self.interfaces = getattr(component, '__remote_interfaces__', ())
         # XXX: document
-        klass = getattr(component, 'component_view', ComponentView)
+        klass = getattr(component, 'component_view_class', ComponentView)
         self.view = klass(component)
         
     def login(self, username):
@@ -51,7 +52,7 @@ class ComponentFactory(pbutil.ReconnectingPBClientFactory):
         self.view.cb_gotPerspective(perspective)
 
 class ComponentView(pb.Referenceable, log.Loggable):
-    'Implements a view on a local component'
+    'Implements a view on a local component for the managing ComponentAvatar'
     logCategory = 'componentview'
 
     def __init__(self, component):
@@ -59,6 +60,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
         self.comp.connect('state-changed', self.component_state_changed_cb)
         self.comp.connect('error', self.component_error_cb)
         self.comp.connect('log', self.component_log_cb)
+        self.comp.connect('notify-feed-ports', self.notify_feed_ports_cb)
         
         self.remote = None # the perspective we have on the other side (?)
         
@@ -108,9 +110,19 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def component_state_changed_cb(self, component, feeder, state):
         self.callRemote('stateChanged', feeder, state)
 
+    def notify_feed_ports_cb(self, component):
+        """
+        @param feed_ports: feedName -> port
+        """
+        self.callRemote('notifyFeedPorts', component.feed_ports)
+
     ### Referenceable remote methods which can be called from manager
-    def remote_link(self, eaters, feeders):
-        self.comp.link(eaters, feeders)
+    # FIXME: rename link, unambiguate eaters and feeders' meaning
+    def remote_link(self, eatersData, feedersData):
+        self.debug('remote_link with eaters data %s and feeders data %s' % (eatersData, feedersData))
+        ret = self.comp.link(eatersData, feedersData)
+        self.debug('remote_link: returning value %s' % ret)
+        return ret
 
     def remote_getElementProperty(self, element_name, property):
         return self.comp.get_element_property(element_name, property)
@@ -143,8 +155,10 @@ class ComponentView(pb.Referenceable, log.Loggable):
 
         return {'ip' : self.getIP(),
                 'pid' :  os.getpid(), 
-                'eaters' : self.comp.get_eaters(),
-                'feeders' : self.comp.get_feeders(),
+                # FIXME: rename to something like eaterFeeders
+                # also rename in flumotion.manager.component.py
+                'eaters' : self.comp.get_eater_names(),
+                'feeders' : self.comp.get_feeder_names(),
                 'elements': self.comp.get_element_names() }
     
     def remote_getFreePorts(self, feeders):
@@ -217,22 +231,31 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
     gsignal('state-changed', str, object)
     gsignal('error', str, str)
     gsignal('log', object)
+    gsignal('notify-feed-ports')
     
     logCategory = 'basecomponent'
     __remote_interfaces__ = interfaces.IBaseComponent,
-    component_view = ComponentView
+    component_view_class = ComponentView
     
-    def __init__(self, name, eaters, feeders):
+    def __init__(self, name, eater_config, feeder_config):
+        """
+        @param name: unique name of the component
+        @type name: string
+        @param eater_config: <source></source> entries from config
+        @param feeder_config: <feed></feed> entries from config
+        """
         self.__gobject_init__()
         DirectoryProvider.__init__(self)
         
         self.component_name = name
-        self.eaters = eaters
-        self.feeders = feeders
+
+        self.feed_ports = [] # feed_name -> port mapping
         self.pipeline = None
         self.pipeline_signals = []
         self.files = []
         
+        self.parseEaterConfig(eater_config)
+        self.parseFeederConfig(feeder_config)
         self.setup_pipeline()
 
     ### Loggable methods
@@ -248,14 +271,51 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
             gobject.GObject.emit(self, name, *args)
         
     ### BaseComponent methods
+    def parseEaterConfig(self, eater_config):
+        # the source feeder names come from the config
+        # they are specified under <component> as <source> elements in XML
+        # so if they don't specify a feed name, use "default" as the feed name
+        self.eater_names = []
+
+        for block in eater_config:
+            eater_name = block
+            if block.find(':') == -1:
+                eater_name = block + ':default'
+            self.eater_names.append(eater_name)
+            
+    def parseFeederConfig(self, feeder_config):
+        ### FIXME: for pipeline components, in the case there is only one
+        ### feeder, it's not explicitly listed currently as a <feed></feed>.
+        ### that sucks, maybe we want to force this to be there ?
+
+        # the feed names come from the config
+        # they are specified under <component> as <feed> elements in XML
+        self.feed_names = feeder_config
+
+        # we create feeder names this component contains based on feed names
+        name = self.component_name
+        self.feeder_names = map(lambda n: name + ':' + n, self.feed_names)
+
     def get_name(self):
         return self.component_name
     
-    def get_eaters(self):
-        return self.eaters
+    def get_eater_names(self):
+        """
+        Return the list of feeder names this component eats from.
+        """
+        return self.eater_names
     
-    def get_feeders(self):
-        return self.feeders
+    def get_feeder_names(self):
+        """
+        Return the list of feeder names this component has.
+        """
+        return self.feeder_names
+
+    def get_feed_names(self):
+        """
+        Return the list of feeder names this component has.
+        """
+        return self.feed_names
 
     def restart(self):
         self.debug('restarting')
@@ -302,22 +362,30 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
         retval = self.pipeline.set_state(gst.STATE_NULL)
         if not retval:
             self.warning('Setting pipeline to NULL failed')
+
+    def set_feed_ports(self, feed_ports):
+        """
+        @param feed_ports: feed_name -> port
+        @type feed_ports: dict
+        """
+        self.feed_ports = feed_ports
         
-    def setup_eaters(self, eaters):
+    def _setup_eaters(self, eatersData):
         """
         Set up the feeded GStreamer elements in our pipeline based on
         information in the tuple.  For each feeded element in the tuple,
-        it sets the host and port on the feeded element.
+        it sets the host and port of the feeder on the feeded element.
 
-        @type eaters: tuple
-        @param eaters: a tuple of (name, host, port) tuples.
+        @type eatersData: list
+        @param eatersData: list of (feederName, host, port) tuples
         """
         if not self.pipeline:
             raise NotReadyError('No pipeline')
         
         # Setup all eaters
-        for name, host, port in eaters:
-            self.debug('Going to connect to %s (%s:%d)' % (name, host, port))
+        for feederName, host, port in eatersData:
+            self.debug('Going to connect to feeder %s (%s:%d)' % (feederName, host, port))
+            name = 'eater:' + feederName
             eater = self.pipeline.get_by_name(name)
             assert eater, 'No eater element named %s in pipeline' % name
             assert isinstance(eater, gst.Element)
@@ -326,29 +394,51 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
             eater.set_property('port', port)
             eater.set_property('protocol', 'gdp')
             
+    # FIXME: need to make a separate callback to implement "mood" of component
     def feeder_state_change_cb(self, element, old, state, feeder):
         # also called by subclasses
         self.debug('state-changed %s %s' % (element.get_path_string(),
                                             gst.element_state_get_name(state)))
         self.emit('state-changed', feeder, state)
 
-    def setup_feeders(self, feeders):
+    def _setup_feeders(self, feedersData):
+        """
+        Set up the feeding GStreamer elements in our pipeline based on
+        information in the tuple.  For each feeding element in the tuple,
+        it sets the host it will listen as.
+
+        @type feedersData: tuple
+        @param feedersData: a list of (feederName, host) tuples.
+
+        @returns: a list of (feedName, host, port) tuples for our feeders.
+        """
+ 
         if not self.pipeline:
             raise errors.NotReadyError('No pipeline')
-        
+
+        retval = []
         # Setup all feeders
-        for name, host, port in feeders:
-            self.debug('Going to listen on %s (%s:%d)' % (name, host, port))
+        for feeder_name, host in feedersData:
+            feed_name = feeder_name.split(':')[1]
+            assert self.feed_ports.has_key(feed_name)
+            port = self.feed_ports[feed_name]
+            self.debug('Going to listen on feeder %s (%s:%d)' % (feeder_name, host, port))
+            name = 'feeder:' + feeder_name
             feeder = self.pipeline.get_by_name(name)
-            feeder.connect('state-change', self.feeder_state_change_cb, name)
+            assert feeder
+            feeder.connect('state-change', self.feeder_state_change_cb, feed_name)
             
-            assert feeder, 'No feeder element named %s in pipeline' % name
+            assert feeder, 'No feeder element named %s in pipeline' % feed_name
             assert isinstance(feeder, gst.Element)
             
             feeder.set_property('host', host)
             feeder.set_property('port', port)
             feeder.set_property('protocol', 'gdp')
 
+            retval.append((feed_name, host, port))
+
+        return retval
+    
     def cleanup(self):
         self.debug("cleaning up")
         
@@ -376,16 +466,36 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
         self.debug('Pausing')
         self.pipeline_pause()
                 
-    def link(self, eaters, feeders):
-        self.setup_eaters(eaters)
-        self.setup_feeders(feeders)
+    # FIXME: rename, unambiguate and comment
+    def link(self, eatersData, feedersData):
+        """
+        @param eatersData: list of (feederName, host, port) tuples to eat from
+        @param feedersData: list of (feederName, host) tuples to use as feeders
+
+        @returns: a list of (feedName,  host, port) tuples for our feeders
+        """
+        self.debug('manager asks us to link')
+        self.debug('setting up eaters')
+        self._setup_eaters(eatersData)
+
+        self.debug('setting up feeders')
+        retval = self._setup_feeders(feedersData)
         
+        # call a child's link_setup() method if it has it
         func = getattr(self, 'link_setup', None)
         if func:
-            func(eaters, feeders)
+            self.debug('calling function %r' % func)
+            func(eatersData, feedersData)
             
+        self.debug('setting pipeline to play')
         self.pipeline_play()
+        # FIXME: fill feedPorts
+        self.debug('emitting feed port notify')
+        self.emit('notify-feed-ports')
+        self.debug('.link() returning %s' % retval)
 
+        return retval
+    
     def get_element_names(self):
         'Return the names of all elements in the GStreamer pipeline.'
         pipeline = self.get_pipeline()
@@ -426,8 +536,12 @@ gobject.type_register(BaseComponent)
     
 class ParseLaunchComponent(BaseComponent):
     'A component using gst-launch syntax'
+
+    # keep these as class variables for the tests
     EATER_TMPL = 'tcpclientsrc'
     FEEDER_TMPL = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'
+    DELIMETER = '@'
+
     def __init__(self, name, eaters, feeders, pipeline_string=''):
         self.pipeline_string = pipeline_string
         BaseComponent.__init__(self, name, eaters, feeders)
@@ -443,22 +557,84 @@ class ParseLaunchComponent(BaseComponent):
         BaseComponent.setup_pipeline(self)
 
     ### ParseLaunchComponent methods
-    def parse_tmpl(self, pipeline, parts, template, sign, format):
+    def _expandElementName(self, block):
+        """
+        Expand the given string to a full element name for an eater or feeder.
+        The full name is of the form eater:(sourceComponentName):(feedName)
+        or feeder:(componentName):feedName
+        """
+        if ' ' in block:
+            raise TypeError, "spaces not allowed in '%s'" % block
+        if not ':' in block:
+            raise TypeError, "no colons in'%s'" % block
+        if block.count(':') > 2:
+            raise TypeError, "too many colons in '%s'" % block
+            
+        parts = block.split(':')
+
+        if parts[0] != 'eater' and parts[0] != 'feeder':
+            raise TypeError, "'%s' does not start with eater or feeder" % block
+            
+        # we can only fill in component names for feeders
+        if not parts[1]:
+            if parts[0] == 'eater':
+                raise TypeError, "'%s' should specify feeder component" % block
+            parts[1] = self.component_name
+        if len(parts) == 2:
+            parts.append('')
+        if  not parts[2]:
+            parts[2] = 'default'
+
+        return ":".join(parts)
+        
+    def _expandElementNames(self, block):
+        """
+        Expand each @..@ block to use the full element name for eater or feeder.
+        The full name is of the form eater:(sourceComponentName):(feedName)
+        or feeder:(componentName):feedName
+        This also does some basic checking of the block.
+        """
+        assert block != ''
+
+        # verify the template has an even number of delimiters
+        if block.count(self.DELIMETER) % 2 != 0:
+            raise TypeError, "'%s' contains an odd number of '%s'" % (block, self.DELIMETER)
+        
+        # when splitting, the even-indexed members will remain,
+        # and the odd-indexed members are the blocks to be substituted
+        blocks = block.split(self.DELIMETER)
+
+        for i in range(1, len(blocks) - 1, 2):
+            blocks[i] = self._expandElementName(blocks[i].strip())
+        return "@".join(blocks)
+  
+    def parse_tmpl(self, pipeline, names, template, format):
+        """
+        Expand the given pipeline string representation by substituting
+        blocks between '@' with a filled-in template.
+
+        @param pipeline: a pipeline string representation with variables
+        @param names: the element names to substitute for @...@ segments
+        @param template: the template to use for element factory info
+        @param format: the format to use when substituting
+
+        Returns: a new pipeline string representation.
+        """
         assert pipeline != ''
-        if len(parts) == 1:
-            part_name = parts[0]
+
+        deli = self.DELIMETER
+
+        if len(names) == 1:
+            part_name = names[0]
             if pipeline.find(part_name) != -1:
-                pipeline = pipeline.replace(sign + part_name, '%s name=%s' % (template, part_name))
+                pipeline = pipeline.replace(deli + part_name + deli, '%s name=%s' % (template, part_name))
             else:
                 pipeline = format % {'tmpl': template, 'name': part_name, 'pipeline': pipeline}
         else:
-            for part in parts:
-                if ' ' in part:
-                    raise TypeError, "spaces not allowed in parts"
-            
-                part_name = sign + part
+            for part in names:
+                part_name = deli + part + deli
                 if pipeline.find(part_name) == -1:
-                    raise TypeError, "%s needs to be specified in the pipeline for %s" % (part_name, self.name)
+                    raise TypeError, "%s needs to be specified in the pipeline '%s'" % (part_name, pipeline)
             
                 pipeline = pipeline.replace(part_name, '%s name=%s' % (template, part))
         return pipeline
@@ -466,27 +642,36 @@ class ParseLaunchComponent(BaseComponent):
     def parse_pipeline(self, pipeline):
         self.debug('Creating pipeline, template is %s' % pipeline)
         
-        eaters = self.get_eaters()
-        if pipeline == '' and not eaters:
+        eater_names = self.get_eater_names()
+        if pipeline == '' and not eater_names:
             raise TypeError, "Need a pipeline or a eater"
 
         need_sink = True
         if pipeline == '':
-            assert eaters
+            assert eater_names
             pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
             need_sink = False
         elif pipeline.find('name=sink') != -1:
             need_sink = False
             
-        feeders = self.get_feeders()
-
-        self.debug('eaters=%s, feeders=%s' % (eaters, feeders))
-        pipeline = self.parse_tmpl(pipeline, eaters, self.EATER_TMPL, '@',
-                                 '%(tmpl)s name=%(name)s ! %(pipeline)s') 
-        pipeline = self.parse_tmpl(pipeline, feeders, self.FEEDER_TMPL, ':',
-                                 '%(pipeline)s ! %(tmpl)s name=%(name)s') 
+        # we expand the pipeline based on the templates and eater/feeder names
+        # elements are named eater:(source_component_name):(feed_name)
+        # or feeder:(component_name):(feed_name)
+        eater_element_names = map(lambda n: "eater:" + n, eater_names)
+        feeder_element_names = map(lambda n: "feeder:" + n, self.feeder_names)
+        self.debug('we eat with eater elements %s' % eater_element_names)
+        self.debug('we feed with feeder elements %s' % feeder_element_names)
+        pipeline = self._expandElementNames(pipeline)
+        
+        pipeline = self.parse_tmpl(pipeline, eater_element_names,
+                                   self.EATER_TMPL,
+                                   '%(tmpl)s name=%(name)s ! %(pipeline)s') 
+        pipeline = self.parse_tmpl(pipeline, feeder_element_names,
+                                   self.FEEDER_TMPL,
+                                   '%(pipeline)s ! %(tmpl)s name=%(name)s') 
         
         self.debug('pipeline for %s is %s' % (self.get_name(), pipeline))
+        assert self.DELIMETER not in pipeline
         
         return pipeline
 

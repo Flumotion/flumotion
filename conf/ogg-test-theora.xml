@@ -1,5 +1,12 @@
 <root>
-  <component name="producer-video-test" type="producer">
+  <workers policy="password">
+    <worker username="johan" password="johan-pass" default="true"/>
+    <worker username="thomas" password="thomas-pass"/>
+    <worker username="thread" password="thread-pass"/>
+    <worker username="tee" password="tee-pass"/>
+  </workers>
+
+   <component name="producer-video-test" type="producer">
     <pipeline>
 videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
     </pipeline>

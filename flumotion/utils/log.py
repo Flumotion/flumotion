@@ -134,7 +134,8 @@ def stderrHandler(category, level, message):
     @type level: string
     @type message: string
     """
-    sys.stderr.write('%s %-5s %-15s %s\n' % (time.strftime("%b %d %H:%M:%S"),
+    sys.stderr.write('[%5d] %s %-5s %-15s %s\n' % (os.getpid(),
+                                             time.strftime("%b %d %H:%M:%S"),
                                              level, category, message))
     sys.stderr.flush()
 

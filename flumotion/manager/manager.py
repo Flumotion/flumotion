@@ -119,10 +119,11 @@ class Dispatcher(log.Loggable):
 
 class ManagerCredentials(cred.FlexibleCredentials):
     def requestAvatarId(self, credentials):
-        # XXX: If it's component, allow anonymous access.
+        # XXX: If it's component or admin, allow anonymous access.
         #      This is a big hack, but it emulates the current behavior
         #      Do we need to authenticate components and workers?
-        if interfaces.IBaseComponent in credentials.interfaces:
+        if (interfaces.IBaseComponent in credentials.interfaces or
+            interfaces.IAdminComponent in credentials.interfaces):
             return credentials.username
 
         return cred.FlexibleCredentials.requestAvatarId(self, credentials)

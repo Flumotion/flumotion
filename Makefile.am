@@ -14,11 +14,12 @@ EXTRA_DIST = \
 clean-local:
 	@rm -rf _trial_temp
 
+coverage:
+	trial --coverage coverage -R flumotion.test
+
 release: dist
 	make $(PACKAGE)-$(VERSION).tar.bz2.md5
 
 # generate md5 sum files
 %.md5: %
 	md5sum $< > $@
-
-	

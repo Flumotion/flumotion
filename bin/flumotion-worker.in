@@ -2,7 +2,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# bin/flumotion-worker: Flumotion worker daemon
+# bin/flumotion-worker: Flumotion worker
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -41,18 +41,15 @@ sys.path.insert(0, root)
 from flumotion.twisted import gstreactor
 gstreactor.install()
 
-from flumotion.common.registry import registry
 from flumotion.common import errors
 from flumotion.utils import log
-from flumotion.worker import worker
+from flumotion.common.registry import registry
+from flumotion.worker.main import main
 
-def main(args):
+if __name__ == '__main__':
     log.init()
     registry.verify(root)
-        
-    return worker.main(args)
-    
-if __name__ == '__main__':
+
     try:
         sys.exit(main(sys.argv))
     except errors.SystemError, e:

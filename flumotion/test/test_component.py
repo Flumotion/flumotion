@@ -19,64 +19,150 @@ from twisted.trial import unittest
 
 import common
 
+from twisted.trial import unittest
+
 from flumotion.component.component import ParseLaunchComponent
 
 class PipelineTest(ParseLaunchComponent):
-    def __init__(self, eaters, feeders):
+    def __init__(self, eater_config, feeder_config):
         self.__gobject_init__()
-        self.component_name = '<fake>'
-        self.eaters = eaters
-        self.feeders = feeders
+        self.component_name = 'fake'
         self.remote = None
+
+        self.parseEaterConfig(eater_config)
+        self.parseFeederConfig(feeder_config)
         
-def pipelineFactory(pipeline, eaters=[], feeders=[]):
-    p = PipelineTest(eaters, feeders)
+def pipelineFactory(pipeline, eater_config=[], feeder_config=[]):
+    p = PipelineTest(eater_config, feeder_config)
     return p.parse_pipeline(pipeline)
 
 EATER = ParseLaunchComponent.EATER_TMPL
 FEEDER = ParseLaunchComponent.FEEDER_TMPL
 
+class TestExpandElementName(unittest.TestCase):
+    def setUp(self):
+        self.p = PipelineTest([], [])
+
+    def testSpaces(self):
+        try:
+            r = self.p._expandElementName('test with spaces')
+            raise
+        except TypeError:
+            pass
+
+    def testNoColons(self):
+        try:
+            r = self.p._expandElementName('testwithoutcolons')
+            raise
+        except TypeError:
+            pass
+
+    def testTooManyColons(self):
+        try:
+            r = self.p._expandElementName('too:many:colons:here')
+            raise
+        except TypeError:
+            pass
+
+    def testNoEaterFeeder(self):
+        try:
+            r = self.p._expandElementName(':test')
+            raise
+        except TypeError:
+            pass
+
+    def testEaterComponent(self):
+        try:
+            r = self.p._expandElementName('eater::feed')
+            raise
+        except TypeError:
+            pass
+
+    def testFeederComponent(self):
+        r = self.p._expandElementName('feeder::feed')
+        assert r == 'feeder:fake:feed'
+
+    def testFeederDefault(self):
+        r = self.p._expandElementName('feeder:test')
+        assert r == 'feeder:test:default'
+        r = self.p._expandElementName('feeder:test:')
+        assert r == 'feeder:test:default'
+
+    def testEaterDefault(self):
+        r = self.p._expandElementName('eater:test')
+        assert r == 'eater:test:default'
+        r = self.p._expandElementName('eater:test:')
+        assert r == 'eater:test:default'
+
+    def testFeederEmpty(self):
+        r = self.p._expandElementName('feeder::')
+        assert r == 'feeder:fake:default'
+        r = self.p._expandElementName('feeder:')
+        assert r == 'feeder:fake:default'
+        try:
+            r = self.p._expandElementName('feeder')
+            raise
+        except TypeError:
+            pass
+
+class TestExpandElementNames(unittest.TestCase):
+    def setUp(self):
+        self.p = PipelineTest([], [])
+
+    def testOddDelimeters(self):
+        try:
+            r = self.p._expandElementNames('@ this:is:wrong @ ! because ! @')
+            raise
+        except TypeError:
+            pass
+
+    def testPipeline(self):
+        r = self.p._expandElementNames('@eater:card @ !  @ feeder::sound @')
+        assert r == '@eater:card:default@ !  @feeder:fake:sound@' 
+        
 class TestParser(unittest.TestCase):
     def testSimple(self):
         assert pipelineFactory('foobar') == 'foobar'
         assert pipelineFactory('foo ! bar') == 'foo ! bar'
 
     def testOneSource(self):
-        res = pipelineFactory('@foo ! bar', ['foo'])
-        assert res == '%s name=foo ! bar' % EATER, res
+        res = pipelineFactory('@eater:foo@ ! bar', ['foo'])
+        assert res == '%s name=eater:foo:default ! bar' % EATER, res
 
     def testOneSourceWithout(self):
         res = pipelineFactory('bar', ['foo'])
-        assert res == '%s name=foo ! bar' % EATER, res
+        assert res == '%s name=eater:foo:default ! bar' % EATER, res
 
     def testOneFeed(self):
-        res = pipelineFactory('foo ! :bar', [], ['bar'])
-        assert res == 'foo ! %s name=bar' % FEEDER, res
+        res = pipelineFactory('foo ! @feeder::bar@', [], ['bar'])
+        assert res == 'foo ! %s name=feeder:fake:bar' % FEEDER, res
         
     def testOneFeedWithout(self):
         res = pipelineFactory('foo', [], ['bar'])
-        assert res == 'foo ! %s name=bar' % FEEDER, res
+        assert res == 'foo ! %s name=feeder:fake:bar' % FEEDER, res
 
     def testTwoSources(self):
-        res = pipelineFactory('@foo ! @bar ! baz', ['foo', 'bar'])
-        assert res == '%s name=foo ! %s name=bar ! baz' \
+        res = pipelineFactory('@eater:foo@ ! @eater:bar@ ! baz', ['foo', 'bar'])
+        assert res == '%s name=eater:foo:default ! %s name=eater:bar:default ! baz' \
                % (EATER, EATER), res
 
     def testTwoFeeds(self):
-        res = pipelineFactory('foo ! :bar ! :baz', [], ['bar', 'baz'])
-        assert res == 'foo ! %s name=bar ! %s name=baz' \
+        res = pipelineFactory('foo ! @feeder::bar@ ! @feeder::baz@', [], ['bar', 'baz'])
+        assert res == 'foo ! %s name=feeder:fake:bar ! %s name=feeder:fake:baz' \
                % (FEEDER, FEEDER), res
 
     def testTwoBoth(self):
-        res = pipelineFactory('@eater1 ! @eater2 ! :feeder1 ! :feeder2',
-                              ['eater1', 'eater2',],
-                              ['feeder1', 'feeder2'])
-        assert res == ('%s name=eater1 ! %s name=eater2 ! ' % \
+        res = pipelineFactory('@eater:comp1@ ! @eater:comp2@ ! @feeder::feed1@ ! @feeder::feed2@',
+                              ['comp1', 'comp2',],
+                              ['feed1', 'feed2'])
+        assert res == ('%s name=eater:comp1:default ! %s name=eater:comp2:default ! ' % \
                        (EATER, EATER) + 
-                       '%s name=feeder1 ! %s name=feeder2' % \
+                       '%s name=feeder:fake:feed1 ! %s name=feeder:fake:feed2' % \
                        (FEEDER, FEEDER))
-    def testErrors(self):
-        self.assertRaises(TypeError, pipelineFactory, '')
+
+    # FIXME: what is this ???
+    #def testErrors(self):
+    #    self.assertRaises(TypeError, pipelineFactory, '')
 
 if __name__ == '__main__':
     unittest.main()

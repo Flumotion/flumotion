@@ -33,3 +33,7 @@ import gst
 ltihooks = sys.modules.get('gst.ltihooks')
 if ltihooks:
     ltihooks.uninstall()
+
+# make sure logging works
+from flumotion.utils import log
+log.init()

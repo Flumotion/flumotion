@@ -1,7 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/worker/job.py: jobs done by the worker
+# flumotion/worker/job.py: functionality for the flumotion-worker job processes
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
@@ -64,28 +64,39 @@ def getComponent(dict, defs):
     return component
 
 class JobView(pb.Referenceable, log.Loggable):
+    """
+    I present a View to the worker brain on a job.
+    I live in the job process.
+    """
     logCategory = 'job'
     def __init__(self):
         self.remote = None
         
-    def hasPerspective(self):
-        return self.remote != None
-
-    def cb_gotPerspective(self, perspective):
-        self.remote = perspective
-
+    ### pb.Referenceable remote methods called on by the WorkerBrain
     def remote_initial(self, host, port):
         self.manager_host = host
         self.manager_port = port
         self.launcher = launcher.Launcher(host, port)
         
-    def remote_start(self, name, type, config):
+    def remote_start(self, name, type, config, feedPorts):
+        """
+        @param feedPorts: feedName -> port
+        @type feedPorts: dict
+        """
         defs = registry.getComponent(type)
-        self.run_component(name, type, config, defs)
+        self.run_component(name, type, config, defs, feedPorts)
 
     def remote_stop(self):
         reactor.stop()
         raise SystemExit
+
+    ### our methods
+
+    def hasPerspective(self):
+        return self.remote != None
+
+    def cb_gotPerspective(self, perspective):
+        self.remote = perspective
     
     def set_nice(self, name, nice):
         if not nice:
@@ -115,7 +126,12 @@ class JobView(pb.Referenceable, log.Loggable):
         except RuntimeError:
             self.warning('Old PyGTK with threading disabled detected')
     
-    def run_component(self, name, type, config, defs):
+    def run_component(self, name, type, config, defs, feed_ports):
+        """
+        @param feed_ports: feed_name -> port
+        @type feed_ports: dict
+        """
+        # XXX: Remove this hack
         if not config.get('start-factory', True):
             return
         
@@ -132,12 +148,18 @@ class JobView(pb.Referenceable, log.Loggable):
         log.debug(name, 'Configuration dictionary is: %r' % config)
 
         comp = getComponent(config, defs)
-        factory = component.ComponentFactory(comp)
-        factory.login(name)
+        comp.set_feed_ports(feed_ports)
+        manager_client_factory = component.ComponentFactory(comp)
+        # XXX: get username/password from parent
+        manager_client_factory.login(name)
         reactor.connectTCP(self.manager_host,
-                           self.manager_port, factory)
+                           self.manager_port, manager_client_factory)
     
-class JobFactory(pb.PBClientFactory, log.Loggable):
+class JobClientFactory(pb.PBClientFactory, log.Loggable):
+    """
+    I am a client factory that logs in to the WorkerBrain.
+    I live in the flumotion-worker job process.
+    """
     def __init__(self, name):
         pb.PBClientFactory.__init__(self)
         

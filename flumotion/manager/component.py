@@ -34,108 +34,182 @@ from flumotion.utils import gstutils, log
 class Options:
     """dummy class for storing manager side options of a component"""
 
-# abstracts the concept of a GStreamer tcpserversink producing a feeder
+# abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
 class Feeder:
-    "I am an object used by L{FeederSet}"
-    def __init__(self, name):
-        self.name = name
-        self.dependencies = []
-        self.ready = False
+    """
+    I am an object used by L{FeederSet}.
+    My name is of the form componentName:feedName
+    """
+    def __init__(self, feederName):
+        """
+        @type  feederName: string
+        @param feederName: the name of the feeder
+        """
+        # we really do want a full feederName because that's how it's called
+        # in the code
+        if feederName.find(':') == -1:
+            # FIXME: log this more nicely ?
+            print "ERROR: cannot create feeder without full name"
+            raise
+        
+        componentName, feedName = feederName.split(':')
+        self.feedName = feedName
+        self.feederName = feederName
         self.component = None
 
-    def setComponent(self, component):
-        self.component = component
+        self.dependencies = {}
+        self.ready = False
         
-    def addDependency(self, func, *args):
-        self.dependencies.append((func, args))
+    def addDependency(self, feederName, func, *args):
+        """
+        Add a dependency function for this feeder depending on another
+        feeder in another component.  The function will be called when the
+        other feeder is ready.
+
+        @type  feederName: string
+        @param feederName: the name of the feeder (componentName:feedName).
+        @param func: a function to run when the feeder is ready
+        @param *args: arguments to the function
+        """
+        self.dependencies[feederName] = (func, args)
+
+    def setComponentAvatar(self, componentAvatar):
+        """
+        Give the feeder the component avatar that contains the feeder.
+        
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        @param componentAvatar: avatar for the component containing this feeder
+        """
+        assert not self.component
+        self.component = componentAvatar
+        self.component.debug('taken control of feeder %s' % self.getName())
 
     def setReady(self):
+        """
+        Set the feeder to ready, triggering dependency functions.
+        """
+        assert not self.ready
+        assert self.component
+        self.component.debug('Feeder.setReady() on feeder %s' % self.getName())
         self.ready = True
-        for func, args in self.dependencies:
+
+        for eatername in self.dependencies.keys():
+            func, args = self.dependencies[eatername]
+            self.component.debug('running dependency function %r with args %r for eater from %s' % (func, args, eatername))
             func(*args)
-        self.dependencies = []
+        self.dependencies = {}
 
     def isReady(self):
         return self.ready
+
+    def hasComponentAvatar(self):
+        return self.component is not None
     
+    def getFeedName(self):
+        return self.feedName
+
     def getName(self):
-        return self.name
+        return self.feederName
 
     def getListenHost(self):
+        assert self.component
         return self.component.getListenHost()
 
     def getListenPort(self):
-        return self.component.getListenPort(self.name)
+        assert self.component
+        log.log('feeder', 'getListenPort(): asking component %s for port of feedName %s' % (self.component, self.feedName))
+        return self.component.getFeedPort(self.feedName)
     
     def __repr__(self):
-        return '<Feeder %s ready=%r>' % (self.name, self.ready)
+        return '<Feeder %s on %r ready=%r>' % (self.feederName, self.component or '<unavailable component>', self.ready)
     
-class FeederSet:
+class FeederSet(log.Loggable):
     """
     I represent a collection of L{Feeder}s.
-    I know when a feed is ready and I handle dependencies between feeds.
+    I know when a feeder is ready and I handle dependencies between feeders.
     """
+    logCategory = 'feederset'
     def __init__(self):
-        self.feeders = {}
+        self.feeders = {} # feederName -> Feeder
 
     def __getitem__(self, key):
-        if key.find(':') == -1:
-            key += ':default'
+        # FIXME: feeders are now fully named, so remove this hack
+        #if key.find(':') == -1:
+        #    key += ':default'
         return self.feeders[key]
         
-    def hasFeeder(self, name):
-        if name.find(':') == -1:
-            name += ':default'
+    def hasFeeder(self, feederName):
+        # FIXME: remove this hack and enforce
+        #if feederName.find(':') == -1:
+        #    feederName += ':default'
 
-        return self.feeders.has_key(name)
+        return self.feeders.has_key(feederName)
     
-    def getFeeder(self, name):
-        return self[name]
+    def getFeeder(self, feederName):
+        return self[feederName]
     
-    def addFeeders(self, component):
-        # add the component's feeders
-        name = component.getName()
-        feeders = component.getFeeders(True)
-        for feedername in feeders:
-            longname = name + ':' + feedername
-            if not self.feeders.has_key(feedername):
-                self.feeders[feedername] = Feeder(feedername)
-            self.feeders[feedername].setComponent(component)
+    def addFeeders(self, componentAvatar):
+        """
+        Add the feeders of the given component to the set.
+
+        @type component: L{flumotion.manager.component.ComponentAvatar}
+        """
+        name = componentAvatar.getName()
+        feeders = componentAvatar.getFeeders()
+
+        for feederName in feeders:
+            if not self.hasFeeder(feederName):
+                self.debug('adding new Feeder with name %s' % feederName)
+                self.feeders[feederName] = Feeder(feederName)
+            if not self.feeders[feederName].hasComponentAvatar():
+                self.debug('setting component %r' % componentAvatar)
+                self.feeders[feederName].setComponentAvatar(componentAvatar)
             
-    def isFeederReady(self, feedername):
-        if not self.hasFeeder(feedername):
+    def isFeederReady(self, feederName):
+        if not self.hasFeeder(feederName):
             return False
 
-        feeder = self[feedername]
+        feeder = self[feederName]
 
         return feeder.isReady()
     
-    def feederReady(self, feedername): 
-        # set the feeder to ready
-        # If we don't specify the feeder
-        log.debug('manager', 'feeder %s ready' % (feedername))
+    def feederSetReady(self, feederName): 
+        """
+        Set the given feeder to ready.
+        """
+        self.debug('feederSetReady: setting feeder %s ready' % (feederName))
 
-        if not self.feeders.has_key(feedername):
-            self.warning('FIXME: no feeder called: %s' % feedername)
+        if not self.feeders.has_key(feederName):
+            self.error('FIXME: no feeder called: %s' % feederName)
             return
         
-        feeder = self.feeders[feedername]
+        feeder = self.feeders[feederName]
         feeder.setReady()
+        self.debug('feederSetReady: done')
             
-    def dependOnFeeder(self, feedername, func, *args):
-        # make this feeder depend on another feeder
-        # If we don't specify the feeder
-        if feedername.find(':') == -1:
-            feedername += ':default'
+    def dependComponentOnFeeder(self, componentAvatar, feederName, func):
+        """
+        Make the given component dependent on the given feeder.
+        Register a function and arguments to call when the feeder is ready.
 
-        if not self.feeders.has_key(feedername):
-            self.feeders[feedername] = Feeder(feedername)
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        @param componentAvatar: the component to make dependant
+        @param feederName: the name of the feeder to depend upon
+        @param func: a function to run when the feeder is ready, taking the ComponentAvatar as its first argument.
+        """
+
+        if not self.feeders.has_key(feederName):
+            # the component will be set later on
+            self.feeders[feederName] = Feeder(feederName)
             
-        feeder = self.feeders[feedername]
+        feeder = self.feeders[feederName]
+        
         if not feeder.isReady():
-            feeder.addDependency(func, *args)
+            self.debug('feeder %s is not ready, adding dependency' % feederName)
+            feeder.addDependency(feederName, func, componentAvatar)
         else:
-            func(*args)
+            self.debug('feeder %s is ready, executing function %r' % (feederName, func))
+            func(componentAvatar)
 
 class ComponentAvatar(pb.Avatar, log.Loggable):
     """
@@ -152,7 +226,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         self.username = username
         self.state = gst.STATE_NULL
         self.options = Options()
-        self.listen_ports = {}
+        self.ports = {} # feedName -> port
         self.started = False
         self.starting = False
         
@@ -198,7 +272,9 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         print "Ignore the following Traceback line, issue in Twisted"
         return failure
 
-    def _mindRegisterCallback(self, options):
+    def _mindRegisterCallback(self, options): 
+        # called after the mind has attached.  options is a dict passed in from
+        # flumotion.component.component's remote_register
         for key, value in options.items():
             setattr(self.options, key, value)
         self.options.dict = options
@@ -219,6 +295,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         This is scheduled by the portal after the client has logged in.
 
         @type mind: L{twisted.spread.pb.RemoteReference}
+        @param mind: a remote reference into the component
         """
         self.debug('mind attached, calling remote register()')
         self.mind = mind
@@ -243,22 +320,31 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         """
         return self.mind.broker.transport.getPeer()
 
+    # FIXME: rename to something like getEaterFeeders()
     def getEaters(self):
         """
-        Returns a list of names of feeded elements.
+        Get a list of feeder names feeding this component.
         """
+        # FIXME: rename this when flumotion.component.component renames it
         return self.options.eaters
     
-    def getFeeders(self, longname=False):
+    def getFeeders(self):
         """
-        Returns a list of names of feeding elements.
+        Get a list of feeder names (componentName:feedName) in this component.
         """
-        if longname:
-            return map(lambda feeder:
-                       self.getName() + ':' + feeder, self.options.feeders)
-        else:
-            return self.options.feeders
+        ### FIXME: rename self.options.feeders to e.g. feederConfig
+        #if longName:
+        #    return map(lambda feeder:
+        #               self.getName() + ':' + feeder, self.options.feeders)
+        #else:
+        return self.options.feeders
 
+    def getFeedPort(self, feedName):
+        """
+        Returns the port this feed is being fed on.
+        """
+        return self.ports[feedName]
+ 
     def getRemoteManagerIP(self):
         return self.options.ip
 
@@ -272,16 +358,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         except AttributeError:
             return peer[1]
         return self.getTransportPeer()
-
-    # This method should ask the component if the port is free
-    def getListenPort(self, feeder):
-        if feeder.find(':') != -1:
-            feeder = feeder.split(':')[1]
-
-        assert self.listen_ports.has_key(feeder), self.listen_ports
-        assert self.listen_ports[feeder] != -1, self.listen_ports
-        return self.listen_ports[feeder]
-
+   
     def stop(self):
         """
         Tell the avatar to stop the component.
@@ -289,24 +366,31 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         d = self._mindCallRemote('stop')
         d.addErrback(lambda x: None)
             
-    def link(self, eaters, feeders):
+    # FIXME: rename, since it's not GStreamer linking.
+    # This function tells the component to start consuming feeds and start
+    # its feeders
+    def link(self, eatersData, feedersData):
         """
         Tell the component to link itself to other components.
 
-        @type eaters: tuple of (name, host, port) tuples of feeded elements.
-        @type feeders: tuple of (name, host, port) tuples of feeding elements.
+        @type eatersData: tuple of (feedername, host, port) tuples of elements feeding our eaters.
+        @type feedersData: tuple of (name, host) tuples of our feeding elements.
         """
-        def _getFreePortsCallback((feeders, ports)):
-            self.listen_ports = ports
-            d = self._mindCallRemote('link', eaters, feeders)
-            d.addErrback(self._mindErrback)
+        def linkCallback(feedData):
+            for feedName, host, port in feedData:
+                self.debug('feed %s (%s:%d) is ready' % (feedName, host, port))
+                self.host = host
+                self.ports[feedName] = port
+                
+                self.checkFeedReady(feedName)
+                self.debug('linkCallback: done linking')
 
-        if feeders:
-            d = self._mindCallRemote('getFreePorts', feeders)
-            d.addCallbacks(_getFreePortsCallback, self._mindErrback)
-        else:
-            d = self._mindCallRemote('link', eaters, [])
-            d.addErrback(self._mindErrback)
+        def linkErrback(reason):
+            self.error("Could not make component link, reason %s" % reason)
+                
+        d = self._mindCallRemote('link', eatersData, feedersData)
+        d.addCallback(linkCallback)
+        d.addErrback(linkErrback)
     
     def setElementProperty(self, element, property, value):
         """
@@ -432,7 +516,27 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         cb.addErrback(self._mindErrback)
         return cb
     
-    ### IPerspective methods
+    def checkFeedReady(self, feedName):
+        # check if the given feed is ready to start, and start it if it is
+        self.info('checkFeedReady: feedName %s' % feedName)
+        if not self.ports.has_key(feedName):
+            self.info('checkFeedReady: no port yet')
+            return
+        
+        if not self.getFeeders():
+            self.info('checkFeedReady: no remote options yet')
+            return
+
+        if self.state != gst.STATE_PLAYING:
+            self.info('checkFeedReady: not playing yet (%s)' %
+                      gst.element_state_get_name(self.state))
+            return
+
+        self.info('checkFeedReady: setting to ready')
+        self.heaven.setComponentFeedReady(self, feedName)
+        self.log('checkFeedReady: set to ready')
+
+    ### IPerspective methods, called by the worker's component
     def perspective_log(self, *msg):
         log.debug(self.getName(), *msg)
         
@@ -443,8 +547,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         if self.state == gst.STATE_PLAYING:
             self.info('is now playing')
 
-        if self.getFeeders():
-            self.heaven.startPendingComponents(self, feeder)
+            self.checkFeedReady(feeder)
             
     def perspective_error(self, element, error):
         self.error('error element=%s string=%s' % (element, error))
@@ -452,6 +555,9 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
 
     def perspective_uiStateChanged(self, component_name, state):
         self.vishnu.adminheaven.uiStateChanged(component_name, state)
+
+    def perspective_notifyFeedPorts(self, feedPorts):
+        self.debug('received feed ports from component: %s' % feedPorts)
 
 class ComponentHeaven(pb.Root, log.Loggable):
     """
@@ -490,11 +596,13 @@ class ComponentHeaven(pb.Root, log.Loggable):
             raise errors.AlreadyConnectedError(avatarId)
 
         avatar = ComponentAvatar(self, avatarId)
-        self._addAvatar(avatar)
+        self._addComponentAvatar(avatar)
         return avatar
 
     def removeAvatar(self, avatarId):
         self.removeComponentByName(avatarId)
+    
+    ### our methods
     
     def isLocalComponent(self, component):
         peer = component.getTransportPeer()
@@ -541,19 +649,19 @@ class ComponentHeaven(pb.Root, log.Loggable):
         
         return self.avatars.has_key(name)
     
-    def _addAvatar(self, avatar):
+    def _addComponentAvatar(self, componentAvatar):
         """
         Adds a component avatar.
 
-        @type avatar: L{flumotion.manager.component.ComponentAvatar}
-        @param avatar: the component avatar
+        @type componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        @param componentAvatar: the component avatar
         """
 
-        component_name = avatar.getName()
+        component_name = componentAvatar.getName()
         if self.hasComponent(component_name):
             raise KeyError, component_name
             
-        self.avatars[component_name] = avatar
+        self.avatars[component_name] = componentAvatar
         
     def removeComponent(self, component):
         """
@@ -575,75 +683,71 @@ class ComponentHeaven(pb.Root, log.Loggable):
         
         self.vishnu.adminheaven.componentRemoved(component)
 
-    def getComponentEaters(self, component):
+    def getComponentEatersData(self, component):
         """
-        Retrieves the eaters (feed consumer elements) of a component.
+        Retrieve the information about the feeders this component's eaters
+        are eating from.
 
-        @type component:  component
+        @type  component: L{flumotion.manager.component.ComponentAvatar}
         @param component: the component
 
         @rtype:           tuple with 3 items
-        @returns:         name, hostname and port
+        @returns:         tuple of feeder name, host name and port
         """
 
-        peernames = component.getEaters()
+        eaterFeederNames = component.getEaters()
+        #feederName is componentName:feedName on the feeding component
         retval = []
-        for peername in peernames:
-            feeder = self.feeder_set.getFeeder(peername)
-            feedername = feeder.getName()
-            if feedername.endswith(':default'):
-                feedername = feedername[:-8]
+        for feederName in eaterFeederNames:
+            feeder = self.feeder_set.getFeeder(feederName)
+            self.debug('EatersData(): feeder %r' % feeder)
 
             host = feeder.getListenHost()
             if (not self.isLocalComponent(component) and host == '127.0.0.1'):
                 host = component.getRemoteManagerIP()
 
-            retval.append((feedername, host,feeder.getListenPort()))
+            retval.append((feederName, host, feeder.getListenPort()))
         return retval
 
     def getComponentFeeders(self, component):
         """
         Retrieves the feeders (feed producer elements) for a component.
 
-        @type component:  component
+        @type  component: L{flumotion.manager.component.ComponentAvatar}
         @param component: the component
-
-        @rtype:           tuple of with 3 items
-        @returns:         name, host and port
+        @rtype:           tuple of with 2 items
+        @returns:         name and host
         """
 
         host = component.getListenHost()
-        feedernames = component.getFeeders()
+        feeders = component.getFeeders()
         retval = []
-        for feedername in feedernames:
-            if self.isLocalComponent(component):
-                port = gstutils.get_free_port(self.last_free_port)
-                self.last_free_port = port + 1
-            else:
-                port = None
-
-            retval.append((feedername, host, port))
+        for feeder in feeders:
+            retval.append((feeder, host))
         return retval
 
     def componentStart(self, component):
-        component.debug('Starting')
-        #assert isinstance(component, ComponentPerspective)
-        #assert component != ComponentPerspective
-
-        eaters = self.getComponentEaters(component)
+        component.debug('Starting, asking component to link')
+        eatersData = self.getComponentEatersData(component)
         feeders = self.getComponentFeeders(component)
-        component.link(eaters, feeders)
 
-    def maybeComponentStart(self, component):
-        component.debug('maybeComponentStart')
+        component.debug('Starting, asking component to link with eatersData %s and feedersData %s' % (eatersData, feeders))
+        component.link(eatersData, feeders)
+
+    def checkComponentStart(self, component):
+        """
+        Check if the component can start up.
+        This depends on whether the components and feeders it depends on have
+        started.
+        """
+        component.debug('checkComponentStart')
         
-        for eater in component.getEaters():
-            # eater and feeder elements are named with the feed name
-            # on the GObject level
-            if not self.feeder_set.isFeederReady(eater):
-                component.debug('feeder %s is not ready' % (eater))
+        for eaterFeeder in component.getEaters():
+            if not self.feeder_set.isFeederReady(eaterFeeder):
+                component.debug('feeder %s is not ready' % (eaterFeeder))
                 return
 
+        # FIXME: change this to mood
         if component.starting:
             return
         
@@ -651,24 +755,36 @@ class ComponentHeaven(pb.Root, log.Loggable):
         self.componentStart(component)
         
     def componentRegistered(self, component):
+        """
+        This function is triggered when the mind is attached.
+
+        @type  component: L{flumotion.manager.component.ComponentAvatar}
+        """
         component.debug('registering component')
         self.vishnu.adminheaven.componentAdded(component)
         self.feeder_set.addFeeders(component)
 
-        eaters = component.getEaters()
-        if not eaters:
+        # check if we eat feeds from other feeders
+        eaterFeeders = component.getEaters()
+        if not eaterFeeders:
             component.debug('component does not take feeds, starting')
             self.componentStart(component)
             return
-        else:
-            for eater in eaters:
-                self.feeder_set.dependOnFeeder(eater,
-                                               self.maybeComponentStart,
-                                               component)
+
+        # we do, so we need to make our eaters depend on other feeders
+        component.debug('need to wait for %s' % eaterFeeders)
+        for feeder in eaterFeeders:
+            self.feeder_set.dependComponentOnFeeder(component, feeder,
+                self.checkComponentStart)
                 
-    def startPendingComponents(self, component, feeder):
-        feedername = component.getName() + ':' + feeder
-        self.feeder_set.feederReady(feedername)
+    # FIXME: rename, since this doesn't start components, that's done by
+    # the feeder set
+    def setComponentFeedReady(self, component, feedName):
+        # tell the feeder set that the given feeder on that component is ready
+        feederName = component.getName() + ':' + feedName
+        component.debug('setting feeder %s to ready in feaderset' % feederName)
+        self.feeder_set.feederSetReady(feederName)
+        component.log('setComponentFeedReady done')
 
     def stopComponent(self, name):
         """

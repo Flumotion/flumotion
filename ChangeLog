@@ -1,3 +1,129 @@
+2004-10-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
+	* TODO:
+	* bin/flumotion-worker.in:
+	* bin/flumotion.in:
+	* conf/Makefile.am:
+	* conf/complex.xml:
+	* conf/ogg-test-theora.xml:
+	* conf/ogg-test-vorbis-theora.xml:
+	* conf/videotest-jpeg.xml:
+	* flumotion/component/component.py:
+	* flumotion/component/http/http.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/common.py:
+	* flumotion/test/test_component.py:
+	* flumotion/test/test_manager.py:
+	* flumotion/utils/log.py:
+	* flumotion/worker/Makefile.am:
+	* flumotion/worker/job.py:
+	* flumotion/worker/report.py:
+	* flumotion/worker/worker.py:
+	  merge diffs between revision 681 on branch and trunk to trunk
+
+2004-10-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	branch: johan-workers
+
+	* flumotion/manager/component.py:
+	  and this should fix that problem by delaying adding of the component
+	  avatar to the feeder
+
+2004-10-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	branch: johan-workers
+
+	* flumotion/manager/component.py:
+	  I guess this explains why I get random tracebacks in the manager.
+	  This means I can go home and fix it on monday.
+
+2004-10-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	branch: johan-workers
+
+	* TODO:
+	* flumotion/test/Makefile.am:
+	  make test dir stop "make" on errors
+	* flumotion/manager/component.py:
+	* flumotion/test/test_manager.py:
+	  some more cleanups
+
+2004-10-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	branch: johan-workers
+
+	* Makefile.am:
+	* TODO:
+	* conf/complex.xml:
+	* flumotion/component/component.py:
+	* flumotion/component/http/http.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/common.py:
+	* flumotion/test/test_component.py:
+	* flumotion/test/test_manager.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  server starts up now in the correct order, yay !
+
+2004-09-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	branch: johan-workers
+
+	* flumotion/component/component.py:
+	* flumotion/manager/component.py:
+	  finally arrived at the next error
+
+2004-09-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	branch: johan-workers
+
+	* flumotion/utils/log.py:
+	  add PID
+	* flumotion/component/component.py:
+	* flumotion/manager/component.py:
+	* flumotion/worker/__init__.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/launcher.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  clear up confusion with feedName, feederName, and friends
+	  document and comment
+
+2004-09-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/worker.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/report.py:
+	* flumotion/worker/worker.py:
+	  merging report functionality with worker.py
+	  clean up and comment
+
+2004-09-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	branch: johan-workers
+
+	* bin/flumotion-worker.in:
+	  make it just like flumotion.in
+	* flumotion/worker/Makefile.am:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  split it up similarly to manager
+
+2004-09-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/ogg-test-theora.xml:
+	  use username and password and stuff
+	* flumotion/worker/job.py:
+	* flumotion/worker/report.py:
+	* flumotion/worker/worker.py:
+	  rename some objects, restructure main()
+
 2004-09-30  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/Makefile.am:
@@ -131,6 +257,7 @@
 	* flumotion/worker/worker.py:
 	  synchronize headers of source code
 
+>>>>>>> .merge-right.r680
 2004-09-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/utils/Makefile.am:

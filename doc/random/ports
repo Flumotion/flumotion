@@ -1,0 +1,37 @@
+Port management for the components
+----------------------------------
+
+It is the worker who decides what ports the tcpserversink's will listen on.
+This way the administrator can easily limit the ports to be used, and
+the worker can ensure that ports are assigned correctly.
+
+- manager sends config info for a component to be started by the worker
+   flumotion.manager.worker.WorkerHeaven.start()
+   -> flumotion.manager.worker.WorkerAvatar.start()
+   -> flumotion.worker.worker.WorkerView.remote_start()
+  
+- the worker checks how many feeds this component will feed
+- the worker reserves ports for this component
+
+- the worker spawns a job process
+  flumotion.worker.worker.Kindergarten.play()
+- the spawned process logs in to the worker
+  flumotion.worker.job.JobClientFactory.login(, , JobView())
+- worker creates a JobAvatar and schedules an attached
+- worker's JobAvatar calls 'initial' on job, passing manager's host and port
+- job's JobView starts a launcher
+- worker's JobAvatar gets the feed names and assigns free ports
+  (_cb_afterInitial)
+- worker's JobAvatar calls 'start' on job, passing name, type, config, and
+  a dict of feedPorts (feedName -> port) to use
+- job's JobView sets nice level, creates a component based on the config,
+  creates a pb client factory and tells the Component to log in to the manager.
+
+- when the manager decides that the component should be started (because
+  there are no more upstream components waiting to be started), it calls
+  a remote_link on the component (FIXME: "link" will be renamed).
+  This link contains the info for eaters (feedername, host port) and feeders
+  (feedername, host)
+- component.component.BaseComponent.link() gets called
+- the component starts up, and tells the manager what ports it used for the
+  feeds it's producing

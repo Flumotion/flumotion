@@ -1,8 +1,8 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/worker/worker.py: client-side objects handling component launch
-# 
+# flumotion/worker/worker.py: flumotion-worker objects handling component jobs
+#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
 
@@ -15,9 +15,11 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+import os
 import signal
 import sys
 
+from twisted.cred import portal
 from twisted.internet import protocol, reactor
 from twisted.spread import pb
 
@@ -27,15 +29,18 @@ from flumotion.common import errors, interfaces
 from flumotion.twisted import cred, pbutil
 from flumotion.utils import log
 
-#factory = pbutil.ReconnectingPBClientFactory
-factory = pbutil.FMClientFactory
-class WorkerFactory(factory):
-    #__super_login = factory.startLogin
-    __super_login = factory.login
+#factoryClass = pbutil.ReconnectingPBClientFactory
+factoryClass = pbutil.FMClientFactory
+class WorkerClientFactory(factoryClass):
+    """
+    I am a client factory for the worker to log in to the manager.
+    """
+    #__super_login = factoryClass.startLogin
+    __super_login = factoryClass.login
     def __init__(self, parent):
         self.view = parent.worker_view
         # doing this as a class method triggers a doc error
-        factory.__init__(self)
+        factoryClass.__init__(self)
         
     def login(self, username, password):
         return self.__super_login(cred.Username(username, password),
@@ -46,9 +51,12 @@ class WorkerFactory(factory):
         self.view.cb_gotPerspective(perspective)
 
 class WorkerView(pb.Referenceable, log.Loggable):
+    """
+    I present a view of the worker to the manager.
+    """
     logCategory = 'worker-view'
-    def __init__(self, fabric):
-        self.fabric = fabric
+    def __init__(self, brain):
+        self.brain = brain
         
     def cb_gotPerspective(self, perspective):
         self.info('got perspective: %s' % perspective)
@@ -59,9 +67,20 @@ class WorkerView(pb.Referenceable, log.Loggable):
     def cb_processFailed(self, *args):
         self.info('processFailed %r' % args)
 
+    ### pb.Referenceable method for the manager's WorkerAvatar
     def remote_start(self, name, type, config):
-        self.info('start called')
-        self.fabric.kindergarten.play(name, type, config)
+        """
+	Start a component of the given type with the given config.
+
+        @param name: name of the component to start
+        @type name: string
+        @param type: type of the component
+        @type type: string
+        @param config: a configuration dictionary for the component
+        @type config: dict
+        """
+        self.info('manager asked me to start')
+        self.brain.kindergarten.play(name, type, config)
         
 class Kid:
     def __init__(self, protocol, name, type, config):
@@ -75,12 +94,18 @@ class Kid:
         return self.protocol.pid
     
 class Kindergarten:
+    """
+    I spawn job processes.
+    I live in the worker brain.
+    """
     def __init__(self):
         dirname = os.path.split(os.path.abspath(sys.argv[0]))[0]
         self.program = os.path.join(dirname, 'flumotion-worker')
         self.kids = {}
         
     def play(self, name, type, config):
+        ### FIXME: move this to the worker brain, since this is the unix
+        ### domain socket
         worker_filename = '/tmp/flumotion.%d' % os.getpid()
         args = [self.program,
                 '--job', name,
@@ -101,7 +126,11 @@ class Kindergarten:
         return self.kids.values()
     
 # Similar to Vishnu, but for worker related classes
-class WorkerFabric:
+class WorkerBrain:
+    """
+    I manage jobs and everything related.
+    I live in the main worker process.
+    """
     def __init__(self, host, port):
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -110,86 +139,187 @@ class WorkerFabric:
         self.manager_port = port
         
         self.kindergarten = Kindergarten()
-        from flumotion.worker import report
-        self.report_factory, self.report_heaven = report.setup(self)
+        self.job_server_factory, self.job_heaven = self.setup()
 
         self.worker_view = WorkerView(self)
-        self.worker_factory = WorkerFactory(self)
+        self.worker_client_factory = WorkerClientFactory(self)
 
     def login(self, username, password):
-        d = self.worker_factory.login(username, password)
-        d.addErrback(self.cb_accessDenied)
-        d.addErrback(self.cb_loginFailed)
+        d = self.worker_client_factory.login(username, password)
+        d.addErrback(self._cb_accessDenied)
+        d.addErrback(self._cb_loginFailed)
+                                 
+    def setup(self):
+        root = JobHeaven(self)
+        dispatcher = JobDispatcher(root)
+        checker = cred.FlexibleCredentials()
+        checker.allowAnonymous(True)
+        p = portal.Portal(dispatcher, [checker])
+        job_server_factory = pb.PBServerFactory(p)
+        reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(),
+                           job_server_factory)
 
-    def cb_accessDenied(self, failure):
+        return job_server_factory, root
+
+    def _cb_accessDenied(self, failure):
         failure.trap(cred.error.UnauthorizedLogin)
         print 'ERROR: Access denied.'
         reactor.stop()
     
-    def cb_loginFailed(self, failure):
+    def _cb_loginFailed(self, failure):
         print 'Login failed, reason: %s' % str(failure)
 
-def main(args):
-    parser = optparse.OptionParser()
-    group = optparse.OptionGroup(parser, "Worker options")
-    group.add_option('-m', '--manager-host',
-                     action="store", type="string", dest="host",
-                     default="localhost",
-                     help="Manager to connect to [default localhost]")
-    group.add_option('-p', '--manager-port',
-                     action="store", type="int", dest="port",
-                     default=8890,
-                     help="Manager port to connect to [default 8890]")
-    group.add_option('-u', '--username',
-                     action="store", type="string", dest="username",
-                     default="",
-                     help="Username to use")
-    group.add_option('-d', '--password',
-                     action="store", type="string", dest="password",
-                     default="",
-                     help="Password to use, - for interactive")
-    parser.add_option_group(group)
-    group = optparse.OptionGroup(parser, "Job options")
-    group.add_option('-j', '--job',
-                     action="store", type="string", dest="job",
-                     help="Run job")
-    group.add_option('-w', '--worker',
-                     action="store", type="string", dest="worker",
-                     help="Worker unix socket to connect to")
-    parser.add_option_group(group)
+class JobDispatcher:
+    __implements__ = portal.IRealm
     
-    log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
-    options, args = parser.parse_args(args)
+    def __init__(self, root):
+        """
+        @type root: L{flumotion.worker.worker.JobHeaven}
+        """
+        self.root = root
+        
+    ### portal.IRealm methods
+    # flumotion-worker job processes log in to us.
+    # The mind is a RemoteReference which allows the brain to call back into
+    # the job.
+    def requestAvatar(self, avatarId, mind, *interfaces):
+        if pb.IPerspective in interfaces:
+            avatar = self.root.createAvatar(avatarId)
+            reactor.callLater(0, avatar.attached, mind)
+            return pb.IPerspective, avatar, avatar.shutdown
+        else:
+            raise NotImplementedError("no interface")
 
-    # If job is specificed, run a job
-    if options.job:
-        from flumotion.worker import job
-        job_factory = job.JobFactory(options.job)
-        reactor.connectUNIX(options.worker, job_factory)
-        category = 'job'
-    else:
-        log.debug('Connectiong to %s:%d' % (options.host, options.port))
+class Port:
+    """
+    I am an abstraction of a local TCP port which will be used by GStreamer.
+    """
+    def __init__(self, number):
+        self.number = number
+        self.used = False
+
+    def free(self):
+        self.used = False
+
+    def use(self):
+        self.used = True
+
+    def isFree(self):
+        return self.used == False
+
+    def getNumber(self):
+        return self.number
+
+    def __repr__(self):
+        if self.isFree():
+            return '<Port %d (unused)>' % self.getNumber()
+        else:
+            return '<Port %d (used)>' % self.getNumber()
+            
+class JobAvatar(pb.Avatar, log.Loggable):
+    """
+    I am an avatar for the job living in the worker.
+    """
+    logCategory = 'job-avatar'
+    def __init__(self, heaven, name):
+        """
+        @type heaven: L{flumotion.worker.worker.JobHeaven}
+        @type name: string
+        """
+        
+        self.heaven = heaven
+        self.name = name
+        self.mind = None
+        self.debug("created new JobAvatar")
+        
+        self.feeds = []
+            
+    def hasRemoteReference(self):
+        """
+        Check if the avatar has a remote reference to the peer.
+
+        @rtype: boolean
+        """
+        return self.mind != None
+
+    def attached(self, mind):
+        """
+        @param mind: the reference on which we can call remote methods.
+        
+        I am scheduled from the dispatcher's requestAvatar method.
+        """
+        self.mind = mind
+        self.log('Client attached mind %s' % mind)
+        host = self.heaven.brain.manager_host
+        port = self.heaven.brain.manager_port
+        cb = self.mind.callRemote('initial', host, port)
+        cb.addCallback(self._cb_afterInitial)
+
+    def _getFreePort(self):
+        for port in self.heaven.ports:
+            if port.isFree():
+                port.use()
+                return port
+
+        # XXX: Raise better error message
+        raise AssertionError
     
-        fabric = WorkerFabric(options.host, options.port)
-        fabric.login(options.username, options.password or '')
-        reactor.connectTCP(options.host, options.port, fabric.worker_factory)
+    def _cb_afterInitial(self, unused):
+        kid = self.heaven.brain.kindergarten.getKid(self.name)
+        feedNames = kid.config.get('feeds', ['default'])
 
-        category = 'worker'
+        # This is going to be sent to the component
+        feedports = {} # feedName -> port number
+        # This is saved, so we can unmark the ports when shutting down
+        self.feeds = []
+        for feedName in feedNames:
+            port = self._getFreePort()
+            feedports[feedName] = port.getNumber()
+            self.feeds.append((feedName, port))
+            
+        self.mind.callRemote('start', kid.name, kid.type,
+                             kid.config, feedports)
+                                          
+    def shutdown(self):
+        self.log('%s disconnected' % self.name)
+        self.mind = None
+        for feed, port in self.feeds:
+            port.free()
+        self.feeds = []
         
-    log.debug(category, 'Starting reactor')
-    reactor.run()
-    log.debug(category, 'Reactor stopped')
-
-    if not options.job:
-        log.debug('worker', 'Shutting down jobs')
-        # XXX: Is this really necessary
-        fabric.report_heaven.shutdown()
-
-        pids = [kid.getPid() for kid in fabric.kindergarten.getKids()]
+    def stop(self):
+        if not self.mind:
+            return
         
-        log.debug('worker', 'Waiting for jobs to finish')
-        while pids:
-            pid = os.wait()[0]
-            pids.remove(pid)
+        return self.mind.callRemote('stop')
+        
+    def remote_ready(self):
+        pass
 
-        log.debug('worker', 'All jobs finished, closing down')
+### this is a different kind of heaven, not IHeaven, for now...
+class JobHeaven(pb.Root, log.Loggable):
+    logCategory = "job-heaven"
+    def __init__(self, brain):
+        self.avatars = {}
+        self.brain = brain
+
+        # Allocate ports
+        start = 5500
+        self.ports = []
+        for i in range(50):
+            self.ports.append(Port(start+i))
+        
+    def createAvatar(self, avatarId):
+        avatar = JobAvatar(self, avatarId)
+        self.avatars[avatarId] = avatar
+        return avatar
+
+    def shutdown(self):
+        cb = None
+        for avatar in self.avatars.values():
+            new = avatar.stop()
+            if cb:
+                cb.chainDeferred(new)
+                cb = new
+        return cb
+

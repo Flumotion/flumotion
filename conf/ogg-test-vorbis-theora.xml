@@ -1,16 +1,23 @@
 <root>
-  <component name="producer-video-test" type="producer">
+  <workers policy="password">
+    <worker username="johan" password="johan-pass" default="true"/>
+    <worker username="thomas" password="thomas-pass"/>
+    <worker username="thread" password="thread-pass"/>
+    <worker username="tee" password="tee-pass"/>
+  </workers>
+
+   <component name="producer-video-test" type="producer">
     <pipeline>
-videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=10.0,format=(fourcc)I420
+videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
     </pipeline>
   </component>
 
   <component name="producer-audio-test" type="producer">
     <pipeline>
-sinesrc ! audio/x-raw-int,rate=8000 ! audiorate ! identity sync=true
+sinesrc ! audio/x-raw-int,rate=8000 ! audiorate ! identity silent=true sync=true
     </pipeline>
   </component>
- 
+
   <component name="converter-theora" type="converter">
     <source>producer-video-test</source>
     <pipeline>
@@ -29,9 +36,9 @@ audioconvert ! rawvorbisenc bitrate=8000
     <source>converter-theora</source>
     <source>converter-vorbis</source>
     <pipeline>
-      { @converter-theora ! queue } !
+      { @eater:converter-theora@ ! queue } !
         oggmux name=mux max-delay=10000000 max-page-delay=10000000
-      { @converter-vorbis ! queue } ! mux.
+      { @eater:converter-vorbis@ ! queue } ! mux.
       mux.
     </pipeline>
   </component>
@@ -41,5 +48,4 @@ audioconvert ! rawvorbisenc bitrate=8000
     <port>8800</port>
     <logfile>/tmp/ogg-test-vorbis-theora.access.log</logfile>
   </component>
-
 </root>

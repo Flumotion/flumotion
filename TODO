@@ -1,3 +1,6 @@
+* EASY		make log test not print stuff now that we made common init
+		log; or alternatively move it to each test
+
 * MEDIUM	integration with monitoring tools:
 		big brother: either:
 
@@ -13,6 +16,13 @@
 
 * MEDIUM	create a common.heaven.Heaven base class, and subclass others
 	        involves making admin use same system for managing avatars
+
+* MEDIUM	implement moods of component:
+		- angry: error
+		- happy: running
+		- hungry/bored: waiting for feeds to start
+
+* MEDIUM	allow expression of "test component depends on streamer component"
 
 * EASY		make all pb. factories called Client or Server so it's obvious
 

@@ -3,4 +3,5 @@ EXTRA_DIST = \
 	multipart-bttv-jpeg.xml \
 	multipart-bttv-overlay-jpeg.xml \
 	ogg-test-theora.xml \
-	ogg-test-vorbis-theora.xml
+	ogg-test-vorbis-theora.xml \
+	videotest-jpeg.xml

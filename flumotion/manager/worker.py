@@ -61,7 +61,7 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         self.info('detached %r' % mind)
 
     def start(self, name, type, config):
-        self.info('starting %s' % name)
+        self.info('starting %s on %s' % (name, self.avatarId))
         return self.mind.callRemote('start', name, type, config)
         
 class WorkerHeaven(pb.Root):
@@ -78,7 +78,7 @@ class WorkerHeaven(pb.Root):
         @type vishnu: L{flumotion.manager.manager.Vishnu}
         @param vishnu: the Vishnu object
         """
-        self.avatars = {}
+        self.avatars = {} # avatarId -> WorkerAvatar
         self.conf = None
         self.vishnu = vishnu
         
@@ -142,7 +142,20 @@ class WorkerHeaven(pb.Root):
 
             self.start(name, entry.getType(), dict, worker_name)
             
+    # FIXME: move worker to second argument
+    # FIXME: rename method to workerStart
     def start(self, name, type, config, worker):
+        """
+        @param name:
+        @type name: string
+        @param type:
+        @type type: string
+        @param config: a configuration dictionary
+        @type config: dict
+        @param worker: name of the worker to start the component on
+        @type worker: string
+        """
+        
         if not self.avatars:
             raise AttributeError
 

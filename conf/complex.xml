@@ -4,8 +4,8 @@
     <feed>video</feed>
     <feed>audio</feed>
     <pipeline>
-      videotestsrc sync=1 ! video/x-raw-yuv,width=64,height=64,framerate=5.0 ! :video 
-      { sinesrc sync=1 ! :audio }
+      videotestsrc sync=1 ! video/x-raw-yuv,width=64,height=64,framerate=5.0 ! @feeder::video @
+      { sinesrc sync=1 ! @feeder::audio @ }
     </pipeline>
   </component>
 
@@ -50,8 +50,8 @@
     <source>vorbis</source>
     <source>theora</source>
     <pipeline>
-      @vorbis ! oggmux name=mux max-delay=10000000 max-page-delay=10000000 
-      @theora ! mux. mux.
+      @ eater:vorbis @ ! oggmux name=mux max-delay=10000000 max-page-delay=10000000 
+      @ eater:theora @ ! mux. mux.
     </pipeline>
   </component>
 
@@ -60,8 +60,8 @@
     <source>vorbis-high</source>
     <source>theora</source>
     <pipeline>
-      @vorbis-high ! oggmux name=mux max-delay=10000000 max-page-delay=10000000 
-      @theora ! mux. mux.
+      @ eater:vorbis-high @ ! oggmux name=mux max-delay=10000000 max-page-delay=10000000 
+      @ eater:theora @ ! mux. mux.
     </pipeline>
   </component>
 
@@ -70,9 +70,9 @@
     <source>video+sine:audio</source>
     <source>video+sine:video</source>
     <pipeline>
-      { @video+sine:audio ! audioscale ! audioconvert ! 
+      { @ eater:video+sine:audio @ ! audioscale ! audioconvert ! 
         audio/x-raw-int,rate=8000,channels=1 ! mulawenc name=aenc } 
-      { @video+sine:video ! smokeenc name=venc } 
+      { @ eater:video+sine:video @ ! smokeenc name=venc } 
          aenc. ! queue max-size-bytes=1000000 ! multipartmux name=mux venc. ! 
                  queue max-size-bytes=1000000 ! mux. mux.
     </pipeline>

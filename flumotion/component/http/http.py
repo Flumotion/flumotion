@@ -519,7 +519,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     gsignal('client-removed', object, int, int, object)
     gsignal('ui-state-changed')
     
-    component_view = HTTPView
+    component_view_class = HTTPView
 
     def __init__(self, name, source, port):
         self.port = port
@@ -675,7 +675,10 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
 
     ### END OF THREAD-AWARE CODE
 
-    def feeder_state_change_cb(self, element, old, state):
+    # FIXME: a streamer doesn't have feeders, so shouldn't call the base
+    # method; right now this is done so the manager knows it started.
+    # fix this by implementing concept of "moods" for components
+    def _sink_state_change_cb(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
@@ -685,7 +688,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         sink = self.get_sink()
         # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self._notify_caps_cb)
-        sink.connect('state-change', self.feeder_state_change_cb)
+        sink.connect('state-change', self._sink_state_change_cb)
         # these are made threadsafe using idle_add in the handler
         sink.connect('client-removed', self._client_removed_cb)
         sink.connect('client-added', self._client_added_cb)
