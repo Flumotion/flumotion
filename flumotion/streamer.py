@@ -52,8 +52,7 @@ class Streamer(gobject.GObject, component.BaseComponent):
         self.caps = None
         
     def sink_handoff_cb(self, element, buffer, pad):
-        pass
-        #self.emit('data-received', buffer)
+        self.emit('data-received', buffer)
 
     def notify_caps_cb(self, element, pad, param):
         if not self.caps and pad.is_negotiated():
@@ -64,8 +63,8 @@ class Streamer(gobject.GObject, component.BaseComponent):
         print 'connect', sources
         self.setup_sources(sources)
         sink = self.get_sink()
-        sink.connect('handoff', self.sink_handoff_cb)
-        sink.connect('deep-notify::caps', self.notify_caps_cb)
+        #sink.connect('handoff', self.sink_handoff_cb)
+        #sink.connect('deep-notify::caps', self.notify_caps_cb)
         
         self.pipeline_play()
 
