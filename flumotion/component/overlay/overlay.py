@@ -25,9 +25,9 @@ def createComponent(config):
     config['source'] = [source]
 
     # Set pipeline from the template
-    pipeline = "filesrc location=%s blocksize=100000 !" % location + \
-               "pngdec ! alphacolor ! videomixer name=mix ! :default " + \
-               "@%s ! ffmpegcolorspace ! alpha ! mix." % source
+    pipeline = "filesrc location=%s blocksize=100000 ! " % location + \
+               "pngdec ! alphacolor ! videomixer name=mix ! @feeder::@ " + \
+               "@eater:%s@ ! ffmpegcolorspace ! alpha ! mix." % source
     config['pipeline'] = pipeline
 
     return converter.createComponent(config)
