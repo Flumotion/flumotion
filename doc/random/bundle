@@ -1,0 +1,98 @@
+Bundles
+=======
+
+The code from the wizard should move to their respective components, 
+and should be sent as bundles from the manager to the administration interface. 
+The components itself will, through the main wizard object have a reference
+to the administration medium and using that it can easily call remote methods, 
+the main (only?) usage will be running code on a connected worker.
+
+I'd suggest that a bundle is specified in the xml file, for instance:
+<registry>
+
+  <component name="video-test">
+   ...
+  </component>
+  <bundles>
+    <bundle name="component-videotest">
+      <dependency name="component"/>
+      <directory name="flumotion/components/producers/videotest">
+        <filename location="videotest.py"/>
+      </directory>
+    </bundle>
+    <bundle name="admin-gtk-videotest">
+      <dependency name="base"/>
+      <directory name="flumotion/components/producers/videotest">
+        <filename location="gtk/videotest.glade/>
+        <filename location="gtk/wizard.py"/>
+      </directory>
+    </bundle>
+    <bundle name="admin-gtk-wizard-videotest">
+      <dependency name="base"/>
+      <directory name="flumotion/components/producers/videotest">
+        <filename location="gtk/videotest.glade/>
+        <filename location="gtk/admin.py"/>
+      </directory>
+    </bundle>
+  </bundles>
+</registry>
+
+Notes:
+
+* The bundle name must be unique
+* <directory> must have a name attribute, which is the base
+  directory where all components are loaded from, it should
+  be relative to the python root, eg always start with flumotion/
+* i' should not in any ways be tied to python code, eg glade or images can
+  also be included
+
+Admin, sending over a bundle
+============================
+
+1. Requests for flumotion/components/producers/videotest/gtk/admin.py
+
+2. "Bundle Manager" tells its in the bundle admin-gtk-videotest
+
+3. It checks the dependencies; finds out it depends on base.
+
+4. base bundle is sent over (if its not already up to date)
+
+5. admin-gtk-videotest bundle is sent over.
+
+6. the bundle is unzipped and __path__ is set properly.
+
+7. admin imports the module, end of story
+
+
+Creating a bundle
+=================
+
+This is only done on request, so bundles are not created unless they're
+needed.
+
+1. Create the directory layout, specified in the directory tag
+
+2. Create __init__.py for all directories, unless its already specified
+   in a filename tag
+
+3. Create the zip file.
+
+Requesting bundles
+==================
+
+In AdminHeaven, possible to move to an abstract base class at some point.
+
+remote_getBundle(name=None, file=None pythonName=None)
+
+(and getBundle in AdminMedium)
+
+XXX: How should components in workers be instantiated?
+
+
+
+
+
+
+
+  
+

@@ -1,0 +1,103 @@
+Wizard User Interface
+
+WizardStep
+==========
+
+Class variables:
+
+step_name	Used in the title, use .get_name() to access this
+glade_file	location of the glade file
+icon		location of the icon to be used
+has_worker	whether the step needs a worker
+section		what section the step belongs to, used by the sidebar
+section_name	name of the section, used in the title
+sidebar_name	name to display in sidebar, maybe rename to short_name
+last_step	if its the last step
+
+Instance variables:
+
+visited		If we've been to the step, used by the sidebar
+
+A step is a wrapper around a glade file with some extra information
+to be able to integrate it to the wizard, it is a class with meta data
+such as icon name, title. It also contains methods which is used by the
+wizard to determine the flow of the configuration. 
+The step has complete access to the main wizard object and can, by calling
+different methods to block the next/prev buttons, show a dialog or run a 
+function on a specified worker.
+
+Calls step -> wizard:
+  block next button
+  unblock next button
+  setting the worker combobox to sensitive
+  displaying an error message
+
+Additionally, getting the state of the widget needs to move from the wizard
+to the step itself (get_step_option/get_step_options/get_step_state)
+
+Methods that can be overriden:
+
+  get_next		Is used to determine the next step
+  activated		after the new step is shown
+  deactivated		after the step is hidden
+  setup			during construction
+  before_show		just before the step is shown
+  worker_changed	worker changed for the current step
+
+
+Wizard
+======
+
+The wizard interface contains n different parts:
+
+* Sidebar
+* Step area
+* Prev/Next button row
+* Title row (title and icon)
+
+All steps are stored in a stack and are added as the user navigates
+through the wizard. Back simply pops the item and next puts it on the top.
+
+To load the steps, flumotion.wizard.steps is imported and all steps are
+added to the global list _steps. Then each step is added to the wizard, 
+setup() is called on the step and if its the initial step its added on top
+of the stack. The rest of the steps are simply stored in a list and they are
+used by the sidebar code for instance.
+
+To run the wizard, the run() method is used. It's rather complex because
+it was designed to support non interactive use, eg by the testsuite.
+So it has options to specify whether it should run its own mainloop to be
+able to reuse a rector when running with twisted for instance.
+
+The sidebar is completely rebuilt in each step, it's basically a vertical
+box with a number of other horizontal boxes. Because we cannot show 
+the complete progress, due to the dynamic nature of the wizard we need
+to put group them into different sections.
+Welcome, Production, Conversion, Consumption and License
+
+XXX: Add some more bits about the set_step,show_next,show_previous logic
+
+Once the configuration is finished its state is used by WizardSaver to
+transform it into a configuration xml file.
+
+WizardSaver
+===========
+
+Iterates over all steps in the stack and generates a configuration file
+matching the input. It mainly takes care of doing checks between 
+different components.
+
+
+Future design
+=============
+Currently we have some logic tied to the WizardSaver, for instance
+when using both firewire audio and video we're doing an optimization
+to only instantiate one component, and reuse audio and video from it.
+This needs to be separated and moved into a rule like system we're we
+can define some logic to manipulate the state the wizard gives us and
+add optimizations or other technics, before passing it on to the
+component that saves it to xml (or any other format).
+
+WizarSaver should therefor probably only save the final state to xml and not
+anything else.
+
