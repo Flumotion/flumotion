@@ -1,3 +1,31 @@
+2004-09-30  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/Makefile.am:
+	* data/glade/wizard.glade:
+	* data/glade/wizard_audio_encoder.glade:
+	* data/glade/wizard_audiosource.glade:
+	* data/glade/wizard_consumption.glade:
+	* data/glade/wizard_disk.glade:
+	* data/glade/wizard_encoding.glade:
+	* data/glade/wizard_firewire.glade:
+	* data/glade/wizard_http.glade:
+	* data/glade/wizard_jpeg.glade:
+	* data/glade/wizard_overlay.glade:
+	* data/glade/wizard_smoke.glade:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_testsource.glade:
+	* data/glade/wizard_theora.glade:
+	* data/glade/wizard_tvcard.glade:
+	* data/glade/wizard_webcam.glade:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/__init__.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/wizard_step.py: 
+
+	More wizard work. Most pages in
+	place and pretty functional. No configuration saving yet. Need a
+	little bit more logic aswell.
+
 2004-09-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac: bump nano version for development
