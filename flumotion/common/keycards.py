@@ -66,10 +66,11 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
 
         Subclasses should override to add additional information.
         """
-        return dict(
-            id=self.id,
-            requester=self.requesterName,
-            domain=self.domain)
+        return {
+            'id':        self.id,
+            'requester': self.requesterName,
+            'domain':    self.domain
+        }
         
     def __repr__(self):
         return "<%s in state %s>" % (self.__class__.__name__,
