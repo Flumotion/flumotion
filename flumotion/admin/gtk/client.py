@@ -392,7 +392,7 @@ class Window(log.Loggable, gobject.GObject):
         self.components_view.update(components)
 
     ### ui callbacks
-    def _components_view_selected_cb(self, name):
+    def _components_view_selected_cb(self, view, name):
         if not name:
             self.warning('Select a component')
             return
