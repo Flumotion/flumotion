@@ -15,11 +15,11 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from flumotion.component import component
+from flumotion.component import feedcomponent
 
 __all__ = ['Converter']
 
-class Converter(component.ParseLaunchComponent):
+class Converter(feedcomponent.ParseLaunchComponent):
     logCategory = 'conv-pipe'
 
 def createComponent(config):

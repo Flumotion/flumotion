@@ -28,7 +28,7 @@ from twisted.web import server, resource
 from twisted.internet import reactor
 import twisted.internet.error
 
-from flumotion.component import component
+from flumotion.component import feedcomponent
 from flumotion.common import auth, bundle, common, interfaces
 from flumotion.utils import gstutils, log
 from flumotion.utils.gstutils import gsignal
@@ -491,12 +491,12 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             return self.admin
         return self
 
-class HTTPView(component.FeedComponentView):
+class HTTPView(feedcomponent.FeedComponentView):
     def __init__(self, comp):
         """
         @type comp: L{Stats}
         """
-        component.FeedComponentView.__init__(self, comp)
+        feedcomponent.FeedComponentView.__init__(self, comp)
 
         self.comp.connect('ui-state-changed', self._comp_ui_state_changed_cb)
 
@@ -507,7 +507,7 @@ class HTTPView(component.FeedComponentView):
         self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
 
 ### the actual component is a streamer using multifdsink
-class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
+class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     # this object is given to the HTTPView as comp
     logCategory = 'cons-http'
     # use select for test
@@ -525,7 +525,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     def __init__(self, name, source, port):
         self.port = port
         self.gst_properties = []
-        component.ParseLaunchComponent.__init__(self, name, [source], [],
+        feedcomponent.ParseLaunchComponent.__init__(self, name, [source], [],
                                                 self.pipe_template)
         Stats.__init__(self, sink=self.get_sink())
         self.caps = None
@@ -680,7 +680,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     # method; right now this is done so the manager knows it started.
     # fix this by implementing concept of "moods" for components
     def _sink_state_change_cb(self, element, old, state):
-        component.FeedComponent.feeder_state_change_cb(self, element,
+        feedcomponent.FeedComponent.feeder_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
             self.debug('Ready to serve clients on %d' % self.port)

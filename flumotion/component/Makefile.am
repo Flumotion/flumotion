@@ -1,5 +1,8 @@
 componentdir = $(libdir)/flumotion/python/flumotion/component
-component_PYTHON = __init__.py component.py
+component_PYTHON = \
+	__init__.py \
+	feedcomponent.py \
+	component.py
 
 TAGS_FILES = $(component_PYTHON)
 

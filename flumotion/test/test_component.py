@@ -21,7 +21,7 @@ import common
 
 from twisted.trial import unittest
 
-from flumotion.component.component import ParseLaunchComponent
+from flumotion.component.feedcomponent import ParseLaunchComponent
 
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, eater_config, feeder_config):

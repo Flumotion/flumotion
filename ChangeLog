@@ -1,5 +1,17 @@
 2004-10-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/Makefile.am:
+	* flumotion/component/base/converter.py:
+	* flumotion/component/base/producer.py:
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/file/file.py:
+	* flumotion/component/http/http.py:
+	* flumotion/test/test_component.py:
+	  separate out feedcomponent to a separate file
+
+2004-10-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* TODO:
 	* flumotion/admin/admin.py:
 	* flumotion/common/interfaces.py:

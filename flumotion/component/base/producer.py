@@ -15,14 +15,14 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from flumotion.component import component
+from flumotion.component import feedcomponent
 
 __all__ = ['Producer']
 
-class Producer(component.ParseLaunchComponent):
+class Producer(feedcomponent.ParseLaunchComponent):
     logCategory = 'prod-pipe'
     def __init__(self, name, feeders, pipeline):
-        component.ParseLaunchComponent.__init__(self, name, [],
+        feedcomponent.ParseLaunchComponent.__init__(self, name, [],
                                                 feeders, pipeline)
 
 def createComponent(config):

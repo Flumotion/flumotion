@@ -19,14 +19,14 @@ import time
 
 import gst
 
-from flumotion.component import component
+from flumotion.component import feedcomponent
 
 __all__ = ['FileSinkStreamer']
 
-class FileSinkStreamer(component.ParseLaunchComponent):
+class FileSinkStreamer(feedcomponent.ParseLaunchComponent):
     pipe_template = 'multifdsink sync-clients=1 name=fdsink mode=1'
     def __init__(self, name, source, location):
-        component.ParseLaunchComponent.__init__(self, name, [source],
+        feedcomponent.ParseLaunchComponent.__init__(self, name, [source],
                                                 [], self.pipe_template)
         self.file_fd = None
         self.location = location
@@ -55,7 +55,7 @@ class FileSinkStreamer(component.ParseLaunchComponent):
         return location
     
     def feeder_state_change_cb(self, element, old, state):
-        component.BaseComponent.feeder_state_change_cb(self, element,
+        feedcomponent.BaseComponent.feeder_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
             self.debug('Ready')
