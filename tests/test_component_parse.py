@@ -7,7 +7,8 @@ class PipelineTest(ParseLaunchComponent):
         self.component_name = '<fake>'
         self.sources = sources
         self.feeds = feeds
-
+        self.remote = None
+        
 def pipelineFactory(pipeline, sources=[], feeds=[]):
     p = PipelineTest(sources, feeds)
     return p.parse_pipeline(pipeline)
