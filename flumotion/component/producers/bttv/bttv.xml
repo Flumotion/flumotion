@@ -5,6 +5,7 @@
       <property name="feed" type="string" multiple="yes"/>
       <property name="device" type="string" required="yes"/>
       <property name="channel" type="string" required="no"/>
+      <property name="signal" type="string" required="no"/>
       <property name="height" type="int"/>
       <property name="width" type="int"/>
       <property name="framerate" type="float"/>
