@@ -33,6 +33,8 @@ except RuntimeError:
 
 from flumotion.ui import fgtk
 
+INTERVAL = 100 # in ms
+
 class VUTest(unittest.TestCase):
     def testScale(self):
         w = fgtk.FVUMeter()
@@ -63,8 +65,8 @@ class VUTest(unittest.TestCase):
         window = gtk.Window()
         window.add(w)
         window.show_all()
-        gobject.timeout_add(0, w.set_property, 'peak', -50.0)
-        gobject.timeout_add(1, w.set_property, 'peak', -5.0)
-        gobject.timeout_add(2, gtk.main_quit)
+        gobject.timeout_add(0 * INTERVAL, w.set_property, 'peak', -50.0)
+        gobject.timeout_add(1 * INTERVAL, w.set_property, 'peak', -5.0)
+        gobject.timeout_add(2 * INTERVAL, gtk.main_quit)
         gtk.main()
         window.destroy()
