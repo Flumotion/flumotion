@@ -209,6 +209,7 @@
 	      <child>
 		<widget class="GtkToolButton" id="tool_open">
 		  <property name="visible">True</property>
+		  <property name="tooltip" translatable="yes">Open a stored configuration</property>
 		  <property name="stock_id">gtk-open</property>
 		  <property name="visible_horizontal">True</property>
 		  <property name="visible_vertical">True</property>
@@ -225,6 +226,7 @@
 		<widget class="GtkToolButton" id="tool_save">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
+		  <property name="tooltip" translatable="yes">Save the currently running configuration</property>
 		  <property name="stock_id">gtk-save</property>
 		  <property name="visible_horizontal">True</property>
 		  <property name="visible_vertical">True</property>
@@ -253,6 +255,7 @@
 	      <child>
 		<widget class="GtkToolButton" id="tool_clean">
 		  <property name="visible">True</property>
+		  <property name="tooltip" translatable="yes">Stop and remove all components</property>
 		  <property name="label" translatable="yes"></property>
 		  <property name="use_underline">True</property>
 		  <property name="stock_id">gtk-clear</property>
@@ -283,6 +286,7 @@
 	      <child>
 		<widget class="GtkToolButton" id="tool_quit">
 		  <property name="visible">True</property>
+		  <property name="tooltip" translatable="yes">Quit the administration tool</property>
 		  <property name="stock_id">gtk-quit</property>
 		  <property name="visible_horizontal">True</property>
 		  <property name="visible_vertical">True</property>
