@@ -1,3 +1,8 @@
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	  fix Johan's bug
+
 2004-10-17  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_wizard.py: Fix test breakage

@@ -234,7 +234,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     # FIXME: this is the new method to get the UI, by getting a bundle
     # and an entry point
-    def getUIZip(self, component, style):
+    def getUIZip(self, component, domain, style):
         """
         Get the zip containing the given user interface from the manager.
 
@@ -245,8 +245,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
         @rtype: deferred
         """
-        self.info('calling remote getUIZip %s, %s' % (component, style))
-        return self.remote.callRemote('getUIZip', component, style)
+        self.info('calling remote getUIZip %s, %s, %s' % (component, domain, style))
+        return self.remote.callRemote('getUIZip', component, domain, style)
 
     def getUIMD5Sum(self, component, domain, style):
         """
@@ -283,7 +283,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             self.debug("got UI MD5 sum: %s" % md5sum)
             dir = os.path.join(os.environ['HOME'], '.flumotion', 'cache', md5sum)
             if not os.path.exists(dir):
-                d = self.getUIZip(component, style)
+                d = self.getUIZip(component, domain, style)
                 d.addErrback(self._defaultErrback)
                 d.addCallback(_ZipCallback, self, component, domain, style)
                 return d
