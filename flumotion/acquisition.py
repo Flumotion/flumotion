@@ -42,7 +42,8 @@ class Acquisition(pb.Referenceable):
         defered.addCallback(self.gotPerspective)
         
         self.pipeline_string = pipeline_string
-
+        self.persp = None
+        
     def gotPerspective(self, persp):
         self.persp = persp
         
@@ -87,6 +88,10 @@ class Acquisition(pb.Referenceable):
         
     def remote_prepare(self):
         log.msg('start called')
+        if not self.persp:
+            print 'We are not ready yet, waiting 100 ms'
+            reactor.callLater(0.100, self.remote_prepare)
+            
         full_pipeline = '%s ! fakesink silent=1 name=fakesink' % self.pipeline_string
         log.msg('going to run pipeline: %s' % full_pipeline)
         self.pipeline = gst.parse_launch(full_pipeline)
