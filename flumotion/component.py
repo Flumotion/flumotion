@@ -211,16 +211,14 @@ class BaseComponent(pb.Referenceable):
         self.pipeline_signals.append(sig_id)
         sig_id = self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         self.pipeline_signals.append(sig_id)
-        sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
-        self.pipeline_signals.append(sig_id)
+        #sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
+        #self.pipeline_signals.append(sig_id)
         
     def remote_register(self):
         if not self.hasPerspective():
             log.msg('WARNING: We are not ready yet, waiting 250 ms')
             reactor.callLater(0.250, self.remote_register)
             return
-        
-        #self.setup_pipeline()
         
         return {'ip' : self.getIP(),
                 'pid' :  os.getpid(), 

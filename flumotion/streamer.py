@@ -44,7 +44,7 @@ class Streamer(gobject.GObject, component.BaseComponent):
     }
 
     kind = 'streamer'
-    pipe_template = 'fakesink signal-handoffs=1 silent=1 name=sink'
+    pipe_template = 'fakesink signal-handoffs=1 silent=0 name=sink'
     
     def __init__(self, name, sources):
         self.__gobject_init__()
@@ -53,11 +53,11 @@ class Streamer(gobject.GObject, component.BaseComponent):
         
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-received', buffer)
-
+        
     def notify_caps_cb(self, element, pad, param):
         if not self.caps and pad.is_negotiated():
             self.caps = pad.get_negotiated_caps()
-        
+
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
         print 'connect', sources
@@ -81,11 +81,20 @@ class StreamingResource(resource.Resource):
         self.current_requests = []
         self.buffer_queue = []
 
+        self.first_buffer = None
+        self.caps_buffers = []
+        
         reactor.callLater(0, self.bufferWrite)
         
     def data_received_cb(self, transcoder, gbuffer):
-        self.buffer_queue.append(str(buffer(gbuffer)))
-        
+        s = str(buffer(gbuffer))
+        if gbuffer.flag_is_set(gst.BUFFER_IN_CAPS):
+            self.caps_buffers.append(s)
+        else:
+            if not self.first_buffer:
+                self.first_buffer = gbuffer
+            self.buffer_queue.append(s)
+                                             
     def bufferWrite(self, *args):
         for buffer in self.buffer_queue:
             for request in self.current_requests:
@@ -100,11 +109,19 @@ class StreamingResource(resource.Resource):
     def lost(self, obj, request):
         print 'client from', request.getClientIP(), 'disconnected'
         self.current_requests.remove(request)
+
+    def isReady(self):
+        if not self.streamer.caps:
+            return False
+        
+        if self.first_buffer is None:
+            return False
+
+        return True
         
     def render(self, request):
         print 'client from', request.getClientIP(), 'connected'
-        if not self.streamer.caps:
-            print 'No caps, skipping'
+        if not self.isReady():
             return server.NOT_DONE_YET
 
         # Stolen from camserv
@@ -113,6 +130,9 @@ class StreamingResource(resource.Resource):
         request.setHeader("Content-type", "%s;boundary=ThisRandomString" % self.streamer.caps)
         request.setHeader('Pragma', 'no-cache')
         
+        for buffer in self.caps_buffers:
+            request.write(buffer)
+            
         self.current_requests.append(request)
         request.notifyFinish().addBoth(self.lost, request)
         

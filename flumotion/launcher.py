@@ -45,10 +45,9 @@ def enable_stderr(fd, suffix):
 
     return [line for line in data.split('\n')]
 
-CONTROLLER_PORT = 8900
 class Launcher:
     streaming_port = 8080
-    def __init__(self):
+    def __init__(self, port):
         self.children = []
 
         #signal.signal(signal.SIGINT, self.signal_handler)
@@ -56,8 +55,7 @@ class Launcher:
 
         pid = os.fork()
         if not pid:
-            self.controller = reactor.listenTCP(CONTROLLER_PORT,
-                                                ControllerServerFactory())
+            self.controller = reactor.listenTCP(port, ControllerServerFactory())
             try:
                 reactor.run(False)
             except KeyboardInterrupt:
@@ -132,14 +130,16 @@ class Launcher:
         print '*** STOPPING MAINLOOP'
         reactor.stop()
 
-
         raise SystemExit
     
-PRODUCER_PIPELINE = 'tcpclientsrc host=core port=5502' #'videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=9.375,format=(fourcc)I420'
-PRODUCER2_PIPELINE = 'tcpclientsrc host=core port=5504'
-CONVERTER_PIPELINE = '{ @producer1 ! jpegenc quality=50 ! queue name=video max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
-                     '{ @producer2 ! mulawenc ! queue name=audio max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
-                     'video.src ! multipartmux name=muxer audio.src ! muxer. muxer.'
+CONTROLLER_PORT = 8906
+
+#PRODUCER_PIPELINE = 'videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=9.375,format=(fourcc)I420'
+PRODUCER2_PIPELINE = 'sinesrc'
+#CONVERTER_PIPELINE = '{ @producer1 ! theoraenc ! queue name=video max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
+#                     '{ @producer2 ! audioconvert ! rawvorbisenc ! queue name=audio max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
+#                     'video.src ! oggmux name=muxer audio.src ! muxer. muxer.'
+CONVERTER_PIPELINE = 'audioconvert ! rawvorbisenc ! oggmux'
 
 def is_port_free(port):
     import socket
@@ -158,11 +158,11 @@ if __name__ == '__main__':
         log.msg('Port %d is already used.' % CONTROLLER_PORT)
         raise SystemExit
     
-    launcher = Launcher()
+    launcher = Launcher(CONTROLLER_PORT)
     
-    launcher.start(Producer('producer1', [], PRODUCER_PIPELINE))
+    #launcher.start(Producer('producer1', [], PRODUCER_PIPELINE))
     launcher.start(Producer('producer2', [], PRODUCER2_PIPELINE))
-    launcher.start(Converter('converter', ['producer1', 'producer2'], CONVERTER_PIPELINE))
+    launcher.start(Converter('converter', ['producer2'], CONVERTER_PIPELINE))
     
     streamer = Streamer('streamer', ['converter'])
     reactor.listenTCP(8081,
