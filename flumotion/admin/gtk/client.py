@@ -322,10 +322,39 @@ class Window(log.Loggable, gobject.GObject):
 
     # menubar/toolbar callbacks
     def file_new_cb(self, button):
-        raise NotImplementedError
+        # XXX: This need to be able to run twice
+        def _wizard_finished_cb(wizard, configuration):
+            wizard.hide()
+            self.admin.loadConfiguration(configuration)
+            self.show()
+
+        wiz = wizard.Wizard(self.admin)
+        wiz.connect('finished', _wizard_finished_cb)
+        wiz.run(True, self.admin.getWorkers(), main=False)
     
     def file_open_cb(self, button):
-        raise NotImplementedError
+        dialog = gtk.FileChooserDialog("Open..",
+                                       None,
+                                       gtk.FILE_CHOOSER_ACTION_OPEN,
+                                       (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                        gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        dialog.set_default_response(gtk.RESPONSE_OK)
+
+        directory = os.path.join(os.environ['HOME'], '.flumotion')
+        if os.path.exists(directory):
+            dialog.set_current_folder(directory)
+            
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            filename = dialog.get_filename()
+        elif response == gtk.RESPONSE_CANCEL:
+            dialog.destroy()
+            return
+        
+        dialog.hide()
+        configuration = open(filename).read()
+        self.admin.loadConfiguration(configuration)
+        dialog.destroy()
     
     def file_save_cb(self, button):
         raise NotImplementedError

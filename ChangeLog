@@ -1,5 +1,13 @@
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/main.py:
+
+	Add file->open and file->new in interface. Don't load default
+	configuration on startup.
+	
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/admin.glade:
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:

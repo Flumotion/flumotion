@@ -27,14 +27,14 @@ directory = os.path.split(os.path.abspath(__file__))[0]
 fontpath = os.path.join(directory, 'Vera.ttf')
 logopath = directory
 
-fluendoLogoPath = os.path.join(logopath, 'fluendo.24x24.png')
-ccLogoPath = os.path.join(logopath, 'cc.24x24.png')
-xiphLogoPath = os.path.join(logopath, 'xiph.24x24.png')
+fluendoLogoPath = os.path.join(logopath, 'fluendo.36x36.png')
+ccLogoPath = os.path.join(logopath, 'cc.36x36.png')
+xiphLogoPath = os.path.join(logopath, 'xiph.36x36.png')
 
-TEXT_XOFFSET = 4
-TEXT_YOFFSET = 4
-WIDTH = 24
-BORDER = 4
+TEXT_XOFFSET = 6
+TEXT_YOFFSET = 6
+WIDTH = 36
+BORDER = 8
 FONT_SIZE = 22
 
 def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,

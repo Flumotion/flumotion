@@ -33,14 +33,12 @@ def _write_default(configuration):
         os.makedirs(directory)
         
     filename = os.path.join(directory, 'default.xml')
-    print 'Saving configuration to', filename
     fd = file(filename, 'w')
     fd.write(configuration)
 
 def _read_default():
     directory = os.path.split(FIRST_TIME_FILE)[0]
     filename = os.path.join(directory, 'default.xml')
-    print 'Loading configuration from', filename
     fd = file(filename)
     return fd.read()
 
@@ -65,8 +63,6 @@ def _window_connected_cb(window, options):
             wiz.load_steps()
             wiz.run(not options.debug, workers, main=False)
         else:
-            configuration = _read_default()
-            window.admin.loadConfiguration(configuration)
             window.show()
         
 def _runWizard(debug):
