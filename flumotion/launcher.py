@@ -18,9 +18,10 @@ from twisted.web import server, resource
 import gstutils
 
 class Launcher:
-    def __init__(self):
+    def __init__(self, controller_port):
         self.children = []
         self.controller_pid = None
+        self.controller_port = controller_port
         
         #signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
@@ -53,7 +54,9 @@ class Launcher:
 
         signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         signal.signal(signal.SIGINT, exit_cb)
-        reactor.connectTCP('localhost', 8890, component.factory)
+        reactor.connectTCP('localhost', self.controller_port,
+                           component.factory)
+        
         try:
             reactor.run(False)
         except KeyboardInterrupt:
@@ -169,6 +172,9 @@ def main(args):
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="Be verbose")
+    parser.add_option('-c', '--controller-port',
+                      action="store", type="int", dest="port",
+                      help="Controller port")
 
     options, args = parser.parse_args(args)
     if len(args) < 2:
@@ -178,12 +184,12 @@ def main(args):
     if options.verbose:
         log.startLogging(sys.stderr)
 
-    launcher = Launcher()
+    launcher = Launcher(options.port)
 
-    if not gstutils.is_port_free(8890):
+    if not gstutils.is_port_free(options.port):
         log.msg('Controller is already started')
     else:
-        launcher.start_controller(8890)
+        launcher.start_controller(options.port)
         
     launcher.load_config(args[1])
     
