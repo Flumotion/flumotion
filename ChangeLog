@@ -1,3 +1,8 @@
+2004-10-19  Wim Taymans  <wim@fluendo.com>
+
+	* flumotion/manager/main.py:
+	Fix typos and copy-and-paste errors.
+
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
 	reviewed by: <delete if not using a buddy>

@@ -111,7 +111,7 @@ def main(args):
     defaultSSLPort = configure.defaultSSLManagerPort
     defaultTCPPort = configure.defaultTCPManagerPort
     group.add_option('-H', '--hostname',
-                     action="store", type="string", dest="port",
+                     action="store", type="string", dest="host",
                      default="",
                      help="hostname to listen to [default ""]")
     group.add_option('-P', '--port',
@@ -124,7 +124,7 @@ def main(args):
                      help="transport protocol to use (tcp/ssl) [default ssl]")
     group.add_option('-C', '--certificate',
                      action="store", type="string", dest="certificate",
-                     default="default.pem",
+                     default="flumotion.pem",
                      help="specify PEM certificate file (for SSL)")
     group.add_option('-D', '--daemonize',
                      action="store_true", dest="daemonize",
