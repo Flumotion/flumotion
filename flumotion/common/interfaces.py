@@ -59,10 +59,10 @@ class IWorkerComponent(components.Interface):
     pass
 
 class IHeaven(components.Interface):
-    def getAvatar(self, name):
+    def getAvatar(self, avatarID):
         pass
 
-    def removeAvatar(self, avatar, mind):
+    def removeAvatar(self, avatarID):
         pass
     
 class INewCredPerspective(components.Interface):
