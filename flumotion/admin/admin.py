@@ -186,6 +186,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.info('calling remote getUIEntry %s' % component)
         return self.remote.callRemote('getUIEntry', component)
 
+    def getUIFileList(self, component):
+        self.debug('calling remote getUIFileList %s' % component)
+        return self.remote.callRemote('getUIFileList', component)
+
     # FIXME: this should not be allowed to be called, move away
     # by abstracting callers further
     # returns a dict of name -> component

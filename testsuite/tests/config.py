@@ -30,7 +30,7 @@ class TestConfig(unittest.TestCase):
         assert isinstance(flumotion.config.gladedir, str)
 
     def testUninstalled(self):
-        assert flumotion.config.installed == 0
+        assert flumotion.config.isinstalled == 0
 
 if __name__ == '__main__':
      unittest.main()

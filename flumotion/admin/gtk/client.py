@@ -85,7 +85,7 @@ class PropertyChangeDialog(gtk.Dialog):
         if response == gtk.RESPONSE_APPLY:
             self.emit('set', self.element_entry.get_text(),
                       self.property_entry.get_text(),
-                      value = self.value_entry.get_text())
+                      self.value_entry.get_text())
         elif response == RESPONSE_FETCH:
             self.emit('get', self.element_entry.get_text(),
                       self.property_entry.get_text())

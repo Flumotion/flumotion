@@ -1,4 +1,5 @@
 SUBDIRS = \
+	admin \
 	common \
 	component \
 	config \
