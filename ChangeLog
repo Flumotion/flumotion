@@ -1,5 +1,10 @@
 2004-12-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/wizard/steps.py:
+	  fixes #136 - warn about missing dv1394src and dvdec elements
+
+2004-12-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/streaming:
 	  some additional notes
 	* flumotion/common/log.py:

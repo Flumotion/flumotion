@@ -265,6 +265,10 @@ class FireWire(VideoSource):
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
     icon = 'firewire.png'
+
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'dv1394src', 'dvdec',)
+
 wizard.register_step(FireWire)
 
 
