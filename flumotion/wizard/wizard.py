@@ -192,9 +192,10 @@ class WizardStep(object, log.Loggable):
         pass
 
 class Wizard(gobject.GObject, log.Loggable):
-    sidebar_color = gtk.gdk.color_parse('#9bc6ff')
-    main_color = gtk.gdk.color_parse('white')
-    sidebar_active_color = gtk.gdk.color_parse('#79abed')
+    sidebar_bg = None
+    sidebar_fg = None
+    sidebar_fgi = None
+    sidebar_pre_bg = None
     
     gsignal('finished', str)
     
@@ -208,8 +209,18 @@ class Wizard(gobject.GObject, log.Loggable):
         for widget in self.wtree.get_widget_prefix(''):
             setattr(self, widget.get_name(), widget)
         self.wtree.signal_autoconnect(self)
-        self.eventbox_top.modify_bg(gtk.STATE_NORMAL, self.sidebar_color)
-        self.eventbox_main.modify_bg(gtk.STATE_NORMAL, self.main_color)
+
+        # have to get the style from the theme, but it's not really there until
+        # it's attached
+        self.label_title.realize()
+        style = self.label_title.get_style()
+
+        self.sidebar_bg = style.bg[gtk.STATE_SELECTED]
+        self.sidebar_fg = style.fg[gtk.STATE_SELECTED]
+        self.sidebar_fgi = style.mid[gtk.STATE_SELECTED]
+        self.sidebar_pre_bg = style.bg[gtk.STATE_ACTIVE]
+        self.eventbox_top.modify_bg(gtk.STATE_NORMAL, self.sidebar_bg)
+        self.label_title.modify_fg(gtk.STATE_NORMAL, self.sidebar_fg)
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))
         self._admin = admin
@@ -297,8 +308,7 @@ class Wizard(gobject.GObject, log.Loggable):
 
         # Add current
         widget = step.get_main_widget()
-        self.content_area.add(widget)
-        self.content_area.set_child_packing(widget, False, False, 0, 0)
+        self.content_area.pack_start(widget, True, True, 0)
 
         self._append_workers(step)
         icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
@@ -482,7 +492,7 @@ class Wizard(gobject.GObject, log.Loggable):
         else:
             parent = self.eventbox_sidebar
 
-        parent.modify_bg(gtk.STATE_NORMAL, self.sidebar_color)
+        parent.modify_bg(gtk.STATE_NORMAL, self.sidebar_bg)
         self.vbox_sidebar = gtk.VBox()
         self.vbox_sidebar.set_border_width(5)
         self.vbox_sidebar.set_size_request(200, -1)
@@ -494,16 +504,21 @@ class Wizard(gobject.GObject, log.Loggable):
         ph.show()
         self.vbox_sidebar.pack_start(ph)
         
+    # FIXME: use theme-sensitive colors instead of hardcoding
     def _sidebar_add_step(self, step, name, active, padding):
         hbox = gtk.HBox(0, False)
         hbox.show()
 
         text = escape(name)
         button = gtk.Button('')
-        button.modify_bg(gtk.STATE_PRELIGHT, self.sidebar_active_color)
-        button.modify_bg(gtk.STATE_ACTIVE, self.sidebar_active_color)
+        button.modify_bg(gtk.STATE_PRELIGHT, self.sidebar_pre_bg)
+        button.modify_bg(gtk.STATE_ACTIVE, self.sidebar_pre_bg)
 
         label = button.get_children()[0]
+        label.modify_fg(gtk.STATE_NORMAL, self.sidebar_fg)
+        label.modify_fg(gtk.STATE_INSENSITIVE, self.sidebar_fgi)
+        button.modify_bg(gtk.STATE_NORMAL, self.sidebar_bg)
+        button.modify_bg(gtk.STATE_INSENSITIVE, self.sidebar_bg)
         label.set_padding(padding, 0)
         label.set_alignment(0, 0.5)
         button.set_relief(gtk.RELIEF_NONE)
@@ -529,13 +544,11 @@ class Wizard(gobject.GObject, log.Loggable):
             button.set_sensitive(False)
             
         if not active and not step.visited:
-            markup = '<span color="#7a7a7a">%s</span>' % name
             button.set_sensitive(False)
         else:
-            markup = '<span color="black">%s</span>' % (name)
             button.set_property('can_focus', False)
             
-        label.set_markup(markup)
+        label.set_markup(name)
 
         button.show()
         return button

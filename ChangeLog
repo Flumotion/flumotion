@@ -1,3 +1,26 @@
+2005-01-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/checks/video.py (check1394): New bundled
+	function, checks to see if dv1394 can go to PLAYING. Will fail if
+	the user lacks the /dev/raw1394 entry.
+	
+	* flumotion/wizard/steps.py (FireWire): Add some checks to see if
+	the firewire device really works.
+	
+	* flumotion/admin/gtk/wizard.py:
+	* flumotion/wizard/wizard.py: Get theme colors the right way, by
+	realizing the label first. 
+
+	* data/glade/wizard_welcome.glade: The introductory text is not
+	selectable.
+
+	* data/glade/wizard_firewire.glade: Add a textview below the
+	parameters for status information.
+
+	* flumotion/admin/gtk/greeter.py (Authenticate)
+	(ConnectToExisting): Grab focus to entries. Make enter go to the
+	next entry if there is one.
+
 2005-01-26  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/base.py:

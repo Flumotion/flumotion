@@ -134,3 +134,12 @@ def checkTracks(source_element, device):
     pipeline = '%s name=source device=%s ! fakesink' % (source_element, device)
 
     return make_element_checker(pipeline, 'source', get_tracks)()
+
+
+def check1394():
+    def do_check(element):
+        # if we made it into ready, we're golden
+        return True
+
+    pipeline = 'dv1394src name=source ! dvdec ! fakesink'
+    return make_element_checker(pipeline, 'source', do_check)()

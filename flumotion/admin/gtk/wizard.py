@@ -129,8 +129,13 @@ class Wizard(gobject.GObject):
         self.window.set_icon_from_file(iconfile)
         self.image_icon.set_from_file(iconfile)
 
-        title_bg = self.textview_text.get_style().bg[gtk.STATE_SELECTED]
-        title_fg = self.textview_text.get_style().fg[gtk.STATE_SELECTED]
+        # have to get the style from the theme, but it's not really there until
+        # it's realized
+        self.label_title.realize()
+        style = self.label_title.get_style()
+
+        title_bg = style.bg[gtk.STATE_SELECTED]
+        title_fg = style.fg[gtk.STATE_SELECTED]
         self.eventbox_top.modify_bg(gtk.STATE_NORMAL, title_bg)
         self.label_title.modify_fg(gtk.STATE_NORMAL, title_fg)
         normal_bg = self.textview_text.get_style().bg[gtk.STATE_NORMAL]

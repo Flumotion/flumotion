@@ -223,8 +223,31 @@ class FireWire(VideoSource):
     component_type = 'firewire'
     icon = 'firewire.png'
 
+    def _queryCallback(self, x):
+        # if we are here, then it was successful
+        buf = self.textview_status.get_buffer()
+        buf.set_text('Firewire device detected.')
+        for i in 'width', 'height', 'framerate':
+            but = getattr(self, 'spinbutton_'+i)
+            but.set_property('sensitive', True)
+        self.wizard.block_next(False)
+
+    def _queryErrback(self, failure):
+        buf = self.textview_status.get_buffer()
+        buf.set_text('No Firewire device detected.\n(%s)' % failure.value)
+
     def before_show(self):
-        self.wizard.check_elements(self.worker, 'dv1394src', 'dvdec',)
+        normal_bg = self.textview_status.get_style().bg[gtk.STATE_NORMAL]
+        self.textview_status.modify_base(gtk.STATE_NORMAL, normal_bg)
+        buf = self.textview_status.get_buffer()
+        buf.set_text('Detecting Firewire device...')
+        for i in 'width', 'height', 'framerate':
+            but = getattr(self, 'spinbutton_'+i)
+            but.set_property('sensitive', False)
+        self.wizard.block_next(True)
+        d = self.workerRun('flumotion.worker.checks.video', 'check1394')
+        d.addCallback(self._queryCallback)
+        d.addErrback(self._queryErrback)
 
 wizard.register_step(FireWire)
 
