@@ -6,9 +6,8 @@
     <worker username="tee" password="tee-pass"/>
   </workers>
 
-   <component name="http-bouncer" type="bouncer">
-<!--     <filename>/tmp/htpasswd</filename>
--->
+   <component name="http-bouncer" type="htpasswd">
+     <filename>/tmp/htpasswd</filename>
    </component>
 
    <component name="producer-video-test" type="producer">
