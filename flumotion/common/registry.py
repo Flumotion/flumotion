@@ -26,7 +26,10 @@ Parsing of registry.
 
 import os
 import stat
+import errno
+
 from xml.dom import minidom, Node
+from xml.parsers import expat
 
 from twisted.python import reflect
 
@@ -320,6 +323,12 @@ class ComponentRegistry(log.Loggable):
         return self.components.values()
     
     def dump(self, fd):
+        """
+        Dump the cache of components to the given opened file descriptor.
+
+        @type fd: integer
+        @param fd: open file descriptor to write to
+        """
         print >> fd, '<components>'
         for component in self.components.values():
             data = ''
@@ -351,15 +360,28 @@ class ComponentRegistry(log.Loggable):
         print >> fd, '</components>'
 
     def clean(self):
+        """
+        Clean the cache of components.
+        """
         self.components = {}
 
     def getFileList(self, root):
+        """
+        Get all files ending in .xml from all directories under the given root.
+
+        @type root: string
+        @param root: the root directory under which to search
+        
+        @returns: a list of .xml files, relative to the given root directory
+        """
         files = []
         for dir in os.listdir(root):
             filename = os.path.join(root, dir)
+            # if it's a .xml file, then add it to the list
             if not os.path.isdir(filename):
                 if filename.endswith('.xml'):
                     files.append(filename)
+            # if it's a directory, then get its files and add them
             else:
                 files += self.getFileList(filename)
                 
@@ -373,11 +395,23 @@ class ComponentRegistry(log.Loggable):
         # create parent directory
         dir = os.path.split(self.filename)[0]
         if not os.path.exists(dir):
-            os.makedirs(dir)
+            try:
+                os.makedirs(dir)
+            except IOError, e:
+                if e.errno == errno.EACCES:
+                    self.error('Registry directory %s could not be created !' % dir)
+                else:
+                    raise
         if not os.path.isdir(dir):
             self.error('Registry directory %s is not a directory !')
-        fd = open(self.filename, 'w')
-        registry.dump(fd)
+        try:
+            fd = open(self.filename, 'w')
+            registry.dump(fd)
+        except IOError, e:
+            if e.errno == errno.EACCES:
+                self.error('Registry file %s could not be created !' % self.filename)
+            else:
+                raise
 
     def isDirty(self, root):
         if registry.isEmpty():
@@ -400,7 +434,10 @@ class ComponentRegistry(log.Loggable):
         if not os.path.exists(self.filename):
             force = True
         else:
-            registry.addFromFile(self.filename)
+            try:
+                registry.addFromFile(self.filename)
+            except expat.ExpatError, e:
+                self.warning("Error while parsing %s: %s" % (self.filename, e))
 
         if force or self.isDirty(dir):
             self.info('Rebuilding registry')

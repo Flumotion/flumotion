@@ -1,3 +1,9 @@
+2004-10-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	* flumotion/test/test_registry.py:
+	  fix make distcheck.
+
 2004-10-25  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_firewire.glade:

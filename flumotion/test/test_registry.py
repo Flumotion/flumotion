@@ -20,11 +20,13 @@
 
 # Headers in this file shall remain intact.
 
+import common
+from twisted.trial import unittest
+
 import os
 import warnings
+import tempfile
 warnings.filterwarnings('ignore', category=FutureWarning)
-
-from twisted.trial import unittest
 
 from flumotion.common import registry
 from flumotion.common.registry import istrue
@@ -208,6 +210,14 @@ def rmdir(root):
             
 class TestFindComponents(unittest.TestCase):
     def setUp(self):
+        # override the registry's filename so make distcheck works
+        (fd, registry.registry.filename) = tempfile.mkstemp()
+        os.close(fd)
+        os.unlink(registry.registry.filename)
+
+        self.tempdir = tempfile.mkdtemp()
+        self.cwd = os.getcwd()
+        os.chdir(self.tempdir) 
         os.makedirs('subdir')
         os.makedirs('subdir/foo')
         os.makedirs('subdir/bar')
@@ -215,6 +225,14 @@ class TestFindComponents(unittest.TestCase):
         self.writeComponent('subdir/foo/second.xml', 'second')
         self.writeComponent('subdir/bar/third.xml', 'third')
         registry.registry.clean()
+
+    def tearDown(self):
+        rmdir('subdir')
+        os.chdir(self.cwd)
+        registry.registry.clean()
+        rmdir(self.tempdir)
+
+        os.unlink(registry.registry.filename)
 
     def writeComponent(self, filename, name):
         open(filename, 'w').write("""<components>
@@ -243,7 +261,3 @@ class TestFindComponents(unittest.TestCase):
         registry.registry.verify('.', force=True)
         rmdir('flumotion/component')
 
-    def tearDown(self):
-        registry.registry.clean()
-        rmdir('subdir')
-        
