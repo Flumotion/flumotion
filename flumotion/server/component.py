@@ -145,6 +145,27 @@ class ComponentView(pb.Referenceable, log.Loggable):
             
         return retval, ports
 
+    def remote_reloadComponent(self):
+        """Reload modules in the component."""
+        import sys
+        from twisted.python.rebuild import rebuild
+        # reload ourselves first
+        rebuild(sys.modules[__name__])
+
+        # now rebuild relevant modules
+        import flumotion.utils
+        rebuild(sys.modules['flumotion.utils'])
+        try:
+            flumotion.utils.reload()
+        except SyntaxError, msg:
+            raise flumotion.twisted.errors.ReloadSyntaxError(msg)
+        self._reloaded()
+
+    # separate method so it runs the newly reloaded one :)
+    def _reloaded(self):
+        self.info('reloaded module code for %s' % __name__)
+
+
 class IFlumotionComponent:
     pass
 

@@ -1,3 +1,15 @@
+2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/video-server-admin.in:
+	* flumotion/components/http/http.py:
+	* flumotion/gui/adminclient.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/component.py:
+	* flumotion/server/controller.py:
+	  adding reload on all levels, works now
+	* flumotion/twisted/errors.py:
+	  add ReloadSyntaxError
+
 2004-09-01  Johan Dahlin  <johan@gnome.org>
 
 	* data/registry/basecomponents.xml:

@@ -23,13 +23,8 @@ import sys
 
 import gobject
 import gst
-import pygtk
-pygtk.require('2.0')
 import gtk
 import gtk.glade
-
-from twisted.internet import gtk2reactor
-gtk2reactor.install()
 
 from twisted.internet import reactor
 from twisted.internet import error
@@ -107,11 +102,33 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     def getProperty(self, component, element, property):
         return self.remote.callRemote('getComponentElementProperty', component, element, property)
 
-    def getUIEntry(self, component):
-        return self.remote.callRemote('getUIEntry', component)
-        
+    def reload(self):
+        # first reload ourselves
+        import sys
+        from twisted.python.rebuild import rebuild
+        from twisted.python.reflect import filenameToModuleName
+        name = filenameToModuleName(__file__)
+
+        #self.log("rebuilding '%s'" % name)
+        print("rebuilding '%s'" % name)
+        rebuild(sys.modules[name])
+
+        import flumotion.utils
+        flumotion.utils.reload()
+
+        cb = self.reloadController()
+        for client in self.clients:
+            cb = cb.addCallback(self.reloadComponent, client)
+
     def reloadController(self):
         return self.remote.callRemote('reloadController')
+
+    def reloadComponent(self, result, client):
+        print("Asking for reload of component %s" % client.name)
+        return self.remote.callRemote('reloadComponent', client.name)
+
+    def getUIEntry(self, component):
+        return self.remote.callRemote('getUIEntry', component)
     
 gobject.type_register(AdminInterface)
 
@@ -267,7 +284,7 @@ class Window(log.Loggable):
 
     # reload code
     def _button_reload_cb(self, button):
-        cb = self.admin.reloadController()
+        cb = self.admin.reload()
  
     def error_dialog(self, message, parent = None):
         """

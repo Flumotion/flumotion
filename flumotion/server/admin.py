@@ -196,6 +196,11 @@ class AdminPerspective(pb.Avatar, log.Loggable):
             self.warning(str(e))
             raise
 
+    def perspective_reloadComponent(self, component_name):
+        """Reload modules in the given component."""
+        component = self.controller.getComponent(component_name)
+        return component.reloadComponent()
+
     def perspective_reloadController(self):
         """Reload modules in the controller."""
         import sys

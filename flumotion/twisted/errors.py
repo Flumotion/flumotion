@@ -30,11 +30,9 @@ class PipelineParseError(pb.Error):
 
 class NotReadyError(pb.Error):
     "The component is not ready yet"
-    pass
 
 class PropertyError(pb.Error):
     "An error occurred while setting a property on the component"
-    pass
 
 class AlreadyConnectedError(pb.Error):
     "The component is already connected to the controller"
@@ -44,3 +42,6 @@ class NoPerspectiveError(pb.Error):
     
 class SystemError(pb.Error):
     "A system error, is usually fatal"
+
+class ReloadSyntaxError(pb.Error):
+    "A syntax error during a reload of a module"

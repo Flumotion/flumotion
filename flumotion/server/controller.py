@@ -157,7 +157,11 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
     # general fallback for unhandled errors so we detect them
     # FIXME: we can't use this since we want a PropertyError to fall through
     # afger going through the PropertyErrback.
-    def _mindErrback(self, failure):
+    def _mindErrback(self, failure, ignores = None):
+        if ignores:
+            for ignore in ignores:
+                if isinstance(failure, ignore):
+                    return failure
         self.warning("Unhandled remote call error: %s" % failure.getErrorMessage())
         self.warning("raising '%s'" % str(failure.type))
         return failure
@@ -251,6 +255,17 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
         cb.addCallback(self._mindGetPropertyCallback)
         cb.addErrback(self._mindPropertyErrback)
         return cb
+
+    def _reloadComponentErrback(self, failure):
+        import exceptions
+        failure.trap(errors.ReloadSyntaxError)
+        self.warning(failure.getErrorMessage())
+        return failure
+
+    def reloadComponent(self):
+        cb = self._mindCallRemote('reloadComponent')
+        cb.addErrback(self._reloadComponentErrback)
+        cb.addErrback(self._mindErrback, (errors.ReloadSyntaxError, ))
 
     def getUIEntry(self):
         cb = self._mindCallRemote('getUIEntry')

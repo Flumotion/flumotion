@@ -143,7 +143,7 @@ class HTTPStreamingAdminResource(resource.Resource):
 
         el = self.streaming.streamer.get_sink()
         stats = {}
-        stats['Clients connected'] = str(len(self.streaming.request_hash))
+        stats['lients connected'] = str(len(self.streaming.request_hash))
         stats['Flesh shown'] = random.choice(('too much', 'not enough', 'just about right'))
         stats['Mime type'] = self.streaming.streamer.get_mime()
         bytes_sent = el.get_property('bytes-served')
