@@ -381,6 +381,7 @@ class ComponentAvatar(base.ManagerAvatar):
             self._heartbeatCheck)
 
     def detached(self, mind):
+        self.cleanup() # callback
         self.vishnu.unregisterComponent(self)
         self.heaven.unregisterComponent(self)
 

@@ -380,26 +380,21 @@ class TestVishnu(unittest.TestCase):
 
         # verify component mapper
         # 3 component states + avatarId's gotten from the config
-        # FIXME: add avatarId again in manager.manager
-        keys = mappers.keys()
-        #print keys
-        self.assertEqual(len(keys), 3)
+        self.assertEqual(len(mappers.keys()), 6)
 
         # log in a worker and verify components get started
         avatar = self._loginWorker('worker')
         self.runReactor(100)
         self.failUnlessEqual(len(self._workers), 1)
-        #self.failUnlessEqual(len(self._components), 2)
+        self.failUnlessEqual(len(self._components), 2)
         
         self.failUnless('producer-video-test' in self._components.keys())
         self.failUnless('converter-ogg-theora' in self._components.keys())
 
         # verify mapper
-        keys = mappers.keys()
-        # print keys
-        # 1 component with only state
+        # 1 component with state and id
         # 2 components with state, avatar, id, and jobstate
-        self.assertEqual(len(keys), 9)
+        self.assertEqual(len(mappers.keys()), 10)
 
         id = 'producer-video-test'
         avatar = self._components[id]
@@ -425,16 +420,30 @@ class TestVishnu(unittest.TestCase):
 
         #import pprint
         #pprint.pprint(mappers.keys())
-        # FIXME: when id gets removed
-        #self.failIf(id in mappers.keys())
-        #self.assertEqual(m.id, None)
+        self.assertEqual(len(mappers.keys()), 8)
+        self.failUnless(id in mappers.keys())
+        self.assertEqual(m.id, id)
         self.failIf(avatar in mappers.keys())
         
         self.assertEqual(m.avatar, None)
         self.failUnless(m.state)
         state = m.state
-        #self.assertEqual(state.get('mood'), moods.waking.value)
+        self.assertEqual(state.get('mood'), moods.sleeping.value,
+            'mood is %s instead of sleeping' % moods.get(state.get('mood')))
 
-        avatar = self._components['converter-ogg-theora']
+        # log out the converter and verify
+        id = 'converter-ogg-theora'
+        m = mappers[id]
+        avatar = self._components[id]
         self._logoutAvatar(avatar)
 
+        self.assertEqual(len(mappers.keys()), 6)
+        self.failUnless(id in mappers.keys())
+        self.assertEqual(m.id, id)
+        self.failIf(avatar in mappers.keys())
+        
+        self.assertEqual(m.avatar, None)
+        self.failUnless(m.state)
+        state = m.state
+        self.assertEqual(state.get('mood'), moods.sleeping.value,
+            'mood is %s instead of sleeping' % moods.get(state.get('mood')))

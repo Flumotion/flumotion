@@ -256,10 +256,17 @@ class Vishnu(log.Loggable):
                         comp.set('config', c.getConfigDict())
                         flow.append('components', comp)
 
+                        # FIXME: when we use full paths for avatarId
+                        #parentName = flow.get('name')
+                        #avatarId = common.componentPath(c.name, parentName)
+                        avatarId = c.name
+
                         # add to mapper
                         m = ComponentMapper()
                         m.state = comp
+                        m.id = avatarId
                         self._componentMappers[comp] = m
+                        self._componentMappers[avatarId] = m
 
     def _setupBundleBasket(self):
         self.bundlerBasket = bundle.BundlerBasket()
@@ -370,15 +377,8 @@ class Vishnu(log.Loggable):
     def _workerStartComponentDelayed(self, result, workerAvatar,
             componentState, type, config):
 
-        name = componentState.get('name')
-        # FIXME: when we use full paths for avatarId
-        #parentName = componentState.get('parent').get('name')
-        #avatarId = common.componentPath(name, parentName)
-        avatarId = name
-        
         m = self._componentMappers[componentState]
-        m.id = avatarId
-        self._componentMappers[avatarId] = m
+        avatarId = m.id
 
         # FIXME: rename to startComp
         d = workerAvatar.start(avatarId, type, config)
