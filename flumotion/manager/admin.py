@@ -153,6 +153,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type mind: L{twisted.spread.pb.RemoteReference}
         """
         self.mind = mind
+        # FIXME: fix deprec warning with accessor
         ip = self.mind.broker.transport.getPeer()[1]
         self.debug('Client from %s attached, sending client components' % ip)
         self.log('Client attached is mind %s' % mind)
