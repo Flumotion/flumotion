@@ -133,14 +133,28 @@ class StreamingResource(resource.Resource):
         return server.NOT_DONE_YET
 
 class NewStreamingResource(resource.Resource):
-    def __init__(self, streamer):
+    def __init__(self, streamer, location):
         self.streamer = streamer
+        if location:
+            self.logfile = file(location, 'a')
+        else:
+            self.logfile = None
         self.msg = streamer.msg
+        
         resource.Resource.__init__(self)
         
+    def log(self, msg):
+        self.msg(msg)
+        if not self.logfile:
+            return
+        
+        timestamp = time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime())
+        self.logfile.write('%s %s\n' % (timestamp, msg))
+        self.logfile.flush()
+
     def lost(self, obj, fd, ip):
-        self.streamer.add_client(fd)
-        self.msg('client from %s disconnected' % ip)
+        self.streamer.remove_client(fd)
+        self.log('client from %s disconnected' % ip)
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -155,7 +169,7 @@ class NewStreamingResource(resource.Resource):
 
     def render(self, request):
         ip = request.getClientIP()
-        self.msg('client from %s connected' % ip)
+        self.log('client from %s connected' % ip)
     
         if not self.isReady():
             self.msg('Not sending data, it\'s not ready')
@@ -183,30 +197,28 @@ class FileSinkStreamer(component.ParseLaunchComponent):
     kind = 'streamer'
     pipe_template = 'filesink name=sink location="%s"'
 
-    def __init__(self, name, sources, location, port):
+    def __init__(self, name, sources, location):
         self.location = location
 
         pipeline = self.pipe_template % self.get_location()
         component.ParseLaunchComponent.__init__(self, name, sources,
                                                 [], pipeline)
-        if port != None:
-            self.start_admin(port)
         
-    def start_admin(self, port):
+    def create_admin(self):
         from twisted.manhole.telnet import ShellFactory
         from flumotion.twisted.shell import Shell
         
         ts = ShellFactory()
         ts.username = 'fluendo'
-        ts.namespace['restart'] = self.local_restart
         ts.protocol = Shell
+        ts.namespace['self'] = self
+        ts.namespace['restart'] = self.local_restart
+
+        return ts
+    
+    def set_instance(self, shell):
+        print 'setting pipeline', self.pipeline == None, self.pipeline is None
         
-        try:
-            reactor.listenTCP(port, ts)
-        except error.CannotListenError, e:
-            print 'ERROR:', e
-            raise SystemExit
-            
     def get_location(self):
         if self.location.find('%') != -1:
             timestamp = time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime())
@@ -218,16 +230,16 @@ class FileSinkStreamer(component.ParseLaunchComponent):
         if self.pipeline is None:
             self.msg('Not started yet, skipping')
             return
-        
-        sink = self.pipeline.get_by_name('sink')
+
 
         self.pipeline.set_state(gst.STATE_PAUSED)
 
         # Save and close file
+        sink = self.pipeline.get_by_name('sink')
         sink.set_state(gst.STATE_READY)
 
         location = self.get_location()
-        self.msg( 'setting location to', location)
+        self.msg('setting location to', location)
         sink.set_property('location', location)
         
         self.pipeline.set_state(gst.STATE_PLAYING)
@@ -267,11 +279,11 @@ class MultifdSinkStreamer(component.ParseLaunchComponent):
 
     def add_client(self, fd):
         sink = self.get_sink()
-        sink.emit('remove', fd)
-
+        sink.emit('add', fd)
+         
     def remove_client(self, fd):
-         sink = self.get_sink()
-         sink.emit('add', fd)
+        sink = self.get_sink()
+        sink.emit('remove', fd)
         
     def get_sink(self):
         assert self.pipeline, 'Pipeline not created'

@@ -159,9 +159,11 @@ class Launcher:
             pass
         component.pipeline_stop()
 
-    def start(self, component, nice):
+    def start(self, component, nice, func=None, *args):
         pid = os.fork()
         if not pid:
+            if func:
+                func(*args)
             self.set_nice(nice, component.component_name)
             set_proc_text('flumotion [%s]' % component.component_name)
             self.spawn(component)
@@ -173,21 +175,6 @@ class Launcher:
                      pid))
             self.children.append(pid)
 
-    def start_streamer(self, component, factory, port, nice):
-        pid = os.fork()
-        if not pid:
-            self.set_nice(nice, component.component_name)
-            set_proc_text('flumotion [%s]' % component.component_name)
-            reactor.listenTCP(port, factory)
-            self.spawn(component)
-            raise SystemExit
-        else:
-            self.msg('Starting %s (%s) on pid %d' %
-                    (component.component_name,
-                     component.getKind(),
-                     pid))
-            self.children.append(pid)
-        
     def run(self):
         self.setup_uid('launcher')
         
@@ -280,18 +267,19 @@ class Launcher:
                 
                 if protocol == 'http':
                     assert c.has_option(section, 'port')
-                    port = c.getint(section, 'port')
+                    shell_port = c.getint(section, 'port')
                     if c.has_option(section, 'logfile'):
                         logfile = c.get(section, 'logfile')
                     else:
                         logfile = None
 
-                    #component = streamer.MultifdSinkStreamer(name, sources)
-                    #factory = server.Site(resource=streamer.NewStreamingResource(component))
+                    def setup(port, component):
+                        factory = server.Site(resource=streamer.StreamingResource(component, logfile))
+                        reactor.listenTCP(port, factory)
+                        
                     component = streamer.FakeSinkStreamer(name, sources)
-                    factory = server.Site(resource=streamer.StreamingResource(component, logfile))
                     self.msg('Starting http factory at port %d' % port)
-                    self.start_streamer(component, factory, port, nice)
+                    self.start(component, nice, port, component)
                 elif protocol == 'file':
                     assert c.has_option(section, 'location')
                     location = c.get(section, 'location')
@@ -299,9 +287,15 @@ class Launcher:
                         port = c.getint(section, 'port')
                     else:
                         port = None
-                    self.start(streamer.FileSinkStreamer(name, sources, location, port), nice)
+                    def setup(port, component):
+                        factory = component.create_admin()
+                        reactor.listenTCP(port, factory)
+                        
+                    component = streamer.FileSinkStreamer(name, sources, location)
+                    self.start(component, nice, setup, port, component)
                 else:
                     raise AssertionError, "unknown protocol: %s" % protocol
+                
             else:
                 raise AssertionError, "unknown component kind: %s" % kind
     
