@@ -2,10 +2,9 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a video streaming server
+# Copyright (C) 2004 Fluendo
 #
 # flumotion/admin/spyglass.py: MVC for spyglass
-#
-# Copyright (C) 2004 Fluendo
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -64,7 +64,7 @@ flumotion/server/Makefile
 flumotion/twisted/Makefile
 flumotion/utils/Makefile
 m4/Makefile
-docs/Makefile
+doc/Makefile
 tests/Makefile
 tests/common.py
 flumotion.spec
