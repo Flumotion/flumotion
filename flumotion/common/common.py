@@ -181,7 +181,7 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     os.dup2(so.fileno(), sys.stdout.fileno())
     os.dup2(se.fileno(), sys.stderr.fileno())
 
-def argRepr(args=(), kwargs={}):
+def argRepr(args=(), kwargs={}, max=-1):
     ### FIXME: Johan, please comment functions, this is meaningless
     assert (type(args) is tuple or
             type(args) is list)
