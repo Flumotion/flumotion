@@ -20,6 +20,8 @@
 
 from flumotion.server import component
 
+__all__ = ['Converter']
+
 class Converter(component.ParseLaunchComponent):
     pass
 

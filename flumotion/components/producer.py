@@ -20,6 +20,8 @@
 
 from flumotion.server import component
 
+__all__ = ['Producer']
+
 class Producer(component.ParseLaunchComponent):
     def __init__(self, name, feeds, pipeline):
         component.ParseLaunchComponent.__init__(self, name, [],

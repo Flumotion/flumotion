@@ -10,6 +10,7 @@ from twisted.internet import reactor
 from flumotion.server import component
 from flumotion.utils import gstutils, log
 
+__all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
 
 HTTP_NAME = 'FlumotionHTTPServer'
 HTTP_VERSION = '0.1.0'
@@ -225,9 +226,6 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
 gobject.type_register(MultifdSinkStreamer)
 
 def createComponent(config):
-    import os
-    print os.getpid()
-    
     name = config['name']
     port = int(config['port'])
     source = config['source']

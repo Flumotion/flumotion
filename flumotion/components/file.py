@@ -24,6 +24,8 @@ import gst
 
 from flumotion.server import component
 
+__all__ = ['FileSinkStreamer']
+
 class FileSinkStreamer(component.ParseLaunchComponent):
     pipe_template = 'filesink name=sink location="%s"'
     def __init__(self, name, source, location):
