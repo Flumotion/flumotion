@@ -72,7 +72,9 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type heaven: L{flumotion.manager.admin.AdminHeaven}
         """
         self.heaven = heaven
+        self.workerHeaven = heaven.vishnu.workerHeaven
         self.componentHeaven = heaven.vishnu.componentHeaven
+
         self.mind = None
         self.avatarId = avatarId
         self.debug("created new AdminAvatar with id %s" % avatarId)
@@ -101,8 +103,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             self.warning("mind %s is a dead reference, removing" % mind)
             return
         
-    # FIXME: this should probably be renamed to getComponents ?
-    def getClients(self):
+    def getComponents(self):
         """
         Return all components logged in to the manager.
         
@@ -111,6 +112,16 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         # FIXME: should we use an accessor to get at components from c ?
         components = map(ComponentView, self.componentHeaven.avatars.values())
         return components
+
+    def getWorkers(self):
+        """
+        Return all workers logged in to the manager.
+        
+        @rtype: C{list} of workers
+        """
+
+        return [worker.getName()
+                    for worker in self.workerHeaven.getAvatars()]
 
     def sendLog(self, category, type, message):
         """
@@ -152,7 +163,9 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         self.debug('Client from %s attached, sending client components' % ip)
         self.log('Client attached is mind %s' % mind)
 
-        self._mindCallRemote('initial', self.getClients())
+        self._mindCallRemote('initial',
+                             self.getComponents(),
+                             self.getWorkers())
 
     def detached(self, mind):
         """
@@ -256,6 +269,10 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         flumotion.utils.reload.reload()
         self._reloaded()
 
+    def perspective_loadConfiguration(self, xml):
+        self.info('loadConfiguration ...')
+        self.workerHeaven.loadConfiguration(None, xml)
+        
     # separate method so it runs the newly reloaded one :)
     def _reloaded(self):
         self.info('reloaded manager code')
@@ -310,7 +327,6 @@ class AdminHeaven(pb.Root, log.Loggable):
         reactor.callLater(0.25, self.sendCache, avatar)
         
         self.avatars[avatarId] = avatar
-        print "avatars: %r" % self.avatars
         return avatar
 
     def removeAvatar(self, avatarId):
@@ -321,7 +337,6 @@ class AdminHeaven(pb.Root, log.Loggable):
         @param avatarId: id of the avatar to remove
         """
         self.debug('removing AdminAvatar with id %s' % avatarId)
-        print "avatars: %r" % self.avatars
         del self.avatars[avatarId]
     
     ### my methods

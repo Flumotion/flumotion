@@ -15,9 +15,7 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-import optparse
 import os
-import sys
 
 import gobject
 import gst
@@ -26,12 +24,12 @@ import gtk
 import gtk.glade
 from twisted.internet import reactor
 
-from flumotion.configure import configure
 from flumotion.admin.admin import AdminModel
-from flumotion.manager import admin   # Register types
-from flumotion.common import errors, log
-from flumotion.utils.gstutils import gsignal
 from flumotion.admin.gtk import dialogs
+from flumotion.configure import configure
+from flumotion.common import errors, log
+from flumotion.manager import admin # Register types
+from flumotion.utils.gstutils import gsignal
 
 COL_PIXBUF = 0
 COL_TEXT   = 1
@@ -94,18 +92,19 @@ class PropertyChangeDialog(gtk.Dialog):
     
 gobject.type_register(PropertyChangeDialog)
 
-class Window(log.Loggable):
+class Window(log.Loggable, gobject.GObject):
     '''
     Creates the GtkWindow for the user interface.
     Also connects to the manager on the given host and port.
     '''
 
     logCategory = 'adminview'
-
-    def __init__(self, options):
-        self.gladedir = configure.gladedir
-        self.imagedir = configure.imagedir
-        self._connectToManager(options)
+    gsignal('connected')
+    
+    def __init__(self, host, port, transport, username, password):
+        self.__gobject_init__()
+        
+        self._connectToManager(host, port, transport, username, password)
         self.create_ui()
         self.current_component = None # the component we're showing UI for
         
@@ -115,15 +114,14 @@ class Window(log.Loggable):
         return failure
 
     def create_ui(self):
-        wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
+        wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
         self.window = wtree.get_widget('main_window')
-        iconfile = os.path.join(self.imagedir, 'fluendo.png')
+        iconfile = os.path.join(configure.imagedir, 'fluendo.png')
         gtk.window_set_default_icon_from_file(iconfile)
         self.window.set_icon_from_file(iconfile)
         
         self.hpaned = wtree.get_widget('hpaned')
         self.window.connect('delete-event', self.close)
-        self.window.show_all()
         
         self.component_model = gtk.ListStore(gdk.Pixbuf, str)
         self.component_view = wtree.get_widget('component_view')
@@ -243,7 +241,8 @@ class Window(log.Loggable):
 
     def admin_connected_cb(self, admin):
         self.update_components()
-
+        self.emit('connected')
+        
     def admin_connection_refused_later(self, host, port):
         message = "Connection to manager on %s:%d was refused." % (host, port)
         d = self.error_dialog(message, response = False)
@@ -268,12 +267,9 @@ class Window(log.Loggable):
 
     ### functions
 
-    def _connectToManager(self, options):
+    def _connectToManager(self, host, port, transport, username, password):
         'connect to manager using given options.  Called by __init__'
-        host = options.host
-        port = options.port
-        transport = options.transport
-        self.admin = AdminModel(options)
+        self.admin = AdminModel(username, password)
         self.admin.connect('connected', self.admin_connected_cb)
         self.admin.connect('connection-refused',
                            self.admin_connection_refused_cb, host, port)
@@ -284,7 +280,7 @@ class Window(log.Loggable):
             from twisted.internet import ssl
             self.info('Connecting to manager %s:%d with SSL' % (host, port))
             reactor.connectSSL(host, port, self.admin.clientFactory,
-                ssl.ClientContextFactory())
+                               ssl.ClientContextFactory())
         elif transport == "tcp":
             self.info('Connecting to manager %s:%d with TCP' % (host, port))
             reactor.connectTCP(host, port, self.admin.clientFactory)
@@ -390,73 +386,10 @@ class Window(log.Loggable):
 
     def help_about_cb(self, button):
         raise NotImplementedError
-    
-def main(args):
-    parser = optparse.OptionParser()
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="be verbose")
-    parser.add_option('', '--version',
-                      action="store_true", dest="version",
-                      default=False,
-                      help="show version information")
-    
-    parser.add_option('-H', '--host',
-                     action="store", type="string", dest="host",
-                     default='localhost',
-                     help="manager host to connect to [default localhost]")
-    defaultSSLPort = configure.defaultSSLManagerPort
-    defaultTCPPort = configure.defaultTCPManagerPort
-    parser.add_option('-P', '--port',
-                     action="store", type="int", dest="port",
-                     default=None,
-                     help="port to listen on [default %d (ssl) or %d (tcp)]" % (defaultSSLPort, defaultTCPPort))
-    parser.add_option('-T', '--transport',
-                      action="store", type="string", dest="transport",
-                      default="ssl",
-                      help="transport protocol to use (tcp/ssl)")
 
-    parser.add_option('-u', '--username',
-                      action="store", type="string", dest="username",
-                      default="",
-                      help="username to use")
-    parser.add_option('-p', '--password',
-                      action="store", type="string", dest="password",
-                      default="",
-                      help="password to use, - for interactive")
+    def show(self):
+        # XXX: Use show()
+        self.window.show_all()
+        
+gobject.type_register(Window)
 
-    parser.add_option('', '--wizard',
-                     action="store_true", dest="wizard",
-                     help="run the wizard")
-    parser.add_option('', '--debug',
-                      action="store_false", dest="debug",
-                      default=True,
-                      help="run in debug")
-
-    options, args = parser.parse_args(args)
-
-    if options.version:
-        from flumotion.common import common
-        print common.version("flumotion-admin")
-        return 0
-
-
-    if options.verbose:
-        log.setFluDebug("*:4")
-
-    if not options.port:
-        if options.transport == "tcp":
-            options.port = defaultTCPPort
-        elif options.transport == "ssl":
-            options.port = defaultSSLPort
-
-    if options.wizard:
-        from flumotion.wizard import wizard
-        wizard.run(interactive=options.debug)
-        return
-    
-    win = Window(options)
-    reactor.run()
-    
-if __name__ == '__main__':
-    sys.exit(main(sys.argv))

@@ -93,14 +93,20 @@ class WorkerHeaven(pb.Root, log.Loggable):
 
     def removeAvatar(self, avatarId):
         del self.avatars[avatarId]
-
+        
     ### my methods
 
-    def loadConfiguration(self, filename):
+    # XXX: Move to IHeaven?
+    def getAvatars(self):
+        return self.avatars.values()
+    
+    def loadConfiguration(self, filename, string=None):
         # XXX: Merge?
-        self.conf = FlumotionConfigXML(filename)
-        return
+        self.conf = FlumotionConfigXML(filename, string)
 
+        for worker in self.getAvatars():
+            self.workerAttached(worker)
+            
     def getEntries(self, worker):
         # get all components from the config for this worker
         workerName = worker.getName()
@@ -113,6 +119,7 @@ class WorkerHeaven(pb.Root, log.Loggable):
         entries = {}
         if self.conf.atmosphere and self.conf.atmosphere.components:
             entries.update(self.conf.atmosphere.components)
+            
         for flowEntry in self.conf.flows:
             entries.update(flowEntry.components)
 

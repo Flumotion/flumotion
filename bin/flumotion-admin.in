@@ -37,7 +37,7 @@ else:
 sys.path.insert(0, root)
 
 from flumotion.common import errors, setup
-from flumotion.admin.gtk.client import main
+from flumotion.admin.gtk.main import main
 
 if __name__ == '__main__':
     setup.setup(root)

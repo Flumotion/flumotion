@@ -55,7 +55,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
     __implements__ = interfaces.IAdminMedium,
 
-    def __init__(self, options):
+    def __init__(self, username, password):
         self.__gobject_init__()
         self.clientFactory = fpb.FPBClientFactory()
         self.debug("logging in to ClientFactory")
@@ -63,20 +63,21 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         # FIXME: one without address maybe ? or do we want manager to set it ?
         # or do we set our guess and let manager correct ?
         # FIXME: try both, one by one, and possibly others
-        #keycard = keycards.KeycardUACPP(options.username, options.password, 'localhost')
-        keycard = keycards.KeycardUACPCC(options.username, 'localhost')
+        #keycard = keycards.KeycardUACPP(username, password, 'localhost')
+        keycard = keycards.KeycardUACPCC(username, 'localhost')
         # FIXME: decide on an admin name ?
         keycard.avatarId = "admin"
  
         d = self.clientFactory.login(keycard, self, interfaces.IAdminMedium)
         # add a callback to respond to the challenge
-        d.addCallback(self._loginCallback, options.password)
+        d.addCallback(self._loginCallback, password)
         d.addCallback(self.setRemoteReference)
         d.addErrback(self._accessDeniedErrback)
         d.addErrback(self._connectionRefusedErrback)
         d.addErrback(self._defaultErrback)
         self._components = {} # dict of components
-
+        self._workers = []
+        
         self.remote = None
 
     ### our methods
@@ -137,10 +138,12 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         del self._components[component.name]
         self.emit('update')
         
-    def remote_initial(self, components):
+    def remote_initial(self, components, workers):
         self.debug('remote_initial(components=%s)' % components)
         for component in components:
             self._components[component.name] = component
+        self._workers = workers
+        
         self.emit('connected')
 
     def remote_shutdown(self):
@@ -171,7 +174,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     def callComponentRemote(self, component_name, method_name, *args, **kwargs):
         return self.remote.callRemote('callComponentRemote',
                                       component_name, method_name, *args, **kwargs)
-        
+
+    def loadConfiguration(self, xml_string):
+        return self.remote.callRemote('loadConfiguration', xml_string)
+    
     def reload(self):
         # XXX: reload admin.py too
         name = reflect.filenameToModuleName(__file__)
@@ -317,5 +323,9 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     # returns a dict of name -> component
     def get_components(self):
         return self._components
+
+    def getWorkers(self):
+        return self._workers
+
     
 gobject.type_register(AdminModel)

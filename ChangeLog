@@ -1,3 +1,18 @@
+2004-10-17  Johan Dahlin  <johan@gnome.org>
+
+	* bin/flumotion-admin.in:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/main.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/worker.py:
+	* flumotion/wizard/wizard.py:
+
+	Integrate the Wizard into the admin client, almost works as it
+	should.
+	
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent.py:

@@ -52,7 +52,7 @@ class ProgressDialog(gtk.Dialog):
         self.bar.pulse()
         return True
 
-if __name__ == '__main__':
+def test():
     window = gtk.Window()
     dialog = ProgressDialog("I am busy", 'Doing lots of complicated stuff', window)
     dialog.start()
@@ -66,3 +66,6 @@ if __name__ == '__main__':
     gobject.timeout_add(3000, lambda dialog: dialog.message('Step 3'), dialog)
     gobject.timeout_add(5000, stop, dialog)
     gtk.main()
+
+if __name__ == '__main__':
+    test()

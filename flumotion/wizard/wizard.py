@@ -24,6 +24,7 @@ import gtk.glade
 
 from flumotion.configure import configure
 from flumotion.common import log
+from flumotion.utils.gstutils import gsignal
 from flumotion.wizard import enums, save
 
 def escape(text):
@@ -293,12 +294,14 @@ class WizardStep(object, log.Loggable):
 
         
 
-class Wizard:
+class Wizard(gobject.GObject):
     sidebar_color = gtk.gdk.color_parse('#9bc6ff')
     main_color = gtk.gdk.color_parse('white')
     sidebar_active_color = gtk.gdk.color_parse('#79abed')
-
+    gsignal('finished', str)
+    
     def __init__(self):
+        self.__gobject_init__()
         self.wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'wizard.glade'))
         for widget in self.wtree.get_widget_prefix(''):
             setattr(self, widget.get_name(), widget)
@@ -309,8 +312,7 @@ class Wizard:
                                                     'fluendo.png'))
 
         self._save = save.WizardSaver(self)
-        
-        
+        self._use_main = True
         self._workers = []
         self.steps = []
         self.stack = Stack()
@@ -528,7 +530,7 @@ class Wizard:
         self.vbox_sidebar.show()
         
     def on_wizard_delete_event(self, wizard, event):
-        self.finish()
+        self.finish(self.use_main)
 
     def on_button_prev_clicked(self, button):
         self.show_previous()
@@ -536,16 +538,24 @@ class Wizard:
     def on_button_next_clicked(self, button):
         self.show_next()
 
-    def finish(self, main):
-        if main:
+    def finish(self, main=True):
+        configuration = self._save.getXML()
+        self.emit('finished', configuration)
+        
+        if self._use_main:
             try:
                 gtk.main_quit()
             except RuntimeError:
                 pass
+            
+        return configuration
 
-        return self._save.getXML()
-    
+    def hide(self):
+        self.window.hide()
+        
     def run(self, interactive, workers, main):
+        self._use_main = False
+        
         self._workers = workers
         if not self.stack:
             raise TypeError("need an initial step")
@@ -556,18 +566,21 @@ class Wizard:
             return self.finish(main)
 
         self.window.show()
-        if main:
+        if self._use_main:
             gtk.main()
         
         return self._save.getXML()
 
-    
+    def load_steps(self):
+        # XXX: This is really ugly
+        globals()['wiz'] = self
+        import flumotion.wizard.steps
+gobject.type_register(Wizard)
+
         
 wiz = None
 def register_step(klass):
     global wiz
-    if not wiz:
-        wiz = Wizard()
 
     if not len(wiz):
         wiz.add_step(klass, initial=True)
