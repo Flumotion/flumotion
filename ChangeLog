@@ -1,5 +1,14 @@
 2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  make the view register listeners on states itself
+	  add callViews
+	  remove remote_componentAdded/Removed
+	* flumotion/admin/gtk/client.py:
+	  listen to stuff in default flow
+
+2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/manager.py:
 	* flumotion/test/test_manager_manager.py:
 	  test emptyPlanet()

@@ -53,7 +53,6 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     I am a data model for any admin view implementing a UI to
     communicate with one manager.
     I send signals when things happen.
-    I only communicate names of objects to views, not actual objects.
 
     Manager calls on us through L{flumotion.manager.admin.AdminAvatar}
     """
@@ -222,20 +221,26 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     def hasRemoteReference(self):
         return self.remote != None
 
+    def callViews(self, methodName, *args, **kwargs):
+        """
+        Call a method on all views.
+        """
+        for view in self._views:
+            if not hasattr(view, methodName):
+                msg = 'view %r does not implement %s' % (view, methodName)
+                self.warning(msg)
+                raise errors.NoMethodError(msg)
+            m = getattr(view, methodName)
+            m(*args, **kwargs)
+
     ### pb.Referenceable methods
     def remote_log(self, category, type, message):
         self.log('remote: %s: %s: %s' % (type, category, message))
         
     def remote_componentCall(self, componentName, methodName, *args, **kwargs):
-        for view in self._views:
-            view.componentCall(componentName, methodName, *args, **kwargs)
+        self.callViews('componentCall',
+            componentName, methodName, *args, **kwargs)
 
-    def remote_componentAdded(self, component):
-        self.debug('componentAdded %s' % component.get('name'))
-        self._components[component.get('name')] = component
-        component.addListener(self)
-        self.emit('update')
-        
     def remote_componentStateChanged(self, component, state):
         """
         @param component: component that changed state.
@@ -244,30 +249,18 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         self.debug('componentStateChanged %s' % component.get('name'))
         self._components[component.get('name')] = component
         self.emit('update')
-         
-    def remote_componentRemoved(self, component):
-        # FIXME: this asserts, no method, when server dies
-        # component will be a RemoteComponentView, so we can only use a
-        # member, not a method to get the name
-        self.debug('componentRemoved %s' % component.get('name'))
-        del self._components[component.get('name')]
-        self.emit('update')
-        
+       
     # IStateListener interface
     def stateSet(self, state, key, value):
         self.debug("state set on %r: key %s" % (state, key))
-        for view in self._views:
-            view.stateSet(state, key, value)
 
     def stateAppend(self, state, key, value):
         self.debug("state append on %r: key %s" % (state, key))
-        for view in self._views:
-            view.stateAppend(state, key, value)
+
+        # if a flow gets added to a planet, add ourselves as a listener
 
     def stateRemove(self, state, key, value):
         self.debug("state remove on %r: key %s" % (state, key))
-        for view in self._views:
-            view.stateRemove(state, key, value)
 
     def remote_shutdown(self):
         self.debug('shutting down')
@@ -606,21 +599,13 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     getComponents = get_components
     
     def _setPlanetState(self, planetState):
-        self.debug('parsing planetState %r' % planetState)
+        self.debug('setting planetState %r' % planetState)
         self._planetState = planetState
-        self._components = {}
-        for c in planetState.get('atmosphere').get('components'):
-            name = c.get('name')
-            self.debug('adding atmosphere component "%s"' % name)
-            self._components[name] = c
-        for f in planetState.get('flows'):
-            if f.get('name') != 'default':
-                continue
-            for c in f.get('components'):
-                name = c.get('name')
-                self.debug('adding default flow component "%s"' % name)
-                self._components[name] = c
-            
+        self.callViews('setPlanetState', planetState)
+
+    def getPlanetState(self):
+        return self._planetState
+           
     def _setWorkerHeavenState(self, state):
         self._workerHeavenState = state
 

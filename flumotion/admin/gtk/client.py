@@ -31,6 +31,7 @@ from flumotion.admin.gtk import dialogs, parts
 from flumotion.configure import configure
 from flumotion.common import errors, log, worker, planet
 from flumotion.manager import admin # Register types
+from flumotion.twisted import flavors
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
@@ -41,6 +42,8 @@ class Window(log.Loggable, gobject.GObject):
     Also connects to the manager on the given host and port.
     '''
 
+    __implements__ = flavors.IStateListener,
+    
     logCategory = 'adminview'
     gsignal('connected')
     
@@ -51,10 +54,14 @@ class Window(log.Loggable, gobject.GObject):
         self._disconnected_dialog = None # set to a dialog if we're
                                          # disconnected
 
+        self.debug('creating UI')
         self.window = self._create_ui()
 
         self.admin = None
+        self._planetState = None
+        self._components = None # name -> default flow + atmosphere
 
+        self.debug('setting model')
         self._setAdminModel(model)
 
     def _setAdminModel(self, model):
@@ -62,8 +69,12 @@ class Window(log.Loggable, gobject.GObject):
         assert not self.admin
 
         self.admin = model
+
+        # window gets created after model connects initially, so check
+        # here
         if self.admin.isConnected():
             self.admin_connected_cb(model)
+
         self.admin.connect('connected', self.admin_connected_cb)
         self.admin.connect('disconnected', self.admin_disconnected_cb)
         self.admin.connect('connection-refused',
@@ -288,6 +299,34 @@ class Window(log.Loggable, gobject.GObject):
         self.debug("component: returning result: %r to caller" % result)
         return result
 
+    def setPlanetState(self, planetState):
+        self.debug('parsing planetState %r' % planetState)
+        self._planetState = planetState
+
+        # clear and rebuild list of components that interests us
+        self._components = {}
+
+        planetState.addListener(self)
+
+        a = planetState.get('atmosphere')
+        a.addListener(self)
+
+        for c in a.get('components'):
+            name = c.get('name')
+            self.debug('adding atmosphere component "%s"' % name)
+            self._components[name] = c
+            
+        for f in planetState.get('flows'):
+            if f.get('name') != 'default':
+                continue
+            f.addListener(self)
+            for c in f.get('components'):
+                name = c.get('name')
+                self.debug('adding default flow component "%s"' % name)
+                self._components[name] = c
+
+        self.update_components()
+ 
     def stateSet(self, state, key, value):
         # called by model when state of something changes
         if not isinstance(state, planet.AdminComponentState):
@@ -297,18 +336,49 @@ class Window(log.Loggable, gobject.GObject):
             self.statusbar.set('main', value)
 
     def stateAppend(self, state, key, value):
-        if not isinstance(state, worker.AdminWorkerHeavenState):
-            return
-
-        if key == 'names':
-            self.statusbar.set('main', 'Worker %s logged in.' % value)
+        if isinstance(state, worker.AdminWorkerHeavenState):
+            if key == 'names':
+                self.statusbar.set('main', 'Worker %s logged in.' % value)
+        elif isinstance(state, planet.AdminFlowState):
+            self.debug('flow state append: key %s, value %r' % (key, value))
+            if state.get('name') != 'default':
+                return
+            if key == 'components':
+                self._components[value.get('name')] = value
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components()
+        elif isinstance(state, planet.AdminAtmosphereState):
+            if key == 'components':
+                self._components[value.get('name')] = value
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components()
+        elif isinstance(state, planet.AdminPlanetState):
+            if key == 'flows':
+                if value.get('name') != 'default':
+                    return
+                self.debug('default flow started')
+                value.addListener(self)
+        else:
+            self.warning('stateAppend on unknown object %r' % state)
 
     def stateRemove(self, state, key, value):
-        if not isinstance(state, worker.AdminWorkerHeavenState):
-            return
-
-        if key == 'names':
-            self.statusbar.set('main', 'Worker %s logged out.' % value)
+        if isinstance(state, worker.AdminWorkerHeavenState):
+            if key == 'names':
+                self.statusbar.set('main', 'Worker %s logged out.' % value)
+        elif isinstance(state, planet.AdminFlowState):
+            if state.get('name') != 'default':
+                return
+            if key == 'components':
+                del self._components[value.get('name')]
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components()
+        elif isinstance(state, planet.AdminAtmosphereState):
+            if key == 'components':
+                del self._components[value.get('name')]
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components()
+        else:
+            self.warning('stateAppend on unknown object %r' % state)
 
     ### admin model callbacks
     def admin_connected_cb(self, admin):
@@ -320,11 +390,12 @@ class Window(log.Loggable, gobject.GObject):
         self.window.set_title('%s:%d - Flumotion Administration'
                               % (admin.host, admin.port))
 
-        components = self.update_components()
-
         self.emit('connected')
 
-        if not components:
+        # get initial info we need
+        self.setPlanetState(self.admin.getPlanetState())
+
+        if not self._components:
             self.debug('no components detected, running wizard')
             self.runWizard()
     
@@ -387,9 +458,7 @@ class Window(log.Loggable, gobject.GObject):
         self.update_components()
 
     def update_components(self):
-        components = self.admin.get_components()
-        self.components_view.update(components)
-        return components
+        self.components_view.update(self._components)
 
     ### ui callbacks
     def _components_view_selected_cb(self, view, state):
@@ -692,5 +761,6 @@ class Window(log.Loggable, gobject.GObject):
         # XXX: Use show()
         self.window.show_all()
         
+
 gobject.type_register(Window)
 
