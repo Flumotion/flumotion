@@ -1,3 +1,12 @@
+2004-08-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/multipart-bttv-overlay-jpeg.xml:
+	* data/registry/basecomponents.xml:
+	* flumotion/components/bttv.py:
+	  add channel choosing using interfaces
+	* misc/flu.modules:
+	  add jhbuild modules file
+
 2004-08-17  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/component.py (ComponentView): New class with

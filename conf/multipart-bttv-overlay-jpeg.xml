@@ -4,8 +4,9 @@
     <device-width>384</device-width>
     <device-height>288</device-height>
     <width>320</width>
-    <height>248</height>
+    <height>240</height>
     <framerate>10.0</framerate>
+    <channel>Composite1</channel>
   </component>
 
   <component name="converter-overlay" type="overlay">
