@@ -1,0 +1,18 @@
+<root>
+  
+  <component name="producer-videotest" type="videotest">
+    <width>320</width>
+    <height>240</height>
+    <framerate>5.0</framerate>
+  </component>
+
+  <component name="converter-multipart-jpeg" type="multipartjpeg">
+    <source>producer-videotest</source>
+  </component>
+
+  <component name="streamer-multipart-test-jpeg" type="http-streamer">
+    <source>converter-multipart-jpeg</source>
+    <port>8800</port>
+  </component>
+
+</root>
