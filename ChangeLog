@@ -1,5 +1,11 @@
 2004-06-18  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/server/controller.py (Controller.isLocalComponent):
+	Don't call getListenHost, since it needs to be working for
+	streamer too.
+	(Controller.getSourceComponents): Enable remote "hack" name
+	resolving again
+
 	* conf/test-ogg-theora-vorbis.conf (feeds): Update to have two
 	feeds in one pipeline
 

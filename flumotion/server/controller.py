@@ -45,22 +45,19 @@ def msg(*args):
 
 class Dispatcher:
     __implements__ = portal.IRealm
-    def __init__(self, controller):
+    def __init__(self, controller, admin):
         self.controller = controller
-
-    def requestAvatar(self, avatarID, mind, interface):
-        assert interface == pb.IPerspective
+        self.admin = admin
         
-        #msg('requestAvatar (%s, %s, %s)' % (avatarID, mind, interface))
-
-        # This could use some cleaning up
-        component_type, avatarID = avatarID.split('_', 1)
+    def requestAvatar(self, avatarID, mind, *interfaces):
+        if avatarID == 'admin':
+            p = self.admin.getPerspective()
+        else:
+            component_type, avatarID = avatarID.split('_', 1)
+            if self.controller.hasComponent(avatarID):
+                raise TypeError, "client %s already connected" % avatarID
         
-        if self.controller.hasComponent(avatarID):
-            # XXX: Raise exception/deny access
-            return
-        
-        p = self.controller.getPerspective(component_type, avatarID)
+            p = self.controller.getPerspective(component_type, avatarID)
 
         #msg("returning Avatar(%s): %s" % (avatarID, p))
         if not p:
@@ -71,7 +68,7 @@ class Dispatcher:
         return (pb.IPerspective, p,
                 lambda p=p,mind=mind: p.detached(mind))
 
-class Options:
+class Options(pb.Copyable):
     """dummy class for storing controller side options of a component"""
 
 class ComponentPerspective(pbutil.NewCredPerspective):
@@ -133,7 +130,8 @@ class ComponentPerspective(pbutil.NewCredPerspective):
 
         for key, value in options.items():
             setattr(self.options, key, value)
-
+        self.options.dict = options
+        
         self.controller.componentRegistered(self)
             
     def attached(self, mind):
@@ -301,7 +299,7 @@ class FeedManager:
             feed.addDependency(func, *args)
         else:
             func(*args)
-    
+
 class Controller(pb.Root):
     def __init__(self):
         self.components = {}
@@ -325,7 +323,8 @@ class Controller(pb.Root):
 
     def isLocalComponent(self, component):
         # TODO: This could be a lot smarter
-        if component.getListenHost() == '127.0.0.1':
+        host = component.mind.broker.transport.getPeer()
+        if host == '127.0.0.1':
             return True
         else:
             return False
@@ -398,9 +397,14 @@ class Controller(pb.Root):
             feedname = feed.getName()
             if feedname.endswith(':default'):
                 feedname = feedname[:-8]
-                
+
+            host = feed.getListenHost()
+            if (not self.isLocalComponent(component) and
+                host == '127.0.0.1'):
+                host = component.getRemoteControllerIP()
+
             retval.append((feedname,
-                           feed.getListenHost(),
+                           host,
                            feed.getListenPort()))
         return retval
 
@@ -496,7 +500,9 @@ class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):
         self.controller = Controller()
-        self.dispatcher = Dispatcher(self.controller)
+        #from flumotion.server import admin
+        self.admin = None #Admin(self.controller)
+        self.dispatcher = Dispatcher(self.controller, self.admin)
         checker = pbutil.ReallyAllowAnonymousAccess()
         
         self.portal = portal.Portal(self.dispatcher, [checker])
@@ -523,3 +529,4 @@ if __name__ == '__main__':
 
     
     reactor.run(False)
+
