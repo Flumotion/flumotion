@@ -1,0 +1,26 @@
+<planet>
+
+  <flow name="test">
+    <component name="producer-video-test" type="producer">
+      <feed>default</feed>
+      <pipeline>
+  videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
+      </pipeline>
+    </component>
+  
+    <component name="converter-ogg-theora" type="converter">
+      <feed>default</feed>
+      <source>producer-video-test</source>
+      <pipeline>
+  ffmpegcolorspace ! theoraenc keyframe-force=5 ! oggmux
+      </pipeline>
+    </component>
+  
+    <component name="streamer-ogg-theora" type="http-streamer" worker="streamer">
+      <source>converter-ogg-theora</source>
+      <port>8800</port>
+      <logfile>/tmp/ogg-test-theora.access.log</logfile>
+    </component>
+  </flow>
+
+</planet>
