@@ -1,3 +1,24 @@
+2005-02-03  Andy Wingo  <wingo@pobox.com>
+
+	* data/glade/Makefile.am:
+	* data/glade/greeter-load_connection.glade: Glade file for new
+	page.
+
+	* flumotion/admin/gtk/main.py (_runInterface): When getting back
+	from the greeter, save the connection to disk.
+
+	* flumotion/admin/gtk/wizard.py (Wizard.set_page): Set Next to
+	sensitive when going to a new page. (::setup should override it if
+	necessary.)
+
+	* flumotion/admin/gtk/greeter.py (parse_connection): New function,
+	parses a saved connection file into a hash.
+	(_populate_liststore): Load up the list of previous connections
+	from files in the registry dir.
+	(_clear_iter): Remove a row and the corresponding connection file.
+	(LoadConnection.title): New page, will load up a saved connection.
+	(Greeter): Add the LoadConnection page.
+
 2005-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/main.py:

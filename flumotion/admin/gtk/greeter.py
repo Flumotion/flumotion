@@ -19,6 +19,12 @@
 # Headers in this file shall remain intact.
 
 
+import os
+from xml.dom import minidom, Node
+
+import gtk
+
+from flumotion.configure import configure
 from flumotion.admin.gtk import wizard
 
 
@@ -114,11 +120,110 @@ class Authenticate(wizard.WizardStep):
         return '*finished*'
 
 
+def parse_connection(f):
+    print 'Parsing XML file: %s' % os.path.basename(f)
+    tree = minidom.parse(f)
+    state = {}
+    for n in [x for x in tree.documentElement.childNodes
+                if x.nodeType != Node.TEXT_NODE
+                   and x.nodeType != Node.COMMENT_NODE]:
+        state[n.nodeName] = n.childNodes[0].wholeText
+    state['port'] = int(state['port'])
+    state['use_insecure'] = (state['use_insecure'] != '0')
+    state['manager'] = 'fixme'
+    return state
+
+MANAGER_COL = 0
+HOST_STR_COL = 1
+FILE_COL = 2
+STATE_COL = 3
+
+def _populate_liststore(l):
+    try:
+        # DSU, or as perl folks call it, a Schwartz Transform
+        files = os.listdir(configure.registrydir)
+        files = [os.path.join(configure.registrydir, f) for f in files]
+        files = [(os.stat(f).st_mtime, f) for f in files
+                                          if f.endswith('.connection')]
+        files.sort()
+        for f in [x[1] for x in files]:
+            try:
+                state = parse_connection(f)
+                i = l.append()
+                l.set_value(i, HOST_STR_COL,
+                            '%s:%d' % (state['host'], state['port']))
+                l.set_value(i, MANAGER_COL, state['manager'])
+                l.set_value(i, FILE_COL, f)
+                l.set_value(i, STATE_COL, state)
+            except Exception, e:
+                print 'Error parsing %s: %r' % (f, e)
+                raise
+    except OSError, e:
+        print 'Error: %s: %s' % (e.strerror, e.filename)
+
+def _clear_iter(model, i):
+    os.unlink(model.get_value(i,FILE_COL))
+    model.remove(i)
+
+class LoadConnection(wizard.WizardStep):
+    name = 'load_connection'
+    title = 'Load connection'
+    text = 'Please choose a connection from the box below.'
+    treeview_connections = None
+
+    def setup(self, state):
+        l = gtk.ListStore(str, str, str, object)
+        v = self.treeview_connections
+
+        c = gtk.TreeViewColumn('Manager', gtk.CellRendererText(),
+                               text=MANAGER_COL)
+
+        v.append_column(c)
+        c = gtk.TreeViewColumn('Host', gtk.CellRendererText(),
+                               text=HOST_STR_COL)
+        v.append_column(c)
+
+        v.set_model(l)
+        _populate_liststore(l)
+        s = self.treeview_connections.get_selection()
+        s.set_mode(gtk.SELECTION_SINGLE)
+        if l.get_iter_first():
+            s.select_path((0,))
+        else:
+            self.button_next.set_sensitive(False)
+
+    def on_clear_all(self, *args):
+        m = self.treeview_connections.get_model()
+        i = m.get_iter_first()
+        while i:
+            _clear_iter(m, i)
+            i = m.get_iter_first()
+        self.button_next.set_sensitive(False)
+
+    def on_clear(self, *args):
+        s = self.treeview_connections.get_selection()
+        model, i = s.get_selected()
+        if i:
+            _clear_iter(model, i)
+            if model.get_iter_first():
+                s.select_path((0,))
+            else:
+                self.button_next.set_sensitive(False)
+        
+    def on_next(self, state):
+        s = self.treeview_connections.get_selection()
+        model, i = s.get_selected()
+        state.update(model.get_value(i, STATE_COL))
+        state['file'] = model.get_value(i, FILE_COL)
+        return '*finished*'
+
+
 class Greeter:
     wiz = None
     def __init__(self):
         self.wiz = wizard.Wizard('greeter', 'initial',
-                                 Initial, ConnectToExisting, Authenticate)
+                                 Initial, ConnectToExisting, Authenticate,
+                                 LoadConnection)
     def run(self):
         self.wiz.show()
         return self.wiz.run()

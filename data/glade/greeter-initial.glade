@@ -16,6 +16,7 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+  <property name="focus_on_map">True</property>
 
   <child>
     <widget class="GtkVBox" id="page">
@@ -43,9 +44,8 @@
       </child>
 
       <child>
-	<widget class="GtkRadioButton" id="load_config">
+	<widget class="GtkRadioButton" id="load_connection">
 	  <property name="visible">True</property>
-	  <property name="sensitive">False</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">Load a _previous connection</property>
 	  <property name="use_underline">True</property>

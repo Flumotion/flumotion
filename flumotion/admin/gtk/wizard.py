@@ -176,6 +176,7 @@ class Wizard(gobject.GObject):
         self.page_bin.add(page.page)
         self.label_title.set_markup('<big><b>%s</b></big>' % page.title)
         self.textview_text.get_buffer().set_text(page.text)
+        self.button_next.set_sensitive(True)
         if hasattr(page, 'setup'):
             page.setup(self.state)
 

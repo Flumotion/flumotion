@@ -4,6 +4,7 @@ glade_DATA = \
 	greeter-initial.glade		\
 	greeter-connect_to_existing.glade	\
 	greeter-authenticate.glade	\
+	greeter-load_connection.glade	\
 	wizard.glade 			\
 	wizard_audiotest.glade		\
 	wizard_audio_encoder.glade	\
