@@ -479,7 +479,6 @@ class Window(log.Loggable, gobject.GObject):
             self.show()
 
         state = self.admin.getWorkerHeavenState()
-        print "THOMAS: state: %r" % state
         if not state.get('names'):
             self.show_error_dialog(
                 'The wizard cannot be run because no workers are logged in.')
