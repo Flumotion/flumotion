@@ -173,10 +173,12 @@ class Window(log.Loggable, gobject.GObject):
         return failure
 
     # UI helper functions
-    def show_error_dialog(self, message, parent=None, response=True):
+    def show_error_dialog(self, message, parent=None, close_on_response=True):
         if not parent:
             parent = self.window
-        return dialogs.show_error_dialog(message, parent, response)
+        d = dialogs.ErrorDialog(message, parent, close_on_response)
+        d.show_all()
+        return d
 
     def create_ui(self):
         wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
@@ -476,7 +478,8 @@ class Window(log.Loggable, gobject.GObject):
     def admin_connection_refused_later(self, host, port):
         message = "Connection to manager on %s:%d was refused." % (host, port)
         self.info(message)
-        d = self.show_error_dialog(message, response = False)
+        d = dialogs.ErrorDialog(message, self)
+        d.show_all()
         d.connect('response', self.close)
 
     def admin_connection_refused_cb(self, admin, host, port):
@@ -601,7 +604,7 @@ class Window(log.Loggable, gobject.GObject):
         state = self.admin.getWorkerHeavenState()
         if not state.get('names'):
             self.show_error_dialog(
-                'Need at least one worker connected to run the wizard')
+                'The wizard cannot be run because no workers are logged in.')
             return
         
         wiz = wizard.Wizard(self.admin)

@@ -1,5 +1,10 @@
 2005-01-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	  fix errors
+
+2005-01-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/dialogs.py:
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_dialogs.py:
