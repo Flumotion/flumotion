@@ -54,6 +54,7 @@ class RemoteComponentView(pb.RemoteCopy):
     I am a copy of a manager-side L{ComponentView}
     I live in an admin client.
     """
+    name = None # shuts up pychecker
     def __cmp__(self, other):
         if not isinstance(other, RemoteComponentView):
             return False
