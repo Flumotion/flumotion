@@ -304,7 +304,7 @@ class Window(log.Loggable, gobject.GObject):
         if key == 'message':
             self.statusbar.set('main', value)
 
-    def stateAdd(self, state, key, value):
+    def stateAppend(self, state, key, value):
         if not isinstance(state, worker.AdminWorkerHeavenState):
             return
 

@@ -46,7 +46,7 @@ class TestRoot(pb.Root):
         self.state.set('name', name)
 
     def remote_bearChild(self, name):
-        self.state.add('children', name)
+        self.state.append('children', name)
 
     def remote_haveAdopted(self, name):
         self.state.remove('children', name)
@@ -95,7 +95,7 @@ class TestStateSet(unittest.TestCase):
 
         self.failUnlessEqual(state.get('name'), 'clark')
 
-    def testStateAddRemove(self):
+    def testStateAppendRemove(self):
         # start everything
         self.runServer()
         d = self.runClient()
@@ -150,8 +150,8 @@ class TestStateSet(unittest.TestCase):
     def stateSet(self, state, key, value):
         self.changes.append(('set', state, key, value))
 
-    def stateAdd(self, state, key, value):
-        self.changes.append(('add', state, key, value))
+    def stateAppend(self, state, key, value):
+        self.changes.append(('append', state, key, value))
 
     def stateRemove(self, state, key, value):
         self.changes.append(('remove', state, key, value))
@@ -175,7 +175,7 @@ class TestStateSet(unittest.TestCase):
         c = self.changes.pop()
         self.failUnlessEqual(c, ('set', state, 'name', 'robin'))
 
-    def testStateAddRemoveListener(self):
+    def testStateAppendRemoveListener(self):
         # start everything
         self.runServer()
         d = self.runClient()
@@ -192,14 +192,14 @@ class TestStateSet(unittest.TestCase):
         r = unittest.deferredResult(d)
 
         c = self.changes.pop()
-        self.failUnlessEqual(c, ('add', state, 'children', 'robin'))
+        self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
 
         # lists can have same member more than once
         d = self.perspective.callRemote('bearChild', 'robin')
         r = unittest.deferredResult(d)
 
         c = self.changes.pop()
-        self.failUnlessEqual(c, ('add', state, 'children', 'robin'))
+        self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
 
         # give one of them away
         d = self.perspective.callRemote('haveAdopted', 'robin')
@@ -213,7 +213,29 @@ class TestStateSet(unittest.TestCase):
         r = unittest.deferredResult(d)
 
         c = self.changes.pop()
-        self.failUnlessEqual(c, ('add', state, 'children', 'batman'))
+        self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
+
+class TestStateAddKey(unittest.TestCase):
+    def testStateAddKey(self):
+        c = flavors.StateCacheable()
+
+        c.addListKey('list')
+        l = c.get('list')
+        self.failUnlessEqual(len(l), 0)
+        c.append('list', 'item')
+        l = c.get('list')
+        self.failUnlessEqual(len(l), 1)
+        self.failUnlessEqual(l[0], 'item')
+
+        c.addListKey('two')
+        l = c.get('two')
+        self.failUnlessEqual(len(l), 0)
+        c.append('two', 'B')
+        l = c.get('two')
+        self.failUnlessEqual(len(l), 1)
+        self.failUnlessEqual(l[0], 'B')
+        
+        
  
 if __name__ == '__main__':
     unittest.main()

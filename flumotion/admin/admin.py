@@ -220,10 +220,10 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         for view in self._views:
             view.stateSet(state, key, value)
 
-    def stateAdd(self, state, key, value):
-        self.debug("state add on %r: key %s" % (state, key))
+    def stateAppend(self, state, key, value):
+        self.debug("state append on %r: key %s" % (state, key))
         for view in self._views:
-            view.stateAdd(state, key, value)
+            view.stateAppend(state, key, value)
 
     def stateRemove(self, state, key, value):
         self.debug("state remove on %r: key %s" % (state, key))

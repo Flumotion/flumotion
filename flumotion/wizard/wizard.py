@@ -619,7 +619,7 @@ class Wizard(gobject.GObject, log.Loggable):
             pass
 
     ### IStateListener methods
-    def stateAdd(self, state, key, value):
+    def stateAppend(self, state, key, value):
         if not isinstance(state, worker.AdminWorkerHeavenState):
             return
         self.info('worker %s logged in to manager' % value)

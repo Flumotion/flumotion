@@ -1,5 +1,18 @@
 2005-01-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_flavors.py:
+	* flumotion/twisted/flavors.py:
+	* flumotion/wizard/wizard.py:
+	  Go back to using append for List keys, since python also
+	  uses append/remove.  Yes, I suck.  To make up, fix a bug
+	  with List keys sharing their list among one another.
+
+2005-01-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	  scrub some paths like .svn stuff for package candidates
 
