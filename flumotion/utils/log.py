@@ -1,8 +1,10 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
-#
+
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
+#
+# flumotion/utils/log.py: logging for Flumotion server
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +19,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
+
+"""
+This module provides logging to Flumotion components.
+
+Just like in GStreamer, five levels are defined.
+These are, in order of decreasing verbosity: log, debug, info, warning, error.
+
+API Stability: freezing
+
+Maintainer: U{Thomas Vander Stichele <thomas at apestaart dot org>}
+"""
 
 import sys
 
@@ -38,28 +51,32 @@ def stderrHandlerLimited(category, type, message):
     sys.stderr.write('[%s:%s] %s\n' % (category, type, message))
     sys.stderr.flush()
 
-def handle(category, type, message):
+def _handle(category, type, message):
     global _log_handlers
 
     for handler in _log_handlers:
         handler(category, type, message)
     
 def error(cat, *args):
+    """
+    Log an error message in the given category. \
+    This will also raise a L{flumotion.twisted.errors.SystemError}.
+    """
     msg = ' '.join(args)
-    handle(cat, 'ERROR', msg)
+    _handle(cat, 'ERROR', msg)
     raise errors.SystemError(msg)
 
 def warning(cat, *args):
-    handle(cat, 'WARNING', ' '.join(args))
+    _handle(cat, 'WARNING', ' '.join(args))
 
 def info(cat, *args):
-    handle(cat, 'INFO', ' '.join(args))
+    _handle(cat, 'INFO', ' '.join(args))
 
 def debug(cat, *args):
-    handle(cat, 'DEBUG', ' '.join(args))
+    _handle(cat, 'DEBUG', ' '.join(args))
 
 def log(cat, *args):
-    handle(cat, 'LOG', ' '.join(args))
+    _handle(cat, 'LOG', ' '.join(args))
 
 def enableLogging():
     global _log_handlers
@@ -69,8 +86,6 @@ def enableLogging():
 def disableLogging():
     if stderrHandler in _log_handlers:
         _log_handlers.remove(stderrHandler)
-    
-    _do_logging = False
     
 def addLogHandler(func):
     _log_handlers.append(func)

@@ -25,6 +25,7 @@ MODULE_FILES = \
 	flumotion/server/launcher.py		\
 	flumotion/server/registry.py		\
 	flumotion/twisted/gstreactor.py		\
+	flumotion/twisted/errors.py		\
 	flumotion/utils/gstutils.py		\
 	flumotion/utils/log.py
 
@@ -36,7 +37,7 @@ html/index.html: $(patsubst %, $(top_srcdir)/%, $(MODULE_FILES))
 
 all-local: html/index.html
 
-distclean-local:
+clean-local:
 	rm -rf html
 else
 EPYDOC_HTML =
