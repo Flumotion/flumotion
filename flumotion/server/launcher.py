@@ -133,7 +133,7 @@ class Launcher:
             pass
         component.pipeline_stop()
 
-    def start(self, component):
+    def start(self, component, nice = 0):
         pid = os.fork()
         if not pid:
             set_proc_text('flumotion [%s]' % component.component_name)
@@ -145,6 +145,9 @@ class Launcher:
                      component.getKind(),
                      pid))
             self.children.append(pid)
+            if nice:
+                self.msg('Renicing with %d' % nice)
+                os.nice (nice)
 
     def start_streamer(self, component, factory, port):
         pid = os.fork()
@@ -228,7 +231,7 @@ class Launcher:
             if kind == 'producer':
                 self.start(Producer(name, sources, feeds, pipeline))
             elif kind == 'converter':
-                self.start(Converter(name, sources, feeds, pipeline))
+                self.start(Converter(name, sources, feeds, pipeline), nice=5)
             elif kind == 'streamer':
                 assert c.has_option(section, 'protocol')
                 protocol = c.get(section, 'protocol')
