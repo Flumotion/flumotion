@@ -1,5 +1,8 @@
 2004-10-16  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/worker/worker.py: Clean up error
+	handling in worker brain.
+
 	* flumotion/component/Makefile.am:
 	* flumotion/component/audiotest/Makefile.am:
 	* flumotion/component/audiotest/__init__.py:

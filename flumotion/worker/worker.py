@@ -27,6 +27,7 @@ from twisted.cred import portal
 from twisted.internet import protocol, reactor
 from twisted.spread import pb
 import twisted.cred.error
+import twisted.internet.error
 
 # We want to avoid importing gst, otherwise --help fails
 # so be very careful when adding imports
@@ -168,6 +169,7 @@ class WorkerBrain:
     def login(self, creds):
         d = self.worker_client_factory.login(creds)
         d.addErrback(self._cb_accessDenied)
+        d.addErrback(self._cb_connectionRefused)
         d.addErrback(self._cb_loginFailed)
                                  
     def setup(self):
@@ -182,13 +184,21 @@ class WorkerBrain:
 
         return job_server_factory, root
 
+    def error(self, message):
+        print >> sys.stderr, 'ERROR: %s' % message
+        reactor.stop()
+        
     def _cb_accessDenied(self, failure):
         failure.trap(twisted.cred.error.UnauthorizedLogin)
-        print 'ERROR: Access denied.'
-        reactor.stop()
-    
+        self.error('Access denied.')
+        
+    def _cb_connectionRefused(self, failure):
+        failure.trap(twisted.internet.error.ConnectionRefusedError)
+        self.error('Connection to %s:%d refused.' % (self.manager_host,
+                                                     self.manager_port))
+                                                      
     def _cb_loginFailed(self, failure):
-        print 'Login failed, reason: %s' % str(failure)
+        self.error('Login failed, reason: %s' % str(failure))
 
 class JobDispatcher:
     __implements__ = portal.IRealm
