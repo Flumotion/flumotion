@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if test -z "$@"; then
+   echo "usage: $0 FILE1 FILE2..." >&2
+   exit 1
+fi
+
+for f in $@; do
+   echo "* $f"
+   grep -v '<property name="width_chars"' $f \
+   | grep -v '<property name="ellipsize"' \
+   | grep -v '<property name="focus_on_map"' \
+   | grep -v '<property name="hover_selection"' \
+   | grep -v '<property name="hover_expand"' \
+   | grep -v '<property name="single_line_mode"' \
+   | grep -v '<property name="angle"' \
+   > $f.new
+   mv $f.new $f
+done

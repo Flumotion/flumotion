@@ -70,6 +70,7 @@ class WizardTest(unittest.TestCase):
                 return False
             gobject.idle_add(proc_star)
         
+        idle_add(lambda: wiz.page.connect_to_existing.emit('clicked'))
         idle_add(lambda: next.emit('clicked'))
         idle_add(lambda: prev.emit('clicked'))
         idle_add(lambda: next.emit('clicked'))

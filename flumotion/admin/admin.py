@@ -193,6 +193,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     def _writeConnection(self):
         s = ''.join(['<connection>',
                      '<host>%s</host>' % self.host,
+                     '<manager>%s</manager>' % self._planetState.get('name'),
                      '<port>%d</port>' % self.port,
                      '<use_insecure>%d</use_insecure>' 
                      % (self.use_insecure and 1 or 0),

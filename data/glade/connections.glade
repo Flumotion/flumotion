@@ -16,9 +16,6 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
-<!--
-  <property name="focus_on_map">True</property>
--->
 
   <child>
     <widget class="GtkVBox" id="page">
@@ -29,7 +26,6 @@
       <child>
 	<widget class="GtkScrolledWindow" id="scrolledwindow1">
 	  <property name="visible">True</property>
-	  <property name="can_focus">True</property>
 	  <property name="hscrollbar_policy">GTK_POLICY_NEVER</property>
 	  <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
 	  <property name="shadow_type">GTK_SHADOW_IN</property>
@@ -40,15 +36,12 @@
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="has_focus">True</property>
-	      <property name="headers_visible">True</property>
+	      <property name="headers_visible">False</property>
 	      <property name="rules_hint">False</property>
 	      <property name="reorderable">False</property>
 	      <property name="enable_search">True</property>
 	      <property name="fixed_height_mode">False</property>
-<!--
-	      <property name="hover_selection">False</property>
-	      <property name="hover_expand">False</property>
--->
+	      <signal name="row_activated" handler="on_row_activated" last_modification_time="Tue, 08 Feb 2005 14:37:11 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -62,6 +55,7 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox1">
 	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
 	  <property name="spacing">0</property>
 

@@ -135,9 +135,15 @@ class LoadConnection(wizard.WizardStep):
     def on_has_selection(self, widget, has_selection):
         self.button_next.set_sensitive(has_selection)
 
+    def on_connection_activated(self, widget, state):
+        self.button_next.emit('clicked')
+
     def on_next(self, state):
         state.update(self.connections.get_selected())
         return '*finished*'
+
+    def setup(self, state):
+        self.connections.grab_focus()
 
 
 class Greeter:

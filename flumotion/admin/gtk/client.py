@@ -520,11 +520,7 @@ class Window(log.Loggable, gobject.GObject):
         self.setPlanetState(self.admin.getPlanetState())
 
         if not self._components:
-            def nullwizard(*args):
-                self.wizard = None
             self.debug('no components detected, running wizard')
-            self.wizard = self.runWizard()
-            self.wizard.connect('destroy', nullwizard)
     
     def admin_disconnected_cb(self, admin):
         message = "Lost connection to manager, reconnecting ..."
@@ -667,12 +663,20 @@ class Window(log.Loggable, gobject.GObject):
         self.debug('Configuration=%s' % fd.read())
         
     def runWizard(self):
+        if self.wizard:
+            self.wizard.present()
+            return
+
         from flumotion.wizard import wizard
+
         def _wizard_finished_cb(wizard, configuration):
-            wizard.hide()
+            wizard.destroy()
             self._logConfig(configuration)
             self.admin.loadConfiguration(configuration)
             self.show()
+
+        def nullwizard(*args):
+            self.wizard = None
 
         state = self.admin.getWorkerHeavenState()
         if not state.get('names'):
@@ -685,7 +689,8 @@ class Window(log.Loggable, gobject.GObject):
         wiz.load_steps()
         wiz.run(True, state, False)
 
-        return wiz
+        self.wizard = wiz
+        self.wizard.connect('destroy', nullwizard)
 
     # component view activation functions
     def _component_modify(self, state):

@@ -1,3 +1,39 @@
+2005-02-08  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/wizard.py (Wizard.present): New proxy method.
+
+	* flumotion/admin/gtk/connections.py (Connections): Use fake uris
+	instead of multiple columns.
+	(Connections.on_grab_focus): Implement a handler that bypasses the
+	scrollwindow, instead focusing the treeview directly
+	(Connections.on_row_activated): Emit ::connection-activated.
+	(Connections::connection-activated): New signal.
+
+	* flumotion/admin/gtk/client.py (Window.runWizard): Take care of
+	the one-and-only-one wizard logic all in this function.
+
+	* flumotion/admin/gtk/greeter.py
+	(LoadConnection.on_connection_activated): Hooked up, yo!
+	(LoadConnection.setup): Grab focus on the Connections.
+
+	* flumotion/admin/admin.py (AdminModel._writeConnection): Write
+	the manager, too.
+
+	* data/glade/greeter-initial.glade: Make "load a previous
+	connection" be the first and default option.
+
+	* data/glade/connections.glade: Headers not visible any more, we
+	use pseudo-uris. Not sure if this is best.
+
+	* data/glade/connection-dialog.glade: Play with the padding, add a
+	label. Makes it look less bad. Connect to ::connection-activated.
+
+	* data/glade/greeter-load_connection.glade: Connect the
+	connection-activated signal.
+
+	* tools/gtk-2.4-ify-glade-files: New script, filters out gtk 2.6
+	properties from glade files. Ugly, but hey.
+
 2005-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/admin.glade:

@@ -238,6 +238,9 @@ class Wizard(gobject.GObject, log.Loggable):
 
         self.window.connect('destroy', lambda *x: self.emit('destroy'))
 
+    def present(self):
+        self.window.present()
+
     def destroy(self):
         self.window.destroy()
         del self.window

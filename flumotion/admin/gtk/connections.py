@@ -40,20 +40,19 @@ def parse_connection(f):
         state[n.nodeName] = n.childNodes[0].wholeText
     state['port'] = int(state['port'])
     state['use_insecure'] = (state['use_insecure'] != '0')
-    state['manager'] = 'fixme'
     return state
 
         
 class Connections(GladeWidget):
     glade_file = 'connections.glade'
 
-    MANAGER_COL = 0
-    HOST_STR_COL = 1
-    FILE_COL = 2
-    STATE_COL = 3
+    STR_COL = 0
+    FILE_COL = 1
+    STATE_COL = 2
 
     model = None
     gsignal('has-selection', bool)
+    gsignal('connection-activated', object)
 
     treeview_connections = None
 
@@ -61,16 +60,17 @@ class Connections(GladeWidget):
         GladeWidget.__init__(self)
         v = self.treeview_connections
 
-        c = gtk.TreeViewColumn('Manager', gtk.CellRendererText(),
-                               text=self.MANAGER_COL)
-
-        v.append_column(c)
         c = gtk.TreeViewColumn('Host', gtk.CellRendererText(),
-                               text=self.HOST_STR_COL)
+                               text=self.STR_COL)
         v.append_column(c)
 
         self._populate_liststore()
         v.set_model(self.model)
+
+        # Bizarre. This doesn't work at all.
+        #self.scrolledwindow1.set_property('can-focus', False)
+
+        self.connect('grab-focus', self.on_grab_focus)
 
         s = self.treeview_connections.get_selection()
         s.set_mode(gtk.SELECTION_SINGLE)
@@ -79,9 +79,9 @@ class Connections(GladeWidget):
             self.emit('has-selection', True)
         else:
             self.emit('has-selection', False)
-        
+
     def _populate_liststore(self):
-        self.model = gtk.ListStore(str, str, str, object)
+        self.model = gtk.ListStore(str, str, object)
         try:
             # DSU, or as perl folks call it, a Schwartz Transform
             files = os.listdir(configure.registrydir)
@@ -95,9 +95,9 @@ class Connections(GladeWidget):
                 try:
                     state = parse_connection(f)
                     i = l.append()
-                    l.set_value(i, self.HOST_STR_COL,
-                                '%s:%d' % (state['host'], state['port']))
-                    l.set_value(i, self.MANAGER_COL, state['manager'])
+                    l.set_value(i, self.STR_COL,
+                                '%s:%d/%s' % (state['host'], state['port'],
+                                              state['manager']))
                     l.set_value(i, self.FILE_COL, f)
                     l.set_value(i, self.STATE_COL, state)
                 except Exception, e:
@@ -120,6 +120,14 @@ class Connections(GladeWidget):
             i = m.iter_next(i)
         return connections
         
+    def on_grab_focus(self, *args):
+        v = self.treeview_connections
+        model, i = v.get_selection().get_selected()
+        if model:
+            v.set_cursor(model.get_path(i), None, False)
+            self.treeview_connections.grab_focus()
+        return True
+
     def on_clear_all(self, *args):
         m = self.model
         i = m.get_iter_first()
@@ -137,6 +145,9 @@ class Connections(GladeWidget):
                 s.select_path((0,))
             else:
                 self.emit('has-selection', False)
+
+    def on_row_activated(self, *args):
+        self.emit('connection-activated', self.get_selected())
 
     def get_selected(self):
         s = self.treeview_connections.get_selection()
@@ -166,6 +177,9 @@ class ConnectionsDialog(GladeWindow):
 
     def on_has_selection(self, widget, has_selection):
         self.button_ok.set_sensitive(has_selection)
+
+    def on_connection_activated(self, widget, state):
+        self.emit('have-connection', state)
 
     def on_ok(self, x):
         self.emit('have-connection',
