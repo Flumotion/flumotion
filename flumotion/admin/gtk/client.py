@@ -114,10 +114,12 @@ class Window(log.Loggable, gobject.GObject):
             i = gtk.Image()
             i.set_from_file(f)
             proc(i)
-            
+        
+        def make_menu_proc(m):
+            return lambda f: m.set_property('image', f)
         def menu_set_icon(m, name):
-            set_icon(lambda f: m.set_property('image', f), 16, name)
-
+            set_icon(make_menu_proc(m), 16, name)
+        
         def tool_set_icon(m, name):
             set_icon(m.set_icon_widget, 24, name)
 
