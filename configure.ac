@@ -128,6 +128,8 @@ bin/Makefile
 data/Makefile
 data/glade/Makefile
 data/image/Makefile
+data/image/16x16/Makefile
+data/image/24x24/Makefile
 data/image/wizard/Makefile
 flumotion/Makefile
 flumotion/admin/Makefile

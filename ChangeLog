@@ -1,3 +1,30 @@
+2005-02-02  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/client.py (Window.widgets): New instance
+	attribute, a dict of widgets from glade.
+	(Window._create_ui): Populate Window.widgets. Set custom icons for
+	the Run Wizard toolbar and menu items.
+	(Window.file_new_cb, Window.file_open_cb): Raise NotImplemented
+	errors instead of doing shite.
+	(Window.file_save_cb): Removed, it didn't do anything anyway.
+	(Window.manage_stop_all_cb): Used to be the clean toolbar button,
+	now labeled as "stop all".
+	(Window.manage_run_wizard_cb): New cb from menu and toolbar.
+	(Window.help_about_cb): No emails. Vainly add emails to list.
+
+	* data/glade/admin.glade: Reworked quite a bit.
+	s/File/Connection/, added a Manage menu, menu items to stop and
+	start components individually or as a group, a wizard button,
+	removed the exit button, etc.
+
+	* data/images/16x16/wizard.png:
+	* data/images/24x24/wizard.png: New images from David Vignoni.
+
+	* data/images/Makefile.am
+	* data/images/16x16/Makefile.am
+	* data/images/24x24/Makefile.am
+	* configure.ac: Add data/images/{16x16,24x24} dirs.
+
 2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:

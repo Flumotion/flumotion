@@ -1,4 +1,4 @@
-SUBDIRS = wizard
+SUBDIRS = wizard 16x16 24x24
 
 image_DATA = \
 	fluendo.png 		\

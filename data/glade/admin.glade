@@ -2,7 +2,6 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
-<requires lib="gnome"/>
 
 <widget class="GtkWindow" id="main_window">
   <property name="width_request">640</property>
@@ -32,7 +31,7 @@
 	  <child>
 	    <widget class="GtkMenuItem" id="menuitem1">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">_File</property>
+	      <property name="label" translatable="yes">_Connection</property>
 	      <property name="use_underline">True</property>
 
 	      <child>
@@ -41,43 +40,18 @@
 		  <child>
 		    <widget class="GtkImageMenuItem" id="file_new">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">New...</property>
-		      <property name="use_underline">True</property>
+		      <property name="label">gtk-new</property>
+		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="file_new_cb" last_modification_time="Tue, 19 Oct 2004 13:36:00 GMT"/>
-		      <accelerator key="N" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-
-		      <child internal-child="image">
-			<widget class="GtkImage" id="image46">
-			  <property name="visible">True</property>
-			  <property name="stock">gtk-new</property>
-			  <property name="icon_size">1</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-		      </child>
 		    </widget>
 		  </child>
 
 		  <child>
 		    <widget class="GtkImageMenuItem" id="file_open">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Open...</property>
-		      <property name="use_underline">True</property>
+		      <property name="label">gtk-open</property>
+		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="file_open_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
-
-		      <child internal-child="image">
-			<widget class="GtkImage" id="image47">
-			  <property name="visible">True</property>
-			  <property name="stock">gtk-open</property>
-			  <property name="icon_size">1</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-		      </child>
 		    </widget>
 		  </child>
 
@@ -90,15 +64,108 @@
 		  <child>
 		    <widget class="GtkImageMenuItem" id="file_quit">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Quit</property>
-		      <property name="use_underline">True</property>
+		      <property name="label">gtk-quit</property>
+		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="file_quit_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
-		      <accelerator key="Q" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+	    </widget>
+	  </child>
+
+	  <child>
+	    <widget class="GtkMenuItem" id="manage1">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">_Manage</property>
+	      <property name="use_underline">True</property>
+
+	      <child>
+		<widget class="GtkMenu" id="manage1_menu">
+
+		  <child>
+		    <widget class="GtkImageMenuItem" id="menuitem_manage_start_component">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Start Component</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="manage_start_component_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image48">
+			<widget class="GtkImage" id="image73">
 			  <property name="visible">True</property>
-			  <property name="stock">gtk-quit</property>
+			  <property name="stock">gtk-media-play</property>
+			  <property name="icon_size">1</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkImageMenuItem" id="menuitem_manage_stop_component">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Stop Component</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="manage_stop_component_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image74">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-media-pause</property>
+			  <property name="icon_size">1</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkSeparatorMenuItem" id="separator2">
+		      <property name="visible">True</property>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_manage_start_all">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Start All</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="manage_start_all_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_manage_stop_all">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Stop All</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="manage_stop_all_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkSeparatorMenuItem" id="separator1">
+		      <property name="visible">True</property>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkImageMenuItem" id="menuitem_manage_run_wizard">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Run _Wizard</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="manage_run_wizard_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image75">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-zoom-fit</property>
 			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
@@ -116,36 +183,60 @@
 	  <child>
 	    <widget class="GtkMenuItem" id="debug1">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Debug</property>
+	      <property name="label" translatable="yes">_Debug</property>
 	      <property name="use_underline">True</property>
 
 	      <child>
 		<widget class="GtkMenu" id="debug1_menu">
 
 		  <child>
-		    <widget class="GtkMenuItem" id="debug_reload_manager">
+		    <widget class="GtkImageMenuItem" id="debug_reload_manager">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Reload manager</property>
+		      <property name="label" translatable="yes">Reload _Manager</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="debug_reload_manager_cb" last_modification_time="Wed, 05 Jan 2005 19:02:03 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image76">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-refresh</property>
+			  <property name="icon_size">1</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
 		    </widget>
 		  </child>
 
 		  <child>
 		    <widget class="GtkMenuItem" id="debug_reload_all">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Reload all</property>
+		      <property name="label" translatable="yes">Reload _All</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="debug_reload_all_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkMenuItem" id="start_shell1">
+		    <widget class="GtkImageMenuItem" id="start_shell1">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Start shell</property>
+		      <property name="label" translatable="yes">Start _Shell</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="debug_start_shell_cb" last_modification_time="Wed, 08 Dec 2004 17:42:07 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image77">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-execute</property>
+			  <property name="icon_size">1</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
 		    </widget>
 		  </child>
 		</widget>
@@ -163,10 +254,10 @@
 		<widget class="GtkMenu" id="item4_menu">
 
 		  <child>
-		    <widget class="GtkMenuItem" id="help_about">
+		    <widget class="GtkImageMenuItem" id="help_about">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">_About</property>
-		      <property name="use_underline">True</property>
+		      <property name="label">gtk-about</property>
+		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="help_about_cb" last_modification_time="Wed, 01 Sep 2004 16:01:05 GMT"/>
 		    </widget>
 		  </child>
@@ -198,14 +289,13 @@
 	      <property name="show_arrow">True</property>
 
 	      <child>
-		<widget class="GtkToolButton" id="tool_open">
+		<widget class="GtkToolButton" id="tool_new">
 		  <property name="visible">True</property>
-		  <property name="tooltip" translatable="yes">Open a stored configuration</property>
-		  <property name="stock_id">gtk-open</property>
+		  <property name="stock_id">gtk-new</property>
 		  <property name="visible_horizontal">True</property>
 		  <property name="visible_vertical">True</property>
 		  <property name="is_important">False</property>
-		  <signal name="clicked" handler="on_tool_open_clicked" last_modification_time="Tue, 19 Oct 2004 13:34:10 GMT"/>
+		  <signal name="clicked" handler="file_new_cb" last_modification_time="Wed, 02 Feb 2005 15:26:45 GMT"/>
 		</widget>
 		<packing>
 		  <property name="expand">False</property>
@@ -214,15 +304,14 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkToolButton" id="tool_save">
+		<widget class="GtkToolButton" id="tool_open">
 		  <property name="visible">True</property>
-		  <property name="sensitive">False</property>
-		  <property name="tooltip" translatable="yes">Save the currently running configuration</property>
-		  <property name="stock_id">gtk-save</property>
+		  <property name="tooltip" translatable="yes">Open a stored configuration</property>
+		  <property name="stock_id">gtk-open</property>
 		  <property name="visible_horizontal">True</property>
 		  <property name="visible_vertical">True</property>
 		  <property name="is_important">False</property>
-		  <signal name="clicked" handler="on_tool_save_clicked" last_modification_time="Tue, 19 Oct 2004 13:34:14 GMT"/>
+		  <signal name="clicked" handler="file_open_cb" last_modification_time="Wed, 02 Feb 2005 15:26:31 GMT"/>
 		</widget>
 		<packing>
 		  <property name="expand">False</property>
@@ -244,12 +333,51 @@
 	      </child>
 
 	      <child>
+		<widget class="GtkToolButton" id="toolbutton1">
+		  <property name="visible">True</property>
+		  <property name="stock_id">gtk-media-play</property>
+		  <property name="visible_horizontal">True</property>
+		  <property name="visible_vertical">True</property>
+		  <property name="is_important">False</property>
+		</widget>
+		<packing>
+		  <property name="expand">False</property>
+		  <property name="homogeneous">True</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkToolButton" id="toolbutton2">
+		  <property name="visible">True</property>
+		  <property name="stock_id">gtk-media-pause</property>
+		  <property name="visible_horizontal">True</property>
+		  <property name="visible_vertical">True</property>
+		  <property name="is_important">False</property>
+		</widget>
+		<packing>
+		  <property name="expand">False</property>
+		  <property name="homogeneous">True</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkSeparatorToolItem" id="separatortoolitem3">
+		  <property name="visible">True</property>
+		  <property name="draw">True</property>
+		  <property name="visible_horizontal">True</property>
+		  <property name="visible_vertical">True</property>
+		</widget>
+		<packing>
+		  <property name="expand">False</property>
+		  <property name="homogeneous">False</property>
+		</packing>
+	      </child>
+
+	      <child>
 		<widget class="GtkToolButton" id="tool_clean">
 		  <property name="visible">True</property>
 		  <property name="tooltip" translatable="yes">Stop and remove all components</property>
-		  <property name="label" translatable="yes"></property>
-		  <property name="use_underline">True</property>
-		  <property name="stock_id">gtk-clear</property>
+		  <property name="stock_id">gtk-stop</property>
 		  <property name="visible_horizontal">True</property>
 		  <property name="visible_vertical">True</property>
 		  <property name="is_important">False</property>
@@ -275,14 +403,14 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkToolButton" id="tool_quit">
+		<widget class="GtkToolButton" id="toolbutton_wizard">
 		  <property name="visible">True</property>
-		  <property name="tooltip" translatable="yes">Quit the administration tool</property>
-		  <property name="stock_id">gtk-quit</property>
+		  <property name="label" translatable="yes"></property>
+		  <property name="use_underline">True</property>
 		  <property name="visible_horizontal">True</property>
 		  <property name="visible_vertical">True</property>
 		  <property name="is_important">False</property>
-		  <signal name="clicked" handler="on_tool_quit_clicked" last_modification_time="Tue, 19 Oct 2004 13:31:37 GMT"/>
+		  <signal name="clicked" handler="manage_run_wizard_cb" last_modification_time="Wed, 02 Feb 2005 15:25:19 GMT"/>
 		</widget>
 		<packing>
 		  <property name="expand">False</property>

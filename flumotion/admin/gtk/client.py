@@ -50,14 +50,14 @@ class Window(log.Loggable, gobject.GObject):
     def __init__(self, model):
         self.__gobject_init__()
         
+        self.widgets = {}
+        self.debug('creating UI')
+        self._create_ui()
+
         self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
                                          # disconnected
 
-        self.debug('creating UI')
-        self.window = self._create_ui()
-
-        self.admin = None
         self._planetState = None
         self._components = None # name -> default flow + atmosphere
 
@@ -97,12 +97,30 @@ class Window(log.Loggable, gobject.GObject):
         # returns the window
         # called from __init__
         wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'admin.glade'))
-        window = wtree.get_widget('main_window')
+        wtree.signal_autoconnect(self)
+
+        for widget in wtree.get_widget_prefix(''):
+            self.widgets[widget.get_name()] = widget
+        widgets = self.widgets
+
+        window = self.window = widgets['main_window']
         iconfile = os.path.join(configure.imagedir, 'fluendo.png')
         gtk.window_set_default_icon_from_file(iconfile)
         window.set_icon_from_file(iconfile)
         
-        self.hpaned = wtree.get_widget('hpaned')
+        iconfile = os.path.join(configure.imagedir, 'fluendo.png')
+        gtk.window_set_default_icon_from_file(iconfile)
+
+        m = widgets['menuitem_manage_run_wizard']
+        iconfile = os.path.join(configure.imagedir, '16x16', 'wizard.png')
+        i = gtk.Image(); i.set_from_file(iconfile)
+        m.set_property('image', i)
+        iconfile = os.path.join(configure.imagedir, '24x24', 'wizard.png')
+        i = gtk.Image(); i.set_from_file(iconfile)
+        t = widgets['toolbutton_wizard']
+        t.set_icon_widget(i)
+
+        self.hpaned = widgets['hpaned']
         # too blatant self-promotion ?
         #old = self.hpaned.get_child2()
         #self.hpaned.remove(old)
@@ -113,15 +131,12 @@ class Window(log.Loggable, gobject.GObject):
  
         window.connect('delete-event', self.close)
 
-        wtree.signal_autoconnect(self)
-
-        self.components_view = parts.ComponentsView(
-            wtree.get_widget('component_view'))
-        self.components_view.connect('selected',
+        self.components_view = parts.ComponentsView(widgets['component_view'])
+        self.components_view.connect('selected', 
             self._components_view_selected_cb)
         self.components_view.connect('activated',
             self._components_view_activated_cb)
-        self.statusbar = parts.AdminStatusbar(wtree.get_widget('statusbar'))
+        self.statusbar = parts.AdminStatusbar(widgets['statusbar'])
         return window
 
 
@@ -619,62 +634,22 @@ class Window(log.Loggable, gobject.GObject):
   
     # menubar/toolbar callbacks
     def file_new_cb(self, button):
-        self.runWizard()
+        raise NotImplementedError()
 
     def file_open_cb(self, button):
-        dialog = gtk.FileChooserDialog("Open..", self.window,
-                                       gtk.FILE_CHOOSER_ACTION_OPEN,
-                                       (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                        gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-        dialog.set_default_response(gtk.RESPONSE_OK)
-
-        directory = os.path.join(os.environ['HOME'], '.flumotion')
-        if os.path.exists(directory):
-            dialog.set_current_folder(directory)
-             
-        response = dialog.run()
-        if response == gtk.RESPONSE_OK:
-            filename = dialog.get_filename()
-        elif response == gtk.RESPONSE_CANCEL:
-            dialog.destroy()
-            return
-        
-        dialog.hide()
-        configuration = open(filename).read()
-        self.admin.loadConfiguration(configuration)
-        dialog.destroy()
+        raise NotImplementedError()
+        #configuration = open(filename).read()
+        #self.admin.loadConfiguration(configuration)
+        #dialog.destroy()
     
-    def file_save_cb(self, button):
-        dialog = gtk.FileChooserDialog("Save as..", self.window,
-                                       gtk.FILE_CHOOSER_ACTION_SAVE,
-                                       (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                        gtk.STOCK_SAVE, gtk.RESPONSE_OK))
-        dialog.set_default_response(gtk.RESPONSE_OK)
-
-        directory = os.path.join(os.environ['HOME'], '.flumotion')
-        if os.path.exists(directory):
-            dialog.set_current_folder(directory)
-
-        response = dialog.run()
-        if response == gtk.RESPONSE_OK:
-            filename = dialog.get_filename()
-        elif response == gtk.RESPONSE_CANCEL:
-            dialog.destroy()
-            return
-        
-        dialog.hide()
-
-        fd = open(filename, 'w')
-        # FIXME: where is this config supposed to come from ??
-        #fd.write(configuration)
-        fd.close()
-        dialog.destroy()
-
     def file_quit_cb(self, button):
         self.close()
     
-    def edit_properties_cb(self, button):
-        raise NotImplementedError
+    def manage_stop_all_cb(self, button):
+        self.admin.cleanComponents()
+        
+    def manage_run_wizard_cb(self, x):
+        self.runWizard()
 
     def debug_reload_manager_cb(self, button):
         self.admin.reloadManager()
@@ -731,9 +706,10 @@ class Window(log.Loggable, gobject.GObject):
         version.show()
 
         text = 'Flumotion is a streaming media server\n\n(C) 2004-2005 Fluendo S.L.'
-        authors = ('Johan Dahlin &lt;johan@fluendo.com&gt;',
-                   'Thomas Vander Stichele &lt;thomas@fluendo.com&gt;',
-                   'Wim Taymans &lt;wim@fluendo.com&gt;')
+        authors = ('Andy Wingo',
+                   'Johan Dahlin',
+                   'Thomas Vander Stichele',
+                   'Wim Taymans')
         text += '\n\n<small>Authors:\n'
         for author in authors:
             text += '  %s\n' % author
@@ -750,13 +726,6 @@ class Window(log.Loggable, gobject.GObject):
         dialog.run()
         dialog.destroy()
 
-    on_tool_open_clicked = file_open_cb
-    on_tool_save_clicked = file_save_cb
-    on_tool_quit_clicked = file_quit_cb
-
-    def on_tool_clean_clicked(self, button):
-        self.admin.cleanComponents()
-        
     def show(self):
         # XXX: Use show()
         self.window.show_all()
