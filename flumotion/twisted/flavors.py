@@ -28,6 +28,10 @@ from twisted.internet import defer
 from twisted.python import components
 from twisted.spread import pb
 
+# T1.3: suppress components warnings in Twisted 2.0
+from flumotion.twisted import compat
+compat.filterWarnings(components, 'ComponentsDeprecationWarning')
+
 ### Generice Cacheable/RemoteCache for state objects
 class IStateListener(components.Interface):
     """

@@ -33,6 +33,10 @@ from flumotion.component import component
 from flumotion.component.bouncers import bouncer
 from flumotion.twisted import credentials, checkers
 
+# T1.3: suppress components warnings in Twisted 2.0
+from flumotion.twisted import compat
+compat.filterWarnings(components, 'ComponentsDeprecationWarning')
+
 __all__ = ['HTPasswdCrypt']
 
 class HTPasswdCrypt(bouncer.Bouncer):

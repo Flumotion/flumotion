@@ -1,3 +1,16 @@
+2005-03-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_twisted_compat.py:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/compat.py:
+	  add a twisted.compat to help alleviate 1.3/2.0 transition issues
+	  add unit tests for it working on both 1.3 and 2.0
+
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/twisted/flavors.py:
+	  use the warning filter
+
 2005-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/flumotion-admin.in:
