@@ -73,7 +73,7 @@ export PYTHONPATH=$PYGST_DIR:$PYTHONPATH
 AS_PYTHON_IMPORT([gst],,
                  AC_MSG_ERROR([Maybe you forgot to set your PYTHONPATH?]))
 
-AS_PYTHON_IMPORT([gst.interfaces],,
+AS_PYTHON_IMPORT([gst, gst.interfaces],,
                  AC_MSG_ERROR([You need to recompile gst-python with gst.interfaces support]))
 
 dnl check for epydoc
