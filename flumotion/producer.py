@@ -18,103 +18,31 @@
 #
 
 import re
+import optik
 import sys
-    
-import gobject
-import gst
 
+# Workaround for non existent popt integration
+_sys_argv = sys.argv
+sys.argv = sys.argv[:1]
+
+# XXX: Why does this have to be done before the reactor import?
+#      Find out a better way
 if __name__ == '__main__':
     import gstreactor
     gstreactor.install()
-
+    
+import gst
 from twisted.internet import reactor
 from twisted.python import log
 from twisted.spread import pb
 
-import pbutil
-import gstutils
+from component import Component
 
-class Producer(pb.Referenceable):
-    def __init__(self, username, host, port, pipeline_string):
-        factory = pb.PBClientFactory()
-        reactor.connectTCP(host, port, factory)
-        defered = factory.login(pbutil.Username('prod_%s' % username),
-                                client=self)
-        defered.addCallback(self.got_perspective_cb)
+class Producer(Component):
+    def __init__(self, name, host, port, pipeline):
+        Component.__init__(self, name, host, port)
         
-        self.pipeline_string = pipeline_string
-        self.persp = None
-        self.pipeline = None
-        self.pipeline_signals = []
-        
-    def got_perspective_cb(self, persp):
-        #reactor.callLater(2, setattr, self, 'persp', persp)
-        self.persp = persp
-        
-    def pipeline_error_cb(self, object, element, error, arg):
-        log.msg('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
-        if self.persp:
-            self.persp.callRemote('error', element.get_path_string(), error.message)
-        else:
-            print 'skipping remote-error, no perspective'
-
-        # XXX: Maybe do this from controller
-        self.prepare()
-        
-    def pipeline_state_change_cb(self, element, old, state):
-        log.msg('pipeline state-changed %s %s -> %s' % (element.get_path_string(),
-                                                        gst.element_state_get_name(old),
-                                                        gst.element_state_get_name(state)))
-        if self.persp is not None:
-            self.persp.callRemote('stateChanged', old, state)
-        else:
-            print 'skipping state-changed, no perspective'
-        
-    def pipeline_deep_notify_cb(self, object, orig, pspec):
-        log.msg('deep-notify %s: %s = %s' % (orig.get_path_string(),
-                                             pspec.name,
-                                             orig.get_property(pspec.name)))
-
-    def pipeline_pause(self):
-        retval = self.pipeline.set_state(gst.STATE_PAUSED)
-        if not retval:
-            log.msg('WARNING: Changing state to PLAYING failed')
-        gobject.idle_add(self.pipeline.iterate)
-        
-    def pipeline_play(self):
-        retval = self.pipeline.set_state(gst.STATE_PLAYING)
-        if not retval:
-            log.msg('WARNING: Changing state to PLAYING failed')
-        gobject.idle_add(self.pipeline.iterate)
-
-    def prepare(self):
-        if self.persp is None:
-            log.msg('WARNING: We are not ready yet, waiting 250 ms')
-            reactor.callLater(0.250, self.prepare)
-            return
-
-        log.msg('prepare called')
-
-        if self.pipeline is not None:
-            if self.pipeline.get_state() != gst.STATE_NULL:
-                log.msg('Pipeline was in state %s, changing to NULL' %
-                        gst.element_state_get_name(self.pipeline.get_state()))
-                self.pipeline.set_state(gst.STATE_NULL)
-            # Disconnect signals
-            map(self.pipeline.disconnect, self.pipeline_signals)
-            self.pipeline = None
-            self.pipeline_signals = []
-            
-        pipeline = '%s ! tcpserversink name=sink' % self.pipeline_string
-        
-        log.msg('going to run pipeline: %s' % pipeline)
-        self.pipeline = gst.parse_launch(pipeline)
-        sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
-        self.pipeline_signals.append(sig_id)
-        sig_id = self.pipeline.connect('state-change', self.pipeline_state_change_cb)
-        self.pipeline_signals.append(sig_id)
-        sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
-        self.pipeline_signals.append(sig_id)
+        self.pipeline_string = '%s ! tcpserversink name=sink' % pipeline
         
     def listen(self, host, port):
         log.msg('Going to listen on port %d' % port)
@@ -126,30 +54,49 @@ class Producer(pb.Referenceable):
         
         self.pipeline_play()
         
-    # Remote interface
-    def remote_prepare(self):
-        self.prepare()
-
     def remote_listen(self, host, port):
         self.listen(host, port)
         
-if __name__ == '__main__':
-    log.startLogging(sys.stdout)
-    
-    if len(sys.argv) == 2:
-        pipeline = sys.argv[1]
-        controller = ''
-    elif len(sys.argv) == 3:
-        pipeline = sys.argv[1] 
-        controller = sys.argv[2]
-    else:
-        print 'Usage: producer.py pipeline [controller-host[:port]]'
-        sys.exit(2)
+def main(args):
+    parser = optik.OptionParser()
+    parser.add_option('-c', '--controller',
+                      action="store", type="string", dest="host",
+                      default="localhost:8890",
+                      help="Controller to connect to default localhost:8890]")
+    parser.add_option('-n', '--name',
+                      action="store", type="string", dest="name",
+                      default=None,
+                      help="Name of component")
+    parser.add_option('-p', '--pipeline',
+                      action="store", type="string", dest="pipeline",
+                      default=None,
+                      help="Pipeline to run")
+    parser.add_option('-v', '--verbose',
+                      action="store_true", dest="verbose",
+                      help="Be verbose")
 
-    name = 'johan'
-    host = controller
-    port = 8890
+    options, args = parser.parse_args(args)
+
+    if options.pipeline is None:
+        print 'Need a pipeline'
+        return 2
+
+    if options.name is None:
+        print 'Need a name'
+        return 2
+
+    if options.verbose:
+        log.startLogging(sys.stdout)
+
+    if ':' in options.host:
+        host, port = options.split(options.host)
+    else:
+        host = options.host
+        port = 8890
+
     log.msg('Connect to %s on port %d' % (host, port))
-    client = Producer(name, host, port, pipeline)
+    client = Producer(options.name, host, port, options.pipeline)
     reactor.run()
-    
+
+if __name__ == '__main__':
+    sys.exit(main(_sys_argv))

@@ -20,73 +20,39 @@
 import pygtk
 pygtk.require('2.0')
 
-import re
+import optik
 import socket
 import sys
-    
-import gobject
-import gst
 
+# Workaround for non existent popt integration
+_sys_argv = sys.argv
+sys.argv = sys.argv[:1]
+
+# XXX: Why does this have to be done before the reactor import?
+#      Find out a better way
 if __name__ == '__main__':
     import gstreactor
     gstreactor.install()
+    
+import gst
 
 from twisted.internet import reactor
 from twisted.python import log
 from twisted.spread import pb
 
-import pbutil
+from component import Component
 import gstutils
 
-class Converter(gobject.GObject, pb.Referenceable):
-    __gsignals__ = {
-        'data-recieved': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
-                          (gst.Buffer,)),
-    }
-    def __init__(self, username, host, port, pipeline):
-        self.__gobject_init__()
-        self.host = host
-        factory = pb.PBClientFactory()
-        reactor.connectTCP(host, port, factory)
-        defered = factory.login(pbutil.Username('conv_%s' % username),
-                                client=self)
-        defered.addCallback(self.got_perspective_cb)
-        self.pipeline_string = pipeline
-        
-    def got_perspective_cb(self, persp):
-        self.persp = persp
-        
-    def pipeline_error_cb(self, object, element, error, arg):
-        log.msg('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
-        self.persp.callRemote('error', element.get_path_string(), error.message)
-
-    def pipeline_state_change_cb(self, element, old, state):
-        log.msg('pipeline state-changed %s %s -> %s' % (element.get_path_string(),
-                                                        gst.element_state_get_name(old),
-                                                        gst.element_state_get_name(state)))
-        self.persp.callRemote('stateChanged', old, state)
-        
-    def pipeline_pause(self):
-        retval = self.pipeline.set_state(gst.STATE_PAUSED)
-        if not retval:
-            log.msg('Changing state to PAUSED failed')
-        gobject.idle_add(self.pipeline.iterate)
-        
-    def pipeline_play(self):
-        retval = self.pipeline.set_state(gst.STATE_PLAYING)
-        if not retval:
-            log.msg('Changing state to PLAYING failed')
-        gobject.idle_add(self.pipeline.iterate)
+class Converter(Component):
+    def __init__(self, name, host, port, pipeline, source):
+        Component.__init__(self, name, host, port)
+        self.pipeline_string = 'tcpclientsrc name=source ! ' + \
+                               '%s ! tcpserversink name=sink' % pipeline
+        self.source = source
         
     def start(self, source_port, sink_host, sink_port):
         log.msg('(source) Going to listen on port %d' % source_port)
         log.msg('(sink)   Going to connect to %s:%d' % (sink_host, sink_port))
-        
-        pipe = 'tcpclientsrc name=source ! %s ! tcpserversink name=sink'
-        self.pipeline = gst.parse_launch(pipe % self.pipeline_string)
-        self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
-        self.pipeline.connect('error', self.pipeline_error_cb)
-        self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         
         source = self.pipeline.get_by_name('source')
         source.set_property('host', sink_host)
@@ -96,42 +62,60 @@ class Converter(gobject.GObject, pb.Referenceable):
         sink.set_property('port', sink_port)
         
         reactor.callLater(0, self.pipeline_play)
-        log.msg('returning from listen')
+        log.msg('returning from start')
 
-    # XXX: Rename to get_controller_host or something
-    def remote_prepare(self):
-        return socket.gethostbyname(self.host)
-    
     def remote_start(self, source_port, sink_host, sink_port):
         self.start(source_port, sink_host, sink_port)
+        
+def main(args):
+    parser = optik.OptionParser()
+    parser.add_option('-c', '--controller',
+                      action="store", type="string", dest="host",
+                      default="localhost:8890",
+                      help="Controller to connect to default localhost:8890]")
+    parser.add_option('-n', '--name',
+                      action="store", type="string", dest="name",
+                      default=None,
+                      help="Name of component")
+    parser.add_option('-p', '--pipeline',
+                      action="store", type="string", dest="pipeline",
+                      default=None,
+                      help="Pipeline to run")
+    parser.add_option('-s', '--source',
+                      action="store", type="string", dest="source",
+                      default=None,
+                      help="Host source to get data from")
+    parser.add_option('-v', '--verbose',
+                      action="store_true", dest="verbose",
+                      help="Be verbose")
 
-        
-def parseHostString(string, port=8890):
-    if not string:
-        return 'localhost', port
+    options, args = parser.parse_args(args)
+
+    if options.pipeline is None:
+        print 'Need a pipeline'
+        return 2
+
+    if options.name is None:
+        print 'Need a name'
+        return 2
+
+    if options.source is None:
+        print 'Need a source'
+        return 2
     
-    try:
-        host, port = re.search(r'(.+):(\d+)', string).groups()
-    except:
-        host = string
-        
-    return host, port
+    if options.verbose:
+        log.startLogging(sys.stdout)
+
+    if ':' in options.host:
+        host, port = options.split(options.host)
+    else:
+        host = options.host
+        port = 8890
+
+    log.msg('Connect to %s on port %d' % (host, port))
+    client = Converter(options.name, host, port,
+                       options.pipeline, options.source)
+    reactor.run()
     
 if __name__ == '__main__':
-    log.startLogging(sys.stdout)
-
-    if len(sys.argv) == 2:
-        pipeline = sys.argv[1]
-        controller = ''
-    elif len(sys.argv) == 3:
-        pipeline = sys.argv[1] 
-        controller = sys.argv[2]
-    else:
-        print 'Usage: converter.py pipeline [controller-host[:port]]'
-        sys.exit(2)
-        
-    name = 'johan'
-    host, port = parseHostString(controller)
-    log.msg('Connect to %s on port %d' % (host, port))
-    client = Converter(name, host, port, pipeline)
-    reactor.run()
+    sys.exit(main(_sys_argv))

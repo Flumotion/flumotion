@@ -61,74 +61,40 @@ class Dispatcher:
         return (pb.IPerspective, p,
                 lambda p=p,mind=mind: p.detached(mind))
 
-class ProducerPerspective(pbutil.NewCredPerspective):
-    def __init__(self, controller, username):
-        self.controller = controller
-        self.username = username
-        self.state = gst.STATE_NULL
-        self.ready = False
-        
-    def __repr__(self):
-        return '<ProducerPerspective for %s>' % self.username
-    
-    def getPeer(self):
-        return self.mind.broker.transport.getPeer()
-
-    def after_prepare_cb(self, obj):
-        self.controller.componentReady(self)
-        
-    def attached(self, mind):
-        log.msg('%s attached, preparing' % self.username)
-        
-        cb = mind.callRemote('prepare')
-        cb.addCallback(self.after_prepare_cb)
-
-        self.mind = mind
-        
-    def detached(self, mind):
-        log.msg('%r detached' % mind)
-        self.controller.removeComponent(self)
-
-    def perspective_stateChanged(self, old, state):
-        log.msg('%s.stateChanged %s -> %s' %
-                (self.username,
-                 gst.element_state_get_name(old),
-                 gst.element_state_get_name(state)))
-        self.state = state
-        
-    def perspective_error(self, element, error):
-        log.msg('%s.error element=%s string=%s' % (self.username, element, error))
-
-class ConverterPerspective(pbutil.NewCredPerspective):
+class ComponentPerspecetive(pbutil.NewCredPerspective):
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
         self.ready = False
         self.state = gst.STATE_NULL
-        self.remote_hostname = None
-        
-    def __repr__(self):
-        return '<ConverterPerspective for %s>' % self.username
+        self.remote_host = None
 
     def getPeer(self):
         return self.mind.broker.transport.getPeer()
 
+    # XXX: Rename
     def getControllerHostname(self):
-        return self.remote_hostname
+        return self.remote_host
     
+    def after_register_cb(self, host, cb):
+        if host == None:
+            cb = self.mind.callRemote('register')
+            cb.addCallback(self.after_register_cb, cb)
+            return
+        self.remote_host = host
+        
+        self.controller.componentReady(self)
+        
     def attached(self, mind):
-        log.msg('%s attached, preparing' % self.username)
-        defer = mind.callRemote('prepare')
-        defer.addCallback(self.prepareDone)
+        log.msg('%s attached, registering' % self.username)
         self.mind = mind
+        
+        cb = mind.callRemote('register')
+        cb.addCallback(self.after_register_cb, cb)
         
     def detached(self, mind):
         log.msg('%r detached' % mind)
         self.controller.removeComponent(self)
-        
-    def prepareDone(self, hostname):
-        self.remote_hostname = hostname
-        self.controller.componentReady(self)
 
     def perspective_stateChanged(self, old, state):
         log.msg('%s.stateChanged %s -> %s' %
@@ -140,18 +106,17 @@ class ConverterPerspective(pbutil.NewCredPerspective):
     def perspective_error(self, element, error):
         log.msg('%s.error element=%s string=%s' % (self.username, element, error))
         
+        self.ready = False
+        cb = self.mind.callRemote('register')
+        cb.addCallback(self.after_register_cb)
+
 class Controller(pb.Root):
     def __init__(self):
         self.components = {}
         
     def getPerspective(self, username):
-        if username.startswith('prod_'):
-            component = ProducerPerspective(self, username)
-        elif username.startswith('conv_'):
-            component = ConverterPerspective(self, username)
-
+        component = ComponentPerspective(self, username)
         self.addComponent(username, component)
-
         return component
 
     def addComponent(self, name, component):
@@ -186,6 +151,9 @@ class Controller(pb.Root):
                 prev = curr
 
     def link(self, prod, conv):
+        assert prod.ready
+        assert conv.ready
+        
         prod_port = 5500
         conv_port = 5501
         proto, prod_hostname, port = prod.getPeer()
