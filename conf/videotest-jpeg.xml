@@ -21,7 +21,7 @@
     <source>png-overlay</source>
   </component>
 
-  <component name="jpeg+multipart" type="multipartjpeg">
+  <component name="jpeg+multipart-big" type="multipartjpeg">
     <source>videotest-producer-big</source>
   </component>
 

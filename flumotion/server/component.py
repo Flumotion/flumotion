@@ -50,6 +50,8 @@ class BaseComponent(pb.Referenceable):
         self.pipeline = None
         self.pipeline_signals = []
 
+        self.setup_pipeline()
+
         # Prefix our login name with the name of the component
         self.username = name
         self.factory = ComponentClientFactory()
@@ -202,11 +204,10 @@ class BaseComponent(pb.Referenceable):
             self.warning('We are not ready yet, waiting 250 ms')
             reactor.callLater(0.250, self.remote_register)
             return
-        
-        self.setup_pipeline()
 
+        pipeline = self.get_pipeline()
         element_names = [element.get_name()
-                            for element in self.pipeline.get_list()]
+                            for element in pipeline.get_list()]
 
         return {'ip' : self.getIP(),
                 'pid' :  os.getpid(), 
