@@ -24,8 +24,6 @@
 
 * MEDIUM	allow expression of "test component depends on streamer component"
 
-* EASY		make all pb. factories called Client or Server so it's obvious
-
 - API cleanup:
 
 - manager/component.py:
