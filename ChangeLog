@@ -1,3 +1,10 @@
+2005-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/gtkunit.py:
+	* flumotion/test/test_greeter.py:
+	  clicked buttons flash
+	  entries get typed in
+
 2005-03-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/gtkunit.py: New file, implements some functions

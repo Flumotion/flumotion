@@ -25,7 +25,7 @@ except RuntimeError:
     import os
     os._exit(0)
 
-_INTERVAL = 10 # in ms
+_INTERVAL = 1 # in ms
 
 _WINDOW = None
 def set_window(w):
@@ -41,13 +41,14 @@ def _assert(expr):
         raise # to show the backtrace
     FAILED = True
 
-def timeout_add(proc):
+def timeout_add(proc, increase=True):
     def proc_no_return():
         proc()
     gobject.timeout_add(timeout_add.n * _INTERVAL, proc_no_return)
-    timeout_add.n += 1
+    if increase:
+        timeout_add.n += 1
 timeout_add.n = 0
-        
+         
 def find_widget(parent, name):
     if parent.get_name() == name:
         return parent
@@ -58,13 +59,20 @@ def find_widget(parent, name):
                 return found
     return None
             
-def call(name, method, *args, **kwargs):
+def _call(increase, name, method, *args, **kwargs):
     def check():
         w = find_widget(_WINDOW, name)
         assert w
         m = getattr(w, method)
         m(*args, **kwargs)
-    timeout_add(check)
+
+    timeout_add(check, increase=increase)
+
+def call(name, method, *args, **kwargs):
+    _call(False, name, method, *args, **kwargs)
+
+def call_inc(name, method, *args, **kwargs):
+    _call(True, name, method, *args, **kwargs)
 
 def assert_call_returns(name, method, val, *args, **kwargs):
     def check():

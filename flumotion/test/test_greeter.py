@@ -29,10 +29,18 @@ from flumotion.admin.gtk import greeter, wizard
 
 
 def click(name):
-    call(name, 'emit', 'clicked')
+    call_inc(name, 'set_relief', gtk.RELIEF_HALF)
+    call_inc(name, 'set_relief', gtk.RELIEF_NORMAL)
+    call_inc(name, 'emit', 'clicked')
 
 def set_text(name, text):
-    call(name, 'set_text', text)
+    call(name, 'grab_focus')
+    call_inc(name, 'delete_text', 0, -1)
+    for i in range(len(text)):
+        call(name, 'set_position', i)
+        call(name, 'insert_text', text[i], i)
+        call_inc(name, 'set_position', i + 1)
+
 
 def check_text(name, text):
     assert_call_returns(name, 'get_text', text)
@@ -68,7 +76,7 @@ class WizardTest(unittest.TestCase):
         prev()
         next()
         check_prev_next(True, True)
-        set_text('host_entry', 'foo')
+        set_text('host_entry', 'foolio')
         check_prev_next(True, True)
         click('ssl_check')
         check_text('port_entry', '8642')
@@ -88,6 +96,6 @@ class WizardTest(unittest.TestCase):
         assert_not_failed()
         wiz.destroy()
         
-        refstate = {'passwd': 'baz', 'host': 'foo', 'port': 8642,
+        refstate = {'passwd': 'baz', 'host': 'foolio', 'port': 8642,
                     'use_insecure': True, 'user': 'bar'}
         assert state == refstate
