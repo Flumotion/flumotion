@@ -28,11 +28,6 @@
 
 * MEDIUM	allow expression of "test component depends on streamer component"
 
-* MEDIUM	implement moods of component:
-		- angry: error
-		- happy: running
-		- hungry/bored: waiting for feeds to start
-
 * EASY:		change rawstring regentry type to string, and make pipelinestring for pipelines which need \n translated to space
 * EASY		and force update every minute,
 		or when stats are different from last,
@@ -63,6 +58,20 @@
 
 * HARD		split up source code layout according to bundleability
 
+* EASY		run with debug level 3 and make all messages "sane"
+		and symmetric
+
+* MEDIUM	implement cacheable Heavens for workers and components
+		to admin
+
+* HARD		work on proxyable state so that manager can initially create
+		it then send it to admin who then becomes master
+
+* MEDIUM	create Directed Acyclic Graph class and use it for
+		- bundle dependencies
+		- component dependencies
+		and possibly remove feederset
+		
 - API cleanup:
 
 - manager/component.py:

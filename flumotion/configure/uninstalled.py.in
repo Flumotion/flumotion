@@ -30,13 +30,16 @@ def get():
 
     # some special magic for the registry location
     registrydir = os.path.join(__toplevel, 'cache', 'registry')
+    rundir = os.path.join(__toplevel, 'run')
     # distcheck hack: if we live in a path containing _build, it means
     # we're running in distcheck mode and we should write everything
     # under the writable builddir
     if os.getcwd().find('_build'):
         srcdir = os.getcwd().split('_build')[0]
         top_builddir = os.path.join(srcdir, '_build')
+
         registrydir = os.path.join(top_builddir, 'cache', 'registry')
+        rundir = os.path.join(top_builddir, 'run')
 
     return {
         'isinstalled': False,
@@ -47,6 +50,6 @@ def get():
         'logdir':        os.path.join(__toplevel, 'log'),
         'pythondir':     os.path.join(__toplevel),
         'registrydir':   registrydir,
-        'rundir':        os.path.join(__toplevel, 'run'),
+        'rundir':        rundir,
         'version':       '@VERSION@',
     }
