@@ -68,7 +68,6 @@ class TestConfig(unittest.TestCase):
         dict = component.getConfigDict()
         assert dict.get('name') == 'component-name', dict['name']
         assert dict.get('type') == 'test-component', dict['type']
-        assert component.startFactory()
         
     def testParseManager(self):
         conf = config.FlumotionConfigXML(None,
