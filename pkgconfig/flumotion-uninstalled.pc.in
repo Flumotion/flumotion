@@ -1,7 +1,8 @@
 # the standard variables don't make sense for an uninstalled copy
 prefix=
 exec_prefix=
-flumotiondir=${pcfiledir}/../flumotion
+
+flumotiondir=${pcfiledir}/..
 
 Name: Flumotion Uninstalled
 Description: Streaming media server, Not Installed

@@ -1,7 +1,7 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
-flumotiondir=${libdir}/flumotion/python/flumotion
+flumotiondir=${libdir}/flumotion/python
 
 Name: Flumotion
 Description: Streaming media server

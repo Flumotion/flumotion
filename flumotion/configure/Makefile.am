@@ -1,7 +1,5 @@
 include $(top_srcdir)/python.mk
                                                                                 
-INCLUDES = $(PYTHON_INCLUDES)
-
 flumotiondir = $(libdir)/flumotion/python/flumotion/configure
 
 flumotion_PYTHON = \

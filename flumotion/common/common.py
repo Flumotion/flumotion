@@ -242,9 +242,9 @@ def _listRecursively(path):
             
     return retval
 
-def _findPackageCandidates(path):
+def _findPackageCandidates(path, prefix='flumotion'):
     """
-    I take a directory and returns a list of candidate python packages.
+    I take a directory and return a list of candidate python packages.
 
     @param path: the path
     @type  path: string
@@ -257,20 +257,28 @@ def _findPackageCandidates(path):
 
     # chop off the base path to get a list of "relative" bundlespace paths
     bundlePaths = [x[len(path) + 1:] for x in dirs]
+    # convert paths to module namespace
     bundlePackages = [".".join(x.split(os.path.sep)) for x in bundlePaths]
+    # remove all not starting with prefix
+    for p in bundlePackages:
+        if not p.startswith(prefix):
+            bundlePackages.remove(p)
 
     # sort them so that depending packages are after higher-up packages
     bundlePackages.sort()
         
     return bundlePackages
 
-def registerPackagePath(packagePath):
+def registerPackagePath(packagePath, prefix='flumotion'):
     """
     Register a given path as a path that can be imported from.
-    Used to support partition of bundled code.
+    Used to support partition of bundled code or import code from various
+    uninstalled location.
 
-    @param packagePath: path to add
+    @param packagePath: path to add under which the module namespaces live.
     @type  packagePath: string
+    @param prefix:      prefix of the packages to be considered
+    @type  prefix:      string
     """
 
     # FIXME: this should potentially also clean up older registered package
@@ -283,18 +291,22 @@ def registerPackagePath(packagePath):
     # fancy stuff later on.
     abs = os.path.abspath(packagePath)
     if not abs in sys.path:
+        log.log('bundle', 'adding packagePath %s to sys.path' % packagePath)
         sys.path.append(abs)
 
     # Find the packages in the path and sort them,
     # the following algorithm only works if they're sorted.
     # By sorting the list we can ensure that a parent package
-    # is always processed before one of its childrens
-    packageNames = _findPackageCandidates(packagePath)
+    # is always processed before one of its children
+    packageNames = _findPackageCandidates(packagePath, prefix)
     packageNames.sort()
 
     if not packageNames:
+        log.log('bundle', 'packagePath %s does not have package candidates' %
+            packagePath)
         return
 
+    log.log('bundle', 'package candidates %r' % packageNames)
     # Since the list is sorted, the top module is the first item
     log.log('bundle', 'packagePath %s has packageNames %r' % (
         packagePath, packageNames)) 
@@ -309,6 +321,8 @@ def registerPackagePath(packagePath):
         name = ".".join(partials)
         try:
             package = reflect.namedAny(name)
+        #except ValueError: # Empty module name, ie. subdir has no __init__
+        #    continue
         except:
             print "ERROR: could not reflect name %s" % name
             raise
@@ -334,8 +348,10 @@ def registerPackagePath(packagePath):
         rebuild.rebuild(package)
 
         if not subPath in package.__path__:
-            # insert because FLU_REGISTRY_PATH paths should override
+            # insert at front because FLU_REGISTRY_PATH paths should override
             # base components
+            log.log('bundle', 'inserting subPath %s for package %r' % (
+                subPath, package))
             package.__path__.insert(0, subPath)
 
 def ensureDir(dir, description):

@@ -1,3 +1,14 @@
+2005-01-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
+	* flumotion/configure/Makefile.am:
+	  add prefix when looking for package candidates.  Fixes some issues
+	  when trying to registerPackagePaths from outside flumotion.
+	* pkgconfig/Makefile.am:
+	* pkgconfig/flumotion-uninstalled.pc.in:
+	* pkgconfig/flumotion.pc.in:
+	  point to the base dir under which flumotion lives instead
+
 2005-01-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac: prerelease
