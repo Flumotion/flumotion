@@ -1,3 +1,12 @@
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/save.py: Boolean expression was broken, it's
+	now as it should be.
+	* flumotion/wizard/steps.py: Don't skip audio encoding page if we
+	have both audio and video. Don't skip encoding if we're chosing a
+	audio page without a configuration, instead of going directly to
+	consumption page.
+
 2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/Makefile.am:

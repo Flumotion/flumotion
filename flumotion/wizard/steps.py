@@ -108,7 +108,7 @@ class Source(wizard.WizardStep):
             if audio_source == AudioDevice.Soundcard:
                 return 'Audio Source'
             else:
-                return 'Consumption'
+                return 'Encoding'
         raise AssertionError
 wizard.register_step(Source)
 
@@ -363,8 +363,10 @@ class Encoding(wizard.WizardStep):
                 return 'Smoke'
             elif codec == EncodingVideo.JPEG:
                 return 'JPEG'
-            
-        return 'Consumption'
+        elif self.wizard.get_step_option('Source', 'has_audio'):
+            return self.get_audio_page()
+        else:
+            return 'Consumption'
 wizard.register_step(Encoding)
 
 
