@@ -26,7 +26,7 @@
 	* flumotion/wizard/wizard_step.py:
 
 	Fix headers for encoders. Add ogg muxer, soundcard and webcam
-	component.
+	components.
 	We can now actually parse the default output of the wizard.
 	
 2004-10-12  Johan Dahlin  <johan@gnome.org>
