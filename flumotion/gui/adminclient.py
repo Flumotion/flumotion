@@ -147,6 +147,7 @@ class Window(log.Loggable):
         self.wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
         self.window = self.wtree.get_widget('main_window')
         iconfile = os.path.join(self.imagedir, 'fluendo.png')
+        gtk.window_set_default_icon_from_file(iconfile)
         self.window.set_icon_from_file(iconfile)
         self.button_change = self.wtree.get_widget('button_change')
         self.button_change.connect('clicked', self._button_change_cb)
@@ -342,7 +343,7 @@ class Window(log.Loggable):
     def close(self, *args):
         reactor.stop()
 
-def main(args, gladedir=flumotion.config.gladedir):
+def main(args):
     try:
         host = args[1]
         port = int(args[2])

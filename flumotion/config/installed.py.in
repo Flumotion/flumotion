@@ -23,5 +23,6 @@ def get():
         'installed': 1,
         'pythondir': os.path.join('@DATADIR@', 'flumotion'),
         'datadir': os.path.join('@DATADIR@', 'flumotion'),
-        'uidir':   os.path.join('@DATADIR@', 'flumotion', 'ui'),
+        'gladedir':   os.path.join('@DATADIR@', 'flumotion', 'glade'),
+        'imagedir':   os.path.join('@DATADIR@', 'flumotion', 'image'),
     }

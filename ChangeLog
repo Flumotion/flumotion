@@ -1,5 +1,14 @@
 2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-admin.in:
+	* flumotion/config/installed.py.in:
+	* flumotion/config/uninstalled.py.in:
+	  fix locations properly
+	* flumotion/gui/adminclient.py:
+	  set default icon
+
+2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/Makefile.am:
 	* bin/video-server-admin.in:
 	* configure.ac:

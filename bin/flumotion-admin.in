@@ -13,15 +13,13 @@ gtk2reactor.install()
 dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.exists(os.path.join(dir, '.svn')):
     root = os.path.split(dir)[0]
-    gladedir = os.path.join(root, 'data', 'ui')
 else:
     root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
-    gladedir = os.path.join('@prefix@', 'share', 'flumotion', 'glade')
 sys.path.insert(0, root)
 
 from flumotion.gui import adminclient
 
 def main(args):
-    return adminclient.main(args, gladedir)
+    return adminclient.main(args)
 
 sys.exit(main(sys.argv))
