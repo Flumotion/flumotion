@@ -47,6 +47,7 @@ class PipeTransport:
         
 class FakeRequest:
     transport = PipeTransport()
+    method = 'GET'
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
         self.headers = {}
