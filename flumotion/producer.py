@@ -48,8 +48,7 @@ class Producer(Component):
         log.msg('Going to listen on port %d' % port)
 
         sink = self.pipeline.get_by_name('sink')
-        if host:
-            sink.set_property('host', host)
+        sink.set_property('host', host)
         sink.set_property('port', port)
         
         self.pipeline_play()

@@ -76,6 +76,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.ready = False
         self.state = gst.STATE_NULL
         self.options = Options()
+        self.listen_port = -1
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.username)
@@ -97,8 +98,9 @@ class ComponentPerspective(pbutil.NewCredPerspective):
 
     # This method should ask the component if the port is free
     def getListenPort(self):
-        raise NotImplementedError
-    
+        assert self.listen_port != -1
+        return self.listen_port
+
     def after_register_cb(self, options, cb):
         if options == None:
             cb = self.mind.callRemote('register')
@@ -137,25 +139,17 @@ class ComponentPerspective(pbutil.NewCredPerspective):
               
 class ProducerPerspective(ComponentPerspective):
     kind = 'producer'
-    listen_port = -1
-    def getListenPort(self):
-        assert self.listen_port != -1
-        return self.listen_port
-
     def listen(self, host):
         def after_get_free_port_cb(port):
             self.listen_port = port
             self.mind.callRemote('listen', host, port)
+            
+        log.msg('Calling remote method get_free_port()')
         cb = self.mind.callRemote('get_free_port')
         cb.addCallback(after_get_free_port_cb)
         
 class ConverterPerspective(ComponentPerspective):
     kind = 'converter'
-    listen_port = -1
-    def getListenPort(self):
-        assert self.listen_port != -1
-        return self.listen_port
-
     def start(self, source_host, source_port, listen_host):
         def after_get_free_port_cb(listen_port):
             self.listen_port = listen_port
@@ -171,6 +165,12 @@ class ConverterPerspective(ComponentPerspective):
 
 class StreamerPerspective(ComponentPerspective):
     kind = 'streamer'
+
+    def getListenHost(self):
+        raise AssertionError
+    
+    def getListenPort(self):
+        raise AssertionError
 
     def connect(self, host, port):
         self.mind.callRemote('connect', host, port)
