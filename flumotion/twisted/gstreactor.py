@@ -41,7 +41,6 @@ pygtk.require('2.0')
 __all__ = ['install']
 
 import gobject
-import gst
 import sys, time
 
 # Twisted Imports
@@ -78,6 +77,7 @@ class GstReactor(default.PosixReactorBase):
 
     def __init__(self):
         self.context = gobject.MainContext()
+        
         default.PosixReactorBase.__init__(self)
         
     # The input_add function in pygtk1 checks for objects with a
@@ -156,9 +156,11 @@ class GstReactor(default.PosixReactorBase):
             self.doIterationTimer = None
 
     def crash(self):
+        import gst
         gst.main_quit()
 
     def run(self, installSignalHandlers=1):
+        import gst
         try:
             self.startRunning(installSignalHandlers=installSignalHandlers)
             self.simulate()
