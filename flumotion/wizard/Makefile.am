@@ -2,6 +2,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/wizard
 
 flumotion_PYTHON = \
 	__init__.py \
+	enums.py \
 	wizard.py \
 	wizard_step.py
 

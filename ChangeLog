@@ -1,3 +1,15 @@
+2004-10-05  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard.glade:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_enum.py:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/wizard_step.py:
+
+	More enum work.
+
 2004-10-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:
@@ -161,6 +173,17 @@
 	More wizard work. Most pages in
 	place and pretty functional. No configuration saving yet. Need a
 	little bit more logic aswell.
+
+2004-09-28  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard.glade:
+	* data/glade/wizard_audiosource.glade:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_testsource.glade:
+	* data/glade/wizard_tvcard.glade:
+	* flumotion/wizard/wizard_step.py:
+
+	Do some more wizard work
 
 2004-09-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 

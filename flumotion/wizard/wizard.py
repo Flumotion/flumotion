@@ -14,7 +14,7 @@
 
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
-
+
 import sys
 sys.path.insert(0, '../..')
 import pygtk
@@ -28,21 +28,32 @@ import gtk.glade
 
 from flumotion.config import gladedir
 from flumotion.utils import log
+from flumotion.wizard import enums
 
+
 class Stack(list):
     push = list.append
     def peek(self):
         return self[-1]
-
+
 class WizardComboBox(gtk.ComboBox):
-    COLUMN_NAME = 0
-    COLUMN_VALUE = 1
+    COLUMN_NICK = 0
+    COLUMN_NAME = 1
+    COLUMN_VALUE = 2
+
+    _column_types = (str, str, gobject.TYPE_UINT)
+    
     def __len__(self):
         model = self.get_model()
         iter = model.get_iter((0,))
         return model.iter_n_children(iter)
         
     def get_text(self):
+        iter = self.get_active_iter()
+        model = self.get_model()
+        return model.get(iter, self.COLUMN_NICK)[0]
+
+    def get_string(self):
         iter = self.get_active_iter()
         model = self.get_model()
         return model.get(iter, self.COLUMN_NAME)[0]
@@ -53,38 +64,57 @@ class WizardComboBox(gtk.ComboBox):
             model = self.get_model()
             return model.get(iter, self.COLUMN_VALUE)[0]
 
-    def set_enum(self, enum, value_filter=()):
+    def get_enum(self):
+        return self.enum_class.get(self.get_value())
+    
+    def set_enum(self, enum_class, value_filter=()):
         model = self.get_model()
         model.clear()
-        for value, name in enum:
+        for enum in enum_class:
             # If values are specified
-            if value_filter and not value in value_filter:
+            if value_filter and not enum in value_filter:
                 continue
             iter = model.append()
             model.set(iter,
-                      self.COLUMN_NAME, name,
-                      self.COLUMN_VALUE, value)
+                      self.COLUMN_NAME, enum.name,
+                      self.COLUMN_VALUE, enum.value,
+                      self.COLUMN_NICK, enum.nick)
 
         self.set_active(0)
-        self.enum = enum
+        self.enum_class = enum_class
         
     def set_multi_active(self, *values): 
-        if not hasattr(self, 'enum'):
+        if not hasattr(self, 'enum_class'):
             raise TypeError
         
-        self.set_enum(self.enum, values)
+        self.set_enum(self.enum_class, values)
         if len(values) == 1:
             self.set_sensitive(False)
         else:
             self.set_sensitive(True)
 
+    def set_active(self, item):
+        if isinstance(item, enums.Enum):
+            gtk.ComboBox.set_active(self, item.value)
+        else:
+            gtk.ComboBox.set_active(self, item)
+            
+    def get_active(self):
+        value = gtk.ComboBox.get_active(self)
+        if hasattr(self, 'enum_class'):
+            value = self.enum_class.get(value)
+        return value
+
     def copy_model(self, old):
-        model = gtk.ListStore(str, gobject.TYPE_UINT)
+        model = gtk.ListStore(*self._column_types)
         value = 0
         for item in old:
+            name = old.get(item.iter, 0)[0]
             iter = model.append()
-            model.set_value(iter, 0, old.get(item.iter, 0)[0])
-            model.set_value(iter, 1, value)
+            model.set(iter,
+                      self.COLUMN_NAME, name,
+                      self.COLUMN_VALUE, value,
+                      self.COLUMN_NICK, name)
             value += 1
         self.set_model(model)
         
@@ -92,11 +122,15 @@ class WizardComboBox(gtk.ComboBox):
         return int(self.get_value())
 gobject.type_register(WizardComboBox)
 
+
+
 class WizardEntry(gtk.Entry):
     def get_state(self):
         return self.get_text()
 gobject.type_register(WizardEntry)
-    
+
+
+    
 class WizardCheckButton(gtk.CheckButton):
     def get_state(self):
         return self.get_active()
@@ -105,6 +139,8 @@ class WizardCheckButton(gtk.CheckButton):
         return self.get_active()
 gobject.type_register(WizardCheckButton)
 
+
+
 class WizardRadioButton(gtk.RadioButton):
     def get_state(self):
         return self.get_active()
@@ -113,11 +149,15 @@ class WizardRadioButton(gtk.RadioButton):
         return self.get_active()
 gobject.type_register(WizardRadioButton)
 
+
+
 class WizardSpinButton(gtk.SpinButton):
     def get_state(self):
         return self.get_value()
 gobject.type_register(WizardSpinButton)
 
+
+
 class WizardStep(object, log.Loggable):
     step_name = None # Subclass sets this
     glade_file = None # Subclass sets this
@@ -218,15 +258,14 @@ class WizardStep(object, log.Loggable):
 
         This can be implemented in a subclass."""
 
+        
+
 class Wizard:
     def __init__(self):
         self.wtree = gtk.glade.XML(os.path.join(gladedir, 'wizard.glade'))
+        for widget in self.wtree.get_widget_prefix(''):
+            setattr(self, widget.get_name(), widget)
         self.wtree.signal_autoconnect(self)
-        self.window = self.wtree.get_widget('wizard')
-        self.content_area = self.wtree.get_widget('content_area')
-        self.label_title = self.wtree.get_widget('label_title')
-        self.button_prev = self.wtree.get_widget('button_prev')
-        self.button_next = self.wtree.get_widget('button_next')
         
         self.steps = {}
         self.stack = Stack()
@@ -268,6 +307,8 @@ class Wizard:
         for child in self.content_area.get_children():
             self.content_area.remove(child)
 
+        self.select_section(step)
+        
         # Add current
         widget = step.get_main_widget()
         self.content_area.add(widget)
@@ -320,6 +361,18 @@ class Wizard:
 
         self.update_buttons(next)
 
+    def select_section(self, step):
+        active = step.section
+        print 'selection', active
+        self.label_production.set_sensitive(active == 'Production')
+        self.label_consumption.set_sensitive(active == 'Consumption')
+        self.label_conversion.set_sensitive(active == 'Conversion')
+        self.label_license.set_sensitive(active == 'License')
+        self.label_arrow_production.set_property('visible', active == 'Production')
+        self.label_arrow_consumption.set_property('visible', active == 'Consumption')
+        self.label_arrow_conversion.set_property('visible', active == 'Conversion')
+        self.label_arrow_license.set_property('visible', active == 'License')
+
     def update_buttons(self, has_next):
         if len(self.stack) == 1:
             self.button_prev.set_sensitive(False)
@@ -360,10 +413,11 @@ class Wizard:
         self.window.show()
         gtk.main()
 
-INITIAL_STEP = 'WizardStepSource'
-#INITIAL_STEP = 'WizardStepConsumption'
-
+
 if __name__ == '__main__':
+    INITIAL_STEP = 'WizardStepSource'
+    #INITIAL_STEP = 'WizardStepConsumption'
+
     from flumotion.wizard import wizard_step as ws
     wiz = Wizard()
     for attrname in dir(ws):

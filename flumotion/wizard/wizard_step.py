@@ -18,14 +18,16 @@
 from flumotion.wizard.enums import * # XXX: fix later
 from flumotion.wizard import wizard
 
+
+
 class WizardStepSource(wizard.WizardStep):
     step_name = 'Source'
     glade_file = 'wizard_source.glade'
     section = 'Production'
     
     def setup(self):
-        self.combobox_video.set_enum(VideoDeviceType)
-        self.combobox_audio.set_enum(AudioDeviceType)
+        self.combobox_video.set_enum(VideoDevice)
+        self.combobox_audio.set_enum(AudioDevice)
         
     def on_checkbutton_has_video_toggled(self, button):
         self.combobox_video.set_sensitive(button.get_active())
@@ -44,70 +46,83 @@ class WizardStepSource(wizard.WizardStep):
     def get_next(self):
         if self.checkbutton_has_video:
             video_source = self.combobox_video.get_active()
-            if video_source == VideoDeviceType.TVCard:
+            if video_source == VideoDevice.TVCard:
                 return 'TV Card'
-            elif video_source == VideoDeviceType.Firewire:
+            elif video_source == VideoDevice.Firewire:
                 return 'Firewire'
-            elif video_source == VideoDeviceType.Webcam:
+            elif video_source == VideoDevice.Webcam:
                 return 'Webcam'
-            elif video_source == VideoDeviceType.Test:
+            elif video_source == VideoDevice.Test:
                 return 'Test Source'
             raise AssertionError
         elif self.checkbutton_has_audio:
             return 'Audio Source'
         raise AssertionError
 
+
+
 class WizardStepVideoSource(wizard.WizardStep):
     section = 'Production'
     component_name = 'video-source'
     def get_next(self):
         return 'Overlay'
 
+
+
 class WizardStepTVCard(WizardStepVideoSource):
     step_name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
 
     def setup(self):
-        self.combobox_device.set_enum(TVCardDeviceType)
-        self.combobox_signal.set_enum(TVCardSignalType)
+        self.combobox_device.set_enum(TVCardDevice)
+        self.combobox_signal.set_enum(TVCardSignal)
 
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
-        options['device'] = TVCardDeviceType.get(options['device'])
-        options['signal'] = TVCardSignalType.get(options['signal'])
+        options['device'] = TVCardDevice.get(options['device']).name
+        options['signal'] = TVCardSignal.get(options['signal']).name
         return options
 
+
+
 class WizardStepFireWirde(WizardStepVideoSource):
     step_name = 'Firewire'
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
 
+
+
 class WizardStepWebcam(WizardStepVideoSource):
     step_name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
-    
+
+
+    
 class WizardStepTestSource(WizardStepVideoSource):
     step_name = 'Test Source'
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
 
     def setup(self):
-        self.combobox_pattern.set_enum(VideoTestPatternType)
-        self.combobox_format.set_enum(VideoTestFormatType)
+        self.combobox_pattern.set_enum(VideoTestPattern)
+        self.combobox_format.set_enum(VideoTestFormat)
 
     def get_component_properties(self):
-        options = self.wizard.get_step_state(self)
-        format = options['format']
-        if format == VideoTestFormatType.YUV:
+        format = self.combobox_format.get_enum()
+        options = {}
+        if format == VideoTestFormat.YUV:
             options['format'] = 'video/x-raw-yuv'
-        elif format == VideoTestFormatType.RGB:
+        elif format == VideoTestFormat.RGB:
             options['format'] = 'video/x-raw-rgb'
         else:
             raise AssertionError
+        options['pattern'] = self.combobox_pattern.get_string()
         return options
 
+
+
 class WizardStepOverlay(wizard.WizardStep):
     step_name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
@@ -121,6 +136,8 @@ class WizardStepOverlay(wizard.WizardStep):
         else:
             return 'Encoding'
 
+
+
 # XXX: Rename to Soundcard
 class WizardStepAudioSource(wizard.WizardStep):
     step_name = 'Audio Source'
@@ -128,10 +145,32 @@ class WizardStepAudioSource(wizard.WizardStep):
     section = 'Production'
     component_name = 'audio-source'
     component_type = 'osssrc'
-    
+
+    def setup(self):
+        self.combobox_device.set_enum(SoundcardDevice)
+        self.combobox_input.set_enum(SoundcardInput)
+        self.combobox_channels.set_enum(SoundcardChannels)
+        self.combobox_samplerate.set_enum(SoundcardSamplerate)
+        self.combobox_bitdepth.set_enum(SoundcardBitdepth)
+        
+    def get_component_properties(self):
+        channels = self.combobox_channels.get_enum()
+        if channels == SoundcardChannels.Mono:
+            channels = 'mono'
+        elif channels == SoundcardChannels.Stereo:
+            channels = 'stereo'
+            
+        return dict(device=self.combobox_device.get_string(),
+                    bitdepth=self.combobox_bitdepth.get_string(),
+                    samplerate=self.combobox_samplerate.get_string(),
+                    channels=channels,
+                    input=self.combobox_input.get_string())
+
     def get_next(self):
         return 'Encoding'
 
+
+
 class WizardStepEncoding(wizard.WizardStep):
     step_name = 'Encoding'
     glade_file = 'wizard_encoding.glade'
@@ -199,10 +238,14 @@ class WizardStepEncoding(wizard.WizardStep):
             
         return 'Consumption'
 
+
+
 class WizardStepVideoEncoder(wizard.WizardStep):
     section = 'Conversion'
     component_name = 'video-encoder'
-    
+
+
+
 class WizardStepTheora(WizardStepVideoEncoder):
     step_name = 'Theora'
     glade_file = 'wizard_theora.glade'
@@ -218,6 +261,8 @@ class WizardStepTheora(WizardStepVideoEncoder):
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
 
+
+
 class WizardStepSmoke(WizardStepVideoEncoder):
     step_name = 'Smoke'
     glade_file = 'wizard_smoke.glade'
@@ -227,6 +272,8 @@ class WizardStepSmoke(WizardStepVideoEncoder):
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
 
+
+
 class WizardStepJPEG(WizardStepVideoEncoder):
     step_name = 'JPEG'
     glade_file = 'wizard_jpeg.glade'
@@ -236,6 +283,8 @@ class WizardStepJPEG(WizardStepVideoEncoder):
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
 
+
+
 class WizardStepAudioEncoder(wizard.WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
@@ -244,18 +293,26 @@ class WizardStepAudioEncoder(wizard.WizardStep):
     def get_next(self):
         return 'Consumption'
 
+
+
 class WizardStepVorbis(WizardStepAudioEncoder):
     step_name = 'Vorbis'
     component_type = 'vorbis'
 
+
+
 class WizardStepSpeex(WizardStepAudioEncoder):
     step_name = 'Speex'
     component_type = 'speex'
 
+
+
 class WizardStepMulaw(WizardStepAudioEncoder):
     step_name = 'Mulaw'
     component_type = 'Mulaw'
 
+
+
 class WizardStepConsumption(wizard.WizardStep):
     step_name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
@@ -341,6 +398,8 @@ class WizardStepConsumption(wizard.WizardStep):
             else:
                 return 'Content License'
 
+
+
 class WizardStepHTTP(wizard.WizardStep):
     glade_file = 'wizard_http.glade'
     section = 'Consumption'
@@ -362,27 +421,35 @@ class WizardStepHTTP(wizard.WizardStep):
             options['worker'] = 'Local'
             
         return options
-    
+
+
+    
 class WizardStepHTTPBoth(WizardStepHTTP):
     step_name = 'HTTP Streamer (audio & video)'
     component_name = 'http-streamer-audio+video'
-                    
+
+
+                  
 class WizardStepHTTPAudio(WizardStepHTTP):
     step_name = 'HTTP Streamer (audio only)'
     component_name = 'http-streamer-audio'
 
+
+
 class WizardStepHTTPVideo(WizardStepHTTP):
     step_name = 'HTTP Streamer (video only)'
     component_name = 'http-streamer-video'
 
+    
+
 class WizardStepDisk(wizard.WizardStep):
     glade_file = 'wizard_disk.glade'
     section = 'Consumption'
 
     def setup(self):
-        self.combobox_time_list.set_enum(RotateTimeType)
-        self.combobox_size_list.set_enum(RotateSizeType)
-        self.combobox_size_list.set_active(RotateSizeType.MB)
+        self.combobox_time_list.set_enum(RotateTime)
+        self.combobox_size_list.set_enum(RotateSize)
+        self.combobox_size_list.set_active(RotateSize.MB)
         
     def on_button_browse_clicked(self, button):
         pass
@@ -419,19 +486,27 @@ class WizardStepDisk(wizard.WizardStep):
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
+
+
 class WizardStepDiskBoth(WizardStepDisk):
     step_name = 'Disk (audio & video)'
-                    
+
+
+
 class WizardStepDiskAudio(WizardStepDisk):
     step_name = 'Disk (audio only)'
 
+
+
 class WizardStepDiskVideo(WizardStepDisk):
     step_name = 'Disk (video only)'
 
+
+
 class WizardStepLicence(wizard.WizardStep):
     step_name = "Content License"
     glade_file = "wizard_license.glade"
-    section = 'Licence'
+    section = 'License'
 
     def on_checkbutton_set_license_toggled(self, button):
         self.combobox_license.set_sensitive(button.get_active())
