@@ -15,6 +15,7 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+import os
 import sys
 import optparse
 
@@ -26,11 +27,21 @@ def main(args):
     parser.add_option('-c', '--configdir',
                       action="store", dest="configdir",
                       help="flumotion configuration directory")
+    parser.add_option('-l', '--logfile',
+                      action="store", dest="logfile",
+                      help="flumotion service log file")
 
     options, args = parser.parse_args(args)
 
     if not options.configdir:
         options.configdir = configure.configdir
+
+    # if log file is specified, redirect stdout and stderr
+    if options.logfile:
+        out = open(options.logfile, 'a+')
+        err = open(options.logfile, 'a+', 0)
+        os.dup2(out.fileno(), sys.stdout.fileno())
+        os.dup2(err.fileno(), sys.stderr.fileno())
 
     servicer = service.Servicer(options.configdir)
     try:

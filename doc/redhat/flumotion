@@ -12,42 +12,75 @@
 service=flumotion
 prog=/usr/sbin/flumotion
 lockdir=/var/lock/subsys
+logfile=/var/log/flumotion/service.log
 
-# The semantics of these two functions differ from the way apachectl does
-# things -- attempting to start while running is a failure, and shutdown
-# when not running is also a failure.  So we just do it the way init scripts
-# are expected to behave here.
+# if arguments are specified, we only start/stop that service part
 start() {
+	if test "x$*" != "x"
+	then
+		startone $*
+		return $?
+	fi
+
 	list=`$prog status | cut -f1,2 -d' ' | tr ' ' @`
+	RETVAL=0
 	for line in $list
 	do
 		type=`echo $line | cut -f1 -d'@'`
 		name=`echo $line | cut -f2 -d'@'`
-        	echo -n $"Starting $type $name: "
-        	daemon --user flumotion $prog start $type $name
-        	RETVAL=$?
-        	echo
-        	[ $RETVAL = 0 ] && touch ${lockdir}/flumotion.$type.$name.lock
+		startone $type $name
+		$? && RETVAL=1
 	done
         return $RETVAL
 }
+
+startone() {
+	type=$1
+	name=$2
+	echo -n $"Starting $type $name: "
+	daemon --user flumotion $prog -l $logfile start $type $name
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && touch ${lockdir}/flumotion.$type.$name.lock
+	return $RETVAL
+}
+
 stop() {
+	if test "x$*" != "x"
+	then
+		stopone $*
+		return $?
+	fi
+
 	list=`$prog status | cut -f1,2 -d' ' | tr ' ' @`
+	RETVAL=0
+
 	for line in $list
 	do
 		type=`echo $line | cut -f1 -d'@'`
 		name=`echo $line | cut -f2 -d'@'`
-		lockfile=${lockdir}/flumotion.$type.$name.lock
-		if test -e ${lockfile}
-		then
-			echo -n $"Stopping $type $name: "
-			$prog stop $type $name
-        		RETVAL=$?
-        		[ $RETVAL = 0 ] && success || failure
-			echo
-        		[ $RETVAL = 0 ] && rm ${lockdir}/flumotion.$type.$name.lock
-		fi
+		startone $type $name
+		$? && RETVAL=1
 	done
+	return $RETVAL
+}
+
+stopone() {
+	type=$1
+	name=$2
+
+        RETVAL=0
+	lockfile=${lockdir}/flumotion.$type.$name.lock
+	if test -e ${lockfile}
+	then
+		echo -n $"Stopping $type $name: "
+		$prog stop -l $logfile $type $name
+		RETVAL=$?
+		[ $RETVAL = 0 ] && success || failure
+		echo
+		[ $RETVAL = 0 ] && rm ${lockdir}/flumotion.$type.$name.lock
+	fi
+	return $RETVAL
 }
 
 status() {
@@ -61,20 +94,23 @@ list() {
 # See how we were called.
 case "$1" in
   start)
-	start
+	shift
+	start $*
 	;;
   stop)
-	stop
+	shift
+	stop $*
+	;;
+  restart)
+	shift
+	stop $*
+	start $*
 	;;
   status)
         status
 	;;
   list)
         list
-	;;
-  restart)
-	stop
-	start
 	;;
   *)
 	echo $"Usage: $service {start|stop|restart|list|status}"

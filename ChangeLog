@@ -1,3 +1,15 @@
+2004-11-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	  expand LIBDIR for installed.py.in
+	* doc/redhat/flumotion:
+	  allow starting and stopping only one of the service parts
+	  handle error values correctly
+	  log to a service log file
+	* flumotion/manager/main.py:
+	* flumotion/service/main.py:
+	  add log file for service startup
+
 2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/service/main.py:

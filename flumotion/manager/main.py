@@ -217,6 +217,7 @@ def main(args):
         message = "Could not listen on port %d: %s" % (port, e.args[1])
         raise errors.SystemError, message
 
+    log.info('manager', 'Starting manager "%s"' % options.name)
     if options.daemonize:
         common.ensureDir(configure.logdir, "log file")
         common.ensureDir(configure.rundir, "run file")
@@ -244,6 +245,6 @@ def main(args):
         log.debug('manager', 'deleting pid file')
         common.deletePidFile('manager', options.name)
 
-    log.info('manager', 'Stopping server')    
+    log.info('manager', 'Stopping manager "%s"' % options.name)
 
     return 0
