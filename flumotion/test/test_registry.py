@@ -59,19 +59,22 @@ class TestRegistry(unittest.TestCase):
         
     def testParseBasic(self):
         assert self.reg.isEmpty()
-        self.reg.addFromString('<components></components>')
+        self.reg.addFromString('<root></root>')
         assert self.reg.isEmpty()
-        self.assertRaises(registry.XmlParserError,
-                          self.reg.addFromString, '<root></root>')
+        self.reg.addFromString('<registry><components></components></registry>')
+        assert self.reg.isEmpty()
         
     def testParseComponents(self):
         assert self.reg.isEmpty()
-        self.reg.addFromString("""<components>
-          <component name="foo" type="bar">
-          </component>
-          <component name="foobie" type="baz">
-          </component>
-        </components>""")
+        self.reg.addFromString("""
+<registry>
+  <components>
+    <component name="foo" type="bar">
+    </component>
+    <component name="foobie" type="baz">
+    </component>
+  </components>
+</registry>""")
 
         assert not self.reg.isEmpty()
         
@@ -94,13 +97,16 @@ class TestRegistry(unittest.TestCase):
         
     def testParseProperties(self):
         assert self.reg.isEmpty()
-        self.reg.addFromString("""<components>
-          <component name="foobie" type="component">
-            <properties>
-              <property name="source" type="string" required="yes" multiple="yes"/>
-            </properties>
-          </component>
-        </components>""")
+        self.reg.addFromString("""
+<registry>
+  <components>
+    <component name="foobie" type="component">
+      <properties>
+        <property name="source" type="string" required="yes" multiple="yes"/>
+      </properties>
+    </component>
+  </components>
+</registry>""")
 
         comp = self.reg.getComponent('component')
         props = comp.getProperties()
@@ -113,13 +119,16 @@ class TestRegistry(unittest.TestCase):
         assert prop.isMultiple()
 
     def testParsePropertiesErrors(self):
-        template = """<components>
-          <component name="foobie" type="component">
-            <properties>
-              %s
-            </properties>
-          </component>
-        </components>"""
+        template = """
+<registry>
+  <components>
+    <component name="foobie" type="component">
+      <properties>
+        %s
+      </properties>
+    </component>
+  </components>
+</registry>"""
 
         property = "<base-name/>"
         self.assertRaises(registry.XmlParserError,
@@ -134,8 +143,13 @@ class TestRegistry(unittest.TestCase):
                           self.reg.addFromString, template % property)
 
     def testClean(self):
-        xml = """<components>
-          <component name="foo" type="bar"></component></components>"""
+        xml = """
+<registry>
+  <components>
+    <component name="foo" type="bar">
+    </component>
+  </components>
+</registry>"""
         reg = registry.ComponentRegistry()
         reg.addFromString(xml)
         reg.clean()
@@ -143,22 +157,33 @@ class TestRegistry(unittest.TestCase):
 
     def testAddTypeError(self):
         reg = registry.ComponentRegistry()
-        xml = """<components>
-          <component name="foo" type="bar"></component></components>"""
+        xml = """
+<registry>
+  <components>
+    <component name="foo" type="bar"></component>
+  </components>
+</registry>"""
         reg.addFromString(xml) 
        
     def testAddXmlParseError(self):
         reg = registry.ComponentRegistry()
-        xml = """<components>
-          <component name="unique"></component></components>"""
+        xml = """
+<registry>
+  <components>
+    <component name="unique"></component>
+  </components>
+</registry>"""
         self.assertRaises(registry.XmlParserError, reg.addFromString, xml)
-        xml = """<components>
-          <foo></foo></components>"""
+        xml = """<registry><components><foo></foo></components></registry>"""
         self.assertRaises(registry.XmlParserError, reg.addFromString, xml)
         
     def testDump(self):
-        xml = """<components>
-          <component name="foo" type="bar"></component></components>"""
+        xml = """
+<registry>
+  <components>
+    <component name="foo" type="bar"></component>
+  </components>
+</registry>"""
         reg = registry.ComponentRegistry()
         reg.clean()
         reg.addFromString(xml)
@@ -240,13 +265,15 @@ class TestFindComponents(unittest.TestCase):
             os.unlink(self.reg.filename)
 
     def writeComponent(self, filename, name):
-        open(filename, 'w').write("""<components>
-  <component type="%s">
-    <properties>
-    </properties>
-  </component>
-</components>
-""" % name)
+        open(filename, 'w').write("""
+<registry>
+  <components>
+    <component type="%s">
+      <properties>
+      </properties>
+    </component>
+  </components>
+</registry>""" % name)
     
     def testSimple(self):
         self.reg.addDirectory('.')

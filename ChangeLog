@@ -1,3 +1,25 @@
+2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/bouncers/htpasswdcrypt.xml:
+	* flumotion/component/consumers/disker/disker.xml:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/component/converters/overlay/overlay.xml:
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/bttv/bttv.xml:
+	* flumotion/component/producers/firewire/firewire.xml:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/component/producers/videotest/videotest.xml:
+	* flumotion/component/producers/webcam/webcam.xml:
+	* flumotion/test/test_config.py:
+	* flumotion/test/test_registry.py:
+	  add <registry></registry> toplevel nodes in all partial xml
+	  files.  do not raise when a file without <registry> is being
+	  parsed so it doesn't trip over other .xml files
+
 2004-11-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/wizard.py:

@@ -1,13 +1,15 @@
-<components>
-  <component type="videotest">
-    <source location="flumotion.component.producers.videotest.videotest"/>
-    <properties>
-      <property name="feed" type="string" multiple="yes"/>
-      <property name="height" type="int"/>
-      <property name="width" type="int"/>
-      <property name="framerate" type="float"/>
-      <property name="format" type="string"/>
-      <property name="pattern" type="int"/>
-    </properties>
-  </component>
-</components>
+<registry>
+  <components>
+    <component type="videotest">
+      <source location="flumotion.component.producers.videotest.videotest"/>
+      <properties>
+        <property name="feed" type="string" multiple="yes"/>
+        <property name="height" type="int"/>
+        <property name="width" type="int"/>
+        <property name="framerate" type="float"/>
+        <property name="format" type="string"/>
+        <property name="pattern" type="int"/>
+      </properties>
+    </component>
+  </components>
+</registry> 

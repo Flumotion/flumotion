@@ -24,18 +24,21 @@ from twisted.trial import unittest
 
 from flumotion.common import config, registry
 
-registry.registry.addFromString("""<components>
-<component name="foobie" type="test-component">
-  <properties>
-    <property name="one" type="string"/>
-    <property name="two" type="int"/>
-    <property name="three" type="float"/>
-    <property name="four" type="xml"/>
-    <property name="five" type="bool"/>
-    <property name="six" type="long"/>
-  </properties>
-</component>
-</components>""")
+registry.registry.addFromString("""
+<registry>
+  <components>
+    <component name="foobie" type="test-component">
+      <properties>
+        <property name="one" type="string"/>
+        <property name="two" type="int"/>
+        <property name="three" type="float"/>
+        <property name="four" type="xml"/>
+        <property name="five" type="bool"/>
+        <property name="six" type="long"/>
+      </properties>
+    </component>
+  </components>
+</registry>""")
 
 class TestConfig(unittest.TestCase):
     def testParseEmpty(self):

@@ -1,13 +1,15 @@
-<components>
-  <component type="disker">
-    <source location="flumotion.component.consumers.disker.disker"/>
-    <properties>
-      <property name="source" type="string" required="yes"/>
-      <property name="directory" type="string" required="yes"/>
-      <property name="rotateType" type="string"/>
-      <property name="size" type="long"/>
-      <property name="time" type="long"/>
-    </properties>
-  </component>
-</components>
-
+<registry>
+  <components>
+    <component type="disker">
+      <source location="flumotion.component.consumers.disker.disker"/>
+      <properties>
+        <property name="source" type="string" required="yes"/>
+        <property name="directory" type="string" required="yes"/>
+        <property name="rotateType" type="string"/>
+        <property name="size" type="long"/>
+        <property name="time" type="long"/>
+      </properties>
+    </component>
+  </components>
+</registry> 
+  

@@ -138,7 +138,7 @@ class RegistryParser(log.Loggable):
     standalone component files.
 
     For parsing registries use the parseRegistry function and for components
-    use parseFile.
+    use parseRegistryFile.
 
     I also have a list of all components and directories which the
     directory use (instead of saving its own copy)
@@ -167,6 +167,8 @@ class RegistryParser(log.Loggable):
         return self._components[name]
 
     def _getChildNodes(self, node, tag=''):
+        # get all the usable children nodes for the given node
+        # check if the given node matches the node name given as tag
         if tag and node.nodeName != tag:
             raise XmlParserError(
                 'expected <%s>, but <%s> found' % (tag, node.nodeName))
@@ -287,16 +289,34 @@ class RegistryParser(log.Loggable):
         return files
 
     ## Component registry specific functions
-    def parseFile(self, filename, string=None):
+    def parseRegistryFile(self, filename, string=None):
+        # FIXME: better separation of filename and string ?
+        """
+        Parse the given XML registry part file,
+        And add it to our registry.
+        If a string is given, the string overrides the given file.
+        """
         self.filename = filename
+        # so we have something nice to print for parsing errors
+        if string:
+            self.filename = "<string>"
 
         root = self._getRoot(filename, string)
-        # FIXME: we should be able to print a nice warning here
-        #try:
-        components = self._parseComponents(root.documentElement)
+
+        # check if it's of the right type; we ignore it silently
+        # since this function is used to parse all .xml files encountered
+        node = root.documentElement
+        try:
+            children = self._getChildNodes(node, 'registry')
+        except XmlParserError:
+            self.debug('%s does not have registry as root tag' % self.filename)
+            return
+
+        # FIXME: when registry parts will contain more than components,
+        # we need to create a _parseRegistry function
+        node = children[0]
+        components = self._parseComponents(node)
         self._components.update(components)
-        #except XmlParserError, message:
-        #    self.warning("Could not parse file %s: %s" % (filename, message))
 
     ## Base registry specific functions
     def parseRegistry(self, filename, string=None):
@@ -408,7 +428,7 @@ class ComponentRegistry(log.Loggable):
     
     def addFile(self, filename, string=None):
         self.debug('Adding file: %s' % filename)
-        self._parser.parseFile(filename, string)
+        self._parser.parseRegistryFile(filename, string)
         
     def addFromString(self, string):
         self.addFile('<string>', string)

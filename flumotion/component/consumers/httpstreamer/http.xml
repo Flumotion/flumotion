@@ -1,21 +1,23 @@
-<components>
-  <component type="http-streamer">
-    <source location="flumotion.component.consumers.httpstreamer.http"/>
-    <properties>
-      <property name="source" type="string" required="yes"/>
-      <property name="port" type="int" required="yes"/>
-      <property name="logfile" type="string"/>
-      <property name="gst-property" type="xml" multiple="yes"/>
-      <property name="admin-password" type="string"/>
-      <property name="maxclients" type="int"/>
-      <property name="bouncer" type="string"/>
-      <property name="mount_point" type="string"/>
-    </properties>
-<!--
-    <ui style="gtk" type="control">
-      <file source="gtk.py">
-      <file source="http.glade">
-    </ui>
--->
-  </component>
-</components>
+<registry>
+  <components>
+    <component type="http-streamer">
+      <source location="flumotion.component.consumers.httpstreamer.http"/>
+      <properties>
+        <property name="source" type="string" required="yes"/>
+        <property name="port" type="int" required="yes"/>
+        <property name="logfile" type="string"/>
+        <property name="gst-property" type="xml" multiple="yes"/>
+        <property name="admin-password" type="string"/>
+        <property name="maxclients" type="int"/>
+        <property name="bouncer" type="string"/>
+        <property name="mount_point" type="string"/>
+      </properties>
+  <!--
+      <ui style="gtk" type="control">
+        <file source="gtk.py">
+        <file source="http.glade">
+      </ui>
+  -->
+    </component>
+  </components>
+</registry> 

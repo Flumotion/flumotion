@@ -1,11 +1,13 @@
-<components>
-  <component type="firewire">
-    <source location="flumotion.component.producers.firewire.firewire"/>
-    <properties>
-      <property name="feed" type="string" required="yes" multiple="yes"/>
-      <property name="height" type="int"/>
-      <property name="width" type="int"/>
-      <property name="framerate" type="float"/>
-    </properties>
-  </component>
-</components>
+<registry>
+  <components>
+    <component type="firewire">
+      <source location="flumotion.component.producers.firewire.firewire"/>
+      <properties>
+        <property name="feed" type="string" required="yes" multiple="yes"/>
+        <property name="height" type="int"/>
+        <property name="width" type="int"/>
+        <property name="framerate" type="float"/>
+      </properties>
+    </component>
+  </components>
+</registry> 

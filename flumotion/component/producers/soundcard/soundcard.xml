@@ -1,13 +1,15 @@
-<components>
-  <component type="soundcard">
-    <source location="flumotion.component.producers.soundcard.soundcard"/>
-    <properties>
-      <property name="feed" type="string" required="yes" multiple="yes"/>
-      <property name="device" type="string"/>
-      <property name="channels" type="string"/>
-      <property name="input" type="string"/>
-      <property name="bitdepth" type="int"/>
-      <property name="samplerate" type="int"/>
-    </properties>
-  </component>
-</components>
+<registry>
+  <components>
+    <component type="soundcard">
+      <source location="flumotion.component.producers.soundcard.soundcard"/>
+      <properties>
+        <property name="feed" type="string" required="yes" multiple="yes"/>
+        <property name="device" type="string"/>
+        <property name="channels" type="string"/>
+        <property name="input" type="string"/>
+        <property name="bitdepth" type="int"/>
+        <property name="samplerate" type="int"/>
+      </properties>
+    </component>
+  </components>
+</registry> 
