@@ -65,6 +65,7 @@ flumotion/twisted/Makefile
 flumotion/utils/Makefile
 m4/Makefile
 doc/Makefile
+doc/reference/Makefile
 tests/Makefile
 tests/common.py
 flumotion.spec

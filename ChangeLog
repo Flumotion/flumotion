@@ -1,3 +1,15 @@
+2004-08-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* doc/Makefile.am:
+	* doc/coding-style.txt:
+	* doc/gendoc.py:
+	* doc/header.py:
+	* doc/ideas.txt:
+	* doc/reference/Makefile.am:
+	* doc/simple.dia:
+	  reorganize docs in preparation for the manual
+
 2004-08-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/Makefile.am:
