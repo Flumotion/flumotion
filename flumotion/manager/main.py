@@ -49,11 +49,15 @@ def _startSSL(vishnu, host, port, pemFile):
     ctxFactory = ServerContextFactory(pemFile)
     
     log.info('manager', 'Starting on port %d using SSL' % port)
+    if not host == "":
+        log.info('manager', 'Listening as host %s' % host)
     reactor.listenSSL(port, vishnu.getFactory(), ctxFactory, interface=host)
     reactor.run()
 
 def _startTCP(vishnu, host, port):
     log.info('manager', 'Starting on port %d using TCP' % port)
+    if not host == "":
+        log.info('manager', 'Listening as host %s' % host)
     reactor.listenTCP(port, vishnu.getFactory(), interface=host)
     reactor.run()
 
@@ -77,6 +81,7 @@ def _loadConfig(vishnu, filename):
         import flumotion.worker.job
         vishnu.setBouncer(flumotion.worker.job.getComponent(configDict, defs))
         vishnu.bouncer.debug('started')
+        log.info('manager', 'Started manager bouncer')
 
     # make the workerheaven load the config
     vishnu.workerHeaven.loadConfiguration(filename)
@@ -173,4 +178,5 @@ def main(args):
         print >> sys.stderr, \
               'ERROR: unsupported transport: %s, must be ssl or tcp' % options.transport
         return 1
+    log.info('manager', 'Stopping server')    
     return 0

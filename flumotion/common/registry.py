@@ -290,7 +290,7 @@ class ComponentRegistry(log.Loggable):
         self.components = {}
 
     def addFromFile(self, filename, string=None):
-        self.info('Merging registry from %s' % filename)
+        self.debug('Merging registry from %s' % filename)
         parser = RegistryXmlParser(filename, string)
         for component in parser.getComponents():
             type = component.getType()

@@ -36,7 +36,7 @@ from flumotion.twisted import credentials
 def getComponent(dict, defs):
     #FIXME: add setup of files to be transmitted over the wire.
     source = defs.getSource()
-    log.info('job', 'Loading %s' % source)
+    log.debug('component', 'Loading source %s' % source)
     try:
         module = reflect.namedAny(source)
     except ValueError:
@@ -159,6 +159,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
         @type  feedPorts: dict
         """
         
+        self.info('Starting component %s of type %s' % (name, type))
         #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()

@@ -103,7 +103,7 @@ class GstReactor(default.PosixReactorBase):
         try:
             self.simulate()
         except KeyboardInterrupt:
-            print "KeyboardInterrupt (gstreactor.addReader())"
+            flog.debug('gstreactor', "KeyboardInterrupt in addReader()")
 
     def addWriter(self, writer):
         if not hasWriter(writer):
@@ -164,7 +164,7 @@ class GstReactor(default.PosixReactorBase):
             gst.main()
         except KeyboardInterrupt:
             from flumotion.common import log as flog
-            flog.info('gstreactor', "KeyboardInterrupt in run()")
+            flog.debug('gstreactor', "KeyboardInterrupt in run()")
 
     def _doReadOrWrite(self, source, condition, faildict={
         error.ConnectionDone: failure.Failure(error.ConnectionDone()),
