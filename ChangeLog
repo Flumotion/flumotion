@@ -1,5 +1,17 @@
 2004-09-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/component/Makefile.am:
+	* flumotion/config/Makefile.am:
+	* flumotion/manager/Makefile.am:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/utils/Makefile.am:
+	* flumotion/worker/Makefile.am:
+	  adding ctags generation
+
+2004-09-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/component.py:
 	* flumotion/manager/component.py:
 	  remove depreciation warnings

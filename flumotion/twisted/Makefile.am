@@ -7,6 +7,8 @@ flumotion_PYTHON = \
 	portal.py \
 	shell.py
 
+TAGS_FILES = $(flumotion_PYTHON)
+
 clean-local:
 	rm -rf *.pyc *.pyo
 

@@ -5,5 +5,7 @@ component_PYTHON = \
 
 SUBDIRS = gtk
 
+TAGS_FILES = $(component_PYTHON)
+
 clean-local:
 	rm -rf *.pyc *.pyo

@@ -10,6 +10,8 @@ flumotion_PYTHON = \
 	launcher.py \
 	registry.py
 
+TAGS_FILES = $(flumotion_PYTHON)
+
 clean-local:
 	rm -rf *.pyc *.pyo
 

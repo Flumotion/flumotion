@@ -7,6 +7,8 @@ flumotion_PYTHON = \
 	__init__.py \
 	log.py
 
+TAGS_FILES = $(flumotion_PYTHON)
+
 clean-local:
 	rm -rf *.pyc *.pyo
 

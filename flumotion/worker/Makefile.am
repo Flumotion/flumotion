@@ -5,6 +5,8 @@ flumotion_PYTHON = \
 	launcher.py \
 	worker.py
 	
+TAGS_FILES = $(flumotion_PYTHON)
+
 clean-local:
 	rm -rf *.pyc *.pyo
 
