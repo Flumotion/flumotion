@@ -20,6 +20,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
+"""
+Manager-side objects to handle administrative clients.
+"""
+
 from twisted.internet import reactor
 from twisted.spread import pb
 
@@ -30,7 +34,8 @@ from flumotion.utils import log
 class ComponentView(pb.Copyable):
     """
     I present state of a component through a L{RemoteComponentView} in the peer.
-    I get the state I present from a L{flumotion.manager.component.ComponentAvatar}.
+    I get the state I present from a
+    L{flumotion.manager.component.ComponentAvatar}.
     I live in the manager.
     """
     def __init__(self, component):
@@ -109,11 +114,11 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         """
         Return all components logged in to the manager.
         
-        @rtype: C{list} of L{flumotion.manager.manager.ComponentView}
+        @rtype: C{list} of L{flumotion.manager.admin.ComponentView}
         """
         # FIXME: should we use an accessor to get at components from c ?
-        clients = map(ComponentView, self.manager.components.values())
-        return clients
+        components = map(ComponentView, self.manager.components.values())
+        return components
 
     def sendLog(self, category, type, message):
         """
@@ -250,11 +255,12 @@ class AdminHeaven(pb.Root, log.Loggable):
     logCategory = "admin-heaven"
     __implements__ = interfaces.IHeaven
 
-    def __init__(self, manager):
+    def __init__(self, componentheaven):
         """
-        @type manager: L{flumotion.manager.manager.Manager}
+        @type componentheaven: L{flumotion.manager.component.ComponentHeaven}
+        @param componentheaven: the ComponentHeaven to administrate for
         """
-        self.manager = manager
+        self.manager = componentheaven
         self.clients = [] # all AdminAvatars we instantiate
         log.addLogHandler(self.logHandler)
         self.logcache = []

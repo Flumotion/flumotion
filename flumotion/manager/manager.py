@@ -52,12 +52,12 @@ class Dispatcher(log.Loggable):
 
     logCategory = 'dispatcher'
 
-    def __init__(self, manager, adminheaven):
+    def __init__(self, componentheaven, adminheaven):
         """
-        @type manager: L{manager.manager.Manager}
-        @type adminheaven:      L{manager.admin.AdminHeaven}
+        @type componentheaven: L{flumotion.manager.component.ComponentHeaven}
+        @type adminheaven: L{flumotion.manager.admin.AdminHeaven}
         """
-        self.manager = manager
+        self.componentheaven = componentheaven
         self.adminheaven = adminheaven
 
     # requestAvatar gets called through ClientFactory.login()

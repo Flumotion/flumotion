@@ -1,5 +1,15 @@
 2004-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/reference/Makefile.am:
+	* flumotion/admin/admin.py:
+	* flumotion/common/bundle.py:
+	* flumotion/common/interfaces.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/manager.py:
+	  various doc fixes
+
+2004-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/Makefile.am:
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:

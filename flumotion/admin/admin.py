@@ -20,6 +20,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
+"""
+Model abstraction for admin clients.
+The model can support different views.
+"""
+
 import sys
 
 import gobject
@@ -164,10 +169,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         """
         Tell the manager to reload code for a component.
 
-        @type component: string
-        @param component: name of the component to reload.
+        @type name: string
+        @param name: name of the component to reload.
 
-        @rtype: deferred
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         def _reloaded(result, self, component):
             self.info("reloaded component %s code" % component.name)
