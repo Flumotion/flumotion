@@ -102,6 +102,9 @@ class Dispatcher(log.Loggable):
         self.heavens[interface] = heaven
 
 class Vishnu:
+    """
+    I am the toplevel manager object that knows about all heavens and factories
+    """
     def __init__(self):
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me

@@ -20,6 +20,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
+"""
+Manager-side objects to handle worker clients.
+"""
+
 from twisted.spread import pb
 
 from flumotion.common import interfaces
@@ -27,6 +31,11 @@ from flumotion.common.config import FlumotionConfigXML
 from flumotion.utils import log
 
 class WorkerAvatar(pb.Avatar, log.Loggable):
+    """
+    I am an avatar created for a worker.
+    A reference to me is given when logging in and requesting an "worker" avatar.
+    I live in the manager.
+    """
     
     __implements__ = interfaces.INewCredPerspective
 
@@ -61,6 +70,11 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         return self.mind.callRemote('start', name, type, config)
         
 class WorkerHeaven(pb.Root):
+    """
+    I interface between the Manager and worker clients.
+    For each worker client I create an L{WorkerAvatar} to handle requests.
+    I live in the manager.
+    """
     
     __implements__ = interfaces.IHeaven
     

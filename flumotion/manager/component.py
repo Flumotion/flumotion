@@ -41,6 +41,7 @@ class Options:
 
 # abstracts the concept of a GStreamer tcpserversink producing a feeder
 class Feeder:
+    "I am a quite dummy Feeder object used by L{FeederSet}"
     def __init__(self, name):
         self.name = name
         self.dependencies = []
@@ -75,6 +76,10 @@ class Feeder:
         return '<Feeder %s ready=%r>' % (self.name, self.ready)
     
 class FeederSet:
+    """
+    I represent a collection of L{Feeder}s, I know when a feed is ready and
+    and I handle dependencies between feeds
+    """
     def __init__(self):
         self.feeders = {}
 
