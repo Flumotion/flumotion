@@ -1,5 +1,8 @@
 2004-09-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/common/config.py (ConfigEntry.getWorker): 
+	Add dummy getWorker() method
+
 	* testsuite/tests/log.py (TestLog.testLogHandlerAssertion): Add test
 
 	* flumotion/utils/log.py (addLogHandler): Doc fix, add pedantic

@@ -37,7 +37,8 @@ class ConfigEntry(log.Loggable):
         self.type = type
         self.config = config
         self.defs = defs
-
+        self.worker = None
+        
     def getModule(self):
         source = self.defs.getSource()
         self.info('Loading %s' % source)
@@ -60,6 +61,9 @@ class ConfigEntry(log.Loggable):
 
     def getConfigDict(self):
         return self.config
+
+    def getWorker(self):
+        return self.worker
     
     def getComponent(self):
         # Setup files to be transmitted over the wire. Must be a
