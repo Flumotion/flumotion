@@ -447,8 +447,11 @@ def _checkTracks(source_element, device):
             # list_tracks was added in gst-python 0.7.94
             if not res.returned:
                 res.returned = True
-                res.d.errback(errors.GstError(
-                    'Please upgrade gstreamer-python to 0.7.94 or higher.'))
+                version = " ".join([str(number) for number in gst.pygst_version])
+                message = 'Your version of gstreamer-python is %d.%d.%d. ' % \
+                    gst.pygst_version + \
+                    'Please upgrade gstreamer-python to 0.7.94 or higher.'
+                res.d.errback(errors.GstError(message))
             
         reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
         if not res.returned:

@@ -1,6 +1,11 @@
 2004-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/steps.py:
+	  Explain the real deal
+
+2004-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/steps.py:
 	  fix error message for list_tracks
 
 2004-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
