@@ -1,3 +1,8 @@
+2004-10-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  advertise correct Flumotion version
+
 2004-10-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/job.py:

@@ -31,6 +31,7 @@ import gst
 from twisted.protocols import http
 from twisted.web import server, resource as web_resource
 from twisted.internet import reactor, defer
+from flumotion.configure import configure
 import twisted.internet.error
 
 from flumotion.common import common, log, keycards
@@ -39,7 +40,7 @@ __all__ = ['HTTPStreamingAdminResource',
            'HTTPStreamingResource', 'MultifdSinkStreamer']
 
 HTTP_NAME = 'FlumotionHTTPServer'
-HTTP_VERSION = '0.1.0'
+HTTP_VERSION = configure.version
 
 ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 <html>
