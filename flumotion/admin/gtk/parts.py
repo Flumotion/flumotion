@@ -29,7 +29,7 @@ from flumotion.common import log, planet
 from flumotion.twisted import flavors
 
 from flumotion.common.planet import moods
-from flumotion.common.pygobject import gsignal
+from flumotion.common.pygobject import gsignal, gproperty
 
 COL_MOOD       = 0
 COL_NAME       = 1
@@ -132,6 +132,10 @@ class ComponentsView(log.Loggable, gobject.GObject):
     gsignal('has-selection', object)  # state-or-None
     gsignal('activated', object, str) # state, action name
     #gsignal('right-clicked', object, int, float)
+    gproperty(bool, 'can-start-any', 'True if any component can be started',
+              False, construct=True)
+    gproperty(bool, 'can-stop-any', 'True if any component can be stopped',
+              False, construct=True)
     
     def __init__(self, tree_widget):
         """
@@ -261,6 +265,16 @@ class ComponentsView(log.Loggable, gobject.GObject):
         
         return model.get(iter, COL_STATE)[0]
 
+    def update_start_stop_props(self):
+        oldstop = self.get_property('can-stop-any')
+        oldstart = self.get_property('can-start-any')
+        moodnames = [moods.get(x[COL_MOOD_VALUE]).name for x in self._model]
+        can_stop = bool([x for x in moodnames if (x!='lost' and x!='sleeping')])
+        can_start = bool([x for x in moodnames if (x=='sleeping')])
+        if oldstop != can_stop:
+            self.set_property('can-stop-any', can_stop)
+        if oldstart != can_start:
+            self.set_property('can-start-any', can_start)
 
     def _removeListenerForeach(self, model, path, iter):
         # remove the listener for each state object
@@ -311,6 +325,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
             else:
                 self._model.set(iter, COL_PID, None)
 
+        self.update_start_stop_props()
+
     def stateSet(self, state, key, value):
         if not isinstance(state, planet.AdminComponentState):
             self.warning('Got state change for unknown object %r' % state)
@@ -340,6 +356,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
         """
         self._model.set(iter, COL_MOOD, self._moodPixbufs[value])
         self._model.set(iter, COL_MOOD_VALUE, value)
+
+        self.update_start_stop_props()
 
 gobject.type_register(ComponentsView)
 

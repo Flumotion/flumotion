@@ -58,6 +58,7 @@ class Window(log.Loggable, gobject.GObject):
         self._append_recent_connections()
 
         self.current_component = None # the component we're showing UI for
+        self.current_component_state = None
         self._disconnected_dialog = None # set to a dialog if we're
                                          # disconnected
 
@@ -151,7 +152,12 @@ class Window(log.Loggable, gobject.GObject):
         self.components_view.connect('activated',
             self._components_view_activated_cb)
         self.statusbar = parts.AdminStatusbar(widgets['statusbar'])
-        self._set_component_ops_sensitive(False)
+        self._set_stop_start_component_sensitive()
+        self.components_view.connect('notify::can-start-any',
+                                     self.start_stop_notify_cb)
+        self.components_view.connect('notify::can-stop-any',
+                                     self.start_stop_notify_cb)
+        self.start_stop_notify_cb()
         return window
 
     def open_connected_cb(self, model, ids):
@@ -459,6 +465,8 @@ class Window(log.Loggable, gobject.GObject):
 
         if key == 'message':
             self.statusbar.set('main', value)
+        elif key == 'mood':
+            self._set_stop_start_component_sensitive()
 
     def stateAppend(self, state, key, value):
         if isinstance(state, worker.AdminWorkerHeavenState):
@@ -578,22 +586,40 @@ class Window(log.Loggable, gobject.GObject):
         if comp:
             comp.propertyChanged(propertyName, value)
          
+    def start_stop_notify_cb(self, *args):
+        can_start = self.components_view.get_property('can-start-any')
+        can_stop = self.components_view.get_property('can-stop-any')
+        self.widgets['menuitem_manage_stop_all'].set_sensitive(can_stop)
+        self.widgets['menuitem_manage_start_all'].set_sensitive(can_start)
+
     def admin_update_cb(self, admin):
         self.update_components()
 
     def update_components(self):
         self.components_view.update(self._components)
 
-    def _set_component_ops_sensitive(self, is_sensitive):
-        for i in 'stop', 'start':
-            w = self.widgets['menuitem_manage_'+i+'_component']
-            w.set_sensitive(is_sensitive)
-            w = self.widgets['toolbutton_'+i+'_component']
-            w.set_sensitive(is_sensitive)
+    def _set_stop_start_component_sensitive(self):
+        state = self.current_component_state
+        d = self.widgets
+        can_start = bool(state
+                         and moods.get(state.get('mood')).name == 'sleeping')
+        d['menuitem_manage_start_component'].set_sensitive(can_start)
+        d['toolbutton_start_component'].set_sensitive(can_start)
+
+        moodname = state and moods.get(state.get('mood')).name
+        can_stop = bool(moodname and moodname!='sleeping' and moodname!='lost')
+        d['menuitem_manage_stop_component'].set_sensitive(can_stop)
+        d['toolbutton_stop_component'].set_sensitive(can_stop)
 
     ### ui callbacks
     def _components_view_has_selection_cb(self, view, state):
-        self._set_component_ops_sensitive(bool(state))
+        if self.current_component_state:
+            self.current_component_state.removeListener(self)
+        self.current_component_state = state
+        if self.current_component_state:
+            self.current_component_state.addListener(self)
+
+        self._set_stop_start_component_sensitive()
 
         if not state:
             return

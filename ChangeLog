@@ -1,3 +1,30 @@
+2005-02-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/client.py (Window.current_component_state):
+	New instance var, either None or the current AdminComponentState
+	being shown.
+	(Window._create_ui): Set the start/stop component ui widgets'
+	sensitivity when the ui is made. Hook into the can-start-any and
+	can-stop-any notifications to keep the sensitivity state current.
+	(Window.stateSet): Also handle notifications of 'mood'.
+	(Window.start_stop_notify_cb): New cb, sets sensitivity of
+	stop-all/start all.
+	(Window._set_stop_start_component_sensitive): New routine, sets
+	sensitivity according to current_component_state.
+	(Window._components_view_has_selection_cb): Set
+	current_component_state.
+
+	* flumotion/admin/gtk/parts.py (ComponentsView): Landed the
+	can-start-any and can-stop-any properties.
+	(ComponentsView.update_start_stop_props): New proc, scans the
+	treemodel to see if we need to update the can-start-any or
+	can-stop-any properties. 
+	(ComponentsView.update, ComponentsView._set_mood_value): Hook into
+	update_start_stop_props().
+
+	* flumotion/admin/admin.py (AdminModel): Moved can-start-any and
+	can-stop-any properties to ComponentsView.
+
 2005-02-14  Andy Wingo  <wingo@pobox.com>
 
 	* m4/as-python.m4 (AS_PATH_PYTHON): Use textual comparison for

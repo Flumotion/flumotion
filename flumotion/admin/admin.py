@@ -66,11 +66,6 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     gsignal('message', str)
     gsignal('update')
 
-    gproperty(bool, 'can-start-any', 'True if any component can be started',
-              False, construct=True)
-    gproperty(bool, 'can-stop-any', 'True if any component can be stopped',
-              False, construct=True)
-    
     logCategory = 'adminmodel'
 
     __implements__ = interfaces.IAdminMedium, flavors.IStateListener,
