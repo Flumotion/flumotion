@@ -19,3 +19,4 @@ launcher
 controller
 - accept launcher connections and add a protocol to communicate with
   a launcher to start up components
+- authentication between components
