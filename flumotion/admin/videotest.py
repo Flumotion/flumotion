@@ -41,7 +41,7 @@ import os
 import string
 
 if gtk.pygtk_version < (2,3,96):
-   raise SystemExit, "PyGTK 2.3.96 or higher required"
+    raise SystemExit, "PyGTK 2.3.96 or higher required"
 
 def _debug(*args):
     flumotion.utils.log.debug('videotest', ' '.join(args))
@@ -50,15 +50,14 @@ def _debug(*args):
 __all__ = ('Controller', )
     
 class Controller(gobject.GObject):
-    '''
+    """
     Controller for a video test producer, used to generate a video test feed.
     The controller's model produces a raw video test feed using videotestsrc.
-    '''
+    """
 # FIXME: decide on a good name for prepared that says "you can do stuff with me
 # now"
-    __gsignals__ = {
-        'prepared': (gobject.SIGNAL_RUN_FIRST, None, ()),
-    }
+    gsignal('prepared')
+    
     def __init__(self):
         """
         Create a new video test controller.
@@ -116,13 +115,12 @@ class Controller(gobject.GObject):
         self.model.set_pattern(index)
 
 class View(gobject.GObject):
-    __gsignals__ = {
-        'width-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
-        'height-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
-        'framerate-changed': (gobject.SIGNAL_RUN_FIRST, None, (float, )),
-        'format-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
-        'pattern-changed': (gobject.SIGNAL_RUN_FIRST, None, (int, )),
-    }
+    gsignal('width-changed', int)
+    gsignal('height-changed', int)
+    gsignal('framerate-changed', float)
+    gsignal('format-changed', int)
+    gsignal('pattern-changed', int)
+   
     latency = 100 # latency for timeouts on config changes
 
     def __init__(self):

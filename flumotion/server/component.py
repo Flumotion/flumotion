@@ -212,12 +212,6 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
     gsignal('error', str, str)
     gsignal('log', object)
     
-    #__gsignals__ = {
-    #    'state-changed': (gobject.SIGNAL_RUN_FIRST, None, (str, object)),
-    #    'error':         (gobject.SIGNAL_RUN_FIRST, None, (str, str)),
-    #    'log':         (gobject.SIGNAL_RUN_FIRST, None, (object,)),
-    #    }
-    
     logCategory = 'basecomponent'
     __remote_interfaces__ = interfaces.IBaseComponent,
     component_view = ComponentView

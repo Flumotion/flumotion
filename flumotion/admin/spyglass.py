@@ -30,11 +30,12 @@ import gtk
 import gtk.glade
 
 import flumotion.config
+from flumotion.utils.gstutils import gsignal
 
 import os
 
 if gtk.pygtk_version < (2,3,91):
-   raise SystemExit, "PyGTK 2.3.91 or higher required"
+    raise SystemExit, "PyGTK 2.3.91 or higher required"
 
 def _debug(*args):
     flumotion.utils.log.debug('spyglass', ' '.join(args))
@@ -43,16 +44,15 @@ def _debug(*args):
 __all__ = ('Controller', )
     
 class Controller(gobject.GObject):
-    '''
+    """
     Controller for a spyglass, used for viewing a video feed.
     The controller's model takes a raw video feed as accepted by ximagesink.
-    '''
-# FIXME: decide on a good name for prepared that says "you can do stuff with me
-# now"
-    __gsignals__ = {
-        'prepared': (gobject.SIGNAL_RUN_FIRST, None, ()),
-        'focus-changed': (gobject.SIGNAL_RUN_FIRST, None, (object, )),
-    }
+    """
+    # FIXME: decide on a good name for prepared that says "you can do stuff with me
+    # now"
+    gsignal('prepared')
+    gsignal('focus-changed', object)
+    
     def __init__(self):
         """
         Create a new spyglass controller.
@@ -105,10 +105,8 @@ class Controller(gobject.GObject):
         self.emit('focus-changed', key)
 
 class View(gobject.GObject):
-    __gsignals__ = {
-        'have_xid': (gobject.SIGNAL_RUN_FIRST, None, (long, )),
-        'focus-changed': (gobject.SIGNAL_RUN_FIRST, None, (object, ))
-    }
+    gsignal('have-xid', long)
+    gsignal('focus-changed' , object)
 
     def __init__(self):
         """
