@@ -651,7 +651,7 @@ class Vishnu(log.Loggable):
             self.debug('appended deferreds')
 
         dl = defer.DeferredList(list)
-        self.debug('emptyPlanetCallback: returning deferred list %r' % dl)
+        return dl
        
     def _getComponentsToStart(self):
         # return a list of components that are sleeping and not pending
