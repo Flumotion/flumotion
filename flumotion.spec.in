@@ -52,7 +52,7 @@ install -m 755 doc/redhat/flu-worker $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
 # create a .flumotion in the new home
 # FIXME: needs to be done more gracefully
 
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/.flumotion
+install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/flumotion/.flumotion
 
 # create log directory
 install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
@@ -118,7 +118,7 @@ fi
 %{_bindir}/flumotion-tester
 %{_libdir}/flumotion
 %{_datadir}/flumotion
-%attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
+%dir %attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
 %{_sysconfdir}/flumotion
 
 #%ghost %config(noreplace) %attr(600,root,flumotion) %{_sysconfdir}/flumotion/managers/default/default.pem
