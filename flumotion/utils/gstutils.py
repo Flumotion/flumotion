@@ -50,7 +50,7 @@ def verbose_deep_notify_cb(object, orig, pspec, component):
     if pspec.name == 'caps' and output == 'None':
         return
     
-    component.msg('%s: %s = %s' % (orig.get_path_string(),
+    component.debug('%s: %s = %s' % (orig.get_path_string(),
                                    pspec.name,
                                    output))
 

@@ -165,7 +165,7 @@ class HTTPStreamingResource(resource.Resource):
         self.logfile = None
             
         streamer.connect('client-removed', self.streamer_client_removed_cb)
-        self.msg = streamer.msg
+        self.debug = streamer.debug
         self.streamer = streamer
         self.admin = HTTPStreamingAdminResource(self)
 
@@ -228,12 +228,12 @@ class HTTPStreamingResource(resource.Resource):
         request = self.request_hash[fd]
         ip = request.getClientIP()
         self.log(fd, ip, request)
-        self.msg('(%d) client from %s disconnected' % (fd, ip))
+        self.debug('(%d) client from %s disconnected' % (fd, ip))
         del self.request_hash[fd]
         
     def isReady(self):
         if self.streamer.caps is None:
-            self.msg('We have no caps yet')
+            self.debug('We have no caps yet')
             return False
         
         return True
@@ -271,7 +271,7 @@ class HTTPStreamingResource(resource.Resource):
         else:
             setHeader('Content-type', mime)
             
-        self.msg('setting Content-type to %s' % mime)
+        self.debug('setting Content-type to %s' % mime)
         os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
         
     def update_average(self):
@@ -299,11 +299,11 @@ class HTTPStreamingResource(resource.Resource):
         self.streamer.add_client(fd)
 
     def handleNotReady(self, request):
-        self.msg('Not sending data, it\'s not ready')
+        self.debug('Not sending data, it\'s not ready')
         return server.NOT_DONE_YET
         
     def handleMaxclients(self, request):
-        self.msg('Refusing clients, already 1001 clients')
+        self.debug('Refusing clients, already 1001 clients')
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_VERSION)
         
@@ -314,7 +314,7 @@ class HTTPStreamingResource(resource.Resource):
                                  'error': http.RESPONSES[error_code]}
         
     def handleUnauthorized(self, request):
-        self.msg('client from %s is unauthorized' % (request.getClientIP()))
+        self.debug('client from %s is unauthorized' % (request.getClientIP()))
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_VERSION)
         if self.auth:
@@ -334,7 +334,7 @@ class HTTPStreamingResource(resource.Resource):
         return server.NOT_DONE_YET
         
     def render(self, request):
-        self.msg('client from %s connected' % (request.getClientIP()))
+        self.debug('client from %s connected' % (request.getClientIP()))
     
         if not self.isReady():
             return self.handleNotReady(request)
@@ -371,12 +371,12 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
             return
         
         caps_str = gstutils.caps_repr(caps)
-        self.msg('Got caps: %s' % caps_str)
+        self.debug('Got caps: %s' % caps_str)
         
         if not self.caps is None:
             self.warn('Already had caps: %s, replacing' % caps_str)
 
-        self.msg('Storing caps: %s' % caps_str)
+        self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
 
     def get_mime(self):
@@ -403,7 +403,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
         component.BaseComponent.feed_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
-            self.msg('Ready to serve clients on %d' % self.port)
+            self.debug('Ready to serve clients on %d' % self.port)
             
     def link_setup(self, sources, feeds):
         sink = self.get_sink()
@@ -440,7 +440,7 @@ def createComponent(config):
 
     resource = HTTPStreamingResource(component)
     if config.has_key('logfile'):
-        component.msg('Logging to %s' % config['logfile'])
+        component.debug('Logging to %s' % config['logfile'])
         resource.setLogfile(config['logfile'])
 
     if config.has_key('auth'):
@@ -449,7 +449,7 @@ def createComponent(config):
         resource.setAuth(auth_component)
         
     factory = server.Site(resource=resource)
-    component.msg('Listening on %d' % port)
+    component.debug('Listening on %d' % port)
     reactor.listenTCP(port, factory)
 
     return component

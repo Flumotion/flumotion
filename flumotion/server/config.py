@@ -117,7 +117,7 @@ class FlumotionConfigXML:
         defs = registry.getComponent(type)
         properties = defs.getProperties()
 
-        self.msg('Parsing component: %s' % name)
+        self.debug('Parsing component: %s' % name)
         options = self.parseProperties(node, type, properties)
 
         function = self.getFunction(defs)
