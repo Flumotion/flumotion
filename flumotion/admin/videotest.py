@@ -130,7 +130,7 @@ class View(gobject.GObject):
         Construct a new videotest View.
         """
         self.__gobject_init__()
-        self._gladefile = os.path.join(flumotion.config.uidir, 'videotest.glade')
+        self._gladefile = os.path.join(flumotion.config.gladedir, 'videotest.glade')
         self._glade = gtk.glade.XML(self._gladefile, "videotest-widget")
         self._widget = self._glade.get_widget("videotest-widget")
         self._width_timeout = 0

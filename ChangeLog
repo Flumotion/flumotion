@@ -1,5 +1,21 @@
 2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	* data/Makefile.am:
+	* data/image/fluendo.png:
+	* data/ui/Makefile.am:
+	* data/ui/admin.glade:
+	* data/ui/spyglass.glade:
+	* data/ui/videotest.glade:
+	* flumotion/admin/spyglass.py:
+	* flumotion/admin/videotest.py:
+	* flumotion/gui/adminclient.py:
+	  create data/image and data/glade
+	  use it everywhere
+	  add and set app icon
+
+2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/video-server-admin.in:
 	* flumotion/components/http/http.py:
 	* flumotion/gui/adminclient.py:

@@ -1,1 +1,1 @@
-SUBDIRS = registry ui
+SUBDIRS = registry glade image

@@ -115,7 +115,7 @@ class View(gobject.GObject):
         Construct a new Spyglass View.
         """
         self.__gobject_init__()
-        self._gladefile = os.path.join(flumotion.config.uidir, 'spyglass.glade')
+        self._gladefile = os.path.join(flumotion.config.gladedir, 'spyglass.glade')
         self._glade = gtk.glade.XML(self._gladefile, "spyglass-widget")
         self._widget = self._glade.get_widget("spyglass-widget")
         self._combo = self._glade.get_widget("spyglass-combo")

@@ -137,14 +137,17 @@ class Window(log.Loggable):
     Creates the GtkWindow for the user interface.
     Also connects to the controller on the given host and port.
     '''
-    def __init__(self, gladedir, host, port):
-        self.gladedir = gladedir
+    def __init__(self, host, port):
+        self.gladedir = flumotion.config.gladedir
+        self.imagedir = flumotion.config.imagedir
         self.connect(host, port)
         self.create_ui()
         
     def create_ui(self):
         self.wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
         self.window = self.wtree.get_widget('main_window')
+        iconfile = os.path.join(self.imagedir, 'fluendo.png')
+        self.window.set_icon_from_file(iconfile)
         self.button_change = self.wtree.get_widget('button_change')
         self.button_change.connect('clicked', self._button_change_cb)
         self.button_reload = self.wtree.get_widget('button_reload')
@@ -339,14 +342,14 @@ class Window(log.Loggable):
     def close(self, *args):
         reactor.stop()
 
-def main(args, gladedir=flumotion.config.uidir):
+def main(args, gladedir=flumotion.config.gladedir):
     try:
         host = args[1]
         port = int(args[2])
     except IndexError:
         print "Please specify a host and a port number"
         sys.exit(1)
-    win = Window(gladedir, host, port)
+    win = Window(host, port)
     reactor.run()
     
 if __name__ == '__main__':

@@ -52,7 +52,8 @@ bin/flumotion
 bin/video-server-admin
 bin/Makefile
 data/Makefile
-data/ui/Makefile
+data/glade/Makefile
+data/image/Makefile
 data/registry/Makefile
 flumotion/Makefile
 flumotion/components/Makefile
