@@ -516,7 +516,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
 
     def _render(self, request):
         fd = request.transport.fileno()
-        self.debug('[fd %5d] render: client from %s connected, request %s' %
+        self.debug('[fd %5d] _render(): client from %s connected, request %s' %
             (fd, request.getClientIP(), request))
 
         if not self.isReady():
@@ -526,7 +526,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
 
         d = self.authenticate(request)
         d.addCallback(self._authenticatedCallback, request)
-        self.debug('asked for authentication')
+        self.debug('_render(): asked for authentication')
         # FIXME
         #d.addErrback()
 
@@ -542,19 +542,26 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             return
 
         # properly authenticated
-        fd = request.transport.fileno()
-        if self.bouncerName:
-            self._fdToKeycard[fd] = keycard
-            self._idToKeycard[keycard.id] = keycard
-
-        if keycard.duration:
-            self.debug('new connection on %d will be expired in %f seconds' % (fd, keycard.duration))
-            self._fdToDurationCall[fd] = reactor.callLater(keycard.duration, self._durationCallLater, fd)
-
         if request.method == 'GET':
+            fd = request.transport.fileno()
+
+            if self.bouncerName:
+                self._fdToKeycard[fd] = keycard
+                self._idToKeycard[keycard.id] = keycard
+
+            if keycard.duration:
+                self.debug('new connection on %d will be expired in %f seconds' % (fd, keycard.duration))
+                self._fdToDurationCall[fd] = reactor.callLater(keycard.duration, self._durationCallLater, fd)
+
             self._handleNewClient(request)
+
         elif request.method == 'HEAD':
+            self.debug('handling HEAD request')
             self._writeHeaders(request)
+            # tell Twisted we already wrote headers ourselves
+            request.startedWriting = True
+            request.finish()
+
         else:
             raise AssertionError
 
