@@ -562,8 +562,8 @@ class Soundcard(wizard.WizardStep):
         element = self.combobox_system.get_enum().element
 
         d = dict(device=self.combobox_device.get_string(),
-                    bitdepth=int(self.combobox_bitdepth.get_string()),
-                    samplerate=int(self.combobox_samplerate.get_string()),
+                    depth=int(self.combobox_bitdepth.get_string()),
+                    rate=int(self.combobox_samplerate.get_string()),
                     channels=channels,
                     input=self.combobox_input.get_string())
         # FIXME: can a key with a dash be specified ?
