@@ -19,6 +19,7 @@ Requires:	python-imaging
 Requires(post):	openssl
 
 BuildRequires:	gstreamer-devel >= 0.8.5
+BuildRequires:	gstreamer-python >= 0.7.93
 BuildRequires:	python-devel >= 2.3
 BuildRequires:	pygtk2-devel >= 2.4.0
 BuildRequires:	epydoc
