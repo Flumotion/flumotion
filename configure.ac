@@ -66,6 +66,7 @@ flumotion/admin/gtk/Makefile
 flumotion/common/Makefile
 flumotion/component/Makefile
 flumotion/component/base/Makefile
+flumotion/component/bouncers/Makefile
 flumotion/component/bttv/Makefile
 flumotion/component/dv/Makefile
 flumotion/component/file/Makefile

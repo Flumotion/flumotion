@@ -1,5 +1,17 @@
 2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/bouncer.py:
+	* flumotion/component/bouncer.xml:
+	* flumotion/component/bouncers/Makefile.am:
+	* flumotion/component/bouncers/__init__.py:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/bouncer.xml:
+	  bounce the bouncer around
+
+2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/keycards.py:
 	* flumotion/component/bouncer.py:
 	* flumotion/component/http/http.py:

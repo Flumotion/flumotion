@@ -4,7 +4,7 @@
 # Flumotion - a video streamer server
 # Copyright (C) 2004 Fluendo
 #
-# flumotion/component/bouncer.py: base class for bouncer components
+# flumotion/component/bouncers/bouncer.py: base class for bouncer components
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
