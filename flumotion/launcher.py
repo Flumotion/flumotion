@@ -25,11 +25,11 @@ class Launcher:
         #signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
-    def start_controller(self):
+    def start_controller(self, port):
         pid = os.fork()
         if not pid:
             from controller import ControllerServerFactory
-            self.controller = reactor.listenTCP(8890,
+            self.controller = reactor.listenTCP(port,
                                                 ControllerServerFactory())
             try:
                 reactor.run(False)
