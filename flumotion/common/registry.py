@@ -21,7 +21,6 @@ Parsing of registry.
 
 import os
 import stat
-import sys
 from xml.dom import minidom, Node
 
 from twisted.python import reflect
@@ -198,7 +197,7 @@ class RegistryXmlParser(log.Loggable):
             if child.nodeName == 'source':
                 source = self.parse_source(child)
             elif child.nodeName == 'properties':
-                child_properties = self.parse_properties(properties, child)
+                self.parse_properties(properties, child)
             elif child.nodeName == 'files':
                 files = self.parse_files(child)
             else:
