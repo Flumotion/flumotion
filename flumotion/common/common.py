@@ -68,7 +68,7 @@ def formatStorage(units, precision = 2):
     prefix = prefixes.pop()
     while prefixes and value >= 1000:
         prefix = prefixes.pop()
-        value /= 999
+        value /= 1000
 
     format = "%%.%df %%s" % precision
     return format % (value, prefix)
