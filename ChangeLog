@@ -1,3 +1,10 @@
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/Makefile.am:
+	* testsuite/Makefile.am:
+	* testsuite/runtests.py:
+	  first stab at making make distcheck work again
+
 2004-09-08  Johan Dahlin  <johan@gnome.org>
 
 	* tests/manager.py: update tests.
