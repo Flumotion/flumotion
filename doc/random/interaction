@@ -1,0 +1,87 @@
+interaction between client-side UI parts and worker-side components
+-------------------------------------------------------------------
+
+- admin_gtk.py files and component.py files are closely tied together in
+  that they need to have a "silent interface" they respect so they can call
+  on each other
+
+- a ui node wants to call a method on an effect:
+  - node does self.effectCallRemote(methodName, ...)
+  - base.admin_gtk has EffectAdminGtkNode base class which
+    creates a ui node for an effect and does
+    self.admin.componentCallRemote(componentName, "effect", effectName,
+      methodName, ...)
+  - flumotion.admin.admin:
+    the model (self.admin) calls componentCallRemote
+  - flumotion.manager.admin:
+    the admin avatar receives this as 
+    perspective_componentCallRemote(componentName, "effect", effectName,
+      methodName, ...)
+    if the component exists in the componentheaven, the call gets transfered
+    to the component avatar
+    with component.mindCallRemote("effect", effectName, methodName, ...)
+  - flumotion.manager.common:
+    the avatar calls mindCallRemote("effect", effectName, methodName, ...)
+  - flumotion.component.feedcomponent:
+    the feed component's medium receives this call as
+    remote_effect(effectName, methodName, ...)
+    - it checks if the effect exists
+    - it checks if the effect has a method called effect_(methodName)
+    - it calls the method on it with (...)
+  - (whatever actual effect):
+    - method is called on the effect
+    
+- an effect wants to call a method on all UI nodes representing it:
+  - a message needs to go from a component to an admin-side view on the
+    component
+
+  - f.c.e.colorbalance.colorbalance:
+    colorbalance does
+    self.component.adminCallRemote("effectPropertyChanged", effectName,
+       propertyName, value)
+
+    --> ORIGINAL MESSAGE:
+    self.component.adminCallRemote("effectPropertyChanged", effectName,
+       propertyName, value)
+
+  - f.c.component:
+    self.medium.callRemote("adminCallRemote", "effectPropertyChanged",
+        effectName, propertyName, value)
+  - f.c.component:
+    medium does callRemote()
+
+  MANAGER
+  - f.m.component:
+    serialized to perspective_adminCallRemote("effectPropertyChanged",
+       effectName, propertyName, value)
+
+    calls self.vishnu.adminHeaven.avatarsCallRemote("componentCall",
+	componentName, "effectPropertyChanged", effectName, propertyName, value)
+
+  - f.m.admin:
+    calls avatar.mindCallRemote() for each avatar
+  - f.m.admin:
+    each avatar calls 
+    self.mindCallRemote('componentCall', componentName,
+      "effectPropertyChanged", effectName, propertyName, value)
+
+  ADMIN
+  - f.a.admin:
+    gets serialized to remote_componentCall()
+    for each view:
+      view.componentCall(componentName, "effectPropertyChanged", effectName,
+        propertyName, value)
+
+  - f.a.gtk.client:
+    gets componentCall called
+    looks up componentName in list of componentViews
+    looks up if "component_effectPropertyChanged" is implemented
+    calls componentView.component_effectPropertyChanged(effectName,
+        propertyName, value)
+
+   - f.c.base.admin_gtk:
+     effectPropertyChanged(effectName, propertyName, value): -> INTERFACE
+     base method gets overridden in the admin ui class
+
+TODO:
+flumotion.manager.admin perspective_workerCallRemote
