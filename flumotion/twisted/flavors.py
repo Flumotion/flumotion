@@ -33,18 +33,36 @@ class IStateListener(components.Interface):
     I am an interface for objects that want to listen to changes on
     cached states.
     """
-    def stateSet(self, key, value):
+    def stateSet(self, object, key, value):
         """
-        The given key has been set to the given value.
+        @type  object: L{RemoteCache}
+        @param object: the state object having changed
+        @type  key:    string
+        @param key:    the key being set
+        @param value:  the value the key is being set to
+        
+        The given key on the given object has been set to the given value.
         """
 
-    def stateAppend(self, key, value):
+    def stateAppend(self, object, key, value):
         """
+        @type  object: L{RemoteCache}
+        @param object: the state object having changed
+        @type  key:    string
+        @param key:    the key being appended to
+        @param value:  the value being appended to the list given by key
+
         The given value has been added to the list given by the key.
         """
 
-    def stateRemove(self, key, value):
+    def stateRemove(self, object, key, value):
         """
+        @type  object: L{RemoteCache}
+        @param object: the state object having changed
+        @type  key:    string
+        @param key:    the key being removed from
+        @param value:  the value being removed from the list given by key
+
         The given value has been removed from the list given by the key.
         """
 
