@@ -1,12 +1,14 @@
 2004-10-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/test_http.py: Fix rest regressions.
+
 	* doc/reference/Makefile.am:
 	* flumotion/common/Makefile.am:
 	* flumotion/common/auth.py:
 	* flumotion/component/http/http.py:
 	* flumotion/component/http/http.xml:
 
-	Kill auth, replaced by bouncer
+	Kill auth, replaced by bouncer.
 	
 2004-10-14  Johan Dahlin  <johan@gnome.org>
 
