@@ -105,7 +105,9 @@ class WizardSaver:
             license_options = self.wizard.get_step_options('Content License')
             if license_options['license'] == LicenseType.CC:
                 properties['cc_logo'] = True
-    
+        else:
+            properties = {}
+            
         return Component('video-overlay', 'overlay', properties, step.worker)
         
     def getVideoEncoder(self):
