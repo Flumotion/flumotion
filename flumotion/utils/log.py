@@ -20,9 +20,13 @@
 
 import sys
 
+_do_logging = False
+
 def log(m):
-    sys.stderr.write(m)
-    sys.stderr.flush()
+    global _do_logging
+    if _do_logging:
+        sys.stderr.write(m)
+        sys.stderr.flush()
     
 def msg(category, *args):
     log('[%s] %s\n' % (category, ' '.join(args)))
@@ -34,3 +38,11 @@ def error(category, *args):
     log('[%s] ERROR: %s\n' % (category, ' '.join(args)))
     raise SystemExit
 
+def enableLogging():
+    global _do_logging
+    _do_logging = True
+
+def disableLogging():
+    global _do_logging
+    _do_logging = False
+    

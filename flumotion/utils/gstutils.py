@@ -24,6 +24,14 @@ import gobject
 import gst
 from twisted.python import log
 
+def caps_repr(caps):
+    value = str(caps)
+    pos = value.find('streamheader')
+    if pos != -1:
+        return value[:pos+12] + '=<...>'
+    else:
+        return value
+        
 def verbose_deep_notify_cb(object, orig, pspec):
     value = orig.get_property(pspec.name)
     if pspec.value_type == gobject.TYPE_BOOLEAN:
@@ -33,12 +41,7 @@ def verbose_deep_notify_cb(object, orig, pspec):
             value = 'FALSE'
         output = value
     elif pspec.value_type == gst.Caps.__gtype__:
-        value = str(value)
-        pos = value.find('streamheader')
-        if pos != -1:
-            output = value[:pos+12] + '=<...>'
-        else:
-            output = value
+        output = caps_repr(value)
     else:
         output = value
 

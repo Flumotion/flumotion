@@ -28,19 +28,51 @@ import string
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 
+sys_argv = sys.argv
+sys.argv = sys_argv[:1]
+import gst
+sys.argv = sys_argv
+
 from flumotion.twisted import gstreactor
 gstreactor.install()
+
 
 from twisted.internet import reactor
 from twisted.web import server, resource
 
 from flumotion import errors
-from flumotion.server import controller
+from flumotion.server.controller import ControllerServerFactory
 from flumotion.server.converter import Converter
 from flumotion.server.producer import Producer
 from flumotion.server.streamer import Streamer, StreamingResource
 from flumotion.utils import log, gstutils
 
+def set_proc_text(text):
+    return
+
+    i = 0
+    for item in proc:
+        n = len(item)
+        if not text:
+            value = '\0'
+        elif len(text) > n:
+            value = text[:n+1] 
+            text = text[n:]
+        else:
+            value = text + '\0'
+            text = None
+
+        print '%d = %r' % (i, value)
+        proc[i] = value
+        i += 1
+        
+    #print len(proc)
+    #proc[0] = 'flumotion - laun'
+    #proc[1] = 'cher\0'
+    #proc[2] = '\0'
+    #proc[3] = '\0'
+    #proc[4] = '\0'
+    
 class Launcher:
     def __init__(self, controller_port):
         self.children = []
@@ -48,15 +80,18 @@ class Launcher:
         self.controller_port = controller_port
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-
+        
+        set_proc_text('flumotion [launcher]')
+        
     def msg(self, *args):
-        log.msg('[launcher] %s' % string.join(args))
+        log.msg('launcher', *args)
 
     def start_controller(self, port):
         pid = os.fork()
         if not pid:
-            from controller import ControllerServerFactory
-            self.controller = reactor.listenTCP(port, ControllerServerFactory())
+            set_proc_text('flumotion [controller]')
+            factory = ControllerServerFactory()
+            self.controller = reactor.listenTCP(port, factory)
             try:
                 reactor.run(False)
             except KeyboardInterrupt:
@@ -93,6 +128,7 @@ class Launcher:
     def start(self, component):
         pid = os.fork()
         if not pid:
+            set_proc_text('flumotion [%s]' % component.component_name)
             self.spawn(component)
             raise SystemExit
         else:
@@ -105,6 +141,7 @@ class Launcher:
     def start_streamer(self, component, factory, port):
         pid = os.fork()
         if not pid:
+            set_proc_text('flumotion [%s]' % component.component_name)
             reactor.listenTCP(port, factory)
             self.spawn(component)
             raise SystemExit
@@ -145,11 +182,8 @@ class Launcher:
         raise SystemExit
 
     def load_config(self, filename):
-        from producer import Producer
-        from converter import Converter
-        from streamer import Streamer, StreamingResource
-
         c = ConfigParser.ConfigParser()
+        self.msg('Loading configuration file `%s\'' % filename)
         c.read(filename)
 
         components = {}
@@ -196,55 +230,63 @@ class Launcher:
     
 def get_options_for(kind, args):
     if kind == 'producer':
-        need_pipeline = True
         need_sources = False
-    elif kind == 'converter':
         need_pipeline = True
+    elif kind == 'converter':
         need_sources = True
+        need_pipeline = True
     elif kind == 'streamer':
-        need_pipeline = False
         need_sources = True
+        need_pipeline = False
     else:
         raise AssertionError
-    
-    parser = optparse.OptionParser()
-    parser.add_option('-c', '--controller-host',
-                      action="store", type="string", dest="host",
-                      default="localhost",
-                      help="Controller to connect to [default localhost]")
-    parser.add_option('', '--controller-port',
-                      action="store", type="int", dest="port",
-                      default=8890,
-                      help="Controller port to connect to [default 8890]")
-    parser.add_option('-n', '--name',
-                      action="store", type="string", dest="name",
-                      default=None,
-                      help="Name of component")
-    if need_pipeline:
-        parser.add_option('-p', '--pipeline',
-                          action="store", type="string", dest="pipeline",
-                          default=None,
-                          help="Pipeline to run")
+
+    usage = "usage: flumotion %s [options]" % kind
+    parser = optparse.OptionParser(usage=usage)
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="Be verbose")
+    
+    group = optparse.OptionGroup(parser, '%s%s options' % (kind[0].upper(),
+                                                           kind[1:]))
+    group.add_option('-n', '--name',
+                     action="store", type="string", dest="name",
+                     default=None,
+                     help="Name of component")
+    if need_pipeline:
+        group.add_option('-p', '--pipeline',
+                         action="store", type="string", dest="pipeline",
+                         default=None,
+                         help="Pipeline to run")
 
     if need_sources:
-        parser.add_option('-s', '--sources',
-                          action="store", type="string", dest="sources",
-                          default="",
-                          help="Host sources to get data from, separated by ,")
+        group.add_option('-s', '--sources',
+                         action="store", type="string", dest="sources",
+                         default="",
+                         help="Host sources to get data from, separated by ,")
 
     if kind == 'streamer':
-        parser.add_option('-p', '--protocol',
-                          action="store", type="string", dest="protocol",
-                          default="http",
-                          help="Protocol to use [default http]")
-        parser.add_option('-o', '--listen-port',
-                          action="store", type="int", dest="listen_port",
-                          default=8080,
-                          help="Port to bind to [default 8080]")
-        
+        group.add_option('-p', '--protocol',
+                         action="store", type="string", dest="protocol",
+                         default="http",
+                         help="Protocol to use [default http]")
+        group.add_option('-o', '--listen-port',
+                         action="store", type="int", dest="listen_port",
+                         default=8080,
+                         help="Port to bind to [default 8080]")
+    parser.add_option_group(group)
+    
+    group = optparse.OptionGroup(parser, "Controller options")
+    group.add_option('-c', '--controller-host',
+                     action="store", type="string", dest="host",
+                     default="localhost",
+                     help="Controller to connect to [default localhost]")
+    group.add_option('', '--controller-port',
+                     action="store", type="int", dest="port",
+                     default=8890,
+                     help="Controller port to connect to [default 8890]")
+    parser.add_option_group(group)
+
     options, args = parser.parse_args(args)
 
     if options.name is None:
@@ -261,7 +303,7 @@ def get_options_for(kind, args):
             return 2
         
     if options.verbose:
-        log.startLogging(sys.stdout)
+        log.enableLogging()
 
     if need_sources:
         if ',' in  options.sources:
@@ -273,7 +315,7 @@ def get_options_for(kind, args):
         
     return options
 
-def run_launcher(config_file):
+def run_launcher(args):
     parser = optparse.OptionParser()
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
@@ -284,8 +326,12 @@ def run_launcher(config_file):
 
     options, args = parser.parse_args(args)
 
+    if len(args) < 3:
+        print 'Need a configuration file'
+        return -1
+    
     if options.verbose:
-        log.startLogging(sys.stderr)
+        log.enableLogging()
 
     launcher = Launcher(options.port)
 
@@ -293,10 +339,37 @@ def run_launcher(config_file):
         launcher.msg('Controller is already started')
     else:
         launcher.start_controller(options.port)
-        
-    launcher.load_config(config_file)
+
+    launcher.load_config(args[2])
         
     launcher.run()
+
+    return 0
+
+def run_controller(args):
+    parser = optparse.OptionParser()
+    parser.add_option('-v', '--verbose',
+                      action="store_true", dest="verbose",
+                      help="Be verbose")
+    group = optparse.OptionGroup(parser, "Controller options")
+    group.add_option('-p', '--port',
+                     action="store", type="int", dest="port",
+                     default=8890,
+                     help="Port to listen on [default 8890]")
+    parser.add_option_group(group)
+    
+    options, args = parser.parse_args(args)
+
+    if options.verbose:
+        log.enableLogging()
+
+    factory = ControllerServerFactory()
+    
+    log.msg('controller', 'Starting at port %d' % options.port)
+    reactor.listenTCP(options.port, factory)
+    reactor.run()
+
+    return 0
 
 def run_component(name, args):
     try:
@@ -336,28 +409,36 @@ def run_component(name, args):
     
     reactor.run()
 
-def run_controller(port=8890):
-    log.msg('controller', 'Starting at port %d' % port)
-    factory = controller.ControllerServerFactory()
-    reactor.listenTCP(port, factory)
-    reactor.run()
-
-    return 0
+def usage():
+    print 'Usage: flumotion command [command-options-and-arguments]'
     
+def show_commands():
+    print 'Flumotion commands are:'
+    print '\tlauncher      Component launcher'
+    print '\tcontroller    Component controller'
+    print '\tproducer      Producer component'
+    print '\tconverter     Converter component'
+    print '\tstreamer      Streamer component'
+    print
+    print '(Specify the --help option for a list of other help options)'
+
 def main(args):
     if len(args) < 2:
-        print 'Usage: flumotion [config file or component] .'
-        raise SystemExit
+        usage()
+        return -1
 
     name = args[1]
-    if name in 'controller':
-        return run_controller()
-    elif name in ['producer', 'converter', 'streamer']:
+    if name == 'controller':
+        return run_controller(args)
+    if name in ['producer', 'converter', 'streamer']:
         return run_component(args[1], args[2:])
-    elif os.path.exists(args[1]):
-        return run_launcher(args[1])
+    elif name == 'launcher':
+        return run_launcher(args)
     else:
-        raise AssertionError
+        print "Unknown command: `%s'" % name
+        print
+        show_commands()
+        return -1
 
     return 0
 

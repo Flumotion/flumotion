@@ -20,7 +20,7 @@
 
 from flumotion.server import component
 
-class Converter(component.BaseComponent):
+class Converter(component.ParseLaunchComponent):
     kind = 'converter'
     def start(self, sources, sink_host, sink_port):
         self.setup_sources(sources)

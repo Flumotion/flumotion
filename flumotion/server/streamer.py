@@ -28,8 +28,9 @@ from twisted.web import server, resource
 from twisted.internet import reactor
 
 from flumotion.server import component
+from flumotion.utils import gstutils
 
-class Streamer(gobject.GObject, component.BaseComponent):
+class Streamer(gobject.GObject, component.ParseLaunchComponent):
     __gsignals__ = {
         'data-received' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
                           (gst.Buffer,)),
@@ -40,20 +41,25 @@ class Streamer(gobject.GObject, component.BaseComponent):
     
     def __init__(self, name, sources):
         self.__gobject_init__()
-        component.BaseComponent.__init__(self, name, sources, self.pipe_template)
+        component.ParseLaunchComponent.__init__(self, name, sources, self.pipe_template)
         self.caps = None
         
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-received', buffer)
         
     def notify_caps_cb(self, element, pad, param):
-        self.msg('Got caps: %s' % pad.get_negotiated_caps())
+        caps = pad.get_negotiated_caps()
+        if caps is None:
+            return
+        
+        caps_str = gstutils.caps_repr(caps)
+        self.msg('Got caps: %s' % caps_str)
         
         if not self.caps is None:
-            self.warn('Already had caps: %s, replacing' % self.caps)
+            self.warn('Already had caps: %s, replacing' % caps_str)
 
-        self.msg('Storing caps: %s' % pad.get_negotiated_caps())
-        self.caps = pad.get_negotiated_caps()
+        self.msg('Storing caps: %s' % caps_str)
+        self.caps = caps
 
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):

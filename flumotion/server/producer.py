@@ -20,7 +20,7 @@
 
 from flumotion.server import component
 
-class Producer(component.BaseComponent):
+class Producer(component.ParseLaunchComponent):
     kind = 'producer'
     
     def listen(self, host, port):
