@@ -27,7 +27,8 @@ AC_PROG_LIBTOOL
 
 dnl check for python
 AM_PATH_PYTHON(2.3)
-AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
+dnl useful when we compile our own python modules
+dnl AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
 
 dnl check for GStreamer
 PKG_CHECK_MODULES(GST, gstreamer-0.8 >= $GST_REQ)
@@ -47,7 +48,26 @@ AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
 AM_CONDITIONAL(HAVE_EPYDOC, test "x$EPYDOC" = "xyes")
 
 dnl check for Twisted
-AS_PYTHON_IMPORT(twisted,,
+AS_PYTHON_IMPORT(twisted,
+  [
+  AC_MSG_CHECKING(for Twisted >= 1.3.0)
+  prog="
+import sys
+import twisted.copyright
+minver = '1.3.0'
+if twisted.copyright.version < minver:
+    sys.exit(1)
+sys.exit(0)
+"
+  if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
+  then
+    AC_MSG_RESULT(found)
+  else
+    AC_MSG_RESULT(too old)
+    AC_MSG_ERROR([You need at least version 1.3.0 of Twisted])
+  fi
+  ]
+  ,
   AC_MSG_ERROR([You need at least version 1.3.0 of Twisted])
 )
 
