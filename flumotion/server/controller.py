@@ -294,7 +294,6 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             
     def perspective_error(self, element, error):
         self.error('error element=%s string=%s' % (element, error))
-        
         self.controller.removeComponent(self)
 
     def perspective_uiStateChanged(self, component_name, state):

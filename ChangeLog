@@ -1,7 +1,5 @@
 2004-09-06  Johan Dahlin  <johan@gnome.org>
 
-	reviewed by: <delete if not using a buddy>
-
 	* flumotion/components/http/http.py:
 	* flumotion/components/http/http_gui.py:
 	* flumotion/gui/adminclient.py:
@@ -9,6 +7,8 @@
 	* flumotion/server/admin.py:
 	* flumotion/server/component.py:
 	* flumotion/server/controller.py:
+
+	Add notifications to administrative interface, improve http view slightly
 
 2004-09-06  Johan Dahlin  <johan@gnome.org>
 
