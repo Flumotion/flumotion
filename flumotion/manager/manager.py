@@ -122,8 +122,6 @@ class Dispatcher(log.Loggable):
         """
         assert components.implements(heaven, interfaces.IHeaven)
        
-        THIS_VAR_DOES_NOT_EXIST_AND_SHOULD_BREAK_BUILDBOT
-         
         self._interfaceHeavens[interface] = heaven
 
 class Vishnu(log.Loggable):
