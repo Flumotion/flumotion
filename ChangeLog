@@ -1,3 +1,8 @@
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/admin.glade:
+	Disable Save in the user interface for now
+
 2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* NEWS:
