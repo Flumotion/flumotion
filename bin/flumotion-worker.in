@@ -40,7 +40,8 @@ def _init_gobject():
     is sane enough to be usable by us
     """
     
-    sys.path.insert(0, PYGTK_DIR)
+    if not PYGTK_DIR in sys.path:
+        sys.path.insert(0, PYGTK_DIR)
 
     try:
         import pygtk
@@ -68,7 +69,8 @@ def _init_gst():
     """
 
     if PYGST_DIR != PYGTK_DIR:
-        sys.path.insert(0, PYGTK_DIR)
+        if not PYGS_DIR in sys.path:
+            sys.path.insert(0, PYGST_DIR)
         
     try:
         import gst

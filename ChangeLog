@@ -1,3 +1,11 @@
+2005-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-admin.in:
+	* bin/flumotion-manager.in:
+	* bin/flumotion-worker.in:
+	  don't insert paths that are already there - allowing me to
+	  test against a Twisted somewhere else than /usr
+
 2005-03-23  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_greeter.py (WizardTest.testMakeGreeter):
