@@ -1,5 +1,23 @@
 2005-02-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/wizard.py (Wizard.destroy): New method, will
+	proxy the destroy to the gtk-window and also free some resources.
+	(::destroy): New signal, fired if the wizard gets destroyed
+	(i.e., the window gets destroyed somehow).
+
+	* flumotion/admin/gtk/connections.py: Remove some printf's.
+	(Connections.get_recent_connections): New method, returns a list
+	of recent connections.
+
+	* flumotion/admin/gtk/client.py (Window.open_connected_cb) 
+	(Window.open_refused_cb, Window.on_open_recent) 
+	(Window._append_recent_connections): New methods, implementing the
+	recent connections menu items.
+	(Window._setAdminModel): Allow re-setting the model. If
+	re-setting, make sure the wizard gets destroyed.
+
+	* data/glade/admin.glade: Name the connections menu.
+
 	* flumotion/admin/gtk/greeter.py: Moved connections code out to
 	connections.py.
 

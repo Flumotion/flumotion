@@ -61,7 +61,6 @@ gobject.type_register(GladeWidget)
 
 
 def parse_connection(f):
-    print 'Parsing XML file: %s' % os.path.basename(f)
     tree = minidom.parse(f)
     state = {}
     for n in [x for x in tree.documentElement.childNodes
@@ -89,7 +88,6 @@ class Connections(GladeWidget):
 
     def __init__(self):
         GladeWidget.__init__(self)
-        print 'totally initializing dude'
         v = self.treeview_connections
 
         c = gtk.TreeViewColumn('Manager', gtk.CellRendererText(),
@@ -119,7 +117,7 @@ class Connections(GladeWidget):
             files = [os.path.join(configure.registrydir, f) for f in files]
             files = [(os.stat(f).st_mtime, f) for f in files
                                               if f.endswith('.connection')]
-            files.sort()
+            files.sort(reverse=True)
             l = self.model
             for f in [x[1] for x in files]:
                 try:
@@ -140,6 +138,16 @@ class Connections(GladeWidget):
         os.unlink(self.model.get_value(i, self.FILE_COL))
         self.model.remove(i)
 
+    def get_recent_connections(self):
+        'used to get connections to add to a menu'
+        connections = []
+        m = self.model
+        i = m.get_iter_first()
+        while i:
+            connections.append(m.get_value(i, self.STATE_COL))
+            i = m.iter_next(i)
+        return connections
+        
     def on_clear_all(self, *args):
         m = self.model
         i = m.get_iter_first()

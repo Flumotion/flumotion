@@ -200,6 +200,7 @@ class Wizard(gobject.GObject, log.Loggable):
     sidebar_pre_bg = None
     
     gsignal('finished', str)
+    gsignal('destroy')
     
     logCategory = 'wizard'
 
@@ -234,6 +235,15 @@ class Wizard(gobject.GObject, log.Loggable):
         self.current_step = None
         self._last_worker = 0 # combo id last worker from step to step
         self._worker_box = None # gtk.Widget containing worker combobox
+
+        self.window.connect('destroy', lambda *x: self.emit('destroy'))
+
+    def destroy(self):
+        self.window.destroy()
+        del self.window
+        del self.wtree
+        del self._admin
+        del self._save
 
     def __getitem__(self, stepname):
         for item in self.steps:

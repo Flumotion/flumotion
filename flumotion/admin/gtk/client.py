@@ -27,7 +27,7 @@ import gtk.glade
 from twisted.internet import reactor
 
 from flumotion.admin.admin import AdminModel
-from flumotion.admin.gtk import dialogs, parts
+from flumotion.admin.gtk import dialogs, parts, connections
 from flumotion.configure import configure
 from flumotion.common import errors, log, worker, planet
 from flumotion.manager import admin # Register types
@@ -54,6 +54,9 @@ class Window(log.Loggable, gobject.GObject):
         self.debug('creating UI')
         self._create_ui()
 
+        self._connections = connections.Connections()
+        self._append_recent_connections()
+
         self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
                                          # disconnected
@@ -63,11 +66,16 @@ class Window(log.Loggable, gobject.GObject):
 
         self.debug('setting model')
         self.admin = None
+        self.wizard = None
         self._setAdminModel(model)
 
     def _setAdminModel(self, model):
         'set the model to which we are a view/controller'
-        assert not self.admin
+        # it's ok if we've already been connected
+        if self.admin:
+            self.debug('Connecting to new model %r' % model)
+            if self.wizard:
+                self.wizard.destroy()
 
         self.admin = model
 
@@ -115,7 +123,7 @@ class Window(log.Loggable, gobject.GObject):
             i.set_from_file(f)
             proc(i)
         
-        def make_menu_proc(m):
+        def make_menu_proc(m): # $%^& pychecker!
             return lambda f: m.set_property('image', f)
         def menu_set_icon(m, name):
             set_icon(make_menu_proc(m), 16, name)
@@ -134,13 +142,6 @@ class Window(log.Loggable, gobject.GObject):
         tool_set_icon(widgets['toolbutton_stop_component'], 'pause.png')
 
         self.hpaned = widgets['hpaned']
-        # too blatant self-promotion ?
-        #old = self.hpaned.get_child2()
-        #self.hpaned.remove(old)
-        #image = gtk.Image()
-        #image.set_from_file(os.path.join(configure.imagedir, 'fluendo.png'))
-        #self.hpaned.add2(image)
-        #image.show()
  
         window.connect('delete-event', self.close)
 
@@ -152,6 +153,47 @@ class Window(log.Loggable, gobject.GObject):
         self.statusbar = parts.AdminStatusbar(widgets['statusbar'])
         return window
 
+    def open_connected_cb(self, model, ids):
+        map(model.disconnect, ids)
+        self.window.set_sensitive(True)
+        self._setAdminModel(model)
+
+    def open_refused_cb(self, model, host, port, use_insecure, ids):
+        map(model.disconnect, ids)
+        self.window.set_sensitive(True)
+        print '\n\nconnection refused, try again'
+        print 'FIXME: make a proper errbox'
+
+    def on_open_recent(self, item, config):
+        model = AdminModel(config['user'], config['passwd'])
+        model.connectToHost(config['host'], config['port'],
+                            config['use_insecure'])
+
+        ids = []
+        ids.append(model.connect('connected',
+                                 self.open_connected_cb, ids))
+        ids.append(model.connect('connection-refused',
+                                 self.open_refused_cb, ids))
+        self.window.set_sensitive(False)
+
+    def _append_recent_connections(self):
+        menu = self.widgets['connection_menu'].get_submenu()
+        clist = self._connections.get_recent_connections()
+        if len(clist) < 2:
+            return
+
+        def append(i):
+            i.show()
+            gtk.MenuShell.append(menu, i) # $%^&* pychecker
+        def append_txt(c, n):
+            s = '_%d: %s:%d/%s' % (n, c['host'], c['port'], c['manager'])
+            i = gtk.MenuItem(s)
+            i.connect('activate', self.on_open_recent, c)
+            append(i)
+            
+        append(gtk.SeparatorMenuItem())
+        # the first one is the current one, don't show it
+        map(append_txt, clist[1:], range(1,len(clist)))
 
     # UI helper functions
     def show_error_dialog(self, message, parent=None, close_on_response=True):
@@ -426,8 +468,11 @@ class Window(log.Loggable, gobject.GObject):
         self.setPlanetState(self.admin.getPlanetState())
 
         if not self._components:
+            def nullwizard(*args):
+                self.wizard = None
             self.debug('no components detected, running wizard')
-            self.runWizard()
+            self.wizard = self.runWizard()
+            self.wizard.connect('destroy', nullwizard)
     
     def admin_disconnected_cb(self, admin):
         message = "Lost connection to manager, reconnecting ..."
