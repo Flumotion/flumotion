@@ -32,29 +32,25 @@ from twisted.internet import reactor, error, defer
 from twisted.cred import error as crederror
 from twisted.spread import pb
 
-from flumotion.common import interfaces, errors, log, planet
+from flumotion.common import interfaces, errors, log, planet, medium
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 from flumotion.common.pygobject import gsignal
 
-# FIXME: make the superklass reconnecting ?
-superklass = fpb.FPBClientFactory
-# the client factory logging in to the manager
-class ComponentClientFactory(superklass):
+
+class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     """
     I am a client factory for a component logging in to the manager.
     """
     logCategory = 'component'
-    __super_login = superklass.login
     def __init__(self, component):
         """
         @param component: L{flumotion.component.component.BaseComponent}
         """
         # doing this as a class method triggers a doc error
-        super_init = superklass.__init__
-        super_init(self)
+        fpb.ReconnectingFPBClientFactory.__init__(self)
         
         self.component = component
         # get the component's medium class, defaulting to the base one
@@ -63,6 +59,7 @@ class ComponentClientFactory(superklass):
         self.medium = klass(component)
         component.setMedium(self.medium)
 
+        self.maxDelay = 10
         # get the interfaces implemented by the component medium class
         self.interfaces = getattr(klass, '__implements__', ())
 
@@ -77,40 +74,39 @@ class ComponentClientFactory(superklass):
         reactor.stop()
         self.component.setMood(moods.sad)
 
-    def login(self, keycard):
-        d = self.__super_login(keycard, self.medium,
-                               interfaces.IComponentMedium)
-        d.addCallback(self._loginCallback)
-        d.addErrback(self._unauthorizedLoginErrback)
-        d.addErrback(self._connectionRefusedErrback)
-        d.addErrback(self._loginErrback)
-        return d
+    # vmethod implementation
+    def gotDeferredLogin(self, d):
+        def remoteDisconnected(remoteReference):
+            self.warning('Lost connection to manager, will attempt to reconnect')
+
+        def loginCallback(reference):
+            self.info("Logged in to manager")
+            self.debug("remote reference %r" % reference)
+            self.medium.setRemoteReference(reference)
+            reference.notifyOnDisconnect(remoteDisconnected)
+
+        def accessDeniedErrback(failure):
+            failure.trap(crederror.UnauthorizedLogin)
+            self.error('Access denied.')
+            
+        def connectionRefusedErrback(failure):
+            failure.trap(error.ConnectionRefusedError)
+            self.error('Connection to manager refused.')
+                                                          
+        def loginFailedErrback(failure):
+            self.error('Login failed, reason: %s' % failure)
+
+        d.addCallback(loginCallback)
+        d.addErrback(accessDeniedErrback)
+        d.addErrback(connectionRefusedErrback)
+        d.addErrback(loginFailedErrback)
+
+    def startLogin(self, keycard):
+        fpb.ReconnectingFPBClientFactory.startLogin(self, keycard, self.medium,
+                                                    interfaces.IComponentMedium)
         
-    # this method receives a RemoteReference
-    # it can't tell if it's from an IPerspective implementor, Viewpoint or
-    # Referenceable
-    def _loginCallback(self, remoteReference):
-        """
-        @param remoteReference: an object on which we can callRemote to the
-                                manager's avatar
-        @type remoteReference: L{twisted.spread.pb.RemoteReference}
-        """
-        self.medium.setRemoteReference(remoteReference)
-
-    def _unauthorizedLoginErrback(self, failure):
-        failure.trap(crederror.UnauthorizedLogin)
-        self.error('Unauthorized login.')
-                                                                                
-    def _connectionRefusedErrback(self, failure):
-        failure.trap(error.ConnectionRefusedError)
-        self.error('Connection to %s:%d refused.' % (self.manager_host,
-                                                     self.manager_port))
-
-    def _loginErrback(self, failure):
-        self.error('Login failed, reason: %r' % failure)
-    
 # needs to be before BaseComponent because BaseComponent references it
-class BaseComponentMedium(pb.Referenceable, log.Loggable):
+class BaseComponentMedium(medium.BaseMedium):
     """
     I am a medium interfacing with a manager-side avatar.
     I implement a Referenceable for the manager's avatar to call on me.
@@ -127,42 +123,8 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         self.comp = component
         self.comp.connect('log', self._component_log_cb)
         
-        self.remote = None # the perspective we have on the other side (?)
-
         self.logName = component.name
         
-    ### IMedium methods
-    def setRemoteReference(self, remoteReference):
-        self.remote = remoteReference
-        
-    def hasRemoteReference(self):
-        return self.remote != None
-
-    # call function on remote perspective in manager
-    def callRemoteErrback(self, failure, name):
-        self.warning('callRemote(%s) failed because of %r' % (name, failure))
-        failure.trap(pb.PBConnectionLost)
-        
-    def callRemote(self, name, *args, **kwargs):
-        """
-        @returns: a deferred
-        """
-        if not self.hasRemoteReference():
-            self.debug('skipping %s, no perspective' % name)
-            return
-
-        #def errback(reason):
-        #    self.warning('stopping pipeline because of %s' % reason)
-        #    self.comp.pipeline_stop()
-
-        try:
-            d = self.remote.callRemote(name, *args, **kwargs)
-        except pb.DeadReferenceError:
-            return
-        
-        d.addErrback(self.callRemoteErrback, name)
-        return d
-
     ### our methods
     def getIP(self):
         """
@@ -196,6 +158,16 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         self.debug('remote_getState of f: returning %r' % self.comp.state)
 
         return self.comp.state
+        
+    def remote_getConfig(self):
+        """
+        Return the configuration of the component.
+
+        @rtype:   dict
+        @returns: component's current configuration
+        """
+        self.debug('remote_getConfig of f: returning %r' % self.comp.config)
+        return self.comp.config
         
     def remote_start(self, *args, **kwargs):
         return self.comp.start(*args, **kwargs)
@@ -254,7 +226,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
     @type component_medium_class: child class of L{BaseComponentMedium}
     """
 
-    __remote_interfaces__ = interfaces.IComponentMedium,
     logCategory = 'basecomp'
 
     gsignal('log', object)
@@ -269,9 +240,10 @@ class BaseComponent(log.Loggable, gobject.GObject):
         @param name: unique name of the component
         @type name: string
         """
-        self.__gobject_init__()
+        gobject.GObject.__init__(self)
 
         self.state = planet.WorkerJobState()
+        self.config = None # a dict
         
         #self.state.set('name', name)
         self.state.set('mood', moods.sleeping.value)
@@ -339,6 +311,9 @@ class BaseComponent(log.Loggable, gobject.GObject):
 
     def setWorkerName(self, workerName):
         self.state.set('workerName', workerName)
+
+    def setConfig(self, config):
+        self.config = config
 
     def getWorkerName(self):
         return self.state.get('workerName')

@@ -289,7 +289,7 @@ class ComponentAvatar(base.ManagerAvatar):
     ### ComponentAvatar methods
     def cleanup(self):
         """
-        Clean up when detaching."
+        Clean up when detaching.
         """
         if self._HeartbeatCheckDC:
             self._HeartbeatCheckDC.cancel()
@@ -374,8 +374,9 @@ class ComponentAvatar(base.ManagerAvatar):
 
     def _mindGetStateCallback(self, state): 
         # called after the mind has attached.
-        # state: L{flumotion.common.component.ManagerComponentState}
+        # state: L{flumotion.common.planet.ManagerJobState}
         if not state:
+            # how in god's name is this possible?
             self.debug('no state received yet, rescheduling')
             reactor.callLater(1, self._getState)
             return None
@@ -887,6 +888,33 @@ class ComponentHeaven(base.ManagerHeaven):
         # tell the admin client
         #componentName = componentAvatar.avatarId
         #self.vishnu.adminHeaven.uiStateChanged(componentName, state)
+
+        # ensure it has a parent -- the parent will be null if this is
+        # an already-running worker connects to a freshly restarted
+        # manager
+        state = componentAvatar.componentState
+        if not state:
+            self.warning('Implement manager connection sniffing')
+            return
+
+        if not state.get('parent'):
+            # parent is normally set by the manager when creating a flow
+            # from an xml file. in this case we get a state, and
+            # reconstruct the parent. unfortunately we have to do it by
+            # parsing the avatar id, but hey, life isn't perfect.
+            flowName = componentAvatar.avatarId.split('/')[1]
+            flows = self.vishnu.state.get('flows')
+            try:
+                flow = dict([(x.get('name'),x) for x in flows])[flowName]
+            except KeyError:
+                # FIXME: this is just copied from manager.py
+                self.info('Creating flow "%s"' % flowName)
+                flow = planet.ManagerFlowState()
+                flow.set('name', flowName)
+                flow.set('parent', self.vishnu.state)
+                self.vishnu.state.append('flows', flow)
+            state.set('parent', flow)
+            flow.append('components', state)
 
         # tell the feeder set
         set = self._getFeederSet(componentAvatar)

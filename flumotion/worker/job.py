@@ -33,6 +33,7 @@ from twisted.python import reflect, failure
 from twisted.spread import pb
 
 from flumotion.common import config, errors, interfaces, log, registry, keycards
+from flumotion.common import medium
 from flumotion.component import component
 
 def getComponent(dict, defs):
@@ -92,7 +93,7 @@ def getComponent(dict, defs):
     log.debug('job', 'returning component %r' % component)
     return component
 
-class JobMedium(pb.Referenceable, log.Loggable):
+class JobMedium(medium.BaseMedium):
     """
     I am a medium between the job and the worker's job avatar.
     I live in the job process.
@@ -102,7 +103,6 @@ class JobMedium(pb.Referenceable, log.Loggable):
     __implements__ = interfaces.IJobMedium,
 
     def __init__(self, options):
-        self.remote = None
         self.options = options
         self.avatarId = None
         self.logName = None
@@ -114,7 +114,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.manager_port = port
         self.manager_transport = transport
         
-    def remote_start(self, avatarId, type, configDict, feedPorts):
+    def remote_start(self, avatarId, type, config, feedPorts):
         """
         I am called on by the worker's JobAvatar to start a component.
         
@@ -122,8 +122,8 @@ class JobMedium(pb.Referenceable, log.Loggable):
         @type  avatarId:   string
         @param type:       type of component to start
         @type  type:       string
-        @param configDict: the configuration dictionary
-        @type  configDict: dict
+        @param config:     the configuration dictionary
+        @type  config:     dict
         @param feedPorts:  feedName -> port
         @type  feedPorts:  dict
         """
@@ -131,20 +131,12 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.logName = avatarId
 
         defs = registry.registry.getComponent(type)
-        self._runComponent(avatarId, type, configDict, defs, feedPorts)
+        self._runComponent(avatarId, type, config, defs, feedPorts)
 
     def remote_stop(self):
         self.debug('remote_stop() called')
         reactor.stop()
         #os._exit(0)
-
-    ### IMedium methods
-    def setRemoteReference(self, remoteReference):
-        self.remote = remoteReference
-    
-    # FIXME: add to IMedium
-    def hasPerspective(self):
-        return self.remote != None
 
     ### our methods
     def _set_nice(self, nice):
@@ -223,14 +215,14 @@ class JobMedium(pb.Referenceable, log.Loggable):
             comp.set_feed_ports(feedPorts)
 
         comp.setWorkerName(self.options.name)
+        comp.setConfig(config)
 
         # make component log in to manager
         manager_client_factory = component.ComponentClientFactory(comp)
         keycard = keycards.KeycardUACPP(self.options.username,
             self.options.password, 'localhost')
         keycard.avatarId = avatarId
-        d = manager_client_factory.login(keycard)
-        d.addCallback(lambda result: self.info('Logged in to manager'))
+        manager_client_factory.startLogin(keycard)
 
         host = self.manager_host
         port = self.manager_port

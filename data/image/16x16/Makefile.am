@@ -1,8 +1,9 @@
 imagedir = $(pkgdatadir)/image/16x16
 
 image_DATA = \
-	wizard.png \
+	about.png \
+	pause.png \
 	play.png \
-	pause.png
+	wizard.png
 
 EXTRA_DIST = $(image_DATA)

@@ -7,6 +7,7 @@ flumotion_PYTHON = \
 	checkers.py \
 	compat.py \
 	credentials.py \
+	defer.py \
 	flavors.py \
 	gstreactor.py \
 	gtk2reactor.py \

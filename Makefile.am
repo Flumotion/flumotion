@@ -60,7 +60,8 @@ PYCHECKER_WHITELIST = \
 PYCHECKER_BLACKLIST = \
 	flumotion/component/converters/overlay/overlay.py \
 	flumotion/component/producers/firewire/firewire.py \
-	flumotion/worker/checks/video.py
+	flumotion/worker/checks/video.py \
+	flumotion/twisted/defer.py
 
 pychecker:
 	@echo running pychecker ...

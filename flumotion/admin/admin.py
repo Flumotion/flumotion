@@ -33,10 +33,11 @@ from twisted.internet import error, defer, reactor
 from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
-from flumotion.common import bundle, common, errors, interfaces, log, keycards
+from flumotion.common import bundle, common, errors, interfaces, log
+from flumotion.common import keycards, worker, planet, medium
 from flumotion.twisted import flavors
+from flumotion.twisted.defer import defer_generator
 # serializable worker and component state
-from flumotion.common import worker, planet
 
 from flumotion.configure import configure
 from flumotion.common import reload
@@ -45,10 +46,64 @@ from flumotion.twisted import pb as fpb
 
 from flumotion.common.pygobject import gsignal, gproperty
 
-# FIXME: this is a Medium
+
+class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
+    def __init__(self, medium, user, passwd):
+        fpb.ReconnectingFPBClientFactory.__init__(self)
+
+        self.user = user
+        self.passwd = passwd
+        self.medium = medium
+        self.maxDelay = 20
+
+        # FIXME: try more than one auth method
+        #keycard = keycards.KeycardUACPP(user, passwd, 'localhost')
+        keycard = keycards.KeycardUACPCC(user, 'localhost')
+        # FIXME: decide on an admin name ?
+        keycard.avatarId = "admin"
+ 
+        # start logging in
+        self.startLogin(keycard, medium, interfaces.IAdminMedium)
+
+    # vmethod implementation
+    def gotDeferredLogin(self, d):
+        yield d
+
+        try:
+            result = d.value()
+            assert result
+            # if it's not a reference, we need to respond to a
+            # challenge...
+            if not isinstance(result, pb.RemoteReference):
+                keycard = result
+                keycard.setPassword(self.passwd)
+                self.log("_loginCallback: responding to challenge")
+                d = self.login(keycard, self.medium, interfaces.IAdminMedium)
+                yield d
+                result = d.value()
+
+            self.medium.setRemoteReference(result)
+
+        except error.ConnectionRefusedError:
+            self.debug("emitting connection-refused")
+            self.emit('connection-refused')
+            self.debug("emitted connection-refused")
+
+        except crederror.UnauthorizedLogin:
+            # FIXME: unauthorized login emit !
+            self.debug("emitting connection-refused")
+            self.medium.emit('connection-refused')
+            self.debug("emitted connection-refused")
+
+        except Exception, e:
+            self.medium._defaultErrback(e)
+
+    gotDeferredLogin = defer_generator(gotDeferredLogin)
+        
+
 # FIXME: stop using signals, we can provide a richer interface with actual
 # objects and real interfaces for the views a model communicates with
-class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
+class AdminModel(medium.BaseMedium, gobject.GObject):
     """
     I live in the admin client.
     I am a data model for any admin view implementing a UI to
@@ -59,7 +114,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     """
     gsignal('connected')
     gsignal('disconnected')
-    gsignal('connection-refused', str, int, bool)
+    gsignal('connection-refused')
     gsignal('ui-state-changed', str, object)
     gsignal('component-property-changed', str, str, object)
     gsignal('reloading', str)
@@ -70,67 +125,29 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
 
     __implements__ = interfaces.IAdminMedium, flavors.IStateListener,
 
-    # appease pychecker
-    # FIXME: this is stupid, fix this properly ?
-    _components = {}
-    clientFactory = None
-    remote = None
-    _workerHeavenState = None
-    _views = []
-    _unbundler = None
-    state = 'disconnected'
-
-    user = passwd = host = port = use_insecure = None
+    # Public instance variables (read-only)
+    planet = None
 
     def __init__(self, username, password):
         self.__gobject_init__()
         
+        # All of these instance variables are private. Cuidado cabrones!
         self.user = username
         self.passwd = password
+        self.host = self.port = self.use_insecure = None
 
-        self.clientFactory = fpb.ReconnectingFPBClientFactory()
+        self.state = 'disconnected'
+        self.clientFactory = AdminClientFactory(self, username, password)
         # 20 secs max for an admin to reconnect
         self.clientFactory.maxDelay = 20
 
-        self.remote = None
-
         self._components = {} # dict of components
-        self._planetState = None
+        self.planet = None
         self._workerHeavenState = None
         
         self._views = [] # all UI views I am serving
 
         self._unbundler = bundle.Unbundler(configure.cachedir)
-
-        self.debug("logging in to ServerFactory")
-
-        # FIXME: one without address maybe ? or do we want manager to set it ?
-        # or do we set our guess and let manager correct ?
-        # FIXME: try both, one by one, and possibly others
-        #keycard = keycards.KeycardUACPP(username, password, 'localhost')
-        keycard = keycards.KeycardUACPCC(username, 'localhost')
-        # FIXME: decide on an admin name ?
-        keycard.avatarId = "admin"
- 
-        # start logging in
-        self.clientFactory.startLogin(keycard, self, interfaces.IAdminMedium)
-
-        # override gotDeferredLogin so we can add callbacks.
-        def gotDeferredLogin(d):
-            # add a callback to respond to the challenge
-            d.addCallback(self._loginCallback, password)
-            d.addErrback(self._accessDeniedErrback)
-            d.addErrback(self._connectionRefusedErrback)
-            # when the loginCallback finally succeeds, we are logged in
-            # and get a remote reference
-            d.addCallback(self.setRemoteReference)
-            d.addCallback(self._getPlanetState)
-            d.addCallback(self._getWorkerHeavenState)
-            d.addCallback(self._connectedCallback)
-            d.addErrback(self._defaultErrback)
-
-        # if this ever breaks, do real subclassing
-        self.clientFactory.gotDeferredLogin = gotDeferredLogin
 
     def connectToHost(self, host, port, use_insecure=False):
         'Connect to a host.'
@@ -147,72 +164,6 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
             reactor.connectSSL(host, port, self.clientFactory,
                                ssl.ClientContextFactory())
 
-    ### our methods
-    def _loginCallback(self, result, password):
-        self.log("_loginCallback(result=%r, password=%s)" % (result, password))
-        assert result
-        # if we have a reference, we're in
-        if isinstance(result, pb.RemoteReference):
-            return result
-        # else, we need to respond to the challenge
-        keycard = result
-        keycard.setPassword(password)
-        self.log("_loginCallback: responding to challenge")
-        d = self.clientFactory.login(keycard, self, interfaces.IAdminMedium)
-        return d
-        
-    def _connectionRefusedErrback(self, failure):
-        failure.trap(error.ConnectionRefusedError)
-        self.debug("emitting connection-refused")
-        self.emit('connection-refused', self.host, self.port, self.use_insecure)
-        self.debug("emitted connection-refused")
-
-    def _accessDeniedErrback(self, failure):
-        failure.trap(crederror.UnauthorizedLogin)
-        # FIXME: unauthorized login emit !
-        self.debug("emitting connection-refused")
-        self.emit('connection-refused', self.host, self.port, self.use_insecure)
-        self.debug("emitted connection-refused")
-
-    def _getPlanetState(self, result):
-        # called after logging in and getting a reference
-        d = self.callRemote('getPlanetState')
-        d.addCallback(lambda result: self._setPlanetState(result))
-        d.addCallback(lambda result, s: s.debug('got planet state'), self)
-
-        # if you don't return the deferred, they don't chain properly !       
-        return d
-
-    def _getWorkerHeavenState(self, result):
-        # called after logging in and getting a reference
-        d = self.callRemote('getWorkerHeavenState')
-        d.addCallback(lambda result: self._setWorkerHeavenState(result))
-        d.addCallback(lambda result, s: s.debug('got worker state'), self)
-        return d
-        
-    def _writeConnection(self):
-        s = ''.join(['<connection>',
-                     '<host>%s</host>' % self.host,
-                     '<manager>%s</manager>' % self._planetState.get('name'),
-                     '<port>%d</port>' % self.port,
-                     '<use_insecure>%d</use_insecure>' 
-                     % (self.use_insecure and 1 or 0),
-                     '<user>%s</user>' % self.user,
-                     '<passwd>%s</passwd>' % self.passwd,
-                     '</connection>'])
-        
-        sum = md5.new(s).hexdigest()
-        f = os.path.join(configure.registrydir, '%s.connection' % sum)
-        h = open(f, 'w')
-        h.write(s)
-        h.close()
-
-    def _connectedCallback(self, result):
-        self.debug('Connected to manager and retrieved all state')
-        self.state = 'connected'
-        self._writeConnection()
-        self.emit('connected')
-        
     # default Errback
     def _defaultErrback(self, failure):
         self.debug('Unhandled deferred failure: %r (%s)' % (
@@ -224,21 +175,57 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         self.clientFactory.resetDelay()
         #self.clientFactory.retry(self.clientFactory.connector)
 
-    ### IMedium methods
+    def connectionInfoStr(self):
+        return '%s:%s (%s)' % (self.host, self.port,
+                               self.use_insecure and 'http' or 'https')
+
     def setRemoteReference(self, remoteReference):
-        # we get called when we managed to log in to a manager
-        self.debug("setRemoteReference: %s" % remoteReference)
-        self.remote = remoteReference
-        self.remote.notifyOnDisconnect(self._remoteDisconnected)
+        def writeConnection():
+            s = ''.join(['<connection>',
+                         '<host>%s</host>' % self.host,
+                         '<manager>%s</manager>' % self.planet.get('name'),
+                         '<port>%d</port>' % self.port,
+                         '<use_insecure>%d</use_insecure>' 
+                         % (self.use_insecure and 1 or 0),
+                         '<user>%s</user>' % self.user,
+                         '<passwd>%s</passwd>' % self.passwd,
+                         '</connection>'])
+            
+            sum = md5.new(s).hexdigest()
+            f = os.path.join(configure.registrydir, '%s.connection' % sum)
+            h = open(f, 'w')
+            h.write(s)
+            h.close()
 
-    def _remoteDisconnected(self, remoteReference):
-        self.debug("emitting disconnected")
-        self.state = 'disconnected'
-        self.emit('disconnected')
-        self.debug("emitted disconnected")
+        # chain up
+        medium.BaseMedium.setRemoteReference(self, remoteReference)
 
-    def hasRemoteReference(self):
-        return self.remote != None
+        # fixme: push the disconnect notification upstream
+        def remoteDisconnected(remoteReference):
+            self.debug("emitting disconnected")
+            self.state = 'disconnected'
+            self.emit('disconnected')
+            self.debug("emitted disconnected")
+        self.remote.notifyOnDisconnect(remoteDisconnected)
+
+        d = self.callRemote('getPlanetState')
+        yield d
+        self.planet = d.value()
+        # monkey, Monkey, MONKEYPATCH!!!!!
+        self.planet.admin = self
+        self.debug('got planet state')
+        self.callViews('setPlanetState', self.planet)
+
+        d = self.callRemote('getWorkerHeavenState')
+        yield d
+        self._workerHeavenState = d.value()
+        self.debug('got worker state')
+        
+        writeConnection()
+        self.debug('Connected to manager and retrieved all state')
+        self.state = 'connected'
+        self.emit('connected')
+    setRemoteReference = defer_generator(setRemoteReference)
 
     def callViews(self, methodName, *args, **kwargs):
         """
@@ -299,14 +286,6 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
             self._views.remove(view)
         
     ## generic remote call methods
-    def callRemote(self, methodName, *args, **kwargs):
-        """
-        Call the given remote method on the manager-side AdminAvatar.
-        """
-        if not self.remote:
-            raise errors.ManagerNotConnectedError
-        return self.remote.callRemote(methodName, *args, **kwargs)
-
     def componentCallRemote(self, componentState, methodName, *args, **kwargs):
         """
         Call the given method on the given component with the given args.
@@ -413,7 +392,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
 
         self.emit('reloading', 'manager')
         self.info("reloading manager code")
-        d = self.remote.callRemote('reloadManager')
+        d = self.callRemote('reloadManager')
         d.addCallback(_reloaded, self)
         d.addErrback(self._defaultErrback)
         return d
@@ -432,20 +411,20 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         name = componentState.get('name')
         self.info("reloading component %s code" % name)
         self.emit('reloading', name)
-        d = self.remote.callRemote('reloadComponent', componentState)
+        d = self.callRemote('reloadComponent', componentState)
         d.addCallback(_reloaded, self, componentState)
         d.addErrback(self._defaultErrback)
         return d
 
     ## manager remote methods
     def loadConfiguration(self, xml_string):
-        return self.remote.callRemote('loadConfiguration', xml_string)
+        return self.callRemote('loadConfiguration', xml_string)
 
     def getConfiguration(self):
-        return self.remote.callRemote('getConfiguration')
+        return self.callRemote('getConfiguration')
 
     def cleanComponents(self):
-        return self.remote.callRemote('cleanComponents')
+        return self.callRemote('cleanComponents')
 
     # function to get remote code for admin parts
     # FIXME: rename slightly ?
@@ -632,14 +611,6 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         return self._components
     getComponents = get_components
     
-    def _setPlanetState(self, planetState):
-        self.debug('setting planetState %r' % planetState)
-        self._planetState = planetState
-        self.callViews('setPlanetState', planetState)
-
-    def getPlanetState(self):
-        return self._planetState
-           
     def _setWorkerHeavenState(self, state):
         self._workerHeavenState = state
 

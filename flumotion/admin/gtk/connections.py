@@ -31,16 +31,43 @@ from flumotion.configure import configure
 from flumotion.common.pygobject import gsignal, gproperty
 
 
-def parse_connection(f):
-    tree = minidom.parse(f)
-    state = {}
-    for n in [x for x in tree.documentElement.childNodes
-                if x.nodeType != Node.TEXT_NODE
-                   and x.nodeType != Node.COMMENT_NODE]:
-        state[n.nodeName] = n.childNodes[0].wholeText
-    state['port'] = int(state['port'])
-    state['use_insecure'] = (state['use_insecure'] != '0')
-    return state
+def get_recent_connections():
+    def parse_connection(f):
+        tree = minidom.parse(f)
+        state = {}
+        for n in [x for x in tree.documentElement.childNodes
+                    if x.nodeType != Node.TEXT_NODE
+                       and x.nodeType != Node.COMMENT_NODE]:
+            state[n.nodeName] = n.childNodes[0].wholeText
+        state['port'] = int(state['port'])
+        state['use_insecure'] = (state['use_insecure'] != '0')
+        return state
+    def human_readable(state):
+        return '%s@%s:%d' % (state['user'], state['host'], state['port'])
+
+    try:
+        # DSU, or as perl folks call it, a Schwartz Transform
+        files = os.listdir(configure.registrydir)
+        files = [os.path.join(configure.registrydir, f) for f in files]
+        files = [(os.stat(f).st_mtime, f) for f in files
+                                          if f.endswith('.connection')]
+        files.sort()
+        files.reverse()
+
+        ret = []
+        for f in [x[1] for x in files]:
+            try:
+                state = parse_connection(f)
+                ret.append({'name': human_readable(state),
+                            'file': f,
+                            'state': state})
+            except Exception, e:
+                print 'Error parsing %s: %r' % (f, e)
+                raise
+        return ret
+    except OSError, e:
+        print 'Error: %s: %s' % (e.strerror, e.filename)
+        return []
 
         
 class Connections(GladeWidget):
@@ -81,47 +108,16 @@ class Connections(GladeWidget):
             self.emit('has-selection', False)
 
     def _populate_liststore(self):
-        def human_readable(state):
-            return '%s@%s:%d' % (state['user'], state['host'], state['port'])
-
         self.model = gtk.ListStore(str, str, object)
-        try:
-            # DSU, or as perl folks call it, a Schwartz Transform
-            files = os.listdir(configure.registrydir)
-            files = [os.path.join(configure.registrydir, f) for f in files]
-            files = [(os.stat(f).st_mtime, f) for f in files
-                                              if f.endswith('.connection')]
-            files.sort()
-            files.reverse()
-            l = self.model
-            for f in [x[1] for x in files]:
-                try:
-                    state = parse_connection(f)
-                    i = l.append()
-                    l.set_value(i, self.STR_COL, human_readable(state))
-                    l.set_value(i, self.FILE_COL, f)
-                    l.set_value(i, self.STATE_COL, state)
-                except Exception, e:
-                    print 'Error parsing %s: %r' % (f, e)
-                    raise
-        except OSError, e:
-            print 'Error: %s: %s' % (e.strerror, e.filename)
+        for x in get_recent_connections():
+            i = self.model.append()
+            self.model.set(i, self.STR_COL, x['name'], self.FILE_COL, x['file'],
+                           self.STATE_COL, x['state'])
 
     def _clear_iter(self, i):
         os.unlink(self.model.get_value(i, self.FILE_COL))
         self.model.remove(i)
 
-    def get_recent_connections(self):
-        'Returns a list of (string, state) tuples of recent manager connections'
-        connections = []
-        m = self.model
-        i = m.get_iter_first()
-        while i:
-            t = [m.get_value(i, c) for c in self.STR_COL, self.STATE_COL]
-            connections.append(t)
-            i = m.iter_next(i)
-        return connections
-        
     def on_grab_focus(self, *args):
         v = self.treeview_connections
         model, i = v.get_selection().get_selected()

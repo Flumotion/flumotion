@@ -24,8 +24,8 @@ Flumotion interfaces
 
 from twisted.python import components
 
-# FIXME: create a base class that implements setRemoteReference
-# since they're the same in all
+
+# See also flumotion.medium.BaseMedium.
 class IMedium(components.Interface):
     """
     I am a base interface for PB client-side mediums interfacing with

@@ -65,11 +65,15 @@ class TestWorkerClientFactory(unittest.TestCase):
         reactor.callLater(0, reactor.stop)
         reactor.run()
 
+class FakeRef:
+    def notifyOnDisconnect(self, callback):
+        pass
+
 class TestWorkerMedium(unittest.TestCase):
     def testSetRemoteReference(self):
         brain = worker.WorkerBrain(FakeOptions())
         self.medium = worker.WorkerMedium(brain)
-        self.medium.setRemoteReference('remote')
+        self.medium.setRemoteReference(FakeRef())
         self.assert_(self.medium.hasRemoteReference())
         reactor.callLater(0, reactor.stop)
         reactor.run()

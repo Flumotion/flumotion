@@ -36,7 +36,8 @@ from twisted.spread import pb
 import twisted.cred.error
 import twisted.internet.error
 
-from flumotion.common import errors, interfaces, log, bundleclient, common
+from flumotion.common import errors, interfaces, log, bundleclient
+from flumotion.common import common, medium
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
 from flumotion.worker import job
@@ -64,36 +65,34 @@ class WorkerClientFactory(factoryClass):
         factoryClass.startLogin(self, keycard, self.medium,
             interfaces.IWorkerMedium)
         
+    # vmethod implementation
     def gotDeferredLogin(self, d):
-        d.addCallback(self._loginCallback)
-        d.addErrback(self._accessDeniedErrback)
-        d.addErrback(self._connectionRefusedErrback)
-        d.addErrback(self._loginFailedErrback)
+        def remoteDisconnected(remoteReference):
+            self.warning('Lost connection to manager, will attempt to reconnect')
+
+        def loginCallback(reference):
+            self.info("Logged in to manager")
+            self.debug("remote reference %r" % reference)
+            self.medium.setRemoteReference(reference)
+            reference.notifyOnDisconnect(remoteDisconnected)
+
+        def accessDeniedErrback(failure):
+            failure.trap(twisted.cred.error.UnauthorizedLogin)
+            self.error('Access denied.')
             
-    def _loginCallback(self, reference):
-        self.info("Logged in to manager")
-        self.debug("remote reference %r" % reference)
-        self.setRemoteReference(reference)
+        def connectionRefusedErrback(failure):
+            failure.trap(twisted.internet.error.ConnectionRefusedError)
+            self.error('Connection to %s:%d refused.' % (self.manager_host,
+                                                         self.manager_port))
+                                                          
+        def loginFailedErrback(failure):
+            self.error('Login failed, reason: %s' % str(failure))
 
-    def setRemoteReference(self, remoteReference):
-        self.medium.setRemoteReference(remoteReference)
-        remoteReference.notifyOnDisconnect(self._remoteDisconnected)
-
-    def _remoteDisconnected(self, remoteReference):
-        self.warning('Lost connection to manager, will attempt to reconnect')
-
-    def _accessDeniedErrback(self, failure):
-        failure.trap(twisted.cred.error.UnauthorizedLogin)
-        self.error('Access denied.')
-        
-    def _connectionRefusedErrback(self, failure):
-        failure.trap(twisted.internet.error.ConnectionRefusedError)
-        self.error('Connection to %s:%d refused.' % (self.manager_host,
-                                                     self.manager_port))
-                                                      
-    def _loginFailedErrback(self, failure):
-        self.error('Login failed, reason: %s' % str(failure))
-
+        d.addCallback(loginCallback)
+        d.addErrback(accessDeniedErrback)
+        d.addErrback(connectionRefusedErrback)
+        d.addErrback(loginFailedErrback)
+            
     # override log.Loggable method so we don't traceback
     def error(self, message):
         self.warning('Shutting down worker because of error:')
@@ -101,7 +100,7 @@ class WorkerClientFactory(factoryClass):
         print >> sys.stderr, 'ERROR: %s' % message
         reactor.stop()
 
-class WorkerMedium(pb.Referenceable, log.Loggable):
+class WorkerMedium(medium.BaseMedium):
     """
     I am a medium interfacing with the manager-side WorkerAvatar.
     """
@@ -112,7 +111,6 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
     
     def __init__(self, brain):
         self.brain = brain
-        self.remote = None
         self.bundleLoader = None
         
     def cb_processFinished(self, *args):
@@ -121,21 +119,12 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
     def cb_processFailed(self, *args):
         self.debug('processFailed %r' % args)
 
-    ### IMedium methods
-    def setRemoteReference(self, remoteReference):
-        self.debug('setRemoteReference: %r' % remoteReference)
-        self.remote = remoteReference
-        self.bundleLoader = bundleclient.BundleLoader(self.remote)
-
-    def hasRemoteReference(self):
-        return self.remote != None
-
     ### pb.Referenceable method for the manager's WorkerAvatar
     def remote_start(self, avatarId, type, config):
         """
         Start a component of the given type with the given config.
 
-        @param avatarId: type of the component to start
+        @param avatarId: avatar identification string
         @type  avatarId: string
         @param type:     type of the component to start
         @type  type:     string

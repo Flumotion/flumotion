@@ -19,7 +19,6 @@
 # Headers in this file shall remain intact.
 
 import os
-import md5
 import sys
 
 import gobject
@@ -36,6 +35,7 @@ from flumotion.configure import configure
 from flumotion.common import errors, log, worker, planet, common
 from flumotion.manager import admin # Register types
 from flumotion.twisted import flavors, reflect
+from flumotion.ui import icons
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
@@ -118,33 +118,26 @@ class Window(log.Loggable, gobject.GObject):
         widgets = self.widgets
 
         window = self.window = widgets['main_window']
-        iconfile = os.path.join(configure.imagedir, 'fluendo.png')
-        gtk.window_set_default_icon_from_file(iconfile)
-        window.set_icon_from_file(iconfile)
         
         def set_icon(proc, size, name):
-            f = os.path.join(configure.imagedir, '%dx%d' % (size,size), name)
             i = gtk.Image()
-            i.set_from_file(f)
+            i.set_from_stock('flumotion-'+name, size)
             proc(i)
         
         def make_menu_proc(m): # $%^& pychecker!
             return lambda f: m.set_property('image', f)
         def menu_set_icon(m, name):
-            set_icon(make_menu_proc(m), 16, name)
+            set_icon(make_menu_proc(m), gtk.ICON_SIZE_MENU, name)
         
         def tool_set_icon(m, name):
-            set_icon(m.set_icon_widget, 24, name)
+            set_icon(m.set_icon_widget, gtk.ICON_SIZE_SMALL_TOOLBAR, name)
 
-        iconfile = os.path.join(configure.imagedir, 'fluendo.png')
-        gtk.window_set_default_icon_from_file(iconfile)
-
-        menu_set_icon(widgets['menuitem_manage_run_wizard'], 'wizard.png')
-        tool_set_icon(widgets['toolbutton_wizard'], 'wizard.png')
-        menu_set_icon(widgets['menuitem_manage_start_component'], 'play.png')
-        tool_set_icon(widgets['toolbutton_start_component'], 'play.png')
-        menu_set_icon(widgets['menuitem_manage_stop_component'], 'pause.png')
-        tool_set_icon(widgets['toolbutton_stop_component'], 'pause.png')
+        menu_set_icon(widgets['menuitem_manage_run_wizard'], 'wizard')
+        tool_set_icon(widgets['toolbutton_wizard'], 'wizard')
+        menu_set_icon(widgets['menuitem_manage_start_component'], 'play')
+        tool_set_icon(widgets['toolbutton_start_component'], 'play')
+        menu_set_icon(widgets['menuitem_manage_stop_component'], 'pause')
+        tool_set_icon(widgets['toolbutton_stop_component'], 'pause')
 
         self.hpaned = widgets['hpaned']
  
@@ -203,7 +196,7 @@ class Window(log.Loggable, gobject.GObject):
             else:
                 menu.remove(w)
 
-        clist = connections.Connections().get_recent_connections()
+        clist = connections.get_recent_connections()
         if not clist:
             return
 
@@ -211,8 +204,8 @@ class Window(log.Loggable, gobject.GObject):
             i.show()
             gtk.MenuShell.append(menu, i) # $%^&* pychecker
         def append_txt(c, n):
-            i = gtk.MenuItem(c[0])
-            i.connect('activate', self.on_recent_activate, c[1])
+            i = gtk.MenuItem(c['name'])
+            i.connect('activate', self.on_recent_activate, c['state'])
             append(i)
             
         append(gtk.SeparatorMenuItem())
@@ -540,7 +533,7 @@ class Window(log.Loggable, gobject.GObject):
         self.emit('connected')
 
         # get initial info we need
-        self.setPlanetState(self.admin.getPlanetState())
+        self.setPlanetState(self.admin.planet)
 
         if not self._components:
             self.debug('no components detected, running wizard')
@@ -568,18 +561,17 @@ class Window(log.Loggable, gobject.GObject):
         elif id == 1:
             self.admin.reconnect()
         
-    def admin_connection_refused_later(self, host, port, use_insecure):
-        message = "Connection to manager on %s:%d (%s) was refused." \
-                  % (host, port, use_insecure and 'http' or 'https')
+    def admin_connection_refused_later(self, admin):
+        message = ("Connection to manager on %s was refused."
+                   % admin.connectionInfoStr())
         self.info(message)
         d = dialogs.ErrorDialog(message, self)
         d.show_all()
         d.connect('response', self.close)
 
-    def admin_connection_refused_cb(self, admin, host, port, use_insecure):
+    def admin_connection_refused_cb(self, admin):
         log.debug('adminclient', "handling connection-refused")
-        reactor.callLater(0, self.admin_connection_refused_later,
-                          host, port, use_insecure)
+        reactor.callLater(0, self.admin_connection_refused_later, admin)
         log.debug('adminclient', "handled connection-refused")
 
     def admin_ui_state_changed_cb(self, admin, name, state):

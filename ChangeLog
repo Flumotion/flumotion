@@ -1,3 +1,132 @@
+2005-04-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/admin.py (AdminModel.setRemoteReference): Molest
+	the planet.
+	
+	* flumotion/admin/admin.py (AdminClientFactory.gotDeferredLogin):
+	Refactor to use defer_generator.
+
+	* flumotion/admin/gtk/client.py: Adapt to admin.py api change.
+
+	* flumotion/twisted/defer.py: Feeble attempt to appease pychecker.
+	If infants can code it, pychecker can verify it! Non-infant use
+	not recommended.
+
+	* flumotion/admin/admin.py (AdminModel.setRemoteReference): Rework
+	to use defer_generator.
+	(AdminModel.planet): Renamed from _planetState, public for
+	readonly access. All accessors changed.
+	(AdminModel.__init__): Move private instance variable
+	initialization here.
+	(AdminModel.getPlanetState): Removed, just get AdminModel.planet.
+	
+	* flumotion/test/defer.py: Fix test suite name.
+
+	* flumotion/test/Makefile.am (flumotion_PYTHON):
+	* flumotion/test/test_defer.py: Test suite for
+	flumotion.twisted.defer.
+
+	* flumotion/twisted/Makefile.am (flumotion_PYTHON):
+	* flumotion/twisted/defer.py: New file, integrating twisted
+	deferreds with python generators. I'm not using deferredGenerator
+	because it's too verbose.
+
+2005-04-04  Andy Wingo  <wingo@pobox.com>
+
+	* data/image/16x16/about.png: 
+	* data/image/24x24/about.png: New files, from the hicolor gnome
+	theme. LGPL.
+
+	* flumotion/admin/gtk/client.py (Window._create_ui): Use stock
+	icons.
+
+	* flumotion/ui/Makefile.am: 
+	* flumotion/ui/icons.py: New file, instantiates stock icons for
+	flumotion doohickeys.
+
+	* flumotion/manager/component.py
+	(ComponentHeaven.registerComponent): Add some brackets, make
+	python 2.3 happy
+
+	* flumotion/admin/gtk/client.py
+	(Window._append_recent_connections): Adapt to recieve a list of
+	dicts instead of tuples.
+
+	* flumotion/admin/gtk/connections.py (get_recent_connections):
+	Refactored out of Connections. Now returns a list of dicts instead
+	of a list of tuples.
+	(Connections._populate_liststore): Use get_recent_connections.
+
+	* flumotion/test/test_worker_worker.py
+	(TestWorkerMedium.testSetRemoteReference): Fix so the remote
+	reference behaves more like a remote reference.
+
+	* flumotion/common/medium.py (BaseMedium): New file, implements a
+	base class for mediums.
+	(BaseMedium.setRemoteReference, BaseMedium.hasRemoteReference)
+	(BaseMedium.callRemote): Implement these interface methods in the
+	BaseMedium. callRemote traps PBConnectionLost.
+	(BaseMedium.remote, BaseMedium.bundleLoader): Instance vars, set
+	to None.
+
+	* flumotion/common/interfaces.py: Add a note pointing to the
+	medium implementation in flumotion.medium.
+
+	* flumotion/component/component.py (BaseComponentMedium): 
+	* flumotion/worker/worker.py (WorkerMedium): 
+	* flumotion/worker/job.py (JobMedium): 
+	* flumotion/admin/admin.py (AdminModel): Descend from BaseMedium,
+	removing unneeded code.
+
+	* flumotion/admin/admin.py (AdminClientFactory):
+	AdminModel-specific client factory, encapsulating all of the login
+	krap.
+	(AdminModel::connection-refused): Don't pass connection parameters
+	in the args, rather provide...
+	(AdminModel.connectionInfoStr): New function, returns a
+	human-presentable string for the connection parameters.
+	(AdminModel.setRemoteReference): Extends the BaseMedium method,
+	encapsulating all of the operations that happens when a model gets
+	connected to a remote reference.
+
+	* flumotion/admin/gtk/client.py
+	(Window.admin_connection_refused_later)
+	(Window.admin_connection_refused_cb): Adapt to connection-refused
+	signal change, call connectionInfoStr().
+
+	* flumotion/worker/worker.py (WorkerMedium.remote_start): Doc fix.
+	(WorkerClientFactory.gotDeferredLogin): Refactor callbacks as
+	closures rather than methods. Kleaner.
+
+	* flumotion/worker/job.py (JobMedium.remote_start): Rename
+	configDict arg to config.
+	(JobMedium._runComponent): Set the config dict on the component,
+	so it knows how it was instantiated. Adapt to reconnecting
+	component factory api.
+	(JobMedium.hasPerspective): Removed, it's the same as
+	hasRemoteReference implemented in BaseMedium.
+
+	* flumotion/manager/component.py (ComponentAvatar.cleanup): Fix
+	extra quote in doc.
+	(ComponentAvatar._mindGetStateCallback): Doc type of state
+	argument.
+	(ComponentHeaven.registerComponent): Beginnings of componentState
+	reconstruction code.
+
+	* flumotion/component/component.py
+	(BaseComponent.__remote_interfaces__): Removed. What on earth was
+	this, anyway? It's not referenced at all in flumotion or twisted.
+	(ComponentClientFactory): Now a reconnecting factory. This means
+	that if the manager goes away, components will try to reconnect to
+	it later. Methods refactored to use the
+	startLogin/gotDeferredLogin interface.
+	(BaseComponentMedium.remote_getConfig): New remote method, will
+	return the component's configuration dict.
+	(BaseComponent.__init__): Chain up properly, add .dict instance
+	var.
+	(BaseComponent.setConfig): New method, sets the configuration dict
+	on a component.
+
 2005-04-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:

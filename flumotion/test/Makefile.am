@@ -16,6 +16,7 @@ EXTRA_DIST = 				\
 	test_config.py 			\
 	test_credentials.py 		\
 	test_dag.py	 		\
+	test_defer.py			\
 	test_dialogs.py 		\
 	test_enum.py 			\
 	test_flavors.py 		\
