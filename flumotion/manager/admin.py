@@ -29,13 +29,12 @@ from flumotion.utils import log
 class ComponentView(pb.Copyable):
     """
     I present state of a component through a L{RemoteComponentView} in the peer.
-    I get the state I present from a L{manager.ComponentAvatar}.
+    I get the state I present from a L{flumotion.manager.component.ComponentAvatar}.
     I live in the manager.
     """
     def __init__(self, component):
-        # FIXME: move ComponentAvatar to manager.component
         """
-        @type component: L{flumotion.manager.manager.ComponentAvatar}
+        @type component: L{flumotion.manager.component.ComponentAvatar}
         """
         self.name = component.getName()
         # forced to int so it's jellyable
@@ -108,7 +107,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         """
         Return all components logged in to the manager.
         
-        @rtype: C{list} of L{flumotion.manager.admin.ComponentView}
+        @rtype: C{list} of L{flumotion.manager.manager.ComponentView}
         """
         # FIXME: should we use an accessor to get at components from c ?
         clients = map(ComponentView, self.manager.components.values())
@@ -296,7 +295,7 @@ class AdminHeaven(pb.Root, log.Loggable):
         """
         Tell all created AdminAvatars that a component was added.
 
-        @type component: L{flumotion.manager.manager.ComponentAvatar}
+        @type component: L{flumotion.manager.component.ComponentAvatar}
         """
         for client in self.clients:
             client.componentAdded(component)
@@ -305,7 +304,7 @@ class AdminHeaven(pb.Root, log.Loggable):
         """
         Tell all created AdminAvatars that a component was removed.
 
-        @type component: L{flumotion.manager.manager.ComponentAvatar}
+        @type component: L{flumotion.manager.component.ComponentAvatar}
         """
         for client in self.clients:
             client.componentRemoved(component)

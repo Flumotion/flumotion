@@ -4,6 +4,7 @@ flumotion_PYTHON = \
 	__init__.py \
 	admin.py \
 	auth.py \
+	component.py \
 	config.py \
 	interfaces.py \
 	launcher.py \

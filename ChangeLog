@@ -1,5 +1,14 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/Makefile.am:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* tests/manager.py:
+	  created manager/component.py, yay !
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/admin.py:
 	* flumotion/manager/manager.py:
 	  change doc crosslinks to match

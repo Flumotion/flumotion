@@ -1,6 +1,6 @@
 from common import unittest
 
-from flumotion.manager import manager
+from flumotion.manager import component, manager
 
 class FakeComponentPerspective:
     def __init__(self, name='fake', eaters=[], port=-1, listen_host='listen-host'):
@@ -36,7 +36,7 @@ class TestManager(unittest.TestCase):
 
     def testGetPerspective(self):
         p = self.manager.getAvatar('foo-bar-baz')
-        assert isinstance(p, manager.ComponentAvatar)
+        assert isinstance(p, component.ComponentAvatar)
 
         #self.assertRaises(AssertionError,
         #                  self.manager.getPerspective, 'does-not-exist')
