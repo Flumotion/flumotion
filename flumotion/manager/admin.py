@@ -256,8 +256,8 @@ class AdminHeaven(pb.Root, log.Loggable):
 
     def __init__(self, vishnu):
         """
-        @type componentheaven: L{flumotion.manager.component.ComponentHeaven}
-        @param componentheaven: the ComponentHeaven to administrate for
+        @type vishnu: L{flumotion.manager.manager.Vishnu}
+        @param vishnu: the Vishnu in control of all the heavens
         """
         self.vishnu = vishnu
         self.clients = [] # all AdminAvatars we instantiate
