@@ -151,13 +151,11 @@ class WorkerHeaven(pb.Root):
     def workerStartComponent(self, workerName, componentName, type, config):
         """
         @param workerName: name of the worker to start component on
-        @type name: string
-        @param type:
-        @type type: string
+        @type  workerName: string
+        @param componentName: name of the component to start
+        @type  componentName: string
         @param config: a configuration dictionary
-        @type config: dict
-        @param worker: name of the worker to start the component on
-        @type worker: string
+        @type  config: dict
         """
         
         if not self.avatars:
