@@ -1,3 +1,26 @@
+2005-01-21  Andy Wingo  <wingo@pobox.com>
+
+	* data/glade/admin-wizard.glade: Glade file for the generic
+	wizard.
+	
+	* data/glade/greeter-initial.glade: 
+	* data/glade/greeter-connect_to_existing.glade: 
+	* data/glade/greeter-authenticate.glade: Glade files for the
+	greeter wizard.
+
+	* flumotion/admin/gtk/greeter.py: New file, uses wizard.py to make
+	a greeter, run when the user first starts the admin client.
+
+	* flumotion/test/test_greeter.py: New test for the wizard set up
+	to run the greeter.
+
+	* flumotion/admin/gtk/wizard.py: New file, implementing a generic
+	wizard widget.
+	
+	* flumotion/admin/gtk/Makefile.am (component_PYTHON): 
+	* data/glade/Makefile.am (glade_DATA): 
+	* flumotion/test/Makefile.am (EXTRA_DIST): Updated appropriately.
+
 2005-01-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:

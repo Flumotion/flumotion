@@ -13,6 +13,7 @@ EXTRA_DIST = 			\
 	test_dialogs.py 	\
 	test_enum.py 		\
 	test_flavors.py 	\
+	test_greeter.py		\
 	test_htpasswdcrypt.py 	\
 	test_http.py 		\
 	test_keycards.py 	\

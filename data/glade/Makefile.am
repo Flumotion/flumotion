@@ -1,5 +1,9 @@
- glade_DATA = \
+glade_DATA = \
 	admin.glade 			\
+	admin-wizard.glade		\
+	greeter-initial.glade		\
+	greeter-connect_to_existing.glade	\
+	greeter-authenticate.glade	\
 	wizard.glade 			\
 	wizard_audiotest.glade		\
 	wizard_audio_encoder.glade	\
@@ -24,4 +28,4 @@
 
 gladedir = $(pkgdatadir)/glade
 
-EXTRA_DIST = $(glade_DATA)
+EXTRA_DIST = $(glade_DATA) $(testfiles)
