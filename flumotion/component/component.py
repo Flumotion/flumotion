@@ -78,8 +78,12 @@ class ComponentView(pb.Referenceable, log.Loggable):
         def errback(reason):
             self.warning('stopping pipeline because of %s' % reason)
             self.comp.pipeline_stop()
-            
-        cb = self.remote.callRemote(name, *args, **kwargs)
+
+        try:
+            cb = self.remote.callRemote(name, *args, **kwargs)
+        except pb.DeadReferenceError:
+            return
+        
         cb.addErrback(errback)
 
     def cb_gotPerspective(self, perspective):
