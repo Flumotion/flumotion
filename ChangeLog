@@ -13,6 +13,10 @@
 
 2004-10-12  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/http/http.py:
+	Allow grids without a bouncer. Refactor stuff a little bit. Show 
+	a better error message for PROPFIND requests.
+
 	* data/glade/Makefile.am:
 	* data/glade/wizard.glade:
 	* data/glade/wizard_welcome.glade:
