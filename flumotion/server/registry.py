@@ -76,9 +76,9 @@ class RegistryXmlParser:
         return self.components
 
     def parse(self):
-        """<components>
-             <component>
-           </components>"""
+        # <components>
+        #   <component>
+        # </components>
 
         root = self.doc.documentElement
         
@@ -94,10 +94,10 @@ class RegistryXmlParser:
                 raise XmlParserError, "unexpected node: %s" % child
             
     def parse_components(self, node):
-        """<component type="...">
-             <source>
-             <properties>
-           </component>"""    
+        # <component type="...">
+        #   <source>
+        #   <properties>
+        # </component>
         if not node.hasAttribute('type'):
             raise XmlParserError, "<component> must have a type attribute"
 
@@ -118,16 +118,16 @@ class RegistryXmlParser:
         return Component(node.getAttribute('type'), source, properties)
 
     def parse_source(self, node):
-        """<source location="..."/>"""
+        # <source location="..."/>
         if not node.hasAttribute('location'):
             raise XmlParserError, "<source> must have a location attribute"
 
         return node.getAttribute('location')
 
     def parse_properties(self, node):
-        """<properties>
-             <property name="..." type="" required="yes/no" multiple="yes/bno"/>
-           </properties>"""
+        # <properties>
+        #   <property name="..." type="" required="yes/no" multiple="yes/bno"/>
+        #  </properties>
         
         properties = []
         for child in node.childNodes:

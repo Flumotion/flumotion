@@ -161,9 +161,9 @@ class FlumotionConfigXML:
         return self.components
 
     def parse(self):
-        """<root>
-             <component>
-           </root>"""
+        # <root>
+        #     <component>
+        # </root>
 
         root = self.doc.documentElement
         
@@ -179,9 +179,9 @@ class FlumotionConfigXML:
                 raise XmlParserError, "unexpected node: %s" % child
             
     def parse_component(self, node):
-        """<component name="..." type="...">
-             ...
-           </component>"""    
+        # <component name="..." type="...">
+        #     ...
+        # </component>
         if not node.hasAttribute('name'):
             raise XmlParserError, "<component> must have a name attribute"
         if not node.hasAttribute('type'):

@@ -29,13 +29,10 @@ from twisted.spread import pb
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
 
-class ClientFactory(pbutil.ReconnectingPBClientFactory):
+class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
     __super_init = pbutil.ReconnectingPBClientFactory.__init__
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
-    def __init__(self, component):
-        self.__super_init()
-        self.component = component
-        
+
     def login(self, username):
         self.__super_login(pbutil.Username(username),
                            client=self.component)
@@ -54,7 +51,8 @@ class BaseComponent(pb.Referenceable):
 
         # Prefix our login name with the name of the component
         self.username = name
-        self.factory = ClientFactory(self)
+        self.factory = ComponentClientFactory()
+        self.factory.component = self
         self.factory.login(self.username)
 
     def msg(self, *args):

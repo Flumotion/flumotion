@@ -311,7 +311,6 @@ class Controller(pb.Root):
     def getPerspective(self, *args):
         """Creates a new perspective for a component
         @type args:      tuple
-        @param username: extra arguments sent to the perspective class
         @rtype:          ComponentPerspective
         @returns:        the perspective for the component"""
 
