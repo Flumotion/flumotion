@@ -120,8 +120,6 @@ class HTTPStreamingAdminResource(resource.Resource):
         'call with a HTTPStreamingResource to admin for'
         self.parent = parent
         self.debug = self.parent.debug
-        #self.info = lambda msg: log.info('HTTP admin', msg)
-
         resource.Resource.__init__(self)
 
     def getChild(self, path, request):
@@ -150,11 +148,8 @@ class HTTPStreamingAdminResource(resource.Resource):
         return self.render_stats(request)
     
     def render_stats(self, request):
-        stats = self.parent.streamer
-        
-        bytes_sent      = stats.getBytesSent()
-        bytes_received  = stats.getBytesReceived()
-        uptime          = stats.getUptime()
+        streamer = self.parent.streamer
+        s = streamer.getState()
         
         def row(label, value):
             return '<tr><td>%s</td><td>%s</td></tr>' % (label, value)
@@ -162,35 +157,33 @@ class HTTPStreamingAdminResource(resource.Resource):
 
         block.append('<tr><td colspan=2><b>Stream</b></td></tr>')
         block.append('<tr>')
-        block.append(row('Mime type', self.parent.streamer.get_mime()))
-        block.append(row('Uptime', format_time(uptime)))
-        bitrate = format_bytes(bytes_received / uptime) + '/sec'
-        block.append(row('Bit rate', bitrate))
-        block.append(row('Total bytes', format_bytes(bytes_received)))
+        block.append(row('Mime type',   s['stream-mime']))
+        block.append(row('Uptime',      s['stream-uptime']))
+        block.append(row('Bit rate',    s['stream-bitrate']))
+        block.append(row('Total bytes', s['stream-totalbytes']))
         block.append('</tr>')
 
         block.append('<tr><td colspan=2><b>Clients</b></td></tr>')
         block.append('<tr>')
-        clients = stats.getClients()
-        max = int(self.parent.maxAllowedClients())
-        block.append(row('Current Connections', "%d of %d" % (clients, max)))
-        peak = stats.getPeakClients()
-        peak_time = time.ctime(stats.getPeakEpoch())
-        block.append(row('Peak Connections', "%d (%s)" % (peak, peak_time)))
-        stats.updateAverage()
-        block.append(row('Average Connections', int(stats.getAverageClients())))
+        current = s['clients-current']
+        max = s['clients-max']
+        block.append(row('Current', "%s (of %s) " % (current, max)))
+        block.append(row('Average', s['clients-average']))
+        peak = s['clients-peak']
+        time = s['clients-peak-time']
+        block.append(row('Peak',    "%s (at %s) " % (peak, time)))
         block.append('</tr>')
 
         block.append('<tr><td colspan=2><b>Client consumption</b></td></tr>')
         block.append('<tr>')
-        bitrate = format_bytes(bytes_sent / uptime) + '/sec'
-        block.append(row('Bit rate', bitrate))
-        block.append(row('Total bytes', format_bytes(bytes_sent)))
+        block.append(row('Bit rate',    s['consumption-bitrate']))
+        block.append(row('Total bytes', s['consumption-totalbytes']))
         block.append('</tr>')
          
         return STATS_TEMPLATE % {
-            'name': self.parent.streamer.get_name(),
-            'stats': "\n".join(block)}
+            'name': streamer.get_name(),
+            'stats': "\n".join(block)
+        }
 
 class Stats:
     def __init__(self, sink):
@@ -255,7 +248,34 @@ class Stats:
     
     def getAverageClients(self):
         return self.average_client_number
-        
+
+    def getState(self):
+       
+        c = self
+        s = {}
+
+        bytes_sent      = c.getBytesSent()
+        bytes_received  = c.getBytesReceived()
+        uptime          = c.getUptime()
+
+
+        s['stream-mime'] = c.get_mime()
+        s['stream-uptime'] = format_time(uptime)
+        s['stream-bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
+        s['stream-totalbytes'] = format_bytes(bytes_received)
+
+        s['clients-current'] = str(c.getClients())
+        s['clients-max'] = str(c.getMaxClients())
+        s['clients-peak'] = str(c.getPeakClients())
+        s['clients-peak-time'] = time.ctime(c.getPeakEpoch())
+        s['clients-average'] = str(int(c.getAverageClients()))
+
+        s['consumption-bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
+        s['consumption-totalbytes'] = format_bytes(bytes_sent)
+
+        return s
+    
+ 
 class HTTPStreamingResource(resource.Resource, log.Loggable):
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
 
@@ -469,32 +489,8 @@ class HTTPView(component.ComponentView):
         self.comp.connect('ui-state-changed', self.comp_ui_state_changed_cb)
 
     def getState(self):
-        c = self.comp
+        return self.comp.getState()
 
-        s = {}
-
-        bytes_sent      = c.getBytesSent()
-        bytes_received  = c.getBytesReceived()
-        uptime          = c.getUptime()
-
-
-        s['stream-mime'] = c.get_mime()
-        s['stream-uptime'] = format_time(uptime)
-        s['stream-bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
-        s['stream-totalbytes'] = format_bytes(bytes_sent)
-
-
-        s['clients-current'] = str(c.getClients())
-        s['clients-max'] = str(c.getMaxClients())
-        s['clients-peak'] = str(c.getPeakClients())
-        s['clients-peak-time'] = time.ctime(c.getPeakEpoch())
-        s['clients-average'] = str(int(c.getAverageClients()))
-
-        s['consumption-totalbytes'] = format_bytes(bytes_received)
-        s['consumption-bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
-
-        return s
-    
     def comp_ui_state_changed_cb(self, comp):
         self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
 

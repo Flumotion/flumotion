@@ -57,6 +57,7 @@ class HTTPStreamerUI(BaseUI):
         label.show()
 
     def setUIState(self, state):
+        print state
         self.label_uptime.set_text(str(state['stream-uptime']))
         self.label_mime.set_text(state['stream-mime'])
         self.label_clients.set_text(str(state['clients-current']))

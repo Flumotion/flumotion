@@ -1,5 +1,11 @@
 2004-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/http/http.py:
+	* flumotion/component/http/http_gui.py:
+	  use getStats() for HTML stats page as well
+
+2004-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/admin.glade:
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
