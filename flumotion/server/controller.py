@@ -71,10 +71,8 @@ class Dispatcher(log.Loggable):
         p = None
         if not pb.IPerspective in interfaces:
             raise errors.NoPerspectiveError(avatarID)
-        elif IBaseComponent in interfaces:
-            if self.controller.hasComponent(avatarID):
-                raise errors.AlreadyConnectedError(avatarID)
         
+        if IBaseComponent in interfaces:
             p = self.controller.getPerspective(avatarID)
         # FIXME: can we connect multiple admin clients this way ?
         elif avatarID == 'admin':
@@ -348,13 +346,17 @@ register and start up pending components."""
     def setAdmin(self, admin):
         self.admin = admin
         
-    def getPerspective(self, *args):
-        """Creates a new perspective for a component
+    def getPerspective(self, avatarID):
+        """Creates a new perspective for a component, raises
+        an AlreadyConnectedError if the component is already found in the cache
         @type args:      tuple
         @rtype:          L{server.controller.ComponentPerspective}
         @returns:        the perspective for the component"""
 
-        componentp = ComponentPerspective(self, *args)
+        if self.hasComponent(avatarID):
+            raise errors.AlreadyConnectedError(avatarID)
+
+        componentp = ComponentPerspective(self, avatarID)
         self.addComponent(componentp)
         return componentp
 
