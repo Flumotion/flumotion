@@ -123,9 +123,8 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.controller.removeComponent(self)
 
     def perspective_stateChanged(self, old, state):
-        log.msg('%s.stateChanged %s -> %s' %
+        log.msg('%s.stateChanged %s' %
                 (self.username,
-                 gst.element_state_get_name(old),
                  gst.element_state_get_name(state)))
         self.state = state
         
@@ -135,24 +134,40 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.ready = False
         cb = self.mind.callRemote('register')
         cb.addCallback(self.after_register_cb)
-
-
               
 class ProducerPerspective(ComponentPerspective):
     kind = 'producer'
+    listen_port = -1
     def getListenPort(self):
-        return 5500
+        assert self.listen_port != -1
+        return self.listen_port
 
-    def listen(self, host, port):
-        self.mind.callRemote('listen', host, port)
+    def listen(self, host):
+        def after_get_free_port_cb(port):
+            self.listen_port = port
+            self.mind.callRemote('listen', host, port)
+        cb = self.mind.callRemote('get_free_port')
+        cb.addCallback(after_get_free_port_cb)
         
 class ConverterPerspective(ComponentPerspective):
     kind = 'converter'
+    listen_port = -1
     def getListenPort(self):
-        return 5501
-    
-    def start(self, source_host, source_port, listen_host, listen_port):
-        self.mind.callRemote('start', source_host, source_port, listen_host, listen_port)
+        assert self.listen_port != -1
+        return self.listen_port
+
+    def start(self, source_host, source_port, listen_host):
+        def after_get_free_port_cb(listen_port):
+            self.listen_port = listen_port
+            log.msg('Calling remote method start (%s, %d, %s, %d)' % (source_host, source_port,
+                                                                      listen_host, listen_port))
+            self.mind.callRemote('start',
+                                 source_host, source_port,
+                                 listen_host, listen_port)
+
+        log.msg('Calling remote method get_free_port()')
+        cb = self.mind.callRemote('get_free_port')
+        cb.addCallback(after_get_free_port_cb)
 
 class StreamerPerspective(ComponentPerspective):
     kind = 'streamer'
@@ -208,20 +223,16 @@ class Controller(pb.Root):
 
     def producerStart(self, producer):
         host = producer.getListenHost()
-        port = producer.getListenPort()
-        log.msg('Calling remote method listen (%s, %d)' % (host, port))
-        producer.listen(host, port)
+        log.msg('Calling remote method listen (%s)' % host)
+        producer.listen(host)
 
     def converterStart(self, converter):
         source = self.getSourceComponent(converter)
         source_host = source.getListenHost()
         source_port = source.getListenPort()
         listen_host = converter.getListenHost()
-        listen_port = converter.getListenPort()
-        log.msg('Calling remote method start (%s, %d, %s, %d)' % (source_host, source_port,
-                                                                  listen_host, listen_port))
-        converter.start(source_host, source_port, listen_host, listen_port)
-
+        converter.start(source_host, source_port, listen_host)
+            
     def streamerStart(self, streamer):
         source = self.getSourceComponent(converter)
         host = source.getListenHost()
@@ -261,42 +272,7 @@ class Controller(pb.Root):
             log.msg('%r requires %s to be running, but its not so waiting' % (component, source_name))
             self.waitForComponent(source_name, component)
         
-    def link(self, prod, conv):
-        assert prod.ready
-        assert conv.ready
-    
-        prod_port = 5500
-        conv_port = 5501
-        proto, prod_hostname, port = prod.getTransportPeer()
-        conv_hostname = conv.getTransportPeer()[1]
-
-        if (prod_hostname == '127.0.0.1' and conv_hostname != '127.0.0.1'):
-            prod_hostname = conv.getRemoteControllerIP()
-            
-        def listenDone(obj=None):
-            assert prod.state == gst.STATE_PLAYING, \
-                   gst.element_state_get_name(prod.state)
-
-            log.msg('calling %s.start(%d, %s, %d)' % (conv.username,
-                                                       prod_port,
-                                                       prod_hostname,
-                                                       conv_port))
-            conv.mind.callRemote('start', prod_port, prod_hostname, conv_port)
-
-        if prod.state != gst.STATE_PLAYING:
-            log.msg('calling %s.listen(%s, %d)' % (prod.username,
-                                                   prod_hostname,
-                                                   prod_port))
-            obj = prod.mind.callRemote('listen', prod_hostname, prod_port)
-            obj.addCallback(listenDone)
-        else:
-            log.msg('calling %s.start(%d, %s, %d)' % (conv.username,
-                                                       prod_port,
-                                                       prod_hostname,
-                                                       conv_port))
-            conv.mind.callRemote('start', prod_port, prod_hostname, conv_port)
-            
-class ControllerMaster(pb.PBServerFactory):
+class ControllerServerFactory(pb.PBServerFactory):
     def __init__(self):
         controller = Controller()
         disp = Dispatcher(controller)
@@ -306,11 +282,8 @@ class ControllerMaster(pb.PBServerFactory):
         pb.PBServerFactory.__init__(self, port)
 
     def __repr__(self):
-        return '<ControllerMaster>'
+        return '<ControllerServerFactory>'
     
-    def clientConnectionMade(self, broker):
-        log.msg('Broker connected: %r' % broker)
-        
 log.startLogging(sys.stdout)
-reactor.listenTCP(8890, ControllerMaster())
+reactor.listenTCP(8890, ControllerServerFactory())
 reactor.run()

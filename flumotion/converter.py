@@ -64,7 +64,6 @@ class Converter(Component):
         sink.set_property('port', sink_port)
         
         reactor.callLater(0, self.pipeline_play)
-        log.msg('returning from start')
 
     def remote_start(self, source_host, source_port, sink_host, sink_port):
         self.start(source_host, source_port, sink_host, sink_port)

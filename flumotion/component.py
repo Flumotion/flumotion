@@ -62,9 +62,8 @@ class Component(pb.Referenceable):
             print 'skipping remote-error, no perspective'
 
     def pipeline_state_change_cb(self, element, old, state):
-        log.msg('pipeline state-changed %s %s -> %s' % (element.get_path_string(),
-                                                        gst.element_state_get_name(old),
-                                                        gst.element_state_get_name(state)))
+        log.msg('pipeline state-changed %s %s ' % (element.get_path_string(),
+                                                   gst.element_state_get_name(state)))
         if self.persp is not None:
             self.persp.callRemote('stateChanged', old, state)
         else:
@@ -121,3 +120,17 @@ class Component(pb.Referenceable):
         return {'ip' : self.get_ip(),
                 'source' : self.source }
     
+    def remote_get_free_port(self):
+        start = 5500
+        fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        while 1:
+            try:
+                fd.bind(('', start))
+            except socket.error:
+                start += 1
+                continue
+            break
+        return start
+    
+                        
+                      
