@@ -218,6 +218,10 @@ class TVCard(VideoSource):
     def _unknownDeviceErrback(self, failure):
         failure.trap(errors.UnknownDeviceError)
         self.clear_combos()
+
+    def _queryRemoteRunErrback(self, failure):
+        failure.trap(errors.RemoteRunError)
+        self.wizard.error_dialog('General error: %s' % failure.value)
         
     def update_sources(self):
         self.wizard.block_next(True)
@@ -227,6 +231,7 @@ class TVCard(VideoSource):
         d.addCallback(self._queryCallback)
         d.addErrback(self._queryGstErrorErrback)
         d.addErrback(self._unknownDeviceErrback)
+        d.addErrback(self._queryRemoteRunErrback)
         
     def get_component_properties(self):
         options = {}
@@ -335,6 +340,10 @@ class Webcam(VideoSource):
         failure.trap(errors.UnknownDeviceError)
         self.clear()
 
+    def _queryRemoteRunErrback(self, failure):
+        failure.trap(errors.RemoteRunError)
+        self.wizard.error_dialog('General error: %s' % failure.value)
+
     def update(self):
         if self.in_setup:
             return
@@ -346,6 +355,7 @@ class Webcam(VideoSource):
         d.addCallback(self._queryCallback)
         d.addErrback(self._queryGstErrorErrback)
         d.addErrback(self._unknownDeviceErrback)
+        d.addErrback(self._queryRemoteRunErrback)
         
 wizard.register_step(Webcam)
 
@@ -466,6 +476,8 @@ def _checkTracks(source_element, device):
             res.returned = True
             res.d.errback(errors.GstError(error.message))
 
+    el = gst.element_factory_make('fakesrc')
+    print "source_element: %s, %s" % (source_element, type(source_element))
     pipeline = '%s name=source device=%s ! fakesink' % (source_element, device)
     bin = gst.parse_launch(pipeline)
     result = Result()
@@ -549,6 +561,10 @@ class Soundcard(wizard.WizardStep):
         self.clear_combos()
         self.wizard.error_dialog('GStreamer error: %s' % failure.value)
 
+    def _queryRemoteRunErrback(self, failure):
+        failure.trap(errors.RemoteRunError)
+        self.wizard.error_dialog('General error: %s' % failure.value)
+
     def update_inputs(self):
         if self.block_update:
             return
@@ -559,6 +575,7 @@ class Soundcard(wizard.WizardStep):
         d = self.workerRun(_checkTracks, enum.element, device)
         d.addCallback(self._queryCallback)
         d.addErrback(self._queryGstErrorErrback)
+        d.addErrback(self._queryRemoteRunErrback)
         #d.addErrback(self._unknownDeviceErrback)
         #d.addErrback(self._permissionDeniedErrback)
         

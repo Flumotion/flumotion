@@ -1,13 +1,13 @@
 AC_INIT(README)
 
-AS_VERSION(flumotion, FLUMOTION, 0, 1, 2, 1)
+AS_VERSION(flumotion, FLUMOTION, 0, 1, 3, 0)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 
 AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
 
 AC_SUBST(PYGTK_REQ, 2.4.0)
-AC_SUBST(PYGST_REQ, 0.7.93)
+AC_SUBST(PYGST_REQ, 0.7.94)
 AC_SUBST(GST_REQ, 0.8.7)
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
@@ -40,6 +40,7 @@ dnl check for pygtk
 PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_REQ)
 PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
 AC_SUBST(PYGTK_DIR)
+AC_MSG_NOTICE(Using pygtk installed in $PYGTK_DIR)
 
 export PYTHONPATH=$PYGTK_DIR:$PYTHONPATH
 
@@ -68,6 +69,7 @@ dnl checks for gst-python
 PKG_CHECK_MODULES(PYGST, gst-python-0.8 >= $PYGST_REQ)
 PYGST_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
 AC_SUBST(PYGST_DIR)
+AC_MSG_NOTICE(Using gstreamer-python installed in $PYGST_DIR)
 
 export PYTHONPATH=$PYGST_DIR:$PYTHONPATH
 AS_PYTHON_IMPORT([gst],,
