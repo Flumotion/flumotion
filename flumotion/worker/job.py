@@ -278,12 +278,15 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     def _connectedErrback(self, error):
         print 'ERROR:' + str(error)
 
-def run(name, options):
+def getSocketPath():
+    # FIXME: better way of getting at a tmp dir ?
+    return os.path.join('/tmp', "flumotion.worker.%d" % os.getpid())
+
+def run(componentName, options):
     """
     Called by the worker to start a job fork.
     """
-    # FIXME: rename and cleanup
-    worker_filename = '/tmp/flumotion.%d' % os.getpid()
+    workerSocket = getSocketPath()
 
     pid = os.fork()
     if pid:
@@ -296,8 +299,8 @@ def run(name, options):
 
     # the only usable object created for now in the child is the
     # JobClientFactory, so we throw the options at it
-    job_factory = JobClientFactory(name, options)
-    reactor.connectUNIX(worker_filename, job_factory)
+    job_factory = JobClientFactory(componentName, options)
+    reactor.connectUNIX(workerSocket, job_factory)
     log.info('job', 'Started job on pid %d' % os.getpid())
     log.debug('job', 'Starting reactor')
     reactor.run()

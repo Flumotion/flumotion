@@ -21,6 +21,8 @@
 import common
 from twisted.trial import unittest
 
+from twisted.internet import reactor
+
 from flumotion.worker import worker
 
 class TestKid(unittest.TestCase):
@@ -60,9 +62,8 @@ class TestWorkerClientFactory(unittest.TestCase):
     def testInit(self):
         brain = worker.WorkerBrain(FakeOptions())
         factory = worker.WorkerClientFactory(brain)
-        # FIXME: ewww !
-        import os
-        os.unlink('/tmp/flumotion.%d' % os.getpid())
+        reactor.callLater(0, reactor.stop)
+        reactor.run()
 
 class TestWorkerMedium(unittest.TestCase):
     def testSetRemoteReference(self):
@@ -70,9 +71,8 @@ class TestWorkerMedium(unittest.TestCase):
         self.medium = worker.WorkerMedium(brain)
         self.medium.setRemoteReference('remote')
         self.assert_(self.medium.hasRemoteReference())
-        # FIXME: ewww !
-        import os
-        os.unlink('/tmp/flumotion.%d' % os.getpid())
+        reactor.callLater(0, reactor.stop)
+        reactor.run()
 
 # FIXME: add tests to test signal handler ? Might not be so easy.
 

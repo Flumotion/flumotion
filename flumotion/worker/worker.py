@@ -339,15 +339,14 @@ class WorkerBrain(log.Loggable):
         self.worker_client_factory.startLogin(keycard)
                              
     def setup(self):
+        # called from Init
         root = JobHeaven(self, self.options.feederports)
         dispatcher = JobDispatcher(root)
         checker = checkers.FlexibleCredentialsChecker()
         checker.allowAnonymous(True)
         p = portal.Portal(dispatcher, [checker])
         job_server_factory = pb.PBServerFactory(p)
-        # FIXME: this is too ugly for words, and doesn't get cleaned up nicely
-        reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(),
-                           job_server_factory)
+        reactor.listenUNIX(job.getSocketPath(), job_server_factory)
 
         return job_server_factory, root
 
