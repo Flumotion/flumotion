@@ -121,7 +121,7 @@ def main(args):
                      help="transport protocol to use (tcp/ssl)")
     group.add_option('-C', '--certificate',
                      action="store", type="string", dest="certificate",
-                     default="flumotion.pem",
+                     default="default.pem",
                      help="specify PEM certificate file (for SSL)")
     group.add_option('-D', '--daemonize',
                      action="store_true", dest="daemonize",

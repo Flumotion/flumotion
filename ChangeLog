@@ -1,3 +1,14 @@
+2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/Makefile.am:
+	* data/glade/Makefile.am:
+	* flumotion.spec.in:
+	  updates
+	* flumotion/component/bouncers/Makefile.am:
+	* flumotion/component/converters/overlay/overlay.py:
+	  import correctly, use tempfile
+	* flumotion/manager/main.py:
+
 2004-10-18  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_audiotest.glade:

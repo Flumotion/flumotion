@@ -16,9 +16,11 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 from flumotion.component import feedcomponent
-from flumotion.component.overlay import genimg
+from flumotion.component.converters.overlay import genimg
 
-FILENAME = '/tmp/flumotion-overlay.png'
+import tempfile
+
+FILENAME = tempfile.mktemp('flumotion.png')
 
 class Overlay(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, eaters, pipeline):

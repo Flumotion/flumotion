@@ -4,7 +4,11 @@ component_PYTHON = \
 	htpasswdcrypt.py \
 	bouncer.py
 
+component_DATA = htpasswdcrypt.xml
+
 TAGS_FILES = $(component_PYTHON)
 
 clean-local:
 	rm -rf *.pyc *.pyo
+
+EXTRA_DIST = $(component_DATA)

@@ -1,7 +1,7 @@
  glade_DATA = \
 	admin.glade 			\
 	wizard.glade 			\
-	wizard_audiotest.glade	\
+	wizard_audiotest.glade		\
 	wizard_audio_encoder.glade	\
 	wizard_audiosource.glade	\
 	wizard_consumption.glade	\
@@ -10,6 +10,7 @@
 	wizard_firewire.glade		\
 	wizard_http.glade		\
 	wizard_jpeg.glade		\
+	wizard_license.glade		\
 	wizard_overlay.glade		\
 	wizard_smoke.glade		\
 	wizard_source.glade		\
