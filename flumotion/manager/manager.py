@@ -483,7 +483,9 @@ class Vishnu(log.Loggable):
 
     def emptyPlanet(self):
         """
-        Empty the planet of all atmospheres, components, and flows.
+        Empty the planet of all components, and flows.
+
+        @returns: a deferred that will fire when the planet is empty.
         """
         # first get all components to sleep
         components = self.getComponentStates()
@@ -524,7 +526,9 @@ class Vishnu(log.Loggable):
         for c in components:
             if c.get('mood') is not moods.sleeping.value:
                 self.warning('Component %s is not sleeping' % c.get('name'))
-            # clear mapper; componentstate should be the last thing in here
+            # clear mapper; remove componentstate and id
+            m = self._componentMappers[c]
+            del self._componentMappers[m.id]
             del self._componentMappers[c]
 
         # if anything's left, we have a mistake somewhere

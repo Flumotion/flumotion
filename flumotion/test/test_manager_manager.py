@@ -449,6 +449,12 @@ class TestVishnu(unittest.TestCase):
 
         self._verifyConfigAndNoWorker()
 
+        # clear out the complete planet
+        d = self.vishnu.emptyPlanet()
+        unittest.deferredResult(d)
+
+        self.assertEqual(len(mappers.keys()), 0)
+
     def _verifyConfigAndOneWorker(self):
         mappers = self.vishnu._componentMappers
 
