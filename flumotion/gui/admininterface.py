@@ -83,11 +83,11 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         self.emit('connected')
 
     def remote_shutdown(self):
-        print 'shutdown'
+        self.debug('shutting down')
 
     def setProperty(self, component, element, property, value):
         if not self.remote:
-            print 'Warning, no remote'
+            self.warning('No remote object')
             return
         return self.remote.callRemote('setComponentElementProperty',
                                       component, element, property, value)
@@ -100,7 +100,7 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         name = reflect.filenameToModuleName(__file__)
 
         #self.log("rebuilding '%s'" % name)
-        print "rebuilding '%s'" % name
+        self.info("rebuilding '%s'" % name)
         rebuild.rebuild(sys.modules[name])
 
         reload()

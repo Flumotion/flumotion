@@ -1,3 +1,8 @@
+2004-09-02  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/gui/admininterface.py (AdminInterface): Use debugging
+	framework instead of prints
+
 2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/server/launcher.py:
