@@ -109,7 +109,12 @@ def _run_main(path):
     from flumotion.common import errors
     from flumotion.common import setup
     setup.setup()
-    
+
+    # verify registry
+    # FIXME: the worker should not need a registry at all ! Issue #129
+    from flumotion.common.registry import registry  
+    registry.verify()  
+
     main = reflect.namedAny(path)
     
     try:
