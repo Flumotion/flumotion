@@ -7,6 +7,9 @@ SUBDIRS = bin conf data flumotion doc m4
 EXTRA_DIST = \
 	LICENSE.GPL \
 	LICENSE.Flumotion \
-	flumotion.spec
+	flumotion.spec \
+	misc/flu.modules \
+	misc/jhbuildrc
 
-
+clean-local:
+	@rm -rf _trial_temp

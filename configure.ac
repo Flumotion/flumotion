@@ -1,6 +1,6 @@
 AC_INIT(README)
 
-AS_VERSION(flumotion, FLUMOTION, 0, 0, 0, 1)
+AS_VERSION(flumotion, FLUMOTION, 0, 0, 1, 0)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 
 dnl AM_CONFIG_HEADER(config.h)
@@ -8,8 +8,9 @@ dnl AM_CONFIG_HEADER(config.h)
 AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
 
-AC_SUBST(PYGTK_REQ, 2.3.95)
+AC_SUBST(PYGTK_REQ, 2.3.96)
 AC_SUBST(PYGST_REQ, 0.7.91)
+AC_SUBST(GST_REQ, 0.8.5.1)
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")
@@ -30,9 +31,11 @@ dnl check for python
 AM_PATH_PYTHON(2.3)
 AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
 
+dnl check for GStreamer
+PKG_CHECK_MODULES(GST, gstreamer-0.8 >= $GST_REQ)
+
 dnl check for pygtk
 PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_REQ)
-
 PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
 AC_SUBST(PYGTK_DIR)
 
