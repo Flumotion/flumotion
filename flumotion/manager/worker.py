@@ -103,12 +103,16 @@ class WorkerHeaven(pb.Root):
         self.conf = FlumotionConfigXML(filename)
 
         workers = self.conf.getWorkers()
+        if workers:
+            self.setupWorkers(workers)
+
+    def setupWorkers(Self, workers):
         if workers.getPolicy() == 'password':
             self.vishnu.checker.allowAnonymous(False)
 
-        for worker in workers.workers:
-            self.vishnu.checker.addUser(worker.getUsername(),
-                                        worker.getPassword())
+            for worker in workers.workers:
+                self.vishnu.checker.addUser(worker.getUsername(),
+                                            worker.getPassword())
             
     def getEntries(self, worker):
         if not self.conf:
