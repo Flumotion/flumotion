@@ -42,12 +42,13 @@ class ClientFactory(pbutil.ReconnectingPBClientFactory):
                            client=self.component)
 
     def gotPerspective(self, perspective):
-        self.component.remote = perspective
+        self.component.gotPerspective(perspective)
         
 class BaseComponent(pb.Referenceable):
-    def __init__(self, name, sources):
+    def __init__(self, name, sources, feeds):
         self.component_name = name
         self.sources = sources
+        self.feeds = feeds
         self.remote = None
         self.pipeline = None
         self.pipeline_signals = []
@@ -57,13 +58,15 @@ class BaseComponent(pb.Referenceable):
         self.factory = ClientFactory(self)
         self.factory.login(self.username)
 
-        self.setup_pipeline()
-
     def msg(self, *args):
-        log.msg(self.kind, *args)
+        log.msg(self.component_name, *args)
 
     def warn(self, *args):
-        log.warning(self.kind, *args)
+        log.warning(self.component_name, *args)
+
+    def gotPerspective(self, perspective):
+        self.remote = perspective
+        self.setup_pipeline()
         
     def hasPerspective(self):
         return self.remote != None
@@ -75,6 +78,9 @@ class BaseComponent(pb.Referenceable):
     def getSources(self):
         return self.sources
     
+    def getFeeds(self):
+        return self.feeds
+
     def getIP(self):
         assert self.remote
         peer = self.remote.broker.transport.getPeer()
@@ -101,10 +107,10 @@ class BaseComponent(pb.Referenceable):
 
         #self.restart()
         
-    def pipeline_state_change_cb(self, element, old, state):
-        self.msg('pipeline state-changed %s %s ' % (element.get_path_string(),
-                                                   gst.element_state_get_name(state)))
-        self.callRemote('stateChanged', old, state)
+    def feed_state_change_cb(self, element, old, state, feed):
+        self.msg('state-changed %s %s' % (element.get_path_string(),
+                                          gst.element_state_get_name(state)))
+        self.callRemote('stateChanged', feed, old, state)
 
     def set_state_and_iterate(self, state):
         retval = self.pipeline.set_state(state)
@@ -120,8 +126,7 @@ class BaseComponent(pb.Referenceable):
         self.pipeline.set_name('pipeline-' + self.component_name)
         sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
         self.pipeline_signals.append(sig_id)
-        sig_id = self.pipeline.connect('state-change', self.pipeline_state_change_cb)
-        self.pipeline_signals.append(sig_id)
+        
         #sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
         #self.pipeline_signals.append(sig_id)
 
@@ -134,27 +139,26 @@ class BaseComponent(pb.Referenceable):
     def pipeline_stop(self):
         self.set_state_and_iterate(gst.STATE_NULL)
         
-    def get_sink(self):
-        assert self.pipeline, 'Pipeline not created'
-        sink = self.pipeline.get_by_name('sink')
-        assert sink, 'No sink element in pipeline'
-        assert isinstance(sink, gst.Element)
-        return sink
-
-    def set_sink_properties(self, **properties):
-        sink = self.get_sink()
-        for prop_name in properties.keys():
-            self.msg('property %s set to %r' %
-                     (prop_name, properties[prop_name]))
-            sink.set_property(prop_name, properties[prop_name])
-        sink.set_property('protocol', 'gdp')
+    def setup_feeds(self, feeds):
+        # Setup all feeds sources
+        for name, host, port in feeds:
+            self.msg('Going to listen on %s (%s:%d)' % (name, host, port))
+            feed = self.pipeline.get_by_name(name)
+            feed.connect('state-change', self.feed_state_change_cb, name)
+            
+            assert feed, 'No feed element named %s in pipeline' % name
+            assert isinstance(feed, gst.Element)
+            
+            feed.set_property('host', host)
+            feed.set_property('port', port)
+            feed.set_property('protocol', 'gdp')
 
     def setup_sources(self, sources):
         # Setup all sources
         for source_name, source_host, source_port in sources:
             self.msg('Going to connect to %s (%s:%d)' % (source_name,
-                                                        source_host,
-                                                        source_port))
+                                                         source_host,
+                                                         source_port))
             source = self.pipeline.get_by_name(source_name)
             assert source, 'No source element named %s in pipeline' % source_name
             assert isinstance(source, gst.Element)
@@ -186,10 +190,21 @@ class BaseComponent(pb.Referenceable):
         
         return {'ip' : self.getIP(),
                 'pid' :  os.getpid(), 
-                'sources' : self.getSources() }
+                'sources' : self.getSources(),
+                'feeds' : self.getFeeds() }
     
-    def remote_get_free_port(self):
-        return gstutils.get_free_port(start=5500)
+    def remote_get_free_ports(self, feeds):
+        retval = []
+        ports = {}
+        free_port = gstutils.get_free_port(start=5500)
+        for name, host, port in feeds:
+            if port == None:
+                port = free_port
+                free_port += 1
+            ports[name] = port
+            retval.append((name, host, port))
+            
+        return retval, ports
 
     def remote_play(self):
         self.pipeline_play()
@@ -201,28 +216,15 @@ class BaseComponent(pb.Referenceable):
         self.pipeline_pause()
 
 class ParseLaunchComponent(BaseComponent):
-    def __init__(self, name, sources, pipeline_string=''):
+    def __init__(self, name, sources, feeds, pipeline_string=''):
         self.pipeline_string = pipeline_string
-        BaseComponent.__init__(self, name, sources)
+        BaseComponent.__init__(self, name, sources, feeds)
         
     def setup_pipeline(self):
         self.create_pipeline()
         BaseComponent.setup_pipeline(self)
-        
-    def create_pipeline(self):
-        pipeline = self.pipeline_string
-        sources = self.getSources()
-        if pipeline == '' and not sources:
-            raise TypeError, "Need a pipeline or a source"
 
-        need_sink = True
-        if pipeline == '':
-            assert sources
-            pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
-            need_sink = False
-        elif pipeline.find('name=sink') != -1:
-            need_sink = False
-            
+    def do_sources(self, sources, pipeline):
         assert pipeline != ''
         if len(sources) == 1:
             source_name = sources[0]
@@ -240,9 +242,50 @@ class ParseLaunchComponent(BaseComponent):
                     raise TypeError, "%s needs to be specified in the pipeline" % source_name
             
                 pipeline = pipeline.replace(source_name, 'tcpclientsrc name=%s' % source)
+        return pipeline
 
-        if need_sink:
-            pipeline = '%s ! tcpserversink name=sink' % pipeline
+    def do_feeds(self, feeds, pipeline):
+        element = 'tcpserversink'
+        sign = ':'
+        
+        if len(feeds) == 1:
+            feed_name = feeds[0]
+            if pipeline.find(feed_name) != -1:
+                pipeline = pipeline.replace(sign + feed_name, '%s name=%s' % (element, feed_name))
+            else:
+                pipeline = '%s ! %s name=%s' % (pipeline, element, feed_name)
+        else:
+            for feed in self.feeds:
+                if ' ' in feed:
+                    raise TypeError, "spaces not allowed in sources"
+            
+                feed_name = sign + feed
+                if pipeline.find(feed_name) == -1:
+                    raise TypeError, "%s needs to be specified in the pipeline" % feed_name
+            
+                pipeline = pipeline.replace(feed_name, '%s name=%s' % (element, feed))
+        return pipeline
+        
+    def create_pipeline(self):
+        pipeline = self.pipeline_string
+        self.msg('Creating pipeline, template is %s' % pipeline)
+        sources = self.getSources()
+        if pipeline == '' and not sources:
+            raise TypeError, "Need a pipeline or a source"
+
+        need_sink = True
+        if pipeline == '':
+            assert sources
+            pipeline = 'fakesink signal-handoffs=1 silent=1 name=sink'
+            need_sink = False
+        elif pipeline.find('name=sink') != -1:
+            need_sink = False
+            
+        feeds = self.getFeeds()
+
+        self.msg('sources=%s, feeds=%s' % (sources, feeds))
+        pipeline = self.do_sources(sources, pipeline)
+        pipeline = self.do_feeds(feeds, pipeline)
 
         self.msg('pipeline for %s is %s' % (self.component_name, pipeline))
         
@@ -250,4 +293,3 @@ class ParseLaunchComponent(BaseComponent):
             self.pipeline = gst.parse_launch(pipeline)
         except gobject.GError, e:
             raise errors.PipelineParseError, e
-

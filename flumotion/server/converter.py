@@ -22,12 +22,11 @@ from flumotion.server import component
 
 class Converter(component.ParseLaunchComponent):
     kind = 'converter'
-    def start(self, sources, sink_host, sink_port):
-        self.setup_sources(sources)
-        
-        self.msg('Going to listen on %s:%d' % (sink_host, sink_port))
-        self.set_sink_properties(host=sink_host, port=sink_port)
 
+    def start(self, sources, feeds):
+        self.setup_sources(sources)
+        self.setup_feeds(feeds)
+        
         self.pipeline_play()
 
     remote_start = start

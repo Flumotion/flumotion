@@ -38,7 +38,7 @@ from twisted.manhole import telnet
 from twisted.spread import pb
 
 from flumotion.twisted import pbutil, shell
-from flumotion.utils import log
+from flumotion.utils import gstutils, log
 
 def msg(*args):
     log.msg('controller', *args)
@@ -81,20 +81,32 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.username = username
         self.state = gst.STATE_NULL
         self.options = Options()
-        self.listen_port = -1
+        self.listen_ports = {}
         self.started = False
+        self.starting = False
         
     def __repr__(self):
         return '<%s %s in state %s>' % (self.__class__.__name__,
                                         self.getName(),
                                         gst.element_state_get_name(self.state))
-    
+
+    def msg(self, *args):
+        args = ('=%s=' % self.getName(),) + args
+        msg(*args)
+        
     def getTransportPeer(self):
         return self.mind.broker.transport.getPeer()
 
     def getSources(self):
         return self.options.sources
     
+    def getFeeds(self, longname=False):
+        if longname:
+            return map(lambda feed:
+                       self.getName() + ':' + feed, self.options.feeds)
+        else:
+            return self.options.feeds
+
     def getRemoteControllerIP(self):
         return self.options.ip
 
@@ -105,9 +117,13 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         return self.getTransportPeer()[1]
 
     # This method should ask the component if the port is free
-    def getListenPort(self):
-        assert self.listen_port != -1
-        return self.listen_port
+    def getListenPort(self, feed):
+        if feed.find(':') != -1:
+            feed = feed.split(':')[1]
+
+        assert self.listen_ports.has_key(feed), self.listen_ports
+        assert self.listen_ports[feed] != -1, self.listen_ports
+        return self.listen_ports[feed]
 
     def after_register_cb(self, options, cb):
         if options == None:
@@ -128,64 +144,54 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         cb.addCallback(self.after_register_cb, cb)
         
     def detached(self, mind):
+        self.msg('detached')
         name = self.getName()
-        msg('%s detached' % name)
         if self.controller.hasComponent(name):
             self.controller.removeComponent(self)
 
-    def perspective_stateChanged(self, old, state):
-        #msg('%s.stateChanged %s' % (self.getName(),
-        #                            gst.element_state_get_name(state)))
+    def perspective_stateChanged(self, feed, old, state):
+        #self.msg('stateChanged :%s %s' % (feed,
+        #                                  gst.element_state_get_name(state)))
         
         self.state = state
         if self.state == gst.STATE_PLAYING:
-            msg('%s is now playing' % self.getName())
-            self.started = True
-            self.controller.startPendingComponents(self)
+            self.msg('%s is now playing' % feed)
+            self.controller.startPendingComponents(self, feed)
             
     def perspective_error(self, element, error):
-        msg('%s.error element=%s string=%s' % (self.getName(), element, error))
+        self.msg('error element=%s string=%s' % (element, error))
         
         self.controller.removeComponent(self)
 
 class ProducerPerspective(ComponentPerspective):
     """Perspective for producer components"""
     kind = 'producer'
-    def listen(self, host, port=None):
-        """starts the remote methods listen"""
-        if port == None:
-            def after_get_free_port_cb(port):
-                self.listen_port = port
-                msg('Calling remote method listen (%s, %d)' % (host, port))
-                self.mind.callRemote('listen', host, port)
+    def after_get_free_ports_cb(self, (feeds, ports)):
+        self.listen_ports = ports
+        self.msg('Calling remote method listen (%s)' % feeds)
+        self.mind.callRemote('listen', feeds)
 
-            msg('Calling remote method get_free_port()')
-            cb = self.mind.callRemote('get_free_port')
-            cb.addCallback(after_get_free_port_cb)
-        else:
-            self.listen_port = port
-            msg('Calling remote method listen (%s, %d)' % (host, port))
-            self.mind.callRemote('listen', host, port)
+    def listen(self, feeds):
+        """starts the remote methods listen"""
+
+        self.msg('Calling remote method get_free_ports()')
+        cb = self.mind.callRemote('get_free_ports', feeds)
+        cb.addCallback(self.after_get_free_ports_cb)
             
 class ConverterPerspective(ComponentPerspective):
     """Perspective for converter components"""
     kind = 'converter'
-    def start(self, sources, host, port=None):
-        """starts the remote methods start"""
-        
-        if port == None:
-            def after_get_free_port_cb(port):
-                self.listen_port = port
-                msg('Calling remote method start (%s, %s, %d)' % (sources, host, port))
-                self.mind.callRemote('start', sources,  host, port)
 
-            msg('Calling remote method get_free_port()')
-            cb = self.mind.callRemote('get_free_port')
-            cb.addCallback(after_get_free_port_cb)
-        else:
-            self.listen_port = port
-            msg('Calling remote method start (%s, %s, %d)' % (sources, host, port))
-            self.mind.callRemote('start', sources,  host, port)
+    def start(self, sources, feeds):
+        def after_get_free_ports_cb((feeds, ports)):
+            self.listen_ports = ports
+            self.msg('Calling remote method start (%s %s)' % (sources, feeds))
+            self.mind.callRemote('start', sources, feeds)
+            
+        """starts the remote methods start"""
+        self.msg('Calling remote method get_free_port()')
+        cb = self.mind.callRemote('get_free_ports', feeds)
+        cb.addCallback(after_get_free_ports_cb)
             
 class StreamerPerspective(ComponentPerspective):
     """Perspective for streamer components"""
@@ -201,13 +207,106 @@ class StreamerPerspective(ComponentPerspective):
 
     def connect(self, sources):
         """starts the remote methods connect"""
-        msg('Calling remote method connect(%s)' % sources)
+        self.msg('Calling remote method connect(%s)' % sources)
         self.mind.callRemote('connect', sources)
 
+STATE_NULL     = 0
+STATE_STARTING = 1
+STATE_READY    = 2
+
+class Feed:
+    def __init__(self, name):
+        self.name = name
+        self.dependencies = []
+        self.state = STATE_NULL
+        self.component = None
+
+    def setComponent(self, component):
+        self.component = component
+        
+    def addDependency(self, func, *args):
+        self.dependencies.append((func, args))
+
+    def setReady(self):
+        self.state = STATE_READY
+        for func, args in self.dependencies:
+            func(*args)
+        self.dependencies = []
+
+    def getName(self):
+        return self.name
+
+    def getListenHost(self):
+        return self.component.getListenHost()
+
+    def getListenPort(self):
+        return self.component.getListenPort(self.name)
+    
+    def __repr__(self):
+        return '<Feed %s state=%d>' % (self.name, self.state)
+    
+class FeedManager:
+    def __init__(self):
+        self.feeds = {}
+
+    def hasFeed(self, feedname):
+        if feedname.find(':') == -1:
+            feedname += ':default'
+
+        return self.feeds.has_key(feedname)
+    
+    def __getitem__(self, key):
+        if key.find(':') == -1:
+            key += ':default'
+
+        return self.feeds[key]
+        
+    def getFeed(self, feedname):
+        return self[feedname]
+    
+    def addFeeds(self, component):
+        name = component.getName()
+        feeds = component.getFeeds(True)
+        for feedname in feeds:
+            longname = name + ':' + feedname
+            if not self.feeds.has_key(feedname):
+                self.feeds[feedname] = Feed(feedname)
+            self.feeds[feedname].setComponent(component)
+            
+    def isFeedReady(self, feedname):
+        if not self.hasFeed(feedname):
+            return False
+
+        feed = self[feedname]
+
+        return feed.state == STATE_READY
+    
+    def feedReady(self, feedname): 
+        # If we don't specify the feed
+        log.msg('controller', '=%s= ready' % (feedname))
+
+        feed = self.feeds[feedname]
+        feed.setReady()
+            
+    def dependOnFeed(self, feedname, func, *args):
+        # If we don't specify the feed
+        if feedname.find(':') == -1:
+            feedname += ':default'
+
+        if not self.feeds.has_key(feedname):
+            self.feeds[feedname] = Feed(feedname)
+            
+        feed = self.feeds[feedname]
+        if feed.state != STATE_READY:
+            feed.addDependency(func, *args)
+        else:
+            func(*args)
+    
 class Controller(pb.Root):
     def __init__(self):
         self.components = {}
-        self.deps = {}
+        self.feed_manager = FeedManager()
+        
         self.last_free_port = 5500
         
     def getPerspective(self, component_type, username):
@@ -239,21 +338,6 @@ class Controller(pb.Root):
 
         return component.started == True
     
-    def getFreePort(self):
-        start = self.last_free_port
-        fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        while 1:
-            try:
-                fd.bind(('', start))
-            except socket.error:
-                start += 1
-                continue
-            break
-        
-        self.last_free_port = start + 1
-        
-        return start
-        
     def getComponent(self, name):
         """retrieves a new component
         @type name:  string
@@ -310,32 +394,51 @@ class Controller(pb.Root):
         peernames = component.getSources()
         retval = []
         for peername in peernames:
-            assert self.components.has_key(peername), peername
-            source = self.components[peername]
-            retval.append((source.getName(),
-                           source.getListenHost(),
-                           source.getListenPort()))
+            feed = self.feed_manager.getFeed(peername)
+            feedname = feed.getName()
+            if feedname.endswith(':default'):
+                feedname = feedname[:-8]
+                
+            retval.append((feedname,
+                           feed.getListenHost(),
+                           feed.getListenPort()))
+        return retval
+
+    def getFeedsForComponent(self, component):
+        """Retrives the source components for component
+
+        @type component:  component
+        @param component: the component
+        @rtype:           tuple of with 3 items
+        @returns:         name, hostname and port"""
+
+        assert isinstance(component, ComponentPerspective), component
+
+        host = component.getListenHost()
+        feednames = component.getFeeds()
+        retval = []
+        for feedname in feednames:
+            if self.isLocalComponent(component):
+                port = gstutils.get_free_port(self.last_free_port)
+                self.last_free_port = port + 1
+            else:
+                port = None
+
+            retval.append((feedname, host, port))
         return retval
 
     def producerStart(self, producer):
         assert isinstance(producer, ProducerPerspective)
-        
-        host = producer.getListenHost()
-        if self.isLocalComponent(producer):
-            producer.listen(host, self.getFreePort())
-        else:
-            producer.listen(host)
+
+        feeds = self.getFeedsForComponent(producer)
+        producer.listen(feeds)
 
     def converterStart(self, converter):
         assert isinstance(converter, ConverterPerspective)
         
         sources = self.getSourceComponents(converter)
-        host = converter.getListenHost()
-            
-        if self.isLocalComponent(converter):
-            converter.start(sources, host, self.getFreePort())
-        else:
-            converter.start(sources, host)
+        feeds = self.getFeedsForComponent(converter)
+        converter.start(sources, feeds)
             
     def streamerStart(self, streamer):
         assert isinstance(streamer, StreamerPerspective)
@@ -344,7 +447,7 @@ class Controller(pb.Root):
         streamer.connect(sources)
         
     def componentStart(self, component):
-        msg('Starting component %s of type %s' % (component.getName(), component.kind))
+        component.msg('Starting')
         assert isinstance(component, ComponentPerspective)
         assert component != ComponentPerspective
 
@@ -355,52 +458,40 @@ class Controller(pb.Root):
         elif isinstance(component, StreamerPerspective):
             self.streamerStart(component)
 
+    def maybeComponentStart(self, component):
+        component.msg('maybeComponentStart')
+        
+        for source in component.getSources():
+            if not self.feed_manager.isFeedReady(source):
+                component.msg('source %s is not ready' % (source))
+                return
+
+        if component.starting:
+            return
+        
+        component.starting = True
+        self.componentStart(component)
+        
     def componentRegistered(self, component):
-        msg('%s is registered' % component.getName())
+        component.msg('in componentRegistered')
+    
+        self.feed_manager.addFeeds(component)
 
         sources = component.getSources()
         if not sources:
+            component.msg('no sources, starting immediatelly')
             self.componentStart(component)
             return
-
-        can_start = True
-        name = component.getName()
-        for source in sources:
-            if self.isComponentStarted(source):
-                #msg('%s is already started' % source)
-                continue
-
-            can_start = False
-            msg('%s will wait for %s' % (name, source))
-                    
-            if not self.deps.has_key(source):
-                self.deps[source] = []
+        else:
+            for source in sources:
+                self.feed_manager.dependOnFeed(source,
+                                               self.maybeComponentStart,
+                                               component)
                 
-            self.deps[source].append(name)
+    def startPendingComponents(self, component, feed):
+        feedname = component.getName() + ':' + feed
+        self.feed_manager.feedReady(feedname)
 
-        if can_start:
-            self.componentStart(component)
-            
-    def startPendingComponents(self, component):
-        component_name = component.getName()
-        if self.deps.has_key(component_name):
-            msg('starting pending components for %s' % component_name)
-            comps = self.deps[component_name]
-            for name in comps[:]:
-                child = self.components[name]
-                for source in child.getSources():
-                    if not self.isComponentStarted(source):
-                        return
-                    
-                self.componentStart(child)
-            return
-
-        for component_name in self.components:
-            if not self.isComponentStarted(component_name):
-                return
-
-        msg('Server started up correctly')
-            
 class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):

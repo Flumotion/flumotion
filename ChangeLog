@@ -1,3 +1,13 @@
+2004-06-18  Johan Dahlin  <johan@gnome.org>
+
+	* conf/test-ogg-theora-vorbis.conf (feeds): Update to have two
+	feeds in one pipeline
+
+	* flumotion/server: Add support for feeds. Introduce Feed and
+	FeedManager objects. In a sort of hackish state. But it seems to
+	run all configuration files quite well so assuming it works for
+	now.
+	
 2004-06-17  Johan Dahlin  <johan@gnome.org>
 
 	* bin/flumotion.in (dir): Remove silly require.

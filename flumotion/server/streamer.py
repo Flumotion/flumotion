@@ -41,7 +41,7 @@ class Streamer(gobject.GObject, component.ParseLaunchComponent):
     
     def __init__(self, name, sources):
         self.__gobject_init__()
-        component.ParseLaunchComponent.__init__(self, name, sources, self.pipe_template)
+        component.ParseLaunchComponent.__init__(self, name, sources, [], self.pipe_template)
         self.caps = None
         
     def sink_handoff_cb(self, element, buffer, pad):
@@ -60,6 +60,13 @@ class Streamer(gobject.GObject, component.ParseLaunchComponent):
 
         self.msg('Storing caps: %s' % caps_str)
         self.caps = caps
+
+    def get_sink(self):
+        assert self.pipeline, 'Pipeline not created'
+        sink = self.pipeline.get_by_name('sink')
+        assert sink, 'No sink element in pipeline'
+        assert isinstance(sink, gst.Element)
+        return sink
 
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):

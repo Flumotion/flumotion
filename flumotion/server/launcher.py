@@ -199,8 +199,13 @@ class Launcher:
             if kind == 'producer' or kind == 'converter':
                 assert c.has_option(section, 'pipeline')
                 pipeline = c.get(section, 'pipeline')
+                if c.has_option(section, 'feeds'):
+                    feeds = c.get(section, 'feeds').split(',')
+                else:
+                    feeds = ['default']
             else:
-                pipeline = None
+                feeds = []
+                pipeline = ''
                 
             if kind == 'converter' or kind == 'streamer':
                 assert (c.has_option(section, 'source') or
@@ -217,9 +222,9 @@ class Launcher:
                 port = c.getint(section, 'port')
 
             if kind == 'producer':
-                self.start(Producer(name, sources, pipeline))
+                self.start(Producer(name, sources, feeds, pipeline))
             elif kind == 'converter':
-                self.start(Converter(name, sources, pipeline))
+                self.start(Converter(name, sources, feeds, pipeline))
             elif kind == 'streamer':
                 component = Streamer(name, sources)
                 resource = StreamingResource(component)
@@ -258,6 +263,10 @@ def get_options_for(kind, args):
                          action="store", type="string", dest="pipeline",
                          default=None,
                          help="Pipeline to run")
+        group.add_option('-f', '--feeds',
+                         action="store", type="string", dest="feeds",
+                         default=[],
+                         help="Feeds to provide")
 
     if need_sources:
         group.add_option('-s', '--sources',
@@ -291,8 +300,13 @@ def get_options_for(kind, args):
 
     if options.name is None:
         raise errors.OptionError, 'Need a name'
-    elif need_pipeline and options.pipeline is None:
-        raise errors.OptionError, 'Need a pipeline'
+    elif need_pipeline:
+        if options.pipeline is None:
+            raise errors.OptionError, 'Need a pipeline'
+        if options.feeds is None:
+            raise errors.OptionError, 'Need feeds'
+        else:
+            options.feeds = options.feeds.split(',')
     elif need_sources and options.sources is None:
         raise OptionError, 'Need a source'
     elif kind == 'streamer':
@@ -380,10 +394,10 @@ def run_component(name, args):
 
     if name == 'producer':
         klass = Producer
-        args = (options.name, options.sources, options.pipeline)
+        args = (options.name, options.sources, options.feeds, options.pipeline)
     elif name == 'converter':
         klass = Converter
-        args = (options.name, options.sources, options.pipeline)
+        args = (options.name, options.sources, options.feeds, options.pipeline)
     elif name == 'streamer':
         klass = Streamer
         args = (options.name, options.sources)
@@ -391,6 +405,7 @@ def run_component(name, args):
         raise AssertionError
         
     try:
+        print klass, args
         component = klass(*args)
     except errors.PipelineParseError, e:
         print 'Bad pipeline: %s' % e

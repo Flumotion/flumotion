@@ -23,9 +23,8 @@ from flumotion.server import component
 class Producer(component.ParseLaunchComponent):
     kind = 'producer'
     
-    def listen(self, host, port):
-        self.msg('Going to listen on %s:%d' % (host, port))
-        self.set_sink_properties(host=host, port=port)
+    def listen(self, feeds):
+        self.setup_feeds(feeds)
         
         self.pipeline_play()
         
