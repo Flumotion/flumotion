@@ -1,3 +1,9 @@
+2005-03-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/bundleclient.py:
+	* flumotion/worker/worker.py:
+	  doc and debug changes
+
 2005-03-02  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/ui/glade.py (GladeWindow.__init__): Make the parent

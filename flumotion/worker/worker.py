@@ -172,9 +172,9 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         instantiated.
 
         @param elementNames:   names of the Gstreamer elements
-        @type elementNames:    list of strings
+        @type  elementNames:   list of strings
 
-        @rtype: list of strings
+        @rtype:   list of strings
         @returns: a list of instantiatable element names
         """
         self.debug('remote_checkElements: element names to check %r' % (
@@ -186,21 +186,33 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         return list
 
     def remote_runProc(self, module, function, *args, **kwargs):
+        """
+        Runs the given function in the given module with the given arguments.
+        
+        @param module:   module the function lives in
+        @type  module:   string
+        @param function: function to run
+        @type  function: string
+
+        @returns: the return value of the given function in the module.
+        """
         def got_module(result):
+            self.debug('got module, running %s' % function)
             try:
                 proc = getattr(result, function)
                 return proc(*args, **kwargs)
             except Exception, e:
-                msg = 'runCode function failed: %s raised: %s' % (
-                    e.__class__.__name__, " ".join(e.args))
+                msg = 'runCode(%s, %s) failed: %s raised: %s' % (
+                    module, function, e.__class__.__name__, " ".join(e.args))
                 self.warning(msg)
                 raise errors.RemoteRunError(msg)
             except:
-                msg = 'runCode function failed: Unknown exception'
+                msg = 'runCode(%s, %s) failed: Unknown exception' % (
+                    module, function)
                 self.warning(msg)
                 raise errors.RemoteRunError(msg)
 
-        print 'loading %s' % module
+        self.debug('loading module %s for function %s' % (module, function))
         d = self.bundleLoader.load(module)
         d.addCallback(got_module)
         return d

@@ -86,6 +86,14 @@ class BundleLoader(log.Loggable):
         return d
 
     def load(self, moduleName):
+        """
+        Load the module given by name.
+        Sets up all necessary bundles to be able to load the module.
+
+        @rtype:   L{twisted.internet.defer.Deferred}
+        @returns: a deferred that will fire when the given module is loaded.
+        """
+        
         attach_sums_and_return = find_missing_packages = None
 
         def find_missing_packages(sums):
