@@ -1,3 +1,12 @@
+2004-10-17  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_overlay.glade:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Fixes to overlay component, it should only show a text if chose to
+	include one in the wizard.
+	
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:
