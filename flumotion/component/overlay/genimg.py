@@ -48,12 +48,16 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
     draw.text((TEXT_XOFFSET, TEXT_YOFFSET),
               text, font=font)
 
+    # How many logos we're going to show
+    logos = len([i for i in (show_fluendo, show_cc, show_xiph) if i])
+
+    # This is really *NOT* the optimal way of doing this.
+    # We should really find out a better way of adding an image on
+    # another image (with an offset)
+
     imax = max(width, height)
     y_corr = -(abs(width - height) + WIDTH + BORDER)
 
-    # How many logos we're going to show
-    logos = len([i for i in (show_fluendo, show_cc, show_xiph) if i])
-    
     if show_xiph:
         xiph = Image.open(xiphLogoPath)
         xiph = ImageOps.expand(xiph, imax)
@@ -80,4 +84,4 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
     image.save(filename, 'png')
 
 if __name__ == '__main__':    
-    generate_overlay('test.png', 'Testing', True, 320, 240)
+    generate_overlay('test.png', 'Testing', True, True, True, 320, 240)
