@@ -11,6 +11,7 @@ from twisted.spread.pb import PBClientFactory
 # TODO:
 #   subclass FMClientFactory
 #   merge FMCF back into twisted
+#
 class ReconnectingPBClientFactory(PBClientFactory,
                                   protocol.ReconnectingClientFactory):
     """Reconnecting client factory for PB brokers.

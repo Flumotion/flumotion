@@ -45,6 +45,11 @@ class IAuthenticate(components.Interface):
         
     def authenticate(self, keycard):
         "authenticates a keycard, must be a IClientKeycard"
-    
+
+# TODO: Common base?
+
 class IBaseComponent(components.Interface):
+    pass
+
+class IAdminComponent(components.Interface):
     pass

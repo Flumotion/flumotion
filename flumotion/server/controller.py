@@ -33,7 +33,7 @@ from twisted.internet import reactor
 from twisted.spread import pb
 
 from flumotion.server import admin
-from flumotion.server.interfaces import IBaseComponent
+from flumotion.server.interfaces import IAdminComponent, IBaseComponent
 from flumotion.twisted import errors, pbutil, portal
 from flumotion.utils import gstutils, log
 
@@ -47,7 +47,9 @@ class Dispatcher(log.Loggable):
     """
     
     __implements__ = portal.IRealm
+
     logCategory = 'dispatcher'
+
     def __init__(self, controller, admin):
         """
         @type controller: L{server.controller.Controller}
@@ -55,33 +57,32 @@ class Dispatcher(log.Loggable):
         """
         self.controller = controller
         self.admin = admin
-        
-    ### IRealm method
-    def requestAvatar(self, avatarID, mind, *interfaces):
-        # requestAvatar gets called through pb.PBClientFactory.login()
-        # An optional second argument can be passed to login, which should be
-        # a L{twisted.spread.flavours.Referenceable}
-        # A L{twisted.spread.pb.RemoteReference} to it is passed to
-        # requestAvatar as mind.
-        # So in short, the mind is a reference to the client passed in login()
-        # on the peer, allowing any object that has the mind to call back
-        # to the piece that called login(),
-        # which in our case is a component or an admin.
 
-        p = None
+    # requestAvatar gets called through ClientFactory.login()
+    # An optional second argument can be passed to login, which should be
+    # a L{twisted.spread.flavours.Referenceable}
+    # A L{twisted.spread.pb.RemoteReference} to it is passed to
+    # requestAvatar as mind.
+    # So in short, the mind is a reference to the client passed in login()
+    # on the peer, allowing any object that has the mind to call back
+    # to the piece that called login(),
+    # which in our case is a component or an admin.
+    def requestAvatar(self, avatarID, mind, *interfaces):
+
         if not pb.IPerspective in interfaces:
             raise errors.NoPerspectiveError(avatarID)
 
+        p = None
         if IBaseComponent in interfaces:
             p = self.controller.getPerspective(avatarID)
-        # FIXME: can we connect multiple admin clients this way ?
-        elif avatarID == 'admin':
+        elif IAdminComponent in interfaces:
             p = self.admin.getPerspective()
 
-        self.debug("returning Avatar: id %s, perspective %s" % (avatarID, p))
         if not p:
             raise errors.NoPerspectiveError(avatarID)
 
+        self.debug("returning Avatar: id %s, perspective %s" % (avatarID, p))
+        
         # schedule a perspective attached for after this function
         reactor.callLater(0, p.attached, mind)
         

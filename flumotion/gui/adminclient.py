@@ -37,6 +37,7 @@ from twisted.spread import pb
 
 from flumotion.twisted import pbutil
 from flumotion.server import admin   # Register types
+from flumotion.server import interfaces
 from flumotion.utils import log
 
 import flumotion.config
@@ -57,7 +58,9 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         self.__gobject_init__()
         self.factory = pbutil.FMClientFactory()
         self.debug("logging in to ClientFactory")
-        cb = self.factory.login(pbutil.Username('admin'), client=self)
+        cb = self.factory.login(pbutil.Username('admin'), self,
+                                pb.IPerspective,
+                                interfaces.IAdminComponent)
         cb.addCallback(self._gotPerspective)
         cb.addErrback(self._gotError)
 

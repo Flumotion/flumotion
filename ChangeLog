@@ -1,5 +1,10 @@
 2004-08-31  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/server/interfaces.py (IAdminComponent): Add a new interface
+
+	* flumotion/server/controller.py (Dispatcher.requestAvatar): And
+	use it here
+
 	* flumotion/twisted/pbutil.py (FMClientFactory): New factory, to
 	be used instead PBClientFactory
 
