@@ -320,15 +320,21 @@ class Window(log.Loggable, gobject.GObject):
         reactor.stop()
 
     # menubar/toolbar callbacks
+    def file_new_cb(self, button):
+        raise NotImplementedError
+    
     def file_open_cb(self, button):
         raise NotImplementedError
+    on_tool_open_clicked = file_open_cb
     
     def file_save_cb(self, button):
         raise NotImplementedError
-
+    on_tool_save_clicked = file_save_cb
+    
     def file_quit_cb(self, button):
         self.close()
-
+    on_tool_quit_clicked = file_quit_cb
+    
     def edit_properties_cb(self, button):
         raise NotImplementedError
 
@@ -393,7 +399,44 @@ class Window(log.Loggable, gobject.GObject):
         d.run()
 
     def help_about_cb(self, button):
-        raise NotImplementedError
+        dialog = gtk.Dialog('About Flumotion', self.window,
+                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                            (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        dialog.set_has_separator(False)
+        dialog.set_resizable(False)
+        dialog.set_border_width(12)
+        dialog.vbox.set_spacing(6)
+        
+        image = gtk.Image()
+        dialog.vbox.pack_start(image)
+        image.set_from_file(os.path.join(configure.imagedir, 'fluendo.png'))
+        image.show()
+        
+        version = gtk.Label('<span size="xx-large"><b>Flumotion %s</b></span>' % configure.version)
+        version.set_selectable(True)
+        dialog.vbox.pack_start(version)
+        version.set_use_markup(True)
+        version.show()
+
+        text = 'Flumotion is a streaming video server\n\n(C) 2004 Fluendo S.L.'
+        authors = ('Johan Dahlin &lt;johan@fluendo.com&gt;',
+                   'Thomas V. Stichele &lt;thomas@fluendo.com&gt;',
+                   'Wim Taymans &lt;wim@fluendo.com&gt;')
+        text += '\n\n<small>Authors:\n'
+        for author in authors:
+            text += '  %s\n' % author
+        text += '</small>'
+        info = gtk.Label(text)
+        dialog.vbox.pack_start(info)
+        info.set_use_markup(True)
+        info.set_selectable(True)
+        info.set_justify(gtk.JUSTIFY_FILL)
+        info.set_line_wrap(True)
+        info.show()
+
+        dialog.show()
+        dialog.run()
+        dialog.destroy()
 
     def show(self):
         # XXX: Use show()

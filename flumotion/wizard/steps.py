@@ -47,7 +47,6 @@ class Source(wizard.WizardStep):
     section = 'Production'
     section_name = 'Production'
     icon = 'source.png'
-    has_worker = False
     
     def setup(self):
         self.combobox_video.set_enum(VideoDevice)
@@ -59,8 +58,11 @@ class Source(wizard.WizardStep):
                      'If you want to stream audio')
         
         # XXX: Default to something else
-        self.combobox_video.set_active(VideoDevice.Test)
-        self.combobox_audio.set_active(AudioDevice.Test)
+        self.combobox_video.set_active(VideoDevice.Firewire)
+        self.combobox_audio.set_active(AudioDevice.Firewire)
+
+    def activated(self):
+        self.verify()
         
     def on_checkbutton_has_video_toggled(self, button):
         self.combobox_video.set_sensitive(button.get_active())
@@ -70,12 +72,32 @@ class Source(wizard.WizardStep):
         self.combobox_audio.set_sensitive(button.get_active())
         self.verify()
 
+    def on_combobox_video_changed(self, button):
+        self.verify()
+        
+    def on_combobox_audio_changed(self, button):
+        self.verify()
+        
     def verify(self):
-        if (not self.checkbutton_has_audio and
-            not self.checkbutton_has_video):
+        if not hasattr(self.wizard, 'combobox_worker'):
+            return
+        
+        has_audio = self.checkbutton_has_audio
+        has_video = self.checkbutton_has_video
+        if (not has_audio and not has_video):
             self.wizard.block_next(True)
+            self.wizard.combobox_worker.set_sensitive(False)
+            return
         else:
             self.wizard.block_next(False)
+
+        video_source = self.combobox_video.get_active()
+        audio_source = self.combobox_audio.get_active()
+        if (has_video and video_source == VideoDevice.Firewire or
+            has_audio and audio_source == AudioDevice.Firewire):
+            self.wizard.combobox_worker.set_sensitive(True)
+        else:
+            self.wizard.combobox_worker.set_sensitive(False)
 
     def get_next(self):
         if self.checkbutton_has_video:

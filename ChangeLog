@@ -1,3 +1,15 @@
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/admin.glade:
+	* data/glade/wizard_source.glade:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/steps.py:
+
+	Remove some broken stuff in the admin interface.
+	Improve the wizard, it was quite broken.
+	
 2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:

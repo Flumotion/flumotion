@@ -87,9 +87,15 @@ class WizardSaver:
         options = self.wizard.get_step_options('Source')
         source = options['video']
         video_step = self.wizard[source.step]
-        return Component('video-source', source.component_type,
-                         video_step.get_component_properties(),
-                         video_step.worker)
+        
+        if hasattr(video_step, 'worker'):
+            props = video_step.get_component_properties()
+            worker = video_step.worker
+        else:
+            props = {}
+            worker = self.wizard['Source'].worker
+            
+        return Component('video-source', source.component_type, props, worker)
 
     def getVideoOverlay(self, show_logo):
         # At this point we already know that we should overlay something
@@ -118,18 +124,26 @@ class WizardSaver:
                          encoder_step.get_component_properties(),
                          encoder_step.worker)
 
-    def getAudioSource(self):
+    def getAudioSource(self, video_source):
         options = self.wizard.get_step_options('Source')
         source = options['audio']
-        if source == AudioDevice.Test:
-            props = {}
-            audio_step = self.wizard['Audio Test']
-        else:
-            audio_step = self.wizard['Audio Source']
-            props = audio_step.get_component_properties()
+        props = {}
         
-        return Component('audio-source', source.component_type, props,
-                         audio_step.worker)
+        audio_step = self.wizard['Audio Source']
+        
+        if source == AudioDevice.Firewire:
+            # First, if we have firewire, video return that component
+            if options['video'] == VideoDevice.Firewire:
+                # FIXME: do this is a better way
+                return video_source
+            
+        if hasattr(audio_step, 'worker'):
+            props = audio_step.get_component_properties()
+            worker = audio_step.worker
+        else:
+            worker = self.wizard['Source'].worker
+        
+        return Component('audio-source', source.component_type, props, worker)
 
     def getAudioEncoder(self):
         options = self.wizard.get_step_options('Encoding')
@@ -144,8 +158,7 @@ class WizardSaver:
             props = encoder_step.get_component_properties()
             worker = encoder_step.worker
             
-        return Component('audio-encoder', encoder.component_type, props,
-                         worker)
+        return Component('audio-encoder', encoder.component_type, props, worker)
 
     def getMuxer(self, name):
         options = self.wizard.get_step_options('Encoding')
@@ -175,11 +188,13 @@ class WizardSaver:
         else:
             video_encoder.link(video_source)
         components.append(video_encoder)
-        return video_encoder
+        return video_encoder, video_source
             
-    def handleAudio(self, components):
-        audio_source = self.getAudioSource()
-        components.append(audio_source)
+    def handleAudio(self, components, video_source):
+        audio_source = self.getAudioSource(video_source)
+        # In case of firewire component, which can already be there
+        if not audio_source in components:
+            components.append(audio_source)
 
         audio_encoder = self.getAudioEncoder()
         components.append(audio_encoder)
@@ -205,6 +220,7 @@ class WizardSaver:
             video_muxer.link(video_encoder)
 
         steps = []
+        both_muxer = None
         if has_audio and has_video:
             both_muxer = self.getMuxer('audio-video')
             components.append(both_muxer)
@@ -259,11 +275,11 @@ class WizardSaver:
             consumer.link(muxer)
             components.append(consumer)
 
-        if not audio_muxer and audio_muxer.eaters:
+        if audio_muxer and audio_muxer.eaters:
             components.remove(audio_muxer)
-        if not video_muxer and video_muxer.eaters:
+        if video_muxer and video_muxer.eaters:
             components.remove(video_muxer)
-        if not both_muxer and both_muxer.eaters:
+        if both_muxer and both_muxer.eaters:
             components.remove(both_muxer)
             
     def getXML(self):
@@ -273,13 +289,16 @@ class WizardSaver:
 
         components = []
         
+        video_encoder = None
+        video_source = None
+        if has_video:
+            video_encoder, video_source = self.handleVideo(components)
+
+        # Must do audio after video, in case of a firewire audio component
+        # is selected together with a firewire video component
         audio_encoder = None
         if has_audio:
-            audio_encoder = self.handleAudio(components)
-            
-        video_encoder = None
-        if has_video:
-            video_encoder = self.handleVideo(components)
+            audio_encoder = self.handleAudio(components, video_source)
             
         self.handleConsumers(components, audio_encoder, video_encoder)
         
