@@ -52,9 +52,11 @@ class Dispatcher(log.Loggable):
     logCategory = 'dispatcher'
 
     def __init__(self):
-        self.heavens = {}
-        self.avatars = {}
+        self.heavens = {} # registered heavens, keyed on interface
+        self.avatars = {} # avatarID -> heaven
         
+    ### IRealm methods
+
     # requestAvatar gets called through ClientFactory.login()
     # An optional second argument can be passed to login, which should be
     # a L{twisted.spread.flavours.Referenceable}
@@ -75,6 +77,8 @@ class Dispatcher(log.Loggable):
         # return a tuple of interface, aspect, and logout function 
         return (pb.IPerspective, avatar,
                 lambda a=avatar, m=mind, i=avatarID: self.removeAvatar(i, a, m))
+
+    ### our methods
 
     def removeAvatar(self, avatarID, avatar, mind):
         heaven = self.avatars[avatarID]
@@ -97,6 +101,9 @@ class Dispatcher(log.Loggable):
         raise errors.NoPerspectiveError(avatarID)
         
     def registerHeaven(self, interface, heaven):
+        """
+        register a Heaven implementing the given interface.
+        """
         assert components.implements(heaven, interfaces.IHeaven)
         
         self.heavens[interface] = heaven
@@ -120,12 +127,12 @@ class Vishnu:
         # connecting to me
         self.dispatcher = Dispatcher()
 
-        self.workerheaven = self.createHeaven(interfaces.IWorkerComponent,
-                                              worker.WorkerHeaven)
-        self.componentheaven = self.createHeaven(interfaces.IBaseComponent,
-                                                 component.ComponentHeaven)
-        self.adminheaven = self.createHeaven(interfaces.IAdminComponent,
-                                             admin.AdminHeaven)
+        self.workerheaven = self._createHeaven(interfaces.IWorkerComponent,
+                                               worker.WorkerHeaven)
+        self.componentheaven = self._createHeaven(interfaces.IBaseComponent,
+                                                  component.ComponentHeaven)
+        self.adminheaven = self._createHeaven(interfaces.IAdminComponent,
+                                              admin.AdminHeaven)
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
@@ -136,7 +143,7 @@ class Vishnu:
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
         self.factory = pb.PBServerFactory(p)
 
-    def createHeaven(self, interface, klass):
+    def _createHeaven(self, interface, klass):
         heaven = klass(self)
         self.dispatcher.registerHeaven(interface, heaven)
         return heaven

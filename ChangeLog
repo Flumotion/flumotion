@@ -1,3 +1,8 @@
+2004-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/manager.py:
+	  commenting some more, privatize a function
+
 2004-09-17  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/config.py:
