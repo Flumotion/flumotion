@@ -410,8 +410,9 @@ class WorkerBrain(log.Loggable):
                 if signum == signal.SIGSEGV:
                     self.warning("Job child with pid % segfaulted" % pid)
                     if not os.WCOREDUMP(status):
-                    self.warning(
-                        "Consider enabling core dumps for the next time")
+                        self.warning(
+                            "No core dump generated.  "\
+                            "Were core dumps enabled at the start ?")
                 else:
                     self.info(
                         "Reaped job child with pid %d signaled by signal %d" % (
