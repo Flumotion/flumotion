@@ -85,37 +85,29 @@ class Launcher:
         self.msg('Starting controller')
         
         pid = os.fork()
-        if not pid:
-            if logging:
-                log.enableLogging()
-            signal.signal(signal.SIGINT, signal.SIG_IGN)
+        if pid:
+            self.controller_pid = pid
+            return
+        
+        if logging:
+            log.enableLogging()
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
                 
-            self.restore_uid()
-            factory = ControllerServerFactory()
-            reactor.listenTCP(self.controller_port, factory)
-            f = Factory()
-            f.protocol = MiniProtocol
-            f.protocol.controller = factory.controller
-            reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(), f)
+        self.restore_uid()
+        factory = ControllerServerFactory()
+        reactor.listenTCP(self.controller_port, factory)
+        f = Factory()
+        f.protocol = MiniProtocol
+        f.protocol.controller = factory.controller
+        reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(), f)
 
-            #try:
-            reactor.run(False)
-            #except KeyboardInterrupt:
-            #    pass
+        reactor.run(False)
             
-            raise SystemExit
-        self.controller_pid = pid
+        raise SystemExit
         
     def spawn(self, component, function=None, args=None):
-        def exit_cb(*args):
-            print 'Shutting down', component.getName()
-            self.msg('Stopping pipeline')
-            component.pipeline_stop()
-            raise SystemExit
-        
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
-        #signal.signal(signal.SIGINT, exit_cb)
         reactor.connectTCP(self.controller_host, self.controller_port,
                            component.factory)
         
