@@ -1,0 +1,20 @@
+<root>
+  <component name="producer-video-bttv" type="producer">
+    <pipeline>
+v4lsrc device=/dev/video0 copy-mode=true ! video/x-raw-yuv,width=384,height=288 ! videoscale ! video/x-raw-yuv,width=192,height=144 ! videorate ! video/x-raw-yuv,framerate=10.0
+    </pipeline>
+  </component>
+
+  <component name="converter-ogg-theora" type="converter">
+    <source>producer-video-bttv</source>
+    <pipeline>
+ffmpegcolorspace ! theoraenc ! oggmux
+    </pipeline>
+  </component>
+
+  <component name="streamer-ogg-theora" type="http-streamer">
+    <source>converter-ogg-theora</source>
+    <port>8800</port>
+    <logfile>/tmp/ogg-bttv-theora.access.log</logfile>
+  </component>
+</root>
