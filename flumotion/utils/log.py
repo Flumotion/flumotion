@@ -38,25 +38,28 @@ def stderrHandlerLimited(category, type, message):
     sys.stderr.write('[%s:%s] %s\n' % (category, type, message))
     sys.stderr.flush()
 
-def log(category, type, message):
+def handle(category, type, message):
     global _log_handlers
 
     for handler in _log_handlers:
         handler(category, type, message)
     
-def debug(cat, *args):
-    log(cat, 'DEBUG', ' '.join(args))
-
-def msg(cat, *args):
-    log(cat, 'INFO', ' '.join(args))
-
-def warn(cat, *args):
-    log(cat, 'WARNING', ' '.join(args))
-
 def error(cat, *args):
     msg = ' '.join(args)
-    log(cat, 'ERROR', msg)
+    handle(cat, 'ERROR', msg)
     raise errors.SystemError(msg)
+
+def warning(cat, *args):
+    handle(cat, 'WARNING', ' '.join(args))
+
+def info(cat, *args):
+    handle(cat, 'INFO', ' '.join(args))
+
+def debug(cat, *args):
+    handle(cat, 'DEBUG', ' '.join(args))
+
+def log(cat, *args):
+    handle(cat, 'LOG', ' '.join(args))
 
 def enableLogging():
     global _log_handlers

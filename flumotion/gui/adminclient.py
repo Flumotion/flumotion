@@ -32,6 +32,7 @@ from twisted.internet import gtk2reactor
 gtk2reactor.install()
 
 from twisted.internet import reactor
+from twisted.internet import error
 from twisted.spread import pb
 
 from flumotion.twisted import pbutil
@@ -43,37 +44,50 @@ import flumotion.config
 class AdminInterface(pb.Referenceable, gobject.GObject):
     __gsignals__ = {
         'connected' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
+        'connection-refused' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
         'update'    : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (object,))
     }
 
     def __init__(self):
         self.__gobject_init__()
         self.factory = pb.PBClientFactory()
-        log.debug('adminclient', "logging in to ClientFactory")
+        self.debug("logging in to ClientFactory")
         cb = self.factory.login(pbutil.Username('admin'), client=self)
         cb.addCallback(self.gotPerspective)
+        cb.addErrback(self.gotError)
 
     def gotPerspective(self, perspective):
-        log.debug('adminclient', "gotPerspective")
+        self.debug("gotPerspective")
         self.remote = perspective
 
-    def msg(self, *args):
+    def gotError(self, failure):
+        r = failure.trap(error.ConnectionRefusedError)
+        self.debug("emitting connection-refused")
+        self.emit('connection-refused')
+        self.debug("emitted connection-refused")
+
+    def info(self, *args):
+        log.info('adminclient', *args)
+    def debug(self, *args):
         log.debug('adminclient', *args)
+    def log(self, *args):
+        log.log('adminclient', *args)
         
     def remote_log(self, category, type, message):
-        log.debug('adminclient', category, type, message)
+        self.log(category, type, message)
         
     def remote_componentAdded(self, component):
-        self.msg( 'componentAdded %s' % component.getName())
+        self.debug('componentAdded %s' % component.getName())
         self.clients.append(component)
         self.emit('update', self.clients)
         
     def remote_componentRemoved(self, component):
-        self.msg( 'componentRemoved %s' % component.getName())
+        self.debug('componentRemoved %s' % component.getName())
         self.clients.remove(component)
         self.emit('update', self.clients)
         
     def remote_initial(self, clients):
+        self.debug('remote_initial %s' % clients)
         self.clients = clients
         self.emit('connected')
 
@@ -189,6 +203,18 @@ class Window:
     def update_cb(self, admin, clients):
         self.update(clients)
 
+    def connection_refused_later(self, host, port):
+        d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
+            gtk.BUTTONS_OK,
+            "Connection to controller on %s:%d was refused." % (host, port))
+        d.run()
+        self.close()
+
+    def connection_refused_cb(self, admin, host, port):
+        log.debug('adminclient', "handling connection-refused")
+        reactor.callLater(0, self.connection_refused_later, host, port)
+        log.debug('adminclient', "handled connection-refused")
+
     def update(self, orig_clients):
         model = self.component_model
         model.clear()
@@ -208,6 +234,7 @@ class Window:
         self.admin = AdminInterface()
         self.admin.connect('connected', self.connected_cb)
         self.admin.connect('update', self.update_cb)
+        self.admin.connect('connection-refused', self.connection_refused_cb, host, port)
         reactor.connectTCP(host, port, self.admin.factory)
         
     def menu_quit_cb(self, button):

@@ -1,3 +1,10 @@
+2004-08-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/gui/adminclient.py:
+	  throw up a dialog if we can't connect
+	* flumotion/utils/log.py:
+	  make logging similar to GStreamer's
+
 2004-08-11  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/config.py (FlumotionConfigXML.parseProperties):
