@@ -32,14 +32,13 @@ try:
 except:
     pass
 
-sys_argv = sys.argv
-sys.argv = sys_argv[:1]
+#sys_argv = sys.argv
+#sys.argv = sys_argv[:1]
 import gst
-sys.argv = sys_argv
+#sys.argv = sys_argv
 
 from flumotion.twisted import gstreactor
 gstreactor.install()
-
 
 from twisted.internet import reactor
 from twisted.web import server, resource
@@ -52,32 +51,6 @@ from flumotion.server.producer import Producer
 from flumotion.server import streamer
 from flumotion.utils import log, gstutils
 
-def set_proc_text(text):
-    return
-
-    i = 0
-    for item in proc:
-        n = len(item)
-        if not text:
-            value = '\0'
-        elif len(text) > n:
-            value = text[:n+1] 
-            text = text[n:]
-        else:
-            value = text + '\0'
-            text = None
-
-        print '%d = %r' % (i, value)
-        proc[i] = value
-        i += 1
-        
-    #print len(proc)
-    #proc[0] = 'flumotion - laun'
-    #proc[1] = 'cher\0'
-    #proc[2] = '\0'
-    #proc[3] = '\0'
-    #proc[4] = '\0'
-    
 class Launcher:
     def __init__(self, host, port):
         self.children = []
@@ -89,36 +62,32 @@ class Launcher:
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         signal.signal(signal.SIGSEGV, self.segv_handler)
         
-        set_proc_text('flumotion [launcher]')
-        
-    def setup_uid(self, name):
+    def restore_uid(self):
         if self.uid is not None:
             try:
                 os.setuid(self.uid)
-                self.msg('uid set to %d for %s' % (self.uid, name))
+                self.msg('uid set to %d' % (self.uid))
             except OSError, e:
-                self.msg('failed to set uid: %s' % str(e))
+                self.warn('failed to set uid: %s' % str(e))
 
-    def msg(self, *args):
-        log.msg('launcher', *args)
+    msg = lambda s, *a: log.msg('launcher', *a)
+    warn = lambda s, *a: log.warn('launcher', *a)
+    error = lambda s, *a: log.error('launcher', *a)
 
-    def set_nice(self, nice, name):
+    def set_nice(self, nice):
         if nice:
             try:
                 os.nice(nice)
             except OSError, e:
-                self.msg('Failed to set nice level: %s' % str(e))
+                self.warn('Failed to set nice level: %s' % str(e))
             else:
                 self.msg('Nice level set to %d' % nice)
 
-        self.setup_uid(name)
-        
     def start_controller(self):
         pid = os.fork()
         self.msg('Starting controller')
         if not pid:
-            self.setup_uid('controller')
-            set_proc_text('flumotion [controller]')
+            self.restore_uid()
             factory = ControllerServerFactory()
             self.controller = reactor.listenTCP(self.controller_port,
                                                 factory)
@@ -144,7 +113,7 @@ class Launcher:
     def spawn(self, component):
         pid = os.getpid()
         def exit_cb(*args):
-            print 'EXIT'
+            self.msg('Stopping pipeline')
             component.pipeline_stop()
             raise SystemExit
 
@@ -160,24 +129,8 @@ class Launcher:
             pass
         component.pipeline_stop()
 
-    def start(self, component, nice, func=None, *args):
-        pid = os.fork()
-        if not pid:
-            if func:
-                func(*args)
-            self.set_nice(nice, component.component_name)
-            set_proc_text('flumotion [%s]' % component.component_name)
-            self.spawn(component)
-            raise SystemExit
-        else:
-            self.msg('Starting %s (%s) on pid %d' %
-                    (component.component_name,
-                     component.getKind(),
-                     pid))
-            self.children.append(pid)
-
     def run(self):
-        self.setup_uid('launcher')
+        self.restore_uid()
         
         while self.children:
             for pid in self.children:
@@ -206,33 +159,71 @@ class Launcher:
         reactor.stop()
 
         raise SystemExit
-        
+
+    def start(self, component, nice=0, func=None, *args):
+        pid = os.fork()
+        if not pid:
+            if func:
+                func(*args)
+            self.set_nice(nice)
+            self.restore_uid()
+            self.spawn(component)
+            raise SystemExit
+        else:
+            self.msg('Starting %s (%s) on pid %d' %
+                    (component.getName(),
+                     component.getKind(),
+                     pid))
+            self.children.append(pid)
+
+    def setup_http_streamer(self, c):
+        def setup_cb(port, component):
+            resource = streamer.HTTPStreamingResource(component,
+                                                      c.logfile)
+            factory = server.Site(resource=resource)
+            self.msg('Starting http factory on port %d' % c.port)
+            reactor.listenTCP(port, factory)
+        component = streamer.MultifdSinkStreamer(c.name, c.sources)
+        callback = setup_cb
+        callback_args = (c.port, component)
+
+        return component, callback, callback_args
+
+    def setup_file_streamer(self, c):
+        def setup_cb(port, component):
+            factory = component.create_admin()
+            self.msg('Starting admin factory on port %d' % c.port)
+            reactor.listenTCP(port, factory)
+        component = streamer.FileSinkStreamer(c.name,
+                                              c.sources, c.location)
+        if c.port:
+            callback = setup_cb
+            callback_args = (c.port, component)
+        else:
+            callback = None
+            callback_args = ()
+
+        return component, callback, callback_args
+    
     def load_config(self, filename):
         config = FlumotionConfig(filename)
 
         for c in config.components.values():
+            cb = None
+            args = ()
             if c.kind == 'producer':
-                self.start(Producer(c.name, [],
-                                    c.feeds, c.pipeline), c.nice)
+                component = Producer(c.name, [], c.feeds, c.pipeline)
             elif c.kind == 'converter':
-                self.start(Converter(c.name, c.sources, c.feeds, c.pipeline), c.nice)
+                component = Converter(c.name, c.sources, c.feeds, c.pipeline)
             elif c.kind == 'streamer':
                 if c.protocol == 'http':
-                    def setup_cb(port, component):
-                        resource = streamer.HTTPStreamingResource(component, c.logfile)
-                        factory = server.Site(resource=resource)
-                        reactor.listenTCP(port, factory)
-                        
-                    component = streamer.MultifdSinkStreamer(c.name, c.sources)
-                    self.msg('Starting http factory at port %d' % c.port)
-                    self.start(component, c.nice, setup_cb, c.port, component)
+                    component, cb, args = self.setup_http_streamer(c)
                 elif c.protocol == 'file':
-                    def setup_cb(port, component):
-                        factory = component.create_admin()
-                        reactor.listenTCP(port, factory)
-                        
-                    component = streamer.FileSinkStreamer(c.name, c.sources, location)
-                    self.start(component, c.nice, setup_cb, c.port, c.component)
+                    component, cb, args = self.setup_file_streamer(c)
+            else:
+                self.warn("unknown component type: %s" % c.kind)
+                continue
+            self.start(component, c.nice, cb, *args)
     
 def get_options_for(kind, args):
     if kind == 'producer':
@@ -352,14 +343,14 @@ def run_launcher(args):
         log.enableLogging()
 
     launcher = Launcher(options.host, options.port)
-    launcher.load_config(args[2])
 
     if options.host == 'localhost':
         if not gstutils.is_port_free(options.port):
-            launcher.msg('Controller is already started')
+            launcher.error('Controller is already started')
         else:
             launcher.start_controller()
 
+    launcher.load_config(args[2])
     launcher.run()
 
     return 0

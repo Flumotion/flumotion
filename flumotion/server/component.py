@@ -41,7 +41,7 @@ class ClientFactory(pbutil.ReconnectingPBClientFactory):
                            client=self.component)
 
     def gotPerspective(self, perspective):
-        self.component.gotPerspective(perspective)
+        self.component.cb_gotPerspective(perspective)
 
 class BaseComponent(pb.Referenceable):
     def __init__(self, name, sources, feeds):
@@ -57,18 +57,18 @@ class BaseComponent(pb.Referenceable):
         self.factory = ClientFactory(self)
         self.factory.login(self.username)
 
-    def msg(self, *args):
-        log.msg(self.component_name, *args)
+    msg = lambda s, *a: log.msg(s.getName(), *a)
+    warn = lambda s, *a: log.warn(s.getName(), *a)
 
-    def warn(self, *args):
-        log.warning(self.component_name, *args)
-
-    def gotPerspective(self, perspective):
+    def cb_gotPerspective(self, perspective):
         self.remote = perspective
         
     def hasPerspective(self):
         return self.remote != None
 
+    def getName(self):
+        return self.component_name
+    
     def getKind(self):
         assert hasattr(self, 'kind')
         return self.kind
@@ -123,7 +123,7 @@ class BaseComponent(pb.Referenceable):
         raise NotImplementedError
     
     def setup_pipeline(self):
-        self.pipeline.set_name('pipeline-' + self.component_name)
+        self.pipeline.set_name('pipeline-' + self.getName())
         sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
         self.pipeline_signals.append(sig_id)
         
@@ -198,7 +198,8 @@ class BaseComponent(pb.Referenceable):
         
         self.setup_pipeline()
 
-        element_names = [element.get_name() for element in self.pipeline.get_list()]
+        element_names = [element.get_name()
+                            for element in self.pipeline.get_list()]
 
         return {'ip' : self.getIP(),
                 'pid' :  os.getpid(), 
@@ -244,8 +245,10 @@ class BaseComponent(pb.Referenceable):
             if pspec.name == property:
                 break
 
-        if pspec.value_type in (gobject.TYPE_INT, gobject.TYPE_UINT, gobject.TYPE_INT,
-                                gobject.TYPE_INT64, gobject.TYPE_UINT64):
+        if pspec.value_type in (gobject.TYPE_INT,
+                                gobject.TYPE_UINT,
+                                gobject.TYPE_INT64,
+                                gobject.TYPE_UINT64):
             value = int(value)
         elif pspec.value_type == gobject.TYPE_BOOLEAN:
             if value == 'False':
@@ -334,7 +337,7 @@ class ParseLaunchComponent(BaseComponent):
         pipeline = self.do_sources(sources, pipeline)
         pipeline = self.do_feeds(feeds, pipeline)
 
-        self.msg('pipeline for %s is %s' % (self.component_name, pipeline))
+        self.msg('pipeline for %s is %s' % (self.getName(), pipeline))
         
         try:
             self.pipeline = gst.parse_launch(pipeline)

@@ -21,21 +21,28 @@
 import sys
 
 _do_logging = False
+_log_handlers = []
 
-def log(m):
-    global _do_logging
-    if _do_logging:
-        sys.stderr.write(m)
-        sys.stderr.flush()
+def stderrHandler(category, type, message):
+    sys.stderr.write('[%s] %s %s\n' % (category, type, message))
+    sys.stderr.flush()
+
+def log(category, type, message):
+    global _do_logging, _log_handlers
+    if not _do_logging and type != 'ERROR':
+        return
+
+    for handler, args in _log_handlers:
+        handler(category, type, message, *args)
     
-def msg(category, *args):
-    log('[%s] %s\n' % (category, ' '.join(args)))
+def msg(cat, *args):
+    log(cat, 'INFO', ' '.join(args))
 
-def warning(category, *args):
-    log('[%s] WARNING: %s\n' % (category, ' '.join(args)))
+def warn(cat, *args):
+    log(cat, 'WARNING', ' '.join(args))
 
-def error(category, *args):
-    log('[%s] ERROR: %s\n' % (category, ' '.join(args)))
+def error(cat, *args):
+    log(cat, 'ERROR', ' '.join(args))
     raise SystemExit
 
 def enableLogging():
@@ -46,3 +53,7 @@ def disableLogging():
     global _do_logging
     _do_logging = False
     
+def addLogHandler(func, *args):
+    _log_handlers.append((func, args))
+
+_log_handlers.append((stderrHandler, ()))

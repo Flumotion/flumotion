@@ -26,7 +26,9 @@ class ConfigError(Exception):
     pass
 
 class ConfigComponent:
-    nice = 0
+    nice = None
+    logfile = None
+    port = None
     def __init__(self, name):
         self.name = name
 
@@ -44,8 +46,7 @@ class FlumotionConfig(ConfigParser):
         self.read(filename)
         self.parse()
 
-    def msg(self, *args):
-        log.msg('config', *args)
+    msg = lambda s, *a: log.msg('config', *a)
         
     def add_component(self, name, **kwargs):
         component = ConfigComponent(name)

@@ -45,8 +45,7 @@ class AdminPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller):
         self.controller = controller
 
-    def msg(self, msg):
-        log.msg('admin', msg)
+    msg = lambda s, *a: log.msg('admin', *a)
         
     def getClients(self):
         return map(ComponentView,

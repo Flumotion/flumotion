@@ -41,9 +41,6 @@ from flumotion.server import admin
 from flumotion.twisted import errors, pbutil, shell
 from flumotion.utils import gstutils, log
 
-def msg(*args):
-    log.msg('controller', *args)
-
 class Dispatcher:
     __implements__ = portal.IRealm
     def __init__(self, controller, admin):
@@ -94,10 +91,10 @@ class ComponentPerspective(pbutil.NewCredPerspective):
                                         self.getName(),
                                         gst.element_state_get_name(self.state))
 
-    def msg(self, *args):
-        args = ('=%s=' % self.getName(),) + args
-        msg(*args)
-        
+    msg = lambda s, *a: log.msg('controller', *(s.getName(),) + a)
+    warn = lambda s, *a: log.warn('controller', *(s.getName(),) + a)
+    error = lambda s, *a: log.error('controller', *(s.getName(),) + a)
+
     def getTransportPeer(self):
         return self.mind.broker.transport.getPeer()
 
@@ -141,19 +138,18 @@ class ComponentPerspective(pbutil.NewCredPerspective):
     def cb_register(self, options, cb):
         for key, value in options.items():
             setattr(self.options, key, value)
-            print self, key, '=', value
         self.options.dict = options
         
         self.controller.componentRegistered(self)
 
     def cb_checkAll(self, failure):
-        log.msg('ERROR:' + str(failure))
+        self.error(str(failure))
         self.callRemote('stop')
         return None
                 
     def cb_checkPipelineError(self, failure):
         failure.trap(errors.PipelineParseError)
-        self.msg('Invalid pipeline for component')
+        self.error('Invalid pipeline for component')
         self.callRemote('stop')
         return None
 
@@ -197,7 +193,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
             self.controller.startPendingComponents(self, feed)
             
     def perspective_error(self, element, error):
-        self.msg('error element=%s string=%s' % (element, error))
+        self.error('error element=%s string=%s' % (element, error))
         
         self.controller.removeComponent(self)
 
@@ -320,10 +316,10 @@ class FeedManager:
     
     def feedReady(self, feedname): 
         # If we don't specify the feed
-        log.msg('controller', '=%s= ready' % (feedname))
+        log.msg('controller', 'feed %s ready' % (feedname))
 
         if not self.feeds.has_key(feedname):
-            log.msg('FIXME: no feed called: %s' % feedname)
+            self.warn('FIXME: no feed called: %s' % feedname)
             return
         
         feed = self.feeds[feedname]
