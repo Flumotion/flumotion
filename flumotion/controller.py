@@ -106,7 +106,7 @@ class ControllerFactory(pb.Referenceable):
             if hasattr(other, 'result'):
                 self.objs[obj.processUniqueID()] = other.result
                 self.objs[other.result.processUniqueID()] = obj
-            obj.callRemote('startFileSink', '/tmp/foo')
+            obj.callRemote('start')
             return obj
 
         first.addCallback(onConnect, second)
@@ -115,54 +115,49 @@ class ControllerFactory(pb.Referenceable):
             if hasattr(other, 'result'):
                 self.objs[obj.processUniqueID()] = other.result
                 self.objs[other.result.processUniqueID()] = obj
-            #obj.callRemote('startFileSrc', '/tmp/foo')
-            obj.callRemote('startFileSrc', '/tmp/foo')
+            obj.callRemote('start')
             return obj
 
         second.addCallback(onConnect2, first)
 
-    def remote_acqStarted(self, acq):
-        print 'Controller.remote_acqStarted', acq
-        
     def remote_acqFinished(self, acq):
         print 'Controller.remote_acquisitionFinished', acq
 
     def remote_acqNotifyCaps(self, acq_id, caps):
         print 'Controller.remote_acqNotifyCaps', caps
 
-        #print 'FIXME: Retrieve transcoder for acq'
-        #print acq_id
         acq = self.acq_mgr.objs[acq_id]
         transcoder = self.objs[acq.processUniqueID()]
-        transcoder.callRemote('setCaps', caps)
-        acq.callRemote('assignRealSink')
+        retval = transcoder.callRemote('setCaps', caps)
+        
+        def whenCapsIsSet(obj, acq):
+            print 'Transcoders caps is set, calling up to acq'
+            acq.callRemote('assignRealSink')
+            return obj
+        retval.addCallback(whenCapsIsSet, acq)
 
-        # XXX: Un-tie
-        #transcoder = self.trans_mgr.transcoder
-        #transcoder.addCallback(lambda obj: obj.callRemote('setCaps', caps))
-            
     def remote_transStarted(self, trans):
         print 'Controller.remote_transStarted', trans
         
 if __name__ == '__main__':
     controller = ControllerFactory()
+    start_acq = False
+    start_trans = False
 
-    filename = '/tmp/foo'
-    if os.path.exists(filename):
-        os.unlink(filename)
-        os.mkfifo(filename, 0600)
+    if start_acq:
+        pipeline = 'videotestsrc'
+        hostname, port = controller.createAcquisition(8802, pipeline=pipeline)
 
-    #pipeline = 'filesrc location="/home/jdahlin/Movies/alien.mpg" ! mpegdemux ! mpeg2dec'
-    pipeline = 'videotestsrc' # ! identity'
-    #hostname, port = controller.createAcquisition(8802, pipeline=pipeline)
-    hostname = 'localhost'
-    port = 8802
-    acq = controller.connectAcquisition(hostname, port)
+    if start_trans:
+        hostname, port = controller.createTranscoder(8803)
+        
+    first = sys.argv[1]
+    hostname, port = first.split(':')
+    acq = controller.connectAcquisition(hostname, int(port))
     
-    #hostname, port = controller.createTranscoder(8803)
-    hostname = 'localhost'
-    port = 8803
-    trans = controller.connectTranscoder(hostname, port)
+    second = sys.argv[2]
+    hostname, port = second.split(':')
+    trans = controller.connectTranscoder(hostname, int(port))
 
     controller.link(acq, trans)
     

@@ -17,37 +17,48 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+import gobject
 import gst
+
+if __name__ == '__main__':
+    import gstreactor
+    gstreactor.install()
+
 from twisted.spread import pb
 from twisted.internet import reactor
 
 class TranscoderFactory(pb.Root):
-    def remote_setController(self, controller):
-        print "Transcoder.setController", controller
-        self.controller = controller
+    def pipeline_iterate(self):
+        self.pipeline.iterate()
+        return True
 
-    def remote_startFileSrc(self, filename):
-        print 'Transcoder.remote_startFilesrc', filename
-        self.thread = gst.Thread('acquisition-thread')
-        
-        #self.src = gst.element_factory_make('filesrc')
-        #self.src.set_property('location', filename)
+    def pipeline_play(self):
+        self.pipeline.set_state(gst.STATE_PLAYING)
+
+    def error_cb(self, object, element, error, arg):
+        print element.get_name(), str(error)
+
+    def remote_start(self):
+        print 'Transcoder.startFilesrc'
+        self.pipeline = gst.Pipeline('acquisition-thread')
+        self.pipeline.connect('error', self.error_cb)
         
         self.src = gst.element_factory_make('tcpserversrc')
-        #self.src.set_property('location', filename)
-        
         self.sink = gst.element_factory_make('xvimagesink')
         self.reframer = gst.element_factory_make('videoreframer')
-        
+
+    def remote_setController(self, controller):
+        self.controller = controller
+
     def remote_setCaps(self, caps):
-        print "Transcoder.remote_setCaps", caps
-        self.thread.add_many(self.src, self.reframer, self.sink)
+        print "Transcoder got caps", caps
+        self.pipeline.add_many(self.src, self.reframer, self.sink)
         self.src.link(self.reframer)
         self.reframer.link_filtered(self.sink, gst.caps_from_string(caps))
-        self.controller.callRemote('transStarted', self)
-            
-        reactor.callLater(0, self.thread.set_state, gst.STATE_PLAYING)
 
+        reactor.callLater(0, self.pipeline_play)
+        gobject.idle_add(self.pipeline_iterate)
+        
 if __name__ == '__main__':
     factory = pb.PBServerFactory(TranscoderFactory())
     reactor.listenTCP(8803, factory)

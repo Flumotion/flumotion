@@ -17,73 +17,93 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+import sys
+    
+import gobject
 import gst
+
+if __name__ == '__main__':
+    import gstreactor
+    gstreactor.install()
+
 from twisted.spread import pb
 from twisted.internet import reactor
 
 class AcquisitionFactory(pb.Root):
     def __init__(self, pipeline):
-        self.pipeline = pipeline
+        self.pipeline_string = pipeline
         
-        self.thread = gst.parse_launch('{ %s }' % pipeline)
-        self.src = self.thread.get_list()[-1]
-
-        self.sink = gst.element_factory_make('fakesink')
-        
-        # XXX: Disconnect?
-        pad = self.sink.get_pad('sink')
-        pad.connect('notify::caps', self.sink_pad_notify_caps_cb)
-
-        self.thread.add(self.sink)
-        self.src.link(self.sink)
-        
-    def sink_pad_notify_caps_cb(self, pad, unused):
-        print 'got caps, notifying'
+    def sink_pad_notify_caps_cb(self, element, pad, caps):
+        # XXX: Only do this for fakesinks sink pad
+        if not (element.get_name() == 'fakesink' and pad.get_name() == 'sink'):
+            return
 
         caps = pad.get_negotiated_caps()
         if not caps:
+            print 'BAD CAPS', str(caps)
             return
 
-        self.control.callRemote('acqNotifyCaps', hash(self), str(caps))
+        print 'got caps, notifying'
+        self.controller.callRemote('acqNotifyCaps', hash(self), str(caps))
 
-        # 
-        #reactor.callLater(0, self.assignRealSink)
+    def error_cb(self, object, element, error, arg):
+        print element.get_name(), str(error)
         
     def remote_assignRealSink(self):
         print 'swapping sinks'
-        
-        self.thread.set_state(gst.STATE_PAUSED)
-        
-        # Pause, unlink and remove
-        self.thread.remove(self.sink)
-        self.src.unlink(self.sink)
 
-        # Create new, add and link and play
-        #self.sink = gst.element_factory_make('filesink')
-        #self.sink.set_property('location', self.filename)
+        # Pause
+        self.pipeline.set_state(gst.STATE_PAUSED)
+        
+        # Stream back to the beginning
+        event = gst.event_new_seek(gst.FORMAT_TIME |
+                                   gst.SEEK_METHOD_SET |
+                                   gst.SEEK_FLAG_FLUSH, 0)
+        self.sink.send_event(event)
+
+        # Unlink and remove
+        self.pipeline.remove(self.sink)
+        assert not self.src.unlink(self.sink)
+
         self.sink = gst.element_factory_make('tcpclientsink')
-        self.thread.add(self.sink)
+        self.sink.connect('error', self.error_cb)
+        self.pipeline.add(self.sink)
         self.src.link(self.sink)
-
-        self.thread.set_state(gst.STATE_PLAYING)
+ 
+        reactor.callLater(0, self.pipeline_play)
 
     def remote_setController(self, object):
-        print 'Acquisition.setController', object
-        self.control = object
+        self.controller = object
         return hash(self)
     
     def remote_setTranscoder(self, object):
-        print 'Acquisition.setTranscoder', object
         self.transcoder = object
         
-    def remote_startFileSink(self, filename):
-        print "Acquisition.remote_startFileSink", filename
-        self.filename = filename
-        self.thread.set_state(gst.STATE_PLAYING)
+    def pipeline_iterate(self):
+        #print 'iterating'
+        self.pipeline.iterate()
+        return True
+
+    def pipeline_play(self):
+        print 'playing'
+        self.pipeline.set_state(gst.STATE_PLAYING)
+        
+    def remote_start(self):
+        print "Acquisition.remote_startFileSink"
+
+        self.pipeline = gst.parse_launch('%s ! fakesink name=fakesink' % self.pipeline_string)
+        self.pipeline.connect('error', self.error_cb)
+        self.src = self.pipeline.get_list()[-2]
+        
+        self.sink = self.pipeline.get_by_name('fakesink')
+        
+        # XXX: Disconnect signal?
+        self.sink.connect('deep-notify::caps', self.sink_pad_notify_caps_cb)
+
+        reactor.callLater(0, self.pipeline_play)
+        gobject.idle_add(self.pipeline_iterate)
         
 if __name__ == '__main__':
-    import sys
-    
     factory = pb.PBServerFactory(AcquisitionFactory(sys.argv[1]))
     reactor.listenTCP(8802, factory)
     reactor.run()
