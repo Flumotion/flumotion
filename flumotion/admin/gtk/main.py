@@ -56,7 +56,7 @@ def _wizard_finished_cb(wizard, configuration, window):
     
 def _window_connected_cb(window, options):
     if not window.admin.getComponents() and not os.path.exists(FIRST_TIME_FILE):
-        workers = window.admin.getWorkers()
+        workers = window.admin.getWorkerHeavenState()
         if not workers:
             print >> sys.stderr, "ERROR: No workers connected"
             reactor.stop()
