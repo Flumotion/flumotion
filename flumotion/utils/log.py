@@ -59,7 +59,7 @@ def _handle(category, type, message):
     
 def error(cat, *args):
     """
-    Log an error message in the given category. \
+    Log a fatal error message in the given category. \
     This will also raise a L{flumotion.twisted.errors.SystemError}.
     """
     msg = ' '.join(args)
