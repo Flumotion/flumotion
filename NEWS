@@ -8,6 +8,7 @@ ticket  summary
 98      Getting assertion error when selecting bttv card on thread as its gives 
 	me soundcard
 101     soundcard producer was broken
+86	[PATCH] Spec file improvements
 
 Issues fixed since 0.1.1:
 
