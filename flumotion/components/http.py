@@ -273,7 +273,7 @@ class HTTPStreamingResource(resource.Resource):
         dt2 = now - self.average_time
         dc2 = len(self.request_hash)
         self.average_time = now # we can update now that we used self.av
-         if dt1 == 0:
+        if dt1 == 0:
             # first measurement
             self.average_client_number = 0
         else:
