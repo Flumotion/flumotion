@@ -157,10 +157,16 @@ def stderrHandler(level, object, category, file, line, message):
 
     where = "(%s:%d)" % (file, line)
 
-    # 5 + 1 + 20 + 1 + 12 + 1 + 32 + 1 + 7 == 80
-    sys.stderr.write('%-5s %-20s %-12s %-32s [%5d] %-4s %-15s %s\n' % (
-        level, o, category, where, os.getpid(),
-        "", time.strftime("%b %d %H:%M:%S"), message))
+    # level   pid     object   cat      time
+    # 5 + 1 + 7 + 1 + 25 + 1 + 24 + 1 + 15 == 80
+    sys.stderr.write('%-5s [%5d] %-25s %-24s %-15s ' % (
+        level, os.getpid(), o, category, time.strftime("%b %d %H:%M:%S")))
+    sys.stderr.write('%-4s %s %s\n' % ("", message, where))
+
+    # old: 5 + 1 + 20 + 1 + 12 + 1 + 32 + 1 + 7 == 80
+    #sys.stderr.write('%-5s %-20s %-12s %-32s [%5d] %-4s %-15s %s\n' % (
+    #    level, o, category, where, os.getpid(),
+    #    "", time.strftime("%b %d %H:%M:%S"), message))
     sys.stderr.flush()
 
 def _handle(level, object, category, message):

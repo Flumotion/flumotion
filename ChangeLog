@@ -1,3 +1,10 @@
+2005-02-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/errors.py:
+	  add some errors for future use
+	* flumotion/common/log.py:
+	  change logging format again
+
 2005-02-01  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_wizard.py: Make sure Firewire is ready to be
