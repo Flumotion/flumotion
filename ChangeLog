@@ -1,3 +1,11 @@
+2005-02-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/Makefile.am:
+	* flumotion/common/dag.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_dag.py:
+	  adding code for direct acyclic graphs
+
 2005-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/job.py:

@@ -8,6 +8,7 @@ flumotion_PYTHON = \
 	bundleclient.py \
 	common.py \
 	config.py \
+	dag.py \
 	enum.py \
 	errors.py \
 	gstreamer.py \
