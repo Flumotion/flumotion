@@ -43,3 +43,32 @@ FIXME: would be good if
   the connection should be terminated
 
 
+
+IMPLEMENTATION
+--------------
+
+a Keycard is an object exchanged between a Bouncer and something needing auth.
+e.g. a client connects to an HTTP streamer
+Keycard is subclass of pb.RemoteCopy and pb.Copyable so we can send it over
+the manager to the bouncer
+Keycard implements ICredentials
+
+Keycard base class has:
+- componentName: component requesting auth
+- ip address ?
+- streamer creates a Keycard, and sends it to the manager together with
+  the bouncerName
+- manager forwards to bouncer
+- bouncer checks if it can authenticate it
+- if it can, it generates a unique ID and gives it to the keycard, so it can
+  ask for stuff to be done on it (so it needs a format containing component,
+  e.g. streamer-000000)
+- bouncer can set a duration on the keycard to specify how long it is allowed
+  to live
+- bouncer returns the keycard if allowed, and None if not
+- manager returns the keycard or None to the original requester
+- original requester stores keycard in a hash with the id
+- bouncer can at some point call expire() on the KeycardId and componentName,
+  which will be forwarded to the component
+- requester is responsible for telling the bouncer that the keycard can
+  be removed

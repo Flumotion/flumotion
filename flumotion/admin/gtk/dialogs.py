@@ -16,6 +16,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 import gtk
+import gobject
 
 class ProgressDialog(gtk.Dialog):
     def __init__(self, title, message, parent = None):
