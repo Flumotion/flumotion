@@ -127,7 +127,7 @@ class Authenticate(wizard.WizardStep):
 
 class LoadConnection(wizard.WizardStep):
     name = 'load_connection'
-    title = 'Load connection'
+    title = 'Recent connections'
     text = 'Please choose a connection from the box below.'
     connections = None
     next_pages = []
