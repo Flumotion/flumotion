@@ -207,7 +207,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             self.warning(str(e))
             raise
 
-    def perspective_workerCallRemote(self, workerName, remoteMethod, *args, **kwargs):
+    def perspective_workerCallRemote(self, workerName, methodName, *args, **kwargs):
         """
         Call a remote method on the worker.
         This is used so that admin clients can call methods from the interface
