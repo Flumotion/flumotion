@@ -48,7 +48,7 @@ class BaseComponent(pb.Referenceable):
         self.component_name = name
         self.sources = sources
         self.feeds = feeds
-        self.remote = None
+        self.remote = None # the perspective we have on the other side (?)
         self.pipeline = None
         self.pipeline_signals = []
 
@@ -86,16 +86,18 @@ class BaseComponent(pb.Referenceable):
 
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
-            print 'skipping %s, no perspective' % name
+            self.msg('skipping %s, no perspective' % name)
             return
 
         def errback(reason):
+            self.warn('stopping pipeline because of %s' % reason)
             self.pipeline_stop()
             
         cb = self.remote.callRemote(name, *args, **kwargs)
         cb.addErrback(errback)
 
     def restart(self):
+        self.msg('restarting')
         self.cleanup()
         self.setup_pipeline()
         

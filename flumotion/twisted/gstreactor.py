@@ -1,18 +1,22 @@
-# Twisted, the Framework of Your Internet
-# Copyright (C) 2001 Matthew W. Lefkowitz
-#
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of version 2.1 of the GNU Lesser General Public
-# License as published by the Free Software Foundation.
-#
-# This library is distributed in the hope that it will be useful,
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
+# Flumotion - a video streaming server
+# Copyright (C) 2004 Fluendo
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with this library; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 """
 This module provides support for Twisted to interact with the GStreamer
@@ -26,9 +30,9 @@ In order to use this support, simply do the following::
 Then use twisted.internet APIs as usual.  The other methods here are not
 intended to be called directly.
 
-API Stability: stable
+API Stability: unstable
 
-Maintainer: U{Itamar Shtull-Trauring<mailto:twisted@itamarst.org>}
+Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """
 
 import pygtk
@@ -83,7 +87,7 @@ class GstReactor(default.PosixReactorBase):
     # gtk_input_add(). We use g_io_add_watch() here in case pygtk fixes this
     # bug.
     def input_add(self, source, condition, callback):
-	if hasattr(source, 'fileno'):
+        if hasattr(source, 'fileno'):
             # handle python objects
             def wrapper(source, condition, real_s=source, real_cb=callback):
                 return real_cb(real_s, condition)
@@ -148,6 +152,7 @@ class GstReactor(default.PosixReactorBase):
             self.doIterationTimer = None
 
     def crash(self):
+        print "DEBUG: gstreactor.py: crash"
         gst.main_quit()
 
     def run(self, installSignalHandlers=1):
@@ -156,6 +161,7 @@ class GstReactor(default.PosixReactorBase):
             self.simulate()
             gst.main()
         except KeyboardInterrupt:
+            print "DEBUG: gstreactor.py: Keyboard Interrupt, passing"
             pass
 
     def _doReadOrWrite(self, source, condition, faildict={

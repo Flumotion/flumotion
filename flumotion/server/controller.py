@@ -64,8 +64,9 @@ class Dispatcher:
         if not p:
             raise ValueError, "no perspective for '%s'" % avatarID
 
+        # schedule an immediate perspective attached
         reactor.callLater(0, p.attached, mind)
-        
+        # return a deferred with interface, aspect, and logout function 
         return (pb.IPerspective, p,
                 lambda p=p,mind=mind: p.detached(mind))
 
