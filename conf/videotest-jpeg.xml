@@ -25,6 +25,12 @@
     <port>8803</port>
     <logfile>/tmp/videotestsrc_access.log</logfile>
     <auth>auth-1</auth>
+    <maxclients>1</maxclients>
   </component>
 
+  <component name="file-video" type="file-dumper">
+    <source>jpeg+multipart</source>
+    <auth-port>9999</auth-port>
+    <location>/tmp/logg.raw</location>
+  </component>
 </root>

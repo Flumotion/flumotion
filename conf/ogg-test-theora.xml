@@ -17,4 +17,11 @@ ffmpegcolorspace ! theoraenc keyframe-force=5 ! oggmux
     <port>8800</port>
     <logfile>/tmp/ogg-test-theora.access.log</logfile>
   </component>
+
+  <component name="file-video" type="file-dumper">
+    <source>converter-ogg-theora</source>
+    <auth-port>9999</auth-port>
+    <location>/tmp/logg.raw</location>
+  </component>
+
 </root>

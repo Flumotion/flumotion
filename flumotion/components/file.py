@@ -57,6 +57,8 @@ class FileSinkStreamer(component.ParseLaunchComponent):
         fno = self.file_fd.fileno()
         sink.emit('add', fno)
 
+        return location
+    
     def feed_state_change_cb(self, element, old, state):
         component.BaseComponent.feed_state_change_cb(self, element,
                                                      old, state, '')
@@ -106,7 +108,7 @@ class FileStreamingResource(resource.Resource):
                                      error=http.RESPONSES[error_code])
 
     def restart(self):
-        self.streamer.change_filename()
+        return self.streamer.change_filename()
         
     def restart_form(self, request):
         return '''<form action="/" method="POST">
@@ -117,9 +119,11 @@ class FileStreamingResource(resource.Resource):
         if not self.isAuthenticated(request):
             return self.makeError(request, http.UNAUTHORIZED)
 
-        self.restart()
+        filename = self.restart()
         
-        return '''<b>Restarted</b><br><br>''' + self.restart_form(request)
+        return 'b>Restarted</b><br>' + \
+               'Now saving to %s<br> <br>%s' % (filename,
+                                                self.restart_form(request))
     
     def render_GET(self, request):
         if not self.isAuthenticated(request):

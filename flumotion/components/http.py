@@ -183,6 +183,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         # keep track of average clients by tracking last average and its time
         self.average_client_number = 0
         self.average_time = self.start_time
+        self.maxclients = -1
         
         resource.Resource.__init__(self)
 
@@ -242,7 +243,11 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
 
     def setAuth(self, auth):
         self.auth = auth
-    
+
+    def setMaxClients(self, maxclients):
+        print 'setting maxclients to', maxclients
+        self.maxclients = maxclients
+        
     def getChild(self, path, request):
         if path == 'stats':
             return self.admin
@@ -292,12 +297,15 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         maximum number of allowed clients based on soft limit for number of
         open file descriptors and fd reservation
         """
-        from resource import getrlimit, RLIMIT_NOFILE
-        limit = getrlimit(RLIMIT_NOFILE)
-        return limit[0] - self.__reserve_fds__
+        if self.maxclients != -1:
+            return self.maxclients
+        else:
+            from resource import getrlimit, RLIMIT_NOFILE
+            limit = getrlimit(RLIMIT_NOFILE)
+            return limit[0] - self.__reserve_fds__
 
     def reachedMaxClients(self):
-        return len(self.request_hash) >=  self.maxAllowedClients()
+        return len(self.request_hash) >= self.maxAllowedClients()
     
     def isAuthenticated(self, request):
         if self.auth is None:
@@ -489,10 +497,12 @@ def createComponent(config):
     source = config['source']
 
     component = MultifdSinkStreamer(name, source, port)
+    resource = HTTPStreamingResource(component)
+    factory = server.Site(resource=resource)
+    
     if config.has_key('gst-property'):
         component.setProperties(config['gst-property'])
 
-    resource = HTTPStreamingResource(component)
     if config.has_key('logfile'):
         component.debug('Logging to %s' % config['logfile'])
         resource.setLogfile(config['logfile'])
@@ -501,8 +511,10 @@ def createComponent(config):
         auth_component = auth.getAuth(config['config'],
                                       config['auth'])
         resource.setAuth(auth_component)
+
+    if config.has_key('maxclients'):
+        resource.setMaxClients(int(config['maxclients']))
         
-    factory = server.Site(resource=resource)
     component.debug('Listening on %d' % port)
     reactor.listenTCP(port, factory)
 
