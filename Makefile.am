@@ -27,11 +27,13 @@ coverage:
 	@$(PYTHON) tools/show-coverage.py _trial_temp/coverage/flumotion.*
 
 pychecker:
-	pychecker -Q -F misc/pycheckerrc \
-		flumotion/common/*.py \
-		flumotion/component/*.py \
-		flumotion/manager/*.py \
-		flumotion/worker/*.py
+	pychecker -Q -F misc/pycheckerrc 	\
+		flumotion/common/*.py 		\
+		flumotion/configure/*.py 	\
+		flumotion/component/*.py 	\
+		flumotion/manager/*.py 		\
+		flumotion/worker/*.py 		\
+		flumotion/utils/*.py
 
 fixme:
 	tools/fixme | less -R

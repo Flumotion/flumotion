@@ -61,7 +61,6 @@ and then access the variables from the configure module.  For example:
 # FIXME: document all the module variables
 
 import os
-import flumotion.configure
 
 # where am I on the disk ?
 __thisdir = os.path.dirname(os.path.abspath(__file__))

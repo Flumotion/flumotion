@@ -65,7 +65,7 @@ def is_port_free(port):
     fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         fd.bind(('', port))
-    except socket.error, e:
+    except socket.error:
         return False
     
     return True
