@@ -175,6 +175,8 @@ class TestRegistry(unittest.TestCase):
         xml = """<registry><components><foo></foo></components></registry>"""
         self.assertRaises(registry.XmlParserError, reg.addFromString, xml)
         
+    # addFromString does not parse <directory> toplevel entries since they
+    # should not be in partial registry files
     def testDump(self):
         xml = """
 <registry>
@@ -200,9 +202,6 @@ class TestRegistry(unittest.TestCase):
       </directories>
     </bundle>
   </bundles>
-  <directories>
-    <directory filename="test"/>
-  </directories>
 </registry>"""
         reg = registry.ComponentRegistry()
         reg.clean()
@@ -238,9 +237,6 @@ class TestRegistry(unittest.TestCase):
       </directories>
     </bundle>
   </bundles>
-  <directories>
-    <directory filename="test"/>
-  </directories>
 </registry>
 """, data)
         

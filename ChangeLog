@@ -1,5 +1,10 @@
 2005-02-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_registry.py:
+	  partial registry files should not have <directory> root entries
+
+2005-02-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/configure/uninstalled.py.in:
 	  Do not create _build by making sure we check correctly for
 	  presence of _build
