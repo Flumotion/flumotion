@@ -677,21 +677,27 @@ class Wizard(gobject.GObject, log.Loggable):
             pass
 
     def load_steps(self):
-        # XXX: This is really ugly
-        globals()['wiz'] = self
+        global _steps
         import flumotion.wizard.steps
-
+        
+        self.add_step(_steps[0], initial=True)
+        
+        for step_class in _steps[1:]:
+            self.add_step(step_class)
+            
     def printOut(self):
         print self._save.getXML()[:-1]
         
 gobject.type_register(Wizard)
 
-        
-wiz = None
-def register_step(klass):
-    global wiz
+_steps = []
 
-    if not len(wiz):
-        wiz.add_step(klass, initial=True)
-    else:
-        wiz.add_step(klass)
+        
+def register_step(klass):
+    global _steps
+
+    _steps.append(klass)
+
+def get_steps():
+    global _steps
+    return _steps

@@ -53,7 +53,7 @@ class WizardStepTest(unittest.TestCase):
                 self.assert_(isinstance(step.get_next(), str))
                 
     def testStepWidgets(self):
-        widgets = [widget for step in wizard.wiz.steps
+        widgets = [widget for step in self.steps
                               for widget in step.widgets]
         for widget in widgets:
             if isinstance(widget, wizard.WizardSpinButton):
