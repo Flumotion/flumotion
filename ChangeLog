@@ -1,3 +1,13 @@
+2004-06-22  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/utils/gstutils.py (verbose_deep_notify_cb): Log the
+	component name aswell
+
+	* bin/video-server-admin.in: Script to run the admin interface.
+
+	* flumotion/server/*: Cleanup callbacks, always prefix twisted
+	callbacks with cb_.
+	
 2004-06-20  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/utils/gstutils.py (verbose_deep_notify_cb): Filter out
