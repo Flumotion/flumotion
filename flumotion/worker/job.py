@@ -48,8 +48,8 @@ def getComponent(dict, defs):
         raise config.ConfigError("%s source file could not be found" % source)
     except ImportError, e:
         raise config.ConfigError("%s source file could not be imported (%s)" % (source, e))
-    except exception, e:
-        raise config.ConfigError("Exception %s during import  of source %s (%s)" % (exception, source, e))
+    except Exception, e:
+        raise config.ConfigError("Exception %s during import of source %s (%s)" % (e.__class__.__name__, source, e))
         
     if not hasattr(module, 'createComponent'):
         log.warning('job', 'no createComponent() for %s' % source)
