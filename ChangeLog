@@ -1,11 +1,14 @@
 2004-10-18  Johan Dahlin  <johan@gnome.org>
 
-	* doc/reference/gendoc.py:
 	* flumotion/admin/gtk/main.py:
 	* flumotion/wizard/save.py:
 	* flumotion/wizard/wizard.py:
-	  Johan needs to write an entry
 
+	Make --wizard and --debug work again.
+
+	Create muxers when we need them and make sure to only create them
+	when they're needed.
+	
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/errors.py:
