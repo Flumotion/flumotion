@@ -1,3 +1,11 @@
+2004-09-16  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/worker/job.py:
+	* flumotion/worker/report.py:
+	* flumotion/worker/worker.py:
+
+	Proper command line parsing for worker/job
+
 2004-09-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/http/http.py:

@@ -25,14 +25,46 @@ import gobject
 
 from twisted.cred.credentials import UsernamePassword
 from twisted.internet import reactor
+from twisted.python import reflect
 from twisted.spread import pb
 
-from flumotion.common.config import ConfigEntry
 from flumotion.common.registry import registry
 from flumotion.component import component
 from flumotion.worker import launcher
 from flumotion.twisted import pbutil
 from flumotion.utils import log
+
+def getComponent(dict, defs):
+    # Setup files to be transmitted over the wire. Must be a
+    # better way of doing this.
+    source = defs.getSource()
+    log.info('job', 'Loading %s' % source)
+    try:
+        module = reflect.namedAny(source)
+    except ValueError:
+        raise ConfigError("%s source file could not be found" % source)
+        
+    if not hasattr(module, 'createComponent'):
+        log.warning('job', 'no createComponent() for %s' % source)
+        return
+        
+    dir = os.path.split(module.__file__)[0]
+    files = {}
+    for file in defs.getFiles():
+        filename = os.path.basename(file.getFilename())
+        real = os.path.join(dir, filename)
+        files[real] = file
+        
+    # Create the component which the specified configuration
+    # directives. Note that this can't really be moved from here
+    # since it gets called by the launcher from another process
+    # and we don't want to create it in the main process, since
+    # we're going to listen to ports and other stuff which should
+    # be separated from the main process.
+
+    component = module.createComponent(dict)
+    component.setFiles(files)
+    return component
 
 class JobView(pb.Referenceable, log.Loggable):
     logCategory = 'job'
@@ -54,8 +86,7 @@ class JobView(pb.Referenceable, log.Loggable):
         print 'START NOW', type
         
         defs = registry.getComponent(type)
-        entry = ConfigEntry(name, type, config, defs)
-        self.run_component(entry)
+        self.run_component(name, type, config, defs)
 
     def remote_stop(self):
         reactor.stop()
@@ -89,27 +120,23 @@ class JobView(pb.Referenceable, log.Loggable):
         except RuntimeError:
             self.warning('Old PyGTK with threading disabled detected')
     
-    def run_component(self, config):
-        if not config.startFactory():
+    def run_component(self, name, type, config, defs):
+        if not config.get('start-factory', True):
             return
         
-        self.info('setting up signals')
+        #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()
 
-        name = config.getName()
-        type = config.getType()
-        
         log.debug(name, 'Starting on pid %d of type %s' %
                   (os.getpid(), type))
 
-        self.set_nice(name, config.nice)
+        self.set_nice(name, config.get('nice', 0))
         self.enable_core_dumps(name)
         
-        dict = config.getConfigDict()
-        log.debug(name, 'Configuration dictionary is: %r' % dict)
-        
-        comp = config.getComponent()
+        log.debug(name, 'Configuration dictionary is: %r' % config)
+
+        comp = getComponent(config, defs)
         factory = component.ComponentFactory(comp)
         factory.login(name)
         reactor.connectTCP(self.manager_host,
