@@ -18,3 +18,11 @@ the request. So currently we support the following http commands:
 	PROPFIND	Set 405 error (Not allowed)	
 
 We need to investigate what other methods we'd like to support.
+
+References/links:
+
+Hypertext Transfer Protocol -- HTTP/1.1
+  http://www.ietf.org/rfc/rfc2616.txt
+
+HTTP Extensions for Distributed Authoring -- WEBDAV
+  http://www.ietf.org/rfc/rfc2518.txt
