@@ -53,13 +53,13 @@ class FlumotionConfigXML:
     def __init__(self, filename):
         self.entries = {}
     
-        self.msg('Loading configuration file `%s\'' % filename)
+        self.debug('Loading configuration file `%s\'' % filename)
         self.doc = minidom.parse(filename)
         self.path = os.path.split(filename)[0]
         self.parse()
         
-    msg = lambda s, *a: log.msg('config', *a)
-    warn = lambda s, *a: log.warn('config', *a)
+    debug = lambda s, *a: log.debug('config', *a)
+    warning = lambda s, *a: log.warning('config', *a)
 
     def getPath(self):
         return self.path

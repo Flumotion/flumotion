@@ -56,13 +56,14 @@ class BaseComponent(pb.Referenceable):
         self.factory.component = self
         self.factory.login(self.username)
 
-    def msg(self, *args):
+    def debug(self, *args):
         category = self.getName()
-        log.msg(category, *args)
+        log.debug(category, *args)
+        # also log remotely
         if self.hasPerspective():
             self.callRemote('log', *args)
         
-    warn = lambda s, *a: log.warn(s.getName(), *a)
+    warning = lambda s, *a: log.warning(s.getName(), *a)
 
     def cb_gotPerspective(self, perspective):
         self.remote = perspective
@@ -86,37 +87,37 @@ class BaseComponent(pb.Referenceable):
 
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
-            self.msg('skipping %s, no perspective' % name)
+            self.debug('skipping %s, no perspective' % name)
             return
 
         def errback(reason):
-            self.warn('stopping pipeline because of %s' % reason)
+            self.warning('stopping pipeline because of %s' % reason)
             self.pipeline_stop()
             
         cb = self.remote.callRemote(name, *args, **kwargs)
         cb.addErrback(errback)
 
     def restart(self):
-        self.msg('restarting')
+        self.debug('restarting')
         self.cleanup()
         self.setup_pipeline()
         
     def pipeline_error_cb(self, object, element, error, arg):
-        self.msg('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
+        self.debug('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
         self.callRemote('error', element.get_path_string(), error.message)
 
         #self.restart()
         
     def feed_state_change_cb(self, element, old, state, feed):
         #print element, feed, gst.element_state_get_name(old), '->', gst.element_state_get_name(state)
-        self.msg('state-changed %s %s' % (element.get_path_string(),
+        self.debug('state-changed %s %s' % (element.get_path_string(),
                                           gst.element_state_get_name(state)))
         self.callRemote('stateChanged', feed, state)
 
     def set_state_and_iterate(self, state):
         retval = self.pipeline.set_state(state)
         if not retval:
-            self.warn('Changing state to %s failed' %
+            self.warning('Changing state to %s failed' %
                     gst.element_state_get_name(state))
         gobject.idle_add(self.pipeline.iterate)
 
@@ -144,7 +145,7 @@ class BaseComponent(pb.Referenceable):
         
         retval = self.pipeline.set_state(gst.STATE_NULL)
         if not retval:
-            self.warn('Setting pipeline to NULL failed')
+            self.warning('Setting pipeline to NULL failed')
         
     def setup_sources(self, sources):
         if not self.pipeline:
@@ -152,7 +153,7 @@ class BaseComponent(pb.Referenceable):
         
         # Setup all sources
         for source_name, source_host, source_port in sources:
-            self.msg('Going to connect to %s (%s:%d)' % (source_name, source_host, source_port))
+            self.debug('Going to connect to %s (%s:%d)' % (source_name, source_host, source_port))
             source = self.pipeline.get_by_name(source_name)
             assert source, 'No source element named %s in pipeline' % source_name
             assert isinstance(source, gst.Element)
@@ -167,7 +168,7 @@ class BaseComponent(pb.Referenceable):
         
         # Setup all feeds
         for name, host, port in feeds:
-            self.msg('Going to listen on %s (%s:%d)' % (name, host, port))
+            self.debug('Going to listen on %s (%s:%d)' % (name, host, port))
             feed = self.pipeline.get_by_name(name)
             feed.connect('state-change', self.feed_state_change_cb, name)
             
@@ -179,12 +180,12 @@ class BaseComponent(pb.Referenceable):
             feed.set_property('protocol', 'gdp')
 
     def cleanup(self):
-        self.msg("cleaning up")
+        self.debug("cleaning up")
         
         assert self.pipeline != None
 
         if self.pipeline.get_state() != gst.STATE_NULL:
-            self.msg('Pipeline was in state %s, changing to NULL' %
+            self.debug('Pipeline was in state %s, changing to NULL' %
                      gst.element_state_get_name(self.pipeline.get_state()))
             self.pipeline.set_state(gst.STATE_NULL)
                 
@@ -195,7 +196,7 @@ class BaseComponent(pb.Referenceable):
         
     def remote_register(self):
         if not self.hasPerspective():
-            self.warn('We are not ready yet, waiting 250 ms')
+            self.warning('We are not ready yet, waiting 250 ms')
             reactor.callLater(0.250, self.remote_register)
             return
         
@@ -224,11 +225,11 @@ class BaseComponent(pb.Referenceable):
         return retval, ports
 
     def remote_play(self):
-        self.msg('Playing')
+        self.debug('Playing')
         self.pipeline_play()
         
     def remote_stop(self):
-        self.msg('Stopping')
+        self.debug('Stopping')
         self.pipeline_stop()
         self.remote.broker.transport.loseConnection()
         reactor.stop()
@@ -251,7 +252,7 @@ class BaseComponent(pb.Referenceable):
         if not element:
             raise errors.PropertyError("No element called: %s" % element_name)
         
-        self.msg('getting property %s on element %s' % (property, element_name))
+        self.debug('getting property %s on element %s' % (property, element_name))
         try:
             value = element.get_property(property)
         except ValueError:
@@ -285,7 +286,7 @@ class BaseComponent(pb.Referenceable):
         else:
             raise errors.PropertyError('Unknown property type: %s' % pspec.value_type)
 
-        self.msg('setting property %s on element %s to %s' % (property, element_name, value))
+        self.debug('setting property %s on element %s to %s' % (property, element_name, value))
         element.set_property(property, value)
 
 class ParseLaunchComponent(BaseComponent):
@@ -325,7 +326,7 @@ class ParseLaunchComponent(BaseComponent):
         return pipeline
         
     def parse_pipeline(self, pipeline):
-        self.msg('Creating pipeline, template is %s' % pipeline)
+        self.debug('Creating pipeline, template is %s' % pipeline)
         sources = self.getSources()
         if pipeline == '' and not sources:
             raise TypeError, "Need a pipeline or a source"
@@ -340,12 +341,12 @@ class ParseLaunchComponent(BaseComponent):
             
         feeds = self.getFeeds()
 
-        self.msg('sources=%s, feeds=%s' % (sources, feeds))
+        self.debug('sources=%s, feeds=%s' % (sources, feeds))
         pipeline = self.parse_tmpl(pipeline, sources, self.SOURCE_TMPL, '@',
                                  '%(tmpl)s name=%(name)s ! %(pipeline)s') 
         pipeline = self.parse_tmpl(pipeline, feeds, self.FEED_TMPL, ':',
                                  '%(pipeline)s ! %(tmpl)s name=%(name)s') 
         
-        self.msg('pipeline for %s is %s' % (self.getName(), pipeline))
+        self.debug('pipeline for %s is %s' % (self.getName(), pipeline))
         
         return pipeline

@@ -1,5 +1,14 @@
 2004-08-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/server/admin.py:
+	* flumotion/server/component.py:
+	* flumotion/server/config.py:
+	* flumotion/server/controller.py:
+	* flumotion/server/launcher.py:
+	  adapt debugging
+
+2004-08-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/gui/adminclient.py:
 	  throw up a dialog if we can't connect
 	* flumotion/utils/log.py:

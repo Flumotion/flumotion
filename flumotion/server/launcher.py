@@ -51,29 +51,29 @@ class Launcher:
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         
-    msg = lambda s, *a: log.msg('launcher', *a)
-    warn = lambda s, *a: log.warn('launcher', *a)
+    debug = lambda s, *a: log.debug('launcher', *a)
+    warning = lambda s, *a: log.warning('launcher', *a)
     error = lambda s, *a: log.error('launcher', *a)
 
     def restore_uid(self):
         if self.uid is not None:
             try:
                 os.setuid(self.uid)
-                self.msg('uid set to %d' % (self.uid))
+                self.debug('uid set to %d' % (self.uid))
             except OSError, e:
-                self.warn('failed to set uid: %s' % str(e))
+                self.warning('failed to set uid: %s' % str(e))
 
     def set_nice(self, nice):
         if nice:
             try:
                 os.nice(nice)
             except OSError, e:
-                self.warn('Failed to set nice level: %s' % str(e))
+                self.warning('Failed to set nice level: %s' % str(e))
             else:
-                self.msg('Nice level set to %d' % nice)
+                self.debug('Nice level set to %d' % nice)
 
     def start_controller(self, logging=False):
-        self.msg('Starting controller')
+        self.debug('Starting controller')
         
         pid = os.fork()
         if pid:
@@ -105,9 +105,9 @@ class Launcher:
         c = ClientCreator(reactor, MiniProtocol)
         defered = c.connectUNIX(filename)
         def cb_Stop(protocol):
-            self.msg('Telling controller to shutdown')
+            self.debug('Telling controller to shutdown')
             protocol.sendString('STOP')
-            self.msg('Shutting down launcher')
+            self.debug('Shutting down launcher')
             reactor.callLater(0, reactor.stop)
         defered.addCallback(cb_Stop)
 
@@ -145,7 +145,7 @@ class Launcher:
         self.set_nice(config.nice)
 
         component = config.getComponent()
-        self.msg('Starting %s (%s) on pid %d' %
+        self.debug('Starting %s (%s) on pid %d' %
                  (config.getName(), config.getType(), pid))
         reactor.connectTCP(self.controller_host, self.controller_port,
                            component.factory)
@@ -157,7 +157,7 @@ class Launcher:
         conf = FlumotionConfigXML(filename)
 
         for name in conf.entries.keys():
-            self.msg('Starting component: %s' % name)
+            self.debug('Starting component: %s' % name)
             self.launch_component(conf.getEntry(name))
     
 def run_launcher(args):
@@ -228,7 +228,7 @@ def run_controller(args):
 
     factory = controller.ControllerServerFactory()
     
-    log.msg('controller', 'Starting at port %d' % options.port)
+    log.debug('controller', 'Starting at port %d' % options.port)
     reactor.listenTCP(options.port, factory)
     reactor.run()
 

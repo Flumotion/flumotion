@@ -47,26 +47,29 @@ class AdminPerspective(pbutil.NewCredPerspective):
         self.controller = controller
         self.mind = None
         
-    msg = lambda s, *a: log.msg('admin', *a)
-    warn = lambda s, *a: log.warn('admin', *a)
+    debug = lambda s, *a: log.debug('admin', *a)
+    warning = lambda s, *a: log.warning('admin', *a)
 
     def hasPerspective(self):
         return self.mind != None
     
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
-            #self.warn("Can't call remote method %s, no perspective" % name)
+            #self.warning("Can't call remote method %s, no perspective" % name)
             return
         
-        #self.msg('Calling remote method %s%r' % (name, args))
+        #self.debug('Calling remote method %s%r' % (name, args))
         try:
             return self.mind.callRemote(name, *args, **kwargs)
-        except pb.DeadReferenceError :
+        except pb.DeadReferenceError:
             self.mind = None
             return
         
     def getClients(self):
-        return map(ComponentView, self.controller.components.values())
+        clients = map(ComponentView, self.controller.components.values())
+        print "clients:"
+        print clients
+        return clients
 
     def sendLog(self, category, type, message):
         self.callRemote('log', category, type, message)
@@ -80,13 +83,13 @@ class AdminPerspective(pbutil.NewCredPerspective):
     def attached(self, mind):
         self.mind = mind
         ip = self.mind.broker.transport.getPeer()[1]
-        self.msg('Client from %s attached' % ip)
+        self.debug('Client from %s attached' % ip)
 
         self.callRemote('initial', self.getClients())
 
     def detached(self, mind):
         ip = self.mind.broker.transport.getPeer()[1]
-        self.msg('Client from %s detached' % ip)
+        self.debug('Client from %s detached' % ip)
         
         self.callRemote('shutdown')
 
@@ -113,8 +116,7 @@ class Admin(pb.Root):
         log.addLogHandler(self.logHandler)
         self.logcache = []
 
-    def msg(self, *args):
-        log.msg('admin', *args)
+    debug = lambda s, *a: log.debug('admin', *a)
         
     def logHandler(self, category, type, message):
         self.logcache.append((category, type, message))
@@ -126,12 +128,12 @@ class Admin(pb.Root):
             reactor.callLater(0.25, self.sendCache, client)
             return
         
-        self.msg('sending logcache to client (%d messages)' % len(self.logcache))
+        self.debug('sending logcache to client (%d messages)' % len(self.logcache))
         for category, type, message in self.logcache:
             client.sendLog(category, type, message)
         
     def getPerspective(self):
-        self.msg('creating new perspective')
+        self.debug('creating new perspective')
         admin = AdminPerspective(self.controller)
         reactor.callLater(0.25, self.sendCache, admin)
         

@@ -47,7 +47,7 @@ class Dispatcher:
         
             p = self.controller.getPerspective(avatarID)
 
-        #msg("returning Avatar(%s): %s" % (avatarID, p))
+        #debug("returning Avatar(%s): %s" % (avatarID, p))
         if not p:
             raise errors.NoPerspectiveError(avatarID)
 
@@ -77,8 +77,8 @@ class ComponentPerspective(pbutil.NewCredPerspective):
                                         self.getName(),
                                         gst.element_state_get_name(self.state))
 
-    msg = lambda s, *a: log.msg('controller', *(s.getName(),) + a)
-    warn = lambda s, *a: log.warn('controller', *(s.getName(),) + a)
+    debug = lambda s, *a: log.debug('controller', *(s.getName(),) + a)
+    warning = lambda s, *a: log.warning('controller', *(s.getName(),) + a)
     error = lambda s, *a: log.error('controller', *(s.getName(),) + a)
 
     def getTransportPeer(self):
@@ -113,7 +113,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         return self.listen_ports[feed]
 
     def callRemote(self, name, *args, **kwargs):
-        self.msg('Calling remote method %s%r' % (name, args))
+        self.debug('Calling remote method %s%r' % (name, args))
         try:
             return self.mind.callRemote(name, *args, **kwargs)
         except pb.DeadReferenceError :
@@ -144,7 +144,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         return None
 
     def attached(self, mind):
-        #msg('%s attached, calling register()' % self.getName())
+        #debug('%s attached, calling register()' % self.getName())
         self.mind = mind
         
         cb = self.callRemote('register')
@@ -153,7 +153,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         cb.addErrback(self.cb_checkAll)
         
     def detached(self, mind=None):
-        self.msg('detached')
+        self.debug('detached')
         name = self.getName()
         if self.controller.hasComponent(name):
             self.controller.removeComponent(self)
@@ -171,14 +171,14 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         return self.callRemote('getElementProperty', element, property)
 
     def perspective_log(self, *msg):
-        log.msg(self.getName(), *msg)
+        log.debug(self.getName(), *msg)
         
     def perspective_stateChanged(self, feed, state):
-        self.msg('stateChanged :%s %s' % (feed, gst.element_state_get_name(state)))
+        self.debug('stateChanged :%s %s' % (feed, gst.element_state_get_name(state)))
         
         self.state = state
         if self.state == gst.STATE_PLAYING:
-            self.msg('is now playing')
+            self.debug('is now playing')
 
         if self.getFeeds():
             self.controller.startPendingComponents(self, feed)
@@ -274,10 +274,10 @@ class FeedManager:
     
     def feedReady(self, feedname): 
         # If we don't specify the feed
-        log.msg('controller', 'feed %s ready' % (feedname))
+        log.debug('controller', 'feed %s ready' % (feedname))
 
         if not self.feeds.has_key(feedname):
-            self.warn('FIXME: no feed called: %s' % feedname)
+            self.warning('FIXME: no feed called: %s' % feedname)
             return
         
         feed = self.feeds[feedname]
@@ -424,7 +424,7 @@ class Controller(pb.Root):
         return retval
 
     def componentStart(self, component):
-        component.msg('Starting')
+        component.debug('Starting')
         #assert isinstance(component, ComponentPerspective)
         #assert component != ComponentPerspective
 
@@ -433,11 +433,11 @@ class Controller(pb.Root):
         component.link(sources, feeds)
 
     def maybeComponentStart(self, component):
-        component.msg('maybeComponentStart')
+        component.debug('maybeComponentStart')
         
         for source in component.getSources():
             if not self.feed_manager.isFeedReady(source):
-                component.msg('source %s is not ready' % (source))
+                component.debug('source %s is not ready' % (source))
                 return
 
         if component.starting:
@@ -447,14 +447,14 @@ class Controller(pb.Root):
         self.componentStart(component)
         
     def componentRegistered(self, component):
-        component.msg('in componentRegistered')
+        component.debug('in componentRegistered')
         if self.admin:
             self.admin.componentAdded(component)
         self.feed_manager.addFeeds(component)
 
         sources = component.getSources()
         if not sources:
-            component.msg('no sources, starting immediatelly')
+            component.debug('no sources, starting immediatelly')
             self.componentStart(component)
             return
         else:
