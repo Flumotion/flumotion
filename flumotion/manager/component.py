@@ -41,7 +41,7 @@ class Options:
 
 # abstracts the concept of a GStreamer tcpserversink producing a feeder
 class Feeder:
-    "I am a quite dummy Feeder object used by L{FeederSet}"
+    "I am an object used by L{FeederSet}"
     def __init__(self, name):
         self.name = name
         self.dependencies = []
@@ -77,8 +77,8 @@ class Feeder:
     
 class FeederSet:
     """
-    I represent a collection of L{Feeder}s, I know when a feed is ready and
-    and I handle dependencies between feeds
+    I represent a collection of L{Feeder}s.
+    I know when a feed is ready and I handle dependencies between feeds.
     """
     def __init__(self):
         self.feeders = {}
@@ -460,10 +460,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
 
 class ComponentHeaven(pb.Root, log.Loggable):
     """
-    Manager, handles all registered components and provides avatars
-    for them.
-    The main function of this class is to handle components, tell them
-    to start register and start up pending components.
+    I handle all registered components and provide avatars for them.
     """
 
     __implements__ = interfaces.IHeaven
@@ -471,7 +468,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
     
     def __init__(self, vishnu):
         """
-        @type vishnu: L{flumotion.manager.manager.Vishnu}
+        @type vishnu:  L{flumotion.manager.manager.Vishnu}
         @param vishnu: the Vishnu object
         """
         self.components = {} # dict of component avatars
@@ -482,8 +479,9 @@ class ComponentHeaven(pb.Root, log.Loggable):
 
     def getAvatar(self, avatarID):
         """
-        Creates a new avatar for a component, raises
-        an AlreadyConnectedError if the component is already found in the cache
+        Creates a new avatar for a component.
+        Raises an AlreadyConnectedError if the component is already found
+        in the cache.
         
         @type avatarID:  string
 
@@ -534,17 +532,21 @@ class ComponentHeaven(pb.Root, log.Loggable):
         return self.components[name]
     
     def hasComponent(self, name):
-        """checks if a component with that name is registered.
+        """
+        Checks if a component with that name is registered.
+
         @type name:  string
         @param name: name of the component
+
         @rtype:      boolean
-        @returns:    True if a component with that name is registered, otherwise False"""
+        @returns:    True if a component with that name is registered
+        """
         
         return self.components.has_key(name)
     
     def addComponent(self, component):
         """
-        adds a component
+        Adds a component.
 
         @type component: L{flumotion.manager.component.ComponentAvatar}
         @param component: the component
@@ -582,6 +584,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
 
         @type component:  component
         @param component: the component
+
         @rtype:           tuple with 3 items
         @returns:         name, hostname and port
         """
@@ -607,6 +610,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
 
         @type component:  component
         @param component: the component
+
         @rtype:           tuple of with 3 items
         @returns:         name, host and port
         """
