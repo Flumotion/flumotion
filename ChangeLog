@@ -1,5 +1,12 @@
 2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  only registerPackagePath when a bundle got unpacked, and
+	  in the right order.  Should fix all lingering "works on second
+	  try" bugs in admin client.
+
+2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  more error handling
 	* flumotion/common/bundle.py:

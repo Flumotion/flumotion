@@ -372,7 +372,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         def _getBundleSumsCallback(result, filename, methodName):
             # callback receiving bundle sums.  Will remote call to get
             # all missing zip files
-            sums = result
+            sums = result # ordered from highest to lowest dependency
             entryName, entrySum = sums[0]
             self.debug('_getBundleSumsCallback: %d sums received' % len(sums))
 
@@ -382,15 +382,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             # check which zips to request from manager
             missing = [] # list of missing bundles
 
-            # for registerPackagePath to work, we need to reverse the order
-            sums.reverse()
             for name, sum in sums:
                 dir = os.path.join(configure.cachedir, sum)
-
-                # add package paths, yay
-                self.debug("registering PackagePath %s for bundle %s" % (
-                    dir, name))
-                common.registerPackagePath(dir)
                 if not os.path.exists(dir):
                     missing.append(name)
 
@@ -398,7 +391,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                 self.debug('_getBundleSumsCallback: requesting zips %r' %
                     missing)
                 d = self.callRemote('getBundleZips', missing)
-                d.addCallback(_getBundleZipsCallback, entryPath, filename, methodName)
+                d.addCallback(_getBundleZipsCallback, entryPath, missing,
+                    filename, methodName)
                 d.addErrback(self._defaultErrback)
                 return d
             else:
@@ -407,17 +401,31 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                     retval, ))
                 return retval
 
-        def _getBundleZipsCallback(result, entryPath, filename, methodName):
-            # callback to receive zips.  Will set up zips and finally
+        def _getBundleZipsCallback(result, entryPath, missing,
+            filename, methodName):
+            # callback to receive zips.  Will set up zips, register package
+            # paths and finally
             # return physical location of entry file and method
             self.debug('_getBundleZipsCallback: received %d zips' % len(result))
-            for name in result.keys():
+            # we use "missing" and reverse it because that way we get the
+            # list of dependencies from lowest to highest and register
+            # package paths in the correct order
+            missing.reverse()
+            for name in missing:
+                if name not in result.keys():
+                    msg = "Missing bundle %s was not received" % name
+                    self.warning(msg)
+                    raise errors.NoBundleError(msg)
+
                 zip = result[name]
                 b = bundle.Bundle()
                 b.setZip(zip)
                 unbundler = bundle.Unbundler(configure.cachedir)
                 dir = unbundler.unbundle(b)
-                self.debug("unpacked %s to dir %s" % (name, dir))
+                self.debug("unpacked bundle %s to dir %s" % (name, dir))
+                self.debug("unpacked bundle %s, registering PackagePath %s" % (
+                    dir, name))
+                common.registerPackagePath(dir)
 
             retval = (entryPath, filename, methodName)
             self.debug('_getBundleSumsCallback: returning %r' % (
