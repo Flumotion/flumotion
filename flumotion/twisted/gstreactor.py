@@ -102,6 +102,7 @@ class GstReactor(default.PosixReactorBase):
         try:
             self.simulate()
         except KeyboardInterrupt:
+            print "KeyboardInterrupt (gstreactor.addReader())"
             pass
 
     def addWriter(self, writer):
@@ -160,6 +161,7 @@ class GstReactor(default.PosixReactorBase):
             self.simulate()
             gst.main()
         except KeyboardInterrupt:
+            print "KeyboardInterrupt (gstreactor.run())"
             pass
 
     def _doReadOrWrite(self, source, condition, faildict={
@@ -182,6 +184,7 @@ class GstReactor(default.PosixReactorBase):
                         if not source.disconnected and source.doWrite != didRead:
                             why = source.doWrite()
                 except KeyboardInterrupt:
+                    print "KeyboardInterrupt (gstreactor._doReadOrWrite())"
                     pass
             except:
                 why = sys.exc_info()[1]
@@ -202,6 +205,7 @@ class GstReactor(default.PosixReactorBase):
             log.callWithLogger(source, self._doReadOrWrite, source, condition)
             self.simulate() # fire Twisted timers
         except KeyboardInterrupt:
+            print "KeyboardInterrupt (gstreactor.callback())"
             return 0
         
         return 1 # 1=don't auto-remove the source
@@ -220,6 +224,7 @@ class GstReactor(default.PosixReactorBase):
             # grumble
             _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
         except KeyboardInterrupt:
+            print "KeyboardInterrupt (gstreactor.simulate())"
             pass
             
    

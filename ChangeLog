@@ -1,5 +1,10 @@
 2004-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/gstreactor.py:
+	  print on KeyboardInterrupt until we figure out where the problem is.
+
+2004-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/gui/adminclient.py:
 	  properly handle error dialog.
 
