@@ -221,12 +221,24 @@ class Controller(pb.Root):
         del self.components[component.username]
 
     def waitForComponent(self, name, component):
+        """adds a component to another components waitlist. Eg wait until
+        the other component has started up before starting it
+        
+        @type name:      string
+        @param name:     name of the other component
+        @type component: component
+        @param component: the component"""
+        
         if not self.waitlists.has_key(name):
             self.waitlists[name] = []
 
         self.waitlists[name].append(component)
 
     def startPendingComponentsFor(self, component):
+        """Starts all components that requires {component} to be started
+        @type component: component
+        @param component: the component"""
+        
         name = component.getName()
         if self.waitlists.has_key(name):
             for component in self.waitlists[name]:
