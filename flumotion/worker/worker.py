@@ -42,8 +42,8 @@ class WorkerClientFactory(factoryClass):
         # doing this as a class method triggers a doc error
         factoryClass.__init__(self)
         
-    def login(self, username, password):
-        return self.__super_login(cred.Username(username, password),
+    def login(self, credentials):
+        return self.__super_login(credentials,
                                   self.view,
                                   interfaces.IWorkerView)
         
@@ -144,15 +144,15 @@ class WorkerBrain:
         self.worker_view = WorkerView(self)
         self.worker_client_factory = WorkerClientFactory(self)
 
-    def login(self, username, password):
-        d = self.worker_client_factory.login(username, password)
+    def login(self, credentials):
+        d = self.worker_client_factory.login(credentials)
         d.addErrback(self._cb_accessDenied)
         d.addErrback(self._cb_loginFailed)
                                  
     def setup(self):
         root = JobHeaven(self)
         dispatcher = JobDispatcher(root)
-        checker = cred.FlexibleCredentials()
+        checker = cred.FlexibleCredentialsChecker()
         checker.allowAnonymous(True)
         p = portal.Portal(dispatcher, [checker])
         job_server_factory = pb.PBServerFactory(p)

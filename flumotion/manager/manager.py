@@ -117,7 +117,7 @@ class Dispatcher(log.Loggable):
         
         self._interfaceHeavens[interface] = heaven
 
-class ManagerCredentials(cred.FlexibleCredentials):
+class ManagerCredentialsChecker(cred.FlexibleCredentialsChecker):
     def requestAvatarId(self, credentials):
         # XXX: If it's component or admin, allow anonymous access.
         #      This is a big hack, but it emulates the current behavior
@@ -126,7 +126,7 @@ class ManagerCredentials(cred.FlexibleCredentials):
             interfaces.IAdminView in credentials.interfaces):
             return credentials.username
 
-        return cred.FlexibleCredentials.requestAvatarId(self, credentials)
+        return cred.FlexibleCredentialsChecker.requestAvatarId(self, credentials)
 
 class Vishnu:
     """
@@ -146,7 +146,7 @@ class Vishnu:
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
-        self.checker = ManagerCredentials()
+        self.checker = ManagerCredentialsChecker()
         self.checker.allowAnonymous(True) # XXX: False
         
         p = portal.FlumotionPortal(self.dispatcher, [self.checker])

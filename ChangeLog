@@ -1,3 +1,13 @@
+2004-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/Makefile.am:
+	* flumotion/manager/manager.py:
+	* flumotion/twisted/cred.py:
+	* flumotion/twisted/portal.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  remove confusion, add comments
+
 2004-10-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/Makefile.am:

@@ -1,6 +1,7 @@
 componentdir = $(libdir)/flumotion/python/flumotion/component
 component_PYTHON = \
 	__init__.py \
+	bouncer.py \
 	feedcomponent.py \
 	component.py
 

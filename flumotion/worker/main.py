@@ -1,4 +1,19 @@
-# worker/main.py: main function of flumotion-worker
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# flumotion/worker/main.py: main function of flumotion-worker
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2004 Fluendo (www.fluendo.com)
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# This program is also licensed under the Flumotion license.
+# See "LICENSE.Flumotion" in the source distribution for more information.
 
 import optparse
 import os
@@ -7,6 +22,7 @@ from twisted.internet import reactor
 
 from flumotion.utils import log
 from flumotion.worker import worker
+from flumotion.twisted import cred
 
 def main(args):
     parser = optparse.OptionParser()
@@ -65,7 +81,10 @@ def _start_worker(options):
 
     # connect the brain to the manager
     reactor.connectTCP(options.host, options.port, brain.worker_client_factory)
-    brain.login(options.username, options.password or '')
+
+    # FIXME: allow for different credentials types
+    credentials = cred.Username(options.username, options.password)
+    brain.login(credentials)
 
     log.debug('worker', 'Starting reactor')
     reactor.run()

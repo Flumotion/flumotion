@@ -36,7 +36,7 @@ class FeedComponentView(basecomponent.BaseComponentView):
 
     def __init__(self, component):
         """
-        @param component: L{flumotion.component.component.FeedComponent}
+        @param component: L{flumotion.component.feedcomponent.FeedComponent}
         """
         basecomponent.BaseComponentView.__init__(self, component)
 

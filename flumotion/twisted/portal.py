@@ -58,9 +58,17 @@ def namedAny(name):
                                                                                 
     return obj
 
+# we create a dummy subclass because there is already an adapter registered
+# for Portal in twisted.spread.pb
 class FlumotionPortal(Portal):
     pass
 
+### FIXME: this code is an adaptation of twisted/spread/pb.py
+# it allows you to login to a PB server requesting interfaces other than
+# IPerspective.
+# in other terms, you can request different "kinds" of avatars from the same
+# PB server.
+# this code needs to be send upstream to Twisted
 class _PortalRoot:
     """Root object, used to login to portal."""
 

@@ -18,7 +18,7 @@
 from twisted.cred import checkers, credentials, error
 
 parent = checkers.InMemoryUsernamePasswordDatabaseDontUse
-class FlexibleCredentials(parent):
+class FlexibleCredentialsChecker(parent):
     def __init__(self, **users):
         parent.__init__(self, **users)
         self.anonymous = False
