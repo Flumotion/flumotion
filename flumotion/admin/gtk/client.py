@@ -238,6 +238,14 @@ class Window(log.Loggable, gobject.GObject):
         self.window.set_icon_from_file(iconfile)
         
         self.hpaned = wtree.get_widget('hpaned')
+        # too blatant self-promotion ?
+        #old = self.hpaned.get_child2()
+        #self.hpaned.remove(old)
+        #image = gtk.Image()
+        #image.set_from_file(os.path.join(configure.imagedir, 'fluendo.png'))
+        #self.hpaned.add2(image)
+        #image.show()
+ 
         self.window.connect('delete-event', self.close)
         
         self.component_model = gtk.ListStore(gdk.Pixbuf, str, str, int, object)
@@ -817,7 +825,7 @@ class Window(log.Loggable, gobject.GObject):
 
         text = 'Flumotion is a streaming media server\n\n(C) 2004-2005 Fluendo S.L.'
         authors = ('Johan Dahlin &lt;johan@fluendo.com&gt;',
-                   'Thomas V. Stichele &lt;thomas@fluendo.com&gt;',
+                   'Thomas Vander Stichele &lt;thomas@fluendo.com&gt;',
                    'Wim Taymans &lt;wim@fluendo.com&gt;')
         text += '\n\n<small>Authors:\n'
         for author in authors:
