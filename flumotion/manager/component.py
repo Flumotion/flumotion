@@ -289,7 +289,7 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Check if we received the heartbeat lately.  Set mood to LOST if not.
         """
-        self.log('checking heartbeat')
+        #self.log('checking heartbeat')
         # FIXME: only notify of LOST mood once !
         if self.lastHeartbeat > 0 \
             and time.time() - self.lastHeartbeat \
@@ -615,7 +615,8 @@ class ComponentAvatar(base.ManagerAvatar):
         
     def perspective_heartbeat(self, moodValue):
         self.lastHeartbeat = time.time()
-        log.log(self.getName(), "got heartbeat at %d" % int(self.lastHeartbeat))
+        #log.log(self.getName(),
+        #    "got heartbeat at %d" % int(self.lastHeartbeat))
         self._setMoodValue(moodValue)
 
     def perspective_feedStateChanged(self, feedName, state):
