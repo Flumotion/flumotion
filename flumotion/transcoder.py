@@ -34,13 +34,14 @@ from twisted.spread import pb
 import pbutil
 
 class Transcoder(pb.Referenceable):
-    def __init__(self, username, host, port):
+    def __init__(self, username, host, port, pipeline):
         factory = pb.PBClientFactory()
         reactor.connectTCP(host, port, factory)
         defered = factory.login(pbutil.Username('trans_%s' % username),
                                 client=self)
         defered.addCallback(self.gotPerspective)
-
+        self.pipeline_string = pipeline
+        
     def gotPerspective(self, persp):
         self.persp = persp
         
@@ -63,36 +64,28 @@ class Transcoder(pb.Referenceable):
         retval = self.pipeline.set_state(gst.STATE_PAUSED)
         if not retval:
             log.msg('Changing state to PAUSED failed')
-        gobject.idle_add(self.pipeline_iterate)
+        gobject.idle_add(self.pipeline.iterate)
         
     def pipeline_play(self):
         retval = self.pipeline.set_state(gst.STATE_PLAYING)
         if not retval:
             log.msg('Changing state to PLAYING failed')
-        gobject.idle_add(self.pipeline_iterate)
+        gobject.idle_add(self.pipeline.iterate)
         
-    def pipeline_iterate(self):
-        return self.pipeline.iterate()
-    
     def remote_prepare(self):
         log.msg('prepare called')
-        
-        self.pipeline = gst.Pipeline('transcoder-pipeline')
+
+        self.pipeline = gst.parse_launch('tcpserversrc name=source ! %s' % self.pipeline_string)
         self.pipeline.connect('error', self.pipeline_error_cb)
         self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         self.pipeline.connect('deep-notify', self.pipeline_deep_notify_cb)
-        
-        self.src = gst.element_factory_make('tcpserversrc')
-        self.sink = gst.element_factory_make('xvimagesink')
-        self.reframer = gst.element_factory_make('videoreframer')
 
+        self.src = self.pipeline.get_by_name('source')
+        
     def remote_listen(self, port, caps):
         log.msg('listen called with port=%d caps=%s' % (port, caps))
         self.src.set_property('port', port)
-        self.pipeline.add_many(self.src, self.reframer, self.sink)
-        self.src.link(self.reframer)
-        self.reframer.link_filtered(self.sink, gst.caps_from_string(caps))
-
+        
         reactor.callLater(0, self.pipeline_play)
         log.msg('returning from listen')
         
@@ -111,12 +104,17 @@ if __name__ == '__main__':
     log.startLogging(sys.stdout)
 
     if len(sys.argv) == 2:
-        controller = sys.argv[1]
-    else:
+        pipeline = sys.argv[1]
         controller = ''
+    elif len(sys.argv) == 3:
+        pipeline = sys.argv[1] 
+        controller = sys.argv[2]
+    else:
+        print 'Usage: transcoder.py pipeline [controller-host[:port]]'
+        sys.exit(2)
         
     name = 'johan'
     host, port = parseHostString(controller)
     log.msg('Connect to %s on port %d' % (host, port))
-    client = Transcoder(name, host, port)
+    client = Transcoder(name, host, port, pipeline)
     reactor.run()

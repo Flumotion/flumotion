@@ -63,6 +63,7 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
         self.username = username
         self.caps = None
         self.state = gst.STATE_NULL
+        self.ready = False
         
     def __repr__(self):
         return '<AcquisitionPerspective for %s>' % self.username
@@ -101,6 +102,7 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
     def __init__(self, controller, username):
         self.controller = controller
         self.username = username
+        self.ready = False
         self.state = gst.STATE_NULL
         
     def __repr__(self):
@@ -135,7 +137,7 @@ class TranscoderPerspective(pbutil.NewCredPerspective):
 class Controller(pb.Root):
     def __init__(self):
         self.components = {}
-
+        
     def getPerspective(self, username):
         if username.startswith('acq_'):
             component = AcquisitionPerspective(self, username)

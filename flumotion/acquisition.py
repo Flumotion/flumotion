@@ -77,21 +77,19 @@ class Acquisition(pb.Referenceable):
         retval = self.pipeline.set_state(gst.STATE_PAUSED)
         if not retval:
             log.msg('Changing state to PLAYING failed')
-        gobject.idle_add(self.pipeline_iterate)
+        gobject.idle_add(self.pipeline.iterate)
         
     def pipeline_play(self):
         retval = self.pipeline.set_state(gst.STATE_PLAYING)
         if not retval:
             log.msg('Changing state to PLAYING failed')
-        gobject.idle_add(self.pipeline_iterate)
+        gobject.idle_add(self.pipeline.iterate)
         
-    def pipeline_iterate(self):
-        return self.pipeline.iterate()
-    
     def remote_prepare(self):
         log.msg('start called')
-        
-        self.pipeline = gst.parse_launch('%s ! video/x-raw-yuv ! fakesink name=fakesink' % self.pipeline_string)
+        full_pipeline = '%s ! fakesink silent=1 name=fakesink' % self.pipeline_string
+        log.msg('going to run pipeline: %s' % full_pipeline)
+        self.pipeline = gst.parse_launch(full_pipeline)
         self.pipeline.connect('error', self.pipeline_error_cb)
         self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         self.pipeline.connect('deep-notify', self.pipeline_deep_notify_cb)
@@ -107,6 +105,8 @@ class Acquisition(pb.Referenceable):
         reactor.callLater(0, self.pipeline_play)
 
     def remote_connect(self, hostname, port):
+        log.msg('Going to connect to %s:%d' % (hostname, port))
+        
         # Pause
         self.pipeline.set_state(gst.STATE_PAUSED)
         
@@ -142,16 +142,15 @@ def parseHostString(string, port=8890):
     
 if __name__ == '__main__':
     log.startLogging(sys.stdout)
-
-    if len(sys.argv) > 3:
-        controller = sys.argv[1]
-        pipeline = sys.argv[2]
-    elif len(sys.argv) == 2:
-        controller = ''
+    if len(sys.argv) == 2:
         pipeline = sys.argv[1]
+        controller = ''
+    elif len(sys.argv) == 3:
+        pipeline = sys.argv[1] 
+        controller = sys.argv[2]
     else:
-        print 'Usage: client [controller] pipeline'
-        sys.exit(1)
+        print 'Usage: acquisition.py pipeline [controller-host[:port]]'
+        sys.exit(2)
 
     name = 'johan'
     host, port = parseHostString(controller)
