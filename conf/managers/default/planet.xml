@@ -6,6 +6,7 @@
     <port></port>
     <transport></transport>
 -->
+    <debug>5</debug>
 
     <component name="manager-bouncer" type="htpasswdcrypt">
       <data><![CDATA[

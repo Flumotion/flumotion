@@ -55,6 +55,7 @@ class WorkerConfigXML(log.Loggable):
         self.manager = None
         self.authentication = None
         self.feederports = None
+        self.fludebug = None
 
         try:
             if filename is not None:
@@ -98,6 +99,8 @@ class WorkerConfigXML(log.Loggable):
                 self.authentication = self.parseAuthentication(node)
             elif node.nodeName == 'feederports':
                 self.feederports = self.parseFeederports(node)
+            elif node.nodeName == 'debug':
+                self.fludebug = str(node.firstChild.nodeValue)
             else:
                 raise ConfigError("unexpected node under '%s': %s" % (root.nodeName, node.nodeName))
 

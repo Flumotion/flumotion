@@ -203,7 +203,7 @@ class Servicer(log.Loggable):
             flowFiles.append(flowFile)
             self.info("Loading flow %s" % flowFile)
             
-        command = "flumotion-manager -v -D -n %s %s %s" % (
+        command = "flumotion-manager --debug 5 -D -n %s %s %s" % (
             name, planetFile, " ".join(flowFiles))
         retval = self.startProcess(command)
 
@@ -232,7 +232,7 @@ class Servicer(log.Loggable):
                 "Worker file %s does not exist" % workerFile
         self.info("Loading worker %s" % workerFile)
 
-        command = "flumotion-worker -v -D -n %s %s" % (name, workerFile)
+        command = "flumotion-worker --debug 5 -D -n %s %s" % (name, workerFile)
         retval = self.startProcess(command)
 
         if retval is 0:

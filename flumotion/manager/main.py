@@ -111,6 +111,9 @@ def main(args):
     args = [arg for arg in args if not arg.startswith('--gst')]
     
     parser = optparse.OptionParser()
+    parser.add_option('-d', '--debug',
+                      action="store", type="string", dest="debug",
+                      help="set debug levels")
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="be verbose")
@@ -205,6 +208,9 @@ def main(args):
 
     if options.verbose:
         log.setFluDebug("*:3")
+
+    if options.debug:
+        log.setFluDebug(options.debug)
 
     vishnu = manager.Vishnu()
 

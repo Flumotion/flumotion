@@ -26,5 +26,6 @@ hostname:(xmlfilename)
     </authentication>
 
     <feederports>8650-8659</feederports>
+    <debug>*:3</debug>
 
 </worker>

@@ -71,12 +71,13 @@ class ConfigEntryFlow:
 
 class ConfigEntryManager:
     "I represent a <manager> entry in a planet config file"
-    def __init__(self, name, host, port, transport, bouncer):
+    def __init__(self, name, host, port, transport, bouncer, fludebug):
         self.name = name
         self.host = host
         self.port = port
         self.transport = transport
         self.bouncer = bouncer
+        self.fludebug = fludebug
 
 class ConfigEntryWorker:
     "I represent a <worker> entry in a registry file"
@@ -267,13 +268,14 @@ class FlumotionConfigXML(log.Loggable):
                 if bouncer:
                     raise ConfigError("<manager> section can only have one <component>")
                 bouncer = self.parseComponent(child)
-                    
+            elif child.nodeName == "debug":
+                fludebug = str(child.firstChild.nodeValue)
             else:
                 raise ConfigError("unexpected '%s' node: %s" % (node.nodeName, child.nodeName))
 
             # FIXME: assert that it is a bouncer !
 
-        return ConfigEntryManager(name, host, port, transport, bouncer)
+        return ConfigEntryManager(name, host, port, transport, bouncer, fludebug)
      
     def DEPRECATED_parse_workers(self, node):
         # <workers policy="password/anonymous">

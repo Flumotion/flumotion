@@ -93,6 +93,9 @@ def main(args):
     defaultTCPPort = configure.defaultTCPManagerPort
     
     parser = optparse.OptionParser()
+    parser.add_option('-d', '--debug',
+                      action="store", type="string", dest="debug",
+                      help="set debug levels")
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="be verbose")
@@ -126,10 +129,10 @@ def main(args):
     parser.add_option('', '--wizard',
                      action="store_true", dest="wizard",
                      help="run the wizard")
-    parser.add_option('', '--debug',
-                      action="store_true", dest="debug",
+    parser.add_option('', '--wizard-debug',
+                      action="store_true", dest="wizarddebug",
                       default=False,
-                      help="run in debug")
+                      help="run wizard in debug")
 
     options, args = parser.parse_args(args)
 
@@ -141,13 +144,16 @@ def main(args):
     if options.verbose:
         log.setFluDebug("*:3")
 
+    if options.debug:
+        log.setFluDebug(options.debug)
+
     if not options.port:
         if options.transport == "tcp":
             options.port = defaultTCPPort
         elif options.transport == "ssl":
             options.port = defaultSSLPort
 
-    if options.wizard and options.debug:
+    if options.wizard and options.wizarddebug:
         _runWizardAndDump()
     else:
         _runInterface(options)

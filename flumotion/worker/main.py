@@ -36,6 +36,9 @@ from flumotion.twisted import credentials
 
 def main(args):
     parser = optparse.OptionParser()
+    parser.add_option('-d', '--debug',
+                      action="store", type="string", dest="debug",
+                      help="set debug levels")
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="be verbose")
@@ -115,6 +118,10 @@ def main(args):
         if not options.feederports and cfg.feederports:
             options.feederports = cfg.feederports
             log.debug('worker', 'Setting feederports %r' % options.feederports)
+
+        # general
+        if not options.debug and cfg.fludebug:
+            options.debug = cfg.fludebug
         
     # set default values for all unset options
     if not options.host:
@@ -150,6 +157,9 @@ def main(args):
 
     if options.verbose:
         log.setFluDebug("*:3")
+
+    if options.debug:
+        log.setFluDebug(options.debug)
 
     if options.daemonize:
         common.ensureDir(configure.logdir, "log file")

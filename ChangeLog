@@ -1,5 +1,17 @@
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/managers/default/planet.xml:
+	* conf/workers/default.xml:
+	* flumotion/admin/gtk/main.py:
+	* flumotion/common/config.py:
+	* flumotion/manager/main.py:
+	* flumotion/worker/config.py:
+	* flumotion/worker/main.py:
+	  add --debug options to command line
+	  add <debug></debug> option to config file for worker and manager
+
+2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/common/errors.py:
 	* flumotion/wizard/steps.py:
