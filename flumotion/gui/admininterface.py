@@ -116,16 +116,29 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         reload()
 
         cb = self.reloadController()
+        # stack callbacks so that a new one only gets sent after the previous
+        # one has completed
         for client in self.clients:
-            cb.addCallback(self.reloadComponent, client)
+            cb = cb.addCallback(self.reloadComponent, client)
         return cb
 
     def reloadController(self):
-        return self.remote.callRemote('reloadController')
+        def _reloaded(result, self):
+            self.info("reloaded controller code")
+
+        self.info("reloading controller code")
+        cb = self.remote.callRemote('reloadController')
+        cb.addCallback(_reloaded, self)
+        return cb
 
     def reloadComponent(self, result, client):
-        self.info("Asking for reload of component %s" % client.name)
-        return self.remote.callRemote('reloadComponent', client.name)
+        def _reloaded(result, self, client):
+            self.info("reloaded component %s code" % client.name)
+
+        self.info("reloading component %s code" % client.name)
+        cb = self.remote.callRemote('reloadComponent', client.name)
+        cb.addCallback(_reloaded, self, client)
+        return cb
 
     def getUIEntry(self, component):
         self.info('calling remote getUIEntry %s' % component)

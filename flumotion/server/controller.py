@@ -272,6 +272,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         cb = self._mindCallRemote('reloadComponent')
         cb.addErrback(self._reloadComponentErrback)
         cb.addErrback(self._mindErrback, (errors.ReloadSyntaxError, ))
+        return cb
 
     def getUIEntry(self):
         self.debug('calling remote getUIEntry')

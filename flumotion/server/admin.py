@@ -209,13 +209,20 @@ class AdminAvatar(pb.Avatar, log.Loggable):
 
     def perspective_reloadComponent(self, component_name):
         """Reload modules in the given component."""
-        component = self.controller.getComponent(component_name)
-        return component.reloadComponent()
+        def _reloaded(result, self, name):
+            self.info("reloaded component %s code" % name)
+
+        self.info("reloading component %s code" % component_name)
+        avatar = self.controller.getComponent(component_name)
+        cb = avatar.reloadComponent()
+        cb.addCallback(_reloaded, self, component_name)
+        return cb
 
     def perspective_reloadController(self):
         """Reload modules in the controller."""
         import sys
         from twisted.python.rebuild import rebuild
+        self.info('reloading controller code')
         # reload ourselves first
         rebuild(sys.modules[__name__])
 
@@ -227,7 +234,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
 
     # separate method so it runs the newly reloaded one :)
     def _reloaded(self):
-        self.info('reloaded module code for %s' % __name__)
+        self.info('reloaded controller code')
 
 class Admin(pb.Root):
     """
