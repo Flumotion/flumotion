@@ -94,8 +94,8 @@ class HTTPStreamingAdminResource(resource.Resource):
         if days >= 1:
             display.append('%d days' % days)
         time %= (3600 * 24)
-        h = time / 24
-        time %= 24
+        h = time / 3600
+        time %= 3600
         m = time / 60
         time %= 60
         s = time
