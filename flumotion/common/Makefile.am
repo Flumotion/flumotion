@@ -2,6 +2,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/common
 
 flumotion_PYTHON = \
 	__init__.py \
+	auth.py \
 	errors.py \
 	interfaces.py
 

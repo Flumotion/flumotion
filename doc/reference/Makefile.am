@@ -10,6 +10,7 @@ MODULE_FILES = \
 	flumotion/admin/__init__.py		\
 	flumotion/admin/spyglass.py		\
 	flumotion/config/__init__.py		\
+	flumotion/common/auth.py		\
 	flumotion/common/errors.py		\
 	flumotion/common/interfaces.py		\
 	flumotion/component/component.py	\
@@ -19,7 +20,6 @@ MODULE_FILES = \
 	flumotion/component/http/http.py	\
 	flumotion/component/passwd/passwd.py	\
 	flumotion/manager/admin.py		\
-	flumotion/manager/auth.py		\
         flumotion/manager/config.py		\
 	flumotion/manager/manager.py		\
 	flumotion/manager/launcher.py		\

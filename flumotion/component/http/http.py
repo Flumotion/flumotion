@@ -32,8 +32,7 @@ from twisted.internet import reactor
 
 from flumotion.component import component
 from flumotion.common import interfaces
-# FIXME: this need to move away from manager !
-from flumotion.manager import auth
+from flumotion.common import auth
 from flumotion.utils import gstutils, log
 from flumotion.utils.gstutils import gsignal
 
