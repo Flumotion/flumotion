@@ -5,7 +5,7 @@ from twisted.protocols import http as twisted_http
 from twisted.python import components
 from twisted.web import server
 
-from flumotion.components import http
+from flumotion.components.http import http
 from flumotion.server import interfaces
 
 # From twisted/test/proto_helpers.py
