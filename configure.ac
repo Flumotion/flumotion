@@ -50,6 +50,7 @@ AC_OUTPUT(
 Makefile
 bin/flumotion
 bin/flumotion-admin
+bin/flumotion-worker
 bin/Makefile
 data/Makefile
 data/glade/Makefile
@@ -74,6 +75,7 @@ flumotion/config/uninstalled.py
 flumotion/manager/Makefile
 flumotion/twisted/Makefile
 flumotion/utils/Makefile
+flumotion/worker/Makefile
 m4/Makefile
 conf/Makefile
 doc/Makefile

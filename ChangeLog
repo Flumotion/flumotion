@@ -1,3 +1,18 @@
+2004-09-09  Johan Dahlin  <johan@gnome.org>
+
+	* bin/Makefile.am:
+	* bin/flumotion-admin.in:
+	* bin/flumotion-worker.in:
+	* configure.ac:
+	* flumotion/Makefile.am:
+	* flumotion/manager/component.py:
+	* flumotion/worker/Makefile.am:
+	* flumotion/worker/__init__.py:
+	* flumotion/worker/launcher.py:
+	* flumotion/worker/worker.py:
+
+	Add basic worker script
+	
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:

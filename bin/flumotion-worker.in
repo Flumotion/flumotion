@@ -5,7 +5,7 @@
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
 #
-# flumotion-admin: Graphical Administration Client for Flumotion
+# bin/flumotion: Flumotion Streaming Media Server
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,14 +23,17 @@
 
 import os
 import sys
-sys.path.insert(0, '@PYGTK_DIR@')
 
 import pygtk
 pygtk.require('2.0')
 
-from twisted.internet import gtk2reactor
-gtk2reactor.install()
+import gobject
+if gobject.pygtk_version < (2,3,96):
+    print 'PyGTK 2.3.96 or higher is required'
+    raise SystemExit
+gobject.threads_init()
 
+# This can't be removed, 
 dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.exists(os.path.join(dir, '.svn')):
     root = os.path.split(dir)[0]
@@ -38,11 +41,23 @@ else:
     root = os.path.join('@prefix@', 'lib', 'flumotion', 'python')
 sys.path.insert(0, root)
 
-from flumotion.admin.gtk import client
+# Install reactor
+from flumotion.twisted import gstreactor
+gstreactor.install()
+
+from flumotion.common.registry import registry
+from flumotion.common import errors
 from flumotion.utils import log
+from flumotion.worker import worker
 
 def main(args):
     log.init()
-    return client.main(args)
-
-sys.exit(main(sys.argv))
+    registry.verify(root)
+        
+    return worker.main(args)
+    
+if __name__ == '__main__':
+    try:
+        sys.exit(main(sys.argv))
+    except errors.SystemError, e:
+        print 'ERROR:', e

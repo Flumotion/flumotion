@@ -469,8 +469,8 @@ class ComponentHeaven(pb.Root, log.Loggable):
         self.addComponent(avatar)
         return avatar
 
-    def removeAvatar(self, avatar, mind):
-        self.warning('NotImplemented')
+    def removeAvatar(self, avatarID):
+        self.removeComponentByName(avatarID)
     
     def isLocalComponent(self, component):
         # TODO: This could be a lot smarter
@@ -532,10 +532,16 @@ class ComponentHeaven(pb.Root, log.Loggable):
         """
 
         component_name = component.getName()
+        self.removeComponentByName(component_name)
+        
+    def removeComponentByName(self, component_name):
+        import code; code.interact(local=locals())
         if not self.hasComponent(component_name):
             raise KeyError, component_name
 
+        component = self.components[component_name]
         del self.components[component_name]
+        
         if self.adminheaven:
             self.adminheaven.componentRemoved(component)
 

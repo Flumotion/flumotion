@@ -1,4 +1,11 @@
-SUBDIRS = admin common component config manager twisted utils
+SUBDIRS = \
+	common \
+	component \
+	config \
+	manager \
+	twisted \
+	utils \
+	worker
 flumotiondir = $(libdir)/flumotion/python/flumotion
 
 flumotion_PYTHON = \

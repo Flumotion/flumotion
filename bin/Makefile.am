@@ -1,4 +1,8 @@
-bin_SCRIPTS = flumotion flumotion-admin
+bin_SCRIPTS = \
+	flumotion \
+	flumotion-admin \
+	flumotion-worker
+
 CLEANFILES = $(bin_SCRIPTS)
 
 all: $(bin_SCRIPTS)
