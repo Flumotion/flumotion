@@ -8,7 +8,7 @@
     <framerate>10.0</framerate>
   </component>
 
-  <component name="converter-overlay" type="bttv">
+  <component name="converter-overlay" type="overlay">
     <source>producer-video-bttv</source>
     <location>/tmp/overlay.png</location>
   </component>
