@@ -242,7 +242,7 @@ def _listRecursively(path):
             
     return retval
 
-def _findPackageCandidates(path, prefix='flumotion'):
+def _findPackageCandidates(path, prefix='flumotion.'):
     """
     I take a directory and return a list of candidate python packages.
 
