@@ -21,6 +21,7 @@ Parsing of configuration files.
 
 import os
 from xml.dom import minidom, Node
+from xml.parsers import expat
 
 from twisted.python import reflect 
 
@@ -142,13 +143,20 @@ class FlumotionConfigXML(log.Loggable):
         self.manager = None
         self.atmosphere = None
 
+        try:
+            if filename is not None:
+                self.debug('Loading configuration file `%s\'' % filename)
+                self.doc = minidom.parse(filename)
+            else:
+                self.doc = minidom.parseString(string)
+        except expat.ExpatError, e:
+            raise ConfigError("XML parser error: %s" % e)
+        
         if filename is not None:
-            self.debug('Loading configuration file `%s\'' % filename)
-            self.doc = minidom.parse(filename)
             self.path = os.path.split(filename)[0]
         else:
-            self.doc = minidom.parseString(string)
             self.path = None
+            
         self.parse()
         
     def getPath(self):
@@ -166,7 +174,7 @@ class FlumotionConfigXML(log.Loggable):
         root = self.doc.documentElement
         
         if not root.nodeName == 'planet':
-            raise ConfigError, "unexpected root node': %s" % root.nodeName
+            raise ConfigError("unexpected root node': %s" % root.nodeName)
         
         for node in root.childNodes:
             if node.nodeType != Node.ELEMENT_NODE:
@@ -181,7 +189,7 @@ class FlumotionConfigXML(log.Loggable):
                 entry = self.parseManager(node)
                 self.manager = entry
             else:
-                raise ConfigError, "unexpected node under 'planet': %s" % node.nodeName
+                raise ConfigError("unexpected node under 'planet': %s" % node.nodeName)
 
     def parseAtmosphere(self, node):
         # <component name="..." type="...">
@@ -196,7 +204,7 @@ class FlumotionConfigXML(log.Loggable):
                 continue
             
             if child.nodeName != "component":
-                raise ConfigError, "unexpected 'atmosphere' node: %s" % child.nodeName
+                raise ConfigError("unexpected 'atmosphere' node: %s" % child.nodeName)
             component = self.parseComponent(child)
             atmosphere.components[component.name] = component
         return atmosphere
@@ -207,9 +215,9 @@ class FlumotionConfigXML(log.Loggable):
         # </component>
         
         if not node.hasAttribute('name'):
-            raise ConfigError, "<component> must have a name attribute"
+            raise ConfigError("<component> must have a name attribute")
         if not node.hasAttribute('type'):
-            raise ConfigError, "<component> must have a type attribute"
+            raise ConfigError("<component> must have a type attribute")
 
         type = str(node.getAttribute('type'))
         name = str(node.getAttribute('name'))
@@ -221,7 +229,7 @@ class FlumotionConfigXML(log.Loggable):
         try:
             defs = registry.getComponent(type)
         except KeyError:
-            raise KeyError, "unknown component type: %s" % type
+            raise KeyError("unknown component type: %s" % type)
         
         properties = defs.getProperties()
 
@@ -250,7 +258,7 @@ class FlumotionConfigXML(log.Loggable):
                 continue
             
             if child.nodeName != "component":
-                raise ConfigError, "unexpected 'grid' node: %s" % child.nodeName
+                raise ConfigError("unexpected 'grid' node: %s" % child.nodeName)
 
             component = self.parseComponent(child)
             grid.components[component.name] = component
@@ -267,9 +275,9 @@ class FlumotionConfigXML(log.Loggable):
                 continue
             
             if child.nodeName != "component":
-                raise ConfigError, "unexpected 'manager' node: %s" % child.nodeName
+                raise ConfigError("unexpected 'manager' node: %s" % child.nodeName)
             if manager.bouncer:
-                raise ConfigError, "<manager> section can only have one <component>"
+                raise ConfigError("<manager> section can only have one <component>")
             manager.bouncer = self.parseComponent(child)
             # FIXME: assert that it is a bouncer !
         return manager
@@ -280,12 +288,12 @@ class FlumotionConfigXML(log.Loggable):
         # </workers>
 
         if not node.hasAttribute('policy'):
-            raise ConfigError, "<workers> must have a policy attribute"
+            raise ConfigError("<workers> must have a policy attribute")
 
         policy = str(node.getAttribute('policy'))
 
-        if policy not in ['password', 'anonymous']:
-            raise ConfigError, "policy for <workers> must be password or anonymous"
+        if policy not in ('password', 'anonymous'):
+            raise ConfigError("policy for <workers> must be password or anonymous")
             
         
         workers = []
@@ -388,7 +396,7 @@ class FlumotionConfigXML(log.Loggable):
             elif type == 'xml':
                 value = self.get_xml_value(nodes)
             else:
-                raise ConfigError, "invalid property type: %s" % type
+                raise ConfigError("invalid property type: %s" % type)
 
             if value == []:
                 continue
