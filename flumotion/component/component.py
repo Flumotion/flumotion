@@ -118,7 +118,7 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
     """
 
     __implements__ = interfaces.IComponentMedium,
-    logCategory = 'basecomponentmedium'
+    logCategory = 'basecompmedium'
 
     def __init__(self, component):
         """
@@ -262,7 +262,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
     """
 
     __remote_interfaces__ = interfaces.IComponentMedium,
-    logCategory = 'basecomponent'
+    logCategory = 'basecomp'
 
     gsignal('log', object)
 
