@@ -109,12 +109,12 @@ class WorkerHeaven(pb.Root, log.Loggable):
 
         retval = []
 
-        # scan config for all atmosphere and grid component Entries
+        # scan config for all atmosphere and flow component Entries
         entries = {}
         if self.conf.atmosphere.components:
             entries.update(self.conf.atmosphere.components)
-        for gridEntry in self.conf.grids:
-            entries.update(gridEntry.components)
+        for flowEntry in self.conf.flows:
+            entries.update(flowEntry.components)
 
         for entry in entries.values():
             if entry.worker and entry.worker != workerName:

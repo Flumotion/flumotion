@@ -11,15 +11,17 @@ test:PSfNpHTkpTx1M
 
   <atmosphere>
     <component name="http-bouncer" type="htpasswdcrypt">
-      <encryption>crypt</encryption>
       <data><![CDATA[
 wim:test
 test:PSfNpHTkpTx1M
 ]]></data>
-    </component>
+<!--
+      <file relative="configdir">htaccess</file>
+-->
+     </component>
   </atmosphere>
 
-  <grid name="test">
+  <flow name="test">
     <component name="producer-video-test" type="producer">
       <feed>default</feed>
       <pipeline>
@@ -41,6 +43,6 @@ test:PSfNpHTkpTx1M
       <port>8800</port>
       <logfile>/tmp/ogg-test-theora.access.log</logfile>
     </component>
-  </grid>
+  </flow>
 
 </planet>

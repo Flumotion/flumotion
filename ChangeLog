@@ -1,6 +1,16 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/planet.xml:
+	* flumotion/common/config.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_config.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/wizard_step.py:
+	  grid to flow
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/planet.xml:
 	  use htpasswdcrypt bouncer for manager and streamer
 	* flumotion/component/http/http_resources.py:
 	  use KeycarUACPP instead of deprecated HTTPClientKeycard

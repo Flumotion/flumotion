@@ -53,15 +53,15 @@ class TestConfig(unittest.TestCase):
         conf = config.FlumotionConfigXML(None,
              """
              <planet>
-               <grid>
+               <flow>
                  <component name="component-name" type="test-component"/>
-               </grid>
+               </flow>
              </planet>
              """)
 
-        grid = conf.grids[0]
-        assert grid.components.has_key('component-name')
-        component = grid.components['component-name']
+        flow = conf.flows[0]
+        assert flow.components.has_key('component-name')
+        component = flow.components['component-name']
         assert component.name == 'component-name'
         assert component.type == 'test-component'
         dict = component.getConfigDict()
@@ -105,7 +105,7 @@ class TestConfig(unittest.TestCase):
 
     def testParseComponentError(self):
         xml = """<planet>
-            <grid><component name="unused" type="not-existing"/></grid>
+            <flow><component name="unused" type="not-existing"/></flow>
             </planet>"""
         self.assertRaises(KeyError, config.FlumotionConfigXML, None, xml)
 
@@ -144,17 +144,17 @@ class TestConfig(unittest.TestCase):
 
     def testParseProperties(self):
         planet = config.FlumotionConfigXML(None,
-             """<planet><grid>
+             """<planet><flow>
              <component name="component-name" type="test-component">
                <one>string</one>
                <two>1</two>
                <three>2.5</three>
                <four attr="attr-value">value</four>
                <five>True</five>
-             </component></grid>
+             </component></flow>
              </planet>""")
-        grid = planet.grids[0]
-        component = grid.components['component-name']
+        flow = planet.flows[0]
+        component = flow.components['component-name']
         conf = component.getConfigDict()
         assert conf.get('one') == 'string'
         assert conf.get('two') == 1

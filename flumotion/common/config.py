@@ -98,8 +98,8 @@ class ConfigEntryComponent(log.Loggable):
     def startFactory(self):
         return self.config.get('start-factory', True)
 
-class ConfigEntryGrid:
-    "I represent a <grid> entry in a planet config file"
+class ConfigEntryFlow:
+    "I represent a <flow> entry in a planet config file"
     def __init__(self):
         self.components = {}
 
@@ -139,7 +139,7 @@ class FlumotionConfigXML(log.Loggable):
     logCategory = 'config'
 
     def __init__(self, filename, string=None):
-        self.grids = []
+        self.flows = []
         self.manager = None
         self.atmosphere = None
 
@@ -167,8 +167,8 @@ class FlumotionConfigXML(log.Loggable):
         # <planet>
         #     <manager>
         #     <atmosphere>
-        #     <grid>
-        #     <grid>
+        #     <flow>
+        #     <flow>
         # </planet>
 
         root = self.doc.documentElement
@@ -182,9 +182,9 @@ class FlumotionConfigXML(log.Loggable):
             if node.nodeName == 'atmosphere':
                 entry = self.parseAtmosphere(node)
                 self.atmosphere = entry
-            elif node.nodeName == 'grid':
-                entry = self.parseGrid(node)
-                self.grids.append(entry)
+            elif node.nodeName == 'flow':
+                entry = self.parseFlow(node)
+                self.flows.append(entry)
             elif node.nodeName == 'manager':
                 entry = self.parseManager(node)
                 self.manager = entry
@@ -245,24 +245,24 @@ class FlumotionConfigXML(log.Loggable):
 
         return ConfigEntryComponent(name, type, config, defs, worker)
 
-    def parseGrid(self, node):
+    def parseFlow(self, node):
         # <component name="..." type="...">
         # </component>
         # <component name="..." type="...">
         # </component>
 
-        grid = ConfigEntryGrid()
+        flow = ConfigEntryFlow()
         for child in node.childNodes:
             if (child.nodeType == Node.TEXT_NODE or
                 child.nodeType == Node.COMMENT_NODE):
                 continue
             
             if child.nodeName != "component":
-                raise ConfigError("unexpected 'grid' node: %s" % child.nodeName)
+                raise ConfigError("unexpected 'flow' node: %s" % child.nodeName)
 
             component = self.parseComponent(child)
-            grid.components[component.name] = component
-        return grid
+            flow.components[component.name] = component
+        return flow
 
     def parseManager(self, node):
         # <component name="..." type="...">
