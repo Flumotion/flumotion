@@ -24,8 +24,8 @@ from flumotion.wizard import wizard
 class Welcome(wizard.WizardStep):
     step_name = 'Welcome'
     glade_file = 'wizard_welcome.glade'
-    section = 'Production'
-    section_name = 'Production'
+    section = 'Welcome'
+    section_name = 'Welcome'
     icon = 'wizard.png'
     def get_next(self):
         return 'Source'
@@ -84,7 +84,6 @@ wizard.register_step(Source)
 
 class VideoSource(wizard.WizardStep):
     section = 'Production'
-    component_name = 'video-source'
     icon = 'widget_doc.png'
 
     def get_next(self):
@@ -168,7 +167,6 @@ class Overlay(wizard.WizardStep):
     glade_file = 'wizard_overlay.glade'
     section = 'Production'
     component_type = 'overlay'
-    component_name = 'overlay'
     icon = 'overlay.png'
     
     def setup(self):
@@ -180,8 +178,19 @@ class Overlay(wizard.WizardStep):
         options = {}
         if self.checkbutton_show_logo:
             options['logo'] = True
+            
         if self.checkbutton_show_text:
             options['text'] = self.entry_text.get_text()
+
+        # XXX: Serious refactoring needed.
+        video_options = self.wizard.get_step_options('Source')
+        video_source = video_options['video']
+        video_step = self.wizard[video_source.step]
+        video_props = video_step.get_component_properties()
+        
+        options['width'] = video_props['width']
+        options['height'] = video_props['height']
+
         return options
 
     def get_next(self):
@@ -189,10 +198,7 @@ class Overlay(wizard.WizardStep):
             audio_source = self.wizard.get_step_option('Source', 'audio')            
             if audio_source == AudioDevice.Soundcard:
                 return 'Audio Source'
-            else:
-                return 'Consumption'
-        else:
-            return 'Encoding'
+        return 'Encoding'
 wizard.register_step(Overlay)
 
 
@@ -202,7 +208,6 @@ class AudioSource(wizard.WizardStep):
     step_name = 'Audio Source'
     glade_file = 'wizard_audiosource.glade'
     section = 'Production'
-    component_name = 'audio-source'
     component_type = 'osssrc'
     icon = 'audiosrc.png'
     
@@ -306,7 +311,6 @@ wizard.register_step(Encoding)
 
 class VideoEncoder(wizard.WizardStep):
     section = 'Conversion'
-    component_name = 'video-encoder'
 wizard.register_step(VideoEncoder)
 
 
@@ -379,7 +383,6 @@ wizard.register_step(JPEG)
 class AudioEncoder(wizard.WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
-    component_name = 'audio-encoder'
     
     def get_next(self):
         return 'Consumption'
@@ -423,6 +426,7 @@ class Consumption(wizard.WizardStep):
     step_name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
     section = 'Consumption'
+    section_name = 'Consumption'
     icon = 'consumption.png'
     
     def on_checkbutton_http_toggled(self, button):
@@ -544,14 +548,12 @@ class HTTP(wizard.WizardStep):
     
 class HTTPBoth(HTTP):
     step_name = 'HTTP Streamer (audio & video)'
-    component_name = 'http-streamer-audio+video'
     sidebar_name = 'HTTP audio/video'
 wizard.register_step(HTTPBoth)
     
                   
 class HTTPAudio(HTTP):
     step_name = 'HTTP Streamer (audio only)'
-    component_name = 'http-streamer-audio'
     sidebar_name = 'HTTP video'
 wizard.register_step(HTTPAudio)
 
@@ -559,7 +561,6 @@ wizard.register_step(HTTPAudio)
 
 class HTTPVideo(HTTP):
     step_name = 'HTTP Streamer (video only)'
-    component_name = 'http-streamer-video'
     sidebar_name = 'HTTP audio'
 wizard.register_step(HTTPVideo)
 
@@ -638,7 +639,9 @@ class Licence(wizard.WizardStep):
     glade_file = "wizard_license.glade"
     section = 'License'
     icon = 'licenses.png'
-    
+    def setup(self):
+        self.combobox_license.set_enum(LicenseType)
+        
     def on_checkbutton_set_license_toggled(self, button):
         self.combobox_license.set_sensitive(button.get_active())
         

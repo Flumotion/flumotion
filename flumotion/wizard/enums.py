@@ -117,7 +117,7 @@ TVCardSignal = EnumClass('TVCardSignal', ('Composite', 'RCA'))
 VideoTestPattern = EnumClass('VideoTestPattern',
                              ('Bars', 'Snow', 'Black'),
                              ('SMPTE Color bars',
-                              'Random (television snow',
+                              'Random (television snow)',
                               'Totaly black'))
 
 VideoTestFormat = EnumClass('VideoTestFormat', ('YUV', 'RGB'))
@@ -159,3 +159,6 @@ RotateTime = EnumClass('RotateTime',
 RotateSize = EnumClass('RotateSize',
                       ('kB', 'MB', 'GB', 'TB'))
  
+LicenseType = EnumClass('LicenseType',
+                        ('CC', 'Commercial'),
+                        ('Creative Commons', 'Commercial'))

@@ -40,7 +40,11 @@ class Component:
 
         if self.props:
             s += "      <!-- properties -->\n"
-            for name, value in self.props.items():
+            property_names = self.props.keys()
+            property_names.sort()
+            
+            for name in property_names:
+                value = self.props[name]
                 s += "      <%s>%s</%s>\n" % (name, value, name)
             
         s += "    </component>"
@@ -63,17 +67,21 @@ class WizardSaver:
                          video_step.get_component_properties())
 
     def getVideoOverlay(self):
+        # At this point we already know that we should overlay something
         step = self.wizard['Overlay']
-
-        # XXX: Serious refactoring needed.
-        video_options = self.wizard.get_step_options('Source')
-        video_source = video_options['video']
-        video_step = self.wizard[video_source.step]
-        video_props = video_step.get_component_properties()
-        
         properties = step.get_component_properties()
-        properties['width'] = video_props['width']
-        properties['height'] = video_props['height']
+        properties['fluendo_logo'] = True
+        encoding_options = self.wizard.get_step_options('Encoding')
+        if (encoding_options['format'] == EncodingFormat.Ogg or
+            encoding_options['video'] == EncodingVideo.Theora or
+            encoding_options['audio'] in (EncodingAudio.Vorbis,
+                                          EncodingAudio.Speex)):
+            properties['xiph_logo'] = True
+            
+        license_options = self.wizard.get_step_options('Content License')
+        if license_options['license'] == LicenseType.CC:
+            properties['cc_logo'] = True
+    
         return Component('video-overlay', 'overlay', properties)
         
     def getVideoEncoder(self):

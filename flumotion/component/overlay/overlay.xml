@@ -5,7 +5,9 @@
       <property name="feed" type="string" required="yes" multiple="yes"/>
       <property name="source" type="string" multiple="no"/>
       <property name="text" type="string"/>
-      <property name="logo" type="string"/>
+      <property name="fluendo_logo" type="bool"/>
+      <property name="cc_logo" type="bool"/>
+      <property name="xiph_logo" type="bool"/>
       <property name="width" type="int"/>
       <property name="height" type="int"/>
     </properties>

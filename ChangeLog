@@ -1,3 +1,27 @@
+2004-10-16  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_audio_encoder.glade:
+	* data/glade/wizard_consumption.glade:
+	* data/glade/wizard_encoding.glade:
+	* data/glade/wizard_overlay.glade:
+	* data/glade/wizard_theora.glade:
+	* data/image/wizard/firewire.png:
+	* data/image/wizard/webcam.png:
+	* flumotion/common/config.py:
+	* flumotion/component/overlay/Makefile.am:
+	* flumotion/component/overlay/genimg.py:
+	* flumotion/component/overlay/overlay.py:
+	* flumotion/component/overlay/overlay.xml:
+	* flumotion/test/test_config.py:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Some HIG fixes, Fix overlay component. Only show logos when we
+	should.
+	Make sidebar work somewhat better.
+	
 2004-10-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_common.py:

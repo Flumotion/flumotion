@@ -26,6 +26,7 @@ registry.registry.addFromString("""<components>
     <property name="two" type="int"/>
     <property name="three" type="float"/>
     <property name="four" type="xml"/>
+    <property name="five" type="bool"/>
   </properties>
 </component>
 </components>""")
@@ -149,6 +150,7 @@ class TestConfig(unittest.TestCase):
                <two>1</two>
                <three>2.5</three>
                <four attr="attr-value">value</four>
+               <five>True</five>
              </component></grid>
              </planet>""")
         grid = planet.grids[0]
@@ -161,4 +163,5 @@ class TestConfig(unittest.TestCase):
         assert custom
         assert getattr(custom, 'data', None) == 'value'
         assert getattr(custom, 'attr', None) == 'attr-value'
+        assert conf.get('five') == True
         

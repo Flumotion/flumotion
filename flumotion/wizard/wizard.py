@@ -188,7 +188,7 @@ class WidgetMapping:
 class WizardStep(object, log.Loggable):
     step_name = None # Subclass sets this
     glade_file = None # Subclass sets this
-
+    icon = 'placeholder.png'
     widget_prefixes = { WizardComboBox    : 'combobox',
                         WizardCheckButton : 'checkbutton',
                         WizardEntry       : 'entry',
@@ -296,6 +296,8 @@ class Wizard:
             setattr(self, widget.get_name(), widget)
         self.wtree.signal_autoconnect(self)
         self.eventbox1.modify_bg(gtk.STATE_NORMAL, self.sidebar_color)
+        self.window.set_icon_from_file(os.path.join(configure.imagedir,
+                                                    'fluendo.png'))
         
         self.steps = {}
         self.stack = Stack()
@@ -358,12 +360,8 @@ class Wizard:
         widget = step.get_main_widget()
         self.content_area.add(widget)
 
-        if hasattr(step, 'icon'):
-            icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
-            self.image_icon.set_from_file(icon_filename)
-            self.image_icon.show()
-        else:
-            self.image_icon.hide()
+        icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
+        self.image_icon.set_from_file(icon_filename)
             
         self.label_title.set_markup('<span size="large">' + escape(step.step_name) + '</span>')
 
@@ -451,23 +449,20 @@ class Wizard:
         self.vbox_sidebar.pack_start(hbox, False, False)
 
         def button_clicked_cb(button):
-            print 'go to', step
             self.set_step(step)
             
         if step:
             button.connect('clicked', button_clicked_cb)
 
-        if step == self.current_step:
-            size = 'large'
+        current = self.current_step
+        if current == step:
             button.set_sensitive(False)
-        else:
-            size = 'medium'
             
         if not active:
             markup = '<span color="#7a7a7a">%s</span>' % name
             button.set_sensitive(False)
         else:
-            markup = '<span size="%s" color="black">%s</span>' % (size, name)
+            markup = '<span color="black">%s</span>' % (name)
             button.set_property('can_focus', False)
             
         label.set_markup(markup)
@@ -483,6 +478,9 @@ class Wizard:
         items = [item for item in stack
                           if item.section == section]
         for item in items:
+            if hasattr(item, 'section_name'):
+                continue
+            
             label = getattr(item, 'sidebar_name', item.step_name)
             self._sidebar_add_step(item, label, True, 20)
 
@@ -491,12 +489,13 @@ class Wizard:
 
         self._sidebar_clean()
         
-        sidebar_steps = ('Production', 'Conversion',
+        sidebar_steps = ('Welcome',
+                         'Production', 'Conversion',
                          'Consumption', 'License')
         active = True
         for stepname in sidebar_steps:
             self._sidebar_add_step(None, stepname, active, 10)
-            
+
             if current == stepname:
                 self._sidebar_add_substeps(stepname)
                 self._sidebar_add_placeholder()

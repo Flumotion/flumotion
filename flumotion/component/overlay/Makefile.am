@@ -1,4 +1,4 @@
-component_PYTHON = __init__.py overlay.py
+component_PYTHON = __init__.py genimg.py overlay.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/overlay
 component_DATA = \
 	overlay.xml \
