@@ -1,5 +1,8 @@
 2005-02-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_parts.py (TestComponentsView.testSelected):
+	Connect to the right signal.
+
 	* flumotion/admin/gtk/parts.py (ComponentsView::has-selection):
 	Renamed from ::selected to indicate that we are fired when the
 	selection is None. Emitters adapted.
