@@ -1,0 +1,64 @@
+naming of objects in the network
+
+COMPONENTS and related objects
+
+- components start in a configuration
+- they have a unique name within the parent they're a part of
+  (a flow, the manager, or the atmosphere)
+- the vishnu loads this config and gives it to the workerHeaven
+- when a worker logs in, it is asked to start all components that that
+  worker could/should start
+- so it calls
+  flumotion.manager.worker.WorkerHeaven.workerStartComponent
+  with componentName and parentName
+  -> WorkerAvatar.start
+- serialized to
+  flumotion.worker.worker.WorkerMedium.remote_start
+- creates a deferred for the starting, and calls
+  kindergarten.play(name, parent, ...)
+- creates a Kid in the kindergarten and hashes it by /parent/name
+- also calls job.run(name, parent, ...)
+- this forks, and starts a JobClientFactory that logs in to worker with
+  /parent/name as avatarId
+- this creates a jobmedium for the worker brain to call on
+- workerbrain calls remote start (name, parent, ...)
+- JobMedium.remote_start(name, parent, ...) gets called
+- calls self._runComponent(name, parent, ...)
+- logs in to manager with keycard.avatarId set to the path
+- manager creates a ComponentAvatar
+- ComponentAvatar.attached() gets called, which calls self._getState()
+- this state contains component name and parent name
+
+COMPONENTS IN MANAGER
+----------
+- manager has three objects related to components
+  - ManagerComponentState (created first)
+  - ComponentAvatar (with an avatarId)
+  - ManagerJobState (received when a component starts)
+
+- Vishnu.loadConfiguration:
+  - parses a config
+  - creates ManagerComponentState objects and puts them in the PlanetState
+  - triggers start of components that aren't started yet and have a worker
+    logged in to start on
+
+- WorkerHeaven.workerAttached (rename to registerWorker ?)
+  - called when a worker logs in
+  - triggers start of components, just like loadConfiguration
+
+- Vishnu starting a component on a worker:
+  - finds WorkerAvatar to start it on
+  - makes up an avatarId for the component to use eventually
+  - vishnu stores avatarId -> state mapping
+  - calls avatar.start(...), which does a remote call
+  - deferred will return when the component has finally started up completely
+
+- ComponentHeaven.componentAttached 
+  - called when a component logs in, knows avatarId
+  - inform vishnu so it can store ComponentAvatar -> avatarId -> state
+  - calls a getState to get the JobState
+  - which eventually gets the ManagerJobState
+  - inform vishnu so it can map
+     ManagerJobState <-> ComponentAvatar
+    and attach MJS to MCS (addListener)
+

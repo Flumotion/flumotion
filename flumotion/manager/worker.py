@@ -90,10 +90,13 @@ class WorkerHeaven(base.ManagerHeaven):
         
     ### my methods
     def workerAttached(self, workerAvatar):
-        # called when the mind is attached, ie the worker logged in
+        # called when the mind of a worker is attached, ie the worker logged in
         workerName = workerAvatar.getName()
+        # FIXME: what if it was already there ?
         if not workerName in self.state.get('names'):
             self.state.append('names', workerName)
+
+        # self.vishnu.workerAttached(workerAvatar)
 
     def workerDetached(self, workerAvatar):
         workerName = workerAvatar.getName()

@@ -1,0 +1,7 @@
+some invariants in the system
+-----------------------------
+
+- job processes use a /(parent)/(componentName) avatarId
+- no flow can be named "atmosphere" because of this
+- or "manager", because of bouncers in the manager section
+
