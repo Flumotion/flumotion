@@ -34,13 +34,8 @@ from flumotion.common import log, errors
 class ConfigError(Exception):
     "Error during parsing of configuration"
 
-class ConfigEntryAtmosphere:
-    "I represent a <atmosphere> entry in a planet config file"
-    def __init__(self):
-        self.components = {}
-
 class ConfigEntryComponent(log.Loggable):
-    "I represent a <component> entry in a registry file"
+    "I represent a <component> entry in a planet config file"
     nice = 0
     logCategory = 'config'
     def __init__(self, name, type, config, defs, worker):
@@ -77,32 +72,11 @@ class ConfigEntryManager:
         self.bouncer = bouncer
         self.fludebug = fludebug
 
-class ConfigEntryWorker:
-    "I represent a <worker> entry in a registry file"
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
+class ConfigEntryAtmosphere:
+    "I represent a <atmosphere> entry in a planet config file"
+    def __init__(self):
+        self.components = {}
 
-    def getUsername(self):
-        return self.username
-    
-    def getPassword(self):
-        return self.password
-
-class ConfigEntryWorkers:
-    "I represent a <workers> entry in a registry file"
-    def __init__(self, workers, policy):
-        self.workers = workers
-        self.policy = policy
-
-    def __iter__(self):
-        return iter(self.workers)
-    
-    def __len__(self):
-        return len(self.workers)
-    
-    def getPolicy(self):
-        return self.policy
 
 # FIXME: rename
 class FlumotionConfigXML(log.Loggable):
@@ -284,43 +258,6 @@ class FlumotionConfigXML(log.Loggable):
             # FIXME: assert that it is a bouncer !
 
         return ConfigEntryManager(name, host, port, transport, bouncer, fludebug)
-     
-    def DEPRECATED_parse_workers(self, node):
-        # <workers policy="password/anonymous">
-        #     <worker name="..." password=""/>
-        # </workers>
-
-        if not node.hasAttribute('policy'):
-            raise ConfigError("<workers> must have a policy attribute")
-
-        policy = str(node.getAttribute('policy'))
-
-        if policy not in ('password', 'anonymous'):
-            raise ConfigError("policy for <workers> must be password or anonymous")
-            
-        
-        workers = []
-        for child in node.childNodes:
-            if (child.nodeType == Node.TEXT_NODE or
-                child.nodeType == Node.COMMENT_NODE):
-                continue
-            
-            if child.nodeName != "worker":
-                raise ConfigError, "unexpected node: %r" % child
-        
-            if not child.hasAttribute('username'):
-                raise ConfigError, "<worker> must have a username attribute"
-
-            if not child.hasAttribute('password'):
-                raise ConfigError, "<worker> must have a password attribute"
-
-            username = str(child.getAttribute('username'))
-            password = str(child.getAttribute('password'))
-
-            worker = ConfigEntryWorker(username, password)
-            workers.append(worker)
-
-        return ConfigEntryWorkers(workers, policy)
 
     def get_float_value(self, nodes):
         return [float(subnode.childNodes[0].data) for subnode in nodes]

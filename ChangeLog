@@ -1,5 +1,10 @@
 2005-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/config.py:
+	  remove unused code
+
+2005-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/manager/component.py:
