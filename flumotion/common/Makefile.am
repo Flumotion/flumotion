@@ -10,7 +10,8 @@ flumotion_PYTHON = \
 	interfaces.py \
 	keycards.py \
 	launcher.py \
-	registry.py
+	registry.py \
+	setup.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 
