@@ -26,9 +26,12 @@ import os
 import gtk
 import gtk.glade
 
-from flumotion.common import errors
+from flumotion.common import errors, log
 
-class BaseAdminGtk:
+class BaseAdminGtk(log.Loggable):
+
+    logCategory = "admingtk"
+    
     def __init__(self, name, admin, view):
         self.name = name
         self.admin = admin
@@ -36,17 +39,24 @@ class BaseAdminGtk:
         
     def propertyErrback(self, failure, window):
         failure.trap(errors.PropertyError)
-        window.error_dialog("%s." % failure.getErrorMessage())
+        self.warning("%s." % failure.getErrorMessage())
+        #window.error_dialog("%s." % failure.getErrorMessage())
         return None
 
-    def setElementProperty(self, element, property, value):
-        cb = self.admin.setProperty(self.name, element, property, value)
-        cb.addErrback(self.propertyErrback, self)
+    def setElementProperty(self, elementName, propertyName, value):
+        d = self.admin.setProperty(self.name, elementName, propertyName, value)
+        d.addErrback(self.propertyErrback, self)
+        return d
     
-    def getElementProperty(self, func, element, property):
-        cb = self.admin.getProperty(self.name, element, property)
-        cb.addCallback(func)
-        cb.addErrback(self.propertyErrback, self)
+    def getElementProperty(self, elementName, propertyName):
+        """
+        Get the value given property of the element with the given name.
+        
+        Returns: L{twisted.internet.defer.Deferred} returning the value.
+        """
+        d = self.admin.getProperty(self.name, elementName, propertyName)
+        d.addErrback(self.propertyErrback, self)
+        return d
 
     def callRemote(self, method_name, *args, **kwargs):
         return self.admin.callComponentRemote(self.name, method_name,

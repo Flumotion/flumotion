@@ -69,10 +69,12 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         Tell the component to link itself to other components.
 
-        @type eatersData: list of (feedername, host, port) tuples of elements feeding our eaters.
-        @type feedersData: list of (name, host) tuples of our feeding elements.
+        @type eatersData: list of (feedername, host, port) tuples of elements
+                          feeding our eaters.
+        @type feedersData: list of (name, host) tuples of our feeding elements
 
-        @returns: list of (feedName, host, port)-tuples of feeds the component produces.
+        @returns: list of (feedName, host, port)-tuples of feeds the component
+                  produces.
         """
     def remote_link(self, eatersData, feedersData):
         self.debug('remote_link with eaters data %s and feeders data %s' % (eatersData, feedersData))
@@ -80,11 +82,11 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.debug('remote_link: returning value %s' % ret)
         return ret
 
-    def remote_getElementProperty(self, element_name, property):
-        return self.comp.get_element_property(element_name, property)
+    def remote_getElementProperty(self, elementName, property):
+        return self.comp.get_element_property(elementName, property)
         
-    def remote_setElementProperty(self, element_name, property, value):
-        self.comp.set_element_property(element_name, property, value)
+    def remote_setElementProperty(self, elementName, property, value):
+        self.comp.set_element_property(elementName, property, value)
 
     def remote_play(self):
         self.comp.play()
@@ -402,11 +404,16 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning(msg)
             raise errors.PropertyError(msg)
 
+        # param enums and enums need to be returned by integer value
+        if isinstance(value, gobject.GEnum):
+            value = int(value)
+
         return value
 
     def set_element_property(self, element_name, property, value):
         'Sets a property on an element in the GStreamer pipeline.'
-        self.debug("%s: setting property %s of element %s to %s" % (self.get_name(), property, element_name, value))
+        self.debug("%s: setting property %s of element %s to %s" % (
+            self.get_name(), property, element_name, value))
         element = self.get_element(element_name)
         if not element:
             msg = "Element '%s' does not exist" % element_name

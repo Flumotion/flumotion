@@ -1,7 +1,16 @@
 <registry>
   <components>
-    <component type="videotest">
+    <component type="videotest"
+               base="flumotion/component/producers/videotest">
       <source location="flumotion.component.producers.videotest.videotest"/>
+
+      <entries>
+        <entry type="component" location="videotest.py"
+               function="createComponent"/>
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass"/>
+      </entries>
+
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="height" type="int"/>
@@ -12,4 +21,19 @@
       </properties>
     </component>
   </components>
+
+  <bundles>
+    <bundle name="videotest-admin-gtk">
+      <dependencies>
+        <dependency name="base-admin-gtk" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/producers/videotest">
+          <filename location="admin_gtk.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+
 </registry> 

@@ -34,6 +34,7 @@ from flumotion.configure import configure
 from flumotion.common import log, errors
 from flumotion.utils.gstutils import gsignal
 from flumotion.wizard import enums, save
+from flumotion.ui import fgtk
 
 def escape(text):
     return text.replace('&', '&amp;')
@@ -42,190 +43,18 @@ class Stack(list):
     push = list.append
     def peek(self):
         return self[-1]
-
-class WizardComboBox(gtk.ComboBox):
-    COLUMN_NICK = 0
-    COLUMN_NAME = 1
-    COLUMN_VALUE = 2
-
-    _column_types = str, str, int
     
-    def __len__(self):
-        model = self.get_model()
-        iter = model.get_iter((0,))
-        return model.iter_n_children(iter)
-
-    def get_column_content(self, column):
-        iter = self.get_active_iter()
-        if iter:
-            model = self.get_model()
-            return model.get(iter, column)[0]
-        
-    def get_text(self):
-        return self.get_column_content(self.COLUMN_NICK)
-    
-    def get_string(self):
-        return self.get_column_content(self.COLUMN_NAME)
-
-    def get_value(self):
-        return self.get_column_content(self.COLUMN_VALUE)
-
-    def get_enum(self):
-        # FIXME: EVIL, this should not return an integer as a fallback,
-        # because you can't call enum methods on it then
-        if hasattr(self, 'enum_class'):
-            return self.enum_class.get(self.get_value())
-        else:
-            return self.get_value()
-    
-    def set_enum(self, enum_class, value_filter=()):
-        """
-        Set the given enum_class on the combobox.
-        This also sets the combobox to the first enum value.
-        """
-        model = self.get_model()
-        model.clear()
-        for enum in enum_class:
-            # If values are specified, filter them out
-            if value_filter and not enum in value_filter:
-                continue
-            iter = model.append()
-            model.set(iter,
-                      self.COLUMN_NAME, enum.name,
-                      self.COLUMN_VALUE, enum.value,
-                      self.COLUMN_NICK, enum.nick)
-
-        self.set_active(0)
-        self.enum_class = enum_class
-
-    def set_list(self, list):
-        if hasattr(self, 'enum_class'):
-            delattr(self, 'enum_class')
-            
-        model = self.get_model()
-        model.clear()
-        for value in list:
-            iter = model.append()
-            model.set(iter, 0, value, 1, value)
-        self.set_active(0)
-
-    def clear(self):
-        model = self.get_model()
-        model.clear()
-
-    def set_multi_active(self, *values): 
-        if not hasattr(self, 'enum_class'):
-            raise TypeError
-        
-        self.set_enum(self.enum_class, values)
-
-    def set_active(self, item):
-        """Small wrapper around set_active() to support enums"""
-        if isinstance(item, enums.Enum):
-            gtk.ComboBox.set_active(self, item.value)
-        else:
-            gtk.ComboBox.set_active(self, item)
-            
-    def get_active(self):
-        """Small wrapper around get_active() to support enums"""
-        value = gtk.ComboBox.get_active(self)
-        if hasattr(self, 'enum_class'):
-            value = self.enum_class.get(value)
-        return value
-
-    def setup(self):
-        "This copies the values from an old model to a new"
-        old_model = self.get_model()
-        if not old_model:
-            step = self.get_data('wizard-step')
-            raise AssertionError("Please set a default value in %s for %r" % (
-                step, self.get_name()))
-        
-        model = gtk.ListStore(*self._column_types)
-        value = 0
-        for item in old_model:
-            # Get the value from the first column
-            name = old_model.get(item.iter, 0)[0]
-            iter = model.append()
-            model.set(iter,
-                      self.COLUMN_NAME, name,
-                      self.COLUMN_NICK, name,
-                      self.COLUMN_VALUE, value)
-            value += 1
-                
-        self.set_model(model)
-
-    def get_state(self):
-        return self.get_enum()
-gobject.type_register(WizardComboBox)
-
-
-
-class WizardEntry(gtk.Entry):
-    def get_state(self):
-        return self.get_text()
-gobject.type_register(WizardEntry)
-
-
-    
-class WizardCheckButton(gtk.CheckButton):
-    def get_state(self):
-        return self.get_active()
-    
-    def __nonzero__(self):
-        return self.get_active()
-gobject.type_register(WizardCheckButton)
-
-
-
-class WizardRadioButton(gtk.RadioButton):
-    def get_state(self):
-        return self.get_active()
-
-    def __nonzero__(self):
-        return self.get_active()
-gobject.type_register(WizardRadioButton)
-
-
-
-class WizardSpinButton(gtk.SpinButton):
-    def get_state(self):
-        return self.get_value()
-gobject.type_register(WizardSpinButton)
-
-
-
-class WidgetMapping:
-    # In PyGTK 2.4.0 gtk.glade.XML type_dict parameter is buggy
-    # If it can't find the name it raises a silent KeyError which
-    # will be raised at random point later (as soon some code call
-    # PyErr_Occurred()), to avoid this, we reimplement the function
-    # as it is internally, eg failback to the real GType, by doing
-    # this PyMapping_GetItemString will never set the error.
-    
-    types = dict(GtkCheckButton=WizardCheckButton,
-                 GtkComboBox=WizardComboBox,
-                 GtkEntry=WizardEntry,
-                 GtkRadioButton=WizardRadioButton,
-                 GtkSpinButton=WizardSpinButton)
-    
-    def __getitem__(self, name):
-        if self.types.has_key(name):
-            return self.types[name]
-        else:
-            return gobject.type_from_name(name)
-        
 
 class WizardStep(object, log.Loggable):
     step_name = None # Subclass sets this
     glade_file = None # Subclass sets this
     icon = 'placeholder.png'
     has_worker = True
-    widget_prefixes = { WizardComboBox    : 'combobox',
-                        WizardCheckButton : 'checkbutton',
-                        WizardEntry       : 'entry',
-                        WizardSpinButton  : 'spinbutton',
-                        WizardRadioButton : 'radiobutton' }
+    widget_prefixes = { fgtk.FComboBox    : 'combobox',
+                        fgtk.FCheckButton : 'checkbutton',
+                        fgtk.FEntry       : 'entry',
+                        fgtk.FSpinButton  : 'spinbutton',
+                        fgtk.FRadioButton : 'radiobutton' }
 
     def __init__(self, wizard):
         self.wizard = wizard
@@ -241,7 +70,7 @@ class WizardStep(object, log.Loggable):
         glade_filename = os.path.join(configure.gladedir, self.glade_file)
         
         self.wtree = gtk.glade.XML(glade_filename,
-                                   typedict=WidgetMapping())
+                                   typedict=fgtk.WidgetMapping())
         
         windows = []
         self.widgets = self.wtree.get_widget_prefix('')
@@ -256,10 +85,6 @@ class WizardStep(object, log.Loggable):
                 windows.append(widget)
                 continue
             
-            if isinstance(widget, WizardComboBox):
-                widget.setup()
-                widget.set_active(0)
-                    
             name = widget.get_name()
             if hasattr(self, name):
                 raise AssertionError("There is already an attribute called %s in %r" % (name, self))

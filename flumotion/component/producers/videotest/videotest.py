@@ -31,6 +31,8 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
                                                     ['default'],
                                                     pipeline)
 
+# FIXME: connect to notify on pattern so we can send information to manager
+
 def setProp(struct, dict, name):
     if dict.has_key(name):
         struct[name] = dict[name]

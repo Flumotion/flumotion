@@ -1,19 +1,10 @@
 include $(top_srcdir)/python.mk
                                                                                 
-flumotiondir = $(libdir)/flumotion/python/flumotion/common
+flumotiondir = $(libdir)/flumotion/python/flumotion/ui
 
 flumotion_PYTHON = \
 	__init__.py \
-	bundle.py \
-	common.py \
-	config.py \
-	enum.py \
-	errors.py \
-	interfaces.py \
-	log.py \
-	keycards.py \
-	registry.py \
-	setup.py
+	fgtk.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 

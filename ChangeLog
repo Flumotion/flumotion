@@ -1,5 +1,36 @@
 2004-12-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/Makefile.am:
+	* flumotion/common/enum.py:
+	  Split up enum code out of wizard stuff
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/__init__.py:
+	* flumotion/ui/fgtk.py:
+	  Create a ui directory holding code and widgets shared among
+	  wizard and admin
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/wizard.py:
+	  use fgtk and enum
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/component/producers/videotest/videotest.xml:
+	  create a first UI for videotest allowing you to change the
+	  pattern from the admin interface.
+
+2004-12-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	* bin/flumotion-admin.in:
+	* flumotion/wizard/steps.py:
+	* flumotion/admin/gtk/client.py:
+	  debugging and various updates
+	* flumotion/manager/admin.py:
+	  also load componentHeaven with wizard-created config
+
+2004-12-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/utils/gstutils.py:
 	  add evil hack so we can set GParamEnum values.  Needs to be fixed !
 	  Issue #119.
