@@ -1,3 +1,19 @@
+2005-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  doc fixes
+	* flumotion/manager/component.py:
+	  make one feederset per flow and handle them correctly
+	  clear up avatarId - getName() confusion
+	* flumotion/manager/manager.py:
+	  use path for avatarId of components now
+	  add Vishnu.componentDetached and make everything symmetrical
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_worker_worker.py:
+	  various fixes
+
 2005-02-03  Andy Wingo  <wingo@pobox.com>
 
 	* data/glade/Makefile.am:

@@ -36,7 +36,7 @@ from twisted.spread import pb
 import twisted.cred.error
 import twisted.internet.error
 
-from flumotion.common import errors, interfaces, log, bundleclient
+from flumotion.common import errors, interfaces, log, bundleclient, common
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
 from flumotion.worker import job
@@ -215,8 +215,6 @@ class Kid:
     def getPid(self):
         return self.pid
 
-
-    
 class Kindergarten(log.Loggable):
     """
     I spawn job processes.
@@ -232,7 +230,7 @@ class Kindergarten(log.Loggable):
         """
         dirname = os.path.split(os.path.abspath(sys.argv[0]))[0]
         self.program = os.path.join(dirname, 'flumotion-worker')
-        self.kids = {}
+        self.kids = {} # avatarId -> Kid
         self.options = options
         
     def play(self, avatarId, type, config):
@@ -268,11 +266,11 @@ class Kindergarten(log.Loggable):
         @returns: whether or not a kid with that pid was removed
         @rtype: boolean
         """
-        for name, kid in self.kids.items():
+        for path, kid in self.kids.items():
             if kid.getPid() == pid:
                 self.debug('Removing kid with name %s and pid %d' % (
-                    name, pid))
-                del self.kids[name]
+                    path, pid))
+                del self.kids[path]
                 return True
 
         self.warning('Asked to remove kid with pid %d but not found' % pid)
@@ -479,6 +477,7 @@ class JobDispatcher:
     # flumotion-worker job processes log in to us.
     # The mind is a RemoteReference which allows the brain to call back into
     # the job.
+    # the avatar id is of the form /(parent)/(name) 
     def requestAvatar(self, avatarId, mind, *interfaces):
         if pb.IPerspective in interfaces:
             avatar = self.root.createAvatar(avatarId)

@@ -252,16 +252,17 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     """
     logCategory = "job"
 
-    def __init__(self, name, options):
+    def __init__(self, id, options):
         """
         @param options: the command-line options the worker was started with
+        @type  id:      string
         """
         pb.PBClientFactory.__init__(self)
         
         # we pass the options to the medium
         self.medium = JobMedium(options)
-        self.logName = name
-        self.login(name)
+        self.logName = id
+        self.login(id)
             
     ### pb.PBClientFactory methods
     def login(self, username):

@@ -168,7 +168,6 @@ class Vishnu(log.Loggable):
         self._componentMappers = {} # any object -> ComponentMapper
 
         self.state = planet.ManagerPlanetState()
-        # FIXME: name
         self.state.set('name', name)
 
         # create a portal so that I can be connected to, through our dispatcher
@@ -255,10 +254,8 @@ class Vishnu(log.Loggable):
                         comp.set('config', c.getConfigDict())
                         flow.append('components', comp)
 
-                        # FIXME: when we use full paths for avatarId
-                        #parentName = flow.get('name')
-                        #avatarId = common.componentPath(c.name, parentName)
-                        avatarId = c.name
+                        parentName = flow.get('name')
+                        avatarId = common.componentPath(c.name, parentName)
 
                         # add to mapper
                         m = ComponentMapper()
@@ -372,7 +369,7 @@ class Vishnu(log.Loggable):
             parentName = c.get('parent').get('name')
             type = c.get('type')
             config = c.get('config')
-            self.debug('workerAttached(): scheduling start of /%s/%s on %s' % (
+            self.debug('_workerStartComponents(): scheduling start of /%s/%s on %s' % (
                 parentName, componentName, workerAvatar.avatarId))
             
             # FIXME: put in parent when we use it everywhere
@@ -417,6 +414,7 @@ class Vishnu(log.Loggable):
         self.debug('vishnu.workerDetached(): id %s' % workerId)
 
     def componentAttached(self, componentAvatar):
+        # called when a component logs in and gets a component avatar created
         id = componentAvatar.avatarId
         if not id in self._componentMappers.keys():
             self.warning('id %s not found' % id)
@@ -425,9 +423,18 @@ class Vishnu(log.Loggable):
         m.avatar = componentAvatar
         self._componentMappers[componentAvatar] = m
 
+        # attach componentstate to avatar
+        componentAvatar.componentState = m.state
+
+    def componentDetached(self, componentAvatar):
+        # called when the component has detached
+
+        # detach componentstate fom avatar
+        componentAvatar.componentState = None
+        
     def registerComponent(self, componentAvatar):
         # called when the jobstate is retrieved
-        self.debug('registering component %r' % componentAvatar)
+        self.debug('vishnu registering component %r' % componentAvatar)
 
         #if not componentAvatar in self._componentMappers.keys():
         #    self.warning('avatar %r not found' % componentAvatar)
@@ -442,11 +449,10 @@ class Vishnu(log.Loggable):
         # attach jobState to state
         m.state.setJobState(jobState)
 
-        # attach componentstate to avatar
-        componentAvatar.componentState = m.state
+        self.debug('vishnu registered component %r' % componentAvatar)
         
     def unregisterComponent(self, componentAvatar):
-        # called when the component has logged out
+        # called when the component is logging out
         # clear up jobState and avatar
         self.debug('unregisterComponent(%r): cleaning up state' %
             componentAvatar)
@@ -462,9 +468,6 @@ class Vishnu(log.Loggable):
         m.state.set('workerName', None)
         m.state.set('message', 'Component "%s" logged out' %
             m.state.get('name'))
-
-        # detach componentstate from avatar
-        componentAvatar.componentState = None
 
         # unmap avatar
         del self._componentMappers[m.avatar]

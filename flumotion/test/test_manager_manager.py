@@ -30,14 +30,17 @@ from twisted.internet import reactor, defer
 from flumotion.common.planet import moods
 
 from flumotion.manager import component, manager
-from flumotion.common import log, planet, interfaces
+from flumotion.common import log, planet, interfaces, common
 from flumotion.common import setup
 
 class FakeComponentAvatar(log.Loggable):
     ### since we fake out componentavatar, eaters need to be specified fully
     ### for the tests, ie sourceComponentName:feedName
-    def __init__(self, name='fake', eaters=[], port=-1, listen_host='127.0.0.1'):
+    def __init__(self, name='fake', parent='eve', eaters=[], port=-1,
+                 listen_host='127.0.0.1'):
         self.name = name
+        self.parent = parent
+        self.avatarId = common.componentPath(name, parent)
         self.eaters = eaters
         self.port = port
         self.listen_host = listen_host
@@ -59,6 +62,9 @@ class FakeComponentAvatar(log.Loggable):
     
     def getName(self):
         return self.name
+
+    def getParentName(self):
+        return self.parent
 
     def cleanup(self):
         pass
@@ -141,7 +147,7 @@ class TestComponentHeaven(unittest.TestCase):
 
     def testCreateAvatar(self):
         p = self.heaven.createAvatar('foo-bar-baz')
-        assert isinstance(p, component.ComponentAvatar)
+        self.failUnless(isinstance(p, component.ComponentAvatar))
 
         #self.assertRaises(AssertionError,
         #                  self.heaven.createAvatar, 'does-not-exist')
@@ -152,51 +158,55 @@ class TestComponentHeaven(unittest.TestCase):
     def testComponentIsLocal(self):
         a = FakeComponentAvatar()
         self.heaven.avatars['test'] = a
-        assert self.heaven._componentIsLocal(a)
+        self.failUnless(self.heaven._componentIsLocal(a))
+
         
     def testGetComponent(self):
         a = self.heaven.createAvatar('prod')
-        assert self.heaven.getComponent('prod') == a
+        self.assertEqual(self.heaven.getAvatar('prod'), a)
         a.cleanup()
 
     def testHasComponent(self):
         a = self.heaven.createAvatar('prod')
-        assert self.heaven.hasComponent('prod')
+        self.failUnless(self.heaven.hasAvatar('prod'))
+
         self.heaven.removeComponent(a)
-        assert not self.heaven.hasComponent('prod')
+        self.failIf(self.heaven.hasAvatar('prod'))
         self.assertRaises(KeyError, self.heaven.removeComponent, a)
+
         a.cleanup()
-        
+
     def testRemoveComponent(self):
-        assert not self.heaven.hasComponent('fake')
+        self.failIf(self.heaven.hasAvatar('fake'))
+
         a = FakeComponentAvatar('fake')
         self.assertRaises(KeyError, self.heaven.removeComponent, a)
-        self.heaven.avatars['fake'] = a
-        assert self.heaven.hasComponent('fake')
+        self.failIf(self.heaven.hasAvatar(a.avatarId))
+
+        self.heaven.avatars[a.avatarId] = a
+        self.failUnless(self.heaven.hasAvatar(a.avatarId))
+
         self.heaven.removeComponent(a)
-        assert not self.heaven.hasComponent('fake')
+        self.failIf(self.heaven.hasAvatar(a.avatarId))
         self.assertRaises(KeyError, self.heaven.removeComponent, a)
 
     def testComponentEatersEmpty(self):
         a = FakeComponentAvatar('fake')
-        self.heaven.avatars['fake'] = a
-        assert self.heaven._getComponentEatersData(a) == []
+        self.heaven.avatars[a.avatarId] = a
+        self.assertEquals(self.heaven._getComponentEatersData(a), [])
         
     def testComponentsEaters(self):
-        a = FakeComponentAvatar('foo', ['bar:default', 'baz:default'])
-        self.heaven.avatars['foo'] = a
-        a2 = FakeComponentAvatar('bar', port=1000, listen_host='bar-host')
-        self.heaven.avatars['bar'] = a2
-        a3 = FakeComponentAvatar('baz', port=1001, listen_host='baz-host')
-        self.heaven.avatars['baz'] = a3
+        a = FakeComponentAvatar(name='foo',
+            eaters=['bar:default', 'baz:default'])
+        self.heaven.avatars[a.avatarId] = a
+        a2 = FakeComponentAvatar(name='bar', port=1000, listen_host='bar-host')
+        self.heaven.avatars[a2.avatarId] = a2
+        a3 = FakeComponentAvatar(name='baz', port=1001, listen_host='baz-host')
+        self.heaven.avatars[a2.avatarId] = a3
 
-        self.heaven._feederSet.addFeeders(a2)
-        self.heaven._feederSet.addFeeders(a3)
-        
-        eaters = self.heaven._getComponentEatersData(a)
-        assert len(eaters) == 2
-        assert ('bar:default', 'bar-host', 1000) in eaters
-        assert ('baz:default', 'baz-host', 1001) in eaters        
+        set = self.heaven._getFeederSet(a)
+        set.addFeeders(a2)
+        set.addFeeders(a3)
 
 class FakeTransport:
     def getPeer(self):
@@ -213,15 +223,20 @@ class FakeMind(log.Loggable):
         self.testcase = testcase
 
     def callRemote(self, name, *args, **kwargs):
+        self.debug('callRemote(%s, %r, %r)' % (name, args, kwargs))
         #print "callRemote(%s, %r, %r)" % (name, args, kwargs)
         method = "remote_" + name
         if hasattr(self, method):
             m = getattr(self, method)
             try:
                 result = m(*args, **kwargs)
+                self.debug('callRemote(%s) succeeded with %r' % (
+                    name, result))
                 return defer.succeed(result)
-            except:
-                return defer.fail()
+            except Exception, e:
+                self.warning('callRemote(%s) failed with %s: %s' % (
+                    name, str(e.__class__), ", ".join(e.args)))
+                return defer.fail(e)
         else:
             raise AttributeError('no method %s on self %r' % (name, self))
 
@@ -234,7 +249,7 @@ class FakeWorkerMind(FakeMind):
         self.avatarId = avatarId
 
     def remote_start(self, avatarId, type, config):
-        self.debug('remote_start(%s)' % avatarId)
+        self.debug('remote_start(%s): logging in component' % avatarId)
         avatar = self.testcase._loginComponent(self.avatarId,
             avatarId, type, config)
         # need to return the avatarId for comparison
@@ -247,6 +262,7 @@ class FakeComponentMind(FakeMind):
     def __init__(self, testcase, workerName, avatarId, type, config):
         FakeMind.__init__(self, testcase)
 
+        self.info('Creating component mind for %s' % avatarId)
         state = planet.ManagerJobState()
         state._dict = {
             'type': type, 'pid': 1, 'mood': moods.waking.value,
@@ -267,7 +283,10 @@ class FakeComponentMind(FakeMind):
         # need to return a list of (feedName, host, port) tuples
         return []
     
-class TestVishnu(unittest.TestCase):
+class TestVishnu(unittest.TestCase, log.Loggable):
+
+    logCategory = "TestVishnu"
+
     def setUp(self):
         # load registry
         from flumotion.common.registry import registry
@@ -456,12 +475,15 @@ class TestVishnu(unittest.TestCase):
         self.assertEqual(len(mappers.keys()), 0)
 
     def _verifyConfigAndOneWorker(self):
+        self.debug('verifying after having loaded config and started worker')
         mappers = self.vishnu._componentMappers
 
         # verify component mapper
         # all components should have gotten started, and logged in
         self.failUnlessEqual(len(self._components), 2)
-        self.assertEqual(len(mappers.keys()), 10)
+        self.assertEqual(len(mappers.keys()), 10,
+            "keys: %r of length %d != 10" % (
+                mappers.keys(), len(mappers.keys())))
 
         self.failUnless('producer-video-test' in self._components.keys())
         self.failUnless('converter-ogg-theora' in self._components.keys())
@@ -484,7 +506,8 @@ class TestVishnu(unittest.TestCase):
         self.failUnless(m.jobState)
 
         state = m.state
-        self.assertEqual(state.get('mood'), moods.happy.value)
+        self.assertEqual(state.get('mood'), moods.happy.value,
+            "mood of %s is not happy" % state.get('name'))
  
         # verify the component avatars
         self.failUnless(avatar.jobState)

@@ -43,7 +43,7 @@ class TestKindergarten(unittest.TestCase):
 
     def testRemoveKidByPid(self):
         k = worker.Kindergarten({})
-        k.kids['johan'] = worker.Kid(1, "johan", "http", {})
+        k.kids['/swede/johan'] = worker.Kid(1, "/swede/johan", "http", {})
 
         self.assertEquals(k.removeKidByPid(2), False)
 

@@ -99,7 +99,10 @@ class Feeder:
 
         Set the feeder to ready, triggering dependency functions.
         """
-        assert self._ready != readiness
+        if self._ready == readiness:
+            self.component.warning('readiness already is %r !' % readiness)
+            raise
+
         assert self.component
 
         self.component.debug('Feeder.setReadiness(%r) on feeder %s' % (
@@ -139,13 +142,18 @@ class Feeder:
     
 class FeederSet(log.Loggable):
     """
-    I represent a collection of L{Feeder}s.
+    I represent a collection of L{Feeder}s within a flow.
     I know when a feeder is ready and I handle dependencies between feeders.
     """
 
     logCategory = 'feederset'
 
-    def __init__(self):
+    def __init__(self, flow):
+        """
+        @type  flow: string
+        """
+        self.flow = flow
+        self.logName = flow
         self.feeders = {} # feederName -> Feeder
 
     def __getitem__(self, key):
@@ -274,7 +282,7 @@ class ComponentAvatar(base.ManagerAvatar):
         else:
             mood = '(unknown)'
         return '<%s %s in mood %s>' % (self.__class__.__name__,
-                                        self.getName(), mood)
+                                        self.avatarId, mood)
 
     ### ComponentAvatar methods
     def cleanup(self):
@@ -370,6 +378,7 @@ class ComponentAvatar(base.ManagerAvatar):
             reactor.callLater(1, self._getState)
             return None
             
+        assert isinstance(state, planet.ManagerJobState)
         self.debug('received state: %r' % state)
         self.jobState = state
         # make the component avatar a listener to state changes
@@ -387,6 +396,8 @@ class ComponentAvatar(base.ManagerAvatar):
         self.heaven.unregisterComponent(self)
 
         self.info('component "%s" logged out' % self.avatarId)
+
+        self.vishnu.componentDetached(self)
         base.ManagerAvatar.detached(self, mind)
 
         self.cleanup() # callback and state done at end
@@ -447,7 +458,10 @@ class ComponentAvatar(base.ManagerAvatar):
         return self.jobState.get('pid')
 
     def getName(self):
-        return self.avatarId
+        return self.componentState.get('name')
+
+    def getParentName(self):
+        return self.componentState.get('parent').get('name')
 
     def getType(self):
         return self.componentState.get('type')
@@ -499,15 +513,15 @@ class ComponentAvatar(base.ManagerAvatar):
         @param value: the value to set the property to
         """
         if not element:
-            msg = "%s: no element specified" % self.getName()
+            msg = "%s: no element specified" % self.avatarId
             self.warning(msg)
             raise errors.PropertyError(msg)
         if not element in self.jobState.get('elements'):
-            msg = "%s: element '%s' does not exist" % (self.getName(), element)
+            msg = "%s: element '%s' does not exist" % (self.avatarId, element)
             self.warning(msg)
             raise errors.PropertyError(msg)
         if not property:
-            msg = "%s: no property specified" % self.getName()
+            msg = "%s: no property specified" % self.avatarId
             self.warning(msg)
             raise errors.PropertyError(msg)
         self.debug("setting property '%s' on element '%s'" % (property, element))
@@ -527,7 +541,7 @@ class ComponentAvatar(base.ManagerAvatar):
         @param property: the property to get
         """
         if not element:
-            msg = "%s: no element specified" % self.getName()
+            msg = "%s: no element specified" % self.avatarId
             self.warning(msg)
             raise errors.PropertyError(msg)
         # FIXME: this is wrong, since it's not dynamic.  Elements can be
@@ -535,11 +549,11 @@ class ComponentAvatar(base.ManagerAvatar):
         # this will work automatically though if the component updates its
         # state
         if not element in self.jobState.get('elements'):
-            msg = "%s: element '%s' does not exist" % (self.getName(), element)
+            msg = "%s: element '%s' does not exist" % (self.avatarId, element)
             self.warning(msg)
             raise errors.PropertyError(msg)
         if not property:
-            msg = "%s: no property specified" % self.getName()
+            msg = "%s: no property specified" % self.avatarId
             self.warning(msg)
             raise errors.PropertyError(msg)
         self.debug("getting property %s on element %s" % (element, property))
@@ -618,11 +632,11 @@ class ComponentAvatar(base.ManagerAvatar):
 
     ### IPerspective methods, called by the worker's component
     def perspective_log(self, *msg):
-        log.debug(self.getName(), *msg)
+        log.debug(self.avatarId, *msg)
         
     def perspective_heartbeat(self, moodValue):
         self.lastHeartbeat = time.time()
-        #log.log(self.getName(),
+        #log.log(self.avatarId,
         #    "got heartbeat at %d" % int(self.lastHeartbeat))
         self._setMoodValue(moodValue)
 
@@ -705,7 +719,7 @@ class ComponentHeaven(base.ManagerHeaven):
         @param vishnu: the Vishnu object this heaven belongs to
         """
         base.ManagerHeaven.__init__(self, vishnu)
-        self._feederSet = FeederSet()
+        self._feederSets = {}
         # FIXME: deprecate componentEntries
         self._componentEntries = {} # configuration entries
         
@@ -718,46 +732,25 @@ class ComponentHeaven(base.ManagerHeaven):
         else:
             return False
 
-    # FIXME: move to base class ?
-    def getComponent(self, name):
-        """
-        Look up a ComponentAvatar by name.
+    def _getFeederSet(self, componentAvatar):
+        # get the feederset this component is part of, creating a new one
+        # if needed
+        parent = componentAvatar.getParentName()
+        if not parent in self._feederSets.keys():
+            self.debug('creating feederset for parent %s' % parent)
+            self._feederSets[parent] = FeederSet(parent)
 
-        @type name:  string
-        @param name: name of the component
+        r = self._feederSets[parent]
+        return r
 
-        @rtype:      L{flumotion.manager.component.ComponentAvatar}
-        @returns:    the component avatar
-        """
-
-        if not self.hasComponent(name):
-            raise KeyError, name
-        
-        return self.avatars[name]
-    
-    def hasComponent(self, name):
-        """
-        Check if a component with that name is registered.
-
-        @type name:  string
-        @param name: name of the component
-
-        @rtype:      boolean
-        @returns:    True if a component with that name is registered
-        """
-        
-        return self.avatars.has_key(name)
-    
     def removeComponent(self, componentAvatar):
         """
-        Remove a component from the heaven.
+        Remove a component avatar from the heaven.
 
-        @type componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         @param componentAvatar: the component
         """
-
-        componentName = componentAvatar.getName()
-        self.removeAvatar(componentName)
+        self.removeAvatar(componentAvatar.avatarId)
         
     # FIXME: deprecate this completely
     def loadConfiguration(self, filename, string=None):
@@ -787,8 +780,9 @@ class ComponentHeaven(base.ManagerHeaven):
 
         #feederName is componentName:feedName on the feeding component
         retval = []
+        set = self._getFeederSet(componentAvatar)
         for feederName in eaterFeederNames:
-            feeder = self._feederSet.getFeeder(feederName)
+            feeder = set.getFeeder(feederName)
             self.debug('EatersData(): feeder %r' % feeder)
 
             host = feeder.getListenHost()
@@ -832,8 +826,9 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         componentAvatar.debug('checkComponentStart')
         
+        set = self._getFeederSet(componentAvatar)
         for eaterFeeder in componentAvatar.getEaters():
-            if not self._feederSet.isFeederReady(eaterFeeder):
+            if not set.isFeederReady(eaterFeeder):
                 componentAvatar.debug('feeder %s is not ready' % (eaterFeeder))
                 return
 
@@ -851,28 +846,34 @@ class ComponentHeaven(base.ManagerHeaven):
 
         @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         """
-        componentAvatar.debug('registering component')
+        self.debug('heaven registering component %r' % componentAvatar)
 
         # tell the admin client
-        #self.vishnu.adminHeaven.registerComponent(componentAvatar)
-        #componentName = componentAvatar.getName()
+        #componentName = componentAvatar.avatarId
         #self.vishnu.adminHeaven.uiStateChanged(componentName, state)
 
         # tell the feeder set
-        self._feederSet.addFeeders(componentAvatar)
+        set = self._getFeederSet(componentAvatar)
+        set.addFeeders(componentAvatar)
 
         # check if we eat feeds from other feeders
+        self.debug('checking if we eat feeds')
         eaterFeeders = componentAvatar.getEaters()
         if not eaterFeeders:
             componentAvatar.debug('component does not take feeds, starting')
             self._startComponent(componentAvatar)
+            self.debug('heaven registered component %r' % componentAvatar)
             return
 
         # we do, so we need to make our eaters depend on other feeders
         componentAvatar.debug('need to wait for %s' % eaterFeeders)
+        set = self._getFeederSet(componentAvatar)
+
         for feeder in eaterFeeders:
-            self._feederSet.dependComponentOnFeeder(componentAvatar, feeder,
+            set.dependComponentOnFeeder(componentAvatar, feeder,
                 self.checkComponentStart)
+
+        self.debug('heaven registered component %r' % componentAvatar)
 
     def unregisterComponent(self, componentAvatar):
         """
@@ -884,7 +885,8 @@ class ComponentHeaven(base.ManagerHeaven):
         componentAvatar.debug('unregistering component')
 
         # tell the feeder set
-        self._feederSet.removeFeeders(componentAvatar)
+        set = self._getFeederSet(componentAvatar)
+        set.removeFeeders(componentAvatar)
 
         # clean up component
         componentAvatar.cleanup()
@@ -905,4 +907,5 @@ class ComponentHeaven(base.ManagerHeaven):
         componentAvatar.debug(
             'setting feeder %s readiness to %s in feaderset' % (
                 feederName, readiness))
-        self._feederSet.feederSetReadiness(feederName, readiness)
+        set = self._getFeederSet(componentAvatar)
+        set.feederSetReadiness(feederName, readiness)

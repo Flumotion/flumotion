@@ -30,7 +30,7 @@ from twisted.internet import defer
 # FIXME: rename to base
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log
-from flumotion.common import config, worker
+from flumotion.common import config, worker, common
 
 class WorkerAvatar(base.ManagerAvatar):
     """
