@@ -198,6 +198,7 @@ class WizardStep(object, log.Loggable):
     def __init__(self, wizard):
         self.wizard = wizard
         self.widget = None
+        self.visited = False
         
         self.load_glade()
 
@@ -255,7 +256,13 @@ class WizardStep(object, log.Loggable):
             state_dict[key] = widget
 
         return state_dict
+
+    def get_name(self):
+        return self.step_name
     
+    def get_sidebar_name(self):
+        return getattr(self, 'sidebar_name', self.step_name)
+        
     def get_next(self):
         """
         @returns name of next step
@@ -299,12 +306,16 @@ class Wizard:
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))
         
-        self.steps = {}
+        self.steps = []
         self.stack = Stack()
         self.current_step = None
 
     def __getitem__(self, stepname):
-        return self.steps[stepname]
+        for item in self.steps:
+            if item.get_name() == stepname:
+                return item
+        else:
+            raise KeyError
 
     def __len__(self):
         return len(self.steps)
@@ -336,10 +347,11 @@ class Wizard:
         if name == None:
             return
         
-        if self.steps.has_key(name):
-            raise TypeError("%s added twice" % name)
-        
-        self.steps[name] = step = step_class(self)
+        #if self.steps.has_key(name):
+        #    raise TypeError("%s added twice" % name)
+
+        step = step_class(self)
+        self.steps.append(step)
 
         if step.__dict__.has_key('get_state'):
             state = self.get_step_state(step)
@@ -363,7 +375,7 @@ class Wizard:
         icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
         self.image_icon.set_from_file(icon_filename)
             
-        self.label_title.set_markup('<span size="large">' + escape(step.step_name) + '</span>')
+        self.label_title.set_markup('<span size="large">' + escape(step.get_name()) + '</span>')
 
         if self.current_step:
             self.current_step.deactivated()
@@ -391,10 +403,12 @@ class Wizard:
             return
 
         try:
-            next_step = self.steps[next]
+            next_step = self[next]
         except KeyError:
             raise TypeError("Wizard step %s is missing" % `next`)
     
+        next_step.visited = True
+        
         self.stack.push(next_step)
         self.set_step(next_step)
 
@@ -448,17 +462,25 @@ class Wizard:
         hbox.pack_start(button, True, True)
         self.vbox_sidebar.pack_start(hbox, False, False)
 
-        def button_clicked_cb(button):
+        if not step:
+            steps = [step for step in self.steps
+                              if getattr(step, 'section_name', '') == name]
+            assert len(steps) == 1
+            step = steps[0]
+
+        def button_clicked_cb(button, step):
             self.set_step(step)
             
         if step:
-            button.connect('clicked', button_clicked_cb)
-
+            button.connect('clicked', button_clicked_cb, step)
+        else:
+            button.connect('clicked', button_clicked_cb, steps[0])
+            
         current = self.current_step
         if current == step:
             button.set_sensitive(False)
             
-        if not active:
+        if not active and not step.visited:
             markup = '<span color="#7a7a7a">%s</span>' % name
             button.set_sensitive(False)
         else:
@@ -471,18 +493,13 @@ class Wizard:
         return button
     
     def _sidebar_add_substeps(self, section):
-        # Skip the last step, since that's what we're currently showing
-        stack = self.stack #[:-1]
-
-        # Filter out steps which is not the same category
-        items = [item for item in stack
-                          if item.section == section]
-        for item in items:
-            if hasattr(item, 'section_name'):
-                continue
-            
-            label = getattr(item, 'sidebar_name', item.step_name)
-            self._sidebar_add_step(item, label, True, 20)
+        filtered_steps = [step for step in self.steps
+                                   if (step.section == section and
+                                       step.visited == True and
+                                       not hasattr(step, 'section_name'))]
+        for step in filtered_steps:
+            label = step.get_sidebar_name()
+            self._sidebar_add_step(step, label, True, 20)
 
     def update_sidebar(self, step):
         current = step.section

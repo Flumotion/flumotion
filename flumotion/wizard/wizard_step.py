@@ -501,7 +501,7 @@ class Consumption(wizard.WizardStep):
         if not step:
             return items[0]
         else:
-            stepname = step.step_name
+            stepname = step.get_name()
             if stepname in items and items[-1] != stepname:
                 return items[items.index(stepname)+1]
             else:

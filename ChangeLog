@@ -1,5 +1,13 @@
 2004-10-17  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Make it possible to go back to major steps. Fixes quite a few bugs.
+	Beginning of cleanup for the WizardStep API.
+	
+2004-10-17  Johan Dahlin  <johan@gnome.org>
+
 	* data/glade/wizard_overlay.glade:
 	* flumotion/wizard/save.py:
 	* flumotion/wizard/wizard_step.py:
