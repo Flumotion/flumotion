@@ -184,9 +184,11 @@ class JobMedium(pb.Referenceable, log.Loggable):
         comp = None
         try:
             comp = getComponent(config, defs)
-        except Exception, error:
-            self.warning("raising ComponentStart(%s)" % error)
-            raise errors.ComponentStart(error)
+        except Exception, e:
+            msg = "Exception %s during import of source %s (%s)" % (
+                e.__class__.__name__, source, e)
+            self.warning("raising ComponentStart(%s)" % msg)
+            raise errors.ComponentStart(msg)
 
         # we have components without feed ports, and without this function
         if feedPorts:

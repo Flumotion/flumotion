@@ -59,6 +59,9 @@ class ComponentStart(pb.Error):
 class UnknownComponentError(pb.Error):
     "A given component or component type does not exist"
 
+class RemoteRunError(pb.Error):
+    "Error while running remote code"
+
 class FlumotionError(pb.Error):
     "Generic Flumotion error"
 

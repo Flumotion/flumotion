@@ -132,7 +132,8 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
 
     def remote_runCode(self, codeSegment, objectName, *args, **kwargs):
         """
-        runs a segment of code and returns a variable from its namespace
+        Run a segment of code and an entry point from its namespace.
+        The function should eventually return a deferred with the result.
 
         @param codeSegment:   a piece of code
         @type codeSegment:    string
@@ -142,22 +143,43 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         @param kwargs:        keyword arguments to function
         """
         
+        self.debug('remote_runCode: received code with entry %s' % objectName)
         namespace = {}
-        exec (codeSegment, globals(), namespace)
+        try:
+            exec (codeSegment, globals(), namespace)
+        except Exception, e:
+            msg = 'runCode exec failed: %s raised: %r' % (
+                e.__class__.__name__, e)
+            self.warning(msg)
+            raise errors.RemoteRunError(msg)
+
+        self.debug('remote_runCode: retrieving entry point %s' % objectName)
         function = namespace.get(objectName, None)
         
-        retval = None
+        deferred = None
         if not callable(function):
-            return
+            msg = 'runCode exec failed: %s not callable' % objectName
+            self.warning(msg)
+            raise errors.RemoteRunError(msg)
 
+        self.debug('remote_runCode: calling entry point %s' % objectName)
+        # FIXME: for some reason this can raise asserts that do not get
+        # caught by the except handlers !
         try:
-            retval = function(*args)
+            deferred = function(*args)
         except Exception, e:
-            self.warning('runCode failed: %s raised: %r' % (e.__class__.__name__,
-                                                            e))
-            retval = defer.fail()
+            msg = 'runCode function failed: %s raised: %r' % (
+                e.__class__.__name__, e)
+            self.warning(msg)
+            raise errors.RemoteRunError(msg)
+        except:
+            msg = 'runCode function failed: Unknown exception'
+            self.warning(msg)
+            raise errors.RemoteRunError(msg)
 
-        return retval
+        self.debug('remote_runCode: returning deferred %r' % deferred)
+        # code got executed and now returns the deferred
+        return deferred
 
     
 class Kid:

@@ -1,5 +1,12 @@
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  attempt to make runCode more robust.  Needs more work.
+
+2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/wizard_soundcard.glade:
 	  fix typo
 	* flumotion/wizard/enums.py:
