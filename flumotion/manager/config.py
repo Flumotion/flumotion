@@ -29,25 +29,29 @@ from flumotion.utils import log
 class ConfigError(Exception):
     pass
 
-class ConfigEntry:
+class ConfigEntry(log.Loggable):
     nice = 0
-    def __init__(self, name, type, func, config, defs):
+    logCategory = 'config'
+    def __init__(self, name, type, config, defs):
         self.name = name
         self.type = type
-        self.func = func
         self.config = config
         self.defs = defs
 
-        # Setup files to be transmitted over the wire. Must be a
-        # better way of doing this.
-        mod = reflect.namedAny(self.defs.getSource())
-        dir = os.path.split(mod.__file__)[0]
-        self.files = {}
-        for file in self.defs.getFiles():
-            filename = os.path.basename(file.getFilename())
-            real = os.path.join(dir, filename)
-            self.files[real] = file
+    def getModule(self):
+        source = self.defs.getSource()
+        self.info('Loading %s' % source)
+        try:
+            module = reflect.namedAny(source)
+        except ValueError:
+            raise ConfigError("%s source file could not be found" % source)
         
+        if not hasattr(module, 'createComponent'):
+            self.warning('no createComponent() for %s' % source)
+            return
+        
+        return module
+    
     def getType(self):
         return self.type
     
@@ -58,15 +62,26 @@ class ConfigEntry:
         return self.config
     
     def getComponent(self):
+        # Setup files to be transmitted over the wire. Must be a
+        # better way of doing this.
+        module = self.getModule()
+        dir = os.path.split(module.__file__)[0]
+        files = {}
+        for file in self.defs.getFiles():
+            filename = os.path.basename(file.getFilename())
+            real = os.path.join(dir, filename)
+            files[real] = file
+        
         # Create the component which the specified configuration
         # directives. Note that this can't really be moved from here
         # since it gets called by the launcher from another process
         # and we don't want to create it in the main process, since
         # we're going to listen to ports and other stuff which should
         # be separated from the main process.
-        
-        component = self.func(self.getConfigDict())
-        component.setFiles(self.files)
+
+        dict = self.getConfigDict()
+        component = module.createComponent(dict)
+        component.setFiles(files)
         return component
 
     def startFactory(self):
@@ -95,20 +110,6 @@ class FlumotionConfigXML(log.Loggable):
     def getEntryType(self, name):
         entry = self.entries[name]
         return entry.getType()
-    
-    def getFunction(self, defs):
-        source = defs.getSource()
-        self.info('Loading %s' % source)
-        try:
-            module = reflect.namedAny(source)
-        except ValueError:
-            raise ConfigError("%s source file could not be found" % source)
-        
-        if not hasattr(module, 'createComponent'):
-            self.warning('no createComponent() for %s' % source)
-            return
-        
-        return module.createComponent
     
     def parse(self):
         # <root>
@@ -151,17 +152,13 @@ class FlumotionConfigXML(log.Loggable):
         self.debug('Parsing component: %s' % name)
         options = self.parseProperties(node, type, properties)
 
-        function = self.getFunction(defs)
-        if not function:
-            return
-        
         config = { 'name': name,
                    'type': type,
                    'config' : self,
                    'start-factory': defs.isFactory() }
         config.update(options)
 
-        return ConfigEntry(name, type, function, config, defs)
+        return ConfigEntry(name, type, config, defs)
 
     def get_float_value(self, nodes):
         return [float(subnode.childNodes[0].data) for subnode in nodes]
