@@ -482,9 +482,9 @@ def waitPidFile(type, name):
     pid = getPid(type, name)
     return pid
  
-def waitForKill():
+def waitForTerm():
     """
-    Wait until we get killed by someone else.
+    Wait until we get killed by a TERM signal (from someone else).
     """
     
     class Waiter:

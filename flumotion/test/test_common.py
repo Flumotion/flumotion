@@ -19,6 +19,8 @@
 # Headers in this file shall remain intact.
 
 import os
+import sys
+import time
 import tempfile
 
 from twisted.trial import unittest
@@ -241,6 +243,48 @@ class TestPort(unittest.TestCase):
 
     def _print(self, p):
         print p, p.getHost()
+        
+class TestProcess(unittest.TestCase):
+    def testTermPid(self):
+        ret = os.fork()
+        if ret == 0:
+            # child
+            time.sleep(4)
+            os._exit(0)
+        else:
+            # parent
+            self.failUnless(common.checkPidRunning(ret))
+            self.failUnless(common.termPid(ret))
+            os.waitpid(ret, 0)
+            # now that it's gone, it should fail
+            self.failIf(common.checkPidRunning(ret))
+            self.failIf(common.termPid(ret))
+            
+    def testKillPid(self):
+        ret = os.fork()
+        if ret == 0:
+            # child
+            common.waitForTerm()
+            os._exit(0)
+        else:
+            # parent
+            self.failUnless(common.killPid(ret))
+            os.waitpid(ret, 0)
+            # now that it's gone, it should fail
+            self.failIf(common.killPid(ret))
+
+    def testKillPid(self):
+        pid = os.getpid()
+
+        ret = os.fork()
+        if ret == 0:
+            # child
+            time.sleep(0.5)
+            self.failUnless(common.termPid(pid))
+            os._exit(0)
+        else:
+            # parent
+            common.waitForTerm()
         
 if __name__ == '__main__':
     unittest.main()

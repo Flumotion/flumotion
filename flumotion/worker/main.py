@@ -231,7 +231,7 @@ def main(args):
     # better, or be reconnecting, or something, instead of sleeping forever.
     if options.daemonize and not reactor.killed:
         log.info('worker', 'Since I am a daemon, I will sleep until killed')
-        common.waitForKill()
+        common.waitForTerm()
         log.info('worker', 'I was killed so I wake up')
 
     log.debug('worker', 'Reactor stopped')

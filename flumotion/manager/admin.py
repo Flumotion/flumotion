@@ -211,7 +211,8 @@ class AdminAvatar(base.ManagerAvatar):
     def perspective_getConfiguration(self):
         """
         Get the configuration of the manager as an XML string.
-        @return string
+
+        @returns: string
         """
         return self.vishnu.getConfiguration()
 

@@ -101,12 +101,13 @@ def with_construct_properties(__init__):
     Wrap a class' __init__ method in a procedure that will construct
     gobject properties. This is necessary because pygtk's object
     construction is a bit broken.
-    Usage:
 
-    class Foo(GObject):
-        def __init__(self):
-            GObject.__init(self)
-        __init__ = with_construct_properties(__init__)
+    Usage::
+
+        class Foo(GObject):
+            def __init__(self):
+                GObject.__init(self)
+            __init__ = with_construct_properties(__init__)
     """
     frame = sys._getframe(1)
     _locals = frame.f_locals

@@ -1,5 +1,15 @@
 2005-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	* flumotion/test/test_common.py:
+	* flumotion/worker/main.py:
+	  increase coverage, rename waitForKill to be more clear
+	* flumotion/common/pygobject.py:
+	* flumotion/manager/admin.py:
+	  doc fixes
+
+2005-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/open-connection.glade:
 	  work with gtk 2.4
 	* flumotion/admin/gtk/parts.py:
