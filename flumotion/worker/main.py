@@ -238,7 +238,10 @@ def main(args):
 
     pids = [kid.getPid() for kid in brain.kindergarten.getKids()]
     
-    log.debug('worker', 'Waiting for jobs to finish (pids %r)' % pids)
+    if pids:
+        log.info('worker', 'Waiting for %d jobs to finish' % len(pids))
+        log.debug('worker', 'pids %r' % pids)
+
     while pids:
         try:
             pid = os.wait()[0]
@@ -250,7 +253,7 @@ def main(args):
             else:
                 raise
         
-        log.debug('worker', 'Job with pid %d finished' % pid)
+        log.info('worker', 'Job with pid %d finished' % pid)
         pids.remove(pid)
 
     if options.daemonize:

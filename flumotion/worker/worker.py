@@ -435,7 +435,7 @@ class WorkerBrain(log.Loggable):
             self._oldSIGTERMHandler = handler
 
     def _SIGTERMHandler(self, signal, frame):
-        print "handling SIGTERM"
+        self.info("Worker daemon received TERM signal, shutting down")
         self.debug("handling SIGTERM")
         reactor.killed = True
         self.debug("_SIGTERMHandler: shutting down jobheaven")
@@ -680,5 +680,7 @@ class JobHeaven(pb.Root, log.Loggable):
 
     def shutdown(self):
         self.debug('Shutting down JobHeaven')
+        self.debug('Stopping all jobs')
         dl = defer.DeferredList([x.stop() for x in self.avatars.values()])
+        dl.addCallback(lambda result: self.debug('Stopped all jobs'))
         return dl

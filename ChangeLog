@@ -1,5 +1,11 @@
 2005-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  improve logging
+
+2005-03-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/gtkunit.py:
 	* flumotion/test/test_greeter.py:
 	  clicked buttons flash
