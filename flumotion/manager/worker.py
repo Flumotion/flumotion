@@ -106,7 +106,7 @@ class WorkerHeaven(pb.Root):
         if workers:
             self.setupWorkers(workers)
 
-    def setupWorkers(Self, workers):
+    def setupWorkers(self, workers):
         if workers.getPolicy() == 'password':
             self.vishnu.checker.allowAnonymous(False)
 
