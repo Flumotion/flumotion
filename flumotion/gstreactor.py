@@ -30,6 +30,9 @@ API Stability: stable
 Maintainer: U{Itamar Shtull-Trauring<mailto:twisted@itamarst.org>}
 """
 
+import pygtk
+pygtk.require('2.0')
+
 __all__ = ['install']
 
 import gobject

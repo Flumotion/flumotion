@@ -17,16 +17,12 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-import re
-import optik
 import sys
 
 # Workaround for non existent popt integration
 _sys_argv = sys.argv
 sys.argv = sys.argv[:1]
 
-# XXX: Why does this have to be done before the reactor import?
-#      Find out a better way
 if __name__ == '__main__':
     import gstreactor
     gstreactor.install()
@@ -35,14 +31,15 @@ import gst
 from twisted.internet import reactor
 from twisted.python import log
 
-from component import Component
+import component
 
-class Producer(Component):
+class Producer(component.BaseComponent):
     name = 'producer'
     def __init__(self, name, host, port, pipeline):
-        Component.__init__(self, name, None, host, port)
-        
-        self.pipeline_string = '%s ! tcpserversink name=sink' % pipeline
+        component.BaseComponent.__init__(self, name, None, host, port, pipeline)
+
+    def get_pipeline(self, pipeline):
+        return '%s ! tcpserversink name=sink' % pipeline
         
     def listen(self, host, port):
         log.msg('Going to listen on port %d' % port)
@@ -57,45 +54,13 @@ class Producer(Component):
         self.listen(host, port)
         
 def main(args):
-    parser = optik.OptionParser()
-    parser.add_option('-c', '--controller',
-                      action="store", type="string", dest="host",
-                      default="localhost:8890",
-                      help="Controller to connect to default localhost:8890]")
-    parser.add_option('-n', '--name',
-                      action="store", type="string", dest="name",
-                      default=None,
-                      help="Name of component")
-    parser.add_option('-p', '--pipeline',
-                      action="store", type="string", dest="pipeline",
-                      default=None,
-                      help="Pipeline to run")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="Be verbose")
-
-    options, args = parser.parse_args(args)
-
-    if options.pipeline is None:
-        print 'Need a pipeline'
-        return 2
-
-    if options.name is None:
-        print 'Need a name'
-        return 2
-
-    if options.verbose:
-        log.startLogging(sys.stdout)
-
-    if ':' in options.host:
-        host, port = options.host.split(':', 2)
-        port = int(port)
-    else:
-        host = options.host
-        port = 8890
-
-    log.msg('Connect to %s on port %d' % (host, port))
-    client = Producer(options.name, host, port, options.pipeline)
+    try:
+        options = component.get_options_for('producer', args)
+    except component.OptionError, e:
+        print 'ERROR:', e
+        raise SystemExit
+    
+    client = Producer(options.name, options.host, options.port, options.pipeline)
     reactor.run()
 
 if __name__ == '__main__':

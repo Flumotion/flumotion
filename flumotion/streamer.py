@@ -17,33 +17,25 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-import pygtk
-pygtk.require('2.0')
-
 import sys
     
-# Workaround for non existent popt integration
 _sys_argv = sys.argv
 sys.argv = sys.argv[:1]
 
-# XXX: Why does this have to be done before the reactor import?
-#      Find out a better way
 if __name__ == '__main__':
     import gstreactor
     gstreactor.install()
 
-import optik
-import time
-
 import gobject
 import gst
+
 from twisted.web import server, resource
 from twisted.internet import reactor
 from twisted.python import log
 
-from component import Component
+import component
 
-class Streamer(gobject.GObject, Component):
+class Streamer(gobject.GObject, component.BaseComponent):
     __gsignals__ = {
         'data-recieved': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
                           (gst.Buffer,)),
@@ -51,30 +43,31 @@ class Streamer(gobject.GObject, Component):
     name = 'streamer'
     def __init__(self, name, sources, host, port):
         self.__gobject_init__()
-        Component.__init__(self, name, sources, host, port)
-        self.pipeline_string = 'fakesink signal-handoffs=1 silent=1 name=sink'
-        for source in sources:
-            self.pipeline_string.replace(source, 'identify name=%s_placeholder' % source)
+        component.BaseComponent.__init__(self, name, sources, host, port)
+
+    def get_pipeline(self, pipeline):
+        if len(self.sources) == 1:
+            return 'tcpclientsrc name=%s ! fakesink signal-handoffs=1 silent=1 name=sink' % self.sources[0]
+        else:
+            raise NotImplemented
         
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-recieved', buffer)
         
-    def connect_to(self, name, host, port):
-        log.msg('Going to connect to %s:%d' % (host, port))
-
-        old = self.pipeline.get_by_name('%s_placeholder' % name)
-
-        source = gst.element_factory_make('tcpclientsrc', source)
-        source.set_property('host', host)
-        source.set_property('port', port)
+    def connect_to(self, sources):
+        for name, host, port in sources:
+            log.msg('Going to connect to %s:%d' % (host, port))
+            source = self.pipeline.get_by_name(name)
+            source.set_property('host', host)
+            source.set_property('port', port)
 
         sink = self.pipeline.get_by_name('sink')
         sink.connect('handoff', self.sink_handoff_cb)
         
         self.pipeline_play()
      
-    def remote_connect(self, host, port):
-        self.connect_to(host, port)
+    def remote_connect(self, sources):
+        self.connect_to(sources)
         
 gobject.type_register(Streamer)
 
@@ -119,70 +112,16 @@ class StreamingResource(resource.Resource):
         return server.NOT_DONE_YET
     
 def main(args):
-    parser = optik.OptionParser()
-    parser.add_option('-c', '--controller',
-                      action="store", type="string", dest="host",
-                      default="localhost:8890",
-                      help="Controller to connect to default localhost:8890]")
-    parser.add_option('-n', '--name',
-                      action="store", type="string", dest="name",
-                      default=None,
-                      help="Name of component")
-    parser.add_option('-p', '--protocol',
-                      action="store", type="string", dest="protocol",
-                      default=None,
-                      help="Protocol to use")
-    parser.add_option('-o', '--port',
-                      action="store", type="int", dest="port",
-                      default=None,
-                      help="Port to bind to")
-    parser.add_option('-s', '--source',
-                      action="store", type="string", dest="source",
-                      default=None,
-                      help="Host source to get data from")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="Be verbose")
-
-    options, args = parser.parse_args(args)
-
-    if options.name is None:
-        print 'Need a name'
-        return 2
-
-    if options.source is None:
-        print 'Need a source'
-        return 2
-
-    if options.protocol is None:
-        print 'Need a protocol'
-        return 2
-
-    if options.port is None:
-        print 'Need a port'
-        return 2
-    
-    if options.verbose:
-        log.startLogging(sys.stdout)
-
-    port = 8890
-    if options.host is None:
-        host = 'localhost'
-    elif ':' in options.host:
-        host, port = options.split(options.host)
-    else:
-        host = options.host
-
-    component = Streamer(options.name, options.source, host, port)
+    options = component.get_options_for('streamer', args)
+    comp = Streamer(options.name, options.sources,
+                    options.host, options.port)
     
     if options.protocol == 'http':
-        factory = server.Site(resource=StreamingResource(component))
+        factory = server.Site(resource=StreamingResource(comp))
     else:
         print 'Only http protcol supported right now'
 
-    log.msg('Connect to controller %s on port %d' % (host, port))
-
-    reactor.listenTCP(options.port, factory)
+    reactor.listenTCP(options.listen_port, factory)
     reactor.run()
 
 if __name__ == '__main__':

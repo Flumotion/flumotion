@@ -17,19 +17,12 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-import pygtk
-pygtk.require('2.0')
-
-import optik
-import socket
 import sys
 
 # Workaround for non existent popt integration
 _sys_argv = sys.argv
-sys.argv = sys.argv[:1]
+sys.argv = sys.argv[:1] # + ['--gst-debug=*:5']
 
-# XXX: Why does this have to be done before the reactor import?
-#      Find out a better way
 if __name__ == '__main__':
     import gstreactor
     gstreactor.install()
@@ -39,26 +32,26 @@ import gst
 from twisted.internet import reactor
 from twisted.python import log
 
-from component import Component
+import component
 import gstutils
 
-class Converter(Component):
+class Converter(component.BaseComponent):
     name = 'converter'
     def __init__(self, name, sources, host, port, pipeline):
-        Component.__init__(self, name, sources, host, port)
+        component.BaseComponent.__init__(self, name, sources, host, port, pipeline)
 
-        for source in sources:
+    def get_pipeline(self, pipeline):
+        for source in self.sources:
             if ' ' in source:
                 raise TypeError, "spaces not allowed in sources"
             
             source_name = '@%s' % source
-            print pipeline
             if pipeline.find(source_name) == -1:
                 raise TypeError, "%s needs to be specified in the pipeline" % source_name
             
             pipeline = pipeline.replace(source_name, 'tcpclientsrc name=%s' % source)
-            
-        self.pipeline_string = pipeline + ' ! tcpserversink name=sink'
+
+        return pipeline + ' ! tcpserversink name=sink'
 
     def start(self, sources, sink_host, sink_port):
         log.msg('(source) Going to listen on port %s:%d' % (sink_host, sink_port))
@@ -83,59 +76,14 @@ class Converter(Component):
         self.start(sources, sink_host, sink_port)
         
 def main(args):
-    parser = optik.OptionParser()
-    parser.add_option('-c', '--controller',
-                      action="store", type="string", dest="host",
-                      default="localhost:8890",
-                      help="Controller to connect to default localhost:8890]")
-    parser.add_option('-n', '--name',
-                      action="store", type="string", dest="name",
-                      default=None,
-                      help="Name of component")
-    parser.add_option('-p', '--pipeline',
-                      action="store", type="string", dest="pipeline",
-                      default=None,
-                      help="Pipeline to run")
-    parser.add_option('-s', '--sources',
-                      action="store", type="string", dest="source",
-                      default=None,
-                      help="Host sources to get data from, separated by ,")
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="Be verbose")
-
-    options, args = parser.parse_args(args)
-
-    if options.pipeline is None:
-        print 'Need a pipeline'
-        return 2
-
-    if options.name is None:
-        print 'Need a name'
-        return 2
-
-    if options.source is None:
-        print 'Need a source'
-        return 2
+    try:
+        options = component.get_options_for('converter', args)
+    except component.OptionError, e:
+        print 'ERROR:', e
+        raise SystemExit
     
-    if options.verbose:
-        log.startLogging(sys.stdout)
-
-    if ':' in options.host:
-        host, port = options.host.split(':', 2)
-        port = int(port)
-    else:
-        host = options.host
-        port = 8890
-
-    if ',' in  options.source:
-        sources = options.source.split(',')
-    else:
-        sources = [options.source]
-        
-    log.msg('Connect to %s on port %d' % (host, port))
-    client = Converter(options.name, sources, host, port,
-                       options.pipeline)
+    client = Converter(options.name, options.sources, options.host,
+                       options.port, options.pipeline)
     reactor.run()
     
 if __name__ == '__main__':

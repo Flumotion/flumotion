@@ -181,9 +181,9 @@ class StreamerPerspective(ComponentPerspective):
         "Should never be called, a Streamer does not accept incoming components"
         raise AssertionError
 
-    def connect(self, name, host, port):
+    def connect(self, sources):
         """starts the remote methods connect"""
-        self.mind.callRemote('connect', name, host, port)
+        self.mind.callRemote('connect', sources)
 
 class Controller(pb.Root):
     def __init__(self):
@@ -268,7 +268,10 @@ class Controller(pb.Root):
         retval = []
         for peername in peernames:
             assert self.components.has_key(peername)
-            retval.append(self.components[peername])
+            source = self.components[peername]
+            retval.append((source.getName(),
+                           source.getListenHost(),
+                           source.getListenPort()))
         return retval
 
     def producerStart(self, producer):
@@ -281,9 +284,7 @@ class Controller(pb.Root):
     def converterStart(self, converter):
         #assert isinstance(converter, ConverterPerspective)
         
-        sources = [(source.getName(),
-                    source.getListenHost(),
-                    source.getListenPort()) for source in self.getSourceComponents(converter)]
+        sources = self.getSourceComponents(converter)
         listen_host = converter.getListenHost()
             
         converter.start(sources, listen_host)
@@ -292,12 +293,8 @@ class Controller(pb.Root):
         #assert isinstance(streamer, StreamerPerspective)
         
         sources = self.getSourceComponents(streamer)
-        for source in sources:
-            name = source.getName()
-            host = source.getListenHost()
-            port = source.getListenPort()
-            log.msg('Calling remote method connect')
-            streamer.connect(name, host, port)
+        log.msg('Calling remote method connect')
+        streamer.connect(sources)
         
     def componentStart(self, component):
         log.msg('Starting component %r of type %s' % (component, component.kind))
