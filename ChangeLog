@@ -1,3 +1,10 @@
+2004-08-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/portal.py:
+	  Copy and adapt namedAny to check for the actual textual message
+	  instead of length of backtrace.  Issue filed in twisted as
+	  http://www.twistedmatrix.com/users/roundup.twistd/twisted/issue698
+
 2004-08-31  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/interfaces.py (IAdminComponent): Add a new interface
