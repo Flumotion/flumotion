@@ -33,7 +33,8 @@ from twisted.internet import reactor
 from flumotion.server import auth, component, interfaces
 from flumotion.utils import gstutils, log
 
-__all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
+__all__ = ['HTTPClientKeycard', 'HTTPStreamingAdminResource',
+           'HTTPStreamingResource', 'MultifdSinkStreamer']
 
 HTTP_NAME = 'FlumotionHTTPServer'
 HTTP_VERSION = '0.1.0'
@@ -103,13 +104,13 @@ class HTTPStreamingAdminResource(resource.Resource):
     def format_time(self, time):
         'nicely format time'
         display = []
-        days = time / (3600 * 24)
+        days = time / 86400
         if days >= 7:
             display.append('%d weeks' % days / 7)
             days %= 7
         if days >= 1:
             display.append('%d days' % days)
-        time %= (3600 * 24)
+        time %= 86400
         h = time / 3600
         time %= 3600
         m = time / 60
@@ -150,7 +151,7 @@ class HTTPStreamingAdminResource(resource.Resource):
         stats['Stream bitrate'] = self.format_bytes(bytes_received / uptime) + '/sec'
         stats['Total client bitrate'] = self.format_bytes(bytes_sent / uptime) + '/sec'
         stats['Peak Client Number'] = self.streaming.peak_client_number
-        self.streaming.update_average()
+        self.streaming.updateAverage()
         stats['Average Simultaneous Clients'] = int(self.streaming.average_client_number)
         block = []
         for key in stats.keys():
@@ -161,7 +162,7 @@ class HTTPStreamingAdminResource(resource.Resource):
         }
 
 class HTTPStreamingResource(resource.Resource):
-    def __init__(self, streamer):
+    def __init__(self, streamer, maxclients=1000):
         self.logfile = None
             
         streamer.connect('client-removed', self.streamer_client_removed_cb)
@@ -177,6 +178,7 @@ class HTTPStreamingResource(resource.Resource):
         self.average_client_number = 0
         self.average_time = self.start_time
         
+        self.maxclients = maxclients
         resource.Resource.__init__(self)
 
     def setLogfile(self, logfile):
@@ -188,8 +190,7 @@ class HTTPStreamingResource(resource.Resource):
 
         headers = request.getAllHeaders()
 
-        sink = self.streamer.get_sink()
-        stats = sink.emit('get-stats', fd)
+        stats = self.streamer.get_stats(fd)
         if stats:
             bytes_sent = stats[0]
             time_connected = int(stats[3] / gst.SECOND)
@@ -224,13 +225,9 @@ class HTTPStreamingResource(resource.Resource):
         self.logfile.flush()
 
     def streamer_client_removed_cb(self, streamer, sink, fd, reason):
-        self.update_average()
         request = self.request_hash[fd]
-        ip = request.getClientIP()
-        self.log(fd, ip, request)
-        self.debug('(%d) client from %s disconnected' % (fd, ip))
-        del self.request_hash[fd]
-        
+        self.removeClient(request)
+
     def isReady(self):
         if self.streamer.caps is None:
             self.debug('We have no caps yet')
@@ -240,13 +237,6 @@ class HTTPStreamingResource(resource.Resource):
 
     def setAuth(self, auth):
         self.auth = auth
-        
-    def isAuthenticated(self, request):
-        if not self.auth:
-            return True
-
-        keycard = HTTPClientKeycard(request)
-        return self.auth.authenticate(keycard)
     
     def getChild(self, path, request):
         if path == 'stats':
@@ -274,7 +264,7 @@ class HTTPStreamingResource(resource.Resource):
         self.debug('setting Content-type to %s' % mime)
         os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
         
-    def update_average(self):
+    def updateAverage(self):
         # update running average of clients connected
         self.average_time = now = time.time()
         # calculate deltas
@@ -289,21 +279,55 @@ class HTTPStreamingResource(resource.Resource):
             self.average_client_number = (dc1 * dt1 / (dt1 + dt2) +
                                           dc2 * dt2 / (dt1 + dt2))
 
+    def isReady(self):
+        if self.streamer.caps is None:
+            self.msg('We have no caps yet')
+            return False
+        
+        return True
+
+    def reachedMaxClients(self):
+        # TODO: Use an integer value
+        return len(self.request_hash) >= (self.maxclients + 1)
+    
+    def isAuthenticated(self, request):
+        if self.auth is None:
+            return True
+
+        keycard = HTTPClientKeycard(request)
+        return self.auth.authenticate(keycard)
+
     def addClient(self, request):
+        """Add a request, so it can be used for statistics
+        @param request: the request
+        @type request: L{twisted.protocol.http.Request}"""
+        
         fd = request.transport.fileno()
         self.request_hash[fd] = request
         # update peak client number
         if len(self.request_hash) > self.peak_client_number:
             self.peak_client_number = len(self.request_hash)
-        self.update_average()
-        self.streamer.add_client(fd)
+        self.updateAverage()
+
+    def removeClient(self, request):
+        """Removes a request and add logging. Note that it does not disconnect the client
+        @param request: the request
+        @type request: L{twisted.protocol.http.Request}"""
+        fd = request.transport.fileno()
+        
+        ip = request.getClientIP()
+        self.log(fd, ip, request)
+        self.debug('(%d) client from %s disconnected' % (fd, ip))
+        del self.request_hash[fd]
+        self.updateAverage()
 
     def handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')
         return server.NOT_DONE_YET
         
     def handleMaxclients(self, request):
-        self.debug('Refusing clients, already 1001 clients')
+        self.debug('Refusing clients, already %s clients' % self.maxclients)
+
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_VERSION)
         
@@ -331,6 +355,7 @@ class HTTPStreamingResource(resource.Resource):
         # everything fulfilled, serve to client
         self.setHeaders(request)
         self.addClient(request)
+        self.streamer.add_client(fd)
         return server.NOT_DONE_YET
         
     def render(self, request):
@@ -338,7 +363,7 @@ class HTTPStreamingResource(resource.Resource):
     
         if not self.isReady():
             return self.handleNotReady(request)
-        elif len(self.request_hash) >= 1001:
+        elif self.reachedMaxClients():
             return self.handleMaxclients(request)
         elif not self.isAuthenticated(request):
             return self.handleUnauthorized(request)
@@ -385,7 +410,11 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     def add_client(self, fd):
         sink = self.get_sink()
         stats = sink.emit('add', fd)
-         
+
+    def get_stats(self, fd):
+        sink = self.streamer.get_sink()
+        return sink.emit('get-stats', fd)
+    
     def get_sink(self):
         assert self.pipeline, 'Pipeline not created'
         sink = self.pipeline.get_by_name('sink')
