@@ -1,7 +1,16 @@
 <registry>
   <components>
-    <component type="tv-card">
+    <component type="tv-card"
+               base="flumotion/component/producers/bttv">
       <source location="flumotion.component.producers.bttv.bttv"/>
+
+      <entries>
+        <entry type="component" location="bttv.py"
+               function="createComponent"/>
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass"/>
+      </entries>
+      
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="device" type="string" required="yes"/>
@@ -10,7 +19,27 @@
         <property name="height" type="int"/>
         <property name="width" type="int"/>
         <property name="framerate" type="float"/>
+        <property name="hue" type="int" required="no"/>
+        <property name="saturation" type="int" required="no"/>
+        <property name="brightness" type="int" required="no"/>
+        <property name="contrast" type="int" required="no"/>
+
       </properties>
     </component>
   </components>
+
+  <bundles>
+    <bundle name="bttv-admin-gtk">
+        <dependencies>
+            <dependency name="base-admin-gtk"/>
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/bttv">
+                <filename location="admin_gtk.py"/>
+            </directory>
+        </directories>
+    </bundle>
+  </bundles>
+            
 </registry> 

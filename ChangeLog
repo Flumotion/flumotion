@@ -1,4 +1,14 @@
 2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+	
+	* patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
+
+	* flumotion/component/producers/bttv/Makefile.am:
+	* flumotion/component/producers/bttv/admin_gtk.py:
+	* flumotion/component/producers/bttv/bttv.py:
+	* flumotion/component/producers/bttv/bttv.xml:
+	  add colorbalance + admin page to bttv
+
+2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/twisted/gstreactor.py:
 	  removing logging to unbreak reactor
