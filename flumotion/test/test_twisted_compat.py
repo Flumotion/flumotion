@@ -24,6 +24,8 @@ from twisted.trial import unittest
 
 import warnings
 from twisted.python import components
+from twisted.spread import pb
+import exceptions
 
 from flumotion.twisted import compat
 
@@ -47,6 +49,7 @@ class TestComponentsWarning(unittest.TestCase):
         def myshowwarning(message, category, filename, lineno, file=None):
             self.warned = True
             
+        self.warned = False
         warnings.showwarning = myshowwarning
         
         instance = AClass()
@@ -56,16 +59,34 @@ class TestComponentsWarning(unittest.TestCase):
         else:
             self.failIf(self.warned)
 
-    # test if our filter filters out this warning
+    # test if our filter filters out this warning for 2.0
     def test20FilterComponentsWarning(self):
         def myshowwarning(message, category, filename, lineno, file=None):
             self.warned = True
             
+        self.warned = False
         warnings.showwarning = myshowwarning
 
         compat.filterWarnings(components, 'ComponentsDeprecationWarning')
 
         instance = AClass()
         self.failUnless(components.implements(instance, AnInterface))
+        self.failIf(self.warned)
+
+    # test a known 1.3 Deprecation warning
+    def test13PerspectiveBrokerFactoryWarning(self):
+        def myshowwarning(message, category, filename, lineno, file=None):
+            self.warned = True
+
+        self.warned = False
+        warnings.showwarning = myshowwarning
+
+        p = pb.BrokerFactory('astring')
+        self.failUnless(self.warned)
+        self.warned = False
+
+        compat.filterWarnings(exceptions, 'DeprecationWarning')
+        
+        p = pb.BrokerFactory('astring')
         self.failIf(self.warned)
 
