@@ -38,6 +38,8 @@
 
 * EASY:		fix all code files to have the new header
 
+* EASY:		doublecheck spec
+
 - API cleanup:
 
 - manager/component.py:

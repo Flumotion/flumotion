@@ -1,7 +1,7 @@
 Name:           @PACKAGE@
 Version:        @VERSION@
 Release:        @RELEASE@
-Summary:        Fluendo Streaming Server.
+Summary:        Flumotion - the Fluendo Streaming Server.
 
 Group:          Applications/Internet
 License:	GPL
