@@ -1,3 +1,8 @@
+2004-10-16  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/manager/main.py (_loadConfig): Don't parse the
+	configuration twice.
+
 2004-10-15  Johan Dahlin  <johan@gnome.org>
 
 	* configure.ac:

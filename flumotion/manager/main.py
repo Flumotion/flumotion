@@ -61,10 +61,14 @@ def _startTCP(vishnu, options):
 def _loadConfig(vishnu, filename):
     # FIXME: this might be used for loading additional config, so maybe
     # unprivatize and cleanup ?
-    vishnu.workerheaven.loadConfiguration(filename)
+
+    conf = config.FlumotionConfigXML(filename)
+
+    # XXX: Cleanup
+    vishnu.workerheaven.conf = conf
 
     # scan filename for a bouncer component in the manager
-    conf = config.FlumotionConfigXML(filename)
+
     if conf.manager and conf.manager.bouncer:
         if vishnu.bouncer:
             vishnu.warning("manager already had a bouncer")
