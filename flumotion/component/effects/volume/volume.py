@@ -47,9 +47,9 @@ class Volume(feedcomponent.Effect):
         """
         Sets volume
 
-        @param value: what value to set volume to (float between 0.0 and 400.0)
+        @param value: what value to set volume to (float between 0.0 and 4.0)
 
-        Returns: the actual percentage it was set to
+        Returns: the actual value it was set to
         """
         self.component.setVolume(value)
         # notify admin clients

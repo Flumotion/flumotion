@@ -35,5 +35,17 @@ class SoundcardAdminGtk(admin_gtk.BaseAdminGtk):
         volume = self._nodes['Volume']
         volume.volumeChanged(channel, rms, peak, decay)
 
+    def component_effectVolumeSet(self, effect, volume):
+        """
+        @param volume: volume multiplier between 0.0 and 4.0
+        @type  volume: float
+        """
+        if effect != 'inputVolume':
+            self.warning('Unknown effect %s in %r' % (effect, self))
+            return
+        v = self._nodes['Volume']
+        v.volumeSet(volume)
+
+
 GUIClass = SoundcardAdminGtk
 

@@ -393,7 +393,7 @@ class Window(log.Loggable, gobject.GObject):
         try:
             result = method(*args, **kwargs)
         except TypeError:
-            msg = "component method %s did not accept *a %s and **kwa %s" % (
+            msg = "component method %s did not accept *a %s and **kwa %s (or TypeError)" % (
                 methodName, args, kwargs)
             self.debug(msg)
             raise errors.RemoteRunError(msg)

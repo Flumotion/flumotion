@@ -1,5 +1,23 @@
 2005-04-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	  clarify other error condition
+	* flumotion/component/effects/volume/volume.glade:
+	  change UI a little to fit in panes and implement "distort" checkbox
+	  use custom widget for level indicator with create function
+	* flumotion/component/effects/volume/admin_gtk.py:
+	  implement handling of the new ui
+	* flumotion/component/effects/volume/volume.py:
+	  use float multiplier values, not percentages
+	* flumotion/component/producers/soundcard/admin_gtk.py:
+	  make sure soundcard gets volumeSet for view node
+	* flumotion/component/producers/firewire/firewire.py:
+	  change value to be a multiplier
+	* flumotion/component/producers/soundcard/soundcard.py:
+	  make it clear we still need to implement setVolume
+
+2005-04-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	  add _listPyFileRecursively
 	  add _findEndModuleCandidates

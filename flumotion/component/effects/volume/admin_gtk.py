@@ -20,8 +20,12 @@
 
 import gtk
 import os
+import math
 
 from flumotion.common import errors, log
+
+# import custom glade handler
+from flumotion.ui import glade
 
 from flumotion.component.base import admin_gtk
 
@@ -41,36 +45,64 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
 
         self.wtree = widgetTree
         self.volume = self.wtree.get_widget('volume-widget')
-        self.scale_volume = fgtk.FVUMeter()
-        self.volume.attach(self.scale_volume, 1, 2, 0, 1,
-            gtk.EXPAND|gtk.FILL, gtk.FILL, 6, 6)
-        self.scale_volume.show()
+        self.scale_volume = self.wtree.get_widget('level-widget')
+        self._volume_set_label = self.wtree.get_widget('volume-set-label')
+        self._volume_set_label.set_text('0')
         self.shown = False
+
         # now do the callbacks for the volume setting
-        self.hscale = self.wtree.get_widget('volume-set-hscale')
-        self.setvolume_signalid = self.hscale.connect('value_changed',
+        self._hscale = self.wtree.get_widget('volume-set-hscale')
+        self._scale_changed_id = self._hscale.connect('value_changed',
                 self.cb_volume_set)
+
+        # callback for checkbutton
+        check = self.wtree.get_widget('volume-set-check')
+        check.connect('toggled', self._check_toggled_cb)
 
         return self.volume
         
     def volumeChanged(self, channel, peak, rms, decay):
         self.scale_volume.set_property('peak', peak)
         self.scale_volume.set_property('decay', decay)
+        pass
 
     # when volume has been set by another admin client
     def volumeSet(self, volume):
-        self.hscale.handler_block(scale_change_id)
-        self.hscale.set_value(volume)
-        self.hscale.handler_unblock(scale_change_id)
+        self._hscale.handler_block(self._scale_changed_id)
+        self._hscale.set_value(volume)
+        dB = "- inf"
+        if volume:
+            dB = "%2.2f" % (20.0 * math.log10(volume))
+        self._volume_set_label.set_text(dB)
+        self._hscale.handler_unblock(self._scale_changed_id)
 
     # run when the scale is moved by user
     def cb_volume_set(self, widget):
         # do something
-        d = self.effectCallRemote("setVolume", self.hscale.get_value())
+        volume = self._hscale.get_value()
+        #self.volumeSet(volume)
+        d = self.effectCallRemote("setVolume", volume)
         d.addErrback(self.setVolumeErrback)
 
-    def setVolumeErrback(self,failure):
+    def setVolumeErrback(self, failure):
         self.warning("Failure %s setting volume: %s" % (
             failure.type, failure.getErrorMessage()))
         return None
+
+    def _update_volume_label(self):
+        # update the volume label's dB value
+        pass
+
+    # when the "increase volume" checkbutton is toggled
+    def _check_toggled_cb(self, widget):
+        checked = widget.get_property('active')
+        self.debug('checkbutton toggled; now %r' % checked)
+        value = self._hscale.get_value()
+        if checked:
+            self._hscale.set_range(0.0, 4.0)
+        else:
+            if value > 1.0: value = 1.0
+            self._hscale.set_range(0.0, 1.0)
+        self.volumeSet(value)
+            
 

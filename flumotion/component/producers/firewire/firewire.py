@@ -1,8 +1,6 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/producers/soundcard/soundcard.py: soundcard producer
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
@@ -20,11 +18,9 @@
 
 # Headers in this file shall remain intact.
 
-
 from flumotion.common import errors
 from flumotion.component import feedcomponent
 from flumotion.component.effects.volume import volume
-
 
 class Firewire(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, pipeline):
@@ -35,13 +31,12 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         self.volume = self.get_pipeline().get_by_name("setvolume")
         
     def setVolume(self, value):
-        if value == 0:
-            setvol = 0
-        else:
-            setvol = value/100.0
-        self.debug("Setting volume to %f" % (setvol))
+        """
+        @param value: float between 0.0 and 4.0
+        """
+        self.debug("Setting volume to %f" % (value))
 
-        self.volume.set_property('volume', setvol)
+        self.volume.set_property('volume', value)
 
                                        
 # See comments in gstdvdec.c for details on the dv format.

@@ -41,7 +41,7 @@ class SoundcardProducer(feedcomponent.ParseLaunchComponent):
 
     def setVolume(self, value):
         self.debug("Volume set to: %d" % (value))
-
+        self.warning("FIXME: soundcard.setVolume not implemented yet")
                                        
 def createComponent(config):
     element = config['source-element']
