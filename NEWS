@@ -1,4 +1,13 @@
-This is Flumotion 0.1.5, "London Bar".
+This is Flumotion 0.1.6, "Bordello".
+
+Issues fixed since 0.1.5:
+
+ticket	summary
+104	GUI for worker
+165	flumotion needs to give error when missing firewire device
+172	login problems in admin client
+175	Speex do not work with current CVS
+176	Colorbalance GUI never comes up with Current CVS
 
 Issues fixed since 0.1.4:
 
