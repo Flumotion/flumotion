@@ -30,10 +30,10 @@ __all__ = ['ComponentPerspective', 'Controller', 'ControllerServerFactory']
 import gst
 
 from twisted.internet import reactor
+from twisted.python import components
 from twisted.spread import pb
 
-from flumotion.server import admin
-from flumotion.server.interfaces import IAdminComponent, IBaseComponent
+from flumotion.server import admin, interfaces
 from flumotion.twisted import errors, pbutil, portal
 from flumotion.utils import gstutils, log
 
@@ -67,15 +67,15 @@ class Dispatcher(log.Loggable):
     # on the peer, allowing any object that has the mind to call back
     # to the piece that called login(),
     # which in our case is a component or an admin.
-    def requestAvatar(self, avatarID, mind, *interfaces):
+    def requestAvatar(self, avatarID, mind, *ifaces):
 
-        if not pb.IPerspective in interfaces:
+        if not pb.IPerspective in ifaces:
             raise errors.NoPerspectiveError(avatarID)
 
         p = None
-        if IBaseComponent in interfaces:
+        if interfaces.IBaseComponent in ifaces:
             p = self.controller.getPerspective(avatarID)
-        elif IAdminComponent in interfaces:
+        elif interfaces.IAdminComponent in ifaces:
             p = self.admin.getPerspective()
 
         if not p:
