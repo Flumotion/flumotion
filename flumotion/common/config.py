@@ -120,7 +120,7 @@ class FlumotionConfigXML(log.Loggable):
 
     def __init__(self, filename):
         self.entries = {}
-        self.workers = []
+        self.workers = None
         
         self.debug('Loading configuration file `%s\'' % filename)
         self.doc = minidom.parse(filename)
