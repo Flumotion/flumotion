@@ -8,8 +8,12 @@ sys.path.insert(1, os.path.abspath('..'))
 import pygtk
 pygtk.require('2.0')
 
-gstdir='@PYGST_DIR@'
+gstdir = '@PYGST_DIR@'
 if not gstdir in sys.path:
     sys.path.append(gstdir)
 
 import gst
+
+ltihooks = sys.modules.get('gst.ltihooks')
+if ltihooks:
+    ltihooks.uninstall()
