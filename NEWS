@@ -1,4 +1,34 @@
-This is Flumotion 0.1.6, "Bordello".
+This is Flumotion 0.1.7, "La Chacha".
+
+Features since 0.1.6:
+
+- running configuration can be exported to XML from the admin client
+- XML can be imported to the manager from the admin client
+- admin client manages and remembers previous connections
+- works with Twisted 2.0 as well
+- TV Cards are properly supported now
+- keycards contain a domain that can be used in bouncers
+- Firewire sound volume can be changed
+
+Issues fixed since 0.1.6:
+
+ticket	summary
+
+18	Use of Norwegian characters in overlay test breaks wizard
+110	Webcam component does not support different devices
+186	in some cases a streamer asking a bouncer to expire tracebacks
+78	[vorbis] should autosample rate,channels for bitrate
+170	flumotion 0.1.5 does not detect python 2.3 on debian unstable
+183	[vorbis] Scale based on bitrate...patch included
+184	add volume control/setting to volume effect and add volume effect
+        to firewire component
+185	bouncers don't work in 0.1.6
+188	overlay component does not clean up temporary overlay .png
+190	admin client does not see locally cached bundles anymore
+192	an admin_gtk that imports another admin_gtk where code gets
+        changed does not get rebuilt properly
+198	firewire input do not start for video
+199	Overlay text not removed even if box for it not checked
 
 Issues fixed since 0.1.5:
 
