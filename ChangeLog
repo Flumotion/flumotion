@@ -2,6 +2,12 @@
 
 	* flumotion/common/bundle.py:
 	* flumotion/test/test_bundle.py:
+	  add relative paths to bundle
+
+2004-09-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/bundle.py:
+	* flumotion/test/test_bundle.py:
 	  test unbundler
 
 2004-09-14  Thomas Vander Stichele  <thomas at apestaart dot org>

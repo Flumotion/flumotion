@@ -31,27 +31,37 @@ import time
 class TestBundler(unittest.TestCase):
     # everything we need to set up the test environment
     def setUp(self):
-        self.filename = __file__
-        self.bundler = bundle.Bundler(self.filename)
+        # create test file
+        (handle, self.filename) = tempfile.mkstemp()
+        os.write(handle, "this is a test file")
+        os.close(handle)
+
+        # create a bundle for it
+        name = os.path.split(self.filename)[1]
+        self.bundler = bundle.Bundler()
+        self.bundler.add(self.filename, name)
+
+    def tearDown(self):
+        os.unlink(self.filename)
 
     # create a bundle of one file and check whether we get the correct
     # md5sum
     def testBundlerOneSum(self):
-        bundle = self.bundler.bundle()
-        sum = bundle.md5sum
+        b = self.bundler.bundle()
+        sum = b.md5sum
 
     # create a bundle of two files and check the md5sum changed
     def testBundlerTwoSum(self):
-        bundle = self.bundler.bundle()
-        sum = bundle.md5sum
+        b = self.bundler.bundle()
+        sum = b.md5sum
         
         (handle, path) = tempfile.mkstemp()
         os.write(handle, "a bit of text to test")
         os.close(handle)
         self.bundler.add(path)
 
-        bundle = self.bundler.bundle()
-        newsum = bundle.md5sum
+        b = self.bundler.bundle()
+        newsum = b.md5sum
         assert newsum != sum
         os.unlink(path)
 
@@ -60,9 +70,9 @@ class TestBundler(unittest.TestCase):
         data = open(self.filename, "r").read()
         md5sum = md5.new(data).hexdigest()
         name = os.path.split(self.filename)[1]
-        bundle = self.bundler.bundle()
-        sum = bundle.md5sum
-        zip = bundle.zip
+        b = self.bundler.bundle()
+        sum = b.md5sum
+        zip = b.zip
 
         filelike = StringIO.StringIO(zip)
         zip = zipfile.ZipFile(filelike, "r")
@@ -82,42 +92,68 @@ class TestBundler(unittest.TestCase):
         os.write(handle, "a bit of text to test")
         os.close(handle)
         self.bundler.add(path)
-        bundle = self.bundler.bundle()
-        sum = bundle.md5sum
+        b = self.bundler.bundle()
+        sum = b.md5sum
 
         # change the test file
         time.sleep(1) # ... or the timestamp doesn't change
         handle = os.open(path, os.O_WRONLY)
         os.write(handle, "different bit of text")
         os.close(handle)
-        bundle = self.bundler.bundle()
-        newsum = bundle.md5sum
+        b = self.bundler.bundle()
+        newsum = b.md5sum
 
         assert newsum != sum
         os.unlink(path)
 
 # we test the Unbundler using the Bundler, should be enough
 class TestUnbundler(unittest.TestCase):
-    # everything we need to set up the test environment
+
     def setUp(self):
-        self.filename = __file__
-        self.bundler = bundle.Bundler(self.filename)
-        self.bundle = self.bundler.bundle()
+        self.tempdir = tempfile.mkdtemp()
+
+        # create test file
+        (handle, self.filename) = tempfile.mkstemp()
+        os.write(handle, "this is a test file")
+        os.close(handle)
+
+    def tearDown(self):
+        os.system("rm -r %s" % self.tempdir)
 
     def testUnbundler(self):
-        path = tempfile.mkdtemp()
-        unbundler = bundle.Unbundler(path)
+        bundler = bundle.Bundler()
+        bundler.add(self.filename)
+        b = bundler.bundle()
+
+        unbundler = bundle.Unbundler(self.tempdir)
         
-        unbundler.unbundle(self.bundle)
+        dir = unbundler.unbundle(b)
 
         # make sure it unpacked
-        newfile = os.path.join(path, self.filename)
+        newfile = os.path.join(dir, self.filename)
         assert os.path.exists(newfile)
 
         # verify contents
         one = open(self.filename, "r").read()
         two = open(newfile, "r").read()
         assert one == two
+
+    def testUnbundlerRelative(self):
+        bundler = bundle.Bundler()
+        bundler.add(self.filename, 'this/is/a/test.py')
+        b = bundler.bundle()
+        unbundler = bundle.Unbundler(self.tempdir)
         
+        dir = unbundler.unbundle(b)
+
+        # make sure it unpacked
+        newfile = os.path.join(dir, 'this/is/a/test.py')
+        assert os.path.exists(newfile)
+
+        # verify contents
+        one = open(self.filename, "r").read()
+        two = open(newfile, "r").read()
+        assert one == two
+ 
 if __name__ == '__main__':
      unittest.main()
