@@ -49,7 +49,7 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
               text, font=font)
 
     # How many logos we're going to show
-    logos = len([i for i in (show_fluendo, show_cc, show_xiph) if i])
+    logos = len([i for i in (show_fluendo, show_cc, show_xiph) if i]) - 1
 
     # This is really *NOT* the optimal way of doing this.
     # We should really find out a better way of adding an image on
@@ -61,21 +61,21 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
     if show_xiph:
         xiph = Image.open(xiphLogoPath)
         xiph = ImageOps.expand(xiph, imax)
-        xiph = ImageChops.offset(xiph, logos * -(WIDTH + BORDER), y_corr)
+        xiph = ImageChops.offset(xiph, -width + (WIDTH*logos), y_corr)
         image = ImageChops.add_modulo(image, xiph)
         logos -= 1
         
     if show_cc:
         cc = Image.open(ccLogoPath)
         cc = ImageOps.expand(cc, imax)
-        cc = ImageChops.offset(cc, logos * -(WIDTH + BORDER), y_corr)
+        cc = ImageChops.offset(cc, -width + (WIDTH*logos), y_corr)
         image = ImageChops.add_modulo(image, cc)
         logos -= 1
 
     if show_fluendo:
         fluendo = Image.open(fluendoLogoPath)
         fluendo = ImageOps.expand(fluendo, imax)
-        fluendo = ImageChops.offset(fluendo, -(WIDTH + BORDER), y_corr)
+        fluendo = ImageChops.offset(fluendo, -width, y_corr)
         image = ImageChops.add_modulo(image, fluendo)
 
     if os.path.exists(filename):
@@ -84,4 +84,5 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
     image.save(filename, 'png')
 
 if __name__ == '__main__':    
+    #generate_overlay('test.png', 'Testing', True, True, True, 320, 240)
     generate_overlay('test.png', 'Testing', True, True, True, 320, 240)
