@@ -57,8 +57,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.__gobject_init__()
         self.clientFactory = pbutil.FMClientFactory()
         self.debug("logging in to ClientFactory")
-        # FIXME: remove old AdminComponent iface before 0.0.1
-        d = self.clientFactory.login(cred.Username('admin'), self,
+        # FIXME: get from startup config
+        credentials = cred.Username('test')
+        credentials.avatarId = 'admin'
+        d = self.clientFactory.login(credentials, self,
             pb.IPerspective,
             interfaces.IAdminMedium)
         d.addCallback(self.setRemoteReference)

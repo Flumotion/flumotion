@@ -82,13 +82,21 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.manager_port = port
         self.manager_transport = transport
         
-    def remote_start(self, componentName, type, config, feedPorts):
+    def remote_start(self, name, type, config, feedPorts):
         """
+        I am called on by the worker's JobAvatar to start a component.
+        
+        @param name:      name of component to start
+        @type  name:      string
+        @param type:      type of component to start
+        @type  type:      string
+        @param config:    the configuration dictionary
+        @type  config:    dict
         @param feedPorts: feedName -> port
-        @type feedPorts: dict
+        @type  feedPorts: dict
         """
         defs = registry.getComponent(type)
-        self._runComponent(componentName, type, config, defs, feedPorts)
+        self._runComponent(name, type, config, defs, feedPorts)
 
     def remote_stop(self):
         reactor.stop()
@@ -131,10 +139,18 @@ class JobMedium(pb.Referenceable, log.Loggable):
         except RuntimeError:
             self.warning('Old PyGTK with threading disabled detected')
     
-    def _runComponent(self, componentName, type, config, defs, feed_ports):
+    def _runComponent(self, componentName, type, config, defs, feedPorts):
         """
-        @param feed_ports: feed_name -> port
-        @type feed_ports: dict, or None
+        @param name:      name of component to start
+        @type  name:      string
+        @param type:      type of component to start
+        @type  type:      string
+        @param config:    the configuration dictionary
+        @type  config:    dict
+        @param defs:      the registry entry for a component
+        @type  defs:      L{flumotion.common.registry.RegistryEntryComponent}
+        @param feedPorts: feedName -> port
+        @type  feedPorts: dict
         """
         # XXX: Remove this hack
         if not config.get('start-factory', True):
@@ -150,14 +166,15 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.set_nice(componentName, config.get('nice', 0))
         self.enable_core_dumps(componentName)
         
-        log.debug(componentName, 'run_component(): config dictionary is: %r' % config)
-        log.debug(componentName, 'run_component(): feed_ports is: %r' % feed_ports)
+        log.debug(componentName, 'run_component(): config: %r' % config)
+        log.debug(componentName, 'run_component(): feedPorts: %r' % feedPorts)
+        log.debug(componentName, 'run_component(): defs is: %r' % defs)
 
         comp = getComponent(config, defs)
 
         # we have components without feed ports, and without this function
-        if feed_ports:
-            comp.set_feed_ports(feed_ports)
+        if feedPorts:
+            comp.set_feed_ports(feedPorts)
 
         manager_client_factory = component.ComponentClientFactory(comp)
         # XXX: we should be getting credentials from somewhere and use them

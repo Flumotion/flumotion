@@ -17,6 +17,7 @@
 
 import optparse
 import os
+import sys
 
 from twisted.internet import reactor
 
@@ -61,6 +62,25 @@ def _loadConfig(vishnu, filename):
     # FIXME: this might be used for loading additional config, so maybe
     # unprivatize and cleanup ?
     vishnu.workerheaven.loadConfiguration(filename)
+
+    # scan filename for a bouncer component in the manager
+    conf = config.FlumotionConfigXML(filename)
+    if conf.manager and conf.manager.bouncer:
+        if vishnu.bouncer:
+            vishnu.warning("manager already had a bouncer")
+
+        vishnu.debug('going to start manager bouncer %s of type %s' % (
+            conf.manager.bouncer.name, conf.manager.bouncer.type))
+        from flumotion.common.registry import registry
+        defs = registry.getComponent(conf.manager.bouncer.type)
+        configDict = conf.manager.bouncer.getConfigDict()
+        import flumotion.worker.job
+        vishnu.setBouncer(flumotion.worker.job.getComponent(configDict, defs))
+        vishnu.bouncer.debug('I AM ALIVE !')
+        # this is a test
+        # from flumotion.common import keycards
+        # print bouncer.authenticate(keycards.HTTPClientKeycard('manager', 'test', 'test', '127.0.0.1'))
+
 
 def _initialLoadConfig(vishnu, filename):
     # this is used with a callLater for the initial config loading

@@ -88,12 +88,12 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         """
         Start a component of the given type with the given config.
 
-        @param name: name of the component to start
-        @type name: string
-        @param type: type of the component
-        @type type: string
+        @param name:   name of the component to start
+        @type name:    string
+        @param type:   type of the component to start
+        @type type:    string
         @param config: a configuration dictionary for the component
-        @type config: dict
+        @type config:  dict
         """
         self.info('remote_start(): manager asked me to start, name %s, type %s, config %r' % (name, type, config))
         self.brain.kindergarten.play(name, type, config)
@@ -120,6 +120,16 @@ class Kindergarten:
         self.kids = {}
         
     def play(self, name, type, config):
+        """
+        Make a kid play.
+        Starts a component with the given name, of the given type, and
+        the given config dictionary.
+
+        @param name:      name of component to start
+        @type  name:      string
+        @param type:      type of component to start
+        @type  type:      string
+        """
         ### FIXME: move this to the worker brain, since this is the unix
         ### domain socket
         worker_filename = '/tmp/flumotion.%d' % os.getpid()

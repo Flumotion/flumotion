@@ -488,7 +488,7 @@ def setup(component, port, mountPoint):
     @returns : the streaming resource
     @rtype   : HTTPStreamingResource
     """
-    if mountPoint[0] == '/':
+    if mountPoint and mountPoint[0] == '/':
         mountPoint = mountPoint[1:]
 
     streamingResource = HTTPStreamingResource(component)

@@ -23,7 +23,7 @@ import crypt
 from twisted.python import components
 from twisted.cred import credentials
 
-from flumotion.common import interfaces, keycards
+from flumotion.common import interfaces, keycards, log
 from flumotion.component import component
 from flumotion.component.bouncers import bouncer
 
@@ -33,9 +33,10 @@ class HTPasswd(bouncer.Bouncer):
 
     logCategory = 'htpasswd'
 
-    def __init__(self, name, filename, type):
+    def __init__(self, name, filename, data, type):
         bouncer.Bouncer.__init__(self, name)
         self._filename = filename
+        self._data = data
         self._type = type
 
         # FIXME: done through state/mood change ?
@@ -44,13 +45,20 @@ class HTPasswd(bouncer.Bouncer):
     # FIXME: generalize to a start method, possibly linked to mood
     def _setup(self):
         self._db = {}
-        lines = open(self._filename).readlines()
+        if self._filename:
+            lines = open(self._filename).readlines()
+        else:
+            lines = self._data.split("\n")
 
         for line in lines:
-            name, password = line[:-1].split(':')
+            if not ':' in line: continue
+            # when coming from a file, it ends in \n, so strip.
+            # for data, we already splitted, so no \n, but strip is fine.
+            name, password = line.strip().split(':')
             self._db[name] = password
 
-        self.debug('parsed %s, %d lines' % (self._filename, len(lines)))
+        self.debug('parsed %s, %d lines' % (self._filename or '<memory>',
+            len(lines)))
    
     def authenticate(self, keycard):
         if not components.implements(keycard, credentials.ICredentials):
@@ -58,28 +66,55 @@ class HTPasswd(bouncer.Bouncer):
             raise AssertionError
 
         if not self._db.has_key(keycard.username):
+            self.info('keycard %r refused, no username %s found' % (
+                keycard, keycard.username))
             return None
                                                                                 
         entry = self._db[keycard.username]
         if self._type == 'crypt':
             salt = entry[:2]
             encrypted = crypt.crypt(keycard.password, salt)
+            if entry == encrypted:
+                return self._authenticated(keycard, "crypt accepted")
+            else:
+                return self._refused(keycard, "crypt refused")
+        elif self._type == 'plaintext':
+            # if it has this method, like for pb auth, use it
+            if hasattr(keycard, 'checkPassword'):
+                if keycard.checkPassword(entry):
+                    return self._authenticated(keycard, "plaintext accepted")
+                else:
+                    return self._refused(keycard, "plaintext refused")
+            raise NotImplementedError
         elif self._type == 'md5':
             raise NotImplementedError
         else:
-            raise AssertionError("unsupported method: %s" % self.type)
+            raise AssertionError("unsupported method: %s" % self._type)
                                                                                 
-        if entry == encrypted:
-            self.info('keycard %r authenticated' % keycard)
-            self._addKeycard(keycard)
-            return keycard
-        else:
-            self.info('keycard %r refused' % keycard)
-            return None
+
+    def _authenticated(self, keycard, reason):
+        self.info('keycard %r authenticated (%s)' % (keycard, reason))
+        self._addKeycard(keycard)
+        return keycard
+    def _refused(self, keycard, reason):
+        self.info('keycard %r refused (%s)' % (keycard, reason))
+        return None
 
 def createComponent(config):
-    filename = config['filename']
-    # FIXME: use checker
-    type = config.get('auth-type', 'crypt')
-    comp = HTPasswd(config['name'], filename, type)
+    # we need either a filename or data
+    filename = None
+    data = None
+    if config.has_key('filename'):
+        filename = config['filename']
+        log.debug('htpasswd', 'using file %s for passwords' % filename)
+    elif config.has_key('data'):
+        data = config['data']
+        log.debug('htpasswd', 'using in-line data for passwords')
+    else:
+        # FIXME
+        raise
+
+    # FIXME: use checker, get type correctly too
+    type = config.get('encryption', 'crypt')
+    comp = HTPasswd(config['name'], filename, data, type)
     return comp

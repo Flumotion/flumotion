@@ -55,12 +55,12 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         """
         Start a component of the given type with the given config.
                                                                                 
-        @param name: name of the component to start
-        @type name: string
-        @param type: type of the component
-        @type type: string
+        @param name:   name of the component to start
+        @type name:    string
+        @param type:   type of the component to start
+        @type type:    string
         @param config: a configuration dictionary for the component
-        @type config: dict
+        @type config:  dict
         """
         self.info('starting %s on %s with config %r' % (name, self.avatarId, config))
         return self.mind.callRemote('start', name, type, config)
@@ -101,18 +101,6 @@ class WorkerHeaven(pb.Root, log.Loggable):
         self.conf = FlumotionConfigXML(filename)
         return
 
-        workers = self.conf.getWorkers()
-        if workers:
-            self.setupWorkers(workers)
-
-    def setupWorkers(self, workers):
-        if workers.getPolicy() == 'password':
-            self.vishnu.checker.allowAnonymous(False)
-
-            for worker in workers.workers:
-                self.vishnu.checker.addUser(worker.getUsername(),
-                                            worker.getPassword())
-            
     def getEntries(self, worker):
         # get all components from the config for this worker
         workerName = worker.getName()
@@ -154,16 +142,16 @@ class WorkerHeaven(pb.Root, log.Loggable):
             self.workerStartComponent(workerName, componentName,
                 entry.getType(), dict)
             
-    # FIXME: move worker to second argument
-    # FIXME: rename method to workerStart
     def workerStartComponent(self, workerName, componentName, type, config):
         """
-        @param workerName: name of the worker to start component on
-        @type  workerName: string
+        @param workerName:    name of the worker to start component on
+        @type  workerName:    string
         @param componentName: name of the component to start
         @type  componentName: string
-        @param config: a configuration dictionary
-        @type  config: dict
+        @param type:          type of the component to start
+        @type  type:          string
+        @param config:        a configuration dictionary
+        @type  config:        dict
         """
         
         if not self.avatars:

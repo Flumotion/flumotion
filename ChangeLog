@@ -1,3 +1,25 @@
+2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	  some more notes
+	* flumotion/component/http/http_resources.py:
+	  fix bug when mountpoint is not specified
+	* flumotion/component/bouncers/htpasswd.py:
+	* flumotion/component/bouncers/htpasswd.xml:
+	  also allow specifying raw data instead of a filename to init
+	* flumotion/admin/admin.py:
+	* flumotion/common/config.py:
+	  add parsing of a raw string
+	* flumotion/manager/worker.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	* flumotion/twisted/portal.py:
+	  documenting
+	* flumotion/manager/manager.py:
+	  use the bouncer to authenticate workers, comps and admin to follow
+	* flumotion/manager/main.py:
+	  create a bouncer component which we don't start, yay !
+
 2004-10-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/config.py:

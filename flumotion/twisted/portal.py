@@ -109,6 +109,8 @@ class _PortalAuthChallenger(pb.Referenceable):
         self.challenge = challenge
         self.interfaces = interfaces
         self.avatarId = avatarId
+
+        self.componentName = "manager" # because we give this to a bouncer
         
     def remote_respond(self, response, mind):
         self.response = response

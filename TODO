@@ -29,6 +29,13 @@
 * EASY		add version number to helps and friends
 
 * EASY		remove utils, split up gstutils
+
+* EASY:		change rawstring regentry type to string, and make pipelinestring for pipelines which need \n translated to space
+
+* MEDIUM:	change keycard/bouncer so there's an authenticated boolean on
+                the keycard, and return the keycard for challenge/response
+		type of auth
+
 - API cleanup:
 
 - manager/component.py:

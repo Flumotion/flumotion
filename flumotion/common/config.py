@@ -327,7 +327,16 @@ class FlumotionConfigXML(log.Loggable):
             values.append(data)
 
         return values
-    
+
+    def get_raw_string_value(self, nodes):
+        values = []
+        for subnode in nodes:
+            data = str(subnode.childNodes[0].data)
+            values.append(data)
+
+        string = "".join(values)
+        return [string, ]
+     
     def get_xml_value(self, nodes):
         class XMLProperty:
             pass
@@ -370,6 +379,8 @@ class FlumotionConfigXML(log.Loggable):
             type = definition.type
             if type == 'string':
                 value = self.get_string_value(nodes)
+            elif type == 'rawstring':
+                value = self.get_raw_string_value(nodes)
             elif type == 'int':
                 value = self.get_int_value(nodes)
             elif type == 'float':

@@ -26,7 +26,8 @@ Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 __all__ = ['ManagerServerFactory', 'Vishnu']
 
 from twisted.internet import reactor
-from twisted.python import components
+from twisted.cred import error
+from twisted.python import components, failure
 from twisted.spread import pb
 
 from flumotion.manager import admin, component, worker
@@ -62,7 +63,6 @@ class Dispatcher(log.Loggable):
     # to the piece that called login(),
     # which in our case is a component or an admin client.
     def requestAvatar(self, avatarId, mind, *ifaces):
-        print "THOMAS: mind %r, ifaces %r" % (mind, ifaces)
         avatar = self.createAvatarFor(avatarId, ifaces)
         self.debug("returning Avatar: id %s, avatar %s" % (avatarId, avatar))
 
@@ -117,7 +117,23 @@ class Dispatcher(log.Loggable):
         self._interfaceHeavens[interface] = heaven
 
 class ManagerCredentialsChecker(cred.FlexibleCredentialsChecker):
+    # FIXME: maybe we should get the actual checker used by bouncer
+    def __init__(self):
+        cred.FlexibleCredentialsChecker.__init__(self)
+        self.bouncer = None
+
     def requestAvatarId(self, credentials):
+        # until we figure out component auth, we pass components freely
+        if interfaces.IComponentMedium in credentials.interfaces:
+            return credentials.avatarId
+
+        # if we have a bouncer, we make workers and admin authenticate
+        if self.bouncer:
+            result = self.bouncer.authenticate(credentials)
+            if not result:
+                self.log('refusing credentials %r' % credentials)
+                return failure.Failure(error.UnauthorizedLogin())
+                
         # XXX: If it's component or admin, allow anonymous access.
         #      This is a big hack, but it emulates the current behavior
         #      Do we need to authenticate components and workers?
@@ -127,10 +143,11 @@ class ManagerCredentialsChecker(cred.FlexibleCredentialsChecker):
 
         return cred.FlexibleCredentialsChecker.requestAvatarId(self, credentials)
 
-class Vishnu:
+class Vishnu(log.Loggable):
     """
     I am the toplevel manager object that knows about all heavens and factories
     """
+    logCategory = "vishnu"
     def __init__(self):
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
@@ -142,6 +159,7 @@ class Vishnu:
                                                   component.ComponentHeaven)
         self.adminheaven = self._createHeaven(interfaces.IAdminMedium,
                                               admin.AdminHeaven)
+        self.bouncer = None # used by manager to authenticate worker/component
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
@@ -169,5 +187,12 @@ class Vishnu:
         self.dispatcher.registerHeaven(heaven, interface)
         return heaven
     
+    def setBouncer(self, bouncer):
+        """
+        @type bouncer: L{flumotion.component.bouncers.bouncer.Bouncer}
+        """
+        self.bouncer = bouncer
+        self.checker.bouncer = bouncer
+
     def getFactory(self):
         return self.factory
