@@ -243,9 +243,9 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         rebuild(sys.modules[__name__])
 
         # now rebuild relevant modules
-        import flumotion.utils
+        import flumotion.utils.reload
         rebuild(sys.modules['flumotion.utils'])
-        flumotion.utils.reload()
+        flumotion.utils.reload.reload()
         self._reloaded()
 
     # separate method so it runs the newly reloaded one :)
