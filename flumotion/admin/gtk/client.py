@@ -349,6 +349,9 @@ class Window(log.Loggable, gobject.GObject):
         self.current_component = gtkAdminInstance
 
     ### IAdminView interface methods: FIXME: create interface somewhere
+    ## Confusingly enough, this procedure is called by remote objects to
+    ## operate on the client ui. I think. It is *not* for calling
+    ## methods on the remote components. Should fix this sometime.
     def componentCall(self, componentState, methodName, *args, **kwargs):
         # FIXME: for now, we only allow calls to go through that have
         # their UI currently displayed.  In the future, maybe we want
@@ -384,6 +387,41 @@ class Window(log.Loggable, gobject.GObject):
             raise errors.RemoteRunError(msg)
         self.debug("component: returning result: %r to caller" % result)
         return result
+
+    def componentCallRemoteStatus(self, state, pre, post, fail,
+                                  methodName, *args, **kwargs):
+        if not state:
+            state = self.components_view.get_selected_state()
+            if not state:
+                return
+        name = state.get('name')
+        if not name:
+            return
+
+        mid = None
+        if pre:
+            mid = self.statusbar.push('main', pre % name)
+        d = self.admin.componentCallRemote(state, methodName, *args, **kwargs)
+
+        def _stopCallback(result, self, mid):
+            if mid:
+                self.statusbar.remove('main', mid)
+            if post:
+                self.statusbar.push('main', post % name)
+        def _stopErrback(failure, self, mid):
+            if mid:
+                self.statusbar.remove('main', mid)
+            self.warning("Failed to execute %s on component %s: %s"
+                         % (methodName, name, failure))
+            if fail:
+                self.statusbar.push('main', fail % name)
+            
+        d.addCallback(_stopCallback, self, mid)
+        d.addErrback(_stopErrback, self, mid)
+  
+    def componentCallRemote(self, state, methodName, *args, **kwargs):
+        self.componentCallRemoteStatus(self, None, None, None,
+                                       methodName, *args, **kwargs)
 
     def setPlanetState(self, planetState):
         self.debug('parsing planetState %r' % planetState)
@@ -688,28 +726,20 @@ class Window(log.Loggable, gobject.GObject):
         dialog.start()
 
     def _component_stop(self, state):
-        name = state.get('name')
-        if not name:
-            return
-
-        mid = self.statusbar.push('main', "Stopping component %s" % name)
-        d = self.admin.componentCallRemote(name, "stop")
-
-        def _stopCallback(result, self, mid):
-            self.statusbar.remove('main', mid)
-            self.statusbar.push('main', "Stopped component %s" % name)
-        def _stopErrback(failure, self, mid):
-            self.statusbar.remove('main', mid)
-            self.warning("Failed to stop component %s: %s" % (name, failure))
-            self.statusbar.push('main', "Failed to stop component %s" % name)
-            
-        d.addCallback(_stopCallback, self, mid)
-        d.addErrback(_stopErrback, self, mid)
+        self.componentCallRemoteStatus(state,
+                                       'Stopping component %s...',
+                                       'Stopped component %s',
+                                       'Failed to stop component %s',
+                                       'stop')
+  
+    def _component_start(self, state):
+        self.componentCallRemoteStatus(state,
+                                       'Starting component %s...',
+                                       'Started component %s',
+                                       'Failed to start component %s',
+                                       'start')
   
     # menubar/toolbar callbacks
-    def file_new_cb(self, button):
-        raise NotImplementedError()
-
     def on_have_connection(self, d, state):
         d.destroy()
         self.on_open_connection(state)
@@ -722,6 +752,12 @@ class Window(log.Loggable, gobject.GObject):
     def file_quit_cb(self, button):
         self.close()
     
+    def manage_start_component_cb(self, button):
+        self._component_start(None)
+        
+    def manage_stop_component_cb(self, button):
+        self._component_stop(None)
+        
     def manage_stop_all_cb(self, button):
         self.admin.cleanComponents()
         
