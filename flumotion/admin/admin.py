@@ -573,4 +573,4 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     def getWorkerHeavenState(self):
         return self._workerHeavenState
 
-#gobject.type_register(AdminModel)
+gobject.type_register(AdminModel)

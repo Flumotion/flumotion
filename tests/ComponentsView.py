@@ -34,6 +34,7 @@ class TestComponentsView:
         self.window.show_all()
         self.view = parts.ComponentsView(self.widget)
         self.view.connect('selected', self.selected)
+        self.window.connect('destroy', gtk.main_quit)
 
     def _createComponent(self, dict):
         jstate = component.JobComponentState()
@@ -56,6 +57,10 @@ class TestComponentsView:
             {'name': 'two', 'mood': moods.sad.value,
              'workerName': 'R2D2', 'pid': 2})
         components['two'] = c
+        c = self._createComponent(
+            {'name': 'three', 'mood': moods.hungry.value,
+             'workerName': 'C3PO', 'pid': 3})
+        components['three'] = c
         self.view.update(components)
 
     def selected(self, view, name):

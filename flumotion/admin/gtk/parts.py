@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_parts -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -30,11 +30,12 @@ from flumotion.common import log, component
 from flumotion.common.component import moods
 from flumotion.common.pygobject import gsignal
 
-COL_MOOD      = 0
-COL_NAME      = 1
-COL_WORKER    = 2
-COL_PID       = 3
-COL_STATE     = 4
+COL_MOOD       = 0
+COL_NAME       = 1
+COL_WORKER     = 2
+COL_PID        = 3
+COL_STATE      = 4
+COL_MOOD_VALUE = 5 # to sort COL_MOOD
 
 class AdminStatusbar:
     """
@@ -133,29 +134,35 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self.__gobject_init__()
         
         self._view = tree_widget
-        self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, int, object)
+        self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, int, object, int)
 
         self._view.connect('cursor-changed', self._view_cursor_changed_cb)
         self._view.set_model(self._model)
         self._view.set_headers_visible(True)
 
         # put in all the columns
+
         col = gtk.TreeViewColumn('Mood', gtk.CellRendererPixbuf(),
                                  pixbuf=COL_MOOD)
+        col.set_sort_column_id(COL_MOOD_VALUE)
         self._view.append_column(col)
 
         col = gtk.TreeViewColumn('Component', gtk.CellRendererText(),
                                  text=COL_NAME)
+        col.set_sort_column_id(COL_NAME)
         self._view.append_column(col)
 
         col = gtk.TreeViewColumn('Worker', gtk.CellRendererText(),
                                  text=COL_WORKER)
+        col.set_sort_column_id(COL_WORKER)
         self._view.append_column(col)
         
         col = gtk.TreeViewColumn('PID', gtk.CellRendererText(),
                                  text=COL_PID)
-
+        col.set_sort_column_id(COL_PID)
         self._view.append_column(col)
+
+        # the additional columns need not be added
 
         self._moodPixbufs = self._getMoodPixbufs()
         self._iters = {} # componentState -> model iter
@@ -218,6 +225,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
             self._model.set(iter, COL_WORKER, component.get('workerName'))
             self._model.set(iter, COL_PID, component.get('pid'))
             self._model.set(iter, COL_STATE, component)
+            self._model.set(iter, COL_MOOD_VALUE, mood)
 
     def set_mood_value(self, state, value):
         """
@@ -227,6 +235,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         """
         iter = self._iters[state]
         self._model.set(iter, COL_MOOD, self._moodPixbufs[value])
+        self._model.set(iter, COL_MOOD_VALUE, value)
 
 gobject.type_register(ComponentsView)
     

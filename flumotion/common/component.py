@@ -30,7 +30,7 @@ from flumotion.common import enum
 # moods
 moods = enum.EnumClass(
     'Moods',
-    ('happy', 'sad', 'lost', 'hungry', 'waking', 'sleeping')
+    ('happy', 'hungry', 'waking', 'sleeping', 'lost', 'sad')
 )
 
 # component state proxy objects

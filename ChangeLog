@@ -1,5 +1,15 @@
 2005-01-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  reregister gobject
+	* tests/ComponentsView.py:
+	* flumotion/admin/gtk/parts.py:
+	  make columns sortable
+	* flumotion/common/component.py:
+	  change moods enum so that happy and sad are at opposite sides
+
+2005-01-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	* doc/reference/Makefile.am:
 	* flumotion/admin/admin.py:
