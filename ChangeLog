@@ -1,5 +1,8 @@
 2005-01-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/wizard.py (Wizard.set_page): Fix stupid
+	something.
+
 	* flumotion/admin/gtk/greeter.py (Initial, ConnectToExisting)
 	(Authenticate): Set used glade attributes to None to appease the
 	mighty pychecker.

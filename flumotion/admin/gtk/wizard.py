@@ -143,7 +143,7 @@ class Wizard(gobject.GObject):
         except KeyError:
             raise AssertionError ('No page named %s in %r' % (name, self.pages))
 
-        if not page['page']:
+        if not page.page:
             wtree = gtk.glade.XML(os.path.join(configure.gladedir,
                                                self.name+'-'+name+'.glade'),
                                   'page')
