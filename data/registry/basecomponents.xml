@@ -9,7 +9,7 @@
   </component>
 
   <component type="producer" inherit="base">
-    <source location="flumotion.server.producer"/>
+    <source location="flumotion.components.producer"/>
     <properties>
       <property name="pipeline" type="string" required="yes"/>
       <property name="feeds" type="list"/>
@@ -17,7 +17,7 @@
   </component>
 
   <component type="converter" inherit="base">
-    <source location="flumotion.server.converter"/>
+    <source location="flumotion.components.converter"/>
     <properties>
       <property name="pipeline" type="string" required="yes"/>
       <property name="feeds" type="list"/>
@@ -26,7 +26,7 @@
   </component>
   
   <component type="http-streamer">
-    <source location="flumotion.components.http"/>
+    <source location="flumotion.components.http" inherit="base"/>
     <properties>
       <property name="source" type="string" required="yes"/>
       <property name="port" type="int" required="yes"/>
@@ -35,7 +35,7 @@
   </component>
 
   <component type="file-streamer">
-    <source location="flumotion.components.file"/>
+    <source location="flumotion.components.file" inherit="base"/>
     <properties>
       <property name="source" type="string" required="yes"/>
       <property name="location" type="string" required="yes"/>

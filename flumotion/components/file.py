@@ -26,59 +26,18 @@ from flumotion.server import component
 
 class FileSinkStreamer(component.ParseLaunchComponent):
     pipe_template = 'filesink name=sink location="%s"'
-    def __init__(self, name, sources, location):
+    def __init__(self, name, source, location):
         self.location = location
 
         pipeline = self.pipe_template % self.get_location()
-        component.ParseLaunchComponent.__init__(self, name, sources,
+        component.ParseLaunchComponent.__init__(self, name, [source],
                                                 [], pipeline)
-
-    def create_admin(self):
-        from twisted.manhole.telnet import ShellFactory
-        from flumotion.twisted.shell import Shell
-        
-        ts = ShellFactory()
-        ts.username = 'fluendo'
-        ts.protocol = Shell
-        ts.namespace['self'] = self
-        ts.namespace['restart'] = self.local_restart
-
-        return ts
-    
-    def get_location(self):
-        if self.location.find('%') != -1:
-            timestamp = time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime())
-            return self.location % timestamp
-
-        return self.location
-
-    def local_restart(self):
-        if self.pipeline is None:
-            self.msg('Not started yet, skipping')
-            return
-
-        self.pipeline.set_state(gst.STATE_PAUSED)
-
-        # Save and close file
-        sink = self.pipeline.get_by_name('sink')
-        sink.set_state(gst.STATE_READY)
-
-        location = self.get_location()
-        self.msg('setting location to', location)
-        sink.set_property('location', location)
-        
-        self.pipeline.set_state(gst.STATE_PLAYING)
 
 def createComponent(config):
     name = config['name']
     source = config['source']
     location = config['location']
     
-    component = FileSinkStreamer(name, [source], location)
-
-    # Administrative interface
-    #factory = component.create_admin()
-    #self.msg('Starting admin factory on port %d' % c.port)
-    #reactor.listenTCP(port, factory)
+    component = FileSinkStreamer(name, source, location)
 
     return component

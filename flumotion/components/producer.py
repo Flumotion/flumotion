@@ -22,7 +22,8 @@ from flumotion.server import component
 
 class Producer(component.ParseLaunchComponent):
     def __init__(self, name, feeds, pipeline):
-        component.ParseLaunchComponent.__init__(self, name, [], feeds, pipeline)
+        component.ParseLaunchComponent.__init__(self, name, [],
+                                                feeds, pipeline)
 
 def createComponent(config):
     name = config['name']

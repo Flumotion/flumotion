@@ -228,15 +228,14 @@ def createComponent(config):
     port = int(config['port'])
     sources = config.get('sources', [])
 
-    # XXX: How can we do this properly?
     component = MultifdSinkStreamer(name, sources)
     resource = HTTPStreamingResource(component)
     if config.has_key('logfile'):
-        log.msg(config['name'], 'Logging to %s' % config['logfile'])
+        component.msg('Logging to %s' % config['logfile'])
         resource.setLogfile(config['logfile'])
         
     factory = server.Site(resource=resource)
-    log.msg(config['name'], 'Listening on %d' % port)
+    component.msg( 'Listening on %d' % port)
     reactor.listenTCP(port, factory)
 
     return component

@@ -23,6 +23,8 @@ import os
 import signal
 import sys
 
+import gobject
+gobject.thread_init()
 import gst
 
 from flumotion.twisted import gstreactor

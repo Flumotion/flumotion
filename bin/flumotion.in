@@ -8,6 +8,11 @@ sys.path.insert(0, '@PYGTK_DIR@')
 import pygtk
 pygtk.require('2.0')
 
+import gobject
+if gobject.pygtk_version < (2,3,96):
+    print 'PyGTK 2.3.96 or higher is required'
+    raise SystemExit
+
 dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.exists(os.path.join(dir, '.svn')):
     root = os.path.split(dir)[0]

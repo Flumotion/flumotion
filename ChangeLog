@@ -1,3 +1,14 @@
+2004-08-03  Johan Dahlin  <johan@gnome.org>
+
+	* bin/flumotion.in: 
+	* configure.ac (PYGTK_REQ): Require PyGTK 2.3.96
+
+	* flumotion/server/launcher.py: Call gobject.thread_init here
+
+	* flumotion/components/producer.py: Ditto
+
+	* flumotion/components/converter.py: Move here
+
 2004-08-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* autogen.sh:

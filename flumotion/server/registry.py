@@ -41,6 +41,15 @@ def check_node(node, tag):
     raise XmlParserError, \
           'expected <%s>, but <%s> found' % (tag, node.nodeName)
 
+# TODO
+# ====
+#
+# Properties (required, type)
+# Inherit or interfaces?
+# Proper description
+# Read and merge other files
+# Links to other files (glade, python, png)
+
 class RegistryXmlParser:
     def __init__(self, filename):
         self.components = []
@@ -57,10 +66,9 @@ class RegistryXmlParser:
         return self.components
 
     def parse(self):
-        """<gst-media-test>
-             <mediums>
-             <test-case>
-           </gst-media-test>"""
+        """<components>
+             <component>
+           </components>"""
 
         root = self.doc.documentElement
         
