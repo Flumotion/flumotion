@@ -25,3 +25,15 @@ class PipelineParseError(pb.Error):
 
 class NotReadyError(pb.Error):
     pass
+
+class PropertyError(pb.Error):
+    pass
+
+class AlreadyConnectedError(pb.Error):
+    pass
+
+class NoPerspectiveError(pb.Error):
+    pass
+
+class SystemError(pb.Error):
+    pass

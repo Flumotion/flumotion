@@ -26,6 +26,7 @@ import gobject
 from twisted.internet import reactor
 from twisted.spread import pb
 
+from flumotion.server import interfaces
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
 
@@ -39,11 +40,12 @@ class ClientFactory(pbutil.ReconnectingPBClientFactory):
     def login(self, username):
         self.__super_login(pbutil.Username(username),
                            client=self.component)
-
+        
     def gotPerspective(self, perspective):
         self.component.cb_gotPerspective(perspective)
 
 class BaseComponent(pb.Referenceable):
+    __implements__ = interfaces.IBaseComponent,
     def __init__(self, name, sources, feeds):
         self.component_name = name
         self.sources = sources
@@ -212,7 +214,7 @@ class BaseComponent(pb.Referenceable):
                 'feeds' : self.getFeeds(),
                 'elements': element_names }
     
-    def remote_get_free_ports(self, feeds):
+    def remote_getFreePorts(self, feeds):
         retval = []
         ports = {}
         free_port = gstutils.get_free_port(start=5500)
@@ -238,22 +240,32 @@ class BaseComponent(pb.Referenceable):
     def remote_pause(self):
         self.pipeline_pause()
 
-    def remote_get_element_property(self, element_name, property):
+    def remote_getElementProperty(self, element_name, property):
         element = self.pipeline.get_by_name(element_name)
+        if not element:
+            raise errors.PropertyError("No element called: %s" % element_name)
+        
         self.msg('getting property %s on element %s' % (property, element_name))
-        return element.get_property(property)
+        try:
+            value = element.get_property(property)
+        except ValueError:
+            raise errors.PropertyError("No property called: %s" % property)
 
-    def remote_set_element_property(self, element_name, property, value):
+        return value
+
+    def remote_setElementProperty(self, element_name, property, value):
         element = self.pipeline.get_by_name(element_name)
+        if not element:
+            raise errors.PropertyError("No element called: %s" % element_name)
 
         for pspec in gobject.list_properties(element):
             if pspec.name == property:
                 break
-
-        if pspec.value_type in (gobject.TYPE_INT,
-                                gobject.TYPE_UINT,
-                                gobject.TYPE_INT64,
-                                gobject.TYPE_UINT64):
+        else:
+            raise errors.PropertyError("No property called: %s" % property)
+        
+        if pspec.value_type in (gobject.TYPE_INT, gobject.TYPE_UINT,
+                                gobject.TYPE_INT64, gobject.TYPE_UINT64):
             value = int(value)
         elif pspec.value_type == gobject.TYPE_BOOLEAN:
             if value == 'False':
@@ -265,7 +277,7 @@ class BaseComponent(pb.Referenceable):
         elif pspec.value_type in (gobject.TYPE_DOUBLE, gobject.TYPE_FLOAT):
             value = float(value)
         else:
-            self.warn('Unknown property type: %s' % pspec.value_type)
+            raise errors.PropertyError('Unknown property type: %s' % pspec.value_type)
 
         self.msg('setting property %s on element %s to %s' % (property, element_name, value))
         element.set_property(property, value)

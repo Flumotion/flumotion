@@ -18,30 +18,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  
-import ConfigParser
 import optparse
 import os
 import signal
 import sys
 import warnings
-import string
-import pwd
 
 try:
     warnings.filterwarnings('ignore', category=FutureWarning)
 except:
     pass
 
-#sys_argv = sys.argv
-#sys.argv = sys_argv[:1]
 import gst
-#sys.argv = sys_argv
 
 from flumotion.twisted import gstreactor
 gstreactor.install()
 
 from twisted.internet import reactor
-from twisted.web import server, resource
+from twisted.web import server
 
 from flumotion import errors, twisted
 from flumotion.server.config import FlumotionConfig
@@ -83,10 +77,12 @@ class Launcher:
             else:
                 self.msg('Nice level set to %d' % nice)
 
-    def start_controller(self):
-        pid = os.fork()
+    def start_controller(self, logging=False):
         self.msg('Starting controller')
+        pid = os.fork()
         if not pid:
+            if logging:
+                log.enableLogging()
             self.restore_uid()
             factory = ControllerServerFactory()
             self.controller = reactor.listenTCP(self.controller_port,
@@ -242,9 +238,9 @@ def get_options_for(kind, args):
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="Be verbose")
-    
-    group = optparse.OptionGroup(parser, '%s%s options' % (kind[0].upper(),
-                                                           kind[1:]))
+
+    nicename = kind[0].upper() + kind[1:]
+    group = optparse.OptionGroup(parser, '%s options' % nicename)
     group.add_option('-n', '--name',
                      action="store", type="string", dest="name",
                      default=None,
@@ -307,9 +303,6 @@ def get_options_for(kind, args):
             raise errors.OptionError, 'Need a listen_port'
             return 2
 
-    if options.verbose:
-        log.enableLogging()
-
     if need_sources:
         if ',' in  options.sources:
             options.sources = options.sources.split(',')
@@ -338,18 +331,19 @@ def run_launcher(args):
         print 'Need a configuration file'
         return -1
     
-    if options.verbose:
-        log.enableLogging()
-
     launcher = Launcher(options.host, options.port)
 
     if options.host == 'localhost':
         if not gstutils.is_port_free(options.port):
             launcher.error('Controller is already started')
         else:
-            launcher.start_controller()
+            launcher.start_controller(options.verbose)
 
     launcher.load_config(args[2])
+
+    if options.verbose:
+        log.enableLogging()
+
     launcher.run()
 
     return 0

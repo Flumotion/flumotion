@@ -18,12 +18,17 @@ else:
 sys.path.insert(0, root)
 
 import __builtin__
-__builtin__.GLADE_ROOT = gladedir
+__builtin__.GLADE_ROOT = gladedir # This should probably go away
 
 from flumotion.server import launcher
+from flumotion.twisted import errors
 
 def main(args):
     return launcher.main(args)
     
 if __name__ == '__main__':
-    sys.exit(main(sys.argv))
+    try:
+        sys.exit(main(sys.argv))
+    except errors.SystemError, e:
+        print 'ERROR:', e
+

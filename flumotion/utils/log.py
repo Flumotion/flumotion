@@ -20,6 +20,8 @@
 
 import sys
 
+from flumotion.twisted import errors
+
 _log_handlers = []
 
 def stderrHandler(category, type, message):
@@ -39,8 +41,9 @@ def warn(cat, *args):
     log(cat, 'WARNING', ' '.join(args))
 
 def error(cat, *args):
-    log(cat, 'ERROR', ' '.join(args))
-    raise SystemExit
+    msg = ' '.join(args)
+    log(cat, 'ERROR', msg)
+    raise errors.SystemError(msg)
 
 def enableLogging():
     global _log_handlers

@@ -36,18 +36,22 @@ class Dispatcher:
         
     def requestAvatar(self, avatarID, mind, *interfaces):
         p = None
+        print avatarID, mind, interfaces
+        if not pb.IPerspective in interfaces:
+            raise errors.NoPerspectiveError(avatarID)
+        
         if avatarID == 'admin':
             p = self.admin.getPerspective()
         else:
             component_type, avatarID = avatarID.split('_', 1)
             if self.controller.hasComponent(avatarID):
-                raise TypeError, "client %s already connected" % avatarID
+                raise errors.AlreadyConnectedError(avatarID)
         
             p = self.controller.getPerspective(component_type, avatarID)
 
         #msg("returning Avatar(%s): %s" % (avatarID, p))
         if not p:
-            raise ValueError, "no perspective for '%s'" % avatarID
+            raise errors.NoPerspectiveError(avatarID)
 
         # schedule a perspective attached
         reactor.callLater(0, p.attached, mind)
@@ -127,7 +131,11 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.controller.componentRegistered(self)
 
     def cb_checkAll(self, failure):
-        self.error(str(failure))
+        try:
+            self.error(str(failure))
+        except errors.SystemError, e:
+            print 'ERROR:', e
+
         self.callRemote('stop')
         return None
                 
@@ -154,19 +162,14 @@ class ComponentPerspective(pbutil.NewCredPerspective):
 
     def setState(self, element, property, value):
         if not element in self.options.elements:
-            raise TypeError, 'not such an element: %s' % element
-        
-        # XXX: Check property name
-        # XXX: Check propery value
-        return self.callRemote('set_element_property', element, property, value)
+            raise errors.PropertyError('not such an element: %s' % element)
+        return self.callRemote('setElementProperty', element, property, value)
         
     def getState(self, element, property):
-        # XXX: Check element name
-        # XXX: Check property name
-        return self.callRemote('get_element_property', element, property)
+        return self.callRemote('getElementProperty', element, property)
 
     def perspective_log(self, *msg):
-        self.msg(*msg)
+        log.msg(self.getName(), *msg)
         
     def perspective_stateChanged(self, feed, state):
         self.msg('stateChanged :%s %s' % (feed,
@@ -195,7 +198,7 @@ class ProducerPerspective(ComponentPerspective):
     def listen(self, feeds):
         """starts the remote methods listen"""
 
-        cb = self.callRemote('get_free_ports', feeds)
+        cb = self.callRemote('getFreePorts', feeds)
         cb.addCallbacks(self.cb_getFreePorts, self.cb_checkAll)
 
 class ConverterPerspective(ComponentPerspective):
@@ -209,7 +212,7 @@ class ConverterPerspective(ComponentPerspective):
             cb.addErrback(self.cb_checkAll)
             
         """starts the remote methods start"""
-        cb = self.callRemote('get_free_ports', feeds)
+        cb = self.callRemote('getFreePorts', feeds)
         cb.addCallbacks(cb_getFreePorts, self.cb_checkAll)
         
 class StreamerPerspective(ComponentPerspective):
