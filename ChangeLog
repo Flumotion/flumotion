@@ -1,3 +1,7 @@
+2005-01-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/common.py (version): Update to 2005.
+
 2005-01-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/config.py:
