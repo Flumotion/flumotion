@@ -15,6 +15,7 @@ EXTRA_DIST = 			\
 	test_log.py 		\
 	test_manager.py 	\
 	test_manager_admin.py 	\
+	test_pb.py	 	\
 	test_reflect.py 	\
 	test_registry.py 	\
 	test_wizard.py 		\
