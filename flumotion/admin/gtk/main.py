@@ -26,6 +26,7 @@ import sys
 
 from flumotion.admin.gtk.client import Window
 from flumotion.configure import configure
+from flumotion.common import log
 from flumotion.wizard import wizard
 from twisted.internet import reactor
 
