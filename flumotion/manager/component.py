@@ -266,7 +266,12 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         return self.username
 
     def getListenHost(self):
-        return self.getTransportPeer().host
+        peer = self.getTransportPeer()
+        try:
+            return peer.host
+        except AttributeError:
+            return peer[1]
+        return self.getTransportPeer()
 
     # This method should ask the component if the port is free
     def getListenPort(self, feeder):

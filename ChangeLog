@@ -1,5 +1,8 @@
 2004-09-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/manager/component.py (ComponentAvatar.getListenHost):
+	Support new and old twisted code for getting the host
+
 	* flumotion/manager/admin.py (AdminAvatar):
 	I don't implement IHeaven, really.
 
