@@ -1,3 +1,13 @@
+2004-12-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/Makefile.am:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/test/test_http.py:
+	  rename component.get_name to getName
+
 2004-12-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:

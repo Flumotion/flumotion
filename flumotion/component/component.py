@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_component -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/component/component.py: basic component functionality
@@ -102,7 +102,7 @@ class ComponentClientFactory(superklass):
         failure.trap(error.ConnectionRefusedError)
         self.error('Connection to %s:%d refused.' % (self.manager_host,
                                                      self.manager_port))
-                                                                                
+
     def _loginErrback(self, failure):
         self.error('Login failed, reason: %r' % failure)
     
@@ -128,7 +128,7 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         
     ### log.Loggable methods
     def logFunction(self, arg):
-        return self.comp.get_name() + ':' + arg
+        return self.comp.getName() + ':' + arg
 
     ### IMedium methods
     def setRemoteReference(self, remoteReference):
@@ -264,7 +264,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
 
     ### Loggable methods
     def logFunction(self, arg):
-        return self.get_name() + ' ' + arg
+        return self.getName() + ' ' + arg
 
     ### GObject methods
     def emit(self, name, *args):
@@ -275,8 +275,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
             gobject.GObject.emit(self, name, *args)
         
     ### BaseComponent methods
-    # FIXME: rename to getName
-    def get_name(self):
+    def getName(self):
         return self.name
 
     def setWorkerName(self, workerName):

@@ -145,7 +145,7 @@ class HTTPAdminResource(web_resource.Resource):
         block.append('</tr>')
          
         return STATS_TEMPLATE % {
-            'name': streamer.get_name(),
+            'name': streamer.getName(),
             'stats': "\n".join(block)
         }
 
@@ -317,7 +317,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         keycard = keycards.KeycardUACPP(
             request.getUser(),
             request.getPassword(), request.getClientIP())
-        keycard.requesterName = self.streamer.get_name()
+        keycard.requesterName = self.streamer.getName()
         keycard._fd = request.transport.fileno()
         
         if self.bouncerName is None:

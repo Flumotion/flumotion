@@ -124,7 +124,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
         date = time.strftime('%Y%m%d-%H%M%S', time.localtime())
         self.location = os.path.join(self.directory,
-                                     '%s.%s.%s' % (self.get_name(), date, ext))
+                                     '%s.%s.%s' % (self.getName(), date, ext))
 
         self.file_fd = open(self.location, 'a')
         sink.emit('add', self.file_fd.fileno())

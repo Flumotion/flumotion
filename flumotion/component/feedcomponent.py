@@ -256,7 +256,7 @@ class FeedComponent(basecomponent.BaseComponent):
         #self.restart()
      
     def setup_pipeline(self):
-        self.pipeline.set_name('pipeline-' + self.get_name())
+        self.pipeline.set_name('pipeline-' + self.getName())
         sig_id = self.pipeline.connect('error', self._pipeline_error_cb)
         self.pipeline_signals.append(sig_id)
         
@@ -426,7 +426,7 @@ class FeedComponent(basecomponent.BaseComponent):
         
     def get_element_property(self, element_name, property):
         'Gets a property of an element in the GStreamer pipeline.'
-        self.debug("%s: getting property %s of element %s" % (self.get_name(), property, element_name))
+        self.debug("%s: getting property %s of element %s" % (self.getName(), property, element_name))
         element = self.get_element(element_name)
         if not element:
             msg = "Element '%s' does not exist" % element_name
@@ -450,7 +450,7 @@ class FeedComponent(basecomponent.BaseComponent):
     def set_element_property(self, element_name, property, value):
         'Sets a property on an element in the GStreamer pipeline.'
         self.debug("%s: setting property %s of element %s to %s" % (
-            self.get_name(), property, element_name, value))
+            self.getName(), property, element_name, value))
         element = self.get_element(element_name)
         if not element:
             msg = "Element '%s' does not exist" % element_name
@@ -597,7 +597,7 @@ class ParseLaunchComponent(FeedComponent):
                                    self.FEEDER_TMPL,
                                    '%(pipeline)s ! %(tmpl)s name=%(name)s') 
         
-        self.debug('pipeline for %s is %s' % (self.get_name(), pipeline))
+        self.debug('pipeline for %s is %s' % (self.getName(), pipeline))
         assert self.DELIMETER not in pipeline
         
         return pipeline

@@ -80,7 +80,7 @@ class FakeStreamer:
     def add_client(self, fd): pass
     def connect(self, *args): pass
     def debug(self, *args): pass
-    def get_name(self): return "fakestreamer"
+    def getName(self): return "fakestreamer"
 
 class FakeAuth:
     def __init__(self, response):
