@@ -6,6 +6,7 @@ flumotion_PYTHON = \
 	__init__.py \
 	checkers.py \
 	credentials.py \
+	flavors.py \
 	gstreactor.py \
 	pb.py \
 	portal.py \

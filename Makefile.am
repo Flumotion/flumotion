@@ -60,7 +60,7 @@ pychecker:
 	@PYTHONPATH=`pwd`			\
 	pychecker -Q -F misc/pycheckerrc	\
 	$(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))\
-		2> /dev/null
+		2> /dev/null || make pycheckerverbose
 
 pycheckerverbose:
 	@echo running pychecker ...

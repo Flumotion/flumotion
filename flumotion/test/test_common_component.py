@@ -27,7 +27,8 @@ from twisted.internet import reactor
 
 import common as mcommon
 
-from flumotion.common import component, common
+from flumotion.common import component
+from flumotion.twisted import flavors
 from flumotion.common.common import moods
 
 class JobComponentStateTest(unittest.TestCase):
@@ -89,7 +90,7 @@ class AllComponentStateTest(unittest.TestCase):
 # new one, instead of updating the old one.  Find a way to make the old
 # serialized object update first
 class ListenerTest(unittest.TestCase):
-    __implements__ = common.IStateListener
+    __implements__ = flavors.IStateListener
 
     def setUp(self):
         self.jstate = component.JobComponentState()

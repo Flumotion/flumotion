@@ -1,5 +1,24 @@
 2004-12-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* flumotion/admin/admin.py:
+	* flumotion/common/common.py:
+	* flumotion/common/component.py:
+	* flumotion/common/worker.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common_component.py:
+	* flumotion/test/test_flavors.py:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/flavors.py:
+	  add flavors with StateCacheable/RemoteCache
+	  add unittests
+	  add possibility of monitoring lists and having append/remove
+	  listener calls
+
+2004-12-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/common/Makefile.am:

@@ -23,19 +23,19 @@
 
 from twisted.spread import pb
 
-from flumotion.common import common
+from flumotion.twisted import flavors
 
 # worker heaven state proxy objects
-class ManagerWorkerHeavenState(common.StateCacheable):
+class ManagerWorkerHeavenState(flavors.StateCacheable):
     def __init__(self):
-        common.StateCacheable.__init__(self)
+        flavors.StateCacheable.__init__(self)
         # FIXME: later on we would want a dict of names -> cacheables ?
         self.addKey('names', [])
 
     def __repr__(self):
         return "%r" % self._dict
 
-class AdminWorkerHeavenState(common.StateRemoteCache):
+class AdminWorkerHeavenState(flavors.StateRemoteCache):
     pass
 
 pb.setUnjellyableForClass(ManagerWorkerHeavenState, AdminWorkerHeavenState)

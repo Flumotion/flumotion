@@ -39,7 +39,8 @@ from twisted.internet import reactor
 from flumotion.configure import configure
 # rename to base
 from flumotion.manager import common as mcommon
-from flumotion.common import errors, interfaces, keycards, log, config, common
+from flumotion.common import errors, interfaces, keycards, log, config
+from flumotion.twisted import flavors
 from flumotion.common.common import moods
 from flumotion.utils import gstutils
 
@@ -241,7 +242,7 @@ class ComponentAvatar(mcommon.ManagerAvatar):
     """
 
     logCategory = 'comp-avatar'
-    __implements__ = common.IStateListener
+    __implements__ = flavors.IStateListener
 
     _heartbeatCheckInterval = configure.heartbeatInterval * 2.5
 

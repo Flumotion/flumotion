@@ -35,8 +35,10 @@ from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
 from flumotion.common import bundle, common, errors, interfaces, log, keycards
-# serializable worker state
-from flumotion.common import worker
+from flumotion.twisted import flavors
+# serializable worker and component state
+from flumotion.common import worker, component
+
 from flumotion.configure import configure
 from flumotion.utils import reload
 from flumotion.utils.gstutils import gsignal
@@ -67,7 +69,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     
     logCategory = 'adminmodel'
 
-    __implements__ = interfaces.IAdminMedium, common.IStateListener,
+    __implements__ = interfaces.IAdminMedium, flavors.IStateListener,
 
     # appease pychecker
     _components = {}

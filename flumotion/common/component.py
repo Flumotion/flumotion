@@ -23,12 +23,12 @@
 
 
 from twisted.spread import pb
-from flumotion.common import common
+from flumotion.twisted import flavors
 
 # component state proxy objects
-class JobComponentState(common.StateCacheable):
+class JobComponentState(flavors.StateCacheable):
     def __init__(self):
-        common.StateCacheable.__init__(self)
+        flavors.StateCacheable.__init__(self)
         self.addKey('name')
         self.addKey('mood')
         self.addKey('pid')
@@ -44,15 +44,15 @@ class JobComponentState(common.StateCacheable):
     def setMood(self, mood):
         self.set('mood', mood)
 
-class ManagerComponentState(common.StateCacheable, common.StateRemoteCache):
+class ManagerComponentState(flavors.StateCacheable, flavors.StateRemoteCache):
     #def __init__(self):
-    #    common.StateCacheable.__init__(self)
-    #    common.StateRemoteCache.__init__(self)
+    #    flavors.StateCacheable.__init__(self)
+    #    flavors.StateRemoteCache.__init__(self)
 
     def __repr__(self):
         return "%r" % self._dict
 
-class AdminComponentState(common.StateRemoteCache):
+class AdminComponentState(flavors.StateRemoteCache):
     pass
 
 pb.setUnjellyableForClass(JobComponentState, ManagerComponentState)
