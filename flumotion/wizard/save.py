@@ -29,7 +29,7 @@ class Component:
     def toXML(self):
         s = '    <component name="%s" type="%s">\n' % (self.name, self.type)
 
-        # XXX: Handle eaters
+        # XXX: Handle eaters properly
         s += '      <feed>default</feed>\n'
                 
         for source in self.feeders:
