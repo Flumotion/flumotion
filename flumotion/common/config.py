@@ -100,6 +100,9 @@ class ConfigEntryWorker:
     def getUsername(self):
         return self.username
     
+    def getPassword(self):
+        return self.password
+
 class ConfigEntryWorkers:
     "I represent a <workers> entry in a registry file"
     def __init__(self, workers, policy):
@@ -109,6 +112,9 @@ class ConfigEntryWorkers:
     def getWorkers(self):
         return self.workers
     
+    def getPolicy(self):
+        return self.policy
+
 class FlumotionConfigXML(log.Loggable):
     logCategory = 'config'
 
