@@ -1,3 +1,13 @@
+2005-03-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_checkers.py:
+	* flumotion/twisted/checkers.py:
+	* flumotion/twisted/credentials.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  increase coverage for checkers to 100%.  Fix obvious security
+	  problem.  Rename Anonymous to Passwordless since that's what it is.
+
 2005-03-09  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/client.py (Window.debug_start_shell_cb): Use

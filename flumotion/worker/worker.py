@@ -333,8 +333,10 @@ class WorkerBrain(log.Loggable):
         # called from Init
         root = JobHeaven(self, self.options.feederports)
         dispatcher = JobDispatcher(root)
+        # FIXME: we should hand a username and password to log in with to
+        # the job process instead of allowing anonymous
         checker = checkers.FlexibleCredentialsChecker()
-        checker.allowAnonymous(True)
+        checker.allowPasswordless(True)
         p = portal.Portal(dispatcher, [checker])
         job_server_factory = pb.PBServerFactory(p)
         reactor.listenUNIX(job.getSocketPath(), job_server_factory)

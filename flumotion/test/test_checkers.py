@@ -25,11 +25,49 @@ import crypt
 
 from twisted.cred import error
 
+from twisted.cred import credentials as tcredentials
 from flumotion.twisted import credentials, checkers
 
 # Use some shorter names
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext
 CredCrypt = credentials.UsernameCryptPasswordCrypt
+
+class TestFlexibleWithPassword(unittest.TestCase):
+    def setUp(self):
+        self.checker = checkers.FlexibleCredentialsChecker(user='test')
+
+    def testCredPlaintextCorrect(self):
+        cred = tcredentials.UsernamePassword('user', 'test')
+        d = self.checker.requestAvatarId(cred)
+        self.assertEquals(unittest.deferredResult(d), 'user')
+
+    def testCredPlaintextCorrectWithId(self):
+        cred = tcredentials.UsernamePassword('user', 'test')
+        cred.avatarId = "requested"
+        d = self.checker.requestAvatarId(cred)
+        self.assertEquals(unittest.deferredResult(d), 'requested')
+
+    def testCredPlaintextWrong(self):
+        cred = tcredentials.UsernamePassword('user', 'wrong')
+        d = self.checker.requestAvatarId(cred)
+        failure = unittest.deferredError(d)
+        failure.trap(error.UnauthorizedLogin)
+
+class TestFlexibleWithoutPassword(unittest.TestCase):
+    def setUp(self):
+        self.checker = checkers.FlexibleCredentialsChecker(user='test')
+        self.checker.allowPasswordless(True)
+
+    def testCredPlaintextCorrect(self):
+        cred = tcredentials.UsernamePassword('user', '')
+        d = self.checker.requestAvatarId(cred)
+        self.assertEquals(unittest.deferredResult(d), 'user')
+
+    def testCredPlaintextCorrectWithId(self):
+        cred = tcredentials.UsernamePassword('user', '')
+        cred.avatarId = "requested"
+        d = self.checker.requestAvatarId(cred)
+        self.assertEquals(unittest.deferredResult(d), 'requested')
 
 class TestCryptCheckerInit(unittest.TestCase):
     def setUp(self):
@@ -38,7 +76,7 @@ class TestCryptCheckerInit(unittest.TestCase):
     def testCredPlaintext(self):
         cred = CredPlaintext('user', 'test')
         d = self.checker.requestAvatarId(cred)
-        assert unittest.deferredResult(d) == 'user'
+        self.assertEquals(unittest.deferredResult(d), 'user')
 
 class TestCryptCheckerAddUser(unittest.TestCase):
     def setUp(self):
@@ -50,7 +88,7 @@ class TestCryptCheckerAddUser(unittest.TestCase):
     def testCredPlaintext(self):
         cred = CredPlaintext('user', 'test')
         d = self.checker.requestAvatarId(cred)
-        assert unittest.deferredResult(d) == 'user'
+        self.assertEquals(unittest.deferredResult(d), 'user')
 
     def testCredPlaintextWrongPassword(self):
         cred = CredPlaintext('user', 'tes')
@@ -66,10 +104,10 @@ class TestCryptCheckerAddUser(unittest.TestCase):
 
     def testCredCrypt(self):
         crypted = crypt.crypt('test', 'qi')
-        assert crypted == 'qi1Lftt0GZC0o'
+        self.assertEquals(crypted, 'qi1Lftt0GZC0o')
         cred = CredCrypt('user', crypted)
         d = self.checker.requestAvatarId(cred)
-        assert unittest.deferredResult(d) == 'user'
+        self.assertEquals(unittest.deferredResult(d), 'user')
 
     def testCredCryptWrongSalt(self):
         crypted = crypt.crypt('test', 'aa')

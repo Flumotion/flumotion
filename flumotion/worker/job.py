@@ -27,14 +27,13 @@ import resource
 import signal
 import gobject
 
-from twisted.cred.credentials import UsernamePassword
+from twisted.cred import credentials
 from twisted.internet import reactor
 from twisted.python import reflect, failure
 from twisted.spread import pb
 
 from flumotion.common import config, errors, interfaces, log, registry, keycards
 from flumotion.component import component
-from flumotion.twisted import credentials
 
 def getComponent(dict, defs):
     """
@@ -265,10 +264,11 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         self.login(id)
             
     ### pb.PBClientFactory methods
+    # FIXME: might be nice if jobs got a password to use to log in to brain
     def login(self, username):
         d = pb.PBClientFactory.login(self, 
-                                     credentials.Username(username),
-                                     self.medium)
+            credentials.UsernamePassword(username, ''),
+            self.medium)
         self.info('Logging in to worker')
         d.addCallbacks(self._connectedCallback,
                        self._connectedErrback)

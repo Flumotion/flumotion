@@ -40,24 +40,34 @@ class FlexibleCredentialsChecker(parent, log.Loggable):
     logCategory = 'credchecker'
     def __init__(self, **users):
         parent.__init__(self, **users)
-        self.anonymous = False
+        self._passwordless = False # do we allow passwordless logins ?
         
-    # we allow anonymous only if the manager has no bouncer
-    def allowAnonymous(self, wellDoWeQuestionMark):
-        self.anonymous = wellDoWeQuestionMark
+    def allowPasswordless(self, wellDoWeQuestionMark):
+        self._passwordless = wellDoWeQuestionMark
                          
     ### ICredentialsChecker interface methods
     def requestAvatarId(self, credentials):
-        # FIXME: authenticate using manager's bouncer
         avatarId = getattr(credentials, 'avatarId', None)
+
+        d = None
+        if not self._passwordless:
+            self.debug('authenticating user %s' % credentials.username)
+            d = parent.requestAvatarId(self, credentials)
+        else:
+            self.debug('allowing passwordless login for user %s' %
+                credentials.username)
+            d = defer.succeed(credentials.username)
+
+        d.addCallback(self._requestCallback, avatarId)
+        return d
+
+    def _requestCallback(self, result, avatarId):
         if avatarId:
             self.debug("assigned requested avatarId %s" % avatarId)
             return avatarId
-
-        if self.anonymous:
-            return credentials.username
-        
-        return parent.requestAvatarId(self, credentials)
+        else:
+            self.debug("assigned avatarId %s" % result)
+            return result
 
 class CryptChecker(log.Loggable):
     """
