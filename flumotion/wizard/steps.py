@@ -516,15 +516,9 @@ class HTTP(wizard.WizardStep):
     section = 'Consumption'
     component_type = 'http-streamer'
 
-    start_port = 8800
-    ports = range(start_port+2, start_port-1, -1)
-
     def setup(self):
-        self.spinbutton_port.set_value(self.get_port())
+        self.spinbutton_port.set_value(self.port)
         
-    def get_port(self):
-        return self.ports.pop()
-    
     def get_next(self):
         return self.wizard['Consumption'].get_next(self)
 
@@ -547,12 +541,14 @@ class HTTP(wizard.WizardStep):
 class HTTPBoth(HTTP):
     step_name = 'HTTP Streamer (audio & video)'
     sidebar_name = 'HTTP audio/video'
+    port = 8800
 wizard.register_step(HTTPBoth)
     
                   
 class HTTPAudio(HTTP):
     step_name = 'HTTP Streamer (audio only)'
     sidebar_name = 'HTTP video'
+    port = 8801
 wizard.register_step(HTTPAudio)
 
 
@@ -560,6 +556,7 @@ wizard.register_step(HTTPAudio)
 class HTTPVideo(HTTP):
     step_name = 'HTTP Streamer (video only)'
     sidebar_name = 'HTTP audio'
+    port = 8802
 wizard.register_step(HTTPVideo)
 
     
