@@ -33,6 +33,8 @@ from twisted.internet import reactor
 from flumotion.server import auth, component, interfaces
 from flumotion.utils import gstutils, log
 
+import twisted.internet.error
+
 __all__ = ['HTTPClientKeycard', 'HTTPStreamingAdminResource',
            'HTTPStreamingResource', 'MultifdSinkStreamer']
 
@@ -564,6 +566,9 @@ def createComponent(config):
         resource.setMaxClients(int(config['maxclients']))
         
     component.debug('Listening on %d' % port)
-    reactor.listenTCP(port, factory)
+    try:
+        reactor.listenTCP(port, factory)
+    except twisted.internet.error.CannotListenError:
+        component.error('Port %d is not available.' % port)
 
     return component

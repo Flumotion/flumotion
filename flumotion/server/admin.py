@@ -58,15 +58,14 @@ class RemoteComponentView(pb.RemoteCopy):
         return '<RemoteComponentView %s>' % self.name
 pb.setUnjellyableForClass(ComponentView, RemoteComponentView)
 
-# FIXME: rename to AdminAvatar
-class AdminPerspective(pb.Avatar, log.Loggable):
+class AdminAvatar(pb.Avatar, log.Loggable):
     """
     I live in the controller.
     I am an avatar created for an administrative client interface.
     A reference to me is given (for example, to gui.AdminInterface)
     when logging in and requesting an "admin" avatar.
     """
-    logCategory = 'admin-persp'
+    logCategory = 'admin-avatar'
     def __init__(self, admin):
         """
         @type admin: L{server.admin.Admin}
@@ -75,10 +74,8 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         # FIXME: use accessor to get controller ?
         self.controller = admin.controller
         self.mind = None
-        self.debug("created new AdminPerspective")
+        self.debug("created new AdminAvatar")
         
-    # FIXME: maybe rename to hasReference ? We are already a Perspective
-    # ourselves
     def hasRemoteReference(self):
         """
         Check if the avatar has a remote reference to the peer.
@@ -127,14 +124,14 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         """
         Tell the avatar that a component has been added.
         """
-        self.debug("AdminPerspective.componentAdded: %s" % component)
+        self.debug("AdminAvatar.componentAdded: %s" % component)
         self._mindCallRemote('componentAdded', ComponentView(component))
         
     def componentRemoved(self, component):
         """
         Tell the avatar that a component has been removed.
         """
-        self.debug("AdminPerspective.componentRemoved: %s" % component)
+        self.debug("AdminAvatar.componentRemoved: %s" % component)
         self._mindCallRemote('componentRemoved', ComponentView(component))
 
     def attached(self, mind):
@@ -162,7 +159,7 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         self.mind = None
         self.debug('Client from %s detached' % ip)
         self.log('Client detached is mind %s' % mind)
-        self.admin.removePerspective(self)
+        self.admin.removeAvatar(self)
 
     ### pb.Avatar IPerspective methods
     def perspective_shutdown(self):
@@ -232,14 +229,14 @@ class Admin(pb.Root):
     """
     I live in the controller.
     I interface between the Controller and administrative clients.
-    For each client I create an L{AdminPerspective} to handle requests.
+    For each client I create an L{AdminAvatar} to handle requests.
     """
     def __init__(self, controller):
         """
         @type controller: L{server.controller.Controller}
         """
         self.controller = controller
-        self.clients = [] # all AdminPerspectives we instantiate
+        self.clients = [] # all AdminAvatars we instantiate
         log.addLogHandler(self.logHandler)
         self.logcache = []
 
@@ -260,30 +257,30 @@ class Admin(pb.Root):
         for category, type, message in self.logcache:
             client.sendLog(category, type, message)
         
-    def getPerspective(self):
+    def getAvatar(self):
         """
-        Creates a new perspective for this admin.
-        @rtype:   L{server.admin.AdminPerspective}
-        @returns: a new perspective on the admin.
+        Creates a new administration avatar.
+        @rtype:   L{server.admin.AdminAvatar}
+        @returns: a new avatar for the admin client.
         """
-        self.debug('creating new perspective')
-        adminp = AdminPerspective(self)
-        reactor.callLater(0.25, self.sendCache, adminp)
+        self.debug('creating new AdminAvatar')
+        avatar = AdminAvatar(self)
+        reactor.callLater(0.25, self.sendCache, avatar)
         
-        self.clients.append(adminp)
-        return adminp
+        self.clients.append(avatar)
+        return avatar
 
-    def removePerspective(self, adminp):
+    def removeAvatar(self, avatar):
         """
-        Removes the AdminPerspective from our list of perspectives.
-        @type adminp: L{server.admin.AdminPerspective}
+        Removes the AdminAvatar from our list of avatars.
+        @type adminp: L{server.admin.AdminAvatar}
         """
-        self.debug('removing perspective %s' % adminp)
-        self.clients.remove(adminp)
+        self.debug('removing AdminAvatar %s' % avatar)
+        self.clients.remove(avatar)
     
     def componentAdded(self, component):
         """
-        Tell all created AdminPerspectives that a component was added.
+        Tell all created AdminAvatars that a component was added.
 
         @type component: L{server.controller.ComponentPerspective}
         """
@@ -292,7 +289,7 @@ class Admin(pb.Root):
 
     def componentRemoved(self, component):
         """
-        Tell all created AdminPerspectives that a component was removed.
+        Tell all created AdminAvatars that a component was removed.
 
         @type component: L{server.controller.ComponentPerspective}
         """

@@ -42,7 +42,7 @@ class Dispatcher(log.Loggable):
     """
     I implement L{portal.IRealm}.
     I make sure that when a L{pb.Avatar} is requested through me, the
-    Avatar/perspective being returned knows about the mind (client) requesting
+    Avatar being returned knows about the mind (client) requesting
     the Avatar.
     """
     
@@ -72,31 +72,31 @@ class Dispatcher(log.Loggable):
         if not pb.IPerspective in ifaces:
             raise errors.NoPerspectiveError(avatarID)
 
-        p = None
+        avatar = None
         if interfaces.IBaseComponent in ifaces:
-            p = self.controller.getPerspective(avatarID)
+            avatar = self.controller.getAvatar(avatarID)
         elif interfaces.IAdminComponent in ifaces:
-            p = self.admin.getPerspective()
+            avatar = self.admin.getAvatar()
 
-        if not p:
+        if not avatar:
             raise errors.NoPerspectiveError(avatarID)
 
-        self.debug("returning Avatar: id %s, perspective %s" % (avatarID, p))
+        self.debug("returning Avatar: id %s, avatar %s" % (avatarID, avatar))
         
         # schedule a perspective attached for after this function
-        reactor.callLater(0, p.attached, mind)
+        reactor.callLater(0, avatar.attached, mind)
         
         # return a tuple of interface, aspect, and logout function 
-        return (pb.IPerspective, p,
-                lambda p=p,mind=mind: p.detached(mind))
+        return (pb.IPerspective, avatar,
+                lambda avatar=avatar,mind=mind: avatar.detached(mind))
 
 class Options:
     """dummy class for storing controller side options of a component"""
 
-class ComponentPerspective(pb.Avatar, log.Loggable):
-    """Controller side perspective of components"""
+class ComponentAvatar(pb.Avatar, log.Loggable):
+    """Controller side avatar of component"""
 
-    logCategory = 'controller'
+    logCategory = 'comp-avatar'
 
     def __init__(self, controller, username):
         self.controller = controller
@@ -406,13 +406,14 @@ class FeedManager:
             func(*args)
 
 class Controller(pb.Root):
-    """Controller, handles all registered components and provides perspectives
-for them
-
-The main function of this class is to handle components, tell the to start
-register and start up pending components."""
+    """
+    Controller, handles all registered components and provides avatars
+    for them.
+    The main function of this class is to handle components, tell them
+    to start register and start up pending components.
+    """
     def __init__(self):
-        self.components = {} # dict of component perspectives
+        self.components = {} # dict of component avatars
         self.feed_manager = FeedManager()
         self.admin = None
         
@@ -421,20 +422,20 @@ register and start up pending components."""
     def setAdmin(self, admin):
         self.admin = admin
         
-    def getPerspective(self, avatarID):
+    def getAvatar(self, avatarID):
         """
-        Creates a new perspective for a component, raises
+        Creates a new avatar for a component, raises
         an AlreadyConnectedError if the component is already found in the cache
         @type avatarID:  string
-        @rtype:          L{server.controller.ComponentPerspective}
-        @returns:        the perspective for the component"""
+        @rtype:          L{server.controller.ComponentAvatar}
+        @returns:        the avatar for the component"""
 
         if self.hasComponent(avatarID):
             raise errors.AlreadyConnectedError(avatarID)
 
-        componentp = ComponentPerspective(self, avatarID)
-        self.addComponent(componentp)
-        return componentp
+        avatar = ComponentAvatar(self, avatarID)
+        self.addComponent(avatar)
+        return avatar
 
     def isLocalComponent(self, component):
         # TODO: This could be a lot smarter
