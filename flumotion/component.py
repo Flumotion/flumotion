@@ -99,7 +99,7 @@ class BaseComponent(pb.Referenceable):
             pipeline = '%s ! tcpserversink name=sink' % pipeline
 
         #pipeline = '{ %s } ' % pipeline
-        print 'pipeline: %s' % pipeline
+        log.msg('pipeline for %s is %s' % (self.component_name, pipeline))
         
         return pipeline
 
@@ -225,16 +225,7 @@ class BaseComponent(pb.Referenceable):
                 'sources' : self.getSources() }
     
     def remote_get_free_port(self):
-        start = 5500
-        fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        while 1:
-            try:
-                fd.bind(('', start))
-            except socket.error:
-                start += 1
-                continue
-            break
-        return start
+        return gstutils.get_free_port(start=5500)
 
     def stop(self):
         if (self.pipeline and

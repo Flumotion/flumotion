@@ -59,9 +59,8 @@ streamer methods
    connect (host, port)
 
 common methods
-   register  -- register the component
-     returns, dict with information:
-        controller_ip = ip number used to connect to the controller
+   register  -- register the component and do as much as possible without playing
 
-   prepare   -- do as much as possible without playing
-    
+   returns, dict with information:
+      controller_ip = ip number used to connect to the controller
+          or None if it's not ready yet.    

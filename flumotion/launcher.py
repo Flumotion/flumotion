@@ -1,3 +1,5 @@
+import ConfigParser
+import optik
 import os
 import signal
 import sys
@@ -13,49 +15,22 @@ from twisted.internet import reactor
 from twisted.python import log
 from twisted.web import server, resource
 
-from controller import ControllerServerFactory
-from producer import Producer
-from converter import Converter
-from streamer import Streamer, StreamingResource
-
-
-def disable_stderr(suffix):
-    #print 'disable', suffix
-    fd = file('/tmp/stderr-%d' % suffix, 'w+')
-                   
-    sys.stderr = os.fdopen(os.dup(2), 'w')
-    os.close(2)
-    os.dup(fd.fileno())
-
-    return fd
-
-def enable_stderr(fd, suffix):
-    os.close(2)
-    try:
-        os.dup(sys.stderr.fileno())
-    except OSError:
-        return []
-
-    #print 'seeking', suffix
-    fd.seek(0, 0)
-    data = fd.read()
-    #print 'closing', suffix
-    fd.close()
-    os.remove('/tmp/stderr-%d' % suffix)
-
-    return [line for line in data.split('\n')]
+import gstutils
 
 class Launcher:
-    streaming_port = 8080
-    def __init__(self, port):
+    def __init__(self):
         self.children = []
-
+        self.controller_pid = None
+        
         #signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
+    def start_controller(self):
         pid = os.fork()
         if not pid:
-            self.controller = reactor.listenTCP(port, ControllerServerFactory())
+            from controller import ControllerServerFactory
+            self.controller = reactor.listenTCP(8890,
+                                                ControllerServerFactory())
             try:
                 reactor.run(False)
             except KeyboardInterrupt:
@@ -74,26 +49,23 @@ class Launcher:
     def spawn(self, component):
         pid = os.getpid()
         def exit_cb(*args):
-            fd = disable_stderr(pid)
-            for line in enable_stderr(fd, pid):
-                if line.find('(null)') != -1:
-                    continue
-                if line.find('Interrupted system call') != -1:
-                    continue
-                if line:
-                    print line
+            #fd = disable_stderr(pid)
+            #for line in enable_stderr(fd, pid):
+            #    if line.find('(null)') != -1:
+            #        continue
+            #    if line.find('Interrupted system call') != -1:
+            #        continue
             component.stop()
             raise SystemExit
 
         #fd = disable_stderr(pid)
         signal.signal(signal.SIGINT, exit_cb)
-        reactor.connectTCP('localhost', CONTROLLER_PORT, component.factory)
+        reactor.connectTCP('localhost', 8890, component.factory)
         try:
             reactor.run(False)
         except KeyboardInterrupt:
             pass
         component.stop()
-        print 'Leaving spawn()'
 
     def start(self, component):
         pid = os.fork()
@@ -101,6 +73,10 @@ class Launcher:
             self.spawn(component)
             raise SystemExit
         else:
+            log.msg('Starting %s (%s) on pid %d' %
+                    (component.component_name,
+                     component.getKind(),
+                     pid))
             self.children.append(pid)
         
     def run(self):
@@ -117,56 +93,98 @@ class Launcher:
             try:
                 pid = os.waitpid(self.children[0], 0)
                 self.children.remove(pid)
-                print pid, 'is dead'
+                log.msg('%d is dead pid' % pid)
             except (KeyboardInterrupt, OSError):
                 pass
             
         #print >> sys.stderr, '**** WAITING FOR CONTROLLER'
-        try:
-            os.kill(self.controller_pid, signal.SIGINT)
-        except OSError:
-            pass
+        if self.controller_pid:
+            try:
+                os.kill(self.controller_pid, signal.SIGINT)
+            except OSError:
+                pass
         
-        print '*** STOPPING MAINLOOP'
+        log.msg('Shutting down reactor')
         reactor.stop()
 
         raise SystemExit
+
+    def load_config(self, filename):
+        from producer import Producer
+        from converter import Converter
+        from streamer import Streamer, StreamingResource
+
+        c = ConfigParser.ConfigParser()
+        c.read(filename)
+
+        components = {}
+        for section in c.sections():
+            name = section
+            if not c.has_option(section, 'kind'):
+                raise AssertionError
+            kind = c.get(section, 'kind')
+            if not kind in ('producer', 'converter', 'streamer'):
+                raise AssertionError
+            
+            # XXX: Throw nice warnings
+            if kind == 'producer' or kind == 'converter':
+                assert c.has_option(section, 'pipeline')
+                pipeline = c.get(section, 'pipeline')
+            else:
+                pipeline = None
+                
+            if kind == 'converter' or kind == 'streamer':
+                assert (c.has_option(section, 'source') or
+                        c.has_option(section, 'sources'))
+                if c.has_option(section, 'source'):
+                    sources = [c.get(section, 'source')]
+                else:
+                    sources = c.get(section, 'sources').split(',')
+            else:
+                sources = []
+                
+            if kind == 'streamer':
+                assert c.has_option(section, 'port')
+                port = c.getint(section, 'port')
+
+            if kind == 'producer':
+                component = Producer(name, sources, pipeline)
+            elif kind == 'converter':
+                component = Converter(name, sources, pipeline)
+            elif kind == 'streamer':
+                component = Streamer(name, sources)
+                resource = StreamingResource(component)
+                factory = server.Site(resource=resource)
+                reactor.listenTCP(port, factory)
+            else:
+                raise AssertionError
+
+            self.start(component)
     
-CONTROLLER_PORT = 8906
+def main(args):
+    parser = optik.OptionParser()
+    parser.add_option('-v', '--verbose',
+                      action="store_true", dest="verbose",
+                      help="Be verbose")
 
-#PRODUCER_PIPELINE = 'videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=9.375,format=(fourcc)I420'
-PRODUCER2_PIPELINE = 'sinesrc'
-#CONVERTER_PIPELINE = '{ @producer1 ! theoraenc ! queue name=video max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
-#                     '{ @producer2 ! audioconvert ! rawvorbisenc ! queue name=audio max-size-buffers=0 max-size-bytes=0 max-size-time=2000000000 } ' + \
-#                     'video.src ! oggmux name=muxer audio.src ! muxer. muxer.'
-CONVERTER_PIPELINE = 'audioconvert ! rawvorbisenc ! oggmux'
-
-def is_port_free(port):
-    import socket
-    fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        fd.bind(('', port))
-    except socket.error:
-        return False
-    return True
-
-if __name__ == '__main__':
-    #log.startLogging(file('all.log', 'w'), False)
-    log.startLogging(sys.stderr)
-
-    if not is_port_free(CONTROLLER_PORT):
-        log.msg('Port %d is already used.' % CONTROLLER_PORT)
+    options, args = parser.parse_args(args)
+    if len(args) < 2:
+        print 'Need a config file.'
         raise SystemExit
-    
-    launcher = Launcher(CONTROLLER_PORT)
-    
-    #launcher.start(Producer('producer1', [], PRODUCER_PIPELINE))
-    launcher.start(Producer('producer2', [], PRODUCER2_PIPELINE))
-    launcher.start(Converter('converter', ['producer2'], CONVERTER_PIPELINE))
-    
-    streamer = Streamer('streamer', ['converter'])
-    reactor.listenTCP(8081,
-                      server.Site(resource=StreamingResource(streamer)))
-    launcher.start(streamer)
+
+    if options.verbose:
+        log.startLogging(sys.stderr)
+
+    launcher = Launcher()
+
+    if not gstutils.is_port_free(8890):
+        log.msg('Controller is already started')
+    else:
+        launcher.start_controller(8890)
+        
+    launcher.load_config(args[1])
     
     launcher.run()
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

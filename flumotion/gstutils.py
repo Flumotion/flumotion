@@ -17,6 +17,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+import socket
+
 import gobject
 import gst
 
@@ -43,3 +45,23 @@ def verbose_deep_notify_cb(object, orig, pspec):
     log.msg('deep-notify %s: %s = %s' % (orig.get_path_string(),
                                          pspec.name,
                                          output))
+
+# XXX: move this to a separate file
+def is_port_free(port):
+    fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        fd.bind(('', port))
+    except socket.error:
+        return False
+    
+    return True
+    
+def get_free_port(start):
+    port = start
+    while 1:
+        if is_port_free(port):
+            return port
+        port += 1
+                
+    return port
+
