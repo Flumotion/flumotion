@@ -88,7 +88,6 @@ def do_element_check(pipeline_str, element_name, check_proc,
     bin.set_state(state)
     return result.d
 
-                    
 def checkChannels(device):
     def get_channels_norms(element):
         deviceName = element.get_property('device-name')
@@ -99,7 +98,7 @@ def checkChannels(device):
     pipeline = 'v4lsrc name=source device=%s ! fakesink' % device
 
     # make a checker and call it
-    return do_element_check(pipeline, 'source', get_channels_norms)()
+    return do_element_check(pipeline, 'source', get_channels_norms)
 
 
 # FIXME: rename, only for v4l stuff

@@ -202,6 +202,9 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
                 proc = getattr(result, function)
                 return proc(*args, **kwargs)
             except Exception, e:
+                # pull out the landing parachute Maverick
+                import traceback
+                traceback.print_exc()
                 msg = 'runCode(%s, %s) failed: %s raised: %s' % (
                     module, function, e.__class__.__name__, " ".join(e.args))
                 self.warning(msg)
