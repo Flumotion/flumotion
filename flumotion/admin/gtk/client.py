@@ -109,6 +109,10 @@ class Window(log.Loggable):
         self.create_ui()
         self.current_component = None
         
+    # default Errback
+    def _defaultErrback(failure):
+        self.warning('Errback failure: %s', failure.getErrorMessage())
+
     def create_ui(self):
         wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
         self.window = wtree.get_widget('main_window')
@@ -208,6 +212,8 @@ class Window(log.Loggable):
         d.show_all()
         return d
 
+    ### glade callbacks
+
     def admin_connected_cb(self, admin):
         # FIXME: abstract away admin's clients
         self.update(admin.components)
@@ -233,6 +239,8 @@ class Window(log.Loggable):
         
     def admin_update_cb(self, admin, components):
         self.update(components)
+
+    ### functions
 
     def connect(self, host, port):
         'connect to manager on given host and port.  Called by __init__'
@@ -288,6 +296,7 @@ class Window(log.Loggable):
         def _callLater(admin, dialog):
             deferred = self.admin.reload()
             deferred.addCallback(lambda result: _stop(dialog))
+            deferred.addErrback(self._defaultErrback)
         
         dialog = dialogs.ProgressDialog("Reloading ...", "Reloading manager", self.window)
         dialog.start()

@@ -24,7 +24,7 @@ import sys
 
 import gobject
 from twisted.spread import pb
-from twisted.internet import error
+from twisted.internet import error, defer
 from twisted.python import rebuild, reflect
 
 from flumotion.common import interfaces, errors
@@ -49,11 +49,11 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.__gobject_init__()
         self.factory = pbutil.FMClientFactory()
         self.debug("logging in to ClientFactory")
-        cb = self.factory.login(pbutil.Username('admin'), self,
-                                pb.IPerspective,
-                                interfaces.IAdminComponent)
-        cb.addCallback(self._gotPerspective)
-        cb.addErrback(self._loginErrback)
+        d = self.factory.login(pbutil.Username('admin'), self,
+                               pb.IPerspective,
+                               interfaces.IAdminComponent)
+        d.addCallback(self._gotPerspective)
+        d.addErrback(self._loginErrback)
 
     def _gotPerspective(self, perspective):
         self.debug("gotPerspective: %s" % perspective)
@@ -64,6 +64,10 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.debug("emitting connection-refused")
         self.emit('connection-refused')
         self.debug("emitted connection-refused")
+
+    # default Errback
+    def _defaultErrback(failure):
+        self.warning('Errback failure: %s', failure.getErrorMessage())
 
     ### pb.Referenceable methods
     def remote_log(self, category, type, message):
@@ -116,26 +120,31 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.info("rebuilding '%s'" % name)
         rebuild.rebuild(sys.modules[name])
 
-        reload()
+        d = defer.execute(reload)
 
-        cb = self.reloadManager()
+        d = d.addCallback(lambda result, self: self.reloadManager(), self)
+        d.addErrback(self._defaultErrback)
         # stack callbacks so that a new one only gets sent after the previous
         # one has completed
         for component in self.components:
-            cb = cb.addCallback(lambda result, component: self.reloadComponent(component), component)
-        return cb
+            d = d.addCallback(lambda result, component: self.reloadComponent(component), component)
+            d.addErrback(self._defaultErrback)
+        return d
 
     def reloadManager(self):
         """
         Tell the manager to reload its code.
+
+        @rtype: deferred
         """
         def _reloaded(result, self):
             self.info("reloaded manager code")
 
         self.info("reloading manager code")
-        cb = self.remote.callRemote('reloadManager')
-        cb.addCallback(_reloaded, self)
-        return cb
+        d = self.remote.callRemote('reloadManager')
+        d.addCallback(_reloaded, self)
+        d.addErrback(self._defaultErrback)
+        return d
 
     def reloadComponent(self, component):
         """
@@ -143,14 +152,17 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
         @type component: string
         @param component: name of the component to reload.
+
+        @rtype: deferred
         """
         def _reloaded(result, self, component):
             self.info("reloaded component %s code" % component.name)
 
         self.info("reloading component %s code" % component.name)
-        cb = self.remote.callRemote('reloadComponent', component.name)
-        cb.addCallback(_reloaded, self, component)
-        return cb
+        d = self.remote.callRemote('reloadComponent', component.name)
+        d.addCallback(_reloaded, self, component)
+        d.addErrback(self._defaultErrback)
+        return d
 
     # FIXME: add a second argument to get the type of UI;
     # gtk or http for example
