@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS = dist-bzip2
+AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -13,3 +13,12 @@ EXTRA_DIST = \
 
 clean-local:
 	@rm -rf _trial_temp
+
+release: dist
+	make $(PACKAGE)-$(VERSION).tar.bz2.md5
+
+# generate md5 sum files
+%.md5: %
+	md5sum $< > $@
+
+	
