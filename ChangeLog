@@ -1,3 +1,7 @@
+2004-09-03  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/controller.py: Make user interface work again
+
 2004-09-02  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/gui/admininterface.py (AdminInterface): Use debugging

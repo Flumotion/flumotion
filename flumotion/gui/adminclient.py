@@ -21,6 +21,7 @@
 import os
 import sys
 
+import gobject
 import gst
 from gtk import gdk
 import gtk
@@ -36,6 +37,67 @@ from flumotion.utils import log
 COL_PIXBUF = 0
 COL_TEXT   = 1
 
+RESPONSE_FETCH = 0
+
+class PropertyChangeDialog(gtk.Dialog):
+    __gsignals__ = {
+        'set': (gobject.SIGNAL_RUN_FIRST, None, (str, str, object)),
+        'get': (gobject.SIGNAL_RUN_FIRST, None, (str, str)),
+    }
+    def __init__(self, name, parent):
+        title = "Change element property on '%s'" % name
+        dialog = gtk.Dialog.__init__(self, title, parent,
+                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.connect('response', self.response_cb)
+        self.add_button('Close', gtk.RESPONSE_CLOSE)
+        self.add_button('Set', gtk.RESPONSE_APPLY)
+        self.add_button('Fetch current', RESPONSE_FETCH)
+
+        hbox = gtk.HBox()
+        hbox.show()
+        
+        label = gtk.Label('Element')
+        label.show()
+        hbox.pack_start(label, False, False)
+        self.element_entry = gtk.Entry()
+        self.element_entry.show()
+        hbox.pack_start(self.element_entry, False, False)
+
+        label = gtk.Label('Property')
+        label.show()
+        hbox.pack_start(label, False, False)
+        self.property_entry = gtk.Entry()
+        self.property_entry.show()
+        hbox.pack_start(self.property_entry, False, False)
+        
+        label = gtk.Label('Value')
+        label.show()
+        hbox.pack_start(label, False, False)
+        self.value_entry = gtk.Entry()
+        self.value_entry.show()
+        hbox.pack_start(self.value_entry, False, False)
+
+        self.vbox.pack_start(hbox)
+        
+    def response_cb(self, dialog, response):
+        if response == gtk.RESPONSE_APPLY:
+            element = self.element_entry.get_text()
+            property = self.property_entry.get_text()
+            value = self.value_entry.get_text()
+            self.emit('set', element, property, value)
+        elif response == RESPONSE_FETCH:
+            element = self.element_entry.get_text()
+            property = self.property_entry.get_text()
+
+            self.emit('get', element, property)
+        elif response == gtk.RESPONSE_CLOSE:
+            dialog.destroy()
+
+    def update_value_entry(self, value):
+        self.value_entry.set_text(str(value))
+    
+gobject.type_register(PropertyChangeDialog)
+
 class Window(log.Loggable):
     '''
     Creates the GtkWindow for the user interface.
@@ -48,29 +110,32 @@ class Window(log.Loggable):
         self.create_ui()
         
     def create_ui(self):
-        self.wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
-        self.window = self.wtree.get_widget('main_window')
+        wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
+        self.window = wtree.get_widget('main_window')
         iconfile = os.path.join(self.imagedir, 'fluendo.png')
         gtk.window_set_default_icon_from_file(iconfile)
         self.window.set_icon_from_file(iconfile)
         
-        self.hpaned = self.wtree.get_widget('hpaned')
+        self.hpaned = wtree.get_widget('hpaned')
         self.window.connect('delete-event', self.close)
         self.window.show_all()
         
         self.component_model = gtk.ListStore(gdk.Pixbuf, str)
-        self.component_view = self.wtree.get_widget('component_view')
-        self.component_view.connect('row-activated', self.component_view_row_activated_cb)
+        self.component_view = wtree.get_widget('component_view')
+        self.component_view.connect('row-activated',
+                                    self.component_view_row_activated_cb)
         self.component_view.set_model(self.component_model)
         self.component_view.set_headers_visible(True)
 
-        col = gtk.TreeViewColumn(' ', gtk.CellRendererPixbuf(), pixbuf=COL_PIXBUF)
+        col = gtk.TreeViewColumn(' ', gtk.CellRendererPixbuf(),
+                                 pixbuf=COL_PIXBUF)
         self.component_view.append_column(col)
 
-        col = gtk.TreeViewColumn('Component', gtk.CellRendererText(), text=COL_TEXT)
+        col = gtk.TreeViewColumn('Component', gtk.CellRendererText(),
+                                 text=COL_TEXT)
         self.component_view.append_column(col)
         
-        self.wtree.signal_autoconnect(self)
+        wtree.signal_autoconnect(self)
 
     def get_selected_component(self):
         selection = self.component_view.get_selection()
@@ -113,86 +178,7 @@ class Window(log.Loggable):
         cb = self.admin.getUIEntry(name)
         cb.addCallback(cb_gotUI)
 
-    def _button_change_cb(self, button):
-        name = self.get_selected_component()
-        if not name:
-            self.warning('Select a component')
-            return
-
-        dialog = gtk.Dialog("Change element property on '%s'" % name,
-                            self.window,
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-
-        hbox = gtk.HBox()
-        
-        label = gtk.Label('Element')
-        hbox.pack_start(label, False, False)
-        element_entry = gtk.Entry()
-        hbox.pack_start(element_entry, False, False)
-
-        label = gtk.Label('Property')
-        hbox.pack_start(label, False, False)
-        property_entry = gtk.Entry()
-        hbox.pack_start(property_entry, False, False)
-        
-        label = gtk.Label('Value')
-        hbox.pack_start(label, False, False)
-        value_entry = gtk.Entry()
-        hbox.pack_start(value_entry, False, False)
-
-        hbox.show_all()
-        
-        RESPONSE_FETCH = 0
-        
-        dialog.vbox.pack_start(hbox)
-        dialog.add_button('Close', gtk.RESPONSE_CLOSE)
-        dialog.add_button('Set', gtk.RESPONSE_APPLY)
-        dialog.add_button('Fetch current', RESPONSE_FETCH)
-
-        def response_cb(dialog, response):
-            def propertyErrback(failure, window):
-                failure.trap(errors.PropertyError)
-                window.error_dialog("%s." % failure.getErrorMessage())
-                return None
-
-            if response == gtk.RESPONSE_APPLY:
-                element = element_entry.get_text()
-                property = property_entry.get_text()
-                value = value_entry.get_text()
-
-                print "FIXME: applying ", name, element, property, value
-                cb = self.admin.setProperty(name, element, property, value)
-                cb.addErrback(propertyErrback, self)
-            elif response == RESPONSE_FETCH:
-                element = element_entry.get_text()
-                property = property_entry.get_text()
-                
-                def after_getProperty(value):
-                    print 'got value', value
-                    value_entry.set_text(str(value))
-                    
-                cb = self.admin.getProperty(name, element, property)
-                cb.addCallback(after_getProperty)
-                cb.addErrback(propertyErrback, self)
-                msg = "Controller error: %s" % failure.getErrorMessage()
-                cb.addErrback(lambda failure: self.error_dialog(msg))
-            elif response == gtk.RESPONSE_CLOSE:
-                dialog.destroy()
-                
-        dialog.connect('response', response_cb)
-        dialog.show_all()
-        
-    def connected_cb(self, admin):
-        self.update(admin.clients)
-
-    def update_cb(self, admin, clients):
-        self.update(clients)
-
-    # reload code
-    def _button_reload_cb(self, button):
-        cb = self.admin.reload()
- 
-    def error_dialog(self, message, parent = None):
+    def error_dialog(self, message, parent=None):
         """
         Show an error message dialog.
         """
@@ -203,19 +189,32 @@ class Window(log.Loggable):
         d.connect("response", lambda self, response: self.destroy())
         d.show_all()
 
+    def admin_connected_cb(self, admin):
+        self.update(admin.clients)
 
-    def connection_refused_later(self, host, port):
-        d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
-            gtk.BUTTONS_OK,
-            "Connection to controller on %s:%d was refused." % (host, port))
+    def admin_update_cb(self, admin, clients):
+        self.update(clients)
+
+    def admin_connection_refused_later(self, host, port):
+        message = "Connection to controller on %s:%d was refused." % (host, port)
+        d = self.error_dialog(message)
         d.run()
         self.close()
 
-    def connection_refused_cb(self, admin, host, port):
+    def admin_connection_refused_cb(self, admin, host, port):
         log.debug('adminclient', "handling connection-refused")
-        reactor.callLater(0, self.connection_refused_later, host, port)
+        reactor.callLater(0, self.admin_connection_refused_later, host, port)
         log.debug('adminclient', "handled connection-refused")
 
+    def connect(self, host, port):
+        'connect to controller on given host and port.  Called by __init__'
+        self.admin = AdminInterface()
+        self.admin.connect('connected', self.admin_connected_cb)
+        self.admin.connect('update', self.admin_update_cb)
+        self.admin.connect('connection-refused',
+                           self.admin_connection_refused_cb, host, port)
+        reactor.connectTCP(host, port, self.admin.factory)
+        
     def update(self, orig_clients):
         model = self.component_model
         model.clear()
@@ -232,20 +231,59 @@ class Window(log.Loggable):
             #model.set(iter, 2, gst.element_state_get_name(client.state))
             #model.set(iter, 3, client.options['ip'])
 
-    def connect(self, host, port):
-        'connect to controller on given host and port.  Called by __init__'
-        self.admin = AdminInterface()
-        self.admin.connect('connected', self.connected_cb)
-        self.admin.connect('update', self.update_cb)
-        self.admin.connect('connection-refused', self.connection_refused_cb, host, port)
-        reactor.connectTCP(host, port, self.admin.factory)
-        
-    def menu_quit_cb(self, button):
-        self.close()
-
     def close(self, *args):
         reactor.stop()
 
+    # menubar/toolbar callbacks
+    def file_open_cb(self, button):
+        raise NotImplementedError
+    
+    def file_save_cb(self, button):
+        raise NotImplementedError
+
+    def file_quit_cb(self, button):
+        self.close()
+
+    def edit_properties_cb(self, button):
+        raise NotImplementedError
+
+    def debug_reload_controller_cb(self, button):
+        cb = self.admin.reloadController()
+
+    def debug_reload_all_cb(self, button):
+        cb = self.admin.reload()
+ 
+    def debug_modify_cb(self, button):
+        name = self.get_selected_component()
+        if not name:
+            self.warning('Select a component')
+            return
+
+        def propertyErrback(failure):
+            failure.trap(errors.PropertyError)
+            self.error_dialog("%s." % failure.getErrorMessage())
+            return None
+
+        def after_getProperty(value, dialog):
+            print 'got value', value
+            dialog.update_value_entry(value)
+            
+        def dialog_set_cb(dialog, element, property, value):
+            cb = self.admin.setProperty(name, element, property, value)
+            cb.addErrback(propertyErrback)
+        def dialog_get_cb(dialog, element, property):
+            cb = self.admin.getProperty(name, element, property)
+            cb.addCallback(after_getProperty, dialog)
+            cb.addErrback(propertyErrback)
+        
+        d = PropertyChangeDialog(name, self.window)
+        d.connect('get', dialog_get_cb)
+        d.connect('set', dialog_set_cb)
+        d.run()
+
+    def help_about_cb(self, button):
+        raise NotImplemenedError
+    
 def main(args):
     try:
         host = args[1]

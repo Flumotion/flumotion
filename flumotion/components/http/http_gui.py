@@ -27,7 +27,7 @@ class BaseUI:
         self.name = name
         self.admin = admin
         
-    def propertyErrback(failure, window):
+    def propertyErrback(self, failure, window):
         failure.trap(errors.PropertyError)
         window.error_dialog("%s." % failure.getErrorMessage())
         return None
@@ -36,21 +36,22 @@ class BaseUI:
         cb = self.admin.setProperty(self.name, element, property, value)
         cb.addErrback(self.propertyErrback, self)
     
-    def getElementProperty(self, func, element, property, value):
-        cb = self.admin.getProperty(self.name, element, property, value)
+    def getElementProperty(self, func, element, property):
+        cb = self.admin.getProperty(self.name, element, property)
         cb.addCallback(func)
         cb.addErrback(self.propertyErrback, self)
     
 class HTTPStreamerUI(BaseUI):
+    def error_dialog(self, message):
+        print 'ERROR:', message
+        
     def button_click_cb(self, button):
         def getReturnValue(value):
+            print value
             
-        self.getElementProperty(getReturnValue,
-                                'foo', 'bar', 'baz')
+        self.getElementProperty(getReturnValue, 'foo', 'bar')
         
     def render(self):
-        self.getElementProperty('foo', 'bar', 'baz')
-
         button = gtk.Button('Click me')
         button.connect('clicked', self.button_click_cb)
         button.show()

@@ -105,9 +105,9 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
 
         reload()
 
-        cb = self.reloadController()
+        self.reloadController()
         for client in self.clients:
-            cb = cb.addCallback(self.reloadComponent, client)
+            cb.addCallback(self.reloadComponent, client)
 
     def reloadController(self):
         return self.remote.callRemote('reloadController')
