@@ -25,7 +25,7 @@ from twisted.internet import reactor
 from twisted.web import server
 
 from flumotion.component import feedcomponent
-from flumotion.common import auth, bundle, common
+from flumotion.common import bundle, common
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
@@ -377,11 +377,6 @@ def createComponent(config):
     if config.has_key('logfile'):
         component.debug('Logging to %s' % config['logfile'])
         resource.setLogfile(config['logfile'])
-
-    if config.has_key('auth'):
-        auth_component = auth.getAuth(config['config'],
-                                      config['auth'])
-        resource.setAuth(auth_component)
 
     if config.has_key('maxclients'):
         resource.setMaxClients(int(config['maxclients']))

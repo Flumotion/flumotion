@@ -1,5 +1,15 @@
 2004-10-14  Johan Dahlin  <johan@gnome.org>
 
+	* doc/reference/Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/auth.py:
+	* flumotion/component/http/http.py:
+	* flumotion/component/http/http.xml:
+
+	Kill auth, replaced by bouncer
+	
+2004-10-14  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/component/feedcomponent.py:
 	* flumotion/component/http/Makefile.am:
 	* flumotion/component/http/http.py:

@@ -10,7 +10,6 @@ MODULE_FILES = \
 	flumotion/admin/__init__.py		\
 	flumotion/admin/admin.py		\
 	flumotion/common/__init__.py		\
-	flumotion/common/auth.py		\
         flumotion/common/bundle.py		\
         flumotion/common/common.py		\
         flumotion/common/config.py		\
