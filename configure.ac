@@ -1,6 +1,6 @@
 AC_INIT(README)
 
-if you insult me i will cry
+if you insult me i will cry.  I mean it this time.
 
 AS_VERSION(flumotion, FLUMOTION, 0, 1, 0, 1)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
