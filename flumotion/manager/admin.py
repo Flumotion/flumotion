@@ -74,24 +74,6 @@ class AdminAvatar(base.ManagerAvatar):
         if self.hasRemoteReference():
             self.mindCallRemote('log', category, type, message)
         
-    # FIXME: deprecated, using state now
-    def componentAdded(self, component):
-        """
-        Tell the avatar that a component has been added.
-        """
-        return
-        self.debug("AdminAvatar.componentAdded: %s" % component)
-        self.mindCallRemote('componentAdded', component.state)
-        
-    # FIXME: deprecated, using state now
-    def componentRemoved(self, component):
-        """
-        Tell the avatar that a component has been removed.
-        """
-        return
-        self.debug("AdminAvatar.componentRemoved: %s" % component)
-        self.mindCallRemote('componentRemoved', component.state)
-
     ### pb.Avatar IPerspective methods
     def perspective_getPlanetState(self):
         self.debug("returning planet state %r" % self.vishnu.state)
