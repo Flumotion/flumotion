@@ -41,33 +41,33 @@ I'd suggest that a bundle is specified in the xml file, for instance:
       </directoies>
     </bundle>
     <bundle name="glade-videotest">
-      <directoies>
+      <directories>
         <directory name="flumotion/components/producers/videotest">
           <filename location="gtk/videotest.glade" relative="gtk/videotest.glade"/>
         </directory>
-      </directoies>
+      </directories>
     </bundle>
     <bundle name="admin-gtk-videotest">
       <dependencies>
         <dependency name="base"/>
         <dependency name="glade-videotest"/>
       </dependencies>
-      <directoies>
+      <directories>
         <directory name="flumotion/components/producers/videotest">
           <filename location="gtk/wizard.py"/>
         </directory>
-      </directoies>
+      </directories>
     </bundle>
     <bundle name="wizard-gtk-videotest">
       <dependencies>
         <dependency name="base"/>
         <dependency name="glade-videotest"/>
       </dependencies>
-      <directoies>
+      <directories>
         <directory name="flumotion/components/producers/videotest">
           <filename location="gtk/admin.py"/>
         </directory>
-      </directoies>
+      </directories>
     </bundle>
   </bundles>
 </registry>
@@ -89,24 +89,16 @@ TODO:
 Sending over a bundle
 ============================
 
-1. Requests for flumotion/components/producers/videotest/gtk/admin.py
-
-2. "Bundle Manager" sees it's in the bundle admin-gtk-videotest
-
-3. It checks the dependencies; finds out it depends on base.
-
-4. md5sum of base bundle zip is sent over
-
-5. if admin's base bundle is out-of-date, it requests and gets the base bundle
-   zip
-
-6. md5sum of admin-gtk-videotest bundle is sent over.
-
-7. zip gets sent over
-
-8. the bundle is unzipped and __path__ is set properly.
-
-9. admin imports the module, end of story
+- admin calls remote method getBundleEntryByType(type)
+  where type is e.g. admin/gtk
+  which returns a filename, method
+- admin client calls remote method getBundleSumsByFile(filename)
+- manager returns the name of the actual bundle,
+  and a dict of bundle names to sums
+- admin client verifies md5sum and calls getBundleByName(name) for each
+  of the updated md5sums
+- the bundle is unzipped and __path__ is set properly.
+- admin imports the module and calls entry point
 
 Note: to speed up the process, the answer to the request for a bundle might
 send over a dictionary of bundle names and md5sums in the first go.
