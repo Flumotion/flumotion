@@ -78,8 +78,8 @@ m4/Makefile
 conf/Makefile
 doc/Makefile
 doc/reference/Makefile
-tests/Makefile
-tests/tests/Makefile
-tests/common.py
+testsuite/Makefile
+testsuite/tests/Makefile
+testsuite/common.py
 flumotion.spec
 )

@@ -1,5 +1,20 @@
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* configure.ac:
+	* tests/Makefile.am:
+	* tests/common.py.in:
+	* tests/runtests.py:
+	* tests/tests/Makefile.am:
+	* tests/tests/component_http.py:
+	* tests/tests/component_parse.py:
+	* tests/tests/config.py:
+	* tests/tests/manager.py:
+	* tests/webbie.py:
+	  move to testsuite
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	* tests/Makefile.am:
 	* tests/config.py:
