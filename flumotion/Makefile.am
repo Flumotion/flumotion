@@ -4,9 +4,11 @@ SUBDIRS = \
 	component \
 	config \
 	manager \
+	test \
 	twisted \
 	utils \
 	worker
+
 flumotiondir = $(libdir)/flumotion/python/flumotion
 
 flumotion_PYTHON = \
