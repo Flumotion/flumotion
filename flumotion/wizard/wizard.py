@@ -38,36 +38,48 @@ from flumotion.common.pygobject import gsignal
 
 def escape(text):
     return text.replace('&', '&amp;')
-
+
 class Stack(list):
     push = list.append
     def peek(self):
         return self[-1]
     
-
 class WizardStep(object, log.Loggable):
-    step_name = None # Subclass sets this
     glade_dir = configure.gladedir
-    glade_file = None # Subclass sets this
-    icon = 'placeholder.png'
-    has_worker = True
     widget_prefixes = { fgtk.FComboBox    : 'combobox',
                         fgtk.FCheckButton : 'checkbutton',
                         fgtk.FEntry       : 'entry',
                         fgtk.FSpinButton  : 'spinbutton',
                         fgtk.FRadioButton : 'radiobutton' }
 
+    # set by subclasses
+    step_name = None
+    glade_file = None
+    icon = 'placeholder.png'
+    has_worker = True
+
+    visited = False # set by Wizard when going through steps
+
     def __init__(self, wizard):
+        """
+        @param wizard: the wizard this step is a part of
+        @type  wizard: L{Wizard}
+        """
         self.wizard = wizard
-        self.widget = None
-        self.visited = False
+        self.widget = None # the main widget; ie. the top child of the window
+        self.widgets = None
+        self.wtree = None
         
-        self.load_glade()
+        self._load_glade()
 
     def __repr__(self):
         return '<WizardStep object %s>' % self.step_name
     
-    def load_glade(self):
+    def _load_glade(self):
+        """
+        Load and process our glade file.
+        Set up the widget tree and main widget.
+        """
         glade_filename = os.path.join(self.glade_dir, self.glade_file)
         
         self.wtree = gtk.glade.XML(glade_filename,
@@ -88,14 +100,18 @@ class WizardStep(object, log.Loggable):
             
             name = widget.get_name()
             if hasattr(self, name):
-                raise AssertionError("There is already an attribute called %s in %r" % (name, self))
+                raise AssertionError(
+                    "There is already an attribute called %s in %r" % (
+                        name, self))
             
             setattr(self, name, widget)
 
         if len(windows) != 1:
-            raise AssertionError("only one window per glade file allowed, got %r in %r" % (
-                windows, self))
+            raise AssertionError(
+                "only one window per glade file allowed, got %r in %r" % (
+                    windows, self))
 
+        # get the main widget as the toplevel child from the window
         self.window = windows[0]
         child = self.window.get_children()[0]
         self.window.remove(child)
@@ -406,6 +422,8 @@ class Wizard(gobject.GObject, log.Loggable):
 
         @param workerName: name of the worker to check on
         @param elementNames: names of the elements to check
+
+        @returns: a deferred returning a tuple of the elements existing
         """
         if not self._admin:
             self.debug('No admin connected, not checking presents of elements')

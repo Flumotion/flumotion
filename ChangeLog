@@ -1,5 +1,13 @@
 2005-03-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* TODO:
+	  some more things to work on
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	  clean up, document, reorder
+
+2005-03-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/converters/overlay/overlay.py:
 	  Clean up temporary image file.  Fixes #188.
 

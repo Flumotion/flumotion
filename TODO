@@ -89,6 +89,15 @@
 		from the admin UI into any worker or manager
 		helps ENORMOUSLY in debugging strange errors at a point
 		where the system is broken - like AlreadyConnectedError
+
+* MEDIUM	merge before_show and worker_changed in wizard, since they
+		are pretty much the same anyway
+
+* MEDIUM	split out wizard steps into their component directories
+
+* EASY		add worker checks to all wizard steps now that infrastructure
+		is there
+
 - API cleanup:
 
 - manager/component.py:

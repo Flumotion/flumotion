@@ -448,8 +448,9 @@ class Overlay(wizard.WizardStep):
     icon = 'overlay.png'
 
     def before_show(self):
-        self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
-                                  'videomixer', 'alpha')
+        d = self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
+            'videomixer', 'alpha')
+        # FIXME: add a PIL check here
         
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())
