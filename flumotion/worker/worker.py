@@ -149,7 +149,7 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
             exec (codeSegment, globals(), namespace)
         except Exception, e:
             msg = 'runCode exec failed: %s raised: %s' % (
-                e.__class__.__name__, " ".join(e.args))
+                e.__class__.__name__, " ".join(getattr(e, 'args', ())))
             self.warning(msg)
             raise errors.RemoteRunError(msg)
 

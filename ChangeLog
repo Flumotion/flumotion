@@ -1,5 +1,12 @@
 2004-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* flumotion/wizard/steps.py:
+	* flumotion/worker/worker.py:
+	  distcheck now works again.
+
+2004-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/wizard_audiotest.glade:
 	  add volume
 	* data/glade/wizard_vorbis.glade:

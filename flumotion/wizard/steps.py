@@ -569,10 +569,11 @@ class Soundcard(wizard.WizardStep):
         # for example, when going through the testsuite
         try:
             channels = self.combobox_channels.get_enum().intvalue
+            element = self.combobox_system.get_enum().element
         except AttributeError:
             # when called without enum setup
             channels = 0
-        element = self.combobox_system.get_enum().element
+            element = "fakesrc"
 
         d = dict(device=self.combobox_device.get_string(),
                     depth=int(self.combobox_bitdepth.get_string()),
