@@ -32,4 +32,5 @@ Makefile
 flumotion/Makefile
 m4/Makefile
 docs/Makefile
+flumotion.spec
 )

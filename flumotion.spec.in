@@ -1,0 +1,46 @@
+Name:           @PACKAGE@
+Version:        @VERSION@
+Release:        @RELEASE@
+Summary:        Fluendo Streaming Server.
+
+Group:          Applications/Internet
+License:	GPL
+URL:            http://www.fluendo.com/
+Source:         %{name}-%{version}.tar.bz2
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+
+Requires:	python
+Requires:	gstreamer-python
+Requires:	python-Twisted
+
+BuildRequires:	python
+BuildArch:	noarch
+
+%description
+Fluendo Streaming Server.
+
+%prep
+%setup -q
+
+%build
+%configure
+
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+%makeinstall
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+%doc ChangeLog COPYING README AUTHORS
+%doc html
+%dir %{_libdir}/python?.?/site-packages/flumotion
+%{_libdir}/python?.?/site-packages/flumotion/*
+
+%changelog
+* Mon Jun 07 2004 Thomas Vander Stichele <thomas at apestaart dot org>
+- first package

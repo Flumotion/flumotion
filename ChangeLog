@@ -1,5 +1,12 @@
 2004-06-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* configure.ac:
+	* flumotion.spec.in:
+	  adding spec file
+
+2004-06-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile:
 	* Makefile.am:
 	* autogen.sh:
