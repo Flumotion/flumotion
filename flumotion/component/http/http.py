@@ -24,6 +24,7 @@ import os
 import random
 import time
 import thread
+import errno
 
 import gobject
 import gst
@@ -367,6 +368,11 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             return self.admin
         return self
 
+    # FIXME: rename to writeHeaders
+    """
+    @rtype: boolean
+    @returns: whether or not the file descriptor can be used further.
+    """
     def setHeaders(self, request):
         fd = request.transport.fileno()
         headers = []
@@ -385,8 +391,13 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         # fd because the client disconnected.  Catch EBADF correctly here.
         try:
             os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
-        except OSError, e:
-            self.warning('[fd %5d] client gone before writing header' % fd)
+            return True
+        except OSError, (no, s):
+            if no == errno.EBADF:
+                self.warning('[fd %5d] client gone before writing header' % fd)
+            else:
+                self.warning('[fd %5d] unhandled write error: %s' % (fd, s))
+            return False
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -489,11 +500,13 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         # hand it to multifdsink
         self.streamer.add_client(fd)
         ip = request.getClientIP()
-        self.info('[fd %5d] client from %s accepted' % (fd, ip))
+        self.info('[fd %5d] start streaming to %s' % (fd, ip))
         return server.NOT_DONE_YET
         
     def render(self, request):
-        self.debug('client from %s connected' % (request.getClientIP()))
+        fd = request.transport.fileno()
+        self.debug('[fd %5d] render: client from %s connected, request %s' %
+            (fd, request.getClientIP(), request))
         if not self.isReady():
             return self.handleNotReady(request)
         elif self.reachedMaxClients():
@@ -541,11 +554,20 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         Stats.__init__(self, sink=self.get_sink())
         self.caps = None
         self.resource = None
+        self.needsUpdate = False
+        # FIXME: call self._callLaterID.cancel() somewhere on shutdown
+        self._callLaterID = reactor.callLater(1, self.checkUpdate)
         
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.component_name
 
     # UI code
+    def checkUpdate(self):
+        if self.needsUpdate == True:
+            self.needsUpdate = False
+            self.update_ui_state()
+        self._callLaterID = reactor.callLater(1, self.checkUpdate)
+
     ### FIXME: abstract this away nicely to the base class of components
     def getUIMD5Sum(self, style):
         if not style == 'gtk':
@@ -607,15 +629,16 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
 
     # this can be called from both application and streaming thread !
     def client_added_cb(self, sink, fd):
-        self.log('client_added_cb from thread %d' % thread.get_ident()) 
+        self.log('[%5d] client_added_cb from thread %d' % 
+            (fd, thread.get_ident())) 
         # FIXME: GIL problem, just call directly for now without remote calls
         #gobject.idle_add(self.client_added_idle)
         self.client_added_idle()
 
     # this can be called from both application and streaming thread !
     def client_removed_cb(self, sink, fd, reason):
-        self.log('client_removed_cb from thread %d' % thread.get_ident()) 
-        self.log('[fd %5d] client_removed_cb, reason %s' % (fd, reason))
+        self.log('[fd %5d] client_removed_cb from thread %d, reason %s' %
+            (fd, thread.get_ident(), reason)) 
         stats = sink.emit('get-stats', fd)
         self.log('[fd %5d] client_removed_cb, got stats' % fd)
         # FIXME: GIL problem, just call directly for now without remote calls
@@ -627,15 +650,16 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     def client_added_idle(self):
         Stats.clientAdded(self)
         # FIXME: GIL problem, don't update UI for now
+        self.needsUpdate = True
         #self.update_ui_state()
         
     def client_removed_idle(self, sink, fd, reason, stats):
         # Johan will trap GST_CLIENT_STATUS_ERROR here someday
         # because STATUS_ERROR seems to have already closed the fd somewhere
-        self.log('[fd %5d] client_removed_idle, reason %s' % (fd, reason))
         self.emit('client-removed', sink, fd, reason, stats)
         Stats.clientRemoved(self)
         # FIXME: GIL problem, don't update UI for now
+        self.needsUpdate = True
         #self.update_ui_state()
         # actually close it - needs gst-plugins 0.8.5 of multifdsink
         self.debug('[fd %5d] closing' % fd)

@@ -1,3 +1,10 @@
+2004-09-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	* flumotion/component/http/http.py:
+	  update at most once every second.  re-enable updating but not
+	  with idle_add, but boolean, which doesn't care if it's threadsafe.
+
 2004-09-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/flumotion-tester.in:
