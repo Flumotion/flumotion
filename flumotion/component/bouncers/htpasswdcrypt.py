@@ -1,11 +1,5 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_htpasswdcrypt -*-
 # vi:si:et:sw=4:sts=4:ts=4
-
-# Flumotion - a video streamer server
-# Copyright (C) 2004 Fluendo
-#
-# flumotion/component/bouncers/htpasswdcrypt.py:
-# an htpasswd-backed bouncer with crypt passwords
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
@@ -23,6 +17,10 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
+
+"""
+an htpasswd-backed bouncer with crypt passwords
+"""
 
 import md5
 import random

@@ -1,8 +1,6 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/manager/manager.py: manager functionality
-# 
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
@@ -24,8 +22,6 @@
 manager implementation and related classes
 
 API Stability: semi-stable
-
-Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """
 
 __all__ = ['ManagerServerFactory', 'Vishnu']

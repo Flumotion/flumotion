@@ -1,8 +1,6 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_manager_admin -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/manager/admin.py: manager-side objects to handle admin clients
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 

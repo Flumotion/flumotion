@@ -1,9 +1,6 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_common_worker -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/common/worker.py: worker state shared between manager and
-# admin
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 

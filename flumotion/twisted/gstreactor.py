@@ -1,8 +1,6 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/twisted/gstreactor.py: a GStreamer-based Twisted reactor
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
@@ -21,7 +19,7 @@
 # Headers in this file shall remain intact.
 
 """
-a GStreamer mainloop-based Twistedreactor
+a GStreamer mainloop-based Twisted reactor
 
 In order to use this support, simply do the following::
 
@@ -32,8 +30,6 @@ Then use twisted.internet APIs as usual.  The other methods here are not
 intended to be called directly.
 
 API Stability: unstable
-
-Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """
 
 from flumotion.common import log as fclog

@@ -1,8 +1,6 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_dialogs -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/admin/gtk/progressdialog.py: a pulsating progress dialog
-# 
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 

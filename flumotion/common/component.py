@@ -1,9 +1,6 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_common_component -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/common/component.py: component state shared between manager and
-# admin
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
@@ -21,6 +18,9 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Component state shared between manager and admin clients
+"""
 
 from twisted.spread import pb
 

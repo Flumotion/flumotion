@@ -1,8 +1,6 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_http -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/test/test_http.py: regression test for HTTP component
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 

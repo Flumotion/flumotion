@@ -1,8 +1,6 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_registry -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/test/test_registry.py: regression test for flumotion.common.registry
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.c om). All rights reserved.
 

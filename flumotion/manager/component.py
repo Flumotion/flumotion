@@ -1,8 +1,6 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_manager -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/manager/component.py: manager-side objects to handle components
-# 
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
@@ -24,8 +22,6 @@
 manager-side objects for components
 
 API Stability: semi-stable
-
-Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """
 
 __all__ = ['ComponentAvatar', 'ComponentHeaven']

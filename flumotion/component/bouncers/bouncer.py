@@ -1,10 +1,5 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
-
-# Flumotion - a video streamer server
-# Copyright (C) 2004 Fluendo
-#
-# flumotion/component/bouncers/bouncer.py: base class for bouncer components
 #
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.

@@ -1,8 +1,6 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/common/errors.py: common errors for flumotion
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
@@ -22,8 +20,6 @@
 
 """
 serializable Flumotion exceptions
-
-Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """
 
 from twisted.spread import pb

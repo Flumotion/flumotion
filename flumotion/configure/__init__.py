@@ -1,8 +1,6 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_flumotion_config -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/configure/__init__.py: package abstracting configure-time config.
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
