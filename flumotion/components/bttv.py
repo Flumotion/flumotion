@@ -18,19 +18,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
-from flumotion.components import converter
+from flumotion.components import producer
 
 def createComponent(config):
-    source = config['source']
-    location = config['location']
+    device = config['device']
+    device_width = config['device-width']
+    device_height = config['device-width']
+
+    width = config.get('width', 320)
+    height = config.get('height', 240)
+    framerate = config.get('framerate', 25.0)
     
-    # Since source in converter is a list, convert it to one
-    config['source'] = [source]
-
-    # Set pipeline from the template
-    pipeline = "filesrc location=%s blocksize=100000 !" % location + \
-               "pngdec ! alphacolor ! videomixer name=mix ! :default " + \
-               "@%s ! ffmpegcolorspace ! alpha ! mix." % source
+    pipeline = ('v4lsrc device=%s copy-mode=true ! '
+                ' video/x-raw-yuv,width=%s,height=%s ! videoscale ! '
+                'video/x-raw-yuv,width=%d,height=%d ! videorate ! '
+                'video/x-raw-yuv,framerate=10.0') % (device,
+                                                     device_width,
+                                                     device_height
+                                                     width, height,
+                                                     framerate)
     config['pipeline'] = pipeline
+    
+    return producer.createComponent(config)
 
-    return converter.createComponent(config)
+

@@ -77,4 +77,16 @@
     </properties>
   </component>
 
+  <component type="bttv">
+    <source location="flumotion.components.videotest"/>
+    <properties>
+      <property name="device" type="string" required="yes"/>
+      <property name="device-height" type="int" required="yes"/>
+      <property name="device-width" type="int" required="yes"/>
+      <property name="height" type="int"/>
+      <property name="width" type="int"/>
+      <property name="framerate" type="float"/>
+    </properties>
+  </component>
+
 </components>

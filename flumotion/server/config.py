@@ -76,7 +76,11 @@ class FlumotionConfigXML:
     
     def getFunction(self, defs):
         source = defs.getSource()
-        module = reflect.namedAny(source)
+        try:
+            module = reflect.namedAny(source)
+        except ValueError:
+            raise ConfigError("%s source file could not be found" % source)
+        
         if not hasattr(module, 'createComponent'):
             self.warn('no createComponent() for %s' % source)
             return

@@ -25,6 +25,8 @@ import crypt
 from twisted.python import components
 from flumotion.server import interfaces
 
+__all__ = ['HTTPGatekeeper']
+
 class HTTPGatekeeper:
 
     __implements__ = interfaces.IAuthenticate,

@@ -9,13 +9,16 @@ MODULES = \
  	flumotion.components.file \
 	flumotion.components.http \
 	flumotion.components.producer \
+	flumotion.components.passwd \
 	flumotion.config \
 	flumotion.errors \
 	flumotion.server.admin \
+	flumotion.server.auth \
 	flumotion.server.component \
         flumotion.server.config \
 	flumotion.server.controller \
 	flumotion.server.errors \
+	flumotion.server.interfaces \
 	flumotion.server.launcher \
 	flumotion.server.registry \
 	flumotion.twisted.gstreactor \
