@@ -291,11 +291,12 @@ class RegistryParser(log.Loggable):
         self.filename = filename
 
         root = self._getRoot(filename, string)
-        try:
-            components = self._parseComponents(root.documentElement)
-            self._components.update(components)
-        except XmlParserError, message:
-            self.warning("Could not parse file %s: %s" % (filename, message))
+        # FIXME: we should be able to print a nice warning here
+        #try:
+        components = self._parseComponents(root.documentElement)
+        self._components.update(components)
+        #except XmlParserError, message:
+        #    self.warning("Could not parse file %s: %s" % (filename, message))
 
     ## Base registry specific functions
     def parseRegistry(self, filename, string=None):
