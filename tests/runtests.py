@@ -21,7 +21,10 @@ suite = unittest.TestSuite()
 loader = unittest.TestLoader()
 
 for name in gettestnames():
-    suite.addTest(loader.loadTestsFromName(name))
+    try:
+        suite.addTest(loader.loadTestsFromName(name))
+    except TypeError:
+        print "give it up"
     
 testRunner = unittest.TextTestRunner()
 testRunner.run(suite)

@@ -6,8 +6,8 @@ class TestConfig(unittest.TestCase):
     def testVariables(self):
         assert hasattr(flumotion.config, 'datadir')
         assert isinstance(flumotion.config.datadir, str)
-        assert hasattr(flumotion.config, 'uidir')
-        assert isinstance(flumotion.config.uidir, str)
+        assert hasattr(flumotion.config, 'gladedir')
+        assert isinstance(flumotion.config.gladedir, str)
 
     def testUninstalled(self):
         assert flumotion.config.installed == 0
