@@ -274,12 +274,11 @@ class Launcher:
                         logfile = None
 
                     def setup(port, component):
-                        factory = server.Site(resource=streamer.NewStreamingResource(component, logfile))
-                        #factory = server.Site(resource=streamer.StreamingResource(component, logfile))
+                        resource = streamer.HTTPStreamingResource(component, logfile)
+                        factory = server.Site(resource=resource)
                         reactor.listenTCP(port, factory)
                         
                     component = streamer.MultifdSinkStreamer(name, sources)
-                    #component = streamer.FakeSinkStreamer(name, sources)
                     self.msg('Starting http factory at port %d' % port)
                     self.start(component, nice, setup, port, component)
                 elif protocol == 'file':
@@ -513,6 +512,8 @@ def main(args):
         usage()
         return -1
 
+    args = [arg for arg in args if not arg.startswith('--gst')]
+        
     name = args[1]
     if name == 'controller':
         return run_controller(args)

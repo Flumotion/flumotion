@@ -32,130 +32,71 @@ from twisted.internet import reactor
 from flumotion.server import component
 from flumotion.utils import gstutils
 
-class StreamingResource(resource.Resource):
+class HTTPStreamingResource(resource.Resource):
     def __init__(self, streamer, location):
-        resource.Resource.__init__(self)
+        
         if location:
             self.logfile = file(location, 'a')
         else:
             self.logfile = None
             
-        self.streamer = streamer
-        self.streamer.connect('data-received', self.data_received_cb)
+        streamer.connect('streamer-client-removed', self.client_removed_cb)
         self.msg = streamer.msg
-        
-        self.current_requests = []
-        self.buffer_queue = []
-
-        self.first_buffer = None
-        self.caps_buffers = []
-        self.bytes_sent = {}
-        
-        reactor.callLater(0, self.bufferWrite)
-
-    def data_received_cb(self, transcoder, gbuffer):
-        s = str(buffer(gbuffer))
-        if gbuffer.flag_is_set(gst.BUFFER_IN_CAPS):
-            self.msg('Received a GST_BUFFER_IN_CAPS buffer')
-            self.caps_buffers.append(s)
-        else:
-            if not self.first_buffer:
-                self.msg('Received the first buffer')
-                self.first_buffer = gbuffer
-            self.buffer_queue.append(s)
-                                             
-    def bufferWrite(self, *args):
-        for buffer in self.buffer_queue:
-            for request in self.current_requests:
-                try:
-                    fd = request.transport.fileno()
-                    self.bytes_sent[fd] += len(buffer)
-                except NotImplementedError:
-                    pass
-                request.write(buffer)
-                
-        self.buffer_queue = []
-            
-        reactor.callLater(0.01, self.bufferWrite)
-        
-    def getChild(self, path, request):
-        return self
-
-    def log(self, msg):
-        self.msg(msg)
-        if self.logfile:
-            timestamp = time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime())
-            self.logfile.write('%s %s\n' % (timestamp, msg))
-            self.logfile.flush()
-        
-    def lost(self, obj, request, fd, ip):
-        self.log('client from %s disconnected (%d bytes sent)' % (ip, self.bytes_sent[fd]))
-        self.current_requests.remove(request)
-        del self.bytes_sent[fd]
-
-    def isReady(self):
-        if self.streamer.caps is None:
-            self.msg('We have no caps yet')
-            return False
-        
-        if self.first_buffer is None:
-            self.msg('We still haven\'t received any buffers')
-            return False
-
-        return True
-        
-    def render(self, request):
-        ip = request.getClientIP()
-        self.log('client from %s connected' % ip)
-        if not self.isReady():
-            self.msg('Not sending data, it\'s not ready')
-            return server.NOT_DONE_YET
-
-        mime = self.streamer.caps.get_structure(0).get_name()
-        if mime == 'multipart/x-mixed-replace':
-            self.msg('setting Content-type to %s but with camserv hack' % mime)
-            # Stolen from camserv
-            request.setHeader('Cache-Control', 'no-cache')
-            request.setHeader('Cache-Control', 'private')
-            request.setHeader("Content-type", "%s;boundary=ThisRandomString" % mime)
-        else:
-            self.msg('setting Content-type to %s' % mime)
-            request.setHeader('Content-type', mime)
-
-        for buffer in self.caps_buffers:
-            request.write(buffer)
-            
-        fd = request.transport.fileno()
-        self.bytes_sent[fd] = 0
-        self.current_requests.append(request)
-        request.notifyFinish().addBoth(self.lost, request, fd, ip)
-        
-        return server.NOT_DONE_YET
-
-class NewStreamingResource(resource.Resource):
-    def __init__(self, streamer, location):
         self.streamer = streamer
-        if location:
-            self.logfile = file(location, 'a')
-        else:
-            self.logfile = None
-        self.msg = streamer.msg
+
+        self.request_hash = {}
         
         resource.Resource.__init__(self)
         
-    def log(self, msg):
-        self.msg(msg)
+    def log(self, fd, ip, request):
         if not self.logfile:
             return
-        
-        timestamp = time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime())
-        self.logfile.write('%s %s\n' % (timestamp, msg))
+
+        headers = request.getAllHeaders()
+
+        sink = self.streamer.get_sink()
+        stats = sink.emit('get-stats', fd)
+        if stats:
+            bytes_sent = stats[0]
+            time_connected = int(stats[3] / gst.SECOND)
+        else:
+            bytes_sent = -1
+            time_connected = -1
+
+        print headers
+        # ip address
+        # ident
+        # authenticated name (from http header)
+        # date
+        # request
+        # request response
+        # bytes sent
+        # referer
+        # user agent
+        # time connected
+        ident = '-'
+        username = '-'
+        date = time.strftime('[%d/%b/%Y:%H:%M:%S %z]', time.localtime())
+        request = 'GET / HTTP/1.0'
+        response = 200
+        referer = headers.get('referer', '-')
+        user_agent = headers.get('user-agent', '-')
+        msg = "%s %s %s %s \"%s\" %d %d %s \"%s\" %d\n" % (ip, ident, username,
+                                                           date, request,
+                                                           response, bytes_sent,
+                                                           referer, user_agent,
+                                                           time_connected)
+        self.logfile.write(msg)
         self.logfile.flush()
 
-    def lost(self, obj, fd, ip):
-        self.streamer.remove_client(fd)
-        self.log('client from %s disconnected' % ip)
-
+    def streamer_client_removed_cb(self, streamer, sink, fd):
+        request = self.request_hash[fd]
+        ip = request.getClientIP()
+        fd = request.transport.fileno()
+        self.log(fd, ip, request)
+        self.msg('(%d) client from %s disconnected' % (fd, ip))
+        del self.request_hash[fd]
+        
     def isReady(self):
         if self.streamer.caps is None:
             self.msg('We have no caps yet')
@@ -168,13 +109,15 @@ class NewStreamingResource(resource.Resource):
 
     def render(self, request):
         ip = request.getClientIP()
-        self.log('client from %s connected' % ip)
+        fd = request.transport.fileno()
+        self.request_hash[fd] = request
+        self.msg('(%d) client from %s connected' % (fd, ip))
     
         if not self.isReady():
             self.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
-        mime = self.streamer.caps.get_structure(0).get_name()
+        mime = self.streamer.get_mime()
         if mime == 'multipart/x-mixed-replace':
             self.msg('setting Content-type to %s but with camserv hack' % mime)
             # Stolen from camserv
@@ -185,17 +128,17 @@ class NewStreamingResource(resource.Resource):
             self.msg('setting Content-type to %s' % mime)
             request.setHeader('Content-type', mime)
 
-        fd = request.transport.fileno()
         self.streamer.add_client(fd)
+        # Noop to write headers, bad twisted
+        request.write('')
         
-        request.notifyFinish().addBoth(self.lost, fd, ip)
+        #request.notifyFinish().addBoth(self.lost, fd, ip)
         
         return server.NOT_DONE_YET
 
 class FileSinkStreamer(component.ParseLaunchComponent):
     kind = 'streamer'
     pipe_template = 'filesink name=sink location="%s"'
-
     def __init__(self, name, sources, location):
         self.location = location
 
@@ -239,7 +182,6 @@ class FileSinkStreamer(component.ParseLaunchComponent):
         
         self.pipeline.set_state(gst.STATE_PLAYING)
 
-        
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
         self.setup_sources(sources)
@@ -250,12 +192,16 @@ class FileSinkStreamer(component.ParseLaunchComponent):
 
     remote_connect = connect_to
 
-
-class MultifdSinkStreamer(component.ParseLaunchComponent):
+class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     kind = 'streamer'
     pipe_template = 'multifdsink buffers-max=500 buffers-soft-max=250 recover-policy=1 name=sink'
+    __gsignals__ = {
+        'client-removed': (gobject.SIGNAL_RUN_FIRST, None, (object, int))
+                   }
+                                       
     
     def __init__(self, name, sources):
+        self.__gobject_init__()
         component.ParseLaunchComponent.__init__(self, name, sources, [], self.pipe_template)
         self.caps = None
         
@@ -273,27 +219,10 @@ class MultifdSinkStreamer(component.ParseLaunchComponent):
         self.msg('Storing caps: %s' % caps_str)
         self.caps = caps
 
+    def get_mime(self):
+        return self.caps.get_structure(0).get_name()
+    
     def add_client(self, fd):
-        if not self.caps:
-            self.msg('We have no caps yet')
-            return
- 
-        os.write(fd, 'HTTP/1.0 200 OK\n')
-        os.write(fd, 'Server: FlumotionMultiFDSink/0.0.0.1\n')
-        
-        mime = self.caps.get_structure(0).get_name()
-        if mime == 'multipart/x-mixed-replace':
-            self.msg('setting Content-type to %s but with camserv hack' % mime)
-            # Stolen from camserv
-            os.write(fd, 'Cache-Control: no-cache\n')
-            os.write(fd, 'Cache-Control: private\n')
-            os.write(fd, "Content-type: %s;boundary=ThisRandomString\n" % mime)
-        else:
-            self.msg('setting Content-type to %s' % mime)
-            os.write(fd, 'Content-type: %s\n' % mime)
-
-        os.write(fd, '\n')
-        
         sink = self.get_sink()
         sink.emit('add', fd)
          
@@ -308,71 +237,18 @@ class MultifdSinkStreamer(component.ParseLaunchComponent):
         assert isinstance(sink, gst.Element)
         return sink
 
+    def client_removed_cb(self, sink, fd):
+        self.emit('client-removed', sink, fd)
+        
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
         self.setup_sources(sources)
         sink = self.get_sink()
         sink.connect('deep-notify::caps', self.notify_caps_cb)
         sink.connect('state-change', self.feed_state_change_cb, '')
+        sink.connect('client-removed', self.client_removed_cb)
         
         self.pipeline_play()
 
     remote_connect = connect_to
-
-class FakeSinkStreamer(gobject.GObject, component.ParseLaunchComponent):
-    __gsignals__ = {
-        'data-received' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
-                          (gst.Buffer,)),
-    }
-
-    kind = 'streamer'
-    pipe_template = 'fakesink signal-handoffs=1 silent=1 name=sink'
-    
-    def __init__(self, name, sources):
-        self.__gobject_init__()
-        component.ParseLaunchComponent.__init__(self, name, sources, [], self.pipe_template)
-        self.caps = None
-        
-    def sink_handoff_cb(self, element, buffer, pad):
-        self.emit('data-received', buffer)
-        
-    def notify_caps_cb(self, element, pad, param):
-        caps = pad.get_negotiated_caps()
-        if caps is None:
-            return
-        
-        caps_str = gstutils.caps_repr(caps)
-        self.msg('Got caps: %s' % caps_str)
-        
-        if not self.caps is None:
-            self.warn('Already had caps: %s, replacing' % caps_str)
-
-        self.msg('Storing caps: %s' % caps_str)
-        self.caps = caps
-
-    def get_sink(self):
-        assert self.pipeline, 'Pipeline not created'
-        sink = self.pipeline.get_by_name('sink')
-        assert sink, 'No sink element in pipeline'
-        assert isinstance(sink, gst.Element)
-        return sink
-
-    def add_client(self, fd):
-        pass
-
-    def remove_client(self, fd):
-        pass
-    
-    # connect() is already taken by gobject.GObject
-    def connect_to(self, sources):
-        self.setup_sources(sources)
-        sink = self.get_sink()
-        sink.connect('handoff', self.sink_handoff_cb)
-        sink.connect('deep-notify::caps', self.notify_caps_cb)
-        sink.connect('state-change', self.feed_state_change_cb, '')
-        
-        self.pipeline_play()
-
-    remote_connect = connect_to
-
-gobject.type_register(FakeSinkStreamer)
+gobject.type_register(MultifdSinkStreamer)
