@@ -41,13 +41,11 @@ def getMTime(file):
 
 class RegistryEntryComponent:
     "This class represents a <component> entry in the registry"
-    def __init__(self, filename, type, factory, source,
-                 source_gui, properties, files):
+    def __init__(self, filename, type, factory, source, properties, files):
         self.filename = filename
         self.type = type
         self.factory = factory
         self.source = source
-        self.source_gui = source_gui
         self.properties = properties
         self.files = files
         
@@ -191,14 +189,11 @@ class RegistryXmlParser(log.Loggable):
                 
         files = []
         source = None
-        source_gui = None
         for child in node.childNodes:
             if child.nodeType != Node.ELEMENT_NODE:
                 continue
 
             if child.nodeName == 'source':
-                source = self.parse_source(child)
-            elif child.nodeName == 'source-gui':
                 source = self.parse_source(child)
             elif child.nodeName == 'properties':
                 child_properties = self.parse_properties(properties, child)
@@ -214,7 +209,7 @@ class RegistryXmlParser(log.Loggable):
                 factory = False
 
         return RegistryEntryComponent(self.filename,
-                                      type, factory, source, source_gui,
+                                      type, factory, source, 
                                       properties.values(), files)
 
     def parse_source(self, node):

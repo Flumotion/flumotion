@@ -51,3 +51,15 @@ class TestRegistry(unittest.TestCase):
           <component name="foo" type="bar"></component></components>""")
         reg.clean()
         assert reg.isEmpty()
+
+class TestComponentEntry(unittest.TestCase):
+    def setUp(self):
+        self.entry = registry.RegistryEntryComponent('filename', 'type', False,
+                                                     'source', ['prop'],
+                                                     ['files'])
+    def testThings(self):
+        assert self.entry.getType() == 'type'
+        assert not self.entry.isFactory()
+        assert self.entry.getSource() == 'source'
+        assert self.entry.getFiles() == ['files']
+        
