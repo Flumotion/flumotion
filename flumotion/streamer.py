@@ -125,6 +125,14 @@ def main(args):
                       action="store", type="string", dest="name",
                       default=None,
                       help="Name of component")
+    parser.add_option('-p', '--protocol',
+                      action="store", type="string", dest="protocol",
+                      default=None,
+                      help="Protocol to use")
+    parser.add_option('-o', '--port',
+                      action="store", type="string", dest="port",
+                      default=None,
+                      help="Port to bind to")
     parser.add_option('-s', '--source',
                       action="store", type="string", dest="source",
                       default=None,
@@ -143,18 +151,33 @@ def main(args):
         print 'Need a source'
         return 2
 
+    if options.protocol is None:
+        print 'Need a protocol'
+        return 2
+
+    if options.port is None:
+        print 'Need a port'
+        return 2
+    
     if options.verbose:
         log.startLogging(sys.stdout)
 
-    if ':' in options.host:
+    port = 8890
+    if options.host is None:
+        host = 'localhost'
+    elif ':' in options.host:
         host, port = options.split(options.host)
     else:
         host = options.host
-        port = 8890
 
-    log.msg('Connect to %s on port %d' % (host, port))
+    if options.protocol == 'http':
+        factory = server.Site(resource=StreamingResource(component))
+    else:
+        print 'Only http protcol supported right now'
+
+    log.msg('Connect to controller %s on port %d' % (host, port))
     component = Streamer(options.name, options.source, host, port)
-    reactor.listenTCP(8806, server.Site(resource=StreamingResource(component)))
+    reactor.listenTCP(options.port, factory)
     reactor.run()
 
 if __name__ == '__main__':
