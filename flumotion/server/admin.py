@@ -67,19 +67,23 @@ class AdminPerspective(pb.Avatar, log.Loggable):
     when logging in and requesting an "admin" avatar.
     """
     logCategory = 'admin-persp'
-    # FIXME: should not be called with controller directly, should be
-    # called with the Admin through which controller can be gotten.
-    def __init__(self, controller):
+    def __init__(self, admin):
         """
-        @type controller: L{server.controller.Controller}
+        @type admin: L{server.admin.Admin}
         """
-        self.controller = controller
+        # FIXME: use accessor to get controller ?
+        self.controller = admin.controller
         self.mind = None
         self.debug("created new AdminPerspective")
         
     # FIXME: maybe rename to hasReference ? We are already a Perspective
     # ourselves
     def hasRemoteReference(self):
+        """
+        Check if the avatar has a remote reference to the peer.
+
+        @rtype: boolean
+        """
         return self.mind != None
     
     def _mindCallRemote(self, name, *args, **kwargs):
@@ -98,8 +102,11 @@ class AdminPerspective(pb.Avatar, log.Loggable):
             self.warning("mind %s is a dead reference, removing" % mind)
             return
         
+    # FIXME: this should probably be renamed to getComponents ?
     def getClients(self):
         """
+        Return all components logged in to the controller.
+        
         @rtype: C{list} of L{server.admin.ComponentView}
         """
         # FIXME: should we use an accessor to get at components from c ?
@@ -107,16 +114,25 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         return clients
 
     def sendLog(self, category, type, message):
+        """
+        Send the given log message to the peer.
+        """
         # don't send if we don't have a remote reference yet.
         # this avoids recursion from the remote caller trying to warn
         if self.hasRemoteReference():
             self._mindCallRemote('log', category, type, message)
         
     def componentAdded(self, component):
+        """
+        Tell the avatar that a component has been added.
+        """
         self.debug("AdminPerspective.componentAdded: %s" % component)
         self._mindCallRemote('componentAdded', ComponentView(component))
         
     def componentRemoved(self, component):
+        """
+        Tell the avatar that a component has been removed.
+        """
         self.debug("AdminPerspective.componentRemoved: %s" % component)
         self._mindCallRemote('componentRemoved', ComponentView(component))
 
@@ -197,7 +213,7 @@ class Admin(pb.Root):
         @returns: a new perspective on the admin.
         """
         self.debug('creating new perspective')
-        adminp = AdminPerspective(self.controller)
+        adminp = AdminPerspective(self)
         reactor.callLater(0.25, self.sendCache, adminp)
         
         self.clients.append(adminp)

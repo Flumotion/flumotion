@@ -348,9 +348,10 @@ register and start up pending components."""
         self.admin = admin
         
     def getPerspective(self, avatarID):
-        """Creates a new perspective for a component, raises
+        """
+        Creates a new perspective for a component, raises
         an AlreadyConnectedError if the component is already found in the cache
-        @type args:      tuple
+        @type avatarID:  string
         @rtype:          L{server.controller.ComponentPerspective}
         @returns:        the perspective for the component"""
 
