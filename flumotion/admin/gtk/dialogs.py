@@ -18,8 +18,7 @@
 
 # Headers in this file shall remain intact.
 
-# FIXME: move
-from flumotion.utils.gstutils import gsignal
+from flumotion.common.pygtk import gsignal
 
 import gtk
 import gobject

@@ -18,8 +18,9 @@
 
 # Headers in this file shall remain intact.
 
-import socket
-import sys
+"""
+GStreamer helper functionality
+"""
 
 # moving this down causes havoc when running this file directly for some reason
 from flumotion.common import errors
@@ -27,8 +28,12 @@ from flumotion.common import errors
 import gobject
 import gst
 
-
 def caps_repr(caps):
+    """
+    Represent L{gst.Caps} as a string.
+
+    @rtype: string
+    """
     value = str(caps)
     pos = value.find('streamheader')
     if pos != -1:
@@ -37,6 +42,9 @@ def caps_repr(caps):
         return value
         
 def verbose_deep_notify_cb(object, orig, pspec, component):
+    """
+    A default deep-notify signal handler for pipelines.
+    """
     value = orig.get_property(pspec.name)
     if pspec.value_type == gobject.TYPE_BOOLEAN:
         if value:
@@ -59,80 +67,11 @@ def verbose_deep_notify_cb(object, orig, pspec, component):
                                    pspec.name,
                                    output))
 
-# XXX: move this to a separate file
-def is_port_free(port):
-    assert type(port) == int
-    fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        fd.bind(('', port))
-    except socket.error:
-        return False
-    
-    return True
-    
-def get_free_port(start):
-    port = start
-    while 1:
-        if is_port_free(port):
-            return port
-        port += 1
-
-
-def gobject_set_property(object, property, value):
-    for pspec in gobject.list_properties(object):
-        if pspec.name == property:
-            break
-    else:
-        raise errors.PropertyError("Property '%s' in element '%s' does not exist" % (property, object.get_property('name')))
-        
-    if pspec.value_type in (gobject.TYPE_INT, gobject.TYPE_UINT,
-                            gobject.TYPE_INT64, gobject.TYPE_UINT64):
-        try:
-            value = int(value)
-        except ValueError:
-            msg = "Invalid value given for property '%s' in element '%s'" % (property, object.get_property('name'))
-            raise errors.PropertyError(msg)
-        
-    elif pspec.value_type == gobject.TYPE_BOOLEAN:
-        if value == 'False':
-            value = False
-        elif value == 'True':
-            value = True
-        else:
-            value = bool(value)
-    elif pspec.value_type in (gobject.TYPE_DOUBLE, gobject.TYPE_FLOAT):
-        value = float(value)
-    elif pspec.value_type == gobject.TYPE_STRING:
-        value = str(value)
-    # FIXME: this is superevil ! we really need to find a better way
-    # of checking if this property is a param enum  
-    # also, we only allow int for now
-    elif repr(pspec.__gtype__).startswith("<GType GParamEnum"):
-        value = int(value)
-    else:
-        raise errors.PropertyError('Unknown property type: %s' % pspec.value_type)
-
-    object.set_property(property, value)
-
-def gsignal(name, *args):
-    """
-    Add a GObject signal to the current object.
-    @type name: string
-    @type args: mixed
-    """
-    frame = sys._getframe(1)
-    locals = frame.f_locals
-    
-    if not '__gsignals__' in locals:
-        dict = locals['__gsignals__'] = {}
-    else:
-        dict = locals['__gsignals__']
-
-    dict[name] = (gobject.SIGNAL_RUN_FIRST, None, args)
-
 def element_factory_has_property(element_factory, property_name):
     """
     Check if the given element factory has the given property.
+
+    @rtype: boolean
     """
     # FIXME: find a better way than instantiating one
     # FIXME: add simple unit test

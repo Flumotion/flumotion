@@ -30,7 +30,7 @@ from twisted.internet import defer
 
 from flumotion.configure import configure
 from flumotion.common import log, errors, worker
-from flumotion.utils.gstutils import gsignal
+from flumotion.common.pygtk import gsignal
 from flumotion.wizard import enums, save
 from flumotion.ui import fgtk
 from flumotion.twisted import flavors

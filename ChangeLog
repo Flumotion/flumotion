@@ -1,3 +1,27 @@
+2005-01-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/admin/gtk/spyglass.py:
+	* flumotion/admin/gtk/videotest.py:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/common.py:
+	* flumotion/common/gstreamer.py:
+	* flumotion/common/pygtk.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/producers/webcam/webcam.py:
+	* flumotion/manager/component.py:
+	* flumotion/utils/Makefile.am:
+	* flumotion/utils/gstutils.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	  first pass at removing utils/gstutils.py
+
 2005-01-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/Makefile.am:

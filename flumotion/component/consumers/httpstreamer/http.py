@@ -32,10 +32,10 @@ from twisted.internet import reactor
 from twisted.web import server
 
 from flumotion.component import feedcomponent
-from flumotion.common import bundle, common
+from flumotion.common import bundle, common, gstreamer
+
 from flumotion.common.component import moods
-from flumotion.utils import gstutils
-from flumotion.utils.gstutils import gsignal
+from flumotion.common.pygtk import gsignal
 
 from flumotion.component.consumers.httpstreamer import resources
 
@@ -232,7 +232,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if caps is None:
             return
         
-        caps_str = gstutils.caps_repr(caps)
+        caps_str = gstreamer.caps_repr(caps)
         self.debug('Got caps: %s' % caps_str)
         
         if not self.caps is None:

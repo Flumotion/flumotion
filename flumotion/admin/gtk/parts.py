@@ -26,8 +26,9 @@ import gtk.glade
 
 from flumotion.configure import configure
 from flumotion.common import log, component
+
 from flumotion.common.component import moods
-from flumotion.utils.gstutils import gsignal
+from flumotion.common.pygtk import gsignal
 
 COL_MOOD      = 0
 COL_NAME      = 1

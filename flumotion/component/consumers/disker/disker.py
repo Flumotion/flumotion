@@ -29,10 +29,10 @@ import gst
 from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
-from flumotion.common import log
+from flumotion.common import log, gstreamer
+
 from flumotion.common.component import moods
-from flumotion.utils import gstutils
-from flumotion.utils.gstutils import gsignal
+from flumotion.common.pygtk import gsignal
 
 __all__ = ['Disker']
 
@@ -136,7 +136,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if caps is None:
             return
         
-        caps_str = gstutils.caps_repr(caps)
+        caps_str = gstreamer.caps_repr(caps)
         self.debug('Got caps: %s' % caps_str)
 
         new = True

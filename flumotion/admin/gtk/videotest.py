@@ -21,6 +21,9 @@
 # FIXME: moving this down causes errors
 from flumotion.common import log
 
+import os
+import string
+
 # johan says modules should not do this, only apps
 import pygtk
 pygtk.require('2.0')
@@ -33,10 +36,8 @@ import gtk
 import gtk.glade
 
 from flumotion.configure import configure
-from flumotion.utils.gstutils import gsignal
+from flumotion.common.pygtk import gsignal
 
-import os
-import string
 
 if gtk.pygtk_version < (2,3,96):
     raise SystemExit, "PyGTK 2.3.96 or higher required"

@@ -38,7 +38,6 @@ from flumotion.manager import base
 from flumotion.common import errors, interfaces, keycards, log, config
 from flumotion.twisted import flavors
 from flumotion.common.component import moods
-from flumotion.utils import gstutils
 
 # abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
 class Feeder:

@@ -39,9 +39,10 @@ from flumotion.common import worker, component
 
 from flumotion.configure import configure
 from flumotion.utils import reload
-from flumotion.utils.gstutils import gsignal
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
+
+from flumotion.common.gobject import gsignal
 
 # FIXME: this is a Medium
 # FIXME: stop using signals, we can provide a richer interface with actual

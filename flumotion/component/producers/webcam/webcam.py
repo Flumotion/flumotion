@@ -22,7 +22,7 @@
 
 import gst
 
-from flumotion.utils import gstutils
+from flumotion.common import gstreamer
 
 from flumotion.component import feedcomponent
 from flumotion.component.effects.colorbalance import colorbalance
@@ -52,7 +52,7 @@ def createComponent(config):
     # create component
     autoprobe = "autoprobe=false"
     # added in gst-plugins 0.8.6
-    if gstutils.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
+    if gstreamer.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
         autoprobe += " autoprobe-fps=false"
     
     pipeline = 'v4lsrc name=source %s copy-mode=1 ! ' \

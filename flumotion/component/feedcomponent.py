@@ -31,10 +31,10 @@ from twisted.spread import pb
 
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
-from flumotion.common import interfaces, errors, log
+from flumotion.common import common, interfaces, errors, log, gstreamer, pygtk
+
 from flumotion.common.component import moods
-from flumotion.utils import gstutils
-from flumotion.utils.gstutils import gsignal
+from flumotion.common.pygtk import gsignal
 
 class FeedComponentMedium(basecomponent.BaseComponentMedium):
     """
@@ -131,7 +131,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         retval = []
         ports = {}
         startPort = configure.defaultGstPortRange[0]
-        free_port = gstutils.get_free_port(startPort)
+        free_port = common.getFirstFreePort(startPort)
         for name, host, port in feeders:
             if port == None:
                 port = free_port
@@ -318,7 +318,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline_signals.append(sig_id)
         
         sig_id = self.pipeline.connect('deep-notify',
-                                       gstutils.verbose_deep_notify_cb, self)
+                                       gstreamer.verbose_deep_notify_cb, self)
         self.pipeline_signals.append(sig_id)
 
     def pipeline_pause(self):
@@ -561,7 +561,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.debug('setting property %s on element %r to %s' %
                    (property, element_name, value))
-        gstutils.gobject_set_property(element, property, value)
+        pygtk.gobject_set_property(element, property, value)
     
 gobject.type_register(FeedComponent)
 

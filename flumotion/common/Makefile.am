@@ -10,9 +10,11 @@ flumotion_PYTHON = \
 	config.py \
 	enum.py \
 	errors.py \
+	gstreamer.py \
 	interfaces.py \
 	log.py \
 	keycards.py \
+	pygobject.py \
 	registry.py \
 	setup.py \
 	worker.py

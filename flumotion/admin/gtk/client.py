@@ -31,9 +31,10 @@ from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs, parts
 from flumotion.configure import configure
 from flumotion.common import errors, log, worker, component
-from flumotion.common.component import moods
 from flumotion.manager import admin # Register types
-from flumotion.utils.gstutils import gsignal
+
+from flumotion.common.component import moods
+from flumotion.common.pygtk import gsignal
 
 class Window(log.Loggable, gobject.GObject):
     '''

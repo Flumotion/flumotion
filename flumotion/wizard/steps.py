@@ -269,12 +269,11 @@ class FireWire(VideoSource):
 
 wizard.register_step(FireWire)
 
-
 # FIXME: rename, only for v4l stuff
 def _checkDeviceName(device):
     # this function gets sent to and executed on the worker
     # it will fire a deferred returning the deviceName, or a failure
-    from flumotion.utils import gstutils
+    from flumotion.common import gstreamer
     from twisted.internet import defer, reactor
     import gst
 
@@ -301,7 +300,7 @@ def _checkDeviceName(device):
 
     autoprobe = "autoprobe=false"
     # added in gst-plugins 0.8.6
-    if gstutils.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
+    if gstreamer.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
         autoprobe += " autoprobe-fps=false"
 
     pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,

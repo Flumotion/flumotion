@@ -24,6 +24,7 @@ small common functions used by all processes
 
 import errno
 import os 
+import socket
 import sys
 import time
 import signal
@@ -475,3 +476,34 @@ def waitForKill():
  
     waiter = Waiter()
     waiter.sleep()
+
+def checkPortFree(port):
+    """
+    Check if the given local port is free to accept on.
+
+    @type port: int
+
+    @rtype: boolean
+    """
+    assert type(port) == int
+    fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        fd.bind(('', port))
+    except socket.error:
+        return False
+    
+    return True
+    
+def getFirstFreePort(startPort):
+    """
+    Get the first free port, starting from the given port.
+
+    @type startPort: int
+
+    @rtype: int
+    """
+    port = startPort
+    while 1:
+        if checkPortFree(port):
+            return port
+        port += 1
