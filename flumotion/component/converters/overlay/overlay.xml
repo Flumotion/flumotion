@@ -6,6 +6,7 @@
         <property name="feed" type="string" required="yes" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
         <property name="text" type="string"/>
+        <property name="show_text" type="bool"/>
         <property name="fluendo_logo" type="bool"/>
         <property name="cc_logo" type="bool"/>
         <property name="xiph_logo" type="bool"/>

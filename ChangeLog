@@ -1,3 +1,14 @@
+2005-04-05  Andy Wingo  <wingo@pobox.com>
+	
+	* flumotion/component/converters/overlay/genimg.py
+	(generate_overlay): If not text, don't draw.text.
+	
+	* flumotion/component/converters/overlay/overlay.xml: Add
+	show_text prop.
+	
+	* flumotion/component/converters/overlay/overlay.py
+	(createComponent): Follow config['show_text'].
+
 2005-04-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

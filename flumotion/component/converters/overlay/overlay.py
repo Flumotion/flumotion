@@ -55,7 +55,10 @@ def createComponent(config):
                         "%s ! ffmpegcolorspace ! alpha ! mix." % eater)
     
 
-    text = config.get('text', None)
+    if config.get('show_text'):
+        text = config.get('text', None)
+    else:
+        text = None
 
     genimg.generate_overlay(FILENAME, text,
                             config.get('fluendo_logo', False),

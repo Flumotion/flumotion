@@ -47,11 +47,12 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
     image = Image.new("RGBA", (width, height))
     draw = ImageDraw.Draw(image) # inheriting color mode
 
-    font = ImageFont.truetype(fontpath, FONT_SIZE)
-    draw.text((TEXT_XOFFSET+2, TEXT_YOFFSET+2),
-              text, font=font, fill='black')
-    draw.text((TEXT_XOFFSET, TEXT_YOFFSET),
-              text, font=font)
+    if text:
+        font = ImageFont.truetype(fontpath, FONT_SIZE)
+        draw.text((TEXT_XOFFSET+2, TEXT_YOFFSET+2),
+                  text, font=font, fill='black')
+        draw.text((TEXT_XOFFSET, TEXT_YOFFSET),
+                  text, font=font)
 
     # How many logos we're going to show
     logos = len([i for i in (show_fluendo, show_cc, show_xiph) if i]) - 1
