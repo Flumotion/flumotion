@@ -102,9 +102,6 @@ class GstReactor(default.PosixReactorBase):
     def addReader(self, reader):
         if not hasReader(reader):
             reads[reader] = self.input_add(reader, INFLAGS, self.callback)
-        else:
-            # FIXME
-            print "ERROR: adding a reader on fd %d that was already here" % reader.fileno()
         try:
             self.simulate()
         except KeyboardInterrupt:
@@ -114,9 +111,6 @@ class GstReactor(default.PosixReactorBase):
     def addWriter(self, writer):
         if not hasWriter(writer):
             writes[writer] = self.input_add(writer, OUTFLAGS, self.callback)
-        else:
-            # FIXME
-            print "ERROR: adding a writer on fd %d that was already here" % writer.fileno()
 
     def removeAll(self):
         v = reads.keys()
