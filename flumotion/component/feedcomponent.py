@@ -30,7 +30,7 @@ from twisted.spread import pb
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
 from flumotion.common import interfaces, errors, log
-from flumotion.common.common import moods
+from flumotion.common.component import moods
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
@@ -58,7 +58,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         #    self.comp.pipeline_stop()
 
     def _component_error_cb(self, component, element_path, message):
-        self.comp.setMood(moods.SAD)
+        self.comp.setMood(moods.sad)
         self.callRemote('error', element_path, message)
         
     def _component_feed_state_changed_cb(self, component, feed_name, state):
@@ -66,7 +66,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         # FIXME: everything heeds to be playing, not just one !
         if state == gst.STATE_PLAYING:
             self.info('component is HAPPY')
-            self.comp.setMood(moods.HAPPY)
+            self.comp.setMood(moods.happy)
 
     def _component_notify_feed_ports_cb(self, component):
         self.callRemote('notifyFeedPorts', component.feed_ports)
@@ -86,7 +86,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         self.debug('remote_start with eaters data %s and feeders data %s' % (
             eatersData, feedersData))
-        self.comp.setMood(moods.WAKING)
+        self.comp.setMood(moods.waking)
 
         ret = self.comp.link(eatersData, feedersData)
 
@@ -216,17 +216,17 @@ class FeedComponent(basecomponent.BaseComponent):
         See the mood transition diagram.
         """
         mood = self.state.get('mood')
-        if mood == moods.SAD:
+        if mood == moods.sad:
             return
 
         if self.eatersWaiting == 0 and self.feedersWaiting == 0:
-            self.setMood(moods.HAPPY)
+            self.setMood(moods.happy)
             return
 
         if self.eatersWaiting == 0:
-            self.setMood(moods.WAKING)
+            self.setMood(moods.waking)
         else:
-            self.setMood(moods.HUNGRY)
+            self.setMood(moods.hungry)
         return
 
     def addEffect(self, effect):
@@ -483,9 +483,9 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         # if we have eaters waiting, we start out hungry, else waking
         if self.eatersWaiting:
-            self.setMood(moods.HUNGRY)
+            self.setMood(moods.hungry)
         else:
-            self.setMood(moods.WAKING)
+            self.setMood(moods.waking)
 
         self.debug('manager asks us to link')
         self.debug('setting up eaters')

@@ -33,7 +33,7 @@ from twisted.web import server
 
 from flumotion.component import feedcomponent
 from flumotion.common import bundle, common
-from flumotion.common.common import moods
+from flumotion.common.component import moods
 from flumotion.utils import gstutils
 from flumotion.utils.gstutils import gsignal
 
@@ -344,7 +344,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # FIXME: add more moods
         if state == gst.STATE_PLAYING:
             self.debug('Ready to serve clients')
-            self.setMood(moods.HAPPY)
+            self.setMood(moods.happy)
 
     def link_setup(self, eaters, feeders):
         sink = self.get_element('sink')

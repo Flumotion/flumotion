@@ -23,7 +23,15 @@
 
 
 from twisted.spread import pb
+
 from flumotion.twisted import flavors
+from flumotion.common import enum
+
+# moods
+moods = enum.EnumClass(
+    'Moods',
+    ('happy', 'sad', 'lost', 'hungry', 'waking', 'sleeping')
+)
 
 # component state proxy objects
 class JobComponentState(flavors.StateCacheable):

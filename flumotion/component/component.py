@@ -35,7 +35,7 @@ from twisted.cred import error as crederror
 from twisted.spread import pb
 
 from flumotion.common import interfaces, errors, log, component
-from flumotion.common.common import moods
+from flumotion.common.component import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
@@ -76,7 +76,7 @@ class ComponentClientFactory(superklass):
         # FIXME: do we need to make sure that this cannot shut down the
         # manager if it's the manager's bouncer ?
         reactor.stop()
-        self.component.setMood(moods.SAD)
+        self.component.setMood(moods.sad)
 
     def login(self, keycard):
         d = self.__super_login(keycard, self.medium,
@@ -279,7 +279,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.state = component.JobComponentState()
         
         self.state.set('name', name)
-        self.state.set('mood', moods.SLEEPING)
+        self.state.set('mood', moods.sleeping.value)
         self.state.set('pid', os.getpid())
 
         # FIXME: remove stuff in state
@@ -297,11 +297,11 @@ class BaseComponent(log.Loggable, gobject.GObject):
         See the mood transition diagram.
         """
         mood = self.state.get('mood')
-        if mood == moods.SAD:
+        if mood == moods.sad.value:
             return
 
         # FIXME: probably could use a state where it's still starting ?
-        self.setMood(moods.HAPPY)
+        self.setMood(moods.happy)
     
     def startHeartbeat(self):
         """
@@ -363,11 +363,11 @@ class BaseComponent(log.Loggable, gobject.GObject):
         Set the given mood on the component if it's different from the current
         one.
         """
-        if self.state.get('mood') == mood:
+        if self.state.get('mood') == mood.value:
             return
 
         self.debug('MOOD changed to %r' % mood)
-        self.state.set('mood', mood)
+        self.state.set('mood', mood.value)
         # send a heartbeat right now
         if self._HeartbeatDC:
             self._HeartbeatDC.reset(0)

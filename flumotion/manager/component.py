@@ -41,7 +41,7 @@ from flumotion.configure import configure
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, keycards, log, config
 from flumotion.twisted import flavors
-from flumotion.common.common import moods
+from flumotion.common.component import moods
 from flumotion.utils import gstutils
 
 # abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
@@ -294,9 +294,9 @@ class ComponentAvatar(base.ManagerAvatar):
         if self.lastHeartbeat > 0 \
             and time.time() - self.lastHeartbeat \
                 > self._heartbeatCheckInterval \
-            and self._getMood() != moods.LOST:
+            and self._getMood() != moods.lost:
                 self.warning('heartbeat missing, component is lost')
-                self._setMood(moods.LOST)
+                self._setMood(moods.lost)
         self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
             self._heartbeatCheck)
 
@@ -367,16 +367,7 @@ class ComponentAvatar(base.ManagerAvatar):
     def stateSet(self, state, key, value):
         self.debug("state set on %r: %s now %r" % (state, key, value))
         if key == 'mood':
-            # FIXME: proper enum
-            names = {
-                moods.HAPPY:    'happy',
-                moods.SAD:      'sad',
-                moods.HUNGRY:   'hungry',
-                moods.WAKING:   'waking',
-                moods.SLEEPING: 'sleeping',
-                moods.LOST:     'lost',
-            }
-            self.info('Mood changed to %s' % names[value])
+            self.info('Mood changed to %s' % moods.get(value).name)
 
     def stateAppend(self, state, key, value):
         pass
@@ -569,7 +560,7 @@ class ComponentAvatar(base.ManagerAvatar):
             self.debug('checkFeedReady: feed not playing yet (%s)' %
                       gst.element_state_get_name(self._gstState))
             return
-        #if self.state.mood != moods.HAPPY:
+        #if self.state.mood != moods.happy:
         #    self.debug('checkFeedReady: not happy yet (%s)' %
         #              self.state.mood)
         #    return

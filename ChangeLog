@@ -1,5 +1,16 @@
 2004-12-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/common/common.py:
+	* flumotion/common/component.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/manager/component.py:
+	  make mood into an enum
+
+2004-12-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/common/worker.py:

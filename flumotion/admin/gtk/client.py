@@ -33,7 +33,7 @@ from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs
 from flumotion.configure import configure
 from flumotion.common import errors, log, worker, component
-from flumotion.common.common import moods
+from flumotion.common.component import moods
 from flumotion.manager import admin # Register types
 from flumotion.utils.gstutils import gsignal
 
@@ -270,21 +270,11 @@ class Window(log.Loggable, gobject.GObject):
         self._moodPixbufs = self._getMoodPixbufs()
 
     # load all pixbufs for the moods
-    # FIXME: enumize
     def _getMoodPixbufs(self):
         pixbufs = {}
-        items = (
-            (moods.HAPPY, "happy"),
-            (moods.SAD, "sad"),
-            (moods.HUNGRY, "hungry"),
-            (moods.LOST, "lost"),
-            (moods.WAKING, "waking"),
-            (moods.SLEEPING, "sleeping"),
-            )
-
-        for item in items:
-            (m, name) = item
-            pixbufs[m] = gtk.gdk.pixbuf_new_from_file(os.path.join(
+        for i in range(0, len(moods)):
+            name = moods.get(i).name
+            pixbufs[i] = gtk.gdk.pixbuf_new_from_file(os.path.join(
                 configure.imagedir, 'mood-%s.png' % name))
 
         return pixbufs
