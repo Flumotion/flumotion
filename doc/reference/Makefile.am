@@ -8,7 +8,7 @@ pypath=$(top_srcdir):@PYGTK_DIR@:$(PYTHONPATH)
 
 MODULE_FILES = \
 	flumotion/admin/__init__.py		\
-	flumotion/admin/spyglass.py		\
+	flumotion/admin/gtk/spyglass.py		\
 	flumotion/config/__init__.py		\
 	flumotion/common/auth.py		\
         flumotion/common/config.py		\
