@@ -23,6 +23,8 @@ import sys
 
 import gobject
 import gst
+import pygtk
+pygtk.require('2.0')
 import gtk
 import gtk.glade
 
@@ -36,6 +38,8 @@ from flumotion.twisted import pbutil
 from flumotion.server import admin   # Register types
 from flumotion.utils import log
 
+import flumotion.config
+
 class AdminInterface(pb.Referenceable, gobject.GObject):
     __gsignals__ = {
         'connected' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
@@ -45,18 +49,19 @@ class AdminInterface(pb.Referenceable, gobject.GObject):
     def __init__(self):
         self.__gobject_init__()
         self.factory = pb.PBClientFactory()
+        log.debug('adminclient', "logging in to ClientFactory")
         cb = self.factory.login(pbutil.Username('admin'), client=self)
         cb.addCallback(self.gotPerspective)
 
     def gotPerspective(self, perspective):
+        log.debug('adminclient', "gotPerspective")
         self.remote = perspective
 
     def msg(self, *args):
-        print args
-        #log.msg('adminclient', *args)
+        log.debug('adminclient', *args)
         
     def remote_log(self, category, type, message):
-        print category, type, message
+        log.debug('adminclient', category, type, message)
         
     def remote_componentAdded(self, component):
         self.msg( 'componentAdded %s' % component.getName())
@@ -211,10 +216,13 @@ class Window:
     def close(self, *args):
         reactor.stop()
 
-def main(args, gladedir='../../data/ui'):
-    log.enableLogging()
-    host = args[1]
-    port = int(args[2])
+def main(args, gladedir=flumotion.config.uidir):
+    try:
+        host = args[1]
+        port = int(args[2])
+    except IndexError:
+        print "Please specify a host and a port number"
+        sys.exit(1)
     win = Window(gladedir, host, port)
     reactor.run()
     
