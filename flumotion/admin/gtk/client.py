@@ -403,12 +403,12 @@ class Window(log.Loggable, gobject.GObject):
             mid = self.statusbar.push('main', pre % name)
         d = self.admin.componentCallRemote(state, methodName, *args, **kwargs)
 
-        def _stopCallback(result, self, mid):
+        def cb(result, self, mid):
             if mid:
                 self.statusbar.remove('main', mid)
             if post:
                 self.statusbar.push('main', post % name)
-        def _stopErrback(failure, self, mid):
+        def eb(failure, self, mid):
             if mid:
                 self.statusbar.remove('main', mid)
             self.warning("Failed to execute %s on component %s: %s"
@@ -416,11 +416,11 @@ class Window(log.Loggable, gobject.GObject):
             if fail:
                 self.statusbar.push('main', fail % name)
             
-        d.addCallback(_stopCallback, self, mid)
-        d.addErrback(_stopErrback, self, mid)
+        d.addCallback(cb, self, mid)
+        d.addErrback(eb, self, mid)
   
     def componentCallRemote(self, state, methodName, *args, **kwargs):
-        self.componentCallRemoteStatus(self, None, None, None,
+        self.componentCallRemoteStatus(None, None, None, None,
                                        methodName, *args, **kwargs)
 
     def setPlanetState(self, planetState):
@@ -737,6 +737,12 @@ class Window(log.Loggable, gobject.GObject):
         return self._component_do(state, 'start', 'Starting', 'Started')
  
     def _component_do(self, state, action, doing, done):
+        if not state:
+            state = self.components_view.get_selected_state()
+            if not state:
+                self.statusbar.push('main', "No component selected.")
+                return None
+
         name = state.get('name')
         if not name:
             return None

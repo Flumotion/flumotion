@@ -1,5 +1,19 @@
 2005-02-09  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/client.py (Window.componentCallRemote): Fix
+	a bug in the arglist to ...Status.
+	(Window.componentCallRemoteStatus): Renamed the callbacks and
+	errbacks.
+
+	* flumotion/admin/gtk/connections.py
+	(ConnectionsDialog.on_cancel): Hooked up!
+	(ConnectionsDialog.on_has_selection): Use self.widgets[], not
+	attrs to get the widget. Word.
+
+	* flumotion/admin/gtk/client.py (Window._component_do): Finish
+	duplicating componentCallRemoteStatus. Gee, code duplication is
+	great. Wonder why I'm writing these changelogs.
+
 	* flumotion/wizard/save.py (WizardSaver.getVideoOverlay): Add CC
 	only if the license is set.
 

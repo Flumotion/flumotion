@@ -163,7 +163,6 @@ class ConnectionsDialog(GladeWindow):
     glade_file = 'connection-dialog.glade'
 
     gsignal('have-connection', object)
-    button_ok = None
 
     def __init__(self, parent):
         def cust_handler(xml, proc, name, *args):
@@ -176,10 +175,13 @@ class ConnectionsDialog(GladeWindow):
         GladeWindow.__init__(self, parent)
 
     def on_has_selection(self, widget, has_selection):
-        self.button_ok.set_sensitive(has_selection)
+        self.widgets['button_ok'].set_sensitive(has_selection)
 
     def on_connection_activated(self, widget, state):
         self.emit('have-connection', state)
+
+    def on_cancel(self, widget):
+        self.destroy()
 
     def on_ok(self, x):
         self.emit('have-connection',
