@@ -308,6 +308,7 @@ class Window(log.Loggable, gobject.GObject):
             self.debug("... but component is not displayed")
             return
         
+        name = state.get('name')
         localMethodName = "component_%s" % methodName
         if not hasattr(self.current_component, localMethodName):
             self.debug("... but does not have method %s" % localMethodName)
