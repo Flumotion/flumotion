@@ -240,7 +240,7 @@ def _checkDeviceName(device):
         if not (old == gst.STATE_NULL and new == gst.STATE_READY):
             return
         element = pipeline.get_by_name('source')
-        deviceName = element.get_property('device-name')
+        deviceName = elementget_property('device-name')
         reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
         d.callback(deviceName)
                 
@@ -407,7 +407,7 @@ def _checkTracks(source_element, device):
         d.callback((deviceName, tracks))
                 
     def error_cb(pipeline, element, error, _):
-        d.errback(errors.UnknownDeviceError("The device does not exist"))
+        d.errback(errors.GstError(error.message))
 
     pipeline = '%s name=source device=%s ! fakesink' % (source_element, device)
     bin = gst.parse_launch(pipeline)
@@ -425,25 +425,13 @@ class Soundcard(wizard.WizardStep):
     component_type = 'osssrc'
     icon = 'soundcard.png'
 
-    in_setup = False          # If we're doing setup
-    in_update_devices = False # If we're updating devices
-    
-    def setup(self):
-        self.in_setup = True
-        self.combobox_system.set_enum(SoundcardSource)
-        self.in_setup = False
-        
-    def on_combobox_system_changed(self, combo):
-        if self.in_setup:
-            return
+    block_update = False
 
+    def on_combobox_system_changed(self, combo):
         self.update_devices()
         self.update_inputs()
 
     def on_combobox_device_changed(self, combo):
-        if self.in_setup:
-            return
-        
         self.update_inputs()
 
     def worker_changed(self):
@@ -453,6 +441,11 @@ class Soundcard(wizard.WizardStep):
 
     def before_show(self):
         self.clear_combos()
+
+        self.block_update = True
+        self.combobox_system.set_enum(SoundcardSource)
+        self.block_update = False
+        
         self.update_devices()
         self.update_inputs()
 
@@ -478,13 +471,13 @@ class Soundcard(wizard.WizardStep):
         self.combobox_input.set_list(tracks)
         self.combobox_input.set_sensitive(True)
 
-    def _unknownDeviceErrback(self, failure):
-        failure.trap(errors.UnknownDeviceError)
+    def _gstErrback(self, failure):
+        failure.trap(errors.GstError)
         self.clear_combos()
+        self.wizard.error_dialog('Gstreamer error: %s' % failure.value)
 
     def update_devices(self):
-        self.in_update_devices = True
-        
+        self.block_update = True
         enum = self.combobox_system.get_enum()
         if enum == SoundcardSource.Alsa:
             self.combobox_device.set_enum(SoundcardAlsaDevice)
@@ -492,20 +485,21 @@ class Soundcard(wizard.WizardStep):
             self.combobox_device.set_enum(SoundcardOSSDevice)
         else:
             raise AssertionError
-        self.in_update_devices = False
+        self.block_update = False
 
     def update_inputs(self):
-        if self.in_update_devices:
+        if self.block_update:
             return
-        
         self.wizard.block_next(True)
         
         enum = self.combobox_system.get_enum()
         device = self.combobox_device.get_string()
         d = self.run_on_worker(_checkTracks, enum.element, device)
         d.addCallback(self._queryCallback)
-        d.addErrback(self._unknownDeviceErrback)
-
+        #d.addErrback(self._unknownDeviceErrback)
+        #d.addErrback(self._permissionDeniedErrback)
+        d.addErrback(self._gstErrback)
+        
     def get_component_properties(self):
         channels = self.combobox_channels.get_enum()
         if channels == SoundcardChannels.Mono:

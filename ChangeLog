@@ -1,7 +1,15 @@
+2004-11-05  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/errors.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+
+	Add error dialog to audio source step
+	
 2004-11-05  Christian Schaller <christian at fluendo com>
 
-	* update spec file and init.d script for redhat integration so
-	  that it appears in services GUI
+	* flumotion.spec.in: update spec file and init.d script for 
+	redhat integration so that it appears in services GUI
 
 2004-11-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 

@@ -393,7 +393,7 @@ class Wizard(gobject.GObject, log.Loggable):
     def __len__(self):
         return len(self.steps)
             
-    def error_dialog(self, message, parent=None, response=True):
+    def error_dialog(self, message):
         """
         Show an error message dialog.
                                                                                 
@@ -402,12 +402,10 @@ class Wizard(gobject.GObject, log.Loggable):
         @param response whether the error dialog should go away after response.
                                                                                          returns: the error dialog.
         """
-        if not parent:
-            parent = self.window
-        d = gtk.MessageDialog(parent, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
-            gtk.BUTTONS_OK, message)
-        if response:
-            d.connect("response", lambda self, response: self.destroy())
+        d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
+                              gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
+                              message)
+        d.connect("response", lambda self, response: self.destroy())
         d.show_all()
         return d
 
