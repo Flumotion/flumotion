@@ -11,12 +11,12 @@ import sys
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-orig = """# See "LICENSE.Flumotion" in the source distribution for more information.
+orig = """# Flumotion - a streaming media server
+# Copyright (C) 2004 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 """
 
-new = """# See "LICENSE.Flumotion" in the source distribution for more information.
-
-# Headers in this file shall remain intact.
+new = """# Flumotion - a streaming media server
+# Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 """
 
 for name in sys.argv[1:]:
