@@ -15,11 +15,10 @@ olddir = os.getcwd()
 os.chdir(root)
 
 # if it contains test, just run it
-filename = os.path.basename(sys.argv[-1])
+filename = os.path.basename(os.path.abspath(sys.argv[-1]))
 if filename.startswith('test_'):
-    modname = reflect.filenameToModuleName(filename)
     sys.argv = sys.argv[:-1]
-    sys.argv.append(modname)
+    sys.argv.append('flumotion.test.' + filename[:-3])
 # Otherwise, run it with --testmodule
 else:
     sys.argv.insert(1, '--testmodule')
