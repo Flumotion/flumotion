@@ -46,6 +46,11 @@ dnl check for epydoc
 AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
 AM_CONDITIONAL(HAVE_EPYDOC, test "x$EPYDOC" = "xyes")
 
+dnl check for Twisted
+AS_PYTHON_IMPORT(twisted,,
+  AC_MSG_ERROR([You need at least version 1.3.0 of Twisted])
+)
+
 dnl output stuff
 AC_OUTPUT(
 Makefile

@@ -1,7 +1,9 @@
 2004-10-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	  check for Twisted, needs version check as well
 	* m4/as-python.m4:
-          new upstream version, check for python module
+	new upstream version, check for python module
 
 2004-10-25  Johan Dahlin  <johan@gnome.org>
 
