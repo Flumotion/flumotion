@@ -41,7 +41,9 @@ PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_REQ)
 PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
 AC_SUBST(PYGTK_DIR)
 
-dnl check for Twisted
+export PYTHONPATH=$PYGTK_DIR:$PYTHONPATH
+
+dnl check for libglade
 AC_MSG_CHECKING(for gtk.glade)
 prog="
 import sys
@@ -62,13 +64,16 @@ else
   AC_MSG_ERROR([You need to have python libglade bindings installed])
 fi
 
-dnl check for gst-python
+dnl checks for gst-python
 PKG_CHECK_MODULES(PYGST, gst-python-0.8 >= $PYGST_REQ)
 PYGST_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
 AC_SUBST(PYGST_DIR)
 
-dnl check for gst.interfaces
-AS_PYTHON_IMPORT([gst, gst.interfaces],,
+export PYTHONPATH=$PYGST_DIR:$PYTHONPATH
+AS_PYTHON_IMPORT([gst],,
+                 AC_MSG_ERROR([Maybe you forgot to set your PYTHONPATH?]))
+
+AS_PYTHON_IMPORT([gst.interfaces],,
                  AC_MSG_ERROR([You need to recompile gst-python with gst.interfaces support]))
 
 dnl check for epydoc

@@ -1,3 +1,8 @@
+2004-11-09  Johan Dahlin  <johan@gnome.org>
+
+	* configure.ac: Check for the gst module before gst.interfaces and
+	set PYTHONPATH based on the directory found in pkg-config.
+
 2004-11-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:
