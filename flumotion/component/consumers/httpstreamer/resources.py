@@ -189,8 +189,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.logfile = open(logfile, 'a')
         
     def logWrite(self, fd, ip, request, stats):
-        if not self.logfile:
-            return
 
         headers = request.getAllHeaders()
 
@@ -224,6 +222,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         msg = format % (ip, ident, username, date, request_str,
                         response, bytes_sent, referer, user_agent,
                         time_connected)
+        # make streamer notify manager of this msg
+        self.streamer.sendLog(msg)
+        if not self.logfile:
+            return
         self.logfile.write(msg)
         self.logfile.flush()
 

@@ -267,6 +267,20 @@ class Window(log.Loggable, gobject.GObject):
             self.debug("Created entry instance %r" % instance)
             instance.setup()
             nodes = instance.getNodes()
+            notebook = gtk.Notebook()
+            nodeWidgets = {}
+
+            # create pages for all nodes, and just show a loading label for
+            # now
+            for nodeName in nodes.keys():
+                self.debug("Creating node for %s" % nodeName)
+                label = gtk.Label('Loading UI for %s ...' % nodeName)
+                table = gtk.Table(1, 1)
+                table.add(label)
+                nodeWidgets[nodeName] = table
+
+                notebook.append_page(table, gtk.Label(nodeName))
+                
 
             # FIXME: we'd want to embed in a notebook with tabs
             firstNode = nodes[nodes.keys()[0]]
@@ -274,19 +288,25 @@ class Window(log.Loggable, gobject.GObject):
             # put "loading" widget in
             old = self.hpaned.get_child2()
             self.hpaned.remove(old)
-            label = gtk.Label('Loading UI for %s ...' % name)
-            self.hpaned.add(label)
-            
-            # trigger render of first node
-            d = firstNode.render()
-            d.addCallback(self._firstNodeRenderCallback, instance)
+            self.hpaned.add2(notebook)
+            notebook.show_all()
 
-    def _firstNodeRenderCallback(self, widget, gtkAdminInstance):
+            # trigger node rendering
+            for nodeName in nodes.keys():
+                node = nodes[nodeName]
+                d = node.render()
+                d.addCallback(self._nodeRenderCallback, nodeName,
+                    instance, nodeWidgets)
+                # FIXME: errback
+
+    def _nodeRenderCallback(self, widget, nodeName, gtkAdminInstance,
+        nodeWidgets):
         # used by show_component
         self.debug("Got sub widget %r" % widget)
 
-        old = self.hpaned.get_child2()
-        self.hpaned.remove(old)
+        table = nodeWidgets[nodeName]
+        for w in table.get_children():
+            table.remove(w)
         
         if not widget:
             self.warning(".render() did not return an object")
@@ -296,7 +316,7 @@ class Window(log.Loggable, gobject.GObject):
             if parent:
                 parent.remove(widget)
             
-        self.hpaned.add2(widget)
+        table.add(widget)
         widget.show()
 
         self.current_component = gtkAdminInstance
@@ -349,7 +369,7 @@ class Window(log.Loggable, gobject.GObject):
         try:
             result = method(*args, **kwargs)
         except TypeError:
-            msg = "component method %s did not accept %s and %s" % (
+            msg = "component method %s did not accept *a %s and **kwa %s" % (
                 methodName, args, kwargs)
             self.debug(msg)
             raise errors.RemoteRunError(msg)

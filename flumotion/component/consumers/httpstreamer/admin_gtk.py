@@ -26,6 +26,9 @@ import gtk
 
 from flumotion.common import errors
 
+# FIXME: remove when we do a proper deferred
+from twisted.internet import defer
+
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
@@ -85,17 +88,36 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         self.shown = False
         return self.statistics
 
+class LogAdminGtkNode(BaseAdminGtkNode):
+    logCategory = 'logadmin'
+
+    def render(self):
+        w = gtk.TextView()
+        w.set_cursor_visible(False)
+        w.set_wrap_mode(gtk.WRAP_WORD)
+        self._buffer = w.get_buffer()
+        return defer.succeed(w)
+
+    def logMessage(self, message):
+        print "THOMAS: logging %s" % message
+        self._buffer.insert_at_cursor(message)
+
 class HTTPStreamerAdminGtk(BaseAdminGtk):
     def setup(self):
         self._nodes = {}
         statistics = StatisticsAdminGtkNode(self.name, self.admin,
             self.view)
-        self._nodes['statistics'] = statistics
+        log = LogAdminGtkNode(self.name, self.admin, self.view)
+        self._nodes['Statistics'] = statistics
+        self._nodes['Log'] = log
 
     # FIXME: tie this to the statistics node better
     def component_statsChanged(self, stats):
         # FIXME: decide on state/stats/statistics
-        self._nodes['statistics'].setStats(stats)
+        self._nodes['Statistics'].setStats(stats)
+
+    def component_logMessage(self, message):
+        self._nodes['Log'].logMessage(message)
  
     def getNodes(self):
         return self._nodes

@@ -141,6 +141,7 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
         self.comp.connect('ui-state-changed', self._comp_ui_state_changed_cb)
+        self.comp.connect('log-message', self._comp_log_message_cb)
 
     def getState(self):
         return self.comp.getState()
@@ -148,6 +149,9 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     # FIXME: decide on "state", "stats", or "statistics"
     def _comp_ui_state_changed_cb(self, comp):
         self.callRemote('adminCallRemote', 'statsChanged', self.getState())
+
+    def _comp_log_message_cb(self, comp, message):
+        self.callRemote('adminCallRemote', 'logMessage', message)
 
     def authenticate(self, bouncerName, keycard):
         """
@@ -182,6 +186,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     gsignal('client-removed', object, int, int, object)
     gsignal('ui-state-changed')
+    gsignal('log-message', str)
     
     component_medium_class = HTTPMedium
 
@@ -209,6 +214,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return '<MultifdSinkStreamer (%s)>' % self.name
 
     # UI code
+    def sendLog(self, message):
+        self.emit('log-message', message)
+
     def _checkUpdate(self):
         if self.needsUpdate:
             self.needsUpdate = False
