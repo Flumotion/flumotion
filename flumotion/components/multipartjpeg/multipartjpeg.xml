@@ -1,0 +1,9 @@
+<components>
+  <component type="multipartjpeg">
+    <source location="multipartjpeg.py"/>
+    <properties>
+      <property name="source" type="string" required="yes"/>
+      <property name="quality" type="int"/>
+    </properties>
+  </component>
+</components>

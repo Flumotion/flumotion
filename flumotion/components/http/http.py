@@ -429,13 +429,11 @@ class MultifdSinkStreamer(component.ParseLaunchComponent):
     def get_mime(self):
         if self.caps:
             return self.caps.get_structure(0).get_name()
-        else:
-            return None
 
     def get_content_type(self):
         mime = self.get_mime()
         if mime == 'multipart/x-mixed-replace':
-            mime = "%s;boundary=ThisRandomString" % mime
+            mime += ";boundary=ThisRandomString"
         return mime
     
     def add_client(self, fd):

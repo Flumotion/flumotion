@@ -1,105 +1,86 @@
 <components>
-
-  <component type="base">
-    <source location="flumotion.server.component"/>
-    <properties>
-      <property name="nice" type="int"/>
-      <property name="username" type="string"/>
-    </properties>
-  </component>
-
-  <component type="producer" inherit="base">
-    <source location="flumotion.components.producer"/>
-    <properties>
-      <property name="pipeline" type="string" required="yes"/>
-      <property name="feed" type="string" multiple="yes"/>
-    </properties>
-  </component>
-
-  <component type="converter" inherit="base">
-    <source location="flumotion.components.converter"/>
-    <properties>
-      <property name="pipeline" type="string" required="yes"/>
-      <property name="feed" type="string" multiple="yes"/>
-      <property name="source" type="string" multiple="yes"/>
-    </properties>
-  </component>
-
-  <component type="http-streamer">
-    <source location="flumotion.components.http" inherit="base"/>
-    <properties>
-      <property name="source" type="string" required="yes"/>
-      <property name="port" type="int" required="yes"/>
-      <property name="logfile" type="string"/>
-      <property name="gst-property" type="xml" multiple="yes"/>
-      <property name="auth" type="string"/>
-      <property name="maxclients" type="int"/>
-    </properties>
-  </component>
-
   <component type="file-dumper">
-    <source location="flumotion.components.file" inherit="base"/>
+    <source location="flumotion.components.file.file"/>
     <properties>
-      <property name="source" type="string" required="yes"/>
-      <property name="location" type="string" required="yes"/>
-      <property name="auth-port" type="int"/>
+      <property name="source" type="string" required="True" multiple="False"/>
+      <property name="location" type="string" required="True" multiple="False"/>
+      <property name="auth-port" type="int" required="False" multiple="False"/>
     </properties>
   </component>
-
-  <component type="htpasswd-auth" factory="false">
-    <source location="flumotion.components.passwd"/>
+  <component type="converter">
+    <source location="flumotion.components.base.converter"/>
     <properties>
-      <property name="filename" type="string" required="yes"/>
-      <property name="type" type="string"/>
-      <property name="domain" type="string"/>
+      <property name="feed" type="string" required="False" multiple="True"/>
+      <property name="source" type="string" required="False" multiple="True"/>
+      <property name="pipeline" type="string" required="True" multiple="False"/>
     </properties>
   </component>
-
+  <component type="producer">
+    <source location="flumotion.components.base.producer"/>
+    <properties>
+      <property name="feed" type="string" required="False" multiple="True"/>
+      <property name="pipeline" type="string" required="True" multiple="False"/>
+    </properties>
+  </component>
   <component type="overlay">
-    <source location="flumotion.components.overlay"/>
+    <source location="flumotion.components.overlay.overlay"/>
     <properties>
-      <property name="source" type="string" multiple="no"/>
-      <property name="location" type="string" required="yes"/>
+      <property name="source" type="string" required="False" multiple="False"/>
+      <property name="location" type="string" required="True" multiple="False"/>
     </properties>
   </component>
-
-  <component type="videotest">
-    <source location="flumotion.components.videotest"/>
+  <component type="http-streamer">
+    <source location="flumotion.components.http.http"/>
     <properties>
-      <property name="height" type="int"/>
-      <property name="width" type="int"/>
-      <property name="framerate" type="float"/>
+      <property name="auth" type="string" required="False" multiple="False"/>
+      <property name="source" type="string" required="True" multiple="False"/>
+      <property name="maxclients" type="int" required="False" multiple="False"/>
+      <property name="logfile" type="string" required="False" multiple="False"/>
+      <property name="gst-property" type="xml" required="False" multiple="True"/>
+      <property name="port" type="int" required="True" multiple="False"/>
     </properties>
   </component>
-
-  <component type="multipartjpeg">
-    <source location="flumotion.components.multipartjpeg"/>
-    <properties>
-      <property name="source" type="string" required="yes"/>
-      <property name="quality" type="int"/>
-    </properties>
-  </component>
-
   <component type="bttv">
-    <source location="flumotion.components.bttv"/>
+    <source location="flumotion.components.bttv.bttv"/>
     <properties>
-      <property name="device" type="string" required="yes"/>
-      <property name="device-height" type="int" required="yes"/>
-      <property name="device-width" type="int" required="yes"/>
-      <property name="channel" type="string" required="no"/>
-      <property name="height" type="int"/>
-      <property name="width" type="int"/>
-      <property name="framerate" type="float"/>
+      <property name="framerate" type="float" required="False" multiple="False"/>
+      <property name="height" type="int" required="False" multiple="False"/>
+      <property name="width" type="int" required="False" multiple="False"/>
+      <property name="device" type="string" required="True" multiple="False"/>
+      <property name="device-width" type="int" required="True" multiple="False"/>
+      <property name="device-height" type="int" required="True" multiple="False"/>
+      <property name="channel" type="string" required="False" multiple="False"/>
     </properties>
   </component>
-
   <component type="dv">
-    <source location="flumotion.components.dv"/>
+    <source location="flumotion.components.dv.dv"/>
     <properties>
-      <property name="height" type="int"/>
-      <property name="width" type="int"/>
-      <property name="drop-factor" type="int"/>
+      <property name="width" type="int" required="False" multiple="False"/>
+      <property name="drop-factor" type="int" required="False" multiple="False"/>
+      <property name="height" type="int" required="False" multiple="False"/>
     </properties>
   </component>
-
+  <component type="videotest">
+    <source location="flumotion.components.videotest.videotest"/>
+    <properties>
+      <property name="width" type="int" required="False" multiple="False"/>
+      <property name="framerate" type="float" required="False" multiple="False"/>
+      <property name="height" type="int" required="False" multiple="False"/>
+    </properties>
+  </component>
+  <component type="multipartjpeg">
+    <source location="flumotion.components.multipartjpeg.multipartjpeg"/>
+    <properties>
+      <property name="source" type="string" required="True" multiple="False"/>
+      <property name="quality" type="int" required="False" multiple="False"/>
+    </properties>
+  </component>
+  <component type="htpasswd-auth" factory="false">
+    <source location="flumotion.components.passwd.passwd"/>
+    <properties>
+      <property name="domain" type="string" required="False" multiple="False"/>
+      <property name="type" type="string" required="False" multiple="False"/>
+      <property name="filename" type="string" required="True" multiple="False"/>
+    </properties>
+  </component>
 </components>

@@ -1,15 +1,14 @@
-flumotiondir = $(libdir)/flumotion/python/flumotion/components
+componentdir = $(libdir)/flumotion/python/flumotion/components
+component_PYTHON = __init__.py
 
-flumotion_DATA = \
-	__init__.py \
-	bttv.py \
-	converter.py \
-	file.py \
-	http.py \
-	multipartjpeg.py \
-	overlay.py \
-	passwd.py \
-	producer.py \
-	videotest.py
+SUBDIRS = \
+	base \
+	bttv \
+	dv \
+	file \
+	http \
+	multipartjpeg \
+	overlay \
+	passwd \
+	videotest
 
-EXTRA_DIST = $(flumotion_DATA)

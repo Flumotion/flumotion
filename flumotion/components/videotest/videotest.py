@@ -18,20 +18,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
-from flumotion.components import converter
+from flumotion.components.base import producer
 
 def createComponent(config):
-    # Since source in converter is a list, convert it to one
-    config['source'] = [config['source']]
-    
-    # Set pipeline from the template
-    config['pipeline'] = 'ffmpegcolorspace ! jpegenc name=jpegenc ! multipartmux'
+    pipeline = 'videotestsrc ! video/x-raw-yuv,format=(fourcc)I420'
 
-    component = converter.createComponent(config)
-    pipeline = component.get_pipeline()
-    if config.has_key('quality'):
-        jpeg = pipeline.get_by_name('jpegenc')
-        jpeg.set_property('quality', int(config['quality']))
-    return component
+    if config.has_key('width'):
+        pipeline += ',width=%d' % config['width']
+    if config.has_key('height'):
+        pipeline += ',height=%d' % config['height']
+    if config.has_key('framerate'):
+        pipeline += ',framerate=%f' % config['framerate']
+
+    config['pipeline'] = pipeline
+    
+    return producer.createComponent(config)
 
 

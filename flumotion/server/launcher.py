@@ -142,8 +142,10 @@ class Launcher(log.Loggable):
         self.threads_init()
         self.set_nice(config.nice)
 
-        comp = config.getComponent()
         component_name = config.getName()
+        self.debug('Configuration dictionary for %s is: %r' % (
+            component_name, config.getConfigDict()))
+        comp = config.getComponent()
         self.debug('Starting %s (%s) on pid %d' %
                    (component_name, config.getType(), pid))
         factory = component.ComponentFactory(comp)
@@ -178,9 +180,6 @@ def run_launcher(args):
     if len(args) < 3:
         print 'Need a configuration file'
         return -1
-
-    filename = os.path.join(config.datadir, 'registry', 'basecomponents.xml')
-    registry.addFromFile(filename)
 
     launcher = Launcher(options.host, options.port)
 

@@ -1,0 +1,31 @@
+<components>
+
+<!--
+  <component type="base">
+    <source location="flumotion.server.component"/>
+    <properties>
+      <property name="nice" type="int"/>
+      <property name="username" type="string"/>
+    </properties>
+  </component>
+-->
+
+  <component type="producer">
+    <source location="producer.py"/>
+    <properties>
+      <property name="pipeline" type="string" required="yes"/>
+      <property name="feed" type="string" multiple="yes"/>
+    </properties>
+  </component>
+
+  <component type="converter">
+    <source location="converter.py"/>
+    <properties>
+      <property name="pipeline" type="string" required="yes"/>
+      <property name="feed" type="string" multiple="yes"/>
+      <property name="source" type="string" multiple="yes"/>
+    </properties>
+  </component>
+
+</components>
+

@@ -1,0 +1,11 @@
+<components>
+  <component type="file-dumper">
+    <source location="file.py"/>
+    <properties>
+      <property name="source" type="string" required="yes"/>
+      <property name="location" type="string" required="yes"/>
+      <property name="auth-port" type="int"/>
+    </properties>
+  </component>
+</components>
+

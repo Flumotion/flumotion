@@ -1,5 +1,11 @@
 2004-08-31  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/server/registry.py (ComponentRegistry): Implement
+	saving and merging
+
+	* flumotion/components: Split out to subdirectories and move out
+	configuration to separate files
+
 	* flumotion/twisted/portal.py (namedAny): Use a method of
 	comparing the raised import message that actually work.
 

@@ -18,19 +18,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
-from flumotion.components import converter
+from flumotion.components.base import converter
 
 def createComponent(config):
-    source = config['source']
-    location = config['location']
-    
     # Since source in converter is a list, convert it to one
-    config['source'] = [source]
-
+    config['source'] = [config['source']]
+    
     # Set pipeline from the template
-    pipeline = "filesrc location=%s blocksize=100000 !" % location + \
-               "pngdec ! alphacolor ! videomixer name=mix ! :default " + \
-               "@%s ! ffmpegcolorspace ! alpha ! mix." % source
-    config['pipeline'] = pipeline
+    config['pipeline'] = 'ffmpegcolorspace ! jpegenc name=jpegenc ! multipartmux'
 
-    return converter.createComponent(config)
+    component = converter.createComponent(config)
+    pipeline = component.get_pipeline()
+    if config.has_key('quality'):
+        jpeg = pipeline.get_by_name('jpegenc')
+        jpeg.set_property('quality', int(config['quality']))
+    return component
+
+

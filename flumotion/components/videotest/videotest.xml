@@ -1,0 +1,10 @@
+<components>
+  <component type="videotest">
+    <source location="videotest.py"/>
+    <properties>
+      <property name="height" type="int"/>
+      <property name="width" type="int"/>
+      <property name="framerate" type="float"/>
+    </properties>
+  </component>
+</components>

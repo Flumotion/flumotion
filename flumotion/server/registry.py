@@ -19,10 +19,20 @@
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
 
 import os
-
+import sys
 from xml.dom import minidom, Node
 
+from twisted.python import reflect
+
+from flumotion import config
+
 __all__ = ['ComponentRegistry', 'registry']
+
+def istrue(value):
+    if value in ('True', 'true', '1', 'yes'):
+        return True
+
+    return False
 
 class Property:
     def __init__(self, name, type, required=False, multiple=False):
@@ -36,12 +46,20 @@ class Property:
     
     def getName(self):
         return self.name
+
+    def getType(self):
+        return self.type
     
     def isRequired(self):
         return self.required
+
+    def isMultiple(self):
+        return self.multiple
     
 class Component:
-    def __init__(self, type, factory, source, source_gui=None, properties={}):
+    def __init__(self, filename, type, factory, source,
+                 source_gui=None, properties={}):
+        self.filename = filename
         self.type = type
         self.factory = factory
         self.source = source
@@ -59,6 +77,11 @@ class Component:
     
     def isFactory(self):
         return self.factory
+
+    def getSourceLocation(self):
+        dir = os.path.split(self.filename)[0]
+        filename = os.path.join(dir, self.source)
+        return reflect.filenameToModuleName(filename) 
     
 class XmlParserError(Exception):
     pass
@@ -82,7 +105,8 @@ def check_node(node, tag):
 class RegistryXmlParser:
     def __init__(self, filename):
         self.components = {}
-    
+        self.filename = filename
+        
         #debug('Parsing XML file: %s' % filename)
         self.doc = minidom.parse(filename)
         self.path = os.path.split(filename)[0]
@@ -150,10 +174,11 @@ class RegistryXmlParser:
         factory = True
         if node.hasAttribute('factory'):
             factory = node.getAttribute('factory')
-            if factory in ('false', 'no'):
+            if not istrue(factory):
                 factory = False
 
-        return Component(type, factory, source, source_gui,
+        return Component(self.filename,
+                         type, factory, source, source_gui,
                          properties.values())
 
     def parse_source(self, node):
@@ -186,10 +211,10 @@ class RegistryXmlParser:
 
             optional = {}
             if child.hasAttribute('required'):
-                optional['required'] = child.getAttribute('required') == 'yes'
+                optional['required'] = istrue(child.getAttribute('required'))
 
             if child.hasAttribute('multiple'):
-                optional['multiple'] = child.getAttribute('multiple') == 'yes'
+                optional['multiple'] = istrue(child.getAttribute('multiple'))
 
             property = Property(name, type, **optional)
 
@@ -197,6 +222,7 @@ class RegistryXmlParser:
 
 class ComponentRegistry:
     """Registry, this is normally not instantiated."""
+    filename = os.path.join(config.datadir, 'registry', 'basecomponents.xml')
     def __init__(self):
         self.components = {}
 
@@ -209,11 +235,67 @@ class ComponentRegistry:
                       "there is already a component of type %s" % type
             self.components[type] = component
             
+    def isEmpty(self):
+        return len(self.components) == 0
+
     def getComponent(self, name):
         return self.components[name]
 
     def hasComponent(self, name):
         return self.component.has_key(name)
 
+    def dump(self, fd):
+        print >> fd, '<components>'
+        for component in self.components.values():
+            data = ''
+            if not component.isFactory():
+                data += ' factory="false"'
+                
+            print >> fd, '  <component type="%s"%s>' % (component.getType(), data)
+            print >> fd, '    <source location="%s"/>' % component.getSourceLocation()
+            print >> fd, '    <properties>'
+            
+            for prop in component.getProperties():
+                print >> fd, '      <property name="%s" type="%s" required="%s" multiple="%s"/>' % (
+                    prop.getName(),
+                    prop.getType(),
+                    prop.isRequired(),
+                    prop.isMultiple())
+                
+            print >> fd, '    </properties>'
+            print >> fd, '  </component>'
+        print >> fd, '</components>'
+
+    def clean(self):
+        self.components = {}
+
+    def getFileList(self, root):
+        files = []
+        for dir in os.listdir(root):
+            dir = os.path.join(root, dir)
+            if not os.path.isdir(dir):
+                continue
+
+            for filename in os.listdir(dir):
+                filename = os.path.join(dir, filename)
+                if filename.endswith('.xml'):
+                    files.append(filename)
+        return file
+    
+    def update(self, root):
+        for file in self.getFileList(root):
+            registry.addFromFile(filename)
+                    
+        fd = open(self.filename, 'w')
+        registry.dump(fd)
+
+    def verify(self):
+        registry.addFromFile(self.filename)
+
+        if registry.isEmpty():
+            dir = os.path.join(root, 'flumotion', 'components')
+            registry.clean()
+            registry.update(dir)
+    
 registry = ComponentRegistry()
 

@@ -1,10 +1,8 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
-#
+
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
-#
-# flumotion/components/__init__.py: components package
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,3 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
+
+from flumotion.components.base import converter
+
+def createComponent(config):
+    source = config['source']
+    location = config['location']
+    
+    # Since source in converter is a list, convert it to one
+    config['source'] = [source]
+
+    # Set pipeline from the template
+    pipeline = "filesrc location=%s blocksize=100000 !" % location + \
+               "pngdec ! alphacolor ! videomixer name=mix ! :default " + \
+               "@%s ! ffmpegcolorspace ! alpha ! mix." % source
+    config['pipeline'] = pipeline
+
+    return converter.createComponent(config)

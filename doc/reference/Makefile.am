@@ -5,15 +5,16 @@ EPYDOC_ARGS=-q --no-frames --html --ignore-param-mismatch
 
 pypath=$(top_srcdir):@PYGTK_DIR@:$(PYTHONPATH)
 
+
 MODULE_FILES = \
 	flumotion/admin/__init__.py		\
 	flumotion/admin/spyglass.py		\
-	flumotion/components/converter.py	\
-	flumotion/components/file.py		\
-	flumotion/components/http.py		\
-	flumotion/components/producer.py	\
-	flumotion/components/passwd.py		\
 	flumotion/config/__init__.py		\
+	flumotion/components/base/producer.py	\
+	flumotion/components/base/converter.py	\
+	flumotion/components/file/file.py	\
+	flumotion/components/http/http.py	\
+	flumotion/components/passwd/passwd.py	\
 	flumotion/errors.py			\
 	flumotion/server/admin.py		\
 	flumotion/server/auth.py		\

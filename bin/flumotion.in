@@ -26,9 +26,12 @@ from flumotion.twisted import gstreactor
 gstreactor.install()
 
 from flumotion.server import launcher
+from flumotion.server.registry import registry
 from flumotion.twisted import errors
 
 def main(args):
+    registry.verify()
+        
     return launcher.main(args)
     
 if __name__ == '__main__':
@@ -36,4 +39,3 @@ if __name__ == '__main__':
         sys.exit(main(sys.argv))
     except errors.SystemError, e:
         print 'ERROR:', e
-

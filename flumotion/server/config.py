@@ -42,6 +42,9 @@ class ConfigEntry:
     
     def getName(self):
         return self.name
+
+    def getConfigDict(self):
+        return self.config
     
     def getComponent(self, *args):
         return self.func(self.config, *args)
@@ -75,13 +78,14 @@ class FlumotionConfigXML(log.Loggable):
     
     def getFunction(self, defs):
         source = defs.getSource()
+        self.info('Loading %s' % source)
         try:
             module = reflect.namedAny(source)
         except ValueError:
             raise ConfigError("%s source file could not be found" % source)
         
         if not hasattr(module, 'createComponent'):
-            self.warn('no createComponent() for %s' % source)
+            self.warning('no createComponent() for %s' % source)
             return
         
         return module.createComponent
@@ -117,7 +121,11 @@ class FlumotionConfigXML(log.Loggable):
         type = str(node.getAttribute('type'))
         name = str(node.getAttribute('name'))
 
-        defs = registry.getComponent(type)
+        try:
+            defs = registry.getComponent(type)
+        except KeyError:
+            raise KeyError, "unknown component type: %s" % type
+        
         properties = defs.getProperties()
 
         self.debug('Parsing component: %s' % name)
@@ -132,7 +140,7 @@ class FlumotionConfigXML(log.Loggable):
                    'config' : self,
                    'start-factory': defs.isFactory() }
         config.update(options)
-        
+
         return ConfigEntry(name, type, function, config)
 
     def get_float_value(self, nodes):

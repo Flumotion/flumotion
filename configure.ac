@@ -56,6 +56,15 @@ data/ui/Makefile
 data/registry/Makefile
 flumotion/Makefile
 flumotion/components/Makefile
+flumotion/components/base/Makefile
+flumotion/components/bttv/Makefile
+flumotion/components/dv/Makefile
+flumotion/components/file/Makefile
+flumotion/components/http/Makefile
+flumotion/components/multipartjpeg/Makefile
+flumotion/components/overlay/Makefile
+flumotion/components/passwd/Makefile
+flumotion/components/videotest/Makefile
 flumotion/config/Makefile
 flumotion/config/installed.py
 flumotion/config/uninstalled.py
