@@ -42,10 +42,11 @@ class AcquisitionManager:
             interface = socket.gethostname()
         return interface, port
 
-    def onConnect(self, object, control):
+    def onConnect(self, object, control, hostname, port):
         d = object.callRemote('setController', control)
         def getRetval(object_id):
-            self.objs[object_id] = object
+            self.objs[object_id] = object, hostname, port
+            return object
         d.addCallback(getRetval)
         return object
         
@@ -54,13 +55,14 @@ class AcquisitionManager:
         reactor.connectTCP(hostname, port, factory)
 
         object = factory.getRootObject()
-        object.addCallback(self.onConnect, self.control)
+        object.addCallback(self.onConnect, self.control, hostname, port)
         return object
     
 class TranscoderManager:
     def __init__(self, control):
         self.control = control
-
+        self.objs = {}
+        
     def create(self, port=8800, interface=''):
         factory = pb.PBServerFactory(TranscoderFactory())
         f = reactor.listenTCP(port, factory, 5, interface)
@@ -78,12 +80,12 @@ class TranscoderManager:
             d = obj.callRemote('setController', control)
             return obj
         object.addCallback(onConnect, self.control)
-
         return object
     
 class ControllerFactory(pb.Referenceable):
     def __init__(self):
         self.objs = {}
+        self.addrs = {}
         self.acq_mgr = AcquisitionManager(self)
         self.trans_mgr = TranscoderManager(self)
         
@@ -99,41 +101,47 @@ class ControllerFactory(pb.Referenceable):
     def connectTranscoder(self, hostname, port):
         return self.trans_mgr.connect(hostname, port)
 
-    def link(self, first, second):
-        print 'Going to link', first, 'with', second
-
-        def onConnect(obj, other):
+    def transGetInfo(self, args, trans):
+        self.addrs[trans.processUniqueID()] = args
+        return trans
+    
+    def link(self, acq, trans):
+        def onAcqConnect(obj, other):
             if hasattr(other, 'result'):
                 self.objs[obj.processUniqueID()] = other.result
                 self.objs[other.result.processUniqueID()] = obj
             obj.callRemote('start')
             return obj
 
-        first.addCallback(onConnect, second)
+        acq.addCallback(onAcqConnect, trans)
         
-        def onConnect2(obj, other):
+        def onTransConnect(obj, other):
             if hasattr(other, 'result'):
                 self.objs[obj.processUniqueID()] = other.result
                 self.objs[other.result.processUniqueID()] = obj
             obj.callRemote('start')
+            retval = obj.callRemote('getInfo')
+            retval.addCallback(self.transGetInfo, obj)
             return obj
 
-        second.addCallback(onConnect2, first)
+        trans.addCallback(onTransConnect, acq)
 
     def remote_acqFinished(self, acq):
         print 'Controller.remote_acquisitionFinished', acq
 
     def remote_acqNotifyCaps(self, acq_id, caps):
-        print 'Controller.remote_acqNotifyCaps', caps
+        print 'Controller.acqNotifyCaps', caps
 
-        acq = self.acq_mgr.objs[acq_id]
+        acq, hostname, port = self.acq_mgr.objs[acq_id]
         transcoder = self.objs[acq.processUniqueID()]
         retval = transcoder.callRemote('setCaps', caps)
         
         def whenCapsIsSet(obj, acq):
             print 'Transcoders caps is set, calling up to acq'
-            acq.callRemote('assignRealSink')
-            return obj
+            hostname, port = self.addrs[transcoder.processUniqueID()]
+            acq.callRemote('assignRealSink', hostname, port)
+            return acq
+        
         retval.addCallback(whenCapsIsSet, acq)
 
     def remote_transStarted(self, trans):
@@ -151,12 +159,10 @@ if __name__ == '__main__':
     if start_trans:
         hostname, port = controller.createTranscoder(8803)
         
-    first = sys.argv[1]
-    hostname, port = first.split(':')
+    hostname, port = sys.argv[1].split(':')
     acq = controller.connectAcquisition(hostname, int(port))
     
-    second = sys.argv[2]
-    hostname, port = second.split(':')
+    hostname, port = sys.argv[2].split(':')
     trans = controller.connectTranscoder(hostname, int(port))
 
     controller.link(acq, trans)

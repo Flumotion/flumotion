@@ -49,8 +49,8 @@ class AcquisitionFactory(pb.Root):
     def error_cb(self, object, element, error, arg):
         print element.get_name(), str(error)
         
-    def remote_assignRealSink(self):
-        print 'swapping sinks'
+    def remote_assignRealSink(self, hostname, port):
+        print 'swapping sinks', hostname, port
 
         # Pause
         self.pipeline.set_state(gst.STATE_PAUSED)
@@ -66,6 +66,9 @@ class AcquisitionFactory(pb.Root):
         assert not self.src.unlink(self.sink)
 
         self.sink = gst.element_factory_make('tcpclientsink')
+        self.sink.set_property('host', hostname)
+        self.sink.set_property('port', port)
+        
         self.sink.connect('error', self.error_cb)
         self.pipeline.add(self.sink)
         self.src.link(self.sink)
@@ -80,7 +83,6 @@ class AcquisitionFactory(pb.Root):
         self.transcoder = object
         
     def pipeline_iterate(self):
-        #print 'iterating'
         self.pipeline.iterate()
         return True
 
@@ -89,8 +91,8 @@ class AcquisitionFactory(pb.Root):
         self.pipeline.set_state(gst.STATE_PLAYING)
         
     def remote_start(self):
-        print "Acquisition.remote_startFileSink"
-
+        print "Acquisition.start()"
+        
         self.pipeline = gst.parse_launch('%s ! fakesink name=fakesink' % self.pipeline_string)
         self.pipeline.connect('error', self.error_cb)
         self.src = self.pipeline.get_list()[-2]

@@ -17,6 +17,9 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+import socket
+import sys
+
 import gobject
 import gst
 
@@ -33,20 +36,29 @@ class TranscoderFactory(pb.Root):
         return True
 
     def pipeline_play(self):
+        print 'Is playing'
         self.pipeline.set_state(gst.STATE_PLAYING)
 
+    def pipeline_state_change_cb(self, *args):
+        print 'state-changed', args
+        
     def error_cb(self, object, element, error, arg):
         print element.get_name(), str(error)
 
     def remote_start(self):
-        print 'Transcoder.startFilesrc'
+        print 'Transcoder.start'
         self.pipeline = gst.Pipeline('acquisition-thread')
+        self.pipeline.connect('state-change', self.pipeline_state_change_cb)
         self.pipeline.connect('error', self.error_cb)
         
         self.src = gst.element_factory_make('tcpserversrc')
         self.sink = gst.element_factory_make('xvimagesink')
         self.reframer = gst.element_factory_make('videoreframer')
 
+    def remote_getInfo(self):
+        return (socket.gethostname(),
+                self.src.get_property('port'))
+    
     def remote_setController(self, controller):
         self.controller = controller
 
@@ -56,8 +68,9 @@ class TranscoderFactory(pb.Root):
         self.src.link(self.reframer)
         self.reframer.link_filtered(self.sink, gst.caps_from_string(caps))
 
-        reactor.callLater(0, self.pipeline_play)
         gobject.idle_add(self.pipeline_iterate)
+        #self.pipeline_play()
+        reactor.callLater(0, self.pipeline_play)
         
 if __name__ == '__main__':
     factory = pb.PBServerFactory(TranscoderFactory())
