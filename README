@@ -1,17 +1,18 @@
 Flumotion - a video streaming server.
 
-0.0.1 - "Backsy"
+0.1.0 - "Agua"
 
 REQUIREMENTS
 ------------
 
 You need:
 
-GStreamer - 0.8.6 or higher
-GStreamer plugins - 0.8.4 or higher
+GStreamer - 0.8.7 or higher
+GStreamer plugins - 0.8.5 or higher
 PyGTK - 2.4.0 or higher
-GStreamer python bindings - 0.8.0 or higher
+GStreamer python bindings - 0.7.93 or higher
 Twisted - 1.3.0
+Python Imaging Library
 
 And depending on what codecs you want to use:
 
@@ -27,18 +28,21 @@ This will set up everything except for Twisted for you from source.
 
 A FIRST TEST
 ------------
-Once everything is installed, You can try this to start the server:
+Once everything is built and possibly installed, 
+you can try this to start the server:
 
 terminal 1:
-  FLU_DEBUG=*:3 flumotion-manager conf/planet.xml
+  flumotion-manager -v conf/managers/default/planet.xml
 
 terminal 2:
-  FLU_DEBUG=*:3 flumotion-worker
+  flumotion-worker -v -u user -p test
 
 terminal 3:
-  FLU_DEBUG=*:3 flumotion-admin
+  flumotion-admin -v -u user -p test
 
-  Double-click the streamer-ogg-test-vorbis-theora component
+  Go through the wizard, choosing defaults.
+
+  Double-click the http component after the wizard has completed
 
 terminal 4:
   gst-launch gnomevfssrc location=http://localhost:8800 ! oggdemux name=mux
@@ -49,7 +53,7 @@ terminal 4:
 
 Alternatively, you can use any theora-enabled network player to see the stream.
 
-terminal 6:
+terminal 5:
   for a in `seq 1 10`; do ( flumotion-tester http://localhost:8800 & ); done
 
   This will throw 10 processes with 100 clients each at the server.  Hopefully,

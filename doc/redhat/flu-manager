@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# flumotion-manager        Startup script for the Flumotion streaming server
+#
+# chkconfig: - 80 20
+# description: Flumotion is a streaming server for audio and video.
+# processname: flumotion-manager
+# config: /etc/sysconfig/flumotion-manager
+# pidfile: /var/run/flumotion-manager.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+if [ -f /etc/sysconfig/flumotion-manager ]; then
+        . /etc/sysconfig/flumotion-manager
+fi
+
+# paths to files and variables
+service=flu-manager
+manager=${HTTPD-/usr/bin/flumotion-manager}
+prog=flumotion-manager
+pidfile=${PIDFILE-/var/run/flumotion-manager.pid}
+lockfile=${LOCKFILE-/var/lock/subsys/flumotion-manager}
+PLANET=/etc/flumotion/conf/planets/default.xml
+RETVAL=0
+
+
+# The semantics of these two functions differ from the way apachectl does
+# things -- attempting to start while running is a failure, and shutdown
+# when not running is also a failure.  So we just do it the way init scripts
+# are expected to behave here.
+start() {
+        echo -n $"Starting $prog: "
+        daemon --user flumotion $manager -D $PLANET $OPTIONS
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && touch ${lockfile}
+	# fake a pid
+	echo 0 > ${pidfile}
+        return $RETVAL
+}
+stop() {
+	echo -n $"Stopping $prog: "
+	# since pidof doesn't find binaries run from python
+	killall -g flumotion-manager $prog 2> /dev/null
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && success || failure
+	[ $RETVAL = 0 ] && rm -f ${lockfile} ${pidfile}
+	echo
+}
+reload() {
+	echo -n $"Reloading $prog: "
+	killproc $httpd -HUP
+	RETVAL=$?
+	echo
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+#  status)
+#        status $manager
+#	RETVAL=$?
+#	;;
+  restart)
+	stop
+	start
+	;;
+  condrestart)
+	if [ -f ${pidfile} ] ; then
+		stop
+		start
+	fi
+	;;
+  reload)
+        reload
+	;;
+  *)
+	echo $"Usage: $service {start|stop|restart|condrestart|reload|status}"
+	exit 1
+esac
+
+exit $RETVAL
