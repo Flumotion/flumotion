@@ -1,6 +1,6 @@
 <planet>
 
-  <flow name="test">
+  <flow name="testflow">
     <component name="producer-video-test" type="producer">
       <feed>default</feed>
       <pipeline>

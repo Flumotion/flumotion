@@ -380,7 +380,7 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         l = s.get('flows')
         self.failUnless(l)
         f = l[0]
-        self.failUnlessEqual(f.get('name'), 'test')
+        self.failUnlessEqual(f.get('name'), 'testflow')
         
         l = f.get('components')
         self.failUnless(l)
@@ -409,7 +409,7 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         self._verifyConfigAndOneWorker()
 
         # log out the producer and verify the mapper
-        id = 'producer-video-test'
+        id = '/testflow/producer-video-test'
         avatar = self._components[id]
         m = mappers[avatar]
 
@@ -422,7 +422,7 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         self._verifyComponentIdGone(id)
 
         # log out the converter and verify
-        id = 'converter-ogg-theora'
+        id = '/testflow/converter-ogg-theora'
         m = mappers[id]
         avatar = self._components[id]
         self._logoutAvatar(avatar)
@@ -448,7 +448,7 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         self._verifyConfigAndOneWorker()
         
         # log out the producer and verify the mapper
-        id = 'producer-video-test'
+        id = '/testflow/producer-video-test'
         avatar = self._components[id]
         m = mappers[avatar]
 
@@ -461,7 +461,7 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         self._verifyComponentIdGone(id)
         
         # log out the converter and verify
-        id = 'converter-ogg-theora'
+        id = '/testflow/converter-ogg-theora'
         m = mappers[id]
         avatar = self._components[id]
         self._logoutAvatar(avatar)
@@ -485,15 +485,16 @@ class TestVishnu(unittest.TestCase, log.Loggable):
             "keys: %r of length %d != 10" % (
                 mappers.keys(), len(mappers.keys())))
 
-        self.failUnless('producer-video-test' in self._components.keys())
-        self.failUnless('converter-ogg-theora' in self._components.keys())
+        keys = self._components.keys()
+        self.failUnless('/testflow/producer-video-test' in keys)
+        self.failUnless('/testflow/converter-ogg-theora' in keys)
 
         # verify mapper
         # 1 component with state and id
         # 2 components with state, avatar, id, and jobstate
         self.assertEqual(len(mappers.keys()), 10)
 
-        id = 'producer-video-test'
+        id = '/testflow/producer-video-test'
         avatar = self._components[id]
         self.failUnless(id in mappers.keys())
         self.failUnless(avatar in mappers.keys())
@@ -518,8 +519,8 @@ class TestVishnu(unittest.TestCase, log.Loggable):
 
         # verify mapper
         self.assertEqual(len(mappers.keys()), 6)
-        self._verifyComponentIdGone('converter-ogg-theora')
-        self._verifyComponentIdGone('producer-video-test')
+        self._verifyComponentIdGone('/testflow/converter-ogg-theora')
+        self._verifyComponentIdGone('/testflow/producer-video-test')
 
     def _verifyComponentIdGone(self, id):
         # verify logged out components
