@@ -35,9 +35,8 @@ global datadir
 __thisdir = os.path.dirname(os.path.abspath(__file__))
 
 if os.path.exists(os.path.join(__thisdir, 'uninstalled.py')):
-    from flumotion.config import uninstalled as module
+    from flumotion.config import uninstalled
+    globals().update(uninstalled.get())
 else:
-    from flumotion.config import installed as module
-
-globals().update(module.get())
-del module
+    from flumotion.config import installed
+    globals().update(installed.get())

@@ -1,5 +1,10 @@
 2004-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/config/__init__.py:
+	  fix config with reload
+
+2004-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/gui/admininterface.py:
 	  fix callbacks for reload
 
