@@ -1,7 +1,5 @@
 0.1.0:
 
-* EASY		remove HTTPGateKeeper, HTPasswd
-
 * MEDIUM	give useful error messages when there is no network !
 		(service network stop and start flumotion and see hang)
 

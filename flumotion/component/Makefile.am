@@ -10,6 +10,7 @@ clean-local:
 	rm -rf *.pyc *.pyo
 
 SUBDIRS = \
+	consumers \
 	audiotest \
 	base \
 	bouncers \

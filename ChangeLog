@@ -1,5 +1,24 @@
 2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* TODO:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/component/file/Makefile.am:
+	* flumotion/component/file/__init__.py:
+	* flumotion/component/file/file.py:
+	* flumotion/component/file/file.xml:
+	* flumotion/component/http/Makefile.am:
+	* flumotion/component/http/__init__.py:
+	* flumotion/component/http/gtk.py:
+	* flumotion/component/http/http.glade:
+	* flumotion/component/http/http.py:
+	* flumotion/component/http/http.xml:
+	* flumotion/component/http/resources.py:
+	  moving and renaming components
+
+2004-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/Makefile.am:
 	* flumotion/component/bouncers/Makefile.am:
 	* flumotion/component/bouncers/htpasswd.py:

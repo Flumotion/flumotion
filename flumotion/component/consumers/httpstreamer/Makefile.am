@@ -4,10 +4,10 @@ component_PYTHON = \
 	resources.py \
 	gtk.py
 
-componentdir = $(libdir)/flumotion/python/flumotion/component/http
+componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/httpstreamer
 component_DATA = http.xml http.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(component_DATA)
+EXTRA_DIST = $(component_PYTHON) $(component_DATA)
