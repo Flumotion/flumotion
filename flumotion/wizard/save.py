@@ -145,10 +145,11 @@ class WizardSaver:
         
         if source == AudioDevice.Firewire:
             # First, if we have firewire, video return that component
-            if options['video'] == VideoDevice.Firewire:
+            if video_source and options['video'] == VideoDevice.Firewire:
                 # FIXME: do this is a better way
                 return video_source
-            
+            else:
+                worker = self.wizard['Source'].worker
         if hasattr(audio_step, 'worker'):
             props = audio_step.get_component_properties()
             worker = audio_step.worker
@@ -207,7 +208,7 @@ class WizardSaver:
         # In case of firewire component, which can already be there
         if not audio_source in components:
             components.append(audio_source)
-
+            
         audio_encoder = self.getAudioEncoder()
         components.append(audio_encoder)
         audio_encoder.link(audio_source)
