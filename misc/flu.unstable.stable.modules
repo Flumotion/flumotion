@@ -1,5 +1,5 @@
 <?xml version="1.0" standalone="no"?> <!--*- mode: nxml -*-->
-<!-- stable Flumotion against stable dependencies -->
+<!-- unstable Flumotion against stable dependencies -->
 <!DOCTYPE moduleset SYSTEM "moduleset.dtd">
 <?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
 <moduleset>
@@ -45,7 +45,7 @@
   </cvsmodule>
 
   <svnmodule id="flumotion" svnroot="svn.fluendo.com" 
-   module="flumotion/tags/flumotion-0.1.0" checkoutdir="flumotion">
+   module="flumotion/trunk" checkoutdir="flumotion">
     <dependencies>
       <dep package="gst-python" />
     </dependencies>

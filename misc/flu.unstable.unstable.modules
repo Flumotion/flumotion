@@ -1,5 +1,5 @@
 <?xml version="1.0" standalone="no"?> <!--*- mode: nxml -*-->
-<!-- stable Flumotion against stable dependencies -->
+<!-- unstable Flumotion against unstable dependencies -->
 <!DOCTYPE moduleset SYSTEM "moduleset.dtd">
 <?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
 <moduleset>
@@ -22,21 +22,22 @@
 
   <cvsmodule id="gstreamer" cvsroot="gstreamer.freedesktop.org"
              autogenargs="--disable-plugin-builddir --disable-tests"
-             revision="RELEASE-0_8_7">
+             >
   </cvsmodule>
 
   <cvsmodule id="gst-plugins" cvsroot="gstreamer.freedesktop.org"
-             revision="RELEASE-0_8_5">
+             >
     <dependencies>
       <dep package="gstreamer" />
     </dependencies>
   </cvsmodule>
 
-  <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_4_0">
+  <cvsmodule id="pygtk" cvsroot="gnome.org"
+             >
   </cvsmodule>
  
   <cvsmodule id="gst-python" cvsroot="gstreamer.freedesktop.org"
-             revision="RELEASE-0_7_93">
+             >
     <dependencies>
       <dep package="gstreamer" />
       <dep package="gst-plugins" />
@@ -45,7 +46,7 @@
   </cvsmodule>
 
   <svnmodule id="flumotion" svnroot="svn.fluendo.com" 
-   module="flumotion/tags/flumotion-0.1.0" checkoutdir="flumotion">
+   module="flumotion/trunk" checkoutdir="flumotion">
     <dependencies>
       <dep package="gst-python" />
     </dependencies>
