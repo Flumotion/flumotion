@@ -19,8 +19,10 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import os
+import signal
 import string
 import sys
+import time
 
 import gobject
 import gst
@@ -158,12 +160,55 @@ class FileSinkStreamer(component.ParseLaunchComponent):
     kind = 'streamer'
     pipe_template = 'filesink name=sink location="%s"'
 
-    def __init__(self, name, sources, location):
+    def __init__(self, name, sources, location, port):
         self.location = location
-        pipeline = self.pipe_template % location
+
+        pipeline = self.pipe_template % self.get_location()
         component.ParseLaunchComponent.__init__(self, name, sources,
                                                 [], pipeline)
+        if port != None:
+            self.start_admin(port)
+        
+    def start_admin(self, port):
+        from twisted.manhole.telnet import ShellFactory
+        from flumotion.twisted.shell import Shell
+        
+        ts = ShellFactory()
+        ts.username = 'fluendo'
+        ts.namespace['restart'] = self.local_restart
+        ts.protocol = Shell
+        
+        try:
+            reactor.listenTCP(port, ts)
+        except error.CannotListenError, e:
+            print 'ERROR:', e
+            raise SystemExit
+            
+    def get_location(self):
+        if self.location.find('%') != -1:
+            timestamp = time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime())
+            return self.location % timestamp
 
+        return self.location
+
+    def local_restart(self):
+        if self.pipeline is None:
+            self.msg('Not started yet, skipping')
+            return
+        
+        sink = self.pipeline.get_by_name('sink')
+
+        self.pipeline.set_state(gst.STATE_PAUSED)
+
+        # Save and close file
+        sink.set_state(gst.STATE_READY)
+
+        location = self.get_location()
+        self.msg( 'setting location to', location)
+        sink.set_property('location', location)
+        
+        self.pipeline.set_state(gst.STATE_PLAYING)
+        
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
         self.setup_sources(sources)
@@ -198,12 +243,10 @@ class MultifdSinkStreamer(component.ParseLaunchComponent):
         self.caps = caps
 
     def add_client(self, fd):
-        print 'client added', fd
         sink = self.get_sink()
         sink.emit('remove', fd)
 
     def remove_client(self, fd):
-         print 'client removed', fd
          sink = self.get_sink()
          sink.emit('add', fd)
         

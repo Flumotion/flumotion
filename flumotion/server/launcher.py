@@ -248,7 +248,11 @@ class Launcher:
                 elif protocol == 'file':
                     assert c.has_option(section, 'location')
                     location = c.get(section, 'location')
-                    self.start(streamer.FileSinkStreamer(name, sources, location))
+                    if c.has_option(section, 'port'):
+                        port = c.getint(section, 'port')
+                    else:
+                        port = None
+                    self.start(streamer.FileSinkStreamer(name, sources, location, port))
                 else:
                     raise AssertionError, "unknown protocol: %s" % protocol
             else:
