@@ -586,7 +586,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
             self.debug('Ready to serve clients on %d' % self.port)
 
     def feeder_state_change_cb(self, element, old, state):
-        gobject.idle_add(feeder_state_change_idle, element, old, state)
+        gobject.idle_add(self.feeder_state_change_idle, element, old, state)
         
     def link_setup(self, eaters, feeders):
         sink = self.get_sink()
