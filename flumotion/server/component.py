@@ -37,7 +37,6 @@ class ComponentFactory(pbutil.ReconnectingPBClientFactory):
         self.view = ComponentView(component)
         
     def login(self, username):
-        
         self.__super_login(pbutil.Username(username),
                            client=self.view)
         
@@ -158,7 +157,15 @@ class BaseComponent(gobject.GObject):
         self.emit('log', args)
         
     warning = lambda s, *a: log.warning(s.get_name(), *a)
+    debug = lambda s, *a: log.debug(s.get_name(), *a)
 
+    def emit(self, name, *args):
+        if 'uninitialized' in str(self):
+            self.warning('Uninitialized object!')
+            #self.__gobject_init__()
+        else:
+            gobject.GObject.emit(self, name, *args)
+        
     def get_name(self):
         return self.component_name
     
