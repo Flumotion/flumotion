@@ -37,9 +37,10 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc ChangeLog COPYING README AUTHORS
-%doc html
-%dir %{_libdir}/python?.?/site-packages/flumotion
-%{_libdir}/python?.?/site-packages/flumotion/*
+%doc docs/html
+%{_bindir}/flumotion
+%dir %{_libdir}/flumotion
+%{_libdir}/flumotion
 
 %changelog
 * Mon Jun 07 2004 Thomas Vander Stichele <thomas at apestaart dot org>

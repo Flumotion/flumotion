@@ -1,3 +1,7 @@
+2004-06-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion.spec.in: update
+
 2004-06-15  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/launcher.py (main): Merge in all command line
