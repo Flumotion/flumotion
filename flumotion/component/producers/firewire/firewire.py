@@ -23,6 +23,7 @@
 
 from flumotion.common import errors
 from flumotion.component import feedcomponent
+from flumotion.component.effects.volume import volume
 
 
 class Firewire(feedcomponent.ParseLaunchComponent):
@@ -31,6 +32,17 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                                                     [],
                                                     ['video', 'audio'],
                                                     pipeline)
+        self.volume = self.get_pipeline().get_by_name("setvolume")
+        
+    def setVolume(self, value):
+        if value == 0:
+            setvol = 0
+        else:
+            setvol = value/100.0
+        self.debug("Setting volume to %f" % (setvol))
+
+        self.volume.set_property('volume', setvol)
+
                                        
 # See comments in gstdvdec.c for details on the dv format.
 
@@ -78,13 +90,20 @@ def createComponent(config):
                             %(pp)s
                             ! @feeder::video@
 
-                            dec. ! audio/x-raw-int ! audiorate ! audioscale
-                            ! audio/x-raw-int,rate=24000 ! @feeder::audio@
+                            dec. ! audio/x-raw-int ! volume name=setvolume !
+                            level name=volumelevel signal=true ! audiorate !
+                            @feeder::audio@
                """ % dict(df=drop_factor, ih=interlaced_height,
                           sq=square_pipe, pp=pad_pipe, sw=scaled_width,
                           h=height, fr=framerate)
     template = template.replace('\n', '')
     
     component = Firewire(config['name'], template)
+    
+    # add volume effect
+    comp_level = component.get_pipeline().get_by_name('volumelevel')
+    vol = volume.Volume('inputVolume', comp_level)
+    component.addEffect(vol)
+
 
     return component

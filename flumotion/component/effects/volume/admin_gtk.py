@@ -50,8 +50,31 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
             gtk.EXPAND|gtk.FILL, gtk.FILL, 6, 6)
         self.scale_volume.show()
         self.shown = False
+        # now do the callbacks for the volume setting
+        self.hscale = self.wtree.get_widget('volume-set-hscale')
+        self.setvolume_signalid = self.hscale.connect('value_changed',
+                self.cb_volume_set)
+
         return self.volume
         
     def volumeChanged(self, channel, peak, rms, decay):
         self.scale_volume.set_property('peak', peak)
         self.scale_volume.set_property('decay', decay)
+
+    # when volume has been set by another admin client
+    def volumeSet(self, volume):
+        self.hscale.handler_block(scale_change_id)
+        self.hscale.set_value(volume)
+        self.hscale.handler_unblock(scale_change_id)
+
+    # run when the scale is moved by user
+    def cb_volume_set(self, widget):
+        # do something
+        d = self.effectCallRemote("setVolume", self.hscale.get_value())
+        d.addErrback(self.setVolumeErrback)
+
+    def setVolumeErrback(self,failure):
+        self.warning("Failure %s setting volume: %s" % (
+            failure.type, failure.getErrorMessage()))
+        return None
+

@@ -39,6 +39,9 @@ class SoundcardProducer(feedcomponent.ParseLaunchComponent):
             for track in element.list_tracks():
                 element.set_record(track, track.label == trackLabel)
 
+    def setVolume(self, value):
+        self.debug("Volume set to: %d" % (value))
+
                                        
 def createComponent(config):
     element = config['source-element']

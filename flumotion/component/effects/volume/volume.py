@@ -42,3 +42,19 @@ class Volume(feedcomponent.Effect):
         # notify ui of level change
         self.component.adminCallRemote("volumeChanged",
             channel, peak, rms, decay)
+
+    def effect_setVolume(self, value):
+        """
+        Sets volume
+
+        @param value: what value to set volume to (float between 0.0 and 400.0)
+
+        Returns: the actual percentage it was set to
+        """
+        self.component.setVolume(value)
+        # notify admin clients
+        self.component.adminCallRemote("effectVolumeSet", self.name, value)
+                        
+
+        return value
+

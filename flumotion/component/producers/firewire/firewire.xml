@@ -1,15 +1,50 @@
 <registry>
   <components>
-    <component type="firewire">
-      <source location="flumotion.component.producers.firewire.firewire"/>
+    <component type="firewire"
+               base="flumotion/component/producers/firewire">
+      <source location="flumotion.component.producers.firewire.firewire" />
+      <entries>
+        <entry type="component" location="firewire.py"
+               function="createComponent" />
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
+      </entries>
+
       <properties>
-        <property name="feed" type="string" required="yes" multiple="yes"/>
-        <property name="height" type="int"/>
-        <property name="width" type="int"/>
-        <property name="scaled_width" type="int"/>
-        <property name="is_square" type="bool"/>
-        <property name="framerate" type="float"/>
+        <property name="feed" type="string" required="yes" multiple="yes" />
+        <property name="height" type="int" />
+        <property name="width" type="int" />
+        <property name="scaled_width" type="int" />
+        <property name="is_square" type="bool" />
+        <property name="framerate" type="float" />
       </properties>
     </component>
   </components>
+ <bundles>
+    <bundle name="firewire-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/firewire">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+     </bundle>
+
+     <bundle name="firewire-admin-gtk">
+        <dependencies>
+            <dependency name="firewire-base" />
+            <dependency name="base-admin-gtk" />
+            <dependency name="volume-admin-gtk" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/firewire">
+                <filename location="admin_gtk.py" />
+            </directory>
+        </directories>
+      </bundle>
+    </bundles>
 </registry> 

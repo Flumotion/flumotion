@@ -1,5 +1,21 @@
 2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
+
+	* flumotion/component/effects/volume/admin_gtk.py:
+	* flumotion/component/effects/volume/volume.glade:
+	* flumotion/component/effects/volume/volume.py:
+	* flumotion/component/producers/firewire/Makefile.am:
+	* flumotion/component/producers/firewire/admin_gtk.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/firewire/firewire.xml:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	  Add way to change volume for the volume effect
+	  Give the firewire a UI component using this
+	  Closes issue #184
+
+2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	  change debug message
 	* flumotion/wizard/steps.py:
