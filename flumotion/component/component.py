@@ -203,28 +203,7 @@ class ComponentView(pb.Referenceable, log.Loggable):
     def _reloaded(self):
         self.info('reloaded module code for %s' % __name__)
 
-class DirectoryProvider:
-    def __init__(self):
-        self.files = []
-        
-    def setFiles(self, files):
-        self.files = files
-
-    def getFiles(self, filename):
-        return self.files[filename]
-
-    def getUIEntry(self):
-        for filename, file in self.files.items():
-            if file.isType('GUI'):
-                break
-        else:
-            return
-
-        data = open(filename).read()
-
-        return data
-
-class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
+class BaseComponent(log.Loggable, gobject.GObject):
     """I am the base class for all Flumotion components."""
 
     gsignal('state-changed', str, object)
@@ -244,7 +223,6 @@ class BaseComponent(log.Loggable, gobject.GObject, DirectoryProvider):
         @param feeder_config: <feed></feed> entries from config
         """
         self.__gobject_init__()
-        DirectoryProvider.__init__(self)
         
         self.component_name = name
 

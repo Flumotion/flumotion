@@ -26,12 +26,12 @@ from flumotion.component import component
 
 __all__ = ['HTTPGatekeeper']
 
-class HTTPGatekeeper(component.DirectoryProvider):
+# FIXME: needs to be renamed to a bouncer type
+class HTTPGatekeeper:
 
     __implements__ = interfaces.IAuthenticate,
     
     def __init__(self, filename, type):
-        component.DirectoryProvider.__init__(self)
         self.filename = filename
         self.type = type
 
