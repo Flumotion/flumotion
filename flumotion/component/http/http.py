@@ -599,17 +599,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self.update_ui_state()
         self._callLaterId = reactor.callLater(1, self._checkUpdate)
 
-    ### FIXME: abstract this away nicely to the base class of components
-    def getUIMD5Sum(self, style):
-        if not style == 'gtk':
-            raise
-        return self.gtk.bundle().md5sum
-
-    def getUIZip(self, style):
-        if not style == 'gtk':
-            raise
-        return self.gtk.bundle().zip
-
     def getMaxClients(self):
         return self.resource.maxAllowedClients()
 
@@ -797,14 +786,14 @@ def createComponent(config):
         resource.setBouncerName(config['bouncer'])
         
     # create bundlers for UI
-    # FIXME: register ui types through base methods on component
     # FIXME: make it so the bundles extract in the full path
     # for later when we transmit everything they depend on
-    component.gtk = bundle.Bundler()
+    bundler = bundle.Bundler()
     # where do we live ?
     dir = os.path.split(__file__)[0]
-    component.gtk.add(os.path.join(dir, 'gtk.py'))
-    component.gtk.add(os.path.join(dir, 'http.glade'))
+    bundler.add(os.path.join(dir, 'gtk.py'))
+    bundler.add(os.path.join(dir, 'http.glade'))
+    component.addUIBundler(bundler, "admin", "gtk")
     
     component.debug('Listening on %d' % port)
     try:

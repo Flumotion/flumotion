@@ -173,70 +173,74 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         raise SystemExit
 
     # Generic interface to call into a component
-    def perspective_callComponentRemote(self, component_name, method_name,
+    def perspective_callComponentRemote(self, componentName, method_name,
                                         *args, **kwargs):
-        component = self.componentheaven.getComponent(component_name)
+        component = self.componentheaven.getComponent(componentName)
         try:
             return component.callComponentRemote(method_name, *args, **kwargs)
         except Exception, e:
             self.warning(str(e))
             raise
         
-    def perspective_setComponentElementProperty(self, component_name, element, property, value):
+    def perspective_setComponentElementProperty(self, componentName, element, property, value):
         """Set a property on an element in a component."""
-        component = self.componentheaven.getComponent(component_name)
+        component = self.componentheaven.getComponent(componentName)
         try:
             return component.setElementProperty(element, property, value)
         except errors.PropertyError, exception:
             self.warning(str(exception))
             raise
 
-    def perspective_getComponentElementProperty(self, component_name, element, property):
+    def perspective_getComponentElementProperty(self, componentName, element, property):
         """Get a property on an element in a component."""
-        component = self.componentheaven.getComponent(component_name)
+        component = self.componentheaven.getComponent(componentName)
         try:
             return component.getElementProperty(element, property)
         except errors.PropertyError, exception:
             self.warning(str(exception))
             raise
 
-    def perspective_getUIZip(self, component_name, style):
+    def perspective_getUIZip(self, componentName, domain, style):
         """
         Get the zip data of the bundle for the user interface.
 
-        @type style:  string
-        @param style: the style of the user interface to get the zip for.
+        @type  domain: string
+        @param domain: the domain of the user interface to get the zip for
+        @type  style:  string
+        @param style:  the style of the user interface to get the zip for
         """
-        component = self.componentheaven.getComponent(component_name)
+        component = self.componentheaven.getComponent(componentName)
         try:
-            return component.getUIZip(style)
+            return component.getUIZip(domain, style)
         except Exception, e:
             self.warning(str(e))
             raise
 
-    def perspective_getUIMD5Sum(self, component_name, style):
+    def perspective_getUIMD5Sum(self, componentName, domain, style):
         """
         Get the MD5 sum of the bundle for the user interface.
 
+        @type  domain: string
+        @param domain: the domain of the user interface to get the MD5 sum for
         @type style:  string
-        @param style: the style of the user interface to get MD5 sum for.
+        @param style: the style of the user interface to get MD5 sum for
         """
-        component = self.componentheaven.getComponent(component_name)
+        component = self.componentheaven.getComponent(componentName)
         try:
-            return component.getUIMD5Sum(style)
+            return component.getUIMD5Sum(domain, style)
         except Exception, e:
             self.warning(str(e))
             raise
 
-    def perspective_reloadComponent(self, component_name):
+    def perspective_reloadComponent(self, componentName):
         """Reload modules in the given component."""
         def _reloaded(result, self, name):
             self.info("reloaded component %s code" % name)
 
-        self.info("reloading component %s code" % component_name)
-        avatar = self.componentheaven.getComponent(component_name)
+        self.info("reloading component %s code" % componentName)
+        avatar = self.componentheaven.getComponent(componentName)
         cb = avatar.reloadComponent()
-        cb.addCallback(_reloaded, self, component_name)
+        cb.addCallback(_reloaded, self, componentName)
         return cb
 
     def perspective_reloadManager(self):

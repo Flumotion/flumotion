@@ -210,23 +210,26 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.info('calling remote getUIZip %s, %s' % (component, style))
         return self.remote.callRemote('getUIZip', component, style)
 
-    def getUIMD5Sum(self, component, style):
+    def getUIMD5Sum(self, component, domain, style):
         """
         Get the md5sum of the given user interface from the manager.
 
         @type component: string
-        @param component: name of the component to get the user interface for.
+        @param component: name of the component to get the user interface for
+        @type domain: string
+        @param domain: domain of the UI to get
         @type style: string
-        @param style: style of the UI to get.
+        @param style: style of the UI to get
 
         @rtype: deferred
         """
-        self.info('calling remote getUIMD5Sum %s, %s' % (component, style))
-        return self.remote.callRemote('getUIMD5Sum', component, style)
+        self.info('calling remote getUIMD5Sum(%s, %s, %s)' % (
+            component, domain, style))
+        return self.remote.callRemote('getUIMD5Sum', component, domain, style)
 
     # FIXME: we probably want to return something else than the cache dir,
     # but for now this will do
-    def getUI(self, component, style):
+    def getUI(self, component, domain, style):
         """
         Check if the UI is current enough, and if not, update it.
 
@@ -236,7 +239,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
         # callback functions
         # FIXME: check if it's ok to return either a deferred or a result    
-        def _MD5SumCallback(result, self, component, style):
+        def _MD5SumCallback(result, self, component, domain, style):
             md5sum = result
             self.info("received UI MD5 sum")
             self.debug("got UI MD5 sum: %s" % md5sum)
@@ -244,12 +247,12 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             if not os.path.exists(dir):
                 d = self.getUIZip(component, style)
                 d.addErrback(self._defaultErrback)
-                d.addCallback(_ZipCallback, self, component, style)
+                d.addCallback(_ZipCallback, self, component, domain, style)
                 return d
             self.debug("UI is in dir %s" % dir)
             return dir
 
-        def _ZipCallback(result, self, component, style):
+        def _ZipCallback(result, self, component, domain, style):
             # the result is the zip data
             self.info("received UI Zip")
             b = bundle.Bundle()
@@ -261,9 +264,9 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             return dir
 
         self.debug("getting UI MD5 sum")
-        d = self.getUIMD5Sum(component, style)
+        d = self.getUIMD5Sum(component, domain, style)
         d.addErrback(self._defaultErrback)
-        d.addCallback(_MD5SumCallback, self, component, style)
+        d.addCallback(_MD5SumCallback, self, component, domain, style)
 
         return d
         

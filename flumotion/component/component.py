@@ -135,11 +135,11 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         
     ### pb.Referenceable remote methods
     ### called from manager by our avatar
-    def remote_getUIZip(self, style):
-        return self.comp.getUIZip(style)
+    def remote_getUIZip(self, domain, style):
+        return self.comp.getUIZip(domain, style)
     
-    def remote_getUIMD5Sum(self, style):
-        return self.comp.getUIMD5Sum(style)
+    def remote_getUIMD5Sum(self, domain, style):
+        return self.comp.getUIMD5Sum(domain, style)
 
     def remote_register(self):
         # FIXME: we need to properly document this; manager calls me to
@@ -204,6 +204,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         # FIXME: rename to .name
         self.component_name = name
         self.medium = None # the medium connecting us to the manager's avatar
+        self._uiBundlers = {}
 
     ### Loggable methods
     def logFunction(self, arg):
@@ -225,5 +226,35 @@ class BaseComponent(log.Loggable, gobject.GObject):
     def setMedium(self, medium):
         assert isinstance(medium, BaseComponentMedium)
         self.medium = medium
+
+    def addUIBundler(self, bundler, domain, style):
+        """
+        Add a bundler of UI files for the given domain and style.
+
+        @type bundler: L{flumotion.common.bundle.Bundler}
+        @type domain: string
+        @type style: string
+        """
+        if not self._uiBundlers.has_key(domain):
+            self._uiBundlers[domain] = {}
+        self._uiBundlers[domain][style] = bundler
+
+    def getUIMD5Sum(self, domain, style):
+        if not self._uiBundlers.has_key(domain):
+            #FIXME
+            raise
+        if not self._uiBundlers[domain].has_key(style):
+            #FIXME
+            raise
+        return self._uiBundlers[domain][style].bundle().md5sum
+
+    def getUIZip(self, domain, style):
+        if not self._uiBundlers.has_key(domain):
+            #FIXME
+            raise
+        if not self._uiBundlers[domain].has_key(style):
+            #FIXME
+            raise
+        return self._uiBundlers[domain][style].bundle().zip
 
 gobject.type_register(BaseComponent)

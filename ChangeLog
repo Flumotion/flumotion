@@ -1,5 +1,15 @@
 2004-10-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/component.py:
+	* flumotion/component/http/http.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	  move ui file bundling to base class and formalize a bit
+
+2004-10-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/Makefile.am:
 	* flumotion/common/interfaces.py:
 	* flumotion/common/keycards.py:

@@ -488,35 +488,39 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         cb.addErrback(self._mindErrback, errors.ReloadSyntaxError)
         return cb
 
-    def getUIZip(self, style):
+    def getUIZip(self, domain, style):
         """
-        Request the UI zip for the component's UI in the given style.
+        Request the zip for the component's UI in the given domain and style.
 
         The deferred returned will receive the code to run the UI.
 
-        @type style: string
-        @param style: the UI style to get
+        @type  domain: string
+        @param domain: the UI domain to get
+        @type  style:  string
+        @param style:  the UI style to get
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        self.debug('calling remote getUIZip(%s)' % style)
-        cb = self._mindCallRemote('getUIZip', style)
-        cb.addErrback(self._mindErrback)
-        return cb
+        self.debug('calling remote getUIZip(%s, %s)' % (domain, style))
+        d = self._mindCallRemote('getUIZip', domain, style)
+        d.addErrback(self._mindErrback)
+        return d
 
-    def getUIMD5Sum(self, style):
+    def getUIMD5Sum(self, domain, style):
         """
-        Request the UI md5sum for the component's UI in the given style.
+        Request the md5sum for the component's UI in the given domain and style.
 
         The deferred returned will receive the md5sum of the UI zip.
 
-        @type style: string
-        @param style: the UI style to get
+        @type  domain: string
+        @param domain: the UI domain to get
+        @type  style:  string
+        @param style:  the UI style to get
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        self.debug('calling remote getUIMD5Sum(%s)' % style)
-        cb = self._mindCallRemote('getUIMD5Sum', style)
+        self.debug('calling remote getUIMD5Sum(%s, %s)' % (domain, style))
+        cb = self._mindCallRemote('getUIMD5Sum', domain, style)
         cb.addErrback(self._mindErrback)
         return cb
     

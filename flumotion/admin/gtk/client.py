@@ -238,7 +238,7 @@ class Window(log.Loggable):
         # FIXME: old code, looking for replacement with bundles
         #cb = self.admin.getUIEntry(name)
         #cb.addCallback(cb_gotUI)
-        d = self.admin.getUI(name, 'gtk')
+        d = self.admin.getUI(name, 'admin', 'gtk')
         d.addCallback(cb_gotUI)
 
     def admin_connected_cb(self, admin):
