@@ -78,12 +78,12 @@
 		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem_manage_start_component">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Start Component</property>
+		      <property name="label" translatable="yes">S_tart Component</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="manage_start_component_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image85">
+			<widget class="GtkImage" id="image89">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-media-play</property>
 			  <property name="icon_size">1</property>
@@ -99,12 +99,12 @@
 		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem_manage_stop_component">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Stop Component</property>
+		      <property name="label" translatable="yes">St_op Component</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="manage_stop_component_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image86">
+			<widget class="GtkImage" id="image90">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-media-pause</property>
 			  <property name="icon_size">1</property>
@@ -126,7 +126,7 @@
 		  <child>
 		    <widget class="GtkMenuItem" id="menuitem_manage_start_all">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Start All</property>
+		      <property name="label" translatable="yes">Start _All</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="manage_start_all_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
 		    </widget>
@@ -135,9 +135,30 @@
 		  <child>
 		    <widget class="GtkMenuItem" id="menuitem_manage_stop_all">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">_Stop All</property>
+		      <property name="label" translatable="yes">Stop A_ll</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="manage_stop_all_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkImageMenuItem" id="menuitem_manage_clear_all">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Clear All</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="manage_clear_all_cb" last_modification_time="Tue, 15 Feb 2005 15:40:39 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image91">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-clear</property>
+			  <property name="icon_size">1</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
 		    </widget>
 		  </child>
 
@@ -155,7 +176,7 @@
 		      <signal name="activate" handler="manage_run_wizard_cb" last_modification_time="Wed, 02 Feb 2005 14:35:41 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image87">
+			<widget class="GtkImage" id="image92">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-zoom-fit</property>
 			  <property name="icon_size">1</property>
@@ -189,7 +210,7 @@
 		      <signal name="activate" handler="debug_reload_manager_cb" last_modification_time="Wed, 05 Jan 2005 19:02:03 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image88">
+			<widget class="GtkImage" id="image93">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-refresh</property>
 			  <property name="icon_size">1</property>
@@ -219,7 +240,7 @@
 		      <signal name="activate" handler="debug_start_shell_cb" last_modification_time="Wed, 08 Dec 2004 17:42:07 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image89">
+			<widget class="GtkImage" id="image94">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-execute</property>
 			  <property name="icon_size">1</property>

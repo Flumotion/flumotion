@@ -1,5 +1,17 @@
 2005-02-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Vishnu.emptyPlanet): Simplify
+	because we require that all of the components be sleeping already.
+
+	* flumotion/admin/gtk/client.py (Window.manage_start_all_cb): New
+	callback.
+	(Window.manage_stop_all_cb): Implement via a simple "for x in
+	l..." idiom instead of emptyPlanet().
+	(Window.manage_clear_all_cb): New callback, uses
+	cleanComponents->emptyPlanet.
+
+	* data/glade/admin.glade: Add a clear-all menu button.
+
 	* flumotion/admin/gtk/client.py (Window.current_component_state):
 	New instance var, either None or the current AdminComponentState
 	being shown.

@@ -64,7 +64,7 @@ class Window(log.Loggable, gobject.GObject):
                                          # disconnected
 
         self._planetState = None
-        self._components = None # name -> default flow + atmosphere
+        self._components = None # name -> planet.AdminComponentState
 
         self.debug('setting model')
         self.admin = None
@@ -611,6 +611,8 @@ class Window(log.Loggable, gobject.GObject):
         can_stop = bool(moodname and moodname!='sleeping' and moodname!='lost')
         d['menuitem_manage_stop_component'].set_sensitive(can_stop)
         d['toolbutton_stop_component'].set_sensitive(can_stop)
+        # they're all in sleeping or lost
+        d['menuitem_manage_clear_all'].set_sensitive(can_start and not can_stop)
 
     ### ui callbacks
     def _components_view_has_selection_cb(self, view, state):
@@ -822,7 +824,15 @@ class Window(log.Loggable, gobject.GObject):
     def manage_stop_component_cb(self, button):
         self._component_stop(None)
         
+    def manage_start_all_cb(self, button):
+        for c in self._components.values():
+            self._component_start(c)
+        
     def manage_stop_all_cb(self, button):
+        for c in self._components.values():
+            self._component_stop(c)
+        
+    def manage_clear_all_cb(self, button):
         self.admin.cleanComponents()
         
     def manage_run_wizard_cb(self, x):

@@ -535,53 +535,9 @@ class Vishnu(log.Loggable):
         """
         # first get all components to sleep
         components = self.getComponentStates()
-
-        # if any component is already in a mood change/command, fail
-        isPending = lambda c: c.get('moodPending') != None
-        components = filter(isPending, components)
-        if len(components) > 0:
-            raise errors.BusyComponentError(components[0])
-
-        # filter out the ones that aren't sleeping and stop them
-        components = self.getComponentStates()
-        isNotSleeping = lambda c: c.get('mood') is not moods.sleeping.value
-        components = filter(isNotSleeping, components)
-
-        # create a big deferred for stopping everything
-        d = defer.Deferred()
-        
-        self.debug('need to stop %d components: %r' % (
-            len(components), components))
-
-        # FIXME: this is where we need some order
-        for c in components:
-            avatar = self._componentMappers[c].avatar
-            d.addCallback(lambda result, a: a.stop(), avatar)
-
-        d.addCallback(self._emptyPlanetCallback)
-
-        # trigger the deferred after returning
-        reactor.callLater(0, d.callback, None)
-
-        return d
-        
-    def _emptyPlanetCallback(self, result):
-        # gets called after all components have stopped
-        # cleans up the rest of the planet state
-        components = self.getComponentStates()
-
-        for c in components:
-            if c.get('mood') is not moods.sleeping.value:
-                self.warning('Component %s is not sleeping' % c.get('name'))
-            # clear mapper; remove componentstate and id
-            m = self._componentMappers[c]
-            del self._componentMappers[m.id]
-            del self._componentMappers[c]
-
-        # if anything's left, we have a mistake somewhere
-        l = self._componentMappers.keys()
-        if len(l) > 0:
-            self.warning('mappers still has keys %r' % (repr(l)))
+        if [x for x in [moods.get(y.get('mood')).name for y in components]
+              if x != 'sleeping']:
+            raise errors.BusyComponentError('non-sleeping component')
 
         self.state.get('atmosphere').empty()
 
