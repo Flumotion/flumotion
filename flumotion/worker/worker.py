@@ -364,11 +364,11 @@ class WorkerBrain(log.Loggable):
         if handler not in (signal.SIG_IGN, signal.SIG_DFL, None):
             self._oldSIGCHLDHandler = handler
 
-    def _SIGCHLDHandler(self, signal, frame):
+    def _SIGCHLDHandler(self, signum, frame):
         self.debug("handling SIGCHLD")
         if self._oldSIGCHLDHandler:
             self.debug("calling Twisted handler")
-            self._oldSIGCHLDHandler(signal, frame)
+            self._oldSIGCHLDHandler(signum, frame)
             
         # we could have been called for more than one kid, so handle all
         reaped = False
@@ -406,18 +406,24 @@ class WorkerBrain(log.Loggable):
                 self.info("Reaped child job with pid %d, exit value %d" % (
                     pid, retval))
             elif os.WIFSIGNALED(status):
-                signal = os.WTERMSIG(status)
-                self.info(
-                    "Reaped job child with pid %d signaled by signal %d" % (
-                        pid, signal))
+                signum = os.WTERMSIG(status)
+                if signum == signal.SIGSEGV:
+                    self.warning("Job child with pid % segfaulted" % pid)
+                    if not os.WCOREDUMP(status):
+                    self.warning(
+                        "Consider enabling core dumps for the next time")
+                else:
+                    self.info(
+                        "Reaped job child with pid %d signaled by signal %d" % (
+                            pid, signum))
                 if os.WCOREDUMP(status):
                     self.info("Core dumped")
                     
             elif os.WIFSTOPPED(status):
-                signal = os.WSTOPSIG(status)
+                signum = os.WSTOPSIG(status)
                 self.info(
                     "Reaped job child with pid %d stopped by signal %d" % (
-                        pid, signal))
+                        pid, signum))
             else:
                 self.info(
                     "Reaped job child with pid %d and unhandled status %d" % (
@@ -434,7 +440,7 @@ class WorkerBrain(log.Loggable):
         if handler not in (signal.SIG_IGN, signal.SIG_DFL, None):
             self._oldSIGTERMHandler = handler
 
-    def _SIGTERMHandler(self, signal, frame):
+    def _SIGTERMHandler(self, signum, frame):
         self.info("Worker daemon received TERM signal, shutting down")
         self.debug("handling SIGTERM")
         reactor.killed = True
@@ -444,10 +450,10 @@ class WorkerBrain(log.Loggable):
         if self._oldSIGTERMHandler:
             if d:
                 self.debug("chaining Twisted handler")
-                d.addCallback(lambda result: self._oldSIGTERMHandler(signal, frame))
+                d.addCallback(lambda result: self._oldSIGTERMHandler(signum, frame))
             else:
                 self.debug("calling Twisted handler")
-                self._oldSIGTERMHandler(signal, frame)
+                self._oldSIGTERMHandler(signum, frame)
 
         self.debug("_SIGTERMHandler: done")
 

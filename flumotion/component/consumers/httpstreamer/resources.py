@@ -344,10 +344,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         Expire a client's connection associated with the keycard Id.
         """
-        self.debug('[fd %5d] expiring client' % fd)
-
         keycard = self._idToKeycard[keycardId]
         fd = keycard._fd
+
+        self.debug('[fd %5d] expiring client' % fd)
 
         if self._fdToDurationCall.has_key(fd):
             self.debug('[fd %5d] canceling later expiration call' % fd)
