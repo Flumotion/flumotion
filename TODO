@@ -63,6 +63,15 @@ LATER:
 * MEDIUM	if you specify a converter with feedname other than default and a consumer
                 eating from that feed and change the source to the same feedname, it fails.
 		
+
+* MEDIUM	figure out a way to have worker code for wizard checks bundled
+
+* MEDIUM	webcams can be I420, YUY2, or others; we should detect this
+	  	gst-plugins 0.8.6 will detect automatically since there is a
+		new option for autoprobe-fps which we can then use
+
+* MEDIUM	add runtime checks for plugin versions to provide decent
+		fallbacks for bugs like this
 - API cleanup:
 
 - manager/component.py:
