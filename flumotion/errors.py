@@ -17,29 +17,5 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-import gobject
-import gst
-
-from twisted.python import log
-
-def verbose_deep_notify_cb(object, orig, pspec):
-    value = orig.get_property(pspec.name)
-    if pspec.value_type == gobject.TYPE_BOOLEAN:
-        if value:
-            value = 'TRUE'
-        else:
-            value = 'FALSE'
-        output = value
-    elif pspec.value_type == gst.Caps.__gtype__:
-        value = str(value)
-        pos = value.find('streamheader')
-        if pos != -1:
-            output = value[:pos+12] + '=<...>'
-        else:
-            output = value
-    else:
-        output = value
-
-    print 'deep-notify %s: %s = %s' % (orig.get_path_string(),
-                                         pspec.name,
-                                         output)
+class PipelineParseError(Exception):
+    pass

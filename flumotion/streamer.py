@@ -49,7 +49,7 @@ class Streamer(gobject.GObject, component.BaseComponent):
 
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-recieved', buffer)
-
+        
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
         self.setup_sources(sources)

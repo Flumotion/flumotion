@@ -91,8 +91,9 @@ class BaseComponent(pb.Referenceable):
         if need_sink:
             pipeline = '%s ! tcpserversink name=sink' % pipeline
 
+        pipeline = '{ %s } ' % pipeline
         print 'pipeline: %s' % pipeline
-
+        
         return pipeline
 
     def hasPerspective(self):
@@ -145,7 +146,6 @@ class BaseComponent(pb.Referenceable):
         self.set_state_and_iterate(gst.STATE_NULL)
         
     def get_sink(self):
-        print self.pipeline
         assert self.pipeline, 'Pipeline not created'
         sink = self.pipeline.get_by_name('sink')
         assert sink, 'No sink element in pipeline'
@@ -192,6 +192,7 @@ class BaseComponent(pb.Referenceable):
         except gobject.GError, e:
             raise errors.PipelineParseError, e
 
+        self.pipeline.set_name('pipeline-' + self.component_name)
         sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
         self.pipeline_signals.append(sig_id)
         sig_id = self.pipeline.connect('state-change', self.pipeline_state_change_cb)
