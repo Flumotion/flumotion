@@ -1,5 +1,13 @@
 2004-12-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/workers/default.xml:
+	* doc/redhat/flumotion:
+	* flumotion/manager/main.py:
+	* flumotion/worker/main.py:
+	  clean up debug levels at various stages
+
+2004-12-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	  bump nano back to HEAD
 

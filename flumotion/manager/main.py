@@ -126,6 +126,10 @@ def main(args):
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
+    # verbose overrides --debug
+    if options.verbose:
+        options.debug = "*:3"
+
     # parse planet config file
     if len(args) <= 1:
         log.warning('manager', 'Please specify a planet configuration file')
@@ -149,6 +153,11 @@ def main(args):
     if not options.name and cfg.manager and cfg.manager.name:
         options.name = cfg.manager.name
         log.debug('manager', 'Setting manager name to %s' % options.name)
+    # command-line debug overrides config file debug
+    if not options.debug and cfg.manager.fludebug:
+        options.debug = cfg.manager.fludebug
+        log.debug('manager', 'Setting debug level to config file value %s' %
+            options.debug)
 
     # set default values for all unset options
     if not options.host:
@@ -180,9 +189,6 @@ def main(args):
     if options.version:
         print common.version("flumotion-manager")
         return 0
-
-    if options.verbose:
-        log.setFluDebug("*:3")
 
     if options.debug:
         log.setFluDebug(options.debug)

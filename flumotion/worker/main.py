@@ -96,6 +96,9 @@ def main(args):
         options.feederports = range(int(lower), int(upper) + 1)
         log.debug('worker', 'Setting feederports %r' % options.feederports)
 
+    # verbose overrides --debug
+    if options.verbose:
+        options.debug = "*:3"
  
     # check if a config file was specified; if so, parse config and copy over
     if len(args) > 1:
@@ -135,6 +138,7 @@ def main(args):
             log.debug('worker', 'Setting feederports %r' % options.feederports)
 
         # general
+        # command-line debug overrides config file debug
         if not options.debug and cfg.fludebug:
             options.debug = cfg.fludebug
         
@@ -169,9 +173,6 @@ def main(args):
     if options.version:
         print common.version("flumotion-worker")
         return 0
-
-    if options.verbose:
-        log.setFluDebug("*:3")
 
     if options.debug:
         log.setFluDebug(options.debug)

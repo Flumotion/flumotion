@@ -41,7 +41,7 @@ startone() {
 	type=$1
 	name=$2
 	echo -n $"Starting $type $name: "
-	daemon --user flumotion $prog -l $logfile start $type $name
+	daemon --user flumotion $prog -d 3 -l $logfile start $type $name
 	RETVAL=$?
 	echo
 	[ $RETVAL = 0 ] && touch ${lockdir}/flumotion.$type.$name.lock
@@ -76,7 +76,7 @@ stopone() {
 	if test -e ${lockfile}
 	then
 		echo -n $"Stopping $type $name: "
-		$prog stop -l $logfile $type $name
+		$prog stop -d 3 -l $logfile $type $name
 		RETVAL=$?
 		[ $RETVAL = 0 ] && success || failure
 		echo
