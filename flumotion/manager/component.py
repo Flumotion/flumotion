@@ -535,7 +535,6 @@ class ComponentHeaven(pb.Root, log.Loggable):
         self.removeComponentByName(component_name)
         
     def removeComponentByName(self, component_name):
-        import code; code.interact(local=locals())
         if not self.hasComponent(component_name):
             raise KeyError, component_name
 
