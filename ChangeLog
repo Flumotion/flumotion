@@ -1,6 +1,11 @@
-2004-09-13  Johan Dahlin  <johan@gnome.org>
+2004-09-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
-	reviewed by: <delete if not using a buddy>
+	* TODO:
+	* flumotion/utils/log.py:
+	* testsuite/tests/log.py:
+	  add tests for logging
+
+2004-09-13  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/bundle.py:
 	* flumotion/component/component.py:
@@ -9,6 +14,7 @@
 	* flumotion/manager/manager.py:
 	* flumotion/manager/worker.py:
 	* testsuite/tests/bundle.py:
+	  I forgot to type a reason for changing all of these, spank me.
 
 2004-09-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 

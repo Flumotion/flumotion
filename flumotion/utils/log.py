@@ -82,6 +82,7 @@ _categories = {}
 
 # log handlers registered
 _log_handlers = []
+_log_handlers_limited = []
 
 # level -> number dict
 _levels = {
@@ -123,7 +124,10 @@ def registerCategory(category):
             if _levels.has_key(value):
                 level = _levels[value]
             else:
-                level = int(value)
+                try:
+                    level = int(value)
+                except ValueError: # e.g. *; we default to most
+                    level = 5
     # store it
     _categories[category] = level
 
@@ -139,28 +143,22 @@ def stderrHandler(category, level, message):
                                              level, category, message))
     sys.stderr.flush()
 
-def stderrHandlerLimited(category, level, message):
-    """
-    A log handler that writes to stdout only when the message's level is
-    not more verbose
-    than the registered level for this category, as specified by FLU_DEBUG.
+def _handle(category, level, message):
+    global _log_handlers, _log_handlers_limited
 
-    @type category: string
-    @type level: string
-    @type message: string
-    """
+    # first all the unlimited ones
+    for handler in _log_handlers:
+        handler(category, level, message)
+
+    # the limited ones
     global _categories
     if not _categories.has_key(category):
         registerCategory(category)
+
     global _levels
     if _levels[level] > _categories[category]:
         return
-    stderrHandler(category, level, message)
-
-def _handle(category, level, message):
-    global _log_handlers
-
-    for handler in _log_handlers:
+    for handler in _log_handlers_limited:
         handler(category, level, message)
     
 def error(cat, *args):
@@ -197,9 +195,19 @@ def log(cat, *args):
     """
     _handle(cat, 'LOG', ' '.join(args))
 
-def addLogHandler(func):
-    """Add a custom log handler."""
-    _log_handlers.append(func)
+def addLogHandler(func, limited = True):
+    """
+    Add a custom log handler.
+
+    @param function: a function object with prototype (category, level, message)
+    where all of them are strings.
+    @type limited: boolean
+    @param limited: whether to automatically filter based on FLU_DEBUG
+    """
+    if limited:
+        _log_handlers_limited.append(func)
+    else:
+        _log_handlers.append(func)
 
 def init():
     """
@@ -209,7 +217,7 @@ def init():
     if os.environ.has_key('FLU_DEBUG'):
         # install a log handler that uses the value of FLU_DEBUG
         setFluDebug(os.environ['FLU_DEBUG'])
-        addLogHandler(stderrHandlerLimited)
+    addLogHandler(stderrHandler, limited = True)
 
 def setFluDebug(string):
     """Set the FLU_DEBUG string.  This controls the log output."""
