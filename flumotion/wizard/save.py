@@ -117,8 +117,8 @@ class WizardSaver:
     def getVideoOverlay(self, show_logo):
         # At this point we already know that we should overlay something
         step = self.wizard['Overlay']
+        properties = step.get_component_properties()
         if show_logo:
-            properties = step.get_component_properties()
             properties['fluendo_logo'] = True
             encoding_options = self.wizard.get_step_options('Encoding')
             if (encoding_options['format'] == EncodingFormat.Ogg or
@@ -128,8 +128,6 @@ class WizardSaver:
             license_options = self.wizard.get_step_options('Content License')
             if license_options['license'] == LicenseType.CC:
                 properties['cc_logo'] = True
-        else:
-            properties = {}
             
         return Component('video-overlay', 'overlay', properties, step.worker)
         

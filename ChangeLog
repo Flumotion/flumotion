@@ -1,3 +1,9 @@
+2004-10-26  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/save.py:
+
+	Ensure width and height always is set.
+
 2004-10-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:
