@@ -157,7 +157,6 @@ flumotion/test/Makefile
 flumotion/tester/Makefile
 flumotion/twisted/Makefile
 flumotion/ui/Makefile
-flumotion/utils/Makefile
 flumotion/wizard/Makefile
 flumotion/worker/Makefile
 m4/Makefile

@@ -16,6 +16,7 @@ flumotion_PYTHON = \
 	keycards.py \
 	pygobject.py \
 	registry.py \
+	reload.py \
 	setup.py \
 	worker.py
 

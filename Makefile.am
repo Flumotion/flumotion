@@ -50,7 +50,6 @@ PYCHECKER_WHITELIST = \
 	    flumotion/worker/*.py 		\
 	    flumotion/twisted/*.py		\
 	    flumotion/ui/*.py			\
-	    flumotion/utils/*.py		\
 	    flumotion/component/*/*.py		\
 	    flumotion/component/*/*/*.py	\
 	    flumotion/admin/*/*.py		\

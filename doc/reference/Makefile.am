@@ -16,7 +16,6 @@ MODULE_FILES = $(shell cd $(top_srcdir) && ls		\
 	flumotion/configure/configure.py		\
 	flumotion/manager/*.py				\
 	flumotion/twisted/*.py				\
-	flumotion/utils/__init__.py			\
 	flumotion/worker/*.py				\
 	)
 

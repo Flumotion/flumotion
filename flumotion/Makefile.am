@@ -11,7 +11,6 @@ SUBDIRS = \
 	tester \
 	twisted \
 	ui \
-	utils \
 	wizard \
 	worker
 

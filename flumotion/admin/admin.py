@@ -38,7 +38,7 @@ from flumotion.twisted import flavors
 from flumotion.common import worker, component
 
 from flumotion.configure import configure
-from flumotion.utils import reload
+from flumotion.common import reload
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 
