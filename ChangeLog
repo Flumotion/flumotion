@@ -1,5 +1,11 @@
 2004-10-26  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/firewire/firewire.py:
+
+	proper width and height in here, avoids unnessacary and ugly scaling.
+
+2004-10-26  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/test/test_wizard.py:
 	* flumotion/wizard/save.py:
 	* flumotion/wizard/wizard.py:

@@ -49,7 +49,7 @@ def createComponent(config):
         interlaced_height = 288
         
     template = """dv1394src ! dvdec name=dec drop-factor=%(drop_factor)d ! video/x-raw-yuv,format=(fourcc)YUY2 !
-    videorate ! videoscale ! video/x-raw-yuv,width=%(interlaced_height)s,height=288 !
+    videorate ! videoscale ! video/x-raw-yuv,width=%(width)s,height=%(interlaced_height)s !
     videoscale ! video/x-raw-yuv,width=%(width)s,height=%(height)s,framerate=%(framerate)f,format=(fourcc)YUY2 ! @feeder::video@
     dec. ! audio/x-raw-int ! audiorate !
     audioscale ! audio/x-raw-int,rate=24000 ! @feeder::audio@""" % dict(drop_factor=drop_factor,
