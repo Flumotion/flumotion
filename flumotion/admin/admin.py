@@ -43,7 +43,7 @@ from flumotion.common import reload
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 
-from flumotion.common.pygobject import gsignal
+from flumotion.common.pygobject import gsignal, gproperty
 
 # FIXME: this is a Medium
 # FIXME: stop using signals, we can provide a richer interface with actual
@@ -65,6 +65,11 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     gsignal('reloading', str)
     gsignal('message', str)
     gsignal('update')
+
+    gproperty(bool, 'can-start-any', 'True if any component can be started',
+              False, construct=True)
+    gproperty(bool, 'can-stop-any', 'True if any component can be stopped',
+              False, construct=True)
     
     logCategory = 'adminmodel'
 

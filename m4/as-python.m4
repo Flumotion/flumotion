@@ -51,9 +51,10 @@ AC_DEFUN([AS_PATH_PYTHON],
 import sys, string
 minver = '$1'
 pyver = string.split(sys.version)[0]  # first word is version string
-# split strings by '.' and convert to numeric
-minver = map(string.atoi, string.split(minver, '.'))
-pyver = map(string.atoi, string.split(pyver, '.'))
+# split strings by '.'. just compare textually to allow for versions like
+# 2.4.1a0
+minver = string.split(minver, '.')
+pyver = string.split(pyver, '.')
 # we can now do comparisons on the two lists:
 if pyver >= minver:
 	sys.exit(0)

@@ -1,3 +1,20 @@
+2005-02-14  Andy Wingo  <wingo@pobox.com>
+
+	* m4/as-python.m4 (AS_PATH_PYTHON): Use textual comparison for
+	version parts, as some pythons have non-numeric micros (2.4.1a0
+	for example).
+
+	* flumotion/test/test_pygobject.py: Add a test for gsignal and
+	gproperty.
+
+	* flumotion/admin/admin.py (AdminModel): Add can-start-any and
+	can-stop-any properties using gproperty().
+
+	* flumotion/common/pygobject.py (gproperty): New function, adds a
+	property to the calling class. Will install
+	do_get_property/do_set_property implementations if they are not
+	already present.
+
 2005-02-14  Christian Schaller <christian at fluendo dot com>
 
 	* Add desktop file with icon for admin tool

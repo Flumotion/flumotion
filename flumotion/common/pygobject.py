@@ -93,3 +93,55 @@ def gsignal(name, *args):
         _dict = _locals['__gsignals__']
 
     _dict[name] = (gobject.SIGNAL_RUN_FIRST, None, args)
+
+def gproperty(type_, name, desc, *args, **kwargs):
+    """
+    Add a GObject property to the current object.
+    To be used from class definition scope.
+
+    @type type_: type object
+    @type name: string
+    @type desc: string
+    @type args: mixed
+    """
+    frame = sys._getframe(1)
+    _locals = frame.f_locals
+    flags = 0
+    
+    def _do_get_property(self, prop):
+        return self.__gproperties[prop]
+
+    def _do_set_property(self, prop, value):
+        self.__gproperties[prop] = value
+        
+    if not 'do_get_property' in _locals:
+        _locals['do_get_property'] = _do_get_property
+        _locals['__gproperties'] = {}
+    if not 'do_set_property' in _locals:
+        _locals['do_set_property'] = _do_set_property
+        _locals['__gproperties'] = {}
+    
+    if not '__gproperties__' in _locals:
+        _dict = _locals['__gproperties__'] = {}
+    else:
+        _dict = _locals['__gproperties__']
+    
+    for i in 'readable', 'writable':
+        if not i in kwargs:
+            kwargs[i] = True
+
+    for k, v in kwargs.items():
+        if k == 'construct':
+            flags |= gobject.PARAM_CONSTRUCT
+        elif k == 'construct_only':
+            flags |= gobject.PARAM_CONSTRUCT_ONLY
+        elif k == 'readable':
+            flags |= gobject.PARAM_READABLE
+        elif k == 'writable':
+            flags |= gobject.PARAM_WRITABLE
+        elif k == 'lax_validation':
+            flags |= gobject.PARAM_LAX_VALIDATION
+        else:
+            raise Exception('Invalid GObject property flag: %r=%r' % (k, v))
+
+    _dict[name] = (type_, name, desc) + args + tuple((flags,))
