@@ -3,9 +3,10 @@ INCLUDES = $(PYTHON_INCLUDES)
 flumotiondir = $(libdir)/flumotion/python/flumotion/utils
 
 flumotion_PYTHON = \
-	gstutils.py \
 	__init__.py \
-	log.py
+	gstutils.py \
+	log.py \
+	reload.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 
