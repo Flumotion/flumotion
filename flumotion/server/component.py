@@ -26,7 +26,6 @@ import gobject
 from twisted.internet import reactor
 from twisted.spread import pb
 
-from flumotion.server import interfaces
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
 
@@ -114,6 +113,7 @@ class BaseComponent(pb.Referenceable):
         #self.restart()
         
     def feed_state_change_cb(self, element, old, state, feed):
+        #print element, feed, gst.element_state_get_name(old), '->', gst.element_state_get_name(state)
         self.msg('state-changed %s %s' % (element.get_path_string(),
                                           gst.element_state_get_name(state)))
         self.callRemote('stateChanged', feed, state)
@@ -147,7 +147,9 @@ class BaseComponent(pb.Referenceable):
         if not self.pipeline:
             return
         
-        self.set_state_and_iterate(gst.STATE_NULL)
+        retval = self.pipeline.set_state(gst.STATE_NULL)
+        if not retval:
+            self.warn('Setting pipeline to NULL failed')
         
     def setup_feeds(self, feeds):
         if not self.pipeline:

@@ -159,6 +159,10 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         if self.controller.hasComponent(name):
             self.controller.removeComponent(self)
 
+    def stop(self):
+        cb = self.callRemote('stop')
+        cb.addErrback(lambda x: None)
+        
     def setState(self, element, property, value):
         if not element in self.options.elements:
             raise errors.PropertyError('not such an element: %s' % element)
@@ -176,7 +180,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         
         self.state = state
         if self.state == gst.STATE_PLAYING:
-            self.msg('%s is now playing' % feed)
+            self.msg('is now playing')
 
         if self.getFeeds():
             self.controller.startPendingComponents(self, feed)
@@ -536,6 +540,13 @@ class Controller(pb.Root):
         feedname = component.getName() + ':' + feed
         self.feed_manager.feedReady(feedname)
 
+    def stopComponent(self, component_name):
+        component = self.components[component_name]
+        component.stop()
+        
+    def shutdown(self):
+        map(self.stopComponent, self.components)
+        
 class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):

@@ -171,8 +171,6 @@ class FlumotionConfig(ConfigParser):
         if self.has_option(section, 'source'):
             kwargs['source'] = self.get(section, 'source')
             
-        print kwargs
-        
         config = registry.getComponent(kind)
         module = reflect.namedAny(config.source)
         if not hasattr(module, 'createComponent'):

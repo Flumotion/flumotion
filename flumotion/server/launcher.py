@@ -48,7 +48,8 @@ class MiniProtocol(NetstringReceiver):
     def stringReceived(self, line):
         if line == 'STOP':
             reactor.stop()
-
+            self.controller.shutdown()
+            
 class Launcher:
     def __init__(self, host, port):
         self.children = []
@@ -94,35 +95,32 @@ class Launcher:
             reactor.listenTCP(self.controller_port, factory)
             f = Factory()
             f.protocol = MiniProtocol
+            f.protocol.controller = factory.controller
             reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(), f)
 
-            try:
-                reactor.run(False)
-            except KeyboardInterrupt:
-                pass
+            #try:
+            reactor.run(False)
+            #except KeyboardInterrupt:
+            #    pass
             
             raise SystemExit
         self.controller_pid = pid
         
     def spawn(self, component, function=None, args=None):
-        pid = os.getpid()
         def exit_cb(*args):
+            print 'Shutting down', component.getName()
             self.msg('Stopping pipeline')
             component.pipeline_stop()
             raise SystemExit
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
         #signal.signal(signal.SIGINT, exit_cb)
-        reactor.connectTCP(self.controller_host,
-                           self.controller_port,
+        reactor.connectTCP(self.controller_host, self.controller_port,
                            component.factory)
         
-        try:
-            reactor.run(False)
-        except KeyboardInterrupt:
-            pass
-        component.pipeline_stop()
-
+        reactor.run(False)
+        
     def stop_controller(self):
         if not self.controller_pid:
             return
