@@ -1,3 +1,15 @@
+2004-06-26  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/controller.py (FeedManager.feedReady): Add
+	silly FIXME
+
+	* flumotion/server/streamer.py: Support client connecting logging,
+	including number of bytes sent to each client.
+
+	* flumotion/server/launcher.py: Start adding nice levels.
+
+	* flumotion/gui/adminclient.py (Window.update): Clean up
+
 2004-06-25  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/streamer.py: New streamers and stuff

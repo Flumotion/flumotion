@@ -33,8 +33,13 @@ from flumotion.server import component
 from flumotion.utils import gstutils
 
 class StreamingResource(resource.Resource):
-    def __init__(self, streamer):
+    def __init__(self, streamer, location):
         resource.Resource.__init__(self)
+        if location:
+            self.logfile = file(location, 'a')
+        else:
+            self.logfile = None
+            
         self.streamer = streamer
         self.streamer.connect('data-received', self.data_received_cb)
         self.msg = streamer.msg
@@ -44,6 +49,7 @@ class StreamingResource(resource.Resource):
 
         self.first_buffer = None
         self.caps_buffers = []
+        self.bytes_sent = {}
         
         reactor.callLater(0, self.bufferWrite)
 
@@ -61,7 +67,13 @@ class StreamingResource(resource.Resource):
     def bufferWrite(self, *args):
         for buffer in self.buffer_queue:
             for request in self.current_requests:
+                try:
+                    fd = request.transport.fileno()
+                    self.bytes_sent[fd] += len(buffer)
+                except NotImplementedError:
+                    pass
                 request.write(buffer)
+                
         self.buffer_queue = []
             
         reactor.callLater(0.01, self.bufferWrite)
@@ -69,9 +81,17 @@ class StreamingResource(resource.Resource):
     def getChild(self, path, request):
         return self
 
-    def lost(self, obj, request):
-        self.msg('client from %s disconnected' % request.getClientIP()) 
+    def log(self, msg):
+        self.msg(msg)
+        if self.logfile:
+            timestamp = time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime())
+            self.logfile.write('%s %s\n' % (timestamp, msg))
+            self.logfile.flush()
+        
+    def lost(self, obj, request, fd, ip):
+        self.log('client from %s disconnected (%d bytes sent)' % (ip, self.bytes_sent[fd]))
         self.current_requests.remove(request)
+        del self.bytes_sent[fd]
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -85,7 +105,8 @@ class StreamingResource(resource.Resource):
         return True
         
     def render(self, request):
-        self.msg('client from %s connected' % request.getClientIP())   
+        ip = request.getClientIP()
+        self.log('client from %s connected' % ip)
         if not self.isReady():
             self.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
@@ -104,8 +125,10 @@ class StreamingResource(resource.Resource):
         for buffer in self.caps_buffers:
             request.write(buffer)
             
+        fd = request.transport.fileno()
+        self.bytes_sent[fd] = 0
         self.current_requests.append(request)
-        request.notifyFinish().addBoth(self.lost, request)
+        request.notifyFinish().addBoth(self.lost, request, fd, ip)
         
         return server.NOT_DONE_YET
 

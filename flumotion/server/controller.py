@@ -305,6 +305,10 @@ class FeedManager:
         # If we don't specify the feed
         log.msg('controller', '=%s= ready' % (feedname))
 
+        if not self.feeds.has_key(feedname):
+            log.msg('FIXME: no feed called: %s' % feedname)
+            return
+        
         feed = self.feeds[feedname]
         feed.setReady()
             

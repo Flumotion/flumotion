@@ -90,6 +90,17 @@ class Launcher:
     def msg(self, *args):
         log.msg('launcher', *args)
 
+    def set_nice(self, nice):
+        if not nice:
+            return
+
+        try:
+            os.nice(nice)
+        except OSError, e:
+            self.msg('Failed to set nice level: %s' % str(e))
+        else:
+            self.msg('Nice level set to %d' % nice)
+        
     def start_controller(self, port):
         pid = os.fork()
         if not pid:
@@ -133,9 +144,10 @@ class Launcher:
             pass
         component.pipeline_stop()
 
-    def start(self, component, nice = 0):
+    def start(self, component, nice):
         pid = os.fork()
         if not pid:
+            self.set_nice(nice)
             set_proc_text('flumotion [%s]' % component.component_name)
             self.spawn(component)
             raise SystemExit
@@ -145,13 +157,11 @@ class Launcher:
                      component.getKind(),
                      pid))
             self.children.append(pid)
-            if nice:
-                self.msg('Renicing with %d' % nice)
-                os.nice (nice)
 
-    def start_streamer(self, component, factory, port):
+    def start_streamer(self, component, factory, port, nice):
         pid = os.fork()
         if not pid:
+            self.set_nice(nice)
             set_proc_text('flumotion [%s]' % component.component_name)
             reactor.listenTCP(port, factory)
             self.spawn(component)
@@ -227,11 +237,16 @@ class Launcher:
                     sources = c.get(section, 'sources').split(',')
             else:
                 sources = []
+
+            if c.has_option(section, 'nice'):
+                nice = c.getint(section, 'nice')
+            else:
+                nice = 0
                 
             if kind == 'producer':
-                self.start(Producer(name, sources, feeds, pipeline))
+                self.start(Producer(name, sources, feeds, pipeline), nice)
             elif kind == 'converter':
-                self.start(Converter(name, sources, feeds, pipeline), nice=5)
+                self.start(Converter(name, sources, feeds, pipeline), nice)
             elif kind == 'streamer':
                 assert c.has_option(section, 'protocol')
                 protocol = c.get(section, 'protocol')
@@ -239,12 +254,17 @@ class Launcher:
                 if protocol == 'http':
                     assert c.has_option(section, 'port')
                     port = c.getint(section, 'port')
+                    if c.has_option(section, 'logfile'):
+                        logfile = c.get(section, 'logfile')
+                    else:
+                        logfile = None
+
                     #component = streamer.MultifdSinkStreamer(name, sources)
                     #factory = server.Site(resource=streamer.NewStreamingResource(component))
                     component = streamer.FakeSinkStreamer(name, sources)
-                    factory = server.Site(resource=streamer.StreamingResource(component))
+                    factory = server.Site(resource=streamer.StreamingResource(component, logfile))
                     self.msg('Starting http factory at port %d' % port)
-                    self.start_streamer(component, factory, port)
+                    self.start_streamer(component, factory, port, nice)
                 elif protocol == 'file':
                     assert c.has_option(section, 'location')
                     location = c.get(section, 'location')
@@ -252,7 +272,7 @@ class Launcher:
                         port = c.getint(section, 'port')
                     else:
                         port = None
-                    self.start(streamer.FileSinkStreamer(name, sources, location, port))
+                    self.start(streamer.FileSinkStreamer(name, sources, location, port), nice)
                 else:
                     raise AssertionError, "unknown protocol: %s" % protocol
             else:

@@ -119,12 +119,10 @@ class Window:
         for client in clients:
             iter = model.append()
             model.set(iter, 0, client.name)
-            pid = client.options.get('pid', -1)
-            model.set(iter, 1, pid)
-            state_name = gst.element_state_get_name(client.state)
-            model.set(iter, 2, state_name)
-            model.set(iter, 3, client.options.get('ip', '?'))
-            
+            model.set(iter, 1, client.options['pid'])
+            model.set(iter, 2, gst.element_state_get_name(client.state))
+            model.set(iter, 3, client.options['ip'])
+
     def connect(self, host, port):
         self.admin = AdminInterface()
         self.admin.connect('connected', self.connected_cb)
