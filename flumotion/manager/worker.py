@@ -87,9 +87,6 @@ class WorkerHeaven(pb.Root):
         self.conf = None
         
     def getAvatar(self, avatarID):
-        if not self.conf.hasWorker(avatarID):
-            raise errors.AlreadyConnectedError(avatarID)
-            
         avatar = WorkerAvatar(self, avatarID)
         self.avatars[avatarID] = avatar
         return avatar
@@ -102,27 +99,30 @@ class WorkerHeaven(pb.Root):
         self.conf = FlumotionConfigXML(filename)
 
     def getEntries(self, worker):
+        retval = []
         if not self.conf:
-            return []
+            return retval
         
-        workers = [worker for worker in self.conf.getWorkers()
-                              if not worker or worker != worker.getName()]
-        return workers
+        for entry in self.conf.entries.values():
+            entry_worker = entry.getWorker()
+            if entry_worker and entry_worker != worker.getName():
+                continue
+            retval.append(entry)
+        return retval
     
     def workerAttached(self, worker):
         entries = self.getEntries(worker)
-        worker_name = worker.getName()
         for entry in entries:
             name = entry.getName()
-            log.debug('config', 'Starting component: %s on %s' % (name, worker_name))
+            log.debug('config', 'Starting component: %s' % name)
             dict = entry.getConfigDict()
             
             if dict.has_key('config'):
                 del dict['config'] # HACK
 
-            self.start(name, entry.getType(), dict, worker_name)
+            worker.start(name, entry.getType(), dict)
             
-    def start(self, name, type, config, worker):
+    def start(self, name, type, config, worker=None):
         if not self.avatars:
             raise AttributeError
 

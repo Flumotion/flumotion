@@ -29,17 +29,30 @@ from flumotion.utils import log
 class ConfigError(Exception):
     pass
 
-class ConfigEntryComponent(log.Loggable):
-    "I represent a <component> entry in a registry file"
+class ConfigEntry(log.Loggable):
     nice = 0
     logCategory = 'config'
-    def __init__(self, name, type, config, defs, worker):
+    def __init__(self, name, type, config, defs):
         self.name = name
         self.type = type
         self.config = config
         self.defs = defs
-        self.worker = worker
+        self.worker = None
         
+    def getModule(self):
+        source = self.defs.getSource()
+        self.info('Loading %s' % source)
+        try:
+            module = reflect.namedAny(source)
+        except ValueError:
+            raise ConfigError("%s source file could not be found" % source)
+        
+        if not hasattr(module, 'createComponent'):
+            self.warning('no createComponent() for %s' % source)
+            return
+        
+        return module
+    
     def getType(self):
         return self.type
     
@@ -51,28 +64,14 @@ class ConfigEntryComponent(log.Loggable):
 
     def getWorker(self):
         return self.worker
-
-    # XXX: kill this codex
+    
     def getComponent(self):
-        defs = self.defs
-        dict = self.config
-        
         # Setup files to be transmitted over the wire. Must be a
         # better way of doing this.
-        source = defs.getSource()
-        self.info('Loading %s' % source)
-        try:
-            module = reflect.namedAny(source)
-        except ValueError:
-            raise ConfigError("%s source file could not be found" % source)
-        
-        if not hasattr(module, 'createComponent'):
-            self.warning('no createComponent() for %s' % source)
-            return
-        
+        module = self.getModule()
         dir = os.path.split(module.__file__)[0]
         files = {}
-        for file in defs.getFiles():
+        for file in self.defs.getFiles():
             filename = os.path.basename(file.getFilename())
             real = os.path.join(dir, filename)
             files[real] = file
@@ -84,38 +83,20 @@ class ConfigEntryComponent(log.Loggable):
         # we're going to listen to ports and other stuff which should
         # be separated from the main process.
 
+        dict = self.getConfigDict()
         component = module.createComponent(dict)
         component.setFiles(files)
         return component
 
     def startFactory(self):
         return self.config.get('start-factory', True)
-
-class ConfigEntryWorker:
-    "I represent a <worker> entry in a registry file"
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-
-    def getUsername(self):
-        return self.username
-    
-class ConfigEntryWorkers:
-    "I represent a <workers> entry in a registry file"
-    def __init__(self, workers, policy):
-        self.workers = workers
-        self.policy = policy
-
-    def getWorkers(self):
-        self.workers
     
 class FlumotionConfigXML(log.Loggable):
     logCategory = 'config'
 
     def __init__(self, filename):
         self.entries = {}
-        self.workers = []
-        
+    
         self.debug('Loading configuration file `%s\'' % filename)
         self.doc = minidom.parse(filename)
         self.path = os.path.split(filename)[0]
@@ -133,21 +114,10 @@ class FlumotionConfigXML(log.Loggable):
     def getEntryType(self, name):
         entry = self.entries[name]
         return entry.getType()
-
-    def getWorkers(self):
-        return self.workers
-
-    def hasWorker(self, name):
-        for worker in self.workers:
-            if worker.getUsername() == name:
-                return True
-
-        return False
     
     def parse(self):
         # <root>
         #     <component>
-        #     <workers>
         # </root>
 
         root = self.doc.documentElement
@@ -158,31 +128,23 @@ class FlumotionConfigXML(log.Loggable):
             if node.nodeType != Node.ELEMENT_NODE:
                 continue
             if node.nodeName == 'component':
-                entry = self.parse_component(node)
+                entry = self.parse_entry(node)
                 if entry is not None:
                     self.entries[entry.getName()] = entry
-            elif node.nodeName == 'workers':
-                entry = self.parse_workers(node)
-                self.workers = entry
             else:
-                raise ConfigError, "unexpected node: %s" % child
+                raise XmlParserError, "unexpected node: %s" % child
             
-    def parse_component(self, node):
-        # <component name="..." type="..." worker="">
+    def parse_entry(self, node):
+        # <component name="..." type="...">
         #     ...
         # </component>
-        
         if not node.hasAttribute('name'):
-            raise ConfigError, "<component> must have a name attribute"
+            raise XmlParserError, "<component> must have a name attribute"
         if not node.hasAttribute('type'):
-            raise ConfigError, "<component> must have a type attribute"
+            raise XmlParserError, "<component> must have a type attribute"
 
         type = str(node.getAttribute('type'))
         name = str(node.getAttribute('name'))
-
-        worker = None
-        if not node.hasAttribute('worker'):
-            worker = str(node.getAttribute('worker'))
 
         try:
             defs = registry.getComponent(type)
@@ -200,40 +162,7 @@ class FlumotionConfigXML(log.Loggable):
                    'start-factory': defs.isFactory() }
         config.update(options)
 
-        return ConfigEntryComponent(name, type, config, defs, worker)
-
-    def parse_workers(self, node):
-        # <workers policy="password/anonymous">
-        #     <worker name="..." password=""/>
-        # </workers>
-
-        if not node.hasAttribute('policy'):
-            raise ConfigError, "<workers> must have a policy attribute"
-
-        policy = str(node.getAttribute('policy'))
-        
-        workers = []
-        for child in node.childNodes:
-            if (child.nodeType == Node.TEXT_NODE or
-                child.nodeType == Node.COMMENT_NODE):
-                continue
-            
-            if child.nodeName != "worker":
-                raise ConfigError, "unexpected node: %s" % child
-        
-            if not child.hasAttribute('username'):
-                raise ConfigError, "<worker> must have a username attribute"
-
-            if not child.hasAttribute('password'):
-                raise ConfigError, "<worker> must have a password attribute"
-
-            username = str(child.getAttribute('username'))
-            password = str(child.getAttribute('password'))
-
-            worker = ConfigEntryWorker(username, password)
-            workers.append(worker)
-
-        return ConfigEntryWorkers(workers, policy)
+        return ConfigEntry(name, type, config, defs)
 
     def get_float_value(self, nodes):
         return [float(subnode.childNodes[0].data) for subnode in nodes]

@@ -1,10 +1,4 @@
 <root>
-  <workers policy="password">
-    <worker username="johan" password="johan-pass" default="true"/>
-    <worker username="thomas" password="thomas-pass"/>
-    <worker username="thread" password="thread-pass"/>
-    <worker username="tee" password="tee-pass"/>
-  </workers>
   
   <component name="videotest-producer" type="videotest">
     <width>320</width>
@@ -24,12 +18,11 @@
   <component name="jpeg+multipart-clean" type="multipartjpeg">
     <source>videotest-producer</source>
   </component>
-<!--
+
   <component name="auth-1" type="htpasswd-auth">
     <filename>/home/jdahlin/htpasswd</filename>
     <auth-type>crypt</auth-type>
   </component>
--->
 
   <component name="http-video" type="http-streamer">
     <source>jpeg+multipart</source>
@@ -38,7 +31,7 @@
 -->
     <port>8803</port>
     <logfile>/tmp/videotestsrc_access.log</logfile>
-<!--    <auth>auth-1</auth> -->
+    <auth>auth-1</auth>
     <maxclients>1</maxclients>
   </component>
 

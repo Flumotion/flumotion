@@ -44,9 +44,6 @@ class AlreadyConnectedError(pb.Error):
 class NoPerspectiveError(pb.Error):
     "The component does not have a perspective"
     
-class AccessDeniedError(pb.Error):
-    "Access was denied"
-    
 class SystemError(pb.Error):
     "A system error, is usually fatal"
 
