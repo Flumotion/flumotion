@@ -18,7 +18,9 @@
              size="7195007" md5sum="70ada9f65742ab2c77a96bcd6dffd9b1" />
   </tarball>
 
-  <cvsmodule id="gstreamer" cvsroot="gstreamer.freedesktop.org" autogenargs="--disable-plugin-builddir --disable-tests">
+  <cvsmodule id="gstreamer" cvsroot="gstreamer.freedesktop.org"
+             autogenargs="--disable-plugin-builddir --disable-tests"
+             revision="RELEASE-0_8_6">
   </cvsmodule>
 
   <cvsmodule id="gst-plugins" cvsroot="gstreamer.freedesktop.org">
@@ -27,13 +29,7 @@
     </dependencies>
   </cvsmodule>
 
-  <cvsmodule id="gst-ffmpeg" cvsroot="gstreamer.freedesktop.org">
-    <dependencies>
-      <dep package="gstreamer" />
-    </dependencies>
-  </cvsmodule>
-
-  <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_3_96">
+  <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_4_0">
 <!--
   <cvsmodule id="pygtk" cvsroot="gnome.org">
 -->
@@ -47,11 +43,14 @@
     </dependencies>
   </cvsmodule>
 
+<!--
   <svnmodule id="flumotion" svnroot="svn.fluendo.com" 
    module="flumotion/trunk" checkoutdir="flumotion">
+-->
+  <svnmodule id="flumotion" svnroot="svn.fluendo.com" 
+   module="flumotion/tags/flumotion-0.0.1" checkoutdir="flumotion">
     <dependencies>
       <dep package="gst-python" />
-      <dep package="gst-ffmpeg" />
     </dependencies>
   </svnmodule>
 
