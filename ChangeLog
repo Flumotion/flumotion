@@ -1,5 +1,23 @@
 2004-09-16  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/common/config.py: 
+	Add basic support for <workers> and <worker> and worker on component
+
+	* flumotion/admin/admin.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/cred.py:
+	* flumotion/twisted/pbutil.py:
+
+	Deprecate pbutil.ReallyAllowAnonymousAcces and replace it by
+	cred.FlexibleCredentials, for which we can turn on/off anonymous
+	access whenever we want.
+	
+2004-09-16  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/worker/job.py:
 	* flumotion/worker/report.py:
 	* flumotion/worker/worker.py:
