@@ -17,6 +17,8 @@ workers:
   - others are chained to the parent's (FlexibleCredentialsChecker)
     requestAvatarId, which currently allows anonymous 
 
+new system:
+
 IMPLEMENTATION
 --------------
 Credentials(twisted):

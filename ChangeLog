@@ -1,3 +1,10 @@
+2004-10-17  Wim Taymans  <wim@fluendo.com>
+
+	* doc/random/authentication:
+	* flumotion/manager/component.py:
+	Added some FIXMEs.
+	Moved callback function.
+
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:

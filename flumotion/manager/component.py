@@ -275,7 +275,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
 
     # general fallback for unhandled errors so we detect them
     # FIXME: we can't use this since we want a PropertyError to fall through
-    # afger going through the PropertyErrback.
+    # after going through the PropertyErrback.
     def _mindErrback(self, failure, *ignores):
         if ignores:
             if failure.check(*ignores):
@@ -487,13 +487,6 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         cb = self._mindCallRemote('callMethod', method, *args, **kwargs)
         cb.addErrback(self._mindErrback, Exception)
         return cb
-        
-    def _reloadComponentErrback(self, failure):
-        import exceptions
-        failure.trap(errors.ReloadSyntaxError)
-        self.warning(failure.getErrorMessage())
-        print "Ignore the following Traceback line, issue in Twisted"
-        return failure
 
     def reloadComponent(self):
         """
@@ -501,6 +494,13 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
+        def _reloadComponentErrback(self, failure):
+            import exceptions
+            failure.trap(errors.ReloadSyntaxError)
+            self.warning(failure.getErrorMessage())
+            print "Ignore the following Traceback line, issue in Twisted"
+            return failure
+
         cb = self._mindCallRemote('reloadComponent')
         cb.addErrback(self._reloadComponentErrback)
         cb.addErrback(self._mindErrback, errors.ReloadSyntaxError)
@@ -542,6 +542,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         cb.addErrback(self._mindErrback)
         return cb
     
+    # FIXME rename to something that reflects an action, like startFeedIfReady
     def checkFeedReady(self, feedName):
         # check if the given feed is ready to start, and start it if it is
         self.info('checkFeedReady: feedName %s' % feedName)
@@ -787,6 +788,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         componentAvatar.debug('Starting, asking component to link with eatersData %s and feedersData %s' % (eatersData, feedersData))
         componentAvatar.link(eatersData, feedersData)
 
+    # FIXME: better name startComponentIfReady
     def checkComponentStart(self, componentAvatar):
         """
         Check if the component can start up, and start it if it can.
