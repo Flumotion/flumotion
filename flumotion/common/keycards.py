@@ -47,11 +47,20 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         self.avatarId = None            # avatarId prefered by requester
         self.id = None                  # set by bouncer when authenticated
         self.duration = 0               # means unlimited
+        self.domain = None              # requester can pass this to bouncer
         self.state = REQUESTING
 
+    def setDomain(self, domain):
+        """
+        Set the domain of the requester on the keycard.
+
+        @type domain: string
+        """
+        self.domain = domain
+
     def __repr__(self):
-        
-        return "<%s in state %s>" % (self.__class__.__name__, _statesEnum[self.state])
+        return "<%s in state %s>" % (self.__class__.__name__,
+            _statesEnum[self.state])
 
 # class KeycardUACCP: username, address, crypt password
 #       from UsernameCryptPasswordCrypt

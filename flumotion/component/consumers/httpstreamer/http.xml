@@ -22,6 +22,7 @@
         <property name="maxclients" type="int"/>
         <property name="bouncer" type="string"/>
         <property name="mount_point" type="string"/>
+        <property name="domain" type="string"/>
       </properties>
     </component>
   </components>

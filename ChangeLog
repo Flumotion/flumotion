@@ -1,3 +1,16 @@
+2005-03-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/keycards.py:
+	  allow setting a domain on a keycard
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  allow a "domain" keyword in config
+	  set it on keycards
+	  use it in HTTP auth challenge
+	* flumotion/test/test_http.py:
+	  finally fix the test marked skip for unauthorized
+
 2005-03-08  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/wizard.py (Wizard.set_page): Remove the

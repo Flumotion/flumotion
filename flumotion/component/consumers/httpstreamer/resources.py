@@ -176,8 +176,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self._fdToKeycard = {}      # request fd -> Keycard
         self._idToKeycard = {}      # keycard id -> Keycard
         self._fdToDurationCall = {} # request fd -> IDelayedCall for duration
+        self._domain = None         # used for auth challenge and on keycard
         self.bouncerName = None
-        self.auth = None
         
         self.maxclients = -1
         
@@ -195,6 +195,15 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         
     def setLogfile(self, logfile):
         self.logfile = open(logfile, 'a')
+
+    def setDomain(self, domain):
+        """
+        Set a domain name on the resource, used in HTTP auth challenges and
+        on the keycard.
+        
+        @type domain: string
+        """
+        self._domain = domain
         
     def logWrite(self, fd, ip, request, stats):
 
@@ -236,9 +245,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             return
         self.logfile.write(msg)
         self.logfile.flush()
-
-    def setAuth(self, auth):
-        self.auth = auth
 
     def setMaxClients(self, maxclients):
         self.info('setting maxclients to %d' % maxclients)
@@ -325,6 +331,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         self.debug('Asking for authentication, user %s, password %s, ip %s' % (
             keycard.username, keycard.password, keycard.address))
+        keycard.setDomain(self._domain)
         return self.streamer.medium.authenticate(self.bouncerName, keycard)
 
     def _addClient(self, request):
@@ -447,9 +454,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.debug('client from %s is unauthorized' % (request.getClientIP()))
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_VERSION)
-        if self.auth:
+        # FIXME: let domain be specifiable from config
+        if self._domain:
             request.setHeader('WWW-Authenticate',
-                              'Basic realm="%s"' % self.auth.getDomain())
+                              'Basic realm="%s"' % self._domain)
             
         error_code = http.UNAUTHORIZED
         request.setResponseCode(error_code)
@@ -533,8 +541,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 self._idToKeycard[keycard.id] = keycard
 
             if keycard.duration:
-                self.debug('new connection on %d will be expired in %f seconds' % (fd, keycard.duration))
-                self._fdToDurationCall[fd] = reactor.callLater(keycard.duration, self._durationCallLater, fd)
+                self.debug('new connection on %d will expire in %f seconds' % (
+                    fd, keycard.duration))
+                self._fdToDurationCall[fd] = reactor.callLater(
+                    keycard.duration, self._durationCallLater, fd)
 
             self._handleNewClient(request)
 

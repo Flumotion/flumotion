@@ -386,4 +386,7 @@ def createComponent(config):
     if config.has_key('bouncer'):
         resource.setBouncerName(config['bouncer'])
 
+    if config.has_key('domain'):
+        resource.setDomain(config['domain'])
+
     return component

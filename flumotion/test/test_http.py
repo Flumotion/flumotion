@@ -19,6 +19,7 @@
 # Headers in this file shall remain intact.
 
 from twisted import protocols
+from twisted.internet import defer
 from twisted.python import components
 from twisted.trial import unittest
 from twisted.web import server
@@ -55,6 +56,7 @@ class FakeRequest:
         self.__dict__.update(kwargs)
         self.headers = {}
         self.response = -1
+        self.data = ""
 
         self.user = "fakeuser"
         self.passwd = "fakepasswd"
@@ -66,6 +68,9 @@ class FakeRequest:
     def setHeader(self, field, value):
         self.headers[field] = value
             
+    def write(self, text): self.data = self.data + text
+    def finish(self): pass
+
     getUser = lambda s: s.user
     getPassword = lambda s: s.passwd
     getClientIP = lambda s: s.ip
@@ -74,69 +79,78 @@ class FakeStreamer:
     caps = None
     mime = 'application/octet-stream'
     
+    def __init__(self):
+        self.medium = FakeMedium()
+
     def get_content_type(self): return self.mime
     def add_client(self, fd): pass
     def connect(self, *args): pass
     def debug(self, *args): pass
     def getName(self): return "fakestreamer"
 
-class FakeAuth:
-    def __init__(self, response):
-        self.response = response
-    def authenticate(self, *args): return self.response
-    def getDomain(self): return 'FakeDomain'
+class FakeMedium:
+    # this medium just pretends that all authentication requests fail
+    def authenticate(self, bouncerName, keycard): return defer.succeed(None)
 
 class TestHTTPStreamingResource(unittest.TestCase):
     def testRenderNotReady(self):
         streamer = FakeStreamer()
         resource = resources.HTTPStreamingResource(streamer)
-        assert not resource.isReady()
+        self.failIf(resource.isReady())
         status = resource.render(FakeRequest(ip=''))
-        assert status == server.NOT_DONE_YET
+        self.assertEquals(status,  server.NOT_DONE_YET)
 
     def testRenderReachedMaxClients(self):
         streamer = FakeStreamer()
         resource = resources.HTTPStreamingResource(streamer)
-        assert not resource.isReady()
+        self.failIf(resource.isReady())
         streamer.caps = True
-        assert resource.isReady()
+        self.failUnless(resource.isReady())
         
         #assert resource.maxAllowedClients() == 974
         resource._requests = ' ' * (resource.maxAllowedClients() + 1)
         
-        assert resource.reachedMaxClients()
+        self.failUnless(resource.reachedMaxClients())
         
         request = FakeRequest(ip='127.0.0.1')
         data = resource.render(request)
         error_code = protocols.http.SERVICE_UNAVAILABLE
-        assert request.headers.get('content-type', '') == 'text/html'
-        assert request.headers.get('server', '') == resources.HTTP_VERSION
-        assert request.response == error_code
+        self.assertEquals(request.headers.get('content-type', ''), 'text/html')
+        self.assertEquals(request.headers.get('server', ''),
+            resources.HTTP_VERSION)
+        self.assertEquals(request.response, error_code)
 
-        expected = resources.ERROR_TEMPLATE % {'code': error_code,
-                                               'error': protocols.http.RESPONSES[error_code]}
-        assert data == expected
+        expected = resources.ERROR_TEMPLATE % {
+            'code': error_code,
+            'error': protocols.http.RESPONSES[error_code]}
+        self.assertEquals(data,  expected)
 
     def testRenderUnauthorized(self):
         streamer = FakeStreamer()
         resource = resources.HTTPStreamingResource(streamer)
-        resource.setAuth(FakeAuth(False))
+        resource.setBouncerName('fakebouncer')
+        resource.setDomain('FakeDomain')
         
         streamer.caps = True
-        assert resource.isReady()
+        self.failUnless(resource.isReady())
         
         request = FakeRequest(ip='127.0.0.1')
-        data = resource.render(request)
+        d = resource.authenticate(request)
+        d.addCallback(resource._authenticatedCallback, request)
+        keycard = unittest.deferredResult(d)
+        # keycard should be False if not authed
+        self.failIf(keycard)
 
         error_code = protocols.http.UNAUTHORIZED
-        assert request.headers.get('content-type', '') == 'text/html'
-        assert request.headers.get('server', '') == resources.HTTP_VERSION
-        assert request.response == error_code
+        self.assertEquals(request.headers.get('content-type', ''), 'text/html')
+        self.assertEquals(request.headers.get('server', ''),
+            resources.HTTP_VERSION)
+        self.assertEquals(request.response, error_code)
         
-        expected = resources.ERROR_TEMPLATE % {'code': error_code,
-                                               'error': protocols.http.RESPONSES[error_code]}
-        assert data == expected
-    testRenderUnauthorized.skip = "Thomas needs to update this"
+        expected = resources.ERROR_TEMPLATE % {
+            'code': error_code,
+            'error': protocols.http.RESPONSES[error_code]}
+        self.assertEquals(request.data, expected)
     
     def testRenderNew(self):
         streamer = FakeStreamer()
@@ -146,7 +160,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         
         request = FakeRequest(ip='127.0.0.1')
         data = resource.render(request)
-        assert server.NOT_DONE_YET
+        self.failUnless(server.NOT_DONE_YET)
         
         #assert request.headers['Server'] == HTTP_VERSION
         #assert request.headers['Date'] == 'FakeDate'
