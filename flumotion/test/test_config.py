@@ -60,7 +60,7 @@ class TestConfig(unittest.TestCase):
         conf = config.FlumotionConfigXML(None,
              """
              <planet>
-               <flow>
+               <flow name="default">
                  <component name="component-name" type="test-component"/>
                </flow>
              </planet>
@@ -111,7 +111,7 @@ class TestConfig(unittest.TestCase):
 
     def testParseComponentError(self):
         xml = """<planet>
-            <flow><component name="unused" type="not-existing"/></flow>
+            <flow name="default"><component name="unused" type="not-existing"/></flow>
             </planet>"""
         self.assertRaises(errors.UnknownComponentError,
             config.FlumotionConfigXML, None, xml)
@@ -151,7 +151,7 @@ class TestConfig(unittest.TestCase):
 
     def testParseProperties(self):
         planet = config.FlumotionConfigXML(None,
-             """<planet><flow>
+             """<planet><flow name="default">
              <component name="component-name" type="test-component">
                <one>string</one>
                <two>1</two>
@@ -181,7 +181,7 @@ class TestConfig(unittest.TestCase):
                <atmosphere>
                  <component name="atmocomp" type="test-component"/>
                </atmosphere>
-               <flow>
+               <flow name="default">
                  <component name="flowcomp" type="test-component"/>
                </flow>
              </planet>
