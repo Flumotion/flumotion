@@ -1,3 +1,10 @@
+2004-08-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* data/Makefile.am:
+	* flumotion/Makefile.am:
+	  fix build
+
 2004-08-05  Johan Dahlin  <johan@gnome.org>
 
 	* conf/*.conf: Move to conf/historic

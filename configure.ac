@@ -53,7 +53,9 @@ bin/video-server-admin
 bin/Makefile
 data/Makefile
 data/ui/Makefile
+data/registry/Makefile
 flumotion/Makefile
+flumotion/components/Makefile
 flumotion/config/Makefile
 flumotion/config/installed.py
 flumotion/config/uninstalled.py
