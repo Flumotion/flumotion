@@ -30,7 +30,7 @@ from twisted.internet import reactor
 from twisted.spread import pb
 from twisted.python import failure
 
-from flumotion.manager import common
+from flumotion.manager import base
 from flumotion.common import errors, interfaces, log
 from flumotion.common.registry import registry
 
@@ -38,7 +38,7 @@ from flumotion.common.registry import registry
 from flumotion.twisted import flavors
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?
-class AdminAvatar(common.ManagerAvatar):
+class AdminAvatar(base.ManagerAvatar):
     """
     I am an avatar created for an administrative client interface.
     A reference to me is given (for example, to gui.AdminInterface)
@@ -50,13 +50,13 @@ class AdminAvatar(common.ManagerAvatar):
     # override base methods
     def attached(self, mind):
         self.info('admin client "%s" logged in' % self.avatarId)
-        common.ManagerAvatar.attached(self, mind)
+        base.ManagerAvatar.attached(self, mind)
         self.mindCallRemote('initial', self.getComponentStates(),
             self.vishnu.workerHeaven.state)
 
     def detached(self, mind):
         self.info('admin client "%s" logged out' % self.avatarId)
-        common.ManagerAvatar.detached(self, mind)
+        base.ManagerAvatar.detached(self, mind)
     
 
     # FIXME: instead of doing this, give a RemoteCache of the heaven state ?
@@ -64,9 +64,9 @@ class AdminAvatar(common.ManagerAvatar):
         """
         Return all component states logged in to the manager.
         The list gets serialized to a list of
-        L{flumotion.common.component.AdminComponentState}
+        L{flumotion.base.component.AdminComponentState}
         
-        @rtype: C{list} of L{flumotion.common.component.ManagerComponentState}
+        @rtype: C{list} of L{flumotion.base.component.ManagerComponentState}
         """
         states = []
         for avatar in self.vishnu.componentHeaven.avatars.values():
@@ -222,7 +222,7 @@ class AdminAvatar(common.ManagerAvatar):
     def _reloaded(self):
         self.info('reloaded manager code')
 
-class AdminHeaven(common.ManagerHeaven):
+class AdminHeaven(base.ManagerHeaven):
     """
     I interface between the Manager and administrative clients.
     For each client I create an L{AdminAvatar} to handle requests.
@@ -238,7 +238,7 @@ class AdminHeaven(common.ManagerHeaven):
         @type vishnu: L{flumotion.manager.manager.Vishnu}
         @param vishnu: the Vishnu in control of all the heavens
         """
-        common.ManagerHeaven.__init__(self, vishnu)
+        base.ManagerHeaven.__init__(self, vishnu)
         #FIXME: don't add a log handler here until we have a good way
         #of filtering client-side again
         #log.addLogHandler(self.logHandler)

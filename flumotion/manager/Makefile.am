@@ -5,7 +5,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/manager
 flumotion_PYTHON =	\
 	__init__.py	\
 	admin.py	\
-	common.py	\
+	base.py		\
 	component.py	\
 	main.py		\
 	manager.py	\

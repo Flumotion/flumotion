@@ -29,11 +29,11 @@ import socket
 from twisted.spread import pb
 
 # FIXME: rename to base
-from flumotion.manager import common as mcommon
+from flumotion.manager import base
 from flumotion.common import errors, interfaces, log
 from flumotion.common import config, worker
 
-class WorkerAvatar(mcommon.ManagerAvatar):
+class WorkerAvatar(base.ManagerAvatar):
     """
     I am an avatar created for a worker.
     A reference to me is given when logging in and requesting a worker avatar.
@@ -46,12 +46,12 @@ class WorkerAvatar(mcommon.ManagerAvatar):
 
     def attached(self, mind):
         self.info('worker "%s" logged in' % self.getName())
-        mcommon.ManagerAvatar.attached(self, mind)
+        base.ManagerAvatar.attached(self, mind)
         self.heaven.workerAttached(self)
 
     def detached(self, mind):
         self.info('worker "%s" logged out' % self.getName())
-        mcommon.ManagerAvatar.detached(self, mind)
+        base.ManagerAvatar.detached(self, mind)
         # FIXME: rename heaven methods to avatarDetached, move to base ?
         self.heaven.workerDetached(self)
     
@@ -70,7 +70,7 @@ class WorkerAvatar(mcommon.ManagerAvatar):
             config))
         return self.mindCallRemote('start', name, type, config, self.avatarId)
 
-class WorkerHeaven(mcommon.ManagerHeaven):
+class WorkerHeaven(base.ManagerHeaven):
     """
     I interface between the Manager and worker clients.
     For each worker client I create an L{WorkerAvatar} to handle requests.
@@ -81,7 +81,7 @@ class WorkerHeaven(mcommon.ManagerHeaven):
     avatarClass = WorkerAvatar
     
     def __init__(self, vishnu):
-        mcommon.ManagerHeaven.__init__(self, vishnu)
+        base.ManagerHeaven.__init__(self, vishnu)
         self.conf = None
         self.state = worker.ManagerWorkerHeavenState()
         
