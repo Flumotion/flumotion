@@ -1,5 +1,8 @@
 2004-08-17  Johan Dahlin  <johan@gnome.org>
 
+	* tests/test_component_parse.py (PipelineTest.__init__): Call
+	__gobject_init__ to avoid segfault.
+
 	* flumotion/components/multipartjpeg.py (createComponent): Add quality
 
 	* flumotion/server/component.py (BaseComponent.debug): Rename gst

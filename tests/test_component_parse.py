@@ -5,6 +5,7 @@ from flumotion.server.component import ParseLaunchComponent
 
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, sources, feeds):
+        self.__gobject_init__()
         self.component_name = '<fake>'
         self.sources = sources
         self.feeds = feeds
