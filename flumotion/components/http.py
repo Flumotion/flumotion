@@ -422,7 +422,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
         stats = sink.emit('add', fd)
 
     def get_stats(self, fd):
-        sink = self.streamer.get_sink()
+        sink = self.get_sink()
         return sink.emit('get-stats', fd)
     
     def get_sink(self):
