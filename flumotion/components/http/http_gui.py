@@ -45,25 +45,47 @@ class BaseUI:
         return self.admin.callComponentRemote(self.name, method_name,
                                               *args, **kwargs)
         
+    def setUiState(self, state):
+        raise NotImplementedError
+    
 class HTTPStreamerUI(BaseUI):
     def error_dialog(self, message):
         print 'ERROR:', message
         
-    def button_click_cb(self, button):
-        pass
-    
     def cb_getMimeType(self, mime, label):
         label.set_text('Mime type: %s' % mime)
         label.show()
+
+    def setUiState(self, state):
+        self.label_mime.set_text(state['mime'])
+        self.label_clients.set_text(str(state['clients-connected']))
+        self.label_uptime.set_text(str(state['uptime']))
         
     def render(self):
+        def newRow(name):
+            hbox = gtk.HBox()
+            label = gtk.Label(name + ':')
+            label.show()
+            hbox.pack_start(label)
+            label = gtk.Label()
+            label.show()
+            hbox.pack_start(label)
+            hbox.show()
+            return hbox, label
+        
         vbox = gtk.VBox()
-        label = gtk.Label('')
-        vbox.pack_start(label)
+        hbox, self.label_mime = newRow('Mime')
+        vbox.pack_start(hbox)
+        
+        hbox, self.label_clients = newRow('Clients')
+        vbox.pack_start(hbox)
+
+        hbox, self.label_uptime = newRow('Uptime')
+        vbox.pack_start(hbox)
+
         vbox.show()
 
-        cb = self.callRemote('getMimeType')
-        cb.addCallback(self.cb_getMimeType, label)
+        self.callRemote('notifyState')
         
         return vbox
 

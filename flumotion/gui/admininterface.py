@@ -37,6 +37,7 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     __gsignals__ = {
         'connected' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
         'connection-refused' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
+        'ui-state-changed'    : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (str, object)),
         'update'    : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (object,))
     }
     logCategory = 'adminclient'
@@ -86,6 +87,9 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     def remote_shutdown(self):
         self.debug('shutting down')
 
+    def remote_uiStateChanged(self, name, state):
+        self.emit('ui-state-changed', name, state)
+        
     def setProperty(self, component, element, property, value):
         if not self.remote:
             self.warning('No remote object')
@@ -102,6 +106,7 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
                                       component_name, method_name, *args, **kwargs)
         
     def reload(self):
+        # XXX: reload admin.py too
         name = reflect.filenameToModuleName(__file__)
 
         #self.log("rebuilding '%s'" % name)

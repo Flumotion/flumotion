@@ -134,6 +134,10 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         self.debug("AdminAvatar.componentRemoved: %s" % component)
         self._mindCallRemote('componentRemoved', ComponentView(component))
 
+    def uiStateChanged(self, name, state):
+        self.debug("AdminAvatar.uiStateChanged: %s %s" % (name, state))
+        self._mindCallRemote('uiStateChanged', name, state)
+
     def attached(self, mind):
         """
         Give the avatar a remote reference to the
@@ -295,3 +299,15 @@ class Admin(pb.Root):
         """
         for client in self.clients:
             client.componentRemoved(component)
+
+    def uiStateChanged(self, name, state):
+        """
+        Tell all created AdminAvatars that an ui state for a component was changed
+
+        @type name:      name of the component
+        @type state:     new ui state
+        """
+        
+        for client in self.clients:
+            client.uiStateChanged(name, state)
+        

@@ -37,7 +37,8 @@ class ComponentFactory(pbutil.ReconnectingPBClientFactory):
         super_init = pbutil.ReconnectingPBClientFactory.__init__
         super_init(self)
         self.interfaces = getattr(component, '__remote_interfaces__', ())
-        self.view = ComponentView(component)
+        klass = getattr(component, 'component_view', ComponentView)
+        self.view = klass(component)
         
     def login(self, username):
         self.__super_login(pbutil.Username(username),

@@ -297,6 +297,9 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         
         self.controller.removeComponent(self)
 
+    def perspective_uiStateChanged(self, component_name, state):
+        self.controller.admin.uiStateChanged(component_name, state)
+        
     def link(self, sources, feeds):
         def cb_getFreePorts((feeds, ports)):
             self.listen_ports = ports

@@ -106,6 +106,7 @@ class Window(log.Loggable):
         self.imagedir = config.imagedir
         self.connect(host, port)
         self.create_ui()
+        self.current_component = None
         
     def create_ui(self):
         wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
@@ -146,10 +147,14 @@ class Window(log.Loggable):
         if not sel:
             return
         model, iter = sel
+        if not iter:
+            return
+        
         return model.get(iter, COL_TEXT)[0]
 
     def show_component(self, name, data):
         sub = None
+        instance = None
         if data:
             namespace = {}
             exec (data, globals(), namespace)
@@ -167,6 +172,8 @@ class Window(log.Loggable):
             
         self.hpaned.add2(sub)
         sub.show()
+
+        self.current_component = instance
         
     def component_view_row_activated_cb(self, *args):
         name = self.get_selected_component()
@@ -203,9 +210,6 @@ class Window(log.Loggable):
     def admin_connected_cb(self, admin):
         self.update(admin.clients)
 
-    def admin_update_cb(self, admin, clients):
-        self.update(clients)
-
     def admin_connection_refused_later(self, host, port):
         message = "Connection to controller on %s:%d was refused." % (host, port)
         d = self.error_dialog(message, response = False)
@@ -216,13 +220,26 @@ class Window(log.Loggable):
         reactor.callLater(0, self.admin_connection_refused_later, host, port)
         log.debug('adminclient', "handled connection-refused")
 
+    def admin_ui_state_changed_cb(self, admin, name, state):
+        current = self.get_selected_component()
+        if current != name:
+            return
+
+        comp = self.current_component
+        if comp:
+            comp.setUiState(state)
+        
+    def admin_update_cb(self, admin, clients):
+        self.update(clients)
+
     def connect(self, host, port):
         'connect to controller on given host and port.  Called by __init__'
         self.admin = AdminInterface()
         self.admin.connect('connected', self.admin_connected_cb)
-        self.admin.connect('update', self.admin_update_cb)
         self.admin.connect('connection-refused',
                            self.admin_connection_refused_cb, host, port)
+        self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
+        self.admin.connect('update', self.admin_update_cb)
         reactor.connectTCP(host, port, self.admin.factory)
         
     def update(self, orig_clients):

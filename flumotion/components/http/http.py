@@ -230,10 +230,12 @@ class Stats:
     
     def getAverageClients(self):
         return self.average_client_number
-    
+        
 class HTTPStreamingResource(resource.Resource, log.Loggable):
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
+
     logCategory = 'httpstreamer'
+    
     def __init__(self, streamer):
         self.logfile = None
             
@@ -437,6 +439,37 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         else:
             return self.handleNewClient(request)
 
+class HTTPView(component.ComponentView):
+    def __init__(self, comp):
+        component.ComponentView.__init__(self, comp)
+
+        self.comp.connect('ui-state-changed', self.comp_ui_state_changed_cb)
+
+    def getState(self):
+        stats = self.comp
+
+        s = {}
+
+        bytes_sent      = stats.getBytesSent()
+        bytes_received  = stats.getBytesReceived()
+        uptime          = stats.getUptime()
+
+        s['clients-connected'] = self.comp.getClients()
+        s['mime'] = self.comp.get_mime()
+        s['bytes-sent'] = format_bytes(bytes_sent)
+        s['bytes-received'] = format_bytes(bytes_received)
+        s['uptime'] = format_time(uptime)
+        s['bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
+        s['clients-bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
+        s['peak-clients'] = stats.getPeakClients()
+        #s['average-clients'] = int(stats.getAverageClients())
+        #s['max-clients'] = int(self.parent.maxAllowedClients())
+        
+        return s
+    
+    def comp_ui_state_changed_cb(self, comp):
+        self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
+
 class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     logCategory = 'cons-http'
     # use select for test
@@ -445,9 +478,12 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
                                 'buffers-soft-max=250 ' + \
                                 'recover-policy=1'
     __gsignals__ = {
-        'client-removed': (gobject.SIGNAL_RUN_FIRST, None, (object, int, int))
-                   }
+        'client-removed': (gobject.SIGNAL_RUN_FIRST, None, (object, int, int)),
+        'ui-state-changed': (gobject.SIGNAL_RUN_FIRST, None, ())
+        }
     
+    component_view = HTTPView
+
     def __init__(self, name, source, port):
         self.port = port
         self.gst_properties = []
@@ -459,9 +495,9 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.component_name
 
-    def remote_getMimeType(self):
-        return self.get_mime()
-    
+    def remote_notifyState(self):
+        self.update_ui_state()
+
     def notify_caps_cb(self, element, pad, param):
         caps = pad.get_negotiated_caps()
         if caps is None:
@@ -475,6 +511,8 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
 
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
+        
+        self.emit('ui-state-changed')
 
     def get_mime(self):
         if self.caps:
@@ -501,26 +539,34 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         assert isinstance(sink, gst.Element)
         return sink
 
+    def update_ui_state(self):
+        self.emit('ui-state-changed')
+        
     def client_added_cb(self, sink, fd):
         Stats.clientAdded(self)
-
+        self.update_ui_state()
+        
     def client_removed_cb(self, sink, fd, reason):
         self.emit('client-removed', sink, fd, reason)
         Stats.clientRemoved(self)
+        self.update_ui_state()
 
     def feed_state_change_cb(self, element, old, state):
         component.BaseComponent.feed_state_change_cb(self, element,
                                                      old, state, '')
         if state == gst.STATE_PLAYING:
             self.debug('Ready to serve clients on %d' % self.port)
-            
+
     def link_setup(self, sources, feeds):
         sink = self.get_sink()
         sink.connect('deep-notify::caps', self.notify_caps_cb)
         sink.connect('state-change', self.feed_state_change_cb)
         sink.connect('client-removed', self.client_removed_cb)
         sink.connect('client-added', self.client_added_cb)
-        
+
+        self.setGstProperties()
+
+    def setGstProperties(self):
         for prop in self.gst_properties:
             type = prop.type
             if type == 'int':
