@@ -1,3 +1,8 @@
+2004-10-17  Wim Taymans  <wim@fluendo.com>
+
+	* data/glade/wizard_overlay.glade:
+	Fix typo.
+
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/wizard_webcam.glade:
