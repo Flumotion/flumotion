@@ -39,34 +39,25 @@ PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
 AC_SUBST(PYGTK_DIR)
 
 dnl check for Twisted
-AS_PYTHON_IMPORT(gtk.glade,
-  [
-  AC_MSG_CHECKING(for gtk.glade)
-  prog="
+AC_MSG_CHECKING(for gtk.glade)
+prog="
 import sys
 try:
   import gtk.glade
+except RuntimeError:
+  sys.exit(0)
 except ImportError:
   sys.exit(1)
-except RuntimeError:
-  pass
 sys.exit(0)
 "
-  if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
-  then
-    AC_MSG_RESULT(found)
-  else
-    AC_MSG_RESULT(not found)
-    AC_MSG_ERROR([You need to have python libglade bindings installed])
-  fi
-  ]
-  ,
-  AC_MSG_ERROR([You need to have python libglade bindings installed])
-)
 
-dnl check for gtk.glade
-AS_PYTHON_IMPORT(gtk.glade,,
-                 [AC_MSG_ERROR([You need to recompile pygtk with libglade support])])
+if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
+then
+  AC_MSG_RESULT(found)
+else
+  AC_MSG_RESULT(not found)
+  AC_MSG_ERROR([You need to have python libglade bindings installed])
+fi
 
 dnl check for gst-python
 PKG_CHECK_MODULES(PYGST, gst-python-0.8 >= $PYGST_REQ)
