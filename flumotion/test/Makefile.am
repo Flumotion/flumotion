@@ -3,6 +3,7 @@ EXTRA_DIST = \
 	test_component.py \
 	test_config.py \
 	test_http.py \
+	test_log.py \
 	test_manager.py
 
 check-local:
