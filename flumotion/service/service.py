@@ -203,8 +203,8 @@ class Servicer(log.Loggable):
             flowFiles.append(flowFile)
             self.info("Loading flow %s" % flowFile)
             
-        command = "flumotion-manager -v -D %s %s" % (
-            planetFile, " ".join(flowFiles))
+        command = "flumotion-manager -v -D -n %s %s %s" % (
+            name, planetFile, " ".join(flowFiles))
         retval = self.startProcess(command)
 
         if retval is 0:
