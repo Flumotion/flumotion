@@ -294,7 +294,8 @@ class WizardStep(object, log.Loggable):
         
 
 class Wizard:
-    sidebar_color = gtk.gdk.color_parse('#82b8ff')
+    sidebar_color = gtk.gdk.color_parse('#9bc6ff')
+    main_color = gtk.gdk.color_parse('white')
     sidebar_active_color = gtk.gdk.color_parse('#79abed')
 
     def __init__(self):
@@ -302,7 +303,8 @@ class Wizard:
         for widget in self.wtree.get_widget_prefix(''):
             setattr(self, widget.get_name(), widget)
         self.wtree.signal_autoconnect(self)
-        self.eventbox1.modify_bg(gtk.STATE_NORMAL, self.sidebar_color)
+        self.eventbox_top.modify_bg(gtk.STATE_NORMAL, self.sidebar_color)
+        self.eventbox_main.modify_bg(gtk.STATE_NORMAL, self.main_color)
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))
         
@@ -375,7 +377,7 @@ class Wizard:
         icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
         self.image_icon.set_from_file(icon_filename)
             
-        self.label_title.set_markup('<span size="large">' + escape(step.get_name()) + '</span>')
+        self.label_title.set_markup('<span size="x-large">' + escape(step.get_name()) + '</span>')
 
         if self.current_step:
             self.current_step.deactivated()
