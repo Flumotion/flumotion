@@ -49,7 +49,7 @@ from twisted.internet.interfaces import IReactorFDSet
 # Sibling Imports
 from twisted.internet import main, error
 
-# THOMAS: Twisted 1.3/2.0 compatibility piece
+# T1.3: backwards-compatibility for default->posixbase change
 
 reads = {}
 writes = {}
