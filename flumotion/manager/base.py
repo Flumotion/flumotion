@@ -247,12 +247,24 @@ class ManagerHeaven(pb.Root, log.Loggable):
         """
         Get the avatar with the given id.
 
-        @type avatarId:  string
+        @type  avatarId: string
         @param avatarId: id of the avatar to get
 
         @rtype: L{ManagerAvatar}
         """
         return self.avatars[avatarId]
+
+    def hasAvatar(self, avatarId):
+        """
+        Check if a component with that name is registered.
+
+        @type  avatarId: string
+        @param avatarId: id of the avatar to check
+
+        @rtype:      boolean
+        @returns:    True if an avatar with that id is registered
+        """
+        return self.avatars.has_key(avatarId)
 
     def getAvatars(self):
         """
@@ -261,11 +273,3 @@ class ManagerHeaven(pb.Root, log.Loggable):
         @rtype: list of L{ManagerAvatar}
         """
         return self.avatars.values()
-
-    def hasAvatar(self, avatarId):
-        """
-        Check if the heaven has the given avatar id registered.
-
-        @returns: whether the heaven has the given avatar registered.
-        """
-        return avatarId in self.avatars.keys()
