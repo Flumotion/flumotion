@@ -13,6 +13,7 @@ EXTRA_DIST = \
 	test_manager.py \
 	test_reflect.py \
 	test_registry.py \
+	test_wizard.py \
 	test_worker_heaven.py
 
 check-local:
