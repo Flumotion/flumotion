@@ -110,7 +110,7 @@ class Launcher:
                 pass
         
         log.msg('Shutting down reactor')
-        reactor.stop()
+        reactor.pipeline_stop()
 
         raise SystemExit
 
