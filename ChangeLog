@@ -1,3 +1,9 @@
+=== release 0.1.0 ===
+
+2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac: releasing 0.1.0, "Agua"
+
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/admin.glade:
