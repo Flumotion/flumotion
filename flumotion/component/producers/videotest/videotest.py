@@ -45,9 +45,13 @@ def createComponent(config):
     setProp(struct, config, 'width')
     setProp(struct, config, 'height')
     setProp(struct, config, 'framerate')
+    # If RGB, set something ffmpegcolorspace can convert.
+    if format == 'video/x-raw-rgb':
+        struct['red_mask'] = 0xff00
     caps = gst.Caps(struct)
     
-    component = VideoTest(config['name'], 'videotestsrc name=source ! %s' % caps)
+    component = VideoTest(config['name'],
+                          'videotestsrc name=source ! %s' % caps)
 
     # Set properties
     source = component.get_element('source')
