@@ -72,9 +72,7 @@ class WizardSaver:
             properties['fluendo_logo'] = True
             encoding_options = self.wizard.get_step_options('Encoding')
             if (encoding_options['format'] == EncodingFormat.Ogg or
-                encoding_options['video'] == EncodingVideo.Theora or
-                encoding_options['audio'] in (EncodingAudio.Vorbis,
-                                              EncodingAudio.Speex)):
+                encoding_options['video'] == EncodingVideo.Theora):
                 properties['xiph_logo'] = True
 
             license_options = self.wizard.get_step_options('Content License')
