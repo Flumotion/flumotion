@@ -85,15 +85,12 @@ class StreamingResource(resource.Resource):
         
     def data_received_cb(self, transcoder, gbuffer):
         self.buffer_queue.append(str(buffer(gbuffer)))
+        self.buffer_queue = []
         
     def bufferWrite(self, *args):
         for buffer in self.buffer_queue:
             for request in self.current_requests:
-                fd = request.transport.fileno()
-                try:
-                    os.write(fd, buffer)
-                except OSError:
-                    pass
+                request.write(buffer)
                 #import code; code.interact(local=locals())
         self.buffer_queue = []
             

@@ -323,11 +323,11 @@ class Controller(pb.Root):
 
         @type component:  component
         @param component: the component
-        @rtype:           list of string
-        @returns:         name of source components"""
+        @rtype:           tuple of with 3 items
+        @returns:         name, hostname and port"""
 
         assert not isinstance(component, ProducerPerspective)
-        
+
         peernames = component.getSources()
         retval = []
         for peername in peernames:
