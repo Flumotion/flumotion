@@ -1,5 +1,19 @@
 2005-01-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/greeter.py (Initial, ConnectToExisting)
+	(Authenticate): Set used glade attributes to None to appease the
+	mighty pychecker.
+
+	* flumotion/admin/gtk/wizard.py (Wizard.set_page): Remove unused
+	local variable. Don't die when adding glade widgets if an
+	attribute exists, only if it exists and is non-false.
+	(WizardStep): None-out a couple more variables.
+	
+	* data/glade/admin-wizard.glade:
+	* data/glade/greeter-initial.glade: 
+	* data/glade/greeter-connect_to_existing.glade: 
+	* data/glade/greeter-authenticate.glade: Focus/mnemonic fixen.
+	
 	* data/glade/admin-wizard.glade:
 	* data/glade/greeter-initial.glade: 
 	* data/glade/greeter-connect_to_existing.glade: 

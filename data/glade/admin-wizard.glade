@@ -210,6 +210,7 @@
 		    <widget class="GtkButton" id="button_next">
 		      <property name="visible">True</property>
 		      <property name="can_default">True</property>
+		      <property name="has_default">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="label">gtk-go-forward</property>
 		      <property name="use_stock">True</property>

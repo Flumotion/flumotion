@@ -51,7 +51,10 @@
       <child>
 	<widget class="GtkEntry" id="host_entry">
 	  <property name="visible">True</property>
+	  <property name="can_default">True</property>
+	  <property name="has_default">True</property>
 	  <property name="can_focus">True</property>
+	  <property name="has_focus">True</property>
 	  <property name="editable">True</property>
 	  <property name="visibility">True</property>
 	  <property name="max_length">0</property>
@@ -85,8 +88,8 @@
 	  <child>
 	    <widget class="GtkLabel" id="Host">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Host</property>
-	      <property name="use_underline">False</property>
+	      <property name="label" translatable="yes">_Host</property>
+	      <property name="use_underline">True</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
 	      <property name="wrap">False</property>
@@ -95,6 +98,7 @@
 	      <property name="yalign">0.5</property>
 	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
+	      <property name="mnemonic_widget">host_entry</property>
 	    </widget>
 	  </child>
 	</widget>
@@ -118,21 +122,22 @@
 	  <property name="top_padding">0</property>
 	  <property name="bottom_padding">0</property>
 	  <property name="left_padding">0</property>
-	  <property name="right_padding">0</property>
+	  <property name="right_padding">6</property>
 
 	  <child>
 	    <widget class="GtkLabel" id="Port">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Port</property>
-	      <property name="use_underline">False</property>
+	      <property name="label" translatable="yes">_Port</property>
+	      <property name="use_underline">True</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
 	      <property name="wrap">False</property>
 	      <property name="selectable">False</property>
 	      <property name="xalign">0</property>
 	      <property name="yalign">0.5</property>
-	      <property name="xpad">6</property>
+	      <property name="xpad">0</property>
 	      <property name="ypad">0</property>
+	      <property name="mnemonic_widget">port_entry</property>
 	    </widget>
 	  </child>
 	</widget>
@@ -162,7 +167,7 @@
 	    <widget class="GtkCheckButton" id="ssl_check">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
-	      <property name="label" translatable="yes">Secure connection via SSL</property>
+	      <property name="label" translatable="yes">_Secure connection via SSL</property>
 	      <property name="use_underline">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>

@@ -77,7 +77,9 @@ class WizardStep:
     name = None
     title = None
     on_next = None
+    button_next = None
     # also, all widgets from the glade file will become attributes
+    page = None # filled from glade
 
 class Wizard(gobject.GObject):
     '''
@@ -141,15 +143,13 @@ class Wizard(gobject.GObject):
         except KeyError:
             raise AssertionError ('No page named %s in %r' % (name, self.pages))
 
-        if not hasattr(page, 'page'):
+        if not page['page']:
             wtree = gtk.glade.XML(os.path.join(configure.gladedir,
                                                self.name+'-'+name+'.glade'),
                                   'page')
-            page_widget = wtree.get_widget('page')
-            
             for widget in wtree.get_widget_prefix(''):
                 wname = widget.get_name()
-                if hasattr(page, wname):
+                if hasattr(page, wname) and page[wname]:
                     raise AssertionError (
                         "There is already an attribute called %s in %r" %
                         (wname, page))

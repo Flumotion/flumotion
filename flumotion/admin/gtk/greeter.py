@@ -40,6 +40,7 @@ class Initial(wizard.WizardStep):
     title = 'Connect to Flumotion manager'
     text = 'Flumotion Admin needs to connect to a Flumotion manager.\nChoose' \
            + ' an option from the list and click "Forward" to begin.'
+    connect_to_existing = None
 
     def on_next(self, state):
         radio_buttons = self.connect_to_existing.get_group()
@@ -54,6 +55,7 @@ class ConnectToExisting(wizard.WizardStep):
     name='connect_to_existing'
     title='Host information'
     text = 'Please enter the address where the manager is running.'
+    host_entry = port_entry = ssl_check = None
 
     def setup(self, state):
         self.on_entries_changed()
@@ -87,6 +89,7 @@ class Authenticate(wizard.WizardStep):
     name = 'authenticate'
     title = 'Authentication'
     text = 'Please select among the following authentication methods.'
+    auth_method_combo = user_entry = passwd_entry = None
 
     def setup(self, state):
         if not 'auth_method' in state:
