@@ -1,0 +1,33 @@
+Code
+====
+
+The style of all python code should honor the recommendations in the
+Style Guide for Python Code [1] document with the following exceptions:
+
+* It's okay to have more than 79 characters _if it makes sense_, we 
+  don't live in the 70ies any longer and can therefor use more
+  characters per line. 
+
+* TODO
+
+[1]: http://www.python.org/peps/pep-0008.html
+
+ChangeLog
+=========
+
+All checkins should add an appropriate entry in the ChangeLog.
+Exceptions for repository ignore files and metadata.
+
+
+Tests
+=====
+
+To be able to archive good quality of the code, all major checkins
+should also add an appropriate test in the testsuite. It's not okay
+to have any tests in a non-working tests when checking in. The testsuite
+should *always* run with no failing tests and ideally with no output.
+This also makes it easier to refactor code.
+If large changes are made over many places in the tree which can't make
+the whole testsuite run, then it should be made on a separate branch and
+not be merged with the maintrunk before everything passes and it has been
+reviewed.
