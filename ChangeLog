@@ -1,3 +1,10 @@
+2004-09-08  Johan Dahlin  <johan@gnome.org>
+
+	* tests/manager.py: update tests.
+
+	* flumotion/manager/component.py (ComponentHeaven): rename and
+	move from manager.Manager
+
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:

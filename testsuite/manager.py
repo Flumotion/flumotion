@@ -1,6 +1,6 @@
 from common import unittest
 
-from flumotion.manager import component, manager
+from flumotion.manager import component
 
 class FakeComponentPerspective:
     def __init__(self, name='fake', eaters=[], port=-1, listen_host='listen-host'):
@@ -30,71 +30,71 @@ class FakeComponentPerspective:
     def getName(self):
         return self.name
 
-class TestManager(unittest.TestCase):
+class TestComponentHeaven(unittest.TestCase):
     def setUp(self):
-        self.manager = manager.Manager()
+        self.heaven = component.ComponentHeaven()
 
     def testGetPerspective(self):
-        p = self.manager.getAvatar('foo-bar-baz')
+        p = self.heaven.getAvatar('foo-bar-baz')
         assert isinstance(p, component.ComponentAvatar)
 
         #self.assertRaises(AssertionError,
-        #                  self.manager.getPerspective, 'does-not-exist')
+        #                  self.heaven.getPerspective, 'does-not-exist')
 
     def testIsLocalComponent(self):
         c = FakeComponentPerspective()
-        self.manager.addComponent(c)
-        assert self.manager.isLocalComponent(c)
+        self.heaven.addComponent(c)
+        assert self.heaven.isLocalComponent(c)
         
     def testIsStarted(self):
-        c = self.manager.getAvatar('prod')
-        assert not self.manager.isComponentStarted('prod')
-        c.started = True # XXX: Use manager.componentStart
-        assert self.manager.isComponentStarted('prod')
+        c = self.heaven.getAvatar('prod')
+        assert not self.heaven.isComponentStarted('prod')
+        c.started = True # XXX: Use heaven.componentStart
+        assert self.heaven.isComponentStarted('prod')
 
     def testGetComponent(self):
-        c = self.manager.getAvatar('prod')
-        assert self.manager.getComponent('prod') == c
+        c = self.heaven.getAvatar('prod')
+        assert self.heaven.getComponent('prod') == c
 
     def testHasComponent(self):
-        c = self.manager.getAvatar('prod')
-        assert self.manager.hasComponent('prod')
-        self.manager.removeComponent(c)
-        assert not self.manager.hasComponent('prod')
-        self.assertRaises(KeyError, self.manager.removeComponent, c)
+        c = self.heaven.getAvatar('prod')
+        assert self.heaven.hasComponent('prod')
+        self.heaven.removeComponent(c)
+        assert not self.heaven.hasComponent('prod')
+        self.assertRaises(KeyError, self.heaven.removeComponent, c)
         
     def testAddComponent(self):
         c = FakeComponentPerspective('fake')
-        self.manager.addComponent(c)
-        assert self.manager.hasComponent('fake')
-        self.assertRaises(KeyError, self.manager.addComponent, c)
+        self.heaven.addComponent(c)
+        assert self.heaven.hasComponent('fake')
+        self.assertRaises(KeyError, self.heaven.addComponent, c)
         
     def testRemoveComponent(self):
-        assert not self.manager.hasComponent('fake')
+        assert not self.heaven.hasComponent('fake')
         c = FakeComponentPerspective('fake')
-        self.assertRaises(KeyError, self.manager.removeComponent, c)
-        self.manager.addComponent(c)
-        assert self.manager.hasComponent('fake')
-        self.manager.removeComponent(c)
-        assert not self.manager.hasComponent('fake')
-        self.assertRaises(KeyError, self.manager.removeComponent, c)
+        self.assertRaises(KeyError, self.heaven.removeComponent, c)
+        self.heaven.addComponent(c)
+        assert self.heaven.hasComponent('fake')
+        self.heaven.removeComponent(c)
+        assert not self.heaven.hasComponent('fake')
+        self.assertRaises(KeyError, self.heaven.removeComponent, c)
 
     def testComponentEatersEmpty(self):
         c = FakeComponentPerspective('fake')
-        self.manager.addComponent(c)
-        assert self.manager.getComponentEaters(c) == []
+        self.heaven.addComponent(c)
+        assert self.heaven.getComponentEaters(c) == []
         
     def testComponentsEaters(self):
         c = FakeComponentPerspective('foo', ['bar', 'baz'])
-        self.manager.addComponent(c)
+        self.heaven.addComponent(c)
         c2 = FakeComponentPerspective('bar', port=1000, listen_host='bar-host')
-        self.manager.addComponent(c2)
+        self.heaven.addComponent(c2)
         c3 = FakeComponentPerspective('baz', port=1001, listen_host='baz-host')
-        self.manager.addComponent(c3)
-        self.manager.feeder_set.addFeeders(c2)
-        self.manager.feeder_set.addFeeders(c3)
+        self.heaven.addComponent(c3)
+        self.heaven.feeder_set.addFeeders(c2)
+        self.heaven.feeder_set.addFeeders(c3)
         
-        eaters = self.manager.getComponentEaters(c)
+        eaters = self.heaven.getComponentEaters(c)
         assert len(eaters) == 2
         assert ('bar', 'bar-host', 1000) in eaters
         assert ('baz', 'baz-host', 1001) in eaters        

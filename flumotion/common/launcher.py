@@ -99,7 +99,7 @@ class Launcher(log.Loggable):
         reactor.listenTCP(self.manager_port, factory)
         f = Factory()
         f.protocol = MiniProtocol
-        f.protocol.manager = factory.manager
+        f.protocol.manager = factory.componentheaven
         reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(), f)
 
         reactor.run(False)
