@@ -364,24 +364,24 @@ class Window(log.Loggable, gobject.GObject):
         # their UI currently displayed.  In the future, maybe we want
         # to create all UI's at startup regardless and allow all messages
         # to be processed, since they're here now anyway   
-        self.debug("componentCall received for %r.%s ..." % (
+        self.log("componentCall received for %r.%s ..." % (
             componentState, methodName))
         state = self.components_view.get_selected_state()
         if not state:
-            self.debug("... but no component selected")
+            self.log("... but no component selected")
             return
         if componentState != state:
-            self.debug("... but component is not displayed")
+            self.log("... but component is not displayed")
             return
         
         name = state.get('name')
         localMethodName = "component_%s" % methodName
         if not hasattr(self.current_component, localMethodName):
-            self.debug("... but does not have method %s" % localMethodName)
+            self.log("... but does not have method %s" % localMethodName)
             self.warning("Component view %s does not implement %s" % (
                 name, localMethodName))
             return
-        self.debug("... and executing")
+        self.log("... and executing")
         method = getattr(self.current_component, localMethodName)
 
         # call the method, catching all sorts of stuff
@@ -392,7 +392,7 @@ class Window(log.Loggable, gobject.GObject):
                 methodName, args, kwargs)
             self.debug(msg)
             raise errors.RemoteRunError(msg)
-        self.debug("component: returning result: %r to caller" % result)
+        self.log("component: returning result: %r to caller" % result)
         return result
 
     def componentCallRemoteStatus(self, state, pre, post, fail,
