@@ -57,7 +57,7 @@ def _wizard_finished_cb(wizard, configuration, window):
     window.show()
     
 def _window_connected_cb(window, options):
-    if window.admin.getComponents() and not os.path.exists(FIRST_TIME_FILE):
+    if not window.admin.getComponents() and not os.path.exists(FIRST_TIME_FILE):
         workers = window.admin.getWorkers()
         if not workers:
             print >> sys.stderr, "ERROR: No workers connected"
