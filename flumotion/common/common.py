@@ -258,9 +258,11 @@ def _findPackageCandidates(path, prefix='flumotion'):
     # chop off the base path to get a list of "relative" bundlespace paths
     bundlePaths = [x[len(path) + 1:] for x in dirs]
 
-    # remove some common candidates, like .svn subdirs
+    # remove some common candidates, like .svn subdirs, or containing -
     isNotSvn = lambda x: x.find('.svn') == -1
     bundlePaths = filter(isNotSvn, bundlePaths)
+    isNotDashed = lambda x: x.find('-') == -1
+    bundlePaths = filter(isNotDashed, bundlePaths)
 
     # convert paths to module namespace
     bundlePackages = [".".join(x.split(os.path.sep)) for x in bundlePaths]
