@@ -5,6 +5,21 @@
 
 * EASY		rename http to httpstreamer because we'll have a reader too
 
+* EASY		remove seconds from uptime, and force update every minute,
+		or when stats are different from last
+
+* MEDIUM	give useful error messages when there is no network !
+		(service network stop and start flumotion and see hang)
+
+- API cleanup:
+
+- manager/component.py:
+  - getAvatar -> createAvatar or similar, and good opposition to removeAvatar
+  - removeAvatar renamed similarly
+  - work on only name or only component, so there is a clear API distinction
+  - name all arguments used in functions that are the same, with the same name
+  - rename components to avatars, and rename functions accordingly
+
 - make an executable script/program that makes all required checks and
   outputs a report, has a proper zero or non-zero exit status and 
   can't run forever if things are stuck (times out properly)
