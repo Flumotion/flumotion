@@ -285,6 +285,12 @@ class TestProcess(unittest.TestCase):
         else:
             # parent
             common.waitForTerm()
-        
+
+class TestObjRepr(unittest.TestCase):
+    def testMe(self):
+        t = TestObjRepr()
+        self.assertEquals(common.objRepr(t),
+            'flumotion.test.test_common.TestObjRepr')
+    
 if __name__ == '__main__':
     unittest.main()

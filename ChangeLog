@@ -1,3 +1,9 @@
+2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
+	* flumotion/test/test_common.py:
+	  add objRepr method and test
+
 2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/pygobject.py:

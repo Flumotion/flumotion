@@ -586,3 +586,11 @@ def componentPath(componentName, parentName):
     """
     
     return '/%s/%s' % (parentName, componentName)
+
+def objRepr(object):
+    """
+    Return a string giving the fully qualified class of the given object.
+    """ 
+    c = object.__class__
+    return "%s.%s" % (c.__module__, c.__name__)
+
