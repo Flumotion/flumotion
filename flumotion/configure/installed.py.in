@@ -34,7 +34,7 @@ def get():
         'gladedir':      os.path.join('@DATADIR@', 'flumotion', 'glade'),
         'imagedir':      os.path.join('@DATADIR@', 'flumotion', 'image'),
         'logdir':        os.path.join('@LOCALSTATEDIR@', 'log', 'flumotion'),
-        'pythondir':     os.path.join('@DATADIR@', 'flumotion'),
+        'pythondir':     os.path.join('@LIBDIR@', 'flumotion', 'python'),
         'registrydir':   registrydir,
         'rundir':        os.path.join('@LOCALSTATEDIR@', 'run', 'flumotion'),
         'version':       '@VERSION@',

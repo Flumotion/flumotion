@@ -1,5 +1,14 @@
 2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/registry.py:
+	  debug
+	* flumotion/configure/installed.py.in:
+	  fix pythondir
+	* flumotion/service/service.py:
+	  set name on worker
+
+2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/consumers/httpstreamer/resources.py:
 	  fix a STUPID bug where the requester was stored as a tuple because
 	  of a trailing comma and of course %s alone doesn't show this as

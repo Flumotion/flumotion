@@ -568,6 +568,7 @@ class ComponentRegistry(log.Loggable):
             paths = os.environ['FLU_REGISTRY_PATH']
             path_directories += paths.split(':')
         
+        self.debug('scanning %r for registry entries' % path_directories)
         force = False
         registry_directories = [dir.getFilename()
                                   for dir in self.getDirectories()]

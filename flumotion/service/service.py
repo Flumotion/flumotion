@@ -218,7 +218,7 @@ class Servicer(log.Loggable):
                 "Worker file %s does not exist" % workerFile
         self.info("Loading worker %s" % workerFile)
 
-        command = "flumotion-worker -v -D %s" % workerFile
+        command = "flumotion-worker -v -D -n %s %s" % (name, workerFile)
         retval = self.startProcess(command)
 
         if retval is 0:
