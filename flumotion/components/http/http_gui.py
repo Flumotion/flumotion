@@ -40,21 +40,31 @@ class BaseUI:
         cb = self.admin.getProperty(self.name, element, property)
         cb.addCallback(func)
         cb.addErrback(self.propertyErrback, self)
-    
+
+    def callRemote(self, method_name, *args, **kwargs):
+        return self.admin.callComponentRemote(self.name, method_name,
+                                              *args, **kwargs)
+        
 class HTTPStreamerUI(BaseUI):
     def error_dialog(self, message):
         print 'ERROR:', message
         
     def button_click_cb(self, button):
-        def getReturnValue(value):
-            print value
-            
-        self.getElementProperty(getReturnValue, 'foo', 'bar')
+        pass
+    
+    def cb_getMimeType(self, mime, label):
+        label.set_text('Mime type: %s' % mime)
+        label.show()
         
     def render(self):
-        button = gtk.Button('Click me')
-        button.connect('clicked', self.button_click_cb)
-        button.show()
-        return button
+        vbox = gtk.VBox()
+        label = gtk.Label('')
+        vbox.pack_start(label)
+        vbox.show()
+
+        cb = self.callRemote('getMimeType')
+        cb.addCallback(self.cb_getMimeType, label)
+        
+        return vbox
 
 GUIClass = HTTPStreamerUI

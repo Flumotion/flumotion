@@ -169,7 +169,17 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         print 'SHUTTING DOWN'
         reactor.stop()
         raise SystemExit
-    
+
+    # Generic interface to call into a component
+    def perspective_callComponentRemote(self, component_name, method_name,
+                                        *args, **kwargs):
+        component = self.controller.getComponent(component_name)
+        try:
+            return component.callComponentRemote(method_name, *args, **kwargs)
+        except Exception, e:
+            self.warning(str(e))
+            raise
+        
     def perspective_setComponentElementProperty(self, component_name, element, property, value):
         """Set a property on an element in a component."""
         component = self.controller.getComponent(component_name)

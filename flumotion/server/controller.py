@@ -256,6 +256,12 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
         cb.addErrback(self._mindErrback, (errors.PropertyError, ))
         return cb
 
+    def callComponentRemote(self, method_name, *args, **kwargs):
+        self.debug("calling component method %s" % method_name)
+        cb = self._mindCallRemote('callMethod', method_name, *args, **kwargs)
+        cb.addErrback(self._mindErrback, (Exception, ))
+        return cb
+        
     def _reloadComponentErrback(self, failure):
         import exceptions
         failure.trap(errors.ReloadSyntaxError)

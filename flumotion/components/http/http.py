@@ -127,7 +127,7 @@ class HTTPStreamingAdminResource(resource.Resource):
         if request.getUser() == 'fluendo' and request.getPassword() == 's3kr3t':
             return True
         return False
-
+    
     def render(self, request):
         self.debug('Request for admin page')
         if not self.isAuthenticated(request):
@@ -143,7 +143,7 @@ class HTTPStreamingAdminResource(resource.Resource):
 
         el = self.streaming.streamer.get_sink()
         stats = {}
-        stats['lients connected'] = str(len(self.streaming.request_hash))
+        stats['Clients connected'] = str(len(self.streaming.request_hash))
         stats['Flesh shown'] = random.choice(('too much', 'not enough', 'just about right'))
         stats['Mime type'] = self.streaming.streamer.get_mime()
         bytes_sent = el.get_property('bytes-served')
@@ -411,6 +411,9 @@ class MultifdSinkStreamer(component.ParseLaunchComponent):
         
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.component_name
+
+    def remote_getMimeType(self):
+        return self.get_mime()
     
     def notify_caps_cb(self, element, pad, param):
         caps = pad.get_negotiated_caps()

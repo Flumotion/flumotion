@@ -1,3 +1,16 @@
+2004-09-03  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/components/http/http.py:
+	* flumotion/components/http/http_gui.py:
+	* flumotion/gui/admininterface.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/component.py:
+	* flumotion/server/controller.py:
+
+	Implement basic avatar proxy: to proxy method between the admin
+	interface and the component interface. So far it's only one way
+	and currently no error checking. Fixes Ticket #1
+
 2004-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/config/__init__.py:

@@ -164,10 +164,16 @@ class ComponentView(pb.Referenceable, log.Loggable):
             raise flumotion.twisted.errors.ReloadSyntaxError(msg)
         self._reloaded()
 
+    def remote_callMethod(self, method_name, *args, **kwargs):
+        method = getattr(self.comp, 'remote_' + method_name, None)
+        if method:
+            return method(*args, **kwargs)
+
+        # XXX: Raise
+                         
     # separate method so it runs the newly reloaded one :)
     def _reloaded(self):
         self.info('reloaded module code for %s' % __name__)
-
 
 class IFlumotionComponent:
     pass

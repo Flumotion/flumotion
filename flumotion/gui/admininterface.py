@@ -96,6 +96,10 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         return self.remote.callRemote('getComponentElementProperty',
                                       component, element, property)
 
+    def callComponentRemote(self, component_name, method_name, *args, **kwargs):
+        return self.remote.callRemote('callComponentRemote',
+                                      component_name, method_name, *args, **kwargs)
+        
     def reload(self):
         name = reflect.filenameToModuleName(__file__)
 
