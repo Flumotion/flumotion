@@ -9,7 +9,7 @@
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_CENTER</property>
   <property name="modal">False</property>
-  <property name="default_width">750</property>
+  <property name="default_width">400</property>
   <property name="default_height">400</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
@@ -28,7 +28,7 @@
 
       <child>
 	<widget class="GtkEventBox" id="eventbox_sidebar">
-	  <property name="width_request">200</property>
+	  <property name="width_request">170</property>
 	  <property name="visible">True</property>
 	  <property name="events">GDK_EXPOSURE_MASK</property>
 	  <property name="visible_window">True</property>
@@ -49,7 +49,7 @@
 	<packing>
 	  <property name="padding">0</property>
 	  <property name="expand">False</property>
-	  <property name="fill">True</property>
+	  <property name="fill">False</property>
 	</packing>
       </child>
 

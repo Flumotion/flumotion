@@ -1,5 +1,12 @@
 2005-02-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/wizard.py: Try to grab focus when run. Doesn't
+	work yet.
+
+	* data/glade/wizard.glade: Fiddle with the default dimensions.
+
+	* data/glade/admin.glade: Focus the treeview first.
+
 	* flumotion/admin/gtk/client.py (Window.widgets): New instance
 	attribute, a dict of widgets from glade.
 	(Window._create_ui): Populate Window.widgets. Set custom icons for

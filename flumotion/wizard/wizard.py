@@ -629,7 +629,8 @@ class Wizard(gobject.GObject, log.Loggable):
                 
             return self.finish(False)
 
-        self.window.show()
+        self.window.present()
+        self.window.grab_focus()
         if not self._use_main:
             return
         
