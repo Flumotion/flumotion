@@ -20,6 +20,8 @@
 
 # Headers in this file shall remain intact.
 
+import os
+
 from flumotion.component import feedcomponent
 from flumotion.component.converters.overlay import genimg
 
@@ -34,7 +36,15 @@ class Overlay(feedcomponent.ParseLaunchComponent):
                                                     ['default'],
                                                     pipeline)
 
-
+    def stop(self):
+        # clean up our temp file
+        # FIXME: it would probably be nicer to implement this through hooks
+        # since now I do this before chaining, while FeedComp does it after
+        # chaining, so it's messy
+        feedcomponent.ParseLaunchComponent.stop(self)
+        self.debug('Removing temporary overlay file %s' % FILENAME)
+        os.unlink(FILENAME)
+        
 def createComponent(config):
     source = config['source']
 
