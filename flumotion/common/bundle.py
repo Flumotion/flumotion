@@ -304,7 +304,6 @@ class BundlerBasket:
         if not bundlerName in self._bundlers:
             raise Exception('Unknown bundle %s' % bundlerName)
         
-        print dep_helper(bundlerName, [])
         return dep_helper(bundlerName, [])
 
     def getBundlerByName(self, bundlerName):
