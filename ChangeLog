@@ -1,5 +1,80 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	* data/registry/basecomponents.xml:
+	* doc/reference/Makefile.am:
+	* flumotion/Makefile.am:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/bttv/Makefile.am:
+	* flumotion/component/bttv/bttv.py:
+	* flumotion/component/bttv/bttv.xml:
+	* flumotion/component/dv/Makefile.am:
+	* flumotion/component/dv/dv.py:
+	* flumotion/component/dv/dv.xml:
+	* flumotion/component/file/Makefile.am:
+	* flumotion/component/file/file.xml:
+	* flumotion/component/http/Makefile.am:
+	* flumotion/component/http/http.xml:
+	* flumotion/component/multipartjpeg/Makefile.am:
+	* flumotion/component/multipartjpeg/multipartjpeg.py:
+	* flumotion/component/multipartjpeg/multipartjpeg.xml:
+	* flumotion/component/overlay/Makefile.am:
+	* flumotion/component/overlay/overlay.py:
+	* flumotion/component/overlay/overlay.xml:
+	* flumotion/component/passwd/Makefile.am:
+	* flumotion/component/passwd/passwd.xml:
+	* flumotion/component/videotest/Makefile.am:
+	* flumotion/component/videotest/videotest.py:
+	* flumotion/component/videotest/videotest.xml:
+	* flumotion/components/Makefile.am:
+	* flumotion/components/__init__.py:
+	* flumotion/components/base/Makefile.am:
+	* flumotion/components/base/__init__.py:
+	* flumotion/components/base/base.xml:
+	* flumotion/components/base/converter.py:
+	* flumotion/components/base/producer.py:
+	* flumotion/components/bttv/Makefile.am:
+	* flumotion/components/bttv/__init__.py:
+	* flumotion/components/bttv/bttv.py:
+	* flumotion/components/bttv/bttv.xml:
+	* flumotion/components/dv/Makefile.am:
+	* flumotion/components/dv/__init__.py:
+	* flumotion/components/dv/dv.py:
+	* flumotion/components/dv/dv.xml:
+	* flumotion/components/file/Makefile.am:
+	* flumotion/components/file/__init__.py:
+	* flumotion/components/file/file.py:
+	* flumotion/components/file/file.xml:
+	* flumotion/components/http/Makefile.am:
+	* flumotion/components/http/__init__.py:
+	* flumotion/components/http/http.py:
+	* flumotion/components/http/http.xml:
+	* flumotion/components/http/http_gui.py:
+	* flumotion/components/multipartjpeg/Makefile.am:
+	* flumotion/components/multipartjpeg/__init__.py:
+	* flumotion/components/multipartjpeg/multipartjpeg.py:
+	* flumotion/components/multipartjpeg/multipartjpeg.xml:
+	* flumotion/components/overlay/Makefile.am:
+	* flumotion/components/overlay/__init__.py:
+	* flumotion/components/overlay/overlay.py:
+	* flumotion/components/overlay/overlay.xml:
+	* flumotion/components/passwd/Makefile.am:
+	* flumotion/components/passwd/__init__.py:
+	* flumotion/components/passwd/passwd.py:
+	* flumotion/components/passwd/passwd.xml:
+	* flumotion/components/videotest/Makefile.am:
+	* flumotion/components/videotest/__init__.py:
+	* flumotion/components/videotest/videotest.py:
+	* flumotion/components/videotest/videotest.xml:
+	* flumotion/manager/Makefile.am:
+	* flumotion/manager/registry.py:
+	* tests/test_http.py:
+	  flumotion.components -> flumotion.component
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion.in:
 	* configure.ac:
 	* doc/reference/Makefile.am:

@@ -1,0 +1,5 @@
+component_PYTHON = __init__.py dv.py
+componentdir = $(libdir)/flumotion/python/flumotion/component/dv
+component_DATA = dv.xml
+
+EXTRA_DIST = $(component_DATA)

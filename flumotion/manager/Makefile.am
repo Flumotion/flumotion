@@ -1,4 +1,4 @@
-flumotiondir = $(libdir)/flumotion/python/flumotion/server
+flumotiondir = $(libdir)/flumotion/python/flumotion/manager
 
 flumotion_PYTHON = \
 	__init__.py \

@@ -381,7 +381,7 @@ class ComponentRegistry(log.Loggable):
         return False
     
     def verify(self, root, force=False):
-        dir = os.path.join(root, 'flumotion', 'components')
+        dir = os.path.join(root, 'flumotion', 'component')
         
         if not os.path.exists(self.filename):
             force = True

@@ -1,0 +1,11 @@
+<components>
+  <component type="htpasswd-auth" factory="false">
+    <source location="flumotion.component.passwd.passwd"/>
+    <properties>
+      <property name="filename" type="string" required="yes"/>
+      <property name="type" type="string"/>
+      <property name="domain" type="string"/>
+    </properties>
+  </component>
+</components>
+

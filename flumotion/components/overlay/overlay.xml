@@ -1,9 +1,0 @@
-<components>
-  <component type="overlay">
-    <source location="flumotion.components.overlay.overlay"/>
-    <properties>
-      <property name="source" type="string" multiple="no"/>
-      <property name="location" type="string" required="yes"/>
-    </properties>
-  </component>
-</components>

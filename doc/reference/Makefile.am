@@ -10,11 +10,11 @@ MODULE_FILES = \
 	flumotion/admin/__init__.py		\
 	flumotion/admin/spyglass.py		\
 	flumotion/config/__init__.py		\
-	flumotion/components/base/producer.py	\
-	flumotion/components/base/converter.py	\
-	flumotion/components/file/file.py	\
-	flumotion/components/http/http.py	\
-	flumotion/components/passwd/passwd.py	\
+	flumotion/component/base/producer.py	\
+	flumotion/component/base/converter.py	\
+	flumotion/component/file/file.py	\
+	flumotion/component/http/http.py	\
+	flumotion/component/passwd/passwd.py	\
 	flumotion/errors.py			\
 	flumotion/manager/admin.py		\
 	flumotion/manager/auth.py		\

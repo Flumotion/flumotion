@@ -1,4 +1,4 @@
-SUBDIRS = components config gui manager twisted utils
+SUBDIRS = component config gui manager twisted utils
 flumotiondir = $(libdir)/flumotion/python/flumotion
 
 flumotion_PYTHON = \
