@@ -18,17 +18,15 @@
 from flumotion.component import feedcomponent
 
 class Vorbis(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, feeders, pipeline):
+    def __init__(self, name, eaters, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    eaters,
                                                     ['default'],
-                                                    feeders,
                                                     pipeline)
 
 def createComponent(config):
-    source = config['source']
-
     component = Vorbis(config['name'], [config['source']],
-                       "rawvorbisenc name=encoder")
+                       "audioconvert ! audio/x-raw-float ! rawvorbisenc name=encoder")
     
     element = component.pipeline.get_by_name('encoder')
     if config.has_key('bitrate'):

@@ -2,9 +2,11 @@
   <component type="videotest">
     <source location="flumotion.component.videotest.videotest"/>
     <properties>
+      <property name="feed" type="string" multiple="yes"/>
       <property name="height" type="int"/>
       <property name="width" type="int"/>
       <property name="framerate" type="float"/>
+      <property name="format" type="string"/>
     </properties>
   </component>
 </components>

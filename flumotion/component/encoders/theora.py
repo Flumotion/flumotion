@@ -18,15 +18,13 @@
 from flumotion.component import feedcomponent
 
 class Theora(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, feeders, pipeline):
+    def __init__(self, name, eaters, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    eaters,
                                                     ['default'],
-                                                    feeders,
                                                     pipeline)
 
 def createComponent(config):
-    source = config['source']
-
     component = Theora(config['name'], [config['source']],
                        "theoraenc name=encoder")
     

@@ -45,6 +45,8 @@ class Source(wizard.WizardStep):
                      'If you want to stream video')
         tips.set_tip(self.checkbutton_has_audio,
                      'If you want to stream audio')
+        # HACK HACK HACK
+        self.combobox_video.set_active(VideoDevice.Test)
         
     def on_checkbutton_has_video_toggled(self, button):
         self.combobox_video.set_sensitive(button.get_active())
@@ -142,6 +144,9 @@ class TestSource(VideoSource):
         else:
             raise AssertionError
         options['pattern'] = self.combobox_pattern.get_string()
+        options['width'] = int(self.spinbutton_width.get_value())
+        options['height'] = int(self.spinbutton_height.get_value())
+        options['framerate'] = self.spinbutton_framerate.get_value()
         return options
 wizard.register_step(TestSource)
 
@@ -302,7 +307,7 @@ class Theora(VideoEncoder):
     
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
-        options['bitrate'] = int(options['bitrate'])
+        options['bitrate'] = int(self.spinbutton_bitrate.get_value())
         options['quality'] = int(options['quality'])
         return options
     
@@ -361,9 +366,14 @@ class AudioEncoder(wizard.WizardStep):
 class Vorbis(AudioEncoder):
     step_name = 'Vorbis'
     component_type = 'vorbis'
+
+    def setup(self):
+        self.spinbutton_bitrate.set_range(6000, 250001)
+        self.spinbutton_bitrate.set_value(64000)
+        
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
-        options['bitrate'] = int(options['bitrate'])
+        options['bitrate'] = int(self.spinbutton_bitrate.get_value())
         return options
 wizard.register_step(Vorbis)
 

@@ -2,6 +2,7 @@
   <component type="soundcard">
     <source location="flumotion.component.soundcard.soundcard"/>
     <properties>
+      <property name="feed" type="string" required="yes" multiple="yes"/>
       <property name="device" type="string"/>
       <property name="channels" type="string"/>
       <property name="input" type="string"/>

@@ -1,14 +1,16 @@
 <components>
   <component type="ogg-muxer">
-    <source location="flumotion.component.encoders.ogg"/>
+    <source location="flumotion.component.muxers.ogg"/>
     <properties>
+      <property name="feed" type="string" multiple="yes"/>
       <property name="source" type="string" multiple="yes"/>
     </properties>
   </component>
 <!--
   <component type="multipart-muxer">
-    <source location="flumotion.component.encoders.multipart"/>
+    <source location="flumotion.component.muxers.multipart"/>
     <properties>
+      <property name="feed" type="string" multiple="yes"/>
       <property name="source" type="string" multiple="yes"/>
     </properties>
   </component>

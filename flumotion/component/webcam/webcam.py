@@ -15,7 +15,7 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from flumotion.component.base import producer
+from flumotion.component import feedcomponent
 
 class WebCamera(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, pipeline):
@@ -29,8 +29,9 @@ def createComponent(config):
 
     element = component.pipeline.get_by_name('camera')
     element.set_property('copy-mode', True)
-    element.set_property('device', config['device'])
-    element.set_property('width', config['width'])
-    element.set_property('height', config['height'])
+
+    # XXX: Width and height through filtered caps.
+    #element.set_property('width', config['width'])
+    #element.set_property('height', config['height'])
 
     return component

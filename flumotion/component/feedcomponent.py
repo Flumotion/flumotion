@@ -292,7 +292,6 @@ class FeedComponent(basecomponent.BaseComponent):
         # Setup all feeders
         for feeder_name, host in feedersData:
             feed_name = feeder_name.split(':')[1]
-            print('THOMAS: feed_ports: %r' % self.feed_ports)
             assert self.feed_ports.has_key(feed_name)
             port = self.feed_ports[feed_name]
             self.debug('Going to listen on feeder %s (%s:%d)' % (feeder_name, host, port))

@@ -15,20 +15,27 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from flumotion.component.base import producer
+import gst
 
+from flumotion.component import feedcomponent
+
+class VideoTest(feedcomponent.ParseLaunchComponent):
+    def __init__(self, name, pipeline):
+        feedcomponent.ParseLaunchComponent.__init__(self, name,
+                                                    [],
+                                                    ['default'],
+                                                    pipeline)
+                                       
 def createComponent(config):
-    pipeline = 'videotestsrc ! video/x-raw-yuv,format=(fourcc)I420'
+    format = 'video/x-raw-yuv' #config['format']    
+    struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
 
-    if config.has_key('width'):
-        pipeline += ',width=%d' % config['width']
-    if config.has_key('height'):
-        pipeline += ',height=%d' % config['height']
-    if config.has_key('framerate'):
-        pipeline += ',framerate=%f' % config['framerate']
-
-    config['pipeline'] = pipeline
+    struct['width'] = config['width']
+    struct['height'] = config['height']
+    struct['framerate'] = config['framerate']
+    caps = gst.Caps(struct)
     
-    return producer.createComponent(config)
+    component = VideoTest(config['name'], 'videotestsrc ! %s' % caps)
 
+    return component
 

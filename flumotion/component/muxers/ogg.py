@@ -26,9 +26,10 @@ class Ogg(feedcomponent.ParseLaunchComponent):
 
 def createComponent(config):
     pipeline = 'oggmux name=muxer '
-    for eater in config['sources']:
-        pipeline += '{ @ eater:%s @ ! mux. } ' % name
-        
-    component = Ogg(config['name'], sources, pipeline)
+    for eater in config['source']:
+        pipeline += '{ @ eater:%s @ ! queue } ! muxer. ' % eater
+    pipeline += 'muxer.'
+    
+    component = Ogg(config['name'], config['source'], pipeline)
     
     return component

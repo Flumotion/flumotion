@@ -27,19 +27,21 @@ def state_changed_cb(element, old, new, channel):
             element.set_channel(c)
     
 class Soundcard(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, pipeline):
+    def __init__(self, name, feeders, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     [],
-                                                    ['default'],
+                                                    feeders,
                                                     pipeline)
                                        
 def createComponent(config):
-    kind = 'osssrc'
-    component = Soundcard(config['name'],
+    kind = 'alsasrc'
+    config['device'] = 'hw:0'
+    
+    component = Soundcard(config['name'], config['feed'],
                           '%s name=source' % kind)
 
     element = component.pipeline.get_by_name('source')
-    element.connect('state-change', state_changed_cb, config['input'])
+    #element.connect('state-change', state_changed_cb, config['input'])
     element.set_property('device', config['device'])
     #element.set_property('channels', config['channels'])
     #element.set_property('samplerate', config['samplerate'])

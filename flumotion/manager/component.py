@@ -50,6 +50,12 @@ class Feeder:
         """
         # we really do want a full feederName because that's how it's called
         # in the code
+        
+        self.ready = False
+        self.feederName = feederName
+        self.dependencies = {}
+        self.component = None
+        
         if feederName.find(':') == -1:
             # FIXME: log this more nicely ?
             print "ERROR: cannot create feeder without full name"
@@ -57,11 +63,7 @@ class Feeder:
         
         componentName, feedName = feederName.split(':')
         self.feedName = feedName
-        self.feederName = feederName
-        self.component = None
 
-        self.dependencies = {}
-        self.ready = False
         
     def addDependency(self, feederName, func, *args):
         """

@@ -1,3 +1,25 @@
+2004-10-13  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_audio_encoder.glade:
+	* flumotion/component/base/producer.py:
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/component/encoders/theora.py:
+	* flumotion/component/encoders/vorbis.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/component/muxers/ogg.py:
+	* flumotion/component/soundcard/soundcard.py:
+	* flumotion/component/soundcard/soundcard.xml:
+	* flumotion/component/videotest/videotest.py:
+	* flumotion/component/videotest/videotest.xml:
+	* flumotion/component/webcam/webcam.py:
+	* flumotion/component/webcam/webcam.xml:
+	* flumotion/manager/component.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Woho, the default configuration is not only parsable, but
+	runnable!
+	
 2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/client.py:
@@ -27,6 +49,8 @@
 	  implement SSL option (-t on worker and manager)
 
 2004-10-13  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/Makefile.am: Add setup.py
 
 	* configure.ac:
 	* data/glade/wizard_overlay.glade:
