@@ -293,18 +293,18 @@ class Window(log.Loggable, gobject.GObject):
         self.current_component = gtkAdminInstance
 
     ### IAdminView interface methods: FIXME: create interface somewhere
-    def componentCall(self, componentName, methodName, *args, **kwargs):
+    def componentCall(self, componentState, methodName, *args, **kwargs):
         # FIXME: for now, we only allow calls to go through that have
         # their UI currently displayed.  In the future, maybe we want
         # to create all UI's at startup regardless and allow all messages
         # to be processed, since they're here now anyway   
-        self.debug("componentCall received for %s.%s ..." % (
-            componentName, methodName))
-        name = self.components_view.get_selected_name()
-        if not name:
+        self.debug("componentCall received for %r.%s ..." % (
+            componentState, methodName))
+        state = self.components_view.get_selected_state()
+        if not state:
             self.debug("... but no component selected")
             return
-        if componentName != name:
+        if componentState != state:
             self.debug("... but component is not displayed")
             return
         

@@ -237,19 +237,10 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     def remote_log(self, category, type, message):
         self.log('remote: %s: %s: %s' % (type, category, message))
         
-    def remote_componentCall(self, componentName, methodName, *args, **kwargs):
+    def remote_componentCall(self, componentState, methodName, *args, **kwargs):
         self.callViews('componentCall',
-            componentName, methodName, *args, **kwargs)
+            componentState, methodName, *args, **kwargs)
 
-    def remote_componentStateChanged(self, component, state):
-        """
-        @param component: component that changed state.
-        @param state: new state of component.
-        """
-        self.debug('componentStateChanged %s' % component.get('name'))
-        self._components[component.get('name')] = component
-        self.emit('update')
-       
     # IStateListener interface
     def stateSet(self, state, key, value):
         self.debug("state set on %r: key %s" % (state, key))

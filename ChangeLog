@@ -2,6 +2,14 @@
 
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	  rework more functions to work on componentState instead of name
+
+2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
 	* flumotion/component/base/admin_gtk.py:
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
 	* flumotion/component/producers/bttv/admin_gtk.py:

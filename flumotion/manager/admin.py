@@ -262,16 +262,6 @@ class AdminHeaven(base.ManagerHeaven):
         
     ### my methods
 
-# FIXME: deprecated; use avatarsCallRemote and use moods
-    def componentStateChanged(self, component, state):
-        """
-        Tell all created AdminAvatars that a component has changed state.
-
-        @type component: L{flumotion.manager.component.ComponentAvatar}
-        """
-        for avatar in self.getAvatars():
-            avatar.componentStateChanged(component, state)
-
     def avatarsCallRemote(self, methodName, *args, **kwargs):
         """
         Call a remote method on all AdminAvatars in this heaven.

@@ -641,9 +641,10 @@ class ComponentAvatar(base.ManagerAvatar):
 
     def perspective_adminCallRemote(self, methodName, *args, **kwargs):
         # proxies admin remote call from component's medium to admin heaven
-        componentName = self.avatarId
+        mapper = self.vishnu.getComponentMapper(self)
+        componentState = mapper.state
         self.vishnu.adminHeaven.avatarsCallRemote("componentCall",
-            componentName, methodName, *args, **kwargs)
+            componentState, methodName, *args, **kwargs)
 
     def perspective_notifyFeedPorts(self, feedPorts):
         self.debug('received feed ports from component: %s' % feedPorts)
