@@ -45,9 +45,20 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/workers
 
 # install service files
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
-install -m 755 doc/redhat/flu-manager $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
-install -m 755 doc/redhat/flu-worker $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
-#install -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+install -m 755 \
+	doc/redhat/init.d/flu-manager \
+	$RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
+install -m 755 \
+	doc/redhat/init.d/flu-worker \
+	$RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
+
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+install -m 755 \
+	doc/redhat/sysconfig/flumotion-manager \
+	$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+install -m 755 \
+	doc/redhat/sysconfig/flumotion-worker \
+	$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 
 # create a .flumotion in the new home
 # FIXME: needs to be done more gracefully
@@ -93,12 +104,18 @@ EOF
 
 fi
 
+%preun
+# if removal and not upgrade, stop the processes
+if [ $1 -eq 1]
+then
+  service flu-manager stop > /dev/null
+  service flu-worker stop > /dev/null
+fi
+
 %postun
 # if removal and not upgrade, clean up user and config
 if [ $1 -eq 0 ]
 then
-  service flu-manager stop > /dev/null
-  service flu-worker stop > /dev/null
   /usr/sbin/userdel flumotion
 
   rm -rf %{_sysconfdir}/flumotion/*
@@ -127,6 +144,8 @@ fi
 %attr(750,flumotion,root) %{_localstatedir}/log/flumotion
 %{_sysconfdir}/rc.d/init.d/flu-manager
 %{_sysconfdir}/rc.d/init.d/flu-worker
+%config(noreplace) %{_sysconfdir}/sysconfig/flumotion-manager
+%config(noreplace) %{_sysconfdir}/sysconfig/flumotion-worker
 
 %changelog
 * Mon Jun 07 2004 Thomas Vander Stichele <thomas at apestaart dot org>

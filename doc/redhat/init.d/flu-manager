@@ -21,7 +21,7 @@ manager=/usr/bin/flumotion-manager
 prog=flumotion-manager
 pidfile=${PIDFILE-/var/run/flumotion-manager.pid}
 lockfile=${LOCKFILE-/var/lock/subsys/flumotion-manager}
-PLANET=/etc/flumotion/conf/managers/default/planet.xml
+PLANET=/etc/flumotion/managers/default/planet.xml
 
 # The semantics of these two functions differ from the way apachectl does
 # things -- attempting to start while running is a failure, and shutdown

@@ -1,3 +1,15 @@
+2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/Makefile.am:
+	* doc/redhat/flu-manager:
+	* doc/redhat/flu-worker:
+	* doc/redhat/init.d/flu-manager:
+	* doc/redhat/sysconfig/flumotion-manager:
+	* doc/redhat/sysconfig/flumotion-worker:
+	* flumotion.spec.in:
+
+	More package fixes, service starts up nicely now, yay
+
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/admin.glade:

@@ -1,0 +1,2 @@
+# these are the default insecure settings
+OPTIONS="-v -u user -p test"
