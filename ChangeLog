@@ -1,5 +1,11 @@
 2004-10-25  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/firewire/firewire.py:
+
+	Add width, height and framerate
+	
+2004-10-25  Johan Dahlin  <johan@gnome.org>
+
 	* flumotion/wizard/steps.py:
 	* flumotion/wizard/wizard.py:
 

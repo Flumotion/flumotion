@@ -30,21 +30,35 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
                                        
 def createComponent(config):
-    p = ''
+    width = config.get('width', 384)
+    height = config.get('height', 288)
+    framerate = config.get('framerate', 12.5)
+
+    if 12.5 < framerate <= 25:
+        drop_factor = 1
+    elif 6.3 < framerate <= 12.5:
+        drop_factor = 2
+    elif 3.2 < framerate <= 6.3:
+        drop_factor = 4
+    else:
+        drop_factor = 8
+
+    if height > 288:
+        interlaced_height = 576
+    else:
+        interlaced_height = 288
+        
+    template = """dv1394src ! dvdec name=dec drop-factor=%(drop_factor)d ! video/x-raw-yuv,format=(fourcc)YUY2 !
+    videorate ! videoscale ! video/x-raw-yuv,width=%(interlaced_height)s,height=288 !
+    videoscale ! video/x-raw-yuv,width=%(width)s,height=%(height)s,framerate=%(framerate)f,format=(fourcc)YUY2 ! @feeder::video@
+    dec. ! audio/x-raw-int ! audiorate !
+    audioscale ! audio/x-raw-int,rate=24000 ! @feeder::audio@""" % dict(drop_factor=drop_factor,
+                                                                        interlaced_height=interlaced_height,
+                                                                        width=width,
+                                                                        height=height,
+                                                                        framerate=framerate)
+    template = template.replace('\n', '')
     
-    # read from firewire, decode video, drop every 2 frames
-    p += 'dv1394src ! dvdec name=dec drop-factor=2 ! video/x-raw-yuv,format=(fourcc)YUY2 ! '
-    
-    # normalize rate, scale down to get rid of interlace
-    p += 'videorate ! videoscale ! video/x-raw-yuv,width=384,height=288 ! '
-    p += 'videoscale ! video/x-raw-yuv,width=384,height=288,framerate=12.5,format=(fourcc)YUY2 ! @feeder::video@ '
-    
-    # audio gets rate corrected
-    p += 'dec. ! audio/x-raw-int ! audiorate ! '
-    
-    # downsample audio to encode it at lower bitrate
-    p += 'audioscale ! audio/x-raw-int,rate=24000 ! @feeder::audio@'
-            
-    component = Firewire(config['name'], p)
+    component = Firewire(config['name'], template)
 
     return component
