@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_worker_heaven -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_manager_worker -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server

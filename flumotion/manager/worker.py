@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_manager_worker -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -89,46 +89,6 @@ class WorkerHeaven(base.ManagerHeaven):
         self.state = worker.ManagerWorkerHeavenState()
         
     ### my methods
-
-    def loadConfiguration(self, filename, string=None):
-        # XXX: Merge?
-        self.conf = config.FlumotionConfigXML(filename, string)
-
-        # trigger an update of config for all attached workers
-        for worker in self.getAvatars():
-            self.workerAttached(worker)
-            
-    def getEntries(self, worker):
-        # get all components from the config for this worker
-        workerName = worker.getName()
-        self.debug('getEntries: for worker %s' % workerName)
-        if not self.conf:
-            self.debug('getEntries: no config, no entries')
-            return []
-
-        retval = []
-
-        entries = self.conf.getComponentEntries()
-
-        for entry in entries.values():
-            # if a worker name is specified, then respect it
-            if entry.worker and entry.worker != workerName:
-                self.log('getEntries: component %s is for worker %s, skipping' %
-                    (entry.name, entry.worker))
-                continue
-            # if not, then only add if it is not currently running
-            if self.vishnu.componentHeaven.hasAvatar(entry.name):
-                self.log('getEntries: component %s already running, skipping' %
-                    entry.name)
-                continue
-
-            self.log('getEntries: adding component %s for worker %s' % (
-                entry.name, workerName))
-            retval.append(entry)
-
-        self.debug('getEntries: returning %r' % retval)
-        return retval
-
     def workerAttached(self, workerAvatar):
         # called when the mind is attached, ie the worker logged in
         workerName = workerAvatar.getName()
