@@ -645,12 +645,10 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
     # handle the thread deserializing queues
     def _handleQueue(self):
 
-        print "handling added queue"
         # handle added clients
         self._added_lock.acquire()
 
-        while len(self._added_queue):
-            print "handling and add"
+        while self._added_queue:
             (sink, fd) = self._added_queue.pop()
             self._added_lock.release()
             self.client_added_handler(sink, fd)
@@ -661,7 +659,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         # handle removed clients
         self._removed_lock.acquire()
 
-        while len(self._removed_queue):
+        while self._removed_queue:
             (sink, fd, reason, stats) = self._removed_queue.pop()
             self._removed_lock.release()
             self.client_removed_handler(sink, fd, reason, stats)
@@ -707,8 +705,6 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         # FIXME: GIL problem, don't update UI for now
         self.needsUpdate = True
         #self.update_ui_state()
-        # actually close it - needs gst-plugins 0.8.5 of multifdsink
-        # self.debug('[fd %5d] closing' % fd)
 
     def feeder_state_change_cb(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,
