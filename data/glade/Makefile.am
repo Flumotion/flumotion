@@ -1,12 +1,14 @@
 glade_DATA = \
 	admin.glade 			\
 	admin-wizard.glade		\
+	authenticate.glade		\
 	connection-dialog.glade		\
 	connections.glade		\
 	greeter-initial.glade		\
 	greeter-connect_to_existing.glade	\
 	greeter-authenticate.glade	\
 	greeter-load_connection.glade	\
+	open-connection.glade		\
 	wizard.glade 			\
 	wizard_audiotest.glade		\
 	wizard_audio_encoder.glade	\

@@ -1,3 +1,8 @@
+2005-03-23  Andy Wingo  <wingo@pobox.com>
+
+	* data/glade/Makefile.am (glade_DATA): Added authenticate.glade
+	and open-connection.glade. Thanks to Zaheer Merali for the tip.
+
 2005-03-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:
