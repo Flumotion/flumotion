@@ -58,6 +58,10 @@ and then access the variables from the configure module.  For example:
 @type version:     string
 '''
 
+# Note: This module is loaded very early on, so
+#       don't add any extra flumotion imports unless you
+#       really know what you're doing
+
 # FIXME: document all the module variables
 
 import os

@@ -1,3 +1,17 @@
+2004-11-02  Johan Dahlin  <johan@gnome.org>
+
+	* Makefile.am:
+	* bin/flumotion-manager.in:
+	* bin/flumotion-worker.in:
+	* configure.ac:
+	* flumotion/common/common.py:
+	* flumotion/common/registry.py:
+	* flumotion/common/setup.py:
+	* flumotion/configure/configure.py:
+	* flumotion/test/test_registry.py:
+
+	Add support for FLU_REGISTRY_PATH
+	
 2004-10-29  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_firewire.glade:

@@ -27,6 +27,11 @@ A set of common functions.
 import os 
 import sys
 
+from twisted.python import reflect
+
+# Note: This module is loaded very early on, so
+#       don't add any extra flumotion imports unless you
+#       really know what you're doing.
 from flumotion.configure import configure
 
 def formatStorage(units, precision = 2):
@@ -196,3 +201,92 @@ def argRepr(args=(), kwargs={}):
         s += ', '.join(r)
             
     return s
+
+def _listRecursivly(path):
+    """
+    I'm similar to os.listdir, but I work recursivly
+    
+    @param path: the path
+    @type  path: string
+    """
+
+    
+    retval = []
+    if not os.path.isdir(path):
+        return retval
+
+    try:
+        files = os.listdir(path)
+    except OSError:
+        pass
+    else:
+        for f in files:
+            retval += _listRecursivly(os.path.join(path, f))
+
+    if os.path.exists(os.path.join(path, '__init__.py')):
+        retval.append(path)
+            
+    return retval
+
+def _findPackages(path):
+    """
+    I take a directory and returns a list of python packages
+    @param path: the path
+    @type  path: string
+    """
+
+    dirs = _listRecursivly(path)
+    if path in dirs:
+        dirs.remove(path)
+        
+    packageNames = map(reflect.filenameToModuleName, dirs)
+    
+    # if os.path.exists(os.path.join(path, '__init__.py'))
+    #    packageNames = map(lambda n: '.'.join(n.split('.')[1:]), packageNames)
+    
+    return packageNames
+
+def addPackagePath(packagePath):
+    """
+    Add a package path so we can import stuff that's already partly present
+    @param packagePath: path to add
+    @type packagePath:  string
+    """
+
+    # First add the root to sys.path, so we can import stuff from it,
+    # probably a good idea to live it there, if we want to do
+    # fancy stuff later on.
+    sys.path.append(os.path.abspath(packagePath))
+
+    # Find the packages in the path and sort them,
+    # the following algorithm only works if they're sorted.
+    # By sorting the list we can ensure that a parent package
+    # is always processed before one of its childrens
+    packageNames = _findPackages(packagePath)
+    packageNames.sort()
+
+    if not packageNames:
+        return
+
+    # Since the list is sorted, the top module is the first item
+    toplevelName = packageNames[0]
+    
+    # Append the bundle to the __path__ of the toplevel directory
+    package = reflect.namedAny(toplevelName)
+    package.__path__.append(os.path.join(packagePath, toplevelName))
+    
+    for packageName in packageNames[1:]:
+        package = sys.modules.get(packageName, None)
+        
+        # If the package fails to import from our bundle, it means
+        # That its funknown at the moment, import it from the package dir
+        # (eg non bundle)
+        if not package:
+            package = reflect.namedAny(packageName)
+
+        # Append ourselves to the packages __path__, this is all
+        # magic that's required
+        subPath = os.path.join(packagePath,
+                               packageName.replace('.', os.sep))
+        package.__path__.insert(0, subPath)
+

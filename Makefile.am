@@ -44,3 +44,5 @@ release: dist
 # generate md5 sum files
 %.md5: %
 	md5sum $< > $@
+
+.PHONY: test

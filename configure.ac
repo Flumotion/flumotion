@@ -26,7 +26,7 @@ AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 
 dnl check for python
-AM_PATH_PYTHON(2.3)
+AS_PATH_PYTHON(2.3)
 dnl useful when we compile our own python modules
 dnl AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
 

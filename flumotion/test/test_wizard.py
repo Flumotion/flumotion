@@ -94,3 +94,23 @@ class WizardSaveTest(unittest.TestCase):
         
         self.failUnlessEqual(config['audio-encoder'].getFeeders(), ['video-source:audio'])
         self.failUnlessEqual(config['video-overlay'].getFeeders(), ['video-source:video'])
+
+    def testAudioTestWorkers(self):
+        source = self.wizard['Source']
+        source.combobox_video.set_active(enums.VideoDevice.Webcam)
+        source.combobox_audio.set_active(enums.AudioDevice.Test)
+
+        self.wizard.run(False, ['first', 'second'], True)
+        
+        self.wizard['Source'].worker = 'second'
+        self.wizard['Webcam'].worker = 'second'
+        self.wizard['Overlay'].worker = 'second'
+        self.wizard['Encoding'].worker = 'second'
+        self.wizard['Theora'].worker = 'second'
+        self.wizard['Vorbis'].worker = 'second'
+        self.wizard['HTTP Streamer (audio & video)'].worker = 'first'
+        
+        config = self.wizard.getConfig()
+        for item in config.values():
+            print item.name, item.worker
+        #print self.wizard.printOut()
