@@ -23,15 +23,18 @@ from twisted.internet import reactor
 
 class TranscoderFactory(pb.Root):
     def remote_setController(self, controller):
-        print "Transcoder.remote_setController", controller
+        print "Transcoder.setController", controller
         self.controller = controller
 
     def remote_startFileSrc(self, filename):
         print 'Transcoder.remote_startFilesrc', filename
         self.thread = gst.Thread('acquisition-thread')
         
-        self.src = gst.element_factory_make('filesrc')
-        self.src.set_property('location', filename)
+        #self.src = gst.element_factory_make('filesrc')
+        #self.src.set_property('location', filename)
+        
+        self.src = gst.element_factory_make('tcpserversrc')
+        #self.src.set_property('location', filename)
         
         self.sink = gst.element_factory_make('xvimagesink')
         self.reframer = gst.element_factory_make('videoreframer')
@@ -42,5 +45,10 @@ class TranscoderFactory(pb.Root):
         self.src.link(self.reframer)
         self.reframer.link_filtered(self.sink, gst.caps_from_string(caps))
         self.controller.callRemote('transStarted', self)
-        
+            
         reactor.callLater(0, self.thread.set_state, gst.STATE_PLAYING)
+
+if __name__ == '__main__':
+    factory = pb.PBServerFactory(TranscoderFactory())
+    reactor.listenTCP(8803, factory)
+    reactor.run()

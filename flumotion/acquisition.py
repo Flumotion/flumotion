@@ -22,50 +22,68 @@ from twisted.spread import pb
 from twisted.internet import reactor
 
 class AcquisitionFactory(pb.Root):
-    def __init__(self):
-        self.thread = None
+    def __init__(self, pipeline):
+        self.pipeline = pipeline
+        
+        self.thread = gst.parse_launch('{ %s }' % pipeline)
+        self.src = self.thread.get_list()[-1]
 
+        self.sink = gst.element_factory_make('fakesink')
+        
+        # XXX: Disconnect?
+        pad = self.sink.get_pad('sink')
+        pad.connect('notify::caps', self.sink_pad_notify_caps_cb)
+
+        self.thread.add(self.sink)
+        self.src.link(self.sink)
+        
     def sink_pad_notify_caps_cb(self, pad, unused):
+        print 'got caps, notifying'
+
         caps = pad.get_negotiated_caps()
         if not caps:
             return
 
-        self.controller.callRemote('acqNotifyCaps', self, str(caps))
+        self.control.callRemote('acqNotifyCaps', hash(self), str(caps))
 
-        #self.sink.get_pad('sink').disconnect(self.sig_id)
-        reactor.callLater(0, self.assignRealSink)
-
-    def assignRealSink(self):
+        # 
+        #reactor.callLater(0, self.assignRealSink)
+        
+    def remote_assignRealSink(self):
+        print 'swapping sinks'
+        
         self.thread.set_state(gst.STATE_PAUSED)
+        
         # Pause, unlink and remove
         self.thread.remove(self.sink)
         self.src.unlink(self.sink)
 
         # Create new, add and link and play
-        self.sink = gst.element_factory_make('filesink')
-        self.sink.set_property('location', self.filename)
+        #self.sink = gst.element_factory_make('filesink')
+        #self.sink.set_property('location', self.filename)
+        self.sink = gst.element_factory_make('tcpclientsink')
         self.thread.add(self.sink)
         self.src.link(self.sink)
-        
-        self.thread.set_state(gst.STATE_PLAYING)
-        
-    def remote_setController(self, controller):
-        print "Acquisition.remote_setController", controller
-        self.controller = controller
 
+        self.thread.set_state(gst.STATE_PLAYING)
+
+    def remote_setController(self, object):
+        print 'Acquisition.setController', object
+        self.control = object
+        return hash(self)
+    
+    def remote_setTranscoder(self, object):
+        print 'Acquisition.setTranscoder', object
+        self.transcoder = object
+        
     def remote_startFileSink(self, filename):
         print "Acquisition.remote_startFileSink", filename
         self.filename = filename
-        
-        self.thread = gst.Thread('acquisition-thread')
-
-        self.src = gst.element_factory_make('videotestsrc')
-        self.sink = gst.element_factory_make('fakesink')
-        
-        pad = self.sink.get_pad('sink')
-        self.sig_id = pad.connect('notify::caps', self.sink_pad_notify_caps_cb)
-        
-        self.thread.add_many(self.src, self.sink)
-        self.src.link(self.sink)
-        
         self.thread.set_state(gst.STATE_PLAYING)
+        
+if __name__ == '__main__':
+    import sys
+    
+    factory = pb.PBServerFactory(AcquisitionFactory(sys.argv[1]))
+    reactor.listenTCP(8802, factory)
+    reactor.run()
