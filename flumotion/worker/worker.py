@@ -370,6 +370,7 @@ class JobHeaven(pb.Root, log.Loggable):
         self.avatars = {}
         self.brain = brain
 
+        # FIXME: use and option from the command line for port range
         # Allocate ports
         self.ports = []
         for port in configure.defaultGstPortRange:
