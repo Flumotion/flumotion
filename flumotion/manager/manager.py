@@ -101,6 +101,16 @@ class Dispatcher(log.Loggable):
         
         self.heavens[interface] = heaven
 
+class ManagerCredentials(cred.FlexibleCredentials):
+    def requestAvatarId(self, credentials):
+        # XXX: If it's component, allow anonymous access.
+        #      This is a big hack, but it emulates the current behavior
+        #      Do we need to authenticate components and workers?
+        if interfaces.IBaseComponent in credentials.interfaces:
+            return credentials.username
+
+        return cred.FlexibleCredentials.requestAvatarId(self, credentials)
+
 class Vishnu:
     """
     I am the toplevel manager object that knows about all heavens and factories
@@ -119,10 +129,10 @@ class Vishnu:
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
-        checker = cred.FlexibleCredentials()
-        checker.allowAnonymous(True)
+        self.checker = ManagerCredentials()
+        self.checker.allowAnonymous(True) # XXX: False
         
-        p = portal.FlumotionPortal(self.dispatcher, [checker])
+        p = portal.FlumotionPortal(self.dispatcher, [self.checker])
         #unsafeTracebacks = 1 # for debugging tracebacks to clients
         self.factory = pb.PBServerFactory(p)
 
