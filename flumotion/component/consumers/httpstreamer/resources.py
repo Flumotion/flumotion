@@ -203,11 +203,11 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             return True
         except OSError, (no, s):
             if no == errno.EBADF:
-                self.warning('[fd %5d] client gone before writing header' % fd)
+                self.info('[fd %5d] client gone before writing header' % fd)
             elif no == errno.ECONNRESET:
-                self.warning('[fd %5d] client reset connection writing header' % fd)
+                self.info('[fd %5d] client reset connection writing header' % fd)
             else:
-                self.warning('[fd %5d] unhandled write error when writing header: %s' % (fd, s))
+                self.info('[fd %5d] unhandled write error when writing header: %s' % (fd, s))
         # trigger cleanup of request
         del request
         return False
@@ -300,9 +300,11 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             id = self._fdToKeycard[fd].id
             del self._fdToKeycard[fd]
             del self._idToKeycard[id]
+            self.debug('[fd %5d] asking bouncer %s to remove keycard id %s' % (
+                fd, self.bouncerName, id))
             self.streamer.medium.removeKeycard(self.bouncerName, id)
         if self._fdToDurationCall.has_key(fd):
-            self.debug("canceling later expiration on fd %d" % fd)
+            self.debug('[fd %5d] canceling later expiration call' % fd)
             self._fdToDurationCall[fd].cancel()
             del self._fdToDurationCall[fd]
 
@@ -329,28 +331,30 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         Expire a client due to a duration expiration.
         """
-        self.debug("duration exceeded, expiring client on fd %d" % fd)
+        self.debug('[fd %5d] duration exceeded, expiring client' % fd)
 
         # we're called from a callLater, so we've already run; just delete
         if self._fdToDurationCall.has_key(fd):
             del self._fdToDurationCall[fd]
             
+        self.debug('[fd %5d] asking streamer to remove client' % fd)
         self.streamer.remove_client(fd)
 
     def expireKeycard(self, keycardId):
         """
         Expire a client's connection associated with the keycard Id.
         """
-        self.debug("expiring client with keycard id %s" % keycardId)
+        self.debug('[fd %5d] expiring client' % fd)
 
         keycard = self._idToKeycard[keycardId]
         fd = keycard._fd
 
         if self._fdToDurationCall.has_key(fd):
-            self.debug("canceling later expiration on fd %d" % fd)
+            self.debug('[fd %5d] canceling later expiration call' % fd)
             self._fdToDurationCall[fd].cancel()
             del self._fdToDurationCall[fd]
 
+        self.debug('[fd %5d] asking streamer to remove client' % fd)
         self.streamer.remove_client(fd)
 
     ### resource.Resource methods
