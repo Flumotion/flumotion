@@ -101,7 +101,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         """
         self.mind = mind
         ip = self.mind.broker.transport.getPeer().host
-        self.debug('PB Client from %s attached' % ip)
+        self.debug('PB client from %s attached' % ip)
         self.log('Client attached is mind %s' % mind)
 
     def detached(self, mind):
@@ -113,7 +113,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         L{flumotion.manager.manager.Dispatcher.removeAvatar}
         """
         assert(self.mind == mind)
-        self.debug('Client from %s detached' % self.getClientAddress())
+        self.debug('PB client from %s detached' % self.getClientAddress())
         self.mind = None
         self.log('Client detached is mind %s' % mind)
 

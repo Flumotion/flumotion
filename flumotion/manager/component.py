@@ -53,9 +53,9 @@ class Feeder:
         # we really do want a full feederName because that's how it's called
         # in the code
         
-        self.ready = False
+        self._ready = False
         self.feederName = feederName
-        self.dependencies = {}
+        self._dependencies = {}
         self.component = None
         
         if feederName.find(':') == -1:
@@ -64,7 +64,6 @@ class Feeder:
             raise
         
         self.feedName = feederName.split(':')[1]
-
         
     def addDependency(self, feederName, func, *args):
         """
@@ -78,10 +77,10 @@ class Feeder:
         @param args: arguments to the function
         """
 
-        if not self.dependencies.has_key(feederName):
-            self.dependencies[feederName] = []
+        if not self._dependencies.has_key(feederName):
+            self._dependencies[feederName] = []
             
-        self.dependencies[feederName].append((func, args))
+        self._dependencies[feederName].append((func, args))
 
     def setComponentAvatar(self, componentAvatar):
         """
@@ -94,24 +93,28 @@ class Feeder:
         self.component = componentAvatar
         self.component.debug('taken control of feeder %s' % self.getName())
 
-    def setReady(self):
+    def setReadiness(self, readiness):
         """
+        @param readiness: bool
+
         Set the feeder to ready, triggering dependency functions.
         """
-        assert not self.ready
+        assert self._ready != readiness
         assert self.component
-        self.component.debug('Feeder.setReady() on feeder %s' % self.getName())
-        self.ready = True
 
-        for eaterName in self.dependencies.keys():
-            for func, args in self.dependencies[eaterName]:
+        self.component.debug('Feeder.setReadiness(%r) on feeder %s' % (
+            readiness, self.getName()))
+        self._ready = readiness
+
+        for eaterName in self._dependencies.keys():
+            for func, args in self._dependencies[eaterName]:
                 self.component.debug('running dependency function %r with args %r for eater from %s' % (func, args, eaterName))
-                func(*args)
+                func(readiness, *args)
                 
-        self.dependencies = {}
+        self._dependencies = {}
 
     def isReady(self):
-        return self.ready
+        return self._ready
 
     def hasComponentAvatar(self):
         return self.component is not None
@@ -132,7 +135,7 @@ class Feeder:
         return self.component.getFeedPort(self.feedName)
     
     def __repr__(self):
-        return '<Feeder %s on %r ready=%r>' % (self.feederName, self.component or '<unavailable component>', self.ready)
+        return '<Feeder %s on %r ready=%r>' % (self.feederName, self.component or '<unavailable component>', self._ready)
     
 class FeederSet(log.Loggable):
     """
@@ -191,29 +194,31 @@ class FeederSet(log.Loggable):
 
         return feeder.isReady()
     
-    def feederSetReady(self, feederName): 
+    def feederSetReadiness(self, feederName, readiness): 
         """
-        Set the given feeder to ready.
+        Set the given feeder to the given readiness.
         """
-        self.debug('feederSetReady: setting feeder %s ready' % (feederName))
+        self.debug('feederSetReadiness: setting feeder %s readiness to %r' % (
+            feederName, readiness))
 
         if not self.feeders.has_key(feederName):
             self.error('FIXME: no feeder called: %s' % feederName)
             return
         
         feeder = self.feeders[feederName]
-        feeder.setReady()
-        self.debug('feederSetReady: done')
+        feeder.setReadiness(readiness)
             
     def dependComponentOnFeeder(self, componentAvatar, feederName, func):
         """
         Make the given component dependent on the given feeder.
-        Register a function and arguments to call when the feeder is ready.
+        Register a function and arguments to call when the feeder's readiness
+        changes.
 
         @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         @param componentAvatar: the component to make dependant
-        @param feederName: the name of the feeder to depend upon
-        @param func: a function to run when the feeder is ready, taking the ComponentAvatar as its first argument.
+        @param feederName:      the name of the feeder to depend upon
+        @param func:            function to run when feeder changes readiness.
+                                function takes (readiness, ComponentAvatar)
         """
 
         if not self.feeders.has_key(feederName):
@@ -227,7 +232,7 @@ class FeederSet(log.Loggable):
             feeder.addDependency(feederName, func, componentAvatar)
         else:
             self.debug('feeder %s is ready, executing function %r' % (feederName, func))
-            func(componentAvatar)
+            func(True, componentAvatar)
 
 class ComponentAvatar(base.ManagerAvatar):
     """
@@ -347,6 +352,7 @@ class ComponentAvatar(base.ManagerAvatar):
         self._getState()
 
     def detached(self, mind):
+        self.heaven.unregisterComponent(self)
         self.info('component "%s" logged out' % self.avatarId)
         base.ManagerAvatar.detached(self, mind)
         
@@ -574,7 +580,7 @@ class ComponentAvatar(base.ManagerAvatar):
         #    return
 
         self.debug('checkFeedReady: setting to ready')
-        self.heaven.setFeederReady(self, feedName)
+        self.heaven.setFeederReadiness(self, feedName, True)
         self.debug('checkFeedReady: set to ready')
 
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
@@ -693,15 +699,7 @@ class ComponentHeaven(base.ManagerHeaven):
         self._feederSet = FeederSet()
         self._componentEntries = {} # configuration entries
         
-    ### IHeaven methods
-    def removeAvatar(self, avatarId):
-        avatar = self.avatars[avatarId]
-        avatar.cleanup()
-        self._feederSet.removeFeeders(avatar)
-        self.vishnu.adminHeaven.componentRemoved(avatar)
-        
-        base.ManagerHeaven.removeAvatar(self, avatarId)
-    
+   
     ### our methods
     def _componentIsLocal(self, componentAvatar):
         host = componentAvatar.getClientAddress()
@@ -813,7 +811,7 @@ class ComponentHeaven(base.ManagerHeaven):
         componentAvatar.start(eatersData, feedersData)
 
     # FIXME: better name startComponentIfReady
-    def checkComponentStart(self, componentAvatar):
+    def checkComponentStart(self, readiness, componentAvatar):
         """
         Check if the component can start up, and start it if it can.
         This depends on whether the components and feeders it depends on have
@@ -862,8 +860,26 @@ class ComponentHeaven(base.ManagerHeaven):
         for feeder in eaterFeeders:
             self._feederSet.dependComponentOnFeeder(componentAvatar, feeder,
                 self.checkComponentStart)
-                
-    def setFeederReady(self, componentAvatar, feedName):
+
+    def unregisterComponent(self, componentAvatar):
+        """
+        This function unregisters a component in the heaven.
+        It is triggered when the mind is detached.
+
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+        """
+        componentAvatar.debug('unregistering component')
+
+        # tell the feeder set
+        self._feederSet.removeFeeders(componentAvatar)
+
+        # tell the admin client
+        self.vishnu.adminHeaven.componentRemoved(componentAvatar)
+        
+        # clean up component
+        componentAvatar.cleanup()
+
+    def setFeederReadiness(self, componentAvatar, feedName, readiness):
         """
         Tell the feeder set that the given feed on the given component is
         ready.
@@ -872,12 +888,14 @@ class ComponentHeaven(base.ManagerHeaven):
         @param componentAvatar: the component containing the feed
         @type  feedName:        string
         @param feedName:        the feed set to ready
+        @type  readiness:       boolean
         """
 
         feederName = componentAvatar.getName() + ':' + feedName
-        componentAvatar.debug('setting feeder %s to ready in feaderset' % feederName)
-        self._feederSet.feederSetReady(feederName)
-        componentAvatar.log('setFeederReady done')
+        componentAvatar.debug(
+            'setting feeder %s readiness to %s in feaderset' % (
+                feederName, readiness))
+        self._feederSet.feederSetReadiness(feederName, readiness)
 
     def shutdown(self):
         """

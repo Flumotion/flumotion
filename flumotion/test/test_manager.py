@@ -65,6 +65,7 @@ class TestComponentHeaven(unittest.TestCase):
 
         #self.assertRaises(AssertionError,
         #                  self.heaven.createAvatar, 'does-not-exist')
+        # make sure callbacks get cancelled
         p.cleanup()
 
     def testComponentIsLocal(self):
@@ -83,6 +84,7 @@ class TestComponentHeaven(unittest.TestCase):
         self.heaven.removeComponent(a)
         assert not self.heaven.hasComponent('prod')
         self.assertRaises(KeyError, self.heaven.removeComponent, a)
+        a.cleanup()
         
     def testRemoveComponent(self):
         assert not self.heaven.hasComponent('fake')

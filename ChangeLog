@@ -1,6 +1,13 @@
 2005-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/base.py:
+	* flumotion/manager/component.py:
+	* flumotion/test/test_manager.py:
+	  change from setReady to setReadiness
+
+2005-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/base.py:
 	  add a hasAvatar method
 	* flumotion/manager/worker.py:
 	  check to see if a component is already running before asking a
