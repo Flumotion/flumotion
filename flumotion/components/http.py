@@ -292,7 +292,7 @@ class HTTPStreamingResource(resource.Resource):
             self.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
-        if len(self.request_hash) >= 1:
+        if len(self.request_hash) >= 1001:
             self.msg('Refusing clients, already 1001 clients')
             error_code = http.SERVICE_UNAVAILABLE
             request.setResponseCode(error_code)

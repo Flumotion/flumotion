@@ -1,5 +1,12 @@
 2004-08-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/multipart-bttv-jpeg.xml:
+	  add jpeg from bttv config
+	* flumotion/components/http.py:
+	  oops, allow more than 1 client
+
+2004-08-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/components/http.py:
 	  set max clients to 1001, return 503 page if too many clients
 
