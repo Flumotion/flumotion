@@ -35,13 +35,13 @@ class HTTPClientKeycard(credentials.UsernamePassword):
         self.ip = ip
         
     def getUsername(self):
-        return self.request.getUser()
+        return self.username
 
     def getPassword(self):
-        return self.request.getPassword()
+        return self.password
 
     def getIP(self):
-        return self.request.getClientIP()
+        return self.ip
 
 class CopyHTTPClientKeycard(HTTPClientKeycard, pb.Copyable):
     pass
