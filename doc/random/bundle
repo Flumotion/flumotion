@@ -9,10 +9,14 @@ the main (only?) usage will be running code on a connected worker.
 
 I'd suggest that a bundle is specified in the xml file, for instance:
 <registry>
-
-  <component name="video-test">
-   ...
-  </component>
+  <components>
+    <component name="video-test">
+<!-- maybe function is not needed, and we keep createComponent -->
+      <entry location="flumotion.component.producers.videotest.videotest"
+             function="..." />
+     ...
+    </component>
+  </components>
   <bundles>
     <bundle name="component-videotest">
       <dependency name="component"/>
@@ -20,17 +24,22 @@ I'd suggest that a bundle is specified in the xml file, for instance:
         <filename location="videotest.py"/>
       </directory>
     </bundle>
-    <bundle name="admin-gtk-videotest">
-      <dependency name="base"/>
+    <bundle name="glade-videotest">
       <directory name="flumotion/components/producers/videotest">
         <filename location="gtk/videotest.glade/>
+      </directory>
+    </bundle>
+    <bundle name="admin-gtk-videotest">
+      <dependency name="base"/>
+      <dependency name="glade-videotest"/>
+      <directory name="flumotion/components/producers/videotest">
         <filename location="gtk/wizard.py"/>
       </directory>
     </bundle>
-    <bundle name="admin-gtk-wizard-videotest">
+    <bundle name="wizard-gtk-videotest">
       <dependency name="base"/>
+      <dependency name="glade-videotest"/>
       <directory name="flumotion/components/producers/videotest">
-        <filename location="gtk/videotest.glade/>
         <filename location="gtk/admin.py"/>
       </directory>
     </bundle>
@@ -40,6 +49,7 @@ I'd suggest that a bundle is specified in the xml file, for instance:
 Notes:
 
 * The bundle name must be unique
+* A file can be in only one bundle
 * <directory> must have a name attribute, which is the base
   directory where all components are loaded from, it should
   be relative to the python root, eg always start with flumotion/
@@ -51,31 +61,51 @@ Admin, sending over a bundle
 
 1. Requests for flumotion/components/producers/videotest/gtk/admin.py
 
-2. "Bundle Manager" tells its in the bundle admin-gtk-videotest
+2. "Bundle Manager" sees it's in the bundle admin-gtk-videotest
 
 3. It checks the dependencies; finds out it depends on base.
 
-4. base bundle is sent over (if its not already up to date)
+4. md5sum of base bundle zip is sent over
 
-5. admin-gtk-videotest bundle is sent over.
+5. if admin's base bundle is out-of-date, it requests and gets the base bundle
+   zip
 
-6. the bundle is unzipped and __path__ is set properly.
+6. md5sum of admin-gtk-videotest bundle is sent over.
 
-7. admin imports the module, end of story
+7. zip gets sent over
 
+8. the bundle is unzipped and __path__ is set properly.
+
+9. admin imports the module, end of story
+
+Note: to speed up the process, the answer to the request for a bundle might
+send over a dictionary of bundle names and md5sums in the first go.
 
 Creating a bundle
 =================
 
-This is only done on request, so bundles are not created unless they're
-needed.
+This is only done on request to the manager.
+Bundles are not created unless they're needed.
 
-1. Create the directory layout, specified in the directory tag
+1. On startup, manager hands bundles configuration to bundle manager
 
-2. Create __init__.py for all directories, unless its already specified
-   in a filename tag
+2. Bundle manager creates a bundler for each bundle registered.
 
-3. Create the zip file.
+3. Manager gets request for a bundle's md5sum and hands it to the corresponding
+   bundler (bundler.md5sum())
+
+4. This is the first time a bundler actually looks at the files.  It notices
+   the bundle is "out of date" since it was never actually created.  It
+   creates the zip file in memory, and calculates the md5sum.
+
+5. Bundle manager returns this md5sum
+
+6. Bundle manager gets request for the zip file and calls bundler.zip()
+
+7. Bundle manager returns zip file
+
+Note: bundle manager could keep size statistics and last use statistics for
+each bundler, so that we could set an upper limit on the memory use.
 
 Requesting bundles
 ==================
@@ -110,10 +140,12 @@ Running a component (in the worker)
 
 (worker)
 
-3. Request the bundle (if its not up to date), by calling getBundle
+3. Request the bundle (if it's not up to date), by calling getBundle
    name is fetched from the registry
 
 4. Run the file from the bundle (using reflect.namedAny)
+   FIXME: not sure if reflect.namedAny makes any sense at all to use here.
+   Why be fancy when we aren't in other cases for the same sort of thing ?
 
 BundleManager
 =============
@@ -122,6 +154,9 @@ public API
 
 class BundleManager:
   def addBundle(bundle)                  # Used by registry
+	# FIXME: I think bundlemanager should manage bundlers,
+        # an intermediary object that knows about contents of bundles
+	# and calculates md5sums and creates zip files
   def getByName(name)
   def getByFilename(filename)
   def getByPythonName(pythonName)
