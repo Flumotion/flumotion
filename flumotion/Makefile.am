@@ -10,6 +10,7 @@ SUBDIRS = \
 	test \
 	tester \
 	twisted \
+	ui \
 	utils \
 	wizard \
 	worker
