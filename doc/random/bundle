@@ -107,6 +107,13 @@ Bundles are not created unless they're needed.
 Note: bundle manager could keep size statistics and last use statistics for
 each bundler, so that we could set an upper limit on the memory use.
 
+Note: we discussed having bundles create __init__.py files automatically on
+      either bundling or unbundling.  In practice the rules for doing this
+      would a) be very vague (what's the difference between a .py script
+      and a .py file part of a package in some other bundle ?) and not
+      actually solve a problem since just setting __path__ correctly makes
+      imports work as they should.
+
 Requesting bundles
 ==================
 
