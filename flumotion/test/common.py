@@ -42,3 +42,50 @@ if ltihooks:
 
 # logging
 flumotion.common.setup.setup()
+
+from twisted.internet import reactor
+from twisted.spread import pb
+
+# test objects to be used in unittests to simulate the processes
+# subclass them to add your own methods
+
+class TestAdmin(pb.Referenceable):
+    def run(self, port):
+        self.perspective = None # perspective on the manager's PB server
+        f = pb.PBClientFactory()
+        reactor.connectTCP("127.0.0.1", port, f)
+        d = f.getRootObject()
+        d.addCallback(self._gotRootObject)
+        return d
+
+    def _gotRootObject(self, perspective):
+        self.perspective = perspective
+        return perspective.callRemote('identify', 'admin', self)
+
+class TestWorker(pb.Referenceable):
+    def run(self, port):
+        f = pb.PBClientFactory()
+        reactor.connectTCP("127.0.0.1", port, f)
+        d = f.getRootObject()
+        d.addCallback(self._gotRootObject)
+        return d
+
+    def _gotRootObject(self, perspective):
+        self.perspective = perspective
+        return perspective.callRemote('identify', 'worker', self)
+
+class TestManagerRoot(pb.Root):
+    def remote_identify(self, who, reference):
+        key = who + 'Reference'
+        setattr(self, key, reference)
+
+class TestManager:
+    def run(self, rootClass):
+        """
+        Run the test manager.  Return port it is listening on.
+        """
+        factory = pb.PBServerFactory(rootClass())
+        factory.unsafeTracebacks = 1
+        p = reactor.listenTCP(0, factory, interface="127.0.0.1")
+        port = p.getHost().port
+        return port

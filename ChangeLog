@@ -1,3 +1,12 @@
+2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/common.py:
+	  add infrastructure to start test worker/admin/manager
+	* flumotion/common/keycards.py:
+	  add .getData() giving you a dict of admin ui-displayable info
+	* flumotion/test/test_keycards.py:
+	  test sending and receiving of keycards
+
 2005-03-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/minimal.xml:

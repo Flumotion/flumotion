@@ -58,6 +58,19 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         """
         self.domain = domain
 
+    def getData(self):
+        """
+        Return a dictionary of the viewable data on the keycard that can be
+        used to identify the keycard.
+        It doesn't include sensitive information though.
+
+        Subclasses should override to add additional information.
+        """
+        return dict(
+            id=self.id,
+            requester=self.requesterName,
+            domain=self.domain)
+        
     def __repr__(self):
         return "<%s in state %s>" % (self.__class__.__name__,
             _statesEnum[self.state])
@@ -76,6 +89,13 @@ class KeycardUACPP(Keycard, UCPP):
         UCPP.__init__(self, username, password)
         Keycard.__init__(self)
         self.address = address
+
+    def getData(self):
+        d = Keycard.getData(self)
+        d['username'] = self.username
+        d['address'] = self.address
+        return d
+
 pb.setUnjellyableForClass(KeycardUACPP, KeycardUACPP)
 
 #: username, address, crypt password
@@ -92,5 +112,11 @@ class KeycardUACPCC(Keycard, UCPCC):
         UCPCC.__init__(self, username)
         Keycard.__init__(self)
         self.address = address
-        dir(self)
+
+    def getData(self):
+        d = Keycard.getData(self)
+        d['username'] = self.username
+        d['address'] = self.address
+        return d
+
 pb.setUnjellyableForClass(KeycardUACPCC, KeycardUACPCC)
