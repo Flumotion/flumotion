@@ -170,7 +170,9 @@ class WizardStep(object, log.Loggable):
             self.warning('skipping workerRun, no worker')
             return defer.fail(errors.FlumotionError('no worker'))
 
-        return admin.workerRun(worker, module, function, *args)
+        d = admin.workerRun(worker, module, function, *args)
+        # FIXME: add errback
+        return d
         
     def get_next(self):
         """

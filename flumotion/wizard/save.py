@@ -184,7 +184,7 @@ class WizardSaver:
         options = self.wizard.get_step_options('Encoding')
         step = self.wizard['Encoding']
         muxer = options['format']
-        return Component('multiplexer-' + name, muxer.component_type,
+        return Component('muxer-' + name, muxer.component_type,
                          worker=step.worker)
 
     def handleVideo(self, components):

@@ -28,6 +28,8 @@ import errno
 import zipfile
 import StringIO
 
+from flumotion.common import errors
+
 __all__ = ['Bundle', 'Bundler', 'Unbundler', 'BundlerBasket']
 
 class BundledFile:
@@ -302,7 +304,7 @@ class BundlerBasket:
             return deps
             
         if not bundlerName in self._bundlers:
-            raise Exception('Unknown bundle %s' % bundlerName)
+            raise errors.NoBundleError('Unknown bundle %s' % bundlerName)
         
         return dep_helper(bundlerName, [])
 

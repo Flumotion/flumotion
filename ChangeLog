@@ -1,3 +1,12 @@
+2005-03-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/bundle.py:
+	  raise proper error
+	* flumotion/wizard/save.py:
+	  shorten the name
+	* flumotion/wizard/wizard.py:
+	  placeholder for future code
+
 2005-03-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
