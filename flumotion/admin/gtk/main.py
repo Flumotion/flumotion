@@ -56,7 +56,7 @@ def _wizard_finished_cb(wizard, configuration, window):
     window.admin.loadConfiguration(configuration)
     window.show()
     
-def _window_connected_cb(window):
+def _window_connected_cb(window, options):
     if not window.admin.getComponents() and not os.path.exists(FIRST_TIME_FILE):
         workers = window.admin.getWorkerHeavenState()
         if not workers:
@@ -81,7 +81,7 @@ def _runWizardAndDump():
     wiz.run(True, ['localhost'], False)
     wiz.printOut()
 
-def _runInterface(conf_file):
+def _runInterface(conf_file, options):
     if conf_file:
         # load the conf file here
         raise NotImplementedError()
@@ -94,12 +94,12 @@ def _runInterface(conf_file):
     model.connectToHost(state['host'], state['port'], state['use_insecure'])
     win = Window(model)
 
-    win.connect('connected', _window_connected_cb)
+    win.connect('connected', _window_connected_cb, options)
     reactor.run()
 
 def main(args):
-    defaultSSLPort = configure.defaultSSLManagerPort
-    defaultTCPPort = configure.defaultTCPManagerPort
+    #defaultSSLPort = configure.defaultSSLManagerPort
+    #defaultTCPPort = configure.defaultTCPManagerPort
     
     parser = optparse.OptionParser()
     parser.add_option('-d', '--debug',
@@ -132,6 +132,6 @@ def main(args):
         w = sys.stderr.write
         w('flumotion-admin: too many configuration files: %r' % conf_files)
     elif conf_files:
-        _runInterface(conf_files[0])
+        _runInterface(conf_files[0], options)
     else:
-        _runInterface(None)
+        _runInterface(None, options)

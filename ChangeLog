@@ -1,3 +1,9 @@
+2005-01-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/admin/gtk/main.py:
+	  fix pychecker warnings
+
 2005-01-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/greeter.py: gtk is not used.
