@@ -23,7 +23,7 @@
 from twisted.internet import reactor
 from twisted.spread import pb
 
-from flumotion.common import errors, interfaces
+from flumotion.common import interfaces
 from flumotion.common.config import ConfigEntry
 from flumotion.common.registry import registry
 from flumotion.twisted import pbutil
@@ -64,12 +64,28 @@ class WorkerView(pb.Referenceable, log.Loggable):
         self.launcher.run(factory)
 
 def main(args):
-    host = 'localhost'
-    port = 8890
+    parser = optparse.OptionParser()
+    parser.add_option('', '--run',
+                     action="store", type="string", dest="run",
+                     default='',
+                     help="Run component")
+    parser.add_option('', '--parent-fd',
+                     action="store", type="int", dest="parent_fd",
+                     fdefault='',
+                     help="Fd of parent")
+    
+    options, args = parser.parse_args(args)
 
-    view = WorkerView(host, port)
-    factory = WorkerFactory(view)
-    factory.login('Foobar')
+    if options.run:
+        launcher.run(options.run, options.parent_fd)
+        reactor.run()
+    else:
+        host = 'localhost'
+        port = 8890
 
-    view.run(factory)
+        view = WorkerView(host, port)
+        factory = WorkerFactory(view)
+        factory.login('Foobar')
+
+        view.run(factory)
     

@@ -30,6 +30,32 @@ from twisted.internet import reactor
 from flumotion.component import component
 from flumotion.utils import log
 
+from twisted.internet import protocol
+
+class WorkerProtocol(protocol.ProcessProtocol):
+    def __init__(self):
+        pass
+    
+    def connectionMade(self):
+        return
+    
+        self.transport.writeToChild(3, self.passphrase)
+        self.transport.closeChildFD(3)
+        self.transport.writeToChild(0, self.crypttext)
+        self.transport.closeChildFD(0)
+        
+    def childDataReceived(self, childFD, data):
+        return
+
+def run(name, fd):
+    proto = WorkerProtocol()
+    cmd = ["flumotion-worker",
+           '--run', name,
+           '--parent-fd', str(fd)]
+    
+    p = reactor.spawnProcess(proto, cmd[0], cmd,
+                             childFDs={str(fd): "rw"})
+    
 class Launcher(log.Loggable):
     logCategory = 'launcher'
     def __init__(self, host, port):
@@ -85,44 +111,49 @@ class Launcher(log.Loggable):
             return
 
         self.info('forking')
+
+        r, w = os.pipe()
         pid = os.fork()
         if pid:
             self.children.append(pid)
             return
 
+        self.run_component(config)
+        
+    def run_component(self, config):
         self.info('setting up signals')
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        #signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()
 
         name = config.getName()
         type = config.getType()
-        nice = config.nice
-        dict = config.getConfigDict()
-        comp = config.getComponent()
         
         log.debug(name, 'Starting on pid %d of type %s' %
                   (os.getpid(), type))
 
         self.restore_uid(name)
-        self.set_nice(name, nice)
+        self.set_nice(name, config.nice)
         self.enable_core_dumps(name)
         
+        dict = config.getConfigDict()
         log.debug(name, 'Configuration dictionary is: %r' % dict)
         
+        comp = config.getComponent()
         factory = component.ComponentFactory(comp)
         factory.login(name)
         reactor.connectTCP(self.manager_host, self.manager_port, factory)
 
         reactor.run(False)
-        raise SystemExit
-
+        
     def run(self, factory):
         reactor.connectTCP(self.manager_host,
                            self.manager_port, factory)
-        reactor.run(False)
+        reactor.run()
 
         for pid in self.children:
-            os.kill(pid, signal.SIGKILL)
+            os.kill(pid, signal.SIGINT)
             
         print 'EXIT RUN'
-        
+
+    
+

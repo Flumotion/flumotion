@@ -20,7 +20,7 @@
 
 from common import unittest
 
-from flumotion.manager import component
+from flumotion.manager import component, manager
 
 class FakeComponentPerspective:
     def __init__(self, name='fake', eaters=[], port=-1, listen_host='listen-host'):
@@ -52,7 +52,7 @@ class FakeComponentPerspective:
 
 class TestComponentHeaven(unittest.TestCase):
     def setUp(self):
-        self.heaven = component.ComponentHeaven()
+        self.heaven = component.ComponentHeaven(manager.Vishnu())
 
     def testGetPerspective(self):
         p = self.heaven.getAvatar('foo-bar-baz')

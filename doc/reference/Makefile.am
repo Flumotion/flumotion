@@ -25,7 +25,9 @@ MODULE_FILES = \
 	flumotion/component/http/http.py	\
 	flumotion/component/passwd/passwd.py	\
 	flumotion/manager/admin.py		\
+	flumotion/manager/component.py		\
 	flumotion/manager/manager.py		\
+	flumotion/manager/worker.py		\
 	flumotion/twisted/gstreactor.py		\
 	flumotion/utils/gstutils.py		\
 	flumotion/utils/log.py
@@ -38,7 +40,7 @@ html/index.html: $(patsubst %, $(top_srcdir)/%, $(MODULE_FILES)) gendoc.py
 
 check-local:
 	@PYTHONPATH=$(pypath) $(PYTHON) $(srcdir)/gendoc.py --check $(MODULES)
-	
+
 all-local: html/index.html
 
 clean-local:

@@ -27,15 +27,14 @@ API Stability: semi-stable
 Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """
 
-__all__ = ['ManagerServerFactory']
-
-import gst
+__all__ = ['ManagerServerFactory', 'Vishnu']
 
 from twisted.internet import reactor
+from twisted.python import components
 from twisted.spread import pb
 
-from flumotion.manager import admin, component
-from flumotion.common import interfaces, errors
+from flumotion.manager import admin, component, worker
+from flumotion.common import errors, interfaces
 from flumotion.twisted import pbutil, portal
 from flumotion.utils import log
 
@@ -52,14 +51,10 @@ class Dispatcher(log.Loggable):
 
     logCategory = 'dispatcher'
 
-    def __init__(self, componentheaven, adminheaven):
-        """
-        @type componentheaven: L{flumotion.manager.component.ComponentHeaven}
-        @type adminheaven: L{flumotion.manager.admin.AdminHeaven}
-        """
-        self.componentheaven = componentheaven
-        self.adminheaven = adminheaven
-
+    def __init__(self):
+        self.heavens = {}
+        self.avatars = {}
+        
     # requestAvatar gets called through ClientFactory.login()
     # An optional second argument can be passed to login, which should be
     # a L{twisted.spread.flavours.Referenceable}
@@ -70,48 +65,68 @@ class Dispatcher(log.Loggable):
     # to the piece that called login(),
     # which in our case is a component or an admin client.
     def requestAvatar(self, avatarID, mind, *ifaces):
+        avatar = self.getAvatarFor(avatarID, ifaces)
 
+        self.debug("returning Avatar: id %s, avatar %s" % (avatarID, avatar))
+
+        # schedule a perspective attached for after this function
+        reactor.callLater(0, avatar.attached, mind)
+
+        # return a tuple of interface, aspect, and logout function 
+        return (pb.IPerspective, avatar,
+                lambda a=avatar, m=mind, i=avatarID: self.removeAvatar(i, a, m))
+
+    def removeAvatar(self, avatarID, avatar, mind):
+        heaven = self.avatars[avatarID]
+        del self.avatars[avatarID]
+        
+        avatar.detached(mind)
+        heaven.removeAvatar(avatarID)
+
+    def getAvatarFor(self, avatarID, ifaces):
         if not pb.IPerspective in ifaces:
             raise errors.NoPerspectiveError(avatarID)
 
-        avatar = None
-        if interfaces.IBaseComponent in ifaces:
-            avatar = self.manager.getAvatar(avatarID)
-        elif interfaces.IAdminComponent in ifaces:
-            avatar = self.adminheaven.getAvatar(avatarID)
+        for iface in ifaces:
+            heaven = self.heavens.get(iface, None)
+            if heaven:
+                avatar = heaven.getAvatar(avatarID)
+                self.avatars[avatarID] = heaven
+                return avatar
 
-        if not avatar:
-            raise errors.NoPerspectiveError(avatarID)
-
-        self.debug("returning Avatar: id %s, avatar %s" % (avatarID, avatar))
+        raise errors.NoPerspectiveError(avatarID)
         
-        # schedule a perspective attached for after this function
-        reactor.callLater(0, avatar.attached, mind)
+    def registerHeaven(self, interface, heaven):
+        assert components.implements(heaven, interfaces.IHeaven)
         
-        # return a tuple of interface, aspect, and logout function 
-        return (pb.IPerspective, avatar,
-                lambda avatar=avatar,mind=mind: avatar.detached(mind))
+        self.heavens[interface] = heaven
 
-class ManagerServerFactory(pb.PBServerFactory):
-    """A Server Factory with a Dispatcher and a Portal"""
+class Vishnu:
     def __init__(self):
-        self.componentheaven = component.ComponentHeaven()
-        
-        self.adminheaven = admin.AdminHeaven(self.componentheaven)
-        self.componentheaven.setAdminHeaven(self.adminheaven)
-        
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
-        self.dispatcher = Dispatcher(self.componentheaven,
-                                     self.adminheaven)
+        self.dispatcher = Dispatcher()
+
+        self.workerheaven = self.createHeaven(interfaces.IWorkerComponent,
+                                              worker.WorkerHeaven)
+        self.componentheaven = self.createHeaven(interfaces.IBaseComponent,
+                                                 component.ComponentHeaven)
+        self.adminheaven = self.createHeaven(interfaces.IAdminComponent,
+                                             admin.AdminHeaven)
 
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a checker that allows anonymous access
         checker = pbutil.ReallyAllowAnonymousAccess()
-        self.portal = portal.FlumotionPortal(self.dispatcher, [checker])
-        # call the parent constructor with this portal for access
-        pb.PBServerFactory.__init__(self, self.portal)
-        #self.unsafeTracebacks = 1 # for debugging tracebacks to clients
+        p = portal.FlumotionPortal(self.dispatcher, [checker])
+        #unsafeTracebacks = 1 # for debugging tracebacks to clients
+        self.factory = pb.PBServerFactory(p)
 
-    def __repr__(self):
-        return '<ManagerServerFactory>'
+    def createHeaven(self, interface, klass):
+        heaven = klass(self)
+        self.dispatcher.registerHeaven(interface, heaven)
+        return heaven
+    
+    def getFactory(self):
+        return self.factory
+
+

@@ -94,12 +94,12 @@ class Launcher(log.Loggable):
         signal.signal(signal.SIGINT, signal.SIG_IGN)
                 
         self.restore_uid('manager')
-        factory = manager.ManagerServerFactory()
+        vishnu = manager.Vishnu()
         log.debug('manager', 'listening on TCP port %d' % self.manager_port)
-        reactor.listenTCP(self.manager_port, factory)
+        reactor.listenTCP(self.manager_port, vishnu.getFactory())
         f = Factory()
         f.protocol = MiniProtocol
-        f.protocol.manager = factory.componentheaven
+        f.protocol.manager = vishnu.componentheaven
         reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(), f)
 
         reactor.run(False)
@@ -242,7 +242,7 @@ def run_manager(args):
     if options.verbose:
         log.setFluDebug("*:4")
 
-    factory = manager.ManagerServerFactory()
+    factory = manager.Vishnu()
     
     log.debug('manager', 'Starting at port %d' % options.port)
     reactor.listenTCP(options.port, factory)

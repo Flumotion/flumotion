@@ -75,7 +75,7 @@ class Loggable:
         return message
 
 # environment variables controlling levels for each category
-_FLU_DEBUG="*:1"
+_FLU_DEBUG = "*:1"
 
 # dynamic dictionary of categories already seen and their level
 _categories = {}
@@ -86,7 +86,7 @@ _log_handlers = []
 # level -> number dict
 _levels = {
     "ERROR": 1,
-    "WARNING": 2,
+    "WARN": 2,
     "INFO": 3,
     "DEBUG": 4,
     "LOG": 5
@@ -108,7 +108,12 @@ def registerCategory(category):
     for chunk in chunks:
         if not chunk:
             continue
-        (spec, value) = chunk.split(':')
+        if ':' in chunk: 
+            spec, value = chunk.split(':')
+        else:
+            spec = '*'
+            value = chunk
+            
         # our glob is unix filename style globbing, so cheat with fnmatch
         # fnmatch.fnmatch didn't work for this, so don't use it
         if category in fnmatch.filter((category, ), spec):
@@ -130,7 +135,8 @@ def stderrHandler(category, level, message):
     @type level: string
     @type message: string
     """
-    sys.stderr.write('%s %-8s %-15s %s\n' % (time.strftime("%b %d %H:%M:%S"), level + ':', category + ':' , message))
+    sys.stderr.write('%s %-5s %-15s %s\n' % (time.strftime("%b %d %H:%M:%S"),
+                                             level, category, message))
     sys.stderr.flush()
 
 def stderrHandlerLimited(category, level, message):
@@ -171,7 +177,7 @@ def warning(cat, *args):
     Log a warning message in the given category.
     This is used for non-fatal problems.
     """
-    _handle(cat, 'WARNING', ' '.join(args))
+    _handle(cat, 'WARN', ' '.join(args))
 
 def info(cat, *args):
     """

@@ -146,8 +146,9 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
 
     logCategory = 'comp-avatar'
 
-    def __init__(self, manager, username):
-        self.manager = manager
+    def __init__(self, heaven, username):
+        self.heaven = heaven
+        self.vishnu = heaven.vishnu
         self.username = username
         self.state = gst.STATE_NULL
         self.options = Options()
@@ -202,7 +203,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             setattr(self.options, key, value)
         self.options.dict = options
         
-        self.manager.componentRegistered(self)
+        self.heaven.componentRegistered(self)
                 
     def _mindPipelineErrback(self, failure):
         failure.trap(errors.PipelineParseError)
@@ -234,9 +235,6 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         @type mind: L{twisted.spread.pb.RemoteReference}
         """
         self.debug('detached')
-        name = self.getName()
-        if self.manager.hasComponent(name):
-            self.manager.removeComponent(self)
 
     # functions
     def getTransportPeer(self):
@@ -421,14 +419,14 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
             self.info('is now playing')
 
         if self.getFeeders():
-            self.manager.startPendingComponents(self, feeder)
+            self.heaven.startPendingComponents(self, feeder)
             
     def perspective_error(self, element, error):
         self.error('error element=%s string=%s' % (element, error))
-        self.manager.removeComponent(self)
+        self.heaven.removeComponent(self)
 
     def perspective_uiStateChanged(self, component_name, state):
-        self.manager.adminheaven.uiStateChanged(component_name, state)
+        self.vishnu.adminheaven.uiStateChanged(component_name, state)
 
 class ComponentHeaven(pb.Root, log.Loggable):
     """
@@ -441,16 +439,13 @@ class ComponentHeaven(pb.Root, log.Loggable):
     __implements__ = interfaces.IHeaven
     logCategory = 'comp-heaven'
     
-    def __init__(self):
+    def __init__(self, vishnu):
         self.components = {} # dict of component avatars
         self.feeder_set = FeederSet()
-        self.adminheaven = None
+        self.vishnu = vishnu
         
         self.last_free_port = 5500
 
-    def setAdminHeaven(self, adminheaven):
-        self.adminheaven = adminheaven
-        
     def getAvatar(self, avatarID):
         """
         Creates a new avatar for a component, raises
@@ -541,8 +536,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         component = self.components[component_name]
         del self.components[component_name]
         
-        if self.adminheaven:
-            self.adminheaven.componentRemoved(component)
+        self.vishnu.adminheaven.componentRemoved(component)
 
     def getComponentEaters(self, component):
         """
@@ -619,8 +613,7 @@ class ComponentHeaven(pb.Root, log.Loggable):
         
     def componentRegistered(self, component):
         component.debug('registering component')
-        if self.adminheaven:
-            self.adminheaven.componentAdded(component)
+        self.vishnu.adminheaven.componentAdded(component)
         self.feeder_set.addFeeders(component)
 
         eaters = component.getEaters()

@@ -80,8 +80,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @type heaven: L{flumotion.manager.admin.AdminHeaven}
         """
         self.heaven = heaven
-        # FIXME: use accessor to get manager ?
-        self.manager = heaven.manager
+        self.componentheaven = heaven.vishnu.componentheaven
         self.mind = None
         self.debug("created new AdminAvatar")
         
@@ -117,7 +116,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         @rtype: C{list} of L{flumotion.manager.admin.ComponentView}
         """
         # FIXME: should we use an accessor to get at components from c ?
-        components = map(ComponentView, self.manager.components.values())
+        components = map(ComponentView, self.componentmanager.components.values())
         return components
 
     def sendLog(self, category, type, message):
@@ -183,7 +182,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
     # Generic interface to call into a component
     def perspective_callComponentRemote(self, component_name, method_name,
                                         *args, **kwargs):
-        component = self.manager.getComponent(component_name)
+        component = self.componentmanager.getComponent(component_name)
         try:
             return component.callComponentRemote(method_name, *args, **kwargs)
         except Exception, e:
@@ -192,7 +191,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
         
     def perspective_setComponentElementProperty(self, component_name, element, property, value):
         """Set a property on an element in a component."""
-        component = self.manager.getComponent(component_name)
+        component = self.componentmanager.getComponent(component_name)
         try:
             return component.setElementProperty(element, property, value)
         except errors.PropertyError, exception:
@@ -201,7 +200,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
 
     def perspective_getComponentElementProperty(self, component_name, element, property):
         """Get a property on an element in a component."""
-        component = self.manager.getComponent(component_name)
+        component = self.componentmanager.getComponent(component_name)
         try:
             return component.getElementProperty(element, property)
         except errors.PropertyError, exception:
@@ -209,7 +208,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             raise
 
     def perspective_getUIEntry(self, component_name):
-        component = self.manager.getComponent(component_name)
+        component = self.componentmanager.getComponent(component_name)
         try:
             return component.getUIEntry()
         except Exception, e:
@@ -222,7 +221,7 @@ class AdminAvatar(pb.Avatar, log.Loggable):
             self.info("reloaded component %s code" % name)
 
         self.info("reloading component %s code" % component_name)
-        avatar = self.manager.getComponent(component_name)
+        avatar = self.componentmanager.getComponent(component_name)
         cb = avatar.reloadComponent()
         cb.addCallback(_reloaded, self, component_name)
         return cb
@@ -255,12 +254,12 @@ class AdminHeaven(pb.Root, log.Loggable):
     logCategory = "admin-heaven"
     __implements__ = interfaces.IHeaven
 
-    def __init__(self, componentheaven):
+    def __init__(self, vishnu):
         """
         @type componentheaven: L{flumotion.manager.component.ComponentHeaven}
         @param componentheaven: the ComponentHeaven to administrate for
         """
-        self.manager = componentheaven
+        self.vishnu = vishnu
         self.clients = [] # all AdminAvatars we instantiate
         log.addLogHandler(self.logHandler)
         self.logcache = []
