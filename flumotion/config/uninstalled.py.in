@@ -30,4 +30,5 @@ def get():
         'gladedir':    os.path.join(__toplevel, 'data', 'glade'),
         'imagedir':    os.path.join(__toplevel, 'data', 'image'),
         'registrydir': os.path.join(__toplevel, 'data', 'registry'),
+        'version':     @VERSION@,
     }

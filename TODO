@@ -25,6 +25,9 @@
 * MEDIUM	allow expression of "test component depends on streamer component"
 
 * EASY		- remove IAdminComponent before 0.1.0
+
+* EASY		add version number to helps and friends
+
 - API cleanup:
 
 - manager/component.py:

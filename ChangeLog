@@ -1,3 +1,9 @@
+2004-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/config/installed.py.in:
+	* flumotion/config/uninstalled.py.in:
+	  add version number
+
 2004-10-07  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/common/registry.py (ComponentRegistry.getFileList):
