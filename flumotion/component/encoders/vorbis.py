@@ -196,10 +196,10 @@ class Vorbis(feedcomponent.FeedComponent):
                         samplerate, maxsamplerate, self._bitrate))
                 samplerate = maxsamplerate
 
-            # link audio scale filtered with this rate because of gst caps
-            # nego problems
-            audioscale.link_filtered(audioconvert, gst.caps_from_string(
-                'audio/x-raw-int, rate=%d' % (samplerate)))
+        # link audio scale filtered with this rate because of gst caps
+        # nego problems
+        audioscale.link_filtered(audioconvert, gst.caps_from_string(
+            'audio/x-raw-int, rate=%d' % (samplerate)))
 
         # link audioconvert to rawvorbisenc with the number of channels
         # from config
