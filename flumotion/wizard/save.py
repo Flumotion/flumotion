@@ -56,11 +56,23 @@ class Component:
                                                          extra)
 
         # XXX: Handle eaters properly
-        s += '      <feed>default</feed>\n'
-                
-        for source in self.feeders:
-            s += "      <source>%s</source>\n" % source.name
+        if self.type == 'firewire':
+            s += '      <feed>audio</feed>\n'
+            s += '      <feed>video</feed>\n'
+        else:
+            s += '      <feed>default</feed>\n'
 
+            for source in self.feeders:
+                if source.type == 'firewire':
+                    if self.name in ('video-encoder', 'video-overlay'):
+                        feed = 'video'
+                    else:
+                        feed = 'audio'
+                    s += "      <source>%s:%s</source>\n" % (source.name, feed)
+                else:
+                    s += "      <source>%s</source>\n" % source.name
+                    
+                
         if self.props:
             s += "      <!-- properties -->\n"
             property_names = self.props.keys()
