@@ -2,7 +2,12 @@ A scenario sits between wizard and its wizard steps
 It takes care of fetching the state of the steps and doing something
 useful to it, eg present next step in case of wizards.
 
-Basic scenario
+Current Basic scenario
+======================
+
+Notes:
+ -> Name of page
+ ui widget >> element property
 
 Welcome
   -> Source
@@ -13,8 +18,48 @@ Source
    else if has_audio
      get step from combobox_audio
 
-VideoSource (for TVCard, FireWire, Webcam, TestVideoSource)
+VideoSource (for Webcam, TVCard, FireWire, TestVideoSource)
   -> Overlay
+
+Webcam
+  -> inherited from VideoSource
+  device	>> device
+  width		>> width
+  height	>> height
+  framerate	>> framerate
+
+TVCard
+  -> inherited from VideoSource
+  device	>> device
+  video source	>> channel
+  norm		>> signal
+  width		>> width
+  height	>> height
+  framerate	>> framerate
+	
+Firewire
+  -> inherited from VideoSource
+  width		>> width
+  height	>> height
+  framerate	>> framerate
+
+TestVideoSource
+  -> inherited from VideoSource
+  width		>> width
+  height	>> height
+  framerate	>> framerate
+  format 	>> format
+
+Soundcard
+  -> inherited from VideoSource
+  sound system	>> source-element
+  device	>> device
+  input		>> unused?
+  channels	>> channels
+  bit depth	>> depth
+  sample rate	>> rate
+
+XXX: Add properties for the rest of the components
 
 Overlay
   if Source option has_video is true
@@ -23,7 +68,11 @@ Overlay
       -> Soundcard
     else
       -> Test Audio Source
-
+  Component properties:
+    show text
+    text
+    show logo
+    
 Soundcard
   -> Encoding
 
@@ -54,7 +103,7 @@ AudioEncoder (for Vorbis, Speex)
   -> Consumption
 
 Consumption (for all HTTP and Disk)
-  Very complex algorithm, see flumotion/wizard/steps.py
+  Complex algorithm, see flumotion/wizard/steps.py
   ends up with:
   -> License
 
@@ -62,3 +111,46 @@ License
   -> Summary
 
 
+API Requirements
+================
+
+  Add pages
+  Activate pages
+  Fetch a property from pages
+
+Properties
+==========
+  
+Some steps have some widgets which maps to component properties
+In most cases, they'll map directly so
+
+  Component.property = WizardStep.property
+
+However, not all "state widgets" does map to a property of a component,
+and sometimes a conversion (eg, float, int) needs to be performed.
+
+  Component.property = filter_function(WizardStep.property)
+
+and for the different name case
+
+  Component.some_name = WizardStep.property
+
+
+Element checking
+================
+
+A step might require a certain element to be present at a worker
+to be able to function properly. Proposed implementation is to specify this
+in the wizard step, but not have the wizar step actually performing the
+logic to do the check, it should probably be done in the wizard.
+Since checking an element is not really tied to a scenario.
+
+Saving to disk
+==============
+To save the state to disk it need to link different components together.
+The current code (flumotion/wizard/save.py) can partly be reused.
+However, there should be no mention of any component names in it, it needs
+to be completely generic.
+
+For example, feeds and eaters needs to be introspected properly.
+Maybe it should be up to the scenary to actually link the components together.
