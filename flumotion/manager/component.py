@@ -28,7 +28,7 @@ __all__ = ['ComponentAvatar', 'ComponentHeaven']
 import gst
 from twisted.spread import pb
 
-from flumotion.common import errors, interfaces
+from flumotion.common import errors, interfaces, keycard
 from flumotion.utils import gstutils, log
 
 class Options:
@@ -562,6 +562,11 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
 
     def perspective_notifyFeedPorts(self, feedPorts):
         self.debug('received feed ports from component: %s' % feedPorts)
+
+    def perspective_authenticate(self, bouncerName, credentials):
+        # FIXME: actually ask a bouncer
+        self.debug('asked to authenticate credentials %r using bouncer %s' % (credentials, bouncerName))
+        return True
 
 class ComponentHeaven(pb.Root, log.Loggable):
     """

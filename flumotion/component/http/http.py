@@ -26,14 +26,15 @@ import gst
 from twisted.protocols import http
 from twisted.web import server, resource
 from twisted.internet import reactor
+from twisted.cred import credentials
 import twisted.internet.error
 
 from flumotion.component import feedcomponent
-from flumotion.common import auth, bundle, common, interfaces
+from flumotion.common import auth, bundle, common, interfaces, keycard
 from flumotion.utils import gstutils, log
 from flumotion.utils.gstutils import gsignal
 
-__all__ = ['HTTPClientKeycard', 'HTTPStreamingAdminResource',
+__all__ = ['HTTPStreamingAdminResource',
            'HTTPStreamingResource', 'MultifdSinkStreamer']
 
 HTTP_NAME = 'FlumotionHTTPServer'
@@ -64,22 +65,6 @@ STATS_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 """
 
 HTTP_VERSION = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
-
-class HTTPClientKeycard:
-    
-    __implements__ = interfaces.IClientKeycard,
-    
-    def __init__(self, request):
-        self.request = request
-        
-    def getUsername(self):
-        return self.request.getUser()
-
-    def getPassword(self):
-        return self.request.getPassword()
-
-    def getIP(self):
-        return self.request.getClientIP()
 
 # implements a Resource for the HTTP admin interface
 class HTTPStreamingAdminResource(resource.Resource):
@@ -391,16 +376,17 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
     def reachedMaxClients(self):
         return len(self.request_hash) >= self.maxAllowedClients()
     
-    def isAuthenticated(self, request):
-    # ask for authentication of the request.  returns a deferred which will
-    # return True or False
+    def authenticate(self, request):
+        """
+        Returns: a deferred firing True or False
+        """
+        # ask for authentication of the request.  returns a deferred which will
+        # return True or False
         if self.bouncerName is None:
             return True
 
-        # FIXME: implement authenticate on bouncer
-        return True
-        credentials = HTTPClientKeycard(request)
-        return self.auth.authenticate(credentials)
+        card = keycard.CopyHTTPClientKeycard(request.getUser(), request.getPassword(), request.getClientIP())
+        return self.streamer.medium.authenticate(self.bouncerName, card)
 
     def _addClient(self, request):
         """
@@ -490,7 +476,21 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
             return self._handleNotReady(request)
         elif self.reachedMaxClients():
             return self._handleMaxClients(request)
-        elif not self.isAuthenticated(request):
+
+        d = self.authenticate(request)
+        d.addCallback(self._authenticatedCallback, request)
+        self.debug('asked for authentication')
+        # FIXME
+        #d.addErrback()
+
+        # we MUST return this from our _render.
+        # FIXME: check if this is true
+        # FIXME: check how we later handle not authorized
+        return server.NOT_DONE_YET
+
+    def _authenticatedCallback(self, authenticated, request):
+        self.debug('_authenticatedCallback: %r' % authenticated)
+        if not authenticated:
             return self._handleUnauthorized(request)
 
         if request.method == 'GET':
@@ -500,7 +500,6 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         else:
             raise AssertionError
         
-        return server.NOT_DONE_YET
 
     render_GET = _render
     render_HEAD = _render
@@ -527,6 +526,10 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
 
     def _comp_ui_state_changed_cb(self, comp):
         self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
+
+    def authenticate(self, bouncerName, credentials):
+        d = self.callRemote('authenticate', bouncerName, credentials)
+        return d
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
@@ -632,10 +635,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def update_ui_state(self):
         self.emit('ui-state-changed')
-
-    def authenticate(self, bouncerName, credentials):
-        # FIXME: call on manager
-        return True
 
     # handle the thread deserializing queues
     def _handleQueue(self):
@@ -750,6 +749,7 @@ def createComponent(config):
 
     component = MultifdSinkStreamer(name, source, port)
     resource = HTTPStreamingResource(component)
+    
     # FIXME: tie these together more nicely
     component.resource = resource
     

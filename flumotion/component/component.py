@@ -31,13 +31,19 @@ from flumotion.utils.gstutils import gsignal
 class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
     def __init__(self, component):
+        """
+        @param component: L{flumotion.twisted.component.component.BaseComponent}
+        """
         # doing this as a class method triggers a doc error
         super_init = pbutil.ReconnectingPBClientFactory.__init__
         super_init(self)
         
         # get the component's medium class, defaulting to the base one
         klass = getattr(component, 'component_medium_class', BaseComponentMedium)
+        # instantiate the medium, giving it the component it's a medium for
         self.medium = klass(component)
+        component.setMedium(self.medium)
+
         # get the interfaces implemented by the component medium class
         self.interfaces = getattr(klass, '__implements__', ())
         
@@ -79,12 +85,10 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         self.remote = None # the perspective we have on the other side (?)
         
     ### log.Loggable methods
-
     def logFunction(self, arg):
         return self.comp.get_name() + ':' + arg
 
     ### IMedium methods
-    
     def setRemoteReference(self, remoteReference):
         self.remote = remoteReference
         
@@ -96,6 +100,9 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
             self.warning('callRemote failed because of %s' % reason)
 
     def callRemote(self, name, *args, **kwargs):
+        """
+        @returns: a deferred
+        """
         if not self.hasRemoteReference():
             self.debug('skipping %s, no perspective' % name)
             return
@@ -105,14 +112,14 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
             self.comp.pipeline_stop()
 
         try:
-            cb = self.remote.callRemote(name, *args, **kwargs)
+            d = self.remote.callRemote(name, *args, **kwargs)
         except pb.DeadReferenceError:
             return
         
-        cb.addErrback(self.callRemoteErrback)
+        d.addErrback(self.callRemoteErrback)
+        return d
 
     ### our methods
-
     def getIP(self):
         assert self.remote
         peer = self.remote.broker.transport.getPeer()
@@ -196,6 +203,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         
         # FIXME: rename to .name
         self.component_name = name
+        self.medium = None # the medium connecting us to the manager's avatar
 
     ### Loggable methods
     def logFunction(self, arg):
@@ -210,6 +218,12 @@ class BaseComponent(log.Loggable, gobject.GObject):
             gobject.GObject.emit(self, name, *args)
         
     ### BaseComponent methods
+    # FIXME: rename to getName
     def get_name(self):
         return self.component_name
+
+    def setMedium(self, medium):
+        assert isinstance(medium, BaseComponentMedium)
+        self.medium = medium
+
 gobject.type_register(BaseComponent)

@@ -1,5 +1,17 @@
 2004-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/ogg-test-theora-bouncer.xml:
+	* flumotion/common/keycard.py:
+	* flumotion/component/component.py:
+	* flumotion/component/http/http.py:
+	* flumotion/manager/component.py:
+	* flumotion/worker/job.py:
+	  add a keycard.py, make keycard remote copyable
+	  send the keycard to the manager, which returns True for now
+	  next step: to the bouncer !
+
+2004-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/common/interfaces.py:
 	* flumotion/component/bouncer.py:

@@ -33,8 +33,7 @@ from flumotion.twisted import cred
 from flumotion.utils import log
 
 def getComponent(dict, defs):
-    # Setup files to be transmitted over the wire. Must be a
-    # better way of doing this.
+    #FIXME: add setup of files to be transmitted over the wire.
     source = defs.getSource()
     log.info('job', 'Loading %s' % source)
     try:
