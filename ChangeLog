@@ -1,3 +1,10 @@
+2004-09-14  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/worker: Commit worker, still WIP
+
+	* flumotion/test/test_log.py:
+	Add, 2 tests skipped now, will handle them later
+
 2004-09-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/Makefile.am:
@@ -6,8 +13,10 @@
 
 2004-09-14  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/test/: Move testsuite over here and use trial.
+
 	* flumotion/manager/worker.py (WorkerHeaven): Clean up, almost
-	ready for general consumption
+	ready for general consumption.
 
 	* flumotion/manager/component.py (ComponentAvatar.getListenHost):
 	Support new and old twisted code for getting the host

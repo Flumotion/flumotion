@@ -3,8 +3,6 @@
 
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
-#
-# worker/worker.py: client-side objects to handle launching of components
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,22 +23,40 @@ import resource
 import signal
 import gobject
 
+from twisted.cred.credentials import UsernamePassword
 from twisted.internet import reactor
+from twisted.spread import pb
 
+from flumotion.common.config import ConfigEntry
+from flumotion.common.registry import registry
 from flumotion.component import component
+from flumotion.worker import launcher
+from flumotion.twisted import pbutil
 from flumotion.utils import log
 
-from twisted.internet import protocol
+class JobView(pb.Referenceable, log.Loggable):
+    logCategory = 'job'
+    def __init__(self):
+        self.remote = None
+        
+    def hasPerspective(self):
+        return self.remote != None
 
-class Launcher(log.Loggable):
-    logCategory = 'launcher'
-    def __init__(self, host, port):
-        self.children = []
+    def cb_gotPerspective(self, perspective):
+        self.remote = perspective
+
+    def remote_initial(self, host, port):
         self.manager_host = host
         self.manager_port = port
+        self.launcher = launcher.Launcher(host, port)
         
-        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-    
+    def remote_start(self, name, type, config):
+        print 'START NOW', type
+        
+        defs = registry.getComponent(type)
+        entry = ConfigEntry(name, type, config, defs)
+        self.run_component(entry)
+
     def set_nice(self, name, nice):
         if not nice:
             return
@@ -80,7 +96,6 @@ class Launcher(log.Loggable):
         log.debug(name, 'Starting on pid %d of type %s' %
                   (os.getpid(), type))
 
-        self.restore_uid(name)
         self.set_nice(name, config.nice)
         self.enable_core_dumps(name)
         
@@ -90,6 +105,29 @@ class Launcher(log.Loggable):
         comp = config.getComponent()
         factory = component.ComponentFactory(comp)
         factory.login(name)
-        reactor.connectTCP(self.manager_host, self.manager_port, factory)
+        reactor.connectTCP(self.manager_host,
+                           self.manager_port, factory)
 
         reactor.run(False)
+    
+class JobFactory(pb.PBClientFactory, log.Loggable):
+    def __init__(self, name):
+        pb.PBClientFactory.__init__(self)
+        
+        self.view = JobView()
+        self.login(name)
+            
+    def login(self, username):
+        d = pb.PBClientFactory.login(self, 
+                                     pbutil.Username(username),
+                                     self.view)
+        d.addCallbacks(self.cb_connected,
+                       self.cb_failure)
+        return d
+    
+    def cb_connected(self, perspective):
+        self.info('perspective %r connected' % perspective)
+        self.view.cb_gotPerspective(perspective)
+
+    def cb_failure(self, error):
+        print 'ERROR:' + str(error)
