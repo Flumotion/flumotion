@@ -1,5 +1,10 @@
 2005-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/main.py:
+	  log versions we are and are using
+
+2005-03-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-admin.in:
 	* bin/flumotion-manager.in:
 	* bin/flumotion-worker.in:

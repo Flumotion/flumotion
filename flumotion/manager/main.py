@@ -233,6 +233,11 @@ def main(args):
 
     # go into the reactor main loop
     log.info('manager', 'Started manager "%s"' % options.name)
+    log.debug('manager', 'Running Flumotion version %s' %
+        configure.version)
+    import twisted.copyright
+    log.debug('manager', 'Running against Twisted version %s' %
+        twisted.copyright.version)
     reactor.run()
 
     # we exited, so we're done
