@@ -1,3 +1,15 @@
+2004-10-12  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/Makefile.am:
+	* data/glade/wizard.glade:
+	* data/glade/wizard_welcome.glade:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Add a welcome step, add --wizard argument to flumotion-admin and
+	run the wizard from there instead.
+
 2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:
