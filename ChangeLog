@@ -1,3 +1,10 @@
+2004-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/gui/adminclient.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/controller.py:
+	  lots of documenting
+
 2004-08-27  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/controller.py (__all__): Don't export private

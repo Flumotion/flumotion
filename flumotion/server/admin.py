@@ -27,8 +27,15 @@ from flumotion.twisted import pbutil
 from flumotion.utils import log
 
 class ComponentView(pb.Copyable):
-    """View on a controller.ComponentPerspective"""
+    """
+    I live in the controller.
+    I present state of a component through a L{RemoteComponentView} to the peer.
+    I get the state I present from a L{controller.ComponentPerspective}.
+    """
     def __init__(self, component):
+        """
+        @type component: L{server.controller.ComponentPerspective}
+        """
         self.name = component.getName()
         # forced to int so it's jellyable
         self.state = int(component.state)
@@ -50,14 +57,23 @@ class AdminPerspective(pbutil.NewCredPerspective, log.Loggable):
     """Perspective on the local controller created locally on behalf of
     a remote AdminInterface"""
     logCategory = 'admin-persp'
+    # FIXME: should not be called with controller directly, should be
+    # called with the Admin through which controller can be gotten.
     def __init__(self, controller):
+        """
+        @type controller: L{server.controller.Controller}
+        """
         self.controller = controller
         self.mind = None
         self.debug("created new AdminPerspective")
         
+    # FIXME: maybe rename to hasReference ? We are already a Perspective
+    # ourselves
     def hasPerspective(self):
         return self.mind != None
     
+    # FIXME: rename method to something else, callRemote is reserved for
+    # References
     def callRemote(self, name, *args, **kwargs):
         if not self.hasPerspective():
             #self.warning("Can't call remote method %s, no perspective" % name)
@@ -71,6 +87,10 @@ class AdminPerspective(pbutil.NewCredPerspective, log.Loggable):
             return
         
     def getClients(self):
+        """
+        @rtype: C{list} of L{server.admin.ComponentView}
+        """
+        # FIXME: should we use an accessor to get at components from c ?
         clients = map(ComponentView, self.controller.components.values())
         return clients
 
@@ -116,8 +136,11 @@ class AdminPerspective(pbutil.NewCredPerspective, log.Loggable):
 
 class Admin(pb.Root):
     def __init__(self, controller):
+        """
+        @type controller: L{server.controller.Controller}
+        """
         self.controller = controller
-        self.clients = []
+        self.clients = [] # all AdminPerspectives we instantiate
         log.addLogHandler(self.logHandler)
         self.logcache = []
 
@@ -139,17 +162,32 @@ class Admin(pb.Root):
             client.sendLog(category, type, message)
         
     def getPerspective(self):
+        """
+        Creates a new perspective for this admin.
+        @rtype:   L{server.admin.AdminPerspective}
+        @returns: a new perspective on the admin.
+        """
         self.debug('creating new perspective')
-        admin = AdminPerspective(self.controller)
-        reactor.callLater(0.25, self.sendCache, admin)
+        adminp = AdminPerspective(self.controller)
+        reactor.callLater(0.25, self.sendCache, adminp)
         
-        self.clients.append(admin)
-        return admin
+        self.clients.append(adminp)
+        return adminp
     
     def componentAdded(self, component):
+        """
+        Tell all created AdminPerspectives that a component was added.
+
+        @type component: L{server.controller.ComponentPerspective}
+        """
         for client in self.clients:
             client.componentAdded(component)
 
     def componentRemoved(self, component):
+        """
+        Tell all created AdminPerspectives that a component was removed.
+
+        @type component: L{server.controller.ComponentPerspective}
+        """
         for client in self.clients:
             client.componentRemoved(component)

@@ -42,6 +42,10 @@ from flumotion.utils import log
 import flumotion.config
 
 class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
+    """Lives in the admin client.
+       Controller calls on us through admin.Admin.
+       I can call on controller admin.Admin objects.
+    """
     __gsignals__ = {
         'connected' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),
         'connection-refused' : (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ()),

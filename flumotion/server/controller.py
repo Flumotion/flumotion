@@ -37,19 +37,42 @@ from flumotion.server import admin
 from flumotion.twisted import errors, pbutil
 from flumotion.utils import gstutils, log
 
+# an internal class
 class Dispatcher(log.Loggable):
+    """
+    I implement L{portal.IRealm}.
+    I make sure that when a L{pb.Avatar} is requested through me, the
+    Avatar/perspective being returned knows about the mind (client) requesting
+    the Avatar.
+    """
+    
     __implements__ = portal.IRealm
     logCategory = 'dispatcher'
     def __init__(self, controller, admin):
+        """
+        @type controller: L{server.controller.Controller}
+        @type admin:      L{server.admin.Admin}
+        """
         self.controller = controller
         self.admin = admin
         
     ### IRealm method
     def requestAvatar(self, avatarID, mind, *interfaces):
+        # requestAvatar gets called through pb.PBClientFactory.login()
+        # an optional second argument can be passed to login.
+        # This should be a Referenceable.
+        # A reference to it is passed to requestAvatar as mind.
+        # So in short, the mind is a reference to the client passed in login()
+        # on the peer, allowing any object that has the mind to call back
+        # to the piece that called login(),
+        # which in our case is a component or an admin.
         p = None
         if not pb.IPerspective in interfaces:
             raise errors.NoPerspectiveError(avatarID)
         
+        # FIXME: if avatarID maps to component names, then we need to add
+        # checks for name uniqueness and for components not named admin
+        # FIXME: can we connect multiple admin clients this way ?
         if avatarID == 'admin':
             p = self.admin.getPerspective()
         else:
@@ -125,6 +148,7 @@ class ComponentPerspective(pbutil.NewCredPerspective, log.Loggable):
         assert self.listen_ports[feed] != -1, self.listen_ports
         return self.listen_ports[feed]
 
+    #FIXME: this is not a referenceable so rename callRemote
     def callRemote(self, name, *args, **kwargs):
         self.debug('Calling remote method %s%r' % (name, args))
         try:
@@ -316,7 +340,7 @@ for them
 The main function of this class is to handle components, tell the to start
 register and start up pending components."""
     def __init__(self):
-        self.components = {}
+        self.components = {} # dict of component perspectives
         self.feed_manager = FeedManager()
         self.admin = None
         
@@ -328,12 +352,12 @@ register and start up pending components."""
     def getPerspective(self, *args):
         """Creates a new perspective for a component
         @type args:      tuple
-        @rtype:          ComponentPerspective
+        @rtype:          L{server.controller.ComponentPerspective}
         @returns:        the perspective for the component"""
 
-        component = ComponentPerspective(self, *args)
-        self.addComponent(component)
-        return component
+        componentp = ComponentPerspective(self, *args)
+        self.addComponent(componentp)
+        return componentp
 
     def isLocalComponent(self, component):
         # TODO: This could be a lot smarter
@@ -364,7 +388,7 @@ register and start up pending components."""
         return self.components[name]
     
     def hasComponent(self, name):
-        """adds a new component
+        """checks if a component with that name is registered.
         @type name:  string
         @param name: name of the component
         @rtype:      boolean
@@ -374,7 +398,7 @@ register and start up pending components."""
     
     def addComponent(self, component):
         """adds a component
-        @type component: component
+        @type component: L{server.controller.ComponentPerspective}
         @param component: the component"""
 
         component_name = component.getName()
@@ -385,7 +409,7 @@ register and start up pending components."""
         
     def removeComponent(self, component):
         """removes a component
-        @type component: component
+        @type component: L{server.controller.ComponentPerspective}
         @param component: the component"""
 
         component_name = component.getName()
@@ -499,13 +523,21 @@ class ControllerServerFactory(pb.PBServerFactory):
     """A Server Factory with a Dispatcher and a Portal"""
     def __init__(self):
         self.controller = Controller()
+        
+        # create an admin object for the controller
+        # FIXME: find a better name for admin
         self.admin = admin.Admin(self.controller)
         self.controller.setAdmin(self.admin)
         
+        # create a Dispatcher which will hand out avatars to clients
+        # connecting to me
         self.dispatcher = Dispatcher(self.controller, self.admin)
+
+        # create a portal so that I can be connected to, through our dispatcher
+        # implementing the IRealm and a checker that allows anonymous access
         checker = pbutil.ReallyAllowAnonymousAccess()
-        
         self.portal = portal.Portal(self.dispatcher, [checker])
+        # call the parent constructor with this portal for access
         pb.PBServerFactory.__init__(self, self.portal)
 
     def __repr__(self):
