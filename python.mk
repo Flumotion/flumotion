@@ -1,1 +1,1 @@
-py_compile = $(top_srcdir)/py-compile --destdir $(DESTDIR)
+py_compile = $(top_srcdir)/py-compile-destdir --destdir $(DESTDIR)

@@ -5,7 +5,7 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = . bin conf data flumotion doc m4 pkgconfig
 
 EXTRA_DIST = \
-	py-compile \
+	py-compile-destdir \
 	python.mk \
 	LICENSE.GPL \
 	LICENSE.Flumotion \
