@@ -36,7 +36,7 @@ API Stability: unstable
 Maintainer: U{Johan Dahlin <johan@fluendo.com>}
 """
 
-import flumotion.common.log as fclog
+from flumotion.common import log as fclog
 
 import pygtk
 pygtk.require('2.0')
