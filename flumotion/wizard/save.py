@@ -128,7 +128,8 @@ class WizardSaver:
                 properties['xiph_logo'] = True
 
             license_options = self.wizard.get_step_options('Content License')
-            if license_options['license'] == enums.LicenseType.CC:
+            if (license_options['set_license']
+                and license_options['license'] == enums.LicenseType.CC):
                 properties['cc_logo'] = True
             
         return Component('video-overlay', 'overlay', properties, step.worker)

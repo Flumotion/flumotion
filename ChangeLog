@@ -1,5 +1,8 @@
 2005-02-09  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/save.py (WizardSaver.getVideoOverlay): Add CC
+	only if the license is set.
+
 	* flumotion/configure/installed.py.in: 
 	* flumotion/configure/uninstalled.py.in: Make sure the cache,
 	registry, and log dirs are available.
