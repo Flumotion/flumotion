@@ -1,3 +1,8 @@
+2004-11-11  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/steps.py:
+	Only skip configuration if we use firewire audio
+
 2004-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:

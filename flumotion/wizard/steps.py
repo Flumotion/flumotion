@@ -112,10 +112,8 @@ class Source(wizard.WizardStep):
             return video_source.step
         elif self.checkbutton_has_audio:
             audio_source = self.combobox_audio.get_active()
-            if audio_source == AudioDevice.Soundcard:
-                return 'Soundcard'
-            else:
-                return 'Encoding'
+            return audio_source.step
+            
         raise AssertionError
 wizard.register_step(Source)
 
