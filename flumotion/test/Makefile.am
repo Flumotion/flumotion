@@ -3,6 +3,7 @@ EXTRA_DIST = \
 	test_common.py \
 	test_component.py \
 	test_config.py \
+	test_checkers.py \
 	test_credentials.py \
 	test_enum.py \
 	test_configure.py \

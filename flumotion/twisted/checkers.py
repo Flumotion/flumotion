@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_checkers -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/twisted/checkers.py: credential checkers; see twisted.cred.checkers
@@ -15,8 +15,11 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-from flumotion.common import log
 from twisted.cred import checkers
+from twisted.internet import defer
+
+from flumotion.common import log
+from flumotion.twisted import credentials
 
 # FIXME: give the manager's bouncer's checker to the flexcredchecker,
 # and forward to it
@@ -43,3 +46,28 @@ class FlexibleCredentialsChecker(parent, log.Loggable):
             return credentials.username
         
         return parent.requestAvatarId(self, credentials)
+
+class CryptChecker:
+    __implements__ = checkers.ICredentialsChecker
+    credentialInterfaces = ( credentials.IUsernameCryptPassword, )
+
+    def __init__(self, **users):
+        self.users = users
+
+    def addUser(self, username, cryptPassword):
+        self.users[username] = cryptPassword
+
+    def _cbCryptPasswordMatch(self, matched, username):
+        if matched:
+            return username
+        else:
+            return failure.Failure(error.UnauthorizedLogin())
+
+    def requestAvatarId(self, credentials):
+        if credentials.username in self.users:
+            return defer.maybeDeferred(
+                credentials.checkCryptPassword,
+                self.users[credentials.username]).addCallback(
+                self._cbCryptPasswordMatch, credentials.username)
+        else:
+            return failure.Failure(error.UnauthorizedLogin())
