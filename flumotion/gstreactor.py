@@ -208,8 +208,8 @@ class GstReactor(default.PosixReactorBase):
         global _simtag
         if _simtag is not None:
             gobject.source_remove(_simtag)
-        self.runUntilCurrent()
         try:
+            self.runUntilCurrent()
             timeout = min(self.timeout(), 0.1)
             if timeout is None:
                 timeout = 0.1
