@@ -107,10 +107,12 @@ def main(args):
                       help="show version information")
   
     group = optparse.OptionGroup(parser, "manager options")
+    defaultSSLPort = configure.defaultSSLManagerPort
+    defaultTCPPort = configure.defaultTCPManagerPort
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
-                     default=8890,
-                     help="port to listen on [default 8890]")
+                     default=None,
+                     help="port to listen on [default %d (ssl) or %d (tcp)]" % (defaultSSLPort, defaultTCPPort))
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
                      default="ssl",
@@ -159,8 +161,12 @@ def main(args):
         common.daemonize(stdout=logPath, stderr=logPath)
 
     if options.transport == "ssl":
+        if not options.port:
+            options.port = defaultSSLPort
         _startSSL(vishnu, options)
     elif options.transport == "tcp":
+        if not options.port:
+            options.port = defaultTCPPort
         _startTCP(vishnu, options)
     else:
         print >> sys.stderr, \

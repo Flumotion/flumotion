@@ -1,5 +1,14 @@
 2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/configure/configure.py:
+	* flumotion/manager/main.py:
+	* flumotion/worker/main.py:
+	  set the default ports for TCP, SSL, streamer and GStreamer
+	  use the default manager ports everywhere
+
+2004-10-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/flows/ogg-test-theora.xml:
 	* conf/planets/default.xml:
 	  some changes for new structure

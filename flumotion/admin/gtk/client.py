@@ -405,10 +405,12 @@ def main(args):
                      action="store", type="string", dest="host",
                      default='localhost',
                      help="manager host to connect to [default localhost]")
+    defaultSSLPort = configure.defaultSSLManagerPort
+    defaultTCPPort = configure.defaultTCPManagerPort
     parser.add_option('-P', '--port',
                      action="store", type="int", dest="port",
-                     default=8890,
-                     help="manager port to connect to [default 8890]")
+                     default=None,
+                     help="port to listen on [default %d (ssl) or %d (tcp)]" % (defaultSSLPort, defaultTCPPort))
     parser.add_option('-T', '--transport',
                       action="store", type="string", dest="transport",
                       default="ssl",
@@ -438,8 +440,15 @@ def main(args):
         print common.version("flumotion-admin")
         return 0
 
+
     if options.verbose:
         log.setFluDebug("*:4")
+
+    if not options.port:
+        if options.transport == "tcp":
+            options.port = defaultTCPPort
+        elif options.transport == "ssl":
+            options.port = defaultSSLPort
 
     if options.wizard:
         from flumotion.wizard import wizard

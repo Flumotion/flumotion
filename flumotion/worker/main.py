@@ -37,15 +37,16 @@ def main(args):
                       help="show version information")
 
     group = optparse.OptionGroup(parser, "worker options")
-
     group.add_option('-H', '--host',
                      action="store", type="string", dest="host",
                      default="localhost",
                      help="manager to connect to [default localhost]")
+    defaultSSLPort = configure.defaultSSLManagerPort
+    defaultTCPPort = configure.defaultTCPManagerPort
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
-                     default=8890,
-                     help="manager port to connect to [default 8890]")
+                     default=None,
+                     help="port to listen on [default %d (ssl) or %d (tcp)]" % (defaultSSLPort, defaultTCPPort))
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
                      default="ssl",
@@ -87,22 +88,30 @@ def main(args):
         logPath = os.path.join(configure.logdir, 'worker.log')
         common.daemonize(stdout=logPath, stderr=logPath)
 
+    if not options.port:
+        if options.transport == "tcp":
+            options.port = defaultTCPPort
+        elif options.transport == "ssl":
+            options.port = defaultSSLPort
+
     # create a brain and have it remember the manager to direct jobs to
     brain = worker.WorkerBrain(options)
 
     # connect the brain to the manager
+    if options.transport == "tcp":
+        reactor.connectTCP(options.host, options.port,
+            brain.worker_client_factory)
+    elif options.transport == "ssl":
+        from twisted.internet import ssl
+        reactor.connectSSL(options.host, options.port,
+            brain.worker_client_factory,
+            ssl.ClientContextFactory())
+    else:
+        log.error('worker', 'Unknown transport protocol: %s' % options.transport)
     log.info('worker',
              'Connecting to manager %s:%d (using %s)' % (options.host,
                                                          options.port,
                                                          options.transport))
-    if options.transport == "tcp":
-        reactor.connectTCP(options.host, options.port, brain.worker_client_factory)
-    elif options.transport == "ssl":
-        from twisted.internet import ssl
-        reactor.connectSSL(options.host, options.port, brain.worker_client_factory,
-                           ssl.ClientContextFactory())
-    else:
-        log.error('worker', 'Unknown transport protocol: %s' % options.transport)
 
     # FIXME: one without address maybe ? or do we want manager to set it ?
     # or do we set our guess and let manager correct ?
