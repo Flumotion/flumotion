@@ -59,6 +59,7 @@ class PropertyChangeDialog(gtk.Dialog):
         label = gtk.Label('Element')
         label.show()
         hbox.pack_start(label, False, False)
+        self.element_combo = gtk.ComboBox()
         self.element_entry = gtk.Entry()
         self.element_entry.show()
         hbox.pack_start(self.element_entry, False, False)
@@ -292,9 +293,10 @@ class Window(log.Loggable):
         d.run()
 
     def help_about_cb(self, button):
-        raise NotImplemenedError
+        raise NotImplementedError
     
 def main(args):
+    # FIXME: use real options
     try:
         host = args[1]
         port = int(args[2])

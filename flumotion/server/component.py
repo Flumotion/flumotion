@@ -31,10 +31,11 @@ from flumotion.twisted import errors, pbutil
 from flumotion.utils import log, gstutils
 
 class ComponentFactory(pbutil.ReconnectingPBClientFactory):
-    __super_init = pbutil.ReconnectingPBClientFactory.__init__
     __super_login = pbutil.ReconnectingPBClientFactory.startLogin
     def __init__(self, component):
-        self.__super_init()
+        # doing this as a class method triggers a doc error
+        super_init = pbutil.ReconnectingPBClientFactory.__init__
+        super_init(self)
         self.interfaces = getattr(component, '__remote_interfaces__', ())
         self.view = ComponentView(component)
         

@@ -49,18 +49,19 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
                                 pb.IPerspective,
                                 interfaces.IAdminComponent)
         cb.addCallback(self._gotPerspective)
-        cb.addErrback(self._gotError)
+        cb.addErrback(self._loginErrback)
 
     def _gotPerspective(self, perspective):
         self.debug("gotPerspective: %s" % perspective)
         self.remote = perspective
 
-    def _gotError(self, failure):
+    def _loginErrback(self, failure):
         r = failure.trap(error.ConnectionRefusedError)
         self.debug("emitting connection-refused")
         self.emit('connection-refused')
         self.debug("emitted connection-refused")
 
+    ### pb.Referenceable methods
     def remote_log(self, category, type, message):
         self.log('remote: %s: %s: %s' % (type, category, message))
         

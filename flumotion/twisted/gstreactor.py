@@ -53,8 +53,11 @@ from twisted.internet import main, default, error
 
 reads = default.reads
 writes = default.writes
-hasReader = reads.has_key
-hasWriter = writes.has_key
+#hasReader = reads.has_key
+#hasWriter = writes.has_key
+# Using direct function assignment triggers doc build errors, so we use a lambda
+hasReader = lambda key: reads.has_key(key)
+hasWriter = lambda key: writes.has_key(key)
 
 # the next callback
 _simtag = None

@@ -1,5 +1,19 @@
 2004-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/gui/adminclient.py:
+	* flumotion/gui/admininterface.py:
+	  document and rename
+	* flumotion/server/admin.py:
+	  more avatar fixes
+	* flumotion/server/component.py:
+	  fix doc build warning
+	* flumotion/server/controller.py:
+	  more avatar fixes
+	* flumotion/twisted/gstreactor.py:
+	  fix doc build warning
+
+2004-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/server/admin.py:
 	  reorganize doc strings
 

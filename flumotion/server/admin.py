@@ -29,12 +29,12 @@ from flumotion.utils import log
 class ComponentView(pb.Copyable):
     """
     I present state of a component through a L{RemoteComponentView} in the peer.
-    I get the state I present from a L{controller.ComponentPerspective}.
+    I get the state I present from a L{controller.ComponentAvatar}.
     I live in the controller.
     """
     def __init__(self, component):
         """
-        @type component: L{server.controller.ComponentPerspective}
+        @type component: L{server.controller.ComponentAvatar}
         """
         self.name = component.getName()
         # forced to int so it's jellyable
@@ -273,7 +273,7 @@ class Admin(pb.Root):
     def removeAvatar(self, avatar):
         """
         Removes the AdminAvatar from our list of avatars.
-        @type adminp: L{server.admin.AdminAvatar}
+        @type avatar: L{server.admin.AdminAvatar}
         """
         self.debug('removing AdminAvatar %s' % avatar)
         self.clients.remove(avatar)
@@ -282,7 +282,7 @@ class Admin(pb.Root):
         """
         Tell all created AdminAvatars that a component was added.
 
-        @type component: L{server.controller.ComponentPerspective}
+        @type component: L{server.controller.ComponentAvatar}
         """
         for client in self.clients:
             client.componentAdded(component)
@@ -291,7 +291,7 @@ class Admin(pb.Root):
         """
         Tell all created AdminAvatars that a component was removed.
 
-        @type component: L{server.controller.ComponentPerspective}
+        @type component: L{server.controller.ComponentAvatar}
         """
         for client in self.clients:
             client.componentRemoved(component)

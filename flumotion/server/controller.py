@@ -476,7 +476,7 @@ class Controller(pb.Root):
     
     def addComponent(self, component):
         """adds a component
-        @type component: L{server.controller.ComponentPerspective}
+        @type component: L{server.controller.ComponentAvatar}
         @param component: the component"""
 
         component_name = component.getName()
@@ -487,7 +487,7 @@ class Controller(pb.Root):
         
     def removeComponent(self, component):
         """removes a component
-        @type component: L{server.controller.ComponentPerspective}
+        @type component: L{server.controller.ComponentAvatar}
         @param component: the component"""
 
         component_name = component.getName()
