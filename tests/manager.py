@@ -91,8 +91,8 @@ class TestManager(unittest.TestCase):
         self.manager.addComponent(c2)
         c3 = FakeComponentPerspective('baz', port=1001, listen_host='baz-host')
         self.manager.addComponent(c3)
-        self.manager.feeder_manager.addFeeders(c2)
-        self.manager.feeder_manager.addFeeders(c3)
+        self.manager.feeder_set.addFeeders(c2)
+        self.manager.feeder_set.addFeeders(c3)
         
         eaters = self.manager.getComponentEaters(c)
         assert len(eaters) == 2

@@ -421,7 +421,7 @@ class Feeder:
     def __repr__(self):
         return '<Feeder %s ready=%r>' % (self.name, self.ready)
     
-class FeederManager:
+class FeederSet:
     def __init__(self):
         self.feeders = {}
 
@@ -493,7 +493,7 @@ class Manager(pb.Root):
     """
     def __init__(self):
         self.components = {} # dict of component avatars
-        self.feeder_manager = FeederManager()
+        self.feeder_set = FeederSet()
         self.admin = None
         
         self.last_free_port = 5500
@@ -593,7 +593,7 @@ class Manager(pb.Root):
         peernames = component.getEaters()
         retval = []
         for peername in peernames:
-            feeder = self.feeder_manager.getFeeder(peername)
+            feeder = self.feeder_set.getFeeder(peername)
             feedername = feeder.getName()
             if feedername.endswith(':default'):
                 feedername = feedername[:-8]
@@ -643,7 +643,7 @@ class Manager(pb.Root):
         for eater in component.getEaters():
             # eater and feeder elements are named with the feed name
             # on the GObject level
-            if not self.feeder_manager.isFeederReady(eater):
+            if not self.feeder_set.isFeederReady(eater):
                 component.debug('feeder %s is not ready' % (eater))
                 return
 
@@ -657,7 +657,7 @@ class Manager(pb.Root):
         component.debug('registering component')
         if self.admin:
             self.admin.componentAdded(component)
-        self.feeder_manager.addFeeders(component)
+        self.feeder_set.addFeeders(component)
 
         eaters = component.getEaters()
         if not eaters:
@@ -666,13 +666,13 @@ class Manager(pb.Root):
             return
         else:
             for eater in eaters:
-                self.feeder_manager.dependOnFeeder(eater,
+                self.feeder_set.dependOnFeeder(eater,
                                                self.maybeComponentStart,
                                                component)
                 
     def startPendingComponents(self, component, feeder):
         feedername = component.getName() + ':' + feeder
-        self.feeder_manager.feederReady(feedername)
+        self.feeder_set.feederReady(feedername)
 
     def stopComponent(self, name):
         """

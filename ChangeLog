@@ -1,5 +1,13 @@
 2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/reference/Makefile.am:
+	  hide line
+	* flumotion/server/manager.py:
+	* tests/manager.py:
+	  change FeederManager to FeederSet
+
+2004-09-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/components/base/converter.py:
 	* flumotion/components/base/producer.py:
 	* flumotion/components/file/file.py:
