@@ -32,10 +32,13 @@ def formatStorage(units, precision = 2):
     Sizes are powers of 10.
     Actual result should be suffixed with bit or byte, not b or B.
 
-    @param precision: the number of floating point digits to use.
+    @param units:     the unit size to format
+    @type  units:     int or float
+    @param precision: the number of floating point digits to use
+    @type  precision: int
 
     @rtype: string
-    @returns: value of units, formatted using SI scale and the given precision.
+    @returns: value of units, formatted using SI scale and the given precision
     """
 
     prefixes = ['E', 'P', 'T', 'G', 'M', 'k', '']

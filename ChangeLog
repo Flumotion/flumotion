@@ -1,5 +1,11 @@
 2004-09-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	* flumotion/component/http/http.py:
+	  display SI units
+
+2004-09-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/reference/Makefile.am:
 	* flumotion/common/Makefile.am:
 	* flumotion/common/common.py:

@@ -35,9 +35,7 @@ from twisted.internet import reactor
 import twisted.internet.error
 
 from flumotion.component import component
-from flumotion.common import interfaces
-from flumotion.common import auth
-from flumotion.common import bundle
+from flumotion.common import auth, bundle, common, interfaces
 from flumotion.utils import gstutils, log
 from flumotion.utils.gstutils import gsignal
 
@@ -88,16 +86,6 @@ class HTTPClientKeycard:
 
     def getIP(self):
         return self.request.getClientIP()
-
-def format_bytes(bytes):
-    'nicely format number of bytes or bits'
-    idx = ['P', 'T', 'G', 'M', 'K', '']
-    value = float(bytes)
-    l = idx.pop()
-    while idx and value >= 1024:
-        l = idx.pop()
-        value /= 1024
-    return "%.2f %s" % (value, l)
 
 def format_time(time):
     'nicely format time'
@@ -273,8 +261,9 @@ class Stats:
 
         s['stream-mime'] = c.get_mime()
         s['stream-uptime'] = format_time(uptime)
-        s['stream-bitrate'] = format_bytes(bytes_received  * 8 / uptime) + 'b/sec'
-        s['stream-totalbytes'] = format_bytes(bytes_received) + 'B'
+        bitspeed = bytes_received * 8 / uptime
+        s['stream-bitrate'] = common.formatStorage(bitspeed) + 'bit/s'
+        s['stream-totalbytes'] = common.formatStorage(bytes_received) + 'Byte'
 
         s['clients-current'] = str(c.getClients())
         s['clients-max'] = str(c.getMaxClients())
@@ -282,8 +271,9 @@ class Stats:
         s['clients-peak-time'] = time.ctime(c.getPeakEpoch())
         s['clients-average'] = str(int(c.getAverageClients()))
 
-        s['consumption-bitrate'] = format_bytes(bytes_sent  * 8 / uptime) + 'b/sec'
-        s['consumption-totalbytes'] = format_bytes(bytes_sent) + 'B'
+        bitspeed = bytes_sent * 8 / uptime
+        s['consumption-bitrate'] = common.formatStorage(bitspeed) + 'bit/s'
+        s['consumption-totalbytes'] = common.formatStorage(bytes_sent) + 'Byte'
 
         return s
  
