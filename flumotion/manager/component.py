@@ -548,21 +548,21 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         # check if the given feed is ready to start, and start it if it is
         self.info('checkFeedReady: feedName %s' % feedName)
         if not self.ports.has_key(feedName):
-            self.info('checkFeedReady: no port yet')
+            self.debug('checkFeedReady: no port yet')
             return
         
         if not self.getFeeders():
-            self.info('checkFeedReady: no remote options yet')
+            self.debug('checkFeedReady: no remote options yet')
             return
 
         if self.state != gst.STATE_PLAYING:
-            self.info('checkFeedReady: not playing yet (%s)' %
+            self.debug('checkFeedReady: not playing yet (%s)' %
                       gst.element_state_get_name(self.state))
             return
 
-        self.info('checkFeedReady: setting to ready')
+        self.debug('checkFeedReady: setting to ready')
         self.heaven.setFeederReady(self, feedName)
-        self.log('checkFeedReady: set to ready')
+        self.debug('checkFeedReady: set to ready')
 
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
     def authenticate(self, keycard):

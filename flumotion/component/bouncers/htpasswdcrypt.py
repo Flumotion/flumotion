@@ -76,7 +76,8 @@ class HTPasswdCrypt(bouncer.Bouncer):
         self._addKeycard(keycard)
         if not keycard.avatarId:
             keycard.avatarId = PossibleAvatarId
-        self.info('keycard %r authenticated, id %s, avatarId %s' % (keycard, keycard.id, keycard.avatarId))
+        self.info('authenticated login of "%s"' % keycard.avatarId)
+        self.debug('keycard %r authenticated, id %s, avatarId %s' % (keycard, keycard.id, keycard.avatarId))
         
         return keycard
 

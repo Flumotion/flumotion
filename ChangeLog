@@ -1,3 +1,10 @@
+2004-10-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/worker.py:
+	  clean up INFO level messages
+
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
 	* bin/flumotion-admin.in:

@@ -67,7 +67,7 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         @param config: a configuration dictionary for the component
         @type config:  dict
         """
-        self.info('starting %s on %s with config %r' % (name, self.avatarId, config))
+        self.debug('starting %s on %s with config %r' % (name, self.avatarId, config))
         return self.mind.callRemote('start', name, type, config)
 
     def checkElements(self, elements):
@@ -97,7 +97,7 @@ class WorkerHeaven(pb.Root, log.Loggable):
     def createAvatar(self, avatarId):
         avatar = WorkerAvatar(self, avatarId)
         self._avatars[avatarId] = avatar
-        self.info('WorkerAvatar %s created' % avatarId)
+        self.debug('WorkerAvatar %s created' % avatarId)
         return avatar
 
     def removeAvatar(self, avatarId):
@@ -144,7 +144,7 @@ class WorkerHeaven(pb.Root, log.Loggable):
        
     def workerAttached(self, workerAvatar):
         # called when the mind is attached, ie the worker logged in
-        self.info('worker %s logged in' % workerAvatar.getName())
+        self.info('worker "%s" logged in' % workerAvatar.getName())
         
         # get all components that are supposed to start on this worker
         workerName = workerAvatar.getName()
@@ -180,4 +180,6 @@ class WorkerHeaven(pb.Root, log.Loggable):
             # eg, if we don't select a worker, just pick the first one.
             avatar = self._avatars.values()[0]
 
+        self.info('Starting component "%s" on worker "%s"' % (
+            componentName, workerName))
         return avatar.start(componentName, type, config)
