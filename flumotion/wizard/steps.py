@@ -560,7 +560,7 @@ class Soundcard(wizard.WizardStep):
 
     def _queryRemoteRunErrback(self, failure):
         failure.trap(errors.RemoteRunError)
-        self.wizard.error_dialog('General error: %s' % failure.value)
+        self.wizard.error_dialog('%s' % failure.value)
 
     def update_inputs(self):
         if self.block_update:

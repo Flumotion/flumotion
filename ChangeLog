@@ -1,5 +1,14 @@
 2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  change debug message
+	* flumotion/wizard/steps.py:
+	  remove 'General error' from dialog
+	* flumotion/worker/checks/video.py:
+	  reorder some error handling
+
+2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  raise a useful error message when parsing of registry xml files
 	  fails

@@ -362,8 +362,8 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
             self.warning("method %s on %s does not exist, component bug" % (
                 methodName, name))
         else:
-            self.debug("unhandled failure on remote call to %s(%s): %r" % (
-                name, methodName, failure))
+            self.debug("passing through failure on remote call to %s(%s): %r" %
+                (name, methodName, failure))
 
         # FIXME: throw up some sort of dialog with debug info
         return failure

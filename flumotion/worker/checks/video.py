@@ -26,7 +26,7 @@ import gst.interfaces
 
 from twisted.internet import defer, reactor
 
-from flumotion.common import gstreamer, errors
+from flumotion.common import gstreamer, errors, log
     
 class Resolution:
     """
@@ -100,15 +100,15 @@ def do_element_check(pipeline_str, element_name, check_proc,
             # setting the bin state to NULL.
             if isinstance(retval, defer.Deferred):
                 retval.addCallback(
-                    lambda result: resolution.callback(result), retval)
+                    lambda result: resolution.callback(result))
             else:
                 reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
                 resolution.callback(retval)
 
         except CheckProcError, e:
-            resolution.errback(e.data)
+            resolution.errback(errors.RemoteRunError(e.data))
         except Exception, e:
-            resolution.errback(e)
+            resolution.errback(errors.RemoteRunError(e))
 
     # if any error happens during the pipeline run, error out
     def error_cb(pipeline, element, error, _, resolution):
@@ -170,8 +170,10 @@ def checkMixerTracks(source_factory, device):
     def get_tracks(element):
         # Only mixers have list_tracks. Why is this a perm error? FIXME in 0.9?
         if not element.implements_interface(gst.interfaces.Mixer):
-            raise CheckProcError('Cannot get mixer tracks from the device.  '\
-                                 'Check permissions on the mixer device.')
+            msg = 'Cannot get mixer tracks from the device.  '\
+                  'Check permissions on the mixer device.'
+            log.debug('checks', "returning failure: %s" % msg)
+            raise CheckProcError(msg)
 
         try:
             return (element.get_property('device-name'),
@@ -181,6 +183,7 @@ def checkMixerTracks(source_factory, device):
             v = gst.pygst_version
             msg = 'Your version of gstreamer-python is %d.%d.%d. ' % v\
                   + 'Please upgrade gstreamer-python to 0.7.94 or higher.'
+            log.debug('checks', "returning failure: %s" % msg)
             raise CheckProcError(msg)
                 
     pipeline = '%s name=source device=%s ! fakesink' % (source_factory, device)
