@@ -8,11 +8,21 @@ dir = os.path.dirname(os.path.abspath(__file__))
 root = os.path.split(dir)[0]
 sys.path.insert(0, root)
 
-sys.argv.insert(1, '--testmodule')
+from twisted.python import reflect
+from twisted.scripts import trial
 
 olddir = os.getcwd()
 os.chdir(root)
 
-from twisted.scripts.trial import run
-run()
+# if it contains test, just run it
+filename = os.path.basename(sys.argv[-1])
+if filename.startswith('test_'):
+    modname = reflect.filenameToModuleName(filename)
+    sys.argv = sys.argv[:-1]
+    sys.argv.append(modname)
+# Otherwise, run it with --testmodule
+else:
+    sys.argv.insert(1, '--testmodule')
+
+trial.run()
 os.chdir(olddir)

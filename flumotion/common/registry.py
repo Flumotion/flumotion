@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_registry -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
 # Flumotion - a video streaming server
@@ -131,14 +131,18 @@ def check_node(node, tag):
 # Proper description
 # Links to other files (glade, python, png)
 
-class RegistryXmlParser:
-    def __init__(self, filename):
+class RegistryXmlParser(log.Loggable):
+    def __init__(self, filename, string=None):
         self.components = {}
         self.filename = filename
-        
-        #debug('Parsing XML file: %s' % filename)
-        self.doc = minidom.parse(filename)
         self.path = os.path.split(filename)[0]
+
+        if string:
+            self.debug('Parsing XML string')
+            self.doc = minidom.parseString(string)
+        else:
+            self.debug('Parsing XML file: %s' % filename)
+            self.doc = minidom.parse(filename)
         self.parse()
         
     def getPath(self):
@@ -290,16 +294,19 @@ class ComponentRegistry(log.Loggable):
     def __init__(self):
         self.components = {}
 
-    def addFromFile(self, filename):
+    def addFromFile(self, filename, string=None):
         self.info('Merging registry from %s' % filename)
-        parser = RegistryXmlParser(filename)
+        parser = RegistryXmlParser(filename, string)
         for component in parser.getComponents():
             type = component.getType()
             if self.components.has_key(type):
                 raise TypeError, \
                       "there is already a component of type %s" % type
             self.components[type] = component
-            
+
+    def addFromString(self, string):
+        self.addFromFile('<string>', string)
+        
     def isEmpty(self):
         return len(self.components) == 0
 
@@ -307,8 +314,11 @@ class ComponentRegistry(log.Loggable):
         return self.components[name]
 
     def hasComponent(self, name):
-        return self.component.has_key(name)
+        return self.components.has_key(name)
 
+    def getComponents(self):
+        return self.components.values()
+    
     def dump(self, fd):
         print >> fd, '<components>'
         for component in self.components.values():

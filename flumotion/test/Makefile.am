@@ -4,7 +4,8 @@ EXTRA_DIST = \
 	test_config.py \
 	test_http.py \
 	test_log.py \
-	test_manager.py
+	test_manager.py \
+	test_registry.py
 
 check-local:
 	@if PYTHONPATH=$(top_srcdir):$(PYTHONPATH) trial -R flumotion.test; \

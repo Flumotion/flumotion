@@ -1,3 +1,14 @@
+2004-09-15  Johan Dahlin  <johan@gnome.org>
+
+	* bin/runtest.in: make it a little bit smarter
+
+	* flumotion/common/registry.py (ComponentRegistry.addFromString):
+	new method, helps testing
+	(ComponentRegistry.hasComponent): Fix a bug, use self.components
+	instead of self.component
+
+	* flumotion/test/test_registry.py: New file, to test basic parsing
+
 2004-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:
