@@ -35,17 +35,11 @@ class TestController(unittest.TestCase):
         self.cont = controller.Controller()
 
     def testGetPerspective(self):
-        p = self.cont.getPerspective('producer', 'prod')
-        assert isinstance(p, controller.ProducerPerspective)
+        p = self.cont.getPerspective('foo-bar-baz')
+        assert isinstance(p, controller.ComponentPerspective)
 
-        p = self.cont.getPerspective('converter', 'conv')
-        assert isinstance(p, controller.ConverterPerspective)
-
-        p = self.cont.getPerspective('streamer', 'stream')
-        assert isinstance(p, controller.StreamerPerspective)
-
-        self.assertRaises(AssertionError,
-                          self.cont.getPerspective, 'foo','bar')
+        #self.assertRaises(AssertionError,
+        #                  self.cont.getPerspective, 'does-not-exist')
 
     def testIsLocalComponent(self):
         c = FakeComponentPerspective()
@@ -53,17 +47,17 @@ class TestController(unittest.TestCase):
         assert self.cont.isLocalComponent(c)
         
     def testIsStarted(self):
-        c = self.cont.getPerspective('producer', 'prod')
+        c = self.cont.getPerspective('prod')
         assert not self.cont.isComponentStarted('prod')
         c.started = True # XXX: Use controller.componentStart
         assert self.cont.isComponentStarted('prod')
 
     def testGetComponent(self):
-        c = self.cont.getPerspective('producer', 'prod')
+        c = self.cont.getPerspective('prod')
         assert self.cont.getComponent('prod') == c
 
     def testHasComponent(self):
-        c = self.cont.getPerspective('producer', 'prod')
+        c = self.cont.getPerspective('prod')
         assert self.cont.hasComponent('prod')
         self.cont.removeComponent(c)
         assert not self.cont.hasComponent('prod')

@@ -21,14 +21,15 @@
 from flumotion.server import component
 
 class Producer(component.ParseLaunchComponent):
-    pass
+    def __init__(self, name, feeds, pipeline):
+        component.ParseLaunchComponent.__init__(self, name, [], feeds, pipeline)
 
 def createComponent(config):
     name = config['name']
     feeds = config.get('feeds', [])
     pipeline = config['pipeline']
 
-    component = Producer(name, [], feeds, pipeline)
+    component = Producer(name, feeds, pipeline)
 
     return component
 

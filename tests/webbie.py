@@ -14,8 +14,6 @@ import gobject
 import gst
 
 class Streamer(resource.Resource):
-    kind = 'streamer'
-    
     def __init__(self, pipeline, mime):
         resource.Resource.__init__(self)
         self.mime = mime
