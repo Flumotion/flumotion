@@ -32,6 +32,7 @@ from twisted.python import log
 from twisted.spread import pb
 
 import pbutil
+import gstutils
 
 class Acquisition(pb.Referenceable):
     def __init__(self, username, host, port, pipeline_string):
@@ -43,6 +44,8 @@ class Acquisition(pb.Referenceable):
         
         self.pipeline_string = pipeline_string
         self.persp = None
+        self.pipeline = None
+        self.pipeline_signals = []
         
     def got_perspective_cb(self, persp):
         #reactor.callLater(2, setattr, self, 'persp', persp)
@@ -55,33 +58,17 @@ class Acquisition(pb.Referenceable):
         else:
             print 'skipping remote-error, no perspective'
 
-        self.pipeline.set_state(gst.STATE_NULL)
+        # XXX: Maybe do this from controller
         self.prepare()
         
     def pipeline_state_change_cb(self, element, old, state):
         log.msg('pipeline state-changed %s %s -> %s' % (element.get_path_string(),
                                                         gst.element_state_get_name(old),
                                                         gst.element_state_get_name(state)))
-        if self.persp:
+        if self.persp is not None:
             self.persp.callRemote('stateChanged', old, state)
         else:
             print 'skipping state-changed, no perspective'
-        
-    def sink_pad_deep_notify_caps_cb(self, element, pad, param):
-        caps = pad.get_negotiated_caps()
-        log.msg('notify-caps %s::%s is %s' % (element.get_path_string(),
-                                              pad.get_name(),
-                                              str(caps)))
-
-        self.sink.disconnect(self.notify_id)
-        self.pipeline_pause()
-        
-        if self.persp:
-            self.persp.callRemote('notifyCaps', str(caps))
-        else:
-            print 'skipping notify-caps, no perspective'
-            
-        self.caps = caps
         
     def pipeline_deep_notify_cb(self, object, orig, pspec):
         log.msg('deep-notify %s: %s = %s' % (orig.get_path_string(),
@@ -101,97 +88,54 @@ class Acquisition(pb.Referenceable):
         gobject.idle_add(self.pipeline.iterate)
 
     def prepare(self):
-        if not self.persp:
+        if self.persp is None:
             log.msg('WARNING: We are not ready yet, waiting 250 ms')
             reactor.callLater(0.250, self.prepare)
             return
-        
+
         log.msg('prepare called')
-        
-        full_pipeline = '%s ! fakesink silent=1 name=fakesink' % self.pipeline_string
-        log.msg('going to run pipeline: %s' % full_pipeline)
-        self.pipeline = gst.parse_launch(full_pipeline)
-        self.pipeline.connect('error', self.pipeline_error_cb)
-        self.pipeline.connect('state-change', self.pipeline_state_change_cb)
-        self.pipeline.connect('deep-notify', self.pipeline_deep_notify_cb)
-        
-        self.src = self.pipeline.get_list()[-2]
-        
-        self.sink = self.pipeline.get_by_name('fakesink')
-        
-        self.notify_id = self.sink.connect('deep-notify::caps',
-                                           self.sink_pad_deep_notify_caps_cb)
 
-        reactor.callLater(0, self.pipeline_play)
-
-    def rewind(self):
-        # Stream back to the beginning
-        event = gst.event_new_seek(gst.FORMAT_TIME |
-                                   gst.SEEK_METHOD_SET |
-                                   gst.SEEK_FLAG_FLUSH, 0)
-        self.sink.send_event(event)
-
-    def relink(self, sink):
-        # Unlink and remove
+        if self.pipeline is not None:
+            if self.pipeline.get_state() != gst.STATE_NULL:
+                log.msg('Pipeline was in state %s, changing to NULL' %
+                        gst.element_state_get_name(self.pipeline.get_state()))
+                self.pipeline.set_state(gst.STATE_NULL)
+            # Disconnect signals
+            map(self.pipeline.disconnect, self.pipeline_signals)
+            self.pipeline = None
+            self.pipeline_signals = []
+            
+        pipeline = '%s ! tcpserversink name=sink' % self.pipeline_string
         
-        self.pipeline.remove(self.sink)
-        assert not self.src.unlink(self.sink)
-
-        self.sink = sink
+        log.msg('going to run pipeline: %s' % pipeline)
+        self.pipeline = gst.parse_launch(pipeline)
+        sig_id = self.pipeline.connect('error', self.pipeline_error_cb)
+        self.pipeline_signals.append(sig_id)
+        sig_id = self.pipeline.connect('state-change', self.pipeline_state_change_cb)
+        self.pipeline_signals.append(sig_id)
+        sig_id = self.pipeline.connect('deep-notify', gstutils.verbose_deep_notify_cb)
+        self.pipeline_signals.append(sig_id)
         
-        self.pipeline.add(self.sink)
-        self.src.link_filtered(self.sink, self.caps)
-        
-    def connect(self, hostname, port):
-        log.msg('Going to connect to %s:%d' % (hostname, port))
-
-        self.pipeline_pause()
-        
-        element = gst.element_factory_make('tcpclientsink')
-        element.set_property('host', hostname)
-        element.set_property('port', port)
-        
-        self.rewind()
-        self.relink(element)
-        
-        reactor.callLater(0, self.pipeline_play)
-
-    def listen(self, port):
+    def listen(self, host, port):
         log.msg('Going to listen on port %d' % port)
 
-        self.pipeline_pause()
+        sink = self.pipeline.get_by_name('sink')
+        if host:
+            sink.set_property('host', host)
+        sink.set_property('port', port)
         
-        element = gst.element_factory_make('tcpserversink')
-        element.set_property('port', port)
-        
-        self.rewind()
-        self.relink(element)
-        
-        reactor.callLater(0, self.pipeline_play)
+        self.pipeline_play()
         
     # Remote interface
     def remote_prepare(self):
         self.prepare()
 
-    def remote_connect(self, hostname, port):
-        self.connect(hostname, port)
-
-    def remote_listen(self, port):
-        self.listen(port)
+    def remote_listen(self, host, port):
+        self.listen(host, port)
         
-def parseHostString(string, port=8890):
-    if not string:
-        return 'localhost', port
-    
-    try:
-        host, port = re.search(r'(.+):(\d+)', string).groups()
-    except:
-        host = string
-        
-    return host, port
-    
 if __name__ == '__main__':
     log.startLogging(sys.stdout)
+    
     if len(sys.argv) == 2:
         pipeline = sys.argv[1]
         controller = ''
@@ -203,7 +147,8 @@ if __name__ == '__main__':
         sys.exit(2)
 
     name = 'johan'
-    host, port = parseHostString(controller)
+    host = controller
+    port = 8890
     log.msg('Connect to %s on port %d' % (host, port))
     client = Acquisition(name, host, port, pipeline)
     reactor.run()

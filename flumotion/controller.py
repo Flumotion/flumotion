@@ -74,9 +74,15 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
     def getPeer(self):
         return self.mind.broker.transport.getPeer()
 
+    def after_prepare_cb(self, obj):
+        self.controller.componentReady(self)
+        
     def attached(self, mind):
         log.msg('%s attached, preparing' % self.username)
-        mind.callRemote('prepare')
+        
+        cb = mind.callRemote('prepare')
+        cb.addCallback(self.after_prepare_cb)
+
         self.mind = mind
         
     def detached(self, mind):
@@ -89,10 +95,6 @@ class AcquisitionPerspective(pbutil.NewCredPerspective):
                  gst.element_state_get_name(old),
                  gst.element_state_get_name(state)))
         self.state = state
-        
-    def perspective_notifyCaps(self, caps):
-        log.msg('%s.notifyCaps %s' % (self.username, caps))
-        self.controller.componentReady(self)
         
     def perspective_error(self, element, error):
         log.msg('%s.error element=%s string=%s' % (self.username, element, error))
@@ -184,19 +186,36 @@ class Controller(pb.Root):
                 prev = curr
 
     def link(self, acq, trans):
-        obj = acq.mind.callRemote('listen', 5500)
+        acq_port = 5500
+        trans_port = 5501
         proto, acq_hostname, port = acq.getPeer()
         trans_hostname = trans.getPeer()[1]
-        
+
         if (acq_hostname == '127.0.0.1' and trans_hostname != '127.0.0.1'):
             acq_hostname = trans.getControllerHostname()
             
         def listenDone(obj=None):
-            assert acq.state != gst.STATE_PLAYING, \
+            assert acq.state == gst.STATE_PLAYING, \
                    gst.element_state_get_name(acq.state)
-            
-            trans.mind.callRemote('connect', acq_hostname, 5500)
-        obj.addCallback(listenDone)
+
+            log.msg('calling %s.listen(%d, %s, %d)' % (trans.username,
+                                                       acq_port,
+                                                       acq_hostname,
+                                                       trans_port))
+            trans.mind.callRemote('start', acq_port, acq_hostname, trans_port)
+
+        if acq.state != gst.STATE_PLAYING:
+            log.msg('calling %s.listen(%s, %d)' % (acq.username,
+                                                   acq_hostname,
+                                                   acq_port))
+            obj = acq.mind.callRemote('listen', acq_hostname, acq_port)
+            obj.addCallback(listenDone)
+        else:
+            log.msg('calling %s.listen(%d, %s, %d)' % (trans.username,
+                                                       acq_port,
+                                                       acq_hostname,
+                                                       trans_port))
+            trans.mind.callRemote('start', acq_port, acq_hostname, trans_port)
             
 class ControllerMaster(pb.PBServerFactory):
     def __init__(self):
