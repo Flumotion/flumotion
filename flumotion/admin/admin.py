@@ -231,6 +231,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         # FIXME: check if it's ok to return either a deferred or a result    
         def _MD5SumCallback(result, self, component, style):
             md5sum = result
+            self.info("received UI MD5 sum")
             self.debug("got UI MD5 sum: %s" % md5sum)
             dir = os.path.join(os.environ['HOME'], '.flumotion', 'cache', md5sum)
             if not os.path.exists(dir):
@@ -243,6 +244,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
 
         def _ZipCallback(result, self, component, style):
             # the result is the zip data
+            self.info("received UI Zip")
             b = bundle.Bundle()
             b.setZip(result)
             cachedir = os.path.join(os.environ['HOME'], ".flumotion", "cache")
