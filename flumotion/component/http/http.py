@@ -617,6 +617,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         self.log('client_removed_cb from thread %d' % thread.get_ident()) 
         self.log('[fd %5d] client_removed_cb, reason %s' % (fd, reason))
         stats = sink.emit('get-stats', fd)
+        self.log('[fd %5d] client_removed_cb, got stats' % fd)
         gobject.idle_add(self.client_removed_idle, sink, fd, reason, stats)
 
     ### END OF THREAD-AWARE CODE
