@@ -28,6 +28,7 @@ import errno
 import os 
 import sys
 import time
+import signal
 
 from twisted.python import reflect, rebuild
 from flumotion.common import errors, log
@@ -388,6 +389,36 @@ def getPid(type, name):
         return
  
     return int(pid)
+
+def termPid(pid):
+    """
+    Send the given process a TERM signal.
+
+    @returns: whether or not the process with the given pid was running
+    """
+    try:
+        os.kill(pid, signal.SIGTERM)
+        return True
+    except OSError, e:
+        if not e.errno == errno.ESRCH:
+        # FIXME: unhandled error, maybe give some better info ?
+            raise
+        return False
+
+def killPid(pid):
+    """
+    Send the given process a KILL signal.
+
+    @returns: whether or not the process with the given pid was running
+    """
+    try:
+        os.kill(pid, signal.SIGKILL)
+        return True
+    except OSError, e:
+        if not e.errno == errno.ESRCH:
+        # FIXME: unhandled error, maybe give some better info ?
+            raise
+        return False
 
 def checkPidRunning(pid):
     """

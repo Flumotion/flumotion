@@ -18,6 +18,7 @@
 import errno
 import os
 import glob
+import time
 import signal
 
 from flumotion.configure import configure
@@ -64,13 +65,13 @@ class Servicer(log.Loggable):
             
         return (managers, workers)
 
-
     def getManagers(self):
         """
         @returns: a dictionary of manager names -> flow names
         """
         managers = {}
 
+        self.log('getManagers()')
         if not os.path.exists(self.managersDir):
             return managers
 
@@ -85,8 +86,9 @@ class Servicer(log.Loggable):
                     name = filename.split(".xml")[0]
                     flows.append(name)
             managerName = os.path.split(managerDir)[1]
-            self.debug('Adding flows %r to manager %s' % (flows, managerName))
+            self.log('Adding flows %r to manager %s' % (flows, managerName))
             managers[managerName] = flows
+        self.log('returning managers: %r' % managers)
         return managers
 
     def getWorkers(self):
@@ -117,6 +119,7 @@ class Servicer(log.Loggable):
         Returns: an exit value
         """
         (managers, workers) = self._parseManagersWorkers('start', args)
+        self.debug("Start managers %r and workers %r" % (managers, workers))
         managersDict = self.getManagers()
         exitvalue = 0
 
@@ -140,6 +143,8 @@ class Servicer(log.Loggable):
         or all if none specified.
         """
         (managers, workers) = self._parseManagersWorkers('stop', args)
+        self.debug("Stop managers %r and workers %r" % (managers, workers))
+
         exitvalue = 0
 
         for name in workers:
@@ -154,14 +159,9 @@ class Servicer(log.Loggable):
     def status(self, args):
         """
         Give status on processes as given in the args.
-
-        If nothing specified, stop all managers and workers.
-        If first argument is "manager", stop given manager,
-        or all if none specified.
-        If first argument is "worker", stop given worker,
-        or all if none specified.
         """
         (managers, workers) = self._parseManagersWorkers('status', args)
+        self.debug("Status managers %r and workers %r" % (managers, workers))
         for type, list in [('manager', managers), ('worker', workers)]:
             for name in list:
                 pid = common.getPid(type, name)
@@ -172,7 +172,23 @@ class Servicer(log.Loggable):
                     print "%s %s is running with pid %d" % (type, name, pid)
                 else:
                     print "%s %s dead (stale pid %d)" % (type, name, pid)
-     
+
+    def clean(self, args):
+        """
+        Clean up dead processes as given in the args.
+        """
+        (managers, workers) = self._parseManagersWorkers('clean', args)
+        self.debug("Clean managers %r and workers %r" % (managers, workers))
+        for type, list in [('manager', managers), ('worker', workers)]:
+            for name in list:
+                pid = common.getPid(type, name)
+                if not pid:
+                    continue
+                if not common.checkPidRunning(pid):
+                    self.debug("Cleaning up stale pid %d for %s %s" % (
+                        pid, type, name))
+                    common.deletePidFile(type, name)
+ 
     def startManager(self, name, flowNames):
         """
         Start the manager as configured in the manager directory for the given
@@ -180,6 +196,8 @@ class Servicer(log.Loggable):
 
         @returns: whether or not the manager daemon started
         """
+        self.info("Starting manager %s" % name)
+        self.debug("Starting manager with flows %r" % flowNames)
         managerDir = os.path.join(self.managersDir, name)
         planetFile = os.path.join(managerDir, 'planet.xml')
         if not os.path.exists(planetFile):
@@ -206,20 +224,23 @@ class Servicer(log.Loggable):
                 raise errors.SystemError, \
                     "Manager %s is dead (stale pid %d)" % (name, pid)
             
-        command = "flumotion-manager --debug 3 -D -n %s %s %s" % (
+        command = "flumotion-manager -D -n %s %s %s" % (
             name, planetFile, " ".join(flowFiles))
+        self.debug("starting process %s" % command)
         retval = self.startProcess(command)
 
         if retval == 0:
             self.debug("Waiting for pid for manager %s" % name)
             pid = common.waitPidFile('manager', name)
             if pid:
-                self.debug("manager %s started with pid %d" % (name, pid))
+                self.info("Started manager %s with pid %d" % (name, pid))
                 return True
             else:
                 self.warning("manager %s could not start" % name)
                 return False
 
+        self.warning("manager %s could not start (return value %d)" % (
+            name, retval))
         return False
 
     def startWorker(self, name):
@@ -229,6 +250,7 @@ class Servicer(log.Loggable):
 
         @returns: whether or not the manager daemon started
         """
+        self.info("Starting worker %s" % name)
         workerFile = os.path.join(self.workersDir, "%s.xml" % name)
         if not os.path.exists(workerFile):
             raise errors.SystemError, \
@@ -277,41 +299,76 @@ class Servicer(log.Loggable):
         """
         Stop the given manager if it is running.
         """
+        self.info("Stopping manager %s" % name)
         pid = common.getPid('manager', name)
         if not pid:
             return True
 
         # FIXME: ensure a correct process is running this pid
-        self.debug('Killing manager %s with pid %d' % (name, pid))
-        try:
-            os.kill(pid, signal.SIGTERM)
-        except OSError, e:
-            if not e.errno == errno.ESRCH:
-                raise
-            self.warning('No process with pid %d' % pid)
-            common.deletePidFile('manager', name)
+        if not common.checkPidRunning(pid):
+            self.info("Manager %s is dead (stale pid %d)" % (name, pid))
             return False
 
+        self.debug('Stopping manager %s with pid %d' % (name, pid))
+        if not self.stopProcess(pid):
+            return False
+
+        self.info('Stopped manager %s with pid %d' % (name, pid))
         return True
 
     def stopWorker(self, name):
         """
         Stop the given worker if it is running.
         """
+        self.info("Stopping worker %s" % name)
         pid = common.getPid('worker', name)
         if not pid:
+            self.info("worker %s was not running" % name)
             return True
 
         # FIXME: ensure a correct process is running this pid
-        self.debug('Killing worker %s with pid %d' % (name, pid))
-        try:
-            os.kill(pid, signal.SIGTERM)
-        except OSError, e:
-            if not e.errno == errno.ESRCH:
-                raise
-            self.warning('No process with pid %d' % pid)
-            common.deletePidFile('worker', name)
+        if not common.checkPidRunning(pid):
+            self.info("Worker %s is dead (stale pid %d)" % (name, pid))
             return False
+
+        self.debug('Stopping worker %s with pid %d' % (name, pid))
+        if not self.stopProcess(pid):
+            return False
+
+        self.info('Stopped worker %s with pid %d' % (name, pid))
+        return True
+
+    def stopProcess(self, pid):
+        """
+        Stop the process with the given pid.
+        Wait until the pid has disappeared.
+        """
+        startClock = time.clock()
+        termClock = startClock + configure.processTermWait
+        killClock = termClock + configure.processKillWait
+
+        self.debug('stopping process with pid %d' % pid)
+        if not common.termPid(pid):
+            self.warning('No process with pid %d' % pid)
+            return False
+
+        # wait for the kill
+        while (common.checkPidRunning(pid)):
+            if time.clock() > termClock:
+                self.warning("Process with pid %d has not responded to TERM " \
+                    "for %d seconds, killing" % (pid,
+                        configure.processTermWait))
+                common.killPid(pid)
+                termClock = killClock + 1.0 # so it does not get triggered again
+
+            if time.clock() > killClock:
+                self.warning("Process with pid %d has not responded to KILL " \
+                    "for %d seconds, stopping" % (pid,
+                        configure.processKillWait))
+                return False
+
+            # busy loop until kill is done
+
         return True
   
     def list(self):

@@ -19,11 +19,20 @@ import os
 import sys
 import optparse
 
+from flumotion.common import common, log
 from flumotion.configure import configure
 from flumotion.service import service
 
 def main(args):
     parser = optparse.OptionParser()
+    parser.add_option('-d', '--debug',
+                      action="store", type="string", dest="debug",
+                      help="set debug levels")
+    parser.add_option('', '--version',
+                      action="store_true", dest="version",
+                      default=False,
+                      help="show version information")
+
     parser.add_option('-c', '--configdir',
                       action="store", dest="configdir",
                       help="flumotion configuration directory")
@@ -36,6 +45,13 @@ def main(args):
     if not options.configdir:
         options.configdir = configure.configdir
 
+    if options.version:
+        print common.version("flumotion-worker")
+        return 0
+
+    if options.debug:
+        log.setFluDebug(options.debug)
+
     # if log file is specified, redirect stdout and stderr
     if options.logfile:
         out = open(options.logfile, 'a+')
@@ -47,7 +63,7 @@ def main(args):
     try:
         command = args[1]
     except IndexError:
-        print "Usage: flumotion {list|start|stop} [options]"
+        print "Usage: flumotion {list|start|stop|restart|status|clean} [which]"
         sys.exit(0)
     
     if command == "list":
@@ -60,6 +76,8 @@ def main(args):
         return servicer.stop(args[2:]) + servicer.start(args[2:])
     elif command == "status":
         return servicer.status(args[2:])
+    elif command == "clean":
+        return servicer.clean(args[2:])
 
     sys.stderr.write("No such command '%s'\n" % command)
     return 1

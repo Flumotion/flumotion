@@ -86,6 +86,11 @@ config_dict['defaultSSLManagerPort'] = 7531
 config_dict['defaultStreamPortRange'] = range(8800, 8844 + 1)
 config_dict['defaultGstPortRange'] = range(8600, 8639 + 1)
 
+# default values for service-related stuff
+# how long to wait before timing out term and kill signals
+config_dict['processTermWait'] = 2
+config_dict['processKillWait'] = 2
+
 for key, value in config_dict.items():
     dictionary = locals()
     dictionary[key] = value

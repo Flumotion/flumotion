@@ -89,6 +89,10 @@ status() {
 	$prog status
 }
 
+clean() {
+	$prog clean
+}
+
 list() {
 	$prog list
 }
@@ -111,11 +115,14 @@ case "$1" in
   status)
         status
 	;;
+  clean)
+        clean
+	;;
   list)
         list
 	;;
   *)
-	echo $"Usage: $service {start|stop|restart|list|status}"
+	echo $"Usage: $service {start|stop|restart|list|status|clean}"
 	exit 1
 esac
 
