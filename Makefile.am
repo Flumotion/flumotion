@@ -6,6 +6,7 @@ SUBDIRS = . bin conf data flumotion doc m4 pkgconfig
 
 EXTRA_DIST = \
 	py-compile-destdir \
+	env.in \
 	python.mk \
 	LICENSE.GPL \
 	LICENSE.Flumotion \

@@ -115,6 +115,8 @@ sys.exit(0)
   AC_MSG_ERROR([You need at least version 1.3.0 of Twisted])
 )
 
+AC_CONFIG_FILES([env], [chmod +x env])
+
 dnl output stuff
 AC_OUTPUT(
 Makefile
