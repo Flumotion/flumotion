@@ -1,3 +1,14 @@
+2004-10-14  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/videotest/videotest.py:
+	* flumotion/component/videotest/videotest.xml:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/wizard_step.py:
+
+	Fix videotest fix pattern property. Add a method on feedcomponent
+	to get an element from a pipeline.
+	
 2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/reference/Makefile.am:
