@@ -26,7 +26,7 @@ from twisted.cred import portal
 from twisted.internet import reactor
 from twisted.spread import pb
 
-from flumotion.twisted import pbutil
+from flumotion.twisted import cred
 from flumotion.utils import log
 
 class Dispatcher:
@@ -111,7 +111,8 @@ class ReportHeaven(pb.Root, log.Loggable):
 def setup(fabric):
     root = ReportHeaven(fabric)
     dispatcher = Dispatcher(root)
-    checker = pbutil.ReallyAllowAnonymousAccess()
+    checker = cred.FlexibleCredentials()
+    checker.allowAnonymous(True)
     p = portal.Portal(dispatcher, [checker])
     report_factory = pb.PBServerFactory(p)
     reactor.listenUNIX('/tmp/flumotion.%d' % os.getpid(),
