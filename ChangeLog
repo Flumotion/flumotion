@@ -1,5 +1,15 @@
 2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/ui/admin.glade:
+	* flumotion/gui/adminclient.py:
+	* flumotion/server/admin.py:
+	* flumotion/server/controller.py:
+	* flumotion/utils/__init__.py:
+	  Add a Reload code button.  Add utility function to reload
+	  flumotion modules.  And it actually works as well.
+
+2004-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/gui/adminclient.py:
 	  handle dialogs a bit nicer.
 	  error dialogs for exceptions raised on controller or component.

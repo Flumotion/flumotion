@@ -229,6 +229,7 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
         self.debug("setting property '%s' on element '%s'" % (property, element))
         
         cb = self._mindCallRemote('setElementProperty', element, property, value)
+        cb.addCallback(self._mindSetPropertyCallback)
         cb.addErrback(self._mindPropertyErrback)
         return cb
         
@@ -247,6 +248,7 @@ class ComponentPerspective(pb.Avatar, log.Loggable):
             raise errors.PropertyError(msg)
         self.debug("getting property %s on element %s" % (element, property))
         cb = self._mindCallRemote('getElementProperty', element, property)
+        cb.addCallback(self._mindGetPropertyCallback)
         cb.addErrback(self._mindPropertyErrback)
         return cb
 

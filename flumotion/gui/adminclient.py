@@ -106,6 +106,9 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
 
     def getProperty(self, component, element, property):
         return self.remote.callRemote('getComponentElementProperty', component, element, property)
+
+    def reloadController(self):
+        return self.remote.callRemote('reloadController')
     
 gobject.type_register(AdminInterface)
 
@@ -123,7 +126,9 @@ class Window:
         self.wtree = gtk.glade.XML(os.path.join(self.gladedir, 'admin.glade'))
         self.window = self.wtree.get_widget('main_window')
         self.button_change = self.wtree.get_widget('button_change')
-        self.button_change.connect('clicked', self.button_change_cb)
+        self.button_change.connect('clicked', self._button_change_cb)
+        self.button_reload = self.wtree.get_widget('button_reload')
+        self.button_reload.connect('clicked', self._button_reload_cb)
         
         self.window.connect('delete-event', self.close)
         self.window.show_all()
@@ -145,18 +150,7 @@ class Window:
 
         self.wtree.signal_autoconnect(self)
 
-    def error_dialog(self, message, parent = None):
-        """
-        Show an error message dialog.
-        """
-        if not parent:
-            parent = self.window
-        d = gtk.MessageDialog(parent, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
-            gtk.BUTTONS_OK, message)
-        d.connect("response", lambda self, response: self.destroy())
-        d.show_all()
-
-    def button_change_cb(self, button):
+    def _button_change_cb(self, button):
         selection = self.component_view.get_selection()
         sel = selection.get_selected()
         if not sel:
@@ -231,6 +225,22 @@ class Window:
 
     def update_cb(self, admin, clients):
         self.update(clients)
+
+    # reload code
+    def _button_reload_cb(self, button):
+        cb = self.admin.reloadController()
+ 
+    def error_dialog(self, message, parent = None):
+        """
+        Show an error message dialog.
+        """
+        if not parent:
+            parent = self.window
+        d = gtk.MessageDialog(parent, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
+            gtk.BUTTONS_OK, message)
+        d.connect("response", lambda self, response: self.destroy())
+        d.show_all()
+
 
     def connection_refused_later(self, host, port):
         d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,

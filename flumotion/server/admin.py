@@ -47,7 +47,7 @@ class RemoteComponentView(pb.RemoteCopy):
     """
     I live in an admin client.
     I represent state of a component.
-    I am a copy of a controll-side L{ComponentView}
+    I am a copy of a controller-side L{ComponentView}
     """
     def __cmp__(self, other):
         if not isinstance(other, RemoteComponentView):
@@ -171,6 +171,7 @@ class AdminPerspective(pb.Avatar, log.Loggable):
         raise SystemExit
     
     def perspective_setComponentElementProperty(self, component_name, element, property, value):
+        """Set a property on an element in a component."""
         component = self.controller.getComponent(component_name)
         try:
             return component.setElementProperty(element, property, value)
@@ -179,12 +180,30 @@ class AdminPerspective(pb.Avatar, log.Loggable):
             raise
 
     def perspective_getComponentElementProperty(self, component_name, element, property):
+        """Get a property on an element in a component."""
         component = self.controller.getComponent(component_name)
         try:
             return component.getElementProperty(element, property)
         except errors.PropertyError, exception:
             self.warning(str(exception))
             raise
+
+    def perspective_reloadController(self):
+        """Reload modules in the controller."""
+        import sys
+        from twisted.python.rebuild import rebuild
+        # reload ourselves first
+        rebuild(sys.modules[__name__])
+
+        # now rebuild relevant modules
+        import flumotion.utils
+        rebuild(sys.modules['flumotion.utils'])
+        flumotion.utils.reload()
+        self._reloaded()
+
+    # separate method so it runs the newly reloaded one :)
+    def _reloaded(self):
+        self.info('reloaded module code for %s' % __name__)
 
 class Admin(pb.Root):
     """
