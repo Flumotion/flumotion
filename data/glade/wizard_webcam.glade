@@ -156,7 +156,7 @@
 	  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 	  <property name="snap_to_ticks">False</property>
 	  <property name="wrap">False</property>
-	  <property name="adjustment">3.75 3.75 30 0.9375 3.75 10</property>
+	  <property name="adjustment">7.5 3.75 30 0.9375 3.75 10</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>

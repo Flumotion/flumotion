@@ -1,5 +1,11 @@
 2004-11-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_tvcard.glade:
+	* data/glade/wizard_webcam.glade:
+	  fix up defaults
+
+2004-11-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	* flumotion.spec.in:
 	* flumotion/Makefile.am:
