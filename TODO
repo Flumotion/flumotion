@@ -59,6 +59,10 @@ LATER:
 
 * EASY		decide if bouncer's base authenticate method should always
 		be overridden and thus raise
+
+* MEDIUM	if you specify a converter with feedname other than default and a consumer
+                eating from that feed and change the source to the same feedname, it fails.
+		
 - API cleanup:
 
 - manager/component.py:
