@@ -674,34 +674,48 @@ class ComponentAvatar(base.ManagerAvatar):
         self.debug('received feed ports from component: %s' % feedPorts)
 
     def perspective_authenticate(self, bouncerName, keycard):
-        self.debug('asked to authenticate keycard %r using bouncer %s' % (keycard, bouncerName))
-        if not self.heaven.hasComponent(bouncerName):
-            # FIXME: return failure object ?
-            return False
+        """
+        Authenticate the given keycard using the given bouncer.
+        The bouncer needs to be part of the atmosphere.
 
-        bouncerAvatar = self.heaven.getComponent(bouncerName)
+        @type  bouncerName: string
+        @param keycard:     keycard to authenticate
+        """
+        self.debug('asked to authenticate keycard %r using bouncer %s' % (
+            keycard, bouncerName))
+        avatarId = '/atmosphere/%s' % bouncerName
+        if not self.heaven.hasAvatar(avatarId):
+            self.warning('No bouncer with id %s registered' % avatarId)
+            raise errors.UnknownComponentError(avatarId)
+
+        bouncerAvatar = self.heaven.getAvatar(avatarId)
         return bouncerAvatar.authenticate(keycard)
 
     def perspective_removeKeycard(self, bouncerName, keycardId):
         """
         Remove a keycard on the given bouncer on behalf of a component's medium.
+
+        This is requested by a component that created the keycard.
+
+        @type  bouncerName: string
+        @param keycardId:   id of keycard to remove
         """
         self.debug('asked to remove keycard %s on bouncer %s' % (
             keycardId, bouncerName))
-        if not self.heaven.hasComponent(bouncerName):
-            self.warning('asked to remove keycard %s on bouncer %s' % (
-                (keycardId, bouncerName)) + \
-                'but no such component registered')
-            # FIXME: return failure object ?
-            return False
+        avatarId = '/atmosphere/%s' % bouncerName
+        if not self.heaven.hasAvatar(avatarId):
+            self.warning('No bouncer with id %s registered' % avatarId)
+            raise errors.UnknownComponentError(avatarId)
 
-        bouncerAvatar = self.heaven.getComponent(bouncerName)
+        bouncerAvatar = self.heaven.getAvatar(avatarId)
         return bouncerAvatar.removeKeycard(keycardId)
 
     def perspective_expireKeycard(self, requesterName, keycardId):
         """
         Expire a keycard (and thus the requester's connection)
         issued to the given requester.
+
+        This is called by the bouncer component that authenticated the keycard.
         """
         # FIXME: we should also be able to expire manager bouncer keycards
         if not self.heaven.hasComponent(requesterName):

@@ -82,7 +82,6 @@ class ConfigEntryAtmosphere:
     def __init__(self):
         self.components = {}
 
-
 # FIXME: rename
 class FlumotionConfigXML(log.Loggable):
     """

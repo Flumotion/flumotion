@@ -66,6 +66,8 @@ class ManagerAtmosphereState(flavors.StateCacheable):
         flavors.StateCacheable.__init__(self)
         self.addKey('parent')
         self.addListKey('components')
+        self.addKey('name')
+        self.set('name', 'atmosphere')
 
     def empty(self):
         """

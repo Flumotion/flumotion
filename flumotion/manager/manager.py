@@ -232,7 +232,8 @@ class Vishnu(log.Loggable):
         added = [] # added components while parsing
         
         if conf.atmosphere:
-            for c in conf.atmosphere.components:
+            self.debug('checking atmosphere components %r' % conf.atmosphere.components)
+            for c in conf.atmosphere.components.values():
                 self.debug('checking atmosphere config component %s' % c.name)
                 isOurComponent = lambda x: x.get('name') == c.name
                 atmosphere = self.state.get('atmosphere')

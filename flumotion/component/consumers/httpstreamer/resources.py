@@ -32,6 +32,7 @@ from twisted.protocols import http
 from twisted.web import server, resource as web_resource
 from twisted.internet import reactor, defer
 from flumotion.configure import configure
+from flumotion.common import errors
 import twisted.internet.error
 
 from flumotion.common import common, log, keycards
@@ -517,6 +518,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         d = self.authenticate(request)
         d.addCallback(self._authenticatedCallback, request)
+        d.addErrback(self._authenticatedErrback, request)
         self.debug('_render(): asked for authentication')
         # FIXME
         #d.addErrback()
@@ -555,6 +557,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         else:
             raise AssertionError
 
+    def _authenticatedErrback(self, failure, request):
+        failure.trap(errors.UnknownComponentError)
+        self._handleUnauthorized(request)
+ 
     render_GET = _render
     render_HEAD = _render
 
