@@ -22,7 +22,7 @@ import socket
 
 import gobject
 import gst
-from twisted.python import log
+from flumotion.utils import log
 
 def caps_repr(caps):
     value = str(caps)
