@@ -15,6 +15,8 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+import gtk
+
 class ProgressDialog(gtk.Dialog):
     def __init__(self, title, message, parent = None):
         gtk.Dialog.__init__(self, title, parent,
