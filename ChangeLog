@@ -1,3 +1,19 @@
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/Makefile.am:
+	* data/glade/wizard.glade:
+	* data/glade/wizard_audio_encoder.glade:
+	* data/glade/wizard_disk.glade:
+	* data/glade/wizard_license.glade:
+	* data/glade/wizard_smoke.glade:
+	* data/glade/wizard_summary.glade:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+
+	Add a summary step, tweak audio_encoder to show quality for vorbis
+	Change the disk button into an entry
+	Increase the size of the wizard slightly
+	
 2004-10-18  Wim Taymans  <wim@fluendo.com>
 
 	* conf/dv-ogg-theora-vorbis.xml:

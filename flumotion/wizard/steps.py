@@ -26,6 +26,7 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
 from flumotion.wizard import wizard
 from flumotion.configure import configure
 
+
 
 class Welcome(wizard.WizardStep):
     step_name = 'Welcome'
@@ -37,6 +38,7 @@ class Welcome(wizard.WizardStep):
     def get_next(self):
         return 'Source'
 wizard.register_step(Welcome)
+
 
 
 class Source(wizard.WizardStep):
@@ -440,16 +442,21 @@ class Vorbis(AudioEncoder):
     component_type = 'vorbis'
     icon = 'xiphfish.png'
 
+    def activated(self):
+        self.label_quality.show()
+        self.spinbutton_quality.show()
+        
     def deactivated(self):
         self.wizard.check_element(self.worker, 'rawvorbisenc')
-
+        
     def setup(self):
-        self.spinbutton_bitrate.set_range(6000, 250001)
-        self.spinbutton_bitrate.set_value(64000)
+        self.spinbutton_bitrate.set_range(6, 250)
+        self.spinbutton_bitrate.set_value(64)
         
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
-        options['bitrate'] = int(self.spinbutton_bitrate.get_value())
+        options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
+        options['quality'] = int(self.spinbutton_quality.get_value())
         return options
 wizard.register_step(Vorbis)
 
@@ -464,12 +471,13 @@ class Speex(AudioEncoder):
         self.wizard.check_element(self.worker, 'speexenc')
         
     def setup(self):
-        self.spinbutton_bitrate.set_range(2150, 30000)
-        self.spinbutton_bitrate.set_value(11000)
+        # Should be 2150 instead of 3 -> 3000
+        self.spinbutton_bitrate.set_range(3, 30)
+        self.spinbutton_bitrate.set_value(11)
         
     def get_component_properties(self):
         options = self.wizard.get_step_state(self)
-        options['bitrate'] = int(self.spinbutton_bitrate.get_value())
+        options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
         return options
 wizard.register_step(Speex)
 
@@ -598,13 +606,15 @@ class HTTPBoth(HTTP):
     sidebar_name = 'HTTP audio/video'
     port = configure.defaultStreamPortRange[0]
 wizard.register_step(HTTPBoth)
-    
+
+
                   
 class HTTPAudio(HTTP):
     step_name = 'HTTP Streamer (audio only)'
     sidebar_name = 'HTTP video'
     port = configure.defaultStreamPortRange[1]
 wizard.register_step(HTTPAudio)
+
 
 
 class HTTPVideo(HTTP):
@@ -621,41 +631,12 @@ class Disk(wizard.WizardStep):
     icon = 'kcmdevices.png'
     
     def setup(self):
-        self.directory = '/tmp'
-        
-        self.tool_tip = gtk.Tooltips()
-        self.tool_tip.set_tip(self.button_browse, 'Select a folder')
-        
         self.combobox_time_list.set_enum(RotateTime)
         self.combobox_size_list.set_enum(RotateSize)
         self.radiobutton_has_time.set_active(True)
         self.spinbutton_time.set_value(12)
         self.combobox_time_list.set_active(RotateTime.Hours)
 
-
-    def on_button_browse_clicked(self, button):
-        fc = gtk.FileChooserDialog("Open..",
-                                   None,
-                                   gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                    gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-        fc.set_default_response(gtk.RESPONSE_OK)
-
-        response = fc.run()
-        if response == gtk.RESPONSE_OK:
-            self.directory = fc.get_filename()
-            if len(self.directory) >= 23:
-                cut_filename = '...' + self.directory[-20:]
-            else:
-                cut_filename = self.directory
-                
-            self.tool_tip.set_tip(self.button_browse, self.directory)
-            self.button_browse.set_label(cut_filename)
-        else:
-            self.tool_tip.set_tip(self.button_browse, 'Select a folder')
-            
-        fc.destroy()
-    
     # This is bound to both radiobutton_has_size and radiobutton_has_time
     def on_radiobutton_rotate_toggled(self, button):
         self.update_radio()
@@ -699,7 +680,7 @@ class Disk(wizard.WizardStep):
                 unit = self.combobox_size_list.get_enum().unit
                 options['size'] = long(self.spinbutton_size.get_value() * unit)
 
-        options['directory'] = self.directory
+        options['directory'] = self.entry_location.get_text()
         
         return options
     
@@ -743,5 +724,19 @@ class Licence(wizard.WizardStep):
         self.combobox_license.set_sensitive(button.get_active())
         
     def get_next(self):
-        return # WOHO, Finished!
+        return 'Summary'
 wizard.register_step(Licence)
+
+
+
+class Summary(wizard.WizardStep):
+    step_name = "Summary"
+    glade_file = "wizard_summary.glade"
+    has_worker = False
+    last_step = True
+    def get_next(self):
+        return
+    
+wizard.register_step(Summary)
+
+

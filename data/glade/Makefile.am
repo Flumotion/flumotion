@@ -14,6 +14,7 @@
 	wizard_overlay.glade		\
 	wizard_smoke.glade		\
 	wizard_source.glade		\
+	wizard_summary.glade		\
 	wizard_testsource.glade		\
 	wizard_theora.glade		\
 	wizard_tvcard.glade		\

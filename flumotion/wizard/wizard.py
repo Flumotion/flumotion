@@ -261,7 +261,10 @@ class WizardStep(object, log.Loggable):
     
     def get_sidebar_name(self):
         return getattr(self, 'sidebar_name', self.step_name)
-        
+
+    def get_section(self):
+        return getattr(self, 'section', '')
+    
     def get_next(self):
         """
         @returns name of next step
@@ -434,6 +437,10 @@ class Wizard(gobject.GObject):
         self.update_buttons(has_next=True)
 
     def check_element(self, worker, *elements):
+        if not self._admin:
+            print 'Running in debug mode, not querying workers'
+            return
+        
         asked = sets.Set(elements)
         def _responseCb(existing):
             existing = sets.Set(existing)
@@ -457,7 +464,7 @@ class Wizard(gobject.GObject):
     def show_next(self):
         next = self.current_step.get_next()
         if not next:
-            self.finish()
+            self.finish(save=True)
             return
 
         try:
@@ -471,7 +478,8 @@ class Wizard(gobject.GObject):
         self.stack.push(next_step)
         self.set_step(next_step)
 
-        self.update_buttons(next)
+        has_next = not hasattr(next_step, 'last_step')
+        self.update_buttons(has_next)
 
     def update_buttons(self, has_next):
         if len(self.stack) == 1:
@@ -496,7 +504,7 @@ class Wizard(gobject.GObject):
         parent.modify_bg(gtk.STATE_NORMAL, self.sidebar_color)
         self.vbox_sidebar = gtk.VBox()
         self.vbox_sidebar.set_border_width(5)
-        self.vbox_sidebar.set_size_request(180, -1)
+        self.vbox_sidebar.set_size_request(200, -1)
         parent.add(self.vbox_sidebar)
 
     def _sidebar_add_placeholder(self):
@@ -553,7 +561,7 @@ class Wizard(gobject.GObject):
     
     def _sidebar_add_substeps(self, section):
         filtered_steps = [step for step in self.steps
-                                   if (step.section == section and
+                                   if (step.get_section() == section and
                                        step.visited == True and
                                        not hasattr(step, 'section_name'))]
         for step in filtered_steps:
@@ -561,7 +569,7 @@ class Wizard(gobject.GObject):
             self._sidebar_add_step(step, label, True, 20)
 
     def update_sidebar(self, step):
-        current = step.section
+        current = step.get_section()
 
         self._sidebar_clean()
         
@@ -582,7 +590,7 @@ class Wizard(gobject.GObject):
         self.vbox_sidebar.show()
         
     def on_wizard_delete_event(self, wizard, event):
-        self.finish(self._use_main)
+        self.finish(self._use_main, save=False)
 
     def on_button_prev_clicked(self, button):
         self.show_previous()
@@ -590,9 +598,10 @@ class Wizard(gobject.GObject):
     def on_button_next_clicked(self, button):
         self.show_next()
 
-    def finish(self, main=True):
-        configuration = self._save.getXML()
-        self.emit('finished', configuration)
+    def finish(self, main=True, save=True):
+        if save:
+            configuration = self._save.getXML()
+            self.emit('finished', configuration)
         
         if self._use_main:
             try:
