@@ -34,6 +34,7 @@ Maintainer: U{Thomas Vander Stichele <thomas at apestaart dot org>}
 import sys
 import os
 import fnmatch
+import time
 
 from flumotion.twisted import errors
 
@@ -122,7 +123,7 @@ def registerCategory(category):
     _categories[category] = level
 
 def stderrHandler(category, level, message):
-    sys.stderr.write('%-8s %-15s %s\n' % (level + ':', category + ':' , message))
+    sys.stderr.write('%s %-8s %-15s %s\n' % (time.strftime("%b %d %H:%M:%S"), level + ':', category + ':' , message))
     sys.stderr.flush()
 
 def stderrHandlerLimited(category, level, message):
