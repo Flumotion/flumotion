@@ -325,11 +325,19 @@ class Window(log.Loggable, gobject.GObject):
     def close(self, *args):
         reactor.stop()
 
+    def _logConfig(self, configation):
+        import pprint
+        import cStringIO
+        fd = cStringIO.StringIO()
+        pprint.pprint(configation, fd)
+        fd.seek(0)
+        self.debug('Configuration=%s' % fd.read())
+        
     def runWizard(self):
         from flumotion.wizard import wizard
-        # XXX: This need to be able to run twice
         def _wizard_finished_cb(wizard, configuration):
             wizard.hide()
+            self._logConfig(configuration)
             self.admin.loadConfiguration(configuration)
             self.show()
 
@@ -344,14 +352,13 @@ class Window(log.Loggable, gobject.GObject):
         wiz.run(True, workers, False)
 
         return wiz
-    
+
     # menubar/toolbar callbacksw
     def file_new_cb(self, button):
         self.runWizard()
 
     def file_open_cb(self, button):
-        dialog = gtk.FileChooserDialog("Open..",
-                                       None,
+        dialog = gtk.FileChooserDialog("Open..", self.window,
                                        gtk.FILE_CHOOSER_ACTION_OPEN,
                                        (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                                         gtk.STOCK_OPEN, gtk.RESPONSE_OK))
@@ -360,7 +367,7 @@ class Window(log.Loggable, gobject.GObject):
         directory = os.path.join(os.environ['HOME'], '.flumotion')
         if os.path.exists(directory):
             dialog.set_current_folder(directory)
-            
+             
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             filename = dialog.get_filename()
@@ -374,8 +381,29 @@ class Window(log.Loggable, gobject.GObject):
         dialog.destroy()
     
     def file_save_cb(self, button):
-        raise NotImplementedError
-    
+        dialog = gtk.FileChooserDialog("Save as..", self.window,
+                                       gtk.FILE_CHOOSER_ACTION_SAVE,
+                                       (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                        gtk.STOCK_SAVE, gtk.RESPONSE_OK))
+        dialog.set_default_response(gtk.RESPONSE_OK)
+
+        directory = os.path.join(os.environ['HOME'], '.flumotion')
+        if os.path.exists(directory):
+            dialog.set_current_folder(directory)
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            filename = dialog.get_filename()
+        elif response == gtk.RESPONSE_CANCEL:
+            dialog.destroy()
+            return
+        
+        dialog.hide()
+
+        fd = open(filename, 'w')
+        fd.write(configuration)
+        dialog.destroy()
+
     def file_quit_cb(self, button):
         self.close()
     

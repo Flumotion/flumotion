@@ -20,16 +20,13 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
-     EncodingFormat, EncodingVideo, Enum, EnumClass, EnumMetaClass, \
-     LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
-     SoundcardChannels, SoundcardDevice, SoundcardInput, \
-     SoundcardSamplerate, TVCardDevice, TVCardSignal, VideoDevice, \
-     VideoTestFormat, VideoTestPattern
+from flumotion.common import log
+from flumotion.wizard import enums
 
 
 class Component:
     def __init__(self, name, type, properties={}, worker=None):
+        log.debug('Creating component %s (%s) worker=%r' % (name, type, worker))
         self.name = name
         self.type = type
         self.props = properties
@@ -118,7 +115,7 @@ class WizardSaver:
         else:
             props = {}
             worker = self.wizard['Source'].worker
-            
+
         return Component('video-source', source.component_type, props, worker)
 
     def getVideoOverlay(self, show_logo):
@@ -128,12 +125,12 @@ class WizardSaver:
         if show_logo:
             properties['fluendo_logo'] = True
             encoding_options = self.wizard.get_step_options('Encoding')
-            if (encoding_options['format'] == EncodingFormat.Ogg or
-                encoding_options['video'] == EncodingVideo.Theora):
+            if (encoding_options['format'] == enums.EncodingFormat.Ogg or
+                encoding_options['video'] == enums.EncodingVideo.Theora):
                 properties['xiph_logo'] = True
 
             license_options = self.wizard.get_step_options('Content License')
-            if license_options['license'] == LicenseType.CC:
+            if license_options['license'] == enums.LicenseType.CC:
                 properties['cc_logo'] = True
             
         return Component('video-overlay', 'overlay', properties, step.worker)
@@ -149,11 +146,12 @@ class WizardSaver:
     def getAudioSource(self, video_source):
         options = self.wizard.get_step_options('Source')
         source = options['audio']
+        
         # If we selected firewire and have selected video
         # and the selected video is Firewire,
         #   return the source
-        if (source == AudioDevice.Firewire and video_source and
-            options['video'] == VideoDevice.Firewire):
+        if (source == enums.AudioDevice.Firewire and video_source and
+            options['video'] == enums.VideoDevice.Firewire):
             return video_source
         
         props = {}
@@ -172,7 +170,7 @@ class WizardSaver:
         options = self.wizard.get_step_options('Encoding')
         encoder = options['audio']
         
-        if encoder == EncodingAudio.Mulaw:
+        if encoder == enums.EncodingAudio.Mulaw:
             props = {}
             # FIXME
             worker = None 

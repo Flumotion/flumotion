@@ -28,6 +28,8 @@ import gtk
 import gtk.gdk
 import gtk.glade
 
+from twisted.internet import defer
+
 from flumotion.configure import configure
 from flumotion.common import log
 from flumotion.utils.gstutils import gsignal
@@ -98,9 +100,7 @@ class WizardComboBox(gtk.ComboBox):
         model.clear()
         for value in list:
             iter = model.append()
-            model.set(iter,
-                      0, value,
-                      1, value)
+            model.set(iter, 0, value, 1, value)
         self.set_active(0)
 
     def clear(self):
@@ -130,6 +130,10 @@ class WizardComboBox(gtk.ComboBox):
     def setup(self):
         "This copies the values from an old model to a new"
         old_model = self.get_model()
+        if not old_model:
+            step = self.get_data('wizard-step')
+            raise AssertionError("Please set a default value in %s for %r" % (
+                step, self.get_name()))
         
         model = gtk.ListStore(*self._column_types)
         value = 0
@@ -142,8 +146,9 @@ class WizardComboBox(gtk.ComboBox):
                       self.COLUMN_NICK, name,
                       self.COLUMN_VALUE, value)
             value += 1
+                
         self.set_model(model)
-        
+
     def get_state(self):
         return self.get_enum()
 gobject.type_register(WizardComboBox)
@@ -235,8 +240,12 @@ class WizardStep(object, log.Loggable):
         windows = []
         self.widgets = self.wtree.get_widget_prefix('')
         for widget in self.widgets:
-            name = widget.get_name()
+            # So we can access the step from inside the widget
+            widget.set_data('wizard-step', self)
+
             if isinstance(widget, gtk.Window):
+                if widget.get_property('visible'):
+                    raise AssertionError('window for %r is visible' % self)
                 widget.hide()
                 windows.append(widget)
                 continue
@@ -245,12 +254,15 @@ class WizardStep(object, log.Loggable):
                 widget.setup()
                 widget.set_active(0)
                     
+            name = widget.get_name()
             if hasattr(self, name):
-                raise TypeError
+                raise AssertionError("There is already an attribute called %s in %r" % (name, self))
+            
             setattr(self, name, widget)
 
         if len(windows) != 1:
-            raise AssertionError("only one window per glade file allowed")
+            raise AssertionError("only one window per glade file allowed, got %r in %r" % (
+                windows, self))
 
         self.window = windows[0]
         child = self.window.get_children()[0]
@@ -290,6 +302,19 @@ class WizardStep(object, log.Loggable):
 
     def get_section(self):
         return getattr(self, 'section', '')
+        
+    def run_on_worker(self, function, *args):
+        admin = self.wizard.get_admin()
+        worker = self.worker
+        d = defer.fail()
+        
+        if not admin:
+            print 'skipping query, no admin'
+        elif not worker:
+            print 'skipping query, no worker'
+        else:
+            d = admin.workerRun(worker, function, *args)
+        return d
         
     def get_next(self):
         """
@@ -550,8 +575,8 @@ class Wizard(gobject.GObject, log.Loggable):
             model = self.combobox_worker.get_model()
             iter = self.combobox_worker.get_active_iter()
             text = model.get(iter, 0)[0]
+            log.debug('%r setting worker to %s' % (step, text))
             step.worker = text
-            log.debug('%r setting worker to %s' % (step, step.worker))
         else:
             log.debug('%r no worker set' % step)
             

@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name:flumotion.test.test_soundcard -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/component/producers/soundcard/soundcard.py: soundcard producer
@@ -25,11 +25,10 @@ import gst.interfaces
 
 from flumotion.component import feedcomponent
 
-def state_changed_cb(element, old, new, channel):
+def state_changed_cb(element, old, new, trackLabel):
     if old == gst.STATE_NULL and new == gst.STATE_READY:
-        c = element.find_channel_by_name(channel)
-        if c:
-            element.set_channel(c)
+        for track in element.list_tracks():
+            element.set_record(track, track.label == trackLabel)
     
 class SoundcardProducer(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, feeders, pipeline):
@@ -39,17 +38,14 @@ class SoundcardProducer(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
                                        
 def createComponent(config):
-    kind = 'alsasrc'
-    config['device'] = 'hw:0'
-    
-    component = SoundcardProducer(config['name'], config['feed'],
-                          '%s name=source' % kind)
+    element = config['source-element']
+    device =  config['device']
+    rate = config.get('rate', 22050)
+    depth = config.get('depth', 16)
+    channels = config.get('channels', 1)
 
-    element = component.pipeline.get_by_name('source')
-    #element.connect('state-change', state_changed_cb, config['input'])
-    element.set_property('device', config['device'])
-    #element.set_property('channels', config['channels'])
-    #element.set_property('samplerate', config['samplerate'])
-    #element.set_property('bitrate', config['bitrate'])
-    
+    caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d,width=%d,signed=(boolean)TRUE,endianness=1234' % (rate, depth, channels, depth)
+    pipeline = '%s device=%s ! audioscale ! audioconvert ! %s' % (element, device, caps)
+    component = SoundcardProducer(config['name'], config['feed'],  pipeline)
+
     return component

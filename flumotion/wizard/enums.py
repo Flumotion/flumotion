@@ -133,9 +133,16 @@ VideoTestPattern = EnumClass('VideoTestPattern',
 VideoTestFormat = EnumClass('VideoTestFormat', ('YUV', 'RGB'))
 
 # Sound card
-SoundcardDevice = EnumClass('SoundcardDevice', ('/dev/dsp',
-                                                '/dev/dsp1',
-                                                '/dev/dsp2'))
+SoundcardSource = EnumClass('SoundcardSource', ('OSS',
+                                                'Alsa'),
+                            element=('osssrc', 'alsasrc'))
+
+SoundcardOSSDevice = EnumClass('SoundcardOSSDevice', ('/dev/dsp',
+                                                      '/dev/dsp1',
+                                                      '/dev/dsp2'))
+SoundcardAlsaDevice = EnumClass('SoundcardAlsaDevice', ('hw:0',
+                                                        'hw:1',
+                                                        'hw:2'))
 SoundcardInput = EnumClass('SoundcardInput',
                            ('Line in', 'Microphone', 'CD'))
 SoundcardChannels = EnumClass('SoundcardChannels', ('Stereo', 'Mono'))

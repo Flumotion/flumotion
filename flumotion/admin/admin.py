@@ -259,7 +259,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
                            
         @returns: deferred
         """
-        r = common.argRepr(args, kwargs)
+        r = common.argRepr(args, kwargs, max=20)
         self.info('calling remote method %s(%s) on worker %s' % (methodName, r,
                                                                  workerName))
         d = self.remote.callRemote('workerCallRemote', workerName,

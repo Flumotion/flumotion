@@ -299,7 +299,7 @@ class FeedComponent(basecomponent.BaseComponent):
         # Setup all feeders
         for feeder_name, host in feedersData:
             feed_name = feeder_name.split(':')[1]
-            assert self.feed_ports.has_key(feed_name)
+            assert self.feed_ports.has_key(feed_name), feed_name
             port = self.feed_ports[feed_name]
             self.debug('Going to listen on feeder %s (%s:%d)' % (feeder_name, host, port))
             name = 'feeder:' + feeder_name
@@ -435,11 +435,12 @@ class ParseLaunchComponent(FeedComponent):
     ### FeedComponent methods
     def setup_pipeline(self):
         pipeline = self.parse_pipeline(self.pipeline_string)
+        self.pipeline_string = pipeline
         try:
             self.pipeline = gst.parse_launch(pipeline)
         except gobject.GError, e:
+            print pipeline
             raise errors.PipelineParseError(e)
-
         FeedComponent.setup_pipeline(self)
 
     ### ParseLaunchComponent methods

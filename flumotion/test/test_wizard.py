@@ -22,9 +22,14 @@
 # Headers in this file shall remain intact.
 
 import common
-import gtk
 
 from twisted.trial import unittest
+
+try:
+    import gtk
+except RuntimeError:
+    import os
+    os._exit(0)
 
 from flumotion.wizard import enums, wizard
 

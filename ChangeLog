@@ -1,3 +1,19 @@
+2004-11-04  Johan Dahlin  <johan@gnome.org>
+
+	* data/glade/wizard_soundcard.glade:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/test/test_wizard.py:
+	* flumotion/wizard/enums.py:
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+
+	Add OSS/Alsa and probing to soundcard, fixes issue #61
+	
 2004-11-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/registry.py:

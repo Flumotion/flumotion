@@ -30,9 +30,9 @@ from flumotion.wizard import wizard
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, Enum, EnumClass, EnumMetaClass, \
      LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
-     SoundcardChannels, SoundcardDevice, SoundcardInput, \
-     SoundcardSamplerate, TVCardDevice, TVCardSignal, VideoDevice, \
-     VideoTestFormat, VideoTestPattern
+     SoundcardChannels, SoundcardSource, SoundcardAlsaDevice, SoundcardOSSDevice, \
+     SoundcardInput, SoundcardSamplerate, TVCardDevice, TVCardSignal, \
+     VideoDevice, VideoTestFormat, VideoTestPattern
 
 
 
@@ -100,7 +100,8 @@ class Source(wizard.WizardStep):
 
         video_source = self.combobox_video.get_active()
         audio_source = self.combobox_audio.get_active()
-        if (has_audio and audio_source == AudioDevice.Firewire):
+        if (has_audio and audio_source == AudioDevice.Firewire and not
+            has_video and video_source == VideoDevice.Firewire):
             self.wizard.combobox_worker.set_sensitive(True)
         else:
             self.wizard.combobox_worker.set_sensitive(False)
@@ -138,7 +139,7 @@ def _checkChannels(device):
     from twisted.internet import defer, reactor
     import gst
     import gst.interfaces
-
+    
     d = defer.Deferred()
 
     # gst, defer and errors are already in the namespace 
@@ -202,22 +203,9 @@ class TVCard(VideoSource):
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
-        d = self.workerRun(_checkChannels, device)
+        d = self.run_on_worker(_checkChannels, device)
         d.addCallback(self._queryCallback)
         d.addErrback(self._unknownDeviceErrback)
-        
-    def workerRun(self, function, *args):
-        admin = self.wizard.get_admin()
-        worker = self.worker
-        d = defer.fail()
-        
-        if not admin:
-            print 'skipping query, no admin'
-        elif not worker:
-            print 'skipping query, no worker'
-        else:
-            d = admin.workerRun(worker, function, *args)
-        return d
         
     def get_component_properties(self):
         options = {}
@@ -331,6 +319,34 @@ class Overlay(wizard.WizardStep):
 wizard.register_step(Overlay)
 
 
+def _checkTracks(source_element, device):
+    from twisted.internet import defer, reactor
+    import gst
+    import gst.interfaces
+
+    d = defer.Deferred()
+
+    # gst, defer and errors are already in the namespace 
+    def state_changed_cb(pipeline, old, new):
+        if not (old == gst.STATE_NULL and new == gst.STATE_READY):
+            return
+        element = pipeline.get_by_name('source')
+        deviceName = element.get_property('device-name')
+        tracks = [track.label for track in element.list_tracks()]
+        reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
+        d.callback((deviceName, tracks))
+                
+    def error_cb(pipeline, element, error, _):
+        d.errback(errors.UnknownDeviceError("The device does not exist"))
+
+    pipeline = '%s name=source device=%s ! fakesink' % (source_element, device)
+    bin = gst.parse_launch(pipeline)
+    bin.connect('state-change', state_changed_cb)
+    bin.connect('error', error_cb)
+    bin.set_state(gst.STATE_PLAYING)
+
+    return d
+
 
 class Soundcard(wizard.WizardStep):
     step_name = 'Soundcard'
@@ -338,14 +354,89 @@ class Soundcard(wizard.WizardStep):
     section = 'Production'
     component_type = 'osssrc'
     icon = 'soundcard.png'
+
+    in_setup = False          # If we're doing setup
+    in_update_devices = False # If we're updating devices
     
     def setup(self):
-        self.combobox_device.set_enum(SoundcardDevice)
-        self.combobox_input.set_enum(SoundcardInput)
-        self.combobox_channels.set_enum(SoundcardChannels)
-        self.combobox_samplerate.set_enum(SoundcardSamplerate)
-        self.combobox_bitdepth.set_enum(SoundcardBitdepth)
+        self.in_setup = True
+        self.combobox_system.set_enum(SoundcardSource)
+        self.in_setup = False
         
+    def on_combobox_system_changed(self, combo):
+        if self.in_setup:
+            return
+
+        self.update_devices()
+        self.update_inputs()
+
+    def on_combobox_device_changed(self, combo):
+        if self.in_setup:
+            return
+        
+        self.update_inputs()
+
+    def worker_changed(self):
+        self.clear_combos()
+        self.update_devices()
+        self.update_inputs()
+
+    def before_show(self):
+        self.clear_combos()
+        self.update_devices()
+        self.update_inputs()
+
+    def clear_combos(self):
+        self.combobox_input.clear()
+        self.combobox_input.set_sensitive(False)
+        self.combobox_channels.clear()
+        self.combobox_channels.set_sensitive(False)
+        self.combobox_samplerate.clear()
+        self.combobox_samplerate.set_sensitive(False)
+        self.combobox_bitdepth.clear()
+        self.combobox_bitdepth.set_sensitive(False)
+        
+    def _queryCallback(self, (deviceName, tracks)):
+        self.wizard.block_next(False)
+        
+        self.combobox_channels.set_enum(SoundcardChannels)
+        self.combobox_channels.set_sensitive(True)
+        self.combobox_samplerate.set_enum(SoundcardSamplerate)
+        self.combobox_samplerate.set_sensitive(True)
+        self.combobox_bitdepth.set_enum(SoundcardBitdepth)
+        self.combobox_bitdepth.set_sensitive(True)
+
+        self.combobox_input.set_list(tracks)
+        self.combobox_input.set_sensitive(True)
+
+    def _unknownDeviceErrback(self, failure):
+        failure.trap(errors.UnknownDeviceError)
+        self.clear_combos()
+
+    def update_devices(self):
+        self.in_update_devices = True
+        
+        enum = self.combobox_system.get_enum()
+        if enum == SoundcardSource.Alsa:
+            self.combobox_device.set_enum(SoundcardAlsaDevice)
+        elif enum == SoundcardSource.OSS:
+            self.combobox_device.set_enum(SoundcardOSSDevice)
+        #else:
+        #    raise AssertionError
+        self.in_update_devices = False
+
+    def update_inputs(self):
+        if self.in_update_devices:
+            return
+        
+        self.wizard.block_next(True)
+        
+        enum = self.combobox_system.get_enum()
+        device = self.combobox_device.get_string()
+        d = self.run_on_worker(_checkTracks, enum.element, device)
+        d.addCallback(self._queryCallback)
+        d.addErrback(self._unknownDeviceErrback)
+
     def get_component_properties(self):
         channels = self.combobox_channels.get_enum()
         if channels == SoundcardChannels.Mono:
