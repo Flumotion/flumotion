@@ -1,5 +1,11 @@
 2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  fix some prints and raises
+
+2004-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	* flumotion/worker/job.py:
 	* flumotion/worker/worker.py:

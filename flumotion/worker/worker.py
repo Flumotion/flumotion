@@ -177,8 +177,8 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
             self.warning(msg)
             raise errors.RemoteRunError(msg)
 
-        self.debug('remote_runCode: returning deferred %r' % deferred)
         # code got executed and now returns the deferred
+        self.debug('remote_runCode: returning deferred')
         return deferred
 
     

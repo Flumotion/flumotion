@@ -185,8 +185,8 @@ class JobMedium(pb.Referenceable, log.Loggable):
         try:
             comp = getComponent(config, defs)
         except Exception, e:
-            msg = "Exception %s during import of source %s (%s)" % (
-                e.__class__.__name__, source, e)
+            msg = "Exception %s during getComponent: %r" % (
+                e.__class__.__name__, e)
             self.warning("raising ComponentStart(%s)" % msg)
             raise errors.ComponentStart(msg)
 
