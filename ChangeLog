@@ -1,6 +1,7 @@
 2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:
+	* flumotion/component/Makefile.am:
 	* flumotion/component/effects/Makefile.am:
 	* flumotion/component/effects/__init__.py:
 	* flumotion/component/effects/colorbalance/Makefile.am:
@@ -18,20 +19,27 @@
 	* flumotion/admin/gtk/client.py:
 	  use an import trick to show components instead
 	* flumotion/common/errors.py:
-	* flumotion/component/Makefile.am:
-	* flumotion/component/base/admin_gtk.py:
-	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
-	* flumotion/component/feedcomponent.py:
+	  add a syntax error
+	* flumotion/wizard/steps.py:
+	  remove print
 	* flumotion/component/producers/bttv/admin_gtk.py:
 	* flumotion/component/producers/bttv/bttv.py:
 	* flumotion/component/producers/bttv/bttv.xml:
+	  use colorbalance effect and admin nodes for display
 	* flumotion/component/producers/videotest/admin_gtk.py:
 	* flumotion/component/producers/videotest/videotest.py:
+	  use new nodes for display
 	* flumotion/component/producers/webcam/admin_gtk.py:
 	* flumotion/component/producers/webcam/webcam.py:
 	* flumotion/component/producers/webcam/webcam.xml:
+	  add admin ui for webcam and use effects and nodes
+	* flumotion/component/feedcomponent.py:
+	  implement effect support
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	  move to new node display
 	* flumotion/package.xml:
-	* flumotion/wizard/steps.py:
+	  add effect
 
 2004-12-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
