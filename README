@@ -64,9 +64,10 @@ terminal 2:
   flumotion-worker -v -T tcp -u user -p test
 
 terminal 3:
-  flumotion-admin -v -T tcp -u user -p test
+  flumotion-admin -v
+  Choose transport "TCP", and "user" and "test" in the dialog
 
-  Go through the wizard, choosing defaults.
+  Go through the wizard, chosing defaults.
 
   Double-click the http component after the wizard has completed
 
