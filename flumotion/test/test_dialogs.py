@@ -27,7 +27,7 @@ import gtk
 
 from flumotion.admin.gtk import dialogs
 
-INTERVAL = 100
+INTERVAL = 100 # in ms
 
 class TestProgressDialog(unittest.TestCase):
     def setUp(self):
