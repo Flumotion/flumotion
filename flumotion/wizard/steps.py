@@ -651,14 +651,14 @@ class Disk(wizard.WizardStep):
     def get_component_properties(self):
         options = {}
         if not self.checkbutton_rotate:
-            options['rotate_type'] = 'none'
+            options['rotateType'] = 'none'
         else:
             if self.radiobutton_has_time:
-                options['rotate_type'] = 'time'
+                options['rotateType'] = 'time'
                 unit = self.combobox_time_list.get_enum().unit
                 options['time'] = long(self.spinbutton_time.get_value() * unit)
             elif self.radiobutton.has_size:
-                options['rotate_type'] = 'size'
+                options['rotateType'] = 'size'
                 unit = self.combobox_size_list.get_enum().unit
                 options['size'] = long(self.spinbutton_size.get_value() * unit)
 
