@@ -23,9 +23,8 @@ import pygtk
 pygtk.require('2.0')
 import gobject
 
-from flumotion.common.pygobject import (gsignal, gproperty,
-                                        with_construct_properties)
-
+from flumotion.common.pygobject import gsignal, gproperty
+from flumotion.common.pygobject import with_construct_properties
 
 class TestPyGObject(unittest.TestCase):
     def testPyGObject(self):
