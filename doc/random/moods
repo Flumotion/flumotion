@@ -3,17 +3,32 @@
 - examples:
   - LOST:     no heartbeat received lately; component locked up, died, or
               network problem
+
   - HUNGRY:   waiting for a dependency to start (e.g., a feed, or other comp)
-  - HAPPY:    everything fine, component working, received heartbeats
+
+  - HAPPY:    everything fine, component started and working,
+              received heartbeats
+
   - SAD:      an error happened (we wanted to use ANGRY, but the difference
               between ANGRY and HUNGRY is close to non-existent in French)
-  - WAKING:   a component started up and is preparing
-  - SLEEPING: exists but not yet asked to do something
+              the component needs to be stopped and started after fixing the
+              error
+
+  - WAKING:   a component exists in a job process, but is waiting to be
+	      started or destroyed
+
+  - SLEEPING: manager "knows" about this component but it is not running on
+	      a worker in a job process
  
 - the "mood" is decided in the manager; for example, a component that is LOST
   could be locked up and doesn't know itself that it is lost !
 - connected admins use a remotecacheable object for the component that has
   the mood 
 - component lifecycle:
-  - gets created -> "WAKING"
-  - manager calls "start" -> component goes to HUNGRY, SAD, or HAPPY
+  - manager has configuration which mentions a component -> SLEEPING
+  - gets created -> createComponent -> "WAKING"
+  - manager calls "start" -> startComponent -> 
+    component goes to HUNGRY, SAD, or HAPPY
+
+  - manager destroys component -> "SLEEPING"
+ 
