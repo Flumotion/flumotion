@@ -1,5 +1,17 @@
 2004-08-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/ogg-test-theora.xml:
+	  fixes
+	* flumotion/components/__init__.py:
+	* flumotion/components/converter.py:
+	* flumotion/components/file.py:
+	* flumotion/components/http.py:
+	* flumotion/components/passwd.py:
+	* flumotion/components/producer.py:
+	  add/fix header
+
+2004-08-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	* configure.ac:
 	* doc/

@@ -1,7 +1,10 @@
+# -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
 # Flumotion - a video streamer server
 # Copyright (C) 2004 Fluendo
+#
+# password.py: implements password protection
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

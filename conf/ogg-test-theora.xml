@@ -1,20 +1,14 @@
 <root>
   <component name="producer-video-test" type="producer">
     <pipeline>
-      videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
-    </pipeline>
-  </component>
-
-  <component name="videotest-producer-big" type="producer">
-    <pipeline>
-      videotestsrc ! video/x-raw-yuv,width=640,height=480,framerate=2.0,format=(fourcc)I420
+videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
     </pipeline>
   </component>
 
   <component name="converter-ogg-theora" type="converter">
     <source>producer-video-test</source>
     <pipeline>
-pipeline=ffcolorspace ! theoraenc ! oggmux
+ffmpegcolorspace ! theoraenc keyframe-force=5 ! oggmux
     </pipeline>
   </component>
 
