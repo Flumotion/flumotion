@@ -8,6 +8,7 @@ SUBDIRS = \
 	tester \
 	twisted \
 	utils \
+	wizard \
 	worker
 
 flumotiondir = $(libdir)/flumotion/python/flumotion
