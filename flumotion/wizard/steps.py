@@ -62,9 +62,8 @@ class Source(wizard.WizardStep):
         tips.set_tip(self.checkbutton_has_audio,
                      'If you want to stream audio')
         
-        # XXX: Default to something else
-        self.combobox_video.set_active(VideoDevice.Firewire)
-        self.combobox_audio.set_active(AudioDevice.Firewire)
+        self.combobox_video.set_active(VideoDevice.Test)
+        self.combobox_audio.set_active(AudioDevice.Test)
 
     def activated(self):
         self.verify()
@@ -539,7 +538,6 @@ class Consumption(wizard.WizardStep):
     has_worker = False
 
     def setup(self):
-        # XXX: remove
         self.checkbutton_disk.set_active(True)
         
     def on_checkbutton_http_toggled(self, button):
