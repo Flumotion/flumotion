@@ -97,6 +97,13 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         self.debug('shutting down')
 
     def remote_uiStateChanged(self, name, state):
+        """
+        Called when the component's UI needs to be updated with new state.
+        Model will emit the 'ui-state-changed' signal.
+
+        @param name: name of component whose state has changed.
+        @param state: new state of component.
+        """
         self.emit('ui-state-changed', name, state)
         
     ### model functions

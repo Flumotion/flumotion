@@ -162,6 +162,14 @@ class Window(log.Loggable):
         return model.get(iter, COL_TEXT)[0]
 
     def show_component(self, name, data):
+        """
+        Show the user interface for this component.
+        Searches data for the GUIClass global, then instantiates an object
+        from that class, and calls the render() method.
+
+        @param name: name to give to the instantiated object.
+        @param data: the python code to load.
+        """
         sub = None
         instance = None
         if data:
@@ -239,7 +247,7 @@ class Window(log.Loggable):
 
         comp = self.current_component
         if comp:
-            comp.setUiState(state)
+            comp.setUIState(state)
         
     def admin_update_cb(self, admin, components):
         self.update(components)

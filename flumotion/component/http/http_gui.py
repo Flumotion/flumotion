@@ -45,7 +45,7 @@ class BaseUI:
         return self.admin.callComponentRemote(self.name, method_name,
                                               *args, **kwargs)
         
-    def setUiState(self, state):
+    def setUIState(self, state):
         raise NotImplementedError
     
 class HTTPStreamerUI(BaseUI):
@@ -56,10 +56,11 @@ class HTTPStreamerUI(BaseUI):
         label.set_text('Mime type: %s' % mime)
         label.show()
 
-    def setUiState(self, state):
-        self.label_mime.set_text(state['mime'])
-        self.label_clients.set_text(str(state['clients-connected']))
-        self.label_uptime.set_text(str(state['uptime']))
+    def setUIState(self, state):
+        self.label_uptime.set_text(str(state['stream-uptime']))
+        self.label_mime.set_text(state['stream-mime'])
+        self.label_clients.set_text(str(state['clients-current']))
+        self.label_clients_average.set_text(str(state['clients-average']))
         
     def render(self):
         def newRow(name):
@@ -78,6 +79,9 @@ class HTTPStreamerUI(BaseUI):
         vbox.pack_start(hbox)
         
         hbox, self.label_clients = newRow('Clients')
+        vbox.pack_start(hbox)
+
+        hbox, self.label_clients_average = newRow('Average Clients')
         vbox.pack_start(hbox)
 
         hbox, self.label_uptime = newRow('Uptime')

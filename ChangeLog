@@ -2,6 +2,14 @@
 
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
+	* flumotion/component/http/http.py:
+	* flumotion/component/http/http_gui.py:
+	  rearranging some code so I understand what to do tomorrow.
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
 	* flumotion/component/component.py:
 	* flumotion/component/http/http.py:
 	* flumotion/component/http/http_gui.py:

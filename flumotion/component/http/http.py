@@ -114,6 +114,7 @@ def format_time(time):
     display.append('%02d:%02d:%02d' % (h, m, s))
     return " ".join(display)
     
+# implements a Resource for the HTTP admin interface
 class HTTPStreamingAdminResource(resource.Resource):
     def __init__(self, parent):
         'call with a HTTPStreamingResource to admin for'
@@ -458,39 +459,47 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         else:
             return self.handleNewClient(request)
 
-# FIXME: this is not used, what does it want to do ?
 class HTTPView(component.ComponentView):
     def __init__(self, comp):
+        """
+        @type comp: L{Stats}
+        """
         component.ComponentView.__init__(self, comp)
 
         self.comp.connect('ui-state-changed', self.comp_ui_state_changed_cb)
 
     def getState(self):
-        stats = self.comp
+        c = self.comp
 
         s = {}
 
-        bytes_sent      = stats.getBytesSent()
-        bytes_received  = stats.getBytesReceived()
-        uptime          = stats.getUptime()
+        bytes_sent      = c.getBytesSent()
+        bytes_received  = c.getBytesReceived()
+        uptime          = c.getUptime()
 
-        s['clients-connected'] = self.comp.getClients()
-        s['mime'] = self.comp.get_mime()
-        s['bytes-sent'] = format_bytes(bytes_sent)
-        s['bytes-received'] = format_bytes(bytes_received)
-        s['uptime'] = format_time(uptime)
-        s['bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
-        s['clients-bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
-        s['peak-clients'] = stats.getPeakClients()
-        #s['average-clients'] = int(stats.getAverageClients())
-        #s['max-clients'] = int(self.parent.maxAllowedClients())
-        
+
+        s['stream-mime'] = c.get_mime()
+        s['stream-uptime'] = format_time(uptime)
+        s['stream-bitrate'] = format_bytes(bytes_received / uptime) + '/sec'
+        s['stream-totalbytes'] = format_bytes(bytes_sent)
+
+
+        s['clients-current'] = str(c.getClients())
+        s['clients-max'] = str(c.getMaxClients())
+        s['clients-peak'] = str(c.getPeakClients())
+        s['clients-peak-time'] = time.ctime(c.getPeakEpoch())
+        s['clients-average'] = str(int(c.getAverageClients()))
+
+        s['consumption-totalbytes'] = format_bytes(bytes_received)
+        s['consumption-bitrate'] = format_bytes(bytes_sent / uptime) + '/sec'
+
         return s
     
     def comp_ui_state_changed_cb(self, comp):
         self.callRemote('uiStateChanged', self.comp.get_name(), self.getState())
 
 class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
+    # this object is given to the HTTPView as comp
     logCategory = 'cons-http'
     # use select for test
     pipe_template = 'multifdsink name=sink ' + \
@@ -510,9 +519,13 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
                                                 self.pipe_template)
         Stats.__init__(self, sink=self.get_sink())
         self.caps = None
+        self.resource = None
         
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.component_name
+
+    def getMaxClients(self):
+        return self.resource.maxAllowedClients()
 
     def remote_notifyState(self):
         self.update_ui_state()
@@ -612,6 +625,8 @@ def createComponent(config):
 
     component = MultifdSinkStreamer(name, source, port)
     resource = HTTPStreamingResource(component)
+    # FIXME: tie these together more nicely
+    component.resource = resource
     
     factory = server.Site(resource=resource)
     
