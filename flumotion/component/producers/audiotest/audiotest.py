@@ -27,5 +27,9 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
 
 def createComponent(config):
     component = AudioTest(config['name'], 'sinesrc name=source sync=1')
+    element = component.get_element('source')
+    if config.has_key('freq'):
+        element.set_property('freq', config['freq'])
+        
     return component
 

@@ -3,6 +3,7 @@
     <source location="flumotion.component.producers.audiotest.audiotest"/>
     <properties>
       <property name="feed" type="string" multiple="yes"/>
+      <property name="freq" type="int"/>
     </properties>
   </component>
 </components>

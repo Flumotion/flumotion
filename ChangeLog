@@ -1,5 +1,12 @@
 2004-10-19  Johan Dahlin  <johan@gnome.org>
 
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+
+	Add freq property.
+	
+2004-10-19  Johan Dahlin  <johan@gnome.org>
+
 	* data/image/wizard/Makefile.am:
 	* data/image/wizard/summary.png:
 	* flumotion/wizard/steps.py:
