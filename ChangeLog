@@ -1,5 +1,19 @@
 2005-02-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/client.py:
+	* glumotion/admin/gtk/connections.py (ConnectionsDialog): New
+	object, a dialog to open a recent connection. Caused general
+	refactoring in client.py.
+
+	* data/glade/connection-dialog.glade: New file, shown as
+	File/Open.
+
+	* data/glade/Makefile.am (glade_DATA): Add connections.glade and
+	connection-dialog.glade to the dist.
+
+	* flumotion/ui/glade.py: New file, implements some base classes
+	for glade-backed widgets and windows.
+
 	* flumotion/admin/gtk/main.py (_runInterface): Don't write the
 	connection, admin.py does it for us.
 

@@ -1,6 +1,8 @@
 glade_DATA = \
 	admin.glade 			\
 	admin-wizard.glade		\
+	connection-dialog.glade		\
+	connections.glade		\
 	greeter-initial.glade		\
 	greeter-connect_to_existing.glade	\
 	greeter-authenticate.glade	\

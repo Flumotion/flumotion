@@ -165,7 +165,7 @@ class Window(log.Loggable, gobject.GObject):
         print '\n\nconnection refused, try again'
         print 'FIXME: make a proper errbox'
 
-    def on_open_recent(self, item, config):
+    def on_open_connection(self, config):
         model = AdminModel(config['user'], config['passwd'])
         model.connectToHost(config['host'], config['port'],
                             config['use_insecure'])
@@ -176,6 +176,9 @@ class Window(log.Loggable, gobject.GObject):
         ids.append(model.connect('connection-refused',
                                  self.open_refused_cb, ids))
         self.window.set_sensitive(False)
+
+    def on_recent_activate(self, widget, state):
+        self.on_open_connection(state)
 
     def _append_recent_connections(self):
         menu = self.widgets['connection_menu'].get_submenu()
@@ -199,7 +202,7 @@ class Window(log.Loggable, gobject.GObject):
         def append_txt(c, n):
             s = '_%d: %s:%d/%s' % (n, c['host'], c['port'], c['manager'])
             i = gtk.MenuItem(s)
-            i.connect('activate', self.on_open_recent, c)
+            i.connect('activate', self.on_recent_activate, c)
             append(i)
             
         append(gtk.SeparatorMenuItem())
@@ -707,11 +710,14 @@ class Window(log.Loggable, gobject.GObject):
     def file_new_cb(self, button):
         raise NotImplementedError()
 
+    def on_have_connection(self, d, state):
+        d.destroy()
+        self.on_open_connection(state)
+
     def file_open_cb(self, button):
-        raise NotImplementedError()
-        #configuration = open(filename).read()
-        #self.admin.loadConfiguration(configuration)
-        #dialog.destroy()
+        d = connections.ConnectionsDialog(self.window)
+        d.show()
+        d.connect('have-connection', self.on_have_connection)
     
     def file_quit_cb(self, button):
         self.close()

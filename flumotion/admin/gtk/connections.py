@@ -26,38 +26,9 @@ import gtk
 import gtk.glade
 import gobject
 
+from flumotion.ui.glade import GladeWidget, GladeWindow
 from flumotion.configure import configure
 from flumotion.common.pygobject import gsignal
-
-
-class GladeWidget(gtk.VBox):
-    glade_file = None
-
-    def __init__(self):
-        gtk.VBox.__init__(self)
-        wtree = gtk.glade.XML(os.path.join(configure.gladedir,
-                                           self.glade_file))
-        win = None
-        for widget in wtree.get_widget_prefix(''):
-            wname = widget.get_name()
-            if isinstance(widget, gtk.Window):
-                assert win == None
-                win = widget
-                continue
-            
-            if hasattr(self, wname) and getattr(self, wname):
-                raise AssertionError (
-                    "There is already an attribute called %s in %r" %
-                    (wname, self))
-            setattr(self, wname, widget)
-
-        assert win != None
-        w = win.get_child()
-        win.remove(w)
-        self.add(w)
-        win.destroy()
-        wtree.signal_autoconnect(self)
-gobject.type_register(GladeWidget)
 
 
 def parse_connection(f):
@@ -174,3 +145,28 @@ class Connections(GladeWidget):
         else:
             return None
 gobject.type_register(Connections)
+
+
+class ConnectionsDialog(GladeWindow):
+    glade_file = 'connection-dialog.glade'
+
+    gsignal('have-connection', object)
+    button_ok = None
+
+    def __init__(self, parent):
+        def cust_handler(xml, proc, name, *args):
+            w = eval(proc)
+            w.set_name(name)
+            w.show()
+            return w
+        gtk.glade.set_custom_handler(cust_handler)
+
+        GladeWindow.__init__(self, parent)
+
+    def on_has_selection(self, widget, has_selection):
+        self.button_ok.set_sensitive(has_selection)
+
+    def on_ok(self, x):
+        self.emit('have-connection',
+                  self.widgets['connections'].get_selected())
+gobject.type_register(ConnectionsDialog)

@@ -4,7 +4,8 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/ui
 
 flumotion_PYTHON = \
 	__init__.py \
-	fgtk.py
+	fgtk.py \
+	glade.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 
