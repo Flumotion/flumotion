@@ -44,8 +44,12 @@ def createComponent(config):
     depth = config.get('depth', 16)
     channels = config.get('channels', 1)
 
+    # FIXME: we should find a way to figure out what the card supports,
+    # so we can add in correct elements on the fly
+    # just adding audioscale and audioconvert always makes the soundcard
+    # open in 1000 Hz, mono
     caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d,width=%d,signed=(boolean)TRUE,endianness=1234' % (rate, depth, channels, depth)
-    pipeline = '%s device=%s ! audioscale ! audioconvert ! %s' % (element, device, caps)
+    pipeline = '%s device=%s ! %s' % (element, device, caps)
     component = SoundcardProducer(config['name'], config['feed'],  pipeline)
 
     return component

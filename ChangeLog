@@ -1,5 +1,11 @@
 2004-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/soundcard/soundcard.py:
+	  Don't use audioscale and audioconvert until we actually
+	  first probe the card so we can set correct fixated caps on it.
+
+2004-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/steps.py:
 	  Another soundcard fix - this never worked.
 	  Bring names of GStreamer properties and step options in line.
