@@ -125,7 +125,9 @@ class ComponentsView(log.Loggable, gobject.GObject):
     """
     
     logCategory = 'components'
-    gsignal('selected', str)
+    gsignal('selected', object)       # state
+    gsignal('activated', object, str) # state, action name
+    #gsignal('right-clicked', object, int, float)
     
     def __init__(self, tree_widget):
         """
@@ -137,11 +139,19 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, int, object, int)
 
         self._view.connect('cursor-changed', self._view_cursor_changed_cb)
+        self._view.connect('button-press-event',
+            self._view_button_press_event_cb)
         self._view.set_model(self._model)
         self._view.set_headers_visible(True)
 
-        # put in all the columns
+        self._add_columns()
 
+        self._moodPixbufs = self._getMoodPixbufs()
+        self._iters = {} # componentState -> model iter
+        self._last_state = None
+
+    def _add_columns(self):
+        # put in all the columns
         col = gtk.TreeViewColumn('Mood', gtk.CellRendererPixbuf(),
                                  pixbuf=COL_MOOD)
         col.set_sort_column_id(COL_MOOD_VALUE)
@@ -164,9 +174,6 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         # the additional columns need not be added
 
-        self._moodPixbufs = self._getMoodPixbufs()
-        self._iters = {} # componentState -> model iter
-
     # load all pixbufs for the moods
     def _getMoodPixbufs(self):
         pixbufs = {}
@@ -179,17 +186,49 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
     def _view_cursor_changed_cb(self, *args):
         # name needs to exist before being used in the child functions
-        name = self.get_selected_name()
+        state = self.get_selected_state()
 
-        if not name:
+        if not state:
             self.debug('no component selected')
             return
+        
+        if state == self._last_state:
+            return
 
-        self.emit('selected', name)
+        self._last_state = state
+        self.emit('selected', state)
 
+    def _view_button_press_event_cb(self, treeview, event):
+        # right-click ?
+        if event.button != 3:
+            return
+            
+        # get iter from coordinates
+        x = int(event.x)
+        y = int(event.y)
+        time = event.time
+        pthinfo = treeview.get_path_at_pos(x, y)
+        if pthinfo == None:
+            return
+
+        path, col, cellx, celly = pthinfo
+        model = treeview.get_model()
+        iter = model.get_iter(path)
+        state = model.get(iter, COL_STATE)[0]
+
+        popup = ComponentMenu(state)
+        popup.popup(None, None, None, event.button, time)
+        popup.connect('activated', self._activated_cb, state)
+        gtk.main_iteration()
+
+    def _activated_cb(self, menu, action, state):
+        self.emit('activated', state, action)
+    
     def get_selected_name(self):
         """
         Get the name of the currently selected component, or None.
+
+        @rtype: string
         """
         selection = self._view.get_selection()
         sel = selection.get_selected()
@@ -200,6 +239,23 @@ class ComponentsView(log.Loggable, gobject.GObject):
             return
         
         return model.get(iter, COL_NAME)[0]
+
+    def get_selected_state(self):
+        """
+        Get the state of the currently selected component, or None.
+
+        @rtype: L{flumotion.common.component.AdminComponentState}
+        """
+        selection = self._view.get_selection()
+        sel = selection.get_selected()
+        if not sel:
+            return None
+        model, iter = sel
+        if not iter:
+            return
+        
+        return model.get(iter, COL_STATE)[0]
+
 
     def update(self, components):
         """
@@ -238,4 +294,56 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self._model.set(iter, COL_MOOD_VALUE, value)
 
 gobject.type_register(ComponentsView)
-    
+
+class ComponentMenu(gtk.Menu):
+
+    gsignal('activated', str)
+
+    def __init__(self, state):
+        """
+        @param state: L{flumotion.common.component.AdminComponentState}
+        """
+        gtk.Menu.__init__(self)
+        self._items = {} # name -> gtk.MenuItem
+
+        self.set_title('Component')
+
+        i = gtk.MenuItem('_Restart')
+        self.append(i)
+        self._items['restart'] = i
+        
+        i = gtk.MenuItem('_Start')
+        mood = moods.get(state.get('mood'))
+        if mood == moods.happy:
+            i.set_property('sensitive', gtk.FALSE)
+        self.append(i)
+        self._items['start'] = i
+        
+        i = gtk.MenuItem('St_op')
+        if mood == moods.sleeping:
+            i.set_property('sensitive', gtk.FALSE)
+        self.append(i)
+        self._items['stop'] = i
+        
+        self.append(gtk.SeparatorMenuItem())
+
+        i = gtk.MenuItem('Reload _code')
+        self.append(i)
+        self._items['reload'] = i
+
+        i = gtk.MenuItem('_Modify element property ...')
+        self.append(i)
+        self._items['modify'] = i
+
+        # connect callback
+        for name in self._items.keys():
+            i = self._items[name]
+            i.connect('activate', self._activated_cb, name)
+            
+        self.show_all()
+
+    def _activated_cb(self, item, name):
+        self.emit('activated', name)
+
+gobject.type_register(ComponentMenu)
+

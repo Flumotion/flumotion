@@ -47,7 +47,7 @@
 		      <accelerator key="N" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image44">
+			<widget class="GtkImage" id="image46">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-new</property>
 			  <property name="icon_size">1</property>
@@ -68,7 +68,7 @@
 		      <signal name="activate" handler="file_open_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image45">
+			<widget class="GtkImage" id="image47">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-open</property>
 			  <property name="icon_size">1</property>
@@ -96,7 +96,7 @@
 		      <accelerator key="Q" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image46">
+			<widget class="GtkImage" id="image48">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-quit</property>
 			  <property name="icon_size">1</property>
@@ -123,20 +123,11 @@
 		<widget class="GtkMenu" id="debug1_menu">
 
 		  <child>
-		    <widget class="GtkMenuItem" id="reload_component">
+		    <widget class="GtkMenuItem" id="debug_reload_manager">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Reload component</property>
+		      <property name="label" translatable="yes">Reload manager</property>
 		      <property name="use_underline">True</property>
-		      <signal name="activate" handler="debug_reload_component_cb" last_modification_time="Thu, 09 Sep 2004 10:10:38 GMT"/>
-		    </widget>
-		  </child>
-
-		  <child>
-		    <widget class="GtkMenuItem" id="debug_reload_controller">
-		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Reload controller</property>
-		      <property name="use_underline">True</property>
-		      <signal name="activate" handler="debug_reload_controller_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
+		      <signal name="activate" handler="debug_reload_manager_cb" last_modification_time="Wed, 05 Jan 2005 19:02:03 GMT"/>
 		    </widget>
 		  </child>
 
@@ -146,15 +137,6 @@
 		      <property name="label" translatable="yes">Reload all</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="debug_reload_all_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
-		    </widget>
-		  </child>
-
-		  <child>
-		    <widget class="GtkMenuItem" id="debug_modify">
-		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Modify element property...</property>
-		      <property name="use_underline">True</property>
-		      <signal name="activate" handler="debug_modify_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 		    </widget>
 		  </child>
 

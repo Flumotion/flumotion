@@ -26,7 +26,7 @@ import common as mcommon
 
 from flumotion.common import component
 from flumotion.twisted import flavors
-from flumotion.common.common import moods
+from flumotion.common.component import moods
 
 class JobComponentStateTest(unittest.TestCase):
     def setUp(self):
@@ -73,15 +73,15 @@ class AllComponentStateTest(unittest.TestCase):
         self.failIf(self.mstate.get('mood'))
         self.failIf(self.astate.get('mood'))
 
-        self.jset('mood', moods.HAPPY)
-        self.failUnlessEqual(self.jstate.get('mood'), moods.HAPPY)
-        self.failUnlessEqual(self.mstate.get('mood'), moods.HAPPY)
-        self.failUnlessEqual(self.astate.get('mood'), moods.HAPPY)
+        self.jset('mood', moods.happy.value)
+        self.failUnlessEqual(self.jstate.get('mood'), moods.happy.value)
+        self.failUnlessEqual(self.mstate.get('mood'), moods.happy.value)
+        self.failUnlessEqual(self.astate.get('mood'), moods.happy.value)
 
-        self.mset('mood', moods.LOST)
-        self.failUnlessEqual(self.jstate.get('mood'), moods.HAPPY)
-        self.failUnlessEqual(self.mstate.get('mood'), moods.LOST)
-        self.failUnlessEqual(self.astate.get('mood'), moods.LOST)
+        self.mset('mood', moods.lost.value)
+        self.failUnlessEqual(self.jstate.get('mood'), moods.happy.value)
+        self.failUnlessEqual(self.mstate.get('mood'), moods.lost.value)
+        self.failUnlessEqual(self.astate.get('mood'), moods.lost.value)
 
 # FIXME: this test doesn't do anything since unjelly(jelly()) creates a
 # new one, instead of updating the old one.  Find a way to make the old
@@ -118,15 +118,15 @@ class ListenerTest(unittest.TestCase):
         self.failIf(self.mstate.get('mood'))
         self.failIf(self.astate.get('mood'))
 
-        self.jset('mood', moods.HAPPY)
-        self.failUnlessEqual(self.jstate.get('mood'), moods.HAPPY)
-        self.failUnlessEqual(self.mstate.get('mood'), moods.HAPPY)
-        self.failUnlessEqual(self.astate.get('mood'), moods.HAPPY)
+        self.jset('mood', moods.happy.value)
+        self.failUnlessEqual(self.jstate.get('mood'), moods.happy.value)
+        self.failUnlessEqual(self.mstate.get('mood'), moods.happy.value)
+        self.failUnlessEqual(self.astate.get('mood'), moods.happy.value)
 
-        self.mset('mood', moods.LOST)
-        self.failUnlessEqual(self.jstate.get('mood'), moods.HAPPY)
-        self.failUnlessEqual(self.mstate.get('mood'), moods.LOST)
-        self.failUnlessEqual(self.astate.get('mood'), moods.LOST)
+        self.mset('mood', moods.lost.value)
+        self.failUnlessEqual(self.jstate.get('mood'), moods.happy.value)
+        self.failUnlessEqual(self.mstate.get('mood'), moods.lost.value)
+        self.failUnlessEqual(self.astate.get('mood'), moods.lost.value)
 
 if __name__ == '__main__':
     unittest.main()

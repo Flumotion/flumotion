@@ -34,7 +34,7 @@ def reload():
         'flumotion.twisted.gobject',
         # added because for some reason rebuilding it makes all log.Loggable
         # subclass objects lose their log methods ...
-        'flumotion.utils.log',
+        'flumotion.common.log',
     )
     for name in sys.modules.keys():
         if name in _ignore:

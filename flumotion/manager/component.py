@@ -541,14 +541,14 @@ class ComponentAvatar(base.ManagerAvatar):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        def _reloadComponentErrback(self, failure):
+        def _reloadComponentErrback(failure, self):
             failure.trap(errors.ReloadSyntaxError)
             self.warning(failure.getErrorMessage())
             print "Ignore the following Traceback line, issue in Twisted"
             return failure
 
         d = self.mindCallRemote('reloadComponent')
-        d.addErrback(_reloadComponentErrback)
+        d.addErrback(_reloadComponentErrback, self)
         d.addErrback(self._mindErrback, errors.ReloadSyntaxError)
         return d
 

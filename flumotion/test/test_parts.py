@@ -116,8 +116,9 @@ class TestComponentsView(unittest.TestCase):
         gtk.main_iteration()
 
     def testSelected(self):
-        def assertSelected(view, name, test):
-            test.assertEqual(name, 'one')
+        def assertSelected(view, state, test):
+            name = state.get('name')
+            test.assertEqual(name, 'one', 'name %s is not one' % name)
             test.asserted = True
             
         self.testUpdate()

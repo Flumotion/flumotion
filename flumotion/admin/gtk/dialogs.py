@@ -30,21 +30,27 @@ class ProgressDialog(gtk.Dialog):
 
                                                                                
         self.label = gtk.Label(message)
-        self.vbox.pack_start(self.label, True, True)
+        self.vbox.pack_start(self.label, True, True, 6)
         self.bar = gtk.ProgressBar()
-        self.vbox.pack_end(self.bar, True, True)
+        self.vbox.pack_end(self.bar, True, True, 6)
         self.active = False
+        self._timeout_id = None
+
+        self.connect('destroy', self._destroy_cb)
 
     def start(self):
         "Show the dialog and start pulsating."
         self.active = True
         self.show_all()
         self.bar.pulse()
-        self.timeout_cb = gobject.timeout_add(200, self._pulse)
+        self._timeout_id = gobject.timeout_add(200, self._pulse)
 
     def stop(self):
         "Remove the dialog and stop pulsating."
         self.active = False
+        if self._timeout_id:
+            gobject.source_remove(self._timeout_id)
+            self._timeout_id = None
 
     def message(self, message):
         "Set the message on the dialog."
@@ -56,6 +62,9 @@ class ProgressDialog(gtk.Dialog):
             return False
         self.bar.pulse()
         return True
+
+    def _destroy_cb(self, widget):
+        self.stop()
 
 class ErrorDialog(gtk.MessageDialog):
     def __init__(self, message, parent=None, close_on_response=True):

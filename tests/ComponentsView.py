@@ -33,7 +33,8 @@ class TestComponentsView:
         self.window.add(self.widget)
         self.window.show_all()
         self.view = parts.ComponentsView(self.widget)
-        self.view.connect('selected', self.selected)
+        self.view.connect('selected', self._selected_cb)
+        self.view.connect('activated', self._activated_cb)
         self.window.connect('destroy', gtk.main_quit)
 
     def _createComponent(self, dict):
@@ -61,10 +62,20 @@ class TestComponentsView:
             {'name': 'three', 'mood': moods.hungry.value,
              'workerName': 'C3PO', 'pid': 3})
         components['three'] = c
+        c = self._createComponent(
+            {'name': 'four', 'mood': moods.sleeping.value,
+             'workerName': 'C3PO', 'pid': 4})
+        components['four'] = c
         self.view.update(components)
 
-    def selected(self, view, name):
+    def _selected_cb(self, view, state):
+        name = state.get('name')
         print "Selected component %s" % name
+
+    def _activated_cb(self, view, state, action_name):
+        name = state.get('name')
+        print "Do action %s on component %s" % (action_name, name)
+
 
 app = TestComponentsView()
 app.setUp()

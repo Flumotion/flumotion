@@ -312,12 +312,12 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
 
     ## component remote methods
     def setProperty(self, component, element, property, value):
-        return self.componentCallRemote('setElementProperty',
+        return self.componentCallRemote(component, 'setElementProperty',
                                         element, property, value)
 
     def getProperty(self, component, element, property):
-        return self.componentCallRemote('getElementProperty',
-                                        component, element, property)
+        return self.componentCallRemote(component, 'getElementProperty',
+                                        element, property)
 
     ## reload methods for everything
     def reload(self):

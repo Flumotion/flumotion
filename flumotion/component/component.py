@@ -227,10 +227,10 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         rebuild(sys.modules[name])
 
         # now rebuild relevant modules
-        import flumotion.utils.reload
-        rebuild(sys.modules['flumotion.utils'])
+        import flumotion.common.reload
+        rebuild(sys.modules['flumotion.common'])
         try:
-            flumotion.utils.reload.reload()
+            flumotion.common.reload.reload()
         except SyntaxError, msg:
             raise errors.ReloadSyntaxError(msg)
         self._reloaded()

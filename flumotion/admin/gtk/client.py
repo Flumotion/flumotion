@@ -116,6 +116,8 @@ class Window(log.Loggable, gobject.GObject):
             wtree.get_widget('component_view'))
         self.components_view.connect('selected',
             self._components_view_selected_cb)
+        self.components_view.connect('activated',
+            self._components_view_activated_cb)
         self.statusbar = parts.AdminStatusbar(wtree.get_widget('statusbar'))
 
 
@@ -387,10 +389,11 @@ class Window(log.Loggable, gobject.GObject):
         self.components_view.update(components)
 
     ### ui callbacks
-    def _components_view_selected_cb(self, view, name):
-        if not name:
+    def _components_view_selected_cb(self, view, state):
+        if not state:
             self.warning('Select a component')
             return
+        name = state.get('name')
 
         def gotEntryCallback(result):
             entryPath, filename, methodName = result
@@ -430,6 +433,14 @@ class Window(log.Loggable, gobject.GObject):
         d.addCallback(gotEntryCallback)
         d.addErrback(gotEntryNoBundleErrback)
 
+    def _components_view_activated_cb(self, view, state, action):
+        self.debug('action %s on component %s' % (action, state.get('name')))
+        method_name = '_component_' + action
+        if hasattr(self, method_name):
+            getattr(self, method_name)(state)
+        else:
+            self.warning("No method '%s' implemented" % method_name)
+
     ### glade callbacks
     def close(self, *args):
         reactor.stop()
@@ -463,6 +474,44 @@ class Window(log.Loggable, gobject.GObject):
 
         return wiz
 
+    # component view activation functions
+    def _component_modify(self, state):
+        def propertyErrback(failure):
+            failure.trap(errors.PropertyError)
+            self.show_error_dialog("%s." % failure.getErrorMessage())
+            return None
+
+        def after_getProperty(value, dialog):
+            self.debug('got value %r' % value)
+            dialog.update_value_entry(value)
+            
+        def dialog_set_cb(dialog, element, property, value):
+            cb = self.admin.setProperty(name, element, property, value)
+            cb.addErrback(propertyErrback)
+        def dialog_get_cb(dialog, element, property):
+            cb = self.admin.getProperty(name, element, property)
+            cb.addCallback(after_getProperty, dialog)
+            cb.addErrback(propertyErrback)
+        
+        name = state.get('name')
+        d = dialogs.PropertyChangeDialog(name, self.window)
+        d.connect('get', dialog_get_cb)
+        d.connect('set', dialog_set_cb)
+        d.run()
+
+    def _component_reload(self, state):
+        name = state.get('name')
+        if not name:
+            return
+
+        dialog = dialogs.ProgressDialog("Reloading",
+            "Reloading component code for %s" % name, self.window)
+        d = self.admin.reloadComponent(name)
+        d.addCallback(lambda result, d: d.destroy(), dialog)
+        # add error
+        d.addErrback(lambda failure, d: d.destroy(), dialog)
+        dialog.start()
+ 
     # menubar/toolbar callbacks
     def file_new_cb(self, button):
         self.runWizard()
@@ -525,11 +574,6 @@ class Window(log.Loggable, gobject.GObject):
     def debug_reload_manager_cb(self, button):
         self.admin.reloadManager()
 
-    def debug_reload_component_cb(self, button):
-        name = self.components_view.get_selected_name()
-        if name:
-            self.admin.reloadComponent(name)
-
     def debug_reload_all_cb(self, button):
         # FIXME: move all of the reloads over to this dialog
         def _stop(dialog):
@@ -557,34 +601,6 @@ class Window(log.Loggable, gobject.GObject):
         dialog.start()
         reactor.callLater(0.2, _callLater, self.admin, dialog)
  
-    def debug_modify_cb(self, button):
-        name = self.components_view.get_selected_name()
-        if not name:
-            self.warning('Select a component')
-            return
-
-        def propertyErrback(failure):
-            failure.trap(errors.PropertyError)
-            self.show_error_dialog("%s." % failure.getErrorMessage())
-            return None
-
-        def after_getProperty(value, dialog):
-            self.debug('got value %r' % value)
-            dialog.update_value_entry(value)
-            
-        def dialog_set_cb(dialog, element, property, value):
-            cb = self.admin.setProperty(name, element, property, value)
-            cb.addErrback(propertyErrback)
-        def dialog_get_cb(dialog, element, property):
-            cb = self.admin.getProperty(name, element, property)
-            cb.addCallback(after_getProperty, dialog)
-            cb.addErrback(propertyErrback)
-        
-        d = dialogs.PropertyChangeDialog(name, self.window)
-        d.connect('get', dialog_get_cb)
-        d.connect('set', dialog_set_cb)
-        d.run()
-
     def debug_start_shell_cb(self, button):
         import code
         code.interact(local=locals())

@@ -203,9 +203,9 @@ class AdminAvatar(base.ManagerAvatar):
         rebuild(sys.modules[__name__])
 
         # now rebuild relevant modules
-        import flumotion.utils.reload
-        rebuild(sys.modules['flumotion.utils'])
-        flumotion.utils.reload.reload()
+        import flumotion.common.reload
+        rebuild(sys.modules['flumotion.common'])
+        flumotion.common.reload.reload()
         self._reloaded()
 
     def perspective_loadConfiguration(self, xml):

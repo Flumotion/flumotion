@@ -1,3 +1,21 @@
+2005-01-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/admin.glade:
+	  remove options that go to context menu
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/common/reload.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	* flumotion/test/test_common_component.py:
+	* flumotion/test/test_parts.py:
+	* tests/ComponentsView.py:
+	  add context menu to components view
+	  fix reload
+
 2005-01-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:
