@@ -21,9 +21,6 @@
 
 # Headers in this file shall remain intact.
 
-import gst
-import gst.interfaces
-
 from flumotion.component import feedcomponent
 
 class Volume(feedcomponent.Effect):

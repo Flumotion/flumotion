@@ -30,7 +30,6 @@ from gtk import gdk
 # FIXME: done for pychecker; apparently these imports before make
 # import gtk; import gtk.glade in later files in the checking fail
 import gtk.glade
-import math
 import gobject
 
 from flumotion.common import enum

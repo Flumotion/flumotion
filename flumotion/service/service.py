@@ -15,11 +15,9 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-import errno
 import os
 import glob
 import time
-import signal
 
 from flumotion.configure import configure
 from flumotion.common import common, errors, log
