@@ -269,6 +269,8 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         return d
 
     def _workerCallRemoteErrback(self, failure, methodName):
+        # XXX: We should have a real error for this, since
+        #      AttributeErrors can also happen inside the code we run
         failure.trap(AttributeError)
         self.debug('No remote method "%s"' % methodName)
 
@@ -276,9 +278,19 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     def checkElements(self, workerName, elements):
         return self.workerCallRemote(workerName, 'checkElements', elements)
     
-    def runCode(self, workerName, codeSegment, variableName):
-        return self.workerCallRemote(workerName, 'runCode',
-                                     codeSegment, variableName)
+    def workerRun(self, workerName, function, *args, **kwargs):
+        import inspect
+        if not callable(function):
+            raise TypeError, "need a callable"
+
+        try:
+            source = inspect.getsource(function)
+        except IOError:
+            return defer.fail()
+        
+        functionName = function.__name__
+        return self.workerCallRemote(workerName, 'runCode', source,
+                                     functionName, *args, **kwargs)
     
     # FIXME: this is the new method to get the UI, by getting a bundle
     # and an entry point

@@ -24,25 +24,26 @@
 Worker-side objects to handle worker clients.
 """
 
+import errno
 import os
 import signal
 import sys
 
 import gst
+import gst.interfaces
 from twisted.cred import portal
-from twisted.internet import protocol, reactor
+from twisted.internet import defer, protocol, reactor
 from twisted.spread import pb
 import twisted.cred.error
 import twisted.internet.error
 
-# We want to avoid importing gst, otherwise --help fails
-# so be very careful when adding imports
 from flumotion.common import errors, interfaces, log
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
 from flumotion.worker import job
 from flumotion.configure import configure
 
+
 #factoryClass = fpb.ReconnectingPBClientFactory
 factoryClass = fpb.FPBClientFactory
 class WorkerClientFactory(factoryClass):
@@ -123,21 +124,36 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         return [name for name in elementNames
                          if gst.element_factory_make(name) is not None]
 
-    def remote_runCode(self, codeSegment, variableName):
+    def remote_runCode(self, codeSegment, objectName, *args, **kwargs):
         """
         runs a segment of code and returns a variable from its namespace
 
         @param codeSegment:   a piece of code
         @type codeSegment:    string
-        @param variableName:  name of variable to return from code executed
-        @type variableName:   string
+        @param objectName:    object to call from the source
+        @type objectName:     string
+        @param args:          arguments to function
+        @param kwargs:        keyword arguments to function
         """
         
         namespace = {}
         exec (codeSegment, globals(), namespace)
-        return namespace.get(variableName, None)
+        function = namespace.get(objectName, None)
         
-    
+        retval = None
+        if not callable(function):
+            return
+
+        try:
+            retval = function(*args)
+        except Exception, e:
+            self.warning('runCode failed: %s raised: %r' % (e.__class__.__name__,
+                                                            e))
+            retval = defer.fail()
+
+        return retval
+
+    
 class Kid:
     def __init__(self, pid, name, type, config):
         self.pid = pid 
@@ -148,7 +164,9 @@ class Kid:
     # pid = protocol.transport.pid
     def getPid(self):
         return self.pid
-    
+
+
+    
 class Kindergarten(log.Loggable):
     """
     I spawn job processes.
@@ -207,7 +225,10 @@ class Kindergarten(log.Loggable):
 
         self.warning('Asked to remove kid with pid %d but not found' % pid)
         return False
+
+
     
+
 # Similar to Vishnu, but for worker related classes
 class WorkerBrain(log.Loggable):
     """
@@ -294,7 +315,16 @@ class WorkerBrain(log.Loggable):
         if self._oldSIGCHLDHandler:
             self.debug("calling Twisted handler")
             self._oldSIGCHLDHandler(signal, frame)
-        (pid, status) = os.waitpid(-1, os.WNOHANG)
+            
+        try:
+            pid, status = os.waitpid(-1, os.WNOHANG)
+        except OSError, e:
+            if e.errno == errno.ECHILD:
+                self.info('No children of mine to wait on')
+                return
+            else:
+                raise
+            
         if pid:
             # remove from the kindergarten
             self.kindergarten.removeKidByPid(pid)
@@ -307,8 +337,9 @@ class WorkerBrain(log.Loggable):
             else:
                 self.info("Reaped job child with pid %d and unhandled status %d" % (
                     pid, status))
-        
 
+        
+
 class JobDispatcher:
     __implements__ = portal.IRealm
     
@@ -330,6 +361,8 @@ class JobDispatcher:
         else:
             raise NotImplementedError("no interface")
 
+
+
 class Port:
     """
     I am an abstraction of a local TCP port which will be used by GStreamer.
@@ -355,7 +388,9 @@ class Port:
             return '<Port %d (unused)>' % self.getNumber()
         else:
             return '<Port %d (used)>' % self.getNumber()
-            
+
+        
+            
 class JobAvatar(pb.Avatar, log.Loggable):
     """
     I am an avatar for the job living in the worker.
@@ -453,6 +488,8 @@ class JobAvatar(pb.Avatar, log.Loggable):
     def remote_ready(self):
         pass
 
+
+
 ### this is a different kind of heaven, not IHeaven, for now...
 class JobHeaven(pb.Root, log.Loggable):
     logCategory = "job-heaven"

@@ -1,3 +1,12 @@
+2004-10-25  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/worker/worker.py: 
+	Change runCode to execute the paramater and make the admin
+	interface to it take a object, which it uses inspect.getsource to
+	retrevie the source. This allows us to just send in a function
+	instead of a string.
+
 2004-10-22  Johan Dahlin  <johan@gnome.org>
 
 	* data/glade/wizard_tvcard.glade:
@@ -9,7 +18,7 @@
 	* flumotion/wizard/wizard.py:
 
 	Query the tv-card for information and use it in the wizard.
-	Fixes Issue #54
+	Fixes Issue #55
 	
 2004-10-22  Johan Dahlin  <johan@gnome.org>
 
