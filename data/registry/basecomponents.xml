@@ -44,7 +44,7 @@
     </properties>
   </component>
 
-  <component type="auth-htpasswd" factory="false">
+  <component type="htpasswd-auth" factory="false">
     <source location="flumotion.components.passwd"/>
     <properties>
       <property name="filename" type="string" required="yes"/>

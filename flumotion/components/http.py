@@ -357,6 +357,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     def __init__(self, name, source, port):
         self.__gobject_init__()
         self.port = port
+        self.gst_properties = []
         component.ParseLaunchComponent.__init__(self, name, [source], [],
                                                 self.pipe_template)
         self.caps = None

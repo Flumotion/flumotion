@@ -30,7 +30,7 @@
     <pipeline>ffmpegcolorspace ! jpegenc ! multipartmux</pipeline>
   </component>
 
-  <component name="auth-1" type="auth-htpasswd">
+  <component name="auth-1" type="htpasswd-auth">
     <filename>/home/jdahlin/htpasswd</filename>
     <!-- <auth-type>crypt</auth-type> -->
   </component>
