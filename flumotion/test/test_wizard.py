@@ -34,7 +34,9 @@ class WizardStepTest(unittest.TestCase):
                                   if isinstance(widget, gtk.Window)]
             self.assert_(len(windows) == 1)
             window = windows[0]
-            self.failIf(window.get_property('visible'))
+            self.assert_(window.get_property('visible') == False)
             self.assert_(hasattr(step, 'icon'))
             self.assert_(hasattr(step, 'glade_file'))
             self.assert_(hasattr(step, 'step_name'))
+            self.assert_(isinstance(step.get_state(), dict))
+            
