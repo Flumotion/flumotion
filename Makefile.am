@@ -36,7 +36,11 @@ coverage:
 
 # for some reason, the run is *completely* different if the last set of
 # components is moved up.  So keep it low
+
+# same for any gtk stuff - keep it low
+
 PYCHECKER_WHITELIST = \
+            tools/pycheckerhelp.py		\
 	    flumotion/component/*.py 		\
 	    flumotion/admin/*.py		\
 	    flumotion/common/*.py		\
@@ -48,7 +52,9 @@ PYCHECKER_WHITELIST = \
 	    flumotion/ui/*.py			\
 	    flumotion/utils/*.py		\
 	    flumotion/component/*/*.py		\
-	    flumotion/component/*/*/*.py
+	    flumotion/component/*/*/*.py	\
+	    flumotion/admin/*/*.py		\
+	    flumotion/admin/*/*/*.py
 
 PYCHECKER_BLACKLIST = \
 	flumotion/component/converters/overlay/overlay.py \

@@ -42,12 +42,12 @@ from flumotion.utils import reload
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 
-from flumotion.common.gobject import gsignal
+from flumotion.common.pygobject import gsignal
 
 # FIXME: this is a Medium
 # FIXME: stop using signals, we can provide a richer interface with actual
 # objects and real interfaces for the views a model communicates with
-class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
+class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     """
     I live in the admin client.
     I am a data model for any admin view implementing a UI to
@@ -71,22 +71,29 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     __implements__ = interfaces.IAdminMedium, flavors.IStateListener,
 
     # appease pychecker
+    # FIXME: this is stupid, fix this properly ?
     _components = {}
     clientFactory = None
+    remote = None
+    _workerHeavenState = None
+    _views = []
+    _unbundler = None
 
     def __init__(self, username, password):
+        self.__gobject_init__()
+        
+        self.clientFactory = fpb.ReconnectingFPBClientFactory()
+        # 20 secs max for an admin to reconnect
+        self.clientFactory.maxDelay = 20
+
+        self.remote = None
+
         self._components = {} # dict of components
         self._workerHeavenState = None
         
-        self.remote = None
-
         self._views = [] # all UI views I am serving
-        self._unbundler = bundle.Unbundler(configure.cachedir)
 
-        self.clientFactory = fpb.ReconnectingFPBClientFactory()
-        self.__gobject_init__()
-        # 20 secs max for an admin to reconnect
-        self.clientFactory.maxDelay = 20
+        self._unbundler = bundle.Unbundler(configure.cachedir)
 
         self.debug("logging in to ServerFactory")
 
@@ -521,7 +528,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
             b = bundle.Bundle()
             b.setZip(zip)
             dir = self._unbundler.unbundle(b)
-            self.debug("unpacked %s to dir %s" % (name, dir))
+            self.debug("unpacked %s to dir %s" % (bundleName, dir))
 
             return os.path.join(dir, bundledPath)
 
@@ -566,4 +573,4 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
     def getWorkerHeavenState(self):
         return self._workerHeavenState
 
-gobject.type_register(AdminModel)
+#gobject.type_register(AdminModel)

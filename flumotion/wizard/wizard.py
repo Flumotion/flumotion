@@ -30,10 +30,11 @@ from twisted.internet import defer
 
 from flumotion.configure import configure
 from flumotion.common import log, errors, worker
-from flumotion.common.pygtk import gsignal
 from flumotion.wizard import enums, save
 from flumotion.ui import fgtk
 from flumotion.twisted import flavors
+
+from flumotion.common.pygobject import gsignal
 
 def escape(text):
     return text.replace('&', '&amp;')

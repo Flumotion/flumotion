@@ -21,7 +21,6 @@
 import os
 
 import gobject
-import gst
 from gtk import gdk
 import gtk
 import gtk.glade
@@ -34,7 +33,7 @@ from flumotion.common import errors, log, worker, component
 from flumotion.manager import admin # Register types
 
 from flumotion.common.component import moods
-from flumotion.common.pygtk import gsignal
+from flumotion.common.pygobject import gsignal
 
 class Window(log.Loggable, gobject.GObject):
     '''
@@ -142,7 +141,6 @@ class Window(log.Loggable, gobject.GObject):
         @param data: the python code to load.
         """
         # methodName has historically been GUIClass
-        sub = None
         instance = None
 
         self.statusbar.set('main', "Loading UI for %s ..." % name)
@@ -217,10 +215,6 @@ class Window(log.Loggable, gobject.GObject):
 
                 notebook.append_page(table, gtk.Label(nodeName))
                 
-
-            # FIXME: we'd want to embed in a notebook with tabs
-            firstNode = nodes[nodes.keys()[0]]
-
             # put "loading" widget in
             old = self.hpaned.get_child2()
             self.hpaned.remove(old)
@@ -251,7 +245,7 @@ class Window(log.Loggable, gobject.GObject):
         
         if not widget:
             self.warning(".render() did not return an object")
-            widget = gtk.Label('%s does not have a UI yet' % name)
+            widget = gtk.Label('%s does not have a UI yet' % nodeName)
         else:
             parent = widget.get_parent()
             if parent:
@@ -366,7 +360,7 @@ class Window(log.Loggable, gobject.GObject):
 
     def admin_ui_state_changed_cb(self, admin, name, state):
         # called when the admin UI for that component has changed
-        current = self.component_view.get_selected_name()
+        current = self.components_view.get_selected_name()
         if current != name:
             return
 
@@ -377,7 +371,7 @@ class Window(log.Loggable, gobject.GObject):
     # FIXME: deprecated
     def property_changed_cb(self, admin, componentName, propertyName, value):
         # called when a property for that component has changed
-        current = self.component_view.get_selected_name()
+        current = self.components_view.get_selected_name()
         if current != componentName:
             return
 
@@ -517,7 +511,9 @@ class Window(log.Loggable, gobject.GObject):
         dialog.hide()
 
         fd = open(filename, 'w')
-        fd.write(configuration)
+        # FIXME: where is this config supposed to come from ??
+        #fd.write(configuration)
+        fd.close()
         dialog.destroy()
 
     def file_quit_cb(self, button):
@@ -527,12 +523,12 @@ class Window(log.Loggable, gobject.GObject):
         raise NotImplementedError
 
     def debug_reload_manager_cb(self, button):
-        deferred = self.admin.reloadManager()
+        self.admin.reloadManager()
 
     def debug_reload_component_cb(self, button):
-        name = self.component_view.get_selected_name()
+        name = self.components_view.get_selected_name()
         if name:
-            deferred = self.admin.reloadComponent(name)
+            self.admin.reloadComponent(name)
 
     def debug_reload_all_cb(self, button):
         # FIXME: move all of the reloads over to this dialog
@@ -549,7 +545,7 @@ class Window(log.Loggable, gobject.GObject):
             
         def _callLater(admin, dialog):
             deferred = self.admin.reload()
-            deferred.addCallback(lambda result: _stop(dialog))
+            deferred.addCallback(lambda result, d: _stop(d), dialog)
             deferred.addErrback(_syntaxErrback, self, dialog)
             deferred.addErrback(self._defaultErrback)
         
@@ -562,7 +558,7 @@ class Window(log.Loggable, gobject.GObject):
         reactor.callLater(0.2, _callLater, self.admin, dialog)
  
     def debug_modify_cb(self, button):
-        name = self.component_view.get_selected_name()
+        name = self.components_view.get_selected_name()
         if not name:
             self.warning('Select a component')
             return

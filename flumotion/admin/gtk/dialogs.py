@@ -18,7 +18,7 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common.pygtk import gsignal
+from flumotion.common.pygobject import gsignal
 
 import gtk
 import gobject

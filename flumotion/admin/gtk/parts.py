@@ -28,7 +28,7 @@ from flumotion.configure import configure
 from flumotion.common import log, component
 
 from flumotion.common.component import moods
-from flumotion.common.pygtk import gsignal
+from flumotion.common.pygobject import gsignal
 
 COL_MOOD      = 0
 COL_NAME      = 1

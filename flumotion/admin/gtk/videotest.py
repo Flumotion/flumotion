@@ -36,7 +36,7 @@ import gtk
 import gtk.glade
 
 from flumotion.configure import configure
-from flumotion.common.pygtk import gsignal
+from flumotion.common.pygobject import gsignal
 
 
 if gtk.pygtk_version < (2,3,96):

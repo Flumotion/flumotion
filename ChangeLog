@@ -1,5 +1,18 @@
 2005-01-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* doc/reference/Makefile.am:
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/admin/gtk/spyglass.py:
+	* flumotion/admin/gtk/videotest.py:
+	* flumotion/wizard/wizard.py:
+	  more gstutils fixes, pychecker fixes
+
+2005-01-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/dialogs.py:

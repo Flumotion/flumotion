@@ -30,7 +30,7 @@ import gtk
 import gtk.glade
 
 from flumotion.configure import configure
-from flumotion.common.pygtk import gsignal
+from flumotion.common.pygobject import gsignal
 
 if gtk.pygtk_version < (2,3,91):
     raise SystemExit, "PyGTK 2.3.91 or higher required"
@@ -143,7 +143,6 @@ class View(gobject.GObject):
     ### callbacks
 
     def view_combo_changed_cb(self, combo):
-        iter = combo.get_active_iter()
         row = self._focus_model[combo.get_active()]
         key = row[1]
         self.emit('focus-changed', key)
