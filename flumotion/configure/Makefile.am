@@ -15,6 +15,6 @@ BUILT_SOURCES = installed.py uninstalled.py
 
 TAGS_FILES = installed.py.in uninstalled.py.in
 
-DISTCLEAN_FILES = installed.pyc installed.pyo uninstalled.pyc uninstalled.pyo
+DISTCLEANFILES = installed.pyc installed.pyo uninstalled.pyc uninstalled.pyo
 
 EXTRA_DIST = $(flumotion_PYTHON) installed.py.in uninstalled.py.in
