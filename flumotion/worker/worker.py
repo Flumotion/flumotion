@@ -118,7 +118,7 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
         @param elementNames:   names of the Gstreamer elements
         @type elementNames:    list of strings
         """
-        self.debug('remote_checkElements: names %r' % elementNames)
+        self.debug('remote_checkElements: names %r' % (elementNames,))
 
         return [name for name in elementNames
                          if gst.element_factory_make(name) is not None]

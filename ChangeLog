@@ -1,3 +1,8 @@
+2004-10-22  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/worker/worker.py: Make sure that we send a tuple with
+	exactly one item.
+
 2004-10-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:
