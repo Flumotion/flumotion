@@ -44,7 +44,7 @@ class Streamer(gobject.GObject, component.BaseComponent):
     }
 
     kind = 'streamer'
-    pipe_template = 'multipartmux ! fakesink signal-handoffs=1 silent=1 name=sink'
+    pipe_template = 'fakesink signal-handoffs=1 silent=1 name=sink'
     
     def __init__(self, name, sources):
         self.__gobject_init__()
@@ -97,10 +97,10 @@ class StreamingResource(resource.Resource):
         self.buffer_queue.append(str(buffer(gbuffer)))
         
     def bufferWrite(self, *args):
-        for buffer in self.buffer_queue[:]:
+        for buffer in self.buffer_queue:
             for request in self.current_requests:
                 request.write(buffer)
-            self.buffer_queue.remove(buffer)
+        self.buffer_queue = []
             
         reactor.callLater(0.01, self.bufferWrite)
         
