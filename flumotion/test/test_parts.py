@@ -27,8 +27,9 @@ import gtk
 
 from twisted.spread import jelly
 from flumotion.admin.gtk import parts
-from flumotion.common import component
-from flumotion.common.component import moods
+from flumotion.common import planet
+
+from flumotion.common.planet import moods
 
 class TestAdminStatusbar(unittest.TestCase):
     def setUp(self):
@@ -91,10 +92,9 @@ class TestComponentsView(unittest.TestCase):
         gtk.main_iteration()
 
     def _createComponent(self, dict):
-        jstate = component.JobComponentState()
+        mstate = planet.ManagerComponentState()
         for key in dict.keys():
-            jstate.set(key, dict[key]) 
-        mstate = jelly.unjelly(jelly.jelly(jstate))
+            mstate.set(key, dict[key]) 
         astate = jelly.unjelly(jelly.jelly(mstate))
         return astate
 

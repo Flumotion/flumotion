@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_common_component -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_common_planet -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -24,13 +24,14 @@ from twisted.internet import reactor
 
 import common as mcommon
 
-from flumotion.common import component
 from flumotion.twisted import flavors
-from flumotion.common.component import moods
+from flumotion.common import planet
 
-class JobComponentStateTest(unittest.TestCase):
+from flumotion.common.planet import moods
+
+class ManagerComponentStateTest(unittest.TestCase):
     def setUp(self):
-        self.state = component.JobComponentState()
+        self.state = planet.ManagerComponentState()
 
     def testGetSet(self):
         self.state.set('name', 'mynameis')
@@ -45,14 +46,7 @@ class JobComponentStateTest(unittest.TestCase):
     
 class AllComponentStateTest(unittest.TestCase):
     def setUp(self):
-        self.jstate = component.JobComponentState()
-        self.mstate = jelly.unjelly(jelly.jelly(self.jstate))
-        self.astate = jelly.unjelly(jelly.jelly(self.mstate))
-
-    def jset(self, key, value):
-        # helper function to set on job state and propagate
-        self.jstate.set(key, value)
-        self.mstate = jelly.unjelly(jelly.jelly(self.jstate))
+        self.mstate = planet.ManagerComponentState()
         self.astate = jelly.unjelly(jelly.jelly(self.mstate))
 
     def mset(self, key, value):
@@ -62,24 +56,15 @@ class AllComponentStateTest(unittest.TestCase):
 
     def testClass(self):
         self.failUnless(isinstance(
-            self.mstate, component.ManagerComponentState))
+            self.mstate, planet.ManagerComponentState))
         self.failUnless(isinstance(
-            self.jstate, component.JobComponentState))
-        self.failUnless(isinstance(
-            self.astate, component.AdminComponentState))
+            self.astate, planet.AdminComponentState))
 
     def testMood(self):
-        self.failIf(self.jstate.get('mood'))
         self.failIf(self.mstate.get('mood'))
         self.failIf(self.astate.get('mood'))
 
-        self.jset('mood', moods.happy.value)
-        self.failUnlessEqual(self.jstate.get('mood'), moods.happy.value)
-        self.failUnlessEqual(self.mstate.get('mood'), moods.happy.value)
-        self.failUnlessEqual(self.astate.get('mood'), moods.happy.value)
-
         self.mset('mood', moods.lost.value)
-        self.failUnlessEqual(self.jstate.get('mood'), moods.happy.value)
         self.failUnlessEqual(self.mstate.get('mood'), moods.lost.value)
         self.failUnlessEqual(self.astate.get('mood'), moods.lost.value)
 
@@ -90,10 +75,8 @@ class ListenerTest(unittest.TestCase):
     __implements__ = flavors.IStateListener
 
     def setUp(self):
-        self.jstate = component.JobComponentState()
-        self.mstate = jelly.unjelly(jelly.jelly(self.jstate))
+        self.mstate = planet.ManagerComponentState()
         self.astate = jelly.unjelly(jelly.jelly(self.mstate))
-        self.mstate.addListener(self)
         self.astate.addListener(self)
         self.changes = []
 
@@ -102,10 +85,9 @@ class ListenerTest(unittest.TestCase):
         print "state set !"
         self.changes.append((state, key, value))
         
-    def jset(self, key, value):
+    def mset(self, key, value):
         # helper function to set on job state and propagate
-        self.jstate.set(key, value)
-        self.mstate = jelly.unjelly(jelly.jelly(self.jstate))
+        self.mstate.set(key, value)
         self.astate = jelly.unjelly(jelly.jelly(self.mstate))
 
     def mset(self, key, value):
@@ -114,17 +96,10 @@ class ListenerTest(unittest.TestCase):
         self.astate = jelly.unjelly(jelly.jelly(self.mstate))
 
     def testMood(self):
-        self.failIf(self.jstate.get('mood'))
         self.failIf(self.mstate.get('mood'))
         self.failIf(self.astate.get('mood'))
 
-        self.jset('mood', moods.happy.value)
-        self.failUnlessEqual(self.jstate.get('mood'), moods.happy.value)
-        self.failUnlessEqual(self.mstate.get('mood'), moods.happy.value)
-        self.failUnlessEqual(self.astate.get('mood'), moods.happy.value)
-
         self.mset('mood', moods.lost.value)
-        self.failUnlessEqual(self.jstate.get('mood'), moods.happy.value)
         self.failUnlessEqual(self.mstate.get('mood'), moods.lost.value)
         self.failUnlessEqual(self.astate.get('mood'), moods.lost.value)
 
