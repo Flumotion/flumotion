@@ -298,7 +298,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
             workerName = component.get('workerName')
             pid = component.get('pid')
             
-            if mood is not None:
+            if mood != None:
                 self._set_mood_value(iter, mood)
 
             self._model.set(iter, COL_STATE, component)

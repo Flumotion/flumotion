@@ -195,14 +195,22 @@ class Wizard(gobject.GObject):
     def show(self):
         self.window.show()
 
+    def destroy(self):
+        assert hasattr(self, 'window')
+        self.window.destroy()
+        del self.window
+
+    def set_sensitive(self, is_sensitive):
+        self.window.set_sensitive(is_sensitive)
+
     def run(self):
         assert self.window
+        self.set_sensitive(True)
+        self.show()
         def on_finished(self):
             gtk.main_quit()
         self.connect('finished', on_finished)
         gtk.main()
-        self.window.destroy()
-        del self.window
         return self.state
 
 gobject.type_register(Wizard)

@@ -456,7 +456,7 @@ class Vishnu(log.Loggable):
         for c in list:
             self.log(repr(c))
             mood = c.get('mood')
-            if mood is None:
+            if mood == None:
                 self.warning('%s has mood None' % c.get('name'))
 
         return list
@@ -469,7 +469,7 @@ class Vishnu(log.Loggable):
         components = self.getComponentStates()
 
         # if any component is already in a mood change/command, fail
-        isPending = lambda c: c.get('moodPending') is not None
+        isPending = lambda c: c.get('moodPending') != None
         components = filter(isPending, components)
         if len(components) > 0:
             raise errors.BusyComponentError(components[0])

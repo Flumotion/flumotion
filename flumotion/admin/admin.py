@@ -78,6 +78,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     _workerHeavenState = None
     _views = []
     _unbundler = None
+    state = 'disconnected'
 
     username = password = host = port = use_insecure = None
 
@@ -186,6 +187,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
 
     def _remoteDisconnected(self, remoteReference):
         self.debug("emitting disconnected")
+        self.state = 'disconnected'
         self.emit('disconnected')
         self.debug("emitted disconnected")
 
@@ -232,7 +234,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
             self._components[name] = component
             mood = component.get('mood')
             self.debug('mood: %r' % mood)
-            if mood is None:
+            if mood == None:
                 self.warning('got mood None for component %s' % name)
 
             # get notified of state changes on component
@@ -240,6 +242,7 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
         # FIXME: rename var
         self._workerHeavenState = workerHeavenState
         self._workerHeavenState.addListener(self)
+        self.state = 'disconnected'
         self.emit('connected')
 
     # IStateListener interface
@@ -264,6 +267,9 @@ class AdminModel(pb.Referenceable, log.Loggable, gobject.GObject):
     ### model functions; called by UI's to send requests to manager or comp
 
     ## view management functions
+    def isConnected(self):
+        return self.state=='connected'
+
     def addView(self, view):
         # FIXME: implement an IAdminView interface
         """

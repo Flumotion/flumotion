@@ -1,3 +1,36 @@
+2005-02-02  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/main.py: Prune of dead code. Re-present the
+	greeter if the model connection fails. Wait for model connection
+	to make the main window.
+
+	* flumotion/admin/gtk/wizard.py (Wizard.destroy) 
+	(Wizard.set_sensitive): New methods.
+	(Wizard.run): Don't destroy the window when finished, in case we
+	need to run it again.
+
+	* flumotion/admin/gtk/client.py (Window._setAdminModel): Call the
+	connected cb ourselves if model.isConnected().
+	(Window.admin_connected_cb): Run the wizard if the model has no
+	components.
+	(Window.update_components): Return the component list.
+
+	* flumotion/admin/gtk/greeter.py (Greeter.destroy, Greeter.hide) 
+	(Greeter.show, Greeter.set_sensitive): New methods, proxy for the
+	Wizard object.
+
+	* flumotion/admin/admin.py:
+	(AdminModel.state): New instance variable, either 'connected' or
+	'disconnected'. Accessed by AdminModel.isConnected().
+
+	* flumotion/manager/manager.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/common/planet.py:
+	* flumotion/admin/admin.py:
+	* flumotion/twisted/flavors.py: s/is None/== None/,
+	s/is not None/!= None/ to avoid pychecker warnings with python
+	2.4.
+	
 2005-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/Makefile.am:

@@ -60,6 +60,8 @@ class Window(log.Loggable, gobject.GObject):
         assert not self.admin
 
         self.admin = model
+        if self.admin.isConnected():
+            self.admin_connected_cb(model)
         self.admin.connect('connected', self.admin_connected_cb)
         self.admin.connect('disconnected', self.admin_disconnected_cb)
         self.admin.connect('connection-refused',
@@ -311,9 +313,16 @@ class Window(log.Loggable, gobject.GObject):
             self._disconnected_dialog.destroy()
             self._disconnected_dialog = None
 
-        self.update_components()
+        self.window.set_title('%s:%d - Flumotion Administration')
+
+        components = self.update_components()
+
         self.emit('connected')
 
+        if not components:
+            self.debug('no components detected, running wizard')
+            self.runWizard()
+    
     def admin_disconnected_cb(self, admin):
         message = "Lost connection to manager, reconnecting ..."
         d = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -375,6 +384,7 @@ class Window(log.Loggable, gobject.GObject):
     def update_components(self):
         components = self.admin.get_components()
         self.components_view.update(components)
+        return components
 
     ### ui callbacks
     def _components_view_selected_cb(self, view, state):

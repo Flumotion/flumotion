@@ -108,7 +108,7 @@ class StateCacheable(pb.Cacheable):
 
         v = self._dict[key]
         # not v would also trigger empty lists
-        if v is None:
+        if v == None:
             return otherwise
 
         return v
@@ -178,7 +178,7 @@ class StateRemoteCache(pb.RemoteCache):
 
         v = self._dict[key]
         # compare to actual None, otherwise we also get zero-like values
-        if v is None:
+        if v == None:
             return otherwise
 
         return v

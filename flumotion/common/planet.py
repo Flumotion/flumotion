@@ -136,7 +136,7 @@ class ManagerComponentState(flavors.StateCacheable):
         for key in ['mood', 'ip', 'pid', 'workerName', 'message']:
             # only set non-None values, handling 'message' being None
             v = jobState.get(key)
-            if v is not None:
+            if v != None:
                 self.set(key, v)
         jobState.addListener(self)
 

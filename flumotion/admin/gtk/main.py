@@ -19,83 +19,47 @@
 # Headers in this file shall remain intact.
 
 import optparse
-import os
 import sys
 
-import gtk
 from twisted.internet import reactor
 
 from flumotion.admin.admin import AdminModel
-from flumotion.admin.gtk import greeter
+from flumotion.admin.gtk.greeter import Greeter
 from flumotion.admin.gtk.client import Window
-from flumotion.configure import configure
 from flumotion.common import log
-from flumotion.wizard import wizard
 
-FIRST_TIME_FILE = os.path.join(os.environ['HOME'], '.flumotion',
-                               'default.xml')
+def _model_connected_cb(model, greeter, ids):
+    map(model.disconnect, ids)
+    greeter.destroy()
+    win = Window(model)
+    win.show()
 
-def _write_default(configuration): 
-    directory = os.path.split(FIRST_TIME_FILE)[0]
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-        
-    filename = os.path.join(directory, 'default.xml')
-    fd = file(filename, 'w')
-    fd.write(configuration)
+def _model_refused_cb(model, host, port, use_insecure, greeter, ids):
+    map(model.disconnect, ids)
+    print '\n\nconnection refused, try again'
+    print 'FIXME: make a proper errbox'
+    _runInterface(None, None, greeter, False)
 
-def _read_default():
-    directory = os.path.split(FIRST_TIME_FILE)[0]
-    filename = os.path.join(directory, 'default.xml')
-    fd = file(filename)
-    return fd.read()
-
-def _wizard_finished_cb(wizard, configuration, window):
-    wizard.hide()
-    _write_default(configuration)
-    window.admin.loadConfiguration(configuration)
-    window.show()
-    
-def _window_connected_cb(window, options):
-    if not window.admin.getComponents() and not os.path.exists(FIRST_TIME_FILE):
-        workers = window.admin.getWorkerHeavenState()
-        if not workers:
-            print >> sys.stderr, "ERROR: No workers connected"
-            reactor.stop()
-        wiz = wizard.Wizard(window.admin)
-        wiz.connect('finished', _wizard_finished_cb, window)
-        wiz.load_steps()
-        wiz.run(not options.debug, workers, main=False)
-        return
-
-    if True:
-        window.show()
-    else:
-        wiz = window.runWizard()
-        wiz.connect('finished', lambda w, c: sys.stdout.write(c))
-        wiz.window.connect('delete-event', gtk.main_quit)
-        
-def _runWizardAndDump():
-    wiz = wizard.Wizard()
-    wiz.load_steps()
-    wiz.run(True, ['localhost'], False)
-    wiz.printOut()
-
-def _runInterface(conf_file, options):
+def _runInterface(conf_file, options, greeter=None, run=True):
     if conf_file:
         # load the conf file here
         raise NotImplementedError()
 
-    state = greeter.Greeter().run()
+    g = greeter or Greeter()
+    state = g.run()
     if not state:
-        exit (0)
+        sys.exit(0)
+    g.set_sensitive(False)
 
     model = AdminModel(state['user'], state['passwd'])
     model.connectToHost(state['host'], state['port'], state['use_insecure'])
-    win = Window(model)
 
-    win.connect('connected', _window_connected_cb, options)
-    reactor.run()
+    ids = []
+    ids.append(model.connect('connected', _model_connected_cb, g, ids))
+    ids.append(model.connect('connection-refused', _model_refused_cb, g, ids))
+
+    if run:
+        reactor.run()
 
 def main(args):
     parser = optparse.OptionParser()
