@@ -1,24 +1,27 @@
 # -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
 # Flumotion - a video streamer server
 # Copyright (C) 2004 Fluendo
-# 
+ 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-# 
+ 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+ 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
+
 
 import os
 import sys
+import string
 
 _sys_argv = sys.argv
 sys.argv = sys.argv[:1]
@@ -51,14 +54,20 @@ class Streamer(gobject.GObject, component.BaseComponent):
         component.BaseComponent.__init__(self, name, sources, self.pipe_template)
         self.caps = None
         
+    def msg(self, *args):
+        log.msg('[launcher] %s' % string.join(args))
+
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-received', buffer)
         
     def notify_caps_cb(self, element, pad, param):
-        log.msg('Got caps: %s' % pad.get_negotiated_caps())
+        self.msg('Got caps: %s' % pad.get_negotiated_caps())
         
-        if self.caps is None:
-            self.caps = pad.get_negotiated_caps()
+        if not self.caps is None:
+            self.msg('WARNING: Already had caps: %s, replacing' % self.caps)
+
+        self.msg('Storing caps: %s' % pad.get_negotiated_caps())
+        self.caps = pad.get_negotiated_caps()
 
     # connect() is already taken by gobject.GObject
     def connect_to(self, sources):
@@ -86,15 +95,19 @@ class StreamingResource(resource.Resource):
         self.caps_buffers = []
         
         reactor.callLater(0, self.bufferWrite)
+
+    def msg(self, *args):
+        log.msg('[launcher] %s' % string.join(args))
+
         
     def data_received_cb(self, transcoder, gbuffer):
         s = str(buffer(gbuffer))
         if gbuffer.flag_is_set(gst.BUFFER_IN_CAPS):
-            log.msg('Received a GST_BUFFER_IN_CAPS buffer')
+            self.msg('Received a GST_BUFFER_IN_CAPS buffer')
             self.caps_buffers.append(s)
         else:
             if not self.first_buffer:
-                log.msg('Received the first buffer')
+                self.msg('Received the first buffer')
                 self.first_buffer = gbuffer
             self.buffer_queue.append(s)
                                              
@@ -110,31 +123,37 @@ class StreamingResource(resource.Resource):
         return self
 
     def lost(self, obj, request):
-        log.msg('client from %s disconnected' % request.getClientIP()) 
+        self.msg('client from %s disconnected' % request.getClientIP()) 
         self.current_requests.remove(request)
 
     def isReady(self):
         if self.streamer.caps is None:
-            log.msg('We have no caps yet')
+            self.msg('We have no caps yet')
             return False
         
         if self.first_buffer is None:
-            log.msg('We still haven\'t received any buffers')
+            self.msg('We still haven\'t received any buffers')
             return False
 
         return True
         
     def render(self, request):
-        log.msg('client from %s connected' % request.getClientIP())   
+        self.msg('client from %s connected' % request.getClientIP())   
         if not self.isReady():
-            log.msg('Not sending data, it\'s not ready')
+            self.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
         # Stolen from camserv
-        request.setHeader('Cache-Control', 'no-cache')
-        request.setHeader('Cache-Control', 'private')
-        request.setHeader("Content-type", "%s;boundary=ThisRandomString" % self.streamer.caps)
-        request.setHeader('Pragma', 'no-cache')
+	# FIXME: only for jpeg of course
+        #request.setHeader('Cache-Control', 'no-cache')
+        #request.setHeader('Cache-Control', 'private')
+        #request.setHeader("Content-type", "%s;boundary=ThisRandomString" % self.streamer.caps)
+        #request.setHeader('Pragma', 'no-cache')
+        #FIXME: get the mime type from the caps correctly, but figure out the
+        # gst python caps api first.  this is a temp hack
+        mime = self.streamer.caps.get_structure(0).get_name()
+        self.msg('setting Content-type to %s' % mime)
+        request.setHeader('Content-type', mime)
         
         for buffer in self.caps_buffers:
             request.write(buffer)

@@ -1,3 +1,13 @@
+2004-06-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component.py:
+	* flumotion/controller.py:
+	* flumotion/launcher.py:
+	* flumotion/streamer.py:
+	  adding vi mode lines
+	  adding self.msg methods that print the object names
+	  figure out content type header from caps
+
 2004-06-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:

@@ -1,7 +1,9 @@
 # -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
-# 
+  
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -15,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
 
 import socket
 import sys
@@ -86,6 +87,9 @@ class ComponentPerspective(pbutil.NewCredPerspective):
                                         self.username,
                                         gst.element_state_get_name(self.state))
     
+    def msg(self, *args):
+        log.msg('[comp %s] %s' % (self.username, args))
+
     def getTransportPeer(self):
         return self.mind.broker.transport.getPeer()
 
@@ -122,7 +126,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         self.controller.componentRegistered(self)
             
     def attached(self, mind):
-        log.msg('%s attached, registering' % self.username)
+        self.msg('attached, registering')
         self.mind = mind
         
         cb = mind.callRemote('register')
@@ -130,7 +134,7 @@ class ComponentPerspective(pbutil.NewCredPerspective):
         
     def detached(self, mind):
         name = self.getName()
-        log.msg('%s detached' % name)
+        self.msg('detached')
         if self.controller.hasComponent(name):
             self.controller.removeComponent(self)
 
@@ -214,6 +218,9 @@ class Controller(pb.Root):
         self.waitlists = {}
         self.last_free_port = 5500
         
+    def msg(self, *args):
+        log.msg('[controller] %s' % args)
+
     def getPerspective(self, component_type, username):
         if component_type == 'producer':
             klass = ProducerPerspective
@@ -314,7 +321,7 @@ class Controller(pb.Root):
 
         name = component.getName()
         if not self.waitlists.has_key(name):
-            #log.msg('%s does not have any pending components' % name)
+            #self.msg('%s does not have any pending components' % name)
             return
             
         for component in self.waitlists[name]:
@@ -370,7 +377,7 @@ class Controller(pb.Root):
         streamer.connect(sources)
         
     def componentStart(self, component):
-        log.msg('Starting component %s of type %s' % (component.getName(), component.kind))
+        self.msg('Starting component %s of type %s' % (component.getName(), component.kind))
         assert isinstance(component, ComponentPerspective)
         assert component != ComponentPerspective
 
@@ -384,7 +391,7 @@ class Controller(pb.Root):
         #component.started = True
         
     def componentRegistered(self, component):
-        #log.msg('%r is registered' % component)
+        #self.msg('%r is registered' % component)
         
         sources = component.getSources()
         if not sources:
@@ -394,13 +401,13 @@ class Controller(pb.Root):
         sources_ready = True
         for source_name in sources:
             if not self.hasComponent(source_name) or self.components[source_name].started == False:
-                log.msg("%r will be waiting for source %s" % (component, source_name))
+                self.msg("%r will be waiting for source %s" % (component, source_name))
                 #import code;code.interact(local=locals())
                 self.waitForComponent(source_name, component)
                 sources_ready = False
 
         if sources_ready:
-            log.msg('All sources for %r (%s) are ready, so starting' % (component, sources))
+            self.msg('All sources for %r (%s) are ready, so starting' % (component, sources))
             self.componentStart(component)
         
 class ControllerServerFactory(pb.PBServerFactory):

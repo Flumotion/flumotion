@@ -1,9 +1,30 @@
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
+# Flumotion - a video streaming server
+# Copyright (C) 2004 Fluendo
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
 import ConfigParser
 import optik
 import os
 import signal
 import sys
 import warnings
+import string
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -25,6 +46,9 @@ class Launcher:
         
         #signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+
+    def msg(self, *args):
+        log.msg('[launcher] %s' % string.join(args))
 
     def start_controller(self, port):
         pid = os.fork()
@@ -69,7 +93,7 @@ class Launcher:
             self.spawn(component)
             raise SystemExit
         else:
-            log.msg('Starting %s (%s) on pid %d' %
+            self.msg('Starting %s (%s) on pid %d' %
                     (component.component_name,
                      component.getKind(),
                      pid))
@@ -82,7 +106,7 @@ class Launcher:
             self.spawn(component)
             raise SystemExit
         else:
-            log.msg('Starting %s (%s) on pid %d' %
+            self.msg('Starting %s (%s) on pid %d' %
                     (component.component_name,
                      component.getKind(),
                      pid))
@@ -102,7 +126,7 @@ class Launcher:
             try:
                 pid = os.waitpid(self.children[0], 0)
                 self.children.remove(pid)
-                log.msg('%d is dead pid' % pid)
+                self.msg('%d is dead pid' % pid)
             except (KeyboardInterrupt, OSError):
                 pass
             
@@ -112,7 +136,7 @@ class Launcher:
             except OSError:
                 pass
         
-        log.msg('Shutting down reactor')
+        self.msg('Shutting down reactor')
         reactor.stop()
 
         raise SystemExit
@@ -187,7 +211,7 @@ def main(args):
     launcher = Launcher(options.port)
 
     if not gstutils.is_port_free(options.port):
-        log.msg('Controller is already started')
+        launcher.msg('Controller is already started')
     else:
         launcher.start_controller(options.port)
         

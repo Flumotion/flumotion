@@ -1,27 +1,29 @@
 # -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
-# 
+ 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-# 
+ 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+ 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
 
 import os
 import time
 import optik
 import socket
 import sys
+import string
 
 import gst
 import gobject
@@ -64,6 +66,9 @@ class BaseComponent(pb.Referenceable):
 
         self.setup_pipeline()
         
+    def msg(self, *args):
+        log.msg('[%s] %s' % (self.component_name, string.join(args)))
+
     def get_pipeline(self, pipeline):
         sources = self.getSources()
         if pipeline == '' and not sources:
@@ -99,7 +104,7 @@ class BaseComponent(pb.Referenceable):
             pipeline = '%s ! tcpserversink name=sink' % pipeline
 
         #pipeline = '{ %s } ' % pipeline
-        log.msg('pipeline for %s is %s' % (self.component_name, pipeline))
+        self.msg('pipeline for %s is %s' % (self.component_name, pipeline))
         
         return pipeline
 
@@ -130,21 +135,21 @@ class BaseComponent(pb.Referenceable):
         cb.addErrback(errback)
         
     def pipeline_error_cb(self, object, element, error, arg):
-        log.msg('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
+        self.msg('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
         self.callRemote('error', element.get_path_string(), error.message)
             
         self.cleanup()
         self.setup_pipeline()
         
     def pipeline_state_change_cb(self, element, old, state):
-        log.msg('pipeline state-changed %s %s ' % (element.get_path_string(),
+        self.msg('pipeline state-changed %s %s ' % (element.get_path_string(),
                                                    gst.element_state_get_name(state)))
         self.callRemote('stateChanged', old, state)
 
     def set_state_and_iterate(self, state):
         retval = self.pipeline.set_state(state)
         if not retval:
-            log.msg('WARNING: Changing state to %s failed' %
+            self.msg('WARNING: Changing state to %s failed' %
                     gst.element_state_get_name(state))
         gobject.idle_add(self.pipeline.iterate)
         
@@ -173,7 +178,7 @@ class BaseComponent(pb.Referenceable):
     def setup_sources(self, sources):
         # Setup all sources
         for source_name, source_host, source_port in sources:
-            log.msg('Going to connect to %s (%s:%d)' % (source_name,
+            self.msg('Going to connect to %s (%s:%d)' % (source_name,
                                                         source_host,
                                                         source_port))
             source = self.pipeline.get_by_name(source_name)
@@ -185,12 +190,12 @@ class BaseComponent(pb.Referenceable):
             source.set_property('protocol', 'gdp')
             
     def cleanup(self):
-        log.msg("cleaning up")
+        self.msg("cleaning up")
         
         assert self.pipeline != None
 
         if self.pipeline.get_state() != gst.STATE_NULL:
-            log.msg('Pipeline was in state %s, changing to NULL' %
+            self.msg('Pipeline was in state %s, changing to NULL' %
                     gst.element_state_get_name(self.pipeline.get_state()))
             self.pipeline.set_state(gst.STATE_NULL)
                 
@@ -200,7 +205,7 @@ class BaseComponent(pb.Referenceable):
         self.pipeline_signals = []
         
     def setup_pipeline(self):
-        log.msg('register(): creating pipeline: %s' % self.pipeline_string)
+        self.msg('register(): creating pipeline: %s' % self.pipeline_string)
         try:
             self.pipeline = gst.parse_launch(self.pipeline_string)
         except gobject.GError, e:
@@ -216,7 +221,7 @@ class BaseComponent(pb.Referenceable):
         
     def remote_register(self):
         if not self.hasPerspective():
-            log.msg('WARNING: We are not ready yet, waiting 250 ms')
+            self.msg('WARNING: We are not ready yet, waiting 250 ms')
             reactor.callLater(0.250, self.remote_register)
             return
         
