@@ -48,8 +48,19 @@ class Streamer(gobject.GObject, component.BaseComponent):
     def get_pipeline(self, pipeline):
         if len(self.sources) == 1:
             return 'tcpclientsrc name=%s ! fakesink signal-handoffs=1 silent=1 name=sink' % self.sources[0]
-        else:
-            raise NotImplemented
+
+        pipeline = ''
+        for source in sources:
+            if ' ' in source:
+                raise TypeError, "spaces not allowed in sources"
+
+            source_name = '@%s' % source
+            if pipeline.find(source_name) == -1:
+                raise TypeError, "%s needs to be specified in the pipeline" % source_name
+            
+            pipeline = pipeline.replace(source_name, 'tcpclientsrc name=%s' % source)
+
+        return pipeline
         
     def sink_handoff_cb(self, element, buffer, pad):
         self.emit('data-recieved', buffer)
