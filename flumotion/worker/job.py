@@ -51,9 +51,9 @@ def getComponent(dict, defs):
         real = os.path.join(dir, filename)
         files[real] = file
         
-    # Create the component which the specified configuration
+    # Create the component with the specified configuration
     # directives. Note that this can't really be moved from here
-    # since it gets called by the launcher from another process
+    # since it gets called by the job from another process
     # and we don't want to create it in the main process, since
     # we're going to listen to ports and other stuff which should
     # be separated from the main process.

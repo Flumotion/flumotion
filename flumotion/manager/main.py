@@ -71,11 +71,11 @@ def main(args):
                       action="store_true", dest="verbose",
                       help="Be verbose")
     group = optparse.OptionGroup(parser, "Manager options")
-    group.add_option('-p', '--port',
+    group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      default=8890,
                      help="Port to listen on [default 8890]")
-    group.add_option('-t', '--transport',
+    group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
                      default="ssl",
                      help="Transport protocol to use (tcp/ssl)")

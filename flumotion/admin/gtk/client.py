@@ -103,10 +103,10 @@ class Window(log.Loggable):
 
     logCategory = 'adminview'
 
-    def __init__(self, host, port):
+    def __init__(self, options):
         self.gladedir = config.gladedir
         self.imagedir = config.imagedir
-        self.connect(host, port)
+        self._connectToManager(options)
         self.create_ui()
         self.current_component = None # the component we're showing UI for
         
@@ -269,15 +269,28 @@ class Window(log.Loggable):
 
     ### functions
 
-    def connect(self, host, port):
-        'connect to manager on given host and port.  Called by __init__'
+    def _connectToManager(self, options):
+        'connect to manager using given options.  Called by __init__'
+        host = options.host
+        port = options.port
+        transport = options.transport
         self.admin = AdminModel()
         self.admin.connect('connected', self.admin_connected_cb)
         self.admin.connect('connection-refused',
                            self.admin_connection_refused_cb, host, port)
         self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
         self.admin.connect('update', self.admin_update_cb)
-        reactor.connectTCP(host, port, self.admin.clientFactory)
+
+        if transport == "ssl":
+            from twisted.internet import ssl
+            self.info('Connecting to manager %s:%d with SSL' % (host, port))
+            reactor.connectSSL(host, port, self.admin.clientFactory,
+                ssl.ClientContextFactory())
+        elif transport == "tcp":
+            self.info('Connecting to manager %s:%d with TCP' % (host, port))
+            reactor.connectTCP(host, port, self.admin.clientFactory)
+        else:
+            self.error("Unknown transport protocol %s" % transport)
         
     def update_components(self):
         model = self.component_model
@@ -384,14 +397,29 @@ def main(args):
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="Be verbose")
-    parser.add_option('', '--host',
+    
+    parser.add_option('-H', '--host',
                      action="store", type="string", dest="host",
                      default='localhost',
-                     help="Port to listen on [default localhost]")
-    parser.add_option('', '--port',
+                     help="Manager host to connect to [default localhost]")
+    parser.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      default=8890,
-                     help="Port to listen on [default 8890]")
+                     help="Manager port to connect to [default 8890]")
+    parser.add_option('-T', '--transport',
+                      action="store", type="string", dest="transport",
+                      default="ssl",
+                      help="Transport protocol to use (tcp/ssl)")
+
+    parser.add_option('-u', '--username',
+                      action="store", type="string", dest="username",
+                      default="",
+                      help="Username to use")
+    parser.add_option('-d', '--password',
+                      action="store", type="string", dest="password",
+                      default="",
+                      help="Password to use, - for interactive")
+
     parser.add_option('', '--wizard',
                      action="store_true", dest="wizard",
                      help="Run the wizard")
@@ -410,7 +438,7 @@ def main(args):
         wizard.run(interactive=options.debug)
         return
     
-    win = Window(options.host, options.port)
+    win = Window(options)
     reactor.run()
     
 if __name__ == '__main__':

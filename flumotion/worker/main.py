@@ -28,14 +28,19 @@ def main(args):
     parser = optparse.OptionParser()
 
     group = optparse.OptionGroup(parser, "Worker options")
-    group.add_option('-m', '--manager-host',
+    group.add_option('-H', '--host',
                      action="store", type="string", dest="host",
                      default="localhost",
                      help="Manager to connect to [default localhost]")
-    group.add_option('-p', '--manager-port',
+    group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      default=8890,
                      help="Manager port to connect to [default 8890]")
+    group.add_option('-T', '--transport',
+                     action="store", type="string", dest="transport",
+                     default="ssl",
+                     help="Transport protocol to use (tcp/ssl)")
+
     group.add_option('-u', '--username',
                      action="store", type="string", dest="username",
                      default="",
@@ -44,10 +49,6 @@ def main(args):
                      action="store", type="string", dest="password",
                      default="",
                      help="Password to use, - for interactive")
-    group.add_option('-t', '--transport',
-                     action="store", type="string", dest="transport",
-                     default="ssl",
-                     help="Transport protocol to use (tcp/ssl)")
      
     parser.add_option_group(group)
     group = optparse.OptionGroup(parser, "Job options")

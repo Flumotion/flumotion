@@ -1,5 +1,16 @@
 2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/manager/main.py:
+	* flumotion/worker/Makefile.am:
+	* flumotion/worker/job.py:
+	* flumotion/worker/launcher.py:
+	* flumotion/worker/main.py:
+	  synchronize more options
+	  make admin client log in with ssl as well
+
+2004-10-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/manager/flumotion.pem:
 	  add a dummy cert
 	* configure.ac:
