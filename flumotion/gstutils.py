@@ -48,6 +48,7 @@ def verbose_deep_notify_cb(object, orig, pspec):
 
 # XXX: move this to a separate file
 def is_port_free(port):
+    assert type(port) == int
     fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         fd.bind(('', port))
@@ -62,6 +63,4 @@ def get_free_port(start):
         if is_port_free(port):
             return port
         port += 1
-                
-    return port
 
