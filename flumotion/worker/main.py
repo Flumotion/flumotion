@@ -114,6 +114,8 @@ def _startWorker(options):
 
     # FIXME: allow for different credentials types
     credentials = cred.Username(options.username, options.password)
+    # FIXME: decide on a workername
+    credentials.avatarId = "localhost"
     brain.login(credentials)
 
     log.debug('worker', 'Starting reactor')

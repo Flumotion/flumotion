@@ -30,6 +30,11 @@ from flumotion.common import log
 class ConfigError(Exception):
     pass
 
+class ConfigEntryAtmosphere:
+    "I represent a <atmosphere> entry in a planet config file"
+    def __init__(self):
+        self.components = {}
+
 class ConfigEntryComponent(log.Loggable):
     "I represent a <component> entry in a registry file"
     nice = 0
@@ -92,6 +97,16 @@ class ConfigEntryComponent(log.Loggable):
     def startFactory(self):
         return self.config.get('start-factory', True)
 
+class ConfigEntryGrid:
+    "I represent a <grid> entry in a planet config file"
+    def __init__(self):
+        self.components = {}
+
+class ConfigEntryManager:
+    "I represent a <manager> entry in a planet config file"
+    def __init__(self):
+        self.bouncer = None
+
 class ConfigEntryWorker:
     "I represent a <worker> entry in a registry file"
     def __init__(self, username, password):
@@ -123,8 +138,9 @@ class FlumotionConfigXML(log.Loggable):
     logCategory = 'config'
 
     def __init__(self, filename, string=None):
-        self.entries = {}
-        self.workers = None
+        self.grids = []
+        self.manager = None
+        self.atmosphere = None
 
         if filename is not None:
             self.debug('Loading configuration file `%s\'' % filename)
@@ -138,53 +154,54 @@ class FlumotionConfigXML(log.Loggable):
     def getPath(self):
         return self.path
 
-    def getEntries(self):
-        return self.entries
-
-    def getEntry(self, name):
-        return self.entries[name]
-
-    def getEntryType(self, name):
-        entry = self.entries[name]
-        return entry.getType()
-
-    def getWorkers(self):
-        return self.workers
-
-    def hasWorker(self, name):
-        return True
-    
-        #print self.workers.getWorkers()
-        for worker in self.workers.getWorkers():
-            if worker.getUsername() == name:
-                return True
-
-        return False
-    
+   
     def parse(self):
-        # <root>
-        #     <component>
-        #     <workers>
-        # </root>
+        # <planet>
+        #     <manager>
+        #     <atmosphere>
+        #     <grid>
+        #     <grid>
+        # </planet>
 
         root = self.doc.documentElement
         
-        #check_node(root, 'root')
+        if not root.nodeName == 'planet':
+            raise ConfigError, "unexpected root node': %s" % root.nodeName
         
         for node in root.childNodes:
             if node.nodeType != Node.ELEMENT_NODE:
                 continue
-            if node.nodeName == 'component':
-                entry = self.parse_component(node)
-                if entry is not None:
-                    self.entries[entry.getName()] = entry
-            elif node.nodeName == 'workers':
-                entry = self.parse_workers(node)
-                self.workers = entry
+            if node.nodeName == 'atmosphere':
+                entry = self.parseAtmosphere(node)
+                self.atmosphere = entry
+            elif node.nodeName == 'grid':
+                entry = self.parseGrid(node)
+                self.grids.append(entry)
+            elif node.nodeName == 'manager':
+                entry = self.parseManager(node)
+                self.manager = entry
             else:
-                raise ConfigError, "unexpected node: %s" % node.nodeName
+                raise ConfigError, "unexpected node under 'planet': %s" % node.nodeName
+
+    def parseAtmosphere(self, node):
+        # <component name="..." type="...">
+        # </component>
+        # <component name="..." type="...">
+        # </component>
+
+        atmosphere = ConfigEntryAtmosphere()
+        for child in node.childNodes:
+            if (child.nodeType == Node.TEXT_NODE or
+                child.nodeType == Node.COMMENT_NODE):
+                continue
             
-    def parse_component(self, node):
+            if child.nodeName != "component":
+                raise ConfigError, "unexpected 'atmosphere' node: %s" % child.nodeName
+            component = self.parseComponent(child)
+            atmosphere.components[component.name] = component
+        return atmosphere
+     
+    def parseComponent(self, node):
         # <component name="..." type="..." worker="">
         #     ...
         # </component>
@@ -220,7 +237,44 @@ class FlumotionConfigXML(log.Loggable):
 
         return ConfigEntryComponent(name, type, config, defs, worker)
 
-    def parse_workers(self, node):
+    def parseGrid(self, node):
+        # <component name="..." type="...">
+        # </component>
+        # <component name="..." type="...">
+        # </component>
+
+        grid = ConfigEntryGrid()
+        for child in node.childNodes:
+            if (child.nodeType == Node.TEXT_NODE or
+                child.nodeType == Node.COMMENT_NODE):
+                continue
+            
+            if child.nodeName != "component":
+                raise ConfigError, "unexpected 'grid' node: %s" % child.nodeName
+
+            component = self.parseComponent(child)
+            grid.components[component.name] = component
+        return grid
+
+    def parseManager(self, node):
+        # <component name="..." type="...">
+        # </component>
+
+        manager = ConfigEntryManager()
+        for child in node.childNodes:
+            if (child.nodeType == Node.TEXT_NODE or
+                child.nodeType == Node.COMMENT_NODE):
+                continue
+            
+            if child.nodeName != "component":
+                raise ConfigError, "unexpected 'manager' node: %s" % child.nodeName
+            if manager.bouncer:
+                raise ConfigError, "<manager> section can only have one <component>"
+            manager.bouncer = self.parseComponent(child)
+            # FIXME: assert that it is a bouncer !
+        return manager
+     
+    def DEPRECATED_parse_workers(self, node):
         # <workers policy="password/anonymous">
         #     <worker name="..." password=""/>
         # </workers>
@@ -241,7 +295,7 @@ class FlumotionConfigXML(log.Loggable):
                 continue
             
             if child.nodeName != "worker":
-                raise ConfigError, "unexpected node: %s" % child
+                raise ConfigError, "unexpected node: %r" % child
         
             if not child.hasAttribute('username'):
                 raise ConfigError, "<worker> must have a username attribute"
@@ -308,7 +362,7 @@ class FlumotionConfigXML(log.Loggable):
                     nodes.append(subnode)
                 
             if definition.isRequired() and not nodes:
-                raise ConfigError("%s is required but not specified" % name)
+                raise ConfigError("'%s' is required but not specified" % name)
 
             if not definition.multiple and len(nodes) > 1:
                 raise ConfigError("multiple value specified but not allowed")

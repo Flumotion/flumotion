@@ -89,25 +89,32 @@ class _PortalWrapper(pb.Referenceable):
         self.portal = portal
         self.broker = broker
 
-    def remote_login(self, username, *interfaces):
+    def remote_login(self, username, avatarId, *interfaces):
+        # corresponds with FMClientFactory._cbSendUsername
         """Start of username/password login."""
         interfaces = [namedAny(interface) for interface in interfaces]
         c = pb.challenge()
-        return c, _PortalAuthChallenger(self, username, c, *interfaces)
+        return c, _PortalAuthChallenger(self, username, avatarId, c, *interfaces)
 
 class _PortalAuthChallenger(pb.Referenceable):
+    # I am a credentials created pb.server side to be presented to the
+    # portal
     """Called with response to password challenge."""
 
     __implements__ = pb.IUsernameHashedPassword, pb.IUsernameMD5Password
 
-    def __init__(self, portalWrapper, username, challenge, *interfaces):
+    def __init__(self, portalWrapper, username, avatarId, challenge, *interfaces):
         self.portalWrapper = portalWrapper
         self.username = username
         self.challenge = challenge
         self.interfaces = interfaces
+        self.avatarId = avatarId
         
     def remote_respond(self, response, mind):
         self.response = response
+        # avatarId is now again a member of the credentials,
+        # so since we pass ourselves to the portal's login, which
+        # will use the checker, the checker can get our desired avatarId !
         d = self.portalWrapper.portal.login(self, mind, *self.interfaces)
         d.addCallback(self._loggedIn)
         return d

@@ -118,12 +118,13 @@ class ReconnectingPBClientFactory(PBClientFactory,
     def login(self, *args):
         raise RuntimeError, "login is one-shot: use startLogin instead"
 
-    def startLogin(self, credentials, client, *interfaces):
+    def startLogin(self, credentials, avatarId, client, *interfaces):
         if not pb.IPerspective in interfaces:
             interfaces += (pb.IPerspective,)
         self._interfaces = [reflect.qual(interface)
                                for interface in interfaces]
         self._credentials = credentials
+        self._avatarId = avatarId
         self._client = client
         
         self._doingLogin = True
@@ -133,12 +134,13 @@ class ReconnectingPBClientFactory(PBClientFactory,
         d = self._cbSendUsername(root,
                                  self._credentials.username,
                                  self._credentials.password,
+                                 self._avatarId,
                                  self._client,
                                  self._interfaces)
         d.addCallbacks(self.gotPerspective, self.failedToGetPerspective)
 
-    def _cbSendUsername(self, root, username, password, client, interfaces):
-        return root.callRemote("login", username, *interfaces).addCallback(
+    def _cbSendUsername(self, root, username, password, avatarId, client, interfaces):
+        return root.callRemote("login", username, avatarId, *interfaces).addCallback(
             self._cbResponse, password, client)
 
     # methods to override
@@ -158,9 +160,16 @@ class ReconnectingPBClientFactory(PBClientFactory,
         self.stopTrying() # logging in harder won't help
         log.err(why)
 
+# we made two changes to the standard PBClientFactory
+# first of all, you can request a specific interface for the avatar to
+# implement, instead of only IPerspective
+# second, you can express your wish for an avatarId, by setting an
+# avatarId member on the credentials you give to login()
+# this way you can request a different avatarId than the user you authenticate
+# with
 class FMClientFactory(pb.PBClientFactory):
-    def _cbSendUsername(self, root, username, password, client, interfaces):
-        d = root.callRemote("login", username, *interfaces)
+    def _cbSendUsername(self, root, username, password, avatarId, client, interfaces):
+        d = root.callRemote("login", username, avatarId, *interfaces)
         return d.addCallback(self._cbResponse, password, client)
 
     def login(self, credentials, client=None, *interfaces):
@@ -178,9 +187,11 @@ class FMClientFactory(pb.PBClientFactory):
                           for interface in interfaces]
             
         d = self.getRootObject()
+        avatarId = getattr(credentials, 'avatarId', None)
         d.addCallback(self._cbSendUsername,
                       credentials.username,
                       credentials.password,
+                      avatarId,
                       client,
                       interfaces)
         return d

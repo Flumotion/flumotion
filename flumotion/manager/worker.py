@@ -65,13 +65,14 @@ class WorkerAvatar(pb.Avatar, log.Loggable):
         self.info('starting %s on %s with config %r' % (name, self.avatarId, config))
         return self.mind.callRemote('start', name, type, config)
         
-class WorkerHeaven(pb.Root):
+class WorkerHeaven(pb.Root, log.Loggable):
     """
     I interface between the Manager and worker clients.
     For each worker client I create an L{WorkerAvatar} to handle requests.
     I live in the manager.
     """
     
+    logCategory = "workerheaven"
     __implements__ = interfaces.IHeaven
     
     def __init__(self, vishnu):
@@ -86,9 +87,6 @@ class WorkerHeaven(pb.Root):
     ### IHeaven methods
 
     def createAvatar(self, avatarId):
-        if not self.conf.hasWorker(avatarId):
-            raise AssertionError
-            
         avatar = WorkerAvatar(self, avatarId)
         self.avatars[avatarId] = avatar
         return avatar
@@ -101,6 +99,7 @@ class WorkerHeaven(pb.Root):
     def loadConfiguration(self, filename):
         # XXX: Merge?
         self.conf = FlumotionConfigXML(filename)
+        return
 
         workers = self.conf.getWorkers()
         if workers:
@@ -115,27 +114,37 @@ class WorkerHeaven(pb.Root):
                                             worker.getPassword())
             
     def getEntries(self, worker):
+        # get all components from the config for this worker
+        workerName = worker.getName()
         if not self.conf:
             return []
 
         retval = []
-        for entry in self.conf.entries.values():
-            entry_worker = entry.getWorker()
-            if entry_worker and entry_worker != worker.getName():
+
+        # scan config for all atmosphere and grid component Entries
+        entries = {}
+        if self.conf.atmosphere.components:
+            entries.update(self.conf.atmosphere.components)
+        for gridEntry in self.conf.grids:
+            entries.update(gridEntry.components)
+
+        for entry in entries.values():
+            if entry.worker and entry.worker != workerName:
                 continue
             retval.append(entry)
         return retval
        
-        workers = [worker for worker in self.conf
-                              if not worker or worker != worker.getName()]
-        return workers
-    
     def workerAttached(self, workerAvatar):
+        # called when the mind is attached, ie the worker logged in
+        self.debug('workerAttached(): worker %r logged in' % workerAvatar)
+
+        # get all components that are supposed to start on this worker
         entries = self.getEntries(workerAvatar)
         workerName = workerAvatar.getName()
         for entry in entries:
             componentName = entry.getName()
-            log.debug('config', 'Starting component: %s on %s' % (componentName, workerName))
+            self.debug('workerAttached(): starting component: %s on %s' % (
+                componentName, workerName))
             # FIXME: we need to put default feeds in this dict
             dict = entry.getConfigDict()
             

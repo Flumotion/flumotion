@@ -62,8 +62,8 @@ class Dispatcher(log.Loggable):
     # to the piece that called login(),
     # which in our case is a component or an admin client.
     def requestAvatar(self, avatarId, mind, *ifaces):
+        print "THOMAS: mind %r, ifaces %r" % (mind, ifaces)
         avatar = self.createAvatarFor(avatarId, ifaces)
-
         self.debug("returning Avatar: id %s, avatar %s" % (avatarId, avatar))
 
         # schedule a perspective attached for after this function

@@ -15,19 +15,30 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
+from flumotion.common import log
 from twisted.cred import checkers, credentials, error
 
+# FIXME: give the manager's bouncer's checker to the flexcredchecker,
+# and forward to it
 parent = checkers.InMemoryUsernamePasswordDatabaseDontUse
-class FlexibleCredentialsChecker(parent):
+class FlexibleCredentialsChecker(parent, log.Loggable):
+    logCategory = 'credchecker'
     def __init__(self, **users):
         parent.__init__(self, **users)
         self.anonymous = False
         
-    def allowAnonymous(self, anon):
-        self.anonymous = anon
+    # we allow anonymous only if the manager has no bouncer
+    def allowAnonymous(self, wellDoWeQuestionMark):
+        self.anonymous = wellDoWeQuestionMark
                          
     ### ICredentialsChecker interface methods
     def requestAvatarId(self, credentials):
+        # FIXME: authenticate using manager's bouncer
+        avatarId = getattr(credentials, 'avatarId', None)
+        if avatarId:
+            self.debug("assigned requested avatarId %s" % avatarId)
+            return avatarId
+
         if self.anonymous:
             return credentials.username
         

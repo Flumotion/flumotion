@@ -82,13 +82,13 @@ class JobMedium(pb.Referenceable, log.Loggable):
         self.manager_port = port
         self.manager_transport = transport
         
-    def remote_start(self, name, type, config, feedPorts):
+    def remote_start(self, componentName, type, config, feedPorts):
         """
         @param feedPorts: feedName -> port
         @type feedPorts: dict
         """
         defs = registry.getComponent(type)
-        self.run_component(name, type, config, defs, feedPorts)
+        self._runComponent(componentName, type, config, defs, feedPorts)
 
     def remote_stop(self):
         reactor.stop()
@@ -131,7 +131,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
         except RuntimeError:
             self.warning('Old PyGTK with threading disabled detected')
     
-    def run_component(self, name, type, config, defs, feed_ports):
+    def _runComponent(self, componentName, type, config, defs, feed_ports):
         """
         @param feed_ports: feed_name -> port
         @type feed_ports: dict, or None
@@ -144,14 +144,14 @@ class JobMedium(pb.Referenceable, log.Loggable):
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()
 
-        log.debug(name, 'Starting on pid %d of type %s' %
+        log.debug(componentName, 'Starting on pid %d of type %s' %
                   (os.getpid(), type))
 
-        self.set_nice(name, config.get('nice', 0))
-        self.enable_core_dumps(name)
+        self.set_nice(componentName, config.get('nice', 0))
+        self.enable_core_dumps(componentName)
         
-        log.debug(name, 'run_component(): config dictionary is: %r' % config)
-        log.debug(name, 'run_component(): feed_ports is: %r' % feed_ports)
+        log.debug(componentName, 'run_component(): config dictionary is: %r' % config)
+        log.debug(componentName, 'run_component(): feed_ports is: %r' % feed_ports)
 
         comp = getComponent(config, defs)
 
@@ -160,8 +160,10 @@ class JobMedium(pb.Referenceable, log.Loggable):
             comp.set_feed_ports(feed_ports)
 
         manager_client_factory = component.ComponentClientFactory(comp)
-        # XXX: get username/password from parent
-        manager_client_factory.login(name)
+        # XXX: we should be getting credentials from somewhere and use them
+        # first argument is username, needs fixing; second is avatarId we
+        # want
+        manager_client_factory.login(componentName, componentName)
 
         host = self.manager_host
         port = self.manager_port

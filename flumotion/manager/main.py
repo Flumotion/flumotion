@@ -21,7 +21,7 @@ import os
 from twisted.internet import reactor
 
 from flumotion.manager import manager
-from flumotion.common import log
+from flumotion.common import log, config
 from flumotion.configure import configure
 
 class ServerContextFactory:
@@ -58,7 +58,19 @@ def _startTCP(vishnu, options):
     reactor.run()
 
 def _loadConfig(vishnu, filename):
+    # FIXME: this might be used for loading additional config, so maybe
+    # unprivatize and cleanup ?
     vishnu.workerheaven.loadConfiguration(filename)
+
+def _initialLoadConfig(vishnu, filename):
+    # this is used with a callLater for the initial config loading
+    try:
+        _loadConfig(vishnu, filename)
+    except config.ConfigError, reason:
+        sys.stderr.write("ERROR: failed to load planet configuration '%s':\n" % filename)
+        sys.stderr.write("%s\n" % reason)
+        # bypass reactor, because sys.exit gets trapped
+        os._exit(-1)
     
 def main(args):
     args = [arg for arg in args if not arg.startswith('--gst')]
@@ -97,10 +109,13 @@ def main(args):
 
     vishnu = manager.Vishnu()
 
+    if len(args) <= 1:
+        log.error('manager', 'Please specify a planet configuration file')
+        return -1
     if len(args) <= 2:
         filename = args[1]
         log.debug('manager', 'Loading configuration file from (%s)' % filename)
-        reactor.callLater(0, _loadConfig, vishnu, filename)
+        reactor.callLater(0, _initialLoadConfig, vishnu, filename)
     
     if options.verbose:
         log.setFluDebug("*:4")

@@ -32,33 +32,62 @@ registry.registry.addFromString("""<components>
 
 class TestConfig(unittest.TestCase):
     def testParseEmpty(self):
-        conf = config.FlumotionConfigXML(None, '<root/>')
+        conf = config.FlumotionConfigXML(None, '<planet/>')
+
+    def testParseAtmosphere(self):
+        conf = config.FlumotionConfigXML(None,
+             """
+             <planet>
+               <atmosphere>
+                 <component name="component-name" type="test-component"/>
+               </atmosphere>
+             </planet>""")
+        assert conf.atmosphere
+        assert conf.atmosphere.components
+        assert len(conf.atmosphere.components) == 1
+        assert conf.atmosphere.components['component-name']
+        assert conf.atmosphere.components['component-name'].name == "component-name"
 
     def testParseComponent(self):
         conf = config.FlumotionConfigXML(None,
-             """<root>
-             <component name="component-name" type="test-component"/>
-             </root>""")
+             """
+             <planet>
+               <grid>
+                 <component name="component-name" type="test-component"/>
+               </grid>
+             </planet>
+             """)
 
-        entries = conf.getEntries()
-        assert entries.has_key('component-name')
-        entry = conf.getEntry('component-name')
-        assert entry.getName() == 'component-name', entry.getName()
-        assert entry.getType() == 'test-component', entry.getType()
-        assert conf.getEntryType('component-name') == entry.getType()
-        dict = entry.getConfigDict()
+        grid = conf.grids[0]
+        assert grid.components.has_key('component-name')
+        component = grid.components['component-name']
+        assert component.name == 'component-name'
+        assert component.type == 'test-component'
+        dict = component.getConfigDict()
         assert dict.get('name') == 'component-name', dict['name']
         assert dict.get('type') == 'test-component', dict['type']
-        assert entry.startFactory()
-        assert not entry.getWorker()
+        assert component.startFactory()
         
-    def testParseWorkers(self):
+    def testParseManager(self):
         conf = config.FlumotionConfigXML(None,
-             """<root>
+             """
+             <planet>
+               <manager>
+                 <component name="component-name" type="test-component"/>
+               </manager>
+             </planet>""")
+        assert conf.manager
+        assert conf.manager.bouncer
+        assert conf.manager.bouncer.name
+        assert conf.manager.bouncer.name == "component-name"
+
+    def obsolete_testParseWorkers(self):
+        conf = config.FlumotionConfigXML(None,
+             """<planet>
              <workers policy="password">
                <worker username="root" password="god"/>
              </workers>
-             </root>""")
+             </planet>""")
 
         workers = conf.getWorkers()
         assert workers.getPolicy() == 'password'
@@ -69,51 +98,62 @@ class TestConfig(unittest.TestCase):
         assert conf.hasWorker('root')
         
     def testParseError(self):
-        xml = '<root><bad-node/></root>'
+        xml = '<planet><bad-node/></planet>'
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
 
     def testParseComponentError(self):
-        xml = '<root><component name="unused" type="not-existing"/></root>'
+        xml = """<planet>
+            <grid><component name="unused" type="not-existing"/></grid>
+            </planet>"""
         self.assertRaises(KeyError, config.FlumotionConfigXML, None, xml)
 
-        xml = '<root><component/></root>'
+        xml = '<planet><component/></planet>'
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
 
-        xml = '<root><component name="without-type"/></root>'
+        xml = '<planet><component name="without-type"/></planet>'
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
 
-    def testParseWorkersError(self):
-        xml = '<root><workers/></root>'
+    def testParseManagerError(self):
+        xml = """<planet><manager>
+            <component name="first" type="test-component"></component>
+            <component name="second" type="test-component"></component>
+            </manager></planet>"""
+        self.assertRaises(config.ConfigError,
+                          config.FlumotionConfigXML, None, xml)
+ 
+    def obsolete_testParseWorkersError(self):
+        xml = '<planet><workers/></planet>'
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
 
-        xml = '<root><workers policy="unknown-policy"/></root>'
+        xml = '<planet><workers policy="unknown-policy"/></planet>'
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
 
-        xml = '<root><workers><worker/></workers></root>'
+        xml = '<planet><workers><worker/></workers></planet>'
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
 
-        xml = '<root><workers><worker username="without-password"/></workers></root>'
+        xml = '<planet><workers><worker username="without-password"/></workers></planet>'
         self.assertRaises(config.ConfigError,
                           config.FlumotionConfigXML, None, xml)
 
     def testParseProperties(self):
-        conf = config.FlumotionConfigXML(None,
-             """<root>
+        planet = config.FlumotionConfigXML(None,
+             """<planet><grid>
              <component name="component-name" type="test-component">
                <one>string</one>
                <two>1</two>
                <three>2.5</three>
                <four attr="attr-value">value</four>
-             </component>
-             </root>""")
-        entry = conf.getEntry('component-name')
-        conf = entry.getConfigDict()
+             </component></grid>
+             </planet>""")
+        grid = planet.grids[0]
+        component = grid.components['component-name']
+        conf = component.getConfigDict()
         assert conf.get('one') == 'string'
         assert conf.get('two') == 1
         assert conf.get('three') == 2.5

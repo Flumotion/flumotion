@@ -1,3 +1,22 @@
+2004-10-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/config.py:
+	* flumotion/component/bouncers/htpasswd.xml:
+	* flumotion/component/component.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_config.py:
+	* flumotion/twisted/cred.py:
+	* flumotion/twisted/pbutil.py:
+	* flumotion/twisted/portal.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/main.py:
+	  move to the final xml configuration syntax for <planet>
+	  add an avatarId request to pb.client and portal so pb.client
+	  can request a specific avatarId when logging in
+
 2004-10-14  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/test/test_http.py: Fix rest regressions.

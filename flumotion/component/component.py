@@ -51,8 +51,9 @@ class ComponentClientFactory(pbutil.ReconnectingPBClientFactory):
         # get the interfaces implemented by the component medium class
         self.interfaces = getattr(klass, '__implements__', ())
         
-    def login(self, username):
+    def login(self, username, avatarId=None):
         self.__super_login(cred.Username(username),
+                           avatarId,
                            self.medium,
                            pb.IPerspective,
                            *self.interfaces)

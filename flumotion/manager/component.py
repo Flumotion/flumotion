@@ -303,7 +303,7 @@ class ComponentAvatar(pb.Avatar, log.Loggable):
         @type mind: L{twisted.spread.pb.RemoteReference}
         @param mind: a remote reference into the component
         """
-        self.debug('mind attached, calling remote register()')
+        self.debug('mind %r attached, calling remote register()' % mind)
         self.mind = mind
         
         d = self._mindCallRemote('register')
