@@ -1,11 +1,11 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
-# Flumotion - a video streaming server
+# doc/random/header.py: template header
+
+# Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo
-#
-# doc/header.py: template header
-#
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
