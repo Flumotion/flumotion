@@ -273,7 +273,7 @@ class WizardStep(object, log.Loggable):
 
     def get_section(self):
         return getattr(self, 'section', '')
-    
+        
     def get_next(self):
         """
         @returns name of next step
@@ -302,14 +302,19 @@ class WizardStep(object, log.Loggable):
 
         This can be implemented in a subclass."""
 
+
+    def before_show(self):
+        """This is called just before we show the widget, everything
+        is created and in place
         
+        This can be implemented in a subclass."""
 
-class Wizard(gobject.GObject):
+class Wizard(gobject.GObject, log.Loggable):
     sidebar_color = gtk.gdk.color_parse('#9bc6ff')
     main_color = gtk.gdk.color_parse('white')
     sidebar_active_color = gtk.gdk.color_parse('#79abed')
     gsignal('finished', str)
-    
+    logCategory = 'wizard'
     def __init__(self, admin=None):
         self.__gobject_init__()
         self.wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'wizard.glade'))
@@ -405,7 +410,10 @@ class Wizard(gobject.GObject):
         self.update_sidebar(step)
         self.update_buttons(has_next=True)
 
-        # Finally show
+        self._setup_worker(step)
+        step.before_show()
+
+        log.debug('showing step %r' % step)
         widget.show()
         step.activated()
 
@@ -449,9 +457,9 @@ class Wizard(gobject.GObject):
 
         self.update_buttons(has_next=True)
 
-    def check_element(self, worker, *elements):
+    def check_elements(self, worker, *elements):
         if not self._admin:
-            print 'Running in debug mode, not querying workers'
+            log.debug('No admin connected, not checking presents of elements')
             return
         
         asked = sets.Set(elements)
@@ -459,12 +467,14 @@ class Wizard(gobject.GObject):
             existing = sets.Set(existing)
             unexisting = asked.difference(existing)
             if unexisting:
-                print 'elements %s does not exist' % ', '.join(unexisting)
+                log.warning('elements %s does not exist' % ', '.join(unexisting))
             self.block_next(False)
-            
+            return tuple(existing)
+        
         self.block_next(True)
         d = self._admin.checkElements(worker, elements)
         d.addCallback(_responseCb)
+        return d
     
     def _setup_worker(self, step):
         # get name of active worker
@@ -473,7 +483,10 @@ class Wizard(gobject.GObject):
             iter = self.combobox_worker.get_active_iter()
             text = model.get(iter, 0)[0]
             step.worker = text
-
+            log.debug('%r setting worker to %s' % (step, step.worker))
+        else:
+            log.debug('%r no worker set' % step)
+            
     def _set_worker_from_step(self, step):
         if not hasattr(step, 'worker'):
             return

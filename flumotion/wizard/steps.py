@@ -124,9 +124,6 @@ class VideoSource(wizard.WizardStep):
     section = 'Production'
     icon = 'widget_doc.png'
    
-    def deactivated(self):
-        self.wizard.check_element(self.worker, 'videotestsrc')
-        
     def get_next(self):
         return 'Overlay'
 
@@ -142,7 +139,7 @@ class TVCard(VideoSource):
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
     icon = 'tv.png'
-    
+
     def setup(self):
         self.combobox_device.set_enum(TVCardDevice)
         self.combobox_signal.set_enum(TVCardSignal)
@@ -174,8 +171,8 @@ class Webcam(VideoSource):
     component_type = 'video4linux'
     icon = 'webcam.png'
     
-    def activated(self):
-        self.wizard.check_element(self.worker, 'v4lsrc')
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'v4lsrc')
         
 wizard.register_step(Webcam)
 
@@ -187,6 +184,9 @@ class TestVideoSource(VideoSource):
     component_type = 'videotestsrc'
     icon = 'testsource.png'
     
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'videotestsrc')
+
     def setup(self):
         self.combobox_pattern.set_enum(VideoTestPattern)
         self.combobox_format.set_enum(VideoTestFormat)
@@ -217,8 +217,8 @@ class Overlay(wizard.WizardStep):
     component_type = 'overlay'
     icon = 'overlay.png'
 
-    def deactivated(self):
-        self.wizard.check_element(self.worker, 'pngdec', 'alphacolor',
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
                                   'videomixer', 'alpha')
         
     def on_checkbutton_show_text_toggled(self, button):
@@ -294,8 +294,8 @@ class TestAudioSource(wizard.WizardStep):
     section = 'Production'
     icon = 'audiosrc.png'
     
-    def deactivated(self):
-        self.wizard.check_element(self.worker, 'sinesrc')
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'sinesrc')
 
     def get_component_properties(self):
         return {'freq': int(self.spinbutton_freq.get_value()) }
@@ -398,8 +398,8 @@ class Theora(VideoEncoder):
         self.spinbutton_quality.set_range(0, 63)
         self.spinbutton_quality.set_value(16)
 
-    def deactivated(self):
-        self.wizard.check_element(self.worker, 'theoraenc')
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'theoraenc')
         
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
@@ -430,8 +430,8 @@ class Smoke(VideoEncoder):
     section = 'Conversion'
     component_type = 'smoke'
 
-    def deactivated(self):
-        self.wizard.check_element(self.worker, 'smokeenc')
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'smokeenc')
         
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
@@ -454,8 +454,8 @@ class JPEG(VideoEncoder):
     section = 'Conversion'
     component_type = 'jpeg'
 
-    def deactivated(self):
-        self.wizard.check_element(self.worker, 'jpegenc')
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'jpegenc')
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
@@ -489,8 +489,8 @@ class Vorbis(AudioEncoder):
         self.spinbutton_bitrate.set_range(6, 250)
         self.spinbutton_bitrate.set_value(64)
         
-    def deactivated(self):
-        self.wizard.check_element(self.worker, 'rawvorbisenc')
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'rawvorbisenc')
         
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
@@ -515,8 +515,8 @@ class Speex(AudioEncoder):
     component_type = 'speex'
     icon = 'xiphfish.png'
     
-    def deactivated(self):
-        self.wizard.check_element(self.worker, 'speexenc')
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'speexenc')
         
     def setup(self):
         # Should be 2150 instead of 3 -> 3000
@@ -631,6 +631,9 @@ class HTTP(wizard.WizardStep):
     section = 'Consumption'
     component_type = 'http-streamer'
 
+    def before_show(self):
+        self.wizard.check_elements(self.worker, 'multifdsink')
+        
     def setup(self):
         self.spinbutton_port.set_value(self.port)
         

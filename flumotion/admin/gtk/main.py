@@ -24,11 +24,13 @@ import optparse
 import os
 import sys
 
+import gtk
+from twisted.internet import reactor
+
 from flumotion.admin.gtk.client import Window
 from flumotion.configure import configure
 from flumotion.common import log
 from flumotion.wizard import wizard
-from twisted.internet import reactor
 
 FIRST_TIME_FILE = os.path.join(os.environ['HOME'], '.flumotion',
                                'default.xml')
@@ -55,29 +57,29 @@ def _wizard_finished_cb(wizard, configuration, window):
     window.show()
     
 def _window_connected_cb(window, options):
-    if window.admin.getComponents():
-        print 'There are already components connected, not sending configuration'
+    if window.admin.getComponents() and not os.path.exists(FIRST_TIME_FILE):
+        workers = window.admin.getWorkers()
+        if not workers:
+            print >> sys.stderr, "ERROR: No workers connected"
+            reactor.stop()
+        wiz = wizard.Wizard(window.admin)
+        wiz.connect('finished', _wizard_finished_cb, window)
+        wiz.load_steps()
+        wiz.run(not options.debug, workers, main=False)
+        return
+
+    if not options.wizard:
         window.show()
     else:
-        if not os.path.exists(FIRST_TIME_FILE):
-            workers = window.admin.getWorkers()
-            if not workers:
-                print >> sys.stderr, "ERROR: No workers connected"
-                reactor.stop()
-            wiz = wizard.Wizard(window.admin)
-            wiz.connect('finished', _wizard_finished_cb, window)
-            wiz.load_steps()
-            wiz.run(not options.debug, workers, main=False)
-        else:
-            window.show()
+        wiz = window.runWizard()
+        wiz.window.connect('delete-event', gtk.main_quit)
         
-def _runWizard(debug):
+def _runWizardAndDump():
     wiz = wizard.Wizard()
     wiz.load_steps()
-    wiz.run(not debug, ['localhost'])
-    if debug:
-        wiz.printOut()
-    
+    wiz.run(True, ['localhost'], False)
+    wiz.printOut()
+
 def _runInterface(options):
     win = Window(options.host, options.port, options.transport,
                  options.username, options.password)
@@ -144,7 +146,7 @@ def main(args):
         elif options.transport == "ssl":
             options.port = defaultSSLPort
 
-    if options.wizard:
-        _runWizard(options.debug)
+    if options.wizard and options.debug:
+        _runWizardAndDump()
     else:
         _runInterface(options)

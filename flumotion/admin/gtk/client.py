@@ -325,8 +325,7 @@ class Window(log.Loggable, gobject.GObject):
     def close(self, *args):
         reactor.stop()
 
-    # menubar/toolbar callbacks
-    def file_new_cb(self, button):
+    def runWizard(self):
         from flumotion.wizard import wizard
         # XXX: This need to be able to run twice
         def _wizard_finished_cb(wizard, configuration):
@@ -342,8 +341,14 @@ class Window(log.Loggable, gobject.GObject):
         wiz = wizard.Wizard(self.admin)
         wiz.connect('finished', _wizard_finished_cb)
         wiz.load_steps()
-        wiz.run(True, workers, main=False)
+        wiz.run(True, workers, False)
+
+        return wiz
     
+    # menubar/toolbar callbacksw
+    def file_new_cb(self, button):
+        self.runWizard()
+
     def file_open_cb(self, button):
         dialog = gtk.FileChooserDialog("Open..",
                                        None,
