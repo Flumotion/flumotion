@@ -1,6 +1,11 @@
 2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/http/http.py:
+	  make PROPFIND return 501
+
+2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/http/http.py:
 	  make HEAD requests work
 
 2004-10-12  Thomas Vander Stichele  <thomas at apestaart dot org>

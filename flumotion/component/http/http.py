@@ -568,8 +568,8 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
     render_GET = _render
     render_HEAD = _render
     
-    def render_PROPFIND(self, request):
-        return http.NOT_ALLOWED
+    #def render_PROPFIND(self, request):
+    #    return http.NOT_ALLOWED
     
     def getChild(self, path, request):
         if path == 'stats':
