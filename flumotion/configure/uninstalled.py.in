@@ -39,7 +39,7 @@ def get():
         registrydir = os.path.join(top_builddir, 'cache', 'registry')
         rundir = os.path.join(top_builddir, 'run')
 
-    return {
+    ret = {
         'isinstalled': False,
         'cachedir':      os.path.join(__toplevel, 'cache'),
         'configdir':     os.path.join(__toplevel, 'conf'),
@@ -51,3 +51,18 @@ def get():
         'rundir':        rundir,
         'version':       '@VERSION@',
     }
+
+    def ensure(path):
+        try:
+            os.listdir(path)
+        except:
+            os.makedirs(path)
+
+    for i in 'cache', 'log', 'registry':
+        try:
+            ensure(ret[i+'dir'])
+        except OSError, e:
+            print 'Error making %s dir %s: %s' % (i, e.filename, e.strerror)
+            print 'Things are probably going to break!'
+
+    return ret

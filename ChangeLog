@@ -1,5 +1,9 @@
 2005-02-09  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/configure/installed.py.in: 
+	* flumotion/configure/uninstalled.py.in: Make sure the cache,
+	registry, and log dirs are available.
+
 	* flumotion/admin/gtk/greeter.py (Initial.next_pages): Fix the
 	order so that load_connection is first by default.
 

@@ -117,7 +117,7 @@ class Wizard(gobject.GObject):
     state = {}
     gsignal('finished')
     image_icon = textview_text = eventbox_top = label_title = None
-    eventbox_content = button_next = None
+    eventbox_content = button_next = button_prev = None
 
     def __init__(self, name, initial_page, *pages):
         self.__gobject_init__()

@@ -25,9 +25,19 @@ def get():
         homedir = os.environ['HOME']
         registrydir = os.path.join(homedir, '.flumotion')
         cachedir = os.path.join(homedir, '.flumotion')
+        def ensure(path):
+            try:
+                os.listdir(path)
+            except:
+                os.makedirs(path)
+        ensure(registrydir)
+        ensure(cachedir)
     except KeyError:
         registrydir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion')
         cachedir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion')
+    except OSError, e:
+        print 'Error making dir %s: %s' % (e.filename, e.strerror)
+        print 'Things are probably going to break!'
 
     return {
         'isinstalled':   True,
