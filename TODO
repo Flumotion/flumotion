@@ -36,6 +36,8 @@
                 the keycard, and return the keycard for challenge/response
 		type of auth
 
+* EASY:		fix all code files to have the new header
+
 - API cleanup:
 
 - manager/component.py:

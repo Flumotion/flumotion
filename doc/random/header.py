@@ -6,11 +6,11 @@
 # Flumotion - a streaming media server
 # Copyright (C) 2004 Fluendo (www.fluendo.com)
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
 # See "LICENSE.GPL" in the source distribution for more information.
 
-# This program is also licensed under the Flumotion license.
+# Licensees holding valid Flumotion Advanced licenses may use this file
+# in accordance with the Flumotion Advanced Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.

@@ -1,3 +1,9 @@
+2004-10-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	* doc/random/header.py:
+	  reworded header after call with the lawyer
+
 2004-10-15  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/component/encoders/encoders.xml:
