@@ -1,5 +1,11 @@
 2004-11-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* TODO:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  fix up todo list
+
+2004-11-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/minimal.xml:
 	* doc/random/bundle:
 	* flumotion/admin/admin.py:

@@ -5,6 +5,7 @@
 <!-- old way of specifying component source -->
     <source location="flumotion.component.consumers.httpstreamer.http"/>
 
+      <!-- entry points for distributable code bundles -->
       <entries>
         <entry type="component" location="http.py"
                function="createComponent"/>

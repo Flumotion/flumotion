@@ -1,21 +1,7 @@
-0.1.0:
-
 * EASY		remove utils, split up gstutils
-
-* EASY:		doublecheck spec
-
-* EASY:		write .pc and -uninstalled.pc
-
-* EASY:		have a FLU_MODULES env var to scan for other flu module .xml
-
-* EASY:		fix all code files to have the new header
-
-* MEDIUM:	write startup "flumotion" script
 
 * MEDIUM	give useful error messages when there is no network !
 		(service network stop and start flumotion and see hang)
-
-LATER:
 
 * EASY		move muxers in their own dir ?
 
@@ -25,8 +11,6 @@ LATER:
 
 * MEDIUM:	component.component overrides .error and calls reactor.stop(),
 	  	this is dangerous, figure that out
-
-* MEDIUM:	make all factories reconnecting and test
 
 * MEDIUM:	add import hooks so that when there is a.b in one pythonpathdir
 	        and a.c in another, programs can import both a.b and a.c
@@ -47,31 +31,29 @@ LATER:
 		or when stats are different from last,
 	 	in http streamer UI
 
-* MEDIUM	create a common.heaven.Heaven base class, and subclass others
-	        involves making admin use same system for managing avatars
-
 * MEDIUM	integration with monitoring tools:
 		big brother: either:
 
 * HARD		transfer ALL code from manager
 
-* EASY		add simple api to add files to bundler from current tree/dir
-
 * EASY		decide if bouncer's base authenticate method should always
 		be overridden and thus raise
 
-* MEDIUM	if you specify a converter with feedname other than default and a consumer
-                eating from that feed and change the source to the same feedname, it fails.
-		
+* MEDIUM	if you specify a converter with feedname other than default
+		and a consumer eating from that feed and change the source
+		to the same feedname, it fails.
 
-* MEDIUM	figure out a way to have worker code for wizard checks bundled
+* MEDIUM	figure out a way to have worker code for wizard checks
+		bundled
 
 * MEDIUM	webcams can be I420, YUY2, or others; we should detect this
 	  	gst-plugins 0.8.6 will detect automatically since there is a
 		new option for autoprobe-fps which we can then use
+		use halogen
 
 * MEDIUM	add runtime checks for plugin versions to provide decent
 		fallbacks for bugs like this
+
 - API cleanup:
 
 - manager/component.py:
