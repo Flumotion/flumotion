@@ -1,5 +1,12 @@
 2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion.in:
+	* flumotion/manager/registry.py:
+	  put registry in homedir.  create higher-level directories.
+	  turn on logging before registry checks.
+
+2004-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* autogen.sh:
 	* configure.ac:
 	  remove autoheader and related things

@@ -51,8 +51,8 @@ from flumotion.common import errors
 from flumotion.utils import log
 
 def main(args):
-    registry.verify(root)
     log.init()
+    registry.verify(root)
         
     return launcher.main(args)
     

@@ -362,6 +362,12 @@ class ComponentRegistry(log.Loggable):
             registry.addFromFile(filename)
 
         self.info('Saving registry to %s' % self.filename)
+        # create parent directory
+        dir = os.path.split(self.filename)[0]
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        if not os.path.isdir(dir):
+            self.error('Registry directory %s is not a directory !')
         fd = open(self.filename, 'w')
         registry.dump(fd)
 
