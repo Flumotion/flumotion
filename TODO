@@ -72,6 +72,23 @@
 		- component dependencies
 		and possibly remove feederset
 		
+* MEDIUM	allow inspecting and changing debug level on the fly of
+		every process.  This way when a problem arises, before
+		stopping and restarting, we can increase it and retry to
+		get debug info
+
+* MEDIUM	allow placing markers in the logs, preferably in all
+		processes at the same time, same marker.  Allows you to
+		keep track of what you are doing during debugging
+
+* MEDIUM	allow to collect logs from all processes everywhere,
+		possibly truncating older data or from older run, and
+		bzip it up, and send it for debug
+
+* MEDIUM	add and test a feature allowing you to start a python shell
+		from the admin UI into any worker or manager
+		helps ENORMOUSLY in debugging strange errors at a point
+		where the system is broken - like AlreadyConnectedError
 - API cleanup:
 
 - manager/component.py:
