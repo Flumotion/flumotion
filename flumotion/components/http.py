@@ -227,7 +227,7 @@ class HTTPStreamingResource(resource.Resource):
 
     def streamer_client_removed_cb(self, streamer, sink, fd, reason):
         request = self.request_hash[fd]
-        self.removeClient(request)
+        self.removeClient(request, fd)
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -318,12 +318,13 @@ class HTTPStreamingResource(resource.Resource):
             self.peak_client_number = len(self.request_hash)
         self.updateAverage()
 
-    def removeClient(self, request):
+    def removeClient(self, request, fd):
         """Removes a request and add logging. Note that it does not disconnect the client
         @param request: the request
-        @type request: L{twisted.protocol.http.Request}"""
-        fd = request.transport.fileno()
-        
+        @type request: L{twisted.protocol.http.Request}
+        @param fd: the file descriptor for the client being removed
+        @type request: L{int}
+        """
         ip = request.getClientIP()
         self.log(fd, ip, request)
         self.debug('(%d) client from %s disconnected' % (fd, ip))
