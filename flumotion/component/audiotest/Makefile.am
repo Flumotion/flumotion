@@ -1,6 +1,6 @@
-component_PYTHON = __init__.py videotest.py
-componentdir = $(libdir)/flumotion/python/flumotion/component/videotest
-component_DATA = videotest.xml
+component_PYTHON = __init__.py audiotest.py
+componentdir = $(libdir)/flumotion/python/flumotion/component/audiotest
+component_DATA = audiotest.xml
 
 clean-local:
 	rm -rf *.pyc *.pyo

@@ -5,6 +5,7 @@ image_DATA = 		\
 	licenses.png 	\
 	kcmdevices.png 	\
 	overlay.png 	\
+	placeholder.png \
 	source.png 	\
 	testsource.png 	\
 	tv.png		\
