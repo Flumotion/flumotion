@@ -8,6 +8,7 @@ EXTRA_DIST = 				\
 	test_bundle.py 			\
 	test_checkers.py 		\
 	test_common.py 			\
+	test_common_componentui.py 	\
 	test_common_gstreamer.py 	\
 	test_common_planet.py	 	\
 	test_component.py 		\

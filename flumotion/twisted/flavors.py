@@ -150,7 +150,11 @@ class StateCacheable(pb.Cacheable):
         if not key in self._dict.keys():
             raise KeyError('%s in %r' % (key, self))
 
-        self._dict[key].remove(value)
+        try:
+            self._dict[key].remove(value)
+        except ValueError:
+            raise ValueError('value %r not in list %r for key %r' % (
+                value, self._dict[key], key))
         list = [o.callRemote('remove', key, value) for o in self._observers]
         dl = defer.DeferredList(list)
         return dl
@@ -233,10 +237,11 @@ class StateRemoteCache(pb.RemoteCache):
             l.stateSet(self, key, value)
 
     def observe_append(self, key, value):
-        self._dict[key].append(value)
         # if we also subclass from Cacheable, then we're a proxy, so proxy
         if hasattr(self, 'append'):
             StateCacheable.append(self, key, value)
+        else:
+            self._dict[key].append(value)
 
         # notify our local listeners
         self._ensureListeners()
@@ -244,10 +249,15 @@ class StateRemoteCache(pb.RemoteCache):
             l.stateAppend(self, key, value)
 
     def observe_remove(self, key, value):
-        self._dict[key].remove(value)
         # if we also subclass from Cacheable, then we're a proxy, so proxy
         if hasattr(self, 'remove'):
             StateCacheable.remove(self, key, value)
+        else:
+            try:
+                self._dict[key].remove(value)
+            except ValueError:
+                raise ValueError("value %r not in list %r" % (id(value),
+                    [id(x) for x in self._dict[key]]))
 
         # notify our local listeners
         self._ensureListeners()

@@ -1,5 +1,18 @@
 2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/Makefile.am:
+	* flumotion/common/componentui.py:
+	  added objects for serializing ui state from component to view in admin
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common_componentui.py:
+	  and a test
+	* flumotion/twisted/flavors.py:
+	  fixed a nasty bug in the case where it subclasses from both
+	  Cacheable and RemoteCache, and the dict of that type got stuff
+	  appended and removed *twice*
+
+2005-03-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  call a .cleanup() on the old AdminGtk objects if they implement it
 	  when showing a new component

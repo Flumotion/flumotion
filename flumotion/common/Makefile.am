@@ -8,6 +8,7 @@ flumotion_PYTHON = \
 	bundleclient.py \
 	code.py \
 	common.py \
+	componentui.py \
 	config.py \
 	dag.py \
 	enum.py \
