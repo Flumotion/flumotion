@@ -1,0 +1,40 @@
+The life of a client in Flumotion
+---------------------------------
+
+What happens on every level ?
+
+- a user tries to connect to the server
+- the Twisted reactor accepts the connection
+  (AT THIS POINT THE FILE DESCRIPTOR IS TAKEN)
+- Twisted passes the request to HTTPStreamingResource.render()
+- render() does a bunch of checks
+- if all checks pass, _handleNewClient() is called.
+- _handleNewClient()
+  - writes HTTP headers for the stream
+  - stores the Request object internally for that fd
+  - removes the request/file descriptor from the reactor, which means
+    it "takes ownership".
+  - hands the fd to multifdsink
+- render() returns server.NOT_DONE_YET
+
+- multifdsink receives the fd and starts polling/selecting on it, writing
+  data to it
+- multifdsink emits client-added
+- MultifdSinkStreamer catches and callbacks
+- callback puts this add info on a threadsafe queue
+- MultifdSinkStreamer has an infinite callLater to dequeue these and log them,
+  and update the internal statistics
+
+- at some point, the client disconnects; multifdsink gets a write of 0 on this
+  fd
+- multifdsink emits client-removed
+- MultifdSinkStreamer catches and callbacks
+- (MultifdSinkStreamer emits signal on multifdsink to collect stats)
+- MultifdSinkStreamer puts this remove on threadsafe queue
+- idler dequeues this and updates stats
+- idler emits client-removed signal
+- HTTPStreamingResource catches and callbacks
+- callback calls _removeClient
+- _removeClient does a request.finish()
+- Twisted CLOSES THE FILE DESCRIPTOR
+
