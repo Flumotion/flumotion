@@ -29,7 +29,7 @@ import gtk.glade
 from twisted.internet import reactor
 
 from flumotion import config
-from flumotion.admin.admininterface import AdminInterface
+from flumotion.admin.admin import AdminModel
 from flumotion.manager import admin   # Register types
 from flumotion.common import errors
 from flumotion.utils import log
@@ -208,7 +208,8 @@ class Window(log.Loggable):
         return d
 
     def admin_connected_cb(self, admin):
-        self.update(admin.clients)
+        # FIXME: abstract away admin's clients
+        self.update(admin.components)
 
     def admin_connection_refused_later(self, host, port):
         message = "Connection to manager on %s:%d was refused." % (host, port)
@@ -229,12 +230,12 @@ class Window(log.Loggable):
         if comp:
             comp.setUiState(state)
         
-    def admin_update_cb(self, admin, clients):
-        self.update(clients)
+    def admin_update_cb(self, admin, components):
+        self.update(components)
 
     def connect(self, host, port):
         'connect to manager on given host and port.  Called by __init__'
-        self.admin = AdminInterface()
+        self.admin = AdminModel()
         self.admin.connect('connected', self.admin_connected_cb)
         self.admin.connect('connection-refused',
                            self.admin_connection_refused_cb, host, port)
@@ -242,22 +243,22 @@ class Window(log.Loggable):
         self.admin.connect('update', self.admin_update_cb)
         reactor.connectTCP(host, port, self.admin.factory)
         
-    def update(self, orig_clients):
+    def update(self, orig_components):
         model = self.component_model
         model.clear()
 
         # Make a copy
-        clients = orig_clients[:]
-        clients.sort()
+        components = orig_components[:]
+        components.sort()
 
-        for client in clients:
+        for component in components:
             iter = model.append()
-            if client.state == gst.STATE_PLAYING:
+            if component.state == gst.STATE_PLAYING:
                 pixbuf = self.icon_playing
             else:
                 pixbuf = self.icon_stopped
             model.set(iter, COL_PIXBUF, pixbuf)
-            model.set(iter, COL_TEXT, client.name)
+            model.set(iter, COL_TEXT, component.name)
 
     def close(self, *args):
         reactor.stop()

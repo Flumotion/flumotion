@@ -3,6 +3,8 @@
 
 # Flumotion - a video streaming server
 # Copyright (C) 2004 Fluendo
+#
+# admin/admin.py: model for admin clients
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,10 +32,11 @@ from flumotion.utils import log, reload
 from flumotion.utils.gstutils import gsignal
 from flumotion.twisted import pbutil
 
-class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
-    """Lives in the admin client.
-       Manager calls on us through admin.Admin.
-       I can call on manager admin.Admin objects.
+class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
+    """
+    I live in the admin client.
+    I am a data model for any admin view implementing a UI.
+    Manager calls on us through L{flumotion.manager.admin.AdminAvatar}
     """
     gsignal('connected')
     gsignal('connection-refused')
@@ -68,20 +71,20 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         
     def remote_componentAdded(self, component):
         self.debug('componentAdded %s' % component.name)
-        self.clients.append(component)
-        self.emit('update', self.clients)
+        self.components.append(component)
+        self.emit('update', self.components)
         
     def remote_componentRemoved(self, component):
         # FIXME: this asserts, no method, when server dies
         # component will be a RemoteComponentView, so we can only use a
         # member, not a method to get the name
         self.debug('componentRemoved %s' % component.name)
-        self.clients.remove(component)
-        self.emit('update', self.clients)
+        self.components.remove(component)
+        self.emit('update', self.components)
         
-    def remote_initial(self, clients):
-        self.debug('remote_initial %s' % clients)
-        self.clients = clients
+    def remote_initial(self, components):
+        self.debug('remote_initial %s' % components)
+        self.components = components
         self.emit('connected')
 
     def remote_shutdown(self):
@@ -90,6 +93,7 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
     def remote_uiStateChanged(self, name, state):
         self.emit('ui-state-changed', name, state)
         
+    ### model functions
     def setProperty(self, component, element, property, value):
         if not self.remote:
             self.warning('No remote object')
@@ -109,7 +113,6 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         # XXX: reload admin.py too
         name = reflect.filenameToModuleName(__file__)
 
-        #self.log("rebuilding '%s'" % name)
         self.info("rebuilding '%s'" % name)
         rebuild.rebuild(sys.modules[name])
 
@@ -118,11 +121,14 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         cb = self.reloadManager()
         # stack callbacks so that a new one only gets sent after the previous
         # one has completed
-        for client in self.clients:
-            cb = cb.addCallback(self.reloadComponent, client)
+        for component in self.components:
+            cb = cb.addCallback(lambda result, component: self.reloadComponent(component), component)
         return cb
 
     def reloadManager(self):
+        """
+        Tell the manager to reload its code.
+        """
         def _reloaded(result, self):
             self.info("reloaded manager code")
 
@@ -131,19 +137,25 @@ class AdminInterface(pb.Referenceable, gobject.GObject, log.Loggable):
         cb.addCallback(_reloaded, self)
         return cb
 
-    def reloadComponent(self, result, client):
-        def _reloaded(result, self, client):
-            self.info("reloaded component %s code" % client.name)
+    def reloadComponent(self, component):
+        """
+        Tell the manager to reload code for a component.
 
-        self.info("reloading component %s code" % client.name)
-        cb = self.remote.callRemote('reloadComponent', client.name)
-        cb.addCallback(_reloaded, self, client)
+        @type component: string
+        @param component: name of the component to reload.
+        """
+        def _reloaded(result, self, component):
+            self.info("reloaded component %s code" % component.name)
+
+        self.info("reloading component %s code" % component.name)
+        cb = self.remote.callRemote('reloadComponent', component.name)
+        cb.addCallback(_reloaded, self, component)
         return cb
 
+    # FIXME: add a second argument to get the type of UI;
+    # gtk or http for example
     def getUIEntry(self, component):
         self.info('calling remote getUIEntry %s' % component)
         return self.remote.callRemote('getUIEntry', component)
     
-gobject.type_register(AdminInterface)
-
- 
+gobject.type_register(AdminModel)
