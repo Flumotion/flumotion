@@ -189,7 +189,7 @@ class JobMedium(pb.Referenceable, log.Loggable):
         @type  feedPorts: dict
         """
         
-        self.info('Starting component %s of type %s' % (name, type))
+        self.info('Starting component "%s" of type "%s"' % (name, type))
         #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.threads_init()
@@ -224,20 +224,19 @@ class JobMedium(pb.Referenceable, log.Loggable):
         keycard = keycards.KeycardUACPP(self.options.username,
             self.options.password, 'localhost')
         keycard.avatarId = name
-        manager_client_factory.login(keycard)
+        d = manager_client_factory.login(keycard)
+        d.addCallback(lambda result: self.info('Logged in to manager'))
 
         host = self.manager_host
         port = self.manager_port
         transport = self.manager_transport
         if transport == "ssl":
             from twisted.internet import ssl
-            log.info('job',
-                'Connecting to manager %s:%d with SSL' % (host, port))
+            self.info('Connecting to manager %s:%d with SSL' % (host, port))
             reactor.connectSSL(host, port, manager_client_factory,
                 ssl.ClientContextFactory())
         elif self.manager_transport == "tcp":
-            log.info('job',
-                'Connecting to manager %s:%d with TCP' % (host, port))
+            self.info('Connecting to manager %s:%d with TCP' % (host, port))
             reactor.connectTCP(host, port, manager_client_factory)
         else:
             self.error('Unknown transport protocol %s' % self.manager_transport)
@@ -249,6 +248,8 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     I am a client factory that logs in to the WorkerBrain.
     I live in the flumotion-worker job process.
     """
+    logCategory = "job"
+
     def __init__(self, name, options):
         """
         @param options: the command-line options the worker was started with
@@ -264,12 +265,14 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         d = pb.PBClientFactory.login(self, 
                                      credentials.Username(username),
                                      self.medium)
+        self.info('Logging in to worker')
         d.addCallbacks(self._connectedCallback,
                        self._connectedErrback)
         return d
     
     def _connectedCallback(self, remoteReference):
-        self.info('perspective %r connected' % remoteReference)
+        self.info('Logged in to worker')
+        self.debug('perspective %r connected' % remoteReference)
         self.medium.setRemoteReference(remoteReference)
 
     def _connectedErrback(self, error):
@@ -283,6 +286,7 @@ def run(name, options):
 
     pid = os.fork()
     if pid:
+        # parent
         return pid
 
     signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -293,6 +297,7 @@ def run(name, options):
     # JobClientFactory, so we throw the options at it
     job_factory = JobClientFactory(name, options)
     reactor.connectUNIX(worker_filename, job_factory)
+    log.info('job', 'Started job on pid %d' % os.getpid())
     log.debug('job', 'Starting reactor')
     reactor.run()
 

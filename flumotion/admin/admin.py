@@ -82,7 +82,7 @@ class AdminModel(pb.Referenceable, gobject.GObject, log.Loggable):
         # 20 secs max for an admin to reconnect
         self.clientFactory.maxDelay = 20
 
-        self.debug("logging in to ClientFactory")
+        self.debug("logging in to ServerFactory")
 
         # FIXME: one without address maybe ? or do we want manager to set it ?
         # or do we set our guess and let manager correct ?

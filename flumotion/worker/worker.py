@@ -49,6 +49,7 @@ class WorkerClientFactory(factoryClass):
     """
     I am a client factory for the worker to log in to the manager.
     """
+    logCategory = 'worker'
     def __init__(self, brain):
         """
         @type brain: L{flumotion.worker.worker.WorkerBrain}

@@ -148,7 +148,8 @@ class Window(log.Loggable, gobject.GObject):
     
     # default Errback
     def _defaultErrback(self, failure):
-        self.warning('Errback: unhandled failure: %s' % failure.getErrorMessage())
+        self.warning('Errback: unhandled failure: %s' %
+            failure.getErrorMessage())
         return failure
 
     def create_ui(self):
@@ -412,6 +413,7 @@ class Window(log.Loggable, gobject.GObject):
         d.addErrback(gotEntryNoBundleErrback)
 
     def admin_connected_cb(self, admin):
+        self.info('Connected to manager')
         if self._disconnected_dialog:
             self._disconnected_dialog.destroy()
             self._disconnected_dialog = None
@@ -441,6 +443,7 @@ class Window(log.Loggable, gobject.GObject):
         
     def admin_connection_refused_later(self, host, port):
         message = "Connection to manager on %s:%d was refused." % (host, port)
+        self.info(message)
         d = self.error_dialog(message, response = False)
         d.connect('response', self.close)
 

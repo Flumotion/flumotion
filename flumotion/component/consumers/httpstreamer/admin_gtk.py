@@ -60,6 +60,8 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             self.labels[name].hide()
 
     def updateLabels(self, state):
+        if not hasattr(self, 'labels'):
+            return
         for name in self.labels.keys():
             text = state[name]
             if text is None:

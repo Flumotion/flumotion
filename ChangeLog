@@ -1,5 +1,14 @@
 2004-12-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  info cleanup.
+
+2004-12-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/steps.py:
 	  fixes #136 - warn about missing dv1394src and dvdec elements
 
