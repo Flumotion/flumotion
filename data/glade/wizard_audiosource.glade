@@ -2,9 +2,9 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
+<requires lib="gnome"/>
 
 <widget class="GtkWindow" id="window1">
-  <property name="visible">True</property>
   <property name="title" translatable="yes">window1</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
@@ -148,7 +148,7 @@
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="combobox2">
+	<widget class="GtkComboBox" id="combobox_input">
 	  <property name="visible">True</property>
 	  <property name="items" translatable="yes">Line in
 Mircophone
@@ -165,7 +165,7 @@ CD</property>
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="combobox3">
+	<widget class="GtkComboBox" id="combobox_channels">
 	  <property name="visible">True</property>
 	  <property name="items" translatable="yes">Stereo
 Mono
@@ -182,7 +182,7 @@ Mono
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="combobox4">
+	<widget class="GtkComboBox" id="combobox_samplerate">
 	  <property name="visible">True</property>
 	  <property name="items" translatable="yes">44100
 22050
@@ -200,7 +200,7 @@ Mono
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="combobox5">
+	<widget class="GtkComboBox" id="combobox_bitdepth">
 	  <property name="visible">True</property>
 	  <property name="items" translatable="yes">16
 8</property>
@@ -216,7 +216,7 @@ Mono
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="combobox1">
+	<widget class="GtkComboBox" id="combobox_device">
 	  <property name="visible">True</property>
 	  <property name="items" translatable="yes">/dev/dsp
 /dev/dsp1

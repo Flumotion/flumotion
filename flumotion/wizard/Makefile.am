@@ -1,6 +1,8 @@
 flumotiondir = $(libdir)/flumotion/python/flumotion/wizard
 
 flumotion_PYTHON = \
+	__init__.py \
+	wizard.py \
 	wizard_step.py
 
 TAGS_FILES = $(flumotion_PYTHON)

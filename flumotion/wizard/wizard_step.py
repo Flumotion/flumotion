@@ -15,233 +15,382 @@
 # This program is also licensed under the Flumotion license.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
-import sys
-sys.path.insert(0, '../..')
-import pygtk
-pygtk.require('2.0')
 
-import os
+from flumotion.wizard import wizard
 
-import gobject
-import gtk
-import gtk.glade
+class Enum:
+    def __init__(self, name, values=[]):
+        self.name = name
+        self.next = 0
 
-from flumotion.config import gladedir
-from flumotion.utils import log
-from flumotion.utils.gstutils import gsignal
-
-class MyComboBox(gtk.ComboBox):
-    def get_text(self):
-        iter = self.get_active_iter()
-        model = self.get_model()
-        return model.get(iter, 0)[0]
-gobject.type_register(MyComboBox)
-
-class WizardStep(gobject.GObject, log.Loggable):
-    gsignal('sanity-changed', bool)
-
-    step_name = None # Subclass sets this
-    glade_file = None # Subclass sets this
-    
-    def __init__(self):
-        self.__gobject_init__()
-        self.widget = None
-        self.load_glade()
-        self._sane = False
-        
-    def load_glade(self):
-        self.wtree = gtk.glade.XML(os.path.join(gladedir, self.glade_file),
-                                   typedict=dict(GtkComboBox=MyComboBox))
-        self.wtree.signal_autoconnect(self)
-        
-        windows = []
-        for widget in self.wtree.get_widget_prefix(''):
-            name = widget.get_name()
-            if isinstance(widget, gtk.Window):
-                widget.hide()
-                windows.append(widget)
-                continue
-            
-            if isinstance(widget, gtk.ComboBox):
-                widget.set_active(0)
-            
-            if hasattr(self, name):
+        self._values = {}
+        for value in values:
+            if type(value) == tuple:
+                if len(value) != 2:
+                    raise TypeError, 'must be a length of 2'
+                name = value[0]
+                value = value[1]
+            elif type(value) == str:
+                name = value
+                value = self.next
+                self.next += 1
+            else:
                 raise TypeError
-            setattr(self, name, widget)
+            
+            assert not hasattr(self, name)
+            assert not self._values.has_key(name)
+            setattr(self, name, value)
+            self._values[value] = name
 
-        if len(windows) != 1:
-            raise AssertionError, "only one window per glade file allowed"
-
-        self.window = windows[0]
-        child = self.window.get_children()[0]
-        self.window.remove(child)
-        self.widget = child
+    def __len__(self):
+        return len(self._values)
+    
+    def __getitem__(self, item):
+        try:
+            name = self.get(item)
+        except KeyError:
+            raise StopIteration
+        return getattr(self, name), name
         
-    def get_main_widget(self):
-        return self.widget
+    def get(self, value):
+        return self._values[value]
 
-    def set_sane(self, sane):
-        self._sane = sane
-        self.emit('sanity-changed', sane)
-        
-    def is_sane(self):
-        return self._sane
 
-    def get_state(self):
-        "A subclass must implement this"
-        raise NotImplementedError
-
-    def next_step(self):
-        "A subclass must implement this"
-        raise NotImplementedError
-        
-gobject.type_register(WizardStep)
-
-class WizardStepSource(WizardStep):
+VideoDeviceType = Enum('VideoDeviceType',
+                       ('TVCard', 'Firewire', 'Webcam', 'Test'))
+AudioDeviceType = Enum('AudioDeviceType',
+                       ('Firewire', 'Sound card', 'Test'))
+class WizardStepSource(wizard.WizardStep):
     step_name = 'Source'
     glade_file = 'wizard_source.glade'
 
-    def on_checkbutton_video_toggled(self, button):
+    def setup(self):
+        self.combobox_video.set_enum(VideoDeviceType)
+        self.combobox_audio.set_enum(AudioDeviceType)
+        
+    def on_checkbutton_has_video_toggled(self, button):
         self.combobox_video.set_sensitive(button.get_active())
         self.verify()
         
-    def on_checkbutton_audio_toggled(self, button):
+    def on_checkbutton_has_audio_toggled(self, button):
         self.combobox_audio.set_sensitive(button.get_active())
         self.verify()
 
     def verify(self):
-        if (not self.checkbutton_audio.get_active() and not
-            not self.checkbutton_video.get_active()):
-            self.set_sane(False)
-            return
-        
-        self.set_sane(True)
-
-    def get_state(self):
-        return dict(video_source=self.combobox_video.get_text(),
-                    audio_source=self.combobox_audio.get_text(),
-                    worker=self.combobox_workers.get_text())
-
-    def get_next(self):
-        if self.checkbutton_video.get_active():
-            return 'Test Source'
+        if (not self.checkbutton_has_audio and not self.checkbutton_has_video):
+            self.wizard.block_next(True)
         else:
-            return 'Audio Source'
-            
-class WizardStepTestSource(WizardStep):
-    step_name = 'Test Source'
-    glade_file = 'wizard_testsource.glade'
+            self.wizard.block_next(False)
 
     def get_next(self):
-        return 'TV Card'
-    
-class WizardStepTVCard(WizardStep):
+        if self.checkbutton_has_video:
+            video_source = self.combobox_video.get_active()
+            if video_source == VideoDeviceType.TVCard:
+                return 'TV Card'
+            elif video_source == VideoDeviceType.Firewire:
+                return 'Firewire'
+            elif video_source == VideoDeviceType.Webcam:
+                return 'Webcam'
+            elif video_source == VideoDeviceType.Test:
+                return 'Test Source'
+            raise AssertionError
+        elif self.checkbutton_has_audio:
+            return 'Audio Source'
+        raise AssertionError
+
+class WizardStepVideoSource(wizard.WizardStep):
+    def get_next(self):
+        return 'Overlay'
+
+class WizardStepTVCard(WizardStepVideoSource):
     step_name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
 
-    def get_next(self):
-        return 'Audio Source'
+class WizardStepFireWirde(WizardStepVideoSource):
+    step_name = 'Firewire'
+    glade_file = 'wizard_firewire.glade'
 
-class WizardStepAudioSource(WizardStep):
+class WizardStepWebcam(WizardStepVideoSource):
+    step_name = 'Webcam'
+    glade_file = 'wizard_webcam.glade'
+
+class WizardStepTestSource(WizardStepVideoSource):
+    step_name = 'Test Source'
+    glade_file = 'wizard_testsource.glade'
+
+class WizardStepOverlay(wizard.WizardStep):
+    step_name = 'Overlay'
+    glade_file = 'wizard_overlay.glade'
+
+    def get_next(self):
+        if self.wizard.get_step_option('Source', 'has_audio'):
+            return 'Audio Source'
+        else:
+            return 'Encoding'
+
+# XXX: Rename to Soundcard
+class WizardStepAudioSource(wizard.WizardStep):
     step_name = 'Audio Source'
     glade_file = 'wizard_audiosource.glade'
 
     def get_next(self):
-        return
+        return 'Encoding'
 
-class Stack(list):
-    push = list.append
-    def peek(self):
-        return self[-1]
+EncodingFormat = Enum('EncodingFormat', ('Ogg', 'Multipart'))
+EncodingVideo = Enum('EncodingVideo', ('Theora', 'Smoke', 'JPEG'))
+EncodingAudio = Enum('EncodingAudio', ('Vorbis', 'Speex', 'Mulaw'))
+
+class WizardStepEncoding(wizard.WizardStep):
+    step_name = 'Encoding'
+    glade_file = 'wizard_encoding.glade'
+    setup_finished = False
     
-class Wizard:
-    def __init__(self):
-        self.wtree = gtk.glade.XML(os.path.join(gladedir, 'wizard.glade'))
-        self.wtree.signal_autoconnect(self)
-        self.window = self.wtree.get_widget('wizard')
-        self.content_area = self.wtree.get_widget('content_area')
-        self.label_title = self.wtree.get_widget('label_title')
-        self.button_prev = self.wtree.get_widget('button_prev')
-        self.button_next = self.wtree.get_widget('button_next')
+    def setup(self):
+        self.combobox_format.set_enum(EncodingFormat)
+        self.combobox_audio.set_enum(EncodingAudio)
+        self.combobox_video.set_enum(EncodingVideo)
+        self.setup_finished = True
         
-        self.steps = {}
-        self.stack = Stack()
-        self.current_step = None
+    def on_combobox_format_changed(self, combo):
+        self.verify()
         
-    def add_step(self, step_class, initial=False):
-        name = step_class.step_name
-        assert not self.steps.has_key(name)
-        self.steps[name] = step = step_class()
-
-        if initial:
-            self.stack.push(step)
-
-    def set_step(self, step):
-        # Remove previous step
-        for child in self.content_area.get_children():
-            self.content_area.remove(child)
-
-        # Add current
-        widget = step.get_main_widget()
-        self.content_area.add(widget)
-
-        self.label_title.set_text(step.step_name)
-        
-        # Finally show
-        widget.show()
-
-        self.current_step = step
-
-    def on_wizard_delete_event(self, wizard, event):
-        gtk.main_quit()
-
-    def on_button_prev_clicked(self, button):
-        self.stack.pop()
-        prev_step = self.stack.peek()
-        self.set_step(prev_step)
-
-        self.update_buttons()
-        
-    def on_button_next_clicked(self, button):
-        next = self.current_step.get_next()
-        if not next:
-            self.finish()
+    def verify(self):
+        # XXX: block signal, it's called too early
+        if not self.setup_finished:
             return
-        next_step = self.steps[next]
-        self.stack.push(next_step)
-        self.set_step(next_step)
+        
+        format = self.combobox_format.get_active()
+        if format == EncodingFormat.Ogg:
+            self.combobox_video.set_multi_active(EncodingVideo.Theora)
+            self.combobox_audio.set_multi_active(EncodingAudio.Vorbis,
+                                                 EncodingAudio.Speex)
+        elif format == EncodingFormat.Multipart:
+            self.combobox_video.set_multi_active(EncodingVideo.Smoke,
+                                                 EncodingVideo.JPEG)
+            self.combobox_audio.set_multi_active(EncodingAudio.Mulaw)
 
-        self.update_buttons()
+        has_audio = self.wizard.get_step_option('Source', 'has_audio')
+        self.combobox_audio.set_property('visible', has_audio)
+        self.label_audio.set_property('visible', has_audio)
+            
+        has_video = self.wizard.get_step_option('Source', 'has_video')
+        self.combobox_video.set_property('visible', has_video)
+        self.label_video.set_property('visible', has_video)
+            
+    
+    def activated(self):
+        self.verify()
 
-    def update_buttons(self):
-        if len(self.stack) == 1:
-            self.button_prev.set_sensitive(False)
+    def get_audio_page(self):
+        if self.wizard.get_step_option('Source', 'has_audio'):
+            codec = self.combobox_audio.get_value()
+            if codec == EncodingAudio.Vorbis:
+                return 'Audio Encoder'
+            elif codec == EncodingAudio.Speex:
+                return 'Audio Encoder'
+            
+        return 'Consumption'
+        
+    def get_next(self):
+        if self.wizard.get_step_option('Source', 'has_video'):
+            codec = self.combobox_video.get_value()
+            if codec == EncodingVideo.Theora:
+                return 'Theora'
+            elif codec == EncodingVideo.Smoke:
+                return 'Smoke'
+            elif codec == EncodingVideo.JPEG:
+                return 'JPEG'
+            
+        return 'Consumption'
+
+class WizardStepTheora(wizard.WizardStep):
+    step_name = 'Theora'
+    glade_file = 'wizard_theora.glade'
+
+    # This is bound to both radiobutton_bitrate and radiobutton_quality
+    def on_radiobutton_toggled(self, button):
+        self.spinbutton_bitrate.set_sensitive(
+            self.radiobutton_bitrate.get_active())
+        self.spinbutton_quality.set_sensitive(
+            self.radiobutton_quality.get_active())
+
+    def get_next(self):
+        return self.wizard['Encoding'].get_audio_page()
+    
+class WizardStepSmoke(wizard.WizardStep):
+    step_name = 'Smoke'
+    glade_file = 'wizard_smoke.glade'
+
+    def get_next(self):
+        return self.wizard['Encoding'].get_audio_page()
+
+class WizardStepJPEG(wizard.WizardStep):
+    step_name = 'JPEG'
+    glade_file = 'wizard_jpeg.glade'
+
+    def get_next(self):
+        return self.wizard['Encoding'].get_audio_page()
+
+class WizardStepAudioEncoder(wizard.WizardStep):
+    step_name = 'Audio Encoder'
+    glade_file = 'wizard_audio_encoder.glade'
+
+    def get_next(self):
+        return 'Consumption'
+
+class WizardStepConsumption(wizard.WizardStep):
+    step_name = 'Consumption'
+    glade_file = 'wizard_consumption.glade'
+
+    def on_checkbutton_http_toggled(self, button):
+        value = self.checkbutton_http.get_active()
+        self.checkbutton_http_audio_video.set_sensitive(value)
+        self.checkbutton_http_audio.set_sensitive(value)
+        self.checkbutton_http_video.set_sensitive(value)
+
+        self.verify()
+        
+    def on_checkbutton_disk_toggled(self, button):
+        value = self.checkbutton_disk.get_active()
+        self.checkbutton_disk_audio_video.set_sensitive(value)
+        self.checkbutton_disk_audio.set_sensitive(value)
+        self.checkbutton_disk_video.set_sensitive(value)
+        
+        self.verify()
+
+    def verify(self):
+        if (not self.checkbutton_disk and not self.checkbutton_http):
+            self.wizard.block_next(True)
         else:
-            self.button_prev.set_sensitive(True)
+            self.wizard.block_next(False)
 
-        current_step = self.stack.peek()
-        if not current_step.get_next():
-            self.button_next.set_label(gtk.STOCK_QUIT)
+    def activated(self):
+        has_audio = self.wizard.get_step_option('Source', 'has_audio')
+        has_video = self.wizard.get_step_option('Source', 'has_video')
+        has_both = has_audio and has_video
+
+        # Most of the options only makes sense if we selected audio
+        # and video in the first page. If we didn't just hide them
+        self.checkbutton_http_audio_video.set_property('visible', has_both)
+        self.checkbutton_http_audio.set_property('visible', has_both)
+        self.checkbutton_http_video.set_property('visible', has_both)
+        self.checkbutton_disk_audio_video.set_property('visible', has_both)
+        self.checkbutton_disk_audio.set_property('visible', has_both)
+        self.checkbutton_disk_video.set_property('visible', has_both)
+
+    def get_next(self, step=None):
+        items = []
+        has_audio = self.wizard.get_step_option('Source', 'has_audio')
+        has_video = self.wizard.get_step_option('Source', 'has_video')
+
+        if has_audio and has_video:
+            if self.checkbutton_http:
+                if self.checkbutton_http_audio_video:
+                    items.append('HTTP Streamer (audio & video)')
+                if self.checkbutton_http_audio:
+                    items.append('HTTP Streamer (audio only)')
+                if self.checkbutton_http_video:
+                    items.append('HTTP Streamer (video only)')
+            if self.checkbutton_disk:
+                if self.checkbutton_disk_audio_video:
+                    items.append('Disk (audio & video)')
+                if self.checkbutton_disk_audio:
+                    items.append('Disk (audio only)')
+                if self.checkbutton_disk_video:
+                    items.append('Disk (video only)')
+        elif has_video and not has_audio:
+            if self.checkbutton_http:
+                items.append('HTTP Streamer (video only)')
+            if self.checkbutton_disk:
+                items.append('Disk (video only)')
+        elif has_audio and not has_video:
+            if self.checkbutton_http:
+                items.append('HTTP Streamer (audio only)')
+            if self.checkbutton_disk:
+                items.append('Disk (audio only)')
         else:
-            self.button_next.set_label(gtk.STOCK_GO_FORWARD)
+            raise AssertionError
+        
+        assert items
+        
+        if not step:
+            return items[0]
+        else:
+            stepname = step.step_name
+            if stepname in items and items[-1] != stepname:
+                return items[items.index(stepname)+1]
+            else:
+                return 'Content License'
 
-    def finish(self):
-        print 'FINISHED'
-        gtk.main_quit()
+class WizardStepHTTP(wizard.WizardStep):
+    glade_file = 'wizard_http.glade'
+
+    def get_next(self):
+        return self.wizard['Consumption'].get_next(self)
+    
+class WizardStepHTTPBoth(WizardStepHTTP):
+    step_name = 'HTTP Streamer (audio & video)'
+                    
+class WizardStepHTTPAudio(WizardStepHTTP):
+    step_name = 'HTTP Streamer (audio only)'
+
+class WizardStepHTTPVideo(WizardStepHTTP):
+    step_name = 'HTTP Streamer (video only)'
+
+RotateTimeType = Enum('RotateTimeType',
+                      ('minutes', 'hours', 'days', 'weeks', 'months'))
+RotateSizeType = Enum('RotateSizeType',
+                      ('kB', 'MB', 'GB', 'TB'))
+
+class WizardStepDisk(wizard.WizardStep):
+    glade_file = 'wizard_disk.glade'
+
+    def setup(self):
+        self.combobox_time_list.set_enum(RotateTimeType)
+        self.combobox_size_list.set_enum(RotateSizeType)
+        self.combobox_size_list.set_active(RotateSizeType.MB)
         
-    def run(self):
-        if not self.stack:
-            raise TypeError, "need an initial step"
+    def on_button_browse_clicked(self, button):
+        pass
+    
+    def on_radiobutton_rotate_toggled(self, button):
+        self.update_radio()
+
+    def update_radio(self):
+        if self.radiobutton_has_size:
+            self.spinbutton_size.set_sensitive(True)
+            self.combobox_size_list.set_sensitive(True)
+            self.spinbutton_time.set_sensitive(False)
+            self.combobox_time_list.set_sensitive(False)
+        elif self.radiobutton_has_time:
+            self.spinbutton_time.set_sensitive(True)
+            self.combobox_time_list.set_sensitive(True)
+            self.spinbutton_size.set_sensitive(False)
+            self.combobox_size_list.set_sensitive(False)
         
-        self.set_step(self.stack.peek())
+    def on_checkbutton_rotate_toggled(self, button):
+        if self.checkbutton_rotate:
+            self.radiobutton_has_size.set_sensitive(True)
+            self.radiobutton_has_time.set_sensitive(True)
+            self.update_radio()
+        else:
+            self.radiobutton_has_size.set_sensitive(False)
+            self.spinbutton_size.set_sensitive(False)
+            self.combobox_size_list.set_sensitive(False)
+            self.radiobutton_has_time.set_sensitive(False)
+            self.spinbutton_time.set_sensitive(False)
+            self.combobox_time_list.set_sensitive(False)
         
-        self.window.show_all()
-        gtk.main()
-        
-if __name__ == '__main__':
-    wiz = Wizard()
-    wiz.add_step(WizardStepSource, initial=True)
-    wiz.add_step(WizardStepTestSource)
-    wiz.add_step(WizardStepTVCard)
-    wiz.add_step(WizardStepAudioSource)
-    wiz.run()
+    def get_next(self):
+        return self.wizard['Consumption'].get_next(self)
+
+    
+class WizardStepDiskBoth(WizardStepDisk):
+    step_name = 'Disk (audio & video)'
+                    
+class WizardStepDiskAudio(WizardStepDisk):
+    step_name = 'Disk (audio only)'
+
+class WizardStepDiskVideo(WizardStepDisk):
+    step_name = 'Disk (video only)'
+
