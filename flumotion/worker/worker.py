@@ -118,11 +118,17 @@ class WorkerMedium(pb.Referenceable, log.Loggable):
 
         @param elementNames:   names of the Gstreamer elements
         @type elementNames:    list of strings
-        """
-        self.debug('remote_checkElements: names %r' % (elementNames,))
 
-        return [name for name in elementNames
+        @rtype: list of strings
+        @returns: a list of instantiatable element names
+        """
+        self.debug('remote_checkElements: element names to check %r' % (
+            elementNames,))
+
+        list = [name for name in elementNames
                          if gst.element_factory_make(name) is not None]
+        self.debug('remote_checkElements: returning elements names %r' % list)
+        return list
 
     def remote_runCode(self, codeSegment, objectName, *args, **kwargs):
         """
