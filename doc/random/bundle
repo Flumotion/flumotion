@@ -18,42 +18,56 @@ I'd suggest that a bundle is specified in the xml file, for instance:
       <!-- additionally, entry points can be overridden, both path and
            entry function 
            location is relative to base -->
-    
-      <entry type="admin/gtk"
-             location="admin/gtk.py"
-             function="..." />
+      <entries>
+        <entry type="admin/gtk"
+               location="admin/gtk.py"
+               function="..." />
 
-      <entry type="component"
-             location="videotest.py"
-             function="createComponent />
-     ...
+        <entry type="component"
+               location="videotest.py"
+               function="createComponent />
+       </entries>
     </component>
   </components>
   <bundles>
     <bundle name="component-videotest">
-      <dependency name="component"/>
-      <directory name="flumotion/components/producers/videotest">
-        <filename location="videotest.py"/>
-      </directory>
+      <dependencies>
+        <dependency name="component"/>
+      </dependencies>
+      <directoies>
+        <directory name="flumotion/components/producers/videotest">
+          <filename location="videotest.py"/>
+        </directory>
+      </directoies>
     </bundle>
     <bundle name="glade-videotest">
-      <directory name="flumotion/components/producers/videotest">
-        <filename location="gtk/videotest.glade/>
-      </directory>
+      <directoies>
+        <directory name="flumotion/components/producers/videotest">
+          <filename location="gtk/videotest.glade/>
+        </directory>
+      </directoies>
     </bundle>
     <bundle name="admin-gtk-videotest">
-      <dependency name="base"/>
-      <dependency name="glade-videotest"/>
-      <directory name="flumotion/components/producers/videotest">
-        <filename location="gtk/wizard.py"/>
-      </directory>
+      <dependencies>
+        <dependency name="base"/>
+        <dependency name="glade-videotest"/>
+      </dependencies>
+      <directoies>
+        <directory name="flumotion/components/producers/videotest">
+          <filename location="gtk/wizard.py"/>
+        </directory>
+      </directoies>
     </bundle>
     <bundle name="wizard-gtk-videotest">
-      <dependency name="base"/>
-      <dependency name="glade-videotest"/>
-      <directory name="flumotion/components/producers/videotest">
-        <filename location="gtk/admin.py"/>
-      </directory>
+      <dependencies>
+        <dependency name="base"/>
+        <dependency name="glade-videotest"/>
+      </dependencies>
+      <directoies>
+        <directory name="flumotion/components/producers/videotest">
+          <filename location="gtk/admin.py"/>
+        </directory>
+      </directoies>
     </bundle>
   </bundles>
 </registry>

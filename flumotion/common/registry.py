@@ -50,12 +50,13 @@ def getMTime(file):
 class RegistryEntryComponent:
     "This class represents a <component> entry in the registry"
     def __init__(self, filename, type, 
-                 source='', properties=[], files=[]):
+                 source='', properties=[], files=[], entries=[]):
         self.filename = filename
         self.type = type
         self.source = source
         self.properties = properties
         self.files = files
+        self.entries = entries
         
     def getProperties(self):
         return self.properties
@@ -63,6 +64,12 @@ class RegistryEntryComponent:
     def getFiles(self):
         return self.files
 
+    def getEntries(self):
+        return self.entries.values()
+
+    def getEntryByType(self, type):
+        return self.entries[type]
+    
     def getGUIEntry(self):
         if not self.files:
             return
@@ -78,6 +85,37 @@ class RegistryEntryComponent:
 
     def getSource(self):
         return self.source
+    
+class RegistryEntryBundle:
+    "This class represents a <bundle> entry in the registry"
+    def __init__(self, name, dependencies, directories):
+        self.name = name
+        self.dependencies = dependencies
+        self.directories = directories
+
+    def __repr__(self):
+        return '<Bundle name=%s>' % self.name
+    
+    def getName(self):
+        return self.name
+
+    def getDependencies(self):
+        return self.dependencies
+
+    def getDirectories(self):
+        return self.directories
+    
+class RegistryEntryBundleDirectory:
+    "This class represents a <directory> entry in the registry"
+    def __init__(self, name, files):
+        self.name = name
+        self.files = files
+
+    def getName(self):
+        return self.name
+
+    def getFiles(self):
+        return self.files
     
 class RegistryEntryProperty:
     "This class represents a <property> entry in the registry"
@@ -120,6 +158,22 @@ class RegistryEntryFile:
     def isType(self, type):
         return self.type == type
     
+class RegistryEntryEntry:
+    "This class represents a <entry> entry in the registry"
+    def __init__(self, type, location, function):
+        self.type = type
+        self.location = location
+        self.function = function
+
+    def getType(self):
+        return self.type
+
+    def getLocation(self):
+        return self.location
+
+    def getFunction(self):
+        return self.function
+    
 class XmlParserError(Exception):
     pass
 
@@ -147,11 +201,13 @@ class RegistryParser(log.Loggable):
     def __init__(self):
         self._components = {}
         self._directories = {}
+        self._bundles = {}
         
     def clean(self):
         self._components = {}
         self._directories = {}
-
+        self._bundles = {}
+        
     def _getRoot(self, filename, string):
         if string:
             self.debug('Parsing XML string')
@@ -197,6 +253,7 @@ class RegistryParser(log.Loggable):
         # <component type="...">
         #   <source>
         #   <properties>
+        #   <entry>
         # </component>
         
         if not node.hasAttribute('type'):
@@ -213,6 +270,7 @@ class RegistryParser(log.Loggable):
                 
         files = []
         source = None
+        entries = {}
         for child in self._getChildNodes(node):
             if child.nodeName == 'source':
                 source = self._parseSource(child)
@@ -220,12 +278,14 @@ class RegistryParser(log.Loggable):
                 self._parseProperties(properties, child)
             elif child.nodeName == 'files':
                 files = self._parseFiles(child)
+            elif child.nodeName == 'entries':
+                entries = self._parseEntries(child)
             else:
                 raise XmlParserError("unexpected node: %s" % child)
 
         return RegistryEntryComponent(self.filename,
                                       type, source, 
-                                      properties.values(), files)
+                                      properties.values(), files, entries)
 
     def _parseSource(self, node):
         # <source location="..."/>
@@ -288,6 +348,35 @@ class RegistryParser(log.Loggable):
             
         return files
 
+    def _parseEntries(self, node):
+        # <entries>
+        #   <entry type="" location="" function=""/>
+        # </entries>
+
+        entries = {}
+        for child in self._getChildNodes(node):
+            if child.nodeName != "entry":
+                raise XmlParserError("unexpected node: %s" % child)
+        
+            if not child.hasAttribute('type'):
+                raise XmlParserError("<entry> must have a type attribute")
+            if not child.hasAttribute('location'):
+                raise XmlParserError("<file> must have a location attribute")
+            if not child.hasAttribute('function'):
+                raise XmlParserError("<file> must have a function attribute")
+
+            type = str(child.getAttribute('type'))
+            location = str(child.getAttribute('location'))
+            function = str(child.getAttribute('function'))
+
+            entry = RegistryEntryEntry(type, location, function)
+            if entries.has_key(type):
+                raise XmlParserError("entry %s already specified" % type)
+            
+            entries[type] = entry
+            
+        return entries
+
     ## Component registry specific functions
     def parseRegistryFile(self, filename, string=None):
         # FIXME: better separation of filename and string ?
@@ -312,11 +401,119 @@ class RegistryParser(log.Loggable):
             self.debug('%s does not have registry as root tag' % self.filename)
             return
 
-        # FIXME: when registry parts will contain more than components,
-        # we need to create a _parseRegistry function
-        node = children[0]
-        components = self._parseComponents(node)
-        self._components.update(components)
+        # FIXME: move to _parseRegistry
+        for node in children:
+            if node.nodeName == 'components':
+                components = self._parseComponents(node)
+                self._components.update(components)
+            elif node.nodeName == 'bundles':
+                bundles = self._parseBundles(node)
+                self._bundles.update(bundles)
+            elif node.nodeName == 'directories':
+                directories = self._parseDirectories(node)
+                self._directories.update(directories)
+            else:
+                raise XmlParserError("<registry> invalid node name: %s" % node.nodeName)
+
+    def _parseBundles(self, node):
+        # <bundles>
+        #   <bundle>
+        # </bundles>
+        
+        bundles = {}
+        
+        for child in self._getChildNodes(node, 'bundles'):
+            if child.nodeName == 'bundle':
+                bundle = self._parseBundle(child)
+                bundles[bundle.getName()] = bundle
+            else:
+                raise XmlParserError("<bundles> unexpected node: %s" % child.nodeName)
+
+        return bundles
+    
+    def _parseBundle(self, node):
+        # <bundle name="...">
+        #   <dependency>
+        #   <directories>
+        # </bundle>
+        
+        if not node.hasAttribute('name'):
+            raise XmlParserError, "<bundle> must have a name attribute"
+        name = str(node.getAttribute('name'))
+
+        dependencies = []
+        directories = []
+
+        for child in self._getChildNodes(node):
+            if child.nodeName == 'dependencies':
+                for dependency in self._parseBundleDependencies(child):
+                    dependencies.append(dependency)
+            elif child.nodeName == 'directories':
+                for directory in self._parseBundleDirectories(child):
+                    directories.append(directory)
+            else:
+                raise XmlParserError("<bundle> unexpected node: %s" % child.nodeName)
+
+        return RegistryEntryBundle(name, dependencies, directories)
+
+    def _parseBundleDependencies(self, node):
+        # <dependencies>
+        #   <dependency name="">
+        # </dependencies>
+    
+        dependencies = []
+        for child in self._getChildNodes(node):
+            if child.nodeName != "dependency":
+                raise XmlParserError("unexpected node: %s" % child)
+        
+            if not child.hasAttribute('name'):
+                raise XmlParserError("<dependency> must have a name attribute")
+
+            name = str(child.getAttribute('name'))
+
+            dependencies.append(name)
+            
+        return dependencies
+
+    def _parseBundleDirectories(self, node):
+        # <directories>
+        #   <directory>
+        # </directories>
+        
+        directories = []
+        
+        for child in self._getChildNodes(node, 'directories'):
+            if child.nodeName == 'directory':
+                directory = self._parseBundleDirectory(child)
+                directories.append(directory)
+            else:
+                raise XmlParserError("unexpected node: %s" % child)
+
+        return directories
+
+    def _parseBundleDirectory(self, node):
+        # <directory name="">
+        #   <filename location="">
+        # </directory>
+        
+        filenames = []
+        if not node.hasAttribute('name'):
+            raise XmlParserError("<directory> must have a name attribute")
+
+        name = str(node.getAttribute('name'))
+        
+        for child in self._getChildNodes(node):
+            if child.nodeName != "filename":
+                raise XmlParserError("unexpected node: %s" % child)
+        
+            if not child.hasAttribute('location'):
+                raise XmlParserError("<filename> must have a location attribute")
+
+            location = str(child.getAttribute('location'))
+
+            filenames.append(location)
+
+        return RegistryEntryBundleDirectory(name, filenames)
 
     ## Base registry specific functions
     def parseRegistry(self, filename, string=None):
@@ -347,10 +544,13 @@ class RegistryParser(log.Loggable):
             elif child.nodeName == 'directories':
                 directories = self._parseDirectories(child)
                 self._directories.update(directories)
+            elif child.nodeName == 'bundles':
+                bundles = self._parseBundles(child)
+                self._bundles.update(bundles)
             else:
                 raise XmlParserError("unexpected node: %s" % child)
         
-    def _parseDirectories(self, node):
+    def _parseDirectories(self, node): 
         # <directories>
         #   <directory>
         # </directories>
@@ -393,7 +593,15 @@ class RegistryDirectory:
         files = []
         
         if os.path.exists(root):
-            for dir in os.listdir(root):
+            try:
+                directory_files = os.listdir(root)
+            except OSError, e:
+                if e.errno == errno.EACCES:
+                    return files
+                else:
+                    raise
+                
+            for dir in directory_files:
                 filename = os.path.join(root, dir)
                 # if it's a .xml file, then add it to the list
                 if not os.path.isdir(filename):
@@ -463,7 +671,10 @@ class ComponentRegistry(log.Loggable):
 
     def getComponents(self):
         return self._parser._components.values()
-    
+
+    def getBundles(self):
+        return self._parser._bundles.values()
+        
     def getDirectories(self):
         return self._parser.getDirectories()
 
@@ -503,14 +714,53 @@ class ComponentRegistry(log.Loggable):
                         file.getName(),
                         file.getType()))
                 w(6, '</files>')
-                
+
+            entries = component.getEntries()
+            if entries:
+                w(6, '<entries>')
+                for entry in entries:
+                    w(8, '<entry type="%s" location="%s" function="%s"/>' % (
+                        entry.getType(),
+                        entry.getLocation(),
+                        entry.getFunction()))
+                w(6, '</entries>')
             w(4, '</component>')
+                
         w(2, '</components>')
 
-        w(2, '<directories>')
-        for d in self.getDirectories():
-            w(4, '<directory filename="%s"/>' % d.getFilename())
-        w(2, '</directories>')
+        # bundles
+        w(2, '<bundles>')
+        for bundle in self.getBundles():
+            w(4, '<bundle name="%s">' % bundle.getName())
+
+            dependencies = bundle.getDependencies()
+            if dependencies:
+                w(6, '<dependencies>')
+                for dependency in dependencies:
+                    w(8, '<dependency name="%s"/>' % dependency)
+                w(6, '</dependencies>')
+
+            dirs = bundle.getDirectories()
+            if dirs:
+                w(6, '<directories>')
+                for dir in dirs:
+                    w(8, '<directory name="%s">' % dir.getName())
+                    for filename in dir.getFiles():
+                        w(10, '<filename location="%s"/>' % filename)
+                    w(8, '</directory>')
+                w(6, '</directories>')
+                
+            w(4, '</bundle>')
+        w(2, '</bundles>')
+
+
+        # Directories
+        directories = self.getDirectories()
+        if directories:
+            w(2, '<directories>')
+            for d in directories:
+                w(4, '<directory filename="%s"/>' % d.getFilename())
+            w(2, '</directories>')
         
         w(0, '</registry>')
 

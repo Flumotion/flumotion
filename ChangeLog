@@ -1,4 +1,14 @@
-2004-11-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+2004-11-26  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/common/registry.py:
+	* flumotion/test/test_registry.py:
+	* doc/random/bundle: 
+
+	Add <bundle> and <component><entry> parsing and tests
+
+	Update the document to reflect the implementation.
+	
+2004-11-26   Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/admin.py:
 	* flumotion/manager/manager.py:
