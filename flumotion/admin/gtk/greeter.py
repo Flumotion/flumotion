@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; fill-column: 80 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -28,44 +28,93 @@ from flumotion.admin.gtk import wizard
 # A wizard run when the user first starts flumotion.
 
 
-# Page callbacks (see wizard.py for details)
+# personal note: these things duplicate to a large extent the code in
+# flumotion.wizard.steps. A bit irritating to find that out after
+# hacking on it for a bit.
 
-def initial_cb(page, state):
-    wtree = gtk.glade.get_widget_tree(page)
-    radio_buttons = wtree.get_widget('connect_to_existing').get_group()
 
-    for i in range(len(radio_buttons)):
-        if radio_buttons[i].get_active():
-            return radio_buttons[i].get_name()
+# Page classes (see wizard.py for details)
 
-    assert(False)
-            
-def connect_to_existing_cb(page, state):
-    wtree = gtk.glade.get_widget_tree(page)
-    host = wtree.get_widget('host_entry').get_text()
-    port = wtree.get_widget('port_entry').get_text()
-    ssl_check = wtree.get_widget('ssl_check').get_active()
+class Initial(wizard.WizardStep):
+    name = 'initial'
+    title = 'Connect to Flumotion manager'
+    text = 'Flumotion Admin needs to connect to a Flumotion manager.\nChoose' \
+           + ' an option from the list and click "Forward" to begin.'
 
-    # fixme: check these values here
-    state['host'] = host
-    state['port'] = port
-    state['ssl_check'] = ssl_check
+    def on_next(self, state):
+        radio_buttons = self.connect_to_existing.get_group()
 
-    return 'authenticate'
-
-def authenticate_cb(page, state):
-    wtree = gtk.glade.get_widget_tree(page)
-    user = wtree.get_widget('user_entry').get_text()
-    passwd = wtree.get_widget('passwd_entry').get_text()
-
-    # fixme: check these values here
-    state['user'] = user
-    state['passwd'] = passwd
+        for i in range(len(radio_buttons)):
+            if radio_buttons[i].get_active():
+                return radio_buttons[i].get_name()
+        raise AssertionError
     
-    return '*finished*'
+
+class ConnectToExisting(wizard.WizardStep):
+    name='connect_to_existing'
+    title='Host information'
+    text = 'Please enter the address where the manager is running.'
+
+    def setup(self, state):
+        self.on_entries_changed()
+
+    def on_entries_changed(self, *args):
+        if self.host_entry.get_text() and self.port_entry.get_text():
+            self.button_next.set_sensitive(True)
+        else:
+            self.button_next.set_sensitive(False)
+
+    def on_ssl_check_toggled(self, button):
+        if button.get_active():
+            self.port_entry.set_text('7531')
+        else:
+            self.port_entry.set_text('8642')
+
+    def on_next(self, state):
+        host = self.host_entry.get_text()
+        port = self.port_entry.get_text()
+        ssl_check = self.ssl_check.get_active()
+
+        # fixme: check these values here
+        state['host'] = host
+        state['port'] = port
+        state['ssl_check'] = ssl_check
+
+        return 'authenticate'
 
 
-def run_greeter_wizard():
-    w = wizard.Wizard('greeter', 'initial')
-    w.show()
-    return w.run()
+class Authenticate(wizard.WizardStep):
+    name = 'authenticate'
+    title = 'Authentication'
+    text = 'Please select among the following authentication methods.'
+
+    def setup(self, state):
+        if not 'auth_method' in state:
+            self.auth_method_combo.set_active(0)
+        self.on_entries_changed()
+
+    def on_entries_changed(self, *args):
+        if self.user_entry.get_text() and self.passwd_entry.get_text():
+            self.button_next.set_sensitive(True)
+        else:
+            self.button_next.set_sensitive(False)
+
+    def on_next(self, state):
+        user = self.user_entry.get_text()
+        passwd = self.passwd_entry.get_text()
+
+        # fixme: check these values here
+        state['user'] = user
+        state['passwd'] = passwd
+
+        return '*finished*'
+
+
+class Greeter(wizard.Wizard):
+    wiz = None
+    def __init__(self):
+        self.wiz = wizard.Wizard('greeter', 'initial',
+                                 Initial, ConnectToExisting, Authenticate)
+    def run(self):
+        self.wiz.show()
+        return self.wiz.run()

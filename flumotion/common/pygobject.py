@@ -85,11 +85,11 @@ def gsignal(name, *args):
     @type args: mixed
     """
     frame = sys._getframe(1)
-    locals = frame.f_locals
+    _locals = frame.f_locals
     
-    if not '__gsignals__' in locals:
-        dict = locals['__gsignals__'] = {}
+    if not '__gsignals__' in _locals:
+        _dict = _locals['__gsignals__'] = {}
     else:
-        dict = locals['__gsignals__']
+        _dict = _locals['__gsignals__']
 
-    dict[name] = (gobject.SIGNAL_RUN_FIRST, None, args)
+    _dict[name] = (gobject.SIGNAL_RUN_FIRST, None, args)

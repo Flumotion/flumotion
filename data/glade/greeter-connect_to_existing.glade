@@ -37,6 +37,7 @@
 	  <property name="has_frame">True</property>
 	  <property name="invisible_char">*</property>
 	  <property name="activates_default">False</property>
+	  <signal name="changed" handler="on_entries_changed" last_modification_time="Fri, 21 Jan 2005 17:43:15 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
@@ -58,6 +59,7 @@
 	  <property name="has_frame">True</property>
 	  <property name="invisible_char">*</property>
 	  <property name="activates_default">False</property>
+	  <signal name="changed" handler="on_entries_changed" last_modification_time="Fri, 21 Jan 2005 17:43:03 GMT"/>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
@@ -145,16 +147,31 @@
       </child>
 
       <child>
-	<widget class="GtkCheckButton" id="ssl_check">
+	<widget class="GtkAlignment" id="alignment3">
 	  <property name="visible">True</property>
-	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Secure connection via SSL</property>
-	  <property name="use_underline">True</property>
-	  <property name="relief">GTK_RELIEF_NORMAL</property>
-	  <property name="focus_on_click">True</property>
-	  <property name="active">True</property>
-	  <property name="inconsistent">False</property>
-	  <property name="draw_indicator">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xscale">1</property>
+	  <property name="yscale">1</property>
+	  <property name="top_padding">6</property>
+	  <property name="bottom_padding">0</property>
+	  <property name="left_padding">0</property>
+	  <property name="right_padding">0</property>
+
+	  <child>
+	    <widget class="GtkCheckButton" id="ssl_check">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label" translatable="yes">Secure connection via SSL</property>
+	      <property name="use_underline">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <property name="active">True</property>
+	      <property name="inconsistent">False</property>
+	      <property name="draw_indicator">True</property>
+	      <signal name="toggled" handler="on_ssl_check_toggled" last_modification_time="Fri, 21 Jan 2005 17:17:57 GMT"/>
+	    </widget>
+	  </child>
 	</widget>
 	<packing>
 	  <property name="left_attach">0</property>

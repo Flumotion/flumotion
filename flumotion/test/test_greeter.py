@@ -30,31 +30,45 @@ except RuntimeError:
     import os
     os._exit(0)
 
-from flumotion.admin.gtk.greeter import *
-from flumotion.admin.gtk import wizard
+from flumotion.admin.gtk import greeter, wizard
 
 class WizardTest(unittest.TestCase):
     def testMakeGreeter(self):
-        wiz = wizard.Wizard('greeter', 'initial')
-        self.assert_(isinstance(wiz.name, str))
-        self.assert_(isinstance(wiz.page, str))
-        self.assert_(isinstance(wiz.page_stack, list))
-        self.assert_(isinstance(wiz.page_widget, gtk.Widget))
-        self.assert_(isinstance(wiz.page_widgets, dict))
-        self.assert_(isinstance(wiz.state, dict))
+        g = greeter.Greeter()
+        ass = self.assert_
+        ass(isinstance(g.wiz, wizard.Wizard))
+        wiz = g.wiz
+        ass(isinstance(wiz.name, str))
+        ass(isinstance(wiz.page, wizard.WizardStep))
+        ass(isinstance(wiz.pages, dict))
+        ass(isinstance(wiz.page_stack, list))
+        ass(isinstance(wiz.state, dict))
 
         # check a couple names that come from libglade..
-        self.assert_(isinstance(wiz.button_next, gtk.Widget))
-        self.assert_(isinstance(wiz.button_prev, gtk.Widget))
+        ass(isinstance(wiz.button_next, gtk.Widget))
+        ass(isinstance(wiz.button_prev, gtk.Widget))
         
         next = wiz.button_next
         prev = wiz.button_prev
         gobject.idle_add(lambda: next.emit('clicked'))
         gobject.idle_add(lambda: prev.emit('clicked'))
         gobject.idle_add(lambda: next.emit('clicked'))
+        gobject.idle_add(lambda: ass(not next.flags() & gtk.SENSITIVE))
+        gobject.idle_add(lambda: wiz.page.host_entry.set_text('foo'))
+        gobject.idle_add(lambda: ass(next.flags() & gtk.SENSITIVE))
+        gobject.idle_add(lambda: wiz.page.ssl_check.emit('clicked'))
+        gobject.idle_add(lambda: ass(wiz.page.port_entry.get_text()=='8642'))
         gobject.idle_add(lambda: next.emit('clicked'))
+        gobject.idle_add(lambda: prev.emit('clicked'))
+        gobject.idle_add(lambda: next.emit('clicked'))
+        gobject.idle_add(lambda: ass(not next.flags() & gtk.SENSITIVE))
+        gobject.idle_add(lambda: ass(wiz.page.auth_method_combo.get_active()==0))
+        gobject.idle_add(lambda: wiz.page.user_entry.set_text('bar'))
+        gobject.idle_add(lambda: ass(not next.flags() & gtk.SENSITIVE))
+        gobject.idle_add(lambda: wiz.page.passwd_entry.set_text('baz'))
+        gobject.idle_add(lambda: ass(next.flags() & gtk.SENSITIVE))
         gobject.idle_add(lambda: next.emit('clicked'))
         state = wiz.run()
-        refstate = {'passwd': '', 'host': '', 'port': '7531',
-                    'ssl_check': True, 'user': ''}
+        refstate = {'passwd': 'baz', 'host': 'foo', 'port': '8642',
+                    'ssl_check': False, 'user': 'bar'}
         self.assert_(state == refstate)

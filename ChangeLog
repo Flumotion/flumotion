@@ -1,3 +1,26 @@
+2005-01-21  Andy Wingo  <wingo@pobox.com>
+
+	* data/glade/admin-wizard.glade:
+	* data/glade/greeter-initial.glade: 
+	* data/glade/greeter-connect_to_existing.glade: 
+	* data/glade/greeter-authenticate.glade: Updates.
+	
+	* tests/greeter.py: Little wrapper to test the greeter.
+
+	* flumotion/admin/gtk/greeter.py: Instead of detecting procs, etc.
+	by name, make them classes and pass them explicitly to the
+	wizard factory. Check inputs, add titles and explanatory text,
+	etc. etc.
+
+	* flumotion/admin/gtk/wizard.py: Rework to be prettier and to take
+	classes as the states. "Polish", if you will.
+
+	* flumotion/test/test_greeter.py: Updates for the new greeter API
+	and behaviour.
+
+	* flumotion/common/pygobject.py (gsignal): Avoid shadowing
+	`locals' and `dict' builtins.
+
 2005-01-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:
@@ -15,8 +38,6 @@
 	* flumotion/admin/gtk/wizard.py:
 	* flumotion/test/test_greeter.py:
 	  fix pychecker warnings; add testsuite headers
-
-2005-01-21  Andy Wingo  <wingo@pobox.com>
 
 	* data/glade/admin-wizard.glade: Glade file for the generic
 	wizard.

@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_greeter -*-
+# -*- test-case-name: flumotion.test.test_greeter; fill-column: 80 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -72,6 +72,13 @@ from flumotion.common.pygobject import gsignal
 # w.run() => {'foo': 'bar'}
 
 
+class WizardStep:
+    # all values filled in by subclasses
+    name = None
+    title = None
+    on_next = None
+    # also, all widgets from the glade file will become attributes
+
 class Wizard(gobject.GObject):
     '''
     A generic wizard, constructed from state procedures and a set of
@@ -81,31 +88,24 @@ class Wizard(gobject.GObject):
     name = None
     page = None
     page_stack = []
-    page_widget = None
-    page_widgets = {}
+    pages = {}
     state = {}
-    _dict = None
     gsignal('finished')
 
-    def __init__(self, name, initial_page):
+    def __init__(self, name, initial_page, *pages):
         self.__gobject_init__()
 
         self.window = None
         self.page_bin = None
-
+        for x in pages: self.pages[x.name] = x()
         self.create_ui()
         self.name = name
-        frame = sys._getframe(1).f_globals
-        self._dict = frame
         self.set_page(initial_page)
 
     def create_ui(self):
         # called from __init__
         wtree = gtk.glade.XML(os.path.join(configure.gladedir,
                                            'admin-wizard.glade'))
-        window = wtree.get_widget('window')
-        iconfile = os.path.join(configure.imagedir, 'fluendo.png')
-        window.set_icon_from_file(iconfile)
 
         for widget in wtree.get_widget_prefix(''):
             # So we can access the step from inside the widget
@@ -122,46 +122,57 @@ class Wizard(gobject.GObject):
             
             setattr(self, name, widget)
 
-        self.window.connect('delete-event', self.on_delete_event)
+        iconfile = os.path.join(configure.imagedir, 'fluendo.png')
+        self.window.set_icon_from_file(iconfile)
+        self.image_icon.set_from_file(iconfile)
+
+        title_bg = self.textview_text.get_style().bg[gtk.STATE_SELECTED]
+        title_fg = self.textview_text.get_style().fg[gtk.STATE_SELECTED]
+        self.eventbox_top.modify_bg(gtk.STATE_NORMAL, title_bg)
+        self.label_title.modify_fg(gtk.STATE_NORMAL, title_fg)
+        normal_bg = self.textview_text.get_style().bg[gtk.STATE_NORMAL]
+        self.textview_text.modify_base(gtk.STATE_NORMAL, normal_bg)
+
         wtree.signal_autoconnect(self)
 
-    def set_page(self, page):
+    def set_page(self, name):
         try:
-            page_widget = self.page_widgets[page]
+            page = self.pages[name]
         except KeyError:
+            raise AssertionError ('No page named %s in %r' % (name, self.pages))
+
+        if not hasattr(page, 'page'):
             wtree = gtk.glade.XML(os.path.join(configure.gladedir,
-                                               self.name+'-'+page+'.glade'),
+                                               self.name+'-'+name+'.glade'),
                                   'page')
             page_widget = wtree.get_widget('page')
-            self.page_widgets[page] = page_widget
+            
+            for widget in wtree.get_widget_prefix(''):
+                wname = widget.get_name()
+                if hasattr(page, wname):
+                    raise AssertionError (
+                        "There is already an attribute called %s in %r" %
+                        (wname, page))
+                setattr(page, wname, widget)
+                wtree.signal_autoconnect(page)
 
-            if page+'_handlers' in self._dict:
-                handler_class = self._dict[page+'_handlers']
-                for widget in wtree.get_widget_prefix(''):
-                    name = widget.get_name()
-                    if hasattr(handler_class, name):
-                        raise AssertionError (
-                            "There is already an attribute called %s in %r" %
-                            (name, self))
-                    setattr(self, name, widget)
-                wtree.signal_autoconnect(handler_class.__dict__)
+        page.button_next = self.button_next
             
         self.page = page
-        if self.page_widget:
-            self.page_bin.remove(self.page_widget)
-        assert not self.page_bin.get_children()
-        self.page_widget = page_widget
-        self.page_bin.add(self.page_widget)
+        for w in self.page_bin.get_children():
+            self.page_bin.remove(w)
+        self.page_bin.add(page.page)
+        self.label_title.set_markup('<big><b>%s</b></big>' % page.title)
+        self.textview_text.get_buffer().set_text(page.text)
+        if hasattr(page, 'setup'):
+            page.setup(self.state)
 
-    def on_delete_event(self, window):
+    def on_delete_event(self, *window):
         self.state = None
         gtk.main_quit()
 
-    def on_next(self, button):
-        if not self.page+'_cb' in self._dict:
-            raise AssertionError ('Missing page handler: %s' % self.page+'_cb')
-        
-        next_page = self._dict[self.page+'_cb'](self.page_widget, self.state)
+    def on_next(self, *button):
+        next_page = self.page.on_next(self.state)
         
         if not next_page:
             # the input is incorrect
@@ -173,7 +184,7 @@ class Wizard(gobject.GObject):
             self.set_page(next_page)
         
     def on_prev(self, button):
-        self.set_page(self.page_stack.pop())
+        self.set_page(self.page_stack.pop().name)
 
     def show(self):
         self.window.show()
