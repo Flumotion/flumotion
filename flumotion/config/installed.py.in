@@ -21,6 +21,6 @@ import os
 def get():
     return {
         'installed': 1,
-        'datadir': os.path.join('@DATADIR@', 'flumotion', 'data'),
+        'datadir': os.path.join('@DATADIR@', 'flumotion'),
         'uidir':   os.path.join('@DATADIR@', 'flumotion', 'ui'),
     }
