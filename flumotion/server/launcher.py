@@ -33,17 +33,12 @@ import gst
 
 from flumotion.twisted import gstreactor
 gstreactor.install()
-
 from twisted.internet import reactor
-from twisted.web import server
 
 from flumotion import errors, twisted
 from flumotion.server.config import FlumotionConfig
 from flumotion.server.controller import ControllerServerFactory
-from flumotion.server.converter import Converter
-from flumotion.server.producer import Producer
 from flumotion.server.registry import registry
-from flumotion.server import streamer
 from flumotion.utils import log, gstutils
 
 from twisted.internet.protocol import ClientCreator, Factory
@@ -58,12 +53,16 @@ class Launcher:
     def __init__(self, host, port):
         self.children = []
         self.controller_pid = None
-        self.uid = None
         self.controller_host = host
         self.controller_port = port
+        self.uid = None
         
         signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         
+    msg = lambda s, *a: log.msg('launcher', *a)
+    warn = lambda s, *a: log.warn('launcher', *a)
+    error = lambda s, *a: log.error('launcher', *a)
+
     def restore_uid(self):
         if self.uid is not None:
             try:
@@ -71,10 +70,6 @@ class Launcher:
                 self.msg('uid set to %d' % (self.uid))
             except OSError, e:
                 self.warn('failed to set uid: %s' % str(e))
-
-    msg = lambda s, *a: log.msg('launcher', *a)
-    warn = lambda s, *a: log.warn('launcher', *a)
-    error = lambda s, *a: log.error('launcher', *a)
 
     def set_nice(self, nice):
         if nice:
@@ -128,12 +123,11 @@ class Launcher:
             pass
         component.pipeline_stop()
 
-    def run(self):
-        filename = '/tmp/flumotion.%d' % self.controller_pid
-        self.restore_uid()
-
-        reactor.run()
+    def stop_controller(self):
+        if not self.controller_pid:
+            return
         
+        filename = '/tmp/flumotion.%d' % self.controller_pid
         c = ClientCreator(reactor, MiniProtocol)
         defered = c.connectUNIX(filename)
         def cb_Stop(protocol):
@@ -142,22 +136,28 @@ class Launcher:
             self.msg('Shutting down launcher')
             reactor.callLater(0, reactor.stop)
         defered.addCallback(cb_Stop)
-        
+
+        # We need to run the reactor again, so we can process
+        # the last events, need to tell the controller to shutdown
         reactor.run()
         
-        raise SystemExit
+    def run(self):
+        self.restore_uid()
 
-    def start(self, component=None, nice=0, func=None, *args):
+        # Run the reactor until its interrupted (eg KeyboardInterrupt)
+        # Need to investigate why we don't need to catch the exception here
+        reactor.run()
+
+        self.stop_controller()
+
+    def start(self, config):
+        assert config.func
         pid = os.fork()
         if not pid:
             retval = None
-            if func:
-                retval = func(*args)
+            component = config.func(config.config) # config.dict ?
                 
-            if not component:
-                component = retval
-                
-            self.set_nice(nice)
+            self.set_nice(config.nice)
             self.restore_uid()
             
             self.spawn(component)
@@ -167,153 +167,13 @@ class Launcher:
 #                    (component.getName(),component.getKind(), pid))
             self.children.append(pid)
 
-    def setup_http_streamer(self, c):
-        def setup_cb(port, component):
-            resource = streamer.HTTPStreamingResource(component,
-                                                      c.logfile)
-            factory = server.Site(resource=resource)
-            self.msg('Starting http factory on port %d' % c.port)
-            reactor.listenTCP(port, factory)
-        component = streamer.MultifdSinkStreamer(c.name, c.sources)
-        callback_args = (c.port, component)
-
-        return component, setup_cb, callback_args
-
-    def setup_file_streamer(self, c):
-        def setup_cb(port, component):
-            factory = component.create_admin()
-            self.msg('Starting admin factory on port %d' % c.port)
-            reactor.listenTCP(port, factory)
-        component = streamer.FileSinkStreamer(c.name,
-                                              c.sources, c.location)
-        if c.port:
-            callback = setup_cb
-            callback_args = (c.port, component)
-        else:
-            callback = None
-            callback_args = ()
-
-        return component, callback, callback_args
-    
     def load_config(self, filename):
-        config = FlumotionConfig(filename)
+        conf = FlumotionConfig(filename)
 
-        for name in config.components.keys():
-            c = config.components[name]
-            print 'Starting', name
-            self.start(None, c.nice, c.func, c.config)
-        return
+        for name in conf.components.keys():
+            self.msg('Starting component: %s' % name)
+            self.start(conf.components[name])
     
-        for c in config.components.values():
-            cb = None
-            args = ()
-            if c.kind == 'producer':
-                component = Producer(c.name, [], c.feeds, c.pipeline)
-            elif c.kind == 'converter':
-                component = Converter(c.name, c.sources, c.feeds, c.pipeline)
-            elif c.kind == 'streamer':
-                if c.protocol == 'http':
-                    component, cb, args = self.setup_http_streamer(c)
-                elif c.protocol == 'file':
-                    component, cb, args = self.setup_file_streamer(c)
-            else:
-                self.warn("unknown component type: %s" % c.kind)
-                continue
-            self.start(component, c.nice, cb, *args)
-    
-def get_options_for(kind, args):
-    if kind == 'producer':
-        need_sources = False
-        need_pipeline = True
-    elif kind == 'converter':
-        need_sources = True
-        need_pipeline = True
-    elif kind == 'streamer':
-        need_sources = True
-        need_pipeline = False
-    else:
-        raise AssertionError
-
-    usage = "usage: flumotion %s [options]" % kind
-    parser = optparse.OptionParser(usage=usage)
-    parser.add_option('-v', '--verbose',
-                      action="store_true", dest="verbose",
-                      help="Be verbose")
-
-    nicename = kind[0].upper() + kind[1:]
-    group = optparse.OptionGroup(parser, '%s options' % nicename)
-    group.add_option('-n', '--name',
-                     action="store", type="string", dest="name",
-                     default=None,
-                     help="Name of component")
-    if need_pipeline:
-        group.add_option('-p', '--pipeline',
-                         action="store", type="string", dest="pipeline",
-                         default=None,
-                         help="Pipeline to run")
-        group.add_option('-f', '--feeds',
-                         action="store", type="string", dest="feeds",
-                         default=[],
-                         help="Feeds to provide")
-
-    if need_sources:
-        group.add_option('-s', '--sources',
-                         action="store", type="string", dest="sources",
-                         default="",
-                         help="Host sources to get data from, separated by ,")
-
-    if kind == 'streamer':
-        group.add_option('-p', '--protocol',
-                         action="store", type="string", dest="protocol",
-                         default="http",
-                         help="Protocol to use [default http]")
-        group.add_option('-o', '--listen-port',
-                         action="store", type="int", dest="listen_port",
-                         default=8080,
-                         help="Port to bind to [default 8080]")
-    parser.add_option_group(group)
-    
-    group = optparse.OptionGroup(parser, "Controller options")
-    group.add_option('-c', '--controller-host',
-                     action="store", type="string", dest="host",
-                     default="localhost",
-                     help="Controller to connect to [default localhost]")
-    group.add_option('', '--controller-port',
-                     action="store", type="int", dest="port",
-                     default=8890,
-                     help="Controller port to connect to [default 8890]")
-    parser.add_option_group(group)
-
-    options, args = parser.parse_args(args)
-
-    if options.name is None:
-        raise errors.OptionError, 'Need a name'
-    elif need_pipeline:
-        if options.pipeline is None:
-            raise errors.OptionError, 'Need a pipeline'
-        if options.feeds is None:
-            raise errors.OptionError, 'Need feeds'
-        else:
-            options.feeds = options.feeds.split(',')
-    elif need_sources and options.sources is None:
-        raise OptionError, 'Need a source'
-    elif kind == 'streamer':
-        if not options.protocol:
-            raise errors.OptionError, 'Need a protocol'
-        elif not options.listen_port:
-            raise errors.OptionError, 'Need a listen_port'
-            return 2
-
-    if need_sources:
-        if ',' in  options.sources:
-            options.sources = options.sources.split(',')
-        else:
-            options.sources = [options.sources]
-    else:
-        options.sources = []
-        
-    return options
-
 def run_launcher(args):
     parser = optparse.OptionParser()
     parser.add_option('-v', '--verbose',
@@ -377,46 +237,6 @@ def run_controller(args):
 
     return 0
 
-def run_component(name, args):
-    try:
-        options = get_options_for(name, args)
-    except errors.OptionError, e:
-        print 'ERROR:', e
-        raise SystemExit
-
-    if name == 'producer':
-        klass = Producer
-        args = (options.name, options.sources, options.feeds, options.pipeline)
-    elif name == 'converter':
-        klass = Converter
-        args = (options.name, options.sources, options.feeds, options.pipeline)
-    elif name == 'streamer':
-        # IGNORE THIS
-        if options.protocol == 'http':
-            web_factory = server.Site(resource=streamer.StreamingResource(component))
-            reactor.listenTCP(options.listen_port, web_factory)
-            klass = streamer.FakeSinkStreamer
-            args = (options.name, options.sources)
-        elif options.protocol == 'file':
-            klass = streamer.FileStreamer
-            args = (options.name, options.sources, options.location)
-        else:
-            print 'Only http and file protcol supported right now'
-            return
-    else:
-        raise AssertionError
-        
-    try:
-        print klass, args
-        component = klass(*args)
-    except twisted.errors.PipelineParseError, e:
-        print 'Bad pipeline: %s' % e
-        raise SystemExit
-    
-    reactor.connectTCP(options.host, options.port, component.factory)
-    
-    reactor.run()
-
 def usage():
     print 'Usage: flumotion command [command-options-and-arguments]'
     
@@ -424,9 +244,6 @@ def show_commands():
     print 'Flumotion commands are:'
     print '\tlauncher      Component launcher'
     print '\tcontroller    Component controller'
-    print '\tproducer      Producer component'
-    print '\tconverter     Converter component'
-    print '\tstreamer      Streamer component'
     print
     print '(Specify the --help option for a list of other help options)'
 
@@ -440,8 +257,6 @@ def main(args):
     name = args[1]
     if name == 'controller':
         return run_controller(args)
-    if name in ['producer', 'converter', 'streamer']:
-        return run_component(args[1], args[2:])
     elif name == 'launcher':
         return run_launcher(args)
     else:

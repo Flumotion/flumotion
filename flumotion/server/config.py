@@ -168,6 +168,8 @@ class FlumotionConfig(ConfigParser):
             kwargs['protocol'] = self.get(section, 'protocol')
         if self.has_option(section, 'location'):
             kwargs['location'] = self.get(section, 'location')
+        if self.has_option(section, 'source'):
+            kwargs['source'] = self.get(section, 'source')
             
         print kwargs
         

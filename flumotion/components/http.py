@@ -86,7 +86,6 @@ class HTTPStreamingResource(resource.Resource):
     def streamer_client_removed_cb(self, streamer, sink, fd):
         request = self.request_hash[fd]
         ip = request.getClientIP()
-        fd = request.transport.fileno()
         self.log(fd, ip, request)
         self.msg('(%d) client from %s disconnected' % (fd, ip))
         del self.request_hash[fd]
@@ -131,7 +130,7 @@ class HTTPStreamingResource(resource.Resource):
             setHeader('Content-type', mime)
 
         os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
-
+        
     def addClient(self, request):
         fd = request.transport.fileno()
         self.request_hash[fd] = request
@@ -140,20 +139,21 @@ class HTTPStreamingResource(resource.Resource):
     def render(self, request):
         self.msg('client from %s connected' % (request.getClientIP()))
     
+        sink = self.streamer.get_sink()
         if not self.isReady():
             self.msg('Not sending data, it\'s not ready')
             return server.NOT_DONE_YET
 
         if self.isAuthenticated(request):
             self.setHeaders(request)
-            self.addClient(request) 
+            self.addClient(request)
             return server.NOT_DONE_YET
         else:
             error_code = http.UNAUTHORIZED
             request.setResponseCode(error_code)
             request.setHeader('server', HTTP_VERSION)
             request.setHeader('content-type', 'text/html')
-            request.setHeader('WWW-Authenticate', 'Basic realm="Restricted Access"')
+            #request.setHeader('WWW-Authenticate', 'Basic realm="Restricted Access"')
 
             return ERROR_TEMPLATE % {'code': error_code,
                                      'error': http.RESPONSES[error_code]}
@@ -195,7 +195,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, gobject.GObject):
     
     def add_client(self, fd):
         sink = self.get_sink()
-        sink.emit('add', fd)
+        stats = sink.emit('add', fd)
          
     def remove_client(self, fd):
         sink = self.get_sink()
@@ -235,7 +235,7 @@ def createComponent(config):
 
     # XXX: How can we do this properly?
     MultifdSinkStreamer.kind = 'streamer'
-    
+
     component = MultifdSinkStreamer(name, sources)
     resource = HTTPStreamingResource(component)
     if config.has_key('logfile'):

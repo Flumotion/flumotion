@@ -28,7 +28,7 @@
   <component type="http-streamer">
     <source location="flumotion.components.http"/>
     <properties>
-      <property name="source" type="str" required="yes"/>
+      <property name="source" type="string" required="yes"/>
       <property name="port" type="int" required="yes"/>
       <property name="logfile" type="string"/>
     </properties>
@@ -37,7 +37,7 @@
   <component type="file-streamer">
     <source location="flumotion.components.file"/>
     <properties>
-      <property name="sources" type="list" required="yes"/>
+      <property name="source" type="string" required="yes"/>
       <property name="location" type="string" required="yes"/>
     </properties>
   </component>

@@ -1,3 +1,10 @@
+2004-08-02  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/server/launcher.py: Kill command line options for
+	individual components
+
+	* flumotion/components/file.py: Move out file streamer here.
+
 2004-07-30  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/server/config.py: More cleaning up, work in progress
