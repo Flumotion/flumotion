@@ -387,7 +387,7 @@ class HTTPStreamingResource(resource.Resource, log.Loggable):
         try:
             os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
         except OSError, e:
-            self.warning('client on fd %d gone before writing header')
+            self.warning('client on fd %d gone before writing header' % fd)
 
     def isReady(self):
         if self.streamer.caps is None:
@@ -636,7 +636,7 @@ class MultifdSinkStreamer(component.ParseLaunchComponent, Stats):
         try:
             os.close(fd)
         except OSError:
-            print "Johan will trap GST_CLIENT_STATUS_ERROR here someday to get rid of OSError"
+            print "fd %d, Johan will trap GST_CLIENT_STATUS_ERROR here someday to get rid of OSError" % d
 
     def feeder_state_change_cb(self, element, old, state):
         component.BaseComponent.feeder_state_change_cb(self, element,
