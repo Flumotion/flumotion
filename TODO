@@ -1,3 +1,6 @@
+* EASY		rename components, files, ... to be uniform
+		(e.g. web-camera -> webcam, ...)
+
 * EASY		remove all old deprecated bundling code everywhere
 
 * EASY		don't throw up the disconnect dialog when exiting admin client

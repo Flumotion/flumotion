@@ -27,73 +27,86 @@ from flumotion.component.base import producer
 from flumotion.component import feedcomponent
 from flumotion.common import log
 
-__all__ = ['bttv']
+# FIXME: rename to TVCard
+# FIXME: what does __all__ *do* ?
+__all__ = ['BTTV']
 
-class bttvMedium(feedcomponent.FeedComponentMedium):
+class BTTVMedium(feedcomponent.FeedComponentMedium):
     def __init__(self, comp):
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
-        # connect to value_changed for colorbalance channels....wierd doesnt get called when we change it
+        # connect to value_changed for colorbalance channels
+        # FIXME: doesn't get called when we change it
         pipeline = comp.get_pipeline()
-        element = pipeline.get_by_name('src')
-
+        element = pipeline.get_by_name('source')
         element.connect('value-changed', self.cb_colorbalance_changed)
 
-    def remote_change_colorbalance(self, type, value):
-        channel = self.comp.change_colorbalance(type,value)
+    def remote_setColorBalanceProperty(self, which, value):
+        channel = self.comp.setColorBalanceProperty(which, value)
 
-        # call callback coz it doesnt get called when we change it
+        # FIXME: call callback coz it doesnt get called when we change it
         if channel:
             pipeline = self.comp.get_pipeline()
-            element = pipeline.get_by_name('src')
-
+            element = pipeline.get_by_name('source')
             self.cb_colorbalance_changed(element, channel, value)
-
 
     def remote_getColorBalanceProperties(self):
         return self.comp.getColorBalanceProperties()
 
     def cb_colorbalance_changed(self, element, channel, value):
-        self.debug('ColorBalance property: %s changed to value: %d' % (channel.label, value))
-        self.callRemote('propertyChanged', self.comp.get_name(), channel.label, value)
+        self.debug('ColorBalance property: %s changed to value: %d' % (
+            channel.label, value))
+        self.callRemote('propertyChanged', self.comp.get_name(), channel.label,
+            value)
         
-class bttv(feedcomponent.ParseLaunchComponent):
-    component_medium_class = bttvMedium
+class BTTV(feedcomponent.ParseLaunchComponent):
+    component_medium_class = BTTVMedium
     def __init__(self, name, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self,name,
                                                     [],
                                                     ['default'],
                                                     pipeline)
-                
-
                                        
-    def change_colorbalance(self, type, value):
+    def setColorBalanceProperty(self, which, value):
+        """
+        Set a color balance property.
+
+        @param which: which property to change
+        @param value: what value to set it to
+        """
         pipeline = self.get_pipeline() 
-        element = pipeline.get_by_name('src')
+        element = pipeline.get_by_name('source')
 
         if self.cb_channels:
             for i in self.cb_channels:
-                log.debug('colorbalance label is %s min is %d max is %d value is %d' % (i.label,i.min_value,i.max_value,element.get_value(i)))
-                if i.label == type and value >= i.min_value and value <= i.max_value:
+                log.debug('colorbalance %s: %d <= %d <= %d' % (
+                    i.label, i.min_value, element.get_value(i), i.max_value))
+                if i.label == which and value >= i.min_value
+                                   and value <= i.max_value:
                     element.set_value(i, value)
                     return i
 
     def getColorBalanceProperties(self):
+        """
+        Returns: a list of (label, min, max, value) tuples.
+        """
         pipeline = self.get_pipeline() 
-        element = pipeline.get_by_name('src')
+        element = pipeline.get_by_name('source')
 
-        retval = [[],[],[],[]]
-        blah = 0
-        if self.cb_channels:
-            for i in self.cb_channels:
-                log.debug('colorbalance label is %s min is %d max is %d value is %d' % (i.label,i.min_value,i.max_value,element.get_value(i)))
-                retval[blah] = [i.label, i.min_value, i.max_value, element.get_value(i)]
-                blah = blah + 1
+        retval = []
+        if not self.cb_channels:
+            return retval
+        for i in self.cb_channels:
+            log.debug('colorbalance %s: %d <= %d <= %d' % (
+                i.label, i.min_value, element.get_value(i), i.max_value))
+            retval.append([i.label, i.min_value, i.max_value,
+                element.get_value(i)])
 
         return retval
 
-
-    def state_changed_cb(self, element, old, new, channel, norm, hue, saturation, brightness, contrast):
+    # called to set initial properties based on state change
+    def state_changed_cb(self, element, old, new, channel, norm,
+                         hue, saturation, brightness, contrast):
         if not (old == gst.STATE_NULL and new == gst.STATE_READY):
             return
     
@@ -108,13 +121,13 @@ class bttv(feedcomponent.ParseLaunchComponent):
         
         self.cb_channels = element.list_colorbalance_channels()
 
-        if hue > -1:
+        if hue:
             self.change_colorbalance('Hue', hue)
-        if saturation > -1:
+        if saturation:
             self.change_colorbalance('Saturation', saturation)
-        if brightness > -1:
+        if brightness:
             self.change_colorbalance('Brightness', brightness)
-        if contrast > -1:
+        if contrast:
             self.change_colorbalance('Contrast', contrast)
         
      
@@ -124,10 +137,10 @@ def createComponent(config):
     height = config.get('height', 240)
     channel = config['channel']
     norm = config['signal']
-    hue = config.get('hue', -1)
-    saturation = config.get('saturation', -1)
-    brightness = config.get('brightness', -1)
-    contrast = config.get('contrast', -1)
+    hue = config.get('hue', None)
+    saturation = config.get('saturation', None)
+    brightness = config.get('brightness', None)
+    contrast = config.get('contrast', None)
 
     # This needs to be done properly
     device_width = width
@@ -137,7 +150,7 @@ def createComponent(config):
 
     framerate = config.get('framerate', 25.0)
     
-    pipeline = ('v4lsrc name=src device=%s copy-mode=true ! '
+    pipeline = ('v4lsrc name=source device=%s copy-mode=true ! '
                 'video/x-raw-yuv,width=%d,height=%d ! videoscale ! '
                 'video/x-raw-yuv,width=%d,height=%d ! videorate ! '
                 'video/x-raw-yuv,framerate=%f') % (device,
@@ -147,9 +160,9 @@ def createComponent(config):
                                                    framerate)
     config['pipeline'] = pipeline
 
-    component = bttv(config['name'], pipeline)
+    component = BTTV(config['name'], pipeline)
     pipeline = component.get_pipeline() 
-    element = pipeline.get_by_name('src')
+    element = pipeline.get_by_name('source')
     element.connect('state-change', component.state_changed_cb,
                     channel, norm, hue, saturation, brightness, contrast)
     

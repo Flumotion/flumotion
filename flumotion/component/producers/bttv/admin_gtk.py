@@ -1,4 +1,7 @@
-# flumotion/component/producers/videotest/admin_gtk.py
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# flumotion/component/producers/videotest/admin_gtk.py:
 # admin client-side code for bttv
 # 
 # Flumotion - a streaming media server
@@ -25,14 +28,7 @@ from flumotion.common import errors
 #import flumotion.component
 from flumotion.component.base import admin_gtk
 
-class bttvAdminGtk(admin_gtk.BaseAdminGtk):
-    # FIXME: do something with this
-    def setUIState(self, state):
-        self.updateLabels(state)
-        if not self.shown:
-            self.shown = True
-            self.statistics.show_all()
-        
+class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
     def render(self):
         # FIXME: gladify
         self.widget = gtk.Table(4,2)
@@ -56,89 +52,95 @@ class bttvAdminGtk(admin_gtk.BaseAdminGtk):
         return self.widget
         
     def getColorBalancePropertiesCallback(self, result):
-        self.debug("%s: minimum: %d maximum: %d value: %d" % (result[0][0], result[0][1], result[0][2], result[0][3]))
+        self.debug("%s: minimum: %d maximum: %d value: %d" % (
+            result[0][0], result[0][1], result[0][2], result[0][3]))
 
         for i in result:
-            # create scale that uses 0 decimal places, and only updates after a little time after user finished moving scale
+            # create scale that uses 0 decimal places,
+            # and only updates after a little time after user
+            # finished moving scale
             scale = gtk.HScale()
             scale.set_range(i[1], i[2])
             scale.set_value(i[3])
             scale.set_increments(1,100)
             scale.set_digits(0)
             scale.set_update_policy(gtk.UPDATE_DELAYED)
-            changeid = scale.connect('value-changed',self.cb_colorbalance_change)
+            change_id = scale.connect('value-changed',
+                self.cb_colorbalance_change)
 
             if i[0] == 'Hue':
-                self.huescale = scale
-                self.huechangeid = changeid
+                self.scale_hue = scale
+                self.hue_changed_id = change_id
             if i[0] == 'Saturation':
-                self.saturationscale = scale
-                self.saturationchangeid = changeid
+                self.scale_saturation = scale
+                self.saturation_changed_id = change_id
             if i[0] == 'Brightness':
-                self.brightnessscale = scale
-                self.brightnesschangeid = changeid
+                self.scale_brightness = scale
+                self.brightness_changed_id = change_id
             if i[0] == 'Contrast':
-                self.contrastscale = scale
-                self.contrastchangeid = changeid
+                self.scale_contrast = scale
+                self.contrast_changed_id = change_id
 
         
 
-        self.widget.attach(self.huescale, 1, 2, 0, 1, gtk.EXPAND|gtk.FILL, 0, 6, 6)
-        self.huescale.show()
+        self.widget.attach(self.scale_hue, 1, 2, 0, 1, gtk.EXPAND|gtk.FILL, 0, 6, 6)
+        self.scale_hue.show()
         
-        self.widget.attach(self.saturationscale, 1, 2, 1, 2, gtk.EXPAND|gtk.FILL, 0, 6, 6)
-        self.saturationscale.show()
+        self.widget.attach(self.scale_saturation, 1, 2, 1, 2, gtk.EXPAND|gtk.FILL, 0, 6, 6)
+        self.scale_saturation.show()
 
-        self.widget.attach(self.brightnessscale, 1, 2, 2, 3, gtk.EXPAND|gtk.FILL, 0, 6, 6)
-        self.brightnessscale.show()
+        self.widget.attach(self.scale_brightness, 1, 2, 2, 3, gtk.EXPAND|gtk.FILL, 0, 6, 6)
+        self.scale_brightness.show()
 
-        self.widget.attach(self.contrastscale, 1, 2, 3, 4, gtk.EXPAND|gtk.FILL, 0, 6, 6)
-        self.contrastscale.show()
+        self.widget.attach(self.scale_contrast, 1, 2, 3, 4, gtk.EXPAND|gtk.FILL, 0, 6, 6)
+        self.scale_contrast.show()
         
 
     def getColorBalancePropertiesErrback(self, failure):
-        self.warning("Failure %s getting color balance properties: %s" % (failure.type, failure.getErrorMessage()))
+        self.warning("Failure %s getting color balance properties: %s" % (
+            failure.type, failure.getErrorMessage()))
         return None
     
     def cb_colorbalance_change(self, scale):
         value = scale.get_value()
         label = ""
-        if scale == self.huescale:
+        if scale == self.scale_hue:
             label = "Hue"
-        if scale == self.saturationscale:
+        if scale == self.scale_saturation:
             label = "Saturation"
-        if scale == self.brightnessscale:
+        if scale == self.scale_brightness:
             label = "Brightness"
-        if scale == self.contrastscale:
+        if scale == self.scale_contrast:
             label = "Contrast"
         log.debug('changing colorbalance %s to %d' % (label, value))
-        d = self.callRemote("change_colorbalance", label, int(value))
-        d.addErrback(self.colorbalanceChangeErrBack)
+        d = self.callRemote("setColorBalanceProperty", label, int(value))
+        d.addErrback(self.colorbalanceChangeErrback)
 
-    def colorbalanceChangeErrBack(self,failure):
-        self.warning("Failure %s changing filename: %s" % (failure.type, failure.getErrorMessage()))
+    def colorbalanceChangeErrback(self,failure):
+        self.warning("Failure %s changing colorbalance: %s" % (failure.type,
+            failure.getErrorMessage()))
 
     def propertyChanged(self, name, value):
         self.debug('property %s changed to %d' % (name, value))
 
-        changeid = -1
+        change_id = -1
         if name == 'Hue':
-            scale = self.huescale
-            changeid = self.huechangeid
+            scale = self.scale_hue
+            change_id = self.hue_changed_id
         if name == 'Saturation':
-            scale = self.saturationscale
-            changeid = self.saturationchangeid
+            scale = self.scale_saturation
+            change_id = self.saturation_changed_id
         if name == 'Brightness':
-            scale = self.brightnessscale
-            changeid = self.brightnesschangeid
+            scale = self.scale_brightness
+            change_id = self.brightness_changed_id
         if name == 'Contrast':
-            scale = self.contrastscale
-            changeid = self.contrastchangeid
+            scale = self.scale_contrast
+            change_id = self.contrast_changed_id
 
-        if changeid != -1:
-            scale.handler_block(changeid)
+        if change_id != -1:
+            scale.handler_block(change_id)
             scale.set_value(value)
-            scale.handler_unblock(changeid)
+            scale.handler_unblock(change_id)
             
 
-GUIClass = bttvAdminGtk
+GUIClass = BTTVAdminGtk

@@ -1,5 +1,12 @@
 2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* TODO:
+	* flumotion/component/producers/bttv/admin_gtk.py:
+	* flumotion/component/producers/bttv/bttv.py:
+	  style fixing
+
+2004-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/steps.py:
 	  make bttv one like webcam one
 
