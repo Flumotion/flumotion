@@ -1,3 +1,8 @@
+2004-11-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/wizard.py:
+	  make wizard remember last chosen worker.  fixes issue #76
+
 2004-11-03  Johan Dahlin  <johan@gnome.org>
 
 	* configure.ac: Check for gst.interfaces and gtk.glade

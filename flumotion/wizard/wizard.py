@@ -334,7 +334,9 @@ class Wizard(gobject.GObject, log.Loggable):
     sidebar_color = gtk.gdk.color_parse('#9bc6ff')
     main_color = gtk.gdk.color_parse('white')
     sidebar_active_color = gtk.gdk.color_parse('#79abed')
+    
     gsignal('finished', str)
+    
     logCategory = 'wizard'
 
     def __init__(self, admin=None):
@@ -354,6 +356,7 @@ class Wizard(gobject.GObject, log.Loggable):
         self.steps = []
         self.stack = Stack()
         self.current_step = None
+        self._last_worker = 0 # combo id last worker from step to step
 
     def __getitem__(self, stepname):
         for item in self.steps:
@@ -457,10 +460,13 @@ class Wizard(gobject.GObject, log.Loggable):
         step.activated()
 
     def _combobox_worker_changed(self, combobox, step):
+        self._last_worker = combobox.get_active()
         self._setup_worker(step)
         step.worker_changed()
         
     def _append_workers(self, step):
+        # called for each new page to put in the worker drop down box
+        # if the step needs a worker
         if not step.has_worker:
             self.combobox_worker = None
             return
@@ -488,7 +494,7 @@ class Wizard(gobject.GObject, log.Loggable):
         box.pack_start(self.combobox_worker, False, False, 6)
         map(self.combobox_worker.append_text, self._workers)
             
-        self.combobox_worker.set_active(0)
+        self.combobox_worker.set_active(self._last_worker)
         self.combobox_worker.show()
         
     def show_previous(self):
