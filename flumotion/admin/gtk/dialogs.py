@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_dialogs -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # flumotion/admin/gtk/progressdialog.py: a pulsating progress dialog
@@ -60,22 +60,24 @@ class ProgressDialog(gtk.Dialog):
         self.bar.pulse()
         return True
 
-def show_error_dialog(message, parent, response=True):
+class ErrorDialog(gtk.MessageDialog):
+    def __init__(self, message, parent=None, close_on_response=True):
+        gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
+            gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
+        if close_on_response:
+            self.connect("response", lambda self, response: self.hide())
+
+def show_error_dialog(message, parent, close_on_response=True):
     """
     Show an error message dialog.
 
     @param message the message to display.
     @param parent the gtk.Window parent window.
-    @param response whether the error dialog should go away after response.
+    @param close_on_response whether the error dialog should go away after response.
 
     returns: the error dialog.
     """
-    d = gtk.MessageDialog(parent, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR,
-        gtk.BUTTONS_OK, message)
-    if response:
-        d.connect("response", lambda self, response: self.destroy())
-    d.show_all()
-    return d
+    return ErrorDialog(message, parent, close_on_response)
 
 class PropertyChangeDialog(gtk.Dialog):
     """
@@ -92,9 +94,9 @@ class PropertyChangeDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, title, parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         self.connect('response', self.response_cb)
-        self.add_button('Close', gtk.RESPONSE_CLOSE)
-        self.add_button('Set', gtk.RESPONSE_APPLY)
-        self.add_button('Fetch current', self.RESPONSE_FETCH)
+        self._close = self.add_button('Close', gtk.RESPONSE_CLOSE)
+        self._set = self.add_button('Set', gtk.RESPONSE_APPLY)
+        self._fetch = self.add_button('Fetch current', self.RESPONSE_FETCH)
 
         hbox = gtk.HBox()
         hbox.show()
@@ -132,28 +134,9 @@ class PropertyChangeDialog(gtk.Dialog):
             self.emit('get', self.element_entry.get_text(),
                       self.property_entry.get_text())
         elif response == gtk.RESPONSE_CLOSE:
-            dialog.destroy()
+            dialog.hide()
 
     def update_value_entry(self, value):
         self.value_entry.set_text(str(value))
     
 gobject.type_register(PropertyChangeDialog)
-
-
-def test():
-    window = gtk.Window()
-    dialog = ProgressDialog("I am busy", 'Doing lots of complicated stuff', window)
-    dialog.start()
-
-    def stop(dialog):
-        dialog.stop()
-        gtk.main_quit()
-        
-    gobject.timeout_add(1000, lambda dialog: dialog.message('Step 1'), dialog)
-    gobject.timeout_add(2000, lambda dialog: dialog.message('Step 2 but with a lot longer text so we test shrinking'), dialog)
-    gobject.timeout_add(3000, lambda dialog: dialog.message('Step 3'), dialog)
-    gobject.timeout_add(5000, stop, dialog)
-    gtk.main()
-
-if __name__ == '__main__':
-    test()

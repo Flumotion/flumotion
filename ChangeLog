@@ -1,3 +1,10 @@
+2005-01-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_dialogs.py:
+	  testsuite for dialogs
+
 2004-12-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/disker/disker.py:
