@@ -1,5 +1,11 @@
 2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/registry.py:
+	  raise a useful error message when parsing of registry xml files
+	  fails
+
+2005-04-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/componentui.py:
 	  remove all of the commented-out code
 	* flumotion/test/test_common_componentui.py:

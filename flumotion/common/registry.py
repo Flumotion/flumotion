@@ -227,7 +227,11 @@ class RegistryParser(log.Loggable):
             return minidom.parseString(string)
         else:
             self.debug('Parsing XML file: %s' % os.path.basename(filename))
-            return minidom.parse(filename)
+            try:
+                return minidom.parse(filename)
+            except expat.ExpatError, e:
+                raise XmlParserError('Error parsing XML file %s: %s: %s' % (
+                    filename, common.objRepr(e), ' '.join(e.args)))
         
     def getComponents(self):
         return self._components.values()
