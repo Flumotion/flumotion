@@ -22,6 +22,8 @@
 
 import gtk
         
+from twisted.internet import defer
+
 from flumotion.common import errors
 from flumotion.configure import configure
 from flumotion.wizard import wizard
@@ -135,41 +137,60 @@ class VideoSource(wizard.WizardStep):
         return options
 
 
+def _checkChannels(device):
+    from twisted.internet import defer, reactor
+    import gst
+    import gst.interfaces
+
+    d = defer.Deferred()
+
+    # gst, defer and errors are already in the namespace 
+    def state_changed_cb(pipeline, old, new):
+        if not (old == gst.STATE_NULL and new == gst.STATE_READY):
+            return
+        element = pipeline.get_by_name('source')
+        deviceName = element.get_property('device-name')
+        channels = [channel.label for channel in element.list_channels()]
+        norms = [norm.label for norm in element.list_norms()]
+        reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
+        d.callback((deviceName, channels, norms))
+                
+    def error_cb(pipeline, element, error, _):
+        d.errback(errors.UnknownDeviceError("The device does not exist"))
+
+    pipeline = 'v4lsrc name=source device=%s ! fakesink' % device
+    bin = gst.parse_launch(pipeline)
+    bin.connect('state-change', state_changed_cb)
+    bin.connect('error', error_cb)
+    bin.set_state(gst.STATE_PLAYING)
+
+    return d
+
+
 class TVCard(VideoSource):
     step_name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
     icon = 'tv.png'
 
-    code = """
-from twisted.internet import defer
-from flumotion.common import errors
-import gst
-import gst.interfaces
-
-def state_changed_cb(pipeline, old, new, d):
-    if old == gst.STATE_NULL and new == gst.STATE_READY:
-        element = pipeline.get_by_name('source')
-        channels = [channel.label for channel in element.list_channels()]
-        norms = [norm.label for norm in element.list_norms()]
-        reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
-        d.callback((channels, norms))
-def error_cb(pipeline, element, error, _, d):
-    d.errback(errors.UnknownDeviceError("The device does not exist"))
-d = defer.Deferred()        
-pipeline = gst.parse_launch('v4lsrc name=source device=%s ! fakesink')
-pipeline.connect('state-change', state_changed_cb, d)
-pipeline.connect('error', error_cb, d)
-pipeline.set_state(gst.STATE_PLAYING)
-"""
     def on_combobox_device_changed(self, combo):
         self.update_channels()
 
+    def worker_changed(self):
+        self.clear_combos()
+        self.update_channels()
+        
     def before_show(self):
         self.clear_combos()
         self.update_channels()
         
-    def _queryCallback(self, (channels, norms)):
+    def clear_combos(self):
+        self.combobox_signal.clear()
+        self.combobox_signal.set_sensitive(False)
+        self.combobox_channel.clear()
+        self.combobox_channel.set_sensitive(False)
+        
+    def _queryCallback(self, (deviceName, channels, norms)):
         self.wizard.block_next(False)
         self.combobox_signal.set_list(norms)
         self.combobox_signal.set_sensitive(True)
@@ -180,24 +201,26 @@ pipeline.set_state(gst.STATE_PLAYING)
         failure.trap(errors.UnknownDeviceError)
         self.clear_combos()
         
-    def clear_combos(self):
-        self.combobox_signal.clear()
-        self.combobox_signal.set_sensitive(False)
-        self.combobox_channel.clear()
-        self.combobox_channel.set_sensitive(False)
-        
     def update_channels(self):
         self.wizard.block_next(True)
-        admin = self.wizard.get_admin()
-        if not admin:
-            print 'skipping query'
-            return
         
         device = self.combobox_device.get_string()
-        code = self.code % device
-        d = admin.runCode(self.worker, code, 'd')
+        d = self.workerRun(_checkChannels, device)
         d.addCallback(self._queryCallback)
         d.addErrback(self._unknownDeviceErrback)
+        
+    def workerRun(self, function, *args):
+        admin = self.wizard.get_admin()
+        worker = self.worker
+        d = defer.fail()
+        
+        if not admin:
+            print 'skipping query, no admin'
+        elif not worker:
+            print 'skipping query, no worker'
+        else:
+            d = admin.workerRun(worker, function, *args)
+        return d
         
     def get_component_properties(self):
         options = {}

@@ -325,6 +325,10 @@ class WizardStep(object, log.Loggable):
         is created and in place
         
         This can be implemented in a subclass."""
+
+    def worker_changed(self):
+        pass
+    
 
 class Wizard(gobject.GObject, log.Loggable):
     sidebar_color = gtk.gdk.color_parse('#9bc6ff')
@@ -342,7 +346,6 @@ class Wizard(gobject.GObject, log.Loggable):
         self.eventbox_main.modify_bg(gtk.STATE_NORMAL, self.main_color)
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))
-
         self._admin = admin
         self._save = save.WizardSaver(self)
         self._use_main = True
@@ -434,6 +437,10 @@ class Wizard(gobject.GObject, log.Loggable):
         widget.show()
         step.activated()
 
+    def _combobox_worker_changed(self, combobox, step):
+        self._setup_worker(step)
+        step.worker_changed()
+        
     def _append_workers(self, step):
         if not step.has_worker:
             self.combobox_worker = None
@@ -456,6 +463,9 @@ class Wizard(gobject.GObject, log.Loggable):
         box.show()
 
         self.combobox_worker = gtk.combo_box_new_text()
+        self.combobox_worker.connect('changed',
+                                     self._combobox_worker_changed, step)
+        
         box.pack_start(self.combobox_worker, False, False, 6)
         map(self.combobox_worker.append_text, self._workers)
             

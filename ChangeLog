@@ -1,3 +1,10 @@
+2004-10-25  Johan Dahlin  <johan@gnome.org>
+
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+
+	Allow you to change worker and make things easily updatable
+
 2004-10-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/wizard_vorbis.glade:
