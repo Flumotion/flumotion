@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_greeter -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -22,7 +22,6 @@
 import os
 
 import sys
-import copy
 
 import gobject
 import gtk
@@ -90,9 +89,14 @@ class Wizard(gobject.GObject):
 
     def __init__(self, name, initial_page):
         self.__gobject_init__()
+
+        self.window = None
+        self.page_bin = None
+
         self.create_ui()
         self.name = name
-        self._dict = frame = sys._getframe(1).f_globals
+        frame = sys._getframe(1).f_globals
+        self._dict = frame
         self.set_page(initial_page)
 
     def create_ui(self):
@@ -111,7 +115,7 @@ class Wizard(gobject.GObject):
                     raise AssertionError('window for %r is visible' % self)
             
             name = widget.get_name()
-            if hasattr(self, name):
+            if hasattr(self, name) and self.name:
                 raise AssertionError(
                     "There is already an attribute called %s in %r" % (name,
                                                                        self))

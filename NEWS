@@ -1,4 +1,14 @@
-This is Flumotion 0.1.4, "NH Hoteles".
+This is Flumotion 0.1.5, "London Bar".
+
+Issues fixed since 0.1.4:
+
+ticket	summary
+31	RGB test source does not work
+69	Logitech Webcam(quickcam) causes flumotion-worker to hang during
+	configuration
+144	make clean breaks uninstalled launch
+59	mention authorization (.pem/planet.xml) in README
+163	flumotion hangs sometimes on overlay
 
 Issues fixed since 0.1.3:
 
@@ -58,3 +68,4 @@ ticket	summary
 56	traceback in wizard with webcam
 38	trac URL wrong
 46	check for twisted 1.3.0 in configure
+

@@ -1,3 +1,16 @@
+=== release 0.1.5 ===
+
+2005-01-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* NEWS:
+	* configure.ac:
+	  releasing 0.1.5, "London Bar"
+
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/admin/gtk/wizard.py:
+	* flumotion/test/test_greeter.py:
+	  fix pychecker warnings; add testsuite headers
+
 2005-01-21  Andy Wingo  <wingo@pobox.com>
 
 	* data/glade/admin-wizard.glade: Glade file for the generic

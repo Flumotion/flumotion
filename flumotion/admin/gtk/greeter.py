@@ -19,11 +19,10 @@
 # Headers in this file shall remain intact.
 
 
-import gobject
 import gtk
 import gtk.glade
 
-import flumotion.admin.gtk.wizard
+from flumotion.admin.gtk import wizard
 
 
 # A wizard run when the user first starts flumotion.
