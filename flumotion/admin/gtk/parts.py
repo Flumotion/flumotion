@@ -137,6 +137,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
               False, construct=True)
     gproperty(bool, 'can-stop-any', 'True if any component can be stopped',
               False, construct=True)
+    _model = _view = _moodPixbufs = None # i heart pychecker
     
     def __init__(self, tree_widget):
         """
