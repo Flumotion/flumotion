@@ -40,6 +40,7 @@ pychecker:
 	    flumotion/component/*/*.py 		\
 	    flumotion/manager/*.py 		\
 	    flumotion/worker/*.py 		\
+	    flumotion/ui/*.py			\
 	    flumotion/utils/*.py		\
 	2> /dev/null
 

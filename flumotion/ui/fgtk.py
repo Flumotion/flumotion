@@ -24,12 +24,10 @@
 I am a collection of extended GTK widgets for use in Flumotion.
 """
 
-import os
-
-import gobject
 import gtk
 import gtk.gdk
 import gtk.glade
+import gobject
 
 from flumotion.common import enum
 
@@ -176,11 +174,12 @@ class WidgetMapping:
     # as it is internally, eg failback to the real GType, by doing
     # this PyMapping_GetItemString will never set the error.
     
-    types = dict(GtkCheckButton=FCheckButton,
-                 GtkComboBox=FComboBox,
-                 GtkEntry=FEntry,
-                 GtkRadioButton=FRadioButton,
-                 GtkSpinButton=FSpinButton)
+    types = { 'GtkCheckButton': FCheckButton,
+              'GtkComboBox': FComboBox,
+              'GtkEntry': FEntry,
+              'GtkRadioButton': FRadioButton,
+              'GtkSpinButton': FSpinButton
+            }
     
     def __getitem__(self, name):
         if self.types.has_key(name):

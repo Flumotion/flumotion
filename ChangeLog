@@ -1,5 +1,11 @@
 2004-12-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* flumotion/ui/fgtk.py:
+	  fix up pychecker warnings and add to check
+
+2004-12-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/enum.py:
 	* flumotion/test/test_enum.py:
 	  make pychecker happy
