@@ -28,7 +28,7 @@ import socket
 
 import gobject
 
-from twisted.internet import reactor, error
+from twisted.internet import reactor, error, defer
 from twisted.cred import error as crederror
 from twisted.spread import pb
 
@@ -139,8 +139,8 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         return self.remote != None
 
     # call function on remote perspective in manager
-    def callRemoteErrback(self, failure):
-        self.warning('callRemote failed because of %r' % failure)
+    def callRemoteErrback(self, failure, name):
+        self.warning('callRemote(%s) failed because of %r' % (name, failure))
         failure.trap(pb.PBConnectionLost)
         
     def callRemote(self, name, *args, **kwargs):
@@ -160,7 +160,7 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
         except pb.DeadReferenceError:
             return
         
-        d.addErrback(self.callRemoteErrback)
+        d.addErrback(self.callRemoteErrback, name)
         return d
 
     ### our methods
@@ -202,9 +202,15 @@ class BaseComponentMedium(pb.Referenceable, log.Loggable):
        
     def remote_stop(self):
         self.info('Stopping job')
+        d = defer.maybeDeferred(self.comp.stop)
+        d.addCallback(self._destroyCallback)
+
+        return d
+
+    def _destroyCallback(self, result):
+        self.debug('_destroyCallback: losing connection and stopping reactor')
         reactor.callLater(0, self.remote.broker.transport.loseConnection)
         reactor.callLater(0, reactor.stop)
-        return self.comp.stop()
 
     def remote_reloadComponent(self):
         """Reload modules in the component."""
@@ -296,13 +302,16 @@ class BaseComponent(log.Loggable, gobject.GObject):
         """
         Start sending heartbeats.
         """
+        self.debug('start sending heartbeats')
         self._heartbeat()
 
     def stopHeartbeat(self):
         """
         Stop sending heartbeats.
         """
+        self.debug('stop sending heartbeats')
         if self._HeartbeatDC:
+            self.debug('canceling pending heartbeat')
             self._HeartbeatDC.cancel()
         self._HeartbeatDC = None
          
@@ -384,6 +393,5 @@ class BaseComponent(log.Loggable, gobject.GObject):
         The job process will also finish.
         """
         self.stopHeartbeat()
-        self.stop()
 
 gobject.type_register(BaseComponent)

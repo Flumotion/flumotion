@@ -284,6 +284,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning('Changing state to %s failed' %
                     gst.element_state_get_name(state))
         gobject.idle_add(self.pipeline.iterate)
+        return retval
 
     def get_pipeline(self):
         return self.pipeline
@@ -315,7 +316,7 @@ class FeedComponent(basecomponent.BaseComponent):
         if not self.pipeline:
             return
         
-        retval = self.pipeline.set_state(gst.STATE_NULL)
+        retval = self.set_state_and_iterate(gst.STATE_NULL)
         if not retval:
             self.warning('Setting pipeline to NULL failed')
 
@@ -484,6 +485,8 @@ class FeedComponent(basecomponent.BaseComponent):
     def stop(self):
         self.debug('Stopping')
         self.pipeline_stop()
+        self.debug('Stopped')
+        basecomponent.BaseComponent.stop(self)
 
     def pause(self):
         self.debug('Pausing')

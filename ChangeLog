@@ -1,5 +1,12 @@
 2005-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent.py:
+	  fix some error handling
+	  fix heartbeat callback cleanup
+
+2005-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/admin_gtk.py:
 	* flumotion/component/component.py:
 	* flumotion/component/feedcomponent.py:
