@@ -51,3 +51,46 @@ def formatStorage(units, precision = 2):
 
     format = "%%.%df %%s" % precision
     return format % (value, prefix)
+
+def formatTime(seconds):
+    """
+    Nicely format time in a human-readable format.
+    Will chunks weeks, days, hours and minutes.
+
+    @param seconds: the time in seconds to format.
+    @type  seconds: int or float
+
+    @rtype: string
+    @returns: a nicely formatted time string.
+    """
+    chunks = []
+    
+    week = 60 * 60 * 24 * 7
+    weeks = seconds / week
+    seconds %= week
+
+    day = 60 * 60 * 24
+    days = seconds / day
+    seconds %= day
+
+    hour = 60 * 60
+    hours = seconds / hour
+    seconds %= hour
+
+    minute = 60
+    minutes = seconds / minute
+    seconds %= minute
+
+    if weeks > 1:
+        chunks.append('%d weeks' % weeks)
+    elif weeks == 1:
+        chunks.append('1 week')
+
+    if days > 1:
+        chunks.append('%d days' % days)
+    elif days == 1:
+        chunks.append('1 day')
+
+    chunks.append('%02d:%02d' % (hours, minutes))
+
+    return " ".join(chunks)

@@ -1,6 +1,12 @@
 2004-09-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:
+	* flumotion/test/test_common.py:
+	  nicely format time with common.formatTime()
+
+2004-09-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
 	* flumotion/component/http/http.py:
 	  display SI units
 

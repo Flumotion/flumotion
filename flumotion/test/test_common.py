@@ -57,6 +57,48 @@ class TestFormatStorage(unittest.TestCase):
     def testExbibyte(self):
         value = 1024 * 1024 * 1024 * 1024 * 1024 * 1024
         assert common.formatStorage(value, 4) == "1.1529 E"
+
+class TestFormatTime(unittest.TestCase):
+    def testSecond(self):
+        value = 1
+        assert common.formatTime(value) == "00:00"
+
+    def testMinuteSecond(self):
+        value = 60 + 1
+        assert common.formatTime(value) == "00:01"
+
+    def testHourMinuteSecond(self):
+        value = 60 * 60 + 60 + 2
+        assert common.formatTime(value) == "01:01"
+
+    def testDay(self):
+        value = 60 * 60 * 24
+        assert common.formatTime(value) == "1 day 00:00"
+
+    def testDays(self):
+        value = 60 * 60 * 24 * 2
+        assert common.formatTime(value) == "2 days 00:00"
     
+    def testWeek(self):
+        value = 60 * 60 * 24 * 7
+        assert common.formatTime(value) == "1 week 00:00"
+    
+    def testWeeks(self):
+        value = 60 * 60 * 24 * 7 * 2
+        assert common.formatTime(value) == "2 weeks 00:00"
+    
+    def testYear(self):
+        value = 60 * 60 * 24 * 365
+        assert common.formatTime(value) == "52 weeks 1 day 00:00"
+    
+    def testReallyLong(self):
+        minute = 60
+        hour = minute * 60
+        day = hour * 24
+        week = day * 7
+        
+        value = week * 291 + day * 5 + hour * 13 + minute * 5
+        assert common.formatTime(value) == "291 weeks 5 days 13:05"
+     
 if __name__ == '__main__':
     unittest.main()
