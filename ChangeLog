@@ -1,6 +1,15 @@
 2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/medium.py:
+	* flumotion/configure/uninstalled.py.in:
+	* tools/pycheckerhelp.py:
+	  fix make distcheck again
+
+2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
 	  add pycheckersplit target for maximum CPU usage
 	* TODO:
 	  some notes

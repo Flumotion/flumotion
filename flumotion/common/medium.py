@@ -22,7 +22,6 @@ from twisted.spread import pb
 
 from flumotion.common import log, interfaces, bundleclient, errors
 
-
 class BaseMedium(pb.Referenceable, log.Loggable):
     """
     I am a base interface for PB client-side mediums interfacing with

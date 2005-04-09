@@ -26,29 +26,25 @@ def get():
     # toplevel dir
     __toplevel = os.path.normpath(os.path.join(__thisdir, '..', '..'))
 
-    # some special magic for the registry location
-    registrydir = os.path.join(__toplevel, 'cache', 'registry')
-    rundir = os.path.join(__toplevel, 'run')
+    __toplevelwrite = __toplevel
+
     # distcheck hack: if we live in a path containing _build, it means
     # we're running in distcheck mode and we should write everything
     # under the writable builddir
     if os.getcwd().find('_build') > -1:
         srcdir = os.getcwd().split('_build')[0]
-        top_builddir = os.path.join(srcdir, '_build')
-
-        registrydir = os.path.join(top_builddir, 'cache', 'registry')
-        rundir = os.path.join(top_builddir, 'run')
+        __toplevelwrite = os.path.join(srcdir, '_build')
 
     ret = {
         'isinstalled': False,
-        'cachedir':      os.path.join(__toplevel, 'cache'),
-        'configdir':     os.path.join(__toplevel, 'conf'),
-        'gladedir':      os.path.join(__toplevel, 'data', 'glade'),
-        'imagedir':      os.path.join(__toplevel, 'data', 'image'),
-        'logdir':        os.path.join(__toplevel, 'log'),
+        'cachedir':      os.path.join(__toplevelwrite, 'cache'),
+        'configdir':     os.path.join(__toplevel,      'conf'),
+        'gladedir':      os.path.join(__toplevel,      'data', 'glade'),
+        'imagedir':      os.path.join(__toplevel,      'data', 'image'),
+        'logdir':        os.path.join(__toplevelwrite, 'log'),
         'pythondir':     os.path.join(__toplevel),
-        'registrydir':   registrydir,
-        'rundir':        rundir,
+        'registrydir':   os.path.join(__toplevelwrite, 'cache', 'registry'),
+        'rundir':        os.path.join(__toplevelwrite, 'run'),
         'version':       '@VERSION@',
     }
 

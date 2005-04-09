@@ -10,8 +10,9 @@ import gtk
 import gtk.gdk
 import gtk.glade
 
-#import gst
-#import gst.interfaces
+import gst
+import gst.interfaces
+e = gst.element_factory_make('fakesrc')
 
 import pyexpat
 
