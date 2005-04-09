@@ -214,5 +214,7 @@ debug = 0
 suppressions = {
   # FIXME: Consumption has a get_next with steps=None
   'flumotion.wizard.steps.Consumption': "no-override",
+  # FIXME: the import there is for registering steps; do an actual method
+  'flumotion.wizard.wizard.Wizard': "no-import",
 #  'flumotion.twisted.defer.defer_generator': "self=wrapperself",
 }

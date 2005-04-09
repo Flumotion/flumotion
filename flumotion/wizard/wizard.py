@@ -696,7 +696,9 @@ class Wizard(gobject.GObject, log.Loggable):
 
     def load_steps(self):
         global _steps
-        
+        # this import registers steps with us, but this should be done better.
+        import flumotion.wizard.steps 
+
         self.add_step(_steps[0], initial=True)
         
         for step_class in _steps[1:]:
