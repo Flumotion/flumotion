@@ -1,3 +1,9 @@
+2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/twisted/defer.py:
+	  make a c_defer_generator to be used for instance methods
+
 2005-04-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/admin.py (AdminModel.setRemoteReference): Molest

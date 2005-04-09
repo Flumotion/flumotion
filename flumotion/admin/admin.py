@@ -35,9 +35,9 @@ from twisted.python import rebuild, reflect
 
 from flumotion.common import bundle, common, errors, interfaces, log
 from flumotion.common import keycards, worker, planet, medium
-from flumotion.twisted import flavors
-from flumotion.twisted.defer import defer_generator
 # serializable worker and component state
+from flumotion.twisted import flavors
+from flumotion.twisted.defer import c_defer_generator
 
 from flumotion.configure import configure
 from flumotion.common import reload
@@ -86,7 +86,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
         except error.ConnectionRefusedError:
             self.debug("emitting connection-refused")
-            self.emit('connection-refused')
+            self.medium.emit('connection-refused')
             self.debug("emitted connection-refused")
 
         except crederror.UnauthorizedLogin:
@@ -98,9 +98,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         except Exception, e:
             self.medium._defaultErrback(e)
 
-    gotDeferredLogin = defer_generator(gotDeferredLogin)
+    gotDeferredLogin = c_defer_generator(gotDeferredLogin)
         
-
 # FIXME: stop using signals, we can provide a richer interface with actual
 # objects and real interfaces for the views a model communicates with
 class AdminModel(medium.BaseMedium, gobject.GObject):
@@ -225,7 +224,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self.debug('Connected to manager and retrieved all state')
         self.state = 'connected'
         self.emit('connected')
-    setRemoteReference = defer_generator(setRemoteReference)
+    setRemoteReference = c_defer_generator(setRemoteReference)
 
     def callViews(self, methodName, *args, **kwargs):
         """
