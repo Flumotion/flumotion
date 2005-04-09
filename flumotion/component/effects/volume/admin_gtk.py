@@ -41,8 +41,6 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         return d
 
     def _loadGladeFileCallback(self, widgetTree):
-        from flumotion.ui import fgtk
-
         self.wtree = widgetTree
         self.volume = self.wtree.get_widget('volume-widget')
         self.scale_volume = self.wtree.get_widget('level-widget')

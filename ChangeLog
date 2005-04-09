@@ -1,6 +1,15 @@
 2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:
+	  remove stuff from blacklist after fixing
+	* flumotion/component/converters/overlay/overlay.py:
+	  rework so we can use a safe function
+	* flumotion/component/effects/volume/admin_gtk.py:
+	  remove an import
+
+2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
 	* flumotion/common/Makefile.am:
 	* flumotion/common/medium.py:
 	* flumotion/configure/uninstalled.py.in:

@@ -58,8 +58,6 @@ PYCHECKER_WHITELIST = \
 	    flumotion/admin/*/*/*.py
 
 PYCHECKER_BLACKLIST = \
-	flumotion/component/converters/overlay/overlay.py \
-	flumotion/component/producers/firewire/firewire.py \
 	flumotion/worker/checks/video.py
 
 pycheckersplit:

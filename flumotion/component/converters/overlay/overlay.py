@@ -27,14 +27,38 @@ from flumotion.component.converters.overlay import genimg
 
 import tempfile
 
-FILENAME = tempfile.mktemp('flumotion.png')
-
 class Overlay(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, eaters, pipeline):
+    def __init__(self, name, eaters, pipeline, config):
+        self._filename = None
+        self._config = config
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     eaters,
                                                     ['default'],
                                                     pipeline)
+
+    def start(self, eatersData, feedersData):
+        # create temp file
+        (fd, self._filename) = tempfile.mkstemp('flumotion.png')
+        os.close(fd)
+
+        text = None
+        if self._config['show_text']:
+            text = self._config['text']
+        print "THOMAS: text: %s" % text
+        print "THOMAS: config: %r" % self._config
+        genimg.generate_overlay(self._filename,
+                                text,
+                                self._config.get('fluendo_logo', False),
+                                self._config.get('cc_logo', False),
+                                self._config.get('xiph_logo', False),
+                                self._config['width'],
+                                self._config['height'])
+        
+        source = self.get_element('source')
+        source.set_property('location', self._filename)
+
+        return feedcomponent.ParseLaunchComponent.start(self,
+            eatersData, feedersData)
 
     def stop(self):
         # clean up our temp file
@@ -42,8 +66,9 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         # since now I do this before chaining, while FeedComp does it after
         # chaining, so it's messy
         feedcomponent.ParseLaunchComponent.stop(self)
-        self.debug('Removing temporary overlay file %s' % FILENAME)
-        os.unlink(FILENAME)
+        self.debug('Removing temporary overlay file %s' % self._filename)
+        os.unlink(self._filename)
+        self._filename = None
         
 def createComponent(config):
     source = config['source']
@@ -52,22 +77,7 @@ def createComponent(config):
     component = Overlay(config['name'], [source],
                         "filesrc name=source blocksize=100000 ! " + \
                         "pngdec ! alphacolor ! videomixer name=mix ! @ feeder:: @ " + \
-                        "%s ! ffmpegcolorspace ! alpha ! mix." % eater)
-    
-
-    if config.get('show_text'):
-        text = config.get('text', None)
-    else:
-        text = None
-
-    genimg.generate_overlay(FILENAME, text,
-                            config.get('fluendo_logo', False),
-                            config.get('cc_logo', False),
-                            config.get('xiph_logo', False),
-                            config['width'], config['height'])
-    
-    source = component.get_element('source')
-    source.set_property('location', FILENAME)
+                        "%s ! ffmpegcolorspace ! alpha ! mix." % eater, config)
     
     return component
 
