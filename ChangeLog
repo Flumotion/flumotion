@@ -1,6 +1,14 @@
 2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	* misc/pycheckerrc:
+	  make wizard be checked as well
+
+2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
 	  remove stuff from blacklist after fixing
 	* flumotion/component/converters/overlay/overlay.py:
 	  rework so we can use a safe function

@@ -35,6 +35,10 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      AudioTestSamplerate, TVCardDevice, TVCardSignal, \
      VideoDevice, VideoTestFormat, VideoTestPattern
 
+# pychecker doesn't like the auto-generated widget attrs
+# or the extra args we name in callbacks
+__pychecker__ = 'no-classattr no-argsused'
+
 class Welcome(wizard.WizardStep):
     step_name = 'Welcome'
     glade_file = 'wizard_welcome.glade'
@@ -455,7 +459,7 @@ class Overlay(wizard.WizardStep):
     icon = 'overlay.png'
 
     def before_show(self):
-        d = self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
+        self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
             'videomixer', 'alpha')
         # FIXME: add a PIL check here
         

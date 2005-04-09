@@ -36,6 +36,10 @@ from flumotion.twisted import flavors
 
 from flumotion.common.pygobject import gsignal
 
+# pychecker doesn't like the auto-generated widget attrs
+# or the extra args we name in callbacks
+__pychecker__ = 'no-classattr no-argsused'
+
 def escape(text):
     return text.replace('&', '&amp;')
 
@@ -538,7 +542,6 @@ class Wizard(gobject.GObject, log.Loggable):
         hbox = gtk.HBox(0, False)
         hbox.show()
 
-        text = escape(name)
         button = gtk.Button('')
         button.modify_bg(gtk.STATE_PRELIGHT, self.sidebar_pre_bg)
         button.modify_bg(gtk.STATE_ACTIVE, self.sidebar_pre_bg)
@@ -573,7 +576,7 @@ class Wizard(gobject.GObject, log.Loggable):
         else:
             button.connect('clicked', button_clicked_cb, steps[0])
             
-        current = self.current_step
+        # current = self.current_step
 
         # We want to mark what the current step is, but I don't think
         # that using sensitivity is a good idea, because your text will
@@ -600,7 +603,7 @@ class Wizard(gobject.GObject, log.Loggable):
     def _sidebar_add_substeps(self, section):
         filtered_steps = [step for step in self.steps
                                    if (step.get_section() == section and
-                                       step.visited == True and
+                                       step.visited and
                                        not hasattr(step, 'section_name'))]
         for step in filtered_steps:
             label = step.get_sidebar_name()
@@ -693,7 +696,6 @@ class Wizard(gobject.GObject, log.Loggable):
 
     def load_steps(self):
         global _steps
-        import flumotion.wizard.steps
         
         self.add_step(_steps[0], initial=True)
         

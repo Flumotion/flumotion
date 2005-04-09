@@ -211,6 +211,8 @@ printParse = 0
 debug = 0
 
 # suppressions work like this
-#suppressions = {
+suppressions = {
+  # FIXME: Consumption has a get_next with steps=None
+  'flumotion.wizard.steps.Consumption': "no-override",
 #  'flumotion.twisted.defer.defer_generator': "self=wrapperself",
-#}
+}
