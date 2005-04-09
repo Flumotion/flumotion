@@ -41,7 +41,6 @@ coverage:
 # same for any gtk stuff - keep it low
 
 PYCHECKER_WHITELIST = \
-            tools/pycheckerhelp.py		\
 	    flumotion/component/*.py 		\
 	    flumotion/admin/*.py		\
 	    flumotion/common/*.py		\
@@ -60,13 +59,29 @@ PYCHECKER_WHITELIST = \
 PYCHECKER_BLACKLIST = \
 	flumotion/component/converters/overlay/overlay.py \
 	flumotion/component/producers/firewire/firewire.py \
-	flumotion/worker/checks/video.py \
-	flumotion/twisted/defer.py
+	flumotion/worker/checks/video.py
+
+pycheckersplit:
+	@echo running pychecker on each file ...
+	@for file in $(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST))); \
+	do \
+		PYTHONPATH=`pwd`					\
+		pychecker -Q -F misc/pycheckerrc 			\
+                tools/pycheckerhelp.py					\
+		$$file			 				\
+		> /dev/null 2>&1;					\
+		if test $$? -ne 0; then 				\
+			echo "Error on $$file";				\
+			pychecker -Q -F misc/pycheckerrc		\
+                	tools/pycheckerhelp.py				\
+			$$file;	break; fi; 				\
+	done
 
 pychecker:
 	@echo running pychecker ...
 	@PYTHONPATH=`pwd`			\
 	pychecker -Q -F misc/pycheckerrc	\
+            tools/pycheckerhelp.py		\
 	$(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))\
 		2> /dev/null || make pycheckerverbose
 
@@ -74,6 +89,7 @@ pycheckerverbose:
 	@echo running pychecker ...
 	PYTHONPATH=`pwd`			\
 	pychecker -F misc/pycheckerrc		\
+            tools/pycheckerhelp.py		\
 	$(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))
 
 

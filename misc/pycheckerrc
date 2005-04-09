@@ -210,3 +210,7 @@ printParse = 0
 # turn on debugging for checker
 debug = 0
 
+# suppressions work like this
+#suppressions = {
+#  'flumotion.twisted.defer.defer_generator': "self=wrapperself",
+#}

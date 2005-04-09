@@ -1,5 +1,16 @@
 2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	  add pycheckersplit target for maximum CPU usage
+	* TODO:
+	  some notes
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  don't reuse var
+	* misc/pycheckerrc:
+	  add a comment
+
+2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/twisted/defer.py:
 	  make a c_defer_generator to be used for instance methods

@@ -52,7 +52,7 @@ ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 </html>
 """
 
-HTTP_VERSION = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
+HTTP_SERVER = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 
 ### the Twisted resource that handles the base URL
 class HTTPStreamingResource(web_resource.Resource, log.Loggable):
@@ -187,7 +187,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             headers.append('%s: %s\r\n' % (field, name))
 
         # Mimic Twisted as close as possible
-        setHeader('Server', HTTP_VERSION)
+        setHeader('Server', HTTP_SERVER)
         setHeader('Date', http.datetimeToString())
         setHeader('Cache-Control', 'no-cache')
         setHeader('Cache-Control', 'private')

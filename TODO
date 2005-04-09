@@ -106,6 +106,10 @@
 		in there in some other way than putting it in the config dict
 
 * EASY		change RequesterName to RequesterId
+
+* MEDIUM	block a feeding gst port, and have something eat from it ->
+		hangs in connect.  kill it -> process stays around
+
 - API cleanup:
 
 - manager/component.py:
