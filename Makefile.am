@@ -57,8 +57,7 @@ PYCHECKER_WHITELIST = \
 	    flumotion/admin/*/*.py		\
 	    flumotion/admin/*/*/*.py
 
-PYCHECKER_BLACKLIST = \
-	flumotion/worker/checks/video.py
+PYCHECKER_BLACKLIST =
 
 pycheckersplit:
 	@echo running pychecker on each file ...

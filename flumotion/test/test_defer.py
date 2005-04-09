@@ -35,23 +35,28 @@ class TestDefer(unittest.TestCase):
 
     def testYieldResultAtFirst(self):
         self.result = None
+        
         def gen():
             yield 42
         gen = defer_generator(gen)
+
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
         assert self.result == 42
 
     def testYieldResultAfter(self):
         self.result = None
+
         def square_later(x):
             d = defer.Deferred()
             reactor.callLater(0.1, lambda: d.callback(x*x))
             return d
+            
         def gen():
             yield square_later(0)
             yield 42
         gen = defer_generator(gen)
+
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
         run_until_finished()
@@ -59,13 +64,16 @@ class TestDefer(unittest.TestCase):
 
     def testYieldNothing(self):
         self.result = 42
+        
         def square_later(x):
             d = defer.Deferred()
             reactor.callLater(0.1, lambda: d.callback(x*x))
             return d
+            
         def gen():
             yield square_later(0)
         gen = defer_generator(gen)
+
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
         run_until_finished()
@@ -73,17 +81,23 @@ class TestDefer(unittest.TestCase):
 
     def testValues(self):
         self.result = None
+
         def square_later(x):
             d = defer.Deferred()
             reactor.callLater(0.1, lambda: d.callback(x*x))
             return d
+            
         def gen():
             for i in range(10):
                 d = square_later(i)
                 yield d
+                
+                # .value() gets the result of the deferred
                 assert d.value() == i*i
+                
             yield d.value()
         gen = defer_generator(gen)
+
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
         run_until_finished()
@@ -109,17 +123,23 @@ class TestDefer(unittest.TestCase):
                     d.errback(e)
             reactor.callLater(0.1, divide)
             return d
+
         def gen():
-            d = divide_later (42, 0)
+            d = divide_later(42, 0)
             yield d
+
+            # .value() gets the result of the deferred and raises
+            # if there was an errback
             try:
                 assert d.value() == 42
             except ZeroDivisionError:
-                d = divide_later (42, 1)
+                d = divide_later(42, 1)
                 yield d
+                
                 assert d.value() == 42
                 yield True
         gen = defer_generator(gen)
+
         d = gen()
         d.addCallback(lambda x: setattr(self, 'result', x))
         run_until_finished()
