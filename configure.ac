@@ -127,6 +127,7 @@ bin/flumotion-tester
 bin/flumotion-worker
 bin/runtest
 bin/Makefile
+common/Makefile
 data/Makefile
 data/glade/Makefile
 data/image/Makefile
@@ -170,7 +171,6 @@ flumotion/ui/Makefile
 flumotion/wizard/Makefile
 flumotion/worker/Makefile
 flumotion/worker/checks/Makefile
-m4/Makefile
 conf/Makefile
 doc/Makefile
 doc/reference/Makefile

@@ -1,40 +1,20 @@
 AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip 1.8
 
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I common
 
-SUBDIRS = . bin conf data flumotion doc m4 pkgconfig
+include $(srcdir)/common/common.mk
+include $(srcdir)/common/pychecker.mk
+
+SUBDIRS = . bin conf data flumotion doc common pkgconfig
 
 EXTRA_DIST = \
-	py-compile-destdir \
 	env.in \
-	python.mk \
 	LICENSE.GPL \
 	LICENSE.Flumotion \
 	flumotion.spec \
 	tools/pycheckerhelp.py \
 	misc/flu.modules \
 	misc/jhbuildrc
-
-clean-local:
-	@rm -rf _trial_temp
-
-if HAVE_PYCHECKER
-check-local: pychecker
-endif
-
-test:
-	@make check -C flumotion/test
-
-check-docs:
-	@make check -C doc/reference
-
-coverage:
-	@trial --coverage coverage -R flumotion.test
-	@$(PYTHON) tools/show-coverage.py _trial_temp/coverage/flumotion.*
-
-# we redirect stderr so we don't get messages like
-# warning: couldn't find real module for class SSL.Error (module name: SSL)
-# which can't be turned off in pychecker
 
 # for some reason, the run is *completely* different if the last set of
 # components is moved up.  So keep it low
@@ -59,52 +39,6 @@ PYCHECKER_WHITELIST = \
 	    flumotion/admin/*/*/*.py
 
 PYCHECKER_BLACKLIST =
-
-pycheckersplit:
-	@echo running pychecker on each file ...
-	@for file in $(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST))); \
-	do \
-		PYTHONPATH=`pwd`					\
-		pychecker -Q -F misc/pycheckerrc 			\
-                $(top_srcdir)/tools/pycheckerhelp.py			\
-		$$file			 				\
-		> /dev/null 2>&1;					\
-		if test $$? -ne 0; then 				\
-			echo "Error on $$file";				\
-			pychecker -Q -F misc/pycheckerrc		\
-                	$(top_srcdir)/tools/pycheckerhelp.py		\
-			$$file;	break; fi; 				\
-	done
-
-pychecker:
-	@echo running pychecker ...
-	@PYTHONPATH=`pwd`				\
-	pychecker -Q -F misc/pycheckerrc		\
-            $(top_srcdir)/tools/pycheckerhelp.py	\
-	$(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))\
-		2> /dev/null || make pycheckerverbose
-
-pycheckerverbose:
-	@echo running pychecker ...
-	PYTHONPATH=`pwd`				\
-	pychecker -F misc/pycheckerrc			\
-            $(top_srcdir)/tools/pycheckerhelp.py	\
-	$(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))
-
-
-fixme:
-	tools/fixme | less -R
-
-release: dist
-	make $(PACKAGE)-$(VERSION).tar.bz2.md5
-
-# generate md5 sum files
-%.md5: %
-	md5sum $< > $@
-
-# generate a sloc count
-sloc:
-	sloccount flumotion | grep "(SLOC)" | cut -d = -f 2
 
 .PHONY: test
 

@@ -1,4 +1,4 @@
-include $(top_srcdir)/python.mk
+include $(top_srcdir)/common/python.mk
 
 component_PYTHON = __init__.py volume.py admin_gtk.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/effects/volume

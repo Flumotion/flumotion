@@ -1,7 +1,7 @@
 #!/bin/sh
 set -x
 
-aclocal -I m4 || exit 1
+aclocal -I common || exit 1
 libtoolize --force || exit 1
 # autoheader || exit 1
 autoconf || exit 1

@@ -1,4 +1,4 @@
-include $(top_srcdir)/python.mk
+include $(top_srcdir)/common/python.mk
 
 component_PYTHON = __init__.py audiotest.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/producers/audiotest

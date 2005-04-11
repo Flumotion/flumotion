@@ -1,4 +1,4 @@
-include $(top_srcdir)/python.mk
+include $(top_srcdir)/common/python.mk
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/disker
 

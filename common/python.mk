@@ -1,4 +1,4 @@
-py_compile = $(top_srcdir)/py-compile-destdir --destdir $(DESTDIR)
+py_compile = $(top_srcdir)/common/py-compile-destdir --destdir $(DESTDIR)
 
 #if HAVE_PYCHECKER
 #check-local: $(PYCHECKER_FILES)
