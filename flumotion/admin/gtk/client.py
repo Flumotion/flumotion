@@ -779,10 +779,10 @@ class Window(log.Loggable, gobject.GObject):
         dialog.start()
 
     def _component_stop(self, state):
-        return self._component_do(state, 'stop', 'Stopping', 'Stopped')
+        return self._component_do(state, 'Stop', 'Stopping', 'Stopped')
         
     def _component_start(self, state):
-        return self._component_do(state, 'start', 'Starting', 'Started')
+        return self._component_do(state, 'Start', 'Starting', 'Started')
  
     def _component_do(self, state, action, doing, done):
         if not state:
@@ -796,7 +796,7 @@ class Window(log.Loggable, gobject.GObject):
             return None
 
         mid = self.statusbar.push('main', "%s component %s" % (doing, name))
-        d = self.admin.componentCallRemote(state, action)
+        d = self.admin.callRemote('component'+action, state)
 
         def _actionCallback(result, self, mid):
             self.statusbar.remove('main', mid)

@@ -96,6 +96,20 @@ class AdminAvatar(base.ManagerAvatar):
         """
         return self.vishnu.componentStart(componentState)
         
+    def perspective_componentStop(self, componentState):
+        """
+        Stop the given component.
+        """
+        return self.perspective_componentCallRemote(componentState, 'stop')
+        
+    def perspective_componentRestart(self, componentState):
+        """
+        Restart the given component.
+        """
+        d = self.perspective_componentStop(componentState)
+        d.addCallback(lambda *x: self.perspective_componentStart, componentState)
+        return d
+        
     # Generic interface to call into a component
     def perspective_componentCallRemote(self, componentState, methodName,
                                         *args, **kwargs):
@@ -107,7 +121,7 @@ class AdminAvatar(base.ManagerAvatar):
         assert isinstance(componentState, planet.ManagerComponentState)
 
         if methodName == "start":
-            self.debug('forwarding "start" to perspective_componentStart')
+            self.warning('forwarding "start" to perspective_componentStart')
             return self.perspective_componentStart(componentState)
 
         m = self.vishnu.getComponentMapper(componentState)
