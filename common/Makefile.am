@@ -3,5 +3,6 @@ EXTRA_DIST = \
 	as-version.m4 		\
 	as-ac-expand.m4		\
 	py-compile-destdir 	\
+	common.mk 		\
 	python.mk 		\
 	pychecker.mk

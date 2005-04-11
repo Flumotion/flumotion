@@ -12,7 +12,7 @@ EXTRA_DIST = \
 	LICENSE.GPL \
 	LICENSE.Flumotion \
 	flumotion.spec \
-	tools/pycheckerhelp.py \
+	misc/pycheckerhelp.py \
 	misc/flu.modules \
 	misc/jhbuildrc
 

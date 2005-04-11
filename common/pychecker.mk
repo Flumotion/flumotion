@@ -13,13 +13,13 @@ pycheckersplit:
 	do \
 		PYTHONPATH=`pwd`					\
 		pychecker -Q -F misc/pycheckerrc 			\
-                $(top_srcdir)/tools/pycheckerhelp.py			\
+                $(top_srcdir)/misc/pycheckerhelp.py			\
 		$$file			 				\
 		> /dev/null 2>&1;					\
 		if test $$? -ne 0; then 				\
 			echo "Error on $$file";				\
 			pychecker -Q -F misc/pycheckerrc		\
-                	$(top_srcdir)/tools/pycheckerhelp.py		\
+                	$(top_srcdir)/misc/pycheckerhelp.py		\
 			$$file;	break; fi; 				\
 	done
 
@@ -27,7 +27,7 @@ pychecker:
 	@echo running pychecker ...
 	@PYTHONPATH=`pwd`				\
 	pychecker -Q -F misc/pycheckerrc		\
-            $(top_srcdir)/tools/pycheckerhelp.py	\
+            $(top_srcdir)/misc/pycheckerhelp.py		\
 	$(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))\
 		2> /dev/null || make pycheckerverbose
 
@@ -35,5 +35,5 @@ pycheckerverbose:
 	@echo running pychecker ...
 	PYTHONPATH=`pwd`				\
 	pychecker -F misc/pycheckerrc			\
-            $(top_srcdir)/tools/pycheckerhelp.py	\
+            $(top_srcdir)/misc/pycheckerhelp.py		\
 	$(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))
