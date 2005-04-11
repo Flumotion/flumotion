@@ -65,36 +65,6 @@ def defer_generator(proc):
 
     return wrapper
 
-# use this generator for class methods; it makes pychecker happy
-def c_defer_generator(proc):
-    def wrapper(self, *args, **kwargs):
-        gen = proc(self, *args, **kwargs)
-        result = defer.Deferred()
-
-        def generator_next():
-            try:
-                x = gen.next()
-                if isinstance(x, defer.Deferred):
-                    x.addCallback(callback, x).addErrback(errback, x)
-                else:
-                    result.callback(x)
-            except StopIteration:
-                result.callback(None)
-            except Exception, e:
-                result.errback(e)
-
-        def errback(failure, d):
-            def raise_error():
-                raise failure.type(failure.value)
-            d.value = _makemethod(lambda self: raise_error(), d)
-            generator_next()
-
-        def callback(result, d):
-            d.value = _makemethod(lambda self: result, d)
-            generator_next()
-
-        generator_next()
-
-        return result
-
-    return wrapper
+def defer_generator_method(proc):
+    return lambda self, *args, **kwargs: \
+        defer_generator(proc)(self, *args, **kwargs)

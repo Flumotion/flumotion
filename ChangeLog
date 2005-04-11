@@ -1,3 +1,11 @@
+2005-04-11  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/admin.py:
+	s/c_defer_generator/defer_generator_method/
+
+	* flumotion/twisted/defer.py (defer_generator_method): Renamed
+	from c_defer_generator, return a curried function.
+
 2005-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:
