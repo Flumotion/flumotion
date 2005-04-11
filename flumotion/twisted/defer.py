@@ -22,15 +22,6 @@
 from twisted.internet import defer
 
 
-# appease pychecker's desire for instance methods
-class _Foo:
-    def bar(self):
-        pass
-
-_instancemethod = type(_Foo.bar)
-def _makemethod(proc, obj):
-    return _instancemethod(proc, obj, defer.Deferred)
-
 # See flumotion.test.test_defer for examples
 def defer_generator(proc):
     def wrapper(*args, **kwargs):
@@ -52,11 +43,11 @@ def defer_generator(proc):
         def errback(failure, d):
             def raise_error():
                 raise failure.type(failure.value)
-            d.value = _makemethod(lambda self: raise_error(), d)
+            d.value = raise_error
             generator_next()
 
         def callback(result, d):
-            d.value = _makemethod(lambda self: result, d)
+            d.value = lambda: result
             generator_next()
 
         generator_next()

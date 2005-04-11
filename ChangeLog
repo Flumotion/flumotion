@@ -1,5 +1,11 @@
 2005-04-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/defer.py: Remove hacks, pychecker seems happy
+	enough without them.
+
+	* flumotion/common/planet.py (moods.can_start, moods.can_stop):
+	New static methods.
+
 	* flumotion/component/component.py (BaseComponent.stop): Set the
 	component mood to sleeping before we stop. "One last heartbeat."
 	Allows the manager to immediately start a component after stopping
