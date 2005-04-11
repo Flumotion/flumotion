@@ -44,8 +44,6 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         text = None
         if self._config['show_text']:
             text = self._config['text']
-        print "THOMAS: text: %s" % text
-        print "THOMAS: config: %r" % self._config
         genimg.generate_overlay(self._filename,
                                 text,
                                 self._config.get('fluendo_logo', False),
