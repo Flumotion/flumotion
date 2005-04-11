@@ -367,6 +367,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         The connection to the manager will be closed.
         The job process will also finish.
         """
+        self.setMood(moods.sleeping)
         self.stopHeartbeat()
 
 gobject.type_register(BaseComponent)

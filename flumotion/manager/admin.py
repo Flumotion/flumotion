@@ -107,7 +107,7 @@ class AdminAvatar(base.ManagerAvatar):
         Restart the given component.
         """
         d = self.perspective_componentStop(componentState)
-        d.addCallback(lambda *x: self.perspective_componentStart, componentState)
+        d.addCallback(lambda *x: self.perspective_componentStart(componentState))
         return d
         
     # Generic interface to call into a component
