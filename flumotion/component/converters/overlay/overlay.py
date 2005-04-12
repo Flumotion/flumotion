@@ -66,9 +66,12 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         # since now I do this before chaining, while FeedComp does it after
         # chaining, so it's messy
         feedcomponent.ParseLaunchComponent.stop(self)
-        self.debug('Removing temporary overlay file %s' % self._filename)
-        os.unlink(self._filename)
-        self._filename = None
+        if self._filename:
+            self.debug('Removing temporary overlay file %s' % self._filename)
+            os.unlink(self._filename)
+            self._filename = None
+        else:
+            self.debug('Temporary overlay already gone, did we not start up correctly ?')
         
 def createComponent(config):
     source = config['source']
