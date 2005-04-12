@@ -22,6 +22,8 @@
 
 import os
 
+from flumotion.common import log
+
 from flumotion.component import feedcomponent
 from flumotion.component.converters.overlay import genimg
 
@@ -70,12 +72,23 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         
 def createComponent(config):
     source = config['source']
-
     eater = '@ eater:%s @' % source
-    component = Overlay(config['name'], [source],
-                        "filesrc name=source blocksize=100000 ! " + \
-                        "pngdec ! alphacolor ! videomixer name=mix ! @ feeder:: @ " + \
-                        "%s ! ffmpegcolorspace ! alpha ! mix." % eater, config)
+
+    # AYUV conversion got added to ffmpegcolorspace in 0.8.5
+    # alphacolor element works too, but has bugs for non-multiples of 4 or eight
+    alpha = 'ffmpegcolorspace ! alpha'
+
+    # due to createComponent entry pointism, we have to import inside our
+    # function.  PLEASE MAKE THE PAIN GO AWAY ?
+    from flumotion.worker.checks import video
+    if video.check_ffmpegcolorspace_AYUV():
+        alpha = 'ffmpegcolorspace'
+    else:
+        log.info('Using gst-plugins older than 0.8.5, consider upgrading if you notice a diagonal green line in your video output.')
     
+    component = Overlay(config['name'], [source], """
+filesrc name=source blocksize=100000 ! pngdec ! alphacolor !
+videomixer name=mix ! @ feeder:: @ %(eater)s ! %(alpha)s ! mix.""" % locals(),
+        config)
     return component
 

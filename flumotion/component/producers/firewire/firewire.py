@@ -64,8 +64,11 @@ def createComponent(config):
     else:
         square_pipe = ''
 
+    # the point of width correction is to get to a multiple of 8 for width
+    # so codecs are happy; it's unrelated to the aspect ratio correction
+    # to get to 4:3 or 16:9
     if width_correction > 0:
-        pad_pipe = '! ffmpegcolorspace ! videobox right=-%d ' % (width - scaled_width)
+        pad_pipe = '! ffmpegcolorspace ! videobox right=-%d ' % width_correction
     else:
         pad_pipe = ''
 
@@ -76,6 +79,8 @@ def createComponent(config):
     else:
         interlaced_height = 288
         
+# FIXME: might be nice to factor out dv1394src ! dvdec so we can replace it
+# with videotestsrc of the same size and PAR, so we can unittest the pipeline
     template = """dv1394src ! dvdec name=dec drop-factor=%(df)d
                             ! video/x-raw-yuv,format=(fourcc)YUY2
                             ! videorate ! videoscale

@@ -1,3 +1,23 @@
+2005-04-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/firewire:
+	  some notes about firewire
+	* flumotion/common/gstreamer.py:
+	  add a function to get plugin version; only works with new gst-python
+	* flumotion/wizard/steps.py:
+	  use one way to calculate all widths being used, so what's shown
+	  is what's done
+	  make overlay component check if we can use ffmpegcolorspace over
+	  alpha
+	* flumotion/component/converters/overlay/overlay.py:
+	  check for AYUV-ffmpegcolorspace
+	* flumotion/component/producers/firewire/firewire.py:
+	  cleanups
+	* flumotion/wizard/wizard.py:
+	  allow showing info dialogs
+	* flumotion/worker/checks/video.py:
+	  add a check for ffmpegcolorspace having AYUV
+
 2005-04-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/worker.py (WorkerMedium.remote_runProc): Proxy

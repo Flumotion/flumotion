@@ -228,14 +228,14 @@ class FireWire(VideoSource):
     # options detected from the device:
     dims = None
     factors = (1,2,3,4,6,8)
-    heights = None
-    widths = None
+    input_heights = None
+    input_widths = None
     par = None
 
     # these are instance state variables:
     is_square = None
-    factor_i = None
-    width_correction = None
+    factor_i = None             # index into self.factors
+    width_correction = None     # currently chosen item from width_corrections
     
     def set_sensitive(self, is_sensitive):
         if is_sensitive:
@@ -250,10 +250,10 @@ class FireWire(VideoSource):
         # if we are here, then it was successful
         self.dims = (options['width'], options['height'])
         self.par = options['par']
-        self.heights = [self.dims[1]/i for i in self.factors]
-        self.widths = [self.dims[0]/i for i in self.factors]
+        self.input_heights = [self.dims[1]/i for i in self.factors]
+        self.input_widths = [self.dims[0]/i for i in self.factors]
         store = gtk.ListStore(str)
-        for i in self.heights:
+        for i in self.input_heights:
             store.set(store.append(), 0, '%d pixels' % i)
         self.combobox_scaled_height.set_model(store)
         self.combobox_scaled_height.set_active(1)
@@ -278,44 +278,49 @@ class FireWire(VideoSource):
 
         self.update_output_format()
 
+    def _get_width_height(self):
+        # returns dict with sw, sh, ow, oh
+        # which are scaled width and height, and output width and height
+        sh = self.input_heights[self.factor_i]
+        sw = self.input_widths[self.factor_i]
+        par = 1. * self.par[0] / self.par[1]
+
+        if self.is_square:
+            sw = int(math.ceil(sw * par))
+            # for GStreamer element sanity, make sw an even number
+            # FIXME: check if this can now be removed
+            # sw = sw + (2 - (sw % 2)) % 2
+        
+        # if scaled width (after squaring) is not multiple of 8, present
+        # width correction
+        self.frame_width_correction.set_sensitive(sw % 8 != 0)
+
+        # actual output
+        ow = sw
+        oh = sh
+        if self.width_correction == 'pad':
+            ow = sw + (8 - (sw % 8)) % 8
+        elif self.width_correction == 'stretch':
+            ow = sw + (8 - (sw % 8)) % 8
+            sw = ow
+        
+        return dict(sw=sw,sh=sh,ow=ow,oh=oh)
+
     def update_output_format(self):
-        h = self.heights[self.factor_i]
-        w = self.widths[self.factor_i]
-        par = 1.*self.par[0]/self.par[1]
-        self.frame_width_correction.set_sensitive(w%8 != 0)
-
+        d = self._get_width_height()
         if self.is_square:
-            w = int(math.ceil(w * par))
-        if self.width_correction != 'none':
-            w = w + (8-(w%8))%8
-
-        if self.is_square:
-            msg = ('<i>%dx%d, 1/1 pixel aspect ratio</i>' % (w, h))
+            msg = ('<i>%dx%d, 1/1 pixel aspect ratio</i>' % (d['ow'], d['oh']))
         else:
             msg = ('<i>%dx%d, %d/%d pixel aspect ratio</i>'
-                   % (w, h, self.par[0], self.par[1]))
+                   % (d['ow'], d['oh'], self.par[0], self.par[1]))
         self.label_output_format.set_markup(msg)
         
     def get_state(self):
         options = {} # VideoSource.get_state(self)
-        options['height'] = self.heights[self.factor_i]
-        width = self.widths[self.factor_i]
-        if self.is_square:
-            width = int(math.ceil(width * self.par[0]/self.par[1]))
-
-        if self.width_correction == 'none' or width%8 == 0:
-            scaled_width = width
-        else:
-            w = width + (8-width%8) % 8
-            if self.width_correction == 'pad':
-                scaled_width = width
-            elif self.width_correction == 'stretch':
-                scaled_width = w
-            else:
-                assert False
-            width = w
-        options['scaled_width'] = scaled_width
-        options['width'] = width
+        d = self._get_width_height()
+        options['height'] = d['oh']
+        options['scaled_width'] = d['sw']
+        options['width'] = d['ow']
         options['is_square'] = self.is_square
         options['framerate'] = self.spinbutton_framerate.get_value()
         return options
@@ -459,9 +464,36 @@ class Overlay(wizard.WizardStep):
     icon = 'overlay.png'
 
     def before_show(self):
+        d = self.workerRun('flumotion.worker.checks.video',
+            'check_ffmpegcolorspace_AYUV')
+        d.addCallback(self._queryCallback)
+        #d.addErrback(self._queryRemoteRunErrback)
+        d.addErrback(self._queryErrback)
+
         self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
             'videomixer', 'alpha')
+
         # FIXME: add a PIL check here
+
+    def _queryCallback(self, result):
+        if result:
+            self.wizard.check_elements(self.worker, 'pngdec',
+                'ffmpegcolorspace', 'videomixer')
+        else:
+            # throw up an informational dialog
+            msg = """This worker's ffmpegcolorspace plugin is older than 0.8.5.
+Please consider upgrading if your output video has a diagonal line in the
+image."""
+            self.debug(msg)
+            self.wizard.info_dialog(msg)
+            self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
+                'videomixer', 'alpha', 'ffmpegcolorspace')
+            
+    def _queryErrback(self, failure):
+        msg = ('Could not check ffmpegcolorspace features.\n(%s)' %
+            failure.value)
+        self.wizard.block_next(True)
+        self.wizard.error_dialog(msg)
         
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())

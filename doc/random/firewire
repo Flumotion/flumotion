@@ -1,0 +1,60 @@
+Notes on Firewire
+-----------------
+
+- dv1394src supports all libraw1394-supported cameras;
+  this means the camcorder variety, but not the DC (digital camera) ones.
+
+- cameras are either PAL or NTSC
+- and can capture in 4:3 or 16:9 mode
+- always captures at a width of 720 pixels
+
+- 4:3 PAL captures in 720x576 with a PAR of 59:54 -> 786.67x576 at 1:1 PAR
+- 16:9 PAL captures in 720x576 with a PAR of 118:81 -> 1048.89x576 at 1:1 PAR
+- 4:3 NTSC captures in 720x480 with a PAR of 10:11 -> 654.55x480 at 1:1 PAR
+- 16:9 NTSC captures in 720x480 with a PAR of 40:33 -> 872.73x480 at 1:1 PAR
+
+- the GStreamer dvdec element outputs the actual pixel size captured by the
+  device, plus the pixel-aspect-ratio.  It's up to other elements to crop
+  or pad.
+
+- none of these display ratios match the actual display ratio, so video needs
+  to be either cropped on the sides or padded on top and bottom.  Cropping
+  is better, that way we preserve the scanlines/recording height of the video.
+
+- Flumotion's wizard:
+  - gets width, height, and par from worker through
+    flumotion.worker.checks.video
+  - presents scaled heights of capture height scaled down by 1, 2, 3, 4, 6, 8
+  - presents option to convert to square pixels - which will change width
+    - if end width is not multiple of 8:
+      - presents width correction
+        - none
+        - pad to multiple of 8 (ie, add black on sides)
+        - stretch to multiple of 8
+
+  - so wizard has three different kinds of width:
+    - input_width:  width the device is giving us; this is in original PAR
+    - scaled_width: this is the width after scaling; either because of 
+                    square pixel conversion, width correction stretching, or
+                    both
+    - output_width: the actual video width the component will report, which
+                    can be bigger than scaled_width because of width correction
+                    padding
+
+- firewire component:
+  - takes options:
+    - height: height of the decoded video
+    - scaled_width: width decoded video should be scaled to
+      (for GStreamer element sanity, make this an even number !)
+    - width: actual video width the component will be producing
+    - is_square: whether the pixels are square or not
+    - framerate
+
+  - if width > scaled_width, a videobox is added to add black on the right
+
+- dvdec outputs in YUY2
+  sample fake firewire:
+  gst-launch -v videotestsrc ! video/x-raw-yuv,width=720,height=576,format=\(fourcc\)YUY2,framerate=25.0,pixel-aspect-ratio=\(fraction\)59/54 !
+
+- TODO: cropping or top/bottom padding to get to 4:3 or 16:9; probably
+  should be done 

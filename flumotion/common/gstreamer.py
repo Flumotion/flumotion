@@ -81,3 +81,17 @@ def element_factory_has_property(element_factory, property_name):
             return True
     return False
   
+def get_plugin_version(plugin_name):
+    """
+    Find the version of the given plugin.
+
+    @rtype: tuple of (major, minor, micro, [nano]), or None if it could not be
+            found or determined
+    """
+    if gst.pygst_version > (0, 8, 1):
+        # API added after gst-python 0.8.1 release
+        plugin = gst.registry_pool_find_plugin(plugin_name)
+        if not plugin: return None
+        return plugin.get_version()
+
+    return None

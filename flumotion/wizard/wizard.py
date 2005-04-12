@@ -283,23 +283,43 @@ class Wizard(gobject.GObject, log.Loggable):
 
     def __len__(self):
         return len(self.steps)
+
+    def _dialog(self, type, message):
+        """
+        Show a message dialog.
+                                                                                
+        @param type:    the gtk.MESSAGE_ type to show
+        @param message: the message to display
+
+        returns: the dialog.
+        """
+        d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
+                              type, gtk.BUTTONS_OK,
+                              message)
+        d.connect("response", lambda self, response: self.destroy())
+        d.show_all()
+        return d
+
             
     def error_dialog(self, message):
         """
         Show an error message dialog.
                                                                                 
-        @param message the message to display.
-        @param parent the gtk.Window parent window.
-        @param response whether the error dialog should go away after response.
+        @param message: the message to display
 
-        returns: the error dialog.
+        returns: the error dialog
         """
-        d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
-                              gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
-                              message)
-        d.connect("response", lambda self, response: self.destroy())
-        d.show_all()
-        return d
+        return self._dialog(gtk.MESSAGE_ERROR, message)
+
+    def info_dialog(self, message):
+        """
+        Show an info message dialog.
+                                                                                
+        @param message: the message to display
+
+        returns: the info dialog
+        """
+        return self._dialog(gtk.MESSAGE_INFO, message)
 
     def get_step_option(self, stepname, option):
         state = self.get_step_options(stepname)
