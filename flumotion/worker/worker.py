@@ -185,29 +185,8 @@ class WorkerMedium(medium.BaseMedium):
 
         @returns: the return value of the given function in the module.
         """
-        def got_module(result):
-            self.debug('got module, running %s' % function)
-            try:
-                proc = getattr(result, function)
-                return proc(*args, **kwargs)
-            except Exception, e:
-                # pull out the landing parachute Maverick
-                import traceback
-                traceback.print_exc()
-                msg = 'runCode(%s, %s) failed: %s raised: %s' % (
-                    module, function, e.__class__.__name__, " ".join(e.args))
-                self.warning(msg)
-                raise errors.RemoteRunError(msg)
-            except:
-                msg = 'runCode(%s, %s) failed: Unknown exception' % (
-                    module, function)
-                self.warning(msg)
-                raise errors.RemoteRunError(msg)
+        return self.run_bundled_proc(module, function, *args, **kwargs)
 
-        self.debug('loading module %s for function %s' % (module, function))
-        d = self.bundleLoader.load(module)
-        d.addCallback(got_module)
-        return d
 
 class Kid:
     """

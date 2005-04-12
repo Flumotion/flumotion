@@ -150,7 +150,7 @@ class BaseAdminGtkNode(log.Loggable):
 
     def setElementProperty(self, elementName, propertyName, value):
         """
-        Set the given property on the element with the given name."
+        Set the given property on the element with the given name.
         """
         d = self.admin.setProperty(self.state, elementName, propertyName, value)
         d.addErrback(self.propertyErrback, self)

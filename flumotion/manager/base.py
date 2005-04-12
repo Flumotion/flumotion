@@ -136,7 +136,8 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
                 
         return None
 
-    def perspective_getBundleSums(self, bundleName):
+    def perspective_getBundleSums(self, bundleName=None, filename=None,
+                                  modname=None):
         """
         Get a list of (bundleName, md5sum) of all dependency bundles,
         starting with this bundle, in the correct order.
@@ -150,6 +151,18 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         basket = self.vishnu.bundlerBasket
 
         # will raise an error if bundleName not known
+        if not bundleName:
+            if filename:
+                bundleName = basket.getBundlerNameByFile(filename)
+                if not bundleName:
+                    raise errors.NoBundleError('bundle containing ' + filename)
+            elif modname:
+                bundleName = basket.getBundlerNameByImport(modname)
+                if not bundleName:
+                    raise errors.NoBundleError('bundle for module ' + modname)
+            else:
+                raise Exception('invalid arguments')
+    
         deps = basket.getDependencies(bundleName)
         self.debug('dependencies of %s: %r' % (bundleName, deps))
         sums = []

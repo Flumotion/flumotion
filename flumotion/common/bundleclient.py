@@ -24,14 +24,12 @@ bundled code
 """
 
 
-import os
-import sys
-
 from twisted.internet import error, defer
 from twisted.python import rebuild
 
 from flumotion.common import bundle, common, errors, log
 from flumotion.configure import configure
+from flumotion.twisted.defer import defer_generator_method
 
 
 __all__ = ['BundleLoader']
@@ -57,35 +55,28 @@ class BundleLoader(log.Loggable):
             raise errors.ManagerNotConnectedError
         return self.remote.callRemote(methodName, *args, **kwargs)
 
-    def _defaultErrback(self, failure):
-        self.debug('Unhandled deferred failure: %r (%s)' % (
-            failure.type, failure.getErrorMessage()))
-        return failure
-
     def _fetchAndRegisterBundles(self, names):
-        # relies on the caller to ensure dependencies are satisfied.
-        def got_zips(result):
-            self.debug('_fetchAndRegisterBundles: rec\'d %d zips' % len(result))
-            for name in names:
-                if name not in result.keys():
-                    msg = "Missing bundle %s was not received" % name
-                    self.warning(msg)
-                    raise errors.NoBundleError(msg)
-
-                b = bundle.Bundle(name)
-                b.setZip(result[name])
-                path = self._unbundler.unbundle(b)
-
-                self.debug("unpacked bundle %s to dir %s" % (name, path))
-                common.registerPackagePath(path)
-            return names
-
         d = self._callRemote('getBundleZips', names)
-        d.addCallback(got_zips)
-        d.addErrback(self._defaultErrback)
-        return d
+        yield d
+        result = d.value()
 
-    def load(self, moduleName):
+        self.debug('_fetchAndRegisterBundles: rec\'d %d zips' % len(result))
+        for name in names:
+            if name not in result.keys():
+                msg = "Missing bundle %s was not received" % name
+                self.warning(msg)
+                raise errors.NoBundleError(msg)
+
+            b = bundle.Bundle(name)
+            b.setZip(result[name])
+            path = self._unbundler.unbundle(b)
+
+            self.debug("unpacked bundle %s to dir %s" % (name, path))
+            common.registerPackagePath(path)
+        yield names
+    _fetchAndRegisterBundles = defer_generator_method(_fetchAndRegisterBundles)
+
+    def load_module(self, moduleName):
         """
         Load the module given by name.
         Sets up all necessary bundles to be able to load the module.
@@ -94,56 +85,54 @@ class BundleLoader(log.Loggable):
         @returns: a deferred that will fire when the given module is loaded.
         """
         
-        attach_sums_and_return = find_missing_packages = None
+        # fool pychecker
+        import os
+        import sys
 
-        def find_missing_packages(sums):
-            # sums is a list of name, sum tuples
-            to_fetch = []
-            to_load = []
-            for name, md5 in sums:
-                try:
-                    m = sys.modules[name]
-                    if m.__md5__ == md5:
-                        # module is up to date, no need to do anything
-                        self.log(name + ' is loaded and up to date')
-                        continue
-                    else:
-                        raise
-                except:
-                    path = os.path.join(configure.cachedir, name, md5)
-                    if os.path.exists(path):
-                        self.log(name + ' not loaded but the cache is valid')
-                        common.registerPackagePath(path)
-                        to_load.append(name)
-                    else:
-                        self.log(name + ' not loaded and needs updating')
-                        to_fetch.append((name,sum))
-
-            d = self._fetchAndRegisterBundles([x[0] for x in to_fetch])
-            d.addCallback(attach_sums_and_return, sums, to_load)
-            d.addErrback(self._defaultErrback)
-            return d
-
-        def attach_sums_and_return(fetched, names_and_sums, to_load):
-            # load all the new modules, just in case some are only
-            # loaded conditionally -- we need to attach the __md5__
-            # values
-            for name, md5 in names_and_sums:
-                if name in fetched or name in to_load:
-                    if name in sys.modules:
-                        self.log('rebuilding ' + name)
-                        rebuild.rebuild(sys.modules[name])
-                    else:
-                        self.log('__importing__ ' + name)
-                        __import__(name, globals(), locals(), [])
-                    sys.modules[name].__md5__ = md5
-            # make sure we have loaded the toplevel module
-            __import__(moduleName, globals(), locals(), [])
-            return sys.modules[moduleName]
-
-        # d is a deferred list of name, sum tuples
         d = self._callRemote('getBundleSums', moduleName)
-        d.addCallback(find_missing_packages)
-        d.addErrback(self._defaultErrback)
+        yield d
+        sums = d.value()
 
-        return d
+        # sums is a list of name, sum tuples
+        to_fetch = []
+        to_load = []
+        for name, md5 in sums:
+            try:
+                m = sys.modules[name]
+                if m.__md5__ == md5:
+                    # module is up to date, no need to do anything
+                    self.log(name + ' is loaded and up to date')
+                    continue
+                else:
+                    raise
+            except:
+                path = os.path.join(configure.cachedir, name, md5)
+                if os.path.exists(path):
+                    self.log(name + ' not loaded but the cache is valid')
+                    common.registerPackagePath(path)
+                    to_load.append(name)
+                else:
+                    self.log(name + ' not loaded and needs updating')
+                    to_fetch.append((name,sum))
+
+        d = self._fetchAndRegisterBundles([x[0] for x in to_fetch])
+        yield d
+        fetched = d.value()
+
+        # load all the new modules, just in case some are only
+        # loaded conditionally -- we need to attach the __md5__
+        # values
+        for name, md5 in sums:
+            if name in fetched or name in to_load:
+                if name in sys.modules:
+                    self.log('rebuilding ' + name)
+                    rebuild.rebuild(sys.modules[name])
+                else:
+                    self.log('__importing__ ' + name)
+                    __import__(name, globals(), locals(), [])
+                sys.modules[name].__md5__ = md5
+        # make sure we have loaded the toplevel module
+        __import__(moduleName, globals(), locals(), [])
+
+        yield sys.modules[moduleName]
+    load_module = defer_generator_method(load_module)

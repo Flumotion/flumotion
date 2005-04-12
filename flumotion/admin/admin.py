@@ -380,6 +380,31 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             d.addErrback(self._defaultErrback)
         return d
 
+    def reload_async(self, duckport):
+        name = reflect.filenameToModuleName(__file__)
+
+        self.info("rebuilding '%s'" % name)
+        rebuild.rebuild(sys.modules[name])
+
+        d = self.reloadManager()
+        yield d
+        try:
+            d.value()
+            duckport.write('Reloaded manager')
+        except Exception, e:
+            duckport.write('Failed to reload manager: %s' % e)
+
+        for name in self._components.keys():
+            d = self.reloadComponent(name)
+            yield d
+            try:
+                d.value()
+                duckport.write('Reloaded component %s' % name)
+            except Exception, e:
+                duckport.write('Failed to reload component %s: %s' % (name, e))
+        duckport.close()
+    reload_async = defer_generator_method(reload_async)
+
     def reloadManager(self):
         """
         Tell the manager to reload its code.
@@ -445,7 +470,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             filename, methodName = result
             self.debug("entry point for %r of type %s is in file %s and method %s" % (componentState, type, filename, methodName))
             # request bundle sums
-            d = self.callRemote('getBundleSumsByFile', filename)
+            d = self.callRemote('getBundleSums', filename=filename)
             d.addCallback(_getBundleSumsCallback, filename, methodName)
             d.addErrback(self._defaultErrback)
             return d
@@ -581,7 +606,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             return os.path.join(dir, bundledPath)
 
         # start chain
-        d = self.callRemote('getBundleSumsByFile', bundledPath)
+        d = self.callRemote('getBundleSums', filename=bundledPath)
         d.addCallback(_getBundleSumsCallback, bundledPath)
         d.addErrback(self._defaultErrback)
         return d

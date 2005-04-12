@@ -46,7 +46,7 @@ class Resolution:
     def callback(self, result):
         """
         Make the result succeed, calling the callbacks with the given result.
-        If a result was already reached, do nothing."
+        If a result was already reached, do nothing.
         """
         if not self.returned:
             self.returned = True
@@ -55,7 +55,7 @@ class Resolution:
     def errback(self, exception):
         """
         Make the result fail, calling the errbacks with the given exception.
-        If a result was already reached, do nothing."
+        If a result was already reached, do nothing.
         """
         if not self.returned:
             self.returned = True

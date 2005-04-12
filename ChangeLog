@@ -1,3 +1,26 @@
+2005-04-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/worker.py (WorkerMedium.remote_runProc): Proxy
+	BaseMedium.run_bundled_proc.
+
+	* flumotion/common/medium.py (BaseMedium.load_module): New method,
+	proxy from the bundleLoader.
+	(BaseMedium.run_bundled_proc): New method, runs a procedure in a
+	module, first fetching the bundles that support the module.
+
+	* flumotion/common/bundleclient.py (BundleLoader.load_module):
+	Renamed from .load. Don't assume the bundle has the same name as a
+	module. Implement with a defer generator.
+	(BundleLoader._fetchAndRegisterBundles): Now a defer generator.
+
+	* flumotion/manager/base.py
+	(ManagerAvatar.perspective_getBundleSums): Now also gets bundle
+	sums for a file or module as well.
+	(ManagerAvatar.perspective_getBundleSumsByFile): Removed.
+
+	* flumotion/admin/admin.py (AdminModel.reload_async): New method,
+	takes a port as an argument for output.
+
 2005-04-11  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/twisted/defer.py: Remove hacks, pychecker seems happy
