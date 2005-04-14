@@ -90,10 +90,9 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         for type in ('bitrate', 'totalbytes'):
             self.registerLabel('consumption-' + type)
 
-        mid = self.view.statusbar.push('notebook', 'Getting statistics ...')
+        mid = self.status_push('Getting statistics ...')
         d = self.callRemote('notifyState')
-        d.addCallback(lambda result, self, mid:
-            self.view.statusbar.remove('notebook', mid), self, mid) 
+        d.addCallback(lambda result: self.status_pop(mid))
         self.shown = False
         return self.statistics
 
@@ -113,9 +112,8 @@ class LogAdminGtkNode(BaseAdminGtkNode):
 class HTTPStreamerAdminGtk(BaseAdminGtk):
     def setup(self):
         self._nodes = {}
-        statistics = StatisticsAdminGtkNode(self.state, self.admin,
-            self.view)
-        log = LogAdminGtkNode(self.state, self.admin, self.view)
+        statistics = StatisticsAdminGtkNode(self.state, self.admin)
+        log = LogAdminGtkNode(self.state, self.admin)
         self._nodes['Statistics'] = statistics
         self._nodes['Log'] = log
 

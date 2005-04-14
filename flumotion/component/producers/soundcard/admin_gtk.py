@@ -25,7 +25,7 @@ class SoundcardAdminGtk(admin_gtk.BaseAdminGtk):
     def setup(self):
         self._nodes = {}
         volume = vadmin_gtk.VolumeAdminGtkNode(self.state, self.admin,
-            self.view, 'inputVolume')
+                                               'inputVolume')
         self._nodes['Volume'] = volume
 
     def getNodes(self):

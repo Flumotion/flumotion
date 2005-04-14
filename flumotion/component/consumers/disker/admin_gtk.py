@@ -62,7 +62,7 @@ class FilenameNode(BaseAdminGtkNode):
     
 class DiskerAdminGtk(BaseAdminGtk):
     def setup(self):
-        filename = FilenameNode(self.state, self.admin, self.view)
+        filename = FilenameNode(self.state, self.admin)
         self._nodes = {'Filename' : filename}
 
     def getNodes(self):

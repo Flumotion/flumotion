@@ -1,3 +1,46 @@
+2005-04-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_defer.py
+	(TestDefer.testException.divide_later.divide): Tighten up the
+	class of the error we check for.
+
+	* flumotion/component/base/admin_gtk.py
+	(BaseAdminGtkNode.status_pop, BaseAdminGtkNode.status_push): New
+	methods for dealing with status bars. Hackily checks if the view
+	set a 'statusbar' attribute on the node. Hey hey hey it's fat
+	albert.
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py
+	(DiskerAdminGtk.setup):
+	* flumotion/component/consumers/disker/admin_gtk.py
+	(DiskerAdminGtk.setup):
+	* flumotion/component/producers/firewire/admin_gtk.py
+	(FirewireAdminGtk.setup):
+	* flumotion/component/producers/videotest/admin_gtk.py
+	(VideoTestAdminGtk.setup):
+	* flumotion/component/producers/soundcard/admin_gtk.py
+	(SoundcardAdminGtk.setup):
+	* flumotion/component/producers/bttv/admin_gtk.py
+	(BTTVAdminGtk.setup):
+	* flumotion/component/bouncers/admin_gtk.py
+	(HTPasswdCryptAdminGtk.setup): Don't pass around view as an
+	argument.
+
+	* flumotion/admin/gtk/client.py (Window.show_component): Don't
+	pass self to BaseAdminGtk*.__init__. Set node.statusbar instead.
+
+	* flumotion/component/base/admin_gtk.py
+	(BaseAdminGtk.loadGladeFile): Unused, removed.
+	(EffectAdminGtkNode.__init__): 
+	(BaseAdminGtkNode.__init__)
+	(BaseAdminGtk.__init__): Remove last argument (normally a
+	flumotion.admin.gtk.client.AdminClient instance), as it's unused.
+
+	* flumotion/twisted/defer.py
+	(defer_generator.wrapper.errback.raise_error): If the exception
+	comes from a remote PB, failure.type will be a string. Try to use
+	the exception class that corresponds to that string.
+
 2005-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:

@@ -28,7 +28,7 @@ class WebcamAdminGtk(BaseAdminGtk):
     def setup(self):
         self._nodes = {}
         colorbalance = ColorbalanceAdminGtkNode(self.state, self.admin,
-            self.view, 'outputColorbalance')
+                                                'outputColorbalance')
         self._nodes['Colorbalance'] = colorbalance
 
     def getNodes(self):

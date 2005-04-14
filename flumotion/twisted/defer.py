@@ -20,6 +20,7 @@
 
 
 from twisted.internet import defer
+from twisted.python import reflect
 
 
 # See flumotion.test.test_defer for examples
@@ -42,7 +43,11 @@ def defer_generator(proc):
 
         def errback(failure, d):
             def raise_error():
-                raise failure.type(failure.value)
+                k = failure.type
+                if not callable(k):
+                    k = (reflect.namedClass(failure.type)
+                         or (lambda v: Exception('%s: %r' % (failure.type, v))))
+                raise k(failure.value)
             d.value = raise_error
             generator_next()
 

@@ -33,7 +33,7 @@ class BaseAdminGtk(log.Loggable):
 
     logCategory = "admingtk"
     
-    def __init__(self, state, admin, view):
+    def __init__(self, state, admin):
         """
         @param state: state of component this is a UI for
         @type  state: L{flumotion.common.planet.AdminComponentState}
@@ -45,7 +45,6 @@ class BaseAdminGtk(log.Loggable):
         self.state = state
         self.name = state.get('name')
         self.admin = admin
-        self.view = view
         self.debug('creating admin gtk for state %r' % state)
         
     def propertyErrback(self, failure, window):
@@ -76,18 +75,6 @@ class BaseAdminGtk(log.Loggable):
         return self.admin.componentCallRemote(self.state, methodName,
                                               *args, **kwargs)
         
-    # FIXME: deprecated, moved to node
-    # FIXME: abstract this method so it loads file with the relative
-    # flumotion/ path as put together in bundles,
-    # and it looks for the right bundle for this file
-    def loadGladeFile(self, gladeFile):
-        path = os.path.join(self.view.uidir, gladeFile)
-        if not os.path.exists(path):
-            self.warning ("Glade file %s not found in path %s" % (
-                gladeFile, path))
-        wtree = gtk.glade.XML(path)
-        return wtree
-
     ### child class methods to be overridden
     def setUIState(self, state):
         raise NotImplementedError
@@ -129,7 +116,7 @@ class BaseAdminGtkNode(log.Loggable):
 
     logCategory = "admingtk"
 
-    def __init__(self, state, admin, view):
+    def __init__(self, state, admin):
         """
         @param state: state of component this is a UI node for
         @type  state: L{flumotion.common.planet.AdminComponentState}
@@ -140,8 +127,16 @@ class BaseAdminGtkNode(log.Loggable):
         """
         self.state = state
         self.admin = admin
-        self.view = view
+        self.statusbar = None
         
+    def status_push(self, str):
+        if self.statusbar:
+            return self.statusbar.push('notebook', str)
+
+    def status_pop(self, mid):
+        if self.statusbar:
+            return self.statusbar.remove('notebook', mid)
+
     def propertyErrback(self, failure, window):
         failure.trap(errors.PropertyError)
         self.warning("%s." % failure.getErrorMessage())
@@ -215,7 +210,7 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
     @type widget: L{gtk.Widget}
     @ivar wtree:  the widget tree representation for this node
     """
-    def __init__(self, state, admin, view, effectName):
+    def __init__(self, state, admin, effectName):
         """
         @param state: state of component this is a UI for
         @type  state: L{flumotion.common.planet.AdminComponentState}
@@ -224,7 +219,7 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
         @param view:  the GTK+ admin view we are embedded in
         @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
         """
-        BaseAdminGtkNode.__init__(self, state, admin, view)
+        BaseAdminGtkNode.__init__(self, state, admin)
         self.effectName = effectName
 
         self.wtree = None

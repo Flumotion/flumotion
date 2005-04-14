@@ -80,7 +80,7 @@ class PatternNode(BaseAdminGtkNode):
 class VideoTestAdminGtk(BaseAdminGtk):
     def setup(self):
         # FIXME: have constructor take self instead ?
-        pattern = PatternNode(self.state, self.admin, self.view)
+        pattern = PatternNode(self.state, self.admin)
         self._nodes = {'Pattern': pattern}
 
     # FIXME: move to base class, make _nodes a public member

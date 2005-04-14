@@ -146,7 +146,7 @@ class KeycardsNode(BaseAdminGtkNode):
 class HTPasswdCryptAdminGtk(BaseAdminGtk):
     def setup(self):
         # FIXME: have constructor take self instead ?
-        keycards = KeycardsNode(self.state, self.admin, self.view)
+        keycards = KeycardsNode(self.state, self.admin)
         self._nodes = {'Keycards': keycards}
 
     # FIXME: move to base class, make _nodes a public member

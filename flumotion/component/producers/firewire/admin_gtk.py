@@ -21,7 +21,7 @@ class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
     def setup(self):
         self._nodes = {}
         volume = VolumeAdminGtkNode(self.state, self.admin,
-            self.view, 'inputVolume')
+                                    'inputVolume')
         self._nodes['Volume'] = volume
 
     def getNodes(self):

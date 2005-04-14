@@ -119,7 +119,7 @@ class TestDefer(unittest.TestCase):
             def divide():
                 try:
                     d.callback(x/y)
-                except Exception, e:
+                except ZeroDivisionError, e:
                     d.errback(e)
             reactor.callLater(0.1, divide)
             return d

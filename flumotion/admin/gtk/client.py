@@ -290,7 +290,7 @@ class Window(log.Loggable, gobject.GObject):
         # instantiate the GUIClass, giving ourself as the first argument
         # FIXME: we cheat by giving the view as second for now,
         # but let's decide for either view or model
-        instance = klass(state, self.admin, self)
+        instance = klass(state, self.admin)
         self.debug("Created entry instance %r" % instance)
         instance.setup()
         nodes = instance.getNodes()
@@ -322,6 +322,7 @@ class Window(log.Loggable, gobject.GObject):
             mid = self.statusbar.push('notebook',
                 "Loading tab %s for %s ..." % (nodeName, name))
             node = nodes[nodeName]
+            node.statusbar = self.statusbar # hack
             d = node.render()
             d.addCallback(self._nodeRenderCallback, nodeName,
                 instance, nodeWidgets, mid)
