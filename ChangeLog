@@ -1,3 +1,10 @@
+2005-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/common.mk:
+	* common/pychecker.mk:
+	* common/show-coverage.py:
+	  updates to common/ for shared stuff
+
 2005-04-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/random/firewire:

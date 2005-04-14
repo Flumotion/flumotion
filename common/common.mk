@@ -13,7 +13,7 @@ check-docs:
 
 coverage:
 	@trial --coverage coverage -R flumotion.test
-	@$(PYTHON) tools/show-coverage.py _trial_temp/coverage/flumotion.*
+	@$(PYTHON) common/show-coverage.py _trial_temp/coverage/flumotion.*
 
 fixme:
 	tools/fixme | less -R
