@@ -398,8 +398,9 @@ def registerPackagePath(packagePath, prefix='flumotion'):
     packageNames.sort()
 
     if not packageNames:
-        log.log('bundle', 'packagePath %s does not have package candidates' %
-            packagePath)
+        log.log('bundle',
+            'packagePath %s does not have package candidates starting with %s' %
+                (packagePath, prefix))
         return
 
     log.log('bundle', 'package candidates %r' % packageNames)
@@ -467,7 +468,12 @@ def registerPackagePath(packagePath, prefix='flumotion'):
     for name in moduleNames:
         if name in sys.modules:
             log.log('bundle', "rebuilding non-package module %s" % name)
-            module = reflect.namedAny(name)
+            try:
+                module = reflect.namedAny(name)
+            except AttributeError:
+                log.warning('bundle',
+                    "could not reflect non-package module %s" % name)
+                continue
             rebuild.rebuild(module)
 
 def ensureDir(dir, description):

@@ -189,27 +189,69 @@ class TestPackagePath(unittest.TestCase):
         handle.close()
         common.registerPackagePath(self.tempdir)
         os.system("rm -r %s" % self.tempdir)
-          
-# FIXME: move to a separate module
-#class TestRoot (pb.Root):
-#    pass
 
-class TestState:#unittest.TestCase):
-    def runClient(self):
-        f = pb.PBClientFactory()
-        reactor.connectTCP("127.0.0.1", self.port, f)
-        f.getRootObject().addCallbacks(self.connected, self.notConnected)
-        self.id = reactor.callLater(10, self.timeOut)
+    def testTwoStackedProjects(self):
+        # we create two stacked projects
+        # A is under a subdir of tempdir
+        # B lives in the tempdir
+        # each has parts of a common namespace
+        # set up stuff so we can import from both
+        # this shows we can develop uninstalled against uninstalled
+        self.cwd = os.getcwd()
+        self.tempdir = tempfile.mkdtemp('', 'trial')
 
-    def runServer(self):
-        factory = pb.PBServerFactory(TestRoot())
-        factory.unsafeTracebacks = self.unsafeTracebacks
-        p = reactor.listenTCP(0, factory, interface="127.0.0.1")
+        self._createA()
+        self._createB()
 
-    def testState(self):
-        self.runServer()
-        self.runClient()
-        reactor.run()
+        os.chdir(self.tempdir)
+
+        # first show we cannot import from A
+        try:
+            import package.A
+            self.fail("Should not be able to import package.A")
+        except ImportError:
+            pass
+
+        # set up so we can import from A
+        sys.path.append(self.adir)
+        try:
+            import package.A
+        except ImportError:
+            self.fail("Should be able to import package.A")
+
+        # but still can't from project B under same namespace
+        try:
+            import package.B
+            self.fail("Should not be able to import package.B")
+        except ImportError:
+            pass
+
+        # but we can pull in registerPackagePath from project A to bootstrap,
+        # and register the space for B
+        package.A.registerPackagePath(self.tempdir, prefix='package')
+        try:
+            import package.B
+        except ImportError:
+            self.fail("Should be able to import package.B")
+
+    def _createA(self):
+        self.adir = os.path.join(self.tempdir, "A")
+        os.mkdir(self.adir)
+        apackagedir = os.path.join(self.adir, "package")
+        os.mkdir(apackagedir)
+        open(os.path.join(apackagedir, "__init__.py"), "w").close()
+        handle = open(os.path.join(apackagedir, "A.py"), "w")
+        handle.write('me = "A"\n')
+        handle.write('from flumotion.common.common import registerPackagePath\n')
+        handle.close()
+
+    def _createB(self):
+        packagedir = os.path.join(self.tempdir, "package")
+        os.mkdir(packagedir)
+        open(os.path.join(packagedir, "__init__.py"), "w").close()
+        handle = open(os.path.join(packagedir, "B.py"), "w")
+        handle.write('me = "B"\n')
+        handle.close()
 
 class TestAddress(unittest.TestCase):
     def setUp(self):

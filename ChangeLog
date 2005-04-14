@@ -1,5 +1,13 @@
 2005-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	  warn but don't fail on failed reflects during registerPackagePath
+	* flumotion/test/test_common.py:
+	  add a test for registerPackagePath simulating an
+	  uninstalled project sharing an import namespace with another
+
+2005-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/wizard_firewire.glade:
 	* flumotion/wizard/steps.py:
 	  admin-side fixes for widescreenity of firewire
