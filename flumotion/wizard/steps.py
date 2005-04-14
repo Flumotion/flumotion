@@ -265,6 +265,29 @@ class FireWire(VideoSource):
         buf.set_text('No Firewire device detected.\n(%s)' % failure.value)
 
     def on_update_output_format(self, *args):
+        # update label_camera_settings
+        type = 'Unknown'
+        aspect = 'Unknown'
+        h = self.dims[1]
+        if h == 576:
+            type = 'PAL'
+        elif h == 480:
+            type = 'NTSC'
+        else:
+            self.warning('Unknown capture type for height %d' % h)
+
+        nom = self.par[0]
+        den = self.par[1]
+        if nom == 59 or nom == 10:
+            aspect = '4:3'
+        elif nom == 118 or nom == 40:
+            aspect = '16:9'
+        else:
+            self.warning('Unknown pixel aspect ratio %d/%d' % (nom, den))
+
+        text = '%s, %s (%d/%d pixel aspect ratio)' % (type, aspect, nom, den)
+        self.label_camera_settings.set_text(text)
+            
         # factor is a double
         self.factor_i = self.combobox_scaled_height.get_active()
         self.is_square = self.checkbutton_square_pixels.get_active()
@@ -309,9 +332,9 @@ class FireWire(VideoSource):
     def update_output_format(self):
         d = self._get_width_height()
         if self.is_square:
-            msg = ('<i>%dx%d, 1/1 pixel aspect ratio</i>' % (d['ow'], d['oh']))
+            msg = ('%dx%d, 1/1 pixel aspect ratio' % (d['ow'], d['oh']))
         else:
-            msg = ('<i>%dx%d, %d/%d pixel aspect ratio</i>'
+            msg = ('%dx%d, %d/%d pixel aspect ratio'
                    % (d['ow'], d['oh'], self.par[0], self.par[1]))
         self.label_output_format.set_markup(msg)
         

@@ -1,5 +1,11 @@
 2005-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_firewire.glade:
+	* flumotion/wizard/steps.py:
+	  admin-side fixes for widescreenity of firewire
+
+2005-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/common.mk:
 	* common/pychecker.mk:
 	* common/show-coverage.py:
