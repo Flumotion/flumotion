@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_workerconfig -*-
+# -*- Mode: Python; test-case-name:flumotion.test.test_workerconfig -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -49,7 +49,7 @@ class WorkerConfigXML(log.Loggable):
     logCategory = 'config'
 
     def __init__(self, filename, string=None):
-        self.name = 'default'
+        self.name = None
         self.manager = None
         self.authentication = None
         self.feederports = None

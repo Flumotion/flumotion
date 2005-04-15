@@ -1,5 +1,13 @@
 2005-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_workerconfig.py:
+	* flumotion/worker/config.py:
+	  do not use 'default' as a default worker name for config.
+	  If nothing is specified, we should be using sockety stuff to
+	  get a name.
+
+2005-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent.py:
 	* flumotion/component/producers/firewire/firewire.py:
 	* flumotion/worker/checks/video.py:
