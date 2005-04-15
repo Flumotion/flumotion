@@ -35,6 +35,7 @@ class ManagerPlanetState(flavors.StateCacheable):
 
         # we always have at least one atmosphere
         self.set('atmosphere', ManagerAtmosphereState())
+        self.get('atmosphere').set('parent', self)
 
     def getComponents(self):
         """

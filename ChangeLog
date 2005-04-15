@@ -1,5 +1,8 @@
 2005-04-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/planet.py (ManagerPlanetState.__init__): Make
+	sure the atmosphere state has the planet state as a parent.
+
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py
 	(StatisticsAdminGtkNode.updateLabels): Fix to work with uiState.
 
