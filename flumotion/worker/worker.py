@@ -76,6 +76,11 @@ class WorkerClientFactory(factoryClass):
             self.medium.setRemoteReference(reference)
             reference.notifyOnDisconnect(remoteDisconnected)
 
+        def alreadyConnectedErrback(failure):
+            failure.trap(errors.AlreadyConnectedError)
+            self.error('A worker with the name "%s" is already connected.' %
+                failure.value)
+
         def accessDeniedErrback(failure):
             failure.trap(twisted.cred.error.UnauthorizedLogin)
             self.error('Access denied.')
@@ -91,6 +96,7 @@ class WorkerClientFactory(factoryClass):
         d.addCallback(loginCallback)
         d.addErrback(accessDeniedErrback)
         d.addErrback(connectionRefusedErrback)
+        d.addErrback(alreadyConnectedErrback)
         d.addErrback(loginFailedErrback)
             
     # override log.Loggable method so we don't traceback
