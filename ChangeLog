@@ -1,5 +1,10 @@
 2005-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/main.py:
+	  error out nicely on config errors
+
+2005-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_workerconfig.py:
 	* flumotion/worker/config.py:
 	  do not use 'default' as a default worker name for config.

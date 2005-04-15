@@ -102,7 +102,12 @@ def main(args):
     if len(args) > 1:
         workerFile = args[1]
         log.info('worker', 'Reading configuration from %s' % workerFile)
-        cfg = config.WorkerConfigXML(workerFile)
+        try:
+            cfg = config.WorkerConfigXML(workerFile)
+        except config.ConfigError, value:
+            raise errors.SystemError(
+                "Could not load configuration from %s: %s" % (
+                workerFile, value))
 
         # now copy over stuff from config that is not set yet
         if not options.name and cfg.name:
