@@ -19,6 +19,7 @@
 # Headers in this file shall remain intact.
 
 
+import re
 import os
 
 import gst
@@ -212,13 +213,23 @@ def check1394():
         s = caps.get_structure(0)
         w = s.get_int('width')
         h = s.get_int('height')
-        # from the height we can know the aspect ratio, because PAL has
-        # one height and NTSC the other. but, we don't know if it's wide
-        # or not, because we haven't wrapped gststructure properly. yet.
-        # so, assume it's 4/3.
-        p = h==576 and (59,54) or (10,11)
+
+        # FIXME: in the future we should check gst-python version and use
+        # the pixel-aspect-ratio fraction tuple when it gets wrapped.
+        # For now we do fairly safe string matching.
+        matcher = re.compile(".*pixel-aspect-ratio=\(fraction\)(\d+)/(\d+).*")
+        match = matcher.search(s.to_string())
+        nom, den = 1, 1
+        if match:
+            nom, den = [int(s) for s in match.groups()]
+        else:
+            log.warning('Could not get pixel aspect ratio from device')
+        log.debug('Using pixel aspect ratio of %d/%d' % (nom, den))
+
         reactor.callLater(0, bin.set_state, gst.STATE_NULL)
-        resolution.callback(dict(width=w, height=h, par=p))
+        result = dict(width=w, height=h, par=(nom, den))
+        log.debug('returning dict %r' % result)
+        resolution.callback(result)
         
     def do_check(element):
         bin = element.get_parent()

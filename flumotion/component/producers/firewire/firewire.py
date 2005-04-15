@@ -48,7 +48,7 @@ def createComponent(config):
     is_square = config['is_square']
     framerate = config['framerate']
 
-    width_correction = width - scaled_width
+    scale_correction = width - scaled_width
 
     if 12.5 < framerate <= 25:
         drop_factor = 1
@@ -67,8 +67,11 @@ def createComponent(config):
     # the point of width correction is to get to a multiple of 8 for width
     # so codecs are happy; it's unrelated to the aspect ratio correction
     # to get to 4:3 or 16:9
-    if width_correction > 0:
-        pad_pipe = '! ffmpegcolorspace ! videobox right=-%d ' % width_correction
+    if scale_correction > 0:
+        # videobox in 0.8.8 has a stride problem outputting AYUV with odd width
+        # I420 works fine, but is slower when overlay is used
+
+        pad_pipe = '! ffmpegcolorspace ! videobox right=-%d ! video/x-raw-yuv,format=(fourcc)I420 ' % scale_correction
     else:
         pad_pipe = ''
 
@@ -94,8 +97,8 @@ def createComponent(config):
                             level name=volumelevel signal=true ! audiorate !
                             @feeder::audio@
                """ % dict(df=drop_factor, ih=interlaced_height,
-                          sq=square_pipe, pp=pad_pipe, sw=scaled_width,
-                          h=height, fr=framerate)
+                          sq=square_pipe, pp=pad_pipe,
+                          sw=scaled_width, h=height, fr=framerate)
     template = template.replace('\n', '')
     
     component = Firewire(config['name'], template)

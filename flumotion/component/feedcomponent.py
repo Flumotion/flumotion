@@ -700,6 +700,7 @@ class ParseLaunchComponent(FeedComponent):
         return pipeline
         
     def parse_pipeline(self, pipeline):
+        pipeline = " ".join(pipeline.split())
         self.debug('Creating pipeline, template is %s' % pipeline)
         
         eater_names = self.get_eater_names()
@@ -725,6 +726,7 @@ class ParseLaunchComponent(FeedComponent):
         pipeline = self.parse_tmpl(pipeline, feeder_element_names,
                                    self.FEEDER_TMPL,
                                    '%(pipeline)s ! %(tmpl)s name=%(name)s') 
+        pipeline = " ".join(pipeline.split())
         
         self.debug('pipeline for %s is %s' % (self.getName(), pipeline))
         assert self.DELIMETER not in pipeline
