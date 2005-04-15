@@ -56,13 +56,6 @@ class BouncerMedium(component.BaseComponentMedium):
         self.warning("FIXME: remote_link should only be called for feedComponent")
         return []
 
-    # FIXME: use a method to get the keycards
-    def remote_getBouncerState(self):
-        self.debug('returning bouncer state %r with %d keycards' % (
-            self.comp._bouncerState,
-            len(self.comp._bouncerState.get('keycards'))))
-        return self.comp._bouncerState
-
 class Bouncer(component.BaseComponent):
     keycardClasses = ()
 
@@ -73,9 +66,8 @@ class Bouncer(component.BaseComponent):
         component.BaseComponent.__init__(self, name)
         self._idCounter = 0
         self._keycards = {} # keycard id -> Keycard
-        self._keycardDatas = {} # keycard id -> data in bouncerState
-        self._bouncerState = WorkerComponentUIState()
-        self._bouncerState.addListKey('keycards')
+        self._keycardDatas = {} # keycard id -> data in uiState
+        self.uiState.addListKey('keycards')
         
     def setDomain(self, name):
         self.domain = name
@@ -118,7 +110,7 @@ class Bouncer(component.BaseComponent):
         data = keycard.getData()
         self._keycardDatas[id] = data
 
-        self._bouncerState.append('keycards', data)
+        self.uiState.append('keycards', data)
         self.debug("added keycard with id %s" % keycard.id)
 
     def removeKeycard(self, keycard):
@@ -129,7 +121,7 @@ class Bouncer(component.BaseComponent):
         del self._keycards[id]
 
         data = self._keycardDatas[id]
-        self._bouncerState.remove('keycards', data)
+        self.uiState.remove('keycards', data)
         del self._keycardDatas[id]
         self.debug("removed keycard with id %s" % id)
 

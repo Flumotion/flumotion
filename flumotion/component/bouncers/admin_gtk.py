@@ -70,7 +70,7 @@ class KeycardsNode(BaseAdminGtkNode):
             text=COLUMN_ADDRESS)
         self.tree.append_column(col)
 
-        d = self.callRemote('getBouncerState')
+        d = self.callRemote('getUIState')
         d.addCallback(self._gotStateCallback)
         d.addCallback(lambda x: self.widget)
         return d

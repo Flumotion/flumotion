@@ -67,7 +67,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         if not hasattr(self, 'labels'):
             return
         for name in self.labels.keys():
-            text = state[name]
+            text = state.get(name)
             if text == None:
                 text = ''
             self.labels[name].set_text(text)
@@ -91,7 +91,8 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             self.registerLabel('consumption-' + type)
 
         mid = self.status_push('Getting statistics ...')
-        d = self.callRemote('notifyState')
+        d = self.callRemote('getUIState')
+        d.addCallback(self.setStats)
         d.addCallback(lambda result: self.status_pop(mid))
         self.shown = False
         return self.statistics

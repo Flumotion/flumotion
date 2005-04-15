@@ -77,6 +77,7 @@ class BaseAdminGtk(log.Loggable):
         
     ### child class methods to be overridden
     def setUIState(self, state):
+        # fixme: what is this? who implements this?
         raise NotImplementedError
 
     def propertyChanged(self, name, value):

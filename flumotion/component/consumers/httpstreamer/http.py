@@ -109,31 +109,29 @@ class Stats:
     def getAverageClients(self):
         return self.average_client_number
 
-    def getState(self):
+    def updateState(self, set):
         c = self
-        s = {}
  
         bytes_sent      = c.getBytesSent()
         bytes_received  = c.getBytesReceived()
         uptime          = c.getUptime()
 
-        s['stream-mime'] = c.get_mime()
-        s['stream-uptime'] = common.formatTime(uptime)
+        set('stream-mime', c.get_mime())
+        set('stream-uptime', common.formatTime(uptime))
         bitspeed = bytes_received * 8 / uptime
-        s['stream-bitrate'] = common.formatStorage(bitspeed) + 'bit/s'
-        s['stream-totalbytes'] = common.formatStorage(bytes_received) + 'Byte'
+        set('stream-bitrate', common.formatStorage(bitspeed) + 'bit/s')
+        set('stream-totalbytes', common.formatStorage(bytes_received) + 'Byte')
 
-        s['clients-current'] = str(c.getClients())
-        s['clients-max'] = str(c.getMaxClients())
-        s['clients-peak'] = str(c.getPeakClients())
-        s['clients-peak-time'] = time.ctime(c.getPeakEpoch())
-        s['clients-average'] = str(int(c.getAverageClients()))
+        set('clients-current', str(c.getClients()))
+        set('clients-max', str(c.getMaxClients()))
+        set('clients-peak', str(c.getPeakClients()))
+        set('clients-peak-time', time.ctime(c.getPeakEpoch()))
+        set('clients-average', str(int(c.getAverageClients())))
 
         bitspeed = bytes_sent * 8 / uptime
-        s['consumption-bitrate'] = common.formatStorage(bitspeed) + 'bit/s'
-        s['consumption-totalbytes'] = common.formatStorage(bytes_sent) + 'Byte'
+        set('consumption-bitrate', common.formatStorage(bitspeed) + 'bit/s')
+        set('consumption-totalbytes', common.formatStorage(bytes_sent) + 'Byte')
 
-        return s
 
 class HTTPMedium(feedcomponent.FeedComponentMedium):
     def __init__(self, comp):
@@ -142,15 +140,7 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         """
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
-        self.comp.connect('ui-state-changed', self._comp_ui_state_changed_cb)
         self.comp.connect('log-message', self._comp_log_message_cb)
-
-    def getState(self):
-        return self.comp.getState()
-
-    # FIXME: decide on "state", "stats", or "statistics"
-    def _comp_ui_state_changed_cb(self, comp):
-        self.callRemote('adminCallRemote', 'statsChanged', self.getState())
 
     def _comp_log_message_cb(self, comp, message):
         self.callRemote('adminCallRemote', 'logMessage', message)
@@ -187,7 +177,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                                 'recover-policy=3'
 
     gsignal('client-removed', object, int, int, object)
-    gsignal('ui-state-changed')
     gsignal('log-message', str)
     
     component_medium_class = HTTPMedium
@@ -214,6 +203,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # FIXME: do a .cancel on this Id somewhere
         self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
         
+        for i in ('stream-mime', 'stream-uptime', 'stream-bitrate',
+                  'stream-totalbytes', 'clients-current', 'clients-max',
+                  'clients-peak', 'clients-peak-time', 'clients-average',
+                  'consumption-bitrate', 'consumption-totalbytes'):
+            self.uiState.addKey(i, None)
+
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.name
 
@@ -265,7 +260,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         sink.emit('remove', fd)
 
     def update_ui_state(self):
-        self.emit('ui-state-changed')
+        def set(k, v):
+            if self.uiState.get(k) != v:
+                self.uiState.set(k, v)
+        # fixme: have updateState just update what changed itself
+        # without the hack above
+        self.updateState(set)
 
     # handle the thread deserializing queues
     def _handleQueue(self):

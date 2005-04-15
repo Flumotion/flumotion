@@ -1,3 +1,39 @@
+2005-04-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py
+	(StatisticsAdminGtkNode.updateLabels): Fix to work with uiState.
+
+	* flumotion/common/bundleclient.py (BundleLoader.load_module):
+	Don't assume that bundle names are module names. Fixing this
+	assumption leads to lots of cleanups.
+
+	* flumotion/twisted/defer.py
+	(defer_generator.wrapper.default_errback): Add an
+	errback-of-last-resort that will print a traceback if nothing
+	catches an error.
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(Stats.updateState): Renamed from getState. Takes a setter proc to
+	set the args instead of returning a new dict.
+	(HTTPMedium.remote_notifyState): Removed, instead use getUIState.
+	(MultifdSinkStreamer.__init__): Add keys to the uiState.
+	(MultifdSinkStreamer.update_ui_state.set): Call Stats.updateState
+	with a setter for our uiState.
+
+	* flumotion/component/bouncers/admin_gtk.py
+	(KeycardsNode._loadGladeFileCallback): call getUIState instead of
+	getBouncerState.
+	* flumotion/component/bouncers/bouncer.py (Bouncer.__init__): Use
+	uiState instead of _bouncerState.
+	(BouncerMedium.remote_getBouncerState): Removed, use getUIState
+	instead.
+
+	* flumotion/component/component.py
+	(BaseComponentMedium.remote_getUIState): New method, returns the
+	UI state of the component.
+	(BaseComponent.__init__): Initialize self.uiState to a new
+	WorkerCompoenentUIState.
+
 2005-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/main.py:

@@ -467,6 +467,7 @@ def registerPackagePath(packagePath, prefix='flumotion'):
     moduleNames = _findEndModuleCandidates(packagePath)
     for name in moduleNames:
         if name in sys.modules:
+            # fixme: isn't sys.modules[name] sufficient?
             log.log('bundle', "rebuilding non-package module %s" % name)
             try:
                 module = reflect.namedAny(name)

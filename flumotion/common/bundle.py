@@ -271,7 +271,7 @@ class BundlerBasket:
             if package.endswith('__init__'):
                 package = os.path.split(package)[0]
                 
-            package = ".".join(package.split(os.pathsep))
+            package = ".".join(package.split('/')) # win32 fixme
             if self._imports.has_key(package):
                 raise Exception("Bundler %s already has import %s" % (
                     bundleName, package))

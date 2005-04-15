@@ -29,6 +29,16 @@ def defer_generator(proc):
         gen = proc(*args, **kwargs)
         result = defer.Deferred()
 
+        # Add errback-of-last-resort
+        def default_errback(failure, d):
+            def print_traceback(f):
+                import traceback
+                print 'Unhandled error calling', proc.__name__, ':', f.type
+                traceback.print_exc()
+            d.addErrback(print_traceback)
+            raise
+        result.addErrback(default_errback, result)
+
         def generator_next():
             try:
                 x = gen.next()

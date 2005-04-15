@@ -55,27 +55,6 @@ class BundleLoader(log.Loggable):
             raise errors.ManagerNotConnectedError
         return self.remote.callRemote(methodName, *args, **kwargs)
 
-    def _fetchAndRegisterBundles(self, names):
-        d = self._callRemote('getBundleZips', names)
-        yield d
-        result = d.value()
-
-        self.debug('_fetchAndRegisterBundles: rec\'d %d zips' % len(result))
-        for name in names:
-            if name not in result.keys():
-                msg = "Missing bundle %s was not received" % name
-                self.warning(msg)
-                raise errors.NoBundleError(msg)
-
-            b = bundle.Bundle(name)
-            b.setZip(result[name])
-            path = self._unbundler.unbundle(b)
-
-            self.debug("unpacked bundle %s to dir %s" % (name, path))
-            common.registerPackagePath(path)
-        yield names
-    _fetchAndRegisterBundles = defer_generator_method(_fetchAndRegisterBundles)
-
     def load_module(self, moduleName):
         """
         Load the module given by name.
@@ -89,7 +68,7 @@ class BundleLoader(log.Loggable):
         import os
         import sys
 
-        d = self._callRemote('getBundleSums', moduleName)
+        d = self._callRemote('getBundleSums', modname=moduleName)
         yield d
         sums = d.value()
 
@@ -97,42 +76,35 @@ class BundleLoader(log.Loggable):
         to_fetch = []
         to_load = []
         for name, md5 in sums:
-            try:
-                m = sys.modules[name]
-                if m.__md5__ == md5:
-                    # module is up to date, no need to do anything
-                    self.log(name + ' is loaded and up to date')
-                    continue
-                else:
-                    raise
-            except:
-                path = os.path.join(configure.cachedir, name, md5)
-                if os.path.exists(path):
-                    self.log(name + ' not loaded but the cache is valid')
-                    common.registerPackagePath(path)
-                    to_load.append(name)
-                else:
-                    self.log(name + ' not loaded and needs updating')
-                    to_fetch.append((name,sum))
+            path = os.path.join(configure.cachedir, name, md5)
+            if os.path.exists(path):
+                self.log(name + ' is up to date, registering package path')
+                common.registerPackagePath(path)
+                to_load.append(name)
+            else:
+                self.log(name + ' needs updating')
+                to_fetch.append(name)
 
-        d = self._fetchAndRegisterBundles([x[0] for x in to_fetch])
+        d = self._callRemote('getBundleZips', to_fetch)
         yield d
-        fetched = d.value()
+        result = d.value()
 
-        # load all the new modules, just in case some are only
-        # loaded conditionally -- we need to attach the __md5__
-        # values
-        for name, md5 in sums:
-            if name in fetched or name in to_load:
-                if name in sys.modules:
-                    self.log('rebuilding ' + name)
-                    rebuild.rebuild(sys.modules[name])
-                else:
-                    self.log('__importing__ ' + name)
-                    __import__(name, globals(), locals(), [])
-                sys.modules[name].__md5__ = md5
-        # make sure we have loaded the toplevel module
+        self.debug('load_module: received %d zips' % len(result))
+        for name in to_fetch:
+            if name not in result.keys():
+                msg = "Missing bundle %s was not received" % name
+                self.warning(msg)
+                raise errors.NoBundleError(msg)
+
+            b = bundle.Bundle(name)
+            b.setZip(result[name])
+            path = self._unbundler.unbundle(b)
+
+            self.debug("registering bundle %s in path %s" % (name, path))
+            common.registerPackagePath(path)
+
+        # load up the module and return it
         __import__(moduleName, globals(), locals(), [])
-
+        self.log('loaded module %s' % moduleName)
         yield sys.modules[moduleName]
     load_module = defer_generator_method(load_module)

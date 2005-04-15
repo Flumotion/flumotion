@@ -33,6 +33,7 @@ from twisted.cred import error as crederror
 from twisted.spread import pb
 
 from flumotion.common import interfaces, errors, log, planet, medium
+from flumotion.common import componentui
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
@@ -203,6 +204,12 @@ class BaseComponentMedium(medium.BaseMedium):
             raise errors.ReloadSyntaxError(msg)
         self._reloaded()
 
+    def remote_getUIState(self):
+        """Get a WorkerComponentUIState containing details needed to
+        present an admin-side UI state
+        """
+        return self.comp.uiState
+
     # separate method so it runs the newly reloaded one :)
     def _reloaded(self):
         self.info('reloaded module code for %s' % __name__)
@@ -255,6 +262,8 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self._HeartbeatDC = None
         self.medium = None # the medium connecting us to the manager's avatar
  
+        self.uiState = componentui.WorkerComponentUIState()
+
     def updateMood(self):
         """
         Update the mood because a mood condition has changed.
