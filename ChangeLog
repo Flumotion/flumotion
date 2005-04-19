@@ -1,3 +1,10 @@
+2005-04-19  Andy Wingo  <wingo@pobox.com>
+
+	* data/glade/houston.glade: Default action fixes.
+
+	* flumotion/admin/admin.py (AdminModel.managerInfoStr): New
+	method, returns a nice string to identify the manager.
+
 2005-04-15  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/planet.py (ManagerPlanetState.__init__): Make

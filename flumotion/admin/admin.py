@@ -178,6 +178,10 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         return '%s:%s (%s)' % (self.host, self.port,
                                self.use_insecure and 'http' or 'https')
 
+    def managerInfoStr(self):
+        assert self.planet
+        return '%s (%s:%s)' % (self.planet.get('name'), self.host, self.port)
+
     def setRemoteReference(self, remoteReference):
         def writeConnection():
             s = ''.join(['<connection>',
