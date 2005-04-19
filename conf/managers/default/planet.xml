@@ -1,6 +1,7 @@
 <planet>
 
-  <manager>
+  
+  <manager name="planet">
 <!--
     <host></host>
     <port></port>

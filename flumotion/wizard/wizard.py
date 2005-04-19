@@ -227,6 +227,8 @@ class Wizard(gobject.GObject, log.Loggable):
     
     logCategory = 'wizard'
 
+    flowName = 'default'
+
     __implements__ = flavors.IStateListener,
 
     def __init__(self, parent_window=None, admin=None):

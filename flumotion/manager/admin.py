@@ -238,6 +238,10 @@ class AdminAvatar(base.ManagerAvatar):
         self.info('loadConfiguration ...')
         self.vishnu.loadConfiguration(None, xml)
 
+    def perspective_deleteFlow(self, flowName):
+        return self.vishnu.deleteFlow(flowName)
+
+    # Deprecated -- remove me when no one uses me any more
     def perspective_cleanComponents(self):
         return self.vishnu.emptyPlanet()
 

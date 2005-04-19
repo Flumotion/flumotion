@@ -41,6 +41,7 @@ from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
+from flumotion.twisted.defer import defer_generator_method
 
 # an internal class
 class Dispatcher(log.Loggable):
@@ -600,6 +601,48 @@ class Vishnu(log.Loggable):
 
         return list
 
+    def deleteFlow(self, flowName):
+        """
+        Empty the planet of all components, and flows.
+
+        @returns: a deferred that will fire when the planet is empty.
+        """
+        def find(list, value, proc=lambda x: x):
+            return list[[proc(x) for x in list].index(value)]
+
+        def first(list, proc=lambda x: x):
+            for x in list:
+                if proc(x): return x
+
+        def any(list, proc=lambda x: x):
+            return filter(proc, list)
+
+        def fint(*procs):
+            # intersection of functions
+            def int(*args, **kwargs):
+                for p in procs:
+                    if not p(*args, **kwargs): return False
+                return True
+            return int
+
+        # first get all components to sleep
+        flow = find(self.state.get('flows'), flowName, lambda x: x.get('name'))
+        components = flow.get('components')
+
+        # if any component is already in a mood change/command, fail
+        isBusy = lambda c: c.get('moodPending') != None
+        isNotSleeping = lambda c: c.get('mood') is not moods.sleeping.value
+        pred = fint(isBusy, isNotSleeping)
+        if any(components, pred):
+            raise errors.BusyComponentError(first(components, pred))
+
+        for c in components:
+            del self._componentMappers[self._componentMappers[c].id]
+            del self._componentMappers[c]
+        yield flow.empty()
+        yield self.state.remove('flows', flow)
+    deleteFlow = defer_generator_method(deleteFlow)
+        
     def emptyPlanet(self):
         """
         Empty the planet of all components, and flows.

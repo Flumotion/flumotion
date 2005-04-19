@@ -5,6 +5,20 @@
 
 2005-04-19  Andy Wingo  <wingo@pobox.com>
 
+	* conf/managers/default/planet.xml: Add a default name for the
+	manager. Call it 'planet'.
+
+	* flumotion/manager/manager.py (Vishnu.deleteFlow): New routine,
+	deletes just a single flow.
+
+	* flumotion/manager/admin.py (AdminAvatar.perspective_deleteFlow):
+	New method.
+
+	* flumotion/wizard/wizard.py (Wizard): Set flowName to 'default'.
+	
+	* flumotion/wizard/save.py (WizardSaver.getXML): Take the flow
+	name from the wizard.
+
 	* data/glade/houston.glade: Default action fixes.
 
 	* flumotion/admin/admin.py (AdminModel.managerInfoStr): New

@@ -330,7 +330,7 @@ class WizardSaver:
         components = self.getComponents()
         
         s = '<planet>\n'
-        s += '  <flow name="default">\n'
+        s += '  <flow name="%s">\n' % self.wizard.flowName
         for component in components:
             s += component.toXML()
         s += '  </flow>\n'
