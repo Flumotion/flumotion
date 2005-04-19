@@ -43,7 +43,7 @@
 	  <property name="text" translatable="yes">Congratulations ! You are now ready to use 
 your streaming server.
 
-When you press &quot;Quit&quot;, your configuration will be automatically loaded on your network.  This will take some time.</property>
+When you press &quot;Apply&quot;, your configuration will be automatically loaded on your network.  This will take some time.</property>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>

@@ -1,3 +1,8 @@
+2005-04-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/wizard_summary.glade:
+	  change Quit to Apply, noted by jbn-o in #fluendo
+
 2005-04-19  Andy Wingo  <wingo@pobox.com>
 
 	* data/glade/houston.glade: Default action fixes.
