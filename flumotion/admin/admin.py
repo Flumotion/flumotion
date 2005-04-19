@@ -531,6 +531,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             # package paths in the correct order; since we need to
             # register package paths one by one for the namedAny's
             # FIXME: missing can contain duplicate entries, remove ?
+            unpacked = []
             for name in missing:
                 if name not in result.keys():
                     msg = "Missing bundle %s was not received" % name
@@ -542,13 +543,17 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
                 b.setZip(zip)
                 dir = self._unbundler.unbundle(b)
                 self.debug("unpacked bundle %s to dir %s" % (name, dir))
-                self.debug("unpacked bundle %s, registering PackagePath %s" % (
-                    dir, name))
-                common.registerPackagePath(dir)
+                unpacked.append(dir)
 
             # now make sure all cachedPaths are registered
             # FIXME: does it matter we already did some before ?
             self._registerCachedPaths(cachedPaths)
+
+            # and now register our new contestants
+            for dir in unpacked:
+                self.debug("register PackagePath %s for unpacked bundle %s" % (
+                    dir, name))
+                common.registerPackagePath(dir)
 
             retval = (entryPath, filename, methodName)
             self.debug('_getBundleSumsCallback: returning %r' % (

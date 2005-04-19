@@ -1,5 +1,13 @@
 2005-04-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  make sure we register cached paths first before registering
+	  newly unbundled stuff.  If we just started up the admin,
+	  the cached paths are not yet registered while we're trying to
+	  stack our unbundled one on top of it.  Fixes #216.
+
+2005-04-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/wizard_summary.glade:
 	  change Quit to Apply, noted by jbn-o in #fluendo
 
