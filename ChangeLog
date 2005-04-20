@@ -1,3 +1,16 @@
+2005-04-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (find, first, any, fint): Move
+	utils out to the toplevel.
+	(Vishnu._configToComponentState): New method, converts a config
+	dict to a managercomponentstate. This is really hacky though,
+	there shouldn't be two ways to set up component states. Need to
+	merge with loadconfiguration at some point.
+	(Vishnu.componentAttached): Get the config and make the state if
+	the avatar is unknown (i.e., if the manager quit and the component
+	is logging back in again.)
+	(Vishnu.registerComponent): Remove commented-out code.
+
 2005-04-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:

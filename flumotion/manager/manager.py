@@ -43,6 +43,26 @@ from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 from flumotion.twisted.defer import defer_generator_method
 
+
+def find(list, value, proc=lambda x: x):
+    return list[[proc(x) for x in list].index(value)]
+
+def first(list, proc=lambda x: x):
+    for x in list:
+        if proc(x): return x
+
+def any(list, proc=lambda x: x):
+    return filter(proc, list)
+
+def fint(*procs):
+    # intersection of functions
+    def int(*args, **kwargs):
+        for p in procs:
+            if not p(*args, **kwargs): return False
+        return True
+    return int
+
+
 # an internal class
 class Dispatcher(log.Loggable):
     """
@@ -527,18 +547,56 @@ class Vishnu(log.Loggable):
         workerId = workerAvatar.avatarId
         self.debug('vishnu.workerDetached(): id %s' % workerId)
 
+    def _configToComponentState(self, config, avatar):
+        assert not avatar.avatarId in self._componentMappers.keys()
+
+        state = planet.ManagerComponentState()
+        state.set('name', config['name'])
+        state.set('type', config['type'])
+        state.set('workerRequested', None)
+        state.set('mood', moods.waking.value)
+        state.set('config', config)
+
+        # check if we have this flow yet and add if not
+        isOurFlow = lambda x: x.get('name') == config['parent']
+        flow = first(self.state.get('flows'), isOurFlow)
+        if not flow:
+            self.info('Creating flow "%s"' % config['parent'])
+            flow = planet.ManagerFlowState()
+            flow.set('name', config['parent'])
+            flow.set('parent', self.state)
+            self.state.append('flows', flow)
+
+        state.set('parent', flow)
+        flow.append('components', state)
+
+        # add to mapper
+        m = ComponentMapper()
+        m.state = state
+        m.id = avatar.avatarId
+        self._componentMappers[m.state] = m
+        self._componentMappers[m.id] = m
+
+        # add nodes to graph
+        self._dag.addNode(state)
+
+        return self.componentAttached(avatar)
+
     def componentAttached(self, componentAvatar):
         # called when a component logs in and gets a component avatar created
         id = componentAvatar.avatarId
         if not id in self._componentMappers.keys():
-            self.warning('id %s not found' % id)
-            return
+            # the manager quit and the component is logging back in
+            d = componentAvatar.mindCallRemote('getConfig')
+            d.addCallback(self._configToComponentState, componentAvatar)
+            return d
         m = self._componentMappers[id]
         m.avatar = componentAvatar
         self._componentMappers[componentAvatar] = m
 
         # attach componentstate to avatar
         componentAvatar.componentState = m.state
+        return defer.succeed(None)
 
     def componentDetached(self, componentAvatar):
         # called when the component has detached
@@ -549,10 +607,6 @@ class Vishnu(log.Loggable):
     def registerComponent(self, componentAvatar):
         # called when the jobstate is retrieved
         self.debug('vishnu registering component %r' % componentAvatar)
-
-        #if not componentAvatar in self._componentMappers.keys():
-        #    self.warning('avatar %r not found' % componentAvatar)
-        #    return
 
         # map jobState
         jobState = componentAvatar.jobState
@@ -607,23 +661,6 @@ class Vishnu(log.Loggable):
 
         @returns: a deferred that will fire when the planet is empty.
         """
-        def find(list, value, proc=lambda x: x):
-            return list[[proc(x) for x in list].index(value)]
-
-        def first(list, proc=lambda x: x):
-            for x in list:
-                if proc(x): return x
-
-        def any(list, proc=lambda x: x):
-            return filter(proc, list)
-
-        def fint(*procs):
-            # intersection of functions
-            def int(*args, **kwargs):
-                for p in procs:
-                    if not p(*args, **kwargs): return False
-                return True
-            return int
 
         # first get all components to sleep
         flow = find(self.state.get('flows'), flowName, lambda x: x.get('name'))
