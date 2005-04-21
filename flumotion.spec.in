@@ -159,8 +159,8 @@ fi
 %{_libdir}/flumotion
 %{_libdir}/pkgconfig/flumotion.pc
 %{_datadir}/flumotion
-%{_datadir}/applications
-%{_datadir}/pixmaps
+%{_datadir}/applications/*.desktop
+%{_datadir}/pixmaps/*
 %dir %attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
 %attr(750,flumotion,root) %{_sysconfdir}/flumotion
 %attr(750,flumotion,root) %{_localstatedir}/run/flumotion
