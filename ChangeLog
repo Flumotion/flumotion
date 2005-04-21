@@ -1,3 +1,9 @@
+2005-04-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/ui/glade.py (GladeWindow.glade_typedict)
+	(GladeWidget.glade_typedict): Added typedict class variables, and
+	used them in the initializers.
+
 2005-04-20  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py (find, first, any, fint): Move

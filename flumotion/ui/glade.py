@@ -78,11 +78,13 @@ class GladeWidget(gtk.VBox):
         
     glade_dir = configure.gladedir
     glade_file = None
+    glade_typedict = None
 
     def __init__(self):
         gtk.VBox.__init__(self)
         try:
-            wtree = gtk.glade.XML(os.path.join(self.glade_dir, self.glade_file))
+            wtree = gtk.glade.XML(os.path.join(self.glade_dir, self.glade_file),
+                                  typedict=(self.glade_typedict or {}))
         except RuntimeError, e:
             raise RuntimeError('Failed to load file %s from directory %s: %s'
                                % (self.glade_file, self.glade_dir, e))
@@ -127,13 +129,15 @@ class GladeWindow(gobject.GObject):
 
     glade_dir = configure.gladedir
     glade_file = None
+    glade_typedict = None
 
     window = None
 
     def __init__(self, parent=None):
         gobject.GObject.__init__(self)
         try:
-            wtree = gtk.glade.XML(os.path.join(self.glade_dir, self.glade_file))
+            wtree = gtk.glade.XML(os.path.join(self.glade_dir, self.glade_file),
+                                  typedict=(self.glade_typedict or {}))
         except RuntimeError, e:
             raise RuntimeError('Failed to load file %s from directory %s: %s'
                                % (self.glade_file, self.glade_dir, e))
