@@ -8,6 +8,13 @@
 
 2005-04-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/step.py: New file.
+	(WizardStep): Split out from wizard.py.
+
+	* flumotion/wizard/steps.py: 
+	* flumotion/test/test_wizard.py (WizardStepTest.testLoadSteps):
+	step.WizardStep.
+
 	* flumotion/ui/glade.py (GladeWidget.__init__): Try to fix a
 	python 2.3/pygtk 2.4 error?
 

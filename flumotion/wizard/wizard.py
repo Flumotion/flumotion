@@ -18,6 +18,7 @@
 
 # Headers in this file shall remain intact.
 
+
 import os
 import sets
 
@@ -31,11 +32,13 @@ from twisted.internet import defer
 from flumotion.configure import configure
 from flumotion.common import log, errors, worker
 from flumotion.wizard import enums, save
+#from flumotion.wizard.sidebar import WizardSidebar
 from flumotion.ui import fgtk
 from flumotion.ui.glade import GladeWindow, GladeWidget
 from flumotion.twisted import flavors
 
 from flumotion.common.pygobject import gsignal
+
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
@@ -49,115 +52,6 @@ class Stack(list):
     def peek(self):
         return self[-1]
     
-class WizardStep(GladeWidget, log.Loggable):
-    glade_typedict = fgtk.WidgetMapping()
-
-    # set by subclasses
-    step_name = None
-    section = None
-    sidebar_name = None # optional
-    icon = 'placeholder.png'
-    has_worker = True
-
-    visited = False # set by Wizard when going through steps
-
-    def __init__(self, wizard):
-        """
-        @param wizard: the wizard this step is a part of
-        @type  wizard: L{Wizard}
-        """
-        GladeWidget.__init__(self)
-        self.set_name(self.step_name)
-        if not self.sidebar_name:
-            self.sidebar_name = self.step_name
-        self.wizard = wizard
-
-    def __repr__(self):
-        return '<WizardStep object %s>' % self.step_name
-    
-    def get_component_properties(self):
-        return self.get_state()
-    
-    def iterate_widgets(self):
-        # depth-first
-        def iterator(w):
-            if isinstance(w, gtk.Container):
-                for c in w.get_children():
-                    for cc in iterator(c):
-                        yield cc
-            yield w
-        return iterator(self)
-
-    # returns a new dict. is this necessary?
-    def get_state(self):
-        state_dict = {}
-        for w in self.iterate_widgets():
-            if hasattr(w, 'get_state') and w != self:
-                # only fgtk widgets implement get_state
-                key = w.get_name().split('_', 1)[1]
-                state_dict[key] = w.get_state()
-
-        return state_dict
-
-    def workerRun(self, module, function, *args):
-        """
-        Run the given function and arguments on the selected worker.
-
-        @returns: L{twisted.internet.defer.Deferred}
-        """
-        admin = self.wizard.get_admin()
-        worker = self.worker
-        
-        if not admin:
-            self.warning('skipping workerRun, no admin')
-            return defer.fail(errors.FlumotionError('no admin'))
-
-        if not worker:
-            self.warning('skipping workerRun, no worker')
-            return defer.fail(errors.FlumotionError('no worker'))
-
-        d = admin.workerRun(worker, module, function, *args)
-        # FIXME: add errback
-        return d
-        
-    def get_next(self):
-        """
-        @returns name of next step
-        @rtype   string
-
-        This is called when the user presses next in the wizard,
-        
-        A subclass must implement this"""
-        
-        raise NotImplementedError
-
-    def activated(self):
-        """Called just before the step is shown, so the step can
-        do some logic, eg setup the default state
-
-        This can be implemented in a subclass"""
-        
-    def deactivated(self):
-        """Called after the user pressed next
-
-        This can be implemented in a subclass"""
-
-    def setup(self):
-        """This is called after the step is constructed, to be able to
-        do some initalization time logic in the steps.
-
-        This can be implemented in a subclass."""
-
-
-    def before_show(self):
-        """This is called just before we show the widget, everything
-        is created and in place
-        
-        This can be implemented in a subclass."""
-
-    def worker_changed(self):
-        pass
-
 class Wizard(gobject.GObject, log.Loggable):
     sidebar_bg = None
     sidebar_fg = None

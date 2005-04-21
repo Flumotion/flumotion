@@ -33,7 +33,7 @@ except RuntimeError:
 
 from flumotion.ui import fgtk
 from flumotion.common import enum
-from flumotion.wizard import enums, wizard
+from flumotion.wizard import enums, wizard, step
 
 class WizardStepTest(unittest.TestCase):
     def setUpClass(self):
@@ -43,7 +43,7 @@ class WizardStepTest(unittest.TestCase):
         
     def testLoadSteps(self):
         for step in self.steps:
-            self.assert_(isinstance(step, wizard.WizardStep))
+            self.assert_(isinstance(step, step.WizardStep))
             self.assert_(hasattr(step, 'icon'))
             self.assert_(hasattr(step, 'icon'))
             self.assert_(hasattr(step, 'glade_file'))

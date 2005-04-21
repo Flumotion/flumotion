@@ -27,6 +27,7 @@ from twisted.internet import defer
 from flumotion.common import errors
 from flumotion.configure import configure
 from flumotion.wizard import wizard
+from flumotion.wizard.step import WizardStep
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, \
      LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
@@ -39,7 +40,7 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
 
-class Welcome(wizard.WizardStep):
+class Welcome(WizardStep):
     step_name = 'Welcome'
     glade_file = 'wizard_welcome.glade'
     section = 'Welcome'
@@ -50,7 +51,7 @@ class Welcome(wizard.WizardStep):
         return 'Source'
 wizard.register_step(Welcome, initial=True)
 
-class Source(wizard.WizardStep):
+class Source(WizardStep):
     step_name = 'Source'
     glade_file = 'wizard_source.glade'
     section = 'Production'
@@ -118,7 +119,7 @@ class Source(wizard.WizardStep):
         raise AssertionError
 wizard.register_step(Source)
 
-class VideoSource(wizard.WizardStep):
+class VideoSource(WizardStep):
     section = 'Production'
     icon = 'widget_doc.png'
    
@@ -126,7 +127,7 @@ class VideoSource(wizard.WizardStep):
         return 'Overlay'
 
     def get_state(self):
-        options = wizard.WizardStep.get_state(self)
+        options = WizardStep.get_state(self)
         options['width'] = int(options['width'])
         options['height'] = int(options['height'])
         return options
@@ -479,7 +480,7 @@ class TestVideoSource(VideoSource):
         return options
 wizard.register_step(TestVideoSource)
 
-class Overlay(wizard.WizardStep):
+class Overlay(WizardStep):
     step_name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
     section = 'Production'
@@ -522,7 +523,7 @@ image."""
         self.entry_text.set_sensitive(button.get_active())
 
     def get_state(self):
-        options = wizard.WizardStep.get_state(self)
+        options = WizardStep.get_state(self)
         if self.checkbutton_show_logo:
             options['logo'] = True
             
@@ -551,7 +552,7 @@ image."""
         return 'Encoding'
 wizard.register_step(Overlay)
 
-class Soundcard(wizard.WizardStep):
+class Soundcard(WizardStep):
     step_name = 'Soundcard'
     glade_file = 'wizard_soundcard.glade'
     section = 'Production'
@@ -671,7 +672,7 @@ class Soundcard(wizard.WizardStep):
         return 'Encoding'
 wizard.register_step(Soundcard)
 
-class TestAudioSource(wizard.WizardStep):
+class TestAudioSource(WizardStep):
     step_name = 'Test Audio Source'
     glade_file = 'wizard_audiotest.glade'
     section = 'Production'
@@ -693,7 +694,7 @@ class TestAudioSource(wizard.WizardStep):
         return 'Encoding'
 wizard.register_step(TestAudioSource)
 
-class Encoding(wizard.WizardStep):
+class Encoding(WizardStep):
     step_name = 'Encoding'
     glade_file = 'wizard_encoding.glade'
     section = 'Conversion'
@@ -765,7 +766,7 @@ class Encoding(wizard.WizardStep):
             return 'Consumption'
 wizard.register_step(Encoding)
 
-class VideoEncoder(wizard.WizardStep):
+class VideoEncoder(WizardStep):
     section = 'Conversion'
 wizard.register_step(VideoEncoder)
 
@@ -848,7 +849,7 @@ class JPEG(VideoEncoder):
     
 wizard.register_step(JPEG)
 
-class AudioEncoder(wizard.WizardStep):
+class AudioEncoder(WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
     
@@ -908,7 +909,7 @@ class Speex(AudioEncoder):
         return options
 wizard.register_step(Speex)
 
-class Consumption(wizard.WizardStep):
+class Consumption(WizardStep):
     step_name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
     section = 'Consumption'
@@ -1001,7 +1002,7 @@ class Consumption(wizard.WizardStep):
 wizard.register_step(Consumption)
 
 # XXX: If audio codec is speex, disable java applet option
-class HTTP(wizard.WizardStep):
+class HTTP(WizardStep):
     glade_file = 'wizard_http.glade'
     section = 'Consumption'
     component_type = 'http-streamer'
@@ -1016,7 +1017,7 @@ class HTTP(wizard.WizardStep):
         return self.wizard['Consumption'].get_next(self)
 
     def get_state(self):
-        options = wizard.WizardStep.get_state(self)
+        options = WizardStep.get_state(self)
 
         options['bandwidth_limit'] = int(options['bandwidth_limit'])
         options['user_limit'] = int(options['user_limit'])
@@ -1042,7 +1043,7 @@ class HTTPVideo(HTTP):
     port = configure.defaultStreamPortRange[2]
 wizard.register_step(HTTPVideo)
 
-class Disk(wizard.WizardStep):
+class Disk(WizardStep):
     glade_file = 'wizard_disk.glade'
     section = 'Consumption'
     icon = 'kcmdevices.png'
@@ -1119,7 +1120,7 @@ class DiskVideo(Disk):
     sidebar_name = 'Disk video'
 wizard.register_step(DiskVideo)
 
-class Licence(wizard.WizardStep):
+class Licence(WizardStep):
     step_name = "Content License"
     glade_file = "wizard_license.glade"
     section = 'License'
@@ -1136,7 +1137,7 @@ class Licence(wizard.WizardStep):
         return 'Summary'
 wizard.register_step(Licence)
 
-class Summary(wizard.WizardStep):
+class Summary(WizardStep):
     step_name = "Summary"
     glade_file = "wizard_summary.glade"
     icon = 'summary.png'
