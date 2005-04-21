@@ -1,3 +1,11 @@
+2005-04-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* data/Makefile.am:
+	* data/flu-admin.desktop.in:
+	* data/flumotion-admin.desktop.in:
+	  rename to flumotion-admin.desktop.in and fix up to FE packaging
+
 2005-04-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/ui/glade.py (GladeWidget.__init__): Try to fix a

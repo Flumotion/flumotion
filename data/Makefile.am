@@ -1,7 +1,7 @@
 SUBDIRS = glade image
 
 desktopdir = $(datadir)/applications
-desktop_in_files = flu-admin.desktop.in
+desktop_in_files = flumotion-admin.desktop.in
 desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
 pixmapdir = $(datadir)/pixmaps
