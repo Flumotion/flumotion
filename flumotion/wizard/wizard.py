@@ -32,6 +32,7 @@ from flumotion.configure import configure
 from flumotion.common import log, errors, worker
 from flumotion.wizard import enums, save
 from flumotion.ui import fgtk
+from flumotion.ui.glade import GladeWindow, GladeWidget
 from flumotion.twisted import flavors
 
 from flumotion.common.pygobject import gsignal
@@ -48,17 +49,13 @@ class Stack(list):
     def peek(self):
         return self[-1]
     
-class WizardStep(object, log.Loggable):
-    glade_dir = configure.gladedir
-    widget_prefixes = { fgtk.FComboBox    : 'combobox',
-                        fgtk.FCheckButton : 'checkbutton',
-                        fgtk.FEntry       : 'entry',
-                        fgtk.FSpinButton  : 'spinbutton',
-                        fgtk.FRadioButton : 'radiobutton' }
+class WizardStep(GladeWidget, log.Loggable):
+    glade_typedict = fgtk.WidgetMapping()
 
     # set by subclasses
     step_name = None
-    glade_file = None
+    section = None
+    sidebar_name = None # optional
     icon = 'placeholder.png'
     has_worker = True
 
@@ -69,94 +66,39 @@ class WizardStep(object, log.Loggable):
         @param wizard: the wizard this step is a part of
         @type  wizard: L{Wizard}
         """
+        GladeWidget.__init__(self)
+        self.set_name(self.step_name)
+        if not self.sidebar_name:
+            self.sidebar_name = self.step_name
         self.wizard = wizard
-        self.widget = None # the main widget; ie. the top child of the window
-        self.widgets = None
-        self.wtree = None
-        
-        self._load_glade()
 
     def __repr__(self):
         return '<WizardStep object %s>' % self.step_name
     
-    def _load_glade(self):
-        """
-        Load and process our glade file.
-        Set up the widget tree and main widget.
-        """
-        glade_filename = os.path.join(self.glade_dir, self.glade_file)
-        
-        self.wtree = gtk.glade.XML(glade_filename,
-                                   typedict=fgtk.WidgetMapping())
-        
-        windows = []
-        self.widgets = self.wtree.get_widget_prefix('')
-        for widget in self.widgets:
-            # So we can access the step from inside the widget
-            widget.set_data('wizard-step', self)
-
-            if isinstance(widget, gtk.Window):
-                if widget.get_property('visible'):
-                    raise AssertionError('window for %r is visible' % self)
-                widget.hide()
-                windows.append(widget)
-                continue
-            
-            name = widget.get_name()
-            if hasattr(self, name):
-                raise AssertionError(
-                    "There is already an attribute called %s in %r" % (
-                        name, self))
-            
-            setattr(self, name, widget)
-
-        if len(windows) != 1:
-            raise AssertionError(
-                "only one window per glade file allowed, got %r in %r" % (
-                    windows, self))
-
-        # get the main widget as the toplevel child from the window
-        self.window = windows[0]
-        child = self.window.get_children()[0]
-        self.window.remove(child)
-        self.widget = child
-
-        # And at last, connect signals.
-        self.wtree.signal_autoconnect(self)
-        
     def get_component_properties(self):
         return self.get_state()
     
-    def get_main_widget(self):
-        return self.widget
+    def iterate_widgets(self):
+        # depth-first
+        def iterator(w):
+            if isinstance(w, gtk.Container):
+                for c in w.get_children():
+                    for cc in iterator(c):
+                        yield cc
+            yield w
+        return iterator(self)
 
     # returns a new dict. is this necessary?
     def get_state(self):
         state_dict = {}
-        for widget in self.widgets:
-            name = widget.get_name()
-            prefix = self.widget_prefixes.get(widget.__class__, None)
-            if not prefix:
-                continue
-            try:
-                key = name.split('_', 1)[1]
-            except IndexError:
-                continue
-            
-            # only fgtk widgets implement get_state
-            state_dict[key] = widget.get_state()
+        for w in self.iterate_widgets():
+            if hasattr(w, 'get_state') and w != self:
+                # only fgtk widgets implement get_state
+                key = w.get_name().split('_', 1)[1]
+                state_dict[key] = w.get_state()
 
         return state_dict
 
-    def get_name(self):
-        return self.step_name
-    
-    def get_sidebar_name(self):
-        return getattr(self, 'sidebar_name', self.step_name)
-
-    def get_section(self):
-        return getattr(self, 'section', '')
-        
     def workerRun(self, module, function, *args):
         """
         Run the given function and arguments on the selected worker.
@@ -361,8 +303,7 @@ class Wizard(gobject.GObject, log.Loggable):
         map(self.content_area.remove, self.content_area.get_children())
 
         # Add current
-        widget = step.get_main_widget()
-        self.content_area.pack_start(widget, True, True, 0)
+        self.content_area.pack_start(step, True, True, 0)
 
         self._append_workers(step)
         icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
@@ -382,7 +323,7 @@ class Wizard(gobject.GObject, log.Loggable):
         step.before_show()
 
         self.debug('showing step %r' % step)
-        widget.show()
+        step.show()
         step.activated()
 
     def _combobox_worker_changed(self, combobox, step):
@@ -624,15 +565,14 @@ class Wizard(gobject.GObject, log.Loggable):
     
     def _sidebar_add_substeps(self, section):
         filtered_steps = [step for step in self.steps
-                                   if (step.get_section() == section and
+                                   if (step.section == section and
                                        step.visited and
                                        not hasattr(step, 'section_name'))]
         for step in filtered_steps:
-            label = step.get_sidebar_name()
-            self._sidebar_add_step(step, label, True, 20)
+            self._sidebar_add_step(step, step.sidebar_name, True, 20)
 
     def update_sidebar(self, step):
-        current = step.get_section()
+        current = step.section
 
         self._sidebar_clean()
         

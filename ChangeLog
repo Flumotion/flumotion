@@ -1,5 +1,23 @@
 2005-04-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/wizard.py (WizardStep): Change to be a
+	GladeWidget. Set glade_typedict to the fgtk.WidgetMapping().
+	(WizardStep.section, WizardStep.section_name): Add default class
+	vars, set to None by default.
+	(WizardStep._load_glade): Removed, implemented by GladeWidget.
+	(WizardStep.iterate_widgets): New generator.
+	(WizardStep.get_main_widget): Removed, WizardStep is a widget.
+	(WizardStep.get_name): Use gtk.Widget implementation.
+	(WizardStep.get_sidebar_name): Unused, removed.
+	(WizardStep.get_section): Removed, just access WizardStep.section.
+	(Wizard): Updated for WizardStep changes.
+	
+	* flumotion/test/test_wizard.py (WizardStepTest.testLoadSteps):
+	Remove tests obsoleted by the use of gladewidget, step_name and
+	step.get_name() are equal but not identical.
+	(WizardStepTest.testStepWidgets): Use iterate_widgets() instead of
+	self.widgets.
+
 	* flumotion/ui/glade.py (GladeWindow.glade_typedict)
 	(GladeWidget.glade_typedict): Added typedict class variables, and
 	used them in the initializers.

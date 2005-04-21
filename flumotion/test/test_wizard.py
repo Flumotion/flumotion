@@ -45,25 +45,20 @@ class WizardStepTest(unittest.TestCase):
         for step in self.steps:
             self.assert_(isinstance(step, wizard.WizardStep))
             self.assert_(hasattr(step, 'icon'))
-            windows = [widget for widget in step.widgets
-                                  if isinstance(widget, gtk.Window)]
-            self.assert_(len(windows) == 1)
-            window = windows[0]
-            self.failIfEqual(window.get_property('visible'), True)
             self.assert_(hasattr(step, 'icon'))
             self.assert_(hasattr(step, 'glade_file'))
             self.assert_(hasattr(step, 'step_name'))
             if step.get_name() == 'Firewire':
                 step._queryCallback(dict(height=576, width=720, par=(59,54)))
             self.assert_(isinstance(step.get_state(), dict))
-            self.assertIdentical(step.step_name, step.get_name())
+            self.assertEqual(step.step_name, step.get_name())
 
             if step.get_name() != 'Summary':
                 self.assert_(isinstance(step.get_next(), str))
                 
     def testStepWidgets(self):
         widgets = [widget for step in self.steps if step.get_name() != 'Firewire'
-                              for widget in step.widgets]
+                              for widget in step.iterate_widgets()]
         for widget in widgets:
             if isinstance(widget, fgtk.FSpinButton):
                 self.assert_(isinstance(widget.get_state(), float))
