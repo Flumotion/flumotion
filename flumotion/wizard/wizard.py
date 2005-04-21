@@ -120,40 +120,31 @@ class WizardStep(GladeWidget, log.Loggable):
         # FIXME: add errback
         return d
         
+    # Required vmethods
     def get_next(self):
         """
         @returns name of next step
         @rtype   string
 
-        This is called when the user presses next in the wizard,
-        
-        A subclass must implement this"""
+        Called when the user presses next in the wizard."""
         
         raise NotImplementedError
 
+    # Optional vmethods
     def activated(self):
         """Called just before the step is shown, so the step can
-        do some logic, eg setup the default state
-
-        This can be implemented in a subclass"""
+        do some logic, eg setup the default state"""
         
     def deactivated(self):
-        """Called after the user pressed next
-
-        This can be implemented in a subclass"""
+        """Called after the user pressed next"""
 
     def setup(self):
         """This is called after the step is constructed, to be able to
-        do some initalization time logic in the steps.
-
-        This can be implemented in a subclass."""
-
+        do some initalization time logic in the steps."""
 
     def before_show(self):
         """This is called just before we show the widget, everything
-        is created and in place
-        
-        This can be implemented in a subclass."""
+        is created and in place"""
 
     def worker_changed(self):
         pass

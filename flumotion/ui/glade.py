@@ -83,8 +83,12 @@ class GladeWidget(gtk.VBox):
     def __init__(self):
         gtk.VBox.__init__(self)
         try:
-            wtree = gtk.glade.XML(os.path.join(self.glade_dir, self.glade_file),
-                                  typedict=(self.glade_typedict or {}))
+            file = os.path.join(self.glade_dir, self.glade_file)
+            if self.glade_typedict:
+                wtree = gtk.glade.XML(file, typedict=self.glade_typedict)
+            else:
+                # pygtk 2.4 doesn't like typedict={} ?
+                wtree = gtk.glade.XML(file)
         except RuntimeError, e:
             raise RuntimeError('Failed to load file %s from directory %s: %s'
                                % (self.glade_file, self.glade_dir, e))
