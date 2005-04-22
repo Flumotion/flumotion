@@ -1,5 +1,11 @@
 2005-04-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_common_gstreamer.py:
+	* flumotion/common/gstreamer.py:
+	  add bin_find_sinks() and test
+
+2005-04-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_wizard.py:
 	* flumotion/wizard/step.py:
 	  fix Patrick Build Breakage

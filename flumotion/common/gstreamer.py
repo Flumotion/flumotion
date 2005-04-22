@@ -95,3 +95,20 @@ def get_plugin_version(plugin_name):
         return plugin.get_version()
 
     return None
+
+def bin_find_sinks(bin):
+    """
+    Return a list of all sink elements (without a source pad) in the given bin.
+
+    @rtype: list of L{gst.Element}
+    """
+    result = list(bin.get_list())
+
+    for e in bin.get_list():
+        pads = e.get_pad_list()
+        for pad in pads:
+            if pad.get_direction() == gst.PAD_SRC:
+                result.remove(e)
+                break
+
+    return result
