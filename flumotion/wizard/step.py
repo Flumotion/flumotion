@@ -37,6 +37,7 @@ class WizardStep(GladeWidget, log.Loggable):
     sidebar_name = None # optional
     icon = 'placeholder.png'
     has_worker = True
+    worker = None
 
     visited = False # set by Wizard when going through steps
 
