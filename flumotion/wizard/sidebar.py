@@ -92,6 +92,9 @@ gobject.type_register(SidebarButton)
 
 
 class SidebarSection(gtk.VBox):
+    title = None
+    steps = None
+
     gsignal('step-chosen', str)
 
     def __init__(self, name):

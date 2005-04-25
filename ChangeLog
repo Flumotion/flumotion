@@ -1,3 +1,8 @@
+2005-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/sidebar.py:
+	  declare the classvars
+
 2005-04-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/wizard/sidebar.py (WizardSidebar.__init__): Fix size
