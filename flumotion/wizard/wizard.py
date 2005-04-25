@@ -49,7 +49,7 @@ def escape(text):
 
 class Sections(types.KeyedList):
     def __init__(self, *args):
-        KeyedList.__init__(self, *args)
+        types.KeyedList.__init__(self, *args)
         self.add_key(str, lambda x: x.section)
 
 class Scenario:
@@ -109,7 +109,6 @@ class Scenario:
             s = self.stack.pop()
             s.visited = False
             self.sidebar.pop()
-        print self.stack
 
         if not next_step.visited:
             self.sidebar.push(next_step.section, next_step.step_name,

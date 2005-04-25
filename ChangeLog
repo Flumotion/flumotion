@@ -1,5 +1,12 @@
 2005-04-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/wizard.py (Scenario.show_next): Fix variable
+	ref.
+	
+	* flumotion/wizard/wizard.py (Scenario.show_next): 
+	* flumotion/wizard/types.py (WalkableStack.push): Remove some
+	prints.
+
 	* flumotion/wizard/steps.py: Don't register the steps, that kruft
 	is gone thankfully. Add pages for sections. Return None for
 	get_next at the end of sections. Unfortunately have to change the

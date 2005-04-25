@@ -44,7 +44,6 @@ class WalkableStack:
             self.pos += 1
             return True
         else:
-            print x, self.l[self.pos + 1]
             return False
 
     def current(self):
