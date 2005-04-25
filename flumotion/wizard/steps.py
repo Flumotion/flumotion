@@ -48,18 +48,9 @@ class Welcome(WizardSection):
         return None
 
 class Production(WizardSection):
-    glade_file = 'wizard_overview.glade'
-    section = 'Production'
-    section_name = 'Production'
-    icon = 'source.png'
-    def get_next(self):
-        return 'Source'
-
-class Source(WizardStep):
-    step_name = 'Source'
     glade_file = 'wizard_source.glade'
+    name = 'Source'
     section = 'Production'
-    section_name = 'Production'
     icon = 'source.png'
     
     def setup(self):
@@ -143,7 +134,7 @@ class VideoSource(WizardStep):
 # apps (and flumotion) talk about "TV Norm" and "source",
 # and channel (corresponding to frequency)
 class TVCard(VideoSource):
-    step_name = 'TV Card'
+    name = 'TV Card'
     glade_file = 'wizard_tvcard.glade'
     component_type = 'bttv'
     icon = 'tv.png'
@@ -222,7 +213,7 @@ class TVCard(VideoSource):
         return options
 
 class FireWire(VideoSource):
-    step_name = 'Firewire'
+    name = 'Firewire'
     glade_file = 'wizard_firewire.glade'
     component_type = 'firewire'
     icon = 'firewire.png'
@@ -375,7 +366,7 @@ class FireWire(VideoSource):
         d.addErrback(self._queryErrback)
 
 class Webcam(VideoSource):
-    step_name = 'Webcam'
+    name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
     component_type = 'video4linux'
     icon = 'webcam.png'
@@ -450,7 +441,7 @@ class Webcam(VideoSource):
         return options
 
 class TestVideoSource(VideoSource):
-    step_name = 'Test Video Source'
+    name = 'Test Video Source'
     glade_file = 'wizard_testsource.glade'
     component_type = 'videotestsrc'
     icon = 'testsource.png'
@@ -479,7 +470,7 @@ class TestVideoSource(VideoSource):
         return options
 
 class Overlay(WizardStep):
-    step_name = 'Overlay'
+    name = 'Overlay'
     glade_file = 'wizard_overlay.glade'
     section = 'Production'
     component_type = 'overlay'
@@ -550,7 +541,7 @@ image."""
         return None
 
 class Soundcard(WizardStep):
-    step_name = 'Soundcard'
+    name = 'Soundcard'
     glade_file = 'wizard_soundcard.glade'
     section = 'Production'
     component_type = 'osssrc'
@@ -669,7 +660,7 @@ class Soundcard(WizardStep):
         return None
 
 class TestAudioSource(WizardStep):
-    step_name = 'Test Audio Source'
+    name = 'Test Audio Source'
     glade_file = 'wizard_audiotest.glade'
     section = 'Production'
     icon = 'soundcard.png'
@@ -690,14 +681,8 @@ class TestAudioSource(WizardStep):
         return None
 
 class Conversion(WizardSection):
-    glade_file = 'wizard_overview.glade'
-    section = 'Conversion'
-    def get_next(self):
-        return 'Encoding'
-
-class Encoding(WizardStep):
-    step_name = 'Encoding'
     glade_file = 'wizard_encoding.glade'
+    name = 'Encoding'
     section = 'Conversion'
     
     setup_finished = False
@@ -769,7 +754,7 @@ class VideoEncoder(WizardStep):
     section = 'Conversion'
 
 class Theora(VideoEncoder):
-    step_name = 'Theora'
+    name = 'Theora'
     glade_file = 'wizard_theora.glade'
     component_type = 'theora'
     icon = 'xiphfish.png'
@@ -804,7 +789,7 @@ class Theora(VideoEncoder):
         return options
     
 class Smoke(VideoEncoder):
-    step_name = 'Smoke'
+    name = 'Smoke'
     glade_file = 'wizard_smoke.glade'
     section = 'Conversion'
     component_type = 'smoke'
@@ -824,7 +809,7 @@ class Smoke(VideoEncoder):
         return options
 
 class JPEG(VideoEncoder):
-    step_name = 'JPEG'
+    name = 'JPEG'
     glade_file = 'wizard_jpeg.glade'
     section = 'Conversion'
     component_type = 'jpeg'
@@ -851,7 +836,7 @@ class AudioEncoder(WizardStep):
 # Worker?
 class Vorbis(AudioEncoder):
     glade_file = 'wizard_vorbis.glade'
-    step_name = 'Vorbis'
+    name = 'Vorbis'
     component_type = 'vorbis'
     icon = 'xiphfish.png'
 
@@ -882,7 +867,7 @@ class Vorbis(AudioEncoder):
         return options
 
 class Speex(AudioEncoder):
-    step_name = 'Speex'
+    name = 'Speex'
     component_type = 'speex'
     icon = 'xiphfish.png'
     
@@ -900,13 +885,7 @@ class Speex(AudioEncoder):
         return options
 
 class Consumption(WizardSection):
-    glade_file = 'wizard_overview.glade'
-    section = 'Consumption'
-    def get_next(self):
-        return 'Consumption2'
-
-class Consumption2(WizardStep):
-    step_name = 'Consumption2'
+    name = 'Consumption'
     glade_file = 'wizard_consumption.glade'
     section = 'Consumption'
     icon = 'consumption.png'
@@ -1008,7 +987,7 @@ class HTTP(WizardStep):
         self.spinbutton_port.set_value(self.port)
         
     def get_next(self):
-        return self.wizard['Consumption2'].get_next(self)
+        return self.wizard['Consumption'].get_next(self)
 
     def get_state(self):
         options = WizardStep.get_state(self)
@@ -1020,17 +999,17 @@ class HTTP(WizardStep):
         return options
 
 class HTTPBoth(HTTP):
-    step_name = 'HTTP Streamer (audio & video)'
+    name = 'HTTP Streamer (audio & video)'
     sidebar_name = 'HTTP audio/video'
     port = configure.defaultStreamPortRange[0]
 
 class HTTPAudio(HTTP):
-    step_name = 'HTTP Streamer (audio only)'
+    name = 'HTTP Streamer (audio only)'
     sidebar_name = 'HTTP audio'
     port = configure.defaultStreamPortRange[1]
 
 class HTTPVideo(HTTP):
-    step_name = 'HTTP Streamer (video only)'
+    name = 'HTTP Streamer (video only)'
     sidebar_name = 'HTTP video'
     port = configure.defaultStreamPortRange[2]
 
@@ -1094,32 +1073,27 @@ class Disk(WizardStep):
         return options
     
     def get_next(self):
-        return self.wizard['Consumption2'].get_next(self)
+        return self.wizard['Consumption'].get_next(self)
 
 class DiskBoth(Disk):
-    step_name = 'Disk (audio & video)'
+    name = 'Disk (audio & video)'
     sidebar_name = 'Disk audio/video'
 
 class DiskAudio(Disk):
-    step_name = 'Disk (audio only)'
+    name = 'Disk (audio only)'
     sidebar_name = 'Disk audio'
 
 class DiskVideo(Disk):
-    step_name = 'Disk (video only)'
+    name = 'Disk (video only)'
     sidebar_name = 'Disk video'
 
 class License(WizardSection):
-    glade_file = 'wizard_overview.glade'
-    section = 'License'
-    def get_next(self):
-        return 'Content License'
-
-class ContentLicense(WizardStep):
-    step_name = "Content License"
+    name = "Content License"
     glade_file = "wizard_license.glade"
     section = 'License'
     icon = 'licenses.png'
     has_worker = False
+
     def setup(self):
         self.combobox_license.set_enum(LicenseType)
         

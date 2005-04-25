@@ -60,9 +60,9 @@ class Scenario:
         self.wizard = wizard # remove?
         self.sidebar = wizard.sidebar
         assert self.sections
-        self.sidebar.set_sections(map(lambda x:x.section, self.sections))
+        self.sidebar.set_sections([(x.section, x.name) for x in self.sections])
         self.current_section = 0
-        self.steps = []
+        self.steps = list(self.sections)
         self.stack = types.WalkableStack()
         self.current_step = None
         self.sidebar.connect('step-chosen', self.step_selected)
@@ -111,7 +111,7 @@ class Scenario:
             self.sidebar.pop()
 
         if not next_step.visited:
-            self.sidebar.push(next_step.section, next_step.step_name,
+            self.sidebar.push(next_step.section, next_step.name,
                               next_step.sidebar_name)
         else:
             self.sidebar.show_step(next_step.section, next_step.name)
@@ -159,7 +159,7 @@ class BasicScenario(Scenario):
             try:
                 if issubclass(v, step.WizardSection):
                     pass
-                elif issubclass(v, step.WizardStep) and v.step_name:
+                elif issubclass(v, step.WizardStep) and v.name:
                     self.add_step(v)
             except TypeError:
                 pass
@@ -284,7 +284,8 @@ class Wizard(GladeWindow, log.Loggable):
         icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
         self.image_icon.set_from_file(icon_filename)
             
-        self.label_title.set_markup('<span size="x-large">' + escape(step.get_name()) + '</span>')
+        m = '<span size="x-large">%s</span>' % escape(step.name)
+        self.label_title.set_markup(m)
 
         if self.current_step:
             self.current_step.deactivated()

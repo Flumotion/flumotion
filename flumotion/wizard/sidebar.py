@@ -97,13 +97,13 @@ class SidebarSection(gtk.VBox):
 
     gsignal('step-chosen', str)
 
-    def __init__(self, name):
+    def __init__(self, title, name):
         gtk.VBox.__init__(self)
 
-        self.set_name(name)
+        self.set_name(title)
         self.steps = []
 
-        self.title = SidebarButton(name, 10)
+        self.title = SidebarButton(title, 10)
         self.title.show()
         self.title.set_sensitive(False)
         self.pack_start(self.title, False, False)
@@ -160,6 +160,7 @@ class WizardSidebar(gtk.EventBox):
         self.vbox.show()
         self.add(self.vbox)
         self.active = -1
+        self.top = -1
         self.sections = []
         self.connect_after('realize', WizardSidebar.on_realize)
 
@@ -187,7 +188,7 @@ class WizardSidebar(gtk.EventBox):
                 self.vbox.reorder_child(self.sections[i], l - i)
 
     # public
-    def set_sections(self, section_names):
+    def set_sections(self, titles_and_names):
         for w in self.sections:
             self.vbox.remove(w)
             del w
@@ -197,8 +198,8 @@ class WizardSidebar(gtk.EventBox):
 
         self.sections = []
 
-        for section_name in section_names:
-            w = SidebarSection(section_name)
+        for x in titles_and_names:
+            w = SidebarSection(*x)
             w.connect('step-chosen', clicked_cb)
             w.show()
             w.set_active(False)
@@ -213,20 +214,22 @@ class WizardSidebar(gtk.EventBox):
         raise AssertionError()
 
     def push(self, section_name, step_name, step_title):
-        if step_name:
-            # it's a step
-            assert self.sections[self.active].name == section_name
+        if self.sections[self.active].name == section_name:
+            # same section
             self.sections[self.active].push_step(step_name, step_title)
         else:
-            # it's a section
+            # new section
             assert self.sections[self.active + 1].name == section_name
             self.set_active(self.active + 1)
+            self.top += 1
             self.sections[self.active].push_header()
             
     def pop(self):
-        if self.sections[self.active].steps:
-            self.sections[self.active].pop_step()
+        if self.sections[self.top].steps:
+            self.sections[self.top].pop_step()
         else:
-            self.sections[self.active].pop_header()
-            self.set_active(self.active - 1)
+            self.sections[self.top].pop_header()
+            self.top -= 1
+            if self.top < self.active:
+                self.set_active(self.top)
 gobject.type_register(WizardSidebar)

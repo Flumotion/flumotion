@@ -5,6 +5,20 @@
 
 2005-04-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/steps.py: No more placeholders, no more
+	Consumption2.
+
+	* flumotion/wizard/step.py (WizardStep): s/step_name/name/. All
+	accessors changed.
+
+	* flumotion/wizard/sidebar.py (SidebarSection.__init__): Allow
+	sidebar entries to have different titles than their names. Thus a
+	Production button can have a Source title. Crack.
+	(WizardSidebar.push, WizardSidebar.pop): Push and pop from the top
+	of the stack, not the active section.
+
+	* data/wizard/wizard_summary.glade: Fix visibility problem.
+
 	* flumotion/wizard/sidebar.py (WizardSidebar.__init__): Fix size
 	request. 
 	(SidebarButton.__init__): Fix padding.

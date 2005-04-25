@@ -32,14 +32,17 @@ class WizardStep(GladeWidget, log.Loggable):
     glade_typedict = fgtk.WidgetMapping()
 
     # set by subclasses
-    step_name = None
+    name = None
     section = None
-    sidebar_name = None # optional
     icon = 'placeholder.png'
-    has_worker = True
-    worker = None
 
-    visited = False # set by Wizard when going through steps
+    # optional
+    sidebar_name = None
+    has_worker = True
+
+    # set by Wizard when going through steps
+    visited = False
+    worker = None
 
     def __init__(self, wizard):
         """
@@ -47,14 +50,14 @@ class WizardStep(GladeWidget, log.Loggable):
         @type  wizard: L{Wizard}
         """
         GladeWidget.__init__(self)
-        self.set_name(self.step_name)
+        self.set_name(self.name)
         if not self.sidebar_name:
-            self.sidebar_name = self.step_name
+            self.sidebar_name = self.name
         self.wizard = wizard
         self.setup()
 
     def __repr__(self):
-        return '<WizardStep object %s>' % self.step_name
+        return '<WizardStep object %s>' % self.name
     
     def get_component_properties(self):
         return self.get_state()
@@ -131,8 +134,10 @@ class WizardStep(GladeWidget, log.Loggable):
         pass
 
 class WizardSection(WizardStep):
-    def __repr__(self):
-        return '<WizardSection object %s>' % self.section
+    def __init__(self, *args):
+        if not self.name:
+            self.name = self.section
+        WizardStep.__init__(self, *args)
 
-    def set_name(self, x):
-        gtk.Widget.set_name(self, self.section)
+    def __repr__(self):
+        return '<WizardSection object %s>' % self.name
