@@ -46,11 +46,11 @@ class WizardStepTest(unittest.TestCase):
             self.assert_(hasattr(s, 'icon'))
             self.assert_(hasattr(s, 'icon'))
             self.assert_(hasattr(s, 'glade_file'))
-            self.assert_(hasattr(s, 'step_name'))
+            self.assert_(hasattr(s, 'name'))
             if s.get_name() == 'Firewire':
                 s._queryCallback(dict(height=576, width=720, par=(59,54)))
             self.assert_(isinstance(s.get_state(), dict))
-            self.assertEqual(s.step_name, s.get_name())
+            self.assertEqual(s.name, s.get_name())
 
             if s.get_name() != 'Summary':
                 get_next_ret = s.get_next()
