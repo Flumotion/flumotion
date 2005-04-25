@@ -1,3 +1,40 @@
+2005-04-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/steps.py: Don't register the steps, that kruft
+	is gone thankfully. Add pages for sections. Return None for
+	get_next at the end of sections. Unfortunately have to change the
+	name of the consumption page -- will be working on this.
+
+	* flumotion/wizard/wizard.py (Scenario): Initial attempt at
+	tearing the stack logic out of the wizard.
+	(BasicScenario): Basic scenario with six sections and steps
+	autoloaded from steps.py.
+	(Wizard): Is a gladewindow now.
+
+	* flumotion/wizard/sidebar.py: New file.
+	(WizardSidebar): Widget for the sidebar. Has four operations:
+	set_sections, show_step, push, and pop.
+
+	* data/glade/wizard_overview.glade: Placeholder for forthcoming
+	summary pages.
+
+	* flumotion/wizard/types.py: New file.
+	(WalkableStack): A stack that you can walk down. Pushing an item
+	on the stack can fail if you're not at the head and the next item
+	is different from the one you're pushing.
+	(KeyedList): An ordered list of objects that can be accessed by
+	non-numeric keys as well. Perhaps a crack idea.
+
+	* flumotion/wizard/save.py (WizardSaver.handleConsumers):
+	Temporary fix for Consumption2 page name.
+
+	* flumotion/common/watched.py: New file, implements data types
+	that notify listeners when it changes.
+	(WatchedList): Bling.
+
+	* flumotion/ui/glade.py (GladeWindow.destroy): Delete the window
+	reference after destroying it.
+
 2005-04-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_common_gstreamer.py:

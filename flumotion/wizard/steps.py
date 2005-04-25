@@ -26,8 +26,7 @@ from twisted.internet import defer
 
 from flumotion.common import errors
 from flumotion.configure import configure
-from flumotion.wizard import wizard
-from flumotion.wizard.step import WizardStep
+from flumotion.wizard.step import WizardStep, WizardSection
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      EncodingFormat, EncodingVideo, \
      LicenseType, RotateSize, RotateTime, SoundcardBitdepth, \
@@ -40,16 +39,21 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
 
-class Welcome(WizardStep):
-    step_name = 'Welcome'
+class Welcome(WizardSection):
     glade_file = 'wizard_welcome.glade'
     section = 'Welcome'
-    section_name = 'Welcome'
     icon = 'wizard.png'
     has_worker = False
     def get_next(self):
+        return None
+
+class Production(WizardSection):
+    glade_file = 'wizard_overview.glade'
+    section = 'Production'
+    section_name = 'Production'
+    icon = 'source.png'
+    def get_next(self):
         return 'Source'
-wizard.register_step(Welcome, initial=True)
 
 class Source(WizardStep):
     step_name = 'Source'
@@ -117,7 +121,6 @@ class Source(WizardStep):
             return audio_source.step
             
         raise AssertionError
-wizard.register_step(Source)
 
 class VideoSource(WizardStep):
     section = 'Production'
@@ -217,7 +220,6 @@ class TVCard(VideoSource):
         options['height'] = int(self.spinbutton_height.get_value())
         options['framerate'] = self.spinbutton_framerate.get_value()
         return options
-wizard.register_step(TVCard)
 
 class FireWire(VideoSource):
     step_name = 'Firewire'
@@ -372,8 +374,6 @@ class FireWire(VideoSource):
         d.addCallback(self._queryCallback)
         d.addErrback(self._queryErrback)
 
-wizard.register_step(FireWire)
-
 class Webcam(VideoSource):
     step_name = 'Webcam'
     glade_file = 'wizard_webcam.glade'
@@ -448,7 +448,6 @@ class Webcam(VideoSource):
         options['height'] = int(self.spinbutton_height.get_value())
         options['framerate'] = self.spinbutton_framerate.get_value()
         return options
-wizard.register_step(Webcam)
 
 class TestVideoSource(VideoSource):
     step_name = 'Test Video Source'
@@ -478,7 +477,6 @@ class TestVideoSource(VideoSource):
         options['height'] = int(self.spinbutton_height.get_value())
         options['framerate'] = self.spinbutton_framerate.get_value()
         return options
-wizard.register_step(TestVideoSource)
 
 class Overlay(WizardStep):
     step_name = 'Overlay'
@@ -549,8 +547,7 @@ image."""
             elif audio_source == AudioDevice.Test:
                 return 'Test Audio Source'
             
-        return 'Encoding'
-wizard.register_step(Overlay)
+        return None
 
 class Soundcard(WizardStep):
     step_name = 'Soundcard'
@@ -669,8 +666,7 @@ class Soundcard(WizardStep):
         return d
 
     def get_next(self):
-        return 'Encoding'
-wizard.register_step(Soundcard)
+        return None
 
 class TestAudioSource(WizardStep):
     step_name = 'Test Audio Source'
@@ -691,14 +687,18 @@ class TestAudioSource(WizardStep):
         }
     
     def get_next(self):
+        return None
+
+class Conversion(WizardSection):
+    glade_file = 'wizard_overview.glade'
+    section = 'Conversion'
+    def get_next(self):
         return 'Encoding'
-wizard.register_step(TestAudioSource)
 
 class Encoding(WizardStep):
     step_name = 'Encoding'
     glade_file = 'wizard_encoding.glade'
     section = 'Conversion'
-    section_name = 'Conversion'
     
     setup_finished = False
 
@@ -747,9 +747,9 @@ class Encoding(WizardStep):
             elif codec == EncodingAudio.Speex:
                 return 'Speex'
             elif codec == EncodingAudio.Mulaw:
-                return 'Consumption'
+                return None
             
-        return 'Consumption'
+        return None
         
     def get_next(self):
         if self.wizard.get_step_option('Source', 'has_video'):
@@ -763,12 +763,10 @@ class Encoding(WizardStep):
         elif self.wizard.get_step_option('Source', 'has_audio'):
             return self.get_audio_page()
         else:
-            return 'Consumption'
-wizard.register_step(Encoding)
+            return None
 
 class VideoEncoder(WizardStep):
     section = 'Conversion'
-wizard.register_step(VideoEncoder)
 
 class Theora(VideoEncoder):
     step_name = 'Theora'
@@ -805,8 +803,6 @@ class Theora(VideoEncoder):
 
         return options
     
-wizard.register_step(Theora)
-
 class Smoke(VideoEncoder):
     step_name = 'Smoke'
     glade_file = 'wizard_smoke.glade'
@@ -827,8 +823,6 @@ class Smoke(VideoEncoder):
         options['keyframe'] = int(options['keyframe'])
         return options
 
-wizard.register_step(Smoke)
-
 class JPEG(VideoEncoder):
     step_name = 'JPEG'
     glade_file = 'wizard_jpeg.glade'
@@ -847,14 +841,12 @@ class JPEG(VideoEncoder):
         options['framerate'] = float(options['framerate'])
         return options
     
-wizard.register_step(JPEG)
-
 class AudioEncoder(WizardStep):
     glade_file = 'wizard_audio_encoder.glade'
     section = 'Conversion'
     
     def get_next(self):
-        return 'Consumption'
+        return None
 
 # Worker?
 class Vorbis(AudioEncoder):
@@ -888,7 +880,6 @@ class Vorbis(AudioEncoder):
         elif self.radiobutton_quality:
             options['quality'] = int(self.spinbutton_quality.get_value())
         return options
-wizard.register_step(Vorbis)
 
 class Speex(AudioEncoder):
     step_name = 'Speex'
@@ -907,13 +898,17 @@ class Speex(AudioEncoder):
         options = AudioEncoder.get_state(self)
         options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
         return options
-wizard.register_step(Speex)
 
-class Consumption(WizardStep):
-    step_name = 'Consumption'
+class Consumption(WizardSection):
+    glade_file = 'wizard_overview.glade'
+    section = 'Consumption'
+    def get_next(self):
+        return 'Consumption2'
+
+class Consumption2(WizardStep):
+    step_name = 'Consumption2'
     glade_file = 'wizard_consumption.glade'
     section = 'Consumption'
-    section_name = 'Consumption'
     icon = 'consumption.png'
     has_worker = False
 
@@ -998,8 +993,7 @@ class Consumption(WizardStep):
             if stepname in items and items[-1] != stepname:
                 return items[items.index(stepname)+1]
             else:
-                return 'Content License'
-wizard.register_step(Consumption)
+                return None
 
 # XXX: If audio codec is speex, disable java applet option
 class HTTP(WizardStep):
@@ -1014,7 +1008,7 @@ class HTTP(WizardStep):
         self.spinbutton_port.set_value(self.port)
         
     def get_next(self):
-        return self.wizard['Consumption'].get_next(self)
+        return self.wizard['Consumption2'].get_next(self)
 
     def get_state(self):
         options = WizardStep.get_state(self)
@@ -1029,19 +1023,16 @@ class HTTPBoth(HTTP):
     step_name = 'HTTP Streamer (audio & video)'
     sidebar_name = 'HTTP audio/video'
     port = configure.defaultStreamPortRange[0]
-wizard.register_step(HTTPBoth)
 
 class HTTPAudio(HTTP):
     step_name = 'HTTP Streamer (audio only)'
     sidebar_name = 'HTTP audio'
     port = configure.defaultStreamPortRange[1]
-wizard.register_step(HTTPAudio)
 
 class HTTPVideo(HTTP):
     step_name = 'HTTP Streamer (video only)'
     sidebar_name = 'HTTP video'
     port = configure.defaultStreamPortRange[2]
-wizard.register_step(HTTPVideo)
 
 class Disk(WizardStep):
     glade_file = 'wizard_disk.glade'
@@ -1103,28 +1094,30 @@ class Disk(WizardStep):
         return options
     
     def get_next(self):
-        return self.wizard['Consumption'].get_next(self)
+        return self.wizard['Consumption2'].get_next(self)
 
 class DiskBoth(Disk):
     step_name = 'Disk (audio & video)'
     sidebar_name = 'Disk audio/video'
-wizard.register_step(DiskBoth)
 
 class DiskAudio(Disk):
     step_name = 'Disk (audio only)'
     sidebar_name = 'Disk audio'
-wizard.register_step(DiskAudio)
 
 class DiskVideo(Disk):
     step_name = 'Disk (video only)'
     sidebar_name = 'Disk video'
-wizard.register_step(DiskVideo)
 
-class Licence(WizardStep):
+class License(WizardSection):
+    glade_file = 'wizard_overview.glade'
+    section = 'License'
+    def get_next(self):
+        return 'Content License'
+
+class ContentLicense(WizardStep):
     step_name = "Content License"
     glade_file = "wizard_license.glade"
     section = 'License'
-    section_name = 'License'
     icon = 'licenses.png'
     has_worker = False
     def setup(self):
@@ -1134,11 +1127,10 @@ class Licence(WizardStep):
         self.combobox_license.set_sensitive(button.get_active())
         
     def get_next(self):
-        return 'Summary'
-wizard.register_step(Licence)
+        return None
 
-class Summary(WizardStep):
-    step_name = "Summary"
+class Summary(WizardSection):
+    section = "Summary"
     glade_file = "wizard_summary.glade"
     icon = 'summary.png'
     has_worker = False
@@ -1148,5 +1140,4 @@ class Summary(WizardStep):
         normal_bg = self.textview_message.get_style().bg[gtk.STATE_NORMAL]
         self.textview_message.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
     def get_next(self):
-        return
-wizard.register_step(Summary)
+        return None

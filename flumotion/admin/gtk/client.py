@@ -735,7 +735,6 @@ class Window(log.Loggable, gobject.GObject):
         
         wiz = wizard.Wizard(self.window, self.admin)
         wiz.connect('finished', _wizard_finished_cb)
-        wiz.load_steps()
         wiz.run(True, state, False)
 
         self.wizard = wiz

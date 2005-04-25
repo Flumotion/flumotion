@@ -31,10 +31,10 @@ from twisted.internet import defer
 
 from flumotion.configure import configure
 from flumotion.common import log, errors, worker
-from flumotion.wizard import enums, save
+from flumotion.wizard import enums, save, step, types
 #from flumotion.wizard.sidebar import WizardSidebar
 from flumotion.ui import fgtk
-from flumotion.ui.glade import GladeWindow, GladeWidget
+from flumotion.ui.glade import GladeWindow
 from flumotion.twisted import flavors
 
 from flumotion.common.pygobject import gsignal
@@ -47,17 +47,125 @@ __pychecker__ = 'no-classattr no-argsused'
 def escape(text):
     return text.replace('&', '&amp;')
 
-class Stack(list):
-    push = list.append
-    def peek(self):
-        return self[-1]
+class Sections(types.KeyedList):
+    def __init__(self, *args):
+        KeyedList.__init__(self, *args)
+        self.add_key(str, lambda x: x.section)
+
+class Scenario:
+    # to be provided by subclasses
+    sections = None
+
+    def __init__(self, wizard):
+        self.wizard = wizard # remove?
+        self.sidebar = wizard.sidebar
+        assert self.sections
+        self.sidebar.set_sections(map(lambda x:x.section, self.sections))
+        self.current_section = 0
+        self.steps = []
+        self.stack = types.WalkableStack()
+        self.current_step = None
+        self.sidebar.connect('step-chosen', self.step_selected)
     
-class Wizard(gobject.GObject, log.Loggable):
-    sidebar_bg = None
-    sidebar_fg = None
-    sidebar_fgi = None
-    sidebar_pre_bg = None
-    
+    def add_step(self, step_class):
+        # FIXME: remove ref to wiz
+        self.steps.append(step_class(self.wizard))
+
+    def step_selected(self, sidebar, name):
+        self.stack.skip_to(lambda x: x.name == name)
+        step = self.stack.current()
+        self.current_step = step
+        self.sidebar.show_step(step.section, step.name)
+        self.current_section = self.sections.index(self.sections[step.section])
+        self.wizard.set_step(step)
+
+    def show_previous(self):
+        step = self.stack.back()
+        self.current_section = self.sections.index(self.sections[step.section])
+        self.wizard.set_step(step)
+        self.current_step = step
+        #self._set_worker_from_step(prev_step)
+        self.wizard.update_buttons(has_next=True)
+        self.sidebar.show_step(step.section, step.name)
+        has_next = not hasattr(step, 'last_step')
+        self.wizard.update_buttons(has_next)
+
+    def show_next(self):
+        self.wizard._setup_worker(self.current_step)
+        next = self.current_step.get_next()
+        if not next:
+            if self.current_section + 1 == len(self.sections):
+                self.wizard.finish(save=True)
+                return
+            self.current_section += 1
+            next_step = self.sections[self.current_section]
+        else:
+            try:
+                next_step = self.wizard[next]
+            except KeyError:
+                raise TypeError("Wizard step %s is missing" % `next`)
+
+        while not self.stack.push(next_step):
+            s = self.stack.pop()
+            s.visited = False
+            self.sidebar.pop()
+        print self.stack
+
+        if not next_step.visited:
+            self.sidebar.push(next_step.section, next_step.step_name,
+                              next_step.sidebar_name)
+        else:
+            self.sidebar.show_step(next_step.section, next_step.name)
+        next_step.visited = True
+        self.wizard.set_step(next_step)
+        self.current_step = next_step
+
+        has_next = not hasattr(next_step, 'last_step')
+        self.wizard.update_buttons(has_next)
+
+    def run(self, interactive):
+        section = self.sections[self.current_section]
+        self.sidebar.push(section.section, None, section.section)
+        self.stack.push(section)
+        self.wizard.set_step(section)
+        self.current_step = section
+        
+        if not interactive:
+            while self.show_next():
+                pass
+            return self.wizard.finish(False)
+
+        self.wizard.window.present()
+        self.wizard.window.grab_focus()
+        if not self.wizard._use_main:
+            return
+        
+        try:
+            gtk.main()
+        except KeyboardInterrupt:
+            pass
+
+class BasicScenario(Scenario):
+    def __init__(self, wizard):
+        from flumotion.wizard import steps
+        self.sections = Sections()
+        for klass in (steps.Welcome, steps.Production, steps.Conversion,
+                      steps.Consumption, steps.License, steps.Summary):
+            self.sections.append(klass(wizard))
+
+        Scenario.__init__(self, wizard)
+
+        for k in dir(steps):
+            v = getattr(steps, k)
+            try:
+                if issubclass(v, step.WizardSection):
+                    pass
+                elif issubclass(v, step.WizardStep) and v.step_name:
+                    self.add_step(v)
+            except TypeError:
+                pass
+
+class Wizard(GladeWindow, log.Loggable):
     gsignal('finished', str)
     gsignal('destroy')
     
@@ -65,62 +173,56 @@ class Wizard(gobject.GObject, log.Loggable):
 
     flowName = 'default'
 
+    glade_file = 'wizard.glade'
+
     __implements__ = flavors.IStateListener,
 
     def __init__(self, parent_window=None, admin=None):
-        self.__gobject_init__()
-        self.wtree = gtk.glade.XML(os.path.join(configure.gladedir, 'wizard.glade'))
-        for widget in self.wtree.get_widget_prefix(''):
-            setattr(self, widget.get_name(), widget)
-        self.wtree.signal_autoconnect(self)
+        GladeWindow.__init__(self, parent_window)
+        for k, v in self.widgets.items():
+            setattr(self, k, v)
 
-        if parent_window:
-            self.window.set_transient_for(parent_window)
+        self.scenario = BasicScenario(self)
 
-        # have to get the style from the theme, but it's not really there until
-        # it's attached
-        self.label_title.realize()
-        style = self.label_title.get_style()
-
-        self.sidebar_bg = style.bg[gtk.STATE_SELECTED]
-        self.sidebar_fg = style.fg[gtk.STATE_SELECTED]
-        self.sidebar_fgi = style.light[gtk.STATE_SELECTED]
-        self.sidebar_pre_bg = style.bg[gtk.STATE_ACTIVE]
-        self.eventbox_top.modify_bg(gtk.STATE_NORMAL, self.sidebar_bg)
-        self.label_title.modify_fg(gtk.STATE_NORMAL, self.sidebar_fg)
         self.window.set_icon_from_file(os.path.join(configure.imagedir,
                                                     'fluendo.png'))
         self._admin = admin
         self._save = save.WizardSaver(self)
         self._use_main = True
-        self._workerHeavenState = None
-        self.steps = []
-        self.stack = Stack()
         self.current_step = None
+        self._workerHeavenState = None
         self._last_worker = 0 # combo id last worker from step to step
         self._worker_box = None # gtk.Widget containing worker combobox
 
+        self.window.connect_after('realize', self.on_realize)
         self.window.connect('destroy', lambda *x: self.emit('destroy'))
+
+    def on_realize(self, window):
+        # have to get the style from the theme, but it's not really
+        # there until it's attached
+        style = self.window.get_style()
+        bg = style.bg[gtk.STATE_SELECTED]
+        fg = style.fg[gtk.STATE_SELECTED]
+        self.eventbox_top.modify_bg(gtk.STATE_NORMAL, bg)
+        self.label_title.modify_fg(gtk.STATE_NORMAL, fg)
 
     def present(self):
         self.window.present()
 
     def destroy(self):
-        self.window.destroy()
-        del self.window
-        del self.wtree
+        GladeWindow.destroy(self)
         del self._admin
         del self._save
 
     def __getitem__(self, stepname):
-        for item in self.steps:
+        for item in self.scenario.steps:
             if item.get_name() == stepname:
                 return item
         else:
             raise KeyError
 
     def __len__(self):
-        return len(self.steps)
+        return len(self.scenario.steps)
 
     def _dialog(self, type, message):
         """
@@ -138,7 +240,6 @@ class Wizard(gobject.GObject, log.Loggable):
         d.show_all()
         return d
 
-            
     def error_dialog(self, message):
         """
         Show an error message dialog.
@@ -173,25 +274,6 @@ class Wizard(gobject.GObject, log.Loggable):
     def block_prev(self, block):
         self.button_prev.set_sensitive(not block)
 
-    def add_step(self, step_class, initial=False):
-        # If we don't have step_name set, count it as a base class
-        name = step_class.step_name
-        if name == None:
-            return
-        
-        #if self.steps.has_key(name):
-        #    raise TypeError("%s added twice" % name)
-
-        # FIXME: document why steps need to ref their parent. otherwise
-        # remove this
-        step = step_class(self)
-        self.steps.append(step)
-
-        step.setup()
-
-        if initial:
-            self.stack.push(step)
-
     def set_step(self, step):
         # Remove previous step
         map(self.content_area.remove, self.content_area.get_children())
@@ -210,7 +292,6 @@ class Wizard(gobject.GObject, log.Loggable):
 
         self.current_step = step
         
-        self.update_sidebar(step)
         self.update_buttons(has_next=True)
 
         self._setup_worker(step)
@@ -264,18 +345,6 @@ class Wizard(gobject.GObject, log.Loggable):
             model.append((name,))
         self.combobox_worker.set_active(self._last_worker)
         
-    def show_previous(self):
-        step = self.stack.pop()
-
-        self._setup_worker(step)
-
-        prev_step = self.stack.peek()
-        
-        self.set_step(prev_step)
-        self._set_worker_from_step(prev_step)
-
-        self.update_buttons(has_next=True)
-
     def get_admin(self):
         return self._admin
     
@@ -338,32 +407,10 @@ class Wizard(gobject.GObject, log.Loggable):
                 self.combobox_worker.set_active_iter(row.iter)
                 break
 
-    def show_next(self):
-        next = self.current_step.get_next()
-        if not next:
-            self.finish(save=True)
-            return
-
-        self._setup_worker(self.current_step)
-
-        try:
-            next_step = self[next]
-        except KeyError:
-            raise TypeError("Wizard step %s is missing" % `next`)
-
-        
-        next_step.visited = True
-
-        self.stack.push(next_step)
-        self.set_step(next_step)
-
-        has_next = not hasattr(next_step, 'last_step')
-        self.update_buttons(has_next)
-
     def update_buttons(self, has_next):
         # update the forward and next buttons
         # has_next: whether or not there is a next step
-        if len(self.stack) == 1:
+        if self.scenario.stack.pos == 0:
             self.button_prev.set_sensitive(False)
         else:
             self.button_prev.set_sensitive(True)
@@ -375,125 +422,14 @@ class Wizard(gobject.GObject, log.Loggable):
             # use APPLY, just like in gnomemeeting
             self.button_next.set_label(gtk.STOCK_APPLY)
 
-    def _sidebar_clean(self):
-        # First remove the old the VBox if we can find one
-        parent = self.vbox_sidebar.get_parent()
-        if parent:
-            parent.remove(self.vbox_sidebar)
-        else:
-            parent = self.eventbox_sidebar
-
-        parent.modify_bg(gtk.STATE_NORMAL, self.sidebar_bg)
-        self.vbox_sidebar = gtk.VBox()
-        self.vbox_sidebar.set_border_width(5)
-        parent.add(self.vbox_sidebar)
-
-    def _sidebar_add_placeholder(self):
-        # Placeholder label, which expands vertically
-        ph = gtk.Label()
-        ph.show()
-        self.vbox_sidebar.pack_start(ph)
-        
-    # FIXME: use theme-sensitive colors instead of hardcoding
-    def _sidebar_add_step(self, step, name, active, padding):
-        hbox = gtk.HBox(0, False)
-        hbox.show()
-
-        button = gtk.Button('')
-        button.modify_bg(gtk.STATE_PRELIGHT, self.sidebar_pre_bg)
-        button.modify_bg(gtk.STATE_ACTIVE, self.sidebar_pre_bg)
-
-        # CZECH THIS SHIT. You *can* set the fg/text on a label, but it
-        # will still emboss the color in the INSENSITIVE state. The way
-        # to avoid embossing is to use pango attributes (e.g. via
-        # <span>), but then in INSENSITIVE you get stipple. Where is
-        # this documented? Grumble.
-        label = button.get_children()[0]
-        label.modify_fg(gtk.STATE_NORMAL, self.sidebar_fg)
-        # label.modify_fg(gtk.STATE_INSENSITIVE, gtk.gdk.color_parse('red'))
-        button.modify_bg(gtk.STATE_NORMAL, self.sidebar_bg)
-        button.modify_bg(gtk.STATE_INSENSITIVE, self.sidebar_bg)
-        label.set_padding(padding, 0)
-        label.set_alignment(0, 0.5)
-        button.set_relief(gtk.RELIEF_NONE)
-        hbox.pack_start(button, True, True)
-        self.vbox_sidebar.pack_start(hbox, False, False)
-
-        if not step:
-            steps = [step for step in self.steps
-                              if getattr(step, 'section_name', '') == name]
-            assert len(steps) == 1
-            step = steps[0]
-
-        def button_clicked_cb(button, step):
-            self.set_step(step)
-            
-        if step:
-            button.connect('clicked', button_clicked_cb, step)
-        else:
-            button.connect('clicked', button_clicked_cb, steps[0])
-            
-        # current = self.current_step
-
-        # We want to mark what the current step is, but I don't think
-        # that using sensitivity is a good idea, because your text will
-        # either be embossed or stippled by pango.
-        #if current == step:
-        #    button.set_sensitive(False)
-            
-        def pc(c):
-            return '#%02x%02x%02x' % (c.red>>8, c.green>>8, c.blue>>8)
-
-        if active or step.visited:
-            button.set_property('can_focus', False)
-            s = '<small>%s</small>' % name
-        else:
-            button.set_sensitive(False)
-            s = ('<small><span foreground="%s">%s</span></small>'
-                 % (pc(self.sidebar_fgi), name))
-            
-        label.set_markup(s)
-
-        button.show()
-        return button
-    
-    def _sidebar_add_substeps(self, section):
-        filtered_steps = [step for step in self.steps
-                                   if (step.section == section and
-                                       step.visited and
-                                       not hasattr(step, 'section_name'))]
-        for step in filtered_steps:
-            self._sidebar_add_step(step, step.sidebar_name, True, 20)
-
-    def update_sidebar(self, step):
-        current = step.section
-
-        self._sidebar_clean()
-        
-        sidebar_steps = ('Welcome',
-                         'Production', 'Conversion',
-                         'Consumption', 'License')
-        active = True
-        for stepname in sidebar_steps:
-            self._sidebar_add_step(None, stepname, active, 10)
-
-            if current == stepname:
-                self._sidebar_add_substeps(stepname)
-                self._sidebar_add_placeholder()
-                active = False
-            else:
-                continue
-            
-        self.vbox_sidebar.show()
-        
     def on_wizard_delete_event(self, wizard, event):
         self.finish(self._use_main, save=False)
 
     def on_button_prev_clicked(self, button):
-        self.show_previous()
+        self.scenario.show_previous()
 
     def on_button_next_clicked(self, button):
-        self.show_next()
+        self.scenario.show_next()
 
     def finish(self, main=True, save=True):
         if save:
@@ -513,27 +449,7 @@ class Wizard(gobject.GObject, log.Loggable):
         self._workerHeavenState = workerHeavenState
         self._use_main = main
         workerHeavenState.addListener(self)
-        
-        if not self.stack:
-            raise TypeError("need an initial step")
-
-        self.set_step(self.stack.peek())
-        
-        if not interactive:
-            while self.current_step.get_next():
-                self.show_next()
-                
-            return self.finish(False)
-
-        self.window.present()
-        self.window.grab_focus()
-        if not self._use_main:
-            return
-        
-        try:
-            gtk.main()
-        except KeyboardInterrupt:
-            pass
+        self.scenario.run(interactive)
 
     ### IStateListener methods
     def stateAppend(self, state, key, value):
@@ -550,16 +466,6 @@ class Wizard(gobject.GObject, log.Loggable):
         #FIXME: make this work correctly
         #self._rebuild_worker_combobox()
 
-    def load_steps(self):
-        global _steps
-        # this import registers steps with us, but this should be done better.
-        exec('import flumotion.wizard.steps') 
-
-        self.add_step(_steps[0], initial=True)
-        
-        for step_class in _steps[1:]:
-            self.add_step(step_class)
-            
     def printOut(self):
         print self._save.getXML()[:-1]
 
@@ -570,26 +476,3 @@ class Wizard(gobject.GObject, log.Loggable):
 
         return dict
 gobject.type_register(Wizard)
-
-_steps = []
-_steps_dict = {}
-
-        
-def register_step(klass, initial=False):
-    global _steps
-    global _steps_dict
-
-    # Make sure there's only one step of a given name
-    try:
-        _steps.remove(_steps_dict[klass.step_name])
-    except: pass
-        
-    _steps_dict[klass.step_name] = klass
-    if initial:
-        _steps.insert(0, klass)
-    else:
-        _steps.append(klass)
-
-def get_steps():
-    global _steps
-    return _steps

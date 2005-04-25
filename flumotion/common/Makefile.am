@@ -23,6 +23,7 @@ flumotion_PYTHON = \
 	registry.py \
 	reload.py \
 	setup.py \
+	watched.py \
 	worker.py
 
 TAGS_FILES = $(flumotion_PYTHON)

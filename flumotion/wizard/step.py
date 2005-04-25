@@ -51,6 +51,7 @@ class WizardStep(GladeWidget, log.Loggable):
         if not self.sidebar_name:
             self.sidebar_name = self.step_name
         self.wizard = wizard
+        self.setup()
 
     def __repr__(self):
         return '<WizardStep object %s>' % self.step_name
@@ -128,3 +129,10 @@ class WizardStep(GladeWidget, log.Loggable):
 
     def worker_changed(self):
         pass
+
+class WizardSection(WizardStep):
+    def __repr__(self):
+        return '<WizardSection object %s>' % self.section
+
+    def set_name(self, x):
+        gtk.Widget.set_name(self, self.section)

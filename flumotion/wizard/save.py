@@ -223,7 +223,7 @@ class WizardSaver:
         return audio_encoder
     
     def handleConsumers(self, components, audio_encoder, video_encoder):
-        cons_options = self.wizard.get_step_options('Consumption')
+        cons_options = self.wizard.get_step_options('Consumption2')
         has_audio = self.wizard.get_step_option('Source', 'has_audio')
         has_video = self.wizard.get_step_option('Source', 'has_video')
 

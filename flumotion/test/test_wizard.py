@@ -38,8 +38,7 @@ from flumotion.wizard import enums, wizard, step
 class WizardStepTest(unittest.TestCase):
     def setUpClass(self):
         wiz = wizard.Wizard()
-        wiz.load_steps()
-        self.steps = wiz.steps
+        self.steps = wiz.scenario.steps
         
     def testLoadSteps(self):
         for s in self.steps:
@@ -54,7 +53,8 @@ class WizardStepTest(unittest.TestCase):
             self.assertEqual(s.step_name, s.get_name())
 
             if s.get_name() != 'Summary':
-                self.assert_(isinstance(s.get_next(), str))
+                get_next_ret = s.get_next()
+                self.assert_(not get_next_ret or isinstance(get_next_ret, str))
                 
     def testStepWidgets(self):
         widgets = [widget for s in self.steps if s.get_name() != 'Firewire'
@@ -87,7 +87,6 @@ class WizardStepTest(unittest.TestCase):
 class WizardSaveTest(unittest.TestCase):
     def setUp(self):
         self.wizard = wizard.Wizard()
-        self.wizard.load_steps()
         s = worker.ManagerWorkerHeavenState()
         s.set('names', ['localhost'])
         self.workerHeavenState = jelly.unjelly(jelly.jelly(s))

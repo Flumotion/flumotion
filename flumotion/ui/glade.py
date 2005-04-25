@@ -83,6 +83,7 @@ class GladeWidget(gtk.VBox):
     def __init__(self):
         gtk.VBox.__init__(self)
         try:
+            assert self.glade_file
             file = os.path.join(self.glade_dir, self.glade_file)
             if self.glade_typedict:
                 wtree = gtk.glade.XML(file, typedict=self.glade_typedict)
@@ -140,6 +141,7 @@ class GladeWindow(gobject.GObject):
     def __init__(self, parent=None):
         gobject.GObject.__init__(self)
         try:
+            assert self.glade_file
             file = os.path.join(self.glade_dir, self.glade_file)
             if self.glade_typedict:
                 wtree = gtk.glade.XML(file, typedict=self.glade_typedict)
@@ -168,8 +170,12 @@ class GladeWindow(gobject.GObject):
 
         wtree.signal_autoconnect(self)
 
-        self.destroy = self.window.destroy
         self.show = self.window.show
         self.hide = self.window.hide
         self.present = self.window.present
+
+    def destroy(self):
+        self.window.destroy()
+        del self.window
+
 gobject.type_register(GladeWindow)
