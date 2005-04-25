@@ -36,11 +36,15 @@ class SidebarButton(gtk.Button):
     sensitive = False
 
     def __init__(self, name, padding=0):
-        gtk.Button.__init__(self, '')
+        gtk.Button.__init__(self)
         self.set_name(name)
-        self.label = self.get_children()[0]
-        self.label.set_padding(padding, 0)
-        self.label.set_alignment(0, 0.5)
+        a = gtk.Alignment(0.0, 0.5)
+        a.set_property('left-padding', padding)
+        a.show()
+        self.label = gtk.Label()
+        self.label.show()
+        a.add(self.label)
+        self.add(a)
         self.set_relief(gtk.RELIEF_NONE)
         self.set_property('can_focus', False) # why?
         self.connect_after('realize', SidebarButton.on_realize)
@@ -147,6 +151,7 @@ class WizardSidebar(gtk.EventBox):
 
     def __init__(self):
         gtk.EventBox.__init__(self)
+        self.set_size_request(160, -1)
         self.vbox = gtk.VBox()
         self.vbox.set_border_width(5)
         self.vbox.show()

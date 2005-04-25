@@ -1,5 +1,9 @@
 2005-04-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/sidebar.py (WizardSidebar.__init__): Fix size
+	request. 
+	(SidebarButton.__init__): Fix padding.
+
 	* flumotion/wizard/wizard.py (Scenario.show_next): Fix variable
 	ref.
 	
