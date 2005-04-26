@@ -334,9 +334,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     # this can be called from both application and streaming thread !
     def _client_removed_cb(self, sink, fd, reason):
         self._removed_lock.acquire()
-        # commented out to see if it solves GIL problems
-        #stats = sink.emit('get-stats', fd)
-        stats = None
+        # used to be commented out to see if it solves GIL problems
+        stats = sink.emit('get-stats', fd)
+        #stats = None
         self._removed_queue.append((sink, fd, reason, stats))
         self._removed_lock.release()
 

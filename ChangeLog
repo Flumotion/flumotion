@@ -1,3 +1,11 @@
+2005-04-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  get the stats again, instead of using None.
+	  DANGER WILL: if there are GIL problems, this is the first
+	  thing to check !
+
 2005-04-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/sidebar.py:

@@ -88,6 +88,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         web_resource.Resource.__init__(self)
 
     def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
+        # this is the callback attached to our flumotion component,
+        # not the GStreamer element
         try:
             request = self._requests[fd]
             self._removeClient(request, fd, stats)
