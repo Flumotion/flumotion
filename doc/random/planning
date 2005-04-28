@@ -182,3 +182,8 @@ Planned features for flumotion and what's needed to implement it
     firewall pitcher and catcher ?
   - needs to use adaptable codecs that don't use too much bandwidth
 
+- status reporter component in atmosphere
+  - collects "events" from everywhere about flumotion itself
+    - streams added/removed
+    - streams not reachable
+    - worker segfault
