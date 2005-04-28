@@ -28,6 +28,7 @@ import sys
 
 # Variable templates 
 PREFIX = '@prefix@'
+LIBDIR = '@libdir@'
 PYGTK_DIR = '@PYGTK_DIR@'
 PYGST_DIR = '@PYGST_DIR@'
 PYGTK_VERSION = '@PYGTK_REQ@'
@@ -38,7 +39,7 @@ def _setup_project_root():
     if os.path.exists(os.path.join(dir, '.svn')):
         root = os.path.split(dir)[0]
     else:
-        root = os.path.join(PREFIX, 'lib', 'flumotion', 'python')
+        root = os.path.join(LIBDIR, 'flumotion', 'python')
     sys.path.insert(0, root)
 
 def _run_main(path):

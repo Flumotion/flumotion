@@ -1,3 +1,12 @@
+2005-04-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-admin.in:
+	* bin/flumotion-manager.in:
+	* bin/flumotion-tester.in:
+	* bin/flumotion-worker.in:
+	* bin/flumotion.in:
+	  "64 bit" fixes
+
 2005-04-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
