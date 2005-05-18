@@ -39,8 +39,6 @@ class BaseAdminGtk(log.Loggable):
         @type  state: L{flumotion.common.planet.AdminComponentState}
         @type  admin: L{flumotion.admin.admin.AdminModel}
         @param admin: the admin model that interfaces with the manager for us
-        @type  view:   
-        @param view:  the toolkit view we are embedded in
         """
         self.state = state
         self.name = state.get('name')
@@ -123,8 +121,6 @@ class BaseAdminGtkNode(log.Loggable):
         @type  state: L{flumotion.common.planet.AdminComponentState}
         @param admin: the admin model that interfaces with the manager for us
         @type  admin: L{flumotion.admin.admin.AdminModel}
-        @param view:  the GTK+ admin view we are embedded in
-        @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
         """
         self.state = state
         self.admin = admin
@@ -217,8 +213,6 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
         @type  state: L{flumotion.common.planet.AdminComponentState}
         @param admin: the admin model that interfaces with the manager for us
         @type  admin: L{flumotion.admin.admin.AdminModel}
-        @param view:  the GTK+ admin view we are embedded in
-        @type  view:  L{flumotion.component.base.admin_gtk.BaseAdminGtk} 
         """
         BaseAdminGtkNode.__init__(self, state, admin)
         self.effectName = effectName
