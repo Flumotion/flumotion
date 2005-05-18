@@ -32,7 +32,10 @@ from flumotion.manager import manager
 from flumotion.common import log, config, common, errors
 from flumotion.configure import configure
 
-class ServerContextFactory:
+class ServerContextFactory(log.Loggable):
+
+    logCategory = "SSLServer"
+    
     def __init__(self, pemFile):
         self._pemFile = pemFile
 
@@ -42,8 +45,12 @@ class ServerContextFactory:
         """
         from OpenSSL import SSL
         ctx = SSL.Context(SSL.SSLv23_METHOD)
-        ctx.use_certificate_file(self._pemFile)
-        ctx.use_privatekey_file(self._pemFile)
+        try:
+            ctx.use_certificate_file(self._pemFile)
+            ctx.use_privatekey_file(self._pemFile)
+        except SSL.Error, e:
+            self.warning('SSL error: %r' % e.args)
+            self.error('Could not open certificate %s' % self._pemFile)
         return ctx
 
 def _startSSL(vishnu, host, port, pemFile):
