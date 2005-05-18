@@ -1,5 +1,26 @@
 2005-05-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
+
+	* configure.ac:
+	* flumotion/Makefile.am:
+	* flumotion/extern/Makefile.am:
+	* flumotion/extern/__init__.py:
+	* flumotion/extern/pytrayicon/Makefile.am:
+	* flumotion/extern/pytrayicon/__init__.py:
+	* flumotion/extern/pytrayicon/eggtrayicon.c:
+	* flumotion/extern/pytrayicon/eggtrayicon.h:
+	* flumotion/extern/pytrayicon/ltihooks.py:
+	* flumotion/extern/pytrayicon/pytrayicon.defs:
+	* flumotion/extern/pytrayicon/pytrayicon.override:
+	* flumotion/extern/pytrayicon/pytrayiconmodule.c:
+	  first part of adding a trayicon to Flumotion.
+	  This builds the python module, so you can do
+	  import flumotion.extern.pytrayicon
+	  trayicon = pytrayicon.TrayIcon
+
+2005-05-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/main.py:
 	  catch errors on access of the pem file.  Fixes #202.
 

@@ -30,8 +30,8 @@ AC_PROG_LIBTOOL
 
 dnl check for python
 AS_PATH_PYTHON(2.3)
-dnl useful when we compile our own python modules
-dnl AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
+
+AM_CHECK_PYTHON_HEADERS(HAVE_PYTHON_H=yes, HAVE_PYTHON_H=no)
 
 dnl check for GStreamer
 PKG_CHECK_MODULES(GST, gstreamer-0.8 >= $GST_REQ)
@@ -46,8 +46,40 @@ if test "x$PYGTK_VERSION" = "x2.5.2"
 then
   AC_MSG_ERROR([PyGTK 2.5.2 contains known bugs, please install other version])
 fi
-
 export PYTHONPATH=$PYGTK_DIR:$PYTHONPATH
+
+dnl check stuff we can generate the tray icon with
+AC_MSG_CHECKING(for pygtk codegen)
+PYGTK_CODEGEN="$PYTHON `$PKG_CONFIG --variable=codegendir pygtk-2.0`/codegen.py"dnl PYGTK_CODEGEN="$PYTHON \$(top_srcdir)/codegen/codegen.py"
+AC_SUBST(PYGTK_CODEGEN)
+AC_MSG_RESULT($PYGTK_CODEGEN)
+
+AC_MSG_CHECKING(for pygtk defsdir)
+PYGTK_DEFSDIR=`$PKG_CONFIG --variable=defsdir pygtk-2.0`
+AC_SUBST(PYGTK_DEFSDIR)
+AC_MSG_RESULT($PYGTK_DEFSDIR)
+
+PKG_CHECK_MODULES(GTK, gtk+-2.0, HAVE_GTK=yes, HAVE_GTK=no)
+
+# decide on tray icon
+BUILD_TRAYICON=yes
+if test "x$HAVE_PYTHON_H" = "xno"
+then
+  AC_MSG_NOTICE([Python headers missing, not building tray icon])
+  BUILD_TRAYICON=no
+fi
+if test "x$HAVE_GTK" = "xno"
+then
+  AC_MSG_NOTICE([GTK+ 2 development files missing, not building tray icon])
+  BUILD_TRAYICON=no
+fi
+
+if test "x$BUILD_TRAYICON" = "xyes"
+then
+  AC_MSG_NOTICE([Building tray icon])
+fi
+
+AM_CONDITIONAL(BUILD_TRAYICON, test "x$BUILD_TRAYICON" = "xyes")
 
 dnl check for libglade
 AC_MSG_CHECKING(for gtk.glade)
@@ -162,6 +194,8 @@ flumotion/component/producers/webcam/Makefile
 flumotion/configure/Makefile
 flumotion/configure/installed.py
 flumotion/configure/uninstalled.py
+flumotion/extern/Makefile
+flumotion/extern/pytrayicon/Makefile
 flumotion/manager/Makefile
 flumotion/service/Makefile
 flumotion/test/Makefile

@@ -5,6 +5,7 @@ SUBDIRS = \
 	common \
 	component \
 	configure \
+	extern \
 	manager \
 	service \
 	test \
