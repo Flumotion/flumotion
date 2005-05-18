@@ -67,12 +67,15 @@ class Vorbis(feedcomponent.FeedComponent):
         self.pipeline = gst.Pipeline(self.name)
         eater_element = gst.element_factory_make(self.EATER_TMPL, 
                                                  eater_element_names[0])
+        wc_element = gst.element_factory_make("audioconvert", "widthconvert")
         as_element = gst.element_factory_make("audioscale", "audioscale")
         fake_element = gst.element_factory_make("fakesink", "fakesink")
         fake_element.set_property("silent", 1)
 
-        self.pipeline.add_many(eater_element, as_element, fake_element)
-        eater_element.link(as_element)
+        self.pipeline.add_many(eater_element, wc_element, as_element,
+            fake_element)
+        eater_element.link(wc_element)
+        wc_element.link(as_element)
         as_element.link(fake_element)
         
         # connect to notify::caps
@@ -157,20 +160,21 @@ class Vorbis(feedcomponent.FeedComponent):
         self.debug('have_caps called')
         caps_struct = caps.get_structure(0)
         samplerate = caps_struct.get_int('rate')
+        width = caps_struct.get_int('width')
         
-        self.debug('sample rate %d' % (samplerate))
+        self.debug('sample rate %d Hz, width %d' % (samplerate, width))
         as_pad.disconnect(self.have_caps_handler)
         # need to defer because shouldnt modify pipeline in signal
         # handler
-        reactor.callLater(0, self._create_rest_pipeline, samplerate)
+        reactor.callLater(0, self._create_rest_pipeline, samplerate, width)
     
-    def _create_rest_pipeline(self, samplerate):
+    def _create_rest_pipeline(self, samplerate, width):
         # Now need to create rest of pipeline as incoming caps is known
         self.pause()
-        audioscale = self.pipeline.get_by_name('audioscale')
-        fakesink = self.pipeline.get_by_name('fakesink')
-        audioconvert = gst.element_factory_make('audioconvert', 'audioconvert')
-        enc = gst.element_factory_make('rawvorbisenc', 'enc')
+        audioscale = self.pipeline.get_by_name("audioscale")
+        audioconvert = gst.element_factory_make("audioconvert", "audioconvert")
+        fakesink = self.pipeline.get_by_name("fakesink")
+        enc = gst.element_factory_make("rawvorbisenc", "enc")
         if self._bitrate > -1:
             enc.set_property('bitrate', self._bitrate)
         else:

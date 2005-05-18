@@ -1,5 +1,12 @@
 2005-05-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/encoders/vorbis.py:
+	  Partial fix for #197 for OSS
+	* flumotion/component/feedcomponent.py:
+	  fix bug in updateMood so sad stays sad
+
+2005-05-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent.py:
 	  don't try to manage idle's - they get removed when iterate
 	  returns FALSE, so the previous patch is not a really good idea

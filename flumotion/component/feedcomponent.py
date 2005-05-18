@@ -212,7 +212,9 @@ class FeedComponent(basecomponent.BaseComponent):
         See the mood transition diagram.
         """
         mood = self.state.get('mood')
-        if mood == moods.sad:
+        self.debug('updateMood: currently in %r' % moods.get(mood).name)
+        if mood == moods.sad.value:
+            self.debug('updateMood: sad, not changing')
             return
 
         if self.eatersWaiting == 0 and self.feedersWaiting == 0:
