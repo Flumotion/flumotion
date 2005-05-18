@@ -112,6 +112,20 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             ext = 'ogg'
         elif mime == 'multipart/x-mixed-replace':
             ext = 'multipart'
+        elif mime == 'audio/mpeg':
+            ext = 'mp3'
+        elif mime == 'video/x-msvideo':
+            ext = 'avi'
+        elif mime == 'video/x-ms-asf':
+            ext = 'asf'
+        elif mime == 'audio/x-flac':
+            ext = 'flac'
+        elif mime == 'audio/x-wav':
+            ext = 'wav'
+        elif mime == 'video/x-matroska':
+            ext = 'mkv'
+        elif mime == 'video/x-dv':
+            ext = 'dv'
         else:
             ext = 'data'
         

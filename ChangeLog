@@ -1,5 +1,12 @@
 2005-05-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
+
+	* flumotion/component/consumers/disker/disker.py:
+	  add more file extensions.  Closes #206.
+
+2005-05-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/encoders/vorbis.py:
 	  Partial fix for #197 for OSS
 	* flumotion/component/feedcomponent.py:
