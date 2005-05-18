@@ -1,3 +1,10 @@
+2005-05-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/encoders/vorbis.py:
+	  check if we start up correctly
+	* flumotion/component/feedcomponent.py:
+	  save the idle iterator id so we only have one running
+
 2005-04-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/flumotion-admin.in:

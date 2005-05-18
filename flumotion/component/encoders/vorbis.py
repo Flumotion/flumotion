@@ -103,7 +103,8 @@ class Vorbis(feedcomponent.FeedComponent):
         
         # we'll first start eating, so we can figure out caps from the incoming
         # stream and make decisions before starting to feed
-        self._start_eaters(eatersData)
+        if not self._start_eaters(eatersData):
+            return None
 
         # chain to parent 
         basecomponent.BaseComponent.start(self)
@@ -118,6 +119,7 @@ class Vorbis(feedcomponent.FeedComponent):
 
         @param eatersData: list of (feederName, host, port) tuples to eat from
 
+        @returns: whether the eaters got started succesfully
         """
         # if we have eaters waiting, we start out hungry, else waking
         if self.eatersWaiting:
@@ -129,7 +131,7 @@ class Vorbis(feedcomponent.FeedComponent):
         self._setup_eaters(eatersData)
 
         self.debug('setting pipeline to play')
-        self.pipeline_play()
+        return self.pipeline_play()
     
     def _start_feeders(self, feedersData):
         """

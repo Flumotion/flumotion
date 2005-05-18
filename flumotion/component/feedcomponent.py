@@ -174,6 +174,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline_signals = []
         self.files = []
         self.effects = {}
+        self._iterate_idle_id = None
 
         # add extra keys to state
         self.state.addKey('eaterNames')
@@ -287,11 +288,17 @@ class FeedComponent(basecomponent.BaseComponent):
         self.setup_pipeline()
        
     def set_state_and_iterate(self, state):
+        """
+        Set the given gst state and start iterating the pipeline if not done
+        yet.
+        """
         retval = self.pipeline.set_state(state)
         if not retval:
             self.warning('Changing state to %s failed' %
                     gst.element_state_get_name(state))
-        gobject.idle_add(self.pipeline.iterate)
+        if not self._iterate_idle_id:
+            self._iterate_idle_id = gobject.idle_add(self.pipeline.iterate)
+
         return retval
 
     def get_pipeline(self):
@@ -318,7 +325,19 @@ class FeedComponent(basecomponent.BaseComponent):
         self.set_state_and_iterate(gst.STATE_PAUSED)
         
     def pipeline_play(self):
-        self.set_state_and_iterate(gst.STATE_PLAYING)
+        """
+        Start playing the pipeline.
+
+        @returns: whether or not the pipeline was started successfully.
+        """
+        retval = self.set_state_and_iterate(gst.STATE_PLAYING)
+        if not retval:
+            self.setMood(moods.sad)
+            self.state.set('message',
+                "Component %s could not start" % self.name)
+            return False
+
+        return True
 
     def pipeline_stop(self):
         if not self.pipeline:
@@ -405,9 +424,9 @@ class FeedComponent(basecomponent.BaseComponent):
             # as well, so we PAUSE then PLAY the complete pipeline
             #element.set_state(gst.STATE_PLAYING)
             self.debug('pausing and iterating')
-            self.set_state_and_iterate(gst.STATE_PAUSED)
+            self.pipeline_pause()
             self.debug('playing and iterating')
-            self.set_state_and_iterate(gst.STATE_PLAYING)
+            self.pipeline_play()
             self.debug('reconnected')
         else:
             self.debug('%s:%d not accepting connections, trying later' % (
@@ -487,10 +506,12 @@ class FeedComponent(basecomponent.BaseComponent):
                      gst.element_state_get_name(self.pipeline.get_state()))
             self.pipeline.set_state(gst.STATE_NULL)
                 
-        # Disconnect signals
+        # Disconnect signals and id's
         map(self.pipeline.disconnect, self.pipeline_signals)
         self.pipeline = None
         self.pipeline_signals = []
+        if self._iterate_idle_id:
+            gobject.source_remove(self._iterate_idle_id)
 
     def play(self):
         self.debug('Playing')
