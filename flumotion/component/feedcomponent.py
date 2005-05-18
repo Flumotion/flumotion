@@ -174,7 +174,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline_signals = []
         self.files = []
         self.effects = {}
-        self._iterate_idle_id = None
 
         # add extra keys to state
         self.state.addKey('eaterNames')
@@ -296,8 +295,8 @@ class FeedComponent(basecomponent.BaseComponent):
         if not retval:
             self.warning('Changing state to %s failed' %
                     gst.element_state_get_name(state))
-        if not self._iterate_idle_id:
-            self._iterate_idle_id = gobject.idle_add(self.pipeline.iterate)
+        # the idle handler will go away as soon as iterate returns FALSE
+        gobject.idle_add(self.pipeline.iterate)
 
         return retval
 
@@ -506,12 +505,10 @@ class FeedComponent(basecomponent.BaseComponent):
                      gst.element_state_get_name(self.pipeline.get_state()))
             self.pipeline.set_state(gst.STATE_NULL)
                 
-        # Disconnect signals and id's
+        # Disconnect signals
         map(self.pipeline.disconnect, self.pipeline_signals)
         self.pipeline = None
         self.pipeline_signals = []
-        if self._iterate_idle_id:
-            gobject.source_remove(self._iterate_idle_id)
 
     def play(self):
         self.debug('Playing')
