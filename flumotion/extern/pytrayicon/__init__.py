@@ -22,5 +22,9 @@ try:
     from flumotion.extern.pytrayicon.pytrayicon import *
 except ImportError:
     import ltihooks
-    from flumotion.extern.pytrayicon.pytrayicon import *
+    try:
+        from flumotion.extern.pytrayicon.pytrayicon import *
+    except ImportError:
+        # no pytrayicon anywhere
+        pass
     ltihooks.uninstall()

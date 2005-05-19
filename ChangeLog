@@ -1,5 +1,18 @@
 2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
+
+	* configure.ac:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/extern/Makefile.am:
+	* flumotion/extern/pytrayicon/__init__.py:
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/trayicon.py:
+	  add the tray icon.  Make sure it still works if the trayicon
+	  is not compiled.  Closes #231.
+
+2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_common.py:
 	  remove double test that causes spurious problems
 

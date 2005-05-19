@@ -6,7 +6,8 @@ flumotion_PYTHON = \
 	__init__.py \
 	fgtk.py \
 	glade.py \
-	icons.py
+	icons.py \
+	trayicon.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 

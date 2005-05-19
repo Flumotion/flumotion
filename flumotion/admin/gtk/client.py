@@ -35,7 +35,7 @@ from flumotion.configure import configure
 from flumotion.common import errors, log, worker, planet, common
 from flumotion.manager import admin # Register types
 from flumotion.twisted import flavors, reflect
-from flumotion.ui import icons
+from flumotion.ui import icons, trayicon
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
@@ -58,6 +58,8 @@ class Window(log.Loggable, gobject.GObject):
 
         self.widgets = {}
         self.debug('creating UI')
+        self._trayicon = None
+
         self._create_ui()
 
         self._append_recent_connections()
@@ -139,6 +141,8 @@ class Window(log.Loggable, gobject.GObject):
         menu_set_icon(widgets['menuitem_manage_stop_component'], 'pause')
         tool_set_icon(widgets['toolbutton_stop_component'], 'pause')
 
+        self._trayicon = trayicon.FluTrayIcon(self)
+
         self.hpaned = widgets['hpaned']
  
         window.connect('delete-event', self.close)
@@ -155,6 +159,7 @@ class Window(log.Loggable, gobject.GObject):
         self.components_view.connect('notify::can-stop-any',
                                      self.start_stop_notify_cb)
         self.start_stop_notify_cb()
+
         return window
 
     def open_connected_cb(self, model, ids):
@@ -610,6 +615,7 @@ class Window(log.Loggable, gobject.GObject):
 
     def update_components(self):
         self.components_view.update(self._components)
+        self._trayicon.update(self._components)
 
     def _set_stop_start_component_sensitive(self):
         state = self.current_component_state
