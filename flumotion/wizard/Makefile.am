@@ -6,7 +6,10 @@ flumotion_PYTHON = \
 	__init__.py \
 	enums.py \
 	save.py \
+	sidebar.py \
+	step.py \
 	steps.py \
+	types.py \
 	wizard.py
 
 TAGS_FILES = $(flumotion_PYTHON)

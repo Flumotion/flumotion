@@ -32,8 +32,6 @@ from flumotion.twisted import flavors
 
 from flumotion.common.planet import moods
 
-from flumotion.extern import pytrayicon
- 
 class FluTrayIcon(log.Loggable):
     """
     I represent a tray icon in GNOME's notification area for the Admin UI.
@@ -58,6 +56,11 @@ class FluTrayIcon(log.Loggable):
         
     def _create_trayicon(self):
         # start off with just the fluendo logo
+        try:
+            from flumotion.extern import pytrayicon
+        except ImportError:
+            self.debug('No pytrayicon module found, no trayicon will be shown')
+            return
         try:
             self._tray_container = pytrayicon.TrayIcon("Flumotion")
         except AttributeError:

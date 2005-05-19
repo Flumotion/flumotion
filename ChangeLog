@@ -1,5 +1,13 @@
 2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion.spec.in:
+	* flumotion/extern/Makefile.am:
+	* flumotion/ui/trayicon.py:
+	* flumotion/wizard/Makefile.am:
+	  various fixes to make spec file and trayicon work
+
+2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/Makefile.am:
 	* doc/redhat/make-dummy-cert:
 	* flumotion.spec.in:

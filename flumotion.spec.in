@@ -31,7 +31,8 @@ BuildRequires:	epydoc
 # sigh, libtool
 BuildRequires:  gcc-c++
 
-BuildArch:	noarch
+# since we compile pytrayicon, we're no longer noarch
+# BuildArch:	noarch
 
 # no debuginfo packages
 %define debug_package %{nil}
