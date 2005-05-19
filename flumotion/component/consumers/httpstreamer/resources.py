@@ -152,9 +152,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.logfile.write(msg)
         self.logfile.flush()
 
-    def setMaxClients(self, maxclients):
-        self.info('setting maxclients to %d' % maxclients)
-        self.maxclients = maxclients
+    def setUserLimit(self, limit):
+        self.info('setting maxclients to %d' % limit)
+        self.maxclients = limit
 
     def setBouncerName(self, bouncerName):
         self.bouncerName = bouncerName

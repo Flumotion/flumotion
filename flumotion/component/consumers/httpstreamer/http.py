@@ -394,8 +394,8 @@ def createComponent(config):
         component.debug('Logging to %s' % config['logfile'])
         component.resource.setLogfile(config['logfile'])
 
-    if config.has_key('maxclients'):
-        component.resource.setMaxClients(int(config['maxclients']))
+    if config.has_key('user_limit'):
+        component.resource.setUserLimit(int(config['user_limit']))
         
     if config.has_key('bouncer'):
         component.resource.setBouncerName(config['bouncer'])

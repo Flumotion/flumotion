@@ -1,5 +1,14 @@
 2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  check user_limit since that's what it's called now
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  add user_limit and bandwidth_limit
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  rename setMaxClients to setUserLimit
+
+2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/encoders/encoders.xml:
 	* flumotion/wizard/steps.py:
 	  treat vorbis encoding quality as a float (0.0 - 1.0)
