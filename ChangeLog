@@ -1,5 +1,12 @@
 2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	  make audiotest component respect sample rate setting
+	  fixes #212
+
+2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	  check user_limit since that's what it's called now
 	* flumotion/component/consumers/httpstreamer/http.xml:

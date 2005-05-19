@@ -31,7 +31,7 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
 
 def createComponent(config):
-    rate = config.get('samplerate', 8000)
+    rate = config.get('rate', 8000)
     volume = config.get('volume', 1.0)
 
     component = AudioTest(config['name'],
