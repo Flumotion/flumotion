@@ -1,4 +1,5 @@
 SUBDIRS = reference
 
 EXTRA_DIST = \
-	redhat/flumotion
+	redhat/flumotion \
+	redhat/make-dummy-cert

@@ -1,5 +1,13 @@
 2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/Makefile.am:
+	* doc/redhat/make-dummy-cert:
+	* flumotion.spec.in:
+	  use an included make-dummy-cert because it was removed
+	  from openssl rpm for FC4
+
+2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/encoders/encoders.xml:
 	* flumotion/component/encoders/theora.py:
 	  apply patch for theora advanced settings.  Closes #201.

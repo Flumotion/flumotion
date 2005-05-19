@@ -16,6 +16,7 @@ Requires:	python-twisted >= 1.3.0
 Requires:	pygtk2 >= 2.4.0
 Requires:	python-imaging
 
+# for make-dummy-cert to work
 Requires(post):	openssl
 
 BuildRequires:	gstreamer-devel >= 0.8.5
@@ -85,7 +86,7 @@ rm -rf $RPM_BUILD_ROOT
 PEM_FILE="%{_sysconfdir}/flumotion/default.pem"
 if ! test -e ${PEM_FILE}
 then
-  sh %{_datadir}/ssl/certs/make-dummy-cert ${PEM_FILE}
+  sh doc/redhat/make-dummy-cert ${PEM_FILE}
   chown :flumotion ${PEM_FILE}
   chmod 640 ${PEM_FILE}
 fi
@@ -172,6 +173,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Thu May 19 2005 Thomas Vander Stichele <thomas at apestaart dot org>
+- use disted make-dummy-cert
+
 * Mon Feb 14 2005 Christian Schaller <christian at fluendo dot com>
 - Add desktop file for admin tool and icon
 
