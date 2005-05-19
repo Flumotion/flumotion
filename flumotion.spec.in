@@ -57,6 +57,12 @@ make DESTDIR=$RPM_BUILD_ROOT install
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/managers/default/flows
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/workers
 
+# install make-dummy-cert script
+install -d $RPM_BUILD_ROOT%{_datadir}/flumotion
+install -m 644 \
+	doc/redhat/make-dummy-cert \
+	$RPM_BUILD_ROOT%{_datadir}/flumotion
+
 # install service files
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
 install -m 755 \
@@ -86,7 +92,7 @@ rm -rf $RPM_BUILD_ROOT
 PEM_FILE="%{_sysconfdir}/flumotion/default.pem"
 if ! test -e ${PEM_FILE}
 then
-  sh doc/redhat/make-dummy-cert ${PEM_FILE}
+  sh %{_datadir}/flumotion/make-dummy-cert ${PEM_FILE}
   chown :flumotion ${PEM_FILE}
   chmod 640 ${PEM_FILE}
 fi
