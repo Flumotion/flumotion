@@ -74,7 +74,6 @@ then
   BUILD_TRAYICON=no
 fi
 
-BUILD_TRAYICON=no
 if test "x$BUILD_TRAYICON" = "xyes"
 then
   AC_MSG_NOTICE([Building tray icon])
