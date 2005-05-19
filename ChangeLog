@@ -1,3 +1,8 @@
+2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_common.py:
+	  remove double test that causes spurious problems
+
 2005-05-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>

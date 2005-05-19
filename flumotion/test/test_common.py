@@ -297,7 +297,9 @@ class TestProcess(unittest.TestCase):
             # parent
             self.failUnless(common.checkPidRunning(ret))
             self.failUnless(common.termPid(ret))
+
             os.waitpid(ret, 0)
+
             # now that it's gone, it should fail
             self.failIf(common.checkPidRunning(ret))
             self.failIf(common.termPid(ret))
@@ -314,19 +316,6 @@ class TestProcess(unittest.TestCase):
             os.waitpid(ret, 0)
             # now that it's gone, it should fail
             self.failIf(common.killPid(ret))
-
-    def testKillPid(self):
-        pid = os.getpid()
-
-        ret = os.fork()
-        if ret == 0:
-            # child
-            time.sleep(0.5)
-            self.failUnless(common.termPid(pid))
-            os._exit(0)
-        else:
-            # parent
-            common.waitForTerm()
 
 class TestObjRepr(unittest.TestCase):
     def testMe(self):
