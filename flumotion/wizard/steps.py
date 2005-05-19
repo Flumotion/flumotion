@@ -863,7 +863,7 @@ class Vorbis(AudioEncoder):
         if self.radiobutton_bitrate:
             options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1024
         elif self.radiobutton_quality:
-            options['quality'] = int(self.spinbutton_quality.get_value())
+            options['quality'] = self.spinbutton_quality.get_value()
         return options
 
 class Speex(AudioEncoder):

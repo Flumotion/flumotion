@@ -1,5 +1,12 @@
 2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/wizard/steps.py:
+	  treat vorbis encoding quality as a float (0.0 - 1.0)
+	  Fixes #212
+
+2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
 
 	* configure.ac:
