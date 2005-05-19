@@ -8,6 +8,11 @@
         <property name="source" type="string" multiple="no"/>
         <property name="bitrate" type="int"/>
         <property name="quality" type="int"/>
+        <property name="keyframe-threshold" type="int" />
+        <property name="keyframe-mindistance" type="int" />
+        <property name="keyframe-maxdistance" type="int" />
+        <property name="quick-compress" type="int" />
+        <property name="noise-sensitivity" type="int" />
       </properties>
     </component>
   

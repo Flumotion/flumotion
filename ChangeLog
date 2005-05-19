@@ -1,5 +1,11 @@
 2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/component/encoders/theora.py:
+	  apply patch for theora advanced settings.  Closes #201.
+
+2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/producers/audiotest/audiotest.py:
 	* flumotion/component/producers/audiotest/audiotest.xml:
 	  make audiotest component respect sample rate setting

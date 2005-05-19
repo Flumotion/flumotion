@@ -36,5 +36,22 @@ def createComponent(config):
         element.set_property('bitrate', config['bitrate'])
     if config.has_key('quality'):
         element.set_property('quality', config['quality'])
-
+    if config.has_key('keyframe-threshold'):
+        element.set_property('keyframe-threshold', 
+            config['keyframe-threshold'])
+    if config.has_key('keyframe-mindistance'):
+        element.set_property('keyframe-mindistance',
+            config['keyframe-mindistance'])
+    if config.has_key('keyframe-maxdistance'):
+        element.set_property('keyframe-freq',
+            config['keyframe-maxdistance'])
+        element.set_property('keyframe-force',
+            config['keyframe-maxdistance'])
+    if config.has_key('quick-compress'):
+        element.set_property('quick',
+            config['quick-compress'])
+    if config.has_key('noise-sensitivity'):
+        element.set_property('noise-sensitivity',
+            config['noise-sensitivity'])
+        
     return component
