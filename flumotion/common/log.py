@@ -157,17 +157,21 @@ def stderrHandler(level, object, category, file, line, message):
 
     where = "(%s:%d)" % (file, line)
 
-    # level   pid     object   cat      time
-    # 5 + 1 + 7 + 1 + 32 + 1 + 17 + 1 + 15 == 80
-    sys.stderr.write('%-5s [%5d] %-32s %-17s %-15s ' % (
-        level, os.getpid(), o, category, time.strftime("%b %d %H:%M:%S")))
-    sys.stderr.write('%-4s %s %s\n' % ("", message, where))
+    try:
+        # level   pid     object   cat      time
+        # 5 + 1 + 7 + 1 + 32 + 1 + 17 + 1 + 15 == 80
+        sys.stderr.write('%-5s [%5d] %-32s %-17s %-15s ' % (
+            level, os.getpid(), o, category, time.strftime("%b %d %H:%M:%S")))
+        sys.stderr.write('%-4s %s %s\n' % ("", message, where))
 
-    # old: 5 + 1 + 20 + 1 + 12 + 1 + 32 + 1 + 7 == 80
-    #sys.stderr.write('%-5s %-20s %-12s %-32s [%5d] %-4s %-15s %s\n' % (
-    #    level, o, category, where, os.getpid(),
-    #    "", time.strftime("%b %d %H:%M:%S"), message))
-    sys.stderr.flush()
+        # old: 5 + 1 + 20 + 1 + 12 + 1 + 32 + 1 + 7 == 80
+        #sys.stderr.write('%-5s %-20s %-12s %-32s [%5d] %-4s %-15s %s\n' % (
+        #    level, o, category, where, os.getpid(),
+        #    "", time.strftime("%b %d %H:%M:%S"), message))
+        sys.stderr.flush()
+    except IOError:
+        # happens in SIGCHLDHandler for example
+        pass
 
 def _handle(level, object, category, message):
     global _log_handlers, _log_handlers_limited
