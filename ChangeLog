@@ -3,7 +3,7 @@
 	* flumotion/component/producers/audiotest/audiotest.py:
 	* flumotion/component/producers/audiotest/audiotest.xml:
 	  make audiotest component respect sample rate setting
-	  fixes #212
+	  fixes #210
 
 2005-05-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
