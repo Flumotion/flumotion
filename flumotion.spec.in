@@ -32,6 +32,9 @@ BuildRequires:  gcc-c++
 
 BuildArch:	noarch
 
+# no debuginfo packages
+%define debug_package %{nil}
+
 %description
 Fluendo Streaming Server.
 
