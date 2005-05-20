@@ -3,7 +3,6 @@ Encoding=UTF-8
 Name=Flumotion Streaming Server Administration
 GenericName=Streaming Server Administration
 Comment=Manage the Flumotion Streaming Server
-GenericName=
 Exec=flumotion-admin
 Terminal=false
 Type=Application
