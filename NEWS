@@ -1,4 +1,21 @@
-This is Flumotion 0.1.7, "La Chacha".
+This is Flumotion 0.1.8, "Baja Beach".
+
+Features since 0.1.7:
+
+- Firewire widescreen capture now works
+- A trayicon got added, giving you an immediate view of the status of your
+  admin client
+
+Issues fixed since 0.1.7:
+
+ticket	summary
+201	[PATCH] support advanced theora encoding properties
+202	No error message when wrong permission on .pem file
+206	[disker] [patch] support more extensions
+210	test audio component does not respect sample rate setting
+212	Ogg Vorbis quality setting incorrectly recorded in planet file
+216	wrong bundle setup at times causes tracebacks when showing UI
+231	[patch] tray icon
 
 Features since 0.1.6:
 
