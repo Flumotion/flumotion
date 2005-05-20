@@ -34,6 +34,28 @@ import os
 import fnmatch
 import time
 
+# environment variables controlling levels for each category
+_FLU_DEBUG = "*:1"
+
+# dynamic dictionary of categories already seen and their level
+_categories = {}
+
+# log handlers registered
+_log_handlers = []
+_log_handlers_limited = []
+
+_initialized = False
+
+# level -> number dict
+_levels = {
+    "ERROR": 1,
+    "WARN": 2,
+    "INFO": 3,
+    "DEBUG": 4,
+    "LOG": 5
+}
+
+
 class Loggable:
     """
     Base class for objects that want to be able to log messages with
@@ -84,24 +106,28 @@ class Loggable:
 
         return None
 
-# environment variables controlling levels for each category
-_FLU_DEBUG = "*:1"
+# we need an object as the observer because startLoggingWithObserver
+# expects a bound method
+class FluLogObserver:
+    """
+    Twisted log observer that integrates with Flumotion's logging.
+    """
+    def emit(self, eventDict):
+        edm = eventDict['message']
+        if not edm:
+            if eventDict['isError'] and eventDict.has_key('failure'):
+                text = eventDict['failure'].getTraceback()
+            elif eventDict.has_key('format'):
+                text = eventDict['format'] % eventDict
+            else:
+                # we don't know how to log this
+                return
+        else:
+            text = ' '.join(map(str, edm))
 
-# dynamic dictionary of categories already seen and their level
-_categories = {}
-
-# log handlers registered
-_log_handlers = []
-_log_handlers_limited = []
-
-# level -> number dict
-_levels = {
-    "ERROR": 1,
-    "WARN": 2,
-    "INFO": 3,
-    "DEBUG": 4,
-    "LOG": 5
-}
+        fmtDict = {'system': eventDict['system'], 'text': text.replace("\n", "\n\t")}
+        msgStr = " [%(system)s] %(text)s\n" % fmtDict
+        debug('twisted', msgStr)
 
 def registerCategory(category):
     """
@@ -267,19 +293,31 @@ def init():
     Initialize the logging system and parse the FLU_DEBUG environment variable.
     Needs to be called before starting the actual application.
     """
+    global _initialized
+
+    if _initialized:
+        return
+
     if os.environ.has_key('FLU_DEBUG'):
         # install a log handler that uses the value of FLU_DEBUG
         setFluDebug(os.environ['FLU_DEBUG'])
     addLogHandler(stderrHandler, limited=True)
 
+    # integrate twisted's logging with us
+    from twisted.python import log as tlog
+    tlog.startLoggingWithObserver(FluLogObserver().emit, False)
+
+    _initialized = True
+
 def reset():
     """
     Resets the logging system, removing all log handlers.
     """
-    global _log_handlers, _log_handlers_limited
+    global _log_handlers, _log_handlers_limited, _initialized
     
     _log_handlers = []
     _log_handlers_limited = []
+    _initialized = False
     
 def setFluDebug(string):
     """Set the FLU_DEBUG string.  This controls the log output."""
@@ -304,10 +342,18 @@ def getFileLine():
         entry = stack.pop()
         if not entry[0].endswith('log.py'):
             file = entry[0]
-            # strip everything before first occurence of flumotion/, inclusive
+
+            # strip everything before first occurence of flumotion/
+            # same for twisted code
             i = file.rfind('flumotion')
             if i != -1:
-                file = file[i + len('flumotion') + 1:]
+                #file = file[i + len('flumotion') + 1:]
+                file = file[i:]
+            else:
+                i = file.rfind('twisted')
+                if i != -1:
+                    file = file[i:]
             return file, entry[1]
         
     return "Not found", 0
+

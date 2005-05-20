@@ -1,5 +1,11 @@
 2005-05-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/log.py:
+	  integrate twisted's logging with ours.  This might help us
+	  debug some problems, no ? I think this is spiffy anyway.
+
+2005-05-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	  back to TRUNK
 
