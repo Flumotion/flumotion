@@ -212,6 +212,9 @@ class FakeTransport:
     def getPeer(self):
         from twisted.internet.address import IPv4Address
         return IPv4Address('TCP', 'nullhost', 1)
+    def getHost(self):
+        from twisted.internet.address import IPv4Address
+        return IPv4Address('TCP', 'nullhost', 1)
 
 class FakeBroker:
     def __init__(self):
