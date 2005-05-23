@@ -26,7 +26,7 @@ from twisted.internet import reactor
 from twisted.spread import pb
 from twisted.python import failure
 
-from flumotion.common import errors, interfaces, log
+from flumotion.common import errors, interfaces, log, common
 
 class ManagerAvatar(pb.Avatar, log.Loggable):
     """
@@ -105,8 +105,13 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         @type mind: L{twisted.spread.pb.RemoteReference}
         """
         self.mind = mind
-        ip = self.mind.broker.transport.getPeer().host
-        self.debug('PB client from %s attached' % ip)
+        transport = self.mind.broker.transport
+        tarzan = transport.getHost()
+        jane = transport.getPeer()
+        if tarzan and jane:
+            self.debug("PB client connection is from %s to me on %s" % (
+                common.addressGetHost(tarzan),
+                common.addressGetHost(jane)))
         self.log('Client attached is mind %s' % mind)
 
     def detached(self, mind):

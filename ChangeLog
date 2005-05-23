@@ -1,5 +1,14 @@
 2005-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/medium.py:
+	* flumotion/manager/base.py:
+	* flumotion/worker/worker.py:
+	  make avatars (PB server) and mediums (PB client) figure out
+	  addresses on both sides of their connection as seen by them.
+	  Will be useful to figure out network topology and firewalls.
+
+2005-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	* flumotion/service/service.py:
 	  factor out getPidPath() and use it

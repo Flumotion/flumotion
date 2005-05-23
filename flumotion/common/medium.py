@@ -22,7 +22,7 @@ from twisted.spread import pb
 from twisted.internet import defer
 
 from flumotion.twisted.defer import defer_generator_method
-from flumotion.common import log, interfaces, bundleclient, errors
+from flumotion.common import log, interfaces, bundleclient, errors, common
 
 class BaseMedium(pb.Referenceable, log.Loggable):
     """
@@ -38,12 +38,30 @@ class BaseMedium(pb.Referenceable, log.Loggable):
     bundleLoader = None
 
     def setRemoteReference(self, remoteReference):
+        """
+        @param remoteReference: L{twisted.spread.pb.RemoteReference}
+        """
         self.debug('%r.setRemoteReference: %r' % (self, remoteReference))
         self.remote = remoteReference
         def nullRemote(x):
             self.info('%r: disconnected from %r' % (self, self.remote))
             self.remote = None
         self.remote.notifyOnDisconnect(nullRemote)
+
+        # figure out connection addresses
+        tarzan = None
+        jane = None
+        try:
+            transport = remoteReference.broker.transport
+            tarzan = transport.getHost()
+            jane = transport.getPeer()
+        except Exception, e:
+            self.debug("could not get connection info, reason %r" % e)
+        if tarzan and jane:
+            self.debug("connection is from me on %s to manager on %s" % (
+                common.addressGetHost(tarzan),
+                common.addressGetHost(jane)))
+
         self.bundleLoader = bundleclient.BundleLoader(self.remote)
 
     def hasRemoteReference(self):
