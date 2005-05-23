@@ -183,6 +183,7 @@ class Servicer(log.Loggable):
                 if not common.checkPidRunning(pid):
                     self.debug("Cleaning up stale pid %d for %s %s" % (
                         pid, type, name))
+                    print "deleting stale pid file for %s %s" % (type, name)
                     common.deletePidFile(type, name)
  
     def startManager(self, name, flowNames):
@@ -261,6 +262,7 @@ class Servicer(log.Loggable):
                 raise errors.SystemError, \
                     "Worker %s is dead (stale pid %d)" % (name, pid)
             
+        # we are sure the worker is not running and there's no pid file
         self.info("Loading worker %s" % workerFile)
 
         command = "flumotion-worker -D -n %s %s" % (name, workerFile)
@@ -270,12 +272,14 @@ class Servicer(log.Loggable):
             self.debug("Waiting for pid for worker %s" % name)
             pid = common.waitPidFile('worker', name)
             if pid:
-                self.debug("worker %s started with pid %d" % (name, pid))
+                self.info("Started worker %s with pid %d" % (name, pid))
                 return True
             else:
                 self.warning("worker %s could not start" % name)
                 return False
 
+        self.warning("worker %s could not start (return value %d)" % (
+            name, retval))
         return False
 
     def startProcess(self, command):

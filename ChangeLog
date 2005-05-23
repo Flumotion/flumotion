@@ -1,3 +1,11 @@
+2005-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
+	* flumotion/service/service.py:
+	  factor out getPidPath() and use it
+	  change waitPidFile to actually wait for the pid file to arrive,
+	  instead of the fancy and brittle mtime on the run dir.
+
 2005-05-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/log.py:

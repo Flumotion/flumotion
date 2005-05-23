@@ -489,17 +489,20 @@ def ensureDir(dir, description):
             raise errors.SystemError, "could not create %s directory %s" % (
                 description, dir)
 
+def getPidPath(type, name):
+    """
+    Get the full path to the pid file for the given process type and name.
+    """
+    return os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
  
 def writePidFile(type, name):
     """
     Write a pid file in the run directory, using the given process type
     and process name for the filename.
     """
-    
     ensureDir(configure.rundir, "rundir")
     pid = os.getpid()
-    pidPath = os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
-    file = open(pidPath, 'w')
+    file = open(getPidPath(type, name), 'w')
     file.write("%d\n" % pid)
     file.close()
  
@@ -508,19 +511,17 @@ def deletePidFile(type, name):
     Delete the pid file in the run directory, using the given process type
     and process name for the filename.
     """
-    
-    pidPath = os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
-    os.unlink(pidPath)
+    os.unlink(getPidPath(type, name))
  
 def getPid(type, name):
     """
     Get the pid from the pid file in the run directory, using the given
     process type and process name for the filename.
     
-    @returns: pid of the process, or None.
+    @returns: pid of the process, or None if not running or file not found.
     """
     
-    pidPath = os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
+    pidPath = getPidPath(type, name)
     if not os.path.exists(pidPath):
         return
     
@@ -578,24 +579,20 @@ def checkPidRunning(pid):
  
 def waitPidFile(type, name):
     """
-    Wait for the given process type and name to have started.
-    Return the pid if it started successfully, or None if it didn't.
+    Wait for the given process type and name to have started and created
+    a pid file.
+
+    Return the pid.
     """
+    # getting it from the start avoids an unneeded time.sleep
+    pid = getPid(type, name)
     
-    mtime = os.stat(configure.rundir)[8]
-    pid = getPid(type, name)
-    if pid:
-        return pid
-         
-    while os.stat(configure.rundir)[8] == mtime:
-        pid = getPid(type, name)
-        #if pid:
-        #    return pid
+    while not pid:
         time.sleep(0.1)
- 
-    pid = getPid(type, name)
+        pid = getPid(type, name)
+
     return pid
- 
+
 def waitForTerm():
     """
     Wait until we get killed by a TERM signal (from someone else).
