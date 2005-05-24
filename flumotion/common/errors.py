@@ -37,6 +37,9 @@ class NotConnectedError(ConnectionError):
 class ConnectionRefusedError(ConnectionError):
     "Connection refused"
 
+class ConnectionFailedError(ConnectionError):
+    "Connection failed"
+
 class ManagerNotConnectedError(NotConnectedError):
     "Manager not connected"
 

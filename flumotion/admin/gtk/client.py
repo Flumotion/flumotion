@@ -95,6 +95,10 @@ class Window(log.Loggable, gobject.GObject):
         self.admin.connect('disconnected', self.admin_disconnected_cb)
         self.admin.connect('connection-refused',
                            self.admin_connection_refused_cb)
+        self.admin.connect('nnection-failed',
+                           self.admin_connection_failed_cb)
+        self.admin.connect('connection-failed',
+                           self.admin_connection_failed_cb)
         self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
         self.admin.connect('component-property-changed',
             self.property_changed_cb)
@@ -574,6 +578,19 @@ class Window(log.Loggable, gobject.GObject):
         log.debug('adminclient', "handling connection-refused")
         reactor.callLater(0, self.admin_connection_refused_later, admin)
         log.debug('adminclient', "handled connection-refused")
+
+    def admin_connection_failed_later(self, admin, reason):
+        message = ("Connection to manager on %s failed (%s)."
+                   % (admin.connectionInfoStr(), reason))
+        self.info(message)
+        d = dialogs.ErrorDialog(message, self)
+        d.show_all()
+        d.connect('response', self.close)
+
+    def admin_connection_failed_cb(self, admin):
+        log.debug('adminclient', "handling connection-failed")
+        reactor.callLater(0, self.admin_connection_failed_later, admin)
+        log.debug('adminclient', "handled connection-failed")
 
     def admin_ui_state_changed_cb(self, admin, name, state):
         # called when the admin UI for that component has changed

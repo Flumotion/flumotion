@@ -46,9 +46,14 @@ from flumotion.twisted import pb as fpb
 
 from flumotion.common.pygobject import gsignal, gproperty
 
-
+# FIXME: keycard should be created and handed to factory instead
 class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
     def __init__(self, medium, user, passwd):
+        """
+        @type medium:  AdminModel
+        @param user:   username to log in with
+        @param passwd: password to log in with
+        """
         fpb.ReconnectingFPBClientFactory.__init__(self)
 
         self.user = user
@@ -64,6 +69,18 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
  
         # start logging in
         self.startLogin(keycard, medium, interfaces.IAdminMedium)
+
+    def clientConnectionFailed(self, connector, reason):
+        """
+        @param reason: L{twisted.spread.pb.failure.Failure}
+        """
+        if reason.check(error.DNSLookupError):
+            self.debug('DNS lookup error')
+            self.medium.connectionFailed(reason)
+            return
+
+        fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self, connector,
+            reason)
 
     # vmethod implementation
     def gotDeferredLogin(self, d):
@@ -83,6 +100,11 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
                 result = d.value()
 
             self.medium.setRemoteReference(result)
+
+        except error.ConnectionFailedError:
+            self.debug("emitting connection-failed")
+            self.medium.emit('connection-failed', "I failed my master")
+            self.debug("emitted connection-failed")
 
         except error.ConnectionRefusedError:
             self.debug("emitting connection-refused")
@@ -114,6 +136,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
     gsignal('connected')
     gsignal('disconnected')
     gsignal('connection-refused')
+    gsignal('connection-failed', str)
     gsignal('ui-state-changed', str, object)
     gsignal('component-property-changed', str, str, object)
     gsignal('reloading', str)
@@ -171,11 +194,17 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             map(model.disconnect, ids)
             d.errback(errors.ConnectionRefusedError())
 
+        def connection_failed(model, reason, d, ids):
+            map(model.disconnect, ids)
+            d.errback(errors.ConnectionFailedError(reason))
+
         d = defer.Deferred()
         ids = []
         ids.append(self.connect('connected', connected, d, ids))
         ids.append(self.connect('connection-refused',
                                 connection_refused, d, ids))
+        ids.append(self.connect('connection-failed',
+                                connection_failed, d, ids))
         return d
 
     # default Errback
@@ -196,6 +225,14 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
     def managerInfoStr(self):
         assert self.planet
         return '%s (%s:%s)' % (self.planet.get('name'), self.host, self.port)
+
+    def connectionFailed(self, reason):
+        # called by client factory
+        if reason.check(error.DNSLookupError):
+            self.debug('emitting connection-failed')
+            self.emit('connection-failed', "Could not look up host '%s'." %
+                self.host)
+            self.debug('emited connection-failed')
 
     def setRemoteReference(self, remoteReference):
         def writeConnection():

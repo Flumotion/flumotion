@@ -1,5 +1,15 @@
 2005-05-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/main.py:
+	* flumotion/common/errors.py:
+	* flumotion/twisted/pb.py:
+	  add ConnectionFailedError and handle name lookup errors everywhere
+
+2005-05-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/tags:
 	  add GTK 2.4 tag
 	* flumotion/admin/gtk/dialogs.py:

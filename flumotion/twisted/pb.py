@@ -131,17 +131,20 @@ class ReconnectingFPBClientFactory(FPBClientFactory,
         self._doingGetPerspective = False
         
     def clientConnectionFailed(self, connector, reason):
+        log.msg("connection failed, reason %r" % reason)
         FPBClientFactory.clientConnectionFailed(self, connector, reason)
         RCF = protocol.ReconnectingClientFactory
         RCF.clientConnectionFailed(self, connector, reason)
 
     def clientConnectionLost(self, connector, reason):
+        log.msg("connection lost, reason %r" % reason)
         FPBClientFactory.clientConnectionLost(self, connector, reason,
                                              reconnecting=True)
         RCF = protocol.ReconnectingClientFactory
         RCF.clientConnectionLost(self, connector, reason)
 
     def clientConnectionMade(self, broker):
+        log.msg("connection made")
         self.resetDelay()
         FPBClientFactory.clientConnectionMade(self, broker)
         if self._doingLogin:

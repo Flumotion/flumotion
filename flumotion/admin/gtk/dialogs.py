@@ -94,6 +94,12 @@ def connection_refused_modal_message(host, parent=None):
     d.run()
     d.destroy()
 
+def connection_failed_modal_message(message, parent=None):
+    d = ErrorDialog('Connection failed', parent, True, message)
+    d.run()
+    d.destroy()
+
+
 class PropertyChangeDialog(gtk.Dialog):
     """
     I am a dialog to get and set GStreamer element properties on a component.

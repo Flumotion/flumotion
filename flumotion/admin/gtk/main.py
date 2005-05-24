@@ -54,8 +54,16 @@ def _runInterface(conf_file, options, greeter=None, run=True):
                                                  greeter.window)
         _runInterface(None, None, greeter, False)
 
+    def failed(failure, greeter):
+        failure.trap(errors.ConnectionFailedError)
+        message = "".join(failure.value.args)
+        dialogs.connection_failed_modal_message(message, greeter.window)
+        _runInterface(None, None, greeter, False)
+
+
     d.addCallback(connected, g)
     d.addErrback(refused, g)
+    d.addErrback(failed, g)
 
     if run:
         reactor.run()
