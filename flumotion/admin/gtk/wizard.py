@@ -138,6 +138,7 @@ class Wizard(GladeWindow):
             p = self.pages[x.name] = x(self.name+'-')
             p.show()
 
+        self.loop = gobject.MainLoop()
         self._setup_ui()
         self.set_page(initial_page)
 
@@ -190,7 +191,7 @@ class Wizard(GladeWindow):
 
     def on_delete_event(self, *window):
         self.state = None
-        gtk.main_quit()
+        self.loop.quit()
 
     def on_next(self, *button):
         next_page = self.page.on_next(self.state)
@@ -218,15 +219,15 @@ class Wizard(GladeWindow):
     def set_sensitive(self, is_sensitive):
         self.window.set_sensitive(is_sensitive)
 
-
     def run(self):
-        def on_finished(self):
-            gtk.main_quit()
         assert self.window
         self.set_sensitive(True)
         self.show()
-        self.connect('finished', on_finished)
-        gtk.main()
+        def finished(x):
+            self.disconnect(i)
+            self.loop.quit()
+        i = self.connect('finished', finished)
+        self.loop.run()
         return self.state
 
 gobject.type_register(Wizard)

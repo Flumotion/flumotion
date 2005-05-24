@@ -210,7 +210,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
     # default Errback
     def _defaultErrback(self, failure):
         self.debug('Unhandled deferred failure: %r (%s)' % (
-            failure.type, failure.getErrorMessage()))
+            failure, failure.getErrorMessage()))
         return failure
 
     def reconnect(self):

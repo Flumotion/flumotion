@@ -30,7 +30,7 @@ from flumotion.admin.gtk.client import Window
 from flumotion.common import log, errors
 from flumotion.configure import configure
 
-def _runInterface(conf_file, options, greeter=None, run=True):
+def _runInterface(conf_file, options, greeter=None):
     if conf_file:
         # load the conf file here
         raise NotImplementedError()
@@ -38,7 +38,8 @@ def _runInterface(conf_file, options, greeter=None, run=True):
     g = greeter or Greeter()
     state = g.run()
     if not state:
-        sys.exit(0)
+        reactor.stop()
+        return
     g.set_sensitive(False)
 
     model = AdminModel(state['user'], state['passwd'])
@@ -52,7 +53,7 @@ def _runInterface(conf_file, options, greeter=None, run=True):
         failure.trap(errors.ConnectionRefusedError)
         dialogs.connection_refused_modal_message(state['host'],
                                                  greeter.window)
-        _runInterface(None, None, greeter, False)
+        _runInterface(None, None, greeter)
 
     def failed(failure, greeter):
         failure.trap(errors.ConnectionFailedError)
@@ -64,9 +65,6 @@ def _runInterface(conf_file, options, greeter=None, run=True):
     d.addCallback(connected, g)
     d.addErrback(refused, g)
     d.addErrback(failed, g)
-
-    if run:
-        reactor.run()
 
 def main(args):
     parser = optparse.OptionParser()
@@ -103,3 +101,5 @@ def main(args):
         _runInterface(conf_files[0], options)
     else:
         _runInterface(None, options)
+
+    reactor.run()

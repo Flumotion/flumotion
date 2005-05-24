@@ -1,3 +1,16 @@
+2005-05-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/main.py (main): Run main loop in main
+	function.
+	(_runInterface): Stop the reactor instead of doing a sys.exit.
+
+	* flumotion/admin/gtk/wizard.py (Wizard): Use our own main loop,
+	not the GTK one. Disconnect from the finished handler after one
+	fire.
+
+	* flumotion/admin/admin.py (AdminModel._defaultErrback): Not all
+	failures have .type.
+
 2005-05-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:
