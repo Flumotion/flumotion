@@ -71,14 +71,20 @@ class ErrorDialog(gtk.MessageDialog):
                  secondary_text=None):
         gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
             gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
+        self.message = message
         if close_on_response:
             self.connect("response", lambda self, response: self.hide())
+
+        # GTK 2.4 does not have format_secondary_text
+        if not hasattr(self, 'format_secondary_text'):
+            self.format_secondary_text = self._format_secondary_text_backport
+
         if secondary_text:
-            if hasattr(self, 'format_secondary_text'):
-                self.format_secondary_text(secondary_text)
-            else:
-                self.set_markup('<span weight="bold" size="larger">%s</span>'
-                                '\n\n%s' % (message, secondary_text))
+            self.format_secondary_text(secondary_text)
+
+    def _format_secondary_text_backport(self, secondary_text):
+        self.set_markup('<span weight="bold" size="larger">%s</span>'
+                        '\n\n%s' % (self.message, secondary_text))
 
 def connection_refused_modal_message(host, parent=None):
     d = ErrorDialog('Connection refused', parent, True,

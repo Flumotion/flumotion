@@ -1,3 +1,11 @@
+2005-05-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/tags:
+	  add GTK 2.4 tag
+	* flumotion/admin/gtk/dialogs.py:
+	  provide a format_secondary_text "backport" function for pychecker's
+	  happiness
+
 2005-05-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/main.py (_runInterface):
