@@ -59,8 +59,7 @@ def _runInterface(conf_file, options, greeter=None):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
         dialogs.connection_failed_modal_message(message, greeter.window)
-        _runInterface(None, None, greeter, False)
-
+        _runInterface(None, None, greeter)
 
     d.addCallback(connected, g)
     d.addErrback(refused, g)
