@@ -67,11 +67,26 @@ class ProgressDialog(gtk.Dialog):
         self.stop()
 
 class ErrorDialog(gtk.MessageDialog):
-    def __init__(self, message, parent=None, close_on_response=True):
+    def __init__(self, message, parent=None, close_on_response=True,
+                 secondary_text=None):
         gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
             gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
         if close_on_response:
             self.connect("response", lambda self, response: self.hide())
+        if secondary_text:
+            if hasattr(self, 'format_secondary_text'):
+                self.format_secondary_text(secondary_text)
+            else:
+                self.set_markup('<span weight="bold" size="larger">%s</span>'
+                                '\n\n%s' % (message, secondary_text))
+
+def connection_refused_modal_message(host, parent=None):
+    d = ErrorDialog('Connection refused', parent, True,
+                    '"%s" refused your connection.\n'
+                    'Check your user name and password and try again.'
+                    % host)
+    d.run()
+    d.destroy()
 
 class PropertyChangeDialog(gtk.Dialog):
     """

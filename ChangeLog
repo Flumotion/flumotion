@@ -1,3 +1,22 @@
+2005-05-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/main.py (_runInterface):
+	* flumotion/admin/gtk/client.py (Window.on_open_connection): Use
+	the deferred from connectToHost and the new error dialog.
+
+	* flumotion/admin/gtk/dialogs.py
+	(connection_refused_modal_message): New proc, pops up a modal
+	message that the connection to a manager was refused.
+	(ErrorDialog.__init__): Add a secondary_text kwarg. Attempt to
+	make it work on PyGTK 2.4.
+
+	* flumotion/common/errors.py (ConnectedRefusedError): New error,
+	raised by AdminModel.connectToHost's deferred.
+
+	* flumotion/admin/admin.py (AdminModel.connectToHost): Return a
+	deferred instead of requiring callers to connect to the
+	::connected and ::connection-refused signals.
+
 2005-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/medium.py:

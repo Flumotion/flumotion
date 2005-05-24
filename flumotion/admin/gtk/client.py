@@ -162,28 +162,23 @@ class Window(log.Loggable, gobject.GObject):
 
         return window
 
-    def open_connected_cb(self, model, ids):
-        map(model.disconnect, ids)
-        self.window.set_sensitive(True)
-        self._setAdminModel(model)
-        self._append_recent_connections()
-
-    def open_refused_cb(self, model, host, port, use_insecure, ids):
-        map(model.disconnect, ids)
-        self.window.set_sensitive(True)
-        print '\n\nconnection refused, try again'
-        print 'FIXME: make a proper errbox'
-
     def on_open_connection(self, config):
         model = AdminModel(config['user'], config['passwd'])
-        model.connectToHost(config['host'], config['port'],
-                            config['use_insecure'])
+        d = model.connectToHost(config['host'], config['port'],
+                                config['use_insecure'])
 
-        ids = []
-        ids.append(model.connect('connected',
-                                 self.open_connected_cb, ids))
-        ids.append(model.connect('connection-refused',
-                                 self.open_refused_cb, ids))
+        def connected(model):
+            self.window.set_sensitive(True)
+            self._setAdminModel(model)
+            self._append_recent_connections()
+
+        def refused(failure):
+            failure.trap(errors.ConnectionRefusedError)
+            dialogs.connection_refused_modal_message(config['host'],
+                                                     self.window)
+            self.window.set_sensitive(True)
+
+        d.addCallback(connected).addErrback(refused)
         self.window.set_sensitive(False)
 
     def on_recent_activate(self, widget, state):

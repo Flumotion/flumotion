@@ -34,6 +34,9 @@ class ConnectionError(pb.Error):
 class NotConnectedError(ConnectionError):
     "Not connected"
 
+class ConnectionRefusedError(ConnectionError):
+    "Not connected"
+
 class ManagerNotConnectedError(NotConnectedError):
     "Manager not connected"
 

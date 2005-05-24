@@ -24,22 +24,11 @@ import sys
 from twisted.internet import reactor
 
 from flumotion.admin.admin import AdminModel
+from flumotion.admin.gtk import dialogs
 from flumotion.admin.gtk.greeter import Greeter
 from flumotion.admin.gtk.client import Window
-from flumotion.common import log
+from flumotion.common import log, errors
 from flumotion.configure import configure
-
-def _model_connected_cb(model, greeter, ids):
-    map(model.disconnect, ids)
-    greeter.destroy()
-    win = Window(model)
-    win.show()
-
-def _model_refused_cb(model, host, port, use_insecure, greeter, ids):
-    map(model.disconnect, ids)
-    print '\n\nconnection refused, try again'
-    print 'FIXME: make a proper errbox'
-    _runInterface(None, None, greeter, False)
 
 def _runInterface(conf_file, options, greeter=None, run=True):
     if conf_file:
@@ -53,11 +42,20 @@ def _runInterface(conf_file, options, greeter=None, run=True):
     g.set_sensitive(False)
 
     model = AdminModel(state['user'], state['passwd'])
-    model.connectToHost(state['host'], state['port'], state['use_insecure'])
+    d = model.connectToHost(state['host'], state['port'], state['use_insecure'])
 
-    ids = []
-    ids.append(model.connect('connected', _model_connected_cb, g, ids))
-    ids.append(model.connect('connection-refused', _model_refused_cb, g, ids))
+    def connected(model, greeter):
+        greeter.destroy()
+        Window(model).show()
+
+    def refused(failure, greeter):
+        failure.trap(errors.ConnectionRefusedError)
+        dialogs.connection_refused_modal_message(state['host'],
+                                                 greeter.window)
+        _runInterface(None, None, greeter, False)
+
+    d.addCallback(connected, g)
+    d.addErrback(refused, g)
 
     if run:
         reactor.run()

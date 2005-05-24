@@ -163,6 +163,21 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             reactor.connectSSL(host, port, self.clientFactory,
                                ssl.ClientContextFactory())
 
+        def connected(model, d, ids):
+            map(model.disconnect, ids)
+            d.callback(model)
+
+        def connection_refused(model, d, ids):
+            map(model.disconnect, ids)
+            d.errback(errors.ConnectionRefusedError())
+
+        d = defer.Deferred()
+        ids = []
+        ids.append(self.connect('connected', connected, d, ids))
+        ids.append(self.connect('connection-refused',
+                                connection_refused, d, ids))
+        return d
+
     # default Errback
     def _defaultErrback(self, failure):
         self.debug('Unhandled deferred failure: %r (%s)' % (
