@@ -596,7 +596,6 @@ class ComponentAvatar(base.ManagerAvatar):
     def checkFeedReady(self, feedName):
         # check if the given feed is ready to start, and start it if it is
         self.debug('checkFeedReady: feedName %s' % feedName)
-        print "THOMAS: self.ports.keys(): %r" % self.ports.keys()
         if not self.ports.has_key(feedName):
             self.debug('checkFeedReady: no port yet')
             return
