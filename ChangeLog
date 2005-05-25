@@ -1,3 +1,10 @@
+2005-05-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/sidebar.py (WizardSidebar.pop): Return True if
+	the pop succeeded, False if there was nothing left.
+	(WizardSidebar.set_sections): Reset the stack position when
+	resetting the set of sections.
+
 2005-05-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/main.py (main): Run main loop in main

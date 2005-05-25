@@ -197,6 +197,7 @@ class WizardSidebar(gtk.EventBox):
             self.emit('step-chosen', name)
 
         self.sections = []
+        self.active = self.top = -1
 
         for x in titles_and_names:
             w = SidebarSection(*x)
@@ -230,6 +231,9 @@ class WizardSidebar(gtk.EventBox):
         else:
             self.sections[self.top].pop_header()
             self.top -= 1
+            if self.top < 0:
+                return False
             if self.top < self.active:
                 self.set_active(self.top)
+        return True
 gobject.type_register(WizardSidebar)
