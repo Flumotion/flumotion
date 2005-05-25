@@ -1,0 +1,37 @@
+#!/bin/bash -i
+#
+# this script setups up env to work on flumotion uninstalled
+
+# this script is run -i so that PS1 doesn't get cleared
+
+# change this variable to a different location depending on where you
+# store your cvs checkouts
+
+MYFLU=$HOME/flu
+
+# extract version from $0
+# if this script is called "flu-head" then version will be "head"
+VERSION=`echo $0 | sed s/.*flu-//g`
+
+# base path under which dirs are installed
+FLU=$MYFLU/$VERSION
+if test ! -e $FLU/flumotion; then
+  echo "$FLU/flumotion does not exist !"
+  exit
+fi
+
+export PYTHONPATH=$FLU/flumotion:$PYTHONPATH
+export PATH=$FLU/flumotion/bin:$PATH
+export PKG_CONFIG_PATH=$FLU/flumotion/pkgconfig:$PKG_CONFIG_PATH
+
+# if we got a command, run it, else start a shell
+if test ! -z "$1";
+then
+  $@
+  exit $?
+fi
+
+# set up prompt to help us remember we're in a subshell, cd to
+# the flumotion dir and start $SHELL
+cd $FLU/flumotion
+PS1="[flu] $PS1" $SHELL
