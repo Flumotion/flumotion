@@ -34,4 +34,4 @@ fi
 # set up prompt to help us remember we're in a subshell, cd to
 # the flumotion dir and start $SHELL
 cd $FLU/flumotion
-PS1="[flu] $PS1" $SHELL
+PS1="[flu-$VERSION] $PS1" $SHELL
