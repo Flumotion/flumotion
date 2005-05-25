@@ -268,9 +268,15 @@ class FakeComponentMind(FakeMind):
         self.info('Creating component mind for %s' % avatarId)
         state = planet.ManagerJobState()
         state._dict = {
-            'type': type, 'pid': 1, 'mood': moods.waking.value,
-            'ip': '0.0.0.0', 'workerName': workerName, 'message': None, 
-            'feederNames': [], 'eaterNames': [] }
+            'type': type,
+            'pid': 1,
+            'cpu': 0.1,
+            'mood': moods.waking.value,
+            'ip': '0.0.0.0',
+            'workerName': workerName,
+            'message': None, 
+            'feederNames': [],
+            'eaterNames': [] }
         self.state = state
 
     def remote_getState(self):

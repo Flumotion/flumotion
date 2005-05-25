@@ -132,6 +132,7 @@ class ManagerComponentState(flavors.StateCacheable):
         # proxied from job state
         self.addKey('ip')
         self.addKey('pid')
+        self.addKey('cpu') # cpu usage, 0.0 -> 1.0
         self.addKey('workerName')
         self.addKey('message')
         self._jobState = None
@@ -145,7 +146,7 @@ class ManagerComponentState(flavors.StateCacheable):
         @type jobState: L{ManagerJobState}
         """
         self._jobState = jobState
-        for key in ['mood', 'ip', 'pid', 'workerName', 'message']:
+        for key in ['mood', 'ip', 'pid', 'workerName', 'message', 'cpu']:
             # only set non-None values, handling 'message' being None
             v = jobState.get(key)
             if v != None:
@@ -182,6 +183,7 @@ class WorkerJobState(flavors.StateCacheable):
         self.addKey('mood')
         self.addKey('ip')
         self.addKey('pid')
+        self.addKey('cpu')
         self.addKey('workerName')
         self.addKey('message')
 

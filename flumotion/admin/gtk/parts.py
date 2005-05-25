@@ -38,6 +38,7 @@ COL_WORKER     = 2
 COL_PID        = 3
 COL_STATE      = 4
 COL_MOOD_VALUE = 5 # to sort COL_MOOD
+COL_CPU        = 6
 
 class AdminStatusbar:
     """
@@ -146,7 +147,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self.__gobject_init__()
         
         self._view = tree_widget
-        self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, str, object, int)
+        self._model = gtk.ListStore(gtk.gdk.Pixbuf, str, str, str, object, int, str)
 
         self._view.connect('cursor-changed', self._view_cursor_changed_cb)
         self._view.connect('button-press-event',
@@ -181,6 +182,11 @@ class ComponentsView(log.Loggable, gobject.GObject):
         col = gtk.TreeViewColumn('PID', gtk.CellRendererText(),
                                  text=COL_PID)
         col.set_sort_column_id(COL_PID)
+        self._view.append_column(col)
+
+        col = gtk.TreeViewColumn('CPU %', gtk.CellRendererText(),
+                                 text=COL_CPU)
+        col.set_sort_column_id(COL_CPU)
         self._view.append_column(col)
 
         # the additional columns need not be added
@@ -316,6 +322,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
             self.debug('component has mood %r' % mood)
             workerName = component.get('workerName')
             pid = component.get('pid')
+            cpu = component.get('cpu')
             
             if mood != None:
                 self._set_mood_value(iter, mood)
@@ -328,6 +335,10 @@ class ComponentsView(log.Loggable, gobject.GObject):
                 self._model.set(iter, COL_PID, str(pid))
             else:
                 self._model.set(iter, COL_PID, None)
+            if cpu:
+                self._model.set(iter, COL_CPU, "%.2f" % (cpu * 100.0))
+            else:
+                self._model.set(iter, COL_CPU, None)
         self.debug('updated components view')
 
         self.update_start_stop_props()
@@ -347,6 +358,11 @@ class ComponentsView(log.Loggable, gobject.GObject):
                 self._model.set(iter, COL_PID, str(value))
             else:
                 self._model.set(iter, COL_PID, None)
+        elif key == 'cpu':
+            if value:
+                self._model.set(iter, COL_CPU, "%.2f" % (value * 100.0))
+            else:
+                self._model.set(iter, COL_CPU, None)
         elif key == 'name':
             if value:
                 self._model.set(iter, COL_NAME, value)

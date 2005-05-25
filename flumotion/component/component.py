@@ -24,6 +24,7 @@ worker-side objects for components
 
 import os
 import sys
+import time
 import socket
 
 import gobject
@@ -264,6 +265,12 @@ class BaseComponent(log.Loggable, gobject.GObject):
  
         self.uiState = componentui.WorkerComponentUIState()
 
+        # FIXME: when we need this somewhere else, put this in a class and
+        # use it that way
+        self.baseTime = time.time()
+        self.lastTime = time.time()
+        self.lastClock = time.clock()
+
     def updateMood(self):
         """
         Update the mood because a mood condition has changed.
@@ -305,6 +312,23 @@ class BaseComponent(log.Loggable, gobject.GObject):
             self.medium.callRemote('heartbeat', self.state.get('mood'))
         self._HeartbeatDC = reactor.callLater(self._heartbeatInterval,
             self._heartbeat)
+
+        # update CPU time stats
+        nowTime = time.time()
+        nowClock = time.clock()
+        deltaTime = nowTime - self.lastTime
+        deltaClock = nowClock - self.lastClock
+        CPU = deltaClock/deltaTime
+        self.state.set('cpu', CPU)
+        self.debug('CPU use in last %.3f seconds: %.2f' % (
+            deltaTime, CPU * 100.0))
+        deltaTime = nowTime - self.baseTime
+        deltaClock = nowClock
+        CPU = deltaClock/deltaTime
+        self.debug('CPU use in last %.3f seconds: %.2f' % (
+            deltaTime, CPU * 100.0))
+        self.lastTime = nowTime
+        self.lastClock = nowClock
 
     ### GObject methods
     def emit(self, name, *args):

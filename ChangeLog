@@ -1,3 +1,15 @@
+2005-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/common/planet.py:
+	* flumotion/component/component.py:
+	* flumotion/test/test_manager_manager.py:
+	  implement CPU usage monitoring.  Components will set CPU use
+	  percentage since last heartbeat on the state, and the UI will
+	  show it.  Needs factoring of the cpu code into an object
+	  (when something else would start using it) and needs a celldata
+	  func to be slightly nicer in the UI code.
+
 2005-05-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/wizard/sidebar.py (WizardSidebar.pop): Return True if
