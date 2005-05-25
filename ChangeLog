@@ -1,5 +1,15 @@
 2005-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard_http.glade:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/wizard/steps.py:
+	  implement burst-on-connect.  Currently this is only sensible
+	  for video, since audio frames are all keyframes, so it doesn't
+	  give you a burst to sync to previous keyframe.
+
+2005-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/parts.py:
 	* flumotion/common/planet.py:
 	* flumotion/component/component.py:

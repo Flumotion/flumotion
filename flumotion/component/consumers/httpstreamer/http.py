@@ -169,11 +169,11 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     # this object is given to the HTTPMedium as comp
     logCategory = 'cons-http'
+    
     # use select for test
     pipe_template = 'multifdsink name=sink ' + \
                                 'buffers-max=500 ' + \
                                 'buffers-soft-max=250 ' + \
-                                'sync-clients=TRUE ' + \
                                 'recover-policy=3'
 
     gsignal('client-removed', object, int, int, object)
@@ -351,6 +351,15 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def link_setup(self, eaters, feeders):
         sink = self.get_element('sink')
+
+        # check how to set client sync mode
+        if gstreamer.element_factory_has_property('multifdsink', 'sync-method'):
+            # FIXME: add config option for burst-on-connect
+            sink.set_property('sync-method', 2)
+        else:
+            # old property; does sync-to-keyframe
+            sink.set_property('sync-clients', True)
+            
         # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self._notify_caps_cb)
         sink.connect('state-change', self._sink_state_change_cb)

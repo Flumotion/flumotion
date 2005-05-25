@@ -995,7 +995,7 @@ class HTTP(WizardStep):
         options['bandwidth_limit'] = int(options['bandwidth_limit'])
         options['user_limit'] = int(options['user_limit'])
         options['port'] = int(options['port'])
-
+ 
         return options
 
 class HTTPBoth(HTTP):
