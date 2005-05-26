@@ -70,7 +70,7 @@ def _init_gst():
     """
 
     if PYGST_DIR != PYGTK_DIR:
-        if not PYGS_DIR in sys.path:
+        if not PYGST_DIR in sys.path:
             sys.path.insert(0, PYGST_DIR)
         
     try:
