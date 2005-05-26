@@ -1,3 +1,26 @@
+2005-05-26  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py
+	(HTTPStreamerAdminGtk.uiStateChanged): Implement vmethod, update
+	the statistics.
+	(StatisticsAdminGtkNode._loadGladeFileCallback): Don't get the
+	uistate ourselves.
+
+	* flumotion/component/consumers/httpstreamer/resources.py
+	(HTTPStreamingResource.logWrite): Output time in GMT.
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.stateSet) 
+	(BaseAdminGtk.stateAppend, BaseAdminGtk.stateRemove) 
+	(BaseAdminGtk.__implements__): You be a listener.
+	(BaseAdminGtk.__init__): Get the uistate when any admin-gtk view
+	is created, and listen to it.
+	(BaseAdminGtk.uiStateChanged): vmethod, called when the ui state
+	changes. It is possible to override stateSet, etc individually
+	though.
+
+	* flumotion/admin/gtk/client.py (Window._setAdminModel): Connect
+	to the right signal.
+
 2005-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/wizard_http.glade:

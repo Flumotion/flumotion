@@ -90,11 +90,6 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         for type in ('bitrate', 'totalbytes'):
             self.registerLabel('consumption-' + type)
 
-        mid = self.status_push('Getting statistics ...')
-        d = self.callRemote('getUIState')
-        d.addCallback(self.setStats)
-        d.addCallback(lambda result: self.status_pop(mid))
-        self.shown = False
         return self.statistics
 
 class LogAdminGtkNode(BaseAdminGtkNode):
@@ -117,6 +112,9 @@ class HTTPStreamerAdminGtk(BaseAdminGtk):
         log = LogAdminGtkNode(self.state, self.admin)
         self._nodes['Statistics'] = statistics
         self._nodes['Log'] = log
+
+    def uiStateChanged(self, state):
+        self._nodes['Statistics'].setStats(state)
 
     # FIXME: tie this to the statistics node better
     def component_statsChanged(self, stats):

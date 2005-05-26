@@ -24,12 +24,15 @@ import gtk
 import gtk.glade
 
 from flumotion.common import errors, log
+from flumotion.twisted import flavors
 
 class BaseAdminGtk(log.Loggable):
     """
     I am a base class for all GTK+-based Admin views.
     I am a view on one component's properties.
     """
+
+    __implements__ = (flavors.IStateListener,)
 
     logCategory = "admingtk"
     
@@ -44,6 +47,15 @@ class BaseAdminGtk(log.Loggable):
         self.name = state.get('name')
         self.admin = admin
         self.debug('creating admin gtk for state %r' % state)
+        self.uiState = None
+
+        #mid = self.status_push('Getting component information ...')
+        def got_state(state):
+            state.addListener(self)
+            self.uiState = state
+            self.uiStateChanged(state)
+        d = admin.componentCallRemote(state, 'getUIState')
+        d.addCallback(got_state)
         
     def propertyErrback(self, failure, window):
         failure.trap(errors.PropertyError)
@@ -106,6 +118,19 @@ class BaseAdminGtk(log.Loggable):
         main widget for embedding.
         """
         raise NotImplementedError
+
+    def uiStateChanged(self):
+        # default implementation
+        pass
+
+    def stateSet(self, object, key, value):
+        self.uiStateChanged(object)
+
+    def stateAppend(self, object, key, value):
+        self.uiStateChanged(object)
+
+    def stateRemove(self, object, key, value):
+        self.uiStateChanged(object)
 
 class BaseAdminGtkNode(log.Loggable):
     """

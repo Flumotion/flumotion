@@ -134,7 +134,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # time connected
         ident = '-'
         username = '-'
-        date = time.strftime('%d/%b/%Y:%H:%M:%S %z', time.localtime())
+        date = time.strftime('%d/%b/%Y:%H:%M:%S +0000', time.gmtime())
         request_str = '%s %s %s' % (request.method,
                                     request.uri,
                                     request.clientproto)

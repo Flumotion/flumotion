@@ -95,7 +95,7 @@ class Window(log.Loggable, gobject.GObject):
         self.admin.connect('disconnected', self.admin_disconnected_cb)
         self.admin.connect('connection-refused',
                            self.admin_connection_refused_cb)
-        self.admin.connect('nnection-failed',
+        self.admin.connect('connection-failed',
                            self.admin_connection_failed_cb)
         self.admin.connect('connection-failed',
                            self.admin_connection_failed_cb)
