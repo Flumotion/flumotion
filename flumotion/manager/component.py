@@ -407,7 +407,7 @@ class ComponentAvatar(base.ManagerAvatar):
  
     # IStateListener methods
     def stateSet(self, state, key, value):
-        self.debug("state set on %r: %s now %r" % (state, key, value))
+        self.log("state set on %r: %s now %r" % (state, key, value))
         if key == 'mood':
             self.info('Mood changed to %s' % moods.get(value).name)
 

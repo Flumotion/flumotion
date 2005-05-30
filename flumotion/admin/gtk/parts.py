@@ -349,7 +349,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
             return
             
         iter = self._iters[state]
-        self.debug('stateSet: state %r, key %s, value %r' % (state, key, value))
+        self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
 
         if key == 'mood':
             self._set_mood_value(iter, value)
