@@ -1,3 +1,11 @@
+2005-05-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	Patch by: Gergely Nagy
+
+	* data/glade/wizard_soundcard.glade:
+	* flumotion/wizard/steps.py:
+	  Fix for #135, adding human-readable names to the soundcard
+
 2005-05-26  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py

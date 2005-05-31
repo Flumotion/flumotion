@@ -586,6 +586,7 @@ class Soundcard(WizardStep):
         
     def _queryCallback(self, (deviceName, tracks)):
         self.wizard.block_next(False)
+        self.label_devicename.set_label(deviceName)
         self.combobox_channels.set_enum(SoundcardChannels)
         self.combobox_channels.set_sensitive(True)
         self.combobox_samplerate.set_enum(SoundcardSamplerate)
