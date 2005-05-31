@@ -119,7 +119,7 @@ class BaseAdminGtk(log.Loggable):
         """
         raise NotImplementedError
 
-    def uiStateChanged(self):
+    def uiStateChanged(self, stateObject):
         # default implementation
         pass
 
