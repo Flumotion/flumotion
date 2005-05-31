@@ -26,6 +26,7 @@ except RuntimeError:
     os._exit(0)
 
 _INTERVAL = 1 # in ms
+#_INTERVAL = 300 # in ms
 
 _WINDOW = None
 def set_window(w):
