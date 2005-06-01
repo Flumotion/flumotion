@@ -95,6 +95,7 @@ egg_tray_icon_init (EggTrayIcon *icon)
 {
   icon->stamp = 1;
   icon->orientation = GTK_ORIENTATION_HORIZONTAL;
+  icon->tooltips = gtk_tooltips_new ();
   
   gtk_widget_add_events (GTK_WIDGET (icon), GDK_PROPERTY_CHANGE_MASK);
 }
@@ -465,4 +466,12 @@ egg_tray_icon_get_orientation (EggTrayIcon *icon)
   g_return_val_if_fail (EGG_IS_TRAY_ICON (icon), GTK_ORIENTATION_HORIZONTAL);
 
   return icon->orientation;
+}
+
+void
+egg_tray_icon_set_tooltip (EggTrayIcon *icon, const gchar *tooltip)
+{
+  g_return_if_fail (EGG_IS_TRAY_ICON (icon));
+  gtk_tooltips_set_tip (icon->tooltips, GTK_WIDGET (icon), tooltip,
+    NULL);
 }

@@ -1,3 +1,21 @@
+2005-06-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/parts.py:
+	  use a datafunc for pid and cpu use
+	* flumotion/extern/pytrayicon/eggtrayicon.c: (egg_tray_icon_init),
+	(egg_tray_icon_get_orientation):
+	* flumotion/extern/pytrayicon/eggtrayicon.h:
+	* flumotion/extern/pytrayicon/pytrayicon.defs:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/ui/trayicon.py:
+	  add tooltip to tray icon
+	* flumotion/manager/manager.py:
+	  reset CPU use when component stops
+	* flumotion/component/component.py:
+	  debug -> log on cpu stuff
+	* flumotion/admin/admin.py:
+	  add another Str method for tooltips to use
+
 2005-05-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	Patch by: Gergely Nagy

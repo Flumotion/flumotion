@@ -179,13 +179,31 @@ class ComponentsView(log.Loggable, gobject.GObject):
         col.set_sort_column_id(COL_WORKER)
         self._view.append_column(col)
         
-        col = gtk.TreeViewColumn('PID', gtk.CellRendererText(),
-                                 text=COL_PID)
+        def type_pid_datafunc(column, cell, model, iter):
+            state = model.get_value(iter, COL_STATE)
+            pid = state.get('pid')
+            if pid:
+                model.set(iter, COL_PID, str(pid))
+            else:
+                model.set(iter, COL_PID, None)
+
+        t = gtk.CellRendererText()
+        col = gtk.TreeViewColumn('PID', t, text=COL_PID)
+        col.set_cell_data_func(t, type_pid_datafunc)
         col.set_sort_column_id(COL_PID)
         self._view.append_column(col)
 
-        col = gtk.TreeViewColumn('CPU %', gtk.CellRendererText(),
-                                 text=COL_CPU)
+        def type_cpu_datafunc(column, cell, model, iter):
+            state = model.get_value(iter, COL_STATE)
+            cpu = state.get('cpu')
+            if cpu != None:
+                model.set(iter, COL_CPU, "%.2f" % (cpu * 100.0))
+            else:
+                model.set(iter, COL_CPU, None)
+                
+        t = gtk.CellRendererText()
+        col = gtk.TreeViewColumn('CPU %', t, text=COL_CPU)
+        col.set_cell_data_func(t, type_cpu_datafunc)
         col.set_sort_column_id(COL_CPU)
         self._view.append_column(col)
 
@@ -321,8 +339,6 @@ class ComponentsView(log.Loggable, gobject.GObject):
             mood = component.get('mood')
             self.debug('component has mood %r' % mood)
             workerName = component.get('workerName')
-            pid = component.get('pid')
-            cpu = component.get('cpu')
             
             if mood != None:
                 self._set_mood_value(iter, mood)
@@ -331,14 +347,6 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
             self._model.set(iter, COL_NAME, component.get('name'))
             self._model.set(iter, COL_WORKER, workerName)
-            if pid:
-                self._model.set(iter, COL_PID, str(pid))
-            else:
-                self._model.set(iter, COL_PID, None)
-            if cpu:
-                self._model.set(iter, COL_CPU, "%.2f" % (cpu * 100.0))
-            else:
-                self._model.set(iter, COL_CPU, None)
         self.debug('updated components view')
 
         self.update_start_stop_props()
@@ -353,16 +361,6 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         if key == 'mood':
             self._set_mood_value(iter, value)
-        elif key == 'pid':
-            if value:
-                self._model.set(iter, COL_PID, str(value))
-            else:
-                self._model.set(iter, COL_PID, None)
-        elif key == 'cpu':
-            if value:
-                self._model.set(iter, COL_CPU, "%.2f" % (value * 100.0))
-            else:
-                self._model.set(iter, COL_CPU, None)
         elif key == 'name':
             if value:
                 self._model.set(iter, COL_NAME, value)

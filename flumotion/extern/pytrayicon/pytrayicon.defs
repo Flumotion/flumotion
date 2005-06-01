@@ -61,4 +61,11 @@
   (return-type "GtkOrientation")
 )
 
-
+(define-method set_tooltip
+  (of-object "EggTrayIcon")
+  (c-name "egg_tray_icon_set_tooltip")
+  (return-type "none")
+  (parameters
+    '("const-char*" "tooltip")
+  )
+)

@@ -320,12 +320,12 @@ class BaseComponent(log.Loggable, gobject.GObject):
         deltaClock = nowClock - self.lastClock
         CPU = deltaClock/deltaTime
         self.state.set('cpu', CPU)
-        self.debug('CPU use in last %.3f seconds: %.2f' % (
+        self.log('CPU use in last %.3f seconds: %.2f' % (
             deltaTime, CPU * 100.0))
         deltaTime = nowTime - self.baseTime
         deltaClock = nowClock
         CPU = deltaClock/deltaTime
-        self.debug('CPU use in last %.3f seconds: %.2f' % (
+        self.log('CPU use in last %.3f seconds: %.2f' % (
             deltaTime, CPU * 100.0))
         self.lastTime = nowTime
         self.lastClock = nowClock

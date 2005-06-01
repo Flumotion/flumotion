@@ -21,6 +21,7 @@
 #ifndef __EGG_TRAY_ICON_H__
 #define __EGG_TRAY_ICON_H__
 
+#include <gtk/gtk.h>
 #include <gtk/gtkplug.h>
 #include <gdk/gdkx.h>
 
@@ -47,6 +48,7 @@ struct _EggTrayIcon
   Atom system_tray_opcode_atom;
   Atom orientation_atom;
   Window manager_window;
+  GtkTooltips *tooltips;
 
   GtkOrientation orientation;
 };
@@ -70,8 +72,11 @@ guint        egg_tray_icon_send_message   (EggTrayIcon *icon,
 void         egg_tray_icon_cancel_message (EggTrayIcon *icon,
 					   guint        id);
 
+void         egg_tray_icon_set_tooltip    (EggTrayIcon *icon,
+                                           const gchar *tooltip);
+
 GtkOrientation egg_tray_icon_get_orientation (EggTrayIcon *icon);
-					    
+
 G_END_DECLS
 
 #endif /* __EGG_TRAY_ICON_H__ */

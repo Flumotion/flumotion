@@ -218,10 +218,15 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self.clientFactory.resetDelay()
         #self.clientFactory.retry(self.clientFactory.connector)
 
+    # FIXME: give these three sensible names
+    def adminInfoStr(self):
+        return '%s@%s:%s' % (self.user, self.host, self.port)
+
     def connectionInfoStr(self):
         return '%s:%s (%s)' % (self.host, self.port,
                                self.use_insecure and 'http' or 'https')
 
+    # used in fgc
     def managerInfoStr(self):
         assert self.planet
         return '%s (%s:%s)' % (self.planet.get('name'), self.host, self.port)

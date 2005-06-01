@@ -146,6 +146,7 @@ class Window(log.Loggable, gobject.GObject):
         tool_set_icon(widgets['toolbutton_stop_component'], 'pause')
 
         self._trayicon = trayicon.FluTrayIcon(self)
+        self._trayicon.set_tooltip('Not connected')
 
         self.hpaned = widgets['hpaned']
  
@@ -170,6 +171,8 @@ class Window(log.Loggable, gobject.GObject):
         model = AdminModel(config['user'], config['passwd'])
         d = model.connectToHost(config['host'], config['port'],
                                 config['use_insecure'])
+        self._trayicon.set_tooltip("Connecting to %s:%s" %
+            (config['host'], config['port']))
 
         def connected(model):
             self.window.set_sensitive(True)
@@ -532,8 +535,10 @@ class Window(log.Loggable, gobject.GObject):
             self._disconnected_dialog.destroy()
             self._disconnected_dialog = None
 
-        self.window.set_title('%s@%s:%d - Flumotion Administration'
-                              % (admin.user, admin.host, admin.port))
+        # FIXME: have a method for this
+        self.window.set_title('%s - Flumotion Administration' %
+            self.admin.adminInfoStr())
+        self._trayicon.set_tooltip(self.admin.adminInfoStr())
 
         self.emit('connected')
 
@@ -569,6 +574,8 @@ class Window(log.Loggable, gobject.GObject):
     def admin_connection_refused_later(self, admin):
         message = ("Connection to manager on %s was refused."
                    % admin.connectionInfoStr())
+        self._trayicon.set_tooltip("Connection to %s was refused" %
+            self.admin.adminInfoStr())
         self.info(message)
         d = dialogs.ErrorDialog(message, self)
         d.show_all()
@@ -582,6 +589,8 @@ class Window(log.Loggable, gobject.GObject):
     def admin_connection_failed_later(self, admin, reason):
         message = ("Connection to manager on %s failed (%s)."
                    % (admin.connectionInfoStr(), reason))
+        self._trayicon.set_tooltip("Connection to %s failed" %
+            self.admin.adminInfoStr())
         self.info(message)
         d = dialogs.ErrorDialog(message, self)
         d.show_all()

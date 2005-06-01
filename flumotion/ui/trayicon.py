@@ -167,3 +167,6 @@ class FluTrayIcon(log.Loggable):
         self.popupMenu.add(self.popupMenuQuititem)
         self.popupMenu.popup(None, None, None, 3, gtk.get_current_event_time())
         self.popupMenu.show_all()
+
+    def set_tooltip(self, tooltip):
+        self._tray_container.set_tooltip(tooltip)
