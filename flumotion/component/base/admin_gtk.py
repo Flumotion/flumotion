@@ -36,6 +36,8 @@ class BaseAdminGtk(log.Loggable):
 
     logCategory = "admingtk"
     
+    state = admin = 'hello pychecker'
+
     def __init__(self, state, admin):
         """
         @param state: state of component this is a UI for
