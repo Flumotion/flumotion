@@ -35,7 +35,7 @@ dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.exists(os.path.join(dir, '.svn')):
     root = os.path.split(dir)[0]
 else:
-    root = os.path.join('@libdir@', 'flumotion', 'python')
+    root = os.path.join('@LIBDIR@', 'flumotion', 'python')
 sys.path.insert(0, root)
 
 # gtk2reactor is in Twisted 2.0; we have a 1.3 one as well

@@ -27,8 +27,7 @@ import os
 import sys
 
 # Variable templates 
-PREFIX = '@prefix@'
-LIBDIR = '@libdir@'
+LIBDIR = '@LIBDIR@'
 PYGTK_DIR = '@PYGTK_DIR@'
 PYGST_DIR = '@PYGST_DIR@'
 PYGTK_VERSION = '@PYGTK_REQ@'
@@ -53,7 +52,7 @@ def _init_gobject():
         raise SystemExit('ERROR: PyGTK could not be found')
 
     if gobject.pygtk_version < PYGTK_VERSION.split('.'):
-        raise SystemExit('ERROR: PyGTKPyGTK %s or higher is required' % PYGTK_VERSION)
+        raise SystemExit('ERROR: PyGTK %s or higher is required' % PYGTK_VERSION)
 
     # To be able to have other threads emitting signals connected
     # python callbacks we need to use the new PyGILThread_STATE API

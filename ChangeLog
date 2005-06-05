@@ -1,3 +1,13 @@
+2005-06-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-admin.in:
+	* bin/flumotion-manager.in:
+	* bin/flumotion-tester.in:
+	* bin/flumotion-worker.in:
+	  Remove unused PREFIX template var.  Fix the @libdir@ vs
+	  @LIBDIR@ confusion, @libdir@ is the not-expanded version
+	  and should not be used !
+
 2005-06-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.state):

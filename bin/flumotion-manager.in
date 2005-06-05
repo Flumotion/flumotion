@@ -27,8 +27,7 @@ import os
 import sys
 
 # Variable templates 
-PREFIX = '@prefix@'
-LIBDIR = '@libdir@'
+LIBDIR = '@LIBDIR@'
 PYGTK_DIR = '@PYGTK_DIR@'
 PYGST_DIR = '@PYGST_DIR@'
 PYGTK_VERSION = '@PYGTK_REQ@'
