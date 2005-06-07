@@ -114,3 +114,42 @@ Queryies
 
 Add a list of elements, and don't do the checkin in the wizard step, it
 should be done in the wizard or the scenario
+
+
+THOMAS design notes
+-------------------
+
+- the following use cases should be possible to implement:
+  - choosing a "creative commons" license in the wizard should:
+    - instruct the ogg muxer to tag it with that license as a comment
+    - instruct the video overlayer, if used, to use a CC icon
+
+  - changing the license while streaming should:
+    - create a new physical ogg stream (since the comment changes)
+    - change the overlayer
+
+  - streamer wizard page should have an option to serve the java applet
+    - the streamer thus needs to know some options like width, height,
+      is there audio, framerate, ... to figure out some of the applet
+      params
+
+
+- scenarios:
+  - contain all the logic for:
+    - choosing which pages/page sets to present
+    - making overall choices depending on page state/choices
+  - get and use page sets
+    - since scenario and page code is on the manager, API is allowed to be
+      tightly coupled
+    - scenario either uses page sets hardcoded, or uses page sets that conform
+      to some base page set or interface (say, for example, all encoders)
+
+  - page sets
+    - are not allowed to directly reference other page sets
+    - get their "needs" provided by the scenario
+      (ie. stuff like width/height/framerate)
+    - can export their state, probably as a dict
+    - share pieces of code with components like:
+      - requirement checks (devices, versions, ...)
+      - code that transforms UI choices into derived information
+        (calculating w/h from pixel aspect ratio, ...)
