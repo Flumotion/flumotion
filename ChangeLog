@@ -1,3 +1,10 @@
+2005-06-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion.in:
+	  Remove unused PREFIX template var.  Fix the @libdir@ vs
+	  @LIBDIR@ confusion, @libdir@ is the not-expanded version
+	  and should not be used !
+
 2005-06-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/flumotion-admin.in:
