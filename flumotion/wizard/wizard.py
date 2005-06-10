@@ -31,7 +31,7 @@ from twisted.internet import defer
 
 from flumotion.configure import configure
 from flumotion.common import log, errors, worker
-from flumotion.wizard import enums, save, step, types
+from flumotion.wizard import enums, save, step, types, message
 #from flumotion.wizard.sidebar import WizardSidebar
 from flumotion.ui import fgtk
 from flumotion.ui.glade import GladeWindow
@@ -91,7 +91,8 @@ class Scenario:
         self.wizard.update_buttons(has_next)
 
     def show_next(self):
-        self.wizard._setup_worker(self.current_step)
+        self.wizard._setup_worker(self.current_step,
+                                  self.wizard.worker_list.get_worker())
         next = self.current_step.get_next()
         if not next:
             if self.current_section + 1 == len(self.sections):
@@ -191,7 +192,8 @@ class Wizard(GladeWindow, log.Loggable):
         self.current_step = None
         self._workerHeavenState = None
         self._last_worker = 0 # combo id last worker from step to step
-        self._worker_box = None # gtk.Widget containing worker combobox
+        self.worker_list.connect('worker-selected',
+                                 self._combobox_worker_changed)
 
         self.window.connect_after('realize', self.on_realize)
         self.window.connect('destroy', lambda *x: self.emit('destroy'))
@@ -203,6 +205,7 @@ class Wizard(GladeWindow, log.Loggable):
         bg = style.bg[gtk.STATE_SELECTED]
         fg = style.fg[gtk.STATE_SELECTED]
         self.eventbox_top.modify_bg(gtk.STATE_NORMAL, bg)
+        self.hbuttonbox2.modify_bg(gtk.STATE_NORMAL, bg)
         self.label_title.modify_fg(gtk.STATE_NORMAL, fg)
 
     def present(self):
@@ -223,41 +226,16 @@ class Wizard(GladeWindow, log.Loggable):
     def __len__(self):
         return len(self.scenario.steps)
 
-    def _dialog(self, type, message):
-        """
-        Show a message dialog.
-                                                                                
-        @param type:    the gtk.MESSAGE_ type to show
-        @param message: the message to display
+    def info_msg(self, id, msg):
+        m = message.Message(level=message.INFO, priority=50, id=id, msg=msg)
+        self.message_area.add_message(m)
 
-        returns: the dialog.
-        """
-        d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
-                              type, gtk.BUTTONS_OK,
-                              message)
-        d.connect("response", lambda self, response: self.destroy())
-        d.show_all()
-        return d
+    def error_msg(self, id, msg):
+        m = message.Message(level=message.ERROR, priority=60, id=id, msg=msg)
+        self.message_area.add_message(m)
 
-    def error_dialog(self, message):
-        """
-        Show an error message dialog.
-                                                                                
-        @param message: the message to display
-
-        returns: the error dialog
-        """
-        return self._dialog(gtk.MESSAGE_ERROR, message)
-
-    def info_dialog(self, message):
-        """
-        Show an info message dialog.
-                                                                                
-        @param message: the message to display
-
-        returns: the info dialog
-        """
-        return self._dialog(gtk.MESSAGE_INFO, message)
+    def clear_msg(self, id):
+        self.message_area.clear_message(id)
 
     def get_step_option(self, stepname, option):
         state = self.get_step_options(stepname)
@@ -276,11 +254,11 @@ class Wizard(GladeWindow, log.Loggable):
     def set_step(self, step):
         # Remove previous step
         map(self.content_area.remove, self.content_area.get_children())
+        self.message_area.clear()
 
         # Add current
         self.content_area.pack_start(step, True, True, 0)
 
-        self._append_workers(step)
         icon_filename = os.path.join(configure.imagedir, 'wizard', step.icon)
         self.image_icon.set_from_file(icon_filename)
             
@@ -293,57 +271,30 @@ class Wizard(GladeWindow, log.Loggable):
         self.current_step = step
         
         self.update_buttons(has_next=True)
+        self.block_next(False)
 
-        self._setup_worker(step)
+        if step.has_worker:
+            self.worker_list.show()
+        else:
+            self.worker_list.hide()
+        self._rebuild_worker_combobox()
+        
+        self._setup_worker(step, self.worker_list.get_worker())
         step.before_show()
 
         self.debug('showing step %r' % step)
         step.show()
         step.activated()
 
-    def _combobox_worker_changed(self, combobox, step):
-        self._last_worker = combobox.get_active()
-        self._setup_worker(step)
-        step.worker_changed()
+    def _combobox_worker_changed(self, combobox, worker):
+        self._last_worker = worker
+        if self.current_step:
+            self._setup_worker(self.current_step, worker)
+            self.current_step.worker_changed()
         
-    def _append_workers(self, step):
-        # called for each new page to put in the worker drop down box
-        # if the step needs a worker
-        if not step.has_worker:
-            self.combobox_worker = None
-            return
-        
-        # Horizontal, under step
-        hbox = gtk.HBox()
-        self.content_area.pack_end(hbox, False, False)
-        hbox.set_border_width(6)
-        hbox.show()
-        
-        frame = gtk.Frame('Worker')
-        hbox.pack_end(frame, False, False, 0)
-        frame.show()
-
-        # Internal, so we can add border width
-        box = gtk.HBox()
-        frame.add(box)
-        box.set_border_width(6)
-        box.show()
-        self.combobox_worker = gtk.combo_box_new_text()
-        box.pack_start(self.combobox_worker, False, False, 6)
-        self._rebuild_worker_combobox()
-        self.combobox_worker.connect('changed',
-                                     self._combobox_worker_changed, step)
-        self.combobox_worker.show()
-
     def _rebuild_worker_combobox(self):
-        model = self.combobox_worker.get_model()
-        model.clear()
-
-        # re-add all worker names
-        names = self._workerHeavenState.get('names')
-        for name in names:
-            model.append((name,))
-        self.combobox_worker.set_active(self._last_worker)
+        self.worker_list.set_workers(self._workerHeavenState.get('names'))
+        self.worker_list.select_worker(self._last_worker)
         
     def get_admin(self):
         return self._admin
@@ -371,8 +322,7 @@ class Wizard(GladeWindow, log.Loggable):
                 message = "Worker %s is missing GStreamer elements '%s'.  " % (
                     workerName, "', '".join(unexisting)) \
                         + "You will not be able to go forward."
-                # FIXME: parent
-                self.error_dialog(message)
+                self.error_msg('-'.join(elementNames), message)
             else:
                 self.block_next(False)
             return tuple(existing)
@@ -382,18 +332,10 @@ class Wizard(GladeWindow, log.Loggable):
         d.addCallback(_checkElementsCallback, workerName)
         return d
 
-    def _setup_worker(self, step):
+    def _setup_worker(self, step, worker):
         # get name of active worker
-        if self.combobox_worker:
-            model = self.combobox_worker.get_model()
-            iter = self.combobox_worker.get_active_iter()
-            if iter:
-                text = model.get(iter, 0)[0]
-                self.debug('%r setting worker to %s' % (step, text))
-                step.worker = text
-                return
-
-        self.debug('%r no worker set' % step)
+        self.debug('%r setting worker to %s' % (step, worker))
+        step.worker = worker
             
     def _set_worker_from_step(self, step):
         if not hasattr(step, 'worker'):

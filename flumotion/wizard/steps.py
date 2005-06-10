@@ -24,6 +24,7 @@ import gtk
         
 from twisted.internet import defer
 
+from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import errors
 from flumotion.configure import configure
 from flumotion.wizard.step import WizardStep, WizardSection
@@ -44,6 +45,12 @@ class Welcome(WizardSection):
     section = 'Welcome'
     icon = 'wizard.png'
     has_worker = False
+
+    def before_show(self):
+        self.textview_message.realize()
+        normal_bg = self.textview_message.get_style().bg[gtk.STATE_NORMAL]
+        self.textview_message.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
+
     def get_next(self):
         return None
 
@@ -150,15 +157,11 @@ class TVCard(VideoSource):
         self.in_setup = False
     
     def on_combobox_device_changed(self, combo):
-        self.update_sources()
+        self.run_checks()
 
     def worker_changed(self):
         self.clear_combos()
-        self.update_sources()
-        
-    def before_show(self):
-        self.clear_combos()
-        self.update_sources()
+        self.run_checks()
         
     def clear_combos(self):
         self.combobox_tvnorm.clear()
@@ -166,41 +169,31 @@ class TVCard(VideoSource):
         self.combobox_source.clear()
         self.combobox_source.set_sensitive(False)
         
-    def _queryCallback(self, (deviceName, channels, norms)):
-        self.wizard.block_next(False)
-        self.combobox_tvnorm.set_list(norms)
-        self.combobox_tvnorm.set_sensitive(True)
-        self.combobox_source.set_list(channels)
-        self.combobox_source.set_sensitive(True)
-
-    def _queryGstErrorErrback(self, failure):
-        failure.trap(errors.GstError)
-        self.clear_combos()
-        self.wizard.error_dialog('GStreamer error: %s' % failure.value)
-
-    def _unknownDeviceErrback(self, failure):
-        failure.trap(errors.UnknownDeviceError)
-        self.clear_combos()
-
-    def _queryRemoteRunErrback(self, failure):
-        failure.trap(errors.RemoteRunError)
-        self.wizard.error_dialog('General error: %s' % failure.value)
-        
-    def update_sources(self):
+    def run_checks(self):
         if self.in_setup:
-            return
+            yield None
 
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
-        if not device:
-            print "ERROR: no device selected"
+        assert device
         d = self.workerRun('flumotion.worker.checks.video', 'checkTVCard',
                            device)
-        d.addCallback(self._queryCallback)
-        d.addErrback(self._queryGstErrorErrback)
-        d.addErrback(self._unknownDeviceErrback)
-        d.addErrback(self._queryRemoteRunErrback)
+        yield d
+        try:
+            deviceName, channels, norms = d.value()
+            self.clear_msg('tvcard-error')
+            self.wizard.block_next(False)
+            self.combobox_tvnorm.set_list(norms)
+            self.combobox_tvnorm.set_sensitive(True)
+            self.combobox_source.set_list(channels)
+            self.combobox_source.set_sensitive(True)
+        except errors.GstError, e:
+            self.info_msg('test', 'Foo')
+            self.error_msg('tvcard-error', 'GStreamer error: %s' % e)
+        except errors.RemoteRunError, e:
+            self.error_msg('tvcard-error', 'General error: %s' % e)
+    run_checks = defer_generator_method(run_checks)
         
     def get_state(self):
         options = {}
@@ -232,32 +225,9 @@ class FireWire(VideoSource):
     width_correction = None     # currently chosen item from width_corrections
     
     def set_sensitive(self, is_sensitive):
-        if is_sensitive:
-            self.vbox_controls.show()
-            self.textview_status.hide()
-        else:
-            self.vbox_controls.hide()
-            self.textview_status.show()
+        self.vbox_controls.set_sensitive(is_sensitive)
         self.wizard.block_next(not is_sensitive)
         
-    def _queryCallback(self, options):
-        # if we are here, then it was successful
-        self.dims = (options['width'], options['height'])
-        self.par = options['par']
-        self.input_heights = [self.dims[1]/i for i in self.factors]
-        self.input_widths = [self.dims[0]/i for i in self.factors]
-        store = gtk.ListStore(str)
-        for i in self.input_heights:
-            store.set(store.append(), 0, '%d pixels' % i)
-        self.combobox_scaled_height.set_model(store)
-        self.combobox_scaled_height.set_active(1)
-        self.set_sensitive(True)
-        self.on_update_output_format()
-
-    def _queryErrback(self, failure):
-        buf = self.textview_status.get_buffer()
-        buf.set_text('No Firewire device detected.\n(%s)' % failure.value)
-
     def on_update_output_format(self, *args):
         # update label_camera_settings
         type = 'Unknown'
@@ -343,27 +313,31 @@ class FireWire(VideoSource):
         return options
 
     def worker_changed(self):
-        self.clear()
-        self.update()
+        self.run_checks()
         
-    def before_show(self):
-        self.clear()
-        self.update()
-
-    def clear(self):
-        buf = self.textview_status.get_buffer()
-        buf.set_text('')
- 
-    def update(self):
-        self.textview_status.realize()
-        normal_bg = self.textview_status.get_style().bg[gtk.STATE_NORMAL]
-        self.textview_status.modify_base(gtk.STATE_INSENSITIVE, normal_bg)
-        buf = self.textview_status.get_buffer()
-        buf.set_text('Detecting Firewire device...')
+    def run_checks(self):
         self.set_sensitive(False)
         d = self.workerRun('flumotion.worker.checks.video', 'check1394')
-        d.addCallback(self._queryCallback)
-        d.addErrback(self._queryErrback)
+        yield d
+        try:
+            options = d.value()
+            self.clear_msg('firewire-error')
+            self.dims = (options['width'], options['height'])
+            self.par = options['par']
+            self.input_heights = [self.dims[1]/i for i in self.factors]
+            self.input_widths = [self.dims[0]/i for i in self.factors]
+            store = gtk.ListStore(str)
+            for i in self.input_heights:
+                store.set(store.append(), 0, '%d pixels' % i)
+            self.combobox_scaled_height.set_model(store)
+            self.combobox_scaled_height.set_active(1)
+            self.set_sensitive(True)
+            self.on_update_output_format()
+        except Exception, e:
+            self.error_msg('firewire-error',
+                           'No Firewire device detected.\n'
+                           '(%s)' % e)
+    run_checks = defer_generator_method(run_checks)
 
 class Webcam(VideoSource):
     name = 'Webcam'
@@ -382,55 +356,44 @@ class Webcam(VideoSource):
         self.in_setup = False
 
     def on_combobox_device_changed(self, combo):
-        self.update()
+        self.run_checks()
 
     def worker_changed(self):
         self.clear()
-        self.update()
-        
-    def before_show(self):
-        self.clear()
-        self.update()
+        self.run_checks()
         
     def clear(self):
         self.spinbutton_width.set_sensitive(False)
         self.spinbutton_height.set_sensitive(False)
         self.spinbutton_framerate.set_sensitive(False)
         self.label_name.set_label("")
+        self.wizard.block_next(True)
         
-    def _queryCallback(self, deviceName):
-        self.label_name.set_label(deviceName)
-        self.wizard.block_next(False)
-        self.spinbutton_width.set_sensitive(True)
-        self.spinbutton_height.set_sensitive(True)
-        self.spinbutton_framerate.set_sensitive(True)
-
-    def _queryGstErrorErrback(self, failure):
-        failure.trap(errors.GstError)
-        self.clear()
-        self.wizard.error_dialog('GStreamer error: %s' % failure.value)
-
-    def _unknownDeviceErrback(self, failure):
-        failure.trap(errors.UnknownDeviceError)
-        self.clear()
-
-    def _queryRemoteRunErrback(self, failure):
-        failure.trap(errors.RemoteRunError)
-        self.wizard.error_dialog('General error: %s' % failure.value)
-
-    def update(self):
+    def run_checks(self):
         if self.in_setup:
-            return
+            yield None
         
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
         d = self.workerRun('flumotion.worker.checks.video', 'checkWebcam',
                            device)
-        d.addCallback(self._queryCallback)
-        d.addErrback(self._queryGstErrorErrback)
-        d.addErrback(self._unknownDeviceErrback)
-        d.addErrback(self._queryRemoteRunErrback)
+        yield d
+        try:
+            deviceName = d.value()
+            self.clear_msg('webcam-check')
+            self.label_name.set_label(deviceName)
+            self.wizard.block_next(False)
+            self.spinbutton_width.set_sensitive(True)
+            self.spinbutton_height.set_sensitive(True)
+            self.spinbutton_framerate.set_sensitive(True)
+        except errors.GstError, e:
+            self.clear()
+            self.error_msg('webcam-check', 'GStreamer error: %s' % e)
+        except errors.RemoteRunError, e:
+            self.clear()
+            self.error_msg('webcam-check', 'General error: %s' % e)
+    run_checks = defer_generator_method (run_checks)
 
     def get_state(self):
         options = {}
@@ -476,37 +439,27 @@ class Overlay(WizardStep):
     component_type = 'overlay'
     icon = 'overlay.png'
 
-    def before_show(self):
+    def worker_changed(self):
         d = self.workerRun('flumotion.worker.checks.video',
             'check_ffmpegcolorspace_AYUV')
-        d.addCallback(self._queryCallback)
-        #d.addErrback(self._queryRemoteRunErrback)
-        d.addErrback(self._queryErrback)
-
-        self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
-            'videomixer', 'alpha')
-
-        # FIXME: add a PIL check here
-
-    def _queryCallback(self, result):
-        if result:
-            self.wizard.check_elements(self.worker, 'pngdec',
-                'ffmpegcolorspace', 'videomixer')
-        else:
-            # throw up an informational dialog
-            msg = """This worker's ffmpegcolorspace plugin is older than 0.8.5.
-Please consider upgrading if your output video has a diagonal line in the
-image."""
-            self.debug(msg)
-            self.wizard.info_dialog(msg)
-            self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
-                'videomixer', 'alpha', 'ffmpegcolorspace')
-            
-    def _queryErrback(self, failure):
-        msg = ('Could not check ffmpegcolorspace features.\n(%s)' %
-            failure.value)
-        self.wizard.block_next(True)
-        self.wizard.error_dialog(msg)
+        yield d
+        try:
+            if d.value():
+                self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
+                    'videomixer', 'alpha', 'ffmpegcolorspace')
+            else:
+                msg = ("This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
+                       "Please consider upgrading if your output video has a "
+                       "diagonal line in the image.")
+                self.info_msg('overlay-old-colorspace', msg)
+                self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
+                    'videomixer', 'alpha')
+            self.clear_msg('overlay-colorspace')
+        except Exception, e:
+            self.wizard.block_next(True)
+            msg = ('Could not check ffmpegcolorspace features.\n(%s)' % e)
+            self.error_msg('overlay-colorspace', msg)
+    worker_changed = defer_generator_method (worker_changed)
         
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())
@@ -562,17 +515,12 @@ class Soundcard(WizardStep):
         self.update_devices()
         self.update_inputs()
 
-    def before_show(self):
+    def setup(self):
         # block updates, because populating a shown combobox will of course
         # trigger the callback
         self.block_update = True
         self.combobox_system.set_enum(SoundcardSystem)
         self.block_update = False
-        
-        self.clear_combos()
-        
-        self.update_devices()
-        self.update_inputs()
 
     def clear_combos(self):
         self.combobox_input.clear()
@@ -584,19 +532,6 @@ class Soundcard(WizardStep):
         self.combobox_bitdepth.clear()
         self.combobox_bitdepth.set_sensitive(False)
         
-    def _queryCallback(self, (deviceName, tracks)):
-        self.wizard.block_next(False)
-        self.label_devicename.set_label(deviceName)
-        self.combobox_channels.set_enum(SoundcardChannels)
-        self.combobox_channels.set_sensitive(True)
-        self.combobox_samplerate.set_enum(SoundcardSamplerate)
-        self.combobox_samplerate.set_sensitive(True)
-        self.combobox_bitdepth.set_enum(SoundcardBitdepth)
-        self.combobox_bitdepth.set_sensitive(True)
-
-        self.combobox_input.set_list(tracks)
-        self.combobox_input.set_sensitive(True)
-
     def update_devices(self):
         self.block_update = True
         enum = self.combobox_system.get_enum()
@@ -608,16 +543,6 @@ class Soundcard(WizardStep):
             raise AssertionError
         self.block_update = False
 
-    # FIXME: move higher up in hierarchy
-    def _queryGstErrorErrback(self, failure):
-        failure.trap(errors.GstError)
-        self.clear_combos()
-        self.wizard.error_dialog('GStreamer error: %s' % failure.value)
-
-    def _queryRemoteRunErrback(self, failure):
-        failure.trap(errors.RemoteRunError)
-        self.wizard.error_dialog('%s' % failure.value)
-
     def update_inputs(self):
         if self.block_update:
             return
@@ -627,12 +552,28 @@ class Soundcard(WizardStep):
         device = self.combobox_device.get_string()
         d = self.workerRun('flumotion.worker.checks.video', 'checkMixerTracks',
                            enum.element, device)
-        d.addCallback(self._queryCallback)
-        d.addErrback(self._queryGstErrorErrback)
-        d.addErrback(self._queryRemoteRunErrback)
-        #d.addErrback(self._unknownDeviceErrback)
-        #d.addErrback(self._permissionDeniedErrback)
-        
+        yield d
+        try:
+            deviceName, tracks = d.value()
+            self.clear_msg('soundcard-check')
+            self.wizard.block_next(False)
+            self.label_devicename.set_label(deviceName)
+            self.combobox_channels.set_enum(SoundcardChannels)
+            self.combobox_channels.set_sensitive(True)
+            self.combobox_samplerate.set_enum(SoundcardSamplerate)
+            self.combobox_samplerate.set_sensitive(True)
+            self.combobox_bitdepth.set_enum(SoundcardBitdepth)
+            self.combobox_bitdepth.set_sensitive(True)
+
+            self.combobox_input.set_list(tracks)
+            self.combobox_input.set_sensitive(True)
+        except errors.GstError, e:
+            self.clear_combos()
+            self.error_msg('soundcard-check', 'GStreamer error: %s' % e)
+        except errors.RemoteRunError, e:
+            self.error_msg('soundcard-check', 'General error: %s' % e)
+    update_inputs = defer_generator_method(update_inputs)
+            
     def get_state(self):
         # FIXME: this can't be called if the soundcard hasn't been probed yet
         # for example, when going through the testsuite
@@ -666,8 +607,10 @@ class TestAudioSource(WizardStep):
     section = 'Production'
     icon = 'soundcard.png'
     
-    def before_show(self):
+    def worker_changed(self):
         self.wizard.check_elements(self.worker, 'sinesrc')
+
+    def before_show(self):
         self.combobox_samplerate.set_enum(AudioTestSamplerate)
         self.combobox_samplerate.set_sensitive(True)
 
@@ -767,7 +710,7 @@ class Theora(VideoEncoder):
         self.spinbutton_quality.set_range(0, 63)
         self.spinbutton_quality.set_value(16)
 
-    def before_show(self):
+    def worker_changed(self):
         self.wizard.check_elements(self.worker, 'theoraenc')
         
     # This is bound to both radiobutton_bitrate and radiobutton_quality
@@ -795,7 +738,7 @@ class Smoke(VideoEncoder):
     section = 'Conversion'
     component_type = 'smoke'
 
-    def before_show(self):
+    def worker_changed(self):
         self.wizard.check_elements(self.worker, 'smokeenc')
         
     def get_next(self):
@@ -815,7 +758,7 @@ class JPEG(VideoEncoder):
     section = 'Conversion'
     component_type = 'jpeg'
 
-    def before_show(self):
+    def worker_changed(self):
         self.wizard.check_elements(self.worker, 'jpegenc')
 
     def get_next(self):
@@ -849,7 +792,7 @@ class Vorbis(AudioEncoder):
         self.radiobutton_bitrate.set_active(False)
         self.radiobutton_quality.set_active(True)
         
-    def before_show(self):
+    def worker_changed(self):
         self.wizard.check_elements(self.worker, 'rawvorbisenc')
         
     # This is bound to both radiobutton_bitrate and radiobutton_quality
@@ -872,7 +815,7 @@ class Speex(AudioEncoder):
     component_type = 'speex'
     icon = 'xiphfish.png'
     
-    def before_show(self):
+    def worker_changed(self):
         self.wizard.check_elements(self.worker, 'speexenc')
         
     def setup(self):
@@ -981,7 +924,7 @@ class HTTP(WizardStep):
     section = 'Consumption'
     component_type = 'http-streamer'
 
-    def before_show(self):
+    def worker_changed(self):
         self.wizard.check_elements(self.worker, 'multifdsink')
         
     def setup(self):

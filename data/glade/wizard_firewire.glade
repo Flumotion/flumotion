@@ -25,7 +25,6 @@
 
       <child>
 	<widget class="GtkVBox" id="vbox_controls">
-	  <property name="border_width">6</property>
 	  <property name="visible">True</property>
 	  <property name="homogeneous">False</property>
 	  <property name="spacing">6</property>
@@ -153,7 +152,6 @@
 			  <property name="label" translatable="yes">Convert to s_quare pixels</property>
 			  <property name="use_underline">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
-			  <property name="focus_on_click">True</property>
 			  <property name="active">False</property>
 			  <property name="inconsistent">False</property>
 			  <property name="draw_indicator">True</property>
@@ -280,7 +278,6 @@
 				  <property name="label" translatable="yes">_No width correction</property>
 				  <property name="use_underline">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <property name="active">True</property>
 				  <property name="inconsistent">False</property>
 				  <property name="draw_indicator">True</property>
@@ -303,7 +300,6 @@
 				  <property name="label" translatable="yes">_Stretch to multiple of 8 pixels</property>
 				  <property name="use_underline">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <property name="active">False</property>
 				  <property name="inconsistent">False</property>
 				  <property name="draw_indicator">True</property>
@@ -327,7 +323,6 @@
 				  <property name="label" translatable="yes">_Pad to multiple of 8 pixels</property>
 				  <property name="use_underline">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <property name="active">False</property>
 				  <property name="inconsistent">False</property>
 				  <property name="draw_indicator">True</property>
@@ -576,32 +571,6 @@
 	      <property name="fill">True</property>
 	    </packing>
 	  </child>
-	</widget>
-	<packing>
-	  <property name="padding">0</property>
-	  <property name="expand">True</property>
-	  <property name="fill">True</property>
-	</packing>
-      </child>
-
-      <child>
-	<widget class="GtkTextView" id="textview_status">
-	  <property name="visible">True</property>
-	  <property name="sensitive">False</property>
-	  <property name="can_focus">True</property>
-	  <property name="editable">False</property>
-	  <property name="overwrite">False</property>
-	  <property name="accepts_tab">False</property>
-	  <property name="justification">GTK_JUSTIFY_LEFT</property>
-	  <property name="wrap_mode">GTK_WRAP_WORD</property>
-	  <property name="cursor_visible">False</property>
-	  <property name="pixels_above_lines">0</property>
-	  <property name="pixels_below_lines">0</property>
-	  <property name="pixels_inside_wrap">0</property>
-	  <property name="left_margin">0</property>
-	  <property name="right_margin">0</property>
-	  <property name="indent">0</property>
-	  <property name="text" translatable="yes"></property>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>

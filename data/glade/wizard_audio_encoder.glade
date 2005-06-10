@@ -18,7 +18,6 @@
 
   <child>
     <widget class="GtkTable" id="table1">
-      <property name="border_width">6</property>
       <property name="visible">True</property>
       <property name="n_rows">1</property>
       <property name="n_columns">3</property>
@@ -61,7 +60,7 @@
 	  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 	  <property name="snap_to_ticks">False</property>
 	  <property name="wrap">False</property>
-	  <property name="adjustment">1 0 1e+08 1 10 10</property>
+	  <property name="adjustment">1 0 100000000 1 10 10</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>

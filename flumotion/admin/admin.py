@@ -159,7 +159,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self.host = self.port = self.use_insecure = None
 
         self.state = 'disconnected'
-        self.clientFactory = AdminClientFactory(self, username, password)
+        self.clientFactory = self._makeFactory(username, password)
         # 20 secs max for an admin to reconnect
         self.clientFactory.maxDelay = 20
 
@@ -170,6 +170,10 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self._views = [] # all UI views I am serving
 
         self._unbundler = bundle.Unbundler(configure.cachedir)
+
+    # a method so mock testing frameworks can override it
+    def _makeFactory(username, password):
+        return AdminClientFactory(self, username, password)
 
     def connectToHost(self, host, port, use_insecure=False):
         'Connect to a host.'

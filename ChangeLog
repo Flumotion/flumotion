@@ -1,3 +1,70 @@
+2005-06-10  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/message.py (MessageView.__init__): Back off on
+	the padding of the message.
+
+	* flumotion/wizard/worker.py: New file, implements a list of
+	workers. Fires 'worker-selected' when the selected worker changes.
+
+	* flumotion/wizard/message.py: New file, implements a message
+	area, showing 0 to N messages. It hides itself when there are no
+	messages to show. Messages have id's. They can be cleared by id,
+	and no two messages of the same id will be visible at a time. The
+	UI needs some work.
+
+	* flumotion/wizard/wizard.py (Wizard.info_msg, Wizard.error_msg) 
+	(Wizard.clear_msg): New methods to show and clear messages in the
+	message area. No more modal dialogs.
+	(Wizard.set_step): Updates to get the worker list, message area,
+	and next button states right. Fire worker_changed on the step when
+	we switch to it.
+
+	* flumotion/wizard/steps.py: All remote calls turned into
+	defer_generator_methods for clearer code and default errbacks.
+	Error and info dialogs turned into messages via info_msg() and
+	error_msg(). before_show() checks moved to worker_changed().
+
+	* flumotion/wizard/step.py (WizardStep.info_msg)
+	(WizardStep.error_msg, WizardStep.clear_msg): New methods, proxy
+	to the wizard.
+
+	* data/glade/.hidden: Nautilus pacification file.
+
+	* tools/gtk-2.4-ify-glade-files: focus_on_click was in gtk 2.4.
+
+	* data/glade/wizard_webcam.glade:
+	* data/glade/wizard_audio_encoder.glade:
+	* data/glade/wizard_source.glade:
+	* data/glade/wizard_audiotest.glade:
+	* data/glade/wizard_vorbis.glade:
+	* data/glade/wizard_firewire.glade:
+	* data/glade/wizard_consumption.glade:
+	* data/glade/wizard_license.glade:
+	* data/glade/wizard_soundcard.glade:
+	* data/glade/wizard_jpeg.glade:
+	* data/glade/wizard_encoding.glade:
+	* data/glade/wizard_disk.glade:
+	* data/glade/wizard_welcome.glade:
+	* data/glade/wizard_summary.glade:
+	* data/glade/wizard_testsource.glade:
+	* data/glade/wizard_smoke.glade:
+	* data/glade/wizard_overlay.glade:
+	* data/glade/wizard_theora.glade:
+	* data/glade/wizard_tvcard.glade:
+	* data/glade/wizard_http.glade: No border, the border comes from
+	the wizard itself.
+	
+	* data/glade/wizard_firewire.glade: Text status area replaced by
+	message area from wizard.
+	
+	* data/glade/wizard_welcome.glade: Use a textview instead of a
+	label to allow for text reflowing.
+	
+	* data/glade/wizard.glade: Make gargantuan in size, no more center
+	on parent. Fix up borders in the main area to 12px all around. No
+	more frame border. Add a line above buttons. Add message area and
+	worker list.
+
 2005-06-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/flumotion.in:

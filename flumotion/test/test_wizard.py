@@ -84,9 +84,27 @@ class WizardStepTest(unittest.TestCase):
             self.assert_(isinstance(s.get_component_properties(), dict))
 
 
+class TestAdmin(admin.AdminModel):
+    def _makeFactory(self, username, password):
+        return None
+
+    def workerRun(self, worker, module, function, *args, **kwargs):
+        success = {('localhost', 'flumotion.worker.checks.video', 'checkTVCard'):
+                   {'height': 576, 'width': 720, 'par': (59,54)}}
+        failures = {}
+        
+        key = (worker, module, function)
+        if key in success:
+            return defer.succeed(success[key])
+        elif key in failures:
+            return defer.fail(failures[key])
+        else:
+            assert False
+
 class WizardSaveTest(unittest.TestCase):
     def setUp(self):
         self.wizard = wizard.Wizard()
+        self.wizard.admin = TestAdmin('user', 'test')
         s = worker.ManagerWorkerHeavenState()
         s.set('names', ['localhost'])
         self.workerHeavenState = jelly.unjelly(jelly.jelly(s))
@@ -96,9 +114,7 @@ class WizardSaveTest(unittest.TestCase):
         source.combobox_video.set_active(enums.VideoDevice.Firewire)
         source.combobox_audio.set_active(enums.AudioDevice.Firewire)
 
-        self.wizard['Firewire']._queryCallback(dict(height=576,
-                                                    width=720,
-                                                    par=(59,54)))
+        self.wizard['Firewire'].run_checks()
         self.wizard.run(False, self.workerHeavenState, True)
 
         config = self.wizard.getConfig()

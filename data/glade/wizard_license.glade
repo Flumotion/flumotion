@@ -18,7 +18,6 @@
 
   <child>
     <widget class="GtkTable" id="table1">
-      <property name="border_width">6</property>
       <property name="visible">True</property>
       <property name="n_rows">2</property>
       <property name="n_columns">2</property>
@@ -33,7 +32,6 @@
 	  <property name="label" translatable="yes">Specify _license:</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
-	  <property name="focus_on_click">True</property>
 	  <property name="active">True</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>

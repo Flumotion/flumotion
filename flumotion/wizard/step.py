@@ -83,6 +83,15 @@ class WizardStep(GladeWidget, log.Loggable):
 
         return state_dict
 
+    def info_msg(self, *args, **kwargs):
+        self.wizard.info_msg(*args, **kwargs)
+
+    def error_msg(self, *args, **kwargs):
+        self.wizard.error_msg(*args, **kwargs)
+
+    def clear_msg(self, *args, **kwargs):
+        self.wizard.clear_msg(*args, **kwargs)
+
     def workerRun(self, module, function, *args):
         """
         Run the given function and arguments on the selected worker.
