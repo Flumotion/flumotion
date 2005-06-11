@@ -1,5 +1,13 @@
 2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/wizard/message.py:
+	  use a longer name for cb
+	  make them private attributes, because they are
+	* flumotion/wizard/worker.py:
+	  pychecker happiness
+
+2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	  another actual bug pychecker caught in three different ways.
 		flumotion/admin/admin.py:162:

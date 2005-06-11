@@ -127,7 +127,8 @@ class MessageView(gtk.VBox):
         self.buttonbox.pack_start(b, False, False, 0)
 
         kids = [(w.message.priority, w) for w in self.buttonbox.get_children()]
-        kids.sort(reverse=True)
+        kids.sort()
+        kids.reverse()
         kids = [(i, kids[i][1]) for i in range(len(kids))]
         for x in kids:
             self.buttonbox.reorder_child(x[1], x[0])

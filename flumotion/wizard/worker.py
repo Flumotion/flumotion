@@ -33,34 +33,38 @@ class WorkerListStore(gtk.ListStore):
 
 class WorkerList(gtk.HBox):
     gsignal('worker-selected', str)
+    _combobox = None
+    _label = None
 
     def __init__(self):
         gtk.HBox.__init__(self)
 
-        def on_changed(cb):
-            self.emit('worker-selected', self.get_worker())
+        self._combobox = gtk.ComboBox()
+        self._label = gtk.Label('Worker: ')
 
-        self.label = gtk.Label('Worker: ')
-        self.label.show()
-        self.pack_start(self.label, False, False, 0)
+        self._label.show()
+        self.pack_start(self._label, False, False, 0)
         vb = gtk.VBox()
         self.pack_start(vb, False, False, 0)
         vb.show()
         a = gtk.Alignment(0.5, 0.5)
         a.show()
         vb.pack_start (a, True, False, 0)
-        self.cb = gtk.ComboBox()
         cell = gtk.CellRendererText()
-        self.cb.pack_start(cell, gtk.TRUE)
-        self.cb.add_attribute(cell, 'text', 0)
-        self.cb.connect('changed', on_changed)
-        self.cb.show()
-        self.cb.set_property('focus-on-click', False)
-        self.cb.set_property('has-frame', False)
-        a.add(self.cb)
+        self._combobox.pack_start(cell, gtk.TRUE)
+        self._combobox.add_attribute(cell, 'text', 0)
+
+        def on_changed(cb):
+            self.emit('worker-selected', self.get_worker())
+
+        self._combobox.connect('changed', on_changed)
+        self._combobox.show()
+        self._combobox.set_property('focus-on-click', False)
+        self._combobox.set_property('has-frame', False)
+        a.add(self._combobox)
 
     def set_workers(self, l):
-        self.cb.set_model(WorkerListStore(l))
+        self._combobox.set_model(WorkerListStore(l))
         self.connect_after('realize', WorkerList.on_realize)
 
     def on_realize(self):
@@ -70,14 +74,18 @@ class WorkerList(gtk.HBox):
 
     def select_worker(self, worker):
         # worker == none means select first worker
-        for r in self.cb.get_model():
+        for r in self._combobox.get_model():
             if not worker or r.model.get_value(r.iter, 0) == worker:
-                self.cb.set_active_iter(r.iter)
+                self._combobox.set_active_iter(r.iter)
                 return
+        # FIXME: let's not print, have correct logging
         print 'warning: worker %s not available' % worker
 
     def get_worker(self):
-        i = self.cb.get_active_iter()
+        i = self._combobox.get_active_iter()
         if i:
-            return self.cb.get_model().get_value(i, 0)
+            return self._combobox.get_model().get_value(i, 0)
+
+        return None
+
 gobject.type_register(WorkerList)
