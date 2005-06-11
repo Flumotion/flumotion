@@ -172,7 +172,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self._unbundler = bundle.Unbundler(configure.cachedir)
 
     # a method so mock testing frameworks can override it
-    def _makeFactory(username, password):
+    def _makeFactory(self, username, password):
         return AdminClientFactory(self, username, password)
 
     def connectToHost(self, host, port, use_insecure=False):

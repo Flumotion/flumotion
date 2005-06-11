@@ -1,5 +1,20 @@
 2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  another actual bug pychecker caught in three different ways.
+		flumotion/admin/admin.py:162:
+			Invalid arguments to (_makeFactory), got 2, expected 1
+		flumotion/admin/admin.py:175:
+			self is not first method argument
+		flumotion/admin/admin.py:176:
+			No global (self) found
+	  I don't want to hear any more "useless pychecker" whining.
+	  Solutions, not problems.
+
+	* flumotion/wizard/worker.py:
+
+2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/main.py:
 	  make sure we catch all raises from _initialLoadConfig correctly,
 	  and print a traceback for those we don't explicitly handle
