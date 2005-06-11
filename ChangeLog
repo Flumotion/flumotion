@@ -1,3 +1,9 @@
+2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/main.py:
+	  make sure we catch all raises from _initialLoadConfig correctly,
+	  and print a traceback for those we don't explicitly handle
+
 2005-06-10  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/wizard/message.py (MessageView.__init__): Back off on

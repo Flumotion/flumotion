@@ -73,6 +73,14 @@ def _startTCP(vishnu, host, port):
         log.info('manager', 'Listening as host %s' % host)
     reactor.listenTCP(port, vishnu.getFactory(), interface=host)
 
+def _errorAndStop(message, reason):
+    sys.stderr.write("ERROR: %s\n" % message)
+    if reason:
+        sys.stderr.write("%s\n" % reason)
+    # bypass reactor, because sys.exit gets trapped
+    os._exit(-1)
+
+
 def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
     for path in paths:
@@ -80,16 +88,20 @@ def _initialLoadConfig(vishnu, paths):
         try:
             vishnu.loadConfiguration(path)
         except config.ConfigError, reason:
-            sys.stderr.write("ERROR: failed to load planet configuration '%s':\n" % path)
-            sys.stderr.write("%s\n" % reason)
-            # bypass reactor, because sys.exit gets trapped
-            os._exit(-1)
+            _errorAndStop("failed to load planet configuration '%s':" % path,
+                reason)
         except errors.UnknownComponentError, reason:
-            sys.stderr.write("ERROR: failed to load planet configuration '%s':\n" % path)
-            sys.stderr.write("%s\n" % reason)
-            # bypass reactor, because sys.exit gets trapped
-            os._exit(-1)
-     
+            _errorAndStop("failed to load planet configuration '%s':" % path,
+                reason)
+        except Exception, e:
+            # a re-raise here would be caught by twisted and only shows at
+            # debug level 4 because that's where we hooked up twisted logging
+            # so print a traceback before stopping the program
+            import traceback
+            traceback.print_tb(sys.exc_traceback)
+            _errorAndStop("failed to load planet configuration '%s':" % path,
+                "%s: %s" % (e.__class__, str(e)))
+
 def main(args):
     # XXX: gst_init should remove all options, like gtk_init
     args = [arg for arg in args if not arg.startswith('--gst')]
