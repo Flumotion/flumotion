@@ -1,5 +1,27 @@
 2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	  check also for UNIXAddress
+	* flumotion/common/errors.py:
+	* flumotion/common/config.py:
+	  move ConfigError, still needs cleanup
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  catch unwritable log file error
+	* flumotion/worker/job.py:
+	  pass through nice configerrors
+	* flumotion/manager/main.py:
+	  make ERROR stand out some more
+
+2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	  raise ConfigError on IOError while reading htpasswd file
+	* flumotion/worker/job.py:
+	  pass through config.ConfigError's
+
+2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/medium.py:
 	* flumotion/twisted/defer.py:
 	* flumotion/worker/job.py:

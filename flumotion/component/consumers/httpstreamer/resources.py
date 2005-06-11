@@ -99,8 +99,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def setRoot(self, path):
         self.putChild(path, self)
         
-    def setLogfile(self, logfile):
-        self.logfile = open(logfile, 'a')
+    def setLogfile(self, logfilename):
+        self.logfile = open(logfilename, 'a')
 
     def setDomain(self, domain):
         """

@@ -98,6 +98,9 @@ def getComponent(dict, defs):
     #component = module.createComponent(dict)
     try:
         component = module.createComponent(dict)
+    except config.ConfigError:
+        # already nicely formatted, so fall through
+        raise
     except Exception, e:
         # find where the exception occurred
         stack = traceback.extract_tb(sys.exc_info()[2])

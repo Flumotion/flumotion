@@ -75,9 +75,9 @@ def _startTCP(vishnu, host, port):
     reactor.listenTCP(port, vishnu.getFactory(), interface=host)
 
 def _errorAndStop(message, reason):
-    sys.stderr.write("ERROR: %s\n" % message)
+    sys.stderr.write("\nERROR: %s\n" % message)
     if reason:
-        sys.stderr.write("%s\n" % reason)
+        sys.stderr.write("%s\n\n" % reason)
     # bypass reactor, because sys.exit gets trapped
     os._exit(-1)
 
@@ -89,10 +89,12 @@ def _initialLoadConfig(vishnu, paths):
         try:
             vishnu.loadConfiguration(path)
         except config.ConfigError, reason:
-            _errorAndStop("failed to load planet configuration '%s':" % path,
+            _errorAndStop(
+                "configuration error in configuration file\n'%s':" % path,
                 reason)
         except errors.UnknownComponentError, reason:
-            _errorAndStop("failed to load planet configuration '%s':" % path,
+            _errorAndStop(
+                "unknown component in configuration file\n'%s':" % path,
                 reason)
         except Exception, e:
             # a re-raise here would be caught by twisted and only shows at

@@ -28,7 +28,7 @@ import random
 from twisted.python import components
 from twisted.cred import error
 
-from flumotion.common import interfaces, keycards, log
+from flumotion.common import interfaces, keycards, log, config
 from flumotion.component import component
 from flumotion.component.bouncers import bouncer
 from flumotion.twisted import credentials, checkers
@@ -58,7 +58,10 @@ class HTPasswdCrypt(bouncer.Bouncer):
     def _setup(self):
         self._db = {}
         if self._filename:
-            lines = open(self._filename).readlines()
+            try:
+                lines = open(self._filename).readlines()
+            except IOError, e:
+                raise config.ConfigError(str(e))
         else:
             lines = self._data.split("\n")
 

@@ -31,7 +31,7 @@ from twisted.internet import reactor, error
 from twisted.web import server
 
 from flumotion.component import feedcomponent
-from flumotion.common import bundle, common, gstreamer
+from flumotion.common import bundle, common, gstreamer, errors
 
 # proxy import
 from flumotion.component.component import moods
@@ -400,8 +400,14 @@ def createComponent(config):
     component.resource = resources.HTTPStreamingResource(component)
     
     if config.has_key('logfile'):
-        component.debug('Logging to %s' % config['logfile'])
-        component.resource.setLogfile(config['logfile'])
+        file = config['logfile']
+        component.debug('Logging to %s' % file)
+        try:
+            component.resource.setLogfile(file)
+        except IOError, data:
+            raise errors.ConfigError(
+                'could not open log file %s for writing (%s)' % (
+                    file, data[1]))
 
     if config.has_key('user_limit'):
         component.resource.setUserLimit(int(config['user_limit']))

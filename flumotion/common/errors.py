@@ -26,6 +26,8 @@ from twisted.spread import pb
 
 class OptionError(Exception):
     "Error in options"
+class ConfigError(Exception):
+    "Error during parsing of configuration"
 
 # connection errors
 class ConnectionError(pb.Error):

@@ -539,7 +539,9 @@ class Vishnu(log.Loggable):
             result, m.id)
 
     def _startErrback(self, error, state):
-        self.info('failed to start component %s: %s'
+        # FIXME: make ConfigError copyable so we can .check() it here
+        # and print a nicer warning
+        self.warning('failed to start component %s: %s'
                   % (state.get('name'), error.getErrorMessage()))
         return None
 

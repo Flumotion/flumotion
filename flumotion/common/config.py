@@ -31,8 +31,8 @@ from twisted.python import reflect
 from flumotion.common.registry import registry
 from flumotion.common import log, errors, common
 
-class ConfigError(Exception):
-    "Error during parsing of configuration"
+# FIXME: move this to errors and adapt everywhere
+from errors import ConfigError
 
 class ConfigEntryComponent(log.Loggable):
     "I represent a <component> entry in a planet config file"

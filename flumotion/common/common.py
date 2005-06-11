@@ -671,7 +671,9 @@ def addressGetHost(a):
 
     @type a: L{twisted.internet.address.IPv4Address}
     """
-    assert(isinstance(a, address.IPv4Address))
+    if not isinstance(a, address.IPv4Address) and not isinstance(a,
+        address.UNIXAddress):
+        raise TypeError("object %r is not an IPv4Address or UNIXAddress" % a)
     try:
         host = a.host
     except AttributeError:
