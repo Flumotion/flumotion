@@ -149,8 +149,8 @@ def createComponent(config):
         data = config['data']
         log.debug('htpasswd', 'using in-line data for passwords')
     else:
-        # FIXME
-        raise
+        raise config.ConfigError(
+            'HTPasswdCrypt config needs either a <data> or <filename> entry')
 
     # FIXME: use checker
     comp = HTPasswdCrypt(config['name'], filename, data)

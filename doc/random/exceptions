@@ -1,0 +1,12 @@
+Notes on exceptions
+-------------------
+
+Getting a stacktrace from an exception in an except: block
+----------------------------------------------------------
+- traceback module allows you to handle tracebacks
+- traceback.extract_stack() gives you only the traceback from the current
+  frame; so inside an except: block, it already went back up out of the
+  try; so it doesn't contain the exception
+- sys.exc_traceback contains the traceback that caused the exception
+  traceback.extract_tb(sys.exc_traceback) gives you the
+  exception-causing stack as a list

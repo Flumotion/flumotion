@@ -33,6 +33,7 @@ import sys
 import os
 import fnmatch
 import time
+import traceback
 
 # environment variables controlling levels for each category
 _FLU_DEBUG = "*:1"
@@ -331,29 +332,34 @@ def setFluDebug(string):
     for category in _categories:
         registerCategory(category)
 
+def scrubFilename(filename):
+    """
+    Scrub the filename of everything before 'flumotion' and 'twisted'
+    to make them shorter.
+    """
+    i = filename.rfind('flumotion')
+    if i != -1:
+        #filename = filename[i + len('flumotion') + 1:]
+        filename = filename[i:]
+    else:
+        # only pure twisted, not flumotion.twisted
+        i = filename.rfind('twisted')
+        if i != -1:
+            filename = filename[i:]
+
+    return filename
+
 def getFileLine():
     """
     Return a tuple of (file, line) for the first stack entry outside of
-    log.py
+    log.py (which would be the caller of log)
     """
-    import traceback
     stack = traceback.extract_stack()
     while stack:
         entry = stack.pop()
         if not entry[0].endswith('log.py'):
-            file = entry[0]
-
-            # strip everything before first occurence of flumotion/
-            # same for twisted code
-            i = file.rfind('flumotion')
-            if i != -1:
-                #file = file[i + len('flumotion') + 1:]
-                file = file[i:]
-            else:
-                i = file.rfind('twisted')
-                if i != -1:
-                    file = file[i:]
-            return file, entry[1]
+            filename = scrubFilename(entry[0])
+            return filename, entry[1]
         
     return "Not found", 0
 

@@ -18,6 +18,8 @@
 
 # Headers in this file shall remain intact.
 
+import traceback
+
 from twisted.spread import pb
 from twisted.internet import defer
 
@@ -89,7 +91,6 @@ class BaseMedium(pb.Referenceable, log.Loggable):
             yield d
             mod = d.value()
         except Exception, e:
-            import traceback
             traceback.print_exc()
             self.warning('Failed to load bundle %s: %s' % (modname, e))
             yield None
@@ -111,7 +112,6 @@ class BaseMedium(pb.Referenceable, log.Loggable):
             
         except Exception, e:
             # pull out the landing parachute Maverick
-            import traceback
             traceback.print_exc()
             msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s raised: %s'
                    % (modname, procname, args, kwargs,

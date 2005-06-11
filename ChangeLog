@@ -1,5 +1,12 @@
 2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/random/exceptions:
+	  add some notes on exceptions and handling them
+	* flumotion/common/log.py:
+	  factor out a scrubFilename() function
+
+2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/message.py:
 	  use a longer name for cb
 	  make them private attributes, because they are

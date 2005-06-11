@@ -23,9 +23,15 @@ worker-side objects to handle job processes
 """
 
 import os
+import sys
 import resource
 import signal
 import gobject
+
+# I've read somewhere that importing the traceback module messes up the
+# exception state, so it's better to import it globally instead of in the
+# exception handler
+import traceback
 
 from twisted.cred import credentials
 from twisted.internet import reactor
@@ -43,29 +49,35 @@ def getComponent(dict, defs):
     @param defs: the registry entry for a component
     @type  defs: L{flumotion.common.registry.RegistryEntryComponent}
     """
-    log.debug('component', 'getting source for defs %r' % defs)
+    log.debug('component', 'getting module for defs %r' % defs)
     try:
-        source = defs.getSource()
+        moduleName = defs.getSource()
     except TypeError, e:
-        raise config.ConfigError("could not get source for defs %r (%s)" % (defs, e))
+        raise config.ConfigError(
+            "could not get module name for defs %r (%s)" % (defs, e))
     except Exception, e:
-        raise config.ConfigError("Exception %s while getting source  for defs %r (%s)" % (e.__class__.__name__, defs, " ".join(e.args)))
+        raise config.ConfigError(
+            "Exception %s while getting module name for defs %r (%s)" % (
+                e.__class__.__name__, defs, " ".join(e.args)))
         
-    log.debug('component', 'Loading source %s' % source)
+    log.debug('component', 'Loading moduleName %s' % moduleName)
     try:
-        module = reflect.namedAny(source)
+        module = reflect.namedAny(moduleName)
     except ValueError:
-        raise config.ConfigError("%s source file could not be found" % source)
+        raise config.ConfigError("module %s could not be found" % moduleName)
     except ImportError, e:
-        raise config.ConfigError("%s source file could not be imported (%s)" % (source, e))
+        raise config.ConfigError("module %s could not be imported (%s)" % (
+            moduleName, e))
     except SyntaxError, e:
-        raise config.ConfigError("syntax error in %s:%d" % (
-            e.filename, e.lineno))
+        raise config.ConfigError("module %s has a syntax error in %s:%d" % (
+            moduleName, e.filename, e.lineno))
     except Exception, e:
-        raise config.ConfigError("Exception %r during import of source %s (%r)" % (e.__class__.__name__, source, e.args))
+        raise config.ConfigError(
+            "Exception %r during import of module %s (%r)" % (
+                e.__class__.__name__, moduleName, e.args))
         
     if not hasattr(module, 'createComponent'):
-        log.warning('job', 'no createComponent() for %s' % source)
+        log.warning('job', 'no createComponent() in module %s' % moduleName)
         return
         
     dir = os.path.split(module.__file__)[0]
@@ -82,13 +94,20 @@ def getComponent(dict, defs):
     # we're going to listen to ports and other stuff which should
     # be separated from the main process.
 
-    log.debug('job', 'calling createComponent for type %s' % source)
+    log.debug('job', 'calling createComponent for module %s' % moduleName)
+    #component = module.createComponent(dict)
     try:
         component = module.createComponent(dict)
     except Exception, e:
-        msg = "Exception %s during createComponent of type %s: %s" % (
-            e.__class__.__name__, source, " ".join(e.args))
-        log.warning('job', 'raising config.ConfigError(%s)' % msg)
+        # find where the exception occurred
+        stack = traceback.extract_tb(sys.exc_traceback)
+        (filename, line, func, text) = stack[-1]
+        filename = log.scrubFilename(filename)
+        msg = "%s:%s: %s(): %s during %s.createComponent(): %s" % (
+            filename, line, func, e.__class__.__name__, moduleName,
+            " ".join([repr(i) for i in e.args]))
+        log.warning('job', msg)
+        log.warning('job', 'raising config.ConfigError')
         raise config.ConfigError(msg)
     log.debug('job', 'returning component %r' % component)
     return component
@@ -205,7 +224,6 @@ class JobMedium(medium.BaseMedium):
         except Exception, e:
             msg = "Exception %s during getComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))
-            import traceback
             traceback.print_exc()
             self.warning("raising ComponentStart(%s)" % msg)
             raise errors.ComponentStart(msg)

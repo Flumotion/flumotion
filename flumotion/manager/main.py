@@ -25,6 +25,7 @@ manager main function
 import optparse
 import os
 import sys
+import traceback
 
 from twisted.internet import reactor, error
 
@@ -97,7 +98,6 @@ def _initialLoadConfig(vishnu, paths):
             # a re-raise here would be caught by twisted and only shows at
             # debug level 4 because that's where we hooked up twisted logging
             # so print a traceback before stopping the program
-            import traceback
             traceback.print_tb(sys.exc_traceback)
             _errorAndStop("failed to load planet configuration '%s':" % path,
                 "%s: %s" % (e.__class__, str(e)))
