@@ -100,7 +100,7 @@ def getComponent(dict, defs):
         component = module.createComponent(dict)
     except Exception, e:
         # find where the exception occurred
-        stack = traceback.extract_tb(sys.exc_traceback)
+        stack = traceback.extract_tb(sys.exc_info()[2])
         (filename, line, func, text) = stack[-1]
         filename = log.scrubFilename(filename)
         msg = "%s:%s: %s(): %s during %s.createComponent(): %s" % (

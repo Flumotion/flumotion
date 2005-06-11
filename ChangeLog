@@ -1,5 +1,26 @@
 2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/medium.py:
+	* flumotion/twisted/defer.py:
+	* flumotion/worker/job.py:
+	  final cleanups, createComponent now will tell us what is wrong
+
+2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/defer.py:
+	* flumotion/common/medium.py:
+	* flumotion/manager/main.py:
+	  move "import traceback" to top, so it doesn't mess up stack
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	  do a proper raise when a keyword is missing
+	* flumotion/worker/job.py:
+	  move "import traceback" to top, so it doesn't mess up stack
+	  change source to moduleName since that's what it is
+	  extract the exception traceback instead of the current stack
+	  so we can log the cause of the problem
+
+2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/exceptions:
 	  add some notes on exceptions and handling them
 	* flumotion/common/log.py:

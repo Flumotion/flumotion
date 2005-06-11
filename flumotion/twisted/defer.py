@@ -18,8 +18,6 @@
 
 # Headers in this file shall remain intact.
 
-import traceback
-
 from twisted.internet import defer
 from twisted.python import reflect
 
@@ -32,6 +30,7 @@ def defer_generator(proc):
         # Add errback-of-last-resort
         def default_errback(failure, d):
             def print_traceback(f):
+                import traceback
                 print 'Unhandled error calling', proc.__name__, ':', f.type
                 traceback.print_exc()
             d.addErrback(print_traceback)
