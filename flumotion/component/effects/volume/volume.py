@@ -21,6 +21,7 @@
 
 # Headers in this file shall remain intact.
 
+from math import frexp
 from flumotion.component import feedcomponent
 
 class Volume(feedcomponent.Effect):
@@ -40,6 +41,13 @@ class Volume(feedcomponent.Effect):
     def _level_changed_cb(self, element, time, channel,
                           rms, peak, decay):
         # notify ui of level change
+        try:
+            frexp(rms)
+            frexp(peak)
+            frexp(decay)
+        except (SystemError, OverflowError, ValueError):
+            # something confused log10() on the C side, punt
+            rms = peak = decay = -100.0
         self.component.adminCallRemote("volumeChanged",
             channel, peak, rms, decay)
 

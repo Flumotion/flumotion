@@ -1,5 +1,13 @@
 2005-06-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/effects/volume/volume.py
+	(Volume._level_changed_cb): Deal gracefully with inf's coming from
+	C.
+
+	* flumotion/component/effects/volume/admin_gtk.py
+	(VolumeAdminGtkNode.volumeChanged): Clamp the property values to
+	the proper range to avoid nasty messages.
+
 	* flumotion/admin/gtk/main.py (_runInterface): We're not yet in
 	the reactor if the greeter is killed, so we can't stop it just
 	yet. Use callLater(reactor.stop) instead.

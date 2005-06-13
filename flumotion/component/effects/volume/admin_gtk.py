@@ -29,6 +29,13 @@ from flumotion.ui import glade
 
 from flumotion.component.base import admin_gtk
 
+def clamp(x, min, max):
+    if x < min:
+        return min
+    elif x > max:
+        return max
+    return x
+
 class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     logCategory = 'volume'
 
@@ -60,9 +67,8 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         return self.volume
         
     def volumeChanged(self, channel, peak, rms, decay):
-        self.scale_volume.set_property('peak', peak)
-        self.scale_volume.set_property('decay', decay)
-        pass
+        self.scale_volume.set_property('peak', clamp(peak, -90.0, 0.0))
+        self.scale_volume.set_property('decay', clamp(decay, -90.0, 0.0))
 
     # when volume has been set by another admin client
     def volumeSet(self, volume):
