@@ -182,10 +182,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         def type_pid_datafunc(column, cell, model, iter):
             state = model.get_value(iter, COL_STATE)
             pid = state.get('pid')
-            if pid:
-                model.set(iter, COL_PID, str(pid))
-            else:
-                model.set(iter, COL_PID, None)
+            cell.set_property('text', pid and str(pid) or '')
 
         t = gtk.CellRendererText()
         col = gtk.TreeViewColumn('PID', t, text=COL_PID)
@@ -196,10 +193,10 @@ class ComponentsView(log.Loggable, gobject.GObject):
         def type_cpu_datafunc(column, cell, model, iter):
             state = model.get_value(iter, COL_STATE)
             cpu = state.get('cpu')
-            if cpu != None:
-                model.set(iter, COL_CPU, "%.2f" % (cpu * 100.0))
+            if isinstance(cpu, float):
+                cell.set_property('text', '%.2f' % (cpu * 100.0))
             else:
-                model.set(iter, COL_CPU, None)
+                cell.set_property('text', '')
                 
         t = gtk.CellRendererText()
         col = gtk.TreeViewColumn('CPU %', t, text=COL_CPU)

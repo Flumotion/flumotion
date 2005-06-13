@@ -189,7 +189,6 @@ class TVCard(VideoSource):
             self.combobox_source.set_list(channels)
             self.combobox_source.set_sensitive(True)
         except errors.GstError, e:
-            self.info_msg('test', 'Foo')
             self.error_msg('tvcard-error', 'GStreamer error: %s' % e)
         except errors.RemoteRunError, e:
             self.error_msg('tvcard-error', 'General error: %s' % e)
@@ -317,6 +316,7 @@ class FireWire(VideoSource):
         
     def run_checks(self):
         self.set_sensitive(False)
+        self.info_msg('firewire-error', 'Checking for Firewire device...')
         d = self.workerRun('flumotion.worker.checks.video', 'check1394')
         yield d
         try:

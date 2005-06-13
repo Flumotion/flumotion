@@ -175,8 +175,6 @@ class Wizard(GladeWindow, log.Loggable):
 
     glade_file = 'wizard.glade'
 
-    __implements__ = flavors.IStateListener,
-
     def __init__(self, parent_window=None, admin=None):
         GladeWindow.__init__(self, parent_window)
         for k, v in self.widgets.items():
@@ -275,9 +273,9 @@ class Wizard(GladeWindow, log.Loggable):
 
         if step.has_worker:
             self.worker_list.show()
+            self.worker_list.notify_selected()
         else:
             self.worker_list.hide()
-        self._rebuild_worker_combobox()
         
         self._setup_worker(step, self.worker_list.get_worker())
         step.before_show()
@@ -287,14 +285,17 @@ class Wizard(GladeWindow, log.Loggable):
         step.activated()
 
     def _combobox_worker_changed(self, combobox, worker):
-        self._last_worker = worker
-        if self.current_step:
-            self._setup_worker(self.current_step, worker)
-            self.current_step.worker_changed()
-        
-    def _rebuild_worker_combobox(self):
-        self.worker_list.set_workers(self._workerHeavenState.get('names'))
-        self.worker_list.select_worker(self._last_worker)
+        if worker:
+            self.clear_msg('worker-error')
+            self._last_worker = worker
+            if self.current_step:
+                self._setup_worker(self.current_step, worker)
+                self.current_step.worker_changed()
+        else:
+            self.error_msg('worker-error',
+                           'All workers have logged out.\n'
+                           'Make sure the flumotion server is running '
+                           'properly and try again.')
         
     def get_admin(self):
         return self._admin
@@ -389,24 +390,9 @@ class Wizard(GladeWindow, log.Loggable):
 
     def run(self, interactive, workerHeavenState, main=True):
         self._workerHeavenState = workerHeavenState
+        self.worker_list.set_worker_heaven_state(self._workerHeavenState)
         self._use_main = main
-        workerHeavenState.addListener(self)
         self.scenario.run(interactive)
-
-    ### IStateListener methods
-    def stateAppend(self, state, key, value):
-        if not isinstance(state, worker.AdminWorkerHeavenState):
-            return
-        self.info('worker %s logged in to manager' % value)
-        #FIXME: make this work correctly
-        #self._rebuild_worker_combobox()
-        
-    def stateRemove(self, state, key, value):
-        if not isinstance(state, worker.AdminWorkerHeavenState):
-            return
-        self.info('worker %s logged out of manager' % value)
-        #FIXME: make this work correctly
-        #self._rebuild_worker_combobox()
 
     def printOut(self):
         print self._save.getXML()[:-1]

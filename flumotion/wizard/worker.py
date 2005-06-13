@@ -22,14 +22,34 @@
 import gobject
 import gtk
 from flumotion.common.pygobject import gsignal
+from flumotion.twisted import flavors
 
 
 class WorkerListStore(gtk.ListStore):
-    def __init__(self, workers):
+    __implements__ = flavors.IStateListener,
+    gsignal('changed')
+
+    def __init__(self, whs):
         gtk.ListStore.__init__(self, str)
-        for x in workers:
+        for x in whs.get('names'):
             i = self.append()
             self.set_value(i, 0, x)
+        whs.addListener(self)
+
+    def stateAppend(self, state, key, val):
+        if key == 'names':
+            i = self.append()
+            self.set_value(i, 0, val)
+            self.emit('changed')
+
+    def stateRemove(self, state, key, val):
+        if key == 'names':
+            for r in self:
+                if self.get_value(r.iter, 0) == val:
+                    self.remove(r.iter)
+                    self.emit('changed')
+                    return
+gobject.type_register(WorkerListStore)
 
 class WorkerList(gtk.HBox):
     gsignal('worker-selected', str)
@@ -63,14 +83,19 @@ class WorkerList(gtk.HBox):
         self._combobox.set_property('has-frame', False)
         a.add(self._combobox)
 
-    def set_workers(self, l):
-        self._combobox.set_model(WorkerListStore(l))
-        self.connect_after('realize', WorkerList.on_realize)
+    def set_worker_heaven_state(self, whs):
+        self._combobox.set_model(WorkerListStore(whs))
+        self.select_worker(None)
 
-    def on_realize(self):
-        # have to get the style from the theme, but it's not really
-        # there until we're realized
-        pass
+        def on_model_changed(model):
+            if not self.get_worker():
+                # need to select a new worker
+                self.select_worker(None) # will emit if worker selected
+                if not self.get_worker():
+                    # no workers present!
+                    self.emit('worker-selected', None)
+
+        self._combobox.get_model().connect('changed', on_model_changed)
 
     def select_worker(self, worker):
         # worker == none means select first worker
@@ -78,8 +103,10 @@ class WorkerList(gtk.HBox):
             if not worker or r.model.get_value(r.iter, 0) == worker:
                 self._combobox.set_active_iter(r.iter)
                 return
-        # FIXME: let's not print, have correct logging
-        print 'warning: worker %s not available' % worker
+
+        if worker:
+            # FIXME: let's not print, have correct logging
+            print 'warning: worker %s not available' % worker
 
     def get_worker(self):
         i = self._combobox.get_active_iter()
@@ -87,5 +114,8 @@ class WorkerList(gtk.HBox):
             return self._combobox.get_model().get_value(i, 0)
 
         return None
+
+    def notify_selected(self):
+        self.emit('worker-selected', self.get_worker())
 
 gobject.type_register(WorkerList)

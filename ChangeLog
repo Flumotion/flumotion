@@ -1,3 +1,32 @@
+2005-06-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/wizard.py (Wizard): No longer implements
+	IStateListener -- WorkerListModel does this. Change to not rebuild
+	the worker list all the time, instead just notifying when the page
+	changes. Fixes dynamic updating of the worker box as workers come
+	and go. Make an error message when no worker is available.
+
+	* flumotion/wizard/worker.py (WorkerListStore): Take a
+	WorkerHeavenState instead of a list of workers, and listen to it
+	for changes. Add a ::changed signal for when workers are added or
+	removed.
+	(WorkerList.set_worker_heaven_state): Select a default worker, and
+	listen to changes on the model to keep a worker always selected.
+	Emit ::worker-selected(None) when all workers go away.
+	(WorkerList.select_worker): Only warn if we're not asking for a
+	default worker. 
+	(WorkerList.notify_selected): New method, emits 'worker-selected'
+	for the current worker.
+
+	* flumotion/admin/gtk/parts.py
+	(ComponentsView._add_columns.type_pid_datafunc)
+	(ComponentsView._add_columns.type_cpu_datafunc): Set cell renderer
+	property values instead of model values. Prevents 100% CPU
+	feedback.
+
+	* flumotion/wizard/steps.py (FireWire.run_checks): Display an info
+	message while detecting the firewire device.
+
 2005-06-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/ui/trayicon.py:
