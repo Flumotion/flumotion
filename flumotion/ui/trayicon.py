@@ -74,11 +74,12 @@ class FluTrayIcon(log.Loggable):
         scaled_buf = pixbuf.scale_simple(24, 24, gtk.gdk.INTERP_BILINEAR)
         self._tray_image.set_from_pixbuf(scaled_buf)
         self._tray_event_box.add(self._tray_image)
-        self._tray_container.add(self._tray_event_box)
         # make tray icon show/hide the main window when clicked
         self._tray_event_box.connect("button-press-event",
             self._trayicon_clicked)
-        self._tray_container.show_all()
+        if self._tray_container:
+            self._tray_container.add(self._tray_event_box)
+            self._tray_container.show_all()
 
     def update(self, components):
         """
@@ -158,7 +159,8 @@ class FluTrayIcon(log.Loggable):
         elif key == 'message':
             # one of the components has sent a message
             self.debug("message: %s" % value)
-            self._tray_container.send_message(1000, value)
+            if self._tray_container:
+                self._tray_container.send_message(1000, value)
 
     def _show_popup_menu(self):
         self.popupMenu = gtk.Menu()
@@ -169,4 +171,5 @@ class FluTrayIcon(log.Loggable):
         self.popupMenu.show_all()
 
     def set_tooltip(self, tooltip):
-        self._tray_container.set_tooltip(tooltip)
+        if self._tray_container:
+            self._tray_container.set_tooltip(tooltip)

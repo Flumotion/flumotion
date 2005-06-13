@@ -1,3 +1,8 @@
+2005-06-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/ui/trayicon.py:
+	  work when the .so file cannot be found as well
+
 2005-06-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:
