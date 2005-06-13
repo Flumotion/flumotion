@@ -38,7 +38,7 @@ def _runInterface(conf_file, options, greeter=None):
     g = greeter or Greeter()
     state = g.run()
     if not state:
-        reactor.stop()
+        reactor.callLater(0, reactor.stop)
         return
     g.set_sensitive(False)
 

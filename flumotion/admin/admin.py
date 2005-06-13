@@ -101,12 +101,12 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
             self.medium.setRemoteReference(result)
 
-        except error.ConnectionFailedError:
+        except errors.ConnectionFailedError:
             self.debug("emitting connection-failed")
             self.medium.emit('connection-failed', "I failed my master")
             self.debug("emitted connection-failed")
 
-        except error.ConnectionRefusedError:
+        except errors.ConnectionRefusedError:
             self.debug("emitting connection-refused")
             self.medium.emit('connection-refused')
             self.debug("emitted connection-refused")

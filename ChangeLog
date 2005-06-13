@@ -1,5 +1,13 @@
 2005-06-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/main.py (_runInterface): We're not yet in
+	the reactor if the greeter is killed, so we can't stop it just
+	yet. Use callLater(reactor.stop) instead.
+
+	* flumotion/admin/admin.py (AdminClientFactory.gotDeferredLogin):
+	Get ConnectionFailedError and ConnectionRefusedError from the
+	right module.
+
 	* flumotion/wizard/wizard.py (Wizard): No longer implements
 	IStateListener -- WorkerListModel does this. Change to not rebuild
 	the worker list all the time, instead just notifying when the page
