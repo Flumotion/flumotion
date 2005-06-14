@@ -1,3 +1,8 @@
+2005-06-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py (BaseComponent._heartbeat):
+	Remove cpu logging message.
+
 2005-06-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/effects/volume/volume.py
