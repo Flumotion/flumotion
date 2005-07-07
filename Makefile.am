@@ -38,7 +38,8 @@ PYCHECKER_WHITELIST = \
 	    flumotion/admin/*/*.py		\
 	    flumotion/admin/*/*/*.py
 
-PYCHECKER_BLACKLIST =
+PYCHECKER_BLACKLIST = \
+            flumotion/twisted/gtk2reactor.py
 
 .PHONY: test
 

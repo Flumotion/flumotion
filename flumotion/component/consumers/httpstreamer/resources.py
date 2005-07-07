@@ -28,7 +28,11 @@ import resource
 
 import gst
 
-from twisted.protocols import http
+try:
+    from twisted.web import http
+except ImportError:
+    from twisted.protocols import http
+
 from twisted.web import server, resource as web_resource
 from twisted.internet import reactor, defer
 from flumotion.configure import configure
