@@ -20,7 +20,6 @@
 
 
 import os
-from xml.dom import minidom, Node
 
 import gtk
 import gtk.glade
@@ -30,44 +29,7 @@ from flumotion.ui.glade import GladeWidget, GladeWindow
 from flumotion.configure import configure
 from flumotion.common.pygobject import gsignal, gproperty
 
-
-def get_recent_connections():
-    def parse_connection(f):
-        tree = minidom.parse(f)
-        state = {}
-        for n in [x for x in tree.documentElement.childNodes
-                    if x.nodeType != Node.TEXT_NODE
-                       and x.nodeType != Node.COMMENT_NODE]:
-            state[n.nodeName] = n.childNodes[0].wholeText
-        state['port'] = int(state['port'])
-        state['use_insecure'] = (state['use_insecure'] != '0')
-        return state
-    def human_readable(state):
-        return '%s@%s:%d' % (state['user'], state['host'], state['port'])
-
-    try:
-        # DSU, or as perl folks call it, a Schwartz Transform
-        files = os.listdir(configure.registrydir)
-        files = [os.path.join(configure.registrydir, f) for f in files]
-        files = [(os.stat(f).st_mtime, f) for f in files
-                                          if f.endswith('.connection')]
-        files.sort()
-        files.reverse()
-
-        ret = []
-        for f in [x[1] for x in files]:
-            try:
-                state = parse_connection(f)
-                ret.append({'name': human_readable(state),
-                            'file': f,
-                            'state': state})
-            except Exception, e:
-                print 'Error parsing %s: %r' % (f, e)
-                raise
-        return ret
-    except OSError, e:
-        print 'Error: %s: %s' % (e.strerror, e.filename)
-        return []
+from flumotion.admin import connections
 
         
 class Connections(GladeWidget):
@@ -109,7 +71,7 @@ class Connections(GladeWidget):
 
     def _populate_liststore(self):
         self.model = gtk.ListStore(str, str, object)
-        for x in get_recent_connections():
+        for x in connections.get_recent_connections():
             i = self.model.append()
             self.model.set(i, self.STR_COL, x['name'], self.FILE_COL, x['file'],
                            self.STATE_COL, x['state'])

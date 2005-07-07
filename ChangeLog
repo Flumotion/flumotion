@@ -1,3 +1,13 @@
+2005-07-07  Andy Wingo  <wingo@pobox.com>
+
+	patch by: Zaheer Abbas Merali <zaheermerali at gmail dot com>
+	
+	* flumotion/admin/Makefile.am: Dist new file.
+
+	* flumotion/admin/connections.py: New file.
+	(get_recent_connections): Moved from
+	flumotion.admin.gtk.connections.
+
 2005-06-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/component.py (BaseComponent._heartbeat):
