@@ -23,7 +23,7 @@ osssrc             |
 level              | Ported
 videotestsrc       | Ported
 videobox           | Ported
-dvdec              |
+dvdec              | Ported
 dv1394src          | Ported
 alpha              |
 pngdec             |
@@ -35,3 +35,106 @@ tcpserversink      | Ported
 tcpclientsrc       | Ported
 mulawenc           |
 multipartmux       |
+
+** Pipelines used in Flumotion
+
+Filtered connections are used extensively in Flumotion. Either we change
+these over to use capsfilter, or we update the launch syntax to create
+capsfilter elements. Probably the latter. Must check to see that
+capsfilter actually works.
+
+All the caps below actually have height and width and framerate where
+it is known.
+
+v4lsrc name=source autoprobe=false autoprobe-fps=false copy-mode=1
+    ! video/x-raw-yuv,format=(fourcc)I420
+    ! videorate
+
+videotestsrc
+    ! video/x-raw-yuv,format=(fourcc)I420
+
+videotestsrc
+    ! video/x-raw-rgb,red_mask=0xff00
+
+osssrc
+    ! audio/x-raw-int,rate=22050,depth=16,channels=1,width=16,signed=(boolean)TRUE,endianness=1234
+    ! level signal=true
+
+alsasrc
+    ! audio/x-raw-int,rate=22050,depth=16,channels=1,width=16,signed=(boolean)TRUE,endianness=1234
+    ! level signal=true
+
+dv1394src
+    ! dvdec name=dec drop-factor=2
+    ! video/x-raw-yuv,format=(fourcc)YUY2
+    ! videorate
+    ! videoscale
+    ! video/x-raw-yuv,width=360,height=288
+    ! videoscale
+    ! video/x-raw-yuv,width=240,height=192,framerate=10.0,format=(fourcc)YUY2
+    ! @feeder::video@
+
+    dec.
+    ! audio/x-raw-int
+    ! volume name=setvolume
+    ! level name=volumelevel signal=true
+    ! audiorate
+
+dv1394src
+    ! dvdec name=dec drop-factor=2
+    ! video/x-raw-yuv,format=(fourcc)YUY2
+    ! videorate
+    ! videoscale
+    ! video/x-raw-yuv,width=144,height=288,pixel-aspect-ratio=(fraction)1/1
+    ! videoscale
+    ! video/x-raw-yuv,width=144,height=115,framerate=10.0,format=(fourcc)YUY2
+    ! ffmpegcolorspace
+    ! videobox right=-5
+    ! video/x-raw-yuv,format=(fourcc)I420
+    ! @feeder::video@
+
+    dec.
+    ! audio/x-raw-int
+    ! volume name=setvolume
+    ! level name=volumelevel signal=true
+    ! audiorate
+
+# FIXME use something else to sync, not sinesrc
+sinesrc
+    ! audio/x-raw-int,rate=22050
+    ! volume
+
+multipartmux name=muxer
+    queue ! muxer.
+    queue ! muxer.
+
+oggmux max-delay=500000000 max-page-delay=500000000 name=muxer
+    queue ! muxer.
+    queue ! muxer.
+
+ffmpegcolorspace
+    ! jpegenc quality=0.6
+
+mulawenc
+
+ffmpegcolorspace
+    ! smokeenc qmin= qmax= threshold= keyframe=
+
+speexenc
+
+ffmpegcolorspace
+    ! theoraenc bitrate= quality= keyframe-threshold= ...
+
+# not a parselaunchcomponent
+audioconvert
+    ! audioscale
+    ! vorbisenc
+
+filesrc name=source blocksize=100000
+    ! pngdec
+    ! alphacolor
+    ! videomixer name=mix 
+    @feeder@ ! ffmpegcolorspace ! mix.
+
+multifdsink
+
