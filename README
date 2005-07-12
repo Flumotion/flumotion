@@ -65,7 +65,8 @@ terminal 2:
 
 terminal 3:
   flumotion-admin -v
-  Choose transport "TCP", and "user" and "test" in the dialog
+  Unselect 'Secure connection via SSL', press Next, then enter "user" and 
+  "test" in the dialog.
 
   Go through the wizard, chosing defaults.
 
