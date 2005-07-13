@@ -1,0 +1,62 @@
+.\" Process this file with
+.\" groff -man -Tascii flumotion-admin.1
+.\"
+.TH flumotion-admin 1 "2005 July 13" "Fluendo" "Flumotion"
+
+.SH NAME
+flumotion-admin \- streaming media server administration GUI
+
+.SH SYNOPSIS
+.B flumotion-admin
+[
+.B -v
+]
+[
+.B --debug
+.I debug configuration
+]
+
+.SH DESCRIPTION
+.B flumotion-admin
+is a GUI application that provides administration capabilities for the flumotion
+streaming server. Using it, you can configure and monitor the streams flumotion
+serves.
+.B flumotion-admin
+connects to a running 
+.I flumotion-manager
+to control the manager, start and stop components, and display logging and 
+monitoring information about the running components.
+
+You must start 
+.I flumotion-manager
+before you can use
+.B flumotion-admin
+, but once you've done so you can just run
+.B flumotion-admin
+with no arguments to start the GUI.
+
+.SH OPTIONS
+.IP "-h, --help"
+Show a brief help message, then exit.
+.IP "--version"
+Show the version number.
+.IP "-v, --verbose"
+Be verbose in console output.
+.IP "-dDEBUG, --debug=DEBUG"
+Set the debug configuration to the specified 
+.B debug
+string. See the
+.I Debugging
+section for details of this.
+
+.SH DEBUGGING
+
+This section hasn't been written yet.
+
+.SH BUGS
+Hopefully none. If you find any bugs, please report them at
+https://core.fluendo.com/trac/cgi-bin/trac.cgi
+
+.SH SEE ALSO
+
+.BR flumotion(1),flumotion-worker(1),flumotion-manager(1)

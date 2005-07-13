@@ -1,0 +1,112 @@
+.\" Process this file with
+.\" groff -man -Tascii flumotion-worker.1
+.\"
+.TH flumotion-worker 1 "2005 July 13" "Fluendo" "Flumotion"
+
+.SH NAME
+flumotion-worker \- streaming media server worker
+
+.SH SYNOPSIS
+.B flumotion-worker
+[
+.B -v
+]
+[
+.B --debug
+.I debug configuration
+]
+[
+.B -H
+.I host
+]
+[
+.B -P
+.I port
+]
+[
+.B -T
+.I protocol
+]
+[
+.B -C
+.I certificate
+]
+[
+.B -n
+.I name
+]
+[
+.B -D
+]
+.B -u username
+.B -p password
+
+.SH DESCRIPTION
+.B flumotion-worker
+is the part of flumotion that actually performs all the real work of encoding,
+streaming, etc. In a flumotion system, there will be a single manager, and could
+be several workers running on different systems (this is useful to distribute
+the load of, for instance, video encoding). You need to have a minimum of one
+worker for flumotion to function correctly.
+
+You should start flumotion-manager first, then connect flumotion-worker to the
+running manager.
+
+.SH OPTIONS
+.IP "-h, --help"
+Show a brief help message, then exit.
+.IP "--version"
+Show the version number.
+.IP "-v, --verbose"
+Be verbose in console output.
+.IP "-dDEBUG, --debug=DEBUG"
+Set the debug configuration to the specified 
+.B debug
+string. See the
+.I Debugging
+section for details of this.
+.IP "-HHOST, --hostname=HOST"
+Specify the hostname on which the manager is running.
+.IP "-PPORT, --port=PORT"
+Specify the port on which the manager in running (usually 7531 for SSL, or
+8642 otherwise)
+.IP "-TTRANSPORT, --transport=TRANSPORT"
+Set the transport protocol to use, either 'tcp' or 'ssl'. Default is 'ssl'.
+.IP "-CCERTIFICATE, --certificate=CERTIFICATE"
+Specify the PEM certificate file to use. This is required if you use SSL.
+.IP "-nNAME, --name=NAME"
+Set the name for this worker to use in the manager.
+.IP "-D, --daemonize"
+Run in the background as a daemon.
+.IP "-u, --username"
+Specify the username to use to connect to the manager.
+.IP "-p, --password"
+Specify the password to use to connect to the manager.
+.IP "-FPORTS, --feederports=PORTS
+Specify the range of feeder ports to use in the format 'lower-upper'. These are
+the ports used for inter-worker communication. If you have multiple workers on
+seperate systems (perhaps one doing encoding, behind a firewall, and a second
+doing the streaming outside the firewall), they must be able to communicate
+using this port range, so you'll have to open these ports in your firewall. It
+is recommended that you have a range of 20 ports.
+
+.SH DEBUGGING
+
+This section hasn't been written yet.
+
+.SH EXAMPLES
+
+Simple example, starting flumotion-worker connecting to a manager using TCP,
+default host and port, and with the username 'user' and the password 'test'
+
+.RS
+flumotion-worker -v -T tcp -u user -p test
+.RE
+
+.SH BUGS
+Hopefully none. If you find any bugs, please report them at
+https://core.fluendo.com/trac/cgi-bin/trac.cgi
+
+.SH SEE ALSO
+
+.BR flumotion(1),flumotion-manager(1),flumotion-admin(1)

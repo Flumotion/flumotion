@@ -1,3 +1,11 @@
+2005-07-13  Michael Smith <msmith@fluendo.com>
+
+	* doc/man/Makefile.am:
+	* doc/man/flumotion-admin.1:
+	* doc/man/flumotion-manager.1:
+	* doc/man/flumotion-worker.1:
+	  Add more manpages, fix some typos in the manager page.
+
 2005-07-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:
