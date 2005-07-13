@@ -55,7 +55,16 @@ _levels = {
     "DEBUG": 4,
     "LOG": 5
 }
-
+def getLevel(level):
+    """
+    Return an integer value that represents the level.
+    """
+    global _levels
+    if _levels.has_key(level):
+        return _levels[level]
+    if isinstance(int, level):
+        return level
+    raise TypeError
 
 class Loggable:
     """
@@ -117,6 +126,10 @@ class FluLogObserver:
         edm = eventDict['message']
         if not edm:
             if eventDict['isError'] and eventDict.has_key('failure'):
+                msg = "A python traceback occurred."
+                if getCategoryLevel("twisted") < getLevel("DEBUG"):
+                    msg += "  Run with debug level 4 to see the traceback."
+                warning('twisted', msg)
                 text = eventDict['failure'].getTraceback()
             elif eventDict.has_key('format'):
                 text = eventDict['format'] % eventDict
@@ -126,7 +139,9 @@ class FluLogObserver:
         else:
             text = ' '.join(map(str, edm))
 
-        fmtDict = {'system': eventDict['system'], 'text': text.replace("\n", "\n\t")}
+        fmtDict = { 'system': eventDict['system'],
+                    'text': text.replace("\n", "\n\t")
+                  }
         msgStr = " [%(system)s] %(text)s\n" % fmtDict
         debug('twisted', msgStr)
 
@@ -167,6 +182,19 @@ def registerCategory(category):
                     level = 5
     # store it
     _categories[category] = level
+
+def getCategoryLevel(category):
+    """
+    @param category: string
+
+    Get the debug level at which this category is being logged, adding it
+    if it wasn't registered yet.
+    """
+    global _categories
+    if not _categories.has_key(category):
+        registerCategory(category)
+    return _categories[category]
+
 
 def stderrHandler(level, object, category, file, line, message):
     """
@@ -212,12 +240,7 @@ def _handle(level, object, category, message):
             raise SystemError, "handler %r raised a TypeError" % handler
 
     # the limited ones
-    global _categories
-    if not _categories.has_key(category):
-        registerCategory(category)
-
-    global _levels
-    if _levels[level] > _categories[category]:
+    if getLevel(level) > getCategoryLevel(category):
         return
     for handler in _log_handlers_limited:
         try:

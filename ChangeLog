@@ -1,3 +1,10 @@
+2005-07-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
+	  refactored logging a little, and fix #255 nicely by warning the user
+	  at level 2 that there is a python traceback waiting for her at debug
+	  level 4 if she's running below level 4
+
 2005-07-13  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/manager/main.py: Process options that don't require a
