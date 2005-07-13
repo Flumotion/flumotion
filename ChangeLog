@@ -1,3 +1,8 @@
+2005-07-13  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/manager/main.py: Process options that don't require a
+	planet configuration file before requiring one.
+
 2005-07-07  Andy Wingo  <wingo@pobox.com>
 
 	* Makefile.am (PYCHECKER_BLACKLIST): Ignore gtk2reactor.py, it's

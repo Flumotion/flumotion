@@ -153,6 +153,11 @@ def main(args):
     if options.verbose:
         options.debug = "*:3"
 
+    # Handle options that don't require a configuration file.
+    if options.version:
+        print common.version("flumotion-manager")
+        return 0
+
     # parse planet config file
     if len(args) <= 1:
         log.warning('manager', 'Please specify a planet configuration file')
@@ -208,11 +213,7 @@ def main(args):
             options.transport)
         return 1
 
-    # handle options
-    if options.version:
-        print common.version("flumotion-manager")
-        return 0
-
+    # handle all other options
     if options.debug:
         log.setFluDebug(options.debug)
 
