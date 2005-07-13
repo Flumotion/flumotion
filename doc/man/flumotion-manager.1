@@ -1,0 +1,103 @@
+.\" Process this file with
+.\" groff -man -Tascii flumotion-manager.1
+.\"
+.TH flumotion-manager 1 "2005 July 13" "Fluendo" "Flumotion"
+
+.SH NAME
+flumotion-manager \- streaming media server central management
+
+.SH SYNOPSIS
+.B flumotion-manager
+[
+.B -v
+]
+[
+.B --debug
+.I debug configuration
+]
+[
+.B -H
+.I host
+]
+[
+.B -P
+.I port
+]
+[
+.B -T
+.I protocol
+]
+[
+.B -C
+.I certificate
+]
+[
+.B -n
+.I name
+]
+[
+.B -D
+]
+.I configuration_file
+
+.SH DESCRIPTION
+.B flumotion-manager
+is the central management component of the flumotion streaming server.
+.B flumotion-manager
+does not actually perform any streaming or encodign itself, it simply 
+acts as a central point for
+.I flumotion-worker
+instances
+and
+.I flumotion-admin
+administration consoles to connect to. You need to start it before any other
+flumotion component. When starting flumotion-manager, you need only specify a
+.I planet configuration file
+, but it is frequently helpful to set other options from the command line.
+
+.SH OPTIONS
+.IP "-h, --help"
+Show a brief help message, then exit.
+.IP "--version"
+Show the version number.
+.IP "-v, --verbose"
+Be verbose in console output.
+.IP "-dDEBUG, --debug=DEBUG"
+Set the debug configuration to the specified 
+.B debug
+string. See the
+.I Debugging
+section for details of this.
+.IP "-HHOST, --hostname=HOST"
+Set the hostname to listen as.
+.IP "-PPORT, --port=PORT"
+Set the port the manager should listen on. Default is 7531 if SSL is being used,
+or 8642 otherwise.
+.IP "-TTRANSPORT, --transport=TRANSPORT"
+Set the transport protocol to use, either 'tcp' or 'ssl'. Default is 'ssl'.
+.IP "-CCERTIFICATE, --certificate=CERTIFICATE"
+Specify the PEM certificate file to use. This is required if you use SSL.
+.IP "-nNAME, --name=NAME"
+Set the manager name.
+.IP "-D, --daemonize"
+Run in the backgroup as a daemon.
+
+.SH DEBUGGING
+
+This section hasn't been written yet.
+
+.SH EXAMPLES
+
+Simple example, starting flumotion-manager using TCP, in verbose mode:
+
+.RS
+flumotion-manager -v -T tcp conf/managers/default/planet.xml
+.RE
+
+.SH BUGS
+Hopefully none. If you find any bugs, please report them at
+https://core.fluendo.com/trac/cgi-bin/trac.cgi
+
+.SH SEE ALSO
+
+.BR flumotion(1),flumotion-worker(1),flumotion-admin(1)
