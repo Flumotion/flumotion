@@ -71,7 +71,7 @@ class WorkerList(gtk.HBox):
         a.show()
         vb.pack_start (a, True, False, 0)
         cell = gtk.CellRendererText()
-        self._combobox.pack_start(cell, gtk.TRUE)
+        self._combobox.pack_start(cell, True)
         self._combobox.add_attribute(cell, 'text', 0)
 
         def on_changed(cb):

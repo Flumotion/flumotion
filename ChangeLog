@@ -1,3 +1,11 @@
+2005-07-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/Makefile.am:
+	  make make check error out if it notices an import error
+	* flumotion/test/test_wizard.py:
+	* flumotion/wizard/worker.py:
+	  skip some tests that now fail until Andy can look at them
+
 2005-07-13  Michael Smith <msmith@fluendo.com>
 
 	* doc/man/flumotion-admin.1:

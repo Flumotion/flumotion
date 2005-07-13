@@ -39,10 +39,16 @@ EXTRA_DIST = 				\
 	test_workerconfig.py
 
 check-local:
-	@if PYTHONPATH=$(top_srcdir):$(PYTHONPATH) trial -R flumotion.test; \
-	then \
-	    rm -fr $(top_builddir)/flumotion/test/_trial_temp; \
-	else \
-	    exit 1; \
+	@if PYTHONPATH=$(top_srcdir):$(PYTHONPATH)			\
+	trial -R flumotion.test | tee test.log;				\
+	then 								\
+	    rm -fr $(top_builddir)/flumotion/test/_trial_temp;		\
+	    if grep "Could not import" test.log > /dev/null; then	\
+	        exit 1;							\
+	    fi;								\
+	    rm test.log;						\
+	else								\
+	    rm test.log;						\
+	    exit 1;							\
 	fi
 	@rm -fr $(top_builddir)/flumotion/test/*.pyc
