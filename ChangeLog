@@ -1,3 +1,10 @@
+2005-07-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* doc/Makefile.am:
+	* flumotion.spec.in:
+	  install, dist and package the man page
+
 2005-07-13  Michael Smith <msmith@fluendo.com>
 
 	* doc/man/flumotion-manager.1: Add a basic, incomplete manpage.

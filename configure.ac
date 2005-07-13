@@ -208,6 +208,7 @@ flumotion/worker/checks/Makefile
 conf/Makefile
 doc/Makefile
 doc/reference/Makefile
+doc/man/Makefile
 pkgconfig/Makefile
 pkgconfig/flumotion.pc
 pkgconfig/flumotion-uninstalled.pc

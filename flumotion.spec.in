@@ -172,6 +172,7 @@ fi
 %{_datadir}/flumotion
 %{_datadir}/applications/*.desktop
 %{_datadir}/pixmaps/*
+%{_mandir}/man1/flumotion*.1*
 %dir %attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
 %attr(750,flumotion,root) %{_sysconfdir}/flumotion
 %attr(750,flumotion,root) %{_localstatedir}/run/flumotion
