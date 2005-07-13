@@ -69,7 +69,9 @@ string. See the
 .I Debugging
 section for details of this.
 .IP "-HHOST, --hostname=HOST"
-Set the hostname to listen as.
+Specify the interface to bind to, either as a hostname or a numeric address.
+Usually, unless you have multiple network connections, you won't want to set
+this at all. Defaults to binding to all interfaces.
 .IP "-PPORT, --port=PORT"
 Set the port the manager should listen on. Default is 7531 if SSL is being used,
 or 8642 otherwise.
@@ -84,7 +86,34 @@ Run in the background as a daemon.
 
 .SH DEBUGGING
 
-This section hasn't been written yet.
+In the unlikely event of something in flumotion not working, you might want to
+debug it. The flumotion tools (
+.B flumotion-worker
+,
+.B flumotion-admin
+, and
+.B flumotion-manager
+) all alow you to turn on debugging output in two different ways.
+
+Firstly, you can use an environment variable, FLU_DEBUG. Secondly, you can
+launch the program with a -d or --debug switch. Either approach allows you to
+specify a debug configuration string with the following syntax:
+
+.RS
+.B name1:n1,name2:n2,name3:n3
+.RE
+
+In this syntax, the 'name' variables can be replaced with the name of a 
+particular module within flumotion (such as 'admin', 'twisted', etc.). You can 
+also use '*' to specify all modules. The 'n' variables are numbers from 1 to 5,
+larger numbers corresponding to more verbose output (ERROR, WARN, INFO, DEBUG, 
+and LOG). At level 4, full debugging information is emitted. 
+
+You can also use an abbreviated form where you just supply a single number, thisuses that debug level for all modules. Thus the simplest way to enable full
+debug output for all modules is to use '-d 4' on the command line.
+
+A more complex example would be '-d *:3,admin:4' to set the logging level for
+the admin module to DEBUG, and for all other modules to INFO.
 
 .SH EXAMPLES
 
