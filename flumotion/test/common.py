@@ -20,14 +20,13 @@
 
 import os
 import sys
-import unittest
 
 import flumotion.common.setup
 
 #sys.path.insert(1, os.path.abspath('..'))
 
-import pygtk
-pygtk.require('2.0')
+#import pygtk
+#pygtk.require('2.0')
 
 #import gst
 #import gst.interfaces

@@ -19,8 +19,8 @@
 
 from twisted.trial import unittest
 
-import pygtk
-pygtk.require('2.0')
+#import pygtk
+#pygtk.require('2.0')
 import gobject
 
 from flumotion.common.pygobject import gsignal, gproperty
