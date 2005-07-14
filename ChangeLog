@@ -1,5 +1,10 @@
 2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/ui/glade.py:
+	  use log.getExceptionMessage
+
+2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/log.py:
 	* flumotion/worker/job.py:
 	  factor out a log.getExceptionMessage so we can clean up

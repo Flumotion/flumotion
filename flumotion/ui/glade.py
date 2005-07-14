@@ -27,6 +27,7 @@ import gtk.glade
 import gobject
 
 from flumotion.configure import configure
+from flumotion.common import log
 
 
 # proc := module1.module2.moduleN.proc1().maybe_another_proc()
@@ -50,13 +51,15 @@ def flumotion_glade_custom_handler(xml, proc, name, *args):
     try:
         __import__(module)
     except Exception, e:
-        raise RuntimeError('Failed to load module %s: %s' % (module, e))
+        msg = log.getExceptionMessage(e)
+        raise RuntimeError('Failed to load module %s: %s' % (module, msg))
 
     try:
         w = eval(code, sys.modules[module].__dict__)
     except Exception, e:
+        msg = log.getExceptionMessage(e)
         raise RuntimeError('Failed call %s in module %s: %s'
-                           % (code, module, e))
+                           % (code, module, msg))
     w.set_name(name)
     w.show()
     return w
@@ -91,8 +94,9 @@ class GladeWidget(gtk.VBox):
                 # pygtk 2.4 doesn't like typedict={} ?
                 wtree = gtk.glade.XML(file)
         except RuntimeError, e:
+            msg = log.getExceptionMessage(e)
             raise RuntimeError('Failed to load file %s from directory %s: %s'
-                               % (self.glade_file, self.glade_dir, e))
+                               % (self.glade_file, self.glade_dir, msg))
 
         win = None
         for widget in wtree.get_widget_prefix(''):
@@ -103,7 +107,7 @@ class GladeWidget(gtk.VBox):
                 continue
             
             if hasattr(self, wname) and getattr(self, wname):
-                raise AssertionError (
+                raise AssertionError(
                     "There is already an attribute called %s in %r" %
                     (wname, self))
             setattr(self, wname, widget)
@@ -149,8 +153,9 @@ class GladeWindow(gobject.GObject):
                 # pygtk 2.4 doesn't like typedict={} ?
                 wtree = gtk.glade.XML(file)
         except RuntimeError, e:
+            msg = log.getExceptionMessage(e)
             raise RuntimeError('Failed to load file %s from directory %s: %s'
-                               % (self.glade_file, self.glade_dir, e))
+                               % (self.glade_file, self.glade_dir, msg))
 
         self.widgets = {}
         for widget in wtree.get_widget_prefix(''):
