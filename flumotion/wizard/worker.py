@@ -79,8 +79,12 @@ class WorkerList(gtk.HBox):
 
         self._combobox.connect('changed', on_changed)
         self._combobox.show()
-        self._combobox.set_property('focus-on-click', False)
-        self._combobox.set_property('has-frame', False)
+        # GTK 2.4
+        try:
+            self._combobox.set_property('focus-on-click', False)
+            self._combobox.set_property('has-frame', False)
+        except TypeError:
+            pass
         a.add(self._combobox)
 
     def set_worker_heaven_state(self, whs):
