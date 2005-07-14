@@ -102,13 +102,7 @@ def getComponent(dict, defs):
         # already nicely formatted, so fall through
         raise
     except Exception, e:
-        # find where the exception occurred
-        stack = traceback.extract_tb(sys.exc_info()[2])
-        (filename, line, func, text) = stack[-1]
-        filename = log.scrubFilename(filename)
-        msg = "%s:%s: %s(): %s during %s.createComponent(): %s" % (
-            filename, line, func, e.__class__.__name__, moduleName,
-            " ".join([repr(i) for i in e.args]))
+        msg = log.getExceptionMessage(e)
         log.warning('job', msg)
         log.warning('job', 'raising config.ConfigError')
         raise config.ConfigError(msg)

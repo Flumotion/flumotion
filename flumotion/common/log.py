@@ -386,3 +386,9 @@ def getFileLine():
         
     return "Not found", 0
 
+def getExceptionMessage(exception):
+    stack = traceback.extract_tb(sys.exc_info()[2])
+    (filename, line, func, text) = stack[-1]
+    filename = scrubFilename(filename)
+    exc = exception.__class__.__name__
+    return "Exception %(exc)s at %(filename)s:%(line)s: %(func)s()" % locals()

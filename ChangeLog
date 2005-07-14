@@ -1,5 +1,12 @@
 2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/log.py:
+	* flumotion/worker/job.py:
+	  factor out a log.getExceptionMessage so we can clean up
+	  all cases where we try and give some useful info about exceptions
+
+2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  clean up broken admin client because of moved code
 
