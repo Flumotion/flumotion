@@ -1,3 +1,8 @@
+2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/client.py:
+	  clean up broken admin client because of moved code
+
 2005-07-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/Makefile.am:

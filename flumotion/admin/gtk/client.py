@@ -30,7 +30,9 @@ from twisted.internet import reactor
 from twisted.python import rebuild
 
 from flumotion.admin.admin import AdminModel
-from flumotion.admin.gtk import dialogs, parts, connections
+from flumotion.admin import connections
+from flumotion.admin.gtk import dialogs, parts
+from flumotion.admin.gtk import connections as gtkconnections
 from flumotion.configure import configure
 from flumotion.common import errors, log, worker, planet, common
 from flumotion.manager import admin # Register types
@@ -847,7 +849,7 @@ class Window(log.Loggable, gobject.GObject):
         self.on_open_connection(state)
 
     def file_open_cb(self, button):
-        d = connections.ConnectionsDialog(self.window)
+        d = gtkconnections.ConnectionsDialog(self.window)
         d.show()
         d.connect('have-connection', self.on_have_connection)
     
