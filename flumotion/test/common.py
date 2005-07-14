@@ -23,18 +23,6 @@ import sys
 
 import flumotion.common.setup
 
-#sys.path.insert(1, os.path.abspath('..'))
-
-#import pygtk
-#pygtk.require('2.0')
-
-#import gst
-#import gst.interfaces
-
-#ltihooks = sys.modules.get('gst.ltihooks')
-#if ltihooks:
-#    ltihooks.uninstall()
-
 # logging
 flumotion.common.setup.setup()
 
