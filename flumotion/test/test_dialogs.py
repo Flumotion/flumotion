@@ -75,14 +75,14 @@ class TestPropertyChangeDialog(unittest.TestCase):
         gtk.main()
 
         # make sure it was hidden
-        self.failUnlessEqual(dialog.get_property('visible'), gtk.FALSE)
+        self.failUnlessEqual(dialog.get_property('visible'), False)
 
     def get_cb(self, dialog, element, property):
-        self.failUnlessEqual(dialog.get_property('visible'), gtk.TRUE)
+        self.failUnlessEqual(dialog.get_property('visible'), True)
 
         self.failUnlessEqual(element, 'fakesrc')
         self.failUnlessEqual(property, 'silent')
-        dialog.update_value_entry(gtk.FALSE)
+        dialog.update_value_entry(False)
         dialog.value_entry.set_text('True')
         dialog._set.emit('clicked')
 
@@ -103,9 +103,9 @@ class TestErrorDialog(unittest.TestCase):
 
     def testDialogMain(self):
         dialog = dialogs.ErrorDialog("I am a test error message", self.window)
-        self.failUnlessEqual(dialog.get_property('visible'), gtk.FALSE)
+        self.failUnlessEqual(dialog.get_property('visible'), False)
         dialog.show_all()
-        self.failUnlessEqual(dialog.get_property('visible'), gtk.TRUE)
+        self.failUnlessEqual(dialog.get_property('visible'), True)
         
         # find the button and "click" it
         hbox = dialog.action_area
@@ -118,13 +118,13 @@ class TestErrorDialog(unittest.TestCase):
         
         gtk.main()
         
-        self.failUnlessEqual(dialog.get_property('visible'), gtk.FALSE)
+        self.failUnlessEqual(dialog.get_property('visible'), False)
 
     def testDialogRun(self):
         dialog = dialogs.ErrorDialog("I am a test error message", self.window)
-        self.failUnlessEqual(dialog.get_property('visible'), gtk.FALSE)
+        self.failUnlessEqual(dialog.get_property('visible'), False)
         dialog.show_all()
-        self.failUnlessEqual(dialog.get_property('visible'), gtk.TRUE)
+        self.failUnlessEqual(dialog.get_property('visible'), True)
         
         # find the button and "click" it
         hbox = dialog.action_area
@@ -135,5 +135,5 @@ class TestErrorDialog(unittest.TestCase):
         gobject.timeout_add(1 * INTERVAL, lambda b: b.emit('clicked'), button)
         dialog.run()
         
-        self.failUnlessEqual(dialog.get_property('visible'), gtk.FALSE)
+        self.failUnlessEqual(dialog.get_property('visible'), False)
    
