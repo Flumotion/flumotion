@@ -1,5 +1,13 @@
 2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/common.py:
+	  remove a sys.path hackery from jdahlin that escaped my autisticity
+	  for far too long
+	* flumotion/test/test_flavors.py:
+	  remove main call
+
+2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/ui/glade.py:
 	  use log.getExceptionMessage
 

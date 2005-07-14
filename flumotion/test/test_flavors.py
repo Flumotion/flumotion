@@ -268,6 +268,3 @@ class TestState(unittest.TestCase):
         self.assertEquals(c.get('alist'), [])
         self.assertRaises(KeyError, c.remove, 'randomlistkey', 'value')
         self.assertRaises(ValueError, c.remove, 'alist', 'value')
-  
-if __name__ == '__main__':
-    unittest.main()

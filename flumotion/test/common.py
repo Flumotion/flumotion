@@ -24,21 +24,17 @@ import unittest
 
 import flumotion.common.setup
 
-sys.path.insert(1, os.path.abspath('..'))
+#sys.path.insert(1, os.path.abspath('..'))
 
 import pygtk
 pygtk.require('2.0')
 
-gstdir = '/opt/gnome/lib/python2.3/site-packages'
-if not gstdir in sys.path:
-    sys.path.append(gstdir)
+#import gst
+#import gst.interfaces
 
-import gst
-import gst.interfaces
-
-ltihooks = sys.modules.get('gst.ltihooks')
-if ltihooks:
-    ltihooks.uninstall()
+#ltihooks = sys.modules.get('gst.ltihooks')
+#if ltihooks:
+#    ltihooks.uninstall()
 
 # logging
 flumotion.common.setup.setup()
