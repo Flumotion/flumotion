@@ -223,7 +223,7 @@ class View(gobject.GObject):
 class Model:
     def __init__(self):
         self._src = gst.Element('videotestsrc')
-        self._src.set_property('sync', gtk.TRUE)
+        self._src.set_property('sync', True)
         self._src.get_pad('src').connect("notify::caps", self.have_caps_cb)
         self._caps = None
 

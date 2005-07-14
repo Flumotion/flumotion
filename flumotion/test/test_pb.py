@@ -186,12 +186,12 @@ class Test_BouncerWrapper(unittest.TestCase):
         keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
         self.assert_(keycard)
         self.assertEquals(keycard.state, keycards.REQUESTING)
-                                                                                
+
         # submit for auth
         d = self.wrapper.remote_login(keycard, "avatarId", 'twisted.spread.pb.IPerspective')
         keycard = unittest.deferredResult(d)
         self.assertEquals(keycard.state, keycards.REQUESTING)
-                                                                                
+
         # mess with challenge, respond to challenge and resubmit
         keycard.challenge = "I am a h4x0r"
         keycard.setPassword('test')
@@ -226,6 +226,15 @@ class Test_FPBClientFactory(unittest.TestCase):
         reactor.iterate()
         reactor.iterate()
 
+    def clientDisconnect(self, factory, reference):
+        # clean up broker by waiting on Disconnect notify
+        d = defer.Deferred()
+        if reference:
+            reference.notifyOnDisconnect(lambda r: d.callback(None))
+        factory.disconnect()
+        if reference:
+            unittest.deferredResult(d)
+ 
     def testUACPPOk(self):
         factory = pb.FPBClientFactory()
 
@@ -239,10 +248,7 @@ class Test_FPBClientFactory(unittest.TestCase):
         # get result
         result = unittest.deferredResult(d)
         self.assert_(isinstance(result, tpb.RemoteReference))
-
-        factory.disconnect()
-        for i in range(5):
-            reactor.iterate()
+        self.clientDisconnect(factory, result)
 
     def testUACPPWrongPassword(self):
         factory = pb.FPBClientFactory()
@@ -252,10 +258,7 @@ class Test_FPBClientFactory(unittest.TestCase):
 
         p = unittest.deferredError(d)
         self.failUnless(p.check("twisted.cred.error.UnauthorizedLogin"))
-        c.disconnect()
-        reactor.iterate()
-        reactor.iterate()
-        reactor.iterate()
+        self.clientDisconnect(factory, None)
         from twisted.cred.error import UnauthorizedLogin
         tlog.flushErrors(UnauthorizedLogin)
 
@@ -280,7 +283,8 @@ class Test_FPBClientFactory(unittest.TestCase):
         # check if we have a remote reference
         result = unittest.deferredResult(d)
         self.assert_(isinstance(result, tpb.RemoteReference))
-    
+        self.clientDisconnect(factory, result)
+
     def testUACPCCWrongUser(self):
         factory = pb.FPBClientFactory()
 
@@ -300,10 +304,7 @@ class Test_FPBClientFactory(unittest.TestCase):
         # find copied failure
         p = unittest.deferredError(d)
         self.failUnless(p.check("twisted.cred.error.UnauthorizedLogin"))
-        c.disconnect()
-        reactor.iterate()
-        reactor.iterate()
-        reactor.iterate()
+        self.clientDisconnect(factory, None)
         from twisted.cred.error import UnauthorizedLogin
         tlog.flushErrors(UnauthorizedLogin)
 
@@ -326,10 +327,7 @@ class Test_FPBClientFactory(unittest.TestCase):
         # find copied failure
         p = unittest.deferredError(d)
         self.failUnless(p.check("twisted.cred.error.UnauthorizedLogin"))
-        c.disconnect()
-        reactor.iterate()
-        reactor.iterate()
-        reactor.iterate()
+        self.clientDisconnect(factory, None)
         from twisted.cred.error import UnauthorizedLogin
         tlog.flushErrors(UnauthorizedLogin)
 
@@ -356,10 +354,7 @@ class Test_FPBClientFactory(unittest.TestCase):
         # find copied failure
         p = unittest.deferredError(d)
         self.failUnless(p.check("twisted.cred.error.UnauthorizedLogin"))
-        c.disconnect()
-        reactor.iterate()
-        reactor.iterate()
-        reactor.iterate()
+        self.clientDisconnect(factory, None)
         from twisted.cred.error import UnauthorizedLogin
         tlog.flushErrors(UnauthorizedLogin)
 

@@ -78,19 +78,25 @@ class TestStateSet(unittest.TestCase):
     def setUp(self):
         self.changes = []
         
-    def runAll(self):
-        m = common.TestManager()
-        port = m.run(TestRoot)
-
+        self._m = common.TestManager()
+        port = self._m.run(TestRoot)
         self.admin = FakeAdmin()
         d = self.admin.run(port)
         unittest.deferredResult(d)
         self.worker = FakeWorker()
         d = self.worker.run(port)
         unittest.deferredResult(d)
+
+    def tearDown(self):
+        unittest.deferredResult(self._m.stop())
+        unittest.deferredResult(self.admin.stop())
+        unittest.deferredResult(self.worker.stop())
+
+    def reset(self):
+        self.changes = []
         
     def testStateSet(self):
-        self.runAll()
+        self.reset()
         # get the state
         d = self.admin.perspective.callRemote('workerGetState')
         state = unittest.deferredResult(d)
@@ -109,7 +115,7 @@ class TestStateSet(unittest.TestCase):
 
     def testStateAppend(self):
         # change state by appending children
-        self.runAll()
+        self.reset()
         # get the state
         d = self.admin.perspective.callRemote('workerGetState')
         state = unittest.deferredResult(d)
@@ -137,7 +143,7 @@ class TestStateSet(unittest.TestCase):
 
     def testStateListener(self):
         # change state by appending children
-        self.runAll()
+        self.reset()
         # get the state
         d = self.admin.perspective.callRemote('workerGetState')
         state = unittest.deferredResult(d)
@@ -174,7 +180,7 @@ class TestStateSet(unittest.TestCase):
         # change state by appending children
         # verify if we have the right number of items proxied,
         # ie the manager reference doesn't do something weird
-        self.runAll()
+        self.reset()
         # get the state
         d = self.admin.perspective.callRemote('workerGetState')
         state = unittest.deferredResult(d)
@@ -221,7 +227,7 @@ class TestStateSet(unittest.TestCase):
     def testStateSaveReference(self):
         # show that we need to keep the state reference around for listener
         # to work
-        self.runAll()
+        self.reset()
         # get the state
         d = self.admin.perspective.callRemote('workerGetState')
         state = unittest.deferredResult(d)

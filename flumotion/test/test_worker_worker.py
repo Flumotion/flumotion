@@ -62,8 +62,8 @@ class TestWorkerClientFactory(unittest.TestCase):
     def testInit(self):
         brain = worker.WorkerBrain(FakeOptions())
         factory = worker.WorkerClientFactory(brain)
-        reactor.callLater(0, reactor.stop)
-        reactor.run()
+
+        unittest.deferredResult(brain.teardown())
 
 class FakeRef:
     def notifyOnDisconnect(self, callback):
@@ -75,10 +75,7 @@ class TestWorkerMedium(unittest.TestCase):
         self.medium = worker.WorkerMedium(brain)
         self.medium.setRemoteReference(FakeRef())
         self.assert_(self.medium.hasRemoteReference())
-        reactor.callLater(0, reactor.stop)
-        reactor.run()
+
+        unittest.deferredResult(brain.teardown())
 
 # FIXME: add tests to test signal handler ? Might not be so easy.
-
-if __name__ == '__main__':
-    unittest.main()

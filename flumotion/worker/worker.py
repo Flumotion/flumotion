@@ -284,6 +284,7 @@ class WorkerBrain(log.Loggable):
         @param options: the optparsed dictionary of command-line options
         @type  options: an object with attributes
         """
+        self._port = None
         self._oldSIGCHLDHandler = None # stored by installSIGCHLDHandler
         self._oldSIGTERMHandler = None # stored by installSIGTERMHandler
         self.options = options
@@ -317,9 +318,19 @@ class WorkerBrain(log.Loggable):
         checker.allowPasswordless(True)
         p = portal.Portal(dispatcher, [checker])
         job_server_factory = pb.PBServerFactory(p)
-        reactor.listenUNIX(job.getSocketPath(), job_server_factory)
+        self._port = reactor.listenUNIX(job.getSocketPath(), job_server_factory)
 
         return job_server_factory, root
+
+    def teardown(self):
+        """
+        Clean up after setup()
+
+        @Returns: a L{twisted.internet.defer.Deferred} that fires when
+                  the teardown is completed
+        """
+        self.debug("cleaning up port %r" % self._port)
+        return self._port.stopListening()
 
     # override log.Loggable method so we don't traceback
     def error(self, message):

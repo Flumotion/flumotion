@@ -18,7 +18,6 @@
 
 # Headers in this file shall remain intact.
 
-from twisted import protocols
 from twisted.internet import defer
 from twisted.python import components
 from twisted.trial import unittest
@@ -30,6 +29,12 @@ from flumotion.common import interfaces
 # From twisted/test/proto_helpers.py
 import fcntl
 import os
+
+try:
+    from twisted.web import http
+except ImportError:
+    #T1.3
+    from twisted.protocols import http
 
 class PipeTransport:
     def __init__(self):
@@ -114,7 +119,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         
         request = FakeRequest(ip='127.0.0.1')
         data = resource.render(request)
-        error_code = protocols.http.SERVICE_UNAVAILABLE
+        error_code = http.SERVICE_UNAVAILABLE
         self.assertEquals(request.headers.get('content-type', ''), 'text/html')
         self.assertEquals(request.headers.get('server', ''),
             resources.HTTP_VERSION)
@@ -122,7 +127,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
 
         expected = resources.ERROR_TEMPLATE % {
             'code': error_code,
-            'error': protocols.http.RESPONSES[error_code]}
+            'error': http.RESPONSES[error_code]}
         self.assertEquals(data,  expected)
 
     def testRenderUnauthorized(self):
@@ -141,7 +146,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         # keycard should be False if not authed
         self.failIf(keycard)
 
-        error_code = protocols.http.UNAUTHORIZED
+        error_code = http.UNAUTHORIZED
         self.assertEquals(request.headers.get('content-type', ''), 'text/html')
         self.assertEquals(request.headers.get('server', ''),
             resources.HTTP_VERSION)
@@ -149,7 +154,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         
         expected = resources.ERROR_TEMPLATE % {
             'code': error_code,
-            'error': protocols.http.RESPONSES[error_code]}
+            'error': http.RESPONSES[error_code]}
         self.assertEquals(request.data, expected)
     
     def testRenderNew(self):
@@ -165,6 +170,3 @@ class TestHTTPStreamingResource(unittest.TestCase):
         #assert request.headers['Server'] == HTTP_VERSION
         #assert request.headers['Date'] == 'FakeDate'
         #assert request.headers['Content-Type'] == 'application/x-ogg'
-        
-if __name__ == '__main__':
-    unittest.main()

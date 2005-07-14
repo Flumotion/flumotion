@@ -39,6 +39,7 @@ class TestComponentsWarning(unittest.TestCase):
     warned = False
 
     def setUp(self):
+        warnings.resetwarnings()
         self.showwarning = warnings.showwarning
 
     def tearDown(self):
@@ -50,6 +51,7 @@ class TestComponentsWarning(unittest.TestCase):
             self.warned = True
             
         self.warned = False
+        warnings.resetwarnings()
         warnings.showwarning = myshowwarning
         
         instance = AClass()

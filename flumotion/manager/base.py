@@ -91,8 +91,8 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
             self.warning("No such remote method '%s', or AttributeError while executing remote method" % name)
             return failure.Failure(errors.NoMethodError(name))
 
-        self.debug("Failure on remote call %s: %s" % (name,
-             f.getErrorMessage()))
+        self.debug("Failure on remote call %s: %r, %s" % (name,
+             f, f.getErrorMessage()))
         return f
 
     def attached(self, mind):

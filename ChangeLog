@@ -1,5 +1,22 @@
 2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/videotest.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/common.py:
+	* flumotion/test/test_common_componentui.py:
+	* flumotion/test/test_flavors.py:
+	* flumotion/test/test_http.py:
+	* flumotion/test/test_keycards.py:
+	* flumotion/test/test_pb.py:
+	* flumotion/test/test_twisted_compat.py:
+	* flumotion/test/test_worker_worker.py:
+	* flumotion/worker/worker.py:
+	  fix test suite so that it completes with Twisted 2.0
+	  still need to look at some deprecation warnings though.
+
+2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/common.py:
 	  remove a sys.path hackery from jdahlin that escaped my autisticity
 	  for far too long

@@ -26,36 +26,40 @@ import flumotion.common.setup
 # logging
 flumotion.common.setup.setup()
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.spread import pb
 
 # test objects to be used in unittests to simulate the processes
 # subclass them to add your own methods
 
-class TestAdmin(pb.Referenceable):
+class TestClient(pb.Referenceable):
     def run(self, port):
         self.perspective = None # perspective on the manager's PB server
-        f = pb.PBClientFactory()
-        reactor.connectTCP("127.0.0.1", port, f)
-        d = f.getRootObject()
+        self._f = pb.PBClientFactory()
+        self._p = reactor.connectTCP("127.0.0.1", port, self._f)
+        d = self._f.getRootObject()
         d.addCallback(self._gotRootObject)
         return d
 
-    def _gotRootObject(self, perspective):
-        self.perspective = perspective
-        return perspective.callRemote('identify', 'admin', self)
-
-class TestWorker(pb.Referenceable):
-    def run(self, port):
-        f = pb.PBClientFactory()
-        reactor.connectTCP("127.0.0.1", port, f)
-        d = f.getRootObject()
-        d.addCallback(self._gotRootObject)
-        return d
+    def stop(self):
+        self._p.disconnect()
+        return self._dDisconnect
 
     def _gotRootObject(self, perspective):
         self.perspective = perspective
-        return perspective.callRemote('identify', 'worker', self)
+
+        # make sure we will get a deferred fired on disconnect
+        # so that the broker gets cleaned up from the reactor as well
+        self._dDisconnect = defer.Deferred()
+        self.perspective.notifyOnDisconnect(
+            lambda r: self._dDisconnect.callback(None))
+        return perspective.callRemote('identify', self.type, self)
+
+class TestAdmin(TestClient):
+    type = 'admin'
+
+class TestWorker(TestClient):
+    type = 'worker'
 
 class TestManagerRoot(pb.Root):
     def remote_identify(self, who, reference):
@@ -69,6 +73,9 @@ class TestManager:
         """
         factory = pb.PBServerFactory(rootClass())
         factory.unsafeTracebacks = 1
-        p = reactor.listenTCP(0, factory, interface="127.0.0.1")
-        port = p.getHost().port
+        self._p = reactor.listenTCP(0, factory, interface="127.0.0.1")
+        port = self._p.getHost().port
         return port
+
+    def stop(self):
+        return self._p.stopListening()

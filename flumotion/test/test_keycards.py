@@ -74,21 +74,27 @@ class Root(common.TestManagerRoot):
         return keycard
 
 class TestKeycardSending(unittest.TestCase):
-    def testSend(self):
-        m = common.TestManager()
-        port = m.run(Root)
-        a = Admin()
-        d = a.run(port)
+    def setUp(self):
+        self.m = common.TestManager()
+        port = self.m.run(Root)
+        self.a = Admin()
+        d = self.a.run(port)
         unittest.deferredResult(d)
-        w = Worker()
-        d = w.run(port)
+        self.w = Worker()
+        d = self.w.run(port)
         unittest.deferredResult(d)
 
-        d = a.perspective.callRemote('workerGetKeycard')
+    def tearDown(self):
+        unittest.deferredResult(self.m.stop())
+        unittest.deferredResult(self.a.stop())
+        unittest.deferredResult(self.w.stop())
+
+    def testSend(self):
+        d = self.a.perspective.callRemote('workerGetKeycard')
         keycard = unittest.deferredResult(d)
 
         # now send back the keycard to see what happens
-        d = a.perspective.callRemote('workerGiveKeycard', keycard)
+        d = self.a.perspective.callRemote('workerGiveKeycard', keycard)
         result = unittest.deferredResult(d)
         
         # while writing this test, I came to the conclusion that since

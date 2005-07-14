@@ -97,9 +97,10 @@ class Dispatcher(log.Loggable):
         self.debug("returning Avatar: id %s, avatar %s" % (avatarId, avatar))
 
         # schedule a perspective attached for after this function
+        # FIXME: there needs to be a way to not have to do a callLater
+        # blindly so cleanup can be guaranteed
         reactor.callLater(0, avatar.attached, mind)
 
-        # return a tuple of interface, aspect, and logout function 
         return (pb.IPerspective, avatar,
                 lambda a=avatar, m=mind, i=avatarId: self.removeAvatar(i, a, m))
 

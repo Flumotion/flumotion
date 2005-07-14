@@ -22,7 +22,7 @@ import common
 
 from twisted.trial import unittest
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.spread import pb
 from flumotion.twisted import flavors
 
@@ -61,11 +61,15 @@ class TestRoot(common.TestManagerRoot):
 class TestStateSet(unittest.TestCase):
     def setUp(self):
         self.changes = []
+        self.runServer()
 
+    def tearDown(self):
+        unittest.deferredResult(self.stopServer())
+        
     # helper functions to start PB comms
     def runClient(self):
         f = pb.PBClientFactory()
-        reactor.connectTCP("127.0.0.1", self.port, f)
+        self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
         d = f.getRootObject()
         d.addCallback(self.clientConnected)
         return d
@@ -74,19 +78,28 @@ class TestStateSet(unittest.TestCase):
 
     def clientConnected(self, perspective):
         self.perspective = perspective
+        self._dDisconnect = defer.Deferred()
+        perspective.notifyOnDisconnect(
+            lambda r: self._dDisconnect.callback(None))
+
+    def stopClient(self):
+        self.cport.disconnect()
+        return self._dDisconnect
 
     def runServer(self):
         factory = pb.PBServerFactory(TestRoot())
         factory.unsafeTracebacks = 1
-        p = reactor.listenTCP(0, factory, interface="127.0.0.1")
-        self.port = p.getHost().port
+        self.sport = reactor.listenTCP(0, factory, interface="127.0.0.1")
+        self.port = self.sport.getHost().port
+
+    def stopServer(self):
+        d = self.sport.stopListening()
+        return d
 
     # actual tests
     def testStateSet(self):
         # start everything
-        self.runServer()
-        d = self.runClient()
-        unittest.deferredResult(d)
+        unittest.deferredResult(self.runClient())
         
         # get the state
         d = self.perspective.callRemote('getState')
@@ -101,10 +114,10 @@ class TestStateSet(unittest.TestCase):
         r = unittest.deferredResult(d)
 
         self.failUnlessEqual(state.get('name'), 'clark')
+        unittest.deferredResult(self.stopClient())
 
     def testStateAppendRemove(self):
         # start everything
-        self.runServer()
         d = self.runClient()
         unittest.deferredResult(d)
         
@@ -138,10 +151,10 @@ class TestStateSet(unittest.TestCase):
         r = unittest.deferredResult(d)
 
         self.failUnlessEqual(state.get('children'), ['robin', 'batman'])
+        unittest.deferredResult(self.stopClient())
 
     def testStateWrongListener(self):
         # start everything
-        self.runServer()
         d = self.runClient()
         unittest.deferredResult(d)
 
@@ -153,6 +166,7 @@ class TestStateSet(unittest.TestCase):
         self.assertRaises(NotImplementedError, state.removeListener,
             FakeObject())
         self.assertRaises(KeyError, state.removeListener, FakeListener())
+        unittest.deferredResult(self.stopClient())
 
     # listener interface
     __implements__ = flavors.IStateListener,
@@ -169,7 +183,6 @@ class TestStateSet(unittest.TestCase):
     # listener tests
     def testStateSetListener(self):
         # start everything
-        self.runServer()
         d = self.runClient()
         unittest.deferredResult(d)
 
@@ -184,10 +197,10 @@ class TestStateSet(unittest.TestCase):
         r = unittest.deferredResult(d)
         c = self.changes.pop()
         self.failUnlessEqual(c, ('set', state, 'name', 'robin'))
+        unittest.deferredResult(self.stopClient())
 
     def testStateAppendRemoveListener(self):
         # start everything
-        self.runServer()
         d = self.runClient()
         unittest.deferredResult(d)
         
@@ -224,6 +237,7 @@ class TestStateSet(unittest.TestCase):
 
         c = self.changes.pop()
         self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
+        unittest.deferredResult(self.stopClient())
 
 class TestState(unittest.TestCase):
     def testStateAddKey(self):
