@@ -23,7 +23,6 @@ worker-side objects to handle job processes
 """
 
 import os
-import sys
 import resource
 import signal
 import gobject
