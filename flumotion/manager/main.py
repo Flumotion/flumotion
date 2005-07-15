@@ -108,7 +108,13 @@ def main(args):
     # XXX: gst_init should remove all options, like gtk_init
     args = [arg for arg in args if not arg.startswith('--gst')]
     
-    parser = optparse.OptionParser()
+    usagemessage = "usage: %prog [options] config1.xml config2.xml [...]"
+    desc = "The manager is the core component of the Flumotion streaming\
+ server. It takes its configuration from one or more planet configuration\
+ files. If more than one configuration file is present, the files are\
+ merged at runtime to take configuration options from all files."
+
+    parser = optparse.OptionParser(usage=usagemessage, description=desc)
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",
                       help="set debug levels")

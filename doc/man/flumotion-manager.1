@@ -38,7 +38,7 @@ flumotion-manager \- streaming media server central management
 [
 .B -D
 ]
-.I configuration_file
+.I config.xml [config2.xml ...]
 
 .SH DESCRIPTION
 .B flumotion-manager
@@ -55,13 +55,21 @@ flumotion component. When starting flumotion-manager, you need only specify a
 .I planet configuration file
 , but it is frequently helpful to set other options from the command line.
 
+.B flumotion-manager
+can load multiple configuration files, if more than one is specified. These are
+loaded in order, and merged into a single configuration. This allows you to have
+one configuration file specify the basic manager configuration, such as 
+authentication configuration, and have a second specify the streaming 
+configuration.
+
 .SH OPTIONS
 .IP "-h, --help"
 Show a brief help message, then exit.
 .IP "--version"
 Show the version number.
 .IP "-v, --verbose"
-Be verbose in console output.
+Be verbose in console output. This is equivalent to setting the debug level to
+3, and will override any debug specifiers.
 .IP "-dDEBUG, --debug=DEBUG"
 Set the debug configuration to the specified 
 .B debug
@@ -122,6 +130,12 @@ Simple example, starting flumotion-manager using TCP, in verbose mode:
 .RS
 flumotion-manager -v -T tcp conf/managers/default/planet.xml
 .RE
+
+A slightly more complex example, using two different configuration files and
+running in the background:
+
+.RS
+flumotion-manager -T tcp -D conf/managers/default/planet.xml conf/managers/mystream.xml
 
 .SH BUGS
 Hopefully none. If you find any bugs, please report them at

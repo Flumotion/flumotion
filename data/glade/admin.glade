@@ -292,7 +292,7 @@
 		  <child>
 		    <widget class="GtkImageMenuItem" id="help_about">
 		      <property name="visible">True</property>
-		      <property name="label">gtk-about</property>
+		      <property name="label">About</property>
 		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="help_about_cb" last_modification_time="Wed, 01 Sep 2004 16:01:05 GMT"/>
 		    </widget>

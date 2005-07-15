@@ -1,3 +1,15 @@
+2005-07-15  Michael Smith <msmith@fluendo.com>
+
+	* data/glade/admin.glade:
+	Change the 'gtk-about' menu item into a slightly more user-friendly 
+	'About'
+	* doc/man/flumotion-admin.1:
+	* doc/man/flumotion-manager.1:
+	* doc/man/flumotion-worker.1:
+	* flumotion/manager/main.py:
+	Manpage updates, explain multiple config files in flumotion-manager,
+	and fix the flumotion-manager usage message.
+
 2005-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/videotest.py:
