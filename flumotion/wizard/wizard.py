@@ -31,7 +31,7 @@ from twisted.internet import defer
 
 from flumotion.configure import configure
 from flumotion.common import log, errors, worker
-from flumotion.wizard import enums, save, step, types, message
+from flumotion.wizard import enums, save, step, classes, message
 #from flumotion.wizard.sidebar import WizardSidebar
 from flumotion.ui import fgtk
 from flumotion.ui.glade import GladeWindow
@@ -47,9 +47,9 @@ __pychecker__ = 'no-classattr no-argsused'
 def escape(text):
     return text.replace('&', '&amp;')
 
-class Sections(types.KeyedList):
+class Sections(classes.KeyedList):
     def __init__(self, *args):
-        types.KeyedList.__init__(self, *args)
+        classes.KeyedList.__init__(self, *args)
         self.add_key(str, lambda x: x.section)
 
 class Scenario:
@@ -63,7 +63,7 @@ class Scenario:
         self.sidebar.set_sections([(x.section, x.name) for x in self.sections])
         self.current_section = 0
         self.steps = list(self.sections)
-        self.stack = types.WalkableStack()
+        self.stack = classes.WalkableStack()
         self.current_step = None
         self.sidebar.connect('step-chosen', self.step_selected)
     

@@ -1,3 +1,13 @@
+2005-07-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/python.mk:
+	  disable our custom python install program for testing on FC4
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/types.py:
+	* flumotion/wizard/wizard.py:
+	  rename types to classes so it doesn't conflict with the standard
+	  types module and break make install
+
 2005-07-15  Michael Smith <msmith@fluendo.com>
 
 	* data/glade/admin.glade:

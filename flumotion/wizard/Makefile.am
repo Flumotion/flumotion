@@ -10,7 +10,7 @@ flumotion_PYTHON = \
 	sidebar.py \
 	step.py \
 	steps.py \
-	types.py \
+	classes.py \
 	wizard.py \
 	worker.py
 
