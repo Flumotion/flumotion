@@ -1,3 +1,13 @@
+2005-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-worker.in:
+	  use twisted.compat to install the reactor
+	* flumotion/twisted/compat.py:
+	  use the glib2reactor in twisted 2.0
+	* flumotion/worker/worker.py:
+	  don't ignore SIGINT, the reactor handles it nicely.
+	  another step on the way to twisted 2.0 compat
+
 2005-07-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/python.mk:

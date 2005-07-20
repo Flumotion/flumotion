@@ -289,7 +289,11 @@ class WorkerBrain(log.Loggable):
         self._oldSIGTERMHandler = None # stored by installSIGTERMHandler
         self.options = options
 
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        # we used to ignore SIGINT from here on down, but actually
+        # the reactor catches these properly in both 1.3 and 2.0,
+        # and in 2.0 setting it to ignore first will make the reactor
+        # not catch it (because it compares to the default int handler)
+        # signal.signal(signal.SIGINT, signal.SIG_IGN)
 
         self.manager_host = options.host
         self.manager_port = options.port

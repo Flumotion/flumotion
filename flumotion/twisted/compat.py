@@ -34,3 +34,10 @@ def filterWarnings(namespace, category):
         return
     c = getattr(namespace, category)
     warnings.filterwarnings('ignore', category=c)
+
+def install_reactor():
+    try:
+        from twisted.internet import glib2reactor as reactor
+    except ImportError:
+        from flumotion.twisted import gstreactor as reactor
+    reactor.install()
