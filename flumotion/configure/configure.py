@@ -86,8 +86,8 @@ config_dict['defaultGstPortRange'] = range(8600, 8639 + 1)
 
 # default values for service-related stuff
 # how long to wait before timing out term and kill signals
-config_dict['processTermWait'] = 2
-config_dict['processKillWait'] = 2
+config_dict['processTermWait'] = 5
+config_dict['processKillWait'] = 5
 
 # default value for component heartbeat interval, in seconds
 config_dict['heartbeatInterval'] = 5

@@ -1,5 +1,12 @@
 2005-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-manager.in:
+	  install correct manager here too
+	* flumotion/configure/configure.py:
+	  increase timeouts a little
+
+2005-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-worker.in:
 	  use twisted.compat to install the reactor
 	* flumotion/twisted/compat.py:
