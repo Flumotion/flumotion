@@ -1,3 +1,10 @@
+2005-07-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/job.py:
+	  do the least amount necessary to have working worker shutdown
+	  for both twisted 2.0 and twisted 1.3
+	  needs cleanup by refactoring components and cleanup properly
+
 2005-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/flumotion-manager.in:

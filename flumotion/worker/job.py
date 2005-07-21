@@ -121,6 +121,7 @@ class JobMedium(medium.BaseMedium):
         self.options = options
         self.avatarId = None
         self.logName = None
+        self.component = None
 
     ### pb.Referenceable remote methods called on by the WorkerBrain
     ### FIXME: arguments not needed anymore, Medium knows about options
@@ -150,10 +151,30 @@ class JobMedium(medium.BaseMedium):
 
     def remote_stop(self):
         self.debug('remote_stop() called')
-        reactor.stop()
-        #os._exit(0)
+        # stop reactor from a callLater so this remote method finishes
+        # nicely
+        reactor.callLater(0, self.shutdown)
 
     ### our methods
+    def shutdown(self):
+        # FIXME: for now this method actually stops reactor and exits
+        # completely; but ideally we'd do nice cleanup so we don't have
+        # to exit here, but just let the reactor be exited from
+        """
+        Shut down the job process completely, cleaning up the component
+        so the reactor can be left from.
+        """
+        self.debug('stopping component')
+        self.component.stop()
+        self.debug('stopped component')
+        self.debug('calling reactor.stop')
+        reactor.stop()
+        self.debug('called reactor.stop')
+        # we do this here as a quick-stop gap for Twisted 2.0
+        # but ideally we would have better cleanup using deferreds
+        # and then the reactor would be left correctly
+        os._exit(0)
+
     def _set_nice(self, nice):
         if not nice:
             return
@@ -253,6 +274,7 @@ class JobMedium(medium.BaseMedium):
             self.error('Unknown transport protocol %s' % self.manager_transport)
 
         self.component_factory = manager_client_factory
+        self.component = comp
         
 class JobClientFactory(pb.PBClientFactory, log.Loggable):
     """
@@ -291,6 +313,13 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
 
     def _connectedErrback(self, error):
         print 'ERROR:' + str(error)
+
+    # the only way stopFactory can be called is if the WorkerBrain closes
+    # the pb server.  Ideally though we would have gotten a notice before.
+    def stopFactory(self):
+        self.debug('shutting down medium')
+        self.medium.shutdown()
+        self.debug('shut down medium')
 
 def getSocketPath():
     # FIXME: better way of getting at a tmp dir ?
