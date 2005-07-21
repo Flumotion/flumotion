@@ -1,5 +1,13 @@
 2005-07-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	Patch by: Gergely Nagy
+
+	* data/glade/wizard_consumption.glade:
+	* flumotion/wizard/steps.py:
+	  fix issue #240: sensitivity of forward button on consumption page
+
+2005-07-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/job.py:
 	  do the least amount necessary to have working worker shutdown
 	  for both twisted 2.0 and twisted 1.3

@@ -854,11 +854,20 @@ class Consumption(WizardSection):
         
         self.verify()
 
+    def on_secondary_checkbutton_toggled(self, button):
+        self.verify()
+
     def verify(self):
         if (not self.checkbutton_disk and not self.checkbutton_http):
             self.wizard.block_next(True)
         else:
-            self.wizard.block_next(False)
+            if ((self.checkbutton_disk and not self.checkbutton_disk_audio and
+                 not self.checkbutton_disk_video and not self.checkbutton_disk_audio_video) or
+                (self.checkbutton_http and not self.checkbutton_http_audio and
+                 not self.checkbutton_http_video and not self.checkbutton_http_audio_video)):
+                self.wizard.block_next(True)
+            else:
+                self.wizard.block_next(False)
 
     def activated(self):
         has_audio = self.wizard.get_step_option('Source', 'has_audio')
