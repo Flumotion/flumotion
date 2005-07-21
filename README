@@ -129,8 +129,9 @@ http://lists.fluendo.com/mailman/listinfo/flumotion-devel
 
 You can visit us on IRC: #fluendo on irc.freenode.org
 
-You can visit our issues tracker:
-https://core.fluendo.com/tracker/
+You can visit our trac installation for the Wiki, source browsing and
+ticket tracking:
+https://core.fluendo.com/flumotion/trac
 
 LICENSING
 ---------
