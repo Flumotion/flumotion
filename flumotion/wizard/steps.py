@@ -951,6 +951,12 @@ class HTTP(WizardStep):
  
         return options
 
+    def on_entry_mount_point_changed(self, entry):
+        if entry.get_text() == '':
+            self.wizard.block_next(True)
+        else:
+            self.wizard.block_next(False)
+
 class HTTPBoth(HTTP):
     name = 'HTTP Streamer (audio & video)'
     sidebar_name = 'HTTP audio/video'

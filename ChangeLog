@@ -2,6 +2,14 @@
 
 	Patch by: Gergely Nagy
 
+	* data/glade/wizard_http.glade:
+	* flumotion/wizard/steps.py:
+	  fix issue #241: block forward when no mount point specified
+
+2005-07-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	Patch by: Gergely Nagy
+
 	* data/glade/wizard_consumption.glade:
 	* flumotion/wizard/steps.py:
 	  fix issue #240: sensitivity of forward button on consumption page
