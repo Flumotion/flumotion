@@ -1,3 +1,8 @@
+2005-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/wizard_disk.glade:
+	  make disker ui show up again.  Fixes #264.
+
 2005-07-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	Patch by: Gergely Nagy
