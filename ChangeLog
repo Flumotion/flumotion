@@ -1,5 +1,12 @@
 2005-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	Patch by: Gergely Nagy
+
+	* flumotion/admin/gtk/client.py:
+	  fix #236: prompt when possibly overwriting exported config
+
+2005-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/wizard_disk.glade:
 	  make disker ui show up again.  Fixes #264.
 

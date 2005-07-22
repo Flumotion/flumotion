@@ -19,6 +19,7 @@
 # Headers in this file shall remain intact.
 
 import os
+import os.path
 import sys
 
 import gobject
@@ -869,17 +870,31 @@ class Window(log.Loggable, gobject.GObject):
         d.show()
         d.connect('response', self.on_import_response)
     
-    def getConfiguration_cb(self, conf_xml, name):
-        f = open(name, 'w')
-        f.write(conf_xml)
-        f.close()
+    def getConfiguration_cb(self, conf_xml, name, chooser):
+        file_exists = True
+        if os.path.exists(name):
+            d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
+                                  gtk.MESSAGE_ERROR, gtk.BUTTONS_YES_NO,
+                                  "File already exists.\nOverwrite?")
+            d.connect("response", lambda self, response: d.hide())
+            if d.run() == gtk.RESPONSE_YES:
+                file_exists = False
+        else:
+            file_exists = False
+
+        if not file_exists:
+            f = open(name, 'w')
+            f.write(conf_xml)
+            f.close()
+            chooser.destroy()
 
     def on_export_response(self, d, response):
         if response==gtk.RESPONSE_ACCEPT:
             deferred = self.admin.getConfiguration()
             name = d.get_filename()
-            deferred.addCallback(self.getConfiguration_cb, name)
-        d.destroy()
+            deferred.addCallback(self.getConfiguration_cb, name, d)
+        else:
+            d.destroy()
 
     def file_export_configuration_cb(self, button):
         d = gtk.FileChooserDialog("Export Configuration...", self.window,
