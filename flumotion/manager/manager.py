@@ -388,6 +388,7 @@ class Vishnu(log.Loggable):
                     except IOError, e:
                         self.error("Could not add %s to bundle %s" % (
                             fullpath, bundleName))
+                        self.debug("Reason: %r" % e)
 
             for d in b.getDependencies():
                 self.log('Adding dependency of %s on %s' % (bundleName, d))
