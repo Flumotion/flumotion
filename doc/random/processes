@@ -1,0 +1,22 @@
+Some notes about process management
+-----------------------------------
+
+- In general, processes can be told to shut down:
+  - on explicit user request (UI, send a message, ...)
+  - on explicit program request (pb shutdown message, ...)
+  - reception of SIGINT (e.g. ctrl-C)
+  - reception of SIGTERM (the default "kill" signal)
+  - reception of SIGKILL (handled by the kernel, never received by process)
+
+- A worker forks job processes, and these job processes can also be told
+  to shut down, and should do so in a sensible way.
+
+- When the main worker process is told to shut down, it should also make sure
+  all of its job children shut down correctly.
+
+Job processes
+-------------
+- should:
+  - have a SIGINT handler that stops the component
+  - have a SIGTERM handler that stops the component
+  - have a worker brain-callable method to shut down nicely
