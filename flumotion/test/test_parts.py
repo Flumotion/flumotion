@@ -35,6 +35,9 @@ class TestAdminStatusbar(unittest.TestCase):
     def setUp(self):
         self.window = gtk.Window()
         self.widget = gtk.Statusbar()
+        # work around a bug in Statusbar that ends up doing a negative
+        # w/h size request by setting a window size
+        self.window.set_size_request(100, 100)
         self.window.add(self.widget)
         self.window.show_all()
         self.bar = parts.AdminStatusbar(self.widget)

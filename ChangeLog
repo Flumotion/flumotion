@@ -1,5 +1,16 @@
 2005-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/Makefile.am:
+	  don't use tee, since then a failing trial gets lost
+	* flumotion/test/test_config.py:
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_registry.py:
+	  fix up for new getRegistry()/parse() behaviour
+	* flumotion/test/test_parts.py:
+	  get rid of a gtk warning
+
+2005-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-manager.in:
 	* bin/flumotion-worker.in:
 	* flumotion/common/config.py:

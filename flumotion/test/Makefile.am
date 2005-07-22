@@ -40,15 +40,20 @@ EXTRA_DIST = 				\
 
 check-local:
 	@if PYTHONPATH=$(top_srcdir):$(PYTHONPATH)			\
-	trial -R flumotion.test | tee test.log;				\
+	trial -l test.log -R flumotion.test;				\
 	then 								\
 	    rm -fr $(top_builddir)/flumotion/test/_trial_temp;		\
-	    if grep "Could not import" test.log > /dev/null; then	\
-	        exit 1;							\
+	    if test -e test.log; then					\
+		if grep "Could not import" test.log > /dev/null; then	\
+	            exit 1;						\
+		fi;							\
 	    fi;								\
-	    rm test.log;						\
+            make rm-test-log;						\
 	else								\
-	    rm test.log;						\
+            make rm-test-log;						\
 	    exit 1;							\
 	fi
 	@rm -fr $(top_builddir)/flumotion/test/*.pyc
+
+rm-test-log:
+	@if test -e test.log; then rm test.log; fi

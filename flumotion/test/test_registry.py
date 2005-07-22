@@ -35,35 +35,35 @@ class TestRegistry(unittest.TestCase):
         self.reg.clean()
         
     def testDefault(self):
-        assert hasattr(registry, 'registry')
-        reg = registry.registry
-        assert isinstance(reg, registry.ComponentRegistry)
+        self.failUnless(hasattr(registry, 'getRegistry'))
+        reg = registry.getRegistry()
+        self.failUnless(isinstance(reg, registry.ComponentRegistry))
         
     def testIsTrue(self):
-        assert _istrue('True')
-        assert _istrue('true')
-        assert _istrue('1')
-        assert _istrue('yes')
-        assert not _istrue('False') 
-        assert not _istrue('false') 
-        assert not _istrue('0') 
-        assert not _istrue('no') 
-        assert not _istrue('I am a monkey') 
+        self.failUnless(_istrue('True'))
+        self.failUnless(_istrue('true'))
+        self.failUnless(_istrue('1'))
+        self.failUnless(_istrue('yes'))
+        self.failIf(_istrue('False') )
+        self.failIf(_istrue('false') )
+        self.failIf(_istrue('0') )
+        self.failIf(_istrue('no') )
+        self.failIf(_istrue('I am a monkey') )
 
     def testgetMTime(self):
         mtime = registry._getMTime(__file__)
-        assert mtime
-        assert isinstance(mtime, int)
+        self.failUnless(mtime)
+        self.failUnless(isinstance(mtime, int))
         
     def testParseBasic(self):
-        assert self.reg.isEmpty()
+        self.failUnless(self.reg.isEmpty())
         self.reg.addFromString('<root></root>')
-        assert self.reg.isEmpty()
+        self.failUnless(self.reg.isEmpty())
         self.reg.addFromString('<registry><components></components></registry>')
-        assert self.reg.isEmpty()
+        self.failUnless(self.reg.isEmpty())
         
     def testParseComponents(self):
-        assert self.reg.isEmpty()
+        self.failUnless(self.reg.isEmpty())
         self.reg.addFromString("""
 <registry>
   <components>
@@ -74,27 +74,27 @@ class TestRegistry(unittest.TestCase):
   </components>
 </registry>""")
 
-        assert not self.reg.isEmpty()
+        self.failIf(self.reg.isEmpty())
         
-        assert not self.reg.hasComponent('foo')
-        assert self.reg.hasComponent('bar')
+        self.failIf(self.reg.hasComponent('foo'))
+        self.failUnless(self.reg.hasComponent('bar'))
         comp1 = self.reg.getComponent('bar')
-        assert isinstance(comp1, registry.RegistryEntryComponent)
+        self.failUnless(isinstance(comp1, registry.RegistryEntryComponent))
 
-        assert not self.reg.hasComponent('foobie')
+        self.failIf(self.reg.hasComponent('foobie'))
 
-        assert self.reg.hasComponent('baz')
+        self.failUnless(self.reg.hasComponent('baz'))
         comp2 = self.reg.getComponent('baz')
-        assert isinstance(comp2, registry.RegistryEntryComponent)
+        self.failUnless(isinstance(comp2, registry.RegistryEntryComponent))
 
         comps = self.reg.getComponents()
         comps.sort()
-        assert len(comps) == 2
-        assert comp1 in comps
-        assert comp2 in comps
+        self.assertEquals(len(comps), 2)
+        self.failUnless(comp1 in comps)
+        self.failUnless(comp2 in comps)
         
     def testParseComponentProperties(self):
-        assert self.reg.isEmpty()
+        self.failUnless(self.reg.isEmpty())
         self.reg.addFromString("""
 <registry>
   <components>
@@ -108,13 +108,13 @@ class TestRegistry(unittest.TestCase):
 
         comp = self.reg.getComponent('component')
         props = comp.getProperties()
-        assert props
-        assert len(props) == 1
+        self.failUnless(props)
+        self.assertEquals(len(props), 1)
         prop = props[0]
-        assert prop.getName() == 'source'
-        assert prop.getType() == 'string'
-        assert prop.isRequired()
-        assert prop.isMultiple()
+        self.assertEquals(prop.getName(), 'source')
+        self.assertEquals(prop.getType(), 'string')
+        self.failUnless(prop.isRequired())
+        self.failUnless(prop.isMultiple())
 
     def testParseComponentPropertiesErrors(self):
         template = """
@@ -151,7 +151,7 @@ class TestRegistry(unittest.TestCase):
         reg = registry.ComponentRegistry()
         reg.addFromString(xml)
         reg.clean()
-        assert reg.isEmpty()
+        self.failUnless(reg.isEmpty())
 
     def testComponentTypeError(self):
         reg = registry.ComponentRegistry()
@@ -313,7 +313,7 @@ class TestFindComponents(unittest.TestCase):
     def testSimple(self):
         self.reg.addRegistryPath('.')
         components = self.reg.getComponents()
-        assert len(components) == 3, len(components)
+        self.assertEquals(len(components), 3)
         types = [c.getType() for c in components]
         types.sort()
-        assert types == ['first', 'second', 'third'] # alpha order
+        self.assertEquals(types, ['first', 'second', 'third']) # alpha order

@@ -297,9 +297,9 @@ class TestVishnu(unittest.TestCase, log.Loggable):
     logCategory = "TestVishnu"
 
     def setUp(self):
-        # load registry
-        from flumotion.common.registry import registry
-        registry.verify()
+        # load and verify registry
+        from flumotion.common import registry
+        reg = registry.getRegistry()
 
         self.vishnu = manager.Vishnu('test', unsafeTracebacks=1)
         self._workers = {}    # id -> avatar
