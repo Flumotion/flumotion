@@ -383,7 +383,11 @@ class Vishnu(log.Loggable):
                     relative = filename.getRelative()
                     self.log('Adding path %s as %s to bundle %s' % (
                         fullpath, relative, bundleName))
-                    self.bundlerBasket.add(bundleName, fullpath, relative)
+                    try:
+                        self.bundlerBasket.add(bundleName, fullpath, relative)
+                    except IOError, e:
+                        self.error("Could not add %s to bundle %s" % (
+                            fullpath, bundleName))
 
             for d in b.getDependencies():
                 self.log('Adding dependency of %s on %s' % (bundleName, d))

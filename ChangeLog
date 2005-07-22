@@ -1,5 +1,10 @@
 2005-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/manager.py:
+	  error out when we couldn't find a file to add to a bundle
+
+2005-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	Patch by: Gergely Nagy
 
 	* flumotion/admin/gtk/client.py:
