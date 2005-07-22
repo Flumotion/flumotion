@@ -671,6 +671,7 @@ class ComponentRegistry(log.Loggable):
 
     def __init__(self):
         self._parser = RegistryParser()
+        self.verify()
 
         if (os.path.exists(self.filename) and
             os.access(self.filename, os.R_OK)):
@@ -678,6 +679,8 @@ class ComponentRegistry(log.Loggable):
             self._parser.parseRegistry(self.filename)
     
     def addFile(self, filename, string=None):
+        if filename.endswith('registry.xml'):
+            self.warning('%s seems to be an old registry in your tree, please remove it' % filename) 
         self.debug('Adding file: %s' % filename)
         self._parser.parseRegistryFile(filename, string)
         
@@ -903,4 +906,15 @@ class ComponentRegistry(log.Loggable):
 
         self.save(force)
 
-registry = ComponentRegistry()
+__registry = None
+
+def getRegistry():
+    """
+    Return the registry.  Only one registry will ever be created.
+    """
+    global __registry
+
+    if not __registry:
+        __registry = ComponentRegistry()
+
+    return __registry

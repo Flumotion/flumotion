@@ -1,5 +1,23 @@
 2005-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-manager.in:
+	* bin/flumotion-worker.in:
+	* flumotion/common/config.py:
+	* flumotion/common/registry.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/manager.py:
+	* flumotion/worker/config.py:
+	* flumotion/worker/job.py:
+	  rework registry code so that
+	  - internal API is marked as such
+	  - for manager config files, initially only parts of the
+	    .manager object are filled in that don't require the registry
+	  This allows for registry parsing to be loggable and debuggable
+	  since it now happens after setting the appropriate debug level.
+	  I may be on crack.
+
+2005-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/manager.py:
 	  error out when we couldn't find a file to add to a bundle
 

@@ -29,8 +29,7 @@ from twisted.spread import pb
 from twisted.python import failure
 
 from flumotion.manager import base
-from flumotion.common import errors, interfaces, log, planet
-from flumotion.common.registry import registry
+from flumotion.common import errors, interfaces, log, planet, registry
 
 # make ComponentState proxyable
 from flumotion.twisted import flavors
@@ -182,7 +181,8 @@ class AdminAvatar(base.ManagerAvatar):
         self.debug('getting entry of type %s for component %s of type %s' % (
             type, componentName, componentType))
         try:
-            componentRegistryEntry = registry.getComponent(componentType)
+            componentRegistryEntry = registry.getRegistry().getComponent(
+                componentType)
             # FIXME: add logic here for default entry points and functions
             entry = componentRegistryEntry.getEntryByType(type)
         except KeyError:

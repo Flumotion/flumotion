@@ -28,8 +28,7 @@ from xml.parsers import expat
 
 from twisted.python import reflect 
 
-from flumotion.common.registry import registry
-from flumotion.common import log, errors, common
+from flumotion.common import log, errors, common, registry
 
 # FIXME: move this to errors and adapt everywhere
 from errors import ConfigError
@@ -86,6 +85,13 @@ class ConfigEntryAtmosphere:
 class FlumotionConfigXML(log.Loggable):
     """
     I represent a planet configuration file for Flumotion.
+
+    @var manager:    A L{ConfigEntryManager} containing options for the manager
+                     section, filled in at construction time.
+    @var atmosphere: A L{ConfigEntryAtmosphere}, filled in when parse() is
+                     called.
+    @var flows:      A list of L{ConfigEntryFlow}, filled in when parse() is
+                     called.
     """
     logCategory = 'config'
 
@@ -109,7 +115,9 @@ class FlumotionConfigXML(log.Loggable):
         else:
             self.path = None
             
-        self.parse()
+        # We parse without asking for a registry so the registry doesn't
+        # verify before knowing the debug level
+        self.parse(noRegistry=True)
         
     def getPath(self):
         return self.path
@@ -117,7 +125,7 @@ class FlumotionConfigXML(log.Loggable):
     def export(self):
         return self.doc.toxml()
 
-    def parse(self):
+    def parse(self, noRegistry=False):
         # <planet>
         #     <manager>
         #     <atmosphere>
@@ -133,19 +141,23 @@ class FlumotionConfigXML(log.Loggable):
         for node in root.childNodes:
             if node.nodeType != Node.ELEMENT_NODE:
                 continue
+
+            if noRegistry and node.nodeName != 'manager':
+                continue
+                
             if node.nodeName == 'atmosphere':
-                entry = self.parseAtmosphere(node)
+                entry = self._parseAtmosphere(node)
                 self.atmosphere = entry
             elif node.nodeName == 'flow':
-                entry = self.parseFlow(node)
+                entry = self._parseFlow(node)
                 self.flows.append(entry)
             elif node.nodeName == 'manager':
-                entry = self.parseManager(node)
+                entry = self._parseManager(node, noRegistry)
                 self.manager = entry
             else:
                 raise ConfigError("unexpected node under 'planet': %s" % node.nodeName)
 
-    def parseAtmosphere(self, node):
+    def _parseAtmosphere(self, node):
         # <atmosphere>
         #   <component>
         #   ...
@@ -158,14 +170,14 @@ class FlumotionConfigXML(log.Loggable):
                 continue
             
             if child.nodeName == "component":
-                component = self.parseComponent(child, 'atmosphere')
+                component = self._parseComponent(child, 'atmosphere')
             else:
                 raise ConfigError("unexpected 'atmosphere' node: %s" % child.nodeName)
 
             atmosphere.components[component.name] = component
         return atmosphere
      
-    def parseComponent(self, node, parent):
+    def _parseComponent(self, node, parent):
         """
         Parse a <component></component> block.
 
@@ -186,7 +198,7 @@ class FlumotionConfigXML(log.Loggable):
             worker = str(node.getAttribute('worker'))
 
         try:
-            defs = registry.getComponent(type)
+            defs = registry.getRegistry().getComponent(type)
         except KeyError:
             raise errors.UnknownComponentError(
                 "unknown component type: %s" % type)
@@ -194,7 +206,7 @@ class FlumotionConfigXML(log.Loggable):
         properties = defs.getProperties()
 
         self.debug('Parsing component: %s' % name)
-        options = self.parseProperties(node, type, properties)
+        options = self._parseProperties(node, type, properties)
 
         config = { 'name': name,
                    'parent': parent,
@@ -203,7 +215,7 @@ class FlumotionConfigXML(log.Loggable):
 
         return ConfigEntryComponent(name, parent, type, config, defs, worker)
 
-    def parseFlow(self, node):
+    def _parseFlow(self, node):
         # <flow name="...">
         #   <component>
         #   ...
@@ -227,14 +239,14 @@ class FlumotionConfigXML(log.Loggable):
                 continue
             
             if child.nodeName == "component":
-                component = self.parseComponent(child, name)
+                component = self._parseComponent(child, name)
             else:
                 raise ConfigError("unexpected 'flow' node: %s" % child.nodeName)
 
             flow.components[component.name] = component
         return flow
 
-    def parseManager(self, node):
+    def _parseManager(self, node, noRegistry=False):
         # <manager>
         #   <component>
         #   ...
@@ -267,9 +279,12 @@ class FlumotionConfigXML(log.Loggable):
                 if not transport in ('tcp', 'ssl'):
                     raise ConfigError("<transport> must be ssl or tcp")
             elif child.nodeName == "component":
+                if noRegistry:
+                    continue
+
                 if bouncer:
                     raise ConfigError("<manager> section can only have one <component>")
-                bouncer = self.parseComponent(child, 'manager')
+                bouncer = self._parseComponent(child, 'manager')
             elif child.nodeName == "debug":
                 fludebug = str(child.firstChild.nodeValue)
             else:
@@ -279,20 +294,20 @@ class FlumotionConfigXML(log.Loggable):
 
         return ConfigEntryManager(name, host, port, transport, bouncer, fludebug)
 
-    def get_float_value(self, nodes):
+    def _get_float_value(self, nodes):
         return [float(subnode.childNodes[0].data) for subnode in nodes]
 
-    def get_int_value(self, nodes):
+    def _get_int_value(self, nodes):
         return [int(subnode.childNodes[0].data) for subnode in nodes]
 
-    def get_long_value(self, nodes):
+    def _get_long_value(self, nodes):
         return [long(subnode.childNodes[0].data) for subnode in nodes]
 
-    def get_bool_value(self, nodes):
+    def _get_bool_value(self, nodes):
         valid = ['True', 'true', '1', 'Yes', 'yes']
         return [subnode.childNodes[0].data in valid for subnode in nodes]
 
-    def get_string_value(self, nodes):
+    def _get_string_value(self, nodes):
         values = []
         for subnode in nodes:
             data = subnode.childNodes[0].data
@@ -310,7 +325,7 @@ class FlumotionConfigXML(log.Loggable):
 
         return values
 
-    def get_raw_string_value(self, nodes):
+    def _get_raw_string_value(self, nodes):
         values = []
         for subnode in nodes:
             data = str(subnode.childNodes[0].data)
@@ -319,7 +334,7 @@ class FlumotionConfigXML(log.Loggable):
         string = "".join(values)
         return [string, ]
      
-    def get_xml_value(self, nodes):
+    def _get_xml_value(self, nodes):
         class XMLProperty:
             pass
         
@@ -342,7 +357,7 @@ class FlumotionConfigXML(log.Loggable):
 
         return values
 
-    def parseProperties(self, node, type, properties):
+    def _parseProperties(self, node, type, properties):
         # XXX: We might end up calling float(), which breaks
         #      when using LC_NUMERIC when it is not C
         import locale
@@ -365,19 +380,19 @@ class FlumotionConfigXML(log.Loggable):
 
             type = definition.type
             if type == 'string':
-                value = self.get_string_value(nodes)
+                value = self._get_string_value(nodes)
             elif type == 'rawstring':
-                value = self.get_raw_string_value(nodes)
+                value = self._get_raw_string_value(nodes)
             elif type == 'int':
-                value = self.get_int_value(nodes)
+                value = self._get_int_value(nodes)
             elif type == 'long':
-                value = self.get_long_value(nodes)
+                value = self._get_long_value(nodes)
             elif type == 'bool':
-                value = self.get_bool_value(nodes)
+                value = self._get_bool_value(nodes)
             elif type == 'float':
-                value = self.get_float_value(nodes)
+                value = self._get_float_value(nodes)
             elif type == 'xml':
-                value = self.get_xml_value(nodes)
+                value = self._get_xml_value(nodes)
             else:
                 raise ConfigError("invalid property type: %s" % type)
 

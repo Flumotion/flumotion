@@ -146,7 +146,8 @@ class JobMedium(medium.BaseMedium):
         self.avatarId = avatarId
         self.logName = avatarId
 
-        defs = registry.registry.getComponent(type)
+        # FIXME: the worker shouldn't need a registry - see #12e #12e #129 
+        defs = registry.getRegistry().getComponent(type)
         self._runComponent(avatarId, type, config, defs, feedPorts)
 
     def remote_stop(self):

@@ -26,7 +26,6 @@ import os
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
-from flumotion.common.registry import registry
 from flumotion.common import log
 
 class ConfigError(Exception):

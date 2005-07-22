@@ -225,6 +225,7 @@ class Vishnu(log.Loggable):
         # FIXME: we should be able to create "wanted" config/state from
         # something else than XML as well
         self.configuration = conf = config.FlumotionConfigXML(filename, data)
+        conf.parse()
 
         # scan filename for a bouncer component in the manager
         # FIXME: we should have a "running" state object layout similar
@@ -235,8 +236,8 @@ class Vishnu(log.Loggable):
 
             self.debug('going to start manager bouncer %s of type %s' % (
                 conf.manager.bouncer.name, conf.manager.bouncer.type))
-            from flumotion.common.registry import registry
-            defs = registry.getComponent(conf.manager.bouncer.type)
+            defs = registry.getRegistry().getComponent(
+                conf.manager.bouncer.type)
             configDict = conf.manager.bouncer.getConfigDict()
             from flumotion.worker import job
             bouncer = job.getComponent(configDict, defs)
@@ -372,7 +373,7 @@ class Vishnu(log.Loggable):
     def _setupBundleBasket(self):
         self.bundlerBasket = bundle.BundlerBasket()
 
-        for b in registry.registry.getBundles():
+        for b in registry.getRegistry().getBundles():
             bundleName = b.getName()
             self.debug('Adding bundle %s' % bundleName)
             for d in b.getDirectories():
