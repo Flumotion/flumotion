@@ -38,7 +38,7 @@ EXTRA_DIST = 				\
 	test_wizard.py 			\
 	test_workerconfig.py
 
-check-local:
+check-local: rm-test-log
 	@if PYTHONPATH=$(top_srcdir):$(PYTHONPATH)			\
 	trial -l test.log -R flumotion.test;				\
 	then 								\
