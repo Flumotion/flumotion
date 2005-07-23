@@ -190,13 +190,22 @@ class TestPackagePath(unittest.TestCase):
         common.registerPackagePath(self.tempdir)
         os.system("rm -r %s" % self.tempdir)
 
+    def _import(self, which):
+        exec("import %s" % which)
+
     def testTwoStackedProjects(self):
-        # we create two stacked projects
-        # A is under a subdir of tempdir
-        # B lives in the tempdir
+        # we create two stacked projects both with a "package" import space
+        # project A:
+        #   tempdir/A/package/__init__.py
+        #   tempdir/A/package/A.py
+        # project B:
+        #   tempdir/package/__init__.py
+        #   tempdir/package/B.py
+        
         # each has parts of a common namespace
         # set up stuff so we can import from both
         # this shows we can develop uninstalled against uninstalled
+
         self.cwd = os.getcwd()
         self.tempdir = tempfile.mkdtemp('', 'trial')
 
@@ -206,33 +215,22 @@ class TestPackagePath(unittest.TestCase):
         os.chdir(self.tempdir)
 
         # first show we cannot import from A
-        try:
-            import package.A
-            self.fail("Should not be able to import package.A")
-        except ImportError:
-            pass
+        self.assertRaises(ImportError, self._import, "package.A")
 
         # set up so we can import from A
         sys.path.append(self.adir)
-        try:
-            import package.A
-        except ImportError:
-            self.fail("Should be able to import package.A")
+        self.failUnless(self._import, "package.A")
 
         # but still can't from project B under same namespace
-        try:
-            import package.B
-            self.fail("Should not be able to import package.B")
-        except ImportError:
-            pass
+        self.assertRaises(ImportError, self._import, "package.B")
 
         # but we can pull in registerPackagePath from project A to bootstrap,
         # and register the space for B
-        package.A.registerPackagePath(self.tempdir, prefix='package')
-        try:
-            import package.B
-        except ImportError:
-            self.fail("Should be able to import package.B")
+        import package.A
+        package.A.registerPackagePath(
+            os.path.join(self.tempdir, 'B'),
+            prefix='package')
+        self.failUnless(self._import, "package.B")
 
     def _createA(self):
         self.adir = os.path.join(self.tempdir, "A")
@@ -246,10 +244,12 @@ class TestPackagePath(unittest.TestCase):
         handle.close()
 
     def _createB(self):
-        packagedir = os.path.join(self.tempdir, "package")
-        os.mkdir(packagedir)
-        open(os.path.join(packagedir, "__init__.py"), "w").close()
-        handle = open(os.path.join(packagedir, "B.py"), "w")
+        self.bdir = os.path.join(self.tempdir, "B")
+        os.mkdir(self.bdir)
+        bpackagedir = os.path.join(self.bdir, "package")
+        os.mkdir(bpackagedir)
+        open(os.path.join(bpackagedir, "__init__.py"), "w").close()
+        handle = open(os.path.join(bpackagedir, "B.py"), "w")
         handle.write('me = "B"\n')
         handle.close()
 
