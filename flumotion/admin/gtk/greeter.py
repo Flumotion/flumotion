@@ -1,4 +1,4 @@
-# -*- Mode: Python; fill-column: 80 -*-
+# -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -12,7 +12,7 @@
 # See "LICENSE.GPL" in the source distribution for more information.
 
 # Licensees having purchased or holding a valid Flumotion Advanced
-# Streaming Server license may use this file in accordance with th
+# Streaming Server license may use this file in accordance with the
 # Flumotion Advanced Streaming Server Commercial License Agreement.
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
