@@ -1,9 +1,6 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/producers/bttv/admin_gtk.py:
-# admin client-side code for bttv
-# 
 # Flumotion - a streaming media server
 # Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
