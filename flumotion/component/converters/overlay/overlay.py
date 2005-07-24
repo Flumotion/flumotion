@@ -1,8 +1,7 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-
- Flumotion - a streaming media server
+# Flumotion - a streaming media server
 # Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
