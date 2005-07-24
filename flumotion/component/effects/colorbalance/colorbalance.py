@@ -1,9 +1,6 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-# flumotion/component/effects/colorbalance/colorbalance.py:
-# colorbalance effect
-#
 # Flumotion - a streaming media server
 # Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
 
