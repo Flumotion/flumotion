@@ -1,5 +1,5 @@
 <?xml version="1.0" standalone="no"?> <!--*- mode: nxml -*-->
-<!-- unstable Flumotion against unstable dependencies -->
+<!-- stable Flumotion against stable dependencies -->
 <!DOCTYPE moduleset SYSTEM "moduleset.dtd">
 <?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
 <moduleset>
@@ -11,33 +11,65 @@
      root=":pserver:anoncvs@cvs.freedesktop.org:/cvs/gstreamer"
      password="" />
   <svnroot name="svn.fluendo.com" default="yes"
-     href="https://svn.fluendo.com:/svn"
+     href="https://svn.fluendo.com/svn"
      password="" />
 
+<!-- not being used atm -->
   <tarball id="python" version="2.3.3"
            autogenargs="--enable-shared --with-pydebug">
     <source  href="http://www.python.org/ftp/python/2.3.3/Python-2.3.3.tar.bz2"
              size="7195007" md5sum="70ada9f65742ab2c77a96bcd6dffd9b1" />
   </tarball>
 
+  <cvsmodule id="glib" cvsroot="gnome.org">
+<!--
+    <dependencies>
+      <dep package="gtk-doc" />
+    </dependencies>
+-->
+  </cvsmodule>
+
+  <cvsmodule id="pango" cvsroot="gnome.org" autogenargs="--with-qt=no">
+    <dependencies>
+      <dep package="glib" />
+    </dependencies>
+  </cvsmodule>
+
+  <cvsmodule id="gtk+" cvsroot="gnome.org">
+    <dependencies>
+      <dep package="glib" />
+      <dep package="pango" />
+<!--
+      <dep package="atk" />
+      <dep package="shared-mime-info" />
+-->
+    </dependencies>
+  </cvsmodule>
+
   <cvsmodule id="gstreamer" cvsroot="gstreamer.freedesktop.org"
-             autogenargs="--disable-plugin-builddir --disable-tests"
+             revision="BRANCH-GSTREAMER-0_8"
+             autogenargs="--disable-plugin-builddir --disable-tests --disable-docs-build"
              >
   </cvsmodule>
 
   <cvsmodule id="gst-plugins" cvsroot="gstreamer.freedesktop.org"
+             revision="BRANCH-GSTREAMER-0_8"
+             autogenargs="--disable-tests --disable-docs-build"
              >
     <dependencies>
       <dep package="gstreamer" />
     </dependencies>
   </cvsmodule>
 
-  <cvsmodule id="pygtk" cvsroot="gnome.org"
-             >
+  <cvsmodule id="pygtk" cvsroot="gnome.org">
+    <dependencies>
+      <dep package="gtk+" />
+    </dependencies>
   </cvsmodule>
  
-  <cvsmodule id="gst-python" cvsroot="gstreamer.freedesktop.org"
-             >
+  <cvsmodule id="gst-python"
+             revision="BRANCH-GSTREAMER-0_8"
+              cvsroot="gstreamer.freedesktop.org">
     <dependencies>
       <dep package="gstreamer" />
       <dep package="gst-plugins" />

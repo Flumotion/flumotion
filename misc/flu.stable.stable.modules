@@ -14,19 +14,45 @@
      href="https://svn.fluendo.com/svn"
      password="" />
 
-<!-- not used atm -->
+<!-- not being used atm -->
   <tarball id="python" version="2.3.3"
            autogenargs="--enable-shared --with-pydebug">
     <source  href="http://www.python.org/ftp/python/2.3.3/Python-2.3.3.tar.bz2"
              size="7195007" md5sum="70ada9f65742ab2c77a96bcd6dffd9b1" />
   </tarball>
 
+  <cvsmodule id="glib" cvsroot="gnome.org" revision="glib-2-6">
+<!--
+    <dependencies>
+      <dep package="gtk-doc" />
+    </dependencies>
+-->
+  </cvsmodule>
+
+  <cvsmodule id="pango" cvsroot="gnome.org" revision="pango-1-8" autogenargs="--with-qt=no">
+    <dependencies>
+      <dep package="glib" />
+    </dependencies>
+  </cvsmodule>
+
+  <cvsmodule id="gtk+" cvsroot="gnome.org" revision="gtk-2-6">
+    <dependencies>
+      <dep package="glib" />
+      <dep package="pango" />
+<!--
+      <dep package="atk" />
+      <dep package="shared-mime-info" />
+-->
+    </dependencies>
+  </cvsmodule>
+
   <cvsmodule id="gstreamer" cvsroot="gstreamer.freedesktop.org"
-             autogenargs="--disable-plugin-builddir --disable-tests"
+             autogenargs="--disable-plugin-builddir --disable-tests --disable-docs-build"
              revision="RELEASE-0_8_10">
   </cvsmodule>
 
   <cvsmodule id="gst-plugins" cvsroot="gstreamer.freedesktop.org"
+             autogenargs="--disable-tests --disable-docs-build"
              revision="RELEASE-0_8_10">
     <dependencies>
       <dep package="gstreamer" />
@@ -34,10 +60,13 @@
   </cvsmodule>
 
   <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_6_2">
+    <dependencies>
+      <dep package="gtk+" />
+    </dependencies>
   </cvsmodule>
  
   <cvsmodule id="gst-python" cvsroot="gstreamer.freedesktop.org"
-             revision="RELEASE-0_8_2">
+             revision="RELEASE-0_8_1">
     <dependencies>
       <dep package="gstreamer" />
       <dep package="gst-plugins" />
