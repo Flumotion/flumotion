@@ -1,3 +1,10 @@
+2005-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/admin.glade:
+	  change label for help_about back to gtk-about;
+	  while it doesn't work with old GTK, it does the
+	  right thing with recent GTK's
+
 2005-07-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_common.py:
