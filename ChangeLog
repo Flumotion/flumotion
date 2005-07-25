@@ -1,5 +1,14 @@
 2005-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/authenticate.glade:
+	  fix an assertion for grab_focus because the window was not
+	  visible.  I'm pretty sure though that having grab_focus on the
+	  auth combo box isn't actually useful; it's done when a) the widget
+	  is not yet in a window and b) later on the focus is set to the
+	  username.  But, like, whatever.
+
+2005-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/admin.glade:
 	  change label for help_about back to gtk-about;
 	  while it doesn't work with old GTK, it does the
