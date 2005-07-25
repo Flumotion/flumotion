@@ -1,4 +1,27 @@
-This is Flumotion 0.1.8, "Baja Beach".
+This is Flumotion 0.1.9, "Zahara".
+
+Features since 0.1.8:
+
+- Now works correctly with Twisted 2.0
+- Issues related to installing in custom prefixes have been fixed
+- components show their relative CPU usage
+- burst-on-connect for video is implemented, giving clients all data
+  since the last key frame immediately
+- a new message area was added to the wizard so worker messages can be
+  made non-modal
+- man pages were added
+
+Issues fixed since 0.1.8:
+
+ticket	summary
+240	Triggering an assertion on the Consumption wizard page
+264	Disker GUI gone
+236	"Export Configuration" silently overwrites existing files
+241	Clearing the mount property of http-streamer borks the wizard
+47	Remote PB lists
+135	Audio src selection should have device name/info like videosrc
+248	worker not killed with flumotion stop
+255	Twisted reactor tracebacks only appear at debug level 4
 
 Features since 0.1.7:
 
