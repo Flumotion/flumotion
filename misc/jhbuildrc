@@ -1,7 +1,22 @@
 # -*- Mode: python -*- 
-# Sample jhbuildrc file 
+# Flumotion jhbuildrc file 
+# symlink this to a file called .jhbuildrc.flu.(flavor) in your homedir
+# where flavor is stable.stable, unstable.stable, unstable.unstable
+
 import os
-moduleset = os.path.join(os.environ['HOME'], 'flu', 'prefix', 'flu.unstable.stable.modules')
+import sys
+
+me = os.path.basename(__file__)
+prefix = '.jhbuildrc.flu.'
+
+if not me.startswith(prefix):
+    print "%s does not start with %s" % (
+        os.path.basename(__file__), prefix)
+    sys.exit(1)
+
+flavor = me[len(prefix):]
+
+moduleset = os.path.join(os.environ['HOME'], 'flu', 'flu.%s.modules' % flavor)
 modules = ['flumotion']
-checkoutroot = os.path.join(os.environ['HOME'], 'flu', 'prefix', 'src')
-prefix = os.path.join(os.environ['HOME'], 'flu', 'prefix')
+checkoutroot = os.path.join(os.environ['HOME'], 'flu', flavor, 'src')
+prefix = os.path.join(os.environ['HOME'], 'flu', flavor, 'prefix')
