@@ -13,7 +13,9 @@ EXTRA_DIST = \
 	LICENSE.Flumotion \
 	flumotion.spec \
 	misc/pycheckerhelp.py \
-	misc/flu.modules \
+	misc/flu.stable.stable.modules \
+	misc/flu.unstable.stable.modules \
+	misc/flu.unstable.unstable.modules \
 	misc/jhbuildrc
 
 # for some reason, the run is *completely* different if the last set of
