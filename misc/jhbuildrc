@@ -1,7 +1,7 @@
 # -*- Mode: python -*- 
 # Sample jhbuildrc file 
 import os
-moduleset = os.path.join(os.environ['HOME'], 'flu', 'head', 'flu.unstable.stable.modules')
+moduleset = os.path.join(os.environ['HOME'], 'flu', 'prefix', 'flu.unstable.stable.modules')
 modules = ['flumotion']
-checkoutroot = os.path.join(os.environ['HOME'], 'flu', 'head', 'src')
-prefix = os.path.join(os.environ['HOME'], 'flu', 'head', 'prefix')
+checkoutroot = os.path.join(os.environ['HOME'], 'flu', 'prefix', 'src')
+prefix = os.path.join(os.environ['HOME'], 'flu', 'prefix')
