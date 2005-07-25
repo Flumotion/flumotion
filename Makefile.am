@@ -16,7 +16,7 @@ EXTRA_DIST = \
 	misc/flu.stable.stable.modules \
 	misc/flu.unstable.stable.modules \
 	misc/flu.unstable.unstable.modules \
-	misc/jhbuildrc
+	misc/jhbuildrc.flu
 
 # for some reason, the run is *completely* different if the last set of
 # components is moved up.  So keep it low

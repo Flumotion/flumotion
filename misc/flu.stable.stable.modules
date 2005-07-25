@@ -11,32 +11,34 @@
      root=":pserver:anoncvs@cvs.freedesktop.org:/cvs/gstreamer"
      password="" />
   <svnroot name="svn.fluendo.com" default="yes"
-     href="https://svn.fluendo.com:/svn"
+     href="https://svn.fluendo.com/svn"
      password="" />
 
+<!--
   <tarball id="python" version="2.3.3"
            autogenargs="--enable-shared --with-pydebug">
     <source  href="http://www.python.org/ftp/python/2.3.3/Python-2.3.3.tar.bz2"
              size="7195007" md5sum="70ada9f65742ab2c77a96bcd6dffd9b1" />
   </tarball>
+-->
 
   <cvsmodule id="gstreamer" cvsroot="gstreamer.freedesktop.org"
              autogenargs="--disable-plugin-builddir --disable-tests"
-             revision="RELEASE-0_8_7">
+             revision="RELEASE-0_8_10">
   </cvsmodule>
 
   <cvsmodule id="gst-plugins" cvsroot="gstreamer.freedesktop.org"
-             revision="RELEASE-0_8_5">
+             revision="RELEASE-0_8_10">
     <dependencies>
       <dep package="gstreamer" />
     </dependencies>
   </cvsmodule>
 
-  <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_4_0">
+  <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_6_2">
   </cvsmodule>
  
   <cvsmodule id="gst-python" cvsroot="gstreamer.freedesktop.org"
-             revision="RELEASE-0_8_1">
+             revision="RELEASE-0_8_2">
     <dependencies>
       <dep package="gstreamer" />
       <dep package="gst-plugins" />
@@ -45,7 +47,7 @@
   </cvsmodule>
 
   <svnmodule id="flumotion" svnroot="svn.fluendo.com" 
-   module="flumotion/tags/flumotion-0.1.4" checkoutdir="flumotion">
+   module="flumotion/tags/flumotion-0.1.8" checkoutdir="flumotion">
     <dependencies>
       <dep package="gst-python" />
     </dependencies>
