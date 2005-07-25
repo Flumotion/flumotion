@@ -12,11 +12,7 @@ EXTRA_DIST = \
 	LICENSE.GPL \
 	LICENSE.Flumotion \
 	flumotion.spec \
-	misc/pycheckerhelp.py \
-	misc/flu.stable.stable.modules \
-	misc/flu.unstable.stable.modules \
-	misc/flu.unstable.unstable.modules \
-	misc/jhbuildrc.flu
+	misc/pycheckerhelp.py
 
 # for some reason, the run is *completely* different if the last set of
 # components is moved up.  So keep it low
