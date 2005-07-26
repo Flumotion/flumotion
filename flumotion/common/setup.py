@@ -28,8 +28,8 @@ def setupPackagePath():
     from flumotion.configure import configure
 
     registryPaths = [configure.pythondir, ]
-    if os.environ.has_key('FLU_REGISTRY_PATH'):
-        paths = os.environ['FLU_REGISTRY_PATH']
+    if os.environ.has_key('FLU_PROJECT_PATH'):
+        paths = os.environ['FLU_PROJECT_PATH']
         registryPaths += paths.split(':')
     
     log.debug('setup', 'registry paths: %s' % ", ".join(registryPaths))
@@ -38,5 +38,5 @@ def setupPackagePath():
         # we register with the path as part of the key, since
         # these aren't meant to be replaced
         package.getPackager().registerPackagePath(path,
-            "FLU_REGISTRY_PATH_" + path)
+            "FLU_PROJECT_PATH_" + path)
 

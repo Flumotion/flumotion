@@ -1,5 +1,11 @@
 2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/registry.py:
+	* flumotion/common/setup.py:
+	  s/FLU_REGISTRY_PATH/FLU_PROJECT_PATH/g
+
+2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	* flumotion/project/Makefile.am:
 	* flumotion/project/__init__.py:

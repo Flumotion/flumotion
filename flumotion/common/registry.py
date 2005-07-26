@@ -915,19 +915,10 @@ class ComponentRegistry(log.Loggable):
         
         # construct a list of all paths to scan for registry .xml files
         registryPaths = [configure.pythondir, ]
-        if os.environ.has_key('FLU_REGISTRY_PATH'):
-            paths = os.environ['FLU_REGISTRY_PATH']
+        if os.environ.has_key('FLU_PROJECT_PATH'):
+            paths = os.environ['FLU_PROJECT_PATH']
             registryPaths += paths.split(':')
         
-#        self.debug('registry paths: %s' % ", ".join(registryPaths))
-#        for path in registryPaths:
-#            #if not path in sys.path:
-#                self.debug('registering package path: %s' % path)
-#                # we register with the path as part of the key, since
-#                # these aren't meant to be replaced
-#                package.getPackager().registerPackagePath(path,
-#                    "FLU_REGISTRY_PATH_" + path)
-
         # get the list of all paths used to construct the old registry
         oldRegistryPaths = [dir.getPath()
                                   for dir in self.getDirectories()]
