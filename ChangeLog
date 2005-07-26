@@ -1,5 +1,17 @@
 2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/encoders.xml:
+	* flumotion/component/encoders/jpeg.py:
+	* flumotion/component/encoders/mulaw.py:
+	* flumotion/component/encoders/smoke.py:
+	* flumotion/component/encoders/speex.py:
+	* flumotion/component/encoders/theora.py:
+	* flumotion/component/encoders/vorbis.py:
+	  move encoders to their own subdir before we add admin_gtk's
+
+2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/worker.py:
 	* flumotion/test/test_manager_manager.py:
 	* flumotion/test/test_worker_worker.py:

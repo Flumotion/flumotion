@@ -2,7 +2,7 @@
   <components>
   
     <component type="theora-encoder">
-      <source location="flumotion.component.encoders.theora.theora"/>
+      <source location="flumotion.component.encoders.theora"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -17,7 +17,7 @@
     </component>
   
     <component type="smoke-encoder">
-      <source location="flumotion.component.encoders.smoke.smoke"/>
+      <source location="flumotion.component.encoders.smoke"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -29,7 +29,7 @@
     </component>
   
     <component type="jpeg-encoder">
-      <source location="flumotion.component.encoders.jpeg.jpeg"/>
+      <source location="flumotion.component.encoders.jpeg"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -39,7 +39,7 @@
     </component>
   
     <component type="vorbis-encoder">
-      <source location="flumotion.component.encoders.vorbis.vorbis"/>
+      <source location="flumotion.component.encoders.vorbis"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -50,7 +50,7 @@
     </component>
   
     <component type="speex-encoder">
-      <source location="flumotion.component.encoders.speex.speex"/>
+      <source location="flumotion.component.encoders.speex"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -59,7 +59,7 @@
     </component>
   
     <component type="mulaw-encoder">
-      <source location="flumotion.component.encoders.mulaw.mulaw"/>
+      <source location="flumotion.component.encoders.mulaw"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
