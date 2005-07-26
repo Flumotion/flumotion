@@ -1,0 +1,48 @@
+<registry>
+
+  <components>
+  
+    <component type="smoke-encoder">
+      <source location="flumotion.component.encoders.smoke.smoke"/>
+      <properties>
+        <property name="feed" type="string" multiple="yes"/>
+        <property name="source" type="string" multiple="no"/>
+        <property name="qmin" type="int"/>
+        <property name="qmax" type="int"/>
+        <property name="threshold" type="int"/>
+        <property name="keyframe" type="int"/>
+      </properties>
+    </component>
+ 
+  </components>
+
+  <bundles>
+
+    <bundle name="smoke-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/smoke">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="smoke-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="smoke-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/smoke">
+                <filename location="smoke.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

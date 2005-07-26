@@ -18,4 +18,22 @@
     </component>
   
   </components>
+
+  <bundles>
+
+    <bundle name="muxers">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/muxers">
+                <filename location="multipart.py" />
+                <filename location="ogg.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
 </registry> 

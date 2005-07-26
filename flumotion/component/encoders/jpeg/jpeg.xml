@@ -1,0 +1,46 @@
+<registry>
+
+  <components>
+  
+    <component type="jpeg-encoder">
+      <source location="flumotion.component.encoders.jpeg.jpeg"/>
+      <properties>
+        <property name="feed" type="string" multiple="yes"/>
+        <property name="source" type="string" multiple="no"/>
+        <property name="quality" type="int"/>
+        <property name="framerate" type="float"/>
+      </properties>
+    </component>
+ 
+  </components>
+
+  <bundles>
+
+    <bundle name="jpeg-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/jpeg">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="jpeg-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="jpeg-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/jpeg">
+                <filename location="jpeg.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

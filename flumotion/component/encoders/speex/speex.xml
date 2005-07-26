@@ -1,0 +1,45 @@
+<registry>
+
+  <components>
+  
+    <component type="speex-encoder">
+      <source location="flumotion.component.encoders.speex.speex"/>
+      <properties>
+        <property name="feed" type="string" multiple="yes"/>
+        <property name="source" type="string" multiple="no"/>
+        <property name="bitrate" type="int"/>
+      </properties>
+    </component>
+ 
+  </components>
+
+  <bundles>
+
+    <bundle name="speex-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/speex">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="speex-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="speex-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/speex">
+                <filename location="speex.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

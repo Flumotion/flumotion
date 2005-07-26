@@ -1,3 +1,21 @@
+2005-07-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/bundleclient.py:
+	* flumotion/common/registry.py:
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/jpeg/jpeg.xml:
+	* flumotion/component/encoders/mulaw/mulaw.xml:
+	* flumotion/component/encoders/smoke/smoke.xml:
+	* flumotion/component/encoders/speex/speex.xml:
+	* flumotion/component/encoders/theora/theora.xml:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/manager/manager.py:
+	* flumotion/worker/worker.py:
+	  and now all components are run from bundles !
+	  which turned up the fact that we didn't bundle all our components.
+	  So if some components don't work, let me know so I can bundle them.
+
 2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/encoders/Makefile.am:

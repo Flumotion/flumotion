@@ -1,0 +1,47 @@
+<registry>
+
+  <components>
+  
+    <component type="vorbis-encoder">
+      <source location="flumotion.component.encoders.vorbis.vorbis"/>
+      <properties>
+        <property name="feed" type="string" multiple="yes"/>
+        <property name="source" type="string" multiple="no"/>
+        <property name="bitrate" type="int"/>
+        <property name="quality" type="float"/>
+        <property name="channels" type="int"/>
+      </properties>
+    </component>
+ 
+  </components>
+
+  <bundles>
+
+    <bundle name="vorbis-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/vorbis">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="vorbis-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="vorbis-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/vorbis">
+                <filename location="vorbis.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

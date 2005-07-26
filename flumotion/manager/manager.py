@@ -372,7 +372,7 @@ class Vishnu(log.Loggable):
 
         return state
 
-    def _setupBundleBasket(self):
+    def _setupBundleBasket(self, firstTry=True):
         self.bundlerBasket = bundle.BundlerBasket()
 
         for b in registry.getRegistry().getBundles():
@@ -392,6 +392,14 @@ class Vishnu(log.Loggable):
                         self.debug("Reason: %r" % e)
                         self.error("Could not add %s to bundle %s" % (
                             fullpath, bundleName))
+                    except Exception, e:
+                        if not firstTry:
+                            self.error("Could not register bundles")
+                        self.debug(
+                            "Exception %r when adding bundle, rebuilding" % e)
+                        self.warning("Bundle problem, rebuilding registry")
+                        registry.getRegistry().verify(force=True)
+                        self._setupBundleBasket(firstTry=False)
 
             for d in b.getDependencies():
                 self.log('Adding dependency of %s on %s' % (bundleName, d))

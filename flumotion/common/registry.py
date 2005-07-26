@@ -907,12 +907,12 @@ class ComponentRegistry(log.Loggable):
             else:
                 raise
 
-    def verify(self):
+    def verify(self, force=False):
         """
         Verify if the registry is uptodate and rebuild if it is not.
+
+        @param force: True if the registry needs rebuilding for sure.
         """
-        force = False # set to True if needs rebuilding
-        
         # construct a list of all paths to scan for registry .xml files
         registryPaths = [configure.pythondir, ]
         if os.environ.has_key('FLU_PROJECT_PATH'):

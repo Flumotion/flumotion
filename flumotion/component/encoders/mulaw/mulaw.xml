@@ -1,0 +1,44 @@
+<registry>
+
+  <components>
+  
+    <component type="mulaw-encoder">
+      <source location="flumotion.component.encoders.mulaw.mulaw"/>
+      <properties>
+        <property name="feed" type="string" multiple="yes" />
+        <property name="source" type="string" multiple="no" />
+      </properties>
+    </component>
+ 
+  </components>
+
+  <bundles>
+
+    <bundle name="mulaw-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/mulaw">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="mulaw-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="mulaw-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/mulaw">
+                <filename location="mulaw.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

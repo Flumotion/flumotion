@@ -148,12 +148,27 @@ class WorkerMedium(medium.BaseMedium):
         self.debug('remote_start(): id %s, type %s, config %r' % (
             avatarId, type, config))
 
+        # first set up bundles
+        # FIXME: we do this in the main worker process because the component
+        # starts and logs into the manager after being created
+        # but ideally the component would get created as an empty shell that
+        # logs in, then gets the info about what sort of component it should
+        # be, and then sets up the bundles and starts
+        self.debug('setting up bundles for %s' % moduleName)
+        d = self.bundleLoader.load_module(moduleName)
+        d.addCallback(self._startCallback, avatarId, type, moduleName,
+            methodName, config)
+        return d
+
+    def _startCallback(self, result, avatarId, type, moduleName, methodName,
+        config):
         # create a deferred that will be triggered when the jobavatar
         # instructs the job to start a component
         d = self.brain.deferredStartCreate(avatarId)
 
         if d:
             d.addCallback(self._deferredStartCallback, avatarId)
+
             self.brain.kindergarten.play(avatarId, type, moduleName,
                 methodName, config)
             return d

@@ -68,9 +68,11 @@ class BundleLoader(log.Loggable):
         import os
         import sys
 
+        self.debug('Loading module %s' % moduleName)
         d = self._callRemote('getBundleSums', modname=moduleName)
         yield d
         sums = d.value()
+        self.debug('Got sums %r' % sums)
 
         # sums is a list of name, sum tuples
         to_fetch = []
