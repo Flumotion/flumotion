@@ -240,7 +240,9 @@ class Vishnu(log.Loggable):
                 conf.manager.bouncer.type)
             configDict = conf.manager.bouncer.getConfigDict()
             from flumotion.worker import job
-            bouncer = job.getComponent(configDict, defs)
+            # FIXME: don't hardcode createComponent
+            bouncer = job.getComponent(configDict, defs.getSource(),
+                'createComponent')
             self.setBouncer(bouncer)
             self.bouncer.debug('started')
             log.info('manager', "Started manager's bouncer")

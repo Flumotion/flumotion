@@ -41,24 +41,15 @@ from flumotion.common import config, errors, interfaces, log, registry, keycards
 from flumotion.common import medium
 from flumotion.component import component
 
-def getComponent(dict, defs):
+def getComponent(dict, moduleName, methodName):
     """
     @param dict: the configuration dictionary
     @type  dict: dict
-    @param defs: the registry entry for a component
-    @type  defs: L{flumotion.common.registry.RegistryEntryComponent}
+    @param moduleName: name of the module to create the component from
+    @type  moduleName: string
+    @param methodName: the factory method to use to create the component
+    @type  methodName: string
     """
-    log.debug('component', 'getting module for defs %r' % defs)
-    try:
-        moduleName = defs.getSource()
-    except TypeError, e:
-        raise config.ConfigError(
-            "could not get module name for defs %r (%s)" % (defs, e))
-    except Exception, e:
-        raise config.ConfigError(
-            "Exception %s while getting module name for defs %r (%s)" % (
-                e.__class__.__name__, defs, " ".join(e.args)))
-        
     log.debug('component', 'Loading moduleName %s' % moduleName)
     try:
         module = reflect.namedAny(moduleName)
@@ -75,17 +66,9 @@ def getComponent(dict, defs):
             "Exception %r during import of module %s (%r)" % (
                 e.__class__.__name__, moduleName, e.args))
         
-    if not hasattr(module, 'createComponent'):
-        log.warning('job', 'no createComponent() in module %s' % moduleName)
+    if not hasattr(module, methodName):
+        log.warning('job', 'no %s in module %s' % (methodName, moduleName))
         return
-        
-#    dir = os.path.split(module.__file__)[0]
-#FIXME: files not used at all, remove ?
-#    files = {}
-#    for file in defs.getFiles():
-#        filename = os.path.basename(file.getFilename())
-#        real = os.path.join(dir, filename)
-#        files[real] = file
         
     # Create the component with the specified configuration
     # directives. Note that this can't really be moved from here
@@ -94,9 +77,9 @@ def getComponent(dict, defs):
     # we're going to listen to ports and other stuff which should
     # be separated from the main process.
 
-    log.debug('job', 'calling createComponent for module %s' % moduleName)
+    log.debug('job', 'calling %s.%s(dict)' % (moduleName, methodName))
     try:
-        component = module.createComponent(dict)
+        component = getattr(module, methodName)(dict)
     except config.ConfigError:
         # already nicely formatted, so fall through
         raise
@@ -148,7 +131,10 @@ class JobMedium(medium.BaseMedium):
 
         # FIXME: the worker shouldn't need a registry - see #12e #12e #129 
         defs = registry.getRegistry().getComponent(type)
-        self._runComponent(avatarId, type, config, defs, feedPorts)
+        moduleName = defs.getSource()
+        methodName = 'createComponent'
+        self._runComponent(avatarId, type, moduleName, methodName, config,
+            feedPorts)
 
     def remote_stop(self):
         self.debug('remote_stop() called')
@@ -204,16 +190,19 @@ class JobMedium(medium.BaseMedium):
         except RuntimeError:
             self.warning('Old PyGTK with threading disabled detected')
     
-    def _runComponent(self, avatarId, type, config, defs, feedPorts):
+    def _runComponent(self, avatarId, type, moduleName, methodName, config,
+        feedPorts):
         """
-        @param avatarId:  avatarId component will use to log in to manager
-        @type  avatarId:  string
-        @param type:      type of component to start
-        @type  type:      string
-        @param config:    the configuration dictionary
-        @type  config:    dict
-        @param defs:      the registry entry for a component
-        @type  defs:      L{flumotion.common.registry.RegistryEntryComponent}
+        @param avatarId:   avatarId component will use to log in to manager
+        @type  avatarId:   string
+        @param type:       type of component to start
+        @type  type:       string
+        @param moduleName: name of the module that contains the entry point
+        @type  moduleName: string
+        @param methodName: name of the factory method to create the component
+        @type  methodName: string
+        @param config:     the configuration dictionary
+        @type  config:     dict
         @param feedPorts: feedName -> port
         @type  feedPorts: dict
         """
@@ -230,7 +219,6 @@ class JobMedium(medium.BaseMedium):
         
         self.debug('_runComponent(): config dictionary is: %r' % config)
         self.debug('_runComponent(): feedPorts is: %r' % feedPorts)
-        self.debug('_runComponent(): defs is: %r' % defs)
 
         comp = None
 
@@ -238,7 +226,7 @@ class JobMedium(medium.BaseMedium):
         # but it'd be nicer to do this outside of config, so do this
         config['avatarId'] = avatarId
         try:
-            comp = getComponent(config, defs)
+            comp = getComponent(config, moduleName, methodName)
         except Exception, e:
             msg = "Exception %s during getComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))
@@ -247,6 +235,7 @@ class JobMedium(medium.BaseMedium):
             raise errors.ComponentStart(msg)
 
         # we have components without feed ports, and without this function
+        print "THOMAS:", comp
         if feedPorts:
             comp.set_feed_ports(feedPorts)
 

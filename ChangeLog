@@ -1,5 +1,12 @@
 2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/manager.py:
+	* flumotion/worker/job.py:
+	  work towards not needing the registry in the worker by moving
+	  up the registry necessity in the API callchain
+
+2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	* flumotion/common/setup.py:
 	  s/FLU_REGISTRY_PATH/FLU_PROJECT_PATH/g
