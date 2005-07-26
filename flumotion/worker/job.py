@@ -236,7 +236,6 @@ class JobMedium(medium.BaseMedium):
             raise errors.ComponentStart(msg)
 
         # we have components without feed ports, and without this function
-        print "THOMAS:", comp
         if feedPorts:
             comp.set_feed_ports(feedPorts)
 
