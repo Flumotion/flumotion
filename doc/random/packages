@@ -1,0 +1,72 @@
+In Flumotion, the illusion is created that pieces of the import space
+are merged together so that all import statements for flumotion modules
+"just work".
+
+There are a number of use cases for this:
+- bundles - a way of transferring code from a process to another, so that
+  the second process can transparently run this code
+- running uninstalled stacks:
+  - consider a new user interface project that you want to run uninstalled,
+    and also run against an uninstalled flumotion
+    the depending project sets up everything so that its own part of the
+    flumotion import space is mapped onto the existing one
+  - consider a new component project that you want to run uninstalled,
+    against an uninstalled flumotion
+    flumotion should set up everything, based on an env var, so that this
+    new project's flumotion import space is overlapped onto the existing one
+- running installed-but-in-different-prefix-stacks
+
+TERMS
+-----
+- module:
+  - something that can be imported
+  - has a __file__ attribute that points to the file this module is
+    represented by
+  - A/__init__.py represents the module A
+    A/B/__init__.py represents the module A.B
+    A/B/C/.py represents the module A.B.C
+- package:
+  - a module that has modules underneath itself, and is thus not an end module
+  - has a __path__ attribute that is a list of paths to look for child
+    modules
+  - A/B/__init__.py contains the package A.B
+- end module:
+  - a module that is not a package; represented by a file.py
+  - thus it has __file__ but not __path__
+  - A/B/C.py contains the end module A.B.C
+
+REGISTRY
+--------
+The registry serves two tasks:
+  - list of components, and their config syntax
+  - list of bundles, and files they contain
+
+PROCEDURE
+---------
+- at the start of any application that needs additional projects:
+  - bootstrapping is necessary to get at registerPackagePath method
+    from the package module
+  - so sys.path is set to point at the main flumotion location
+  - registerPackagePath on the main flumotion location, either installed
+    or uninstalled
+  - registerPackagePath on all dirs listed in an env var, so other
+    (uninstalled, or installed in different prefix) projects' import space
+    is added
+ 
+- when a bundle needs to be registered:
+  - unpack the bundle
+  - registerPackagePath for the bundle
+    - if this bundle was registered before with a different packagepath:
+      - remove all old paths for this bundle from everywhere
+      - insert new path for this bundle everywhere relevant
+      - mark the modules in this bundle as needing a rebuild.rebuild
+
+- importhooks:
+  every time a package gets imported, there's a new module loaded in python,
+  which will have a __path__ attribute, set to a list with one item:
+  the location where it was found first underneath its parent package.
+  At that point, __path__ needs to be added to, since we could have
+  project1/package/A/B/C.py
+  and
+  project2/package/A/B/D.py
+  where import package.A will end up
