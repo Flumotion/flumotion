@@ -113,7 +113,8 @@ class JobMedium(medium.BaseMedium):
         self.manager_port = port
         self.manager_transport = transport
         
-    def remote_start(self, avatarId, type, config, feedPorts):
+    def remote_start(self, avatarId, type, moduleName, methodName, config,
+        feedPorts):
         """
         I am called on by the worker's JobAvatar to start a component.
         
@@ -121,6 +122,10 @@ class JobMedium(medium.BaseMedium):
         @type  avatarId:   string
         @param type:       type of component to start
         @type  type:       string
+        @param moduleName: name of the module to create the component from
+        @type  moduleName: string
+        @param methodName: the factory method to use to create the component
+        @type  methodName: string
         @param config:     the configuration dictionary
         @type  config:     dict
         @param feedPorts:  feedName -> port
@@ -129,10 +134,6 @@ class JobMedium(medium.BaseMedium):
         self.avatarId = avatarId
         self.logName = avatarId
 
-        # FIXME: the worker shouldn't need a registry - see #12e #12e #129 
-        defs = registry.getRegistry().getComponent(type)
-        moduleName = defs.getSource()
-        methodName = 'createComponent'
         self._runComponent(avatarId, type, moduleName, methodName, config,
             feedPorts)
 

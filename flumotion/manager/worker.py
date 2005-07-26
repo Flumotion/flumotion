@@ -29,7 +29,7 @@ from twisted.internet import defer
 
 # FIXME: rename to base
 from flumotion.manager import base
-from flumotion.common import errors, interfaces, log
+from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import config, worker, common
 
 class WorkerAvatar(base.ManagerAvatar):
@@ -69,9 +69,14 @@ class WorkerAvatar(base.ManagerAvatar):
         @returns: a deferred that will give the avatarId the component
                   will use to log in to the manager
         """
-        self.debug('starting %s on worker %s with config %r' % (
-            avatarId, self.avatarId, config))
-        return self.mindCallRemote('start', avatarId, type, config)
+        self.debug('starting %s (%s) on worker %s with config %r' % (
+            avatarId, type, self.avatarId, config))
+        defs = registry.getRegistry().getComponent(type)
+        moduleName = defs.getSource()
+        # FIXME: get the proper entry point
+        methodName = "createComponent"
+        return self.mindCallRemote('start', avatarId, type, moduleName,
+            methodName, config)
 
 class WorkerHeaven(base.ManagerHeaven):
     """

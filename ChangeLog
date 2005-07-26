@@ -1,5 +1,15 @@
 2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_worker_worker.py:
+	* flumotion/worker/job.py:
+	* flumotion/worker/worker.py:
+	  el workero no necesita un registro, oye !
+	  fixes #129
+
+2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/manager.py:
 	* flumotion/worker/job.py:
 	  work towards not needing the registry in the worker by moving

@@ -251,10 +251,10 @@ class FakeWorkerMind(FakeMind):
         FakeMind.__init__(self, testcase)
         self.avatarId = avatarId
 
-    def remote_start(self, avatarId, type, config):
+    def remote_start(self, avatarId, type, moduleName, methodName, config):
         self.debug('remote_start(%s): logging in component' % avatarId)
         avatar = self.testcase._loginComponent(self.avatarId,
-            avatarId, type, config)
+            avatarId, moduleName, methodName, type, config)
         # need to return the avatarId for comparison
         return avatarId
 
@@ -262,7 +262,8 @@ class FakeComponentMind(FakeMind):
 
     logCategory = 'fakecomponentmind'
 
-    def __init__(self, testcase, workerName, avatarId, type, config):
+    def __init__(self, testcase, workerName, avatarId, type,
+        moduleName, methodName, config):
         FakeMind.__init__(self, testcase)
 
         self.info('Creating component mind for %s' % avatarId)
@@ -329,11 +330,13 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         self._workers[avatarId] = avatar
         return avatar
 
-    def _loginComponent(self, workerName, avatarId, type, config):
+    def _loginComponent(self, workerName, avatarId, type, moduleName,
+        methodName, config):
         # create a component and log it in
         # return the avatar
 
-        mind = FakeComponentMind(self, workerName, avatarId, type, config)
+        mind = FakeComponentMind(self, workerName, avatarId, type,
+            moduleName, methodName, config)
 
         tuple = self.vishnu.dispatcher.requestAvatar(avatarId, mind,
             pb.IPerspective, interfaces.IComponentMedium)

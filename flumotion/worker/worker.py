@@ -127,16 +127,20 @@ class WorkerMedium(medium.BaseMedium):
         self.debug('processFailed %r' % args)
 
     ### pb.Referenceable method for the manager's WorkerAvatar
-    def remote_start(self, avatarId, type, config):
+    def remote_start(self, avatarId, type, moduleName, methodName, config):
         """
         Start a component of the given type with the given config.
 
-        @param avatarId: avatar identification string
-        @type  avatarId: string
-        @param type:     type of the component to start
-        @type  type:     string
-        @param config:   a configuration dictionary for the component
-        @type  config:   dict
+        @param avatarId:   avatar identification string
+        @type  avatarId:   string
+        @param type:       type of the component to start
+        @type  type:       string
+        @param moduleName: name of the module to create the component from
+        @type  moduleName: string
+        @param methodName: the factory method to use to create the component
+        @type  methodName: string
+        @param config:     a configuration dictionary for the component
+        @type  config:     dict
 
         @returns: a deferred fired when the process has started
         """
@@ -150,7 +154,8 @@ class WorkerMedium(medium.BaseMedium):
 
         if d:
             d.addCallback(self._deferredStartCallback, avatarId)
-            self.brain.kindergarten.play(avatarId, type, config)
+            self.brain.kindergarten.play(avatarId, type, moduleName,
+                methodName, config)
             return d
         else:
             msg = ('Component "%s" has already received a start request'
@@ -199,10 +204,12 @@ class Kid:
     """
     I am an abstraction of a job process started by the worker.
     """
-    def __init__(self, pid, avatarId, type, config):
+    def __init__(self, pid, avatarId, type, moduleName, methodName, config):
         self.pid = pid 
         self.avatarId = avatarId
         self.type = type
+        self.moduleName = moduleName
+        self.methodName = methodName
         self.config = config
 
     # pid = protocol.transport.pid
@@ -227,24 +234,28 @@ class Kindergarten(log.Loggable):
         self.kids = {} # avatarId -> Kid
         self.options = options
         
-    def play(self, avatarId, type, config):
+    def play(self, avatarId, type, moduleName, methodName, config):
         """
         Create a kid and make it "play" by starting a job.
         Starts a component with the given name, of the given type, and
         the given config dictionary.
 
-        @param avatarId: avatarId the component should use to log in
-        @type  avatarId: string
-        @param type:     type of component to start
-        @type  type:     string
-        @param config:   a configuration dictionary for the component
-        @type  config:   dict
+        @param avatarId:   avatarId the component should use to log in
+        @type  avatarId:   string
+        @param type:       type of component to start
+        @type  type:       string
+        @param moduleName: name of the module to create the component from
+        @type  moduleName: string
+        @param methodName: the factory method to use to create the component
+        @type  methodName: string
+        @param config:     a configuration dictionary for the component
+        @type  config:     dict
         """
-        
         # This forks and returns the pid
         pid = job.run(avatarId, self.options)
         
-        self.kids[avatarId] = Kid(pid, avatarId, type, config)
+        self.kids[avatarId] = Kid(pid, avatarId, type, moduleName, methodName,
+            config)
 
     def getKid(self, avatarId):
         return self.kids[avatarId]
@@ -623,7 +634,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
         self.debug('asking job to start with config %r and feedPorts %r' % (
             kid.config, feedPorts))
         d = self.mind.callRemote('start', kid.avatarId, kid.type,
-                                 kid.config, feedPorts)
+            kid.moduleName, kid.methodName, kid.config, feedPorts)
 
         # make sure that we trigger the start deferred after this
         d.addCallback(
