@@ -7,6 +7,7 @@ SUBDIRS = \
 	configure \
 	extern \
 	manager \
+	project \
 	service \
 	test \
 	tester \

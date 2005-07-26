@@ -23,7 +23,6 @@ small common functions used by all processes
 """
 
 import errno
-import glob
 import os 
 import socket
 import sys
@@ -215,268 +214,6 @@ def argRepr(args=(), kwargs={}, max=-1):
             
     return s
 
-def _listDirRecursively(path):
-    """
-    I'm similar to os.listdir, but I work recursively and only return
-    directories containing python code.
-    
-    @param path: the path
-    @type  path: string
-    """
-    retval = []
-    # files are never returned, only directories
-    if not os.path.isdir(path):
-        return retval
-
-    try:
-        files = os.listdir(path)
-    except OSError:
-        pass
-    else:
-        for f in files:
-            # this only adds directories since files are not returned
-            retval += _listDirRecursively(os.path.join(path, f))
-
-    if glob.glob(os.path.join(path, '*.py*')):
-        retval.append(path)
-            
-    return retval
-
-def _listPyFileRecursively(path):
-    """
-    I'm similar to os.listdir, but I work recursively and only return
-    files representing python non-package modules.
-    
-    @param path: the path
-    @type  path: string
-
-    @rtype:      list
-    @returns:    list of files underneath the given path containing python code
-    """
-    retval = []
-
-    # get all the dirs containing python code
-    dirs = _listDirRecursively(path)
-
-    for dir in dirs:
-        pyfiles = glob.glob(os.path.join(dir, '*.py*'))
-        dontkeep = glob.glob(os.path.join(dir, '*__init__.py*'))
-        for f in dontkeep:
-            if f in pyfiles:
-                pyfiles.remove(f)
-
-        retval.extend(pyfiles)
-
-    return retval
-
-def _findPackageCandidates(path, prefix='flumotion.'):
-    """
-    I take a directory and return a list of candidate python packages.
-    A package is a module containing modules; typically the directory
-    with the same name as the package contains __init__.py
-
-    @param path: the path
-    @type  path: string
-    """
-    # this function also "guesses" candidate packages when __init__ is missing
-    # so a bundle with only a subpackage is also detected
-    dirs = _listDirRecursively(path)
-    if path in dirs:
-        dirs.remove(path)
-
-    # chop off the base path to get a list of "relative" bundlespace paths
-    bundlePaths = [x[len(path) + 1:] for x in dirs]
-
-    # remove some common candidates, like .svn subdirs, or containing -
-    isNotSvn = lambda x: x.find('.svn') == -1
-    bundlePaths = filter(isNotSvn, bundlePaths)
-    isNotDashed = lambda x: x.find('-') == -1
-    bundlePaths = filter(isNotDashed, bundlePaths)
-
-    # convert paths to module namespace
-    bundlePackages = [".".join(x.split(os.path.sep)) for x in bundlePaths]
-
-    # remove all not starting with prefix
-    isInPrefix = lambda x: x.startswith(prefix)
-    bundlePackages = filter(isInPrefix, bundlePackages)
-
-    # sort them so that depending packages are after higher-up packages
-    bundlePackages.sort()
-        
-    return bundlePackages
-
-def _findEndModuleCandidates(path, prefix='flumotion.'):
-    """
-    I take a directory and return a list of candidate end python modules.
-    These are non-package modules.
-
-    @param path: the path
-    @type  path: string
-    """
-    files = _listPyFileRecursively(path)
-
-    # chop off the base path to get a list of "relative" bundlespace paths
-    bundlePaths = [x[len(path) + 1:] for x in files]
-
-    # remove some common candidates, like .svn subdirs, or containing -
-    isNotSvn = lambda x: x.find('.svn') == -1
-    bundlePaths = filter(isNotSvn, bundlePaths)
-    isNotDashed = lambda x: x.find('-') == -1
-    bundlePaths = filter(isNotDashed, bundlePaths)
-
-    # convert paths to module namespace
-    bundleModules = [pathToModuleName(x) for x in bundlePaths]
-
-    # remove all not starting with prefix
-    isInPrefix = lambda x: x.startswith(prefix)
-    bundleModules = filter(isInPrefix, bundleModules)
-
-    # sort them so that depending packages are after higher-up packages
-    bundleModules.sort()
-
-    # make unique
-    res = {}
-    for b in bundleModules: res[b] = 1
-
-    return res.keys()
-
-# FIXME: an extra key argument (used for bundle) might help in keeping
-# track of old paths
-# ie, it would ensure that only one packagePath per key is registered
-def registerPackagePath(packagePath, prefix='flumotion'):
-    """
-    Register a given path as a path that can be imported from.
-    Used to support partition of bundled code or import code from various
-    uninstalled location.
-
-    sys.path will also be changed to include this, and remove references
-    to older packagePath's for the same bundle.
-
-    @param packagePath: path to add under which the module namespaces live,
-                        (ending in an md5sum, for flumotion purposes)
-    @type  packagePath: string
-    @param prefix:      prefix of the packages to be considered
-    @type  prefix:      string
-    """
-
-    # FIXME: this should potentially also clean up older registered package
-    # paths for the same bundle ?
-    # This would involve us keeping track of what has been registered before,
-    # and would probably involve creating an object to keep track of this state
-
-    # First add the root to sys.path, so we can import stuff from it,
-    # probably a good idea to live it there, if we want to do
-    # fancy stuff later on.
-    packagePath = os.path.abspath(packagePath)
-    if not os.path.exists(packagePath):
-        log.warning('bundle', 'registering a non-existing package path %s' %
-            packagePath)
-
-    log.log('bundle', 'registering packagePath %s' % packagePath)
-
-    # check if a packagePath for this bundle was already registered
-    # by stripping off the last part, which is the md5sum
-    oneup = os.path.split(packagePath)[0]
-    if oneup:
-        paths = sys.path
-        targets = [x for x in paths if x.startswith(oneup) and x != packagePath]
-
-    for path in targets:
-        log.log('bundle', 'removing old packagePath %s from sys.path' % path)
-        sys.path.remove(path)
-
-    # put packagePath at the top of sys.path if not in there
-    if not packagePath in sys.path:
-        log.log('bundle', 'adding packagePath %s to sys.path' % packagePath)
-        sys.path.insert(0, packagePath)
-
-    # Find the packages in the path and sort them,
-    # the following algorithm only works if they're sorted.
-    # By sorting the list we can ensure that a parent package
-    # is always processed before one of its children
-    packageNames = _findPackageCandidates(packagePath, prefix)
-    packageNames.sort()
-
-    if not packageNames:
-        log.log('bundle',
-            'packagePath %s does not have package candidates starting with %s' %
-                (packagePath, prefix))
-        return
-
-    log.log('bundle', 'package candidates %r' % packageNames)
-    # Since the list is sorted, the top module is the first item
-    log.log('bundle', 'packagePath %s has packageNames %r' % (
-        packagePath, packageNames)) 
-
-    toplevelName = packageNames[0]
-    
-    # Insert or move the bundle's absolute path to the top of __path__ of
-    # each of its higher-level packages, so reload() will take the new path
-
-    # FIXME: for complete correctness, it'd be good to remove the path
-    # for the previous bundle if there is a previous bundle
-    partials = []
-    for partial in toplevelName.split("."):
-        partials.append(partial)
-        name = ".".join(partials)
-        try:
-            package = reflect.namedAny(name)
-        #except ValueError: # Empty module name, ie. subdir has no __init__
-        #    continue
-        except:
-            print "ERROR: could not reflect name %s" % name
-            raise
-        path = os.path.join(packagePath, name.replace('.', os.sep))
-        if path in package.__path__:
-            package.__path__.remove(path)
-        package.__path__.insert(0, path)
-        
-    for packageName in packageNames[1:]:
-        package = sys.modules.get(packageName, None)
-        
-        # If the package fails to import from our bundle, it means
-        # that it's unknown at the moment, import it from the package dir
-        # (eg non bundle)
-        if not package:
-            package = reflect.namedAny(packageName)
-
-        # Append ourselves to the packages __path__, this is all
-        # magic that's required
-        subPath = os.path.join(packagePath,
-                               packageName.replace('.', os.sep))
-
-        # rebuild the package
-        rebuild.rebuild(package)
-
-        # insert at front because FLU_REGISTRY_PATH paths should override
-        # base components, and because subsequent reload() should prefer
-        # the latest registered path
-        # FIXME: we might eventually want to remove old paths for the same
-        # bundle   
-        if subPath in package.__path__:
-            log.log('bundle', 'moving subPath %s to top for package %r' % (
-                subPath, package))
-            package.__path__.remove(subPath)
-            package.__path__.insert(0, subPath)
-        else:
-            log.log('bundle', 'inserting subPath %s for package %r' % (
-                subPath, package))
-            package.__path__.insert(0, subPath)
-
-    # now rebuild all non-package modules in this packagePath
-    moduleNames = _findEndModuleCandidates(packagePath)
-    for name in moduleNames:
-        if name in sys.modules:
-            # fixme: isn't sys.modules[name] sufficient?
-            log.log('bundle', "rebuilding non-package module %s" % name)
-            try:
-                module = reflect.namedAny(name)
-            except AttributeError:
-                log.warning('bundle',
-                    "could not reflect non-package module %s" % name)
-                continue
-            rebuild.rebuild(module)
-
 def ensureDir(dir, description):
     """
     Ensure the given directory exists, creating it if not.
@@ -667,13 +404,16 @@ def checkRemotePort(host, port):
 
 def addressGetHost(a):
     """
-    Get the port number of an IPv4 address.
+    Get the host name of an IPv4 address.
 
     @type a: L{twisted.internet.address.IPv4Address}
     """
     if not isinstance(a, address.IPv4Address) and not isinstance(a,
         address.UNIXAddress):
         raise TypeError("object %r is not an IPv4Address or UNIXAddress" % a)
+    if isinstance(a, address.UNIXAddress):
+        return 'localhost'
+
     try:
         host = a.host
     except AttributeError:
@@ -711,10 +451,23 @@ def pathToModuleName(path):
     """
     Convert the given (relative) path to the python module it would have to
     be imported as.
+
+    Return None if the path is not a valid python module
     """
-    if path.endswith('.pyc'): path = path[:-4]
-    if path.endswith('.py'): path = path[:-3]
-    if path.endswith('__init__'): path = path[:-9]
+    # __init__ is last because it works on top of the first three
+    valid = False
+    suffixes = ['.pyc', '.pyo', '.py', os.path.sep + '__init__']
+    for s in suffixes:
+        if path.endswith(s):
+            path = path[:-len(s)]
+            valid = True
+
+    # if the path still contains dots, it can't possibly be a valid module
+    if not '.' in path:
+        valid = True
+
+    if not valid:
+        return None
 
     return ".".join(path.split(os.path.sep))
 

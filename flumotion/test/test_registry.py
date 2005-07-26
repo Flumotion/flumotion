@@ -211,8 +211,10 @@ class TestRegistry(unittest.TestCase):
         reg.dump(s)
         s.seek(0, 0)
         data = s.read()
-        self.assertEquals("""<registry>
+        target = """<registry>
+
   <components>
+
     <component type="bar" base="base/dir">
       <source location="None"/>
       <properties>
@@ -221,9 +223,11 @@ class TestRegistry(unittest.TestCase):
         <entry type="test/test" location="loc" function="main"/>
       </entries>
     </component>
+
   </components>
+
   <bundles>
-    <bundle name="test-bundle">
+    <bundle name="test-bundle" project="flumotion">
       <dependencies>
         <dependency name="test-dependency"/>
       </dependencies>
@@ -236,10 +240,21 @@ class TestRegistry(unittest.TestCase):
         </directory>
       </directories>
     </bundle>
+
   </bundles>
 </registry>
-""", data)
-        
+"""
+        datalines = data.split("\n")
+        targetlines = target.split("\n")
+        datalines.reverse()
+        targetlines.reverse()
+        i = 0
+        while targetlines:
+            i = i + 1
+            d = datalines.pop()
+            t = targetlines.pop()
+            self.assertEquals(t, d, "line %d: '%s' != '%s'" % (i, d, t))
+            
 class TestComponentEntry(unittest.TestCase):
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
@@ -311,7 +326,7 @@ class TestFindComponents(unittest.TestCase):
 </registry>""" % name)
     
     def testSimple(self):
-        self.reg.addRegistryPath('.')
+        self.reg.addRegistryPath('.', prefix='subdir')
         components = self.reg.getComponents()
         self.assertEquals(len(components), 3)
         types = [c.getType() for c in components]

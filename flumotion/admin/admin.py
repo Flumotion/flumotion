@@ -34,7 +34,7 @@ from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
 from flumotion.common import bundle, common, errors, interfaces, log
-from flumotion.common import keycards, worker, planet, medium
+from flumotion.common import keycards, worker, planet, medium, package
 # serializable worker and component state
 from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
@@ -212,8 +212,9 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         return d
 
     # default Errback
+    # FIXME: we can set it up with a list of types not to warn for ?
     def _defaultErrback(self, failure):
-        self.debug('Unhandled deferred failure: %r (%s)' % (
+        self.debug('Possibly unhandled deferred failure: %r (%s)' % (
             failure, failure.getErrorMessage()))
         return failure
 
@@ -537,12 +538,20 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             # request bundle sums
             d = self.callRemote('getBundleSums', filename=filename)
             d.addCallback(_getBundleSumsCallback, filename, methodName)
+            d.addErrback(_getBundleSumsErrback, componentState, type)
             d.addErrback(self._defaultErrback)
             return d
+
+        def _getBundleSumsErrback(failure, componentState, type):
+            failure.trap(errors.NoBundleError)
+            self.warning('Could not find the bundle for component %s (%s)' % (
+                componentState.get('type'), type))
+            return failure
 
         def _getBundleSumsCallback(result, filename, methodName):
             # callback receiving bundle sums.  Will remote call to get
             # all missing zip files
+            pathToName = {} # bundle path -> bundle name
             sums = result # ordered from highest to lowest dependency
             entryName, entrySum = sums[0]
             self.debug('_getBundleSumsCallback: %d sums received' % len(sums))
@@ -556,6 +565,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
 
             for name, sum in sums:
                 dir = os.path.join(configure.cachedir, name, sum)
+                pathToName[dir] = name
                 if not os.path.exists(dir):
                     missing.append(name)
                 else:
@@ -571,18 +581,18 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
                     missing)
                 d = self.callRemote('getBundleZips', missing)
                 d.addCallback(_getBundleZipsCallback, entryPath, missing,
-                    cachedPaths, filename, methodName)
+                    cachedPaths, pathToName, filename, methodName)
                 d.addErrback(self._defaultErrback)
                 return d
             else:
                 retval = (entryPath, filename, methodName)
                 self.debug('_getBundleSumsCallback: returning %r' % (
                     retval, ))
-                self._registerCachedPaths(cachedPaths)
+                self._registerCachedPaths(cachedPaths, pathToName)
                 return retval
 
         def _getBundleZipsCallback(result, entryPath, missing, cachedPaths,
-            filename, methodName):
+            pathToName, filename, methodName):
             # callback to receive zips.  Will set up zips, register package
             # paths and finally
             # return physical location of entry file and method
@@ -608,13 +618,13 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
 
             # now make sure all cachedPaths are registered
             # FIXME: does it matter we already did some before ?
-            self._registerCachedPaths(cachedPaths)
+            self._registerCachedPaths(cachedPaths, pathToName)
 
             # and now register our new contestants
             for dir in unpacked:
                 self.debug("register PackagePath %s for unpacked bundle %s" % (
                     dir, name))
-                common.registerPackagePath(dir)
+                package.getPackager().registerPackagePath(dir, name)
 
             retval = (entryPath, filename, methodName)
             self.debug('_getBundleSumsCallback: returning %r' % (
@@ -628,10 +638,12 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         # d.addErrback(self._defaultErrback)
         return d
 
-    def _registerCachedPaths(self, paths):
+    def _registerCachedPaths(self, paths, pathToName):
         for dir in paths:
-            self.debug("registering cached PackagePath %s" % dir)
-            common.registerPackagePath(dir)
+            key = pathToName[dir]
+            self.debug("registering cached PackagePath %s with key %s" % (
+                dir, key))
+            package.getPackager().registerPackagePath(dir, pathToName[dir])
 
     def getBundledFile(self, bundledPath):
         """

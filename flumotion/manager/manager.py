@@ -379,7 +379,7 @@ class Vishnu(log.Loggable):
             for d in b.getDirectories():
                 directory = d.getName()
                 for file in d.getFiles():
-                    fullpath = os.path.join(configure.pythondir, directory,
+                    fullpath = os.path.join(b.getProjectBase(), directory,
                                             file.getLocation())
                     relative = file.getRelative()
                     self.log('Adding path %s as %s to bundle %s' % (

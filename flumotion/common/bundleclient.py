@@ -27,7 +27,7 @@ bundled code
 from twisted.internet import error, defer
 from twisted.python import rebuild
 
-from flumotion.common import bundle, common, errors, log
+from flumotion.common import bundle, common, errors, log, package
 from flumotion.configure import configure
 from flumotion.twisted.defer import defer_generator_method
 
@@ -79,7 +79,7 @@ class BundleLoader(log.Loggable):
             path = os.path.join(configure.cachedir, name, md5)
             if os.path.exists(path):
                 self.log(name + ' is up to date, registering package path')
-                common.registerPackagePath(path)
+                package.getPackager().registerPackagePath(path, name)
                 to_load.append(name)
             else:
                 self.log(name + ' needs updating')
@@ -101,7 +101,7 @@ class BundleLoader(log.Loggable):
             path = self._unbundler.unbundle(b)
 
             self.debug("registering bundle %s in path %s" % (name, path))
-            common.registerPackagePath(path)
+            package.getPackager().registerPackagePath(path, name)
 
         # load up the module and return it
         __import__(moduleName, globals(), locals(), [])

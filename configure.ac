@@ -197,6 +197,7 @@ flumotion/configure/uninstalled.py
 flumotion/extern/Makefile
 flumotion/extern/pytrayicon/Makefile
 flumotion/manager/Makefile
+flumotion/project/Makefile
 flumotion/service/Makefile
 flumotion/test/Makefile
 flumotion/tester/Makefile

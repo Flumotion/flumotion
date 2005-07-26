@@ -94,8 +94,9 @@ def main(args):
     conf_files = args[1:]
 
     if conf_files and len(conf_files) > 1:
-        w = sys.stderr.write
-        w('flumotion-admin: too many configuration files: %r' % conf_files)
+        log.error('flumotion-admin',
+            'too many configuration files: %r' % conf_files)
+
     elif conf_files:
         _runInterface(conf_files[0], options)
     else:

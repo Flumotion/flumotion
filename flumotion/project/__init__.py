@@ -17,26 +17,3 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
-
-def setup():
-    from flumotion.common import log
-    log.init()
-
-def setupPackagePath():
-    import os
-    from flumotion.common import package, log
-    from flumotion.configure import configure
-
-    registryPaths = [configure.pythondir, ]
-    if os.environ.has_key('FLU_REGISTRY_PATH'):
-        paths = os.environ['FLU_REGISTRY_PATH']
-        registryPaths += paths.split(':')
-    
-    log.debug('setup', 'registry paths: %s' % ", ".join(registryPaths))
-    for path in registryPaths:
-        log.debug('setup', 'registering package path: %s' % path)
-        # we register with the path as part of the key, since
-        # these aren't meant to be replaced
-        package.getPackager().registerPackagePath(path,
-            "FLU_REGISTRY_PATH_" + path)
-

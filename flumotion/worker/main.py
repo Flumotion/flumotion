@@ -194,6 +194,11 @@ def main(args):
         log.debug('worker', 'writing pid file')
         common.writePidFile('worker', options.name)
 
+    # register all package paths (FIXME: this should go away when
+    # components come from manager)
+    from flumotion.common import setup
+    setup.setupPackagePath()
+
     # create a brain and have it remember the manager to direct jobs to
     brain = worker.WorkerBrain(options)
 

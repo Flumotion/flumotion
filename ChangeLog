@@ -1,5 +1,44 @@
 2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	* flumotion/project/Makefile.am:
+	* flumotion/project/__init__.py:
+	* flumotion/project/project.py:
+	* flumotion/Makefile.am:
+	  adding a flumotion.project where add-on projects will put their
+	  project files
+	* flumotion/common/package.py:
+	* flumotion/test/test_common_package.py:
+	  create a new module for the packager and package registration
+	* flumotion/test/test_common.py:
+	* flumotion/common/common.py:
+	  move code for package registering to new module
+	  give UNIXAddress a localhost as host
+	* flumotion/common/setup.py:
+	  add a setupPackagePath method that parses the env var for
+	  additional projects
+	* flumotion/common/bundleclient.py:
+	  use the new packager to register package paths
+	* flumotion/common/config.py:
+	  doc fixes
+	* flumotion/common/registry.py:
+	  add "project" attribute to <bundle> entries; add API for it
+	  add "prefix" argument to API for directories
+	  fixes to make sure registry only gets rebuilt when needed
+	  add some whitespace to registry output
+	* flumotion/admin/admin.py:
+	  use new packager
+	* flumotion/component/base/admin_gtk.py:
+	  add getWidget(), and set widget tree on loading glade file
+	* flumotion/manager/main.py:
+	  give a list of projects loaded into flumotion in debug log
+	* flumotion/manager/manager.py:
+	  get bundles from correct project base
+	* flumotion/test/test_registry.py:
+	  add 'project' tags to test
+
+2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* bin/flumotion-admin.in:
 	  don't remove __path__ because it won't play nice with our
 	  new package stuff

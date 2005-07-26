@@ -180,79 +180,6 @@ class TestPid(unittest.TestCase):
         self.assertEquals(os.getpid(), pid)
         common.deletePidFile('test', 'default')
 
-class TestPackagePath(unittest.TestCase):
-    def testCurrent(self):
-        self.tempdir = tempfile.mkdtemp()
-        packagedir = os.path.join(self.tempdir, "package")
-        os.mkdir(packagedir)
-        handle = open(os.path.join(packagedir, "__init__.py"), "w")
-        handle.close()
-        common.registerPackagePath(self.tempdir)
-        os.system("rm -r %s" % self.tempdir)
-
-    def _import(self, which):
-        exec("import %s" % which)
-
-    def testTwoStackedProjects(self):
-        # we create two stacked projects both with a "package" import space
-        # project A:
-        #   tempdir/A/package/__init__.py
-        #   tempdir/A/package/A.py
-        # project B:
-        #   tempdir/package/__init__.py
-        #   tempdir/package/B.py
-        
-        # each has parts of a common namespace
-        # set up stuff so we can import from both
-        # this shows we can develop uninstalled against uninstalled
-
-        self.cwd = os.getcwd()
-        self.tempdir = tempfile.mkdtemp('', 'trial')
-
-        self._createA()
-        self._createB()
-
-        os.chdir(self.tempdir)
-
-        # first show we cannot import from A
-        self.assertRaises(ImportError, self._import, "package.A")
-
-        # set up so we can import from A
-        sys.path.append(self.adir)
-        self.failUnless(self._import, "package.A")
-
-        # but still can't from project B under same namespace
-        self.assertRaises(ImportError, self._import, "package.B")
-
-        # but we can pull in registerPackagePath from project A to bootstrap,
-        # and register the space for B
-        import package.A
-        package.A.registerPackagePath(
-            os.path.join(self.tempdir, 'B'),
-            prefix='package')
-        self.failUnless(self._import, "package.B")
-
-    def _createA(self):
-        self.adir = os.path.join(self.tempdir, "A")
-        os.mkdir(self.adir)
-        apackagedir = os.path.join(self.adir, "package")
-        os.mkdir(apackagedir)
-        open(os.path.join(apackagedir, "__init__.py"), "w").close()
-        handle = open(os.path.join(apackagedir, "A.py"), "w")
-        handle.write('me = "A"\n')
-        handle.write('from flumotion.common.common import registerPackagePath\n')
-        handle.close()
-
-    def _createB(self):
-        self.bdir = os.path.join(self.tempdir, "B")
-        os.mkdir(self.bdir)
-        bpackagedir = os.path.join(self.bdir, "package")
-        os.mkdir(bpackagedir)
-        open(os.path.join(bpackagedir, "__init__.py"), "w").close()
-        handle = open(os.path.join(bpackagedir, "B.py"), "w")
-        handle.write('me = "B"\n')
-        handle.close()
-
 class TestAddress(unittest.TestCase):
     def setUp(self):
         self.address = address.IPv4Address('TCP', 'localhost', '8000')
@@ -327,115 +254,12 @@ class TestPathToModule(unittest.TestCase):
     def testPaths(self):
         tests = {
             'flumotion/common/common.py': 'flumotion.common.common',
+            'flumotion/common/common.pyo': 'flumotion.common.common',
             'flumotion/common/__init__.pyc': 'flumotion.common',
             'flumotion/common': 'flumotion.common',
+            'flumotion/configure/uninstalled.py.in': None,
         }
         
         for (path, module) in tests.items():
-            self.assertEquals(common.pathToModuleName(path), module)
-
-class TestRecursively(unittest.TestCase):
-    def testListDir(self):
-        self.tempdir = tempfile.mkdtemp()
-
-        # empty tree
-        a = os.path.join(self.tempdir, 'A')
-        common.ensureDir(a, "a description")
-        dirs = common._listDirRecursively(self.tempdir)
-        self.assertEquals(dirs, [])
-
-        # add a non-python file
-        os.system("touch %s" % os.path.join(a, 'test'))
-        dirs = common._listDirRecursively(self.tempdir)
-        self.assertEquals(dirs, [])
-
-        # add a python file; should now get returned
-        os.system("touch %s" % os.path.join(a, 'test.py'))
-        dirs = common._listDirRecursively(self.tempdir)
-        self.assertEquals(dirs, [a])
-
-        # add another level
-        b = os.path.join(self.tempdir, 'B')
-        b = os.path.join(self.tempdir, 'B')
-        common.ensureDir(b, "a description")
-        c = os.path.join(b, 'C')
-        common.ensureDir(c, "a description")
-        dirs = common._listDirRecursively(self.tempdir)
-        self.assertEquals(dirs, [a])
-
-        # add a non-python file
-        os.system("touch %s" % os.path.join(c, 'test'))
-        dirs = common._listDirRecursively(self.tempdir)
-        self.assertEquals(dirs, [a])
-
-        # add a python file; should now get returned
-        os.system("touch %s" % os.path.join(c, 'test.py'))
-        dirs = common._listDirRecursively(self.tempdir)
-        self.assertEquals(dirs.sort(), [a, c].sort())
-
-        # cleanup
-        os.system("rm -r %s" % self.tempdir)
-
-    def testListPyfile(self):
-        self.tempdir = tempfile.mkdtemp()
-
-        # empty tree
-        a = os.path.join(self.tempdir, 'A')
-        common.ensureDir(a, "a description")
-        dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs, [])
-
-        # add a non-python file
-        os.system("touch %s" % os.path.join(a, 'test'))
-        dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs, [])
-
-        # add a __init__ file
-        os.system("touch %s" % os.path.join(a, '__init__.py'))
-        dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs, [])
-        os.system("touch %s" % os.path.join(a, '__init__.pyc'))
-        dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs, [])
-
-        # add a python file; should now get returned
-        test1 = os.path.join(a, 'test.py')
-        os.system("touch %s" % test1)
-        dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs, [test1])
-
-        # add another level
-        b = os.path.join(self.tempdir, 'B')
-        common.ensureDir(b, "a description")
-        c = os.path.join(b, 'C')
-        common.ensureDir(c, "a description")
-        dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs, [test1])
-
-        # add a non-python file
-        os.system("touch %s" % os.path.join(c, 'test'))
-        dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs, [test1])
-
-        # add a python file; should now get returned
-        test2 = os.path.join(c, 'test.py')
-        os.system("touch %s" % test2)
-        dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs.sort(), [test1, test2].sort())
-        mods = common._findEndModuleCandidates(self.tempdir,
-            prefix='')
-        self.assertEquals(mods, ['B.C.test', 'A.test'])
-
-        # add a python file but with .c; should now get returned, but
-        # no new module candidate
-        test3 = os.path.join(c, 'test.pyc')
-        os.system("touch %s" % test3)
-        dirs = common._listPyFileRecursively(self.tempdir)
-        self.assertEquals(dirs.sort(), [test1, test2, test3].sort())
-
-        mods = common._findEndModuleCandidates(self.tempdir,
-            prefix='')
-        self.assertEquals(mods, ['B.C.test', 'A.test'])
-
-        # cleanup
-        os.system("rm -r %s" % self.tempdir)
+            self.assertEquals(common.pathToModuleName(path), module,
+                "path %s did not give end module %s" % (path, module))

@@ -31,7 +31,7 @@ from xml.parsers import expat
 
 from twisted.python import reflect
 
-from flumotion.common import common, log
+from flumotion.common import common, log, package
 from flumotion.configure import configure
 
 __all__ = ['ComponentRegistry', 'registry']
@@ -90,8 +90,9 @@ class RegistryEntryComponent:
     
 class RegistryEntryBundle:
     "This class represents a <bundle> entry in the registry"
-    def __init__(self, name, dependencies, directories):
+    def __init__(self, name, project, dependencies, directories):
         self.name = name
+        self.project = project
         self.dependencies = dependencies
         self.directories = directories
 
@@ -106,6 +107,16 @@ class RegistryEntryBundle:
 
     def getDirectories(self):
         return self.directories
+    
+    def getProject(self):
+        return self.project
+
+    def getProjectBase(self):
+        if self.project == 'flumotion':
+            return configure.pythondir
+
+        from flumotion.project import project
+        return project.get(self.project, 'pythondir')
     
 class RegistryEntryBundleDirectory:
     "This class represents a <directory> entry in the registry"
@@ -226,7 +237,7 @@ class RegistryParser(log.Loggable):
             self.debug('Parsing XML string')
             return minidom.parseString(string)
         else:
-            self.debug('Parsing XML file: %s' % os.path.basename(filename))
+            self.debug('Parsing XML file: %s' % filename)
             try:
                 return minidom.parse(filename)
             except expat.ExpatError, e:
@@ -464,6 +475,10 @@ class RegistryParser(log.Loggable):
             raise XmlParserError, "<bundle> must have a name attribute"
         name = str(node.getAttribute('name'))
 
+        project = 'flumotion'
+        if node.hasAttribute('project'):
+            project = str(node.getAttribute('project'))
+
         dependencies = []
         directories = []
 
@@ -477,7 +492,7 @@ class RegistryParser(log.Loggable):
             else:
                 raise XmlParserError("<bundle> unexpected node: %s" % child.nodeName)
 
-        return RegistryEntryBundle(name, dependencies, directories)
+        return RegistryEntryBundle(name, project, dependencies, directories)
 
     def _parseBundleDependencies(self, node):
         # <dependencies>
@@ -611,11 +626,14 @@ class RegistryParser(log.Loggable):
 # FIXME: filename -> path
 class RegistryDirectory:
     """
-    I represent a directory under a registry path.
+    I represent a directory under a path managed by the registry.
+    I can be queried for a list of partial registry .xml files underneath
+    the given path, under the given prefix.
     """
-    def __init__(self, path):
+    def __init__(self, path, prefix='flumotion'):
         self._path = path
-        self._files = self._getFileList(self._path)
+        self._prefix = prefix
+        self._files = self._getFileList(os.path.join(path, prefix))
         
     def _getFileList(self, root):
         """
@@ -671,12 +689,13 @@ class ComponentRegistry(log.Loggable):
 
     def __init__(self):
         self._parser = RegistryParser()
-        self.verify()
 
         if (os.path.exists(self.filename) and
             os.access(self.filename, os.R_OK)):
             self.info('Parsing registry: %s' % self.filename)
             self._parser.parseRegistry(self.filename)
+
+        self.verify()
     
     def addFile(self, filename, string=None):
         if filename.endswith('registry.xml'):
@@ -687,7 +706,7 @@ class ComponentRegistry(log.Loggable):
     def addFromString(self, string):
         self.addFile('<string>', string)
         
-    def addRegistryPath(self, path, force=False):
+    def addRegistryPath(self, path, prefix='flumotion', force=False):
         """
         Add a registry path to this registry.
 
@@ -695,24 +714,31 @@ class ComponentRegistry(log.Loggable):
         if the directory has been modified since the last scan.
         If force is True, then the registry path will be parsed regardless
         of the modification time.
+
+        @param path: a full path containing a 'flumotion' directory,
+                     which will be scanned for registry files.
         """
+        self.debug('path %s, prefix %s, force %r' % (path, prefix, force))
         if not os.path.exists(path):
             return
 
         directory = self._parser._directories.get(path, None)
-        if not force:
+        if not force and directory:
             # if directory is watched in the registry, and it hasn't been
             # updated, everything's fine
-            if directory \
-                and directory.lastModified() < _getMTime(self.filename):
+            dTime = directory.lastModified()
+            fTime = _getMTime(self.filename)
+            if dTime < fTime:
+                self.debug('%s has not been changed since last registy parse' %
+                    path)
                 return
         
         # registry path was either not watched or updated, or a force was
         # asked, so reparse
         self.info('Scanning registry path %s' % path)
-        registryPath = RegistryDirectory(path)
+        registryPath = RegistryDirectory(path, prefix=prefix)
         files = registryPath.getFiles()
-        self.debug('Found %d files' % len(files))
+        self.debug('Found %d possible registry files' % len(files))
         map(self.addFile, files)
         
         self._parser.addDirectory(registryPath)
@@ -721,6 +747,9 @@ class ComponentRegistry(log.Loggable):
         return len(self._parser._components) == 0
 
     def getComponent(self, name):
+        """
+        @rtype: L{RegistryEntryComponent}
+        """
         return self._parser._components[name]
 
     def hasComponent(self, name):
@@ -747,9 +776,11 @@ class ComponentRegistry(log.Loggable):
             print >> fd, ' '*i + msg
             
         w(0, '<registry>')
-        
+        w(0, '')
+
         # Write components
         w(2, '<components>')
+        w(0, '')
         for component in self.getComponents():
             w(4, '<component type="%s" base="%s">' % (component.getType(),
                 component.getBase()))
@@ -783,13 +814,16 @@ class ComponentRegistry(log.Loggable):
                         entry.getFunction()))
                 w(6, '</entries>')
             w(4, '</component>')
+            w(0, '')
                 
         w(2, '</components>')
+        w(0, '')
 
         # bundles
         w(2, '<bundles>')
         for bundle in self.getBundles():
-            w(4, '<bundle name="%s">' % bundle.getName())
+            w(4, '<bundle name="%s" project="%s">' % (
+                bundle.getName(), bundle.getProject()))
 
             dependencies = bundle.getDependencies()
             if dependencies:
@@ -810,6 +844,7 @@ class ComponentRegistry(log.Loggable):
                 w(6, '</directories>')
                 
             w(4, '</bundle>')
+            w(0, '')
         w(2, '</bundles>')
 
 
@@ -817,9 +852,11 @@ class ComponentRegistry(log.Loggable):
         directories = self.getDirectories()
         if directories:
             w(2, '<directories>')
+            w(0, '')
             for d in directories:
                 w(4, '<directory filename="%s"/>' % d.getPath())
             w(2, '</directories>')
+            w(0, '')
         
         w(0, '</registry>')
 
@@ -877,12 +914,19 @@ class ComponentRegistry(log.Loggable):
         force = False # set to True if needs rebuilding
         
         # construct a list of all paths to scan for registry .xml files
-        registryPaths = [os.path.join(configure.pythondir, 'flumotion'), ]
+        registryPaths = [configure.pythondir, ]
         if os.environ.has_key('FLU_REGISTRY_PATH'):
             paths = os.environ['FLU_REGISTRY_PATH']
             registryPaths += paths.split(':')
         
-        self.debug('registry paths: %s' % ", ".join(registryPaths))
+#        self.debug('registry paths: %s' % ", ".join(registryPaths))
+#        for path in registryPaths:
+#            #if not path in sys.path:
+#                self.debug('registering package path: %s' % path)
+#                # we register with the path as part of the key, since
+#                # these aren't meant to be replaced
+#                package.getPackager().registerPackagePath(path,
+#                    "FLU_REGISTRY_PATH_" + path)
 
         # get the list of all paths used to construct the old registry
         oldRegistryPaths = [dir.getPath()
@@ -895,14 +939,17 @@ class ComponentRegistry(log.Loggable):
         registryPaths.sort()
         oldRegistryPaths.sort()
         if registryPaths != oldRegistryPaths:
+            self.debug('old and new registry paths are different')
             self.info('Rescanning registry paths')
             force = True
+        else:
+            self.debug('registry paths are still the same')
 
         if force:
             self.clean()
         
         for directory in registryPaths:
-            self.addRegistryPath(directory, force)
+            self.addRegistryPath(directory, force=force)
 
         self.save(force)
 
@@ -911,10 +958,13 @@ __registry = None
 def getRegistry():
     """
     Return the registry.  Only one registry will ever be created.
+
+    @rtype: L{ComponentRegistry}
     """
     global __registry
 
     if not __registry:
+        log.debug('registry', 'instantiating registry')
         __registry = ComponentRegistry()
 
     return __registry

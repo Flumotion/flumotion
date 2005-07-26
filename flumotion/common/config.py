@@ -86,12 +86,12 @@ class FlumotionConfigXML(log.Loggable):
     """
     I represent a planet configuration file for Flumotion.
 
-    @var manager:    A L{ConfigEntryManager} containing options for the manager
-                     section, filled in at construction time.
-    @var atmosphere: A L{ConfigEntryAtmosphere}, filled in when parse() is
-                     called.
-    @var flows:      A list of L{ConfigEntryFlow}, filled in when parse() is
-                     called.
+    @ivar manager:    A L{ConfigEntryManager} containing options for the manager
+                      section, filled in at construction time.
+    @ivar atmosphere: A L{ConfigEntryAtmosphere}, filled in when parse() is
+                      called.
+    @ivar flows:      A list of L{ConfigEntryFlow}, filled in when parse() is
+                      called.
     """
     logCategory = 'config'
 

@@ -398,7 +398,7 @@ class WorkerBrain(log.Loggable):
             elif os.WIFSIGNALED(status):
                 signum = os.WTERMSIG(status)
                 if signum == signal.SIGSEGV:
-                    self.warning("Job child with pid % segfaulted" % pid)
+                    self.warning("Job child with pid %d segfaulted" % pid)
                     if not os.WCOREDUMP(status):
                         self.warning(
                             "No core dump generated.  "\

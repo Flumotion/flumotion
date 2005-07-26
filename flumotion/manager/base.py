@@ -152,7 +152,11 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
 
         @rtype: list of (string, string) tuples
         """
-        self.debug('asked to get bundle sums for bundle %s' % bundleName)
+        if bundleName:
+            self.debug('asked to get bundle sums for bundle %s' % bundleName)
+        elif filename:
+            self.debug('asked to get bundle sums for file %s' % filename)
+
         basket = self.vishnu.bundlerBasket
 
         # will raise an error if bundleName not known
@@ -160,7 +164,9 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
             if filename:
                 bundleName = basket.getBundlerNameByFile(filename)
                 if not bundleName:
-                    raise errors.NoBundleError('bundle containing ' + filename)
+                    msg = 'containing ' + filename
+                    self.warning('No bundle %s' % msg)
+                    raise errors.NoBundleError(msg)
             elif modname:
                 bundleName = basket.getBundlerNameByImport(modname)
                 if not bundleName:

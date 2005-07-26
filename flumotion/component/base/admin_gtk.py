@@ -189,7 +189,8 @@ class BaseAdminGtkNode(log.Loggable):
         return self.admin.componentCallRemote(self.state, method_name,
                                               *args, **kwargs)
        
-        
+    
+    # FIXME: do this automatically if there is a gladeFile class attr set
     def loadGladeFile(self, gladeFile):
         """
         Returns: a deferred returning the widget tree from the glade file.
@@ -205,7 +206,21 @@ class BaseAdminGtkNode(log.Loggable):
         self.debug("requesting bundle for glade file %s" % gladeFile)
         d = self.admin.getBundledFile(gladeFile)
         d.addCallback(_getBundledFileCallback, gladeFile)
+        d.addCallback(self._setWidgetTreeCallback)
         return d
+
+    def _setWidgetTreeCallback(self, widgetTree):
+        self.widgetTree = widgetTree
+        return widgetTree
+
+    def getWidget(self, name):
+        if not self.widgetTree:
+            raise IndexError
+        widget = self.widgetTree.get_widget(name)
+        if not widget:
+            self.warning('Could not get widget %s' % name)
+
+        return widget
 
     ### child class methods to be overridden
     def setUIState(self, state):

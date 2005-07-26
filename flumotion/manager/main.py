@@ -30,7 +30,7 @@ import traceback
 from twisted.internet import reactor, error
 
 from flumotion.manager import manager
-from flumotion.common import log, config, common, errors
+from flumotion.common import log, config, common, errors, setup
 from flumotion.configure import configure
 
 class ServerContextFactory(log.Loggable):
@@ -223,6 +223,19 @@ def main(args):
     if options.debug:
         log.setFluDebug(options.debug)
 
+    # register package path
+    setup.setupPackagePath()
+    
+    log.debug('manager', 'Running Flumotion version %s' %
+        configure.version)
+    import twisted.copyright
+    log.debug('manager', 'Running against Twisted version %s' %
+        twisted.copyright.version)
+    from flumotion.project import project
+    for p in project.list():
+        log.debug('manager', 'Registered project %s version %s' % (
+            p, project.get(p, 'version')))
+
     vishnu = manager.Vishnu(options.name)
 
     paths = [os.path.abspath(filename) for filename in args[1:]]
@@ -261,11 +274,6 @@ def main(args):
 
     # go into the reactor main loop
     log.info('manager', 'Started manager "%s"' % options.name)
-    log.debug('manager', 'Running Flumotion version %s' %
-        configure.version)
-    import twisted.copyright
-    log.debug('manager', 'Running against Twisted version %s' %
-        twisted.copyright.version)
     reactor.run()
 
     # we exited, so we're done
