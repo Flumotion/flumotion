@@ -79,12 +79,13 @@ def getComponent(dict, defs):
         log.warning('job', 'no createComponent() in module %s' % moduleName)
         return
         
-    dir = os.path.split(module.__file__)[0]
-    files = {}
-    for file in defs.getFiles():
-        filename = os.path.basename(file.getFilename())
-        real = os.path.join(dir, filename)
-        files[real] = file
+#    dir = os.path.split(module.__file__)[0]
+#FIXME: files not used at all, remove ?
+#    files = {}
+#    for file in defs.getFiles():
+#        filename = os.path.basename(file.getFilename())
+#        real = os.path.join(dir, filename)
+#        files[real] = file
         
     # Create the component with the specified configuration
     # directives. Note that this can't really be moved from here
@@ -94,7 +95,6 @@ def getComponent(dict, defs):
     # be separated from the main process.
 
     log.debug('job', 'calling createComponent for module %s' % moduleName)
-    #component = module.createComponent(dict)
     try:
         component = module.createComponent(dict)
     except config.ConfigError:

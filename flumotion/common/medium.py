@@ -48,7 +48,9 @@ class BaseMedium(pb.Referenceable, log.Loggable):
             self.remote = None
         self.remote.notifyOnDisconnect(nullRemote)
 
-        # figure out connection addresses
+        self.bundleLoader = bundleclient.BundleLoader(self.remote)
+
+        # figure out connection addresses if it's an internet address
         tarzan = None
         jane = None
         try:
@@ -61,8 +63,6 @@ class BaseMedium(pb.Referenceable, log.Loggable):
             self.debug("connection is from me on %s to manager on %s" % (
                 common.addressGetHost(tarzan),
                 common.addressGetHost(jane)))
-
-        self.bundleLoader = bundleclient.BundleLoader(self.remote)
 
     def hasRemoteReference(self):
         return self.remote != None

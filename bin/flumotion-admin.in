@@ -51,8 +51,8 @@ gtk2reactor.install()
 # remove flumotion.component and flumotion.ui from our namespace and import,
 # since it should be handled by bundles completely
 # FIXME: this should be done correctly by separating source
-import flumotion.component
-flumotion.component.__path__ = []
+#import flumotion.component
+#flumotion.component.__path__ = []
 #import flumotion.ui
 #flumotion.ui.__path__ = []
 

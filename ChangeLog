@@ -1,5 +1,16 @@
 2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* bin/flumotion-admin.in:
+	  don't remove __path__ because it won't play nice with our
+	  new package stuff
+	* flumotion/common/medium.py:
+	  rearrange a piece of code
+	* flumotion/worker/job.py:
+	  comment out a piece of code that doesn't seem to be used in
+	  preparation of all workers executing jobs from bundles
+
+2005-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	  back to trunk
 
