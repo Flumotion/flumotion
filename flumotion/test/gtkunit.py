@@ -82,3 +82,22 @@ def assert_call_returns(name, method, val, *args, **kwargs):
         m = getattr(w, method)
         _assert(m(*args, **kwargs) == val)
     timeout_add(check)
+
+def click(name):
+    call_inc(name, 'set_relief', gtk.RELIEF_HALF)
+    call_inc(name, 'set_relief', gtk.RELIEF_NORMAL)
+    call_inc(name, 'emit', 'clicked')
+
+def set_text(name, text):
+    call(name, 'grab_focus')
+    call_inc(name, 'delete_text', 0, -1)
+    for i in range(len(text)):
+        call(name, 'set_position', i)
+        call(name, 'insert_text', text[i], i)
+        call_inc(name, 'set_position', i + 1)
+
+def check_text(name, text):
+    assert_call_returns(name, 'get_text', text)
+
+
+
