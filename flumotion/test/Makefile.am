@@ -1,4 +1,5 @@
 include $(top_srcdir)/common/python.mk
+include $(top_srcdir)/common/trial.mk
                                                                                 
 EXTRA_DIST = 				\
 	test.xml			\
@@ -39,22 +40,4 @@ EXTRA_DIST = 				\
 	test_wizard.py 			\
 	test_workerconfig.py
 
-check-local: rm-test-log
-	@if PYTHONPATH=$(top_srcdir):$(PYTHONPATH)			\
-	trial -l test.log -R flumotion.test;				\
-	then 								\
-	    rm -fr $(top_builddir)/flumotion/test/_trial_temp;		\
-	    if test -e test.log; then					\
-		if grep "Could not import" test.log > /dev/null; then	\
-	            exit 1;						\
-		fi;							\
-	    fi;								\
-            make rm-test-log;						\
-	else								\
-            make rm-test-log;						\
-	    exit 1;							\
-	fi
-	@rm -fr $(top_builddir)/flumotion/test/*.pyc
-
-rm-test-log:
-	@if test -e test.log; then rm test.log; fi
+check-local: trial

@@ -1,5 +1,12 @@
 2005-07-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/Makefile.am:
+	* common/trial.mk:
+	* flumotion/test/Makefile.am:
+	  extract the trial stuff in an .mk file so we can share it
+
+2005-07-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/bundleclient.py:
 	* flumotion/common/registry.py:
 	* flumotion/component/encoders/Makefile.am:

@@ -5,4 +5,5 @@ EXTRA_DIST = \
 	py-compile-destdir 	\
 	common.mk 		\
 	python.mk 		\
-	pychecker.mk
+	pychecker.mk		\
+	trial.mk
