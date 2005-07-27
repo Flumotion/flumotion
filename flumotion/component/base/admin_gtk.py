@@ -89,7 +89,7 @@ class BaseAdminGtk(log.Loggable):
         
     ### child class methods to be overridden
     def setUIState(self, state):
-        # fixme: what is this? who implements this?
+        # FIXME: what is this? who implements this?
         raise NotImplementedError
 
     def propertyChanged(self, name, value):
@@ -189,7 +189,6 @@ class BaseAdminGtkNode(log.Loggable):
         return self.admin.componentCallRemote(self.state, method_name,
                                               *args, **kwargs)
        
-    
     # FIXME: do this automatically if there is a gladeFile class attr set
     def loadGladeFile(self, gladeFile):
         """

@@ -1,5 +1,14 @@
 2005-07-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* common/common.mk:
+	  rearrange coverage stuff so we can use it in other parts
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/test/gtkunit.py:
+	  add a class to subclass from for gtk unit tests
+
+2005-07-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/Makefile.am:
 	* common/trial.mk:
 	* flumotion/test/Makefile.am:

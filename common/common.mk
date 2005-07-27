@@ -12,8 +12,15 @@ check-docs:
 	@make check -C doc/reference
 
 coverage:
-	@trial --coverage coverage -R flumotion.test
-	@$(PYTHON) common/show-coverage.py _trial_temp/coverage/flumotion.*
+	@true || trial --coverage coverage -R flumotion.test
+	@test ! -z "$(COVERAGE_MODULES)" ||				\
+	(echo Define COVERAGE_MODULES in your Makefile.am; exit 1)
+	@keep="";							\
+	for m in $(COVERAGE_MODULES); do				\
+		echo adding $$m;					\
+		keep="$$keep `ls _trial_temp/coverage/$$m*`";		\
+	done;								\
+	$(PYTHON) common/show-coverage.py $$keep
 
 fixme:
 	tools/fixme | less -R
