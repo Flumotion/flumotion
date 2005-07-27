@@ -12,9 +12,9 @@
       </entries>
       
       <properties>
-        <property name="source" type="string" required="yes"/>
-        <property name="directory" type="string" required="yes"/>
-        <property name="rotateType" type="string"/>
+        <property name="source" type="string" required="yes" />
+        <property name="directory" type="string" required="yes" />
+        <property name="rotateType" type="string" required="yes" />
         <property name="size" type="long"/>
         <property name="time" type="long"/>
       </properties>

@@ -1,4 +1,5 @@
 <registry>
+
   <components>
     <component type="audiotest">
       <source location="flumotion.component.producers.audiotest.audiotest"/>
@@ -10,4 +11,35 @@
       </properties>
     </component>
   </components>
+
+
+  <bundles>
+
+    <bundle name="audiotest-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/audiotest">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="audiotest-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="audiotest-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/audiotest">
+                <filename location="audiotest.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
 </registry> 
