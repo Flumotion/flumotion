@@ -6,7 +6,7 @@
 
 <widget class="GtkWindow" id="videotest-window">
   <property name="visible">True</property>
-  <property name="title" translatable="yes">window2</property>
+  <property name="title" translatable="no">window2</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
@@ -263,7 +263,7 @@ Black</property>
 	  <child>
 	    <widget class="GtkComboBox" id="format-combo">
 	      <property name="visible">True</property>
-	      <property name="items" translatable="yes">RGB
+	      <property name="items" translatable="no">RGB
 YUV</property>
 	    </widget>
 	    <packing>

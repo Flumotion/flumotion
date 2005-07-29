@@ -282,7 +282,7 @@ RCA</property>
 	  <child>
 	    <widget class="GtkComboBox" id="combobox_device">
 	      <property name="visible">True</property>
-	      <property name="items" translatable="yes">/dev/video0
+	      <property name="items" translatable="no">/dev/video0
 /dev/video1
 /dev/video2
 /dev/video3</property>

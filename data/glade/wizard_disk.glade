@@ -177,7 +177,7 @@ month</property>
 		<widget class="GtkComboBox" id="combobox_size_list">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
-		  <property name="items" translatable="yes">KB
+		  <property name="items" translatable="no">KB
 MB
 GB
 TB
@@ -210,7 +210,7 @@ TB
 	      <property name="editable">True</property>
 	      <property name="visibility">True</property>
 	      <property name="max_length">0</property>
-	      <property name="text" translatable="yes">/tmp</property>
+	      <property name="text" translatable="no">/tmp</property>
 	      <property name="has_frame">True</property>
 	      <property name="invisible_char">*</property>
 	      <property name="activates_default">False</property>

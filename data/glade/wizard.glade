@@ -64,7 +64,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label_title">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">This should be a huge title</property>
+		      <property name="label" translatable="no">This should be a huge title</property>
 		      <property name="use_underline">True</property>
 		      <property name="use_markup">True</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>

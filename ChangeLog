@@ -1,3 +1,23 @@
+2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/open-connection.glade:
+	* data/glade/videotest.glade:
+	* data/glade/wizard.glade:
+	* data/glade/wizard_audiotest.glade:
+	* data/glade/wizard_disk.glade:
+	* data/glade/wizard_encoding.glade:
+	* data/glade/wizard_http.glade:
+	* data/glade/wizard_jpeg.glade:
+	* data/glade/wizard_license.glade:
+	* data/glade/wizard_overlay.glade:
+	* data/glade/wizard_overview.glade:
+	* data/glade/wizard_smoke.glade:
+	* data/glade/wizard_soundcard.glade:
+	* data/glade/wizard_testsource.glade:
+	* data/glade/wizard_tvcard.glade:
+	* data/glade/wizard_webcam.glade:
+	  preparations for translation
+
 2005-07-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:

@@ -234,7 +234,7 @@ Black</property>
       <child>
 	<widget class="GtkComboBox" id="combobox_format">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="yes">RGB
+	  <property name="items" translatable="no">RGB
 YUV</property>
 	</widget>
 	<packing>

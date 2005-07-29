@@ -30,7 +30,7 @@
 	<widget class="GtkCheckButton" id="checkbutton_show_text">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Show _text in upper right corner:</property>
+	  <property name="label" translatable="yes">Show _text in upper left corner:</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="active">True</property>
@@ -52,7 +52,7 @@
 	<widget class="GtkCheckButton" id="checkbutton_show_logo">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Show _logo in bottom left corner</property>
+	  <property name="label" translatable="yes">Show _logo in bottom left corner:</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="active">True</property>
@@ -76,7 +76,7 @@
 	  <property name="editable">True</property>
 	  <property name="visibility">True</property>
 	  <property name="max_length">0</property>
-	  <property name="text" translatable="yes">Fluendo</property>
+	  <property name="text" translatable="no">Fluendo</property>
 	  <property name="has_frame">True</property>
 	  <property name="invisible_char">*</property>
 	  <property name="activates_default">False</property>

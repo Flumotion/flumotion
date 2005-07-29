@@ -148,7 +148,7 @@
       <child>
 	<widget class="GtkComboBox" id="combobox_samplerate">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="yes">16000
+	  <property name="items" translatable="no">16000
 22050
 32000
 </property>

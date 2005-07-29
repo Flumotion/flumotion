@@ -52,7 +52,7 @@
 	  <property name="visible">True</property>
 	  <property name="items" translatable="yes">Creative Commons
 GNU FDL
-Commericial</property>
+Commercial</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>

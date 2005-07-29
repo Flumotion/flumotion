@@ -29,7 +29,7 @@
       <child>
 	<widget class="GtkComboBox" id="combobox_video">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="yes">Theora
+	  <property name="items" translatable="no">Theora
 Smoke
 JPEG</property>
 	</widget>
@@ -46,7 +46,7 @@ JPEG</property>
       <child>
 	<widget class="GtkComboBox" id="combobox_audio">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="yes">Vorbis
+	  <property name="items" translatable="no">Vorbis
 Speex
 Mulaw</property>
 	</widget>
@@ -63,7 +63,7 @@ Mulaw</property>
       <child>
 	<widget class="GtkComboBox" id="combobox_format">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="yes">Ogg
+	  <property name="items" translatable="no">Ogg
 Multipart</property>
 	  <signal name="changed" handler="on_combobox_format_changed" last_modification_time="Thu, 30 Sep 2004 09:10:22 GMT"/>
 	</widget>
