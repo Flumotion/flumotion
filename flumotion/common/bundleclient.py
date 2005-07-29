@@ -171,6 +171,7 @@ class BundleLoader(log.Loggable):
 
         sums = d.value()
         name, md5 = sums[0]
+        import os
         path = os.path.join(configure.cachedir, name, md5)
         self.debug('Got bundle %s in %s' % (bundleName, path))
         yield path
