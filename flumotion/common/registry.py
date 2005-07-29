@@ -531,7 +531,7 @@ class RegistryParser(log.Loggable):
 
     def _parseBundleDirectory(self, node):
         # <directory name="">
-        #   <filename location="">
+        #   <filename location="" [ relative="" ] >
         # </directory>
         
         filenames = []

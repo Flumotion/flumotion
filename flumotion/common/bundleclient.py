@@ -20,9 +20,10 @@
 
 """
 Bundle fetching, caching, and importing utilities for clients using
-bundled code
+bundled code and data
 """
 
+import os
 
 from twisted.internet import error, defer
 from twisted.python import rebuild
@@ -49,19 +50,63 @@ class BundleLoader(log.Loggable):
 
     def _callRemote(self, methodName, *args, **kwargs):
         """
-        Call the given remote method on the manager-side AdminAvatar.
+        Call the given remote method on the manager-side Avatar.
         """
         if not self.remote:
             raise errors.ManagerNotConnectedError
         return self.remote.callRemote(methodName, *args, **kwargs)
 
+    def getBundles(self, **kwargs):
+        """
+        Get and extract all bundles needed.
+        Either one of bundleName, fileName or moduleName should be specified
+        in **kwargs.
+        """
+        # get sums for all bundles we need
+        d = self._callRemote('getBundleSums', **kwargs)
+        yield d
+
+        # sums is a list of name, sum tuples
+        # figure out which bundles we're missing
+        sums = d.value()
+        self.debug('Got sums %r' % sums)
+        toFetch = []
+        for name, md5 in sums:
+            path = os.path.join(configure.cachedir, name, md5)
+            if os.path.exists(path):
+                self.log(name + ' is up to date')
+            else:
+                self.log(name + ' needs updating')
+                toFetch.append(name)
+
+        # ask for the missing bundles
+        d = self._callRemote('getBundleZips', toFetch)
+        yield d
+
+        # unpack the new bundles
+        result = d.value()
+        for name in toFetch:
+            if name not in result.keys():
+                msg = "Missing bundle %s was not received" % name
+                self.warning(msg)
+                raise errors.NoBundleError(msg)
+
+            b = bundle.Bundle(name)
+            b.setZip(result[name])
+            path = self._unbundler.unbundle(b)
+
+        yield sums
+    getBundles = defer_generator_method(getBundles)
+
+    # FIXME: use getBundles and make sure basic admin client uses this
     def load_module(self, moduleName):
         """
         Load the module given by name.
         Sets up all necessary bundles to be able to load the module.
 
         @rtype:   L{twisted.internet.defer.Deferred}
-        @returns: a deferred that will fire when the given module is loaded.
+        @returns: a deferred that will fire when the given module is loaded,
+                  giving the loaded module.
         """
         
         # fool pychecker
@@ -69,30 +114,31 @@ class BundleLoader(log.Loggable):
         import sys
 
         self.debug('Loading module %s' % moduleName)
-        d = self._callRemote('getBundleSums', modname=moduleName)
+
+        # get sums for all bundles we need
+        d = self._callRemote('getBundleSums', moduleName=moduleName)
         yield d
         sums = d.value()
         self.debug('Got sums %r' % sums)
 
         # sums is a list of name, sum tuples
-        to_fetch = []
-        to_load = []
+        # figure out which bundles we're missing
+        toFetch = []
         for name, md5 in sums:
             path = os.path.join(configure.cachedir, name, md5)
             if os.path.exists(path):
                 self.log(name + ' is up to date, registering package path')
                 package.getPackager().registerPackagePath(path, name)
-                to_load.append(name)
             else:
                 self.log(name + ' needs updating')
-                to_fetch.append(name)
+                toFetch.append(name)
 
-        d = self._callRemote('getBundleZips', to_fetch)
+        d = self._callRemote('getBundleZips', toFetch)
         yield d
         result = d.value()
 
         self.debug('load_module: received %d zips' % len(result))
-        for name in to_fetch:
+        for name in toFetch:
             if name not in result.keys():
                 msg = "Missing bundle %s was not received" % name
                 self.warning(msg)
@@ -110,3 +156,22 @@ class BundleLoader(log.Loggable):
         self.log('loaded module %s' % moduleName)
         yield sys.modules[moduleName]
     load_module = defer_generator_method(load_module)
+
+    def getBundleByName(self, bundleName):
+        """
+        Get the given bundle locally.
+
+        @rtype:   L{twisted.internet.defer.Deferred}
+        @returns: a deferred that will fire when the given bundle is fetched,
+                  giving the full local path where the bundle is extracted.
+        """
+        self.debug('Getting bundle %s' % bundleName)
+        d = self.getBundles(bundleName=bundleName)
+        yield d
+
+        sums = d.value()
+        name, md5 = sums[0]
+        path = os.path.join(configure.cachedir, name, md5)
+        self.debug('Got bundle %s in %s' % (bundleName, path))
+        yield path
+    getBundleByName = defer_generator_method(getBundleByName)

@@ -22,12 +22,14 @@ import os
 import os.path
 import sys
 
+from gettext import gettext as _
+
 import gobject
 from gtk import gdk
 import gtk
 import gtk.glade
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.python import rebuild
 
 from flumotion.admin.admin import AdminModel
@@ -149,7 +151,7 @@ class Window(log.Loggable, gobject.GObject):
         tool_set_icon(widgets['toolbutton_stop_component'], 'pause')
 
         self._trayicon = trayicon.FluTrayIcon(self)
-        self._trayicon.set_tooltip('Not connected')
+        self._trayicon.set_tooltip(_('Not connected'))
 
         self.hpaned = widgets['hpaned']
  
@@ -174,7 +176,7 @@ class Window(log.Loggable, gobject.GObject):
         model = AdminModel(config['user'], config['passwd'])
         d = model.connectToHost(config['host'], config['port'],
                                 config['use_insecure'])
-        self._trayicon.set_tooltip("Connecting to %s:%s" %
+        self._trayicon.set_tooltip(_("Connecting to %s:%s") %
             (config['host'], config['port']))
 
         def connected(model):
@@ -259,7 +261,7 @@ class Window(log.Loggable, gobject.GObject):
         self.current_component = None
 
         name = state.get('name')
-        self.statusbar.set('main', "Loading UI for %s ..." % name)
+        self.statusbar.set('main', _("Loading UI for %s ...") % name)
 
         moduleName = common.pathToModuleName(fileName)
         statement = 'import %s' % moduleName
@@ -302,7 +304,12 @@ class Window(log.Loggable, gobject.GObject):
         # but let's decide for either view or model
         instance = klass(state, self.admin)
         self.debug("Created entry instance %r" % instance)
-        instance.setup()
+        d = instance.setup()
+        if not d:
+            d = defer.succeed(None)
+        d.addCallback(self._setupCallback, name, instance)
+
+    def _setupCallback(self, result, name, instance):
         nodes = instance.getNodes()
         notebook = gtk.Notebook()
         nodeWidgets = {}
@@ -312,7 +319,7 @@ class Window(log.Loggable, gobject.GObject):
         # now
         for nodeName in nodes.keys():
             self.debug("Creating node for %s" % nodeName)
-            label = gtk.Label('Loading UI for %s ...' % nodeName)
+            label = gtk.Label(_('Loading UI for %s ...') % nodeName)
             table = gtk.Table(1, 1)
             table.add(label)
             nodeWidgets[nodeName] = table
@@ -330,7 +337,7 @@ class Window(log.Loggable, gobject.GObject):
         # so the status bar can show what happens
         for nodeName in nodes.keys():
             mid = self.statusbar.push('notebook',
-                "Loading tab %s for %s ..." % (nodeName, name))
+                _("Loading tab %s for %s ...") % (nodeName, name))
             node = nodes[nodeName]
             node.statusbar = self.statusbar # hack
             d = node.render()
@@ -350,7 +357,7 @@ class Window(log.Loggable, gobject.GObject):
         
         if not widget:
             self.warning(".render() did not return an object")
-            widget = gtk.Label('%s does not have a UI yet' % nodeName)
+            widget = gtk.Label(_('%s does not have a UI yet') % nodeName)
         else:
             parent = widget.get_parent()
             if parent:
@@ -539,7 +546,7 @@ class Window(log.Loggable, gobject.GObject):
             self._disconnected_dialog = None
 
         # FIXME: have a method for this
-        self.window.set_title('%s - Flumotion Administration' %
+        self.window.set_title(_('%s - Flumotion Administration') %
             self.admin.adminInfoStr())
         self._trayicon.set_tooltip(self.admin.adminInfoStr())
 
@@ -555,7 +562,7 @@ class Window(log.Loggable, gobject.GObject):
             self.runWizard()
     
     def admin_disconnected_cb(self, admin):
-        message = "Lost connection to manager, reconnecting ..."
+        message = _("Lost connection to manager, reconnecting ...")
         d = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT,
             gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, message)
         # FIXME: move this somewhere
@@ -575,9 +582,9 @@ class Window(log.Loggable, gobject.GObject):
             self.admin.reconnect()
         
     def admin_connection_refused_later(self, admin):
-        message = ("Connection to manager on %s was refused."
-                   % admin.connectionInfoStr())
-        self._trayicon.set_tooltip("Connection to %s was refused" %
+        message = _("Connection to manager on %s was refused.") % \
+            admin.connectionInfoStr()
+        self._trayicon.set_tooltip(_("Connection to %s was refused") %
             self.admin.adminInfoStr())
         self.info(message)
         d = dialogs.ErrorDialog(message, self)
@@ -590,7 +597,7 @@ class Window(log.Loggable, gobject.GObject):
         log.debug('adminclient', "handled connection-refused")
 
     def admin_connection_failed_later(self, admin, reason):
-        message = ("Connection to manager on %s failed (%s)."
+        message = (_("Connection to manager on %s failed (%s).")
                    % (admin.connectionInfoStr(), reason))
         self._trayicon.set_tooltip("Connection to %s failed" %
             self.admin.adminInfoStr())
@@ -672,7 +679,7 @@ class Window(log.Loggable, gobject.GObject):
         def gotEntryCallback(result):
             entryPath, filename, methodName = result
 
-            self.statusbar.set('main', 'Showing UI for %s' % name)
+            self.statusbar.set('main', _('Showing UI for %s') % name)
 
             filepath = os.path.join(entryPath, filename)
             self.debug("Got the UI, lives in %s" % filepath)
@@ -691,7 +698,7 @@ class Window(log.Loggable, gobject.GObject):
         def gotEntryNoBundleErrback(failure):
             failure.trap(errors.NoBundleError)
 
-            self.statusbar.set('main', "No UI for component %s" % name)
+            self.statusbar.set('main', _("No UI for component %s") % name)
 
             # no ui, clear; FIXME: do this nicer
             old = self.hpaned.get_child2()
@@ -704,7 +711,8 @@ class Window(log.Loggable, gobject.GObject):
         def gotEntrySleepingComponentErrback(failure):
             failure.trap(errors.SleepingComponentError)
 
-            self.statusbar.set('main', "Component %s is still sleeping" % name)
+            self.statusbar.set('main',
+                _("Component %s is still sleeping") % name)
 
             # no ui, clear; FIXME: do this nicer
             old = self.hpaned.get_child2()
@@ -714,7 +722,7 @@ class Window(log.Loggable, gobject.GObject):
             self.hpaned.add2(sub)
             sub.show()
                       
-        self.statusbar.set('main', "Requesting UI for %s ..." % name)
+        self.statusbar.set('main', _("Requesting UI for %s ...") % name)
 
         d = self.admin.getEntry(state, 'admin/gtk')
         d.addCallback(gotEntryCallback)
@@ -760,7 +768,7 @@ class Window(log.Loggable, gobject.GObject):
         state = self.admin.getWorkerHeavenState()
         if not state.get('names'):
             self.show_error_dialog(
-                'The wizard cannot be run because no workers are logged in.')
+                _('The wizard cannot be run because no workers are logged in.'))
             return
         
         wiz = wizard.Wizard(self.window, self.admin)
@@ -801,7 +809,7 @@ class Window(log.Loggable, gobject.GObject):
             return
 
         dialog = dialogs.ProgressDialog("Reloading",
-            "Reloading component code for %s" % name, self.window)
+            _("Reloading component code for %s") % name, self.window)
         d = self.admin.reloadComponent(name)
         d.addCallback(lambda result, d: d.destroy(), dialog)
         # add error
@@ -818,7 +826,7 @@ class Window(log.Loggable, gobject.GObject):
         if not state:
             state = self.components_view.get_selected_state()
             if not state:
-                self.statusbar.push('main', "No component selected.")
+                self.statusbar.push('main', _("No component selected."))
                 return None
 
         name = state.get('name')
@@ -835,7 +843,7 @@ class Window(log.Loggable, gobject.GObject):
             self.statusbar.remove('main', mid)
             self.warning("Failed to %s component %s: %s" % (
                 action, name, failure))
-            self.statusbar.push('main', "Failed to %s component %s" % (
+            self.statusbar.push('main', _("Failed to %s component %s") % (
                 action, name))
             
         d.addCallback(_actionCallback, self, mid)
@@ -862,7 +870,7 @@ class Window(log.Loggable, gobject.GObject):
         d.destroy()
 
     def file_import_configuration_cb(self, button):
-        d = gtk.FileChooserDialog("Import Configuration...", self.window,
+        d = gtk.FileChooserDialog(_("Import Configuration..."), self.window,
                                   gtk.FILE_CHOOSER_ACTION_OPEN,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -875,7 +883,7 @@ class Window(log.Loggable, gobject.GObject):
         if os.path.exists(name):
             d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
                                   gtk.MESSAGE_ERROR, gtk.BUTTONS_YES_NO,
-                                  "File already exists.\nOverwrite?")
+                                  _("File already exists.\nOverwrite?"))
             d.connect("response", lambda self, response: d.hide())
             if d.run() == gtk.RESPONSE_YES:
                 file_exists = False
@@ -897,7 +905,7 @@ class Window(log.Loggable, gobject.GObject):
             d.destroy()
 
     def file_export_configuration_cb(self, button):
-        d = gtk.FileChooserDialog("Export Configuration...", self.window,
+        d = gtk.FileChooserDialog(_("Export Configuration..."), self.window,
                                   gtk.FILE_CHOOSER_ACTION_SAVE,
                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -941,7 +949,8 @@ class Window(log.Loggable, gobject.GObject):
             failure.trap(errors.ReloadSyntaxError)
             _stop(progress)
             self.show_error_dialog(
-                "Could not reload component:\n%s." % failure.getErrorMessage())
+                _("Could not reload component:\n%s.") %
+                failure.getErrorMessage())
             return None
             
         def _callLater(admin, dialog):
@@ -950,10 +959,10 @@ class Window(log.Loggable, gobject.GObject):
             deferred.addErrback(_syntaxErrback, self, dialog)
             deferred.addErrback(self._defaultErrback)
         
-        dialog = dialogs.ProgressDialog("Reloading ...",
-            "Reloading client code", self.window)
+        dialog = dialogs.ProgressDialog(_("Reloading ..."),
+            _("Reloading client code"), self.window)
         l = lambda admin, text, dialog: dialog.message(
-            "Reloading %s code" % text)
+            _("Reloading %s code") % text)
         self.admin.connect('reloading', l, dialog)
         dialog.start()
         reactor.callLater(0.2, _callLater, self.admin, dialog)
@@ -966,7 +975,7 @@ class Window(log.Loggable, gobject.GObject):
         code.interact()
 
     def help_about_cb(self, button):
-        dialog = gtk.Dialog('About Flumotion', self.window,
+        dialog = gtk.Dialog(_('About Flumotion'), self.window,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                             (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         dialog.set_has_separator(False)
@@ -985,12 +994,12 @@ class Window(log.Loggable, gobject.GObject):
         version.set_use_markup(True)
         version.show()
 
-        text = 'Flumotion is a streaming media server\n\n(C) 2004-2005 Fluendo S.L.'
+        text = _('Flumotion is a streaming media server.\n\n(C) 2004-2005 Fluendo S.L.')
         authors = ('Andy Wingo',
                    'Johan Dahlin',
                    'Thomas Vander Stichele',
                    'Wim Taymans')
-        text += '\n\n<small>Authors:\n'
+        text += '\n\n<small>' + _('Authors') + ':\n'
         for author in authors:
             text += '  %s\n' % author
         text += '</small>'

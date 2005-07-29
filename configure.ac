@@ -11,7 +11,14 @@ AC_SUBST(PYGST_REQ, 0.8.0)
 AC_SUBST(GST_REQ, 0.8.7)
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
-AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")
+AC_SUBST(ACLOCAL_AMFLAGS, "-I common")
+
+dnl gettext
+AM_GNU_GETTEXT_VERSION(0.11.5)
+AM_GNU_GETTEXT([external])
+
+GETTEXT_PACKAGE=$PACKAGE
+AC_SUBST(GETTEXT_PACKAGE)
 
 AS_AC_EXPAND(LIBDIR, $libdir)
 AC_MSG_NOTICE(Storing library files in $LIBDIR)
@@ -214,4 +221,5 @@ pkgconfig/Makefile
 pkgconfig/flumotion.pc
 pkgconfig/flumotion-uninstalled.pc
 flumotion.spec
+po/Makefile.in
 )

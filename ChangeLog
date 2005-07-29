@@ -1,5 +1,48 @@
 2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/gen-locale-xml.py:
+	  script to generate locale registry files
+	* common/locale.mk:
+	  Makefile rules for i18n
+	* autogen.sh:
+	  add autopoint
+	* configure.ac:
+	  add gettext
+	* Makefile.am:
+	  add po directory
+	* flumotion/configure/installed.py.in:
+	* flumotion/configure/uninstalled.py.in:
+	  add localedir
+	* flumotion/common/common.py:
+	  add getLL()
+	* flumotion/common/bundleclient.py:
+	  create a getBundles() generator method, we still need to convert
+	  parts to use bundleclient.py though
+	* flumotion/admin/admin.py:
+	  fix for new getBundleSums call
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/admin/gtk/client.py:
+	  mark strings for translation
+	* flumotion/admin/gtk/main.py:
+	  set up translation domains
+	* flumotion/component/base/admin_gtk.py:
+	  add a domain property to load gload files under
+	* flumotion/component/consumers/httpstreamer/http.glade:
+	  fix for translation
+	* flumotion/project/Makefile.am:
+	  add project files
+	* flumotion/manager/base.py:
+	  make arguments consistent for perspective_getBundleSums
+	* flumotion/manager/manager.py:
+	  make sure we only try rebuilding registry once on errors
+	* po/Makevars:
+	* po/LINGUAS:
+	* po/POTFILES.in:
+	* po/nl.po:
+	  add translation files and a dutch translation
+
+2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/open-connection.glade:
 	* data/glade/videotest.glade:
 	* data/glade/wizard.glade:

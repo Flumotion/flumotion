@@ -21,21 +21,26 @@
 import optparse
 import sys
 
+import gettext
+import gtk.glade
+
 from twisted.internet import reactor
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs
-from flumotion.admin.gtk.greeter import Greeter
 from flumotion.admin.gtk.client import Window
 from flumotion.common import log, errors
 from flumotion.configure import configure
 
-def _runInterface(conf_file, options, greeter=None):
+def _runInterface(conf_file, options, thegreeter=None):
     if conf_file:
         # load the conf file here
         raise NotImplementedError()
 
-    g = greeter or Greeter()
+    # We do the import here so gettext has been set up and class strings
+    # from greeter are translated
+    from flumotion.admin.gtk import greeter
+    g = thegreeter or greeter.Greeter()
     state = g.run()
     if not state:
         reactor.callLater(0, reactor.stop)
@@ -90,6 +95,13 @@ def main(args):
 
     if options.debug:
         log.setFluDebug(options.debug)
+
+    # set up gettext
+    log.debug("locale", "Loading locales from %s" % configure.localedir)
+    gettext.bindtextdomain('flumotion', configure.localedir)
+    gettext.textdomain('flumotion')
+    gtk.glade.bindtextdomain('flumotion', configure.localedir)
+    gtk.glade.textdomain('flumotion')
 
     conf_files = args[1:]
 

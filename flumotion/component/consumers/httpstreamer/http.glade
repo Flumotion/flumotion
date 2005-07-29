@@ -30,7 +30,7 @@
       <child>
 	<widget class="GtkLabel" id="label-stream-totalbytes">
 	  <property name="visible">False</property>
-	  <property name="label" translatable="yes">12.3 GB</property>
+	  <property name="label" translatable="no">12.3 GB</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -54,7 +54,7 @@
       <child>
 	<widget class="GtkLabel" id="label-stream-bitrate">
 	  <property name="visible">False</property>
-	  <property name="label" translatable="yes">50.42 Kbit/sec</property>
+	  <property name="label" translatable="no">50.42 Kbit/sec</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -78,7 +78,7 @@
       <child>
 	<widget class="GtkLabel" id="label-stream-uptime">
 	  <property name="visible">False</property>
-	  <property name="label" translatable="yes">01:02:03</property>
+	  <property name="label" translatable="no">01:02:03</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -102,7 +102,7 @@
       <child>
 	<widget class="GtkLabel" id="label-stream-mime">
 	  <property name="visible">False</property>
-	  <property name="label" translatable="yes">application/ogg</property>
+	  <property name="label" translatable="no">application/ogg</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -358,7 +358,7 @@
       <child>
 	<widget class="GtkLabel" id="label-clients-average">
 	  <property name="visible">False</property>
-	  <property name="label" translatable="yes">1092</property>
+	  <property name="label" translatable="no">1092</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -388,7 +388,7 @@
 	  <child>
 	    <widget class="GtkLabel" id="label-clients-current">
 	      <property name="visible">False</property>
-	      <property name="label" translatable="yes">4910</property>
+	      <property name="label" translatable="no">4910</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -430,7 +430,7 @@
 	  <child>
 	    <widget class="GtkLabel" id="label-clients-max">
 	      <property name="visible">False</property>
-	      <property name="label" translatable="yes">5901</property>
+	      <property name="label" translatable="no">5901</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_RIGHT</property>
@@ -467,7 +467,7 @@
 	  <child>
 	    <widget class="GtkLabel" id="label-clients-peak">
 	      <property name="visible">False</property>
-	      <property name="label" translatable="yes">58910</property>
+	      <property name="label" translatable="no">58910</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -509,7 +509,7 @@
 	  <child>
 	    <widget class="GtkLabel" id="label-clients-peak-time">
 	      <property name="visible">False</property>
-	      <property name="label" translatable="yes">13:76:04 Tue Feb 31, 2004</property>
+	      <property name="label" translatable="no">13:76:04 Tue Feb 31, 2004</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_RIGHT</property>
@@ -540,7 +540,7 @@
       <child>
 	<widget class="GtkLabel" id="label-consumption-bitrate">
 	  <property name="visible">False</property>
-	  <property name="label" translatable="yes">55.12 Mbit/sec</property>
+	  <property name="label" translatable="no">55.12 Mbit/sec</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -564,7 +564,7 @@
       <child>
 	<widget class="GtkLabel" id="label-consumption-totalbytes">
 	  <property name="visible">False</property>
-	  <property name="label" translatable="yes">1.40 TB</property>
+	  <property name="label" translatable="no">1.40 TB</property>
 	  <property name="use_underline">False</property>
 	  <property name="use_markup">False</property>
 	  <property name="justify">GTK_JUSTIFY_LEFT</property>

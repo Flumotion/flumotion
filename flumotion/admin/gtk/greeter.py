@@ -18,6 +18,7 @@
 
 # Headers in this file shall remain intact.
 
+from gettext import gettext as _
 from flumotion.configure import configure
 from flumotion.admin.gtk import wizard, connections
 
@@ -34,9 +35,9 @@ from flumotion.admin.gtk import wizard, connections
 
 class Initial(wizard.WizardStep):
     name = 'initial'
-    title = 'Connect to Flumotion manager'
-    text = 'Flumotion Admin needs to connect to a Flumotion manager.\nChoose' \
-           + ' an option from the list and click "Forward" to begin.'
+    title = _('Connect to Flumotion manager')
+    text = _('Flumotion Admin needs to connect to a Flumotion manager.\n') + \
+           _('Choose an option from the list and click "Forward" to begin.')
     connect_to_existing = None
     next_pages = ['load_connection', 'connect_to_existing']
 
@@ -57,9 +58,9 @@ class Initial(wizard.WizardStep):
 
 
 class ConnectToExisting(wizard.WizardStep):
-    name='connect_to_existing'
-    title='Host information'
-    text = 'Please enter the address where the manager is running.'
+    name = 'connect_to_existing'
+    title = _('Host information')
+    text = _('Please enter the address where the manager is running.')
     next_pages = ['authenticate']
     open_connection = None
 
@@ -82,8 +83,8 @@ class ConnectToExisting(wizard.WizardStep):
 
 class Authenticate(wizard.WizardStep):
     name = 'authenticate'
-    title = 'Authentication'
-    text = 'Please select among the following authentication methods.'
+    title = _('Authentication')
+    text = _('Please select among the following authentication methods.')
     auth_method_combo = user_entry = passwd_entry = None
     next_pages = []
 
@@ -109,8 +110,8 @@ class Authenticate(wizard.WizardStep):
 
 class LoadConnection(wizard.WizardStep):
     name = 'load_connection'
-    title = 'Recent connections'
-    text = 'Please choose a connection from the box below.'
+    title = _('Recent connections')
+    text = _('Please choose a connection from the box below.')
     connections = None
     next_pages = []
 

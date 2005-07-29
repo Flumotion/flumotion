@@ -190,7 +190,7 @@ class BaseAdminGtkNode(log.Loggable):
                                               *args, **kwargs)
        
     # FIXME: do this automatically if there is a gladeFile class attr set
-    def loadGladeFile(self, gladeFile):
+    def loadGladeFile(self, gladeFile, domain='flumotion'):
         """
         Returns: a deferred returning the widget tree from the glade file.
         """
@@ -199,7 +199,13 @@ class BaseAdminGtkNode(log.Loggable):
             if not os.path.exists(path):
                 self.warning("Glade file %s not found in path %s" % (
                     gladeFile, path))
+            self.debug("Switching text domain to %s" % domain)
+            self.debug("loading widget tree from %s" % path)
+            old = gtk.glade.textdomain()
+            gtk.glade.textdomain(domain)
             wtree = gtk.glade.XML(path)
+            self.debug("Switching text domain back to %s" % old)
+            gtk.glade.textdomain(old)
             return wtree
 
         self.debug("requesting bundle for glade file %s" % gladeFile)

@@ -141,37 +141,47 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
                 
         return None
 
-    def perspective_getBundleSums(self, bundleName=None, filename=None,
-                                  modname=None):
+    def perspective_getBundleSums(self, bundleName=None, fileName=None,
+                                  moduleName=None):
         """
         Get a list of (bundleName, md5sum) of all dependency bundles,
         starting with this bundle, in the correct order.
+        One of bundleName, fileName, moduleName must be given.
 
         @type  bundleName: string
-        @param bundleName: the name of the bundle
+        @param bundleName: the name of the bundle for fetching
+        @type  fileName:   string
+        @param fileName:   the name of the file requested for fetching
+        @type  moduleName: string
+        @param moduleName: the name of the module requested for import
 
-        @rtype: list of (string, string) tuples
+        @rtype: list of (string, string) tuples of (bundleName, md5sum)
         """
         if bundleName:
             self.debug('asked to get bundle sums for bundle %s' % bundleName)
-        elif filename:
-            self.debug('asked to get bundle sums for file %s' % filename)
+        elif fileName:
+            self.debug('asked to get bundle sums for file %s' % fileName)
+        elif moduleName:
+            self.debug('asked to get bundle sums for module %s' % moduleName)
 
         basket = self.vishnu.bundlerBasket
 
         # will raise an error if bundleName not known
         if not bundleName:
-            if filename:
-                bundleName = basket.getBundlerNameByFile(filename)
+            if fileName:
+                bundleName = basket.getBundlerNameByFile(fileName)
                 if not bundleName:
-                    msg = 'containing ' + filename
+                    msg = 'containing ' + fileName
                     self.warning('No bundle %s' % msg)
                     raise errors.NoBundleError(msg)
-            elif modname:
-                bundleName = basket.getBundlerNameByImport(modname)
+            elif moduleName:
+                bundleName = basket.getBundlerNameByImport(moduleName)
                 if not bundleName:
-                    raise errors.NoBundleError('bundle for module ' + modname)
+                    msg = 'for module ' + moduleName
+                    self.warning('No bundle %s' % msg)
+                    raise errors.NoBundleError(msg)
             else:
+                # FIXME: handle better
                 raise Exception('invalid arguments')
     
         deps = basket.getDependencies(bundleName)

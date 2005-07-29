@@ -5,7 +5,7 @@ ACLOCAL_AMFLAGS = -I common
 include $(srcdir)/common/common.mk
 include $(srcdir)/common/pychecker.mk
 
-SUBDIRS = . bin conf data flumotion doc common pkgconfig
+SUBDIRS = . bin conf data flumotion doc common pkgconfig po
 
 EXTRA_DIST = \
 	env.in \
@@ -13,6 +13,14 @@ EXTRA_DIST = \
 	LICENSE.Flumotion \
 	flumotion.spec \
 	misc/pycheckerhelp.py
+
+all-local: locale-uninstalled
+
+locale-uninstalled:
+	topbuilddir=`cd $(top_builddir) && pwd`; \
+        cd po; \
+        make datadir=$$topbuilddir install
+
 
 # for some reason, the run is *completely* different if the last set of
 # components is moved up.  So keep it low

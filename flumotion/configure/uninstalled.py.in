@@ -42,6 +42,7 @@ def get():
         'gladedir':      os.path.join(__toplevel,      'data', 'glade'),
         'imagedir':      os.path.join(__toplevel,      'data', 'image'),
         'logdir':        os.path.join(__toplevelwrite, 'log'),
+        'localedir':     os.path.join(__toplevelwrite, 'locale'),
         'pythondir':     os.path.join(__toplevel),
         'registrydir':   os.path.join(__toplevelwrite, 'cache', 'registry'),
         'rundir':        os.path.join(__toplevelwrite, 'run'),

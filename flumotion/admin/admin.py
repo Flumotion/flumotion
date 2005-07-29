@@ -536,7 +536,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             filename, methodName = result
             self.debug("entry point for %r of type %s is in file %s and method %s" % (componentState, type, filename, methodName))
             # request bundle sums
-            d = self.callRemote('getBundleSums', filename=filename)
+            d = self.callRemote('getBundleSums', fileName=filename)
             d.addCallback(_getBundleSumsCallback, filename, methodName)
             d.addErrback(_getBundleSumsErrback, componentState, type)
             d.addErrback(self._defaultErrback)
@@ -680,7 +680,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             # return physical location of bundledPath
             self.debug('_getBundleZipsCallback: received %d zips' % len(result))
             zip = result[bundleName]
-            b = bundle.Bundle()
+            b = bundle.Bundle(bundleName)
             b.setZip(zip)
             dir = self._unbundler.unbundle(b)
             self.debug("unpacked %s to dir %s" % (bundleName, dir))
@@ -688,7 +688,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             return os.path.join(dir, bundledPath)
 
         # start chain
-        d = self.callRemote('getBundleSums', filename=bundledPath)
+        d = self.callRemote('getBundleSums', fileName=bundledPath)
         d.addCallback(_getBundleSumsCallback, bundledPath)
         d.addErrback(self._defaultErrback)
         return d

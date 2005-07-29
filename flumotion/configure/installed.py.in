@@ -45,6 +45,7 @@ def get():
         'configdir':     os.path.join('@SYSCONFDIR@', 'flumotion'),
         'gladedir':      os.path.join('@DATADIR@', 'flumotion', 'glade'),
         'imagedir':      os.path.join('@DATADIR@', 'flumotion', 'image'),
+        'localedir':     os.path.join('@DATADIR@', 'locale'),
         'logdir':        os.path.join('@LOCALSTATEDIR@', 'log', 'flumotion'),
         'pythondir':     os.path.join('@LIBDIR@', 'flumotion', 'python'),
         'registrydir':   registrydir,

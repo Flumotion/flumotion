@@ -400,6 +400,7 @@ class Vishnu(log.Loggable):
                         self.warning("Bundle problem, rebuilding registry")
                         registry.getRegistry().verify(force=True)
                         self._setupBundleBasket(firstTry=False)
+                        return
 
             for d in b.getDependencies():
                 self.log('Adding dependency of %s on %s' % (bundleName, d))

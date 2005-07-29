@@ -471,4 +471,11 @@ def pathToModuleName(path):
 
     return ".".join(path.split(os.path.sep))
 
+def getLL():
+    """
+    Return the (at most) two-letter language code set for message translation.
+    """
+    lang = os.environ['LANG']
+    LL = lang[:2]
 
+    return LL
