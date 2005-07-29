@@ -1,6 +1,6 @@
 # Flumotion
 # This file is put in the public domain.
-# Thomas Vander Stichele <thomas at fluendo dot com>, 2005.
+# Christian Schaller <christian at fluendo com> 2005.
 #
 msgid ""
 msgstr ""
@@ -8,7 +8,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-07-29 17:16+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
-"Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
+"Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,36 +16,36 @@ msgstr ""
 
 #: flumotion/admin/gtk/client.py:154
 msgid "Not connected"
-msgstr "Niet verbonden"
+msgstr "Ingen tilknyttning"
 
 #: flumotion/admin/gtk/client.py:179
 #, python-format
 msgid "Connecting to %s:%s"
-msgstr "Aan het verbinden met %s:%s"
+msgstr "Tilknyttet til %s:%s"
 
 #: flumotion/admin/gtk/client.py:264 flumotion/admin/gtk/client.py:322
 #, python-format
 msgid "Loading UI for %s ..."
-msgstr "UI aan het laden voor %s ..."
+msgstr "Laster UI for %s ..."
 
 #: flumotion/admin/gtk/client.py:340
 #, python-format
 msgid "Loading tab %s for %s ..."
-msgstr "Blad %s aan het laden voor %s ..."
+msgstr "Laster tab %s for %s ..."
 
 #: flumotion/admin/gtk/client.py:360
 #, python-format
 msgid "%s does not have a UI yet"
-msgstr "%s heeft nog geen UI"
+msgstr "%s har ikke noe UI enda"
 
 #: flumotion/admin/gtk/client.py:549
 #, python-format
 msgid "%s - Flumotion Administration"
-msgstr "%s - Flumotion Administratie"
+msgstr "%s - Flumotion Administrasjon"
 
 #: flumotion/admin/gtk/client.py:565
 msgid "Lost connection to manager, reconnecting ..."
-msgstr "Verbinding verbroken met manager, herverbinden ..."
+msgstr "Mistet forbindelse med manager, kobler til på nytt ..."
 
 #: flumotion/admin/gtk/client.py:585
 #, python-format
