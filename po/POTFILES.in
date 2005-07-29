@@ -2,6 +2,9 @@ flumotion/admin/gtk/client.py
 flumotion/admin/gtk/greeter.py
 flumotion/admin/gtk/parts.py
 
+flumotion/component/producers/videotest/admin_gtk.py
+flumotion/wizard/enums.py
+
 flumotion/component/consumers/httpstreamer/http.glade
 
 data/glade/admin.glade

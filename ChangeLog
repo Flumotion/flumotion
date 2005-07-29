@@ -1,5 +1,16 @@
 2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	* flumotion/component/producers/videotest/videotest.xml:
+	  fix video test by putting wizard enums in a bundle
+	* flumotion/wizard/enums.py:
+	* po/POTFILES.in:
+	* po/nl.po:
+	* po/no.po:
+	  add more translation
+
+2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/parts.py:
 	* po/POTFILES.in:
 	* po/nl.po:

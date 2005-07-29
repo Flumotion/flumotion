@@ -22,6 +22,7 @@
 I contain a set of enums used in UI's for Flumotion.
 """
 
+from gettext import gettext as _
 from flumotion.common import enum
 
 # Sources
@@ -78,9 +79,9 @@ TVCardSignal = enum.EnumClass('TVCardSignal', ('Composite', 'RCA'))
 #               GstVideotestsrcPattern
 VideoTestPattern = enum.EnumClass('VideoTestPattern',
                              ('Bars', 'Snow', 'Black'),
-                             ('SMPTE Color bars',
-                              'Random (television snow)',
-                              'Totally black'))
+                             (_('SMPTE Color bars'),
+                              _('Random (television snow)'),
+                              _('Totally black')))
 
 VideoTestFormat = enum.EnumClass('VideoTestFormat', ('YUV', 'RGB'))
 

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-29 17:16+0200\n"
+"POT-Creation-Date: 2005-07-29 20:13+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -224,6 +224,22 @@ msgstr "Herlaad _code"
 #: flumotion/admin/gtk/parts.py:418
 msgid "_Modify element property ..."
 msgstr "_Wijzig elementeigenschap ..."
+
+#: flumotion/component/producers/videotest/admin_gtk.py:33
+msgid "Pattern:"
+msgstr "Patroon:"
+
+#: flumotion/wizard/enums.py:82
+msgid "SMPTE Color bars"
+msgstr "SMPTE Kleurbalken"
+
+#: flumotion/wizard/enums.py:83
+msgid "Random (television snow)"
+msgstr "Willekeurig (televisiesneeuw)"
+
+#: flumotion/wizard/enums.py:84
+msgid "Totally black"
+msgstr "Volledig zwart"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:8
 msgid "Statistics"

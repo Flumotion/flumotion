@@ -18,6 +18,8 @@
 
 # Headers in this file shall remain intact.
 
+from gettext import gettext as _
+
 import gtk
 
 from flumotion.common import errors
@@ -28,7 +30,7 @@ class PatternNode(BaseAdminGtkNode):
     def render(self):
         # FIXME: gladify
         self.widget = gtk.Table(1, 2)
-        label = gtk.Label("Pattern:")
+        label = gtk.Label(_("Pattern:"))
         self.widget.attach(label, 0, 1, 0, 1, 0, 0, 6, 6)
         label.show()
         d = self.callRemote("getElementProperty", "source", "pattern")
