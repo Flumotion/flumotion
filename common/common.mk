@@ -1,6 +1,3 @@
-clean-local:
-	@rm -rf _trial_temp
-
 if HAVE_PYCHECKER
 check-local: pychecker
 endif
@@ -37,3 +34,14 @@ sloc:
 	sloccount flumotion | grep "(SLOC)" | cut -d = -f 2
 
 .PHONY: test
+
+
+locale-uninstalled:
+	if test -d po; then \
+	cd po; \
+	make datadir=../$(top_builddir) install; \
+	fi
+
+locale-uninstalled-clean:
+	@-rm -rf _trial_temp
+	@-rm -rf $(top_builddir)/locale

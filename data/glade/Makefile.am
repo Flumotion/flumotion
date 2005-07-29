@@ -20,6 +20,7 @@ glade_DATA = \
 	wizard_jpeg.glade		\
 	wizard_license.glade		\
 	wizard_overlay.glade		\
+	wizard_overview.glade		\
 	wizard_smoke.glade		\
 	wizard_soundcard.glade		\
 	wizard_source.glade		\

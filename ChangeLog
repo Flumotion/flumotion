@@ -1,5 +1,16 @@
 2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* common/Makefile.am:
+	* common/common.mk:
+	* data/glade/Makefile.am:
+	* flumotion.spec.in:
+	* po/POTFILES.in:
+	* po/nl.po:
+	  various distcheck and spec fixes
+
+2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/gen-locale-xml.py:
 	  script to generate locale registry files
 	* common/locale.mk:

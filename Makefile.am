@@ -15,12 +15,7 @@ EXTRA_DIST = \
 	misc/pycheckerhelp.py
 
 all-local: locale-uninstalled
-
-locale-uninstalled:
-	topbuilddir=`cd $(top_builddir) && pwd`; \
-        cd po; \
-        make datadir=$$topbuilddir install
-
+clean-local: locale-uninstalled-clean
 
 # for some reason, the run is *completely* different if the last set of
 # components is moved up.  So keep it low

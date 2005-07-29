@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-29 02:59+0200\n"
+"POT-Creation-Date: 2005-07-29 13:52+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -245,7 +245,7 @@ msgstr "op"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:591
 msgid "<b>Client Consumption</b>"
-msgstr "<b>Cliêntverbruik</b>"
+msgstr "<b>Cliëntverbruik</b>"
 
 #: data/glade/admin.glade:9
 msgid "Flumotion Administration"
@@ -328,18 +328,17 @@ msgstr "Naam van stap"
 #: data/glade/greeter-connect_to_existing.glade:7
 #: data/glade/greeter-initial.glade:8
 #: data/glade/greeter-load_connection.glade:8
-#: data/glade/open-connection.glade:7 data/glade/spyglass.glade:9
-#: data/glade/wizard_audio_encoder.glade:7 data/glade/wizard_audiotest.glade:8
-#: data/glade/wizard_consumption.glade:7 data/glade/wizard_disk.glade:8
-#: data/glade/wizard_encoding.glade:8 data/glade/wizard_firewire.glade:8
-#: data/glade/wizard_http.glade:8 data/glade/wizard_jpeg.glade:7
-#: data/glade/wizard_license.glade:7 data/glade/wizard_overlay.glade:8
-#: data/glade/wizard_overview.glade:8 data/glade/wizard_smoke.glade:8
-#: data/glade/wizard_soundcard.glade:8 data/glade/wizard_source.glade:8
-#: data/glade/wizard_summary.glade:8 data/glade/wizard_testsource.glade:8
-#: data/glade/wizard_theora.glade:8 data/glade/wizard_tvcard.glade:8
-#: data/glade/wizard_vorbis.glade:8 data/glade/wizard_webcam.glade:8
-#: data/glade/wizard_welcome.glade:7
+#: data/glade/open-connection.glade:7 data/glade/wizard_audio_encoder.glade:7
+#: data/glade/wizard_audiotest.glade:8 data/glade/wizard_consumption.glade:7
+#: data/glade/wizard_disk.glade:8 data/glade/wizard_encoding.glade:8
+#: data/glade/wizard_firewire.glade:8 data/glade/wizard_http.glade:8
+#: data/glade/wizard_jpeg.glade:7 data/glade/wizard_license.glade:7
+#: data/glade/wizard_overlay.glade:8 data/glade/wizard_overview.glade:8
+#: data/glade/wizard_smoke.glade:8 data/glade/wizard_soundcard.glade:8
+#: data/glade/wizard_source.glade:8 data/glade/wizard_summary.glade:8
+#: data/glade/wizard_testsource.glade:8 data/glade/wizard_theora.glade:8
+#: data/glade/wizard_tvcard.glade:8 data/glade/wizard_vorbis.glade:8
+#: data/glade/wizard_webcam.glade:8 data/glade/wizard_welcome.glade:7
 msgid "window1"
 msgstr "window1"
 
@@ -390,45 +389,6 @@ msgstr "_Poort"
 #: data/glade/open-connection.glade:169
 msgid "_Secure connection via SSL"
 msgstr "V_eilige verbinding via SSL"
-
-#: data/glade/spyglass.glade:34
-msgid "<b>Preview</b>"
-msgstr "<b>Voorsmaak</b>"
-
-#: data/glade/videotest.glade:31
-msgid "<b>Options</b>"
-msgstr "<b>Opties</b>"
-
-#: data/glade/videotest.glade:61 data/glade/wizard_testsource.glade:32
-#: data/glade/wizard_tvcard.glade:72 data/glade/wizard_webcam.glade:166
-msgid "_Width:"
-msgstr "_Breedte:"
-
-#: data/glade/videotest.glade:86 data/glade/wizard_testsource.glade:57
-#: data/glade/wizard_tvcard.glade:97 data/glade/wizard_webcam.glade:119
-msgid "_Height:"
-msgstr "_Hoogte:"
-
-#: data/glade/videotest.glade:111
-msgid "_Framerate:"
-msgstr "_Beeldsnelheid:"
-
-#: data/glade/videotest.glade:136 data/glade/wizard_encoding.glade:83
-#: data/glade/wizard_testsource.glade:107
-msgid "F_ormat:"
-msgstr "F_ormaat:"
-
-#: data/glade/videotest.glade:160 data/glade/wizard_testsource.glade:131
-msgid "_Pattern:"
-msgstr "_Patroon:"
-
-#: data/glade/videotest.glade:184 data/glade/wizard_testsource.glade:155
-msgid ""
-"Snow\n"
-"Black"
-msgstr ""
-"Sneeuw\n"
-"Zwart"
 
 #: data/glade/wizard_audio_encoder.glade:31 data/glade/wizard_theora.glade:102
 #: data/glade/wizard_vorbis.glade:102
@@ -496,6 +456,10 @@ msgstr ""
 #: data/glade/wizard_disk.glade:232
 msgid "_Rotate entry every"
 msgstr "_Roteer opslag elke"
+
+#: data/glade/wizard_encoding.glade:83 data/glade/wizard_testsource.glade:107
+msgid "F_ormat:"
+msgstr "F_ormaat:"
 
 #: data/glade/wizard_encoding.glade:108 data/glade/wizard_source.glade:92
 msgid "_Video:"
@@ -725,10 +689,32 @@ msgstr ""
 "Wanneer u \"Toepassen\" klikt, zal uw configuratie automatisch ingeladen "
 "worden op uw netwerk.  Dit zal enige tijd duren."
 
+#: data/glade/wizard_testsource.glade:32 data/glade/wizard_tvcard.glade:72
+#: data/glade/wizard_webcam.glade:166
+msgid "_Width:"
+msgstr "_Breedte:"
+
+#: data/glade/wizard_testsource.glade:57 data/glade/wizard_tvcard.glade:97
+#: data/glade/wizard_webcam.glade:119
+msgid "_Height:"
+msgstr "_Hoogte:"
+
 #: data/glade/wizard_testsource.glade:82 data/glade/wizard_tvcard.glade:166
 #: data/glade/wizard_webcam.glade:72
 msgid "F_ramerate:"
 msgstr "B_eeldsnelheid:"
+
+#: data/glade/wizard_testsource.glade:131
+msgid "_Pattern:"
+msgstr "_Patroon:"
+
+#: data/glade/wizard_testsource.glade:155
+msgid ""
+"Snow\n"
+"Black"
+msgstr ""
+"Sneeuw\n"
+"Zwart"
 
 #: data/glade/wizard_tvcard.glade:38
 msgid ""
@@ -769,3 +755,12 @@ msgstr ""
 "\n"
 "Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
 "configuratie van uw streaming media server."
+
+#~ msgid "<b>Preview</b>"
+#~ msgstr "<b>Voorsmaak</b>"
+
+#~ msgid "<b>Options</b>"
+#~ msgstr "<b>Opties</b>"
+
+#~ msgid "_Framerate:"
+#~ msgstr "_Beeldsnelheid:"

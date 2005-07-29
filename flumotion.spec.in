@@ -89,6 +89,8 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
 install -d $RPM_BUILD_ROOT%{_localstatedir}/run/flumotion
 install -d $RPM_BUILD_ROOT%{_localstatedir}/cache/flumotion
 
+%find_lang flumotion
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -166,7 +168,7 @@ fi
 #   /sbin/service flumotion condrestart
 # fi
 
-%files
+%files -f flumotion.lang
 %defattr(-,root,root,-)
 %doc ChangeLog COPYING README AUTHORS
 %doc doc/reference/html
@@ -191,6 +193,9 @@ fi
 %{_datadir}/applications/fedora-flumotion-admin.desktop
 
 %changelog
+* Fri Jul 29 2005 Thomas Vander Stichele <thomas at apestaart dot org>
+- -added translations
+
 * Thu May 19 2005 Thomas Vander Stichele <thomas at apestaart dot org>
 - use disted make-dummy-cert
 

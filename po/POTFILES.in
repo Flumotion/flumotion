@@ -13,8 +13,6 @@ data/glade/greeter-connect_to_existing.glade
 data/glade/greeter-initial.glade
 data/glade/greeter-load_connection.glade
 data/glade/open-connection.glade
-data/glade/spyglass.glade
-data/glade/videotest.glade
 data/glade/wizard_audio_encoder.glade
 data/glade/wizard_audiotest.glade
 data/glade/wizard_consumption.glade
