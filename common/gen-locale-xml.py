@@ -58,7 +58,7 @@ def main(args):
     print
     
     for lang in codes.keys():
-        print "    <bundle name=\"%s-locale-%s\" project=\"%s\">" % (
+        print "    <bundle name=\"%s-locale-%s\" under=\"localedatadir\" project=\"%s\">" % (
             domain, lang, project)
         print "      <directories>"
         print '        <directory name="locale">'

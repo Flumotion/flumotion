@@ -19,6 +19,7 @@
 # Headers in this file shall remain intact.
 
 import optparse
+import os
 import sys
 
 import gettext
@@ -97,10 +98,11 @@ def main(args):
         log.setFluDebug(options.debug)
 
     # set up gettext
-    log.debug("locale", "Loading locales from %s" % configure.localedir)
-    gettext.bindtextdomain('flumotion', configure.localedir)
+    localedir = os.path.join(configure.localedatadir, 'locale')
+    log.debug("locale", "Loading locales from %s" % localedir)
+    gettext.bindtextdomain('flumotion', localedir)
     gettext.textdomain('flumotion')
-    gtk.glade.bindtextdomain('flumotion', configure.localedir)
+    gtk.glade.bindtextdomain('flumotion', localedir)
     gtk.glade.textdomain('flumotion')
 
     conf_files = args[1:]

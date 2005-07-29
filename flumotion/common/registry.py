@@ -90,9 +90,10 @@ class RegistryEntryComponent:
     
 class RegistryEntryBundle:
     "This class represents a <bundle> entry in the registry"
-    def __init__(self, name, project, dependencies, directories):
+    def __init__(self, name, project, under, dependencies, directories):
         self.name = name
         self.project = project
+        self.under = under
         self.dependencies = dependencies
         self.directories = directories
 
@@ -111,12 +112,12 @@ class RegistryEntryBundle:
     def getProject(self):
         return self.project
 
-    def getProjectBase(self):
+    def getBaseDir(self):
         if self.project == 'flumotion':
-            return configure.pythondir
+            return getattr(configure, self.under)
 
         from flumotion.project import project
-        return project.get(self.project, 'pythondir')
+        return project.get(self.project, self.under)
     
 class RegistryEntryBundleDirectory:
     "This class represents a <directory> entry in the registry"
@@ -478,6 +479,9 @@ class RegistryParser(log.Loggable):
         project = 'flumotion'
         if node.hasAttribute('project'):
             project = str(node.getAttribute('project'))
+        under = 'pythondir'
+        if node.hasAttribute('under'):
+            under = str(node.getAttribute('under'))
 
         dependencies = []
         directories = []
@@ -492,7 +496,7 @@ class RegistryParser(log.Loggable):
             else:
                 raise XmlParserError("<bundle> unexpected node: %s" % child.nodeName)
 
-        return RegistryEntryBundle(name, project, dependencies, directories)
+        return RegistryEntryBundle(name, project, under, dependencies, directories)
 
     def _parseBundleDependencies(self, node):
         # <dependencies>

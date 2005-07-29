@@ -381,7 +381,7 @@ class Vishnu(log.Loggable):
             for d in b.getDirectories():
                 directory = d.getName()
                 for file in d.getFiles():
-                    fullpath = os.path.join(b.getProjectBase(), directory,
+                    fullpath = os.path.join(b.getBaseDir(), directory,
                                             file.getLocation())
                     relative = file.getRelative()
                     self.log('Adding path %s as %s to bundle %s' % (
@@ -390,8 +390,13 @@ class Vishnu(log.Loggable):
                         self.bundlerBasket.add(bundleName, fullpath, relative)
                     except IOError, e:
                         self.debug("Reason: %r" % e)
-                        self.error("Could not add %s to bundle %s" % (
-                            fullpath, bundleName))
+                        if not firstTry:
+                            self.error("Could not add %s to bundle %s" % (
+                                fullpath, bundleName))
+                        self.warning("Bundle problem, rebuilding registry")
+                        registry.getRegistry().verify(force=True)
+                        self._setupBundleBasket(firstTry=False)
+                        return
                     except Exception, e:
                         if not firstTry:
                             self.error("Could not register bundles")

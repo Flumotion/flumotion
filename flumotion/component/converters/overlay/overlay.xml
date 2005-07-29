@@ -14,5 +14,36 @@
         <property name="height" type="int"/>
       </properties>
     </component>
+
   </components>
+
+  <bundles>
+
+    <bundle name="overlay-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/converters/overlay">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="overlay-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="overlay-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/converters/overlay">
+                <filename location="overlay.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
 </registry> 
