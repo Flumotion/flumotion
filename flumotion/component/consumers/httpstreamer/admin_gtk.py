@@ -19,7 +19,11 @@
 # Headers in this file shall remain intact.
 
 import os
+import time
+
 import gtk
+
+from gettext import gettext as _
 
 from flumotion.common import errors
 
@@ -63,7 +67,19 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     def updateLabels(self, state):
         if not hasattr(self, 'labels'):
             return
+
+        # changed in 0.1.9.1 to be int so we can localize time
+        peakTime = state.get('clients-peak-time')
+        if not isinstance(peakTime, str):
+            peakTime = time.strftime ("%c", # _("%a %b %d %H:%M:%S %Y"),
+                time.localtime(peakTime))
+            
+            self.debug('Converted peak time to %s' % peakTime)
+        self.labels['clients-peak-time'].set_text(peakTime)
+        
         for name in self.labels.keys():
+            if name == 'clients-peak-time':
+                continue
             text = state.get(name)
             if text == None:
                 text = ''

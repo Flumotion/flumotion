@@ -122,7 +122,7 @@ class Stats:
         set('clients-current', str(c.getClients()))
         set('clients-max', str(c.getMaxClients()))
         set('clients-peak', str(c.getPeakClients()))
-        set('clients-peak-time', time.ctime(c.getPeakEpoch()))
+        set('clients-peak-time', c.getPeakEpoch())
         set('clients-average', str(int(c.getAverageClients())))
 
         bitspeed = bytes_sent * 8 / uptime
