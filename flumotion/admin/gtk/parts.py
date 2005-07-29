@@ -20,6 +20,8 @@
 
 import os
 
+from gettext import gettext as _
+
 import gobject
 import gtk
 import gtk.glade
@@ -164,17 +166,17 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
     def _add_columns(self):
         # put in all the columns
-        col = gtk.TreeViewColumn('Mood', gtk.CellRendererPixbuf(),
+        col = gtk.TreeViewColumn(_('Mood'), gtk.CellRendererPixbuf(),
                                  pixbuf=COL_MOOD)
         col.set_sort_column_id(COL_MOOD_VALUE)
         self._view.append_column(col)
 
-        col = gtk.TreeViewColumn('Component', gtk.CellRendererText(),
+        col = gtk.TreeViewColumn(_('Component'), gtk.CellRendererText(),
                                  text=COL_NAME)
         col.set_sort_column_id(COL_NAME)
         self._view.append_column(col)
 
-        col = gtk.TreeViewColumn('Worker', gtk.CellRendererText(),
+        col = gtk.TreeViewColumn(_('Worker'), gtk.CellRendererText(),
                                  text=COL_WORKER)
         col.set_sort_column_id(COL_WORKER)
         self._view.append_column(col)
@@ -388,32 +390,32 @@ class ComponentMenu(gtk.Menu):
         gtk.Menu.__init__(self)
         self._items = {} # name -> gtk.MenuItem
 
-        self.set_title('Component')
+        self.set_title(_('Component'))
 
-        i = gtk.MenuItem('_Restart')
+        i = gtk.MenuItem(_('_Restart'))
         self.append(i)
         self._items['restart'] = i
         
-        i = gtk.MenuItem('_Start')
+        i = gtk.MenuItem(_('_Start'))
         mood = moods.get(state.get('mood'))
         if mood == moods.happy:
-            i.set_property('sensitive', gtk.FALSE)
+            i.set_property('sensitive', False)
         self.append(i)
         self._items['start'] = i
         
-        i = gtk.MenuItem('St_op')
+        i = gtk.MenuItem(_('St_op'))
         if mood == moods.sleeping:
-            i.set_property('sensitive', gtk.FALSE)
+            i.set_property('sensitive', False)
         self.append(i)
         self._items['stop'] = i
         
         self.append(gtk.SeparatorMenuItem())
 
-        i = gtk.MenuItem('Reload _code')
+        i = gtk.MenuItem(_('Reload _code'))
         self.append(i)
         self._items['reload'] = i
 
-        i = gtk.MenuItem('_Modify element property ...')
+        i = gtk.MenuItem(_('_Modify element property ...'))
         self.append(i)
         self._items['modify'] = i
 

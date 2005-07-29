@@ -1,5 +1,12 @@
 2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/parts.py:
+	* po/POTFILES.in:
+	* po/nl.po:
+	  more translation
+
+2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/gen-locale-xml.py:
 	* common/locale.mk:
 	* flumotion/configure/installed.py.in:

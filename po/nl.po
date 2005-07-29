@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-29 13:52+0200\n"
+"POT-Creation-Date: 2005-07-29 15:56+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -192,6 +192,38 @@ msgstr "Recente verbindingen"
 #: flumotion/admin/gtk/greeter.py:114 data/glade/connection-dialog.glade:84
 msgid "Please choose a connection from the box below."
 msgstr "Kies een verbinding uit de onderstaande lijst."
+
+#: flumotion/admin/gtk/parts.py:168
+msgid "Mood"
+msgstr "Humeur"
+
+#: flumotion/admin/gtk/parts.py:173 flumotion/admin/gtk/parts.py:392
+msgid "Component"
+msgstr "Component"
+
+#: flumotion/admin/gtk/parts.py:178
+msgid "Worker"
+msgstr "WOrker"
+
+#: flumotion/admin/gtk/parts.py:394
+msgid "_Restart"
+msgstr "_Herstart"
+
+#: flumotion/admin/gtk/parts.py:398
+msgid "_Start"
+msgstr "_Start"
+
+#: flumotion/admin/gtk/parts.py:405
+msgid "St_op"
+msgstr "St_op"
+
+#: flumotion/admin/gtk/parts.py:413
+msgid "Reload _code"
+msgstr "Herlaad _code"
+
+#: flumotion/admin/gtk/parts.py:417
+msgid "_Modify element property ..."
+msgstr "_Wijzig elementeigenschap ..."
 
 #: flumotion/component/consumers/httpstreamer/http.glade:8
 msgid "Statistics"
