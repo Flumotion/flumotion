@@ -23,7 +23,6 @@ Bundle fetching, caching, and importing utilities for clients using
 bundled code and data
 """
 
-import os
 
 from twisted.internet import error, defer
 from twisted.python import rebuild
@@ -71,6 +70,7 @@ class BundleLoader(log.Loggable):
         sums = d.value()
         self.debug('Got sums %r' % sums)
         toFetch = []
+        import os
         for name, md5 in sums:
             path = os.path.join(configure.cachedir, name, md5)
             if os.path.exists(path):
