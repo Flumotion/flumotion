@@ -23,8 +23,6 @@ Bundle fetching, caching, and importing utilities for clients using
 bundled code and data
 """
 
-import os
-
 from twisted.internet import error, defer
 from twisted.python import rebuild
 
