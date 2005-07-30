@@ -1,5 +1,23 @@
 2005-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/bundleclient.py:
+	  add some more logging, there's one corner case where
+	  __path__ seems to be cleared and it's not clear to me if it's a bug
+	  reverse order of registering package path from lowest dep to
+	  highest
+	* flumotion/common/common.py:
+	  add a gettexter method that returns a _ callable for a domain
+	* flumotion/admin/admin.py:
+	* flumotion/common/package.py:
+	* flumotion/component/base/admin_gtk.py:
+	  load glade file automatically if glade_file is set
+	  add a haveWidgetTree method to be subclassed
+	  have render() load the gladefile on its own
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	  remove render, implement haveWidgetTree
+
+2005-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  go back to using a dict since twisted.python.util.OrderedDict
 	  exists

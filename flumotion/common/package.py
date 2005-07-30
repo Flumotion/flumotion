@@ -155,6 +155,8 @@ class Packager(log.Loggable):
             packagePath, packageNames)) 
 
         for packageName in packageNames:
+            self.log('fixing up %s' % packageName)
+
             if packageName not in sys.modules.keys():
                 continue
 
@@ -162,9 +164,13 @@ class Packager(log.Loggable):
             package = sys.modules.get(packageName)
             for path in package.__path__:
                 if not new and path.startswith(oldPath):
+                    self.log('%s.__path__ before remove %r' % (
+                        name, package.__path__))
                     self.log('removing old %s from %s.__path__' % (
                         path, name))
                     package.__path__.remove(path)
+                    self.log('%s.__path__ after remove %r' % (
+                        name, package.__path__))
 
             # move the new path to the top
             # insert at front because FLU_REGISTRY_PATH paths should override
@@ -176,10 +182,18 @@ class Packager(log.Loggable):
             # if path already at position 0, everything's fine
             # if it's in there at another place, it needs to move to front
             # if not in there, it needs to be put in front
-            if package.__path__[0] == newPath:
+            if len(package.__path__) == 0:
+                # FIXME: this seems to happen to e.g. flumotion.component.base
+                # even when it was just rebuilt and had the __path__ set
+                # can be triggered by choosing a admin_gtk depending on
+                # the base admin_gtk where the base admin_gtk changes
+                self.debug('WARN: package %s does not have __path__ values' % (
+                    packageName))
+            elif package.__path__[0] == newPath:
                 self.log('path %s already at start of %s.__path__' % (
                     newPath, packageName))
                 continue
+                
             if newPath in package.__path__:
                 package.__path__.remove(newPath)
                 self.log('moving %s to front of %s.__path__' % (
@@ -198,6 +212,7 @@ class Packager(log.Loggable):
         # now rebuild all non-package modules in this packagePath if this
         # is not a new package
         if not new:
+            self.log('finding end module candidates')
             moduleNames = findEndModuleCandidates(packagePath, prefix)
             self.log('end module candidates to rebuild: %r' % moduleNames)
             for name in moduleNames:
@@ -218,6 +233,7 @@ class Packager(log.Loggable):
                     #if paths:
                     #    module.__path__ = paths
 
+        self.log('registered packagePath %s for key %s' % (packagePath, key))
 
     def unregister(self):
         for path in self._paths.values():

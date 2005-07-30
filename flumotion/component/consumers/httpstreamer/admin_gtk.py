@@ -33,6 +33,9 @@ from twisted.internet import defer
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
+    glade_file = os.path.join('flumotion', 'component', 'consumers',
+        'httpstreamer', 'http.glade')
+
     def __init__(self, *args, **kwargs):
         BaseAdminGtkNode.__init__(self, *args, **kwargs)
         self.shown = False
@@ -92,15 +95,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
                 text = ''
             self.labels[name].set_text(text)
         
-    def render(self):
-        gladeFile = os.path.join('flumotion', 'component', 'consumers',
-            'httpstreamer', 'http.glade')
-        d = self.loadGladeFile(gladeFile)
-        d.addCallback(self._loadGladeFileCallback)
-        return d
-
-    def _loadGladeFileCallback(self, widgetTree):
-        self.wtree = widgetTree
+    def haveWidgetTree(self):
         self.labels = {}
         self.statistics = self.wtree.get_widget('statistics-widget')
         for type in ('uptime', 'mime', 'bitrate', 'totalbytes'):

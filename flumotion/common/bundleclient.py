@@ -68,7 +68,7 @@ class BundleLoader(log.Loggable):
         d = self._callRemote('getBundleSums', **kwargs)
         yield d
 
-        # sums is a list of name, sum tuples
+        # sums is a list of name, sum tuples, highest to lowest
         # figure out which bundles we're missing
         sums = d.value()
         self.debug('Got sums %r' % sums)
@@ -98,8 +98,10 @@ class BundleLoader(log.Loggable):
             b.setZip(result[name])
             path = self._unbundler.unbundle(b)
 
-        # register all package paths
+        # register all package paths; to do so we need to reverse sums
+        sums.reverse()
         for name, md5 in sums:
+            self.log('registerPackagePath for %s' % name)
             path = os.path.join(configure.cachedir, name, md5)
             if not os.path.exists(path):
                 self.warning("path %s for bundle %s does not exist",
@@ -152,7 +154,7 @@ class BundleLoader(log.Loggable):
         yield d
 
         sums = d.value()
-        name, md5 = sums[0]
+        name, md5 = sums[-1]
         import os
         path = os.path.join(configure.cachedir, name, md5)
         self.debug('Got bundle %s in %s' % (bundleName, path))
@@ -173,11 +175,11 @@ class BundleLoader(log.Loggable):
         yield d
 
         sums = d.value()
-        name, md5 = sums[0]
+        name, md5 = sums[-1]
         path = os.path.join(configure.cachedir, name, md5, fileName)
         if not os.path.exists(path):
-            self.warning("path %s for file %s does not exist",
-                path, fileName)
+            self.warning("path %s for file %s does not exist" % (
+                path, fileName))
 
         yield path
     getFile = defer_generator_method(getFile)

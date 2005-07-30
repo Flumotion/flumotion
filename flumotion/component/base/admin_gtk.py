@@ -24,9 +24,11 @@ import gtk
 import gtk.glade
 
 from twisted.python import util
+from twisted.internet import defer
 
 from flumotion.common import errors, log
 from flumotion.twisted import flavors
+from flumotion.twisted.defer import defer_generator_method
 
 class BaseAdminGtk(log.Loggable):
     """
@@ -41,7 +43,7 @@ class BaseAdminGtk(log.Loggable):
 
     logCategory = "admingtk"
     
-    state = admin = 'hello pychecker'
+    state = admin = nodes = 'hello pychecker'
 
     def __init__(self, state, admin):
         """
@@ -144,8 +146,14 @@ class BaseAdminGtkNode(log.Loggable):
     """
     I am a base class for all GTK+-based Admin UI nodes.
     I am a view on a set of properties for a component.
+
+    @ivar widget: the main widget representing this node
+    @type widget: L{gtk.Widget}
+    @ivar wtree:  the widget tree representation for this node
     """
     logCategory = "admingtk"
+    glade_file = None
+    gettext_domain = 'flumotion'
 
     def __init__(self, state, admin, title=None):
         """
@@ -161,6 +169,8 @@ class BaseAdminGtkNode(log.Loggable):
         self.statusbar = None
         self.title = title
         self.nodes = util.OrderedDict()
+        self.wtree = None
+        self.widget = None
         
     def status_push(self, str):
         if self.statusbar:
@@ -212,25 +222,20 @@ class BaseAdminGtkNode(log.Loggable):
             self.debug("loading widget tree from %s" % path)
             old = gtk.glade.textdomain()
             gtk.glade.textdomain(domain)
-            wtree = gtk.glade.XML(path)
+            self.wtree = gtk.glade.XML(path)
             self.debug("Switching text domain back to %s" % old)
             gtk.glade.textdomain(old)
-            return wtree
+            return self.wtree
 
         self.debug("requesting bundle for glade file %s" % gladeFile)
         d = self.admin.bundleLoader.getFile(gladeFile)
         d.addCallback(_getBundledFileCallback, gladeFile)
-        d.addCallback(self._setWidgetTreeCallback)
         return d
 
-    def _setWidgetTreeCallback(self, widgetTree):
-        self.widgetTree = widgetTree
-        return widgetTree
-
     def getWidget(self, name):
-        if not self.widgetTree:
+        if not self.wtree:
             raise IndexError
-        widget = self.widgetTree.get_widget(name)
+        widget = self.wtree.get_widget(name)
         if not widget:
             self.warning('Could not get widget %s' % name)
 
@@ -239,6 +244,16 @@ class BaseAdminGtkNode(log.Loggable):
     ### child class methods to be overridden
     def setUIState(self, state):
         raise NotImplementedError
+
+    def haveWidgetTree(self):
+        """
+        I am called when the widget tree has been gotten from the glade file.
+
+        Override me to act on it.
+
+        Returns: L{twisted.internet.defer.Deferred}
+        """
+        return defer.succeed(None)
 
     def propertyChanged(self, name, value):
         """
@@ -252,16 +267,29 @@ class BaseAdminGtkNode(log.Loggable):
         
         Returns: a deferred returning the main widget for embedding
         """
-        raise NotImplementedError
+        if hasattr(self, 'glade_file'):
+            self.debug('render: loading glade file %s' % self.glade_file)
+            dl = self.loadGladeFile(self.glade_file, self.gettext_domain)
+            yield dl
+
+            self.wtree = dl.value()
+            self.debug('render: calling haveWidgetTree')
+            dh = self.haveWidgetTree()
+            yield dh
+            
+        if not self.widget:
+            self.debug('render: no self.widget, failing')
+            yield defer.fail(IndexError)
+            
+        self.debug('render: yielding widget %s' % self.widget)
+        yield self.widget
+    render = defer_generator_method(render)
 
 class EffectAdminGtkNode(BaseAdminGtkNode):
     """
     I am a base class for all GTK+-based component effect Admin UI nodes.
     I am a view on a set of properties for an effect on a component.
 
-    @ivar widget: the main widget representing this node
-    @type widget: L{gtk.Widget}
-    @ivar wtree:  the widget tree representation for this node
     """
     def __init__(self, state, admin, effectName):
         """
@@ -273,10 +301,6 @@ class EffectAdminGtkNode(BaseAdminGtkNode):
         BaseAdminGtkNode.__init__(self, state, admin)
         self.effectName = effectName
 
-        self.wtree = None
-        self.widget = None
-
     def effectCallRemote(self, methodName, *args, **kwargs):
         return self.admin.componentCallRemote(self.state,
             "effect", self.effectName, methodName, *args, **kwargs)
- 

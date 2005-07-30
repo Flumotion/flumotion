@@ -479,3 +479,12 @@ def getLL():
     LL = lang[:2]
 
     return LL
+
+def gettexter(domain):
+    """
+    Returns a method you can use as _ to translate strings for the given
+    domain.
+    """
+    import gettext
+    return lambda s: gettext.dgettext(domain, s)
+
