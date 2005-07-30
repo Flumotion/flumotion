@@ -60,6 +60,9 @@ class BundleLoader(log.Loggable):
         Get and extract all bundles needed.
         Either one of bundleName, fileName or moduleName should be specified
         in **kwargs.
+
+        @returns: a list of (bundleName, sum) tuples, in with lowest dependency
+                  first.
         """
         # get sums for all bundles we need
         d = self._callRemote('getBundleSums', **kwargs)
@@ -76,7 +79,7 @@ class BundleLoader(log.Loggable):
             if os.path.exists(path):
                 self.log(name + ' is up to date')
             else:
-                self.log(name + ' needs updating')
+                self.log(name + ' needs fetching')
                 toFetch.append(name)
 
         # ask for the missing bundles
@@ -99,7 +102,7 @@ class BundleLoader(log.Loggable):
     getBundles = defer_generator_method(getBundles)
 
     # FIXME: use getBundles and make sure basic admin client uses this
-    def load_module(self, moduleName):
+    def loadModule(self, moduleName):
         """
         Load the module given by name.
         Sets up all necessary bundles to be able to load the module.
@@ -116,46 +119,25 @@ class BundleLoader(log.Loggable):
         self.debug('Loading module %s' % moduleName)
 
         # get sums for all bundles we need
-        d = self._callRemote('getBundleSums', moduleName=moduleName)
+        d = self.getBundles(moduleName=moduleName)
         yield d
+
         sums = d.value()
         self.debug('Got sums %r' % sums)
 
-        # sums is a list of name, sum tuples
-        # figure out which bundles we're missing
-        toFetch = []
         for name, md5 in sums:
             path = os.path.join(configure.cachedir, name, md5)
-            if os.path.exists(path):
-                self.log(name + ' is up to date, registering package path')
-                package.getPackager().registerPackagePath(path, name)
+            if not os.path.exists(path):
+                self.warning("path %s for bundle %s does not exist",
+                    path, name)
             else:
-                self.log(name + ' needs updating')
-                toFetch.append(name)
-
-        d = self._callRemote('getBundleZips', toFetch)
-        yield d
-        result = d.value()
-
-        self.debug('load_module: received %d zips' % len(result))
-        for name in toFetch:
-            if name not in result.keys():
-                msg = "Missing bundle %s was not received" % name
-                self.warning(msg)
-                raise errors.NoBundleError(msg)
-
-            b = bundle.Bundle(name)
-            b.setZip(result[name])
-            path = self._unbundler.unbundle(b)
-
-            self.debug("registering bundle %s in path %s" % (name, path))
-            package.getPackager().registerPackagePath(path, name)
+                package.getPackager().registerPackagePath(path, name)
 
         # load up the module and return it
         __import__(moduleName, globals(), locals(), [])
         self.log('loaded module %s' % moduleName)
         yield sys.modules[moduleName]
-    load_module = defer_generator_method(load_module)
+    loadModule = defer_generator_method(loadModule)
 
     def getBundleByName(self, bundleName):
         """

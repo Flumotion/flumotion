@@ -1,3 +1,10 @@
+2005-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/bundleclient.py:
+	* flumotion/common/medium.py:
+	* flumotion/worker/worker.py:
+	  clean up bundleclient code further
+
 2005-07-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:

@@ -155,7 +155,7 @@ class WorkerMedium(medium.BaseMedium):
         # logs in, then gets the info about what sort of component it should
         # be, and then sets up the bundles and starts
         self.debug('setting up bundles for %s' % moduleName)
-        d = self.bundleLoader.load_module(moduleName)
+        d = self.bundleLoader.loadModule(moduleName)
         d.addCallback(self._startCallback, avatarId, type, moduleName,
             methodName, config)
         return d

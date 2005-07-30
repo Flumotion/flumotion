@@ -80,12 +80,12 @@ class BaseMedium(pb.Referenceable, log.Loggable):
         d.addErrback(errback)
         return d
 
-    def load_module(self, modname):
-        return self.bundleLoader.load_module(modname)
+    def loadModule(self, moduleName):
+        return self.bundleLoader.loadModule(moduleName)
 
     def run_bundled_proc(self, modname, procname, *args, **kwargs):
         try:
-            d = self.load_module(modname)
+            d = self.loadModule(modname)
             yield d
             mod = d.value()
         except Exception, e:
