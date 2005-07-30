@@ -98,10 +98,18 @@ class BundleLoader(log.Loggable):
             b.setZip(result[name])
             path = self._unbundler.unbundle(b)
 
+        # register all package paths
+        for name, md5 in sums:
+            path = os.path.join(configure.cachedir, name, md5)
+            if not os.path.exists(path):
+                self.warning("path %s for bundle %s does not exist",
+                    path, name)
+            else:
+                package.getPackager().registerPackagePath(path, name)
+
         yield sums
     getBundles = defer_generator_method(getBundles)
 
-    # FIXME: use getBundles and make sure basic admin client uses this
     def loadModule(self, moduleName):
         """
         Load the module given by name.
@@ -124,14 +132,6 @@ class BundleLoader(log.Loggable):
 
         sums = d.value()
         self.debug('Got sums %r' % sums)
-
-        for name, md5 in sums:
-            path = os.path.join(configure.cachedir, name, md5)
-            if not os.path.exists(path):
-                self.warning("path %s for bundle %s does not exist",
-                    path, name)
-            else:
-                package.getPackager().registerPackagePath(path, name)
 
         # load up the module and return it
         __import__(moduleName, globals(), locals(), [])
@@ -158,3 +158,28 @@ class BundleLoader(log.Loggable):
         self.debug('Got bundle %s in %s' % (bundleName, path))
         yield path
     getBundleByName = defer_generator_method(getBundleByName)
+
+    def getFile(self, fileName):
+        """
+        Do everything needed to get the given bundled file.
+
+        Returns: a deferred returning the absolute path to a local copy
+                 of the given file.
+        """
+        import os
+
+        self.debug('Getting file %s' % fileName)
+        d = self.getBundles(fileName=fileName)
+        yield d
+
+        sums = d.value()
+        name, md5 = sums[0]
+        path = os.path.join(configure.cachedir, name, md5, fileName)
+        if not os.path.exists(path):
+            self.warning("path %s for file %s does not exist",
+                path, fileName)
+
+        yield path
+    getFile = defer_generator_method(getFile)
+        
+

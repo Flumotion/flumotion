@@ -698,6 +698,7 @@ class Window(log.Loggable, gobject.GObject):
         def gotEntryNoBundleErrback(failure):
             failure.trap(errors.NoBundleError)
 
+            self.debug("No UI for component %s" % name)
             self.statusbar.set('main', _("No UI for component %s") % name)
 
             # no ui, clear; FIXME: do this nicer

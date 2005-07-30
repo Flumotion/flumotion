@@ -118,7 +118,6 @@ class WorkerMedium(medium.BaseMedium):
     
     def __init__(self, brain):
         self.brain = brain
-        self.bundleLoader = None
         
     def cb_processFinished(self, *args):
         self.debug('processFinished %r' % args)

@@ -36,6 +36,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     def __init__(self, *args, **kwargs):
         BaseAdminGtkNode.__init__(self, *args, **kwargs)
         self.shown = False
+        self._stats = None
 
     def error_dialog(self, message):
         # FIXME: dialogize
@@ -46,8 +47,15 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         label.show()
 
     def setStats(self, stats):
+        if not hasattr(self, 'statistics'):
+            # widget tree not created yet
+            self._stats = stats
+            return
+
         self.updateLabels(stats)
+
         if not self.shown:
+            # widget tree created but not yet shown
             self.shown = True
             self.statistics.show_all()
        
@@ -102,6 +110,11 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             self.registerLabel('clients-' + type)
         for type in ('bitrate', 'totalbytes'):
             self.registerLabel('consumption-' + type)
+
+        if self._stats:
+            self.shown = True
+            self.updateLabels(self._stats)
+            self.statistics.show_all()
 
         return self.statistics
 

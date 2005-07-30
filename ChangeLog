@@ -1,5 +1,22 @@
 2005-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  use bundleclient instead of unbundler
+	* flumotion/admin/gtk/client.py:
+	  add a debug to show that the admin really is handling NoBundleError
+	* flumotion/common/bundleclient.py:
+	  make getBundle also registerPackagePath
+	  add getFile method
+	* flumotion/component/base/admin_gtk.py:
+	  use bundleLoader
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	  now that we use deferreds to get glade files, stats can arrive
+	  before the widget tree is loaded; so save them temporarily
+	* flumotion/worker/worker.py:
+	  remove bundleloader
+
+2005-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/bundleclient.py:
 	* flumotion/common/medium.py:
 	* flumotion/worker/worker.py:

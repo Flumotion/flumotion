@@ -33,7 +33,7 @@ from twisted.internet import error, defer, reactor
 from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
-from flumotion.common import bundle, common, errors, interfaces, log
+from flumotion.common import common, errors, interfaces, log
 from flumotion.common import keycards, worker, planet, medium, package
 # serializable worker and component state
 from flumotion.twisted import flavors
@@ -168,8 +168,6 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self._workerHeavenState = None
         
         self._views = [] # all UI views I am serving
-
-        self._unbundler = bundle.Unbundler(configure.cachedir)
 
     # a method so mock testing frameworks can override it
     def _makeFactory(self, username, password):
@@ -518,6 +516,8 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
 
     # function to get remote code for admin parts
     # FIXME: rename slightly ?
+    # FIXME: still have hard-coded os.path.join stuff in here for md5sum,
+    # move to bundleloader ?
     def getEntry(self, componentState, type):
         """
         Do everything needed to set up the entry point for the given
@@ -525,173 +525,24 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
 
         Caller is responsible for adding errbacks to the deferred.
 
-        Returns: a deferred returning (entryPath, filename, methodName)
+        Returns: a deferred returning (entryPath, filename, methodName) with
+                 entryPath: the full local path to the bundle's base
+                 fileName:  the relative location of the bundled file
+                methodName: the method to instantiate with
         """
-        
-        def _getEntryCallback(result, componentState, type):
-            # callback for getting the entry.  Will request bundle sums
-            # based on filename given to me
-            self.debug('_getEntryCallback: result %r' % (result, ))
-
-            filename, methodName = result
-            self.debug("entry point for %r of type %s is in file %s and method %s" % (componentState, type, filename, methodName))
-            # request bundle sums
-            d = self.callRemote('getBundleSums', fileName=filename)
-            d.addCallback(_getBundleSumsCallback, filename, methodName)
-            d.addErrback(_getBundleSumsErrback, componentState, type)
-            d.addErrback(self._defaultErrback)
-            return d
-
-        def _getBundleSumsErrback(failure, componentState, type):
-            failure.trap(errors.NoBundleError)
-            self.warning('Could not find the bundle for component %s (%s)' % (
-                componentState.get('type'), type))
-            return failure
-
-        def _getBundleSumsCallback(result, filename, methodName):
-            # callback receiving bundle sums.  Will remote call to get
-            # all missing zip files
-            pathToName = {} # bundle path -> bundle name
-            sums = result # ordered from highest to lowest dependency
-            entryName, entrySum = sums[0]
-            self.debug('_getBundleSumsCallback: %d sums received' % len(sums))
-
-            # get path where entry bundle is stored
-            entryPath = self._unbundler.unbundlePathByInfo(entryName, entrySum)
-
-            # check which zips to request from manager
-            cachedPaths = [] # list of cached paths to register later
-            missing = [] # list of missing bundles
-
-            for name, sum in sums:
-                dir = os.path.join(configure.cachedir, name, sum)
-                pathToName[dir] = name
-                if not os.path.exists(dir):
-                    missing.append(name)
-                else:
-                    cachedPaths.append(dir)
-
-            cachedPaths.reverse()
-            missing.reverse()
-
-            self.debug('_getBundleSumsCallback: %d bundles missing' %
-                len(missing))
-            if missing:
-                self.debug('_getBundleSumsCallback: requesting zips %r' %
-                    missing)
-                d = self.callRemote('getBundleZips', missing)
-                d.addCallback(_getBundleZipsCallback, entryPath, missing,
-                    cachedPaths, pathToName, filename, methodName)
-                d.addErrback(self._defaultErrback)
-                return d
-            else:
-                retval = (entryPath, filename, methodName)
-                self.debug('_getBundleSumsCallback: returning %r' % (
-                    retval, ))
-                self._registerCachedPaths(cachedPaths, pathToName)
-                return retval
-
-        def _getBundleZipsCallback(result, entryPath, missing, cachedPaths,
-            pathToName, filename, methodName):
-            # callback to receive zips.  Will set up zips, register package
-            # paths and finally
-            # return physical location of entry file and method
-            self.debug('_getBundleZipsCallback: received %d zips' % len(result))
-            # we use missing because that way we get the
-            # list of dependencies from lowest to highest and register
-            # package paths in the correct order; since we need to
-            # register package paths one by one for the namedAny's
-            # FIXME: missing can contain duplicate entries, remove ?
-            unpacked = []
-            for name in missing:
-                if name not in result.keys():
-                    msg = "Missing bundle %s was not received" % name
-                    self.warning(msg)
-                    raise errors.NoBundleError(msg)
-
-                zip = result[name]
-                b = bundle.Bundle(name)
-                b.setZip(zip)
-                dir = self._unbundler.unbundle(b)
-                self.debug("unpacked bundle %s to dir %s" % (name, dir))
-                unpacked.append(dir)
-
-            # now make sure all cachedPaths are registered
-            # FIXME: does it matter we already did some before ?
-            self._registerCachedPaths(cachedPaths, pathToName)
-
-            # and now register our new contestants
-            for dir in unpacked:
-                self.debug("register PackagePath %s for unpacked bundle %s" % (
-                    dir, name))
-                package.getPackager().registerPackagePath(dir, name)
-
-            retval = (entryPath, filename, methodName)
-            self.debug('_getBundleSumsCallback: returning %r' % (
-                retval, ))
-            return retval
-
-        # start chain
         d = self.callRemote('getEntryByType', componentState, type)
-        d.addCallback(_getEntryCallback, componentState, type)
-        # our caller should handle errbacks
-        # d.addErrback(self._defaultErrback)
-        return d
+        yield d
 
-    def _registerCachedPaths(self, paths, pathToName):
-        for dir in paths:
-            key = pathToName[dir]
-            self.debug("registering cached PackagePath %s with key %s" % (
-                dir, key))
-            package.getPackager().registerPackagePath(dir, pathToName[dir])
+        fileName, methodName = d.value()
+        self.debug("entry for %r of type %s is in file %s and method %s" % (
+            componentState, type, fileName, methodName))
+        d = self.bundleLoader.getBundles(fileName=fileName)
+        yield d
 
-    def getBundledFile(self, bundledPath):
-        """
-        Do everything needed to get the given bundled file.
-
-        Returns: a deferred returning the absolute path to a local copy
-        of the given file.
-        """
-        def _getBundleSumsCallback(result, bundledPath):
-            # callback receiving bundle sums.  Will remote call to get
-            # the zip if it's missing
-            sums = result
-            bundleName, bundleSum = sums[0]
-            self.debug('bundledPath %s is in bundle %s' % (bundledPath,
-                bundleName))
-
-            # get path where this bundle is cached
-            cachePath = self._unbundler.unbundlePathByInfo(bundleName,
-                bundleSum)
-
-            if not os.path.exists(cachePath):
-                self.debug('_getBundleSumsCallback: requesting zip %s' %
-                    bundleName)
-                d = self.callRemote('getBundleZips', (bundleName, ))
-                d.addCallback(_getBundleZipsCallback, bundleName, bundledPath)
-                d.addErrback(self._defaultErrback)
-                self.debug("found %s in dir %s" % (bundleName, cachePath))
-                return d
-            else:
-                return os.path.join(cachePath, bundledPath)
-
-        def _getBundleZipsCallback(result, bundleName, bundledPath):
-            # callback to receive zip.  Will set up zips and finally
-            # return physical location of bundledPath
-            self.debug('_getBundleZipsCallback: received %d zips' % len(result))
-            zip = result[bundleName]
-            b = bundle.Bundle(bundleName)
-            b.setZip(zip)
-            dir = self._unbundler.unbundle(b)
-            self.debug("unpacked %s to dir %s" % (bundleName, dir))
-
-            return os.path.join(dir, bundledPath)
-
-        # start chain
-        d = self.callRemote('getBundleSums', fileName=bundledPath)
-        d.addCallback(_getBundleSumsCallback, bundledPath)
-        d.addErrback(self._defaultErrback)
-        return d
+        name, sum = d.value()[0]
+        bundlePath = os.path.join(configure.cachedir, name, sum)
+        yield (bundlePath, fileName, methodName)
+    getEntry = defer_generator_method(getEntry)
 
     ## worker remote methods
     def checkElements(self, workerName, elements):

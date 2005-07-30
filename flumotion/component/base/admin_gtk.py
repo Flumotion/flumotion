@@ -209,7 +209,7 @@ class BaseAdminGtkNode(log.Loggable):
             return wtree
 
         self.debug("requesting bundle for glade file %s" % gladeFile)
-        d = self.admin.getBundledFile(gladeFile)
+        d = self.admin.bundleLoader.getFile(gladeFile)
         d.addCallback(_getBundledFileCallback, gladeFile)
         d.addCallback(self._setWidgetTreeCallback)
         return d
