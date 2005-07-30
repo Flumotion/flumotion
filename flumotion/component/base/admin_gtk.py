@@ -109,7 +109,7 @@ class BaseAdminGtk(log.Loggable):
 
     def getNodes(self):
         """
-        Return a dictionary of node names to admin UI nodes.
+        Return a list of admin UI nodes.
         """
         raise NotImplementedError("Child class needs to implement getNodes")
 
@@ -139,19 +139,23 @@ class BaseAdminGtkNode(log.Loggable):
     I am a base class for all GTK+-based Admin UI nodes.
     I am a view on a set of properties for a component.
     """
+    title = None
 
     logCategory = "admingtk"
 
-    def __init__(self, state, admin):
+    def __init__(self, state, admin, title=title):
         """
         @param state: state of component this is a UI node for
         @type  state: L{flumotion.common.planet.AdminComponentState}
         @param admin: the admin model that interfaces with the manager for us
         @type  admin: L{flumotion.admin.admin.AdminModel}
+        @param title: the (translated) title to show this node with
+        @type  title: str
         """
         self.state = state
         self.admin = admin
         self.statusbar = None
+        self.title = title
         
     def status_push(self, str):
         if self.statusbar:

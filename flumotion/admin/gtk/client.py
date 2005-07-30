@@ -310,21 +310,34 @@ class Window(log.Loggable, gobject.GObject):
         d.addCallback(self._setupCallback, name, instance)
 
     def _setupCallback(self, result, name, instance):
-        nodes = instance.getNodes()
         notebook = gtk.Notebook()
         nodeWidgets = {}
+        # F0.2
+        nodes = instance.getNodes()
+        if isinstance(nodes, dict):
+            l = []
+            self.warning('UI %r still uses a dict for nodes' % instance)
+            # nodes used to be a dict, but that doesn't allow UI's to
+            # order their nodes correctly.  So convert old-style to list here
+            for nodeName, node in nodes.items():
+                if not node.title:
+                    self.warning('UI node %r does not have a title' % node)
+                    node.title = nodeName
+                l.append(node)
+            nodes = l
+            self.debug('Converted node dict to list')
 
         self.statusbar.clear('main')
         # create pages for all nodes, and just show a loading label for
         # now
-        for nodeName in nodes.keys():
-            self.debug("Creating node for %s" % nodeName)
-            label = gtk.Label(_('Loading UI for %s ...') % nodeName)
+        for node in nodes:
+            self.debug("Creating node for %s" % node.title)
+            label = gtk.Label(_('Loading UI for %s ...') % node.title)
             table = gtk.Table(1, 1)
             table.add(label)
-            nodeWidgets[nodeName] = table
+            nodeWidgets[node.title] = table
 
-            notebook.append_page(table, gtk.Label(nodeName))
+            notebook.append_page(table, gtk.Label(node.title))
             
         # put "loading" widget in
         old = self.hpaned.get_child2()
@@ -335,14 +348,14 @@ class Window(log.Loggable, gobject.GObject):
         # trigger node rendering
         # FIXME: might be better to do these one by one, in order,
         # so the status bar can show what happens
-        for nodeName in nodes.keys():
+        for node in nodes:
             mid = self.statusbar.push('notebook',
-                _("Loading tab %s for %s ...") % (nodeName, name))
-            node = nodes[nodeName]
+                _("Loading tab %s for %s ...") % (node.title, name))
             node.statusbar = self.statusbar # hack
             d = node.render()
-            d.addCallback(self._nodeRenderCallback, nodeName,
+            d.addCallback(self._nodeRenderCallback, node.title,
                 instance, nodeWidgets, mid)
+            d.addErrback(self._nodeRenderErrback, node.title)
             # FIXME: errback
 
     def _nodeRenderCallback(self, widget, nodeName, gtkAdminInstance,
@@ -367,6 +380,11 @@ class Window(log.Loggable, gobject.GObject):
         widget.show()
 
         self.current_component = gtkAdminInstance
+
+    def _nodeRenderErrback(self, failure, nodeName):
+        self.debug('Could not render node %s: %r, %s' % (nodeName,
+            failure, failure.getErrorMessage()))
+        self.warning('Could not render node %s' % nodeName)
 
     ### IAdminView interface methods: FIXME: create interface somewhere
     ## Confusingly enough, this procedure is called by remote objects to

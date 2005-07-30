@@ -1,5 +1,14 @@
 2005-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	* flumotion/component/base/admin_gtk.py:
+	  change getNodes to need to return a list instead of a dict
+	  so the order is defined by the component, and not chance
+	  add an on-the-fly conversion from dict to list so stuff
+	  keeps working until things get fixed up
+
+2005-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	  use bundleclient instead of unbundler
 	* flumotion/admin/gtk/client.py:
