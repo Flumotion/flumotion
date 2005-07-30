@@ -43,7 +43,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         print 'ERROR:', message
         
     def cb_getMimeType(self, mime, label):
-        label.set_text('Mime type: %s' % mime)
+        label.set_text(_('Mime type:') + " %s" % mime)
         label.show()
 
     def setStats(self, stats):
@@ -79,8 +79,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         # changed in 0.1.9.1 to be int so we can localize time
         peakTime = state.get('clients-peak-time')
         if not isinstance(peakTime, str):
-            peakTime = time.strftime ("%c", # _("%a %b %d %H:%M:%S %Y"),
-                time.localtime(peakTime))
+            peakTime = time.strftime ("%c", time.localtime(peakTime))
             
             self.debug('Converted peak time to %s' % peakTime)
         self.labels['clients-peak-time'].set_text(peakTime)
@@ -133,24 +132,21 @@ class LogAdminGtkNode(BaseAdminGtkNode):
 
 class HTTPStreamerAdminGtk(BaseAdminGtk):
     def setup(self):
-        self._nodes = {}
-        statistics = StatisticsAdminGtkNode(self.state, self.admin)
-        log = LogAdminGtkNode(self.state, self.admin)
-        self._nodes['Statistics'] = statistics
-        self._nodes['Log'] = log
+        statistics = StatisticsAdminGtkNode(self.state, self.admin, 
+            _("Statistics"))
+        self.nodes['Statistics'] = statistics
+        log = LogAdminGtkNode(self.state, self.admin, _('Log'))
+        self.nodes['Log'] = log
 
     def uiStateChanged(self, state):
-        self._nodes['Statistics'].setStats(state)
+        self.nodes['Statistics'].setStats(state)
 
     # FIXME: tie this to the statistics node better
     def component_statsChanged(self, stats):
         # FIXME: decide on state/stats/statistics
-        self._nodes['Statistics'].setStats(stats)
+        self.nodes['Statistics'].setStats(stats)
 
     def component_logMessage(self, message):
-        self._nodes['Log'].logMessage(message)
+        self.nodes['Log'].logMessage(message)
  
-    def getNodes(self):
-        return self._nodes
-
 GUIClass = HTTPStreamerAdminGtk

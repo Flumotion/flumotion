@@ -23,6 +23,8 @@ import os
 import gtk
 import gtk.glade
 
+from twisted.python import util
+
 from flumotion.common import errors, log
 from flumotion.twisted import flavors
 
@@ -30,6 +32,9 @@ class BaseAdminGtk(log.Loggable):
     """
     I am a base class for all GTK+-based Admin views.
     I am a view on one component's properties.
+
+    @type nodes: L{twisted.python.util.OrderedDict}
+    @ivar nodes: an ordered dict of name -> L{BaseAdminGtkNode}
     """
 
     __implements__ = (flavors.IStateListener,)
@@ -50,6 +55,7 @@ class BaseAdminGtk(log.Loggable):
         self.admin = admin
         self.debug('creating admin gtk for state %r' % state)
         self.uiState = None
+        self.nodes = util.OrderedDict()
 
         #mid = self.status_push('Getting component information ...')
         def got_state(state):
@@ -109,9 +115,9 @@ class BaseAdminGtk(log.Loggable):
 
     def getNodes(self):
         """
-        Return a list of admin UI nodes.
+        Return a dict of admin UI nodes.
         """
-        raise NotImplementedError("Child class needs to implement getNodes")
+        return self.nodes
 
     # FIXME: deprecated
     def render(self):
@@ -139,11 +145,9 @@ class BaseAdminGtkNode(log.Loggable):
     I am a base class for all GTK+-based Admin UI nodes.
     I am a view on a set of properties for a component.
     """
-    title = None
-
     logCategory = "admingtk"
 
-    def __init__(self, state, admin, title=title):
+    def __init__(self, state, admin, title=None):
         """
         @param state: state of component this is a UI node for
         @type  state: L{flumotion.common.planet.AdminComponentState}
@@ -156,6 +160,7 @@ class BaseAdminGtkNode(log.Loggable):
         self.admin = admin
         self.statusbar = None
         self.title = title
+        self.nodes = util.OrderedDict()
         
     def status_push(self, str):
         if self.statusbar:

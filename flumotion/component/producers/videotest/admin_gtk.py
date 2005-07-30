@@ -82,15 +82,11 @@ class PatternNode(BaseAdminGtkNode):
 class VideoTestAdminGtk(BaseAdminGtk):
     def setup(self):
         # FIXME: have constructor take self instead ?
-        pattern = PatternNode(self.state, self.admin)
-        self._nodes = {'Pattern': pattern}
-
-    # FIXME: move to base class, make _nodes a public member
-    def getNodes(self):
-        return self._nodes
+        pattern = PatternNode(self.state, self.admin, title=_("Pattern"))
+        self.nodes['Pattern'] = pattern
 
     def component_propertyChanged(self, name, value):
         # FIXME: tie to correct node better
-        self._nodes['Pattern'].propertyChanged(name, value)
+        self.nodes['Pattern'].propertyChanged(name, value)
 
 GUIClass = VideoTestAdminGtk

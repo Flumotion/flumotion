@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-29 20:13+0200\n"
+"POT-Creation-Date: 2005-07-30 17:28+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -23,89 +23,89 @@ msgstr "Ingen tilknyttning"
 msgid "Connecting to %s:%s"
 msgstr "Tilknyttet til %s:%s"
 
-#: flumotion/admin/gtk/client.py:264 flumotion/admin/gtk/client.py:322
+#: flumotion/admin/gtk/client.py:264 flumotion/admin/gtk/client.py:329
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Laster UI for %s ..."
 
-#: flumotion/admin/gtk/client.py:340
+#: flumotion/admin/gtk/client.py:347
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Laster tab %s for %s ..."
 
-#: flumotion/admin/gtk/client.py:360
+#: flumotion/admin/gtk/client.py:366
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s har ikke noe UI enda"
 
-#: flumotion/admin/gtk/client.py:549
+#: flumotion/admin/gtk/client.py:560
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Flumotion Administrasjon"
 
-#: flumotion/admin/gtk/client.py:565
+#: flumotion/admin/gtk/client.py:576
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Mistet forbindelse med manager, kobler til på nytt ..."
 
-#: flumotion/admin/gtk/client.py:585
+#: flumotion/admin/gtk/client.py:596
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Verbinding met manager op %s werd geweigerd."
 
-#: flumotion/admin/gtk/client.py:587
+#: flumotion/admin/gtk/client.py:598
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Verbinding met %s werd geweigerd"
 
-#: flumotion/admin/gtk/client.py:600
+#: flumotion/admin/gtk/client.py:611
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Verbinding met manager op %s mislukt (%s)."
 
-#: flumotion/admin/gtk/client.py:682
+#: flumotion/admin/gtk/client.py:693
 #, python-format
 msgid "Showing UI for %s"
 msgstr "UI aan het tonen voor %s"
 
-#: flumotion/admin/gtk/client.py:701
+#: flumotion/admin/gtk/client.py:713
 #, python-format
 msgid "No UI for component %s"
 msgstr "Geen UI voor component %s"
 
-#: flumotion/admin/gtk/client.py:715
+#: flumotion/admin/gtk/client.py:727
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Component %s slaapt nog steeds"
 
-#: flumotion/admin/gtk/client.py:725
+#: flumotion/admin/gtk/client.py:737
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "UI aan het opvragen voor %s ..."
 
-#: flumotion/admin/gtk/client.py:771
+#: flumotion/admin/gtk/client.py:783
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr ""
 "De wizard kan niet uitgevoerd worden omdat er geen workers ingelogd zijn."
 
-#: flumotion/admin/gtk/client.py:812
+#: flumotion/admin/gtk/client.py:824
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Componentcode aan het herladen voor %s"
 
-#: flumotion/admin/gtk/client.py:829
+#: flumotion/admin/gtk/client.py:841
 msgid "No component selected."
 msgstr "Geen component geselecteerd."
 
-#: flumotion/admin/gtk/client.py:846
+#: flumotion/admin/gtk/client.py:858
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "%s van component %s mislukt"
 
-#: flumotion/admin/gtk/client.py:873
+#: flumotion/admin/gtk/client.py:885
 msgid "Import Configuration..."
 msgstr "Configuratie invoeren..."
 
-#: flumotion/admin/gtk/client.py:886
+#: flumotion/admin/gtk/client.py:898
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -113,11 +113,11 @@ msgstr ""
 "Bestand bestaat reeds.\n"
 "Overschrijven?"
 
-#: flumotion/admin/gtk/client.py:908
+#: flumotion/admin/gtk/client.py:920
 msgid "Export Configuration..."
 msgstr "Configuratie uitvoeren..."
 
-#: flumotion/admin/gtk/client.py:952
+#: flumotion/admin/gtk/client.py:964
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -126,24 +126,24 @@ msgstr ""
 "Kon component niet herladen:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:962
+#: flumotion/admin/gtk/client.py:974
 msgid "Reloading ..."
 msgstr "Aan het herladen..."
 
-#: flumotion/admin/gtk/client.py:963
+#: flumotion/admin/gtk/client.py:975
 msgid "Reloading client code"
 msgstr "Clientcode aan het herladen"
 
-#: flumotion/admin/gtk/client.py:965
+#: flumotion/admin/gtk/client.py:977
 #, python-format
 msgid "Reloading %s code"
 msgstr "%s code aan het herladen"
 
-#: flumotion/admin/gtk/client.py:978
+#: flumotion/admin/gtk/client.py:990
 msgid "About Flumotion"
 msgstr "Over Flumotion"
 
-#: flumotion/admin/gtk/client.py:997
+#: flumotion/admin/gtk/client.py:1009
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -153,7 +153,7 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1002
+#: flumotion/admin/gtk/client.py:1014
 msgid "Authors"
 msgstr "Auteurs"
 
@@ -230,6 +230,11 @@ msgstr "_Wijzig elementeigenschap ..."
 msgid "Pattern:"
 msgstr "_Patroon:"
 
+#: flumotion/component/producers/videotest/admin_gtk.py:85
+#, fuzzy
+msgid "Pattern"
+msgstr "_Patroon:"
+
 #: flumotion/wizard/enums.py:82
 msgid "SMPTE Color bars"
 msgstr ""
@@ -243,10 +248,12 @@ msgid "Totally black"
 msgstr ""
 
 #: flumotion/component/consumers/httpstreamer/http.glade:8
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:136
 msgid "Statistics"
 msgstr "Statistieken"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:129
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:46
 msgid "Mime type:"
 msgstr "Mimetype:"
 
@@ -295,6 +302,10 @@ msgstr "op"
 #: flumotion/component/consumers/httpstreamer/http.glade:591
 msgid "<b>Client Consumption</b>"
 msgstr "<b>Cliëntverbruik</b>"
+
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:138
+msgid "Log"
+msgstr ""
 
 #: data/glade/admin.glade:9
 msgid "Flumotion Administration"
@@ -804,6 +815,10 @@ msgstr ""
 "\n"
 "Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
 "configuratie van uw streaming media server."
+
+#, fuzzy
+#~ msgid "Mime type: "
+#~ msgstr "Mimetype:"
 
 #~ msgid "<b>Preview</b>"
 #~ msgstr "<b>Voorsmaak</b>"

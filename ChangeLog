@@ -1,6 +1,22 @@
 2005-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/client.py:
+	  go back to using a dict since twisted.python.util.OrderedDict
+	  exists
+	* flumotion/component/base/admin_gtk.py:
+	  make nodes a public member, getNodes an accessor, and use
+	  OrderedDict
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	  give title and use .nodes
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* po/POTFILES.in:
+	* po/nl.po:
+	* po/no.po:
+	  translate some more
+
+2005-07-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/client.py:
 	* flumotion/component/base/admin_gtk.py:
 	  change getNodes to need to return a list instead of a dict
 	  so the order is defined by the component, and not chance

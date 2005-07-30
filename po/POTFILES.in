@@ -6,6 +6,7 @@ flumotion/component/producers/videotest/admin_gtk.py
 flumotion/wizard/enums.py
 
 flumotion/component/consumers/httpstreamer/http.glade
+flumotion/component/consumers/httpstreamer/admin_gtk.py
 
 data/glade/admin.glade
 data/glade/admin-wizard.glade
