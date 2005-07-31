@@ -299,12 +299,11 @@ class Window(log.Loggable, gobject.GObject):
             raise #FIXME: something appropriate
         klass = getattr(module, methodName)
 
-        # instantiate the GUIClass, giving ourself as the first argument
-        # FIXME: we cheat by giving the view as second for now,
-        # but let's decide for either view or model
+        # instantiate the GUIClass
         instance = klass(state, self.admin)
         self.debug("Created entry instance %r" % instance)
         d = instance.setup()
+        # F0.2: setup should return a deferred
         if not d:
             d = defer.succeed(None)
         d.addCallback(self._setupCallback, name, instance)

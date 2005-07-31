@@ -18,9 +18,9 @@
 
 # Headers in this file shall remain intact.
 
+from gettext import gettext as _
 
 import gtk
-
 
 ERROR = 1
 WARNING = 2
@@ -30,9 +30,9 @@ _stock_icons = {ERROR: gtk.STOCK_DIALOG_ERROR,
                 WARNING: gtk.STOCK_DIALOG_WARNING,
                 INFO: gtk.STOCK_DIALOG_INFO}
 
-_headings = {ERROR: 'Error',
-             WARNING: 'Warning',
-             INFO: 'Note'}
+_headings = {ERROR: _('Error'),
+             WARNING: _('Warning'),
+             INFO: _('Note')}
 
 class Message:
     def __init__(self, level=WARNING, priority=50, id=None, msg=None,
@@ -117,7 +117,7 @@ class MessageView(gtk.VBox):
             buf.set_text(b.message.msg)
             self.textview.set_buffer(buf)
             self.label.set_markup('<b>%s</b>'
-                                  % _headings.get(m.level, 'Message'))
+                                  % _headings.get(m.level, _('Message')))
 
         self.clear_message(m.id)
 

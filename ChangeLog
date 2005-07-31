@@ -1,5 +1,17 @@
 2005-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/message.py:
+	  translate more
+	* flumotion/worker/checks/video.py:
+	  mark for translation without translating
+	* po/POTFILES.in:
+	* po/nl.po:
+	* po/no.po:
+	  translation updates
+
+2005-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/admin_gtk.py:
 	  set up translations for BaseAdminGtk in setup()
 

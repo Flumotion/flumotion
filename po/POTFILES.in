@@ -4,9 +4,13 @@ flumotion/admin/gtk/parts.py
 
 flumotion/component/producers/videotest/admin_gtk.py
 flumotion/wizard/enums.py
+flumotion/wizard/steps.py
+flumotion/wizard/message.py
 
 flumotion/component/consumers/httpstreamer/http.glade
 flumotion/component/consumers/httpstreamer/admin_gtk.py
+
+flumotion/worker/checks/video.py
 
 data/glade/admin.glade
 data/glade/admin-wizard.glade

@@ -29,6 +29,9 @@ from twisted.internet import defer, reactor
 
 from flumotion.common import gstreamer, errors, log
     
+def _(str):
+    return str
+
 class Resolution:
     """
     I am a helper class to make sure that the deferred is fired only once
@@ -240,7 +243,7 @@ def check1394():
     # first check if the obvious device node exists
     if not os.path.exists('/dev/raw1394'):
         return defer.fail(errors.DeviceNotFoundError(
-            'device node /dev/raw1394 does not exist'))
+            _('device node /dev/raw1394 does not exist')))
 
     pipeline = 'dv1394src name=source ! dvdec name=dec ! fakesink'
     return do_element_check(pipeline, 'source', do_check,

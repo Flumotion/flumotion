@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-30 17:28+0200\n"
+"POT-Creation-Date: 2005-07-31 22:13+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -23,89 +23,89 @@ msgstr "Ingen tilknyttning"
 msgid "Connecting to %s:%s"
 msgstr "Tilknyttet til %s:%s"
 
-#: flumotion/admin/gtk/client.py:264 flumotion/admin/gtk/client.py:329
+#: flumotion/admin/gtk/client.py:264 flumotion/admin/gtk/client.py:328
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Laster UI for %s ..."
 
-#: flumotion/admin/gtk/client.py:347
+#: flumotion/admin/gtk/client.py:346
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Laster tab %s for %s ..."
 
-#: flumotion/admin/gtk/client.py:366
+#: flumotion/admin/gtk/client.py:365
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s har ikke noe UI enda"
 
-#: flumotion/admin/gtk/client.py:560
+#: flumotion/admin/gtk/client.py:559
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Flumotion Administrasjon"
 
-#: flumotion/admin/gtk/client.py:576
+#: flumotion/admin/gtk/client.py:575
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Mistet forbindelse med manager, kobler til på nytt ..."
 
-#: flumotion/admin/gtk/client.py:596
+#: flumotion/admin/gtk/client.py:595
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Verbinding met manager op %s werd geweigerd."
 
-#: flumotion/admin/gtk/client.py:598
+#: flumotion/admin/gtk/client.py:597
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Verbinding met %s werd geweigerd"
 
-#: flumotion/admin/gtk/client.py:611
+#: flumotion/admin/gtk/client.py:610
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Verbinding met manager op %s mislukt (%s)."
 
-#: flumotion/admin/gtk/client.py:693
+#: flumotion/admin/gtk/client.py:692
 #, python-format
 msgid "Showing UI for %s"
 msgstr "UI aan het tonen voor %s"
 
-#: flumotion/admin/gtk/client.py:713
+#: flumotion/admin/gtk/client.py:712
 #, python-format
 msgid "No UI for component %s"
 msgstr "Geen UI voor component %s"
 
-#: flumotion/admin/gtk/client.py:727
+#: flumotion/admin/gtk/client.py:726
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Component %s slaapt nog steeds"
 
-#: flumotion/admin/gtk/client.py:737
+#: flumotion/admin/gtk/client.py:736
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "UI aan het opvragen voor %s ..."
 
-#: flumotion/admin/gtk/client.py:783
+#: flumotion/admin/gtk/client.py:782
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr ""
 "De wizard kan niet uitgevoerd worden omdat er geen workers ingelogd zijn."
 
-#: flumotion/admin/gtk/client.py:824
+#: flumotion/admin/gtk/client.py:823
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Componentcode aan het herladen voor %s"
 
-#: flumotion/admin/gtk/client.py:841
+#: flumotion/admin/gtk/client.py:840
 msgid "No component selected."
 msgstr "Geen component geselecteerd."
 
-#: flumotion/admin/gtk/client.py:858
+#: flumotion/admin/gtk/client.py:857
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "%s van component %s mislukt"
 
-#: flumotion/admin/gtk/client.py:885
+#: flumotion/admin/gtk/client.py:884
 msgid "Import Configuration..."
 msgstr "Configuratie invoeren..."
 
-#: flumotion/admin/gtk/client.py:898
+#: flumotion/admin/gtk/client.py:897
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -113,11 +113,11 @@ msgstr ""
 "Bestand bestaat reeds.\n"
 "Overschrijven?"
 
-#: flumotion/admin/gtk/client.py:920
+#: flumotion/admin/gtk/client.py:919
 msgid "Export Configuration..."
 msgstr "Configuratie uitvoeren..."
 
-#: flumotion/admin/gtk/client.py:964
+#: flumotion/admin/gtk/client.py:963
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -126,24 +126,24 @@ msgstr ""
 "Kon component niet herladen:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:974
+#: flumotion/admin/gtk/client.py:973
 msgid "Reloading ..."
 msgstr "Aan het herladen..."
 
-#: flumotion/admin/gtk/client.py:975
+#: flumotion/admin/gtk/client.py:974
 msgid "Reloading client code"
 msgstr "Clientcode aan het herladen"
 
-#: flumotion/admin/gtk/client.py:977
+#: flumotion/admin/gtk/client.py:976
 #, python-format
 msgid "Reloading %s code"
 msgstr "%s code aan het herladen"
 
-#: flumotion/admin/gtk/client.py:990
+#: flumotion/admin/gtk/client.py:989
 msgid "About Flumotion"
 msgstr "Over Flumotion"
 
-#: flumotion/admin/gtk/client.py:1009
+#: flumotion/admin/gtk/client.py:1008
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -153,7 +153,7 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1014
+#: flumotion/admin/gtk/client.py:1013
 msgid "Authors"
 msgstr "Auteurs"
 
@@ -247,13 +247,189 @@ msgstr ""
 msgid "Totally black"
 msgstr ""
 
+#: flumotion/wizard/steps.py:47
+msgid "Welcome"
+msgstr ""
+
+#: flumotion/wizard/steps.py:61
+msgid "Source"
+msgstr ""
+
+#: flumotion/wizard/steps.py:62 flumotion/wizard/steps.py:126
+#: flumotion/wizard/steps.py:440 flumotion/wizard/steps.py:503
+#: flumotion/wizard/steps.py:611
+msgid "Production"
+msgstr ""
+
+#: flumotion/wizard/steps.py:70
+msgid "If you want to stream video"
+msgstr ""
+
+#: flumotion/wizard/steps.py:72
+msgid "If you want to stream audio"
+msgstr ""
+
+#: flumotion/wizard/steps.py:146
+msgid "TV Card"
+msgstr ""
+
+#: flumotion/wizard/steps.py:210
+msgid "Firewire"
+msgstr ""
+
+#: flumotion/wizard/steps.py:253
+#, fuzzy, python-format
+msgid "%s, %s (%d/%d pixel aspect ratio)"
+msgstr "PAL, 4:3 (59/54 pixelaspectverhouding)"
+
+#: flumotion/wizard/steps.py:303
+#, fuzzy, python-format
+msgid "%dx%d, %d/%d pixel aspect ratio"
+msgstr "PAL, 4:3 (59/54 pixelaspectverhouding)"
+
+#: flumotion/wizard/steps.py:322
+msgid "Checking for Firewire device..."
+msgstr ""
+
+#: flumotion/wizard/steps.py:341
+msgid "No Firewire device detected."
+msgstr ""
+
+#: flumotion/wizard/steps.py:345
+msgid "Webcam"
+msgstr ""
+
+#: flumotion/wizard/steps.py:409
+#, fuzzy
+msgid "Test Video Source"
+msgstr "Video_bron:"
+
+#: flumotion/wizard/steps.py:438
+msgid "Overlay"
+msgstr ""
+
+#: flumotion/wizard/steps.py:453
+msgid ""
+"\n"
+"This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
+"Please consider upgrading if your output video has a\n"
+"diagonal line in the image."
+msgstr ""
+
+#: flumotion/wizard/steps.py:464
+msgid "Could not check ffmpegcolorspace features."
+msgstr ""
+
+#: flumotion/wizard/steps.py:501
+msgid "Soundcard"
+msgstr ""
+
+#: flumotion/wizard/steps.py:609
+msgid "Test Audio Source"
+msgstr ""
+
+#: flumotion/wizard/steps.py:633
+msgid "Encoding"
+msgstr ""
+
+#: flumotion/wizard/steps.py:634 flumotion/wizard/steps.py:742
+#: flumotion/wizard/steps.py:762
+#, fuzzy
+msgid "Conversion"
+msgstr "_Verbinding"
+
+#: flumotion/wizard/steps.py:836 flumotion/wizard/steps.py:838
+#: flumotion/wizard/steps.py:937 flumotion/wizard/steps.py:981
+#, fuzzy
+msgid "Consumption"
+msgstr "_Verbinding"
+
+#: flumotion/wizard/steps.py:965
+msgid "HTTP Streamer (audio & video)"
+msgstr ""
+
+#: flumotion/wizard/steps.py:966
+msgid "HTTP audio/video"
+msgstr ""
+
+#: flumotion/wizard/steps.py:970
+msgid "HTTP Streamer (audio only)"
+msgstr ""
+
+#: flumotion/wizard/steps.py:971
+msgid "HTTP audio"
+msgstr ""
+
+#: flumotion/wizard/steps.py:975
+msgid "HTTP Streamer (video only)"
+msgstr ""
+
+#: flumotion/wizard/steps.py:976
+msgid "HTTP video"
+msgstr ""
+
+#: flumotion/wizard/steps.py:1042
+#, fuzzy
+msgid "Disk (audio & video)"
+msgstr "Audio & Video"
+
+#: flumotion/wizard/steps.py:1043
+msgid "Disk audio/video"
+msgstr ""
+
+#: flumotion/wizard/steps.py:1046
+#, fuzzy
+msgid "Disk (audio only)"
+msgstr "Enkel audio"
+
+#: flumotion/wizard/steps.py:1047
+msgid "Disk audio"
+msgstr ""
+
+#: flumotion/wizard/steps.py:1050
+#, fuzzy
+msgid "Disk (video only)"
+msgstr "Enkel video"
+
+#: flumotion/wizard/steps.py:1051
+msgid "Disk video"
+msgstr ""
+
+#: flumotion/wizard/steps.py:1054
+msgid "Content License"
+msgstr ""
+
+#: flumotion/wizard/steps.py:1056
+msgid "License"
+msgstr ""
+
+#: flumotion/wizard/steps.py:1070
+msgid "Summary"
+msgstr ""
+
+#: flumotion/wizard/message.py:33
+msgid "Error"
+msgstr ""
+
+#: flumotion/wizard/message.py:34
+msgid "Warning"
+msgstr ""
+
+#: flumotion/wizard/message.py:35
+msgid "Note"
+msgstr ""
+
+#: flumotion/wizard/message.py:120
+msgid "Message"
+msgstr ""
+
 #: flumotion/component/consumers/httpstreamer/http.glade:8
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:136
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:145
 msgid "Statistics"
 msgstr "Statistieken"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:129
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:46
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:49
 msgid "Mime type:"
 msgstr "Mimetype:"
 
@@ -303,8 +479,12 @@ msgstr "op"
 msgid "<b>Client Consumption</b>"
 msgstr "<b>Cliëntverbruik</b>"
 
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:138
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:147
 msgid "Log"
+msgstr ""
+
+#: flumotion/worker/checks/video.py:246
+msgid "device node /dev/raw1394 does not exist"
 msgstr ""
 
 #: data/glade/admin.glade:9
@@ -517,7 +697,7 @@ msgstr ""
 msgid "_Rotate entry every"
 msgstr "_Roteer opslag elke"
 
-#: data/glade/wizard_encoding.glade:83 data/glade/wizard_testsource.glade:107
+#: data/glade/wizard_encoding.glade:83 data/glade/wizard_testsource.glade:120
 msgid "F_ormat:"
 msgstr "F_ormaat:"
 
@@ -585,31 +765,31 @@ msgstr "geen"
 msgid "<b>Output format</b>"
 msgstr "<b>Uitvoerformaat</b>"
 
-#: data/glade/wizard_http.glade:38
+#: data/glade/wizard_http.glade:33
 msgid "_Port:"
 msgstr "_Poort:"
 
-#: data/glade/wizard_http.glade:63
-msgid "_User limit:"
-msgstr "_Gebruikerslimiet:"
-
-#: data/glade/wizard_http.glade:88
+#: data/glade/wizard_http.glade:84
 msgid "B_andwidth limit:"
 msgstr "B_andbreedtelimiet:"
 
 #: data/glade/wizard_http.glade:113
-msgid "_Mount point:"
-msgstr "_Mountpunt:"
+msgid "_User limit:"
+msgstr "_Gebruikerslimiet:"
 
-#: data/glade/wizard_http.glade:138
-msgid "clients"
-msgstr "cliënten"
-
-#: data/glade/wizard_http.glade:162
+#: data/glade/wizard_http.glade:186
 msgid "Mbit/s"
 msgstr "Mbit/s"
 
-#: data/glade/wizard_http.glade:277
+#: data/glade/wizard_http.glade:214
+msgid "clients"
+msgstr "cliënten"
+
+#: data/glade/wizard_http.glade:242
+msgid "_Mount point:"
+msgstr "_Mountpunt:"
+
+#: data/glade/wizard_http.glade:295
 msgid "Bu_rst on connect"
 msgstr "Uitba_rsten bij verbinding"
 
@@ -749,26 +929,26 @@ msgstr ""
 "Wanneer u \"Toepassen\" klikt, zal uw configuratie automatisch ingeladen "
 "worden op uw netwerk.  Dit zal enige tijd duren."
 
-#: data/glade/wizard_testsource.glade:32 data/glade/wizard_tvcard.glade:72
+#: data/glade/wizard_testsource.glade:33 data/glade/wizard_tvcard.glade:72
 #: data/glade/wizard_webcam.glade:166
 msgid "_Width:"
 msgstr "_Breedte:"
 
-#: data/glade/wizard_testsource.glade:57 data/glade/wizard_tvcard.glade:97
+#: data/glade/wizard_testsource.glade:62 data/glade/wizard_tvcard.glade:97
 #: data/glade/wizard_webcam.glade:119
 msgid "_Height:"
 msgstr "_Hoogte:"
 
-#: data/glade/wizard_testsource.glade:82 data/glade/wizard_tvcard.glade:166
+#: data/glade/wizard_testsource.glade:91 data/glade/wizard_tvcard.glade:166
 #: data/glade/wizard_webcam.glade:72
 msgid "F_ramerate:"
 msgstr "B_eeldsnelheid:"
 
-#: data/glade/wizard_testsource.glade:131
+#: data/glade/wizard_testsource.glade:149
 msgid "_Pattern:"
 msgstr "_Patroon:"
 
-#: data/glade/wizard_testsource.glade:155
+#: data/glade/wizard_testsource.glade:178
 msgid ""
 "Snow\n"
 "Black"

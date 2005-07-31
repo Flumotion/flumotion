@@ -22,6 +22,8 @@ import math
 
 import gtk
         
+from gettext import gettext as _
+
 from twisted.internet import defer
 
 from flumotion.twisted.defer import defer_generator_method
@@ -65,9 +67,9 @@ class Production(WizardSection):
         self.combobox_audio.set_enum(AudioDevice)
         tips = gtk.Tooltips()
         tips.set_tip(self.checkbutton_has_video,
-                     'If you want to stream video')
+                     _('If you want to stream video'))
         tips.set_tip(self.checkbutton_has_audio,
-                     'If you want to stream audio')
+                     _('If you want to stream audio'))
         
         self.combobox_video.set_active(VideoDevice.Test)
         self.combobox_audio.set_active(AudioDevice.Test)
@@ -248,7 +250,7 @@ class FireWire(VideoSource):
         else:
             self.warning('Unknown pixel aspect ratio %d/%d' % (nom, den))
 
-        text = '%s, %s (%d/%d pixel aspect ratio)' % (type, aspect, nom, den)
+        text = _('%s, %s (%d/%d pixel aspect ratio)') % (type, aspect, nom, den)
         self.label_camera_settings.set_text(text)
             
         # factor is a double
@@ -294,11 +296,12 @@ class FireWire(VideoSource):
 
     def update_output_format(self):
         d = self._get_width_height()
-        if self.is_square:
-            msg = ('%dx%d, 1/1 pixel aspect ratio' % (d['ow'], d['oh']))
-        else:
-            msg = ('%dx%d, %d/%d pixel aspect ratio'
-                   % (d['ow'], d['oh'], self.par[0], self.par[1]))
+        num, den = 1, 1
+        if not self.is_square:
+            num, den = self.par[0], self.par[1]
+
+        msg = _('%dx%d, %d/%d pixel aspect ratio') % (
+                   d['ow'], d['oh'], num, den)
         self.label_output_format.set_markup(msg)
         
     def get_state(self):
@@ -316,7 +319,7 @@ class FireWire(VideoSource):
         
     def run_checks(self):
         self.set_sensitive(False)
-        self.info_msg('firewire-error', 'Checking for Firewire device...')
+        self.info_msg('firewire-error', _('Checking for Firewire device...'))
         d = self.workerRun('flumotion.worker.checks.video', 'check1394')
         yield d
         try:
@@ -334,9 +337,8 @@ class FireWire(VideoSource):
             self.set_sensitive(True)
             self.on_update_output_format()
         except Exception, e:
-            self.error_msg('firewire-error',
-                           'No Firewire device detected.\n'
-                           '(%s)' % e)
+            self.error_msg('firewire-error', "%s\n(%s)" % (
+                           _('No Firewire device detected.'), _(str(e))))
     run_checks = defer_generator_method(run_checks)
 
 class Webcam(VideoSource):
@@ -448,16 +450,18 @@ class Overlay(WizardStep):
                 self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
                     'videomixer', 'alpha', 'ffmpegcolorspace')
             else:
-                msg = ("This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
-                       "Please consider upgrading if your output video has a "
-                       "diagonal line in the image.")
+                msg = _("""
+This worker's ffmpegcolorspace plugin is older than 0.8.5.
+Please consider upgrading if your output video has a
+diagonal line in the image.""")
                 self.info_msg('overlay-old-colorspace', msg)
                 self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
                     'videomixer', 'alpha')
             self.clear_msg('overlay-colorspace')
         except Exception, e:
             self.wizard.block_next(True)
-            msg = ('Could not check ffmpegcolorspace features.\n(%s)' % e)
+            msg = "%s\n(%s)" % (
+                _('Could not check ffmpegcolorspace features.'), _(str(e)))
             self.error_msg('overlay-colorspace', msg)
     worker_changed = defer_generator_method (worker_changed)
         

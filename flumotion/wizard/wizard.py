@@ -104,7 +104,8 @@ class Scenario:
             try:
                 next_step = self.wizard[next]
             except KeyError:
-                raise TypeError("Wizard step %s is missing" % `next`)
+                raise TypeError("%r: Wizard step %s is missing" % (
+                    self, next))
 
         while not self.stack.push(next_step):
             s = self.stack.pop()
