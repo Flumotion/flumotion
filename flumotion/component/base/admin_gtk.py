@@ -20,13 +20,15 @@
 
 import os
 
+import gettext
+
 import gtk
 import gtk.glade
 
 from twisted.python import util
 from twisted.internet import defer
 
-from flumotion.common import errors, log
+from flumotion.common import errors, log, common
 from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
 
@@ -42,6 +44,7 @@ class BaseAdminGtk(log.Loggable):
     __implements__ = (flavors.IStateListener,)
 
     logCategory = "admingtk"
+    gettext_domain = 'flumotion'
     
     state = admin = nodes = 'hello pychecker'
 
@@ -109,11 +112,34 @@ class BaseAdminGtk(log.Loggable):
         """
         self.debug("property %s changed to %r" % (name, value))
 
+    # FIXME: .setup() is subclassable, while .render() on nodes has
+    # haveWidgetTree.  choose one of the two patterns in general
     def setup(self):
         """
         Set up the admin view so it can display nodes.
         """
-        raise NotImplementedError("Child class needs to implement setup")
+        # set up translations
+        if not hasattr(self, 'gettext_domain'):
+            yield None
+
+        lang = common.getLL()
+        self.debug("loading bundle for %s locales" % lang)
+        bundleName = '%s-locale-%s' % (self.gettext_domain, lang)
+        d = self.admin.bundleLoader.getBundleByName(bundleName)
+        yield d
+
+        try:
+            localedatadir = d.value()
+        except NoBundleError:
+            self.debug("Failed to find locale bundle %s" % bundleName)
+            yield None
+
+        localeDir = os.path.join(localedatadir, 'locale')
+        self.debug("Loading locales from %s" % localeDir)
+        gettext.bindtextdomain(self.gettext_domain, localeDir)
+        gtk.glade.bindtextdomain(self.gettext_domain, localeDir)
+        yield None
+    setup = defer_generator_method(setup)
 
     def getNodes(self):
         """
