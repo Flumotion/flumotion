@@ -19,10 +19,6 @@
 
 * EASY		move muxers in their own dir ?
 
-* MEDIUM:	provide login dialog in flumotion-admin, with user/pass or
-		other types,
-		and sessions saved
-
 * MEDIUM:	component.component overrides .error and calls reactor.stop(),
 	  	this is dangerous, figure that out
 
@@ -44,9 +40,6 @@
 * MEDIUM	if you specify a converter with feedname other than default
 		and a consumer eating from that feed and change the source
 		to the same feedname, it fails.
-
-* MEDIUM	figure out a way to have worker code for wizard checks
-		bundled
 
 * MEDIUM	webcams can be I420, YUY2, or others; we should detect this
 	  	gst-plugins 0.8.6 will detect automatically since there is a
