@@ -38,7 +38,7 @@ flumotion-manager \- streaming media server central management
 [
 .B -D
 ]
-.I config.xml [config2.xml ...]
+.I manager.xml [flow1.xml flow2.xml ...]
 
 .SH DESCRIPTION
 .B flumotion-manager
@@ -56,11 +56,12 @@ flumotion component. When starting flumotion-manager, you need only specify a
 , but it is frequently helpful to set other options from the command line.
 
 .B flumotion-manager
-can load multiple configuration files, if more than one is specified. These are
-loaded in order, and merged into a single configuration. This allows you to have
-one configuration file specify the basic manager configuration, such as 
-authentication configuration, and have a second specify the streaming 
-configuration.
+can load other configuration files as well, if more than one is specified. These
+additional configuration files define 
+.I flows
+that the manager will run on the workers. This allows you to define your manager
+configuration in the first configuration file, and your streaming configuration
+or configurations in one or more additional configurations files.
 
 .SH OPTIONS
 .IP "-h, --help"

@@ -108,11 +108,13 @@ def main(args):
     # XXX: gst_init should remove all options, like gtk_init
     args = [arg for arg in args if not arg.startswith('--gst')]
     
-    usagemessage = "usage: %prog [options] config1.xml config2.xml [...]"
+    usagemessage = "usage: %prog [options] manager.xml flow1.xml flow2.xml [...]"
     desc = "The manager is the core component of the Flumotion streaming\
  server. It takes its configuration from one or more planet configuration\
- files. If more than one configuration file is present, the files are\
- merged at runtime to take configuration options from all files."
+ files. The first file is mandatory, and contains base configuration \
+ information for the manager. Zero or more additional configuration files\
+ can be provided, these are used to configure flows that the manager should run\
+ on available workers."
 
     parser = optparse.OptionParser(usage=usagemessage, description=desc)
     parser.add_option('-d', '--debug',
