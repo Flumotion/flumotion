@@ -73,7 +73,7 @@ def main(args):
     group.add_option('-p', '--password',
                      action="store", type="string", dest="password",
                      default="",
-                     help="password to use, - for interactive")
+                     help="password to use")
 
     group.add_option('-F', '--feederports',
                      action="store", type="string", dest="feederports",

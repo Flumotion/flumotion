@@ -43,8 +43,8 @@ from flumotion.component import component
 
 def getComponent(dict, moduleName, methodName):
     """
-    @param dict: the configuration dictionary
-    @type  dict: dict
+    @param dict:       the configuration dictionary
+    @type  dict:       dict
     @param moduleName: name of the module to create the component from
     @type  moduleName: string
     @param methodName: the factory method to use to create the component
