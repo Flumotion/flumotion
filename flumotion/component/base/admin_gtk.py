@@ -130,7 +130,7 @@ class BaseAdminGtk(log.Loggable):
 
         try:
             localedatadir = d.value()
-        except NoBundleError:
+        except errors.NoBundleError:
             self.debug("Failed to find locale bundle %s" % bundleName)
             yield None
 

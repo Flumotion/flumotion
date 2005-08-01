@@ -1,3 +1,9 @@
+2005-08-01  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/base/admin_gtk.py:
+	  Use errors.NoBundleError rather than BundleError. This means we
+	  catch the exception here, so it's non-fatal.
+
 2005-07-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/steps.py:
