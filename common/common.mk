@@ -9,7 +9,7 @@ check-docs:
 	@make check -C doc/reference
 
 coverage:
-	@true || trial --coverage coverage -R flumotion.test
+	@trial --coverage coverage -R flumotion.test
 	@test ! -z "$(COVERAGE_MODULES)" ||				\
 	(echo Define COVERAGE_MODULES in your Makefile.am; exit 1)
 	@keep="";							\
