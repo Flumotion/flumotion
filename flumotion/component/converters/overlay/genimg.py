@@ -20,12 +20,6 @@
 
 import os
 
-from PIL import Image
-from PIL import ImageChops
-from PIL import ImageDraw
-from PIL import ImageFont
-from PIL import ImageOps
-
 directory = os.path.split(os.path.abspath(__file__))[0]
 fontpath = os.path.join(directory, 'Vera.ttf')
 logopath = directory
@@ -42,6 +36,12 @@ FONT_SIZE = 22
 
 def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
                      width, height):
+    from PIL import Image
+    from PIL import ImageChops
+    from  PIL import ImageDraw
+    from PIL import ImageFont
+    from PIL import ImageOps
+
     image = Image.new("RGBA", (width, height))
     draw = ImageDraw.Draw(image) # inheriting color mode
 

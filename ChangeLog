@@ -1,3 +1,11 @@
+2005-08-03  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/converters/overlay/genimg.py:
+	  Don't import PIL at top-level, instead defer this until we actually
+	  run the generate_overlay() function. Avoids crash in theoraenc due
+	  to clashing symbols, since with this we never dlopen() the clashing
+	  libraries in the same process.
+
 2005-08-01  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/base/admin_gtk.py:
