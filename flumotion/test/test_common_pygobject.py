@@ -28,6 +28,9 @@ import gtk
 
 from flumotion.common import pygobject, errors
 
+from flumotion.common.pygobject import gsignal, gproperty
+from flumotion.common.pygobject import with_construct_properties
+
 class SetProperty(unittest.TestCase):
     def testButton(self):
         b = gtk.Button()
@@ -51,3 +54,27 @@ class SetProperty(unittest.TestCase):
         self.assertEquals(b.get_property('can-focus'), True)
         pygobject.gobject_set_property(b, 'can-focus', [])
         self.assertEquals(b.get_property('can-focus'), False)
+
+class TestPyGObject(unittest.TestCase):
+    def testPyGObject(self):
+        class Foo(gobject.GObject):
+            gsignal('hcf', bool, str)
+            gproperty(bool, 'burning', 'If the object is burning',
+                      False, construct=True)
+
+            def __init__(xself):
+                gobject.GObject.__init__(xself)
+                xself.connect('hcf', xself.on_hcf)
+            __init__ = with_construct_properties (__init__)
+
+            def on_hcf(xself, again_self, x, y):
+                self.assert_(isinstance(x, bool))
+                self.assert_(isinstance(y, str))
+                xself.set_property('burning', True)
+        gobject.type_register(Foo)
+
+        o = Foo()
+
+        self.assertEquals(False, o.get_property('burning'))
+        o.emit('hcf', False, 'foogoober')
+        self.assertEquals(True, o.get_property('burning'))
