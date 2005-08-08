@@ -1,5 +1,10 @@
 2005-08-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_component.py:
+	  remove accidental commit of part of [2281]
+
+2005-08-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/Makefile.am:
 	  dist parts of the test dir so other projects can build on it
 

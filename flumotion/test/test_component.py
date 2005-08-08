@@ -130,54 +130,38 @@ class TestParser(unittest.TestCase):
 
     def testOneSource(self):
         res = pipelineFactory('@eater:foo@ ! bar', ['foo'])
-        assert res == ('%s name=eater:foo:default ' % \
-                       EATER +
-                       '! tee name=tee-eater:foo:default ! bar'), res
+        assert res == '%s name=eater:foo:default ! bar' % EATER, res
 
     def testOneSourceWithout(self):
         res = pipelineFactory('bar', ['foo'])
-        assert res == ('%s name=eater:foo:default ' % \
-                       EATER +
-                       '! tee name=tee-eater:foo:default ! bar'), res
+        assert res == '%s name=eater:foo:default ! bar' % EATER, res
 
     def testOneFeed(self):
         res = pipelineFactory('foo ! @feeder::bar@', [], ['bar'])
-        assert res == ('foo ! tee name=tee-feeder:fake:bar ' +
-                       '! %s name=feeder:fake:bar' % FEEDER), res
+        assert res == 'foo ! %s name=feeder:fake:bar' % FEEDER, res
         
     def testOneFeedWithout(self):
         res = pipelineFactory('foo', [], ['bar'])
-        assert res == ('foo ! tee name=tee-feeder:fake:bar ' +
-                       '! %s name=feeder:fake:bar' % FEEDER), res
+        assert res == 'foo ! %s name=feeder:fake:bar' % FEEDER, res
 
     def testTwoSources(self):
         res = pipelineFactory('@eater:foo@ ! @eater:bar@ ! baz', ['foo', 'bar'])
-        assert res == ('%s name=eater:foo:default ' % \
-                       EATER + 
-                       '! tee name=tee-eater:foo:default ' +
-                       '! %s name=eater:bar:default ' % \
-                       EATER +
-                       '! tee name=tee-eater:bar:default ! baz'), res
+        assert res == '%s name=eater:foo:default ! %s name=eater:bar:default ! baz' \
+               % (EATER, EATER), res
 
     def testTwoFeeds(self):
         res = pipelineFactory('foo ! @feeder::bar@ ! @feeder::baz@', [], ['bar', 'baz'])
-        assert res == ('foo ! tee name=tee-feeder:fake:bar ' +
-                       '! %s name=feeder:fake:bar ' % FEEDER +
-                       '! tee name=tee-feeder:fake:baz ' +
-                       '! %s name=feeder:fake:baz' % FEEDER), res
+        assert res == 'foo ! %s name=feeder:fake:bar ! %s name=feeder:fake:baz' \
+               % (FEEDER, FEEDER), res
 
     def testTwoBoth(self):
         res = pipelineFactory('@eater:comp1@ ! @eater:comp2@ ! @feeder::feed1@ ! @feeder::feed2@',
                               ['comp1', 'comp2',],
                               ['feed1', 'feed2'])
-        assert res == ('%s name=eater:comp1:default ' % EATER +
-                       '! tee name=tee-eater:comp1:default ' +
-                       '! %s name=eater:comp2:default ' % EATER +
-                       '! tee name=tee-eater:comp2:default ' +
-                       '! tee name=tee-feeder:fake:feed1 ' + 
-                       '! %s name=feeder:fake:feed1 ' % FEEDER +
-                       '! tee name=tee-feeder:fake:feed2 ' +
-                       '! %s name=feeder:fake:feed2' % FEEDER)
+        assert res == ('%s name=eater:comp1:default ! %s name=eater:comp2:default ! ' % \
+                       (EATER, EATER) + 
+                       '%s name=feeder:fake:feed1 ! %s name=feeder:fake:feed2' % \
+                       (FEEDER, FEEDER))
 
     def testErrors(self):
         self.assertRaises(TypeError, pipelineFactory, '')
