@@ -1,3 +1,8 @@
+2005-08-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/Makefile.am:
+	  dist parts of the test dir so other projects can build on it
+
 2005-08-03  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/converters/overlay/genimg.py:

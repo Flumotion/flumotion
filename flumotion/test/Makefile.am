@@ -1,11 +1,15 @@
 include $(top_srcdir)/common/python.mk
 include $(top_srcdir)/common/trial.mk
                                                                                 
+flumotiondir = $(libdir)/flumotion/python/flumotion/test
+
+flumotion_PYTHON =			\
+        __init__.py			\
+	common.py			\
+	gtkunit.py
+
 EXTRA_DIST = 				\
 	test.xml			\
-	__init__.py			\
-	common.py			\
-	gtkunit.py			\
 	test_bundle.py 			\
 	test_checkers.py 		\
 	test_common.py 			\
