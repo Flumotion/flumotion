@@ -1,3 +1,10 @@
+2005-08-09  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/checks/video.py (check_ffmpegcolorspace_AYUV):
+	Removed, ffmpeg is correct in gst 0.9.
+
+	* tests/checks.py: New app, checks the checks.
+
 2005-08-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_component.py:
