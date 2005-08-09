@@ -248,3 +248,15 @@ def check1394():
     pipeline = 'dv1394src name=source ! dvdec name=dec ! fakesink'
     return do_element_check(pipeline, 'source', do_check,
                             state=gst.STATE_PLAYING)
+
+def check_ffmpegcolorspace_AYUV():
+    """
+    Check if the ffmpegcolorspace element converts AYUV.
+    This was added in gst-plugins 0.8.5
+    """
+    e = gst.element_factory_make('ffmpegcolorspace')
+    s = e.get_pad_template('sink').get_caps().to_string()
+    if s.find('AYUV') > -1:
+        return True
+
+    return False
