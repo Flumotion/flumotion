@@ -1,3 +1,14 @@
+2005-08-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent.py:
+	  push FEEDER and EATER templates down to FeedComponent
+	* flumotion/component/encoders/vorbis/vorbis.py:
+	  use FeedComponent's templates, don't create tcp stuff on our own
+	* flumotion/test/test_component.py:
+	  fix tests for new way of handling templates
+	* flumotion/manager/manager.py:
+	  make a component SAD if it didn't start up correctly
+
 2005-08-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_component.py:

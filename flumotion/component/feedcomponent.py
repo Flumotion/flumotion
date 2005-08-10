@@ -147,6 +147,9 @@ class FeedComponent(basecomponent.BaseComponent):
     """
     I am a base class for all Flumotion feed components.
     """
+    # keep these as class variables for the tests
+    EATER_TMPL = 'tcpclientsrc name=%(name)s'
+    FEEDER_TMPL = 'tcpserversink name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
 
     logCategory = 'feedcomponent'
 
@@ -617,9 +620,6 @@ gobject.type_register(FeedComponent)
 class ParseLaunchComponent(FeedComponent):
     'A component using gst-launch syntax'
 
-    # keep these as class variables for the tests
-    EATER_TMPL = 'tcpclientsrc'
-    FEEDER_TMPL = 'tcpserversink buffers-max=500 buffers-soft-max=450 recover-policy=1'
     DELIMETER = '@'
 
     def __init__(self, name, eaters, feeders, pipeline_string=''):
@@ -706,17 +706,19 @@ class ParseLaunchComponent(FeedComponent):
 
         if len(names) == 1:
             part_name = names[0]
+            named = template % {'name': part_name}
             if pipeline.find(part_name) != -1:
-                pipeline = pipeline.replace(deli + part_name + deli, '%s name=%s' % (template, part_name))
+                pipeline = pipeline.replace(deli + part_name + deli, named)
             else:
-                pipeline = format % {'tmpl': template, 'name': part_name, 'pipeline': pipeline}
+                pipeline = format % {'tmpl': named, 'pipeline': pipeline}
         else:
             for part in names:
                 part_name = deli + part + deli
                 if pipeline.find(part_name) == -1:
                     raise TypeError, "%s needs to be specified in the pipeline '%s'" % (part_name, pipeline)
             
-                pipeline = pipeline.replace(part_name, '%s name=%s' % (template, part))
+                pipeline = pipeline.replace(part_name,
+                    template % {'name': part})
         return pipeline
         
     def parse_pipeline(self, pipeline):
@@ -742,10 +744,10 @@ class ParseLaunchComponent(FeedComponent):
         
         pipeline = self.parse_tmpl(pipeline, eater_element_names,
                                    self.EATER_TMPL,
-                                   '%(tmpl)s name=%(name)s ! %(pipeline)s') 
+                                   '%(tmpl)s ! %(pipeline)s') 
         pipeline = self.parse_tmpl(pipeline, feeder_element_names,
                                    self.FEEDER_TMPL,
-                                   '%(pipeline)s ! %(tmpl)s name=%(name)s') 
+                                   '%(pipeline)s ! %(tmpl)s') 
         pipeline = " ".join(pipeline.split())
         
         self.debug('pipeline for %s is %s' % (self.getName(), pipeline))

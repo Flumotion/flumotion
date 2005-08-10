@@ -27,11 +27,6 @@ from twisted.internet import reactor, defer
 from flumotion.common.planet import moods
 
 class Vorbis(feedcomponent.FeedComponent):
-    # keep these as class variables for the tests
-    EATER_TMPL = 'tcpclientsrc'
-    FEEDER_TMPL = 'tcpserversink'
-    # feeder properties: buffers-max=500 buffers-soft-max=450 recover-policy=1
-    
     def __init__(self, name, eaters, bitrate, quality, numChannels):
     	"""
         @param name:        name of the component
@@ -65,8 +60,12 @@ class Vorbis(feedcomponent.FeedComponent):
         # the rest we create once we have the caps
 
         self.pipeline = gst.Pipeline(self.name)
-        eater_element = gst.element_factory_make(self.EATER_TMPL, 
-                                                 eater_element_names[0])
+        # FIXME: when our eaters become more than one element, this will
+        # parse into a pipeline instead, so at that point we need bins
+        # and search for unconnected pads to use
+        eater_element = gst.parse_launch(
+            self.EATER_TMPL % {'name': eater_element_names[0]})
+
         wc_element = gst.element_factory_make("audioconvert", "widthconvert")
         as_element = gst.element_factory_make("audioscale", "audioscale")
         fake_element = gst.element_factory_make("fakesink", "fakesink")
@@ -182,11 +181,8 @@ class Vorbis(feedcomponent.FeedComponent):
         
         # create feeder
         feeder_element_names = map(lambda n: "feeder:" + n, self.feeder_names)
-        feeder = gst.element_factory_make(self.FEEDER_TMPL,
-            feeder_element_names[0])
-        feeder.set_property('buffers-max', 500)
-        feeder.set_property('buffers-soft-max', 450)
-        feeder.set_property('recover-policy', 1)
+        feeder = gst.parse_launch(
+            self.FEEDER_TMPL % {'name': feeder_element_names[0]})
 
         self.pipeline.add_many(audioconvert, enc, feeder)
         audioscale.unlink(fakesink)
@@ -265,20 +261,9 @@ class Vorbis(feedcomponent.FeedComponent):
         return retval
 
 def createComponent(config):
-    if config.has_key('channels'):
-        channels = config['channels']
-    else:
-        channels = 2
-
-    if config.has_key('bitrate'):
-        bitrate = config['bitrate']
-    else:
-        bitrate = -1
-    
-    if config.has_key('quality'):
-        quality = config['quality']
-    else:
-        quality = 0.3
+    channels = config.get('channels', 2)
+    bitrate = config.get('bitrate', -1)
+    quality = config.get('quality', 0.3)
             
     component = Vorbis(config['name'], [config['source']], bitrate,
                     quality, channels)

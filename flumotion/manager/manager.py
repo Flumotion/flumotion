@@ -566,6 +566,7 @@ class Vishnu(log.Loggable):
         # and print a nicer warning
         self.warning('failed to start component %s: %s'
                   % (state.get('name'), error.getErrorMessage()))
+        state.set('mood', moods.sad.value)
         return None
 
     def workerDetached(self, workerAvatar):
