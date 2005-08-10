@@ -15,4 +15,5 @@ SUBDIRS = \
 	firewire \
 	soundcard \
 	videotest \
-	webcam
+	webcam \
+	jukebox
