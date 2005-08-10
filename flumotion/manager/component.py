@@ -296,6 +296,7 @@ class ComponentAvatar(base.ManagerAvatar):
         self._HeartbeatCheckDC = None
 
         self.jobState = None
+        self._setMood(moods.sleeping)
 
     def _heartbeatCheck(self):
         """

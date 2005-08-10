@@ -1,5 +1,22 @@
 2005-08-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/encoders/vorbis/vorbis.py:
+	  style fixes
+	* configure.ac:
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/manager/component.py:
+	  some debugging fixes
+	  make component be sleeping when it logs out
+	* flumotion/component/producers/jukebox/Makefile.am:
+	* flumotion/component/producers/jukebox/__init__.py:
+	* flumotion/component/producers/jukebox/jukebox.py:
+	* flumotion/component/producers/jukebox/jukebox.xml:
+	  a new audio jukebox component, using gst-python > 0.8.2
+	  and the extend module
+
+2005-08-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent.py:
 	  push FEEDER and EATER templates down to FeedComponent
 	* flumotion/component/encoders/vorbis/vorbis.py:

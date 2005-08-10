@@ -221,12 +221,15 @@ class FeedComponent(basecomponent.BaseComponent):
             return
 
         if self.eatersWaiting == 0 and self.feedersWaiting == 0:
+            self.debug('no eaters or feeders waiting, happy')
             self.setMood(moods.happy)
             return
 
         if self.eatersWaiting == 0:
+            self.debug('%d feeders waiting, waking' % self.feedersWaiting)
             self.setMood(moods.waking)
         else:
+            self.debug('%d eaters waiting, hungry' % self.eatersWaiting)
             self.setMood(moods.hungry)
         return
 
@@ -438,6 +441,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self._eaterReconnectDC[name] = reactor.callLater(
                 self._reconnectInterval, self._eaterReconnect, element)
             
+    # FIXME: vorbis.py calls this method, clean that up
     def _setup_feeders(self, feedersData):
         """
         Set up the feeding GStreamer elements in our pipeline based on
@@ -767,6 +771,7 @@ class ParseLaunchComponent(FeedComponent):
         @returns: list of (feedName, host, port)-tuples of feeds the component
                   produces.
         """
+        self.debug('ParseLaunchComponent.start')
         self.debug('start with eaters data %s and feeders data %s' % (
             eatersData, feedersData))
         self.setMood(moods.waking)

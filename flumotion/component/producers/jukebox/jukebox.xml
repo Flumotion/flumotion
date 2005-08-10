@@ -1,0 +1,47 @@
+<registry>
+
+  <components>
+    <component type="jukebox">
+      <source location="flumotion.component.producers.jukebox.jukebox" />
+      <properties>
+        <property name="feed" type="string" multiple="yes" />
+        <property name="playlist" type="string" />
+        <property name="rate" type="int" />
+        <property name="channels" type="int" />
+        <property name="loops" type="int" />
+        <property name="random" type="bool" />
+      </properties>
+    </component>
+  </components>
+
+
+  <bundles>
+
+    <bundle name="jukebox-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/jukebox">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="jukebox-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="jukebox-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/jukebox">
+                <filename location="jukebox.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

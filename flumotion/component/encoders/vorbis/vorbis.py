@@ -43,6 +43,8 @@ class Vorbis(feedcomponent.FeedComponent):
     
     ### FeedComponent methods
     def setup_pipeline(self):
+        # create the initial pipeline; called during __init__
+        # is responsible for creating self.pipeline
         eater_names = self.get_eater_names()
         if not eater_names:
             raise TypeError, "Need an eater"
@@ -95,11 +97,11 @@ class Vorbis(feedcomponent.FeedComponent):
                           feeding our eaters.
         @type feedersData: list of (name, host) tuples of our feeding elements
 
-        @returns: a deferrer
+        @returns: a deferred
         """
         self.debug('start with eaters data %s and feeders data %s' % (
             eatersData, feedersData))
-        self.feed_def = defer.Deferred()
+        self._start_deferred = defer.Deferred()
         self.setMood(moods.waking)
         self.feedersData = feedersData
         
@@ -111,7 +113,7 @@ class Vorbis(feedcomponent.FeedComponent):
         # chain to parent 
         basecomponent.BaseComponent.start(self)
         
-        return self.feed_def
+        return self._start_deferred
     
     # start eaters
     def _start_eaters(self, eatersData):
@@ -141,6 +143,7 @@ class Vorbis(feedcomponent.FeedComponent):
 
         @params feedersData: list of (feederName, host) tuples to feed to
         """
+        # FIXME: _setup_feeders is a FeedComponent method, clean up
         retval = self._setup_feeders(feedersData)
         # pipeline is in paused state when in this function
         self.pipeline_play()
@@ -216,7 +219,7 @@ class Vorbis(feedcomponent.FeedComponent):
         self.debug('emitting feed port notify')
         self.emit('notify-feed-ports')
 
-        self.feed_def.callback(retval)
+        self._start_deferred.callback(retval)
 
     def _get_max_sample_rate(self, bitrate, channels):
         # maybe better in a hashtable/associative array?

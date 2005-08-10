@@ -387,6 +387,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         Extended by subclasses.  Subclasses call this as the last method if
         the start is successful.  Sets the mood to happy.
         """
+        self.debug('BaseComponent.start')
         self.updateMood()
         self.startHeartbeat()
         
@@ -396,6 +397,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         The connection to the manager will be closed.
         The job process will also finish.
         """
+        self.debug('BaseComponent.stop')
         self.setMood(moods.sleeping)
         self.stopHeartbeat()
 
