@@ -31,17 +31,19 @@
   </components>
 
   <bundles>
+
     <bundle name="base-admin-gtk">
       <dependencies>
         <dependency name="flumotion" />
+        <dependency name="component-base" />
       </dependencies>
       <directories>
         <directory name="flumotion/component/base">
-          <filename location="__init__.py" />
           <filename location="admin_gtk.py" />
         </directory>
       </directories>
     </bundle>
+
   </bundles>
 
 </registry> 

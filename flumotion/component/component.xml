@@ -16,6 +16,9 @@
           <filename location="consumers/__init__.py" />
           <filename location="bouncers/__init__.py" />
           <filename location="effects/__init__.py" />
+          <filename location="base/__init__.py" />
+          <filename location="base/converter.py" />
+          <filename location="base/producer.py" />
         </directory>
       </directories>
     </bundle>
