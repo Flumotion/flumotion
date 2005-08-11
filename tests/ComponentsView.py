@@ -23,8 +23,8 @@ import gtk
 
 from twisted.spread import jelly
 from flumotion.admin.gtk import parts
-from flumotion.common import component
-from flumotion.common.component import moods
+from flumotion.common import planet
+from flumotion.common.planet import moods
 
 class TestComponentsView:
     def setUp(self):
@@ -33,15 +33,14 @@ class TestComponentsView:
         self.window.add(self.widget)
         self.window.show_all()
         self.view = parts.ComponentsView(self.widget)
-        self.view.connect('selected', self._selected_cb)
+        self.view.connect('has-selection', self._has_selection_cb)
         self.view.connect('activated', self._activated_cb)
         self.window.connect('destroy', gtk.main_quit)
 
     def _createComponent(self, dict):
-        jstate = component.JobComponentState()
+        mstate = planet.ManagerComponentState()
         for key in dict.keys():
-            jstate.set(key, dict[key]) 
-        mstate = jelly.unjelly(jelly.jelly(jstate))
+            mstate.set(key, dict[key]) 
         astate = jelly.unjelly(jelly.jelly(mstate))
         return astate
 
@@ -68,7 +67,7 @@ class TestComponentsView:
         components['four'] = c
         self.view.update(components)
 
-    def _selected_cb(self, view, state):
+    def _has_selection_cb(self, view, state):
         name = state.get('name')
         print "Selected component %s" % name
 

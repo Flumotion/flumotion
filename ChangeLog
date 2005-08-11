@@ -1,5 +1,10 @@
 2005-08-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* tests/ComponentsView.py:
+	  make test work again
+
+2005-08-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/base.xml:
 	* flumotion/component/component.xml:
 	  put converter and producer base compnents in bundles
