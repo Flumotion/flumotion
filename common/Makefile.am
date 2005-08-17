@@ -4,6 +4,8 @@ EXTRA_DIST = \
 	as-ac-expand.m4		\
 	py-compile-destdir 	\
 	common.mk 		\
+	epydoc.mk 		\
+	gendoc.py 		\
 	locale.mk 		\
 	python.mk 		\
 	pychecker.mk		\

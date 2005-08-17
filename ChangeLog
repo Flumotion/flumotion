@@ -1,3 +1,15 @@
+2005-08-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/trial.mk:
+	  use PIPESTATUS so we can run, output to terminal, output to file,
+	  and get exitstatus all at once ! I love the internet.
+	* common/Makefile.am:
+	* common/epydoc.mk:
+	* common/gendoc.py:
+	  extract doc generation stuff into something we can use from projects
+	* doc/reference/Makefile.am:
+	  use it
+
 2005-08-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* tests/ComponentsView.py:

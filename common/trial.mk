@@ -2,8 +2,10 @@
 # include from flumotion/test/Makefile.am
 
 trial: rm-trial-test-log
-	@if PYTHONPATH=$(top_srcdir):$(PYTHONPATH)			\
-	trial -l trial.test.log -R flumotion.test;			\
+	@PYTHONPATH=$(top_srcdir):$(PYTHONPATH)				\
+		trial -R flumotion.test 2>&1		 		\
+		| tee trial.test.log;					\
+	if test $${PIPESTATUS[0]} -eq 0;				\
 	then 								\
 	    rm -fr $(top_builddir)/flumotion/test/_trial_temp;		\
 	    if test -e trial.test.log; then				\
