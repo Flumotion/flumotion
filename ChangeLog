@@ -1,5 +1,11 @@
 2005-08-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/package.py:
+	  reverse order of fixing up so we go from submodules to parent
+	  packages
+
+2005-08-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/epydoc.mk:
 	  don't need PYGTK in there - it messes up our path and throws in
 	  gst from installed packages

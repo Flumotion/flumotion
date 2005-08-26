@@ -35,7 +35,7 @@ class PackageHooks(ihooks.Hooks):
 
     def load_package(self, name, filename, file=None):
         # this is only ever called the first time a package is imported
-        log.log('packager', 'load_ package %s' % name)
+        log.log('packager', 'load_package %s' % name)
         ret = ihooks.Hooks.load_package(self, name, filename, file)
 
         m = sys.modules[name]
@@ -64,6 +64,7 @@ class Packager(log.Loggable):
         self._importer = ihooks.ModuleImporter()
         self._importer.set_hooks(self._hooks)
         self._importer.install()
+        self.debug('installing custom importer')
 
     def getPathsForPackage(self, packageName):
         if not packageName in self._packages.keys():
@@ -153,24 +154,26 @@ class Packager(log.Loggable):
                 
         self.log('packagePath %s has packageNames %r' % (
             packagePath, packageNames)) 
+        # since we want sub-modules ot be fixed up before parent packages,
+        # we reverse the list
+        packageNames.reverse()
 
         for packageName in packageNames:
-            self.log('fixing up %s' % packageName)
-
             if packageName not in sys.modules.keys():
                 continue
+            self.log('fixing up %s ...' % packageName)
 
             # the package is imported, so mess with __path__ and rebuild
             package = sys.modules.get(packageName)
             for path in package.__path__:
                 if not new and path.startswith(oldPath):
                     self.log('%s.__path__ before remove %r' % (
-                        name, package.__path__))
+                        PackageName, package.__path__))
                     self.log('removing old %s from %s.__path__' % (
                         path, name))
                     package.__path__.remove(path)
                     self.log('%s.__path__ after remove %r' % (
-                        name, package.__path__))
+                        PackageName, package.__path__))
 
             # move the new path to the top
             # insert at front because FLU_REGISTRY_PATH paths should override
@@ -203,10 +206,10 @@ class Packager(log.Loggable):
                     newPath, packageName))
             package.__path__.insert(0, newPath)
 
-            self.log('rebuilding package %s from paths %r' % (name,
+            self.log('rebuilding package %s from paths %r' % (packageName,
                 package.__path__))
             rebuild.rebuild(package)
-            self.log('rebuilt package %s with paths %r' % (name,
+            self.log('rebuilt package %s with paths %r' % (packageName,
                 package.__path__))
 
         # now rebuild all non-package modules in this packagePath if this
@@ -242,6 +245,7 @@ class Packager(log.Loggable):
                 sys.path.remove(path)
         self._paths = {}
         self._packages = {}
+        self.debug('uninstalling custom importer')
         self._importer.uninstall()
 
 def _listDirRecursively(path):
