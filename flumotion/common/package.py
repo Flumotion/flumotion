@@ -168,12 +168,12 @@ class Packager(log.Loggable):
             for path in package.__path__:
                 if not new and path.startswith(oldPath):
                     self.log('%s.__path__ before remove %r' % (
-                        PackageName, package.__path__))
+                        packageName, package.__path__))
                     self.log('removing old %s from %s.__path__' % (
                         path, name))
                     package.__path__.remove(path)
                     self.log('%s.__path__ after remove %r' % (
-                        PackageName, package.__path__))
+                        packageName, package.__path__))
 
             # move the new path to the top
             # insert at front because FLU_REGISTRY_PATH paths should override
