@@ -475,8 +475,14 @@ def getLL():
     """
     Return the (at most) two-letter language code set for message translation.
     """
-    lang = os.environ['LANG']
-    LL = lang[:2]
+    # LANGUAGE is a GNU extension; it can be colon-seperated but we ignore the
+    # advanced stuff. If that's not present, just use LANG, as normal.
+    language = os.environ['LANGUAGE']
+    if language != None:
+      LL = language[:2]
+    else:
+      lang = os.environ['LANG']
+      LL = lang[:2]
 
     return LL
 

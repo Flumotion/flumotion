@@ -1,3 +1,10 @@
+2005-08-29  Michael Smith <msmith@xiph.org>
+nvironment variable>
+
+	* flumotion/common/common.py:
+	  Look for LANGUAGE env var before checking LANG, makes translations
+	  work on my ubuntu system.
+
 2005-08-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/package.py:
