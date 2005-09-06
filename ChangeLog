@@ -1,5 +1,10 @@
-2005-08-29  Michael Smith <msmith@xiph.org>
-nvironment variable>
+2005-09-06  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/worker/worker.py:
+	  When dumping a core, print out os.getcwd(), so we can tell users
+	  where to find core dumps when they send us logs.
+
+2005-08-29  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/common.py:
 	  Look for LANGUAGE env var before checking LANG, makes translations

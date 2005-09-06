@@ -433,7 +433,7 @@ class WorkerBrain(log.Loggable):
                         "Reaped job child with pid %d signaled by signal %d" % (
                             pid, signum))
                 if os.WCOREDUMP(status):
-                    self.info("Core dumped")
+                    self.info("Core dumped (in %s)" % os.getcwd())
                     
             elif os.WIFSTOPPED(status):
                 signum = os.WSTOPSIG(status)
