@@ -1,3 +1,9 @@
+2005-09-07  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/admin.py:
+	  Handle ConnectionRefusedError when attempting admin login, 
+	  fixes bug 266.
+
 2005-09-06  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/worker/worker.py:

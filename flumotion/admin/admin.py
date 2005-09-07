@@ -66,7 +66,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         keycard = keycards.KeycardUACPCC(user, 'localhost')
         # FIXME: decide on an admin name ?
         keycard.avatarId = "admin"
- 
+
         # start logging in
         self.startLogin(keycard, medium, interfaces.IAdminMedium)
 
@@ -76,6 +76,10 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         """
         if reason.check(error.DNSLookupError):
             self.debug('DNS lookup error')
+            self.medium.connectionFailed(reason)
+            return
+        elif reason.check(error.ConnectionRefusedError):
+            self.debug("Connection refused error")
             self.medium.connectionFailed(reason)
             return
 
@@ -240,6 +244,11 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             self.debug('emitting connection-failed')
             self.emit('connection-failed', "Could not look up host '%s'." %
                 self.host)
+            self.debug('emited connection-failed')
+        if reason.check(error.ConnectionRefusedError):
+            self.debug('emitting connection-failed')
+            self.emit('connection-failed', "Could not connect to host '%s' on port %d." %
+                (self.host, self.port))
             self.debug('emited connection-failed')
 
     def setRemoteReference(self, remoteReference):
