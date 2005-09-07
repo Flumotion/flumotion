@@ -1,5 +1,11 @@
 2005-09-07  Michael Smith <msmith@fluendo.com>
 
+	* flumotion/admin/gtk/client.py:
+	  Make admin_connection_failed_cb take the correct number of
+	  arguments. Fixes some remaining parts of bug 273.
+
+2005-09-07  Michael Smith <msmith@fluendo.com>
+
 	* flumotion/admin/admin.py:
 	  Handle ConnectionRefusedError when attempting admin login, 
 	  fixes bug 266.
