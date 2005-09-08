@@ -412,7 +412,7 @@ class TestVideoSource(VideoSource):
     icon = 'testsource.png'
     
     def before_show(self):
-        self.wizard.check_elements(self.worker, 'videotestsrc')
+        self.wizard.require_elements(self.worker, 'videotestsrc')
 
     def setup(self):
         self.combobox_pattern.set_enum(VideoTestPattern)
@@ -447,7 +447,7 @@ class Overlay(WizardStep):
         yield d
         try:
             if d.value():
-                self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
+                self.wizard.require_elements(self.worker, 'pngdec', 'alphacolor',
                     'videomixer', 'alpha', 'ffmpegcolorspace')
             else:
                 msg = _("""
@@ -455,7 +455,7 @@ This worker's ffmpegcolorspace plugin is older than 0.8.5.
 Please consider upgrading if your output video has a
 diagonal line in the image.""")
                 self.info_msg('overlay-old-colorspace', msg)
-                self.wizard.check_elements(self.worker, 'pngdec', 'alphacolor',
+                self.wizard.require_elements(self.worker, 'pngdec', 'alphacolor',
                     'videomixer', 'alpha')
             self.clear_msg('overlay-colorspace')
         except Exception, e:
@@ -612,7 +612,7 @@ class TestAudioSource(WizardStep):
     icon = 'soundcard.png'
     
     def worker_changed(self):
-        self.wizard.check_elements(self.worker, 'sinesrc')
+        self.wizard.require_elements(self.worker, 'sinesrc')
 
     def before_show(self):
         self.combobox_samplerate.set_enum(AudioTestSamplerate)
@@ -715,7 +715,7 @@ class Theora(VideoEncoder):
         self.spinbutton_quality.set_value(16)
 
     def worker_changed(self):
-        self.wizard.check_elements(self.worker, 'theoraenc')
+        self.wizard.require_elements(self.worker, 'theoraenc')
         
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
@@ -743,7 +743,7 @@ class Smoke(VideoEncoder):
     component_type = 'smoke'
 
     def worker_changed(self):
-        self.wizard.check_elements(self.worker, 'smokeenc')
+        self.wizard.require_elements(self.worker, 'smokeenc')
         
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
@@ -763,7 +763,7 @@ class JPEG(VideoEncoder):
     component_type = 'jpeg'
 
     def worker_changed(self):
-        self.wizard.check_elements(self.worker, 'jpegenc')
+        self.wizard.require_elements(self.worker, 'jpegenc')
 
     def get_next(self):
         return self.wizard['Encoding'].get_audio_page()
@@ -797,7 +797,7 @@ class Vorbis(AudioEncoder):
         self.radiobutton_quality.set_active(True)
         
     def worker_changed(self):
-        self.wizard.check_elements(self.worker, 'rawvorbisenc')
+        self.wizard.require_elements(self.worker, 'rawvorbisenc')
         
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
@@ -820,7 +820,7 @@ class Speex(AudioEncoder):
     icon = 'xiphfish.png'
     
     def worker_changed(self):
-        self.wizard.check_elements(self.worker, 'speexenc')
+        self.wizard.require_elements(self.worker, 'speexenc')
         
     def setup(self):
         # Should be 2150 instead of 3 -> 3000
@@ -938,7 +938,7 @@ class HTTP(WizardStep):
     component_type = 'http-streamer'
 
     def worker_changed(self):
-        self.wizard.check_elements(self.worker, 'multifdsink')
+        self.wizard.require_elements(self.worker, 'multifdsink')
         
     def setup(self):
         self.spinbutton_port.set_value(self.port)

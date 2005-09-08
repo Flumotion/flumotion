@@ -40,6 +40,8 @@ class TestPackagePath(unittest.TestCase):
         # store our old sys.path
         self.syspath = sys.path[:]
         
+        self._assertions = 0
+
         self.cwd = os.getcwd()
         self.tempdir = tempfile.mkdtemp('', 'trialTestPackagePath.')
 

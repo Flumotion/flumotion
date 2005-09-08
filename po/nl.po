@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-31 22:13+0200\n"
+"POT-Creation-Date: 2005-09-08 14:20+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -245,20 +245,6 @@ msgstr "Willekeurig (televisiesneeuw)"
 msgid "Totally black"
 msgstr "Volledig zwart"
 
-#: flumotion/wizard/steps.py:47
-msgid "Welcome"
-msgstr "Welkom"
-
-#: flumotion/wizard/steps.py:61
-msgid "Source"
-msgstr "Bron"
-
-#: flumotion/wizard/steps.py:62 flumotion/wizard/steps.py:126
-#: flumotion/wizard/steps.py:440 flumotion/wizard/steps.py:503
-#: flumotion/wizard/steps.py:611
-msgid "Production"
-msgstr "Productie"
-
 #: flumotion/wizard/steps.py:70
 msgid "If you want to stream video"
 msgstr "Als je video wil streamen"
@@ -266,14 +252,6 @@ msgstr "Als je video wil streamen"
 #: flumotion/wizard/steps.py:72
 msgid "If you want to stream audio"
 msgstr "Als je audio wil streamen"
-
-#: flumotion/wizard/steps.py:146
-msgid "TV Card"
-msgstr "TV-kaart"
-
-#: flumotion/wizard/steps.py:210
-msgid "Firewire"
-msgstr "Vuurdraad"
 
 #: flumotion/wizard/steps.py:253
 #, python-format
@@ -293,18 +271,6 @@ msgstr "Bezig met detecteren Vuurdraadapparaat..."
 msgid "No Firewire device detected."
 msgstr "Geen Vuurdraadapparaat gedetecteerd."
 
-#: flumotion/wizard/steps.py:345
-msgid "Webcam"
-msgstr "Webcam"
-
-#: flumotion/wizard/steps.py:409
-msgid "Test Video Source"
-msgstr "Testvideobron"
-
-#: flumotion/wizard/steps.py:438
-msgid "Overlay"
-msgstr "Overlay"
-
 #: flumotion/wizard/steps.py:453
 msgid ""
 "\n"
@@ -320,88 +286,6 @@ msgstr ""
 #: flumotion/wizard/steps.py:464
 msgid "Could not check ffmpegcolorspace features."
 msgstr "Kon ffmpegcolorspace-eigenschappen niet controleren."
-
-#: flumotion/wizard/steps.py:501
-msgid "Soundcard"
-msgstr "Geluidskaart"
-
-#: flumotion/wizard/steps.py:609
-msgid "Test Audio Source"
-msgstr "Test-audiobron"
-
-#: flumotion/wizard/steps.py:633
-msgid "Encoding"
-msgstr "Encodering"
-
-#: flumotion/wizard/steps.py:634 flumotion/wizard/steps.py:742
-#: flumotion/wizard/steps.py:762
-msgid "Conversion"
-msgstr "Conversie"
-
-#: flumotion/wizard/steps.py:836 flumotion/wizard/steps.py:838
-#: flumotion/wizard/steps.py:937 flumotion/wizard/steps.py:981
-msgid "Consumption"
-msgstr "Consumptie"
-
-#: flumotion/wizard/steps.py:965
-msgid "HTTP Streamer (audio & video)"
-msgstr "HTTP Streamer (audio & video)"
-
-#: flumotion/wizard/steps.py:966
-msgid "HTTP audio/video"
-msgstr "HTTP audio/video"
-
-#: flumotion/wizard/steps.py:970
-msgid "HTTP Streamer (audio only)"
-msgstr "HTTP Streamer (enkel audio)"
-
-#: flumotion/wizard/steps.py:971
-msgid "HTTP audio"
-msgstr "HTTP audio"
-
-#: flumotion/wizard/steps.py:975
-msgid "HTTP Streamer (video only)"
-msgstr "HTTP Streamer (enkel video)"
-
-#: flumotion/wizard/steps.py:976
-msgid "HTTP video"
-msgstr "HTTP video"
-
-#: flumotion/wizard/steps.py:1042
-msgid "Disk (audio & video)"
-msgstr "Schijf (audio & video)"
-
-#: flumotion/wizard/steps.py:1043
-msgid "Disk audio/video"
-msgstr "Schijf audio/video"
-
-#: flumotion/wizard/steps.py:1046
-msgid "Disk (audio only)"
-msgstr "Schijf (enkel audio)"
-
-#: flumotion/wizard/steps.py:1047
-msgid "Disk audio"
-msgstr "Schijf audio"
-
-#: flumotion/wizard/steps.py:1050
-msgid "Disk (video only)"
-msgstr "Schijf (enkel video)"
-
-#: flumotion/wizard/steps.py:1051
-msgid "Disk video"
-msgstr "Schijf video"
-
-#: flumotion/wizard/steps.py:1054
-msgid "Content License"
-msgstr "Inhoudslicensie"
-
-#: flumotion/wizard/steps.py:1056
-msgid "License"
-msgstr "Licensie"
-
-#: flumotion/wizard/steps.py:1070
-msgid "Summary"
-msgstr "Samenvatting"
 
 #: flumotion/wizard/message.py:33
 msgid "Error"
@@ -420,7 +304,7 @@ msgid "Message"
 msgstr "Bericht"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:8
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:145
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:131
 msgid "Statistics"
 msgstr "Statistieken"
 
@@ -475,7 +359,7 @@ msgstr "op"
 msgid "<b>Client Consumption</b>"
 msgstr "<b>Cliëntverbruik</b>"
 
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:147
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:133
 msgid "Log"
 msgstr "Log"
 
@@ -991,3 +875,87 @@ msgstr ""
 "\n"
 "Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
 "configuratie van uw streaming media server."
+
+#~ msgid "Welcome"
+#~ msgstr "Welkom"
+
+#~ msgid "Source"
+#~ msgstr "Bron"
+
+#~ msgid "Production"
+#~ msgstr "Productie"
+
+#~ msgid "TV Card"
+#~ msgstr "TV-kaart"
+
+#~ msgid "Firewire"
+#~ msgstr "Vuurdraad"
+
+#~ msgid "Webcam"
+#~ msgstr "Webcam"
+
+#~ msgid "Test Video Source"
+#~ msgstr "Testvideobron"
+
+#~ msgid "Overlay"
+#~ msgstr "Overlay"
+
+#~ msgid "Soundcard"
+#~ msgstr "Geluidskaart"
+
+#~ msgid "Test Audio Source"
+#~ msgstr "Test-audiobron"
+
+#~ msgid "Encoding"
+#~ msgstr "Encodering"
+
+#~ msgid "Conversion"
+#~ msgstr "Conversie"
+
+#~ msgid "Consumption"
+#~ msgstr "Consumptie"
+
+#~ msgid "HTTP Streamer (audio & video)"
+#~ msgstr "HTTP Streamer (audio & video)"
+
+#~ msgid "HTTP audio/video"
+#~ msgstr "HTTP audio/video"
+
+#~ msgid "HTTP Streamer (audio only)"
+#~ msgstr "HTTP Streamer (enkel audio)"
+
+#~ msgid "HTTP audio"
+#~ msgstr "HTTP audio"
+
+#~ msgid "HTTP Streamer (video only)"
+#~ msgstr "HTTP Streamer (enkel video)"
+
+#~ msgid "HTTP video"
+#~ msgstr "HTTP video"
+
+#~ msgid "Disk (audio & video)"
+#~ msgstr "Schijf (audio & video)"
+
+#~ msgid "Disk audio/video"
+#~ msgstr "Schijf audio/video"
+
+#~ msgid "Disk (audio only)"
+#~ msgstr "Schijf (enkel audio)"
+
+#~ msgid "Disk audio"
+#~ msgstr "Schijf audio"
+
+#~ msgid "Disk (video only)"
+#~ msgstr "Schijf (enkel video)"
+
+#~ msgid "Disk video"
+#~ msgstr "Schijf video"
+
+#~ msgid "Content License"
+#~ msgstr "Inhoudslicensie"
+
+#~ msgid "License"
+#~ msgstr "Licensie"
+
+#~ msgid "Summary"
+#~ msgstr "Samenvatting"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-31 22:13+0200\n"
+"POT-Creation-Date: 2005-09-08 14:20+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -247,34 +247,12 @@ msgstr ""
 msgid "Totally black"
 msgstr ""
 
-#: flumotion/wizard/steps.py:47
-msgid "Welcome"
-msgstr ""
-
-#: flumotion/wizard/steps.py:61
-msgid "Source"
-msgstr ""
-
-#: flumotion/wizard/steps.py:62 flumotion/wizard/steps.py:126
-#: flumotion/wizard/steps.py:440 flumotion/wizard/steps.py:503
-#: flumotion/wizard/steps.py:611
-msgid "Production"
-msgstr ""
-
 #: flumotion/wizard/steps.py:70
 msgid "If you want to stream video"
 msgstr ""
 
 #: flumotion/wizard/steps.py:72
 msgid "If you want to stream audio"
-msgstr ""
-
-#: flumotion/wizard/steps.py:146
-msgid "TV Card"
-msgstr ""
-
-#: flumotion/wizard/steps.py:210
-msgid "Firewire"
 msgstr ""
 
 #: flumotion/wizard/steps.py:253
@@ -295,19 +273,6 @@ msgstr ""
 msgid "No Firewire device detected."
 msgstr ""
 
-#: flumotion/wizard/steps.py:345
-msgid "Webcam"
-msgstr ""
-
-#: flumotion/wizard/steps.py:409
-#, fuzzy
-msgid "Test Video Source"
-msgstr "Video_bron:"
-
-#: flumotion/wizard/steps.py:438
-msgid "Overlay"
-msgstr ""
-
 #: flumotion/wizard/steps.py:453
 msgid ""
 "\n"
@@ -318,93 +283,6 @@ msgstr ""
 
 #: flumotion/wizard/steps.py:464
 msgid "Could not check ffmpegcolorspace features."
-msgstr ""
-
-#: flumotion/wizard/steps.py:501
-msgid "Soundcard"
-msgstr ""
-
-#: flumotion/wizard/steps.py:609
-msgid "Test Audio Source"
-msgstr ""
-
-#: flumotion/wizard/steps.py:633
-msgid "Encoding"
-msgstr ""
-
-#: flumotion/wizard/steps.py:634 flumotion/wizard/steps.py:742
-#: flumotion/wizard/steps.py:762
-#, fuzzy
-msgid "Conversion"
-msgstr "_Verbinding"
-
-#: flumotion/wizard/steps.py:836 flumotion/wizard/steps.py:838
-#: flumotion/wizard/steps.py:937 flumotion/wizard/steps.py:981
-#, fuzzy
-msgid "Consumption"
-msgstr "_Verbinding"
-
-#: flumotion/wizard/steps.py:965
-msgid "HTTP Streamer (audio & video)"
-msgstr ""
-
-#: flumotion/wizard/steps.py:966
-msgid "HTTP audio/video"
-msgstr ""
-
-#: flumotion/wizard/steps.py:970
-msgid "HTTP Streamer (audio only)"
-msgstr ""
-
-#: flumotion/wizard/steps.py:971
-msgid "HTTP audio"
-msgstr ""
-
-#: flumotion/wizard/steps.py:975
-msgid "HTTP Streamer (video only)"
-msgstr ""
-
-#: flumotion/wizard/steps.py:976
-msgid "HTTP video"
-msgstr ""
-
-#: flumotion/wizard/steps.py:1042
-#, fuzzy
-msgid "Disk (audio & video)"
-msgstr "Audio & Video"
-
-#: flumotion/wizard/steps.py:1043
-msgid "Disk audio/video"
-msgstr ""
-
-#: flumotion/wizard/steps.py:1046
-#, fuzzy
-msgid "Disk (audio only)"
-msgstr "Enkel audio"
-
-#: flumotion/wizard/steps.py:1047
-msgid "Disk audio"
-msgstr ""
-
-#: flumotion/wizard/steps.py:1050
-#, fuzzy
-msgid "Disk (video only)"
-msgstr "Enkel video"
-
-#: flumotion/wizard/steps.py:1051
-msgid "Disk video"
-msgstr ""
-
-#: flumotion/wizard/steps.py:1054
-msgid "Content License"
-msgstr ""
-
-#: flumotion/wizard/steps.py:1056
-msgid "License"
-msgstr ""
-
-#: flumotion/wizard/steps.py:1070
-msgid "Summary"
 msgstr ""
 
 #: flumotion/wizard/message.py:33
@@ -424,7 +302,7 @@ msgid "Message"
 msgstr ""
 
 #: flumotion/component/consumers/httpstreamer/http.glade:8
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:145
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:131
 msgid "Statistics"
 msgstr "Statistieken"
 
@@ -479,7 +357,7 @@ msgstr "op"
 msgid "<b>Client Consumption</b>"
 msgstr "<b>Cliëntverbruik</b>"
 
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:147
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:133
 msgid "Log"
 msgstr ""
 
@@ -995,6 +873,30 @@ msgstr ""
 "\n"
 "Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
 "configuratie van uw streaming media server."
+
+#, fuzzy
+#~ msgid "Test Video Source"
+#~ msgstr "Video_bron:"
+
+#, fuzzy
+#~ msgid "Conversion"
+#~ msgstr "_Verbinding"
+
+#, fuzzy
+#~ msgid "Consumption"
+#~ msgstr "_Verbinding"
+
+#, fuzzy
+#~ msgid "Disk (audio & video)"
+#~ msgstr "Audio & Video"
+
+#, fuzzy
+#~ msgid "Disk (audio only)"
+#~ msgstr "Enkel audio"
+
+#, fuzzy
+#~ msgid "Disk (video only)"
+#~ msgstr "Enkel video"
 
 #, fuzzy
 #~ msgid "Mime type: "

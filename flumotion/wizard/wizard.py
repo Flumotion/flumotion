@@ -308,31 +308,48 @@ class Wizard(GladeWindow, log.Loggable):
         @param workerName: name of the worker to check on
         @param elementNames: names of the elements to check
 
-        @returns: a deferred returning a tuple of the elements existing
+        @returns: a deferred returning a tuple of the missing elements
         """
         if not self._admin:
-            self.debug('No admin connected, not checking presents of elements')
+            self.debug('No admin connected, not checking presence of elements')
             return
         
         asked = sets.Set(elementNames)
         def _checkElementsCallback(existing, workerName):
             existing = sets.Set(existing)
-            unexisting = asked.difference(existing)
-            # if we're missing elements, we cannot unblock the next button
-            if unexisting:
-                self.warning('elements %s does not exist' % ', '.join(unexisting))
-                message = "Worker %s is missing GStreamer elements '%s'.  " % (
-                    workerName, "', '".join(unexisting)) \
-                        + "You will not be able to go forward."
-                self.error_msg('-'.join(elementNames), message)
-            else:
-                self.block_next(False)
-            return tuple(existing)
+            self.block_next(False)
+            return tuple(asked.difference(existing))
         
         self.block_next(True)
         d = self._admin.checkElements(workerName, elementNames)
         d.addCallback(_checkElementsCallback, workerName)
         return d
+
+    def require_elements(self, workerName, *elementNames):
+        """
+        Require that the given list of GStreamer elements exists on the
+        given worker. If the elements do not exist, an error message is
+        posted and the next button remains blocked.
+
+        @param workerName: name of the worker to check on
+        @param elementNames: names of the elements to check
+        """
+        if not self._admin:
+            self.debug('No admin connected, not checking presence of elements')
+            return
+        
+        self.debug('requiring elements %r' % (elementNames,))
+        def got_missing_elements(elements, workerName):
+            if elements:
+                self.warning('elements %r do not exist' % (elements,))
+                message = "Worker %s is missing GStreamer elements '%s'.  " % (
+                    workerName, "', '".join(elements)) \
+                        + "You will not be able to go forward."
+                self.block_next(True)
+                self.error_msg('-'.join(elementNames), message)
+        
+        d = self.check_elements(workerName, *elementNames)
+        d.addCallback(got_missing_elements, workerName)
 
     def _setup_worker(self, step, worker):
         # get name of active worker

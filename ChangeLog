@@ -1,5 +1,16 @@
 2005-09-08  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/steps.py: Callers of check_elements updated.
+
+	* flumotion/wizard/wizard.py (Wizard.check_elements): Changed to
+	just return a deferred with the missing elements, not to post
+	errors.
+	(Wizard.require_elements): This is what old callers of
+	check_elements want to call.
+
+	* flumotion/test/test_common_package.py (TestPackagePath.setUp):
+	Initialize _assertions properly.
+
 	* common/as-python.m4 (AS_PYTHON_IMPORT): Take an optional fourth
 	argument, PREAMBLE, to do e.g. pygst.require(). Take an optional
 	fifth argument, POSTAMBLE, to run code after the import.
