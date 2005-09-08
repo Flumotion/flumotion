@@ -1,5 +1,9 @@
 2005-09-08  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/component.py (BaseComponent.setMood): Don't
+	let setMood work if we're in sad -- you have to restart to get out
+	of sad.
+
 	* tests/checks.py:
 	* tests/debugslider.py: New files, ported over from the 0.9
 	branch. Check the checker check check check. Is this thing on?

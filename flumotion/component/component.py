@@ -359,7 +359,13 @@ class BaseComponent(log.Loggable, gobject.GObject):
         Set the given mood on the component if it's different from the current
         one.
         """
-        if self.state.get('mood') == mood.value:
+        current = self.state.get('mood')
+
+        if current == mood.value:
+            self.log('already in mood %r', mood)
+            return
+        elif current == moods.sad.value:
+            self.info('tried to set mood to %r, but already sad :-(' mood)
             return
 
         self.debug('MOOD changed to %r' % mood)
