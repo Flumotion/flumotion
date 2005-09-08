@@ -80,14 +80,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.callRemote('notifyFeedPorts', component.feed_ports)
 
     ### Referenceable remote methods which can be called from manager
-    def remote_play(self):
-        self.debug('manager asked to play')
-        self.comp.play()
-        
-    def remote_pause(self):
-        self.debug('manager asked to pause')
-        self.comp.pause()
-
     def remote_getElementProperty(self, elementName, property):
         return self.comp.get_element_property(elementName, property)
         
@@ -105,7 +97,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         # FIXME: rename functions to Twisted style
         state.set('eaterNames', self.comp.get_eater_names())
         state.set('feederNames', self.comp.get_feeder_names())
-        state.set('elementNames', self.comp.get_element_names())
         self.debug('remote_getState of fc: returning state %r' % state)
 
         return state
@@ -577,11 +568,6 @@ class FeedComponent(basecomponent.BaseComponent):
         element = self.pipeline.get_by_name(element_name)
         return element
     
-    def get_element_names(self):
-        'Return the names of all elements in the GStreamer pipeline.'
-        pipeline = self.get_pipeline()
-        return [element.get_name() for element in pipeline.get_list()]
-        
     def get_element_property(self, element_name, property):
         'Gets a property of an element in the GStreamer pipeline.'
         self.debug("%s: getting property %s of element %s" % (self.getName(), property, element_name))

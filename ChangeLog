@@ -1,5 +1,12 @@
 2005-09-08  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.remote_getState): Don't set
+	state['elementNames'], it's not necessary.
+	(FeedComponent.get_element_names): Removed, not used.
+	(FeedComponentMedium.remote_play) 
+	(FeedComponentMedium.remote_pause): Removed, not used.
+
 	* flumotion/component/producers/webcam/webcam.py
 	(createComponent): Add a colorspace to make ppc happy for rgb
 	formats.
