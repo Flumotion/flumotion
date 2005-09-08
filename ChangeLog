@@ -1,3 +1,8 @@
+2005-09-08  Andy Wingo  <wingo@pobox.com>
+
+	* Makefile.am (AUTOMAKE_OPTIONS): Reorder options so as to give
+	the user a nicer error.
+
 2005-09-07  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/gtk/client.py:
