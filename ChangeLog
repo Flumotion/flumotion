@@ -1,5 +1,11 @@
 2005-09-08  Andy Wingo  <wingo@pobox.com>
 
+	* common/as-python.m4 (AS_PYTHON_IMPORT): Take an optional fourth
+	argument, PREAMBLE, to do e.g. pygst.require(). Take an optional
+	fifth argument, POSTAMBLE, to run code after the import.
+
+2005-09-08  Andy Wingo  <wingo@pobox.com>
+
 	* Makefile.am (AUTOMAKE_OPTIONS): Reorder options so as to give
 	the user a nicer error.
 

@@ -151,7 +151,7 @@ else:
   AC_MSG_RESULT([looks good])
 ])
 
-dnl AS_PYTHON_IMPORT(PACKAGE/MODULE, [ACTION-IF-FOUND, [ACTION-IF-NOT-FOUND]])
+dnl AS_PYTHON_IMPORT(PACKAGE/MODULE, [ACTION-IF-FOUND, [ACTION-IF-NOT-FOUND, [PREAMBLE, [POSTAMBLE]]]])
 dnl Try to import the given PACKAGE/MODULE
 
 AC_DEFUN([AS_PYTHON_IMPORT],
@@ -165,7 +165,9 @@ AC_DEFUN([AS_PYTHON_IMPORT],
 import sys
 
 try:
+    $4
     import $1
+    $5
     sys.exit(0)
     print 'yes'
 except ImportError:
