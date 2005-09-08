@@ -1,5 +1,9 @@
 2005-09-08  Andy Wingo  <wingo@pobox.com>
 
+	* tests/checks.py:
+	* tests/debugslider.py: New files, ported over from the 0.9
+	branch. Check the checker check check check. Is this thing on?
+
 	* flumotion/component/feedcomponent.py
 	(FeedComponentMedium.remote_getState): Don't set
 	state['elementNames'], it's not necessary.
