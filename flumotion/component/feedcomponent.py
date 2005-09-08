@@ -51,8 +51,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         basecomponent.BaseComponentMedium.__init__(self, component)
 
-        self.comp.connect('feed-state-changed',
-            self._component_feed_state_changed_cb)
+        self.comp.connect('feed-ready',
+            self._component_feed_ready_cb)
         self.comp.connect('error', self._component_error_cb)
         self.comp.connect('notify-feed-ports',
             self._component_notify_feed_ports_cb)
@@ -69,12 +69,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             message))
         self.callRemote('error', element_path, message)
         
-    def _component_feed_state_changed_cb(self, component, feed_name, old, state):
-        self.callRemote('feedStateChanged', feed_name, old, state)
-        # FIXME: everything heeds to be playing, not just one !
-        if state == gst.STATE_PLAYING:
-            self.info('component is HAPPY')
-            self.comp.setMood(moods.happy)
+    def _component_feed_ready_cb(self, component, feed_name, ready):
+        self.callRemote('feedReady', feed_name, ready)
 
     def _component_notify_feed_ports_cb(self, component):
         self.callRemote('notifyFeedPorts', component.feed_ports)
@@ -144,7 +140,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     logCategory = 'feedcomponent'
 
-    gsignal('feed-state-changed', str, object, object)
+    gsignal('feed-ready', str, bool)
     gsignal('error', str, str)
     gsignal('notify-feed-ports')
 
@@ -196,7 +192,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self.setup_pipeline()
         self.debug('__init__ finished')
 
-    ### base class overrides
     def updateMood(self):
         """
         Update the mood because a mood condition has changed.
@@ -477,7 +472,7 @@ class FeedComponent(basecomponent.BaseComponent):
     #        This is used by file/file.py, so make sure to syncronize them
     def feeder_state_change_cb(self, element, old, state, feed_name):
         # also called by subclasses
-        self.debug('feed-state-changed on feed %s: element %s, state %s' % (
+        self.debug('feed %s changed state: element %s, state %s' % (
             feed_name, element.get_path_string(),
             gst.element_state_get_name(state)))
 
@@ -486,15 +481,15 @@ class FeedComponent(basecomponent.BaseComponent):
             self.debug('feeder %s is now feeding' % element.get_name())
             self.feedersWaiting -= 1
             self.updateMood()
+            self.emit('feed-ready', feed_name, True)
         if old == gst.STATE_PLAYING and state == gst.STATE_PAUSED:
             self.debug('feeder %s is now waiting' % element.get_name())
             self.feedersWaiting += 1
             self.updateMood()
+            self.emit('feed-ready', feed_name, False)
 
         self.debug('%d feeders waiting' % self.feedersWaiting)
-        self.emit('feed-state-changed', feed_name, old, state)
 
-    
     def cleanup(self):
         self.debug("cleaning up")
         

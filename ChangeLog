@@ -1,13 +1,28 @@
 2005-09-08  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feedcomponent.py
+	(FeedComponent::feed-ready): Changed from feed-state-changed, now
+	just emits a boolean as to whether the feed is ready or not.
+	(FeedComponent.feeder_state_change_cb): Emit feed-ready as
+	appropriate. Don't set the component mood, it already did that
+	itself.
+
+	* flumotion/manager/component.py: Don't import gstreamer. Woot!
+	(ComponentAvatar): Gone are _gstState, _gstOldState, dogs.
+	(ComponentAvatar.setFeederReadiness): Renamed from
+	checkFeederReadiness to ACT. Active functions. No more passivity.
+	(ComponentAvatar.start.startCallback): Api update.
+	(ComponentAvatar.perspective_feedReady): Changed from
+	feedStateChange. Api update.
+
+	* flumotion/component/feedcomponent.py
 	(ParseLaunchComponent.do_start): Changed from start, don't chain
 	up.
 
 	* flumotion/component/component.py (BaseComponent.start): Made not
 	a vmethod. Subclasses should override do_start.
 	(BaseComponent.do_start): Default implementation.
-	(BaseComponent.setMood): Fix typo.
+	(BaseComponent.setMood): Fix typos.
 
 	* flumotion/component/component.py (BaseComponent.setMood): Don't
 	let setMood work if we're in sad -- you have to restart to get out
