@@ -362,10 +362,10 @@ class BaseComponent(log.Loggable, gobject.GObject):
         current = self.state.get('mood')
 
         if current == mood.value:
-            self.log('already in mood %r', mood)
+            self.log('already in mood %r' % mood)
             return
         elif current == moods.sad.value:
-            self.info('tried to set mood to %r, but already sad :-(' mood)
+            self.info('tried to set mood to %r, but already sad :-(' % mood)
             return
 
         self.debug('MOOD changed to %r' % mood)
@@ -385,17 +385,36 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.medium.callRemote("adminCallRemote", methodName, *args, **kwargs)
 
     # mood change functions
+    def do_start(self, *args, **kwargs):
+        """
+        BaseComponent vmethod for starting up. If you override this
+        method, you are responsible for arranging that the component
+        becomes happy.
+        """
+        # default behavior
+        self.setMood(moods.happy)
+        
     def start(self, *args, **kwargs):
         """
         Tell the component to start.  This is called when all its dependencies
         are already started.
 
-        Extended by subclasses.  Subclasses call this as the last method if
-        the start is successful.  Sets the mood to happy.
+        To hook onto this method, implement your own do_start method.
+        See BaseComponent.do_start() for what your do_start method is
+        responsible for doing.
+
+        Again, don't override this method. Thanks.
         """
         self.debug('BaseComponent.start')
-        self.updateMood()
+        self.setMood(moods.waking)
+
+        ret = self.do_start(*args, **kwargs)
+
+        self.debug('start: returning value %s' % ret)
+
         self.startHeartbeat()
+
+        return ret
         
     def stop(self):
         """

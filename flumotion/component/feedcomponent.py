@@ -745,8 +745,8 @@ class ParseLaunchComponent(FeedComponent):
         
         return pipeline
 
-    # mood change/state functions
-    def start(self, eatersData, feedersData):
+    # mood change/state vmethod impl
+    def do_start(self, eatersData, feedersData):
         """
         Tell the component to start, linking itself to other components.
 
@@ -762,14 +762,7 @@ class ParseLaunchComponent(FeedComponent):
             eatersData, feedersData))
         self.setMood(moods.waking)
 
-        ret = self.link(eatersData, feedersData)
-
-        self.debug('start: returning value %s' % ret)
-
-        # chain to parent 
-        basecomponent.BaseComponent.start(self)
-        
-        return ret
+        return self.link(eatersData, feedersData)
 
 
 class Effect(log.Loggable):
