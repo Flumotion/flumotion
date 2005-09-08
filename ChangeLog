@@ -1,5 +1,13 @@
 2005-09-08  Andy Wingo  <wingo@pobox.com>
 
+	* bin/flumotion.in:
+	* bin/flumotion-worker.in: 
+	* bin/flumotion-manager.in: Hard-code to use the 0.8 values
+	detected in the configure script.
+
+	* configure.ac: Check for both 0.8 and 0.9 versions of GStreamer
+	and gst-python. Bling.
+
 	* flumotion/component/feedcomponent.py
 	(FeedComponent::feed-ready): Changed from feed-state-changed, now
 	just emits a boolean as to whether the feed is ready or not.

@@ -6,9 +6,16 @@ AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
 
-AC_SUBST(PYGTK_REQ, 2.4.0)
-AC_SUBST(PYGST_REQ, 0.8.0)
-AC_SUBST(GST_REQ, 0.8.7)
+AC_SUBST(PYGTK_REQ_08, 2.4.0)
+AC_SUBST(PYGST_REQ_08, 0.8.0)
+AC_SUBST(GST_REQ_08, 0.8.7)
+
+AC_SUBST(PYGTK_REQ_09, 2.6.3)
+AC_SUBST(PYGST_REQ_09, 0.9.0)
+AC_SUBST(GST_REQ_09, 0.9.2)
+
+GST_08_SUPPORTED=true
+GST_09_SUPPORTED=true
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_SUBST(ACLOCAL_AMFLAGS, "-I common")
@@ -41,23 +48,91 @@ AS_PATH_PYTHON(2.3)
 AM_CHECK_PYTHON_HEADERS(HAVE_PYTHON_H=yes, HAVE_PYTHON_H=no)
 
 dnl check for GStreamer
-PKG_CHECK_MODULES(GST, gstreamer-0.8 >= $GST_REQ)
+PKG_CHECK_MODULES(GST_08, gstreamer-0.8 >= $GST_REQ_08,
+    [GST_08_SUPPORTED=yes], [AC_MSG_RESULT([$GST_08_PKG_ERRORS]); GST_08_SUPPORTED=no])
+PKG_CHECK_MODULES(GST_09, gstreamer-0.9 >= $GST_REQ_09,
+    [GST_09_SUPPORTED=yes], [AC_MSG_RESULT([$GST_09_PKG_ERRORS]); GST_09_SUPPORTED=no])
 
-dnl check for pygtk
-PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_REQ)
+if test $GST_08_SUPPORTED = "no" -a $GST_09_SUPPORTED = "no"; then
+  AC_MSG_ERROR([No GStreamer development packages found.
+Please install GStreamer development packages for version 0.8 or 0.9 (or both).
+Also, check your PKG_CONFIG_PATH.])
+fi  
+
+export PYTHONPATH=$PYGTK_DIR:$PYTHONPATH
+PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_REQ_08)
 PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
 AC_SUBST(PYGTK_DIR)
 AC_MSG_NOTICE(Using pygtk installed in $PYGTK_DIR)
 PYGTK_VERSION="`$PKG_CONFIG --modversion pygtk-2.0`"
+
 if test "x$PYGTK_VERSION" = "x2.5.2"
 then
   AC_MSG_ERROR([PyGTK 2.5.2 contains known bugs, please install other version])
 fi
-export PYTHONPATH=$PYGTK_DIR:$PYTHONPATH
+
+AS_PYTHON_IMPORT([gtk.glade],,
+                 AC_MSG_ERROR([You need to have python libglade bindings installed]))
+
+if test $GST_09_SUPPORTED = "yes"; then
+  AC_MSG_CHECKING([if found PyGTK version is new enough to support GStreamer 0.9])
+  if test "$PYGTK_VERSION" < $PYGTK_REQ_09; then
+    AC_MSG_RESULT([no, $PYGTK_VERSION < $PYGTK_REQ_09])
+    GST_09_SUPPORTED=no
+  else
+    AC_MSG_RESULT([yes, $PYGTK_VERSION >= $PYGTK_REQ_09])
+  fi
+fi
+
+if test $GST_08_SUPPORTED = "no" -a $GST_09_SUPPORTED = "no"; then
+  AC_MSG_ERROR([No appropriate version of PyGTK installed. Correct the above
+errors and try again.])
+fi
+
+dnl checks for gst-python
+if test $GST_08_SUPPORTED = "yes"; then
+  PKG_CHECK_MODULES(PYGST_08, gst-python-0.8 >= $PYGST_REQ_08)
+  PYGST_08_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
+  AC_SUBST(PYGST_08_DIR)
+  AC_MSG_NOTICE(Using gstreamer-python 0.8 installed in $PYGST_08_DIR)
+
+  saved_PYTHONPATH=$PYTHONPATH
+  export PYTHONPATH=$PYGST_08_DIR:$PYTHONPATH
+  AS_PYTHON_IMPORT([gst],,
+                   AC_MSG_ERROR([Maybe you forgot to set your PYTHONPATH?]),,
+                   [assert gst.pygst_version[[1]] == 8])
+
+  AS_PYTHON_IMPORT([gst, gst.interfaces],,
+                   AC_MSG_ERROR([You need to recompile gst-python with gst.interfaces support]))
+  export PYTHONPATH=$saved_PYTHONPATH
+else
+  PKG_CHECK_MODULES(PYGST_09, gst-python-0.9 >= $PYGST_REQ_09)
+  PYGST_09_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.9`"
+  AC_SUBST(PYGST_09_DIR)
+  AC_MSG_NOTICE(Using gstreamer-python 0.9 installed in $PYGST_09_DIR)
+
+  saved_PYTHONPATH=$PYTHONPATH
+  export PYTHONPATH=$PYGST_09_DIR:$PYTHONPATH
+  AS_PYTHON_IMPORT([gst],,
+                   AC_MSG_ERROR([Maybe you forgot to set your PYTHONPATH?]),
+                   [import pygst; pygst.require('0.9')],
+                   [assert gst.pygst_version[[1]] == 9])
+
+  AS_PYTHON_IMPORT([gst, gst.interfaces],,
+                   AC_MSG_ERROR([You need to recompile gst-python with gst.interfaces support]),
+                   [import pygst; pygst.require('0.9')])
+  export PYTHONPATH=$saved_PYTHONPATH
+fi
+
+if test $GST_08_SUPPORTED = "no" -a $GST_09_SUPPORTED = "no"; then
+  AC_MSG_ERROR([No suitably gstreamer-python versions found. Correct the above
+errors and try again.])
+fi  
 
 dnl check stuff we can generate the tray icon with
 AC_MSG_CHECKING(for pygtk codegen)
-PYGTK_CODEGEN="$PYTHON `$PKG_CONFIG --variable=codegendir pygtk-2.0`/codegen.py"dnl PYGTK_CODEGEN="$PYTHON \$(top_srcdir)/codegen/codegen.py"
+PYGTK_CODEGEN="$PYTHON `$PKG_CONFIG --variable=codegendir pygtk-2.0`/codegen.py"
+dnl PYGTK_CODEGEN="$PYTHON \$(top_srcdir)/codegen/codegen.py"
 AC_SUBST(PYGTK_CODEGEN)
 AC_MSG_RESULT($PYGTK_CODEGEN)
 
@@ -87,40 +162,6 @@ then
 fi
 
 AM_CONDITIONAL(BUILD_TRAYICON, test "x$BUILD_TRAYICON" = "xyes")
-
-dnl check for libglade
-AC_MSG_CHECKING(for gtk.glade)
-prog="
-import sys
-try:
-  import gtk.glade
-except RuntimeError:
-  sys.exit(0)
-except ImportError:
-  sys.exit(1)
-sys.exit(0)
-"
-
-if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
-then
-  AC_MSG_RESULT(found)
-else
-  AC_MSG_RESULT(not found)
-  AC_MSG_ERROR([You need to have python libglade bindings installed])
-fi
-
-dnl checks for gst-python
-PKG_CHECK_MODULES(PYGST, gst-python-0.8 >= $PYGST_REQ)
-PYGST_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
-AC_SUBST(PYGST_DIR)
-AC_MSG_NOTICE(Using gstreamer-python installed in $PYGST_DIR)
-
-export PYTHONPATH=$PYGST_DIR:$PYTHONPATH
-AS_PYTHON_IMPORT([gst],,
-                 AC_MSG_ERROR([Maybe you forgot to set your PYTHONPATH?]))
-
-AS_PYTHON_IMPORT([gst, gst.interfaces],,
-                 AC_MSG_ERROR([You need to recompile gst-python with gst.interfaces support]))
 
 dnl check for epydoc
 AC_CHECK_PROG(EPYDOC, epydoc, yes, no)
