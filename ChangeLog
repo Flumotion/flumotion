@@ -1,5 +1,9 @@
 2005-09-08  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/webcam/webcam.py
+	(createComponent): Add a colorspace to make ppc happy for rgb
+	formats.
+
 	* flumotion/wizard/steps.py: Callers of check_elements updated.
 
 	* flumotion/wizard/wizard.py (Wizard.check_elements): Changed to
