@@ -19,6 +19,8 @@
 # Headers in this file shall remain intact.
 
 import common
+import testclasses
+
 from twisted.trial import unittest
 
 from twisted.python import components
@@ -41,9 +43,9 @@ class TestKeycardUACPCC(unittest.TestCase):
             keycard, credentials.IUsernameCryptPassword))
         
 # test sending keycards back and forth
-class Admin(common.TestAdmin):
+class Admin(testclasses.TestAdmin):
     pass
-class Worker(common.TestWorker):
+class Worker(testclasses.TestWorker):
     keycard = None
      
     def remote_getKeycard(self):
@@ -58,7 +60,7 @@ class Worker(common.TestWorker):
         #print "Worker keycard %r, id: %d" % (keycard, id(keycard))
         pass
      
-class Root(common.TestManagerRoot):
+class Root(testclasses.TestManagerRoot):
     def remote_workerGetKeycard(self):
         d = self.workerReference.callRemote('getKeycard')
         d.addCallback(self._printKeycard)
@@ -75,7 +77,7 @@ class Root(common.TestManagerRoot):
 
 class TestKeycardSending(unittest.TestCase):
     def setUp(self):
-        self.m = common.TestManager()
+        self.m = testclasses.TestManager()
         port = self.m.run(Root)
         self.a = Admin()
         d = self.a.run(port)

@@ -19,6 +19,7 @@
 # Headers in this file shall remain intact.
 
 import common
+import testclasses
 
 from twisted.trial import unittest
 
@@ -30,10 +31,10 @@ from flumotion.common import componentui
 
 class FakeObject: pass
 
-class FakeAdmin(common.TestAdmin):
+class FakeAdmin(testclasses.TestAdmin):
     pass
 
-class FakeWorker(common.TestWorker):
+class FakeWorker(testclasses.TestWorker):
     def remote_getState(self):
         if not hasattr(self, 'state'):
             self.state = componentui.WorkerComponentUIState()
@@ -51,7 +52,7 @@ class FakeWorker(common.TestWorker):
     def remote_haveAdopted(self, name):
         self.state.remove('children', name)
 
-class TestRoot(common.TestManagerRoot):
+class TestRoot(testclasses.TestManagerRoot):
     def remote_workerGetState(self):
         d = self.workerReference.callRemote('getState')
         d.addCallback(self._workerGotState)
@@ -78,7 +79,7 @@ class TestStateSet(unittest.TestCase):
     def setUp(self):
         self.changes = []
         
-        self._m = common.TestManager()
+        self._m = testclasses.TestManager()
         port = self._m.run(TestRoot)
         self.admin = FakeAdmin()
         d = self.admin.run(port)

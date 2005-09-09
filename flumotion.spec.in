@@ -138,6 +138,8 @@ then
   cat > %{_sysconfdir}/flumotion/workers/default.xml <<EOF
 <worker>
  
+  <!-- <debug>3</debug> -->
+
   <manager>
   </manager>
 
@@ -146,6 +148,8 @@ then
     <password>test</password>
   </authentication>
  
+  <!-- <feederports>8600-8639</feederports> -->
+
 </worker>
 EOF
 

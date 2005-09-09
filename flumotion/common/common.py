@@ -30,10 +30,9 @@ import time
 import signal
 
 from twisted.python import reflect, rebuild, components
-from twisted.spread import pb
 from twisted.internet import address
 
-from flumotion.common import errors, log
+from flumotion.common import log
 
 # Note: This module is loaded very early on, so
 #       don't add any extra flumotion imports unless you
@@ -223,6 +222,7 @@ def ensureDir(dir, description):
         try:
             os.makedirs(dir)
         except:
+            from flumotion.common import errors
             raise errors.SystemError, "could not create %s directory %s" % (
                 description, dir)
 

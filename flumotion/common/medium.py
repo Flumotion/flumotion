@@ -74,7 +74,9 @@ class BaseMedium(pb.Referenceable, log.Loggable):
             return None
         
         def errback(failure):
-            self.warning('callRemote(%s) failed: %r' % (name, failure))
+            # shouldn't be a warning, since this a common occurrence
+            # when running worker tests
+            self.debug('callRemote(%s) failed: %r' % (name, failure))
             failure.trap(pb.PBConnectionLost)
         d = self.remote.callRemote(name, *args, **kwargs)
         d.addErrback(errback)
@@ -108,14 +110,10 @@ class BaseMedium(pb.Referenceable, log.Loggable):
             # only if d was actually a deferred will we get here
             # this is a bit nasty :/
             yield d.value()
-            
         except Exception, e:
-            import traceback
-            # pull out the landing parachute Maverick
-            traceback.print_exc()
             msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s raised: %s'
                    % (modname, procname, args, kwargs,
                       e.__class__.__name__, e.__str__()))
-            self.warning(msg)
-            raise
+            self.debug(msg)
+            raise e
     run_bundled_proc = defer_generator_method(run_bundled_proc)

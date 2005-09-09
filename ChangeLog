@@ -1,3 +1,18 @@
+2005-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion.spec.in:
+	  add some commented out config params for reference
+	* flumotion/common/common.py:
+	* flumotion/common/medium.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/common.py:
+	* flumotion/test/testclasses.py:
+	* flumotion/test/test_common_componentui.py:
+	* flumotion/test/test_flavors.py:
+	* flumotion/test/test_keycards.py:
+	  break out our test classes to a separate module
+	  so we can avoid having to import reactor this early
+
 2005-09-08  Andy Wingo  <wingo@pobox.com>
 
 	* bin/flumotion.in:

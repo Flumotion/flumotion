@@ -19,6 +19,7 @@
 # Headers in this file shall remain intact.
 
 import common
+import testclasses
 
 from twisted.trial import unittest
 
@@ -42,7 +43,7 @@ class FakeListener:
     def stateAppend(self, state, key, value): pass
     def stateRemove(self, state, key, value): pass
 
-class TestRoot(common.TestManagerRoot):
+class TestRoot(testclasses.TestManagerRoot):
     def remote_getState(self):
         self.state = TestStateCacheable()
         self.state.addKey('name', 'lois')
