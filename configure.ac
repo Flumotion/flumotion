@@ -40,6 +40,7 @@ AS_AC_EXPAND(LOCALSTATEDIR, $localstatedir)
 AC_MSG_NOTICE(Using localstatedir $LOCALSTATEDIR)
 
 AC_DISABLE_STATIC
+AS_LIBTOOL_TAGS([])
 AC_PROG_LIBTOOL
 
 dnl check for python
@@ -76,7 +77,7 @@ AS_PYTHON_IMPORT([gtk.glade],,
 
 if test $GST_09_SUPPORTED = "yes"; then
   AC_MSG_CHECKING([if found PyGTK version is new enough to support GStreamer 0.9])
-  if test "$PYGTK_VERSION" < $PYGTK_REQ_09; then
+  if test "$PYGTK_VERSION" \< $PYGTK_REQ_09; then
     AC_MSG_RESULT([no, $PYGTK_VERSION < $PYGTK_REQ_09])
     GST_09_SUPPORTED=no
   else
@@ -91,37 +92,55 @@ fi
 
 dnl checks for gst-python
 if test $GST_08_SUPPORTED = "yes"; then
-  PKG_CHECK_MODULES(PYGST_08, gst-python-0.8 >= $PYGST_REQ_08)
-  PYGST_08_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
-  AC_SUBST(PYGST_08_DIR)
-  AC_MSG_NOTICE(Using gstreamer-python 0.8 installed in $PYGST_08_DIR)
+  PKG_CHECK_MODULES(PYGST_08, gst-python-0.8 >= $PYGST_REQ_08,
+      [PYGST_08_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
+       AC_SUBST(PYGST_08_DIR)
+       AC_MSG_NOTICE(Using gstreamer-python 0.8 installed in $PYGST_08_DIR)],
+      [AC_MSG_RESULT([$PYGST_08_PKG_ERRORS])
+       GST_08_SUPPORTED=no])
 
-  saved_PYTHONPATH=$PYTHONPATH
-  export PYTHONPATH=$PYGST_08_DIR:$PYTHONPATH
-  AS_PYTHON_IMPORT([gst],,
-                   AC_MSG_ERROR([Maybe you forgot to set your PYTHONPATH?]),,
-                   [assert gst.pygst_version[[1]] == 8])
+  if test $GST_08_SUPPORTED = "yes"; then
+    saved_PYTHONPATH=$PYTHONPATH
+    export PYTHONPATH=$PYGST_08_DIR:$PYTHONPATH
+    AS_PYTHON_IMPORT([gst],,
+                     [AC_MSG_NOTICE([Unable to import gst-python 0.8 -- check your PYTHONPATH?])
+                      GST_08_SUPPORTED=no],,
+                     [assert gst.pygst_version[[1]] == 8])
 
-  AS_PYTHON_IMPORT([gst, gst.interfaces],,
-                   AC_MSG_ERROR([You need to recompile gst-python with gst.interfaces support]))
-  export PYTHONPATH=$saved_PYTHONPATH
-else
-  PKG_CHECK_MODULES(PYGST_09, gst-python-0.9 >= $PYGST_REQ_09)
-  PYGST_09_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.9`"
-  AC_SUBST(PYGST_09_DIR)
-  AC_MSG_NOTICE(Using gstreamer-python 0.9 installed in $PYGST_09_DIR)
+    if test $GST_08_SUPPORTED = "yes"; then
+      AS_PYTHON_IMPORT([gst, gst.interfaces],,
+                       [AC_MSG_NOTICE([You need to recompile gst-python 0.8 with gst.interfaces support])
+                        GST_08_SUPPORTED=no])
+      export PYTHONPATH=$saved_PYTHONPATH
+    fi
+  fi
+fi
 
-  saved_PYTHONPATH=$PYTHONPATH
-  export PYTHONPATH=$PYGST_09_DIR:$PYTHONPATH
-  AS_PYTHON_IMPORT([gst],,
-                   AC_MSG_ERROR([Maybe you forgot to set your PYTHONPATH?]),
-                   [import pygst; pygst.require('0.9')],
-                   [assert gst.pygst_version[[1]] == 9])
+if test $GST_09_SUPPORTED = "yes"; then
+  PKG_CHECK_MODULES(PYGST_09, gst-python-0.9 >= $PYGST_REQ_09,
+      [PYGST_09_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.9`"
+       AC_SUBST(PYGST_09_DIR)
+       AC_MSG_NOTICE(Using gstreamer-python 0.9 installed in $PYGST_09_DIR)],
+      [AC_MSG_RESULT([$PYGST_09_PKG_ERRORS])
+       GST_09_SUPPORTED=no])
 
-  AS_PYTHON_IMPORT([gst, gst.interfaces],,
-                   AC_MSG_ERROR([You need to recompile gst-python with gst.interfaces support]),
-                   [import pygst; pygst.require('0.9')])
-  export PYTHONPATH=$saved_PYTHONPATH
+  if test $GST_09_SUPPORTED = "yes"; then
+    saved_PYTHONPATH=$PYTHONPATH
+    export PYTHONPATH=$PYGST_09_DIR:$PYTHONPATH
+    AS_PYTHON_IMPORT([gst],,
+                     [AC_MSG_NOTICE([Unable to import gst-python 0.9 -- check your PYTHONPATH?])
+                      GST_09_SUPPORTED=no],
+                     [import pygst; pygst.require('0.9')],
+                     [assert gst.pygst_version[[1]] == 9])
+
+    if test $GST_08_SUPPORTED = "yes"; then
+      AS_PYTHON_IMPORT([gst, gst.interfaces],,
+                       [AC_MSG_NOTICE([You need to recompile gst-python 0.9 with gst.interfaces support])
+                        GST_09_SUPPORTED=no],
+                       [import pygst; pygst.require('0.9')])
+      export PYTHONPATH=$saved_PYTHONPATH
+    fi
+  fi
 fi
 
 if test $GST_08_SUPPORTED = "no" -a $GST_09_SUPPORTED = "no"; then
@@ -265,3 +284,15 @@ pkgconfig/flumotion-uninstalled.pc
 flumotion.spec
 po/Makefile.in
 )
+
+echo
+echo "configure: *** Flumotion has been configured with support for the"
+echo "               following versions of GStreamer:"
+echo
+echo "    GStreamer 0.8: $GST_08_SUPPORTED"
+echo "    GStreamer 0.9: $GST_09_SUPPORTED"
+echo
+echo "If either version is disabled, check the configure output above to"
+echo "determine the cause of the problem, and re-run the configure"
+echo "script after installing the necessary dependencies."
+echo

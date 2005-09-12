@@ -169,8 +169,13 @@ try:
     import $1
     $5
     sys.exit(0)
-    print 'yes'
 except ImportError:
+    sys.exit(1)
+except SystemExit:
+    raise
+except Exception, e:
+    print '  Error while trying to import $1:'
+    print '    %r: %s' % (e, e)
     sys.exit(1)"
 
 if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC

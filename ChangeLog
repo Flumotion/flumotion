@@ -1,3 +1,17 @@
+2005-09-12  Andy Wingo  <wingo@pobox.com>
+
+	* configure.ac: Some logic fixes and robusticization for checking
+	for the different versions of gst-python.
+
+	* common/as-python.m4: Print more useful messages if importing the
+	module or the checks cause a random assertion to be raised.
+
+	* configure.ac: Use AS_LIBTOOL_TAGS to avoid notices about
+	fortran.
+
+	* common/Makefile.am (EXTRA_DIST): 
+	* common/as-libtool-tags.m4: Slurp from GStreamer.
+
 2005-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:
