@@ -27,7 +27,6 @@ import gobject
 
 from flumotion.ui.glade import GladeWidget, GladeWindow
 from flumotion.configure import configure
-from flumotion.common import compat
 from flumotion.common.pygobject import gsignal, gproperty
 
 from flumotion.admin import connections
@@ -117,7 +116,7 @@ class Connections(GladeWidget):
             return model.get_value(i, self.STATE_COL)
         else:
             return None
-compat.type_register(Connections)
+gobject.type_register(Connections)
 
 
 class ConnectionsDialog(GladeWindow):
@@ -137,7 +136,7 @@ class ConnectionsDialog(GladeWindow):
     def on_ok(self, x):
         self.emit('have-connection',
                   self.widgets['connections'].get_selected())
-compat.type_register(ConnectionsDialog)
+gobject.type_register(ConnectionsDialog)
 
 
 class OpenConnection(GladeWidget):
@@ -179,7 +178,7 @@ class OpenConnection(GladeWidget):
         return {'host': self.host_entry.get_text(),
                 'port': int(self.port_entry.get_text()),
                 'use_insecure': not self.ssl_check.get_active()}
-compat.type_register(OpenConnection)
+gobject.type_register(OpenConnection)
 
 
 class Authenticate(GladeWidget):
@@ -219,4 +218,4 @@ class Authenticate(GladeWidget):
     def get_state(self):
         return {'user': self.user_entry.get_text(),
                 'passwd': self.passwd_entry.get_text()}
-compat.type_register(Authenticate)
+gobject.type_register(Authenticate)

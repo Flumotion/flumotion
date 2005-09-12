@@ -21,7 +21,6 @@
 
 import gobject
 import gtk
-from flumotion.common import compat
 from flumotion.common.pygobject import gsignal
 from flumotion.twisted import flavors
 
@@ -50,7 +49,7 @@ class WorkerListStore(gtk.ListStore):
                     self.remove(r.iter)
                     self.emit('changed')
                     return
-compat.type_register(WorkerListStore)
+gobject.type_register(WorkerListStore)
 
 class WorkerList(gtk.HBox):
     gsignal('worker-selected', str)
@@ -123,4 +122,4 @@ class WorkerList(gtk.HBox):
     def notify_selected(self):
         self.emit('worker-selected', self.get_worker())
 
-compat.type_register(WorkerList)
+gobject.type_register(WorkerList)

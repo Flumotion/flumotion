@@ -33,7 +33,7 @@ from twisted.internet import error, defer, reactor
 from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect
 
-from flumotion.common import common, errors, interfaces, log, compat
+from flumotion.common import common, errors, interfaces, log
 from flumotion.common import keycards, worker, planet, medium, package
 # serializable worker and component state
 from flumotion.twisted import flavors
@@ -583,4 +583,4 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
     def getWorkerHeavenState(self):
         return self._workerHeavenState
 
-compat.type_register(AdminModel)
+gobject.type_register(AdminModel)

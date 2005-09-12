@@ -19,8 +19,6 @@
 # Headers in this file shall remain intact.
 
 from flumotion.common.pygobject import gsignal
-from flumotion.common import compat
-
 
 import gtk
 import gobject
@@ -162,4 +160,4 @@ class PropertyChangeDialog(gtk.Dialog):
     def update_value_entry(self, value):
         self.value_entry.set_text(str(value))
     
-compat.type_register(PropertyChangeDialog)
+gobject.type_register(PropertyChangeDialog)

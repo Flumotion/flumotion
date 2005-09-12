@@ -30,7 +30,7 @@ import gtk.glade
 from twisted.internet import defer
 
 from flumotion.configure import configure
-from flumotion.common import log, errors, worker, compat
+from flumotion.common import log, errors, worker
 from flumotion.wizard import enums, save, step, classes, message
 #from flumotion.wizard.sidebar import WizardSidebar
 from flumotion.ui import fgtk
@@ -421,4 +421,4 @@ class Wizard(GladeWindow, log.Loggable):
             dict[component.name] = component
 
         return dict
-compat.type_register(Wizard)
+gobject.type_register(Wizard)
