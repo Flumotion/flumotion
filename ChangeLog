@@ -1,5 +1,23 @@
 2005-09-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/compat.py (install_reactor): Take an optional
+	argument gtk, which if True will try to load the gtk2reactor
+	instead of the normal glib/gst ones.
+
+	* configure.ac: s/REQ_0X/0X_REQ/, subst variables properly.
+
+	* flumotion/common/boot.py.in: New file, factors out the
+	initialization code that was in the manager and worker scripts.
+	Enhanced to choose pygst version at runtime based on the
+	FLU_GST_VERSION environment variable.
+
+	* bin/flumotion-worker.in: 
+	* bin/flumotion-manager.in: Use flumotion.common.boot.
+
+	* flumotion/common/Makefile.am (nodist_flumotion_PYTHON) 
+	(EXTRA_DIST): Makefile rules so as to install boot.py but ship
+	only boot.py.in.
+
 	* configure.ac: Some logic fixes and robusticization for checking
 	for the different versions of gst-python.
 

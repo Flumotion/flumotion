@@ -6,13 +6,15 @@ AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
 
-AC_SUBST(PYGTK_REQ_08, 2.4.0)
-AC_SUBST(PYGST_REQ_08, 0.8.0)
-AC_SUBST(GST_REQ_08, 0.8.7)
+AC_SUBST(PYGTK_BASE_REQ, 2.4.0)
 
-AC_SUBST(PYGTK_REQ_09, 2.6.3)
-AC_SUBST(PYGST_REQ_09, 0.9.0)
-AC_SUBST(GST_REQ_09, 0.9.2)
+AC_SUBST(PYGTK_08_REQ, 2.4.0)
+AC_SUBST(PYGST_08_REQ, 0.8.0)
+AC_SUBST(GST_08_REQ, 0.8.7)
+
+AC_SUBST(PYGTK_09_REQ, 2.6.3)
+AC_SUBST(PYGST_09_REQ, 0.9.0)
+AC_SUBST(GST_09_REQ, 0.9.2)
 
 GST_08_SUPPORTED=true
 GST_09_SUPPORTED=true
@@ -49,9 +51,9 @@ AS_PATH_PYTHON(2.3)
 AM_CHECK_PYTHON_HEADERS(HAVE_PYTHON_H=yes, HAVE_PYTHON_H=no)
 
 dnl check for GStreamer
-PKG_CHECK_MODULES(GST_08, gstreamer-0.8 >= $GST_REQ_08,
+PKG_CHECK_MODULES(GST_08, gstreamer-0.8 >= $GST_08_REQ,
     [GST_08_SUPPORTED=yes], [AC_MSG_RESULT([$GST_08_PKG_ERRORS]); GST_08_SUPPORTED=no])
-PKG_CHECK_MODULES(GST_09, gstreamer-0.9 >= $GST_REQ_09,
+PKG_CHECK_MODULES(GST_09, gstreamer-0.9 >= $GST_09_REQ,
     [GST_09_SUPPORTED=yes], [AC_MSG_RESULT([$GST_09_PKG_ERRORS]); GST_09_SUPPORTED=no])
 
 if test $GST_08_SUPPORTED = "no" -a $GST_09_SUPPORTED = "no"; then
@@ -61,7 +63,7 @@ Also, check your PKG_CONFIG_PATH.])
 fi  
 
 export PYTHONPATH=$PYGTK_DIR:$PYTHONPATH
-PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_REQ_08)
+PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_08_REQ)
 PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
 AC_SUBST(PYGTK_DIR)
 AC_MSG_NOTICE(Using pygtk installed in $PYGTK_DIR)
@@ -77,11 +79,11 @@ AS_PYTHON_IMPORT([gtk.glade],,
 
 if test $GST_09_SUPPORTED = "yes"; then
   AC_MSG_CHECKING([if found PyGTK version is new enough to support GStreamer 0.9])
-  if test "$PYGTK_VERSION" \< $PYGTK_REQ_09; then
-    AC_MSG_RESULT([no, $PYGTK_VERSION < $PYGTK_REQ_09])
+  if test "$PYGTK_VERSION" \< $PYGTK_09_REQ; then
+    AC_MSG_RESULT([no, $PYGTK_VERSION < $PYGTK_09_REQ])
     GST_09_SUPPORTED=no
   else
-    AC_MSG_RESULT([yes, $PYGTK_VERSION >= $PYGTK_REQ_09])
+    AC_MSG_RESULT([yes, $PYGTK_VERSION >= $PYGTK_09_REQ])
   fi
 fi
 
@@ -92,7 +94,7 @@ fi
 
 dnl checks for gst-python
 if test $GST_08_SUPPORTED = "yes"; then
-  PKG_CHECK_MODULES(PYGST_08, gst-python-0.8 >= $PYGST_REQ_08,
+  PKG_CHECK_MODULES(PYGST_08, gst-python-0.8 >= $PYGST_08_REQ,
       [PYGST_08_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
        AC_SUBST(PYGST_08_DIR)
        AC_MSG_NOTICE(Using gstreamer-python 0.8 installed in $PYGST_08_DIR)],
@@ -117,7 +119,7 @@ if test $GST_08_SUPPORTED = "yes"; then
 fi
 
 if test $GST_09_SUPPORTED = "yes"; then
-  PKG_CHECK_MODULES(PYGST_09, gst-python-0.9 >= $PYGST_REQ_09,
+  PKG_CHECK_MODULES(PYGST_09, gst-python-0.9 >= $PYGST_09_REQ,
       [PYGST_09_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.9`"
        AC_SUBST(PYGST_09_DIR)
        AC_MSG_NOTICE(Using gstreamer-python 0.9 installed in $PYGST_09_DIR)],
@@ -147,6 +149,9 @@ if test $GST_08_SUPPORTED = "no" -a $GST_09_SUPPORTED = "no"; then
   AC_MSG_ERROR([No suitably gstreamer-python versions found. Correct the above
 errors and try again.])
 fi  
+
+AC_SUBST(GST_08_SUPPORTED)
+AC_SUBST(GST_09_SUPPORTED)
 
 dnl check stuff we can generate the tray icon with
 AC_MSG_CHECKING(for pygtk codegen)
@@ -238,6 +243,7 @@ flumotion/Makefile
 flumotion/admin/Makefile
 flumotion/admin/gtk/Makefile
 flumotion/common/Makefile
+flumotion/common/boot.py
 flumotion/component/Makefile
 flumotion/component/base/Makefile
 flumotion/component/bouncers/Makefile

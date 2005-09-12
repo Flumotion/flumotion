@@ -1,0 +1,135 @@
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
+
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+import os
+import sys
+
+PYGTK_DIR = '@PYGTK_DIR@'
+
+PYGTK_BASE_REQ = '@PYGTK_BASE_REQ@'
+
+GST_08_SUPPORTED = '@GST_08_SUPPORTED@'
+PYGST_08_DIR = '@PYGST_08_DIR@'
+PYGTK_08_REQ = '@PYGTK_08_REQ@'
+
+GST_09_SUPPORTED = '@GST_09_SUPPORTED@'
+PYGST_09_DIR = '@PYGST_09_DIR@'
+PYGTK_09_REQ = '@PYGTK_09_REQ@'
+
+def _init_gobject():
+    """
+    I setup paths for pygtk from configure and
+    make sure that the installed version of pygtk
+    is sane enough to be usable by us
+    """
+    
+    if not PYGTK_DIR in sys.path:
+        sys.path.insert(0, PYGTK_DIR)
+
+    try:
+        import pygtk
+        pygtk.require('2.0')
+
+        import gobject
+    except ImportError:
+        raise SystemExit('ERROR: PyGTK could not be found')
+
+    if gobject.pygtk_version < PYGTK_BASE_REQ.split('.'):
+        raise SystemExit(
+            'ERROR: PyGTK %s or higher is required' % PYGTK_BASE_REQ)
+
+    # To be able to have other threads emitting signals connected
+    # python callbacks we need to use the new PyGILThread_STATE API
+    # Which in PyGTK 2.4.0 only can be turned on by using an
+    # environment variable
+    os.environ['PYGTK_USE_GIL_STATE_API'] = ''
+    gobject.threads_init()
+
+def _init_gst():
+    """
+    I setup paths for gst-python from configure and
+    make sure that the installed version of gst-python
+    is sane enough to be usable by us
+    """
+
+    default_version = GST_09_SUPPORTED == 'yes' and '0.9' or '0.8'
+    gst_version = os.getenv('FLU_GST_VERSION', default_version)
+
+    if gst_version == '0.8':
+        pygst_dir = PYGST_08_DIR
+        pygtk_req = PYGTK_08_REQ
+    elif gst_version == '0.9':
+        pygst_dir = PYGST_09_DIR
+        pygtk_req = PYGTK_09_REQ
+    else:
+        raise SystemExit(
+            'ERROR: Invalid FLU_GST_VERSION: "%s" ("0.8" or "0.9" expected)'
+            % gst_version)
+
+    assert 'gobject' in sys.modules
+
+    import gobject
+
+    if gobject.pygtk_version < pygtk_req.split('.'):
+        raise SystemExit(
+            'ERROR: PyGTK %s or higher is required for FLU_GST_VERSION=%s'
+            % (pygtk_req, gst_version))
+
+    if pygst_dir != PYGTK_DIR:
+        if not pygst_dir in sys.path:
+            sys.path.insert(0, pygst_dir)
+        
+    if gst_version == '0.9':
+        try:
+            import pygst
+            pygst.require('0.9')
+        except ImportError:
+            raise SystemExit('ERROR: Could not load gst-python 0.9')
+
+    try:
+        import gst
+    except ImportError:
+        raise SystemExit('ERROR: gst-python could not be found')
+    
+    if gst.pygst_version < gst_version.split('.'):
+        raise SystemExit(
+            'ERROR: Expected gst-python version %s in %s, but found %r'
+            % (gst_version, pygst_dir, gst.pygst_version))
+    
+def boot(path, gtk=False):
+    from flumotion.twisted import compat
+
+    _init_gobject()
+    _init_gst()
+    compat.install_reactor(gtk)
+
+    from flumotion.twisted import reflect
+    from flumotion.common import errors
+    from flumotion.common import setup
+
+    setup.setup()
+
+    main = reflect.namedAny(path)
+    
+    try:
+        sys.exit(main(sys.argv))
+    except errors.SystemError, e:
+        print 'ERROR:', e
+        sys.exit(1)

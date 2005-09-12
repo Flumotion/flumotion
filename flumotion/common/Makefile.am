@@ -2,6 +2,9 @@ include $(top_srcdir)/common/python.mk
                                                                                 
 flumotiondir = $(libdir)/flumotion/python/flumotion/common
 
+nodist_flumotion_PYTHON = \
+	boot.py
+
 flumotion_PYTHON = \
 	__init__.py \
 	bundle.py \
@@ -32,4 +35,4 @@ TAGS_FILES = $(flumotion_PYTHON)
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(flumotion_PYTHON)
+EXTRA_DIST = boot.py.in

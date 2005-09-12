@@ -28,56 +28,10 @@ import sys
 
 # Variable templates 
 LIBDIR = '@LIBDIR@'
-PYGTK_DIR = '@PYGTK_DIR@'
-PYGST_DIR = '@PYGST_DIR@'
-PYGTK_VERSION = '@PYGTK_REQ@'
 PROGRAM_PATH = 'flumotion.worker.main.main'
 
-def _init_gobject():
-    """
-    I setup paths for pygtk from configure and
-    make sure that the installed version of pygtk
-    is sane enough to be usable by us
-    """
-    
-    if not PYGTK_DIR in sys.path:
-        sys.path.insert(0, PYGTK_DIR)
-
-    try:
-        import pygtk
-        pygtk.require('2.0')
-
-        import gobject
-    except ImportError:
-        raise SystemExit('ERROR: PyGTK could not be found')
-
-    if gobject.pygtk_version < PYGTK_VERSION.split('.'):
-        raise SystemExit('ERROR: PyGTK %s or higher is required' % PYGTK_VERSION)
-
-    # To be able to have other threads emitting signals connected
-    # python callbacks we need to use the new PyGILThread_STATE API
-    # Which in PyGTK 2.4.0 only can be turned on by using an
-    # environment variable
-    os.environ['PYGTK_USE_GIL_STATE_API'] = ''
-    gobject.threads_init()
-
-def _init_gst():
-    """
-    I setup paths for gst-python from configure and
-    make sure that the installed version of gst-python
-    is sane enough to be usable by us
-    """
-
-    if PYGST_DIR != PYGTK_DIR:
-        if not PYGST_DIR in sys.path:
-            sys.path.insert(0, PYGST_DIR)
-        
-    try:
-        import gst
-    except ImportError:
-        raise SystemExit('ERROR: gst-python could not be found')
-    
-def _setup_project_root():
+try:
+    # setup the project root
     dir = os.path.dirname(os.path.abspath(__file__))
     if os.path.exists(os.path.join(dir, '.svn')):
         root = os.path.split(dir)[0]
@@ -85,35 +39,9 @@ def _setup_project_root():
         root = os.path.join(LIBDIR, 'flumotion', 'python')
     sys.path.insert(0, root)
 
-def _install_reactor():
-    from flumotion.twisted import compat
-    """
-    Installs our reactor, so we can use twisted.internet from the
-    whole code base without caring about the default reactor
-    """
-    compat.install_reactor()    
+    # and boot!
+    from flumotion.common import boot
+    boot.boot(PROGRAM_PATH)
 
-def _run_main(path):
-    from flumotion.twisted import reflect
-    
-    # Import errors first, otherwise the exception fails
-    from flumotion.common import errors
-    from flumotion.common import setup
-    setup.setup()
-
-    main = reflect.namedAny(path)
-    
-    try:
-        sys.exit(main(sys.argv))
-    except errors.SystemError, e:
-        print 'ERROR:', e
-        sys.exit(1)
-    
-try:
-    _setup_project_root()
-    _init_gobject()
-    _init_gst()
-    _install_reactor()
-    _run_main(PROGRAM_PATH)
 except KeyboardInterrupt:
     print 'Interrupted'
