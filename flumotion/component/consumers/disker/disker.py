@@ -27,7 +27,7 @@ import gst
 from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
-from flumotion.common import log, gstreamer
+from flumotion.common import log, gstreamer, compat
 
 # proxy import
 from flumotion.component.component import moods
@@ -173,7 +173,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.connect('state-change', self._feeder_state_change_cb)
         sink.connect('deep-notify::caps', self._notify_caps_cb)
 
-gobject.type_register(Disker)
+compat.type_register(Disker)
         
 def createComponent(config):
     name = config['name']
