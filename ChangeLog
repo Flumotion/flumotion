@@ -1,5 +1,13 @@
 2005-09-13  Andy Wingo  <wingo@pobox.com>
 
+	* bin/flumotion-admin.in: Convert to the new boot code.
+
+	* flumotion/common/boot.py.in (_init_gst): Add some helpful
+	debugging.
+
+	* flumotion/common/gstreamer.py (verbose_deep_notify_cb): Marshal
+	all logging to the main thread.
+
 	* configure.ac: Don't try to import gtk.glade if DISPLAY is unset.
 
 2005-09-12  Andy Wingo  <wingo@pobox.com>
