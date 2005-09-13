@@ -41,7 +41,8 @@ PYCHECKER_WHITELIST = \
 	    flumotion/admin/*/*/*.py
 
 PYCHECKER_BLACKLIST = \
-            flumotion/twisted/gtk2reactor.py
+            flumotion/twisted/gtk2reactor.py    \
+            flumotion/worker/checks/video09.py
 
 COVERAGE_MODULES = flumotion
 
