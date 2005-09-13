@@ -166,7 +166,7 @@ usesExec = 0
 ignoreStandardLibrary = 1
 
 # ignore warnings from the list of modules
-blacklist = ['gtk', 'twisted', 'twisted.python', 'pyexpat', 'flumotion.worker.checks.video09']
+blacklist = ['gtk', 'twisted', 'twisted.python', 'pyexpat']
 
 # ignore global variables not used if name is one of these values
 variablesToIgnore = ['__version__', '__warningregistry__', '__all__', '__credits__', '__test__', '__author__', '__email__', '__revision__']
