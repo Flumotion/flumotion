@@ -189,8 +189,9 @@ class WizardSaver:
 
     def handleVideo(self, components):
         overlay_options = self.wizard.get_step_options('Overlay')
-        has_overlay = overlay_options['show_logo'] or \
-                      overlay_options['show_text']
+        has_overlay = (overlay_options['can_overlay'] and
+                       (overlay_options['show_logo'] or
+                        overlay_options['show_text']))
         
         video_source =  self.getVideoSource()
         components.append(video_source)

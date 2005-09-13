@@ -441,7 +441,9 @@ class Overlay(WizardStep):
     component_type = 'overlay'
     icon = 'overlay.png'
 
-    def worker_changed(self):
+    can_overlay = True
+
+    def worker_changed_08(self):
         d = self.workerRun('flumotion.worker.checks.video',
             'check_ffmpegcolorspace_AYUV')
         yield d
@@ -450,8 +452,8 @@ class Overlay(WizardStep):
                 self.wizard.require_elements(self.worker, 'pngdec', 'alphacolor',
                     'videomixer', 'alpha', 'ffmpegcolorspace')
             else:
-                msg = _("""
-This worker's ffmpegcolorspace plugin is older than 0.8.5.
+                msg = _(
+"""This worker's ffmpegcolorspace plugin is older than 0.8.5.
 Please consider upgrading if your output video has a
 diagonal line in the image.""")
                 self.info_msg('overlay-old-colorspace', msg)
@@ -463,8 +465,34 @@ diagonal line in the image.""")
             msg = "%s\n(%s)" % (
                 _('Could not check ffmpegcolorspace features.'), _(str(e)))
             self.error_msg('overlay-colorspace', msg)
-    worker_changed = defer_generator_method (worker_changed)
-        
+    worker_changed_08 = defer_generator_method(worker_changed_08)
+
+    def worker_changed_09(self):
+        d = self.wizard.check_elements(self.worker, 'pngdec', 'ffmpegcolorspace',
+            'videomixer')
+        yield d
+        missing = d.value()
+        if missing:
+            self.wizard.info_msg('overlay',
+                'This worker is missing the following GStreamer elements: %s\n'
+                'Click Next to proceed without overlay.' %
+                ', '.join(missing))
+            self.can_overlay = False
+            self.set_sensitive(False)
+        else:
+            self.clear_msg('overlay')
+            self.can_overlay = True
+            self.set_sensitive(True)
+    worker_changed_09 = defer_generator_method(worker_changed_09)
+
+    def worker_changed(self):
+        import gst
+
+        if gst.gst_version[1] == 8:
+            self.worker_changed_08()
+        else:
+            self.worker_changed_09()
+
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())
 
@@ -475,6 +503,8 @@ diagonal line in the image.""")
             
         if self.checkbutton_show_text:
             options['text'] = self.entry_text.get_text()
+
+        options['can_overlay'] = self.can_overlay
 
         # XXX: Serious refactoring needed.
         video_options = self.wizard.get_step_options('Source')

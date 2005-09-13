@@ -1,5 +1,28 @@
 2005-09-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/steps.py (Overlay.get_state): Tell the saver
+	whether or not we can overlay.
+	(Overlay.worker_changed_08): Moved from worker_changed.
+	(Overlay.worker_changed_09): Copied over from the 0.9 branch.
+	Doesn't actually require the elements, which is nice considering
+	pngdec and videomixer are not ported.
+	(Overlay.worker_changed): Voodoo.
+
+	* flumotion/wizard/save.py (WizardSaver.handleVideo): Only
+	configure an overlay if the checks passed.
+
+	* flumotion/worker/checks/video.py: Voodoo to include the right
+	version of the worker checks.
+
+	* flumotion/worker/checks/video09.py: Copied from the gstreamer
+	0.9 branch.
+	* flumotion/worker/checks/video08.py: Copied from the old
+	video.py.
+
+	* flumotion/worker/checks/package.xml: 
+	* flumotion/worker/checks/Makefile.am (flumotion_PYTHON): Add new
+	files.
+
 	* bin/flumotion-admin.in: Convert to the new boot code.
 
 	* flumotion/common/boot.py.in (_init_gst): Add some helpful
