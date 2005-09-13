@@ -74,8 +74,12 @@ then
   AC_MSG_ERROR([PyGTK 2.5.2 contains known bugs, please install other version])
 fi
 
-AS_PYTHON_IMPORT([gtk.glade],,
-                 AC_MSG_ERROR([You need to have python libglade bindings installed]))
+if test "x$DISPLAY" != "x"; then
+  AS_PYTHON_IMPORT([gtk.glade],,
+                   AC_MSG_ERROR([You need to have python libglade bindings installed]))
+else
+  AC_MSG_NOTICE([Not trying to import gtk.glade because DISPLAY is unset])
+fi
 
 if test $GST_09_SUPPORTED = "yes"; then
   AC_MSG_CHECKING([if found PyGTK version is new enough to support GStreamer 0.9])

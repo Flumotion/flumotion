@@ -1,3 +1,7 @@
+2005-09-13  Andy Wingo  <wingo@pobox.com>
+
+	* configure.ac: Don't try to import gtk.glade if DISPLAY is unset.
+
 2005-09-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/twisted/compat.py (install_reactor): Take an optional
