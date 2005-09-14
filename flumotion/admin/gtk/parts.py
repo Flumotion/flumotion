@@ -27,7 +27,7 @@ import gtk
 import gtk.glade
 
 from flumotion.configure import configure
-from flumotion.common import log, planet
+from flumotion.common import log, planet, compat
 from flumotion.twisted import flavors
 
 from flumotion.common.planet import moods
@@ -377,7 +377,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         self.update_start_stop_props()
 
-gobject.type_register(ComponentsView)
+compat.type_register(ComponentsView)
 
 class ComponentMenu(gtk.Menu):
 
@@ -429,5 +429,5 @@ class ComponentMenu(gtk.Menu):
     def _activated_cb(self, item, name):
         self.emit('activated', name)
 
-gobject.type_register(ComponentMenu)
+compat.type_register(ComponentMenu)
 

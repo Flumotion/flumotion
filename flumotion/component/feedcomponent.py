@@ -31,7 +31,7 @@ from twisted.spread import pb
 
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
-from flumotion.common import common, interfaces, errors, log
+from flumotion.common import common, interfaces, errors, log, compat
 from flumotion.common import gstreamer, pygobject
 
 from flumotion.common.planet import moods
@@ -600,7 +600,7 @@ class FeedComponent(basecomponent.BaseComponent):
                    (property, element_name, value))
         pygobject.gobject_set_property(element, property, value)
     
-gobject.type_register(FeedComponent)
+compat.type_register(FeedComponent)
 
 class ParseLaunchComponent(FeedComponent):
     'A component using gst-launch syntax'

@@ -19,7 +19,7 @@
 # Headers in this file shall remain intact.
 
 # FIXME: moving this down causes errors
-from flumotion.common import log
+from flumotion.common import log, compat
 
 import os
 
@@ -167,8 +167,8 @@ class Model:
         self._sink.set_xwindow_id(long(xid))
         
 # register our types globally
-gobject.type_register(View)
-gobject.type_register(Controller)
+compat.type_register(View)
+compat.type_register(Controller)
 
 if __name__ == '__main__':
     def controller_prepared_cb(controller, thread):

@@ -30,7 +30,7 @@ from gtk import gdk
 import gtk.glade
 import gobject
 
-from flumotion.common import enum
+from flumotion.common import enum, compat
 
 class FComboBox(gtk.ComboBox):
     """
@@ -148,12 +148,12 @@ class FComboBox(gtk.ComboBox):
 
     def get_state(self):
         return self.get_enum()
-gobject.type_register(FComboBox)
+compat.type_register(FComboBox)
 
 class FEntry(gtk.Entry):
     def get_state(self):
         return self.get_text()
-gobject.type_register(FEntry)
+compat.type_register(FEntry)
 
 class FCheckButton(gtk.CheckButton):
     def get_state(self):
@@ -161,7 +161,7 @@ class FCheckButton(gtk.CheckButton):
     
     def __nonzero__(self):
         return self.get_active()
-gobject.type_register(FCheckButton)
+compat.type_register(FCheckButton)
 
 class FRadioButton(gtk.RadioButton):
     def get_state(self):
@@ -169,12 +169,12 @@ class FRadioButton(gtk.RadioButton):
 
     def __nonzero__(self):
         return self.get_active()
-gobject.type_register(FRadioButton)
+compat.type_register(FRadioButton)
 
 class FSpinButton(gtk.SpinButton):
     def get_state(self):
         return self.get_value()
-gobject.type_register(FSpinButton)
+compat.type_register(FSpinButton)
 
 # this VUMeter respects IEC standard
 # BS 6840-18:1996/IEC-268-18
@@ -436,7 +436,7 @@ class FVUMeter(gtk.DrawingArea):
             self.topborder + int(vumeter_height/2 - layout_height/2),
             layout)
 
-gobject.type_register(FVUMeter)
+compat.type_register(FVUMeter)
 
 class WidgetMapping:
     # In PyGTK 2.4.0 gtk.glade.XML type_dict parameter is buggy

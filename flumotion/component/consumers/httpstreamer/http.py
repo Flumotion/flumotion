@@ -28,7 +28,7 @@ from twisted.internet import reactor, error
 from twisted.web import server
 
 from flumotion.component import feedcomponent
-from flumotion.common import bundle, common, gstreamer, errors
+from flumotion.common import bundle, common, gstreamer, errors, compat
 
 # proxy import
 from flumotion.component.component import moods
@@ -377,7 +377,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self.setMood(moods.sad)
             # FIXME: set message as well
 
-gobject.type_register(MultifdSinkStreamer)
+compat.type_register(MultifdSinkStreamer)
 
 ### create the component based on the config file
 def createComponent(config):

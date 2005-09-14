@@ -1,3 +1,31 @@
+2005-09-12  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/connections.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/admin/gtk/spyglass.py:
+	* flumotion/admin/gtk/videotest.py:
+	* flumotion/admin/gtk/wizard.py:
+	* flumotion/common/compat.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/test/test_common_pygobject.py:
+	* flumotion/tester/httpclient.py:
+	* flumotion/ui/fgtk.py:
+	* flumotion/ui/glade.py:
+	* flumotion/wizard/sidebar.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/worker.py:
+	  Another attempt to get rid of loud gobject deprecation warnings by 
+	  adding a compat package and checking pygtk version in there. 
+	  Call through this for everything that does gobject.type_register().
+	  Doesn't work properly, since our __gsignals__ attribute is strangely
+	  missing.
+
 2005-09-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/wizard/steps.py (Overlay.get_state): Tell the saver
