@@ -1,3 +1,9 @@
+2005-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
+	  add some nice helper methods to log failures.  Add a cool
+	  simple errback handler to objects, I feel fuzzy now.
+
 2005-09-12  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/admin.py:

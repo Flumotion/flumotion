@@ -103,6 +103,14 @@ class Loggable:
         logObject(self.logObjectName(), self.logCategory,
             self.logFunction(*args))
 
+    def warningFailure(self, failure):
+        """
+        Log a warning about a Failure. Useful as an errback handler:
+        d.addErrback(self.warningFailure)
+        """
+        warningObject(self.logObjectName(), self.logCategory,
+            self.logFunction(getFailureMessage(failure)))
+
     def logFunction(self, message):
         """Overridable log function.  Default just returns passed message."""
         return message
@@ -392,3 +400,11 @@ def getExceptionMessage(exception):
     filename = scrubFilename(filename)
     exc = exception.__class__.__name__
     return "Exception %(exc)s at %(filename)s:%(line)s: %(func)s()" % locals()
+
+def getFailureMessage(failure):
+    (func, filename, line, some, other) = failure.frames[-1]
+    filename = scrubFilename(filename)
+    fai = failure.__class__.__name__
+    exc = str(failure.type)
+    msg = failure.getErrorMessage()
+    return "Failure %(fai)s of Exception %(exc)s at %(filename)s:%(line)s: %(func)s(): %(msg)s" % locals()
