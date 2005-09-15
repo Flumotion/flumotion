@@ -131,12 +131,15 @@ class FluLogObserver:
     Twisted log observer that integrates with Flumotion's logging.
     """
     def emit(self, eventDict):
+        method = log # by default, lowest level
         edm = eventDict['message']
         if not edm:
             if eventDict['isError'] and eventDict.has_key('failure'):
+                method = debug # tracebacks from errors at debug level
                 msg = "A python traceback occurred."
                 if getCategoryLevel("twisted") < getLevel("DEBUG"):
                     msg += "  Run with debug level 4 to see the traceback."
+                # and an additional warning
                 warning('twisted', msg)
                 text = eventDict['failure'].getTraceback()
             elif eventDict.has_key('format'):
@@ -151,7 +154,7 @@ class FluLogObserver:
                     'text': text.replace("\n", "\n\t")
                   }
         msgStr = " [%(system)s] %(text)s\n" % fmtDict
-        debug('twisted', msgStr)
+        method('twisted', msgStr)
 
 def registerCategory(category):
     """
@@ -299,6 +302,9 @@ warning = lambda cat, *args: warningObject(None, cat, *args)
 info = lambda cat, *args: infoObject(None, cat, *args)
 debug = lambda cat, *args: debugObject(None, cat, *args)
 log = lambda cat, *args: logObject(None, cat, *args)
+
+#warningFailure = lambda failure: Loggable.warningFailure(None, '', failure)
+warningFailure = lambda failure: warning('', getFailureMessage(failure))
 
 def addLogHandler(func, limited=True):
     """

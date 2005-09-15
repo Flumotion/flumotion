@@ -1,6 +1,16 @@
 2005-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/log.py:
+	  add another helper.  relegate twisted logging to level 5 by
+	  default, I got tired of the spew.  But error tracebacks are
+	  still at level 4
+	* pkgconfig/flumotion-uninstalled.pc.in:
+	* pkgconfig/flumotion.pc.in:
+	  fix for now to use an existing symbol, but hm.  needs work.
+
+2005-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
 	  add some nice helper methods to log failures.  Add a cool
 	  simple errback handler to objects, I feel fuzzy now.
 

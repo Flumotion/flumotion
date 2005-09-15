@@ -7,4 +7,4 @@ flumotiondir=${pcfiledir}/..
 Name: Flumotion Uninstalled
 Description: Streaming media server, Not Installed
 Version: @VERSION@
-Requires: gstreamer-0.8 >= @GST_REQ@
+Requires: gstreamer-0.8 >= @GST_08_REQ@
