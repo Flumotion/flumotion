@@ -33,7 +33,7 @@ GST_09_SUPPORTED = '@GST_09_SUPPORTED@'
 PYGST_09_DIR = '@PYGST_09_DIR@'
 PYGTK_09_REQ = '@PYGTK_09_REQ@'
 
-def _init_gobject():
+def init_gobject():
     """
     I setup paths for pygtk from configure and
     make sure that the installed version of pygtk
@@ -62,7 +62,7 @@ def _init_gobject():
     os.environ['PYGTK_USE_GIL_STATE_API'] = ''
     gobject.threads_init()
 
-def _init_gst():
+def init_gst():
     """
     I setup paths for gst-python from configure and
     make sure that the installed version of gst-python
@@ -122,8 +122,8 @@ def _init_gst():
 def boot(path, gtk=False):
     from flumotion.twisted import compat
 
-    _init_gobject()
-    _init_gst()
+    init_gobject()
+    init_gst()
     compat.install_reactor(gtk)
 
     from flumotion.twisted import reflect

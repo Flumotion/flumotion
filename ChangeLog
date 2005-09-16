@@ -1,5 +1,8 @@
 2005-09-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/boot.py.in (boot): Commit the non-generated
+	file, doh....
+
 	* misc/pycheckerhelp.py: Use boot.py.
 
 	* Makefile.am (PYCHECKER_BLACKLIST): Ignore spyglass.py, until
