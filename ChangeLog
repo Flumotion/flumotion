@@ -1,6 +1,6 @@
 2005-09-16  Andy Wingo  <wingo@pobox.com>
 
-	* Changelog updated. Heh heh heh.
+	* Changelog updated. Heh heh heh heh heh heh.
 
 	* flumotion/common/gstreamer.py (get_plugin_version): Ignore
 	module attribute references in this file. Requires latest
