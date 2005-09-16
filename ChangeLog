@@ -1,4 +1,3 @@
-<<<<<<< .mine
 2005-09-16  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/checks/video.py: Um....
@@ -9,7 +8,6 @@
 
 	* common/pychecker.mk: Cleanup, preparation for some haxoring.
 
-=======
 2005-09-16  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/common/compat.py:
@@ -61,7 +59,6 @@
 	  Doesn't work properly, since our __gsignals__ attribute is strangely
 	  missing.
 
->>>>>>> .r2338
 2005-09-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/wizard/steps.py (Overlay.get_state): Tell the saver
