@@ -41,7 +41,8 @@ PYCHECKER_WHITELIST = \
 	    flumotion/admin/*/*/*.py
 
 PYCHECKER_BLACKLIST = \
-            flumotion/twisted/gtk2reactor.py
+            flumotion/twisted/gtk2reactor.py	\
+            flumotion/admin/gtk/spyglass.py
 
 COVERAGE_MODULES = flumotion
 

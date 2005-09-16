@@ -1,5 +1,18 @@
 2005-09-16  Andy Wingo  <wingo@pobox.com>
 
+	* misc/pycheckerhelp.py: Use boot.py.
+
+	* Makefile.am (PYCHECKER_BLACKLIST): Ignore spyglass.py, until
+	it's ported at least.
+
+	* flumotion/common/gstreamer.py (get_plugin_version): Work in
+	either gst version.
+
+	* common/pychecker.mk: Fix up to separate gst-independent tests,
+	gst 0.8 tests, and gst 0.9 tests.
+
+	* flumotion/common/boot.py (init_gst, init_gobject): Make public.
+
 	* flumotion/worker/checks/video.py: Um....
 
 	* flumotion/worker/checks/video09.py: No need to import re

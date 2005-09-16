@@ -87,13 +87,18 @@ def get_plugin_version(plugin_name):
     @rtype: tuple of (major, minor, micro, [nano]), or None if it could not be
             found or determined
     """
-    if gst.pygst_version > (0, 8, 1):
+    plugin = None
+
+    if gst.pygst_version >= (0, 9, 0):
+        plugin = gst.registry_get_default().find_plugin(plugin_name)
+    elif gst.pygst_version > (0, 8, 1):
         # API added after gst-python 0.8.1 release
         plugin = gst.registry_pool_find_plugin(plugin_name)
-        if not plugin: return None
-        return plugin.get_version()
 
-    return None
+    if not plugin:
+        return None
+    else:
+        return plugin.get_version()
 
 def bin_find_sinks(bin):
     """

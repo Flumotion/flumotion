@@ -7,12 +7,22 @@
 pychecker_setup = `ls $(top_srcdir)/misc/setup.py 2> /dev/null`
 pychecker_help = `ls $(top_srcdir)/misc/pycheckerhelp.py 2> /dev/null`
 pychecker =					\
-	PYTHONPATH=`pwd`			\
 	pychecker -Q -F misc/pycheckerrc	\
 	$(pychecker_setup)			\
 	$(pychecker_help)
 
 pychecker_all_files = $(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))
+pychecker_08_files = $(filter %08.py,$(pychecker_all_files))
+pychecker_09_files = $(filter %09.py,$(pychecker_all_files))
+pychecker_indep_files = $(filter-out $(pychecker_08_files) $(pychecker_09_files),$(pychecker_all_files))
+
+pychecker_indep = PYTHONPATH=`pwd` $(pychecker)
+pychecker_08 = PYTHONPATH=$(PYGST_08_DIR):`pwd` FLU_GST_VERSION=0.8 $(pychecker)
+pychecker_09 = PYTHONPATH=$(PYGST_09_DIR):`pwd` FLU_GST_VERSION=0.9 $(pychecker)
+
+pychecker_if_08 = if test $(GST_08_SUPPORTED) = yes; then 
+pychecker_if_09 = if test $(GST_09_SUPPORTED) = yes; then 
+pychecker_fi = else echo "passing, gstreamer version not supported"; fi
 
 # we redirect stderr so we don't get messages like
 # warning: couldn't find real module for class SSL.Error (module name: SSL)
@@ -28,10 +38,33 @@ pycheckersplit:
 		fi							\
 	done
 
-pychecker:
-	@echo running pychecker ...
-	@$(pychecker) $(pychecker_all_files) 2>/dev/null || make pycheckerverbose
+pychecker: pychecker08 pychecker09 pycheckerindep
+	@true
 
-pycheckerverbose:
-	@echo running pychecker verbose ...
-	$(pychecker) $(pychecker_all_files)
+pycheckerindep: 
+	@echo running pychecker, gstreamer-agnostic files ...
+	@$(pychecker_indep) $(pychecker_indep_files) 2>/dev/null || make pycheckerverboseindep
+
+pychecker08:
+	@echo running pychecker, gstreamer 0.8-specific code ...
+	@$(pychecker_if_08) $(pychecker_08) $(pychecker_08_files) 2>/dev/null \
+	  || make pycheckerverbose08; $(pychecker_fi)
+
+pychecker09:
+	@echo running pychecker, gstreamer 0.9-specific code ...
+	@$(pychecker_if_09) $(pychecker_09) $(pychecker_09_files) 2>/dev/null \
+	  || make pycheckerverbose09; $(pychecker_fi)
+
+pycheckerverbose: pycheckerverbose08 pycheckerverbose09 pycheckerverboseindep
+
+pycheckerverboseindep:
+	@echo "running pychecker, gstreamer-agnostic files (verbose) ..."
+	$(pychecker_indep) $(pychecker_indep_files)
+
+pycheckerverbose08:
+	@echo "running pychecker, gstreamer 0.8-specific code (verbose) ..."
+	$(pychecker_if_08) $(pychecker_08) $(pychecker_08_files); $(pychecker_fi)
+
+pycheckerverbose09:
+	@echo "running pychecker, gstreamer 0.9-specific code (verbose) ..."
+	$(pychecker_if_09) $(pychecker_09) $(pychecker_09_files); $(pychecker_fi)
