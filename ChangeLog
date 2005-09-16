@@ -1,5 +1,9 @@
 2005-09-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/gstreamer.py (get_plugin_version): Ignore
+	module attribute references in this file. Requires latest
+	pychecker CVS plus a patch in their tracker.
+
 	* flumotion/common/boot.py.in (boot): Commit the non-generated
 	file, doh....
 

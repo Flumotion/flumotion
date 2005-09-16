@@ -87,6 +87,8 @@ def get_plugin_version(plugin_name):
     @rtype: tuple of (major, minor, micro, [nano]), or None if it could not be
             found or determined
     """
+    __pychecker__ = 'no-moduleattr'
+
     plugin = None
 
     if gst.pygst_version >= (0, 9, 0):
