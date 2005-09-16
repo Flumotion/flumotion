@@ -21,7 +21,7 @@
 
 import gst
 
-if gst.gst_version[2] == 8:
+if gst.gst_version[1] == 8:
     from video08 import *
 else:
     from video09 import *
