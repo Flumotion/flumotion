@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-09-08 14:20+0200\n"
+"POT-Creation-Date: 2005-09-16 15:15+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -273,15 +273,14 @@ msgstr ""
 msgid "No Firewire device detected."
 msgstr ""
 
-#: flumotion/wizard/steps.py:453
+#: flumotion/wizard/steps.py:456
 msgid ""
-"\n"
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
 "diagonal line in the image."
 msgstr ""
 
-#: flumotion/wizard/steps.py:464
+#: flumotion/wizard/steps.py:466
 msgid "Could not check ffmpegcolorspace features."
 msgstr ""
 
@@ -359,10 +358,6 @@ msgstr "<b>Cliëntverbruik</b>"
 
 #: flumotion/component/consumers/httpstreamer/admin_gtk.py:133
 msgid "Log"
-msgstr ""
-
-#: flumotion/worker/checks/video.py:246
-msgid "device node /dev/raw1394 does not exist"
 msgstr ""
 
 #: data/glade/admin.glade:9
