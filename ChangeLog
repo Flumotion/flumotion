@@ -1,5 +1,18 @@
 2005-09-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent09.py (FeedComponent): New
+	file, FeedComponent ported over from the 0.9 branch. Not
+	completely ported yet.
+
+	* flumotion/component/Makefile.am (component_PYTHON): Add new
+	files.
+
+	* flumotion/component/feedcomponent.py: Import the appropriate
+	version of FeedComponent.
+
+	* flumotion/component/feedcomponent08.py (FeedComponent): Moved
+	here from feedcomponent.py.
+
 	* flumotion/component/feedcomponent.py
 	(FeedComponentMedium.__init__): Inline the handlers listening to
 	signals from the component. Don't futz the component's mood or
