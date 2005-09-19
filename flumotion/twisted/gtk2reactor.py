@@ -52,10 +52,16 @@ from twisted.python import log, threadable, runtime, failure
 from twisted.internet.interfaces import IReactorFDSet
 
 # Sibling Imports
-from twisted.internet import main, default, error
+from twisted.internet import main, error
+try:
+    from twisted.internet import selectreactor
+    from twisted.internet import posixbase
+except ImportError:
+    from twisted.internet import default as selectreactor
+    from twisted.internet import default as posixbase
 
-reads = default.reads
-writes = default.writes
+reads = selectreactor.reads
+writes = selectreactor.writes
 hasReader = reads.has_key
 hasWriter = writes.has_key
 
@@ -70,11 +76,11 @@ INFLAGS = gobject.IO_IN | POLL_DISCONNECTED
 OUTFLAGS = gobject.IO_OUT | POLL_DISCONNECTED
 
 
-class Gtk2Reactor(default.PosixReactorBase):
+class Gtk2Reactor(posixbase.PosixReactorBase):
     """GTK+-2 event loop reactor.
     """
 
-    __implements__ = (default.PosixReactorBase.__implements__, IReactorFDSet)
+    __implements__ = (posixbase.PosixReactorBase.__implements__, IReactorFDSet)
 
     # The input_add function in pygtk1 checks for objects with a
     # 'fileno' method and, if present, uses the result of that method
@@ -206,7 +212,7 @@ class Gtk2Reactor(default.PosixReactorBase):
         _simtag = gobject.timeout_add(int(timeout * 1010), self.simulate)
 
 
-class PortableGtkReactor(default.SelectReactor):
+class PortableGtkReactor(selectreactor.SelectReactor):
     """Reactor that works on Windows.
 
     input_add is not supported on GTK+ for Win32, apparently.
