@@ -29,5 +29,7 @@ import gobject
 def type_register(klass):
     if gobject.pygtk_version < (2, 8):
         gobject.type_register(klass)
-    elif not hasattr(klass, '__gtype__'):
+    elif klass.__gtype__.pytype is not klass:
+        # all subclasses will at least have a __gtype__ from their
+        # parent, make sure it corresponds to the exact class
         gobject.type_register(klass)

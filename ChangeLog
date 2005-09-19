@@ -1,5 +1,8 @@
 2005-09-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/compat.py (type_register): Attempt the fourth
+	at getting this working properly.
+
 	* flumotion/component/feedcomponent09.py (FeedComponent): Port to
 	GStreamer 0.9. Mostly copied over from the branch.
 
