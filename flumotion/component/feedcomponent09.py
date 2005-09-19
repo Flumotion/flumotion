@@ -312,7 +312,8 @@ class FeedComponent(basecomponent.BaseComponent):
 
     def stop(self):
         self.debug('Stopping')
-        self.cleanup()
+        if self.pipeline:
+            self.cleanup()
         self.debug('Stopped')
         basecomponent.BaseComponent.stop(self)
 

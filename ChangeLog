@@ -1,5 +1,8 @@
 2005-09-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent09.py (FeedComponent.stop):
+	Don't cleanup without a pipeline.
+
 	* flumotion/common/compat.py (type_register): Attempt the fourth
 	at getting this working properly.
 
