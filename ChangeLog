@@ -1,5 +1,8 @@
 2005-09-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/compat.py (type_register): Indentation and
+	style fixes. Also, it works now.
+
 	* flumotion/component/feedcomponent09.py (FeedComponent): New
 	file, FeedComponent ported over from the 0.9 branch. Not
 	completely ported yet.

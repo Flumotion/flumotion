@@ -26,11 +26,8 @@ import gobject
 
 # We don't want to get the loud deprecation warnings from PyGtk for using
 # gobject.type_register() if we don't need it
-def type_register(type):
-  (major, minor, patch) = gobject.pygtk_version
-  if(major <= 2 and minor < 8):
-    gobject.type_register(type)
-  elif(not (hasattr(type, '__gtype_name__') or hasattr(type, '__gproperties__')
-         or hasattr(type, '__gsignals__'))):
-    gobject.type_register(type)
-
+def type_register(klass):
+    if gobject.pygtk_version < (2, 8):
+        gobject.type_register(klass)
+    elif not hasattr(klass, '__gtype__'):
+        gobject.type_register(klass)
