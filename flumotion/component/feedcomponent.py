@@ -51,29 +51,23 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         basecomponent.BaseComponentMedium.__init__(self, component)
 
-        self.comp.connect('feed-ready',
-            self._component_feed_ready_cb)
-        self.comp.connect('error', self._component_error_cb)
-        self.comp.connect('notify-feed-ports',
-            self._component_notify_feed_ports_cb)
+        def on_feed_ready(component):
+            self.callRemote('notifyFeedPorts', component.feed_ports)
+
+        def on_component_error(component, element_path, message):
+            self.callRemote('error', element_path, message)
+
+        def on_component_notify_feed_ports(component):
+            self.callRemote('notifyFeedPorts', component.feed_ports)
+
+        self.comp.connect('feed-ready', on_feed_ready)
+        self.comp.connect('error', on_component_error)
+        self.comp.connect('notify-feed-ports', on_component_notify_feed_ports)
         
         # override base Errback for callRemote to stop the pipeline
         #def callRemoteErrback(reason):
         #    self.warning('stopping pipeline because of %s' % reason)
         #    self.comp.pipeline_stop()
-
-    def _component_error_cb(self, component, element_path, message):
-        self.comp.setMood(moods.sad)
-        self.comp.state.set('message',
-            "GStreamer error in component %s (%s)" % (self.comp.name,
-            message))
-        self.callRemote('error', element_path, message)
-        
-    def _component_feed_ready_cb(self, component, feed_name, ready):
-        self.callRemote('feedReady', feed_name, ready)
-
-    def _component_notify_feed_ports_cb(self, component):
-        self.callRemote('notifyFeedPorts', component.feed_ports)
 
     ### Referenceable remote methods which can be called from manager
     def remote_getElementProperty(self, elementName, property):
@@ -302,6 +296,9 @@ class FeedComponent(basecomponent.BaseComponent):
         
     def _pipeline_error_cb(self, object, element, error, arg):
         self.debug('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
+        self.setMood(moods.sad)
+        self.state.set('message',
+            "GStreamer error in component %s (%s)" % (self.name, error.message))
         self.emit('error', element.get_path_string(), error.message)
         #self.restart()
      

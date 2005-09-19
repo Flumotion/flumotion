@@ -1,3 +1,12 @@
+2005-09-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.__init__): Inline the handlers listening to
+	signals from the component. Don't futz the component's mood or
+	state, assume that the component handles that.
+	(FeedComponent._pipeline_error_cb): Set mood to sad, add message
+	to component state.
+
 2005-09-16  Andy Wingo  <wingo@pobox.com>
 
 	* Changelog updated. Heh heh heh heh heh heh.
