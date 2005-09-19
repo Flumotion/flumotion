@@ -18,6 +18,8 @@
 
 # Headers in this file shall remain intact.
 
+import gst
+
 from flumotion.component import feedcomponent
 
 class Ogg(feedcomponent.ParseLaunchComponent):
@@ -34,7 +36,13 @@ def createComponent(config):
         maxDelay, maxPageDelay)
 
     for eater in config['source']:
-        pipeline += '{ @ eater:%s @ ! queue max-size-buffers=16 } ! muxer. ' % eater
+        if gst.gst_version < (0, 9):
+            pipeline += '{ @ eater:%s @ ! queue max-size-buffers=16 } ! muxer. '\
+                % eater
+        else:
+            pipeline += '@ eater:%s @ ! queue max-size-buffers=16 ! muxer. '\
+                % eater
+            
     pipeline += 'muxer.'
     
     component = Ogg(config['name'], config['source'], pipeline)

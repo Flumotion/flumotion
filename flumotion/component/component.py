@@ -271,21 +271,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.lastTime = time.time()
         self.lastClock = time.clock()
 
-    def updateMood(self):
-        """
-        Update the mood because a mood condition has changed.
-        Will not change the mood if it's sad - sad needs to be explicitly
-        fixed.
-
-        See the mood transition diagram.
-        """
-        mood = self.state.get('mood')
-        if mood == moods.sad.value:
-            return
-
-        # FIXME: probably could use a state where it's still starting ?
-        self.setMood(moods.happy)
-    
     def startHeartbeat(self):
         """
         Start sending heartbeats.

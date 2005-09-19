@@ -1,5 +1,28 @@
 2005-09-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent09.py (FeedComponent): Port to
+	GStreamer 0.9. Mostly copied over from the branch.
+
+	* flumotion/component/component.xml: Add the versioned
+	feedcomponent files.
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.link_setup.sink_state_change_cb): Only wait
+	for the state change in 0.8.
+
+	* flumotion/component/muxers/multipart.py (createComponent): 
+	* flumotion/component/muxers/ogg.py (createComponent): No {}
+	threads in 0.9.
+
+	* flumotion/component/component.py (BaseComponent.updateMood):
+	Removed, unnecessary as a base class method. Subclasses should
+	just use setMood, which can't change a component out of sad
+	anyway.
+
+	* flumotion/component/feedcomponent09.py (FeedComponent.__init__):
+	* flumotion/component/feedcomponent08.py (FeedComponent.__init__):
+	State has no 'eaterNames' key anymore.
+
 	* flumotion/common/compat.py (type_register): Indentation and
 	style fixes. Also, it works now.
 

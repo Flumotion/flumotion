@@ -67,7 +67,6 @@ class FeedComponent(basecomponent.BaseComponent):
         # add extra keys to state
         self.state.addKey('eaterNames')
         self.state.addKey('feederNames')
-        self.state.addKey('elementNames')
 
         self.feed_names = None # done by self.parse*
         self.feeder_names = None

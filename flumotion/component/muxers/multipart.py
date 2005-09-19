@@ -18,6 +18,8 @@
 
 # Headers in this file shall remain intact.
 
+import gst
+
 from flumotion.component import feedcomponent
 
 class Multipart(feedcomponent.ParseLaunchComponent):
@@ -30,7 +32,10 @@ class Multipart(feedcomponent.ParseLaunchComponent):
 def createComponent(config):
     pipeline = 'multipartmux name=muxer '
     for eater in config['source']:
-        pipeline += '{ @ eater:%s @ ! queue } ! muxer. ' % eater
+        if gst.gst_version < (0, 9):
+            pipeline += '{ @ eater:%s @ ! queue } ! muxer. ' % eater
+        else:
+            pipeline += '@ eater:%s @ ! queue ! muxer. ' % eater
     pipeline += 'muxer.'
     
     component = Multipart(config['name'], config['source'], pipeline)

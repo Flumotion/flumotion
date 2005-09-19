@@ -61,13 +61,13 @@ class FeedComponent(basecomponent.BaseComponent):
         self.feed_ports = {} # feed_name -> port mapping
         self.pipeline = None
         self.pipeline_signals = []
+        self.bus_watch_id = None
         self.files = []
         self.effects = {}
 
         # add extra keys to state
         self.state.addKey('eaterNames')
         self.state.addKey('feederNames')
-        self.state.addKey('elementNames')
 
         self.feed_names = None # done by self.parse*
         self.feeder_names = None
@@ -90,33 +90,6 @@ class FeedComponent(basecomponent.BaseComponent):
         # FIXME: maybe this should move to a callLater ?
         self.setup_pipeline()
         self.debug('__init__ finished')
-
-    def updateMood(self):
-        """
-        Update the mood because a mood condition has changed.
-        Will not change the mood if it's sad - sad needs to be explicitly
-        fixed.
-
-        See the mood transition diagram.
-        """
-        mood = self.state.get('mood')
-        self.debug('updateMood: currently in %r' % moods.get(mood).name)
-        if mood == moods.sad.value:
-            self.debug('updateMood: sad, not changing')
-            return
-
-        if self.eatersWaiting == 0 and self.feedersWaiting == 0:
-            self.debug('no eaters or feeders waiting, happy')
-            self.setMood(moods.happy)
-            return
-
-        if self.eatersWaiting == 0:
-            self.debug('%d feeders waiting, waking' % self.feedersWaiting)
-            self.setMood(moods.waking)
-        else:
-            self.debug('%d eaters waiting, hungry' % self.eatersWaiting)
-            self.setMood(moods.hungry)
-        return
 
     def addEffect(self, effect):
         self.effects[effect.name] = effect
@@ -179,66 +152,76 @@ class FeedComponent(basecomponent.BaseComponent):
         self.cleanup()
         self.setup_pipeline()
        
-    def set_state_and_iterate(self, state):
-        """
-        Set the given gst state and start iterating the pipeline if not done
-        yet.
-        """
-        retval = self.pipeline.set_state(state)
-        if not retval:
-            self.warning('Changing state to %s failed' %
-                    gst.element_state_get_name(state))
-        # the idle handler will go away as soon as iterate returns FALSE
-        gobject.idle_add(self.pipeline.iterate)
-
-        return retval
-
     def get_pipeline(self):
         return self.pipeline
 
     def create_pipeline(self):
         raise NotImplementedError, "subclass must implement create_pipeline"
         
-    def _pipeline_error_cb(self, object, element, error, arg):
-        self.debug('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
-        self.setMood(moods.sad)
-        self.state.set('message',
-            "GStreamer error in component %s (%s)" % (self.name, error.message))
-        self.emit('error', element.get_path_string(), error.message)
-        #self.restart()
-     
+    def bus_watch_handler(self, bus, message):
+        t = message.type
+        src = message.src
+
+        if t == gst.MESSAGE_STATE_CHANGED:
+            old, new = message.parse_state_changed()
+            self.log('state change: %r %s->%s'
+                     % (src, old.value_nick, new.value_nick))
+            if src == self.pipeline:
+                if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
+                    self.setMood(moods.happy)
+            elif src.get_name() in self.feeder_names:
+                if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
+                    self.debug('feeder %s is now feeding' % src.get_name())
+                    self.feedersWaiting -= 1
+                    self.debug('%d feeders waiting' % self.feedersWaiting)
+                    self.emit('feed-ready', src.get_name(), True)
+                    if self.feedersWaiting == 0:
+                        self.setMood(moods.happy)
+                # don't bother handling the playing->paused case,
+                # elements don't change their state any more...
+        elif t == gst.MESSAGE_ERROR:
+            err, debug = message.parse_error()
+            self.debug('element %s error %s %s' %
+                       (src.get_path_string(), err, debug))
+            self.setMood(moods.sad)
+            self.state.set('message',
+                "GStreamer error in component %s (%s)" % (self.name, message))
+            self.emit('error', src.get_path_string(), err.message)
+        elif t == gst.MESSAGE_EOS:
+            if src == self.pipeline:
+                self.info('End-of-stream in pipeline, stopping')
+                self.cleanup()
+        else:
+            self.log('message-received: %r' % message)
+            self.emit('message-received', message)
+
+        return True
+
     def setup_pipeline(self):
+        assert self.bus_watch_id == None
+
         self.pipeline.set_name('pipeline-' + self.getName())
-        sig_id = self.pipeline.connect('error', self._pipeline_error_cb)
-        self.pipeline_signals.append(sig_id)
-        
+        bus = self.pipeline.get_bus()
+        self.bus_watch_id = bus.add_watch(self.bus_watch_handler)
+
+        # Setting the play-timeout then calling watch_for_state_change
+        # ensures that we get messages on the bus regardless of the
+        # outcome of the set_state. It's the only way to handle all of
+        # the cases properly.
+        # FIXME: should investigate set_state_async
+        self.pipeline.set_property('play-timeout', 0L)
+
         sig_id = self.pipeline.connect('deep-notify',
                                        gstreamer.verbose_deep_notify_cb, self)
         self.pipeline_signals.append(sig_id)
-
-    def pipeline_pause(self):
-        self.set_state_and_iterate(gst.STATE_PAUSED)
-        
-    def pipeline_play(self):
-        """
-        Start playing the pipeline.
-
-        @returns: whether or not the pipeline was started successfully.
-        """
-        retval = self.set_state_and_iterate(gst.STATE_PLAYING)
-        if not retval:
-            self.setMood(moods.sad)
-            self.state.set('message',
-                "Component %s could not start" % self.name)
-            return False
-
-        return True
 
     def pipeline_stop(self):
         if not self.pipeline:
             return
         
-        retval = self.set_state_and_iterate(gst.STATE_NULL)
+        retval = self.pipeline.set_state(gst.STATE_NULL)
+        # FIXME: use set_state_async?
+        self.pipeline.watch_for_state_change()
         if not retval:
             self.warning('Setting pipeline to NULL failed')
 
@@ -273,62 +256,7 @@ class FeedComponent(basecomponent.BaseComponent):
             eater.set_property('host', host)
             eater.set_property('port', port)
             eater.set_property('protocol', 'gdp')
-            eater.connect('state-change', self.eater_state_change_cb)
 
-    def eater_state_change_cb(self, element, old, state):
-        """
-        Called when the eater element changes state.
-        """
-        # also called by subclasses
-        name = element.get_name()
-        self.debug('eater-state-changed: eater %s, element %s, state %s' % (
-            name,
-            element.get_path_string(),
-            gst.element_state_get_name(state)))
-
-        # update eatersWaiting count
-        if old == gst.STATE_PAUSED and state == gst.STATE_PLAYING:
-            self.debug('eater %s is now eating' % name)
-            self.eatersWaiting -= 1
-            self.updateMood()
-            if self._eaterReconnectDC[name]:
-                self._eaterReconnectDC[name].cancel()
-                self._eaterReconnectDC[name] = None
-                
-        if old == gst.STATE_PLAYING and state == gst.STATE_PAUSED:
-            self.debug('eater %s is now hungry' % name)
-            self.eatersWaiting += 1
-            self.state.set('message',
-                "Component %s is now hungry, starting reconnect" % self.name)
-            self.updateMood()
-            self._eaterReconnectDC[name] = reactor.callLater(
-                self._reconnectInterval, self._eaterReconnect, element)
-            
-        self.debug('%d eaters waiting' % self.eatersWaiting)
-
-    def _eaterReconnect(self, element):
-        name = element.get_name()
-        self.debug('Trying to reconnect eater %s' % name)
-        host = element.get_property('host')
-        port = element.get_property('port')
-        if common.checkRemotePort(host, port):
-            self.debug('%s:%d accepting connections, setting to PLAYING' % (
-                host, port))
-            self._eaterReconnectDC[name] = None
-            # currently, we need to make sure all other elements go to PLAYING
-            # as well, so we PAUSE then PLAY the complete pipeline
-            #element.set_state(gst.STATE_PLAYING)
-            self.debug('pausing and iterating')
-            self.pipeline_pause()
-            self.debug('playing and iterating')
-            self.pipeline_play()
-            self.debug('reconnected')
-        else:
-            self.debug('%s:%d not accepting connections, trying later' % (
-                host, port))
-            self._eaterReconnectDC[name] = reactor.callLater(
-                self._reconnectInterval, self._eaterReconnect, element)
-            
     # FIXME: vorbis.py calls this method, clean that up
     def _setup_feeders(self, feedersData):
         """
@@ -361,7 +289,6 @@ class FeedComponent(basecomponent.BaseComponent):
             assert feeder, 'No feeder element named %s in pipeline' % feed_name
             assert isinstance(feeder, gst.Element)
 
-            feeder.connect('state-change', self.feeder_state_change_cb, feed_name)
             feeder.set_property('host', host)
             feeder.set_property('port', port)
             feeder.set_property('protocol', 'gdp')
@@ -370,57 +297,25 @@ class FeedComponent(basecomponent.BaseComponent):
 
         return retval
 
-    # FIXME: need to make a separate callback to implement "mood" of component
-    #        This is used by file/file.py, so make sure to syncronize them
-    def feeder_state_change_cb(self, element, old, state, feed_name):
-        # also called by subclasses
-        self.debug('feed %s changed state: element %s, state %s' % (
-            feed_name, element.get_path_string(),
-            gst.element_state_get_name(state)))
-
-        # update feedersWaiting count
-        if old == gst.STATE_PAUSED and state == gst.STATE_PLAYING:
-            self.debug('feeder %s is now feeding' % element.get_name())
-            self.feedersWaiting -= 1
-            self.updateMood()
-            self.emit('feed-ready', feed_name, True)
-        if old == gst.STATE_PLAYING and state == gst.STATE_PAUSED:
-            self.debug('feeder %s is now waiting' % element.get_name())
-            self.feedersWaiting += 1
-            self.updateMood()
-            self.emit('feed-ready', feed_name, False)
-
-        self.debug('%d feeders waiting' % self.feedersWaiting)
-
     def cleanup(self):
         self.debug("cleaning up")
         
         assert self.pipeline != None
 
-        if self.pipeline.get_state() != gst.STATE_NULL:
-            self.debug('Pipeline was in state %s, changing to NULL' %
-                     gst.element_state_get_name(self.pipeline.get_state()))
-            self.pipeline.set_state(gst.STATE_NULL)
-                
+        self.pipeline_stop()
         # Disconnect signals
         map(self.pipeline.disconnect, self.pipeline_signals)
         self.pipeline = None
         self.pipeline_signals = []
-
-    def play(self):
-        self.debug('Playing')
-        self.pipeline_play()
+        gobject.source_remove(self.bus_watch_id)
+        self.bus_watch_id = None
 
     def stop(self):
         self.debug('Stopping')
-        self.pipeline_stop()
+        self.cleanup()
         self.debug('Stopped')
         basecomponent.BaseComponent.stop(self)
 
-    def pause(self):
-        self.debug('Pausing')
-        self.pipeline_pause()
-                
     # FIXME: rename, unambiguate and comment
     def link(self, eatersData, feedersData):
         """
@@ -433,10 +328,7 @@ class FeedComponent(basecomponent.BaseComponent):
         @returns: a list of (feedName, host, port) tuples for our feeders
         """
         # if we have eaters waiting, we start out hungry, else waking
-        if self.eatersWaiting:
-            self.setMood(moods.hungry)
-        else:
-            self.setMood(moods.waking)
+        self.setMood(moods.waking)
 
         self.debug('manager asks us to link')
         self.debug('setting up eaters')
@@ -452,8 +344,13 @@ class FeedComponent(basecomponent.BaseComponent):
             func(eatersData, feedersData)
             
         self.debug('setting pipeline to play')
-        self.pipeline_play()
-        # FIXME: fill feedPorts
+
+        #hack
+        self.pipeline.set_state(gst.STATE_READY)
+        self.pipeline.set_state(gst.STATE_PAUSED)
+        self.pipeline.set_state(gst.STATE_PLAYING)
+        self.pipeline.watch_for_state_change()
+
         self.debug('emitting feed port notify')
         self.emit('notify-feed-ports')
         self.debug('.link() returning %s' % retval)

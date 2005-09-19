@@ -339,13 +339,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     ### END OF THREAD-AWARE CODE
 
-    def _sink_state_change_cb(self, element, old, state):
-        # when our sink is PLAYING, then we are HAPPY
-        # FIXME: add more moods
-        if state == gst.STATE_PLAYING:
-            self.debug('Ready to serve clients')
-            self.setMood(moods.happy)
-
     def link_setup(self, eaters, feeders):
         sink = self.get_element('sink')
 
@@ -359,7 +352,17 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             
         # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self._notify_caps_cb)
-        sink.connect('state-change', self._sink_state_change_cb)
+
+        if gst.gst_version < (0, 9):
+            def sink_state_change_cb(element, old, state):
+                # when our sink is PLAYING, then we are HAPPY
+                # FIXME: add more moods
+                if state == gst.STATE_PLAYING:
+                    self.debug('Ready to serve clients')
+                    self.setMood(moods.happy)
+
+            sink.connect('state-change', sink_state_change_cb)
+
         # these are made threadsafe using idle_add in the handler
         sink.connect('client-removed', self._client_removed_cb)
         sink.connect('client-added', self._client_added_cb)
