@@ -1,5 +1,10 @@
 2005-09-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/jukebox/Makefile.am
+	(component_PYTHON):
+	* flumotion/component/encoders/Makefile.am (vorbis_PYTHON): Fix up
+	makefiles.
+
 	* flumotion/component/producers/jukebox/jukebox08.py: Moved here
 	from jukebox.py, so that it only gets checked for gstreamer 0.8.
 

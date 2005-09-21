@@ -45,6 +45,9 @@ vorbisdir = $(componentdir)/vorbis
 vorbis_PYTHON = \
 	vorbis/__init__.py \
 	vorbis/vorbis.py
+	vorbis/vorbisutils.py
+	vorbis/vorbis08.py
+	vorbis/vorbis09.py
 vorbis_DATA = \
 	vorbis/vorbis.xml
 
