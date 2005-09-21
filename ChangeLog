@@ -1,5 +1,11 @@
 2005-09-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/jukebox/jukebox08.py: Moved here
+	from jukebox.py, so that it only gets checked for gstreamer 0.8.
+
+	* flumotion/component/producers/jukebox/jukebox.xml: Updated to
+	use new entry point; hopefully works.
+
 	* flumotion/wizard/steps.py (Vorbis.worker_changed): Check the
 	right element.
 
