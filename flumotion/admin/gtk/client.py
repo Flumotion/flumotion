@@ -612,7 +612,7 @@ class Window(log.Loggable, gobject.GObject):
         self._trayicon.set_tooltip("Connection to %s failed" %
             self.admin.adminInfoStr())
         self.info(message)
-        d = dialogs.ErrorDialog(message, self)
+        d = dialogs.ErrorDialog(message, self.window)
         d.show_all()
         d.connect('response', self.close)
 

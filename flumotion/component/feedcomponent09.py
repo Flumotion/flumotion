@@ -158,7 +158,7 @@ class FeedComponent(basecomponent.BaseComponent):
     def create_pipeline(self):
         raise NotImplementedError, "subclass must implement create_pipeline"
         
-    def bus_watch_handler(self, bus, message):
+    def bus_watch_func(self, bus, message):
         t = message.type
         src = message.src
 
@@ -202,7 +202,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.pipeline.set_name('pipeline-' + self.getName())
         bus = self.pipeline.get_bus()
-        self.bus_watch_id = bus.add_watch(self.bus_watch_handler)
+        self.bus_watch_id = bus.add_watch(gst.MESSAGE_ANY, self.bus_watch_func)
 
         # Setting the play-timeout then calling watch_for_state_change
         # ensures that we get messages on the bus regardless of the

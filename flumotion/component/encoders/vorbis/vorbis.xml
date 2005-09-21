@@ -38,6 +38,9 @@
         <directories>
             <directory name="flumotion/component/encoders/vorbis">
                 <filename location="vorbis.py" />
+                <filename location="vorbisutils.py" />
+                <filename location="vorbis08.py" />
+                <filename location="vorbis09.py" />
             </directory>
         </directories>
     </bundle>

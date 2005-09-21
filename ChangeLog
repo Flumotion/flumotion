@@ -1,3 +1,32 @@
+2005-09-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/steps.py (Vorbis.worker_changed): Check the
+	right element.
+
+	* flumotion/admin/gtk/client.py
+	(Window.admin_connection_failed_later): Use correct parent
+	argument.
+
+	* flumotion/component/encoders/vorbis/vorbis.xml: Add files.
+
+	* flumotion/component/encoders/vorbis/vorbis09.py: New file,
+	simple and nonfunctional.
+
+	* flumotion/component/encoders/vorbis/vorbis.py: Selectively
+	import the 0.8 or 0.9 versions of the Vorbis class.
+
+	* tests/vorbis.py: New test case, not part of the test suite. But
+	fails nonetheless.
+
+	* flumotion/component/encoders/vorbis/vorbis08.py: The guts of the
+	0.8 vorbis encoder are here.
+
+	* flumotion/component/encoders/vorbis/vorbisutils.py
+	(get_max_sample_rate): Pulled out into its own file.
+
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.setup_pipeline): Fix for new bus API.
+
 2005-09-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/twisted/gtk2reactor.py:

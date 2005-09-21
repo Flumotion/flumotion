@@ -827,7 +827,10 @@ class Vorbis(AudioEncoder):
         self.radiobutton_quality.set_active(True)
         
     def worker_changed(self):
-        self.wizard.require_elements(self.worker, 'rawvorbisenc')
+        if gst.gst_version < (0, 9):
+            self.wizard.require_elements(self.worker, 'rawvorbisenc')
+        else:
+            self.wizard.require_elements(self.worker, 'vorbisenc')
         
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
