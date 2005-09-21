@@ -47,31 +47,19 @@ class Caps(unittest.TestCase):
 class FakeComponent:
     def debug(self, string): pass
 
+def run_it_a_little_while(p):
+    p.set_state(gst.STATE_PLAYING)
+    if gst.gst_version < (0, 9):
+        for i in range(10):
+            p.iterate()
+    else:
+        m = p.get_bus().poll(gst.MESSAGE_EOS, -1)
+    p.set_state(gst.STATE_NULL)
+
 class DeepNotify(unittest.TestCase):
     def testDeepNotify(self):
         component = FakeComponent()
         pipeline = gst.parse_launch('fakesrc num-buffers=3 ! fakesink')
         pipeline.connect('deep-notify', gstreamer.verbose_deep_notify_cb,
             component)
-
-        for i in range(10):
-            pipeline.iterate()
-
-class BinFindSink(unittest.TestCase):
-    def testBinFindSinkZero(self):
-        p = gst.parse_launch('identity ! identity')
-        self.assertEquals(gstreamer.bin_find_sinks(p), [])
-
-    def testBinFindSinkOne(self):
-        p = gst.parse_launch('fakesrc ! fakesink name=n')
-        l = gstreamer.bin_find_sinks(p)
-        self.assertEquals(len(l), 1)
-        self.assertEquals(l[0].get_name(), 'n')
-
-    def testBinFindSinkTwo(self):
-        p = gst.parse_launch('fakesrc ! fakesink name=n fakesrc ! fakesink name=n2')
-        l = gstreamer.bin_find_sinks(p)
-        self.assertEquals(len(l), 2)
-        self.assertEquals(l[0].get_name(), 'n')
-        self.assertEquals(l[1].get_name(), 'n2')
 
