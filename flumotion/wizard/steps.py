@@ -20,6 +20,7 @@
 
 import math
 
+import gst
 import gtk
         
 from gettext import gettext as _
