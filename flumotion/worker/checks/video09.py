@@ -87,9 +87,9 @@ def do_element_check(pipeline_str, element_name, check_proc):
                     run_check(pipeline, resolution)
         elif t == gst.MESSAGE_ERROR:
             err, debug = message.parse_error()
-            resolution.errback(errors.GstError(err.message, debug))
+            resolution.errback(errors.GStreamerError(err.message, debug))
         elif t == gst.MESSAGE_EOS:
-            resolution.errback(errors.GstError("Unexpected end of stream"))
+            resolution.errback(errors.GStreamerError("Unexpected end of stream"))
         else:
             print '%s: %s:' % (message.src.get_path_string(),
                                message.type.value_nicks[1])
@@ -104,7 +104,7 @@ def do_element_check(pipeline_str, element_name, check_proc):
     try:
         pipeline = gst.parse_launch(pipeline_str)
     except gobject.GError, e:
-        resolution.errback(errors.GstError(e.message))
+        resolution.errback(errors.GStreamerError(e.message))
         return resolution.d
 
     bus = pipeline.get_bus()
@@ -191,7 +191,7 @@ def check1394():
         pad = demux.get_pad('video')
 
         if pad.get_negotiated_caps() == None:
-            raise errors.GstError('Pipeline failed to negotiate?')
+            raise errors.GStreamerError('Pipeline failed to negotiate?')
 
         caps = pad.get_negotiated_caps()
         s = caps.get_structure(0)

@@ -84,7 +84,7 @@ def do_element_check(pipeline_str, element_name, check_proc,
 
     # if any error happens during the pipeline run, error out
     def error_cb(pipeline, element, error, _, resolution):
-        resolution.errback(errors.GstError(error.message))
+        resolution.errback(errors.GStreamerError(error.message))
 
     bin = gst.parse_launch(pipeline_str)
     resolution = fdefer.Resolution()

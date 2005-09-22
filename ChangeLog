@@ -1,5 +1,14 @@
 2005-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/worker/checks/video08.py:
+	* flumotion/worker/checks/video09.py:
+	  have GStreamerError be a generic, string-taking error,
+	  while GstError is an exception wrapper around gst.Error
+
+2005-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/twisted/defer.py:
 	* flumotion/worker/checks/video08.py:
 	* flumotion/worker/checks/video09.py:

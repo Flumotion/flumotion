@@ -191,7 +191,7 @@ class TVCard(VideoSource):
             self.combobox_tvnorm.set_sensitive(True)
             self.combobox_source.set_list(channels)
             self.combobox_source.set_sensitive(True)
-        except errors.GstError, e:
+        except errors.GStreamerError, e:
             self.error_msg('tvcard-error', 'GStreamer error: %s' % e)
         except errors.RemoteRunError, e:
             self.error_msg('tvcard-error', 'General error: %s' % e)
@@ -390,7 +390,7 @@ class Webcam(VideoSource):
             self.spinbutton_width.set_sensitive(True)
             self.spinbutton_height.set_sensitive(True)
             self.spinbutton_framerate.set_sensitive(True)
-        except errors.GstError, e:
+        except errors.GStreamerError, e:
             self.clear()
             self.error_msg('webcam-check', 'GStreamer error: %s' % e)
         except errors.RemoteRunError, e:
@@ -602,7 +602,7 @@ class Soundcard(WizardStep):
 
             self.combobox_input.set_list(tracks)
             self.combobox_input.set_sensitive(True)
-        except errors.GstError, e:
+        except errors.GStreamerError, e:
             self.clear_combos()
             self.error_msg('soundcard-check', 'GStreamer error: %s' % e)
         except errors.RemoteRunError, e:
