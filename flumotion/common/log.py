@@ -405,12 +405,14 @@ def getExceptionMessage(exception):
     (filename, line, func, text) = stack[-1]
     filename = scrubFilename(filename)
     exc = exception.__class__.__name__
-    return "Exception %(exc)s at %(filename)s:%(line)s: %(func)s()" % locals()
+    return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()" % locals()
 
 def getFailureMessage(failure):
-    (func, filename, line, some, other) = failure.frames[-1]
-    filename = scrubFilename(filename)
-    fai = failure.__class__.__name__
     exc = str(failure.type)
     msg = failure.getErrorMessage()
-    return "Failure %(fai)s of Exception %(exc)s at %(filename)s:%(line)s: %(func)s(): %(msg)s" % locals()
+    if len(failure.frames) == 0:
+        return "failure %(exc)s: %(msg)s" % locals()
+
+    (func, filename, line, some, other) = failure.frames[-1]
+    filename = scrubFilename(filename)
+    return "failure %(exc)s at %(filename)s:%(line)s: %(func)s(): %(msg)s" % locals()

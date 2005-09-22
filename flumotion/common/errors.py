@@ -119,6 +119,9 @@ class NoBundleError(pb.Error):
 class GstError(pb.Error):
     "Generic GStreamer error"
 
+class StateChangeError(GstError):
+    "The state change failed"
+
 class UnknownDeviceError(pb.Error):
     "The device does not exist"
 

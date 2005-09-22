@@ -1,3 +1,10 @@
+2005-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/errors.py:
+	  add a state change gst error
+	* flumotion/common/log.py:
+	  log warnings that don't have a traceback
+
 2005-09-22  Andy Wingo  <wingo@pobox.com>
 
 	* tests/vorbis.py (buffer_probe): Use the right format, poll for
