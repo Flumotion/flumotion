@@ -1,4 +1,19 @@
+2005-09-22  Andy Wingo  <wingo@pobox.com>
+
+	* tests/vorbis.py (buffer_probe): Use the right format, poll for
+	the right thingy. Vorbis encoding works!
+
+	* flumotion/component/encoders/vorbis/vorbis09.py
+	(Vorbis.__init__.buffer_probe): Use the right format.
+
 2005-09-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_common_gstreamer.py (DeepNotify): Fix up for
+	0.9.
+	
+	* flumotion/test/test_common_gstreamer.py (BinFindSink) 
+	* flumotion/common/gstreamer.py (bin_find_sinks): Removed, it
+	wasn't used, and also isn't yet supported in 0.9.
 
 	* flumotion/component/producers/jukebox/Makefile.am
 	(component_PYTHON):

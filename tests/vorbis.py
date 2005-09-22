@@ -42,7 +42,7 @@ def buffer_probe(pad, buffer, cf):
 
     print 'hey'
 
-    caps_str = 'audio/x-raw-int, rate=%d' % in_rate
+    caps_str = 'audio/x-raw-float, rate=%d' % in_rate
     cf.set_property('filter-caps',
                     gst.caps_from_string(caps_str))
     pad.remove_buffer_probe(handle)
@@ -70,4 +70,4 @@ if __name__ == '__main__':
 
     p.set_state(gst.STATE_PLAYING)
     
-    p.get_bus().poll(gst.MESSAGE_ANY, -1)
+    p.get_bus().poll(gst.MESSAGE_EOS, -1)
