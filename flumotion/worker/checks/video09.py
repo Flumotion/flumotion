@@ -28,26 +28,14 @@ import gst.interfaces
 from twisted.internet import defer, reactor
 
 from flumotion.common import gstreamer, errors, log
+from flumotion.twisted import defer as fdefer
     
 def _(str):
     return str
 
-class Resolution:
-    """
-    I am a helper class to make sure that the deferred is fired only once
-    with either a result or exception.
-
-    @ivar d: the deferred that gets fired as part of the resolution
-    @type d: L{twisted.internet.defer.Deferred}
-    """
-    def __init__(self):
-        self.d = defer.Deferred()
-        # have to have a returned field here because we can return
-        # either from the error signal or from the state changed signal,
-        # and we have to make sure we return only once.
-        self.returned = False
-        self.watch_id = None
-        self.pipeline = None
+class BusResolution(fdefer.Resolution):
+    pipeline = None
+    watch_id = None
 
     def cleanup(self):
         if self.watch_id:
@@ -57,26 +45,6 @@ class Resolution:
             self.pipeline.set_state(gst.STATE_NULL)
             self.pipeline = None
 
-    def callback(self, result):
-        """
-        Make the result succeed, calling the callbacks with the given result.
-        If a result was already reached, do nothing.
-        """
-        if not self.returned:
-            self.returned = True
-            self.cleanup()
-            self.d.callback(result)
-    
-    def errback(self, exception):
-        """
-        Make the result fail, calling the errbacks with the given exception.
-        If a result was already reached, do nothing.
-        """
-        if not self.returned:
-            self.returned = True
-            self.cleanup()
-            self.d.errback(exception)
-    
 class CheckProcError(Exception):
     'Utility error for element checker procedures'
     data = None
@@ -131,7 +99,7 @@ def do_element_check(pipeline_str, element_name, check_proc):
                 print '    (no structure)'
         return True
 
-    resolution = Resolution()
+    resolution = BusResolution()
 
     try:
         pipeline = gst.parse_launch(pipeline_str)

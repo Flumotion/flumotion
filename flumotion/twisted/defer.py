@@ -72,3 +72,42 @@ def defer_generator(proc):
 def defer_generator_method(proc):
     return lambda self, *args, **kwargs: \
         defer_generator(proc)(self, *args, **kwargs)
+
+class Resolution:
+    """
+    I am a helper class to make sure that the deferred is fired only once
+    with either a result or exception.
+
+    @ivar d: the deferred that gets fired as part of the resolution
+    @type d: L{twisted.internet.defer.Deferred}
+    """
+    def __init__(self):
+        self.d = defer.Deferred()
+        self.fired = False
+
+    def cleanup(self):
+        """
+        Clean up any resources related to the resolution.
+        Subclasses can implement me.
+        """
+        pass
+        
+    def callback(self, result):
+        """
+        Make the result succeed, triggering the callbacks with the given result.
+        If a result was already reached, do nothing.
+        """
+        if not self.fired:
+            self.fired = True
+            self.cleanup()
+            self.d.callback(result)
+    
+    def errback(self, exception):
+        """
+        Make the result fail, triggering the errbacks with the given exception.
+        If a result was already reached, do nothing.
+        """
+        if not self.fired:
+            self.fired = True
+            self.cleanup()
+            self.d.errback(exception)

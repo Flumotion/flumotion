@@ -1,5 +1,13 @@
 2005-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/defer.py:
+	* flumotion/worker/checks/video08.py:
+	* flumotion/worker/checks/video09.py:
+	  factor out a Resolution class and use it in the
+	  checks
+
+2005-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	  add a state change gst error
 	* flumotion/common/log.py:

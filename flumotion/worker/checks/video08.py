@@ -25,46 +25,14 @@ import os
 import gst
 import gst.interfaces
 
-from twisted.internet import defer, reactor
+from twisted.internet import reactor, defer
 
 from flumotion.common import gstreamer, errors, log
+from flumotion.twisted import defer as fdefer
     
 def _(str):
     return str
 
-class Resolution:
-    """
-    I am a helper class to make sure that the deferred is fired only once
-    with either a result or exception.
-
-    @ivar d: the deferred that gets fired as part of the resolution
-    @type d: L{twisted.internet.defer.Deferred}
-    """
-    def __init__(self):
-        self.d = defer.Deferred()
-        # have to have a returned field here because we can return
-        # either from the error signal or from the state changed signal,
-        # and we have to make sure we return only once.
-        self.returned = False
-
-    def callback(self, result):
-        """
-        Make the result succeed, calling the callbacks with the given result.
-        If a result was already reached, do nothing.
-        """
-        if not self.returned:
-            self.returned = True
-            self.d.callback(result)
-    
-    def errback(self, exception):
-        """
-        Make the result fail, calling the errbacks with the given exception.
-        If a result was already reached, do nothing.
-        """
-        if not self.returned:
-            self.returned = True
-            self.d.errback(exception)
-    
 class CheckProcError(Exception):
     'Utility error for element checker procedures'
     data = None
@@ -119,7 +87,7 @@ def do_element_check(pipeline_str, element_name, check_proc,
         resolution.errback(errors.GstError(error.message))
 
     bin = gst.parse_launch(pipeline_str)
-    resolution = Resolution()
+    resolution = fdefer.Resolution()
     bin.connect('state-change', state_changed_cb, resolution)
     bin.connect('error', error_cb, resolution)
     bin.set_state(state)
@@ -236,7 +204,7 @@ def check1394():
         
     def do_check(element):
         bin = element.get_parent()
-        resolution = Resolution()
+        resolution = fdefer.Resolution()
         reactor.callLater(0, iterate, bin, resolution)
         return resolution.d
 
