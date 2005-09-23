@@ -47,5 +47,19 @@
             </directory>
         </directories>
       </bundle>
+
+    <bundle name="soundcard-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="soundcard-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/soundcard">
+                <filename location="soundcard.py" />
+            </directory>
+        </directories>
+    </bundle>
+
     </bundles>
 </registry> 

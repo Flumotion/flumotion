@@ -1,3 +1,10 @@
+2005-09-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	  bundle up soundcard component
+	* flumotion/ui/fgtk.py:
+	  remove a bunch of code by using a table and loop
+
 2005-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/errors.py:
