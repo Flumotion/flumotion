@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-09-16 15:15+0200\n"
+"POT-Creation-Date: 2005-09-27 12:25+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -245,33 +245,33 @@ msgstr "Willekeurig (televisiesneeuw)"
 msgid "Totally black"
 msgstr "Volledig zwart"
 
-#: flumotion/wizard/steps.py:70
+#: flumotion/wizard/steps.py:71
 msgid "If you want to stream video"
 msgstr "Als je video wil streamen"
 
-#: flumotion/wizard/steps.py:72
+#: flumotion/wizard/steps.py:73
 msgid "If you want to stream audio"
 msgstr "Als je audio wil streamen"
 
-#: flumotion/wizard/steps.py:253
+#: flumotion/wizard/steps.py:254
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d pixelaspectverhouding)"
 
-#: flumotion/wizard/steps.py:303
+#: flumotion/wizard/steps.py:304
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d pixelaspectverhouding"
 
-#: flumotion/wizard/steps.py:322
+#: flumotion/wizard/steps.py:323
 msgid "Checking for Firewire device..."
 msgstr "Bezig met detecteren Vuurdraadapparaat..."
 
-#: flumotion/wizard/steps.py:341
+#: flumotion/wizard/steps.py:342
 msgid "No Firewire device detected."
 msgstr "Geen Vuurdraadapparaat gedetecteerd."
 
-#: flumotion/wizard/steps.py:456
+#: flumotion/wizard/steps.py:457
 #, fuzzy
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
@@ -283,7 +283,7 @@ msgstr ""
 "Gelieve te overwegen om deze te vernieuwen als uw video een\n"
 "diagonale lijn in het beeld bevat."
 
-#: flumotion/wizard/steps.py:466
+#: flumotion/wizard/steps.py:467
 msgid "Could not check ffmpegcolorspace features."
 msgstr "Kon ffmpegcolorspace-eigenschappen niet controleren."
 

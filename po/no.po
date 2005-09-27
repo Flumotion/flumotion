@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-09-16 15:15+0200\n"
+"POT-Creation-Date: 2005-09-27 12:25+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -247,40 +247,40 @@ msgstr ""
 msgid "Totally black"
 msgstr ""
 
-#: flumotion/wizard/steps.py:70
+#: flumotion/wizard/steps.py:71
 msgid "If you want to stream video"
 msgstr ""
 
-#: flumotion/wizard/steps.py:72
+#: flumotion/wizard/steps.py:73
 msgid "If you want to stream audio"
 msgstr ""
 
-#: flumotion/wizard/steps.py:253
+#: flumotion/wizard/steps.py:254
 #, fuzzy, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "PAL, 4:3 (59/54 pixelaspectverhouding)"
 
-#: flumotion/wizard/steps.py:303
+#: flumotion/wizard/steps.py:304
 #, fuzzy, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "PAL, 4:3 (59/54 pixelaspectverhouding)"
 
-#: flumotion/wizard/steps.py:322
+#: flumotion/wizard/steps.py:323
 msgid "Checking for Firewire device..."
 msgstr ""
 
-#: flumotion/wizard/steps.py:341
+#: flumotion/wizard/steps.py:342
 msgid "No Firewire device detected."
 msgstr ""
 
-#: flumotion/wizard/steps.py:456
+#: flumotion/wizard/steps.py:457
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
 "diagonal line in the image."
 msgstr ""
 
-#: flumotion/wizard/steps.py:466
+#: flumotion/wizard/steps.py:467
 msgid "Could not check ffmpegcolorspace features."
 msgstr ""
 
