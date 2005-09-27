@@ -51,17 +51,23 @@ def createComponent(config):
     # FIXME: why do we not connect to state_changed_cb so correct
     # soundcard input is used?
     
+    if gst.gst_version < (0,9):
+        message = 'signal'
+    else:
+        message = 'message'
+
     # FIXME: we should find a way to figure out what the card supports,
     # so we can add in correct elements on the fly
     # just adding audioscale and audioconvert always makes the soundcard
     # open in 1000 Hz, mono
     caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d,width=%d,signed=(boolean)TRUE,endianness=1234' % (rate, depth, channels, depth)
-    pipeline = '%s device=%s ! %s ! level name=volumelevel signal=true' % (element, device, caps)
+    pipeline = '%s device=%s ! %s ! level name=volumelevel %s=true' % (element, device, caps, message)
     component = SoundcardProducer(config['name'], config['feed'],  pipeline)
 
     # add volume effect
-    comp_level = component.get_pipeline().get_by_name('volumelevel')
-    vol = volume.Volume('inputVolume', comp_level)
-    component.addEffect(vol)
+    if gst.gst_version < (0,9):
+        comp_level = component.get_pipeline().get_by_name('volumelevel')
+        vol = volume.Volume('inputVolume', comp_level)
+        component.addEffect(vol)
 
     return component

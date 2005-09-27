@@ -108,7 +108,7 @@ def do_element_check(pipeline_str, element_name, check_proc):
         return resolution.d
 
     bus = pipeline.get_bus()
-    watch_id = bus.add_watch(message_rcvd, pipeline, resolution)
+    watch_id = bus.add_watch(gst.MESSAGE_ANY, message_rcvd, pipeline, resolution)
 
     resolution.watch_id = watch_id
     resolution.pipeline = pipeline

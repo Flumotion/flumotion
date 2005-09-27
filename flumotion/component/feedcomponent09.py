@@ -36,7 +36,7 @@ class FeedComponent(basecomponent.BaseComponent):
     """
     # keep these as class variables for the tests
     EATER_TMPL = 'tcpclientsrc name=%(name)s'
-    FEEDER_TMPL = 'tcpserversink name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
+    FEEDER_TMPL = 'tcpserversink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
 
     logCategory = 'feedcomponent'
 

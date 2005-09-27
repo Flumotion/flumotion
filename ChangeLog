@@ -1,3 +1,20 @@
+2005-09-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/checks/video09.py (do_element_check): Update
+	for api changes.
+
+	* flumotion/component/producers/soundcard/soundcard.py
+	(createComponent): Beginnings of 0.9 compat..
+
+	* flumotion/component/producers/soundcard/soundcard.xml: Cleanups.
+
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.FEEDER_TMPL): tcpserversink sync=false, because the
+	sources already sync to clocks.
+
+	* flumotion/component/producers/audiotest/audiotest.py
+	(createComponent): s/sync/is-live/.
+
 2005-09-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/ui/fgtk.py:

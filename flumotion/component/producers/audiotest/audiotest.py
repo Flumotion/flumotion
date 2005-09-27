@@ -32,7 +32,7 @@ def createComponent(config):
     volume = config.get('volume', 1.0)
 
     component = AudioTest(config['name'],
-        'sinesrc name=source sync=1 ! audio/x-raw-int,rate=%d ! volume volume=%f' % (rate, volume))
+        'sinesrc name=source is-live=true ! audio/x-raw-int,rate=%d ! volume volume=%f' % (rate, volume))
     element = component.get_element('source')
     if config.has_key('freq'):
         element.set_property('freq', config['freq'])

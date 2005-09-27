@@ -17,11 +17,11 @@
         <property name="channels" type="int"/>
         <property name="depth" type="int"/>
         <property name="rate" type="int"/>
-     </properties>
+      </properties>
     </component>
- </components>
+  </components>
 
- <bundles>
+  <bundles>
     <bundle name="soundcard-base">
         <dependencies>
             <dependency name="component-base" />
@@ -46,9 +46,9 @@
                 <filename location="admin_gtk.py"/>
             </directory>
         </directories>
-      </bundle>
+     </bundle>
 
-    <bundle name="soundcard-component">
+     <bundle name="soundcard-component">
         <dependencies>
             <dependency name="component" />
             <dependency name="soundcard-base" />
@@ -59,7 +59,6 @@
                 <filename location="soundcard.py" />
             </directory>
         </directories>
-    </bundle>
-
-    </bundles>
+     </bundle>
+  </bundles>
 </registry> 
