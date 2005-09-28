@@ -1,3 +1,9 @@
+2005-09-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/audiotest/audiotest.py: 
+	* flumotion/component/producers/videotest/videotest.py
+	(createComponent): Add is-live to the pipeline when using gst 0.9.
+
 2005-09-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/encoders/Makefile.am:

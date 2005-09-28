@@ -18,6 +18,7 @@
 
 # Headers in this file shall remain intact.
 
+import gst
 from flumotion.component import feedcomponent
 
 class AudioTest(feedcomponent.ParseLaunchComponent):
@@ -31,8 +32,14 @@ def createComponent(config):
     rate = config.get('rate', 8000)
     volume = config.get('volume', 1.0)
 
+    if gst.gst_version < (0,9):
+        is_live = ''
+    else:
+        is_live = 'is-live=true'
+
     component = AudioTest(config['name'],
-        'sinesrc name=source is-live=true ! audio/x-raw-int,rate=%d ! volume volume=%f' % (rate, volume))
+        'sinesrc name=source %s ! audio/x-raw-int,rate=%d ! volume volume=%f'
+        % (is_live, rate, volume))
     element = component.get_element('source')
     if config.has_key('freq'):
         element.set_property('freq', config['freq'])

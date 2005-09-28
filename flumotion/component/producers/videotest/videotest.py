@@ -65,8 +65,13 @@ def createComponent(config):
         struct['red_mask'] = 0xff00
     caps = gst.Caps(struct)
     
+    if gst.gst_version < (0,9):
+        is_live = ''
+    else:
+        is_live = 'is-live=true'
+
     component = VideoTest(config['name'],
-                          'videotestsrc name=source ! %s' % caps)
+                          'videotestsrc %s name=source ! %s' % (is_live, caps))
 
     # Set properties
     source = component.get_element('source')
