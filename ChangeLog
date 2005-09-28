@@ -1,3 +1,12 @@
+2005-09-28  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	  Treat ConnectionFailed differently depending on whether we've ever
+	  been connected before. This allows us sensible behaviour when
+	  initially logging in, but restores auto-reconnect behaviour that I
+	  broke.
+
 2005-09-28  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/producers/audiotest/audiotest.py: 

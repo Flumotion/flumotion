@@ -61,6 +61,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         self.medium = medium
         self.maxDelay = 20
 
+        self.hasBeenConnected = 0
+
         # FIXME: try more than one auth method
         #keycard = keycards.KeycardUACPP(user, passwd, 'localhost')
         keycard = keycards.KeycardUACPCC(user, 'localhost')
@@ -69,6 +71,11 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
         # start logging in
         self.startLogin(keycard, medium, interfaces.IAdminMedium)
+
+    def clientConnectionMade(self, broker):
+      self.hasBeenConnected = 1
+
+      fpb.ReconnectingFPBClientFactory.clientConnectionMade(self, broker)
 
     def clientConnectionFailed(self, connector, reason):
         """
@@ -79,12 +86,18 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             self.medium.connectionFailed(reason)
             return
         elif reason.check(error.ConnectionRefusedError):
+            # If we're logging in for the first time, we want to make this a
+            # real error; we present a dialog, etc. 
+            # However, if we fail later on (e.g. manager shut down, and 
+            # hasn't yet been restarted), we want to keep trying to reconnect,
+            # so we just log a message.
             self.debug("Connection refused error")
-            self.medium.connectionFailed(reason)
-            return
+            if not self.hasBeenConnected:
+                self.medium.connectionFailed(reason)
+                return
 
-        fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self, connector,
-            reason)
+        fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self, 
+            connector, reason)
 
     # vmethod implementation
     def gotDeferredLogin(self, d):
