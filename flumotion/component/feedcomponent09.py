@@ -192,8 +192,7 @@ class FeedComponent(basecomponent.BaseComponent):
                 self.info('End-of-stream in pipeline, stopping')
                 self.cleanup()
         else:
-            self.log('message-received: %r' % message)
-            self.emit('message-received', message)
+            self.log('message received: %r' % message)
 
         return True
 
@@ -202,7 +201,8 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.pipeline.set_name('pipeline-' + self.getName())
         bus = self.pipeline.get_bus()
-        self.bus_watch_id = bus.add_watch(gst.MESSAGE_ANY, self.bus_watch_func)
+        bus.add_signal_watch()
+        self.bus_watch_id = bus.connect('message', self.bus_watch_func)
 
         # Setting the play-timeout then calling watch_for_state_change
         # ensures that we get messages on the bus regardless of the
@@ -305,9 +305,10 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline_stop()
         # Disconnect signals
         map(self.pipeline.disconnect, self.pipeline_signals)
+        self.pipeline.get_bus().disconnect(self.bus_watch_id)
+        self.pipeline.get_bus().remove_signal_watch()
         self.pipeline = None
         self.pipeline_signals = []
-        gobject.source_remove(self.bus_watch_id)
         self.bus_watch_id = None
 
     def stop(self):

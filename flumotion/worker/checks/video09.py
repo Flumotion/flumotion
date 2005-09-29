@@ -38,10 +38,11 @@ class BusResolution(fdefer.Resolution):
     watch_id = None
 
     def cleanup(self):
-        if self.watch_id:
-            gobject.source_remove(self.watch_id)
-            self.watch_id = None
         if self.pipeline:
+            if self.watch_id:
+                self.pipeline.get_bus().remove_signal_watch()
+                self.pipeline.get_bus().disconnect(self.watch_id)
+                self.watch_id = None
             self.pipeline.set_state(gst.STATE_NULL)
             self.pipeline = None
 
@@ -108,7 +109,8 @@ def do_element_check(pipeline_str, element_name, check_proc):
         return resolution.d
 
     bus = pipeline.get_bus()
-    watch_id = bus.add_watch(gst.MESSAGE_ANY, message_rcvd, pipeline, resolution)
+    bus.add_signal_watch()
+    watch_id = bus.connect('message', message_rcvd, pipeline, resolution)
 
     resolution.watch_id = watch_id
     resolution.pipeline = pipeline

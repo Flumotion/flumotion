@@ -1,3 +1,16 @@
+2005-09-29  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/checks/video09.py (BusResolution.cleanup) 
+	(do_element_check): Updates for bus API.
+
+	* flumotion/component/producers/soundcard/soundcard.py
+	(createComponent): Less needless fixation for the 0.9 code.
+
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.setup_pipeline, FeedComponent.cleanup): Updates for
+	bus API.
+	(FeedComponent.bus_watch_func): Don't emit nonexistent signal.
+
 2005-09-28  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/admin/admin.py:
