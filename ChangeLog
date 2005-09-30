@@ -1,3 +1,9 @@
+2005-09-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent.py:
+	  fix on_feed_ready prototype that probably got broken during
+	  the 08/09 merge.  weird.
+
 2005-09-29  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/checks/video09.py (BusResolution.cleanup) 
