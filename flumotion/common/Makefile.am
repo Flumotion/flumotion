@@ -2,6 +2,8 @@ include $(top_srcdir)/common/python.mk
                                                                                 
 flumotiondir = $(libdir)/flumotion/python/flumotion/common
 
+BUILT_SOURCES = boot.py
+
 nodist_flumotion_PYTHON = \
 	boot.py
 

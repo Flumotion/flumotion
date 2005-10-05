@@ -1,3 +1,8 @@
+2005-10-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/Makefile.am:
+	  make sure boot.py gets built
+
 2005-09-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent.py:
