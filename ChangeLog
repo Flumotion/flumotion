@@ -1,8 +1,16 @@
+<<<<<<< .mine
+2005-10-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/encoders/vorbis/vorbis09.py
+	(Vorbis.__init__.buffer_probe): s/filter-caps/caps/.
+
+=======
 2005-10-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/Makefile.am:
 	  make sure boot.py gets built
 
+>>>>>>> .r2374
 2005-09-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent.py:

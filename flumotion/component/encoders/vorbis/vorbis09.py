@@ -66,7 +66,7 @@ class Vorbis(feedcomponent.ParseLaunchComponent):
                     rate = maxsamplerate
 
             caps_str = 'audio/x-raw-float, rate=%d' % rate
-            cf.set_property('filter-caps',
+            cf.set_property('caps',
                             gst.caps_from_string(caps_str))
             pad.remove_buffer_probe(handle)
             return True
