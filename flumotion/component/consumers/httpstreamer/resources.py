@@ -227,10 +227,11 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         maximum number of allowed clients based on soft limit for number of
         open file descriptors and fd reservation
         """
-        if self.maxclients != -1:
+        limit = resource.getrlimit(resource.RLIMIT_NOFILE)
+        if self.maxclients != -1 and 
+                limit[0] >= self.maxclients - self.__reserve_fds__:
             return self.maxclients
         else:
-            limit = resource.getrlimit(resource.RLIMIT_NOFILE)
             return limit[0] - self.__reserve_fds__
 
     def reachedMaxClients(self):
