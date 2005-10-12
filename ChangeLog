@@ -1,3 +1,18 @@
+2005-10-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/firewire/firewire.py
+	(createComponent): Don't add volume for now. This is a fixme.
+
+	* flumotion/component/producers/firewire/firewire.xml: Add bundle
+	for firewire component.
+
+	* flumotion/component/consumers/httpstreamer/resources.py
+	(HTTPStreamingResource.maxAllowedClients): Fix syntax error.
+
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.pipeline_stop, FeedComponent.link): State API
+	updates.
+
 2005-10-07  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

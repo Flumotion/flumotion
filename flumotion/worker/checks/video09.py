@@ -83,7 +83,7 @@ def do_element_check(pipeline_str, element_name, check_proc):
         t = message.type
         if t == gst.MESSAGE_STATE_CHANGED:
             if message.src == pipeline:
-                old, new = message.parse_state_changed()
+                old, new, pending = message.parse_state_changed()
                 if new == gst.STATE_PLAYING:
                     run_check(pipeline, resolution)
         elif t == gst.MESSAGE_ERROR:
@@ -115,12 +115,7 @@ def do_element_check(pipeline_str, element_name, check_proc):
     resolution.watch_id = watch_id
     resolution.pipeline = pipeline
     
-    # Setting the play-timeout calling watch_for_state_change ensures
-    # that we get messages on the bus regardless of the outcome of the
-    # set_state. It's the only way to handle all of the cases properly.
-    pipeline.set_property('play-timeout', 0L)
     pipeline.set_state(gst.STATE_PLAYING)
-    pipeline.watch_for_state_change()
 
     return resolution.d
 

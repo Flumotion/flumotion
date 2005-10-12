@@ -163,7 +163,7 @@ class FeedComponent(basecomponent.BaseComponent):
         src = message.src
 
         if t == gst.MESSAGE_STATE_CHANGED:
-            old, new = message.parse_state_changed()
+            old, new, pending = message.parse_state_changed()
             self.log('state change: %r %s->%s'
                      % (src, old.value_nick, new.value_nick))
             if src == self.pipeline:
@@ -204,13 +204,6 @@ class FeedComponent(basecomponent.BaseComponent):
         bus.add_signal_watch()
         self.bus_watch_id = bus.connect('message', self.bus_watch_func)
 
-        # Setting the play-timeout then calling watch_for_state_change
-        # ensures that we get messages on the bus regardless of the
-        # outcome of the set_state. It's the only way to handle all of
-        # the cases properly.
-        # FIXME: should investigate set_state_async
-        self.pipeline.set_property('play-timeout', 0L)
-
         sig_id = self.pipeline.connect('deep-notify',
                                        gstreamer.verbose_deep_notify_cb, self)
         self.pipeline_signals.append(sig_id)
@@ -220,9 +213,7 @@ class FeedComponent(basecomponent.BaseComponent):
             return
         
         retval = self.pipeline.set_state(gst.STATE_NULL)
-        # FIXME: use set_state_async?
-        self.pipeline.watch_for_state_change()
-        if not retval:
+        if retval != GST_STATE_SUCCESS:
             self.warning('Setting pipeline to NULL failed')
 
     def set_feed_ports(self, feed_ports):
@@ -347,11 +338,7 @@ class FeedComponent(basecomponent.BaseComponent):
             
         self.debug('setting pipeline to play')
 
-        #hack
-        self.pipeline.set_state(gst.STATE_READY)
-        self.pipeline.set_state(gst.STATE_PAUSED)
         self.pipeline.set_state(gst.STATE_PLAYING)
-        self.pipeline.watch_for_state_change()
 
         self.debug('emitting feed port notify')
         self.emit('notify-feed-ports')

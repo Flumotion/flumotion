@@ -20,7 +20,7 @@
 
 from flumotion.common import errors
 from flumotion.component import feedcomponent
-from flumotion.component.effects.volume import volume
+#from flumotion.component.effects.volume import volume
 
 class Firewire(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, pipeline):
@@ -104,9 +104,9 @@ def createComponent(config):
     component = Firewire(config['name'], template)
     
     # add volume effect
-    comp_level = component.get_pipeline().get_by_name('volumelevel')
-    vol = volume.Volume('inputVolume', comp_level)
-    component.addEffect(vol)
+    #comp_level = component.get_pipeline().get_by_name('volumelevel')
+    #vol = volume.Volume('inputVolume', comp_level)
+    #component.addEffect(vol)
 
 
     return component
