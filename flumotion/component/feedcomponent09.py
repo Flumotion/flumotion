@@ -213,7 +213,7 @@ class FeedComponent(basecomponent.BaseComponent):
             return
         
         retval = self.pipeline.set_state(gst.STATE_NULL)
-        if retval != GST_STATE_SUCCESS:
+        if retval != gst.STATE_SUCCESS:
             self.warning('Setting pipeline to NULL failed')
 
     def set_feed_ports(self, feed_ports):

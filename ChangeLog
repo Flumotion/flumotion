@@ -1,5 +1,8 @@
 2005-10-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.pipeline_stop): Whoops, fix C thinko.
+
 	* flumotion/component/producers/firewire/firewire.py
 	(createComponent): Don't add volume for now. This is a fixme.
 
