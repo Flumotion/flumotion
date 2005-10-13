@@ -344,11 +344,13 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         # check how to set client sync mode
         if gstreamer.element_factory_has_property('multifdsink', 'sync-method'):
-            # FIXME: add config option for burst-on-connect
-            sink.set_property('sync-method', 2)
+            if self.burst_on_connect:
+                sink.set_property('sync-method', 2)
+            else:
+                sink.set_property('sync-method', 0)
         else:
             # old property; does sync-to-keyframe
-            sink.set_property('sync-clients', True)
+            sink.set_property('sync-clients', self.burst_on_connect)
             
         # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self._notify_caps_cb)
@@ -408,6 +410,8 @@ def createComponent(config):
             raise errors.ConfigError(
                 'could not open log file %s for writing (%s)' % (
                     file, data[1]))
+
+    component.burst_on_connect = config.get('burst_on_connect', False)
 
     if config.has_key('user_limit'):
         component.resource.setUserLimit(int(config['user_limit']))

@@ -228,11 +228,11 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         open file descriptors and fd reservation
         """
         limit = resource.getrlimit(resource.RLIMIT_NOFILE)
-        if (self.maxclients != -1 and 
-                limit[0] >= self.maxclients - self.__reserve_fds__):
+        fd_limit = limit[0] - self.__reserve_fds__
+        if self.maxclients != -1 and fd_limit >= self.maxclients:
             return self.maxclients
         else:
-            return limit[0] - self.__reserve_fds__
+            return fd_limit
 
     def reachedMaxClients(self):
         return len(self._requests) >= self.maxAllowedClients()
