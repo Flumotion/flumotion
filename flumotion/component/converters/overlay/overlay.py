@@ -81,15 +81,19 @@ def createComponent(config):
 
     # due to createComponent entry pointism, we have to import inside our
     # function.  PLEASE MAKE THE PAIN GO AWAY ?
-    from flumotion.worker.checks import video
-    if video.check_ffmpegcolorspace_AYUV():
-        alpha = 'ffmpegcolorspace'
+    import gst
+    if gst.gst_version < (0,9):
+        from flumotion.worker.checks import video
+        if video.check_ffmpegcolorspace_AYUV():
+            alpha = 'ffmpegcolorspace'
+        else:
+            log.info('Using gst-plugins older than 0.8.5, consider upgrading if you notice a diagonal green line in your video output.')
+        pipeline = ('filesrc name=source blocksize=100000 ! pngdec '
+                    ' ! alphacolor ! videomixer name=mix '
+                    ' ! @ feeder:: @ %(eater)s ! %(alpha)s ! mix.' % locals())
     else:
-        log.info('Using gst-plugins older than 0.8.5, consider upgrading if you notice a diagonal green line in your video output.')
+        pipeline = ('filesrc name=source blocksize=100000 ! pngdec '
+                    ' ! ffmpegcolorspace ! videomixer name=mix '
+                    ' ! @ feeder:: @ %(eater)s ! ffmpegcolorspace ! mix.' % locals())
     
-    component = Overlay(config['name'], [source], """
-filesrc name=source blocksize=100000 ! pngdec ! alphacolor !
-videomixer name=mix ! @ feeder:: @ %(eater)s ! %(alpha)s ! mix.""" % locals(),
-        config)
-    return component
-
+    return Overlay(config['name'], [source], pipeline, config)

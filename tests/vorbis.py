@@ -43,7 +43,7 @@ def buffer_probe(pad, buffer, cf):
     print 'hey'
 
     caps_str = 'audio/x-raw-float, rate=%d' % in_rate
-    cf.set_property('filter-caps',
+    cf.set_property('caps',
                     gst.caps_from_string(caps_str))
     pad.remove_buffer_probe(handle)
     return True
