@@ -1,5 +1,7 @@
 2005-10-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/Makefile.am (flumotion_PYTHON): Dist boot.py.
+
 	* configure.ac: Make scripts executable from configure time.
 
 	* bin/flumotion-launch.in: 

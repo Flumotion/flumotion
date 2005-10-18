@@ -9,6 +9,7 @@ nodist_flumotion_PYTHON = \
 
 flumotion_PYTHON = \
 	__init__.py \
+	boot.py \
 	bundle.py \
 	bundleclient.py \
 	code.py \
