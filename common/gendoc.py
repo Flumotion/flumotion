@@ -9,11 +9,11 @@ try:
 except ImportError:
     pass
     
-import pygtk
-pygtk.require('2.0')
-
-import gst
-import gst.interfaces
+from flumotion.common import boot
+boot.init_gobject()
+boot.init_gst()
+from flumotion.twisted import compat
+compat.install_reactor()
 
 # monkey patching twisted doc errors
 from twisted.spread import pb

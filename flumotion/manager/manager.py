@@ -26,8 +26,6 @@ API Stability: semi-stable
 
 __all__ = ['ManagerServerFactory', 'Vishnu']
 
-import os
-
 from twisted.internet import reactor, defer
 from twisted.cred import error
 from twisted.python import components, failure
@@ -184,8 +182,7 @@ class Vishnu(log.Loggable):
         
         self.bouncer = None # used by manager to authenticate worker/component
         
-        self.bundlerBasket = None
-        self._setupBundleBasket()
+        self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
 
         self._componentMappers = {} # any object -> ComponentMapper
 
@@ -372,45 +369,6 @@ class Vishnu(log.Loggable):
 
         return state
 
-    def _setupBundleBasket(self, firstTry=True):
-        self.bundlerBasket = bundle.BundlerBasket()
-
-        for b in registry.getRegistry().getBundles():
-            bundleName = b.getName()
-            self.debug('Adding bundle %s' % bundleName)
-            for d in b.getDirectories():
-                directory = d.getName()
-                for file in d.getFiles():
-                    fullpath = os.path.join(b.getBaseDir(), directory,
-                                            file.getLocation())
-                    relative = file.getRelative()
-                    self.log('Adding path %s as %s to bundle %s' % (
-                        fullpath, relative, bundleName))
-                    try:
-                        self.bundlerBasket.add(bundleName, fullpath, relative)
-                    except IOError, e:
-                        self.debug("Reason: %r" % e)
-                        if not firstTry:
-                            self.error("Could not add %s to bundle %s" % (
-                                fullpath, bundleName))
-                        self.warning("Bundle problem, rebuilding registry")
-                        registry.getRegistry().verify(force=True)
-                        self._setupBundleBasket(firstTry=False)
-                        return
-                    except Exception, e:
-                        if not firstTry:
-                            self.error("Could not register bundles")
-                        self.debug(
-                            "Exception %r when adding bundle, rebuilding" % e)
-                        self.warning("Bundle problem, rebuilding registry")
-                        registry.getRegistry().verify(force=True)
-                        self._setupBundleBasket(firstTry=False)
-                        return
-
-            for d in b.getDependencies():
-                self.log('Adding dependency of %s on %s' % (bundleName, d))
-                self.bundlerBasket.depend(bundleName, d)
-        
     def _createHeaven(self, interface, klass):
         """
         Create a heaven of the given klass that will send avatars to clients

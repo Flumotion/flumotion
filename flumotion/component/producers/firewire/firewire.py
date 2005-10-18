@@ -18,9 +18,9 @@
 
 # Headers in this file shall remain intact.
 
+import gst
 from flumotion.common import errors
 from flumotion.component import feedcomponent
-#from flumotion.component.effects.volume import volume
 
 class Firewire(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, pipeline):
@@ -82,31 +82,46 @@ def createComponent(config):
     else:
         interlaced_height = 288
         
-# FIXME: might be nice to factor out dv1394src ! dvdec so we can replace it
-# with videotestsrc of the same size and PAR, so we can unittest the pipeline
-    template = """dv1394src ! dvdec name=dec drop-factor=%(df)d
-                            ! video/x-raw-yuv,format=(fourcc)YUY2
-                            ! videorate ! videoscale
-                            ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s
-                            ! videoscale
-                            ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)f,format=(fourcc)YUY2
-                            %(pp)s
-                            ! @feeder::video@
-
-                            dec. ! audio/x-raw-int ! volume name=setvolume !
-                            level name=volumelevel signal=true ! audiorate !
-                            @feeder::audio@
-               """ % dict(df=drop_factor, ih=interlaced_height,
-                          sq=square_pipe, pp=pad_pipe,
-                          sw=scaled_width, h=height, fr=framerate)
-    template = template.replace('\n', '')
+    # FIXME: might be nice to factor out dv1394src ! dvdec so we can replace it
+    # with videotestsrc of the same size and PAR, so we can unittest the pipeline
+    if gst.gst_version < (0,9):
+        template = ('dv1394src ! dvdec name=dec drop-factor=%(df)d'
+                    '    ! video/x-raw-yuv,format=(fourcc)YUY2'
+                    '    ! videorate ! videoscale'
+                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
+                    '    ! videoscale'
+                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)f,format=(fourcc)YUY2'
+                    '    %(pp)s'
+                    '    ! @feeder::video@'
+                    '  dec. ! audio/x-raw-int ! volume name=setvolume'
+                    '    ! level name=volumelevel signal=true ! audiorate'
+                    '    ! @feeder::audio@'
+                    % dict(df=drop_factor, ih=interlaced_height,
+                           sq=square_pipe, pp=pad_pipe,
+                           sw=scaled_width, h=height, fr=framerate))
+    else:
+        template = ('dv1394src ! dvdemux name=demux'
+                    '  demux. ! dvdec drop-factor=%(df)d'
+                    '    ! video/x-raw-yuv,format=(fourcc)YUY2'
+                    '    ! videorate ! videoscale'
+                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
+                    '    ! videoscale'
+                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)f,format=(fourcc)YUY2'
+                    '    %(pp)s'
+                    '    ! @feeder::video@'
+                    '  demux. ! audio/x-raw-int ! volume name=setvolume'
+                    '    ! level name=volumelevel message=true ! audiorate'
+                    '    ! @feeder::audio@'
+                    % dict(df=drop_factor, ih=interlaced_height,
+                           sq=square_pipe, pp=pad_pipe,
+                           sw=scaled_width, h=height, fr=framerate))
     
     component = Firewire(config['name'], template)
     
-    # add volume effect
-    #comp_level = component.get_pipeline().get_by_name('volumelevel')
-    #vol = volume.Volume('inputVolume', comp_level)
-    #component.addEffect(vol)
-
+    if gst.gst_version < (0,9):
+        from flumotion.component.effects.volume import volume
+        comp_level = component.get_pipeline().get_by_name('volumelevel')
+        vol = volume.Volume('inputVolume', comp_level)
+        component.addEffect(vol)
 
     return component

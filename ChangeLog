@@ -1,3 +1,36 @@
+2005-10-18  Andy Wingo  <wingo@pobox.com>
+
+	* configure.ac: Make scripts executable from configure time.
+
+	* bin/flumotion-launch.in: 
+	* flumotion/launch/main.py: Something like gst-launch for
+	components, as yet unfinished.
+
+	* bin/flumotion-inspect.in:
+	* flumotion/launch/inspect.py: New files implementing something
+	like gst-inspect for components.
+
+	* flumotion/manager/manager.py (Vishnu.__init__): Use
+	ComponentRegistry.makeBundlerBasket() instead of rolling it
+	ourselves.
+
+	* flumotion/common/registry.py
+	(ComponentRegistry.makeBundlerBasket): New method, takes a
+	registry and returns a bundler basket populated by the bundles in
+	the registry.
+
+	* common/gendoc.py: Use flumotion.common.boot to init the right
+	pygtk and gst-python.
+
+	* flumotion/common/boot.py (init_gst): Better error.
+
+	* flumotion/component/producers/firewire/firewire.py
+	(createComponent): Conditionally create different pipeline for
+	0.9. Re-enable volume effect for 0.8.
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.__init__): Pacify the pychecker.
+
 2005-10-17  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/converters/overlay/overlay.py

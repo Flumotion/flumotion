@@ -6,9 +6,8 @@ bin_SCRIPTS = \
 
 sbin_SCRIPTS = flumotion
 
-noinst_SCRIPTS = runtest
+noinst_SCRIPTS = runtest \
+	flumotion-inspect \
+	flumotion-launch
 
 CLEANFILES = $(bin_SCRIPTS) $(sbin_SCRIPTS)
-
-all: $(bin_SCRIPTS) $(sbin_SCRIPTS) $(noinst_SCRIPTS)
-	@chmod +x $(bin_SCRIPTS) $(sbin_SCRIPTS) $(noinst_SCRIPTS)

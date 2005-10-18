@@ -6,6 +6,7 @@ SUBDIRS = \
 	component \
 	configure \
 	extern \
+	launch \
 	manager \
 	project \
 	service \

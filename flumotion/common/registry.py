@@ -31,7 +31,7 @@ from xml.parsers import expat
 
 from twisted.python import reflect
 
-from flumotion.common import common, log, package
+from flumotion.common import common, log, package, bundle
 from flumotion.configure import configure
 
 __all__ = ['ComponentRegistry', 'registry']
@@ -767,6 +767,42 @@ class ComponentRegistry(log.Loggable):
         
     def getDirectories(self):
         return self._parser.getDirectories()
+
+    def makeBundlerBasket(self):
+        def load():
+            ret = bundle.BundlerBasket()
+            for b in self.getBundles():
+                bundleName = b.getName()
+                self.debug('Adding bundle %s' % bundleName)
+                for d in b.getDirectories():
+                    directory = d.getName()
+                    for file in d.getFiles():
+                        fullpath = os.path.join(b.getBaseDir(), directory,
+                                                file.getLocation())
+                        relative = file.getRelative()
+                        self.log('Adding path %s as %s to bundle %s' % (
+                            fullpath, relative, bundleName))
+                        try:
+                            ret.add(bundleName, fullpath, relative)
+                        except Exception, e:
+                            self.debug("Reason: %r" % e)
+                            raise RuntimeError(
+                                'Could not add %s to bundle %s (%s)'
+                                % (fullpath, bundleName, e))
+                for d in b.getDependencies():
+                    self.log('Adding dependency of %s on %s' % (bundleName, d))
+                    ret.depend(bundleName, d)
+            return ret
+
+        try:
+            return load()
+        except Exception, e:
+            self.warning("Bundle problem, rebuilding registry (%s)" % e)
+            self.verify(force=True)
+            try:
+                return load()
+            except Exception, e:
+                self.error("Could not register bundles (%s)" % e)
 
     def dump(self, fd):
         """

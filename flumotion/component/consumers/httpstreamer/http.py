@@ -186,6 +186,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.resource = None
         self.mountPoint = None
         self.port = None
+        self.burst_on_connect = False
 
         # handled regular updating
         self.needsUpdate = False

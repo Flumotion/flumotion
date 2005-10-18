@@ -224,16 +224,18 @@ sys.exit(0)
 )
 
 AC_CONFIG_FILES([env], [chmod +x env])
+AC_CONFIG_FILES([bin/flumotion], [chmod +x bin/flumotion])
+AC_CONFIG_FILES([bin/flumotion-admin], [chmod +x bin/flumotion-admin])
+AC_CONFIG_FILES([bin/flumotion-inspect], [chmod +x bin/flumotion-inspect])
+AC_CONFIG_FILES([bin/flumotion-launch], [chmod +x bin/flumotion-launch])
+AC_CONFIG_FILES([bin/flumotion-manager], [chmod +x bin/flumotion-manager])
+AC_CONFIG_FILES([bin/flumotion-tester], [chmod +x bin/flumotion-tester])
+AC_CONFIG_FILES([bin/flumotion-worker], [chmod +x bin/flumotion-worker])
+AC_CONFIG_FILES([bin/runtest], [chmod +x bin/runtest])
 
 dnl output stuff
 AC_OUTPUT(
 Makefile
-bin/flumotion
-bin/flumotion-admin
-bin/flumotion-manager
-bin/flumotion-tester
-bin/flumotion-worker
-bin/runtest
 bin/Makefile
 common/Makefile
 data/Makefile
@@ -274,6 +276,7 @@ flumotion/configure/installed.py
 flumotion/configure/uninstalled.py
 flumotion/extern/Makefile
 flumotion/extern/pytrayicon/Makefile
+flumotion/launch/Makefile
 flumotion/manager/Makefile
 flumotion/project/Makefile
 flumotion/service/Makefile
