@@ -258,16 +258,14 @@ class TestRegistry(unittest.TestCase):
 class TestComponentEntry(unittest.TestCase):
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
-        self.entry = registry.RegistryEntryComponent('filename', 'type',
-                                                     'source', 'base', 
-                                                     ['prop'],
-                                                     [self.file])
-        self.empty_entry = registry.RegistryEntryComponent('filename', 'type',
-                                                           'source', 'base', ['prop'],
-                                                           [])
-        self.multiple_entry = registry.RegistryEntryComponent('filename', 'type', 
-                                                              'source', 'base', ['prop'],
-                                                              [self.file, self.file])
+        rec = registry.RegistryEntryComponent
+        self.entry = rec('filename', 'type', 'source', 'base', 
+                         ['prop'], [self.file], {}, [], [])
+        self.empty_entry = rec('filename', 'type', 'source', 'base',
+                               ['prop'], [], {}, [], [])
+        self.multiple_entry = rec('filename', 'type', 'source', 'base', ['prop'],
+                                  [self.file, self.file], {}, [], [])
+
     def testThings(self):
         self.assertEquals(self.entry.getType(), 'type')
         self.assertEquals(self.entry.getSource(), 'source')

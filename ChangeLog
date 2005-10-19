@@ -1,6 +1,21 @@
 2005-10-19  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_registry.py (TestComponentEntry.setUp): Fix
+	test suite.
+
 	* All xml files updated with eaters and feeders.
+
+	* flumotion/launch/inspect.py (main): Print out eaters and
+	feeders.
+
+	* flumotion/common/registry.py (RegistryEntryComponent.__init__):
+	No more default args (lists as default args lead to bugs), add
+	args for eaters and feeders.
+	(RegistryEntryComponent.getEaters) 
+	(RegistryEntryComponent.getFeeders): New API.
+	(RegistryParser._parseComponent, RegistryParser._parseEater) 
+	(RegistryParser._parseFeeder): Parse <eater> and <feeder> entries
+	in the registry.
 
 2005-10-18  Andy Wingo  <wingo@pobox.com>
 
