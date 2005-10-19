@@ -3,6 +3,9 @@
   <components>
     <component type="jukebox">
       <source location="flumotion.component.producers.jukebox.jukebox08" />
+
+      <feeder name="default"/>
+
       <properties>
         <property name="feed" type="string" multiple="yes" />
         <property name="playlist" type="string" />

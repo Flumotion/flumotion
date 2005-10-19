@@ -75,6 +75,18 @@ def main(args):
             print '\nSource:'
             print '  %s' % c.getSource()
             print '  in %s' % c.getBase()
+            print '\nEaters:'
+            if c.getEaters():
+                for e in c.getEaters():
+                    print '  %s' % e
+            else:
+                print '  (None)'
+            print '\nFeeders:'
+            if c.getFeeders():
+                for e in c.getFeeders():
+                    print '  %s' % e
+            else:
+                print '  (None)'
             print '\nFeatures:'
             features = [(p.getType(), p) for p in c.getEntries()]
             features.sort()

@@ -3,6 +3,8 @@
   
     <component type="theora-encoder">
       <source location="flumotion.component.encoders.theora.theora"/>
+      <eater name="default"/>
+      <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -18,6 +20,8 @@
   
     <component type="smoke-encoder">
       <source location="flumotion.component.encoders.smoke.smoke"/>
+      <eater name="default"/>
+      <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -30,6 +34,8 @@
   
     <component type="jpeg-encoder">
       <source location="flumotion.component.encoders.jpeg.jpeg"/>
+      <eater name="default"/>
+      <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -40,6 +46,8 @@
   
     <component type="vorbis-encoder">
       <source location="flumotion.component.encoders.vorbis.vorbis"/>
+      <eater name="default"/>
+      <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -51,6 +59,8 @@
   
     <component type="speex-encoder">
       <source location="flumotion.component.encoders.speex.speex"/>
+      <eater name="default"/>
+      <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
@@ -60,6 +70,8 @@
   
     <component type="mulaw-encoder">
       <source location="flumotion.component.encoders.mulaw.mulaw"/>
+      <eater name="default"/>
+      <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>

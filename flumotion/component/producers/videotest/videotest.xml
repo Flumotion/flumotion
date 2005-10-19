@@ -4,6 +4,8 @@
                base="flumotion/component/producers/videotest">
       <source location="flumotion.component.producers.videotest.videotest"/>
 
+      <feeder name="default"/>
+
       <entries>
         <entry type="component" location="videotest.py"
                function="createComponent"/>

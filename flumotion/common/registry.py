@@ -48,7 +48,8 @@ def _getMTime(file):
 class RegistryEntryComponent:
     "This class represents a <component> entry in the registry"
     def __init__(self, filename, type, 
-                 source='', base='', properties=[], files=[], entries=[]):
+                 source, base, properties, files,
+                 entries, eaters, feeders):
         self.filename = filename
         self.type = type
         self.source = source
@@ -56,6 +57,8 @@ class RegistryEntryComponent:
         self.properties = properties
         self.files = files
         self.entries = entries
+        self.eaters = eaters
+        self.feeders = feeders
         
     def getProperties(self):
         return self.properties
@@ -88,6 +91,12 @@ class RegistryEntryComponent:
     def getSource(self):
         return self.source
     
+    def getEaters(self):
+        return self.eaters
+
+    def getFeeders(self):
+        return self.feeders
+
 class RegistryEntryBundle:
     "This class represents a <bundle> entry in the registry"
     def __init__(self, name, project, under, dependencies, directories):
@@ -282,6 +291,8 @@ class RegistryParser(log.Loggable):
     def _parseComponent(self, node):
         # <component type="..." base="...">
         #   <source>
+        #   <eater>
+        #   <feeder>
         #   <properties>
         #   <entry>
         # </component>
@@ -306,6 +317,8 @@ class RegistryParser(log.Loggable):
         files = []
         source = None
         entries = {}
+        eaters = []
+        feeders = []
         for child in self._getChildNodes(node):
             if child.nodeName == 'source':
                 source = self._parseSource(child)
@@ -315,12 +328,17 @@ class RegistryParser(log.Loggable):
                 files = self._parseFiles(child)
             elif child.nodeName == 'entries':
                 entries = self._parseEntries(child)
+            elif child.nodeName == 'eater':
+                eaters.append(self._parseEater(child))
+            elif child.nodeName == 'feeder':
+                feeders.append(self._parseFeeder(child))
             else:
                 raise XmlParserError("unexpected node: %s" % child)
 
         return RegistryEntryComponent(self.filename,
                                       type, source, baseDir,
-                                      properties.values(), files, entries)
+                                      properties.values(), files,
+                                      entries, eaters, feeders)
 
     def _parseSource(self, node):
         # <source location="..."/>
@@ -411,6 +429,20 @@ class RegistryParser(log.Loggable):
             entries[type] = entry
             
         return entries
+
+    def _parseEater(self, node):
+        # <eater name="..."/>
+        if not node.hasAttribute('name'):
+            raise XmlParserError("<eater> must have a name attribute")
+
+        return str(node.getAttribute('name'))
+
+    def _parseFeeder(self, node):
+        # <feeder name="..."/>
+        if not node.hasAttribute('name'):
+            raise XmlParserError("<feeder> must have a name attribute")
+
+        return str(node.getAttribute('name'))
 
     ## Component registry specific functions
     def parseRegistryFile(self, filename, string=None):

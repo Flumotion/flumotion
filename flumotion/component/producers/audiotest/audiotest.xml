@@ -3,6 +3,7 @@
   <components>
     <component type="audiotest">
       <source location="flumotion.component.producers.audiotest.audiotest"/>
+      <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="volume" type="float"/>

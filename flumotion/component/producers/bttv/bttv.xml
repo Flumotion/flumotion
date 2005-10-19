@@ -4,6 +4,8 @@
                base="flumotion/component/producers/bttv">
       <source location="flumotion.component.producers.bttv.bttv"/>
 
+      <feeder name="default"/>
+
       <entries>
         <entry type="component" location="bttv.py"
                function="createComponent"/>

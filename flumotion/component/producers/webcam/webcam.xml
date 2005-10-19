@@ -4,6 +4,8 @@
                base="flumotion/component/producers/webcam">
       <source location="flumotion.component.producers.webcam.webcam" />
 
+      <feeder name="default"/>
+
       <entries>
         <entry type="component" location="webcam.py"
                function="createComponent" />

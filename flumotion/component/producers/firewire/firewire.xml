@@ -3,6 +3,8 @@
     <component type="firewire"
                base="flumotion/component/producers/firewire">
       <source location="flumotion.component.producers.firewire.firewire" />
+      <feeder name="audio"/>
+      <feeder name="video"/>
       <entries>
         <entry type="component" location="firewire.py"
                function="createComponent" />

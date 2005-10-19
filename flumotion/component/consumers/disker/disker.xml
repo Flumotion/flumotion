@@ -4,6 +4,8 @@
                base="flumotion/component/consumers/disker">
       <source location="flumotion.component.consumers.disker.disker"/>
 
+      <eater name="default"/>
+
       <entries>
         <entry type="component" location="disker.py"
                function="createComponent"/>

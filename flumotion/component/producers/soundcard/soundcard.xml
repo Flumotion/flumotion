@@ -4,6 +4,8 @@
     	       base="flumotion/component/producers/soundcard">
       <source location="flumotion.component.producers.soundcard.soundcard"/>
 
+      <feeder name="default"/>
+
       <entries>
         <entry type="component" location="soundcard.py"
                function="createComponent"/>

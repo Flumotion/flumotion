@@ -4,6 +4,8 @@
   
     <component type="smoke-encoder">
       <source location="flumotion.component.encoders.smoke.smoke"/>
+      <eater name="default"/>
+      <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>

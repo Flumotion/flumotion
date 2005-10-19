@@ -1,3 +1,7 @@
+2005-10-19  Andy Wingo  <wingo@pobox.com>
+
+	* All xml files updated with eaters and feeders.
+
 2005-10-18  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/Makefile.am (flumotion_PYTHON): Dist boot.py.

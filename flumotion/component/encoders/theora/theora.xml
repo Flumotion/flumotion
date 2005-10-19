@@ -4,6 +4,8 @@
   
     <component type="theora-encoder">
       <source location="flumotion.component.encoders.theora.theora"/>
+      <eater name="default"/>
+      <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
