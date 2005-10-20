@@ -1,10 +1,14 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/preview/preview.py: Remove some
+	unnecessary includes.
+
 	* configure.ac:
 	* flumotion/component/consumers/Makefile.am
 	* flumotion/component/consumers/preview/__init__.py: 
 	* flumotion/component/consumers/preview/Makefile.am: 
 	* flumotion/component/consumers/preview/preview.py: 
+
 	* flumotion/component/consumers/preview/preview.xml: New
 	component, allows you to preview what's happening in a stream.
 	Sortof. Mostly useful for flumotion-launch.

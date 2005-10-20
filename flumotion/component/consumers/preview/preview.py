@@ -18,16 +18,8 @@
 
 # Headers in this file shall remain intact.
 
-import os
-import time
-
-import gobject
-import gst
-
-from twisted.internet import reactor
-
 from flumotion.component import feedcomponent
-from flumotion.common import log, gstreamer, compat
+from flumotion.common import log, compat
 
 __all__ = ['Preview']
 
