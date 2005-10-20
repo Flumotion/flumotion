@@ -214,7 +214,11 @@ class ComponentWrapper(object):
             if not prop.isMultiple():
                 if len(feeders) > 1:
                     err('Component %s can only eat from one feeder' % name)
-                config['source'] = feeders[0]
+                if feeders:
+                    config['source'] = feeders[0]
+                else:
+                    # don't set
+                    pass
             elif feeders:
                 config['source'] = feeders
             else:
@@ -239,7 +243,7 @@ class ComponentWrapper(object):
             module = reflect.namedAny(importname)
         except Exception, e:
             err('Could not load module %s for component %s: %s'
-                % (importname, x, e))
+                % (importname, name, e))
         self.procedure = getattr(module, entry.getFunction())
 
     def instantiate(self, feed_ports):

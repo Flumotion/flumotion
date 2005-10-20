@@ -1,5 +1,9 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py (ComponentWrapper.__init__): If a
+	source is not required, don't error if it's not there.
+	(ComponentWrapper.__init__): Fix name error.
+
 	* flumotion/component/producers/firewire/firewire.py
 	(createComponent): Fix the default height.
 
