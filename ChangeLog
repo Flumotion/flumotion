@@ -1,5 +1,11 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/encoders/vorbis/vorbis.xml: Add component
+	entry.
+
+	* flumotion/component/encoders/encoders.xml: Remove vorbis from
+	here.
+
 	* flumotion/launch/main.py (main): Setup the package path
 	properly.
 

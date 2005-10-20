@@ -2,7 +2,7 @@
 
   <components>
   
-    <component type="vorbis-encoder">
+    <component type="vorbis-encoder" base="flumotion/component/encoders/vorbis">
       <source location="flumotion.component.encoders.vorbis.vorbis"/>
       <eater name="default"/>
       <feeder name="default"/>
@@ -13,6 +13,10 @@
         <property name="quality" type="float"/>
         <property name="channels" type="int"/>
       </properties>
+      <entries>
+        <entry type="component" location="vorbis.py"
+               function="createComponent"/>
+      </entries>
     </component>
  
   </components>
