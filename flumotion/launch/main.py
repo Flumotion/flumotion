@@ -246,9 +246,18 @@ def main(args):
     components, links, properties = parse_args(args[1:])
 
     def mkfeedername(link):
-        return '%s:%s' % (link[0], link[1] or 'default')
-    def mkeatername(link):
-        return '%s:%s' % (link[2], link[3] or 'default')
+        compname = link[0]
+        comptype = [x[1] for x in components if x[0]==compname][0]
+        compreg = registry.getRegistry().getComponent(comptype)
+        if link[1]:
+            if not link[1] in compreg.getFeeders():
+                err('Component %s has no feeder named %s', (link[0], link[1]))
+            feeder = link[1]
+        else:
+            if not compreg.getFeeders():
+                err('Component %s has no feeders' % link[0])
+            feeder = compreg.getFeeders()[0]
+        return '%s:%s' % (link[0], feeder)
 
     wrappers = []
     for name, type in components:

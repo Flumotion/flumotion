@@ -1,5 +1,12 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py (main.mkfeedername): Verify that the
+	link is from a valid feeder. If no feeder is spefified, take the
+	first one in the list instead of 'default' (makes firewire work).
+
+	* flumotion/common/registry.py (ComponentRegistry.dump): Save
+	eaters and feeders to the registry. Ak.
+
 	* flumotion/manager/Makefile.am: 
 	* flumotion/common/Makefile.am: Enable TAGS.
 

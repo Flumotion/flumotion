@@ -865,6 +865,10 @@ class ComponentRegistry(log.Loggable):
                 component.getBase()))
 
             w(6, '<source location="%s"/>' % component.getSource())
+            for x in component.getEaters():
+                w(6, '<eater name="%s"/>' % x)
+            for x in component.getFeeders():
+                w(6, '<feeder name="%s"/>' % x)
             w(6, '<properties>')
             for prop in component.getProperties():
                 w(8, '<property name="%s" type="%s" required="%s" multiple="%s"/>' % (
