@@ -1,5 +1,8 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/firewire/firewire.xml: Feed is not
+	a necessary property AFAICT.
+
 	* flumotion/component/producers/bttv/bttv.py: Don't import
 	producer.
 
