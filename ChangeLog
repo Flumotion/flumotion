@@ -1,5 +1,8 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py: Support componentname.feeder/eater
+	links like gst-launch does, actually works now.
+
 	* flumotion/common/registry.py (RegistryEntryEntry.getModuleName):
 	New function.
 

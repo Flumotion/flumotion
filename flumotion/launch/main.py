@@ -21,6 +21,7 @@
 import optparse
 import sys
 
+from twisted.python import reflect
 from twisted.internet import reactor
 
 from flumotion.common import log, common, registry
@@ -31,48 +32,188 @@ def err(x):
     raise SystemExit(1)
 
 def parse_args(args):
-    link_left = None
     links = []
     components = []
-    _properties = []
+    properties = {}
 
-    args.reverse()
+    if not args:
+        err('Usage: flumotion-launch COMPONENT [! COMPONENT]...')
+
+    # components: [(name, type), ...]
+    # links: [(feedercomponentname, feeder, eatercomponentname, eater), ...]
+    # properties: {componentname=>{prop=>value, ..}, ..}
+
+    _names = {}
+    def add_component(type):
+        i = _names.get(type, 0)
+        _names[type] = i + 1
+        name = '%s%d' % (type, i)
+        components.append((name, type))
+        properties[name] = {}
+        
+    def last_component():
+        return components[-1][0]
+
+    link_tmp = []
+    def link(feedercompname=None, feeder=None, eatercompname=None, eater=None):
+        if feedercompname:
+            assert not link_tmp
+            tmp = [feedercompname, feeder, eatercompname, eater]
+            link_tmp.append(tmp)
+        elif feeder:
+            err('how did i get here?')
+        elif eatercompname:
+            if not link_tmp:
+                err('Invalid grammar: trying to link, but no feeder component')
+            link_tmp[0][2] = eatercompname
+            if eater:
+                link_tmp[0][3] = eater
+        elif eater:
+            if not link_tmp:
+                err('Invalid grammar: trying to link, but no feeder component')
+            link_tmp[0][3] = eater
+        else:
+             # no args, which is what happens when ! is seen
+            if not link_tmp:
+                link_tmp.append([last_component(), None, None, None])
+            else:
+                if not link_tmp[0][0]:
+                    link_tmp[0][0] = last_component()
+            
+        if link_tmp and link_tmp[0][0] and link_tmp[0][2]:
+            links.append(link_tmp[0])
+            del link_tmp[0]
+
+    args.reverse() # so we can pop from the tail
 
     while args:
         x = args.pop().strip()
         if x == '!':
             if not components:
-                err('Invalid grammar: `!\' without left-hand-side')
-            link_left = components[-1]
+                err('Invalid grammar: `!\' without feeder component')
+            link()
         elif x.find('=') != -1:
             prop = x[:x.index('=')]
             val = x[x.index('=')+1:]
             if not prop or not val:
                 err('Invalid property setting: %s' % x)
-            if link_left or not components:
+            if link_tmp or not components:
                 err('Invalid grammar: Property %s does not follow a component'
                     % x)
-            _properties.append((components[-1], prop, val))
+            properties[last_component()][prop] = val
+        elif x.find('.') != -1:
+            t = x.split('.')
+            if len(t) != 2:
+                err('Invalid grammar: bad eater/feeder specification: %s' % x)
+            t = [z or None for z in t]
+            if link_tmp:
+                link(eatercompname=t[0], eater=t[1])
+            elif components:
+                link(feedercompname=t[0] or last_component(), feeder=t[1])
+            else:
+                err('Invalid grammar: trying to link from feeder %s but '
+                    'no feeder component' % x)
         else:
-            if x in components:
-                err('component appears twice, -ETOOLAME: %s' % x)
-            components.append(x)
-            if link_left:
-                links.append((link_left, x))
-                link_left = None
-    if link_left:
-        err('Invalid grammar: `!\' without right-hand-side')
+            add_component(x)
+            if link_tmp:
+                link(eatercompname=last_component())
+    if link_tmp:
+        err('Invalid grammar: uncompleted link from %s.%s')
         
-    properties = {}
-    for x in components:
-        properties[x] = []
-    for x in _properties:
-        properties[x[0]].append((x[1], x[2]))
+    for x in links:
+        assert x[0] and x[2]
+        if not x[0] in properties.keys():
+            err('Invalid grammar: no feeder component %s to link from' % x[0])
+        if not x[2] in properties.keys():
+            err('Invalid grammar: no eater component %s to link to' % x[2])
 
-    print links
-    print components
-    print properties
     return components, links, properties
+
+class ComponentWrapper(object):
+    name = None
+    type = None
+    prototype = None
+    procedure = None
+    config = None
+    component = None
+
+    def __init__(self, name, type, properties, feeders):
+        self.name = name
+        self.type = type
+
+        r = registry.getRegistry()
+        if not r.hasComponent(type):
+            err('Unknown component type: %s' % type)
+
+        c = r.getComponent(type)
+        compprops = dict([(p.getName(), p) for p in c.getProperties()])
+        config = {'name': name}
+        
+        for k, v in properties.items():
+            if k not in compprops.keys():
+                err('Component %s has no such property `%s\'' % (name, k))
+            t = compprops[k].getType()
+            if t == 'int':
+                val = int(v)
+            elif t == 'float':
+                val = float(v)
+            elif t == 'bool':
+                val = bool(v)
+            elif t == 'string':
+                val = str(v)
+            else:
+                err('Unknown type `%s\' of property %s in component %s'
+                    % (t, k, name))
+            if compprops[k].isMultiple():
+                if not k in config:
+                    config[k] = []
+                config[k].append(val)
+            else:
+                config[k] = val
+
+        if 'source' in compprops:
+            prop = compprops['source']
+            if prop.isRequired() and not feeders:
+                err('Component %s wants to eat but you didn\'t give it '
+                    'food' % name)
+            if not prop.isMultiple():
+                if len(feeders) > 1:
+                    err('Component %s can only eat from one feeder' % name)
+                config['source'] = feeders[0]
+            elif feeders:
+                config['source'] = feeders
+            else:
+                # don't even set config['source']
+                pass
+        else:
+            if feeders:
+                err('Component %s can\'t feed from anything' % name)
+            
+        for k, v in compprops.items():
+            if v.isRequired() and not k in config:
+                err('Component %s missing required property `%s\' of type %s'
+                    % (name, k, v.getType()))
+        self.config = config
+
+        try:
+            entry = c.getEntryByType('component')
+        except KeyError:
+            err('Component %s has no component entry' % name)
+        importname = entry.getModuleName(c.getBase())
+        try:
+            module = reflect.namedAny(importname)
+        except Exception, e:
+            err('Could not load module %s for component %s: %s'
+                % (importname, x, e))
+        self.procedure = getattr(module, entry.getFunction())
+
+    def instantiate(self, feed_ports):
+        self.component = self.procedure(self.config)
+        self.component.set_feed_ports(feed_ports)
+        print 'Created component %s' % self.component
+
+    def start(self, eatersdata, feedersdata):
+        return self.component.start(eatersdata, feedersdata)
 
 def main(args):
     parser = optparse.OptionParser()
@@ -104,29 +245,41 @@ def main(args):
 
     components, links, properties = parse_args(args[1:])
 
-    r = registry.getRegistry()
-    bb = r.makeBundlerBasket()
-    for x in components:
-        if not r.hasComponent(x):
-            err('Unknown component: %s' % x)
-        c = r.getComponent(x)
-        compprops = dict([(p.getName(), p) for p in c.getProperties()])
-        for k, v in properties[x]:
-            if k not in compprops.keys():
-                err('Component %s has no such property `%s\'' % (x, k))
-            # FIXME: how to verify type?
-        for k, v in compprops.items():
-            if v.isRequired() and not k in properties:
-                err('Component %s missing required property `%s\' of type %s'
-                    % (x, k, v.getType()))
-        
-    if not args:
-        err('Usage: flumotion-launch COMPONENT [! COMPONENT]...')
+    def mkfeedername(link):
+        return '%s:%s' % (link[0], link[1] or 'default')
+    def mkeatername(link):
+        return '%s:%s' % (link[2], link[3] or 'default')
 
-    # register all package paths (FIXME: this should go away when
-    # components come from manager)
-    from flumotion.common import setup
-    setup.setupPackagePath()
+    wrappers = []
+    for name, type in components:
+        feeders = [mkfeedername(x) for x in links if x[2] == name]
+        wrappers.append(ComponentWrapper(name, type, properties[name], feeders))
+    
+    port = 7600
+    feed_ports = {}
+    #for feeder in [mkfeedername(x) for x in links]:
+    #    feed_ports[feeder] = port
+    
+    for wrapper in wrappers:
+        print port
+        wrapper.instantiate({'default':port})
+        feed_ports['%s:default' % wrapper.name] = port
+        port += 1
+
+    eatersdata = []
+    for wrapper in wrappers:
+        eatersdata = [mkfeedername(x) for x in links if x[2] == wrapper.name]
+        eatersdata = [(x, 'localhost', feed_ports[x]) for x in eatersdata]
+        feedersdata = [mkfeedername(x) for x in links if x[0] == wrapper.name]
+        feedersdata = [(x, 'localhost') for x in feedersdata]
+        ret = wrapper.start(eatersdata, feedersdata)
+        if ret:
+            for x in ret:
+                assert x[2] == feed_ports['%s:default' % wrapper.name]
+    
+    #print wrappers[0].start([]
+
+    print 'Running the reactor. Press Ctrl-C to exit.'
 
     log.debug('launch', 'Starting reactor')
     # FIXME: sort-of-ugly, but twisted recommends globals, and this is as
