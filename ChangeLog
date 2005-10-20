@@ -1,5 +1,20 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/bttv/bttv.py: Don't import
+	producer.
+
+	* flumotion/component/component.xml: Remove converter.py and
+	producer.py from here too. What is this file up to?
+
+	* flumotion/component/base/base.xml: 
+	* flumotion/component/base/Makefile.am (component_PYTHON):
+	* flumotion/component/base/producer.py: 
+	* flumotion/component/base/converter.py: Remove converter.py and
+	producer.py, they were not used anywhere.
+
+	* flumotion/component/producers/firewire/firewire.xml: I don't
+	think the feed property is necessary. Removing it.
+
 	* flumotion/component/consumers/preview/preview.py: Remove some
 	unnecessary includes.
 

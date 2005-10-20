@@ -1,37 +1,5 @@
 <registry>
-  <components>
-  
-  <!--
-    <component type="base">
-      <source location="flumotion.server.component"/>
-      <properties>
-        <property name="nice" type="int"/>
-        <property name="username" type="string"/>
-      </properties>
-    </component>
-  -->
-  
-    <component type="producer">
-      <source location="flumotion.component.base.producer"/>
-      <properties>
-        <property name="pipeline" type="string" required="yes"/>
-        <property name="feed" type="string" required="yes" multiple="yes"/>
-      </properties>
-    </component>
-  
-    <component type="converter">
-      <source location="flumotion.component.base.converter"/>
-      <properties>
-        <property name="pipeline" type="string" required="yes"/>
-        <property name="feed" type="string" required="yes" multiple="yes"/>
-        <property name="source" type="string" multiple="yes"/>
-      </properties>
-    </component>
-  
-  </components>
-
   <bundles>
-
     <bundle name="base-admin-gtk">
       <dependencies>
         <dependency name="flumotion" />
@@ -43,7 +11,5 @@
         </directory>
       </directories>
     </bundle>
-
   </bundles>
-
 </registry> 

@@ -23,7 +23,6 @@ import gst.interfaces
 
 from flumotion.common import log
 
-from flumotion.component.base import producer
 from flumotion.component import feedcomponent
 from flumotion.component.effects.colorbalance import colorbalance
 
