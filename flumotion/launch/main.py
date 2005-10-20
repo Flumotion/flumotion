@@ -255,6 +255,9 @@ class ComponentWrapper(object):
         return self.component.start(eatersdata, feedersdata)
 
 def main(args):
+    from flumotion.common import setup
+    setup.setupPackagePath()
+
     parser = optparse.OptionParser()
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",
