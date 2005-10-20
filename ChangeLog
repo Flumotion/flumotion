@@ -1,3 +1,14 @@
+2005-10-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/encoders/theora/theora.xml: Add a component
+	entry.
+
+	* flumotion/component/encoders/encoders.xml: Don't list theora
+	here, it has its own xml. This xml file should probably go.
+
+	* flumotion/component/muxers/muxers.xml: Add a component entry for
+	ogg-muxer.
+
 2005-10-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_registry.py (TestComponentEntry.setUp): Fix

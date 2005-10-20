@@ -1,10 +1,14 @@
 <registry>
   <components>
   
-    <component type="ogg-muxer">
+    <component type="ogg-muxer" base="flumotion/component/muxers">
       <source location="flumotion.component.muxers.ogg"/>
       <eater name="default"/>
       <feeder name="default"/>
+      <entries>
+        <entry type="component" location="ogg.py"
+               function="createComponent"/>
+      </entries>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="yes"/>

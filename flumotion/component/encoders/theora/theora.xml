@@ -2,10 +2,14 @@
 
   <components>
   
-    <component type="theora-encoder">
+    <component type="theora-encoder" base="flumotion/component/encoders/theora">
       <source location="flumotion.component.encoders.theora.theora"/>
       <eater name="default"/>
       <feeder name="default"/>
+      <entries>
+        <entry type="component" location="theora.py"
+               function="createComponent"/>
+      </entries>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
