@@ -260,6 +260,7 @@ flumotion/component/encoders/Makefile
 flumotion/component/consumers/Makefile
 flumotion/component/consumers/disker/Makefile
 flumotion/component/consumers/httpstreamer/Makefile
+flumotion/component/consumers/preview/Makefile
 flumotion/component/converters/Makefile
 flumotion/component/converters/overlay/Makefile
 flumotion/component/muxers/Makefile

@@ -11,4 +11,5 @@ clean-local:
 
 SUBDIRS = \
 	disker \
-	httpstreamer
+	httpstreamer \
+	preview

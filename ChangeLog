@@ -1,7 +1,18 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* configure.ac:
+	* flumotion/component/consumers/Makefile.am
+	* flumotion/component/consumers/preview/__init__.py: 
+	* flumotion/component/consumers/preview/Makefile.am: 
+	* flumotion/component/consumers/preview/preview.py: 
+	* flumotion/component/consumers/preview/preview.xml: New
+	component, allows you to preview what's happening in a stream.
+	Sortof. Mostly useful for flumotion-launch.
+	
 	* flumotion/launch/main.py: Support componentname.feeder/eater
-	links like gst-launch does, actually works now.
+	links like gst-launch does. Actually works now, but only with
+	gstreamer 0.9 (0.8 deadlocks because it expects there to be
+	different processes, whereas 0.9 has threads).
 
 	* flumotion/common/registry.py (RegistryEntryEntry.getModuleName):
 	New function.

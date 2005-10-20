@@ -1,0 +1,48 @@
+<registry>
+  <components>
+    <component type="preview"
+               base="flumotion/component/consumers/preview">
+      <source location="flumotion.component.consumers.preview.preview"/>
+
+      <eater name="default"/>
+
+      <entries>
+        <entry type="component" location="preview.py"
+               function="createComponent"/>
+      </entries>
+      
+      <properties>
+        <property name="source" type="string" required="yes" />
+      </properties>
+    </component>
+  </components>
+
+  <bundles>
+    <bundle name="preview-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/preview">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="preview-component">
+        <dependencies>
+            <dependency name="component"/>
+            <dependency name="preview-base"/>
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/preview">
+                <filename location="preview.py"/>
+            </directory>
+        </directories>
+     </bundle>
+  </bundles>
+
+</registry> 
+  
