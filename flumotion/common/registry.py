@@ -206,6 +206,13 @@ class RegistryEntryEntry:
     def getLocation(self):
         return self.location
 
+    def getModuleName(self, base=None):
+        if base:
+            path = os.path.join(base, self.getLocation())
+        else:
+            path = self.getLocation()
+        return reflect.filenameToModuleName(path)
+
     def getFunction(self):
         return self.function
     
@@ -294,7 +301,7 @@ class RegistryParser(log.Loggable):
         #   <eater>
         #   <feeder>
         #   <properties>
-        #   <entry>
+        #   <entries>
         # </component>
         
         if not node.hasAttribute('type'):

@@ -1,5 +1,8 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/registry.py (RegistryEntryEntry.getModuleName):
+	New function.
+
 	* flumotion/component/encoders/theora/theora.xml: Add a component
 	entry.
 
