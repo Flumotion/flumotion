@@ -31,6 +31,39 @@ def err(x):
     sys.stderr.write(x + '\n')
     raise SystemExit(1)
 
+def resolve_links(links, components):
+    reg = registry.getRegistry()
+    for link in links:
+        compname = link[0]
+        comptype = [x[1] for x in components if x[0]==compname][0]
+        compreg = reg.getComponent(comptype)
+        if link[1]:
+            if not link[1] in compreg.getFeeders():
+                err('Component %s has no feeder named %s', (compname, link[1]))
+            feeder = link[1]
+        else:
+            if not compreg.getFeeders():
+                err('Component %s has no feeders' % compname)
+            feeder = compreg.getFeeders()[0]
+        link[1] = '%s:%s' % (compname, feeder)
+    
+    for link in links:
+        compname = link[2]
+        comptype = [x[1] for x in components if x[0]==compname][0]
+        compreg = reg.getComponent(comptype)
+        if link[3]:
+            if not link[3] in compreg.getEaters():
+                err('Component %s has no eater named %s', (compname, link[3]))
+            eater = link[3]
+        else:
+            if not compreg.getEaters():
+                err('Component %s has no eaters' % compname)
+            eater = compreg.getEaters()[0]
+        link[3] = '%s:%s' % (compname, eater)
+    
+    for link in links:
+        print link
+
 def parse_args(args):
     links = []
     components = []
@@ -126,6 +159,8 @@ def parse_args(args):
             err('Invalid grammar: no feeder component %s to link from' % x[0])
         if not x[2] in properties.keys():
             err('Invalid grammar: no eater component %s to link to' % x[2])
+
+    resolve_links(links, components)
 
     return components, links, properties
 
@@ -245,46 +280,38 @@ def main(args):
 
     components, links, properties = parse_args(args[1:])
 
-    def mkfeedername(link):
-        compname = link[0]
-        comptype = [x[1] for x in components if x[0]==compname][0]
-        compreg = registry.getRegistry().getComponent(comptype)
-        if link[1]:
-            if not link[1] in compreg.getFeeders():
-                err('Component %s has no feeder named %s', (link[0], link[1]))
-            feeder = link[1]
-        else:
-            if not compreg.getFeeders():
-                err('Component %s has no feeders' % link[0])
-            feeder = compreg.getFeeders()[0]
-        return '%s:%s' % (link[0], feeder)
-
+    feed_ports = {}
     wrappers = []
     for name, type in components:
-        feeders = [mkfeedername(x) for x in links if x[2] == name]
+        print name
+        feed_ports[name] = {}
+        feeders = [x[1] for x in links if x[2] == name]
         wrappers.append(ComponentWrapper(name, type, properties[name], feeders))
     
     port = 7600
-    feed_ports = {}
-    #for feeder in [mkfeedername(x) for x in links]:
-    #    feed_ports[feeder] = port
+    for link in links:
+        feed_ports[link[0]][link[1]] = port
+        port += 1
     
     for wrapper in wrappers:
-        print port
-        wrapper.instantiate({'default':port})
-        feed_ports['%s:default' % wrapper.name] = port
-        port += 1
+        data = {}
+        for feeder, port in feed_ports[wrapper.name].items():
+            data[feeder[feeder.index(':')+1:]] = port
+        wrapper.instantiate(data)
 
     eatersdata = []
     for wrapper in wrappers:
-        eatersdata = [mkfeedername(x) for x in links if x[2] == wrapper.name]
-        eatersdata = [(x, 'localhost', feed_ports[x]) for x in eatersdata]
-        feedersdata = [mkfeedername(x) for x in links if x[0] == wrapper.name]
+        eatersdata = [(x[0], x[1]) for x in links if x[2] == wrapper.name]
+        print feed_ports[wrapper.name]
+        eatersdata = [(x[1], 'localhost', feed_ports[x[0]][x[1]])
+                      for x in eatersdata]
+        feedersdata = [x[1] for x in links if x[0] == wrapper.name]
         feedersdata = [(x, 'localhost') for x in feedersdata]
         ret = wrapper.start(eatersdata, feedersdata)
         if ret:
             for x in ret:
-                assert x[2] == feed_ports['%s:default' % wrapper.name]
+                feeder = '%s:%s' % (wrapper.name, x[0])
+                assert x[2] == feed_ports[wrapper.name][feeder]
     
     #print wrappers[0].start([]
 

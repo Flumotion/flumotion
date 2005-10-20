@@ -1,5 +1,8 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py (main): More cleanups, feeder/eater
+	verifications (with the goal being to get firewire to work)
+
 	* flumotion/launch/main.py (main.mkfeedername): Verify that the
 	link is from a valid feeder. If no feeder is spefified, take the
 	first one in the list instead of 'default' (makes firewire work).
