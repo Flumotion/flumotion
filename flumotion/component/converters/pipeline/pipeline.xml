@@ -1,0 +1,49 @@
+<registry>
+
+  <components>
+    <component type="pipeline-converter"
+               base="flumotion/component/converters/pipeline">
+      <source location="flumotion.component.converters.pipeline.pipeline"/>
+      <eater name="default"/>
+      <feeder name="default"/>
+      <entries>
+        <entry type="component" location="pipeline.py"
+               function="createComponent"/>
+      </entries>
+      <properties>
+        <property name="pipeline" type="string" required="yes"/>
+      </properties>
+    </component>
+  </components>
+
+
+  <bundles>
+
+    <bundle name="pipeline-converter-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/converters/pipeline">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="pipeline-converter-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="pipeline-converter-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/converters/pipeline">
+                <filename location="pipeline.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

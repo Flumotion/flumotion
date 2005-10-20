@@ -10,4 +10,5 @@ clean-local:
 	rm -rf *.pyc *.pyo
 
 SUBDIRS = \
-	overlay
+	overlay \
+	pipeline

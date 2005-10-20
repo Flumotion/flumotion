@@ -1,0 +1,48 @@
+<registry>
+
+  <components>
+    <component type="pipeline-producer"
+               base="flumotion/component/producers/pipeline">
+      <source location="flumotion.component.producers.pipeline.pipeline"/>
+      <feeder name="default"/>
+      <entries>
+        <entry type="component" location="pipeline.py"
+               function="createComponent"/>
+      </entries>
+      <properties>
+        <property name="pipeline" type="string" required="yes"/>
+      </properties>
+    </component>
+  </components>
+
+
+  <bundles>
+
+    <bundle name="pipeline-producer-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/pipeline">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="pipeline-producer-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="pipeline-producer-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/pipeline">
+                <filename location="pipeline.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

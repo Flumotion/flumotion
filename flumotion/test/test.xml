@@ -1,14 +1,14 @@
 <planet>
 
   <flow name="testflow">
-    <component name="producer-video-test" type="producer">
+    <component name="producer-video-test" type="pipeline-producer">
       <feed>default</feed>
       <pipeline>
   videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
       </pipeline>
     </component>
   
-    <component name="converter-ogg-theora" type="converter">
+    <component name="converter-ogg-theora" type="pipeline-converter">
       <feed>default</feed>
       <source>producer-video-test</source>
       <pipeline>

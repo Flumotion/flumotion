@@ -13,6 +13,7 @@ SUBDIRS = \
 	audiotest \
 	bttv \
 	firewire \
+	pipeline \
 	soundcard \
 	videotest \
 	webcam \

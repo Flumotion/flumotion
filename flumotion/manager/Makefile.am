@@ -12,6 +12,7 @@ flumotion_PYTHON =	\
 	worker.py
 
 TAGS_FILES = $(flumotion_PYTHON)
+ETAGS_ARGS = --lang=python $(flumotion_PYTHON)
 
 clean-local:
 	rm -rf *.pyc *.pyo

@@ -34,7 +34,8 @@ flumotion_PYTHON = \
 	watched.py \
 	worker.py
 
-TAGS_FILES = $(flumotion_PYTHON)
+TAGS_DEPENDENCIES = $(flumotion_PYTHON)
+ETAGS_ARGS = --lang=python $(flumotion_PYTHON)
 
 clean-local:
 	rm -rf *.pyc *.pyo

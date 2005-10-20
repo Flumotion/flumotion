@@ -42,11 +42,11 @@ class Firewire(feedcomponent.ParseLaunchComponent):
 # See comments in gstdvdec.c for details on the dv format.
 
 def createComponent(config):
-    height = config['height']
-    width = config['width']
-    scaled_width = config['scaled_width']
-    is_square = config['is_square']
-    framerate = config['framerate']
+    width = config.get('width', 240)
+    height = config.get('height', int(720.0/width*576)) # assuming PAL :-/
+    scaled_width = config.get('scaled_width', width)
+    is_square = config.get('is_square', False)
+    framerate = config.get('framerate', 12.5)
 
     scale_correction = width - scaled_width
 

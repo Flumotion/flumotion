@@ -1,5 +1,29 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/Makefile.am: 
+	* flumotion/common/Makefile.am: Enable TAGS.
+
+	* configure.ac: 
+	* flumotion/component/converters/Makefile.am: 
+	* flumotion/component/converters/pipeline/Makefile.am: 
+	* flumotion/component/converters/pipeline/__init__.py:
+	* flumotion/component/converters/pipeline/pipeline.xml: 
+	* flumotion/component/converters/pipeline/pipeline.py:
+	* flumotion/component/producers/Makefile.am: 
+	* flumotion/component/producers/pipeline/Makefile.am: 
+	* flumotion/component/producers/pipeline/__init__.py:
+	* flumotion/component/producers/pipeline/pipeline.xml: 
+	* flumotion/component/producers/pipeline/pipeline.py: Add somehing
+	like what was in flumotion.component.base as pipeline-producer and
+	pipeline-converter. Neat for testing.
+
+	* flumotion/test/test.xml: Update to use the pipeline-producer and
+	pipeline-converter.
+
+	* flumotion/test/test_manager_manager.py
+	(TestVishnu.testConfigBeforeWorker): Skip for now. No idea what's
+	going on, but I know the DAG is unused.
+
 	* flumotion/component/producers/firewire/firewire.xml: Feed is not
 	a necessary property AFAICT.
 

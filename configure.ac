@@ -262,6 +262,7 @@ flumotion/component/consumers/disker/Makefile
 flumotion/component/consumers/httpstreamer/Makefile
 flumotion/component/consumers/preview/Makefile
 flumotion/component/converters/Makefile
+flumotion/component/converters/pipeline/Makefile
 flumotion/component/converters/overlay/Makefile
 flumotion/component/muxers/Makefile
 flumotion/component/producers/Makefile
@@ -269,6 +270,7 @@ flumotion/component/producers/audiotest/Makefile
 flumotion/component/producers/bttv/Makefile
 flumotion/component/producers/firewire/Makefile
 flumotion/component/producers/jukebox/Makefile
+flumotion/component/producers/pipeline/Makefile
 flumotion/component/producers/soundcard/Makefile
 flumotion/component/producers/videotest/Makefile
 flumotion/component/producers/webcam/Makefile
