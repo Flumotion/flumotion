@@ -43,7 +43,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
 
 def createComponent(config):
     width = config.get('width', 240)
-    height = config.get('height', int(720.0/width*576)) # assuming PAL :-/
+    height = config.get('height', int(576 * width/720.)) # assuming PAL :-/
     scaled_width = config.get('scaled_width', width)
     is_square = config.get('is_square', False)
     framerate = config.get('framerate', 12.5)

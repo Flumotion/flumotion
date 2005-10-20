@@ -1,5 +1,8 @@
 2005-10-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/firewire/firewire.py
+	(createComponent): Fix the default height.
+
 	* flumotion/launch/main.py (main): More cleanups, feeder/eater
 	verifications (with the goal being to get firewire to work)
 
