@@ -1,9 +1,13 @@
 <registry>
 
   <components>
-    <component type="audiotest">
+    <component type="audiotest" base="flumotion/component/producers/audiotest">
       <source location="flumotion.component.producers.audiotest.audiotest"/>
       <feeder name="default"/>
+      <entries>
+        <entry type="component" location="audiotest.py"
+               function="createComponent"/>
+      </entries>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="volume" type="float"/>
