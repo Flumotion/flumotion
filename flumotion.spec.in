@@ -119,6 +119,9 @@ then
  
   <manager>
     <host>localhost</host>
+<!--
+    <port>7531</port>
+-->
     <component name="manager-bouncer" type="htpasswdcrypt">
       <data><![CDATA[
 user:PSfNpHTkpTx1M
@@ -141,6 +144,10 @@ then
   <!-- <debug>3</debug> -->
 
   <manager>
+<!--
+    <host>localhost</host>
+    <port>7531</port>
+-->
   </manager>
 
   <authentication type="plaintext">
