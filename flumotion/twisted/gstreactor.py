@@ -89,6 +89,7 @@ class GstReactor(posixbasemod.PosixReactorBase):
 
     def __init__(self):
         self.context = gobject.MainContext()
+        self.loop = gobject.MainLoop(self.context)
         
         posixbasemod.PosixReactorBase.__init__(self)
         
@@ -198,14 +199,14 @@ class GstReactor(posixbasemod.PosixReactorBase):
 
     def crash(self):
         import gst
-        gst.main_quit()
+        self.loop.quit()
 
     def run(self, installSignalHandlers=1):
         import gst
         try:
             self.startRunning(installSignalHandlers=installSignalHandlers)
             self.simulate()
-            gst.main()
+            self.loop.run()
         except KeyboardInterrupt:
             pass
 

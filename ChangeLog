@@ -1,5 +1,9 @@
 2005-10-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/gstreactor.py (GstReactor.run) 
+	(GstReactor.crash, GstReactor.__init__): Attempt to make this
+	thing work with GStreamer 0.8 and 0.9.
+
 	* flumotion/manager/main.py (main): 
 	* flumotion/worker/main.py (main): Allow the environment to
 	override debugging levels in config files. Remove default=None, as
