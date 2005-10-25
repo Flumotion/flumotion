@@ -1,5 +1,7 @@
 2005-10-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py (main): Remove print.
+
 	* flumotion/twisted/Makefile.am (flumotion_PYTHON): Don't install
 	gstreactor.py...
 

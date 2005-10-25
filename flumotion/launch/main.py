@@ -315,7 +315,6 @@ def main(args):
                       for x in links if x[2] == wrapper.name]
         feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost')
                        for x in feed_ports[wrapper.name].keys()]
-        print feedersdata
         ret = wrapper.start(eatersdata, feedersdata)
         if ret:
             for x in ret:
