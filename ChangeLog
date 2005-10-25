@@ -1,5 +1,10 @@
 2005-10-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/main.py (main): 
+	* flumotion/worker/main.py (main): Allow the environment to
+	override debugging levels in config files. Remove default=None, as
+	optparse already sets the default to None.
+
 	* flumotion/component/feedcomponent09.py
 	(FeedComponent._setup_feeders): Check to see if all feeders have
 	ports assigned.

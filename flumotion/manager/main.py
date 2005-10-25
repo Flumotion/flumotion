@@ -189,8 +189,9 @@ def main(args):
     if not options.name and cfg.manager and cfg.manager.name:
         options.name = cfg.manager.name
         log.debug('manager', 'Setting manager name to %s' % options.name)
-    # command-line debug overrides config file debug
-    if not options.debug and cfg.manager and cfg.manager.fludebug:
+    # environment debug > command-line debug > config file debug
+    if not options.debug and cfg.manager and cfg.manager.fludebug \
+        and not os.environ.has_key('FLU_DEBUG'):
         options.debug = cfg.manager.fludebug
         log.debug('manager', 'Setting debug level to config file value %s' %
             options.debug)

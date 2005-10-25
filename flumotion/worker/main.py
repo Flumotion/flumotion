@@ -42,7 +42,6 @@ def main(args):
                       help="be verbose")
     parser.add_option('', '--version',
                       action="store_true", dest="version",
-                      default=False,
                       help="show version information")
 
     group = optparse.OptionGroup(parser, "worker options")
@@ -53,7 +52,6 @@ def main(args):
     defaultTCPPort = configure.defaultTCPManagerPort
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
-                     default=None,
                      help="port to listen on [default %d (ssl) or %d (tcp)]" % (defaultSSLPort, defaultTCPPort))
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
@@ -63,7 +61,6 @@ def main(args):
                      help="worker name to use in the manager")
     group.add_option('-D', '--daemonize',
                      action="store_true", dest="daemonize",
-                     default=False,
                      help="run in background as a daemon")
 
     group.add_option('-u', '--username',
@@ -77,7 +74,6 @@ def main(args):
 
     group.add_option('-F', '--feederports',
                      action="store", type="string", dest="feederports",
-                     default=None,
                      help="range of feeder ports to use")
 
     parser.add_option_group(group)
@@ -141,8 +137,9 @@ def main(args):
             log.debug('worker', 'Setting feederports %r' % options.feederports)
 
         # general
-        # command-line debug overrides config file debug
-        if not options.debug and cfg.fludebug:
+        # command-line debug > environment debug > config file debug
+        if not options.debug and cfg.fludebug \
+            and not os.environ.has_key('FLU_DEBUG'):
             options.debug = cfg.fludebug
         
     # set default values for all unset options
