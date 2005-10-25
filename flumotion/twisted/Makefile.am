@@ -9,7 +9,6 @@ flumotion_PYTHON = \
 	credentials.py \
 	defer.py \
 	flavors.py \
-	gstreactor.py \
 	gtk2reactor.py \
 	pb.py \
 	portal.py \

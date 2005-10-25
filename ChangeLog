@@ -1,5 +1,17 @@
 2005-10-25  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/Makefile.am (flumotion_PYTHON): Don't install
+	gstreactor.py...
+
+	* flumotion/twisted/compat.py (install_reactor): Fix up to work
+	properly on both twisted 1.3 and 2.0.
+
+	* flumotion/twisted/gstreactor.py: Remove, it's not necessary any
+	more.
+
+	* flumotion/twisted/gtk2reactor.py: Backport from twisted 2.0.
+	Works both with and without gtk.
+
 	* flumotion/twisted/gstreactor.py (GstReactor.run) 
 	(GstReactor.crash, GstReactor.__init__): Attempt to make this
 	thing work with GStreamer 0.8 and 0.9.

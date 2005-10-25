@@ -36,16 +36,10 @@ def filterWarnings(namespace, category):
     warnings.filterwarnings('ignore', category=c)
 
 def install_reactor(gtk=False):
-    if gtk:
-        from twisted.copyright import version
-        if version[0] >= '2':
-            from twisted.internet import gtk2reactor as reactor
-        else:
-            from flumotion.twisted import gtk2reactor as reactor
+    from twisted.copyright import version
+    if version[0] >= '2':
+        from twisted.internet import gtk2reactor as reactor
     else:
-        try:
-            from twisted.internet import glib2reactor as reactor
-        except ImportError:
-            from flumotion.twisted import gstreactor as reactor
+        from flumotion.twisted import gtk2reactor as reactor
 
-    reactor.install()
+    reactor.install(useGtk=gtk)
