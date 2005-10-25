@@ -266,6 +266,10 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.debug("_setup_feeders: feedersData %r" % feedersData)
 
+        for feeder in self.feeder_names:
+            assert feeder in [x[0] for x in feedersData], \
+                   "feedersData does not mention feeder %s" % feeder
+
         retval = []
         # Setup all feeders
         for feeder_name, host in feedersData:

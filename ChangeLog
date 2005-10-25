@@ -1,3 +1,12 @@
+2005-10-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent._setup_feeders): Check to see if all feeders have
+	ports assigned.
+
+	* flumotion/launch/main.py: Rework to assign feeder ports to
+	feeders that are unconnected, like firewire.
+
 2005-10-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:

@@ -40,12 +40,11 @@ def resolve_links(links, components):
         if link[1]:
             if not link[1] in compreg.getFeeders():
                 err('Component %s has no feeder named %s', (compname, link[1]))
-            feeder = link[1]
+            # leave link[1] unchanged
         else:
             if not compreg.getFeeders():
                 err('Component %s has no feeders' % compname)
-            feeder = compreg.getFeeders()[0]
-        link[1] = '%s:%s' % (compname, feeder)
+            link[1] = compreg.getFeeders()[0]
     
     for link in links:
         compname = link[2]
@@ -54,15 +53,14 @@ def resolve_links(links, components):
         if link[3]:
             if not link[3] in compreg.getEaters():
                 err('Component %s has no eater named %s', (compname, link[3]))
-            eater = link[3]
+            # leave link[1] unchanged
         else:
             if not compreg.getEaters():
                 err('Component %s has no eaters' % compname)
-            eater = compreg.getEaters()[0]
-        link[3] = '%s:%s' % (compname, eater)
+            link[3] = compreg.getEaters()[0]
     
     for link in links:
-        print link
+        print '%s:%s => %s:%s' % tuple(link)
 
 def parse_args(args):
     links = []
@@ -171,6 +169,7 @@ class ComponentWrapper(object):
     procedure = None
     config = None
     component = None
+    feeders = None
 
     def __init__(self, name, type, properties, feeders):
         self.name = name
@@ -184,6 +183,8 @@ class ComponentWrapper(object):
         compprops = dict([(p.getName(), p) for p in c.getProperties()])
         config = {'name': name}
         
+        self.feeders = c.getFeeders()
+
         for k, v in properties.items():
             if k not in compprops.keys():
                 err('Component %s has no such property `%s\'' % (name, k))
@@ -249,7 +250,6 @@ class ComponentWrapper(object):
     def instantiate(self, feed_ports):
         self.component = self.procedure(self.config)
         self.component.set_feed_ports(feed_ports)
-        print 'Created component %s' % self.component
 
     def start(self, eatersdata, feedersdata):
         return self.component.start(eatersdata, feedersdata)
@@ -287,41 +287,40 @@ def main(args):
 
     components, links, properties = parse_args(args[1:])
 
-    feed_ports = {}
+    # load the modules, make the component
     wrappers = []
     for name, type in components:
-        print name
-        feed_ports[name] = {}
-        feeders = [x[1] for x in links if x[2] == name]
+        feeders = ['%s:%s' % (x[0], x[1]) for x in links if x[2] == name]
         wrappers.append(ComponentWrapper(name, type, properties[name], feeders))
-    
+
+    # assign feed ports
     port = 7600
-    for link in links:
-        feed_ports[link[0]][link[1]] = port
-        port += 1
+    feed_ports = {}
+    for wrapper in wrappers:
+        feed_ports[wrapper.name] = {}
+        for feeder in wrapper.feeders:
+            feed_ports[wrapper.name][feeder] = port
+            port += 1
     
+    # instantiate the components
     for wrapper in wrappers:
         data = {}
         for feeder, port in feed_ports[wrapper.name].items():
-            data[feeder[feeder.index(':')+1:]] = port
+            data[feeder] = port
         wrapper.instantiate(data)
 
-    eatersdata = []
+    # figure out the links and start the components
     for wrapper in wrappers:
-        eatersdata = [(x[0], x[1]) for x in links if x[2] == wrapper.name]
-        print feed_ports[wrapper.name]
-        eatersdata = [(x[1], 'localhost', feed_ports[x[0]][x[1]])
-                      for x in eatersdata]
-        feedersdata = [x[1] for x in links if x[0] == wrapper.name]
-        feedersdata = [(x, 'localhost') for x in feedersdata]
+        eatersdata = [('%s:%s' % (x[0], x[1]), 'localhost', feed_ports[x[0]][x[1]])
+                      for x in links if x[2] == wrapper.name]
+        feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost')
+                       for x in feed_ports[wrapper.name].keys()]
+        print feedersdata
         ret = wrapper.start(eatersdata, feedersdata)
         if ret:
             for x in ret:
-                feeder = '%s:%s' % (wrapper.name, x[0])
-                assert x[2] == feed_ports[wrapper.name][feeder]
+                assert x[2] == feed_ports[wrapper.name][x[0]]
     
-    #print wrappers[0].start([]
-
     print 'Running the reactor. Press Ctrl-C to exit.'
 
     log.debug('launch', 'Starting reactor')
