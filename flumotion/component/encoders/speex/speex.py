@@ -28,7 +28,7 @@ class Speex(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
 
 def createComponent(config):
-    component = Speex(config['name'], [config['source']],
+    component = Speex(config['name'], config['source'],
                        "speexenc name=encoder")
     
     element = component.pipeline.get_by_name('encoder')

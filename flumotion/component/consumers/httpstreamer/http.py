@@ -179,7 +179,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     component_medium_class = HTTPMedium
 
     def __init__(self, name, source):
-        feedcomponent.ParseLaunchComponent.__init__(self, name, [source], [],
+        feedcomponent.ParseLaunchComponent.__init__(self, name, source, [],
                                                     self.pipe_template)
         Stats.__init__(self, sink=self.get_element('sink'))
         self.caps = None

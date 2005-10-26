@@ -32,7 +32,7 @@ def createComponent(config):
     bitrate = config.get('bitrate', -1)
     quality = config.get('quality', 0.3)
             
-    component = Vorbis(config['name'], [config['source']], bitrate,
+    component = Vorbis(config['name'], config['source'], bitrate,
                     quality, channels)
               
     return component

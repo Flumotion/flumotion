@@ -28,7 +28,7 @@ class Smoke(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
 
 def createComponent(config):
-    component = Smoke(config['name'], [config['source']],
+    component = Smoke(config['name'], config['source'],
                       "ffmpegcolorspace ! smokeenc name=encoder")
     
     element = component.pipeline.get_by_name('encoder')

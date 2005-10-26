@@ -1,3 +1,34 @@
+2005-10-26  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseComponent):
+	Parse feeds and sources separately, in preparation for making them
+	not overlap with properties. config['source'] will now always be a
+	list.
+	(FlumotionConfigXML._parseFeeds) 
+	(FlumotionConfigXML._parseSources): New functions dude.
+
+	* flumotion/component/consumers/disker/disker.py
+	(Disker.__init__):
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.__init__):
+	* flumotion/component/consumers/preview/preview.py
+	(Preview.__init__):
+	* flumotion/component/encoders/jpeg/jpeg.py (createComponent): 
+	* flumotion/component/encoders/mulaw/mulaw.py (createComponent): 
+	* flumotion/component/encoders/smoke/smoke.py (createComponent): 
+	* flumotion/component/encoders/speex/speex.py (createComponent): 
+	* flumotion/component/encoders/theora/theora.py (createComponent): 
+	* flumotion/component/encoders/vorbis/vorbis.py (createComponent): 
+	* flumotion/component/converters/overlay/overlay.py
+	(createComponent): Adapt to work with config['source'] always
+	being a list.
+
+	* flumotion/component/encoders/vorbis/vorbis08.py
+	(createComponent): Remove unused function.
+
+	* flumotion/component/producers/webcam/webcam.xml: feed is not a
+	required property.
+
 2005-10-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/main.py (main): Remove print.

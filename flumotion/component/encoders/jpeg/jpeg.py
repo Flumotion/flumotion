@@ -34,7 +34,7 @@ def createComponent(config):
         pipeline = pipeline + "videorate ! video/x-raw-yuv,framerate=(double)%f ! " % config['framerate']
     pipeline = pipeline + "jpegenc name=encoder"
 
-    component = JPEG(config['name'], [config['source']], pipeline)
+    component = JPEG(config['name'], config['source'], pipeline)
     
     element = component.pipeline.get_by_name('encoder')
     if config.has_key('quality'):

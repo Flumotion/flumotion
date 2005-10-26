@@ -28,7 +28,7 @@ class Theora(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
 
 def createComponent(config):
-    component = Theora(config['name'], [config['source']],
+    component = Theora(config['name'], config['source'],
                        "ffmpegcolorspace ! theoraenc name=encoder")
     
     element = component.pipeline.get_by_name('encoder')

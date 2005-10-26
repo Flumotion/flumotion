@@ -184,6 +184,11 @@ class FlumotionConfigXML(log.Loggable):
         @rtype: L{ConfigEntryComponent}
         """
         # <component name="..." type="..." worker="">
+        #   <feed>*
+        #   <source>*
+        #   <prop1>*
+        #   ...
+        # FIXME <propN>... should be in <properties> (#286)
         
         if not node.hasAttribute('name'):
             raise ConfigError("<component> must have a name attribute")
@@ -208,6 +213,30 @@ class FlumotionConfigXML(log.Loggable):
         self.debug('Parsing component: %s' % name)
         options = self._parseProperties(node, type, properties)
 
+        feeds = self._parseFeeds(node, defs)
+        sources = self._parseSources(node, defs)
+
+        # FIXME: this shouldn't be necessary in the future
+        if feeds:
+            options['feed'] = feeds
+        if sources:
+            options['source'] = sources
+
+        feeders = defs.getFeeders()
+        if feeders:
+            if not 'feed' in options:
+                # assert that the old code works the way it should; when
+                # we stop writing <feed> entries this can go
+                raise ConfigError("no <feed> entries for component %s", name)
+        for feeder in feeders:
+            if not feeder in options['feed']:
+                # assert that the old code works the way it should; when
+                # we stop writing <feed> entries this can go
+                raise ConfigError("component %s missing <feed> entry for %s",
+                    name, feeder)
+
+        # FIXME: 'name', 'parent', 'type', 'feed', and 'source' should
+        # be in a different namespace from the other properties
         config = { 'name': name,
                    'parent': parent,
                    'type': type }
@@ -357,11 +386,35 @@ class FlumotionConfigXML(log.Loggable):
 
         return values
 
+    def _parseFeeds(self, node, defs):
+        nodes = []
+        for subnode in node.childNodes:
+            if subnode.nodeName == 'feed':
+                nodes.append(subnode)
+        feeds = self._get_string_value(nodes)
+        for feed in feeds:
+            if not feed in defs.getFeeders():
+                # should be an error, but flumotion.wizard.save is too
+                # dumb right now
+                self.warning('Invalid feed for component type %s: %s'
+                    % (defs.getType(), feed))
+        return feeds
+
+    def _parseSources(self, node, defs):
+        nodes = []
+        for subnode in node.childNodes:
+            if subnode.nodeName == 'source':
+                nodes.append(subnode)
+        return self._get_string_value(nodes)
+
     def _parseProperties(self, node, type, properties):
         # XXX: We might end up calling float(), which breaks
         #      when using LC_NUMERIC when it is not C
         import locale
         locale.setlocale(locale.LC_NUMERIC, "C")
+
+        # FIXME: validate nodes, make sure they are all valid properties
+        # as well as the other way around
 
         config = {}
         for definition in properties:

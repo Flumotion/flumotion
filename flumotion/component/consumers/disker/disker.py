@@ -67,7 +67,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.caps = None
         
         feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    [source],
+                                                    source,
                                                     [],
                                                     self.pipe_template)
     def setTimeRotate(self, time):

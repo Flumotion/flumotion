@@ -28,7 +28,7 @@ class Mulaw(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
 
 def createComponent(config):
-    component = Mulaw(config['name'], [config['source']],
+    component = Mulaw(config['name'], config['source'],
                        "mulawenc name=encoder")
     
     return component

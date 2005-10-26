@@ -28,7 +28,7 @@ class Preview(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     def __init__(self, name, source):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    [source],
+                                                    source,
                                                     [],
                                                     self.pipe_template)
 

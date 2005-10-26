@@ -72,8 +72,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
             self.debug('Temporary overlay already gone, did we not start up correctly ?')
         
 def createComponent(config):
-    source = config['source']
-    eater = '@ eater:%s @' % source
+    eater = '@ eater:%s @' % config['source'][0]
 
     # AYUV conversion got added to ffmpegcolorspace in 0.8.5
     # alphacolor element works too, but has bugs for non-multiples of 4 or eight
@@ -96,4 +95,4 @@ def createComponent(config):
                     ' ! ffmpegcolorspace ! videomixer name=mix '
                     ' ! @ feeder:: @ %(eater)s ! ffmpegcolorspace ! mix.' % locals())
     
-    return Overlay(config['name'], [source], pipeline, config)
+    return Overlay(config['name'], config['source'], pipeline, config)

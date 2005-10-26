@@ -221,13 +221,3 @@ class Vorbis(feedcomponent.FeedComponent):
         self.emit('notify-feed-ports')
 
         self._start_deferred.callback(retval)
-
-def createComponent(config):
-    channels = config.get('channels', 2)
-    bitrate = config.get('bitrate', -1)
-    quality = config.get('quality', 0.3)
-            
-    component = Vorbis(config['name'], [config['source']], bitrate,
-                    quality, channels)
-              
-    return component
