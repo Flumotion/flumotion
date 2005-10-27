@@ -1,3 +1,22 @@
+2005-10-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/launch/main.py (ComponentWrapper.__init__): Work with
+	the 'source'-is-always-a-list change.
+
+	* flumotion/component/producers/firewire/firewire.py
+	(createComponent): Throw a leaky queue after dv1394src, so that if
+	the sink starts blocking the buffers still have somewhere to do.
+	Otherwise the kernel starts complaining about every dropped iso
+	packet, overloading the system.
+
+	* flumotion/component/converters/overlay/overlay.py
+	(Overlay.start): Don't rely on show_text or text being there.
+
+	* flumotion/component/converters/overlay/overlay.xml: feed no
+	longer a required property. width and height are, for now --
+	although really we should just get this info from the incoming
+	caps.
+
 2005-10-26  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/config.py (FlumotionConfigXML._parseComponent):

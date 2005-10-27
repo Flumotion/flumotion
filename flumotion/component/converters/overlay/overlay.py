@@ -42,8 +42,8 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         os.close(fd)
 
         text = None
-        if self._config['show_text']:
-            text = self._config['text']
+        if self._config.get('show_text', False):
+            text = self._config.get('text', 'set the "text" property')
         genimg.generate_overlay(self._filename,
                                 text,
                                 self._config.get('fluendo_logo', False),
@@ -92,7 +92,7 @@ def createComponent(config):
                     ' ! @ feeder:: @ %(eater)s ! %(alpha)s ! mix.' % locals())
     else:
         pipeline = ('filesrc name=source blocksize=100000 ! pngdec '
-                    ' ! ffmpegcolorspace ! videomixer name=mix '
+                    ' ! alphacolor ! videomixer name=mix '
                     ' ! @ feeder:: @ %(eater)s ! ffmpegcolorspace ! mix.' % locals())
     
     return Overlay(config['name'], config['source'], pipeline, config)

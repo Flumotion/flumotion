@@ -215,12 +215,7 @@ class ComponentWrapper(object):
             if not prop.isMultiple():
                 if len(feeders) > 1:
                     err('Component %s can only eat from one feeder' % name)
-                if feeders:
-                    config['source'] = feeders[0]
-                else:
-                    # don't set
-                    pass
-            elif feeders:
+            if feeders:
                 config['source'] = feeders
             else:
                 # don't even set config['source']

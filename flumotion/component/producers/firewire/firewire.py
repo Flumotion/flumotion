@@ -100,7 +100,10 @@ def createComponent(config):
                            sq=square_pipe, pp=pad_pipe,
                            sw=scaled_width, h=height, fr=framerate))
     else:
-        template = ('dv1394src ! dvdemux name=demux'
+        # need a queue in case tcpserversink blocks somehow
+        template = ('dv1394src'
+                    '    ! queue leaky=2 max-size-time=1000000000'
+                    '    ! dvdemux name=demux'
                     '  demux. ! dvdec drop-factor=%(df)d'
                     '    ! video/x-raw-yuv,format=(fourcc)YUY2'
                     '    ! videorate ! videoscale'
