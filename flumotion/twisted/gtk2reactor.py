@@ -191,7 +191,15 @@ class Gtk2Reactor(posixbase.PosixReactorBase):
                 log.deferr()
 
         if why:
-            self._disconnectSelectable(source, why, didRead == source.doRead)
+            #self._disconnectSelectable(source, why, didRead == source.doRead)
+            # this block copied from the 1.3 gtk2reactor
+            self.removeReader(source)
+            self.removeWriter(source)
+            f = faildict.get(why.__class__)
+            if f:
+                source.connectionLost(f)
+            else:
+                source.connectionLost(failure.Failure(why))
     
     def callback(self, source, condition):
         log.callWithLogger(source, self._doReadOrWrite, source, condition)
