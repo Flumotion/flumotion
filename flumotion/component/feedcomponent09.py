@@ -164,9 +164,9 @@ class FeedComponent(basecomponent.BaseComponent):
 
         if t == gst.MESSAGE_STATE_CHANGED:
             old, new, pending = message.parse_state_changed()
-            self.log('state change: %r %s->%s'
-                     % (src, old.value_nick, new.value_nick))
             if src == self.pipeline:
+                self.log('state change: %r %s->%s'
+                    % (src, old.value_nick, new.value_nick)) 
                 if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
                     self.setMood(moods.happy)
             elif src.get_name() in self.feeder_names:
@@ -175,10 +175,6 @@ class FeedComponent(basecomponent.BaseComponent):
                     self.feedersWaiting -= 1
                     self.debug('%d feeders waiting' % self.feedersWaiting)
                     self.emit('feed-ready', src.get_name(), True)
-                    if self.feedersWaiting == 0:
-                        self.setMood(moods.happy)
-                # don't bother handling the playing->paused case,
-                # elements don't change their state any more...
         elif t == gst.MESSAGE_ERROR:
             err, debug = message.parse_error()
             self.debug('element %s error %s %s' %

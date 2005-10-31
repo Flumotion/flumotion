@@ -1,5 +1,9 @@
 2005-10-31  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.bus_watch_func): Set to happy only from the global
+	pipeline state change message. Log a little less.
+
 	* flumotion/worker/job.py (run): Profile the job if profiling is
 	available. Don't start another reactor; rely on worker.py
 	unwinding cleanly.
