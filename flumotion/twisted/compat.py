@@ -38,8 +38,14 @@ def filterWarnings(namespace, category):
 def install_reactor(gtk=False):
     from twisted.copyright import version
     if version[0] >= '2':
-        from twisted.internet import gtk2reactor as reactor
+        from twisted.internet import gtk2reactor as Reactor
     else:
-        from flumotion.twisted import gtk2reactor as reactor
+        from flumotion.twisted import gtk2reactor as Reactor
 
-    reactor.install(useGtk=gtk)
+    Reactor.install(useGtk=gtk)
+
+    if version[0] >= '2':
+        from twisted.internet import reactor
+        from twisted.names import client
+        # avoid spawning threads -- the normal resolver spawns threads
+        reactor.installResolver(client.createResolver())
