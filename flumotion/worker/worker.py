@@ -40,6 +40,7 @@ from flumotion.common import errors, interfaces, log, bundleclient
 from flumotion.common import common, medium
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
+from flumotion.twisted.defer import defer_generator
 from flumotion.worker import job
 from flumotion.configure import configure
 
@@ -147,39 +148,45 @@ class WorkerMedium(medium.BaseMedium):
         self.debug('remote_start(): id %s, type %s, config %r' % (
             avatarId, type, config))
 
-        # first set up bundles
-        # FIXME: we do this in the main worker process because the component
-        # starts and logs into the manager after being created
-        # but ideally the component would get created as an empty shell that
-        # logs in, then gets the info about what sort of component it should
-        # be, and then sets up the bundles and starts
-        self.debug('setting up bundles for %s' % moduleName)
-        d = self.bundleLoader.loadModule(moduleName)
-        d.addCallback(self._startCallback, avatarId, type, moduleName,
-            methodName, config)
-        return d
+        ret = defer.Deferred()
 
-    def _startCallback(self, result, avatarId, type, moduleName, methodName,
-        config):
-        # create a deferred that will be triggered when the jobavatar
-        # instructs the job to start a component
-        d = self.brain.deferredStartCreate(avatarId)
+        # first unwind the stack by going into a callLater
+        def do_start():
+            # then set up bundles as we need to have a pb connection to
+            # download the modules -- can't do that before connecting in
+            # the kid
+            self.debug('setting up bundles for %s' % moduleName)
+            d = self.bundleLoader.loadModule(moduleName)
+            yield d
+            try:
+                # check errors
+                d.value()
+            except Exception, e:
+                ret.errback(e)
 
-        if d:
-            d.addCallback(self._deferredStartCallback, avatarId)
+            d = self.brain.deferredStartCreate(avatarId)
 
-            self.brain.kindergarten.play(avatarId, type, moduleName,
+            pid = self.brain.kindergarten.play(avatarId, type, moduleName,
                 methodName, config)
-            return d
-        else:
-            msg = ('Component "%s" has already received a start request'
-                   % avatarId)
-            raise errors.ComponentStart(msg)
 
-    def _deferredStartCallback(self, result, avatarId):
-        self.debug('deferred start for %s fired, remote_start returns %s' % (
-            avatarId, result))
-        return result
+            if not pid:
+                # this is the kid returning; returning here should
+                # finally unwind back to the reactor
+                return
+
+            yield d
+            try:
+                result = d.value()
+                self.debug('deferred start for %s succeeded (%r)'
+                           % (avatarId, result))
+                ret.callback(result)
+            except Exception, e:
+                msg = ('Component "%s" has already received a start request'
+                   % avatarId)
+                ret.errback(errors.ComponentStart(msg))
+        do_start = defer_generator(do_start)
+            
+        reactor.callLater(0, do_start)
 
     def remote_checkElements(self, elementNames):
         """
@@ -254,6 +261,9 @@ class Kindergarten(log.Loggable):
         Starts a component with the given name, of the given type, and
         the given config dictionary.
 
+        Returns the pid of the child process, or None if returning from
+        the child process, just like os.fork().
+
         @param avatarId:   avatarId the component should use to log in
         @type  avatarId:   string
         @param type:       type of component to start
@@ -265,11 +275,19 @@ class Kindergarten(log.Loggable):
         @param config:     a configuration dictionary for the component
         @type  config:     dict
         """
-        # This forks and returns the pid
+        # This forks and returns the pid, or None if we're in the kid
         pid = job.run(avatarId, self.options)
-        
-        self.kids[avatarId] = Kid(pid, avatarId, type, moduleName, methodName,
-            config)
+
+        if not pid:
+            # this is the kid, just return so we can unwind the stack
+            # back to the reactor
+            return None
+
+        # we're the parent
+        self.kids[avatarId] = \
+            Kid(pid, avatarId, type, moduleName, methodName, config)
+
+        return pid
 
     def getKid(self, avatarId):
         return self.kids[avatarId]

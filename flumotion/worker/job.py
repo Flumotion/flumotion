@@ -145,9 +145,6 @@ class JobMedium(medium.BaseMedium):
 
     ### our methods
     def shutdown(self):
-        # FIXME: for now this method actually stops reactor and exits
-        # completely; but ideally we'd do nice cleanup so we don't have
-        # to exit here, but just let the reactor be exited from
         """
         Shut down the job process completely, cleaning up the component
         so the reactor can be left from.
@@ -158,10 +155,6 @@ class JobMedium(medium.BaseMedium):
         self.debug('calling reactor.stop')
         reactor.stop()
         self.debug('called reactor.stop')
-        # we do this here as a quick-stop gap for Twisted 2.0
-        # but ideally we would have better cleanup using deferreds
-        # and then the reactor would be left correctly
-        os._exit(0)
 
     def _set_nice(self, nice):
         if not nice:
@@ -336,10 +329,23 @@ def run(avatarId, options):
     reactor.connectUNIX(workerSocket, job_factory)
     log.info('job', 'Started job on pid %d' % os.getpid())
     log.debug('job', 'Starting reactor')
-    reactor.run()
 
-    log.debug('job', 'Left reactor.run')
-    log.info('job', 'Job stopped, returning with exit value 0')
-            
-    os._exit(0)
+    try:
+        import statprof
+        statprof.start()
+        print 'profiling started'
+
+        def stop_profiling():
+            print 'stopping profiling and displaying'
+            statprof.stop()
+            statprof.display()
+
+        reactor.addSystemEventTrigger('before', 'shutdown',
+            stop_profiling)
+    except ImportError:
+        print 'no profiling'
+        pass
     
+    # flumotion.worker.worker.Kindergarten.play() looks for a return of
+    # None if it's the kid returning; be explicit here
+    return None

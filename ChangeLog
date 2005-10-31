@@ -1,3 +1,19 @@
+2005-10-31  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/job.py (run): Profile the job if profiling is
+	available. Don't start another reactor; rely on worker.py
+	unwinding cleanly.
+	(JobMedium.shutdown): Don't os._exit(0), allow twisted to clean
+	itself properly.
+
+	* flumotion/worker/worker.py (WorkerMedium.remote_start): Rework
+	to receive return values both from the parent and child process.
+	Now uses defer generators.
+	(Kindergarten.play): Return the pid or None like os.fork().
+
+	* flumotion/twisted/compat.py (install_reactor): Don't spawn
+	threads to resolve names with twisted 2.0.
+
 2005-10-27  Thomas Vander Stichele  <thomas (at) apestaart (dot) org>
 
 	* flumotion/twisted/gtk2reactor.py:
