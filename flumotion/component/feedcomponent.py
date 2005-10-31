@@ -52,7 +52,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         basecomponent.BaseComponentMedium.__init__(self, component)
 
         def on_feed_ready(component, feedName, isReady):
-            self.callRemote('notifyFeedPorts', component.feed_ports)
+            self.callRemote('feedReady', feedName, isReady)
 
         def on_component_error(component, element_path, message):
             self.callRemote('error', element_path, message)
