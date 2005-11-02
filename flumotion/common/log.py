@@ -136,12 +136,12 @@ def _handle(level, object, category, message):
 
             return filename
 
-        stack = traceback.extract_stack()
-        while stack:
-            entry = stack.pop()
-            if not entry[0].endswith('log.py'):
-                filename = scrubFilename(entry[0])
-                return filename, entry[1]
+        frame = sys._getframe()
+        while frame:
+            co = frame.f_code
+            if not co.co_filename.endswith('log.py'):
+                return scrubFilename(co.co_filename), frame.f_lineno
+            frame = frame.f_back
             
         return "Not found", 0
 

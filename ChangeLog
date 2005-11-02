@@ -1,5 +1,11 @@
 2005-11-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/log.py (_handle.getFileLine): Don't extract the
+	whole stack, just work back frame by frame getting the information
+	we need.
+
+2005-11-02  Andy Wingo  <wingo@pobox.com>
+
 	* flumotion/test/test_log.py: Update test suite.
 
 	* flumotion/common/Makefile.am (flumotion_PYTHON): 
