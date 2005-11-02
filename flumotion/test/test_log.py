@@ -73,12 +73,12 @@ class TestLog(unittest.TestCase):
         # log 3 we should get
         self.tester.info("visible")
         assert self.category == 'testlog'
-        assert self.level == 'INFO'
+        assert self.level == log.INFO
         assert self.message == 'visible'
   
         self.tester.warning("also visible")
         assert self.category == 'testlog'
-        assert self.level == 'WARN'
+        assert self.level == log.WARN
         assert self.message == 'also visible'
   
     def testLimitedError(self):
@@ -87,7 +87,7 @@ class TestLog(unittest.TestCase):
         
         self.assertRaises(errors.SystemError, self.tester.error, "error")
         assert self.category == 'testlog'
-        assert self.level == 'ERROR'
+        assert self.level == log.ERROR
         assert self.message == 'error'
 
     def testLogHandlerLimitedLevels(self):
@@ -99,12 +99,12 @@ class TestLog(unittest.TestCase):
 
         self.tester.debug("debug")
         assert self.category == 'testlog'
-        assert self.level == 'DEBUG'
+        assert self.level == log.DEBUG
         assert self.message == 'debug'
   
         self.tester.log("log")
         assert self.category == 'testlog'
-        assert self.level == 'LOG'
+        assert self.level == log.LOG
         assert self.message == 'log'
 
     # test that we get all log messages

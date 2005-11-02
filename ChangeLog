@@ -1,5 +1,7 @@
 2005-11-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_log.py: Update test suite.
+
 	* flumotion/common/Makefile.am (flumotion_PYTHON): 
 	* flumotion/common/debug.py: New module, exports trace_start() and
 	trace_stop() procedures.
