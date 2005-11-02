@@ -1,5 +1,8 @@
 2005-11-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/log.py (scrubFilename): Whoops, pychecker
+	caught a bug.
+
 	* flumotion/worker/worker.py (WorkerMedium.remote_start): Turned
 	into a defer generator method. Do a callLater right before forking
 	so that the stack won't have any reads in progress -- because

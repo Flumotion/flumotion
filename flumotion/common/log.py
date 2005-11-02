@@ -117,25 +117,26 @@ def _canShortcutLogging(category, level):
     else:
         return level > getCategoryLevel(category)
 
+def scrubFilename(filename):
+    '''
+    Scrub the filename of everything before 'flumotion' and'twisted' to make them shorter.
+    '''
+    i = filename.rfind('flumotion')
+    if i != -1:
+        #filename = filename[i + len('flumotion') + 1:]
+        filename = filename[i:]
+    else:
+        # only pure twisted, not flumotion.twisted
+        i = filename.rfind('twisted')
+        if i != -1:
+            filename = filename[i:]
+    
+    return filename
+
 def _handle(level, object, category, message):
     def getFileLine():
         # Return a tuple of (file, line) for the first stack entry
         # outside of log.py (which would be the caller of log)
-        def scrubFilename(filename):
-            # Scrub the filename of everything before 'flumotion' and
-            # 'twisted' to make them shorter.
-            i = filename.rfind('flumotion')
-            if i != -1:
-                #filename = filename[i + len('flumotion') + 1:]
-                filename = filename[i:]
-            else:
-                # only pure twisted, not flumotion.twisted
-                i = filename.rfind('twisted')
-                if i != -1:
-                    filename = filename[i:]
-
-            return filename
-
         frame = sys._getframe()
         while frame:
             co = frame.f_code
