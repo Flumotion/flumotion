@@ -18,6 +18,7 @@ flumotion_PYTHON = \
 	componentui.py \
 	config.py \
 	dag.py \
+	debug.py \
 	enum.py \
 	errors.py \
 	gstreamer.py \

@@ -1,3 +1,25 @@
+2005-11-02  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/Makefile.am (flumotion_PYTHON): 
+	* flumotion/common/debug.py: New module, exports trace_start() and
+	trace_stop() procedures.
+
+	* flumotion/common/log.py (ERROR, WARN, INFO, DEBUG, LOG): New
+	integer values exported by the module.
+	(_levels, getLevel): Removed; levels are ints and not strings.
+	(getLevelName): New proc. Does type-checking on its input. Should
+	really have some nice decorators to check types.
+	(registerCategory): Adapted for the change to levels.
+	(_canShortcutLogging): New proc, returns True if no logging will
+	be performed for this category at this level.
+	(_handle): Make scrubFileName and getFileLine internal. Adapt to
+	level changes. Don't call getFileLine if not necessary.
+	(Loggable.error, Loggable.warning, Loggable.info, Loggable.debug) 
+	(Loggable.log): if _canShortcutLogging(), avoid doing expensive
+	calculations.
+	(FluLogObserver.emit): Adapt to level changes.
+	(stderrHandler): Same.
+
 2005-10-31  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/feedcomponent.py
@@ -34,7 +56,7 @@
 
 	* flumotion/component/producers/firewire/firewire.py
 	(createComponent): Throw a leaky queue after dv1394src, so that if
-	the sink starts blocking the buffers still have somewhere to do.
+	the sink starts blocking the buffers still have somewhere to go.
 	Otherwise the kernel starts complaining about every dropped iso
 	packet, overloading the system.
 

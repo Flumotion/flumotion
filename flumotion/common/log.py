@@ -47,114 +47,20 @@ _log_handlers_limited = []
 
 _initialized = False
 
-# level -> number dict
-_levels = {
-    "ERROR": 1,
-    "WARN": 2,
-    "INFO": 3,
-    "DEBUG": 4,
-    "LOG": 5
-}
-def getLevel(level):
+# public log levels
+ERROR = 1
+WARN = 2
+INFO = 3
+DEBUG = 4
+LOG = 5
+
+def getLevelName(level):
     """
-    Return an integer value that represents the level.
+    Return the name of a log level.
     """
-    global _levels
-    if _levels.has_key(level):
-        return _levels[level]
-    if isinstance(int, level):
-        return level
-    raise TypeError
-
-class Loggable:
-    """
-    Base class for objects that want to be able to log messages with
-    different level of severity.  The levels are, in order from least
-    to most: log, debug, info, warning, error.
-
-    @cvar logCategory: Implementors can provide a category to log their
-       messages under.
-    """
-
-    logCategory = 'default'
-    
-    def error(self, *args):
-        """Log an error.  By default this will also raise an exception."""
-        errorObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
-        
-    def warning(self, *args):
-        """Log a warning.  Used for non-fatal problems."""
-        warningObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
-        
-    def info(self, *args):
-        """Log an informational message.  Used for normal operation."""
-        infoObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
-
-    def debug(self, *args):
-        """Log a debug message.  Used for debugging."""
-        debugObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
-
-    def log(self, *args):
-        """Log a log message.  Used for debugging recurring events."""
-        logObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
-
-    def warningFailure(self, failure):
-        """
-        Log a warning about a Failure. Useful as an errback handler:
-        d.addErrback(self.warningFailure)
-        """
-        warningObject(self.logObjectName(), self.logCategory,
-            self.logFunction(getFailureMessage(failure)))
-
-    def logFunction(self, message):
-        """Overridable log function.  Default just returns passed message."""
-        return message
-
-    def logObjectName(self):
-        """Overridable object name function."""
-        # cheat pychecker
-        for name in ['logName', 'name']:
-            if hasattr(self, name):
-                return getattr(self, name)
-
-        return None
-
-# we need an object as the observer because startLoggingWithObserver
-# expects a bound method
-class FluLogObserver:
-    """
-    Twisted log observer that integrates with Flumotion's logging.
-    """
-    def emit(self, eventDict):
-        method = log # by default, lowest level
-        edm = eventDict['message']
-        if not edm:
-            if eventDict['isError'] and eventDict.has_key('failure'):
-                method = debug # tracebacks from errors at debug level
-                msg = "A python traceback occurred."
-                if getCategoryLevel("twisted") < getLevel("DEBUG"):
-                    msg += "  Run with debug level 4 to see the traceback."
-                # and an additional warning
-                warning('twisted', msg)
-                text = eventDict['failure'].getTraceback()
-            elif eventDict.has_key('format'):
-                text = eventDict['format'] % eventDict
-            else:
-                # we don't know how to log this
-                return
-        else:
-            text = ' '.join(map(str, edm))
-
-        fmtDict = { 'system': eventDict['system'],
-                    'text': text.replace("\n", "\n\t")
-                  }
-        msgStr = " [%(system)s] %(text)s\n" % fmtDict
-        method('twisted', msgStr)
+    assert isinstance(level, int) and level > 0 and level < 6, \
+           "Bad debug level"
+    return ('ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG')[level - 1]
 
 def registerCategory(category):
     """
@@ -184,13 +90,10 @@ def registerCategory(category):
             # we have a match, so set level based on string or int
             if not value:
                 continue
-            if _levels.has_key(value):
-                level = _levels[value]
-            else:
-                try:
-                    level = int(value)
-                except ValueError: # e.g. *; we default to most
-                    level = 5
+            try:
+                level = int(value)
+            except ValueError: # e.g. *; we default to most
+                level = 5
     # store it
     _categories[category] = level
 
@@ -205,6 +108,215 @@ def getCategoryLevel(category):
     if not _categories.has_key(category):
         registerCategory(category)
     return _categories[category]
+
+def _canShortcutLogging(category, level):
+    if _log_handlers:
+        # we have some loggers operating without filters, have to do
+        # everything
+        return False
+    else:
+        return level > getCategoryLevel(category)
+
+def _handle(level, object, category, message):
+    def getFileLine():
+        # Return a tuple of (file, line) for the first stack entry
+        # outside of log.py (which would be the caller of log)
+        def scrubFilename(filename):
+            # Scrub the filename of everything before 'flumotion' and
+            # 'twisted' to make them shorter.
+            i = filename.rfind('flumotion')
+            if i != -1:
+                #filename = filename[i + len('flumotion') + 1:]
+                filename = filename[i:]
+            else:
+                # only pure twisted, not flumotion.twisted
+                i = filename.rfind('twisted')
+                if i != -1:
+                    filename = filename[i:]
+
+            return filename
+
+        stack = traceback.extract_stack()
+        while stack:
+            entry = stack.pop()
+            if not entry[0].endswith('log.py'):
+                filename = scrubFilename(entry[0])
+                return filename, entry[1]
+            
+        return "Not found", 0
+
+    # first all the unlimited ones
+    if _log_handlers:
+        (file, line) = getFileLine()
+        for handler in _log_handlers:
+            try:
+                handler(level, object, category, file, line, message)
+            except TypeError:
+                raise SystemError, "handler %r raised a TypeError" % handler
+
+    if level > getCategoryLevel(category):
+        return
+
+    # set this a second time, just in case there weren't unlimited
+    # loggers there before
+    (file, line) = getFileLine()
+
+    for handler in _log_handlers_limited:
+        try:
+            handler(level, object, category, file, line, message)
+        except TypeError:
+            raise SystemError, "handler %r raised a TypeError" % handler
+    
+def errorObject(object, cat, *args):
+    """
+    Log a fatal error message in the given category. \
+    This will also raise a L{flumotion.common.errors.SystemError}.
+    """
+    _handle(ERROR, object, cat, ' '.join(args))
+
+    # we do the import here because having it globally causes weird import
+    # errors if our gstreactor also imports .log, which brings in errors
+    # and pb stuff
+    from flumotion.common.errors import SystemError
+    raise SystemError(' '.join(args))
+
+def warningObject(object, cat, *args):
+    """
+    Log a warning message in the given category.
+    This is used for non-fatal problems.
+    """
+    _handle(WARN, object, cat, ' '.join(args))
+
+def infoObject(object, cat, *args):
+    """
+    Log an informational message in the given category.
+    """
+    _handle(INFO, object, cat, ' '.join(args))
+
+def debugObject(object, cat, *args):
+    """
+    Log a debug message in the given category.
+    """
+    _handle(DEBUG, object, cat, ' '.join(args))
+
+def logObject(object, cat, *args):
+    """
+    Log a log message.  Used for debugging recurring events.
+    """
+    _handle(LOG, object, cat, ' '.join(args))
+
+error = lambda cat, *args: errorObject(None, cat, *args)
+warning = lambda cat, *args: warningObject(None, cat, *args)
+info = lambda cat, *args: infoObject(None, cat, *args)
+debug = lambda cat, *args: debugObject(None, cat, *args)
+log = lambda cat, *args: logObject(None, cat, *args)
+
+#warningFailure = lambda failure: Loggable.warningFailure(None, '', failure)
+warningFailure = lambda failure: warning('', getFailureMessage(failure))
+
+class Loggable:
+    """
+    Base class for objects that want to be able to log messages with
+    different level of severity.  The levels are, in order from least
+    to most: log, debug, info, warning, error.
+
+    @cvar logCategory: Implementors can provide a category to log their
+       messages under.
+    """
+
+    logCategory = 'default'
+    
+    def error(self, *args):
+        """Log an error.  By default this will also raise an exception."""
+        if _canShortcutLogging(self.logCategory, ERROR):
+            return
+        errorObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
+        
+    def warning(self, *args):
+        """Log a warning.  Used for non-fatal problems."""
+        if _canShortcutLogging(self.logCategory, WARN):
+            return
+        warningObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
+        
+    def info(self, *args):
+        """Log an informational message.  Used for normal operation."""
+        if _canShortcutLogging(self.logCategory, INFO):
+            return
+        infoObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
+
+    def debug(self, *args):
+        """Log a debug message.  Used for debugging."""
+        if _canShortcutLogging(self.logCategory, DEBUG):
+            return
+        debugObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
+
+    def log(self, *args):
+        """Log a log message.  Used for debugging recurring events."""
+        if _canShortcutLogging(self.logCategory, LOG):
+            return
+        logObject(self.logObjectName(), self.logCategory,
+            self.logFunction(*args))
+
+    def warningFailure(self, failure):
+        """
+        Log a warning about a Failure. Useful as an errback handler:
+        d.addErrback(self.warningFailure)
+        """
+        if _canShortcutLogging(self.logCategory, WARN):
+            return
+        warningObject(self.logObjectName(), self.logCategory,
+            self.logFunction(getFailureMessage(failure)))
+
+    def logFunction(self, message):
+        """Overridable log function.  Default just returns passed message."""
+        return message
+
+    def logObjectName(self):
+        """Overridable object name function."""
+        # cheat pychecker
+        for name in ['logName', 'name']:
+            if hasattr(self, name):
+                return getattr(self, name)
+
+        return None
+
+# we need an object as the observer because startLoggingWithObserver
+# expects a bound method
+class FluLogObserver:
+    """
+    Twisted log observer that integrates with Flumotion's logging.
+    """
+    def emit(self, eventDict):
+        method = log # by default, lowest level
+        edm = eventDict['message']
+        if not edm:
+            if eventDict['isError'] and eventDict.has_key('failure'):
+                method = debug # tracebacks from errors at debug level
+                msg = "A python traceback occurred."
+                if getCategoryLevel("twisted") < DEBUG:
+                    msg += "  Run with debug level 4 to see the traceback."
+                # and an additional warning
+                warning('twisted', msg)
+                text = eventDict['failure'].getTraceback()
+                print text
+            elif eventDict.has_key('format'):
+                text = eventDict['format'] % eventDict
+            else:
+                # we don't know how to log this
+                return
+        else:
+            text = ' '.join(map(str, edm))
+
+        fmtDict = { 'system': eventDict['system'],
+                    'text': text.replace("\n", "\n\t")
+                  }
+        msgStr = " [%(system)s] %(text)s\n" % fmtDict
+        method('twisted', msgStr)
+
 
 
 def stderrHandler(level, object, category, file, line, message):
@@ -227,7 +339,8 @@ def stderrHandler(level, object, category, file, line, message):
         # level   pid     object   cat      time
         # 5 + 1 + 7 + 1 + 32 + 1 + 17 + 1 + 15 == 80
         sys.stderr.write('%-5s [%5d] %-32s %-17s %-15s ' % (
-            level, os.getpid(), o, category, time.strftime("%b %d %H:%M:%S")))
+            getLevelName(level), os.getpid(), o, category,
+            time.strftime("%b %d %H:%M:%S")))
         sys.stderr.write('%-4s %s %s\n' % ("", message, where))
 
         # old: 5 + 1 + 20 + 1 + 12 + 1 + 32 + 1 + 7 == 80
@@ -239,80 +352,16 @@ def stderrHandler(level, object, category, file, line, message):
         # happens in SIGCHLDHandler for example
         pass
 
-def _handle(level, object, category, message):
-    global _log_handlers, _log_handlers_limited
-
-    # first all the unlimited ones
-    (file, line) = getFileLine()
-    for handler in _log_handlers:
-        try:
-            handler(level, object, category, file, line, message)
-        except TypeError:
-            raise SystemError, "handler %r raised a TypeError" % handler
-
-    # the limited ones
-    if getLevel(level) > getCategoryLevel(category):
-        return
-    for handler in _log_handlers_limited:
-        try:
-            handler(level, object, category, file, line, message)
-        except TypeError:
-            raise SystemError, "handler %r raised a TypeError" % handler
-    
-def errorObject(object, cat, *args):
-    """
-    Log a fatal error message in the given category. \
-    This will also raise a L{flumotion.common.errors.SystemError}.
-    """
-    _handle('ERROR', object, cat, ' '.join(args))
-
-    # we do the import here because having it globally causes weird import
-    # errors if our gstreactor also imports .log, which brings in errors
-    # and pb stuff
-    from flumotion.common.errors import SystemError
-    raise SystemError(' '.join(args))
-
-def warningObject(object, cat, *args):
-    """
-    Log a warning message in the given category.
-    This is used for non-fatal problems.
-    """
-    _handle('WARN', object, cat, ' '.join(args))
-
-def infoObject(object, cat, *args):
-    """
-    Log an informational message in the given category.
-    """
-    _handle('INFO', object, cat, ' '.join(args))
-
-def debugObject(object, cat, *args):
-    """
-    Log a debug message in the given category.
-    """
-    _handle('DEBUG', object, cat, ' '.join(args))
-
-def logObject(object, cat, *args):
-    """
-    Log a log message.  Used for debugging recurring events.
-    """
-    _handle('LOG', object, cat, ' '.join(args))
-
-error = lambda cat, *args: errorObject(None, cat, *args)
-warning = lambda cat, *args: warningObject(None, cat, *args)
-info = lambda cat, *args: infoObject(None, cat, *args)
-debug = lambda cat, *args: debugObject(None, cat, *args)
-log = lambda cat, *args: logObject(None, cat, *args)
-
-#warningFailure = lambda failure: Loggable.warningFailure(None, '', failure)
-warningFailure = lambda failure: warning('', getFailureMessage(failure))
-
 def addLogHandler(func, limited=True):
     """
     Add a custom log handler.
 
     @param func:    a function object
                     with prototype (level, object, category, message)
-                    where all of them are strings or None.
+                    where level is either ERROR, WARN, INFO, DEBUG, or
+                    LOG, and the rest of the arguments are strings or
+                    None. Use getLevelName(level) to get a printable
+                    name for the log level.
     @type func:     a callable function
     @type limited:  boolean
     @param limited: whether to automatically filter based on FLU_DEBUG
@@ -368,37 +417,6 @@ def setFluDebug(string):
     # reparse all already registered category levels
     for category in _categories:
         registerCategory(category)
-
-def scrubFilename(filename):
-    """
-    Scrub the filename of everything before 'flumotion' and 'twisted'
-    to make them shorter.
-    """
-    i = filename.rfind('flumotion')
-    if i != -1:
-        #filename = filename[i + len('flumotion') + 1:]
-        filename = filename[i:]
-    else:
-        # only pure twisted, not flumotion.twisted
-        i = filename.rfind('twisted')
-        if i != -1:
-            filename = filename[i:]
-
-    return filename
-
-def getFileLine():
-    """
-    Return a tuple of (file, line) for the first stack entry outside of
-    log.py (which would be the caller of log)
-    """
-    stack = traceback.extract_stack()
-    while stack:
-        entry = stack.pop()
-        if not entry[0].endswith('log.py'):
-            filename = scrubFilename(entry[0])
-            return filename, entry[1]
-        
-    return "Not found", 0
 
 def getExceptionMessage(exception):
     stack = traceback.extract_tb(sys.exc_info()[2])
