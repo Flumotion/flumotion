@@ -29,41 +29,56 @@ from twisted.python.reflect import filenameToModuleName
 _tracing = 0
 _indent = ''
 
-def trace_start(func_filter=None, print_returns=False):
+def trace_start(func_filter=None, ignore_files_re=None, print_returns=False,
+                write=None):
     global _tracing, _indent
     
     if func_filter:
         func_filter = re.compile(func_filter)
 
+    if ignore_files_re:
+        ignore_files_re = re.compile(ignore_files_re)
+
+    if not write:
+        def write(indent, str, *args):
+            print (indent + str) % args
+            
     def do_trace(frame, event, arg):
         global _tracing, _indent
         
         if not _tracing:
             print '[tracing stopped]'
             return None
-        elif event == 'line':
+
+        co = frame.f_code
+
+        if event == 'line':
             return do_trace
+        if func_filter and not func_filter.search(co.co_name):
+            return None
+        if ignore_files_re and ignore_files_re.search(co.co_filename):
+            return None
         elif event == 'call' or event == 'c_call':
-            code = frame.f_code
-            if func_filter and not func_filter.match(code.co_name):
+            if co.co_name == '?':
                 return None
-            if code.co_name == '?':
-                return None
-            module = filenameToModuleName(code.co_filename)
-            print ('%s%s:%d:%s():'
-                   % (_indent, module, code.co_firstlineno, code.co_name))
+            module = filenameToModuleName(co.co_filename)
+            write(_indent, '%s:%d:%s():', module, frame.f_lineno, co.co_name)
             _indent += '  '
             return do_trace
         elif event == 'return' or event == 'c_return':
             if print_returns:
-                print '%sreturn %r' % (_indent, arg)
+                write(_indent, 'return %r', arg)
             _indent = _indent[:-2]
             return None
         elif event == 'exception' or event == 'c_exception':
-            print '%sException: %r' % (_indent, arg)
+            if arg:
+                write(_indent, 'Exception: %s:%d: %s (%s)', co.co_filename,
+                      frame.f_lineno, arg[0].__name__, arg[1])
+            else:
+                write(_indent, 'Exception: (from C)')
             return do_trace
         else:
-            print 'unknown event: %s' % event
+            write(_indent, 'unknown event: %s', event)
             return None
 
     _tracing += 1

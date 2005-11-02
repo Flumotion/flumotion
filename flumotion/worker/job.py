@@ -149,12 +149,13 @@ class JobMedium(medium.BaseMedium):
         Shut down the job process completely, cleaning up the component
         so the reactor can be left from.
         """
-        self.debug('stopping component')
-        self.component.stop()
-        self.debug('stopped component')
-        self.debug('calling reactor.stop')
+        if self.component:
+            self.debug('stopping component')
+            self.component.stop()
+            self.debug('stopped component')
+        self.debug('stopping reactor')
         reactor.stop()
-        self.debug('called reactor.stop')
+        self.debug('reactor stopped')
 
     def _set_nice(self, nice):
         if not nice:
@@ -295,7 +296,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         self.medium.setRemoteReference(remoteReference)
 
     def _connectedErrback(self, error):
-        print 'ERROR:' + str(error)
+        print 'ERROR connecting job to worker [%d]: %s' % (os.getpid(), error)
 
     # the only way stopFactory can be called is if the WorkerBrain closes
     # the pb server.  Ideally though we would have gotten a notice before.
@@ -322,29 +323,38 @@ def run(avatarId, options):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     
     reactor.removeAll()
+    # as it turns out this won't remove the waker from reactors in
+    # twisted 2.0. remove it and install a new one, sigh...
+    if hasattr(reactor, 'waker'):
+        reactor.removeReader(reactor.waker)
+        reactor.waker = None
+        reactor.installWaker()
+        assert hasattr(reactor, 'waker')
+    for delayed in reactor.getDelayedCalls():
+        delayed.cancel()
 
     # the only usable object created for now in the child is the
     # JobClientFactory, so we throw the options at it
     job_factory = JobClientFactory(avatarId, options)
     reactor.connectUNIX(workerSocket, job_factory)
     log.info('job', 'Started job on pid %d' % os.getpid())
-    log.debug('job', 'Starting reactor')
+    log.debug('job', 'Dropping back into reactor')
 
     try:
-        import statprof
-        statprof.start()
-        print 'profiling started'
+        if 'FLU_PROFILE' in os.environ:
+            import statprof
+            statprof.start()
+            print 'Profiling started.'
 
-        def stop_profiling():
-            print 'stopping profiling and displaying'
-            statprof.stop()
-            statprof.display()
+            def stop_profiling():
+                statprof.stop()
+                statprof.display()
 
-        reactor.addSystemEventTrigger('before', 'shutdown',
-            stop_profiling)
-    except ImportError:
-        print 'no profiling'
-        pass
+            reactor.addSystemEventTrigger('before', 'shutdown',
+                stop_profiling)
+    except ImportError, e:
+        print ('Profiling requested, but statprof is not available (%s)'
+               % e)
     
     # flumotion.worker.worker.Kindergarten.play() looks for a return of
     # None if it's the kid returning; be explicit here

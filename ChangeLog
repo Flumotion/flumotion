@@ -1,5 +1,29 @@
 2005-11-02  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/worker.py (WorkerMedium.remote_start): Turned
+	into a defer generator method. Do a callLater right before forking
+	so that the stack won't have any reads in progress -- because
+	delayed calls are part of IReactorTime and read/writes are part of
+	IReactorFDSet, they are guaranteed(tm) not to interact. Fixes lots
+	of nastiness.
+
+	* flumotion/common/debug.py (trace_start): Add ignore_files_re and
+	write optional arguments.
+
+	* flumotion/component/component.py
+	(ComponentClientFactory.gotDeferredLogin.remoteDisconnected):
+	* flumotion/worker/worker.py
+	(WorkerClientFactory.gotDeferredLogin.remoteDisconnected): Know
+	when to hold em, know when to fold em.
+
+	* flumotion/twisted/compat.py (install_reactor): Add an instance
+	variable, 'killed', that indicates whether a reactor is being
+	killed or not. Allows reconnecting factories to know when not to
+	warn.
+
+	* flumotion/worker/job.py (run): Only profile if the FLU_PROFILE
+	environment variable was set.
+
 	* flumotion/common/log.py (_handle.getFileLine): Don't extract the
 	whole stack, just work back frame by frame getting the information
 	we need.

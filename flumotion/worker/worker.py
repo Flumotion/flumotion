@@ -40,7 +40,7 @@ from flumotion.common import errors, interfaces, log, bundleclient
 from flumotion.common import common, medium
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
-from flumotion.twisted.defer import defer_generator
+from flumotion.twisted.defer import defer_generator_method
 from flumotion.worker import job
 from flumotion.configure import configure
 
@@ -69,7 +69,11 @@ class WorkerClientFactory(factoryClass):
     # vmethod implementation
     def gotDeferredLogin(self, d):
         def remoteDisconnected(remoteReference):
-            self.warning('Lost connection to manager, will attempt to reconnect')
+            if reactor.killed:
+                self.log('Connection to manager lost due to SIGINT shutdown')
+            else:
+                self.warning('Lost connection to manager, '
+                             'will attempt to reconnect')
 
         def loginCallback(reference):
             self.info("Logged in to manager")
@@ -144,49 +148,42 @@ class WorkerMedium(medium.BaseMedium):
 
         @returns: a deferred fired when the process has started
         """
+
+        # from flumotion.common import debug
+        # def write(indent, str, *args):
+        #     print ('[%d]%s%s' % (os.getpid(), indent, str)) % args
+        # debug.trace_start(ignore_files_re='twisted/python/rebuild', write=write)
+
         self.info('Starting component "%s" of type "%s"' % (avatarId, type))
         self.debug('remote_start(): id %s, type %s, config %r' % (
             avatarId, type, config))
 
-        ret = defer.Deferred()
+        # set up bundles as we need to have a pb connection to download
+        # the modules -- can't do that in the kid yet.
+        self.debug('setting up bundles for %s' % moduleName)
+        d = self.bundleLoader.loadModule(moduleName)
+        yield d
+        # check errors, will proxy to the manager
+        d.value()
 
-        # first unwind the stack by going into a callLater
-        def do_start():
-            # then set up bundles as we need to have a pb connection to
-            # download the modules -- can't do that before connecting in
-            # the kid
-            self.debug('setting up bundles for %s' % moduleName)
-            d = self.bundleLoader.loadModule(moduleName)
-            yield d
-            try:
-                # check errors
-                d.value()
-            except Exception, e:
-                ret.errback(e)
+        d = self.brain.deferredStartCreate(avatarId)
 
-            d = self.brain.deferredStartCreate(avatarId)
+        # unwind the stack -- write more about me!
+        reactor.callLater(0, self.brain.kindergarten.play,
+            avatarId, type, moduleName, methodName, config)
 
-            pid = self.brain.kindergarten.play(avatarId, type, moduleName,
-                methodName, config)
+        yield d
 
-            if not pid:
-                # this is the kid returning; returning here should
-                # finally unwind back to the reactor
-                return
-
-            yield d
-            try:
-                result = d.value()
-                self.debug('deferred start for %s succeeded (%r)'
-                           % (avatarId, result))
-                ret.callback(result)
-            except Exception, e:
-                msg = ('Component "%s" has already received a start request'
+        try:
+            result = d.value()
+            self.debug('deferred start for %s succeeded (%r)'
+                       % (avatarId, result))
+            yield result
+        except Exception, e:
+            msg = ('Component "%s" has already received a start request'
                    % avatarId)
-                ret.errback(errors.ComponentStart(msg))
-        do_start = defer_generator(do_start)
-            
-        reactor.callLater(0, do_start)
+            raise errors.ComponentStart(msg)
+    remote_start = defer_generator_method(remote_start)
 
     def remote_checkElements(self, elementNames):
         """

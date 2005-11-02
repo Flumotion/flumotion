@@ -70,7 +70,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     # override log.Loggable method so we don't traceback
     def error(self, message):
         self.warning('Shutting down because of %s' % message)
-        print >> sys.stderr, 'ERROR: %s' % message
+        print >> sys.stderr, 'ERROR: [%d] %s' % (os.getpid(), message)
         # FIXME: do we need to make sure that this cannot shut down the
         # manager if it's the manager's bouncer ?
         reactor.stop()
@@ -79,7 +79,11 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     # vmethod implementation
     def gotDeferredLogin(self, d):
         def remoteDisconnected(remoteReference):
-            self.warning('Lost connection to manager, will attempt to reconnect')
+            if reactor.killed:
+                self.log('Connection to manager lost due to SIGINT shutdown')
+            else:
+                self.warning('Lost connection to manager, '
+                             'will attempt to reconnect')
 
         def loginCallback(reference):
             self.info("Logged in to manager")
@@ -95,12 +99,18 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
             failure.trap(error.ConnectionRefusedError)
             self.error('Connection to manager refused.')
                                                           
+        def alreadyLoggedInErrback(failure):
+            failure.trap(errors.AlreadyConnectedError)
+            self.error('Component named %s is already logged in.'
+                       % failure.value.args)
+                                                          
         def loginFailedErrback(failure):
             self.error('Login failed, reason: %s' % failure)
 
         d.addCallback(loginCallback)
         d.addErrback(accessDeniedErrback)
         d.addErrback(connectionRefusedErrback)
+        d.addErrback(alreadyLoggedInErrback)
         d.addErrback(loginFailedErrback)
 
     def startLogin(self, keycard):

@@ -44,8 +44,20 @@ def install_reactor(gtk=False):
 
     Reactor.install(useGtk=gtk)
 
+    # this monkeypatched var exists to let reconnecting factories know
+    # when they should warn about a connection being closed, and when
+    # they shouldn't because the system is shutting down.
+    # 
+    # there is no race condition here -- the reactor doesn't handle
+    # signals until it is run().
+    from twisted.internet import reactor
+    reactor.killed = False
+    def setkilled(killed):
+        reactor.killed = killed
+    reactor.addSystemEventTrigger('before', 'startup', setkilled, False)
+    reactor.addSystemEventTrigger('before', 'shutdown', setkilled, True)
+
     if version[0] >= '2':
-        from twisted.internet import reactor
         from twisted.names import client
         # avoid spawning threads -- the normal resolver spawns threads
         reactor.installResolver(client.createResolver())
