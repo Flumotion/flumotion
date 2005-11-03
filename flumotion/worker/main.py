@@ -228,9 +228,6 @@ def main(args):
     reactor.addSystemEventTrigger('after', 'startup',
         brain.installSIGTERMHandler)
     log.debug('worker', 'Starting reactor')
-    # FIXME: sort-of-ugly, but twisted recommends globals, and this is as
-    # good as a global
-    reactor.killed = False
     reactor.run()
 
     # for now, if we are a daemon, we keep living until we get killed

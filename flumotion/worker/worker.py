@@ -168,7 +168,14 @@ class WorkerMedium(medium.BaseMedium):
 
         d = self.brain.deferredStartCreate(avatarId)
 
-        # unwind the stack -- write more about me!
+        # We can't fork from within this call, because we're in the
+        # callback from the loadModule deferred, and we don't know what
+        # other work is pending on the stack. When we fork, we need to
+        # be able to drop back down to the reactor without having any
+        # work from the parent process pending on the stack (e.g., more
+        # data coming in from banana). So do a callLater, which means
+        # the stack will just be main() -> reactor.run() ->
+        # handleDeferredCall().
         reactor.callLater(0, self.brain.kindergarten.play,
             avatarId, type, moduleName, methodName, config)
 

@@ -1,3 +1,11 @@
+2005-11-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/worker.py (WorkerMedium.remote_start): Comment
+	a bit.
+
+	* flumotion/worker/main.py (main): Don't set reactor.killed,
+	that's handled by flumotion.twisted.compat.install_reactor().
+
 2005-11-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/managers/default/flows/ogg-test-theora.xml:
