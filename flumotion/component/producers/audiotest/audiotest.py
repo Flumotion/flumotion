@@ -33,7 +33,7 @@ def createComponent(config):
     volume = config.get('volume', 1.0)
 
     if gst.gst_version < (0,9):
-        is_live = ''
+        is_live = 'sync=true'
     else:
         is_live = 'is-live=true'
 
