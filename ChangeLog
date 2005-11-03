@@ -1,5 +1,9 @@
 2005-11-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/worker.py (WorkerBrain._SIGTERMHandler): Don't
+	set reactor.killed, the old sigterm handler will call
+	reactor.stop() which will trigger .killed to be set.
+	
 	* flumotion/worker/worker.py (WorkerMedium.remote_start): Comment
 	a bit.
 

@@ -481,7 +481,6 @@ class WorkerBrain(log.Loggable):
     def _SIGTERMHandler(self, signum, frame):
         self.info("Worker daemon received TERM signal, shutting down")
         self.debug("handling SIGTERM")
-        reactor.killed = True
         self.debug("_SIGTERMHandler: shutting down jobheaven")
         d = self.job_heaven.shutdown()
 
