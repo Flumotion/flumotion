@@ -100,7 +100,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         def alreadyLoggedInErrback(failure):
             failure.trap(errors.AlreadyConnectedError)
             self.error('Component named %s is already logged in.'
-                       % failure.value.args)
+                       % self.component.name)
                                                           
         def loginFailedErrback(failure):
             self.error('Login failed, reason: %s' % failure)
