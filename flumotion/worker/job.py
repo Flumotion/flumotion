@@ -105,14 +105,11 @@ class JobMedium(medium.BaseMedium):
         self.avatarId = None
         self.logName = None
         self.component = None
+        self.manager_host = options.host
+        self.manager_port = options.port
+        self.manager_transport = options.transport
 
     ### pb.Referenceable remote methods called on by the WorkerBrain
-    ### FIXME: arguments not needed anymore, Medium knows about options
-    def remote_initial(self, host, port, transport):
-        self.manager_host = host
-        self.manager_port = port
-        self.manager_transport = transport
-        
     def remote_start(self, avatarId, type, moduleName, methodName, config,
         feedPorts):
         """
@@ -171,20 +168,13 @@ class JobMedium(medium.BaseMedium):
     def _enable_core_dumps(self):
         soft, hard = resource.getrlimit(resource.RLIMIT_CORE)
         if hard != resource.RLIM_INFINITY:
-            self.warning('Could not set ulimited core dump sizes, setting to %d instead' % hard)
+            self.warning('Could not set unlimited core dump sizes, '
+                         'setting to %d instead' % hard)
         else:
-            self.debug('Enabling core dumps of ulimited size')
+            self.debug('Enabling core dumps of unlimited size')
             
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
         
-    def threads_init(self):
-        try:
-            gobject.threads_init()
-        except AttributeError:
-            self.warning('Old PyGTK detected')
-        except RuntimeError:
-            self.warning('Old PyGTK with threading disabled detected')
-    
     def _runComponent(self, avatarId, type, moduleName, methodName, config,
         feedPorts):
         """
@@ -205,7 +195,6 @@ class JobMedium(medium.BaseMedium):
         self.info('Starting component "%s" of type "%s"' % (avatarId, type))
         #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
-        self.threads_init()
 
         self.debug('Starting on pid %d of type %s' % (os.getpid(), type))
 
@@ -214,8 +203,6 @@ class JobMedium(medium.BaseMedium):
         
         self.debug('_runComponent(): config dictionary is: %r' % config)
         self.debug('_runComponent(): feedPorts is: %r' % feedPorts)
-
-        comp = None
 
         # FIXME: we put avatarId in the config for now
         # but it'd be nicer to do this outside of config, so do this
@@ -312,6 +299,13 @@ def getSocketPath():
 def run(avatarId, options):
     """
     Called by the worker to start a job fork.
+
+    @param avatarId:   avatar identification string
+    @type  avatarId:   string
+    @param options:    command line options as parsed by flumotion.worker.main
+                       (includes manager host, port, and transport,
+                       among other things)
+    @type  options:    dict
     """
     workerSocket = getSocketPath()
 
@@ -340,8 +334,8 @@ def run(avatarId, options):
     log.info('job', 'Started job on pid %d' % os.getpid())
     log.debug('job', 'Dropping back into reactor')
 
-    try:
-        if 'FLU_PROFILE' in os.environ:
+    if 'FLU_PROFILE' in os.environ:
+        try:
             import statprof
             statprof.start()
             print 'Profiling started.'
@@ -352,9 +346,9 @@ def run(avatarId, options):
 
             reactor.addSystemEventTrigger('before', 'shutdown',
                 stop_profiling)
-    except ImportError, e:
-        print ('Profiling requested, but statprof is not available (%s)'
-               % e)
+        except ImportError, e:
+            print ('Profiling requested, but statprof is not available (%s)'
+                   % e)
     
     # flumotion.worker.worker.Kindergarten.play() looks for a return of
     # None if it's the kid returning; be explicit here

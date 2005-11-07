@@ -52,13 +52,22 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         basecomponent.BaseComponentMedium.__init__(self, component)
 
         def on_feed_ready(component, feedName, isReady):
-            self.callRemote('feedReady', feedName, isReady)
+            # fixme this is hacky
+            name = feedName.split(':')[2]
+            # print 'feed ready: %s' % name
+            self.callRemote('feedReady', name, isReady)
 
         def on_component_error(component, element_path, message):
             self.callRemote('error', element_path, message)
 
         def on_component_notify_feed_ports(component):
-            self.callRemote('notifyFeedPorts', component.feed_ports)
+            # not sure what the real format of feed_ports should be --
+            # just 'default' or 'feeder:foo:default' -- right now it's
+            # the former. passing them on like they are tho..
+            ports = {} # str => int
+            for feeder, port in component.feed_ports.items():
+                ports[feeder] = port
+            self.callRemote('notifyFeedPorts', ports)
 
         self.comp.connect('feed-ready', on_feed_ready)
         self.comp.connect('error', on_component_error)
@@ -278,8 +287,10 @@ class ParseLaunchComponent(FeedComponent):
                            feeding our eaters.
         @type feedersData: list of (name, host) tuples of our feeding elements
 
-        @returns: list of (feedName, host, port)-tuples of feeds the component
-                  produces.
+        @returns: something that should not be used. FIXME to make sure
+                  that callers connect to notify-feed-ports instead of
+                  using this return value, which is a list of (feedName,
+                  host, port)-tuples of feeds the component produces.
         """
         self.debug('ParseLaunchComponent.start')
         self.debug('start with eaters data %s and feeders data %s' % (

@@ -36,6 +36,7 @@ from flumotion.configure import configure
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, keycards, log, config, planet
 from flumotion.twisted import flavors
+from flumotion.twisted.defer import defer_generator_method
 from flumotion.common.planet import moods
 
 # abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
@@ -375,7 +376,7 @@ class ComponentAvatar(base.ManagerAvatar):
         # state: L{flumotion.common.planet.ManagerJobState}
         if not state:
             # how in god's name is this possible?
-            self.debug('no state received yet, rescheduling')
+            self.warning('no state received yet, rescheduling')
             reactor.callLater(1, self._getState)
             return None
             
@@ -493,24 +494,15 @@ class ComponentAvatar(base.ManagerAvatar):
                            of elements feeding our eaters
         @type feedersData: tuple of (name, host) tuples of our feeding elements
         """
-        def startCallback(feedData):
-            if feedData:
-                for feedName, host, port in feedData:
-                    self.debug('feed %s (%s:%d) is ready' % (
-                        feedName, host, port))
-                    self.host = host
-                    self.ports[feedName] = port
-                    
-                    self.setFeederReadiness(feedName, True)
-
-            self.debug('startCallback: done starting')
-
-        def startErrback(reason):
-            self.error("Could not make component start, reason %s" % reason)
-                
+        print 'calling remote_start on component %r' % self
         d = self.mindCallRemote('start', eatersData, feedersData)
-        d.addCallback(startCallback)
-        d.addErrback(startErrback)
+        yield d
+        try:
+            d.value()
+        except Exception, e:
+            self.error("Could not make component start, reason %s"
+                       % log.getExceptionMessage(e))
+    start = defer_generator_method(start)
     
     def setElementProperty(self, element, property, value):
         """
@@ -658,7 +650,16 @@ class ComponentAvatar(base.ManagerAvatar):
             componentState, methodName, *args, **kwargs)
 
     def perspective_notifyFeedPorts(self, feedPorts):
+        """
+        @param feedPorts: feeders provided by the component and the
+                          ports they are feeding on
+        @type  feedPorts: dict of feederName (string) -> port (int)
+        """
         self.debug('received feed ports from component: %s' % feedPorts)
+        for feedName, port in feedPorts.items():
+            # print 'feed %s will feed on port %d' % (feedName, port)
+            self.debug('feed %s will feed on port %d' % (feedName, port))
+            self.ports[feedName] = port
 
     def perspective_authenticate(self, bouncerName, keycard):
         """

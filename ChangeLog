@@ -1,4 +1,63 @@
+2005-11-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py
+	(ComponentAvatar._mindGetStateCallback): debugging.
+	(ComponentAvatar.perspective_notifyFeedPorts): Doc the argument
+	type. Actually implement.
+	(ComponentAvatar.start): Ignore the return value of calling start
+	on the component, rather choosing to wait for the notifyfeedports.
+
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.__init__.on_feed_ready)
+	(FeedComponentMedium.__init__.on_component_notify_feed_ports):
+	Hacks to make sure we callRemote with the right feeder names. The
+	feeder names *really* need to be canonicalized at some point
+	(feeder:foo:default vs foo:default vs default).
+	(ParseLaunchComponent.do_start): Document obsolete return value.
+
+	* flumotion/component/component.py
+	(ComponentClientFactory.__init__): Clean some code that checks for
+	obsolete conditions.
+
+	* flumotion/component/feedcomponent09.py (FeedComponent.link):
+	Pause the pipeline, notify the feed ports, and then set the
+	pipeline to playing. Should avoid race conditions with the ports
+	being ready.
+	(FeedComponent.bus_watch_func): Fix some feeder name checks.
+
+	* flumotion/common/gstreamer.py (verbose_deep_notify_cb): Don't do
+	a g_idle_add so as to avoid bug #320886.
+
 2005-11-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py (BaseComponent): No more 'log'
+	signal. Nothing was emitting it.
+	(BaseComponentMedium.__init__): Don't try to connect to
+	component's log signal.
+
+	* flumotion/worker/job.py (JobMedium._enable_core_dumps): Fix some
+	log typos.
+	(JobMedium.threads_init): Removed, obsolete.
+	(run): Reorganize try/except blocks.
+
+	* flumotion/worker/job.py (run): Add some docs.
+
+	* flumotion/worker/worker.py (JobAvatar.attached): Turned into a
+	defer generator method. Folded in _cb_afterInitial; no need to
+	call 'initial' on the job medium, as the options dict has all of
+	the necessary information.
+
+	* flumotion/worker/job.py (JobMedium.__init__): Set manager host,
+	port, and transport directly from the options dictionary.
+	(JobMedium.remote_initial): No need for this any more.
+
+	* flumotion/worker/worker.py (WorkerBrain.deferredStartCreate):
+	Throw ComponentAlreadyStartingError if appropriate instead of
+	returning None.
+
+	* flumotion/common/errors.py (ComponentAlreadyStartingError): New
+	error, thrown when worker told to start a component but it's
+	already starting.
 
 	* flumotion/worker/worker.py (WorkerBrain._SIGTERMHandler): Don't
 	set reactor.killed, the old sigterm handler will call

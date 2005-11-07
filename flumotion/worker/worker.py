@@ -166,6 +166,7 @@ class WorkerMedium(medium.BaseMedium):
         # check errors, will proxy to the manager
         d.value()
 
+        # this could throw ComponentAlreadyStartingError
         d = self.brain.deferredStartCreate(avatarId)
 
         # We can't fork from within this call, because we're in the
@@ -467,6 +468,8 @@ class WorkerBrain(log.Loggable):
                     "Reaped job child with pid %d and unhandled status %d" % (
                         pid, status))
 
+    # FIXME: this isnt' necessary, we can just connect to the shutdown
+    # event on the reactor, reducing a lot of complexity here...
     def installSIGTERMHandler(self):
         """
         Install our own signal handler for SIGTERM.
@@ -502,9 +505,7 @@ class WorkerBrain(log.Loggable):
         """
         self.debug('creating start deferred for %s' % avatarId)
         if avatarId in self._startDeferreds.keys():
-            self.warning('Already a start deferred registered for %s' %
-                avatarId)
-            return None
+            raise errors.ComponentAlreadyStartingError(avatarId)
 
         d = defer.Deferred()
         self._startDeferreds[avatarId] = d
@@ -525,7 +526,7 @@ class WorkerBrain(log.Loggable):
         # return the avatarId the component will use to the original caller
         d.callback(avatarId)
  
-    def deferredStartFailed(self, avatarId, failure):
+    def deferredStartFailed(self, avatarId, exception):
         """
         Notify the caller that a start has failed, and remove the start
         from the list of pending starts.
@@ -535,7 +536,7 @@ class WorkerBrain(log.Loggable):
 
         d = self._startDeferreds[avatarId]
         del self._startDeferreds[avatarId]
-        d.errback(failure)
+        d.errback(exception)
  
 class JobDispatcher:
     """
@@ -627,34 +628,11 @@ class JobAvatar(pb.Avatar, log.Loggable):
         host = self.heaven.brain.manager_host
         port = self.heaven.brain.manager_port
         transport = self.heaven.brain.manager_transport
-        cb = self.mind.callRemote('initial', host, port, transport)
-        cb.addCallback(self._cb_afterInitial)
 
-    def _getFreePort(self):
-        for port in self.heaven.ports:
-            if port.isFree():
-                port.use()
-                return port
-
-        # XXX: Raise better error message
-        raise AssertionError
-    
-    def _defaultErrback(self, failure):
-        self.warning('unhandled remote error: type %s, message %s' % (
-            failure.type, failure.getErrorMessage()))
-        
-    def _startErrback(self, failure, avatarId, type):
-        failure.trap(errors.ComponentStart)
-        
-        self.warning('could not start component %s of type %s: %r' % (
-            avatarId, type, failure.getErrorMessage()))
-        self.heaven.brain.deferredStartFailed(avatarId, failure)
-
-    def _cb_afterInitial(self, unused):
         kid = self.heaven.brain.kindergarten.getKid(self.avatarId)
         # we got kid.config through WorkerMedium.remote_start from the manager
         feedNames = kid.config.get('feed', [])
-        self.log('_cb_afterInitial(): feedNames %r' % feedNames)
+        self.log('feedNames: %r' % feedNames)
 
         # This is going to be sent to the component
         feedPorts = {} # feedName -> port number
@@ -671,13 +649,28 @@ class JobAvatar(pb.Avatar, log.Loggable):
         d = self.mind.callRemote('start', kid.avatarId, kid.type,
             kid.moduleName, kid.methodName, kid.config, feedPorts)
 
-        # make sure that we trigger the start deferred after this
-        d.addCallback(
-            lambda result, n: self.heaven.brain.deferredStartTrigger(n),
-                kid.avatarId)
-        d.addErrback(self._startErrback, kid.avatarId, kid.type)
-        d.addErrback(self._defaultErrback)
-                                          
+        yield d
+        try:
+            d.value() # check for errors
+            self.heaven.brain.deferredStartTrigger(kid.avatarId)
+        except errors.ComponentStart, e:
+            self.warning('could not start component %s of type %s: %r'
+                         % (kid.avatarId, kid.type, e))
+            self.heaven.brain.deferredStartFailed(kid.avatarId, e)
+        except Exception, e:
+            self.warning('unhandled remote error: type %s, message %s'
+                         % (e.__class__.__name__, e))
+    attached = defer_generator_method(attached)
+
+    def _getFreePort(self):
+        for port in self.heaven.ports:
+            if port.isFree():
+                port.use()
+                return port
+
+        # XXX: Raise better error message
+        raise AssertionError
+    
     def logout(self):
         self.log('logout called, %s disconnected' % self.avatarId)
         self.mind = None

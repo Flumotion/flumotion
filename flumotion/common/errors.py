@@ -90,6 +90,9 @@ class ComponentError(pb.Error):
 class SleepingComponentError(ComponentError):
     "Component is sleeping, cannot handle request"
 
+class ComponentAlreadyStartingError(ComponentError):
+    "Component told to start, but is already starting"
+
 class ComponentMoodError(ComponentError):
     "Component is in the wrong mood to perform the given function"
 

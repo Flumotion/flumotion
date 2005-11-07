@@ -162,14 +162,16 @@ class FeedComponent(basecomponent.BaseComponent):
         t = message.type
         src = message.src
 
+        # print 'message:', t, src and src.get_name() or '(no source)'
         if t == gst.MESSAGE_STATE_CHANGED:
             old, new, pending = message.parse_state_changed()
+            # print src.get_name(), old.value_nick, new.value_nick, pending.value_nick
             if src == self.pipeline:
                 self.log('state change: %r %s->%s'
                     % (src, old.value_nick, new.value_nick)) 
                 if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
                     self.setMood(moods.happy)
-            elif src.get_name() in self.feeder_names:
+            elif src.get_name() in ['feeder:'+n for n in self.feeder_names]:
                 if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
                     self.debug('feeder %s is now feeding' % src.get_name())
                     self.feedersWaiting -= 1
@@ -336,12 +338,16 @@ class FeedComponent(basecomponent.BaseComponent):
             self.debug('calling function %r' % func)
             func(eatersData, feedersData)
             
-        self.debug('setting pipeline to play')
+        self.debug('setting pipeline to paused')
 
-        self.pipeline.set_state(gst.STATE_PLAYING)
+        self.pipeline.set_state(gst.STATE_PAUSED)
 
         self.debug('emitting feed port notify')
         self.emit('notify-feed-ports')
+
+        self.debug('setting pipeline to playing')
+
+        self.pipeline.set_state(gst.STATE_PLAYING)
         self.debug('.link() returning %s' % retval)
 
         return retval

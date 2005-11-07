@@ -55,15 +55,13 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         fpb.ReconnectingFPBClientFactory.__init__(self)
         
         self.component = component
-        # get the component's medium class, defaulting to the base one
-        klass = getattr(component, 'component_medium_class', BaseComponentMedium)
-        # instantiate the medium, giving it the component it's a medium for
-        self.medium = klass(component)
+        # make a medium to interface with the manager
+        self.medium = component.component_medium_class(component)
         component.setMedium(self.medium)
 
         self.maxDelay = 10
         # get the interfaces implemented by the component medium class
-        self.interfaces = getattr(klass, '__implements__', ())
+        self.interfaces = self.medium.__class__.__implements__
 
         self.logName = component.name
         
@@ -133,8 +131,6 @@ class BaseComponentMedium(medium.BaseMedium):
         @param component: L{flumotion.component.component.BaseComponent}
         """
         self.comp = component
-        self.comp.connect('log', self._component_log_cb)
-        
         self.logName = component.name
         
     ### our methods
@@ -151,9 +147,6 @@ class BaseComponentMedium(medium.BaseMedium):
 
         return socket.gethostbyname(host)
 
-    def _component_log_cb(self, component, args):
-        self.callRemote('log', *args)
-        
     ### pb.Referenceable remote methods
     ### called from manager by our avatar
     def remote_getState(self):
@@ -203,6 +196,8 @@ class BaseComponentMedium(medium.BaseMedium):
         from twisted.python.reflect import filenameToModuleName
         name = filenameToModuleName(__file__)
 
+        ## fixme: re-fetch bundles
+
         # reload ourselves first
         rebuild(sys.modules[name])
 
@@ -245,8 +240,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
     """
 
     logCategory = 'basecomp'
-
-    gsignal('log', object)
 
     component_medium_class = BaseComponentMedium
     _heartbeatInterval = configure.heartbeatInterval
