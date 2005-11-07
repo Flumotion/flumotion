@@ -91,8 +91,12 @@ class Dispatcher(log.Loggable):
     # to the piece that called login(),
     # which in our case is a component or an admin client.
     def requestAvatar(self, avatarId, mind, *ifaces):
-        avatar = self.createAvatarFor(avatarId, ifaces)
-        self.debug("returning Avatar: id %s, avatar %s" % (avatarId, avatar))
+        try:
+            avatar = self.createAvatarFor(avatarId, ifaces)
+            self.debug("returning Avatar: id %s, avatar %s" % (avatarId, avatar))
+        except errors.AlreadyConnectedError, e:
+            self.debug("component with id %s already logged in" % (avatarId))
+            return defer.fail(failure.Failure(e))
 
         # schedule a perspective attached for after this function
         # FIXME: there needs to be a way to not have to do a callLater

@@ -1,5 +1,8 @@
 2005-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Dispatcher.requestAvatar): Better
+	debugging.
+
 	* flumotion/component/component.py
 	(ComponentClientFactory.gotDeferredLogin.alreadyLoggedInErrback):
 	Punt on what the failure actually is...
