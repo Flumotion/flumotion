@@ -108,7 +108,8 @@ def init_gst():
     except ImportError:
         raise SystemExit('ERROR: gst-python could not be found')
     
-    if gst.pygst_version < gst_version.split('.'):
+    if not (gst.pygst_version[1] == 8 and gst_version == '0.8'
+            or gst.pygst_version[1] >= 9 and gst_version == '0.9'):
         raise SystemExit(
             'ERROR: Expected gst-python version %s in %s, but found %r'
             % (gst_version, pygst_dir, gst.pygst_version))
