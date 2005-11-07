@@ -1,5 +1,9 @@
 2005-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/feedcomponent08.py (FeedComponent.link): Set
+	to paused, notify ports, then play. Fixes race condition between
+	component and manager.
+
 	* flumotion/component/consumers/disker/disker.py
 	(Disker.pipe_template): Use a version-dependent pipeline.
 

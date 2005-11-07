@@ -448,11 +448,16 @@ class FeedComponent(basecomponent.BaseComponent):
             self.debug('calling function %r' % func)
             func(eatersData, feedersData)
             
-        self.debug('setting pipeline to play')
-        self.pipeline_play()
+        self.debug('setting pipeline to paused')
+        self.pipeline_pause()
+
         # FIXME: fill feedPorts
         self.debug('emitting feed port notify')
         self.emit('notify-feed-ports')
+
+        self.debug('setting pipeline to playing')
+        self.pipeline_play()
+
         self.debug('.link() returning %s' % retval)
 
         return retval
