@@ -144,7 +144,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.emit('add', self.file_fd.fileno())
         self.emit('filename-changed', self.location)
     
-    def _notify_caps_cb(self, element, pad, param):
+    def _notify_caps_cb(self, pad, param):
         caps = pad.get_negotiated_caps()
         if caps == None:
             return
@@ -163,15 +163,18 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if new:
             reactor.callLater(0, self.change_filename)
 
-    def _feeder_state_change_cb(self, element, old, state):
-        # FIXME: add more states
-        if state == gst.STATE_PLAYING:
-            self.setMood(moods.happy)
             
     def link_setup(self, eaters, feeders):
         sink = self.get_element('fdsink')
-        sink.connect('state-change', self._feeder_state_change_cb)
-        sink.connect('deep-notify::caps', self._notify_caps_cb)
+        sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
+
+        import gst
+        if gst.gst_version < (0, 9):
+            sink.connect('state-change', self._feeder_state_change_cb)
+            def _feeder_state_change_cb(self, element, old, state):
+                # FIXME: add more states
+                if state == gst.STATE_PLAYING:
+                    self.setMood(moods.happy)
 
 compat.type_register(Disker)
         
