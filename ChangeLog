@@ -1,6 +1,7 @@
 2005-11-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/boot.py.in (init_gst): Fix version check.
+	(init_gst): Move the pygst_dir up to the front.
 
 	* flumotion/manager/component.py
 	(ComponentAvatar._mindGetStateCallback): debugging.

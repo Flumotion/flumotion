@@ -93,8 +93,10 @@ def init_gst():
             % (pygtk_req, gst_version))
 
     if pygst_dir != PYGTK_DIR:
-        if not pygst_dir in sys.path:
-            sys.path.insert(0, pygst_dir)
+        if pygst_dir in sys.path:
+            sys.path.remove(pygst_dir)
+
+        sys.path.insert(0, pygst_dir)
         
     if gst_version == '0.9':
         try:
