@@ -1,3 +1,7 @@
+2005-11-07  Julien MOUTTE  <julien@moutte.net>
+
+	* doc/man/flumotion-worker.1: Add example for feederports.
+
 2005-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/worker.py:
