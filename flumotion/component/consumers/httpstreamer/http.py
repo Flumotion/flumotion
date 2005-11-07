@@ -168,10 +168,17 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     logCategory = 'cons-http'
     
     # use select for test
-    pipe_template = 'multifdsink name=sink ' + \
-                                'buffers-max=500 ' + \
-                                'buffers-soft-max=250 ' + \
-                                'recover-policy=3'
+    if gst.gst_version < (0, 9):
+        pipe_template = 'multifdsink name=sink ' + \
+                                    'buffers-max=500 ' + \
+                                    'buffers-soft-max=250 ' + \
+                                    'recover-policy=3'
+    else:
+        pipe_template = 'multifdsink name=sink ' + \
+                                    'sync=false ' + \
+                                    'buffers-max=500 ' + \
+                                    'buffers-soft-max=250 ' + \
+                                    'recover-policy=3'
 
     gsignal('client-removed', object, int, int, object)
     gsignal('log-message', str)

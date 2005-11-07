@@ -1,5 +1,9 @@
 2005-11-07  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.pipe_template): Don't sync to timestamps in
+	0.9.
+
 	* flumotion/component/encoders/vorbis/vorbis08.py
 	(Vorbis._start_feeders): Emit notify-feed-ports before going to
 	playing -- prevents race conditions like the ones that were in
