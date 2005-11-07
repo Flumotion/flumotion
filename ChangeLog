@@ -1,3 +1,20 @@
+2005-11-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/disker/disker.py
+	(Disker.pipe_template): Use a version-dependent pipeline.
+
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.bus_watch_func): Move hacky feeder->feed munge
+	here...
+
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.__init__.on_feed_ready): ... from here. Fixes
+	0.8 feed-ready notification.
+
+	* flumotion/component/feedcomponent08.py
+	(FeedComponent.feeder_state_change_cb): Remove out of date
+	comment.
+
 2005-11-07  Julien MOUTTE  <julien@moutte.net>
 
 	* doc/man/flumotion-worker.1: Add example for feederports.

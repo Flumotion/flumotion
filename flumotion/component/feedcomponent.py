@@ -52,10 +52,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         basecomponent.BaseComponentMedium.__init__(self, component)
 
         def on_feed_ready(component, feedName, isReady):
-            # fixme this is hacky
-            name = feedName.split(':')[2]
-            # print 'feed ready: %s' % name
-            self.callRemote('feedReady', name, isReady)
+            # print 'feed ready: %s' % feedName
+            self.callRemote('feedReady', feedName, isReady)
 
         def on_component_error(component, element_path, message):
             self.callRemote('error', element_path, message)

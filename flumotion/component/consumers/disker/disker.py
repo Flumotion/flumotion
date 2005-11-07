@@ -56,7 +56,11 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
         
 class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     component_medium_class = DiskerMedium
-    pipe_template = 'multifdsink sync-clients=1 name=fdsink mode=1'
+    if gst.gst_version < (0,9):
+        pipe_template = 'multifdsink sync-clients=1 name=fdsink mode=1'
+    else:
+        pipe_template = 'multifdsink sync-method=1 name=fdsink mode=1 sync=false'
+
     # signal for changed filename which medium connects to
     gsignal('filename-changed', str)
 
@@ -168,7 +172,6 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
 
-        import gst
         if gst.gst_version < (0, 9):
             sink.connect('state-change', self._feeder_state_change_cb)
             def _feeder_state_change_cb(self, element, old, state):

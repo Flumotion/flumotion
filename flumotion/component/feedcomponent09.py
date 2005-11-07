@@ -176,7 +176,9 @@ class FeedComponent(basecomponent.BaseComponent):
                     self.debug('feeder %s is now feeding' % src.get_name())
                     self.feedersWaiting -= 1
                     self.debug('%d feeders waiting' % self.feedersWaiting)
-                    self.emit('feed-ready', src.get_name(), True)
+                    # somewhat hacky... feeder:foo:default => default
+                    feed_name = src.get_name().split(':')[2]
+                    self.emit('feed-ready', feed_name, True)
         elif t == gst.MESSAGE_ERROR:
             err, debug = message.parse_error()
             self.debug('element %s error %s %s' %
