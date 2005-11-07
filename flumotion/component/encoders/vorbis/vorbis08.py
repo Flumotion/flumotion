@@ -147,8 +147,8 @@ class Vorbis(feedcomponent.FeedComponent):
         # FIXME: _setup_feeders is a FeedComponent method, clean up
         retval = self._setup_feeders(feedersData)
         # pipeline is in paused state when in this function
-        self.pipeline_play()
         self.emit('notify-feed-ports')
+        self.pipeline_play()
         self.debug('_start_feeders() returning %s' % retval)
 
         return retval
