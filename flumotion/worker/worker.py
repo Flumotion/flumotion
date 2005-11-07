@@ -160,11 +160,13 @@ class WorkerMedium(medium.BaseMedium):
 
         # set up bundles as we need to have a pb connection to download
         # the modules -- can't do that in the kid yet.
-        self.debug('setting up bundles for %s' % moduleName)
-        d = self.bundleLoader.loadModule(moduleName)
-        yield d
-        # check errors, will proxy to the manager
-        d.value()
+        # FIXME: thomas: find a way to rebuild less so this doesn't take
+        # excessive amounts of CPU time
+        # self.debug('setting up bundles for %s' % moduleName)
+        # d = self.bundleLoader.loadModule(moduleName)
+        # yield d
+        # # check errors, will proxy to the manager
+        # d.value()
 
         # this could throw ComponentAlreadyStartingError
         d = self.brain.deferredStartCreate(avatarId)

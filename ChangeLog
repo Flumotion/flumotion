@@ -1,3 +1,8 @@
+2005-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/worker.py:
+	  remove loading bundles for component until we fix CPU use
+
 2005-11-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/boot.py.in (init_gst): Fix version check.
