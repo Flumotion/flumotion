@@ -63,6 +63,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.bus_watch_id = None
         self.files = []
         self.effects = {}
+        self._probe_ids = {} # eater name -> probe handler id
 
         # add extra keys to state
         self.state.addKey('eaterNames')
@@ -131,18 +132,24 @@ class FeedComponent(basecomponent.BaseComponent):
     def get_eater_names(self):
         """
         Return the list of feeder names this component eats from.
+
+        @returns: a list of "componentName:feedName" strings
         """
         return self.eater_names
     
     def get_feeder_names(self):
         """
         Return the list of feeder names this component has.
+
+        @returns: a list of "componentName:feedName" strings
         """
         return self.feeder_names
 
     def get_feed_names(self):
         """
         Return the list of feeder names this component has.
+
+        @returns: a list of "feedName" strings
         """
         return self.feed_names
 
@@ -342,10 +349,32 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('setting pipeline to playing')
 
         self.pipeline.set_state(gst.STATE_PLAYING)
+
+        # attach one-time buffer-probe callbacks for each eater
+        for eaterName in self.get_eater_names():
+            self.debug('adding buffer probe for eater %s' % eaterName)
+            name = "eater:%s" % eaterName
+            eater = self.get_element(name)
+            # FIXME: should probably raise
+            if not eater:
+                self.warning('No element named %s in pipeline' % name)
+                continue
+            pad = eater.get_pad("src")
+            self._probe_ids[name] = pad.add_buffer_probe(self._buffer_probe_cb,
+                name)
+
         self.debug('.link() returning %s' % retval)
 
         return retval
 
+    def _buffer_probe_cb(self, pad, buffer, name):
+        # log info about first incoming buffer, then remove ourselves
+        self.debug('first buffer probe on eater %s has timestamp %.3f' % (
+            name, float(buffer.timestamp) / gst.SECOND))
+        if self._probe_ids[name]:
+            pad.remove_buffer_probe(self._probe_ids[name])
+            self._probe_ids[name] = None
+        
     def get_element(self, element_name):
         assert self.pipeline
         element = self.pipeline.get_by_name(element_name)

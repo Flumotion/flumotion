@@ -1,5 +1,11 @@
 2005-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent09.py:
+	  log first buffer's timestamp on tcpclientsrc to help
+	  in debugging startup time
+
+2005-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  Implement restart component
 
