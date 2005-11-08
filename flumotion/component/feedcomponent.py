@@ -53,23 +53,20 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         def on_feed_ready(component, feedName, isReady):
             # print 'feed ready: %s' % feedName
-            self.callRemote('feedReady', feedName, isReady)
+            if isReady:
+                assert feedName in self.comp.feed_ports
+                # fixme: this should really come from GStreamer via
+                # element.get_propery('port')
+                self.callRemote('feedReady', feedName,
+                                self.comp.feed_ports[feedName])
+            else:
+                self.callRemote('feedReady', feedName, None)
 
         def on_component_error(component, element_path, message):
             self.callRemote('error', element_path, message)
 
-        def on_component_notify_feed_ports(component):
-            # not sure what the real format of feed_ports should be --
-            # just 'default' or 'feeder:foo:default' -- right now it's
-            # the former. passing them on like they are tho..
-            ports = {} # str => int
-            for feeder, port in component.feed_ports.items():
-                ports[feeder] = port
-            self.callRemote('notifyFeedPorts', ports)
-
         self.comp.connect('feed-ready', on_feed_ready)
         self.comp.connect('error', on_component_error)
-        self.comp.connect('notify-feed-ports', on_component_notify_feed_ports)
         
         # override base Errback for callRemote to stop the pipeline
         #def callRemoteErrback(reason):
@@ -286,9 +283,9 @@ class ParseLaunchComponent(FeedComponent):
         @type feedersData: list of (name, host) tuples of our feeding elements
 
         @returns: something that should not be used. FIXME to make sure
-                  that callers connect to notify-feed-ports instead of
-                  using this return value, which is a list of (feedName,
-                  host, port)-tuples of feeds the component produces.
+                  that callers connect to feed-ready instead of using
+                  this return value, which is a list of (feedName, host,
+                  port)-tuples of feeds the component produces.
         """
         self.debug('ParseLaunchComponent.start')
         self.debug('start with eaters data %s and feeders data %s' % (

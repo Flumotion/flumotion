@@ -1,10 +1,40 @@
-<<<<<<< .mine
 2005-11-08  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/job.py: Remove unused gobject import.
+
+	* flumotion/component/encoders/vorbis/vorbis08.py
+	(Vorbis._start_feeders): No more notify-feed-ports.
+
+	* flumotion/component/feedcomponent09.py (FeedComponent)
+	(FeedComponent.link):
+	* flumotion/component/feedcomponent08.py (FeedComponent)
+	(FeedComponent.link): No more notify-feed-ports.
+
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.__init__.on_component_notify_feed_ports):
+	Removed.
+	(FeedComponentMedium.__init__): Don't connect to
+	notify-feed-ports.
+	(FeedComponentMedium.__init__.on_feed_ready): Pass the port we
+	feed on, or None, instead of a boolean.
+	(ParseLaunchComponent.do_start): Redoc.
+
+	* flumotion/manager/component.py
+	(ComponentAvatar.perspective_notifyFeedPorts)
+	(ComponentAvatar.perspective_feedReady): Combine two-stage
+	"notify-feed-ports then feed-ready" into a one-stage "feed-ready
+	with port" call. Removes some nice bugs. notifyFeedPorts is no
+	longer there.
+	(ComponentAvatar.perspective_log): Remove log method. used to be
+	used for sending all logging events to the manager, but that was
+	deemed too expensive months ago. A new logging framework would be
+	different anyway.
+	(ComponentAvatar.setFeederReadiness): Roll into
+	perspective_feedReady.
 
 	* flumotion/component/consumers/disker/disker.py
 	(Disker.link_setup.feeder_state_change_cb): Fix borken refactor.
 
-=======
 2005-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/bundleclient.py:
@@ -13,7 +43,6 @@
 	  Register package patsh without rebuilding every possible module;
 	  should both work and be fast enough
 
->>>>>>> .r2447
 2005-11-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py

@@ -25,7 +25,6 @@ worker-side objects to handle job processes
 import os
 import resource
 import signal
-import gobject
 
 # I've read somewhere that importing the traceback module messes up the
 # exception state, so it's better to import it globally instead of in the

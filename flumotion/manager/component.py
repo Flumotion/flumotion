@@ -582,20 +582,6 @@ class ComponentAvatar(base.ManagerAvatar):
         d.addErrback(self._mindErrback, errors.ReloadSyntaxError)
         return d
 
-    def setFeederReadiness(self, feedName, ready):
-        # check if the given feed is ready to start, and start it if it is
-        self.debug('setFeederReadiness: feedName %s' % feedName)
-        # these checks are crack -- fixme to try again later
-        if not self.ports.has_key(feedName):
-            self.warning('setFeederReadiness: no port yet')
-            return
-        
-        if not self.getFeeders():
-            self.warning('setFeederReadiness: no remote options yet')
-            return
-
-        self.heaven.setFeederReadiness(self, feedName, ready)
-
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
     def authenticate(self, keycard):
         d = self.mindCallRemote('authenticate', keycard)
@@ -623,21 +609,44 @@ class ComponentAvatar(base.ManagerAvatar):
         return d
 
     ### IPerspective methods, called by the worker's component
-    def perspective_log(self, *msg):
-        log.debug(self.avatarId, *msg)
-        
+    def perspective_feedReady(self, feedName, port):
+        """
+        Called by the component to tell the manager that a given feed is
+        ready or not. Will notify other components depending on this
+        feeder, starting them if all of their dependencies are ready.
+
+        @param feedName: name of the feeder, e.g. "default".
+        @type  feedName: string
+        @param port: port on which the feed is, or None if the port is
+                     being deactivated.
+        @type  port: int or NoneType
+        """
+        assert isinstance(feedName, str)
+        assert isinstance(port, int) or port == None
+
+        if port == None:
+            self.debug('feedReady: feed name %s is NOT ready' % feedName)
+            if not feedName in self.ports:
+                self.warning(("feed %s deactivated, but we don't know "
+                              "what port is was feeding on") % feedName)
+            else:
+                del self.ports[feedName]
+        else:
+            self.debug('feed %s will feed on port %d' % (feedName, port))
+            if feedName in self.ports:
+                self.warning(("feed %s activated on port %d, but it was "
+                              "already feeding on %d")
+                             % (feedName, port, self.ports[feedName]))
+            self.ports[feedName] = port
+            
+        self.heaven.setFeederReadiness(self, feedName, (port != None))
+            
     def perspective_heartbeat(self, moodValue):
         self.lastHeartbeat = time.time()
         #log.log(self.avatarId,
         #    "got heartbeat at %d" % int(self.lastHeartbeat))
         self._setMoodValue(moodValue)
 
-    def perspective_feedReady(self, feedName, ready):
-        self.debug('feedReady: feed name %s %s' % (
-            feedName, ready and 'ready' or 'NOT ready'))
-        
-        self.setFeederReadiness(feedName, ready)
-            
     def perspective_error(self, element, error):
         self.error('error element=%s string=%s' % (element, error))
         self.heaven.removeComponent(self)
@@ -648,18 +657,6 @@ class ComponentAvatar(base.ManagerAvatar):
         componentState = mapper.state
         self.vishnu.adminHeaven.avatarsCallRemote("componentCall",
             componentState, methodName, *args, **kwargs)
-
-    def perspective_notifyFeedPorts(self, feedPorts):
-        """
-        @param feedPorts: feeders provided by the component and the
-                          ports they are feeding on
-        @type  feedPorts: dict of feederName (string) -> port (int)
-        """
-        self.debug('received feed ports from component: %s' % feedPorts)
-        for feedName, port in feedPorts.items():
-            # print 'feed %s will feed on port %d' % (feedName, port)
-            self.debug('feed %s will feed on port %d' % (feedName, port))
-            self.ports[feedName] = port
 
     def perspective_authenticate(self, bouncerName, keycard):
         """

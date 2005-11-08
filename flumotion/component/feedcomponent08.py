@@ -42,7 +42,6 @@ class FeedComponent(basecomponent.BaseComponent):
 
     gsignal('feed-ready', str, bool)
     gsignal('error', str, str)
-    gsignal('notify-feed-ports')
 
     _reconnectInterval = 3
     
@@ -448,13 +447,6 @@ class FeedComponent(basecomponent.BaseComponent):
             self.debug('calling function %r' % func)
             func(eatersData, feedersData)
             
-        self.debug('setting pipeline to paused')
-        self.pipeline_pause()
-
-        # FIXME: fill feedPorts
-        self.debug('emitting feed port notify')
-        self.emit('notify-feed-ports')
-
         self.debug('setting pipeline to playing')
         self.pipeline_play()
 
