@@ -826,11 +826,25 @@ class Window(log.Loggable, gobject.GObject):
         dialog.start()
 
     def _component_stop(self, state):
+        """
+        @returns: a L{twisted.internet.defer.Deferred}
+        """
         return self._component_do(state, 'Stop', 'Stopping', 'Stopped')
         
     def _component_start(self, state):
+        """
+        @returns: a L{twisted.internet.defer.Deferred}
+        """
         return self._component_do(state, 'Start', 'Starting', 'Started')
  
+    def _component_restart(self, state):
+        """
+        @returns: a L{twisted.internet.defer.Deferred}
+        """
+        d = self._component_stop(state)
+        d.addCallback(lambda r: self._component_start(state))
+        return d
+        
     def _component_do(self, state, action, doing, done):
         if not state:
             state = self.components_view.get_selected_state()
