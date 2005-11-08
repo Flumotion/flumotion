@@ -108,7 +108,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.emit('filename-changed',self.location)
     
     def change_filename(self):
-        self.debug("Change filename called")
+        self.debug("change_filename()")
         mime = self.get_mime()
         if mime == 'application/ogg':
             ext = 'ogg'
