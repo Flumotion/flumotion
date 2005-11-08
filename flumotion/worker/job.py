@@ -39,6 +39,7 @@ from twisted.spread import pb
 from flumotion.common import config, errors, interfaces, log, registry, keycards
 from flumotion.common import medium
 from flumotion.component import component
+from flumotion.twisted.defer import defer_generator_method
 
 def getComponent(dict, moduleName, methodName):
     """
@@ -268,22 +269,23 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     ### pb.PBClientFactory methods
     # FIXME: might be nice if jobs got a password to use to log in to brain
     def login(self, username):
+        self.info('Logging in to worker')
         d = pb.PBClientFactory.login(self, 
             credentials.UsernamePassword(username, ''),
             self.medium)
-        self.info('Logging in to worker')
-        d.addCallbacks(self._connectedCallback,
-                       self._connectedErrback)
-        return d
+        yield d
+        try:
+            remoteReference = d.value()
+            self.info('Logged in to worker')
+            self.debug('perspective %r connected' % remoteReference)
+            self.medium.setRemoteReference(remoteReference)
+        except Exception, e:
+            import traceback; traceback.print_stack()
+            print ('ERROR connecting job to worker [%d]: %s'
+                   % (os.getpid(), log.getExceptionMessage(e)))
+            # raise error
+    login = defer_generator_method(login)
     
-    def _connectedCallback(self, remoteReference):
-        self.info('Logged in to worker')
-        self.debug('perspective %r connected' % remoteReference)
-        self.medium.setRemoteReference(remoteReference)
-
-    def _connectedErrback(self, error):
-        print 'ERROR connecting job to worker [%d]: %s' % (os.getpid(), error)
-
     # the only way stopFactory can be called is if the WorkerBrain closes
     # the pb server.  Ideally though we would have gotten a notice before.
     def stopFactory(self):

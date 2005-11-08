@@ -23,6 +23,8 @@ Debugging helper code
 
 import sys
 import re
+import linecache
+
 from twisted.python.reflect import filenameToModuleName
 
 
@@ -93,3 +95,27 @@ def trace_stop():
     if not _tracing:
         sys.settrace(None)
         _indent = ''
+
+def print_stack():
+    f = sys._getframe(1)
+    output = []
+    while f:
+        co = f.f_code
+        filename = co.co_filename
+        lineno = f.f_lineno
+        name = co.co_name
+        linecache.checkcache(filename)
+        line = linecache.getline(filename, lineno)
+        # reversed so we can reverse() later
+        if f.f_locals:
+            for k, v in f.f_locals.items():
+                output.append('      %s = %r' % (k, v))
+            output.append('    Locals:')
+        if line:
+            output.append('    %s' % line.strip())
+        output.append('  File "%s", line %d, in %s' % (filename,lineno,name))
+        f = f.f_back
+    output.reverse()
+    for line in output:
+        print line
+

@@ -1,5 +1,11 @@
 2005-11-08  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/debug.py (print_stack): New function, prints a
+	backtrace with local variables.
+
+	* flumotion/worker/job.py (JobClientFactory.login): Refactor a bit
+	of the login code.
+	
 	* flumotion/worker/job.py: Remove unused gobject import.
 
 	* flumotion/component/encoders/vorbis/vorbis08.py
