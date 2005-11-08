@@ -25,7 +25,6 @@ bundled code and data
 
 
 from twisted.internet import error, defer
-from twisted.python import rebuild
 
 from flumotion.common import bundle, common, errors, log, package
 from flumotion.configure import configure

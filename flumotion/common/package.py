@@ -154,7 +154,7 @@ class Packager(log.Loggable):
                 
         self.log('packagePath %s has packageNames %r' % (
             packagePath, packageNames)) 
-        # since we want sub-modules ot be fixed up before parent packages,
+        # since we want sub-modules to be fixed up before parent packages,
         # we reverse the list
         packageNames.reverse()
 
@@ -206,11 +206,13 @@ class Packager(log.Loggable):
                     newPath, packageName))
             package.__path__.insert(0, newPath)
 
-            self.log('rebuilding package %s from paths %r' % (packageName,
-                package.__path__))
-            rebuild.rebuild(package)
-            self.log('rebuilt package %s with paths %r' % (packageName,
-                package.__path__))
+            # Rebuilding these packages just to get __path__ fixed in
+            # seems not necessary - but re-enable it if it breaks
+            # self.log('rebuilding package %s from paths %r' % (packageName,
+            #     package.__path__))
+            # rebuild.rebuild(package)
+            # self.log('rebuilt package %s with paths %r' % (packageName,
+            #     package.__path__))
 
         # now rebuild all non-package modules in this packagePath if this
         # is not a new package
