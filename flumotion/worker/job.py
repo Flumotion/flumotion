@@ -152,7 +152,10 @@ class JobMedium(medium.BaseMedium):
             self.debug('stopped component')
         self.debug('stopping reactor')
         reactor.stop()
-        self.debug('reactor stopped')
+        self.debug('reactor stopped, exiting process')
+
+        # FIXME: temporary hack
+        os._exit(0)
 
     def _set_nice(self, nice):
         if not nice:
@@ -280,7 +283,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
             self.debug('perspective %r connected' % remoteReference)
             self.medium.setRemoteReference(remoteReference)
         except Exception, e:
-            import traceback; traceback.print_stack()
+            from flumotion.common import debug; debug.print_stack()
             print ('ERROR connecting job to worker [%d]: %s'
                    % (os.getpid(), log.getExceptionMessage(e)))
             # raise error
@@ -331,7 +334,7 @@ def run(avatarId, options):
     # the only usable object created for now in the child is the
     # JobClientFactory, so we throw the options at it
     job_factory = JobClientFactory(avatarId, options)
-    reactor.connectUNIX(workerSocket, job_factory)
+    c = reactor.connectUNIX(workerSocket, job_factory)
     log.info('job', 'Started job on pid %d' % os.getpid())
     log.debug('job', 'Dropping back into reactor')
 
@@ -351,6 +354,9 @@ def run(avatarId, options):
             print ('Profiling requested, but statprof is not available (%s)'
                    % e)
     
+    # run reactor recursively -- temporary hack
+    reactor.run()
+
     # flumotion.worker.worker.Kindergarten.play() looks for a return of
     # None if it's the kid returning; be explicit here
     return None

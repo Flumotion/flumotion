@@ -1,3 +1,9 @@
+2005-11-08  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/job.py (run): Run reactor recursively.
+	(JobMedium.shutdown): Instead of cleanly exiting, do os._exit(0).
+	Temporary hack, partially reverts changeset 2412.
+
 2005-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent09.py:
