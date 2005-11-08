@@ -216,8 +216,4 @@ class Vorbis(feedcomponent.FeedComponent):
 
         retval = self._start_feeders(self.feedersData)
         
-        self.pipeline_play()
-        self.debug('emitting feed port notify')
-        self.emit('notify-feed-ports')
-
         self._start_deferred.callback(retval)

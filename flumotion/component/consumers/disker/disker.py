@@ -173,11 +173,11 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
 
         if gst.gst_version < (0, 9):
-            sink.connect('state-change', self._feeder_state_change_cb)
-            def _feeder_state_change_cb(self, element, old, state):
+            def feeder_state_change_cb(element, old, state):
                 # FIXME: add more states
                 if state == gst.STATE_PLAYING:
                     self.setMood(moods.happy)
+            sink.connect('state-change', feeder_state_change_cb)
 
 compat.type_register(Disker)
         
