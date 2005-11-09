@@ -1,3 +1,8 @@
+2005-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/bundleclient.py:
+	  Fix loading of glade files and other bundled files
+
 2005-11-09  Michael Smith <msmith@fluendo.com>
 
 	* bin/Makefile.am:

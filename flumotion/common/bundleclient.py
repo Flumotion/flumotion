@@ -172,7 +172,8 @@ class BundleLoader(log.Loggable):
         yield d
 
         bundles = d.value()
-        name, path = bundles[-1]
+        name, bundlePath = bundles[-1]
+        path = os.path.join(bundlePath, fileName)
         if not os.path.exists(path):
             self.warning("path %s for file %s does not exist" % (
                 path, fileName))
