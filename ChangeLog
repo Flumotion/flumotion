@@ -1,3 +1,75 @@
+2005-11-09  Thomas Vander Wingo  <wingo@apestaart.com>
+
+	* flumotion/job/job.py (JobMedium.remote_bootstrap): New remote
+	method, to be called before remote_start.
+
+	* flumotion/job/Makefile.am: 
+	* flumotion/job/__init__.py: 
+	* flumotion/job/job.py:
+	* flumotion/job/main.py: New files, yay. job.py is what
+	flumotion.worker.job.py was. main.py is the code for the
+	flumotion-job main loop.
+
+	* flumotion/worker/worker.py (WorkerMedium.remote_start): Don't
+	actually load the modules, just fetch the bundles and their paths.
+	Fix already-starting error detection.
+	(Kid.__init__): New field, bundles, the paths that the kid should
+	register.
+	(JobProcessProtocol): New class, lets the kindergarten know when a
+	process exits.
+	(Kindergarten.play): New option, bundles. Don't actually fork,
+	just call reactor.spawnProcess on flumotion-job. Fixes lots of
+	bugs.
+	(getSocketPath): Moved here from flumotion.worker.job. Should be
+	removed at some point, whereby workers communicate with jobs over
+	normal fd's.
+	(WorkerBrain.__init__): Don't set a sigchild handler, spawnProcess
+	does everything for us.
+	(WorkerBrain.keycard): New field; passed to jobs when
+	bootstrapping.
+	(JobAvatar.attached): Call 'bootstrap' on the job before calling
+	'start'; allows the kid to register the necessary package paths,
+	and to receive credentials for logging into the manager.
+	(JobHeaven.getKeycard, JobHeaven.getWorkerName): Nice new methods,
+	retrieve properties from the worker brain.
+
+	* flumotion/component/consumers/httpstreamer/http.xml: Add
+	resources.py to the bundle.
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtkNode.render):
+	Catch errors loading the glade file.
+
+	* flumotion/component/converters/overlay/overlay.xml: Bundle up
+	genimg.py, the png files, and the font.
+
+	* flumotion/common/bundleclient.py (BundleLoader.getBundles):
+	Change to return a list of (bundleName, bundlePath) tuples instead
+	of (bundleName, bundleSum).
+	(BundleLoader.loadModule, BundleLoader.getBundleByName) 
+	(BundleLoader.getFile):
+	* flumotion/admin/admin.py (AdminModel.getEntry): Adapt to
+	getBundles change.
+
+	* flumotion/twisted/defer.py
+	(defer_generator.wrapper.default_errback.print_traceback): Print
+	out what is printing this message.
+
+	* flumotion/test/test_worker_worker.py (TestKid.testGetPid) 
+	(TestKindergarten.testRemoveKidByPid): Adapt to worker.Kid()
+	constructor change.
+
+	* Makefile.am (PYCHECKER_WHITELIST): Add flumotion/job to the
+	pychecker whitelist.
+
+	* conf/workers/default.xml (feederports): Default to 20 free ports
+	so that by default you can enable all 6 consumers.
+
+	* bin/flumotion-job.in: New executable, run by the worker instead
+	of having the worker fork.
+
+	* configure.ac (AC_CONFIG_FILES):
+	* bin/Makefile.am (bin_SCRIPTS): Add flumotion-job.
+
 2005-11-08  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/job.py (run): Run reactor recursively.

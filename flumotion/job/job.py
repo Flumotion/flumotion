@@ -19,12 +19,11 @@
 # Headers in this file shall remain intact.
 
 """
-worker-side objects to handle job processes
+the job-side half of the worker-job connection
 """
 
 import os
 import resource
-import signal
 
 # I've read somewhere that importing the traceback module messes up the
 # exception state, so it's better to import it globally instead of in the
@@ -37,7 +36,7 @@ from twisted.python import reflect, failure
 from twisted.spread import pb
 
 from flumotion.common import config, errors, interfaces, log, registry, keycards
-from flumotion.common import medium
+from flumotion.common import medium, package
 from flumotion.component import component
 from flumotion.twisted.defer import defer_generator_method
 
@@ -100,16 +99,55 @@ class JobMedium(medium.BaseMedium):
 
     __implements__ = interfaces.IJobMedium,
 
-    def __init__(self, options):
-        self.options = options
+    def __init__(self):
         self.avatarId = None
         self.logName = None
         self.component = None
-        self.manager_host = options.host
-        self.manager_port = options.port
-        self.manager_transport = options.transport
+        self.worker_name = None
+        self.manager_host = None
+        self.manager_port = None
+        self.manager_transport = None
+        self.manager_keycard = None
 
     ### pb.Referenceable remote methods called on by the WorkerBrain
+    def remote_bootstrap(self, workerName, host, port, transport, keycard,
+            packagePaths):
+        """
+        I receive the information on how to connect to the manager. I also set
+        up package paths to be able to run the component.
+        
+        Called by the worker's JobAvatar.
+        
+        @param workerName:   the name of the worker running this job
+        @type  workerName:   str
+        @param host:         the host that is running the manager
+        @type  host:         str
+        @param port:         port on which the manager is listening
+        @type  port:         int
+        @param transport:    'tcp' or 'ssl'
+        @type  transport:    string
+        @param keycard:      credentials used to log in to the manager
+        @type  keycard:      L{flumotion.common.keycards.Keycard}
+        @param packagePaths: ordered list of (package name, package path) tuples
+        @type  packagePaths: list of (str, str)
+        """
+        assert isinstance(workerName, str)
+        assert isinstance(host, str)
+        assert isinstance(port, int)
+        assert transport in ('ssl', 'tcp')
+        assert isinstance(keycard, keycards.Keycard)
+        assert isinstance(packagePaths, list)
+
+        self.worker_name = workerName
+        self.manager_host = host
+        self.manager_port = port
+        self.manager_transport = transport
+        self.manager_keycard = keycard
+        
+        packager = package.getPackager()
+        for name, path in packagePaths:
+            packager.registerPackagePath(path, name)
+
     def remote_start(self, avatarId, type, moduleName, methodName, config,
         feedPorts):
         """
@@ -223,13 +261,12 @@ class JobMedium(medium.BaseMedium):
         if feedPorts:
             comp.set_feed_ports(feedPorts)
 
-        comp.setWorkerName(self.options.name)
+        comp.setWorkerName(self.worker_name)
         comp.setConfig(config)
 
         # make component log in to manager
         manager_client_factory = component.ComponentClientFactory(comp)
-        keycard = keycards.KeycardUACPP(self.options.username,
-            self.options.password, 'localhost')
+        keycard = self.manager_keycard
         keycard.avatarId = avatarId
         manager_client_factory.startLogin(keycard)
 
@@ -257,15 +294,14 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     """
     logCategory = "job"
 
-    def __init__(self, id, options):
+    def __init__(self, id):
         """
-        @param options: the command-line options the worker was started with
+        @param id:      the avatar id used for logging into the workerbrain
         @type  id:      string
         """
         pb.PBClientFactory.__init__(self)
         
-        # we pass the options to the medium
-        self.medium = JobMedium(options)
+        self.medium = JobMedium()
         self.logName = id
         self.login(id)
             
@@ -295,68 +331,3 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         self.debug('shutting down medium')
         self.medium.shutdown()
         self.debug('shut down medium')
-
-def getSocketPath():
-    # FIXME: better way of getting at a tmp dir ?
-    return os.path.join('/tmp', "flumotion.worker.%d" % os.getpid())
-
-def run(avatarId, options):
-    """
-    Called by the worker to start a job fork.
-
-    @param avatarId:   avatar identification string
-    @type  avatarId:   string
-    @param options:    command line options as parsed by flumotion.worker.main
-                       (includes manager host, port, and transport,
-                       among other things)
-    @type  options:    dict
-    """
-    workerSocket = getSocketPath()
-
-    pid = os.fork()
-    if pid:
-        # parent
-        return pid
-
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-    
-    reactor.removeAll()
-    # as it turns out this won't remove the waker from reactors in
-    # twisted 2.0. remove it and install a new one, sigh...
-    if hasattr(reactor, 'waker'):
-        reactor.removeReader(reactor.waker)
-        reactor.waker = None
-        reactor.installWaker()
-        assert hasattr(reactor, 'waker')
-    for delayed in reactor.getDelayedCalls():
-        delayed.cancel()
-
-    # the only usable object created for now in the child is the
-    # JobClientFactory, so we throw the options at it
-    job_factory = JobClientFactory(avatarId, options)
-    c = reactor.connectUNIX(workerSocket, job_factory)
-    log.info('job', 'Started job on pid %d' % os.getpid())
-    log.debug('job', 'Dropping back into reactor')
-
-    if 'FLU_PROFILE' in os.environ:
-        try:
-            import statprof
-            statprof.start()
-            print 'Profiling started.'
-
-            def stop_profiling():
-                statprof.stop()
-                statprof.display()
-
-            reactor.addSystemEventTrigger('before', 'shutdown',
-                stop_profiling)
-        except ImportError, e:
-            print ('Profiling requested, but statprof is not available (%s)'
-                   % e)
-    
-    # run reactor recursively -- temporary hack
-    reactor.run()
-
-    # flumotion.worker.worker.Kindergarten.play() looks for a return of
-    # None if it's the kid returning; be explicit here
-    return None

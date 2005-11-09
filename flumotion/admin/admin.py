@@ -561,8 +561,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         d = self.bundleLoader.getBundles(fileName=fileName)
         yield d
 
-        name, sum = d.value()[-1]
-        bundlePath = os.path.join(configure.cachedir, name, sum)
+        name, bundlePath = d.value()[-1]
         yield (bundlePath, fileName, methodName)
     getEntry = defer_generator_method(getEntry)
 

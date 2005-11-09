@@ -23,6 +23,7 @@ Bundle fetching, caching, and importing utilities for clients using
 bundled code and data
 """
 
+import os
 
 from twisted.internet import error, defer
 
@@ -30,15 +31,9 @@ from flumotion.common import bundle, common, errors, log, package
 from flumotion.configure import configure
 from flumotion.twisted.defer import defer_generator_method
 
-
 __all__ = ['BundleLoader']
 
-
 class BundleLoader(log.Loggable):
-    """
-    foo
-    """
-
     remote = None
     _unbundler = None
 
@@ -55,13 +50,17 @@ class BundleLoader(log.Loggable):
         return self.remote.callRemote(methodName, *args, **kwargs)
 
     def getBundles(self, **kwargs):
+        # FIXME: later on, split out this method into getBundles which does
+        # not call registerPackagePath, and setupBundles which calls getBundles
+        # and register.  Then change getBundles calls to setupBundles.
         """
-        Get and extract all bundles needed.
+        Get, extract and register all bundles needed.
         Either one of bundleName, fileName or moduleName should be specified
         in **kwargs.
 
-        @returns: a list of (bundleName, sum) tuples, in with lowest dependency
-                  first.
+        @returns: a list of (bundleName, bundlePath) tuples, with lowest
+                  dependency first.  bundlePath is the directory to register
+                  for this package.
         """
         # get sums for all bundles we need
         d = self._callRemote('getBundleSums', **kwargs)
@@ -99,6 +98,7 @@ class BundleLoader(log.Loggable):
 
         # register all package paths; to do so we need to reverse sums
         sums.reverse()
+        ret = []
         for name, md5 in sums:
             self.log('registerPackagePath for %s' % name)
             path = os.path.join(configure.cachedir, name, md5)
@@ -107,8 +107,9 @@ class BundleLoader(log.Loggable):
                     path, name)
             else:
                 package.getPackager().registerPackagePath(path, name)
+            ret.append((name, path))
 
-        yield sums
+        yield ret
     getBundles = defer_generator_method(getBundles)
 
     def loadModule(self, moduleName):
@@ -131,8 +132,8 @@ class BundleLoader(log.Loggable):
         d = self.getBundles(moduleName=moduleName)
         yield d
 
-        sums = d.value()
-        self.debug('Got sums %r' % sums)
+        bundles = d.value()
+        self.debug('Got bundles %r' % bundles)
 
         # load up the module and return it
         __import__(moduleName, globals(), locals(), [])
@@ -145,17 +146,16 @@ class BundleLoader(log.Loggable):
         Get the given bundle locally.
 
         @rtype:   L{twisted.internet.defer.Deferred}
-        @returns: a deferred that will fire when the given bundle is fetched,
-                  giving the full local path where the bundle is extracted.
+        @returns: a deferred returning the absolute path under which the
+                  bundle is extracted.
         """
         self.debug('Getting bundle %s' % bundleName)
         d = self.getBundles(bundleName=bundleName)
         yield d
 
-        sums = d.value()
-        name, md5 = sums[-1]
-        import os
-        path = os.path.join(configure.cachedir, name, md5)
+        bundles = d.value()
+        name, path = bundles[-1]
+        assert name == bundleName
         self.debug('Got bundle %s in %s' % (bundleName, path))
         yield path
     getBundleByName = defer_generator_method(getBundleByName)
@@ -167,20 +167,15 @@ class BundleLoader(log.Loggable):
         Returns: a deferred returning the absolute path to a local copy
                  of the given file.
         """
-        import os
-
         self.debug('Getting file %s' % fileName)
         d = self.getBundles(fileName=fileName)
         yield d
 
-        sums = d.value()
-        name, md5 = sums[-1]
-        path = os.path.join(configure.cachedir, name, md5, fileName)
+        bundles = d.value()
+        name, path = bundles[-1]
         if not os.path.exists(path):
             self.warning("path %s for file %s does not exist" % (
                 path, fileName))
 
         yield path
     getFile = defer_generator_method(getFile)
-        
-

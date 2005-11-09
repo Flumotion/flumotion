@@ -219,12 +219,6 @@ def main(args):
     keycard.avatarId = options.name
     brain.login(keycard)
 
-    # the reactor needs to be able to reap its own children
-    # but we also want ours reaped
-    # so we install our own signal handler that first chains to twisted's,
-    # then reaps children
-    reactor.addSystemEventTrigger('after', 'startup',
-        brain.installSIGCHLDHandler)
     reactor.addSystemEventTrigger('after', 'startup',
         brain.installSIGTERMHandler)
     log.debug('worker', 'Starting reactor')

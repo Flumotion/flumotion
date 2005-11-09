@@ -27,10 +27,12 @@ from flumotion.worker import worker
 
 class TestKid(unittest.TestCase):
     def testGetPid(self):
-        kid = worker.Kid(1092, "kid", "http", "module", "method", {})
+        kid = worker.Kid(1092, "kid", "http", "module", "method", {},
+            [('belgian', '/opt/ion/al'), ('american', '/ess/en/tial')])
         self.assertEquals(kid.avatarId, "kid")
         self.assertEquals(kid.type, "http")
         self.assertEquals(kid.config, {})
+        self.assertEquals(len(kid.bundles), 2)
 
         self.assertEquals(kid.getPid(), 1092)
 
@@ -44,7 +46,7 @@ class TestKindergarten(unittest.TestCase):
     def testRemoveKidByPid(self):
         k = worker.Kindergarten({})
         k.kids['/swede/johan'] = worker.Kid(1, "/swede/johan", "http",
-            "module", "method", {})
+            "module", "method", {}, [('foo', 'bar')])
 
         self.assertEquals(k.removeKidByPid(2), False)
 

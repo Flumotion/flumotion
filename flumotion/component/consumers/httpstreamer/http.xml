@@ -70,6 +70,7 @@
         <directories>
             <directory name="flumotion/component/consumers/httpstreamer">
                 <filename location="http.py" />
+                <filename location="resources.py" />
             </directory>
         </directories>
     </bundle>

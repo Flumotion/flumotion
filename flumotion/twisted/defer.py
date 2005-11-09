@@ -31,7 +31,8 @@ def defer_generator(proc):
         def default_errback(failure, d):
             def print_traceback(f):
                 import traceback
-                print 'Unhandled error calling', proc.__name__, ':', f.type
+                print 'flumotion.twisted.defer.py: ' + \
+                    'Unhandled error calling', proc.__name__, ':', f.type
                 traceback.print_exc()
             d.addErrback(print_traceback)
             raise

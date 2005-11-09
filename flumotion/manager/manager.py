@@ -240,7 +240,9 @@ class Vishnu(log.Loggable):
             defs = registry.getRegistry().getComponent(
                 conf.manager.bouncer.type)
             configDict = conf.manager.bouncer.getConfigDict()
-            from flumotion.worker import job
+            # FIXME: this is terrible, we shouldn't be importing from
+            # anything outside of flumotion.common and flumotion.manager...
+            from flumotion.job import job
             # FIXME: don't hardcode createComponent
             bouncer = job.getComponent(configDict, defs.getSource(),
                 'createComponent')

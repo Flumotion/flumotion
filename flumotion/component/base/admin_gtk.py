@@ -298,7 +298,13 @@ class BaseAdminGtkNode(log.Loggable):
             dl = self.loadGladeFile(self.glade_file, self.gettext_domain)
             yield dl
 
-            self.wtree = dl.value()
+            try:
+                self.wtree = dl.value()
+            except RuntimeError:
+                msg = 'Could not load glade file %s' % self.glade_file
+                self.warning(msg)
+                yield gtk.Label("%s.  Kill the programmer." % msg)
+
             self.debug('render: calling haveWidgetTree')
             dh = self.haveWidgetTree()
             yield dh

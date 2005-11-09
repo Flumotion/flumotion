@@ -1,8 +1,9 @@
 bin_SCRIPTS = \
-	flumotion-manager \
 	flumotion-admin \
-	flumotion-worker \
-	flumotion-tester
+	flumotion-job \
+	flumotion-manager \
+	flumotion-tester \
+	flumotion-worker
 
 sbin_SCRIPTS = flumotion
 

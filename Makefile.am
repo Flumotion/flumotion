@@ -28,6 +28,7 @@ PYCHECKER_WHITELIST = \
 	    flumotion/admin/*.py		\
 	    flumotion/common/*.py		\
 	    flumotion/configure/*.py		\
+	    flumotion/job/*.py 			\
 	    flumotion/launch/*.py 		\
 	    flumotion/manager/*.py 		\
 	    flumotion/service/*.py		\

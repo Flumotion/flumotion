@@ -6,6 +6,7 @@ SUBDIRS = \
 	component \
 	configure \
 	extern \
+	job \
 	launch \
 	manager \
 	project \
@@ -22,7 +23,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion
 flumotion_PYTHON = \
 	__init__.py
 flumotion_DATA = package.xml
- 
+
 clean-local:
 	rm -rf *.pyc *.pyo
 

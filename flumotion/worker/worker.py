@@ -41,7 +41,6 @@ from flumotion.common import common, medium
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
 from flumotion.twisted.defer import defer_generator_method
-from flumotion.worker import job
 from flumotion.configure import configure
 
 factoryClass = fpb.ReconnectingFPBClientFactory
@@ -163,36 +162,27 @@ class WorkerMedium(medium.BaseMedium):
         # FIXME: thomas: find a way to rebuild less so this doesn't take
         # excessive amounts of CPU time
         self.debug('setting up bundles for %s' % moduleName)
-        d = self.bundleLoader.loadModule(moduleName)
+        d = self.bundleLoader.getBundles(moduleName=moduleName)
         yield d
         # check errors, will proxy to the manager
-        d.value()
+        bundles = d.value()
 
         # this could throw ComponentAlreadyStartingError
         d = self.brain.deferredStartCreate(avatarId)
-
-        # We can't fork from within this call, because we're in the
-        # callback from the loadModule deferred, and we don't know what
-        # other work is pending on the stack. When we fork, we need to
-        # be able to drop back down to the reactor without having any
-        # work from the parent process pending on the stack (e.g., more
-        # data coming in from banana). So do a callLater, which means
-        # the stack will just be main() -> reactor.run() ->
-        # handleDeferredCall().
-        reactor.callLater(0, self.brain.kindergarten.play,
-            avatarId, type, moduleName, methodName, config)
-
-        yield d
-
-        try:
-            result = d.value()
-            self.debug('deferred start for %s succeeded (%r)'
-                       % (avatarId, result))
-            yield result
-        except Exception, e:
+        if not d:
             msg = ('Component "%s" has already received a start request'
                    % avatarId)
             raise errors.ComponentStart(msg)
+
+        self.brain.kindergarten.play(avatarId, type, moduleName, methodName,
+            config, bundles)
+
+        yield d
+
+        result = d.value()
+        self.debug('deferred start for %s succeeded (%r)'
+                   % (avatarId, result))
+        yield result
     remote_start = defer_generator_method(remote_start)
 
     def remote_checkElements(self, elementNames):
@@ -232,18 +222,34 @@ class Kid:
     """
     I am an abstraction of a job process started by the worker.
     """
-    def __init__(self, pid, avatarId, type, moduleName, methodName, config):
+    def __init__(self, pid, avatarId, type, moduleName, methodName, config,
+                 bundles):
         self.pid = pid 
         self.avatarId = avatarId
         self.type = type
         self.moduleName = moduleName
         self.methodName = methodName
         self.config = config
+        self.bundles = bundles
 
     # pid = protocol.transport.pid
     def getPid(self):
         return self.pid
 
+class JobProcessProtocol(protocol.ProcessProtocol):
+    def __init__(self, kindergarten):
+        self.kindergarten = kindergarten
+        self.pid = None
+
+    def setPid(self, pid):
+        self.pid = pid
+
+    def processEnded(self, status):
+        # vmethod implementation
+        # status is an instance of failure.Failure
+        self.kindergarten.removeKidByPid(self.pid)
+        self.setPid(None)
+        
 class Kindergarten(log.Loggable):
     """
     I spawn job processes.
@@ -262,7 +268,7 @@ class Kindergarten(log.Loggable):
         self.kids = {} # avatarId -> Kid
         self.options = options
         
-    def play(self, avatarId, type, moduleName, methodName, config):
+    def play(self, avatarId, type, moduleName, methodName, config, bundles):
         """
         Create a kid and make it "play" by starting a job.
         Starts a component with the given name, of the given type, and
@@ -281,20 +287,31 @@ class Kindergarten(log.Loggable):
         @type  methodName: string
         @param config:     a configuration dictionary for the component
         @type  config:     dict
+        @param bundles:    ordered list of (bundleName, bundlePath) for this
+                           component
+        @type bundles:     list of (str, str)
         """
         # This forks and returns the pid, or None if we're in the kid
-        pid = job.run(avatarId, self.options)
+        # FIXME: SPAWN PROCESS
+        p = JobProcessProtocol(self)
+        executable = os.path.join(os.path.dirname(sys.argv[0]), 'flumotion-job')
+        if not os.path.exists(executable):
+            self.error("Trying to spawn job process, but '%s' does not "
+                       "exist" % executable)
+        # Evil FIXME: make argv[0] of the kid insult the user
+        argv = [executable, avatarId, getSocketPath()]
+        childFDs={0:0, 1:1, 2:2}
+        env={}
+        env.update(os.environ)
+        env['FLU_DEBUG'] = log._FLU_DEBUG
+        process = reactor.spawnProcess(p, executable, env=os.environ, args=argv,
+            childFDs=childFDs)
 
-        if not pid:
-            # this is the kid, just return so we can unwind the stack
-            # back to the reactor
-            return None
+        p.setPid(process.pid)
 
-        # we're the parent
         self.kids[avatarId] = \
-            Kid(pid, avatarId, type, moduleName, methodName, config)
-
-        return pid
+            Kid(process.pid, avatarId, type, moduleName, methodName, config,
+                bundles)
 
     def getKid(self, avatarId):
         return self.kids[avatarId]
@@ -320,6 +337,11 @@ class Kindergarten(log.Loggable):
         self.warning('Asked to remove kid with pid %d but not found' % pid)
         return False
 
+def getSocketPath():
+    # FIXME: better way of getting at a tmp dir ?
+    # this is insecure as well, fixme before 0.1.10
+    return os.path.join('/tmp', "flumotion.worker.%d" % os.getpid())
+
 # Similar to Vishnu, but for worker related classes
 class WorkerBrain(log.Loggable):
     """
@@ -335,7 +357,6 @@ class WorkerBrain(log.Loggable):
         @type  options: an object with attributes
         """
         self._port = None
-        self._oldSIGCHLDHandler = None # stored by installSIGCHLDHandler
         self._oldSIGTERMHandler = None # stored by installSIGTERMHandler
         self.options = options
 
@@ -350,6 +371,7 @@ class WorkerBrain(log.Loggable):
         self.manager_transport = options.transport
 
         self.workerName = options.name
+        self.keycard = None
         
         self.kindergarten = Kindergarten(options)
         self.job_server_factory, self.job_heaven = self.setup()
@@ -360,6 +382,8 @@ class WorkerBrain(log.Loggable):
         self._startDeferreds = {}
 
     def login(self, keycard):
+        # called by worker/main.py
+        self.keycard = keycard
         self.worker_client_factory.startLogin(keycard)
                              
     def setup(self):
@@ -372,7 +396,7 @@ class WorkerBrain(log.Loggable):
         checker.allowPasswordless(True)
         p = portal.Portal(dispatcher, [checker])
         job_server_factory = pb.PBServerFactory(p)
-        self._port = reactor.listenUNIX(job.getSocketPath(), job_server_factory)
+        self._port = reactor.listenUNIX(getSocketPath(), job_server_factory)
 
         return job_server_factory, root
 
@@ -393,84 +417,7 @@ class WorkerBrain(log.Loggable):
         print >> sys.stderr, 'ERROR: %s' % message
         reactor.stop()
 
-    def installSIGCHLDHandler(self):
-        """
-        Install our own signal handler for SIGCHLD.
-        This will call the currently installed one first, then reap
-        any leftover zombies.
-        """
-        self.debug("Installing SIGCHLD handler")
-        handler = signal.signal(signal.SIGCHLD, self._SIGCHLDHandler)
-        if handler not in (signal.SIG_IGN, signal.SIG_DFL, None):
-            self._oldSIGCHLDHandler = handler
-
-    def _SIGCHLDHandler(self, signum, frame):
-        self.debug("handling SIGCHLD")
-        if self._oldSIGCHLDHandler:
-            self.debug("calling Twisted handler")
-            self._oldSIGCHLDHandler(signum, frame)
-            
-        # we could have been called for more than one kid, so handle all
-        reaped = False
-
-        while True:
-            # find a pid that needs reaping
-            # only allow ECHILD to pass, which means no children needed reaping
-            pid = 0
-            try:
-                self.debug('calling os.waitpid to reap children')
-                pid, status = os.waitpid(-1, os.WNOHANG)
-                self.debug('os.waitpid() returned pid %d' % pid)
-                reaped = True
-            except OSError, e:
-                if not e.errno == errno.ECHILD:
-                    raise
-                
-            # check if we reaped a child or not
-            # if we reaped none at all in this handling, something shady went
-            # on, so we info
-            if not pid:
-                if not reaped:
-                    self.info('No children of mine to wait on')
-                else:
-                    self.debug('Done reaping children')
-                return
-
-            # we reaped, so ...
-            # remove from the kindergarten
-            self.kindergarten.removeKidByPid(pid)
-
-            # check if it exited nicely; see Stevens
-            if os.WIFEXITED(status):
-                retval = os.WEXITSTATUS(status)
-                self.info("Reaped child job with pid %d, exit value %d" % (
-                    pid, retval))
-            elif os.WIFSIGNALED(status):
-                signum = os.WTERMSIG(status)
-                if signum == signal.SIGSEGV:
-                    self.warning("Job child with pid %d segfaulted" % pid)
-                    if not os.WCOREDUMP(status):
-                        self.warning(
-                            "No core dump generated.  "\
-                            "Were core dumps enabled at the start ?")
-                else:
-                    self.info(
-                        "Reaped job child with pid %d signaled by signal %d" % (
-                            pid, signum))
-                if os.WCOREDUMP(status):
-                    self.info("Core dumped (in %s)" % os.getcwd())
-                    
-            elif os.WIFSTOPPED(status):
-                signum = os.WSTOPSIG(status)
-                self.info(
-                    "Reaped job child with pid %d stopped by signal %d" % (
-                        pid, signum))
-            else:
-                self.info(
-                    "Reaped job child with pid %d and unhandled status %d" % (
-                        pid, status))
-
-    # FIXME: this isnt' necessary, we can just connect to the shutdown
+    # FIXME: this isn't necessary, we can just connect to the shutdown
     # event on the reactor, reducing a lot of complexity here...
     def installSIGTERMHandler(self):
         """
@@ -558,6 +505,7 @@ class JobDispatcher:
     # the job.
     # the avatar id is of the form /(parent)/(name) 
     def requestAvatar(self, avatarId, mind, *interfaces):
+        print 'requesting avatar %s %r %r' % (avatarId, mind, interfaces)
         if pb.IPerspective in interfaces:
             avatar = self.root.createAvatar(avatarId)
             reactor.callLater(0, avatar.attached, mind)
@@ -602,7 +550,6 @@ class JobAvatar(pb.Avatar, log.Loggable):
         @type  heaven:   L{flumotion.worker.worker.JobHeaven}
         @type  avatarId: string
         """
-        
         self.heaven = heaven
         self.avatarId = avatarId
         self.mind = None
@@ -632,6 +579,13 @@ class JobAvatar(pb.Avatar, log.Loggable):
         transport = self.heaven.brain.manager_transport
 
         kid = self.heaven.brain.kindergarten.getKid(self.avatarId)
+
+        d = self.mind.callRemote('bootstrap', self.heaven.getWorkerName(),
+            host, port, transport, self.heaven.getKeycard(), kid.bundles)
+
+        yield d
+        d.value() # allow exceptions
+
         # we got kid.config through WorkerMedium.remote_start from the manager
         feedNames = kid.config.get('feed', [])
         self.log('feedNames: %r' % feedNames)
@@ -697,7 +651,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
 class JobHeaven(pb.Root, log.Loggable):
     """
     I am similar to but not quite the same as a manager-side Heaven.
-    I manage avatars inside the worker for job processes forked by the worker.
+    I manage avatars inside the worker for job processes spawned by the worker.
     """
     logCategory = "job-heaven"
     def __init__(self, brain, feederports):
@@ -722,3 +676,19 @@ class JobHeaven(pb.Root, log.Loggable):
         dl = defer.DeferredList([x.stop() for x in self.avatars.values()])
         dl.addCallback(lambda result: self.debug('Stopped all jobs'))
         return dl
+
+    def getKeycard(self):
+        """
+        Gets the keycard that the worker used to log in to the manager.
+
+        @rtype: L{flumotion.common.keycards.Keycard}
+        """
+        return self.brain.keycard
+
+    def getWorkerName(self):
+        """
+        Gets the name of the worker that spawns the process.
+
+        @rtype: str
+        """
+        return self.brain.workerName
