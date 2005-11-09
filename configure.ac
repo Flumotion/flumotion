@@ -280,6 +280,7 @@ flumotion/configure/installed.py
 flumotion/configure/uninstalled.py
 flumotion/extern/Makefile
 flumotion/extern/pytrayicon/Makefile
+flumotion/job/Makefile
 flumotion/launch/Makefile
 flumotion/manager/Makefile
 flumotion/project/Makefile
