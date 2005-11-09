@@ -188,10 +188,13 @@ fi
 %{_bindir}/flumotion-worker
 %{_bindir}/flumotion-admin
 %{_bindir}/flumotion-tester
+%{_bindir}/flumotion-job
 %{_sbindir}/flumotion
 %{_libdir}/flumotion
 %{_libdir}/pkgconfig/flumotion.pc
-%{_datadir}/flumotion
+%{_datadir}/flumotion/glade
+%{_datadir}/flumotion/image
+%{_datadir}/flumotion/make-dummy-cert
 %{_datadir}/applications/*.desktop
 %{_datadir}/pixmaps/*
 %{_mandir}/man1/flumotion*.1*
@@ -201,7 +204,6 @@ fi
 %attr(750,flumotion,root) %{_localstatedir}/log/flumotion
 %attr(750,flumotion,root) %{_localstatedir}/cache/flumotion
 %{_sysconfdir}/rc.d/init.d/flumotion
-%{_datadir}/applications/fedora-flumotion-admin.desktop
 
 %changelog
 * Fri Jul 29 2005 Thomas Vander Stichele <thomas at apestaart dot org>
