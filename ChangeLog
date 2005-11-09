@@ -1,3 +1,26 @@
+2005-11-09  Michael Smith <msmith@fluendo.com>
+
+	* bin/Makefile.am:
+	* configure.ac:
+	* flumotion/admin/Makefile.am:
+	* flumotion/admin/text/Makefile.am:
+	* flumotion/admin/text/admin_text.py:
+	* flumotion/admin/text/connection.py:
+	* flumotion/admin/text/greeter.py:
+	* flumotion/admin/text/main.py:
+	* flumotion/admin/text/misc_curses.py:
+	* flumotion/admin/text/view.py:
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/consumers/disker/Makefile.am:
+	* flumotion/component/consumers/disker/disker.xml:
+	* flumotion/component/producers/videotest/Makefile.am:
+	* flumotion/component/producers/videotest/videotest.xml:
+	  Text Admin!
+	  Thanks a lot to Zaheer for pushing this through.
+	  Still need to clean up deferred error handling for this to be usable
+	  without modifications, though.
+
 2005-11-09  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/Makefile.am (flumotion_PYTHON): Remove job.py

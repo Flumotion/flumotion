@@ -11,6 +11,8 @@
                function="createComponent"/>
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass"/>
+        <entry type="admin/text" location="admin_text.py"
+               function="UIClass"/>
       </entries>
 
       <properties>
@@ -51,7 +53,17 @@
         </directory>
       </directories>
     </bundle>
-
+    <bundle name="videotest-admin-text">
+      <dependencies>
+        <dependency name="videotest-base" />
+        <dependency name="base-admin-text" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/producers/videotest">
+           <filename location="admin_text.py" />
+        </directory>
+      </directories>
+    </bundle>
     <bundle name="videotest-component">
         <dependencies>
             <dependency name="component" />

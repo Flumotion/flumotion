@@ -11,5 +11,16 @@
         </directory>
       </directories>
     </bundle>
+    <bundle name="base-admin-text">
+      <dependencies>
+        <dependency name="flumotion" />
+        <dependency name="component-base" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/base">
+          <filename location="admin_text.py" />
+        </directory>
+      </directories>
+    </bundle>
   </bundles>
 </registry> 

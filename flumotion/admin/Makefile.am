@@ -6,7 +6,7 @@ component_PYTHON = \
 	admin.py \
 	connections.py
 
-SUBDIRS = gtk
+SUBDIRS = gtk text
 
 TAGS_FILES = $(component_PYTHON)
 

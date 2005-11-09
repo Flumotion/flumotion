@@ -1,5 +1,6 @@
 bin_SCRIPTS = \
 	flumotion-admin \
+	flumotion-admin-text \
 	flumotion-job \
 	flumotion-manager \
 	flumotion-tester \

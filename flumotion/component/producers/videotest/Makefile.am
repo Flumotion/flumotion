@@ -1,6 +1,6 @@
 include $(top_srcdir)/common/python.mk
 
-component_PYTHON = __init__.py videotest.py admin_gtk.py
+component_PYTHON = __init__.py videotest.py admin_gtk.py admin_text.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/producers/videotest
 component_DATA = videotest.xml
 

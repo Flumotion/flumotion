@@ -5,7 +5,8 @@ componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/disker
 component_PYTHON = \
 	__init__.py \
 	disker.py  \
-	admin_gtk.py
+	admin_gtk.py \
+	admin_text.py
 
 component_DATA = disker.xml disker.glade
 
