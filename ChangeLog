@@ -1,5 +1,7 @@
 2005-11-09  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/Makefile.am (flumotion_PYTHON): Remove job.py
+
 	* configure.ac: Add job/Makefile
 
 2005-11-09  Thomas Vander Wingo  <wingo@apestaart.com>
