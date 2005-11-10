@@ -61,6 +61,7 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="webcam-base" />
+            <dependency name="colorbalance-effect" />
         </dependencies>
 
         <directories>

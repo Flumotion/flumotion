@@ -40,6 +40,7 @@ def setProp(struct, dict, name):
                                                                                 
 def createComponent(config):
     device = config['device']
+
     # Filtered caps
     format = config.get('format', 'video/x-raw-yuv')
     struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
@@ -55,7 +56,7 @@ def createComponent(config):
         autoprobe += " autoprobe-fps=false"
     
     pipeline = 'v4lsrc name=source %s copy-mode=1 device=%s ! ' \
-               'ffmpegcolorspace ! %s ! videorate ! %s' \
+               'ffmpegcolorspace ! "%s" ! videorate ! "%s"' \
                % (autoprobe, device, caps, caps)
     component = WebCamera(config['name'], pipeline)
 

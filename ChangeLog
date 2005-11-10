@@ -1,3 +1,10 @@
+2005-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/webcam/webcam.py:
+	  make launch line pasteable
+	* flumotion/component/producers/webcam/webcam.xml:
+	  fix dependency on colorbalance effect
+
 2005-11-10  Julien MOUTTE  <julien@moutte.net>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:
