@@ -1,3 +1,9 @@
+2005-11-10  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/producers/videotest/videotest.xml:
+	  Don't have 'wizard' as a dependency, since no such bundle exists.
+	  Prevents a warning when using videotest admin interface.
+
 2005-11-10  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/twisted/defer.py

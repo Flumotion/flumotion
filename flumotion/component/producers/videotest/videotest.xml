@@ -44,7 +44,6 @@
       <dependencies>
         <dependency name="videotest-base" />
         <dependency name="base-admin-gtk" />
-        <dependency name="wizard" />
       </dependencies>
 
       <directories>
