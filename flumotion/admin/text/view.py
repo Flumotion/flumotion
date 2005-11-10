@@ -173,11 +173,15 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                     
 
     def gotEntryNoBundleErrback(self, failure, name):
+        self.stdscr.addstr(0, 0, 'bar')
+        self.stdscr.refresh()
         failure.trap(errors.NoBundleError)
         self.debug("No admin ui for component %s" % name)
 
     def gotEntrySleepingComponentErrback(self, failure):
         failure.trap(errors.SleepingComponentError)
+        self.stdscr.addstr(1, 0, '%r' % (failure))
+        self.stdscr.refresh()
 
 
     def update_components(self, components):
@@ -196,6 +200,7 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             
             # get bundle for component
             d = self.admin.getEntry(component, 'admin/text')
+            import time; time.sleep(5)
             d.addCallback(self.gotEntryCallback, name)
             d.addErrback(self.gotEntryNoBundleErrback, name)
             d.addErrback(self.gotEntrySleepingComponentErrback)

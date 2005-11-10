@@ -295,6 +295,7 @@ def main(args):
         feed_ports[wrapper.name] = {}
         for feeder in wrapper.feeders:
             feed_ports[wrapper.name][feeder] = port
+            print '%s:%s feeds on port %d' % (wrapper.name, feeder, port)
             port += 1
     
     # instantiate the components

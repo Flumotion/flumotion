@@ -53,9 +53,10 @@ def defer_generator(proc):
         def errback(failure, d):
             def raise_error():
                 k = failure.type
-                if not callable(k):
-                    k = (reflect.namedClass(failure.type)
-                         or (lambda v: Exception('%s: %r' % (failure.type, v))))
+                if isinstance(k, str):
+                    k = reflect.namedClass(k)
+                if not k:
+                    k = lambda v: Exception('%s: %r' % (failure.type, v))
                 raise k(failure.value)
             d.value = raise_error
             generator_next()

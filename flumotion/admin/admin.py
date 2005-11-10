@@ -556,6 +556,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         yield d
 
         fileName, methodName = d.value()
+            
         self.debug("entry for %r of type %s is in file %s and method %s" % (
             componentState, type, fileName, methodName))
         d = self.bundleLoader.getBundles(fileName=fileName)

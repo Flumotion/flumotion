@@ -1,3 +1,8 @@
+2005-11-10  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/launch/main.py (main): Print feed ports for debugging
+	porpoises.
+
 2005-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/worker.py:
