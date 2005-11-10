@@ -304,7 +304,7 @@ class Kindergarten(log.Loggable):
         env={}
         env.update(os.environ)
         env['FLU_DEBUG'] = log._FLU_DEBUG
-        process = reactor.spawnProcess(p, executable, env=os.environ, args=argv,
+        process = reactor.spawnProcess(p, executable, env=env, args=argv,
             childFDs=childFDs)
 
         p.setPid(process.pid)
