@@ -52,6 +52,7 @@
        <dependencies>
            <dependency name="component" />
            <dependency name="firewire-base" />
+           <dependency name="volume-effect" />
        </dependencies>
 
        <directories>
