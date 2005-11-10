@@ -190,11 +190,19 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             headers.append('%s: %s\r\n' % (field, name))
 
         # Mimic Twisted as close as possible
+        content = self.streamer.get_content_type()
         setHeader('Server', HTTP_SERVER)
         setHeader('Date', http.datetimeToString())
         setHeader('Cache-Control', 'no-cache')
         setHeader('Cache-Control', 'private')
-        setHeader('Content-type', self.streamer.get_content_type())
+        setHeader('Content-type', content)
+        
+        # ASF needs a Pragma header for live broadcasts
+        if content in [
+            "video/x-ms-asf",
+            "audio/x-ms-asf",
+        ]:
+            setHeader('Pragma', 'features=broadcast')
             
         #self.debug('setting Content-type to %s' % mime)
         ### FIXME: there's a window where Twisted could have removed the

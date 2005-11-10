@@ -1,5 +1,10 @@
 2005-11-10  Julien MOUTTE  <julien@moutte.net>
 
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  set the broadcast Pragma for ASF streams
+
+2005-11-10  Julien MOUTTE  <julien@moutte.net>
+
 	* flumotion/common/log.py:
 	  log the correct end of the stack
 	* flumotion/component/producers/firewire/firewire.xml:
