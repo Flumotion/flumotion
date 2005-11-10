@@ -1,3 +1,9 @@
+2005-11-10  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent09.py:
+	  Return true from buffer probe callback; this avoids dropping crucial
+	  caps buffers on the floor.
+
 2005-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/package.py:

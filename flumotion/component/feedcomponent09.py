@@ -374,6 +374,7 @@ class FeedComponent(basecomponent.BaseComponent):
         if self._probe_ids[name]:
             pad.remove_buffer_probe(self._probe_ids[name])
             self._probe_ids[name] = None
+        return True
         
     def get_element(self, element_name):
         assert self.pipeline
