@@ -27,6 +27,30 @@ def defer_generator(proc):
         gen = proc(*args, **kwargs)
         result = defer.Deferred()
 
+        # To support having the errback of last resort, we need to have
+        # an errback which runs after all the other errbacks, *at the
+        # point at which the deferred is fired*. So users of this code
+        # have from between the time the deferred is created and the
+        # time that the deferred is fired to attach their errbacks.
+        #
+        # Unfortunately we only control the time that the deferred is
+        # created. So we attach a first errback that then adds an
+        # errback to the end of the list. Unfortunately we can't add to
+        # the list while the deferred is firing. In a decision between
+        # having decent error reporting and being nice to a small part
+        # of twisted I chose the former. This code takes a reference to
+        # the callback list, so that we can add an errback to the list
+        # while the deferred is being fired. It temporarily sets the
+        # state of the deferred to not having been fired, so that adding
+        # the errbacks doesn't automatically call the newly added
+        # methods.
+        result.__callbacks = result.callbacks
+        def with_saved_callbacks(proc, *_args, **_kwargs):
+            saved_callbacks, saved_called = result.callbacks, result.called
+            result.callbacks, result.called = result.__callbacks, False
+            proc(*args, **kwargs)
+            result.callbacks, result.called = saved_callbacks, saved_called
+
         # Add errback-of-last-resort
         def default_errback(failure, d):
             def print_traceback(f):
@@ -34,7 +58,7 @@ def defer_generator(proc):
                 print 'flumotion.twisted.defer.py: ' + \
                     'Unhandled error calling', proc.__name__, ':', f.type
                 traceback.print_exc()
-            d.addErrback(print_traceback)
+            with_saved_callbacks (lambda: d.addErrback(print_traceback))
             raise
         result.addErrback(default_errback, result)
 

@@ -1,3 +1,19 @@
+2005-11-10  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_defer.py (TestDefer.testExceptionChain): New
+	test, checks that chained errbacks work. Won't actually error if
+	the traceback-printing bug is hit, but you will see output.
+
+	* flumotion/twisted/defer.py
+	(defer_generator.wrapper.with_saved_callbacks): New procedure,
+	executes its arguments with the deferred's callbacks set to what
+	they were in the beginning. A bit hacky but the rationale is in
+	the comments.
+	(defer_generator.wrapper.default_errback): Add errbacks from
+	within with_saved_callbacks.
+
+	* flumotion/admin/text/view.py: Revert debugging commit.
+
 2005-11-10  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent09.py:

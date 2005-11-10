@@ -145,3 +145,46 @@ class TestDefer(unittest.TestCase):
         run_until_finished()
         assert self.result == True
 
+    def testExceptionChain(self):
+        def divide_later(x, y):
+            d = defer.Deferred()
+            def divide():
+                try:
+                    d.callback(x/y)
+                except ZeroDivisionError, e:
+                    d.errback(e)
+            reactor.callLater(0.1, divide)
+            return d
+
+        def gen():
+            d = divide_later(42, 0)
+            yield d
+            yield d.value()
+        gen = defer_generator(gen)
+
+        exception_chain = []
+
+        def oserrorback(failure):
+            exception_chain.append('oserror')
+            failure.trap(OSError)
+
+        def zerodivisionerrorback(failure):
+            exception_chain.append('zerodivisionerror')
+            failure.trap(ZeroDivisionError)
+
+        def runtimeerrorback(failure):
+            exception_chain.append('runtimeerror')
+            failure.trap(RuntimeError)
+
+        def checkexceptionchain(value):
+            self.result = exception_chain
+
+        self.result = False
+        d = gen()
+        d.addErrback(oserrorback)
+        d.addErrback(zerodivisionerrorback)
+        d.addErrback(runtimeerrorback)
+        d.addCallback(checkexceptionchain)
+        run_until_finished()
+        assert self.result == ['oserror', 'zerodivisionerror'],\
+               "Unexpected exception chain: %r" % (self.result,)
