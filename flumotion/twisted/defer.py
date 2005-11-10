@@ -48,7 +48,7 @@ def defer_generator(proc):
         def with_saved_callbacks(proc, *_args, **_kwargs):
             saved_callbacks, saved_called = result.callbacks, result.called
             result.callbacks, result.called = result.__callbacks, False
-            proc(*args, **kwargs)
+            proc(*_args, **_kwargs)
             result.callbacks, result.called = saved_callbacks, saved_called
 
         # Add errback-of-last-resort

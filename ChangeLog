@@ -1,5 +1,9 @@
 2005-11-10  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/defer.py
+	(defer_generator.wrapper.with_saved_callbacks): whoops, call with
+	the right args
+
 	* flumotion/test/test_defer.py (TestDefer.testExceptionChain): New
 	test, checks that chained errbacks work. Won't actually error if
 	the traceback-printing bug is hit, but you will see output.
