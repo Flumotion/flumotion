@@ -54,6 +54,7 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="soundcard-base" />
+            <dependency name="volume-effect" />
         </dependencies>
 
         <directories>

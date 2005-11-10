@@ -1,3 +1,13 @@
+2005-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/package.py:
+	  have a logCategory
+	* flumotion/job/job.py:
+	* flumotion/worker/worker.py:
+	  add some debug
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	  fix the volume effect
+
 2005-11-10  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/main.py (main): Print feed ports for debugging

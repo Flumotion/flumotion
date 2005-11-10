@@ -55,6 +55,8 @@ class PackageHooks(ihooks.Hooks):
         return ret
 
 class Packager(log.Loggable):
+    logCategory = 'packager'
+
     def __init__(self):
         self._paths = {} # key -> package path registered with that key
         self._packages = {} # package name -> keys for that package

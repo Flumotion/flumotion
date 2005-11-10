@@ -138,6 +138,7 @@ class JobMedium(medium.BaseMedium):
         assert isinstance(keycard, keycards.Keycard)
         assert isinstance(packagePaths, list)
 
+        self.debug('bootstrap')
         self.worker_name = workerName
         self.manager_host = host
         self.manager_port = port
@@ -146,6 +147,8 @@ class JobMedium(medium.BaseMedium):
         
         packager = package.getPackager()
         for name, path in packagePaths:
+            self.debug('registering package path for %s' % name)
+            self.log('... from path %s' % path)
             packager.registerPackagePath(path, name)
 
     def remote_start(self, avatarId, type, moduleName, methodName, config,

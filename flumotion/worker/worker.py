@@ -274,8 +274,7 @@ class Kindergarten(log.Loggable):
         Starts a component with the given name, of the given type, and
         the given config dictionary.
 
-        Returns the pid of the child process, or None if returning from
-        the child process, just like os.fork().
+        This will spawn a new flumotion-job process.
 
         @param avatarId:   avatarId the component should use to log in
         @type  avatarId:   string
@@ -291,8 +290,6 @@ class Kindergarten(log.Loggable):
                            component
         @type bundles:     list of (str, str)
         """
-        # This forks and returns the pid, or None if we're in the kid
-        # FIXME: SPAWN PROCESS
         p = JobProcessProtocol(self)
         executable = os.path.join(os.path.dirname(sys.argv[0]), 'flumotion-job')
         if not os.path.exists(executable):
