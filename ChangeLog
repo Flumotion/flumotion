@@ -1,3 +1,10 @@
+2005-11-10  Julien MOUTTE  <julien@moutte.net>
+
+	* flumotion/component/feedcomponent.py:
+	  give a warning when we can't parse pipeline
+	* flumotion/component/producers/webcam/webcam.py:
+	  remove colorspace, and the double quotes that don't work in 0.8
+
 2005-11-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/webcam/webcam.py:

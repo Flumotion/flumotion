@@ -55,9 +55,15 @@ def createComponent(config):
     if gstreamer.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
         autoprobe += " autoprobe-fps=false"
     
+    # FIXME: ffmpegcolorspace in the pipeline causes bad negotiation.
+    # hack in 0.9 to work around, not in 0.8
+    # correct solution would be to find the colorspaces, see halogen
+    # pipeline = 'v4lsrc name=source %s copy-mode=1 device=%s ! ' \
+    #           'ffmpegcolorspace ! "%s" ! videorate ! "%s"' \
+    #           % (autoprobe, device, caps, caps)
     pipeline = 'v4lsrc name=source %s copy-mode=1 device=%s ! ' \
-               'ffmpegcolorspace ! "%s" ! videorate ! "%s"' \
-               % (autoprobe, device, caps, caps)
+               'videorate ! %s' \
+               % (autoprobe, device, caps)
     component = WebCamera(config['name'], pipeline)
 
     # create and add colorbalance effect

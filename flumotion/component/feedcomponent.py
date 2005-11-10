@@ -151,6 +151,7 @@ class ParseLaunchComponent(FeedComponent):
         try:
             self.pipeline = gst.parse_launch(pipeline)
         except gobject.GError, e:
+            self.warning('Could not parse pipeline: %s' % e.message)
             raise errors.PipelineParseError(e.message)
         FeedComponent.setup_pipeline(self)
 
