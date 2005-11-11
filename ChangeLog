@@ -1,5 +1,10 @@
 2005-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/boot.py.in:
+	  Don't offend our dear users
+
+2005-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/component.py:
 	  remove print
 
