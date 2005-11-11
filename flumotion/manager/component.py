@@ -494,7 +494,7 @@ class ComponentAvatar(base.ManagerAvatar):
                            of elements feeding our eaters
         @type feedersData: tuple of (name, host) tuples of our feeding elements
         """
-        print 'calling remote_start on component %r' % self
+        self.debug('calling remote_start on component %r' % self)
         d = self.mindCallRemote('start', eatersData, feedersData)
         yield d
         try:
