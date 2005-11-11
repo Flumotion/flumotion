@@ -190,6 +190,8 @@ fi
 %{_bindir}/flumotion-admin-text
 %{_bindir}/flumotion-tester
 %{_bindir}/flumotion-job
+%{_bindir}/flumotion-inspect
+%{_bindir}/flumotion-launch
 %{_sbindir}/flumotion
 %{_libdir}/flumotion
 %{_libdir}/pkgconfig/flumotion.pc
