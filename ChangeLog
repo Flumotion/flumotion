@@ -1,3 +1,14 @@
+2005-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/errors.py:
+	  add a NoProjectError
+	* flumotion/project/project.py:
+	  raise it
+	* flumotion/common/registry.py:
+	  catch it
+	* flumotion/launch/main.py:
+	  add some logging about projects
+
 2005-11-10  Julien MOUTTE  <julien@moutte.net>
 
 	* flumotion/component/feedcomponent.py:

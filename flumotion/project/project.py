@@ -20,7 +20,9 @@
 
 import os
 import sys
-from flumotion.common import package
+
+from flumotion.common import package, errors
+
 import flumotion.project
 
 def list():
@@ -47,6 +49,6 @@ def get(project, attribute, default=None):
     try:
         exec("import %s" % moduleName)
     except ImportError:
-        raise
+        raise errors.NoProjectError(moduleName)
     m = sys.modules[moduleName]
     return getattr(m, attribute, default)

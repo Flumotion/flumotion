@@ -31,7 +31,7 @@ from xml.parsers import expat
 
 from twisted.python import reflect
 
-from flumotion.common import common, log, package, bundle
+from flumotion.common import common, log, package, bundle, errors
 from flumotion.configure import configure
 
 __all__ = ['ComponentRegistry', 'registry']
@@ -816,7 +816,12 @@ class ComponentRegistry(log.Loggable):
                 for d in b.getDirectories():
                     directory = d.getName()
                     for file in d.getFiles():
-                        fullpath = os.path.join(b.getBaseDir(), directory,
+                        try:
+                            basedir = b.getBaseDir()
+                        except errors.NoProjectError, e:
+                            self.warning("Could not find project %s" % e.args)
+                            raise
+                        fullpath = os.path.join(basedir, directory,
                                                 file.getLocation())
                         relative = file.getRelative()
                         self.log('Adding path %s as %s to bundle %s' % (
@@ -841,7 +846,9 @@ class ComponentRegistry(log.Loggable):
             try:
                 return load()
             except Exception, e:
-                self.error("Could not register bundles (%s)" % e)
+                self.debug("Could not register bundles twice: %s" %
+                    log.getExceptionMessage(e))
+                self.error("Could not not register bundles (%s)" % e)
 
     def dump(self, fd):
         """

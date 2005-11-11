@@ -28,6 +28,8 @@ class OptionError(Exception):
     "Error in options"
 class ConfigError(Exception):
     "Error during parsing of configuration"
+class NoProjectError(Exception):
+    "The given project does not exist"
 
 # connection errors
 class ConnectionError(pb.Error):

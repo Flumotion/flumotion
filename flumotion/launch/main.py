@@ -252,6 +252,15 @@ class ComponentWrapper(object):
 def main(args):
     from flumotion.common import setup
     setup.setupPackagePath()
+    log.debug('manager', 'Running Flumotion version %s' %
+        configure.version)
+    import twisted.copyright
+    log.debug('manager', 'Running against Twisted version %s' %
+        twisted.copyright.version)
+    from flumotion.project import project
+    for p in project.list():
+        log.debug('manager', 'Registered project %s version %s' % (
+            p, project.get(p, 'version')))
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--debug',
