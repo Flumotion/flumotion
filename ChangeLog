@@ -1,5 +1,10 @@
 2005-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/launch/inspect.py:
+	  Fix flumotion-inspect with projects
+
+2005-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	  add a NoProjectError
 	* flumotion/project/project.py:

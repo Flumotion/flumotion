@@ -29,6 +29,9 @@ def err(x):
     raise SystemExit(1)
 
 def main(args):
+    from flumotion.common import setup
+    setup.setupPackagePath()
+
     parser = optparse.OptionParser()
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",
