@@ -1,3 +1,9 @@
+=== release 0.1.10 ===
+
+2005-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac: releasing 0.1.10, "Rosa Negra"
+
 2005-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/boot.py.in:
@@ -1677,7 +1683,7 @@
 2005-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:
-	  releasing 0.1.9, "Zahara>
+	  releasing 0.1.9, "Zahara"
 
 2005-07-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 

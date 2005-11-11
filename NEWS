@@ -1,4 +1,21 @@
-This is Flumotion 0.1.9, "Zahara".
+This is Flumotion 0.1.10, "Rosa Negra".
+
+Features since 0.1.9:
+
+- (Experimental) support for GStreamer 0.9.x Development series
+- flumotion-inspect to examine installed components
+- flumotion-launch to launch a command-line specified flow in one process 
+- projects allow uninstalled additional Flumotion projects to be used
+- workers now spawn job processes
+- Flumotion can now be translated; Dutch translation added
+
+Issues fixed since 0.1.9:
+
+ticket  summary
+261     interactive password prompting doesn't work
+129     remove registry dependency in job.py so worker doesnt need registry
+173     admin hangs if manager is not running
+258     flumotion-manager --version fails
 
 Features since 0.1.8:
 
