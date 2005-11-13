@@ -287,22 +287,35 @@ class Loggable:
 
 # we need an object as the observer because startLoggingWithObserver
 # expects a bound method
-class FluLogObserver:
+class FluLogObserver(Loggable):
     """
     Twisted log observer that integrates with Flumotion's logging.
     """
+    logCategory = "logobserver"
+
+    def __init__(self):
+        self._ignoreErrors = []
+
     def emit(self, eventDict):
         method = log # by default, lowest level
         edm = eventDict['message']
         if not edm:
             if eventDict['isError'] and eventDict.has_key('failure'):
+                f = eventDict['failure']
+                for type in self._ignoreErrors:
+                    r = f.check(type)
+                    if r:
+                        self.debug("Failure of type %r, ignoring" % type)
+                        return
+                    
                 method = debug # tracebacks from errors at debug level
                 msg = "A python traceback occurred."
                 if getCategoryLevel("twisted") < DEBUG:
                     msg += "  Run with debug level 4 to see the traceback."
                 # and an additional warning
                 warning('twisted', msg)
-                text = eventDict['failure'].getTraceback()
+                text = f.getTraceback()
+                print "\nTwisted traceback:\n"
                 print text
             elif eventDict.has_key('format'):
                 text = eventDict['format'] % eventDict
@@ -318,7 +331,18 @@ class FluLogObserver:
         msgStr = " [%(system)s] %(text)s\n" % fmtDict
         method('twisted', msgStr)
 
+    def ignoreErrors(self, *types):
+        for type in types:
+            self._ignoreErrors.append(type)
 
+    def clearIgnores(self):
+        self._ignoreErrors = []
+
+# make a singleton
+try:
+    theFluLogObserver
+except NameError:
+    theFluLogObserver = FluLogObserver()
 
 def stderrHandler(level, object, category, file, line, message):
     """
@@ -393,7 +417,7 @@ def init():
 
     # integrate twisted's logging with us
     from twisted.python import log as tlog
-    tlog.startLoggingWithObserver(FluLogObserver().emit, False)
+    tlog.startLoggingWithObserver(theFluLogObserver.emit, False)
 
     _initialized = True
 

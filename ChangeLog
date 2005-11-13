@@ -1,3 +1,12 @@
+2005-11-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
+	  make theFluLogObserver a singleton
+	  add ignoreErrors and clearIgnores so we can ignore PB-related
+	  tracebacks from trial
+	* flumotion/test/test_pb.py:
+	  use these new methods to remove the stray prints
+
 2005-11-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:

@@ -32,7 +32,7 @@ from twisted.cred import portal, error
 
 from flumotion.twisted import checkers, credentials, pb
 from flumotion.twisted import portal as fportal
-from flumotion.common import keycards
+from flumotion.common import keycards, log
 from flumotion.component.bouncers import htpasswdcrypt
 
 ### lots of fake objects to have fun with
@@ -220,8 +220,11 @@ class Test_FPBClientFactory(unittest.TestCase):
         self.factory = tpb.PBServerFactory(self.portal, unsafeTracebacks=1)
         self.port = reactor.listenTCP(0, self.factory, interface="127.0.0.1")
         self.portno = self.port.getHost().port
+        # don't output Twisted tracebacks for PB errors we will trigger
+        log.theFluLogObserver.ignoreErrors(error.UnauthorizedLogin)
 
     def tearDown(self):
+        log.theFluLogObserver.clearIgnores()
         self.port.stopListening()
         reactor.iterate()
         reactor.iterate()
