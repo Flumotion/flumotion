@@ -252,6 +252,7 @@ class ComponentWrapper(object):
 def main(args):
     from flumotion.common import setup
     setup.setupPackagePath()
+    from flumotion.configure import configure
     log.debug('manager', 'Running Flumotion version %s' %
         configure.version)
     import twisted.copyright

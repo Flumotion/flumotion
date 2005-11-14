@@ -1,3 +1,9 @@
+2005-11-14  Michael Smith <msmith@fluendo.com>
+
+	* flumotion/launch/main.py:
+	  Make flumotion-launch work again by importing flumotion.configure
+	  before using it.
+
 2005-11-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/log.py:
