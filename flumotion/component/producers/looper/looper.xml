@@ -1,0 +1,49 @@
+<registry>
+  <components>
+    <component type="looper"
+               base="flumotion/component/producers/looper">
+      <source location="flumotion.component.producers.looper.looper" />
+      <feeder name="audio"/>
+      <feeder name="video"/>
+      <entries>
+        <entry type="component" location="looper.py"
+               function="createComponent" />
+      </entries>
+
+      <properties>
+        <property name="height" type="int" />
+        <property name="width" type="int" />
+        <property name="framerate" type="float" />
+	<property name="location" type="string" />
+      </properties>
+    </component>
+  </components>
+  <bundles>
+
+    <bundle name="looper-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/looper">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="looper-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="looper-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/looper">
+                <filename location="looper.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry> 

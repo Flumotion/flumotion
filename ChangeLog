@@ -1,3 +1,13 @@
+2005-11-15  Edward Hervey  <edward@fluendo.com>
+
+	* configure.ac:
+	* flumotion/component/producers/Makefile.am
+	* flumotion/component/producers/looper/Makefile.am
+	* flumotion/component/producers/looper/__init__.py
+	* flumotion/component/producers/looper/looper.xml	
+	* flumotion/component/producers/looper/looper.py: (createComponent): 
+	Added looper element for ogg/vorbis/theora. Loops the entire file.
+
 2005-11-14  Michael Smith <msmith@fluendo.com>
 
 	* flumotion/launch/main.py:

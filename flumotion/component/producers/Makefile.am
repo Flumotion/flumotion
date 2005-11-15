@@ -17,4 +17,5 @@ SUBDIRS = \
 	soundcard \
 	videotest \
 	webcam \
-	jukebox
+	jukebox \
+	looper
