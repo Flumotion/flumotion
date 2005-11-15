@@ -1,5 +1,10 @@
 2005-11-15  Edward Hervey  <edward@fluendo.com>
 
+	* flumotion/component/producers/looper/looper.py: (Looper._message_cb):
+	so if we loop 1 000 000 000 times we end up playing one second less.... bad !
+
+2005-11-15  Edward Hervey  <edward@fluendo.com>
+
 	* configure.ac:
 	* flumotion/component/producers/Makefile.am
 	* flumotion/component/producers/looper/Makefile.am

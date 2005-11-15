@@ -43,7 +43,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
             # let's looooop again :)
             gst.debug("sending segment seek again")
             self.oggdemux.seek(1.0, gst.FORMAT_TIME, gst.SEEK_FLAG_SEGMENT,
-                               gst.SEEK_TYPE_SET, 0, gst.SEEK_TYPE_END, -1)
+                               gst.SEEK_TYPE_SET, 0, gst.SEEK_TYPE_END, 0)
         elif message.src == self.oggdemux and message.type == gst.MESSAGE_STATE_CHANGED:
             gst.debug("got state changed on oggdemux")
             old, new, pending = message.parse_state_changed()
@@ -51,7 +51,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
                 # initial segment seek
                 gst.debug("send initial seek")
                 self.oggdemux.seek(1.0, gst.FORMAT_TIME, gst.SEEK_FLAG_SEGMENT | gst.SEEK_FLAG_FLUSH,
-                                   gst.SEEK_TYPE_SET, 0, gst.SEEK_TYPE_END, -1)
+                                   gst.SEEK_TYPE_SET, 0, gst.SEEK_TYPE_END, 0)
                 self.initial_seek = True
 
     def start(self, eatersData, feedersData):
