@@ -1,3 +1,8 @@
+2005-11-16  Edward Hervey  <edward@fluendo.com>
+
+	* flumotion/component/producers/looper/looper.py: (createComponent): 
+	Fix looper pipeline.
+
 2005-11-15  Edward Hervey  <edward@fluendo.com>
 
 	* flumotion/component/producers/looper/looper.py: (Looper._message_cb):

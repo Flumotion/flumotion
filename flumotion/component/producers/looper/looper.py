@@ -84,12 +84,14 @@ def createComponent(config):
     template = (
         'filesrc location=%(location)s'
         '       ! oggdemux name=demux'
-        '    demux. ! theoradec name=theoradec ! videorate ! videoscale'
+        '    demux. ! theoradec name=theoradec'
+        '       ! videorate'
+        '       ! videoscale'
         '       ! video/x-raw-yuv,width=%(width)d,height=%(height)d,framerate=%(framerate)f'
-        '       ! queue ! identity sync=true silent=true ! @feeder::video@'
+        '       ! queue ! identity name=vident sync=true silent=true check-perfect=true ! @feeder::video@'
         '    demux. ! vorbisdec name=vorbisdec ! audioconvert'
-        '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true ! queue'
-        '       ! identity sync=true silent=true ! @feeder::audio@'
+        '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
+        '       ! queue ! identity name=aident sync=true silent=true check-perfect=true ! @feeder::audio@'
         % dict(location=location, width=width,
                height=height, framerate=framerate))
     
