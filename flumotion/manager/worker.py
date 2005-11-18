@@ -72,9 +72,17 @@ class WorkerAvatar(base.ManagerAvatar):
         self.debug('starting %s (%s) on worker %s with config %r' % (
             avatarId, type, self.avatarId, config))
         defs = registry.getRegistry().getComponent(type)
-        moduleName = defs.getSource()
-        # FIXME: get the proper entry point
-        methodName = "createComponent"
+        try:
+            entry = defs.getEntryByType('component')
+            # FIXME: use entry.getModuleName() (doesn't work atm?)
+            moduleName = defs.getSource()
+            methodName = entry.getFunction()
+        except KeyError:
+            self.warning('no "component" entry in registry of type %s, %s',
+                         type, 'falling back to createComponent')
+            moduleName = defs.getSource()
+            methodName = "createComponent"
+
         return self.mindCallRemote('start', avatarId, type, moduleName,
             methodName, config)
 

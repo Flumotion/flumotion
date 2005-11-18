@@ -1,5 +1,8 @@
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/worker.py (WorkerAvatar.start): Pull the entry
+	point from the registry.
+
 	* flumotion/component/producers/pipeline/pipeline.py
 	(Producer.__init__): Fix stupid errors
 
