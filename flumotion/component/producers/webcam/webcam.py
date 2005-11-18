@@ -25,55 +25,47 @@ from flumotion.common import gstreamer
 from flumotion.component import feedcomponent
 from flumotion.component.effects.colorbalance import colorbalance
 
-# FIXME: rename to Webcam
-class WebCamera(feedcomponent.ParseLaunchComponent):
+class Webcam(feedcomponent.ParseLaunchComponent):
 
-    def __init__(self, name, pipeline):
+    def __init__(self, config):
+        name = config['name']
+        device = config['device']
+
+        # Filtered caps
+        format = config.get('format', 'video/x-raw-yuv')
+        struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
+        for k in 'width', 'height', 'framerate':
+            if k in config:
+                struct[k] = config[k]
+        caps = gst.Caps(struct)
+       
+        # create component
+        autoprobe = "autoprobe=false"
+        # added in gst-plugins 0.8.6
+        if gstreamer.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
+            autoprobe += " autoprobe-fps=false"
+        
+        # FIXME: ffmpegcolorspace in the pipeline causes bad negotiation.
+        # hack in 0.9 to work around, not in 0.8
+        # correct solution would be to find the colorspaces, see halogen
+        # pipeline = 'v4lsrc name=source %s copy-mode=1 device=%s ! ' \
+        #           'ffmpegcolorspace ! "%s" ! videorate ! "%s"' \
+        #           % (autoprobe, device, caps, caps)
+        pipeline = 'v4lsrc name=source %s copy-mode=1 device=%s ! ' \
+                   'videorate ! %s' \
+                   % (autoprobe, device, caps)
+
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     [],
                                                     ['default'],
                                                     pipeline)
 
-def setProp(struct, dict, name):
-    if dict.has_key(name):
-        struct[name] = dict[name]
-                                                                                
-def createComponent(config):
-    device = config['device']
-
-    # Filtered caps
-    format = config.get('format', 'video/x-raw-yuv')
-    struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
-    setProp(struct, config, 'width')
-    setProp(struct, config, 'height')
-    setProp(struct, config, 'framerate')
-    caps = gst.Caps(struct)
-   
-    # create component
-    autoprobe = "autoprobe=false"
-    # added in gst-plugins 0.8.6
-    if gstreamer.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
-        autoprobe += " autoprobe-fps=false"
-    
-    # FIXME: ffmpegcolorspace in the pipeline causes bad negotiation.
-    # hack in 0.9 to work around, not in 0.8
-    # correct solution would be to find the colorspaces, see halogen
-    # pipeline = 'v4lsrc name=source %s copy-mode=1 device=%s ! ' \
-    #           'ffmpegcolorspace ! "%s" ! videorate ! "%s"' \
-    #           % (autoprobe, device, caps, caps)
-    pipeline = 'v4lsrc name=source %s copy-mode=1 device=%s ! ' \
-               'videorate ! %s' \
-               % (autoprobe, device, caps)
-    component = WebCamera(config['name'], pipeline)
-
-    # create and add colorbalance effect
-    source = component.get_pipeline().get_by_name('source')
-    hue = config.get('hue', None)
-    saturation = config.get('saturation', None)
-    brightness = config.get('brightness', None)
-    contrast = config.get('contrast', None)
-    cb = colorbalance.Colorbalance('outputColorbalance', source,
-        hue, saturation, brightness, contrast)
-    component.addEffect(cb)
-
-    return component
+        # create and add colorbalance effect
+        source = self.get_pipeline().get_by_name('source')
+        hue = config.get('hue', None)
+        saturation = config.get('saturation', None)
+        brightness = config.get('brightness', None)
+        contrast = config.get('contrast', None)
+        cb = colorbalance.Colorbalance('outputColorbalance', source,
+            hue, saturation, brightness, contrast)
+        self.addEffect(cb)

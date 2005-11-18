@@ -8,7 +8,7 @@
 
       <entries>
         <entry type="component" location="webcam.py"
-               function="createComponent" />
+               function="Webcam" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
       </entries>
