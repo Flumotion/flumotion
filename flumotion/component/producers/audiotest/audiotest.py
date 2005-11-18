@@ -22,7 +22,7 @@ import gst
 from flumotion.component import feedcomponent
 
 class AudioTest(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, pipeline):
+    def __init__(self, config):
         rate = config.get('rate', 8000)
         volume = config.get('volume', 1.0)
 
