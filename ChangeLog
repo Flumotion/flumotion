@@ -1,5 +1,9 @@
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/bttv/bttv.xml: 
+	* flumotion/component/producers/bttv/bttv.py (BTTV.__init__):
+	entry = BTTV
+
 	* flumotion/component/producers/firewire/firewire.xml: 
 	* flumotion/component/producers/firewire/firewire.py
 	(Firewire.__init__): entry = Firewire

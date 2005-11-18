@@ -32,11 +32,49 @@ __all__ = ['BTTV']
 
 class BTTV(feedcomponent.ParseLaunchComponent):
 
-    def __init__(self, name, pipeline):
-        feedcomponent.ParseLaunchComponent.__init__(self,name,
+    def __init__(self, config):
+        device = config['device']
+        width = config.get('width', 320)
+        height = config.get('height', 240)
+        channel = config['channel']
+        norm = config['signal']
+
+        # This needs to be done properly
+        device_width = width
+        device_height = height
+        #device_width = config['device-width']
+        #device_height = config['device-height']
+
+        framerate = config.get('framerate', 25.0)
+        
+        pipeline = ('v4lsrc name=source device=%s copy-mode=true ! '
+                    'video/x-raw-yuv,width=%d,height=%d ! videoscale ! '
+                    'video/x-raw-yuv,width=%d,height=%d ! videorate ! '
+                    'video/x-raw-yuv,framerate=%f') % (device,
+                                                       device_width,
+                                                       device_height,
+                                                       width, height,
+                                                       framerate)
+        config['pipeline'] = pipeline
+
+        feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
                                                     [],
                                                     ['default'],
                                                     pipeline)
+
+        # create and add colorbalance effect
+        source = component.get_pipeline().get_by_name('source')
+        hue = config.get('hue', None)
+        saturation = config.get('saturation', None)
+        brightness = config.get('brightness', None)
+        contrast = config.get('contrast', None)
+        cb = colorbalance.Colorbalance('outputColorbalance', source,
+            hue, saturation, brightness, contrast)
+        component.addEffect(cb)
+
+        # register state change notify to set channel and norm
+        element = component.get_pipeline().get_by_name('source')
+        element.connect('state-change', component.state_changed_cb, channel, norm)
 
     # called to set initial channel and norm from NULL->READY
     def state_changed_cb(self, element, old, new, channel, norm):
@@ -55,47 +93,3 @@ class BTTV(feedcomponent.ParseLaunchComponent):
             if c:
                 self.debug("set norm to %s" % norm)
                 element.set_norm(c)
-
-                                       
-def createComponent(config):
-    device = config['device']
-    width = config.get('width', 320)
-    height = config.get('height', 240)
-    channel = config['channel']
-    norm = config['signal']
-
-    # This needs to be done properly
-    device_width = width
-    device_height = height
-    #device_width = config['device-width']
-    #device_height = config['device-height']
-
-    framerate = config.get('framerate', 25.0)
-    
-    pipeline = ('v4lsrc name=source device=%s copy-mode=true ! '
-                'video/x-raw-yuv,width=%d,height=%d ! videoscale ! '
-                'video/x-raw-yuv,width=%d,height=%d ! videorate ! '
-                'video/x-raw-yuv,framerate=%f') % (device,
-                                                   device_width,
-                                                   device_height,
-                                                   width, height,
-                                                   framerate)
-    config['pipeline'] = pipeline
-
-    component = BTTV(config['name'], pipeline)
-
-    # create and add colorbalance effect
-    source = component.get_pipeline().get_by_name('source')
-    hue = config.get('hue', None)
-    saturation = config.get('saturation', None)
-    brightness = config.get('brightness', None)
-    contrast = config.get('contrast', None)
-    cb = colorbalance.Colorbalance('outputColorbalance', source,
-        hue, saturation, brightness, contrast)
-    component.addEffect(cb)
-
-    # register state change notify to set channel and norm
-    element = component.get_pipeline().get_by_name('source')
-    element.connect('state-change', component.state_changed_cb, channel, norm)
-
-    return component
