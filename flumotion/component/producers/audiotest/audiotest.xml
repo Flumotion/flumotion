@@ -6,7 +6,7 @@
       <feeder name="default"/>
       <entries>
         <entry type="component" location="audiotest.py"
-               function="createComponent"/>
+               function="AudioTest"/>
       </entries>
       <properties>
         <property name="feed" type="string" multiple="yes"/>

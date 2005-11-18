@@ -1,5 +1,9 @@
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/audiotest/audiotest.xml: 
+	* flumotion/component/producers/audiotest/audiotest.py
+	(AudioTest.__init__): entry = AudioTest
+
 	* flumotion/component/producers/bttv/bttv.xml: 
 	* flumotion/component/producers/bttv/bttv.py (BTTV.__init__):
 	entry = BTTV
