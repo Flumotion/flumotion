@@ -8,7 +8,7 @@
 
       <entries>
         <entry type="component" location="videotest.py"
-               function="createComponent"/>
+               function="VideoTest"/>
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass"/>
         <entry type="admin/text" location="admin_text.py"

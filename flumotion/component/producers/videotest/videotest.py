@@ -39,44 +39,38 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
 
     component_medium_class = VideoTestMedium
     
-    def __init__(self, name, pipeline):
+    def __init__(self, config):
+        format = config.get('format', 'video/x-raw-yuv')
+
+        if format == 'video/x-raw-yuv':
+            format = '%s,format=(fourcc)I420' % format
+
+        # Filtered caps
+        struct = gst.structure_from_string(format)
+        for k in 'width', 'height', 'framerate':
+            if k in config:
+                struct[k] = config[k]
+
+        # If RGB, set something ffmpegcolorspace can convert.
+        if format == 'video/x-raw-rgb':
+            struct['red_mask'] = 0xff00
+        caps = gst.Caps(struct)
+        
+        if gst.gst_version < (0,9):
+            is_live = 'sync=true'
+        else:
+            is_live = 'is-live=true'
+
+        name = config['name']
+        pipeline = 'videotestsrc %s name=source ! %s' % (is_live, caps)
+
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     [],
                                                     ['default'],
                                                     pipeline)
-
-
-def setProp(struct, dict, name):
-    if dict.has_key(name):
-        struct[name] = dict[name]
         
-def createComponent(config):
-    format = config.get('format', 'video/x-raw-yuv')
-
-    if format == 'video/x-raw-yuv':
-        format = '%s,format=(fourcc)I420' % format
-    # Filtered caps
-    struct = gst.structure_from_string(format)
-    setProp(struct, config, 'width')
-    setProp(struct, config, 'height')
-    setProp(struct, config, 'framerate')
-    # If RGB, set something ffmpegcolorspace can convert.
-    if format == 'video/x-raw-rgb':
-        struct['red_mask'] = 0xff00
-    caps = gst.Caps(struct)
-    
-    if gst.gst_version < (0,9):
-        is_live = 'sync=true'
-    else:
-        is_live = 'is-live=true'
-
-    component = VideoTest(config['name'],
-                          'videotestsrc %s name=source ! %s' % (is_live, caps))
-
-    # Set properties
-    source = component.get_element('source')
-    if config.has_key('pattern'):
-        source.set_property('pattern', config['pattern'])
-                            
-    return component
+        # Set properties
+        source = self.get_element('source')
+        if 'pattern' in config:
+            source.set_property('pattern', config['pattern'])
 

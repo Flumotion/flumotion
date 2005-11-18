@@ -1,5 +1,12 @@
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/videotest/videotest.xml: Set the
+	class as the component entry point.
+
+	* flumotion/component/producers/videotest/videotest.py
+	(VideoTest.__init__): Move createComponent code to __init__. This
+	is probably how all components should be done.
+
 	* flumotion/manager/worker.py (WorkerAvatar.start): Pull the entry
 	point from the registry.
 
