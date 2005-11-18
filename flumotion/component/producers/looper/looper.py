@@ -53,7 +53,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
             % dict(location=location, width=width,
                    height=height, framerate=framerate))
         
-        feedcomponent.ParseLaunchComponent.__init__(self, config['name']
+        feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
                                                     [],
                                                     ['video', 'audio'],
                                                     template)
