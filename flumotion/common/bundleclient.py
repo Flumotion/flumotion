@@ -23,8 +23,6 @@ Bundle fetching, caching, and importing utilities for clients using
 bundled code and data
 """
 
-import os
-
 from twisted.internet import error, defer
 
 from flumotion.common import bundle, common, errors, log, package
@@ -66,12 +64,13 @@ class BundleLoader(log.Loggable):
         d = self._callRemote('getBundleSums', **kwargs)
         yield d
 
+        import os # fool pychecker
+
         # sums is a list of name, sum tuples, highest to lowest
         # figure out which bundles we're missing
         sums = d.value()
         self.debug('Got sums %r' % sums)
         toFetch = []
-        import os
         for name, md5 in sums:
             path = os.path.join(configure.cachedir, name, md5)
             if os.path.exists(path):
@@ -123,7 +122,7 @@ class BundleLoader(log.Loggable):
         """
         
         # fool pychecker
-        import os
+        import os # fool pychecker
         import sys
 
         self.debug('Loading module %s' % moduleName)
@@ -170,6 +169,8 @@ class BundleLoader(log.Loggable):
         self.debug('Getting file %s' % fileName)
         d = self.getBundles(fileName=fileName)
         yield d
+
+        import os # fool pychecker
 
         bundles = d.value()
         name, bundlePath = bundles[-1]

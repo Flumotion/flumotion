@@ -339,10 +339,7 @@ class FluLogObserver(Loggable):
         self._ignoreErrors = []
 
 # make a singleton
-try:
-    theFluLogObserver
-except NameError:
-    theFluLogObserver = FluLogObserver()
+theFluLogObserver = FluLogObserver()
 
 def stderrHandler(level, object, category, file, line, message):
     """

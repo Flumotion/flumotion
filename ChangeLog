@@ -1,5 +1,15 @@
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/pipeline/pipeline.py
+	(Producer.__init__): Fix stupid errors
+
+	* flumotion/common/log.py (theFluLogObserver): Make a singleton
+	normally.
+
+	* flumotion/common/bundleclient.py (BundleLoader.getBundles):
+	Fool pychecker -- for some reason it doesn't like os at the
+	toplevel here.
+
 	* flumotion/component/converters/pipeline/pipeline.py
 	(Converter.__init__):
 	* flumotion/component/producers/pipeline/pipeline.py
