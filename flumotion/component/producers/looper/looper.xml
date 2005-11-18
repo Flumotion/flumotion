@@ -7,7 +7,7 @@
       <feeder name="video"/>
       <entries>
         <entry type="component" location="looper.py"
-               function="createComponent" />
+               function="Looper" />
       </entries>
 
       <properties>

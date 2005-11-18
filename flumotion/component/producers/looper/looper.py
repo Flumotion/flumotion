@@ -31,11 +31,32 @@ class Looper(feedcomponent.ParseLaunchComponent):
 
     component_medium_class = LooperMedium
 
-    def __init__(self, name, pipeline):
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
+    def __init__(self, config):
+        # setup the properties
+        width = config.get('width', 240)
+        height = config.get('height', int(576 * width/720.))
+        framerate = config.get('framerate', 12.5)
+        location = config.get('location')
+        
+        # create the component
+        template = (
+            'filesrc location=%(location)s'
+            '       ! oggdemux name=demux'
+            '    demux. ! theoradec name=theoradec'
+            '       ! videorate'
+            '       ! videoscale'
+            '       ! video/x-raw-yuv,width=%(width)d,height=%(height)d,framerate=%(framerate)f'
+            '       ! queue ! identity name=vident sync=true silent=true check-perfect=true ! @feeder::video@'
+            '    demux. ! vorbisdec name=vorbisdec ! audioconvert'
+            '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
+            '       ! queue ! identity name=aident sync=true silent=true check-perfect=true ! @feeder::audio@'
+            % dict(location=location, width=width,
+                   height=height, framerate=framerate))
+        
+        feedcomponent.ParseLaunchComponent.__init__(self, config['name']
                                                     [],
                                                     ['video', 'audio'],
-                                                    pipeline)
+                                                    template)
         self.initial_seek = False
 
     def _message_cb(self, bus, message):
@@ -68,36 +89,3 @@ class Looper(feedcomponent.ParseLaunchComponent):
         #                   gst.SEEK_TYPE_NONE, 0, gst.SEEK_TYPE_NONE, 0)
 
         feedcomponent.ParseLaunchComponent.start(self, eatersData, feedersData)
-
-def setProp(struct, dict, name):
-    if dict.has_key(name):
-        struct[name] = dict[name]
-        
-def createComponent(config):
-    # setup the properties
-    width = config.get('width', 240)
-    height = config.get('height', int(576 * width/720.))
-    framerate = config.get('framerate', 12.5)
-    location = config.get('location')
-    
-    # create the component
-    template = (
-        'filesrc location=%(location)s'
-        '       ! oggdemux name=demux'
-        '    demux. ! theoradec name=theoradec'
-        '       ! videorate'
-        '       ! videoscale'
-        '       ! video/x-raw-yuv,width=%(width)d,height=%(height)d,framerate=%(framerate)f'
-        '       ! queue ! identity name=vident sync=true silent=true check-perfect=true ! @feeder::video@'
-        '    demux. ! vorbisdec name=vorbisdec ! audioconvert'
-        '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
-        '       ! queue ! identity name=aident sync=true silent=true check-perfect=true ! @feeder::audio@'
-        % dict(location=location, width=width,
-               height=height, framerate=framerate))
-    
-    component = Looper(config['name'],
-                       template)
-
-    # return the component
-    return component
-

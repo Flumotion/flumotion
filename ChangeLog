@@ -1,5 +1,9 @@
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/looper/looper.xml: 
+	* flumotion/component/producers/looper/looper.py
+	(Looper.__init__): entry = Looper
+
 	* flumotion/component/producers/pipeline/pipeline.py
 	(Producer.__init__): entry = Producer
 	* flumotion/component/producers/pipeline/pipeline.xml: entry =
