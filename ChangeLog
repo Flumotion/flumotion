@@ -1,5 +1,7 @@
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/firewire/firewire.py
+	(Firewire.__init__):
 	* flumotion/component/producers/soundcard/soundcard.py
 	(Soundcard.__init__):
 	* flumotion/component/producers/bttv/bttv.py (BTTV.__init__):
