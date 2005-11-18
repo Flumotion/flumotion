@@ -24,12 +24,6 @@ __all__ = ['Producer']
 
 class Producer(feedcomponent.ParseLaunchComponent):
     logCategory = 'prod-pipe'
-    def __init__(self, name, pipeline):
-        feedcomponent.ParseLaunchComponent.__init__(self, name, [],
-                                                    ['default'], pipeline)
-
-def createComponent(config):
-    name = config['name']
-    pipeline = config['pipeline']
-
-    return Producer(name, pipeline)
+    def __init__(self, config):
+        feedcomponent.ParseLaunchComponent.__init__(self, config['name'], [],
+            ['default'], config['pipeline'])

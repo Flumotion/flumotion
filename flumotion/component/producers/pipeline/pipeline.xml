@@ -7,7 +7,7 @@
       <feeder name="default"/>
       <entries>
         <entry type="component" location="pipeline.py"
-               function="createComponent"/>
+               function="Producer"/>
       </entries>
       <properties>
         <property name="pipeline" type="string" required="yes"/>
