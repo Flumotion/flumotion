@@ -7,7 +7,7 @@
       <feeder name="video"/>
       <entries>
         <entry type="component" location="firewire.py"
-               function="createComponent" />
+               function="Firewire" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
       </entries>
