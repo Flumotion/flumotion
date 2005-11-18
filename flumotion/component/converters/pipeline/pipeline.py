@@ -24,14 +24,13 @@ __all__ = ['Converter']
 
 class Converter(feedcomponent.ParseLaunchComponent):
     logCategory = 'conv-pipe'
-    def __init__(self, name, eaters, feeders, pipeline):
+    def __init__(self, name, eaters, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name, eaters,
-                                                    feeders, pipeline)
+                                                    ['default'], pipeline)
 
 def createComponent(config):
     name = config['name']
-    feeders = config.get('feed', ['default'])
     eaters = config.get('source', [])
     pipeline = config['pipeline']
 
-    return Converter(name, eaters, feeders, pipeline)
+    return Converter(name, eaters, pipeline)

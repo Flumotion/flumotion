@@ -26,10 +26,10 @@ from flumotion.component.effects.volume import volume
 
     
 class SoundcardProducer(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, feeders, pipeline):
+    def __init__(self, name, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     [],
-                                                    feeders,
+                                                    ['default'],
                                                     pipeline)
     
     def state_changed_cb(self, element, old, new, trackLabel):
@@ -62,7 +62,7 @@ def createComponent(config):
         caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d' % (rate, depth, channels)
         pipeline = '%s device=%s ! %s ! level name=volumelevel message=true' % (element, device, caps)
 
-    component = SoundcardProducer(config['name'], config['feed'],  pipeline)
+    component = SoundcardProducer(config['name'], pipeline)
 
     # add volume effect
     if gst.gst_version < (0,9):

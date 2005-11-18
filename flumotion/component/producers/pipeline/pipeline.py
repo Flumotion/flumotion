@@ -26,11 +26,10 @@ class Producer(feedcomponent.ParseLaunchComponent):
     logCategory = 'prod-pipe'
     def __init__(self, name, feeders, pipeline):
         feedcomponent.ParseLaunchComponent.__init__(self, name, [],
-                                                    feeders, pipeline)
+                                                    ['default'], pipeline)
 
 def createComponent(config):
     name = config['name']
-    feeders = config.get('feed', ['default'])
     pipeline = config['pipeline']
 
-    return Producer(name, feeders, pipeline)
+    return Producer(name,, pipeline)

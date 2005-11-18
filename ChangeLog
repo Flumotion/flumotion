@@ -1,3 +1,13 @@
+2005-11-18  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/converters/pipeline/pipeline.py
+	(Converter.__init__):
+	* flumotion/component/producers/pipeline/pipeline.py
+	(Producer.__init__):
+	* flumotion/component/producers/soundcard/soundcard.py
+	(SoundcardProducer.__init__): Don't poke config['feed'], this is
+	not a property.
+
 2005-11-16  Edward Hervey  <edward@fluendo.com>
 
 	* flumotion/component/producers/looper/looper.py: (createComponent): 
