@@ -8,7 +8,7 @@
 
       <entries>
         <entry type="component" location="soundcard.py"
-               function="createComponent"/>
+               function="Soundcard"/>
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass"/>
       </entries>

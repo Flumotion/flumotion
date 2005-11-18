@@ -1,5 +1,10 @@
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/soundcard/soundcard.xml: entry =
+	Soundcard
+	* flumotion/component/producers/soundcard/soundcard.py
+	(SoundcardProducer.__init__): entry = Soundcard
+
 	* flumotion/component/producers/webcam/webcam.py
 	(Webcam.__init__): Refactor so entry = Webcam
 	* flumotion/component/producers/webcam/webcam.xml: entry = Webcam
