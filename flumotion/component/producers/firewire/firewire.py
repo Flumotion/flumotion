@@ -111,9 +111,9 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         self.volume = self.get_pipeline().get_by_name("setvolume")
         if gst.gst_version < (0,9):
             from flumotion.component.effects.volume import volume
-            comp_level = component.get_pipeline().get_by_name('volumelevel')
+            comp_level = self.get_pipeline().get_by_name('volumelevel')
             vol = volume.Volume('inputVolume', comp_level)
-            component.addEffect(vol)
+            self.addEffect(vol)
 
         
     def setVolume(self, value):

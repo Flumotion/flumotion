@@ -63,18 +63,18 @@ class BTTV(feedcomponent.ParseLaunchComponent):
                                                     pipeline)
 
         # create and add colorbalance effect
-        source = component.get_pipeline().get_by_name('source')
+        source = self.get_pipeline().get_by_name('source')
         hue = config.get('hue', None)
         saturation = config.get('saturation', None)
         brightness = config.get('brightness', None)
         contrast = config.get('contrast', None)
         cb = colorbalance.Colorbalance('outputColorbalance', source,
             hue, saturation, brightness, contrast)
-        component.addEffect(cb)
+        self.addEffect(cb)
 
         # register state change notify to set channel and norm
-        element = component.get_pipeline().get_by_name('source')
-        element.connect('state-change', component.state_changed_cb, channel, norm)
+        element = self.get_pipeline().get_by_name('source')
+        element.connect('state-change', self.state_changed_cb, channel, norm)
 
     # called to set initial channel and norm from NULL->READY
     def state_changed_cb(self, element, old, new, channel, norm):

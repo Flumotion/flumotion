@@ -55,9 +55,9 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
 
         # add volume effect
         if gst.gst_version < (0,9):
-            comp_level = component.get_pipeline().get_by_name('volumelevel')
+            comp_level = self.get_pipeline().get_by_name('volumelevel')
             vol = volume.Volume('inputVolume', comp_level)
-            component.addEffect(vol)
+            self.addEffect(vol)
 
     def state_changed_cb(self, element, old, new, trackLabel):
         if old == gst.STATE_NULL and new == gst.STATE_READY:

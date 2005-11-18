@@ -1,5 +1,10 @@
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/soundcard/soundcard.py
+	(Soundcard.__init__):
+	* flumotion/component/producers/bttv/bttv.py (BTTV.__init__):
+	build fixes
+
 	* flumotion/component/producers/audiotest/audiotest.xml: 
 	* flumotion/component/producers/audiotest/audiotest.py
 	(AudioTest.__init__): entry = AudioTest
