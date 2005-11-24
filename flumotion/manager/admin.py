@@ -93,18 +93,21 @@ class AdminAvatar(base.ManagerAvatar):
         Start the given component.  The component should be sleeping before
         this.
         """
+        self.debug('perspective_componentStart(%r)' % componentState)
         return self.vishnu.componentStart(componentState)
         
     def perspective_componentStop(self, componentState):
         """
         Stop the given component.
         """
+        self.debug('perspective_componentStop(%r)' % componentState)
         return self.perspective_componentCallRemote(componentState, 'stop')
         
     def perspective_componentRestart(self, componentState):
         """
         Restart the given component.
         """
+        self.debug('perspective_componentRestart(%r)' % componentState)
         d = self.perspective_componentStop(componentState)
         d.addCallback(lambda *x: self.perspective_componentStart(componentState))
         return d
