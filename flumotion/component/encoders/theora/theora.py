@@ -21,37 +21,30 @@
 from flumotion.component import feedcomponent
 
 class Theora(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, eaters, pipeline):
+    def __init__(self, config):
+        name = config['name']
+        eaters = config['source']
+        pipeline = "ffmpegcolorspace ! theoraenc name=encoder"
+    
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     eaters,
                                                     ['default'],
                                                     pipeline)
 
-def createComponent(config):
-    component = Theora(config['name'], config['source'],
-                       "ffmpegcolorspace ! theoraenc name=encoder")
-    
-    element = component.pipeline.get_by_name('encoder')
-    if config.has_key('bitrate'):
-        element.set_property('bitrate', config['bitrate'])
-    if config.has_key('quality'):
-        element.set_property('quality', config['quality'])
-    if config.has_key('keyframe-threshold'):
-        element.set_property('keyframe-threshold', 
-            config['keyframe-threshold'])
-    if config.has_key('keyframe-mindistance'):
-        element.set_property('keyframe-mindistance',
-            config['keyframe-mindistance'])
-    if config.has_key('keyframe-maxdistance'):
-        element.set_property('keyframe-freq',
-            config['keyframe-maxdistance'])
-        element.set_property('keyframe-force',
-            config['keyframe-maxdistance'])
-    if config.has_key('quick-compress'):
-        element.set_property('quick',
-            config['quick-compress'])
-    if config.has_key('noise-sensitivity'):
-        element.set_property('noise-sensitivity',
-            config['noise-sensitivity'])
-        
-    return component
+        element = self.pipeline.get_by_name('encoder')
+
+        properties = ('bitrate',
+                      'quality',
+                      'keyframe-threshold',
+                      'keyframe-mindistance', 
+                      ('quick-compress', 'quick'),
+                      ('keyframe-maxdistance', 'keyframe-freq'),
+                      ('keyframe-maxdistance', 'keyframe-force'),
+                      'noise-sensitivity')
+
+        for p in properties:
+            cproperty = isinstance(p, tuple) and p[0] or p
+            eproperty = isinstance(p, tuple) and p[1] or p
+
+            if cproperty in config:
+                element.set_property(eproperty, config['cproperty'])

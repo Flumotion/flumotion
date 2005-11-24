@@ -15,7 +15,7 @@
       </properties>
       <entries>
         <entry type="component" location="vorbis.py"
-               function="createComponent"/>
+               function="Vorbis"/>
       </entries>
     </component>
  

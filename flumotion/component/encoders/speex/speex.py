@@ -21,18 +21,15 @@
 from flumotion.component import feedcomponent
 
 class Speex(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, eaters, pipeline):
+    def __init__(self, config):
+        name = config['name']
+        eaters = config['source']
+        pipeline = 'speexenc name=encoder'
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     eaters,
                                                     ['default'],
                                                     pipeline)
 
-def createComponent(config):
-    component = Speex(config['name'], config['source'],
-                       "speexenc name=encoder")
-    
-    element = component.pipeline.get_by_name('encoder')
-    if config.has_key('bitrate'):
-        element.set_property('bitrate', config['bitrate'])
-
-    return component
+        element = self.pipeline.get_by_name('encoder')
+        if config.has_key('bitrate'):
+            element.set_property('bitrate', config['bitrate'])

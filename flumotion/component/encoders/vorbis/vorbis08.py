@@ -28,18 +28,14 @@ from flumotion.common.planet import moods
 from vorbisutils import get_max_sample_rate
 
 class Vorbis(feedcomponent.FeedComponent):
-    def __init__(self, name, eaters, bitrate, quality, numChannels):
-    	"""
-        @param name:        name of the component
-        @param eaters:      entry between <source>...</source> from config
-        @param feeders:     entry between <feed>...</feed> from config
-        @param bitrate:     bitrate of the vorbis stream (-1 if quality is used)
-        @param quality:     quality of the vorbis stream (used if bitrate=-1)
-        @param numChannels: number of channels of output stream
-        """
-        self._numChannels = numChannels
-        self._bitrate = bitrate
-        self._quality = quality
+    def __init__(self, config):
+        name = config['name']
+        eaters = config['source']
+
+        self._numChannels = config.get('channels', 2)
+        self._bitrate = config.get('bitrate', -1)
+        self._quality = config.get('quality', 0.3)
+
         feedcomponent.FeedComponent.__init__(self, name, eaters, ['default'])
     
     ### FeedComponent methods

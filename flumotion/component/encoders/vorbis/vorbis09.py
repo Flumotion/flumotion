@@ -25,16 +25,18 @@ from flumotion.component import feedcomponent
 from vorbisutils import get_max_sample_rate
 
 class Vorbis(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, eaters, bitrate, quality, channels):
-        self.bitrate = bitrate
-        self.quality = quality
-        self.channels = channels
-        
+    def __init__(self, config):
+        name = config['name']
+        eaters = config['source']
+        pipeline = ('audioresample name=ar ! audioconvert ! capsfilter name=cf '
+                    '! vorbisenc name=enc')
+
+        self.bitrate = config.get('bitrate', -1)
+        self.quality = config.get('quality', 0.3)
+        self.channels = config.get('channels', 2)
 
         feedcomponent.ParseLaunchComponent.__init__(self, name, eaters,
-            ['default'],
-            'audioresample name=ar ! audioconvert ! capsfilter name=cf ! '
-            'vorbisenc name=enc')
+            ['default'], pipeline)
 
         enc = self.pipeline.get_by_name('enc')
         cf = self.pipeline.get_by_name('cf')

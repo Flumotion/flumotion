@@ -8,7 +8,7 @@
       <feeder name="default"/>
       <entries>
         <entry type="component" location="theora.py"
-               function="createComponent"/>
+               function="Theora"/>
       </entries>
       <properties>
         <property name="feed" type="string" multiple="yes"/>

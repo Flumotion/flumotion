@@ -25,14 +25,3 @@ if gst.gst_version < (0, 9):
     from vorbis08 import Vorbis
 else:
     from vorbis09 import Vorbis
-
-
-def createComponent(config):
-    channels = config.get('channels', 2)
-    bitrate = config.get('bitrate', -1)
-    quality = config.get('quality', 0.3)
-            
-    component = Vorbis(config['name'], config['source'], bitrate,
-                    quality, channels)
-              
-    return component

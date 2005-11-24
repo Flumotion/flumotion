@@ -2,10 +2,14 @@
 
   <components>
   
-    <component type="speex-encoder">
+    <component type="speex-encoder" base="flumotion/component/encoders/speex">
       <source location="flumotion.component.encoders.speex.speex"/>
       <eater name="default"/>
       <feeder name="default"/>
+      <entries>
+        <entry type="component" location="speex.py"
+               function="Speex"/>
+      </entries>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>

@@ -21,14 +21,12 @@
 from flumotion.component import feedcomponent
 
 class Mulaw(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, eaters, pipeline):
+    def __init__(self, config):
+        name = config['name']
+        eaters = config['source']
+        pipeline = 'mulawenc name=encoder'
+
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     eaters,
                                                     ['default'],
                                                     pipeline)
-
-def createComponent(config):
-    component = Mulaw(config['name'], config['source'],
-                       "mulawenc name=encoder")
-    
-    return component
