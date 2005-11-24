@@ -8,7 +8,7 @@
 
       <entries>
         <entry type="component" location="preview.py"
-               function="createComponent"/>
+               function="Preview"/>
       </entries>
       
       <properties>

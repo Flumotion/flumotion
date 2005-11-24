@@ -7,7 +7,7 @@
       <feeder name="default"/>
       <entries>
         <entry type="component" location="ogg.py"
-               function="createComponent"/>
+               function="Ogg"/>
       </entries>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
@@ -15,10 +15,14 @@
       </properties>
     </component>
   
-    <component type="multipart-muxer">
+    <component type="multipart-muxer" base="flumotion/component/muxers">
       <source location="flumotion.component.muxers.multipart"/>
       <feeder name="default"/>
       <eater name="default"/>
+      <entries>
+        <entry type="component" location="multipart.py"
+               function="Multipart"/>
+      </entries>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="yes"/>

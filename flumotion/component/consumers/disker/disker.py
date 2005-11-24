@@ -64,16 +64,27 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     # signal for changed filename which medium connects to
     gsignal('filename-changed', str)
 
-    def __init__(self, name, source, directory):
+    def __init__(self, config):
+        name = config['name']
+        source = config['source']
+        directory = config['directory']
+    
         self.file_fd = None
         self.directory = directory
         self.location = None
         self.caps = None
-        
+
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     source,
                                                     [],
                                                     self.pipe_template)
+
+        rotateType = config['rotateType']
+        if rotateType == 'size':
+            self.setSizeRotate(config['size'])
+        elif rotateType == 'time':
+            self.setTimeRotate(config['time'])
+        
     def setTimeRotate(self, time):
         reactor.callLater(time, self._rotateTimeCallback, time)
 
@@ -180,18 +191,3 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             sink.connect('state-change', feeder_state_change_cb)
 
 compat.type_register(Disker)
-        
-def createComponent(config):
-    name = config['name']
-    source = config['source']
-    directory = config['directory']
-    
-    component = Disker(name, source, directory)
-
-    rotateType = config['rotateType']
-    if rotateType == 'size':
-        component.setSizeRotate(config['size'])
-    elif rotateType == 'time':
-        component.setTimeRotate(config['time'])
-        
-    return component

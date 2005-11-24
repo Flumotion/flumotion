@@ -10,7 +10,7 @@
       <!-- entry points for distributable code bundles -->
       <entries>
         <entry type="component" location="http.py"
-               function="createComponent"/>
+               function="MultifdSinkStreamer"/>
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass"/>
       </entries>

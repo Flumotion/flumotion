@@ -23,28 +23,25 @@ import gst
 from flumotion.component import feedcomponent
 
 class Ogg(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, sources, pipeline):
+    def __init__(self, config):
+        name = config['name']
+        sources = config['source']
+
+        maxDelay = 500 * 1000 * 1000
+        maxPageDelay = 500 * 1000 * 1000
+        pipeline = 'oggmux name=muxer max-delay=%d max-page-delay=%d ' % (
+            maxDelay, maxPageDelay)
+
+        for eater in sources:
+            if gst.gst_version < (0, 9):
+                tmpl = '{ @ eater:%s @ ! queue max-size-buffers=16 } ! muxer. '
+            else:
+                tmpl = '@ eater:%s @ ! queue max-size-buffers=16 ! muxer. '
+            pipeline += tmpl % eater
+                
+        pipeline += 'muxer.'
+        
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     sources,
                                                     ['default'],
                                                     pipeline)
-
-def createComponent(config):
-    maxDelay = 500 * 1000 * 1000
-    maxPageDelay = 500 * 1000 * 1000
-    pipeline = 'oggmux name=muxer max-delay=%d max-page-delay=%d ' % (
-        maxDelay, maxPageDelay)
-
-    for eater in config['source']:
-        if gst.gst_version < (0, 9):
-            pipeline += '{ @ eater:%s @ ! queue max-size-buffers=16 } ! muxer. '\
-                % eater
-        else:
-            pipeline += '@ eater:%s @ ! queue max-size-buffers=16 ! muxer. '\
-                % eater
-            
-    pipeline += 'muxer.'
-    
-    component = Ogg(config['name'], config['source'], pipeline)
-    
-    return component

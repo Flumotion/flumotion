@@ -8,7 +8,7 @@
 
       <entries>
         <entry type="component" location="disker.py"
-               function="createComponent"/>
+               function="Disker"/>
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass"/>
         <entry type="admin/text" location="admin_text.py"

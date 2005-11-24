@@ -1,5 +1,22 @@
 2005-11-24  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.xml: 
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.__init__): entry = MultifdSinkStreamer
+
+	* flumotion/component/consumers/disker/disker.xml: 
+	* flumotion/component/consumers/disker/disker.py
+	(Disker.__init__): entry = Disker
+
+	* flumotion/component/consumers/preview/preview.xml: 
+	* flumotion/component/consumers/preview/preview.py
+	(Preview.__init__): entry = Preview
+
+	* flumotion/component/muxers/ogg.py (Ogg.__init__): 
+	* flumotion/component/muxers/multipart.py (Multipart.__init__): 
+	* flumotion/component/muxers/muxers.xml: Add entry for Multipart,
+	ogg entry = Ogg
+
 	* flumotion/component/encoders/jpeg/jpeg.xml: 
 	* flumotion/component/encoders/jpeg/jpeg.py (JPEG.__init__): Added
 	entry XML node, entry = JPEG. Doesn't work now if framerate is

@@ -26,18 +26,13 @@ __all__ = ['Preview']
 class Preview(feedcomponent.ParseLaunchComponent, log.Loggable):
     pipe_template = 'decodebin ! ffmpegcolorspace ! xvimagesink'
 
-    def __init__(self, name, source):
+    def __init__(self, config):
+        name = config['name']
+        source = config['source']
+
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     source,
                                                     [],
                                                     self.pipe_template)
 
 compat.type_register(Preview)
-        
-def createComponent(config):
-    name = config['name']
-    source = config['source']
-    
-    component = Preview(name, source)
-
-    return component

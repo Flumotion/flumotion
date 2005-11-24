@@ -23,21 +23,21 @@ import gst
 from flumotion.component import feedcomponent
 
 class Multipart(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, sources, pipeline):
+    def __init__(self, config):
+        name = config ['name']
+        sources = config['source']
+
+        pipeline = 'multipartmux name=muxer '
+        for eater in sources:
+            if gst.gst_version < (0, 9):
+                tmpl = '{ @ eater:%s @ ! queue } ! muxer. '
+            else:
+                tmpl = '@ eater:%s @ ! queue ! muxer. '
+            pipeline += tmpl % eater
+
+        pipeline += 'muxer.'
+
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     sources,
                                                     ['default'],
                                                     pipeline)
-
-def createComponent(config):
-    pipeline = 'multipartmux name=muxer '
-    for eater in config['source']:
-        if gst.gst_version < (0, 9):
-            pipeline += '{ @ eater:%s @ ! queue } ! muxer. ' % eater
-        else:
-            pipeline += '@ eater:%s @ ! queue ! muxer. ' % eater
-    pipeline += 'muxer.'
-    
-    component = Multipart(config['name'], config['source'], pipeline)
-    
-    return component
