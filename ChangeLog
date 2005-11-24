@@ -1,3 +1,13 @@
+2005-11-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/converters/overlay/overlay.xml: 
+	* flumotion/component/converters/overlay/overlay.py
+	(Overlay.__init__): entry = Overlay
+
+	* flumotion/component/converters/pipeline/pipeline.xml: 
+	* flumotion/component/converters/pipeline/pipeline.py
+	(Converter.__init__): entry = Converter
+
 2005-11-18  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/producers/firewire/firewire.py

@@ -29,8 +29,35 @@ import tempfile
 
 class Overlay(feedcomponent.ParseLaunchComponent):
     def __init__(self, name, eaters, pipeline, config):
+        name = config['name']
+        eaters = config['source']
+        eater = '@ eater:%s @' % eaters[0]
+
+        # AYUV conversion got added to ffmpegcolorspace in 0.8.5
+        # alphacolor element works too, but has bugs for non-multiples of 4 or eight
+        alpha = 'ffmpegcolorspace ! alpha'
+
+        # due to createComponent entry pointism, we have to import inside our
+        # function.  PLEASE MAKE THE PAIN GO AWAY ? <- might not be
+        # necessary still
+        import gst
+        if gst.gst_version < (0,9):
+            from flumotion.worker.checks import video
+            if video.check_ffmpegcolorspace_AYUV():
+                alpha = 'ffmpegcolorspace'
+            else:
+                log.info('Using gst-plugins older than 0.8.5, consider upgrading if you notice a diagonal green line in your video output.')
+            pipeline = ('filesrc name=source blocksize=100000 ! pngdec '
+                        ' ! alphacolor ! videomixer name=mix '
+                        ' ! @ feeder:: @ %(eater)s ! %(alpha)s ! mix.' % locals())
+        else:
+            pipeline = ('filesrc name=source blocksize=100000 ! pngdec '
+                        ' ! alphacolor ! videomixer name=mix '
+                        ' ! @ feeder:: @ %(eater)s ! ffmpegcolorspace ! mix.' % locals())
+        
         self._filename = None
         self._config = config
+
         feedcomponent.ParseLaunchComponent.__init__(self, name,
                                                     eaters,
                                                     ['default'],
@@ -71,28 +98,3 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         else:
             self.debug('Temporary overlay already gone, did we not start up correctly ?')
         
-def createComponent(config):
-    eater = '@ eater:%s @' % config['source'][0]
-
-    # AYUV conversion got added to ffmpegcolorspace in 0.8.5
-    # alphacolor element works too, but has bugs for non-multiples of 4 or eight
-    alpha = 'ffmpegcolorspace ! alpha'
-
-    # due to createComponent entry pointism, we have to import inside our
-    # function.  PLEASE MAKE THE PAIN GO AWAY ?
-    import gst
-    if gst.gst_version < (0,9):
-        from flumotion.worker.checks import video
-        if video.check_ffmpegcolorspace_AYUV():
-            alpha = 'ffmpegcolorspace'
-        else:
-            log.info('Using gst-plugins older than 0.8.5, consider upgrading if you notice a diagonal green line in your video output.')
-        pipeline = ('filesrc name=source blocksize=100000 ! pngdec '
-                    ' ! alphacolor ! videomixer name=mix '
-                    ' ! @ feeder:: @ %(eater)s ! %(alpha)s ! mix.' % locals())
-    else:
-        pipeline = ('filesrc name=source blocksize=100000 ! pngdec '
-                    ' ! alphacolor ! videomixer name=mix '
-                    ' ! @ feeder:: @ %(eater)s ! ffmpegcolorspace ! mix.' % locals())
-    
-    return Overlay(config['name'], config['source'], pipeline, config)

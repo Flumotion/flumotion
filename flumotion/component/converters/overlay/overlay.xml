@@ -6,7 +6,7 @@
       <feeder name="default"/>
       <entries>
         <entry type="component" location="overlay.py"
-               function="createComponent" />
+               function="Overlay" />
       </entries>
       <properties>
         <property name="source" type="string" multiple="no"/>
