@@ -28,7 +28,7 @@ from flumotion.component.converters.overlay import genimg
 import tempfile
 
 class Overlay(feedcomponent.ParseLaunchComponent):
-    def __init__(self, name, eaters, pipeline, config):
+    def __init__(self, config):
         name = config['name']
         eaters = config['source']
         eater = '@ eater:%s @' % eaters[0]
