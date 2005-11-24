@@ -47,4 +47,4 @@ class Theora(feedcomponent.ParseLaunchComponent):
             eproperty = isinstance(p, tuple) and p[1] or p
 
             if cproperty in config:
-                element.set_property(eproperty, config['cproperty'])
+                element.set_property(eproperty, config[cproperty])

@@ -1,5 +1,8 @@
 2005-11-24  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/encoders/theora/theora.py (Theora.__init__):
+	Whoops!
+
 	* flumotion/component/producers/videotest/videotest.py
 	(VideoTest.__init__): Temporary hack for framerate, will fix later.
 
