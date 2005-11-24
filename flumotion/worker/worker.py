@@ -199,8 +199,17 @@ class WorkerMedium(medium.BaseMedium):
         self.debug('remote_checkElements: element names to check %r' % (
             elementNames,))
 
-        list = [name for name in elementNames
-                         if gst.element_factory_make(name) != None]
+        list = []
+        # GST 0.8
+        for name in elementNames:
+            # in 0.9.x, element_factory_make started
+            # raising gst.PluginNotFoundError
+            try:
+                e = gst.element_factory_make(name)
+                if e:
+                    list.append(name)
+            except gst.PluginNotFoundError:
+                pass
         self.debug('remote_checkElements: returning elements names %r' % list)
         return list
 

@@ -1,3 +1,9 @@
+2005-11-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/worker.py:
+	  fix remote_checkElements() because element_factory_make now raises
+	  when plug-ins are missing
+
 2005-11-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/converters/overlay/overlay.xml: 
