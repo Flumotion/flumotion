@@ -47,9 +47,10 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
 
         # Filtered caps
         struct = gst.structure_from_string(format)
-        for k in 'width', 'height', 'framerate':
+        for k in 'width', 'height':
             if k in config:
                 struct[k] = config[k]
+        struct['framerate'] = gst.Fraction(10, 1)
 
         # If RGB, set something ffmpegcolorspace can convert.
         if format == 'video/x-raw-rgb':

@@ -1,5 +1,8 @@
 2005-11-24  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/videotest/videotest.py
+	(VideoTest.__init__): Temporary hack for framerate, will fix later.
+
 	* flumotion/component/producers/audiotest/audiotest.py
 	(AudioTest.__init__): audiotestsrc in 0.9.
 
