@@ -1,5 +1,8 @@
 2005-11-24  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/audiotest/audiotest.py
+	(AudioTest.__init__): audiotestsrc in 0.9.
+
 	* flumotion/common/log.py (FluLogObserver.emit): Print tracebacks
 	at WARN now that the defer_generator tracebacks are not spamming
 	any more.

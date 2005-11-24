@@ -28,11 +28,13 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
 
         if gst.gst_version < (0,9):
             is_live = 'sync=true'
+            source = 'sinesrc'
         else:
             is_live = 'is-live=true'
+            source = 'audiotestsrc'
 
-        pipeline = ('sinesrc name=source %s ! audio/x-raw-int,rate=%d ! volume volume=%f'
-                    % (is_live, rate, volume))
+        pipeline = ('%s name=source %s ! audio/x-raw-int,rate=%d ! volume volume=%f'
+                    % (source, is_live, rate, volume))
 
         feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
                                                     [],
