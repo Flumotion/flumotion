@@ -1,5 +1,9 @@
 2005-11-24  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/log.py (FluLogObserver.emit): Print tracebacks
+	at WARN now that the defer_generator tracebacks are not spamming
+	any more.
+
 	* flumotion/component/consumers/httpstreamer/http.xml: 
 	* flumotion/component/consumers/httpstreamer/http.py
 	(MultifdSinkStreamer.__init__): entry = MultifdSinkStreamer
