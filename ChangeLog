@@ -1,3 +1,8 @@
+2005-11-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/bttv/bttv.xml:
+	  fix bttv depending on colorbalance effect
+
 2005-11-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/encoders/theora/theora.py (Theora.__init__):

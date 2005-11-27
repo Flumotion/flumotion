@@ -63,6 +63,7 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="bttv-base" />
+            <dependency name="colorbalance-effect" />
         </dependencies>
 
         <directories>
