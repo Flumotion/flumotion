@@ -34,6 +34,7 @@ reg.addFromString("""
         <property name="four" type="xml"/>
         <property name="five" type="bool"/>
         <property name="six" type="long"/>
+        <property name="seven" type="fraction"/>
       </properties>
     </component>
   </components>
@@ -238,6 +239,7 @@ class TestConfig(unittest.TestCase):
                <four attr="attr-value">value</four>
                <five>True</five>
                <six>3981391981389138998131389L</six>
+               <seven>30000/1001</seven>
              </component></flow>
              </planet>""")
         self.failIf(planet.flows)
@@ -255,6 +257,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(getattr(custom, 'attr', None), 'attr-value')
         self.failUnless(conf.get('five'))
         self.assertEquals(conf.get('six'), 3981391981389138998131389L)
+        self.assertEquals(conf.get('seven'), (30000, 1001))
 
     def testGetComponentEntries(self):
         conf = config.FlumotionConfigXML(None,

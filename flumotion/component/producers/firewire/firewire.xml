@@ -17,7 +17,7 @@
         <property name="width" type="int" />
         <property name="scaled_width" type="int" />
         <property name="is_square" type="bool" />
-        <property name="framerate" type="float" />
+        <property name="framerate" type="fraction" />
       </properties>
     </component>
   </components>

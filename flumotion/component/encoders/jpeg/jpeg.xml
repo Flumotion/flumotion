@@ -14,7 +14,7 @@
         <property name="feed" type="string" multiple="yes"/>
         <property name="source" type="string" multiple="no"/>
         <property name="quality" type="int"/>
-        <property name="framerate" type="float"/>
+        <property name="framerate" type="fraction"/>
       </properties>
     </component>
  

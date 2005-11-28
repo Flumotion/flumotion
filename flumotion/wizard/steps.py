@@ -43,6 +43,11 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
 # or the extra args we name in callbacks
 __pychecker__ = 'no-classattr no-argsused'
 
+# the denominator arg for all calls of this function was sniffed from
+# the glade file's spinbutton adjustment
+def fraction_from_float(number, denominator):
+    return (int(number*denominator), denominator)
+
 class Welcome(WizardSection):
     glade_file = 'wizard_welcome.glade'
     section = 'Welcome'
@@ -204,7 +209,8 @@ class TVCard(VideoSource):
         options['channel'] = self.combobox_source.get_string()
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] = self.spinbutton_framerate.get_value()
+        options['framerate'] = \
+            fraction_from_float(self.spinbutton_framerate.get_value(), 10)
         return options
 
 class FireWire(VideoSource):
@@ -312,7 +318,8 @@ class FireWire(VideoSource):
         options['scaled_width'] = d['sw']
         options['width'] = d['ow']
         options['is_square'] = self.is_square
-        options['framerate'] = self.spinbutton_framerate.get_value()
+        options['framerate'] = \
+            fraction_from_float(self.spinbutton_framerate.get_value(), 2)
         return options
 
     def worker_changed(self):
@@ -403,7 +410,8 @@ class Webcam(VideoSource):
         options['device'] = self.combobox_device.get_string()
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] = self.spinbutton_framerate.get_value()
+        options['framerate'] = \
+            fraction_from_float(self.spinbutton_framerate.get_value(), 16)
         return options
 
 class TestVideoSource(VideoSource):
@@ -432,7 +440,8 @@ class TestVideoSource(VideoSource):
         options['pattern'] = self.combobox_pattern.get_value()
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] = self.spinbutton_framerate.get_value()
+        options['framerate'] =
+            fraction_from_float(self.spinbutton_framerate.get_value(), 10)
         return options
 
 class Overlay(WizardStep):
@@ -802,7 +811,7 @@ class JPEG(VideoEncoder):
     def get_state(self):
         options = VideoEncoder.get_state(self)
         options['quality'] = int(options['quality'])
-        options['framerate'] = float(options['framerate'])
+        options['framerate'] = fraction_from_float(options['framerate'], 2)
         return options
     
 class AudioEncoder(WizardStep):

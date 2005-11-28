@@ -34,7 +34,15 @@ class Webcam(feedcomponent.ParseLaunchComponent):
         # Filtered caps
         format = config.get('format', 'video/x-raw-yuv')
         struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
-        for k in 'width', 'height', 'framerate':
+
+        if 'framerate' in config:
+            framerate = config['framerate']
+            if gst.gst_version < (0,9):
+                struct['framerate'] = float(framerate[0]) / framerate[1]
+            else:
+                struct['framerate'] = gst.Fraction(framerate[0], framerate[1])
+
+        for k in 'width', 'height':
             if k in config:
                 struct[k] = config[k]
         caps = gst.Caps(struct)

@@ -1,3 +1,37 @@
+2005-11-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/looper/looper.py
+	(Looper.__init__):
+	* flumotion/component/producers/videotest/videotest.py
+	(VideoTest.__init__):
+	* flumotion/component/producers/bttv/bttv.py (BTTV.__init__):
+	* flumotion/component/producers/firewire/firewire.py
+	(Firewire.__init__):
+	* flumotion/component/producers/webcam/webcam.py
+	(Webcam.__init__): Handle fraction framerate properly in 0.8 and
+	0.9.
+
+	* flumotion/component/encoders/jpeg/jpeg.xml: 
+	* flumotion/component/producers/bttv/bttv.xml: 
+	* flumotion/component/producers/firewire/firewire.xml: 
+	* flumotion/component/producers/videotest/videotest.xml: 
+	* flumotion/component/producers/webcam/webcam.xml: Framerate is
+	now a fraction.
+
+	* flumotion/wizard/steps.py (fraction_from_float): New utility for
+	making fractions from floats given the denominator.
+	(TVCard.get_state, FireWire.get_state, Webcam.get_state) 
+	(TestVideoSource.get_state, JPEG.get_state): Fractional
+	framerates.
+
+	* flumotion/common/config.py
+	(FlumotionConfigXML._get_fraction_value): New property type
+	parser.
+	(FlumotionConfigXML._parseProperties): Add parser for fractions.
+
+	* flumotion/test/test_config.py (TestConfig.testParseProperties):
+	Add a test for fraction-typed properties.
+
 2005-11-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/bttv/bttv.xml:

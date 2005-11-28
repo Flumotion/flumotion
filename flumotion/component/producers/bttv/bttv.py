@@ -45,16 +45,20 @@ class BTTV(feedcomponent.ParseLaunchComponent):
         #device_width = config['device-width']
         #device_height = config['device-height']
 
-        framerate = config.get('framerate', 25.0)
+        framerate = config.get('framerate', (25, 1))
+        if gst.gst_version < (0,9):
+            framerate_string = '%f' % (float(framerate[0]) / framerate[1])
+        else:
+            framerate_string = '%d/%d' % (framerate[0], framerate[1])
         
         pipeline = ('v4lsrc name=source device=%s copy-mode=true ! '
                     'video/x-raw-yuv,width=%d,height=%d ! videoscale ! '
                     'video/x-raw-yuv,width=%d,height=%d ! videorate ! '
-                    'video/x-raw-yuv,framerate=%f') % (device,
+                    'video/x-raw-yuv,framerate=%s') % (device,
                                                        device_width,
                                                        device_height,
                                                        width, height,
-                                                       framerate)
+                                                       framerate_string)
         config['pipeline'] = pipeline
 
         feedcomponent.ParseLaunchComponent.__init__(self, config['name'],

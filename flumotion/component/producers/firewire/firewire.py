@@ -30,15 +30,16 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         height = config.get('height', int(576 * width/720.)) # assuming PAL :-/
         scaled_width = config.get('scaled_width', width)
         is_square = config.get('is_square', False)
-        framerate = config.get('framerate', 12.5)
+        framerate = config.get('framerate', (30, 2))
+        framerate_float = float(framerate[0]) / framerate[1]
 
         scale_correction = width - scaled_width
 
-        if 12.5 < framerate <= 25:
+        if 12.5 < framerate_float <= 25:
             drop_factor = 1
-        elif 6.3 < framerate <= 12.5:
+        elif 6.3 < framerate_float <= 12.5:
             drop_factor = 2
-        elif 3.2 < framerate <= 6.3:
+        elif 3.2 < framerate_float <= 6.3:
             drop_factor = 4
         else:
             drop_factor = 8
@@ -74,7 +75,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                         '    ! videorate ! videoscale'
                         '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
                         '    ! videoscale'
-                        '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)f,format=(fourcc)YUY2'
+                        '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)s,format=(fourcc)YUY2'
                         '    %(pp)s'
                         '    ! @feeder::video@'
                         '  dec. ! audio/x-raw-int ! volume name=setvolume'
@@ -82,7 +83,8 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                         '    ! @feeder::audio@'
                         % dict(df=drop_factor, ih=interlaced_height,
                                sq=square_pipe, pp=pad_pipe,
-                               sw=scaled_width, h=height, fr=framerate))
+                               sw=scaled_width, h=height,
+                               fr=('%f' % framerate_float)))
         else:
             # need a queue in case tcpserversink blocks somehow
             template = ('dv1394src'
@@ -93,7 +95,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                         '    ! videorate ! videoscale'
                         '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
                         '    ! videoscale'
-                        '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)f,format=(fourcc)YUY2'
+                        '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)s,format=(fourcc)YUY2'
                         '    %(pp)s'
                         '    ! @feeder::video@'
                         '  demux. ! audio/x-raw-int ! volume name=setvolume'
@@ -101,7 +103,8 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                         '    ! @feeder::audio@'
                         % dict(df=drop_factor, ih=interlaced_height,
                                sq=square_pipe, pp=pad_pipe,
-                               sw=scaled_width, h=height, fr=framerate))
+                               sw=scaled_width, h=height,
+                               fr=('%d/%d' % (framerate[0], framerate[1]))))
     
         feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
                                                     [],

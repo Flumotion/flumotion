@@ -386,6 +386,15 @@ class FlumotionConfigXML(log.Loggable):
 
         return values
 
+    def _get_fraction_value(self, nodes):
+        def fraction_from_string(string):
+            parts = string.split('/')
+            if not len(parts) == 2:
+                raise ConfigError("Invalid fraction: %s", string)
+            return (int(parts[0]), int(parts[1]))
+        return [fraction_from_string(subnode.childNodes[0].data)
+                for subnode in nodes]
+
     def _parseFeeds(self, node, defs):
         nodes = []
         for subnode in node.childNodes:
@@ -446,6 +455,8 @@ class FlumotionConfigXML(log.Loggable):
                 value = self._get_float_value(nodes)
             elif type == 'xml':
                 value = self._get_xml_value(nodes)
+            elif type == 'fraction':
+                value = self._get_fraction_value(nodes)
             else:
                 raise ConfigError("invalid property type: %s" % type)
 

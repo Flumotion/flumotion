@@ -50,7 +50,13 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
         for k in 'width', 'height':
             if k in config:
                 struct[k] = config[k]
-        struct['framerate'] = gst.Fraction(10, 1)
+
+        if 'framerate' in config:
+            framerate = config['framerate']
+            if gst.gst_version < (0,9):
+                struct['framerate'] = float(framerate[0]) / framerate[1]
+            else:
+                struct['framerate'] = gst.Fraction(framerate[0], framerate[1])
 
         # If RGB, set something ffmpegcolorspace can convert.
         if format == 'video/x-raw-rgb':

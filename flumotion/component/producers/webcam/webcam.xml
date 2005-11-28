@@ -17,7 +17,7 @@
         <property name="device" type="string" required="yes"/>
         <property name="height" type="int" />
         <property name="width" type="int" />
-        <property name="framerate" type="float" />
+        <property name="framerate" type="fraction" />
 
 <!-- FIXME: get these into an effect namespace ? -->
         <property name="hue" type="int" required="no" />

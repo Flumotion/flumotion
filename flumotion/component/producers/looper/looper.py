@@ -35,7 +35,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
         # setup the properties
         width = config.get('width', 240)
         height = config.get('height', int(576 * width/720.))
-        framerate = config.get('framerate', 12.5)
+        framerate = config.get('framerate', (25, 2))
         location = config.get('location')
         
         # create the component
@@ -45,13 +45,13 @@ class Looper(feedcomponent.ParseLaunchComponent):
             '    demux. ! theoradec name=theoradec'
             '       ! videorate'
             '       ! videoscale'
-            '       ! video/x-raw-yuv,width=%(width)d,height=%(height)d,framerate=%(framerate)f'
+            '       ! video/x-raw-yuv,width=%(width)d,height=%(height)d,framerate=%(framerate)s'
             '       ! queue ! identity name=vident sync=true silent=true check-perfect=true ! @feeder::video@'
             '    demux. ! vorbisdec name=vorbisdec ! audioconvert'
             '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
             '       ! queue ! identity name=aident sync=true silent=true check-perfect=true ! @feeder::audio@'
             % dict(location=location, width=width,
-                   height=height, framerate=framerate))
+                   height=height, framerate=('%d/%d' % (framerate[0], framerate[1]))))
         
         feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
                                                     [],
