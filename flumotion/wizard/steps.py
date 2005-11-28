@@ -440,8 +440,8 @@ class TestVideoSource(VideoSource):
         options['pattern'] = self.combobox_pattern.get_value()
         options['width'] = int(self.spinbutton_width.get_value())
         options['height'] = int(self.spinbutton_height.get_value())
-        options['framerate'] =
-            fraction_from_float(self.spinbutton_framerate.get_value(), 10)
+        options['framerate'] = fraction_from_float(
+            self.spinbutton_framerate.get_value(), 10)
         return options
 
 class Overlay(WizardStep):
