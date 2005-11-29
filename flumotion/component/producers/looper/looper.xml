@@ -6,6 +6,10 @@
       <feeder name="audio"/>
       <feeder name="video"/>
       <entries>
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass"/>
+        <entry type="admin/text" location="admin_text.py"
+               function="UIClass"/>
         <entry type="component" location="looper.py"
                function="Looper" />
       </entries>

@@ -37,21 +37,28 @@ class Looper(feedcomponent.ParseLaunchComponent):
         height = config.get('height', int(576 * width/720.))
         framerate = config.get('framerate', (25, 2))
         location = config.get('location')
+
+        vstruct = gst.structure_from_string("video/x-raw-yuv,width=%(width)d,height=%(height)d" %
+                                            dict (width=width, height=height))
+        vstruct['framerate'] = gst.Fraction(framerate[0], framerate[1])
+
+        vcaps = gst.Caps(vstruct)
         
         # create the component
         template = (
             'filesrc location=%(location)s'
             '       ! oggdemux name=demux'
             '    demux. ! theoradec name=theoradec'
+            '       ! identity single-segment=true silent=true'
             '       ! videorate'
             '       ! videoscale'
-            '       ! video/x-raw-yuv,width=%(width)d,height=%(height)d,framerate=%(framerate)s'
-            '       ! queue ! identity name=vident sync=true silent=true check-perfect=true ! @feeder::video@'
-            '    demux. ! vorbisdec name=vorbisdec ! audioconvert'
+            '       ! %(vcaps)s'
+            '       ! queue ! identity name=vident sync=true silent=true ! @feeder::video@'
+            '    demux. ! vorbisdec name=vorbisdec ! identity single-segment=true silent=true'
+            '       ! audioconvert'
             '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
-            '       ! queue ! identity name=aident sync=true silent=true check-perfect=true ! @feeder::audio@'
-            % dict(location=location, width=width,
-                   height=height, framerate=('%d/%d' % (framerate[0], framerate[1]))))
+            '       ! queue ! identity name=aident sync=true silent=true ! @feeder::audio@'
+            % dict(location=location, vcaps=vcaps))
         
         feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
                                                     [],

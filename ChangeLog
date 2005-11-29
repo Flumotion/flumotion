@@ -1,3 +1,11 @@
+2005-11-29  Edward Hervey  <edward@fluendo.com>
+
+	* flumotion/component/producers/looper/looper.py: 
+	* flumotion/component/producers/looper/looper.xml:
+	Update fraction behaviour,
+	Use single-segment identity so the stream really behaves as a live
+	stream.
+
 2005-11-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/steps.py:
