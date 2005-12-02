@@ -1,0 +1,120 @@
+-*- text -*-
+
+This file documents the protocol used by the component base classes to
+produce initialized components. These descriptions are not the only
+tasks that the methods perform, but they are the documented points of
+extensibility. An alternate (overridden) implementation of these methods
+must perform the named tasks.
+
+For more information on object protocols, see
+http://www2.parc.com/csl/groups/sda/publications/papers/Kiczales-OOPSLA92/.
+
+
+Entry points
+============
+
+Component instantiation starts when the manager tells the worker to
+spawn a job to call a procedure on its behalf. This procedure is called
+the entry point. Component entry points are called with one argument,
+the configuration dictionary.
+
+In practice all components in flumotion's repository are set to have the
+component class as an entry point. This allows the __init__ in the
+BaseComponent class to handle entry point requests. To allow for
+extensibility, there is a protocol that __init__ is expected to follow
+to initialize the component.
+
+Implementations
+---------------
+
+BaseComponent.__init__(self, config)
+------------------------------------
+This method is expected to produce an initialized component from a
+config dictionary. It will call the following methods in the following
+order:
+
+  BaseComponent.setConfig(self, config)
+  BaseComponent.setup(self, config)
+
+Interface
+---------
+
+BaseComponent.setConfig(self, config)
+-------------------------------------
+This method is expected to set self.config to config.
+
+BaseComponent.setup(self, config)
+---------------------------------
+This method has no requirements. It is implementation-specific.
+
+
+Feed components
+===============
+
+A feed component is a component that has a pipeline. Its initialization
+protocol provides a mechanism for creating and initializing the
+pipeline.
+
+Implementations
+---------------
+
+FeedComponent.setup(self, config)
+---------------------------------
+This method will instantiate a pipeline first, then allow the object a
+chance to do any further initialization after the pipeline is created.
+It does this by calling the following two methods:
+
+  FeedComponent.create_pipeline(self)
+  FeedComponent.set_pipeline(self, pipeline)
+
+Interface
+---------
+
+FeedComponent.create_pipeline(self)
+-----------------------------------
+This method should return a GstPipeline object. It is a pure virtual
+method.
+
+FeedComponent.set_pipeline(self, pipeline)
+------------------------------------------
+The base implementation of this method will set self.pipeline to
+pipeline and will connect to signals, the bus, etc. Subclass
+implementations should chain up to this method first.
+
+
+Parse-launch components
+=======================
+
+Parse-launch components construct their pipelines via strings. This
+protocol provides a mechanism whereby subclasses have a convenient
+interface for producing these strings, and for configuring themselves
+once the pipeline is created.
+
+Implementation
+--------------
+
+ParseLaunchComponent.create_pipeline(self)
+------------------------------------------
+Calls the following method:
+
+  ParseLaunchComponent.get_pipeline_string(self, properties)
+
+ParseLaunchComponent.set_pipeline(self, pipeline)
+-------------------------------------------------
+Chains up to the parent, then calls the following method:
+
+  ParseLaunchComponent.configure_pipeline(self, pipeline, properties)
+
+Interface
+---------
+
+ParseLaunchComponent.get_pipeline_string(self, properties)
+----------------------------------------------------------
+Must return a string, the pipeline template. Properties is a dict from
+self.config['properties'] (i.e., the component properties, without the
+name, type, parent, etc.). Pure virtual.
+
+ParseLaunchComponent.configure_pipeline(self, pipeline, properties)
+-------------------------------------------------------------------
+Called so that subclasses can manipulate the pipeline directly if
+needed. Defaults to doing nothing.
