@@ -29,9 +29,9 @@ GST_08_SUPPORTED = '@GST_08_SUPPORTED@'
 PYGST_08_DIR = '@PYGST_08_DIR@'
 PYGTK_08_REQ = '@PYGTK_08_REQ@'
 
-GST_09_SUPPORTED = '@GST_09_SUPPORTED@'
-PYGST_09_DIR = '@PYGST_09_DIR@'
-PYGTK_09_REQ = '@PYGTK_09_REQ@'
+GST_10_SUPPORTED = '@GST_10_SUPPORTED@'
+PYGST_10_DIR = '@PYGST_10_DIR@'
+PYGTK_10_REQ = '@PYGTK_10_REQ@'
 
 def init_gobject():
     """
@@ -69,18 +69,18 @@ def init_gst():
     is sane enough to be usable by us
     """
 
-    default_version = GST_09_SUPPORTED == 'yes' and '0.9' or '0.8'
+    default_version = GST_10_SUPPORTED == 'yes' and '0.10' or '0.8'
     gst_version = os.getenv('FLU_GST_VERSION', default_version)
 
     if gst_version == '0.8':
         pygst_dir = PYGST_08_DIR
         pygtk_req = PYGTK_08_REQ
-    elif gst_version == '0.9':
-        pygst_dir = PYGST_09_DIR
-        pygtk_req = PYGTK_09_REQ
+    elif gst_version == '0.10':
+        pygst_dir = PYGST_10_DIR
+        pygtk_req = PYGTK_10_REQ
     else:
         raise SystemExit(
-            'ERROR: Invalid FLU_GST_VERSION: "%s" ("0.8" or "0.9" expected)'
+            'ERROR: Invalid FLU_GST_VERSION: "%s" ("0.8" or "0.10" expected)'
             % gst_version)
 
     assert 'gobject' in sys.modules
@@ -98,12 +98,12 @@ def init_gst():
 
         sys.path.insert(0, pygst_dir)
         
-    if gst_version == '0.9':
+    if gst_version == '0.10':
         try:
             import pygst
-            pygst.require('0.9')
+            pygst.require('0.10')
         except ImportError:
-            raise SystemExit('ERROR: Could not load gst-python 0.9')
+            raise SystemExit('ERROR: Could not load gst-python 0.10')
 
     try:
         import gst
@@ -111,16 +111,18 @@ def init_gst():
         raise SystemExit('ERROR: gst-python could not be found')
     
     if not (gst.pygst_version[1] == 8 and gst_version == '0.8'
-            or gst.pygst_version[1] >= 9 and gst_version == '0.9'):
+            or gst.pygst_version[1] >= 10 and gst_version == '0.10'
+            or gst.pygst_version[1] == 9 and gst.pygst_version[2] >= 7 
+               and gst_version == '0.10'):
         raise SystemExit(
             'ERROR: Expected gst-python version %s in %s, but found %r'
             % (gst_version, pygst_dir, gst.pygst_version))
     
 #     print 'Using GStreamer %s' % gst_version
-#     if gst_version == '0.9':
+#     if gst_version == '0.10':
 #         print 'Yeeeaaaaaaaah baby!'
 #     else:
-#         print 'Goober. All the cool kids are using 0.9.'
+#         print 'Goober. All the cool kids are using 0.10.'
 
 def boot(path, gtk=False):
     from flumotion.twisted import compat
