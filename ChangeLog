@@ -1,5 +1,8 @@
 2005-12-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/encoders/encoders.xml: Remove duplicated
+	registry entry for jpeg-encoder.
+
 	* All components: adapted for new init protocol.
 
 	* flumotion/manager/manager.py (Vishnu.loadConfiguration): Try to
