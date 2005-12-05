@@ -21,19 +21,12 @@
 from flumotion.component import feedcomponent
 
 class Smoke(feedcomponent.ParseLaunchComponent):
-    def __init__(self, config):
-        name = config['name']
-        eaters = config['source']
-        pipeline = 'ffmpegcolorspace ! smokeenc name=encoder'
+    def get_pipeline_string(self, properties):
+        return 'ffmpegcolorspace ! smokeenc name=encoder'
 
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    eaters,
-                                                    ['default'],
-                                                    pipeline)
+    def configure_pipeline(self, pipeline, properties):
+        element = pipeline.get_by_name('encoder')
 
-        element = self.pipeline.get_by_name('encoder')
-        properties = ('qmin', 'qmax', 'threshold', 'keyframe')
-
-        for p in properties:
-            if p in config:
-                element.set_property(p, config[p])
+        for p in ('qmin', 'qmax', 'threshold', 'keyframe'):
+            if p in properties:
+                element.set_property(p, properties[p])

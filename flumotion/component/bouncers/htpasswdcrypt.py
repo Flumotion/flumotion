@@ -44,8 +44,23 @@ class HTPasswdCrypt(bouncer.Bouncer):
     logCategory = 'htpasswdcrypt'
     keycardClasses = (keycards.KeycardUACPP, keycards.KeycardUACPCC)
 
-    def __init__(self, name, filename, data):
-        bouncer.Bouncer.__init__(self, name)
+    def setup(self, conf):
+        bouncer.Bouncer.setup(self, conf)
+
+        # we need either a filename or data
+        filename = None
+        data = None
+        props = conf['properties']
+        if props.has_key('filename'):
+            filename = props['filename']
+            log.debug('htpasswd', 'using file %s for passwords' % filename)
+        elif props.has_key('data'):
+            data = props['data']
+            log.debug('htpasswd', 'using in-line data for passwords')
+        else:
+            raise config.ConfigError(
+                'HTPasswdCrypt config needs either a <data> or <filename> entry')
+
         self._filename = filename
         self._data = data
         self._checker = checkers.CryptChecker()
@@ -141,20 +156,3 @@ class HTPasswdCrypt(bouncer.Bouncer):
         d.addErrback(self._requestAvatarIdErrback, keycard)
         return d
 
-def createComponent(config):
-    # we need either a filename or data
-    filename = None
-    data = None
-    if config.has_key('filename'):
-        filename = config['filename']
-        log.debug('htpasswd', 'using file %s for passwords' % filename)
-    elif config.has_key('data'):
-        data = config['data']
-        log.debug('htpasswd', 'using in-line data for passwords')
-    else:
-        raise config.ConfigError(
-            'HTPasswdCrypt config needs either a <data> or <filename> entry')
-
-    # FIXME: use checker
-    comp = HTPasswdCrypt(config['name'], filename, data)
-    return comp

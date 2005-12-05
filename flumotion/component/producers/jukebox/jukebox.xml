@@ -1,10 +1,16 @@
 <registry>
 
   <components>
-    <component type="jukebox">
+    <component type="jukebox"
+               base="flumotion/component/producers/jukebox">
       <source location="flumotion.component.producers.jukebox.jukebox08" />
 
       <feeder name="default"/>
+
+      <entries>
+        <entry type="component" location="jukebox08.py"
+               function="Jukebox"/>
+      </entries>
 
       <properties>
         <property name="feed" type="string" multiple="yes" />

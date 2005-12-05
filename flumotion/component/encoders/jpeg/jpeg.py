@@ -23,13 +23,10 @@ from flumotion.component import feedcomponent
 import gst
 
 class JPEG(feedcomponent.ParseLaunchComponent):
-    def __init__(self, config):
-        name = config['name']
-        eaters = config['source']
-
+    def get_pipeline_string(self, properties):
         framerate = ''
-        if config.has_key('framerate'):
-            frac = config['framerate']
+        if properties.has_key('framerate'):
+            frac = properties['framerate']
             if gst.gst_version < (0,9):
                 framerate = '(double)%f' % (float(frac[0])/frac[1])
             else:
@@ -37,13 +34,10 @@ class JPEG(feedcomponent.ParseLaunchComponent):
 
             framerate = (' ! videorate ! video/x-raw-yuv,framerate=%s '
                          % framerate)
-        pipeline = 'ffmpegcolorspace %s ! jpegenc name=encoder' % framerate
 
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    eaters,
-                                                    ['default'],
-                                                    pipeline)
-        
-        element = self.pipeline.get_by_name('encoder')
-        if 'quality' in config:
-            element.set_property('quality', config['quality'])
+        return 'ffmpegcolorspace %s ! jpegenc name=encoder' % framerate
+
+    def configure_pipeline(self, pipeline, properties):
+        element = pipeline.get_by_name('encoder')
+        if 'quality' in properties:
+            element.set_property('quality', properties['quality'])

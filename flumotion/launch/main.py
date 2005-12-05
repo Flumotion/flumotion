@@ -181,7 +181,7 @@ class ComponentWrapper(object):
 
         c = r.getComponent(type)
         compprops = dict([(p.getName(), p) for p in c.getProperties()])
-        config = {'name': name}
+        config = {'name': name, 'properties':{}}
         
         self.feeders = c.getFeeders()
 
@@ -201,11 +201,11 @@ class ComponentWrapper(object):
                 err('Unknown type `%s\' of property %s in component %s'
                     % (t, k, name))
             if compprops[k].isMultiple():
-                if not k in config:
-                    config[k] = []
-                config[k].append(val)
+                if not k in config['properties']:
+                    config['properties'][k] = []
+                config['properties'][k].append(val)
             else:
-                config[k] = val
+                config['properties'][k] = val
 
         if 'source' in compprops:
             prop = compprops['source']
@@ -225,10 +225,12 @@ class ComponentWrapper(object):
                 err('Component %s can\'t feed from anything' % name)
             
         for k, v in compprops.items():
-            if v.isRequired() and not k in config:
+            if v.isRequired() and k != 'source' and not k in config['properties']:
                 err('Component %s missing required property `%s\' of type %s'
                     % (name, k, v.getType()))
         self.config = config
+
+        config['feed'] = c.getFeeders()
 
         try:
             entry = c.getEntryByType('component')

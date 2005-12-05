@@ -29,24 +29,20 @@ from flumotion.component import component, feedcomponent
 from flumotion.common.planet import moods
 
 class Jukebox(feedcomponent.FeedComponent):
-    def __init__(self, config):
-        name = config.get('name')
-        self._rate = config.get('rate', 44100)
-        self._channels = config.get('channels', 2)
-        self._playlist = config.get('playlist')
-        self._random = config.get('random', True)
-        self._loops = config.get('loops', -1)
-        feedcomponent.FeedComponent.__init__(self, name,
-                                                    [],
-                                                    ['default'])
-
-    def setup_pipeline(self):
+    def create_pipeline(self):
         try:
             from gst.extend import jukebox
         except ImportError:
             self.error('This component needs at least gst-python 0.8.3')
 
-        self.pipeline = gst.Pipeline(self.name)
+        props = self.config['properties']
+        self._rate = props.get('rate', 44100)
+        self._channels = props.get('channels', 2)
+        self._playlist = props.get('playlist')
+        self._random = props.get('random', True)
+        self._loops = props.get('loops', -1)
+
+        pipeline = gst.Pipeline(self.name)
         picklepath = os.path.join(configure.cachedir, 'jukebox.pck')
         
         if not os.path.exists(self._playlist):
@@ -58,7 +54,8 @@ class Jukebox(feedcomponent.FeedComponent):
             random=self._random, loops=self._loops,
             picklepath=picklepath)
         self.pipeline.add(self._jukebox)
-        feedcomponent.FeedComponent.setup_pipeline(self)
+
+        return pipeline
 
     def start(self, eatersData, feedersData):
         self.debug('Jukebox.start')
@@ -117,7 +114,3 @@ class Jukebox(feedcomponent.FeedComponent):
     def _error_cb(self, source, element, gerror, message):
         self.error("Some jukebox error happened: %r" % gerror)
         self.setMood(moods.sad)
-
-def createComponent(config):
-    component = Jukebox(config)
-    return component

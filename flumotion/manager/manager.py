@@ -243,9 +243,17 @@ class Vishnu(log.Loggable):
             # FIXME: this is terrible, we shouldn't be importing from
             # anything outside of flumotion.common and flumotion.manager...
             from flumotion.job import job
-            # FIXME: don't hardcode createComponent
-            bouncer = job.getComponent(configDict, defs.getSource(),
-                'createComponent')
+            try:
+                entry = defs.getEntryByType('component')
+                # FIXME: use entry.getModuleName() (doesn't work atm?)
+                moduleName = defs.getSource()
+                methodName = entry.getFunction()
+            except KeyError:
+                self.warning('no "component" entry in registry of type %s, %s',
+                             type, 'falling back to createComponent')
+                moduleName = defs.getSource()
+                methodName = "createComponent"
+            bouncer = job.getComponent(configDict, moduleName, methodName)
             self.setBouncer(bouncer)
             self.bouncer.debug('started')
             log.info('manager', "Started manager's bouncer")

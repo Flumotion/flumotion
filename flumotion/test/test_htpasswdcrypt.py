@@ -25,11 +25,13 @@ from twisted.internet import defer
 from flumotion.common import keycards
 from flumotion.component.bouncers import htpasswdcrypt
 
+bouncerconf = {'name': 'testbouncer',
+               'properties': {'data': "user:qi1Lftt0GZC0o"}}
+
 # this is a type that should not be allowed
 class TestHTPasswdCryptKeycard(unittest.TestCase):
     def setUp(self):
-        data = """user:qi1Lftt0GZC0o"""
-        self.bouncer = htpasswdcrypt.HTPasswdCrypt('testbouncer', None, data)
+        self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
 
     def testWrongKeycardClass(self):
         keycard = keycards.Keycard()
@@ -39,8 +41,7 @@ class TestHTPasswdCryptKeycard(unittest.TestCase):
 
 class TestHTPasswdCryptUACPP(unittest.TestCase):
     def setUp(self):
-        data = """user:qi1Lftt0GZC0o"""
-        self.bouncer = htpasswdcrypt.HTPasswdCrypt('testbouncer', None, data)
+        self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
 
     def tearDown(self):
         del self.bouncer
@@ -68,8 +69,7 @@ class TestHTPasswdCryptUACPP(unittest.TestCase):
 
 class TestHTPasswdCryptUACPCC(unittest.TestCase):
     def setUp(self):
-        data = """user:qi1Lftt0GZC0o"""
-        self.bouncer = htpasswdcrypt.HTPasswdCrypt('testbouncer', None, data)
+        self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
 
     def testOk(self):
         # create challenger

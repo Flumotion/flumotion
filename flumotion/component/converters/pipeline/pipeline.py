@@ -24,9 +24,6 @@ __all__ = ['Converter']
 
 class Converter(feedcomponent.ParseLaunchComponent):
     logCategory = 'conv-pipe'
-    def __init__(self, config):
-        name = config['name']
-        eaters = config.get('source', [])
-        pipeline = config['pipeline']
-        feedcomponent.ParseLaunchComponent.__init__(self, name, eaters,
-                                                    ['default'], pipeline)
+
+    def get_pipeline_string(self, properties):
+        return properties['pipeline']

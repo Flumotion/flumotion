@@ -244,24 +244,23 @@ class BaseComponent(log.Loggable, gobject.GObject):
     component_medium_class = BaseComponentMedium
     _heartbeatInterval = configure.heartbeatInterval
     
-    def __init__(self, name):
+    def __init__(self, config):
         # FIXME: name is unique where ? only in flow, so not in worker
         # need to use full path maybe ?
         """
-        @param name: unique name of the component
-        @type name: string
+        @param config: the configuration dictionary for the component
+        @type  config: dict
         """
         gobject.GObject.__init__(self)
 
         self.state = planet.WorkerJobState()
-        self.config = None # a dict
+
+        self.name = None
+        self.setConfig(config)
         
         #self.state.set('name', name)
         self.state.set('mood', moods.sleeping.value)
         self.state.set('pid', os.getpid())
-
-        # FIXME: remove stuff in state
-        self.name = name
 
         self._HeartbeatDC = None
         self.medium = None # the medium connecting us to the manager's avatar
@@ -273,6 +272,11 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.baseTime = time.time()
         self.lastTime = time.time()
         self.lastClock = time.clock()
+
+        self.setup(self.config)
+
+    def setup(self, config):
+        pass
 
     def startHeartbeat(self):
         """
@@ -330,7 +334,11 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.state.set('workerName', workerName)
 
     def setConfig(self, config):
+        if self.name:
+            assert config['name'] == self.name, \
+                   "Can't change name while running"
         self.config = config
+        self.name = config['name']
 
     def getWorkerName(self):
         return self.state.get('workerName')

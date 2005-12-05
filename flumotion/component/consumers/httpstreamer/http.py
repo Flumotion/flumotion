@@ -185,14 +185,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     
     component_medium_class = HTTPMedium
 
-    def __init__(self, config):
-        name = config['name']
-        source = config['source']
+    def get_pipeline_string(self, properties):
+        return self.pipe_template
 
+    def configure_pipeline(self, pipeline, properties):
         reactor.debug = True
-
-        feedcomponent.ParseLaunchComponent.__init__(self, name, source, [],
-                                                    self.pipe_template)
         Stats.__init__(self, sink=self.get_element('sink'))
         self.caps = None
         self.resource = None
@@ -219,11 +216,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                   'consumption-bitrate', 'consumption-totalbytes'):
             self.uiState.addKey(i, None)
 
-        self._post_init(config)
+        self._post_init(properties)
 
-    def _post_init(self, config):
-        self.port = int(config['port'])
-        mountPoint = config.get('mount_point', '')
+    def _post_init(self, properties):
+        self.port = int(properties['port'])
+        mountPoint = properties.get('mount_point', '')
         if mountPoint.startswith('/'):
             mountPoint = mountPoint[1:]
         self.mountPoint = mountPoint
@@ -231,30 +228,29 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # FIXME: tie these together more nicely
         self.resource = resources.HTTPStreamingResource(self)
         
-        if config.has_key('logfile'):
-            file = config['logfile']
+        if properties.has_key('logfile'):
+            file = properties['logfile']
             self.debug('Logging to %s' % file)
             try:
                 self.resource.setLogfile(file)
             except IOError, data:
-                raise errors.ConfigError(
+                raise errors.PropertiesError(
                     'could not open log file %s for writing (%s)' % (
                         file, data[1]))
 
-        self.burst_on_connect = config.get('burst_on_connect', False)
+        self.burst_on_connect = properties.get('burst_on_connect', False)
 
-        if config.has_key('user_limit'):
-            self.resource.setUserLimit(int(config['user_limit']))
+        if properties.has_key('user_limit'):
+            self.resource.setUserLimit(int(properties['user_limit']))
             
-        if config.has_key('bouncer'):
-            self.resource.setBouncerName(config['bouncer'])
+        if properties.has_key('bouncer'):
+            self.resource.setBouncerName(properties['bouncer'])
 
-        if config.has_key('domain'):
-            self.resource.setDomain(config['domain'])
+        if properties.has_key('domain'):
+            self.resource.setDomain(properties['domain'])
 
-        # FIXME: get avatarId out of config, and have it as a real constructor arg
-        if config.has_key('avatarId'):
-            self.resource.setRequesterName(config['avatarId'])
+        if self.config.has_key('avatarId'):
+            self.resource.setRequesterName(self.config['avatarId'])
 
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.name

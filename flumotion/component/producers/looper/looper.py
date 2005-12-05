@@ -31,12 +31,12 @@ class Looper(feedcomponent.ParseLaunchComponent):
 
     component_medium_class = LooperMedium
 
-    def __init__(self, config):
+    def get_pipeline_string(self, properties):
         # setup the properties
-        width = config.get('width', 240)
-        height = config.get('height', int(576 * width/720.))
-        framerate = config.get('framerate', (25, 2))
-        location = config.get('location')
+        width = properties.get('width', 240)
+        height = properties.get('height', int(576 * width/720.))
+        framerate = properties.get('framerate', (25, 2))
+        location = properties.get('location')
 
         vstruct = gst.structure_from_string("video/x-raw-yuv,width=%(width)d,height=%(height)d" %
                                             dict (width=width, height=height))
@@ -44,6 +44,8 @@ class Looper(feedcomponent.ParseLaunchComponent):
 
         vcaps = gst.Caps(vstruct)
         
+        self.initial_seek = False
+
         # create the component
         template = (
             'filesrc location=%(location)s'
@@ -59,12 +61,8 @@ class Looper(feedcomponent.ParseLaunchComponent):
             '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
             '       ! queue ! identity name=aident sync=true silent=true ! @feeder::audio@'
             % dict(location=location, vcaps=vcaps))
-        
-        feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
-                                                    [],
-                                                    ['video', 'audio'],
-                                                    template)
-        self.initial_seek = False
+
+        return template
 
     def _message_cb(self, bus, message):
         if message.src == self.pipeline and message.type == gst.MESSAGE_SEGMENT_DONE:

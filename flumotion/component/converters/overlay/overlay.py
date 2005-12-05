@@ -28,15 +28,7 @@ from flumotion.component.converters.overlay import genimg
 import tempfile
 
 class Overlay(feedcomponent.ParseLaunchComponent):
-    def __init__(self, config):
-        name = config['name']
-        eaters = config['source']
-        eater = '@ eater:%s @' % eaters[0]
-
-        # AYUV conversion got added to ffmpegcolorspace in 0.8.5
-        # alphacolor element works too, but has bugs for non-multiples of 4 or eight
-        alpha = 'ffmpegcolorspace ! alpha'
-
+    def get_pipeline_string(self, properties):
         # due to createComponent entry pointism, we have to import inside our
         # function.  PLEASE MAKE THE PAIN GO AWAY ? <- might not be
         # necessary still
@@ -44,45 +36,48 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         if gst.gst_version < (0,9):
             from flumotion.worker.checks import video
             if video.check_ffmpegcolorspace_AYUV():
+                # AYUV conversion got added to ffmpegcolorspace in 0.8.5
                 alpha = 'ffmpegcolorspace'
             else:
-                log.info('Using gst-plugins older than 0.8.5, consider upgrading if you notice a diagonal green line in your video output.')
-            pipeline = ('filesrc name=source blocksize=100000 ! pngdec '
-                        ' ! alphacolor ! videomixer name=mix '
-                        ' ! @ feeder:: @ %(eater)s ! %(alpha)s ! mix.' % locals())
+                # alphacolor element works too, but has bugs for non-multiples of 4 or eight
+                alpha = 'ffmpegcolorspace ! alpha !'
+                log.info('Using gst-plugins older than 0.8.5, consider '
+                         'upgrading if you notice a diagonal green line '
+                         'in your video output.')
+            pipeline = ('%(alpha)s videomixer name=mix ! @ feeder:: @'
+                        ' filesrc name=source blocksize=100000 ! pngdec '
+                        ' ! alphacolor ! mix.' % {'alpha': alpha})
         else:
-            pipeline = ('filesrc name=source blocksize=100000 ! pngdec '
-                        ' ! alphacolor ! videomixer name=mix '
-                        ' ! @ feeder:: @ %(eater)s ! ffmpegcolorspace ! mix.' % locals())
+            pipeline = ('ffmpegcolorspace ! videomixer name=mix ! @ feeder:: @'
+                        ' filesrc name=source blocksize=100000 ! pngdec '
+                        ' ! alphacolor ! mix.')
         
         self._filename = None
-        self._config = config
 
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    eaters,
-                                                    ['default'],
-                                                    pipeline)
+        return pipeline
 
-    def start(self, eatersData, feedersData):
+    def do_start(self, eatersData, feedersData):
         # create temp file
         (fd, self._filename) = tempfile.mkstemp('flumotion.png')
         os.close(fd)
 
+        props = self.config['properties']
+
         text = None
-        if self._config.get('show_text', False):
-            text = self._config.get('text', 'set the "text" property')
+        if props.get('show_text', False):
+            text = props.get('text', 'set the "text" property')
         genimg.generate_overlay(self._filename,
                                 text,
-                                self._config.get('fluendo_logo', False),
-                                self._config.get('cc_logo', False),
-                                self._config.get('xiph_logo', False),
-                                self._config['width'],
-                                self._config['height'])
+                                props.get('fluendo_logo', False),
+                                props.get('cc_logo', False),
+                                props.get('xiph_logo', False),
+                                props['width'],
+                                props['height'])
         
         source = self.get_element('source')
         source.set_property('location', self._filename)
 
-        return feedcomponent.ParseLaunchComponent.start(self,
+        return feedcomponent.ParseLaunchComponent.do_start(self,
             eatersData, feedersData)
 
     def stop(self):

@@ -248,16 +248,18 @@ class TestConfig(unittest.TestCase):
         flow = planet.flows[0]
         component = flow.components['component-name']
         conf = component.getConfigDict()
-        self.assertEquals(conf.get('one'), 'string')
-        self.assertEquals(conf.get('two'), 1)
-        self.assertEquals(conf.get('three'), 2.5)
-        custom = conf.get('four')
+        props = conf.get('properties')
+        self.failUnless(isinstance(props, dict))
+        self.assertEquals(props.get('one'), 'string')
+        self.assertEquals(props.get('two'), 1)
+        self.assertEquals(props.get('three'), 2.5)
+        custom = props.get('four')
         self.failUnless(custom)
         self.assertEquals(getattr(custom, 'data', None), 'value')
         self.assertEquals(getattr(custom, 'attr', None), 'attr-value')
-        self.failUnless(conf.get('five'))
-        self.assertEquals(conf.get('six'), 3981391981389138998131389L)
-        self.assertEquals(conf.get('seven'), (30000, 1001))
+        self.failUnless(props.get('five'))
+        self.assertEquals(props.get('six'), 3981391981389138998131389L)
+        self.assertEquals(props.get('seven'), (30000, 1001))
 
     def testGetComponentEntries(self):
         conf = config.FlumotionConfigXML(None,

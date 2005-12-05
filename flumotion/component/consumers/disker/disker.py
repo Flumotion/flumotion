@@ -64,27 +64,22 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     # signal for changed filename which medium connects to
     gsignal('filename-changed', str)
 
-    def __init__(self, config):
-        name = config['name']
-        source = config['source']
-        directory = config['directory']
+    def get_pipeline_string(self, properties):
+        directory = properties['directory']
     
         self.file_fd = None
         self.directory = directory
         self.location = None
         self.caps = None
 
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    source,
-                                                    [],
-                                                    self.pipe_template)
-
-        rotateType = config['rotateType']
+        rotateType = properties['rotateType']
         if rotateType == 'size':
-            self.setSizeRotate(config['size'])
+            self.setSizeRotate(properties['size'])
         elif rotateType == 'time':
-            self.setTimeRotate(config['time'])
-        
+            self.setTimeRotate(properties['time'])
+
+        return self.pipe_template
+
     def setTimeRotate(self, time):
         reactor.callLater(time, self._rotateTimeCallback, time)
 

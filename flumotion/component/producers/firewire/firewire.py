@@ -25,12 +25,12 @@ from flumotion.component import feedcomponent
 # See comments in gstdvdec.c for details on the dv format.
 
 class Firewire(feedcomponent.ParseLaunchComponent):
-    def __init__(self, config):
-        width = config.get('width', 240)
-        height = config.get('height', int(576 * width/720.)) # assuming PAL :-/
-        scaled_width = config.get('scaled_width', width)
-        is_square = config.get('is_square', False)
-        framerate = config.get('framerate', (30, 2))
+    def get_pipeline_string(self, props):
+        width = props.get('width', 240)
+        height = props.get('height', int(576 * width/720.)) # assuming PAL :-/
+        scaled_width = props.get('scaled_width', width)
+        is_square = props.get('is_square', False)
+        framerate = props.get('framerate', (30, 2))
         framerate_float = float(framerate[0]) / framerate[1]
 
         scale_correction = width - scaled_width
@@ -106,15 +106,13 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                                sw=scaled_width, h=height,
                                fr=('%d/%d' % (framerate[0], framerate[1]))))
     
-        feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
-                                                    [],
-                                                    ['video', 'audio'],
-                                                    template)
+        return template
 
-        self.volume = self.get_pipeline().get_by_name("setvolume")
+    def configure_pipeline(self, pipeline, properties):
+        self.volume = pipeline.get_by_name("setvolume")
         if gst.gst_version < (0,9):
             from flumotion.component.effects.volume import volume
-            comp_level = self.get_pipeline().get_by_name('volumelevel')
+            comp_level = pipeline.get_by_name('volumelevel')
             vol = volume.Volume('inputVolume', comp_level)
             self.addEffect(vol)
 

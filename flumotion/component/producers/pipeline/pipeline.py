@@ -24,6 +24,5 @@ __all__ = ['Producer']
 
 class Producer(feedcomponent.ParseLaunchComponent):
     logCategory = 'prod-pipe'
-    def __init__(self, config):
-        feedcomponent.ParseLaunchComponent.__init__(self, config['name'], [],
-            ['default'], config['pipeline'])
+    def get_pipeline_string(self, properties):
+        return properties['pipeline']

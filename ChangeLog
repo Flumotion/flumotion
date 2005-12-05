@@ -1,5 +1,79 @@
 2005-12-05  Andy Wingo  <wingo@pobox.com>
 
+	* All components: adapted for new init protocol.
+
+	* flumotion/manager/manager.py (Vishnu.loadConfiguration): Try to
+	get the bouncer's entry point from the registry.
+
+	* flumotion/component/feedcomponent.py
+	(ParseLaunchComponent.create_pipeline): Implement the init
+	protocol via calling get_pipeline_string, then creating a pipeline
+	from that.
+	(ParseLaunchComponent.set_pipeline): After chaining to the parent,
+	call self.configure_pipeline to give subclasses a look at the
+	pipeline.
+	(ParseLaunchComponent.get_pipeline_string): New vmethod, to be
+	implemented by subclasses.
+	(ParseLaunchComponent.configure_pipeline): New vmethod.
+	Implementation optional.
+
+	* flumotion/component/component.py (BaseComponent.__init__):
+	Implement the base of the initialization protocol via calling
+	setConfig and setup; take a config dict as an arg so this can be
+	an entry point.
+	(BaseComponent.setup): Default setup implementation, does nothing.
+	(BaseComponent.setConfig): Default setConfig implementation, sets
+	self.config and self.name.
+
+	* flumotion/component/feedcomponent09.py (FeedComponent.setup) 
+	* flumotion/component/feedcomponent08.py (FeedComponent.setup):
+	Implement the new initialization protocol. Was __init__.
+	
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.set_pipeline)
+	* flumotion/component/feedcomponent08.py
+	(FeedComponent.set_pipeline): Implement set_pipeline, calls
+	setup_pipeline.
+
+	* flumotion/component/bouncers/htpasswdcrypt.xml: entry =
+	HTPasswdCrypt.
+
+	* flumotion/component/bouncers/htpasswdcrypt.py
+	(HTPasswdCrypt.setup): Fold createComponent into here, allow
+	BaseComponent.__init__ to be the entry point. Adapt to properties
+	as a subdict of config.
+
+	* flumotion/component/bouncers/bouncer.py (Bouncer.setup): Update
+	to the new initialization protocol.
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseComponent):
+	Put properties in config['properties']. The XML representation for
+	now is the same though.
+
+	* flumotion/launch/main.py (ComponentWrapper.__init__): Put
+	properties in config['properties'], not config itself. Set
+	config['feed'] from the registry, and ignore missing
+	config['properties]['source'] for now, it's in config['source'] --
+	components shouldn't have 'source' as a property anyway.
+
+	* flumotion/test/test_config.py (TestConfig.testParseProperties):
+	Update for properties being in a subdict of config.
+
+	* flumotion/test/test_component.py (PipelineTest): Adapt to new
+	__init__ args. Override the pipeline creation parts of the init
+	protocol so that we don't try to gst.parse_launch with made-up
+	names.
+	(TestParser.testErrors): Don't skip this one; it passes here.
+	(pipelineFactory): Update so that PipelineTest gets the right
+	pipeline.
+
+	* flumotion/test/test_htpasswdcrypt.py
+	(TestHTPasswdCryptKeycard.setUp)
+	(TestHTPasswdCryptUACPP.setUp, TestHTPasswdCryptUACPCC.setUp):
+	* flumotion/test/test_pb.py (Test_FPBClientFactory.setUp) 
+	(Test_BouncerWrapper.setUp): Update for bouncer initialization
+	changes.
+
 	* flumotion/wizard/steps.py (TestAudioSource.worker_changed):
 	Check for audiotestsrc when working with 0.10.
 

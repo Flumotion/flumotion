@@ -32,20 +32,18 @@ __all__ = ['BTTV']
 
 class BTTV(feedcomponent.ParseLaunchComponent):
 
-    def __init__(self, config):
-        device = config['device']
-        width = config.get('width', 320)
-        height = config.get('height', 240)
-        channel = config['channel']
-        norm = config['signal']
+    def get_pipeline_string(self, properties):
+        device = properties['device']
+        width = properties.get('width', 320)
+        height = properties.get('height', 240)
 
         # This needs to be done properly
         device_width = width
         device_height = height
-        #device_width = config['device-width']
-        #device_height = config['device-height']
+        #device_width = properties['device-width']
+        #device_height = properties['device-height']
 
-        framerate = config.get('framerate', (25, 1))
+        framerate = properties.get('framerate', (25, 1))
         if gst.gst_version < (0,9):
             framerate_string = '%f' % (float(framerate[0]) / framerate[1])
         else:
@@ -59,25 +57,23 @@ class BTTV(feedcomponent.ParseLaunchComponent):
                                                        device_height,
                                                        width, height,
                                                        framerate_string)
-        config['pipeline'] = pipeline
+        return pipeline
 
-        feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
-                                                    [],
-                                                    ['default'],
-                                                    pipeline)
-
+    def configure_pipeline(self, pipeline, properties):
         # create and add colorbalance effect
-        source = self.get_pipeline().get_by_name('source')
-        hue = config.get('hue', None)
-        saturation = config.get('saturation', None)
-        brightness = config.get('brightness', None)
-        contrast = config.get('contrast', None)
+        source = pipeline.get_by_name('source')
+        hue = properties.get('hue', None)
+        saturation = properties.get('saturation', None)
+        brightness = properties.get('brightness', None)
+        contrast = properties.get('contrast', None)
         cb = colorbalance.Colorbalance('outputColorbalance', source,
             hue, saturation, brightness, contrast)
         self.addEffect(cb)
 
         # register state change notify to set channel and norm
-        element = self.get_pipeline().get_by_name('source')
+        element = pipeline.get_by_name('source')
+        channel = properties['channel']
+        norm = properties['signal']
         element.connect('state-change', self.state_changed_cb, channel, norm)
 
     # called to set initial channel and norm from NULL->READY

@@ -27,17 +27,34 @@ from twisted.trial import unittest
 from flumotion.component.feedcomponent import ParseLaunchComponent
 
 class PipelineTest(ParseLaunchComponent):
-    def __init__(self, eater_config, feeder_config):
-        self.__gobject_init__()
-        self.name = 'fake'
-        self.remote = None
+    def __init__(self, eaters=None, feeders=None, pipeline='test-pipeline'):
+        config = {'name': 'fake',
+                  'source': eaters or [],
+                  'feed': feeders or [],
+                  'properties': {}}
 
-        self.parseEaterConfig(eater_config)
-        self.parseFeederConfig(feeder_config)
+        self.__pipeline = pipeline
+
+        ParseLaunchComponent.__init__(self, config)
+
+    def create_pipeline(self):
+        unparsed = self.__pipeline
+        self.pipeline_string = self.parse_pipeline(unparsed)
+
+        try:
+            # don't bother creating a gstreamer pipeline
+            # pipeline = gst.parse_launch(self.pipeline_string)
+            return None
+        except gobject.GError, e:
+            self.warning('Could not parse pipeline: %s' % e.message)
+            raise errors.PipelineParseError(e.message)
+
+    def set_pipeline(self, pipeline):
+        self.pipeline = pipeline
         
-def pipelineFactory(pipeline, eater_config=[], feeder_config=[]):
-    p = PipelineTest(eater_config, feeder_config)
-    return p.parse_pipeline(pipeline)
+def pipelineFactory(pipeline, eaters=None, feeders=None):
+    t = PipelineTest(pipeline=pipeline, eaters=eaters, feeders=feeders)
+    return t.parse_pipeline(pipeline)
 
 EATER = ParseLaunchComponent.EATER_TMPL
 FEEDER = ParseLaunchComponent.FEEDER_TMPL
@@ -171,7 +188,6 @@ class TestParser(unittest.TestCase):
 
     def testErrors(self):
         self.assertRaises(TypeError, pipelineFactory, '')
-    testErrors.skip = "Empty pipeline should raise TypeError"
     
 if __name__ == '__main__':
     unittest.main()

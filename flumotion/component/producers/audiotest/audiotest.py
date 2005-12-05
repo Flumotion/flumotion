@@ -22,9 +22,9 @@ import gst
 from flumotion.component import feedcomponent
 
 class AudioTest(feedcomponent.ParseLaunchComponent):
-    def __init__(self, config):
-        rate = config.get('rate', 8000)
-        volume = config.get('volume', 1.0)
+    def get_pipeline_string(self, properties):
+        rate = properties.get('rate', 8000)
+        volume = properties.get('volume', 1.0)
 
         if gst.gst_version < (0,9):
             is_live = 'sync=true'
@@ -33,14 +33,10 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
             is_live = 'is-live=true'
             source = 'audiotestsrc'
 
-        pipeline = ('%s name=source %s ! audio/x-raw-int,rate=%d ! volume volume=%f'
-                    % (source, is_live, rate, volume))
+        return ('%s name=source %s ! audio/x-raw-int,rate=%d ! volume volume=%f'
+                % (source, is_live, rate, volume))
 
-        feedcomponent.ParseLaunchComponent.__init__(self, config['name'],
-                                                    [],
-                                                    ['default'],
-                                                    pipeline)
-
+    def configure_pipeline(self, pipeline, properties):
         element = self.get_element('source')
-        if config.has_key('freq'):
-            element.set_property('freq', config['freq'])
+        if properties.has_key('freq'):
+            element.set_property('freq', properties['freq'])

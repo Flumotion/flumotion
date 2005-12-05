@@ -24,15 +24,7 @@ from flumotion.common import log, compat
 __all__ = ['Preview']
 
 class Preview(feedcomponent.ParseLaunchComponent, log.Loggable):
-    pipe_template = 'decodebin ! ffmpegcolorspace ! xvimagesink'
-
-    def __init__(self, config):
-        name = config['name']
-        source = config['source']
-
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    source,
-                                                    [],
-                                                    self.pipe_template)
+    def get_pipeline_string(self, properties):
+        return 'decodebin ! ffmpegcolorspace ! xvimagesink'
 
 compat.type_register(Preview)

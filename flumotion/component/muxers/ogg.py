@@ -23,9 +23,8 @@ import gst
 from flumotion.component import feedcomponent
 
 class Ogg(feedcomponent.ParseLaunchComponent):
-    def __init__(self, config):
-        name = config['name']
-        sources = config['source']
+    def get_pipeline_string(self, properties):
+        sources = self.config['source']
 
         maxDelay = 500 * 1000 * 1000
         maxPageDelay = 500 * 1000 * 1000
@@ -41,7 +40,4 @@ class Ogg(feedcomponent.ParseLaunchComponent):
                 
         pipeline += 'muxer.'
         
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    sources,
-                                                    ['default'],
-                                                    pipeline)
+        return pipeline

@@ -35,6 +35,9 @@ from flumotion.twisted import portal as fportal
 from flumotion.common import keycards, log
 from flumotion.component.bouncers import htpasswdcrypt
 
+bouncerconf = {'name': 'testbouncer',
+               'properties': {'data': "user:qi1Lftt0GZC0o"}}
+
 ### lots of fake objects to have fun with
 
 class FakePortalWrapperPlaintext:
@@ -115,10 +118,9 @@ class TestTwisted_PortalAuthChallenger(unittest.TestCase):
 ### SHINY NEW FPB
 class Test_BouncerWrapper(unittest.TestCase):
     def setUp(self):
-        data = """user:qi1Lftt0GZC0o"""
         broker = FakeBroker()
 
-        self.bouncer = htpasswdcrypt.HTPasswdCrypt('testbouncer', None, data)
+        self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
         self.bouncerPortal = fportal.BouncerPortal(FakeRealm(), self.bouncer)
         self.wrapper = pb._BouncerWrapper(self.bouncerPortal, broker)
         
@@ -212,9 +214,8 @@ class Test_FPortalRoot(unittest.TestCase):
 # time for the big kahuna
 class Test_FPBClientFactory(unittest.TestCase):
     def setUp(self):
-        data = """user:qi1Lftt0GZC0o"""
         self.realm = FakeRealm()
-        self.bouncer = htpasswdcrypt.HTPasswdCrypt('testbouncer', None, data)
+        self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
         self.portal = fportal.BouncerPortal(self.realm, self.bouncer)
         unsafeTracebacks = 1
         self.factory = tpb.PBServerFactory(self.portal, unsafeTracebacks=1)

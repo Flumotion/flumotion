@@ -23,9 +23,8 @@ import gst
 from flumotion.component import feedcomponent
 
 class Multipart(feedcomponent.ParseLaunchComponent):
-    def __init__(self, config):
-        name = config ['name']
-        sources = config['source']
+    def get_pipeline_string(self, properties):
+        sources = self.config['source']
 
         pipeline = 'multipartmux name=muxer '
         for eater in sources:
@@ -37,7 +36,4 @@ class Multipart(feedcomponent.ParseLaunchComponent):
 
         pipeline += 'muxer.'
 
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    sources,
-                                                    ['default'],
-                                                    pipeline)
+        return pipeline

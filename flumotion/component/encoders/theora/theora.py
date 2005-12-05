@@ -21,30 +21,24 @@
 from flumotion.component import feedcomponent
 
 class Theora(feedcomponent.ParseLaunchComponent):
-    def __init__(self, config):
-        name = config['name']
-        eaters = config['source']
-        pipeline = "ffmpegcolorspace ! theoraenc name=encoder"
-    
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    eaters,
-                                                    ['default'],
-                                                    pipeline)
+    def get_pipeline_string(self, properties):
+        return "ffmpegcolorspace ! theoraenc name=encoder"
 
-        element = self.pipeline.get_by_name('encoder')
+    def configure_pipeline(self, pipeline, properties):
+        element = pipeline.get_by_name('encoder')
 
-        properties = ('bitrate',
-                      'quality',
-                      'keyframe-threshold',
-                      'keyframe-mindistance', 
-                      ('quick-compress', 'quick'),
-                      ('keyframe-maxdistance', 'keyframe-freq'),
-                      ('keyframe-maxdistance', 'keyframe-force'),
-                      'noise-sensitivity')
+        props = ('bitrate',
+                 'quality',
+                 'keyframe-threshold',
+                 'keyframe-mindistance', 
+                 ('quick-compress', 'quick'),
+                 ('keyframe-maxdistance', 'keyframe-freq'),
+                 ('keyframe-maxdistance', 'keyframe-force'),
+                 'noise-sensitivity')
 
-        for p in properties:
-            cproperty = isinstance(p, tuple) and p[0] or p
+        for p in props:
+            pproperty = isinstance(p, tuple) and p[0] or p
             eproperty = isinstance(p, tuple) and p[1] or p
 
-            if cproperty in config:
-                element.set_property(eproperty, config[cproperty])
+            if pproperty in properties:
+                element.set_property(eproperty, properties[pproperty])

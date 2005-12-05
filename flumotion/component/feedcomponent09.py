@@ -45,17 +45,18 @@ class FeedComponent(basecomponent.BaseComponent):
 
     _reconnectInterval = 3
     
-    def __init__(self, name, eater_config, feeder_config):
+    def setup(self, config):
         """
-        @param name: name of the component
-        @type  name: string
-        @param eater_config: entries between <source>...</source> from config
-        @param feeder_config: entries between <feed>...</feed> from config
+        @param config: the configuration dictionary of the component
+        @type  config: dict
         """
-        basecomponent.BaseComponent.__init__(self, name)
+        basecomponent.BaseComponent.setup(self, config)
 
-        self.debug("feedcomponent.__init__: eater_config %r" % eater_config)
-        self.debug("feedcomponent.__init__: feeder_config %r" % feeder_config)
+        eater_config = config.get('source', [])
+        feeder_config = config.get('feed', [])
+
+        self.debug("feedcomponent.setup(): eater_config %r" % eater_config)
+        self.debug("feedcomponent.setup(): feeder_config %r" % feeder_config)
         
         self.feed_ports = {} # feed_name -> port mapping
         self.pipeline = None
@@ -84,12 +85,13 @@ class FeedComponent(basecomponent.BaseComponent):
         self.feeder_names = []
         self.parseFeederConfig(feeder_config)
         self.feedersWaiting = len(self.feeder_names)
-        self.debug('__init__ with %d eaters and %d feeders waiting' % (
+        self.debug('setup() with %d eaters and %d feeders waiting' % (
             self.eatersWaiting, self.feedersWaiting))
 
-        # FIXME: maybe this should move to a callLater ?
-        self.setup_pipeline()
-        self.debug('__init__ finished')
+        pipeline = self.create_pipeline()
+        self.set_pipeline(pipeline)
+
+        self.debug('setup() finished')
 
     def addEffect(self, effect):
         self.effects[effect.name] = effect
@@ -163,6 +165,10 @@ class FeedComponent(basecomponent.BaseComponent):
 
     def create_pipeline(self):
         raise NotImplementedError, "subclass must implement create_pipeline"
+        
+    def set_pipeline(self, pipeline):
+        self.pipeline = pipeline
+        self.setup_pipeline()
         
     def bus_watch_func(self, bus, message):
         t = message.type

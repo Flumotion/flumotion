@@ -39,7 +39,7 @@ class Vorbis(feedcomponent.FeedComponent):
         feedcomponent.FeedComponent.__init__(self, name, eaters, ['default'])
     
     ### FeedComponent methods
-    def setup_pipeline(self):
+    def create_pipeline(self):
         # create the initial pipeline; called during __init__
         # is responsible for creating self.pipeline
         eater_names = self.get_eater_names()
@@ -58,7 +58,7 @@ class Vorbis(feedcomponent.FeedComponent):
         # create element's eater ! audioscale
         # the rest we create once we have the caps
 
-        self.pipeline = gst.Pipeline(self.name)
+        pipeline = gst.Pipeline(self.name)
         # FIXME: when our eaters become more than one element, this will
         # parse into a pipeline instead, so at that point we need bins
         # and search for unconnected pads to use
@@ -70,7 +70,7 @@ class Vorbis(feedcomponent.FeedComponent):
         fake_element = gst.element_factory_make("fakesink", "fakesink")
         fake_element.set_property("silent", True)
 
-        self.pipeline.add_many(eater_element, wc_element, as_element,
+        pipeline.add_many(eater_element, wc_element, as_element,
             fake_element)
         eater_element.link(wc_element)
         wc_element.link(as_element)
@@ -83,7 +83,7 @@ class Vorbis(feedcomponent.FeedComponent):
         self.have_caps_handler = as_pad.connect_after('notify::caps', 
             self.have_caps)
 
-        feedcomponent.FeedComponent.setup_pipeline(self)
+        return pipeline
 
     ### BaseComponent methods
     def start(self, eatersData, feedersData):

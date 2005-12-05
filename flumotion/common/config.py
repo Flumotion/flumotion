@@ -202,46 +202,52 @@ class FlumotionConfigXML(log.Loggable):
         if node.hasAttribute('worker'):
             worker = str(node.getAttribute('worker'))
 
+        config = { 'name': name,
+                   'parent': parent,
+                   'type': type }
+
         try:
             defs = registry.getRegistry().getComponent(type)
         except KeyError:
             raise errors.UnknownComponentError(
                 "unknown component type: %s" % type)
         
+        # FIXME: 'feed' can come directly from the registry; dunno about
+        # 'source'
+
+        feeds = self._parseFeeds(node, defs)
+        if feeds:
+            if defs.getFeeders():
+                config['feed'] = feeds
+            else:
+                self.warning('Feeds specified for component %s, but '
+                             'none possible: %r' % (name, feeds))
+
+        sources = self._parseSources(node, defs)
+        if sources:
+            config['source'] = sources
+
         properties = defs.getProperties()
 
         self.debug('Parsing component: %s' % name)
-        options = self._parseProperties(node, type, properties)
+        config['properties'] = self._parseProperties(node, type, properties)
 
-        feeds = self._parseFeeds(node, defs)
-        sources = self._parseSources(node, defs)
-
-        # FIXME: this shouldn't be necessary in the future
-        if feeds:
-            options['feed'] = feeds
-        if sources:
-            options['source'] = sources
-
+        # verification
         feeders = defs.getFeeders()
         if feeders:
-            if not 'feed' in options:
+            if not 'feed' in config:
                 # assert that the old code works the way it should; when
                 # we stop writing <feed> entries this can go
                 raise ConfigError("no <feed> entries for component %s", name)
         for feeder in feeders:
-            if not feeder in options['feed']:
+            if not feeder in config['feed']:
                 # assert that the old code works the way it should; when
                 # we stop writing <feed> entries this can go
                 raise ConfigError("component %s missing <feed> entry for %s",
                     name, feeder)
 
-        # FIXME: 'name', 'parent', 'type', 'feed', and 'source' should
-        # be in a different namespace from the other properties
-        config = { 'name': name,
-                   'parent': parent,
-                   'type': type }
-        config.update(options)
-
+        # fixme: all of the information except the worker is in the
+        # config dict: why?
         return ConfigEntryComponent(name, parent, type, config, defs, worker)
 
     def _parseFlow(self, node):

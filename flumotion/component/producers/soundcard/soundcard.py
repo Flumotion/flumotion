@@ -26,13 +26,12 @@ from flumotion.component.effects.volume import volume
 
     
 class Soundcard(feedcomponent.ParseLaunchComponent):
-    def __init__(self, config):
-        element = config['source-element']
-        device =  config['device']
-        rate = config.get('rate', 22050)
-        depth = config.get('depth', 16)
-        channels = config.get('channels', 1)
-        name = config['name']
+    def get_pipeline_string(self, properties):
+        element = properties['source-element']
+        device =  properties['device']
+        rate = properties.get('rate', 22050)
+        depth = properties.get('depth', 16)
+        channels = properties.get('channels', 1)
 
         # FIXME: why do we not connect to state_changed_cb so correct
         # soundcard input is used?
@@ -48,14 +47,12 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
             caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d' % (rate, depth, channels)
             pipeline = '%s device=%s ! %s ! level name=volumelevel message=true' % (element, device, caps)
 
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    [],
-                                                    ['default'],
-                                                    pipeline)
+        return pipeline
 
+    def configure_pipeline(self, pipeline, properties):
         # add volume effect
         if gst.gst_version < (0,9):
-            comp_level = self.get_pipeline().get_by_name('volumelevel')
+            comp_level = pipeline.get_by_name('volumelevel')
             vol = volume.Volume('inputVolume', comp_level)
             self.addEffect(vol)
 

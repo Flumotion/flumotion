@@ -140,22 +140,37 @@ class ParseLaunchComponent(FeedComponent):
 
     DELIMETER = '@'
 
-    def __init__(self, name, eaters, feeders, pipeline_string=''):
-        self.pipeline_string = pipeline_string
-        FeedComponent.__init__(self, name, eaters, feeders)
-
     ### FeedComponent methods
-    def setup_pipeline(self):
-        pipeline = self.parse_pipeline(self.pipeline_string)
-        self.pipeline_string = pipeline
+    def create_pipeline(self):
+        unparsed = self.get_pipeline_string(self.config['properties'])
+        self.pipeline_string = self.parse_pipeline(unparsed)
+
         try:
-            self.pipeline = gst.parse_launch(pipeline)
+            pipeline = gst.parse_launch(self.pipeline_string)
+            return pipeline
         except gobject.GError, e:
             self.warning('Could not parse pipeline: %s' % e.message)
             raise errors.PipelineParseError(e.message)
-        FeedComponent.setup_pipeline(self)
+
+    def set_pipeline(self, pipeline):
+        FeedComponent.set_pipeline(self, pipeline)
+        self.configure_pipeline(self.pipeline, self.config['properties'])
 
     ### ParseLaunchComponent methods
+    def get_pipeline_string(self, properties):
+        """
+        Method that must be implemented by subclasses to produce the
+        gstparse string for the component's pipeline. Subclasses should
+        not chain up; this method raises a NotImplemented error.
+
+        Returns: a new pipeline string representation.
+        """
+        raise NotImplementedError('subclasses should implement '
+                                  'get_pipeline_string')
+        
+    def configure_pipeline(self, pipeline, properties):
+        pass
+
     def _expandElementName(self, block):
         """
         Expand the given string to a full element name for an eater or feeder.
@@ -232,7 +247,7 @@ class ParseLaunchComponent(FeedComponent):
                 pipeline = format % {'tmpl': named, 'pipeline': pipeline}
         else:
             for part in names:
-                part_name = deli + part + deli
+                part_name = deli + part + deli # mmm, deli sandwich
                 if pipeline.find(part_name) == -1:
                     raise TypeError, "%s needs to be specified in the pipeline '%s'" % (part_name, pipeline)
             

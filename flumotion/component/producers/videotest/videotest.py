@@ -39,8 +39,8 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
 
     component_medium_class = VideoTestMedium
     
-    def __init__(self, config):
-        format = config.get('format', 'video/x-raw-yuv')
+    def get_pipeline_string(self, properties):
+        format = properties.get('format', 'video/x-raw-yuv')
 
         if format == 'video/x-raw-yuv':
             format = '%s,format=(fourcc)I420' % format
@@ -48,11 +48,11 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
         # Filtered caps
         struct = gst.structure_from_string(format)
         for k in 'width', 'height':
-            if k in config:
-                struct[k] = config[k]
+            if k in properties:
+                struct[k] = properties[k]
 
-        if 'framerate' in config:
-            framerate = config['framerate']
+        if 'framerate' in properties:
+            framerate = properties['framerate']
             if gst.gst_version < (0,9):
                 struct['framerate'] = float(framerate[0]) / framerate[1]
             else:
@@ -68,16 +68,11 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
         else:
             is_live = 'is-live=true'
 
-        name = config['name']
-        pipeline = 'videotestsrc %s name=source ! %s' % (is_live, caps)
-
-        feedcomponent.ParseLaunchComponent.__init__(self, name,
-                                                    [],
-                                                    ['default'],
-                                                    pipeline)
+        return 'videotestsrc %s name=source ! %s' % (is_live, caps)
         
-        # Set properties
+    # Set properties
+    def configure_pipeline(self, pipeline, properties):
         source = self.get_element('source')
-        if 'pattern' in config:
-            source.set_property('pattern', config['pattern'])
+        if 'pattern' in properties:
+            source.set_property('pattern', properties['pattern'])
 
