@@ -656,7 +656,10 @@ class TestAudioSource(WizardStep):
     icon = 'soundcard.png'
     
     def worker_changed(self):
-        self.wizard.require_elements(self.worker, 'sinesrc')
+        if gst.gst_version < (0,9):
+            self.wizard.require_elements(self.worker, 'sinesrc')
+        else:
+            self.wizard.require_elements(self.worker, 'audiotestsrc')
 
     def before_show(self):
         self.combobox_samplerate.set_enum(AudioTestSamplerate)
