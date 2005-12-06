@@ -216,6 +216,22 @@ class RegistryEntryEntry:
     def getFunction(self):
         return self.function
     
+class RegistryEntryEater:
+    "This class represents a <eater> entry in the registry"
+    def __init__(self, name, required=True, multiple=False):
+        self.name = name
+        self.required = required
+        self.multiple = multiple
+
+    def getName(self):
+        return self.name
+
+    def getRequired(self):
+        return self.required
+
+    def getMultiple(self):
+        return self.multiple
+    
 class XmlParserError(Exception):
     "Error during parsing of XML."
 
@@ -438,11 +454,20 @@ class RegistryParser(log.Loggable):
         return entries
 
     def _parseEater(self, node):
-        # <eater name="..."/>
+        # <eater name="..." [required="yes/no"] [multiple="yes/no"]/>
         if not node.hasAttribute('name'):
             raise XmlParserError("<eater> must have a name attribute")
+        name = str(node.getAttribute('name'))
 
-        return str(node.getAttribute('name'))
+        required = True
+        if node.hasAttribute('required'):
+            required = _istrue(node.getAttribute('required'))
+        
+        multiple = False
+        if node.hasAttribute('multiple'):
+            multiple = _istrue(node.getAttribute('multiple'))
+
+        return RegistryEntryEater(name, required, multiple)
 
     def _parseFeeder(self, node):
         # <feeder name="..."/>
@@ -873,7 +898,9 @@ class ComponentRegistry(log.Loggable):
 
             w(6, '<source location="%s"/>' % component.getSource())
             for x in component.getEaters():
-                w(6, '<eater name="%s"/>' % x)
+                w(6, '<eater name="%s" required="%s" multiple="%s"/>'
+                  % (x.getName(), x.getRequired() and "yes" or "no",
+                     x.getMultiple() and "yes" or "no"))
             for x in component.getFeeders():
                 w(6, '<feeder name="%s"/>' % x)
             w(6, '<properties>')

@@ -7,7 +7,6 @@
       <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
-        <property name="source" type="string" multiple="no"/>
         <property name="qmin" type="int"/>
         <property name="qmax" type="int"/>
         <property name="threshold" type="int"/>
@@ -21,7 +20,6 @@
       <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
-        <property name="source" type="string" multiple="no"/>
         <property name="bitrate" type="int"/>
       </properties>
     </component>
@@ -32,7 +30,6 @@
       <feeder name="default"/>
       <properties>
         <property name="feed" type="string" multiple="yes"/>
-        <property name="source" type="string" multiple="no"/>
       </properties>
     </component>
   

@@ -3,23 +3,23 @@
   <flow name="testflow">
     <component name="producer-video-test" type="pipeline-producer">
       <feed>default</feed>
-      <pipeline>
+      <property name="pipeline">
   videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
-      </pipeline>
+      </property>
     </component>
   
     <component name="converter-ogg-theora" type="pipeline-converter">
       <feed>default</feed>
       <source>producer-video-test</source>
-      <pipeline>
+      <property name="pipeline">
   ffmpegcolorspace ! theoraenc keyframe-force=5 ! oggmux
-      </pipeline>
+      </property>
     </component>
   
     <component name="streamer-ogg-theora" type="http-streamer" worker="streamer">
       <source>converter-ogg-theora</source>
-      <port>8800</port>
-      <logfile>/tmp/ogg-test-theora.access.log</logfile>
+      <property name="port">8800</property>
+      <property name="logfile">/tmp/ogg-test-theora.access.log</property>
     </component>
   </flow>
 

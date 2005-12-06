@@ -1,3 +1,56 @@
+2005-12-06  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/launch/inspect.py (main): Print out required/multiple
+	attributes of eaters.
+
+	* flumotion/launch/main.py (ComponentWrapper.__init__): Update for
+	eater registry changes, removal of 'source' property.
+
+	* flumotion/component/muxers/muxers.xml: Remove "source"
+	properties, set multiple=yes on the feeders.
+
+	* flumotion/component/encoders/encoders.xml: 
+	* flumotion/component/encoders/jpeg/jpeg.xml: 
+	* flumotion/component/encoders/mulaw/mulaw.xml: 
+	* flumotion/component/encoders/smoke/smoke.xml: 
+	* flumotion/component/encoders/speex/speex.xml: 
+	* flumotion/component/encoders/theora/theora.xml: 
+	* flumotion/component/encoders/vorbis/vorbis.xml: 
+	* flumotion/component/converters/overlay/overlay.xml: 
+	* flumotion/component/consumers/disker/disker.xml: 
+	* flumotion/component/consumers/httpstreamer/http.xml: 
+	* flumotion/component/consumers/preview/preview.xml: Remove
+	"source" properties.
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseSources):
+	Check multiple/required sources against the registry. Removes the
+	need to have "source" properties in components.
+
+	* flumotion/common/registry.py (RegistryEntryEater): New class, to
+	store an <eater> node inside a <component>. This is because we
+	need to know if some eaters can have multiple feeders, and if some
+	eaters are required.
+	(RegistryParser._parseEater): Parse the eater as a
+	RegistryEntryEater.
+	(ComponentRegistry.dump): Update to write out <eater> entries
+	properly.
+
+	* flumotion/test/test.xml:
+	* flumotion/test/test_config.py (TestConfig.testParseProperties):
+	Update for new syntax.
+
+	* flumotion/common/config.py
+	(FlumotionConfigXML._parseProperties): Parse the new property
+	format. As a bonus, checks that properties actually exist in the
+	registry.
+	(FlumotionConfigXML._parseComponent): Validate that there are only
+	'feed', 'source', and 'property' subnodes in <component> nodes.
+
+	* flumotion/wizard/save.py (Component.toXML): Instead of putting
+	properties in their own nodes ("<foo>bar</foo>"), put them in
+	property nodes ("<property name='foo'>bar</property>"). Separates
+	the XML namespace properly.
+
 2005-12-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/encoders/encoders.xml: Remove duplicated

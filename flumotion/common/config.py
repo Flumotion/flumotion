@@ -186,9 +186,8 @@ class FlumotionConfigXML(log.Loggable):
         # <component name="..." type="..." worker="">
         #   <feed>*
         #   <source>*
-        #   <prop1>*
-        #   ...
-        # FIXME <propN>... should be in <properties> (#286)
+        #   <property name="name">value</property>*
+        # </component>
         
         if not node.hasAttribute('name'):
             raise ConfigError("<component> must have a name attribute")
@@ -212,9 +211,20 @@ class FlumotionConfigXML(log.Loggable):
             raise errors.UnknownComponentError(
                 "unknown component type: %s" % type)
         
-        # FIXME: 'feed' can come directly from the registry; dunno about
-        # 'source'
+        possible_node_names = ['feed', 'source', 'property']
+        for subnode in node.childNodes:
+            if subnode.nodeType == Node.COMMENT_NODE:
+                continue
+            elif subnode.nodeType == Node.TEXT_NODE:
+                # fixme: should check here that the string is empty
+                # should just make a dtd, gah
+                continue
+            elif subnode.nodeName not in possible_node_names:
+                raise ConfigError("Invalid subnode of <component>: %s"
+                                  % subnode.nodeName)
 
+        # FIXME: 'feed' can come directly from the registry, no need to
+        # specify in the XML
         feeds = self._parseFeeds(node, defs)
         if feeds:
             if defs.getFeeders():
@@ -416,55 +426,73 @@ class FlumotionConfigXML(log.Loggable):
         return feeds
 
     def _parseSources(self, node, defs):
+        eaters = dict([(x.getName(), x) for x in defs.getEaters()])
+
         nodes = []
         for subnode in node.childNodes:
             if subnode.nodeName == 'source':
                 nodes.append(subnode)
-        return self._get_string_value(nodes)
+        strings = self._get_string_value(nodes)
 
+        # at this point we don't support assigning certain sources to
+        # certain eaters -- a problem to fix later. for now take the
+        # union of the properties.
+        required = True in [x.getRequired() for x in eaters.values()]
+        multiple = True in [x.getMultiple() for x in eaters.values()]
+
+        if len(strings) == 0 and required:
+            raise ConfigError("Component %s wants to eat on %s, but no "
+                              "source specified"
+                              % (node.nodeName, eaters.keys()[0]))
+        elif len(strings) > 1 and not multiple:
+            raise ConfigError("Component %s does not support multiple "
+                              "sources feeding %s (%r)"
+                              % (node.nodeName, eaters.keys()[0], strings))
+
+        return strings
+            
     def _parseProperties(self, node, type, properties):
         # XXX: We might end up calling float(), which breaks
-        #      when using LC_NUMERIC when it is not C
+        #      when using LC_NUMERIC when it is not C -- only in python
+        #      2.3 though, no prob in 2.4
         import locale
         locale.setlocale(locale.LC_NUMERIC, "C")
 
-        # FIXME: validate nodes, make sure they are all valid properties
-        # as well as the other way around
+        properties_given = {}
+        for subnode in node.childNodes:
+            if subnode.nodeName == 'property':
+                if not subnode.hasAttribute('name'):
+                    raise ConfigError("<property> must have a name attribute")
+                name = subnode.getAttribute('name')
+                if not name in properties_given:
+                    properties_given[name] = []
+                properties_given[name].append(subnode)
+                
+        property_specs = dict([(x.name, x) for x in properties])
 
         config = {}
-        for definition in properties:
-            name = definition.name
-
-            nodes = []
-            for subnode in node.childNodes:
-                if subnode.nodeName == name:
-                    nodes.append(subnode)
+        for name, nodes in properties_given.items():
+            if not name in property_specs:
+                raise ConfigError("Unknown property: %s" % name)
                 
-            if definition.isRequired() and not nodes:
-                raise ConfigError("'%s' is required but not specified" % name)
+            definition = property_specs[name]
 
             if not definition.multiple and len(nodes) > 1:
                 raise ConfigError("multiple value specified but not allowed")
 
-            type = definition.type
-            if type == 'string':
-                value = self._get_string_value(nodes)
-            elif type == 'rawstring':
-                value = self._get_raw_string_value(nodes)
-            elif type == 'int':
-                value = self._get_int_value(nodes)
-            elif type == 'long':
-                value = self._get_long_value(nodes)
-            elif type == 'bool':
-                value = self._get_bool_value(nodes)
-            elif type == 'float':
-                value = self._get_float_value(nodes)
-            elif type == 'xml':
-                value = self._get_xml_value(nodes)
-            elif type == 'fraction':
-                value = self._get_fraction_value(nodes)
-            else:
+            parsers = {'string': self._get_string_value,
+                       'rawstring': self._get_raw_string_value,
+                       'int': self._get_int_value,
+                       'long': self._get_long_value,
+                       'bool': self._get_bool_value,
+                       'float': self._get_float_value,
+                       'xml': self._get_xml_value,
+                       'fraction': self._get_fraction_value}
+                       
+            if not definition.type in parsers:
                 raise ConfigError("invalid property type: %s" % type)
+                
+            value = parsers[definition.type](nodes)
 
             if value == []:
                 continue
@@ -474,6 +502,10 @@ class FlumotionConfigXML(log.Loggable):
             
             config[name] = value
             
+        for name, definition in property_specs.items():
+            if definition.isRequired() and not name in config:
+                raise ConfigError("'%s' is required but not specified" % name)
+
         return config
 
     # FIXME: move to a config base class ?

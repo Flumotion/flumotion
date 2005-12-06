@@ -81,7 +81,10 @@ def main(args):
             print '\nEaters:'
             if c.getEaters():
                 for e in c.getEaters():
-                    print '  %s' % e
+                    print ('  %s (%s%s)'
+                           % (e.getName(),
+                              e.getRequired() and 'required' or 'optional',
+                              (e.getMultiple() and ', multiple ok' or '')))
             else:
                 print '  (None)'
             print '\nFeeders:'

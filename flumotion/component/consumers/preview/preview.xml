@@ -10,10 +10,6 @@
         <entry type="component" location="preview.py"
                function="Preview"/>
       </entries>
-      
-      <properties>
-        <property name="source" type="string" required="yes" />
-      </properties>
     </component>
   </components>
 

@@ -233,13 +233,13 @@ class TestConfig(unittest.TestCase):
         planet = config.FlumotionConfigXML(None,
              """<planet><flow name="default">
              <component name="component-name" type="test-component">
-               <one>string</one>
-               <two>1</two>
-               <three>2.5</three>
-               <four attr="attr-value">value</four>
-               <five>True</five>
-               <six>3981391981389138998131389L</six>
-               <seven>30000/1001</seven>
+               <property name="one">string</property>
+               <property name="two">1</property>
+               <property name="three">2.5</property>
+               <property name="four" attr="attr-value">value</property>
+               <property name="five">True</property>
+               <property name="six">3981391981389138998131389L</property>
+               <property name="seven">30000/1001</property>
              </component></flow>
              </planet>""")
         self.failIf(planet.flows)

@@ -9,7 +9,6 @@
                function="Overlay" />
       </entries>
       <properties>
-        <property name="source" type="string" multiple="no"/>
         <property name="text" type="string"/>
         <property name="show_text" type="bool"/>
         <property name="fluendo_logo" type="bool"/>

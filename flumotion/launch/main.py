@@ -50,14 +50,15 @@ def resolve_links(links, components):
         compname = link[2]
         comptype = [x[1] for x in components if x[0]==compname][0]
         compreg = reg.getComponent(comptype)
+        eaters = compreg.getEaters()
         if link[3]:
-            if not link[3] in compreg.getEaters():
+            if not link[3] in [x.getName() for x in eaters]:
                 err('Component %s has no eater named %s', (compname, link[3]))
             # leave link[1] unchanged
         else:
-            if not compreg.getEaters():
+            if not eaters:
                 err('Component %s has no eaters' % compname)
-            link[3] = compreg.getEaters()[0]
+            link[3] = eaters[0].getName()
     
     for link in links:
         print '%s:%s => %s:%s' % tuple(link)
@@ -207,14 +208,15 @@ class ComponentWrapper(object):
             else:
                 config['properties'][k] = val
 
-        if 'source' in compprops:
-            prop = compprops['source']
-            if prop.isRequired() and not feeders:
+        eaters = c.getEaters()
+        if eaters:
+            required = True in [x.getRequired() for x in eaters]
+            multiple = True in [x.getMultiple() for x in eaters]
+            if required and not feeders:
                 err('Component %s wants to eat but you didn\'t give it '
                     'food' % name)
-            if not prop.isMultiple():
-                if len(feeders) > 1:
-                    err('Component %s can only eat from one feeder' % name)
+            if not multiple and len(feeders) > 1:
+                err('Component %s can only eat from one feeder' % name)
             if feeders:
                 config['source'] = feeders
             else:
@@ -225,11 +227,12 @@ class ComponentWrapper(object):
                 err('Component %s can\'t feed from anything' % name)
             
         for k, v in compprops.items():
-            if v.isRequired() and k != 'source' and not k in config['properties']:
+            if v.isRequired() and not k in config['properties']:
                 err('Component %s missing required property `%s\' of type %s'
                     % (name, k, v.getType()))
         self.config = config
 
+        # fixme: 'feed' is not strictly necessary in config
         config['feed'] = c.getFeeders()
 
         try:

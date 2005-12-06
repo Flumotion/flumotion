@@ -87,7 +87,7 @@ class Component:
             
             for name in property_names:
                 value = self.props[name]
-                s += "      <%s>%s</%s>\n" % (name, value, name)
+                s += '      <property name="%s">%s</property>\n' % (name, value)
             
         s += "    </component>\n"
         return s
