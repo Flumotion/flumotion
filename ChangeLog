@@ -1,5 +1,20 @@
 2005-12-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_config.py (TestConfig.testClockMasterAutoSelection) 
+	(TestConfig.testClockMasterUserSelection) 
+	(TestConfig.testClockMasterError): New testes.
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseFlow):
+	Choose a default master clock if necessary, sorting by the clock
+	priorities in the registry.
+
+	* flumotion/test/test_config.py (TestConfig.testParseProperties):
+	Test that clock-master defaults to False.
+
+	* flumotion/common/config.py
+	(FlumotionConfigXML._parseClockMaster): Parse out <clock-master>
+	from a config.
+
 	* flumotion/component/encoders/Makefile.am: Don't try to dist
 	encoders.xml.
 

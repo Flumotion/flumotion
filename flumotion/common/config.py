@@ -210,7 +210,7 @@ class FlumotionConfigXML(log.Loggable):
             raise errors.UnknownComponentError(
                 "unknown component type: %s" % type)
         
-        possible_node_names = ['source', 'property']
+        possible_node_names = ['source', 'clock-master', 'property']
         for subnode in node.childNodes:
             if subnode.nodeType == Node.COMMENT_NODE:
                 continue
@@ -228,6 +228,8 @@ class FlumotionConfigXML(log.Loggable):
         sources = self._parseSources(node, defs)
         if sources:
             config['source'] = sources
+
+        config['clock-master'] = self._parseClockMaster(node)
 
         properties = defs.getProperties()
 
@@ -267,6 +269,23 @@ class FlumotionConfigXML(log.Loggable):
                 raise ConfigError("unexpected 'flow' node: %s" % child.nodeName)
 
             flow.components[component.name] = component
+
+        # handle master clock selection
+        masters = [x for x in flow.components.values()
+                     if x.config['clock-master']]
+        if not masters:
+            need_sync = [x for x in flow.components.values()
+                           if x.defs.getNeedsSynchronization()]
+            if need_sync:
+                need_sync = [(x.defs.getClockPriority(), x) for x in need_sync]
+                need_sync.sort()
+                master = need_sync[-1][1]
+                self.info("setting %s as clock master", master.getName())
+                master.config['clock-master'] = True
+        elif len(masters) > 1:
+            raise ConfigError("Multiple clock masters in flow %s: %r"
+                              % (name, masters))
+
         return flow
 
     def _parseManager(self, node, noRegistry=False):
@@ -414,6 +433,18 @@ class FlumotionConfigXML(log.Loggable):
                               % (node.nodeName, eaters.keys()[0], strings))
 
         return strings
+            
+    def _parseClockMaster(self, node):
+        nodes = []
+        for subnode in node.childNodes:
+            if subnode.nodeName == 'clock-master':
+                nodes.append(subnode)
+        bools = self._get_bool_value(nodes)
+
+        if len(bools) > 1:
+            raise ConfigError("Only one <clock-master> node allowed")
+
+        return bool(bools and bools[0])
             
     def _parseProperties(self, node, type, properties):
         # XXX: We might end up calling float(), which breaks

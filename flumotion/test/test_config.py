@@ -37,6 +37,12 @@ reg.addFromString("""
         <property name="seven" type="fraction"/>
       </properties>
     </component>
+    <component name="foobiesync" type="test-component-sync">
+      <synchronization required="true" />
+    </component>
+    <component name="foobiesync-provider" type="test-component-sync-provider">
+      <synchronization required="true" clock-priority="130"/>
+    </component>
   </components>
 </registry>""")
 
@@ -260,6 +266,69 @@ class TestConfig(unittest.TestCase):
         self.failUnless(props.get('five'))
         self.assertEquals(props.get('six'), 3981391981389138998131389L)
         self.assertEquals(props.get('seven'), (30000, 1001))
+
+        # should be false -- no master in a pipeline that doesn't need
+        # synchronization
+        self.assertEquals(conf['clock-master'], False)
+
+    def testClockMasterAutoSelection(self):
+        planet = config.FlumotionConfigXML(None,
+             """<planet>
+             <flow name="default">
+             <component name="one" type="test-component-sync">
+             </component>
+             <component name="two" type="test-component-sync-provider">
+             </component>
+             </flow>
+             </planet>""")
+        self.failIf(planet.flows)
+
+        planet.parse()
+        flow = planet.flows[0]
+        one = flow.components['one']
+        two = flow.components['two']
+        confone = one.getConfigDict()
+        conftwo = two.getConfigDict()
+        self.assertEquals(confone['clock-master'], False)
+        self.assertEquals(conftwo['clock-master'], True)
+
+    def testClockMasterUserSelection(self):
+        planet = config.FlumotionConfigXML(None,
+             """<planet>
+             <flow name="default">
+             <component name="one" type="test-component-sync">
+               <clock-master>yes</clock-master>
+             </component>
+             <component name="two" type="test-component-sync-provider">
+             </component>
+             </flow>
+             </planet>""")
+        self.failIf(planet.flows)
+
+        planet.parse()
+        flow = planet.flows[0]
+        one = flow.components['one']
+        two = flow.components['two']
+        confone = one.getConfigDict()
+        conftwo = two.getConfigDict()
+        self.assertEquals(confone['clock-master'], True)
+        self.assertEquals(conftwo['clock-master'], False)
+
+    def testClockMasterError(self):
+        planet = config.FlumotionConfigXML(None,
+             """<planet>
+             <flow name="default">
+             <component name="one" type="test-component-sync">
+               <clock-master>yes</clock-master>
+             </component>
+             <component name="two" type="test-component-sync-provider">
+               <clock-master>yes</clock-master>
+             </component>
+             </flow>
+             </planet>""")
+        self.failIf(planet.flows)
+
+        self.assertRaises(config.ConfigError, planet.parse)
 
     def testGetComponentEntries(self):
         conf = config.FlumotionConfigXML(None,
