@@ -1,3 +1,9 @@
+2005-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/worker.py:
+	  put back the segfault handler
+	  try to be helpful by pointing out the core dump file
+
 2005-12-06  Andy Wingo  <wingo@pobox.com>
 
 	* doc/random/synchronization: New file, describes how

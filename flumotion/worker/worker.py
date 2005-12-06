@@ -256,7 +256,31 @@ class JobProcessProtocol(protocol.ProcessProtocol):
     def processEnded(self, status):
         # vmethod implementation
         # status is an instance of failure.Failure
-        self.kindergarten.removeKidByPid(self.pid)
+        # status.value is a twisted.internet.error.ProcessTerminated
+        # status.value.status is the os.WAIT-like status value
+        kg = self.kindergarten
+        kg.removeKidByPid(self.pid)
+        if status.value.exitCode is not None:
+            kg.info("Reaped child job with pid %d, exit value %d" % (
+                                self.pid, status.value.exitCode))
+        signum = status.value.signal
+        if signum is not None:
+            if signum == signal.SIGSEGV:
+                kg.warning("Job child with pid %d segfaulted" % self.pid)
+                if not os.WCOREDUMP(status.value.status):
+                    kg.warning(
+                        "No core dump generated.  "\
+                        "Were core dumps enabled at the start ?")
+            else:
+                kg.info(
+                    "Reaped job child with pid %d signaled by signal %d" % (
+                        self.pid, signum))
+            if os.WCOREDUMP(status.value.status):
+                kg.info("Core dumped")
+                corepath = os.path.join(os.getcwd(), 'core.%d' % self.pid)
+                if os.path.exists(corepath):
+                    kg.info("Core file is probably %s" % corepath)
+
         self.setPid(None)
         
 class Kindergarten(log.Loggable):
