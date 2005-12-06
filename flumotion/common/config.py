@@ -184,7 +184,6 @@ class FlumotionConfigXML(log.Loggable):
         @rtype: L{ConfigEntryComponent}
         """
         # <component name="..." type="..." worker="">
-        #   <feed>*
         #   <source>*
         #   <property name="name">value</property>*
         # </component>
@@ -211,7 +210,7 @@ class FlumotionConfigXML(log.Loggable):
             raise errors.UnknownComponentError(
                 "unknown component type: %s" % type)
         
-        possible_node_names = ['feed', 'source', 'property']
+        possible_node_names = ['source', 'property']
         for subnode in node.childNodes:
             if subnode.nodeType == Node.COMMENT_NODE:
                 continue
@@ -223,15 +222,8 @@ class FlumotionConfigXML(log.Loggable):
                 raise ConfigError("Invalid subnode of <component>: %s"
                                   % subnode.nodeName)
 
-        # FIXME: 'feed' can come directly from the registry, no need to
-        # specify in the XML
-        feeds = self._parseFeeds(node, defs)
-        if feeds:
-            if defs.getFeeders():
-                config['feed'] = feeds
-            else:
-                self.warning('Feeds specified for component %s, but '
-                             'none possible: %r' % (name, feeds))
+        # let the component know what its feeds should be called
+        config['feed'] = defs.getFeeders()
 
         sources = self._parseSources(node, defs)
         if sources:
@@ -241,20 +233,6 @@ class FlumotionConfigXML(log.Loggable):
 
         self.debug('Parsing component: %s' % name)
         config['properties'] = self._parseProperties(node, type, properties)
-
-        # verification
-        feeders = defs.getFeeders()
-        if feeders:
-            if not 'feed' in config:
-                # assert that the old code works the way it should; when
-                # we stop writing <feed> entries this can go
-                raise ConfigError("no <feed> entries for component %s", name)
-        for feeder in feeders:
-            if not feeder in config['feed']:
-                # assert that the old code works the way it should; when
-                # we stop writing <feed> entries this can go
-                raise ConfigError("component %s missing <feed> entry for %s",
-                    name, feeder)
 
         # fixme: all of the information except the worker is in the
         # config dict: why?
@@ -410,20 +388,6 @@ class FlumotionConfigXML(log.Loggable):
             return (int(parts[0]), int(parts[1]))
         return [fraction_from_string(subnode.childNodes[0].data)
                 for subnode in nodes]
-
-    def _parseFeeds(self, node, defs):
-        nodes = []
-        for subnode in node.childNodes:
-            if subnode.nodeName == 'feed':
-                nodes.append(subnode)
-        feeds = self._get_string_value(nodes)
-        for feed in feeds:
-            if not feed in defs.getFeeders():
-                # should be an error, but flumotion.wizard.save is too
-                # dumb right now
-                self.warning('Invalid feed for component type %s: %s'
-                    % (defs.getType(), feed))
-        return feeds
 
     def _parseSources(self, node, defs):
         eaters = dict([(x.getName(), x) for x in defs.getEaters()])

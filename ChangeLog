@@ -1,5 +1,19 @@
 2005-12-06  Andy Wingo  <wingo@pobox.com>
 
+	* conf/managers/default/flows/ogg-test-theora.xml: Update for
+	config changes.
+
+	* flumotion/test/test.xml: Remove <feed> properties.
+
+	* flumotion/wizard/save.py (Component.toXML): Don't write out
+	<feed> entries.
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseFeeds):
+	Removed.
+	(FlumotionConfigXML._parseComponent): Take the feeds directly from
+	the registry. A <feed> node in a <component> is an error. Could
+	add something back when/if we support deactivated feeds.
+
 	* flumotion/launch/inspect.py (main): Print out required/multiple
 	attributes of eaters.
 

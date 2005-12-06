@@ -69,17 +69,9 @@ class Component:
                                                          self.type,
                                                          extra)
 
-        # XXX: Handle eaters properly
-        if self.type == 'firewire':
-            s += '      <feed>audio</feed>\n'
-            s += '      <feed>video</feed>\n'
-        else:
-            s += '      <feed>default</feed>\n'
-
         for sourceName in self.getFeeders():
             s += "      <source>%s</source>\n" % sourceName
                     
-                
         if self.props:
             s += "      <!-- properties -->\n"
             property_names = self.props.keys()
