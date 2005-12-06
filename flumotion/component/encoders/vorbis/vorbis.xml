@@ -7,7 +7,6 @@
       <eater name="default"/>
       <feeder name="default"/>
       <properties>
-        <property name="feed" type="string" multiple="yes"/>
         <property name="bitrate" type="int"/>
         <property name="quality" type="float"/>
         <property name="channels" type="int"/>

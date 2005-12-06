@@ -9,9 +9,6 @@
         <entry type="component" location="ogg.py"
                function="Ogg"/>
       </entries>
-      <properties>
-        <property name="feed" type="string" multiple="yes"/>
-      </properties>
     </component>
   
     <component type="multipart-muxer" base="flumotion/component/muxers">
@@ -22,9 +19,6 @@
         <entry type="component" location="multipart.py"
                function="Multipart"/>
       </entries>
-      <properties>
-        <property name="feed" type="string" multiple="yes"/>
-      </properties>
     </component>
   
   </components>

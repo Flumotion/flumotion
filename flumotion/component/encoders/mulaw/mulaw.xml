@@ -10,9 +10,6 @@
         <entry type="component" location="mulaw.py"
                function="Mulaw"/>
       </entries>
-      <properties>
-        <property name="feed" type="string" multiple="yes" />
-      </properties>
     </component>
  
   </components>

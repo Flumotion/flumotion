@@ -11,7 +11,6 @@
                function="Theora"/>
       </entries>
       <properties>
-        <property name="feed" type="string" multiple="yes"/>
         <property name="bitrate" type="int"/>
         <property name="quality" type="int"/>
         <property name="keyframe-threshold" type="int" />

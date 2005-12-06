@@ -9,7 +9,6 @@
                function="AudioTest"/>
       </entries>
       <properties>
-        <property name="feed" type="string" multiple="yes"/>
         <property name="volume" type="float"/>
         <property name="rate" type="int"/>
         <property name="freq" type="int"/>

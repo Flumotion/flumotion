@@ -13,7 +13,6 @@
       </entries>
 
       <properties>
-        <property name="feed" type="string" multiple="yes" />
         <property name="playlist" type="string" />
         <property name="rate" type="int" />
         <property name="channels" type="int" />

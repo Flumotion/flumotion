@@ -13,7 +13,6 @@
                function="GUIClass"/>
       </entries>
       <properties>
-        <property name="feed" type="string" required="yes" multiple="yes"/>
         <property name="source-element" type="string"/>
         <property name="device" type="string"/>
         <property name="channels" type="int"/>

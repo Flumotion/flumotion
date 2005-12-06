@@ -11,7 +11,6 @@
                function="Smoke"/>
       </entries>
       <properties>
-        <property name="feed" type="string" multiple="yes"/>
         <property name="qmin" type="int"/>
         <property name="qmax" type="int"/>
         <property name="threshold" type="int"/>

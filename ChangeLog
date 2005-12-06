@@ -1,5 +1,23 @@
 2005-12-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/encoders/encoders.xml: Removed, there are
+	already xml files for all encoders.
+
+	* flumotion/component/muxers/muxers.xml: 
+	* flumotion/component/producers/audiotest/audiotest.xml: 
+	* flumotion/component/producers/bttv/bttv.xml: 
+	* flumotion/component/producers/jukebox/jukebox.xml: 
+	* flumotion/component/producers/soundcard/soundcard.xml: 
+	* flumotion/component/producers/videotest/videotest.xml: 
+	* flumotion/component/encoders/jpeg/jpeg.xml: 
+	* flumotion/component/encoders/mulaw/mulaw.xml: 
+	* flumotion/component/encoders/smoke/smoke.xml: 
+	* flumotion/component/encoders/speex/speex.xml: 
+	* flumotion/component/encoders/theora/theora.xml: 
+	* flumotion/component/encoders/vorbis/vorbis.xml: Remove "feed"
+	properties. Unnecessary, given the <feeder> entries in the
+	registry.
+
 	* conf/managers/default/flows/ogg-test-theora.xml: Update for
 	config changes.
 
