@@ -6,6 +6,8 @@
 
       <feeder name="default"/>
 
+      <synchronization required="yes" />
+
       <entries>
         <entry type="component" location="webcam.py"
                function="Webcam" />

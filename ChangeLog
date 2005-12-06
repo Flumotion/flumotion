@@ -1,3 +1,30 @@
+2005-12-06  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_registry.py (TestRegistry.testDump): Update
+	dump test for default synchronization writeout.
+	(TestComponentEntry.setUp): Add a couple tests.
+
+	* flumotion/common/registry.py
+	(RegistryEntryComponent.__init__)
+	(RegistryParser._parseSynchronization)
+	(RegistryParser._parseComponent): Add support for parsing
+	<synchronization>.
+	(RegistryEntryComponent.getNeedsSynchronization) 
+	(RegistryEntryComponent.getClockPriority): New accessors.
+	(ComponentRegistry.dump): Support writing out the synchronization
+	data.
+
+	* flumotion/component/producers/audiotest/audiotest.xml: 
+	* flumotion/component/producers/bttv/bttv.xml: 
+	* flumotion/component/producers/firewire/firewire.xml: 
+	* flumotion/component/producers/jukebox/jukebox.xml: 
+	* flumotion/component/producers/looper/looper.xml: 
+	* flumotion/component/producers/pipeline/pipeline.xml: 
+	* flumotion/component/producers/soundcard/soundcard.xml: 
+	* flumotion/component/producers/videotest/videotest.xml: 
+	* flumotion/component/producers/webcam/webcam.xml: Add
+	synchronization properties, as per the synchronization doc.
+
 2005-12-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/worker.py:

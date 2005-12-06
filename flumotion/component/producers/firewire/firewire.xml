@@ -12,6 +12,8 @@
                function="GUIClass" />
       </entries>
 
+      <synchronization required="yes" clock-priority="160"/>
+
       <properties>
         <property name="height" type="int" />
         <property name="width" type="int" />

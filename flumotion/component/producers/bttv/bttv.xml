@@ -13,6 +13,8 @@
                function="GUIClass"/>
       </entries>
       
+      <synchronization required="yes" />
+
       <properties>
         <property name="device" type="string" required="yes"/>
         <property name="channel" type="string" required="no"/>

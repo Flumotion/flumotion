@@ -49,7 +49,7 @@ class RegistryEntryComponent:
     "This class represents a <component> entry in the registry"
     def __init__(self, filename, type, 
                  source, base, properties, files,
-                 entries, eaters, feeders):
+                 entries, eaters, feeders, needs_sync, clock_priority):
         self.filename = filename
         self.type = type
         self.source = source
@@ -59,6 +59,8 @@ class RegistryEntryComponent:
         self.entries = entries
         self.eaters = eaters
         self.feeders = feeders
+        self.needs_sync = needs_sync
+        self.clock_priority = clock_priority
         
     def getProperties(self):
         return self.properties
@@ -96,6 +98,12 @@ class RegistryEntryComponent:
 
     def getFeeders(self):
         return self.feeders
+
+    def getNeedsSynchronization(self):
+        return self.needs_sync
+
+    def getClockPriority(self):
+        return self.clock_priority
 
 class RegistryEntryBundle:
     "This class represents a <bundle> entry in the registry"
@@ -318,6 +326,7 @@ class RegistryParser(log.Loggable):
         #   <feeder>
         #   <properties>
         #   <entries>
+        #   <synchronization>
         # </component>
         
         if not node.hasAttribute('type'):
@@ -342,6 +351,8 @@ class RegistryParser(log.Loggable):
         entries = {}
         eaters = []
         feeders = []
+        needs_sync = False
+        clock_priority = 100
         for child in self._getChildNodes(node):
             if child.nodeName == 'source':
                 source = self._parseSource(child)
@@ -355,13 +366,16 @@ class RegistryParser(log.Loggable):
                 eaters.append(self._parseEater(child))
             elif child.nodeName == 'feeder':
                 feeders.append(self._parseFeeder(child))
+            elif child.nodeName == 'synchronization':
+                needs_sync, clock_priority = self._parseSynchronization(child)
             else:
                 raise XmlParserError("unexpected node: %s" % child)
 
         return RegistryEntryComponent(self.filename,
                                       type, source, baseDir,
                                       properties.values(), files,
-                                      entries, eaters, feeders)
+                                      entries, eaters, feeders,
+                                      needs_sync, clock_priority)
 
     def _parseSource(self, node):
         # <source location="..."/>
@@ -475,6 +489,18 @@ class RegistryParser(log.Loggable):
             raise XmlParserError("<feeder> must have a name attribute")
 
         return str(node.getAttribute('name'))
+
+    def _parseSynchronization(self, node):
+        # <synchronization [required="yes/no"] [clock-priority="yes/no"]/>
+        required = False
+        if node.hasAttribute('required'):
+            required = _istrue(node.getAttribute('required'))
+        
+        clock_priority = 100
+        if node.hasAttribute('clock-priority'):
+            clock_priority = int(node.getAttribute('clock-priority'))
+
+        return required, clock_priority
 
     ## Component registry specific functions
     def parseRegistryFile(self, filename, string=None):
@@ -903,6 +929,9 @@ class ComponentRegistry(log.Loggable):
                      x.getMultiple() and "yes" or "no"))
             for x in component.getFeeders():
                 w(6, '<feeder name="%s"/>' % x)
+            w(6, '<synchronization required="%s" clock-priority="%d"/>'
+              % (component.getNeedsSynchronization() and "yes" or "no",
+                 component.getClockPriority()))
             w(6, '<properties>')
             for prop in component.getProperties():
                 w(8, '<property name="%s" type="%s" required="%s" multiple="%s"/>' % (

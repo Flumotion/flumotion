@@ -9,6 +9,9 @@
         <entry type="component" location="pipeline.py"
                function="Producer"/>
       </entries>
+
+      <synchronization required="yes" />
+
       <properties>
         <property name="pipeline" type="string" required="yes"/>
       </properties>

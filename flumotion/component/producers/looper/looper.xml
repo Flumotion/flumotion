@@ -14,6 +14,8 @@
                function="Looper" />
       </entries>
 
+      <synchronization required="yes" clock-priority="110" />
+
       <properties>
         <property name="height" type="int" />
         <property name="width" type="int" />

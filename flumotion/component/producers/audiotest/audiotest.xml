@@ -8,6 +8,9 @@
         <entry type="component" location="audiotest.py"
                function="AudioTest"/>
       </entries>
+
+      <synchronization required="yes" />
+
       <properties>
         <property name="volume" type="float"/>
         <property name="rate" type="int"/>

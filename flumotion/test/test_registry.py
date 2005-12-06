@@ -217,6 +217,7 @@ class TestRegistry(unittest.TestCase):
 
     <component type="bar" base="base/dir">
       <source location="None"/>
+      <synchronization required="no" clock-priority="100"/>
       <properties>
       </properties>
       <entries>
@@ -260,11 +261,12 @@ class TestComponentEntry(unittest.TestCase):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
         rec = registry.RegistryEntryComponent
         self.entry = rec('filename', 'type', 'source', 'base', 
-                         ['prop'], [self.file], {}, [], [])
+                         ['prop'], [self.file], {}, [], [], False, 100)
         self.empty_entry = rec('filename', 'type', 'source', 'base',
-                               ['prop'], [], {}, [], [])
+                               ['prop'], [], {}, [], [], True, 130)
         self.multiple_entry = rec('filename', 'type', 'source', 'base', ['prop'],
-                                  [self.file, self.file], {}, [], [])
+                                  [self.file, self.file], {}, [], [],
+                                  False, 100)
 
     def testThings(self):
         self.assertEquals(self.entry.getType(), 'type')
@@ -273,6 +275,10 @@ class TestComponentEntry(unittest.TestCase):
         self.assertEquals(self.entry.getGUIEntry(), 'gui-filename')
         self.assertEquals(self.empty_entry.getGUIEntry(), None)
         self.assertEquals(self.multiple_entry.getGUIEntry(), None)
+        self.assertEquals(self.empty_entry.getNeedsSynchronization(), True) 
+        self.assertEquals(self.empty_entry.getClockPriority(), 130)
+        self.assertEquals(self.multiple_entry.getNeedsSynchronization(), False)
+        self.assertEquals(self.multiple_entry.getClockPriority(), 100)
 
 def rmdir(root):
     for file in os.listdir(root):
