@@ -1,5 +1,8 @@
 2005-12-06  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/encoders/Makefile.am: Don't try to dist
+	encoders.xml.
+
 	* flumotion/test/test_registry.py (TestRegistry.testDump): Update
 	dump test for default synchronization writeout.
 	(TestComponentEntry.setUp): Add a couple tests.

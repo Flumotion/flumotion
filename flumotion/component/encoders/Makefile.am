@@ -3,8 +3,6 @@ include $(top_srcdir)/common/python.mk
 componentdir = $(libdir)/flumotion/python/flumotion/component/encoders
 component_PYTHON = \
 	__init__.py
-component_DATA = \
-	encoders.xml
 
 jpegdir = $(componentdir)/jpeg
 jpeg_PYTHON = \
