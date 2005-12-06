@@ -1,5 +1,8 @@
 2005-12-06  Andy Wingo  <wingo@pobox.com>
 
+	* doc/random/synchronization: New file, describes how
+	synchronization works in flumotion.
+
 	* flumotion/component/encoders/encoders.xml: Removed, there are
 	already xml files for all encoders.
 

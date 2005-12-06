@@ -1,0 +1,66 @@
+-*- text -*-
+
+Synchronization in Flumotion relies on one thing only, which is ensuring
+that data that is captured is timestamped relative to the same clock. If
+the data has correct timestamps, then a muxer will be able to combine
+streams in the proper order, ensuring proper muxing, and when the stream
+is played back it the timestamps will be correct as well.
+
+To understanp how to produce timestamps, one must know how GStreamer
+timestamps its data:
+  
+  timestamp = clock time - base time
+
+To ensure that the timestamp of buffers captured on different machines
+are synchronized, then we must have the same "base time" and the same
+clock time.
+
+In practice, this means that components that need synchronization need
+to have the same clock. (Note that not all components need
+synchronization -- e.g. the muxer does not need a clock to do its job.)
+One clock should be chosen as the master, then Flumotion tells the other
+components to slave their clocks to the master using the
+NetTimeProvider/NetClientClock GStreamer interface.
+
+The question becomes, how to determine which components need
+syncronization, and how to choose the master clock? Whether or not the
+component needs syncronization is a property of the component type --
+all soundcard producers, for example, need to have their clocks
+synchronized with other capture streams. Thus this property belongs in
+the registry. We choose to represent this as
+
+  <syncronization required="yes"/>
+
+in the component XML node, so that when the full registry is written out
+there can be required="no" lines for components that do not need
+synchronization.
+
+The question of which master to choose is a more difficult issue. Even
+in the simple case of synchronizing two sound cards, which is the same
+component type, the user might have a preference that one card's clock
+be preferred over the other. The user should be allowed that choice,
+which implies that the choice of the master clock should be able to be
+specified in the configuration XML (rather than the registry XML).
+
+In the configuration XML, it might look like this:
+
+  <component name="audio-source" type="audiotest" worker="localhost">
+    <clock-master>yes</clock-master>
+    ...
+  </component>
+
+However, if the user does not specify a clock master, Flumotion needs to
+choose a clock master on behalf of the user. It does this by finding the
+components that need syncronization, and selecting the component with
+the highest clock-priority as the master. The default priority of a
+component is 100. Components can override this in the registry e.g. as:
+
+  <syncronization required="yes" clock-priority="150"/>
+
+This will allow audio clocks to be chosen over video clocks in the
+normal case.
+
+(This discussion is halfway implementation and halfway useful -- would
+be nice to take out the part about how timestamps are calculated and
+just leave the practical details, leaving the implementation information
+to another file -- we don't talk about how it is implemented anyway...)
