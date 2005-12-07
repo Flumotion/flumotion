@@ -34,6 +34,10 @@ from twisted.python import reflect
 from flumotion.common import common, log, package, bundle, errors
 from flumotion.configure import configure
 
+# RegistryEntryComponent has a constructor with a lot of arguments, but that's
+# ok here. Allow it through pychecker.
+__pychecker__ = 'maxargs=12'
+
 __all__ = ['ComponentRegistry', 'registry']
 
 def _istrue(value):
