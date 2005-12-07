@@ -280,7 +280,7 @@ class FlumotionConfigXML(log.Loggable):
                 need_sync = [(x.defs.getClockPriority(), x) for x in need_sync]
                 need_sync.sort()
                 master = need_sync[-1][1]
-                self.info("setting %s as clock master", master.getName())
+                self.info("setting %s as clock master" % master.getName())
                 master.config['clock-master'] = True
         elif len(masters) > 1:
             raise ConfigError("Multiple clock masters in flow %s: %r"
