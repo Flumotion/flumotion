@@ -60,6 +60,7 @@ class FeedComponent(basecomponent.BaseComponent):
         
         self.feed_ports = {} # feed_name -> port mapping
         self.pipeline = None
+        self.net_time_provider = None
         self.pipeline_signals = []
         self.bus_watch_id = None
         self.files = []
@@ -210,6 +211,10 @@ class FeedComponent(basecomponent.BaseComponent):
 
     def setup_pipeline(self):
         assert self.bus_watch_id == None
+
+        # disable the pipeline's management of base_time -- we're going
+        # to set it ourselves.
+        self.pipeline.set_new_stream_time(gst.CLOCK_TIME_NONE)
 
         self.pipeline.set_name('pipeline-' + self.getName())
         bus = self.pipeline.get_bus()
