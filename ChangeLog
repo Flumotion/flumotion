@@ -1,5 +1,11 @@
 2005-12-07  Michael Smith  <msmith@fluendo.com>
 
+	* common/pychecker.mk:
+	  Fix pychecker macros to look for gstreamer 0.10 instead of 0.9 so we
+	  actually check the blah09.py files.
+
+2005-12-07  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/common/config.py:
 	  Fix syntax in log call so that 'make check' passes again.
 

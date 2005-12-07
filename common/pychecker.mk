@@ -11,17 +11,18 @@ pychecker =					\
 	$(pychecker_setup)			\
 	$(pychecker_help)
 
+# TODO: This looks a little confusing because out 0.10 files are names blah09.py
 pychecker_all_files = $(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))
 pychecker_08_files = $(filter %08.py,$(pychecker_all_files))
-pychecker_09_files = $(filter %09.py,$(pychecker_all_files))
-pychecker_indep_files = $(filter-out $(pychecker_08_files) $(pychecker_09_files),$(pychecker_all_files))
+pychecker_10_files = $(filter %09.py,$(pychecker_all_files))
+pychecker_indep_files = $(filter-out $(pychecker_08_files) $(pychecker_10_files),$(pychecker_all_files))
 
 pychecker_indep = PYTHONPATH=`pwd` $(pychecker)
 pychecker_08 = PYTHONPATH=$(PYGST_08_DIR):`pwd` FLU_GST_VERSION=0.8 $(pychecker)
-pychecker_09 = PYTHONPATH=$(PYGST_09_DIR):`pwd` FLU_GST_VERSION=0.9 $(pychecker)
+pychecker_10 = PYTHONPATH=$(PYGST_10_DIR):`pwd` FLU_GST_VERSION=0.10 $(pychecker)
 
 pychecker_if_08 = if test $(GST_08_SUPPORTED) = yes; then 
-pychecker_if_09 = if test $(GST_09_SUPPORTED) = yes; then 
+pychecker_if_10 = if test $(GST_10_SUPPORTED) = yes; then 
 pychecker_fi = else echo "passing, gstreamer version not supported"; fi
 
 # we redirect stderr so we don't get messages like
@@ -38,7 +39,7 @@ pycheckersplit:
 		fi							\
 	done
 
-pychecker: pychecker08 pychecker09 pycheckerindep
+pychecker: pychecker08 pychecker10 pycheckerindep
 	@true
 
 pycheckerindep: 
@@ -50,12 +51,12 @@ pychecker08:
 	@$(pychecker_if_08) $(pychecker_08) $(pychecker_08_files) 2>/dev/null \
 	  || make pycheckerverbose08; $(pychecker_fi)
 
-pychecker09:
-	@echo running pychecker, gstreamer 0.9-specific code ...
-	@$(pychecker_if_09) $(pychecker_09) $(pychecker_09_files) 2>/dev/null \
-	  || make pycheckerverbose09; $(pychecker_fi)
+pychecker10:
+	@echo running pychecker, gstreamer 0.10-specific code ...
+	@$(pychecker_if_10) $(pychecker_10) $(pychecker_10_files) 2>/dev/null \
+	  || make pycheckerverbose10; $(pychecker_fi)
 
-pycheckerverbose: pycheckerverbose08 pycheckerverbose09 pycheckerverboseindep
+pycheckerverbose: pycheckerverbose08 pycheckerverbose10 pycheckerverboseindep
 
 pycheckerverboseindep:
 	@echo "running pychecker, gstreamer-agnostic files (verbose) ..."
@@ -65,6 +66,6 @@ pycheckerverbose08:
 	@echo "running pychecker, gstreamer 0.8-specific code (verbose) ..."
 	$(pychecker_if_08) $(pychecker_08) $(pychecker_08_files); $(pychecker_fi)
 
-pycheckerverbose09:
-	@echo "running pychecker, gstreamer 0.9-specific code (verbose) ..."
-	$(pychecker_if_09) $(pychecker_09) $(pychecker_09_files); $(pychecker_fi)
+pycheckerverbose10:
+	@echo "running pychecker, gstreamer 0.10-specific code (verbose) ..."
+	$(pychecker_if_10) $(pychecker_10) $(pychecker_10_files); $(pychecker_fi)
