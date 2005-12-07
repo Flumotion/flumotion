@@ -1,6 +1,12 @@
 2005-12-07  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/registry.py:
+	  It has been pointed out to me that I can make the previous change 
+	  specific to the single class in question rather than file-global.
+
+2005-12-07  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/registry.py:
 	  Tell pychecker to allow the 12-arg constructor in this file.
 
 2005-12-07  Michael Smith  <msmith@fluendo.com>

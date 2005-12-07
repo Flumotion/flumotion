@@ -34,10 +34,6 @@ from twisted.python import reflect
 from flumotion.common import common, log, package, bundle, errors
 from flumotion.configure import configure
 
-# RegistryEntryComponent has a constructor with a lot of arguments, but that's
-# ok here. Allow it through pychecker.
-__pychecker__ = 'maxargs=12'
-
 __all__ = ['ComponentRegistry', 'registry']
 
 def _istrue(value):
@@ -50,6 +46,10 @@ def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
 
 class RegistryEntryComponent:
+    # RegistryEntryComponent has a constructor with a lot of arguments, but that's
+    # ok here. Allow it through pychecker.
+    __pychecker__ = 'maxargs=12'
+
     "This class represents a <component> entry in the registry"
     def __init__(self, filename, type, 
                  source, base, properties, files,
