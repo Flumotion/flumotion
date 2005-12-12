@@ -36,7 +36,7 @@ class Vorbis(feedcomponent.FeedComponent):
         self._bitrate = config.get('bitrate', -1)
         self._quality = config.get('quality', 0.3)
 
-        feedcomponent.FeedComponent.__init__(self, name, eaters, ['default'])
+        feedcomponent.FeedComponent.__init__(self, config)
     
     ### FeedComponent methods
     def create_pipeline(self):
