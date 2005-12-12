@@ -46,14 +46,17 @@ def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
 
 class RegistryEntryComponent:
-    # RegistryEntryComponent has a constructor with a lot of arguments, but that's
-    # ok here. Allow it through pychecker.
+    # RegistryEntryComponent has a constructor with a lot of arguments,
+    # but that's ok here. Allow it through pychecker.
     __pychecker__ = 'maxargs=12'
 
     "This class represents a <component> entry in the registry"
     def __init__(self, filename, type, 
                  source, base, properties, files,
                  entries, eaters, feeders, needs_sync, clock_priority):
+        """
+        @type properties: dict of str -> L{RegistryEntryProperty}
+        """
         self.filename = filename
         self.type = type
         self.source = source
@@ -67,7 +70,18 @@ class RegistryEntryComponent:
         self.clock_priority = clock_priority
         
     def getProperties(self):
-        return self.properties
+        """
+        Get a list of all properties.
+
+        @rtype: list of L{RegistryEntryProperty}
+        """
+        return self.properties.values()
+
+    def hasProperty(self, name):
+        """
+        Check if the component has a property with the given name.
+        """
+        return name in self.properties.keys()
 
     def getFiles(self):
         return self.files
@@ -377,7 +391,7 @@ class RegistryParser(log.Loggable):
 
         return RegistryEntryComponent(self.filename,
                                       type, source, baseDir,
-                                      properties.values(), files,
+                                      properties, files,
                                       entries, eaters, feeders,
                                       needs_sync, clock_priority)
 

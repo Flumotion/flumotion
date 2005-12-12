@@ -85,7 +85,7 @@ def getComponent(dict, moduleName, methodName):
     except Exception, e:
         msg = log.getExceptionMessage(e)
         log.warning('job', msg)
-        # FIMXE: we probably want another error raised here
+        # FIXME: we probably want another error raised here
         log.warning('job', 'raising config.ConfigError')
         raise config.ConfigError(msg)
     log.debug('job', 'returning component %r' % component)

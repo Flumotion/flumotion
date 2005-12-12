@@ -1,5 +1,17 @@
 2005-12-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/registry.py:
+	  change RegistryEntryComponent to take a dict for properties, not
+	  a list of values
+	  add a .hasProperty()
+	  update .getProperties() so interface is the same
+	* flumotion/component/converters/overlay/genimg.py:
+	  cosmetic fix
+	* flumotion/job/job.py:
+	  typo fix
+
+2005-12-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/log.py:
 	* flumotion/test/test_log.py:
 	  make getExceptionMessage look at the bottom of the stack

@@ -38,7 +38,7 @@ def generate_overlay(filename, text, show_fluendo, show_cc, show_xiph,
                      width, height):
     from PIL import Image
     from PIL import ImageChops
-    from  PIL import ImageDraw
+    from PIL import ImageDraw
     from PIL import ImageFont
     from PIL import ImageOps
 
