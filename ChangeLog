@@ -1,3 +1,12 @@
+2005-12-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
+	* flumotion/test/test_log.py:
+	  make getExceptionMessage look at the bottom of the stack
+	  add some unit tests to verify this; I seem to remember having
+	  changed this piece before, so if that turns up again, add more
+	  tests !
+
 2005-12-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/job/job.py (JobMedium.remote_start): Don't take

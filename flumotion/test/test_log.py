@@ -142,5 +142,43 @@ class TestOwnLogHandler(unittest.TestCase):
     def testLogHandlerAssertion(self):
         self.assertRaises(TypeError, log.addLogHandler, None)
   
+class TestGetExceptionMessage(unittest.TestCase):
+
+    def func3(self):
+        self.func2()
+
+    def func2(self):
+        self.func1()
+
+    def func1(self):
+        raise TypeError, "I am in func1"
+
+    def testLevel3(self):
+        try:
+            self.func3()
+            self.fail()
+        except TypeError, e:
+            self.verifyException(e)
+
+    def testLevel2(self):
+        try:
+            self.func2()
+            self.fail()
+        except TypeError, e:
+            self.verifyException(e)
+
+    def testLevel3(self):
+        try:
+            self.func3()
+            self.fail()
+        except TypeError, e:
+            self.verifyException(e)
+
+    def verifyException(self, e):
+        message = log.getExceptionMessage(e)
+        self.failUnless("func1()" in message)
+        self.failUnless("test_log.py" in message)
+        self.failUnless("TypeError" in message)
+
 if __name__ == '__main__':
      unittest.main()
