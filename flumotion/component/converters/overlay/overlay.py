@@ -28,32 +28,40 @@ from flumotion.component.converters.overlay import genimg
 import tempfile
 
 class Overlay(feedcomponent.ParseLaunchComponent):
+    _filename = None
+
     def get_pipeline_string(self, properties):
         # due to createComponent entry pointism, we have to import inside our
         # function.  PLEASE MAKE THE PAIN GO AWAY ? <- might not be
         # necessary still
+
+        # GST 0.8
+
+        # we need an element that does RGBA -> AYUV so we can overlay png
+        # this got added to ffmpegcolorspace in 0.8.5
+        addalpha = 'ffmpegcolorspace'
+
         import gst
         if gst.gst_version < (0,9):
             from flumotion.worker.checks import video
-            if video.check_ffmpegcolorspace_AYUV():
-                # AYUV conversion got added to ffmpegcolorspace in 0.8.5
-                alpha = 'ffmpegcolorspace'
-            else:
-                # alphacolor element works too, but has bugs for non-multiples of 4 or eight
-                alpha = 'ffmpegcolorspace ! alpha !'
+            if not video.check_ffmpegcolorspace_AYUV():
+                # alphacolor element works too for the colorspace conversion,
+                # but has bugs for non-multiples of 4 or eight
+                addalpha = 'ffmpegcolorspace ! alpha'
                 log.info('Using gst-plugins older than 0.8.5, consider '
                          'upgrading if you notice a diagonal green line '
                          'in your video output.')
-            pipeline = ('%(alpha)s videomixer name=mix ! @ feeder:: @'
-                        ' filesrc name=source blocksize=100000 ! pngdec '
-                        ' ! alphacolor ! mix.' % {'alpha': alpha})
-        else:
-            pipeline = ('ffmpegcolorspace ! videomixer name=mix ! @ feeder:: @'
-                        ' filesrc name=source blocksize=100000 ! pngdec '
-                        ' ! alphacolor ! mix.')
-        
-        self._filename = None
 
+        source = self.config['source'][0]
+        eater = '@ eater:%s @' % source
+
+        # the order here is important; to have our eater be the reference
+        # stream for videomixer it needs to be specified last
+        pipeline = (
+            'filesrc name=source blocksize=100000 ! pngdec ! alphacolor ! '
+            'videomixer name=mix ! @ feeder:: @ '
+            '%(eater)s ! %(addalpha)s ! mix.' % locals())
+        
         return pipeline
 
     def do_start(self, eatersData, feedersData):

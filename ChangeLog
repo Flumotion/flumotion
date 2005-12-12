@@ -1,5 +1,20 @@
 2005-12-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/converters/overlay/overlay.py:
+	  move stray self._filename = None from the __init__ days
+	  only use one pipeline template
+	  reorder again so that pngdec part is first in the parse_launch;
+	  don't change this, videomixer relies on the order
+	  fix the ! being in the wrong place
+	  Fixes overlay for 0.8, but not yet for 0.10: see
+	  http://bugzilla.gnome.org/show_bug.cgi?id=323896
+	  
+	* flumotion/wizard/save.py:
+	  warn about and do not write properties that are not listed in
+	  the registry
+
+2005-12-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  change RegistryEntryComponent to take a dict for properties, not
 	  a list of values

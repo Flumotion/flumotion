@@ -18,12 +18,14 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import log
+from flumotion.common import log, registry
 from flumotion.wizard import enums
 
-class Component:
+class Component(log.Loggable):
+    logCategory = "componentsave"
+
     def __init__(self, name, type, properties={}, worker=None):
-        log.debug('Creating component %s (%s) worker=%r' % (
+        self.debug('Creating component %s (%s) worker=%r' % (
             name, type, worker))
         self.name = name
         self.type = type
@@ -59,7 +61,14 @@ class Component:
                 
         return s
     
-    def toXML(self):
+    def toXML(self, registry):
+        """
+        Write out the XML <component> section for this component.
+
+        @type registry: L{flumotion.common.registry.ComponentRegistry}
+        """
+        regentry = registry.getComponent(self.type)
+
         if self.worker:
             extra = ' worker="%s"' % self.worker
         else:
@@ -77,7 +86,14 @@ class Component:
             property_names = self.props.keys()
             property_names.sort()
             
+            #import code; code.interact(local=locals())
             for name in property_names:
+                # FIXME: warn if a property name is not in the registry
+                # change to a more visible warning once we fix all of these
+                if not regentry.hasProperty(name):
+                    self.debug('WARNING: property named %s in component '
+                        'config, but not in registry.  Fix wizard !' % name)
+                    continue
                 value = self.props[name]
                 s += '      <property name="%s">%s</property>\n' % (name, value)
             
@@ -93,6 +109,7 @@ class Component:
 class WizardSaver:
     def __init__(self, wizard):
         self.wizard = wizard
+        self.registry = registry.getRegistry()
 
     def getVideoSource(self):
         options = self.wizard.get_step_options('Source')
@@ -325,7 +342,7 @@ class WizardSaver:
         s = '<planet>\n'
         s += '  <flow name="%s">\n' % self.wizard.flowName
         for component in components:
-            s += component.toXML()
+            s += component.toXML(self.registry)
         s += '  </flow>\n'
         s += '</planet>\n'
 
