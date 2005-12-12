@@ -103,6 +103,10 @@
 * MEDIUM	block a feeding gst port, and have something eat from it ->
 		hangs in connect.  kill it -> process stays around
 
+* MEDIUM	clean up ambiguous naming in registry/wizard code
+		e.g. registry.getComponent -> getComponentEntry (it's a
+		template for a component, not an actual component)
+
 - API cleanup:
 
 - manager/component.py:
