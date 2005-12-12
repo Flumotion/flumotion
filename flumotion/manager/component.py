@@ -293,6 +293,12 @@ class ComponentAvatar(base.ManagerAvatar):
             self._HeartbeatCheckDC.cancel()
         self._HeartbeatCheckDC = None
 
+        if self.ports:
+            self.vishnu.releasePortsOnWorker(self.getWorkerName(),
+                                             self.ports.values())
+            
+        self.ports = {}
+
         self.jobState = None
         self._setMood(moods.sleeping)
 
@@ -452,7 +458,7 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Returns the port this feed is being fed on.
         """
-        return self.ports[feedName]
+        return self.ports[self.getName() + ':' + feedName]
  
     def getRemoteManagerIP(self):
         return self.jobState.get('ip')
@@ -461,7 +467,7 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Return the name of the worker.
         """
-        return self.componentState.get('workerName')
+        return self.jobState.get('workerName')
 
     def getPid(self):
         return self.jobState.get('pid')
@@ -494,6 +500,12 @@ class ComponentAvatar(base.ManagerAvatar):
                            of elements feeding our eaters
         @type feedersData: tuple of (name, host) tuples of our feeding elements
         """
+        for feedname, host, port in feedersData:
+            if feedname in self.ports:
+                self.warning('feed %s already has port %d; trying to '
+                             'start anyway' % (feedname, self.ports[feedname]))
+            self.ports[feedname] = port
+
         self.debug('calling remote_start on component %r' % self)
         d = self.mindCallRemote('start', eatersData, feedersData)
         yield d
@@ -609,7 +621,7 @@ class ComponentAvatar(base.ManagerAvatar):
         return d
 
     ### IPerspective methods, called by the worker's component
-    def perspective_feedReady(self, feedName, port):
+    def perspective_feedReady(self, feedName, isReady):
         """
         Called by the component to tell the manager that a given feed is
         ready or not. Will notify other components depending on this
@@ -617,29 +629,11 @@ class ComponentAvatar(base.ManagerAvatar):
 
         @param feedName: name of the feeder, e.g. "default".
         @type  feedName: string
-        @param port: port on which the feed is, or None if the port is
-                     being deactivated.
-        @type  port: int or NoneType
+        @param isReady: True if the feed is now ready, False otherwise.
+        @type  port: bool
         """
         assert isinstance(feedName, str)
-        assert isinstance(port, int) or port == None
-
-        if port == None:
-            self.debug('feedReady: feed name %s is NOT ready' % feedName)
-            if not feedName in self.ports:
-                self.warning(("feed %s deactivated, but we don't know "
-                              "what port is was feeding on") % feedName)
-            else:
-                del self.ports[feedName]
-        else:
-            self.debug('feed %s will feed on port %d' % (feedName, port))
-            if feedName in self.ports:
-                self.warning(("feed %s activated on port %d, but it was "
-                              "already feeding on %d")
-                             % (feedName, port, self.ports[feedName]))
-            self.ports[feedName] = port
-            
-        self.heaven.setFeederReadiness(self, feedName, (port != None))
+        self.heaven.setFeederReadiness(self, feedName, isReady)
             
     def perspective_heartbeat(self, moodValue):
         self.lastHeartbeat = time.time()
@@ -802,23 +796,22 @@ class ComponentHeaven(base.ManagerHeaven):
             retval.append((feederName, host, feeder.getListenPort()))
         return retval
 
-    def _getComponentFeedersData(self, componentAvatar):
+    def _getComponentFeedersData(self, component):
         """
         Retrieves the data of feeders (feed producer elements) for a component.
 
-        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
-        @param componentAvatar: the component
+        @type  component: L{flumotion.manager.component.ComponentAvatar}
+        @param component: the component
 
         @rtype:   tuple of doubles
-        @returns: tuple of (name, host) for each feeder
+        @returns: tuple of (name, host, port) for each feeder
         """
 
-        host = componentAvatar.getClientAddress()
-        feeders = componentAvatar.getFeeders()
-        retval = []
-        for feeder in feeders:
-            retval.append((feeder, host))
-        return retval
+        host = component.getClientAddress()
+        feeders = component.getFeeders()
+        ports = self.vishnu.reservePortsOnWorker(component.getWorkerName(),
+                                                 len(feeders))
+        return map(lambda f, p: (f, host, p), feeders, ports)
 
     def _startComponent(self, componentAvatar):
         eatersData = self._getComponentEatersData(componentAvatar)

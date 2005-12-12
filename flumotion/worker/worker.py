@@ -120,16 +120,20 @@ class WorkerMedium(medium.BaseMedium):
 
     __implements__ = interfaces.IWorkerMedium,
     
-    def __init__(self, brain):
+    def __init__(self, brain, ports):
         self.brain = brain
+        self.ports = ports
         
-    def cb_processFinished(self, *args):
-        self.debug('processFinished %r' % args)
-
-    def cb_processFailed(self, *args):
-        self.debug('processFailed %r' % args)
-
     ### pb.Referenceable method for the manager's WorkerAvatar
+    def remote_getPorts(self):
+        """
+        Gets the range of feed ports that this worker was configured to
+        use.
+
+        @returns: a list of ports, as integers
+        """
+        return self.ports
+
     def remote_start(self, avatarId, type, moduleName, methodName, config):
         """
         Start a component of the given type with the given config.
@@ -406,7 +410,7 @@ class WorkerBrain(log.Loggable):
         self.kindergarten = Kindergarten(options)
         self.job_server_factory, self.job_heaven = self.setup()
 
-        self.medium = WorkerMedium(self)
+        self.medium = WorkerMedium(self, self.options.feederports)
         self.worker_client_factory = WorkerClientFactory(self)
 
         self._startDeferreds = {}
@@ -418,7 +422,7 @@ class WorkerBrain(log.Loggable):
                              
     def setup(self):
         # called from Init
-        root = JobHeaven(self, self.options.feederports)
+        root = JobHeaven(self)
         dispatcher = JobDispatcher(root)
         # FIXME: we should hand a username and password to log in with to
         # the job process instead of allowing anonymous
@@ -543,32 +547,6 @@ class JobDispatcher:
         else:
             raise NotImplementedError("no interface")
 
-class Port:
-    """
-    I am an abstraction of a local TCP port which will be used by GStreamer.
-    """
-    def __init__(self, number):
-        self.number = number
-        self.used = False
-
-    def free(self):
-        self.used = False
-
-    def use(self):
-        self.used = True
-
-    def isFree(self):
-        return self.used is False
-
-    def getNumber(self):
-        return self.number
-
-    def __repr__(self):
-        if self.isFree():
-            return '<Port %d (unused)>' % self.getNumber()
-        else:
-            return '<Port %d (used)>' % self.getNumber()
-
 class JobAvatar(pb.Avatar, log.Loggable):
     """
     I am an avatar for the job living in the worker.
@@ -584,8 +562,6 @@ class JobAvatar(pb.Avatar, log.Loggable):
         self.avatarId = avatarId
         self.mind = None
         self.debug("created new JobAvatar")
-        
-        self.feeds = []
             
     def hasRemoteReference(self):
         """
@@ -620,20 +596,9 @@ class JobAvatar(pb.Avatar, log.Loggable):
         feedNames = kid.config.get('feed', [])
         self.log('feedNames: %r' % feedNames)
 
-        # This is going to be sent to the component
-        feedPorts = {} # feedName -> port number
-        # This is saved, so we can unmark the ports when shutting down
-        self.feeds = []
-        for feedName in feedNames:
-            port = self._getFreePort()
-            feedPorts[feedName] = port.getNumber()
-            self.debug('reserving port %r for feed %s' % (port, feedName))
-            self.feeds.append((feedName, port))
-            
-        self.debug('asking job to start with config %r and feedPorts %r' % (
-            kid.config, feedPorts))
+        self.debug('asking job to start with config %r' % kid.config)
         d = self.mind.callRemote('start', kid.avatarId, kid.type,
-            kid.moduleName, kid.methodName, kid.config, feedPorts)
+            kid.moduleName, kid.methodName, kid.config)
 
         yield d
         try:
@@ -648,21 +613,9 @@ class JobAvatar(pb.Avatar, log.Loggable):
                          % (e.__class__.__name__, e))
     attached = defer_generator_method(attached)
 
-    def _getFreePort(self):
-        for port in self.heaven.ports:
-            if port.isFree():
-                port.use()
-                return port
-
-        # XXX: Raise better error message
-        raise AssertionError
-    
     def logout(self):
         self.log('logout called, %s disconnected' % self.avatarId)
         self.mind = None
-        for feed, port in self.feeds:
-            port.free()
-        self.feeds = []
         
     def stop(self):
         """
@@ -684,16 +637,9 @@ class JobHeaven(pb.Root, log.Loggable):
     I manage avatars inside the worker for job processes spawned by the worker.
     """
     logCategory = "job-heaven"
-    def __init__(self, brain, feederports):
+    def __init__(self, brain):
         self.avatars = {}
         self.brain = brain
-        self.feederports = feederports
-
-        # FIXME: use and option from the command line for port range
-        # Allocate ports
-        self.ports = []
-        for port in self.feederports:
-            self.ports.append(Port(port))
         
     def createAvatar(self, avatarId):
         avatar = JobAvatar(self, avatarId)

@@ -1,3 +1,70 @@
+2005-12-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/job/job.py (JobMedium.remote_start): Don't take
+	feedPorts as an arg, it's not necessary.
+	(JobMedium._runComponent): No feedPorts. Also no need to
+	setConfig, BaseComponent.__init__ does that.
+
+	* flumotion/launch/main.py (ComponentWrapper.instantiate):
+	set_feed_ports is gone.
+	(main): Start the component with the ports allocated.
+
+	* flumotion/manager/component.py (ComponentAvatar.cleanup):
+	Release ports when the component is detached.
+	(ComponentAvatar.getWorkerName): Use the jobState to get the
+	worker name, because we have it before we have the componentState.
+	(ComponentAvatar.start): Keep track of which ports we have
+	reserved for the component.
+	(ComponentAvatar.perspective_feedReady): Take a boolean instead of
+	the port number -- we know which port it's on.
+	(ComponentHeaven._getComponentFeedersData): This is where we
+	actually allocate the ports.
+
+	* flumotion/manager/manager.py (Vishnu.reservePortsOnWorker) 
+	(Vishnu.releasePortsOnWorker): New vishnu methods.
+
+	* flumotion/manager/worker.py (PortSet): New helper object to keep
+	track of ports available on a worker.
+	(WorkerAvatar.attached): Before notifying the heaven or vishnu
+	about a new worker, call getPorts() to get the configured range of
+	ports.
+	(WorkerAvatar.reservePorts, WorkerAvatar.releasePorts): New
+	methods.
+
+	* flumotion/worker/worker.py (WorkerMedium.cb_processFinished) 
+	(WorkerMedium.cb_processFailed): Removed, were not referenced
+	anywhere.
+	(WorkerMedium.remote_getPorts): New remote call, returns the set
+	of ports this worker was configured to use.
+	(WorkerMedium.__init__): Take ports as an initarg.
+	(WorkerBrain.setup): JobHeaven doesn't need the ports.
+	(Port): Port allocation code moved to manager.
+	(JobAvatar.attached): Don't allocate ports for the kid, the
+	manager will do that.
+	(JobHeaven.__init__): No need to keep the port list around.
+
+	* flumotion/component/feedcomponent08.py: 
+	* flumotion/component/feedcomponent09.py (FeedComponent.setup):
+	Remove feed_ports instance variable.
+	(FeedComponent.set_feed_ports): Removed, feed ports are now passed
+	to FeedComponent.start().
+	(FeedComponent._setup_feeders): feedersData tuples now include the
+	port as well. No need for a return value.
+	(FeedComponent.link): Don't return anything, adapt to ports in
+	feedersData.
+
+	* flumotion/test/test_manager_manager.py
+	(FakeWorkerMind.remote_getPorts): Implement the getPorts remote
+	call on our fake worker.
+
+	* flumotion/test/test_worker_worker.py
+	(TestWorkerMedium.testSetRemoteReference): Update for WorkerMedium
+	initargs change.
+
+	* conf/managers/default/flows/ogg-test-theora.xml: Replace with
+	standard components instead of pipeline components. The only
+	videotestsrc pipeline had a fraction framerate.
+
 2005-12-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/encoders/vorbis/vorbis08.py:

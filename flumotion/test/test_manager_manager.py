@@ -251,6 +251,9 @@ class FakeWorkerMind(FakeMind):
         FakeMind.__init__(self, testcase)
         self.avatarId = avatarId
 
+    def remote_getPorts(self):
+        return range(7600,7610)
+
     def remote_start(self, avatarId, type, moduleName, methodName, config):
         self.debug('remote_start(%s): logging in component' % avatarId)
         avatar = self.testcase._loginComponent(self.avatarId,

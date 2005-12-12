@@ -58,7 +58,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug("feedcomponent.setup(): eater_config %r" % eater_config)
         self.debug("feedcomponent.setup(): feeder_config %r" % feeder_config)
         
-        self.feed_ports = {} # feed_name -> port mapping
         self.pipeline = None
         self.pipeline_signals = []
         self.files = []
@@ -246,14 +245,6 @@ class FeedComponent(basecomponent.BaseComponent):
         if not retval:
             self.warning('Setting pipeline to NULL failed')
 
-    def set_feed_ports(self, feed_ports):
-        """
-        @param feed_ports: feed_name -> port
-        @type feed_ports: dict
-        """
-        assert isinstance(feed_ports, dict)
-        self.feed_ports = feed_ports
-        
     def _setup_eaters(self, eatersData):
         """
         Set up the feeded GStreamer elements in our pipeline based on
@@ -338,12 +329,10 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         Set up the feeding GStreamer elements in our pipeline based on
         information in the tuple.  For each feeding element in the tuple,
-        it sets the host it will listen as.
+        it sets the host and port it will listen as.
 
         @type  feedersData: tuple
-        @param feedersData: a list of (feederName, host) tuples.
-
-        @returns: a list of (feedName, host, port) tuples for our feeders.
+        @param feedersData: a list of (feederName, host, port) tuples.
         """
  
         if not self.pipeline:
@@ -351,28 +340,18 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.debug("_setup_feeders: feedersData %r" % feedersData)
 
-        retval = []
-        # Setup all feeders
-        for feeder_name, host in feedersData:
-            feed_name = feeder_name.split(':')[1]
-            self.debug("_setup_feeders: self.feed_ports: %r" % self.feed_ports)
-            assert self.feed_ports.has_key(feed_name), feed_name
-            port = self.feed_ports[feed_name]
+        for feeder_name, host, port in feedersData:
             self.debug('Going to listen on feeder %s (%s:%d)' % (
                 feeder_name, host, port))
             name = 'feeder:' + feeder_name
             feeder = self.get_element(name)
-            assert feeder, 'No feeder element named %s in pipeline' % feed_name
+            assert feeder, 'No feeder element named %s in pipeline' % name
             assert isinstance(feeder, gst.Element)
 
             feeder.connect('state-change', self.feeder_state_change_cb, feed_name)
             feeder.set_property('host', host)
             feeder.set_property('port', port)
             feeder.set_property('protocol', 'gdp')
-
-            retval.append((feed_name, host, port))
-
-        return retval
 
     def feeder_state_change_cb(self, element, old, state, feed_name):
         # also called by subclasses
@@ -430,9 +409,8 @@ class FeedComponent(basecomponent.BaseComponent):
         producing feeds itself.
 
         @param eatersData: list of (feederName, host, port) tuples to eat from
-        @param feedersData: list of (feederName, host) tuples to use as feeders
-
-        @returns: a list of (feedName, host, port) tuples for our feeders
+        @param feedersData: list of (feederName, host, port) tuples to
+        use as feeders
         """
         # if we have eaters waiting, we start out hungry, else waking
         if self.eatersWaiting:
@@ -445,7 +423,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self._setup_eaters(eatersData)
 
         self.debug('setting up feeders')
-        retval = self._setup_feeders(feedersData)
+        self._setup_feeders(feedersData)
         
         # call a child's link_setup() method if it has it
         func = getattr(self, 'link_setup', None)
@@ -455,10 +433,6 @@ class FeedComponent(basecomponent.BaseComponent):
             
         self.debug('setting pipeline to playing')
         self.pipeline_play()
-
-        self.debug('.link() returning %s' % retval)
-
-        return retval
 
     def get_element(self, element_name):
         assert self.pipeline

@@ -247,9 +247,8 @@ class ComponentWrapper(object):
                 % (importname, name, e))
         self.procedure = getattr(module, entry.getFunction())
 
-    def instantiate(self, feed_ports):
+    def instantiate(self):
         self.component = self.procedure(self.config)
-        self.component.set_feed_ports(feed_ports)
 
     def start(self, eatersdata, feedersdata):
         return self.component.start(eatersdata, feedersdata)
@@ -315,17 +314,14 @@ def main(args):
     
     # instantiate the components
     for wrapper in wrappers:
-        data = {}
-        for feeder, port in feed_ports[wrapper.name].items():
-            data[feeder] = port
-        wrapper.instantiate(data)
+        wrapper.instantiate()
 
     # figure out the links and start the components
     for wrapper in wrappers:
         eatersdata = [('%s:%s' % (x[0], x[1]), 'localhost', feed_ports[x[0]][x[1]])
                       for x in links if x[2] == wrapper.name]
-        feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost')
-                       for x in feed_ports[wrapper.name].keys()]
+        feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost', p)
+                       for x, p in feed_ports[wrapper.name].items()]
         ret = wrapper.start(eatersdata, feedersdata)
         if ret:
             for x in ret:

@@ -152,8 +152,7 @@ class JobMedium(medium.BaseMedium):
             self.log('... from path %s' % path)
             packager.registerPackagePath(path, name)
 
-    def remote_start(self, avatarId, type, moduleName, methodName, config,
-        feedPorts):
+    def remote_start(self, avatarId, type, moduleName, methodName, config):
         """
         I am called on by the worker's JobAvatar to start a component.
         
@@ -167,14 +166,11 @@ class JobMedium(medium.BaseMedium):
         @type  methodName: string
         @param config:     the configuration dictionary
         @type  config:     dict
-        @param feedPorts:  feedName -> port
-        @type  feedPorts:  dict
         """
         self.avatarId = avatarId
         self.logName = avatarId
 
-        self._runComponent(avatarId, type, moduleName, methodName, config,
-            feedPorts)
+        self._runComponent(avatarId, type, moduleName, methodName, config)
 
     def remote_stop(self):
         self.debug('remote_stop() called')
@@ -220,8 +216,7 @@ class JobMedium(medium.BaseMedium):
             
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
         
-    def _runComponent(self, avatarId, type, moduleName, methodName, config,
-        feedPorts):
+    def _runComponent(self, avatarId, type, moduleName, methodName, config):
         """
         @param avatarId:   avatarId component will use to log in to manager
         @type  avatarId:   string
@@ -233,8 +228,6 @@ class JobMedium(medium.BaseMedium):
         @type  methodName: string
         @param config:     the configuration dictionary
         @type  config:     dict
-        @param feedPorts: feedName -> port
-        @type  feedPorts: dict
         """
         
         self.info('Starting component "%s" of type "%s"' % (avatarId, type))
@@ -247,7 +240,6 @@ class JobMedium(medium.BaseMedium):
         self._enable_core_dumps()
         
         self.debug('_runComponent(): config dictionary is: %r' % config)
-        self.debug('_runComponent(): feedPorts is: %r' % feedPorts)
 
         # FIXME: we put avatarId in the config for now
         # but it'd be nicer to do this outside of config, so do this
@@ -261,12 +253,7 @@ class JobMedium(medium.BaseMedium):
             self.warning("raising ComponentStart(%s)" % msg)
             raise errors.ComponentStart(msg)
 
-        # we have components without feed ports, and without this function
-        if feedPorts:
-            comp.set_feed_ports(feedPorts)
-
         comp.setWorkerName(self.worker_name)
-        comp.setConfig(config)
 
         # make component log in to manager
         manager_client_factory = component.ComponentClientFactory(comp)

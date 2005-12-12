@@ -75,7 +75,7 @@ class FakeRef:
 class TestWorkerMedium(unittest.TestCase):
     def testSetRemoteReference(self):
         brain = worker.WorkerBrain(FakeOptions())
-        self.medium = worker.WorkerMedium(brain)
+        self.medium = worker.WorkerMedium(brain, [])
         self.medium.setRemoteReference(FakeRef())
         self.assert_(self.medium.hasRemoteReference())
 

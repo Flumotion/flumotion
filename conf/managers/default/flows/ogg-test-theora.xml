@@ -1,24 +1,30 @@
+<?xml version="1.0" ?>
 <planet>
-
   <flow name="default">
-    <component name="producer-video-test" type="pipeline-producer">
-      <property name="pipeline">
-  videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
-      </property>
+    <component name="video-source" type="videotest" worker="localhost">
+      <!-- properties -->
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
     </component>
-  
-    <component name="converter-ogg-theora" type="pipeline-converter">
-      <source>producer-video-test</source>
-      <property name="pipeline">
-  ffmpegcolorspace ! theoraenc keyframe-force=5 ! oggmux
-      </property>
+    <component name="video-encoder" type="theora-encoder" worker="localhost">
+      <source>video-source</source>
+      <!-- properties -->
+      <property name="bitrate">400</property>
     </component>
-  
-    <component name="streamer-ogg-theora" type="http-streamer" worker="streamer">
-      <source>converter-ogg-theora</source>
+    <component name="muxer-video" type="ogg-muxer" worker="localhost">
+      <source>video-encoder</source>
+    </component>
+    <component name="http-video" type="http-streamer" worker="localhost">
+      <source>muxer-video</source>
+      <!-- properties -->
+      <property name="bandwidth_limit">10</property>
+      <property name="burst_on_connect">True</property>
+      <property name="mount_point">/</property>
       <property name="port">8800</property>
-      <property name="logfile">/tmp/ogg-test-theora.access.log</property>
+      <property name="user_limit">1024</property>
     </component>
   </flow>
-
 </planet>

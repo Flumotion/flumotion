@@ -31,7 +31,44 @@ from twisted.internet import defer
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import config, worker, common
+from flumotion.twisted.defer import defer_generator_method
 
+class PortSet(log.Loggable):
+    """
+    A list of ports that keeps track of which are available for use by a
+    given worker.
+    """
+    def __init__(self, workername, ports):
+        self.logName = workername
+        self.ports = ports
+        self.used = [False] * len(ports)
+
+    def reservePorts(self, numPorts):
+        ret = []
+        while numPorts > 0:
+            if not False in self.used:
+                raise errors.ComponentStart('could not allocate port '
+                                            'on worker %s' % self.logName)
+            i = self.used.index(False)
+            ret.append(self.ports[i])
+            self.used[i] = True
+            numPorts -= 1
+        return ret
+
+    def releasePorts(self, ports):
+        for p in ports:
+            try:
+                i = self.ports.index(p)
+                if self.used[i]:
+                    self.used[i] = False
+                else:
+                    self.warning('releasing unallocated port: %d' % p)
+            except ValueError:
+                self.warning('releasing unknown port: %d' % p)
+
+    def numFree(self):
+        return len(filter(lambda x: not x, self.used))
+    
 class WorkerAvatar(base.ManagerAvatar):
     """
     I am an avatar created for a worker.
@@ -40,14 +77,23 @@ class WorkerAvatar(base.ManagerAvatar):
     """
     logCategory = 'worker-avatar'
 
+    portset = None
+
     def getName(self):
         return self.avatarId
 
     def attached(self, mind):
         self.info('worker "%s" logged in' % self.getName())
         base.ManagerAvatar.attached(self, mind)
+
+        d = self.mindCallRemote('getPorts')
+        yield d
+        ports = d.value()
+        self.portset = PortSet(self.avatarId, ports)
+
         self.heaven.workerAttached(self)
         self.vishnu.workerAttached(self)
+    attached = defer_generator_method(attached)
 
     def detached(self, mind):
         self.info('worker "%s" logged out' % self.getName())
@@ -55,6 +101,12 @@ class WorkerAvatar(base.ManagerAvatar):
         self.heaven.workerDetached(self)
         self.vishnu.workerDetached(self)
     
+    def reservePorts(self, numPorts):
+        return self.portset.reservePorts(numPorts)
+
+    def releasePorts(self, ports):
+        self.portset.releasePorts(ports)
+
     def start(self, avatarId, type, config):
         """
         Start a component of the given type with the given config.

@@ -52,15 +52,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         basecomponent.BaseComponentMedium.__init__(self, component)
 
         def on_feed_ready(component, feedName, isReady):
-            # print 'feed ready: %s' % feedName
-            if isReady:
-                assert feedName in self.comp.feed_ports
-                # fixme: this should really come from GStreamer via
-                # element.get_propery('port')
-                self.callRemote('feedReady', feedName,
-                                self.comp.feed_ports[feedName])
-            else:
-                self.callRemote('feedReady', feedName, None)
+            self.callRemote('feedReady', feedName, isReady)
 
         def on_component_error(component, element_path, message):
             self.callRemote('error', element_path, message)
@@ -95,20 +87,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         return state
     
-    def remote_getFreePorts(self, feeders):
-        retval = []
-        ports = {}
-        startPort = configure.defaultGstPortRange[0]
-        free_port = common.getFirstFreePort(startPort)
-        for name, host, port in feeders:
-            if port == None:
-                port = free_port
-                free_port += 1
-            ports[name] = port
-            retval.append((name, host, port))
-            
-        return retval, ports
-
     def remote_effect(self, effectName, methodName, *args, **kwargs):
         self.debug("calling %s on effect %s" % (methodName, effectName))
         if not effectName in self.comp.effects:
@@ -297,18 +275,13 @@ class ParseLaunchComponent(FeedComponent):
         @type eatersData:  list of (feedername, host, port) tuples of elements
                            feeding our eaters.
         @type feedersData: list of (name, host) tuples of our feeding elements
-
-        @returns: something that should not be used. FIXME to make sure
-                  that callers connect to feed-ready instead of using
-                  this return value, which is a list of (feedName, host,
-                  port)-tuples of feeds the component produces.
         """
         self.debug('ParseLaunchComponent.start')
         self.debug('start with eaters data %s and feeders data %s' % (
             eatersData, feedersData))
         self.setMood(moods.waking)
 
-        return self.link(eatersData, feedersData)
+        self.link(eatersData, feedersData)
 
 
 class Effect(log.Loggable):
