@@ -29,9 +29,6 @@ from vorbisutils import get_max_sample_rate
 
 class Vorbis(feedcomponent.FeedComponent):
     def __init__(self, config):
-        name = config['name']
-        eaters = config['source']
-
         self._numChannels = config.get('channels', 2)
         self._bitrate = config.get('bitrate', -1)
         self._quality = config.get('quality', 0.3)

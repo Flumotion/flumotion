@@ -341,6 +341,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug("_setup_feeders: feedersData %r" % feedersData)
 
         for feeder_name, host, port in feedersData:
+            feed_name = feeder_name.split(':')[1]
             self.debug('Going to listen on feeder %s (%s:%d)' % (
                 feeder_name, host, port))
             name = 'feeder:' + feeder_name
