@@ -138,7 +138,7 @@ FeedComponent.component_medium_class = FeedComponentMedium
 class ParseLaunchComponent(FeedComponent):
     'A component using gst-launch syntax'
 
-    DELIMETER = '@'
+    DELIMITER = '@'
 
     ### FeedComponent methods
     def create_pipeline(self):
@@ -211,12 +211,12 @@ class ParseLaunchComponent(FeedComponent):
         assert block != ''
 
         # verify the template has an even number of delimiters
-        if block.count(self.DELIMETER) % 2 != 0:
-            raise TypeError, "'%s' contains an odd number of '%s'" % (block, self.DELIMETER)
+        if block.count(self.DELIMITER) % 2 != 0:
+            raise TypeError, "'%s' contains an odd number of '%s'" % (block, self.DELIMITER)
         
         # when splitting, the even-indexed members will remain,
         # and the odd-indexed members are the blocks to be substituted
-        blocks = block.split(self.DELIMETER)
+        blocks = block.split(self.DELIMITER)
 
         for i in range(1, len(blocks) - 1, 2):
             blocks[i] = self._expandElementName(blocks[i].strip())
@@ -236,7 +236,7 @@ class ParseLaunchComponent(FeedComponent):
         """
         assert pipeline != ''
 
-        deli = self.DELIMETER
+        deli = self.DELIMITER
 
         if len(names) == 1:
             part_name = names[0]
@@ -285,7 +285,7 @@ class ParseLaunchComponent(FeedComponent):
         pipeline = " ".join(pipeline.split())
         
         self.debug('pipeline for %s is %s' % (self.getName(), pipeline))
-        assert self.DELIMETER not in pipeline
+        assert self.DELIMITER not in pipeline
         
         return pipeline
 
