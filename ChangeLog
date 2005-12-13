@@ -1,3 +1,18 @@
+2005-12-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseFlow):
+	Instead of setting 'clock-master' to True or False, set it to
+	either None (for no clock master) or an avatar ID of the component
+	hosting the clock master.
+	(FlumotionConfigXML._parseComponent): Set config['avatarId'] here.
+	(FlumotionConfigXML._parseClockMaster): Return True or None.
+
+	* flumotion/test/test_config.py (TestConfig.testParseProperties):
+	False -> None.
+	(TestConfig.testClockMasterAutoSelection) 
+	(TestConfig.testClockMasterUserSelection): 'clock-master' =
+	avatarId of component providing clock.
+
 2005-12-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/converters/overlay/overlay.py:
@@ -29,12 +44,18 @@
 
 	* flumotion/common/log.py:
 	* flumotion/test/test_log.py:
-	  make getExceptionMessage look at the bottom of the stack
+	  make getExceptionMessage look at the top of the stack
 	  add some unit tests to verify this; I seem to remember having
 	  changed this piece before, so if that turns up again, add more
 	  tests !
 
 2005-12-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feedcomponent08.py
+	(FeedComponent._setup_feeders): Put feed_name definition back in.
+
+	* flumotion/component/encoders/vorbis/vorbis08.py
+	(Vorbis.__init__): Remove unused locals.
 
 	* flumotion/job/job.py (JobMedium.remote_start): Don't take
 	feedPorts as an arg, it's not necessary.

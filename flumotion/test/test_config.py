@@ -267,9 +267,9 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(props.get('six'), 3981391981389138998131389L)
         self.assertEquals(props.get('seven'), (30000, 1001))
 
-        # should be false -- no master in a pipeline that doesn't need
+        # should be none -- no master in a pipeline that doesn't need
         # synchronization
-        self.assertEquals(conf['clock-master'], False)
+        self.assertEquals(conf['clock-master'], None)
 
     def testClockMasterAutoSelection(self):
         planet = config.FlumotionConfigXML(None,
@@ -289,8 +289,8 @@ class TestConfig(unittest.TestCase):
         two = flow.components['two']
         confone = one.getConfigDict()
         conftwo = two.getConfigDict()
-        self.assertEquals(confone['clock-master'], False)
-        self.assertEquals(conftwo['clock-master'], True)
+        self.assertEquals(confone['clock-master'], '/default/two')
+        self.assertEquals(conftwo['clock-master'], '/default/two')
 
     def testClockMasterUserSelection(self):
         planet = config.FlumotionConfigXML(None,
@@ -311,8 +311,8 @@ class TestConfig(unittest.TestCase):
         two = flow.components['two']
         confone = one.getConfigDict()
         conftwo = two.getConfigDict()
-        self.assertEquals(confone['clock-master'], True)
-        self.assertEquals(conftwo['clock-master'], False)
+        self.assertEquals(confone['clock-master'], '/default/one')
+        self.assertEquals(conftwo['clock-master'], '/default/one')
 
     def testClockMasterError(self):
         planet = config.FlumotionConfigXML(None,

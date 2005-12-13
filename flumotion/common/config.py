@@ -44,7 +44,7 @@ class ConfigEntryComponent(log.Loggable):
         self.config = config
         self.defs = defs
         self.worker = worker
-        
+
     def getType(self):
         return self.type
     
@@ -202,7 +202,9 @@ class FlumotionConfigXML(log.Loggable):
 
         config = { 'name': name,
                    'parent': parent,
-                   'type': type }
+                   'type': type,
+                   'avatarId': common.componentPath(name, parent)
+                 }
 
         try:
             defs = registry.getRegistry().getComponent(type)
@@ -273,18 +275,31 @@ class FlumotionConfigXML(log.Loggable):
         # handle master clock selection
         masters = [x for x in flow.components.values()
                      if x.config['clock-master']]
-        if not masters:
-            need_sync = [x for x in flow.components.values()
-                           if x.defs.getNeedsSynchronization()]
-            if need_sync:
-                need_sync = [(x.defs.getClockPriority(), x) for x in need_sync]
-                need_sync.sort()
-                master = need_sync[-1][1]
-                self.info("setting %s as clock master" % master.getName())
-                master.config['clock-master'] = True
-        elif len(masters) > 1:
+        if len(masters) > 1:
             raise ConfigError("Multiple clock masters in flow %s: %r"
                               % (name, masters))
+
+        need_sync = [(x.defs.getClockPriority(), x)
+                     for x in flow.components.values()
+                     if x.defs.getNeedsSynchronization()]
+        need_sync.sort()
+        need_sync = [x[1] for x in need_sync]
+
+        if need_sync:
+            if masters:
+                master = masters[0]
+            else:
+                master = need_sync[-1]
+
+            masterAvatarId = master.config['avatarId']
+            self.info("setting %s as clock master" % masterAvatarId)
+
+            for c in need_sync:
+                c.config['clock-master'] = masterAvatarId
+        elif masters:
+            self.info('master clock specified, but no synchronization '
+                      'necessary -- ignoring')
+            masters[0].config['clock-master'] = None
 
         return flow
 
@@ -444,7 +459,10 @@ class FlumotionConfigXML(log.Loggable):
         if len(bools) > 1:
             raise ConfigError("Only one <clock-master> node allowed")
 
-        return bool(bools and bools[0])
+        if bools and bools[0]:
+            return True # will get changed to avatarId in parseFlow
+        else:
+            return None
             
     def _parseProperties(self, node, type, properties):
         # XXX: We might end up calling float(), which breaks
