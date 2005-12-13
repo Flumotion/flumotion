@@ -50,5 +50,7 @@ def get(project, attribute, default=None):
         exec("import %s" % moduleName)
     except ImportError:
         raise errors.NoProjectError(moduleName)
+    except SyntaxError:
+        raise errors.NoProjectError(moduleName)
     m = sys.modules[moduleName]
     return getattr(m, attribute, default)

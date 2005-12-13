@@ -1,3 +1,9 @@
+2005-12-13  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/project/project.py:
+	  Catch syntax errors in exec() so that illegal project/module names are
+	  caught, rather than getting an unhelpful message later.
+
 2005-12-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py (Vishnu.loadConfiguration) 
