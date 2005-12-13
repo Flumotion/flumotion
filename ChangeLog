@@ -1,5 +1,9 @@
 2005-12-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Vishnu.loadConfiguration) 
+	(Vishnu._addComponent, Vishnu._workerStartComponentDelayed): Get
+	avatarId from the config dict, not the component mapper.
+
 	* flumotion/common/config.py (FlumotionConfigXML._parseFlow):
 	Instead of setting 'clock-master' to True or False, set it to
 	either None (for no clock master) or an avatar ID of the component

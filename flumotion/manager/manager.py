@@ -326,7 +326,7 @@ class Vishnu(log.Loggable):
                     name = eater.split(':')[0]
 
                 flowName = state.get('parent').get('name')
-                avatarId = common.componentPath(name, flowName)
+                avatarId = dict['avatarId']
                 parentState = self._componentMappers[avatarId].state
                 self.debug('depending %r on %r' % (state, parentState))
                 self._dag.addEdge(parentState, state)
@@ -368,8 +368,7 @@ class Vishnu(log.Loggable):
         state.set('parent', parent)
         parent.append('components', state)
 
-        parentName = parent.get('name')
-        avatarId = common.componentPath(config.name, parentName)
+        avatarId = config.getConfigDict()['avatarId']
 
         # add to mapper
         m = ComponentMapper()
@@ -517,8 +516,7 @@ class Vishnu(log.Loggable):
     def _workerStartComponentDelayed(self, result, workerAvatar,
             componentState, type, config):
 
-        m = self._componentMappers[componentState]
-        avatarId = m.id
+        avatarId = config['avatarId']
 
         # FIXME: rename to startComp
         d = workerAvatar.start(avatarId, type, config)
