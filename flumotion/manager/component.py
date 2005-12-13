@@ -29,7 +29,7 @@ __all__ = ['ComponentAvatar', 'ComponentHeaven']
 import time
 
 from twisted.spread import pb
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 
 from flumotion.configure import configure
 # rename to base
@@ -509,11 +509,15 @@ class ComponentAvatar(base.ManagerAvatar):
         config = self.componentState.get('config')
         master = config['clock-master'] # an avatarId
         clocking = None
-        if master and master != self.avatarId:
-            d = self.heaven.getMasterClock(master)
+        if master:
+            d = self.heaven.getMasterClockInfo(master)
             yield d
             try:
                 clocking = d.value()
+                if master == self.avatarId:
+                    # we needed to wait for the set_master to complete,
+                    # but we don't slave the clock to itself...
+                    clocking = None
             except Exception, e:
                 self.error("Could not make component start, reason %s"
                            % log.getExceptionMessage(e))
@@ -737,8 +741,10 @@ class ComponentHeaven(base.ManagerHeaven):
         self._feederSets = {}
         # FIXME: deprecate componentEntries
         self._componentEntries = {} # configuration entries
+
+        self._clockMasterWaiters = {}
+        self.masterClockInfo = {}
         
-   
     ### our methods
     def _componentIsLocal(self, componentAvatar):
         host = componentAvatar.getClientAddress()
@@ -894,6 +900,10 @@ class ComponentHeaven(base.ManagerHeaven):
             state.set('parent', flow)
             flow.append('components', state)
 
+        if state.get('config')['clock-master'] == componentAvatar.avatarId:
+            # houston, we have a master clock
+            self.provideMasterClock(componentAvatar)
+
         # tell the feeder set
         set = self._getFeederSet(componentAvatar)
         set.addFeeders(componentAvatar)
@@ -952,9 +962,55 @@ class ComponentHeaven(base.ManagerHeaven):
         set = self._getFeederSet(componentAvatar)
         set.feederSetReadiness(feederName, readiness)
 
-    def getMasterClock(self, avatarId):
-        self.info('getting master clock info for component %s' % avatarId)
-        return defer.succeed(None)
+    def provideMasterClock(self, componentAvatar):
+        avatarId = componentAvatar.avatarId
 
-    def provideMasterClock(self, avatarId, ip, port, baseTime):
-        raise NotImplementedError(":-)")
+        def setMasterClockInfo(result):
+            self.masterClockInfo[avatarId] = result
+            return result
+
+        def wakeClockMasterWaiters(result):
+            self.info('got master clock info for component %s: %r'
+                      % (avatarId, result))
+            if avatarId in self._clockMasterWaiters:
+                waiters = self._clockMasterWaiters[avatarId]
+                del self._clockMasterWaiters[avatarId]
+                for d in waiters:
+                    d.callback(result)
+
+        workerName = componentAvatar.getWorkerName()
+        port = self.vishnu.reservePortsOnWorker(workerName, 1)[0]
+
+        if avatarId in self.masterClockInfo:
+            self.warning('component %s already has master clock info: %r'
+                         % (avatarId, self.masterClockInfo[avatarId]))
+            del self.masterClockInfo[avatarId]
+        d = componentAvatar.mindCallRemote('provideMasterClock', port)
+        d.addCallback(setMasterClockInfo)
+        d.addCallback(wakeClockMasterWaiters)
+
+    def getMasterClockInfo(self, avatarId):
+        self.debug('getting master clock info for component %s' % avatarId)
+        if avatarId in self.masterClockInfo:
+            return defer.succeed(self.masterClockInfo[avatarId])
+        else:
+            if not avatarId in self._clockMasterWaiters:
+                self._clockMasterWaiters[avatarId] = []
+
+            ret = defer.Deferred()
+            self._clockMasterWaiters[avatarId].append(ret)
+            return ret
+
+    def removeMasterClockInfo(self, avatarId):
+        if avatarId in self._clockMasterWaiters:
+            waiters = self._clockMasterWaiters[avatarId]
+            del self._clockMasterWaiters[avatarId]
+            for d in waiters:
+                d.errback(errors.ComponentStart('clock master component '
+                                                'start cancelled'))
+
+        if avatarId in self.masterClockInfo:
+            del self.masterClockInfo[avatarId]
+        else:
+            self.warning('component %s has no master clock info'
+                         % (avatarId,))

@@ -87,6 +87,13 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         return state
     
+    def remote_provideMasterClock(self, port):
+        """
+        @returns: (ip, port, base_time)
+        @rtype: tuple of (str, int, long)
+        """
+        return self.comp.provide_master_clock(port)
+
     def remote_effect(self, effectName, methodName, *args, **kwargs):
         self.debug("calling %s on effect %s" % (methodName, effectName))
         if not effectName in self.comp.effects:
@@ -284,11 +291,12 @@ class ParseLaunchComponent(FeedComponent):
         self.debug('start with eaters data %s and feeders data %s' % (
             eatersData, feedersData))
         if clocking:
-            self.debug('slaving to clock on %s:%d with base time %d' % clocking)
+            self.info('slaving to clock on %s:%d with base time %d' % clocking)
         self.setMood(moods.waking)
 
         if clocking:
             self.set_master_clock(*clocking)
+
         self.link(eatersData, feedersData)
 
 

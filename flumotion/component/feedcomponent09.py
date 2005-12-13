@@ -65,6 +65,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self.effects = {}
         self._probe_ids = {} # eater name -> probe handler id
 
+        self.clock_provider = None
+
         # add extra keys to state
         self.state.addKey('eaterNames')
         self.state.addKey('feederNames')
@@ -212,7 +214,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # disable the pipeline's management of base_time -- we're going
         # to set it ourselves.
-        # self.pipeline.set_new_stream_time(gst.CLOCK_TIME_NONE)
+        self.pipeline.set_new_stream_time(gst.CLOCK_TIME_NONE)
 
         self.pipeline.set_name('pipeline-' + self.getName())
         bus = self.pipeline.get_bus()
@@ -227,6 +229,9 @@ class FeedComponent(basecomponent.BaseComponent):
         if not self.pipeline:
             return
         
+        if self.clock_provider:
+            self.clock_provider.set_property('active', False)
+            self.clock_provider = None
         retval = self.pipeline.set_state(gst.STATE_NULL)
         if retval != gst.STATE_CHANGE_SUCCESS:
             self.warning('Setting pipeline to NULL failed')
@@ -308,8 +313,26 @@ class FeedComponent(basecomponent.BaseComponent):
         basecomponent.BaseComponent.stop(self)
 
     def set_master_clock(self, ip, port, base_time):
-        # my fingers are tingling
-        pass
+        clock = gst.NetClientClock(None, ip, port, base_time)
+        self.pipeline.set_base_time(base_time)
+        self.pipeline.use_clock(clock)
+
+    def provide_master_clock(self, port):
+        if self.clock_provider:
+            self.warning('already had a clock provider, removing it')
+            self.clock_provider = None
+
+        clock = self.pipeline.get_clock()
+        self.clock_provider = gst.NetTimeProvider(clock, None, port)
+        # small window here but that's ok
+        self.clock_provider.set_property('active', False)
+        
+        base_time = clock.get_time()
+        self.pipeline.set_base_time(base_time)
+
+        ip = self.state.get('ip')
+
+        return (ip, port, base_time)
 
     # FIXME: rename the comment, unambiguate it, and comment on it
     # FIXME: rename, unambiguate and comment
@@ -340,6 +363,8 @@ class FeedComponent(basecomponent.BaseComponent):
             
         self.debug('setting pipeline to playing')
 
+        if self.clock_provider:
+            self.clock_provider.set_property('active', True)
         self.pipeline.set_state(gst.STATE_PLAYING)
 
         # attach one-time buffer-probe callbacks for each eater

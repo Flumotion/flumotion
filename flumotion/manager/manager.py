@@ -325,7 +325,6 @@ class Vishnu(log.Loggable):
                 if ':' in name:
                     name = eater.split(':')[0]
 
-                flowName = state.get('parent').get('name')
                 avatarId = dict['avatarId']
                 parentState = self._componentMappers[avatarId].state
                 self.debug('depending %r on %r' % (state, parentState))

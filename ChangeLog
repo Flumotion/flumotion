@@ -1,5 +1,40 @@
 2005-12-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (ComponentAvatar.start): Change
+	to call getMasterClockInfo, not getMasterClock. Avoid slaving a
+	clock to itself.
+	(ComponentHeaven.registerComponent): Provide a master clock as
+	appropriate.
+	(ComponentHeaven.provideMasterClock): Actually implemented.
+	(ComponentHeaven.getMasterClockInfo): Renamed from getMasterClock,
+	implemented.
+	(ComponentHeaven.removeMasterClockInfo): New function.
+
+	* flumotion/manager/manager.py (Vishnu.loadConfiguration): Remove
+	spurious variable.
+
+	* flumotion/component/feedcomponent.py
+	(FeedComponentMedium.remote_provideMasterClock): New remote
+	method, proxies to the component.
+
+	* flumotion/component/producers/audiotest/audiotest.xml: Up the
+	priority of the clock here so that this clock is deterministically
+	chosen when testing.
+
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.setup_pipeline): Disable automatic management of
+	stream time.
+	(FeedComponent.pipeline_stop): Deactivate and dispose of the clock
+	provider, if any, when going to NULL.
+	(FeedComponent.set_master_clock): Implement. Yay.
+	(FeedComponent.provide_master_clock): New method, implemented.
+	(FeedComponent.link): Activate the clock provider, if any, before
+	going to PLAYING.
+
+	* flumotion/component/feedcomponent08.py
+	(FeedComponent.provide_master_clock): Ignore request to provide
+	master clock on 0.8.
+
 	* flumotion/manager/component.py (ComponentHeaven.getMasterClock):
 	New method, returns a deferred that will fire whenever the
 	information is available (possibly immediately). Right now just

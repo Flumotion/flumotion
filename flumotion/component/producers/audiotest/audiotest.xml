@@ -9,7 +9,9 @@
                function="AudioTest"/>
       </entries>
 
-      <synchronization required="yes" />
+      <!-- priority to this clock so that when testing, clock choice is
+           deterministic -->
+      <synchronization required="yes" clock-priority="110"/>
 
       <properties>
         <property name="volume" type="float"/>
