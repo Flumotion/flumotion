@@ -1,3 +1,31 @@
+2005-12-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py (ComponentHeaven.getMasterClock):
+	New method, returns a deferred that will fire whenever the
+	information is available (possibly immediately). Right now just
+	returns None.
+	(ComponentHeaven.provideMasterClock): New method, called when a
+	component provides a master clock. Not yet implemented...
+	(ComponentAvatar.start): If we need a master clock, get that info
+	using getMasterClock. Pass a third argument to start(), the
+	clocking information, which can be None.
+
+	* flumotion/component/feedcomponent.py
+	(ParseLaunchComponent.do_start): Take a third argument, clocking,
+	meant to be information about the master clock. Pass it on to a
+	new FeedComponent method, set_master_clock.
+
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.set_master_clock): Stub set_master_clock
+	implementation.
+
+	* flumotion/component/feedcomponent08.py
+	(FeedComponent.set_master_clock): Ignore request to set the master
+	clock for 0.8, it's not supported.
+
+	* flumotion/component/encoders/vorbis/vorbis08.py (Vorbis.start):
+	Ignore the clocking arg.
+
 2005-12-13  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/project/project.py:

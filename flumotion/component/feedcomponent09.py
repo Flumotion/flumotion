@@ -307,6 +307,10 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('Stopped')
         basecomponent.BaseComponent.stop(self)
 
+    def set_master_clock(self, ip, port, base_time):
+        # my fingers are tingling
+        pass
+
     # FIXME: rename the comment, unambiguate it, and comment on it
     # FIXME: rename, unambiguate and comment
     def link(self, eatersData, feedersData):

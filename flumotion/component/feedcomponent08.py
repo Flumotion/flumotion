@@ -403,6 +403,11 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('Pausing')
         self.pipeline_pause()
                 
+    def set_master_clock(self, ip, port, base_time):
+        self.info('Told to slave clock to master, but GStreamer 0.8 does '
+                  'not support master/slave clocking. Ignoring request.')
+        return
+
     # FIXME: rename, unambiguate and comment
     def link(self, eatersData, feedersData):
         """

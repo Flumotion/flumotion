@@ -83,7 +83,7 @@ class Vorbis(feedcomponent.FeedComponent):
         return pipeline
 
     ### BaseComponent methods
-    def start(self, eatersData, feedersData):
+    def start(self, eatersData, feedersData, clocking):
         """
         Tell the component to start, linking itself to other components.
 
@@ -99,6 +99,8 @@ class Vorbis(feedcomponent.FeedComponent):
         self.setMood(moods.waking)
         self.feedersData = feedersData
         
+        # just ignore clocking..
+
         # we'll first start eating, so we can figure out caps from the incoming
         # stream and make decisions before starting to feed
         if not self._start_eaters(eatersData):

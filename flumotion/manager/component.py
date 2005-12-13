@@ -506,8 +506,20 @@ class ComponentAvatar(base.ManagerAvatar):
                              'start anyway' % (feedname, self.ports[feedname]))
             self.ports[feedname] = port
 
+        config = self.componentState.get('config')
+        master = config['clock-master'] # an avatarId
+        clocking = None
+        if master and master != self.avatarId:
+            d = self.heaven.getMasterClock(master)
+            yield d
+            try:
+                clocking = d.value()
+            except Exception, e:
+                self.error("Could not make component start, reason %s"
+                           % log.getExceptionMessage(e))
+
         self.debug('calling remote_start on component %r' % self)
-        d = self.mindCallRemote('start', eatersData, feedersData)
+        d = self.mindCallRemote('start', eatersData, feedersData, clocking)
         yield d
         try:
             d.value()
@@ -939,3 +951,10 @@ class ComponentHeaven(base.ManagerHeaven):
                 feederName, readiness))
         set = self._getFeederSet(componentAvatar)
         set.feederSetReadiness(feederName, readiness)
+
+    def getMasterClock(self, avatarId):
+        self.info('getting master clock info for component %s' % avatarId)
+        return defer.succeed(None)
+
+    def provideMasterClock(self, avatarId, ip, port, baseTime):
+        raise NotImplementedError(":-)")

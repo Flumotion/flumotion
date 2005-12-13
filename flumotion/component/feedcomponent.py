@@ -268,19 +268,27 @@ class ParseLaunchComponent(FeedComponent):
         return pipeline
 
     # mood change/state vmethod impl
-    def do_start(self, eatersData, feedersData):
+    def do_start(self, eatersData, feedersData, clocking):
         """
         Tell the component to start, linking itself to other components.
 
         @type eatersData:  list of (feedername, host, port) tuples of elements
                            feeding our eaters.
-        @type feedersData: list of (name, host) tuples of our feeding elements
+        @type feedersData: list of (name, host, port) tuples on which to
+                           produce data.
+        @param clocking: tuple of (ip, port, base_time) of a master clock,
+                         or None not to slave the clock
+        @type  clocking: tuple(str, int, long) or None.
         """
         self.debug('ParseLaunchComponent.start')
         self.debug('start with eaters data %s and feeders data %s' % (
             eatersData, feedersData))
+        if clocking:
+            self.debug('slaving to clock on %s:%d with base time %d' % clocking)
         self.setMood(moods.waking)
 
+        if clocking:
+            self.set_master_clock(*clocking)
         self.link(eatersData, feedersData)
 
 
