@@ -1,3 +1,21 @@
+2005-12-14  Edward Hervey  <edward@fluendo.com>
+
+	* configure.ac:
+	Bump the gst-0.10 requirement to 0.10.0.1 because of the use of
+	gst.extend.discoverer in the looper element.
+	
+	* flumotion/component/producers/looper/looper.py:
+	* flumotion/component/producers/looper/looper.xml:
+	* flumotion/component/producers/looper/looper.glade:
+	* flumotion/component/producers/looper/flufileinfo.glade:
+	Glade-ified the admin UI.
+	Rely on gst.extend.discoverer.Discoverer for discovering the file
+	information, and using the flufileinfo UI to display it.
+	Show current position in loop.
+
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	typo fix
+
 2005-12-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/checks/video09.py (checkWebcam): Do autoprobe

@@ -62,7 +62,7 @@ class PatternNode(BaseAdminGtkNode):
 
     def cb_pattern_changed(self, combobox):
         def _setPatternErrback(failure):
-            self.warning("Failure %s getting pattern: %s" % (
+            self.warning("Failure %s setting pattern: %s" % (
                 failure.type, failure.getErrorMessage()))
             return None
 
