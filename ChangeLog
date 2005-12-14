@@ -1,5 +1,9 @@
 2005-12-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/manager.py (Vishnu.releasePortsOnWorker):
+	s/warning/debug/, the condition can occur legitimately. Cut out if
+	the worker is not available.
+
 	* flumotion/manager/component.py
 	(ComponentHeaven.removeMasterClock): Renamed from
 	removeMasterClockInfo. Release the port from the worker.
