@@ -539,7 +539,6 @@ class JobDispatcher:
     # the job.
     # the avatar id is of the form /(parent)/(name) 
     def requestAvatar(self, avatarId, mind, *interfaces):
-        print 'requesting avatar %s %r %r' % (avatarId, mind, interfaces)
         if pb.IPerspective in interfaces:
             avatar = self.root.createAvatar(avatarId)
             reactor.callLater(0, avatar.attached, mind)
