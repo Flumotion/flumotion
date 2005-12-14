@@ -325,7 +325,8 @@ class Vishnu(log.Loggable):
                 if ':' in name:
                     name = eater.split(':')[0]
 
-                avatarId = dict['avatarId']
+                flowName = state.get('parent').get('name')  
+                avatarId = common.componentPath(name, flowName)
                 parentState = self._componentMappers[avatarId].state
                 self.debug('depending %r on %r' % (state, parentState))
                 self._dag.addEdge(parentState, state)
