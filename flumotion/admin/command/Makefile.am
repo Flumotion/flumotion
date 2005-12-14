@@ -1,14 +1,9 @@
 include $(top_srcdir)/common/python.mk
                                                                                 
-componentdir = $(libdir)/flumotion/python/flumotion/admin
+componentdir = $(libdir)/flumotion/python/flumotion/admin/command
 component_PYTHON = \
 	__init__.py \
-	admin.py \
-	connections.py
-
-SUBDIRS = command gtk text
-
-TAGS_FILES = $(component_PYTHON)
+	main.py
 
 clean-local:
 	rm -rf *.pyc *.pyo

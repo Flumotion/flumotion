@@ -227,6 +227,7 @@ AC_CONFIG_FILES([env], [chmod +x env])
 AC_CONFIG_FILES([bin/flumotion], [chmod +x bin/flumotion])
 AC_CONFIG_FILES([bin/flumotion-admin], [chmod +x bin/flumotion-admin])
 AC_CONFIG_FILES([bin/flumotion-admin-text], [chmod +x bin/flumotion-admin-text])
+AC_CONFIG_FILES([bin/flumotion-command], [chmod +x bin/flumotion-command])
 AC_CONFIG_FILES([bin/flumotion-inspect], [chmod +x bin/flumotion-inspect])
 AC_CONFIG_FILES([bin/flumotion-job], [chmod +x bin/flumotion-job])
 AC_CONFIG_FILES([bin/flumotion-launch], [chmod +x bin/flumotion-launch])
@@ -249,6 +250,7 @@ data/image/wizard/Makefile
 data/flumotion-admin.desktop
 flumotion/Makefile
 flumotion/admin/Makefile
+flumotion/admin/command/Makefile
 flumotion/admin/gtk/Makefile
 flumotion/admin/text/Makefile
 flumotion/common/Makefile

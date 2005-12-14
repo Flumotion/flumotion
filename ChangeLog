@@ -1,5 +1,17 @@
 2005-12-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/gtk/Makefile.am: 
+	* flumotion/admin/command/__init__.py: Add new module space for
+	flumotion-command.
+
+	* bin/flumotion-command.in: New executable. Designed to log in to
+	the manager, execute a command, wait for a response, and then
+	exit.
+
+	* configure.ac: 
+	* bin/Makefile.am (bin_SCRIPTS): flumotion-command infrastructure.
+	* flumotion/admin/Makefile.am (SUBDIRS): 
+
 	* flumotion/manager/manager.py (Vishnu.loadConfiguration): Fix DAG
 	error.
 
