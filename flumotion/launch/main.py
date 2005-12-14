@@ -251,7 +251,7 @@ class ComponentWrapper(object):
         self.component = self.procedure(self.config)
 
     def start(self, eatersdata, feedersdata):
-        return self.component.start(eatersdata, feedersdata)
+        return self.component.start(eatersdata, feedersdata, None)
 
 def main(args):
     from flumotion.common import setup

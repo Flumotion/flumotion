@@ -1,3 +1,8 @@
+2005-12-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/launch/main.py (ComponentWrapper.start): Call start()
+	with the right number of args.
+
 2005-12-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/config.py:
@@ -5,6 +10,9 @@
 	  parsing of properties
 
 2005-12-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/command/main.py: New file, implementing args
+	parsing.
 
 	* flumotion/admin/gtk/Makefile.am: 
 	* flumotion/admin/command/__init__.py: Add new module space for
