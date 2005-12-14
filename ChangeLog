@@ -16,6 +16,7 @@
 	* flumotion/component/producers/looper/looper.xml:
 	* flumotion/component/producers/looper/looper.glade:
 	* flumotion/component/producers/looper/flufileinfo.glade:
+	* flumotion/component/producers/looper/admin_gtk.py:
 	Glade-ified the admin UI.
 	Rely on gst.extend.discoverer.Discoverer for discovering the file
 	information, and using the flufileinfo UI to display it.
