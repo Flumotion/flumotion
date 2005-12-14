@@ -841,7 +841,7 @@ class ComponentRegistry(log.Loggable):
             dTime = directory.lastModified()
             fTime = _getMTime(self.filename)
             if dTime < fTime:
-                self.debug('%s has not been changed since last registy parse' %
+                self.debug('%s has not been changed since last registry parse' %
                     path)
                 return
         
