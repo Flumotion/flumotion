@@ -99,14 +99,17 @@ class FlumotionConfigXML(log.Loggable):
         self.flows = []
         self.manager = None
         self.atmosphere = None
+        self._repr = None
 
         try:
             if filename != None:
                 self.debug('Loading configuration file `%s\'' % filename)
                 self.doc = minidom.parse(filename)
+                self._repr = filename
             else:
                 self.debug('Loading string file `%s\'' % string)
                 self.doc = minidom.parseString(string)
+                self._repr = "<string>"
         except expat.ExpatError, e:
             raise ConfigError("XML parser error: %s" % e)
         
@@ -236,7 +239,8 @@ class FlumotionConfigXML(log.Loggable):
         properties = defs.getProperties()
 
         self.debug('Parsing component: %s' % name)
-        config['properties'] = self._parseProperties(node, type, properties)
+        config['properties'] = self._parseProperties(node, name, type,
+            properties)
 
         # fixme: all of the information except the worker is in the
         # config dict: why?
@@ -464,7 +468,7 @@ class FlumotionConfigXML(log.Loggable):
         else:
             return None
             
-    def _parseProperties(self, node, type, properties):
+    def _parseProperties(self, node, componentName, type, properties):
         # XXX: We might end up calling float(), which breaks
         #      when using LC_NUMERIC when it is not C -- only in python
         #      2.3 though, no prob in 2.4
@@ -475,7 +479,9 @@ class FlumotionConfigXML(log.Loggable):
         for subnode in node.childNodes:
             if subnode.nodeName == 'property':
                 if not subnode.hasAttribute('name'):
-                    raise ConfigError("<property> must have a name attribute")
+                    raise ConfigError(
+                        "%s: <property> must have a name attribute" %
+                        componentName)
                 name = subnode.getAttribute('name')
                 if not name in properties_given:
                     properties_given[name] = []
@@ -486,12 +492,16 @@ class FlumotionConfigXML(log.Loggable):
         config = {}
         for name, nodes in properties_given.items():
             if not name in property_specs:
-                raise ConfigError("Unknown property: %s" % name)
+                    raise ConfigError(
+                        "%s: %s: unknown property" % (
+                            componentName, name))
                 
             definition = property_specs[name]
 
             if not definition.multiple and len(nodes) > 1:
-                raise ConfigError("multiple value specified but not allowed")
+                raise ConfigError(
+                    "%s: %s: multiple value specified but not allowed" % (
+                        componentName, name))
 
             parsers = {'string': self._get_string_value,
                        'rawstring': self._get_raw_string_value,
@@ -503,7 +513,9 @@ class FlumotionConfigXML(log.Loggable):
                        'fraction': self._get_fraction_value}
                        
             if not definition.type in parsers:
-                raise ConfigError("invalid property type: %s" % type)
+                raise ConfigError(
+                    "%s: %s: invalid property type %s" % (
+                        componentName, name, type))
                 
             value = parsers[definition.type](nodes)
 
@@ -517,7 +529,9 @@ class FlumotionConfigXML(log.Loggable):
             
         for name, definition in property_specs.items():
             if definition.isRequired() and not name in config:
-                raise ConfigError("'%s' is required but not specified" % name)
+                raise ConfigError(
+                    "%s: %s: required but unspecified property" % (
+                        componentName, name))
 
         return config
 
