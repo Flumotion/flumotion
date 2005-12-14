@@ -29,7 +29,7 @@ all soundcard producers, for example, need to have their clocks
 synchronized with other capture streams. Thus this property belongs in
 the registry. We choose to represent this as
 
-  <syncronization required="yes"/>
+  <synchronization required="yes"/>
 
 in the component XML node, so that when the full registry is written out
 there can be required="no" lines for components that do not need
