@@ -940,6 +940,11 @@ class ComponentHeaven(base.ManagerHeaven):
         set = self._getFeederSet(componentAvatar)
         set.removeFeeders(componentAvatar)
 
+        config = componentAvatar.componentState.get('config')
+        if config['clock-master'] == componentAvatar.avatarId:
+            # houston, we have a master clock
+            self.removeMasterClock(componentAvatar)
+
         # clean up component
         componentAvatar.cleanup()
 
@@ -989,6 +994,25 @@ class ComponentHeaven(base.ManagerHeaven):
         d.addCallback(setMasterClockInfo)
         d.addCallback(wakeClockMasterWaiters)
 
+    def removeMasterClock(self, componentAvatar):
+        avatarId = componentAvatar.avatarId
+        workerName = componentAvatar.getWorkerName()
+
+        if avatarId in self._clockMasterWaiters:
+            waiters = self._clockMasterWaiters[avatarId]
+            del self._clockMasterWaiters[avatarId]
+            for d in waiters:
+                d.errback(errors.ComponentStart('clock master component '
+                                                'start cancelled'))
+
+        if avatarId in self.masterClockInfo:
+            port = self.masterClockInfo[avatarId][1]
+            self.vishnu.releasePortsOnWorker(workerName, [port])
+            del self.masterClockInfo[avatarId]
+        else:
+            self.warning('component %s has no master clock info'
+                         % (avatarId,))
+
     def getMasterClockInfo(self, avatarId):
         self.debug('getting master clock info for component %s' % avatarId)
         if avatarId in self.masterClockInfo:
@@ -1000,17 +1024,3 @@ class ComponentHeaven(base.ManagerHeaven):
             ret = defer.Deferred()
             self._clockMasterWaiters[avatarId].append(ret)
             return ret
-
-    def removeMasterClockInfo(self, avatarId):
-        if avatarId in self._clockMasterWaiters:
-            waiters = self._clockMasterWaiters[avatarId]
-            del self._clockMasterWaiters[avatarId]
-            for d in waiters:
-                d.errback(errors.ComponentStart('clock master component '
-                                                'start cancelled'))
-
-        if avatarId in self.masterClockInfo:
-            del self.masterClockInfo[avatarId]
-        else:
-            self.warning('component %s has no master clock info'
-                         % (avatarId,))
