@@ -323,6 +323,9 @@ class FeedComponent(basecomponent.BaseComponent):
             self.clock_provider = None
 
         clock = self.pipeline.get_clock()
+        # make sure the pipeline sticks with this clock
+        self.pipeline.use_clock(clock)
+
         self.clock_provider = gst.NetTimeProvider(clock, None, port)
         # small window here but that's ok
         self.clock_provider.set_property('active', False)

@@ -146,7 +146,7 @@ def checkWebcam(device):
     def get_device_name(element):
         return element.get_property('device-name')
                 
-    autoprobe = "autoprobe=false autoprobe-fps=false"
+    autoprobe = "autoprobe-fps=false"
 
     pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,
         autoprobe)

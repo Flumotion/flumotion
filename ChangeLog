@@ -1,3 +1,9 @@
+2005-12-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/feedcomponent09.py
+	(FeedComponent.provide_master_clock): Make sure the pipeline keeps
+	using the clock we're providing.
+
 2005-12-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py (ComponentAvatar.start): Change

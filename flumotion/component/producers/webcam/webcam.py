@@ -63,11 +63,12 @@ class Webcam(feedcomponent.ParseLaunchComponent):
 
     def configure_pipeline(self, pipeline, properties):
         # create and add colorbalance effect
-        source = pipeline.get_by_name('source')
-        hue = properties.get('hue', None)
-        saturation = properties.get('saturation', None)
-        brightness = properties.get('brightness', None)
-        contrast = properties.get('contrast', None)
-        cb = colorbalance.Colorbalance('outputColorbalance', source,
-            hue, saturation, brightness, contrast)
-        self.addEffect(cb)
+        if gst.gst_version < (0,9):
+            source = pipeline.get_by_name('source')
+            hue = properties.get('hue', None)
+            saturation = properties.get('saturation', None)
+            brightness = properties.get('brightness', None)
+            contrast = properties.get('contrast', None)
+            cb = colorbalance.Colorbalance('outputColorbalance', source,
+                hue, saturation, brightness, contrast)
+            self.addEffect(cb)
