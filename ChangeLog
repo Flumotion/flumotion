@@ -1,5 +1,13 @@
 2005-12-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/checks/video09.py (checkWebcam): Do autoprobe
+	colorspaces. Takes about 2 seconds, but it actually works (unlike
+	the previous code).
+
+	* flumotion/component/producers/webcam/webcam.py
+	(Webcam.configure_pipeline): Only add colorspace effect for 0.8,
+	until it's ported to 0.10.
+
 	* flumotion/component/feedcomponent09.py
 	(FeedComponent.provide_master_clock): Make sure the pipeline keeps
 	using the clock we're providing.
