@@ -1,3 +1,10 @@
+2005-12-14  Edward Hervey  <edward@fluendo.com>
+
+	* flumotion/component/producers/looper/admin_gtk.py:
+	Remove print
+	* flumotion/component/producers/looper/flufileinfo.glade:
+	ellipsize the filename string
+
 2005-12-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/main.py (ComponentWrapper.start): Call start()

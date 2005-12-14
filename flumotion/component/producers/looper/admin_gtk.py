@@ -91,7 +91,7 @@ class LooperNode(BaseAdminGtkNode):
         return defer.succeed(self.widget)
 
     def _restart_callback(self, result):
-        print "result:", result
+        pass
 
     def _restart_failed(self, failure):
         self.warning("Failure %s getting pattern: %s" % (
@@ -116,7 +116,6 @@ class LooperNode(BaseAdminGtkNode):
             self.positionbar.set_text(time_to_string(newposition % self.fileinfowidget.duration))
 
     def numberIterationsChanged(self, nbiterations):
-        print "number of iterations is now", nbiterations
         self.numiterlabel.set_text(str(nbiterations))
 
 class LooperAdminGtk(BaseAdminGtk):
