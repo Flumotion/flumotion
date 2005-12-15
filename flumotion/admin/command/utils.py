@@ -39,11 +39,12 @@ def find_component(planet, avatarId):
            % (avatarId[1], avatarId[0]))
     return None
 
-def get_component_uistate(model, avatarId):
-    d = model.callRemote('getPlanetState')
-    yield d
-    planet = d.value()
-    component = find_component(planet, avatarId)
+def get_component_uistate(model, avatarId, component=None, quiet=False):
+    if not component:
+        d = model.callRemote('getPlanetState')
+        yield d
+        planet = d.value()
+        component = find_component(planet, avatarId)
     if component:
         d = model.componentCallRemote(component, 'getUIState')
         yield d
@@ -51,6 +52,7 @@ def get_component_uistate(model, avatarId):
             uistate = d.value()
             yield uistate
         except errors.SleepingComponentError:
-            print ('Error: Component %s in flow %s is sleeping'
-                   % (avatarId[1], avatarId[0]))
+            if not quiet:
+                print ('Error: Component %s in flow %s is sleeping'
+                       % (avatarId[1], avatarId[0]))
 get_component_uistate = defer_generator(get_component_uistate)

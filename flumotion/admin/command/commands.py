@@ -98,6 +98,29 @@ def do_getmood(model, quit, avatarId):
     quit()
 do_getmood = defer_generator(do_getmood)
 
+def do_showcomponent(model, quit, avatarId):
+    d = model.callRemote('getPlanetState')
+    yield d
+    planet = d.value()
+    c = utils.find_component(planet, avatarId)
+    if c:
+        print 'Component state:'
+        keys = c.keys()
+        keys.sort()
+        for k in keys:
+            print '    %s: %r' % (k, c.get(k))
+        d = utils.get_component_uistate(model, avatarId, c, quiet=True)
+        yield d
+        ui = d.value()
+        if ui:
+            print '\nUI state:'
+            keys = ui.keys()
+            keys.sort()
+            for k in keys:
+                print '    %s: %r' % (k, ui.get(k))
+    quit()
+do_showcomponent = defer_generator(do_showcomponent)
+
 commands = (('getprop',
              'gets a property on a component',
              (('component-path', utils.avatarId),
@@ -117,5 +140,10 @@ commands = (('getprop',
              (('component-path', utils.avatarId),
               ),
              do_getmood),
+            ('showcomponent',
+             'shows everything we know about a component',
+             (('component-path', utils.avatarId),
+              ),
+             do_showcomponent),
             )
 

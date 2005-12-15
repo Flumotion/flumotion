@@ -1,3 +1,8 @@
+2005-12-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/command/commands.py (do_showcomponent): New
+	command.
+
 2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/Makefile.am:
