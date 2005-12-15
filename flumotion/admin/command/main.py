@@ -92,11 +92,11 @@ def setup_reactor(connection):
     d = model.connectToHost(connection['host'], connection['port'],
                             connection['use_insecure'])
 
-    def refused(failure, greeter):
+    def refused(failure):
         failure.trap(errors.ConnectionRefusedError)
         err("Manager refused connection. Check your user and password.")
 
-    def failed(failure, greeter):
+    def failed(failure):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
         err("Connection to manager failed: %s" % message)

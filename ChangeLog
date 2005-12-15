@@ -1,5 +1,8 @@
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/main.py (setup_reactor.refused) 
+	(setup_reactor.failed): Fix prototypes.
+
 	* flumotion/admin/command/commands.py (do_getprop): Actually
 	implemented.
 	(get_component_uistate): New helper method to get a component's
