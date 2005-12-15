@@ -1,5 +1,20 @@
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/commands.py (do_getprop): Actually
+	implemented.
+	(get_component_uistate): New helper method to get a component's
+	uistate.
+	(do_listprops): New operation, lists the properties on a
+	component.
+	(avatarId): New parser.
+	(commands): Update the commands list.
+
+	* flumotion/twisted/flavors.py (StateCacheable.keys): New method
+	on StateCacheable objects. Should just make these derive from dict
+	somehow.
+	(StateRemoteCache.keys): Add the method on the cached objects as
+	well.
+
 	* flumotion/admin/command/main.py: Load commands from
 	flumotion.admin.command.commands.
 
