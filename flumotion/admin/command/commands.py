@@ -61,7 +61,8 @@ def get_component_uistate(model, avatarId):
         uistate = d.value()
         yield uistate
     else:
-        print 'Could not find component named %s in flow %s' % avatarId
+        print ('Could not find component named %s in flow %s'
+               % (avatarId[0], avatarId[1]))
         yield None
 get_component_uistate = defer_generator(get_component_uistate)
     

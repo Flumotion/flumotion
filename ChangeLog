@@ -1,5 +1,8 @@
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/commands.py (get_component_uistate): Fix
+	format string.
+
 	* flumotion/admin/command/main.py (setup_reactor.refused) 
 	(setup_reactor.failed): Fix prototypes.
 	(setup_reactor): Remove default errback.
