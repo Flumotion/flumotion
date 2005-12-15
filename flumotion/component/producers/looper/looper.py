@@ -21,8 +21,7 @@
 import gst
 import gobject
 
-from gst.extend.discoverer import Discoverer
-
+from flumotion.common import errors
 from flumotion.component import feedcomponent
 
 class LooperMedium(feedcomponent.FeedComponentMedium):
@@ -62,7 +61,14 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.nbiterations = 0
 
         self.discovered = False
-        self.discoverer = Discoverer(self.filelocation)
+        try:
+            from gst.extend import discoverer
+        except ImportError:
+            raise errors.ComponentError(
+                'Could not import gst.extend.discoverer.  '
+                'You need at least GStreamer Python Bindings 0.10.1')
+
+        self.discoverer = discoverer.Discoverer(self.filelocation)
         self.discoverer.connect('discovered', self._filediscovered)
         self.discoverer.discover()
         self.fileinformation = None
@@ -128,7 +134,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
                     self.timeoutid = gobject.timeout_add(500, self._check_time)
 
     def _check_time(self):
-        self.debug("checking position")
+        self.log("checking position")
         try:
             pos, format = self.pipeline.query_position(gst.FORMAT_TIME)
         except:

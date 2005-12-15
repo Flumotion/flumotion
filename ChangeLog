@@ -1,5 +1,13 @@
 2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* configure.ac:
+	  back down to gst-python 0.10.0
+	* flumotion/component/producers/looper/looper.py:
+	  move a regularly recurring debug line to log level 5
+	  try to import discoverer and fail if not found
+
+2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/log.py:
 	  if we only have one arg for an exception and it's a string,
 	  we can consider it an error message that we can show
