@@ -1,5 +1,8 @@
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/commands.py (do_showplanet): New
+	command.
+
 	* flumotion/component/consumers/httpstreamer/http.py
 	(Stats.updateState, MultifdSinkStreamer.configure_pipeline): Add
 	'stream-bitrate-raw', 'stream-totalbytes-raw'

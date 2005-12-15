@@ -62,6 +62,24 @@ def do_listprops(model, quit, avatarId):
     quit()
 do_listprops = defer_generator(do_listprops)
 
+def do_showplanet(model, quit):
+    d = model.callRemote('getPlanetState')
+    yield d
+    planet = d.value()
+
+    for f in planet.get('flows'):
+        print 'flow: %s' % f.get('name')
+        for c in f.get('components'):
+            print '  %s' % c.get('name')
+
+    a = planet.get('atmosphere')
+    print 'atmosphere: %s' % a.get('name')
+    for c in a.get('components'):
+        print '  %s' % c.get('name')
+
+    quit()
+do_showplanet = defer_generator(do_showplanet)
+
 commands = (('getprop',
              'gets a property on a component',
              (('component-path', utils.avatarId),
@@ -72,5 +90,9 @@ commands = (('getprop',
              (('component-path', utils.avatarId),
               ),
              do_listprops),
+            ('showplanet',
+             'shows the flows, atmosphere, and components in the planet',
+             (),
+             do_showplanet),
             )
 
