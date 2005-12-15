@@ -29,18 +29,21 @@ def avatarId(string):
     assert not split[0]
     return split[1:]
 
-def get_component_uistate(model, avatarId):
-    def find_component(planet):
-        for f in planet.get('flows'):
-            if f.get('name') == avatarId[0]:
-                for c in f.get('components'):
-                    if c.get('name') == avatarId[1]:
-                        return c
+def find_component(planet, avatarId):
+    for f in planet.get('flows'):
+        if f.get('name') == avatarId[0]:
+            for c in f.get('components'):
+                if c.get('name') == avatarId[1]:
+                    return c
+    print ('Could not find component named %s in flow %s'
+           % (avatarId[1], avatarId[0]))
+    return None
 
+def get_component_uistate(model, avatarId):
     d = model.callRemote('getPlanetState')
     yield d
     planet = d.value()
-    component = find_component(planet)
+    component = find_component(planet, avatarId)
     if component:
         d = model.componentCallRemote(component, 'getUIState')
         yield d
@@ -50,9 +53,4 @@ def get_component_uistate(model, avatarId):
         except errors.SleepingComponentError:
             print ('Error: Component %s in flow %s is sleeping'
                    % (avatarId[1], avatarId[0]))
-            yield None
-    else:
-        print ('Could not find component named %s in flow %s'
-               % (avatarId[1], avatarId[0]))
-        yield None
 get_component_uistate = defer_generator(get_component_uistate)

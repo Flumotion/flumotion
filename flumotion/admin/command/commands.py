@@ -21,6 +21,7 @@
 
 from flumotion.twisted.defer import defer_generator
 from flumotion.admin.command import utils
+from flumotion.common.planet import moods
 
 
 __all__ = ['commands']
@@ -80,6 +81,23 @@ def do_showplanet(model, quit):
     quit()
 do_showplanet = defer_generator(do_showplanet)
 
+def do_getmood(model, quit, avatarId):
+    d = model.callRemote('getPlanetState')
+    yield d
+    planet = d.value()
+    c = utils.find_component(planet, avatarId)
+    if c:
+        mood = c.get('mood')
+        try:
+            import os
+            os.spawnlp(os.P_WAIT, 'cowsay', 'cowsay',
+                       "%s is %s" % (c.get('name'), moods[mood].name))
+        except Exception:
+            print "%s is %s" % (c.get('name'), moods[mood].name)
+
+    quit()
+do_getmood = defer_generator(do_getmood)
+
 commands = (('getprop',
              'gets a property on a component',
              (('component-path', utils.avatarId),
@@ -94,5 +112,10 @@ commands = (('getprop',
              'shows the flows, atmosphere, and components in the planet',
              (),
              do_showplanet),
+            ('getmood',
+             'gets the mood of a component',
+             (('component-path', utils.avatarId),
+              ),
+             do_getmood),
             )
 

@@ -1,3 +1,9 @@
+2005-12-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/command/commands.py (do_showplanet): New
+	command.
+	(do_getmood): New command.
+
 2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:
@@ -6,9 +12,6 @@
 	  which breaks when using projects
 
 2005-12-15  Andy Wingo  <wingo@pobox.com>
-
-	* flumotion/admin/command/commands.py (do_showplanet): New
-	command.
 
 	* flumotion/component/consumers/httpstreamer/http.py
 	(Stats.updateState, MultifdSinkStreamer.configure_pipeline): Add
