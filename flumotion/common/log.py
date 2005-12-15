@@ -445,7 +445,12 @@ def getExceptionMessage(exception):
     (filename, line, func, text) = stack[-1]
     filename = scrubFilename(filename)
     exc = exception.__class__.__name__
-    return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()" % locals()
+    msg = ""
+    # a shortcut to extract a useful message out of most flumotion errors
+    # for now
+    if len(exception.args) == 1 and isinstance(exception.args[0], str):
+        msg = ": %s" % exception.args[0]
+    return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()%(msg)s" % locals()
 
 def getFailureMessage(failure):
     exc = str(failure.type)

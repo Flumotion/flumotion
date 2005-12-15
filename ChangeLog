@@ -1,3 +1,9 @@
+2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
+	  if we only have one arg for an exception and it's a string,
+	  we can consider it an error message that we can show
+
 2005-12-15  Edward Hervey  <edward@fluendo.com>
 
 	* flumotion/component/producers/looper/Makefile.am:
