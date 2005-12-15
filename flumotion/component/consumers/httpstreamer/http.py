@@ -118,6 +118,8 @@ class Stats:
         bitspeed = bytes_received * 8 / uptime
         set('stream-bitrate', common.formatStorage(bitspeed) + 'bit/s')
         set('stream-totalbytes', common.formatStorage(bytes_received) + 'Byte')
+        set('stream-bitrate-raw', bitspeed)
+        set('stream-totalbytes-raw', bytes_received)
 
         set('clients-current', str(c.getClients()))
         set('clients-max', str(c.getMaxClients()))
@@ -128,6 +130,8 @@ class Stats:
         bitspeed = bytes_sent * 8 / uptime
         set('consumption-bitrate', common.formatStorage(bitspeed) + 'bit/s')
         set('consumption-totalbytes', common.formatStorage(bytes_sent) + 'Byte')
+        set('consumption-bitrate-raw', bitspeed)
+        set('consumption-totalbytes-raw', bytes_sent)
 
 
 class HTTPMedium(feedcomponent.FeedComponentMedium):
@@ -213,7 +217,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         for i in ('stream-mime', 'stream-uptime', 'stream-bitrate',
                   'stream-totalbytes', 'clients-current', 'clients-max',
                   'clients-peak', 'clients-peak-time', 'clients-average',
-                  'consumption-bitrate', 'consumption-totalbytes'):
+                  'consumption-bitrate', 'consumption-totalbytes',
+                  'stream-bitrate-raw', 'stream-totalbytes-raw',
+                  'consumption-bitrate-raw', 'consumption-totalbytes-raw'):
             self.uiState.addKey(i, None)
 
         self._post_init(properties)

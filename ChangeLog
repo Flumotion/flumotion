@@ -1,5 +1,11 @@
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py
+	(Stats.updateState, MultifdSinkStreamer.configure_pipeline): Add
+	'stream-bitrate-raw', 'stream-totalbytes-raw'
+	'consumption-bitrate-raw', and 'consumption-totalbytes-raw'
+	entries in the uiState.
+
 	* flumotion/admin/command/main.py (usage): Less wrong options
 	string.
 
