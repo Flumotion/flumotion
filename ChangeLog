@@ -1,5 +1,11 @@
 2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion.spec.in:
+	  add -command
+	  fix double includes
+
+2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* configure.ac:
 	  back down to gst-python 0.10.0
 	* flumotion/component/producers/looper/looper.py:
