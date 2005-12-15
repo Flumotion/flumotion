@@ -107,6 +107,9 @@
 		e.g. registry.getComponent -> getComponentEntry (it's a
 		template for a component, not an actual component)
 
+* MEDIUM	flumotion.common.registry: ewww @ RegistryEntryEntry
+		rename generic Entry to Node ?
+
 - API cleanup:
 
 - manager/component.py:

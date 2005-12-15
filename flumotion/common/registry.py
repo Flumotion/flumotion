@@ -29,8 +29,6 @@ import errno
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
-from twisted.python import reflect
-
 from flumotion.common import common, log, package, bundle, errors
 from flumotion.configure import configure
 
@@ -55,7 +53,9 @@ class RegistryEntryComponent:
                  source, base, properties, files,
                  entries, eaters, feeders, needs_sync, clock_priority):
         """
-        @type properties: dict of str -> L{RegistryEntryProperty}
+        @type properties:  dict of str -> L{RegistryEntryProperty}
+        @type entries:     dict of str -> L{RegistryEntryEntry}
+        @param entries:    dict of type -> entry
         """
         self.filename = filename
         self.type = type
@@ -90,6 +90,11 @@ class RegistryEntryComponent:
         return self.entries.values()
 
     def getEntryByType(self, type):
+        """
+        Get the entry point for the given type of entry.
+
+        @type type: string
+        """
         return self.entries[type]
     
     def getGUIEntry(self):
@@ -237,7 +242,7 @@ class RegistryEntryEntry:
             path = os.path.join(base, self.getLocation())
         else:
             path = self.getLocation()
-        return reflect.filenameToModuleName(path)
+        return common.pathToModuleName(path)
 
     def getFunction(self):
         return self.function
@@ -460,6 +465,7 @@ class RegistryParser(log.Loggable):
         # <entries>
         #   <entry type="" location="" function=""/>
         # </entries>
+        # returns: dict of type -> entry
 
         entries = {}
         for child in self._getChildNodes(node):

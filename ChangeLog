@@ -1,3 +1,10 @@
+2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	* flumotion/common/registry.py:
+	  use common.pathToModuleName, it doesn't check on-disk for a file,
+	  which breaks when using projects
+
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/command/commands.py (do_showplanet): New
