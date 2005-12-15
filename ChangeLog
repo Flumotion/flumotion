@@ -1,5 +1,8 @@
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/main.py (usage): Less wrong options
+	string.
+
 	* flumotion/admin/command/Makefile.am (component_PYTHON): 
 	* flumotion/admin/command/commands.py: 
 	* flumotion/admin/command/utils.py: Factored some noise out of

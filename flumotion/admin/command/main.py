@@ -48,7 +48,7 @@ def command_usage():
         sys.stdout.write('\n')
 
 def usage(args, exitval=0):
-    print 'usage: %s -m [OPTIONS] MANAGER COMMAND COMMAND-ARGS...' % args[0]
+    print 'usage: %s [OPTIONS] -m MANAGER COMMAND COMMAND-ARGS...' % args[0]
     print ''
     print 'Available commands:'
     print ''
