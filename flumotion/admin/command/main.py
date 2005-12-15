@@ -95,13 +95,13 @@ def setup_reactor(connection):
     def refused(failure):
         failure.trap(errors.ConnectionRefusedError)
         print "Manager refused connection. Check your user and password."
-        reactor.quit()
+        reactor.stop()
 
     def failed(failure):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
         print "Connection to manager failed: %s" % message
-        reactor.quit()
+        reactor.stop()
 
     d.addErrback(refused)
     d.addErrback(failed)

@@ -2,6 +2,7 @@
 
 	* flumotion/admin/command/main.py (setup_reactor.refused) 
 	(setup_reactor.failed): Quit the reactor on errors.
+	(setup_reactor.failed, setup_reactor.refused): Or, stop it.
 
 	* flumotion/admin/command/commands.py (get_component_uistate): Fix
 	format string.
