@@ -1,5 +1,12 @@
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/main.py: Load commands from
+	flumotion.admin.command.commands.
+
+	* flumotion/admin/command/Makefile.am (component_PYTHON): 
+	* flumotion/admin/command/commands.py: New file, split out from
+	main.py. Here's where all of the commands will get defined.
+
 	* flumotion/admin/command/main.py: Implement a bit more; just need
 	to implement do_getprop and I'm there.
 

@@ -30,33 +30,14 @@ from flumotion.admin import connections
 from flumotion.common import log, errors
 from flumotion.configure import configure
 
+from flumotion.admin.command.commands import commands
+
 def err(string):
     sys.stderr.write('Error: ' + string + '\n')
     sys.exit(1)
 
 def warn(string):
     sys.stderr.write('Warning: ' + string + '\n')
-
-# command-list := (command-spec, command-spec...)
-# command-spec := (command-name, command-desc, arguments, command-proc)
-# command-name := str
-# command-desc := str
-# command-proc := f(model, quit, *args) -> None
-# arguments := (arg-spec, arg-spec...)
-# arg-spec := (arg-name, arg-parser)
-# arg-name := str
-# arg-parser := f(x) -> Python value or exception
-
-def do_getprop(model, quit, path, propname):
-    print 'foo'
-    quit()
-
-commands = (('getprop',
-             'gets a property on a component',
-             (('component-path', str),
-              ('property-name', str)),
-             do_getprop),
-            )
 
 def command_usage():
     for name, desc, argspecs, proc in commands:
