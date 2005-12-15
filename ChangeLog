@@ -1,3 +1,10 @@
+2005-12-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/command/Makefile.am (component_PYTHON): 
+	* flumotion/admin/command/commands.py: 
+	* flumotion/admin/command/utils.py: Factored some noise out of
+	commands.py. Fixed a couple bugs as well.
+
 2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/package.py:

@@ -95,13 +95,13 @@ def setup_reactor(connection):
     def refused(failure):
         failure.trap(errors.ConnectionRefusedError)
         print "Manager refused connection. Check your user and password."
-        reactor.stop()
+        raise
 
     def failed(failure):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
         print "Connection to manager failed: %s" % message
-        reactor.stop()
+        raise
 
     d.addErrback(refused)
     d.addErrback(failed)
@@ -208,5 +208,8 @@ def main(args):
     d = setup_reactor(connection)
 
     d.addCallback(lambda model: command(model, quit))
+    # assume that whatever raised the error already printed -- this is a
+    # bit geto
+    d.addErrback(lambda failure: quit())
 
     reactor.run()

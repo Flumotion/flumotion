@@ -20,11 +20,13 @@
 
 
 from flumotion.twisted.defer import defer_generator
-from flumotion.common import componentui # so we can unjelly uiState
+from flumotion.admin.command import utils
 
 
 __all__ = ['commands']
 
+
+# it's probably time to move this stuff into classes...
 
 # command-list := (command-spec, command-spec...)
 # command-spec := (command-name, command-desc, arguments, command-proc)
@@ -37,37 +39,8 @@ __all__ = ['commands']
 # arg-parser := f(x) -> Python value or exception
 
 
-def avatarId(string):
-    split = string.split('/')
-    assert len(split) == 3
-    assert not split[0]
-    return split[1:]
-
-def get_component_uistate(model, avatarId):
-    def find_component(planet):
-        for f in planet.get('flows'):
-            if f.get('name') == avatarId[0]:
-                for c in f.get('components'):
-                    if c.get('name') == avatarId[1]:
-                        return c
-
-    d = model.callRemote('getPlanetState')
-    yield d
-    planet = d.value()
-    component = find_component(planet)
-    if component:
-        d = model.componentCallRemote(component, 'getUIState')
-        yield d
-        uistate = d.value()
-        yield uistate
-    else:
-        print ('Could not find component named %s in flow %s'
-               % (avatarId[0], avatarId[1]))
-        yield None
-get_component_uistate = defer_generator(get_component_uistate)
-    
 def do_getprop(model, quit, avatarId, propname):
-    d = get_component_uistate(model, avatarId)
+    d = utils.get_component_uistate(model, avatarId)
     yield d
     uistate = d.value()
     if uistate:
@@ -75,12 +48,12 @@ def do_getprop(model, quit, avatarId, propname):
             print uistate.get(propname)
         else:
             print ('Component %s in flow %s has no property called %s'
-                   % (avatarId[0], avatarId[1], propname))
+                   % (avatarId[1], avatarId[0], propname))
     quit()
 do_getprop = defer_generator(do_getprop)
 
 def do_listprops(model, quit, avatarId):
-    d = get_component_uistate(model, avatarId)
+    d = utils.get_component_uistate(model, avatarId)
     yield d
     uistate = d.value()
     if uistate:
@@ -91,12 +64,12 @@ do_listprops = defer_generator(do_listprops)
 
 commands = (('getprop',
              'gets a property on a component',
-             (('component-path', avatarId),
+             (('component-path', utils.avatarId),
               ('property-name', str)),
              do_getprop),
             ('listprops',
              'lists the properties a component has',
-             (('component-path', avatarId),
+             (('component-path', utils.avatarId),
               ),
              do_listprops),
             )
