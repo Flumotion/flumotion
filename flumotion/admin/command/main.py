@@ -101,13 +101,8 @@ def setup_reactor(connection):
         message = "".join(failure.value.args)
         err("Connection to manager failed: %s" % message)
 
-    def default(failure):
-        message = "".join(failure.value.args)
-        err("Could not connect to manager: %s" % message)
-
     d.addErrback(refused)
     d.addErrback(failed)
-    d.addErrback(default)
 
     return d
 

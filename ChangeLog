@@ -2,6 +2,7 @@
 
 	* flumotion/admin/command/main.py (setup_reactor.refused) 
 	(setup_reactor.failed): Fix prototypes.
+	(setup_reactor): Remove default errback.
 
 	* flumotion/admin/command/commands.py (do_getprop): Actually
 	implemented.
