@@ -106,7 +106,7 @@ class LooperNode(BaseAdminGtkNode):
             self.fileinfowidget.set_information(fileinformation)
         
     def haveUpdatedPosition(self, newposition):
-        self.debug("got new position : %d" % newposition)
+        self.log("got new position : %d" % newposition)
         if self.fileinfowidget.duration:
             percent = float(newposition % self.fileinfowidget.duration) / float(self.fileinfowidget.duration)
             self.positionbar.set_fraction(percent)
