@@ -1,3 +1,8 @@
+2005-12-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/command/main.py: Implement a bit more; just need
+	to implement do_getprop and I'm there.
+
 2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:

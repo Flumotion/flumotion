@@ -37,70 +37,98 @@ def err(string):
 def warn(string):
     sys.stderr.write('Warning: ' + string + '\n')
 
-def type_chk(type):
-    return lambda x: isinstance(x, type)
-
-def item_chk(checker):
-    def ret(x):
-        for i in x:
-            if not checker(i):
-                return False
-        return True
-    return ret
-
-# function intersection
-def fint(*procs):
-    def ret(x):
-        for f in procs:
-            if not f(x):
-                return False
-        return True
-    return ret
-
 # command-list := (command-spec, command-spec...)
-# command-spec := (command-name, arguments)
+# command-spec := (command-name, command-desc, arguments, command-proc)
 # command-name := str
+# command-desc := str
+# command-proc := f(model, quit, *args) -> None
 # arguments := (arg-spec, arg-spec...)
-# arg-spec := (arg-name, arg-predicate)
+# arg-spec := (arg-name, arg-parser)
 # arg-name := str
-# arg-predicate := f(x) -> True or False
+# arg-parser := f(x) -> Python value or exception
 
-commands = (('getprop', (('component-path', type_chk(str)),
-                         ('property-name', type_chk(str)))))
+def do_getprop(model, quit, path, propname):
+    print 'foo'
+    quit()
 
-def setup_reactor(options):
-    # We do the import here so gettext has been set up and class strings
-    # from greeter are translated
-    from flumotion.admin.gtk import greeter
-    g = thegreeter or greeter.Greeter()
-    state = g.run()
-    if not state:
-        reactor.callLater(0, reactor.stop)
-        return
-    g.set_sensitive(False)
+commands = (('getprop',
+             'gets a property on a component',
+             (('component-path', str),
+              ('property-name', str)),
+             do_getprop),
+            )
 
-    model = AdminModel(state['user'], state['passwd'])
-    d = model.connectToHost(state['host'], state['port'], state['use_insecure'])
+def command_usage():
+    for name, desc, argspecs, proc in commands:
+        sys.stdout.write('  %s -- %s\n' % (name, desc))
+        sys.stdout.write('    usage: %s' % name)
+        for name, pred in argspecs:
+            sys.stdout.write(' %s' % name.upper())
+        sys.stdout.write('\n')
 
-    def connected(model, greeter):
-        greeter.destroy()
-        Window(model).show()
+def usage(args, exitval=0):
+    print 'usage: %s -m [OPTIONS] MANAGER COMMAND COMMAND-ARGS...' % args[0]
+    print ''
+    print 'Available commands:'
+    print ''
+    command_usage()
+    print ''
+    print 'See %s -h for help on the available options.' % args[0]
+    sys.exit(exitval)
+
+def parse_commands(args):
+    op = args[1]
+    matching = [x for x in commands if x[0] == op]
+    if not matching:
+        print 'Error: Unknown command: %s' % op
+        usage(args, exitval=1)
+    commandspec = matching[0]
+
+    argspecs = commandspec[2]
+    if len(args[2:]) != len(argspecs):
+        print 'Error: Invalid arguments to operation %s: %r' % (op, args[2:])
+        usage(args, exitval=1)
+
+    vals = []
+    for argspec, arg in zip(argspecs, args[2:]):
+        name, parse = argspec
+        try:
+            vals.append(parse(arg))
+        except Exception:
+            err('Error: Operation %s\'s arg %s="%s" could not be '
+                'parsed as type "%s"'
+                % (op, name, arg, parse.__name__))
+
+    proc = commandspec[3]
+
+    def command(model, quit):
+        proc(model, quit, *vals)
+
+    return command
+
+def setup_reactor(connection):
+    model = AdminModel(connection['user'], connection['passwd'])
+    d = model.connectToHost(connection['host'], connection['port'],
+                            connection['use_insecure'])
 
     def refused(failure, greeter):
         failure.trap(errors.ConnectionRefusedError)
-        dialogs.connection_refused_modal_message(state['host'],
-                                                 greeter.window)
-        _runInterface(None, None, greeter)
+        err("Manager refused connection. Check your user and password.")
 
     def failed(failure, greeter):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
-        dialogs.connection_failed_modal_message(message, greeter.window)
-        _runInterface(None, None, greeter)
+        err("Connection to manager failed: %s" % message)
 
-    d.addCallback(connected, g)
-    d.addErrback(refused, g)
-    d.addErrback(failed, g)
+    def default(failure):
+        message = "".join(failure.value.args)
+        err("Could not connect to manager: %s" % message)
+
+    d.addErrback(refused)
+    d.addErrback(failed)
+    d.addErrback(default)
+
+    return d
 
 pat = re.compile('^(([^:@]*)(:([^:@]+))?@)?([^:@]+)(:([0-9]+))?$')
 
@@ -108,18 +136,19 @@ def parse_connection(manager_string, use_insecure):
     recent = connections.get_recent_connections()
 
     if manager_string:
-        matched = pat.match(manager_string)
+        matched = pat.search(manager_string)
         if not matched:
             err('invalid manager string: %s '
                 '(looking for [user[:pass]@]host[:port])'
                 % manager_string)
 
+        groups = matched.groups()
         ret = {}
         for k, v in (('user', 1),
                      ('passwd', 3),
                      ('host', 4),
                      ('port', 6)):
-            ret[k] = matched[v]
+            ret[k] = groups[v]
         ret['use_insecure'] = bool(use_insecure)
         if not ret['port']:
             if use_insecure:
@@ -135,14 +164,17 @@ def parse_connection(manager_string, use_insecure):
 
         if not ret['user']:
             for c in recent:
-                if compatible(ret, c, 'host', 'port', 'use_insecure'):
-                    ret['user'] = c['user']
-                    ret['passwd'] = c['passwd']
+                state = c['state']
+                if compatible(ret, state, 'host', 'port', 'use_insecure'):
+                    ret['user'] = state['user']
+                    ret['passwd'] = state['passwd']
                     break
         elif not ret['passwd']:
             for c in recent:
-                if compatible(ret, c, 'host', 'port', 'use_insecure', 'user'):
-                    ret['passwd'] = c['passwd']
+                state = c['state']
+                if compatible(ret, state, 'host', 'port', 'use_insecure',
+                              'user'):
+                    ret['passwd'] = state['passwd']
                     break
         if not (ret['user'] and ret['passwd']):
             err('You are connecting to %s for the first time; please '
@@ -154,7 +186,7 @@ def parse_connection(manager_string, use_insecure):
 
         return ret
     elif recent:
-        return recent[0]
+        return recent[0]['state']
     else:
         err('Missing --manager, and no recent connections to use.')
 
@@ -163,6 +195,9 @@ def main(args):
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",
                       help="set debug levels")
+    parser.add_option('-u', '--usage',
+                      action="store_true", dest="usage",
+                      help="show a usage message")
     parser.add_option('-m', '--manager',
                       action="store", type="string", dest="manager",
                       help="the manager to connect to, e.g. localhost:7531")
@@ -184,19 +219,16 @@ def main(args):
     if options.debug:
         log.setFluDebug(options.debug)
 
-    if not args[1:]:
-        #usage
-        print 'here is how to use this thing'
-        sys.exit(0)
+    if options.usage or not args[1:]:
+        usage(args)
 
-    connection = parse_connection(options.manager)
-    print connection
+    connection = parse_connection(options.manager, options.no_ssl)
 
-    #thunk = parse_commands(args)
-    #quit = lambda: reactor.callLater(0, reactor.stop)
+    command = parse_commands(args)
+    quit = lambda: reactor.callLater(0, reactor.stop)
 
-    #d = setup_reactor()
+    d = setup_reactor(connection)
 
-    #d.addCallback(lambda result: thunk(quit))
+    d.addCallback(lambda model: command(model, quit))
 
-    #reactor.run()
+    reactor.run()
