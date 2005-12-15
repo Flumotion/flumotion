@@ -287,7 +287,10 @@ class FakeComponentMind(FakeMind):
         self.debug('remote_getState: returning %r' % self.state)
         return self.state
 
-    def remote_start(self, eatersData, feedersData):
+    def remote_provideMasterClock(self, port):
+        return ("127.0.0.1", port, 0L)
+
+    def remote_start(self, eatersData, feedersData, clocking):
         self.debug('remote_start(%r, %r)' % (eatersData, feedersData))
         self.testcase.failUnless(hasattr(self, 'state'))
         self.testcase.failUnless(hasattr(self.state, 'observe_set'))

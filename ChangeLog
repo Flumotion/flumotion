@@ -1,3 +1,10 @@
+2005-12-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_manager_manager.py
+	(FakeComponentMind.remote_provideMasterClock): Add a stub
+	provideMasterClock implementation.
+	(FakeComponentMind.remote_start): start() takes three args now.
+
 2005-12-14  Edward Hervey  <edward@fluendo.com>
 
 	* flumotion/component/producers/looper/admin_gtk.py:
