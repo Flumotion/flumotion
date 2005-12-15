@@ -41,10 +41,7 @@ def time_to_string(value):
 class FileInfo(GladeWidget):
     glade_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'flufileinfo.glade')
-
-    def __init__(self):
-        GladeWidget.__init__(self)
-        self.duration = 0
+    duration = 0
 
     def set_information(self, information):
         """Set the file information"""
