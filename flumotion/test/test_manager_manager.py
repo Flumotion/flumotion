@@ -296,8 +296,6 @@ class FakeComponentMind(FakeMind):
         self.testcase.failUnless(hasattr(self.state, 'observe_set'))
         
         self.state.observe_set('mood', moods.happy.value)
-        # need to return a list of (feedName, host, port) tuples
-        return []
     
 class TestVishnu(unittest.TestCase, log.Loggable):
 

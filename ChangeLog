@@ -4,6 +4,7 @@
 	(FakeComponentMind.remote_provideMasterClock): Add a stub
 	provideMasterClock implementation.
 	(FakeComponentMind.remote_start): start() takes three args now.
+	(FakeComponentMind.remote_start): Don't return anything.
 
 2005-12-14  Edward Hervey  <edward@fluendo.com>
 
