@@ -1,5 +1,8 @@
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/main.py: New file, committing
+	prematurely so as to assuage the buildbots.
+
 	* flumotion/test/test_manager_manager.py
 	(FakeComponentMind.remote_provideMasterClock): Add a stub
 	provideMasterClock implementation.
