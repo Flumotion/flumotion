@@ -215,6 +215,7 @@ class Packager(log.Loggable):
             # rebuild.rebuild(package)
             # self.log('rebuilt package %s with paths %r' % (packageName,
             #     package.__path__))
+            self.log('fixed up %s, __path__ %s ...' % (packageName, package.__path__))
 
         # now rebuild all non-package modules in this packagePath if this
         # is not a new package

@@ -23,6 +23,13 @@ def setup():
     log.init()
 
 def setupPackagePath():
+    """
+    set up all project paths specified in the FLU_PROJECT_PATH environment
+    variable.
+
+    This should be called by every Flumotion binary before starting/importing
+    any other flumotion code.
+    """
     import os
     from flumotion.common import package, log
     from flumotion.configure import configure

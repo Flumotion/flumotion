@@ -53,11 +53,10 @@ def main(args):
     socket = args[2]
         
     # register all package paths (FIXME: this should go away when
-    # components come from manager)
-    # wingo: i don't think this is necessary, as we will get the set of
-    # package paths directly from the worker
-    # from flumotion.common import setup
-    # setup.setupPackagePath()
+    # components and all deps come from manager)
+    # this is still necessary so that code from other projects can be imported
+    from flumotion.common import setup
+    setup.setupPackagePath()
 
     log.info('job', 'Connecting to worker on socket %s' % (socket))
 
