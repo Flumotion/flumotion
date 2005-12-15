@@ -7,7 +7,7 @@ component_PYTHON = \
 	component.py \
 	feedcomponent.py \
 	feedcomponent08.py \
-	feedcomponent09.py
+	feedcomponent010.py
 
 TAGS_FILES = $(component_PYTHON)
 

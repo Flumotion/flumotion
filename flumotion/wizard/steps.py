@@ -481,7 +481,7 @@ diagonal line in the image.""")
             self.error_msg('overlay-colorspace', msg)
     worker_changed_08 = defer_generator_method(worker_changed_08)
 
-    def worker_changed_09(self):
+    def worker_changed_010(self):
         d = self.wizard.check_elements(self.worker, 'pngdec', 'ffmpegcolorspace',
             'videomixer')
         yield d
@@ -497,7 +497,7 @@ diagonal line in the image.""")
             self.clear_msg('overlay')
             self.can_overlay = True
             self.set_sensitive(True)
-    worker_changed_09 = defer_generator_method(worker_changed_09)
+    worker_changed_010 = defer_generator_method(worker_changed_010)
 
     def worker_changed(self):
         import gst
@@ -505,7 +505,7 @@ diagonal line in the image.""")
         if gst.gst_version[1] == 8:
             self.worker_changed_08()
         else:
-            self.worker_changed_09()
+            self.worker_changed_010()
 
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())

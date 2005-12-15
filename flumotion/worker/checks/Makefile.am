@@ -6,7 +6,7 @@ flumotion_PYTHON = \
 	__init__.py 	\
 	video.py	\
 	video08.py	\
-	video09.py	\
+	video010.py	\
 	package.xml
 
 TAGS_FILES = $(flumotion_PYTHON)

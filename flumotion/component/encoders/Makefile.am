@@ -45,7 +45,7 @@ vorbis_PYTHON = \
 	vorbis/vorbis.py \
 	vorbis/vorbisutils.py \
 	vorbis/vorbis08.py \
-	vorbis/vorbis09.py
+	vorbis/vorbis010.py
 vorbis_DATA = \
 	vorbis/vorbis.xml
 

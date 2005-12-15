@@ -6,8 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-09 18:20+0100\n"
-"POT-Creation-Date: 2005-11-11 21:18+0100\n"
+"POT-Creation-Date: 2005-12-15 18:19+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -85,8 +84,7 @@ msgstr "Anmoder of grafisk grensesnitt for %s ..."
 
 #: flumotion/admin/gtk/client.py:780
 msgid "The wizard cannot be run because no workers are logged in."
-msgstr ""
-"Veiviseren kan ikke starte fordi ingen arbeidere er logget inn."
+msgstr "Veiviseren kan ikke starte fordi ingen arbeidere er logget inn."
 
 #: flumotion/admin/gtk/client.py:821
 #, python-format
@@ -248,33 +246,33 @@ msgstr "Tilfelding (tv snø)"
 msgid "Totally black"
 msgstr "Fullstending sort"
 
-#: flumotion/wizard/steps.py:71
+#: flumotion/wizard/steps.py:80
 msgid "If you want to stream video"
 msgstr "Hvis du ønsker å streame video"
 
-#: flumotion/wizard/steps.py:73
+#: flumotion/wizard/steps.py:82
 msgid "If you want to stream audio"
 msgstr "Hvis du ønsker å streame audio"
 
-#: flumotion/wizard/steps.py:254
+#: flumotion/wizard/steps.py:264
 #, fuzzy, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "PAL, 4:3 (59/54 pixel aspekt ratio)"
 
-#: flumotion/wizard/steps.py:304
+#: flumotion/wizard/steps.py:314
 #, fuzzy, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "PAL, 4:3 (59/54 pixel aspekt ratio)"
 
-#: flumotion/wizard/steps.py:323
+#: flumotion/wizard/steps.py:334
 msgid "Checking for Firewire device..."
 msgstr "Sjekker for Firewire enhet..."
 
-#: flumotion/wizard/steps.py:342
+#: flumotion/wizard/steps.py:353
 msgid "No Firewire device detected."
 msgstr "Ingen Firewire enhet oppdaget."
 
-#: flumotion/wizard/steps.py:457
+#: flumotion/wizard/steps.py:470
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
@@ -284,7 +282,7 @@ msgstr ""
 "Vær vennlig å vurdere å oppgradere hvis ditt utgående video har en\n"
 "diagonal linje i bildet."
 
-#: flumotion/wizard/steps.py:467
+#: flumotion/wizard/steps.py:480
 msgid "Could not check ffmpegcolorspace features."
 msgstr "Kunne ikke sjekke ffmpegcolorspace egenskaper."
 

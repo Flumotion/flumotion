@@ -116,7 +116,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 if gst.gst_version < (0, 9):
     from feedcomponent08 import FeedComponent
 else:
-    from feedcomponent09 import FeedComponent
+    from feedcomponent010 import FeedComponent
 
 FeedComponent.component_medium_class = FeedComponentMedium
 

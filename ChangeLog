@@ -1,3 +1,22 @@
+2005-12-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/Makefile.am:
+	* flumotion/component/component.xml:
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/vorbis/vorbis.py:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	* flumotion/component/encoders/vorbis/vorbis09.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent09.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/worker/checks/Makefile.am:
+	* flumotion/worker/checks/package.xml:
+	* flumotion/worker/checks/video.py:
+	* flumotion/worker/checks/video09.py:
+	* po/nl.po:
+	* po/no.po:
+	  rename 09 files to 010
+
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/command/commands.py (do_showplanet): New
