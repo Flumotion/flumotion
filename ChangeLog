@@ -1,3 +1,8 @@
+2005-12-15  Edward Hervey  <edward@fluendo.com>
+
+	* flumotion/component/producers/looper/Makefile.am:
+	Forgot to add admin_gtk.py and the glade files to Makefile.am
+
 2005-12-15  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/command/main.py: New file, committing
