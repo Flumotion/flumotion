@@ -64,7 +64,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         
         return pipeline
 
-    def do_start(self, eatersData, feedersData):
+    def do_start(self, eatersData, feedersData, clocking):
         # create temp file
         (fd, self._filename) = tempfile.mkstemp('flumotion.png')
         os.close(fd)
@@ -86,7 +86,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         source.set_property('location', self._filename)
 
         return feedcomponent.ParseLaunchComponent.do_start(self,
-            eatersData, feedersData)
+            eatersData, feedersData, clocking)
 
     def stop(self):
         # clean up our temp file
