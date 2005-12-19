@@ -196,6 +196,14 @@ def main(args):
     from flumotion.common import setup
     setup.setupPackagePath()
 
+    log.debug('manager', 'Running Flumotion version %s' %
+        configure.version)
+    import twisted.copyright
+    log.debug('manager', 'Running against Twisted version %s' %
+        twisted.copyright.version)
+    log.debug('manager', 'Running against GStreamer version %s' %
+        configure.gst_version)
+
     # create a brain and have it remember the manager to direct jobs to
     brain = worker.WorkerBrain(options)
 

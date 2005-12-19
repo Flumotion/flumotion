@@ -1,5 +1,13 @@
 2005-12-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/boot.py.in:
+	* flumotion/manager/main.py:
+	* flumotion/worker/main.py:
+	  log the GStreamer version by sticking it in
+	  flumotion.configure.configure
+
+2005-12-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* NEWS:
 	  add note about new config
 	* flumotion.spec.in:

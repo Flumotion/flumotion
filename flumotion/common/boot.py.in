@@ -118,11 +118,9 @@ def init_gst():
             'ERROR: Expected gst-python version %s in %s, but found %r'
             % (gst_version, pygst_dir, gst.pygst_version))
     
-#     print 'Using GStreamer %s' % gst_version
-#     if gst_version == '0.10':
-#         print 'Yeeeaaaaaaaah baby!'
-#     else:
-#         print 'Goober. All the cool kids are using 0.10.'
+    # store our gst version for later logging
+    from flumotion.configure import configure
+    configure.gst_version = gst_version
 
 def boot(path, gtk=False):
     from flumotion.twisted import compat

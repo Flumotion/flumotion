@@ -234,6 +234,8 @@ def main(args):
     import twisted.copyright
     log.debug('manager', 'Running against Twisted version %s' %
         twisted.copyright.version)
+    log.debug('manager', 'Running against GStreamer version %s' %
+        configure.gst_version)
     from flumotion.project import project
     for p in project.list():
         log.debug('manager', 'Registered project %s version %s' % (
