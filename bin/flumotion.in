@@ -28,9 +28,6 @@ import sys
 
 # Variable templates 
 LIBDIR = '@LIBDIR@'
-PYGTK_DIR = '@PYGTK_DIR@'
-PYGST_DIR = '@PYGST_08_DIR@'
-PYGTK_VERSION = '@PYGTK_REQ_08@'
 PROGRAM_PATH = 'flumotion.service.main.main'
 
 def _setup_project_root():
