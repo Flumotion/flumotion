@@ -1,5 +1,14 @@
 This is Flumotion 0.1.10, "Rosa Negra".
 
+IMPORTANT NOTE:
+The XML config format was changed for components.  They should now list
+each of their properties in a
+<property name="propname"> section instead of just having
+<propname></propname>  
+
+This must also be done in the maanger section where it's using a bouncer
+component.
+
 Features since 0.1.9:
 
 - (Experimental) support for GStreamer 0.9.x Development series

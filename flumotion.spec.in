@@ -123,9 +123,9 @@ then
     <port>7531</port>
 -->
     <component name="manager-bouncer" type="htpasswdcrypt">
-      <data><![CDATA[
+      <property name="data"><![CDATA[
 user:PSfNpHTkpTx1M
-]]></data>
+]]></property>
     </component>
   </manager>
  
