@@ -477,11 +477,11 @@ def getLL():
     """
     # LANGUAGE is a GNU extension; it can be colon-seperated but we ignore the
     # advanced stuff. If that's not present, just use LANG, as normal.
-    language = os.environ['LANGUAGE']
+    language = os.environ.get('LANGUAGE', None)
     if language != None:
       LL = language[:2]
     else:
-      lang = os.environ['LANG']
+      lang = os.environ.get('LANG', 'en')
       LL = lang[:2]
 
     return LL
