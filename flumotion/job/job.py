@@ -40,6 +40,8 @@ from flumotion.common import medium, package
 from flumotion.component import component
 from flumotion.twisted.defer import defer_generator_method
 
+# FIXME: dict should be put last, and renamed to something more descriptive
+# like configDict
 def getComponent(dict, moduleName, methodName):
     """
     @param dict:       the configuration dictionary
@@ -48,6 +50,11 @@ def getComponent(dict, moduleName, methodName):
     @type  moduleName: string
     @param methodName: the factory method to use to create the component
     @type  methodName: string
+
+    Invokes the entry point for a component in the given module using the
+    given factory method, using the given dictionary for configuration.
+
+    @rtype: L{flumotion.component.component.BaseComponent}
     """
     log.debug('component', 'Loading moduleName %s' % moduleName)
     try:
@@ -76,7 +83,8 @@ def getComponent(dict, moduleName, methodName):
     # we're going to listen to ports and other stuff which should
     # be separated from the main process.
 
-    log.debug('job', 'calling %s.%s(dict)' % (moduleName, methodName))
+    log.debug('job', 'calling entry point %s.%s(configdict)' % (
+        moduleName, methodName))
     try:
         component = getattr(module, methodName)(dict)
     except config.ConfigError:
@@ -230,6 +238,8 @@ class JobMedium(medium.BaseMedium):
         @type  config:     dict
         """
         
+        self.debug('_runComponent(): config dictionary is: %r' % config)
+
         self.info('Starting component "%s" of type "%s"' % (avatarId, type))
         #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -239,8 +249,6 @@ class JobMedium(medium.BaseMedium):
         self._set_nice(config.get('nice', 0))
         self._enable_core_dumps()
         
-        self.debug('_runComponent(): config dictionary is: %r' % config)
-
         # FIXME: we put avatarId in the config for now
         # but it'd be nicer to do this outside of config, so do this
         config['avatarId'] = avatarId
@@ -256,7 +264,10 @@ class JobMedium(medium.BaseMedium):
         comp.setWorkerName(self.worker_name)
 
         # make component log in to manager
+        self.debug('creating ComponentClientFactory')
         manager_client_factory = component.ComponentClientFactory(comp)
+        self.debug('created ComponentClientFactory %r' %
+            manager_client_factory)
         keycard = self.manager_keycard
         keycard.avatarId = avatarId
         manager_client_factory.startLogin(keycard)
@@ -264,12 +275,13 @@ class JobMedium(medium.BaseMedium):
         host = self.manager_host
         port = self.manager_port
         transport = self.manager_transport
+        self.debug('logging in')
         if transport == "ssl":
             from twisted.internet import ssl
             self.info('Connecting to manager %s:%d with SSL' % (host, port))
             reactor.connectSSL(host, port, manager_client_factory,
                 ssl.ClientContextFactory())
-        elif self.manager_transport == "tcp":
+        elif transport == "tcp":
             self.info('Connecting to manager %s:%d with TCP' % (host, port))
             reactor.connectTCP(host, port, manager_client_factory)
         else:
