@@ -136,7 +136,8 @@ class WorkerMedium(medium.BaseMedium):
 
     def remote_start(self, avatarId, type, moduleName, methodName, config):
         """
-        Start a component of the given type with the given config.
+        Start a component of the given type with the given config dict.
+        Will spawn a new job process to run the component in.
 
         @param avatarId:   avatar identification string
         @type  avatarId:   string
@@ -178,6 +179,7 @@ class WorkerMedium(medium.BaseMedium):
                    % avatarId)
             raise errors.ComponentStart(msg)
 
+        # spawn the job process
         self.brain.kindergarten.play(avatarId, type, moduleName, methodName,
             config, bundles)
 
@@ -337,6 +339,7 @@ class Kindergarten(log.Loggable):
         childFDs={0:0, 1:1, 2:2}
         env={}
         env.update(os.environ)
+        # FIXME: publicize log._FLU_DEBUG ?
         env['FLU_DEBUG'] = log._FLU_DEBUG
         process = reactor.spawnProcess(p, executable, env=env, args=argv,
             childFDs=childFDs)
