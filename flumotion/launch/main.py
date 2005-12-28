@@ -192,6 +192,8 @@ class ComponentWrapper(object):
             t = compprops[k].getType()
             if t == 'int':
                 val = int(v)
+            elif t == 'long':
+                val = long(v)
             elif t == 'float':
                 val = float(v)
             elif t == 'bool':

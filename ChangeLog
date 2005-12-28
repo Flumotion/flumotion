@@ -1,5 +1,13 @@
 2005-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/disker/disker.py:
+	  move var declaration to class, out of setup
+	  check if self.location is set from size rotation callback
+	* flumotion/launch/main.py:
+	  support longs
+
+2005-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	* flumotion/component/consumers/httpstreamer/http.xml:
 	  default to 8800 for port

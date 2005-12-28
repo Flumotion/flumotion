@@ -60,6 +60,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         pipe_template = 'multifdsink sync-clients=1 name=fdsink mode=1'
     else:
         pipe_template = 'multifdsink sync-method=1 name=fdsink mode=1 sync=false'
+    file_fd = None
+    directory = None
+    location = None
+    caps = None
 
     # signal for changed filename which medium connects to
     gsignal('filename-changed', str)
@@ -67,10 +71,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     def get_pipeline_string(self, properties):
         directory = properties['directory']
     
-        self.file_fd = None
         self.directory = directory
-        self.location = None
-        self.caps = None
 
         rotateType = properties['rotateType']
         if rotateType == 'size':
@@ -93,8 +94,11 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         reactor.callLater(time, self._rotateTimeCallback, time)
 
     def _rotateSizeCallback(self, size):
-        if os.stat(self.location).st_size > size:
-            self.change_filename()
+        if not self.location:
+            self.warning('Cannot rotate file, no file location set')
+        else:
+            if os.stat(self.location).st_size > size:
+                self.change_filename()
         
         # Add a new one
         reactor.callLater(5, self._rotateTimeCallback, size)
@@ -111,7 +115,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     
     # sends signal so admin ui is notified of filename change
     def update_ui_state(self):
-        self.emit('filename-changed',self.location)
+        self.emit('filename-changed', self.location)
     
     def change_filename(self):
         self.debug("change_filename()")
