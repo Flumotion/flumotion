@@ -225,7 +225,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._post_init(properties)
 
     def _post_init(self, properties):
-        self.port = int(properties['port'])
+        self.port = int(properties.get('port', 8800))
         mountPoint = properties.get('mount_point', '')
         if mountPoint.startswith('/'):
             mountPoint = mountPoint[1:]

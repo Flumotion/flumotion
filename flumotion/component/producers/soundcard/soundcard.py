@@ -27,11 +27,11 @@ from flumotion.component.effects.volume import volume
     
 class Soundcard(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
-        element = properties['source-element']
-        device =  properties['device']
-        rate = properties.get('rate', 22050)
+        element = properties.get('source-element', 'alsasrc')
+        device = properties.get('device', 'hw:0')
+        rate = properties.get('rate', 44100)
         depth = properties.get('depth', 16)
-        channels = properties.get('channels', 1)
+        channels = properties.get('channels', 2)
 
         # FIXME: why do we not connect to state_changed_cb so correct
         # soundcard input is used?
