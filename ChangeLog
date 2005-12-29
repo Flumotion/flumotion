@@ -1,5 +1,13 @@
 2005-12-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* NEWS:
+	  update
+	* flumotion/common/common.py:
+	* flumotion/test/test_common.py:
+	  add common.compareVersions() method and test
+
+2005-12-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/save.py:
 	  save project and version in xml
 

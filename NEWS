@@ -4,9 +4,9 @@ IMPORTANT NOTE:
 The XML config format was changed for components.  They should now list
 each of their properties in a
 <property name="propname"> section instead of just having
-<propname></propname>  
+<propname></propname>.  Also, the <feed> nodes are gone.
 
-This must also be done in the maanger section where it's using a bouncer
+This must also be done in the manager section where it's using a bouncer
 component.
 
 Features since 0.1.9:

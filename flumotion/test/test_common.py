@@ -133,7 +133,7 @@ class TestMergeImplements(unittest.TestCase):
      
 class TestVersion(unittest.TestCase):
     def testVersion(self):
-        self.assert_(common.version('abinary'))
+        self.failUnless(common.version('abinary'))
 
 class TestArgRepr(unittest.TestCase):
     def testEmpty(self):
@@ -263,3 +263,29 @@ class TestPathToModule(unittest.TestCase):
         for (path, module) in tests.items():
             self.assertEquals(common.pathToModuleName(path), module,
                 "path %s did not give end module %s" % (path, module))
+
+class TestCompareVersions(unittest.TestCase):
+    def testBadVersion(self):
+        self.assertRaises(ValueError, common.compareVersions, "no", "version")
+
+    def testEquals(self):
+        self.assertEquals(common.compareVersions("1.2.3", "1.2.3"), 0)
+        self.assertEquals(common.compareVersions("1.2.3", "1.2.3.0"), 0)
+        self.assertEquals(common.compareVersions("1.2.3.0", "1.2.3"), 0)
+
+    def testSmaller(self):
+        self.assertEquals(common.compareVersions("1", "2"), -1)
+        self.assertEquals(common.compareVersions("1", "1.1"), -1)
+        self.assertEquals(common.compareVersions("1.0", "1.1"), -1)
+        self.assertEquals(common.compareVersions("1.2", "1.10"), -1)
+        self.assertEquals(common.compareVersions("1.2.3.4", "1.2.3.5"), -1)
+        self.assertEquals(common.compareVersions("1.2.3.4", "1.2.4.4"), -1)
+        self.assertEquals(common.compareVersions("1.2.3.4", "1.3.3.4"), -1)
+
+    def testBigger(self):
+        self.assertEquals(common.compareVersions("2", "1"), 1)
+        self.assertEquals(common.compareVersions("2.0", "1"), 1)
+        self.assertEquals(common.compareVersions("2", "1.0"), 1)
+        self.assertEquals(common.compareVersions("2.0", "1.0"), 1)
+        self.assertEquals(common.compareVersions("2.1", "2.0"), 1)
+        self.assertEquals(common.compareVersions("1.2.3.4", "1.2.3.3.0"), 1)

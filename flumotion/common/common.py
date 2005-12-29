@@ -494,3 +494,39 @@ def gettexter(domain):
     import gettext
     return lambda s: gettext.dgettext(domain, s)
 
+def compareVersions(first, second):
+    """
+    Compares two version strings.  Returns -1, 0 or 1 if first is smaller than,
+    equal to or larger than second.
+
+    @type  first:  str
+    @type  second: str
+
+    @rtype: int
+    """
+    if first == second:
+        return 0
+
+    firsts = first.split(".")
+    seconds = second.split(".")
+
+    while firsts or seconds:
+        f = 0
+        s = 0
+        try:
+            f = int(firsts[0])
+            del firsts[0]
+        except IndexError:
+            pass
+        try:
+            s = int(seconds[0])
+            del seconds[0]
+        except IndexError:
+            pass
+
+        if f < s:
+            return -1
+        if f > s:
+            return 1
+
+    return 0
