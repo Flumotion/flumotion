@@ -20,6 +20,7 @@
 
 from flumotion.common import log, registry
 from flumotion.wizard import enums
+from flumotion.configure import configure
 
 class Component(log.Loggable):
     logCategory = "componentsave"
@@ -74,9 +75,11 @@ class Component(log.Loggable):
         else:
             extra = ''
             
-        s = '    <component name="%s" type="%s"%s>\n' % (self.name,
-                                                         self.type,
-                                                         extra)
+        # FIXME: when the wizard can be split among projects, "project"
+        # and "version" should be taken from the relevant project
+        s = '    <component name="%s" type="%s" '
+            'project="flumotion" version="%s"%s>\n' % (
+            self.name, self.type, configure.version, extra)
 
         for sourceName in self.getFeeders():
             s += "      <source>%s</source>\n" % sourceName
