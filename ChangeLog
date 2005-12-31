@@ -1,5 +1,14 @@
 2005-12-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/parts.py:
+	  make it so that "Worker" column shows in italics the worker
+	  that needs to log in for the component to be able to start
+	* tests/ComponentsView.py:
+	* tests/vorbis.py:
+	  update tests
+
+2005-12-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/save.py:
 	  fix syntax error
 
