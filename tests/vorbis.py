@@ -27,7 +27,7 @@ import gobject
 gobject.threads_init()
 
 def make_pipeline():
-    s = ('sinesrc num-buffers=1000 ! audio/x-raw-int,channels=1,rate=8000'
+    s = ('audiotestsrc num-buffers=1000 ! audio/x-raw-int,channels=1,rate=8000'
          ' ! audioresample name=ar ! audioconvert ! capsfilter name=cf'
          ' ! vorbisenc name=enc ! oggmux ! filesink location=foo.ogg')
 

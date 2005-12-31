@@ -177,7 +177,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         self._view.append_column(col)
 
         col = gtk.TreeViewColumn(_('Worker'), gtk.CellRendererText(),
-                                 text=COL_WORKER)
+                                 markup=COL_WORKER)
         col.set_sort_column_id(COL_WORKER)
         self._view.append_column(col)
         
@@ -337,7 +337,6 @@ class ComponentsView(log.Loggable, gobject.GObject):
             
             mood = component.get('mood')
             self.debug('component has mood %r' % mood)
-            workerName = component.get('workerName')
             
             if mood != None:
                 self._set_mood_value(iter, mood)
@@ -345,10 +344,30 @@ class ComponentsView(log.Loggable, gobject.GObject):
             self._model.set(iter, COL_STATE, component)
 
             self._model.set(iter, COL_NAME, component.get('name'))
-            self._model.set(iter, COL_WORKER, workerName)
+
+            self._updateWorker(iter, component)
         self.debug('updated components view')
 
         self.update_start_stop_props()
+
+    def _updateWorker(self, iter, componentState):
+        # update the worker name:
+        # - italic [any worker] if no workerName/workerRequested
+        # - italic if workerName, or no workerName but workerRequested
+        # - normal if running
+
+        workerName = componentState.get('workerName')
+        workerRequested = componentState.get('workerRequested')
+        if not workerName:
+            workerName = "%s" % workerRequested
+            if not workerRequested:
+                workerName = _("[any worker]")
+
+        mood = componentState.get('mood')
+        markup = workerName
+        if mood == moods.sleeping.value:
+            markup = "<i>%s</i>" % workerName
+        self._model.set(iter, COL_WORKER, markup)
 
     def stateSet(self, state, key, value):
         if not isinstance(state, planet.AdminComponentState):
@@ -360,11 +379,12 @@ class ComponentsView(log.Loggable, gobject.GObject):
 
         if key == 'mood':
             self._set_mood_value(iter, value)
+            self._updateWorker(iter, state)
         elif key == 'name':
             if value:
                 self._model.set(iter, COL_NAME, value)
         elif key == 'workerName':
-            self._model.set(iter, COL_WORKER, value)
+            self._updateWorker(iter, state)
 
     def _set_mood_value(self, iter, value):
         """

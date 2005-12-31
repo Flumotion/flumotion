@@ -18,6 +18,9 @@
 
 # Headers in this file shall remain intact.
 
+from twisted.internet import reactor
+
+# importing "gtk" before reactor blows up with a TypeError in T1.3.0
 import gobject
 import gtk
 
@@ -63,7 +66,7 @@ class TestComponentsView:
         components['three'] = c
         c = self._createComponent(
             {'name': 'four', 'mood': moods.sleeping.value,
-             'workerName': 'C3PO', 'pid': 4})
+             'workerName': 'C3PO', 'pid': None})
         components['four'] = c
         self.view.update(components)
 

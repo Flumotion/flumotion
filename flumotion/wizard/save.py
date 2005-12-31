@@ -77,7 +77,7 @@ class Component(log.Loggable):
             
         # FIXME: when the wizard can be split among projects, "project"
         # and "version" should be taken from the relevant project
-        s = '    <component name="%s" type="%s" '
+        s = '    <component name="%s" type="%s" ' \
             'project="flumotion" version="%s"%s>\n' % (
             self.name, self.type, configure.version, extra)
 
