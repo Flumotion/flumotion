@@ -1,5 +1,13 @@
 2005-12-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/Makefile.am:
+	* data/upgrade-to-0.2.0.xsl:
+	  add an xsl stylesheet to transform pre-0.2.0 config files
+	* NEWS:
+	  add notes on how to use it
+
+2005-12-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/parts.py:
 	  make it so that "Worker" column shows in italics the worker
 	  that needs to log in for the component to be able to start

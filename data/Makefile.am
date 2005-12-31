@@ -7,5 +7,8 @@ desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = flumotion.png
 
+xsldir = $(pkgdatadir)
+xsl_DATA = upgrade-to-0.2.0.xsl
+
 EXTRA_DIST = \
-        $(desktop_in_files) flumotion.png
+        $(desktop_in_files) $(pixmap_DATA) $(xsl_DATA)

@@ -1,4 +1,4 @@
-This is Flumotion 0.1.10, "Rosa Negra".
+This is Flumotion 0.2.0, "Unreleased".
 
 IMPORTANT NOTE:
 The XML config format was changed for components.  They should now list
@@ -8,6 +8,14 @@ each of their properties in a
 
 This must also be done in the manager section where it's using a bouncer
 component.
+
+You can upgrade your planet config files using xsltproc and the
+included stylesheet:
+
+    xsltproc $datadir/upgrade-to-0.2.0.xsl planet.xml > new.xml
+
+Where $datadir is the datadir passed to configure, or the "data" directory
+in the Flumotion source tarball.
 
 Features since 0.1.9:
 
