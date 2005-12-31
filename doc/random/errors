@@ -1,0 +1,23 @@
+Error handling in Flumotion
+---------------------------
+
+GOALS
+-----
+- admin clients should be able to see warnings and errors about components
+
+NOTES
+-----
+- a component collects error objects in its state in the manager;
+  these are serializable to the admin client
+- stopping a component clears the error objects
+- the error objects should be translated in the admin client's language
+  -> translation happens in the client
+- error objects should contain:
+  - a domain enum
+  - an error enum in the domain
+  - a non-translated translatable user-showable string
+  - possibly extra debug info (non-translated)
+
+- manager that asks a worker or component to do something and receiving a
+  failure should create an error object from this
+- for a component, it should attach it to the componentstate

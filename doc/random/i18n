@@ -1,0 +1,31 @@
+- strings need to be translated in the admin client, not in worker or manager
+- so translations need to be put in a bundle and sent to admin
+- two choices for what to transfer
+  - send over .po files, and build them into .mo files on client
+  - send over .mo files
+    - possible because while .mo files are generated with the host endianness,
+      both endianesses can be read with gettext
+- how to bundle
+  - put all .mo files in one big bundle
+    - bad because you normally only run one language
+  - put each .mo file in one bundle
+    - bad because nl_BE falls back to nl in gettext
+  - put each .mo file in a bundle according to the first two letters of the
+    code
+
+HOW
+---
+- glade files:
+  - gtk.glade.bindtextdomain(domain, dir)
+    - under dir there should be a hierarchy of (lang)/LC_MESSAGES/(domain).mo
+      files
+    - these are typically under $(datadir)/locale
+  - gtk.glade.textdomain(domain)
+    - sets the domain to use
+
+- projects generate a flumotion/project/(name).py file with config data
+  that specifies a localedatadir as the path under which 'locale' is put,
+  preferring an uninstalled in-tree copy
+- (localedatadir is used so in the bundlespace everything is under locale/)
+- common/gen-locale-xml.py generates a registry snippet for all locales
+  indexed on LL code
