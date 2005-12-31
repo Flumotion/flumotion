@@ -205,6 +205,7 @@ fi
 %{_datadir}/flumotion/glade
 %{_datadir}/flumotion/image   	  	 
 %{_datadir}/flumotion/make-dummy-cert  
+%{_datadir}/flumotion/*.xsl
 %dir %attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
 
 %attr(750,flumotion,root) %{_sysconfdir}/flumotion
