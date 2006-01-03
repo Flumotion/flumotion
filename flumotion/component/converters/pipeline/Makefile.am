@@ -1,7 +1,7 @@
 include $(top_srcdir)/common/python.mk
 
 component_PYTHON = __init__.py pipeline.py
-componentdir = $(libdir)/flumotion/python/flumotion/component/producers/pipeline
+componentdir = $(libdir)/flumotion/python/flumotion/component/converters/pipeline
 component_DATA = pipeline.xml
 
 clean-local:
