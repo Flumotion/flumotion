@@ -646,7 +646,7 @@ class ComponentAvatar(base.ManagerAvatar):
         @param feedName: name of the feeder, e.g. "default".
         @type  feedName: string
         @param isReady: True if the feed is now ready, False otherwise.
-        @type  port: bool
+        @type  isReady: bool
         """
         assert isinstance(feedName, str)
         self.heaven.setFeederReadiness(self, feedName, isReady)

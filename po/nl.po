@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-15 18:19+0100\n"
+"POT-Creation-Date: 2005-12-31 15:47+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -197,7 +197,7 @@ msgstr "Kies een verbinding uit de onderstaande lijst."
 msgid "Mood"
 msgstr "Humeur"
 
-#: flumotion/admin/gtk/parts.py:174 flumotion/admin/gtk/parts.py:393
+#: flumotion/admin/gtk/parts.py:174 flumotion/admin/gtk/parts.py:413
 msgid "Component"
 msgstr "Component"
 
@@ -205,23 +205,27 @@ msgstr "Component"
 msgid "Worker"
 msgstr "Worker"
 
-#: flumotion/admin/gtk/parts.py:395
+#: flumotion/admin/gtk/parts.py:364
+msgid "[any worker]"
+msgstr ""
+
+#: flumotion/admin/gtk/parts.py:415
 msgid "_Restart"
 msgstr "_Herstart"
 
-#: flumotion/admin/gtk/parts.py:399
+#: flumotion/admin/gtk/parts.py:419
 msgid "_Start"
 msgstr "_Start"
 
-#: flumotion/admin/gtk/parts.py:406
+#: flumotion/admin/gtk/parts.py:426
 msgid "St_op"
 msgstr "St_op"
 
-#: flumotion/admin/gtk/parts.py:414
+#: flumotion/admin/gtk/parts.py:434
 msgid "Reload _code"
 msgstr "Herlaad _code"
 
-#: flumotion/admin/gtk/parts.py:418
+#: flumotion/admin/gtk/parts.py:438
 msgid "_Modify element property ..."
 msgstr "_Wijzig elementeigenschap ..."
 
