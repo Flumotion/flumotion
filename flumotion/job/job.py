@@ -112,11 +112,11 @@ class JobMedium(medium.BaseMedium):
         self.avatarId = None
         self.logName = None
         self.component = None
-        self.worker_name = None
-        self.manager_host = None
-        self.manager_port = None
-        self.manager_transport = None
-        self.manager_keycard = None
+        self._worker_name = None
+        self._manager_host = None
+        self._manager_port = None
+        self._manager_transport = None
+        self._manager_keycard = None
 
     ### pb.Referenceable remote methods called on by the WorkerBrain
     def remote_bootstrap(self, workerName, host, port, transport, keycard,
@@ -147,12 +147,12 @@ class JobMedium(medium.BaseMedium):
         assert isinstance(keycard, keycards.Keycard)
         assert isinstance(packagePaths, list)
 
-        self.debug('bootstrap')
-        self.worker_name = workerName
-        self.manager_host = host
-        self.manager_port = port
-        self.manager_transport = transport
-        self.manager_keycard = keycard
+        self.debug('remote_bootstrap')
+        self._worker_name = workerName
+        self._manager_host = host
+        self._manager_port = port
+        self._manager_transport = transport
+        self._manager_keycard = keycard
         
         packager = package.getPackager()
         for name, path in packagePaths:
@@ -175,6 +175,7 @@ class JobMedium(medium.BaseMedium):
         @param config:     the configuration dictionary
         @type  config:     dict
         """
+        self.debug('remote_start, avatarId %s' % avatarId)
         self.avatarId = avatarId
         self.logName = avatarId
 
@@ -203,7 +204,7 @@ class JobMedium(medium.BaseMedium):
         # FIXME: temporary hack
         os._exit(0)
 
-    def _set_nice(self, nice):
+    def _setNice(self, nice):
         if not nice:
             return
         
@@ -214,7 +215,7 @@ class JobMedium(medium.BaseMedium):
         else:
             self.debug('Nice level set to %d' % nice)
 
-    def _enable_core_dumps(self):
+    def _enableCoreDumps(self):
         soft, hard = resource.getrlimit(resource.RLIMIT_CORE)
         if hard != resource.RLIM_INFINITY:
             self.warning('Could not set unlimited core dump sizes, '
@@ -246,8 +247,8 @@ class JobMedium(medium.BaseMedium):
 
         self.debug('Starting on pid %d of type %s' % (os.getpid(), type))
 
-        self._set_nice(config.get('nice', 0))
-        self._enable_core_dumps()
+        self._setNice(config.get('nice', 0))
+        self._enableCoreDumps()
         
         # FIXME: we put avatarId in the config for now
         # but it'd be nicer to do this outside of config, so do this
@@ -261,20 +262,20 @@ class JobMedium(medium.BaseMedium):
             self.warning("raising ComponentStart(%s)" % msg)
             raise errors.ComponentStart(msg)
 
-        comp.setWorkerName(self.worker_name)
+        comp.setWorkerName(self._worker_name)
 
         # make component log in to manager
         self.debug('creating ComponentClientFactory')
         manager_client_factory = component.ComponentClientFactory(comp)
         self.debug('created ComponentClientFactory %r' %
             manager_client_factory)
-        keycard = self.manager_keycard
+        keycard = self._manager_keycard
         keycard.avatarId = avatarId
         manager_client_factory.startLogin(keycard)
 
-        host = self.manager_host
-        port = self.manager_port
-        transport = self.manager_transport
+        host = self._manager_host
+        port = self._manager_port
+        transport = self._manager_transport
         self.debug('logging in')
         if transport == "ssl":
             from twisted.internet import ssl
@@ -285,7 +286,7 @@ class JobMedium(medium.BaseMedium):
             self.info('Connecting to manager %s:%d with TCP' % (host, port))
             reactor.connectTCP(host, port, manager_client_factory)
         else:
-            self.error('Unknown transport protocol %s' % self.manager_transport)
+            self.error('Unknown transport protocol %s' % self._manager_transport)
 
         self.component_factory = manager_client_factory
         self.component = comp

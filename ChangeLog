@@ -1,3 +1,9 @@
+2006-01-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/job/job.py:
+	  clean up internal method names
+	  privatize more internal variables
+
 2005-12-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/Makefile.am:
