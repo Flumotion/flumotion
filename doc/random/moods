@@ -12,7 +12,10 @@
   - SAD:      an error happened (we wanted to use ANGRY, but the difference
               between ANGRY and HUNGRY is close to non-existent in French)
               the component needs to be stopped and started after fixing the
-              error
+              error.  If the error happened after creation of the job process,
+	      the job process will still be running.  If it happened during
+	      creation/before start, the job process is not logged into the
+	      manager and will have exited.
 
   - WAKING:   a component exists in a job process, but is waiting to be
 	      started or destroyed
