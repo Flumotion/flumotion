@@ -259,7 +259,8 @@ class JobMedium(medium.BaseMedium):
             msg = "Exception %s during getComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))
             traceback.print_exc()
-            self.warning("raising ComponentStart(%s)" % msg)
+            self.warning("raising ComponentStart(%s) and stopping job" % msg)
+            reactor.callLater(0, self.shutdown)
             raise errors.ComponentStart(msg)
 
         comp.setWorkerName(self._worker_name)

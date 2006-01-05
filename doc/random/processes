@@ -8,7 +8,7 @@ Some notes about process management
   - reception of SIGTERM (the default "kill" signal)
   - reception of SIGKILL (handled by the kernel, never received by process)
 
-- A worker forks job processes, and these job processes can also be told
+- A worker spawns job processes, and these job processes can also be told
   to shut down, and should do so in a sensible way.
 
 - When the main worker process is told to shut down, it should also make sure

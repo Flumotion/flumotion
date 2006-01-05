@@ -1,3 +1,14 @@
+2006-01-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/component:
+	* doc/random/processes:
+	  add notes about component creation phase and error handling
+	* flumotion/job/job.py:
+	* flumotion/manager/admin.py:
+	  make it so components that ran into an error during creation
+	  stop the job process, and the admin can restart those sad
+	  non-running components.
+
 2006-01-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/job/job.py:

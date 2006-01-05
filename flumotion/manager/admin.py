@@ -128,6 +128,13 @@ class AdminAvatar(base.ManagerAvatar):
 
         m = self.vishnu.getComponentMapper(componentState)
         avatar = m.avatar
+
+        # if the component is sad, not running, and we're asked to stop it,
+        # do so so the state gets cleared
+        if methodName == "stop" and componentState.get('mood') == planet.moods.sad.value and not avatar:
+            self.debug('asked to stop a sad component without avatar')
+            componentState.set('mood', planet.moods.sleeping.value)
+            return
         
         if not avatar:
             self.warning('No avatar for %s, cannot call remote' %

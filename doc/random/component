@@ -26,3 +26,47 @@ How communication works
 
 - a node can call remote methods to the component using self.callRemote()
 - a node can call on effects in the component using self.callRemote('effect'
+
+Component lifecycle
+-------------------
+- create:
+  - manager asks worker to create a component of a given type;
+    worker spawns job;
+    job creates component of the given type;
+    job logs in to manager;
+    only then does the original remote method return a result.
+    Any error happening during this stage will trigger a failure on the
+    original remote method; the component job will shut down on its own;
+    in the manager the component is in the "sad" mood; and a stop/start
+    sequence needs to be triggered to clear it
+    As little as possible code should be executed during this by the component,
+    since we do not yet have a manager-component PB connection over which
+    to report problems.
+
+- setup:
+  - manager sends config to component (TODO)
+  - component calls setup, which triggers setConfig
+  - errors get serialized as messages through state;
+    setup can fail (missing elements, devices, ...);
+    this allows for more elaborate feedback/remedying over the
+    manager-component PB connection
+  - jobs keep running; need to be told to shutdown by a stop command
+
+- start:
+  - component actually starts performing its function
+  - can fail; messages get serialized
+
+- stop:
+  - component can be stopped by manager
+
+- destroy:
+  - terminate the job process, and clean up
+
+How components start
+--------------------
+- M: WorkerAvatar.start() does a callRemote (FIXME: rename to _create)
+  - W: WorkerMedium.remote_start()
+    - sets up bundles
+    - self.brain.kindergarten.play()
+      - Kindergarten.play():
+      - spawns a job process, giving it avatarId and socket path as arguments
