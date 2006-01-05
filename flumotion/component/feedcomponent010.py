@@ -318,6 +318,11 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline.use_clock(clock)
 
     def provide_master_clock(self, port):
+        if not self.pipeline:
+            self.warning('No self.pipeline, cannot provide master clock')
+            # FIXME: should we have a NoSetupError() for cases where setup
+            # was not called ? For now we fall through and get an exception
+
         if self.clock_provider:
             self.warning('already had a clock provider, removing it')
             self.clock_provider = None

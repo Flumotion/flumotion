@@ -742,6 +742,7 @@ class ComponentHeaven(base.ManagerHeaven):
         # FIXME: deprecate componentEntries
         self._componentEntries = {} # configuration entries
 
+        # avatarId -> list of deferreds created by getMasterClockInfo
         self._clockMasterWaiters = {}
         self.masterClockInfo = {}
         
@@ -968,6 +969,13 @@ class ComponentHeaven(base.ManagerHeaven):
         set.feederSetReadiness(feederName, readiness)
 
     def provideMasterClock(self, componentAvatar):
+        """
+        Tell the given component to provide a master clock.
+        Trigger all deferreds waiting on this componentAvatar to provide
+        a master clock.
+        
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
         avatarId = componentAvatar.avatarId
 
         def setMasterClockInfo(result):
@@ -1014,6 +1022,12 @@ class ComponentHeaven(base.ManagerHeaven):
                          % (avatarId,))
 
     def getMasterClockInfo(self, avatarId):
+        """
+        Get the master clock information for the given component.
+
+        @returns: a deferred firing an (ip, port, base_time) triple.
+        @rtype:   L{twisted.internet.defer.Deferred}
+        """
         self.debug('getting master clock info for component %s' % avatarId)
         if avatarId in self.masterClockInfo:
             return defer.succeed(self.masterClockInfo[avatarId])

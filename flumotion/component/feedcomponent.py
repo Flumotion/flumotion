@@ -87,11 +87,16 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         return state
     
-    def remote_provideMasterClock(self, port):
+        def remote_provideMasterClock(self, port):
         """
+        Tells the component to start providing a master clock on the given
+        UDP port.
+        Can only be called if setup() has been called on the component.
+
         @returns: (ip, port, base_time)
-        @rtype: tuple of (str, int, long)
+        @rtype:   tuple of (str, int, long)
         """
+        self.debug('remote_provideMasterClock(port=%r)' % port)
         return self.comp.provide_master_clock(port)
 
     def remote_effect(self, effectName, methodName, *args, **kwargs):
