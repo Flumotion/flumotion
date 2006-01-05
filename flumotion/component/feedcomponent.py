@@ -87,7 +87,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         return state
     
-        def remote_provideMasterClock(self, port):
+    def remote_provideMasterClock(self, port):
         """
         Tells the component to start providing a master clock on the given
         UDP port.
