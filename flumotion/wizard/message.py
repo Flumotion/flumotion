@@ -66,6 +66,9 @@ class MessageButton(gtk.ToggleButton):
         return '<MessageButton for %s at %d>' % (self.message, id(self))
 
 class MessageView(gtk.VBox):
+    """
+    I am a widget that can show messages.
+    """
     def __init__(self):
         gtk.VBox.__init__(self)
 
@@ -99,11 +102,18 @@ class MessageView(gtk.VBox):
         self.clear()
 
     def clear(self):
+        """
+        Remove all messages and hide myself.
+        """
         for i in self.buttonbox.get_children():
             self.clear_message(i.message.id)
         self.hide()
 
     def add_message(self, m):
+        """
+        Add a message to me.
+        @type  m: L{Message}
+        """
         def on_toggled(b):
             if not b.get_active():
                 if self.active_button == b:
