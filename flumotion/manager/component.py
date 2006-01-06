@@ -744,7 +744,7 @@ class ComponentHeaven(base.ManagerHeaven):
 
         # avatarId -> list of deferreds created by getMasterClockInfo
         self._clockMasterWaiters = {}
-        self.masterClockInfo = {}
+        self._masterClockInfo = {}
         
     ### our methods
     def _componentIsLocal(self, componentAvatar):
@@ -979,7 +979,7 @@ class ComponentHeaven(base.ManagerHeaven):
         avatarId = componentAvatar.avatarId
 
         def setMasterClockInfo(result):
-            self.masterClockInfo[avatarId] = result
+            self._masterClockInfo[avatarId] = result
             return result
 
         def wakeClockMasterWaiters(result):
@@ -994,10 +994,10 @@ class ComponentHeaven(base.ManagerHeaven):
         workerName = componentAvatar.getWorkerName()
         port = self.vishnu.reservePortsOnWorker(workerName, 1)[0]
 
-        if avatarId in self.masterClockInfo:
+        if avatarId in self._masterClockInfo:
             self.warning('component %s already has master clock info: %r'
-                         % (avatarId, self.masterClockInfo[avatarId]))
-            del self.masterClockInfo[avatarId]
+                         % (avatarId, self._masterClockInfo[avatarId]))
+            del self._masterClockInfo[avatarId]
         d = componentAvatar.mindCallRemote('provideMasterClock', port)
         d.addCallback(setMasterClockInfo)
         d.addCallback(wakeClockMasterWaiters)
@@ -1013,10 +1013,10 @@ class ComponentHeaven(base.ManagerHeaven):
                 d.errback(errors.ComponentStart('clock master component '
                                                 'start cancelled'))
 
-        if avatarId in self.masterClockInfo:
-            port = self.masterClockInfo[avatarId][1]
+        if avatarId in self._masterClockInfo:
+            port = self._masterClockInfo[avatarId][1]
             self.vishnu.releasePortsOnWorker(workerName, [port])
-            del self.masterClockInfo[avatarId]
+            del self._masterClockInfo[avatarId]
         else:
             self.warning('component %s has no master clock info'
                          % (avatarId,))
@@ -1029,12 +1029,12 @@ class ComponentHeaven(base.ManagerHeaven):
         @rtype:   L{twisted.internet.defer.Deferred}
         """
         self.debug('getting master clock info for component %s' % avatarId)
-        if avatarId in self.masterClockInfo:
-            return defer.succeed(self.masterClockInfo[avatarId])
-        else:
-            if not avatarId in self._clockMasterWaiters:
-                self._clockMasterWaiters[avatarId] = []
+        if avatarId in self._masterClockInfo:
+            return defer.succeed(self._masterClockInfo[avatarId])
 
-            ret = defer.Deferred()
-            self._clockMasterWaiters[avatarId].append(ret)
-            return ret
+        if not avatarId in self._clockMasterWaiters:
+            self._clockMasterWaiters[avatarId] = []
+
+        ret = defer.Deferred()
+        self._clockMasterWaiters[avatarId].append(ret)
+        return ret
