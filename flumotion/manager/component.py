@@ -278,11 +278,11 @@ class ComponentAvatar(base.ManagerAvatar):
     ### python methods
     def __repr__(self):
         if self.componentState:
-            mood = self.componentState.get('mood')
+            mood = moods.get(self.componentState.get('mood')).name
         else:
             mood = '(unknown)'
-        return '<%s %s in mood %s>' % (self.__class__.__name__,
-                                        self.avatarId, mood)
+        return '<%s %s (mood %s)>' % (self.__class__.__name__,
+                                      self.avatarId, mood)
 
     ### ComponentAvatar methods
     def cleanup(self):
@@ -838,8 +838,19 @@ class ComponentHeaven(base.ManagerHeaven):
         eatersData = self._getComponentEatersData(componentAvatar)
         feedersData = self._getComponentFeedersData(componentAvatar)
 
+        # FIXME: providing the master clock needs to be done between setup
+        # and start
+        state = componentAvatar.componentState
+        if state.get('config')['clock-master'] == componentAvatar.avatarId:
+            # houston, we have a master clock
+            self.debug('telling component %s to provide master clock' %
+                componentAvatar.avatarId)
+            yield self.provideMasterClock(componentAvatar)
+
+
         componentAvatar.debug('asking component to start with eatersData %s and feedersData %s' % (eatersData, feedersData))
         componentAvatar.start(eatersData, feedersData)
+    _startComponent = defer_generator_method(_startComponent)
 
     # FIXME: better name startComponentIfReady
     def checkComponentStart(self, readiness, componentAvatar):
@@ -902,10 +913,6 @@ class ComponentHeaven(base.ManagerHeaven):
                 self.vishnu.state.append('flows', flow)
             state.set('parent', flow)
             flow.append('components', state)
-
-        if state.get('config')['clock-master'] == componentAvatar.avatarId:
-            # houston, we have a master clock
-            self.provideMasterClock(componentAvatar)
 
         # tell the feeder set
         set = self._getFeederSet(componentAvatar)
@@ -1004,6 +1011,7 @@ class ComponentHeaven(base.ManagerHeaven):
         d = componentAvatar.mindCallRemote('provideMasterClock', port)
         d.addCallback(setMasterClockInfo)
         d.addCallback(wakeClockMasterWaiters)
+        return d
 
     def removeMasterClock(self, componentAvatar):
         avatarId = componentAvatar.avatarId

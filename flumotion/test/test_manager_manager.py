@@ -401,6 +401,8 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         l = f.get('components')
         self.failUnless(l)
 
+        # FIXME: why a second time ? Maybe to check that reloading doesn't
+        # change things ?
         self.vishnu.loadConfiguration(file)
 
     def testConfigBeforeWorker(self):
@@ -535,7 +537,8 @@ class TestVishnu(unittest.TestCase, log.Loggable):
 
         state = m.state
         self.assertEqual(state.get('mood'), moods.happy.value,
-            "mood of %s is not happy" % state.get('name'))
+            "mood of %s is not happy but %r" % (
+                state.get('name'), moods.get(state.get('mood'))))
  
         # verify the component avatars
         self.failUnless(avatar.jobState)

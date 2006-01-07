@@ -1,3 +1,11 @@
+2006-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/component.py:
+	  use the name of the mood in an avatar representation
+	* flumotion/test/test_manager_manager.py:
+	  move the provideMasterClock closer to where we want it by
+	  putting it in the _startComponent method, which now is a defgen
+
 2006-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:
