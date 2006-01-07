@@ -482,7 +482,8 @@ class Vishnu(log.Loggable):
             
     def _workerStartComponents(self, workerAvatar, components):
         """
-        Start the list of components on the given worker, sequentially.
+        Start the list of components on the given worker, sequentially, but
+        in no specific order.
 
         @type  workerAvatar: L{flumotion.manager.worker.WorkerAvatar}
         @type  components:   list of
@@ -498,7 +499,8 @@ class Vishnu(log.Loggable):
             parentName = c.get('parent').get('name')
             type = c.get('type')
             config = c.get('config')
-            self.debug('_workerStartComponents(): scheduling start of /%s/%s on %s' % (
+            self.debug(
+                '_workerStartComponents(): scheduling start of /%s/%s on %s' % (
                 parentName, componentName, workerAvatar.avatarId))
             
             d.addCallback(self._workerStartComponentDelayed,

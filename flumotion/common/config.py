@@ -296,7 +296,7 @@ class FlumotionConfigXML(log.Loggable):
                 master = need_sync[-1]
 
             masterAvatarId = master.config['avatarId']
-            self.info("setting %s as clock master" % masterAvatarId)
+            self.info("Setting %s as clock master" % masterAvatarId)
 
             for c in need_sync:
                 c.config['clock-master'] = masterAvatarId

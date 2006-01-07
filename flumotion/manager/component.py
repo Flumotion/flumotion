@@ -500,6 +500,7 @@ class ComponentAvatar(base.ManagerAvatar):
                            of elements feeding our eaters
         @type feedersData: tuple of (name, host) tuples of our feeding elements
         """
+        self.debug('ComponentAvatar.start()')
         for feedname, host, port in feedersData:
             if feedname in self.ports:
                 self.warning('feed %s already has port %d; trying to '
@@ -507,9 +508,10 @@ class ComponentAvatar(base.ManagerAvatar):
             self.ports[feedname] = port
 
         config = self.componentState.get('config')
-        master = config['clock-master'] # an avatarId
+        master = config['clock-master'] # avatarId of the clock master comp
         clocking = None
         if master:
+            self.debug('Need to synchronize with clock master %r' % master)
             d = self.heaven.getMasterClockInfo(master)
             yield d
             try:
@@ -977,6 +979,7 @@ class ComponentHeaven(base.ManagerHeaven):
         @rtype: L{twisted.internet.defer.Deferred}
         """
         avatarId = componentAvatar.avatarId
+        self.debug('provideMasterClock on component %s' % avatarId)
 
         def setMasterClockInfo(result):
             self._masterClockInfo[avatarId] = result
