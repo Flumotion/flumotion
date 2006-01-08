@@ -258,12 +258,6 @@ class Vishnu(log.Loggable):
             self.bouncer.debug('started')
             log.info('manager', "Started manager's bouncer")
 
-        # make component heaven
-        # load the configuration as well
-        # FIXME: we should only handle the added conf, so we get the changes
-        # parsing should also be done only once
-        self.componentHeaven.loadConfiguration(filename, data)
-
         # now add stuff from the config that did not exist in self.state yet
         self.debug('syncing up planet state with config')
         added = [] # added components while parsing

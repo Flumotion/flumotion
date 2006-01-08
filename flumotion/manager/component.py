@@ -741,8 +741,6 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         base.ManagerHeaven.__init__(self, vishnu)
         self._feederSets = {}
-        # FIXME: deprecate componentEntries
-        self._componentEntries = {} # configuration entries
 
         # avatarId -> list of deferreds created by getMasterClockInfo
         self._clockMasterWaiters = {}
@@ -776,17 +774,6 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         self.removeAvatar(componentAvatar.avatarId)
         
-    # FIXME: deprecate this completely
-    def loadConfiguration(self, filename, string=None):
-        conf = config.FlumotionConfigXML(filename, string)
-        
-        # get atmosphere and flow entries
-        entries = conf.getComponentEntries()
-        self.debug('got entries %r from conf %r' % (entries, conf))
-        self._componentEntries.update(entries)
-        self.debug("added entries for components %r" %
-            self._componentEntries.keys())
-            
     def _getComponentEatersData(self, componentAvatar):
         """
         Retrieve the information about the feeders this component's eaters
