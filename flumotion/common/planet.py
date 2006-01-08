@@ -114,6 +114,8 @@ moods = enum.EnumClass(
 moods.can_stop = staticmethod(lambda m: m != moods.sleeping and m != moods.lost)
 moods.can_start = staticmethod(lambda m: m == moods.sleeping)
 
+_jobStateKeys = ['mood', 'ip', 'pid', 'workerName', 'message', 'cpu']
+
 class ManagerComponentState(flavors.StateCacheable):
 
     __implements__ = flavors.IStateListener,
@@ -127,14 +129,10 @@ class ManagerComponentState(flavors.StateCacheable):
         self.addKey('moodPending')
         self.addKey('workerRequested')
         self.addKey('config') # dictionary
-        # combined from job state and our state
-        self.addKey('mood')
-        # proxied from job state
-        self.addKey('ip')
-        self.addKey('pid')
-        self.addKey('cpu') # cpu usage, 0.0 -> 1.0
-        self.addKey('workerName')
-        self.addKey('message')
+        
+        # proxied from job state or combined with our state (mood)
+        for k in _jobStateKeys:
+            self.addKey(k)
         self._jobState = None
 
     def __repr__(self):
@@ -146,7 +144,7 @@ class ManagerComponentState(flavors.StateCacheable):
         @type jobState: L{ManagerJobState}
         """
         self._jobState = jobState
-        for key in ['mood', 'ip', 'pid', 'workerName', 'message', 'cpu']:
+        for key in _jobStateKeys:
             # only set non-None values, handling 'message' being None
             v = jobState.get(key)
             if v != None:
@@ -161,14 +159,19 @@ class ManagerComponentState(flavors.StateCacheable):
         self._jobState = None
 
     # IStateListener interface
+    # only proxy keys we want proxied; eaterNames and feederNames are ignored
+    # for example
     def stateAppend(self, state, key, value):
-        self.append(key, value)
+        if key in _jobStateKeys:
+            self.append(key, value)
 
     def stateRemove(self, state, key, value):
-        self.remove(key, value)
+        if key in _jobStateKeys:
+            self.remove(key, value)
 
     def stateSet(self, state, key, value):
-        self.set(key, value)
+        if key in _jobStateKeys:
+            self.set(key, value)
 
 class AdminComponentState(flavors.StateRemoteCache):
     pass
@@ -180,12 +183,8 @@ pb.setUnjellyableForClass(ManagerComponentState, AdminComponentState)
 class WorkerJobState(flavors.StateCacheable):
     def __init__(self):
         flavors.StateCacheable.__init__(self)
-        self.addKey('mood')
-        self.addKey('ip')
-        self.addKey('pid')
-        self.addKey('cpu')
-        self.addKey('workerName')
-        self.addKey('message')
+        for k in _jobStateKeys:
+            self.addKey(k)
 
 class ManagerJobState(flavors.StateRemoteCache):
     pass

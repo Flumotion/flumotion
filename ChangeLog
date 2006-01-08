@@ -1,3 +1,10 @@
+2006-01-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/planet.py:
+	  use a module global for keys we want to proxy from job to
+	  component state
+	  only proxy those keys, no others
+
 2006-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:
