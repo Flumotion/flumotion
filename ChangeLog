@@ -1,5 +1,10 @@
 2006-01-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/worker.py:
+	  add documentation and warnings for unexpected situations
+
+2006-01-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/planet.py:
 	  use a module global for keys we want to proxy from job to
 	  component state

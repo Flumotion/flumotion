@@ -155,16 +155,29 @@ class WorkerHeaven(base.ManagerHeaven):
         
     ### my methods
     def workerAttached(self, workerAvatar):
-        # called when the mind of a worker is attached, ie the worker logged in
+        """
+        Notify the heaven that the given worker has logged in.
+
+        @type  workerAvatar: L{WorkerAvatar}
+        """
         workerName = workerAvatar.getName()
-        # FIXME: what if it was already there ?
         if not workerName in self.state.get('names'):
             self.state.append('names', workerName)
-
-        # self.vishnu.workerAttached(workerAvatar)
+        else:
+            # FIXME: what if it was already there ?
+            self.warning('worker %s was already registered in the heaven' %
+                workerName)
 
     def workerDetached(self, workerAvatar):
+        """
+        Notify the heaven that the given worker has logged out.
+
+        @type  workerAvatar: L{WorkerAvatar}
+        """
         workerName = workerAvatar.getName()
         names = self.state.get('names')
         if workerName in self.state.get('names'):
             self.state.remove('names', workerName)
+        else:
+            self.warning('worker %s was never registered in the heaven' %
+                workerName)
