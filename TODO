@@ -1,3 +1,10 @@
+* MEDIUM	expand config file format with <section> blocks so the
+		same set of properties can be repeated for, for example,
+		a streamer component
+
+* MEDIUM	expose a raw dv stream as a second feed on the firewire
+		producer and allow the disker to connect to it
+
 * MEDIUM	decide on style for properties in xml:
 		mount-point, mountpoint or mountPoint
 		some of these are gotten from glade file !
