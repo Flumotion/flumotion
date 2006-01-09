@@ -724,6 +724,16 @@ class ComponentAvatar(base.ManagerAvatar):
         componentAvatar = self.heaven.getAvatar(requesterName)
         return componentAvatar.expireKeycard(keycardId)
 
+    def perspective_reservePortsOnWorker(self, workerName, number_of_ports):
+        """
+        Request a number of ports on a particular worker.
+
+        This can be called from a job if it needs some ports itself
+        """
+        ports = self.heaven.vishnu.reservePortsOnWorker(workerName, 
+            number_of_ports)
+        return ports
+
 class ComponentHeaven(base.ManagerHeaven):
     """
     I handle all registered components and provide avatars for them.

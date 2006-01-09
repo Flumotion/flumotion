@@ -1,3 +1,9 @@
+2006-01-09  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/component.py:
+	  Add a perspective method to reserve worker ports, needed so that
+	  RTCP servers can be started on demand.
+
 2006-01-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:
