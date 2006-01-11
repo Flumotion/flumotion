@@ -261,8 +261,12 @@ class BaseComponent(log.Loggable, gobject.GObject):
         # FIXME: name is unique where ? only in flow, so not in worker
         # need to use full path maybe ?
         """
-        @param config: the configuration dictionary for the component
-        @type  config: dict
+        A subclass should do as little as possible in its __init__ method.
+        In particular, it should not try to access resources.
+
+        Failures during __init__ are marshalled back to the manager through
+        the worker's remote_create method, since there is no component state
+        proxied to the manager yet at the time of __init__
         """
         gobject.GObject.__init__(self)
 
