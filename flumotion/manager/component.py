@@ -497,9 +497,15 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Set up the component with the given config.
         """
+        def _setupErrback(failure, self):
+            self._setMood(moods.sad)
+            return failure
+
         self.debug('remote call setup(config=%r)' % config)
         d = self.mindCallRemote('setup', config)
+        d.addErrback(_setupErrback, self)
         return d
+
         
     # This function tells the component to start
     # feedcomponents will start consuming feeds and start its feeders
@@ -929,7 +935,16 @@ class ComponentHeaven(base.ManagerHeaven):
         # set up the component so we have feeders and eaters
         state = componentAvatar.componentState
         config = state.get('config')
-        yield componentAvatar.setup(config)
+
+        self.debug('setting up componentAvatar %r' % componentAvatar)
+        d = componentAvatar.setup(config)
+        yield d
+
+        try:
+            d.value()
+        except:
+            self.warning('setup failed')
+            raise errors.FlumotionError('Could not set up component')
 
         # tell the feeder set
         set = self._getFeederSet(componentAvatar)

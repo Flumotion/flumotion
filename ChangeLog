@@ -1,6 +1,26 @@
 2006-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/random/component-initialization-protocol:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/feedcomponent08.py:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/job/job.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_component.py:
+	* flumotion/test/test_htpasswdcrypt.py:
+	* flumotion/test/test_pb.py:
+	  remove the config argument from component __init__
+	  basic scenario still works; time to verify others
+	* flumotion/component/component.py:
+	  add setup() to medium
+	* flumotion/manager/component.py:
+	  remove config dict from getComponent
+
+2006-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/component-initialization-protocol:
 	* flumotion/test/test_component.py:
 	* flumotion/test/test_pb.py:
 	* flumotion/test/test_htpasswdcrypt.py:

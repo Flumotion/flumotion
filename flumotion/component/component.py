@@ -134,6 +134,9 @@ class BaseComponentMedium(medium.BaseMedium):
         self.logName = component.name
         
     ### our methods
+    def setup(self, config):
+        pass
+
     def getIP(self):
         """
         Return our own IP as seen from the manager.
@@ -179,10 +182,10 @@ class BaseComponentMedium(medium.BaseMedium):
         Set up the component and the component's medium with the given config,
         in that order.
         """
-        # FIXME: use the given config ? decide on __init__ vs setup
         # FIXME: decide on return vars ? possibly chain deferreds ?
-        self.comp.setup(self.comp.config)
-        self.setup(self.comp.config)
+        self.debug('remote_setup(%r)' % config)
+        self.comp.setup(config)
+        self.setup(config)
         
     def remote_start(self, *args, **kwargs):
         return self.comp.start(*args, **kwargs)
@@ -254,7 +257,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
     component_medium_class = BaseComponentMedium
     _heartbeatInterval = configure.heartbeatInterval
     
-    def __init__(self, config):
+    def __init__(self):
         # FIXME: name is unique where ? only in flow, so not in worker
         # need to use full path maybe ?
         """
@@ -266,7 +269,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.state = planet.WorkerJobState()
 
         self.name = None
-        self.setConfig(config)
         
         #self.state.set('name', name)
         self.state.set('mood', moods.sleeping.value)
@@ -284,7 +286,7 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.lastClock = time.clock()
 
     def setup(self, config):
-        pass
+        self.setConfig(config)
 
     def startHeartbeat(self):
         """

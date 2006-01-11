@@ -26,7 +26,7 @@ class VideoTestMedium(feedcomponent.FeedComponentMedium):
     def __init__(self, comp):
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
-    def setup(self):
+    def setup(self, config):
         # called after component's setup
         # connect to pattern notify
         source = self.comp.get_element('source')

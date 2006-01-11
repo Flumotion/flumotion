@@ -253,7 +253,7 @@ class Vishnu(log.Loggable):
                              type, 'falling back to createComponent')
                 moduleName = defs.getSource()
                 methodName = "createComponent"
-            bouncer = job.getComponent(configDict, moduleName, methodName)
+            bouncer = job.getComponent(moduleName, methodName)
             bouncer.setup(configDict)
             self.setBouncer(bouncer)
             self.bouncer.debug('started')

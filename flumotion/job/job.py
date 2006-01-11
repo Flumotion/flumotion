@@ -40,12 +40,8 @@ from flumotion.common import medium, package
 from flumotion.component import component
 from flumotion.twisted.defer import defer_generator_method
 
-# FIXME: dict should be put last, and renamed to something more descriptive
-# like configDict
-def getComponent(dict, moduleName, methodName):
+def getComponent(moduleName, methodName):
     """
-    @param dict:       the configuration dictionary
-    @type  dict:       dict
     @param moduleName: name of the module to create the component from
     @type  moduleName: string
     @param methodName: the factory method to use to create the component
@@ -83,10 +79,10 @@ def getComponent(dict, moduleName, methodName):
     # we're going to listen to ports and other stuff which should
     # be separated from the main process.
 
-    log.debug('job', 'calling entry point %s.%s(configdict)' % (
+    log.debug('job', 'calling entry point %s.%s()' % (
         moduleName, methodName))
     try:
-        component = getattr(module, methodName)(dict)
+        component = getattr(module, methodName)()
     except config.ConfigError:
         # already nicely formatted, so fall through
         raise
@@ -254,7 +250,7 @@ class JobMedium(medium.BaseMedium):
         # but it'd be nicer to do this outside of config, so do this
         config['avatarId'] = avatarId
         try:
-            comp = getComponent(config, moduleName, methodName)
+            comp = getComponent(moduleName, methodName)
         except Exception, e:
             msg = "Exception %s during getComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))

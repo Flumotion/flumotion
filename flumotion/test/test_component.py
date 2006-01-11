@@ -35,7 +35,7 @@ class PipelineTest(ParseLaunchComponent):
 
         self.__pipeline = pipeline
 
-        ParseLaunchComponent.__init__(self, config)
+        ParseLaunchComponent.__init__(self)
 
         # we can short-circuit to setup since we're a test
         self.setup(config)

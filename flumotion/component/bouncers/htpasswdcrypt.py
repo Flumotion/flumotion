@@ -44,8 +44,8 @@ class HTPasswdCrypt(bouncer.Bouncer):
     logCategory = 'htpasswdcrypt'
     keycardClasses = (keycards.KeycardUACPP, keycards.KeycardUACPCC)
 
-    def __init__(self, config):
-        bouncer.Bouncer.__init__(self, config)
+    def __init__(self):
+        bouncer.Bouncer.__init__(self)
         self._filename = None
         self._data = None
         self._checker = checkers.CryptChecker()

@@ -63,12 +63,12 @@ class Bouncer(component.BaseComponent):
     
     logCategory = 'bouncer'
 
-    def __init__(self, config):
+    def __init__(self):
         self._idCounter = 0
         self._keycards = {} # keycard id -> Keycard
         self._keycardDatas = {} # keycard id -> data in uiState
         
-        component.BaseComponent.__init__(self, config)
+        component.BaseComponent.__init__(self)
 
         self.uiState.addListKey('keycards')
         

@@ -46,8 +46,8 @@ class FeedComponent(basecomponent.BaseComponent):
     _reconnectInterval = 3
     
     # FIXME: do we need config in the init ?
-    def __init__(self, config):
-        basecomponent.BaseComponent.__init__(self, config)
+    def __init__(self):
+        basecomponent.BaseComponent.__init__(self)
         # add extra keys to state
         self.state.addKey('eaterNames')
         self.state.addKey('feederNames')
@@ -218,6 +218,7 @@ class FeedComponent(basecomponent.BaseComponent):
         return True
 
     def setup_pipeline(self):
+        self.debug('setup_pipeline()')
         assert self.bus_watch_id == None
 
         # disable the pipeline's management of base_time -- we're going

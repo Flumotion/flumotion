@@ -27,12 +27,10 @@ to initialize the component.
 Implementations
 ---------------
 
-BaseComponent.__init__(self, config)
-------------------------------------
-This method is expected to produce an initialized component from a
-config dictionary. It will call the following method:
-
-  BaseComponent.setConfig(self, config)
+BaseComponent.__init__(self)
+----------------------------
+This method is expected to produce an initialized component.
+It should do as little as possible, and not access any resources, config, ...
 
 Interface
 ---------

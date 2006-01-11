@@ -31,7 +31,7 @@ bouncerconf = {'name': 'testbouncer',
 # this is a type that should not be allowed
 class TestHTPasswdCryptKeycard(unittest.TestCase):
     def setUp(self):
-        self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
+        self.bouncer = htpasswdcrypt.HTPasswdCrypt()
 
     def testWrongKeycardClass(self):
         keycard = keycards.Keycard()
@@ -41,7 +41,7 @@ class TestHTPasswdCryptKeycard(unittest.TestCase):
 
 class TestHTPasswdCryptUACPP(unittest.TestCase):
     def setUp(self):
-        self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
+        self.bouncer = htpasswdcrypt.HTPasswdCrypt()
         self.bouncer.setup(bouncerconf)
 
     def tearDown(self):
@@ -70,7 +70,7 @@ class TestHTPasswdCryptUACPP(unittest.TestCase):
 
 class TestHTPasswdCryptUACPCC(unittest.TestCase):
     def setUp(self):
-        self.bouncer = htpasswdcrypt.HTPasswdCrypt(bouncerconf)
+        self.bouncer = htpasswdcrypt.HTPasswdCrypt()
         self.bouncer.setup(bouncerconf)
 
     def testOk(self):
