@@ -254,6 +254,7 @@ class Vishnu(log.Loggable):
                 moduleName = defs.getSource()
                 methodName = "createComponent"
             bouncer = job.getComponent(configDict, moduleName, methodName)
+            bouncer.setup(configDict)
             self.setBouncer(bouncer)
             self.bouncer.debug('started')
             log.info('manager', "Started manager's bouncer")
@@ -307,11 +308,15 @@ class Vishnu(log.Loggable):
             if not dict.has_key('source'):
                 continue
 
+            # source entries are feederName:
+            # componentName[:feedName], with feedName defaulting to default
             list = dict['source']
 
             # FIXME: there's a bug in config parsing - sometimes this gives us
             # one string, and sometimes a list of one string, and sometimes
             # a list
+            # we make this component depend on every component listed in
+            # source; they have the same parent by design
             if isinstance(list, str):
                 list = [list, ]
             for eater in list:
@@ -338,10 +343,10 @@ class Vishnu(log.Loggable):
             else:
                 avatar = self.workerHeaven.avatars[workerId]
                 self._workerStartComponents(avatar, ours)
-            # make sure components with no worker specified don't get started
-            # on all different workers
-            for c in ours:
-                components.remove(c)
+                # they're started, so remove them from the running list of
+                # components
+                for c in ours:
+                    components.remove(c)
  
     def _addComponent(self, config, parent):
         """
@@ -520,6 +525,9 @@ class Vishnu(log.Loggable):
         # started, so now attach it to the planetState's component state
         d.addCallback(self._startCallback, componentState)
         d.addErrback(self._startErrback, componentState)
+
+        # FIXME: shouldn't we return d here to make sure components
+        # wait on each other to be started ?
 
     def _startCallback(self, result, componentState):
         self.debug('got avatarId %s for state %s' % (result, componentState))

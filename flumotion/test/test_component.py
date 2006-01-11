@@ -37,6 +37,9 @@ class PipelineTest(ParseLaunchComponent):
 
         ParseLaunchComponent.__init__(self, config)
 
+        # we can short-circuit to setup since we're a test
+        self.setup(config)
+
     def create_pipeline(self):
         unparsed = self.__pipeline
         self.pipeline_string = self.parse_pipeline(unparsed)

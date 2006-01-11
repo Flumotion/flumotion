@@ -174,6 +174,16 @@ class BaseComponentMedium(medium.BaseMedium):
         self.debug('remote_getConfig of f: returning %r' % self.comp.config)
         return self.comp.config
         
+    def remote_setup(self, config):
+        """
+        Set up the component and the component's medium with the given config,
+        in that order.
+        """
+        # FIXME: use the given config ? decide on __init__ vs setup
+        # FIXME: decide on return vars ? possibly chain deferreds ?
+        self.comp.setup(self.comp.config)
+        self.setup(self.comp.config)
+        
     def remote_start(self, *args, **kwargs):
         return self.comp.start(*args, **kwargs)
        
@@ -272,8 +282,6 @@ class BaseComponent(log.Loggable, gobject.GObject):
         self.baseTime = time.time()
         self.lastTime = time.time()
         self.lastClock = time.clock()
-
-        self.setup(self.config)
 
     def setup(self, config):
         pass

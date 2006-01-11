@@ -30,11 +30,9 @@ Implementations
 BaseComponent.__init__(self, config)
 ------------------------------------
 This method is expected to produce an initialized component from a
-config dictionary. It will call the following methods in the following
-order:
+config dictionary. It will call the following method:
 
   BaseComponent.setConfig(self, config)
-  BaseComponent.setup(self, config)
 
 Interface
 ---------
@@ -45,8 +43,8 @@ This method is expected to set self.config to config.
 
 BaseComponent.setup(self, config)
 ---------------------------------
-This method has no requirements. It is implementation-specific.
-
+This method has no requirements. It is implementation-specific.  After this
+call, the component should have created all resources and be ready to start.
 
 Feed components
 ===============
@@ -57,6 +55,8 @@ pipeline.
 
 Implementations
 ---------------
+
+### FIXME: what's the point in passing "config" if setConfig sets it ?
 
 FeedComponent.setup(self, config)
 ---------------------------------

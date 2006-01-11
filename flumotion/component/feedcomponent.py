@@ -72,21 +72,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     def remote_setElementProperty(self, elementName, property, value):
         self.comp.set_element_property(elementName, property, value)
 
-    def remote_getState(self):
-        """
-        @rtype: L{flumotion.common.planet.WorkerJobState}
-        """
-        state = basecomponent.BaseComponentMedium.remote_getState(self)
-        if not state:
-            return state
-
-        # FIXME: rename functions to Twisted style
-        state.set('eaterNames', self.comp.get_eater_names())
-        state.set('feederNames', self.comp.get_feeder_names())
-        self.debug('remote_getState of fc: returning state %r' % state)
-
-        return state
-    
     def remote_provideMasterClock(self, port):
         """
         Tells the component to start providing a master clock on the given

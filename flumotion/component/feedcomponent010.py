@@ -45,6 +45,30 @@ class FeedComponent(basecomponent.BaseComponent):
 
     _reconnectInterval = 3
     
+    # FIXME: do we need config in the init ?
+    def __init__(self, config):
+        basecomponent.BaseComponent.__init__(self, config)
+        # add extra keys to state
+        self.state.addKey('eaterNames')
+        self.state.addKey('feederNames')
+
+        self.pipeline = None
+        self.pipeline_signals = []
+        self.bus_watch_id = None
+        self.files = []
+        self.effects = {}
+        self._probe_ids = {} # eater name -> probe handler id
+
+        self.clock_provider = None
+
+        self.eater_names = [] # componentName:feedName list
+        self._eaterReconnectDC = {} 
+
+        self.feedersFeeding = 0
+        self.feed_names = []
+        self.feeder_names = []
+
+    ### BaseComponent methods
     def setup(self, config):
         """
         @param config: the configuration dictionary of the component
@@ -58,32 +82,11 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug("feedcomponent.setup(): eater_config %r" % eater_config)
         self.debug("feedcomponent.setup(): feeder_config %r" % feeder_config)
         
-        self.pipeline = None
-        self.pipeline_signals = []
-        self.bus_watch_id = None
-        self.files = []
-        self.effects = {}
-        self._probe_ids = {} # eater name -> probe handler id
-
-        self.clock_provider = None
-
-        # add extra keys to state
-        self.state.addKey('eaterNames')
-        self.state.addKey('feederNames')
-
-        self.feed_names = None # done by self.parse*
-        self.feeder_names = None
-
-        self.eater_names = [] # componentName:feedName list
         self.parseEaterConfig(eater_config)
         self.eatersWaiting = len(self.eater_names)
-        self._eaterReconnectDC = {} 
         for name in self.eater_names:
             self._eaterReconnectDC['eater:' + name] = None
 
-        self.feedersFeeding = 0
-        self.feed_names = []
-        self.feeder_names = []
         self.parseFeederConfig(feeder_config)
         self.feedersWaiting = len(self.feeder_names)
         self.debug('setup() with %d eaters and %d feeders waiting' % (
@@ -98,6 +101,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.effects[effect.name] = effect
         effect.setComponent(self)
 
+    ### FeedComponent methods
     def effectPropertyChanged(self, effectName, propertyName, value):
         """
         Notify the manager that an effect property has changed to a new value.
@@ -118,7 +122,9 @@ class FeedComponent(basecomponent.BaseComponent):
             if block.find(':') == -1:
                 eater_name = block + ':default'
             eater_names.append(eater_name)
+        self.debug('parsed eater config, eaters %r' % eater_names)
         self.eater_names = eater_names
+        self.state.set('eaterNames', self.eater_names)
             
     def parseFeederConfig(self, feeder_config):
         # for pipeline components, in the case there is only one
@@ -131,6 +137,8 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # we create feeder names this component contains based on feed names
         self.feeder_names = map(lambda n: self.name + ':' + n, self.feed_names)
+        self.debug('parsed feeder config, feeders %r' % self.feeder_names)
+        self.state.set('feederNames', self.feeder_names)
 
     def get_eater_names(self):
         """

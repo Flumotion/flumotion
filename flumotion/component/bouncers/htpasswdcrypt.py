@@ -44,34 +44,29 @@ class HTPasswdCrypt(bouncer.Bouncer):
     logCategory = 'htpasswdcrypt'
     keycardClasses = (keycards.KeycardUACPP, keycards.KeycardUACPCC)
 
+    def __init__(self, config):
+        bouncer.Bouncer.__init__(self, config)
+        self._filename = None
+        self._data = None
+        self._checker = checkers.CryptChecker()
+        self._challenges = {} # for UACPCC
+        self._db = {}
+ 
     def setup(self, conf):
         bouncer.Bouncer.setup(self, conf)
 
         # we need either a filename or data
-        filename = None
-        data = None
         props = conf['properties']
         if props.has_key('filename'):
-            filename = props['filename']
+            self._filename = props['filename']
             log.debug('htpasswd', 'using file %s for passwords' % filename)
         elif props.has_key('data'):
-            data = props['data']
+            self._data = props['data']
             log.debug('htpasswd', 'using in-line data for passwords')
         else:
             raise config.ConfigError(
                 'HTPasswdCrypt config needs either a <data> or <filename> entry')
-
-        self._filename = filename
-        self._data = data
-        self._checker = checkers.CryptChecker()
-        self._challenges = {} # for UACPCC
-
-        # FIXME: done through state/mood change ?
-        self._setup()
-
-    # FIXME: generalize to a start method, possibly linked to mood
-    def _setup(self):
-        self._db = {}
+        # FIXME: generalize to a start method, possibly linked to mood
         if self._filename:
             try:
                 lines = open(self._filename).readlines()

@@ -1,5 +1,31 @@
 2006-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/random/component-initialization-protocol:
+	* flumotion/test/test_component.py:
+	* flumotion/test/test_pb.py:
+	* flumotion/test/test_htpasswdcrypt.py:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/manager/manager.py:
+	  separate component setup() from __init__()
+	  invoke setup() explicitly after creating components
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/feedcomponent08.py:
+	  same as above, but also:
+	  move member var initialization back to __init__
+	* flumotion/manager/component.py:
+	  add a setup() method to proxy to the job-side component
+	  turn _startComponent in a defer generator that also takes care of
+	  setup() for now
+	* flumotion/component/component.py:
+	  provide remote_setup to manager's ComponentAvatar
+	* flumotion/component/feedcomponent.py:
+	  remote_getState is not necessary anymore, since the eaterNames
+	  and feederNames keys are set at the correct place
+
+2006-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_manager_manager.py:
 	  add a listener object to turn a state change on a RemoteCache
 	  into a deferred so we can wait inside the unittest on a result

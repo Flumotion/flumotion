@@ -62,10 +62,14 @@ class Bouncer(component.BaseComponent):
     component_medium_class = BouncerMedium
     
     logCategory = 'bouncer'
-    def setup(self, config):
+
+    def __init__(self, config):
         self._idCounter = 0
         self._keycards = {} # keycard id -> Keycard
         self._keycardDatas = {} # keycard id -> data in uiState
+        
+        component.BaseComponent.__init__(self, config)
+
         self.uiState.addListKey('keycards')
         
     def setDomain(self, name):

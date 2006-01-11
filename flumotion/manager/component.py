@@ -377,6 +377,8 @@ class ComponentAvatar(base.ManagerAvatar):
         d.addErrback(self._mindPipelineErrback)
         #d.addErrback(self._mindErrback)
 
+        # FIXME: return d to serialize ?
+
     def _mindGetStateCallback(self, state): 
         # called after the mind has attached.
         # state: L{flumotion.common.planet.ManagerJobState}
@@ -450,6 +452,7 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         # non-feed components don't have these keys
         if not self.jobState.hasKey('feederNames'):
+            self.warning('no feederNames key, so no feeders')
             return []
 
         return self.jobState.get('feederNames', [])
@@ -490,6 +493,14 @@ class ComponentAvatar(base.ManagerAvatar):
         d.addErrback(lambda x: None)
         return d
             
+    def setup(self, config):
+        """
+        Set up the component with the given config.
+        """
+        self.debug('remote call setup(config=%r)' % config)
+        d = self.mindCallRemote('setup', config)
+        return d
+        
     # This function tells the component to start
     # feedcomponents will start consuming feeds and start its feeders
     def start(self, eatersData, feedersData):
@@ -500,7 +511,8 @@ class ComponentAvatar(base.ManagerAvatar):
                            of elements feeding our eaters
         @type feedersData: tuple of (name, host) tuples of our feeding elements
         """
-        self.debug('ComponentAvatar.start()')
+        self.debug('ComponentAvatar.start(eatersData=%r, feedersData=%r)' % (
+            eatersData, feedersData))
         for feedname, host, port in feedersData:
             if feedname in self.ports:
                 self.warning('feed %s already has port %d; trying to '
@@ -832,20 +844,23 @@ class ComponentHeaven(base.ManagerHeaven):
         return map(lambda f, p: (f, host, p), feeders, ports)
 
     def _startComponent(self, componentAvatar):
-        eatersData = self._getComponentEatersData(componentAvatar)
-        feedersData = self._getComponentFeedersData(componentAvatar)
-
-        # FIXME: providing the master clock needs to be done between setup
-        # and start
         state = componentAvatar.componentState
-        if state.get('config')['clock-master'] == componentAvatar.avatarId:
+        config = state.get('config')
+    
+        # provide master clock if needed
+        if config['clock-master'] == componentAvatar.avatarId:
             # houston, we have a master clock
             self.debug('telling component %s to provide master clock' %
                 componentAvatar.avatarId)
             yield self.provideMasterClock(componentAvatar)
 
+        # start
+        eatersData = self._getComponentEatersData(componentAvatar)
+        feedersData = self._getComponentFeedersData(componentAvatar)
 
-        componentAvatar.debug('asking component to start with eatersData %s and feedersData %s' % (eatersData, feedersData))
+        componentAvatar.debug(
+            'starting component with eatersData %s and feedersData %s' % (
+                eatersData, feedersData))
         componentAvatar.start(eatersData, feedersData)
     _startComponent = defer_generator_method(_startComponent)
 
@@ -911,6 +926,11 @@ class ComponentHeaven(base.ManagerHeaven):
             state.set('parent', flow)
             flow.append('components', state)
 
+        # set up the component so we have feeders and eaters
+        state = componentAvatar.componentState
+        config = state.get('config')
+        yield componentAvatar.setup(config)
+
         # tell the feeder set
         set = self._getFeederSet(componentAvatar)
         set.addFeeders(componentAvatar)
@@ -933,6 +953,7 @@ class ComponentHeaven(base.ManagerHeaven):
                 self.checkComponentStart)
 
         self.debug('heaven registered component %r' % componentAvatar)
+    registerComponent = defer_generator_method(registerComponent)
 
     def unregisterComponent(self, componentAvatar):
         """
