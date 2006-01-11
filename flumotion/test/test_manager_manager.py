@@ -32,7 +32,46 @@ from flumotion.common.planet import moods
 from flumotion.manager import component, manager
 from flumotion.common import log, planet, interfaces, common
 from flumotion.common import setup
+from flumotion.twisted import flavors
 
+class MyListener(log.Loggable):
+    # a helper object that you can get deferreds from that fire when
+    # a certain state has a certain key set to a certain value
+    __implements__ = flavors.IStateListener
+
+    def __init__(self):
+        self._setters = {} # (state, key, value) tuple -> list of deferred
+        
+    def notifyOnSet(self, state, key, value):
+        self.debug("notify on state %r key %r set to value %r" % (
+            state, key, value))
+        
+        if state.hasKey(key) and state.get(key) == value:
+            self.debug("key already has the given value, firing")
+            return defer.succeed(None)
+            
+        d = defer.Deferred()
+        t = (state, key, value)
+        if not t in self._setters.keys():
+            self._setters[t] = []
+        self._setters[t].append(d)
+        self.debug("created notify deferred %r" % d)
+        return d
+
+    def stateSet(self, object, key, value):
+        self.debug("%r key %r set to %r" % (object, key, value))
+        
+        t = (object, key, value)
+        if t in self._setters.keys():
+            list = self._setters[t]
+            for d in list:
+                self.debug("firing deferred %d" % d)
+                d.callback(None)
+            del self._setters[t]
+
+    def stateAppend(self, object, key, value): pass
+    def stateRemove(self, object, key, value): pass
+    
 class FakeComponentAvatar(log.Loggable):
     ### since we fake out componentavatar, eaters need to be specified fully
     ### for the tests, ie sourceComponentName:feedName
@@ -290,6 +329,9 @@ class FakeComponentMind(FakeMind):
     def remote_provideMasterClock(self, port):
         return ("127.0.0.1", port, 0L)
 
+    def remote_setup(self, config):
+        self.debug('remote_setup(%r)' % config)
+
     def remote_start(self, eatersData, feedersData, clocking):
         self.debug('remote_start(%r, %r)' % (eatersData, feedersData))
         self.testcase.failUnless(hasattr(self, 'state'))
@@ -535,10 +577,15 @@ class TestVishnu(unittest.TestCase, log.Loggable):
         self.failUnless(m.state)
         self.failUnless(m.jobState)
 
-        state = m.state
+        state = m.jobState
+        l = MyListener()
+        state.addListener(l)
+        d = l.notifyOnSet(state, 'mood', moods.happy.value)
+        unittest.deferredResult(d)
+
         self.assertEqual(state.get('mood'), moods.happy.value,
             "mood of %s is not happy but %r" % (
-                state.get('name'), moods.get(state.get('mood'))))
+                m.state.get('name'), moods.get(state.get('mood'))))
  
         # verify the component avatars
         self.failUnless(avatar.jobState)

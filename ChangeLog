@@ -1,3 +1,10 @@
+2006-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_manager_manager.py:
+	  add a listener object to turn a state change on a RemoteCache
+	  into a deferred so we can wait inside the unittest on a result
+	  to happen
+
 2006-01-09  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/component.py:
