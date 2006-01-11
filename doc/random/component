@@ -15,8 +15,8 @@ Writing a component
     - implement a setup method and getNodes method
 
 
-How communication works
------------------------
+Interaction between admin clients and components
+------------------------------------------------
 - an admin client asks for a bundle with the entrypoint (e.g. 'admin/gtk')
 - admin loads the bundle and creates an object given the entry constructor
 - this object should get .setup() called to prepare nodes
@@ -27,14 +27,19 @@ How communication works
 - a node can call remote methods to the component using self.callRemote()
 - a node can call on effects in the component using self.callRemote('effect'
 
-Component lifecycle
--------------------
+Component lifecycle overview
+----------------------------
+- a component enters the manager as a ManagerComponentState object because
+  of a component node in the configuration state.  It starts in the sleeping
+  mood.
+
 - create:
   - manager asks worker to create a component of a given type;
     worker spawns job;
-    job creates component of the given type;
-    job logs in to manager;
+    job creates component and component medium of the given type;
+    component logs in to manager;
     only then does the original remote method return a result.
+
     Any error happening during this stage will trigger a failure on the
     original remote method; the component job will shut down on its own;
     in the manager the component is in the "sad" mood; and a stop/start
@@ -45,28 +50,146 @@ Component lifecycle
 
 - setup:
   - manager sends config to component (TODO)
-  - component calls setup, which triggers setConfig
+  - job calls .setup() on component, which triggers setConfig
+  - job calls .setup() on medium
   - errors get serialized as messages through state;
     setup can fail (missing elements, devices, ...);
     this allows for more elaborate feedback/remedying over the
     manager-component PB connection
   - jobs keep running; need to be told to shutdown by a stop command
+  - setup must be done before start or after stop
+  - if successful, the mood is waking, otherwise sad.
 
 - start:
   - component actually starts performing its function
   - can fail; messages get serialized
+  - if successful, the mood becomes happy
 
 - stop:
   - component can be stopped by manager
+  - if successful, the mood becomes sleeping again
 
 - destroy:
   - terminate the job process, and clean up
 
-How components start
---------------------
-- M: WorkerAvatar.start() does a callRemote (FIXME: rename to _create)
-  - W: WorkerMedium.remote_start()
-    - sets up bundles
-    - self.brain.kindergarten.play()
-      - Kindergarten.play():
-      - spawns a job process, giving it avatarId and socket path as arguments
+Detailed breakdown of program flow
+----------------------------------
+- In manager, configuration gets loaded containing component descriptions
+  - components have a unique name within the parent they're a part of
+    (a flow, the manager, or the atmosphere)
+  - vishnu is created, with ManagerPlanetState as self.state
+  - configuration is added:
+    - at startup: flumotion/manager/main.py _initialLoadConfig
+    - through admin: flumotion/manager/admin.py, perspective_loadConfiguration
+  - both go through flumotion.manager.manager.Vishnu.loadConfiguration
+    - parses config
+    - checks for bouncer, starting it if needed
+    - goes through self.state:
+      - adding ManagerComponentState objects for atmosphere components
+        if they're new (through self._addComponent)
+      - adding flows if they're new
+      - adding ManagerComponentState objects for flow components
+        if they're new in the flow (through self._addComponent)
+      - _addComponent:
+	- creates the ManagerComponentState and sets stuff on it
+	- creates a ComponentMapper for it and adds it to the mappers
+	- adds nodes to the dag (FIXME: need to use this more)
+      - registers dependencies by examining source entries which list the
+	feeders this component eats from
+      - starts all components that can be started given the workers currently
+        logged in
+
+- components get created/instantiated (on request of manager) by the worker:
+  - as part of loading configuration (see above)
+  - as part of workerAttached()
+  - both go through vishnu._workerStartComponents
+    (FIXME: we should only do create; actual start should
+    be triggered by the graph when all dependencies are happy)
+  - Vishnu._workerStartComponentDelayed() fires deferreds to start components
+    (FIXME: rename to create)
+    - workerAvatar.start(avatarId, type, config) (FIXME: rename)
+      - looks up entry point for the given type
+      - remote call serialized to
+        flumotion.worker.worker.WorkerMedium.remote_start
+      - will fire a deferred returning the avatarId the component will use to
+        log in (FIXME: isn't this the same as the one given ?)
+    - the worker process will start up the component:
+      - sets up (downloads) bundles for the component of that type
+      - creates a deferred for the starting, and calls
+        kindergarten.play(name, parent, ...)
+      - creates a Kid in the kindergarten and hashes it by /parent/name
+      - also calls job.run(name, parent, ...)
+      - this spawns a flumotion-job process:
+        - giving it avatarId and socket path as arguments
+        - starts a JobClientFactory that logs in to worker with
+          /parent/name as avatarId
+        - this creates a jobmedium for the worker brain to call on
+        - workerbrain calls remote_bootstrap (workerName, manager connection
+          info, packagePaths)
+        - job registers package paths for the bundles previously downloaded by
+	  worker
+        - workerbrain calls remote start (name, parent, ...) (FIXME: rename)
+        - JobMedium.remote_start(name, parent, ...) gets called
+        - calls self._runComponent(name, parent, ...)
+        - logs in to manager with keycard.avatarId set to the path
+        - in the manager: 
+	  - ComponentAvatar gets created
+          - ComponentAvatar.attached() gets called:
+            - triggers vishnu.componentAttached, which maps the component
+              avatar to the id
+            - calls self._getState(), which will return a
+              ManagerJobState, containing component name and parent name
+              - proxy MJS to MCS through addListener
+            - self.heaven.registerComponent():
+	      - flow gets created in self.vishnu.state if it didn't exist yet
+                (FIXME: maybe this should move to vishnu ?)
+              - componentAvatar.setup()
+                (FIXME: maybe this should be done at a later step ?)
+              - feeder set gets informed (must be done after setup)
+              - components get started if they don't take feeds; otherwise
+                they get depended on feeders, and checked if they can start:wa
+                
+            - self.vishnu.registerComponent():
+            - inform vishnu so it can map
+     ManagerJobState <-> ComponentAvatar
+
+  - the component has been created, and the deferred chain for this
+    component unfurls (FIXME: verify this is sequential-per-component,
+    but that different components get created in parallel)
+    (FIXME: it might be nice to have the workers sequentialize the creation
+    of components though, instead of parallelizing)
+
+naming of objects in the network
+
+COMPONENTS and related objects
+
+
+COMPONENTS IN MANAGER
+----------
+- manager has three objects related to components
+  - ManagerComponentState (created first)
+  - ComponentAvatar (with an avatarId)
+  - ManagerJobState (received when a component starts)
+
+- Vishnu.loadConfiguration:
+  - parses a config
+  - creates ManagerComponentState objects and puts them in the PlanetState
+  - triggers start of components that aren't started yet and have a worker
+    logged in to start on
+
+- WorkerHeaven.workerAttached (rename to registerWorker ?)
+  - called when a worker logs in
+  - triggers start of components, just like loadConfiguration
+
+- Vishnu starting a component on a worker:
+  - finds WorkerAvatar to start it on
+  - makes up an avatarId for the component to use eventually
+  - vishnu stores avatarId -> state mapping
+  - calls avatar.start(...), which does a remote call
+  - deferred will return when the component has finally started up completely
+
+- ComponentHeaven.componentAttached 
+  - called when a component logs in, knows avatarId
+  - inform vishnu so it can store ComponentAvatar -> avatarId -> state
+  - calls a getState to get the JobState
+  - which eventually gets the ManagerJobState
