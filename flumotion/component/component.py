@@ -34,7 +34,7 @@ from twisted.cred import error as crederror
 from twisted.spread import pb
 
 from flumotion.common import interfaces, errors, log, planet, medium, compat
-from flumotion.common import componentui
+from flumotion.common import componentui, common
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
@@ -241,7 +241,7 @@ class BaseComponentMedium(medium.BaseMedium):
         self.warning(msg)
         raise errors.MoMethodError(msg)
 
-class BaseComponent(log.Loggable, gobject.GObject):
+class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
     """
     I am the base class for all Flumotion components.
 
@@ -270,6 +270,10 @@ class BaseComponent(log.Loggable, gobject.GObject):
         """
         gobject.GObject.__init__(self)
 
+        # this will call self.init() for all implementors of init()
+        common.InitMixin.__init__(self)
+
+    def init(self):
         self.state = planet.WorkerJobState()
 
         self.name = None

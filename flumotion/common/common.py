@@ -566,6 +566,7 @@ def call_each_method(obj, method, *args, **kwargs):
     the class' superclasses. Calls the methods in method resolution
     order, which goes from subclasses to superclasses.
     """
+    mro = type(obj).__mro__
     _call_each_method(obj, method, mro, args, kwargs)
 
 def call_each_method_reversed(obj, method, *args, **kwargs):

@@ -1,5 +1,11 @@
 2006-01-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/component.py (BaseComponent): Mix in the
+	InitMixin, call it too.
+	(BaseComponent.init): Init variables in init(), why not.
+
+	* flumotion/common/common.py (call_each_method): Fix a bugaboo.
+
 	* flumotion/test/test_common.py (TestInitMixin): Bling!
 
 	* flumotion/common/common.py (_uniq, _call_each_method): New
