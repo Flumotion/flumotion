@@ -1,3 +1,15 @@
+2006-01-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_common.py (TestInitMixin): Bling!
+
+	* flumotion/common/common.py (_uniq, _call_each_method): New
+	helpers.
+	(call_each_method, call_each_method_reversed): New public
+	functions to call a method for each implementation in a class
+	hierarchy.
+	(InitMixin): New mixin class that will call init() implementations
+	on an object using call_each_method_reversed.
+
 2006-01-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/pychecker.mk:

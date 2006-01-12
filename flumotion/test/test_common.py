@@ -289,3 +289,33 @@ class TestCompareVersions(unittest.TestCase):
         self.assertEquals(common.compareVersions("2.0", "1.0"), 1)
         self.assertEquals(common.compareVersions("2.1", "2.0"), 1)
         self.assertEquals(common.compareVersions("1.2.3.4", "1.2.3.3.0"), 1)
+
+class InitA(common.InitMixin):
+    def __init__(self):
+        self.inited = []
+        common.InitMixin.__init__(self, 3, 4, x=5, y=6)
+
+class InitB(InitA):
+    def init(self, *args, **kwargs):
+        self.inited.append((InitB, args, kwargs))
+
+class InitC(InitB):
+    pass
+
+class InitD(InitC):
+    def init(self, *args, **kwargs):
+        self.inited.append((InitD, args, kwargs))
+
+class TestInitMixin(unittest.TestCase):
+    def testInitA(self):
+        self.assertEquals(InitA().inited, [])
+
+    def testInitB(self):
+        self.assertEquals(InitB().inited, [(InitB, (3, 4), {'x':5, 'y':6})])
+
+    def testInitC(self):
+        self.assertEquals(InitC().inited, [(InitB, (3, 4), {'x':5, 'y':6})])
+
+    def testInitD(self):
+        self.assertEquals(InitD().inited, [(InitB, (3, 4), {'x':5, 'y':6}),
+                                           (InitD, (3, 4), {'x':5, 'y':6})])

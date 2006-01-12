@@ -530,3 +530,73 @@ def compareVersions(first, second):
             return 1
 
     return 0
+
+def _uniq(l, key=lambda x: x):
+    """
+    Filters out duplicate entries in a list.
+    """
+    out = []
+    for x in l:
+        if key(x) not in [key(y) for y in out]:
+            out.append(x)
+    return out
+
+def _call_each_method(obj, method, mro, args, kwargs):
+    procs = []
+    for c in mro:
+        if hasattr(c, method):
+            proc = getattr(c, method)
+            assert callable(proc) and hasattr(proc, 'im_func'),\
+                   'attr %s of class %s is not a method' % (method, c)
+            procs.append(proc)
+
+    # In a hierarchy A -> B, if A implements the method, B will inherit
+    # it as well. Compare the functions implementing the methods so as
+    # to avoid calling them twice.
+    procs = _uniq(procs, lambda proc: proc.im_func)
+
+    for proc in procs:
+        proc(obj, *args, **kwargs)
+
+def call_each_method(obj, method, *args, **kwargs):
+    """
+    Invoke all implementations of a method on an object.
+
+    Searches for method implementations in the object's class and all of
+    the class' superclasses. Calls the methods in method resolution
+    order, which goes from subclasses to superclasses.
+    """
+    _call_each_method(obj, method, mro, args, kwargs)
+
+def call_each_method_reversed(obj, method, *args, **kwargs):
+    """
+    Invoke all implementations of a method on an object.
+
+    Like call_each_method, but calls the methods in reverse method
+    resolution order, from superclasses to subclasses.
+    """
+    # do a list() so as to copy the mro, we reverse the list in
+    # place so as to start with the base class
+    mro = list(type(obj).__mro__)
+    mro.reverse()
+    _call_each_method(obj, method, mro, args, kwargs)
+    
+class InitMixin(object):
+    """
+    A mixin class to help with object initialization.
+
+    In some class hierarchies, __init__ is only used for initializing
+    instance variables. In these cases it is advantageous to avoid the
+    need to "chain up" to a parent implementation of a method. Adding
+    this class to your hierarchy will, for each class in the object's
+    class hierarchy, call the class's init() implementation on the
+    object.
+
+    Note that the function is called init() without underscrores, and
+    that there is no need to chain up to superclasses' implementations.
+
+    Uses call_each_method_reversed() internally.
+    """
+
+    def __init__(self, *args, **kwargs):
+        call_each_method_reversed(self, 'init', *args, **kwargs)
