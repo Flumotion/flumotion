@@ -253,7 +253,7 @@ class Vishnu(log.Loggable):
                              type, 'falling back to createComponent')
                 moduleName = defs.getSource()
                 methodName = "createComponent"
-            bouncer = job.getComponent(moduleName, methodName)
+            bouncer = job.createComponent(moduleName, methodName)
             bouncer.setup(configDict)
             self.setBouncer(bouncer)
             self.bouncer.debug('started')
@@ -342,7 +342,7 @@ class Vishnu(log.Loggable):
                 self.debug('no components scheduled for worker %s' % workerId)
             else:
                 avatar = self.workerHeaven.avatars[workerId]
-                self._workerStartComponents(avatar, ours)
+                self._workerCreateComponents(avatar, ours)
                 # they're started, so remove them from the running list of
                 # components
                 for c in ours:
@@ -406,9 +406,10 @@ class Vishnu(log.Loggable):
     def getFactory(self):
         return self.factory
        
-    def componentStart(self, componentState):
+    def componentCreate(self, componentState):
         """
-        Start the given component.
+        Create the given component.  This will currently also trigger
+        a start eventually when the component avatar attaches.
 
         The component should be sleeping.
         The worker it should be started on should be present.
@@ -452,8 +453,8 @@ class Vishnu(log.Loggable):
             raise errors.ComponentNoWorkerError(
                 "Could not find any worker to start on")
 
-        # now that we have a worker, get started
-        return self._workerStartComponents(worker, [componentState])
+        # now that we have a worker, get going
+        return self._workerCreateComponents(worker, [componentState])
 
     # FIXME: unify naming of stuff like this
     def workerAttached(self, workerAvatar):
@@ -477,11 +478,11 @@ class Vishnu(log.Loggable):
             self.debug('vishnu.workerAttached(): no components for this worker')
             return
 
-        self._workerStartComponents(workerAvatar, components)
+        self._workerCreateComponents(workerAvatar, components)
             
-    def _workerStartComponents(self, workerAvatar, components):
+    def _workerCreateComponents(self, workerAvatar, components):
         """
-        Start the list of components on the given worker, sequentially, but
+        Create the list of components on the given worker, sequentially, but
         in no specific order.
 
         @type  workerAvatar: L{flumotion.manager.worker.WorkerAvatar}
@@ -489,7 +490,7 @@ class Vishnu(log.Loggable):
                              L{flumotion.common.planet.ManagerComponentState}
         """
         names = [c.get('name') for c in components]
-        self.debug('starting components %r' % names)
+        self.debug('creating components %r' % names)
         
         d = defer.Deferred()
 
@@ -499,46 +500,45 @@ class Vishnu(log.Loggable):
             type = c.get('type')
             config = c.get('config')
             self.debug(
-                '_workerStartComponents(): scheduling start of /%s/%s on %s' % (
+                '_workerCreateComponents(): scheduling create of /%s/%s on %s' % (
                 parentName, componentName, workerAvatar.avatarId))
             
-            d.addCallback(self._workerStartComponentDelayed,
+            d.addCallback(self._workerCreateComponentDelayed,
                 workerAvatar, c, type, config)
 
         d.addCallback(lambda result: self.debug(
-            '_workerStartComponents(): completed start chain'))
+            '_workerCreateComponents(): completed setting up create chain'))
 
         # now trigger the chain
-        self.debug('_workerStartComponents(): triggering start chain')
+        self.debug('_workerCreateComponents(): triggering create chain')
         d.callback(None)
         #reactor.callLater(0, d.callback, None)
         return d
 
-    def _workerStartComponentDelayed(self, result, workerAvatar,
+    def _workerCreateComponentDelayed(self, result, workerAvatar,
             componentState, type, config):
 
         avatarId = config['avatarId']
 
-        # FIXME: rename to startComp
-        d = workerAvatar.start(avatarId, type, config)
+        d = workerAvatar.createComponent(avatarId, type, config)
         # FIXME: here we get the avatar Id of the component we wanted
         # started, so now attach it to the planetState's component state
-        d.addCallback(self._startCallback, componentState)
-        d.addErrback(self._startErrback, componentState)
+        d.addCallback(self._createCallback, componentState)
+        d.addErrback(self._createErrback, componentState)
 
         # FIXME: shouldn't we return d here to make sure components
         # wait on each other to be started ?
 
-    def _startCallback(self, result, componentState):
+    def _createCallback(self, result, componentState):
         self.debug('got avatarId %s for state %s' % (result, componentState))
         m = self._componentMappers[componentState]
         assert result == m.id, "received id %s is not the expected id %s" % (
             result, m.id)
 
-    def _startErrback(self, error, state):
+    def _createErrback(self, error, state):
         # FIXME: make ConfigError copyable so we can .check() it here
         # and print a nicer warning
-        self.warning('failed to start component %s: %s'
+        self.warning('failed to create component %s: %s'
                   % (state.get('name'), error.getErrorMessage()))
         state.set('mood', moods.sad.value)
         return None

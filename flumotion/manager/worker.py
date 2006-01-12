@@ -107,13 +107,13 @@ class WorkerAvatar(base.ManagerAvatar):
     def releasePorts(self, ports):
         self.portset.releasePorts(ports)
 
-    def start(self, avatarId, type, config):
+    def createComponent(self, avatarId, type, config):
         """
-        Start a component of the given type with the given config.
+        Create a component of the given type with the given config.
 
         @param avatarId: avatarId the component should use to log in
         @type  avatarId: string
-        @param type:     type of the component to start
+        @param type:     type of the component to create
         @type  type:     string
         @param config:   a configuration dictionary for the component
         @type  config:   dict
@@ -121,7 +121,7 @@ class WorkerAvatar(base.ManagerAvatar):
         @returns: a deferred that will give the avatarId the component
                   will use to log in to the manager
         """
-        self.debug('starting %s (%s) on worker %s with config %r' % (
+        self.debug('creating %s (%s) on worker %s with config %r' % (
             avatarId, type, self.avatarId, config))
         defs = registry.getRegistry().getComponent(type)
         try:
@@ -135,7 +135,8 @@ class WorkerAvatar(base.ManagerAvatar):
             moduleName = defs.getSource()
             methodName = "createComponent"
 
-        return self.mindCallRemote('start', avatarId, type, moduleName,
+        self.debug('call remote create')
+        return self.mindCallRemote('create', avatarId, type, moduleName,
             methodName, config)
 
 class WorkerHeaven(base.ManagerHeaven):

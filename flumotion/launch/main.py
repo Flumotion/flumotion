@@ -250,9 +250,10 @@ class ComponentWrapper(object):
         self.procedure = getattr(module, entry.getFunction())
 
     def instantiate(self):
-        self.component = self.procedure(self.config)
+        self.component = self.procedure()
 
     def start(self, eatersdata, feedersdata):
+        self.component.setup(self.config)
         return self.component.start(eatersdata, feedersdata, None)
 
 def main(args):

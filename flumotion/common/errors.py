@@ -104,6 +104,9 @@ class ComponentNoWorkerError(ComponentError):
 class BusyComponentError(ComponentError):
     "Component is busy doing something"
 
+class ComponentCreate(ComponentError):
+    "An error during creation of a component"
+
 class ComponentStart(ComponentError):
     "An error during starting of a component"
 

@@ -1,3 +1,17 @@
+2006-01-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/launch/main.py:
+	  fix flumotion-launch, it wasn't using getComponent
+	* flumotion/common/errors.py:
+	* flumotion/job/job.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/worker/worker.py:
+	  call methods create instead of start, because that's what it is
+	  now
+
 2006-01-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/component.py (BaseComponent): Mix in the

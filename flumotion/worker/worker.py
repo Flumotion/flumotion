@@ -134,14 +134,14 @@ class WorkerMedium(medium.BaseMedium):
         """
         return self.ports
 
-    def remote_start(self, avatarId, type, moduleName, methodName, config):
+    def remote_create(self, avatarId, type, moduleName, methodName, config):
         """
         Start a component of the given type with the given config dict.
         Will spawn a new job process to run the component in.
 
         @param avatarId:   avatar identification string
         @type  avatarId:   string
-        @param type:       type of the component to start
+        @param type:       type of the component to create
         @type  type:       string
         @param moduleName: name of the module to create the component from
         @type  moduleName: string
@@ -150,7 +150,8 @@ class WorkerMedium(medium.BaseMedium):
         @param config:     a configuration dictionary for the component
         @type  config:     dict
 
-        @returns: a deferred fired when the process has started
+        @returns: a deferred fired when the process has started and created
+                  the component
         """
 
         # from flumotion.common import debug
@@ -159,7 +160,7 @@ class WorkerMedium(medium.BaseMedium):
         # debug.trace_start(ignore_files_re='twisted/python/rebuild', write=write)
 
         self.info('Starting component "%s" of type "%s"' % (avatarId, type))
-        self.debug('remote_start(): id %s, type %s, config %r' % (
+        self.debug('remote_create(): id %s, type %s, config %r' % (
             avatarId, type, config))
 
         # set up bundles as we need to have a pb connection to download
@@ -173,11 +174,11 @@ class WorkerMedium(medium.BaseMedium):
         bundles = d.value()
 
         # this could throw ComponentAlreadyStartingError
-        d = self.brain.deferredStartCreate(avatarId)
+        d = self.brain.deferredCreate(avatarId)
         if not d:
-            msg = ('Component "%s" has already received a start request'
+            msg = ('Component "%s" has already received a create request'
                    % avatarId)
-            raise errors.ComponentStart(msg)
+            raise errors.ComponentCreate(msg)
 
         # spawn the job process
         self.brain.kindergarten.play(avatarId, type, moduleName, methodName,
@@ -186,10 +187,10 @@ class WorkerMedium(medium.BaseMedium):
         yield d
 
         result = d.value()
-        self.debug('deferred start for %s succeeded (%r)'
+        self.debug('deferred create for %s succeeded (%r)'
                    % (avatarId, result))
         yield result
-    remote_start = defer_generator_method(remote_start)
+    remote_create = defer_generator_method(remote_create)
 
     def remote_checkElements(self, elementNames):
         """
@@ -416,7 +417,7 @@ class WorkerBrain(log.Loggable):
         self.medium = WorkerMedium(self, self.options.feederports)
         self.worker_client_factory = WorkerClientFactory(self)
 
-        self._startDeferreds = {}
+        self._createDeferreds = {}
 
     def login(self, keycard):
         # called by worker/main.py
@@ -483,45 +484,45 @@ class WorkerBrain(log.Loggable):
 
         self.debug("_SIGTERMHandler: done")
 
-    def deferredStartCreate(self, avatarId):
+    def deferredCreate(self, avatarId):
         """
-        Create and register a deferred for starting up the given component.
+        Create and register a deferred for creating the given component.
         This deferred will be fired when the JobAvatar has instructed the
-        job to start the component.
+        job to create the component.
         """
-        self.debug('creating start deferred for %s' % avatarId)
-        if avatarId in self._startDeferreds.keys():
+        self.debug('making create deferred for %s' % avatarId)
+        if avatarId in self._createDeferreds.keys():
             raise errors.ComponentAlreadyStartingError(avatarId)
 
         d = defer.Deferred()
-        self._startDeferreds[avatarId] = d
+        self._createDeferreds[avatarId] = d
         return d
 
-    def deferredStartTrigger(self, avatarId):
+    def deferredCreateTrigger(self, avatarId):
         """
-        Trigger a previously registered deferred for starting up the given
+        Trigger a previously registered deferred for creating up the given
         component.
         """
-        self.debug('triggering start deferred for %s' % avatarId)
-        if not avatarId in self._startDeferreds.keys():
-            self.warning('No deferred start registered for %s' % avatarId)
+        self.debug('triggering create deferred for %s' % avatarId)
+        if not avatarId in self._createDeferreds.keys():
+            self.warning('No deferred create registered for %s' % avatarId)
             return
 
-        d = self._startDeferreds[avatarId]
-        del self._startDeferreds[avatarId]
+        d = self._createDeferreds[avatarId]
+        del self._createDeferreds[avatarId]
         # return the avatarId the component will use to the original caller
         d.callback(avatarId)
  
-    def deferredStartFailed(self, avatarId, exception):
+    def deferredCreateFailed(self, avatarId, exception):
         """
-        Notify the caller that a start has failed, and remove the start
-        from the list of pending starts.
+        Notify the caller that a create has failed, and remove the create
+        from the list of pending creates.
         """
-        self.debug('deferred start failed for %s' % avatarId)
-        assert avatarId in self._startDeferreds.keys()
+        self.debug('deferred create failed for %s' % avatarId)
+        assert avatarId in self._createDeferreds.keys()
 
-        d = self._startDeferreds[avatarId]
-        del self._startDeferreds[avatarId]
+        d = self._createDeferreds[avatarId]
+        del self._createDeferreds[avatarId]
         d.errback(exception)
  
 class JobDispatcher:
@@ -598,16 +599,16 @@ class JobAvatar(pb.Avatar, log.Loggable):
         feedNames = kid.config.get('feed', [])
         self.log('feedNames: %r' % feedNames)
 
-        self.debug('asking job to start with config %r' % kid.config)
-        d = self.mind.callRemote('start', kid.avatarId, kid.type,
+        self.debug('asking job to create component with config %r' % kid.config)
+        d = self.mind.callRemote('create', kid.avatarId, kid.type,
             kid.moduleName, kid.methodName, kid.config)
 
         yield d
         try:
             d.value() # check for errors
             self.heaven.brain.deferredStartTrigger(kid.avatarId)
-        except errors.ComponentStart, e:
-            self.warning('could not start component %s of type %s: %r'
+        except errors.ComponentCreate, e:
+            self.warning('could not create component %s of type %s: %r'
                          % (kid.avatarId, kid.type, e))
             self.heaven.brain.deferredStartFailed(kid.avatarId, e)
         except Exception, e:

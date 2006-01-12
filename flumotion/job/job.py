@@ -40,7 +40,7 @@ from flumotion.common import medium, package
 from flumotion.component import component
 from flumotion.twisted.defer import defer_generator_method
 
-def getComponent(moduleName, methodName):
+def createComponent(moduleName, methodName):
     """
     @param moduleName: name of the module to create the component from
     @type  moduleName: string
@@ -48,7 +48,7 @@ def getComponent(moduleName, methodName):
     @type  methodName: string
 
     Invokes the entry point for a component in the given module using the
-    given factory method, using the given dictionary for configuration.
+    given factory method, thus creating the component.
 
     @rtype: L{flumotion.component.component.BaseComponent}
     """
@@ -156,9 +156,9 @@ class JobMedium(medium.BaseMedium):
             self.log('... from path %s' % path)
             packager.registerPackagePath(path, name)
 
-    def remote_start(self, avatarId, type, moduleName, methodName, config):
+    def remote_create(self, avatarId, type, moduleName, methodName, config):
         """
-        I am called on by the worker's JobAvatar to start a component.
+        I am called on by the worker's JobAvatar to create a component.
         
         @param avatarId:   avatarId for component to log in to manager
         @type  avatarId:   string
@@ -171,11 +171,11 @@ class JobMedium(medium.BaseMedium):
         @param config:     the configuration dictionary
         @type  config:     dict
         """
-        self.debug('remote_start, avatarId %s' % avatarId)
+        self.debug('remote_create, avatarId %s' % avatarId)
         self.avatarId = avatarId
         self.logName = avatarId
 
-        self._runComponent(avatarId, type, moduleName, methodName, config)
+        self._createComponent(avatarId, type, moduleName, methodName, config)
 
     def remote_stop(self):
         self.debug('remote_stop() called')
@@ -221,8 +221,12 @@ class JobMedium(medium.BaseMedium):
             
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
         
-    def _runComponent(self, avatarId, type, moduleName, methodName, config):
+    # FIXME: we only use "nice" from config anymore
+    def _createComponent(self, avatarId, type, moduleName, methodName, config):
         """
+        Create a component of the given type.
+        Log in to the manager with the given avatarId.
+
         @param avatarId:   avatarId component will use to log in to manager
         @type  avatarId:   string
         @param type:       type of component to start
@@ -250,9 +254,9 @@ class JobMedium(medium.BaseMedium):
         # but it'd be nicer to do this outside of config, so do this
         config['avatarId'] = avatarId
         try:
-            comp = getComponent(moduleName, methodName)
+            comp = createComponent(moduleName, methodName)
         except Exception, e:
-            msg = "Exception %s during getComponent: %s" % (
+            msg = "Exception %s during createComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))
             traceback.print_exc()
             self.warning("raising ComponentStart(%s) and stopping job" % msg)

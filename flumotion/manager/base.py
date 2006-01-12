@@ -52,6 +52,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         """
         return self.mind != None
     
+    # FIXME: we probably need to return Failure objects when something is wrong
     def mindCallRemote(self, name, *args, **kwargs):
         """
         Call the given remote method.
