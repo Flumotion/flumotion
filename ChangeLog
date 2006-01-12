@@ -1,5 +1,8 @@
 2006-01-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/encoders/vorbis/vorbis08.py
+	(Vorbis.create_pipeline): Fix^2.
+
 	* flumotion/component/producers/looper/looper.py (Looper.init):
 	Move some inits here.
 

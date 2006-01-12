@@ -32,7 +32,7 @@ class Vorbis(feedcomponent.FeedComponent):
     def create_pipeline(self):
         # create the initial pipeline; called during setup()
         # is responsible for creating self.pipeline
-        props = config['properties']
+        props = self.config['properties']
         
         self._numChannels = props.get('channels', 2)
         self._bitrate = props.get('bitrate', -1)
