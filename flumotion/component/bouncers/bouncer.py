@@ -149,6 +149,3 @@ class Bouncer(component.BaseComponent):
         # by the requester when the client is definately gone
 
         return d
- 
-def createComponent(config):
-    return Bouncer(config['name'])

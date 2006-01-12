@@ -59,7 +59,8 @@ class HTPasswdCrypt(bouncer.Bouncer):
         props = conf['properties']
         if props.has_key('filename'):
             self._filename = props['filename']
-            log.debug('htpasswd', 'using file %s for passwords' % filename)
+            log.debug('htpasswd', 'using file %s for passwords' %
+                self._filename)
         elif props.has_key('data'):
             self._data = props['data']
             log.debug('htpasswd', 'using in-line data for passwords')

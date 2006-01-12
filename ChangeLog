@@ -1,3 +1,12 @@
+2006-01-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/pychecker.mk:
+	  09 -> 010
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/test/test_config.py:
+	  fix some pychecker-y issues
+
 2006-01-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/random/component-initialization-protocol:

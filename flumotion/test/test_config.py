@@ -22,8 +22,9 @@ from twisted.trial import unittest
 
 from flumotion.common import config, registry, errors
 
-reg = registry.getRegistry()
-reg.addFromString("""
+import common
+
+regchunk = """
 <registry>
   <components>
     <component name="foobie" type="test-component">
@@ -44,7 +45,10 @@ reg.addFromString("""
       <synchronization required="true" clock-priority="130"/>
     </component>
   </components>
-</registry>""")
+</registry>"""
+
+reg = registry.getRegistry()
+reg.addFromString(regchunk)
 
 class TestConfig(unittest.TestCase):
     def testParseEmpty(self):

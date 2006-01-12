@@ -11,10 +11,10 @@ pychecker =					\
 	$(pychecker_setup)			\
 	$(pychecker_help)
 
-# TODO: This looks a little confusing because out 0.10 files are names blah09.py
+# TODO: This looks a little confusing because out 0.10 files are names blah010.py
 pychecker_all_files = $(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))
 pychecker_08_files = $(filter %08.py,$(pychecker_all_files))
-pychecker_10_files = $(filter %09.py,$(pychecker_all_files))
+pychecker_10_files = $(filter %010.py,$(pychecker_all_files))
 pychecker_indep_files = $(filter-out $(pychecker_08_files) $(pychecker_10_files),$(pychecker_all_files))
 
 pychecker_indep = PYTHONPATH=`pwd` $(pychecker)
