@@ -64,6 +64,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         
         return pipeline
 
+    # FIXME: move to configure_pipeline
     def do_start(self, eatersData, feedersData, clocking):
         # create temp file
         (fd, self._filename) = tempfile.mkstemp('flumotion.png')
@@ -88,6 +89,8 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         return feedcomponent.ParseLaunchComponent.do_start(self,
             eatersData, feedersData, clocking)
 
+    # FIXME: this is not part of the interface (init protocol); maybe
+    # need to add a new call_each_method() ?
     def stop(self):
         # clean up our temp file
         # FIXME: it would probably be nicer to implement this through hooks

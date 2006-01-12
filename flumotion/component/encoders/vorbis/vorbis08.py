@@ -28,17 +28,16 @@ from flumotion.common.planet import moods
 from vorbisutils import get_max_sample_rate
 
 class Vorbis(feedcomponent.FeedComponent):
-    def __init__(self, config):
-        self._numChannels = config.get('channels', 2)
-        self._bitrate = config.get('bitrate', -1)
-        self._quality = config.get('quality', 0.3)
-
-        feedcomponent.FeedComponent.__init__(self, config)
-    
     ### FeedComponent methods
     def create_pipeline(self):
-        # create the initial pipeline; called during __init__
+        # create the initial pipeline; called during setup()
         # is responsible for creating self.pipeline
+        props = config['properties']
+        
+        self._numChannels = props.get('channels', 2)
+        self._bitrate = props.get('bitrate', -1)
+        self._quality = props.get('quality', 0.3)
+
         eater_names = self.get_eater_names()
         if not eater_names:
             raise TypeError, "Need an eater"

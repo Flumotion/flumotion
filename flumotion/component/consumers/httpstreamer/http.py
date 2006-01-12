@@ -189,31 +189,24 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     
     component_medium_class = HTTPMedium
 
-    def get_pipeline_string(self, properties):
-        return self.pipe_template
-
-    def configure_pipeline(self, pipeline, properties):
+    def init(self):
         reactor.debug = True
-        Stats.__init__(self, sink=self.get_element('sink'))
+
         self.caps = None
         self.resource = None
         self.mountPoint = None
         self.port = None
         self.burst_on_connect = False
 
-        # handled regular updating
+        # handle regular updating
         self.needsUpdate = False
-        # FIXME: call self._callLaterId.cancel() somewhere on shutdown
-        self._callLaterId = reactor.callLater(1, self._checkUpdate)
 
         # handle added and removed queue
         self._added_lock = thread.allocate_lock()
         self._added_queue = []
         self._removed_lock = thread.allocate_lock()
         self._removed_queue = []
-        # FIXME: do a .cancel on this Id somewhere
-        self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
-        
+
         for i in ('stream-mime', 'stream-uptime', 'stream-bitrate',
                   'stream-totalbytes', 'clients-current', 'clients-max',
                   'clients-peak', 'clients-peak-time', 'clients-average',
@@ -222,6 +215,18 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                   'consumption-bitrate-raw', 'consumption-totalbytes-raw'):
             self.uiState.addKey(i, None)
 
+    def get_pipeline_string(self, properties):
+        return self.pipe_template
+
+    def configure_pipeline(self, pipeline, properties):
+        Stats.__init__(self, sink=self.get_element('sink'))
+
+        # FIXME: call self._callLaterId.cancel() somewhere on shutdown
+        self._callLaterId = reactor.callLater(1, self._checkUpdate)
+
+        # FIXME: do a .cancel on this Id somewhere
+        self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
+        
         self._post_init(properties)
 
     def _post_init(self, properties):

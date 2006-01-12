@@ -45,9 +45,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     _reconnectInterval = 3
     
-    # FIXME: do we need config in the init ?
-    def __init__(self):
-        basecomponent.BaseComponent.__init__(self)
+    def init(self):
         # add extra keys to state
         self.state.addKey('eaterNames')
         self.state.addKey('feederNames')

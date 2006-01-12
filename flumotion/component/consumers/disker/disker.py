@@ -177,7 +177,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if new:
             reactor.callLater(0, self.change_filename)
 
-            
+    # FIXME: move this to configure_pipeline (easy, just needs a test)
     def link_setup(self, eaters, feeders):
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)

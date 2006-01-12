@@ -1,3 +1,26 @@
+2006-01-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/looper/looper.py (Looper.init):
+	Move some inits here.
+
+	* flumotion/component/encoders/vorbis/vorbis08.py
+	(Vorbis.create_pipeline): Fold init stuff here. Fix code to look
+	for props in the right place. Fix comments.
+
+	* flumotion/component/converters/overlay/overlay.py (Overlay):
+	* flumotion/component/consumers/disker/disker.py
+	(Disker): Add comments.
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.init): Inits moved here from
+	configure_pipeline().
+
+	* flumotion/component/bouncers/htpasswdcrypt.py (HTPasswdCrypt.init): 
+	* flumotion/component/bouncers/bouncer.py (Bouncer.init): 
+	* flumotion/component/feedcomponent08.py (FeedComponent.init): 
+	* flumotion/component/feedcomponent010.py (FeedComponent.init):
+	Changed from __init__().
+
 2006-01-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/launch/main.py:

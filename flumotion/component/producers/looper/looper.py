@@ -42,6 +42,13 @@ class Looper(feedcomponent.ParseLaunchComponent):
 
     component_medium_class = LooperMedium
 
+    def init(self):
+        self.initial_seek = False
+        self.nbiterations = 0
+        self.discovered = False
+        self.fileinformation = None
+        self.timeoutid = 0
+
     def get_pipeline_string(self, properties):
         # setup the properties
         self.bus = None
@@ -57,10 +64,6 @@ class Looper(feedcomponent.ParseLaunchComponent):
 
         vcaps = gst.Caps(vstruct)
         
-        self.initial_seek = False
-        self.nbiterations = 0
-
-        self.discovered = False
         try:
             from gst.extend import discoverer
         except ImportError:
@@ -71,9 +74,6 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.discoverer = discoverer.Discoverer(self.filelocation)
         self.discoverer.connect('discovered', self._filediscovered)
         self.discoverer.discover()
-        self.fileinformation = None
-
-        self.timeoutid = 0
 
         # create the component
         template = (
