@@ -11,4 +11,5 @@ EXTRA_DIST = \
 	python.mk 		\
 	pychecker.mk		\
 	trial.mk		\
+	twisted-modules.m4	\
 	gen-locale-xml.py

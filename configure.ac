@@ -223,16 +223,8 @@ sys.exit(0)
   AC_MSG_ERROR([You need at least version 1.3.0 of Twisted])
 )
 
-dnl check for Twisted
-AS_PYTHON_IMPORT(twisted.names,
-  []
-  ,
-  AC_MSG_ERROR([twisted.names not found.
-
-Your distribution appears to have separated twisted.names from the rest
-of twisted. Please install the package providing twisted.names and try
-again.])
-)
+TWISTED_MODULE([twisted.names])
+TWISTED_MODULE([twisted.web])
 
 AC_CONFIG_FILES([env], [chmod +x env])
 AC_CONFIG_FILES([bin/flumotion], [chmod +x bin/flumotion])
