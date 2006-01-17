@@ -1,5 +1,11 @@
 2006-01-17  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_manager_manager.py (TestVishnu): Make this
+	first a log.loggable, then a unittest. Apparently unittest has
+	picked up a .debug attribute which is a method that takes no
+	arguments (other than self). Not sure what's going on here, but
+	this fixes the test suite.
+
 	* flumotion/test/test_common.py (TestObjRepr.testMe): Just test
 	the repr of self -- works around what appears to be a bug in trial
 	with twisted 2.1.

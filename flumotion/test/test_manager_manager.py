@@ -339,7 +339,7 @@ class FakeComponentMind(FakeMind):
         
         self.state.observe_set('mood', moods.happy.value)
     
-class TestVishnu(unittest.TestCase, log.Loggable):
+class TestVishnu(log.Loggable, unittest.TestCase):
 
     logCategory = "TestVishnu"
 
