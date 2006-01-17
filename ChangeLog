@@ -1,5 +1,8 @@
 2006-01-17  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_wizard.py (WizardSaveTest): Apparently these
+	skip attributes need to be strings.
+
 	* flumotion/test/test_manager_manager.py (TestVishnu): Make this
 	first a log.loggable, then a unittest. Apparently unittest has
 	picked up a .debug attribute which is a method that takes no
