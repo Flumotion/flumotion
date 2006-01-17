@@ -246,8 +246,7 @@ class TestProcess(unittest.TestCase):
 
 class TestObjRepr(unittest.TestCase):
     def testMe(self):
-        t = TestObjRepr()
-        self.assertEquals(common.objRepr(t),
+        self.assertEquals(common.objRepr(self),
             'flumotion.test.test_common.TestObjRepr')
     
 class TestPathToModule(unittest.TestCase):

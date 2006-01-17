@@ -1,5 +1,9 @@
 2006-01-17  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_common.py (TestObjRepr.testMe): Just test
+	the repr of self -- works around what appears to be a bug in trial
+	with twisted 2.1.
+
 	* configure.ac: Check for twisted.web as well.
 
 	* common/Makefile.am (EXTRA_DIST): 
