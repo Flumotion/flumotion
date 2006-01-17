@@ -1,3 +1,7 @@
+2006-01-17  Andy Wingo  <wingo@pobox.com>
+
+	* configure.ac: Check that the user has twisted.names installed.
+
 2006-01-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/encoders/vorbis/vorbis08.py
