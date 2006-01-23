@@ -25,6 +25,7 @@ import sys
 # Variable templates 
 LIBDIR = '@LIBDIR@'
 PROGRAM_PATH = 'flumotion.admin.command.main.main'
+NEEDS_GTK=False
 
 try:
     # setup the project root
@@ -40,7 +41,7 @@ try:
 
     # and boot!
     from flumotion.common import boot
-    boot.boot(PROGRAM_PATH, gtk=True)
+    boot.boot(PROGRAM_PATH, gtk=NEEDS_GTK)
 
 except KeyboardInterrupt:
     print 'Interrupted'
