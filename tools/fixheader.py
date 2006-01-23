@@ -16,7 +16,8 @@ orig = """# Flumotion - a streaming media server
 """
 
 new = """# Flumotion - a streaming media server
-# Copyright (C) 2004,2005 Fluendo, S.L. (www.fluendo.com). All rights reserved.
+# Copyright (C) 2004,2005,2006 Fluendo, S.L. (www.fluendo.com).
+# All rights reserved.
 """
 
 for name in sys.argv[1:]:
