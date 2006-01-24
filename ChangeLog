@@ -1,5 +1,18 @@
 2006-01-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	* flumotion/job/job.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/worker.py:
+	* flumotion/worker/worker.py:
+	  rename error.Compoment{Create/Start} to end in Error just like
+	  the rest of them.  Some further small cleanups.
+	  I get a nice manager WARN line that tells me exactly what the
+	  problem is when a compoment can't be created because of an
+	  ImportError.
+
+2006-01-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/job/job.py:
 	* flumotion/worker/worker.py:
 	  use errors.ComponentCreate where applicable

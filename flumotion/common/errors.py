@@ -105,11 +105,17 @@ class ComponentNoWorkerError(ComponentError):
 class BusyComponentError(ComponentError):
     "Component is busy doing something"
 
-class ComponentCreate(ComponentError):
-    "An error during creation of a component"
+class ComponentCreateError(ComponentError):
+    """
+    An error during creation of a component.  Can be raised during a
+    remote_create call on a worker.
+    """
 
-class ComponentStart(ComponentError):
-    "An error during starting of a component"
+class ComponentStartError(ComponentError):
+    """
+    An error during starting of a component.  Can be raised during a
+    remote_start call on a component.
+    """
 
 class UnknownComponentError(ComponentError):
     "A given component or component type does not exist"

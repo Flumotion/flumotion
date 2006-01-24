@@ -179,7 +179,7 @@ class WorkerMedium(medium.BaseMedium):
         if not d:
             msg = ('Component "%s" has already received a create request'
                    % avatarId)
-            raise errors.ComponentCreate(msg)
+            raise errors.ComponentCreateError(msg)
 
         # spawn the job process
         self.brain.kindergarten.play(avatarId, type, moduleName, methodName,
@@ -189,7 +189,7 @@ class WorkerMedium(medium.BaseMedium):
 
         try:
             result = d.value()
-        except errors.ComponentCreate, e:
+        except errors.ComponentCreateError, e:
             self.debug('deferred create for %s failed, forwarding error' %
                 avatarId)
             raise
@@ -614,7 +614,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
             d.value() # check for errors
             self.debug('job started component with avatarId %s' % kid.avatarId)
             self.heaven.brain.deferredCreateTrigger(kid.avatarId)
-        except errors.ComponentCreate, e:
+        except errors.ComponentCreateError, e:
             self.warning('could not create component %s of type %s: %r'
                          % (kid.avatarId, kid.type, e))
             self.heaven.brain.deferredCreateFailed(kid.avatarId, e)

@@ -1055,8 +1055,8 @@ class ComponentHeaven(base.ManagerHeaven):
             waiters = self._clockMasterWaiters[avatarId]
             del self._clockMasterWaiters[avatarId]
             for d in waiters:
-                d.errback(errors.ComponentStart('clock master component '
-                                                'start cancelled'))
+                d.errback(errors.ComponentStartError(
+                    'clock master component start cancelled'))
 
         if avatarId in self._masterClockInfo:
             port = self._masterClockInfo[avatarId][1]

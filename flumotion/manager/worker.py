@@ -48,8 +48,8 @@ class PortSet(log.Loggable):
         ret = []
         while numPorts > 0:
             if not False in self.used:
-                raise errors.ComponentStart('could not allocate port '
-                                            'on worker %s' % self.logName)
+                raise errors.ComponentStartError(
+                    'could not allocate port on worker %s' % self.logName)
             i = self.used.index(False)
             ret.append(self.ports[i])
             self.used[i] = True

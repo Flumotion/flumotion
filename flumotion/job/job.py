@@ -29,7 +29,7 @@ import resource
 # I've read somewhere that importing the traceback module messes up the
 # exception state, so it's better to import it globally instead of in the
 # exception handler
-import traceback
+# import traceback
 
 from twisted.cred import credentials
 from twisted.internet import reactor
@@ -57,15 +57,17 @@ def createComponent(moduleName, methodName):
     try:
         module = reflect.namedAny(moduleName)
     except ValueError:
-        raise errors.ComponentCreate("module %s could not be found" % moduleName)
+        raise errors.ComponentCreateError(
+            "module %s could not be found" % moduleName)
     except ImportError, e:
-        raise errors.ComponentCreate("module %s could not be imported (%s)" % (
-            moduleName, e))
+        raise errors.ComponentCreateError(
+            "module %s could not be imported (%s)" % (moduleName, e))
     except SyntaxError, e:
-        raise errors.ComponentCreate("module %s has a syntax error in %s:%d" % (
-            moduleName, e.filename, e.lineno))
+        raise errors.ComponentCreateError(
+            "module %s has a syntax error in %s:%d" % (
+                moduleName, e.filename, e.lineno))
     except Exception, e:
-        raise errors.ComponentCreate(
+        raise errors.ComponentCreateError(
             "Exception %r during import of module %s (%r)" % (
                 e.__class__.__name__, moduleName, e.args))
         
@@ -84,14 +86,15 @@ def createComponent(moduleName, methodName):
         moduleName, methodName))
     try:
         component = getattr(module, methodName)()
-    except config.ConfigError:
+    except errors.ComponentCreateError:
         # already nicely formatted, so fall through
+        log.debug('job', 'letting ComponentCreateError fall through')
         raise
     except Exception, e:
         msg = log.getExceptionMessage(e)
         log.warning('job', msg)
-        log.warning('job', 'raising errors.ComponentCreate')
-        raise errors.ComponentCreate(msg)
+        log.warning('job', 'raising errors.ComponentCreateError')
+        raise errors.ComponentCreateError(msg)
     log.debug('job', 'returning component %r' % component)
     return component
 
@@ -259,11 +262,12 @@ class JobMedium(medium.BaseMedium):
             msg = "Exception %s during createComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))
             # traceback.print_exc()
-            if isinstance(e, errors.ComponentCreate):
+            if isinstance(e, errors.ComponentCreateError):
                 msg = e.args[0]
-            self.warning("raising ComponentCreate(%s) and stopping job" % msg)
+            self.warning(
+                "raising ComponentCreateError(%s) and stopping job" % msg)
             reactor.callLater(0, self.shutdown)
-            raise errors.ComponentCreate(msg)
+            raise errors.ComponentCreateError(msg)
 
         comp.setWorkerName(self._worker_name)
 
