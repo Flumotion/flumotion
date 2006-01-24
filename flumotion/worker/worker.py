@@ -187,7 +187,12 @@ class WorkerMedium(medium.BaseMedium):
 
         yield d
 
-        result = d.value()
+        try:
+            result = d.value()
+        except errors.ComponentCreate, e:
+            self.debug('deferred create for %s failed, forwarding error' %
+                avatarId)
+            raise
         self.debug('deferred create for %s succeeded (%r)'
                    % (avatarId, result))
         yield result
@@ -607,11 +612,12 @@ class JobAvatar(pb.Avatar, log.Loggable):
         yield d
         try:
             d.value() # check for errors
-            self.heaven.brain.deferredStartTrigger(kid.avatarId)
+            self.debug('job started component with avatarId %s' % kid.avatarId)
+            self.heaven.brain.deferredCreateTrigger(kid.avatarId)
         except errors.ComponentCreate, e:
             self.warning('could not create component %s of type %s: %r'
                          % (kid.avatarId, kid.type, e))
-            self.heaven.brain.deferredStartFailed(kid.avatarId, e)
+            self.heaven.brain.deferredCreateFailed(kid.avatarId, e)
         except Exception, e:
             self.warning('unhandled remote error: type %s, message %s'
                          % (e.__class__.__name__, e))

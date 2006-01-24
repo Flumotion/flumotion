@@ -57,15 +57,15 @@ def createComponent(moduleName, methodName):
     try:
         module = reflect.namedAny(moduleName)
     except ValueError:
-        raise config.ConfigError("module %s could not be found" % moduleName)
+        raise errors.ComponentCreate("module %s could not be found" % moduleName)
     except ImportError, e:
-        raise config.ConfigError("module %s could not be imported (%s)" % (
+        raise errors.ComponentCreate("module %s could not be imported (%s)" % (
             moduleName, e))
     except SyntaxError, e:
-        raise config.ConfigError("module %s has a syntax error in %s:%d" % (
+        raise errors.ComponentCreate("module %s has a syntax error in %s:%d" % (
             moduleName, e.filename, e.lineno))
     except Exception, e:
-        raise config.ConfigError(
+        raise errors.ComponentCreate(
             "Exception %r during import of module %s (%r)" % (
                 e.__class__.__name__, moduleName, e.args))
         
@@ -90,9 +90,8 @@ def createComponent(moduleName, methodName):
     except Exception, e:
         msg = log.getExceptionMessage(e)
         log.warning('job', msg)
-        # FIXME: we probably want another error raised here
-        log.warning('job', 'raising config.ConfigError')
-        raise config.ConfigError(msg)
+        log.warning('job', 'raising errors.ComponentCreate')
+        raise errors.ComponentCreate(msg)
     log.debug('job', 'returning component %r' % component)
     return component
 
@@ -259,10 +258,12 @@ class JobMedium(medium.BaseMedium):
         except Exception, e:
             msg = "Exception %s during createComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))
-            traceback.print_exc()
-            self.warning("raising ComponentStart(%s) and stopping job" % msg)
+            # traceback.print_exc()
+            if isinstance(e, errors.ComponentCreate):
+                msg = e.args[0]
+            self.warning("raising ComponentCreate(%s) and stopping job" % msg)
             reactor.callLater(0, self.shutdown)
-            raise errors.ComponentStart(msg)
+            raise errors.ComponentCreate(msg)
 
         comp.setWorkerName(self._worker_name)
 

@@ -1,5 +1,13 @@
 2006-01-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/job/job.py:
+	* flumotion/worker/worker.py:
+	  use errors.ComponentCreate where applicable
+	  forward it through nicely everywhere, instead of rewrapping it
+	  fix more instances of Start->Create
+
+2006-01-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/admin.py:
 	  ixnay on the keeping of local patches
 	  this makes components startable from the admin again
