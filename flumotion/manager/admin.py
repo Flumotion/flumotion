@@ -95,7 +95,7 @@ class AdminAvatar(base.ManagerAvatar):
         this.
         """
         self.debug('perspective_componentStart(%r)' % componentState)
-        return self.vishnu.componentStart(componentState)
+        return self.vishnu.componentCreate(componentState)
         
     def perspective_componentStop(self, componentState):
         """

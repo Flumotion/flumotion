@@ -1,3 +1,9 @@
+2006-01-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/admin.py:
+	  ixnay on the keeping of local patches
+	  this makes components startable from the admin again
+
 2006-01-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/gen-locale-xml.py:
