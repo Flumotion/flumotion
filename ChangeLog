@@ -1,5 +1,15 @@
 2006-01-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* conf/managers/default/planet.xml:
+	* flumotion.spec.in:
+	* flumotion/common/config.py:
+	* flumotion/manager/main.py:
+	  add a <certificate> option to the <manager> section in config
+	  file formats, and document it in sample config and spec file
+	  Closes #246
+
+2006-01-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/main.py:
 	  on a config parsing error after daemonizing, only log the error
 	  and SystemError, but not exit.  Fixes #310

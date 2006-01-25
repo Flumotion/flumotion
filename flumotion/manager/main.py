@@ -142,8 +142,9 @@ def main(args):
                      help="transport protocol to use (tcp/ssl) [default ssl]")
     group.add_option('-C', '--certificate',
                      action="store", type="string", dest="certificate",
-                     default="default.pem",
-                     help="specify PEM certificate file (for SSL)")
+                     default=None,
+                     help="PEM certificate file (for SSL) "
+                     "[default default.pem]")
     group.add_option('-n', '--name',
                      action="store", type="string", dest="name",
                      help="manager name")
@@ -179,25 +180,30 @@ def main(args):
         return -1
 
     # now copy over stuff from config that is not set yet
-    if not options.host and cfg.manager and cfg.manager.host:
-        options.host = cfg.manager.host
-        log.debug('manager', 'Setting manager host to %s' % options.host)
-    if not options.port and cfg.manager and cfg.manager.port:
-        options.port = cfg.manager.port
-        log.debug('manager', 'Setting manager port to %s' % options.port)
-    if not options.transport and cfg.manager and cfg.manager.transport:
-        options.transport = cfg.manager.transport
-        log.debug('manager', 'Setting manager transport to %s' %
-            options.transport)
-    if not options.name and cfg.manager and cfg.manager.name:
-        options.name = cfg.manager.name
-        log.debug('manager', 'Setting manager name to %s' % options.name)
-    # environment debug > command-line debug > config file debug
-    if not options.debug and cfg.manager and cfg.manager.fludebug \
-        and not os.environ.has_key('FLU_DEBUG'):
-        options.debug = cfg.manager.fludebug
-        log.debug('manager', 'Setting debug level to config file value %s' %
-            options.debug)
+    if cfg.manager:
+        if not options.host and cfg.manager.host:
+            options.host = cfg.manager.host
+            log.debug('manager', 'Setting manager host to %s' % options.host)
+        if not options.port and cfg.manager.port:
+            options.port = cfg.manager.port
+            log.debug('manager', 'Setting manager port to %s' % options.port)
+        if not options.transport and cfg.manager.transport:
+            options.transport = cfg.manager.transport
+            log.debug('manager', 'Setting manager transport to %s' %
+                options.transport)
+        if not options.certificate and cfg.manager.certificate:
+            options.certificate = cfg.manager.certificate
+            log.debug('manager', 'Using certificate %s' %
+                options.certificate)
+        if not options.name and cfg.manager.name:
+            options.name = cfg.manager.name
+            log.debug('manager', 'Setting manager name to %s' % options.name)
+        # environment debug > command-line debug > config file debug
+        if not options.debug and cfg.manager.fludebug \
+            and not os.environ.has_key('FLU_DEBUG'):
+            options.debug = cfg.manager.fludebug
+            log.debug('manager', 'Setting debug level to config file value %s' %
+                options.debug)
 
     # set default values for all unset options
     if not options.host:
@@ -209,6 +215,8 @@ def main(args):
             options.port = defaultTCPPort
         elif options.transport == "ssl":
             options.port = defaultSSLPort
+    if not options.certificate and options.transport == 'ssl':
+        options.certificate = 'default.pem'
     if not options.name:
         try:
             # if the file is in a directory under a 'managers' directory,

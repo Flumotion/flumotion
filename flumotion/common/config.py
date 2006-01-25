@@ -69,11 +69,13 @@ class ConfigEntryFlow:
 
 class ConfigEntryManager:
     "I represent a <manager> entry in a planet config file"
-    def __init__(self, name, host, port, transport, bouncer, fludebug):
+    def __init__(self, name, host, port, transport, certificate, bouncer,
+            fludebug):
         self.name = name
         self.host = host
         self.port = port
         self.transport = transport
+        self.certificate = certificate
         self.bouncer = bouncer
         self.fludebug = fludebug
 
@@ -318,6 +320,7 @@ class FlumotionConfigXML(log.Loggable):
         host = None
         port = None
         transport = None
+        certificate = None
         bouncer = None
         fludebug = None
 
@@ -340,6 +343,8 @@ class FlumotionConfigXML(log.Loggable):
                 transport = str(child.firstChild.nodeValue)
                 if not transport in ('tcp', 'ssl'):
                     raise ConfigError("<transport> must be ssl or tcp")
+            elif child.nodeName == "certificate":
+                certificate = str(child.firstChild.nodeValue)
             elif child.nodeName == "component":
                 if noRegistry:
                     continue
@@ -354,7 +359,8 @@ class FlumotionConfigXML(log.Loggable):
 
             # FIXME: assert that it is a bouncer !
 
-        return ConfigEntryManager(name, host, port, transport, bouncer, fludebug)
+        return ConfigEntryManager(name, host, port, transport, certificate,
+            bouncer, fludebug)
 
     def _get_float_value(self, nodes):
         return [float(subnode.childNodes[0].data) for subnode in nodes]
