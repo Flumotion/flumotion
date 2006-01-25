@@ -1,5 +1,13 @@
 2006-01-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/common/medium.py:
+	* flumotion/worker/worker.py:
+	  rename run_bundled_proc to runFunction and move it to the
+	  worker's medium, since we only ever want workers to do this for us.
+
+2006-01-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/config.py:
 	  make wrapper functions to read an int and a string, so that
 	  we get a ConfigError if the values in the config are empty

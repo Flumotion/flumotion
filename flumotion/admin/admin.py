@@ -581,7 +581,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
 
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        return self.workerCallRemote(workerName, 'runProc', moduleName,
+        return self.workerCallRemote(workerName, 'runFunction', moduleName,
                                      functionName, *args, **kwargs)
     
     # FIXME: this should not be allowed to be called, move away

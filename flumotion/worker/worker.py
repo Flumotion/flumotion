@@ -226,7 +226,7 @@ class WorkerMedium(medium.BaseMedium):
         self.debug('remote_checkElements: returning elements names %r' % list)
         return list
 
-    def remote_runProc(self, module, function, *args, **kwargs):
+    def remote_runFunction(self, module, function, *args, **kwargs):
         """
         Runs the given function in the given module with the given arguments.
         
@@ -237,8 +237,44 @@ class WorkerMedium(medium.BaseMedium):
 
         @returns: the return value of the given function in the module.
         """
-        return self.run_bundled_proc(module, function, *args, **kwargs)
+        try:
+            d = self.bundleLoader.loadModule(module)
+            yield d
+            mod = d.value()
+        except Exception, e:
+            import traceback
+            traceback.print_exc()
+            msg = 'Failed to load bundle %s: %s' % (module, e)
+            self.warning(msg)
+            # FIXME: make this work
+            #yield errors.RemoteRunError(msg)
+            yield None
 
+        try:
+            proc = getattr(mod, function)
+        except AttributeError:
+            msg = 'No procedure named %s in module %s' % (function, module)
+            self.warning(msg)
+            # FIXME: make this work
+            #yield errors.RemoteRunError(msg)
+            yield None
+
+        try:
+            self.debug('calling %r(%r, %r)' % (proc, args, kwargs))
+            d = proc(*args, **kwargs)
+            yield d
+            # only if d was actually a deferred will we get here
+            # this is a bit nasty :/
+            yield d.value()
+        except Exception, e:
+            # FIXME: make e.g. GStreamerError nicely serializable, without
+            # printing ugly tracebacks
+            msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s raised: %s'
+                   % (module, function, args, kwargs,
+                      e.__class__.__name__, e.__str__()))
+            self.debug(msg)
+            raise e
+    remote_runFunction = defer_generator_method(remote_runFunction)
 
 class Kid:
     """

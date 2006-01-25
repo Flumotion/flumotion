@@ -82,39 +82,3 @@ class BaseMedium(pb.Referenceable, log.Loggable):
         d = self.remote.callRemote(name, *args, **kwargs)
         d.addErrback(errback)
         return d
-
-    def loadModule(self, moduleName):
-        return self.bundleLoader.loadModule(moduleName)
-
-    def run_bundled_proc(self, modname, procname, *args, **kwargs):
-        try:
-            d = self.loadModule(modname)
-            yield d
-            mod = d.value()
-        except Exception, e:
-            import traceback
-            traceback.print_exc()
-            self.warning('Failed to load bundle %s: %s' % (modname, e))
-            yield None
-
-        try:
-            proc = getattr(mod, procname)
-        except AttributeError:
-            self.warning('No procedure named %s in module %s' %
-                         (procname, modname))
-            yield None
-
-        try:
-            self.debug('calling %r(%r, %r)' % (proc, args, kwargs))
-            d = proc(*args, **kwargs)
-            yield d
-            # only if d was actually a deferred will we get here
-            # this is a bit nasty :/
-            yield d.value()
-        except Exception, e:
-            msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s raised: %s'
-                   % (modname, procname, args, kwargs,
-                      e.__class__.__name__, e.__str__()))
-            self.debug(msg)
-            raise e
-    run_bundled_proc = defer_generator_method(run_bundled_proc)
