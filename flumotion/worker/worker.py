@@ -237,27 +237,26 @@ class WorkerMedium(medium.BaseMedium):
 
         @returns: the return value of the given function in the module.
         """
+        d = self.bundleLoader.loadModule(module)
+        yield d
+
         try:
-            d = self.bundleLoader.loadModule(module)
-            yield d
             mod = d.value()
-        except Exception, e:
-            import traceback
-            traceback.print_exc()
-            msg = 'Failed to load bundle %s: %s' % (module, e)
+        except errors.NoBundleError:
+            msg = 'Failed to find bundle for module %s' % module
             self.warning(msg)
-            # FIXME: make this work
-            #yield errors.RemoteRunError(msg)
-            yield None
+            raise errors.RemoteRunError(msg)
+        except Exception, e:
+            msg = 'Failed to load bundle for module %s' % module
+            self.warning(msg)
+            raise errors.RemoteRunError(msg)
 
         try:
             proc = getattr(mod, function)
         except AttributeError:
             msg = 'No procedure named %s in module %s' % (function, module)
             self.warning(msg)
-            # FIXME: make this work
-            #yield errors.RemoteRunError(msg)
-            yield None
+            raise errors.RemoteRunError(msg)
 
         try:
             self.debug('calling %r(%r, %r)' % (proc, args, kwargs))
