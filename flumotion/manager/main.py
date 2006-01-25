@@ -75,26 +75,24 @@ def _startTCP(vishnu, host, port):
         log.info('manager', 'Listening as host %s' % host)
     reactor.listenTCP(port, vishnu.getFactory(), interface=host)
 
-def _errorAndStop(message, reason):
-    sys.stderr.write("\nERROR: %s\n" % message)
+def _error(message, reason):
+    log.error('manager', message)
     if reason:
-        sys.stderr.write("%s\n\n" % reason)
-    # bypass reactor, because sys.exit gets trapped
-    os._exit(-1)
-
+        log.error(reason)
 
 def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
+    # since this is run after daemonizing, it should show errors, but not stop
     for path in paths:
         log.debug('manager', 'Loading configuration file from (%s)' % path)
         try:
             vishnu.loadConfiguration(path)
         except config.ConfigError, reason:
-            _errorAndStop(
+            _error(
                 "configuration error in configuration file\n'%s':" % path,
                 reason)
         except errors.UnknownComponentError, reason:
-            _errorAndStop(
+            _error(
                 "unknown component in configuration file\n'%s':" % path,
                 reason)
         except Exception, e:
@@ -102,7 +100,7 @@ def _initialLoadConfig(vishnu, paths):
             # debug level 4 because that's where we hooked up twisted logging
             # so print a traceback before stopping the program
             traceback.print_tb(sys.exc_traceback)
-            _errorAndStop("failed to load planet configuration '%s':" % path,
+            _error("failed to load planet configuration '%s':" % path,
                 "%s: %s" % (e.__class__, str(e)))
 
 def main(args):
@@ -269,6 +267,7 @@ def main(args):
 
     log.info('manager', 'Starting manager "%s"' % options.name)
     if options.daemonize:
+        log.info('manager', 'Daemonizing')
         common.ensureDir(configure.logdir, "log file")
         common.ensureDir(configure.rundir, "run file")
                 
@@ -278,6 +277,7 @@ def main(args):
 
         logPath = os.path.join(configure.logdir,
             'manager.%s.log' % options.name)
+        log.debug('manager', 'Further logging will be done to %s' % logPath)
 
         # here we daemonize; so we also change our pid
         common.daemonize(stdout=logPath, stderr=logPath)

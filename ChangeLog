@@ -1,6 +1,12 @@
 2006-01-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/main.py:
+	  on a config parsing error after daemonizing, only log the error
+	  and SystemError, but not exit.  Fixes #310
+
+2006-01-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/main.py:
 	  print a nice error when we can't read the first (manager) config
 	  file correctly
 	  if we set the manager name based on path, make sure the path is
