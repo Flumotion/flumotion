@@ -1,3 +1,9 @@
+2006-01-25  Zaheer Abbas Merali <zaheermerali at gmail dot com>
+
+	* flumotion/components/encoders/vorbis/vorbis010.py: Fix
+	regression from gst 0.8 so that it respects the channels parameter
+	passed from the config. Fixes #316. Reviewed by Andy Wingo.
+
 2006-01-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py
