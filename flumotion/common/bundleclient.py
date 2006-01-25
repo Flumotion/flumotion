@@ -65,13 +65,17 @@ class BundleLoader(log.Loggable):
         d = self._callRemote('getBundleSums', **kwargs)
         yield d
 
-        import os # fool pychecker
-
         # sums is a list of name, sum tuples, highest to lowest
         # figure out which bundles we're missing
-        sums = d.value()
+        try:
+            sums = d.value()
+        except Exception, e:
+            raise
         self.debug('Got sums %r' % sums)
         toFetch = []
+
+        import os # fool pychecker
+
         for name, md5 in sums:
             path = os.path.join(configure.cachedir, name, md5)
             if os.path.exists(path):
