@@ -1,3 +1,9 @@
+2006-01-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer._checkUpdate): Update the UI state
+	unconditionally every 10 seconds.
+
 2006-01-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/errors.py:

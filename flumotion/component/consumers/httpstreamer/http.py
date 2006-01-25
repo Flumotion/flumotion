@@ -201,6 +201,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         # handle regular updating
         self.needsUpdate = False
+        self._tenSecondCount = 10
 
         # handle added and removed queue
         self._added_lock = thread.allocate_lock()
@@ -272,7 +273,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.emit('log-message', message)
 
     def _checkUpdate(self):
-        if self.needsUpdate:
+        self._tenSecondCount -= 1
+        if self.needsUpdate or self._tenSecondCount <= 0:
+            self._tenSecondCount = 10
             self.needsUpdate = False
             self.update_ui_state()
         self._callLaterId = reactor.callLater(1, self._checkUpdate)
