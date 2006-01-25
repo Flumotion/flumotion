@@ -176,7 +176,13 @@ def main(args):
     try:
         cfg = config.FlumotionConfigXML(planetFile)
     except IOError:
-        sys.stderr.write("Could not read configuration from %s\n" % planetFile)
+        sys.stderr.write("ERROR: Could not read configuration from '%s'.\n" %
+            planetFile)
+        return -1
+    except errors.ConfigError, e:
+        sys.stderr.write("ERROR: Could not read configuration from '%s':\n" %
+            planetFile)
+        sys.stderr.write("ERROR: %s\n" % e.args[0])
         return -1
 
     # now copy over stuff from config that is not set yet

@@ -1,5 +1,14 @@
 2006-01-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/config.py:
+	  make wrapper functions to read an int and a string, so that
+	  we get a ConfigError if the values in the config are empty
+	* flumotion/manager/main.py:
+	  if there is a config error, print a nice warning instead of
+	  a traceback
+
+2006-01-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* conf/managers/default/planet.xml:
 	* flumotion.spec.in:
 	* flumotion/common/config.py:

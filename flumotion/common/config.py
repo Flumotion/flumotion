@@ -333,34 +333,49 @@ class FlumotionConfigXML(log.Loggable):
                 continue
             
             if child.nodeName == "host":
-                host = str(child.firstChild.nodeValue)
+                host = self._nodeGetString("host", child)
             elif child.nodeName == "port":
-                try:
-                    port = int(child.firstChild.nodeValue)
-                except ValueError:
-                    raise ConfigError("<port> value must be an integer")
+                port = self._nodeGetInt("port", child)
             elif child.nodeName == "transport":
-                transport = str(child.firstChild.nodeValue)
+                transport = self._nodeGetString("transport", child)
                 if not transport in ('tcp', 'ssl'):
                     raise ConfigError("<transport> must be ssl or tcp")
             elif child.nodeName == "certificate":
-                certificate = str(child.firstChild.nodeValue)
+                certificate = self._nodeGetString("certificate", child)
             elif child.nodeName == "component":
                 if noRegistry:
                     continue
 
                 if bouncer:
-                    raise ConfigError("<manager> section can only have one <component>")
+                    raise ConfigError(
+                        "<manager> section can only have one <component>")
                 bouncer = self._parseComponent(child, 'manager')
             elif child.nodeName == "debug":
-                fludebug = str(child.firstChild.nodeValue)
+                fludebug = self._nodeGetString("debug", child)
             else:
-                raise ConfigError("unexpected '%s' node: %s" % (node.nodeName, child.nodeName))
+                raise ConfigError("unexpected '%s' node: %s" % (
+                    node.nodeName, child.nodeName))
 
             # FIXME: assert that it is a bouncer !
 
         return ConfigEntryManager(name, host, port, transport, certificate,
             bouncer, fludebug)
+
+    def _nodeGetInt(self, name, node):
+        try:
+            value = int(node.firstChild.nodeValue)
+        except ValueError:
+            raise ConfigError("<%s> value must be an integer" % name)
+        except AttributeError:
+            raise ConfigError("<%s> value not specified" % name)
+        return value
+
+    def _nodeGetString(self, name, node):
+        try:
+            value = str(node.firstChild.nodeValue)
+        except AttributeError:
+            raise ConfigError("<%s> value not specified" % name)
+        return value
 
     def _get_float_value(self, nodes):
         return [float(subnode.childNodes[0].data) for subnode in nodes]
