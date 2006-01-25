@@ -174,7 +174,11 @@ def main(args):
         return -1
 
     planetFile = args[1]
-    cfg = config.FlumotionConfigXML(planetFile)
+    try:
+        cfg = config.FlumotionConfigXML(planetFile)
+    except IOError:
+        sys.stderr.write("Could not read configuration from %s\n" % planetFile)
+        return -1
 
     # now copy over stuff from config that is not set yet
     if not options.host and cfg.manager and cfg.manager.host:
@@ -209,13 +213,18 @@ def main(args):
             options.port = defaultSSLPort
     if not options.name:
         try:
-            head, filename = os.path.split(planetFile)
+            # if the file is in a directory under a 'managers' directory,
+            # use the parent directory name
+            head, filename = os.path.split(os.path.abspath(planetFile))
             head, name = os.path.split(head)
+            head, managers = os.path.split(head)
+            if managers != 'managers':
+                raise
             options.name = name
             log.debug('manager', 'Setting name to %s based on path' % name)
         except:
-            options.name = 'default'
-            log.debug('manager', 'Setting name to default')
+            options.name = 'unnamed'
+            log.debug('manager', 'Setting name to unnamed')
 
     # check for wrong options/arguments
     if not options.transport in ['ssl', 'tcp']:
