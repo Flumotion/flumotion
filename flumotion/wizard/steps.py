@@ -391,7 +391,7 @@ class Webcam(VideoSource):
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
-        d = self.workerRun('flumotion.worker.checks.vide', 'checkWebcam',
+        d = self.workerRun('flumotion.worker.checks.video', 'checkWebcam',
                            device)
         yield d
         try:
