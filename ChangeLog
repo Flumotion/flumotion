@@ -1,5 +1,14 @@
 2006-01-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/wizard.glade:
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/wizard/Makefile.am:
+	* flumotion/wizard/message.py:
+	* flumotion/wizard/wizard.py:
+	  moved message.py to flumotion/admin/gtk
+
+2006-01-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/Makefile.am:
 	* flumotion/common/messages.py:
 	  add a Message serializable class, extracted from wizard.message

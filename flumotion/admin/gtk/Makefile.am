@@ -7,6 +7,7 @@ component_PYTHON = \
 	connections.py \
 	dialogs.py \
 	greeter.py \
+	message.py \
 	parts.py \
 	main.py \
 	wizard.py

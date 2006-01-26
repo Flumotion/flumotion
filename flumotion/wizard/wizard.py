@@ -32,7 +32,8 @@ from twisted.internet import defer
 
 from flumotion.configure import configure
 from flumotion.common import log, errors, worker, compat, messages
-from flumotion.wizard import enums, save, step, classes, message
+
+from flumotion.wizard import enums, save, step, classes
 #from flumotion.wizard.sidebar import WizardSidebar
 from flumotion.ui import fgtk
 from flumotion.ui.glade import GladeWindow
