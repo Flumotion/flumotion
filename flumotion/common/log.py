@@ -309,6 +309,8 @@ class FluLogObserver(Loggable):
                         self.debug("Failure of type %r, ignoring" % type)
                         return
                     
+                self.log("Failure %r" % f)
+
                 method = debug # tracebacks from errors at debug level
                 msg = "A python traceback occurred."
                 if getCategoryLevel("twisted") < WARN:
@@ -415,6 +417,10 @@ def init():
 
     # integrate twisted's logging with us
     from twisted.python import log as tlog
+    from twisted.spread import pb
+    # we don't want logs for pb.Error types since they
+    # are specifically raised to be handled on the other side
+    theFluLogObserver.ignoreErrors([pb.Error,])
     tlog.startLoggingWithObserver(theFluLogObserver.emit, False)
 
     _initialized = True
