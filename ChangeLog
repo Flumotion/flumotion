@@ -1,5 +1,19 @@
 2006-01-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/Makefile.am:
+	* flumotion/common/messages.py:
+	  add a Message serializable class, extracted from wizard.message
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common_messages.py:
+	  and a simple test for it
+	* data/glade/wizard.glade:
+	* flumotion/wizard/message.py:
+	* flumotion/wizard/wizard.py:
+	  use the new Message class
+	  rename MessageView to MessagesView, it shows more than one
+
+2006-01-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/log.py:
 	  don't debug tracebacks from pb.Error, since they specifically
 	  get handled on the other side of a pb connection

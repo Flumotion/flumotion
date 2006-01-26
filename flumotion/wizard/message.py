@@ -19,34 +19,19 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.common import messages
+
 from gettext import gettext as _
 
 import gtk
 
-ERROR = 1
-WARNING = 2
-INFO = 3
+_stock_icons = {messages.ERROR: gtk.STOCK_DIALOG_ERROR,
+                messages.WARNING: gtk.STOCK_DIALOG_WARNING,
+                messages.INFO: gtk.STOCK_DIALOG_INFO}
 
-_stock_icons = {ERROR: gtk.STOCK_DIALOG_ERROR,
-                WARNING: gtk.STOCK_DIALOG_WARNING,
-                INFO: gtk.STOCK_DIALOG_INFO}
-
-_headings = {ERROR: _('Error'),
-             WARNING: _('Warning'),
-             INFO: _('Note')}
-
-class Message:
-    def __init__(self, level=WARNING, priority=50, id=None, msg=None,
-                 details=None):
-        self.level = level
-        self.id = id
-        self.sigid = 0
-        self.priority = priority
-        self.msg = msg
-        self.details = details
-
-    def __repr__(self):
-        return '<Message %s at %d>' % (self.id, id(self))
+_headings = {messages.ERROR: _('Error'),
+             messages.WARNING: _('Warning'),
+             messages.INFO: _('Note')}
 
 class MessageButton(gtk.ToggleButton):
     def __init__(self, message):
@@ -66,7 +51,8 @@ class MessageButton(gtk.ToggleButton):
     def __repr__(self):
         return '<MessageButton for %s at %d>' % (self.message, id(self))
 
-class MessageView(gtk.VBox):
+# instantiated through create_function in glade files
+class MessagesView(gtk.VBox):
     """
     I am a widget that can show messages.
     """
@@ -113,7 +99,7 @@ class MessageView(gtk.VBox):
     def add_message(self, m):
         """
         Add a message to me.
-        @type  m: L{Message}
+        @type  m: L{flumotion.common.messages.Message}
         """
         def on_toggled(b):
             if not b.get_active():
@@ -125,7 +111,7 @@ class MessageView(gtk.VBox):
             if old_active and old_active != b:
                 old_active.set_active(False)
             buf = gtk.TextBuffer()
-            buf.set_text(b.message.msg)
+            buf.set_text(b.message.text)
             self.textview.set_buffer(buf)
             self.label.set_markup('<b>%s</b>'
                                   % _headings.get(m.level, _('Message')))

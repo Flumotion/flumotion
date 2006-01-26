@@ -31,7 +31,7 @@ import gtk.glade
 from twisted.internet import defer
 
 from flumotion.configure import configure
-from flumotion.common import log, errors, worker, compat
+from flumotion.common import log, errors, worker, compat, messages
 from flumotion.wizard import enums, save, step, classes, message
 #from flumotion.wizard.sidebar import WizardSidebar
 from flumotion.ui import fgtk
@@ -226,12 +226,12 @@ class Wizard(GladeWindow, log.Loggable):
     def __len__(self):
         return len(self.scenario.steps)
 
-    def info_msg(self, id, msg):
-        m = message.Message(level=message.INFO, priority=50, id=id, msg=msg)
+    def info_msg(self, id, text):
+        m = messages.Info(priority=50, id=id, text=text)
         self.message_area.add_message(m)
 
-    def error_msg(self, id, msg):
-        m = message.Message(level=message.ERROR, priority=60, id=id, msg=msg)
+    def error_msg(self, id, text):
+        m = messages.Error(priority=60, id=id, text=text)
         self.message_area.add_message(m)
 
     def clear_msg(self, id):

@@ -189,7 +189,7 @@
 		      <child>
 			<widget class="Custom" id="message_area">
 			  <property name="height_request">80</property>
-			  <property name="creation_function">flumotion.wizard.message.MessageView()</property>
+			  <property name="creation_function">flumotion.wizard.message.MessagesView()</property>
 			  <property name="int1">0</property>
 			  <property name="int2">0</property>
 			  <property name="last_modification_time">Wed, 08 Jun 2005 14:37:07 GMT</property>

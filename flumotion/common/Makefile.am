@@ -26,6 +26,7 @@ flumotion_PYTHON = \
 	log.py \
 	keycards.py \
 	medium.py \
+	messages.py \
 	package.py \
 	planet.py \
 	pygobject.py \

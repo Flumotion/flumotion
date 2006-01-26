@@ -16,6 +16,7 @@ EXTRA_DIST = 				\
 	test_common.py 			\
 	test_common_componentui.py 	\
 	test_common_gstreamer.py 	\
+	test_common_messages.py 	\
 	test_common_package.py	 	\
 	test_common_planet.py	 	\
 	test_common_pygobject.py 	\
