@@ -119,6 +119,7 @@ class BaseAdminGtk(log.Loggable):
         """
         Set up the admin view so it can display nodes.
         """
+        self.debug('BaseAdminGtk.setup()')
         # set up translations
         if not hasattr(self, 'gettext_domain'):
             yield None
@@ -136,7 +137,8 @@ class BaseAdminGtk(log.Loggable):
             yield None
 
         localeDir = os.path.join(localedatadir, 'locale')
-        self.debug("Loading locales from %s" % localeDir)
+        self.debug("Loading locales for %s from %s" % (
+            self.gettext_domain, localeDir))
         gettext.bindtextdomain(self.gettext_domain, localeDir)
         gtk.glade.bindtextdomain(self.gettext_domain, localeDir)
         yield None
@@ -245,12 +247,12 @@ class BaseAdminGtkNode(log.Loggable):
             if not os.path.exists(path):
                 self.warning("Glade file %s not found in path %s" % (
                     gladeFile, path))
-            self.debug("Switching text domain to %s" % domain)
+            self.debug("Switching glade text domain to %s" % domain)
             self.debug("loading widget tree from %s" % path)
             old = gtk.glade.textdomain()
             gtk.glade.textdomain(domain)
             self.wtree = gtk.glade.XML(path)
-            self.debug("Switching text domain back to %s" % old)
+            self.debug("Switching glade text domain back to %s" % old)
             gtk.glade.textdomain(old)
             return self.wtree
 
@@ -295,7 +297,8 @@ class BaseAdminGtkNode(log.Loggable):
         Returns: a deferred returning the main widget for embedding
         """
         if hasattr(self, 'glade_file'):
-            self.debug('render: loading glade file %s' % self.glade_file)
+            self.debug('render: loading glade file %s in text domain %s' % (
+                self.glade_file, self.gettext_domain))
             dl = self.loadGladeFile(self.glade_file, self.gettext_domain)
             yield dl
 
