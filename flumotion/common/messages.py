@@ -50,6 +50,8 @@ class Message(pb.Copyable, pb.RemoteCopy):
         self.priority = priority
 pb.setUnjellyableForClass(Message, Message)
 
+# these are implemented as factory functions instead of classes because
+# properly proxying to the correct subclass is hard with Copyable/RemoteCopy
 def Error(*args, **kwargs):
     return Message(ERROR, *args, **kwargs)
 
