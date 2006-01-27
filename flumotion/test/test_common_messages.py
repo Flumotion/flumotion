@@ -25,22 +25,81 @@ from twisted.internet import reactor
 
 import common
 
+import os
+import gettext
+
 from flumotion.common import messages
+from flumotion.configure import configure
+
 
 class SerializeTest(unittest.TestCase):
     def testSerialize(self):
-        text = "Something is really wrong."
-        self.cmsg = messages.Error(text)
+        messages.install('flumotion')
+        t = N_("Something is really wrong.")
+        self.cmsg = messages.Error(t)
         self.mmsg = jelly.unjelly(jelly.jelly(self.cmsg))
-        self.assertEquals(self.mmsg.text, text)
+        t = self.mmsg.translatables[0]
+        self.assertEquals(t.format, "Something is really wrong.")
         self.assertEquals(self.mmsg.level, messages.ERROR)
         self.amsg = jelly.unjelly(jelly.jelly(self.mmsg))
-        self.assertEquals(self.amsg.text, text)
+        t = self.amsg.translatables[0]
+        self.assertEquals(t.format, "Something is really wrong.")
         self.assertEquals(self.amsg.level, messages.ERROR)
 
     def testCreate(self):
         self.failUnless(messages.Info("info"))
         self.failUnless(messages.Warning("warning"))
+
+class TranslatableTest(unittest.TestCase):
+    def testTranslatable(self):
+        messages.install('flumotion')
+        t = N_("%s can be translated", ("I", ))
+        self.assertEquals(t.domain, "flumotion")
+        self.assertEquals(t.format, "%s can be translated")
+        self.assertEquals(t.args, ("I", ))
+
+    def testTranslatablePlural(self):
+        messages.install('flumotion')
+        # Andy 3 is a droid in the Andy series and doesn't need translating
+        t = ngettext("%s %d has %d thing", "%s %d has %d things", 5,
+            ("Andy", 3, 5))
+        self.assertEquals(t.domain, "flumotion")
+        self.assertEquals(t.singular, "%s %d has %d thing")
+        self.assertEquals(t.plural, "%s %d has %d things")
+        self.assertEquals(t.count, 5)
+        self.assertEquals(t.args, ("Andy", 3, 5))
+        self.assertEquals(t.plural % t.args, "Andy 3 has 5 things")
+
+        # now translate to nl_NL
+        localedir = os.path.join(configure.localedatadir, 'locale')
+        self.nl = gettext.translation("flumotion", localedir, ["nl_NL"])
+        self.failUnless(self.nl)
+        text = self.nl.ngettext(t.singular, t.plural, t.count) % t.args
+        self.assertEquals(text, "Andy 3 heeft 5 dingen")
+
+class TranslatorTest(unittest.TestCase):
+    def testTranslateOne(self):
+        t = N_("%s can be translated", ("Andy", ))
+
+        translator = messages.Translator()
+        localedir = os.path.join(configure.localedatadir, 'locale')
+        translator.addLocaleDir('flumotion', localedir)
+        text = translator.translateTranslatable(t, lang=["nl_NL"])
+        self.assertEquals(text, 'Andy kan vertaald worden')
+        
+    def testTranslateMessage(self):
+        messages.install('flumotion')
+        cmsg = messages.Error(N_("Something is really wrong. "))
+        t = N_("But does %s know what ?", ("Andy", ))
+        cmsg.add(t)
+        mmsg = jelly.unjelly(jelly.jelly(cmsg))
+
+        translator = messages.Translator()
+        localedir = os.path.join(configure.localedatadir, 'locale')
+        translator.addLocaleDir('flumotion', localedir)
+
+        text = translator.translate(mmsg, lang=["nl_NL"])
+        self.assertEquals(text, "Er is iets echt mis. Maar weet Andy wat ?")
 
 if __name__ == '__main__':
     unittest.main()

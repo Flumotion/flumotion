@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-27 13:28+0100\n"
+"POT-Creation-Date: 2006-01-27 18:35+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -366,27 +366,53 @@ msgstr "<b>Klient forbruk</b>"
 msgid "Log"
 msgstr "Logg"
 
-#: flumotion/test/test_i18n.py:60 flumotion/test/test_i18n.py:97
-msgid "I am a translateable string"
+#: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:91
+msgid "I am a translatable string"
 msgstr ""
 
-#: flumotion/test/test_i18n.py:61 flumotion/test/test_i18n.py:98
+#: flumotion/test/test_i18n.py:58 flumotion/test/test_i18n.py:92
 msgid "I am a translated string"
 msgstr ""
 
-#: flumotion/test/test_i18n.py:114 flumotion/test/test_i18n.py:119
+#: flumotion/test/test_i18n.py:108 flumotion/test/test_i18n.py:113
 #, python-format
 msgid "I can translate %d thing"
 msgid_plural "I can translate %d things"
 msgstr[0] ""
 msgstr[1] ""
 
-#: flumotion/test/test_i18n.py:117 flumotion/test/test_i18n.py:121
+#: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:115
 #, python-format
 msgid "I translated %d thing"
 msgid_plural "I translated %d things"
 msgstr[0] ""
 msgstr[1] ""
+
+#: flumotion/test/test_common_messages.py:38
+msgid "Something is really wrong."
+msgstr ""
+
+#: flumotion/test/test_common_messages.py:56
+#: flumotion/test/test_common_messages.py:82
+#, python-format
+msgid "%s can be translated"
+msgstr ""
+
+#: flumotion/test/test_common_messages.py:64
+#, python-format
+msgid "%s %d has %d thing"
+msgid_plural "%s %d has %d things"
+msgstr[0] ""
+msgstr[1] ""
+
+#: flumotion/test/test_common_messages.py:92
+msgid "Something is really wrong. "
+msgstr ""
+
+#: flumotion/test/test_common_messages.py:93
+#, python-format
+msgid "But does %s know what ?"
+msgstr ""
 
 #: data/glade/admin.glade:9
 msgid "Flumotion Administration"

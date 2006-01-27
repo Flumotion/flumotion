@@ -54,11 +54,11 @@ class TestSingularClassbased(unittest.TestCase):
         self.failUnless(mo)
         self.nl = gettext.translation("flumotion", localedir, ["nl_NL"])
         self.failUnless(self.nl)
-        self.able = N_("I am a translateable string")
+        self.able = N_("I am a translatable string")
         self.ed = self.nl.gettext("I am a translated string")
 
-    def testTranslateable(self):
-        self.assertEquals(self.able, "I am a translateable string")
+    def testTranslatable(self):
+        self.assertEquals(self.able, "I am a translatable string")
         self.assertEquals(self.nl.gettext(self.able),
             "Ik ben een vertaalbare string")
 
@@ -88,11 +88,11 @@ class TestGettext(unittest.TestCase):
 class TestSingularGettext(TestGettext):
     def setUp(self):
         TestGettext.setUp(self)
-        self.able = N_("I am a translateable string")
+        self.able = N_("I am a translatable string")
         self.ed = _("I am a translated string")
 
-    def testTranslateable(self):
-        self.assertEquals(self.able, "I am a translateable string")
+    def testTranslatable(self):
+        self.assertEquals(self.able, "I am a translatable string")
         self.assertEquals(gettext.gettext(self.able),
             "Ik ben een vertaalbare string")
 
@@ -115,7 +115,7 @@ class TestPluralGettext(TestGettext):
         self.edcount = gettext.ngettext("I translated %d thing",
             "I translated %d things", self.count)
 
-    def testTranslateable(self):
+    def testTranslatable(self):
         self.assertEquals(len(self.ableone), 3)
         self.assertEquals(len(self.ablecount), 3)
 

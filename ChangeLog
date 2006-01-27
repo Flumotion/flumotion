@@ -1,5 +1,24 @@
 2006-01-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/messages.py:
+	  - add .install(), which puts N_ and ngettext methods in __builtin__
+	    to mark messages for translation.  See gettext.install()
+	  - add Translatable classes for Singular and Plural forms that store
+	    everything needed to translate a message admin-side
+	  - add a Translator class that can translate translatables and
+	    messages, given localedirs for text domains
+	  - make messages take translatable objects in the constructor
+	* flumotion/test/test_common_messages.py:
+	* flumotion/test/test_i18n.py:
+	  tests for all of this, using the nl_NL locale
+	* po/POTFILES.in:
+	* po/ca.po:
+	* po/nl.po:
+	* po/no.po:
+	  update with test strings
+
+2006-01-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_i18n.py:
 	* po/POTFILES.in:
