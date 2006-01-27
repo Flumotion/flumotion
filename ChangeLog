@@ -1,3 +1,14 @@
+2006-01-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_i18n.py:
+	* po/POTFILES.in:
+	* po/ca.po:
+	* po/nl.po:
+	* po/no.po:
+	  add a test for various aspects of gettext and i18n
+	  in preparation for some message support
+
 2006-01-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/wizard.glade:

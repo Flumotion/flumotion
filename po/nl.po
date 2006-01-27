@@ -6,106 +6,107 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-31 15:47+0100\n"
+"POT-Creation-Date: 2006-01-27 13:28+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: flumotion/admin/gtk/client.py:152
+#: flumotion/admin/gtk/client.py:153
 msgid "Not connected"
 msgstr "Niet verbonden"
 
-#: flumotion/admin/gtk/client.py:177
+#: flumotion/admin/gtk/client.py:178
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Aan het verbinden met %s:%s"
 
-#: flumotion/admin/gtk/client.py:262 flumotion/admin/gtk/client.py:326
+#: flumotion/admin/gtk/client.py:263 flumotion/admin/gtk/client.py:327
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "UI aan het laden voor %s ..."
 
-#: flumotion/admin/gtk/client.py:344
+#: flumotion/admin/gtk/client.py:345
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Blad %s aan het laden voor %s ..."
 
-#: flumotion/admin/gtk/client.py:363
+#: flumotion/admin/gtk/client.py:364
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s heeft nog geen UI"
 
-#: flumotion/admin/gtk/client.py:557
+#: flumotion/admin/gtk/client.py:558
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Flumotion Administratie"
 
-#: flumotion/admin/gtk/client.py:573
+#: flumotion/admin/gtk/client.py:574
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Verbinding verbroken met manager, herverbinden ..."
 
-#: flumotion/admin/gtk/client.py:593
+#: flumotion/admin/gtk/client.py:594
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Verbinding met manager op %s werd geweigerd."
 
-#: flumotion/admin/gtk/client.py:595
+#: flumotion/admin/gtk/client.py:596
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Verbinding met %s werd geweigerd"
 
-#: flumotion/admin/gtk/client.py:608
+#: flumotion/admin/gtk/client.py:609
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Verbinding met manager op %s mislukt (%s)."
 
-#: flumotion/admin/gtk/client.py:690
+#: flumotion/admin/gtk/client.py:691
 #, python-format
 msgid "Showing UI for %s"
 msgstr "UI aan het tonen voor %s"
 
-#: flumotion/admin/gtk/client.py:710
+#: flumotion/admin/gtk/client.py:711
 #, python-format
 msgid "No UI for component %s"
 msgstr "Geen UI voor component %s"
 
-#: flumotion/admin/gtk/client.py:724
+#: flumotion/admin/gtk/client.py:725
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Component %s slaapt nog steeds"
 
-#: flumotion/admin/gtk/client.py:734
+#: flumotion/admin/gtk/client.py:735
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "UI aan het opvragen voor %s ..."
 
-#: flumotion/admin/gtk/client.py:780
+#: flumotion/admin/gtk/client.py:781
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr ""
 "De wizard kan niet uitgevoerd worden omdat er geen workers ingelogd zijn."
 
-#: flumotion/admin/gtk/client.py:821
+#: flumotion/admin/gtk/client.py:822
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Componentcode aan het herladen voor %s"
 
-#: flumotion/admin/gtk/client.py:852
+#: flumotion/admin/gtk/client.py:853
 msgid "No component selected."
 msgstr "Geen component geselecteerd."
 
-#: flumotion/admin/gtk/client.py:869
+#: flumotion/admin/gtk/client.py:870
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "%s van component %s mislukt"
 
-#: flumotion/admin/gtk/client.py:896
+#: flumotion/admin/gtk/client.py:897
 msgid "Import Configuration..."
 msgstr "Configuratie invoeren..."
 
-#: flumotion/admin/gtk/client.py:909
+#: flumotion/admin/gtk/client.py:910
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -113,11 +114,11 @@ msgstr ""
 "Bestand bestaat reeds.\n"
 "Overschrijven?"
 
-#: flumotion/admin/gtk/client.py:931
+#: flumotion/admin/gtk/client.py:932
 msgid "Export Configuration..."
 msgstr "Configuratie uitvoeren..."
 
-#: flumotion/admin/gtk/client.py:975
+#: flumotion/admin/gtk/client.py:976
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -126,24 +127,24 @@ msgstr ""
 "Kon component niet herladen:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:985
+#: flumotion/admin/gtk/client.py:986
 msgid "Reloading ..."
 msgstr "Aan het herladen..."
 
-#: flumotion/admin/gtk/client.py:986
+#: flumotion/admin/gtk/client.py:987
 msgid "Reloading client code"
 msgstr "Clientcode aan het herladen"
 
-#: flumotion/admin/gtk/client.py:988
+#: flumotion/admin/gtk/client.py:989
 #, python-format
 msgid "Reloading %s code"
 msgstr "%s code aan het herladen"
 
-#: flumotion/admin/gtk/client.py:1001
+#: flumotion/admin/gtk/client.py:1002
 msgid "About Flumotion"
 msgstr "Over Flumotion"
 
-#: flumotion/admin/gtk/client.py:1020
+#: flumotion/admin/gtk/client.py:1021
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -153,129 +154,145 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1025
+#: flumotion/admin/gtk/client.py:1026
 msgid "Authors"
 msgstr "Auteurs"
 
-#: flumotion/admin/gtk/greeter.py:38
+#: flumotion/admin/gtk/message.py:32
+msgid "Error"
+msgstr "Fout"
+
+#: flumotion/admin/gtk/message.py:33
+msgid "Warning"
+msgstr "Waarschuwing"
+
+#: flumotion/admin/gtk/message.py:34
+msgid "Note"
+msgstr "Noot"
+
+#: flumotion/admin/gtk/message.py:117
+msgid "Message"
+msgstr "Bericht"
+
+#: flumotion/admin/gtk/greeter.py:39
 msgid "Connect to Flumotion manager"
 msgstr "Verbinden met Flumotion manager"
 
-#: flumotion/admin/gtk/greeter.py:39
+#: flumotion/admin/gtk/greeter.py:40
 msgid "Flumotion Admin needs to connect to a Flumotion manager.\n"
 msgstr "Flumotion Admin moet een verbinding maken met een Flumotion manager.\n"
 
-#: flumotion/admin/gtk/greeter.py:40
+#: flumotion/admin/gtk/greeter.py:41
 msgid "Choose an option from the list and click \"Forward\" to begin."
 msgstr "Kies een optie uit de lijst en klik \"Verder\" om te beginnen."
 
-#: flumotion/admin/gtk/greeter.py:62
+#: flumotion/admin/gtk/greeter.py:63
 msgid "Host information"
 msgstr "Gastinformatie"
 
-#: flumotion/admin/gtk/greeter.py:63
+#: flumotion/admin/gtk/greeter.py:64
 msgid "Please enter the address where the manager is running."
 msgstr "Gelieve het adres in te geven waar de manager op draait."
 
-#: flumotion/admin/gtk/greeter.py:86
+#: flumotion/admin/gtk/greeter.py:87
 msgid "Authentication"
 msgstr "_Authenticatie"
 
-#: flumotion/admin/gtk/greeter.py:87
+#: flumotion/admin/gtk/greeter.py:88
 msgid "Please select among the following authentication methods."
 msgstr "Gelieve uit de volgende authenticatiemethodes te kiezen."
 
-#: flumotion/admin/gtk/greeter.py:113
+#: flumotion/admin/gtk/greeter.py:114
 msgid "Recent connections"
 msgstr "Recente verbindingen"
 
-#: flumotion/admin/gtk/greeter.py:114 data/glade/connection-dialog.glade:84
+#: flumotion/admin/gtk/greeter.py:115 data/glade/connection-dialog.glade:84
 msgid "Please choose a connection from the box below."
 msgstr "Kies een verbinding uit de onderstaande lijst."
 
-#: flumotion/admin/gtk/parts.py:169
+#: flumotion/admin/gtk/parts.py:170
 msgid "Mood"
 msgstr "Humeur"
 
-#: flumotion/admin/gtk/parts.py:174 flumotion/admin/gtk/parts.py:413
+#: flumotion/admin/gtk/parts.py:175 flumotion/admin/gtk/parts.py:414
 msgid "Component"
 msgstr "Component"
 
-#: flumotion/admin/gtk/parts.py:179
+#: flumotion/admin/gtk/parts.py:180
 msgid "Worker"
 msgstr "Worker"
 
-#: flumotion/admin/gtk/parts.py:364
+#: flumotion/admin/gtk/parts.py:365
 msgid "[any worker]"
 msgstr ""
 
-#: flumotion/admin/gtk/parts.py:415
+#: flumotion/admin/gtk/parts.py:416
 msgid "_Restart"
 msgstr "_Herstart"
 
-#: flumotion/admin/gtk/parts.py:419
+#: flumotion/admin/gtk/parts.py:420
 msgid "_Start"
 msgstr "_Start"
 
-#: flumotion/admin/gtk/parts.py:426
+#: flumotion/admin/gtk/parts.py:427
 msgid "St_op"
 msgstr "St_op"
 
-#: flumotion/admin/gtk/parts.py:434
+#: flumotion/admin/gtk/parts.py:435
 msgid "Reload _code"
 msgstr "Herlaad _code"
 
-#: flumotion/admin/gtk/parts.py:438
+#: flumotion/admin/gtk/parts.py:439
 msgid "_Modify element property ..."
 msgstr "_Wijzig elementeigenschap ..."
 
-#: flumotion/component/producers/videotest/admin_gtk.py:33
+#: flumotion/component/producers/videotest/admin_gtk.py:34
 msgid "Pattern:"
 msgstr "Patroon:"
 
-#: flumotion/component/producers/videotest/admin_gtk.py:85
+#: flumotion/component/producers/videotest/admin_gtk.py:86
 msgid "Pattern"
 msgstr "Patroon"
 
-#: flumotion/wizard/enums.py:82
+#: flumotion/wizard/enums.py:83
 msgid "SMPTE Color bars"
 msgstr "SMPTE Kleurbalken"
 
-#: flumotion/wizard/enums.py:83
+#: flumotion/wizard/enums.py:84
 msgid "Random (television snow)"
 msgstr "Willekeurig (televisiesneeuw)"
 
-#: flumotion/wizard/enums.py:84
+#: flumotion/wizard/enums.py:85
 msgid "Totally black"
 msgstr "Volledig zwart"
 
-#: flumotion/wizard/steps.py:80
+#: flumotion/wizard/steps.py:81
 msgid "If you want to stream video"
 msgstr "Als je video wil streamen"
 
-#: flumotion/wizard/steps.py:82
+#: flumotion/wizard/steps.py:83
 msgid "If you want to stream audio"
 msgstr "Als je audio wil streamen"
 
-#: flumotion/wizard/steps.py:264
+#: flumotion/wizard/steps.py:265
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d pixelaspectverhouding)"
 
-#: flumotion/wizard/steps.py:314
+#: flumotion/wizard/steps.py:315
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d pixelaspectverhouding"
 
-#: flumotion/wizard/steps.py:334
+#: flumotion/wizard/steps.py:335
 msgid "Checking for Firewire device..."
 msgstr "Bezig met detecteren Vuurdraadapparaat..."
 
-#: flumotion/wizard/steps.py:353
+#: flumotion/wizard/steps.py:354
 msgid "No Firewire device detected."
 msgstr "Geen Vuurdraadapparaat gedetecteerd."
 
-#: flumotion/wizard/steps.py:470
+#: flumotion/wizard/steps.py:471
 #, fuzzy
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
@@ -287,33 +304,17 @@ msgstr ""
 "Gelieve te overwegen om deze te vernieuwen als uw video een\n"
 "diagonale lijn in het beeld bevat."
 
-#: flumotion/wizard/steps.py:480
+#: flumotion/wizard/steps.py:481
 msgid "Could not check ffmpegcolorspace features."
 msgstr "Kon ffmpegcolorspace-eigenschappen niet controleren."
 
-#: flumotion/wizard/message.py:33
-msgid "Error"
-msgstr "Fout"
-
-#: flumotion/wizard/message.py:34
-msgid "Warning"
-msgstr "Waarschuwing"
-
-#: flumotion/wizard/message.py:35
-msgid "Note"
-msgstr "Noot"
-
-#: flumotion/wizard/message.py:120
-msgid "Message"
-msgstr "Bericht"
-
 #: flumotion/component/consumers/httpstreamer/http.glade:8
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:131
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:132
 msgid "Statistics"
 msgstr "Statistieken"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:129
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:49
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:50
 msgid "Mime type:"
 msgstr "Mimetype:"
 
@@ -363,9 +364,31 @@ msgstr "op"
 msgid "<b>Client Consumption</b>"
 msgstr "<b>Cliëntverbruik</b>"
 
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:133
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:134
 msgid "Log"
 msgstr "Log"
+
+#: flumotion/test/test_i18n.py:60 flumotion/test/test_i18n.py:97
+msgid "I am a translateable string"
+msgstr "Ik ben een vertaalbare string"
+
+#: flumotion/test/test_i18n.py:61 flumotion/test/test_i18n.py:98
+msgid "I am a translated string"
+msgstr "Ik ben een vertaalde string"
+
+#: flumotion/test/test_i18n.py:114 flumotion/test/test_i18n.py:119
+#, python-format
+msgid "I can translate %d thing"
+msgid_plural "I can translate %d things"
+msgstr[0] "Ik kan %d ding vertalen"
+msgstr[1] "Ik kan %d dingen vertalen"
+
+#: flumotion/test/test_i18n.py:117 flumotion/test/test_i18n.py:121
+#, python-format
+msgid "I translated %d thing"
+msgid_plural "I translated %d things"
+msgstr[0] "Ik vertaalde %d ding"
+msgstr[1] "Ik vertaalde %d dingen"
 
 #: data/glade/admin.glade:9
 msgid "Flumotion Administration"

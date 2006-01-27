@@ -31,6 +31,7 @@ EXTRA_DIST = 				\
 	test_greeter.py			\
 	test_htpasswdcrypt.py 		\
 	test_http.py 			\
+	test_i18n.py 			\
 	test_keycards.py 		\
 	test_log.py 			\
 	test_manager_admin.py 		\
