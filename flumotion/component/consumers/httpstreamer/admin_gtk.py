@@ -133,6 +133,8 @@ class HTTPStreamerAdminGtk(BaseAdminGtk):
         self.nodes['Statistics'] = statistics
         log = LogAdminGtkNode(self.state, self.admin, _('Log'))
         self.nodes['Log'] = log
+        # FIXME: maybe make a protocol instead of overriding
+        return BaseAdminGtk.setup(self)
 
     def uiStateChanged(self, state):
         self.nodes['Statistics'].setStats(state)
