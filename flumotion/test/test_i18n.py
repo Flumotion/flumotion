@@ -49,9 +49,6 @@ def ngettext(singular, plural, count): return (singular, plural, count)
 # this test uses the class-based gettext API
 class TestSingularClassbased(unittest.TestCase):
     def setUp(self):
-        #self.oldlocaledir = gettext.bindtextdomain('flumotion')
-        #gettext.bindtextdomain('flumotion', os.path.abspath('..'))
-        # switch to nl
         localedir = os.path.join(configure.localedatadir, 'locale')
         mo = gettext.find("flumotion", localedir, ["nl_NL"])
         self.failUnless(mo)
@@ -59,10 +56,6 @@ class TestSingularClassbased(unittest.TestCase):
         self.failUnless(self.nl)
         self.able = N_("I am a translateable string")
         self.ed = self.nl.gettext("I am a translated string")
-
-    def tearDown(self):
-        #gettext.bindtextdomain('flumotion', self.oldlocaledir)
-        pass
 
     def testTranslateable(self):
         self.assertEquals(self.able, "I am a translateable string")
