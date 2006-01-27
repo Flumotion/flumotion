@@ -1,5 +1,11 @@
 2006-01-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_component_init.py:
+	  add a test I still had lying around, which tries to create
+	  every component in the flumotion registry
+
+2006-01-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/messages.py:
 	  - add .install(), which puts N_ and ngettext methods in __builtin__
 	    to mark messages for translation.  See gettext.install()
