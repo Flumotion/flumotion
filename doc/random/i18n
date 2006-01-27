@@ -1,17 +1,33 @@
-- strings need to be translated in the admin client, not in worker or manager
+WHAT IS NEEDED
+--------------
+- strings need to be translated into the language used by the admin client
+- so worker/manager should always deal with untranslated strings
+- if we only concern ourselves with flumotion and flumotion projects,
+  we can assume the manager has the catalogs for all the code it's sending
+  to both workers and admins
 - so translations need to be put in a bundle and sent to admin
+- a message from a component/worker serialized through the manager to the admin
+  should consist of:
+  - a list of:
+    - "format string", (args tuple), "textdomain"
+      or
+    - ("singular format", "plural format", integer), (args tuple), "textdomain" 
+
+DESIGN QUESTIONS and CHOICES
+-----------------------------
 - two choices for what to transfer
   - send over .po files, and build them into .mo files on client
   - send over .mo files
     - possible because while .mo files are generated with the host endianness,
       both endianesses can be read with gettext
+      this is what we do
 - how to bundle
   - put all .mo files in one big bundle
     - bad because you normally only run one language
   - put each .mo file in one bundle
     - bad because nl_BE falls back to nl in gettext
   - put each .mo file in a bundle according to the first two letters of the
-    code
+    code: this is what we'll do
 
 HOW
 ---
