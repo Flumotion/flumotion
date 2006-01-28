@@ -45,22 +45,22 @@ def ngettext(singular, plural, count):
 
 def gettexter(domain):
     """
-    Return a function that takes a format string and an args tuple,
-    and creates a L{TranslatableSingular} from it.
+    Return a function that takes a format string or tuple, and additional
+    format args,
+    and creates a L{Translatable} from it.
 
     Example:
         T_ = messages.gettexter('flumotion')
-        t = T_(N_("Could not find '%s'."), (file, ))
+        t = T_(N_("Could not find '%s'."), file)
     """
-    return lambda *args: TranslatableSingular(domain, *args)
+    def create(format, *args):
+        if isinstance(format, str):
+            return TranslatableSingular(domain, format, *args)
+        else:
+            return TranslatablePlural(domain, format, *args)
 
-def ngettexter(domain):
-    """
-    Return a function that takes a (singular, plural, count) tuple
-    and an args tuple, and creates a L{TranslatablePlural} from it.
-    """
-    return lambda *args: TranslatablePlural(domain, *args)
-    
+    return lambda *args: create(*args)
+
 class Translatable(pb.Copyable, pb.RemoteCopy):
     domain = None
     
@@ -72,7 +72,7 @@ class TranslatableSingular(Translatable):
     @param format: a format string
     @param args:   any arguments to the format string
     """
-    def __init__(self, domain, format, args=None):
+    def __init__(self, domain, format, *args):
         self.domain = domain
         self.format = format
         self.args = args
@@ -86,7 +86,7 @@ class TranslatablePlural(Translatable):
     @param format: a (singular, plural, count) tuple
     @param args:   any arguments to the format string
     """
-    def __init__(self, domain, format, args=None):
+    def __init__(self, domain, format, *args):
         singular, plural, count = format
         self.domain = domain
         self.singular = singular
@@ -197,6 +197,7 @@ class Message(pb.Copyable, pb.RemoteCopy):
 
     def __repr__(self):
         return '<Message %r at %r>' % (self.id, id(self.id))
+
     def add(self, translatable):
         if not isinstance(translatable, Translatable):
             raise ValueError('%r is not Translatable' % translatable)

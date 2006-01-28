@@ -36,12 +36,11 @@ from flumotion.common.messages import N_, ngettext
 
 # translatablers
 T_ = messages.gettexter('flumotion')
-TP_ = messages.ngettexter('flumotion')
 
 class SerializeTest(unittest.TestCase):
     def testSerialize(self):
-        t = T_(N_("Something is really wrong."))
-        self.cmsg = messages.Error(t)
+        text = N_("Something is really wrong.")
+        self.cmsg = messages.Error(T_(text))
         self.mmsg = jelly.unjelly(jelly.jelly(self.cmsg))
         t = self.mmsg.translatables[0]
         self.assertEquals(t.format, "Something is really wrong.")
@@ -57,15 +56,15 @@ class SerializeTest(unittest.TestCase):
 
 class TranslatableTest(unittest.TestCase):
     def testTranslatable(self):
-        t = T_(N_("%s can be translated"), ("I", ))
+        t = T_(N_("%s can be translated"), "I")
         self.assertEquals(t.domain, "flumotion")
         self.assertEquals(t.format, "%s can be translated")
         self.assertEquals(t.args, ("I", ))
 
     def testTranslatablePlural(self):
         # Andy 3 is a droid in the Andy series and doesn't need translating
-        t = TP_(ngettext("%s %d has %d thing", "%s %d has %d things", 5),
-            ("Andy", 3, 5))
+        t = T_(ngettext("%s %d has %d thing", "%s %d has %d things", 5),
+            "Andy", 3, 5)
         self.assertEquals(t.domain, "flumotion")
         self.assertEquals(t.singular, "%s %d has %d thing")
         self.assertEquals(t.plural, "%s %d has %d things")
@@ -82,7 +81,7 @@ class TranslatableTest(unittest.TestCase):
 
 class TranslatorTest(unittest.TestCase):
     def testTranslateOne(self):
-        t = T_(N_("%s can be translated"), ("Andy", ))
+        t = T_(N_("%s can be translated"), "Andy")
 
         translator = messages.Translator()
         localedir = os.path.join(configure.localedatadir, 'locale')
@@ -92,7 +91,7 @@ class TranslatorTest(unittest.TestCase):
         
     def testTranslateMessage(self):
         cmsg = messages.Error(T_(N_("Something is really wrong. ")))
-        t = T_(N_("But does %s know what ?"), ("Andy", ))
+        t = T_(N_("But does %s know what ?"), "Andy")
         cmsg.add(t)
         mmsg = jelly.unjelly(jelly.jelly(cmsg))
 

@@ -1,6 +1,15 @@
 2006-01-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/messages.py:
+	  fold ngettexter into gettexter method by checking for str format
+	  make constructors of Translatable take *args, making the creation
+	  more natural in the no-or-one arg case
+	* flumotion/test/test_common_messages.py:
+	  update to match
+
+2006-01-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/messages.py:
 	  - remove the .install() function, better not to mess with __builtin__
 	  - add N_ and ngettext functions, used for marking up strings
 	  - add .gettexter(domain) and .ngettexter(domain) methods, which return
