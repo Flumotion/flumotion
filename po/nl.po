@@ -817,7 +817,7 @@ msgstr "beelden"
 #: data/glade/wizard_soundcard.glade:32 data/glade/wizard_tvcard.glade:261
 #: data/glade/wizard_webcam.glade:32
 msgid "_Device:"
-msgstr "_Toestel:"
+msgstr "T_oestel:"
 
 #: data/glade/wizard_soundcard.glade:57
 msgid "_Input:"
