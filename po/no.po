@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-27 18:35+0100\n"
+"POT-Creation-Date: 2006-01-28 10:48+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -156,19 +156,24 @@ msgstr ""
 msgid "Authors"
 msgstr "Forfattere"
 
-#: flumotion/admin/gtk/message.py:32
+#: flumotion/admin/gtk/message.py:34
 msgid "Error"
 msgstr "Feil"
 
-#: flumotion/admin/gtk/message.py:33
+#: flumotion/admin/gtk/message.py:35
 msgid "Warning"
 msgstr "Advarsel"
 
-#: flumotion/admin/gtk/message.py:34
+#: flumotion/admin/gtk/message.py:36
 msgid "Note"
 msgstr "Notat"
 
-#: flumotion/admin/gtk/message.py:117
+#: flumotion/admin/gtk/message.py:130
+#, fuzzy
+msgid "Debug information:\n"
+msgstr "Host informasjon"
+
+#: flumotion/admin/gtk/message.py:134
 msgid "Message"
 msgstr "Melding"
 
@@ -292,7 +297,11 @@ msgstr "Sjekker for Firewire enhet..."
 msgid "No Firewire device detected."
 msgstr "Ingen Firewire enhet oppdaget."
 
-#: flumotion/wizard/steps.py:471
+#: flumotion/wizard/steps.py:394
+msgid "Probing webcam, this can take a while..."
+msgstr ""
+
+#: flumotion/wizard/steps.py:479
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
@@ -302,9 +311,13 @@ msgstr ""
 "Vær vennlig å vurdere å oppgradere hvis ditt utgående video har en\n"
 "diagonal linje i bildet."
 
-#: flumotion/wizard/steps.py:481
+#: flumotion/wizard/steps.py:489
 msgid "Could not check ffmpegcolorspace features."
 msgstr "Kunne ikke sjekke ffmpegcolorspace egenskaper."
+
+#: flumotion/wizard/step.py:140
+msgid "Internal error: could not run check code on worker."
+msgstr ""
 
 #: flumotion/component/consumers/httpstreamer/http.glade:8
 #: flumotion/component/consumers/httpstreamer/admin_gtk.py:132
@@ -366,6 +379,29 @@ msgstr "<b>Klient forbruk</b>"
 msgid "Log"
 msgstr "Logg"
 
+#: flumotion/worker/checks/video010.py:176
+#, python-format
+msgid "No device found on %s."
+msgstr ""
+
+#: flumotion/worker/checks/video010.py:178
+#, python-format
+msgid "Could not open device %s.  Check permissions on the device."
+msgstr ""
+
+#: flumotion/worker/checks/video010.py:181
+#: flumotion/worker/checks/video010.py:184
+msgid "GStreamer error while probing webcam."
+msgstr ""
+
+#: flumotion/worker/checks/video010.py:187
+msgid "Failed to probe webcam."
+msgstr ""
+
+#: flumotion/worker/checks/video010.py:248
+msgid "device node /dev/raw1394 does not exist"
+msgstr ""
+
 #: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:91
 msgid "I am a translatable string"
 msgstr ""
@@ -412,6 +448,15 @@ msgstr ""
 #: flumotion/test/test_common_messages.py:93
 #, python-format
 msgid "But does %s know what ?"
+msgstr ""
+
+#: flumotion/test/test_common_messages.py:113
+#, fuzzy
+msgid "warning"
+msgstr "Advarsel"
+
+#: flumotion/test/test_common_messages.py:126
+msgid "uh oh"
 msgstr ""
 
 #: data/glade/admin.glade:9

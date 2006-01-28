@@ -23,6 +23,7 @@
 support for serializable translatable messages from component/manager to admin
 """
 
+from flumotion.common import log
 from twisted.spread import pb
 import gettext
 
@@ -30,17 +31,35 @@ ERROR = 1
 WARNING = 2
 INFO = 3
 
-def install(domain):
+def N_(format):
     """
-    install 'N_' and 'ngettext' methods in the current namespace that
-    can be used for marking translatable strings, and return
-    Translatable instances.
+    Mark a singular string for translation, without translating it.
     """
-    import __builtin__
-    N_ = lambda *args: TranslatableSingular(domain, *args)
-    ngettext = lambda *args: TranslatablePlural(domain, *args)
-    __builtin__.__dict__['ngettext'] = ngettext
-    __builtin__.__dict__['N_'] = N_
+    return format
+
+def ngettext(singular, plural, count):
+    """
+    Mark a plural string for translation, without translating it.
+    """
+    return (singular, plural, count)
+
+def gettexter(domain):
+    """
+    Return a function that takes a format string and an args tuple,
+    and creates a L{TranslatableSingular} from it.
+
+    Example:
+        T_ = messages.gettexter('flumotion')
+        t = T_(N_("Could not find '%s'."), (file, ))
+    """
+    return lambda *args: TranslatableSingular(domain, *args)
+
+def ngettexter(domain):
+    """
+    Return a function that takes a (singular, plural, count) tuple
+    and an args tuple, and creates a L{TranslatablePlural} from it.
+    """
+    return lambda *args: TranslatablePlural(domain, *args)
     
 class Translatable(pb.Copyable, pb.RemoteCopy):
     domain = None
@@ -48,6 +67,10 @@ class Translatable(pb.Copyable, pb.RemoteCopy):
 class TranslatableSingular(Translatable):
     """
     I represent a translatable gettext msg in the singular form.
+
+    @param domain: the text domain for translations of this message
+    @param format: a format string
+    @param args:   any arguments to the format string
     """
     def __init__(self, domain, format, args=None):
         self.domain = domain
@@ -58,8 +81,13 @@ pb.setUnjellyableForClass(TranslatableSingular, TranslatableSingular)
 class TranslatablePlural(Translatable):
     """
     I represent a translatable gettext msg in the plural form.
+
+    @param domain: the text domain for translations of this message
+    @param format: a (singular, plural, count) tuple
+    @param args:   any arguments to the format string
     """
-    def __init__(self, domain, singular, plural, count, args=None):
+    def __init__(self, domain, format, args=None):
+        singular, plural, count = format
         self.domain = domain
         self.singular = singular
         self.plural = plural
@@ -67,12 +95,15 @@ class TranslatablePlural(Translatable):
         self.args = args
 pb.setUnjellyableForClass(TranslatablePlural, TranslatablePlural)
     
-class Translator:
+class Translator(log.Loggable):
     """
     I translate translatables and messages.
     I need to be told where locale directories can be found for all domains
     I need to translate for.
     """
+
+    logCategory = "translator"
+
     def __init__(self):
         self._localedirs = {} # domain name -> list of locale dirs
 
@@ -84,6 +115,7 @@ class Translator:
             self._localedirs[domain] = []
 
         if not dir in self._localedirs[domain]:
+            self.debug('Adding localedir %s for domain %s' % (dir, domain))
             self._localedirs[domain].append(dir)
 
     def translateTranslatable(self, translatable, lang=None):
@@ -97,17 +129,35 @@ class Translator:
         t = None
         # FIXME: possibly trap IOError and handle nicely ?
         for localedir in self._localedirs[domain]:
-            t = gettext.translation(domain, localedir, lang)
-
+            try:
+                t = gettext.translation(domain, localedir, lang)
+            except IOError:
+                pass
+            
         format = None
-        if isinstance(translatable, TranslatableSingular):
-            format = t.gettext(translatable.format)
-        elif isinstance(translatable, TranslatablePlural):
-            format = t.ngettext(translatable.singular, translatable.plural,
-                translatable.count)
+        if not t:
+            # if no translation object found, fall back to C
+            self.debug('no translation found, falling back to C')
+            if isinstance(translatable, TranslatableSingular):
+                format = translatable.format
+            elif isinstance(translatable, TranslatablePlural):
+                if translatable.count == 1:
+                    format = translatable.singular
+                else:
+                    format = translatable.plural
+            else:
+                raise NotImplementedError('Cannot translate translatable %r' %
+                    translatable)
         else:
-            raise NotImplementedError('Cannot translate translatable %r' %
-                translatable)
+            # translation object found, translate
+            if isinstance(translatable, TranslatableSingular):
+                format = t.gettext(translatable.format)
+            elif isinstance(translatable, TranslatablePlural):
+                format = t.ngettext(translatable.singular, translatable.plural,
+                    translatable.count)
+            else:
+                raise NotImplementedError('Cannot translate translatable %r' %
+                    translatable)
 
         if translatable.args:
             return format % translatable.args
@@ -139,12 +189,17 @@ class Message(pb.Copyable, pb.RemoteCopy):
                              level
         """
         self.level = level
-        self.translatables = [translatable, ]
+        self.translatables = []
+        self.add(translatable)
         self.debug = debug
         self.id = id
         self.priority = priority
 
+    def __repr__(self):
+        return '<Message %r at %r>' % (self.id, id(self.id))
     def add(self, translatable):
+        if not isinstance(translatable, Translatable):
+            raise ValueError('%r is not Translatable' % translatable)
         self.translatables.append(translatable)
 pb.setUnjellyableForClass(Message, Message)
 
@@ -158,4 +213,20 @@ def Warning(*args, **kwargs):
 
 def Info(*args, **kwargs):
     return Message(INFO, *args, **kwargs)
+
+class Result(pb.Copyable, pb.RemoteCopy):
+    def __init__(self):
+        self.messages = []
+        self.value = None
+        self.failed = False
+
+    def succeed(self, value):
+        self.value = value
+
+    def add(self, message):
+        self.messages.append(message)
+        if message.level == ERROR:
+            self.failed = True
+            self.value = None
+pb.setUnjellyableForClass(Result, Result)
 

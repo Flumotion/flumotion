@@ -31,11 +31,16 @@ import gettext
 from flumotion.common import messages
 from flumotion.configure import configure
 
+# markers
+from flumotion.common.messages import N_, ngettext
+
+# translatablers
+T_ = messages.gettexter('flumotion')
+TP_ = messages.ngettexter('flumotion')
 
 class SerializeTest(unittest.TestCase):
     def testSerialize(self):
-        messages.install('flumotion')
-        t = N_("Something is really wrong.")
+        t = T_(N_("Something is really wrong."))
         self.cmsg = messages.Error(t)
         self.mmsg = jelly.unjelly(jelly.jelly(self.cmsg))
         t = self.mmsg.translatables[0]
@@ -47,21 +52,19 @@ class SerializeTest(unittest.TestCase):
         self.assertEquals(self.amsg.level, messages.ERROR)
 
     def testCreate(self):
-        self.failUnless(messages.Info("info"))
-        self.failUnless(messages.Warning("warning"))
+        self.failUnless(messages.Info(T_(N_("Note"))))
+        self.failUnless(messages.Warning(T_(N_("warning"))))
 
 class TranslatableTest(unittest.TestCase):
     def testTranslatable(self):
-        messages.install('flumotion')
-        t = N_("%s can be translated", ("I", ))
+        t = T_(N_("%s can be translated"), ("I", ))
         self.assertEquals(t.domain, "flumotion")
         self.assertEquals(t.format, "%s can be translated")
         self.assertEquals(t.args, ("I", ))
 
     def testTranslatablePlural(self):
-        messages.install('flumotion')
         # Andy 3 is a droid in the Andy series and doesn't need translating
-        t = ngettext("%s %d has %d thing", "%s %d has %d things", 5,
+        t = TP_(ngettext("%s %d has %d thing", "%s %d has %d things", 5),
             ("Andy", 3, 5))
         self.assertEquals(t.domain, "flumotion")
         self.assertEquals(t.singular, "%s %d has %d thing")
@@ -79,7 +82,7 @@ class TranslatableTest(unittest.TestCase):
 
 class TranslatorTest(unittest.TestCase):
     def testTranslateOne(self):
-        t = N_("%s can be translated", ("Andy", ))
+        t = T_(N_("%s can be translated"), ("Andy", ))
 
         translator = messages.Translator()
         localedir = os.path.join(configure.localedatadir, 'locale')
@@ -88,9 +91,8 @@ class TranslatorTest(unittest.TestCase):
         self.assertEquals(text, 'Andy kan vertaald worden')
         
     def testTranslateMessage(self):
-        messages.install('flumotion')
-        cmsg = messages.Error(N_("Something is really wrong. "))
-        t = N_("But does %s know what ?", ("Andy", ))
+        cmsg = messages.Error(T_(N_("Something is really wrong. ")))
+        t = T_(N_("But does %s know what ?"), ("Andy", ))
         cmsg.add(t)
         mmsg = jelly.unjelly(jelly.jelly(cmsg))
 
@@ -101,5 +103,36 @@ class TranslatorTest(unittest.TestCase):
         text = translator.translate(mmsg, lang=["nl_NL"])
         self.assertEquals(text, "Er is iets echt mis. Maar weet Andy wat ?")
 
+class ResultTest(unittest.TestCase):
+    def setUp(self):
+        self.translator = messages.Translator()
+        localedir = os.path.join(configure.localedatadir, 'locale')
+        self.translator.addLocaleDir('flumotion', localedir)
+
+    def testSerializeWithWarning(self):
+        wresult = messages.Result()
+        wresult.add(messages.Warning(T_(N_("Warning"))))
+        wresult.succeed("I did it")
+
+        mresult = jelly.unjelly(jelly.jelly(wresult))
+        self.failIf(mresult.failed)
+        self.assertEquals(mresult.value, "I did it")
+        m = mresult.messages[0]
+        self.assertEquals(m.level, messages.WARNING)
+        text = self.translator.translate(m, lang=["nl_NL",])
+        self.assertEquals(text, "Waarschuwing")
+
+    def testSerializeWithError(self):
+        wresult = messages.Result()
+        wresult.add(messages.Error(T_(N_("uh oh"))))
+
+        mresult = jelly.unjelly(jelly.jelly(wresult))
+        self.failUnless(mresult.failed)
+        self.assertEquals(mresult.value, None)
+        m = mresult.messages[0]
+        self.assertEquals(m.level, messages.ERROR)
+        text = self.translator.translate(m, lang=["nl_NL",])
+        self.assertEquals(text, "o jeetje")
+      
 if __name__ == '__main__':
     unittest.main()

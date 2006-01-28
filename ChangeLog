@@ -1,5 +1,29 @@
 2006-01-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/messages.py:
+	  - remove the .install() function, better not to mess with __builtin__
+	  - add N_ and ngettext functions, used for marking up strings
+	  - add .gettexter(domain) and .ngettexter(domain) methods, which return
+	    methods to create translatables as used by messages.
+	    Typically used as T_(N_(format), args)
+	    and TP_(ngettext(s, p, c), args)
+	    These changes are needed because we were wrongly doing
+	    N_(format, *args) which happened to work by accident but does
+	    not conform to gettext markup
+	  - make TranslatablePlural take a format triple instead
+	  - make Translator do a 'C' translation if no other found
+	  - make Message.add() check that it receives a Translatable
+	  - add a Result class that can hold a list of messages, a failed
+	    status and a resulting value.
+	* flumotion/test/test_common_messages.py:
+	  - update tests for all of this
+	* po/ca.po:
+	* po/nl.po:
+	* po/no.po:
+	  - updated translations
+
+2006-01-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_pb.py:
 	  various cleanups
 	  flush out errors
