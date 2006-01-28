@@ -32,8 +32,12 @@ from twisted.python import failure
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, planet, registry
 
+# make Result and Message proxyable
+from flumotion.common import messages
+
 # make ComponentState proxyable
 from flumotion.twisted import flavors
+
 from flumotion.common import componentui
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?
@@ -164,6 +168,8 @@ class AdminAvatar(base.ManagerAvatar):
         @param methodName: the method to call on the worker.
         """
         
+        self.debug('AdminAvatar.workerCallRemote(%r, %r)' % (
+            workerName, methodName))
         workerAvatar = self.vishnu.workerHeaven.getAvatar(workerName)
         
         # XXX: Maybe we need to a prefix, so we can limit what an admin
