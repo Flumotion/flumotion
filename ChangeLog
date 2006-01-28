@@ -1,5 +1,10 @@
 2006-01-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	  add some specific error types
+
+2006-01-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/messages.py:
 	  fold ngettexter into gettexter method by checking for str format
 	  make constructors of Translatable take *args, making the creation

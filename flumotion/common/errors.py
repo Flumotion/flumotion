@@ -59,7 +59,10 @@ class RemoteMethodError(pb.Error):
     "Generic remote method error"
 
 class RemoteRunError(RemoteMethodError):
-    "Error while running remote code"
+    "Error while running remote code, before getting a result"
+
+class RemoteRunFailure(RemoteMethodError):
+    "A remote method generated a failure result"
 
 class NoMethodError(RemoteMethodError):
     "The remote method does not exist"
@@ -137,6 +140,9 @@ class GstError(Exception):
 # serializable GStreamer errors
 class GStreamerError(pb.Error):
     "Generic GStreamer error"
+
+class GStreamerGstError(GStreamerError):
+    """GStreamer-generated error with the GError and debug string as args"""
 
 class StateChangeError(GStreamerError):
     "The state change failed"
