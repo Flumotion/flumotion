@@ -57,7 +57,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     I am an extended Perspective Broker client factory using generic
     keycards for login.
     """
-    logcategory = "FPBClientFactory"
+    logCategory = "FPBClientFactory"
 
     def login(self, keycard, client=None, *interfaces):
         """
@@ -96,14 +96,16 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     def _cbLoginCallback(self, result, root, client, interfaces, count):
         if count > 5:
             # too many recursions, server is h0rked
-            raise error.UnauthorizedLogin()
+            self.warn('Too many recursions, internal error.')
         self.debug("FPBClientFactory(): result %r" % result)
 
         if not result:
+            self.warn('No result, raising.')
             raise error.UnauthorizedLogin()
 
         if isinstance(result, pb.RemoteReference):
             # everything done, return reference
+            self.debug('Done, returning result %r' % result)
             return result
 
         # must be a keycard
