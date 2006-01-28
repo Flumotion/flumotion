@@ -190,10 +190,10 @@ class Message(pb.Copyable, pb.RemoteCopy):
         """
         self.level = level
         self.translatables = []
-        self.add(translatable)
         self.debug = debug
         self.id = id
         self.priority = priority
+        self.add(translatable)
 
     def __repr__(self):
         return '<Message %r at %r>' % (self.id, id(self.id))
