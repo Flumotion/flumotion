@@ -261,7 +261,8 @@ class WorkerMedium(medium.BaseMedium):
             raise errors.RemoteRunError(msg)
 
         try:
-            self.debug('calling %r(%r, %r)' % (proc, args, kwargs))
+            self.debug('calling %s.%s(%r, %r)' % (
+                module, function, args, kwargs))
             d = proc(*args, **kwargs)
         except Exception, e:
             # FIXME: make e.g. GStreamerError nicely serializable, without
@@ -270,7 +271,7 @@ class WorkerMedium(medium.BaseMedium):
                 module, function, args, kwargs,
                 log.getExceptionMessage(e)))
             self.debug(msg)
-            raise e
+            raise errors.RemoteRunError(log.getExceptionMessage(e))
  
         yield d
 

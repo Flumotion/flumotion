@@ -129,8 +129,12 @@ class WizardStep(GladeWidget, log.Loggable):
 
         def errback(failure):
             self.debug('workerRun errbacked, showing error msg')
-            debug = "Failure while running %s.%s:\n%s" % (
-                module, function, failure.getTraceback())
+            if failure.check(errors.RemoteRunError):
+                debug = failure.value
+            else:
+                debug = "Failure while running %s.%s:\n%s" % (
+                    module, function, failure.getTraceback())
+
             msg = messages.Error(T_(
                 N_("Internal error: could not run check code on worker.")),
                 debug=debug)

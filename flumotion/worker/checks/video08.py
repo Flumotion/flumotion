@@ -28,12 +28,12 @@ import gst.interfaces
 
 from twisted.internet import reactor, defer
 
-from flumotion.common import gstreamer, errors, log
+from flumotion.common import gstreamer, errors, log, messages
 from flumotion.twisted import defer as fdefer
-    
-def _(str):
-    return str
 
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
+    
 class CheckProcError(Exception):
     'Utility error for element checker procedures'
     data = None
@@ -84,8 +84,15 @@ def do_element_check(pipeline_str, element_name, check_proc,
             resolution.errback(errors.RemoteRunError(e))
 
     # if any error happens during the pipeline run, error out
-    def error_cb(pipeline, element, error, _, resolution):
-        resolution.errback(errors.GStreamerError(error.message))
+    def error_cb(pipeline, element, gerror, debug, resolution):
+        # refcounting bug in gst-python 0.8 makes gerror be invalid after
+        # leaving the cb. so, create a fake GError.  What a spectular hack.
+        class FakeGstGError: pass
+        e = FakeGstGError()
+        e.message = gerror.message
+        e.code = gerror.code
+        e.domain = gerror.domain
+        resolution.errback(errors.GStreamerGstError(e, debug))
 
     bin = gst.parse_launch(pipeline_str)
     resolution = fdefer.Resolution()
@@ -95,7 +102,7 @@ def do_element_check(pipeline_str, element_name, check_proc,
 
     return resolution.d
 
-def check1394():
+def check1394(id=None):
     """
     Probe the firewire device.
 
@@ -197,10 +204,11 @@ def check_ffmpegcolorspace_AYUV(id=None):
     e = gst.element_factory_make('ffmpegcolorspace')
     s = e.get_pad_template('sink').get_caps().to_string()
     if s.find('AYUV') > -1:
-        return result.succeed(True)
-
-    msg = messages.Error(T_(N_(
-        'The ffmpegcolorspace element is too old. '
-        'Please upgrade gst-plugins to version 0.8.5.')), id=id)
-    result.add(msg)
-    return result
+        result.succeed(True)
+    else:
+        msg = messages.Error(T_(N_(
+            'The ffmpegcolorspace element is too old. '
+            'Please upgrade gst-plugins to version 0.8.5.')), id=id)
+        result.add(msg)
+        
+    return defer.succeed(result)

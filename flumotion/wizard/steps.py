@@ -486,11 +486,14 @@ diagonal line in the image."""))
                 self.wizard.require_elements(self.worker, 'pngdec',
                     'alphacolor', 'videomixer', 'alpha')
             self.clear_msg('overlay-colorspace')
+        except errors.RemoteRunFailure, e:
+            self.wizard.block_next(True)
+            pass
         except Exception, e:
             self.wizard.block_next(True)
             msg = messages.Error(T_(N_(
                 "Could not check features of the 'ffmpegcolorspace' element.")),
-                debug=str(e), id='overlay-colorspace')
+                debug=repr(e), id='overlay-colorspace')
             self.add_msg(msg)
     worker_changed_08 = defer_generator_method(worker_changed_08)
 

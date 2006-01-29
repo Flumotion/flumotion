@@ -107,6 +107,7 @@ def errbackNotFoundResult(failure, result, id, device):
     """
     failure.trap(errors.GStreamerGstError)
     gerror, debug = failure.value.args
+
     if gerror.domain == "gst-resource-error-quark" and \
         gerror.code == int(gst.RESOURCE_ERROR_NOT_FOUND):
         m = messages.Warning(T_(
