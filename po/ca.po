@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-29 11:55+0100\n"
+"POT-Creation-Date: 2006-01-29 16:59+0100\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: cat\n"
@@ -270,32 +270,34 @@ msgstr "A l'atzar (neu de la televisió)"
 msgid "Totally black"
 msgstr "Totalment negre"
 
-#: flumotion/wizard/wizard.py:304
+#: flumotion/wizard/wizard.py:296
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
 msgstr ""
 
-#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:503
+#: flumotion/wizard/wizard.py:346 flumotion/wizard/steps.py:503
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
 msgstr[0] ""
 msgstr[1] ""
 
-#: flumotion/wizard/wizard.py:358
+#: flumotion/wizard/wizard.py:351
+#, fuzzy
 msgid ""
+"\n"
 "Please install the necessary GStreamer plug-ins that provide these elements "
 "and restart the worker."
 msgstr ""
 "Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
 "en herstart de worker."
 
-#: flumotion/wizard/wizard.py:360
+#: flumotion/wizard/wizard.py:354
 msgid ""
 "\n"
 "\n"
-"You will not be able to go forward."
+"You will not be able to go forward using this worker."
 msgstr ""
 
 #: flumotion/wizard/steps.py:84
@@ -306,25 +308,25 @@ msgstr "Si vostè desitja fluir video"
 msgid "If you want to stream audio"
 msgstr "Si vostè desitja fluir àudio "
 
-#: flumotion/wizard/steps.py:272
+#: flumotion/wizard/steps.py:270
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d quocient d'aspecte del píxel)"
 
-#: flumotion/wizard/steps.py:322
+#: flumotion/wizard/steps.py:320
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d quocient d'aspecte del píxel"
 
-#: flumotion/wizard/steps.py:343
+#: flumotion/wizard/steps.py:340
 msgid "Checking for Firewire device..."
 msgstr "Comprovant dispositiu del firewire..."
 
-#: flumotion/wizard/steps.py:403
+#: flumotion/wizard/steps.py:402
 msgid "Probing webcam, this can take a while..."
 msgstr ""
 
-#: flumotion/wizard/steps.py:483
+#: flumotion/wizard/steps.py:482
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
@@ -334,8 +336,9 @@ msgstr ""
 " Considera per favor augmentar-ho si el seu vídeo de la sortida té a\n"
 " línia diagonal en la imatge."
 
-#: flumotion/wizard/steps.py:493
-msgid "Could not check ffmpegcolorspace features."
+#: flumotion/wizard/steps.py:492
+#, fuzzy
+msgid "Could not check features of the 'ffmpegcolorspace' element."
 msgstr "No podia comprovar característiques del ffmpegcolorspace ."
 
 #: flumotion/wizard/steps.py:507
@@ -345,7 +348,7 @@ msgid ""
 "Click Next to proceed without overlay."
 msgstr ""
 
-#: flumotion/wizard/step.py:141
+#: flumotion/wizard/step.py:135
 msgid "Internal error: could not run check code on worker."
 msgstr ""
 
@@ -409,38 +412,38 @@ msgstr "<b>Consumició Del Client</b>"
 msgid "Log"
 msgstr "Log"
 
-#: flumotion/worker/checks/check.py:47
+#: flumotion/worker/checks/check.py:45
 #, python-format
 msgid "Could not open device '%s'.  Check permissions on the device."
 msgstr ""
 
-#: flumotion/worker/checks/check.py:50
+#: flumotion/worker/checks/check.py:48
 #, python-format
 msgid "Device '%s' is already in use."
 msgstr ""
 
-#: flumotion/worker/checks/check.py:53
+#: flumotion/worker/checks/check.py:51
 #, python-format
 msgid "Device '%s' did not accept the requested settings."
 msgstr ""
 
-#: flumotion/worker/checks/check.py:59 flumotion/worker/checks/check.py:63
+#: flumotion/worker/checks/check.py:57 flumotion/worker/checks/check.py:61
 msgid "Internal GStreamer error."
 msgstr ""
 
-#: flumotion/worker/checks/check.py:94
+#: flumotion/worker/checks/check.py:92
 #, fuzzy, python-format
 msgid "Could not probe device '%s'."
 msgstr ""
 "No podia recarregar el component:\n"
 "%s."
 
-#: flumotion/worker/checks/check.py:111
+#: flumotion/worker/checks/check.py:109
 #, python-format
 msgid "No device found on %s."
 msgstr ""
 
-#: flumotion/worker/checks/video08.py:218
+#: flumotion/worker/checks/video08.py:215
 msgid "device node /dev/raw1394 does not exist"
 msgstr "el node /dev/raw1394 del dispositiu no existeix "
 

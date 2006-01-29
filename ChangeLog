@@ -1,5 +1,18 @@
 2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/checks/check.py:
+	  add an OPEN_READ message
+	* flumotion/worker/checks/video.py:
+	* flumotion/worker/checks/video010.py:
+	* flumotion/worker/checks/video08.py:
+	  move all but the 1394 check into the video.py class
+	* po/ca.po:
+	* po/nl.po:
+	* po/no.po:
+	  update for translations
+
+2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/wizard_soundcard.glade:
 	  add a handler for combobox_channels changed
 	* flumotion/admin/admin.py:

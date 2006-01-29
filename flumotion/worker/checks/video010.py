@@ -126,95 +126,6 @@ def do_element_check(pipeline_str, element_name, check_proc):
 
     return resolution.d
 
-def checkTVCard(device, id='check-tvcard'):
-    """
-    Probe the given device node as a TV card.
-    Return a deferred firing a human-readable device name, a list of channel
-    names (Tuner/Composite/...), and a list of norms (PAL/NTSC/SECAM/...).
-    
-    @rtype: L{twisted.internet.defer.Deferred}
-    """
-    result = messages.Result()
-
-    def get_name_channels_norms(element):
-        deviceName = element.get_property('device-name')
-        channels = [channel.label for channel in element.list_channels()]
-        norms = [norm.label for norm in element.list_norms()]
-        return (deviceName, channels, norms)
-
-    pipeline = 'v4lsrc name=source device=%s ! fakesink' % device
-    d = do_element_check(pipeline, 'source', get_name_channels_norms)
-
-    d.addCallback(check.callbackResult, result)
-    d.addErrback(check.errbackNotFoundResult, result, id, device)
-    d.addErrback(check.errbackResult, result, id, device)
-
-    return d
-
-def checkWebcam(device, id):
-    """
-    Probe the given device node as a webcam.
-
-    The result is either:
-     - succesful, with a None value: no device found
-     - succesful, with a string value: human-readable device name
-     - failed
-    
-    @rtype: L{flumotion.common.messages.Result}
-    """
-    result = messages.Result()
-
-    # FIXME: add code that checks permissions and ownership on errors,
-    # so that we can offer helpful hints on what to do.
-    def get_device_name(element):
-        return element.get_property('device-name')
-                
-    autoprobe = "autoprobe-fps=false"
-    # FIXME: with autoprobe-fps turned off, pwc's don't work anymore
-    autoprobe = ""
-
-    pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,
-        autoprobe)
-    d = do_element_check(pipeline, 'source', get_device_name)
-
-    d.addCallback(check.callbackResult, result)
-    d.addErrback(check.errbackNotFoundResult, result, id, device)
-    d.addErrback(check.errbackResult, result, id, device)
-
-    return d
-
-def checkMixerTracks(source_factory, device, channels, id=None):
-    """
-    Probe the given GStreamer element factory with the given device for
-    audio mixer tracks.
-    Return a deferred firing a human-readable device name and a list of mixer
-    track labels.
-    
-    @rtype: L{twisted.internet.defer.Deferred}
-    """
-    result = messages.Result()
-
-    def get_tracks(element):
-        # Only mixers have list_tracks. Why is this a perm error? FIXME in 0.9?
-        if not element.implements_interface(gst.interfaces.Mixer):
-            msg = 'Cannot get mixer tracks from the device.  '\
-                  'Check permissions on the mixer device.'
-            log.debug('checks', "returning failure: %s" % msg)
-            raise CheckProcError(msg)
-
-        return (element.get_property('device-name'),
-                [track.label for track in element.list_tracks()])
-                
-    pipeline = '%s name=source device=%s ! audio/x-raw-int,channels=%d ! fakesink' % (source_factory, device, channels)
-    d = do_element_check(pipeline, 'source', get_tracks)
-
-    d.addCallback(check.callbackResult, result)
-    d.addErrback(check.errbackNotFoundResult, result, id, device)
-    d.addErrback(check.errbackResult, result, id, device)
-
-    return d
-
-
 def check1394(id):
     """
     Probe the firewire device.
@@ -251,7 +162,7 @@ def check1394(id):
         m = messages.Error(T_(N_("Device node /dev/raw1394 does not exist.")),
             id=id)
         result.add(m)
-        #return defer.succeed(result)
+        return defer.succeed(result)
 
     pipeline = 'dv1394src name=source ! dvdemux name=demux ! fakesink'
     d = do_element_check(pipeline, 'demux', do_check)

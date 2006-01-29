@@ -95,92 +95,32 @@ def do_element_check(pipeline_str, element_name, check_proc,
 
     return resolution.d
 
-def checkTVCard(device):
-    """
-    Probe the given device node as a TV card.
-    Return a deferred firing a human-readable device name, a list of channel
-    names (Tuner/Composite/...), and a list of norms (PAL/NTSC/SECAM/...).
-    
-    @rtype: L{twisted.internet.defer.Deferred}
-    """
-    def get_name_channels_norms(element):
-        deviceName = element.get_property('device-name')
-        channels = [channel.label for channel in element.list_channels()]
-        norms = [norm.label for norm in element.list_norms()]
-        return (deviceName, channels, norms)
-
-    pipeline = 'v4lsrc name=source device=%s ! fakesink' % device
-    return do_element_check(pipeline, 'source', get_name_channels_norms)
-
-def checkWebcam(device):
-    """
-    Probe the given device node as a webcam.
-    Return a deferred firing a human-readable device name.
-    
-    @rtype: L{twisted.internet.defer.Deferred}
-    """
-    def get_device_name(element):
-        return element.get_property('device-name')
-                
-    autoprobe = "autoprobe=false"
-    # added in gst-plugins 0.8.6
-    if gstreamer.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
-        autoprobe += " autoprobe-fps=false"
-
-    pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,
-        autoprobe)
-    return do_element_check(pipeline, 'source', get_device_name)
-
-def checkMixerTracks(source_factory, device):
-    """
-    Probe the given GStreamer element factory with the given device for
-    mixer tracks.
-    Return a deferred firing a human-readable device name and a list of mixer
-    track labels.
-    
-    @rtype: L{twisted.internet.defer.Deferred}
-    """
-    def get_tracks(element):
-        # Only mixers have list_tracks. Why is this a perm error? FIXME in 0.9?
-        if not element.implements_interface(gst.interfaces.Mixer):
-            msg = 'Cannot get mixer tracks from the device.  '\
-                  'Check permissions on the mixer device.'
-            log.debug('checks', "returning failure: %s" % msg)
-            raise CheckProcError(msg)
-
-        try:
-            return (element.get_property('device-name'),
-                    [track.label for track in element.list_tracks()])
-        except AttributeError:
-            # list_tracks was added in gst-python 0.7.94
-            v = gst.pygst_version
-            msg = 'Your version of gstreamer-python is %d.%d.%d. ' % v\
-                  + 'Please upgrade gstreamer-python to 0.7.94 or higher.'
-            log.debug('checks', "returning failure: %s" % msg)
-            raise CheckProcError(msg)
-                
-    pipeline = '%s name=source device=%s ! fakesink' % (source_factory, device)
-    return do_element_check(pipeline, 'source', get_tracks)
-
 def check1394():
     """
     Probe the firewire device.
 
-    Return a deferred firing a dictionary with width, height,
-    and a pixel aspect ratio pair.
+    Return a deferred firing a result.
+
+    The result is either:
+     - succesful, with a None value: no device found
+     - succesful, with a dictionary of width, height, and par as a num/den pair
+     - failed
     
-    @rtype: L{twisted.internet.defer.Deferred}
+    @rtype: L{twisted.internet.defer.Deferred} of 
+            L{flumotion.common.messages.Result}
     """
+    result = messages.Result()
+ 
     def iterate(bin, resolution):
         pad = bin.get_by_name('dec').get_pad('video')
 
         if not bin.iterate():
-            resolution.errback('Failed to iterate bin')
-            return
+            raise errors.GStreamerError('Failed to iterate bin')
         elif pad.get_negotiated_caps() == None:
             reactor.callLater(0, iterate, bin, resolution)
             return
 
+        # we have caps now, examine them
         caps = pad.get_negotiated_caps()
         s = caps.get_structure(0)
         w = s.get_int('width')
@@ -211,21 +151,56 @@ def check1394():
 
     # first check if the obvious device node exists
     if not os.path.exists('/dev/raw1394'):
-        return defer.fail(errors.DeviceNotFoundError(
-            _('device node /dev/raw1394 does not exist')))
+        m = messages.Error(T_(N_("Device node /dev/raw1394 does not exist.")),
+            id=id)
+        result.add(m)
+        return defer.succeed(result)
 
     pipeline = 'dv1394src name=source ! dvdec name=dec ! fakesink'
-    return do_element_check(pipeline, 'source', do_check,
+    d = do_element_check(pipeline, 'source', do_check,
                             state=gst.STATE_PLAYING)
 
-def check_ffmpegcolorspace_AYUV():
+    def errbackResult(failure):
+        log.debug('check', 'returning failed Result, %r' % failure)
+        m = None
+        if failure.check(errors.GStreamerGstError):
+            gerror, debug = failure.value.args
+            log.debug('check', 'GStreamer GError: %s (debug: %s)' % (
+                gerror.message, debug))
+            if gerror.domain == "gst-resource-error-quark":
+                if gerror.code == int(gst.RESOURCE_ERROR_NOT_FOUND):
+                    m = messages.Error(T_(
+                        N_("No Firewire device found.")))
+
+            if not m:
+                m = check.handleGStreamerDeviceError(failure, 'Firewire')
+
+        if not m:
+            m = messages.Error(T_(N_("Could not probe Firewire device.")),
+                debug=check.debugFailure(failure))
+
+        m.id = id
+        result.add(m)
+        return result
+    d.addCallback(check.callbackResult, result)
+    d.addErrback(errbackResult)
+
+    return d
+
+def check_ffmpegcolorspace_AYUV(id=None):
     """
     Check if the ffmpegcolorspace element converts AYUV.
     This was added in gst-plugins 0.8.5
     """
+    result = messages.Result()
+
     e = gst.element_factory_make('ffmpegcolorspace')
     s = e.get_pad_template('sink').get_caps().to_string()
     if s.find('AYUV') > -1:
-        return True
+        return result.succeed(True)
 
-    return False
+    msg = messages.Error(T_(N_(
+        'The ffmpegcolorspace element is too old. '
+        'Please upgrade gst-plugins to version 0.8.5.')), id=id)
+    result.add(msg)
+    return result

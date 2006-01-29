@@ -40,7 +40,10 @@ def handleGStreamerDeviceError(failure, device):
                 gerror.message, gerror.domain, gerror.code, debug))
         
         if gerror.domain == "gst-resource-error-quark":
-            if gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ_WRITE):
+            if gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ):
+                m = messages.Error(T_(
+                    N_("Could not open device '%s' for reading.  Check permissions on the device."), device))
+            elif gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ_WRITE):
                 m = messages.Error(T_(
                     N_("Could not open device '%s'.  Check permissions on the device."), device))
             elif gerror.code == int(gst.RESOURCE_ERROR_BUSY):
@@ -60,6 +63,7 @@ def handleGStreamerDeviceError(failure, device):
     elif failure.check(errors.GStreamerError):
             m = messages.Error(T_(N_("Internal GStreamer error.")),
                 debug=debugFailure(failure))
+    log.debug('handleGStreamerError: returning %r' % m)
     return m
 
 def debugFailure(failure):
