@@ -1,5 +1,11 @@
 2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/wizard/wizard.py:
+	  Make next button respond to mouse clicks after switching
+	  sensitivity.  Fixes #314
+
+2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* data/glade/admin.glade:
 	  make the messages_view a custom widget, with a create function
 	* flumotion/admin/gtk/parts.py:
