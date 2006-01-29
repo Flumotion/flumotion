@@ -80,6 +80,19 @@ def element_factory_has_property(element_factory, property_name):
             return True
     return False
   
+def element_factory_exists(name):
+    """
+    Check if the given element factory name exists.
+
+    @rtype: boolean
+    """
+    registry = gst.registry_get_default()
+    factory = registry.find_feature(name, gst.TYPE_ELEMENT_FACTORY)
+    if factory:
+        return True
+
+    return False
+
 def get_plugin_version(plugin_name):
     """
     Find the version of the given plugin.

@@ -144,6 +144,9 @@ class GStreamerError(pb.Error):
 class GStreamerGstError(GStreamerError):
     """GStreamer-generated error with the GError and debug string as args"""
 
+class MissingElementError(GStreamerError):
+    "A needed element is missing"
+
 class StateChangeError(GStreamerError):
     "The state change failed"
 
