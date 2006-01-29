@@ -49,9 +49,12 @@ def gettexter(domain):
     format args,
     and creates a L{Translatable} from it.
 
-    Example:
+    Example::
+
         T_ = messages.gettexter('flumotion')
         t = T_(N_("Could not find '%s'."), file)
+
+    @param domain: the gettext domain to create translatables for.
     """
     def create(format, *args):
         if isinstance(format, str):
@@ -67,12 +70,13 @@ class Translatable(pb.Copyable, pb.RemoteCopy):
 class TranslatableSingular(Translatable):
     """
     I represent a translatable gettext msg in the singular form.
-
-    @param domain: the text domain for translations of this message
-    @param format: a format string
-    @param args:   any arguments to the format string
     """
     def __init__(self, domain, format, *args):
+        """
+        @param domain: the text domain for translations of this message
+        @param format: a format string
+        @param args:   any arguments to the format string
+        """
         self.domain = domain
         self.format = format
         self.args = args
@@ -81,12 +85,13 @@ pb.setUnjellyableForClass(TranslatableSingular, TranslatableSingular)
 class TranslatablePlural(Translatable):
     """
     I represent a translatable gettext msg in the plural form.
-
-    @param domain: the text domain for translations of this message
-    @param format: a (singular, plural, count) tuple
-    @param args:   any arguments to the format string
     """
     def __init__(self, domain, format, *args):
+        """
+        @param domain: the text domain for translations of this message
+        @param format: a (singular, plural, count) tuple
+        @param args:   any arguments to the format string
+        """
         singular, plural, count = format
         self.domain = domain
         self.singular = singular
