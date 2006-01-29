@@ -34,7 +34,7 @@ from twisted.spread import pb
 from twisted.cred import portal
 
 from flumotion.common import bundle, config, errors, interfaces, log, registry
-from flumotion.common import planet, common, dag
+from flumotion.common import planet, common, dag, messages
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base
@@ -42,6 +42,8 @@ from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 from flumotion.twisted.defer import defer_generator_method
 
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 def find(list, value, proc=lambda x: x):
     return list[[proc(x) for x in list].index(value)]
@@ -536,12 +538,19 @@ class Vishnu(log.Loggable):
         assert result == m.id, "received id %s is not the expected id %s" % (
             result, m.id)
 
-    def _createErrback(self, error, state):
+    def _createErrback(self, failure, state):
         # FIXME: make ConfigError copyable so we can .check() it here
         # and print a nicer warning
         self.warning('failed to create component %s: %s'
-                  % (state.get('name'), error.getErrorMessage()))
+                  % (state.get('name'), failure.getErrorMessage()))
+
+        message = messages.Error(T_(
+            N_("The component could not be started.")),
+                debug=failure.getErrorMessage())
+
         state.set('mood', moods.sad.value)
+        state.append('messages', message)
+
         return None
 
     def workerDetached(self, workerAvatar):

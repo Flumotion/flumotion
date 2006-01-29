@@ -116,6 +116,7 @@ moods.can_stop = staticmethod(lambda m: m != moods.sleeping and m != moods.lost)
 moods.can_start = staticmethod(lambda m: m == moods.sleeping)
 
 _jobStateKeys = ['mood', 'ip', 'pid', 'workerName', 'message', 'cpu']
+_jobStateListKeys = ['messages', ]
 
 class ManagerComponentState(flavors.StateCacheable):
 
@@ -134,6 +135,8 @@ class ManagerComponentState(flavors.StateCacheable):
         # proxied from job state or combined with our state (mood)
         for k in _jobStateKeys:
             self.addKey(k)
+        for k in _jobStateListKeys:
+            self.addListKey(k)
         self._jobState = None
 
     def __repr__(self):
@@ -163,11 +166,11 @@ class ManagerComponentState(flavors.StateCacheable):
     # only proxy keys we want proxied; eaterNames and feederNames are ignored
     # for example
     def stateAppend(self, state, key, value):
-        if key in _jobStateKeys:
+        if key in _jobStateListKeys:
             self.append(key, value)
 
     def stateRemove(self, state, key, value):
-        if key in _jobStateKeys:
+        if key in _jobStateListKeys:
             self.remove(key, value)
 
     def stateSet(self, state, key, value):
@@ -186,6 +189,8 @@ class WorkerJobState(flavors.StateCacheable):
         flavors.StateCacheable.__init__(self)
         for k in _jobStateKeys:
             self.addKey(k)
+        for k in _jobStateListKeys:
+            self.addListKey(k)
 
 class ManagerJobState(flavors.StateRemoteCache):
     pass

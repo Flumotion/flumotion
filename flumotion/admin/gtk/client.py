@@ -35,7 +35,7 @@ from twisted.python import rebuild
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin import connections
-from flumotion.admin.gtk import dialogs, parts
+from flumotion.admin.gtk import dialogs, parts, message
 from flumotion.admin.gtk import connections as gtkconnections
 from flumotion.configure import configure
 from flumotion.common import errors, log, worker, planet, common, compat
@@ -133,11 +133,13 @@ class Window(log.Loggable, gobject.GObject):
             i = gtk.Image()
             i.set_from_stock('flumotion-'+name, size)
             proc(i)
+            i.show()
         
         def make_menu_proc(m): # $%^& pychecker!
             return lambda f: m.set_property('image', f)
         def menu_set_icon(m, name):
             set_icon(make_menu_proc(m), gtk.ICON_SIZE_MENU, name)
+            m.show()
         
         def tool_set_icon(m, name):
             set_icon(m.set_icon_widget, gtk.ICON_SIZE_SMALL_TOOLBAR, name)
@@ -168,6 +170,9 @@ class Window(log.Loggable, gobject.GObject):
         self.components_view.connect('notify::can-stop-any',
                                      self.start_stop_notify_cb)
         self.start_stop_notify_cb()
+
+        self._messages_view = widgets['messages_view']
+        self._messages_view.hide()
 
         return window
 
@@ -492,6 +497,10 @@ class Window(log.Loggable, gobject.GObject):
             self.statusbar.set('main', value)
         elif key == 'mood':
             self._set_stop_start_component_sensitive()
+            current = self.components_view.get_selected_name()
+            if value == moods.sleeping.value:
+                if state.get('name') == current:
+                    self._messages_view.clear()
 
     def stateAppend(self, state, key, value):
         if isinstance(state, worker.AdminWorkerHeavenState):
@@ -516,6 +525,13 @@ class Window(log.Loggable, gobject.GObject):
                     return
                 self.debug('default flow started')
                 value.addListener(self)
+        elif isinstance(state, planet.AdminComponentState):
+            name = state.get('name')
+            self.debug('stateAppend on component state of %s' % name)
+            if key == 'messages':
+                current = self.components_view.get_selected_name()
+                if name == current:
+                    self._messages_view.add_message(value)
         else:
             self.warning('stateAppend on unknown object %r' % state)
 
@@ -681,9 +697,23 @@ class Window(log.Loggable, gobject.GObject):
         self._set_stop_start_component_sensitive()
 
         if not state:
+            self.debug('no state, returning')
             return
 
         name = state.get('name')
+        mood = state.get('mood')
+        messages = state.get('messages')
+        self._messages_view.clear()
+        if messages:
+            for m in messages:
+                self.debug('have message %r' % m)
+                self._messages_view.add_message(m)
+
+        if mood == moods.sad.value:
+            self.debug('component %s is sad' % name)
+            self.statusbar.set('main',
+                _("Component %s is sad") % name)
+            return
 
         def gotEntryCallback(result):
             entryPath, filename, methodName = result
@@ -1041,8 +1071,7 @@ class Window(log.Loggable, gobject.GObject):
 
     def show(self):
         # XXX: Use show()
-        self.window.show_all()
-        
+        self.window.show()
 
 compat.type_register(Window)
 

@@ -2,6 +2,7 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
+<requires lib="gnome"/>
 
 <widget class="GtkWindow" id="main_window">
   <property name="width_request">640</property>
@@ -41,7 +42,7 @@
 		    <widget class="GtkImageMenuItem" id="file_open">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-open</property>
-		      <property name="use_stock">True</property>
+		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="file_open_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 		    </widget>
 		  </child>
@@ -80,7 +81,7 @@
 		    <widget class="GtkImageMenuItem" id="file_quit">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-quit</property>
-		      <property name="use_stock">True</property>
+		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="file_quit_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 		    </widget>
 		  </child>
@@ -293,7 +294,7 @@
 		    <widget class="GtkImageMenuItem" id="help_about">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-about</property>
-		      <property name="use_stock">True</property>
+		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="help_about_cb" last_modification_time="Wed, 01 Sep 2004 16:01:05 GMT"/>
 		    </widget>
 		  </child>
@@ -484,6 +485,34 @@
 	<packing>
 	  <property name="padding">0</property>
 	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkVBox" id="message_view">
+	  <property name="visible">True</property>
+	  <property name="homogeneous">False</property>
+	  <property name="spacing">0</property>
+
+	  <child>
+	    <widget class="Custom" id="messages_view">
+	      <property name="height_request">80</property>
+	      <property name="creation_function">flumotion.admin.gtk.message.MessagesView()</property>
+	      <property name="int1">0</property>
+	      <property name="int2">0</property>
+	      <property name="last_modification_time">Sun, 29 Jan 2006 19:57:06 GMT</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
+	    </packing>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
 	  <property name="fill">True</property>
 	</packing>
       </child>

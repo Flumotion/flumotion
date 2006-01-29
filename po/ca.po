@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-29 16:59+0100\n"
+"POT-Creation-Date: 2006-01-29 20:09+0100\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: cat\n"
@@ -18,93 +18,98 @@ msgstr ""
 msgid "Not connected"
 msgstr "No conectat"
 
-#: flumotion/admin/gtk/client.py:178
+#: flumotion/admin/gtk/client.py:182
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Connectant amb %s:%s"
 
-#: flumotion/admin/gtk/client.py:263 flumotion/admin/gtk/client.py:327
+#: flumotion/admin/gtk/client.py:267 flumotion/admin/gtk/client.py:331
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Carregant UI per %s ..."
 
-#: flumotion/admin/gtk/client.py:345
+#: flumotion/admin/gtk/client.py:349
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Carregant tab %s per %s ..."
 
-#: flumotion/admin/gtk/client.py:364
+#: flumotion/admin/gtk/client.py:368
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s no té UI encara"
 
-#: flumotion/admin/gtk/client.py:558
+#: flumotion/admin/gtk/client.py:573
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administració de Flumotion"
 
-#: flumotion/admin/gtk/client.py:574
+#: flumotion/admin/gtk/client.py:589
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Connexió perduda a l'encarregat, tornant a connectar ..."
 
-#: flumotion/admin/gtk/client.py:594
+#: flumotion/admin/gtk/client.py:609
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Connexió a l'encarregat en %s va ser rebutjada."
 
-#: flumotion/admin/gtk/client.py:596
+#: flumotion/admin/gtk/client.py:611
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Connexió en %s va ser rebutjada "
 
-#: flumotion/admin/gtk/client.py:609
+#: flumotion/admin/gtk/client.py:624
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Connexió a l'encarregat en %s va fallar (%s)."
 
-#: flumotion/admin/gtk/client.py:691
+#: flumotion/admin/gtk/client.py:714
+#, fuzzy, python-format
+msgid "Component %s is sad"
+msgstr "Component %s encara està dormint"
+
+#: flumotion/admin/gtk/client.py:720
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Demostrar UI per a %s"
 
-#: flumotion/admin/gtk/client.py:711
+#: flumotion/admin/gtk/client.py:740
 #, python-format
 msgid "No UI for component %s"
 msgstr "Cap UI per al component %s"
 
-#: flumotion/admin/gtk/client.py:725
+#: flumotion/admin/gtk/client.py:754
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Component %s encara està dormint"
 
-#: flumotion/admin/gtk/client.py:735
+#: flumotion/admin/gtk/client.py:764
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Petició de UI per a %s ..."
 
-#: flumotion/admin/gtk/client.py:781
+#: flumotion/admin/gtk/client.py:810
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "El mag no pot funcionar perquè no s'entra a ningun treballador."
 
-#: flumotion/admin/gtk/client.py:822
+#: flumotion/admin/gtk/client.py:851
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Codi de component recarregant per a %s"
 
-#: flumotion/admin/gtk/client.py:853
+#: flumotion/admin/gtk/client.py:882
 msgid "No component selected."
 msgstr "Cap component seleccionat."
 
-#: flumotion/admin/gtk/client.py:870
+#: flumotion/admin/gtk/client.py:899
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "Fallat de %s al component de %s"
 
-#: flumotion/admin/gtk/client.py:897
+#: flumotion/admin/gtk/client.py:926
 msgid "Import Configuration..."
 msgstr "Importar la configuració..."
 
-#: flumotion/admin/gtk/client.py:910
+#: flumotion/admin/gtk/client.py:939
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -112,11 +117,11 @@ msgstr ""
 "L'arxiu ja existeix.\n"
 "sobreescriu ja? "
 
-#: flumotion/admin/gtk/client.py:932
+#: flumotion/admin/gtk/client.py:961
 msgid "Export Configuration..."
 msgstr "Exportar la configuració..."
 
-#: flumotion/admin/gtk/client.py:976
+#: flumotion/admin/gtk/client.py:1005
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -125,24 +130,24 @@ msgstr ""
 "No podia recarregar el component:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:986
+#: flumotion/admin/gtk/client.py:1015
 msgid "Reloading ..."
 msgstr "Recarregant..."
 
-#: flumotion/admin/gtk/client.py:987
+#: flumotion/admin/gtk/client.py:1016
 msgid "Reloading client code"
 msgstr "Recarregant el codi del client"
 
-#: flumotion/admin/gtk/client.py:989
+#: flumotion/admin/gtk/client.py:1018
 #, python-format
 msgid "Reloading %s code"
 msgstr "Recarregant %s del codi"
 
-#: flumotion/admin/gtk/client.py:1002
+#: flumotion/admin/gtk/client.py:1031
 msgid "About Flumotion"
 msgstr "Sobre Flumotion"
 
-#: flumotion/admin/gtk/client.py:1021
+#: flumotion/admin/gtk/client.py:1050
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -152,7 +157,7 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1026
+#: flumotion/admin/gtk/client.py:1055
 msgid "Authors"
 msgstr "Autors"
 
@@ -214,49 +219,41 @@ msgstr "Connexions recents"
 msgid "Please choose a connection from the box below."
 msgstr "Trii per favor una connexió de la caixa baix."
 
-#: flumotion/admin/gtk/parts.py:170
+#: flumotion/admin/gtk/parts.py:171
 msgid "Mood"
 msgstr "Humor"
 
-#: flumotion/admin/gtk/parts.py:175 flumotion/admin/gtk/parts.py:414
+#: flumotion/admin/gtk/parts.py:176 flumotion/admin/gtk/parts.py:427
 msgid "Component"
 msgstr "Component"
 
-#: flumotion/admin/gtk/parts.py:180
+#: flumotion/admin/gtk/parts.py:181
 msgid "Worker"
 msgstr "Treballador"
 
-#: flumotion/admin/gtk/parts.py:365
+#: flumotion/admin/gtk/parts.py:370
 msgid "[any worker]"
 msgstr ""
 
-#: flumotion/admin/gtk/parts.py:416
+#: flumotion/admin/gtk/parts.py:429
 msgid "_Restart"
 msgstr "_Recomençar"
 
-#: flumotion/admin/gtk/parts.py:420
+#: flumotion/admin/gtk/parts.py:433
 msgid "_Start"
 msgstr "_Començar"
 
-#: flumotion/admin/gtk/parts.py:427
+#: flumotion/admin/gtk/parts.py:440
 msgid "St_op"
 msgstr "Pa_rar"
 
-#: flumotion/admin/gtk/parts.py:435
+#: flumotion/admin/gtk/parts.py:448
 msgid "Reload _code"
 msgstr "Recarregar _el codi"
 
-#: flumotion/admin/gtk/parts.py:439
+#: flumotion/admin/gtk/parts.py:452
 msgid "_Modify element property ..."
 msgstr "_Modificar la característica de l'element ..."
-
-#: flumotion/component/producers/videotest/admin_gtk.py:34
-msgid "Pattern:"
-msgstr "Patró:"
-
-#: flumotion/component/producers/videotest/admin_gtk.py:86
-msgid "Pattern"
-msgstr "Patró"
 
 #: flumotion/wizard/enums.py:83
 msgid "SMPTE Color bars"
@@ -276,7 +273,7 @@ msgid ""
 "Make sure your Flumotion network is running properly and try again."
 msgstr ""
 
-#: flumotion/wizard/wizard.py:346 flumotion/wizard/steps.py:503
+#: flumotion/wizard/wizard.py:346 flumotion/wizard/steps.py:506
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
@@ -336,20 +333,29 @@ msgstr ""
 " Considera per favor augmentar-ho si el seu vídeo de la sortida té a\n"
 " línia diagonal en la imatge."
 
-#: flumotion/wizard/steps.py:492
+#: flumotion/wizard/steps.py:495
 #, fuzzy
 msgid "Could not check features of the 'ffmpegcolorspace' element."
 msgstr "No podia comprovar característiques del ffmpegcolorspace ."
 
-#: flumotion/wizard/steps.py:507
+#: flumotion/wizard/steps.py:510
 msgid ""
 "\n"
 "\n"
 "Click Next to proceed without overlay."
 msgstr ""
 
-#: flumotion/wizard/step.py:135
+#: flumotion/wizard/step.py:139
 msgid "Internal error: could not run check code on worker."
+msgstr ""
+
+#: flumotion/component/feedcomponent.py:143
+msgid "GStreamer error: could not parse component pipeline."
+msgstr ""
+
+#: flumotion/component/consumers/httpstreamer/http.py:448
+#, python-format
+msgid "Network error: TCP port %d is not available."
 msgstr ""
 
 #: flumotion/component/consumers/httpstreamer/http.glade:8
@@ -412,55 +418,78 @@ msgstr "<b>Consumició Del Client</b>"
 msgid "Log"
 msgstr "Log"
 
+#: flumotion/component/producers/videotest/admin_gtk.py:34
+msgid "Pattern:"
+msgstr "Patró:"
+
+#: flumotion/component/producers/videotest/admin_gtk.py:86
+msgid "Pattern"
+msgstr "Patró"
+
+#: flumotion/manager/manager.py:548
+msgid "The component could not be started."
+msgstr ""
+
 #: flumotion/worker/checks/check.py:45
 #, python-format
-msgid "Could not open device '%s'.  Check permissions on the device."
+msgid ""
+"Could not open device '%s' for reading.  Check permissions on the device."
 msgstr ""
 
 #: flumotion/worker/checks/check.py:48
 #, python-format
-msgid "Device '%s' is already in use."
+msgid "Could not open device '%s'.  Check permissions on the device."
 msgstr ""
 
 #: flumotion/worker/checks/check.py:51
 #, python-format
+msgid "Device '%s' is already in use."
+msgstr ""
+
+#: flumotion/worker/checks/check.py:54
+#, python-format
 msgid "Device '%s' did not accept the requested settings."
 msgstr ""
 
-#: flumotion/worker/checks/check.py:57 flumotion/worker/checks/check.py:61
+#: flumotion/worker/checks/check.py:60 flumotion/worker/checks/check.py:64
 msgid "Internal GStreamer error."
 msgstr ""
 
-#: flumotion/worker/checks/check.py:92
+#: flumotion/worker/checks/check.py:96
 #, fuzzy, python-format
 msgid "Could not probe device '%s'."
 msgstr ""
 "No podia recarregar el component:\n"
 "%s."
 
-#: flumotion/worker/checks/check.py:109
+#: flumotion/worker/checks/check.py:114
 #, python-format
 msgid "No device found on %s."
 msgstr ""
 
-#: flumotion/worker/checks/video08.py:215
-msgid "device node /dev/raw1394 does not exist"
-msgstr "el node /dev/raw1394 del dispositiu no existeix "
-
-#: flumotion/worker/checks/video010.py:251
+#: flumotion/worker/checks/video08.py:156
+#: flumotion/worker/checks/video010.py:155
 #, fuzzy
 msgid "Device node /dev/raw1394 does not exist."
 msgstr "el node /dev/raw1394 del dispositiu no existeix "
 
-#: flumotion/worker/checks/video010.py:269
+#: flumotion/worker/checks/video08.py:175
+#: flumotion/worker/checks/video010.py:173
 #, fuzzy
 msgid "No Firewire device found."
 msgstr "Cap dispositiu del firewire va detectar."
 
-#: flumotion/worker/checks/video010.py:275
+#: flumotion/worker/checks/video08.py:181
+#: flumotion/worker/checks/video010.py:179
 #, fuzzy
 msgid "Could not probe Firewire device."
 msgstr "Comprovant dispositiu del firewire..."
+
+#: flumotion/worker/checks/video08.py:205
+msgid ""
+"The ffmpegcolorspace element is too old. Please upgrade gst-plugins to "
+"version 0.8.5."
+msgstr ""
 
 #: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:91
 msgid "I am a translatable string"
@@ -519,71 +548,71 @@ msgstr ""
 msgid "uh oh"
 msgstr ""
 
-#: data/glade/admin.glade:9
+#: data/glade/admin.glade:10
 msgid "Flumotion Administration"
 msgstr "Administració De Flumotion"
 
-#: data/glade/admin.glade:34
+#: data/glade/admin.glade:36
 msgid "_Connection"
 msgstr "_Connexió"
 
-#: data/glade/admin.glade:58
+#: data/glade/admin.glade:60
 msgid "_Import Configuration..."
 msgstr "_Importar la configuració...."
 
-#: data/glade/admin.glade:67
+#: data/glade/admin.glade:69
 msgid "_Export Configuration..."
 msgstr "_Exportar la configuració..."
 
-#: data/glade/admin.glade:95
+#: data/glade/admin.glade:97
 msgid "_Manage"
 msgstr "_Manejar"
 
-#: data/glade/admin.glade:104
+#: data/glade/admin.glade:106
 msgid "S_tart Component"
 msgstr "Co_mençar el component"
 
-#: data/glade/admin.glade:125
+#: data/glade/admin.glade:127
 msgid "St_op Component"
 msgstr "Pa_rar el component"
 
-#: data/glade/admin.glade:152
+#: data/glade/admin.glade:154
 msgid "Start _All"
 msgstr "Començar _Tots"
 
-#: data/glade/admin.glade:161
+#: data/glade/admin.glade:163
 msgid "Stop A_ll"
 msgstr "Parar To_ts"
 
-#: data/glade/admin.glade:170
+#: data/glade/admin.glade:172
 msgid "_Clear All"
 msgstr "_Desperar Tots"
 
-#: data/glade/admin.glade:197
+#: data/glade/admin.glade:199
 msgid "Run _Wizard"
 msgstr "Funcionar _A Mag"
 
-#: data/glade/admin.glade:222
+#: data/glade/admin.glade:224
 msgid "_Debug"
 msgstr "_Eliminar errors"
 
-#: data/glade/admin.glade:231
+#: data/glade/admin.glade:233
 msgid "Reload _Manager"
 msgstr "Recarregar _Encarregat "
 
-#: data/glade/admin.glade:252
+#: data/glade/admin.glade:254
 msgid "Reload _All"
 msgstr "Recarregar_Tots"
 
-#: data/glade/admin.glade:261
+#: data/glade/admin.glade:263
 msgid "Start _Shell"
 msgstr "Començar _Pela"
 
-#: data/glade/admin.glade:286
+#: data/glade/admin.glade:288
 msgid "_Help"
 msgstr "_Ajuda"
 
-#: data/glade/admin.glade:323
+#: data/glade/admin.glade:325
 msgid "Open a stored configuration"
 msgstr "Obrir una configuració emmagatzemada"
 
@@ -1027,6 +1056,9 @@ msgstr ""
 "\n"
 "Aquest mag li dirigirà amb els passos requerits per a ajudar-li a configurar "
 "el seu servidor dels mitjans que fluïxen."
+
+#~ msgid "device node /dev/raw1394 does not exist"
+#~ msgstr "el node /dev/raw1394 del dispositiu no existeix "
 
 #~ msgid "Welcome"
 #~ msgstr "Benvingut"

@@ -439,6 +439,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         """
         self.debug('BaseComponent.stop')
         self.setMood(moods.sleeping)
+        for message in self.state.get('messages'):
+            self.state.remove('messages', message)
         self.stopHeartbeat()
 
 compat.type_register(BaseComponent)

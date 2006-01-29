@@ -30,12 +30,16 @@ from twisted.web import server
 
 from flumotion.component import feedcomponent
 from flumotion.common import bundle, common, gstreamer, errors, compat
+from flumotion.common import messages
 
 # proxy import
 from flumotion.component.component import moods
 from flumotion.common.pygobject import gsignal
 
 from flumotion.component.consumers.httpstreamer import resources
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
     
@@ -440,6 +444,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             feedcomponent.ParseLaunchComponent.start(self, *args, **kwargs)
         except error.CannotListenError:
             self.warning('Port %d is not available.' % self.port)
+            m =messages.Error(T_(N_(
+                "Network error: TCP port %d is not available."), self.port))
+            self.state.append('messages', m)
             self.setMood(moods.sad)
             # FIXME: set message as well
 

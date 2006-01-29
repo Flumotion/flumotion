@@ -163,6 +163,12 @@ class FluTrayIcon(log.Loggable):
             if self._tray_container:
                 self._tray_container.send_message(1000, value)
 
+    # FIXME: we might want to show messages
+    def stateAppend(self, state, key, value):
+        pass
+    def stateRemove(self, state, key, value):
+        pass
+
     def _show_popup_menu(self):
         self.popupMenu = gtk.Menu()
         self.popupMenuQuititem = gtk.ImageMenuItem(gtk.STOCK_QUIT)

@@ -20,7 +20,9 @@
 # Headers in this file shall remain intact.
 
 import gst
+
 from flumotion.component import feedcomponent
+from flumotion.common import errors, gstreamer
 
 class AudioTest(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
@@ -33,6 +35,9 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         else:
             is_live = 'is-live=true'
             source = 'audiotestsrc'
+
+        if not gstreamer.element_factory_exists(source):
+            raise errors.MissingElementError(source)
 
         return ('%s name=source %s ! audio/x-raw-int,rate=%d ! volume volume=%f'
                 % (source, is_live, rate, volume))

@@ -32,11 +32,14 @@ from twisted.spread import pb
 
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
-from flumotion.common import common, interfaces, errors, log, compat
-from flumotion.common import gstreamer, pygobject
+from flumotion.common import common, interfaces, errors, log, compat, messages
+from flumotion.common import gstreamer, pygobject, messages
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 class FeedComponentMedium(basecomponent.BaseComponentMedium):
     """
@@ -118,7 +121,17 @@ class ParseLaunchComponent(FeedComponent):
 
     ### FeedComponent methods
     def create_pipeline(self):
-        unparsed = self.get_pipeline_string(self.config['properties'])
+        try:
+            unparsed = self.get_pipeline_string(self.config['properties'])
+        except errors.MissingElementError, e:
+            m = messages.Error(T_(N_(
+                "The worker does not have the '%s' element installed.\n"
+                "Please install the necessary plug-in and restart "
+                "the component.\n"), e.args[0]))
+            self.state.append('messages', m)
+            # FIXME: different error ?
+            raise errors.PipelineParseError(e)
+        
         self.pipeline_string = self.parse_pipeline(unparsed)
 
         try:
@@ -126,6 +139,10 @@ class ParseLaunchComponent(FeedComponent):
             return pipeline
         except gobject.GError, e:
             self.warning('Could not parse pipeline: %s' % e.message)
+            m = messages.Error(T_(N_(
+                "GStreamer error: could not parse component pipeline.")),
+                debug=e.message)
+            self.state.append('messages', m)
             raise errors.PipelineParseError(e.message)
 
     def set_pipeline(self, pipeline):

@@ -137,6 +137,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
     gsignal('has-selection', object)  # state-or-None
     gsignal('activated', object, str) # state, action name
     #gsignal('right-clicked', object, int, float)
+
     gproperty(bool, 'can-start-any', 'True if any component can be started',
               False, construct=True)
     gproperty(bool, 'can-stop-any', 'True if any component can be stopped',
@@ -224,7 +225,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         state = self.get_selected_state()
 
         if not state:
-            self.debug('no component selected')
+            self.debug('no component selected, emitting has-selection None')
             self.emit('has-selection', None)
             return
         
@@ -232,6 +233,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
             return
 
         self._last_state = state
+        self.debug('component selected, emitting has-selection')
         self.emit('has-selection', state)
 
     def _view_button_press_event_cb(self, treeview, event):
@@ -258,6 +260,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         gtk.main_iteration()
 
     def _activated_cb(self, menu, action, state):
+        self.debug('emitting activated')
         self.emit('activated', state, action)
     
     def get_selected_name(self):
@@ -338,6 +341,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
             
             mood = component.get('mood')
             self.debug('component has mood %r' % mood)
+            messages = component.get('messages')
+            self.debug('component has messages %r' % messages)
             
             if mood != None:
                 self._set_mood_value(iter, mood)
@@ -387,6 +392,14 @@ class ComponentsView(log.Loggable, gobject.GObject):
         elif key == 'workerName':
             self._updateWorker(iter, state)
 
+    # FIXME: proxy messages to message area
+    def stateAppend(self, state, key, value):
+        self.debug('stateAppend: state %r, key %s, value %r' % (
+            state, key, value))
+    def stateRemove(self, state, key, value):
+        self.debug('stateRemove: state %r, key %s, value %r' % (
+            state, key, value))
+    
     def _set_mood_value(self, iter, value):
         """
         Set the mood value on the given component name.

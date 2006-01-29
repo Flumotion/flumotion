@@ -1,5 +1,35 @@
 2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/admin.glade:
+	  make the messages_view a custom widget, with a create function
+	* flumotion/admin/gtk/parts.py:
+	  show messages in the messages_view per component
+	* flumotion/admin/gtk/client.py:
+	  add messages_view
+	  get rid of Window.show_all(), so the messages-view can be hidden
+	  at startup
+	* flumotion/common/planet.py:
+	  add a 'messages' list to componentstates
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  show an error message if the TCP port is in use
+	* flumotion/component/feedcomponent.py:
+	  throw up messages for missing elements or pipeline parse failures
+	* flumotion/component/producers/audiotest/audiotest.py:
+	  Check for necessary elements to start up
+	* flumotion/manager/manager.py:
+	  Pass a component error if a component cannot be created
+	* flumotion/ui/trayicon.py:
+	  let state Append/Remove pass through for now
+	* po/POTFILES.in:
+	* po/ca.po:
+	* po/nl.po:
+	* po/no.po:
+	* po/fr.po:
+	  add a French translation and update the dutch one
+
+2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	* flumotion/common/gstreamer.py:
 	  add a check and an exception for missing GStreamer elements
