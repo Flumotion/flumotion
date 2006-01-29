@@ -118,6 +118,9 @@ def errbackNotFoundResult(failure, result, id, device):
     # let failure fall through otherwise
     return failure
 
-    
+class CheckProcError(Exception):
+    'Utility error for element checker procedures'
+    data = None
 
-                            
+    def __init__(self, data):
+        self.data = data

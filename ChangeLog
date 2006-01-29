@@ -1,5 +1,13 @@
 2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/checks/check.py:
+	* flumotion/worker/checks/video.py:
+	* flumotion/worker/checks/video010.py:
+	* flumotion/worker/checks/video08.py:
+	  move CheckProcError some more for pychecker
+
+2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/checks/video.py:
 	* flumotion/worker/checks/video010.py:
 	* flumotion/worker/checks/video08.py:

@@ -31,6 +31,8 @@ from twisted.internet import reactor, defer
 from flumotion.common import gstreamer, errors, log, messages
 from flumotion.twisted import defer as fdefer
 
+import check
+
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
     
@@ -71,7 +73,7 @@ def do_element_check(pipeline_str, element_name, check_proc,
                 reactor.callLater(0, pipeline.set_state, gst.STATE_NULL)
                 resolution.callback(retval)
 
-        except CheckProcError, e:
+        except check.CheckProcError, e:
             resolution.errback(errors.RemoteRunError(e.data))
         except Exception, e:
             resolution.errback(errors.RemoteRunError(e))
@@ -139,9 +141,9 @@ def check1394(id=None):
         log.debug('Using pixel aspect ratio of %d/%d' % (nom, den))
 
         reactor.callLater(0, bin.set_state, gst.STATE_NULL)
-        result = dict(width=w, height=h, par=(nom, den))
-        log.debug('returning dict %r' % result)
-        resolution.callback(result)
+        res = dict(width=w, height=h, par=(nom, den))
+        log.debug('returning dict %r' % res)
+        resolution.callback(res)
         
     def do_check(element):
         bin = element.get_parent()

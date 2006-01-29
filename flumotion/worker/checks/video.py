@@ -28,14 +28,6 @@ if gst.gst_version[1] == 8:
 else:
     from video010 import *
 
-class CheckProcError(Exception):
-    'Utility error for element checker procedures'
-    data = None
-
-    def __init__(self, data):
-        self.data = data
-
-
 def checkTVCard(device, id='check-tvcard'):
     """
     Probe the given device node as a TV card.
@@ -123,7 +115,7 @@ def checkMixerTracks(source_factory, device, channels, id=None):
             msg = 'Cannot get mixer tracks from the device.  '\
                   'Check permissions on the mixer device.'
             log.debug('checks', "returning failure: %s" % msg)
-            raise CheckProcError(msg)
+            raise check.CheckProcError(msg)
 
         return (element.get_property('device-name'),
                 [track.label for track in element.list_tracks()])

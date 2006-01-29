@@ -67,7 +67,7 @@ def do_element_check(pipeline_str, element_name, check_proc):
         try:
             retval = check_proc(element)
             resolution.callback(retval)
-        except CheckProcError, e:
+        except check.CheckProcError, e:
             log.debug('CheckProcError when running %r: %r' % (check_proc,
                 e.data))
             resolution.errback(errors.RemoteRunError(e.data))
