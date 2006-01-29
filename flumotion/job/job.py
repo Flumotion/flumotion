@@ -242,13 +242,11 @@ class JobMedium(medium.BaseMedium):
         @type  config:     dict
         """
         
-        self.debug('_runComponent(): config dictionary is: %r' % config)
+        self.debug('_createComponent(): config dictionary is: %r' % config)
 
-        self.info('Starting component "%s" of type "%s"' % (avatarId, type))
+        self.info('Creating component "%s" of type "%s"' % (avatarId, type))
         #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
-
-        self.debug('Starting on pid %d of type %s' % (os.getpid(), type))
 
         self._setNice(config.get('nice', 0))
         self._enableCoreDumps()
