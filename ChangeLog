@@ -1,5 +1,12 @@
 2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/checks/video.py:
+	* flumotion/worker/checks/video010.py:
+	* flumotion/worker/checks/video08.py:
+	  move CheckProcError
+
+2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/wizard/step.py:
 	  a RemoteRunError already has a sensible failure.value to show,
 	  so special-case it

@@ -34,13 +34,6 @@ from flumotion.twisted import defer as fdefer
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
     
-class CheckProcError(Exception):
-    'Utility error for element checker procedures'
-    data = None
-
-    def __init__(self, data):
-        self.data = data
-
 def do_element_check(pipeline_str, element_name, check_proc,
                      state=gst.STATE_READY):
     """

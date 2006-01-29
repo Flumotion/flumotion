@@ -28,6 +28,14 @@ if gst.gst_version[1] == 8:
 else:
     from video010 import *
 
+class CheckProcError(Exception):
+    'Utility error for element checker procedures'
+    data = None
+
+    def __init__(self, data):
+        self.data = data
+
+
 def checkTVCard(device, id='check-tvcard'):
     """
     Probe the given device node as a TV card.

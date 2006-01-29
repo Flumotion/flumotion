@@ -48,13 +48,6 @@ class BusResolution(fdefer.Resolution):
             self.pipeline.set_state(gst.STATE_NULL)
             self.pipeline = None
 
-class CheckProcError(Exception):
-    'Utility error for element checker procedures'
-    data = None
-
-    def __init__(self, data):
-        self.data = data
-
 def do_element_check(pipeline_str, element_name, check_proc):
     """
     Parse the given pipeline and set it to the given state.
