@@ -20,9 +20,11 @@
 # Headers in this file shall remain intact.
 
 from flumotion.common import messages
+from flumotion.configure import configure
 
 from gettext import gettext as _
 
+import os
 import gtk
 
 _stock_icons = {messages.ERROR: gtk.STOCK_DIALOG_ERROR,
@@ -34,6 +36,9 @@ _headings = {messages.ERROR: _('Error'),
              messages.INFO: _('Note')}
 
 class MessageButton(gtk.ToggleButton):
+    """
+    I am a button at the top right of the message view, representing a message.
+    """
     def __init__(self, message):
         gtk.ToggleButton.__init__(self)
 
@@ -73,6 +78,7 @@ class MessagesView(gtk.VBox):
         sw.set_shadow_type(gtk.SHADOW_NONE)
         self.pack_start(sw, True, True, 0)
         tv = gtk.TextView()
+        tv.set_wrap_mode(gtk.WRAP_WORD)
         tv.set_left_margin(12)
         tv.set_right_margin(12)
         tv.set_accepts_tab(False)
@@ -88,6 +94,11 @@ class MessagesView(gtk.VBox):
         self.show_all()
         self.clear()
 
+        self._translator = messages.Translator()
+        localedir = os.path.join(configure.localedatadir, 'locale')
+        # FIXME: add locales as messages from domains come in
+        self._translator.addLocaleDir('flumotion', localedir)
+
     def clear(self):
         """
         Remove all messages and hide myself.
@@ -102,6 +113,7 @@ class MessagesView(gtk.VBox):
         @type  m: L{flumotion.common.messages.Message}
         """
         def on_toggled(b):
+            # on toggling the button, show the message
             if not b.get_active():
                 if self.active_button == b:
                     b.set_active(True)
@@ -111,22 +123,31 @@ class MessagesView(gtk.VBox):
             if old_active and old_active != b:
                 old_active.set_active(False)
             buf = gtk.TextBuffer()
-            buf.set_text(b.message.text)
+            # FIXME: it would be good to have a "Debug" button when
+            # applicable, instead of always showing the text
+            text = self._translator.translate(m)
+            if m.debug:
+                text += "\n\n" + _("Debug information:\n") + m.debug
+            buf.set_text(text)
             self.textview.set_buffer(buf)
             self.label.set_markup('<b>%s</b>'
                                   % _headings.get(m.level, _('Message')))
 
+        # FIXME:this clears all messages with the same id as the new one.
+        # effectively replacing.  Is this what we want ?
         self.clear_message(m.id)
 
+        # add a message button to show this message
         b = MessageButton(m)
         b.sigid = b.connect('toggled', on_toggled)
         b.show()
         self.buttonbox.pack_start(b, False, False, 0)
 
-        kids = [(w.message.priority, w) for w in self.buttonbox.get_children()]
+        # Sort all messages first by (reverse of) level, then priority
+        kids = [(-w.message.level, w.message.priority, w) for w in self.buttonbox.get_children()]
         kids.sort()
         kids.reverse()
-        kids = [(i, kids[i][1]) for i in range(len(kids))]
+        kids = [(i, kids[i][2]) for i in range(len(kids))]
         for x in kids:
             self.buttonbox.reorder_child(x[1], x[0])
 
@@ -137,6 +158,11 @@ class MessagesView(gtk.VBox):
         self.show()
 
     def clear_message(self, id):
+        """
+        Clear all messages with the given id.
+        Will bring the remaining most important message to the front,
+        or hide the view completely if no messages are left.
+        """
         for b in self.buttonbox.get_children():
             if b.message.id == id:
                 self.buttonbox.remove(b)

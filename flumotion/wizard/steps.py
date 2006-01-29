@@ -24,12 +24,10 @@ import math
 import gst
 import gtk
         
-from gettext import gettext as _
-
 from twisted.internet import defer
 
 from flumotion.twisted.defer import defer_generator_method
-from flumotion.common import errors
+from flumotion.common import errors, messages
 from flumotion.configure import configure
 from flumotion.wizard.step import WizardStep, WizardSection
 from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
@@ -39,6 +37,11 @@ from flumotion.wizard.enums import AudioDevice, EncodingAudio, \
      SoundcardOSSDevice, SoundcardInput, SoundcardSamplerate, \
      AudioTestSamplerate, TVCardDevice, TVCardSignal, \
      VideoDevice, VideoTestFormat, VideoTestPattern
+
+from gettext import gettext as _
+from flumotion.common.messages import N_, ngettext
+T_ = messages.gettexter('flumotion')
+
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
@@ -191,20 +194,22 @@ class TVCard(VideoSource):
         device = self.combobox_device.get_string()
         assert device
         d = self.workerRun('flumotion.worker.checks.video', 'checkTVCard',
-                           device)
+                           device, id='tvcard-check')
         yield d
         try:
-            deviceName, channels, norms = d.value()
-            self.clear_msg('tvcard-error')
+            value = d.value()
+            if not value:
+                yield None
+
+            deviceName, channels, norms = value
+            self.clear_msg('tvcard-check')
             self.wizard.block_next(False)
             self.combobox_tvnorm.set_list(norms)
             self.combobox_tvnorm.set_sensitive(True)
             self.combobox_source.set_list(channels)
             self.combobox_source.set_sensitive(True)
-        except errors.GStreamerError, e:
-            self.error_msg('tvcard-error', 'GStreamer error: %s' % e)
-        except errors.RemoteRunError, e:
-            self.error_msg('tvcard-error', 'General error: %s' % e)
+        except errors.RemoteRunFailure, e:
+            pass
     run_checks = defer_generator_method(run_checks)
         
     def get_state(self):
@@ -332,12 +337,15 @@ class FireWire(VideoSource):
         
     def run_checks(self):
         self.set_sensitive(False)
-        self.info_msg('firewire-error', _('Checking for Firewire device...'))
-        d = self.workerRun('flumotion.worker.checks.video', 'check1394')
+        msg = messages.Info(T_(N_('Checking for Firewire device...')),
+            id='firewire-check')
+        self.add_msg(msg)
+        d = self.workerRun('flumotion.worker.checks.video', 'check1394',
+            id='firewire-check')
         yield d
         try:
             options = d.value()
-            self.clear_msg('firewire-error')
+            self.clear_msg('firewire-check')
             self.dims = (options['width'], options['height'])
             self.par = options['par']
             self.input_heights = [self.dims[1]/i for i in self.factors]
@@ -349,9 +357,8 @@ class FireWire(VideoSource):
             self.combobox_scaled_height.set_active(1)
             self.set_sensitive(True)
             self.on_update_output_format()
-        except Exception, e:
-            self.error_msg('firewire-error', "%s\n(%s)" % (
-                           _('No Firewire device detected.'), _(str(e))))
+        except errors.RemoteRunFailure:
+            pass
     run_checks = defer_generator_method(run_checks)
 
 class Webcam(VideoSource):
@@ -391,23 +398,27 @@ class Webcam(VideoSource):
         self.wizard.block_next(True)
         
         device = self.combobox_device.get_string()
+        msg = messages.Info(T_(
+                N_("Probing webcam, this can take a while...")),
+            id='webcam-check')
+        self.add_msg(msg)
         d = self.workerRun('flumotion.worker.checks.video', 'checkWebcam',
-                           device)
+                           device, id='webcam-check')
         yield d
         try:
             deviceName = d.value()
+            if not deviceName:
+                self.debug('no device %s' % device)
+                yield None
             self.clear_msg('webcam-check')
             self.label_name.set_label(deviceName)
             self.wizard.block_next(False)
             self.spinbutton_width.set_sensitive(True)
             self.spinbutton_height.set_sensitive(True)
             self.spinbutton_framerate.set_sensitive(True)
-        except errors.GStreamerError, e:
+        except errors.RemoteRunFailure, e:
+            self.debug('a RemoteRunFailure happened')
             self.clear()
-            self.error_msg('webcam-check', 'GStreamer error: %s' % e)
-        except errors.RemoteRunError, e:
-            self.clear()
-            self.error_msg('webcam-check', 'General error: %s' % e)
     run_checks = defer_generator_method (run_checks)
 
     def get_state(self):
@@ -467,31 +478,34 @@ class Overlay(WizardStep):
                 self.wizard.require_elements(self.worker, 'pngdec', 'alphacolor',
                     'videomixer', 'alpha', 'ffmpegcolorspace')
             else:
-                msg = _(
+                t = T_(N_(
 """This worker's ffmpegcolorspace plugin is older than 0.8.5.
 Please consider upgrading if your output video has a
-diagonal line in the image.""")
-                self.info_msg('overlay-old-colorspace', msg)
-                self.wizard.require_elements(self.worker, 'pngdec', 'alphacolor',
-                    'videomixer', 'alpha')
+diagonal line in the image."""))
+                self.add_msg(messages.Info(t, id='overlay-old-colorspace'))
+                self.wizard.require_elements(self.worker, 'pngdec',
+                    'alphacolor', 'videomixer', 'alpha')
             self.clear_msg('overlay-colorspace')
         except Exception, e:
             self.wizard.block_next(True)
-            msg = "%s\n(%s)" % (
-                _('Could not check ffmpegcolorspace features.'), _(str(e)))
-            self.error_msg('overlay-colorspace', msg)
+            msg = messages.Error(T_(N_(
+                "Could not check features of the 'ffmpegcolorspace' element.")),
+                debug=str(e), id='overlay-colorspace')
+            self.add_msg(msg)
     worker_changed_08 = defer_generator_method(worker_changed_08)
 
     def worker_changed_010(self):
-        d = self.wizard.check_elements(self.worker, 'pngdec', 'ffmpegcolorspace',
-            'videomixer')
+        d = self.wizard.check_elements(self.worker, 'pngenc',
+            'ffmpegcolorspace', 'videomixer')
         yield d
-        missing = d.value()
-        if missing:
-            self.wizard.info_msg('overlay',
-                'This worker is missing the following GStreamer elements: %s\n'
-                'Click Next to proceed without overlay.' %
-                ', '.join(missing))
+        elements = d.value()
+        if elements:
+            f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
+                "Worker '%s' is missing GStreamer elements '%s'.",
+                len(elements))
+            message = messages.Warning(T_(f, self.worker, "', '".join(elements)),                id='overlay')
+            message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
+            self.add_msg(message)
             self.can_overlay = False
             self.set_sensitive(False)
         else:
@@ -559,6 +573,12 @@ class Soundcard(WizardStep):
     def on_combobox_device_changed(self, combo):
         self.update_inputs()
 
+    def on_combobox_channels_changed(self, combo):
+        # FIXME: make it so that the number of channels can be changed
+        # and the check gets executed with the new number
+        # self.update_inputs()
+        pass
+
     def worker_changed(self):
         self.clear_combos()
         self.update_devices()
@@ -599,28 +619,32 @@ class Soundcard(WizardStep):
         
         enum = self.combobox_system.get_enum()
         device = self.combobox_device.get_string()
+        e = self.combobox_channels.get_enum()
+        channels = 2
+        if e: channels = e.intvalue
         d = self.workerRun('flumotion.worker.checks.video', 'checkMixerTracks',
-                           enum.element, device)
+                           enum.element, device, channels, id='soundcard-check')
         yield d
         try:
             deviceName, tracks = d.value()
             self.clear_msg('soundcard-check')
             self.wizard.block_next(False)
             self.label_devicename.set_label(deviceName)
+            self.block_update = True
             self.combobox_channels.set_enum(SoundcardChannels)
             self.combobox_channels.set_sensitive(True)
             self.combobox_samplerate.set_enum(SoundcardSamplerate)
             self.combobox_samplerate.set_sensitive(True)
             self.combobox_bitdepth.set_enum(SoundcardBitdepth)
             self.combobox_bitdepth.set_sensitive(True)
+            self.block_update = False
 
             self.combobox_input.set_list(tracks)
             self.combobox_input.set_sensitive(True)
-        except errors.GStreamerError, e:
-            self.clear_combos()
-            self.error_msg('soundcard-check', 'GStreamer error: %s' % e)
-        except errors.RemoteRunError, e:
-            self.error_msg('soundcard-check', 'General error: %s' % e)
+        except errors.RemoteRunFailure, e:
+            pass
+        # FIXME: when probing failed, do
+        # self.clear_combos()
     update_inputs = defer_generator_method(update_inputs)
             
     def get_state(self):

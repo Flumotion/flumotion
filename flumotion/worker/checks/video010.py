@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-
 import os
 
 import gobject
@@ -28,12 +27,14 @@ import gst.interfaces
 
 from twisted.internet import defer, reactor
 
-from flumotion.common import gstreamer, errors, log
+from flumotion.common import gstreamer, errors, log, messages
 from flumotion.twisted import defer as fdefer
-    
-def _(str):
-    return str
 
+from flumotion.worker.checks import check
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
+    
 class BusResolution(fdefer.Resolution):
     pipeline = None
     watch_id = None
@@ -59,8 +60,6 @@ def do_element_check(pipeline_str, element_name, check_proc):
     Parse the given pipeline and set it to the given state.
     When the bin reaches that state, perform the given check function on the
     element with the given name.
-    Return a deferred that will fire the result of the given check function,
-    or a failure. 
     
     @param pipeline_str: description of the pipeline used to test
     @param element_name: name of the element being checked
@@ -76,8 +75,12 @@ def do_element_check(pipeline_str, element_name, check_proc):
             retval = check_proc(element)
             resolution.callback(retval)
         except CheckProcError, e:
+            log.debug('CheckProcError when running %r: %r' % (check_proc,
+                e.data))
             resolution.errback(errors.RemoteRunError(e.data))
         except Exception, e:
+            log.debug('Unhandled exception while running %r: %r' % (check_proc,
+                e))
             resolution.errback(errors.RemoteRunError(e))
 
     def message_rcvd(bus, message, pipeline, resolution):
@@ -88,21 +91,24 @@ def do_element_check(pipeline_str, element_name, check_proc):
                 if new == gst.STATE_PLAYING:
                     run_check(pipeline, resolution)
         elif t == gst.MESSAGE_ERROR:
-            err, debug = message.parse_error()
-            resolution.errback(errors.GStreamerError(err.message, debug))
+            gerror, debug = message.parse_error()
+            resolution.errback(errors.GStreamerGstError(gerror, debug))
         elif t == gst.MESSAGE_EOS:
             resolution.errback(errors.GStreamerError("Unexpected end of stream"))
         else:
-            print '%s: %s:' % (message.src.get_path_string(),
-                               message.type.value_nicks[1])
+            log.debug('check', 'message: %s: %s:' % (
+                message.src.get_path_string(),
+                message.type.value_nicks[1]))
             if message.structure:
-                print '    %s' % message.structure.to_string()
+                log.debug('check', 'message:    %s' %
+                    message.structure.to_string())
             else:
-                print '    (no structure)'
+                log.debug('check', 'message:    (no structure)')
         return True
 
     resolution = BusResolution()
 
+    log.debug('check', 'parsing pipeline %s' % pipeline_str)
     try:
         pipeline = gst.parse_launch(pipeline_str)
     except gobject.GError, e:
@@ -120,7 +126,7 @@ def do_element_check(pipeline_str, element_name, check_proc):
 
     return resolution.d
 
-def checkTVCard(device):
+def checkTVCard(device, id='check-tvcard'):
     """
     Probe the given device node as a TV card.
     Return a deferred firing a human-readable device name, a list of channel
@@ -128,6 +134,8 @@ def checkTVCard(device):
     
     @rtype: L{twisted.internet.defer.Deferred}
     """
+    result = messages.Result()
+
     def get_name_channels_norms(element):
         deviceName = element.get_property('device-name')
         channels = [channel.label for channel in element.list_channels()]
@@ -135,33 +143,57 @@ def checkTVCard(device):
         return (deviceName, channels, norms)
 
     pipeline = 'v4lsrc name=source device=%s ! fakesink' % device
-    return do_element_check(pipeline, 'source', get_name_channels_norms)
+    d = do_element_check(pipeline, 'source', get_name_channels_norms)
 
-def checkWebcam(device):
+    d.addCallback(check.callbackResult, result)
+    d.addErrback(check.errbackNotFoundResult, result, id, device)
+    d.addErrback(check.errbackResult, result, id, device)
+
+    return d
+
+def checkWebcam(device, id):
     """
     Probe the given device node as a webcam.
-    Return a deferred firing a human-readable device name.
+
+    The result is either:
+     - succesful, with a None value: no device found
+     - succesful, with a string value: human-readable device name
+     - failed
     
-    @rtype: L{twisted.internet.defer.Deferred}
+    @rtype: L{flumotion.common.messages.Result}
     """
+    result = messages.Result()
+
+    # FIXME: add code that checks permissions and ownership on errors,
+    # so that we can offer helpful hints on what to do.
     def get_device_name(element):
         return element.get_property('device-name')
                 
     autoprobe = "autoprobe-fps=false"
+    # FIXME: with autoprobe-fps turned off, pwc's don't work anymore
+    autoprobe = ""
 
     pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,
         autoprobe)
-    return do_element_check(pipeline, 'source', get_device_name)
+    d = do_element_check(pipeline, 'source', get_device_name)
 
-def checkMixerTracks(source_factory, device):
+    d.addCallback(check.callbackResult, result)
+    d.addErrback(check.errbackNotFoundResult, result, id, device)
+    d.addErrback(check.errbackResult, result, id, device)
+
+    return d
+
+def checkMixerTracks(source_factory, device, channels, id=None):
     """
     Probe the given GStreamer element factory with the given device for
-    mixer tracks.
+    audio mixer tracks.
     Return a deferred firing a human-readable device name and a list of mixer
     track labels.
     
     @rtype: L{twisted.internet.defer.Deferred}
     """
+    result = messages.Result()
+
     def get_tracks(element):
         # Only mixers have list_tracks. Why is this a perm error? FIXME in 0.9?
         if not element.implements_interface(gst.interfaces.Mixer):
@@ -173,18 +205,32 @@ def checkMixerTracks(source_factory, device):
         return (element.get_property('device-name'),
                 [track.label for track in element.list_tracks()])
                 
-    pipeline = '%s name=source device=%s ! fakesink' % (source_factory, device)
-    return do_element_check(pipeline, 'source', get_tracks)
+    pipeline = '%s name=source device=%s ! audio/x-raw-int,channels=%d ! fakesink' % (source_factory, device, channels)
+    d = do_element_check(pipeline, 'source', get_tracks)
 
-def check1394():
+    d.addCallback(check.callbackResult, result)
+    d.addErrback(check.errbackNotFoundResult, result, id, device)
+    d.addErrback(check.errbackResult, result, id, device)
+
+    return d
+
+
+def check1394(id):
     """
     Probe the firewire device.
 
-    Return a deferred firing a dictionary with width, height,
-    and a pixel aspect ratio pair.
+    Return a deferred firing a result.
+
+    The result is either:
+     - succesful, with a None value: no device found
+     - succesful, with a dictionary of width, height, and par as a num/den pair
+     - failed
     
-    @rtype: L{twisted.internet.defer.Deferred}
+    @rtype: L{twisted.internet.defer.Deferred} of 
+            L{flumotion.common.messages.Result}
     """
+    result = messages.Result()
+    
     def do_check(demux):
         pad = demux.get_pad('video')
 
@@ -202,8 +248,38 @@ def check1394():
         
     # first check if the obvious device node exists
     if not os.path.exists('/dev/raw1394'):
-        return defer.fail(errors.DeviceNotFoundError(
-            _('device node /dev/raw1394 does not exist')))
+        m = messages.Error(T_(N_("Device node /dev/raw1394 does not exist.")),
+            id=id)
+        result.add(m)
+        #return defer.succeed(result)
 
     pipeline = 'dv1394src name=source ! dvdemux name=demux ! fakesink'
-    return do_element_check(pipeline, 'demux', do_check)
+    d = do_element_check(pipeline, 'demux', do_check)
+
+    def errbackResult(failure):
+        log.debug('check', 'returning failed Result, %r' % failure)
+        m = None
+        if failure.check(errors.GStreamerGstError):
+            gerror, debug = failure.value.args
+            log.debug('check', 'GStreamer GError: %s (debug: %s)' % (
+                gerror.message, debug))
+            if gerror.domain == "gst-resource-error-quark":
+                if gerror.code == int(gst.RESOURCE_ERROR_NOT_FOUND):
+                    m = messages.Error(T_(
+                        N_("No Firewire device found.")))
+
+            if not m:
+                m = check.handleGStreamerDeviceError(failure, 'Firewire')
+
+        if not m:
+            m = messages.Error(T_(N_("Could not probe Firewire device.")),
+                debug=check.debugFailure(failure))
+
+        m.id = id
+        result.add(m)
+        return result
+    d.addCallback(check.callbackResult, result)
+    d.addErrback(errbackResult)
+
+    return d
+

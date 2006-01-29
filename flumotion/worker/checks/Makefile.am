@@ -4,6 +4,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/worker/checks
 
 flumotion_PYTHON = \
 	__init__.py 	\
+	check.py	\
 	video.py	\
 	video08.py	\
 	video010.py	\

@@ -38,7 +38,7 @@ import twisted.cred.error
 import twisted.internet.error
 
 from flumotion.common import errors, interfaces, log, bundleclient
-from flumotion.common import common, medium
+from flumotion.common import common, medium, messages
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
 from flumotion.twisted.defer import defer_generator_method
@@ -237,6 +237,7 @@ class WorkerMedium(medium.BaseMedium):
 
         @returns: the return value of the given function in the module.
         """
+        self.debug('remote runFunction(%r, %r)' % (module, function))
         d = self.bundleLoader.loadModule(module)
         yield d
 
@@ -248,6 +249,7 @@ class WorkerMedium(medium.BaseMedium):
             raise errors.RemoteRunError(msg)
         except Exception, e:
             msg = 'Failed to load bundle for module %s' % module
+            self.debug("exception %r" % e)
             self.warning(msg)
             raise errors.RemoteRunError(msg)
 
@@ -261,16 +263,35 @@ class WorkerMedium(medium.BaseMedium):
         try:
             self.debug('calling %r(%r, %r)' % (proc, args, kwargs))
             d = proc(*args, **kwargs)
-            yield d
-            # only if d was actually a deferred will we get here
-            # this is a bit nasty :/
-            yield d.value()
         except Exception, e:
             # FIXME: make e.g. GStreamerError nicely serializable, without
             # printing ugly tracebacks
-            msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s raised: %s'
-                   % (module, function, args, kwargs,
-                      e.__class__.__name__, e.__str__()))
+            msg = ('calling %s.%s(*args=%r, **kwargs=%r) failed: %s' % (
+                module, function, args, kwargs,
+                log.getExceptionMessage(e)))
+            self.debug(msg)
+            raise e
+ 
+        yield d
+
+        try:
+            # only if d was actually a deferred will we get here
+            # this is a bit nasty :/
+            result = d.value()
+            if not isinstance(result, messages.Result):
+                msg = 'function %r returned a non-Result %r' % (
+                    proc, result)
+                raise errors.RemoteRunError(msg)
+
+            self.debug('yielding result %r with failed %r' % (result,
+                result.failed))
+            yield result
+        except Exception, e:
+            # FIXME: make e.g. GStreamerError nicely serializable, without
+            # printing ugly tracebacks
+            msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s' % (
+                module, function, args, kwargs,
+                log.getExceptionMessage(e)))
             self.debug(msg)
             raise e
     remote_runFunction = defer_generator_method(remote_runFunction)

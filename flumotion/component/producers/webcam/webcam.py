@@ -60,7 +60,7 @@ class Webcam(feedcomponent.ParseLaunchComponent):
         #           'ffmpegcolorspace ! "%s" ! videorate ! "%s"' \
         #           % (autoprobe, device, caps, caps)
         return ('v4lsrc name=source %s copy-mode=1 device=%s ! '
-                'videorate ! %s' % (autoprobe, device, caps))
+                '%s ! videorate' % (autoprobe, device, caps))
 
     def configure_pipeline(self, pipeline, properties):
         # create and add colorbalance effect

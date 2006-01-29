@@ -1,3 +1,52 @@
+2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/wizard_soundcard.glade:
+	  add a handler for combobox_channels changed
+	* flumotion/admin/admin.py:
+	  update docstring, workerRun now returns a Result
+	* flumotion/admin/gtk/message.py:
+	  document
+	  make the textview wrap on words
+	  add a translator so we can translate Messages
+	  sort the messages viewed first by level, then priority
+
+	* flumotion/wizard/step.py:
+	  remove the info_msg/error_msg calls
+	  show all messages that are part of the Result of workerRun
+	  raise a RemoteRunFailure if the call produced a failed result
+	  raise a RemoteRunError if the call failed and didn't produce
+	  a result
+	  forward on the value of a succesful Result to the caller
+	* flumotion/wizard/steps.py:
+	  use the new Message for all messages to be shown
+	  add a on_combobox_channels_changed, but needs more integrating
+	* flumotion/wizard/wizard.py:
+	  remove the info_msg/error_msg calls
+	  add add_msg
+	  use Messages (including plural forms for missing element(s))
+
+	* flumotion/component/producers/webcam/webcam.py:
+	  Simple workaround for http://bugzilla.gnome.org/show_bug.cgi?id=328940
+	* flumotion/worker/checks/Makefile.am:
+	* flumotion/worker/checks/package.xml:
+	* flumotion/worker/checks/check.py:
+	  added; contains common functionality usable by checks
+	* flumotion/worker/checks/video.py:
+	* flumotion/worker/checks/video010.py:
+	  rework tests to use Message and Result.
+	  Not finding a device is now a succesful but empty result.
+	  Turn on autoprobe-fps again, since it just doesn't work
+	  at all without it atm.
+	  Doing the 08 ones in a second step, because a lot of them can
+	  be factored out together to be gst-independant
+	* flumotion/worker/worker.py:
+	  verify that workerRun calls end up returning a Result object
+	* po/POTFILES.in:
+	* po/ca.po:
+	* po/nl.po:
+	* po/no.po:
+	  update translations
+
 2006-01-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/admin.py:

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-28 10:48+0100\n"
+"POT-Creation-Date: 2006-01-29 11:55+0100\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: cat\n"
@@ -161,10 +161,11 @@ msgid "Error"
 msgstr "Error"
 
 #: flumotion/admin/gtk/message.py:35
+#: flumotion/test/test_common_messages.py:113
 msgid "Warning"
 msgstr "Advertiment"
 
-#: flumotion/admin/gtk/message.py:36
+#: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:54
 msgid "Note"
 msgstr "Nota"
 
@@ -269,37 +270,61 @@ msgstr "A l'atzar (neu de la televisió)"
 msgid "Totally black"
 msgstr "Totalment negre"
 
-#: flumotion/wizard/steps.py:81
+#: flumotion/wizard/wizard.py:304
+msgid ""
+"All workers have logged out.\n"
+"Make sure your Flumotion network is running properly and try again."
+msgstr ""
+
+#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:503
+#, python-format
+msgid "Worker '%s' is missing GStreamer element '%s'."
+msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
+msgstr[0] ""
+msgstr[1] ""
+
+#: flumotion/wizard/wizard.py:358
+msgid ""
+"Please install the necessary GStreamer plug-ins that provide these elements "
+"and restart the worker."
+msgstr ""
+"Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
+"en herstart de worker."
+
+#: flumotion/wizard/wizard.py:360
+msgid ""
+"\n"
+"\n"
+"You will not be able to go forward."
+msgstr ""
+
+#: flumotion/wizard/steps.py:84
 msgid "If you want to stream video"
 msgstr "Si vostè desitja fluir video"
 
-#: flumotion/wizard/steps.py:83
+#: flumotion/wizard/steps.py:86
 msgid "If you want to stream audio"
 msgstr "Si vostè desitja fluir àudio "
 
-#: flumotion/wizard/steps.py:265
+#: flumotion/wizard/steps.py:272
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d quocient d'aspecte del píxel)"
 
-#: flumotion/wizard/steps.py:315
+#: flumotion/wizard/steps.py:322
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d quocient d'aspecte del píxel"
 
-#: flumotion/wizard/steps.py:335
+#: flumotion/wizard/steps.py:343
 msgid "Checking for Firewire device..."
 msgstr "Comprovant dispositiu del firewire..."
 
-#: flumotion/wizard/steps.py:354
-msgid "No Firewire device detected."
-msgstr "Cap dispositiu del firewire va detectar."
-
-#: flumotion/wizard/steps.py:394
+#: flumotion/wizard/steps.py:403
 msgid "Probing webcam, this can take a while..."
 msgstr ""
 
-#: flumotion/wizard/steps.py:479
+#: flumotion/wizard/steps.py:483
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
@@ -309,11 +334,18 @@ msgstr ""
 " Considera per favor augmentar-ho si el seu vídeo de la sortida té a\n"
 " línia diagonal en la imatge."
 
-#: flumotion/wizard/steps.py:489
+#: flumotion/wizard/steps.py:493
 msgid "Could not check ffmpegcolorspace features."
 msgstr "No podia comprovar característiques del ffmpegcolorspace ."
 
-#: flumotion/wizard/step.py:140
+#: flumotion/wizard/steps.py:507
+msgid ""
+"\n"
+"\n"
+"Click Next to proceed without overlay."
+msgstr ""
+
+#: flumotion/wizard/step.py:141
 msgid "Internal error: could not run check code on worker."
 msgstr ""
 
@@ -377,28 +409,55 @@ msgstr "<b>Consumició Del Client</b>"
 msgid "Log"
 msgstr "Log"
 
-#: flumotion/worker/checks/video010.py:176
+#: flumotion/worker/checks/check.py:47
+#, python-format
+msgid "Could not open device '%s'.  Check permissions on the device."
+msgstr ""
+
+#: flumotion/worker/checks/check.py:50
+#, python-format
+msgid "Device '%s' is already in use."
+msgstr ""
+
+#: flumotion/worker/checks/check.py:53
+#, python-format
+msgid "Device '%s' did not accept the requested settings."
+msgstr ""
+
+#: flumotion/worker/checks/check.py:59 flumotion/worker/checks/check.py:63
+msgid "Internal GStreamer error."
+msgstr ""
+
+#: flumotion/worker/checks/check.py:94
+#, fuzzy, python-format
+msgid "Could not probe device '%s'."
+msgstr ""
+"No podia recarregar el component:\n"
+"%s."
+
+#: flumotion/worker/checks/check.py:111
 #, python-format
 msgid "No device found on %s."
 msgstr ""
 
-#: flumotion/worker/checks/video010.py:178
-#, python-format
-msgid "Could not open device %s.  Check permissions on the device."
-msgstr ""
-
-#: flumotion/worker/checks/video010.py:181
-#: flumotion/worker/checks/video010.py:184
-msgid "GStreamer error while probing webcam."
-msgstr ""
-
-#: flumotion/worker/checks/video010.py:187
-msgid "Failed to probe webcam."
-msgstr ""
-
-#: flumotion/worker/checks/video010.py:248
+#: flumotion/worker/checks/video08.py:218
 msgid "device node /dev/raw1394 does not exist"
 msgstr "el node /dev/raw1394 del dispositiu no existeix "
+
+#: flumotion/worker/checks/video010.py:251
+#, fuzzy
+msgid "Device node /dev/raw1394 does not exist."
+msgstr "el node /dev/raw1394 del dispositiu no existeix "
+
+#: flumotion/worker/checks/video010.py:269
+#, fuzzy
+msgid "No Firewire device found."
+msgstr "Cap dispositiu del firewire va detectar."
+
+#: flumotion/worker/checks/video010.py:275
+#, fuzzy
+msgid "Could not probe Firewire device."
+msgstr "Comprovant dispositiu del firewire..."
 
 #: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:91
 msgid "I am a translatable string"
@@ -422,36 +481,36 @@ msgid_plural "I translated %d things"
 msgstr[0] ""
 msgstr[1] ""
 
-#: flumotion/test/test_common_messages.py:38
+#: flumotion/test/test_common_messages.py:42
 msgid "Something is really wrong."
 msgstr ""
 
-#: flumotion/test/test_common_messages.py:56
-#: flumotion/test/test_common_messages.py:82
+#: flumotion/test/test_common_messages.py:55
+#, fuzzy
+msgid "warning"
+msgstr "Advertiment"
+
+#: flumotion/test/test_common_messages.py:59
+#: flumotion/test/test_common_messages.py:84
 #, python-format
 msgid "%s can be translated"
 msgstr ""
 
-#: flumotion/test/test_common_messages.py:64
+#: flumotion/test/test_common_messages.py:66
 #, python-format
 msgid "%s %d has %d thing"
 msgid_plural "%s %d has %d things"
 msgstr[0] ""
 msgstr[1] ""
 
-#: flumotion/test/test_common_messages.py:92
+#: flumotion/test/test_common_messages.py:93
 msgid "Something is really wrong. "
 msgstr ""
 
-#: flumotion/test/test_common_messages.py:93
+#: flumotion/test/test_common_messages.py:94
 #, python-format
 msgid "But does %s know what ?"
 msgstr ""
-
-#: flumotion/test/test_common_messages.py:113
-#, fuzzy
-msgid "warning"
-msgstr "Advertiment"
 
 #: flumotion/test/test_common_messages.py:126
 msgid "uh oh"
@@ -845,7 +904,7 @@ msgstr ""
 "Micròfon\n"
 "CD"
 
-#: data/glade/wizard_soundcard.glade:174
+#: data/glade/wizard_soundcard.glade:175
 msgid ""
 "Stereo\n"
 "Mono\n"
@@ -855,11 +914,11 @@ msgstr ""
 "Mono\n"
 "5.1"
 
-#: data/glade/wizard_soundcard.glade:243
+#: data/glade/wizard_soundcard.glade:249
 msgid "Sound _system:"
 msgstr "Sistema del _so"
 
-#: data/glade/wizard_soundcard.glade:285 data/glade/wizard_webcam.glade:213
+#: data/glade/wizard_soundcard.glade:292 data/glade/wizard_webcam.glade:213
 msgid "Name:"
 msgstr "Nom:"
 

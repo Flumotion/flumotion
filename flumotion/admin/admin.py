@@ -579,7 +579,8 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         worker does not already have the module, or it is out of date,
         it will be retrieved from the manager.
 
-        @rtype: L{twisted.internet.defer.Deferred}
+        @rtype: L{twisted.internet.defer.Deferred} firing an
+                L{flumotion.common.messages.Result}
         """
         return self.workerCallRemote(workerName, 'runFunction', moduleName,
                                      functionName, *args, **kwargs)

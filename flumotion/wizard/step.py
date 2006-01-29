@@ -24,10 +24,12 @@ import gtk
 
 from twisted.internet import defer
 
-from flumotion.common import log, errors
+from flumotion.common import log, errors, messages
 from flumotion.ui import fgtk
 from flumotion.ui.glade import GladeWidget
 
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 class WizardStep(GladeWidget, log.Loggable):
     glade_typedict = fgtk.WidgetMapping()
@@ -84,21 +86,21 @@ class WizardStep(GladeWidget, log.Loggable):
 
         return state_dict
 
-    def info_msg(self, *args, **kwargs):
-        self.wizard.info_msg(*args, **kwargs)
-
-    def error_msg(self, *args, **kwargs):
-        self.wizard.error_msg(*args, **kwargs)
-
     def clear_msg(self, *args, **kwargs):
         self.wizard.clear_msg(*args, **kwargs)
 
-    def workerRun(self, module, function, *args):
+    def add_msg(self, msg):
+        self.debug('adding message %r' % msg)
+        self.wizard.add_msg(msg)
+
+    # FIXME: maybe add id here for return messages ?
+    def workerRun(self, module, function, *args, **kwargs):
         """
         Run the given function and arguments on the selected worker.
 
         @returns: L{twisted.internet.defer.Deferred}
         """
+        self.debug('workerRun(module=%r, function=%r)' % (module, function))
         admin = self.wizard.get_admin()
         worker = self.worker
         
@@ -110,8 +112,33 @@ class WizardStep(GladeWidget, log.Loggable):
             self.warning('skipping workerRun, no worker')
             return defer.fail(errors.FlumotionError('no worker'))
 
-        d = admin.workerRun(worker, module, function, *args)
-        # FIXME: add errback
+        d = admin.workerRun(worker, module, function, *args, **kwargs)
+
+        def callback(result):
+            self.debug('workerRun callbacked a result')
+            self.clear_msg(function)
+            for m in result.messages:
+                self.debug('showing msg %r' % m)
+                self.add_msg(m)
+
+            if result.failed:
+                self.debug('... that failed')
+                raise errors.RemoteRunFailure('Result failed')
+            self.debug('... that succeeded')
+            return result.value
+
+        def errback(failure):
+            self.debug('workerRun errbacked, showing error msg')
+            debug = "Failure while running %s.%s:\n%s" % (
+                module, function, failure.getTraceback())
+            msg = messages.Error(T_(
+                N_("Internal error: could not run check code on worker.")),
+                debug=debug)
+            self.add_msg(msg)
+            raise errors.RemoteRunError('Internal error.')
+            
+        d.addErrback(errback)
+        d.addCallback(callback)
         return d
         
     # Required vmethods

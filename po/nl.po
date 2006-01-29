@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-28 10:48+0100\n"
+"POT-Creation-Date: 2006-01-29 11:55+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -163,10 +163,11 @@ msgid "Error"
 msgstr "Fout"
 
 #: flumotion/admin/gtk/message.py:35
+#: flumotion/test/test_common_messages.py:113
 msgid "Warning"
 msgstr "Waarschuwing"
 
-#: flumotion/admin/gtk/message.py:36
+#: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:54
 msgid "Note"
 msgstr "Noot"
 
@@ -270,37 +271,64 @@ msgstr "Willekeurig (televisiesneeuw)"
 msgid "Totally black"
 msgstr "Volledig zwart"
 
-#: flumotion/wizard/steps.py:81
+#: flumotion/wizard/wizard.py:304
+msgid ""
+"All workers have logged out.\n"
+"Make sure your Flumotion network is running properly and try again."
+msgstr ""
+
+#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:503
+#, python-format
+msgid "Worker '%s' is missing GStreamer element '%s'."
+msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
+msgstr[0] "Worker '%s' mist het GStreamer-element '%s'."
+msgstr[1] "Worker '%s' mist de GStreamer-elementen '%s'."
+
+#: flumotion/wizard/wizard.py:358
+msgid ""
+"Please install the necessary GStreamer plug-ins that provide these elements "
+"and restart the worker."
+msgstr ""
+"Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
+"en de worker te herstarten."
+
+#: flumotion/wizard/wizard.py:360
+msgid ""
+"\n"
+"\n"
+"You will not be able to go forward."
+msgstr ""
+"\n"
+"\n"
+"U kan niet verder gaan."
+
+#: flumotion/wizard/steps.py:84
 msgid "If you want to stream video"
 msgstr "Als je video wil streamen"
 
-#: flumotion/wizard/steps.py:83
+#: flumotion/wizard/steps.py:86
 msgid "If you want to stream audio"
 msgstr "Als je audio wil streamen"
 
-#: flumotion/wizard/steps.py:265
+#: flumotion/wizard/steps.py:272
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d pixelaspectverhouding)"
 
-#: flumotion/wizard/steps.py:315
+#: flumotion/wizard/steps.py:322
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d, %d/%d pixelaspectverhouding"
 
-#: flumotion/wizard/steps.py:335
+#: flumotion/wizard/steps.py:343
 msgid "Checking for Firewire device..."
 msgstr "Bezig met detecteren Vuurdraadapparaat..."
 
-#: flumotion/wizard/steps.py:354
-msgid "No Firewire device detected."
-msgstr "Geen Vuurdraadapparaat gedetecteerd."
-
-#: flumotion/wizard/steps.py:394
+#: flumotion/wizard/steps.py:403
 msgid "Probing webcam, this can take a while..."
 msgstr "Webcam aan het onderzoeken, dit kan even duren..."
 
-#: flumotion/wizard/steps.py:479
+#: flumotion/wizard/steps.py:483
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
@@ -310,11 +338,21 @@ msgstr ""
 "Gelieve te overwegen om deze te vernieuwen als uw video een\n"
 "diagonale lijn in het beeld bevat."
 
-#: flumotion/wizard/steps.py:489
+#: flumotion/wizard/steps.py:493
 msgid "Could not check ffmpegcolorspace features."
 msgstr "Kon ffmpegcolorspace-eigenschappen niet controleren."
 
-#: flumotion/wizard/step.py:140
+#: flumotion/wizard/steps.py:507
+msgid ""
+"\n"
+"\n"
+"Click Next to proceed without overlay."
+msgstr ""
+"\n"
+"\n"
+"Klik Volgende om verder te gaan zonder transparante overleg."
+
+#: flumotion/wizard/step.py:141
 msgid "Internal error: could not run check code on worker."
 msgstr "Interne fout: kon check-code niet uitvoeren op worker."
 
@@ -378,28 +416,50 @@ msgstr "<b>Cliëntverbruik</b>"
 msgid "Log"
 msgstr "Log"
 
-#: flumotion/worker/checks/video010.py:176
+#: flumotion/worker/checks/check.py:47
+#, python-format
+msgid "Could not open device '%s'.  Check permissions on the device."
+msgstr "Kan toestel '%s' niet openen.  Verifieer toelatingen op het toestel."
+
+#: flumotion/worker/checks/check.py:50
+#, python-format
+msgid "Device '%s' is already in use."
+msgstr "Toestel '%s' is al in gebruik."
+
+#: flumotion/worker/checks/check.py:53
+#, python-format
+msgid "Device '%s' did not accept the requested settings."
+msgstr "Toestel '%s' weigerde de gevraagde instellingen."
+
+#: flumotion/worker/checks/check.py:59 flumotion/worker/checks/check.py:63
+msgid "Internal GStreamer error."
+msgstr "Interne GStreamer-fout."
+
+#: flumotion/worker/checks/check.py:94
+#, python-format
+msgid "Could not probe device '%s'."
+msgstr "Kon toestel '%s' niet onderzoeken."
+
+#: flumotion/worker/checks/check.py:111
 #, python-format
 msgid "No device found on %s."
 msgstr "Geen toestel gevonden op %s."
 
-#: flumotion/worker/checks/video010.py:178
-#, python-format
-msgid "Could not open device %s.  Check permissions on the device."
-msgstr "Kan toestel %s niet openen.  Verifieer toelatingen op het toestel."
-
-#: flumotion/worker/checks/video010.py:181
-#: flumotion/worker/checks/video010.py:184
-msgid "GStreamer error while probing webcam."
-msgstr "GStreamer-fout bij het onderzoeken van de webcam."
-
-#: flumotion/worker/checks/video010.py:187
-msgid "Failed to probe webcam."
-msgstr "Kon webcam niet onderzoeken."
-
-#: flumotion/worker/checks/video010.py:248
+#: flumotion/worker/checks/video08.py:218
 msgid "device node /dev/raw1394 does not exist"
 msgstr "apparaat /dev/raw1394 bestaat niet"
+
+#: flumotion/worker/checks/video010.py:251
+msgid "Device node /dev/raw1394 does not exist."
+msgstr "Apparaat /dev/raw1394 bestaat niet."
+
+#: flumotion/worker/checks/video010.py:269
+msgid "No Firewire device found."
+msgstr "Geen Vuurdraadapparaat gedetecteerd."
+
+#: flumotion/worker/checks/video010.py:275
+msgid "Could not probe Firewire device."
+msgstr "Kon Vuurdraadapparaat niet onderzoeken."
 
 #: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:91
 msgid "I am a translatable string"
@@ -423,35 +483,35 @@ msgid_plural "I translated %d things"
 msgstr[0] "Ik vertaalde %d ding"
 msgstr[1] "Ik vertaalde %d dingen"
 
-#: flumotion/test/test_common_messages.py:38
+#: flumotion/test/test_common_messages.py:42
 msgid "Something is really wrong."
 msgstr "Er is iets echt mis."
 
-#: flumotion/test/test_common_messages.py:56
-#: flumotion/test/test_common_messages.py:82
+#: flumotion/test/test_common_messages.py:55
+msgid "warning"
+msgstr "waarschuwing"
+
+#: flumotion/test/test_common_messages.py:59
+#: flumotion/test/test_common_messages.py:84
 #, python-format
 msgid "%s can be translated"
 msgstr "%s kan vertaald worden"
 
-#: flumotion/test/test_common_messages.py:64
+#: flumotion/test/test_common_messages.py:66
 #, python-format
 msgid "%s %d has %d thing"
 msgid_plural "%s %d has %d things"
 msgstr[0] "%s %d heeft %d ding"
 msgstr[1] "%s %d heeft %d dingen"
 
-#: flumotion/test/test_common_messages.py:92
+#: flumotion/test/test_common_messages.py:93
 msgid "Something is really wrong. "
 msgstr "Er is iets echt mis. "
 
-#: flumotion/test/test_common_messages.py:93
+#: flumotion/test/test_common_messages.py:94
 #, python-format
 msgid "But does %s know what ?"
 msgstr "Maar weet %s wat ?"
-
-#: flumotion/test/test_common_messages.py:113
-msgid "warning"
-msgstr "waarschuwing"
 
 #: flumotion/test/test_common_messages.py:126
 msgid "uh oh"
@@ -845,7 +905,7 @@ msgstr ""
 "Microfoon\n"
 "CD"
 
-#: data/glade/wizard_soundcard.glade:174
+#: data/glade/wizard_soundcard.glade:175
 msgid ""
 "Stereo\n"
 "Mono\n"
@@ -855,11 +915,11 @@ msgstr ""
 "Mono\n"
 "5.1"
 
-#: data/glade/wizard_soundcard.glade:243
+#: data/glade/wizard_soundcard.glade:249
 msgid "Sound _system:"
 msgstr "Geluids_systeem"
 
-#: data/glade/wizard_soundcard.glade:285 data/glade/wizard_webcam.glade:213
+#: data/glade/wizard_soundcard.glade:292 data/glade/wizard_webcam.glade:213
 msgid "Name:"
 msgstr "Naam:"
 
@@ -965,6 +1025,12 @@ msgstr ""
 "\n"
 "Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
 "configuratie van uw streaming media server."
+
+#~ msgid "GStreamer error while probing webcam."
+#~ msgstr "GStreamer-fout bij het onderzoeken van de webcam."
+
+#~ msgid "Failed to probe webcam."
+#~ msgstr "Kon webcam niet onderzoeken."
 
 #~ msgid "Welcome"
 #~ msgstr "Welkom"

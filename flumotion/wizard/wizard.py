@@ -40,7 +40,8 @@ from flumotion.ui.glade import GladeWindow
 from flumotion.twisted import flavors
 
 from flumotion.common.pygobject import gsignal
-
+from flumotion.common.messages import N_, ngettext
+T_ = messages.gettexter('flumotion')
 
 # pychecker doesn't like the auto-generated widget attrs
 # or the extra args we name in callbacks
@@ -227,16 +228,11 @@ class Wizard(GladeWindow, log.Loggable):
     def __len__(self):
         return len(self.scenario.steps)
 
-    def info_msg(self, id, text):
-        m = messages.Info(priority=50, id=id, text=text)
-        self.message_area.add_message(m)
-
-    def error_msg(self, id, text):
-        m = messages.Error(priority=60, id=id, text=text)
-        self.message_area.add_message(m)
-
     def clear_msg(self, id):
         self.message_area.clear_message(id)
+
+    def add_msg(self, msg):
+        self.message_area.add_message(msg)
 
     def get_step_option(self, stepname, option):
         state = self.get_step_options(stepname)
@@ -288,6 +284,7 @@ class Wizard(GladeWindow, log.Loggable):
         step.activated()
 
     def _combobox_worker_changed(self, combobox, worker):
+        self.debug('combobox_worker_changed')
         if worker:
             self.clear_msg('worker-error')
             self._last_worker = worker
@@ -295,10 +292,12 @@ class Wizard(GladeWindow, log.Loggable):
                 self._setup_worker(self.current_step, worker)
                 self.current_step.worker_changed()
         else:
-            self.error_msg('worker-error',
-                           'All workers have logged out.\n'
-                           'Make sure the flumotion server is running '
-                           'properly and try again.')
+            msg = messages.Error(T_(
+                    N_('All workers have logged out.\n'
+                    'Make sure your Flumotion network is running '
+                    'properly and try again.')),
+                id='worker-error')
+            self.add_msg(msg)
         
     def get_admin(self):
         return self._admin
@@ -344,11 +343,19 @@ class Wizard(GladeWindow, log.Loggable):
         def got_missing_elements(elements, workerName):
             if elements:
                 self.warning('elements %r do not exist' % (elements,))
-                message = "Worker %s is missing GStreamer elements '%s'.  " % (
-                    workerName, "', '".join(elements)) \
-                        + "You will not be able to go forward."
+                f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
+                    "Worker '%s' is missing GStreamer elements '%s'.",
+                    len(elements))
+                message = messages.Error(T_(f, workerName,
+                    "', '".join(elements)))
+                message.add(T_(N_("\n"
+                    "Please install the necessary GStreamer plug-ins that "
+                    "provide these elements and restart the worker.")))
+                message.add(T_(N_("\n\n"
+                    "You will not be able to go forward using this worker.")))
                 self.block_next(True)
-                self.error_msg('-'.join(elementNames), message)
+                message.id = 'element' + '-'.join(elementNames)
+                self.add_msg(message)
         
         d = self.check_elements(workerName, *elementNames)
         d.addCallback(got_missing_elements, workerName)

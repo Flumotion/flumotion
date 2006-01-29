@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.worker.checks import check
 
 import gst
 
@@ -26,3 +27,5 @@ if gst.gst_version[1] == 8:
     from video08 import *
 else:
     from video010 import *
+
+
