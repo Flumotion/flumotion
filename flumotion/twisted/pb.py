@@ -96,11 +96,11 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     def _cbLoginCallback(self, result, root, client, interfaces, count):
         if count > 5:
             # too many recursions, server is h0rked
-            self.warn('Too many recursions, internal error.')
+            self.warning('Too many recursions, internal error.')
         self.debug("FPBClientFactory(): result %r" % result)
 
         if not result:
-            self.warn('No result, raising.')
+            self.warning('No result, raising.')
             raise error.UnauthorizedLogin()
 
         if isinstance(result, pb.RemoteReference):
