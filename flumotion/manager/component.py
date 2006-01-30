@@ -816,7 +816,7 @@ class ComponentHeaven(base.ManagerHeaven):
         """
 
         eaterFeederNames = componentAvatar.getEaters()
-        self.debug('eaterFeederNames: %r' % eaterFeederNames)
+        self.debug('feeders we eat from: %r' % eaterFeederNames)
 
         #feederName is componentName:feedName on the feeding component
         retval = []
@@ -846,6 +846,7 @@ class ComponentHeaven(base.ManagerHeaven):
 
         host = component.getClientAddress()
         feeders = component.getFeeders()
+        self.debug('returning data for feeders: %r' % (feeders, ))
         ports = self.vishnu.reservePortsOnWorker(component.getWorkerName(),
                                                  len(feeders))
         return map(lambda f, p: (f, host, p), feeders, ports)
@@ -943,8 +944,8 @@ class ComponentHeaven(base.ManagerHeaven):
 
         try:
             d.value()
-        except:
-            self.warning('setup failed')
+        except Exception, e:
+            self.warning('setup failed:%s' % log.getExceptionMessage(e))
             raise errors.FlumotionError('Could not set up component')
 
         # tell the feeder set
@@ -952,10 +953,11 @@ class ComponentHeaven(base.ManagerHeaven):
         set.addFeeders(componentAvatar)
 
         # check if we eat feeds from other feeders
-        self.debug('checking if we eat feeds')
+        self.debug('checking if %r eats feeds' % componentAvatar)
         eaterFeeders = componentAvatar.getEaters()
         if not eaterFeeders:
-            componentAvatar.debug('component does not take feeds, starting')
+            componentAvatar.debug(
+                'component does not eat feeds, so starting it right away')
             self._startComponent(componentAvatar)
             self.debug('heaven registered component %r' % componentAvatar)
             return
@@ -1059,8 +1061,12 @@ class ComponentHeaven(base.ManagerHeaven):
                     'clock master component start cancelled'))
 
         if avatarId in self._masterClockInfo:
-            port = self._masterClockInfo[avatarId][1]
-            self.vishnu.releasePortsOnWorker(workerName, [port])
+            info = self._masterClockInfo[avatarId]
+            if info:
+                port = info[1]
+                self.vishnu.releasePortsOnWorker(workerName, [port])
+            else:
+                self.debug('avatarId %r has None masterClockInfo' % avatarId)
             del self._masterClockInfo[avatarId]
         else:
             self.warning('component %s has no master clock info'

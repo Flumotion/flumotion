@@ -1,5 +1,11 @@
 2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/component.py:
+	  in 0.8, provideMasterClock returns None, not a tuple.
+	  Handle that case.
+
+2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent08.py:
 	  set eaterNames and feederNames on the state so that startup
 	  happens correctly.
