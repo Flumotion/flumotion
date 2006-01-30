@@ -91,8 +91,8 @@ def errbackResult(failure, result, id, device):
         m = handleGStreamerDeviceError(failure, device)
 
     if not m:
-        log.debug('check', 'unhandled failure: %r (%s)' % (
-            failure, failure.getErrorMessage()))
+        log.debug('check', 'unhandled failure: %r (%s)\nTraceback:\n%s' % (
+            failure, failure.getErrorMessage(), failure.getTraceback()))
         m = messages.Error(T_(N_("Could not probe device '%s'."), device),
             debug=debugFailure(failure))
 

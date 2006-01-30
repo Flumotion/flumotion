@@ -73,6 +73,7 @@ def checkWebcam(device, id):
     def get_device_name(element):
         name = element.get_property('device-name')
         caps = element.get_pad("src").get_negotiated_caps()
+        log.debug('check', 'negotiated caps: %s' % caps.to_string())
         s = caps[0]
         # before 0.10 framerate was a double
         if gst.gst_version[0] == 0 and gst.gst_version[1] < 9:
@@ -84,11 +85,13 @@ def checkWebcam(device, id):
 
         d = {
             'mime': s.get_name(),
-            'format': s['format'].fourcc,
             'width': s['width'],
             'height': s['height'],
             'framerate': (num, denom),
         }
+        # FIXME: do something about rgb
+        if s.get_name() == 'video/x-raw-yuv':
+            d['format'] = s['format'].fourcc,
         return (name, d)
                 
     # FIXME: taken from the 0.8 check
@@ -103,7 +106,7 @@ def checkWebcam(device, id):
 
     pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,
         autoprobe)
-    d = do_element_check(pipeline, 'source', get_device_name)
+    d = do_element_check(pipeline, 'source', get_device_name, state=gst.STATE_PAUSED)
 
     d.addCallback(check.callbackResult, result)
     d.addErrback(check.errbackNotFoundResult, result, id, device)

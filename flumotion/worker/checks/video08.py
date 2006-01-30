@@ -76,7 +76,10 @@ def do_element_check(pipeline_str, element_name, check_proc,
         except check.CheckProcError, e:
             resolution.errback(errors.RemoteRunError(e.data))
         except Exception, e:
-            resolution.errback(errors.RemoteRunError(e))
+            # we need to proxy through this exception, otherwise we only
+            # get a traceback in this callback
+            resolution.errback(errors.RemoteRunError(
+                log.getExceptionMessage(e)))
 
     # if any error happens during the pipeline run, error out
     def error_cb(pipeline, element, gerror, debug, resolution):

@@ -74,7 +74,8 @@ def do_element_check(pipeline_str, element_name, check_proc):
         except Exception, e:
             log.debug('Unhandled exception while running %r: %r' % (check_proc,
                 e))
-            resolution.errback(errors.RemoteRunError(e))
+            resolution.errback(errors.RemoteRunError(
+                log.getExceptionMessage(e)))
 
     def message_rcvd(bus, message, pipeline, resolution):
         t = message.type

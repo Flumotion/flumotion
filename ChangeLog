@@ -1,5 +1,16 @@
 2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/checks/check.py:
+	  get a traceback as debug info for unhandled failures
+	* flumotion/worker/checks/video.py:
+	  put in a fix for RGB webcams, and for 0.8
+	* flumotion/worker/checks/video010.py:
+	* flumotion/worker/checks/video08.py:
+	  have our RemoteRunError on a callback give us a nice exception
+	  message
+
+2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent010.py:
 	  generate error messages on generic GStreamer problems
 	* flumotion/component/producers/webcam/webcam.py:
