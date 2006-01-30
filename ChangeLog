@@ -1,5 +1,19 @@
 2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent010.py:
+	  generate error messages on generic GStreamer problems
+	* flumotion/component/producers/webcam/webcam.py:
+	* flumotion/component/producers/webcam/webcam.xml:
+	  add and use mime/format/width/height/framerate
+	* flumotion/wizard/steps.py:
+	* flumotion/worker/checks/video.py:
+	  also probe for mime/format/width/height/framerate
+	  and use the values suggested as starting points
+	  This makes both pwc and quickcam webcams work again nicely
+	  Fixes #307
+
+2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/config.py:
 	  fix the error being raised
 

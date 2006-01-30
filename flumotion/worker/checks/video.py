@@ -59,7 +59,9 @@ def checkWebcam(device, id):
 
     The result is either:
      - succesful, with a None value: no device found
-     - succesful, with a string value: human-readable device name
+     - succesful, with a tuple:
+                  - device name
+                  - dict of mime, format, width, height, fps pair
      - failed
     
     @rtype: L{flumotion.common.messages.Result}
@@ -69,7 +71,25 @@ def checkWebcam(device, id):
     # FIXME: add code that checks permissions and ownership on errors,
     # so that we can offer helpful hints on what to do.
     def get_device_name(element):
-        return element.get_property('device-name')
+        name = element.get_property('device-name')
+        caps = element.get_pad("src").get_negotiated_caps()
+        s = caps[0]
+        # before 0.10 framerate was a double
+        if gst.gst_version[0] == 0 and gst.gst_version[1] < 9:
+            num = int(s['framerate'] * 16)
+            denom = 16
+        else:
+            num = s['framerate'].num
+            denom = s['framerate'].denom
+
+        d = {
+            'mime': s.get_name(),
+            'format': s['format'].fourcc,
+            'width': s['width'],
+            'height': s['height'],
+            'framerate': (num, denom),
+        }
+        return (name, d)
                 
     # FIXME: taken from the 0.8 check
     # autoprobe = "autoprobe=false"

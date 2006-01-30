@@ -25,11 +25,15 @@ import gobject
 from twisted.internet import reactor
 
 from flumotion.component import component as basecomponent
-from flumotion.common import common, errors, compat
+from flumotion.common import common, errors, compat, messages
 from flumotion.common import gstreamer, pygobject
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
+
 
 class FeedComponent(basecomponent.BaseComponent):
     """
@@ -200,13 +204,18 @@ class FeedComponent(basecomponent.BaseComponent):
                     feed_name = src.get_name().split(':')[2]
                     self.emit('feed-ready', feed_name, True)
         elif t == gst.MESSAGE_ERROR:
-            err, debug = message.parse_error()
+            gerror, debug = message.parse_error()
             self.debug('element %s error %s %s' %
-                       (src.get_path_string(), err, debug))
+                       (src.get_path_string(), gerror, debug))
             self.setMood(moods.sad)
-            self.state.set('message',
-                "GStreamer error in component %s (%s)" % (self.name, message))
-            self.emit('error', src.get_path_string(), err.message)
+            # generate a unique id
+            id = "%s-%s-%d" % (self.name, gerror.domain, gerror.code)
+            m = messages.Error(T_(N_(
+                "Internal GStreamer error.")),
+                debug="%s\n%s: %d\n%s" % (
+                    gerror.message, gerror.domain, gerror.code, debug),
+                id=id)
+            self.state.append('messages', m)
         elif t == gst.MESSAGE_EOS:
             if src == self.pipeline:
                 self.info('End-of-stream in pipeline, stopping')

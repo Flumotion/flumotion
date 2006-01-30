@@ -32,8 +32,10 @@ class Webcam(feedcomponent.ParseLaunchComponent):
         device = properties['device']
 
         # Filtered caps
-        format = properties.get('format', 'video/x-raw-yuv')
-        struct = gst.structure_from_string('%s,format=(fourcc)I420' % format)
+        mime = properties.get('mime', 'video/x-raw-yuv')
+        format = properties.get('format', 'I420')
+        struct = gst.structure_from_string('%s,format=(fourcc)%s' % (
+            mime, format))
 
         if 'framerate' in properties:
             framerate = properties['framerate']

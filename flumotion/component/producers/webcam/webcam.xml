@@ -17,8 +17,12 @@
 
       <properties>
         <property name="device" type="string" required="yes"/>
-        <property name="height" type="int" />
+
+        <property name="mime" type="string" />
+        <property name="format" type="string" />
+
         <property name="width" type="int" />
+        <property name="height" type="int" />
         <property name="framerate" type="fraction" />
 
 <!-- FIXME: get these into an effect namespace ? -->

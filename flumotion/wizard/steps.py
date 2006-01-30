@@ -369,6 +369,10 @@ class Webcam(VideoSource):
     
     in_setup = False
 
+    # these are probed, not set from the UI
+    _mime = None
+    _format = None
+    
     def setup(self):
         self.in_setup = True
         self.combobox_device.set_list(('/dev/video0',
@@ -406,16 +410,25 @@ class Webcam(VideoSource):
                            device, id='webcam-check')
         yield d
         try:
-            deviceName = d.value()
-            if not deviceName:
+            result = d.value()
+            
+            if not result:
                 self.debug('no device %s' % device)
                 yield None
+
+            deviceName, caps = result
             self.clear_msg('webcam-check')
             self.label_name.set_label(deviceName)
             self.wizard.block_next(False)
+            self.spinbutton_width.set_value(caps['width'])
             self.spinbutton_width.set_sensitive(True)
+            self.spinbutton_height.set_value(caps['height'])
             self.spinbutton_height.set_sensitive(True)
+            fps = caps['framerate']
+            self.spinbutton_framerate.set_value(float(fps[0]) / fps[1])
             self.spinbutton_framerate.set_sensitive(True)
+            self._mime = caps['mime']
+            self._format = caps['format']
         except errors.RemoteRunFailure, e:
             self.debug('a RemoteRunFailure happened')
             self.clear()
@@ -428,6 +441,8 @@ class Webcam(VideoSource):
         options['height'] = int(self.spinbutton_height.get_value())
         options['framerate'] = \
             _fraction_from_float(self.spinbutton_framerate.get_value(), 16)
+        options['mime'] = self._mime
+        options['format'] = self._format
         return options
 
 class TestVideoSource(VideoSource):
