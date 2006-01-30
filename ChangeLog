@@ -1,3 +1,11 @@
+2006-01-30  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/launch/main.py (ComponentWrapper.__init__): Parse
+	fraction values as well.
+	(main): Implement a --delay option that will delay starting up the
+	components by a certain amount of time. Can be useful for testing
+	synchronization.
+
 2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:

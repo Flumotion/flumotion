@@ -21,6 +21,7 @@
 
 import optparse
 import sys
+import time
 
 from twisted.python import reflect
 from twisted.internet import reactor
@@ -201,6 +202,11 @@ class ComponentWrapper(object):
                 val = bool(v)
             elif t == 'string':
                 val = str(v)
+            elif t == 'fraction':
+                split = v.split('/')
+                assert len(split) == 2, \
+                       "Fraction values should be in the form N/D"
+                val = (int(split[0]), int(split[1]))
             else:
                 err('Unknown type `%s\' of property %s in component %s'
                     % (t, k, name))
@@ -275,6 +281,9 @@ def main(args):
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",
                       help="set debug levels")
+    parser.add_option('', '--delay',
+                      action="store", type="float", dest="delay",
+                      help="set debug levels")
     parser.add_option('-v', '--verbose',
                       action="store_true", dest="verbose",
                       help="be verbose")
@@ -297,6 +306,11 @@ def main(args):
 
     if options.debug:
         log.setFluDebug(options.debug)
+
+    if options.delay:
+        delay = options.delay
+    else:
+        delay = 0.
 
     components, links, properties = parse_args(args[1:])
 
@@ -326,6 +340,7 @@ def main(args):
                       for x in links if x[2] == wrapper.name]
         feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost', p)
                        for x, p in feed_ports[wrapper.name].items()]
+        time.sleep(delay)
         ret = wrapper.start(eatersdata, feedersdata)
         if ret:
             for x in ret:
