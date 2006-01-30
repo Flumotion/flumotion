@@ -1,105 +1,107 @@
 # Flumotion
 # This file is put in the public domain.
 # Thomas Vander Stichele <thomas at fluendo dot com>, 2006.
-#
+# Thomas Vander Stichele <thomas at fluendo dot com>, 2006.
+# 
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-01-29 20:09+0100\n"
-"PO-Revision-Date: 2006-01-29 19:46+0100\n"
-"Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
-"Language-Team: fr\n"
+"PO-Revision-Date: 2006-01-30 18:28+0000\n"
+"Last-Translator: bilboed <(null)>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);"
 
 #: flumotion/admin/gtk/client.py:153
 msgid "Not connected"
-msgstr "Pas connecté"
+msgstr "Non connecté"
 
 #: flumotion/admin/gtk/client.py:182
 #, python-format
 msgid "Connecting to %s:%s"
-msgstr ""
+msgstr "Connexion à %s:%s"
 
 #: flumotion/admin/gtk/client.py:267 flumotion/admin/gtk/client.py:331
 #, python-format
 msgid "Loading UI for %s ..."
-msgstr ""
+msgstr "Chargement de l'interface de %s"
 
 #: flumotion/admin/gtk/client.py:349
 #, python-format
 msgid "Loading tab %s for %s ..."
-msgstr ""
+msgstr "Chargement de l'onglet %s pour %s"
 
 #: flumotion/admin/gtk/client.py:368
 #, python-format
 msgid "%s does not have a UI yet"
-msgstr ""
+msgstr "%s n'a pas encore d'interface graphique"
 
 #: flumotion/admin/gtk/client.py:573
 #, python-format
 msgid "%s - Flumotion Administration"
-msgstr ""
+msgstr "%s - Administration de Flumotion"
 
 #: flumotion/admin/gtk/client.py:589
 msgid "Lost connection to manager, reconnecting ..."
-msgstr ""
+msgstr "Connection au contremaître perdue, reconnection en cours..."
 
 #: flumotion/admin/gtk/client.py:609
 #, python-format
 msgid "Connection to manager on %s was refused."
-msgstr ""
+msgstr "La connexion au contremaître sur %s a été refusée."
 
 #: flumotion/admin/gtk/client.py:611
 #, python-format
 msgid "Connection to %s was refused"
-msgstr ""
+msgstr "Connection à %s refusée."
 
 #: flumotion/admin/gtk/client.py:624
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
-msgstr ""
+msgstr "Connection au contremaître sur %s a echouée (%s)."
 
 #: flumotion/admin/gtk/client.py:714
 #, python-format
 msgid "Component %s is sad"
-msgstr "Component %s pleure"
+msgstr "Le composant %s est malheureux"
 
 #: flumotion/admin/gtk/client.py:720
 #, python-format
 msgid "Showing UI for %s"
-msgstr ""
+msgstr "Affichage de l'interface graphique pour %s"
 
 #: flumotion/admin/gtk/client.py:740
 #, python-format
 msgid "No UI for component %s"
-msgstr ""
+msgstr "Pas d'interface graphique pour le composant %s"
 
 #: flumotion/admin/gtk/client.py:754
 #, python-format
 msgid "Component %s is still sleeping"
-msgstr ""
+msgstr "Le composant %s est encore en train de dormir"
 
 #: flumotion/admin/gtk/client.py:764
 #, python-format
 msgid "Requesting UI for %s ..."
-msgstr ""
+msgstr "Demande de l'interface graphique pour %s ..."
 
 #: flumotion/admin/gtk/client.py:810
 msgid "The wizard cannot be run because no workers are logged in."
-msgstr ""
+msgstr "L'assistant ne peut être executé car aucun ouvrier n'est connecté."
 
 #: flumotion/admin/gtk/client.py:851
 #, python-format
 msgid "Reloading component code for %s"
-msgstr ""
+msgstr "Re-chargement du code de composant pour %s"
 
 #: flumotion/admin/gtk/client.py:882
 msgid "No component selected."
-msgstr ""
+msgstr "Aucun composant sélectionné."
 
 #: flumotion/admin/gtk/client.py:899
 #, python-format
@@ -108,41 +110,44 @@ msgstr ""
 
 #: flumotion/admin/gtk/client.py:926
 msgid "Import Configuration..."
-msgstr ""
+msgstr "Charger Configuration..."
 
 #: flumotion/admin/gtk/client.py:939
 msgid ""
 "File already exists.\n"
 "Overwrite?"
 msgstr ""
+"Le fichier existe déjà.\n"
+"Ecrire par dessus ?"
 
 #: flumotion/admin/gtk/client.py:961
 msgid "Export Configuration..."
-msgstr ""
+msgstr "Exporter la configuration..."
 
 #: flumotion/admin/gtk/client.py:1005
 #, python-format
 msgid ""
 "Could not reload component:\n"
 "%s."
-msgstr ""
+msgstr "Impossible de relancer le composant:\n"
+"%s."
 
 #: flumotion/admin/gtk/client.py:1015
 msgid "Reloading ..."
-msgstr ""
+msgstr "Re-chargement"
 
 #: flumotion/admin/gtk/client.py:1016
 msgid "Reloading client code"
-msgstr ""
+msgstr "Re-chargement du code du client"
 
 #: flumotion/admin/gtk/client.py:1018
 #, python-format
 msgid "Reloading %s code"
-msgstr ""
+msgstr "Re-chargement du code de %s"
 
 #: flumotion/admin/gtk/client.py:1031
 msgid "About Flumotion"
-msgstr ""
+msgstr "A propos de Flumotion"
 
 #: flumotion/admin/gtk/client.py:1050
 msgid ""
@@ -150,27 +155,30 @@ msgid ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 msgstr ""
+"Flumotion est un serveur de diffusion de médias.\n"
+"\n"
+"(C)·2004-2005·Fluendo·S.L."
 
 #: flumotion/admin/gtk/client.py:1055
 msgid "Authors"
-msgstr ""
+msgstr "Auteurs"
 
 #: flumotion/admin/gtk/message.py:34
 msgid "Error"
-msgstr ""
+msgstr "Erreur"
 
 #: flumotion/admin/gtk/message.py:35
 #: flumotion/test/test_common_messages.py:113
 msgid "Warning"
-msgstr ""
+msgstr "Avertissement"
 
 #: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:54
 msgid "Note"
-msgstr ""
+msgstr "Note"
 
 #: flumotion/admin/gtk/message.py:130
 msgid "Debug information:\n"
-msgstr "Information de debug:\n"
+msgstr "Information de débogage:\n"
 
 #: flumotion/admin/gtk/message.py:134
 msgid "Message"
@@ -178,39 +186,39 @@ msgstr "Message"
 
 #: flumotion/admin/gtk/greeter.py:39
 msgid "Connect to Flumotion manager"
-msgstr ""
+msgstr "Connection au contremaître Flumotion"
 
 #: flumotion/admin/gtk/greeter.py:40
 msgid "Flumotion Admin needs to connect to a Flumotion manager.\n"
-msgstr ""
+msgstr "L'administrateur Flumotion doit être connecté à un contremaître Flumotion.\n"
 
 #: flumotion/admin/gtk/greeter.py:41
 msgid "Choose an option from the list and click \"Forward\" to begin."
-msgstr ""
+msgstr "Choisissez une option dans la liste et appuyez sur \"Suivant\" pour démarrer."
 
 #: flumotion/admin/gtk/greeter.py:63
 msgid "Host information"
-msgstr ""
+msgstr "Information sur l'hôte"
 
 #: flumotion/admin/gtk/greeter.py:64
 msgid "Please enter the address where the manager is running."
-msgstr ""
+msgstr "Veuillez entrer l'adresse où le contremaître est actif."
 
 #: flumotion/admin/gtk/greeter.py:87
 msgid "Authentication"
-msgstr ""
+msgstr "Authentification"
 
 #: flumotion/admin/gtk/greeter.py:88
 msgid "Please select among the following authentication methods."
-msgstr ""
+msgstr "Veuillez choisir une des méthodes d'authentification suivantes."
 
 #: flumotion/admin/gtk/greeter.py:114
 msgid "Recent connections"
-msgstr ""
+msgstr "Connexions récentes"
 
 #: flumotion/admin/gtk/greeter.py:115 data/glade/connection-dialog.glade:84
 msgid "Please choose a connection from the box below."
-msgstr ""
+msgstr "Veuillez choisir une connection ci-dessous."
 
 #: flumotion/admin/gtk/parts.py:171
 msgid "Mood"
@@ -218,15 +226,15 @@ msgstr "Humeur"
 
 #: flumotion/admin/gtk/parts.py:176 flumotion/admin/gtk/parts.py:427
 msgid "Component"
-msgstr "Component"
+msgstr "Composant"
 
 #: flumotion/admin/gtk/parts.py:181
 msgid "Worker"
-msgstr "Travailleur"
+msgstr "Ouvrier"
 
 #: flumotion/admin/gtk/parts.py:370
 msgid "[any worker]"
-msgstr ""
+msgstr "[n'importe quel ouvrier]"
 
 #: flumotion/admin/gtk/parts.py:429
 msgid "_Restart"
@@ -238,40 +246,41 @@ msgstr "_Démarrer"
 
 #: flumotion/admin/gtk/parts.py:440
 msgid "St_op"
-msgstr "_Arrête"
+msgstr "A_rrêter"
 
 #: flumotion/admin/gtk/parts.py:448
 msgid "Reload _code"
-msgstr "Recharger _code"
+msgstr "Recharger le _code"
 
 #: flumotion/admin/gtk/parts.py:452
 msgid "_Modify element property ..."
-msgstr ""
+msgstr "_Modifier les propriétés de l'élément ..."
 
 #: flumotion/wizard/enums.py:83
 msgid "SMPTE Color bars"
-msgstr ""
+msgstr "Barres de couleur SMPTE"
 
 #: flumotion/wizard/enums.py:84
 msgid "Random (television snow)"
-msgstr ""
+msgstr "Aléatoire (Neige de télévision)"
 
 #: flumotion/wizard/enums.py:85
 msgid "Totally black"
-msgstr ""
+msgstr "Noir"
 
 #: flumotion/wizard/wizard.py:296
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
-msgstr ""
+msgstr "Tous les ouvriers se sont déconnectés.\n"
+"Vérifiez que votre réseau Flumotion est correctemment configuré."
 
 #: flumotion/wizard/wizard.py:346 flumotion/wizard/steps.py:506
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Le composant '%s' n'a pas l'élément GStreamer '%s'."
+msgstr[1] "Le composant '%s' n'a pas les éléments GStreamer '%s'."
 
 #: flumotion/wizard/wizard.py:351
 msgid ""
@@ -279,6 +288,8 @@ msgid ""
 "Please install the necessary GStreamer plug-ins that provide these elements "
 "and restart the worker."
 msgstr ""
+"\n"
+"Veuillez installer les plug-ins GStreamer fournissant ces éléments puis redémarrer l'ouvrier."
 
 #: flumotion/wizard/wizard.py:354
 msgid ""
@@ -286,32 +297,35 @@ msgid ""
 "\n"
 "You will not be able to go forward using this worker."
 msgstr ""
+"\n"
+"\n"
+"Vous ne pourrez pas continuer si vous utilisez cet ouvrier."
 
 #: flumotion/wizard/steps.py:84
 msgid "If you want to stream video"
-msgstr ""
+msgstr "Si vous souhaitez diffuser de la vidéo"
 
 #: flumotion/wizard/steps.py:86
 msgid "If you want to stream audio"
-msgstr ""
+msgstr "Si vous souhaitez diffuser de l'audio"
 
 #: flumotion/wizard/steps.py:270
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
-msgstr ""
+msgstr "%s,·%s·(rapport d'aspect de pixel %d/%d)"
 
 #: flumotion/wizard/steps.py:320
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
-msgstr ""
+msgstr "%dx%d,·rapport de pixel de %d/%d"
 
 #: flumotion/wizard/steps.py:340
 msgid "Checking for Firewire device..."
-msgstr ""
+msgstr "Détection du périphérique Firewire..."
 
 #: flumotion/wizard/steps.py:402
 msgid "Probing webcam, this can take a while..."
-msgstr ""
+msgstr "Détéction de la webcam, cette étape peut prendre du temp..."
 
 #: flumotion/wizard/steps.py:482
 msgid ""
@@ -319,10 +333,12 @@ msgid ""
 "Please consider upgrading if your output video has a\n"
 "diagonal line in the image."
 msgstr ""
+"Le plugin ffmpegcolorspace de ce composant est plus ancien que la version 0.8.5.\n"
+"Veuillez considérez sa mise-à-jour si vous constatez une ligne diagonale dans la sortie vidéo."
 
 #: flumotion/wizard/steps.py:495
 msgid "Could not check features of the 'ffmpegcolorspace' element."
-msgstr ""
+msgstr "Impossible de vérifier les propriétés de l'élément 'ffmpegcolorspace'."
 
 #: flumotion/wizard/steps.py:510
 msgid ""
@@ -330,194 +346,194 @@ msgid ""
 "\n"
 "Click Next to proceed without overlay."
 msgstr ""
+"\n"
+"\n"
+"Appuyez sur Suivant pour continuer sans masque."
 
 #: flumotion/wizard/step.py:139
 msgid "Internal error: could not run check code on worker."
-msgstr ""
+msgstr "Erreur interne: impossible d'éxécuter le code de vérification sur l'ouvrier"
 
 #: flumotion/component/feedcomponent.py:143
 msgid "GStreamer error: could not parse component pipeline."
-msgstr "Erreur GStreamer: échoué de comprendre le tube du component."
+msgstr "Erreur GStreamer: impossible d'analyser le tube du component."
 
 #: flumotion/component/consumers/httpstreamer/http.py:448
 #, python-format
 msgid "Network error: TCP port %d is not available."
-msgstr "Erreur de réseau: porte TCP %d n'est pas disponible."
+msgstr "Erreur de réseau: le port TCP %d n'est pas disponible."
 
 #: flumotion/component/consumers/httpstreamer/http.glade:8
 #: flumotion/component/consumers/httpstreamer/admin_gtk.py:132
 msgid "Statistics"
-msgstr ""
+msgstr "Statistiques"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:129
 #: flumotion/component/consumers/httpstreamer/admin_gtk.py:50
 msgid "Mime type:"
-msgstr ""
+msgstr "Type MIME:"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:155
 msgid "<b>Stream</b>"
-msgstr ""
+msgstr "<b>Flux</b>"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:180
 msgid "Uptime:"
-msgstr ""
+msgstr "Durée de fonctionnement:"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:206
 #: flumotion/component/consumers/httpstreamer/http.glade:616
 msgid "Bit rate:"
-msgstr ""
+msgstr "Débit:"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:232
 #: flumotion/component/consumers/httpstreamer/http.glade:642
 msgid "Total bytes:"
-msgstr ""
+msgstr "Total (octets):"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:258
 msgid "<b>Clients</b>"
-msgstr ""
+msgstr "<b>Clients</b>"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:283
 msgid "Average:"
-msgstr ""
+msgstr "Moyenne:"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:309
 msgid "Current:"
-msgstr ""
+msgstr "Courant:"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:335
 msgid "Peak:"
-msgstr ""
+msgstr "Maximum:"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:412
 msgid "of"
-msgstr ""
+msgstr "sur"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:491
 msgid "at"
-msgstr ""
+msgstr "à"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:591
 msgid "<b>Client Consumption</b>"
-msgstr ""
+msgstr "<b>Consommation du client</b>"
 
 #: flumotion/component/consumers/httpstreamer/admin_gtk.py:134
 msgid "Log"
-msgstr ""
+msgstr "Journal"
 
 #: flumotion/component/producers/videotest/admin_gtk.py:34
 msgid "Pattern:"
-msgstr ""
+msgstr "Motif:"
 
 #: flumotion/component/producers/videotest/admin_gtk.py:86
 msgid "Pattern"
-msgstr ""
+msgstr "Motif"
 
 #: flumotion/manager/manager.py:548
 msgid "The component could not be started."
-msgstr ""
+msgstr "Le composant n'a pas pu être démarré."
 
 #: flumotion/worker/checks/check.py:45
 #, python-format
 msgid ""
 "Could not open device '%s' for reading.  Check permissions on the device."
-msgstr ""
+msgstr "Impossible d'accéder en lecture au périphérique '%s'. Veuillez vérifier les droits d'accés au périphérique."
 
 #: flumotion/worker/checks/check.py:48
 #, python-format
 msgid "Could not open device '%s'.  Check permissions on the device."
-msgstr ""
+msgstr "Impossible d'ouvrir le périphérique '%s'. Vérifiez les droits sur ce périphérique."
 
 #: flumotion/worker/checks/check.py:51
 #, python-format
 msgid "Device '%s' is already in use."
-msgstr ""
+msgstr "Le périphérique '%s' est déjà utilisé."
 
 #: flumotion/worker/checks/check.py:54
 #, python-format
 msgid "Device '%s' did not accept the requested settings."
-msgstr ""
+msgstr "Le périphérique '%s' n'accepte pas les réglages demandés."
 
 #: flumotion/worker/checks/check.py:60 flumotion/worker/checks/check.py:64
 msgid "Internal GStreamer error."
-msgstr ""
+msgstr "Erreur interne à GStreamer"
 
 #: flumotion/worker/checks/check.py:96
 #, python-format
 msgid "Could not probe device '%s'."
-msgstr ""
+msgstr "Impossible de sonder le périphérique '%s'"
 
 #: flumotion/worker/checks/check.py:114
 #, python-format
 msgid "No device found on %s."
-msgstr ""
+msgstr "Aucun périphérique détecté sur %s."
 
 #: flumotion/worker/checks/video08.py:156
 #: flumotion/worker/checks/video010.py:155
 msgid "Device node /dev/raw1394 does not exist."
-msgstr ""
+msgstr "Le noeud de périphérique /dev/raw1394 n'existe pas."
 
 #: flumotion/worker/checks/video08.py:175
 #: flumotion/worker/checks/video010.py:173
 msgid "No Firewire device found."
-msgstr ""
+msgstr "Aucun périphérique Firewire détécté."
 
 #: flumotion/worker/checks/video08.py:181
 #: flumotion/worker/checks/video010.py:179
 msgid "Could not probe Firewire device."
-msgstr ""
+msgstr "Impossible de sonder pour le périphérique Firewire."
 
 #: flumotion/worker/checks/video08.py:205
 msgid ""
 "The ffmpegcolorspace element is too old. Please upgrade gst-plugins to "
 "version 0.8.5."
 msgstr ""
+"L'élément ffmpegcolorspace est trop ancien. Veuillez mettre à jour gst-plugins à la version 0.8.5."
 
 #: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:91
 msgid "I am a translatable string"
-msgstr ""
+msgstr "Je suis une chaîne traduisible"
 
 #: flumotion/test/test_i18n.py:58 flumotion/test/test_i18n.py:92
 msgid "I am a translated string"
-msgstr ""
+msgstr "Je suis une chaîne traduite"
 
 #: flumotion/test/test_i18n.py:108 flumotion/test/test_i18n.py:113
 #, python-format
 msgid "I can translate %d thing"
-msgid_plural "I can translate %d things"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:115
 #, python-format
 msgid "I translated %d thing"
-msgid_plural "I translated %d things"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: flumotion/test/test_common_messages.py:42
 msgid "Something is really wrong."
-msgstr ""
+msgstr "Quelque chose ne va vraiment pas."
 
 #: flumotion/test/test_common_messages.py:55
 msgid "warning"
-msgstr ""
+msgstr "avertissement"
 
 #: flumotion/test/test_common_messages.py:59
 #: flumotion/test/test_common_messages.py:84
 #, python-format
 msgid "%s can be translated"
-msgstr ""
+msgstr "%s·peut être traduit."
 
 #: flumotion/test/test_common_messages.py:66
 #, python-format
 msgid "%s %d has %d thing"
 msgid_plural "%s %d has %d things"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s %d a %d chose"
+msgstr[1] "%s %d a %d choses"
 
 #: flumotion/test/test_common_messages.py:93
 msgid "Something is really wrong. "
-msgstr ""
+msgstr "Quelque chose ne va vraiment pas."
 
 #: flumotion/test/test_common_messages.py:94
 #, python-format
@@ -526,83 +542,83 @@ msgstr ""
 
 #: flumotion/test/test_common_messages.py:126
 msgid "uh oh"
-msgstr ""
+msgstr "oh oh"
 
 #: data/glade/admin.glade:10
 msgid "Flumotion Administration"
-msgstr "Gestion de Flumotion"
+msgstr "Administration de Flumotion"
 
 #: data/glade/admin.glade:36
 msgid "_Connection"
-msgstr "_Connection"
+msgstr "_Connexion"
 
 #: data/glade/admin.glade:60
 msgid "_Import Configuration..."
-msgstr ""
+msgstr "_Importer Configuration..."
 
 #: data/glade/admin.glade:69
 msgid "_Export Configuration..."
-msgstr ""
+msgstr "_Exporter Configuration..."
 
 #: data/glade/admin.glade:97
 msgid "_Manage"
-msgstr "_Manager"
+msgstr "_Contrôler"
 
 #: data/glade/admin.glade:106
 msgid "S_tart Component"
-msgstr ""
+msgstr "_Démarrer le Composant"
 
 #: data/glade/admin.glade:127
 msgid "St_op Component"
-msgstr ""
+msgstr "_Arrêter le Composant"
 
 #: data/glade/admin.glade:154
 msgid "Start _All"
-msgstr ""
+msgstr "_Tout Démarrer"
 
 #: data/glade/admin.glade:163
 msgid "Stop A_ll"
-msgstr ""
+msgstr "Tout A_rrêter"
 
 #: data/glade/admin.glade:172
 msgid "_Clear All"
-msgstr ""
+msgstr "Tout _Enlever"
 
 #: data/glade/admin.glade:199
 msgid "Run _Wizard"
-msgstr ""
+msgstr "Démarrer l'A_ssistant"
 
 #: data/glade/admin.glade:224
 msgid "_Debug"
-msgstr ""
+msgstr "_Déboguage"
 
 #: data/glade/admin.glade:233
 msgid "Reload _Manager"
-msgstr ""
+msgstr "Redémarrer le _Contremaître"
 
 #: data/glade/admin.glade:254
 msgid "Reload _All"
-msgstr ""
+msgstr "Tout _Redémarrer"
 
 #: data/glade/admin.glade:263
 msgid "Start _Shell"
-msgstr ""
+msgstr "Démarrer le _Shell"
 
 #: data/glade/admin.glade:288
 msgid "_Help"
-msgstr "_Secours"
+msgstr "_Aide"
 
 #: data/glade/admin.glade:325
 msgid "Open a stored configuration"
-msgstr ""
+msgstr "Charger une configuration"
 
 #: data/glade/admin-wizard.glade:8 data/glade/wizard.glade:8
 msgid "Flumotion Configuration Wizard"
-msgstr ""
+msgstr "Assistant de Configuration de Flumotion"
 
 #: data/glade/admin-wizard.glade:43
 msgid "Name of step"
-msgstr ""
+msgstr "Nom de l'étape"
 
 #: data/glade/authenticate.glade:8 data/glade/connections.glade:8
 #: data/glade/greeter-authenticate.glade:8
@@ -621,104 +637,104 @@ msgstr ""
 #: data/glade/wizard_tvcard.glade:8 data/glade/wizard_vorbis.glade:8
 #: data/glade/wizard_webcam.glade:8 data/glade/wizard_welcome.glade:7
 msgid "window1"
-msgstr ""
+msgstr "vive le camembert !"
 
 #: data/glade/authenticate.glade:32
 msgid "_Password"
-msgstr ""
+msgstr "Mot de _Passe"
 
 #: data/glade/authenticate.glade:118
 msgid "Name and Password"
-msgstr ""
+msgstr "Nom et Mot de passe"
 
 #: data/glade/authenticate.glade:148
 msgid "_Authentication Method"
-msgstr ""
+msgstr "Méthode d'_Authentification"
 
 #: data/glade/authenticate.glade:175
 msgid "_Username"
-msgstr ""
+msgstr "_Utilisateur"
 
 #: data/glade/connection-dialog.glade:8
 msgid "Open Connection..."
-msgstr ""
+msgstr "Ouvrir une Connexion..."
 
 #: data/glade/connections.glade:79
 msgid "Clear _All"
-msgstr ""
+msgstr "Tout _Enlever"
 
 #: data/glade/greeter-initial.glade:30
 msgid "_Open recent connection"
-msgstr ""
+msgstr "_Ouvrir une connexion récente"
 
 #: data/glade/greeter-initial.glade:48
 msgid "Connect to a _running manager"
-msgstr ""
+msgstr "Connexion à un contremaît_re actif"
 
 #: data/glade/greeter-initial.glade:68
 msgid "Start a _new manager and connect to it"
-msgstr ""
+msgstr "Démarrer un _nouveau contremaître et se connecter a celui-ci"
 
 #: data/glade/open-connection.glade:90
 msgid "_Host"
-msgstr ""
+msgstr "_Hôte"
 
 #: data/glade/open-connection.glade:129
 msgid "_Port"
-msgstr ""
+msgstr "_Port"
 
 #: data/glade/open-connection.glade:169
 msgid "_Secure connection via SSL"
-msgstr ""
+msgstr "Connexion _sécurisée via SSL"
 
 #: data/glade/wizard_audio_encoder.glade:31 data/glade/wizard_theora.glade:102
 #: data/glade/wizard_vorbis.glade:102
 msgid "Bit _rate:"
-msgstr ""
+msgstr "_Débit:"
 
 #: data/glade/wizard_audio_encoder.glade:78 data/glade/wizard_theora.glade:32
 #: data/glade/wizard_vorbis.glade:32
 msgid "kbit/s"
-msgstr ""
+msgstr "kbit/s"
 
 #: data/glade/wizard_audiotest.glade:32
 msgid "_Volume:"
-msgstr ""
+msgstr "_Volume:"
 
 #: data/glade/wizard_audiotest.glade:57
 msgid "_Sample rate:"
-msgstr ""
+msgstr "_Taux d'échantillonage:"
 
 #: data/glade/wizard_audiotest.glade:82
 msgid "F_requency:"
-msgstr ""
+msgstr "F_réquence:"
 
 #: data/glade/wizard_consumption.glade:29
 msgid "S_tream over HTTP"
-msgstr ""
+msgstr "Diffusion sur _HTTP"
 
 #: data/glade/wizard_consumption.glade:60
 #: data/glade/wizard_consumption.glade:163
 msgid "Audio & Video"
-msgstr ""
+msgstr "Audio et Vidéo"
 
 #: data/glade/wizard_consumption.glade:79
 #: data/glade/wizard_consumption.glade:183
 msgid "Audio only"
-msgstr ""
+msgstr "Audio seulement"
 
 #: data/glade/wizard_consumption.glade:98
 #: data/glade/wizard_consumption.glade:203
 msgid "Video only"
-msgstr ""
+msgstr "Vidéo seulement"
 
 #: data/glade/wizard_consumption.glade:131
 msgid "S_ave to disk"
-msgstr ""
+msgstr "_Enregistrer sur disque"
 
 #: data/glade/wizard_disk.glade:38
 msgid "_Choose location:"
-msgstr ""
+msgstr "_Choisir emplacement:"
 
 #: data/glade/wizard_disk.glade:117
 msgid ""
@@ -728,119 +744,124 @@ msgid ""
 "week\n"
 "month"
 msgstr ""
+"minute\n"
+"heure\n"
+"jour\n"
+"semaine\n"
+"mois"
 
 #: data/glade/wizard_disk.glade:232
 msgid "_Rotate entry every"
-msgstr ""
+msgstr "Effectuer une _rotation tous les"
 
 #: data/glade/wizard_encoding.glade:83 data/glade/wizard_testsource.glade:120
 msgid "F_ormat:"
-msgstr ""
+msgstr "F_ormat:"
 
 #: data/glade/wizard_encoding.glade:108 data/glade/wizard_source.glade:92
 msgid "_Video:"
-msgstr ""
+msgstr "_Vidéo:"
 
 #: data/glade/wizard_encoding.glade:133 data/glade/wizard_source.glade:33
 msgid "_Audio:"
-msgstr ""
+msgstr "_Audio:"
 
 #: data/glade/wizard_firewire.glade:54
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
-msgstr ""
+msgstr "PAL,·4:3·(rapport d'aspect de pixel 59/54)"
 
 #: data/glade/wizard_firewire.glade:72 data/glade/wizard_firewire.glade:487
 msgid "<b>Camera settings</b>"
-msgstr ""
+msgstr "<b>Réglages de Caméra</b>"
 
 #: data/glade/wizard_firewire.glade:126
 msgid "Scaled _height:"
-msgstr ""
+msgstr "Ratio de hauteur:"
 
 #: data/glade/wizard_firewire.glade:150
 msgid "Recommended if you are outputting to a computer screen"
-msgstr ""
+msgstr "Recommandé pour visualisation sur moniteur d'ordinateur"
 
 #: data/glade/wizard_firewire.glade:152
 msgid "Convert to s_quare pixels"
-msgstr ""
+msgstr "Convertir en pixels _carrés"
 
 #: data/glade/wizard_firewire.glade:205
 msgid "<b>Scaling</b>"
-msgstr ""
+msgstr "<b>Retaillage</b>"
 
 #: data/glade/wizard_firewire.glade:278
 msgid "_No width correction"
-msgstr ""
+msgstr "Aucu_ne correction de largeur"
 
 #: data/glade/wizard_firewire.glade:300
 msgid "_Stretch to multiple of 8 pixels"
-msgstr ""
+msgstr "Et_irer a un multiple de 8 pixels"
 
 #: data/glade/wizard_firewire.glade:323
 msgid "_Pad to multiple of 8 pixels"
-msgstr ""
+msgstr "C_omplêter jusqu'à un multiple de 8 pixels"
 
 #: data/glade/wizard_firewire.glade:356
 msgid "<b>Width correction</b>"
-msgstr ""
+msgstr "<b>Correction de largeur</b>"
 
 #: data/glade/wizard_firewire.glade:421 data/glade/wizard_jpeg.glade:56
 msgid "Frame _rate:"
-msgstr ""
+msgstr "Images pa_r secondes:"
 
 #: data/glade/wizard_firewire.glade:462
 msgid "frames per second"
-msgstr ""
+msgstr "images par seconde"
 
 #: data/glade/wizard_firewire.glade:534
 msgid "none"
-msgstr ""
+msgstr "aucun"
 
 #: data/glade/wizard_firewire.glade:552
 msgid "<b>Output format</b>"
-msgstr ""
+msgstr "<b>Format de sortie</b>"
 
 #: data/glade/wizard_http.glade:33
 msgid "_Port:"
-msgstr ""
+msgstr "_Port:"
 
 #: data/glade/wizard_http.glade:84
 msgid "B_andwidth limit:"
-msgstr ""
+msgstr "Limite en _bande passante:"
 
 #: data/glade/wizard_http.glade:113
 msgid "_User limit:"
-msgstr ""
+msgstr "Limite d'_utilisateurs:"
 
 #: data/glade/wizard_http.glade:186
 msgid "Mbit/s"
-msgstr ""
+msgstr "Mbit/s"
 
 #: data/glade/wizard_http.glade:214
 msgid "clients"
-msgstr ""
+msgstr "clients"
 
 #: data/glade/wizard_http.glade:242
 msgid "_Mount point:"
-msgstr ""
+msgstr "Point de _Montage:"
 
 #: data/glade/wizard_http.glade:295
 msgid "Bu_rst on connect"
-msgstr ""
+msgstr "_Rafale à la connexion"
 
 #: data/glade/wizard_jpeg.glade:31 data/glade/wizard_theora.glade:124
 #: data/glade/wizard_vorbis.glade:124
 msgid "_Quality:"
-msgstr ""
+msgstr "_Qualité:"
 
 #: data/glade/wizard_jpeg.glade:149
 msgid "frames/s"
-msgstr ""
+msgstr "images/s"
 
 #: data/glade/wizard_license.glade:32
 msgid "Specify _license:"
-msgstr ""
+msgstr "Préciser la _license:"
 
 #: data/glade/wizard_license.glade:53
 msgid ""
@@ -848,55 +869,58 @@ msgid ""
 "GNU FDL\n"
 "Commercial"
 msgstr ""
+"Creative·Commons\n"
+"GNU·FDL\n"
+"Commercial"
 
 #: data/glade/wizard_overlay.glade:33
 msgid "Show _text in upper left corner:"
-msgstr ""
+msgstr "Afficher du _texte dans le coin supérieur gauche:"
 
 #: data/glade/wizard_overlay.glade:55
 msgid "Show _logo in bottom left corner:"
-msgstr ""
+msgstr "Afficher un logo dans le coin inférieur droit:"
 
 #: data/glade/wizard_smoke.glade:32
 msgid "M_inimum quality:"
-msgstr ""
+msgstr "Qualité m_inimale:"
 
 #: data/glade/wizard_smoke.glade:57
 msgid "M_aximum quality:"
-msgstr ""
+msgstr "Qualité m_aximale:"
 
 #: data/glade/wizard_smoke.glade:82
 msgid "_Threshold:"
-msgstr ""
+msgstr "_Limite:"
 
 #: data/glade/wizard_smoke.glade:107
 msgid "_Keyframe spacing: every"
-msgstr ""
+msgstr "Espacement d'images-clefs: tous les"
 
 #: data/glade/wizard_smoke.glade:269
 msgid "frames"
-msgstr ""
+msgstr "images"
 
 #: data/glade/wizard_soundcard.glade:32 data/glade/wizard_tvcard.glade:261
 #: data/glade/wizard_webcam.glade:32
 msgid "_Device:"
-msgstr ""
+msgstr "_Périphérique:"
 
 #: data/glade/wizard_soundcard.glade:57
 msgid "_Input:"
-msgstr ""
+msgstr "_Entrée:"
 
 #: data/glade/wizard_soundcard.glade:82
 msgid "_Channels:"
-msgstr ""
+msgstr "Nombre de _canaux:"
 
 #: data/glade/wizard_soundcard.glade:107
 msgid "Sample _rate:"
-msgstr ""
+msgstr "_Taux d'échantillonage:"
 
 #: data/glade/wizard_soundcard.glade:132
 msgid "Bi_t depth:"
-msgstr ""
+msgstr "Profon_deur d'échantillonage:"
 
 #: data/glade/wizard_soundcard.glade:157
 msgid ""
@@ -904,6 +928,9 @@ msgid ""
 "Microphone\n"
 "CD"
 msgstr ""
+"Entrée ligne\n"
+"Microphone\n"
+"CD"
 
 #: data/glade/wizard_soundcard.glade:175
 msgid ""
@@ -911,14 +938,17 @@ msgid ""
 "Mono\n"
 "5.1"
 msgstr ""
+"Stéréo\n"
+"Mono\n"
+"5.1"
 
 #: data/glade/wizard_soundcard.glade:249
 msgid "Sound _system:"
-msgstr ""
+msgstr "_Système sonore:"
 
 #: data/glade/wizard_soundcard.glade:292 data/glade/wizard_webcam.glade:213
 msgid "Name:"
-msgstr ""
+msgstr "Nom:"
 
 #: data/glade/wizard_source.glade:54
 msgid ""
@@ -927,6 +957,10 @@ msgid ""
 "Webcam\n"
 "Test"
 msgstr ""
+"Carte TV\n"
+"Firewire·\n"
+"Webcam\n"
+"Test"
 
 #: data/glade/wizard_source.glade:73
 msgid ""
@@ -934,6 +968,9 @@ msgid ""
 "Sound card\n"
 "Test"
 msgstr ""
+"Firewire\n"
+"Carte Son\n"
+"Test"
 
 #: data/glade/wizard_summary.glade:43
 msgid ""
@@ -943,31 +980,37 @@ msgid ""
 "When you press \"Apply\", your configuration will be automatically loaded on "
 "your network.  This will take some time."
 msgstr ""
+"Félicitations·! Votre serveur de diffusion est maintenant prêt à l'utilisation\n"
+"\n"
+"En appuyant sur \"Appliquer\", votre configuration sera automatiquement chargé sur votre réseau.\n"
+"Cette procédure peut prendre un certain temps."
 
 #: data/glade/wizard_testsource.glade:33 data/glade/wizard_tvcard.glade:72
 #: data/glade/wizard_webcam.glade:166
 msgid "_Width:"
-msgstr ""
+msgstr "_Largeur"
 
 #: data/glade/wizard_testsource.glade:62 data/glade/wizard_tvcard.glade:97
 #: data/glade/wizard_webcam.glade:119
 msgid "_Height:"
-msgstr ""
+msgstr "_Hauteur"
 
 #: data/glade/wizard_testsource.glade:91 data/glade/wizard_tvcard.glade:166
 #: data/glade/wizard_webcam.glade:72
 msgid "F_ramerate:"
-msgstr ""
+msgstr "F_ramerate:"
 
 #: data/glade/wizard_testsource.glade:149
 msgid "_Pattern:"
-msgstr ""
+msgstr "M_otif:"
 
 #: data/glade/wizard_testsource.glade:178
 msgid ""
 "Snow\n"
 "Black"
 msgstr ""
+"Neige\n"
+"Noir"
 
 #: data/glade/wizard_tvcard.glade:38
 msgid ""
@@ -976,20 +1019,26 @@ msgid ""
 "S-Video\n"
 "Composite3"
 msgstr ""
+"Télévision\n"
+"Composite1\n"
+"S-Video\n"
+"Composite3"
 
 #: data/glade/wizard_tvcard.glade:56
 msgid ""
 "Composite\n"
 "RCA"
 msgstr ""
+"Composite\n"
+"RCA"
 
 #: data/glade/wizard_tvcard.glade:213
 msgid "Video _source:"
-msgstr ""
+msgstr "_Source vidéo:"
 
 #: data/glade/wizard_tvcard.glade:237
 msgid "TV _norm:"
-msgstr ""
+msgstr "_Norme TV:"
 
 #: data/glade/wizard_welcome.glade:36
 msgid ""
@@ -998,3 +1047,7 @@ msgid ""
 "This wizard will guide you through the required steps to help you configure "
 "your streaming media server."
 msgstr ""
+"Bienvenue dans l'assistant de configuration de Flumotion.\n"
+"\n"
+"Cet assistant va vous guider à travers les étapes nécessaires pour la configuration de votre serveur de diffusion multimédia."
+

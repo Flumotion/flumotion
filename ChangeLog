@@ -1,3 +1,8 @@
+2006-01-30  Edward Hervey  <edward@fluendo.com>
+
+	* po/fr.po:
+	Now even FromageTV can use flumotion :)
+
 2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/gstreamer.py:
