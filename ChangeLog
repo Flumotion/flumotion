@@ -1,5 +1,10 @@
 2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/gstreamer.py:
+	  fix element_factory_exists() for 0.8
+
+2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/checks/check.py:
 	  get a traceback as debug info for unhandled failures
 	* flumotion/worker/checks/video.py:

@@ -86,8 +86,12 @@ def element_factory_exists(name):
 
     @rtype: boolean
     """
-    registry = gst.registry_get_default()
-    factory = registry.find_feature(name, gst.TYPE_ELEMENT_FACTORY)
+    if gst.gst_version < (0, 9):
+        factory = gst.registry_pool_find_feature(name, gst.ElementFactory)
+    else:
+        registry = gst.registry_get_default()
+        factory = registry.find_feature(name, gst.TYPE_ELEMENT_FACTORY)
+
     if factory:
         return True
 
