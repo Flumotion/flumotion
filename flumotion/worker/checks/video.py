@@ -91,7 +91,7 @@ def checkWebcam(device, id):
         }
         # FIXME: do something about rgb
         if s.get_name() == 'video/x-raw-yuv':
-            d['format'] = s['format'].fourcc,
+            d['format'] = s['format'].fourcc
         return (name, d)
                 
     # FIXME: taken from the 0.8 check

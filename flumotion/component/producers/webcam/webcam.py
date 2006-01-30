@@ -34,21 +34,23 @@ class Webcam(feedcomponent.ParseLaunchComponent):
         # Filtered caps
         mime = properties.get('mime', 'video/x-raw-yuv')
         format = properties.get('format', 'I420')
-        struct = gst.structure_from_string('%s,format=(fourcc)%s' % (
-            mime, format))
+        width = properties.get('width', None)
+        height = properties.get('height', None)
 
+        string = mime
+        if mime == 'video/x-raw-yuv':
+            string += ",format=(fourcc)%s" % format
+        if width:
+            string += ",width=%d" % width
+        if height:
+            string += ",height=%d" % height
         if 'framerate' in properties:
-            framerate = properties['framerate']
+            f = properties['framerate']
             if gst.gst_version < (0,9):
-                struct['framerate'] = float(framerate[0]) / framerate[1]
+                string += ",framerate=(double)%f" % (float(f[0]) / f[1])
             else:
-                struct['framerate'] = gst.Fraction(framerate[0], framerate[1])
+                string += ",framerate=(fraction)%d/%d" % (f[0], f[1])
 
-        for k in 'width', 'height':
-            if k in properties:
-                struct[k] = properties[k]
-        caps = gst.Caps(struct)
-       
         # create component
         autoprobe = "autoprobe=false"
         # added in gst-plugins 0.8.6
@@ -62,7 +64,7 @@ class Webcam(feedcomponent.ParseLaunchComponent):
         #           'ffmpegcolorspace ! "%s" ! videorate ! "%s"' \
         #           % (autoprobe, device, caps, caps)
         return ('v4lsrc name=source %s copy-mode=1 device=%s ! '
-                '%s ! videorate' % (autoprobe, device, caps))
+                '%s ! videorate' % (autoprobe, device, string))
 
     def configure_pipeline(self, pipeline, properties):
         # create and add colorbalance effect

@@ -428,7 +428,7 @@ class Webcam(VideoSource):
             self.spinbutton_framerate.set_value(float(fps[0]) / fps[1])
             self.spinbutton_framerate.set_sensitive(True)
             self._mime = caps['mime']
-            self._format = caps['format']
+            self._format = caps.get('format', None)
         except errors.RemoteRunFailure, e:
             self.debug('a RemoteRunFailure happened')
             self.clear()
@@ -442,7 +442,8 @@ class Webcam(VideoSource):
         options['framerate'] = \
             _fraction_from_float(self.spinbutton_framerate.get_value(), 16)
         options['mime'] = self._mime
-        options['format'] = self._format
+        if self._format:
+            options['format'] = self._format
         return options
 
 class TestVideoSource(VideoSource):

@@ -1,3 +1,13 @@
+2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/webcam/webcam.py:
+	  put together a string step by step for the caps.  Works for
+	  both 0.8 and 0.10
+	* flumotion/wizard/steps.py:
+	  we can get RGB, hence no format.  handle that case.
+	* flumotion/worker/checks/video.py:
+	  fix a silly bug that caused the config to have a tuple for format
+
 2006-01-30  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/main.py (ComponentWrapper.__init__): Parse
