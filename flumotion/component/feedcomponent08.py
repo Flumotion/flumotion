@@ -147,7 +147,9 @@ class FeedComponent(basecomponent.BaseComponent):
             if block.find(':') == -1:
                 eater_name = block + ':default'
             eater_names.append(eater_name)
+        self.debug('parsed eater config, eaters %r' % eater_names)
         self.eater_names = eater_names
+        self.state.set('eaterNames', self.eater_names)
             
     def parseFeederConfig(self, feeder_config):
         # for pipeline components, in the case there is only one
@@ -160,6 +162,8 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # we create feeder names this component contains based on feed names
         self.feeder_names = map(lambda n: self.name + ':' + n, self.feed_names)
+        self.debug('parsed feeder config, feeders %r' % self.feeder_names)
+        self.state.set('feederNames', self.feeder_names)
 
     def get_eater_names(self):
         """
