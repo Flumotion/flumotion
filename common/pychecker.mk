@@ -11,15 +11,21 @@ pychecker =					\
 	$(pychecker_setup)			\
 	$(pychecker_help)
 
+# during distcheck, we get executed from $(NAME)-$(VERSION)/_build, while
+# our python sources are one level up.  Figure this out and set a FLU_PATH
+# this uses Makefile syntax, so we need to protect it from automake
+thisdir = $(shell basename `pwd`)
+FLU_PATH = $(if $(subst _build,,$(cur)),$(shell pwd),$(shell pwd)/..)
+
 # TODO: This looks a little confusing because out 0.10 files are names blah010.py
 pychecker_all_files = $(filter-out $(PYCHECKER_BLACKLIST),$(wildcard $(PYCHECKER_WHITELIST)))
 pychecker_08_files = $(filter %08.py,$(pychecker_all_files))
 pychecker_10_files = $(filter %010.py,$(pychecker_all_files))
 pychecker_indep_files = $(filter-out $(pychecker_08_files) $(pychecker_10_files),$(pychecker_all_files))
 
-pychecker_indep = PYTHONPATH=`pwd` $(pychecker)
-pychecker_08 = PYTHONPATH=$(PYGST_08_DIR):`pwd` FLU_GST_VERSION=0.8 $(pychecker)
-pychecker_10 = PYTHONPATH=$(PYGST_10_DIR):`pwd` FLU_GST_VERSION=0.10 $(pychecker)
+pychecker_indep = PYTHONPATH=$(FLU_PATH) $(pychecker)
+pychecker_08 = PYTHONPATH=$(PYGST_08_DIR):$(FLU_PATH) FLU_GST_VERSION=0.8 $(pychecker)
+pychecker_10 = PYTHONPATH=$(PYGST_10_DIR):$(FLU_PATH) FLU_GST_VERSION=0.10 $(pychecker)
 
 pychecker_if_08 = if test $(GST_08_SUPPORTED) = yes; then 
 pychecker_if_10 = if test $(GST_10_SUPPORTED) = yes; then 

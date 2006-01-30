@@ -1,3 +1,9 @@
+2006-01-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/pychecker.mk:
+	  fix distcheck by finding the correct flumotion pythonpath to use
+	  during distcheck
+
 2006-01-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/wizard.py:
