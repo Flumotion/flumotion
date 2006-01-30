@@ -189,6 +189,7 @@ class BaseComponentMedium(medium.BaseMedium):
         self.setup(config)
         
     def remote_start(self, *args, **kwargs):
+        self.debug('remote_start(args=%r, kwargs=%r)' % (args, kwargs))
         return self.comp.start(*args, **kwargs)
        
     def remote_stop(self):
