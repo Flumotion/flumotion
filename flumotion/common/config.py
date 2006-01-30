@@ -537,7 +537,7 @@ class FlumotionConfigXML(log.Loggable):
             if not definition.type in parsers:
                 raise ConfigError(
                     "%s: %s: invalid property type %s" % (
-                        componentName, name, type))
+                        componentName, name, definition.type))
                 
             value = parsers[definition.type](nodes)
 
