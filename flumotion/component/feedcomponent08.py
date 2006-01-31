@@ -46,6 +46,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     _reconnectInterval = 3
     
+    ### BaseComponent interface implementations
     def init(self):
         # add extra keys to state
         self.state.addKey('eaterNames')
@@ -66,16 +67,9 @@ class FeedComponent(basecomponent.BaseComponent):
         self.feed_names = []
         self.feeder_names = []
 
-    ### BaseComponent methods
-    def setup(self, config):
-        """
-        @param config: the configuration dictionary of the component
-        @type  config: dict
-        """
-        basecomponent.BaseComponent.setup(self, config)
-
-        eater_config = config.get('source', [])
-        feeder_config = config.get('feed', [])
+    def do_setup(self):
+        eater_config = self.config.get('source', [])
+        feeder_config = self.config.get('feed', [])
 
         self.debug("feedcomponent.setup(): eater_config %r" % eater_config)
         self.debug("feedcomponent.setup(): feeder_config %r" % feeder_config)
@@ -95,6 +89,17 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.debug('setup() finished')
 
+        return defer.succeed(None)
+
+    ### FeedComponent interface for subclasses
+    def create_pipeline(self):
+        raise NotImplementedError, "subclass must implement create_pipeline"
+        
+    def set_pipeline(self, pipeline):
+        self.pipeline = pipeline
+        self.setup_pipeline()
+  
+    ### FeedComponent methods
     def updateMood(self):
         """
         Update the mood because a mood condition has changed.
@@ -126,7 +131,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self.effects[effect.name] = effect
         effect.setComponent(self)
 
-    ### FeedComponent methods
     def effectPropertyChanged(self, effectName, propertyName, value):
         """
         Notify the manager that an effect property has changed to a new value.
@@ -205,13 +209,7 @@ class FeedComponent(basecomponent.BaseComponent):
     def get_pipeline(self):
         return self.pipeline
 
-    def create_pipeline(self):
-        raise NotImplementedError, "subclass must implement create_pipeline"
-        
-    def set_pipeline(self, pipeline):
-        self.pipeline = pipeline
-        self.setup_pipeline()
-        
+       
     def _pipeline_error_cb(self, object, element, error, arg):
         self.debug('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
         self.setMood(moods.sad)

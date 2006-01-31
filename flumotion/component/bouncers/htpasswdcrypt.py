@@ -28,6 +28,7 @@ import random
 
 from twisted.python import components
 from twisted.cred import error
+from twisted.internet import defer
 
 from flumotion.common import interfaces, keycards, log, config
 from flumotion.component import component
@@ -52,8 +53,8 @@ class HTPasswdCrypt(bouncer.Bouncer):
         self._challenges = {} # for UACPCC
         self._db = {}
  
-    def setup(self, conf):
-        bouncer.Bouncer.setup(self, conf)
+    def do_setup(self):
+        conf = self.config
 
         # we need either a filename or data
         props = conf['properties']
@@ -86,6 +87,8 @@ class HTPasswdCrypt(bouncer.Bouncer):
 
         self.debug('parsed %s, %d lines' % (self._filename or '<memory>',
             len(lines)))
+
+        return defer.succeed(None)
    
     def _requestAvatarIdCallback(self, PossibleAvatarId, keycard):
         # authenticated, so return the keycard with state authenticated

@@ -30,19 +30,65 @@ Implementations
 BaseComponent.__init__(self)
 ----------------------------
 This method is expected to produce an initialized component.
-It should do as little as possible, and not access any resources, config, ...
+It should do as little as possible, and not access any resources,
+config, ...
+
+The implementation calls every init() method of any of the subclasses
+in the hierarchy.
+
+BaseComponent.setup(self, config)
+---------------------------------
+Invoked by manager through medium.
+sets self.config
+Invokes do_check() vmethod, which returns a deferred.
+When this deferred succeeds, invokes do_setup() vmethod, which
+also returns a deferred.
+
+returns the original deferred.
+
+BaseComponent.start(self, *args, **kwargs)
+------------------------------------------
+Sets mood to waking.
+Invokes do_start(), which returns a deferred.
+Returns the deferred.
+
+BaseComponent.stop(self)
+-------------------------
+Sets mood to waking.
+Invokes do_stop(), which should return immediately.
 
 Interface
 ---------
 
-BaseComponent.setConfig(self, config)
--------------------------------------
-This method is expected to set self.config to config.
+BaseComponent.init(self)
+------------------------
+Subclasses should declare instance variables, ...
+All .init methods of every class in the hierarchy get called.
+This method is optional for subclasses.
 
-BaseComponent.setup(self, config)
----------------------------------
-This method has no requirements. It is implementation-specific.  After this
-call, the component should have created all resources and be ready to start.
+BaseComponent.do_check(self)
+----------------------------
+This method has no requirements. It is implementation-specific.
+It can be used to check various requirements.
+After this
+call, the component should be ready to set up.
+
+BaseComponent.do_setup(self)
+----------------------------
+This method has no requirements. It is implementation-specific.
+After this call, the component should have created all resources and
+be ready to start.
+
+BaseComponent.do_start(self, *args, **kwargs)
+---------------------------------------------
+Implementations should make sure that a succesful start sets the mood to
+happy.
+
+BaseComponent.do_stop(self)
+---------------------------
+Implementations should make sure that a succesful stop sets the mood to
+sleeping.
+
 
 Feed components
 ===============
@@ -54,10 +100,8 @@ pipeline.
 Implementations
 ---------------
 
-### FIXME: what's the point in passing "config" if setConfig sets it ?
-
-FeedComponent.setup(self, config)
----------------------------------
+FeedComponent.do_setup(self)
+-------------------------
 This method will instantiate a pipeline first, then allow the object a
 chance to do any further initialization after the pipeline is created.
 It does this by calling the following two methods:

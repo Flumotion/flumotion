@@ -27,7 +27,7 @@ import gst
 import gst.interfaces
 import gobject
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.spread import pb
 
 from flumotion.configure import configure
@@ -119,7 +119,7 @@ class ParseLaunchComponent(FeedComponent):
 
     DELIMITER = '@'
 
-    ### FeedComponent methods
+    ### FeedComponent interface implementations
     def create_pipeline(self):
         try:
             unparsed = self.get_pipeline_string(self.config['properties'])
@@ -149,7 +149,7 @@ class ParseLaunchComponent(FeedComponent):
         FeedComponent.set_pipeline(self, pipeline)
         self.configure_pipeline(self.pipeline, self.config['properties'])
 
-    ### ParseLaunchComponent methods
+    ### ParseLaunchComponent interface for subclasses
     def get_pipeline_string(self, properties):
         """
         Method that must be implemented by subclasses to produce the
@@ -164,6 +164,7 @@ class ParseLaunchComponent(FeedComponent):
     def configure_pipeline(self, pipeline, properties):
         pass
 
+    ### private methods
     def _expandElementName(self, block):
         """
         Expand the given string to a full element name for an eater or feeder.
@@ -282,7 +283,7 @@ class ParseLaunchComponent(FeedComponent):
         
         return pipeline
 
-    # mood change/state vmethod impl
+    ### BaseComponent interface implementation
     def do_start(self, eatersData, feedersData, clocking):
         """
         Tell the component to start, linking itself to other components.
@@ -307,6 +308,7 @@ class ParseLaunchComponent(FeedComponent):
 
         self.link(eatersData, feedersData)
 
+        return defer.succeed(None)
 
 class Effect(log.Loggable):
     """

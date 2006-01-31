@@ -183,10 +183,9 @@ class BaseComponentMedium(medium.BaseMedium):
         Set up the component and the component's medium with the given config,
         in that order.
         """
-        # FIXME: decide on return vars ? possibly chain deferreds ?
         self.debug('remote_setup(%r)' % config)
         self.comp.setup(config)
-        self.setup(config)
+        return self.setup(config)
         
     def remote_start(self, *args, **kwargs):
         self.debug('remote_start(args=%r, kwargs=%r)' % (args, kwargs))
@@ -263,19 +262,28 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         # FIXME: name is unique where ? only in flow, so not in worker
         # need to use full path maybe ?
         """
-        A subclass should do as little as possible in its __init__ method.
-        In particular, it should not try to access resources.
+        Subclasses should not override __init__ at all.
+        
+        Instead, they should implement init(), which will be called
+        by this implementation automatically.
 
-        Failures during __init__ are marshalled back to the manager through
-        the worker's remote_create method, since there is no component state
-        proxied to the manager yet at the time of __init__
+        See L{flumotion.common.common.InitMixin} for more details.
         """
         gobject.GObject.__init__(self)
 
         # this will call self.init() for all implementors of init()
         common.InitMixin.__init__(self)
 
+    # BaseComponent interface for subclasses related to component protocol
     def init(self):
+        """
+        A subclass should do as little as possible in its init method.
+        In particular, it should not try to access resources.
+
+        Failures during init are marshalled back to the manager through
+        the worker's remote_create method, since there is no component state
+        proxied to the manager yet at the time of init
+        """
         self.state = planet.WorkerJobState()
 
         self.name = None
@@ -295,48 +303,111 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.lastTime = time.time()
         self.lastClock = time.clock()
 
-    def setup(self, config):
-        self.setConfig(config)
+    def do_check(self):
+        """
+        Subclasses can implement me to run any checks before the component
+        performs setup.
 
+        Messages can be added to the component state's 'messages' list key.
+
+        self.config will be set when this is called.
+
+        @Returns: L{twisted.internet.defer.Deferred}
+        """
+        return defer.succeed(None)
+
+    def do_setup(self):
+        """
+        Subclasses can implement me to set up the component before it is
+        started.  It should set up the component, possibly opening files
+        and resources.
+
+        self.config will be set when this is called.
+
+        @Returns: L{twisted.internet.defer.Deferred}
+        """
+        return defer.succeed(None)
+
+    def do_start(self, *args, **kwargs):
+        """
+        BaseComponent vmethod for starting up. If you override this
+        method, you are responsible for arranging that the component
+        becomes happy.
+
+        @Returns: L{twisted.internet.defer.Deferred}
+        """
+        # default behavior
+        self.setMood(moods.happy)
+        return defer.succeed(None)
+       
+    def do_stop(self):
+        """
+        BaseComponent vmethod for stopping. If you override this
+        method, you are responsible for arranging that the component
+        becomes sleeping.
+
+        @Returns: None
+        """
+        # default behavior
+        self.setMood(moods.sleeping)
+ 
+    ### BaseComponent implementation related to compoment protocol
+    ### called by manager through medium
+    def setup(self, config):
+        """
+        Sets up the component with the given config.  Called by the manager
+        through the medium.
+
+        @Returns: L{twisted.internet.defer.Deferred}
+        """
+        self._setConfig(config)
+        d = self.do_check()
+        d.addCallback(lambda r: self.do_setup())
+        return d
+
+    def start(self, *args, **kwargs):
+        """
+        Tell the component to start.  This is called when all its dependencies
+        are already started.
+
+        To hook onto this method, implement your own do_start method.
+        See BaseComponent.do_start() for what your do_start method is
+        responsible for doing.
+
+        Again, don't override this method. Thanks.
+        """
+        self.debug('BaseComponent.start')
+        self.setMood(moods.waking)
+        self.startHeartbeat()
+
+        ret = self.do_start(*args, **kwargs)
+
+        self.debug('start: returning value %s' % ret)
+
+        return ret
+        
+    def stop(self):
+        """
+        Tell the component to stop.
+        The connection to the manager will be closed.
+        The job process will also finish.
+        """
+        self.debug('BaseComponent.stop')
+
+        self.setMood(moods.waking)
+        for message in self.state.get('messages'):
+            self.state.remove('messages', message)
+        self.stopHeartbeat()
+
+        self.do_stop()
+
+    # FIXME: privatize
     def startHeartbeat(self):
         """
         Start sending heartbeats.
         """
         self.debug('start sending heartbeats')
         self._heartbeat()
-
-    def stopHeartbeat(self):
-        """
-        Stop sending heartbeats.
-        """
-        self.debug('stop sending heartbeats')
-        if self._HeartbeatDC:
-            self.debug('canceling pending heartbeat')
-            self._HeartbeatDC.cancel()
-        self._HeartbeatDC = None
-         
-    def _heartbeat(self):
-        """
-        Send heartbeat to manager and reschedule.
-        """
-        #self.log('Sending heartbeat')
-        if self.medium:
-            self.medium.callRemote('heartbeat', self.state.get('mood'))
-        self._HeartbeatDC = reactor.callLater(self._heartbeatInterval,
-            self._heartbeat)
-
-        # update CPU time stats
-        nowTime = time.time()
-        nowClock = time.clock()
-        deltaTime = nowTime - self.lastTime
-        deltaClock = nowClock - self.lastClock
-        CPU = deltaClock/deltaTime
-        self.state.set('cpu', CPU)
-        deltaTime = nowTime - self.baseTime
-        deltaClock = nowClock
-        CPU = deltaClock/deltaTime
-        self.lastTime = nowTime
-        self.lastClock = nowClock
 
     ### GObject methods
     def emit(self, name, *args):
@@ -346,19 +417,12 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         else:
             gobject.GObject.emit(self, name, *args)
         
-    ### BaseComponent methods
+    ### BaseComponent public methods
     def getName(self):
         return self.name
 
     def setWorkerName(self, workerName):
         self.state.set('workerName', workerName)
-
-    def setConfig(self, config):
-        if self.name:
-            assert config['name'] == self.name, \
-                   "Can't change name while running"
-        self.config = config
-        self.name = config['name']
 
     def getWorkerName(self):
         return self.state.get('workerName')
@@ -400,48 +464,47 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         """
         self.medium.callRemote("adminCallRemote", methodName, *args, **kwargs)
 
-    # mood change functions
-    def do_start(self, *args, **kwargs):
-        """
-        BaseComponent vmethod for starting up. If you override this
-        method, you are responsible for arranging that the component
-        becomes happy.
-        """
-        # default behavior
-        self.setMood(moods.happy)
-        
-    def start(self, *args, **kwargs):
-        """
-        Tell the component to start.  This is called when all its dependencies
-        are already started.
+    # private methods
+    def _setConfig(self, config):
+        if self.name:
+            assert config['name'] == self.name, \
+                   "Can't change name while running"
+        self.config = config
+        self.name = config['name']
 
-        To hook onto this method, implement your own do_start method.
-        See BaseComponent.do_start() for what your do_start method is
-        responsible for doing.
-
-        Again, don't override this method. Thanks.
+    # FIXME: privatize
+    def stopHeartbeat(self):
         """
-        self.debug('BaseComponent.start')
-        self.setMood(moods.waking)
-
-        ret = self.do_start(*args, **kwargs)
-
-        self.debug('start: returning value %s' % ret)
-
-        self.startHeartbeat()
-
-        return ret
-        
-    def stop(self):
+        Stop sending heartbeats.
         """
-        Tell the component to stop.
-        The connection to the manager will be closed.
-        The job process will also finish.
+        self.debug('stop sending heartbeats')
+        if self._HeartbeatDC:
+            self.debug('canceling pending heartbeat')
+            self._HeartbeatDC.cancel()
+        self._HeartbeatDC = None
+         
+    def _heartbeat(self):
         """
-        self.debug('BaseComponent.stop')
-        self.setMood(moods.sleeping)
-        for message in self.state.get('messages'):
-            self.state.remove('messages', message)
-        self.stopHeartbeat()
+        Send heartbeat to manager and reschedule.
+        """
+        #self.log('Sending heartbeat')
+        if self.medium:
+            self.medium.callRemote('heartbeat', self.state.get('mood'))
+        self._HeartbeatDC = reactor.callLater(self._heartbeatInterval,
+            self._heartbeat)
+
+        # update CPU time stats
+        nowTime = time.time()
+        nowClock = time.clock()
+        deltaTime = nowTime - self.lastTime
+        deltaClock = nowClock - self.lastClock
+        CPU = deltaClock/deltaTime
+        self.state.set('cpu', CPU)
+        deltaTime = nowTime - self.baseTime
+        deltaClock = nowClock
+        CPU = deltaClock/deltaTime
+        self.lastTime = nowTime
+        self.lastClock = nowClock
+
 
 compat.type_register(BaseComponent)

@@ -22,7 +22,7 @@
 import gst
 import gobject
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 
 from flumotion.component import component as basecomponent
 from flumotion.common import common, errors, compat, messages
@@ -50,6 +50,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     _reconnectInterval = 3
     
+    ### BaseComponent interface implementations
     def init(self):
         # add extra keys to state
         self.state.addKey('eaterNames')
@@ -71,16 +72,9 @@ class FeedComponent(basecomponent.BaseComponent):
         self.feed_names = []
         self.feeder_names = []
 
-    ### BaseComponent methods
-    def setup(self, config):
-        """
-        @param config: the configuration dictionary of the component
-        @type  config: dict
-        """
-        basecomponent.BaseComponent.setup(self, config)
-
-        eater_config = config.get('source', [])
-        feeder_config = config.get('feed', [])
+    def do_setup(self):
+        eater_config = self.config.get('source', [])
+        feeder_config = self.config.get('feed', [])
 
         self.debug("feedcomponent.setup(): eater_config %r" % eater_config)
         self.debug("feedcomponent.setup(): feeder_config %r" % feeder_config)
@@ -100,11 +94,30 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.debug('setup() finished')
 
+        return defer.succeed(None)
+
+    ### FeedComponent interface for subclasses
+    def create_pipeline(self):
+        """
+        Subclasses have to implement this method.
+
+        @rtype: L{gst.Pipeline}
+        """
+        raise NotImplementedError, "subclass must implement create_pipeline"
+        
+    def set_pipeline(self, pipeline):
+        """
+        Subclasses can override me.
+        They should chain up first.
+        """
+        self.pipeline = pipeline
+        self.setup_pipeline()
+ 
+    ### FeedComponent methods
     def addEffect(self, effect):
         self.effects[effect.name] = effect
         effect.setComponent(self)
 
-    ### FeedComponent methods
     def effectPropertyChanged(self, effectName, propertyName, value):
         """
         Notify the manager that an effect property has changed to a new value.
@@ -175,13 +188,7 @@ class FeedComponent(basecomponent.BaseComponent):
     def get_pipeline(self):
         return self.pipeline
 
-    def create_pipeline(self):
-        raise NotImplementedError, "subclass must implement create_pipeline"
-        
-    def set_pipeline(self, pipeline):
-        self.pipeline = pipeline
-        self.setup_pipeline()
-        
+       
     def bus_watch_func(self, bus, message):
         t = message.type
         src = message.src
@@ -225,6 +232,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         return True
 
+    # FIXME: privatize
     def setup_pipeline(self):
         self.debug('setup_pipeline()')
         assert self.bus_watch_id == None
