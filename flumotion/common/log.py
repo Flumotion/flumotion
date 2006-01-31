@@ -342,7 +342,15 @@ class FluLogObserver(Loggable):
         self._ignoreErrors = []
 
 # make a singleton
-theFluLogObserver = FluLogObserver()
+__theFluLogObserver = None
+
+def getTheFluLogObserver():
+    global __theFluLogObserver
+
+    if not __theFluLogObserver:
+        __theFluLogObserver = FluLogObserver()
+
+    return __theFluLogObserver
 
 def stderrHandler(level, object, category, file, line, message):
     """
@@ -415,15 +423,39 @@ def init():
         setFluDebug(os.environ['FLU_DEBUG'])
     addLogHandler(stderrHandler, limited=True)
 
+    _initialized = True
+
+_initializedTwisted = False
+
+def logTwisted():
+    """
+    Integrate twisted's logger with Flumotion's logger.
+
+    This is done in a separate method because calling this imports and sets
+    up a reactor.  Since we want basic logging working before choosing a
+    reactor, we need to separate these.
+    """
+    global _initializedTwisted
+
+    if _initializedTwisted:
+        return
+
+    log.debug('log', 'Integrating twisted logger')
+
     # integrate twisted's logging with us
     from twisted.python import log as tlog
+
+    # this call imports the reactor
+    # that is why we do this in a separate method
     from twisted.spread import pb
+
     # we don't want logs for pb.Error types since they
     # are specifically raised to be handled on the other side
-    theFluLogObserver.ignoreErrors([pb.Error,])
-    tlog.startLoggingWithObserver(theFluLogObserver.emit, False)
+    observer = getTheFluLogObserver()
+    observer.ignoreErrors([pb.Error,])
+    tlog.startLoggingWithObserver(observer.emit, False)
 
-    _initialized = True
+    _initializedTwisted = True
 
 def reset():
     """

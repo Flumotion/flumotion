@@ -234,11 +234,11 @@ class Test_FPBClientFactory(unittest.TestCase):
         self.port = reactor.listenTCP(0, self.factory, interface="127.0.0.1")
         self.portno = self.port.getHost().port
         # don't output Twisted tracebacks for PB errors we will trigger
-        log.theFluLogObserver.ignoreErrors(error.UnauthorizedLogin)
+        log.getTheFluLogObserver().ignoreErrors(error.UnauthorizedLogin)
 
     def tearDown(self):
         tlog.flushErrors(error.UnauthorizedLogin)
-        log.theFluLogObserver.clearIgnores()
+        log.getTheFluLogObserver().clearIgnores()
         self.port.stopListening()
         reactor.iterate()
         reactor.iterate()

@@ -22,3 +22,6 @@
 import flumotion.common.setup
 # logging
 flumotion.common.setup.setup()
+
+from flumotion.common import log
+log.logTwisted()

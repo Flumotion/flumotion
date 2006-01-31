@@ -136,6 +136,9 @@ def boot(path, gtk=False):
 
     setup.setup()
 
+    from flumotion.common import log
+    log.logTwisted()
+
     main = reflect.namedAny(path)
     
     try:

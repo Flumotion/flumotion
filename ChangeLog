@@ -1,5 +1,17 @@
 2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/log.py:
+	  make getTheFluLogObserver() a singleton method to delay
+	  creating in
+	  add logTwisted so we can separate importing pb (and thus reactor)
+	  from initing the logging
+	* flumotion/common/boot.py.in:
+	* flumotion/test/common.py:
+	* flumotion/test/test_pb.py:
+	  adapt for this change
+
+2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/command/commands.py:
 	* flumotion/admin/command/main.py:
 	  add an 'invoke' command
