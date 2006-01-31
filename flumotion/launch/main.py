@@ -260,8 +260,9 @@ class ComponentWrapper(object):
         self.component = self.procedure()
 
     def start(self, eatersdata, feedersdata):
-        self.component.setup(self.config)
-        return self.component.start(eatersdata, feedersdata, None)
+        d = self.component.setup(self.config)
+        d.addCallback(lambda r: self.component.start(eatersdata, feedersdata, None))
+        return d
 
 def main(args):
     from flumotion.common import setup
@@ -341,11 +342,17 @@ def main(args):
         feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost', p)
                        for x, p in feed_ports[wrapper.name].items()]
         time.sleep(delay)
-        ret = wrapper.start(eatersdata, feedersdata)
-        if ret:
-            for x in ret:
-                assert x[2] == feed_ports[wrapper.name][x[0]]
-    
+        d  = wrapper.start(eatersdata, feedersdata)
+
+        def _checkStartCallback(ret, name, ports):
+            print "%s started" % name
+            if ret:
+                for x in ret:
+                    assert x[2] == ports[x[0]]
+                
+        d.addCallback(_checkStartCallback, wrapper.name,
+            feed_ports[wrapper.name])
+
     print 'Running the reactor. Press Ctrl-C to exit.'
 
     log.debug('launch', 'Starting reactor')

@@ -1,5 +1,10 @@
 2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/launch/main.py:
+	  update to match the new protocol
+
+2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	  blacklist gstreamer.py because we don't want to split out for
 	  0.8 and 0.10 just for pychecker
