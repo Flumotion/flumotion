@@ -440,7 +440,7 @@ def logTwisted():
     if _initializedTwisted:
         return
 
-    log.debug('log', 'Integrating twisted logger')
+    debug('log', 'Integrating twisted logger')
 
     # integrate twisted's logging with us
     from twisted.python import log as tlog
