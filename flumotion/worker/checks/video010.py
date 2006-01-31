@@ -48,7 +48,7 @@ class BusResolution(fdefer.Resolution):
             self.pipeline.set_state(gst.STATE_NULL)
             self.pipeline = None
 
-def do_element_check(pipeline_str, element_name, check_proc):
+def do_element_check(pipeline_str, element_name, check_proc, state=None):
     """
     Parse the given pipeline and set it to the given state.
     When the bin reaches that state, perform the given check function on the

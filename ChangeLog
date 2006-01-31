@@ -1,5 +1,13 @@
 2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	  blacklist gstreamer.py because we don't want to split out for
+	  0.8 and 0.10 just for pychecker
+	* flumotion/worker/checks/video010.py:
+	  add a state= to do_element_check() to compare with the 08 version
+
+2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/component-initialization-protocol:
 	  update protocol, add check method, make do_ methods
 	* flumotion/component/bouncers/htpasswdcrypt.py:
