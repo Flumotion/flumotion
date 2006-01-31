@@ -22,7 +22,7 @@
 import gst
 import gobject
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 
 from flumotion.component import component as basecomponent
 from flumotion.common import common, errors, compat
