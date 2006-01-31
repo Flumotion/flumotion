@@ -170,6 +170,9 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     def remote_notifyState(self):
         self.comp.update_ui_state()
 
+    def remote_rotateLog(self):
+        self.comp.resource.rotateLogfile()
+
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):

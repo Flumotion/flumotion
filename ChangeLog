@@ -1,5 +1,18 @@
 2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/command/commands.py:
+	* flumotion/admin/command/main.py:
+	  add an 'invoke' command
+	  sample use:
+	   bin/flumotion-command invoke "/default/http-audio" rotateLog
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  add a remote_rotateLog() method
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  privatize log file bits
+	  implement rotating the log
+
+2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/component.py:
 	  BaseComponent.addMessage(): to add messages to the state
 	* flumotion/worker/checks/Makefile.am:

@@ -72,7 +72,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         @param streamer: L{MultifdSinkStreamer}
         """
-        self.logfile = None
+        self._logfile = None
+        self._logfilename = None
             
         streamer.connect('client-removed', self._streamer_client_removed_cb)
         self.streamer = streamer
@@ -102,8 +103,20 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.putChild(path, self)
         
     def setLogfile(self, logfilename):
-        self.logfile = open(logfilename, 'a')
+        self._logfilename = logfilename
+        self._logfile = open(logfilename, 'a')
 
+    def rotateLogfile(self):
+        """
+        Close the logfile, then reopen using the previous logfilename
+        """
+        self.debug('rotating log file %s' % self._logfile)
+
+        if self._logfile:
+            self._logfile.close()
+        if self._logfilename:
+            self.setLogfile(self._logfilename)
+            
     def setDomain(self, domain):
         """
         Set a domain name on the resource, used in HTTP auth challenges and
@@ -149,10 +162,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                         time_connected)
         # make streamer notify manager of this msg
         self.streamer.sendLog(msg)
-        if not self.logfile:
+        if not self._logfile:
             return
-        self.logfile.write(msg)
-        self.logfile.flush()
+        self._logfile.write(msg)
+        self._logfile.flush()
 
     def setUserLimit(self, limit):
         self.info('setting maxclients to %d' % limit)

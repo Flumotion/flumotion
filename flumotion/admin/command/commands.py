@@ -23,6 +23,7 @@
 from flumotion.twisted.defer import defer_generator
 from flumotion.admin.command import utils
 from flumotion.common.planet import moods
+from flumotion.common import errors
 
 
 __all__ = ['commands']
@@ -122,6 +123,28 @@ def do_showcomponent(model, quit, avatarId):
     quit()
 do_showcomponent = defer_generator(do_showcomponent)
 
+def do_invoke(model, quit, avatarId, methodName):
+    d = model.callRemote('getPlanetState')
+    yield d
+    planet = d.value()
+    c = utils.find_component(planet, avatarId)
+    if not c:
+        print "Could not find component %r" % avatarId
+        yield None
+
+    d = model.componentCallRemote(c, methodName)
+    yield d
+
+    try:
+        d.value()
+    except errors.NoMethodError:
+        print "No method '%s' on component '%s'" % (methodName, avatarId)
+    except Exception, e:
+        raise
+
+    quit()
+do_invoke = defer_generator(do_invoke)
+
 commands = (('getprop',
              'gets a property on a component',
              (('component-path', utils.avatarId),
@@ -146,5 +169,10 @@ commands = (('getprop',
              (('component-path', utils.avatarId),
               ),
              do_showcomponent),
+            ('invoke',
+             'invoke a component method',
+             (('component-path', utils.avatarId),
+              ('method-name', str)),
+             do_invoke),
             )
 

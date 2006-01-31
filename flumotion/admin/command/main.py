@@ -29,6 +29,8 @@ from twisted.internet import reactor
 from flumotion.admin.admin import AdminModel
 from flumotion.admin import connections
 from flumotion.common import log, errors
+# make Message proxyable
+from flumotion.common import messages
 from flumotion.configure import configure
 
 from flumotion.admin.command.commands import commands
