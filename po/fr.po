@@ -8,111 +8,111 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-29 20:09+0100\n"
+"POT-Creation-Date: 2006-01-31 19:11+0100\n"
 "PO-Revision-Date: 2006-01-30 18:28+0000\n"
 "Last-Translator: bilboed <(null)>\n"
 "Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: flumotion/admin/gtk/client.py:153
+#: flumotion/admin/gtk/client.py:155
 msgid "Not connected"
 msgstr "Non connecté"
 
-#: flumotion/admin/gtk/client.py:182
+#: flumotion/admin/gtk/client.py:183
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Connexion à %s:%s"
 
-#: flumotion/admin/gtk/client.py:267 flumotion/admin/gtk/client.py:331
+#: flumotion/admin/gtk/client.py:268 flumotion/admin/gtk/client.py:332
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Chargement de l'interface de %s"
 
-#: flumotion/admin/gtk/client.py:349
+#: flumotion/admin/gtk/client.py:350
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Chargement de l'onglet %s pour %s"
 
-#: flumotion/admin/gtk/client.py:368
+#: flumotion/admin/gtk/client.py:369
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s n'a pas encore d'interface graphique"
 
-#: flumotion/admin/gtk/client.py:573
+#: flumotion/admin/gtk/client.py:574
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administration de Flumotion"
 
-#: flumotion/admin/gtk/client.py:589
+#: flumotion/admin/gtk/client.py:590
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Connection au contremaître perdue, reconnection en cours..."
 
-#: flumotion/admin/gtk/client.py:609
+#: flumotion/admin/gtk/client.py:610
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "La connexion au contremaître sur %s a été refusée."
 
-#: flumotion/admin/gtk/client.py:611
+#: flumotion/admin/gtk/client.py:612
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Connection à %s refusée."
 
-#: flumotion/admin/gtk/client.py:624
+#: flumotion/admin/gtk/client.py:625
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Connection au contremaître sur %s a echouée (%s)."
 
-#: flumotion/admin/gtk/client.py:714
+#: flumotion/admin/gtk/client.py:715
 #, python-format
 msgid "Component %s is sad"
 msgstr "Le composant %s est malheureux"
 
-#: flumotion/admin/gtk/client.py:720
+#: flumotion/admin/gtk/client.py:721
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Affichage de l'interface graphique pour %s"
 
-#: flumotion/admin/gtk/client.py:740
+#: flumotion/admin/gtk/client.py:741
 #, python-format
 msgid "No UI for component %s"
 msgstr "Pas d'interface graphique pour le composant %s"
 
-#: flumotion/admin/gtk/client.py:754
+#: flumotion/admin/gtk/client.py:755
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Le composant %s est encore en train de dormir"
 
-#: flumotion/admin/gtk/client.py:764
+#: flumotion/admin/gtk/client.py:765
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Demande de l'interface graphique pour %s ..."
 
-#: flumotion/admin/gtk/client.py:810
+#: flumotion/admin/gtk/client.py:811
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "L'assistant ne peut être executé car aucun ouvrier n'est connecté."
 
-#: flumotion/admin/gtk/client.py:851
+#: flumotion/admin/gtk/client.py:852
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Re-chargement du code de composant pour %s"
 
-#: flumotion/admin/gtk/client.py:882
+#: flumotion/admin/gtk/client.py:883
 msgid "No component selected."
 msgstr "Aucun composant sélectionné."
 
-#: flumotion/admin/gtk/client.py:899
+#: flumotion/admin/gtk/client.py:900
 #, python-format
 msgid "Failed to %s component %s"
 msgstr ""
 
-#: flumotion/admin/gtk/client.py:926
+#: flumotion/admin/gtk/client.py:927
 msgid "Import Configuration..."
 msgstr "Charger Configuration..."
 
-#: flumotion/admin/gtk/client.py:939
+#: flumotion/admin/gtk/client.py:940
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -120,36 +120,37 @@ msgstr ""
 "Le fichier existe déjà.\n"
 "Ecrire par dessus ?"
 
-#: flumotion/admin/gtk/client.py:961
+#: flumotion/admin/gtk/client.py:962
 msgid "Export Configuration..."
 msgstr "Exporter la configuration..."
 
-#: flumotion/admin/gtk/client.py:1005
+#: flumotion/admin/gtk/client.py:1006
 #, python-format
 msgid ""
 "Could not reload component:\n"
 "%s."
-msgstr "Impossible de relancer le composant:\n"
+msgstr ""
+"Impossible de relancer le composant:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1015
+#: flumotion/admin/gtk/client.py:1016
 msgid "Reloading ..."
 msgstr "Re-chargement"
 
-#: flumotion/admin/gtk/client.py:1016
+#: flumotion/admin/gtk/client.py:1017
 msgid "Reloading client code"
 msgstr "Re-chargement du code du client"
 
-#: flumotion/admin/gtk/client.py:1018
+#: flumotion/admin/gtk/client.py:1019
 #, python-format
 msgid "Reloading %s code"
 msgstr "Re-chargement du code de %s"
 
-#: flumotion/admin/gtk/client.py:1031
+#: flumotion/admin/gtk/client.py:1032
 msgid "About Flumotion"
 msgstr "A propos de Flumotion"
 
-#: flumotion/admin/gtk/client.py:1050
+#: flumotion/admin/gtk/client.py:1051
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -159,7 +160,7 @@ msgstr ""
 "\n"
 "(C)·2004-2005·Fluendo·S.L."
 
-#: flumotion/admin/gtk/client.py:1055
+#: flumotion/admin/gtk/client.py:1056
 msgid "Authors"
 msgstr "Auteurs"
 
@@ -190,11 +191,13 @@ msgstr "Connection au contremaître Flumotion"
 
 #: flumotion/admin/gtk/greeter.py:40
 msgid "Flumotion Admin needs to connect to a Flumotion manager.\n"
-msgstr "L'administrateur Flumotion doit être connecté à un contremaître Flumotion.\n"
+msgstr ""
+"L'administrateur Flumotion doit être connecté à un contremaître Flumotion.\n"
 
 #: flumotion/admin/gtk/greeter.py:41
 msgid "Choose an option from the list and click \"Forward\" to begin."
-msgstr "Choisissez une option dans la liste et appuyez sur \"Suivant\" pour démarrer."
+msgstr ""
+"Choisissez une option dans la liste et appuyez sur \"Suivant\" pour démarrer."
 
 #: flumotion/admin/gtk/greeter.py:63
 msgid "Host information"
@@ -268,30 +271,32 @@ msgstr "Aléatoire (Neige de télévision)"
 msgid "Totally black"
 msgstr "Noir"
 
-#: flumotion/wizard/wizard.py:296
+#: flumotion/wizard/wizard.py:302
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
-msgstr "Tous les ouvriers se sont déconnectés.\n"
+msgstr ""
+"Tous les ouvriers se sont déconnectés.\n"
 "Vérifiez que votre réseau Flumotion est correctemment configuré."
 
-#: flumotion/wizard/wizard.py:346 flumotion/wizard/steps.py:506
+#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:522
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
 msgstr[0] "Le composant '%s' n'a pas l'élément GStreamer '%s'."
 msgstr[1] "Le composant '%s' n'a pas les éléments GStreamer '%s'."
 
-#: flumotion/wizard/wizard.py:351
+#: flumotion/wizard/wizard.py:357
 msgid ""
 "\n"
 "Please install the necessary GStreamer plug-ins that provide these elements "
 "and restart the worker."
 msgstr ""
 "\n"
-"Veuillez installer les plug-ins GStreamer fournissant ces éléments puis redémarrer l'ouvrier."
+"Veuillez installer les plug-ins GStreamer fournissant ces éléments puis "
+"redémarrer l'ouvrier."
 
-#: flumotion/wizard/wizard.py:354
+#: flumotion/wizard/wizard.py:360
 msgid ""
 "\n"
 "\n"
@@ -323,24 +328,26 @@ msgstr "%dx%d,·rapport de pixel de %d/%d"
 msgid "Checking for Firewire device..."
 msgstr "Détection du périphérique Firewire..."
 
-#: flumotion/wizard/steps.py:402
+#: flumotion/wizard/steps.py:406
 msgid "Probing webcam, this can take a while..."
 msgstr "Détéction de la webcam, cette étape peut prendre du temp..."
 
-#: flumotion/wizard/steps.py:482
+#: flumotion/wizard/steps.py:498
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
 "diagonal line in the image."
 msgstr ""
-"Le plugin ffmpegcolorspace de ce composant est plus ancien que la version 0.8.5.\n"
-"Veuillez considérez sa mise-à-jour si vous constatez une ligne diagonale dans la sortie vidéo."
+"Le plugin ffmpegcolorspace de ce composant est plus ancien que la version "
+"0.8.5.\n"
+"Veuillez considérez sa mise-à-jour si vous constatez une ligne diagonale "
+"dans la sortie vidéo."
 
-#: flumotion/wizard/steps.py:495
+#: flumotion/wizard/steps.py:511
 msgid "Could not check features of the 'ffmpegcolorspace' element."
 msgstr "Impossible de vérifier les propriétés de l'élément 'ffmpegcolorspace'."
 
-#: flumotion/wizard/steps.py:510
+#: flumotion/wizard/steps.py:526
 msgid ""
 "\n"
 "\n"
@@ -352,13 +359,21 @@ msgstr ""
 
 #: flumotion/wizard/step.py:139
 msgid "Internal error: could not run check code on worker."
-msgstr "Erreur interne: impossible d'éxécuter le code de vérification sur l'ouvrier"
+msgstr ""
+"Erreur interne: impossible d'éxécuter le code de vérification sur l'ouvrier"
+
+#: flumotion/component/feedcomponent.py:128
+#, python-format
+msgid ""
+"The worker does not have the '%s' element installed.\n"
+"Please install the necessary plug-in and restart the component.\n"
+msgstr ""
 
 #: flumotion/component/feedcomponent.py:143
 msgid "GStreamer error: could not parse component pipeline."
 msgstr "Erreur GStreamer: impossible d'analyser le tube du component."
 
-#: flumotion/component/consumers/httpstreamer/http.py:448
+#: flumotion/component/consumers/httpstreamer/http.py:451
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Erreur de réseau: le port TCP %d n'est pas disponible."
@@ -439,12 +454,16 @@ msgstr "Le composant n'a pas pu être démarré."
 #, python-format
 msgid ""
 "Could not open device '%s' for reading.  Check permissions on the device."
-msgstr "Impossible d'accéder en lecture au périphérique '%s'. Veuillez vérifier les droits d'accés au périphérique."
+msgstr ""
+"Impossible d'accéder en lecture au périphérique '%s'. Veuillez vérifier les "
+"droits d'accés au périphérique."
 
 #: flumotion/worker/checks/check.py:48
 #, python-format
 msgid "Could not open device '%s'.  Check permissions on the device."
-msgstr "Impossible d'ouvrir le périphérique '%s'. Vérifiez les droits sur ce périphérique."
+msgstr ""
+"Impossible d'ouvrir le périphérique '%s'. Vérifiez les droits sur ce "
+"périphérique."
 
 #: flumotion/worker/checks/check.py:51
 #, python-format
@@ -470,27 +489,28 @@ msgstr "Impossible de sonder le périphérique '%s'"
 msgid "No device found on %s."
 msgstr "Aucun périphérique détecté sur %s."
 
-#: flumotion/worker/checks/video08.py:156
-#: flumotion/worker/checks/video010.py:155
+#: flumotion/worker/checks/video08.py:159
+#: flumotion/worker/checks/video010.py:156
 msgid "Device node /dev/raw1394 does not exist."
 msgstr "Le noeud de périphérique /dev/raw1394 n'existe pas."
 
-#: flumotion/worker/checks/video08.py:175
-#: flumotion/worker/checks/video010.py:173
+#: flumotion/worker/checks/video08.py:178
+#: flumotion/worker/checks/video010.py:174
 msgid "No Firewire device found."
 msgstr "Aucun périphérique Firewire détécté."
 
-#: flumotion/worker/checks/video08.py:181
-#: flumotion/worker/checks/video010.py:179
+#: flumotion/worker/checks/video08.py:184
+#: flumotion/worker/checks/video010.py:180
 msgid "Could not probe Firewire device."
 msgstr "Impossible de sonder pour le périphérique Firewire."
 
-#: flumotion/worker/checks/video08.py:205
+#: flumotion/worker/checks/video08.py:208
 msgid ""
 "The ffmpegcolorspace element is too old. Please upgrade gst-plugins to "
 "version 0.8.5."
 msgstr ""
-"L'élément ffmpegcolorspace est trop ancien. Veuillez mettre à jour gst-plugins à la version 0.8.5."
+"L'élément ffmpegcolorspace est trop ancien. Veuillez mettre à jour gst-"
+"plugins à la version 0.8.5."
 
 #: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:91
 msgid "I am a translatable string"
@@ -503,12 +523,16 @@ msgstr "Je suis une chaîne traduite"
 #: flumotion/test/test_i18n.py:108 flumotion/test/test_i18n.py:113
 #, python-format
 msgid "I can translate %d thing"
-msgstr ""
+msgid_plural "I can translate %d things"
+msgstr[0] ""
+msgstr[1] ""
 
 #: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:115
 #, python-format
 msgid "I translated %d thing"
-msgstr ""
+msgid_plural "I translated %d things"
+msgstr[0] ""
+msgstr[1] ""
 
 #: flumotion/test/test_common_messages.py:42
 msgid "Something is really wrong."
@@ -548,67 +572,67 @@ msgstr "oh oh"
 msgid "Flumotion Administration"
 msgstr "Administration de Flumotion"
 
-#: data/glade/admin.glade:36
+#: data/glade/admin.glade:35
 msgid "_Connection"
 msgstr "_Connexion"
 
-#: data/glade/admin.glade:60
+#: data/glade/admin.glade:59
 msgid "_Import Configuration..."
 msgstr "_Importer Configuration..."
 
-#: data/glade/admin.glade:69
+#: data/glade/admin.glade:68
 msgid "_Export Configuration..."
 msgstr "_Exporter Configuration..."
 
-#: data/glade/admin.glade:97
+#: data/glade/admin.glade:96
 msgid "_Manage"
 msgstr "_Contrôler"
 
-#: data/glade/admin.glade:106
+#: data/glade/admin.glade:105
 msgid "S_tart Component"
 msgstr "_Démarrer le Composant"
 
-#: data/glade/admin.glade:127
+#: data/glade/admin.glade:126
 msgid "St_op Component"
 msgstr "_Arrêter le Composant"
 
-#: data/glade/admin.glade:154
+#: data/glade/admin.glade:153
 msgid "Start _All"
 msgstr "_Tout Démarrer"
 
-#: data/glade/admin.glade:163
+#: data/glade/admin.glade:162
 msgid "Stop A_ll"
 msgstr "Tout A_rrêter"
 
-#: data/glade/admin.glade:172
+#: data/glade/admin.glade:171
 msgid "_Clear All"
 msgstr "Tout _Enlever"
 
-#: data/glade/admin.glade:199
+#: data/glade/admin.glade:198
 msgid "Run _Wizard"
 msgstr "Démarrer l'A_ssistant"
 
-#: data/glade/admin.glade:224
+#: data/glade/admin.glade:223
 msgid "_Debug"
 msgstr "_Déboguage"
 
-#: data/glade/admin.glade:233
+#: data/glade/admin.glade:232
 msgid "Reload _Manager"
 msgstr "Redémarrer le _Contremaître"
 
-#: data/glade/admin.glade:254
+#: data/glade/admin.glade:253
 msgid "Reload _All"
 msgstr "Tout _Redémarrer"
 
-#: data/glade/admin.glade:263
+#: data/glade/admin.glade:262
 msgid "Start _Shell"
 msgstr "Démarrer le _Shell"
 
-#: data/glade/admin.glade:288
+#: data/glade/admin.glade:287
 msgid "_Help"
 msgstr "_Aide"
 
-#: data/glade/admin.glade:325
+#: data/glade/admin.glade:324
 msgid "Open a stored configuration"
 msgstr "Charger une configuration"
 
@@ -980,9 +1004,11 @@ msgid ""
 "When you press \"Apply\", your configuration will be automatically loaded on "
 "your network.  This will take some time."
 msgstr ""
-"Félicitations·! Votre serveur de diffusion est maintenant prêt à l'utilisation\n"
+"Félicitations·! Votre serveur de diffusion est maintenant prêt à "
+"l'utilisation\n"
 "\n"
-"En appuyant sur \"Appliquer\", votre configuration sera automatiquement chargé sur votre réseau.\n"
+"En appuyant sur \"Appliquer\", votre configuration sera automatiquement "
+"chargé sur votre réseau.\n"
 "Cette procédure peut prendre un certain temps."
 
 #: data/glade/wizard_testsource.glade:33 data/glade/wizard_tvcard.glade:72
@@ -1049,5 +1075,5 @@ msgid ""
 msgstr ""
 "Bienvenue dans l'assistant de configuration de Flumotion.\n"
 "\n"
-"Cet assistant va vous guider à travers les étapes nécessaires pour la configuration de votre serveur de diffusion multimédia."
-
+"Cet assistant va vous guider à travers les étapes nécessaires pour la "
+"configuration de votre serveur de diffusion multimédia."

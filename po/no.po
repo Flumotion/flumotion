@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-29 20:09+0100\n"
+"POT-Creation-Date: 2006-01-31 19:11+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -14,102 +14,102 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: flumotion/admin/gtk/client.py:153
+#: flumotion/admin/gtk/client.py:155
 msgid "Not connected"
 msgstr "Ingen tilknyttning"
 
-#: flumotion/admin/gtk/client.py:182
+#: flumotion/admin/gtk/client.py:183
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Tilknyttet til %s:%s"
 
-#: flumotion/admin/gtk/client.py:267 flumotion/admin/gtk/client.py:331
+#: flumotion/admin/gtk/client.py:268 flumotion/admin/gtk/client.py:332
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Laster UI for %s ..."
 
-#: flumotion/admin/gtk/client.py:349
+#: flumotion/admin/gtk/client.py:350
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Laster tab %s for %s ..."
 
-#: flumotion/admin/gtk/client.py:368
+#: flumotion/admin/gtk/client.py:369
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s har ikke noe UI enda"
 
-#: flumotion/admin/gtk/client.py:573
+#: flumotion/admin/gtk/client.py:574
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Flumotion Administrasjon"
 
-#: flumotion/admin/gtk/client.py:589
+#: flumotion/admin/gtk/client.py:590
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Mistet forbindelse med manager, kobler til på nytt ..."
 
-#: flumotion/admin/gtk/client.py:609
+#: flumotion/admin/gtk/client.py:610
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Forbindelsen til manager %s var ikke godkjent."
 
-#: flumotion/admin/gtk/client.py:611
+#: flumotion/admin/gtk/client.py:612
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Forbindelsen ble %s ikke akseptert."
 
-#: flumotion/admin/gtk/client.py:624
+#: flumotion/admin/gtk/client.py:625
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Forbindelsen til manager %s feilet (%s)."
 
-#: flumotion/admin/gtk/client.py:714
+#: flumotion/admin/gtk/client.py:715
 #, fuzzy, python-format
 msgid "Component %s is sad"
 msgstr "Komponent %s sover fortsatt"
 
-#: flumotion/admin/gtk/client.py:720
+#: flumotion/admin/gtk/client.py:721
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Viser grafisk grensesnitt for %s"
 
-#: flumotion/admin/gtk/client.py:740
+#: flumotion/admin/gtk/client.py:741
 #, python-format
 msgid "No UI for component %s"
 msgstr "Ikke noe grafisk grensesnitt for komponent %s"
 
-#: flumotion/admin/gtk/client.py:754
+#: flumotion/admin/gtk/client.py:755
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Komponent %s sover fortsatt"
 
-#: flumotion/admin/gtk/client.py:764
+#: flumotion/admin/gtk/client.py:765
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Anmoder of grafisk grensesnitt for %s ..."
 
-#: flumotion/admin/gtk/client.py:810
+#: flumotion/admin/gtk/client.py:811
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "Veiviseren kan ikke starte fordi ingen arbeidere er logget inn."
 
-#: flumotion/admin/gtk/client.py:851
+#: flumotion/admin/gtk/client.py:852
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Omlaster komponent kode for %s"
 
-#: flumotion/admin/gtk/client.py:882
+#: flumotion/admin/gtk/client.py:883
 msgid "No component selected."
 msgstr "Ingen komponent valgt."
 
-#: flumotion/admin/gtk/client.py:899
+#: flumotion/admin/gtk/client.py:900
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "Feilet å %s komponent %s"
 
-#: flumotion/admin/gtk/client.py:926
+#: flumotion/admin/gtk/client.py:927
 msgid "Import Configuration..."
 msgstr "Importer konfigurasjon..."
 
-#: flumotion/admin/gtk/client.py:939
+#: flumotion/admin/gtk/client.py:940
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -117,11 +117,11 @@ msgstr ""
 "Filen eksisterer allerede.\n"
 "Overskriv?"
 
-#: flumotion/admin/gtk/client.py:961
+#: flumotion/admin/gtk/client.py:962
 msgid "Export Configuration..."
 msgstr "Eksporter konfigurasjon..."
 
-#: flumotion/admin/gtk/client.py:1005
+#: flumotion/admin/gtk/client.py:1006
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -130,24 +130,24 @@ msgstr ""
 "Kunne ikke laste om komponent:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1015
+#: flumotion/admin/gtk/client.py:1016
 msgid "Reloading ..."
 msgstr "Laster om..."
 
-#: flumotion/admin/gtk/client.py:1016
+#: flumotion/admin/gtk/client.py:1017
 msgid "Reloading client code"
 msgstr "Laster om klient kode"
 
-#: flumotion/admin/gtk/client.py:1018
+#: flumotion/admin/gtk/client.py:1019
 #, python-format
 msgid "Reloading %s code"
 msgstr "Laster om %s kode"
 
-#: flumotion/admin/gtk/client.py:1031
+#: flumotion/admin/gtk/client.py:1032
 msgid "About Flumotion"
 msgstr "Om Flumotion"
 
-#: flumotion/admin/gtk/client.py:1050
+#: flumotion/admin/gtk/client.py:1051
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -157,7 +157,7 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1055
+#: flumotion/admin/gtk/client.py:1056
 msgid "Authors"
 msgstr "Forfattere"
 
@@ -267,20 +267,20 @@ msgstr "Tilfelding (tv snø)"
 msgid "Totally black"
 msgstr "Fullstending sort"
 
-#: flumotion/wizard/wizard.py:296
+#: flumotion/wizard/wizard.py:302
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
 msgstr ""
 
-#: flumotion/wizard/wizard.py:346 flumotion/wizard/steps.py:506
+#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:522
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
 msgstr[0] ""
 msgstr[1] ""
 
-#: flumotion/wizard/wizard.py:351
+#: flumotion/wizard/wizard.py:357
 #, fuzzy
 msgid ""
 "\n"
@@ -290,7 +290,7 @@ msgstr ""
 "Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
 "en herstart de worker."
 
-#: flumotion/wizard/wizard.py:354
+#: flumotion/wizard/wizard.py:360
 msgid ""
 "\n"
 "\n"
@@ -319,11 +319,11 @@ msgstr "PAL, 4:3 (59/54 pixel aspekt ratio)"
 msgid "Checking for Firewire device..."
 msgstr "Sjekker for Firewire enhet..."
 
-#: flumotion/wizard/steps.py:402
+#: flumotion/wizard/steps.py:406
 msgid "Probing webcam, this can take a while..."
 msgstr ""
 
-#: flumotion/wizard/steps.py:482
+#: flumotion/wizard/steps.py:498
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
@@ -333,12 +333,12 @@ msgstr ""
 "Vær vennlig å vurdere å oppgradere hvis ditt utgående video har en\n"
 "diagonal linje i bildet."
 
-#: flumotion/wizard/steps.py:495
+#: flumotion/wizard/steps.py:511
 #, fuzzy
 msgid "Could not check features of the 'ffmpegcolorspace' element."
 msgstr "Kunne ikke sjekke ffmpegcolorspace egenskaper."
 
-#: flumotion/wizard/steps.py:510
+#: flumotion/wizard/steps.py:526
 msgid ""
 "\n"
 "\n"
@@ -349,11 +349,18 @@ msgstr ""
 msgid "Internal error: could not run check code on worker."
 msgstr ""
 
+#: flumotion/component/feedcomponent.py:128
+#, python-format
+msgid ""
+"The worker does not have the '%s' element installed.\n"
+"Please install the necessary plug-in and restart the component.\n"
+msgstr ""
+
 #: flumotion/component/feedcomponent.py:143
 msgid "GStreamer error: could not parse component pipeline."
 msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/http.py:448
+#: flumotion/component/consumers/httpstreamer/http.py:451
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr ""
@@ -469,24 +476,24 @@ msgstr ""
 msgid "No device found on %s."
 msgstr ""
 
-#: flumotion/worker/checks/video08.py:156
-#: flumotion/worker/checks/video010.py:155
+#: flumotion/worker/checks/video08.py:159
+#: flumotion/worker/checks/video010.py:156
 msgid "Device node /dev/raw1394 does not exist."
 msgstr ""
 
-#: flumotion/worker/checks/video08.py:175
-#: flumotion/worker/checks/video010.py:173
+#: flumotion/worker/checks/video08.py:178
+#: flumotion/worker/checks/video010.py:174
 #, fuzzy
 msgid "No Firewire device found."
 msgstr "Ingen Firewire enhet oppdaget."
 
-#: flumotion/worker/checks/video08.py:181
-#: flumotion/worker/checks/video010.py:179
+#: flumotion/worker/checks/video08.py:184
+#: flumotion/worker/checks/video010.py:180
 #, fuzzy
 msgid "Could not probe Firewire device."
 msgstr "Sjekker for Firewire enhet..."
 
-#: flumotion/worker/checks/video08.py:205
+#: flumotion/worker/checks/video08.py:208
 msgid ""
 "The ffmpegcolorspace element is too old. Please upgrade gst-plugins to "
 "version 0.8.5."
@@ -553,67 +560,67 @@ msgstr ""
 msgid "Flumotion Administration"
 msgstr "Flumotion Administrasjon"
 
-#: data/glade/admin.glade:36
+#: data/glade/admin.glade:35
 msgid "_Connection"
 msgstr "_Forbindelse"
 
-#: data/glade/admin.glade:60
+#: data/glade/admin.glade:59
 msgid "_Import Configuration..."
 msgstr "Importer konfigurasjon..."
 
-#: data/glade/admin.glade:69
+#: data/glade/admin.glade:68
 msgid "_Export Configuration..."
 msgstr "_Eksporter Konfigurasjon..."
 
-#: data/glade/admin.glade:97
+#: data/glade/admin.glade:96
 msgid "_Manage"
 msgstr "_Administrer"
 
-#: data/glade/admin.glade:106
+#: data/glade/admin.glade:105
 msgid "S_tart Component"
 msgstr "S_tart Komponent"
 
-#: data/glade/admin.glade:127
+#: data/glade/admin.glade:126
 msgid "St_op Component"
 msgstr "St_op Komponent"
 
-#: data/glade/admin.glade:154
+#: data/glade/admin.glade:153
 msgid "Start _All"
 msgstr "Start _Alt"
 
-#: data/glade/admin.glade:163
+#: data/glade/admin.glade:162
 msgid "Stop A_ll"
 msgstr "Stop A_lt"
 
-#: data/glade/admin.glade:172
+#: data/glade/admin.glade:171
 msgid "_Clear All"
 msgstr "Hvis _Alt"
 
-#: data/glade/admin.glade:199
+#: data/glade/admin.glade:198
 msgid "Run _Wizard"
 msgstr "_Kjør Veiviser"
 
-#: data/glade/admin.glade:224
+#: data/glade/admin.glade:223
 msgid "_Debug"
 msgstr "_Debugg"
 
-#: data/glade/admin.glade:233
+#: data/glade/admin.glade:232
 msgid "Reload _Manager"
 msgstr "Last om _Manager"
 
-#: data/glade/admin.glade:254
+#: data/glade/admin.glade:253
 msgid "Reload _All"
 msgstr "Last om_Alt"
 
-#: data/glade/admin.glade:263
+#: data/glade/admin.glade:262
 msgid "Start _Shell"
 msgstr "_Shell Oppstart"
 
-#: data/glade/admin.glade:288
+#: data/glade/admin.glade:287
 msgid "_Help"
 msgstr "_Hjelp"
 
-#: data/glade/admin.glade:325
+#: data/glade/admin.glade:324
 msgid "Open a stored configuration"
 msgstr "Åpn en lagret konfigurasjon"
 
@@ -988,8 +995,8 @@ msgstr ""
 "Gratulerer ! Du er nå klar til å bruke \n"
 "din streaming server.\n"
 "\n"
-"Når du trykker \"Apply\", saa vil din konfigurasjon bli automatisk lastet "
-"i ditt netverk. Dette vil ta litt tid."
+"Når du trykker \"Apply\", saa vil din konfigurasjon bli automatisk lastet i "
+"ditt netverk. Dette vil ta litt tid."
 
 #: data/glade/wizard_testsource.glade:33 data/glade/wizard_tvcard.glade:72
 #: data/glade/wizard_webcam.glade:166

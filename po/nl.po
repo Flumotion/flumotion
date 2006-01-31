@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-29 20:09+0100\n"
+"POT-Creation-Date: 2006-01-31 19:11+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -15,103 +15,103 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: flumotion/admin/gtk/client.py:153
+#: flumotion/admin/gtk/client.py:155
 msgid "Not connected"
 msgstr "Niet verbonden"
 
-#: flumotion/admin/gtk/client.py:182
+#: flumotion/admin/gtk/client.py:183
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Aan het verbinden met %s:%s"
 
-#: flumotion/admin/gtk/client.py:267 flumotion/admin/gtk/client.py:331
+#: flumotion/admin/gtk/client.py:268 flumotion/admin/gtk/client.py:332
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "UI aan het laden voor %s ..."
 
-#: flumotion/admin/gtk/client.py:349
+#: flumotion/admin/gtk/client.py:350
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Blad %s aan het laden voor %s ..."
 
-#: flumotion/admin/gtk/client.py:368
+#: flumotion/admin/gtk/client.py:369
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s heeft nog geen UI"
 
-#: flumotion/admin/gtk/client.py:573
+#: flumotion/admin/gtk/client.py:574
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Flumotion Administratie"
 
-#: flumotion/admin/gtk/client.py:589
+#: flumotion/admin/gtk/client.py:590
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Verbinding verbroken met manager, herverbinden ..."
 
-#: flumotion/admin/gtk/client.py:609
+#: flumotion/admin/gtk/client.py:610
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Verbinding met manager op %s werd geweigerd."
 
-#: flumotion/admin/gtk/client.py:611
+#: flumotion/admin/gtk/client.py:612
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Verbinding met %s werd geweigerd"
 
-#: flumotion/admin/gtk/client.py:624
+#: flumotion/admin/gtk/client.py:625
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Verbinding met manager op %s mislukt (%s)."
 
-#: flumotion/admin/gtk/client.py:714
+#: flumotion/admin/gtk/client.py:715
 #, python-format
 msgid "Component %s is sad"
 msgstr "Component %s is triestig"
 
-#: flumotion/admin/gtk/client.py:720
+#: flumotion/admin/gtk/client.py:721
 #, python-format
 msgid "Showing UI for %s"
 msgstr "UI aan het tonen voor %s"
 
-#: flumotion/admin/gtk/client.py:740
+#: flumotion/admin/gtk/client.py:741
 #, python-format
 msgid "No UI for component %s"
 msgstr "Geen UI voor component %s"
 
-#: flumotion/admin/gtk/client.py:754
+#: flumotion/admin/gtk/client.py:755
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Component %s slaapt nog steeds"
 
-#: flumotion/admin/gtk/client.py:764
+#: flumotion/admin/gtk/client.py:765
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "UI aan het opvragen voor %s ..."
 
-#: flumotion/admin/gtk/client.py:810
+#: flumotion/admin/gtk/client.py:811
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr ""
 "De wizard kan niet uitgevoerd worden omdat er geen workers ingelogd zijn."
 
-#: flumotion/admin/gtk/client.py:851
+#: flumotion/admin/gtk/client.py:852
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Componentcode aan het herladen voor %s"
 
-#: flumotion/admin/gtk/client.py:882
+#: flumotion/admin/gtk/client.py:883
 msgid "No component selected."
 msgstr "Geen component geselecteerd."
 
-#: flumotion/admin/gtk/client.py:899
+#: flumotion/admin/gtk/client.py:900
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "%s van component %s mislukt"
 
-#: flumotion/admin/gtk/client.py:926
+#: flumotion/admin/gtk/client.py:927
 msgid "Import Configuration..."
 msgstr "Configuratie invoeren..."
 
-#: flumotion/admin/gtk/client.py:939
+#: flumotion/admin/gtk/client.py:940
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -119,11 +119,11 @@ msgstr ""
 "Bestand bestaat reeds.\n"
 "Overschrijven?"
 
-#: flumotion/admin/gtk/client.py:961
+#: flumotion/admin/gtk/client.py:962
 msgid "Export Configuration..."
 msgstr "Configuratie uitvoeren..."
 
-#: flumotion/admin/gtk/client.py:1005
+#: flumotion/admin/gtk/client.py:1006
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -132,24 +132,24 @@ msgstr ""
 "Kon component niet herladen:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1015
+#: flumotion/admin/gtk/client.py:1016
 msgid "Reloading ..."
 msgstr "Aan het herladen..."
 
-#: flumotion/admin/gtk/client.py:1016
+#: flumotion/admin/gtk/client.py:1017
 msgid "Reloading client code"
 msgstr "Clientcode aan het herladen"
 
-#: flumotion/admin/gtk/client.py:1018
+#: flumotion/admin/gtk/client.py:1019
 #, python-format
 msgid "Reloading %s code"
 msgstr "%s code aan het herladen"
 
-#: flumotion/admin/gtk/client.py:1031
+#: flumotion/admin/gtk/client.py:1032
 msgid "About Flumotion"
 msgstr "Over Flumotion"
 
-#: flumotion/admin/gtk/client.py:1050
+#: flumotion/admin/gtk/client.py:1051
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -159,7 +159,7 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1055
+#: flumotion/admin/gtk/client.py:1056
 msgid "Authors"
 msgstr "Auteurs"
 
@@ -268,7 +268,7 @@ msgstr "Willekeurig (televisiesneeuw)"
 msgid "Totally black"
 msgstr "Volledig zwart"
 
-#: flumotion/wizard/wizard.py:296
+#: flumotion/wizard/wizard.py:302
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
@@ -276,14 +276,14 @@ msgstr ""
 "Alle workers zijn afgemeld.\n"
 "Verifieer of uw Flumotion-netwerk correct draait en probeer opnieuw."
 
-#: flumotion/wizard/wizard.py:346 flumotion/wizard/steps.py:506
+#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:522
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
 msgstr[0] "Worker '%s' mist het GStreamer-element '%s'."
 msgstr[1] "Worker '%s' mist de GStreamer-elementen '%s'."
 
-#: flumotion/wizard/wizard.py:351
+#: flumotion/wizard/wizard.py:357
 msgid ""
 "\n"
 "Please install the necessary GStreamer plug-ins that provide these elements "
@@ -293,7 +293,7 @@ msgstr ""
 "Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
 "en de worker te herstarten."
 
-#: flumotion/wizard/wizard.py:354
+#: flumotion/wizard/wizard.py:360
 msgid ""
 "\n"
 "\n"
@@ -325,11 +325,11 @@ msgstr "%dx%d, %d/%d pixelaspectverhouding"
 msgid "Checking for Firewire device..."
 msgstr "Bezig met detecteren Vuurdraadapparaat..."
 
-#: flumotion/wizard/steps.py:402
+#: flumotion/wizard/steps.py:406
 msgid "Probing webcam, this can take a while..."
 msgstr "Webcam aan het onderzoeken, dit kan even duren..."
 
-#: flumotion/wizard/steps.py:482
+#: flumotion/wizard/steps.py:498
 msgid ""
 "This worker's ffmpegcolorspace plugin is older than 0.8.5.\n"
 "Please consider upgrading if your output video has a\n"
@@ -339,11 +339,11 @@ msgstr ""
 "Gelieve te overwegen om deze te vernieuwen als uw video een\n"
 "diagonale lijn in het beeld bevat."
 
-#: flumotion/wizard/steps.py:495
+#: flumotion/wizard/steps.py:511
 msgid "Could not check features of the 'ffmpegcolorspace' element."
 msgstr "Kon eigenschappen van het 'ffmpegcolorspace'-element niet controleren."
 
-#: flumotion/wizard/steps.py:510
+#: flumotion/wizard/steps.py:526
 msgid ""
 "\n"
 "\n"
@@ -357,11 +357,18 @@ msgstr ""
 msgid "Internal error: could not run check code on worker."
 msgstr "Interne fout: kon check-code niet uitvoeren op worker."
 
+#: flumotion/component/feedcomponent.py:128
+#, python-format
+msgid ""
+"The worker does not have the '%s' element installed.\n"
+"Please install the necessary plug-in and restart the component.\n"
+msgstr ""
+
 #: flumotion/component/feedcomponent.py:143
 msgid "GStreamer error: could not parse component pipeline."
 msgstr "GStreamer-fout: kon de component-pijplijn niet verwerken."
 
-#: flumotion/component/consumers/httpstreamer/http.py:448
+#: flumotion/component/consumers/httpstreamer/http.py:451
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Netwerkfout: TCP-poort %d is niet beschikbaar."
@@ -475,22 +482,22 @@ msgstr "Kon toestel '%s' niet onderzoeken."
 msgid "No device found on %s."
 msgstr "Geen toestel gevonden op %s."
 
-#: flumotion/worker/checks/video08.py:156
-#: flumotion/worker/checks/video010.py:155
+#: flumotion/worker/checks/video08.py:159
+#: flumotion/worker/checks/video010.py:156
 msgid "Device node /dev/raw1394 does not exist."
 msgstr "Apparaat /dev/raw1394 bestaat niet."
 
-#: flumotion/worker/checks/video08.py:175
-#: flumotion/worker/checks/video010.py:173
+#: flumotion/worker/checks/video08.py:178
+#: flumotion/worker/checks/video010.py:174
 msgid "No Firewire device found."
 msgstr "Geen Vuurdraadapparaat gedetecteerd."
 
-#: flumotion/worker/checks/video08.py:181
-#: flumotion/worker/checks/video010.py:179
+#: flumotion/worker/checks/video08.py:184
+#: flumotion/worker/checks/video010.py:180
 msgid "Could not probe Firewire device."
 msgstr "Kon Vuurdraadapparaat niet onderzoeken."
 
-#: flumotion/worker/checks/video08.py:205
+#: flumotion/worker/checks/video08.py:208
 msgid ""
 "The ffmpegcolorspace element is too old. Please upgrade gst-plugins to "
 "version 0.8.5."
@@ -558,67 +565,67 @@ msgstr "o jeetje"
 msgid "Flumotion Administration"
 msgstr "Flumotion Administratie"
 
-#: data/glade/admin.glade:36
+#: data/glade/admin.glade:35
 msgid "_Connection"
 msgstr "_Verbinding"
 
-#: data/glade/admin.glade:60
+#: data/glade/admin.glade:59
 msgid "_Import Configuration..."
 msgstr "Configuratie Invoeren..."
 
-#: data/glade/admin.glade:69
+#: data/glade/admin.glade:68
 msgid "_Export Configuration..."
 msgstr "Configuratie Uitvoeren..."
 
-#: data/glade/admin.glade:97
+#: data/glade/admin.glade:96
 msgid "_Manage"
 msgstr "_Beheren"
 
-#: data/glade/admin.glade:106
+#: data/glade/admin.glade:105
 msgid "S_tart Component"
 msgstr "S_tart Component"
 
-#: data/glade/admin.glade:127
+#: data/glade/admin.glade:126
 msgid "St_op Component"
 msgstr "St_op Component"
 
-#: data/glade/admin.glade:154
+#: data/glade/admin.glade:153
 msgid "Start _All"
 msgstr "Start _Alles"
 
-#: data/glade/admin.glade:163
+#: data/glade/admin.glade:162
 msgid "Stop A_ll"
 msgstr "Stop A_lles"
 
-#: data/glade/admin.glade:172
+#: data/glade/admin.glade:171
 msgid "_Clear All"
 msgstr "Wis _Alles"
 
-#: data/glade/admin.glade:199
+#: data/glade/admin.glade:198
 msgid "Run _Wizard"
 msgstr "_Wizard Uitvoeren"
 
-#: data/glade/admin.glade:224
+#: data/glade/admin.glade:223
 msgid "_Debug"
 msgstr "_Debug"
 
-#: data/glade/admin.glade:233
+#: data/glade/admin.glade:232
 msgid "Reload _Manager"
 msgstr "_Manager Herladen"
 
-#: data/glade/admin.glade:254
+#: data/glade/admin.glade:253
 msgid "Reload _All"
 msgstr "_Alles Herladen"
 
-#: data/glade/admin.glade:263
+#: data/glade/admin.glade:262
 msgid "Start _Shell"
 msgstr "_Shell Opstarten"
 
-#: data/glade/admin.glade:288
+#: data/glade/admin.glade:287
 msgid "_Help"
 msgstr "_Help"
 
-#: data/glade/admin.glade:325
+#: data/glade/admin.glade:324
 msgid "Open a stored configuration"
 msgstr "Opgeslagen configuratie openen"
 
