@@ -1,0 +1,66 @@
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2004,2005,2006 Fluendo, S.L. (www.fluendo.com).
+# All rights reserved.
+
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+from twisted.internet import defer
+
+from flumotion.worker.checks import check
+from flumotion.common import gstreamer, messages
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
+
+def checkVorbis():
+    """
+    Check for a recent enough Vorbis encoder.
+    """
+    result = messages.Result()
+    version = gstreamer.get_plugin_version('vorbis')
+    print version
+    if version >= "0.10.0" and version < "0.10.3":
+        m = messages.Warning(T_(
+            N_("Version %s of the '%s' GStreamer plug-in contains a bug. "
+               "Synchronization between audio and video may not be correct.\n"
+               "Please upgrade 'gst-plugins-base' to version 0.10.3."),
+               version, 'vorbis'),
+            id = 'vorbis-check')
+        result.add(m)
+
+    result.succeed(None)
+    return defer.succeed(result)
+
+def checkTheora():
+    """
+    Check for a recent enough Theora encoder.
+    """
+    result = messages.Result()
+    version = gstreamer.get_plugin_version('theora')
+    print version
+    if version >= "0.10.0" and version < "0.10.3":
+        m = messages.Warning(T_(
+            N_("Version %s of the '%s' GStreamer plug-in contains a bug. "
+               "Synchronization between audio and video may not be correct.\n"
+               "Please upgrade 'gst-plugins-base' to version 0.10.3."),
+               version, 'theora'),
+            id = 'theora-check')
+        result.add(m)
+
+    result.succeed(None)
+    return defer.succeed(result)

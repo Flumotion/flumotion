@@ -806,8 +806,15 @@ class Theora(VideoEncoder):
         self.spinbutton_quality.set_value(16)
 
     def worker_changed(self):
-        self.wizard.require_elements(self.worker, 'theoraenc')
+        d= self.wizard.require_elements(self.worker, 'theoraenc')
+
+        yield d
         
+        d = self.workerRun('flumotion.worker.checks.encoder', 'checkTheora')
+
+        yield d
+    worker_changed = defer_generator_method(worker_changed)
+         
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
         self.spinbutton_bitrate.set_sensitive(
@@ -888,11 +895,20 @@ class Vorbis(AudioEncoder):
         self.radiobutton_quality.set_active(True)
         
     def worker_changed(self):
+        self.debug('running Vorbis checks')
+        print 'running Vorbis checks'
         if gst.gst_version < (0, 9):
-            self.wizard.require_elements(self.worker, 'rawvorbisenc')
+            d = self.wizard.require_elements(self.worker, 'rawvorbisenc')
         else:
-            self.wizard.require_elements(self.worker, 'vorbisenc')
+            d = self.wizard.require_elements(self.worker, 'vorbisenc')
+
+        yield d
         
+        d = self.workerRun('flumotion.worker.checks.encoder', 'checkVorbis')
+
+        yield d
+    worker_changed = defer_generator_method(worker_changed)
+  
     # This is bound to both radiobutton_bitrate and radiobutton_quality
     def on_radiobutton_toggled(self, button):
         self.spinbutton_bitrate.set_sensitive(

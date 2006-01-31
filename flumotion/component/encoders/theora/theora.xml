@@ -41,6 +41,7 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="theora-base" />
+            <dependency name="worker-checks" />
         </dependencies>
 
         <directories>

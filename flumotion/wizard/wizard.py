@@ -289,12 +289,13 @@ class Wizard(GladeWindow, log.Loggable):
         step.activated()
 
     def _combobox_worker_changed(self, combobox, worker):
-        self.debug('combobox_worker_changed')
+        self.debug('combobox_worker_changed, worker %r' % worker)
         if worker:
             self.clear_msg('worker-error')
             self._last_worker = worker
             if self.current_step:
                 self._setup_worker(self.current_step, worker)
+                self.debug('calling %r.worker_changed' % self.current_step)
                 self.current_step.worker_changed()
         else:
             msg = messages.Error(T_(
@@ -364,6 +365,8 @@ class Wizard(GladeWindow, log.Loggable):
         
         d = self.check_elements(workerName, *elementNames)
         d.addCallback(got_missing_elements, workerName)
+
+        return d
 
     def _setup_worker(self, step, worker):
         # get name of active worker

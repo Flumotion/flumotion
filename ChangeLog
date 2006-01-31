@@ -1,5 +1,24 @@
 2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/component.py:
+	  BaseComponent.addMessage(): to add messages to the state
+	* flumotion/worker/checks/Makefile.am:
+	* flumotion/worker/checks/package.xml:
+	* flumotion/worker/checks/encoder.py:
+	  add checks for Theora and Vorbis
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/encoders/theora/theora.xml:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	* flumotion/component/encoders/vorbis/vorbis010.py:
+	  run theora and vorbis checks in do_check
+	* flumotion/wizard/steps.py:
+	  use checks for Theora and Vorbis
+	* flumotion/wizard/wizard.py:
+	  add some debug
+	  make sure the deferred from require is returned
+
+2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/launch/main.py:
 	  update to match the new protocol
 

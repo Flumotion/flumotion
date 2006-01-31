@@ -36,6 +36,7 @@
     <bundle name="vorbis-component">
         <dependencies>
             <dependency name="component" />
+            <dependency name="worker-checks" />
             <dependency name="vorbis-base" />
         </dependencies>
 

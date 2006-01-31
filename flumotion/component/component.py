@@ -454,6 +454,12 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         if self._HeartbeatDC:
             self._HeartbeatDC.reset(0)
         
+    def addMessage(self, message):
+        """
+        @type  message: L{flumotion.common.messages.Message}
+        """
+        self.state.append('messages', message)
+        
     def adminCallRemote(self, methodName, *args, **kwargs):
         """
         Call a remote method on all admin client views on this component.

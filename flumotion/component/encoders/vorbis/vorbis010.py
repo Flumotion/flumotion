@@ -26,6 +26,19 @@ from flumotion.component import feedcomponent
 from vorbisutils import get_max_sample_rate
 
 class Vorbis(feedcomponent.ParseLaunchComponent):
+    def do_check(self):
+        self.debug('running Vorbis check')
+        from flumotion.worker.checks import encoder
+        d = encoder.checkVorbis()
+
+        d.addCallback(self._checkCallback)
+        
+        return d
+
+    def _checkCallback(self, result):
+        for m in result.messages:
+            self.addMessage(m)
+
     def get_pipeline_string(self, properties):
         self.bitrate = properties.get('bitrate', -1)
         self.quality = properties.get('quality', 0.3)
