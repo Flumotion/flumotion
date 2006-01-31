@@ -23,23 +23,25 @@ from twisted.trial import unittest
 
 import common
 
-from twisted.trial import unittest
+from twisted.python import failure
 
 from flumotion.component.feedcomponent import ParseLaunchComponent
 
 class PipelineTest(ParseLaunchComponent):
     def __init__(self, eaters=None, feeders=None, pipeline='test-pipeline'):
-        config = {'name': 'fake',
-                  'source': eaters or [],
-                  'feed': feeders or [],
-                  'properties': {}}
-
         self.__pipeline = pipeline
+        self._source = eaters or []
+        self._feed = feeders or []
 
         ParseLaunchComponent.__init__(self)
 
-        # we can short-circuit to setup since we're a test
-        self.setup(config)
+    def config(self):
+        config = {'name': 'fake',
+                  'source': self._source,
+                  'feed': self._feed,
+                  'properties': {}}
+
+        return self.setup(config)
 
     def create_pipeline(self):
         unparsed = self.__pipeline
@@ -58,6 +60,7 @@ class PipelineTest(ParseLaunchComponent):
         
 def pipelineFactory(pipeline, eaters=None, feeders=None):
     t = PipelineTest(pipeline=pipeline, eaters=eaters, feeders=feeders)
+    unittest.deferredResult(t.config())
     return t.parse_pipeline(pipeline)
 
 EATER = ParseLaunchComponent.EATER_TMPL
@@ -66,6 +69,7 @@ FEEDER = ParseLaunchComponent.FEEDER_TMPL
 class TestExpandElementName(unittest.TestCase):
     def setUp(self):
         self.p = PipelineTest([], [])
+        unittest.deferredResult(self.p.config())
 
     def testSpaces(self):
         try:
@@ -132,6 +136,7 @@ class TestExpandElementName(unittest.TestCase):
 class TestExpandElementNames(unittest.TestCase):
     def setUp(self):
         self.p = PipelineTest([], [])
+        unittest.deferredResult(self.p.config())
 
     def testOddDelimeters(self):
         try:
@@ -191,7 +196,7 @@ class TestParser(unittest.TestCase):
                 self._feeder('fake:feed1'), self._feeder('fake:feed2')))
 
     def testErrors(self):
-        self.assertRaises(TypeError, pipelineFactory, '')
+        self.assertRaises(failure.Failure, pipelineFactory, '')
     
 if __name__ == '__main__':
     unittest.main()
