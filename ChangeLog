@@ -1,3 +1,8 @@
+2006-02-01  Edward Hervey  <edward@fluendo.com>
+
+	* po/fr.po:
+	 Slight fixes to the french translation.
+
 2006-01-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/log.py:
