@@ -796,7 +796,7 @@ class Vishnu(log.Loggable):
         and may be returned to the allocation pool.
         """
         if not workerName in self.workerHeaven.avatars:
-            self.debug("Worker %s appears to have logged out, not releasing"
+            self.warning("Worker %s appears to have logged out, not releasing"
                        % workerName)
             return
 
