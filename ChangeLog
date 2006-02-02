@@ -1,4 +1,17 @@
+2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/messages.py:
+	  use FancyEqMixin so we can sensibly compare RemoteCopy objects
+	  of the same original Copyable Messages and Translatable
+	* flumotion/test/test_common_messages.py:
+	  add tests for these
+	* flumotion/twisted/flavors.py:
+	  give us a more useful ValueError when state_remove tries to
+	  remove an unexisting object.
+	  Fixes #322
+
 2006-02-02  Zaheer Abbas Merali <zaheermerali at gmail dot com>
+
 	* flumotion/admin/main.py:
 	  convert port to an integer value on parsing
 	  fixes #324

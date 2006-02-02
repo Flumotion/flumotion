@@ -260,7 +260,11 @@ class StateRemoteCache(pb.RemoteCache):
         if hasattr(self, 'remove'):
             StateCacheable.remove(self, key, value)
         else:
-            self._dict[key].remove(value)
+            try:
+                self._dict[key].remove(value)
+            except ValueError:
+                raise ValueError("value %r not under key %r with values %r",
+                    value, key, self._dict[key])
 
         # notify our local listeners
         self._ensureListeners()

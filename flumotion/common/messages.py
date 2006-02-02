@@ -25,6 +25,8 @@ support for serializable translatable messages from component/manager to admin
 
 from flumotion.common import log
 from twisted.spread import pb
+from twisted.python import util
+
 import gettext
 
 ERROR = 1
@@ -67,10 +69,21 @@ def gettexter(domain):
 class Translatable(pb.Copyable, pb.RemoteCopy):
     domain = None
     
-class TranslatableSingular(Translatable):
+# NOTE: subclassing FancyEqMixin allows us to compare two
+# RemoteCopy instances gotten from the same Copyable; this allows
+# state _append and _remove to work correctly
+# Take note however that this also means that two RemoteCopy objects
+# of two different Copyable objects, but with the same args, will
+# also pass equality
+# For our purposes, this is fine.
+
+class TranslatableSingular(Translatable, util.FancyEqMixin):
     """
     I represent a translatable gettext msg in the singular form.
     """
+
+    compareAttributes = ["domain", "format", "args"]
+
     def __init__(self, domain, format, *args):
         """
         @param domain: the text domain for translations of this message
@@ -82,10 +95,13 @@ class TranslatableSingular(Translatable):
         self.args = args
 pb.setUnjellyableForClass(TranslatableSingular, TranslatableSingular)
 
-class TranslatablePlural(Translatable):
+class TranslatablePlural(Translatable, util.FancyEqMixin):
     """
     I represent a translatable gettext msg in the plural form.
     """
+
+    compareAttributes = ["domain", "singular", "plural", "count", "args"]
+    
     def __init__(self, domain, format, *args):
         """
         @param domain: the text domain for translations of this message
@@ -178,11 +194,17 @@ class Translator(log.Loggable):
             strings.append(self.translateTranslatable(t, lang))
         return "".join(strings)
 
-class Message(pb.Copyable, pb.RemoteCopy):
+# NOTE: same caveats apply for FancyEqMixin as above
+# this might be a little heavy; we could consider only comparing
+# on id, once we verify that all id's are unique
+
+class Message(pb.Copyable, pb.RemoteCopy, util.FancyEqMixin):
     """
     I am a message to be shown in a UI.
-    I can be proxied from a worker or component to managers and admins.
     """
+
+    compareAttributes = ["level", "translatables", "debug", "id", "priority"]
+
     def __init__(self, level, translatable, debug=None, id=None, priority=50):
         """
         @param level:        ERROR, WARNING or INFO
@@ -201,7 +223,7 @@ class Message(pb.Copyable, pb.RemoteCopy):
         self.add(translatable)
 
     def __repr__(self):
-        return '<Message %r at %r>' % (self.id, id(self.id))
+        return '<Message %r at %r>' % (self.id, id(self))
 
     def add(self, translatable):
         if not isinstance(translatable, Translatable):

@@ -20,16 +20,18 @@
 # Headers in this file shall remain intact.
 
 from twisted.trial import unittest
-from twisted.spread import jelly
-from twisted.internet import reactor
+from twisted.spread import jelly, pb
+from twisted.internet import reactor, defer
 
 import common
+import testclasses
 
 import os
 import gettext
 
-from flumotion.common import messages
+from flumotion.common import messages, log
 from flumotion.configure import configure
+from flumotion.twisted import flavors
 
 # markers
 from flumotion.common.messages import N_, ngettext
@@ -133,5 +135,221 @@ class ResultTest(unittest.TestCase):
         text = self.translator.translate(m, lang=["nl_NL",])
         self.assertEquals(text, "o jeetje")
       
+# test if appending and removing messages works across a PB connection
+class TestStateCacheable(flavors.StateCacheable):
+    pass
+class TestStateRemoteCache(flavors.StateRemoteCache):
+    pass
+pb.setUnjellyableForClass(TestStateCacheable, TestStateRemoteCache)
+
+class TestRoot(testclasses.TestManagerRoot, log.Loggable):
+
+    logCategory = "testroot"
+    
+    def setup(self):
+        self.translatable = (T_(N_("Note")))
+        self.message = messages.Info(self.translatable)
+        self.other = messages.Warning(T_(N_("Warning")))
+
+    def remote_getState(self):
+        self.state = TestStateCacheable()
+        self.state.addListKey('messages')
+        return self.state
+
+    def remote_getSameTranslatable(self):
+        # return an instance of always the same translatable object
+        self.debug("remote_getTranslatable: returning %r" % self.translatable)
+        return self.translatable
+
+    def remote_getEqualTranslatable(self):
+        # return an instance of a new translatable object, but always equal
+        t =  T_(N_("Note"))
+        self.debug("remote_getTranslatable: returning %r" % t)
+        return t
+
+    def remote_getMessage(self):
+        # just return a message, to test serialization
+        self.debug("remote_getMessage: returning %r" % self.message)
+        return self.message
+        
+    def remote_appendMessage(self):
+        self.state.append('messages', self.message)
+
+    def remote_appendOtherMessage(self):
+        self.state.append('messages', self.other)
+
+    def remote_removeMessage(self):
+        self.state.remove('messages', self.message)
+
+    def remote_removeOtherMessage(self):
+        self.state.remove('messages', self.other)
+
+class PBSerializationTest(unittest.TestCase):
+    def setUp(self):
+        self.changes = []
+        self.runServer()
+
+    def tearDown(self):
+        unittest.deferredResult(self.stopServer())
+        
+    # helper functions to start PB comms
+    def runClient(self):
+        f = pb.PBClientFactory()
+        self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
+        d = f.getRootObject()
+        d.addCallback(self.clientConnected)
+        return d
+        #.addCallbacks(self.connected, self.notConnected)
+        # self.id = reactor.callLater(10, self.timeOut)
+
+    def clientConnected(self, perspective):
+        self.perspective = perspective
+        self._dDisconnect = defer.Deferred()
+        perspective.notifyOnDisconnect(
+            lambda r: self._dDisconnect.callback(None))
+
+    def stopClient(self):
+        self.cport.disconnect()
+        return self._dDisconnect
+
+    def runServer(self):
+        testroot = TestRoot()
+        testroot.setup()
+        factory = pb.PBServerFactory(testroot)
+        factory.unsafeTracebacks = 1
+        self.sport = reactor.listenTCP(0, factory, interface="127.0.0.1")
+        self.port = self.sport.getHost().port
+
+    def stopServer(self):
+        d = self.sport.stopListening()
+        return d
+
+    # actual tests
+    def testGetSameTranslatableTwice(self):
+        # getting the remote translatable twice
+        # should result in equal (but not necessarily the same) object
+    
+        # start everything
+        unittest.deferredResult(self.runClient())
+        
+        # get the message
+        d = self.perspective.callRemote('getSameTranslatable')
+        t1 = unittest.deferredResult(d)
+        self.failUnless(t1)
+
+        # get it again
+        d = self.perspective.callRemote('getSameTranslatable')
+        t2 = unittest.deferredResult(d)
+        self.failUnless(t2)
+
+        # check if they proxied to objects that are equal, but different
+        self.assertEquals(t1, t2)
+        self.failUnless(t1 == t2)
+        self.failIf(t1 is t2)
+         
+        # stop
+        unittest.deferredResult(self.stopClient())
+
+    def testGetEqualTranslatableTwice(self):
+        # getting two different but equal translatable twice
+        # will also result in equal (but not necessarily the same) object
+    
+        # start everything
+        unittest.deferredResult(self.runClient())
+        
+        # get the message
+        d = self.perspective.callRemote('getEqualTranslatable')
+        t1 = unittest.deferredResult(d)
+        self.failUnless(t1)
+
+        # get it again
+        d = self.perspective.callRemote('getEqualTranslatable')
+        t2 = unittest.deferredResult(d)
+        self.failUnless(t2)
+
+        # check if they proxied to objects that are equal, but different
+        self.assertEquals(t1, t2)
+        self.failUnless(t1 == t2)
+        self.failIf(t1 is t2)
+         
+        # stop
+        unittest.deferredResult(self.stopClient())
+
+    def testGetSameMessageTwice(self):
+        # getting two proxied reference of the same ManagerMessage
+        # should result in equal, but different objects
+    
+        # start everything
+        unittest.deferredResult(self.runClient())
+        
+        # get the message
+        d = self.perspective.callRemote('getMessage')
+        m1 = unittest.deferredResult(d)
+
+        self.failUnless(m1)
+
+        # get it again
+        d = self.perspective.callRemote('getMessage')
+        m2 = unittest.deferredResult(d)
+
+        self.failUnless(m2)
+
+        # check if they proxied to equal but different
+        self.assertEquals(m1, m2)
+        self.failUnless(m1 == m2)
+        self.failIf(m1 is m2)
+         
+        # stop
+        unittest.deferredResult(self.stopClient())
+
+    def testMessageAppendRemove(self):
+        # this is what we eventually want; get the messages removed properly
+        # from the list key
+
+        # start everything
+        unittest.deferredResult(self.runClient())
+        
+        # get the state
+        d = self.perspective.callRemote('getState')
+        state = unittest.deferredResult(d)
+
+        self.failUnless(state)
+        self.assertEqual(len(state.get('messages')), 0)
+
+        # ask server to append a message
+        d = self.perspective.callRemote('appendMessage')
+        r = unittest.deferredResult(d)
+
+        l = state.get('messages')
+        self.assertEquals(len(l), 1)
+        self.assertEquals(l[0].level, messages.INFO)
+
+        # ask server to append another message
+        d = self.perspective.callRemote('appendOtherMessage')
+        r = unittest.deferredResult(d)
+
+        l = state.get('messages')
+        self.assertEquals(len(l), 2)
+        self.assertEquals(l[0].level, messages.INFO)
+        self.assertEquals(l[1].level, messages.WARNING)
+
+        # ask server to remove other message
+        d = self.perspective.callRemote('removeOtherMessage')
+        r = unittest.deferredResult(d)
+
+        l = state.get('messages')
+        self.assertEquals(len(l), 1)
+        self.assertEquals(l[0].level, messages.INFO)
+
+        # ask server to remove first message
+        d = self.perspective.callRemote('removeMessage')
+        r = unittest.deferredResult(d)
+
+        l = state.get('messages')
+        self.assertEquals(len(l), 0)
+
+        # stop
+        unittest.deferredResult(self.stopClient())
+
 if __name__ == '__main__':
     unittest.main()
