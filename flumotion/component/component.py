@@ -193,15 +193,19 @@ class BaseComponentMedium(medium.BaseMedium):
        
     def remote_stop(self):
         self.info('Stopping job')
-        d = defer.maybeDeferred(self.comp.stop)
+        d = self.comp.stop()
         d.addCallback(self._destroyCallback)
 
         return d
 
     def _destroyCallback(self, result):
-        self.debug('_destroyCallback: losing connection and stopping reactor')
-        reactor.callLater(0, self.remote.broker.transport.loseConnection)
-        reactor.callLater(0, reactor.stop)
+        self.debug('_destroyCallback: scheduling destroy')
+        reactor.callLater(0, self._destroyCallLater)
+
+    def _destroyCallLater(self):
+        self.debug('_destroyCalllater: losing connection and stopping reactor')
+        self.remote.broker.transport.loseConnection()
+        reactor.stop()
 
     def remote_reloadComponent(self):
         """Reload modules in the component."""
@@ -400,7 +404,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             self.state.remove('messages', message)
         self.stopHeartbeat()
 
-        self.do_stop()
+        return self.do_stop()
 
     # FIXME: privatize
     def startHeartbeat(self):

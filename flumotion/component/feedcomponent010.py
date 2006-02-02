@@ -330,12 +330,12 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline_signals = []
         self.bus_watch_id = None
 
-    def stop(self):
+    def do_stop(self):
         self.debug('Stopping')
         if self.pipeline:
             self.cleanup()
         self.debug('Stopped')
-        basecomponent.BaseComponent.stop(self)
+        return defer.succeed(None)
 
     def set_master_clock(self, ip, port, base_time):
         clock = gst.NetClientClock(None, ip, port, base_time)
