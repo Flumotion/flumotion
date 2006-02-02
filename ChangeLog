@@ -1,5 +1,17 @@
 2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/overlay.py:
+	  stop -> do_stop()
+	* flumotion/component/feedcomponent08.py:
+	  stop -> do_stop, move it to interface section
+	* flumotion/component/producers/looper/looper.py:
+	  use configure_pipeline instead of overriding start
+	  override do_stop; clean up bus 
+	  fix a UI bug where on startup the number of iterations
+	  was shown as 5
+
+2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/messages.py:
 	  use FancyEqMixin so we can sensibly compare RemoteCopy objects
 	  of the same original Copyable Messages and Translatable

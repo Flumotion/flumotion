@@ -164,22 +164,29 @@ class Looper(feedcomponent.ParseLaunchComponent):
             self.debug("%s: EVENT %s" % (detail, buffer))
         return True
 
-    def start(self, eatersData, feedersData, clocking):
-        self.oggdemux = self.pipeline.get_by_name("demux")
+    def configure_pipeline(self, pipeline, properties):
+        self.oggdemux = pipeline.get_by_name("demux")
 
-        self.bus = self.pipeline.get_bus()
+        self.bus = pipeline.get_bus()
         self.bus.add_signal_watch()
         self.bus.connect('message', self._message_cb)
         self.nbiterations = 0
-        self.adminCallRemote("numberIterationsChanged", 5)
 
-        feedcomponent.ParseLaunchComponent.start(self, eatersData, feedersData, clocking)
+        # fire-and-forget: we ignore the deferred we get
+        self.adminCallRemote("numberIterationsChanged", 0)
 
-    def stop(self):
+    def do_stop(self):
+        d = feedcomponent.ParseLaunchComponent.do_stop(self)
+        d.addCallback(self._do_stopCallback)
+        return d
+
+    def _do_stopCallback(self, result):
         if self.bus:
             self.bus.remove_signal_watch()
+            self.bus = None
+
         if self.timeoutid:
             gobject.source_remove(self.timeoutid)
             self.timeoutid = 0
+
         self.nbiterations = 0
-        self.adminCallRemote("numberIterationsChanged", self.nbiterations)

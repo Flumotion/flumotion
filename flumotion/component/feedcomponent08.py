@@ -91,6 +91,12 @@ class FeedComponent(basecomponent.BaseComponent):
 
         return defer.succeed(None)
 
+    def do_stop(self):
+        self.debug('Stopping')
+        self.pipeline_stop()
+        self.debug('Stopped')
+        return defer.succeed(None)
+
     ### FeedComponent interface for subclasses
     def create_pipeline(self):
         raise NotImplementedError, "subclass must implement create_pipeline"
@@ -400,12 +406,6 @@ class FeedComponent(basecomponent.BaseComponent):
     def play(self):
         self.debug('Playing')
         self.pipeline_play()
-
-    def stop(self):
-        self.debug('Stopping')
-        self.pipeline_stop()
-        self.debug('Stopped')
-        basecomponent.BaseComponent.stop(self)
 
     def pause(self):
         self.debug('Pausing')

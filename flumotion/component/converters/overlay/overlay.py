@@ -21,6 +21,8 @@
 
 import os
 
+from twisted.internet import defer
+
 from flumotion.common import log
 
 from flumotion.component import feedcomponent
@@ -90,18 +92,13 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         return feedcomponent.ParseLaunchComponent.do_start(self,
             eatersData, feedersData, clocking)
 
-    # FIXME: this is not part of the interface (init protocol); maybe
-    # need to add a new call_each_method() ?
-    def stop(self):
+    def do_stop(self):
         # clean up our temp file
-        # FIXME: it would probably be nicer to implement this through hooks
-        # since now I do this before chaining, while FeedComp does it after
-        # chaining, so it's messy
-        feedcomponent.ParseLaunchComponent.stop(self)
         if self._filename:
             self.debug('Removing temporary overlay file %s' % self._filename)
             os.unlink(self._filename)
             self._filename = None
         else:
             self.debug('Temporary overlay already gone, did we not start up correctly ?')
+        return defer.succeed(None)
         
