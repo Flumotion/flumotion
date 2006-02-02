@@ -42,7 +42,7 @@
 		    <widget class="GtkImageMenuItem" id="file_open">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-open</property>
-		      <property name="use_underline">True</property>
+		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="file_open_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 		    </widget>
 		  </child>
@@ -81,7 +81,7 @@
 		    <widget class="GtkImageMenuItem" id="file_quit">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-quit</property>
-		      <property name="use_underline">True</property>
+		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="file_quit_cb" last_modification_time="Wed, 01 Sep 2004 15:55:15 GMT"/>
 		    </widget>
 		  </child>
@@ -294,7 +294,7 @@
 		    <widget class="GtkImageMenuItem" id="help_about">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-about</property>
-		      <property name="use_underline">True</property>
+		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="help_about_cb" last_modification_time="Wed, 01 Sep 2004 16:01:05 GMT"/>
 		    </widget>
 		  </child>

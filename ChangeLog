@@ -1,5 +1,10 @@
 2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/admin.glade:
+	  make sure we use stock items.  Fixes #320.
+
+2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/overlay.py:
 	  stop -> do_stop()
 	* flumotion/component/feedcomponent08.py:
