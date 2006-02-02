@@ -131,7 +131,9 @@ def parse_connection(manager_string, use_insecure):
                      ('port', 6)):
             ret[k] = groups[v]
         ret['use_insecure'] = bool(use_insecure)
-        if not ret['port']:
+        if ret['port']:
+            ret['port'] = int(ret['port'])
+        else:
             if use_insecure:
                 ret['port'] = configure.defaultTCPManagerPort
             else:
