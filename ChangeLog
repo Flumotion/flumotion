@@ -1,3 +1,8 @@
+2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/errors.py:
+	  remove unused errors; we can now use Message to deal with them
+
 2006-02-01  Edward Hervey  <edward@fluendo.com>
 
 	* po/fr.po:

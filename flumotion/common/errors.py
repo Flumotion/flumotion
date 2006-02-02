@@ -133,10 +133,6 @@ class FlumotionError(pb.Error):
 class NoBundleError(pb.Error):
     "The requested bundle was not found"
 
-# an exception for gst.Error
-class GstError(Exception):
-    """Takes an element, gst.Error.message and gst.Error.debug"""
-
 # serializable GStreamer errors
 class GStreamerError(pb.Error):
     "Generic GStreamer error"
@@ -146,18 +142,3 @@ class GStreamerGstError(GStreamerError):
 
 class MissingElementError(GStreamerError):
     "A needed element is missing"
-
-class StateChangeError(GStreamerError):
-    "The state change failed"
-
-class UnknownDeviceError(GStreamerError):
-    "The device does not exist"
-
-class PermissionDeniedError(GStreamerError):
-    "Permission denied"
-
-class DeviceNotFoundError(GStreamerError):
-    "Device could not be found"
-
-class DeviceBusyError(GStreamerError):
-    "Generic GStreamer error"
