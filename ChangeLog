@@ -1,5 +1,13 @@
 2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/random/component-initialization-protocol:
+	* flumotion/component/component.py:
+	  make do_stop also return a deferred, for possible cases
+	  where we might want to inidicate errors from shutdown before the
+	  connection with the manager is lost.
+
+2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	  remove unused errors; we can now use Message to deal with them
 

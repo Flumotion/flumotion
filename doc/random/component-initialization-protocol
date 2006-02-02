@@ -55,7 +55,8 @@ Returns the deferred.
 BaseComponent.stop(self)
 -------------------------
 Sets mood to waking.
-Invokes do_stop(), which should return immediately.
+Invokes do_stop(), which returns a deferred.
+Returns the deferred.
 
 Interface
 ---------

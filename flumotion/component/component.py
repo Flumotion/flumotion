@@ -346,10 +346,11 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         method, you are responsible for arranging that the component
         becomes sleeping.
 
-        @Returns: None
+        @Returns: L{twisted.internet.defer.Deferred}
         """
         # default behavior
         self.setMood(moods.sleeping)
+        return defer.succeed(None)
  
     ### BaseComponent implementation related to compoment protocol
     ### called by manager through medium
