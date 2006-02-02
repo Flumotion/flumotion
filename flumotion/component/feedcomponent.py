@@ -162,6 +162,13 @@ class ParseLaunchComponent(FeedComponent):
                                   'get_pipeline_string')
         
     def configure_pipeline(self, pipeline, properties):
+        """
+        Method that can be implemented by subclasses if they wish to
+        interact with the pipeline after it has been created and set
+        on the component.
+
+        This could include attaching signals and bus handlers.
+        """
         pass
 
     ### private methods
