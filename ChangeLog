@@ -1,5 +1,10 @@
 2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/text/main.py:
+	  make Messages proxyable.  Closes #321.
+
+2006-02-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/component-initialization-protocol:
 	* flumotion/component/component.py:
 	  make do_stop also return a deferred, for possible cases

@@ -29,6 +29,10 @@ from twisted.python import rebuild
 
 
 from flumotion.common import log, errors, worker, planet, common
+
+# make Message proxyable
+from flumotion.common import messages
+
 from flumotion.configure import configure
 from flumotion.twisted import flavors, reflect
 
