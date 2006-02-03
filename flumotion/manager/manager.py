@@ -45,17 +45,17 @@ from flumotion.twisted.defer import defer_generator_method
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
-def find(list, value, proc=lambda x: x):
+def _find(list, value, proc=lambda x: x):
     return list[[proc(x) for x in list].index(value)]
 
-def first(list, proc=lambda x: x):
+def _first(list, proc=lambda x: x):
     for x in list:
         if proc(x): return x
 
-def any(list, proc=lambda x: x):
+def _any(list, proc=lambda x: x):
     return filter(proc, list)
 
-def fint(*procs):
+def _fint(*procs):
     # intersection of functions
     def int(*args, **kwargs):
         for p in procs:
@@ -570,7 +570,7 @@ class Vishnu(log.Loggable):
 
         # check if we have this flow yet and add if not
         isOurFlow = lambda x: x.get('name') == config['parent']
-        flow = first(self.state.get('flows'), isOurFlow)
+        flow = _first(self.state.get('flows'), isOurFlow)
         if not flow:
             self.info('Creating flow "%s"' % config['parent'])
             flow = planet.ManagerFlowState()
@@ -673,15 +673,15 @@ class Vishnu(log.Loggable):
         """
 
         # first get all components to sleep
-        flow = find(self.state.get('flows'), flowName, lambda x: x.get('name'))
+        flow = _find(self.state.get('flows'), flowName, lambda x: x.get('name'))
         components = flow.get('components')
 
         # if any component is already in a mood change/command, fail
         isBusy = lambda c: c.get('moodPending') != None
         isNotSleeping = lambda c: c.get('mood') is not moods.sleeping.value
-        pred = fint(isBusy, isNotSleeping)
-        if any(components, pred):
-            raise errors.BusyComponentError(first(components, pred))
+        pred = _fint(isBusy, isNotSleeping)
+        if _any(components, pred):
+            raise errors.BusyComponentError(_first(components, pred))
 
         for c in components:
             del self._componentMappers[self._componentMappers[c].id]

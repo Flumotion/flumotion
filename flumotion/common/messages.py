@@ -262,6 +262,7 @@ class Result(pb.Copyable, pb.RemoteCopy):
     @ivar value:    the result value of the check
     @ivar failed:   whether or not the check failed.  Typically triggered
                     by adding an ERROR message to the result.
+    @ivar messages: list of messages
     @type messages: list of L{Message}
     """
     def __init__(self):

@@ -1,6 +1,13 @@
 2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/messages.py:
+	  fix doc
+	* flumotion/manager/manager.py:
+	  privatize a bunch of privately used undocumented methods
+
+2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/messages.py:
 	  document
 
 2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
