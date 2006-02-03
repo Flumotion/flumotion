@@ -361,15 +361,17 @@ class Kindergarten(log.Loggable):
 
     logCategory = 'workerbrain' # thomas: I don't like Kindergarten
 
-    def __init__(self, options):
+    def __init__(self, options, socketPath):
         """
         @param options: the optparse option instance of command-line options
         @type  options: dict
+        @param socketPath: the path of the Unix domain socket for PB.
         """
         dirname = os.path.split(os.path.abspath(sys.argv[0]))[0]
         self.program = os.path.join(dirname, 'flumotion-worker')
         self.kids = {} # avatarId -> Kid
         self.options = options
+        self._socketPath = socketPath
         
     def play(self, avatarId, type, moduleName, methodName, config, bundles):
         """
@@ -399,7 +401,7 @@ class Kindergarten(log.Loggable):
             self.error("Trying to spawn job process, but '%s' does not "
                        "exist" % executable)
         # Evil FIXME: make argv[0] of the kid insult the user
-        argv = [executable, avatarId, getSocketPath()]
+        argv = [executable, avatarId, self._socketPath]
         childFDs={0:0, 1:1, 2:2}
         env={}
         env.update(os.environ)
@@ -438,10 +440,17 @@ class Kindergarten(log.Loggable):
         self.warning('Asked to remove kid with pid %d but not found' % pid)
         return False
 
-def getSocketPath():
-    # FIXME: better way of getting at a tmp dir ?
-    # this is insecure as well, fixme before 0.1.10
-    return os.path.join('/tmp', "flumotion.worker.%d" % os.getpid())
+def _getSocketPath():
+    # FIXME: there is mkstemp for sockets, so we have a small window
+    # here in which the socket could be created by something else
+    # I didn't succeed in preparing a socket file with that name either
+
+    # caller needs to delete name before using
+    import tempfile
+    fd, name = tempfile.mkstemp('.%d' % os.getpid(), 'flumotion.worker.')
+    os.close(fd)
+    
+    return name
 
 # Similar to Vishnu, but for worker related classes
 class WorkerBrain(log.Loggable):
@@ -474,7 +483,8 @@ class WorkerBrain(log.Loggable):
         self.workerName = options.name
         self.keycard = None
         
-        self.kindergarten = Kindergarten(options)
+        self._socketPath = _getSocketPath()
+        self.kindergarten = Kindergarten(options, self._socketPath)
         self.job_server_factory, self.job_heaven = self.setup()
 
         self.medium = WorkerMedium(self, self.options.feederports)
@@ -497,7 +507,8 @@ class WorkerBrain(log.Loggable):
         checker.allowPasswordless(True)
         p = portal.Portal(dispatcher, [checker])
         job_server_factory = pb.PBServerFactory(p)
-        self._port = reactor.listenUNIX(getSocketPath(), job_server_factory)
+        os.unlink(self._socketPath)
+        self._port = reactor.listenUNIX(self._socketPath, job_server_factory)
 
         return job_server_factory, root
 

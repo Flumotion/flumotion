@@ -1,5 +1,12 @@
 2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/worker.py:
+	  use a safer way of creating a worker socket.  Would be nice
+	  if we could actually give the file to twisted, without needing
+	  to delete.
+
+2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/messages.py:
 	  fix doc
 	* flumotion/manager/manager.py:
