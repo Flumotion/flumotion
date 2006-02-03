@@ -1,5 +1,12 @@
 2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_pb.py:
+	* flumotion/common/log.py:
+	  document
+	  private getTheFluLogObserver()
+
+2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/planet.py:
 	  remove 'message' from the jobstate
 	* flumotion/component/component.py:

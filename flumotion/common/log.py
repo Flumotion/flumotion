@@ -344,7 +344,8 @@ class FluLogObserver(Loggable):
 # make a singleton
 __theFluLogObserver = None
 
-def getTheFluLogObserver():
+def _getTheFluLogObserver():
+    # used internally and in test
     global __theFluLogObserver
 
     if not __theFluLogObserver:
@@ -451,7 +452,7 @@ def logTwisted():
 
     # we don't want logs for pb.Error types since they
     # are specifically raised to be handled on the other side
-    observer = getTheFluLogObserver()
+    observer = _getTheFluLogObserver()
     observer.ignoreErrors([pb.Error,])
     tlog.startLoggingWithObserver(observer.emit, False)
 
@@ -480,6 +481,10 @@ def setFluDebug(string):
         registerCategory(category)
 
 def getExceptionMessage(exception):
+    """
+    Return a short message based on an exception, useful for debugging.
+    Tries to find where the exception was triggered.
+    """
     stack = traceback.extract_tb(sys.exc_info()[2])
     (filename, line, func, text) = stack[-1]
     filename = scrubFilename(filename)
@@ -492,6 +497,10 @@ def getExceptionMessage(exception):
     return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()%(msg)s" % locals()
 
 def getFailureMessage(failure):
+    """
+    Return a short message based on L{twisted.python.failure.Failure}.
+    Tries to find where the exception was triggered.
+    """
     exc = str(failure.type)
     msg = failure.getErrorMessage()
     if len(failure.frames) == 0:
