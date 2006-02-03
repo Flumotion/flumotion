@@ -76,9 +76,10 @@ def _startTCP(vishnu, host, port):
     reactor.listenTCP(port, vishnu.getFactory(), interface=host)
 
 def _error(message, reason):
-    log.error('manager', message)
+    msg = message
     if reason:
-        log.error(reason)
+        msg += " - reason: %s" % reason
+    log.error('manager', msg)
 
 def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
@@ -90,11 +91,11 @@ def _initialLoadConfig(vishnu, paths):
         except config.ConfigError, reason:
             _error(
                 "configuration error in configuration file\n'%s':" % path,
-                reason)
+                reason.args[0])
         except errors.UnknownComponentError, reason:
             _error(
                 "unknown component in configuration file\n'%s':" % path,
-                reason)
+                reason.args[0])
         except Exception, e:
             # a re-raise here would be caught by twisted and only shows at
             # debug level 4 because that's where we hooked up twisted logging
