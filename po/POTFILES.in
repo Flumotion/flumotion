@@ -16,6 +16,7 @@ flumotion/component/consumers/httpstreamer/admin_gtk.py
 
 flumotion/component/producers/videotest/admin_gtk.py
 
+flumotion/manager/component.py
 flumotion/manager/manager.py
 
 flumotion/worker/checks/check.py

@@ -1,5 +1,11 @@
 2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/component.py:
+	* po/POTFILES.in:
+	  show us a decent message if start fails for any reason
+
+2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/code.py:
 	  make code.interact(local=locals()) work
 

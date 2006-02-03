@@ -36,9 +36,13 @@ from flumotion.configure import configure
 # rename to base
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, keycards, log, config, planet
+from flumotion.common import messages
 from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common.planet import moods
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 # abstracts the concept of a GStreamer tcpserversink (feeder) producing a feed
 class Feeder:
@@ -343,6 +347,12 @@ class ComponentAvatar(base.ManagerAvatar):
             return
         return self.componentState.get('mood')
 
+    def _addMessage(self, message):
+        if not self.componentState:
+            return
+
+        self.componentState.append('messages', message)
+
     # general fallback for unhandled errors so we detect them
     # FIXME: we can't use this since we want a PropertyError to fall through
     # after going through the PropertyErrback.
@@ -549,8 +559,14 @@ class ComponentAvatar(base.ManagerAvatar):
         try:
             d.value()
         except Exception, e:
-            self.error("Could not make component start, reason %s"
+            m = messages.Error(T_(N_("Could not start the component.")),
+                debug = log.getExceptionMessage(e),
+                id = "component-start")
+            self._addMessage(m)
+            self.warning("Could not make component start, reason %s"
                        % log.getExceptionMessage(e))
+            self._setMood(moods.sad)
+            raise e
     start = defer_generator_method(start)
     
     def setElementProperty(self, element, property, value):
