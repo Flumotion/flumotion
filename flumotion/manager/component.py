@@ -318,17 +318,9 @@ class ComponentAvatar(base.ManagerAvatar):
                 > self._heartbeatCheckInterval \
             and self._getMoodValue() != moods.lost.value:
                 self.warning('heartbeat missing, component is lost')
-                self._setMessage('Component %s is lost.' % self.avatarId)
                 self._setMood(moods.lost)
         self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
             self._heartbeatCheck)
-
-    # FIXME: this doesn't actually show up
-    def _setMessage(self, message):
-        if not self.componentState:
-            return
-
-        self.componentState.set('message', message)
 
     def _setMood(self, mood):
         if not self.componentState:

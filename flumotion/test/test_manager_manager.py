@@ -318,7 +318,6 @@ class FakeComponentMind(FakeMind):
             'mood': moods.waking.value,
             'ip': '0.0.0.0',
             'workerName': workerName,
-            'message': None, 
             'feederNames': [],
             'eaterNames': [] }
         self.state = state

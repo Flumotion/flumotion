@@ -25,11 +25,14 @@ import gobject
 from twisted.internet import reactor, defer
 
 from flumotion.component import component as basecomponent
-from flumotion.common import common, errors, compat
+from flumotion.common import common, errors, compat, messages
 from flumotion.common import gstreamer, pygobject
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 class FeedComponent(basecomponent.BaseComponent):
     """
@@ -219,8 +222,9 @@ class FeedComponent(basecomponent.BaseComponent):
     def _pipeline_error_cb(self, object, element, error, arg):
         self.debug('element %s error %s %s' % (element.get_path_string(), str(error), repr(arg)))
         self.setMood(moods.sad)
-        self.state.set('message',
-            "GStreamer error in component %s (%s)" % (self.name, error.message))
+        self.addMessage(messages.Error(T_(N_("GStreamer error.")),
+            id="%s-gstreamer-error" % self.name,
+            debug="%s: %s%s" % (element.get_path_string(), error.message, arg)))
         self.emit('error', element.get_path_string(), error.message)
         #self.restart()
      
@@ -245,8 +249,9 @@ class FeedComponent(basecomponent.BaseComponent):
         retval = self.set_state_and_iterate(gst.STATE_PLAYING)
         if not retval:
             self.setMood(moods.sad)
-            self.state.set('message',
-                "Component %s could not start" % self.name)
+            self.messageAdd(messages.Error(T_(N_("Could not start component.")),
+                id="%s-start" % self.name,
+                debug="Could not set state to PLAYING"))
             return False
 
         return True
@@ -307,8 +312,11 @@ class FeedComponent(basecomponent.BaseComponent):
         if old == gst.STATE_PLAYING and state == gst.STATE_PAUSED:
             self.debug('eater %s is now hungry' % name)
             self.eatersWaiting += 1
-            self.state.set('message',
-                "Component %s is now hungry, starting reconnect" % self.name)
+            # FIXME: clear message in reconnect
+            self.addMessage(Warning(
+                T_(N_("Component lost feed, reconnecting...")),
+                id="lost-feed-%s" % name,
+                debug="Eater %s is hungry" % name))
             self.updateMood()
             self._eaterReconnectDC[name] = reactor.callLater(
                 self._reconnectInterval, self._eaterReconnect, element)

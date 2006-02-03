@@ -1,5 +1,17 @@
 2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/planet.py:
+	  remove 'message' from the jobstate
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent08.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_manager_manager.py:
+	* po/POTFILES.in:
+	  and convert to 'messages' where appropriate
+
+2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/medium.py:
 	* flumotion/common/planet.py:
 	  document

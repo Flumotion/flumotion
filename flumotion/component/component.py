@@ -461,6 +461,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         
     def addMessage(self, message):
         """
+        Add a message to the component.
+
         @type  message: L{flumotion.common.messages.Message}
         """
         self.state.append('messages', message)

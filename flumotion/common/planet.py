@@ -168,8 +168,7 @@ moods = enum.EnumClass(
 moods.can_stop = staticmethod(lambda m: m != moods.sleeping and m != moods.lost)
 moods.can_start = staticmethod(lambda m: m == moods.sleeping)
 
-# FIXME: remove 'message' from the job state
-_jobStateKeys = ['mood', 'ip', 'pid', 'workerName', 'message', 'cpu']
+_jobStateKeys = ['mood', 'ip', 'pid', 'workerName', 'cpu']
 _jobStateListKeys = ['messages', ]
 
 # FIXME: maybe make Atmosphere and Flow subclass from a ComponentGroup class ?
@@ -224,7 +223,7 @@ class ManagerComponentState(flavors.StateCacheable):
         """
         self._jobState = jobState
         for key in _jobStateKeys:
-            # only set non-None values, handling 'message' being None
+            # only set non-None values
             v = jobState.get(key)
             if v != None:
                 self.set(key, v)
