@@ -19,6 +19,11 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Serializable objects from worker through manager to admin for
+planet, flow, job and component.
+"""
+
 from twisted.spread import pb
 from twisted.internet import defer
 
@@ -26,6 +31,17 @@ from flumotion.twisted import flavors
 from flumotion.common import enum
 
 class ManagerPlanetState(flavors.StateCacheable):
+    """
+    I represent the state of a planet in the manager.
+
+    I have the following keys:
+
+     - name
+     - manager
+     - atmosphere:   L{ManagerAtmosphereState}
+     - flows (list): list of L{ManagerFlowState}
+    """
+    # FIXME: why is there a 'parent' key ?
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         self.addKey('name')
@@ -40,7 +56,8 @@ class ManagerPlanetState(flavors.StateCacheable):
 
     def getComponents(self):
         """
-        Return a list of component states in this planet.
+        Return a list of all component states in this planet
+        (from atmosphere and all flows).
 
         @rtype: list of L{ManagerComponentState}
         """
@@ -59,11 +76,26 @@ class ManagerPlanetState(flavors.StateCacheable):
 
 
 class AdminPlanetState(flavors.StateRemoteCache):
+    """
+    I represent the state of a planet in an admin client.
+    See L{ManagerPlanetState}.
+    """
     pass
-
 pb.setUnjellyableForClass(ManagerPlanetState, AdminPlanetState)
 
 class ManagerAtmosphereState(flavors.StateCacheable):
+    """
+    I represent the state of an atmosphere in the manager.
+    The atmosphere contains components that do not participate in a flow,
+    but provide services to flow components.
+
+    I have the following keys:
+
+     - name:              string, "atmosphere"
+     - parent:            L{ManagerPlanetState}
+     - components (list): list of L{ManagerComponentState}
+    """
+ 
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         self.addKey('parent')
@@ -81,11 +113,24 @@ class ManagerAtmosphereState(flavors.StateCacheable):
         return defer.DeferredList(list)
 
 class AdminAtmosphereState(flavors.StateRemoteCache):
+    """
+    I represent the state of an atmosphere in an admin client.
+    See L{ManagerAtmosphereState}.
+    """
     pass
 
 pb.setUnjellyableForClass(ManagerAtmosphereState, AdminAtmosphereState)
 
 class ManagerFlowState(flavors.StateCacheable):
+    """
+    I represent the state of a flow in the manager.
+
+    I have the following keys:
+
+     - name:              string, name of the flow
+     - parent:            L{ManagerPlanetState}
+     - components (list): list of L{ManagerComponentState}
+    """
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         self.addKey('name')
@@ -103,11 +148,19 @@ class ManagerFlowState(flavors.StateCacheable):
         return defer.DeferredList(list)
 
 class AdminFlowState(flavors.StateRemoteCache):
+    """
+    I represent the state of a flow in an admin client.
+    See L{ManagerFlowState}.
+    """
     pass
 
 pb.setUnjellyableForClass(ManagerFlowState, AdminFlowState)
 
 # moods
+# FIXME. make epydoc like this
+"""
+@cvar moods: an enum representing the mood a component can be in.
+"""
 moods = enum.EnumClass(
     'Moods',
     ('happy', 'hungry', 'waking', 'sleeping', 'lost', 'sad')
@@ -115,11 +168,31 @@ moods = enum.EnumClass(
 moods.can_stop = staticmethod(lambda m: m != moods.sleeping and m != moods.lost)
 moods.can_start = staticmethod(lambda m: m == moods.sleeping)
 
+# FIXME: remove 'message' from the job state
 _jobStateKeys = ['mood', 'ip', 'pid', 'workerName', 'message', 'cpu']
 _jobStateListKeys = ['messages', ]
 
+# FIXME: maybe make Atmosphere and Flow subclass from a ComponentGroup class ?
 class ManagerComponentState(flavors.StateCacheable):
+    """
+    I represent the state of a component in the manager.
+    I have my own state, and also proxy state from the L{ManagerJobState}
+    when the component is actually created in a worker.
 
+    I have the following keys of my own:
+
+     - name:              string, name of the component, unique in the parent
+     - parent:            L{ManagerFlowState} or L{ManagerAtmosphereState}
+     - type:              string, type of the component
+     - moodPending:       int, the mood value the component is being set to
+     - workerRequested:   string, name of the worker this component is
+                          requested to be started on.
+
+    I proxy the following keys from the serialized L{WorkerJobState}:
+      - mood, ip, pid, workerName, cpu
+      - messages (list)
+    """
+ 
     __implements__ = flavors.IStateListener,
     
     def __init__(self):
@@ -145,6 +218,8 @@ class ManagerComponentState(flavors.StateCacheable):
 
     def setJobState(self, jobState):
         """
+        Set the job state I proxy from.
+
         @type jobState: L{ManagerJobState}
         """
         self._jobState = jobState
@@ -178,6 +253,10 @@ class ManagerComponentState(flavors.StateCacheable):
             self.set(key, value)
 
 class AdminComponentState(flavors.StateRemoteCache):
+    """
+    I represent the state of a component in the admin client.
+    See L{ManagerComponentState}.
+    """
     pass
 
 pb.setUnjellyableForClass(ManagerComponentState, AdminComponentState)
@@ -185,6 +264,18 @@ pb.setUnjellyableForClass(ManagerComponentState, AdminComponentState)
 # state of an existing component running in a job process
 # exchanged between worker and manager
 class WorkerJobState(flavors.StateCacheable):
+    """
+    I represent the state of a job in the worker, running a component.
+
+    I have the following keys:
+
+     - mood:              int, value of the mood this component is in
+     - ip:                string, IP address of the worker
+     - pid:               int, PID of the job process
+     - workerName:        string, name of the worker I'm running on
+     - cpu:               float, CPU usage
+     - messages:          list of L{flumotion.common.messages.Message}
+    """
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         for k in _jobStateKeys:
@@ -193,6 +284,10 @@ class WorkerJobState(flavors.StateCacheable):
             self.addListKey(k)
 
 class ManagerJobState(flavors.StateRemoteCache):
+    """
+    I represent the state of a job in the manager.
+    See L{WorkerJobState}.
+    """
     pass
 
 pb.setUnjellyableForClass(WorkerJobState, ManagerJobState)

@@ -19,6 +19,10 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Contains the base class for PB client-side mediums.
+"""
+
 from twisted.spread import pb
 from twisted.internet import defer
 
@@ -27,19 +31,28 @@ from flumotion.common import log, interfaces, bundleclient, errors, common
 
 class BaseMedium(pb.Referenceable, log.Loggable):
     """
-    I am a base interface for PB client-side mediums interfacing with
-    manager-side avatars.
+    I am a base interface for PB clients interfacing with PB server-side
+    avatars.
+    Used by admin/worker/component to talk to manager's vishnu,
+    and by job to talk to worker's brain.
+
+    @ivar remoteReference: L{twisted.spread.pb.RemoteReference}
+    @ivar bundleLoader: L{flumotion.common.bundleclient.BundleLoader}
     """
 
     # subclasses will need to set this to the specific medium type
     # tho...
-    __implements__ = interfaces.IMedium,
+    __implements__ = (interfaces.IMedium, )
+    logCategory = "basemedium"
 
     remote = None
     bundleLoader = None
 
     def setRemoteReference(self, remoteReference):
         """
+        Set the given remoteReference as the reference to the server-side
+        avatar.
+
         @param remoteReference: L{twisted.spread.pb.RemoteReference}
         """
         self.debug('%r.setRemoteReference: %r' % (self, remoteReference))
@@ -66,9 +79,18 @@ class BaseMedium(pb.Referenceable, log.Loggable):
                 common.addressGetHost(jane)))
 
     def hasRemoteReference(self):
+        """
+        Does the medium have a remote reference to a server-side avatar ?
+        """
         return self.remote != None
 
     def callRemote(self, name, *args, **kwargs):
+        """
+        Call the given method with the given arguments remotely on the
+        server-side avatar.
+
+        Gets serialized to server-side perspective_ methods.
+        """
         if not self.remote:
             self.warning('Tried to callRemote(%s), but we are disconnected'
                          % name)

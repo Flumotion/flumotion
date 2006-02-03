@@ -1,5 +1,11 @@
 2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/medium.py:
+	* flumotion/common/planet.py:
+	  document
+
+2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/Makefile.am:
 	* flumotion/common/code.py:
 	* flumotion/extern/Makefile.am:
