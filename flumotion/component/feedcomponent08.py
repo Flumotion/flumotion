@@ -249,7 +249,7 @@ class FeedComponent(basecomponent.BaseComponent):
         retval = self.set_state_and_iterate(gst.STATE_PLAYING)
         if not retval:
             self.setMood(moods.sad)
-            self.messageAdd(messages.Error(T_(N_("Could not start component.")),
+            self.addMessage(messages.Error(T_(N_("Could not start component.")),
                 id="%s-start" % self.name,
                 debug="Could not set state to PLAYING"))
             return False
