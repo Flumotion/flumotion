@@ -3,7 +3,8 @@ include $(top_srcdir)/common/python.mk
 flumotiondir = $(libdir)/flumotion/python/flumotion/extern
 
 flumotion_PYTHON = \
-	__init__.py
+	__init__.py \
+	code.py
 
 if BUILD_TRAYICON
 PTI_DIR = pytrayicon
