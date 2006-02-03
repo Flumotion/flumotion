@@ -67,6 +67,9 @@ def gettexter(domain):
     return lambda *args: create(*args)
 
 class Translatable(pb.Copyable, pb.RemoteCopy):
+    """
+    I represent a serializable translatable gettext msg.
+    """
     domain = None
     
 # NOTE: subclassing FancyEqMixin allows us to compare two
@@ -234,24 +237,50 @@ pb.setUnjellyableForClass(Message, Message)
 # these are implemented as factory functions instead of classes because
 # properly proxying to the correct subclass is hard with Copyable/RemoteCopy
 def Error(*args, **kwargs):
+    """
+    Create a L{Message} at ERROR level, indicating a failure that needs
+    intervention to be resolved.
+    """
     return Message(ERROR, *args, **kwargs)
 
 def Warning(*args, **kwargs):
+    """
+    Create a L{Message} at WARNING level, indicating a potential problem.
+    """
     return Message(WARNING, *args, **kwargs)
 
 def Info(*args, **kwargs):
+    """
+    Create a L{Message} at INFO level.
+    """
     return Message(INFO, *args, **kwargs)
 
 class Result(pb.Copyable, pb.RemoteCopy):
+    """
+    I am used in worker checks to return a result.
+
+    @ivar value:    the result value of the check
+    @ivar failed:   whether or not the check failed.  Typically triggered
+                    by adding an ERROR message to the result.
+    @type messages: list of L{Message}
+    """
     def __init__(self):
         self.messages = []
         self.value = None
         self.failed = False
 
     def succeed(self, value):
+        """
+        Make the result be successful, setting the given result value.
+        """
         self.value = value
 
     def add(self, message):
+        """
+        Add a message to the result.
+
+        @type message: L{Message}
+        """
         self.messages.append(message)
         if message.level == ERROR:
             self.failed = True
