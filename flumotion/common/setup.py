@@ -19,7 +19,13 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Code related to setup and used as part of the bootstrapping of binaries.
+"""
 def setup():
+    """
+    Set up the logging system.
+    """
     from flumotion.common import log
     log.init()
 

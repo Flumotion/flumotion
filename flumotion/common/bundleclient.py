@@ -33,10 +33,18 @@ from flumotion.twisted.defer import defer_generator_method
 __all__ = ['BundleLoader']
 
 class BundleLoader(log.Loggable):
+    """
+    I am an object that can get and set up bundles from a PB server.
+
+    @cvar remote: a remote reference to an avatar on the PB server.
+    """
     remote = None
     _unbundler = None
 
     def __init__(self, remote):
+        """
+        @type  remote: L{twisted.spread.pb.RemoteReference}
+        """
         self.remote = remote
         self._unbundler = bundle.Unbundler(configure.cachedir)
 
@@ -57,8 +65,9 @@ class BundleLoader(log.Loggable):
         Either one of bundleName, fileName or moduleName should be specified
         in **kwargs.
 
-        @returns: a list of (bundleName, bundlePath) tuples, with lowest
-                  dependency first.  bundlePath is the directory to register
+        @returns: a deferred firing a a list of (bundleName, bundlePath)
+                  tuples, with lowest dependency first.
+                  bundlePath is the directory to register
                   for this package.
         """
         # get sums for all bundles we need
@@ -70,6 +79,7 @@ class BundleLoader(log.Loggable):
         try:
             sums = d.value()
         except Exception, e:
+            # FIXME: this is stupid
             raise
         self.debug('Got sums %r' % sums)
         toFetch = []

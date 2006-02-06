@@ -32,6 +32,12 @@ from flumotion.common import log, common
 from twisted.python import rebuild, reflect
 
 class PackageHooks(ihooks.Hooks):
+    """
+    I am an import Hooks object that makes sure that every package that gets
+    loaded has every necessary path in the module's __path__ list.
+
+    @type  packager: L{Packager}
+    """
     packager = None
 
     def load_package(self, name, filename, file=None):
@@ -56,6 +62,11 @@ class PackageHooks(ihooks.Hooks):
         return ret
 
 class Packager(log.Loggable):
+    """
+    I am an object through which package paths can be registered, to support
+    the partitioning of the module import namespace across bundles.
+    """
+
     logCategory = 'packager'
 
     def __init__(self):
@@ -70,6 +81,10 @@ class Packager(log.Loggable):
         self.debug('installing custom importer')
 
     def getPathsForPackage(self, packageName):
+        """
+        Return all absolute paths to the top level of a tree from which
+        (part of) the given package name can be imported.
+        """
         if not packageName in self._packages.keys():
             return None
             
@@ -245,6 +260,10 @@ class Packager(log.Loggable):
         self.log('registered packagePath %s for key %s' % (packagePath, key))
 
     def unregister(self):
+        """
+        Unregister all previously registered package paths, and uninstall
+        the custom importer.
+        """
         for path in self._paths.values():
             if path in sys.path:
                 self.log('removing packagePath %s from sys.path' % path)
@@ -397,6 +416,11 @@ def findEndModuleCandidates(path, prefix='flumotion'):
 __packager = None
 
 def getPackager():
+    """
+    Return the (unique) packager.
+
+    @rtype: L{Packager}
+    """
     global __packager
     if not __packager:
         __packager = Packager()

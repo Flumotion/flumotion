@@ -45,11 +45,13 @@ def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
 
 class RegistryEntryComponent:
+    """
+    I represent a <component> entry in the registry
+    """
     # RegistryEntryComponent has a constructor with a lot of arguments,
     # but that's ok here. Allow it through pychecker.
     __pychecker__ = 'maxargs=12'
 
-    "This class represents a <component> entry in the registry"
     def __init__(self, filename, type, 
                  source, base, properties, files,
                  entries, eaters, feeders, needs_sync, clock_priority):

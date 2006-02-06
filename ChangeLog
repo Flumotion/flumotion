@@ -9,13 +9,17 @@
 	* flumotion/component/base/admin_gtk.py:
 	* flumotion/component/base/admin_text.py:
 	* flumotion/component/bouncers/__init__.py:
+	* flumotion/service/service.py:
+	  documentation updates
+
+2006-02-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/bouncers/bouncer.py:
 	* flumotion/component/consumers/httpstreamer/http.py:
 	* flumotion/component/consumers/httpstreamer/resources.py:
 	* flumotion/manager/component.py:
 	  make an overdue function name change:
 	  removeKeycard -> removeKeycardId
-	* flumotion/service/service.py:
 
 2006-02-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 

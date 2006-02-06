@@ -21,10 +21,21 @@ import time
 from flumotion.configure import configure
 from flumotion.common import common, errors, log
 
+"""
+Servicer object used in service scripts
+"""
 class Servicer(log.Loggable):
+    """
+    I manage running managers and workers on behalf of a service script.
+    """
+    
     logCategory = 'servicer'
 
     def __init__(self, configDir):
+        """
+        @type  configDir: string
+        @param configDir: path to the configuration directory
+        """
         self.configDir = configDir
         self.managersDir = os.path.join(self.configDir, 'managers')
         self.workersDir = os.path.join(self.configDir, 'workers')
@@ -113,7 +124,8 @@ class Servicer(log.Loggable):
         If first argument is "worker", start given worker,
         or all if none specified.
 
-        Returns: an exit value
+        @returns: an exit value reflecting the number of processes that failed
+                  to start
         """
         (managers, workers) = self._parseManagersWorkers('start', args)
         self.debug("Start managers %r and workers %r" % (managers, workers))
@@ -138,6 +150,9 @@ class Servicer(log.Loggable):
         or all if none specified.
         If first argument is "worker", stop given worker,
         or all if none specified.
+
+        @returns: an exit value reflecting the number of processes that failed
+                  to stop
         """
         (managers, workers) = self._parseManagersWorkers('stop', args)
         self.debug("Stop managers %r and workers %r" % (managers, workers))
@@ -246,7 +261,7 @@ class Servicer(log.Loggable):
         Start the worker as configured in the worker directory for the given
         worker name.
 
-        @returns: whether or not the manager daemon started
+        @returns: whether or not the worker daemon started
         """
         self.info("Starting worker %s" % name)
         workerFile = os.path.join(self.workersDir, "%s.xml" % name)

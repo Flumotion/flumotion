@@ -19,6 +19,10 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Base classes for component UI's using GTK+
+"""
+
 import os
 
 import gettext

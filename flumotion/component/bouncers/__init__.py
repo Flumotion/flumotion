@@ -18,3 +18,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
+
+"""
+Bouncer components perform authentication services for other components.
+"""

@@ -116,8 +116,3 @@ class BaseAdminText(log.Loggable):
     # run command, return string with result
     def runCommand(self, command):
     	return ""
-
-	
-
-
-

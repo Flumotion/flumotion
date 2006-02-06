@@ -19,12 +19,19 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Objects related to the state of workers.
+"""
+
 from twisted.spread import pb
 
 from flumotion.twisted import flavors
 
 # worker heaven state proxy objects
 class ManagerWorkerHeavenState(flavors.StateCacheable):
+    """
+    I represent the state of the worker heaven on the manager.
+    """
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         # FIXME: later on we would want a dict of names -> cacheables ?
@@ -34,6 +41,9 @@ class ManagerWorkerHeavenState(flavors.StateCacheable):
         return "%r" % self._dict
 
 class AdminWorkerHeavenState(flavors.StateRemoteCache):
+    """
+    I represent the state of the worker heaven in the admin.
+    """
     pass
 
 pb.setUnjellyableForClass(ManagerWorkerHeavenState, AdminWorkerHeavenState)
