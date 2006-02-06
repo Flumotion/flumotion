@@ -328,7 +328,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             del self._idToKeycard[id]
             self.debug('[fd %5d] asking bouncer %s to remove keycard id %s' % (
                 fd, self.bouncerName, id))
-            self.streamer.medium.removeKeycard(self.bouncerName, id)
+            self.streamer.medium.removeKeycardId(self.bouncerName, id)
         if self._fdToDurationCall.has_key(fd):
             self.debug('[fd %5d] canceling later expiration call' % fd)
             self._fdToDurationCall[fd].cancel()

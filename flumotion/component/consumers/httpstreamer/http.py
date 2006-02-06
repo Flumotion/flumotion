@@ -157,11 +157,11 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         """
         return self.callRemote('authenticate', bouncerName, keycard)
 
-    def removeKeycard(self, bouncerName, keycardId):
+    def removeKeycardId(self, bouncerName, keycardId):
         """
         @rtype: L{twisted.internet.defer.Deferred}
         """
-        return self.callRemote('removeKeycard', bouncerName, keycardId)
+        return self.callRemote('removeKeycardId', bouncerName, keycardId)
 
     ### remote methods for manager to call on
     def remote_expireKeycard(self, keycardId):

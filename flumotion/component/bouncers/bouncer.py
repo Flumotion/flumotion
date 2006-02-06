@@ -19,6 +19,11 @@
 
 # Headers in this file shall remain intact.
 
+"""
+Base class and implementation for bouncer components, who perform
+authentication services for other components.
+"""
+
 from twisted.python import components
 from twisted.cred import credentials
 
@@ -36,8 +41,7 @@ class BouncerMedium(component.BaseComponentMedium):
     def remote_authenticate(self, keycard):
         return self.comp.authenticate(keycard)
 
-    # FIXME: rename to ...Id
-    def remote_removeKeycard(self, keycardId):
+    def remote_removeKeycardId(self, keycardId):
         try:
             self.comp.removeKeycardId(keycardId)
         # FIXME: at least have an exception name please

@@ -645,13 +645,13 @@ class ComponentAvatar(base.ManagerAvatar):
         d.addErrback(self._mindErrback)
         return d
 
-    def removeKeycard(self, keycardId):
+    def removeKeycardId(self, keycardId):
         """
         Remove a keycard managed by this bouncer because the requester
         has gone.
         """
-        self.debug('remotecalling removeKeycard with id %s' % keycardId)
-        d = self.mindCallRemote('removeKeycard', keycardId)
+        self.debug('remotecalling removeKeycardId with id %s' % keycardId)
+        d = self.mindCallRemote('removeKeycardId', keycardId)
         d.addErrback(self._mindErrback)
         return d
 
@@ -715,7 +715,7 @@ class ComponentAvatar(base.ManagerAvatar):
         bouncerAvatar = self.heaven.getAvatar(avatarId)
         return bouncerAvatar.authenticate(keycard)
 
-    def perspective_removeKeycard(self, bouncerName, keycardId):
+    def perspective_removeKeycardId(self, bouncerName, keycardId):
         """
         Remove a keycard on the given bouncer on behalf of a component's medium.
 
@@ -732,7 +732,7 @@ class ComponentAvatar(base.ManagerAvatar):
             raise errors.UnknownComponentError(avatarId)
 
         bouncerAvatar = self.heaven.getAvatar(avatarId)
-        return bouncerAvatar.removeKeycard(keycardId)
+        return bouncerAvatar.removeKeycardId(keycardId)
 
     def perspective_expireKeycard(self, requesterName, keycardId):
         """
