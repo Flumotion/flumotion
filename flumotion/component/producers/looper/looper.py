@@ -22,8 +22,11 @@
 import gst
 import gobject
 
-from flumotion.common import errors
+from flumotion.common import errors, messages
 from flumotion.component import feedcomponent
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 class LooperMedium(feedcomponent.FeedComponentMedium):
     def __init__(self, comp):
@@ -111,6 +114,17 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.adminCallRemote("haveFileInformation", info)
 
     def _message_cb(self, bus, message):
+        self.debug('received message %r' % message)
+        if message.type == gst.MESSAGE_ERROR:
+            gerror, debug = message.parse_error()
+            if gerror.domain == 'gst-resource-error-quark' and \
+                gerror.code == gst.RESOURCE_ERROR_NOT_FOUND:
+                m = messages.Error(
+                    T_(N_("Could not open looper file '%s' for reading."), 
+                        self.filelocation),
+                        id = 'looper-error')
+                self.addMessage(m)
+                return
         if message.src == self.pipeline and message.type == gst.MESSAGE_SEGMENT_DONE:
             # let's looooop again :)
             self.debug("sending segment seek again")

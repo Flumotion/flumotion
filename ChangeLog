@@ -1,5 +1,15 @@
 2006-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent010.py:
+	  lower priority of generic internal errors, allowing more specific
+	  one from looper through
+	* flumotion/component/producers/looper/looper.py:
+	  catch RESOURCE_NOT_FOUND and show a nice message
+	  FIXME: need to find a way to not have the default bus func
+	  get a go too.
+
+2006-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	* flumotion/worker/checks/check.py:
 	* flumotion/worker/checks/video010.py:

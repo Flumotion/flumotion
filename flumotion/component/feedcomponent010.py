@@ -221,7 +221,7 @@ class FeedComponent(basecomponent.BaseComponent):
                 "Internal GStreamer error.")),
                 debug="%s\n%s: %d\n%s" % (
                     gerror.message, gerror.domain, gerror.code, debug),
-                id=id)
+                id=id, priority=40)
             self.state.append('messages', m)
         elif t == gst.MESSAGE_EOS:
             if src == self.pipeline:
