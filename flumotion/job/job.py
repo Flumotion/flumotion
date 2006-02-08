@@ -260,6 +260,7 @@ class JobMedium(medium.BaseMedium):
             msg = "Exception %s during createComponent: %s" % (
                 e.__class__.__name__, " ".join(e.args))
             # traceback.print_exc()
+            # a ComponentCreateError is already formatted
             if isinstance(e, errors.ComponentCreateError):
                 msg = e.args[0]
             self.warning(
