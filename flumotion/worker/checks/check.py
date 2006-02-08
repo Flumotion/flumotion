@@ -34,7 +34,7 @@ def handleGStreamerDeviceError(failure, device):
     m = None
 
     if failure.check(errors.GStreamerGstError):
-        gerror, debug = failure.value.args
+        source, gerror, debug = failure.value.args
         log.debug('check',
             'GStreamer GError: %s (domain %s, code %d, debug %s)' % (
                 gerror.message, gerror.domain, gerror.code, debug))
@@ -106,7 +106,7 @@ def errbackNotFoundResult(failure, result, id, device):
     to check for RESOURCE_ERROR_NOT_FOUND, and add a message to the result.
     """
     failure.trap(errors.GStreamerGstError)
-    gerror, debug = failure.value.args
+    source, gerror, debug = failure.value.args
 
     if gerror.domain == "gst-resource-error-quark" and \
         gerror.code == int(gst.RESOURCE_ERROR_NOT_FOUND):

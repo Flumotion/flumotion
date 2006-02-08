@@ -90,7 +90,7 @@ def do_element_check(pipeline_str, element_name, check_proc,
         e.message = gerror.message
         e.code = gerror.code
         e.domain = gerror.domain
-        resolution.errback(errors.GStreamerGstError(e, debug))
+        resolution.errback(errors.GStreamerGstError(element, e, debug))
 
     bin = gst.parse_launch(pipeline_str)
     resolution = fdefer.Resolution()
@@ -169,7 +169,7 @@ def check1394(id=None):
         log.debug('check', 'returning failed Result, %r' % failure)
         m = None
         if failure.check(errors.GStreamerGstError):
-            gerror, debug = failure.value.args
+            source, gerror, debug = failure.value.args
             log.debug('check', 'GStreamer GError: %s (debug: %s)' % (
                 gerror.message, debug))
             if gerror.domain == "gst-resource-error-quark":

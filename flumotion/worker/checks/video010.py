@@ -86,7 +86,7 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None):
                     run_check(pipeline, resolution)
         elif t == gst.MESSAGE_ERROR:
             gerror, debug = message.parse_error()
-            resolution.errback(errors.GStreamerGstError(gerror, debug))
+            resolution.errback(errors.GStreamerGstError(message.src, gerror, debug))
         elif t == gst.MESSAGE_EOS:
             resolution.errback(errors.GStreamerError("Unexpected end of stream"))
         else:
@@ -165,7 +165,7 @@ def check1394(id):
         log.debug('check', 'returning failed Result, %r' % failure)
         m = None
         if failure.check(errors.GStreamerGstError):
-            gerror, debug = failure.value.args
+            source, gerror, debug = failure.value.args
             log.debug('check', 'GStreamer GError: %s (debug: %s)' % (
                 gerror.message, debug))
             if gerror.domain == "gst-resource-error-quark":

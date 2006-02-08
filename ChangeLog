@@ -1,3 +1,12 @@
+2006-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/errors.py:
+	* flumotion/worker/checks/check.py:
+	* flumotion/worker/checks/video010.py:
+	* flumotion/worker/checks/video08.py:
+	  add source of error message as first arg to
+	  GStreamerGstError
+
 2006-02-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/bundleclient.py:
