@@ -28,8 +28,42 @@ from flumotion.component import feedcomponent
 from flumotion.component.effects.colorbalance import colorbalance
 
 # FIXME: rename to TVCard
-# FIXME: what does __all__ *do* ?
 __all__ = ['BTTV']
+
+def arg_filtered(proc, *args):
+    def ret(*_args):
+        for spec in args:
+            if len(spec) == 3:
+                key = spec[2]
+            else:
+                key = lambda x: x
+            index = spec[0]
+            value = spec[1]
+            if len(_args) <= index or key(_args[index]) != value:
+                return
+        return proc (*_args)
+    return ret
+
+def call_on_state_change(element, from_state, to_state, proc, *args, **kwargs):
+    if gst.gst_version < (0,10):
+        def state_changed_cb(element, old, new):
+            proc(*args, **kwargs)
+        state_changed_cb = arg_filtered (state_changed_cb,
+            (1, from_state), (2, to_state))
+        element.connect('state-change', state_changed_cb)
+    else:
+        def bus_watch_func(bus, message):
+            proc(*args, **kwargs)
+        bus_watch_func = arg_filtered(bus_watch_func,
+            (1, element, lambda x: x.src),
+            (1, [from_state, to_state, gst.STATE_VOID_PENDING],
+             lambda x: x.parse_state_changed()))
+        parent = element
+        while parent.get_parent():
+            parent = parent.get_parent()
+        b = parent.get_bus()
+        b.add_signal_watch()
+        b.connect('message::state-changed', bus_watch_func)
 
 class BTTV(feedcomponent.ParseLaunchComponent):
 
@@ -62,26 +96,25 @@ class BTTV(feedcomponent.ParseLaunchComponent):
 
     def configure_pipeline(self, pipeline, properties):
         # create and add colorbalance effect
-        source = pipeline.get_by_name('source')
-        hue = properties.get('hue', None)
-        saturation = properties.get('saturation', None)
-        brightness = properties.get('brightness', None)
-        contrast = properties.get('contrast', None)
-        cb = colorbalance.Colorbalance('outputColorbalance', source,
-            hue, saturation, brightness, contrast)
-        self.addEffect(cb)
+        if gst.gst_version < (0,10):
+            source = pipeline.get_by_name('source')
+            hue = properties.get('hue', None)
+            saturation = properties.get('saturation', None)
+            brightness = properties.get('brightness', None)
+            contrast = properties.get('contrast', None)
+            cb = colorbalance.Colorbalance('outputColorbalance', source,
+                hue, saturation, brightness, contrast)
+            self.addEffect(cb)
 
         # register state change notify to set channel and norm
         element = pipeline.get_by_name('source')
         channel = properties['channel']
         norm = properties['signal']
-        element.connect('state-change', self.state_changed_cb, channel, norm)
 
-    # called to set initial channel and norm from NULL->READY
-    def state_changed_cb(self, element, old, new, channel, norm):
-        if not (old == gst.STATE_NULL and new == gst.STATE_READY):
-            return
-
+        call_on_state_change(element, gst.STATE_READY, gst.STATE_PAUSED,
+            self.set_channel_and_norm, element, channel, norm)
+    
+    def set_channel_and_norm(self, element, channel, norm):
         self.debug("bttv NULL->READY, setting channel %s and norm %s" % (
             channel, norm))
         if channel:

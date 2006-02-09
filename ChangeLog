@@ -1,3 +1,12 @@
+2006-02-09  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/bttv/bttv.py (arg_filtered) 
+	(call_on_state_change): New helper methods. Arguably not all that
+	helpful.
+	(BTTV.configure_pipeline, BTTV.set_channel_and_norm): Arrange to
+	set the channel and norm for both versions. Don't add the
+	colorspace effect for 0.10.
+
 2006-02-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/messages.py:
