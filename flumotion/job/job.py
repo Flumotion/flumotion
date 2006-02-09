@@ -61,7 +61,8 @@ def createComponent(moduleName, methodName):
             "module %s could not be found" % moduleName)
     except ImportError, e:
         raise errors.ComponentCreateError(
-            "module %s could not be imported (%s)" % (moduleName, e))
+            "module %s could not be imported (%s)" % (moduleName,
+                log.getExceptionMessage(e, filename='flumotion')))
     except SyntaxError, e:
         raise errors.ComponentCreateError(
             "module %s has a syntax error in %s:%d" % (

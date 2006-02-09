@@ -1,3 +1,16 @@
+2006-02-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/messages.py:
+	  handle the case where the given locale is not in the translator
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  cleanup
+	* flumotion/common/log.py:
+	  allow for finding the part of an exception stack for a given
+	  file, or a given frame
+	* flumotion/job/job.py:
+	  give a decent ComponentCreateError that can hopefully tell you
+	  exactly where the ImportError happened
+
 2006-02-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent010.py:

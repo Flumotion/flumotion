@@ -151,13 +151,16 @@ class Translator(log.Loggable):
         # gettext.translation objects are rumoured to be cached (API docs)
         domain = translatable.domain
         t = None
-        # FIXME: possibly trap IOError and handle nicely ?
-        for localedir in self._localedirs[domain]:
-            try:
-                t = gettext.translation(domain, localedir, lang)
-            except IOError:
-                pass
-            
+        if domain in self._localedirs.keys():
+            # FIXME: possibly trap IOError and handle nicely ?
+            for localedir in self._localedirs[domain]:
+                try:
+                    t = gettext.translation(domain, localedir, lang)
+                except IOError:
+                    pass
+        else:
+            self.debug('no locales for domain %s' % domain)
+                
         format = None
         if not t:
             # if no translation object found, fall back to C
