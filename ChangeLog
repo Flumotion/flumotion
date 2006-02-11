@@ -1,3 +1,9 @@
+2006-02-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/pygobject.py:
+	  add a gobject.type_register() that does not register for pygtk 2.8
+	  better than shutting up deprecation wwrnings
+
 2006-02-09  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/producers/bttv/bttv.py (arg_filtered) 

@@ -173,3 +173,9 @@ def gproperty(type_, name, desc, *args, **kwargs):
             raise Exception('Invalid GObject property flag: %r=%r' % (k, v))
 
     _dict[name] = (type_, name, desc) + args + tuple((flags,))
+
+# gobject.type_register() can be done automatically in pygtk 2.8
+# PYGTK 2.6
+def type_register(klass):
+    if gobject.pygtk_version < (2, 8, 0):
+        gobject.type_register(klass)
