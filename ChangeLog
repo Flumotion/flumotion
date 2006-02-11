@@ -1,5 +1,13 @@
 2006-02-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent.py:
+	* flumotion/manager/component.py:
+	  do some more debugging on the master clock master stuff
+	  make the clockMasterWaiters hash take tuples so we can
+	  log which avatarId was waiting
+
+2006-02-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/pygobject.py:
 	  add a gobject.type_register() that does not register for pygtk 2.8
 	  better than shutting up deprecation wwrnings

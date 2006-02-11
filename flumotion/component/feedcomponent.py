@@ -307,7 +307,7 @@ class ParseLaunchComponent(FeedComponent):
         self.debug('start with eaters data %s and feeders data %s' % (
             eatersData, feedersData))
         if clocking:
-            self.info('slaving to clock on %s:%d with base time %d' % clocking)
+            self.info('slaving to master clock on %s:%d with base time %d' % clocking)
         self.setMood(moods.waking)
 
         if clocking:
