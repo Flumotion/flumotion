@@ -343,6 +343,11 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline.use_clock(clock)
 
     def provide_master_clock(self, port):
+        """
+        Tell the component to provide a master clock on the given port.
+
+        @returns: (ip, port, base_time) triple.
+        """
         if not self.pipeline:
             self.warning('No self.pipeline, cannot provide master clock')
             # FIXME: should we have a NoSetupError() for cases where setup
@@ -363,6 +368,7 @@ class FeedComponent(basecomponent.BaseComponent):
         base_time = clock.get_time()
         self.pipeline.set_base_time(base_time)
 
+        # FIXME: this is always localhost, no ? Not sure if this is useful
         ip = self.state.get('ip')
 
         return (ip, port, base_time)

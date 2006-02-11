@@ -82,6 +82,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         UDP port.
         Can only be called if setup() has been called on the component.
 
+        The IP address returned is the local IP the clock is listening on.
+
         @returns: (ip, port, base_time)
         @rtype:   tuple of (str, int, long)
         """
