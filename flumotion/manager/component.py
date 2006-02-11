@@ -135,6 +135,7 @@ class Feeder:
         return self.feederName
 
     def getListenHost(self):
+        # return what we think is the IP address where the component is running
         assert self.component
         return self.component.getClientAddress()
 
@@ -467,6 +468,9 @@ class ComponentAvatar(base.ManagerAvatar):
         return self.ports[self.getName() + ':' + feedName]
  
     def getRemoteManagerIP(self):
+        """
+        Get the IP address of the manager as seen by the component.
+        """
         return self.jobState.get('ip')
 
     def getWorkerName(self):
@@ -788,7 +792,9 @@ class ComponentHeaven(base.ManagerHeaven):
         
     ### our methods
     def _componentIsLocal(self, componentAvatar):
+        # gets what we think is the other side's address
         host = componentAvatar.getClientAddress()
+
         if host == '127.0.0.1':
             return True
         else:
@@ -836,7 +842,13 @@ class ComponentHeaven(base.ManagerHeaven):
             feeder = set.getFeeder(feederName)
             self.debug('EatersData(): feeder %r' % feeder)
 
+            # what host do we need to connect to, as seen from manager ?
+            # FIXME: this needs to work across every host, not just from
+            # manager
             host = feeder.getListenHost()
+
+            # if the feeder is local, and the eater isn't, then we need to
+            # tell the eater to connect to the manager's host
             if (not self._componentIsLocal(componentAvatar)
                 and host == '127.0.0.1'):
                 host = componentAvatar.getRemoteManagerIP()
@@ -855,6 +867,7 @@ class ComponentHeaven(base.ManagerHeaven):
         @returns: tuple of (name, host, port) for each feeder
         """
 
+        # get what we think is the IP address where the component is running
         host = component.getClientAddress()
         feeders = component.getFeeders()
         self.debug('returning data for feeders: %r' % (feeders, ))

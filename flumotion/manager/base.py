@@ -113,7 +113,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         tarzan = transport.getHost()
         jane = transport.getPeer()
         if tarzan and jane:
-            self.debug("PB client connection is from %s to me on %s" % (
+            self.debug("PB client connection seen by me is from me %s to %s" % (
                 common.addressGetHost(tarzan),
                 common.addressGetHost(jane)))
         self.log('Client attached is mind %s' % mind)
@@ -133,7 +133,8 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
 
     def getClientAddress(self):
         """
-        Get the IPv4 address of the machine the client is connecting from.
+        Get the IPv4 address of the machine the PB client is connecting from,
+        as seen from the avatar.
         """
         if self.mind:
             peer = self.mind.broker.transport.getPeer()

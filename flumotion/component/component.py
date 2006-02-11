@@ -140,7 +140,7 @@ class BaseComponentMedium(medium.BaseMedium):
 
     def getIP(self):
         """
-        Return our own IP as seen from the manager.
+        Return the manager IP as seen by us.
         """
         assert self.remote
         peer = self.remote.broker.transport.getPeer()
@@ -149,7 +149,9 @@ class BaseComponentMedium(medium.BaseMedium):
         except AttributeError:
             host = peer[1]
 
-        return socket.gethostbyname(host)
+        res = socket.gethostbyname(host)
+        self.debug("getIP(): we think the manager's IP is %r" % res)
+        return res
 
     ### pb.Referenceable remote methods
     ### called from manager by our avatar
