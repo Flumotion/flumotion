@@ -542,6 +542,18 @@ class ComponentAvatar(base.ManagerAvatar):
             try:
                 clocking = d.value()
                 self.debug('Got master clock info %r' % (clocking, ))
+                host, port, base_time = clocking
+                # FIXME: the host we get is as seen from the component, so lo
+                # mangle it here
+                # if the clock master is local (which is what we assume for now)
+                # and the slave is not, then we need to tell the slave our
+                # IP
+                if (not self.heaven._componentIsLocal(self)
+                    and host == '127.0.0.1'):
+                    host = self.getRemoteManagerIP()
+                    self.debug('Overriding clock master host to %s' % host)
+                    clocking = (host, port, base_time)
+
                 if master == self.avatarId:
                     self.debug('we are the master, so reset to None')
                     # we needed to wait for the set_master to complete,
@@ -1051,6 +1063,9 @@ class ComponentHeaven(base.ManagerHeaven):
         self.debug('provideMasterClock on component %s' % avatarId)
 
         def setMasterClockInfo(result):
+            # we get host, port, base_time
+            # FIXME: host is the default from NetClock, so the local IP,
+            # always.  A little inconvenient.
             self._masterClockInfo[avatarId] = result
             return result
 

@@ -1,5 +1,15 @@
 2006-02-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/component.py:
+	  instead of taking the master clock's loopback ip,
+	  fix up the master clock host to be "the manager's IP
+	  as seen from the slave".  Solves the netclock sync
+	  problem in the case where the clock master is on the
+	  manager host. 
+	  FIXME: of course this should require proper fixing.
+
+2006-02-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/component.py:
 	* flumotion/manager/base.py:
 	* flumotion/manager/component.py:
