@@ -73,13 +73,27 @@ def element_factory_has_property(element_factory, property_name):
     @rtype: boolean
     """
     # FIXME: find a better way than instantiating one
-    # FIXME: add simple unit test
     e = gst.element_factory_make(element_factory)
     for pspec in gobject.list_properties(e):
         if pspec.name == property_name:
             return True
     return False
-  
+
+def element_factory_has_property_value(element_factory, property_name, value):
+    """
+    Check if the given element factory allows the given value for the given property.
+
+    @rtype: boolean
+    """
+    # FIXME: find a better way than instantiating one
+    e = gst.element_factory_make(element_factory)
+    try:
+        e.set_property(property_name, value)
+    except TypeError:
+        return False
+
+    return True
+   
 def element_factory_exists(name):
     """
     Check if the given element factory name exists.

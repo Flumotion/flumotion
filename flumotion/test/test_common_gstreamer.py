@@ -64,3 +64,18 @@ class DeepNotify(unittest.TestCase):
         pipeline.connect('deep-notify', gstreamer.verbose_deep_notify_cb,
             component)
 
+class TestProperty(unittest.TestCase):
+    def testHasProperty(self):
+        b = gstreamer.element_factory_has_property('fakesrc', 'num-buffers')
+        self.failUnless(b)
+        b = gstreamer.element_factory_has_property('fakesrc', 'i-do-not-exist')
+        self.failIf(b)
+
+    def testHasPropertyValue(self):
+        b = gstreamer.element_factory_has_property_value('fakesrc', 'num-buffers', 1)
+        self.failUnless(b)
+        b = gstreamer.element_factory_has_property_value('fakesrc', 'sizetype', 'fixed')
+        self.failUnless(b)
+        b = gstreamer.element_factory_has_property_value('fakesrc', 'sizetype', 'no-way')
+        self.failIf(b)
+ 

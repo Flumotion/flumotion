@@ -1,5 +1,13 @@
 2006-02-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/gstreamer.py:
+	  add a quick way of checking if we can set a given value
+	  on a property
+	* flumotion/test/test_common_gstreamer.py:
+	  add tests
+
+2006-02-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/admin/gtk/client.py:
 	* flumotion/admin/gtk/connections.py:
