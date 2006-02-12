@@ -29,7 +29,7 @@ from twisted.internet import reactor, error
 from twisted.web import server
 
 from flumotion.component import feedcomponent
-from flumotion.common import bundle, common, gstreamer, errors, compat
+from flumotion.common import bundle, common, gstreamer, errors, pygobject
 from flumotion.common import messages
 
 # proxy import
@@ -452,4 +452,4 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self.addMessage(m)
             self.setMood(moods.sad)
 
-compat.type_register(MultifdSinkStreamer)
+pygobject.type_register(MultifdSinkStreamer)

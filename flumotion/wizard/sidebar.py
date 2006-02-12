@@ -23,7 +23,7 @@
 import gobject
 import gtk
 
-from flumotion.common import compat
+from flumotion.common import pygobject
 from flumotion.common.pygobject import gsignal
 
 
@@ -90,7 +90,7 @@ class SidebarButton(gtk.Button):
         self.label.set_markup(m)
 
         gtk.Button.set_sensitive(self, sensitive)
-compat.type_register(SidebarButton)
+pygobject.type_register(SidebarButton)
 
 
 class SidebarSection(gtk.VBox):
@@ -148,7 +148,7 @@ class SidebarSection(gtk.VBox):
     def pop_step(self):
         b = self.steps.pop()
         self.remove(b)
-compat.type_register(SidebarSection)
+pygobject.type_register(SidebarSection)
 
 
 class WizardSidebar(gtk.EventBox):
@@ -238,4 +238,4 @@ class WizardSidebar(gtk.EventBox):
             if self.top < self.active:
                 self.set_active(self.top)
         return True
-compat.type_register(WizardSidebar)
+pygobject.type_register(WizardSidebar)

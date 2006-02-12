@@ -28,7 +28,7 @@ import gst
 from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
-from flumotion.common import log, gstreamer, compat
+from flumotion.common import log, gstreamer, pygobject
 
 # proxy import
 from flumotion.component.component import moods
@@ -190,4 +190,4 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                     self.setMood(moods.happy)
             sink.connect('state-change', feeder_state_change_cb)
 
-compat.type_register(Disker)
+pygobject.type_register(Disker)

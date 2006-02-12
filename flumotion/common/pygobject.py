@@ -175,7 +175,13 @@ def gproperty(type_, name, desc, *args, **kwargs):
     _dict[name] = (type_, name, desc) + args + tuple((flags,))
 
 # gobject.type_register() can be done automatically in pygtk 2.8
+# We don't want to get the loud deprecation warnings from PyGtk for using
+# gobject.type_register() if we don't need it
 # PYGTK 2.6
 def type_register(klass):
     if gobject.pygtk_version < (2, 8, 0):
+        gobject.type_register(klass)
+    elif klass.__gtype__.pytype is not klass:
+        # all subclasses will at least have a __gtype__ from their
+        # parent, make sure it corresponds to the exact class
         gobject.type_register(klass)

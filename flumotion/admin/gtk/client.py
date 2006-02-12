@@ -38,7 +38,7 @@ from flumotion.admin import connections
 from flumotion.admin.gtk import dialogs, parts, message
 from flumotion.admin.gtk import connections as gtkconnections
 from flumotion.configure import configure
-from flumotion.common import errors, log, worker, planet, common, compat
+from flumotion.common import errors, log, worker, planet, common, pygobject
 from flumotion.manager import admin # Register types
 from flumotion.twisted import flavors, reflect
 from flumotion.ui import icons, trayicon
@@ -1073,5 +1073,5 @@ class Window(log.Loggable, gobject.GObject):
         # XXX: Use show()
         self.window.show()
 
-compat.type_register(Window)
+pygobject.type_register(Window)
 

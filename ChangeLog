@@ -1,3 +1,32 @@
+2006-02-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/connections.py:
+	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/admin/gtk/spyglass.py:
+	* flumotion/admin/gtk/videotest.py:
+	* flumotion/admin/gtk/wizard.py:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/compat.py:
+	* flumotion/common/pygobject.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/preview/preview.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/feedcomponent08.py:
+	* flumotion/test/test_common_pygobject.py:
+	* flumotion/tester/httpclient.py:
+	* flumotion/ui/fgtk.py:
+	* flumotion/ui/glade.py:
+	* flumotion/wizard/sidebar.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/wizard/worker.py:
+	  fold flumotion.common.compat into flumotion.common.pygobject
+
 2006-02-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:

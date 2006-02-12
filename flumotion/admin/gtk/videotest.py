@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 # FIXME: moving this down causes errors
-from flumotion.common import log, compat
+from flumotion.common import log, pygobject
 
 import os
 import string
@@ -312,8 +312,8 @@ class Model:
         _debug("gst caps of pad now %s" % pad.get_negotiated_caps())
 
 # register our types globally
-compat.type_register(View)
-compat.type_register(Controller)
+pygobject.type_register(View)
+pygobject.type_register(Controller)
 
 if __name__ == '__main__':
     exposed_cb_id = -1

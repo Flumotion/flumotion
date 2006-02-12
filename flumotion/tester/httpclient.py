@@ -27,7 +27,7 @@ import time
 import sys
 import socket
 
-from flumotion.common import log, compat
+from flumotion.common import log, pygobject
 from flumotion.tester import client
 
 class HTTPClient(gobject.GObject, log.Loggable):
@@ -254,5 +254,5 @@ def verify(client, data):
        return False
     return True
 
-compat.type_register(HTTPClient)
-compat.type_register(HTTPClientStatic)
+pygobject.type_register(HTTPClient)
+pygobject.type_register(HTTPClientStatic)

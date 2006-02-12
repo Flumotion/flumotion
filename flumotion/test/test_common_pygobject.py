@@ -27,7 +27,7 @@ import common
 import gobject
 import gtk
 
-from flumotion.common import pygobject, errors, compat
+from flumotion.common import pygobject, errors, pygobject
 
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.pygobject import with_construct_properties
@@ -72,7 +72,7 @@ class TestPyGObject(unittest.TestCase):
                 self.assert_(isinstance(x, bool))
                 self.assert_(isinstance(y, str))
                 xself.set_property('burning', True)
-        compat.type_register(Foo)
+        pygobject.type_register(Foo)
 
         o = Foo()
 

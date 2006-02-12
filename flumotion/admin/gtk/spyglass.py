@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 # FIXME: moving this down causes errors
-from flumotion.common import log, compat
+from flumotion.common import log, pygobject
 
 import os
 
@@ -168,8 +168,8 @@ class Model:
         self._sink.set_xwindow_id(long(xid))
         
 # register our types globally
-compat.type_register(View)
-compat.type_register(Controller)
+pygobject.type_register(View)
+pygobject.type_register(Controller)
 
 if __name__ == '__main__':
     def controller_prepared_cb(controller, thread):

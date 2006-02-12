@@ -32,7 +32,7 @@ from twisted.spread import pb
 
 from flumotion.configure import configure
 from flumotion.component import component as basecomponent
-from flumotion.common import common, interfaces, errors, log, compat, messages
+from flumotion.common import common, interfaces, errors, log, pygobject, messages
 from flumotion.common import gstreamer, pygobject, messages
 
 from flumotion.common.planet import moods

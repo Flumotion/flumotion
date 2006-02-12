@@ -13,7 +13,6 @@ flumotion_PYTHON = \
 	bundle.py \
 	bundleclient.py \
 	common.py \
-	compat.py \
 	componentui.py \
 	config.py \
 	dag.py \

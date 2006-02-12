@@ -30,7 +30,7 @@ import gtk.glade
 
 from flumotion.configure import configure
 
-from flumotion.common import compat
+from flumotion.common import pygobject
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.glade import GladeWidget, GladeWindow
 
@@ -232,4 +232,4 @@ class Wizard(GladeWindow):
         self.loop.run()
         return self.state
 
-compat.type_register(Wizard)
+pygobject.type_register(Wizard)

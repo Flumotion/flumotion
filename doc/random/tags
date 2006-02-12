@@ -9,3 +9,5 @@ F0.2: Flumotion 0.2 stuff to deprecate
 GTK 2.4: GTK+ 2.4 backwards compatibility stuff
 
 GST 0.8: GStreamer 0.8 backwards compatible stuff
+
+PYGTK 2.6: PyGTK/PyGObject 2.6 stuff

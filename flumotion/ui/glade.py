@@ -28,7 +28,7 @@ import gtk.glade
 import gobject
 
 from flumotion.configure import configure
-from flumotion.common import log, compat
+from flumotion.common import log, pygobject
 
 
 # proc := module1.module2.moduleN.proc1().maybe_another_proc()
@@ -119,7 +119,7 @@ class GladeWidget(gtk.VBox):
         self.add(w)
         win.destroy()
         wtree.signal_autoconnect(self)
-compat.type_register(GladeWidget)
+pygobject.type_register(GladeWidget)
 
 
 class GladeWindow(gobject.GObject):
@@ -184,4 +184,4 @@ class GladeWindow(gobject.GObject):
         self.window.destroy()
         del self.window
 
-compat.type_register(GladeWindow)
+pygobject.type_register(GladeWindow)

@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component import feedcomponent
-from flumotion.common import log, compat
+from flumotion.common import log, pygobject
 
 __all__ = ['Preview']
 
@@ -28,4 +28,4 @@ class Preview(feedcomponent.ParseLaunchComponent, log.Loggable):
     def get_pipeline_string(self, properties):
         return 'decodebin ! ffmpegcolorspace ! xvimagesink'
 
-compat.type_register(Preview)
+pygobject.type_register(Preview)

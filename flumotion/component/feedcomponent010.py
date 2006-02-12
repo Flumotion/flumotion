@@ -25,7 +25,7 @@ import gobject
 from twisted.internet import reactor, defer
 
 from flumotion.component import component as basecomponent
-from flumotion.common import common, errors, compat, messages
+from flumotion.common import common, errors, pygobject, messages
 from flumotion.common import gstreamer, pygobject
 
 from flumotion.common.planet import moods
@@ -470,4 +470,4 @@ class FeedComponent(basecomponent.BaseComponent):
                    (property, element_name, value))
         pygobject.gobject_set_property(element, property, value)
     
-compat.type_register(FeedComponent)
+pygobject.type_register(FeedComponent)

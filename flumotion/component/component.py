@@ -34,7 +34,7 @@ from twisted.internet import reactor, error, defer
 from twisted.cred import error as crederror
 from twisted.spread import pb
 
-from flumotion.common import interfaces, errors, log, planet, medium, compat
+from flumotion.common import interfaces, errors, log, planet, medium, pygobject
 from flumotion.common import componentui, common
 from flumotion.common.planet import moods
 from flumotion.configure import configure
@@ -522,4 +522,4 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.lastClock = nowClock
 
 
-compat.type_register(BaseComponent)
+pygobject.type_register(BaseComponent)
