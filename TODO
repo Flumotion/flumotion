@@ -117,6 +117,9 @@
 * MEDIUM	flumotion.common.registry: ewww @ RegistryEntryEntry
 		rename generic Entry to Node ?
 
+* MEDIUM	allow the manager to reparse all known config files; easier
+	        than restarting manager and all workers
+
 - API cleanup:
 
 - manager/component.py:
