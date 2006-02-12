@@ -120,6 +120,12 @@
 * MEDIUM	allow the manager to reparse all known config files; easier
 	        than restarting manager and all workers
 
+* MEDIUM	run all worker checks in a spawned process - segfaults are less
+		painful that way.  maybe even start a job for it always
+
+* MEDIUM	when a component segfaults, have the worker tell the manager that
+		the component segfaulted and make it sad; maybe even allow attaching
+		gdb and filing a bug report
 - API cleanup:
 
 - manager/component.py:
