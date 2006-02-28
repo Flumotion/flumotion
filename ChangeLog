@@ -1,5 +1,11 @@
 2006-02-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/Makefile.am:
+	* common/setup.m4:
+	  add FLUMOTION_SETUP macro
+
+2006-02-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	  use an m4/ dir so that autopoint puts its copied macros there
 	  instead of cluttering up common

@@ -10,6 +10,7 @@ EXTRA_DIST = \
 	locale.mk 		\
 	python.mk 		\
 	pychecker.mk		\
+	setup.m4		\
 	trial.mk		\
 	twisted-module.m4	\
 	gen-locale-xml.py
