@@ -335,6 +335,10 @@ def main(args):
     for wrapper in wrappers:
         wrapper.instantiate()
 
+    # FIXME: sort-of-ugly, but twisted recommends globals, and this is as
+    # good as a global
+    reactor.failed = False
+
     # figure out the links and start the components
     for wrapper in wrappers:
         eatersdata = [('%s:%s' % (x[0], x[1]), 'localhost', feed_ports[x[0]][x[1]])
@@ -344,21 +348,25 @@ def main(args):
         time.sleep(delay)
         d  = wrapper.start(eatersdata, feedersdata)
 
-        def _checkStartCallback(ret, name, ports):
+        def _startCallback(ret, name, ports):
             print "%s started" % name
             if ret:
                 for x in ret:
                     assert x[2] == ports[x[0]]
                 
-        d.addCallback(_checkStartCallback, wrapper.name,
-            feed_ports[wrapper.name])
+        def _startErrback(failure, name):
+            print "starting %s failed" % name
+            reactor.failed = True
+            reactor.stop()
 
-    print 'Running the reactor. Press Ctrl-C to exit.'
+        d.addCallback(_startCallback, wrapper.name,
+            feed_ports[wrapper.name])
+        d.addErrback(_startErrback, wrapper.name)
+
+    if not reactor.failed:
+        print 'Running the reactor. Press Ctrl-C to exit.'
 
     log.debug('launch', 'Starting reactor')
-    # FIXME: sort-of-ugly, but twisted recommends globals, and this is as
-    # good as a global
-    reactor.killed = False
     reactor.run()
 
     log.debug('launch', 'Reactor stopped')

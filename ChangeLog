@@ -1,5 +1,10 @@
 2006-02-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/launch/main.py:
+	  add an errback for component start
+
+2006-02-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/Makefile.am:
 	* common/setup.m4:
 	  add FLUMOTION_SETUP macro
