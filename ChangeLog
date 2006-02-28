@@ -1,3 +1,8 @@
+2006-02-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/text/view.py:
+	  fix text admin going over numebr of rows
+
 2006-02-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/launch/main.py:

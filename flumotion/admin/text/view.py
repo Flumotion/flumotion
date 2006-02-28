@@ -45,6 +45,9 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
     logCategory = 'admintextview'
 
     global_commands = [ 'startall', 'stopall', 'clearall', 'quit' ]
+
+    LINES_BEFORE_COMPONENTS = 4
+    LINES_AFTER_COMPONENTS = 5
   
     def __init__(self, model, stdscr):
         self.initialised = False
@@ -54,6 +57,9 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.lastcommands = []
         self.nextcommands = []
         self.rows, self.cols = self.stdscr.getmaxyx()
+        self.max_components_per_page = self.rows - \
+            self.LINES_BEFORE_COMPONENTS - \
+            self.LINES_AFTER_COMPONENTS
         self._components = {}
         self._comptextui = {}
         self._setAdminModel(model)
@@ -78,12 +84,11 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         # set ourselves as a view for the admin model
         self.admin.addView(self)
 
+    # show the whole text admin screen
     def show(self):
         self.initialised = True
-        #print "Main Menu"
         self.stdscr.addstr(0,0, "Main Menu")
         self.show_components()
-        #print " "
         self.display_status()
         self.stdscr.move(self.lasty,0)
         self.stdscr.clrtoeol()
@@ -93,6 +98,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.stdscr.refresh()
         #gobject.io_add_watch(0, gobject.IO_IN, self.keyboard_input_cb)
 
+    # show the view of components and their mood
+    # called from show
     def show_components(self):
         if self.initialised:
             self.stdscr.addstr(2,0, "Components:")
@@ -111,6 +118,10 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 # output component name and mood
                 self.stdscr.addstr(cury,0,"%s: %s" % (name, moods[mood].name))
                 cury = cury + 1
+                # check if too many components for screen height
+                # FIXME: still need scrolling up and down components
+                if cury - 4 >= self.max_components_per_page:
+                    break
                 
             self.lasty = cury
             #self.stdscr.refresh()
@@ -414,8 +425,6 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
         if self.command_result != "":
             self.stdscr.addstr(self.lasty+4, 0, "Result: %s" % self.command_result)
-        self.stdscr.move(self.lasty+5,0)
-
         self.stdscr.clrtobot()
     
     ### admin model callbacks
