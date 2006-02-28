@@ -9,14 +9,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-31 19:11+0100\n"
+"POT-Creation-Date: 2006-02-28 17:07+0100\n"
 "PO-Revision-Date: 2006-02-01 11:05+0000\n"
 "Last-Translator: Edward Hervey <edward@fluendo.com>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: flumotion/admin/gtk/client.py:155
 msgid "Not connected"
@@ -170,11 +170,14 @@ msgid "Error"
 msgstr "Erreur"
 
 #: flumotion/admin/gtk/message.py:35
-#: flumotion/test/test_common_messages.py:113
+#: flumotion/test/test_common_messages.py:115
+#: flumotion/test/test_common_messages.py:152
 msgid "Warning"
 msgstr "Avertissement"
 
-#: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:54
+#: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:56
+#: flumotion/test/test_common_messages.py:150
+#: flumotion/test/test_common_messages.py:166
 msgid "Note"
 msgstr "Note"
 
@@ -363,17 +366,35 @@ msgid "Internal error: could not run check code on worker."
 msgstr ""
 "Erreur interne: impossible d'éxécuter le code de vérification sur l'ouvrier"
 
-#: flumotion/component/feedcomponent.py:128
+#: flumotion/component/feedcomponent.py:130
 #, python-format
 msgid ""
 "The worker does not have the '%s' element installed.\n"
 "Please install the necessary plug-in and restart the component.\n"
-msgstr "L'élément '%s' n'est pas installé pour l'ouvrier.\n"
+msgstr ""
+"L'élément '%s' n'est pas installé pour l'ouvrier.\n"
 "Veuillez installer le plug-in requis et redémarrer le composant.\n"
 
-#: flumotion/component/feedcomponent.py:143
+#: flumotion/component/feedcomponent.py:145
 msgid "GStreamer error: could not parse component pipeline."
 msgstr "Erreur GStreamer: impossible d'analyser le tube du component."
+
+#: flumotion/component/feedcomponent08.py:225
+#, fuzzy
+msgid "GStreamer error."
+msgstr "Erreur interne à GStreamer"
+
+#: flumotion/component/feedcomponent08.py:252
+#, fuzzy
+msgid "Could not start component."
+msgstr ""
+"Impossible de relancer le composant:\n"
+"%s."
+
+#: flumotion/component/feedcomponent08.py:317
+#, fuzzy
+msgid "Component lost feed, reconnecting..."
+msgstr "Connection au contremaître perdue, reconnection en cours..."
 
 #: flumotion/component/consumers/httpstreamer/http.py:451
 #, python-format
@@ -447,6 +468,13 @@ msgstr "Motif:"
 #: flumotion/component/producers/videotest/admin_gtk.py:86
 msgid "Pattern"
 msgstr "Motif"
+
+#: flumotion/manager/component.py:572
+#, fuzzy
+msgid "Could not start the component."
+msgstr ""
+"Impossible de relancer le composant:\n"
+"%s."
 
 #: flumotion/manager/manager.py:548
 msgid "The component could not be started."
@@ -525,44 +553,48 @@ msgstr "Je suis une chaîne traduite"
 #: flumotion/test/test_i18n.py:108 flumotion/test/test_i18n.py:113
 #, python-format
 msgid "I can translate %d thing"
-msgstr ""
+msgid_plural "I can translate %d things"
+msgstr[0] ""
+msgstr[1] ""
 
 #: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:115
 #, python-format
 msgid "I translated %d thing"
-msgstr ""
+msgid_plural "I translated %d things"
+msgstr[0] ""
+msgstr[1] ""
 
-#: flumotion/test/test_common_messages.py:42
+#: flumotion/test/test_common_messages.py:44
 msgid "Something is really wrong."
 msgstr "Quelque chose ne va vraiment pas."
 
-#: flumotion/test/test_common_messages.py:55
+#: flumotion/test/test_common_messages.py:57
 msgid "warning"
 msgstr "avertissement"
 
-#: flumotion/test/test_common_messages.py:59
-#: flumotion/test/test_common_messages.py:84
+#: flumotion/test/test_common_messages.py:61
+#: flumotion/test/test_common_messages.py:86
 #, python-format
 msgid "%s can be translated"
 msgstr "%s·peut être traduit."
 
-#: flumotion/test/test_common_messages.py:66
+#: flumotion/test/test_common_messages.py:68
 #, python-format
 msgid "%s %d has %d thing"
 msgid_plural "%s %d has %d things"
 msgstr[0] "%s %d a %d chose"
 msgstr[1] "%s %d a %d choses"
 
-#: flumotion/test/test_common_messages.py:93
+#: flumotion/test/test_common_messages.py:95
 msgid "Something is really wrong. "
 msgstr "Quelque chose ne va vraiment pas."
 
-#: flumotion/test/test_common_messages.py:94
+#: flumotion/test/test_common_messages.py:96
 #, python-format
 msgid "But does %s know what ?"
 msgstr ""
 
-#: flumotion/test/test_common_messages.py:126
+#: flumotion/test/test_common_messages.py:128
 msgid "uh oh"
 msgstr "oh oh"
 
@@ -1075,4 +1107,3 @@ msgstr ""
 "\n"
 "Cet assistant va vous guider à travers les étapes nécessaires pour la "
 "configuration de votre serveur de diffusion multimédia."
-

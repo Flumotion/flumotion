@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-31 19:11+0100\n"
+"POT-Creation-Date: 2006-02-28 17:07+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -168,11 +168,14 @@ msgid "Error"
 msgstr "Fout"
 
 #: flumotion/admin/gtk/message.py:35
-#: flumotion/test/test_common_messages.py:113
+#: flumotion/test/test_common_messages.py:115
+#: flumotion/test/test_common_messages.py:152
 msgid "Warning"
 msgstr "Waarschuwing"
 
-#: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:54
+#: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:56
+#: flumotion/test/test_common_messages.py:150
+#: flumotion/test/test_common_messages.py:166
 msgid "Note"
 msgstr "Noot"
 
@@ -357,16 +360,33 @@ msgstr ""
 msgid "Internal error: could not run check code on worker."
 msgstr "Interne fout: kon check-code niet uitvoeren op worker."
 
-#: flumotion/component/feedcomponent.py:128
+#: flumotion/component/feedcomponent.py:130
 #, python-format
 msgid ""
 "The worker does not have the '%s' element installed.\n"
 "Please install the necessary plug-in and restart the component.\n"
 msgstr ""
 
-#: flumotion/component/feedcomponent.py:143
+#: flumotion/component/feedcomponent.py:145
 msgid "GStreamer error: could not parse component pipeline."
 msgstr "GStreamer-fout: kon de component-pijplijn niet verwerken."
+
+#: flumotion/component/feedcomponent08.py:225
+#, fuzzy
+msgid "GStreamer error."
+msgstr "Interne GStreamer-fout."
+
+#: flumotion/component/feedcomponent08.py:252
+#, fuzzy
+msgid "Could not start component."
+msgstr ""
+"Kon component niet herladen:\n"
+"%s."
+
+#: flumotion/component/feedcomponent08.py:317
+#, fuzzy
+msgid "Component lost feed, reconnecting..."
+msgstr "Verbinding verbroken met manager, herverbinden ..."
 
 #: flumotion/component/consumers/httpstreamer/http.py:451
 #, python-format
@@ -440,6 +460,13 @@ msgstr "Patroon:"
 #: flumotion/component/producers/videotest/admin_gtk.py:86
 msgid "Pattern"
 msgstr "Patroon"
+
+#: flumotion/manager/component.py:572
+#, fuzzy
+msgid "Could not start the component."
+msgstr ""
+"Kon component niet herladen:\n"
+"%s."
 
 #: flumotion/manager/manager.py:548
 msgid "The component could not be started."
@@ -527,37 +554,37 @@ msgid_plural "I translated %d things"
 msgstr[0] "Ik vertaalde %d ding"
 msgstr[1] "Ik vertaalde %d dingen"
 
-#: flumotion/test/test_common_messages.py:42
+#: flumotion/test/test_common_messages.py:44
 msgid "Something is really wrong."
 msgstr "Er is iets echt mis."
 
-#: flumotion/test/test_common_messages.py:55
+#: flumotion/test/test_common_messages.py:57
 msgid "warning"
 msgstr "waarschuwing"
 
-#: flumotion/test/test_common_messages.py:59
-#: flumotion/test/test_common_messages.py:84
+#: flumotion/test/test_common_messages.py:61
+#: flumotion/test/test_common_messages.py:86
 #, python-format
 msgid "%s can be translated"
 msgstr "%s kan vertaald worden"
 
-#: flumotion/test/test_common_messages.py:66
+#: flumotion/test/test_common_messages.py:68
 #, python-format
 msgid "%s %d has %d thing"
 msgid_plural "%s %d has %d things"
 msgstr[0] "%s %d heeft %d ding"
 msgstr[1] "%s %d heeft %d dingen"
 
-#: flumotion/test/test_common_messages.py:93
+#: flumotion/test/test_common_messages.py:95
 msgid "Something is really wrong. "
 msgstr "Er is iets echt mis. "
 
-#: flumotion/test/test_common_messages.py:94
+#: flumotion/test/test_common_messages.py:96
 #, python-format
 msgid "But does %s know what ?"
 msgstr "Maar weet %s wat ?"
 
-#: flumotion/test/test_common_messages.py:126
+#: flumotion/test/test_common_messages.py:128
 msgid "uh oh"
 msgstr "o jeetje"
 
