@@ -1,4 +1,4 @@
-dnl as-python.m4 0.1.0
+dnl as-python.m4 0.1.1
 dnl autostars m4 macro for python checks
 
 dnl From Andrew Dalke
@@ -6,7 +6,7 @@ dnl Updated by James Henstridge
 dnl Updated by Andy Wingo to loop through possible pythons
 dnl Updated by Thomas Vander Stichele to check for presence of packages/modules
 
-dnl $Id: as-python.m4,v 1.2 2004/10/25 14:31:33 thomasvs Exp $
+dnl $Id: as-python.m4,v 1.3 2006/02/28 16:49:31 thomasvs Exp $
 
 # AS_PATH_PYTHON([MINIMUM-VERSION])
 
@@ -158,6 +158,8 @@ AC_DEFUN([AS_PYTHON_IMPORT],
 [
   dnl Check if we can import a given module.
   dnl Requires AS_PATH_PYTHON to be called before.
+  dnl PREAMBLE and POSTAMBLE, if given, is code executed right before and after
+  dnl the import
 
   AC_MSG_CHECKING([for python module $1])
 
