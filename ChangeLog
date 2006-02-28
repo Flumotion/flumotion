@@ -1,3 +1,9 @@
+2006-02-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
+	  use an m4/ dir so that autopoint puts its copied macros there
+	  instead of cluttering up common
+
 2006-02-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/gstreamer.py:
