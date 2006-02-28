@@ -1,5 +1,12 @@
 2006-02-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/effects/volume/volume.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	  fix volume effect for 0.10. Fixes #328
+
+2006-02-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/admin/text/view.py:
 	  fix text admin going over numebr of rows
 

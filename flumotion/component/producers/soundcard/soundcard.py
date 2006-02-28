@@ -52,10 +52,13 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
 
     def configure_pipeline(self, pipeline, properties):
         # add volume effect
+        comp_level = pipeline.get_by_name('volumelevel')
+        vol = None
         if gst.gst_version < (0,9):
-            comp_level = pipeline.get_by_name('volumelevel')
             vol = volume.Volume('inputVolume', comp_level)
-            self.addEffect(vol)
+        else:
+            vol = volume.Volume('inputVolume', comp_level, pipeline)
+        self.addEffect(vol)
 
     def state_changed_cb(self, element, old, new, trackLabel):
         if old == gst.STATE_NULL and new == gst.STATE_READY:
