@@ -80,6 +80,9 @@ class TestGettext(unittest.TestCase):
         # FIXME: for some reason locale.setlocale does not work, only env
         #locale.setlocale(locale.LC_ALL, "nl_NL")
         os.environ['LANG'] = 'nl_NL'
+        # LANGUAGE is a GNU extension that overrides LANG. Ubuntu sets it by
+        # default for unknown reasons.
+        os.environ['LANGUAGE'] = 'nl_NL'
 
     def tearDown(self):
         gettext.bindtextdomain('flumotion', self.oldlocaledir)

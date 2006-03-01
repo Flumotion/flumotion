@@ -1,3 +1,9 @@
+2006-03-01  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/test/test_i18n.py:
+	  Ubuntu sets LANGUAGE (GNU extension) by default, so this test fails
+	  unless we set that as well as LANG.
+
 2006-03-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
