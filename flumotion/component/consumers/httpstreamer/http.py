@@ -153,7 +153,7 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
 
     def authenticate(self, bouncerName, keycard):
         """
-        @rtype: L{twisted.internet.defer.Deferred}
+        @rtype: L{twisted.internet.defer.Deferred} firing a keycard or None.
         """
         return self.callRemote('authenticate', bouncerName, keycard)
 

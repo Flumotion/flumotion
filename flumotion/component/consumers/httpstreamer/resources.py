@@ -56,6 +56,56 @@ ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 
 HTTP_SERVER = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 
+### This is new Issuer code that eventually should move to e.g.
+### flumotion.common.keycards or related
+
+class Issuer(log.Loggable):
+    """
+    I am a base class for all Issuers.
+    An issuer issues keycards of a given class based on an object
+    (incoming HTTP request, ...)
+    """
+    def issue(self, *args, **kwargs):
+        """
+        Return a keycard, or None, based on the given arguments. 
+        """
+        raise NotImplementedError
+
+class HTTPAuthIssuer(Issuer):
+    """
+    I create L{flumotion.common.keycards.KeycardUACPP} keycards based on
+    an incoming L{twisted.protocols.http.Request} request's standard
+    HTTP authentication information.
+    """
+    def issue(self, request):
+        # for now, we're happy with a UACPP keycard; the password arrives
+        # plaintext anyway
+        keycard = keycards.KeycardUACPP(
+            request.getUser(),
+            request.getPassword(), request.getClientIP())
+        self.debug('Asking for authentication, user %s, password %s, ip %s' % (
+            keycard.username, keycard.password, keycard.address))
+        return keycard
+ 
+class HTTPTokenIssuer(Issuer):
+    """
+    I create L{flumotion.common.keycards.KeycardToken} keycards based on
+    an incoming L{twisted.protocols.http.Request} request's GET "token"
+    parameter.
+    """
+    def issue(self, request):
+        if not 'token' in request.args.keys():
+            return None
+
+        # args can have lists as values, if more than one specified
+        token = request.args['token']
+        if not isinstance(token, str):
+            token = token[0]
+        
+        keycard = keycards.KeycardToken(token,
+            request.getClientIP())
+        return keycard
+ 
 ### the Twisted resource that handles the base URL
 class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
@@ -78,11 +128,12 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         streamer.connect('client-removed', self._streamer_client_removed_cb)
         self.streamer = streamer
         
-        self._requests = {}         # request fd -> Request
-        self._fdToKeycard = {}      # request fd -> Keycard
-        self._idToKeycard = {}      # keycard id -> Keycard
-        self._fdToDurationCall = {} # request fd -> IDelayedCall for duration
-        self._domain = None         # used for auth challenge and on keycard
+        self._requests = {}            # request fd -> Request
+        self._fdToKeycard = {}         # request fd -> Keycard
+        self._idToKeycard = {}         # keycard id -> Keycard
+        self._fdToDurationCall = {}    # request fd -> IDelayedCall for duration
+        self._domain = None            # used for auth challenge and on keycard
+        self.issuer = HTTPAuthIssuer() # issues keycards
         self.bouncerName = None
         self.requesterName = streamer.getName() # avatarId of streamer component
         
@@ -263,19 +314,16 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         Returns: a deferred returning a keycard or None
         """
-        # for now, we're happy with a UACPP keycard; the password arrives
-        # plaintext anyway
-        keycard = keycards.KeycardUACPP(
-            request.getUser(),
-            request.getPassword(), request.getClientIP())
+        keycard = self.issuer.issue(request)
+        if not keycard:
+            return defer.succeed(None)
+
         keycard.requesterName = self.requesterName
         keycard._fd = request.transport.fileno()
         
         if self.bouncerName == None:
             return defer.succeed(keycard)
 
-        self.debug('Asking for authentication, user %s, password %s, ip %s' % (
-            keycard.username, keycard.password, keycard.address))
         keycard.setDomain(self._domain)
         return self.streamer.medium.authenticate(self.bouncerName, keycard)
 

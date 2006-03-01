@@ -25,7 +25,7 @@ from twisted.trial import unittest
 from twisted.web import server
 
 from flumotion.component.consumers.httpstreamer import resources
-from flumotion.common import interfaces
+from flumotion.common import interfaces, keycards
 
 # From twisted/test/proto_helpers.py
 import fcntl
@@ -59,7 +59,6 @@ class FakeRequest:
     transport = PipeTransport()
     method = 'GET'
     def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
         self.headers = {}
         self.response = -1
         self.data = ""
@@ -67,6 +66,11 @@ class FakeRequest:
         self.user = "fakeuser"
         self.passwd = "fakepasswd"
         self.ip = "255.255.255.255"
+
+        # fake out request.transport.fileno
+        self.fdIncoming = 3
+
+        self.__dict__.update(kwargs)
         
     def setResponseCode(self, code):
         self.response = code
@@ -81,12 +85,32 @@ class FakeRequest:
     getPassword = lambda s: s.passwd
     getClientIP = lambda s: s.ip
 
+# fake mediums that only do authenticate
+
+class FakeAuthMedium:
+    # this medium allows HTTP auth with fakeuser/fakepasswd
+    def authenticate(self, bouncerName, keycard):
+        if keycard.username == 'fakeuser' and keycard.password == 'fakepasswd':
+            keycard.state = keycards.AUTHENTICATED
+            return defer.succeed(keycard)
+
+        return defer.succeed(None)
+
+class FakeTokenMedium:
+    # this medium allows HTTP auth if there is a "LETMEIN" token
+    def authenticate(self, bouncerName, keycard):
+        if keycard.token == 'LETMEIN':
+            keycard.state = keycards.AUTHENTICATED
+            return defer.succeed(keycard)
+
+        return defer.succeed(None)
+
 class FakeStreamer:
     caps = None
     mime = 'application/octet-stream'
     
-    def __init__(self):
-        self.medium = FakeMedium()
+    def __init__(self, mediumClass=FakeAuthMedium):
+        self.medium = mediumClass()
 
     def get_content_type(self): return self.mime
     def add_client(self, fd): pass
@@ -94,11 +118,34 @@ class FakeStreamer:
     def debug(self, *args): pass
     def getName(self): return "fakestreamer"
 
-class FakeMedium:
-    # this medium just pretends that all authentication requests fail
-    def authenticate(self, bouncerName, keycard): return defer.succeed(None)
-
 class TestHTTPStreamingResource(unittest.TestCase):
+    # helpers
+    def assertUnauthorized(self, resource, request):
+        # make the resource authenticate the request, and verify
+        # the request is not authorized
+        d = resource.authenticate(request)
+        d.addCallback(resource._authenticatedCallback, request)
+        unittest.deferredResult(d)
+
+        error_code = http.UNAUTHORIZED
+        self.assertEquals(request.headers.get('content-type', ''), 'text/html')
+        self.assertEquals(request.headers.get('server', ''),
+            resources.HTTP_VERSION)
+        self.assertEquals(request.response, error_code)
+        
+        expected = resources.ERROR_TEMPLATE % {
+            'code': error_code,
+            'error': http.RESPONSES[error_code]}
+        self.assertEquals(request.data, expected)
+ 
+    def assertAuthorized(self, resource, request):
+        # make the resource authenticate the request, and verify
+        # the request is authorized
+        d = resource.authenticate(request)
+        d.addCallback(resource._authenticatedCallback, request)
+        unittest.deferredResult(d)
+        self.failIfEquals(request.response, http.UNAUTHORIZED)
+
     def testRenderNotReady(self):
         streamer = FakeStreamer()
         resource = resources.HTTPStreamingResource(streamer)
@@ -131,7 +178,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
             'error': http.RESPONSES[error_code]}
         self.assertEquals(data,  expected)
 
-    def testRenderUnauthorized(self):
+    def testRenderHTTPAuthUnauthorized(self):
         streamer = FakeStreamer()
         resource = resources.HTTPStreamingResource(streamer)
         resource.setBouncerName('fakebouncer')
@@ -140,24 +187,53 @@ class TestHTTPStreamingResource(unittest.TestCase):
         streamer.caps = True
         self.failUnless(resource.isReady())
         
-        request = FakeRequest(ip='127.0.0.1')
-        d = resource.authenticate(request)
-        d.addCallback(resource._authenticatedCallback, request)
-        keycard = unittest.deferredResult(d)
-        # keycard should be False if not authed
-        self.failIf(keycard)
+        request = FakeRequest(ip='127.0.0.1', user='wronguser')
+        self.assertUnauthorized(resource, request)
 
-        error_code = http.UNAUTHORIZED
-        self.assertEquals(request.headers.get('content-type', ''), 'text/html')
-        self.assertEquals(request.headers.get('server', ''),
-            resources.HTTP_VERSION)
-        self.assertEquals(request.response, error_code)
+    def testRenderHTTPTokenUnauthorized(self):
+        streamer = FakeStreamer(mediumClass=FakeTokenMedium)
+        resource = resources.HTTPStreamingResource(streamer)
+        # override issuer
+        resource.issuer = resources.HTTPTokenIssuer()
+        resource.setBouncerName('fakebouncer')
+        resource.setDomain('FakeDomain')
         
-        expected = resources.ERROR_TEMPLATE % {
-            'code': error_code,
-            'error': http.RESPONSES[error_code]}
-        self.assertEquals(request.data, expected)
-    
+        streamer.caps = True
+        self.failUnless(resource.isReady())
+        
+        # wrong token
+        request = FakeRequest(ip='127.0.0.1', args={'token': 'WRONG'})
+        self.assertUnauthorized(resource, request)
+
+        # no token
+        request = FakeRequest(ip='127.0.0.1', args={'notoken': 'LETMEIN'})
+        self.assertUnauthorized(resource, request)
+
+        # doublewrong token
+        request = FakeRequest(ip='127.0.0.1',
+            args={'token': ['WRONG', 'AGAIN']})
+        self.assertUnauthorized(resource, request)
+
+    def testRenderHTTPTokenAuthorized(self):
+        streamer = FakeStreamer(mediumClass=FakeTokenMedium)
+        resource = resources.HTTPStreamingResource(streamer)
+        # override issuer
+        resource.issuer = resources.HTTPTokenIssuer()
+        resource.setBouncerName('fakebouncer')
+        resource.setDomain('FakeDomain')
+        
+        streamer.caps = True
+        self.failUnless(resource.isReady())
+        
+        # right token
+        request = FakeRequest(ip='127.0.0.1', args={'token': 'LETMEIN'})
+        self.assertAuthorized(resource, request)
+
+        # right token, twice
+        request = FakeRequest(ip='127.0.0.1',
+            args={'token': ['LETMEIN', 'LETMEIN']})
+        self.assertAuthorized(resource, request)
+
     def testRenderNew(self):
         streamer = FakeStreamer()
         resource = resources.HTTPStreamingResource(streamer)

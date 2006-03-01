@@ -1,3 +1,12 @@
+2006-03-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  create an Issuer base class, plus two subclasses, to create
+	  keycards based on requests
+	* flumotion/test/test_http.py:
+	  add tests for this
+
 2006-03-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/keycards.py:
