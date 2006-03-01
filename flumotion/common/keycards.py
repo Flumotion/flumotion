@@ -122,3 +122,24 @@ class KeycardUACPCC(Keycard, UCPCC):
         return d
 
 pb.setUnjellyableForClass(KeycardUACPCC, KeycardUACPCC)
+
+class KeycardToken(Keycard, credentials.Token):
+    """
+    I am a keycard with a token and IP address.
+    I get authenticated by token and maybe IP address.
+    """
+    __implements__ = common.mergeImplements(Keycard,credentials.Token)
+
+    def __init__(self, token, address):
+        credentials.Token.__init__(self, token)
+        Keycard.__init__(self)
+        self.address = address
+
+    def getData(self):
+        d = Keycard.getData(self)
+        d['token'] = self.token
+        d['address'] = self.address
+        return d
+
+pb.setUnjellyableForClass(KeycardToken, KeycardToken)
+

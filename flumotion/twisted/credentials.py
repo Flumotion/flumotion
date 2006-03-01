@@ -175,3 +175,20 @@ class UsernameCryptPasswordCryptChallenger:
 
         expected = cryptRespond(self.challenge, cryptPassword)
         return self.response == expected
+
+class IToken(credentials.ICredentials):
+    """I encapsulate a token.
+
+    This credential is used when a token is received from the
+    party requesting authentication.
+
+    @type token: C{str}
+    @ivar token: The token associated with these credentials.
+    """
+
+class Token:
+    __implements__ = (IToken,)
+
+    def __init__(self, token):
+        self.token = token
+
