@@ -20,6 +20,7 @@
         <property name="logfile" type="string" />
         <property name="gst-property" type="xml" multiple="yes" />
         <property name="bouncer" type="string" />
+        <property name="issuer" type="string" />
         <property name="mount_point" type="string" />
         <property name="domain" type="string" />
         <property name="user_limit" type="int" />

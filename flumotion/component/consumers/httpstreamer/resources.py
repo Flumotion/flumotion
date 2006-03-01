@@ -33,6 +33,8 @@ except ImportError:
 
 from twisted.web import server, resource as web_resource
 from twisted.internet import reactor, defer
+from twisted.python import reflect
+
 from flumotion.configure import configure
 from flumotion.common import errors
 
@@ -133,7 +135,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self._idToKeycard = {}         # keycard id -> Keycard
         self._fdToDurationCall = {}    # request fd -> IDelayedCall for duration
         self._domain = None            # used for auth challenge and on keycard
-        self.issuer = HTTPAuthIssuer() # issues keycards
+        self._issuer = HTTPAuthIssuer() # issues keycards; default for compat
         self.bouncerName = None
         self.requesterName = streamer.getName() # avatarId of streamer component
         
@@ -228,6 +230,16 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def setRequesterName(self, requesterName):
         self.requesterName = requesterName
 
+    def setIssuerClass(self, issuerClass):
+        # FIXME: in the future, we want to make this pluggable and have it
+        # look up somewhere ?
+        if issuerClass == 'HTTPTokenIssuer':
+            self._issuer = HTTPTokenIssuer()
+        elif issuerClass == 'HTTPAuthIssuer':
+            self._issuer = HTTPAuthIssuer()
+        else:
+            raise ValueError, "issuerClass %s not accepted" % issuerClass
+
     # FIXME: rename to writeHeaders
     """
     Write out the HTTP headers for the incoming HTTP request.
@@ -314,7 +326,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         Returns: a deferred returning a keycard or None
         """
-        keycard = self.issuer.issue(request)
+        keycard = self._issuer.issue(request)
         if not keycard:
             return defer.succeed(None)
 

@@ -266,6 +266,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if properties.has_key('bouncer'):
             self.resource.setBouncerName(properties['bouncer'])
 
+        if properties.has_key('issuer'):
+            self.resource.setIssuerClass(properties['issuer'])
+
         if properties.has_key('domain'):
             self.resource.setDomain(properties['domain'])
 

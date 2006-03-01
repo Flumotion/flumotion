@@ -194,7 +194,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
         resource = resources.HTTPStreamingResource(streamer)
         # override issuer
-        resource.issuer = resources.HTTPTokenIssuer()
+        resource.setIssuerClass('HTTPTokenIssuer')
         resource.setBouncerName('fakebouncer')
         resource.setDomain('FakeDomain')
         
@@ -218,7 +218,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
         resource = resources.HTTPStreamingResource(streamer)
         # override issuer
-        resource.issuer = resources.HTTPTokenIssuer()
+        resource.setIssuerClass('HTTPTokenIssuer')
         resource.setBouncerName('fakebouncer')
         resource.setDomain('FakeDomain')
         
