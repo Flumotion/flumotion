@@ -23,11 +23,19 @@ REQUIREMENTS
 
 You need:
 
-GStreamer - 0.8.7 or higher
-GStreamer plugins - 0.8.5 or higher
+Gstreamer: you can use either the 0.8 series, or the 0.10 series.
+For 0.8.x:
+  GStreamer - 0.8.7 or higher, or 0.10.1 or higher.
+  GStreamer plugins - 0.8.5 or higher
+  GStreamer python bindings - 0.7.93 or higher
+For 0.10.x:
+  GStreamer: 0.10.1 or higher
+  GStreamer plugins base 0.10.1 or higher
+  GStreamer plugins good 0.10.1 or higher
+  GStreamer python bindings 0.10.1 or higher
+
 PyGTK - 2.4.0 or higher
-GStreamer python bindings - 0.7.93 or higher
-Twisted - 1.3.0
+Twisted - 1.3.0 or higher
 Python Imaging Library
 
 And depending on what codecs you want to use:
@@ -73,19 +81,25 @@ terminal 3:
   Double-click the http component after the wizard has completed
 
 terminal 4:
-  gst-launch gnomevfssrc location=http://localhost:8800 ! oggdemux name=mux
-             mux. ! { queue ! vorbisdec ! audioconvert ! alsasink }
-             mux. ! { queue ! theoradec ! ffmpegcolorspace ! ximagesink }
+  gst-launch playbin uri=http://localhost:8800
 
-  (make sure you type all of this on only one command line !)
+  Some systems may not have gst-launch, but only gst-launch-0.8 or 
+  gst-launch-0.10, in that case you can substitute either of those commands.
 
-Alternatively, you can use any theora-enabled network player to see the stream.
+  Alternatively, you can use any theora-enabled network player to see the 
+  stream.
 
 terminal 5:
-  for a in `seq 1 10`; do ( flumotion-tester http://localhost:8800 & ); done
+  for a in `seq 1 9`; do ( flumotion-tester http://localhost:8800 & ); done
 
-  This will throw 10 processes with 100 clients each at the server.  Hopefully,
-  all of them will return success at the end of their run !
+  This will throw 9 processes with 100 clients each at the server.  Hopefully,
+  all of them will return success at the end of their run!
+
+  We use 900 clients rather than a nice round number such as 1000 because, with
+  a standard unix system, you'll usually be limited to slightly under 1000 
+  clients by default due to limits on open file descriptors (each client
+  requires a file descriptor). This limit is changable, but it's simpler to just
+  test with slightly fewer clients.
 
 DOCUMENTATION
 -------------
