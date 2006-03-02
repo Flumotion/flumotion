@@ -14,7 +14,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: flumotion/admin/gtk/client.py:155
 msgid "Not connected"
@@ -366,9 +366,9 @@ msgstr "Interne fout: kon check-code niet uitvoeren op worker."
 msgid ""
 "The worker does not have the '%s' element installed.\n"
 "Please install the necessary plug-in and restart the component.\n"
-msgstr "Het '%s'-element is niet geïnstalleerd op de worker.\n"
+msgstr ""
+"Het '%s'-element is niet geïnstalleerd op de worker.\n"
 "Gelieve de nodige plug-in te installeren en de component te herstarten.\n"
-""
 
 #: flumotion/component/feedcomponent.py:145
 msgid "GStreamer error: could not parse component pipeline."
@@ -520,7 +520,6 @@ msgstr "Geen toestel gevonden op %s."
 #: flumotion/worker/checks/encoder.py:42 flumotion/worker/checks/encoder.py:62
 msgid "Synchronization between audio and video may not be correct.\n"
 msgstr "Synchronisatie tussen audio en video kan mogelijks fout zijn.\n"
-""
 
 #: flumotion/worker/checks/video08.py:159
 #: flumotion/worker/checks/video010.py:156
