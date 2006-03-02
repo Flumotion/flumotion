@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-02-28 17:07+0100\n"
+"POT-Creation-Date: 2006-03-01 19:10+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -388,7 +388,7 @@ msgstr ""
 msgid "Component lost feed, reconnecting..."
 msgstr "Verbinding verbroken met manager, herverbinden ..."
 
-#: flumotion/component/consumers/httpstreamer/http.py:451
+#: flumotion/component/consumers/httpstreamer/http.py:454
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Netwerkfout: TCP-poort %d is niet beschikbaar."
@@ -532,22 +532,22 @@ msgstr ""
 "Het ffmpegcolorspace-element is te oud. Gelieve gst-plugins aan te passen "
 "naar versie 0.8.5."
 
-#: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:91
+#: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:94
 msgid "I am a translatable string"
 msgstr "Ik ben een vertaalbare string"
 
-#: flumotion/test/test_i18n.py:58 flumotion/test/test_i18n.py:92
+#: flumotion/test/test_i18n.py:58 flumotion/test/test_i18n.py:95
 msgid "I am a translated string"
 msgstr "Ik ben een vertaalde string"
 
-#: flumotion/test/test_i18n.py:108 flumotion/test/test_i18n.py:113
+#: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:116
 #, python-format
 msgid "I can translate %d thing"
 msgid_plural "I can translate %d things"
 msgstr[0] "Ik kan %d ding vertalen"
 msgstr[1] "Ik kan %d dingen vertalen"
 
-#: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:115
+#: flumotion/test/test_i18n.py:114 flumotion/test/test_i18n.py:118
 #, python-format
 msgid "I translated %d thing"
 msgid_plural "I translated %d things"

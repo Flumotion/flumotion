@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-02-28 17:07+0100\n"
+"POT-Creation-Date: 2006-03-01 19:10+0100\n"
 "PO-Revision-Date: 2006-02-01 11:05+0000\n"
 "Last-Translator: Edward Hervey <edward@fluendo.com>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
@@ -396,7 +396,7 @@ msgstr ""
 msgid "Component lost feed, reconnecting..."
 msgstr "Connection au contremaître perdue, reconnection en cours..."
 
-#: flumotion/component/consumers/httpstreamer/http.py:451
+#: flumotion/component/consumers/httpstreamer/http.py:454
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Erreur de réseau: le port TCP %d n'est pas disponible."
@@ -542,22 +542,22 @@ msgstr ""
 "L'élément ffmpegcolorspace est trop ancien. Veuillez mettre à jour gst-"
 "plugins à la version 0.8.5."
 
-#: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:91
+#: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:94
 msgid "I am a translatable string"
 msgstr "Je suis une chaîne traduisible"
 
-#: flumotion/test/test_i18n.py:58 flumotion/test/test_i18n.py:92
+#: flumotion/test/test_i18n.py:58 flumotion/test/test_i18n.py:95
 msgid "I am a translated string"
 msgstr "Je suis une chaîne traduite"
 
-#: flumotion/test/test_i18n.py:108 flumotion/test/test_i18n.py:113
+#: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:116
 #, python-format
 msgid "I can translate %d thing"
 msgid_plural "I can translate %d things"
 msgstr[0] ""
 msgstr[1] ""
 
-#: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:115
+#: flumotion/test/test_i18n.py:114 flumotion/test/test_i18n.py:118
 #, python-format
 msgid "I translated %d thing"
 msgid_plural "I translated %d things"
