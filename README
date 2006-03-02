@@ -24,6 +24,8 @@ REQUIREMENTS
 You need:
 
 Gstreamer: you can use either the 0.8 series, or the 0.10 series.
+We recommend you use GStreamer 0.10 if you can.
+
 For 0.8.x:
   GStreamer - 0.8.7 or higher, or 0.10.1 or higher.
   GStreamer plugins - 0.8.5 or higher
