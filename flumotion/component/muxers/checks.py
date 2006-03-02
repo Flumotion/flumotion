@@ -38,7 +38,8 @@ def checkOgg():
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
                version, 'ogg'),
             id = 'ogg-check')
-        m.add(T_(N_("The generated Ogg stream will not be fully compliant.\n")))
+        m.add(T_(N_("The generated Ogg stream will not be fully compliant, "
+            "and possibly not even play correctly.\n")))
         m.add(T_(N_("Please upgrade '%s' to version %s."), 'gst-plugins-base',
             '0.10.4'))
         result.add(m)

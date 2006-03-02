@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-02 13:53+0100\n"
+"POT-Creation-Date: 2006-03-02 16:06+0100\n"
 "PO-Revision-Date: 2006-03-02 13:56+0100\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -459,10 +459,13 @@ msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
 msgstr "Versie %s van de '%s' GStreamer-plug-in heeft een fout.\n"
 
 #: flumotion/component/muxers/checks.py:41
-msgid "The generated Ogg stream will not be fully compliant.\n"
-msgstr "De gegenereerde Ogg-stroom zal niet volledig correct zijn.\n"
+msgid ""
+"The generated Ogg stream will not be fully compliant, and possibly not even "
+"play correctly.\n"
+msgstr "De gegenereerde Ogg-stroom zal niet volledig correct zijn, en misschien "
+"zelfs niet afspelen.\n"
 
-#: flumotion/component/muxers/checks.py:42
+#: flumotion/component/muxers/checks.py:43
 #: flumotion/worker/checks/encoder.py:44 flumotion/worker/checks/encoder.py:64
 #, python-format
 msgid "Please upgrade '%s' to version %s."
