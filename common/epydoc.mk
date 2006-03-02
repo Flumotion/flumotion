@@ -10,7 +10,7 @@ pypath = $(top_builddir):$(top_srcdir):$(PYTHONPATH)
 
 html/index.html: $(patsubst %, $(top_srcdir)/%, $(MODULE_FILES)) $(top_srcdir)/common/gendoc.py
 	@echo Generating HTML documentation...
-	PYTHONPATH=$(pypath) $(PYTHON) $(top_srcdir)/common/gendoc.py $(EPYDOC_ARGS) $(MODULES)
+	@PYTHONPATH=$(pypath) $(PYTHON) $(top_srcdir)/common/gendoc.py $(EPYDOC_ARGS) $(MODULES)
 
 all-local-epydoc: html/index.html
 
