@@ -2,6 +2,7 @@ include $(top_srcdir)/common/python.mk
                                                                                 
 component_PYTHON = \
 	__init__.py \
+	checks.py \
 	multipart.py \
 	ogg.py
 

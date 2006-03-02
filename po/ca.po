@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-01 19:10+0100\n"
+"POT-Creation-Date: 2006-03-02 13:53+0100\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: cat\n"
@@ -368,6 +368,7 @@ msgid "GStreamer error."
 msgstr ""
 
 #: flumotion/component/feedcomponent08.py:252
+#: flumotion/manager/component.py:572
 #, fuzzy
 msgid "Could not start component."
 msgstr ""
@@ -444,6 +445,22 @@ msgstr "<b>Consumició Del Client</b>"
 msgid "Log"
 msgstr "Log"
 
+#: flumotion/component/muxers/checks.py:38
+#: flumotion/worker/checks/encoder.py:38 flumotion/worker/checks/encoder.py:58
+#, python-format
+msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
+msgstr ""
+
+#: flumotion/component/muxers/checks.py:41
+msgid "The generated Ogg stream will not be fully compliant.\n"
+msgstr ""
+
+#: flumotion/component/muxers/checks.py:42
+#: flumotion/worker/checks/encoder.py:44 flumotion/worker/checks/encoder.py:64
+#, python-format
+msgid "Please upgrade '%s' to version %s."
+msgstr ""
+
 #: flumotion/component/producers/videotest/admin_gtk.py:34
 msgid "Pattern:"
 msgstr "Patró:"
@@ -451,13 +468,6 @@ msgstr "Patró:"
 #: flumotion/component/producers/videotest/admin_gtk.py:86
 msgid "Pattern"
 msgstr "Patró"
-
-#: flumotion/manager/component.py:572
-#, fuzzy
-msgid "Could not start the component."
-msgstr ""
-"No podia recarregar el component:\n"
-"%s."
 
 #: flumotion/manager/manager.py:548
 msgid "The component could not be started."
@@ -498,6 +508,10 @@ msgstr ""
 #: flumotion/worker/checks/check.py:114
 #, python-format
 msgid "No device found on %s."
+msgstr ""
+
+#: flumotion/worker/checks/encoder.py:42 flumotion/worker/checks/encoder.py:62
+msgid "Synchronization between audio and video may not be correct.\n"
 msgstr ""
 
 #: flumotion/worker/checks/video08.py:159
@@ -1089,6 +1103,12 @@ msgstr ""
 "\n"
 "Aquest mag li dirigirà amb els passos requerits per a ajudar-li a configurar "
 "el seu servidor dels mitjans que fluïxen."
+
+#, fuzzy
+#~ msgid "Could not start the component."
+#~ msgstr ""
+#~ "No podia recarregar el component:\n"
+#~ "%s."
 
 #~ msgid "device node /dev/raw1394 does not exist"
 #~ msgstr "el node /dev/raw1394 del dispositiu no existeix "

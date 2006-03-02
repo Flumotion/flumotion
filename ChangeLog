@@ -1,3 +1,27 @@
+2006-03-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
+	  updates
+	* flumotion/component/muxers/Makefile.am:
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/component/muxers/ogg.py:
+	* flumotion/component/muxers/checks.py:
+	  add a version check for the 0.10.3 version of the Ogg muxer
+	* flumotion/manager/component.py:
+	  update a string
+	* flumotion/wizard/steps.py:
+	  use the check
+	* flumotion/worker/checks/encoder.py:
+	  split the message into multiple translatables to make translation
+	  easier
+	* po/POTFILES.in:
+	* po/ca.po:
+	* po/es.po:
+	* po/fr.po:
+	* po/nl.po:
+	* po/no.po:
+	  updates
+
 2006-03-01  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/test/test_i18n.py:

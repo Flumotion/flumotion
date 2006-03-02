@@ -569,7 +569,7 @@ class ComponentAvatar(base.ManagerAvatar):
         try:
             d.value()
         except Exception, e:
-            m = messages.Error(T_(N_("Could not start the component.")),
+            m = messages.Error(T_(N_("Could not start component.")),
                 debug = log.getExceptionMessage(e),
                 id = "component-start")
             self._addMessage(m)

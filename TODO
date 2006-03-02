@@ -26,12 +26,16 @@
 
 * EASY		move muxers in their own dir ?
 
-* MEDIUM:	component.component overrides .error and calls reactor.stop(),
+* MEDIUM	component.component overrides .error and calls reactor.stop(),
 	  	this is dangerous, figure that out
 
-* MEDIUM	allow expression of "test component depends on streamer component"
+* MEDIUM	allow expression of
+		"test component depends on streamer component"
+		ie. non-feedcomponent dependencies
 
-* EASY:		change rawstring regentry type to string, and make pipelinestring for pipelines which need \n translated to space
+* EASY		change rawstring regentry type to string, and make
+                pipelinestring for pipelines which need \n translated to space
+
 * EASY		and force update every minute,
 		or when stats are different from last,
 	 	in http streamer UI
@@ -123,9 +127,10 @@
 * MEDIUM	run all worker checks in a spawned process - segfaults are less
 		painful that way.  maybe even start a job for it always
 
-* MEDIUM	when a component segfaults, have the worker tell the manager that
-		the component segfaulted and make it sad; maybe even allow attaching
-		gdb and filing a bug report
+* MEDIUM	when a component segfaults, have the worker tell the manager
+		that the component segfaulted and make it sad; maybe even allow
+		attaching gdb and filing a bug report
+
 - API cleanup:
 
 - manager/component.py:

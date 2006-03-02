@@ -34,6 +34,7 @@
             <directory name="flumotion/component/muxers">
                 <filename location="multipart.py" />
                 <filename location="ogg.py" />
+                <filename location="checks.py" />
             </directory>
         </directories>
     </bundle>

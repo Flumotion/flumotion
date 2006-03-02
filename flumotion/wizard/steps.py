@@ -743,6 +743,14 @@ class Conversion(WizardSection):
         
         format = self.combobox_format.get_active()
         if format == EncodingFormat.Ogg:
+            self.debug('running Ogg checks')
+            d = self.wizard.require_elements(self.worker, 'oggmux')
+
+            yield d
+            d = self.workerRun('flumotion.component.muxers.checks', 'checkOgg')
+
+            yield d
+     
             # XXX: Smoke can't be put in ogg. Poke Wim to fix
             self.combobox_video.set_multi_active(EncodingVideo.Theora)
             self.combobox_audio.set_multi_active(EncodingAudio.Speex,
@@ -759,6 +767,7 @@ class Conversion(WizardSection):
         has_video = self.wizard.get_step_option('Source', 'has_video')
         self.combobox_video.set_property('visible', has_video)
         self.label_video.set_property('visible', has_video)
+    verify = defer_generator_method(verify)
     
     def activated(self):
         self.verify()
@@ -903,7 +912,6 @@ class Vorbis(AudioEncoder):
             d = self.wizard.require_elements(self.worker, 'vorbisenc')
 
         yield d
-        
         d = self.workerRun('flumotion.worker.checks.encoder', 'checkVorbis')
 
         yield d
