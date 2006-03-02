@@ -328,15 +328,18 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         keycard = self._issuer.issue(request)
         if not keycard:
+            self.debug('no keycard from issuer, firing None')
             return defer.succeed(None)
 
         keycard.requesterName = self.requesterName
         keycard._fd = request.transport.fileno()
         
         if self.bouncerName == None:
+            self.debug('no bouncer, accepting')
             return defer.succeed(keycard)
 
         keycard.setDomain(self._domain)
+        self.debug('sending keycard to bouncer %r' % self.bouncerName)
         return self.streamer.medium.authenticate(self.bouncerName, keycard)
 
     def _addClient(self, request):
@@ -462,12 +465,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         elif self.reachedMaxClients():
             return self._handleMaxClients(request)
 
+        self.debug('_render(): asked for (possible) authentication')
         d = self.authenticate(request)
         d.addCallback(self._authenticatedCallback, request)
         d.addErrback(self._authenticatedErrback, request)
-        self.debug('_render(): asked for authentication')
-        # FIXME
-        #d.addErrback()
 
         # we MUST return this from our _render.
         # FIXME: check if this is true
@@ -579,7 +580,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         ip = request.getClientIP()
 
         self.info('[fd %5d] Started streaming to %s' % (fd, ip))
-
  
     render_GET = _render
     render_HEAD = _render
