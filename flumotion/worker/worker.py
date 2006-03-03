@@ -177,8 +177,8 @@ class WorkerMedium(medium.BaseMedium):
         # this could throw ComponentAlreadyStartingError
         d = self.brain.deferredCreate(avatarId)
         if not d:
-            msg = ('Component "%s" has already received a create request'
-                   % avatarId)
+            msg = ("Component '%s' has already received a create request"
+                % avatarId)
             raise errors.ComponentCreateError(msg)
 
         # spawn the job process
@@ -316,9 +316,10 @@ class Kid:
         return self.pid
 
 class JobProcessProtocol(protocol.ProcessProtocol):
-    def __init__(self, kindergarten):
+    def __init__(self, kindergarten, avatarId):
         self.kindergarten = kindergarten
         self.pid = None
+        self.avatarId = avatarId
 
     def setPid(self, pid):
         self.pid = pid
@@ -341,6 +342,10 @@ class JobProcessProtocol(protocol.ProcessProtocol):
                     kg.warning(
                         "No core dump generated.  "\
                         "Were core dumps enabled at the start ?")
+            # SIGTRAP occurs when registry is corrupt
+            elif signum == signal.SIGTRAP:
+                kg.warning("Job child with pid %d received a SIGTRAP" % 
+                    self.pid)
             else:
                 kg.info(
                     "Reaped job child with pid %d signaled by signal %d" % (
@@ -350,6 +355,18 @@ class JobProcessProtocol(protocol.ProcessProtocol):
                 corepath = os.path.join(os.getcwd(), 'core.%d' % self.pid)
                 if os.path.exists(corepath):
                     kg.info("Core file is probably %s" % corepath)
+
+            # we need to send trigger a defer failure if job has received a 
+            # signal before job has logged into worker.  Otherwise manager still
+            # thinks its starting up but its dead
+            # If job has attached to the worker the createComponent defer will
+            # have already been triggered
+            
+            msg = "Component '%s' has received signal %d.  This is sometimes " \
+                "triggered by a corrupt GStreamer registry." % (self.avatarId, signum)
+            
+            kg.workerBrain.deferredCreateFailed(self.avatarId, 
+                errors.ComponentCreateError(msg))
 
         self.setPid(None)
         
@@ -361,17 +378,19 @@ class Kindergarten(log.Loggable):
 
     logCategory = 'workerbrain' # thomas: I don't like Kindergarten
 
-    def __init__(self, options, socketPath):
+    def __init__(self, options, socketPath, workerBrain):
         """
         @param options: the optparse option instance of command-line options
         @type  options: dict
         @param socketPath: the path of the Unix domain socket for PB.
+        @param workerBrain: a reference to the workerBrain object.
         """
         dirname = os.path.split(os.path.abspath(sys.argv[0]))[0]
         self.program = os.path.join(dirname, 'flumotion-worker')
         self.kids = {} # avatarId -> Kid
         self.options = options
         self._socketPath = socketPath
+        self.workerBrain = workerBrain
         
     def play(self, avatarId, type, moduleName, methodName, config, bundles):
         """
@@ -395,7 +414,7 @@ class Kindergarten(log.Loggable):
                            component
         @type bundles:     list of (str, str)
         """
-        p = JobProcessProtocol(self)
+        p = JobProcessProtocol(self, avatarId)
         executable = os.path.join(os.path.dirname(sys.argv[0]), 'flumotion-job')
         if not os.path.exists(executable):
             self.error("Trying to spawn job process, but '%s' does not "
@@ -484,7 +503,7 @@ class WorkerBrain(log.Loggable):
         self.keycard = None
         
         self._socketPath = _getSocketPath()
-        self.kindergarten = Kindergarten(options, self._socketPath)
+        self.kindergarten = Kindergarten(options, self._socketPath, self)
         self.job_server_factory, self.job_heaven = self.setup()
 
         self.medium = WorkerMedium(self, self.options.feederports)

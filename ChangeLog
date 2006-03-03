@@ -1,5 +1,13 @@
 2006-03-03  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/test_worker_worker.py:
+	* flumotion/worker/worker.py:
+	  make sure that jobs that crash or dont start properly get reported
+	  as ComponentCreateErrors so components go sad rather than the
+	  manager continually thinking component is starting
+
+2006-03-03  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/worker/checks/encoder.py:
 	  make sure vorbis translatable message actually gets added
 

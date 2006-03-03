@@ -39,13 +39,13 @@ class TestKid(unittest.TestCase):
 
 class TestKindergarten(unittest.TestCase):
     def testInit(self):
-        k = worker.Kindergarten({}, "")
+        k = worker.Kindergarten({}, "", {})
         self.assertEquals(k.options, {})
         self.assertEquals(k.kids, {})
         self.assert_(k.program)
 
     def testRemoveKidByPid(self):
-        k = worker.Kindergarten({}, "")
+        k = worker.Kindergarten({}, "", {})
         k.kids['/swede/johan'] = worker.Kid(1, "/swede/johan", "http",
             "module", "method", {}, [('foo', 'bar')])
 
