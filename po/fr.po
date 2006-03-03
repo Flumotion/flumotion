@@ -10,13 +10,13 @@ msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-03-02 16:06+0100\n"
-"PO-Revision-Date: 2006-02-01 11:05+0000\n"
+"PO-Revision-Date: 2006-03-03 18:02+0000\n"
 "Last-Translator: Edward Hervey <edward@fluendo.com>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);"
 
 #: flumotion/admin/gtk/client.py:155
 msgid "Not connected"
@@ -380,20 +380,16 @@ msgid "GStreamer error: could not parse component pipeline."
 msgstr "Erreur GStreamer: impossible d'analyser le tube du component."
 
 #: flumotion/component/feedcomponent08.py:225
-#, fuzzy
 msgid "GStreamer error."
-msgstr "Erreur interne à GStreamer"
+msgstr "Erreur interne à GStreamer."
 
 #: flumotion/component/feedcomponent08.py:252
 #: flumotion/manager/component.py:572
-#, fuzzy
 msgid "Could not start component."
 msgstr ""
-"Impossible de relancer le composant:\n"
-"%s."
+"Impossible de relancer le composant:"
 
 #: flumotion/component/feedcomponent08.py:317
-#, fuzzy
 msgid "Component lost feed, reconnecting..."
 msgstr "Connection au contremaître perdue, reconnection en cours..."
 
@@ -466,19 +462,19 @@ msgstr "Journal"
 #: flumotion/worker/checks/encoder.py:38 flumotion/worker/checks/encoder.py:58
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
-msgstr ""
+msgstr "La version %s du plug-in GStreamer '%s' contient un bogue."
 
 #: flumotion/component/muxers/checks.py:41
 msgid ""
 "The generated Ogg stream will not be fully compliant, and possibly not even "
 "play correctly.\n"
-msgstr ""
+msgstr "Le flux Ogg ne respectera pas entiérement la norme officielle et risque même de ne pas pouvoir être lu correctement."
 
 #: flumotion/component/muxers/checks.py:43
 #: flumotion/worker/checks/encoder.py:44 flumotion/worker/checks/encoder.py:64
 #, python-format
 msgid "Please upgrade '%s' to version %s."
-msgstr ""
+msgstr "Veuillez mettre à jour '%s' vers la version %s."
 
 #: flumotion/component/producers/videotest/admin_gtk.py:34
 msgid "Pattern:"
@@ -533,7 +529,7 @@ msgstr "Aucun périphérique détecté sur %s."
 
 #: flumotion/worker/checks/encoder.py:42 flumotion/worker/checks/encoder.py:62
 msgid "Synchronization between audio and video may not be correct.\n"
-msgstr ""
+msgstr "La synchronization audio/vidéo risque de ne pas être correcte."
 
 #: flumotion/worker/checks/video08.py:159
 #: flumotion/worker/checks/video010.py:156
@@ -569,16 +565,12 @@ msgstr "Je suis une chaîne traduite"
 #: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:116
 #, python-format
 msgid "I can translate %d thing"
-msgid_plural "I can translate %d things"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: flumotion/test/test_i18n.py:114 flumotion/test/test_i18n.py:118
 #, python-format
 msgid "I translated %d thing"
-msgid_plural "I translated %d things"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: flumotion/test/test_common_messages.py:44
 msgid "Something is really wrong."

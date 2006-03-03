@@ -1,3 +1,8 @@
+2006-03-03  Edward Hervey  <edward@fluendo.com>
+
+	* po/fr.po:
+	Update pour le french translation.
+
 2006-03-03  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_worker_worker.py:
