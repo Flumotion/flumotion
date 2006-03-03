@@ -1,6 +1,7 @@
-This is Flumotion 0.2.0, "Unreleased".
+This is Flumotion 0.2.0, "San Telmo".
 
 IMPORTANT NOTE:
+
 The XML config format was changed for components.  They should now list
 each of their properties in a
 <property name="propname"> section instead of just having
@@ -16,6 +17,54 @@ included stylesheet:
 
 Where $datadir is the datadir passed to configure, or the "data" directory
 in the Flumotion source tarball.
+
+Features since 0.1.10:
+
+- Fully works with GStreamer 0.10
+- a looper element that can create a live stream out of an Ogg/Theora+Vorbis
+  file (GStreamer 0.10 only)
+- Component protocol cleanups, making it a lot easier to write new components.
+  Also fixes a set of bugs where a component ran into an error and can't be
+  restarted.
+- synchronization between capturing components (if they can directly contact
+  each other over UDP).  Should properly synchronize webcams and soundcards.
+- Flumotion now supports add-on projects, that can be discovered even when
+  uninstalled, using the FLU_PROJECT_PATH environment variable.
+- Added flumotion-command, a simple admin client that can execute certain
+  commands on components.  Useful for getting statistics, rotating log files,
+  ...
+- Show what worker a component is supposed to start on.
+- Components can now send fully translatable messages as part of their state.
+  The translations happens in the admin client, in the admin's locale.
+  These messages are now visible in the admin and tell you more about why
+  a component is sad.
+
+Issues fixed since 0.1.10:
+
+81      Error reporting from workers
+138     Worker control problems
+142     JPEG applet's internal buffering produces "lag"
+166     components do not check syntax for their config well
+246     planet.xml should contain path to pem file
+271     Components should log into manager before importing component code
+278     gnomevfssrc blows up when ~/.gnome2 is not writable
+286     component properties mixed up with descriptions of the flow
+295     when a worker runs out of ports it doesn't give a nice error
+300     videotestsrc key frames are not sent by the streamer at client startup
+305     HTTP admin UI doesn't show bitrate when no client has connected
+307     [webcam] 'Could not negotiate format' error in gstbasesrc
+308     if worker is specified in XML, admin should show it even when not
+        logged in (maybe in gray)
+310     when you have a misconfiguration (wrong propety name), the manager
+        starts up, then exits
+314     [wizard] Forward button gets unresponsive on 'leaf' pages
+316     [PATCH] regression in vorbis encoder for 0.10 gstreamer
+320     Help->about is wrong
+321     text admin now spewed with stderr messages (a recent commit)
+322     component gtk ui shows old out of date irrelevant errors :)
+324     flumotion-command manager parsing looks to not parse the port number
+        to an int
+328     [PATCH] make volume effect work in 0.10!
 
 Features since 0.1.9:
 
