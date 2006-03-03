@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-02 16:06+0100\n"
+"POT-Creation-Date: 2006-03-03 17:59+0100\n"
 "PO-Revision-Date: 2006-03-02 13:56+0100\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -453,7 +453,7 @@ msgid "Log"
 msgstr "Log"
 
 #: flumotion/component/muxers/checks.py:38
-#: flumotion/worker/checks/encoder.py:38 flumotion/worker/checks/encoder.py:58
+#: flumotion/worker/checks/encoder.py:38 flumotion/worker/checks/encoder.py:59
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
 msgstr "Versie %s van de '%s' GStreamer-plug-in heeft een fout.\n"
@@ -462,11 +462,12 @@ msgstr "Versie %s van de '%s' GStreamer-plug-in heeft een fout.\n"
 msgid ""
 "The generated Ogg stream will not be fully compliant, and possibly not even "
 "play correctly.\n"
-msgstr "De gegenereerde Ogg-stroom zal niet volledig correct zijn, en misschien "
+msgstr ""
+"De gegenereerde Ogg-stroom zal niet volledig correct zijn, en misschien "
 "zelfs niet afspelen.\n"
 
 #: flumotion/component/muxers/checks.py:43
-#: flumotion/worker/checks/encoder.py:44 flumotion/worker/checks/encoder.py:64
+#: flumotion/worker/checks/encoder.py:44 flumotion/worker/checks/encoder.py:65
 #, python-format
 msgid "Please upgrade '%s' to version %s."
 msgstr "Gelieve '%s' te vernieuwen naar versie %s."
@@ -520,7 +521,7 @@ msgstr "Kon toestel '%s' niet onderzoeken."
 msgid "No device found on %s."
 msgstr "Geen toestel gevonden op %s."
 
-#: flumotion/worker/checks/encoder.py:42 flumotion/worker/checks/encoder.py:62
+#: flumotion/worker/checks/encoder.py:42 flumotion/worker/checks/encoder.py:63
 msgid "Synchronization between audio and video may not be correct.\n"
 msgstr "Synchronisatie tussen audio en video kan mogelijks fout zijn.\n"
 
