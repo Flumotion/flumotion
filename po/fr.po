@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: flumotion/admin/gtk/client.py:155
 msgid "Not connected"
@@ -386,8 +386,7 @@ msgstr "Erreur interne à GStreamer."
 #: flumotion/component/feedcomponent08.py:252
 #: flumotion/manager/component.py:572
 msgid "Could not start component."
-msgstr ""
-"Impossible de relancer le composant:"
+msgstr "Impossible de relancer le composant:"
 
 #: flumotion/component/feedcomponent08.py:317
 msgid "Component lost feed, reconnecting..."
@@ -468,7 +467,9 @@ msgstr "La version %s du plug-in GStreamer '%s' contient un bogue.\n"
 msgid ""
 "The generated Ogg stream will not be fully compliant, and possibly not even "
 "play correctly.\n"
-msgstr "Le flux Ogg ne respectera pas entiérement la norme officielle et risque même de ne pas pouvoir être lu correctement.\n"
+msgstr ""
+"Le flux Ogg ne respectera pas entiérement la norme officielle et risque même "
+"de ne pas pouvoir être lu correctement.\n"
 
 #: flumotion/component/muxers/checks.py:43
 #: flumotion/worker/checks/encoder.py:44 flumotion/worker/checks/encoder.py:65
@@ -565,12 +566,16 @@ msgstr "Je suis une chaîne traduite"
 #: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:116
 #, python-format
 msgid "I can translate %d thing"
-msgstr ""
+msgid_plural "I can translate %d things"
+msgstr[0] ""
+msgstr[1] ""
 
 #: flumotion/test/test_i18n.py:114 flumotion/test/test_i18n.py:118
 #, python-format
 msgid "I translated %d thing"
-msgstr ""
+msgid_plural "I translated %d things"
+msgstr[0] ""
+msgstr[1] ""
 
 #: flumotion/test/test_common_messages.py:44
 msgid "Something is really wrong."
