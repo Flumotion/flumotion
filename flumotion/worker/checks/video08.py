@@ -90,6 +90,8 @@ def do_element_check(pipeline_str, element_name, check_proc,
         e.message = gerror.message
         e.code = gerror.code
         e.domain = gerror.domain
+        # set pipeline state to NULL
+        pipeline.set_state(gst.STATE_NULL)
         resolution.errback(errors.GStreamerGstError(element, e, debug))
 
     bin = gst.parse_launch(pipeline_str)

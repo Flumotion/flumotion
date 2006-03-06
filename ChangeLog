@@ -1,3 +1,11 @@
+2006-03-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/worker/checks/video010.py:
+	* flumotion/worker/checks/video08.py:
+	  set pipeline to NULL after running necessary worker check even
+	  errors freeing necessary resources...fixes #191 - original patch
+	  from Gergely Nagy
+
 2006-03-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:

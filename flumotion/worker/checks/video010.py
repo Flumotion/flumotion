@@ -76,6 +76,10 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None):
                 e))
             resolution.errback(errors.RemoteRunError(
                 log.getExceptionMessage(e)))
+        # set pipeline state to NULL so worker does not consume
+        # unnecessary resources
+        pipeline.set_state(gst.STATE_NULL)
+
 
     def message_rcvd(bus, message, pipeline, resolution):
         t = message.type
@@ -86,6 +90,9 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None):
                     run_check(pipeline, resolution)
         elif t == gst.MESSAGE_ERROR:
             gerror, debug = message.parse_error()
+            # set pipeline state to NULL so worker does not consume
+            # unnecessary resources
+            pipeline.set_state(gst.STATE_NULL)
             resolution.errback(errors.GStreamerGstError(message.src, gerror, debug))
         elif t == gst.MESSAGE_EOS:
             resolution.errback(errors.GStreamerError("Unexpected end of stream"))
