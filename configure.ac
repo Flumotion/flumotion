@@ -22,8 +22,12 @@ GST_10_SUPPORTED=true
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_SUBST(ACLOCAL_AMFLAGS, "-I common")
 
-dnl gettext
-AM_GNU_GETTEXT_VERSION(0.11.5)
+dnl Add parameters for aclocal
+AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common")
+
+dnl set up gettext
+dnl the version check needs to stay here because autopoint greps for it
+AM_GNU_GETTEXT_VERSION([0.11.5])
 AM_GNU_GETTEXT([external])
 
 GETTEXT_PACKAGE=$PACKAGE
