@@ -1,5 +1,10 @@
 2006-03-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/consumers/disker/disker.py:
+	  make disker go sad, when error writing fixes  #331
+ 
+2006-03-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/worker/checks/video010.py:
 	* flumotion/worker/checks/video08.py:
 	  set pipeline to NULL after running necessary worker check even

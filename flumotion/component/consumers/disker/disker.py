@@ -28,11 +28,14 @@ import gst
 from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
-from flumotion.common import log, gstreamer, pygobject
+from flumotion.common import log, gstreamer, pygobject, messages
 
 # proxy import
 from flumotion.component.component import moods
 from flumotion.common.pygobject import gsignal
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 __all__ = ['Disker']
 
@@ -178,10 +181,28 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if new:
             reactor.callLater(0, self.change_filename)
 
+    # callback for when a client is removed so we can figure out
+    # errors
+    def _client_removed_cb(self, element, arg0, client_status):
+        # check if status is error
+        if client_status == 4:
+            # close file descriptor
+            self.file_fd.flush()
+            # make element sad
+            self.setMood(moods.sad)
+            id = "error-writing-%s" % self.location
+            m = messages.Error(T_(N_(
+                "Error writing to file %s.  Maybe disk is full." % (
+                    self.location))),
+                id=id, priority=40)
+            self.state.append('messages', m)
+
     # FIXME: move this to configure_pipeline (easy, just needs a test)
     def link_setup(self, eaters, feeders):
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
+        # connect to client-removed so we can detect errors in file writing
+        sink.connect('client-removed', self._client_removed_cb)
 
         if gst.gst_version < (0, 9):
             def feeder_state_change_cb(element, old, state):
