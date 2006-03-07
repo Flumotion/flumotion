@@ -114,7 +114,12 @@ class FlumotionConfigXML(log.Loggable):
                 self.doc = minidom.parseString(string)
                 self._repr = "<string>"
         except expat.ExpatError, e:
-            raise ConfigError("XML parser error: %s" % e)
+            filestr = "<no filename>"
+            if filename:
+                filestr = filename
+                
+            raise ConfigError("XML parser error in file %s: %s" % (
+                filestr,e))
         
         if filename != None:
             self.path = os.path.split(filename)[0]

@@ -1,3 +1,8 @@
+2006-03-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/common/config.py:
+	  report filename where config has error being parsed fixes #309
+
 2006-03-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/disker/disker.py:
