@@ -46,8 +46,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
     global_commands = [ 'startall', 'stopall', 'clearall', 'quit' ]
 
-    LINES_BEFORE_COMPONENTS = 4
-    LINES_AFTER_COMPONENTS = 5
+    LINES_BEFORE_COMPONENTS = 5
+    LINES_AFTER_COMPONENTS = 6
   
     def __init__(self, model, stdscr):
         self.initialised = False
@@ -60,12 +60,14 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         self.max_components_per_page = self.rows - \
             self.LINES_BEFORE_COMPONENTS - \
             self.LINES_AFTER_COMPONENTS
+        self._first_onscreen_component = 0
+
         self._components = {}
         self._comptextui = {}
         self._setAdminModel(model)
         # get initial info we need
         self.setPlanetState(self.admin.planet)
-
+        
 
     def _setAdminModel(self, model):
         self.admin = model
@@ -108,8 +110,29 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             names.sort()
 
             cury = 4
+            
+            # if number of components is less than the space add
+            # "press page up for previous components" and
+            # "press page down for next components" lines
+            if len(names) > self.max_components_per_page:
+                if self._first_onscreen_component > 0:
+                    self.stdscr.move(cury,0)
+                    self.stdscr.clrtoeol()
+                    self.stdscr.addstr(cury,0,
+                        "Press page up to scroll up components list")
+                    cury=cury+1
+            cur_component = self._first_onscreen_component
+            for name in names[self._first_onscreen_component:len(names)]:
+                # check if too many components for screen height
+                if cury - self.LINES_BEFORE_COMPONENTS >= \
+                        self.max_components_per_page:
+                    self.stdscr.move(cury,0)
+                    self.stdscr.clrtoeol()
+                    self.stdscr.addstr(cury,0,
+                        "Press page down to scroll down components list")
+                    cury = cury + 1
+                    break
 
-            for name in names:
                 component = self._components[name]
                 mood = component.get('mood')
                 # clear current component line
@@ -118,11 +141,8 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 # output component name and mood
                 self.stdscr.addstr(cury,0,"%s: %s" % (name, moods[mood].name))
                 cury = cury + 1
-                # check if too many components for screen height
-                # FIXME: still need scrolling up and down components
-                if cury - 4 >= self.max_components_per_page:
-                    break
-                
+                cur_component = cur_component + 1
+                                
             self.lasty = cury
             #self.stdscr.refresh()
 
@@ -588,6 +608,17 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 if self.inputText != "":
                     self.lastcommands.append(self.inputText)
                 self.inputText = nextcommand
+            elif c == curses.KEY_PPAGE: # page up
+                if self._first_onscreen_component > 0:
+                    self._first_onscreen_component = \
+                        self._first_onscreen_component - 1
+                    self.show()
+            elif c == curses.KEY_NPAGE: # page down
+                if self._first_onscreen_component < len(self._components) - \
+                        self.max_components_per_page:
+                    self._first_onscreen_component = \
+                        self._first_onscreen_component + 1
+                    self.show()
 
             else:
                 # too long

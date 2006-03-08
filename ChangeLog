@@ -1,3 +1,9 @@
+2006-03-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/text/view.py:
+	  make components view a scrollable list in text admin
+	  fixes #329
+
 2006-03-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/config.py:
