@@ -256,14 +256,6 @@ class Window(log.Loggable, gobject.GObject):
         # methodName has historically been GUIClass
         instance = None
 
-        # if there's a current component being shown, give it a chance
-        # to clean up
-        if self.current_component:
-            if hasattr(self.current_component, 'cleanup'):
-                self.debug('Cleaning up current component view')
-                self.current_component.cleanup()
-        self.current_component = None
-
         name = state.get('name')
         self.statusbar.set('main', _("Loading UI for %s ...") % name)
 
@@ -704,6 +696,14 @@ class Window(log.Loggable, gobject.GObject):
         mood = state.get('mood')
         messages = state.get('messages')
         self._messages_view.clear()
+        # no ui, clear; FIXME: do this nicer
+        old = self.hpaned.get_child2()
+        self.hpaned.remove(old)
+        #sub = gtk.Label('%s does not have a UI yet' % name)
+        sub = gtk.Label("")
+        self.hpaned.add2(sub)
+        sub.show()
+
         if messages:
             for m in messages:
                 self.debug('have message %r' % m)
@@ -713,6 +713,7 @@ class Window(log.Loggable, gobject.GObject):
             self.debug('component %s is sad' % name)
             self.statusbar.set('main',
                 _("Component %s is sad") % name)
+           
             return
 
         def gotEntryCallback(result):
@@ -740,29 +741,20 @@ class Window(log.Loggable, gobject.GObject):
             self.debug("No UI for component %s" % name)
             self.statusbar.set('main', _("No UI for component %s") % name)
 
-            # no ui, clear; FIXME: do this nicer
-            old = self.hpaned.get_child2()
-            self.hpaned.remove(old)
-            #sub = gtk.Label('%s does not have a UI yet' % name)
-            sub = gtk.Label("")
-            self.hpaned.add2(sub)
-            sub.show()
-
         def gotEntrySleepingComponentErrback(failure):
             failure.trap(errors.SleepingComponentError)
 
             self.statusbar.set('main',
                 _("Component %s is still sleeping") % name)
 
-            # no ui, clear; FIXME: do this nicer
-            old = self.hpaned.get_child2()
-            self.hpaned.remove(old)
-            #sub = gtk.Label('%s does not have a UI yet' % name)
-            sub = gtk.Label("")
-            self.hpaned.add2(sub)
-            sub.show()
-                      
         self.statusbar.set('main', _("Requesting UI for %s ...") % name)
+        # if there's a current component being shown, give it a chance
+        # to clean up
+        if self.current_component:
+            if hasattr(self.current_component, 'cleanup'):
+                self.debug('Cleaning up current component view')
+                self.current_component.cleanup()
+        self.current_component = None
 
         d = self.admin.getEntry(state, 'admin/gtk')
         d.addCallback(gotEntryCallback)
