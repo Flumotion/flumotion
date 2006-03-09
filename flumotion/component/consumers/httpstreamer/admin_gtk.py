@@ -94,12 +94,17 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             text = state.get(name)
             if text == None:
                 text = ''
-            self.labels[name].set_text(text)
+            # set http url with nice pango markup
+            if name == 'stream-url':
+                text = '<span foreground="blue">%s</span>' % text
+                self.labels[name].set_markup(text)
+            else:
+                self.labels[name].set_text(text)
         
     def haveWidgetTree(self):
         self.labels = {}
         self.statistics = self.wtree.get_widget('statistics-widget')
-        for type in ('uptime', 'mime', 'bitrate', 'totalbytes'):
+        for type in ('uptime', 'mime', 'bitrate', 'totalbytes', 'url'):
             self.registerLabel('stream-' + type)
         for type in ('current', 'average', 'max', 'peak', 'peak-time'):
             self.registerLabel('clients-' + type)

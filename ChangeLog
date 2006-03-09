@@ -1,5 +1,13 @@
 2006-03-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/http.glade:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  Display Stream URL in http admin gtk UI
+
+2006-03-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/producers/firewire/firewire.py:
 	  Report message to admin when firewire bus resets, fixes #325
 

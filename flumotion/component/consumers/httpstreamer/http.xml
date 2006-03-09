@@ -22,6 +22,8 @@
         <property name="bouncer" type="string" />
         <property name="issuer" type="string" />
         <property name="mount_point" type="string" />
+	<!-- Hostname currently for display purposes -->
+	<property name="hostname" type="string" />
         <property name="domain" type="string" />
         <property name="user_limit" type="int" />
         <property name="bandwidth_limit" type="int" />

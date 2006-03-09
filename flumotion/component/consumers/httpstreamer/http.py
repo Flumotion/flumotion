@@ -25,6 +25,9 @@ import thread
 import gobject
 import gst
 
+# socket needed to get hostname
+import socket
+
 from twisted.internet import reactor, error
 from twisted.web import server
 
@@ -57,6 +60,10 @@ class Stats:
         # keep track of average clients by tracking last average and its time
         self.average_client_number = 0
         self.average_time = self.start_time
+
+        self.hostname = "localhost"
+        self.port = 0
+        self.mountPoint = ""
         
     def _updateAverage(self):
         # update running average of clients connected
@@ -111,6 +118,9 @@ class Stats:
     def getAverageClients(self):
         return self.average_client_number
 
+    def getUrl(self):
+        return "http://%s:%d/%s" % (self.hostname, self.port, self.mountPoint) 
+
     def updateState(self, set):
         c = self
  
@@ -119,6 +129,7 @@ class Stats:
         uptime          = c.getUptime()
 
         set('stream-mime', c.get_mime())
+        set('stream-url', c.getUrl())
         set('stream-uptime', common.formatTime(uptime))
         bitspeed = bytes_received * 8 / uptime
         set('stream-bitrate', common.formatStorage(bitspeed) + 'bit/s')
@@ -221,7 +232,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                   'clients-peak', 'clients-peak-time', 'clients-average',
                   'consumption-bitrate', 'consumption-totalbytes',
                   'stream-bitrate-raw', 'stream-totalbytes-raw',
-                  'consumption-bitrate-raw', 'consumption-totalbytes-raw'):
+                  'consumption-bitrate-raw', 'consumption-totalbytes-raw',
+                  'stream-url'):
             self.uiState.addKey(i, None)
 
     def get_pipeline_string(self, properties):
@@ -244,7 +256,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if mountPoint.startswith('/'):
             mountPoint = mountPoint[1:]
         self.mountPoint = mountPoint
-
+        # hostname for display purposes only currently
+        self.hostname = properties.get('hostname', socket.gethostname())
+        
         # FIXME: tie these together more nicely
         self.resource = resources.HTTPStreamingResource(self)
         
