@@ -1,5 +1,10 @@
 2006-03-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/producers/firewire/firewire.py:
+	  Report message to admin when firewire bus resets, fixes #325
+
+2006-03-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  Admin not redrawing properly when displaying warnings fixes #333
 

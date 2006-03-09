@@ -20,8 +20,11 @@
 # Headers in this file shall remain intact.
 
 import gst
-from flumotion.common import errors
+from flumotion.common import errors, messages
 from flumotion.component import feedcomponent
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 # See comments in gstdvdec.c for details on the dv format.
 
@@ -117,6 +120,11 @@ class Firewire(feedcomponent.ParseLaunchComponent):
             vol = volume.Volume('inputVolume', comp_level)
         else:
             vol = volume.Volume('inputVolume', comp_level, pipeline)
+            # catch bus message for when camera disappears
+            bus = pipeline.get_bus()
+            bus.add_signal_watch()
+            bus.connect('message::element', self._bus_message_received_cb)
+
         self.addEffect(vol)
 
         
@@ -127,3 +135,26 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         self.debug("Setting volume to %f" % (value))
 
         self.volume.set_property('volume', value)
+
+    # detect camera unplugging or other cause of firewire bus reset
+    def _bus_message_received_cb(self, bus, message):
+        """
+        @param bus: the message bus sending the message
+        @param message: the message received
+        """
+        if message.structure.get_name() == "ieee1394-bus-reset":
+            # we have a firewire bus reset
+            s = message.structure
+            if s['nodecount']:
+                id = "firewire-bus-reset-%d" % s['nodecount']
+                m = messages.Warning(T_(N_(
+                    "Firewire bus has reset.  This usually happens when the " \
+                    "camera has disconnected or reconnected.  Nodecount: %d" % (
+                        s['nodecount']))),
+                    id=id, priority=40)
+                self.state.append('messages', m)
+                
+
+
+
+
