@@ -41,6 +41,12 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         BaseAdminGtkNode.__init__(self, *args, **kwargs)
         self.shown = False
         self._stats = None
+        self._hasgnomevfs = False
+        try:
+            import gnomevfs
+            self._hasgnomevfs = True
+        except:
+            pass
 
     def error_dialog(self, message):
         # FIXME: dialogize
@@ -94,8 +100,9 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             text = state.get(name)
             if text == None:
                 text = ''
-            # set http url with nice pango markup
-            if name == 'stream-url':
+            # set http url with nice pango markup if gnomevfs present
+            # if not it should be black...so ppl dont click on it
+            if name == 'stream-url' and self._hasgnomevfs:
                 text = '<span foreground="blue">%s</span>' % text
                 self.labels[name].set_markup(text)
             else:
@@ -116,7 +123,21 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             self.updateLabels(self._stats)
             self.statistics.show_all()
 
+        # add signal handler for Stream URL only if we have gnomevfs
+        if self._hasgnomevfs:
+            streamurl_widget_eventbox = self.wtree.get_widget('eventbox-stream-url')
+            streamurl_widget_eventbox.connect('button-release-event', self._stream_url_clicked)
         return self.statistics
+
+    # signal handler for stream url
+    def _stream_url_clicked(self, widget, event):
+        # check if left click
+        if event.type == gtk.gdk.BUTTON_RELEASE and event.button == 1:
+            url = widget.get_children()[0].get_text()
+            import gnomevfs
+            app_to_run = gnomevfs.mime_get_default_application(self._stats.get('stream-mime'))
+            if app_to_run:
+                os.system("%s %s &" % (app_to_run[2],url))
 
 class LogAdminGtkNode(BaseAdminGtkNode):
     logCategory = 'logadmin'
