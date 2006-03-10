@@ -60,6 +60,9 @@ run into them:
 - When encoding to Vorbis, prefer to use quality instead of absolute bitrate.
   For absolute bitrate, for each sample rate a limited range of bitrates is
   allowed.
+- You may see memory leaks if you use the soundcard source component, and 
+  you use PyGTK prior to 0.8.5, or gst-python prior to 0.10.3, so upgrading 
+  to these versions is strongly recommended.
 
 A FIRST TEST
 ------------
