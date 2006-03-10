@@ -61,6 +61,7 @@
         <directories>
             <directory name="flumotion/component/producers/soundcard">
                 <filename location="soundcard.py" />
+                <filename location="checks.py" />
             </directory>
         </directories>
      </bundle>

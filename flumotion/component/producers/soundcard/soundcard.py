@@ -22,11 +22,27 @@
 import gst
 import gst.interfaces
 
+from twisted.internet import defer
+
 from flumotion.component import feedcomponent
 from flumotion.component.effects.volume import volume
 
     
 class Soundcard(feedcomponent.ParseLaunchComponent):
+    def do_check(self):
+        self.debug('running PyGTK/PyGST checks')
+        import checks
+        d1 = checks.checkPyGTK()
+        d2 = checks.checkPyGST()
+        dl = defer.DeferredList([d1, d2])
+        dl.addCallback(self._checkCallback)
+        return dl
+
+    def _checkCallback(self, results):
+        for (state, result) in results:
+            for m in result.messages:
+                self.addMessage(m)
+
     def get_pipeline_string(self, properties):
         element = properties.get('source-element', 'alsasrc')
         device = properties.get('device', 'hw:0')
