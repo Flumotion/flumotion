@@ -1,3 +1,14 @@
+2006-03-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_dag.py:
+	  add another test to ensure we get a unique offspring list
+	* flumotion/common/bundle.py:
+	  Use a DAG to get dependencies of a bundle.  Has the added bonus
+	  of returning a shorter list of dependencies than before, since
+	  now each item appears only once, yet still in a correct order.
+	* flumotion/common/registry.py:
+	  add a docstring
+
 2006-03-10  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/producers/soundcard/checks.py:

@@ -886,6 +886,9 @@ class ComponentRegistry(log.Loggable):
         return self._parser.getDirectories()
 
     def makeBundlerBasket(self):
+        """
+        @rtype: L{flumotion.common.bundle.BundlerBasket}
+        """
         def load():
             ret = bundle.BundlerBasket()
             for b in self.getBundles():

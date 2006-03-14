@@ -29,7 +29,7 @@ import errno
 import zipfile
 import StringIO
 
-from flumotion.common import errors
+from flumotion.common import errors, dag
 
 __all__ = ['Bundle', 'Bundler', 'Unbundler', 'BundlerBasket']
 
@@ -236,7 +236,7 @@ class BundlerBasket:
         self._files = {}        # filename          -> bundle name
         self._imports = {}      # import statements -> bundle name
 
-        self._dependencies = {} # bundler name -> bundle names it depends on
+        self._graph = dag.DAG()
         
     def add(self, bundleName, source, destination = None):
         """
@@ -286,10 +286,12 @@ class BundlerBasket:
         @type dependencies: list of strings
         """
         # note that a bundler doesn't necessarily need to be registered yet
-        if not depender in self._dependencies:
-            self._dependencies[depender] = []
+        if not self._graph.hasObject(depender):
+            self._graph.addNode(depender)
         for dep in dependencies:
-            self._dependencies[depender].append(dep)
+            if not self._graph.hasObject(dep):
+                self._graph.addNode(dep)
+            self._graph.addEdge(depender, dep)
 
     def getDependencies(self, bundlerName):
         """
@@ -297,17 +299,9 @@ class BundlerBasket:
         bundle itself.
         The dependencies are returned in a correct depending order.
         """
-        def dep_helper(name, deps):
-            deps.append(name)
-            if self._dependencies.has_key(name):
-                for dep in self._dependencies[name]:
-                    dep_helper (dep, deps)
-            return deps
-            
         if not bundlerName in self._bundlers:
             raise errors.NoBundleError('Unknown bundle %s' % bundlerName)
-        
-        return dep_helper(bundlerName, [])
+        return [bundlerName,] + self._graph.getOffspring(bundlerName)
 
     def getBundlerByName(self, bundlerName):
         """

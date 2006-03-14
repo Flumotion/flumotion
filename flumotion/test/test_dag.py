@@ -111,6 +111,29 @@ class TestDAG(unittest.TestCase):
         for n in ['enoch', 'irad']:
             self.failUnless(n in offspring)
 
+    def testUniqueChildren(self):
+        # test whether we get a list of unique children even through
+        # common ancestry
+        graph = dag.DAG()
+        
+        # first line
+        graph.addNode('A')
+        graph.addNode('B1')
+        graph.addNode('B2')
+        graph.addNode('B3')
+        graph.addNode('C')
+
+        graph.addEdge('A', 'B1')
+        graph.addEdge('A', 'B2')
+        graph.addEdge('A', 'B3')
+        graph.addEdge('B1', 'C')
+        graph.addEdge('B2', 'C')
+        graph.addEdge('B3', 'C')
+
+        offspring = graph.getOffspring('A')
+        # make sure we have only one C and the three B's
+        self.assertEquals(len(offspring), 4)
+
 # example as shown in
 # http://www.cs.cornell.edu/courses/cs312/2004fa/lectures/lecture15.htm
     def testExample(self):
