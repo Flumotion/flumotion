@@ -1,0 +1,12 @@
+<registry>
+  <bundles>
+
+    <bundle name="producer-checks">
+      <directories>
+        <directory name="flumotion/component/producers">
+          <filename location="checks.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry> 

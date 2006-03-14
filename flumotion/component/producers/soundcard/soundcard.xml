@@ -56,12 +56,10 @@
             <dependency name="component" />
             <dependency name="soundcard-base" />
             <dependency name="volume-effect" />
+            <dependency name="producer-checks" />
         </dependencies>
 
         <directories>
-            <directory name="flumotion/component/producers">
-                <filename location="checks.py" />
-            </directory>
             <directory name="flumotion/component/producers/soundcard">
                 <filename location="soundcard.py" />
             </directory>

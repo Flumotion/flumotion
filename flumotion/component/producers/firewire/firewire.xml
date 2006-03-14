@@ -55,14 +55,12 @@
            <dependency name="component" />
            <dependency name="firewire-base" />
            <dependency name="volume-effect" />
+           <dependency name="producer-checks" />
        </dependencies>
 
        <directories>
            <directory name="flumotion/component/producers/firewire">
                <filename location="firewire.py" />
-           </directory>
-           <directory name="flumotion/component/producers">
-               <filename location="checks.py" />
            </directory>
        </directories>
     </bundle>
