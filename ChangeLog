@@ -1,5 +1,10 @@
 2006-03-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  Make "Refresh" on lost connection work
+
+2006-03-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_dag.py:
 	  add another test to ensure we get a unique offspring list
 	* flumotion/common/bundle.py:

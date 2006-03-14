@@ -99,6 +99,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
         fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self, 
             connector, reason)
+        # delay is now updated
+        self.debug("will try reconnect in %f seconds" % self.delay)
 
     # vmethod implementation
     def gotDeferredLogin(self, d):
@@ -236,8 +238,10 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
 
     def reconnect(self):
         self.debug('asked to log in again')
+        self.clientFactory.stopTrying()
+        # this also makes it try to connect again
         self.clientFactory.resetDelay()
-        #self.clientFactory.retry(self.clientFactory.connector)
+        self.connectToHost(self.host, self.port, self.use_insecure)
 
     # FIXME: give these three sensible names
     def adminInfoStr(self):
