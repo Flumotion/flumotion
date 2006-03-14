@@ -59,9 +59,11 @@
         </dependencies>
 
         <directories>
+            <directory name="flumotion/component/producers">
+                <filename location="checks.py" />
+            </directory>
             <directory name="flumotion/component/producers/soundcard">
                 <filename location="soundcard.py" />
-                <filename location="checks.py" />
             </directory>
         </directories>
      </bundle>

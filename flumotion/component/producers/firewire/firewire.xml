@@ -61,6 +61,9 @@
            <directory name="flumotion/component/producers/firewire">
                <filename location="firewire.py" />
            </directory>
+           <directory name="flumotion/component/producers">
+               <filename location="checks.py" />
+           </directory>
        </directories>
     </bundle>
   </bundles>

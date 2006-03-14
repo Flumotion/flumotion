@@ -2,7 +2,7 @@ include $(top_srcdir)/common/python.mk
                                                                                 
 consumersdir = $(libdir)/flumotion/python/flumotion/component/producers
 consumers_PYTHON = \
-	__init__.py
+	__init__.py checks.py
 
 TAGS_FILES = $(component_PYTHON)
 

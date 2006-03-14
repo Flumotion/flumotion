@@ -31,7 +31,7 @@ from flumotion.component.effects.volume import volume
 class Soundcard(feedcomponent.ParseLaunchComponent):
     def do_check(self):
         self.debug('running PyGTK/PyGST checks')
-        import checks
+        from flumotion.component.producers import checks
         d1 = checks.checkPyGTK()
         d2 = checks.checkPyGST()
         dl = defer.DeferredList([d1, d2])

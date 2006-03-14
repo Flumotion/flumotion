@@ -37,7 +37,7 @@ def checkPyGTK():
     pygtk.require('2.0')
     import gtk
     (major, minor, nano) = gtk.pygtk_version
-    if minor < 8 or (minor == 8 and nano <= 4):
+    if (major, minor, nano) < (2, 8, 5):
         m = messages.Warning(T_(
             N_("Version %d.%d.%d of the PyGTK library contains a memory leak.\n"), 
             major, minor, nano),
@@ -56,7 +56,7 @@ def checkPyGST():
     pygst.require('0.10')
     import gst
     (major, minor, nano) = gst.pygst_version
-    if major == 0 and minor == 10 and nano <= 3:
+    if (major, minor, nano) < (0, 10, 3):
         m = messages.Warning(T_(
             N_("Version %d.%d.%d of the gst-python library contains a large memory leak.\n"), 
             major, minor, nano),

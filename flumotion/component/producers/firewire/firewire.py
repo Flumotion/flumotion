@@ -29,6 +29,20 @@ T_ = messages.gettexter('flumotion')
 # See comments in gstdvdec.c for details on the dv format.
 
 class Firewire(feedcomponent.ParseLaunchComponent):
+    def do_check(self):
+        self.debug('running PyGTK/PyGST checks')
+        from flumotion.component.producers import checks
+        d1 = checks.checkPyGTK()
+        d2 = checks.checkPyGST()
+        dl = defer.DeferredList([d1, d2])
+        dl.addCallback(self._checkCallback)
+        return dl
+
+    def _checkCallback(self, results):
+        for (state, result) in results:
+            for m in result.messages:
+                self.addMessage(m)
+
     def get_pipeline_string(self, props):
         width = props.get('width', 240)
         height = props.get('height', int(576 * width/720.)) # assuming PAL :-/

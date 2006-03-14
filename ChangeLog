@@ -1,3 +1,15 @@
+2006-03-14  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/checks.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/firewire/firewire.xml:
+	* flumotion/component/producers/soundcard/Makefile.am:
+	* flumotion/component/producers/soundcard/checks.py:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	  Extend checks for leaks (in level) to firewire.
+
 2006-03-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:
