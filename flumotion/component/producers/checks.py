@@ -35,8 +35,10 @@ def checkPyGTK():
     result = messages.Result()
     import pygtk
     pygtk.require('2.0')
-    import gtk
-    (major, minor, nano) = gtk.pygtk_version
+    import gobject
+    # Really, we want to check for pygobject_version, but that doesn't exist in
+    # all versions of pygtk, and this check is sufficient.
+    (major, minor, nano) = gobject.pygtk_version
     if (major, minor, nano) < (2, 8, 5):
         m = messages.Warning(T_(
             N_("Version %d.%d.%d of the PyGTK library contains a memory leak.\n"), 
