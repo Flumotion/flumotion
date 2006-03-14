@@ -1,6 +1,11 @@
 2006-03-14  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/producers/Makefile.am:
+	  Add some more magic incantations to the Makefile.am
+
+2006-03-14  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/producers/Makefile.am:
 	* flumotion/component/producers/checks.xml:
 	* flumotion/component/producers/firewire/firewire.xml:
 	* flumotion/component/producers/soundcard/soundcard.xml:
