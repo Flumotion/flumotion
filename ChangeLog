@@ -1,5 +1,10 @@
 2006-03-14  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/producers/firewire/firewire.py:
+	  Fix a missing import.
+
+2006-03-14  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/producers/checks.py:
 	  Get the pygtk version from gobject, to avoid importing gtk. 
 

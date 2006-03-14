@@ -20,6 +20,8 @@
 # Headers in this file shall remain intact.
 
 import gst
+from twisted.internet import defer
+
 from flumotion.common import errors, messages
 from flumotion.component import feedcomponent
 
