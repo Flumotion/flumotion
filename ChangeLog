@@ -1,6 +1,13 @@
 2006-03-15  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/encoders/vorbis/vorbis010.py:
+	* flumotion/component/encoders/vorbis/vorbisutils.py:
+	  If the incoming sample rate is outside the range of permissible
+	  rates, pick a sensible 'standard' rate rather than simply clamping.
+
+2006-03-15  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/encoders/vorbis/vorbis010.py:
 	  Rename configure to configure_pipeline, so that it'll get called.
 
 2006-03-14  Michael Smith  <msmith@fluendo.com>

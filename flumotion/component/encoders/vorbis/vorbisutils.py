@@ -19,6 +19,17 @@
 
 # Headers in this file shall remain intact.
 
+def get_preferred_sample_rate (maxrate):
+    """ Get the preferred 'standard' sample rate not exceeded maxrate"""
+    rates = [192000, 96000, 48000, 44100, 32000, 34000, 22050, 16000, 12000, 
+             11025, 8000]
+
+    for rate in rates:
+        if rate <= maxrate:
+            return rate
+
+    return 8000
+
 def get_max_sample_rate(bitrate, channels):
     # maybe better in a hashtable/associative array?
     # ZAHEER: these really are "magic" limits that i found by trial and
