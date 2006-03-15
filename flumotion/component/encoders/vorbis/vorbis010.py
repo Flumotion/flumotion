@@ -47,7 +47,7 @@ class Vorbis(feedcomponent.ParseLaunchComponent):
         return ('audioresample name=ar ! audioconvert ! capsfilter name=cf '
                 '! vorbisenc name=enc')
 
-    def configure(self, pipeline, properties):
+    def configure_pipeline(self, pipeline, properties):
         enc = pipeline.get_by_name('enc')
         cf = pipeline.get_by_name('cf')
         ar = pipeline.get_by_name('ar')
