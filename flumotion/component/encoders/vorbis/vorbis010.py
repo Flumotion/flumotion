@@ -23,7 +23,7 @@
 import gst
 
 from flumotion.component import feedcomponent
-from vorbisutils import get_max_sample_rate
+from vorbisutils import get_max_sample_rate, get_preferred_sample_rate
 
 class Vorbis(feedcomponent.ParseLaunchComponent):
     def do_check(self):
