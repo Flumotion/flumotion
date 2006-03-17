@@ -1,5 +1,12 @@
 2006-03-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/test_manager_manager.py:
+	  twisted 2.2.0 TestCase does not have a runReactor method
+          and according to twisted changeset 15556 it was always
+          deprecated
+
+2006-03-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/producers/firewire/firewire.py:
 	  Fix stupid syntax error and make pychecker happy
 

@@ -24,6 +24,7 @@ import common
 from twisted.trial import unittest
 
 import os
+import exceptions
 
 from twisted.spread import pb
 from twisted.internet import reactor, defer
@@ -371,8 +372,11 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         avatar._avatarId = avatarId
 
         # trigger attached
-        self.runReactor(1)
-
+        # twisted 2.2.0 TestCase does not have a runReactor method
+        # and according to twisted changeset 15556 it was always
+        # deprecated
+        from twisted.internet import reactor
+        reactor.iterate()
         self._workers[avatarId] = avatar
         return avatar
 
@@ -395,8 +399,12 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         avatar._avatarId = avatarId
 
         # trigger attached
-        self.runReactor(1)
-
+        # twisted 2.2.0 TestCase does not have a runReactor method
+        # and according to twisted changeset 15556 it was always
+        # deprecated
+        from twisted.internet import reactor
+        reactor.iterate()
+    
         self._components[avatarId] = avatar
         return avatar
 
@@ -409,7 +417,11 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         logout(avatar, mind, avatarId)
         
         # trigger detached
-        self.runReactor(1)
+        # twisted 2.2.0 TestCase does not have a runReactor method
+        # and according to twisted changeset 15556 it was always
+        # deprecated
+        from twisted.internet import reactor
+        reactor.iterate()
 
     def testWorker(self):
         names = self.vishnu.workerHeaven.state.get('names')
