@@ -169,7 +169,6 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     # so first remove all the previous messages warning about a
                     # firewire-bus-reset
                 
-                    message_list = self.state.get('messages')
                     for m in self.state.get('messages'):
                         if m.id.startswith('firewire-bus-reset'):
                             self.state.remove('messages',m)
@@ -194,7 +193,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     id = "firewire-bus-reset-%d" % s['nodecount']
                     m = messages.Warning(T_(N_(
                         "Firewire bus has reset.  This usually happens when the " \
-                        "camera has disconnected or reconnected."))),
+                        "camera has disconnected or reconnected.")),
                         id=id, priority=40)
                     self.state.append('messages', m)
                 

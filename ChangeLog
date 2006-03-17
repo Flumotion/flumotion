@@ -1,5 +1,10 @@
 2006-03-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/producers/firewire/firewire.py:
+	  Fix stupid syntax error and make pychecker happy
+
+2006-03-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  Make removal of messages from gtk admin actually happen!
 	* flumotion/component/producers/firewire/firewire.py:
