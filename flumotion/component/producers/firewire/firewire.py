@@ -161,14 +161,42 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         if message.structure.get_name() == "ieee1394-bus-reset":
             # we have a firewire bus reset
             s = message.structure
-            if s['nodecount']:
-                id = "firewire-bus-reset-%d" % s['nodecount']
-                m = messages.Warning(T_(N_(
-                    "Firewire bus has reset.  This usually happens when the " \
-                    "camera has disconnected or reconnected.  Nodecount: %d" % (
-                        s['nodecount']))),
-                    id=id, priority=40)
-                self.state.append('messages', m)
+            # current-device-change is only in gst-plugins-good 0.10.3
+            # not yet released
+            if s['current-device-change']:
+                if s['current-device-change'] != 0:
+                    # we actually have a connect or disconnect of the camera
+                    # so first remove all the previous messages warning about a
+                    # firewire-bus-reset
+                
+                    message_list = self.state.get('messages')
+                    for m in self.state.get('messages'):
+                        if m.id.startswith('firewire-bus-reset'):
+                            self.state.remove('messages',m)
+
+                    if s['current-device-change'] == 1:
+                        # connected
+                        m = messages.Info(T_(N_(
+                            "The camera has now been reconnected")),
+                            id="firewire-bus-reset-%d" % s['nodecount'],
+                            priority=40)
+                        self.state.append('messages', m)
+                    elif s['current-device-change'] == -1:
+                        # disconnected
+                        m = messages.Warning(T_(N_(
+                            "The camera has been disconnected")),
+                            id="firewire-bus-reset-%d" % s['nodecount'],
+                            priority=40)
+                        self.state.append('messages', m)
+            else:
+                
+                if s['nodecount']:
+                    id = "firewire-bus-reset-%d" % s['nodecount']
+                    m = messages.Warning(T_(N_(
+                        "Firewire bus has reset.  This usually happens when the " \
+                        "camera has disconnected or reconnected."))),
+                        id=id, priority=40)
+                    self.state.append('messages', m)
                 
 
 

@@ -552,6 +552,13 @@ class Window(log.Loggable, gobject.GObject):
         elif isinstance(state, planet.AdminPlanetState):
             self.debug('something got removed from the planet')
             pass
+        elif isinstance(state, planet.AdminComponentState):
+            name = state.get('name')
+            self.debug('stateRemove on component state of %s' % name)
+            if key == 'messages':
+                current = self.components_view.get_selected_name()
+                if name == current:
+                    self._messages_view.clear_message(value.id)
         else:
             self.warning('stateRemove of key %s and value %r on unknown object %r' % (key, value, state))
 
