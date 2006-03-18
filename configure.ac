@@ -154,7 +154,7 @@ if test $GST_10_SUPPORTED = "yes"; then
 fi
 
 if test $GST_08_SUPPORTED = "no" -a $GST_10_SUPPORTED = "no"; then
-  AC_MSG_ERROR([No suitably gstreamer-python versions found. Correct the above
+  AC_MSG_ERROR([No suitable gstreamer-python versions found. Correct the above
 errors and try again.])
 fi  
 
