@@ -1,5 +1,7 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/checks/video010.py (do_element_check): Doc.
+
 	* flumotion/component/component.py (BaseComponent.start): Assert
 	that the do_start implementation returns a deferred, because we
 	just pass along its return value.

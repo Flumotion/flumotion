@@ -57,6 +57,8 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None):
     @param pipeline_str: description of the pipeline used to test
     @param element_name: name of the element being checked
     @param check_proc: a function to call with the GstElement as argument.
+    @param state: an unused keyword parameter that will be removed when
+    support for GStreamer 0.8 is dropped.
 
     @returns: a deferred that will fire with the result of check_proc, or
               fail.
