@@ -29,7 +29,7 @@ from xml.parsers import expat
 
 from twisted.python import reflect 
 
-from flumotion.common import log, errors, common, registry
+from flumotion.common import log, errors, common, registry, fxml
 
 # FIXME: move this to errors and adapt everywhere
 from errors import ConfigError
@@ -85,7 +85,7 @@ class ConfigEntryAtmosphere:
         self.components = {}
 
 # FIXME: rename
-class FlumotionConfigXML(log.Loggable):
+class FlumotionConfigXML(fxml.Parser):
     """
     I represent a planet configuration file for Flumotion.
 
@@ -102,25 +102,16 @@ class FlumotionConfigXML(log.Loggable):
         self.flows = []
         self.manager = None
         self.atmosphere = None
-        self._repr = None
+        if filename != None:
+            self._repr = filename
+        else:
+            self._repr = "<string>"
 
         try:
-            if filename != None:
-                self.debug('Loading configuration file `%s\'' % filename)
-                self.doc = minidom.parse(filename)
-                self._repr = filename
-            else:
-                self.debug('Loading string file `%s\'' % string)
-                self.doc = minidom.parseString(string)
-                self._repr = "<string>"
-        except expat.ExpatError, e:
-            filestr = "<no filename>"
-            if filename:
-                filestr = filename
-                
-            raise ConfigError("XML parser error in file %s: %s" % (
-                filestr,e))
-        
+            self.doc = self.getRoot(filename, string)
+        except fxml.ParserError, e:
+            raise ConfigError("%s" % e)
+
         if filename != None:
             self.path = os.path.split(filename)[0]
         else:
@@ -247,6 +238,7 @@ class FlumotionConfigXML(log.Loggable):
             config['source'] = sources
 
         config['clock-master'] = self._parseClockMaster(node)
+        config['plugs'] = self._parsePlugs(node, defs.getSockets())
 
         properties = defs.getProperties()
 
@@ -477,6 +469,52 @@ class FlumotionConfigXML(log.Loggable):
         else:
             return None
             
+    def _parsePlug(self, node, sockets):
+        socket, type = self.parseAttributes(node, ('socket', 'type'))
+
+        if not socket in sockets:
+            raise ConfigError("Component does not support "
+                              "sockets of type %s" % socket)
+
+        try:
+            defs = registry.getRegistry().getPlug(type)
+        except KeyError:
+            raise ConfigError("unknown plug type: %s" % type)
+        
+        possible_node_names = ['properties']
+        for subnode in node.childNodes:
+            if (subnode.nodeType == Node.COMMENT_NODE
+                or subnode.nodeType == Node.TEXT_NODE):
+                continue
+            elif subnode.nodeName not in possible_node_names:
+                raise ConfigError("Invalid subnode of <plug>: %s"
+                                  % subnode.nodeName)
+
+        property_specs = defs.getProperties()
+        properties = self._parseProperties(node, type, socket, property_specs)
+
+        return {'type':type, 'socket':socket, 'properties':properties}
+
+    def _parsePlugs(self, node, sockets):
+        # <plugs>
+        #  <plug socket=... type=...>
+        #   <properties>
+        # returns: dict of socket -> list of plugs
+        # where a plug is 'type'->str, 'socket'->str,
+        #  'properties'->dict of properties
+        plugs = {}
+        for socket in sockets:
+            plugs[socket] = []
+        for subnode in node.childNodes:
+            if subnode.nodeName == 'plugs':
+                for subsubnode in subnode.childNodes:
+                    if subsubnode.nodeName != 'plug':
+                        raise ConfigError("<plugs> should only contain "
+                                          "<plug> subnodes")
+                    plug = self._parsePlug(subsubnode)
+                    plugs[plug['socket']].append(plug)
+        return plugs
+
     def _parseProperties(self, node, componentName, type, properties):
         # XXX: We might end up calling float(), which breaks
         #      when using LC_NUMERIC when it is not C -- only in python

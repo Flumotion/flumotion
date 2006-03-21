@@ -1,5 +1,16 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/config.py (FlumotionConfigXML): Inherit from
+	fxml.Parser so we get parseFromTable, and parseAttributes. However
+	the parser isn't fully converted yet.
+	(FlumotionConfigXML.__init__): Use fxml.Parser's getRoot.
+	(FlumotionConfigXML._parseComponent): Call _parsePlugs to set
+	config['plugs'].
+	(FlumotionConfigXML._get_dict_value): Removed.
+	(FlumotionConfigXML._parsePlugs, FlumotionConfigXML._parsePlug):
+	New exciting parser that parses <plugs> sections from <component>
+	blocks.
+
 	* flumotion/component/consumers/httpstreamer/http.xml: Declare
 	that http-streamer supports the logger socket.
 
