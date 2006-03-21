@@ -12,7 +12,7 @@ else
 PTI_DIR =
 endif
 
-SUBDIRS = \
+SUBDIRS = fdpass \
 	$(PTI_DIR)
 
-DIST_SUBDIRS = pytrayicon
+DIST_SUBDIRS = pytrayicon fdpass

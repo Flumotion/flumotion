@@ -1,3 +1,11 @@
+2006-03-21  Michael Smith  <msmith@fluendo.com>
+
+	* configure.ac:
+	* flumotion/extern/Makefile.am:
+	* flumotion/extern/fdpass/Makefile.am:
+	* flumotion/extern/fdpass/fdpass.c:
+	  Add extension module for file descriptor passing in python.
+
 2006-03-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_manager_manager.py:

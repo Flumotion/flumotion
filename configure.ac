@@ -291,6 +291,7 @@ flumotion/configure/Makefile
 flumotion/configure/installed.py
 flumotion/configure/uninstalled.py
 flumotion/extern/Makefile
+flumotion/extern/fdpass/Makefile
 flumotion/extern/pytrayicon/Makefile
 flumotion/job/Makefile
 flumotion/launch/Makefile
