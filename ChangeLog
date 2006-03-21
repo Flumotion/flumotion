@@ -1,5 +1,11 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/registry.py (RegistryParser): Make the parser
+	descend from fxml.Parser, and refactor most of the parser to use
+	Parser.parseFromTable and parseAttributes. Result is that the
+	registry is much more self-validating now, and the code is a bit
+	cleaner.
+
 	* flumotion/common/fxml.py: New file, pulled out of registry.py.
 	Common routines for parsing XML files.
 	

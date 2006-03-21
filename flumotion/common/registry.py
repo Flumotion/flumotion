@@ -30,19 +30,15 @@ import errno
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
-from flumotion.common import common, log, package, bundle, errors
+from flumotion.common import common, log, package, bundle, errors, fxml
 from flumotion.configure import configure
 
 __all__ = ['ComponentRegistry', 'registry']
 
-def _istrue(value):
-    if value in ('True', 'true', '1', 'yes'):
-        return True
-
-    return False
-
 def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
+
+_istrue = fxml.istrue
 
 class RegistryEntryComponent:
     """
@@ -266,16 +262,7 @@ class RegistryEntryEater:
     def getMultiple(self):
         return self.multiple
     
-class XmlParserError(Exception):
-    "Error during parsing of XML."
-
-class XmlDeprecatedError(Exception):
-    "The given XML is for an older version."
-
-# TODO
-# Bundles
-
-class RegistryParser(log.Loggable):
+class RegistryParser(fxml.Parser):
     """
     Registry parser
 
@@ -290,26 +277,12 @@ class RegistryParser(log.Loggable):
     """
     
     def __init__(self):
-        self._components = {}
-        self._directories = {}
-        self._bundles = {}
+        self.clean()
         
     def clean(self):
         self._components = {}
         self._directories = {}
         self._bundles = {}
-        
-    def _getRoot(self, filename, string):
-        if string:
-            self.debug('Parsing XML string')
-            return minidom.parseString(string)
-        else:
-            self.debug('Parsing XML file: %s' % filename)
-            try:
-                return minidom.parse(filename)
-            except expat.ExpatError, e:
-                raise XmlParserError('Error parsing XML file %s: %s: %s' % (
-                    filename, common.objRepr(e), ' '.join(e.args)))
         
     def getComponents(self):
         return self._components.values()
@@ -317,31 +290,17 @@ class RegistryParser(log.Loggable):
     def getComponent(self, name):
         return self._components[name]
 
-    def _getChildNodes(self, node, tag=''):
-        # get all the usable children nodes for the given node
-        # check if the given node matches the node name given as tag
-        if tag and node.nodeName != tag:
-            raise XmlParserError(
-                'expected <%s>, but <%s> found' % (tag, node.nodeName))
-
-        ret = [child for child in node.childNodes
-                     if (child.nodeType != Node.TEXT_NODE and
-                         child.nodeType != Node.COMMENT_NODE)]
-        return ret
-        
     def _parseComponents(self, node):
         # <components>
         #   <component>
         # </components>
         
         components = {}
+        def addComponent(comp):
+            components[comp.getType()] = comp
         
-        for child in self._getChildNodes(node, 'components'):
-            if child.nodeName == 'component':
-                component = self._parseComponent(child)
-                components[component.getType()] = component
-            else:
-                raise XmlParserError("unexpected node: %s" % child)
+        parsers = {'component': (self._parseComponent, addComponent)}
+        self.parseFromTable(node, parsers)
 
         return components
     
@@ -355,14 +314,15 @@ class RegistryParser(log.Loggable):
         #   <synchronization>
         # </component>
         
-        if not node.hasAttribute('type'):
-            raise XmlParserError, "<component> must have a type attribute"
-        type = str(node.getAttribute('type'))
-        #FIXME: do in all components
-        #if not node.hasAttribute('base'):
-        #    raise XmlParserError, "<component> must have a base attribute"
-        baseDir = str(node.getAttribute('base'))
+        #FIXME: make sure base is in all components
+        type, baseDir = self.parseAttributes(node, ('type',), ('base',))
 
+        files = []
+        source = fxml.Box(None)
+        entries = {}
+        eaters = []
+        feeders = []
+        synchronization = fxml.Box((False, 100))
         properties = {}
 
         # Merge in options for inherit
@@ -372,30 +332,19 @@ class RegistryParser(log.Loggable):
             for prop in base.getProperties():
                 properties[prop.getName()] = prop
 
-        files = []
-        source = None
-        entries = {}
-        eaters = []
-        feeders = []
-        needs_sync = False
-        clock_priority = 100
-        for child in self._getChildNodes(node):
-            if child.nodeName == 'source':
-                source = self._parseSource(child)
-            elif child.nodeName == 'properties':
-                self._parseProperties(properties, child)
-            elif child.nodeName == 'files':
-                files = self._parseFiles(child)
-            elif child.nodeName == 'entries':
-                entries = self._parseEntries(child)
-            elif child.nodeName == 'eater':
-                eaters.append(self._parseEater(child))
-            elif child.nodeName == 'feeder':
-                feeders.append(self._parseFeeder(child))
-            elif child.nodeName == 'synchronization':
-                needs_sync, clock_priority = self._parseSynchronization(child)
-            else:
-                raise XmlParserError("unexpected node: %s" % child)
+        parsers = {'source': (self._parseSource, source.set),
+                   'properties': (self._parseProperties, properties.update),
+                   'files': (self._parseFiles, files.extend),
+                   'entries': (self._parseEntries, entries.update),
+                   'eater': (self._parseEater, eaters.append),
+                   'feeder': (self._parseFeeder, feeders.append),
+                   'synchronization': (self._parseSynchronization,
+                                       synchronization.set)}
+
+        self.parseFromTable(node, parsers)
+
+        source = source.unbox()
+        needs_sync, clock_priority = synchronization.unbox()
 
         return RegistryEntryComponent(self.filename,
                                       type, source, baseDir,
@@ -405,128 +354,102 @@ class RegistryParser(log.Loggable):
 
     def _parseSource(self, node):
         # <source location="..."/>
-        if not node.hasAttribute('location'):
-            raise XmlParserError("<source> must have a location attribute")
+        location, = self.parseAttributes(node, ('location',))
+        return location
 
-        return str(node.getAttribute('location'))
+    def _parseProperty(self, node):
+        # <property name="..." type="" required="yes/no" multiple="yes/no"/>
+        # returns: RegistryEntryProperty
 
-    def _parseProperties(self, properties, node):
+        attrs = self.parseAttributes(node, ('name', 'type'),
+                                     ('required', 'multiple'))
+        name, type, required, multiple = attrs
+        required = _istrue(required)
+        multiple = _istrue(multiple)
+        return RegistryEntryProperty(name, type, required=required,
+                                     multiple=multiple)
+
+    def _parseProperties(self, node):
         # <properties>
-        #   <property name="..." type="" required="yes/no" multiple="yes/no"/>
-        #  </properties>
+        #   <property>
+        # </properties>
         
-        for child in self._getChildNodes(node):
-            if child.nodeName != "property":
-                raise XmlParserError("unexpected node: %s" % child)
-        
-            if not child.hasAttribute('name'):
-                raise XmlParserError("<property> must have a name attribute")
-            elif not child.hasAttribute('type'):
-                raise XmlParserError("<property> must have a type attribute")
+        properties = {}
+        def addProperty(prop):
+            properties[prop.getName()] = prop
 
-            name = str(child.getAttribute('name'))
-            type = str(child.getAttribute('type'))
+        parsers = {'property': (self._parseProperty, addProperty)}
 
-            optional = {}
-            if child.hasAttribute('required'):
-                optional['required'] = _istrue(child.getAttribute('required'))
+        self.parseFromTable(node, parsers)
 
-            if child.hasAttribute('multiple'):
-                optional['multiple'] = _istrue(child.getAttribute('multiple'))
+        return properties
 
-            property = RegistryEntryProperty(name, type, **optional)
+    def _parseFile(self, node):
+        # <file name="..." type=""/>
+        # returns: RegistryEntryFile
 
-            properties[name] = property
+        name, type = self.parseAttributes(node, ('name', 'type'))
+        dir = os.path.split(self.filename)[0]
+        filename = os.path.join(dir, name)
+        return RegistryEntryFile(filename, type)
 
     def _parseFiles(self, node):
         # <files>
-        #   <file name="..." type=""/>
-        #  </files>
+        #   <file>
+        # </files>
 
         files = []
-        for child in self._getChildNodes(node):
-            if child.nodeName != "file":
-                raise XmlParserError("unexpected node: %s" % child)
-        
-            if not child.hasAttribute('name'):
-                raise XmlParserError("<file> must have a name attribute")
+        parsers = {'file': (self._parseFile, files.append)}
 
-            if not child.hasAttribute('type'):
-                raise XmlParserError("<file> must have a type attribute")
+        self.parseFromTable(node, parsers)
 
-            name = str(child.getAttribute('name'))
-            type = str(child.getAttribute('type'))
-
-            dir = os.path.split(self.filename)[0]
-            filename = os.path.join(dir, name)
-            file = RegistryEntryFile(filename, type)
-            files.append(file)
-            
         return files
+
+    def _parseEntry(self, node):
+        attrs = self.parseAttributes(node, ('type', 'location', 'function'))
+        type, location, function = attrs
+        return RegistryEntryEntry(type, location, function)
 
     def _parseEntries(self, node):
         # <entries>
-        #   <entry type="" location="" function=""/>
+        #   <entry>
         # </entries>
         # returns: dict of type -> entry
 
         entries = {}
-        for child in self._getChildNodes(node):
-            if child.nodeName != "entry":
-                raise XmlParserError("unexpected node: %s" % child)
-        
-            if not child.hasAttribute('type'):
-                raise XmlParserError("<entry> must have a type attribute")
-            if not child.hasAttribute('location'):
-                raise XmlParserError("<entry> must have a location attribute")
-            if not child.hasAttribute('function'):
-                raise XmlParserError("<entry> must have a function attribute")
+        def addEntry(entry):
+            if entry.getType() in entries:
+                raise XmlParserError("entry %s already specified"
+                                     % entry.getType())
+            entries[entry.getType()] = entry
 
-            type = str(child.getAttribute('type'))
-            location = str(child.getAttribute('location'))
-            function = str(child.getAttribute('function'))
+        parsers = {'entry': (self._parseEntry, addEntry)}
 
-            entry = RegistryEntryEntry(type, location, function)
-            if entries.has_key(type):
-                raise XmlParserError("entry %s already specified" % type)
-            
-            entries[type] = entry
-            
+        self.parseFromTable(node, parsers)
+
         return entries
 
     def _parseEater(self, node):
         # <eater name="..." [required="yes/no"] [multiple="yes/no"]/>
-        if not node.hasAttribute('name'):
-            raise XmlParserError("<eater> must have a name attribute")
-        name = str(node.getAttribute('name'))
-
-        required = True
-        if node.hasAttribute('required'):
-            required = _istrue(node.getAttribute('required'))
-        
-        multiple = False
-        if node.hasAttribute('multiple'):
-            multiple = _istrue(node.getAttribute('multiple'))
+        attrs = self.parseAttributes(node, ('name',), ('required', 'multiple'))
+        name, required, multiple = attrs
+        # only required defaults to True
+        required = _istrue(required or 'True')
+        multiple = _istrue(multiple)
 
         return RegistryEntryEater(name, required, multiple)
 
     def _parseFeeder(self, node):
         # <feeder name="..."/>
-        if not node.hasAttribute('name'):
-            raise XmlParserError("<feeder> must have a name attribute")
-
-        return str(node.getAttribute('name'))
+        name, = self.parseAttributes(node, ('name',))
+        return name
 
     def _parseSynchronization(self, node):
-        # <synchronization [required="yes/no"] [clock-priority="yes/no"]/>
-        required = False
-        if node.hasAttribute('required'):
-            required = _istrue(node.getAttribute('required'))
-        
-        clock_priority = 100
-        if node.hasAttribute('clock-priority'):
-            clock_priority = int(node.getAttribute('clock-priority'))
-
+        # <synchronization [required="yes/no"] [clock-priority="100"]/>
+        attrs = self.parseAttributes(node, (), ('required', 'clock-priority'))
+        required, clock_priority = attrs
+        required = _istrue(required)
+        clock_priority = int(clock_priority or '100')
         return required, clock_priority
 
     ## Component registry specific functions
@@ -542,30 +465,17 @@ class RegistryParser(log.Loggable):
         if string:
             self.filename = "<string>"
 
-        root = self._getRoot(filename, string)
-
-        # check if it's of the right type; we ignore it silently
-        # since this function is used to parse all .xml files encountered
+        root = self.getRoot(self.filename, string)
         node = root.documentElement
-        try:
-            children = self._getChildNodes(node, 'registry')
-        except XmlParserError:
+
+        if node.nodeName != 'registry':
+            # ignore silently, since this function is used to parse all
+            # .xml files encountered
             self.debug('%s does not have registry as root tag' % self.filename)
             return
 
-        # FIXME: move to _parseRegistry
-        for node in children:
-            if node.nodeName == 'components':
-                components = self._parseComponents(node)
-                self._components.update(components)
-            elif node.nodeName == 'bundles':
-                bundles = self._parseBundles(node)
-                self._bundles.update(bundles)
-            elif node.nodeName == 'directories':
-                # there should be no directories in partial registry bits
-                pass
-            else:
-                raise XmlParserError("<registry> invalid node name: %s" % node.nodeName)
+        # shouldn't have <directories> elements in registry fragments
+        self._parseRoot(node, disallowed=['directories'])
 
     def _parseBundles(self, node):
         # <bundles>
@@ -573,64 +483,49 @@ class RegistryParser(log.Loggable):
         # </bundles>
         
         bundles = {}
-        
-        for child in self._getChildNodes(node, 'bundles'):
-            if child.nodeName == 'bundle':
-                bundle = self._parseBundle(child)
-                bundles[bundle.getName()] = bundle
-            else:
-                raise XmlParserError("<bundles> unexpected node: %s" % child.nodeName)
+        def addBundle(bundle):
+            bundles[bundle.getName()] = bundle
+
+        parsers = {'bundle': (self._parseBundle, addBundle)}
+        self.parseFromTable(node, parsers)
 
         return bundles
     
     def _parseBundle(self, node):
         # <bundle name="...">
-        #   <dependency>
+        #   <dependencies>
         #   <directories>
         # </bundle>
         
-        if not node.hasAttribute('name'):
-            raise XmlParserError, "<bundle> must have a name attribute"
-        name = str(node.getAttribute('name'))
-
-        project = 'flumotion'
-        if node.hasAttribute('project'):
-            project = str(node.getAttribute('project'))
-        under = 'pythondir'
-        if node.hasAttribute('under'):
-            under = str(node.getAttribute('under'))
+        attrs = self.parseAttributes(node, ('name',), ('project', 'under'))
+        name, project, under = attrs
+        project = project or 'flumotion'
+        under = under or 'pythondir'
 
         dependencies = []
         directories = []
 
-        for child in self._getChildNodes(node):
-            if child.nodeName == 'dependencies':
-                for dependency in self._parseBundleDependencies(child):
-                    dependencies.append(dependency)
-            elif child.nodeName == 'directories':
-                for directory in self._parseBundleDirectories(child):
-                    directories.append(directory)
-            else:
-                raise XmlParserError("<bundle> unexpected node: %s" % child.nodeName)
+        parsers = {'dependencies': (self._parseBundleDependencies,
+                                    dependencies.extend),
+                   'directories': (self._parseBundleDirectories,
+                                   directories.extend)}
+        self.parseFromTable(node, parsers)
 
         return RegistryEntryBundle(name, project, under, dependencies, directories)
+
+    def _parseBundleDependency(self, node):
+        name, = self.parseAttributes(node, ('name',))
+        return name
 
     def _parseBundleDependencies(self, node):
         # <dependencies>
         #   <dependency name="">
         # </dependencies>
-    
         dependencies = []
-        for child in self._getChildNodes(node):
-            if child.nodeName != "dependency":
-                raise XmlParserError("unexpected node: %s" % child)
-        
-            if not child.hasAttribute('name'):
-                raise XmlParserError("<dependency> must have a name attribute")
 
-            name = str(child.getAttribute('name'))
-
-            dependencies.append(name)
+        parsers = {'dependency': (self._parseBundleDependency,
+                                  dependencies.append)}
+        self.parseFromTable(node, parsers)
             
         return dependencies
 
@@ -638,44 +533,35 @@ class RegistryParser(log.Loggable):
         # <directories>
         #   <directory>
         # </directories>
-        
         directories = []
-        
-        for child in self._getChildNodes(node, 'directories'):
-            if child.nodeName == 'directory':
-                directory = self._parseBundleDirectory(child)
-                directories.append(directory)
-            else:
-                raise XmlParserError("unexpected node: %s" % child)
 
+        parsers = {'directory': (self._parseBundleDirectory,
+                                 directories.append)}
+        self.parseFromTable(node, parsers)
+            
         return directories
+
+    def _parseBundleDirectoryFilename(self, node, name):
+        attrs = self.parseAttributes(node, ('location',), ('relative',))
+        location, relative = attrs
+            
+        if not relative:
+            relative = os.path.join(name, location)
+                
+        return RegistryEntryBundleFilename(location, relative)
 
     def _parseBundleDirectory(self, node):
         # <directory name="">
         #   <filename location="" [ relative="" ] >
         # </directory>
-        
-        filenames = []
-        if not node.hasAttribute('name'):
-            raise XmlParserError("<directory> must have a name attribute")
+        name, = self.parseAttributes(node, ('name',))
 
-        name = str(node.getAttribute('name'))
-        
-        for child in self._getChildNodes(node):
-            if child.nodeName != "filename":
-                raise XmlParserError("unexpected node: %s" % child)
-        
-            if not child.hasAttribute('location'):
-                raise XmlParserError("<filename> must have a location attribute")
-            
-            location = str(child.getAttribute('location'))
-            
-            if child.hasAttribute('relative'):
-                relative = str(child.getAttribute('relative'))
-            else:
-                relative = os.path.join(name, location)
-                
-            filenames.append(RegistryEntryBundleFilename(location, relative))
+        filenames = []
+        def parseFilename(node):
+            return self._parseBundleDirectoryFilename(node, name)
+
+        parsers = {'filename': (parseFilename, filenames.append)}
+        self.parseFromTable(node, parsers)
 
         return RegistryEntryBundleDirectory(name, filenames)
 
@@ -683,7 +569,7 @@ class RegistryParser(log.Loggable):
     def parseRegistry(self, filename, string=None):
         self.filename = filename
 
-        root = self._getRoot(filename, string)
+        root = self.getRoot(filename, string)
         self._parseRoot(root.documentElement)
 
     def getDirectories(self):
@@ -700,24 +586,17 @@ class RegistryParser(log.Loggable):
         """
         self._directories[directory.getPath()] = directory
 
-    def _parseRoot(self, node):
-        try:
-            children = self._getChildNodes(node, 'registry')
-        except XmlParserError, e:
-            raise XmlDeprecatedError(e)
-        
-        for child in children:
-            if child.nodeName == 'components':
-                components = self._parseComponents(child)
-                self._components.update(components)
-            elif child.nodeName == 'directories':
-                directories = self._parseDirectories(child)
-                self._directories.update(directories)
-            elif child.nodeName == 'bundles':
-                bundles = self._parseBundles(child)
-                self._bundles.update(bundles)
-            else:
-                raise XmlParserError("unexpected node: %s" % child)
+    def _parseRoot(self, node, disallowed=None):
+        # <components>...</components>*
+        # <directories>...</directories>*
+        # <bundles>...</bundles>*
+        parsers = {'components': (self._parseComponents,
+                                  self._components.update),
+                   'directories': (self._parseDirectories,
+                                   self._directories.update),
+                   'bundles': (self._parseBundles, self._bundles.update)}
+
+        self.parseFromTable(node, parsers)
         
     def _parseDirectories(self, node): 
         # <directories>
@@ -725,22 +604,17 @@ class RegistryParser(log.Loggable):
         # </directories>
         
         directories = {}
+        def addDirectory(d):
+            directories[d.getPath()] = d
         
-        for child in self._getChildNodes(node, 'directories'):
-            if child.nodeName == 'directory':
-                directory = self._parseDirectory(child)
-                directories[directory.getPath()] = directory
-            else:
-                raise XmlParserError("unexpected node: %s" % child)
+        parsers = {'directory': (self._parseDirectory, addDirectory)}
+        self.parseFromTable(node, parsers)
 
         return directories
 
     def _parseDirectory(self, node):
         # <directory filename="..."/>
-        if not node.hasAttribute('filename'):
-            raise XmlParserError("<directory> must have a filename attribute")
-
-        filename = str(node.getAttribute('filename'))
+        filename, = self.parseAttributes(node, ('filename',))
         return RegistryDirectory(filename)
 
     
