@@ -80,7 +80,7 @@ class ApacheLogger(StreamLogger):
         self.filename = kwargs['log-file-name']
         
     def start(self):
-        self.file = open(
+        self.file = open()
 
     def event_http_session_completed(self, args):
         ident = '-'
