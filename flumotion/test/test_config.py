@@ -28,7 +28,7 @@ import common
 regchunk = """
 <registry>
   <components>
-    <component name="foobie" type="test-component">
+    <component type="test-component">
       <properties>
         <property name="one" type="string"/>
         <property name="two" type="int"/>
@@ -39,10 +39,10 @@ regchunk = """
         <property name="seven" type="fraction"/>
       </properties>
     </component>
-    <component name="foobiesync" type="test-component-sync">
+    <component type="test-component-sync">
       <synchronization required="true" />
     </component>
-    <component name="foobiesync-provider" type="test-component-sync-provider">
+    <component type="test-component-sync-provider">
       <synchronization required="true" clock-priority="130"/>
     </component>
   </components>

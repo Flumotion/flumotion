@@ -1,5 +1,8 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_config.py (regchunk): Fix registry XML
+	snippet for more pedantic registry parser.
+
 	* flumotion/test/test_registry.py: Update to look for some things
 	in fxml instead of in registry.
 	(TestRegistry.testParseComponents): Components don't have "name"
