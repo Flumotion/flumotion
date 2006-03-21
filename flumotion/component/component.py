@@ -389,6 +389,9 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         ret = self.do_start(*args, **kwargs)
 
+        assert isinstance(ret, defer.Deferred), \
+               "do_start must return a deferred"
+
         self.debug('start: returning value %s' % ret)
 
         return ret
@@ -504,7 +507,11 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         """
         #self.log('Sending heartbeat')
         if self.medium:
-            self.medium.callRemote('heartbeat', self.state.get('mood'))
+            d = self.medium.callRemote('heartbeat', self.state.get('mood'))
+            def trap_not_connected(failure):
+                failure.trap(errors.NotConnectedError)
+            d.addErrback(trap_not_connected)
+
         self._HeartbeatDC = reactor.callLater(self._heartbeatInterval,
             self._heartbeat)
 

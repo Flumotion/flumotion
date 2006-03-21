@@ -94,7 +94,7 @@ class BaseMedium(pb.Referenceable, log.Loggable):
         if not self.remote:
             self.warning('Tried to callRemote(%s), but we are disconnected'
                          % name)
-            return None
+            return defer.fail(errors.NotConnectedError())
         
         def errback(failure):
             # shouldn't be a warning, since this a common occurrence

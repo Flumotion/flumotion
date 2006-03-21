@@ -1,5 +1,14 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/component.py (BaseComponent.start): Assert
+	that the do_start implementation returns a deferred, because we
+	just pass along its return value.
+	(BaseComponent._heartbeat): Make sure we don't get nastiness when
+	calling heartbeat, but we're not connected.
+
+	* flumotion/common/medium.py (BaseMedium.callRemote): Return a
+	deferred in all cases. See #159.
+
 	* flumotion/component/consumers/httpstreamer/http.py
 	(MultifdSinkStreamer.configure_pipeline): Refactoring to do most
 	things in the configure_pipeline method. Still nasty though.
