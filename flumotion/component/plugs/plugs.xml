@@ -1,0 +1,35 @@
+<registry>
+  <plugs>
+    <plug socket="flumotion.component.plugs.loggers.Logger" type="apachelogger">
+      <entry location="flumotion/component/plugs/loggers.py"
+             function="ApacheLogger"/>
+
+      <properties>
+        <property name="logfile" type="string" required="true"/>
+      </properties>
+    </plug>
+  </plugs>
+
+  <bundles>
+    <bundle name="base-plugs">
+      <dependencies>
+        <dependency name="flumotion" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs">
+          <filename location="__init__.py" />
+        </directory>
+      </directories>
+    </bundle>
+    <bundle name="base-plugs-loggers">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs">
+          <filename location="loggers.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry> 
