@@ -1,5 +1,32 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/registry.py (RegistryEntryComponent.__init__):
+	Add an initarg for a component to declare what sockets it
+	supports. Tell pychecker that's OK.
+	(RegistryEntryComponent.getSockets): New accessor.
+	(RegistryEntryPlug): New class, represents a <plug> entry in the
+	registry.
+	(RegistryEntrySocket): New class that is really just a string
+	putting on airs.
+	(RegistryParser.getPlugs, RegistryParser.getPlug)
+	(RegistryParser._parseSocket, RegistryParser._parseSockets)
+	(RegistryParser._parsePlugEntry, RegistryParser._parsePlug)
+	(RegistryParser._parsePlugs): New parser accessors and parse
+	routines, parsing standalone <plug> sections and <socket> sections
+	within <component>s.
+	(ComponentRegistry.getPlug, ComponentRegistry.hasPlug)
+	(ComponentRegistry.getPlugs): New accessors for the registry.
+	(ComponentRegistry.dump): Write out <plug> and <socket> sections
+	as well.
+
+	* flumotion/test/test_registry.py: 
+	(TestRegistry.testDump): Check that <plug> entries are correctly
+	parsed and serialized.
+	(TestComponentEntry.setUp): Update for all-singing 13-argument
+	ComponentEntry constructor.
+	(TestComponentEntry.testThings): Add test for gstSockets()
+	implementation.
+
 	* flumotion/test/test_config.py (regchunk): Fix registry XML
 	snippet for more pedantic registry parser.
 

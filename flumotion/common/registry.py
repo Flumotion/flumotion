@@ -46,15 +46,18 @@ class RegistryEntryComponent:
     """
     # RegistryEntryComponent has a constructor with a lot of arguments,
     # but that's ok here. Allow it through pychecker.
-    __pychecker__ = 'maxargs=12'
+    __pychecker__ = 'maxargs=13'
 
     def __init__(self, filename, type, 
                  source, base, properties, files,
-                 entries, eaters, feeders, needs_sync, clock_priority):
+                 entries, eaters, feeders, needs_sync, clock_priority,
+                 sockets):
         """
         @type properties:  dict of str -> L{RegistryEntryProperty}
-        @type entries:     dict of str -> L{RegistryEntryEntry}
         @param entries:    dict of type -> entry
+        @type entries:     dict of str -> L{RegistryEntryEntry}
+        @param sockets:    list of sockets supported by the element
+        @type sockets:     list of L{RegistryEntrySocket}
         """
         self.filename = filename
         self.type = type
@@ -67,6 +70,7 @@ class RegistryEntryComponent:
         self.feeders = feeders
         self.needs_sync = needs_sync
         self.clock_priority = clock_priority
+        self.sockets = sockets
         
     def getProperties(self):
         """
@@ -126,6 +130,48 @@ class RegistryEntryComponent:
 
     def getClockPriority(self):
         return self.clock_priority
+
+    def getSockets(self):
+        return self.sockets
+
+class RegistryEntryPlug:
+    """
+    I represent an <plug> entry in the registry
+    """
+
+    def __init__(self, filename, type, socket, entry, properties):
+        """
+        @type properties:  dict of str -> L{RegistryEntryProperty}
+        @type entry:     L{RegistryEntryEntry}
+        """
+        self.filename = filename
+        self.type = type
+        self.socket = socket
+        self.entry = entry
+        self.properties = properties
+        
+    def getProperties(self):
+        """
+        Get a list of all properties.
+
+        @rtype: list of L{RegistryEntryProperty}
+        """
+        return self.properties.values()
+
+    def hasProperty(self, name):
+        """
+        Check if the component has a property with the given name.
+        """
+        return name in self.properties.keys()
+
+    def getEntry(self):
+        return self.entry
+
+    def getType(self):
+        return self.type
+
+    def getSocket(self):
+        return self.socket
 
 class RegistryEntryBundle:
     "This class represents a <bundle> entry in the registry"
@@ -262,6 +308,9 @@ class RegistryEntryEater:
     def getMultiple(self):
         return self.multiple
     
+class RegistryEntrySocket(str):
+    pass
+
 class RegistryParser(fxml.Parser):
     """
     Registry parser
@@ -283,12 +332,19 @@ class RegistryParser(fxml.Parser):
         self._components = {}
         self._directories = {}
         self._bundles = {}
+        self._plugs = {}
         
     def getComponents(self):
         return self._components.values()
 
     def getComponent(self, name):
         return self._components[name]
+
+    def getPlugs(self):
+        return self._plugs.values()
+
+    def getPlug(self, name):
+        return self._plugs[name]
 
     def _parseComponents(self, node):
         # <components>
@@ -312,6 +368,7 @@ class RegistryParser(fxml.Parser):
         #   <properties>
         #   <entries>
         #   <synchronization>
+        #   <sockets>
         # </component>
         
         #FIXME: make sure base is in all components
@@ -323,6 +380,7 @@ class RegistryParser(fxml.Parser):
         eaters = []
         feeders = []
         synchronization = fxml.Box((False, 100))
+        sockets = []
         properties = {}
 
         # Merge in options for inherit
@@ -339,7 +397,8 @@ class RegistryParser(fxml.Parser):
                    'eater': (self._parseEater, eaters.append),
                    'feeder': (self._parseFeeder, feeders.append),
                    'synchronization': (self._parseSynchronization,
-                                       synchronization.set)}
+                                       synchronization.set),
+                   'sockets': (self._parseSockets, sockets.extend)}
 
         self.parseFromTable(node, parsers)
 
@@ -350,7 +409,8 @@ class RegistryParser(fxml.Parser):
                                       type, source, baseDir,
                                       properties, files,
                                       entries, eaters, feeders,
-                                      needs_sync, clock_priority)
+                                      needs_sync, clock_priority,
+                                      sockets)
 
     def _parseSource(self, node):
         # <source location="..."/>
@@ -405,6 +465,25 @@ class RegistryParser(fxml.Parser):
 
         return files
 
+    def _parseSocket(self, node):
+        # <socket type=""/>
+        # returns: RegistryEntrySocket
+
+        type, = self.parseAttributes(node, ('type',))
+        return RegistryEntrySocket(type)
+
+    def _parseSockets(self, node):
+        # <sockets>
+        #   <socket>
+        # </sockets>
+
+        sockets = []
+        parsers = {'socket': (self._parseSocket, sockets.append)}
+
+        self.parseFromTable(node, parsers)
+
+        return sockets
+
     def _parseEntry(self, node):
         attrs = self.parseAttributes(node, ('type', 'location', 'function'))
         type, location, function = attrs
@@ -452,6 +531,52 @@ class RegistryParser(fxml.Parser):
         clock_priority = int(clock_priority or '100')
         return required, clock_priority
 
+    def _parsePlugEntry(self, node):
+        # <entry location="" function=""/>
+        # returns: RegistryEntryEntry
+
+        attrs = self.parseAttributes(node, ('location', 'function'))
+        location, function = attrs
+        return RegistryEntryEntry('plug', location, function)
+
+    def _parsePlug(self, node):
+        # <plug socket="..." type="...">
+        #   <entry>
+        #   <properties>
+        # </plug>
+        
+        type, socket = self.parseAttributes(node, ('type', 'socket'))
+
+        entry = fxml.Box(None)
+        properties = {}
+
+        parsers = {'entry': (self._parsePlugEntry, entry.set),
+                   'properties': (self._parseProperties, properties.update)}
+
+        self.parseFromTable(node, parsers)
+
+        if not entry.unbox():
+            raise XmlParserError("<plug> %s needs an <entry>" % type)
+
+        return RegistryEntryPlug(self.filename, type,
+                                 socket, entry.unbox(), properties)
+
+    def _parsePlugs(self, node):
+        # <plugs>
+        #   <plug>
+        # </plugs>
+        
+        self.checkAttributes(node)
+
+        plugs = {}
+        def addPlug(plug):
+            plugs[plug.getType()] = plug
+
+        parsers = {'plug': (self._parsePlug, addPlug)}
+        self.parseFromTable(node, parsers)
+
+        return plugs
+    
     ## Component registry specific functions
     def parseRegistryFile(self, filename, string=None):
         # FIXME: better separation of filename and string ?
@@ -588,13 +713,15 @@ class RegistryParser(fxml.Parser):
 
     def _parseRoot(self, node, disallowed=None):
         # <components>...</components>*
+        # <plugs>...</plugs>*
         # <directories>...</directories>*
         # <bundles>...</bundles>*
         parsers = {'components': (self._parseComponents,
                                   self._components.update),
                    'directories': (self._parseDirectories,
                                    self._directories.update),
-                   'bundles': (self._parseBundles, self._bundles.update)}
+                   'bundles': (self._parseBundles, self._bundles.update),
+                   'plugs': (self._parsePlugs, self._plugs.update)}
 
         self.parseFromTable(node, parsers)
         
@@ -753,6 +880,18 @@ class ComponentRegistry(log.Loggable):
     def getComponents(self):
         return self._parser._components.values()
 
+    def getPlug(self, type):
+        """
+        @rtype: L{RegistryEntryPlug}
+        """
+        return self._parser._plugs[type]
+
+    def hasPlug(self, name):
+        return self._parser._plugs.has_key(name)
+
+    def getPlugs(self):
+        return self._parser._plugs.values()
+
     def getBundles(self):
         return self._parser._bundles.values()
         
@@ -836,6 +975,14 @@ class ComponentRegistry(log.Loggable):
             w(6, '<synchronization required="%s" clock-priority="%d"/>'
               % (component.getNeedsSynchronization() and "yes" or "no",
                  component.getClockPriority()))
+
+            sockets = component.getSockets()
+            if sockets:
+                w(6, '<sockets>')
+                for socket in sockets:
+                    w(8, '<socket type="%s"/>' % socket)
+                w(6, '</sockets>')
+
             w(6, '<properties>')
             for prop in component.getProperties():
                 w(8, '<property name="%s" type="%s" required="%s" multiple="%s"/>' % (
@@ -867,6 +1014,32 @@ class ComponentRegistry(log.Loggable):
             w(0, '')
                 
         w(2, '</components>')
+        w(0, '')
+
+        # Write plugs
+        w(2, '<plugs>')
+        w(0, '')
+        for plug in self.getPlugs():
+            w(4, '<plug type="%s" socket="%s">'
+              % (plug.getType(), plug.getSocket()))
+
+            entry = plug.getEntry()
+            w(6, ('<entry location="%s" function="%s"/>'
+                  % (entry.getLocation(), entry.getFunction())))
+
+            w(6, '<properties>')
+            for prop in plug.getProperties():
+                w(8, ('<property name="%s" type="%s" required="%s" multiple="%s"/>'
+                      % (prop.getName(),
+                         prop.getType(),
+                         prop.isRequired(),
+                         prop.isMultiple())))
+            w(6, '</properties>')
+
+            w(4, '</plug>')
+            w(0, '')
+                
+        w(2, '</plugs>')
         w(0, '')
 
         # bundles
