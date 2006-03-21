@@ -1,5 +1,14 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.configure_pipeline): Refactoring to do most
+	things in the configure_pipeline method. Still nasty though.
+	(MultifdSinkStreamer.link_setup): No longer overridden.
+	(MultifdSinkStreamer.do_start): Implement do_start instead of
+	start(). This probably needs more support from the base classes.
+	Pass along the superclass's do_start return value, or a defer.fail
+	if the port was unavailable.
+
 	* flumotion/common/config.py (FlumotionConfigXML._parseComponent):
 	Wrote some notes -- maybe we shouldn't be passing so much to the
 	component.

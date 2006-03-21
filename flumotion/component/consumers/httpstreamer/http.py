@@ -28,7 +28,7 @@ import gst
 # socket needed to get hostname
 import socket
 
-from twisted.internet import reactor, error
+from twisted.internet import reactor, error, defer
 from twisted.web import server
 
 from flumotion.component import feedcomponent
@@ -248,9 +248,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # FIXME: do a .cancel on this Id somewhere
         self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
         
-        self._post_init(properties)
-
-    def _post_init(self, properties):
         self.port = int(properties.get('port', 8800))
         mountPoint = properties.get('mount_point', '')
         if mountPoint.startswith('/'):
@@ -272,7 +269,34 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                     'could not open log file %s for writing (%s)' % (
                         file, data[1]))
 
+        # check how to set client sync mode
         self.burst_on_connect = properties.get('burst_on_connect', False)
+        sink = self.get_element('sink')
+        if gstreamer.element_factory_has_property('multifdsink', 'sync-method'):
+            if self.burst_on_connect:
+                sink.set_property('sync-method', 2)
+            else:
+                sink.set_property('sync-method', 0)
+        else:
+            # old property; does sync-to-keyframe
+            sink.set_property('sync-clients', self.burst_on_connect)
+            
+        # FIXME: these should be made threadsafe if we use GstThreads
+        sink.connect('deep-notify::caps', self._notify_caps_cb)
+
+        if gst.gst_version < (0, 9):
+            def sink_state_change_cb(element, old, state):
+                # when our sink is PLAYING, then we are HAPPY
+                # FIXME: add more moods
+                if state == gst.STATE_PLAYING:
+                    self.debug('Ready to serve clients')
+                    self.setMood(moods.happy)
+
+            sink.connect('state-change', sink_state_change_cb)
+
+        # these are made threadsafe using idle_add in the handler
+        sink.connect('client-removed', self._client_removed_cb)
+        sink.connect('client-added', self._client_added_cb)
 
         if properties.has_key('user_limit'):
             self.resource.setUserLimit(int(properties['user_limit']))
@@ -424,49 +448,21 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     ### END OF THREAD-AWARE CODE
 
-    def link_setup(self, eaters, feeders):
-        sink = self.get_element('sink')
-
-        # check how to set client sync mode
-        if gstreamer.element_factory_has_property('multifdsink', 'sync-method'):
-            if self.burst_on_connect:
-                sink.set_property('sync-method', 2)
-            else:
-                sink.set_property('sync-method', 0)
-        else:
-            # old property; does sync-to-keyframe
-            sink.set_property('sync-clients', self.burst_on_connect)
-            
-        # FIXME: these should be made threadsafe if we use GstThreads
-        sink.connect('deep-notify::caps', self._notify_caps_cb)
-
-        if gst.gst_version < (0, 9):
-            def sink_state_change_cb(element, old, state):
-                # when our sink is PLAYING, then we are HAPPY
-                # FIXME: add more moods
-                if state == gst.STATE_PLAYING:
-                    self.debug('Ready to serve clients')
-                    self.setMood(moods.happy)
-
-            sink.connect('state-change', sink_state_change_cb)
-
-        # these are made threadsafe using idle_add in the handler
-        sink.connect('client-removed', self._client_removed_cb)
-        sink.connect('client-added', self._client_added_cb)
-
-    def start(self, *args, **kwargs):
+    def do_start(self, *args, **kwargs):
         root = resources.HTTPRoot()
         root.putChild(self.mountPoint, self.resource)
         
         self.debug('Listening on %d' % self.port)
         try:
             reactor.listenTCP(self.port, server.Site(resource=root))
-            feedcomponent.ParseLaunchComponent.start(self, *args, **kwargs)
-        except error.CannotListenError:
+            return feedcomponent.ParseLaunchComponent.do_start(self, *args,
+                                                               **kwargs)
+        except error.CannotListenError, e:
             self.warning('Port %d is not available.' % self.port)
             m = messages.Error(T_(N_(
                 "Network error: TCP port %d is not available."), self.port))
             self.addMessage(m)
             self.setMood(moods.sad)
+            return defer.fail(e)
 
 pygobject.type_register(MultifdSinkStreamer)
