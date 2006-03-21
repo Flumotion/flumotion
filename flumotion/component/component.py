@@ -35,7 +35,7 @@ from twisted.cred import error as crederror
 from twisted.spread import pb
 
 from flumotion.common import interfaces, errors, log, planet, medium, pygobject
-from flumotion.common import componentui, common
+from flumotion.common import componentui, common, registry
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
@@ -309,6 +309,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.lastTime = time.time()
         self.lastClock = time.clock()
 
+        self.plugs = {}
+
     def do_check(self):
         """
         Subclasses can implement me to run any checks before the component
@@ -367,8 +369,42 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         @Returns: L{twisted.internet.defer.Deferred}
         """
+        def setup_plugs():
+            # by this time we have a medium, so we can load bundles
+            reg = registry.getRegistry()
+
+            def load_bundles():
+                modules = {}
+                for plugs in config['plugs'].values():
+                    for plug in plugs:
+                        modules[plug['type']] = True
+                for plugtype in modules.keys():
+                    # we got this far, it should work
+                    entry = reg.getPlug(plugtype).getEntry()
+                    modules[plugtype] = entry.getModuleName()
+                if not modules:
+                    return defer.succeed(True) # shortcut
+                else:
+                    loader = self.medium.bundleLoader
+                    return loader.getBundles(moduleName=modules.values())
+                
+            def make_plugs():
+                for socket, plugs in config['plugs'].items():
+                    self.plugs[socket] = []
+                    for plug in plugs:
+                        entry = reg.getPlug(plug['type']).getEntry()
+                        module = reflect.namedAny(entry.getModuleName())
+                        proc = getattr(module, entry.getFunction())
+                        instance = proc(plug)
+                        self.plugs[socket].append(instance)
+
+            d = load_bundles()
+            d.addCallback(lambda x: make_plugs())
+            return d
+
         self._setConfig(config)
-        d = self.do_check()
+        d = setup_plugs()
+        d.addCallback(lambda r: self.do_check())
         d.addCallback(lambda r: self.do_setup())
         return d
 

@@ -40,6 +40,9 @@ BaseComponent.setup(self, config)
 ---------------------------------
 Invoked by manager through medium.
 sets self.config
+Must configure any plugs specified in config. This involves loading
+their bundles, instantiating the plugs, and adding them to lists on the
+dict stored in the self.plugs attribute.
 Invokes do_check() vmethod, which returns a deferred.
 When this deferred succeeds, invokes do_setup() vmethod, which
 also returns a deferred.

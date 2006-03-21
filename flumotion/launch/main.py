@@ -333,6 +333,10 @@ class ComponentWrapper(object):
         else:
             config['clock-master'] = None
 
+        config['plugs'] = {}
+        for socket in c.getSockets():
+            config['plugs'][socket] = []
+        
         try:
             entry = c.getEntryByType('component')
         except KeyError:
