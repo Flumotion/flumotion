@@ -27,8 +27,8 @@ import warnings
 import tempfile
 warnings.filterwarnings('ignore', category=FutureWarning)
 
-from flumotion.common import registry
-from flumotion.common.registry import _istrue
+from flumotion.common import registry, fxml
+_istrue = fxml.istrue
 
 class TestRegistry(unittest.TestCase):
     def setUp(self):
@@ -68,21 +68,18 @@ class TestRegistry(unittest.TestCase):
         self.reg.addFromString("""
 <registry>
   <components>
-    <component name="foo" type="bar">
+    <component type="bar">
     </component>
-    <component name="foobie" type="baz">
+    <component type="baz">
     </component>
   </components>
 </registry>""")
 
         self.failIf(self.reg.isEmpty())
         
-        self.failIf(self.reg.hasComponent('foo'))
         self.failUnless(self.reg.hasComponent('bar'))
         comp1 = self.reg.getComponent('bar')
         self.failUnless(isinstance(comp1, registry.RegistryEntryComponent))
-
-        self.failIf(self.reg.hasComponent('foobie'))
 
         self.failUnless(self.reg.hasComponent('baz'))
         comp2 = self.reg.getComponent('baz')
@@ -99,7 +96,7 @@ class TestRegistry(unittest.TestCase):
         self.reg.addFromString("""
 <registry>
   <components>
-    <component name="foobie" type="component">
+    <component type="component">
       <properties>
         <property name="source" type="string" required="yes" multiple="yes"/>
       </properties>
@@ -121,7 +118,7 @@ class TestRegistry(unittest.TestCase):
         template = """
 <registry>
   <components>
-    <component name="foobie" type="component">
+    <component type="component">
       <properties>
         %s
       </properties>
@@ -130,22 +127,22 @@ class TestRegistry(unittest.TestCase):
 </registry>"""
 
         property = "<base-name/>"
-        self.assertRaises(registry.XmlParserError,
+        self.assertRaises(fxml.ParserError,
                           self.reg.addFromString, template % property)
 
         property = '<property without-name=""/>'
-        self.assertRaises(registry.XmlParserError,
+        self.assertRaises(fxml.ParserError,
                           self.reg.addFromString, template % property)
 
         property = '<property name="bar" without-type=""/>'
-        self.assertRaises(registry.XmlParserError,
+        self.assertRaises(fxml.ParserError,
                           self.reg.addFromString, template % property)
 
     def testClean(self):
         xml = """
 <registry>
   <components>
-    <component name="foo" type="bar">
+    <component type="bar">
     </component>
   </components>
 </registry>"""
@@ -159,7 +156,7 @@ class TestRegistry(unittest.TestCase):
         xml = """
 <registry>
   <components>
-    <component name="foo" type="bar"></component>
+    <component type="bar"></component>
   </components>
 </registry>"""
         reg.addFromString(xml) 
@@ -169,12 +166,12 @@ class TestRegistry(unittest.TestCase):
         xml = """
 <registry>
   <components>
-    <component name="unique"></component>
+    <component></component>
   </components>
 </registry>"""
-        self.assertRaises(registry.XmlParserError, reg.addFromString, xml)
+        self.assertRaises(fxml.ParserError, reg.addFromString, xml)
         xml = """<registry><components><foo></foo></components></registry>"""
-        self.assertRaises(registry.XmlParserError, reg.addFromString, xml)
+        self.assertRaises(fxml.ParserError, reg.addFromString, xml)
         
     # addFromString does not parse <directory> toplevel entries since they
     # should not be in partial registry files
