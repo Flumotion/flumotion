@@ -1,5 +1,10 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/fxml.py: New file, pulled out of registry.py.
+	Common routines for parsing XML files.
+	
+	* flumotion/common/Makefile.am (flumotion_PYTHON): Add fxml.py.
+
 	* flumotion/manager/base.py
 	(ManagerAvatar.perspective_getBundleSums): Change so that any of
 	the arguments can be lists of strings in addition to simple

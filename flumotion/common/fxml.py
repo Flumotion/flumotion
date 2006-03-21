@@ -1,0 +1,137 @@
+# -*- Mode: Python; test-case-name: flumotion.test.test_registry -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2006 Fluendo, S.L. (www.fluendo.com).
+# All rights reserved.
+
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+"""
+Common routines to parsing XML.
+"""
+
+import sets
+
+from xml.dom import minidom, Node
+from xml.parsers import expat
+
+from flumotion.common import log, common
+
+
+def istrue(value):
+    if value in ('True', 'true', '1', 'yes'):
+        return True
+
+    return False
+
+
+class Box:
+    """
+    Object designed to wrap, or "box", any value. Useful mostly in the
+    context of the table-driven XML parser, so that a handler that wants
+    to set a scalar value can do so, getting around the limitations of
+    Python's lexical scoping.
+    """
+    def __init__(self, val=None):
+        self.set(val)
+
+    def set(self, val):
+        self.val = val
+
+    def unbox(self):
+        return self.val
+
+
+class ParserError(Exception):
+    "Error during parsing of XML."
+
+
+class Parser(log.Loggable):
+    """
+    XML parser base class.
+
+    I add some helper functions for specialized XML parsers, mostly the
+    parseFromTable method.
+
+    I am here so that the config parser and the registry parser can
+    share code.
+    """
+    
+    def getRoot(self, filename=None, string=None):
+        """
+        Return the root of the XML tree for the the string or filename
+        passed as an argument. Raises fxml.ParserError if the XML could
+        not be parsed.
+
+        @param filename: The path to the file to parse.
+        @type filename: str or None.
+        @param string: An in-memory string to parse, defaults to None.
+        If you set this, a string will be parsed instead of a file.
+        @type string: str of None.
+        """
+        assert filename or string
+        try:
+            if string:
+                self.debug('Parsing XML string')
+                filename = '<string>'
+                return minidom.parseString(string)
+            else:
+                self.debug('Parsing XML file: %s' % filename)
+                return minidom.parse(filename)
+        except expat.ExpatError, e:
+            raise ParserError('Error parsing XML file %s: %s: %s'
+                              % (filename, common.objRepr(e),
+                                 ' '.join(e.args)))
+        
+    def checkAttributes(self, node, required=None, optional=None):
+        attrs = sets.Set(node.attributes.keys())
+        required = sets.Set(required or ())
+        optional = sets.Set(optional or ())
+        for x in attrs - required.union(optional):
+            raise ParserError("Unknown attribute in <%s>: %s"
+                              % (node.nodeName, x))
+        for x in required - attrs:
+            raise ParserError("Missing attribute in <%s>: %s"
+                              % (node.nodeName, x))
+
+    def parseAttributes(self, node, required=None, optional=None):
+        self.checkAttributes(node, required, optional)
+        out = []
+        for k in (required or ()) + (optional or ()):
+            if node.hasAttribute(k):
+                # expat always gives us unicode; we always want str
+                out.append(str(node.getAttribute(k)))
+            else:
+                out.append(None)
+        return out
+
+    def parseFromTable(self, parent, parsers, disallowed=None):
+        # Nasty, modifies the parse table. Oh well, there's normally
+        # just one per function call.
+        if disallowed:
+            for k in disallowed:
+                del parsers[k]
+
+        for child in parent.childNodes:
+            if (child.nodeType == Node.TEXT_NODE or
+                child.nodeType == Node.COMMENT_NODE):
+                continue
+            try:
+                parser, handler = parsers[child.nodeName]
+                handler(parser(child))
+            except KeyError:
+                raise ParserError("unexpected node in <%s>: %s"
+                                  % (parent.nodeName, child))

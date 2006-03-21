@@ -19,6 +19,7 @@ flumotion_PYTHON = \
 	debug.py \
 	enum.py \
 	errors.py \
+	fxml.py \
 	gstreamer.py \
 	interfaces.py \
 	log.py \
