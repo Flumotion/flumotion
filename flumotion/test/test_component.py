@@ -39,6 +39,7 @@ class PipelineTest(ParseLaunchComponent):
         config = {'name': 'fake',
                   'source': self._source,
                   'feed': self._feed,
+                  'plugs': {},
                   'properties': {}}
 
         return self.setup(config)

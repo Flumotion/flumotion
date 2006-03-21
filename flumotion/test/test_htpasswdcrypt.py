@@ -27,6 +27,7 @@ from flumotion.common import keycards
 from flumotion.component.bouncers import htpasswdcrypt
 
 bouncerconf = {'name': 'testbouncer',
+               'plugs': {},
                'properties': {'data': "user:qi1Lftt0GZC0o"}}
 
 # this is a type that should not be allowed

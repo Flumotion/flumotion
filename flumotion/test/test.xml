@@ -17,7 +17,7 @@
     <component name="streamer-ogg-theora" type="http-streamer" worker="streamer">
       <source>converter-ogg-theora</source>
       <property name="port">8800</property>
-      <property name="logfile">/tmp/ogg-test-theora.access.log</property>
+      <!-- <property name="logfile">/tmp/ogg-test-theora.access.log</property> -->
     </component>
   </flow>
 

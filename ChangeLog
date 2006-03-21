@@ -1,5 +1,15 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test.xml:
+	* flumotion/test/test_component.py:
+	* flumotion/test/test_htpasswdcrypt.py:
+	* flumotion/test/test_http.py:
+	* flumotion/test/test_pb.py: No more logfile property in
+	http-streamer, and the manual config dicts needed updating for
+	'plugs'.
+
+2006-03-21  Andy Wingo  <wingo@pobox.com>
+
 	* flumotion/extern/fdpass/Makefile.am (common_cflags): Compile
 	with -fPIC. (How many more of this kind of commit will we have?)
 

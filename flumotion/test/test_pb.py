@@ -37,6 +37,7 @@ from flumotion.common import keycards, log
 from flumotion.component.bouncers import htpasswdcrypt
 
 bouncerconf = {'name': 'testbouncer',
+               'plugs': {},
                'properties': {'data': "user:qi1Lftt0GZC0o"}}
 
 ### lots of fake objects to have fun with
