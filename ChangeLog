@@ -1,5 +1,14 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/base.py
+	(ManagerAvatar.perspective_getBundleSums): Change so that any of
+	the arguments can be lists of strings in addition to simple
+	strings. Allows the client to get the most bang out of the network
+	buck. Also cleans up a bit.
+
+	* flumotion/common/bundleclient.py (BundleLoader.getBundles): Note
+	that the arguments can be scalar strings or lists of strings.
+
 	* common/trial.mk (trial): Run trial without -R argument; seems to
 	make twisted 2.2 happy.
 

@@ -63,7 +63,7 @@ class BundleLoader(log.Loggable):
         """
         Get, extract and register all bundles needed.
         Either one of bundleName, fileName or moduleName should be specified
-        in **kwargs.
+        in **kwargs, which should be strings or lists of strings.
 
         @returns: a deferred firing a a list of (bundleName, bundlePath)
                   tuples, with lowest dependency first.

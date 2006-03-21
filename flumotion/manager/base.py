@@ -151,46 +151,66 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         """
         Get a list of (bundleName, md5sum) of all dependency bundles,
         starting with this bundle, in the correct order.
-        One of bundleName, fileName, moduleName must be given.
+        Any of bundleName, fileName, moduleName may be given.
 
-        @type  bundleName: string
+        @type  bundleName: string or list of strings
         @param bundleName: the name of the bundle for fetching
-        @type  fileName:   string
+        @type  fileName:   string or list of strings
         @param fileName:   the name of the file requested for fetching
-        @type  moduleName: string
+        @type  moduleName: string or list of strings
         @param moduleName: the name of the module requested for import
 
         @rtype: list of (string, string) tuples of (bundleName, md5sum)
         """
+        bundleNames = []
+        fileNames = []
+        moduleNames = []
         if bundleName:
-            self.debug('asked to get bundle sums for bundle %s' % bundleName)
-        elif fileName:
-            self.debug('asked to get bundle sums for file %s' % fileName)
-        elif moduleName:
-            self.debug('asked to get bundle sums for module %s' % moduleName)
+            if isinstance(bundleName, str):
+                bundleNames.append(bundleName)
+            else:
+                bundleNames.extend(bundleNames)
+            self.debug('asked to get bundle sums for bundles %r' % bundleName)
+        if fileName:
+            if isinstance(fileName, str):
+                fileNames.append(fileName)
+            else:
+                fileNames.extend(fileName)
+            self.debug('asked to get bundle sums for files %r' % fileNames)
+        if moduleName:
+            if isinstance(moduleName, str):
+                moduleNames.append(moduleName)
+            else:
+                moduleNames.extend(moduleName)
+            self.debug('asked to get bundle sums for modules %r' % moduleNames)
 
         basket = self.vishnu.bundlerBasket
 
         # will raise an error if bundleName not known
-        if not bundleName:
-            if fileName:
-                bundleName = basket.getBundlerNameByFile(fileName)
-                if not bundleName:
-                    msg = 'containing ' + fileName
-                    self.warning('No bundle %s' % msg)
-                    raise errors.NoBundleError(msg)
-            elif moduleName:
-                bundleName = basket.getBundlerNameByImport(moduleName)
-                if not bundleName:
-                    msg = 'for module ' + moduleName
-                    self.warning('No bundle %s' % msg)
-                    raise errors.NoBundleError(msg)
+        for fileName in fileNames:
+            bundleName = basket.getBundlerNameByFile(fileName)
+            if not bundleName:
+                msg = 'containing ' + fileName
+                self.warning('No bundle %s' % msg)
+                raise errors.NoBundleError(msg)
             else:
-                # FIXME: handle better
-                raise Exception('invalid arguments')
+                bundleNames.append(bundleName)
+
+        for moduleName in moduleNames:
+            bundleName = basket.getBundlerNameByImport(moduleName)
+            if not bundleName:
+                msg = 'for module ' + moduleName
+                self.warning('No bundle %s' % msg)
+                raise errors.NoBundleError(msg)
+            else:
+                bundleNames.append(bundleName)
     
-        deps = basket.getDependencies(bundleName)
-        self.debug('dependencies of %s: %r' % (bundleName, deps))
+        deps = []
+        for bundleName in bundleNames:
+            thisdeps = basket.getDependencies(bundleName)
+            self.debug('dependencies of %s: %r' % (bundleName, thisdeps))
+            deps.extend(thisdeps)
+
         sums = []
         for dep in deps:
             bundler = basket.getBundlerByName(dep)
