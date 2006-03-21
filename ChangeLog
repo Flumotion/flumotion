@@ -1,5 +1,24 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py (topological_sort): New function,
+	pulled in from Ofer Faigon via
+	http://www.bitformation.com/art/python_toposort.html.
+	(resolve_links): Don't print out links, we know that.
+	(sort_components): Use topological_sort to sort the components so
+	that we start them in order.
+	(ComponentWrapper.__init__): Set config['clock-master'] as well.
+	(ComponentWrapper.instantiate): Also setup() the component.
+	(ComponentWrapper.provideMasterClock): New method, proxies to the
+	component.
+	(ComponentWrapper.start): Just start() here, setup() was done in
+	instantiate().
+	(DeferredDelay): New function, makes a deferred that will fire in
+	the future.
+	(start_components): Factored out of main() to be a
+	defer_generator, because we have to deal with deferreds in the
+	component protocol. Also takes care of setting up clocking in the
+	pipelines. Starts components in order.
+
 	* flumotion/worker/checks/video010.py (do_element_check): Doc.
 
 	* flumotion/component/component.py (BaseComponent.start): Assert

@@ -24,10 +24,77 @@ import sys
 import time
 
 from twisted.python import reflect
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 
 from flumotion.common import log, common, registry
+from flumotion.twisted.defer import defer_generator
 
+# From Ofer Faigon's "Topological Sort in Python",
+# http://www.bitformation.com/art/python_toposort.html
+def topological_sort(items, partial_order):
+    """Perform topological sort. items is a list of items. partial_order
+    is a list of pairs. If pair (a,b) is in it, it means that item a
+    should appear before item b. Returns a list of the items in one of
+    the possible orders, or None if partial_order contains a loop."""
+
+    def add_node(graph, node):
+        """Add a node to the graph if not already exists."""
+        if not graph.has_key(node):
+            graph[node] = [0] # 0 = number of arcs coming into this node.
+
+    def add_arc(graph, fromnode, tonode):
+        """Add an arc to a graph. Can create multiple arcs. The end
+        nodes must already exist."""
+        graph[fromnode].append(tonode)
+        # Update the count of incoming arcs in tonode.
+        graph[tonode][0] = graph[tonode][0] + 1
+
+    # step 1 - create a directed graph with an arc a->b for each input
+    # pair (a,b).
+    # The graph is represented by a dictionary. The dictionary contains
+    # a pair item:list for each node in the graph. /item/ is the value
+    # of the node. /list/'s 1st item is the count of incoming arcs, and
+    # the rest are the destinations of the outgoing arcs. For example:
+    # {'a':[0,'b','c'], 'b':[1], 'c':[1]}
+    # represents the graph: c <-- a --> b
+    # The graph may contain loops and multiple arcs.
+    # Note that our representation does not contain reference loops to
+    # cause GC problems even when the represented graph contains loops,
+    # because we keep the node names rather than references to the nodes.
+    graph = {}
+    for v in items:
+        add_node(graph, v)
+    for a,b in partial_order:
+        add_arc(graph, a, b)
+
+    # Step 2 - find all roots (nodes with zero incoming arcs).
+    roots = [node for (node,nodeinfo) in graph.items() if nodeinfo[0] == 0]
+
+    # step 3 - repeatedly emit a root and remove it from the graph. Removing
+    # a node may convert some of the node's direct children into roots.
+    # Whenever that happens, we append the new roots to the list of
+    # current roots.
+    sorted = []
+    while len(roots) != 0:
+        # If len(roots) is always 1 when we get here, it means that
+        # the input describes a complete ordering and there is only
+        # one possible output.
+        # When len(roots) > 1, we can choose any root to send to the
+        # output; this freedom represents the multiple complete orderings
+        # that satisfy the input restrictions. We arbitrarily take one of
+        # the roots using pop(). Note that for the algorithm to be efficient,
+        # this operation must be done in O(1) time.
+        root = roots.pop()
+        sorted.append(root)
+        for child in graph[root][1:]:
+            graph[child][0] = graph[child][0] - 1
+            if graph[child][0] == 0:
+                roots.append(child)
+        del graph[root]
+    if len(graph.items()) != 0:
+        # There is a loop in the input.
+        return None
+    return sorted
 
 def err(x):
     sys.stderr.write(x + '\n')
@@ -62,8 +129,17 @@ def resolve_links(links, components):
                 err('Component %s has no eaters' % compname)
             link[3] = eaters[0].getName()
     
-    for link in links:
-        print '%s:%s => %s:%s' % tuple(link)
+    #for link in links:
+    #    print '%s:%s => %s:%s' % tuple(link)
+
+def find(l, pred):
+    return filter(pred, l)[0]
+
+def sort_components(links, components):
+    sorted = topological_sort([x[0] for x in components],
+                              [(x[0], x[2]) for x in links])
+    sorted = [find(components, lambda p: p[0] == x) for x in sorted]
+    return sorted
 
 def parse_args(args):
     links = []
@@ -163,8 +239,14 @@ def parse_args(args):
 
     resolve_links(links, components)
 
+    components = sort_components(links, components)
+
     return components, links, properties
 
+# FIXME: this duplicates code from
+# flumotion.common.config.ConfigEntryComponent, among other things. If
+# the code from f.c.c could be factored into something more like a
+# library that would be good.
 class ComponentWrapper(object):
     name = None
     type = None
@@ -244,6 +326,13 @@ class ComponentWrapper(object):
         # fixme: 'feed' is not strictly necessary in config
         config['feed'] = c.getFeeders()
 
+        # not used by the component -- see notes in _parseComponent in
+        # config.py
+        if c.getNeedsSynchronization():
+            config['clock-master'] = c.getClockPriority()
+        else:
+            config['clock-master'] = None
+
         try:
             entry = c.getEntryByType('component')
         except KeyError:
@@ -258,11 +347,69 @@ class ComponentWrapper(object):
 
     def instantiate(self):
         self.component = self.procedure()
+        return self.component.setup(self.config)
 
-    def start(self, eatersdata, feedersdata):
-        d = self.component.setup(self.config)
-        d.addCallback(lambda r: self.component.start(eatersdata, feedersdata, None))
-        return d
+    def provideMasterClock(self, port):
+        ret = self.component.provide_master_clock(port)
+        # grrrrr! for some reason getting the ip requires being
+        # connected? I suppose it *is* always my ip relative to ip X
+        # though...
+        if not ret[0]:
+            ret = ("127.0.0.1", ret[1], ret[2])
+        return ret
+
+    def start(self, eatersdata, feedersdata, clocking):
+        return self.component.start(eatersdata, feedersdata, clocking)
+
+def DeferredDelay(time):
+    d = defer.Deferred()
+    reactor.callLater(time, d.callback, None)
+    return d
+
+def start_components(wrappers, feed_ports, links, delay):
+    # figure out the links and start the components
+
+    # first phase: instantiation and setup
+    d = defer.DeferredList([wrapper.instantiate() for wrapper in wrappers])
+    yield d
+    results = d.value()
+    success = True
+    for result, wrapper in zip(results, wrappers):
+        if not result[0]:
+            print ("Component %s failed to start, reason: %r"
+                   % (wrapper, result[1]))
+            success = False
+    if not success:
+        raise errors.ComponentStartError()
+
+    # second phase: clocking
+    need_sync = [(x.config['clock-master'], x) for x in wrappers
+                 if x.config['clock-master'] is not None]
+    need_sync.sort()
+    need_sync = [x[1] for x in need_sync]
+
+    if need_sync:
+        master = need_sync.pop(0)
+        print "Telling", master.name, "to provide the master clock."
+        clocking = master.provideMasterClock(7600 - 1) # hack!
+
+    # third phase: start() in order
+    for wrapper in wrappers:
+        eatersdata = [('%s:%s' % (x[0], x[1]), 'localhost', feed_ports[x[0]][x[1]])
+                      for x in links if x[2] == wrapper.name]
+        feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost', p)
+                       for x, p in feed_ports[wrapper.name].items()]
+        if delay:
+            print 'Delaying component startup by %f seconds...' % delay
+            yield DeferredDelay(delay)
+            
+        # start it up, with clocking data only if it needs it
+        d = wrapper.start(eatersdata, feedersdata,
+                          wrapper in need_sync and clocking or None)
+        yield d
+        d.value()
+        print "%s started" % wrapper.name
+start_components = defer_generator(start_components)
 
 def main(args):
     from flumotion.common import setup
@@ -331,37 +478,11 @@ def main(args):
             print '%s:%s feeds on port %d' % (wrapper.name, feeder, port)
             port += 1
     
-    # instantiate the components
-    for wrapper in wrappers:
-        wrapper.instantiate()
-
-    # FIXME: sort-of-ugly, but twisted recommends globals, and this is as
-    # good as a global
-    reactor.failed = False
-
-    # figure out the links and start the components
-    for wrapper in wrappers:
-        eatersdata = [('%s:%s' % (x[0], x[1]), 'localhost', feed_ports[x[0]][x[1]])
-                      for x in links if x[2] == wrapper.name]
-        feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost', p)
-                       for x, p in feed_ports[wrapper.name].items()]
-        time.sleep(delay)
-        d  = wrapper.start(eatersdata, feedersdata)
-
-        def _startCallback(ret, name, ports):
-            print "%s started" % name
-            if ret:
-                for x in ret:
-                    assert x[2] == ports[x[0]]
-                
-        def _startErrback(failure, name):
-            print "starting %s failed" % name
-            reactor.failed = True
-            reactor.stop()
-
-        d.addCallback(_startCallback, wrapper.name,
-            feed_ports[wrapper.name])
-        d.addErrback(_startErrback, wrapper.name)
+    d = start_components(wrappers, feed_ports, links, delay)
+    def errback(failure):
+        print "Error occurred, stopping reactor."
+        reactor.stop()
+    d.addErrback(errback)
 
     if not reactor.failed:
         print 'Running the reactor. Press Ctrl-C to exit.'
