@@ -211,6 +211,10 @@ class FlumotionConfigXML(log.Loggable):
         if node.hasAttribute('worker'):
             worker = str(node.getAttribute('worker'))
 
+        # FIXME: flumotion-launch does not define parent, type, or
+        # avatarId. Thus they don't appear to be necessary, like they're
+        # just extra info for the manager or so. Figure out what's going
+        # on with that. Also, -launch treats clock-master differently.
         config = { 'name': name,
                    'parent': parent,
                    'type': type,
@@ -455,6 +459,7 @@ class FlumotionConfigXML(log.Loggable):
                 for subnode in nodes]
 
     def _parseSources(self, node, defs):
+        # <source>feeding-component:feed-name</source>
         eaters = dict([(x.getName(), x) for x in defs.getEaters()])
 
         nodes = []

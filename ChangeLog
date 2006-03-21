@@ -1,3 +1,10 @@
+2006-03-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseComponent):
+	Wrote some notes -- maybe we shouldn't be passing so much to the
+	component.
+	(FlumotionConfigXML._parseSources): Doc.
+
 2006-03-21  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/extern/fdpass/Makefile.am:
