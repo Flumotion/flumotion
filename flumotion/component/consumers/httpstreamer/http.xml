@@ -3,7 +3,7 @@
     <component type="http-streamer"
                base="flumotion/component/consumers/httpstreamer">
 <!-- old way of specifying component source -->
-    <source location="flumotion.component.consumers.httpstreamer.http"/>
+      <source location="flumotion.component.consumers.httpstreamer.http"/>
 
       <eater name="default"/>
 
@@ -18,7 +18,6 @@
       <properties>
         <property name="port" type="int" />
         <property name="logfile" type="string" />
-        <property name="gst-property" type="xml" multiple="yes" />
         <property name="bouncer" type="string" />
         <property name="issuer" type="string" />
         <property name="mount_point" type="string" />

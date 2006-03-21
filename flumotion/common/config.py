@@ -426,29 +426,6 @@ class FlumotionConfigXML(log.Loggable):
         string = "".join(values)
         return [string, ]
      
-    def _get_xml_value(self, nodes):
-        class XMLProperty:
-            pass
-        
-        values = []
-        for subnode in nodes:
-            # XXX: Child nodes recursively
-            
-            data = subnode.childNodes[0].data
-            if '\n' in data:
-                parts = [x.strip() for x in data.split('\n')]
-                data = ' '.join(parts)
-                
-            property = XMLProperty()
-            property.data = data
-            for key in subnode.attributes.keys():
-                value = subnode.attributes[key].value
-                setattr(property, str(key), value)
-
-            values.append(property)
-
-        return values
-
     def _get_fraction_value(self, nodes):
         def fraction_from_string(string):
             parts = string.split('/')
@@ -541,7 +518,6 @@ class FlumotionConfigXML(log.Loggable):
                        'long': self._get_long_value,
                        'bool': self._get_bool_value,
                        'float': self._get_float_value,
-                       'xml': self._get_xml_value,
                        'fraction': self._get_fraction_value}
                        
             if not definition.type in parsers:

@@ -33,7 +33,7 @@ regchunk = """
         <property name="one" type="string"/>
         <property name="two" type="int"/>
         <property name="three" type="float"/>
-        <property name="four" type="xml"/>
+        <!-- four elided -->
         <property name="five" type="bool"/>
         <property name="six" type="long"/>
         <property name="seven" type="fraction"/>
@@ -247,7 +247,7 @@ class TestConfig(unittest.TestCase):
                <property name="one">string</property>
                <property name="two">1</property>
                <property name="three">2.5</property>
-               <property name="four" attr="attr-value">value</property>
+               <!-- no four -->
                <property name="five">True</property>
                <property name="six">3981391981389138998131389L</property>
                <property name="seven">30000/1001</property>
@@ -264,10 +264,6 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(props.get('one'), 'string')
         self.assertEquals(props.get('two'), 1)
         self.assertEquals(props.get('three'), 2.5)
-        custom = props.get('four')
-        self.failUnless(custom)
-        self.assertEquals(getattr(custom, 'data', None), 'value')
-        self.assertEquals(getattr(custom, 'attr', None), 'attr-value')
         self.failUnless(props.get('five'))
         self.assertEquals(props.get('six'), 3981391981389138998131389L)
         self.assertEquals(props.get('seven'), (30000, 1001))

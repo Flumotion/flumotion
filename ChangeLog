@@ -1,5 +1,17 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.xml: Remove
+	'gst-property' property from http-streamer; it's not implemented,
+	and would cause a bug if you set it. Also it's the only property
+	out there of type 'xml'.
+
+	* flumotion/test/test_config.py (TestConfig.testParseProperties)
+	(regchunk): No more tests for the XML type.
+
+	* flumotion/common/config.py (FlumotionConfigXML._get_dict_value):
+	Removed.
+	(FlumotionConfigXML._parseProperties): No more 'xml' type.
+
 	* flumotion/launch/main.py (topological_sort): New function,
 	pulled in from Ofer Faigon via
 	http://www.bitformation.com/art/python_toposort.html.
