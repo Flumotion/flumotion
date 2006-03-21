@@ -1,5 +1,10 @@
 2006-03-21  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/extern/fdpass/Makefile.am:
+	 Simplify building/running this by not using libtool
+
+2006-03-21  Michael Smith  <msmith@fluendo.com>
+
 	* configure.ac:
 	* flumotion/extern/Makefile.am:
 	* flumotion/extern/fdpass/Makefile.am:
