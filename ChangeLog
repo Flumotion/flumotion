@@ -1,5 +1,8 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/extern/fdpass/Makefile.am (common_cflags): Compile
+	with -fPIC. (How many more of this kind of commit will we have?)
+
 	* flumotion/component/consumers/httpstreamer/http.py (HTTPMedium):
 	Remove code to do admin calls with logging information, that
 	should be implemented via a logger.

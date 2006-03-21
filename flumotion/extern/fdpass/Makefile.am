@@ -1,4 +1,4 @@
-common_cflags = -Wall
+common_cflags = -Wall -fPIC
 common_ldflags = -module -avoid-version
 
 flumotiondir = $(libdir)/flumotion/python/flumotion/extern/fdpass
