@@ -157,11 +157,6 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         """
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
-        self.comp.connect('log-message', self._comp_log_message_cb)
-
-    def _comp_log_message_cb(self, comp, message):
-        self.callRemote('adminCallRemote', 'logMessage', message)
-
     def authenticate(self, bouncerName, keycard):
         """
         @rtype: L{twisted.internet.defer.Deferred} firing a keycard or None.
@@ -182,7 +177,7 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         self.comp.update_ui_state()
 
     def remote_rotateLog(self):
-        self.comp.resource.rotateLogfile()
+        self.comp.resource.rotateLogs()
 
 
 ### the actual component is a streamer using multifdsink
@@ -204,7 +199,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                                     'recover-policy=3'
 
     gsignal('client-removed', object, int, int, object)
-    gsignal('log-message', str)
     
     component_medium_class = HTTPMedium
 
@@ -258,16 +252,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         
         # FIXME: tie these together more nicely
         self.resource = resources.HTTPStreamingResource(self)
-        
-        if properties.has_key('logfile'):
-            file = properties['logfile']
-            self.debug('Logging to %s' % file)
-            try:
-                self.resource.setLogfile(file)
-            except IOError, data:
-                raise errors.PropertiesError(
-                    'could not open log file %s for writing (%s)' % (
-                        file, data[1]))
 
         # check how to set client sync mode
         self.burst_on_connect = properties.get('burst_on_connect', False)
@@ -317,9 +301,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return '<MultifdSinkStreamer (%s)>' % self.name
 
     # UI code
-    def sendLog(self, message):
-        self.emit('log-message', message)
-
     def _checkUpdate(self):
         self._tenSecondCount -= 1
         if self.needsUpdate or self._tenSecondCount <= 0:

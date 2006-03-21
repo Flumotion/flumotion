@@ -124,9 +124,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         @param streamer: L{MultifdSinkStreamer}
         """
-        self._logfile = None
-        self._logfilename = None
-            
         streamer.connect('client-removed', self._streamer_client_removed_cb)
         self.streamer = streamer
         
@@ -141,6 +138,11 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         
         self.maxclients = -1
         
+        self.loggers = \
+            streamer.plugs['flumotion.component.plugs.loggers.Logger']
+        for logger in self.loggers:
+            logger.start(streamer)
+            
         web_resource.Resource.__init__(self)
 
     def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
@@ -155,20 +157,13 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def setRoot(self, path):
         self.putChild(path, self)
         
-    def setLogfile(self, logfilename):
-        self._logfilename = logfilename
-        self._logfile = open(logfilename, 'a')
-
-    def rotateLogfile(self):
+    def rotateLogs(self):
         """
         Close the logfile, then reopen using the previous logfilename
         """
-        self.debug('rotating log file %s' % self._logfile)
-
-        if self._logfile:
-            self._logfile.close()
-        if self._logfilename:
-            self.setLogfile(self._logfilename)
+        for logger in self.loggers:
+            self.debug('rotating logger %r' % logger)
+            logger.rotate()
             
     def setDomain(self, domain):
         """
@@ -190,35 +185,19 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             bytes_sent = -1
             time_connected = -1
 
-        # ip address
-        # ident
-        # authenticated name (from http header)
-        # date
-        # request
-        # request response
-        # bytes sent
-        # referer
-        # user agent
-        # time connected
-        ident = '-'
-        username = '-'
-        date = time.strftime('%d/%b/%Y:%H:%M:%S +0000', time.gmtime())
-        request_str = '%s %s %s' % (request.method,
-                                    request.uri,
-                                    request.clientproto)
-        response = request.code
-        referer = headers.get('referer', '-')
-        user_agent = headers.get('user-agent', '-')
-        format = "%s %s %s [%s] \"%s\" %d %d %s \"%s\" %d\n"
-        msg = format % (ip, ident, username, date, request_str,
-                        response, bytes_sent, referer, user_agent,
-                        time_connected)
-        # make streamer notify manager of this msg
-        self.streamer.sendLog(msg)
-        if not self._logfile:
-            return
-        self._logfile.write(msg)
-        self._logfile.flush()
+        args = {'ip': ip,
+                'time': time.gmtime(),
+                'method': request.method,
+                'uri': request.uri,
+                'clientproto': request.clientproto,
+                'response': request.code,
+                'bytes-sent': bytes_sent,
+                'referer': headers.get('referer', None),
+                'user-agent': headers.get('user-agent', None),
+                'time-connected': time_connected}
+
+        for logger in self.loggers:
+            logger.event('http_session_completed', args)
 
     def setUserLimit(self, limit):
         self.info('setting maxclients to %d' % limit)

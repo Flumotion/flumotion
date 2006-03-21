@@ -21,7 +21,6 @@
 
       <properties>
         <property name="port" type="int" />
-        <property name="logfile" type="string" />
         <property name="bouncer" type="string" />
         <property name="issuer" type="string" />
         <property name="mount_point" type="string" />

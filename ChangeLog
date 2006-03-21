@@ -1,5 +1,22 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py (HTTPMedium):
+	Remove code to do admin calls with logging information, that
+	should be implemented via a logger.
+	(HTTPMedium.remote_rotateLog): Call rotateLogs, not
+	rotateLogfile.
+	(MultifdSinkStreamer): No more log-message signal, or
+	logfile-related code.
+
+	* flumotion/component/consumers/httpstreamer/resources.py
+	(HTTPStreamingResource.__init__): Remove all logfile-specific
+	code, just use the loggers set from the plugs.
+	(HTTPStreamingResource.rotateLogs): Rename from rotateLogfiles,
+	will call rotate() on all loggers.
+	(HTTPStreamingResource.logWrite): Instead of generating a string,
+	pass a dict with all necessary information to all loggers via
+	event('http_session_completed').
+
 	* flumotion/launch/main.py (ComponentWrapper.__init__): Set up
 	config['plugs'] as the components expect it.
 
