@@ -1,5 +1,18 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.xml: Declare
+	that http-streamer supports the logger socket.
+
+	* flumotion/component/plugs/loggers.py: 
+	* flumotion/component/plugs/__init__.py: 
+	* flumotion/component/plugs/plugs.xml: 
+	* flumotion/component/plugs/Makefile.am: New files,
+	implementations of loggers. Plugs for the logger socket, if you
+	will.
+	
+	* configure.ac: 
+	* flumotion/component/Makefile.am: Update for new files.
+
 	* flumotion/launch/inspect.py (main): Add support for showing
 	plugs and sockets.
 

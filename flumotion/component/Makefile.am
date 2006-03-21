@@ -22,6 +22,7 @@ SUBDIRS = \
 	effects \
 	encoders \
 	muxers \
+	plugs \
 	producers
 
 EXTRA_DIST = $(component_DATA)
