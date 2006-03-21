@@ -70,12 +70,20 @@ def main(args):
         print '\nAvailable components:\n'
         for name, c in components:
             print '  %s' % name
+        plugs = [(p.getType(), p) for p in r.getPlugs()]
+        plugs.sort()
+        print '\nAvailable plugs:\n'
+        for name, p in plugs:
+            print '  %s' % name
         print
     elif len(args) == 2:
         cname = args[1]
+        handled = False
         if r.hasComponent(cname):
+            handled = True
             c = r.getComponent(cname)
-            print '\n%s' % cname
+            print '\nComponent:'
+            print '  %s' % cname
             print '\nSource:'
             print '  %s' % c.getSource()
             print '  in %s' % c.getBase()
@@ -111,9 +119,34 @@ def main(args):
                            % (k, v.getType(),
                               v.isRequired() and 'required' or 'optional',
                               v.isMultiple() and ', multiple ok' or ''))
-        else:
-            err('Unknown component `%s\'' % cname)
+            sockets = c.getSockets()
+            print '\nSockets:'
+            for socket in sockets:
+                print '  %s' % socket
+            print
+        if r.hasPlug(cname):
+            handled = True
+            p = r.getPlug(cname)
+            print '\nPlug:'
+            print '  %s' % cname
+            print '\nType:'
+            print '  %s' % p.getType()
+            print '\nEntry:'
+            e = p.getEntry()
+            print '  %s() in %s' % (e.getFunction(), e.getModuleName())
+            print '\nProperties:'
+            properties = [(x.getName(), x) for x in p.getProperties()]
+            properties.sort()
+            if properties:
+                for k, v in properties:
+                    print ('  %s: type %s, %s%s'
+                           % (k, v.getType(),
+                              v.isRequired() and 'required' or 'optional',
+                              v.isMultiple() and ', multiple ok' or ''))
+            print
+        if not handled:
+            err('Unknown component or plug `%s\'' % cname)
     else:
-        err('Usage: flumotion-inspect [COMPONENT]')
+        err('Usage: flumotion-inspect [COMPONENT-OR-PLUG]')
 
     return 0

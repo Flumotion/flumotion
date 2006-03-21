@@ -1,5 +1,8 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/inspect.py (main): Add support for showing
+	plugs and sockets.
+
 	* flumotion/common/registry.py (RegistryEntryComponent.__init__):
 	Add an initarg for a component to declare what sockets it
 	supports. Tell pychecker that's OK.
