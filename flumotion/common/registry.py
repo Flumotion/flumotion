@@ -498,8 +498,8 @@ class RegistryParser(fxml.Parser):
         entries = {}
         def addEntry(entry):
             if entry.getType() in entries:
-                raise XmlParserError("entry %s already specified"
-                                     % entry.getType())
+                raise fxml.ParserError("entry %s already specified"
+                                       % entry.getType())
             entries[entry.getType()] = entry
 
         parsers = {'entry': (self._parseEntry, addEntry)}
@@ -556,7 +556,7 @@ class RegistryParser(fxml.Parser):
         self.parseFromTable(node, parsers)
 
         if not entry.unbox():
-            raise XmlParserError("<plug> %s needs an <entry>" % type)
+            raise fxml.ParserError("<plug> %s needs an <entry>" % type)
 
         return RegistryEntryPlug(self.filename, type,
                                  socket, entry.unbox(), properties)
