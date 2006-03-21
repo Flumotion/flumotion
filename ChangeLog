@@ -1,5 +1,8 @@
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
+	* common/trial.mk (trial): Run trial without -R argument; seems to
+	make twisted 2.2 happy.
+
 	* flumotion/component/consumers/httpstreamer/http.xml: Remove
 	'gst-property' property from http-streamer; it's not implemented,
 	and would cause a bug if you set it. Also it's the only property

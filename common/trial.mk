@@ -3,7 +3,7 @@
 
 trial: rm-trial-test-log
 	@PYTHONPATH=$(top_srcdir):$(PYTHONPATH)				\
-		trial -R flumotion.test 2>&1		 		\
+		trial flumotion.test 2>&1		 		\
 		| tee trial.test.log;					\
 	if test $${PIPESTATUS[0]} -eq 0;				\
 	then 								\
