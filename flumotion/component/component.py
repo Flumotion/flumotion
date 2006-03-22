@@ -33,6 +33,7 @@ import gobject
 from twisted.internet import reactor, error, defer
 from twisted.cred import error as crederror
 from twisted.spread import pb
+from twisted.python import reflect
 
 from flumotion.common import interfaces, errors, log, planet, medium, pygobject
 from flumotion.common import componentui, common, registry
@@ -374,6 +375,11 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             reg = registry.getRegistry()
 
             def load_bundles():
+                if not self.medium:
+                    self.warning('Not connected to a medium, cannot '
+                                 'load bundles -- assuming all modules '
+                                 'are available')
+                    return defer.succeed(True)
                 modules = {}
                 for plugs in config['plugs'].values():
                     for plug in plugs:

@@ -82,7 +82,7 @@ class ApacheLogger(Logger):
     file = None
 
     def start(self, component):
-        self.filename = self.args['logfile']
+        self.filename = self.args['properties']['logfile']
         try:
             self.file = open(self.filename, 'a')
         except IOError, data:

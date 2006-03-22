@@ -1,5 +1,17 @@
 2006-03-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py: Refactor a bit to support adding plugs
+	to components via "/plugtype,plugprop=val,otherprop=val". Also fix
+	a couple of bugs caught by pychecker.
+
+	* flumotion/component/plugs/loggers.py (ApacheLogger.start):
+	Properly drill through the configuration structure.
+
+	* flumotion/component/component.py
+	(BaseComponent.setup.setup_plugs.load_bundles): Succeed even if we
+	have no medium, albeit with a warning -- this is the case when
+	using flumotion-launch, for example.
+
 	* flumotion/launch/main.py (sort_components): Use
 	dag.topological_sort.
 

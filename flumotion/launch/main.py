@@ -21,12 +21,11 @@
 
 import optparse
 import sys
-import time
 
 from twisted.python import reflect
 from twisted.internet import reactor, defer
 
-from flumotion.common import log, common, registry, dag
+from flumotion.common import log, common, registry, dag, errors
 from flumotion.twisted.defer import defer_generator
 
 def err(x):
@@ -41,7 +40,7 @@ def resolve_links(links, components):
         compreg = reg.getComponent(comptype)
         if link[1]:
             if not link[1] in compreg.getFeeders():
-                err('Component %s has no feeder named %s', (compname, link[1]))
+                err('Component %s has no feeder named %s' % (compname, link[1]))
             # leave link[1] unchanged
         else:
             if not compreg.getFeeders():
@@ -55,7 +54,7 @@ def resolve_links(links, components):
         eaters = compreg.getEaters()
         if link[3]:
             if not link[3] in [x.getName() for x in eaters]:
-                err('Component %s has no eater named %s', (compname, link[3]))
+                err('Component %s has no eater named %s' % (compname, link[3]))
             # leave link[1] unchanged
         else:
             if not eaters:
@@ -78,6 +77,7 @@ def parse_args(args):
     links = []
     components = []
     properties = {}
+    plugs = {}
 
     if not args:
         err('Usage: flumotion-launch COMPONENT [! COMPONENT]...')
@@ -85,6 +85,7 @@ def parse_args(args):
     # components: [(name, type), ...]
     # links: [(feedercomponentname, feeder, eatercomponentname, eater), ...]
     # properties: {componentname=>{prop=>value, ..}, ..}
+    # plugs: {componentname=>[(plugtype,{prop=>value, ..}), ...], ...}
 
     _names = {}
     def add_component(type):
@@ -93,6 +94,7 @@ def parse_args(args):
         name = '%s%d' % (type, i)
         components.append((name, type))
         properties[name] = {}
+        plugs[name] = []
         
     def last_component():
         return components[-1][0]
@@ -135,6 +137,21 @@ def parse_args(args):
             if not components:
                 err('Invalid grammar: `!\' without feeder component')
             link()
+        elif x[0] == '/':
+            # a plug
+            plugargs = x.split(',')
+            plug = plugargs.pop(0)[1:]
+            if link_tmp or not components:
+                err('Invalid grammar: Plug %s does not follow a component'
+                    % plug)
+            props = {}
+            for x in plugargs:
+                prop = x[:x.index('=')]
+                val = x[x.index('=')+1:]
+                if not prop or not val:
+                    err('Invalid plug property setting: %s' % x)
+                props[prop] = val
+            plugs[last_component()].append((plug, props))
         elif x.find('=') != -1:
             prop = x[:x.index('=')]
             val = x[x.index('=')+1:]
@@ -174,7 +191,55 @@ def parse_args(args):
 
     components = sort_components(links, components)
 
-    return components, links, properties
+    return components, links, properties, plugs
+
+def parse_properties(cname, strings, specs):
+    # cname: string, name of the component
+    # strings: {'name':'val', ...}
+    # specs: list of flumotion.common.registry.RegistryEntryProperties
+    def parse_fraction(v):
+        split = v.split('/')
+        assert len(split) == 2, \
+               "Fraction values should be in the form N/D"
+        return (int(split[0]), int(split[1]))
+
+    ret = {}
+    compprops = dict([(x.getName(), x) for x in specs])
+
+    for k, v in strings.items():
+        if k not in compprops:
+            err('Component %s has no such property `%s\'' % (cname, k))
+
+        t = compprops[k].getType()
+        parsers = {'int': int,
+                   'long': long,
+                   'float': float,
+                   'bool': bool,
+                   'string': str,
+                   'fraction': parse_fraction}
+
+        try:
+            parser = parsers[t]
+        except KeyError:
+            err('Unknown type `%s\' of property %s in component %s'
+                % (t, k, cname))
+
+        val = parser(v)
+
+        if compprops[k].isMultiple():
+            if not k in ret:
+                ret[k] = []
+            ret[k].append(val)
+        else:
+            ret[k] = val
+
+    for k, v in compprops.items():
+        if v.isRequired() and not k in ret:
+            err('Component %s missing required property `%s\' of type %s'
+                % (cname, k, v.getType()))
+
+    return ret
+
 
 # FIXME: this duplicates code from
 # flumotion.common.config.ConfigEntryComponent, among other things. If
@@ -189,7 +254,7 @@ class ComponentWrapper(object):
     component = None
     feeders = None
 
-    def __init__(self, name, type, properties, feeders):
+    def __init__(self, name, type, properties, feeders, plugs):
         self.name = name
         self.type = type
 
@@ -198,39 +263,12 @@ class ComponentWrapper(object):
             err('Unknown component type: %s' % type)
 
         c = r.getComponent(type)
-        compprops = dict([(p.getName(), p) for p in c.getProperties()])
-        config = {'name': name, 'properties':{}}
+        config = {'name': name}
         
         self.feeders = c.getFeeders()
 
-        for k, v in properties.items():
-            if k not in compprops.keys():
-                err('Component %s has no such property `%s\'' % (name, k))
-            t = compprops[k].getType()
-            if t == 'int':
-                val = int(v)
-            elif t == 'long':
-                val = long(v)
-            elif t == 'float':
-                val = float(v)
-            elif t == 'bool':
-                val = bool(v)
-            elif t == 'string':
-                val = str(v)
-            elif t == 'fraction':
-                split = v.split('/')
-                assert len(split) == 2, \
-                       "Fraction values should be in the form N/D"
-                val = (int(split[0]), int(split[1]))
-            else:
-                err('Unknown type `%s\' of property %s in component %s'
-                    % (t, k, name))
-            if compprops[k].isMultiple():
-                if not k in config['properties']:
-                    config['properties'][k] = []
-                config['properties'][k].append(val)
-            else:
-                config['properties'][k] = val
+        config['properties'] = parse_properties(name, properties,
+                                                c.getProperties())
 
         eaters = c.getEaters()
         if eaters:
@@ -250,10 +288,6 @@ class ComponentWrapper(object):
             if feeders:
                 err('Component %s can\'t feed from anything' % name)
             
-        for k, v in compprops.items():
-            if v.isRequired() and not k in config['properties']:
-                err('Component %s missing required property `%s\' of type %s'
-                    % (name, k, v.getType()))
         self.config = config
 
         # fixme: 'feed' is not strictly necessary in config
@@ -269,7 +303,20 @@ class ComponentWrapper(object):
         config['plugs'] = {}
         for socket in c.getSockets():
             config['plugs'][socket] = []
-        
+        for plugtype, plugprops in plugs:
+            if not r.hasPlug(plugtype):
+                err('Unknown plug type: %s' % plugtype)
+            spec = r.getPlug(plugtype)
+            socket = spec.getSocket()
+            if not socket in config['plugs']:
+                err('Cannot add plug %s to component %s: '
+                    'sockets of type %s not supported'
+                    % (plugtype, name, socket))
+            props = parse_properties(plugtype, plugprops, spec.getProperties())
+            plug = {'type': plugtype, 'socket': socket,
+                    'properties': props}
+            config['plugs'][socket].append(plug)
+                
         try:
             entry = c.getEntryByType('component')
         except KeyError:
@@ -397,13 +444,14 @@ def main(args):
     else:
         delay = 0.
 
-    components, links, properties = parse_args(args[1:])
+    components, links, properties, plugs = parse_args(args[1:])
 
     # load the modules, make the component
     wrappers = []
     for name, type in components:
         feeders = ['%s:%s' % (x[0], x[1]) for x in links if x[2] == name]
-        wrappers.append(ComponentWrapper(name, type, properties[name], feeders))
+        wrappers.append(ComponentWrapper(name, type, properties[name],
+                                         feeders, plugs[name]))
 
     # assign feed ports
     port = 7600
@@ -421,8 +469,7 @@ def main(args):
         reactor.stop()
     d.addErrback(errback)
 
-    if not reactor.failed:
-        print 'Running the reactor. Press Ctrl-C to exit.'
+    print 'Running the reactor. Press Ctrl-C to exit.'
 
     log.debug('launch', 'Starting reactor')
     reactor.run()
