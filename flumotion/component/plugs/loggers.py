@@ -19,78 +19,81 @@
 
 # Headers in this file shall remain intact.
 
-import os
 import time
-import errno
-import resource
 
-import gst
+from flumotion.common import errors, log
 
-try:
-    from twisted.web import http
-except ImportError:
-    from twisted.protocols import http
 
-from twisted.web import server, resource as web_resource
-from twisted.internet import reactor, defer
-from flumotion.configure import configure
-from flumotion.common import errors
-
-from flumotion.common import common, log, keycards
-
-class Logger:
+class Logger(log.Loggable):
+    """
+    Base class for logger implementations. Defines the logger API
+    methods.
+    """
     def __init__(self, args):
-        self.medium = None
-        self
-    def setMedium(self, medium):
-        self.medium = medium
-    def start(self):
+        self.args = args
+
+    def start(self, component):
         pass
-    def stop(self):
+
+    def stop(self, component):
         pass
-    def restart(self):
-        self.stop()
-        return self.start()
+
+    def restart(self, component):
+        self.stop(component)
+        self.start(component)
+
     def event(self, type, args):
         handler = getattr(self, 'event_' + type, None)
         if handler:
             handler(args)
 
-class RequestStringToAdminLogger(StreamLogger):
+def _http_session_completed_to_apache_log(args):
+    ident = '-'
+    username = '-'
+    date = time.strftime('%d/%b/%Y:%H:%M:%S +0000', args['time'])
+
+    return ("%s %s %s [%s] \"%s %s %s\" %d %d %s \"%s\" %d\n"
+            % (args['ip'], ident, username, date,
+               args['method'], args['uri'], args['clientproto'],
+               args['response'], args['bytes-sent'], args['referer'],
+               args['user-agent'], args['time-connected']))
+
+class RequestStringToAdminLogger(Logger):
+    """
+    Logger for passing apache-style request strings to the admin
+    """
+
     medium = None
     
-    def event_http_session_completed(self, args):
-        ident = '-'
-        username = '-'
-        date = time.strftime('%d/%b/%Y:%H:%M:%S +0000', args['time'])
+    def start(self, component):
+        self.medium = component.medium
 
+    def event_http_session_completed(self, args):
         if not self.medium:
-            self.warn('Told to send log messages to the admin, but no medium')
+            self.warning('Told to send log messages to the admin, '
+                         'but no medium')
 
-        msg = ("%s %s %s [%s] \"%s %s %s\" %d %d %s \"%s\" %d\n"
-               % (args['ip'], ident, username, date,
-                  args['method'], args['uri'], args['clientproto'],
-                  args['response'], args['bytes-sent'], args['referer'],
-                  args['user-agent'], args['time-connected']))
-        # make streamer notify manager of this msg
-        self.medium.sendLog(msg)
+        # notify admin of this msg via the manager
+        self.medium.callRemote('adminCallRemote', 'logMessage',
+                               _http_session_completed_to_apache_log(args))
         
-class ApacheLogger(StreamLogger):
-    def configure(self, **kwargs):
-        self.filename = kwargs['log-file-name']
-        
-    def start(self):
-        self.file = open()
+class ApacheLogger(Logger):
+    filename = None
+    file = None
+
+    def start(self, component):
+        self.filename = self.args['logfile']
+        try:
+            self.file = open(self.filename, 'a')
+        except IOError, data:
+            raise errors.PropertiesError('could not open log file %s '
+                                         'for writing (%s)'
+                                         % (self.filename, data[1]))
+
+    def stop(self, component):
+        self.file.close()
+        self.file = None
 
     def event_http_session_completed(self, args):
-        ident = '-'
-        username = '-'
-        date = time.strftime('%d/%b/%Y:%H:%M:%S +0000', args['time'])
-
-        msg = ("%s %s %s [%s] \"%s %s %s\" %d %d %s \"%s\" %d\n"
-               % (args['ip'], ident, username, date,
-                  args['method'], args['uri'], args['clientproto'],
-                  args['response'], args['bytes-sent'], args['referer'],
-                  args['user-agent'], args['time-connected']))
-        self.file.write(msg)
+        self.file.write(_http_session_completed_to_apache_log(args))
         self.file.flush()

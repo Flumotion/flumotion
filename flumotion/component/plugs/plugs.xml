@@ -8,6 +8,12 @@
         <property name="logfile" type="string" required="true"/>
       </properties>
     </plug>
+
+    <plug socket="flumotion.component.plugs.loggers.Logger"
+          type="requeststringtoadminlogger">
+      <entry location="flumotion/component/plugs/loggers.py"
+             function="RequestStringToAdminLogger"/>
+    </plug>
   </plugs>
 
   <bundles>

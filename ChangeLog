@@ -1,3 +1,13 @@
+2006-03-22  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/plugs/plugs.xml: Add the adminlogger via the
+	verbose "requeststringtoadminlogger" moniker.
+
+	* flumotion/component/plugs/loggers.py: 
+	(RequestStringToAdminLogger, ApacheLogger): Actually implement.
+	(Logger): Make start and stop take the component as an argument.
+	Allows e.g. the adminlogger to get the medium.
+
 2006-03-22  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/firewire/firewire.py:
