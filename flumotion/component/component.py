@@ -427,7 +427,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             for socket, plugs in self.plugs.items():
                 for plug in plugs:
                     self.debug('Starting plug %r on socket %s', plug, socket)
-                    plug.start(component)
+                    plug.start(self)
 
         start_plugs()
         ret = self.do_start(*args, **kwargs)
@@ -451,7 +451,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             for socket, plugs in self.plugs.items():
                 for plug in plugs:
                     self.debug('Stopping plug %r on socket %s', plug, socket)
-                    plug.stop(component)
+                    plug.stop(self)
             return ret
 
         self.setMood(moods.waking)

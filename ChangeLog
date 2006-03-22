@@ -1,5 +1,8 @@
 2006-03-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/component.py (BaseComponent.start.start_plugs) 
+	(BaseComponent.stop.stop_plugs): Fix errors caught by pychecker.
+
 	* flumotion/test/test.xml: Add a logger back to the
 	test_manager_manager test case.
 
