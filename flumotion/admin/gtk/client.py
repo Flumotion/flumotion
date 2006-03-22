@@ -239,6 +239,8 @@ class Window(log.Loggable, gobject.GObject):
     # FIXME: this method uses a file and a methodname as entries
     # FIXME: do we want to switch to imports instead so the whole file
     # is available in its namespace ?
+    # FIXME: factor this out into a ComponentView or SidePaneView class
+    # so we can reuse it
     def show_component(self, state, entryPath, fileName, methodName, data):
         """
         Show the user interface for this component.
