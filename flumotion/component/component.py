@@ -423,6 +423,13 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.setMood(moods.waking)
         self.startHeartbeat()
 
+        def start_plugs():
+            for socket, plugs in self.plugs.items():
+                for plug in plugs:
+                    self.debug('Starting plug %r on socket %s', plug, socket)
+                    plug.start(component)
+
+        start_plugs()
         ret = self.do_start(*args, **kwargs)
 
         assert isinstance(ret, defer.Deferred), \
@@ -440,12 +447,21 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         """
         self.debug('BaseComponent.stop')
 
+        def stop_plugs(ret):
+            for socket, plugs in self.plugs.items():
+                for plug in plugs:
+                    self.debug('Stopping plug %r on socket %s', plug, socket)
+                    plug.stop(component)
+            return ret
+
         self.setMood(moods.waking)
         for message in self.state.get('messages'):
             self.state.remove('messages', message)
         self.stopHeartbeat()
 
-        return self.do_stop()
+        d = self.do_stop()
+        d.addCallback(stop_plugs)
+        return d
 
     # FIXME: privatize
     def startHeartbeat(self):

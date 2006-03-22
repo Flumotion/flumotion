@@ -17,7 +17,12 @@
     <component name="streamer-ogg-theora" type="http-streamer" worker="streamer">
       <source>converter-ogg-theora</source>
       <property name="port">8800</property>
-      <!-- <property name="logfile">/tmp/ogg-test-theora.access.log</property> -->
+      <plugs>
+        <plug socket="flumotion.component.plugs.loggers.Logger"
+              type="apachelogger">
+          <property name="logfile">/tmp/ogg-test-theora.access.log</property>
+        </plug>
+      </plugs>
     </component>
   </flow>
 

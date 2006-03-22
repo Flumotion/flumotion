@@ -218,7 +218,8 @@ class FlumotionConfigXML(fxml.Parser):
             raise errors.UnknownComponentError(
                 "unknown component type: %s" % type)
         
-        possible_node_names = ['source', 'clock-master', 'property']
+        possible_node_names = ['source', 'clock-master', 'property',
+                               'plugs']
         for subnode in node.childNodes:
             if subnode.nodeType == Node.COMMENT_NODE:
                 continue
@@ -481,7 +482,7 @@ class FlumotionConfigXML(fxml.Parser):
         except KeyError:
             raise ConfigError("unknown plug type: %s" % type)
         
-        possible_node_names = ['properties']
+        possible_node_names = ['property']
         for subnode in node.childNodes:
             if (subnode.nodeType == Node.COMMENT_NODE
                 or subnode.nodeType == Node.TEXT_NODE):
@@ -508,10 +509,13 @@ class FlumotionConfigXML(fxml.Parser):
         for subnode in node.childNodes:
             if subnode.nodeName == 'plugs':
                 for subsubnode in subnode.childNodes:
+                    if (subsubnode.nodeType == Node.COMMENT_NODE
+                        or subsubnode.nodeType == Node.TEXT_NODE):
+                        continue
                     if subsubnode.nodeName != 'plug':
                         raise ConfigError("<plugs> should only contain "
                                           "<plug> subnodes")
-                    plug = self._parsePlug(subsubnode)
+                    plug = self._parsePlug(subsubnode, sockets)
                     plugs[plug['socket']].append(plug)
         return plugs
 

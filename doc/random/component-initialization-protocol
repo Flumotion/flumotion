@@ -52,6 +52,8 @@ returns the original deferred.
 BaseComponent.start(self, *args, **kwargs)
 ------------------------------------------
 Sets mood to waking.
+Must start any plugs specified in the config, which means calling their
+start() method.
 Invokes do_start(), which returns a deferred.
 Returns the deferred.
 
@@ -59,6 +61,7 @@ BaseComponent.stop(self)
 -------------------------
 Sets mood to waking.
 Invokes do_stop(), which returns a deferred.
+After the deferred fires, must stop all plugs.
 Returns the deferred.
 
 Interface

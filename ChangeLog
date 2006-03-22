@@ -1,5 +1,20 @@
 2006-03-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test.xml: Add a logger back to the
+	test_manager_manager test case.
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseComponent) 
+	(FlumotionConfigXML._parsePlug, FlumotionConfigXML._parsePlugs):
+	Fixes for parsing <plugs> sections in config XML files.
+
+	* flumotion/component/component.py (BaseComponent.start) 
+	(BaseComponent.stop): Start and stop plugs as appropriate.
+
+	* doc/random/component-initialization-protocol
+	(BaseComponent.start): start() on a component should start()
+	plugs.
+	(BaseComponent.stop): stop() on a component should stop() plugs.
+
 	* flumotion/component/plugs/plugs.xml: Add the adminlogger via the
 	verbose "requeststringtoadminlogger" moniker.
 
