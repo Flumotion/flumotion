@@ -271,3 +271,21 @@ class DAG:
 
         #print "done _dfs for object %r" % node.object
 
+def topological_sort(items, partial_order):
+    """
+    Perform topological sort.
+
+    @param items: list of items
+    @param partial_order: list of pairs. If pair (a,b) is in it, it
+    means that item a should appear before item b.
+    @returns: list of the items in one of the possible orders. Raises
+    DAG.CycleError if partial_order contains a loop.
+    """
+
+    graph = DAG()
+    for v in items:
+        graph.addNode(v)
+    for a,b in partial_order:
+        graph.addEdge(a, b)
+
+    return graph.sort()

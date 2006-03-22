@@ -1,5 +1,11 @@
 2006-03-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_dag.py (TestDAG.testSort): Add test for
+	topological_sort().
+
+	* flumotion/common/dag.py (topological_sort): New function to
+	provide functional interface to DAG code.
+
 	* flumotion/component/component.py (BaseComponent.start.start_plugs) 
 	(BaseComponent.stop.stop_plugs): Fix errors caught by pychecker.
 

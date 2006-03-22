@@ -26,6 +26,23 @@ from twisted.trial import unittest
 from flumotion.common import dag
 
 class TestDAG(unittest.TestCase):
+    def testSort(self):
+        nodes = ['a','b','c','d','e','f']
+        edges = [('a','f'),
+                 ('a','d'),
+                 ('f', 'e'),
+                 ('e','c'),
+                 ('d','b')]
+        orderings = [['a','f','e','c'],
+                     ['a','d','b']]
+        sorted = dag.topological_sort(nodes, edges)
+
+        for order in orderings:
+            positions = [sorted.index(x) for x in order]
+            positions_sorted = list(positions)
+            positions_sorted.sort()
+            self.failUnless(positions == positions_sorted)
+
     def testBible(self):
         graph = dag.DAG()
         
