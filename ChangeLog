@@ -1,3 +1,13 @@
+2006-03-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* pkgconfig/flumotion-uninstalled.pc.in:
+	* pkgconfig/flumotion.pc.in:
+	  build the Requires: line for the .pc file and use it
+	* common/pychecker.mk:
+	* flumotion/common/boot.py.in:
+	  use _010, not _10, we don't want people to think GStreamer 1.0 is out
+
 2006-03-22  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/main.py: Refactor a bit to support adding plugs

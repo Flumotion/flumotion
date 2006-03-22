@@ -30,9 +30,9 @@ GST_08_SUPPORTED = '@GST_08_SUPPORTED@'
 PYGST_08_DIR = '@PYGST_08_DIR@'
 PYGTK_08_REQ = '@PYGTK_08_REQ@'
 
-GST_10_SUPPORTED = '@GST_10_SUPPORTED@'
-PYGST_10_DIR = '@PYGST_10_DIR@'
-PYGTK_10_REQ = '@PYGTK_10_REQ@'
+GST_010_SUPPORTED = '@GST_010_SUPPORTED@'
+PYGST_010_DIR = '@PYGST_010_DIR@'
+PYGTK_010_REQ = '@PYGTK_010_REQ@'
 
 def init_gobject():
     """
@@ -70,15 +70,15 @@ def init_gst():
     is sane enough to be usable by us
     """
 
-    default_version = GST_10_SUPPORTED == 'yes' and '0.10' or '0.8'
+    default_version = GST_010_SUPPORTED == 'yes' and '0.10' or '0.8'
     gst_version = os.getenv('FLU_GST_VERSION', default_version)
 
     if gst_version == '0.8':
         pygst_dir = PYGST_08_DIR
         pygtk_req = PYGTK_08_REQ
     elif gst_version == '0.10':
-        pygst_dir = PYGST_10_DIR
-        pygtk_req = PYGTK_10_REQ
+        pygst_dir = PYGST_010_DIR
+        pygtk_req = PYGTK_010_REQ
     else:
         raise SystemExit(
             'ERROR: Invalid FLU_GST_VERSION: "%s" ("0.8" or "0.10" expected)'

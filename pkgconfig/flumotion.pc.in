@@ -5,5 +5,5 @@ flumotiondir=${libdir}/flumotion/python
 
 Name: Flumotion
 Description: Streaming media server
-Requires: gstreamer-0.8 >= @GST_08_REQ@
+@FLU_PKG_CONFIG_REQUIRES@
 Version: @VERSION@
