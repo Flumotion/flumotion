@@ -1,5 +1,8 @@
 2006-03-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py (sort_components): Use
+	dag.topological_sort.
+
 	* flumotion/test/test_dag.py (TestDAG.testSort): Add test for
 	topological_sort().
 
