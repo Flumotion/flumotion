@@ -1,6 +1,12 @@
 2006-03-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:
+	  bump the minor version number, this is the crazy development
+	  branch
+
+2006-03-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
 	* pkgconfig/flumotion-uninstalled.pc.in:
 	* pkgconfig/flumotion.pc.in:
 	  build the Requires: line for the .pc file and use it
