@@ -1,3 +1,8 @@
+2006-03-22  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/firewire/firewire.py:
+	No point displaying firewire bus reset message
+
 2006-03-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/plugs/loggers.py (ApacheLogger.start): Valid

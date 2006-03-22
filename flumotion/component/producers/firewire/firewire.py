@@ -187,17 +187,3 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                             id="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)
-            else:
-                
-                if s['nodecount']:
-                    id = "firewire-bus-reset-%d" % s['nodecount']
-                    m = messages.Warning(T_(N_(
-                        "Firewire bus has reset.  This usually happens when the " \
-                        "camera has disconnected or reconnected.")),
-                        id=id, priority=40)
-                    self.state.append('messages', m)
-                
-
-
-
-
