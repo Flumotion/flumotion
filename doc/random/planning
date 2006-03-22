@@ -26,11 +26,6 @@ Planned features for flumotion and what's needed to implement it
   - .exe installed as a discoverable package
   - wizard provides option and checks presence
 
-- component code transmitted before create
-  - rearranging of code layout
-  - divide into modules
-  - test
-
 - high-res slides in ogg streams
   - establish standard for media mapping for image format into ogg stream
   - implement GStreamer elements
@@ -87,25 +82,12 @@ Planned features for flumotion and what's needed to implement it
   - should allow management of local config files, planets, workers, ...
   - should allow management of manager-side planet config files
 
-- flumotion-admin helps set up manager and worker
-  - should allow you to create configs for manager and worker
-  - should allow you to start a manager and worker as the current user
-  - should allow you to set up authentication
-
-- flumotion-admin has login dialog
-  - allowing you to choose previous connection parameters
-
 - link help to manual
   - yelp can now read docbook raw
   - install our manual's docbook into a discoverable path
   - link to it from UI for explanation of concepts
 
 - unittest actual server setups
-
-- firewall
-  - write a pitcher and catcher component to punch through firewalls
-  - by reversing order and using tcpserversrc to a tcpclientsink
-  - figure out how this changes the DAG of the flow
 
 - network errors: feedcomponent losing connection to feeder
   - feedcomponent can regularly poll currently known connection parameters

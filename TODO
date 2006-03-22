@@ -102,10 +102,6 @@
 * EASY		add worker checks to all wizard steps now that infrastructure
 		is there
 
-* MEDIUM	refactor createComponent to be a real constructor
-
-* MEDIUM	make sure the entry point specified in xml is used instead
-
 * MEDIUM	when creating components in jobs, get the actual avatarId
 		in there in some other way than putting it in the config dict
 
@@ -130,6 +126,9 @@
 * MEDIUM	when a component segfaults, have the worker tell the manager
 		that the component segfaulted and make it sad; maybe even allow
 		attaching gdb and filing a bug report
+
+* HARD		clean up/refactor/document admin UI
+                + abstraction for better reuse
 
 - API cleanup:
 
