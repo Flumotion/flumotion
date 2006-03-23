@@ -8,6 +8,7 @@ flumotion_PYTHON = \
 	compat.py \
 	credentials.py \
 	defer.py \
+	fdserver.py \
 	flavors.py \
 	gtk2reactor.py \
 	pb.py \

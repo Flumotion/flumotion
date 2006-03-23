@@ -40,7 +40,8 @@ PYCHECKER_WHITELIST = \
 	    flumotion/component/*/*/*.py	\
 	    flumotion/wizard/*.py	 	\
 	    flumotion/admin/*/*.py		\
-	    flumotion/admin/*/*/*.py
+	    flumotion/admin/*/*/*.py		\
+	    flumotion/porter/*.py
 
 PYCHECKER_BLACKLIST = \
             flumotion/common/gstreamer.py	\

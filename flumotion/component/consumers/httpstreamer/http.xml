@@ -20,10 +20,19 @@
       </sockets>
 
       <properties>
-        <property name="port" type="int" />
+        <property name="type" type="string" />
         <property name="bouncer" type="string" />
         <property name="issuer" type="string" />
         <property name="mount_point" type="string" />
+
+        <!-- If type is 'master' (default) -->
+        <property name="port" type="int" />
+
+        <!-- If type is 'slave' -->
+        <property name="porter" type="string" />
+        <property name="porter_user" type="string" />
+        <property name="porter_pass" type="string" />
+
 	<!-- Hostname currently for display purposes -->
 	<property name="hostname" type="string" />
         <property name="domain" type="string" />

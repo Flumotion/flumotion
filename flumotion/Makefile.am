@@ -9,6 +9,7 @@ SUBDIRS = \
 	job \
 	launch \
 	manager \
+	porter \
 	project \
 	service \
 	test \

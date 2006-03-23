@@ -304,6 +304,7 @@ flumotion/extern/pytrayicon/Makefile
 flumotion/job/Makefile
 flumotion/launch/Makefile
 flumotion/manager/Makefile
+flumotion/porter/Makefile
 flumotion/project/Makefile
 flumotion/service/Makefile
 flumotion/test/Makefile

@@ -1,3 +1,38 @@
+2006-03-23  Michael Smith  <msmith@fluendo.com>
+
+	* Makefile.am:
+	* configure.ac:
+	* flumotion/Makefile.am:
+	  Add new porter directory Makefile, add to pychecker list
+
+	* flumotion/porter/Makefile.am:
+	* flumotion/porter/__init__.py:
+	* flumotion/porter/porterclient.py:
+	  Add porter client: all the code needed to attach to a porter server,
+	  hooking a (specified) factory to incoming FDs, and adding them to
+	  the reactor
+
+	* flumotion/extern/fdpass/Makefile.am:
+	* flumotion/extern/fdpass/__init__.py
+	* flumotion/extern/fdpass/fdpass.c: (writefds):
+	  Add package init.
+	  Change return value from fdpass.writefds()
+
+	* flumotion/test/common.py:
+	  Hack from thomas to make distcheck pass due to fdpass being built
+	  but the package init living elsewhere.
+	  
+	* flumotion/twisted/Makefile.am:
+	* flumotion/twisted/fdserver.py:
+	  Add fdserver: twisted methods for connecting to unix FDs and
+	  receiving appropriate fd-passing messages.
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  Add optional (untested, since we don't have a porter yet)
+	  configuration to use the httpstreamer as a master (normal) or slave
+	  (slaved to a porter). Defaults to master, which works as before.
+
 2006-03-23  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/registry.py (RegistryEntryComponent.__init__) 

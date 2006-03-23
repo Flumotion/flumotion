@@ -35,6 +35,9 @@ from flumotion.component import feedcomponent
 from flumotion.common import bundle, common, gstreamer, errors, pygobject
 from flumotion.common import messages
 
+from flumotion.twisted import fdserver
+from flumotion.porter import porterclient
+
 # proxy import
 from flumotion.component.component import moods
 from flumotion.common.pygobject import gsignal
@@ -242,7 +245,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # FIXME: do a .cancel on this Id somewhere
         self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
         
-        self.port = int(properties.get('port', 8800))
         mountPoint = properties.get('mount_point', '')
         if mountPoint.startswith('/'):
             mountPoint = mountPoint[1:]
@@ -296,6 +298,14 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         if self.config.has_key('avatarId'):
             self.resource.setRequesterName(self.config['avatarId'])
+
+        self.type = properties.get('type', 'master')
+        if self.type == 'slave':
+            self.porterPath = properties['porter']
+            self.porter_username = properties['porter_user']
+            self.porter_password = properties['porter_pass']
+        else:
+            self.port = int(properties.get('port', 8800))
 
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.name
@@ -435,7 +445,18 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         
         self.debug('Listening on %d' % self.port)
         try:
-            reactor.listenTCP(self.port, server.Site(resource=root))
+            if self.type == 'slave':
+                pbclient = porterclient.PorterClientFactory(
+                    self.porter_username, self.porter_password, 
+                    server.Site(resource=root))
+
+                reactor.connectWith(fdserver.FDConnector, self.porterPath,
+                    pbclient)
+
+                pbclient.registerPath(self.mountPoint)
+            else:
+                reactor.listenTCP(self.port, server.Site(resource=root))
+
             return feedcomponent.ParseLaunchComponent.do_start(self, *args,
                                                                **kwargs)
         except error.CannotListenError, e:

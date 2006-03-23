@@ -20,7 +20,7 @@
 
 /* fdpass.c:
  *
- * Simply python extension module to wrap sendmsg()/recvmsg() for sending
+ * Simple python extension module to wrap sendmsg()/recvmsg() for sending
  * and receiving file descriptors over sockets. 
  *
  * Several such extensions exist; they all seem to wrap the wrong subset of 
@@ -198,8 +198,7 @@ writefds(PyObject *self, PyObject *args)
     return PyErr_SetFromErrno(PyExc_RuntimeError);
   }
 
-  Py_INCREF(Py_None);
-  return Py_None;
+  return Py_BuildValue("i", ret);
 }
 
 static PyMethodDef methods[] = 

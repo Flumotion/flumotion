@@ -19,21 +19,3 @@
 
 # Headers in this file shall remain intact.
 
-import flumotion.common.setup
-# logging
-flumotion.common.setup.setup()
-
-from flumotion.common import log
-log.logTwisted()
-
-import os
-
-# fdpass is a built module,  so it lives in builddir, while the package
-# __init__ is in srcdir.  Append to its __path__ to make the tests work 
-i = os.getcwd().find('_build')
-if i > -1:
-    top_builddir = os.path.join(os.getcwd()[:i], '_build')
-    from flumotion.extern import fdpass
-    fdpass.__path__.append(os.path.join(top_builddir, 'flumotion', 'extern',
-        'fdpass'))
-
