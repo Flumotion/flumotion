@@ -1,0 +1,8 @@
+It's sometimes useful to be able to run some (but not all) jobs that a flumotion
+worker is running under valgrind.
+
+If you want to do this, run the worker with the environment variable
+FLU_VALGRIND_JOB set. It takes a comma-seperated list of component avatar IDs,
+and will run all of these under valgrind with the arguments
+ --leak-check=full --num-callers=24 --leak-resolution=high --show-reachable=yes
+

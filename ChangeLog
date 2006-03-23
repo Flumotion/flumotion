@@ -1,3 +1,10 @@
+2006-03-23  Michael Smith  <msmith@fluendo.com>
+
+	* doc/random/valgrind:
+	  Add a brief note on valgrinding jobs.
+	* flumotion/worker/worker.py:
+	  Commit patch from #332 to allow valgrinding specified jobs.
+
 2006-03-23  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py

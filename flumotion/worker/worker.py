@@ -421,12 +421,30 @@ class Kindergarten(log.Loggable):
                        "exist" % executable)
         # Evil FIXME: make argv[0] of the kid insult the user
         argv = [executable, avatarId, self._socketPath]
+
+        realexecutable = executable
+
+        # Run some jobs under valgrind, optionally. Would be nice to have the
+        # arguments to run it with configurable, but this'll do for now.
+        # FLU_VALGRIND_JOB takes a comma-seperated list of full component
+        # avatar IDs.
+        if os.environ.has_key('FLU_VALGRIND_JOB'):
+            jobnames = os.environ['FLU_VALGRIND_JOB'].split(',')
+            if avatarId in jobnames:
+                realexecutable = 'valgrind'
+                # We can't just valgrind flumotion-job, we have to valgrind
+                # python running flumotion-job, otherwise we'd need 
+                # --trace-children (not quite sure why), which we don't want
+                argv = ['valgrind', '--leak-check=full', '--num-callers=24', 
+                    '--leak-resolution=high', '--show-reachable=yes', 
+                    'python'] + argv
+
         childFDs={0:0, 1:1, 2:2}
         env={}
         env.update(os.environ)
         # FIXME: publicize log._FLU_DEBUG ?
         env['FLU_DEBUG'] = log._FLU_DEBUG
-        process = reactor.spawnProcess(p, executable, env=env, args=argv,
+        process = reactor.spawnProcess(p, realexecutable, env=env, args=argv,
             childFDs=childFDs)
 
         p.setPid(process.pid)
