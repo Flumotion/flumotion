@@ -140,8 +140,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         
         self.loggers = \
             streamer.plugs['flumotion.component.plugs.loggers.Logger']
-        for logger in self.loggers:
-            logger.start(streamer)
             
         web_resource.Resource.__init__(self)
 

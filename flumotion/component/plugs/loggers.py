@@ -21,6 +21,8 @@
 
 import time
 
+from twisted.python import reflect
+
 from flumotion.common import errors, log
 
 
@@ -97,3 +99,51 @@ class ApacheLogger(Logger):
     def event_http_session_completed(self, args):
         self.file.write(_http_session_completed_to_apache_log(args))
         self.file.flush()
+
+class DatabaseLogger(Logger):
+    module = None
+    connection = None
+    operation = None
+    sql_template = ("insert into %s (ip, session_time, session_duration, "
+                    "session_bytes, user_agent, referrer) "
+                    "values (%%s, %%s, %%s, %%s, %%s, %%s)")
+    sql = None
+
+    translators = {'MySQLdb': {'password': 'passwd',
+                               'database': 'db'}}
+
+    def start(self, component):
+        props = self.args['properties']
+
+        modulename = props['database-module']
+        module = reflect.namedModule(modulename)
+
+        translator = self.translators.get(modulename, {})
+
+        kwargs = {}
+        for k in ('user', 'password', 'host', 'port', 'connect-timeout',
+                  'database'):
+            if k in props:
+                kwargs[translator.get(k,k)] = props[k]
+        c = module.connect(**kwargs)
+
+        self.sql = self.sql_template % props.get('table', 'stream')
+        self.module = module
+        self.connection = c
+        self.cursor = c.cursor()
+
+    def stop(self, component):
+        self.cursor.close()
+        self.cursor = None
+        self.connection.close()
+        self.connection = None
+        self.module = None
+
+    def event_http_session_completed(self, args):
+        self.cursor.execute(self.sql,
+                            (args['ip'],
+                             self.module.Timestamp(*args['time'][:6]),
+                             args['time-connected'],
+                             args['bytes-sent'],
+                             args['user-agent'],
+                             args['referer']))

@@ -1,3 +1,16 @@
+2006-03-23  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py
+	(HTTPStreamingResource.__init__): Don't start loggers here, the
+	core does it for us.
+
+	* flumotion/component/plugs/plugs.xml: Declare databaselogger and
+	its properties.
+
+	* flumotion/component/plugs/loggers.py (DatabaseLogger): New class
+	to log directly to a database that supports the python database
+	API version 2.0.
+
 2006-03-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:

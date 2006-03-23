@@ -14,6 +14,22 @@
       <entry location="flumotion/component/plugs/loggers.py"
              function="RequestStringToAdminLogger"/>
     </plug>
+
+    <plug socket="flumotion.component.plugs.loggers.Logger" type="databaselogger">
+      <entry location="flumotion/component/plugs/loggers.py"
+             function="DatabaseLogger"/>
+
+      <properties>
+        <property name="database-module" type="string" required="True"/>
+        <property name="table" type="string"/>
+        <property name="user" type="string"/>
+        <property name="password" type="string"/>
+        <property name="host" type="string"/>
+        <property name="port" type="int"/>
+        <property name="connect-timeout" type="int"/>
+        <property name="database" type="string"/>
+      </properties>
+    </plug>
   </plugs>
 
   <bundles>
