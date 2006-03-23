@@ -375,11 +375,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             reg = registry.getRegistry()
 
             def load_bundles():
-                if not self.medium:
-                    self.warning('Not connected to a medium, cannot '
-                                 'load bundles -- assuming all modules '
-                                 'are available')
-                    return defer.succeed(True)
                 modules = {}
                 for plugs in config['plugs'].values():
                     for plug in plugs:
@@ -390,6 +385,11 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                     modules[plugtype] = entry.getModuleName()
                 if not modules:
                     return defer.succeed(True) # shortcut
+                else if not self.medium:
+                    self.warning('Not connected to a medium, cannot '
+                                 'load bundles -- assuming all modules '
+                                 'are available')
+                    return defer.succeed(True)
                 else:
                     loader = self.medium.bundleLoader
                     return loader.getBundles(moduleName=modules.values())
