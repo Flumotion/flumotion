@@ -57,7 +57,7 @@ class RegistryEntryComponent:
         @param entries:    dict of type -> entry
         @type entries:     dict of str -> L{RegistryEntryEntry}
         @param sockets:    list of sockets supported by the element
-        @type sockets:     list of L{RegistryEntrySocket}
+        @type sockets:     list of str
         """
         self.filename = filename
         self.type = type
@@ -308,9 +308,6 @@ class RegistryEntryEater:
     def getMultiple(self):
         return self.multiple
     
-class RegistryEntrySocket(str):
-    pass
-
 class RegistryParser(fxml.Parser):
     """
     Registry parser
@@ -470,7 +467,7 @@ class RegistryParser(fxml.Parser):
         # returns: RegistryEntrySocket
 
         type, = self.parseAttributes(node, ('type',))
-        return RegistryEntrySocket(type)
+        return type
 
     def _parseSockets(self, node):
         # <sockets>

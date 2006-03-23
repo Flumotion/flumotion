@@ -1,5 +1,9 @@
 2006-03-23  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/registry.py (RegistryEntryComponent.__init__) 
+	(RegistryParser._parseSocket): Make sockets just instances of str,
+	fixes jellying issue.
+
 	* flumotion/common/config.py (FlumotionConfigXML._parsePlug) 
 	(FlumotionConfigXML._parsePlugs): Correct comments.
 
