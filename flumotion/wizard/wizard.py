@@ -203,7 +203,7 @@ class Wizard(GladeWindow, log.Loggable):
     def on_realize(self, window):
         # have to get the style from the theme, but it's not really
         # there until it's attached
-        style = self.window.get_style()
+        style = self.eventbox_top.get_style()
         bg = style.bg[gtk.STATE_SELECTED]
         fg = style.fg[gtk.STATE_SELECTED]
         self.eventbox_top.modify_bg(gtk.STATE_NORMAL, bg)

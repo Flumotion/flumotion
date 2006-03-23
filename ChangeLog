@@ -1,5 +1,10 @@
 2006-03-23  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/wizard.py (Wizard.on_realize): Get the style
+	from the eventbox, not the window. Fixes two-tone wizard border in
+	ubuntu dapper. Doesn't fix the orange color but that is an
+	upstream bug. This one should probably be fixed in 0.2 as well.
+
 	* flumotion/component/component.py
 	(BaseComponent.setup.setup_plugs.load_bundles): Only warn if we
 	are actually going to be loading up plugs. This will still warn if
