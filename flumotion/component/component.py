@@ -385,7 +385,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                     modules[plugtype] = entry.getModuleName()
                 if not modules:
                     return defer.succeed(True) # shortcut
-                else if not self.medium:
+                elif not self.medium:
                     self.warning('Not connected to a medium, cannot '
                                  'load bundles -- assuming all modules '
                                  'are available')
