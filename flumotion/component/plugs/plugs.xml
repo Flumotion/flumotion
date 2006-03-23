@@ -21,6 +21,7 @@
 
       <properties>
         <property name="database-module" type="string" required="True"/>
+        <property name="feed-name" type="string"/>
         <property name="table" type="string"/>
         <property name="user" type="string"/>
         <property name="password" type="string"/>

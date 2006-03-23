@@ -101,12 +101,28 @@ class ApacheLogger(Logger):
         self.file.flush()
 
 class DatabaseLogger(Logger):
+    """
+    Plug to log events directly to a python DB-API v2.0 logging module.
+
+    Example schema that will work with this logger:
+    CREATE TABLE 'access' (
+       'feed_name' varchar(32) default NULL,
+       'ip' varchar(15) default NULL,
+       'session_time' datetime default NULL,
+       'session_duration' int(15) default NULL,
+       'session_bytes' int(15) default NULL,
+       'user_agent' varchar(30) default NULL,
+       'referrer' varchar(30) default NULL,
+    );
+    """
+
     module = None
     connection = None
     operation = None
-    sql_template = ("insert into %s (ip, session_time, session_duration, "
-                    "session_bytes, user_agent, referrer) "
-                    "values (%%s, %%s, %%s, %%s, %%s, %%s)")
+    feed_id = None
+    sql_template = ("insert into %s (feed_name, ip, session_time, "
+                    "session_duration, session_bytes, user_agent, referrer) "
+                    "values (%%s, %%s, %%s, %%s, %%s, %%s, %%s)")
     sql = None
 
     translators = {'MySQLdb': {'password': 'passwd',
@@ -127,7 +143,8 @@ class DatabaseLogger(Logger):
                 kwargs[translator.get(k,k)] = props[k]
         c = module.connect(**kwargs)
 
-        self.sql = self.sql_template % props.get('table', 'stream')
+        self.sql = self.sql_template % props.get('table', 'default')
+        self.feed_name = props.get('feed-name', None)
         self.module = module
         self.connection = c
         self.cursor = c.cursor()
@@ -141,7 +158,8 @@ class DatabaseLogger(Logger):
 
     def event_http_session_completed(self, args):
         self.cursor.execute(self.sql,
-                            (args['ip'],
+                            (self.feed_name,
+                             args['ip'],
                              self.module.Timestamp(*args['time'][:6]),
                              args['time-connected'],
                              args['bytes-sent'],

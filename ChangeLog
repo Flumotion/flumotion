@@ -1,3 +1,15 @@
+2006-03-23  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/plugs/loggers.py (DatabaseLogger): Add
+	example schema.
+	(DatabaseLogger.start): Change default table to be named "access".
+	Parse out feed-name from the properties.
+	(DatabaseLogger.sql_template) 
+	(DatabaseLogger.event_http_session_completed): Insert the
+	feed_name as well.
+
+	* flumotion/component/plugs/plugs.xml: Add feed-name property.
+
 2006-03-23  Michael Smith  <msmith@fluendo.com>
 
 	* doc/random/valgrind:
