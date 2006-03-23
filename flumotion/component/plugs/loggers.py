@@ -143,7 +143,7 @@ class DatabaseLogger(Logger):
                 kwargs[translator.get(k,k)] = props[k]
         c = module.connect(**kwargs)
 
-        self.sql = self.sql_template % props.get('table', 'default')
+        self.sql = self.sql_template % props.get('table', 'access')
         self.feed_name = props.get('feed-name', None)
         self.module = module
         self.connection = c
