@@ -1,5 +1,12 @@
 2006-03-23  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/config.py (FlumotionConfigXML._parsePlug) 
+	(FlumotionConfigXML._parsePlugs): Correct comments.
+
+	* flumotion/test/test_config.py (TestConfig.testParseNoPlugs) 
+	(TestConfig.testParsePlugs): Add a couple tests for the config
+	parser wrt plugs.
+
 	* flumotion/wizard/wizard.py (Wizard.on_realize): Get the style
 	from the eventbox, not the window. Fixes two-tone wizard border in
 	ubuntu dapper. Doesn't fix the orange color but that is an

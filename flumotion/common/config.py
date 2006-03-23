@@ -471,6 +471,8 @@ class FlumotionConfigXML(fxml.Parser):
             return None
             
     def _parsePlug(self, node, sockets):
+        # <plug socket=... type=...>
+        #   <property>
         socket, type = self.parseAttributes(node, ('socket', 'type'))
 
         if not socket in sockets:
@@ -498,8 +500,7 @@ class FlumotionConfigXML(fxml.Parser):
 
     def _parsePlugs(self, node, sockets):
         # <plugs>
-        #  <plug socket=... type=...>
-        #   <properties>
+        #  <plug>
         # returns: dict of socket -> list of plugs
         # where a plug is 'type'->str, 'socket'->str,
         #  'properties'->dict of properties

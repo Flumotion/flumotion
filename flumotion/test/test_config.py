@@ -38,6 +38,9 @@ regchunk = """
         <property name="six" type="long"/>
         <property name="seven" type="fraction"/>
       </properties>
+      <sockets>
+        <socket type="foo.bar"/>
+      </sockets>
     </component>
     <component type="test-component-sync">
       <synchronization required="true" />
@@ -46,6 +49,14 @@ regchunk = """
       <synchronization required="true" clock-priority="130"/>
     </component>
   </components>
+  <plugs>
+    <plug socket="foo.bar" type="frobulator">
+      <entry location="bar/baz.py" function="Frobulator"/>
+      <properties>
+        <property name="rate" type="fraction" required="true"/>
+      </properties>
+    </plug>
+  </plugs>
 </registry>"""
 
 reg = registry.getRegistry()
@@ -271,6 +282,46 @@ class TestConfig(unittest.TestCase):
         # should be none -- no master in a pipeline that doesn't need
         # synchronization
         self.assertEquals(conf['clock-master'], None)
+
+    def testParsePlugs(self):
+        planet = config.FlumotionConfigXML(None,
+             """<planet><flow name="default">
+             <component name="component-name" type="test-component">
+               <plugs>
+                 <plug socket="foo.bar" type="frobulator">
+                   <property name="rate">3/4</property>
+                 </plug>
+               </plugs>
+             </component></flow>
+             </planet>""")
+        self.failIf(planet.flows)
+
+        planet.parse()
+        flow = planet.flows[0]
+        component = flow.components['component-name']
+        conf = component.getConfigDict()
+        plugs = conf['plugs']
+        self.assertEquals(plugs.keys(), ['foo.bar'])
+        foobars = plugs['foo.bar']
+        self.assertEquals(len(foobars), 1)
+        self.assertEquals(foobars[0],
+                          {'socket': 'foo.bar',
+                           'type': 'frobulator',
+                           'properties': {'rate': (3, 4)}})
+
+    def testParseNoPlugs(self):
+        planet = config.FlumotionConfigXML(None,
+             """<planet><flow name="default">
+             <component name="component-name" type="test-component">
+             </component></flow>
+             </planet>""")
+        self.failIf(planet.flows)
+
+        planet.parse()
+        flow = planet.flows[0]
+        component = flow.components['component-name']
+        conf = component.getConfigDict()
+        self.assertEquals(conf['plugs'], {'foo.bar': []})
 
     def testClockMasterAutoSelection(self):
         planet = config.FlumotionConfigXML(None,
