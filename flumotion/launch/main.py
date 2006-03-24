@@ -345,55 +345,77 @@ class ComponentWrapper(object):
     def start(self, eatersdata, feedersdata, clocking):
         return self.component.start(eatersdata, feedersdata, clocking)
 
-def DeferredDelay(time):
+    def stop(self):
+        return self.component.stop()
+
+def DeferredDelay(time, val):
     d = defer.Deferred()
-    reactor.callLater(time, d.callback, None)
+    reactor.callLater(time, d.callback, val)
     return d
 
 def start_components(wrappers, feed_ports, links, delay):
     # figure out the links and start the components
 
     # first phase: instantiation and setup
-    d = defer.DeferredList([wrapper.instantiate() for wrapper in wrappers])
-    yield d
-    results = d.value()
-    success = True
-    for result, wrapper in zip(results, wrappers):
-        if not result[0]:
-            print ("Component %s failed to start, reason: %r"
-                   % (wrapper, result[1]))
-            success = False
-    if not success:
-        raise errors.ComponentStartError()
+    def got_results(results):
+        success = True
+        for result, wrapper in zip(results, wrappers):
+            if not result[0]:
+                print ("Component %s failed to start, reason: %r"
+                       % (wrapper, result[1]))
+                success = False
+        if not success:
+            raise errors.ComponentStartError()
 
-    # second phase: clocking
-    need_sync = [(x.config['clock-master'], x) for x in wrappers
-                 if x.config['clock-master'] is not None]
-    need_sync.sort()
-    need_sync = [x[1] for x in need_sync]
+    def choose_clocking(unused):
+        # second phase: clocking
+        need_sync = [(x.config['clock-master'], x) for x in wrappers
+                     if x.config['clock-master'] is not None]
+        need_sync.sort()
+        need_sync = [x[1] for x in need_sync]
 
-    if need_sync:
-        master = need_sync.pop(0)
-        print "Telling", master.name, "to provide the master clock."
-        clocking = master.provideMasterClock(7600 - 1) # hack!
+        if need_sync:
+            master = need_sync.pop(0)
+            print "Telling", master.name, "to provide the master clock."
+            clocking = master.provideMasterClock(7600 - 1) # hack!
+            return need_sync, clocking
+        else:
+            return None, None
 
-    # third phase: start() in order
-    for wrapper in wrappers:
-        eatersdata = [('%s:%s' % (x[0], x[1]), 'localhost', feed_ports[x[0]][x[1]])
+    def add_delay(val):
+        if delay:
+            print 'Delaying component startup by %f seconds...' % delay
+            return DeferredDelay(delay, val)
+        else:
+            return defer.succeed(val)
+
+    def do_start(synchronization, wrapper):
+        need_sync, clocking = synchronization
+        eatersdata = [('%s:%s' % (x[0], x[1]), 'localhost',
+                       feed_ports[x[0]][x[1]])
                       for x in links if x[2] == wrapper.name]
         feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost', p)
                        for x, p in feed_ports[wrapper.name].items()]
-        if delay:
-            print 'Delaying component startup by %f seconds...' % delay
-            yield DeferredDelay(delay)
-            
+
         # start it up, with clocking data only if it needs it
         d = wrapper.start(eatersdata, feedersdata,
                           wrapper in need_sync and clocking or None)
-        yield d
-        d.value()
-        print "%s started" % wrapper.name
-start_components = defer_generator(start_components)
+        d.addCallback(lambda val: synchronization)
+        return d
+
+    def do_stop(failure):
+        for wrapper in wrappers:
+            wrapper.stop()
+        return failure
+
+    d = defer.DeferredList([wrapper.instantiate() for wrapper in wrappers])
+    d.addCallback(got_results)
+    d.addCallback(choose_clocking)
+    for wrapper in wrappers:
+        d.addCallback(add_delay)
+        d.addCallback(do_start, wrapper)
+    d.addErrback(do_stop)
+    return d
 
 def main(args):
     from flumotion.common import setup
@@ -463,17 +485,29 @@ def main(args):
             print '%s:%s feeds on port %d' % (wrapper.name, feeder, port)
             port += 1
     
+    reactor.running = False
+    reactor.failure = False
+    reactor.callLater(0, lambda: setattr(reactor, 'running', True))
+
     d = start_components(wrappers, feed_ports, links, delay)
     def errback(failure):
-        print "Error occurred, stopping reactor."
-        reactor.stop()
+        print "Error occurred: %s" % failure.getErrorMessage()
+        failure.printDetailedTraceback()
+        reactor.failure = True
+        if reactor.running:
+            print "Stopping reactor."
+            reactor.stop()
     d.addErrback(errback)
 
-    print 'Running the reactor. Press Ctrl-C to exit.'
+    if not reactor.failure:
+        print 'Running the reactor. Press Ctrl-C to exit.'
 
-    log.debug('launch', 'Starting reactor')
-    reactor.run()
+        log.debug('launch', 'Starting reactor')
+        reactor.run()
 
-    log.debug('launch', 'Reactor stopped')
+        log.debug('launch', 'Reactor stopped')
 
-    return 0
+    if reactor.failure:
+        return 1
+    else:
+        return 0

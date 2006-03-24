@@ -404,9 +404,12 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                         instance = proc(plug)
                         self.plugs[socket].append(instance)
 
-            d = load_bundles()
-            d.addCallback(lambda x: make_plugs())
-            return d
+            try:
+                d = load_bundles()
+                d.addCallback(lambda x: make_plugs())
+                return d
+            except Exception, e:
+                return defer.fail(e)
 
         self._setConfig(config)
         d = setup_plugs()
@@ -435,15 +438,15 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                     self.debug('Starting plug %r on socket %s', plug, socket)
                     plug.start(self)
 
-        start_plugs()
-        ret = self.do_start(*args, **kwargs)
-
-        assert isinstance(ret, defer.Deferred), \
-               "do_start must return a deferred"
-
-        self.debug('start: returning value %s' % ret)
-
-        return ret
+        try:
+            start_plugs()
+            ret = self.do_start(*args, **kwargs)
+            assert isinstance(ret, defer.Deferred), \
+                   "do_start must return a deferred"
+            self.debug('start: returning value %s' % ret)
+            return ret
+        except Exception, e:
+            return defer.fail(e)
         
     def stop(self):
         """

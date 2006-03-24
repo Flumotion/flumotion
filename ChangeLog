@@ -1,3 +1,21 @@
+2006-03-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py (BaseComponent.setup.setup_plugs) 
+	(BaseComponent.start): Properly handle errors when loading and
+	starting plugs.
+
+	* flumotion/component/plugs/loggers.py (DatabaseLogger.stop): Make
+	able to be called more than once.
+
+	* flumotion/launch/main.py (start_components): Rework so as not to
+	be a defer generator; defer generators are not appropriate if an
+	exception can be thrown immediately.
+	(main): Rework so as not to run the reactor if there is an error.
+	(DeferredDelay): Pass through the value in the callback.
+	(ComponentWrapper.stop): New method, stops the components if there
+	is an error. Prevents a segfault when exiting due to a startup
+	error.
+
 2006-03-23  Michael Smith  <msmith@fluendo.com>
 
 	* Makefile.am:
@@ -34,6 +52,10 @@
 	  (slaved to a porter). Defaults to master, which works as before.
 
 2006-03-23  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/component.py
+	(BaseComponent.start, BaseComponent.setup.setup_plugs): Handle
+	errors when making plugs.
 
 	* flumotion/common/registry.py (RegistryEntryComponent.__init__) 
 	(RegistryParser._parseSocket): Make sockets just instances of str,

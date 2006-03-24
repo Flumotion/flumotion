@@ -120,6 +120,7 @@ class DatabaseLogger(Logger):
     connection = None
     operation = None
     feed_id = None
+    cursor = None
     sql_template = ("insert into %s (feed_name, ip, session_time, "
                     "session_duration, session_bytes, user_agent, referrer) "
                     "values (%%s, %%s, %%s, %%s, %%s, %%s, %%s)")
@@ -150,10 +151,12 @@ class DatabaseLogger(Logger):
         self.cursor = c.cursor()
 
     def stop(self, component):
-        self.cursor.close()
-        self.cursor = None
-        self.connection.close()
-        self.connection = None
+        if self.cursor:
+            self.cursor.close()
+            self.cursor = None
+        if self.connection:
+            self.connection.close()
+            self.connection = None
         self.module = None
 
     def event_http_session_completed(self, args):
