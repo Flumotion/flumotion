@@ -127,7 +127,8 @@ class DatabaseLogger(Logger):
     sql = None
 
     translators = {'MySQLdb': {'password': 'passwd',
-                               'database': 'db'}}
+                               'database': 'db'},
+                   'flumotion.extern.SQuaLe': {'database': 'connection_name'}}
 
     def start(self, component):
         props = self.args['properties']

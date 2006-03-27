@@ -1,5 +1,13 @@
 2006-03-27  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/extern/SQuaLe.py (Cursor._set_result): Only get the
+	result's data if it was an operation that returns a result set.
+	This fixes non-select calls like INSERT operations.
+
+	* flumotion/component/plugs/loggers.py
+	(DatabaseLogger.translators): Make the 'database' plug property
+	map to 'connection_name' for SQuaLe.
+
 	* flumotion/extern/Makefile.am (flumotion_PYTHON): Add SQuaLe to
 	the makefile.
 

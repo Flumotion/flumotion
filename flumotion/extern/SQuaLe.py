@@ -128,7 +128,10 @@ class Cursor:
     def _set_result(self, r):
         self.description = [(name, STRING, None, None, None, None, None)
                             for name in r.get_column_names()]
-        self.data = r.get_data()
+        if r.get_status() == squale.RESULT_RESULTSET:
+            self.data = r.get_data()
+        else:
+            self.data = []
         self.index = 0
         self.rowcount = len(self.data)
         
