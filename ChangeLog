@@ -1,3 +1,9 @@
+2006-03-27  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	  Make mouseovers over stream url link work, also add right click
+	  context menu for stream url link
+
 2006-03-27  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/extern/SQuaLe.py (Cursor._set_result): Only get the

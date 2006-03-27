@@ -124,21 +124,73 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             self.statistics.show_all()
 
         # add signal handler for Stream URL only if we have gnomevfs
+        # also signal handler to notify when mouse has gone over label
+        # so cursor changes
+        # add popup menu to let you open url or copy link location
+        
         if self._hasgnomevfs:
             streamurl_widget_eventbox = self.wtree.get_widget('eventbox-stream-url')
-            streamurl_widget_eventbox.connect('button-release-event', self._stream_url_clicked)
+            streamurl_widget_eventbox.connect('button-press-event', self._streamurl_clicked)
+            streamurl_widget_eventbox.connect('enter-notify-event', self._streamurl_enter)
+            streamurl_widget_eventbox.connect('leave-notify-event', self._streamurl_leave)
+            self._streamurl_popupmenu = gtk.Menu()
+            item = gtk.ImageMenuItem('_Open Link')
+            image = gtk.Image()
+            image.set_from_stock(gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_MENU)
+            item.set_image(image)
+            item.show()
+            item.connect('activate', self._streamurl_openlink, streamurl_widget_eventbox)
+            self._streamurl_popupmenu.add(item)
+            item = gtk.ImageMenuItem('Copy _Link Address')
+            image = gtk.Image()
+            image.set_from_stock(gtk.STOCK_COPY, gtk.ICON_SIZE_MENU)
+            item.set_image(image)
+            item.show()
+            item.connect('activate', self._streamurl_copylink, streamurl_widget_eventbox)
+            self._streamurl_popupmenu.add(item)
+            
         return self.statistics
 
-    # signal handler for stream url
-    def _stream_url_clicked(self, widget, event):
+    # signal handler for button press on stream url
+    def _streamurl_clicked(self, widget, event):
         # check if left click
-        if event.type == gtk.gdk.BUTTON_RELEASE and event.button == 1:
+        if event.button == 1:
             url = widget.get_children()[0].get_text()
             import gnomevfs
             app_to_run = gnomevfs.mime_get_default_application(self._stats.get('stream-mime'))
             if app_to_run:
                 os.system("%s %s &" % (app_to_run[2],url))
+        elif event.button == 3:
+            self._streamurl_popupmenu.popup(None, None, None, event.button, event.time)
+        
+    # signal handler for open link menu item activation
+    # eventbox is the eventbox that contains the label the url is in
+    def _streamurl_openlink(self, widget, eventbox):
+        url = eventbox.get_children()[0].get_text()
+        import gnomevfs
+        app_to_run = gnomevfs.mime_get_default_application(self._stats.get('stream-mime'))
+        if app_to_run:
+            os.system("%s %s &" % (app_to_run[2],url))
 
+    # signal handler for copy link menu item activation
+    # eventbox is the eventbox that contains the label the url is in
+    def _streamurl_copylink(self, widget, eventbox):
+        url = eventbox.get_children()[0].get_text()
+        clipboard = gtk.Clipboard()
+        clipboard.set_text(url)
+
+    # motion event handles
+    def _streamurl_enter(self, widget, event):
+        cursor = gtk.gdk.Cursor(widget.get_display(), gtk.gdk.HAND2)
+        window = widget.get_root_window()
+        window.set_cursor(cursor)
+            
+    def _streamurl_leave(self, widget, event):
+        window = widget.get_root_window()
+        window.set_cursor(None)
+            
+    
+    
 class LogAdminGtkNode(BaseAdminGtkNode):
     logCategory = 'logadmin'
 
