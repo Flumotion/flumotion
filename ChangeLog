@@ -1,3 +1,11 @@
+2006-03-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/extern/Makefile.am (flumotion_PYTHON): Add SQuaLe to
+	the makefile.
+
+	* flumotion/extern/SQuaLe.py: New file, implements a PEP-249
+	interface for SQuaLe (squale.sourceforge.net).
+
 2006-03-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/component.py (BaseComponent.setup.setup_plugs) 
