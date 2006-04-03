@@ -1,3 +1,10 @@
+2006-04-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/main.py:
+	* flumotion/worker/worker.py:
+	  fix for #345 - only trigger a create failed if the avatarId still
+	  has a pending create deferred.
+
 2006-03-27  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
@@ -580,7 +587,7 @@
 
 	* flumotion/test/test_worker_worker.py:
 	* flumotion/worker/worker.py:
-	  make sure that jobs that crash or dont start properly get reported
+	  make sure that jobs that crash or don't start properly get reported
 	  as ComponentCreateErrors so components go sad rather than the
 	  manager continually thinking component is starting
 

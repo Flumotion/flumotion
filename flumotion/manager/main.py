@@ -304,7 +304,13 @@ def main(args):
 
     # go into the reactor main loop
     log.info('manager', 'Started manager "%s"' % options.name)
-    reactor.run()
+
+    # let SystemError be handled normally, without exiting or tracebacking
+    try:
+        reactor.run()
+    except:
+        print "THOMAS WAS HERE"
+        raise
 
     # we exited, so we're done
     if options.daemonize:

@@ -190,10 +190,10 @@ class WorkerMedium(medium.BaseMedium):
         try:
             result = d.value()
         except errors.ComponentCreateError, e:
-            self.debug('deferred create for %s failed, forwarding error' %
+            self.debug('create deferred for %s failed, forwarding error' %
                 avatarId)
             raise
-        self.debug('deferred create for %s succeeded (%r)'
+        self.debug('create deferred for %s succeeded (%r)'
                    % (avatarId, result))
         yield result
     remote_create = defer_generator_method(remote_create)
@@ -356,17 +356,19 @@ class JobProcessProtocol(protocol.ProcessProtocol):
                 if os.path.exists(corepath):
                     kg.info("Core file is probably %s" % corepath)
 
-            # we need to send trigger a defer failure if job has received a 
-            # signal before job has logged into worker.  Otherwise manager still
-            # thinks its starting up but its dead
-            # If job has attached to the worker the createComponent defer will
-            # have already been triggered
+            # we need to trigger a failure on the create deferred 
+            # if the job received a signal before logging in to the worker;
+            # otherwise the manager still thinks it's starting up when it's
+            # dead.  If the job already attached to the worker however,
+            # the create deferred will already have callbacked.
             
-            msg = "Component '%s' has received signal %d.  This is sometimes " \
-                "triggered by a corrupt GStreamer registry." % (self.avatarId, signum)
+            msg = "Component '%s' has received signal %d.  " \
+                  "This is sometimes triggered by a corrupt " \
+                  "GStreamer registry." % (self.avatarId, signum)
             
-            kg.workerBrain.deferredCreateFailed(self.avatarId, 
-                errors.ComponentCreateError(msg))
+            if kg.workerBrain.deferredCreateRegistered(self.avatarId):
+                kg.workerBrain.deferredCreateFailed(self.avatarId, 
+                    errors.ComponentCreateError(msg))
 
         self.setPid(None)
         
@@ -606,6 +608,7 @@ class WorkerBrain(log.Loggable):
             raise errors.ComponentAlreadyStartingError(avatarId)
 
         d = defer.Deferred()
+        self.debug('registering deferredCreate for %s' % avatarId)
         self._createDeferreds[avatarId] = d
         return d
 
@@ -616,7 +619,7 @@ class WorkerBrain(log.Loggable):
         """
         self.debug('triggering create deferred for %s' % avatarId)
         if not avatarId in self._createDeferreds.keys():
-            self.warning('No deferred create registered for %s' % avatarId)
+            self.warning('No create deferred registered for %s' % avatarId)
             return
 
         d = self._createDeferreds[avatarId]
@@ -629,13 +632,21 @@ class WorkerBrain(log.Loggable):
         Notify the caller that a create has failed, and remove the create
         from the list of pending creates.
         """
-        self.debug('deferred create failed for %s' % avatarId)
-        assert avatarId in self._createDeferreds.keys()
+        self.debug('create deferred failed for %s' % avatarId)
+        if not avatarId in self._createDeferreds.keys():
+            self.warning('No create deferred registered for %s' % avatarId)
+            return
 
         d = self._createDeferreds[avatarId]
         del self._createDeferreds[avatarId]
         d.errback(exception)
- 
+
+    def deferredCreateRegistered(self, avatarId):
+        """
+        Check if a deferred create has been registered for the given avatarId.
+        """
+        return avatarId in self._createDeferreds.keys()
+  
 class JobDispatcher:
     """
     I am a Realm inside the worker for forked jobs to log in to.
