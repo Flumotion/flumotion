@@ -20,7 +20,7 @@
         <property name="height" type="int" />
         <property name="width" type="int" />
         <property name="framerate" type="fraction" />
-	<property name="location" type="string" />
+	<property name="location" type="string" required="yes" />
       </properties>
     </component>
   </components>
