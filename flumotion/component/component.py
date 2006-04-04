@@ -540,8 +540,17 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         This gets serialized through the manager and multiplexed to all
         admin clients, and from there on to all views connected to each
         admin client model.
+
+        Because there can be any number of admin clients that this call
+        will go out do, it does not make sense to have one return value.
+        This function will return None always.
         """
-        self.medium.callRemote("adminCallRemote", methodName, *args, **kwargs)
+        if self.medium:
+            self.medium.callRemote("adminCallRemote", methodName,
+                                   *args, **kwargs)
+        else:
+            self.debug('asked to adminCallRemote(%s), but we are not '
+                       'connected to a manager. ignoring call.')
 
     # private methods
     def _setConfig(self, config):
