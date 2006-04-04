@@ -1,6 +1,7 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.plugs.loggers.Logger" type="apachelogger">
+    <plug socket="flumotion.component.plugs.loggers.Logger"
+          type="apachelogger">
       <entry location="flumotion/component/plugs/loggers.py"
              function="ApacheLogger"/>
 
@@ -15,7 +16,8 @@
              function="RequestStringToAdminLogger"/>
     </plug>
 
-    <plug socket="flumotion.component.plugs.loggers.Logger" type="databaselogger">
+    <plug socket="flumotion.component.plugs.loggers.Logger"
+          type="databaselogger">
       <entry location="flumotion/component/plugs/loggers.py"
              function="DatabaseLogger"/>
 

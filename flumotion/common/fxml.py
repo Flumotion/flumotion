@@ -77,10 +77,11 @@ class Parser(log.Loggable):
         not be parsed.
 
         @param filename: The path to the file to parse.
-        @type filename: str or None.
-        @param string: An in-memory string to parse, defaults to None.
-        If you set this, a string will be parsed instead of a file.
-        @type string: str of None.
+        @type  filename: str or None.
+        @param string:   An in-memory string to parse, defaults to None.
+                         If you set this, a string will be parsed instead
+                         of a file.
+        @type  string:   str of None.
         """
         assert filename or string
         try:

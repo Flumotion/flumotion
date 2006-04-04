@@ -53,11 +53,14 @@ class RegistryEntryComponent:
                  entries, eaters, feeders, needs_sync, clock_priority,
                  sockets):
         """
-        @type properties:  dict of str -> L{RegistryEntryProperty}
-        @param entries:    dict of type -> entry
-        @type entries:     dict of str -> L{RegistryEntryEntry}
+        @param filename:   name of the XML file this component is parsed from
+        @type  filename:   str
+        @param properties: dict of name -> property
+        @type  properties: dict of str -> L{RegistryEntryProperty}
+        @param entries:    dict of entry point type -> entry
+        @type  entries:    dict of str -> L{RegistryEntryEntry}
         @param sockets:    list of sockets supported by the element
-        @type sockets:     list of str
+        @type  sockets:    list of str
         """
         self.filename = filename
         self.type = type
@@ -136,13 +139,22 @@ class RegistryEntryComponent:
 
 class RegistryEntryPlug:
     """
-    I represent an <plug> entry in the registry
+    I represent a <plug> entry in the registry
     """
 
     def __init__(self, filename, type, socket, entry, properties):
         """
-        @type properties:  dict of str -> L{RegistryEntryProperty}
-        @type entry:     L{RegistryEntryEntry}
+        @param filename:   name of the XML file this plug is parsed from
+        @type  filename:   str
+        @param type:       the type of plug
+        @type  type:       str
+        @param socket:     the fully qualified class name of the socket this
+                           plug can be plugged in to
+        @type  socket:     str
+        @param entry:      entry point for instantiating the plug
+        @type  entry:      L{RegistryEntryEntry}
+        @param properties: properties of the plug
+        @type  properties: dict of str -> L{RegistryEntryProperty}
         """
         self.filename = filename
         self.type = type
@@ -319,7 +331,7 @@ class RegistryParser(fxml.Parser):
     use parseRegistryFile.
 
     I also have a list of all components and directories which the
-    directory use (instead of saving its own copy)
+    registry uses (instead of saving its own copy)
     """
     
     def __init__(self):
@@ -387,15 +399,17 @@ class RegistryParser(fxml.Parser):
             for prop in base.getProperties():
                 properties[prop.getName()] = prop
 
-        parsers = {'source': (self._parseSource, source.set),
-                   'properties': (self._parseProperties, properties.update),
-                   'files': (self._parseFiles, files.extend),
-                   'entries': (self._parseEntries, entries.update),
-                   'eater': (self._parseEater, eaters.append),
-                   'feeder': (self._parseFeeder, feeders.append),
-                   'synchronization': (self._parseSynchronization,
-                                       synchronization.set),
-                   'sockets': (self._parseSockets, sockets.extend)}
+        parsers = {
+            'source':          (self._parseSource, source.set),
+            'properties':      (self._parseProperties, properties.update),
+            'files':           (self._parseFiles, files.extend),
+            'entries':         (self._parseEntries, entries.update),
+            'eater':           (self._parseEater, eaters.append),
+            'feeder':          (self._parseFeeder, feeders.append),
+            'synchronization': (self._parseSynchronization,
+                                synchronization.set),
+            'sockets':         (self._parseSockets, sockets.extend),
+        }
 
         self.parseFromTable(node, parsers)
 
@@ -464,7 +478,7 @@ class RegistryParser(fxml.Parser):
 
     def _parseSocket(self, node):
         # <socket type=""/>
-        # returns: RegistryEntrySocket
+        # returns: str of the type
 
         type, = self.parseAttributes(node, ('type',))
         return type
