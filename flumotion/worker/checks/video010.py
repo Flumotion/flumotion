@@ -179,8 +179,20 @@ def check1394(id):
                 gerror.message, debug))
             if gerror.domain == "gst-resource-error-quark":
                 if gerror.code == int(gst.RESOURCE_ERROR_NOT_FOUND):
+                    # dv1394src was fixed after gst-plugins-good 0.10.2
+                    # to distinguish NOT_FOUND and OPEN_READ
+                    version = gstreamer.get_plugin_version('1394')
+                    if version >= "0.10.0" and version <= "0.10.2":
+                        m = messages.Error(T_(
+                            N_("Could not find or open the Firewire device. "
+                               "Check the device node and its permissions.")))
+                    else:
+                        m = messages.Error(T_(
+                            N_("No Firewire device found.")))
+                elif gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ):
                     m = messages.Error(T_(
-                        N_("No Firewire device found.")))
+                        N_("Could not open Firewire device for reading. "
+                           "Check permissions on the device.")))
 
             if not m:
                 m = check.handleGStreamerDeviceError(failure, 'Firewire')

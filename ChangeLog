@@ -1,3 +1,11 @@
+2006-04-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/checks/video010.py:
+	* flumotion/worker/checks/video08.py:
+	  Distinguish between "can't open firewire device" and
+	  "permissions are wrong", if 1394 plugin is new enough.
+	  Fixes #350.
+
 2006-04-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/producers/firewire/firewire.py

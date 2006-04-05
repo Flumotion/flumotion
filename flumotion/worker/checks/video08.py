@@ -178,6 +178,10 @@ def check1394(id=None):
                 if gerror.code == int(gst.RESOURCE_ERROR_NOT_FOUND):
                     m = messages.Error(T_(
                         N_("No Firewire device found.")))
+                elif gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ):
+                    m = messages.Error(T_(
+                        N_("Could not open Firewire device for reading. "
+                           "Check permissions on the device.")))
 
             if not m:
                 m = check.handleGStreamerDeviceError(failure, 'Firewire')
