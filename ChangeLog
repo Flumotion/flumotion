@@ -1,3 +1,8 @@
+2006-04-05  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/producers/checks.py:
+	  Check for pygtk 2.8.6 instead of 2.8.5
+
 2006-04-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/component.py

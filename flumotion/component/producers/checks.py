@@ -39,14 +39,14 @@ def checkPyGTK():
     # Really, we want to check for pygobject_version, but that doesn't exist in
     # all versions of pygtk, and this check is sufficient.
     (major, minor, nano) = gobject.pygtk_version
-    if (major, minor, nano) < (2, 8, 5):
+    if (major, minor, nano) < (2, 8, 6):
         m = messages.Warning(T_(
             N_("Version %d.%d.%d of the PyGTK library contains a memory leak.\n"), 
             major, minor, nano),
             id = 'pygtk-check')
         m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of " 
             "memory as a result, and need to be restarted frequently.\n")))
-        m.add(T_(N_("Please upgrade PyGTK to version 2.8.5")))
+        m.add(T_(N_("Please upgrade PyGTK to version 2.8.6")))
         result.add(m)
 
     result.succeed(None)
