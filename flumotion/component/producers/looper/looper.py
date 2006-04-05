@@ -33,7 +33,7 @@ class LooperMedium(feedcomponent.FeedComponentMedium):
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
     def remote_gimme5(self, text):
-        return self.comp.restart_looping()
+        return self.comp.do_seek()
 
     def remote_getNbIterations(self):
         return self.comp.nbiterations
@@ -42,6 +42,16 @@ class LooperMedium(feedcomponent.FeedComponentMedium):
         return self.comp.fileinformation
 
 
+# How to start the first segment:
+# 1) Make your pipeline, but don't link the sinks
+# 2) Block the source pads of what would be the sinks' peers
+# 3) When both block functions fire, link the pads, then do a segment seek
+# 4) Then you can unblock pads and the sinks will receive exactly one
+# new segment with all gst versions
+#
+# To loop a segment, when you get the segment_done message
+# asynchronously, just do a new segment seek.
+
 class Looper(feedcomponent.ParseLaunchComponent):
 
     component_medium_class = LooperMedium
@@ -49,9 +59,20 @@ class Looper(feedcomponent.ParseLaunchComponent):
     def init(self):
         self.initial_seek = False
         self.nbiterations = 0
-        self.discovered = False
         self.fileinformation = None
         self.timeoutid = 0
+        self.pads_awaiting_block = []
+        self.pads_to_link = []
+
+    def do_check(self):
+        def on_result(result):
+            for m in result.messages:
+                self.addMessage(m)
+
+        from flumotion.component.producers import checks
+        d = checks.checkTicket349()
+        d.addCallback(on_result)
+        return d
 
     def get_pipeline_string(self, properties):
         # setup the properties
@@ -68,97 +89,99 @@ class Looper(feedcomponent.ParseLaunchComponent):
 
         vcaps = gst.Caps(vstruct)
         
-        try:
-            from gst.extend import discoverer
-        except ImportError:
-            raise errors.ComponentError(
-                'Could not import gst.extend.discoverer.  '
-                'You need at least GStreamer Python Bindings 0.10.1')
+        self.run_discoverer()
 
-        self.discoverer = discoverer.Discoverer(self.filelocation)
-        self.discoverer.connect('discovered', self._filediscovered)
-        self.discoverer.discover()
-
-        # create the component
         template = (
             'filesrc location=%(location)s'
             '       ! oggdemux name=demux'
-            '    demux. ! theoradec name=theoradec'
+            '    demux. ! queue ! theoradec name=theoradec'
             '       ! identity name=videolive single-segment=true silent=true'
             '       ! videorate name=videorate'
             '       ! videoscale'
             '       ! %(vcaps)s'
-            '       ! queue ! identity name=vident sync=true silent=true ! @feeder::video@'
-            '    demux. ! vorbisdec name=vorbisdec ! identity name=audiolive single-segment=true silent=true'
+            '       ! identity name=vident sync=true silent=true ! @feeder::video@'
+            '    demux. ! queue ! vorbisdec name=vorbisdec'
+            '       ! identity name=audiolive single-segment=true silent=true'
             '       ! audioconvert'
             '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
-            '       ! queue ! identity name=aident sync=true silent=true ! @feeder::audio@'
+            '       ! identity name=aident sync=true silent=true ! @feeder::audio@'
             % dict(location=self.filelocation, vcaps=vcaps))
 
         return template
 
-    def _filediscovered(self, discoverer, ismedia):
-        self.discovered = True
-        info = {}
-        info["location"] = self.filelocation
-        info["duration"] = max(discoverer.audiolength, discoverer.videolength)
-        if discoverer.is_audio:
-            info["audio"] = "%d channel(s) %dHz" % (discoverer.audiochannels,
-                                                    discoverer.audiorate)
-        if discoverer.is_video:
-            info["video"] = "%d x %d at %d/%d fps" % (discoverer.videowidth,
-                                                      discoverer.videoheight,
-                                                      discoverer.videorate.num,
-                                                      discoverer.videorate.denom)
-        self.fileinformation = info
-        self.adminCallRemote("haveFileInformation", info)
+    def run_discoverer(self):
+        def discovered(d, ismedia):
+            info = {}
+            info["location"] = self.filelocation
+            info["duration"] = max(d.audiolength, d.videolength)
+            if d.is_audio:
+                info["audio"] = "%d channel(s) %dHz" % (d.audiochannels,
+                                                        d.audiorate)
+            if d.is_video:
+                info["video"] = "%d x %d at %d/%d fps" % (d.videowidth,
+                                                          d.videoheight,
+                                                          d.videorate.num,
+                                                          d.videorate.denom)
+            self.fileinformation = info
+            self.adminCallRemote("haveFileInformation", info)
 
-    def _message_cb(self, bus, message):
-        self.debug('received message %r' % message)
-        if message.type == gst.MESSAGE_ERROR:
-            gerror, debug = message.parse_error()
-            if gerror.domain == 'gst-resource-error-quark' and \
-                gerror.code == gst.RESOURCE_ERROR_NOT_FOUND:
-                m = messages.Error(
-                    T_(N_("Could not open looper file '%s' for reading."), 
-                        self.filelocation),
-                        id = 'looper-error')
-                self.addMessage(m)
-                return
-        if message.src == self.pipeline and message.type == gst.MESSAGE_SEGMENT_DONE:
-            # let's looooop again :)
-            self.debug("sending segment seek again")
-            self.nbiterations += 1
-            self.oggdemux.seek(1.0, gst.FORMAT_TIME, gst.SEEK_FLAG_SEGMENT,
-                               gst.SEEK_TYPE_SET, 0, gst.SEEK_TYPE_END, 0)
-            self.adminCallRemote("numberIterationsChanged", self.nbiterations)
-        elif message.src == self.oggdemux and message.type == gst.MESSAGE_STATE_CHANGED:
-            gst.debug("got state changed on oggdemux")
-            old, new, pending = message.parse_state_changed()
-            if old == gst.STATE_NULL and new == gst.STATE_READY and not self.initial_seek:
-                # initial segment seek
-                gst.debug("send initial seek")
-                self.oggdemux.seek(1.0, gst.FORMAT_TIME, gst.SEEK_FLAG_SEGMENT | gst.SEEK_FLAG_FLUSH,
-                                   gst.SEEK_TYPE_SET, 0, gst.SEEK_TYPE_END, 0)
-                self.initial_seek = True
-        elif message.src == self.pipeline and message.type == gst.MESSAGE_STATE_CHANGED:
-            old, new, pending = message.parse_state_changed()
-            if new == gst.STATE_PLAYING:
-                self.debug("Starting time update timeout")
-                if not self.timeoutid:
-                    self.timeoutid = gobject.timeout_add(500, self._check_time)
+        from gst.extend import discoverer
+        d = discoverer.Discoverer(self.filelocation)
+        d.connect('discovered', discovered)
+        d.discover()
+ 
+    def on_segment_done(self):
+        self.do_seek(False)
+        self.nbiterations += 1
+        self.adminCallRemote("numberIterationsChanged", self.nbiterations)
+        
+    def on_pads_blocked(self):
+        for src, sink in self.pads_to_link:
+            src.link(sink)
+        self.do_seek(True)
+        for src, sink in self.pads_to_link:
+            src.set_blocked_async(False, lambda *x: None)
+        self.pads_to_link = []
+        self.nbiterations = 0
+        self.adminCallRemote("numberIterationsChanged", self.nbiterations)
+        
+    def configure_pipeline(self, pipeline, properties):
+        def on_message(bus, message):
+            handlers = {(pipeline, gst.MESSAGE_SEGMENT_DONE): 
+                        self.on_segment_done,
+                        (pipeline, gst.MESSAGE_APPLICATION):
+                        self.on_pads_blocked}
 
-    def _check_time(self):
-        self.log("checking position")
-        try:
-            pos, format = self.pipeline.query_position(gst.FORMAT_TIME)
-        except:
-            self.debug("position query didn't succeed")
-        else:
-            self.adminCallRemote("haveUpdatedPosition", pos)
-        return True
+            if (message.src, message.type) in handlers:
+                handlers[(message.src, message.type)]()
+            
+        self.oggdemux = pipeline.get_by_name("demux")
 
-    def restart_looping(self):
+        for name in 'aident', 'vident':
+            def blocked(x, is_blocked):
+                if not x in self.pads_awaiting_block:
+                    return
+                self.pads_awaiting_block.remove(x)
+                if not self.pads_awaiting_block:
+                    s = gst.Structure('pads-blocked')
+                    m = gst.message_new_application(pipeline, s)
+                    # marshal to the main thread
+                    pipeline.post_message(m)
+
+            e = pipeline.get_by_name(name)
+            src = e.get_pad('src')
+            sink = src.get_peer()
+            src.unlink(sink)
+            src.set_blocked_async(True, blocked)
+            self.pads_awaiting_block.append(src)
+            self.pads_to_link.append((src, sink))
+
+        self.bus = pipeline.get_bus()
+        self.bus.add_signal_watch()
+
+        self.bus.connect('message', on_message)
+
+    def do_seek(self, flushing):
         """
         Restarts the looping.
         
@@ -166,35 +189,32 @@ class Looper(feedcomponent.ParseLaunchComponent):
         Returns False otherwiser
         """
         self.debug("restarting looping")
-        return self.oggdemux.seek(1.0, gst.FORMAT_TIME, gst.SEEK_FLAG_SEGMENT,
+        flags = gst.SEEK_FLAG_SEGMENT | (flushing and gst.SEEK_FLAG_FLUSH or 0)
+        return self.oggdemux.seek(1.0, gst.FORMAT_TIME, flags,
                                   gst.SEEK_TYPE_SET, 0, gst.SEEK_TYPE_END, 0)
 
-    def _probe(self, element, buffer, detail):
-        if isinstance(buffer, gst.Buffer):
-            self.debug("%s: [%s -- %s]" % (detail,
-                                           gst.TIME_ARGS(buffer.timestamp),
-                                           gst.TIME_ARGS(buffer.timestamp + buffer.duration)))
-        else:
-            self.debug("%s: EVENT %s" % (detail, buffer))
-        return True
+    def do_start(self, *args, **kwargs):
+        def check_time():
+            self.log("checking position")
+            try:
+                pos, format = self.pipeline.query_position(gst.FORMAT_TIME)
+            except:
+                self.debug("position query didn't succeed")
+            else:
+                self.adminCallRemote("haveUpdatedPosition", pos)
+            return True
 
-    def configure_pipeline(self, pipeline, properties):
-        self.oggdemux = pipeline.get_by_name("demux")
+        def on_start(result):
+            if not self.timeoutid:
+                self.timeoutid = gobject.timeout_add(500, check_time)
+            return result
 
-        self.bus = pipeline.get_bus()
-        self.bus.add_signal_watch()
-        self.bus.connect('message', self._message_cb)
-        self.nbiterations = 0
+        d = feedcomponent.ParseLaunchComponent.do_start(self, *args, **kwargs)
+        d.addCallback(on_start)
 
-        # fire-and-forget: we ignore the deferred we get
-        self.adminCallRemote("numberIterationsChanged", 0)
-
-    def do_stop(self):
-        d = feedcomponent.ParseLaunchComponent.do_stop(self)
-        d.addCallback(self._do_stopCallback)
         return d
 
-    def _do_stopCallback(self, result):
+    def do_stop(self):
         if self.bus:
             self.bus.remove_signal_watch()
             self.bus = None
@@ -204,3 +224,5 @@ class Looper(feedcomponent.ParseLaunchComponent):
             self.timeoutid = 0
 
         self.nbiterations = 0
+
+        return feedcomponent.ParseLaunchComponent.do_stop(self)

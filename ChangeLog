@@ -1,3 +1,29 @@
+2006-04-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/producers/firewire/firewire.py
+	(Firewire.do_check):
+	* flumotion/component/producers/soundcard/soundcard.py
+	(Soundcard.do_check): Update for check function name changes.
+
+	* flumotion/component/producers/looper/looper.py: Rewrite to do
+	the first segment seek from blocked pads instead of via an
+	asynchronous message to the bus. Fixes some race conditions.
+	Requires new GStreamer core and gst-python.
+
+	* flumotion/component/producers/checks.py
+	(checkTicket347, checkTicket348): Rename from checkPyGTK and
+	checkPyGST, because they test for specific bugs. See #347 and
+	#348.
+	(checkTicket349): New check, fixes #349 along with updates to
+	looper.
+
+	* flumotion/component/feedcomponent010.py
+	(FeedComponent.bus_watch_func): When we get an error message, post
+	it at the warning level.
+
+	* flumotion/component/component.py
+	(BaseComponent.adminCallRemote): More debugging.
+
 2006-04-05  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/producers/checks.py:

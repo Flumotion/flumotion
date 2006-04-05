@@ -212,8 +212,8 @@ class FeedComponent(basecomponent.BaseComponent):
                     self.emit('feed-ready', feed_name, True)
         elif t == gst.MESSAGE_ERROR:
             gerror, debug = message.parse_error()
-            self.debug('element %s error %s %s' %
-                       (src.get_path_string(), gerror, debug))
+            self.warning('element %s error %s %s' %
+                         (src.get_path_string(), gerror, debug))
             self.setMood(moods.sad)
             # generate a unique id
             id = "%s-%s-%d" % (self.name, gerror.domain, gerror.code)
@@ -367,6 +367,9 @@ class FeedComponent(basecomponent.BaseComponent):
         
         base_time = clock.get_time()
         self.pipeline.set_base_time(base_time)
+
+        self.debug('provided master clock from %r, base time %s'
+                   % (clock, gst.TIME_ARGS(base_time)))
 
         # FIXME: this is always localhost, no ? Not sure if this is useful
         ip = self.state.get('ip')

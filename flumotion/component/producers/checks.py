@@ -27,7 +27,19 @@ from flumotion.common import gstreamer, messages
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
-def checkPyGTK():
+def get_gst_version(gst):
+    if hasattr(gst, 'get_gst_version'):
+        return gst.get_gst_version()
+    else:
+        return gst.version() + (0,)
+    
+def get_pygst_version(gst):
+    if hasattr(gst, 'get_pygst_version'):
+        return gst.get_pygst_version()
+    else:
+        return gst.pygst_version + (0,)
+    
+def checkTicket347():
     """
     Check for a recent enough PyGTK to not leak python integers in message 
     processing (mostly affects soundcard, firewire)
@@ -43,7 +55,7 @@ def checkPyGTK():
         m = messages.Warning(T_(
             N_("Version %d.%d.%d of the PyGTK library contains a memory leak.\n"), 
             major, minor, nano),
-            id = 'pygtk-check')
+            id = 'ticket-347')
         m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of " 
             "memory as a result, and need to be restarted frequently.\n")))
         m.add(T_(N_("Please upgrade PyGTK to version 2.8.6")))
@@ -52,7 +64,7 @@ def checkPyGTK():
     result.succeed(None)
     return defer.succeed(result)
 
-def checkPyGST():
+def checkTicket348():
     result = messages.Result()
     import pygst
     pygst.require('0.10')
@@ -62,7 +74,7 @@ def checkPyGST():
         m = messages.Warning(T_(
             N_("Version %d.%d.%d of the gst-python library contains a large memory leak.\n"), 
             major, minor, nano),
-            id = 'pygst-check')
+            id = 'ticket-348')
         m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of " 
             "memory as a result, and need to be restarted frequently.\n")))
         m.add(T_(N_("Please upgrade gst-python to version 0.10.3 or later")))
@@ -71,3 +83,33 @@ def checkPyGST():
     result.succeed(None)
     return defer.succeed(result)
 
+def checkTicket349():
+    result = messages.Result()
+    import pygst
+    pygst.require('0.10')
+    import gst
+
+    if get_gst_version(gst) < (0, 10, 4, 1):
+        major, minor, micro, nano = get_gst_version(gst)
+        m = messages.Error(T_(
+            N_("Version %d.%d.%d of the GStreamer library is too old.\n"),
+            major, minor, micro),
+            id = 'ticket-349')
+        m.add(T_(N_("The looper component needs a newer version of "
+                    "gstreamer.\n")))
+        m.add(T_(N_("Please upgrade GStreamer to version 0.10.5 or later")))
+        result.add(m)
+
+    if get_pygst_version(gst) < (0, 10, 3, 1):
+        major, minor, micro, nano = get_pygst_version(gst)
+        m = messages.Error(T_(
+            N_("Version %d.%d.%d of the gst-python library is too old.\n"),
+            major, minor, micro),
+            id = 'ticket-349')
+        m.add(T_(N_("The looper component needs a newer version of "
+                    "gst-python.\n")))
+        m.add(T_(N_("Please upgrade gst-python to version 0.10.4 or later")))
+        result.add(m)
+
+    result.succeed(None)
+    return defer.succeed(result)

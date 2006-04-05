@@ -32,8 +32,8 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
     def do_check(self):
         self.debug('running PyGTK/PyGST checks')
         from flumotion.component.producers import checks
-        d1 = checks.checkPyGTK()
-        d2 = checks.checkPyGST()
+        d1 = checks.checkTicket347()
+        d2 = checks.checkTicket348()
         dl = defer.DeferredList([d1, d2])
         dl.addCallback(self._checkCallback)
         return dl

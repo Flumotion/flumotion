@@ -549,8 +549,9 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             self.medium.callRemote("adminCallRemote", methodName,
                                    *args, **kwargs)
         else:
-            self.debug('asked to adminCallRemote(%s), but we are not '
-                       'connected to a manager. ignoring call.')
+            self.debug('asked to adminCallRemote(%s, *%r, **%r), but '
+                       'no manager.'
+                       % (methodName, args, kwargs))
 
     # private methods
     def _setConfig(self, config):
