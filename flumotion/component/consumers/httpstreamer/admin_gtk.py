@@ -130,6 +130,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         
         if self._hasgnomevfs:
             streamurl_widget_eventbox = self.wtree.get_widget('eventbox-stream-url')
+            streamurl_widget_eventbox.set_visible_window(False)
             streamurl_widget_eventbox.connect('button-press-event', self._streamurl_clicked)
             streamurl_widget_eventbox.connect('enter-notify-event', self._streamurl_enter)
             streamurl_widget_eventbox.connect('leave-notify-event', self._streamurl_leave)
@@ -182,11 +183,11 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     # motion event handles
     def _streamurl_enter(self, widget, event):
         cursor = gtk.gdk.Cursor(widget.get_display(), gtk.gdk.HAND2)
-        window = widget.get_root_window()
+        window = widget.window
         window.set_cursor(cursor)
             
     def _streamurl_leave(self, widget, event):
-        window = widget.get_root_window()
+        window = widget.window
         window.set_cursor(None)
             
     

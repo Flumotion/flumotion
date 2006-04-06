@@ -1,5 +1,12 @@
 2006-04-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	  Make sure cursor does not get set to the X dfeault but to the
+	  cursor of the parent window and make eventbox not have a visible
+	  window
+
+2006-04-06  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/producers/firewire/firewire.py:
 	  Check key of array properly
 
