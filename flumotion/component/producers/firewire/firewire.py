@@ -163,7 +163,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
             s = message.structure
             # current-device-change is only in gst-plugins-good 0.10.3
             # not yet released
-            if s['current-device-change']:
+            if 'current-device-change' in s:
                 if s['current-device-change'] != 0:
                     # we actually have a connect or disconnect of the camera
                     # so first remove all the previous messages warning about a
