@@ -30,8 +30,10 @@ T_ = messages.gettexter('flumotion')
 def get_gst_version(gst):
     if hasattr(gst, 'get_gst_version'):
         return gst.get_gst_version()
+    elif hasattr(gst, 'version'):
+        return gst.version()
     else:
-        return gst.version() + (0,)
+        return gst.gst_version + (0,)
     
 def get_pygst_version(gst):
     if hasattr(gst, 'get_pygst_version'):
