@@ -734,6 +734,10 @@ class RegistryParser(fxml.Parser):
                    'bundles': (self._parseBundles, self._bundles.update),
                    'plugs': (self._parsePlugs, self._plugs.update)}
 
+        if disallowed:
+            for k in disallowed:
+                del parsers[k]
+
         self.parseFromTable(node, parsers)
         
     def _parseDirectories(self, node): 

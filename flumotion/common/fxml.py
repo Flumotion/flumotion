@@ -98,6 +98,18 @@ class Parser(log.Loggable):
                                  ' '.join(e.args)))
         
     def checkAttributes(self, node, required=None, optional=None):
+        """
+        Checks that a given XML node has all of the required attributes,
+        and no unknown attributes. Raises fxml.ParserError if unknown
+        or missing attributes are detected.
+
+        @param node: An XML DOM node.
+        @type node: L{xml.dom.Node}
+        @param required: Set of required attributes, or None.
+        @type required: Sequence (list, tuple, ...) of strings.
+        @param optional: Set of optional attributes, or None.
+        @type optional: Sequence (list, tuple, ...) of strings.
+        """
         attrs = sets.Set(node.attributes.keys())
         required = sets.Set(required or ())
         optional = sets.Set(optional or ())
@@ -109,6 +121,26 @@ class Parser(log.Loggable):
                               % (node.nodeName, x))
 
     def parseAttributes(self, node, required=None, optional=None):
+        """
+        Checks the validity of the attributes on an XML node, via
+        Parser.checkAttributes, then parses them out and returns them
+        all as a tuple.
+
+        @param node: An XML DOM node.
+        @type node: L{xml.dom.Node}
+        @param required: Set of required attributes, or None.
+        @type required: Sequence (list, tuple, ...) of strings.
+        @param optional: Set of optional attributes, or None.
+        @type optional: Sequence (list, tuple, ...) of strings.
+
+        @returns: List of all attributes as a tuple. The first element
+        of the returned tuple will be the value of the first required
+        attribute, the second the value of the second required
+        attribute, and so on. The optional attributes follow, with None
+        as the value if the optional attribute was not present.
+        @rtype: tuple of string or None, as long as the combined length
+        of the required and optional attributes.
+        """
         self.checkAttributes(node, required, optional)
         out = []
         for k in (required or ()) + (optional or ()):
@@ -119,13 +151,23 @@ class Parser(log.Loggable):
                 out.append(None)
         return out
 
-    def parseFromTable(self, parent, parsers, disallowed=None):
-        # Nasty, modifies the parse table. Oh well, there's normally
-        # just one per function call.
-        if disallowed:
-            for k in disallowed:
-                del parsers[k]
+    def parseFromTable(self, parent, parsers):
+        """
+        A data-driven verifying XML parser. Raises fxml.ParserError if
+        an unexpected child node is encountered.
 
+        @param parent: An XML node whose child nodes you are interested
+        in parsing.
+        @type parent: L{xml.dom.Node}
+        @param parsers: A parse table defining how to parse the child
+        nodes. The keys are the possible child nodes, and the value is a
+        two-tuple of how to parse them consisting of a parser and a
+        value handler. The parser is a one-argument function that will
+        be called with the child node as an argument, and the handler is
+        a one-argument function that will be called with the result of
+        calling the parser.
+        @type parsers: dict of string -> (function, function)
+        """
         for child in parent.childNodes:
             if (child.nodeType == Node.TEXT_NODE or
                 child.nodeType == Node.COMMENT_NODE):

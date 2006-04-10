@@ -1,5 +1,15 @@
 2006-04-10  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/fxml.py (Parser.parseAttributes)
+	(Parser.parseFromTable, Parser.checkAttributes): Doc.
+
+	* flumotion/common/fxml.py (Parser.parseFromTable): Remove
+	'disallowed' argument -- callers should be providing the proper
+	parse tables always.
+
+	* flumotion/common/registry.py (RegistryParser._parseRoot):
+	Actually do something with the disallowed argument.
+
 	* flumotion/manager/base.py
 	(ManagerAvatar.perspective_getBundleSums): Fix debugging if no
 	bundles are found, and error if bundleName is a list.
