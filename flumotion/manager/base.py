@@ -169,7 +169,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
             if isinstance(bundleName, str):
                 bundleNames.append(bundleName)
             else:
-                bundleNames.extend(bundleNames)
+                bundleNames.extend(bundleName)
             self.debug('asked to get bundle sums for bundles %r' % bundleName)
         if fileName:
             if isinstance(fileName, str):
@@ -219,8 +219,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
             else:
                 sums.append((dep, bundler.bundle().md5sum))
 
-        self.debug('requested bundle is %s' % sums[0][0])
-        self.debug('returning %d sums' % len(sums))
+        self.debug('requested bundles: %r' % [x[0] for x in sums])
         return sums
 
     def perspective_getBundleSumsByFile(self, filename):
