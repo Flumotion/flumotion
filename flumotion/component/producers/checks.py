@@ -60,7 +60,8 @@ def checkTicket347():
             id = 'ticket-347')
         m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of " 
             "memory as a result, and need to be restarted frequently.\n")))
-        m.add(T_(N_("Please upgrade PyGTK to version 2.8.6")))
+        m.add(T_(N_("Please upgrade '%s' to version %s or later."),
+            'pygtk', '2.8.6'))
         result.add(m)
 
     result.succeed(None)
@@ -79,7 +80,8 @@ def checkTicket348():
             id = 'ticket-348')
         m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of " 
             "memory as a result, and need to be restarted frequently.\n")))
-        m.add(T_(N_("Please upgrade gst-python to version 0.10.3 or later")))
+        m.add(T_(N_("Please upgrade '%s' to version %s or later."),
+            'gst-python', '0.10.3'))
         result.add(m)
 
     result.succeed(None)
@@ -97,9 +99,10 @@ def checkTicket349():
             N_("Version %d.%d.%d of the GStreamer library is too old.\n"),
             major, minor, micro),
             id = 'ticket-349')
-        m.add(T_(N_("The looper component needs a newer version of "
-                    "gstreamer.\n")))
-        m.add(T_(N_("Please upgrade GStreamer to version 0.10.5 or later")))
+        m.add(T_(N_("The '%s' component needs a newer version of '%s'.\n"),
+                    'looper', 'gstreamer'))
+        m.add(T_(N_("Please upgrade '%s' to version %s or later."),
+            'gstreamer', '0.10.5'))
         result.add(m)
 
     if get_pygst_version(gst) < (0, 10, 3, 1):
@@ -108,9 +111,10 @@ def checkTicket349():
             N_("Version %d.%d.%d of the gst-python library is too old.\n"),
             major, minor, micro),
             id = 'ticket-349')
-        m.add(T_(N_("The looper component needs a newer version of "
-                    "gst-python.\n")))
-        m.add(T_(N_("Please upgrade gst-python to version 0.10.4 or later")))
+        m.add(T_(N_("The '%s' component needs a newer version of '%s'.\n"),
+                    'looper', 'gst-python'))
+        m.add(T_(N_("Please upgrade '%s' to version %s or later."),
+            'gst-python', '0.10.4'))
         result.add(m)
 
     result.succeed(None)

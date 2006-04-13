@@ -1,3 +1,24 @@
+2006-04-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/component-initialization-protocol:
+	  update protocol to reflect decisions about do_check
+	* flumotion/common/errors.py:
+	  add a ComponentSetupError
+	* flumotion/component/component.py:
+	  - make remote_setup() properly handle failures during component
+	    setup, while still give the medium's setup the chance to failure.
+	  - if do_check() generates an Error message on the state, turn sad
+	    and don't proceed to do_setup()
+	  - addMessage(): turn sad if an ERROR is added
+	* flumotion/manager/component.py:
+	  properly trap a ComponentSetupError seperately during setup
+	* flumotion/component/producers/checks.py:
+	  - share translations in messages, and make them uniform
+	* flumotion/component/producers/looper/looper.py:
+	  - declare bus, avoids tracebacks when setup went wrong
+	* flumotion/component/producers/looper/looper.xml:
+	  - depend on producer-checks bundle, since it's being used
+
 2006-04-10  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/fxml.py (Parser.parseAttributes)

@@ -36,7 +36,7 @@ from twisted.spread import pb
 from twisted.python import reflect
 
 from flumotion.common import interfaces, errors, log, planet, medium, pygobject
-from flumotion.common import componentui, common, registry
+from flumotion.common import componentui, common, registry, messages
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
@@ -187,8 +187,9 @@ class BaseComponentMedium(medium.BaseMedium):
         in that order.
         """
         self.debug('remote_setup(%r)' % config)
-        self.comp.setup(config)
-        return self.setup(config)
+        d = self.comp.setup(config)
+        d.addCallback(lambda r, c: self.setup(c), config)
+        return d
         
     def remote_start(self, *args, **kwargs):
         self.debug('remote_start(args=%r, kwargs=%r)' % (args, kwargs))
@@ -289,7 +290,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         Failures during init are marshalled back to the manager through
         the worker's remote_create method, since there is no component state
-        proxied to the manager yet at the time of init
+        proxied to the manager yet at the time of init.
         """
         self.state = planet.WorkerJobState()
 
@@ -318,6 +319,13 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         performs setup.
 
         Messages can be added to the component state's 'messages' list key.
+        Any error messages added will trigger the component going to sad
+        an L{flumotion.common.errors.ComponentSetupError} being raised;
+        do_setup() will not be called.
+
+        In the event of a fatal problem that can't be expressed through an
+        error message, this method should set the mood to sad and raise the
+        error on its own.
 
         self.config will be set when this is called.
 
@@ -369,6 +377,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         through the medium.
 
         @Returns: L{twisted.internet.defer.Deferred}
+        @raise    flumotion.common.errors.ComponentSetupError:
+                  when an error happened during setup of the component
         """
         def setup_plugs():
             # by this time we have a medium, so we can load bundles
@@ -411,9 +421,18 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             except Exception, e:
                 return defer.fail(e)
 
+        def checkErrorCallback(result):
+            # if the mood is now sad, it means an error was encountered
+            # during check, and we should return a failure here.
+            current = self.state.get('mood')
+            if current == moods.sad.value:
+                self.warning('Running checks made the component sad.')
+                raise errors.ComponentSetupError()
+
         self._setConfig(config)
         d = setup_plugs()
         d.addCallback(lambda r: self.do_check())
+        d.addCallback(checkErrorCallback)
         d.addCallback(lambda r: self.do_setup())
         return d
 
@@ -528,10 +547,14 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
     def addMessage(self, message):
         """
         Add a message to the component.
+        If any of the messages is an error, the component will turn sad.
 
         @type  message: L{flumotion.common.messages.Message}
         """
         self.state.append('messages', message)
+        if message.level == messages.ERROR:
+            self.debug('error message, turning sad')
+            self.setMood(moods.sad)
         
     def adminCallRemote(self, methodName, *args, **kwargs):
         """

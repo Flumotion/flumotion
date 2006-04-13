@@ -13,10 +13,13 @@ http://www2.parc.com/csl/groups/sda/publications/papers/Kiczales-OOPSLA92/.
 Entry points
 ============
 
-Component instantiation starts when the manager tells the worker to
-spawn a job to call a procedure on its behalf. This procedure is called
-the entry point. Component entry points are called with one argument,
-the configuration dictionary.
+A component object gets created using a factory function.
+This factory function is called the "entry point" of a component type.
+This entry point is declared in the registry section for that component type.
+
+The manager invokes the worker's remote_create() method.
+The worker then spawns a job to run this component in.
+It calls the factory function with the config dictionary as the sole argument.
 
 In practice all components in flumotion's repository are set to have the
 component class as an entry point. This allows the __init__ in the
@@ -31,7 +34,8 @@ BaseComponent.__init__(self)
 ----------------------------
 This method is expected to produce an initialized component.
 It should do as little as possible, and not access any resources,
-config, ...
+config, ... because it does not yet have a connection to the manager
+to report state through.
 
 The implementation calls every init() method of any of the subclasses
 in the hierarchy.
@@ -46,6 +50,9 @@ dict stored in the self.plugs attribute.
 Invokes do_check() vmethod, which returns a deferred.
 When this deferred succeeds, invokes do_setup() vmethod, which
 also returns a deferred.
+If any of these fail, this method also raises
+flumotion.common.errors.ComponentSetupError() and does not proceed to
+do_setup()
 
 returns the original deferred.
 
@@ -55,6 +62,10 @@ Sets mood to waking.
 Must start any plugs specified in the config, which means calling their
 start() method.
 Invokes do_start(), which returns a deferred.
+Any errors encountered during start() should return a Failure so the remote
+call fails.
+Any errors encountered after this step should be proxied through state
+messages.
 Returns the deferred.
 
 BaseComponent.stop(self)
@@ -76,9 +87,14 @@ This method is optional for subclasses.
 BaseComponent.do_check(self)
 ----------------------------
 This method has no requirements. It is implementation-specific.
-It can be used to check various requirements.
-After this
-call, the component should be ready to set up.
+It can be used to check various requirements, or known bugs in certain
+versions of software.
+If this method adds any error messages to the component state, this will
+automatically trigger a mood change to sad and raise a ComponentSetupError.
+If there is a fatal problem that can't be expressed with a message, this
+method should go to sad and raise ComponentSetupError itself.
+If there is nothing, or only warnings, the method should return a result.
+After this call, the component should be ready to set up.
 
 BaseComponent.do_setup(self)
 ----------------------------

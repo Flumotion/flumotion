@@ -114,6 +114,12 @@ class ComponentCreateError(ComponentError):
     remote_create call on a worker.
     """
 
+class ComponentSetupError(ComponentError):
+    """
+    An error during setup of a component.  Can be raised during a
+    remote_setup call on a component.
+    """
+
 class ComponentStartError(ComponentError):
     """
     An error during starting of a component.  Can be raised during a

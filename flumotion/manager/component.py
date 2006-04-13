@@ -980,6 +980,10 @@ class ComponentHeaven(base.ManagerHeaven):
 
         try:
             d.value()
+        except errors.ComponentSetupError, e:
+            self.warning('Failed to setup component')
+            # FIXME: we cannot start it - is there any reason to go on ?
+            return
         except Exception, e:
             self.warning('setup failed:%s' % log.getExceptionMessage(e))
             raise errors.FlumotionError('Could not set up component')

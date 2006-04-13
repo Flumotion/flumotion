@@ -57,6 +57,7 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="looper-base" />
+            <dependency name="producer-checks" />
         </dependencies>
 
         <directories>

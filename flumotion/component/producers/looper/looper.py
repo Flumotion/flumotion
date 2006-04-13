@@ -63,6 +63,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.timeoutid = 0
         self.pads_awaiting_block = []
         self.pads_to_link = []
+        self.bus = None
 
     def do_check(self):
         def on_result(result):
