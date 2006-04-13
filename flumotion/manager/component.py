@@ -306,7 +306,9 @@ class ComponentAvatar(base.ManagerAvatar):
         self.ports = {}
 
         self.jobState = None
-        self._setMood(moods.sleeping)
+        # if we're sad, we need an explicit cleanup to acknowledge the problem
+        if not self._getMoodValue() == moods.sad.value:
+            self._setMood(moods.sleeping)
 
     def _heartbeatCheck(self):
         """

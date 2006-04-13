@@ -1,5 +1,27 @@
 2006-04-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/worker.py:
+	  create a Message when a job process dies with a signal, so
+	  the admin can see what went wrong.
+	  Also, more signals than SEGV generate core dumps.
+	* flumotion/manager/worker.py:
+	  add perspective_componentAddMessage()
+	* flumotion/manager/manager.py:
+	  add componentAddMessage()
+	  make sure sad moods persist until actively stopped.
+	* flumotion/manager/component.py:
+	  make sure sad moods persist until actively stopped.
+	* po/POTFILES.in:
+	  mark worker.py for translations
+	* po/ca.po:
+	* po/es.po:
+	* po/fr.po:
+	* po/nl.po:
+	* po/no.po:
+	  update
+
+2006-04-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/component-initialization-protocol:
 	  update protocol to reflect decisions about do_check
 	* flumotion/common/errors.py:

@@ -140,6 +140,21 @@ class WorkerAvatar(base.ManagerAvatar):
         return self.mindCallRemote('create', avatarId, type, moduleName,
             methodName, config)
 
+    ### IPerspective methods, called by the worker's component
+    def perspective_componentAddMessage(self, avatarId, message):
+        """
+        Called by the worker to tell the manager to add a given message to
+        the given component.
+        
+        Useful in cases where the component can't report messages itself,
+        for example because it crashed.
+
+        @param avatarId: avatarId of the component the message is about
+        @type  message:  L{flumotion.common.messages.Message}
+        """
+        self.debug('received message from component %s' % avatarId)
+        self.vishnu.componentAddMessage(avatarId, message)
+
 class WorkerHeaven(base.ManagerHeaven):
     """
     I interface between the Manager and worker clients.

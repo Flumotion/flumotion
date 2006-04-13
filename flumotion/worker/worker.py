@@ -44,6 +44,9 @@ from flumotion.twisted import pb as fpb
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.configure import configure
 
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
+
 factoryClass = fpb.ReconnectingFPBClientFactory
 class WorkerClientFactory(factoryClass):
     """
@@ -329,46 +332,73 @@ class JobProcessProtocol(protocol.ProcessProtocol):
         # status is an instance of failure.Failure
         # status.value is a twisted.internet.error.ProcessTerminated
         # status.value.status is the os.WAIT-like status value
+        message = None
         kg = self.kindergarten
         kg.removeKidByPid(self.pid)
         if status.value.exitCode is not None:
-            kg.info("Reaped child job with pid %d, exit value %d" % (
+            kg.info("Reaped child job with pid %d, exit value %d." % (
                                 self.pid, status.value.exitCode))
         signum = status.value.signal
+
+        # SIGKILL is an explicit kill, and never generates a core dump.
+        # For any other signal we want to see if there is a core dump,
+        # and warn if not.
         if signum is not None:
-            if signum == signal.SIGSEGV:
-                kg.warning("Job child with pid %d segfaulted" % self.pid)
+            if signum == signal.SIGKILL:
+                kg.warning("Job child with pid %d killed." % self.pid)
+                message = messages.Error(T_(N_("The component was killed.\n")))
+            else:
+                message = messages.Error(T_(N_("The component crashed.\n")),
+                    debug='Terminated with signal number %d' % signum)
+
+                # use some custom logging depending on signal
+                if signum == signal.SIGSEGV:
+                    kg.warning("Job child with pid %d segfaulted." % self.pid)
+                elif signum == signal.SIGTRAP:
+                    # SIGTRAP occurs when registry is corrupt
+                    kg.warning("Job child with pid %d received a SIGTRAP." % 
+                        self.pid)
+                else:
+                    # if we find any of these, possibly special-case them too
+                    kg.info("Reaped job child with pid %d signaled by "
+                        "signal %d." % (self.pid, signum))
+                    
                 if not os.WCOREDUMP(status.value.status):
                     kg.warning(
                         "No core dump generated.  "\
                         "Were core dumps enabled at the start ?")
-            # SIGTRAP occurs when registry is corrupt
-            elif signum == signal.SIGTRAP:
-                kg.warning("Job child with pid %d received a SIGTRAP" % 
-                    self.pid)
-            else:
-                kg.info(
-                    "Reaped job child with pid %d signaled by signal %d" % (
-                        self.pid, signum))
-            if os.WCOREDUMP(status.value.status):
-                kg.info("Core dumped")
-                corepath = os.path.join(os.getcwd(), 'core.%d' % self.pid)
-                if os.path.exists(corepath):
-                    kg.info("Core file is probably %s" % corepath)
+                    message.add(T_(N_(
+                        "However, no core dump was generated. " \
+                        "You may need to configure the environment "
+                        "if you want to further debug this problem.")))
+                else:
+                    kg.info("Core dumped.")
+                    corepath = os.path.join(os.getcwd(), 'core.%d' % self.pid)
+                    if os.path.exists(corepath):
+                        kg.info("Core file is probably '%s'." % corepath)
+                        message.add(T_(N_(
+                            "The core dump is '%s' on worker '%s'."),
+                            corepath, kg.workerBrain.workerName))
+                        # FIXME: add an action that runs gdb and produces a
+                        # backtrace; or produce it here and attach to the
+                        # message as debug info.
 
             # we need to trigger a failure on the create deferred 
             # if the job received a signal before logging in to the worker;
             # otherwise the manager still thinks it's starting up when it's
             # dead.  If the job already attached to the worker however,
             # the create deferred will already have callbacked.
-            
-            msg = "Component '%s' has received signal %d.  " \
-                  "This is sometimes triggered by a corrupt " \
-                  "GStreamer registry." % (self.avatarId, signum)
-            
             if kg.workerBrain.deferredCreateRegistered(self.avatarId):
+                text = "Component '%s' has received signal %d.  " \
+                       "This is sometimes triggered by a corrupt " \
+                       "GStreamer registry." % (self.avatarId, signum)
                 kg.workerBrain.deferredCreateFailed(self.avatarId, 
-                    errors.ComponentCreateError(msg))
+                    errors.ComponentCreateError(text))
+
+        if message:
+            kg.debug('sending message to manager')
+            kg.workerBrain.callRemote('componentAddMessage', self.avatarId,
+                message)
 
         self.setPid(None)
         
@@ -567,6 +597,9 @@ class WorkerBrain(log.Loggable):
         self.warning(message)
         print >> sys.stderr, 'ERROR: %s' % message
         reactor.stop()
+
+    def callRemote(self, methodName, *args, **kwargs):
+        return self.medium.callRemote(methodName, *args, **kwargs)
 
     # FIXME: this isn't necessary, we can just connect to the shutdown
     # event on the reactor, reducing a lot of complexity here...

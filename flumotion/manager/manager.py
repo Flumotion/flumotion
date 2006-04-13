@@ -459,6 +459,22 @@ class Vishnu(log.Loggable):
         # now that we have a worker, get going
         return self._workerCreateComponents(worker, [componentState])
 
+    def componentAddMessage(self, avatarId, message):
+        """
+        Set the given message on the given component's state.
+        Can be called e.g. by a worker to report on a crashed component.
+        """
+        if not avatarId in self._componentMappers:
+            self.warning('asked to set a message on non-mapped component %s' %
+                avatarId)
+            return
+
+        m = self._componentMappers[avatarId]
+        m.state.append('messages', message)
+        if message.level == messages.ERROR:
+            self.debug('Error message makes component sad')
+            m.state.set('mood', moods.sad.value)
+        
     # FIXME: unify naming of stuff like this
     def workerAttached(self, workerAvatar):
         # called when a worker logs in
@@ -645,7 +661,10 @@ class Vishnu(log.Loggable):
             self.warning('Could not remove jobState for %r' % componentAvatar)
         m.jobState = None
         
-        m.state.set('mood', moods.sleeping.value)
+        # if the component was sad, keep it sad.  It still needs manual
+        # admin intervention.
+        if m.state.get('mood') != moods.sad.value:   
+            m.state.set('mood', moods.sleeping.value)
         m.state.set('pid', None)
         m.state.set('cpu', None)
         m.state.set('workerName', None)

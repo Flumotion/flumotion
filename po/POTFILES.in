@@ -22,6 +22,8 @@ flumotion/component/producers/videotest/admin_gtk.py
 flumotion/manager/component.py
 flumotion/manager/manager.py
 
+flumotion/worker/worker.py
+
 flumotion/worker/checks/check.py
 flumotion/worker/checks/encoder.py
 flumotion/worker/checks/video08.py
