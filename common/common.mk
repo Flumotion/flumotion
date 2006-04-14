@@ -1,6 +1,4 @@
-if HAVE_PYCHECKER
-check-local: pychecker
-endif
+check-local: check-local-pychecker
 
 test:
 	@make check -C flumotion/test

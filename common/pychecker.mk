@@ -1,3 +1,12 @@
+# configure.ac needs to AM_CONDITIONAL HAVE_PYCHECKER
+
+if HAVE_PYCHECKER
+check-local-pychecker: pychecker
+else
+check-local-pychecker:
+	echo "Pychecker not found, passing"
+endif
+
 # include this snippet for the pychecker stuff
 # Makefile.am needs to define
 # PYCHECKER_WHITELIST
@@ -47,7 +56,6 @@ pycheckersplit:
 	done
 
 pychecker: pychecker08 pychecker010 pycheckerindep
-	@true
 
 pycheckerindep: 
 	@echo running pychecker, gstreamer-agnostic files ...
