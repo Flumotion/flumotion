@@ -103,7 +103,6 @@ class Window(log.Loggable, gobject.GObject):
                            self.admin_connection_refused_cb)
         self.admin.connect('connection-failed',
                            self.admin_connection_failed_cb)
-        self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
         self.admin.connect('component-property-changed',
             self.property_changed_cb)
         self.admin.connect('update', self.admin_update_cb)
@@ -636,16 +635,6 @@ class Window(log.Loggable, gobject.GObject):
         log.debug('adminclient', "handling connection-failed")
         reactor.callLater(0, self.admin_connection_failed_later, admin, reason)
         log.debug('adminclient', "handled connection-failed")
-
-    def admin_ui_state_changed_cb(self, admin, name, state):
-        # called when the admin UI for that component has changed
-        current = self.components_view.get_selected_name()
-        if current != name:
-            return
-
-        comp = self.current_component
-        if comp:
-            comp.setUIState(state)
 
     # FIXME: deprecated
     def property_changed_cb(self, admin, componentName, propertyName, value):

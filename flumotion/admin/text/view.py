@@ -78,7 +78,6 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                            self.admin_connection_refused_cb)
         self.admin.connect('connection-failed',
                            self.admin_connection_failed_cb)
-        #self.admin.connect('ui-state-changed', self.admin_ui_state_changed_cb)
         #self.admin.connect('component-property-changed',
         #    self.property_changed_cb)
         self.admin.connect('update', self.admin_update_cb)

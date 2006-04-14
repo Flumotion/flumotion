@@ -1,5 +1,14 @@
 2006-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/text/view.py:
+	* flumotion/component/base/admin_gtk.py:
+	  BaseAdminGtk.setUIState() and the admin's ui-state-changed signal
+	  have been unused since 0.1.4
+
+2006-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/pychecker.mk:
 	  - use $(thisdir) correctly when we check for _build
 	  - rename FLU_PATH to OUR_PATH, because these macros are shared

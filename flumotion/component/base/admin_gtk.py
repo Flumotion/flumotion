@@ -274,10 +274,6 @@ class BaseAdminGtkNode(log.Loggable):
 
         return widget
 
-    ### child class methods to be overridden
-    def setUIState(self, state):
-        raise NotImplementedError
-
     def haveWidgetTree(self):
         """
         I am called when the widget tree has been gotten from the glade file.

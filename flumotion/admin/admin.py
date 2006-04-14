@@ -157,7 +157,6 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
     gsignal('disconnected')
     gsignal('connection-refused')
     gsignal('connection-failed', str)
-    gsignal('ui-state-changed', str, object)
     gsignal('component-property-changed', str, str, object)
     gsignal('reloading', str)
     gsignal('message', str)
