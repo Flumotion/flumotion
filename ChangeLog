@@ -1,3 +1,13 @@
+2006-04-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/pychecker.mk:
+	  - use $(thisdir) correctly when we check for _build
+	  - rename FLU_PATH to OUR_PATH, because these macros are shared
+	    with other modules
+	  - if GST_08_SUPPORTED and GST_010_SUPPORTED are not set from
+	    configure, still work without errors
+	  - x10 -> x010 for consistency
+
 2006-04-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/worker.py:
