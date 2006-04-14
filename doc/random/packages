@@ -70,3 +70,72 @@ PROCEDURE
   and
   project2/package/A/B/D.py
   where import package.A will end up
+
+PROBLEMS
+--------
+doing "from twisted.internet import reactor" should be done before doing
+"from flumotion.common import setup; setup.setup()"
+
+The reason is that reactor immediately del's itself from the global modules
+list, and the subsequent imports it does breaks in the import code:
+    from twisted.internet import reactor
+  File "/usr/lib/python2.4/ihooks.py", line 409, in import_module
+    self.ensure_fromlist(m, fromlist)
+  File "/usr/lib/python2.4/ihooks.py", line 474, in ensure_fromlist
+    submod = self.import_it(sub, subname, m)
+  File "/usr/lib/python2.4/ihooks.py", line 495, in import_it
+    m = self.loader.load_module(fqname, stuff)
+  File "/usr/lib/python2.4/ihooks.py", line 270, in load_module
+    m = self.hooks.load_source(name, filename, file)
+  File "/usr/lib/python2.4/ihooks.py", line 168, in load_source
+    return imp.load_source(name, filename, file)
+  File "/usr/lib/python2.4/site-packages/twisted/internet/reactor.py", line 21, in ?
+    from twisted.python import runtime
+  File "/usr/lib/python2.4/ihooks.py", line 403, in import_module
+    parent = self.determine_parent(globals)
+  File "/usr/lib/python2.4/ihooks.py", line 420, in determine_parent
+    if '.' in pname:
+TypeError: iterable argument required
+
+TODO
+----
+- it would be very nice if any flumotion module can be run against any
+  flumotion base.  Right now, running configure determines which flumotion
+  you run against, making it harder to run a module against a different
+  flumotion branch.
+- to do this:
+  - PYTHONPATH should point to core flumotion as the first directory "flumotion"
+    can be imported from, always
+  - this probably means we should start installing core flumotion in the
+    normal python directories instead of our own tree; right now it is
+    hardcoded at configure-time (that makes installed and uninstalled work
+    the same way again)
+  - from the original flumotion dir, we can then do
+    from flumotion.common import setup; setup.setup() to trampoline the other
+    project flumotion import spaces
+
+- Some notes about sys.path:
+  - whatever dir you run from, or the script that you run lives in, is
+    prepended to sys.path as the first item
+    - create /tmp/test.py
+      import sys; print sys.path
+      and run it
+  - sys.path contains the usual suspects, as well as entries from .pth files
+    (see gst, pygtk, ...)
+  - if PYTHONPATH is set, but to an empty variable, then the cwd gets added
+    after the first one, but before the usual suspects
+    compared to LD_LIBRARY_PATH and similar's behaviour, this can be
+    considered a bug
+  - if PYTHONPATH contains leading or trailing :, this will also be seen
+    as '' (empty string) and thus bring in cwd
+    [thomas@otto trunk]$ PYTHONPATH=/tmp/tmp: python /tmp/test.py
+['/tmp', '/tmp/tmp', '/home/thomas/flu/svn/flumotion-template/trunk', ...
+  - this may be a problem; if you're in a project directory, you have
+    'flumotion' in your cwd, and you want to avoid loading this one first;
+    instead you want to find anything in your sys.path pointing to flumotion
+    *without* cwd.
+- NOTE: having PYTHONPATH end in ':' makes it import from current directory
+        as well
+- QUESTION: if flumotion is in system path, does PYTHONPATH take precedence ?
+            this is necessary to develop/run uninstalled
+  ANSWER: according to the docs, PYTHONPATH entries are prepended to sys.path
