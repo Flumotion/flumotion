@@ -25,3 +25,17 @@ If large changes are made over many places in the tree which can't make
 the whole testsuite run, then it should be made on a separate branch and
 not be merged with the main trunk before everything passes and it has been
 reviewed.
+
+Naming
+======
+- classes should be named with CapitalizedWords
+- methods and functions should be named in the same style as the libraries
+  on the same interface level
+  e.g. GStreamer, GObject and GTK+ subclasses with underscore_method,
+  but Twisted-style classes with lowerCamelCaseMethod
+  When these two conflict, prefer lowerCamelCaseMethod
+  In general, Flumotion follows lowerCamelCaseMethod
+  This goes for regular functions too
+- some Twisted-style methods have a special form of (action)_lowerCamelCase;
+  e.g. perspective_, remote_, do_
+
