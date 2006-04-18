@@ -1013,7 +1013,7 @@ class Window(log.Loggable, gobject.GObject):
  
     def debug_start_shell_cb(self, button):
         if sys.version_info[1] >= 4:
-            from flumotion.common import code
+            from flumotion.extern import code
         else:
             import code
         code.interact()
