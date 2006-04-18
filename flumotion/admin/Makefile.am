@@ -4,7 +4,8 @@ componentdir = $(libdir)/flumotion/python/flumotion/admin
 component_PYTHON = \
 	__init__.py \
 	admin.py \
-	connections.py
+	connections.py \
+	multi.py
 
 SUBDIRS = command gtk text
 

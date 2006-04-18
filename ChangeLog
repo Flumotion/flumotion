@@ -1,3 +1,19 @@
+2006-04-18  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/Makefile.am (component_PYTHON): Add multi.py.
+
+	* flumotion/admin/multi.py: New file, moved here from
+	flumotion-ground-control (where it was known as houston). Its
+	purpose is to be middleware(tm) between a client and many manager
+	connections.
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): Dist the new test
+	suite.
+
+	* flumotion/test/test_admin_multi.py: New test suite.
+	(MultiAdminTest.testConstructor): New test, just tries to
+	instantiate MultiAdminModel.
+
 2006-04-18  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/worker/worker.py:
