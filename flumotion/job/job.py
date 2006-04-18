@@ -266,7 +266,14 @@ class JobMedium(medium.BaseMedium):
                 msg = e.args[0]
             self.warning(
                 "raising ComponentCreateError(%s) and stopping job" % msg)
-            reactor.callLater(0, self.shutdown)
+            # This is a Nasty Hack. We raise ComponentCreateError, which can be
+            # caught on the other side and marshalled as a reasonably 
+            # comprehensible error message. However, if we shutdown immediately,
+            # the PB connection won't be available, so the worker will just get
+            # an error about that! So, instead, we shut down in a tenth of a
+            # second, usually allowing the worker to get scheduled and read the
+            # exception over PB. Ick!
+            reactor.callLater(0.1, self.shutdown)
             raise errors.ComponentCreateError(msg)
 
         comp.setWorkerName(self._worker_name)

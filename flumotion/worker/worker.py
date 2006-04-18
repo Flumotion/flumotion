@@ -770,6 +770,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
         except Exception, e:
             self.warning('unhandled remote error: type %s, message %s'
                          % (e.__class__.__name__, e))
+            self.heaven.brain.deferredCreateFailed(kid.avatarId, e)
     attached = defer_generator_method(attached)
 
     def logout(self):

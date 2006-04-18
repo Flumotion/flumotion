@@ -1,5 +1,16 @@
 2006-04-18  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/worker/worker.py:
+	  Fix bug #359: trigger deferredCreateFailed in ALL failure cases, not
+	  just when catching ComponentCreateFailed
+
+	* flumotion/job/job.py:
+	  Add a hack to make it more likely that the worker will get a chance
+	  to handle ComponentCreateFailed (and thus get a nicer error message
+	  that we can show in the admin)
+
+2006-04-18  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/admin/gtk/client.py:
 	  Add some basic useful local variables to the debug shell.
 	  Print out a message when starting the shell explaining what's
