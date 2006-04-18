@@ -1016,7 +1016,23 @@ class Window(log.Loggable, gobject.GObject):
             from flumotion.extern import code
         else:
             import code
-        code.interact()
+
+        vars = \
+            {
+                "admin": self.admin,
+                "components": self._components
+            }
+        message = ("  Flumotion Admin Debug Shell\n"
+                   "\n"
+                   "Local variables are:\n"
+                   "  admin      (flumotion.admin.admin.AdminModel)\n"
+                   "  components (dict: name -> flumotion.common.planet.AdminComponentState)\n"
+                   "\n"
+                   "You can do remote component calls using:\n"
+                   "  admin.componentCallRemote(components['component-name'],\n"
+                   "         'methodName', arg1, arg2)\n\n")
+
+        code.interact(local=vars, banner=message)
 
     def help_about_cb(self, button):
         dialog = gtk.Dialog(_('About Flumotion'), self.window,

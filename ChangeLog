@@ -1,6 +1,13 @@
 2006-04-18  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/admin/gtk/client.py:
+	  Add some basic useful local variables to the debug shell.
+	  Print out a message when starting the shell explaining what's
+	  available.
+
+2006-04-18  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/admin/gtk/client.py:
 	  flumotion.common.code has been moved to flumotion.extern.code,
 	  import this instead.
 
