@@ -1,3 +1,9 @@
+2006-04-20  Andy Wingo  <wingo@pobox.com>
+
+	* common/setup.m4: Convert to use the AC_CONFIG_* infrastructure,
+	so that we can regenerate the output afterr a make clean. Involves
+	some exciting eval hackery, but it seems to be par for the course.
+
 2006-04-18  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/Makefile.am (component_PYTHON): Add multi.py.

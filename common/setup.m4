@@ -15,12 +15,13 @@ dnl PROJECT:       the name of the project
 
 
 AC_DEFUN([FLUMOTION_SETUP], [
-_RELATIVE_PATH=$1
-_FLUMOTION_DIR=$2
-_PREAMBLE=$3
-_PROJECT=$4
-
-AC_MSG_NOTICE([Creating $_RELATIVE_PATH])
+  AC_CONFIG_COMMANDS($1,
+    [
+flu_var_prefix=`echo "$ac_dest" | sed -e 's/[[^a-zA-Z_0-9]]/_/g'`
+eval _RELATIVE_PATH=\$${flu_var_prefix}_RELATIVE_PATH
+eval _PREAMBLE=\$${flu_var_prefix}_PREAMBLE
+eval _FLUMOTION_DIR=\$${flu_var_prefix}_FLUMOTION_DIR
+eval _PROJECT=\$${flu_var_prefix}_PROJECT
 
 dirpart=`dirname "$_RELATIVE_PATH" 2> /dev/null`
 mkdir -p $dirpart
@@ -92,6 +93,13 @@ def setup():
     package.getPackager().registerPackagePath(__packagePath, PROJECT)
 
     _setup = True
-
 END
+],
+    [  flu_var_prefix=`echo $1 | sed -e 's/[[^a-zA-Z_0-9]]/_/g'`
+     eval \${flu_var_prefix}_RELATIVE_PATH=$1
+    eval \${flu_var_prefix}_FLUMOTION_DIR=$2
+    eval \${flu_var_prefix}_PREAMBLE=<<END
+$3
+END
+    eval \${flu_var_prefix}_PROJECT=$4])
 ])
