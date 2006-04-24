@@ -368,7 +368,7 @@ msgid "GStreamer error."
 msgstr ""
 
 #: flumotion/component/feedcomponent08.py:252
-#: flumotion/manager/component.py:572
+#: flumotion/manager/component.py:574
 #, fuzzy
 msgid "Could not start component."
 msgstr ""

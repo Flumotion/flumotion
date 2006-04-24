@@ -1,3 +1,15 @@
+2006-04-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* po/ca.po:
+	* po/es.po:
+	* po/fr.po:
+	* po/nl.po:
+	* po/no.po:
+	  updates
+	  Translation by: Pablo Lorenzzoni <spectra@debian.org>
+	* po/pt_BR.po:
+	  adding Portuguese/Brazilian translation
+
 2006-04-20  Andy Wingo  <wingo@pobox.com>
 
 	* common/setup.m4: Convert to use the AC_CONFIG_* infrastructure,

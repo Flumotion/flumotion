@@ -1,234 +1,240 @@
-# Flumotion
+# Brazilian Portuguese translation of flumotion.
 # This file is put in the public domain.
-# Christian Schaller <christian at fluendo com> 2005.
-#
+# Pablo Lorenzzoni <spectra@debian.org>, 2006.
+# , fuzzy
+# solis <EMAIL@ADDRESS>, 2006.
+# 
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: flumotion 0.1.9\n"
+"Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-03 17:59+0100\n"
-"PO-Revision-Date: 2005-07-29 01:22+0200\n"
-"Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
-"Language-Team: nl\n"
+"POT-Creation-Date: 2006-04-21 11:38-0300\n"
+"PO-Revision-Date: 2006-04-21 11:36-0300\n"
+"Last-Translator: Pablo Lorenzzoni <spectra@debian.org>\n"
+"Language-Team: pt_BR <spectra@debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: flumotion/admin/gtk/client.py:155
+#: flumotion/admin/gtk/client.py:154
 msgid "Not connected"
-msgstr "Ingen tilknyttning"
+msgstr "Desconectado"
 
-#: flumotion/admin/gtk/client.py:183
+#: flumotion/admin/gtk/client.py:182
 #, python-format
 msgid "Connecting to %s:%s"
-msgstr "Tilknyttet til %s:%s"
+msgstr "Conectando em %s:%s"
 
-#: flumotion/admin/gtk/client.py:268 flumotion/admin/gtk/client.py:332
+#: flumotion/admin/gtk/client.py:259 flumotion/admin/gtk/client.py:323
 #, python-format
 msgid "Loading UI for %s ..."
-msgstr "Laster UI for %s ..."
+msgstr "Carregando UI para %s ..."
 
-#: flumotion/admin/gtk/client.py:350
+#: flumotion/admin/gtk/client.py:341
 #, python-format
 msgid "Loading tab %s for %s ..."
-msgstr "Laster tab %s for %s ..."
+msgstr "Carregando etiqueta %s para %s ..."
 
-#: flumotion/admin/gtk/client.py:369
+#: flumotion/admin/gtk/client.py:360
 #, python-format
 msgid "%s does not have a UI yet"
-msgstr "%s har ikke noe UI enda"
+msgstr "%s ainda não tem UI"
 
-#: flumotion/admin/gtk/client.py:574
+#: flumotion/admin/gtk/client.py:572
 #, python-format
 msgid "%s - Flumotion Administration"
-msgstr "%s - Flumotion Administrasjon"
+msgstr "%s - Administração do Flumotion"
 
-#: flumotion/admin/gtk/client.py:590
+#: flumotion/admin/gtk/client.py:588
 msgid "Lost connection to manager, reconnecting ..."
-msgstr "Mistet forbindelse med manager, kobler til på nytt ..."
+msgstr "Conexão com o gerenciador perdida, reconectando ..."
+
+#: flumotion/admin/gtk/client.py:608
+#, python-format
+msgid "Connection to manager on %s was refused."
+msgstr "Conexão com o gerenciador em %s foi recusada."
 
 #: flumotion/admin/gtk/client.py:610
 #, python-format
-msgid "Connection to manager on %s was refused."
-msgstr "Forbindelsen til manager %s var ikke godkjent."
-
-#: flumotion/admin/gtk/client.py:612
-#, python-format
 msgid "Connection to %s was refused"
-msgstr "Forbindelsen ble %s ikke akseptert."
+msgstr "Conexão com %s foi recusada"
 
-#: flumotion/admin/gtk/client.py:625
+#: flumotion/admin/gtk/client.py:623
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
-msgstr "Forbindelsen til manager %s feilet (%s)."
+msgstr "Conexão com o gerenciador em %s falhou (%s)."
 
-#: flumotion/admin/gtk/client.py:715
-#, fuzzy, python-format
+#: flumotion/admin/gtk/client.py:711
+#, python-format
 msgid "Component %s is sad"
-msgstr "Komponent %s sover fortsatt"
+msgstr "Componente %s está triste"
 
-#: flumotion/admin/gtk/client.py:721
+#: flumotion/admin/gtk/client.py:718
 #, python-format
 msgid "Showing UI for %s"
-msgstr "Viser grafisk grensesnitt for %s"
+msgstr "Mostrando UI para %s"
 
-#: flumotion/admin/gtk/client.py:741
+#: flumotion/admin/gtk/client.py:738
 #, python-format
 msgid "No UI for component %s"
-msgstr "Ikke noe grafisk grensesnitt for komponent %s"
+msgstr "Sem componente UI para %s"
 
-#: flumotion/admin/gtk/client.py:755
+#: flumotion/admin/gtk/client.py:744
 #, python-format
 msgid "Component %s is still sleeping"
-msgstr "Komponent %s sover fortsatt"
+msgstr "Componente %s ainda está dormindo"
 
-#: flumotion/admin/gtk/client.py:765
+#: flumotion/admin/gtk/client.py:746
 #, python-format
 msgid "Requesting UI for %s ..."
-msgstr "Anmoder of grafisk grensesnitt for %s ..."
+msgstr "Solicitando UI para %s ..."
 
-#: flumotion/admin/gtk/client.py:811
+#: flumotion/admin/gtk/client.py:799
 msgid "The wizard cannot be run because no workers are logged in."
-msgstr "Veiviseren kan ikke starte fordi ingen arbeidere er logget inn."
+msgstr "O wizard não pode ser executado porque não há workers conectados."
 
-#: flumotion/admin/gtk/client.py:852
+#: flumotion/admin/gtk/client.py:840
 #, python-format
 msgid "Reloading component code for %s"
-msgstr "Omlaster komponent kode for %s"
+msgstr "Recarregando código do componente %s"
 
-#: flumotion/admin/gtk/client.py:883
+#: flumotion/admin/gtk/client.py:871
 msgid "No component selected."
-msgstr "Ingen komponent valgt."
+msgstr "Nenhum componente selecionado."
 
-#: flumotion/admin/gtk/client.py:900
+#: flumotion/admin/gtk/client.py:888
 #, python-format
 msgid "Failed to %s component %s"
-msgstr "Feilet å %s komponent %s"
+msgstr "Erro ao %s componente %s"
 
-#: flumotion/admin/gtk/client.py:927
+#: flumotion/admin/gtk/client.py:915
 msgid "Import Configuration..."
-msgstr "Importer konfigurasjon..."
+msgstr "Importar Configuração..."
 
-#: flumotion/admin/gtk/client.py:940
+#: flumotion/admin/gtk/client.py:928
 msgid ""
 "File already exists.\n"
 "Overwrite?"
 msgstr ""
-"Filen eksisterer allerede.\n"
-"Overskriv?"
+"Arquivo já existente.\n"
+"Sobrescrever?"
 
-#: flumotion/admin/gtk/client.py:962
+#: flumotion/admin/gtk/client.py:950
 msgid "Export Configuration..."
-msgstr "Eksporter konfigurasjon..."
+msgstr "Exportar Configuração..."
 
-#: flumotion/admin/gtk/client.py:1006
+#: flumotion/admin/gtk/client.py:994
 #, python-format
 msgid ""
 "Could not reload component:\n"
 "%s."
 msgstr ""
-"Kunne ikke laste om komponent:\n"
+"Não foi possível recarregar o componente:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1016
+#: flumotion/admin/gtk/client.py:1004
 msgid "Reloading ..."
-msgstr "Laster om..."
+msgstr "Recarregando ..."
 
-#: flumotion/admin/gtk/client.py:1017
+#: flumotion/admin/gtk/client.py:1005
 msgid "Reloading client code"
-msgstr "Laster om klient kode"
+msgstr "Recarregando código do cliente"
 
-#: flumotion/admin/gtk/client.py:1019
+#: flumotion/admin/gtk/client.py:1007
 #, python-format
 msgid "Reloading %s code"
-msgstr "Laster om %s kode"
+msgstr "Recarregando código de %s"
 
-#: flumotion/admin/gtk/client.py:1032
+#: flumotion/admin/gtk/client.py:1020
 msgid "About Flumotion"
-msgstr "Om Flumotion"
+msgstr "Sobre o Flumotion"
 
-#: flumotion/admin/gtk/client.py:1051
+#: flumotion/admin/gtk/client.py:1039
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 msgstr ""
-"Flumotion er en streaming media server.\n"
+"Flumotion é um servidor de streaming de mídia.\n"
 "\n"
-"(C) 2004-2005 Fluendo S.L."
+"(C)·2004-2005·Fluendo·S.L."
 
-#: flumotion/admin/gtk/client.py:1056
+#: flumotion/admin/gtk/client.py:1044
 msgid "Authors"
-msgstr "Forfattere"
+msgstr "Autores"
 
 #: flumotion/admin/gtk/message.py:34
 msgid "Error"
-msgstr "Feil"
+msgstr "Erro"
 
 #: flumotion/admin/gtk/message.py:35
 #: flumotion/test/test_common_messages.py:115
 #: flumotion/test/test_common_messages.py:152
 msgid "Warning"
-msgstr "Advarsel"
+msgstr "Aviso"
 
 #: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:56
 #: flumotion/test/test_common_messages.py:150
 #: flumotion/test/test_common_messages.py:166
 msgid "Note"
-msgstr "Notat"
+msgstr "Nota"
 
 #: flumotion/admin/gtk/message.py:130
-#, fuzzy
 msgid "Debug information:\n"
-msgstr "Host informasjon"
+msgstr "Informações de debug:\n"
 
 #: flumotion/admin/gtk/message.py:134
 msgid "Message"
-msgstr "Melding"
+msgstr "Mensagem"
 
 #: flumotion/admin/gtk/greeter.py:39
 msgid "Connect to Flumotion manager"
-msgstr "Tilknytt til Flumotion manager"
+msgstr "Conectar ao gerenciador Flumotion"
 
 #: flumotion/admin/gtk/greeter.py:40
 msgid "Flumotion Admin needs to connect to a Flumotion manager.\n"
-msgstr "Flumotion Admin trenger å knytte seg til en Flumotion manager.\n"
+msgstr ""
+"Administrador do Flumotion precisa conectar-se a um gerenciador do "
+"Flumotion.\n"
 
 #: flumotion/admin/gtk/greeter.py:41
 msgid "Choose an option from the list and click \"Forward\" to begin."
-msgstr "Velg fra listen og klikk \"Forover\" for å starte."
+msgstr "Escolha uma opção da lista e clique \"Avançar\" para começar."
 
 #: flumotion/admin/gtk/greeter.py:63
 msgid "Host information"
-msgstr "Host informasjon"
+msgstr "Informações do host"
 
 #: flumotion/admin/gtk/greeter.py:64
 msgid "Please enter the address where the manager is running."
-msgstr "Vær vennlig å skriv inn addressen hvor Manageren kjører."
+msgstr ""
+"Por favor, entre com o endereço onde o gerenciador está sendo executado;"
 
 #: flumotion/admin/gtk/greeter.py:87
 msgid "Authentication"
-msgstr "_Autorisasjon"
+msgstr "Autenticação"
 
 #: flumotion/admin/gtk/greeter.py:88
 msgid "Please select among the following authentication methods."
-msgstr "Vennligst velg mellom de følgende autentiserings metoder."
+msgstr "Por favor, selecione entre os seguintes métodos de autenticação."
 
 #: flumotion/admin/gtk/greeter.py:114
 msgid "Recent connections"
-msgstr "Nylige forbindelser"
+msgstr "Conexões recentes"
 
 #: flumotion/admin/gtk/greeter.py:115 data/glade/connection-dialog.glade:84
 msgid "Please choose a connection from the box below."
-msgstr "Vennligst velg en tilknyttning fra boksen under."
+msgstr "Por favor, escolha uma conexão da caixa abaixo."
 
 #: flumotion/admin/gtk/parts.py:171
 msgid "Mood"
-msgstr "Humør"
+msgstr "Humor"
 
 #: flumotion/admin/gtk/parts.py:176 flumotion/admin/gtk/parts.py:427
 msgid "Component"
-msgstr "Komponent"
+msgstr "Componente"
 
 #: flumotion/admin/gtk/parts.py:181
 msgid "Worker"
@@ -236,62 +242,64 @@ msgstr "Worker"
 
 #: flumotion/admin/gtk/parts.py:370
 msgid "[any worker]"
-msgstr ""
+msgstr "[qualquer worker]"
 
 #: flumotion/admin/gtk/parts.py:429
 msgid "_Restart"
-msgstr "_Start om"
+msgstr "_Reiniciar"
 
 #: flumotion/admin/gtk/parts.py:433
 msgid "_Start"
-msgstr "_Start"
+msgstr "_Iniciar"
 
 #: flumotion/admin/gtk/parts.py:440
 msgid "St_op"
-msgstr "St_op"
+msgstr "_Parar"
 
 #: flumotion/admin/gtk/parts.py:448
 msgid "Reload _code"
-msgstr "Last om _code"
+msgstr "Recarregar _código"
 
 #: flumotion/admin/gtk/parts.py:452
 msgid "_Modify element property ..."
-msgstr "_Modifiser element egenskap ..."
+msgstr "_Modificar propriedade do elemento ..."
 
 #: flumotion/wizard/enums.py:83
 msgid "SMPTE Color bars"
-msgstr "SMPTE farger linjer"
+msgstr "Barras coloridas SMPTE"
 
 #: flumotion/wizard/enums.py:84
 msgid "Random (television snow)"
-msgstr "Tilfelding (tv snø)"
+msgstr "Aleatório (chuvisco de televisão)"
 
 #: flumotion/wizard/enums.py:85
 msgid "Totally black"
-msgstr "Fullstending sort"
+msgstr "Totalmente escuro"
 
 #: flumotion/wizard/wizard.py:302
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
 msgstr ""
+"Todos os workers desconectaram.\n"
+"Assegure-se de que sua rede Flumotion está ok e tente novamente."
 
 #: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:522
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Worker '%s' está sentindo falta do elemento GStreamer '%s'."
+msgstr[1] "Worker '%s' está sentindo falta dos elementos GStreamer '%s'."
 
 #: flumotion/wizard/wizard.py:357
-#, fuzzy
 msgid ""
 "\n"
 "Please install the necessary GStreamer plug-ins that provide these elements "
 "and restart the worker."
 msgstr ""
-"Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
-"en herstart de worker."
+"\n"
+"Por favor, instale os plug-ins GStreamer que contenham estes elementos e "
+"reinicie o worker."
 
 #: flumotion/wizard/wizard.py:360
 msgid ""
@@ -299,32 +307,35 @@ msgid ""
 "\n"
 "You will not be able to go forward using this worker."
 msgstr ""
+"\n"
+"\n"
+"Você não será capaz de seguir adiante usando este worker."
 
 #: flumotion/wizard/steps.py:84
 msgid "If you want to stream video"
-msgstr "Hvis du ønsker å streame video"
+msgstr "Se você quiser streamar o vídeo"
 
 #: flumotion/wizard/steps.py:86
 msgid "If you want to stream audio"
-msgstr "Hvis du ønsker å streame audio"
+msgstr "Se você quiser streamar o audio"
 
 #: flumotion/wizard/steps.py:270
-#, fuzzy, python-format
+#, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
-msgstr "PAL, 4:3 (59/54 pixel aspekt ratio)"
+msgstr ""
 
 #: flumotion/wizard/steps.py:320
-#, fuzzy, python-format
+#, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
-msgstr "PAL, 4:3 (59/54 pixel aspekt ratio)"
+msgstr ""
 
 #: flumotion/wizard/steps.py:340
 msgid "Checking for Firewire device..."
-msgstr "Sjekker for Firewire enhet..."
+msgstr "Checando dispositivo Firewire"
 
 #: flumotion/wizard/steps.py:406
 msgid "Probing webcam, this can take a while..."
-msgstr ""
+msgstr "Verificando webcam, isto pode levar algum tempo..."
 
 #: flumotion/wizard/steps.py:498
 msgid ""
@@ -332,14 +343,13 @@ msgid ""
 "Please consider upgrading if your output video has a\n"
 "diagonal line in the image."
 msgstr ""
-"Denne arbeider's ffmpegcolorspace plugin er eldre enn 0.8.5.\n"
-"Vær vennlig å vurdere å oppgradere hvis ditt utgående video har en\n"
-"diagonal linje i bildet."
+"O plugin ffmpegcolorspace deste worker é mais antigo que 0.8.5.\n"
+"Por favor, considere atualizar se a sua saída de vídeo tiver\n"
+"uma linha diagonal na imagem."
 
 #: flumotion/wizard/steps.py:511
-#, fuzzy
 msgid "Could not check features of the 'ffmpegcolorspace' element."
-msgstr "Kunne ikke sjekke ffmpegcolorspace egenskaper."
+msgstr "Não pode verificar características do elemento 'ffmpegcolorspace'."
 
 #: flumotion/wizard/steps.py:526
 msgid ""
@@ -347,10 +357,13 @@ msgid ""
 "\n"
 "Click Next to proceed without overlay."
 msgstr ""
+"\n"
+"\n"
+"Clique Próximo para proceder sem overlay."
 
 #: flumotion/wizard/step.py:139
 msgid "Internal error: could not run check code on worker."
-msgstr ""
+msgstr "Erro interno: não pode executar código no worker."
 
 #: flumotion/component/feedcomponent.py:130
 #, python-format
@@ -358,203 +371,245 @@ msgid ""
 "The worker does not have the '%s' element installed.\n"
 "Please install the necessary plug-in and restart the component.\n"
 msgstr ""
+"O worker não tem o elemento '%s' instalado.\n"
+"Por favor, instale o plug-in necessário e reinicie o componente.\n"
 
 #: flumotion/component/feedcomponent.py:145
 msgid "GStreamer error: could not parse component pipeline."
-msgstr ""
+msgstr "Erro no GStreamer: não pode parsear o pipeline do componente."
 
 #: flumotion/component/feedcomponent08.py:225
 msgid "GStreamer error."
-msgstr ""
+msgstr "Erro no GStreamer."
 
 #: flumotion/component/feedcomponent08.py:252
 #: flumotion/manager/component.py:574
-#, fuzzy
 msgid "Could not start component."
-msgstr ""
-"Kunne ikke laste om komponent:\n"
-"%s."
+msgstr "Não foi possível iniciar o componente."
 
 #: flumotion/component/feedcomponent08.py:317
-#, fuzzy
 msgid "Component lost feed, reconnecting..."
-msgstr "Mistet forbindelse med manager, kobler til på nytt ..."
+msgstr "O componente perdeu alimentação, reconectando..."
 
-#: flumotion/component/consumers/httpstreamer/http.py:454
+#: flumotion/component/consumers/httpstreamer/http.py:468
 #, python-format
 msgid "Network error: TCP port %d is not available."
-msgstr ""
+msgstr "Erro de rede: porta TCP %d não está disponível."
 
-#: flumotion/component/consumers/httpstreamer/http.glade:8
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:132
+#: flumotion/component/consumers/httpstreamer/http.glade:7
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:212
 msgid "Statistics"
-msgstr "Statistikk"
+msgstr "Estatísticas"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:129
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:50
-msgid "Mime type:"
-msgstr "Mimetype:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:155
+#: flumotion/component/consumers/httpstreamer/http.glade:33
 msgid "<b>Stream</b>"
 msgstr "<b>Stream</b>"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:180
+#: flumotion/component/consumers/httpstreamer/http.glade:58
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:56
+msgid "Mime type:"
+msgstr "Tipo Mime:"
+
+#: flumotion/component/consumers/httpstreamer/http.glade:84
 msgid "Uptime:"
-msgstr "Total oppetid:"
+msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/http.glade:206
-#: flumotion/component/consumers/httpstreamer/http.glade:616
+#: flumotion/component/consumers/httpstreamer/http.glade:110
+#: flumotion/component/consumers/httpstreamer/http.glade:488
 msgid "Bit rate:"
-msgstr "Bit rate:"
+msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/http.glade:232
-#: flumotion/component/consumers/httpstreamer/http.glade:642
+#: flumotion/component/consumers/httpstreamer/http.glade:136
+#: flumotion/component/consumers/httpstreamer/http.glade:514
 msgid "Total bytes:"
-msgstr "Totalt antall bytes:"
+msgstr "Bytes totais:"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:258
+#: flumotion/component/consumers/httpstreamer/http.glade:162
 msgid "<b>Clients</b>"
-msgstr "<b>Klienter</b>"
+msgstr "<b>Clientes</b>"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:283
-msgid "Average:"
-msgstr "Gjennomsnitt:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:309
+#: flumotion/component/consumers/httpstreamer/http.glade:187
 msgid "Current:"
-msgstr "Current:"
+msgstr "Atual:"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:335
+#: flumotion/component/consumers/httpstreamer/http.glade:213
+msgid "Average:"
+msgstr "Média:"
+
+#: flumotion/component/consumers/httpstreamer/http.glade:239
 msgid "Peak:"
-msgstr "Topp:"
+msgstr "Pico:"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:412
+#: flumotion/component/consumers/httpstreamer/http.glade:313
 msgid "of"
-msgstr "fra"
+msgstr "de"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:491
+#: flumotion/component/consumers/httpstreamer/http.glade:389
 msgid "at"
-msgstr "ved"
+msgstr "em"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:591
+#: flumotion/component/consumers/httpstreamer/http.glade:440
 msgid "<b>Client Consumption</b>"
-msgstr "<b>Klient forbruk</b>"
+msgstr "<b>Comsumo de Cliente</b>"
 
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:134
+#: flumotion/component/consumers/httpstreamer/http.glade:655
+msgid "Web URL:"
+msgstr ""
+
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:214
 msgid "Log"
-msgstr "Logg"
+msgstr ""
 
 #: flumotion/component/muxers/checks.py:38
 #: flumotion/worker/checks/encoder.py:38 flumotion/worker/checks/encoder.py:59
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
-msgstr ""
+msgstr "Versão %s do plug-in GStreamer '%s' contém um erro.\n"
 
 #: flumotion/component/muxers/checks.py:41
 msgid ""
 "The generated Ogg stream will not be fully compliant, and possibly not even "
 "play correctly.\n"
 msgstr ""
+"O stream Ogg gerado não será completamente compatível, e possivelmente "
+"nemmesmo seja tocado correctamente.\n"
 
 #: flumotion/component/muxers/checks.py:43
 #: flumotion/worker/checks/encoder.py:44 flumotion/worker/checks/encoder.py:65
 #, python-format
 msgid "Please upgrade '%s' to version %s."
-msgstr ""
+msgstr "Por favor, atualize '%s' para a versão %s."
 
 #: flumotion/component/producers/videotest/admin_gtk.py:34
-#, fuzzy
 msgid "Pattern:"
-msgstr "_Mønster:"
+msgstr "Padrão:"
 
 #: flumotion/component/producers/videotest/admin_gtk.py:86
-#, fuzzy
 msgid "Pattern"
-msgstr "_Mønster:"
+msgstr "Padrão"
 
-#: flumotion/manager/manager.py:548
+#: flumotion/manager/manager.py:564
 msgid "The component could not be started."
+msgstr "O componente não pode ser iniciado."
+
+#: flumotion/worker/worker.py:349
+#, fuzzy
+msgid "The component was killed.\n"
+msgstr "O componente crashou.\n"
+
+#: flumotion/worker/worker.py:351
+msgid "The component crashed.\n"
+msgstr "O componente crashou.\n"
+
+#: flumotion/worker/worker.py:371
+msgid ""
+"However, no core dump was generated. You may need to configure the "
+"environment if you want to further debug this problem."
 msgstr ""
+"Contudo, nenhum core-dump foi gerado. Você pode ter de configurar o ambiente "
+"se você quiser maiores informações de debug deste problema."
+
+#: flumotion/worker/worker.py:380
+#, python-format
+msgid "The core dump is '%s' on worker '%s'."
+msgstr "O core-dump é '%s' no worker '%s'."
 
 #: flumotion/worker/checks/check.py:45
 #, python-format
 msgid ""
 "Could not open device '%s' for reading.  Check permissions on the device."
 msgstr ""
+"Não foi possível abrir o dispositivo '%s' para leitura.  Verifique as "
+"permissões no dispositivo."
 
 #: flumotion/worker/checks/check.py:48
 #, python-format
 msgid "Could not open device '%s'.  Check permissions on the device."
 msgstr ""
+"Não foi possível abrir o dispositivo '%s'. Verifique as permissões no "
+"dispositivo."
 
 #: flumotion/worker/checks/check.py:51
 #, python-format
 msgid "Device '%s' is already in use."
-msgstr ""
+msgstr "Dispositivo '%s' já está em uso."
 
 #: flumotion/worker/checks/check.py:54
 #, python-format
 msgid "Device '%s' did not accept the requested settings."
-msgstr ""
+msgstr "Dispositivo '%s' não aceitou as configurações solicitadas."
 
 #: flumotion/worker/checks/check.py:60 flumotion/worker/checks/check.py:64
 msgid "Internal GStreamer error."
-msgstr ""
+msgstr "Erro GStreamer interno."
 
 #: flumotion/worker/checks/check.py:96
-#, fuzzy, python-format
+#, python-format
 msgid "Could not probe device '%s'."
-msgstr ""
-"Kunne ikke laste om komponent:\n"
-"%s."
+msgstr "Não foi possível verificar dispositivo '%s'."
 
 #: flumotion/worker/checks/check.py:114
 #, python-format
 msgid "No device found on %s."
-msgstr ""
+msgstr "Nenhum dispositivo encontrado em %s."
 
 #: flumotion/worker/checks/encoder.py:42 flumotion/worker/checks/encoder.py:63
 msgid "Synchronization between audio and video may not be correct.\n"
-msgstr ""
+msgstr "Sincronização entre audio e vídeo pode não estar correta.\n"
 
-#: flumotion/worker/checks/video08.py:159
-#: flumotion/worker/checks/video010.py:156
+#: flumotion/worker/checks/video08.py:161
+#: flumotion/worker/checks/video010.py:163
 msgid "Device node /dev/raw1394 does not exist."
-msgstr ""
+msgstr "Node de dispositivo /dev/raw1394 não existe."
 
-#: flumotion/worker/checks/video08.py:178
-#: flumotion/worker/checks/video010.py:174
-#, fuzzy
+#: flumotion/worker/checks/video08.py:180
+#: flumotion/worker/checks/video010.py:189
 msgid "No Firewire device found."
-msgstr "Ingen Firewire enhet oppdaget."
+msgstr "Nenhum dispositivo Firewire encontrado."
 
-#: flumotion/worker/checks/video08.py:184
-#: flumotion/worker/checks/video010.py:180
-#, fuzzy
+#: flumotion/worker/checks/video08.py:183
+#: flumotion/worker/checks/video010.py:192
+msgid ""
+"Could not open Firewire device for reading. Check permissions on the device."
+msgstr ""
+"Não foi possivel abrir o dispositivo Firewire para leitura. Verificando "
+"permissões no dispositivo."
+
+#: flumotion/worker/checks/video08.py:190
+#: flumotion/worker/checks/video010.py:199
 msgid "Could not probe Firewire device."
-msgstr "Sjekker for Firewire enhet..."
+msgstr "Não foi possível verificar dispositivo Firewire."
 
-#: flumotion/worker/checks/video08.py:208
+#: flumotion/worker/checks/video08.py:214
 msgid ""
 "The ffmpegcolorspace element is too old. Please upgrade gst-plugins to "
 "version 0.8.5."
 msgstr ""
+"O elemento ffmpegcolorspace é muito antigo. Por favor, atualize o gst-"
+"plugins paraversão 0.8.5."
+
+#: flumotion/worker/checks/video010.py:185
+msgid ""
+"Could not find or open the Firewire device. Check the device node and its "
+"permissions."
+msgstr ""
+"Não foi possível encontrar ou abrir o dispositivo Firewire. Verifique o node "
+"de dispositivo e suas permissões."
 
 #: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:94
 msgid "I am a translatable string"
-msgstr ""
+msgstr "Eu sou uma string passível de tradução"
 
 #: flumotion/test/test_i18n.py:58 flumotion/test/test_i18n.py:95
 msgid "I am a translated string"
-msgstr ""
+msgstr "Eu sou uma string traduzida"
 
 #: flumotion/test/test_i18n.py:111 flumotion/test/test_i18n.py:116
 #, python-format
 msgid "I can translate %d thing"
 msgid_plural "I can translate %d things"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Eu posso traduzir"
+msgstr[1] "Eu posso traduzir"
 
 #: flumotion/test/test_i18n.py:114 flumotion/test/test_i18n.py:118
 #, python-format
@@ -568,9 +623,8 @@ msgid "Something is really wrong."
 msgstr ""
 
 #: flumotion/test/test_common_messages.py:57
-#, fuzzy
 msgid "warning"
-msgstr "Advarsel"
+msgstr ""
 
 #: flumotion/test/test_common_messages.py:61
 #: flumotion/test/test_common_messages.py:86
@@ -600,79 +654,79 @@ msgstr ""
 
 #: data/glade/admin.glade:10
 msgid "Flumotion Administration"
-msgstr "Flumotion Administrasjon"
+msgstr "Administração do Flumotion"
 
 #: data/glade/admin.glade:35
 msgid "_Connection"
-msgstr "_Forbindelse"
+msgstr "_Conexão"
 
 #: data/glade/admin.glade:59
 msgid "_Import Configuration..."
-msgstr "Importer konfigurasjon..."
+msgstr "_Importar Configuração..."
 
 #: data/glade/admin.glade:68
 msgid "_Export Configuration..."
-msgstr "_Eksporter Konfigurasjon..."
+msgstr "_Exportar Configuração..."
 
 #: data/glade/admin.glade:96
 msgid "_Manage"
-msgstr "_Administrer"
+msgstr "_Gerenciar"
 
 #: data/glade/admin.glade:105
 msgid "S_tart Component"
-msgstr "S_tart Komponent"
+msgstr "_Iniciar Componente"
 
 #: data/glade/admin.glade:126
 msgid "St_op Component"
-msgstr "St_op Komponent"
+msgstr "_Parar Componente"
 
 #: data/glade/admin.glade:153
 msgid "Start _All"
-msgstr "Start _Alt"
+msgstr "Iniciar _Todos"
 
 #: data/glade/admin.glade:162
 msgid "Stop A_ll"
-msgstr "Stop A_lt"
+msgstr "Parar T_odos"
 
 #: data/glade/admin.glade:171
 msgid "_Clear All"
-msgstr "Hvis _Alt"
+msgstr "_Limpar Todos"
 
 #: data/glade/admin.glade:198
 msgid "Run _Wizard"
-msgstr "_Kjør Veiviser"
+msgstr "Executar _Wizard"
 
 #: data/glade/admin.glade:223
 msgid "_Debug"
-msgstr "_Debugg"
+msgstr "_Debug"
 
 #: data/glade/admin.glade:232
 msgid "Reload _Manager"
-msgstr "Last om _Manager"
+msgstr "Recarregar _Gerenciador"
 
 #: data/glade/admin.glade:253
 msgid "Reload _All"
-msgstr "Last om_Alt"
+msgstr "Recarregar _Tudo"
 
 #: data/glade/admin.glade:262
 msgid "Start _Shell"
-msgstr "_Shell Oppstart"
+msgstr "Inicar _Shell"
 
 #: data/glade/admin.glade:287
 msgid "_Help"
-msgstr "_Hjelp"
+msgstr "_Ajuda"
 
 #: data/glade/admin.glade:324
 msgid "Open a stored configuration"
-msgstr "Åpn en lagret konfigurasjon"
+msgstr "Abrir uma configuração armazenada"
 
 #: data/glade/admin-wizard.glade:8 data/glade/wizard.glade:8
 msgid "Flumotion Configuration Wizard"
-msgstr "Flumotion Konfigurasjons Veiviser"
+msgstr "Wizard de Configuração do Flumotion"
 
 #: data/glade/admin-wizard.glade:43
 msgid "Name of step"
-msgstr "Navn på steg"
+msgstr "Nome do passo"
 
 #: data/glade/authenticate.glade:8 data/glade/connections.glade:8
 #: data/glade/greeter-authenticate.glade:8
@@ -691,104 +745,104 @@ msgstr "Navn på steg"
 #: data/glade/wizard_tvcard.glade:8 data/glade/wizard_vorbis.glade:8
 #: data/glade/wizard_webcam.glade:8 data/glade/wizard_welcome.glade:7
 msgid "window1"
-msgstr "window1"
+msgstr ""
 
 #: data/glade/authenticate.glade:32
 msgid "_Password"
-msgstr "_Passord"
+msgstr "_Senha"
 
 #: data/glade/authenticate.glade:118
 msgid "Name and Password"
-msgstr "Navn og Passord"
+msgstr "Nome e Senha"
 
 #: data/glade/authenticate.glade:148
 msgid "_Authentication Method"
-msgstr "_Authentiserings metode"
+msgstr "_Método de Autenticação"
 
 #: data/glade/authenticate.glade:175
 msgid "_Username"
-msgstr "_Brukernavn"
+msgstr "_Nome de usuário"
 
 #: data/glade/connection-dialog.glade:8
 msgid "Open Connection..."
-msgstr "Åpn forbinselse..."
+msgstr "Abrir Conexão..."
 
 #: data/glade/connections.glade:79
 msgid "Clear _All"
-msgstr "Fjern _Alt"
+msgstr "_Limpar Tudo"
 
 #: data/glade/greeter-initial.glade:30
 msgid "_Open recent connection"
-msgstr "_Åpn tidligere forbindelse"
+msgstr "_Abrir conexão recente"
 
 #: data/glade/greeter-initial.glade:48
 msgid "Connect to a _running manager"
-msgstr "Tilknytt til en _aktiv manager"
+msgstr "Conectar-se a um _gerenciador aberto"
 
 #: data/glade/greeter-initial.glade:68
 msgid "Start a _new manager and connect to it"
-msgstr "Start en _ny manager og knytt til"
+msgstr "Iniciar um _novo gerenciador e conectar-se a ele"
 
 #: data/glade/open-connection.glade:90
 msgid "_Host"
-msgstr "_Vert"
+msgstr "_Host"
 
 #: data/glade/open-connection.glade:129
 msgid "_Port"
-msgstr "_Port"
+msgstr "_Porta"
 
 #: data/glade/open-connection.glade:169
 msgid "_Secure connection via SSL"
-msgstr "_Sikker forbindelse via SSL"
+msgstr "Conexão _segura via SSL"
 
 #: data/glade/wizard_audio_encoder.glade:31 data/glade/wizard_theora.glade:102
 #: data/glade/wizard_vorbis.glade:102
 msgid "Bit _rate:"
-msgstr "Bit_rate:"
+msgstr ""
 
 #: data/glade/wizard_audio_encoder.glade:78 data/glade/wizard_theora.glade:32
 #: data/glade/wizard_vorbis.glade:32
 msgid "kbit/s"
-msgstr "kbit/s"
+msgstr ""
 
 #: data/glade/wizard_audiotest.glade:32
 msgid "_Volume:"
-msgstr "_Volum:"
+msgstr ""
 
 #: data/glade/wizard_audiotest.glade:57
 msgid "_Sample rate:"
-msgstr "_Sample rate:"
+msgstr ""
 
 #: data/glade/wizard_audiotest.glade:82
 msgid "F_requency:"
-msgstr "F_rekvens:"
+msgstr "F_reqüencia:"
 
 #: data/glade/wizard_consumption.glade:29
 msgid "S_tream over HTTP"
-msgstr "S_tream over HTTP"
+msgstr "S_tremar sobre HTTP"
 
 #: data/glade/wizard_consumption.glade:60
 #: data/glade/wizard_consumption.glade:163
 msgid "Audio & Video"
-msgstr "Audio og Video"
+msgstr ""
 
 #: data/glade/wizard_consumption.glade:79
 #: data/glade/wizard_consumption.glade:183
 msgid "Audio only"
-msgstr "Bare audio"
+msgstr "Somente áudio"
 
 #: data/glade/wizard_consumption.glade:98
 #: data/glade/wizard_consumption.glade:203
 msgid "Video only"
-msgstr "Bare video"
+msgstr "Somente vídeo"
 
 #: data/glade/wizard_consumption.glade:131
 msgid "S_ave to disk"
-msgstr "_Lagre til disk"
+msgstr "Gr_avar para o disco"
 
 #: data/glade/wizard_disk.glade:38
 msgid "_Choose location:"
-msgstr "_Velg lokasjon:"
+msgstr "_Escolher localização:"
 
 #: data/glade/wizard_disk.glade:117
 msgid ""
@@ -798,124 +852,124 @@ msgid ""
 "week\n"
 "month"
 msgstr ""
-"minutt\n"
-"time\n"
-"dag\n"
-"uke\n"
-"maaned"
+"minuto\n"
+"hora\n"
+"dia\n"
+"semana\n"
+"mês"
 
 #: data/glade/wizard_disk.glade:232
 msgid "_Rotate entry every"
-msgstr "_Roter oppslag hver"
+msgstr "_Rotacionar cada entrada"
 
 #: data/glade/wizard_encoding.glade:83 data/glade/wizard_testsource.glade:120
 msgid "F_ormat:"
-msgstr "F_ormat:"
+msgstr "F_ormato:"
 
 #: data/glade/wizard_encoding.glade:108 data/glade/wizard_source.glade:92
 msgid "_Video:"
-msgstr "_Video:"
+msgstr ""
 
 #: data/glade/wizard_encoding.glade:133 data/glade/wizard_source.glade:33
 msgid "_Audio:"
-msgstr "_Audio:"
+msgstr ""
 
 #: data/glade/wizard_firewire.glade:54
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
-msgstr "PAL, 4:3 (59/54 pixelaspectverhouding)"
+msgstr ""
 
 #: data/glade/wizard_firewire.glade:72 data/glade/wizard_firewire.glade:487
 msgid "<b>Camera settings</b>"
-msgstr "<b>Kamera-instilling</b>"
+msgstr "<b>Configurações da câmera</b>"
 
 #: data/glade/wizard_firewire.glade:126
 msgid "Scaled _height:"
-msgstr "Skaler _høyde:"
+msgstr "Altura _dimensionada:"
 
 #: data/glade/wizard_firewire.glade:150
 msgid "Recommended if you are outputting to a computer screen"
-msgstr "Anbefalt hvis du skal fremvise på en computer skjerm"
+msgstr "Recomendado se sua saída é uma tela de computador"
 
 #: data/glade/wizard_firewire.glade:152
 msgid "Convert to s_quare pixels"
-msgstr "Konverter til f_irkantede piksler"
+msgstr "Converter para pixeis _quadrados"
 
 #: data/glade/wizard_firewire.glade:205
 msgid "<b>Scaling</b>"
-msgstr "<b>Skalerer</b>"
+msgstr "<b>Dimensionamento</b>"
 
 #: data/glade/wizard_firewire.glade:278
 msgid "_No width correction"
-msgstr "_Ingen bredde korreksjon"
+msgstr "_Sem correção de largura"
 
 #: data/glade/wizard_firewire.glade:300
 msgid "_Stretch to multiple of 8 pixels"
-msgstr "_Utvid til en multiple av 8 piksler"
+msgstr "_Amplie para múltiplos de 8 pixels"
 
 #: data/glade/wizard_firewire.glade:323
 msgid "_Pad to multiple of 8 pixels"
-msgstr "_Pakk inn til en multipel av 8 piksler"
+msgstr "_Complete para múltiplos de 8 pixels"
 
 #: data/glade/wizard_firewire.glade:356
 msgid "<b>Width correction</b>"
-msgstr "<b>Bredekorreksjon</b>"
+msgstr "<b>Correção de largura</b>"
 
 #: data/glade/wizard_firewire.glade:421 data/glade/wizard_jpeg.glade:56
 msgid "Frame _rate:"
-msgstr "Bilde_rate:"
+msgstr ""
 
 #: data/glade/wizard_firewire.glade:462
 msgid "frames per second"
-msgstr "bilder per sekund"
+msgstr ""
 
 #: data/glade/wizard_firewire.glade:534
 msgid "none"
-msgstr "ingen"
+msgstr "nenhum"
 
 #: data/glade/wizard_firewire.glade:552
 msgid "<b>Output format</b>"
-msgstr "<b>Ut format</b>"
+msgstr "<b>Formato de saída</b>"
 
 #: data/glade/wizard_http.glade:33
 msgid "_Port:"
-msgstr "_Port:"
+msgstr "_Porta:"
 
 #: data/glade/wizard_http.glade:84
 msgid "B_andwidth limit:"
-msgstr "B_åndbrede grense:"
+msgstr ""
 
 #: data/glade/wizard_http.glade:113
 msgid "_User limit:"
-msgstr "_Bruker grense:"
+msgstr ""
 
 #: data/glade/wizard_http.glade:186
 msgid "Mbit/s"
-msgstr "Mbit/s"
+msgstr ""
 
 #: data/glade/wizard_http.glade:214
 msgid "clients"
-msgstr "klienter"
+msgstr "clientes"
 
 #: data/glade/wizard_http.glade:242
 msgid "_Mount point:"
-msgstr "_Mountpunkt:"
+msgstr ""
 
 #: data/glade/wizard_http.glade:295
 msgid "Bu_rst on connect"
-msgstr "Fl_od ved tilknyttning"
+msgstr "_Romper ao conectar"
 
 #: data/glade/wizard_jpeg.glade:31 data/glade/wizard_theora.glade:124
 #: data/glade/wizard_vorbis.glade:124
 msgid "_Quality:"
-msgstr "_Kvalitet:"
+msgstr "_Qualidade:"
 
 #: data/glade/wizard_jpeg.glade:149
 msgid "frames/s"
-msgstr "bilder/sekund"
+msgstr ""
 
 #: data/glade/wizard_license.glade:32
 msgid "Specify _license:"
-msgstr "Velg _lisens:"
+msgstr "Especificar _licença:"
 
 #: data/glade/wizard_license.glade:53
 msgid ""
@@ -925,56 +979,56 @@ msgid ""
 msgstr ""
 "Creative Commons\n"
 "GNU FDL\n"
-"Kommersiel"
+"Comercial"
 
 #: data/glade/wizard_overlay.glade:33
 msgid "Show _text in upper left corner:"
-msgstr "Vis _tekst i det øvre venstre hjørne:"
+msgstr "Mostrar _texto no canto superior esquerdo:"
 
 #: data/glade/wizard_overlay.glade:55
 msgid "Show _logo in bottom left corner:"
-msgstr "Vis _logo i det nedre venstre hjørne:"
+msgstr "Mostrar _logo no canto inferior esquerdo:"
 
 #: data/glade/wizard_smoke.glade:32
 msgid "M_inimum quality:"
-msgstr "M_inimum kvalitet:"
+msgstr "Qualidade Mín_ima:"
 
 #: data/glade/wizard_smoke.glade:57
 msgid "M_aximum quality:"
-msgstr "M_aximum kvalitet:"
+msgstr "Qualidade Má_xima:"
 
 #: data/glade/wizard_smoke.glade:82
 msgid "_Threshold:"
-msgstr "_Grense:"
+msgstr "_Limiar:"
 
 #: data/glade/wizard_smoke.glade:107
 msgid "_Keyframe spacing: every"
-msgstr "_Nøkkelbile avstand: alle"
+msgstr "Espaçamento de _keyframes: cada"
 
 #: data/glade/wizard_smoke.glade:269
 msgid "frames"
-msgstr "bilder"
+msgstr ""
 
 #: data/glade/wizard_soundcard.glade:32 data/glade/wizard_tvcard.glade:261
 #: data/glade/wizard_webcam.glade:32
 msgid "_Device:"
-msgstr "_Enhet:"
+msgstr "_Dispositivo:"
 
 #: data/glade/wizard_soundcard.glade:57
 msgid "_Input:"
-msgstr "_Inn:"
+msgstr "_Entrada:"
 
 #: data/glade/wizard_soundcard.glade:82
 msgid "_Channels:"
-msgstr "_Kanaler:"
+msgstr "_Canais:"
 
 #: data/glade/wizard_soundcard.glade:107
 msgid "Sample _rate:"
-msgstr "Sample_rate:"
+msgstr ""
 
 #: data/glade/wizard_soundcard.glade:132
 msgid "Bi_t depth:"
-msgstr "Bi_tdybde:"
+msgstr ""
 
 #: data/glade/wizard_soundcard.glade:157
 msgid ""
@@ -982,8 +1036,8 @@ msgid ""
 "Microphone\n"
 "CD"
 msgstr ""
-"Linje inn\n"
-"Microfon\n"
+"Line in\n"
+"Microfone\n"
 "CD"
 
 #: data/glade/wizard_soundcard.glade:175
@@ -992,17 +1046,14 @@ msgid ""
 "Mono\n"
 "5.1"
 msgstr ""
-"Stereo\n"
-"Mono\n"
-"5.1"
 
 #: data/glade/wizard_soundcard.glade:249
 msgid "Sound _system:"
-msgstr "Lyd _system"
+msgstr "Sistema de som:"
 
 #: data/glade/wizard_soundcard.glade:292 data/glade/wizard_webcam.glade:213
 msgid "Name:"
-msgstr "Navn:"
+msgstr "Nome:"
 
 #: data/glade/wizard_source.glade:54
 msgid ""
@@ -1011,10 +1062,10 @@ msgid ""
 "Webcam\n"
 "Test"
 msgstr ""
-"TV-kort\n"
+"Placa de TV\n"
 "Firewire \n"
-"Webkamera\n"
-"Test"
+"Webcam\n"
+"Teste"
 
 #: data/glade/wizard_source.glade:73
 msgid ""
@@ -1023,8 +1074,8 @@ msgid ""
 "Test"
 msgstr ""
 "Firewire\n"
-"Lydkort\n"
-"Test"
+"Placa de som\n"
+"Teste"
 
 #: data/glade/wizard_summary.glade:43
 msgid ""
@@ -1034,38 +1085,38 @@ msgid ""
 "When you press \"Apply\", your configuration will be automatically loaded on "
 "your network.  This will take some time."
 msgstr ""
-"Gratulerer ! Du er nå klar til å bruke \n"
-"din streaming server.\n"
+"Parabéns ! Você está pronto para usar \n"
+"seu servidor de stream.\n"
 "\n"
-"Når du trykker \"Apply\", saa vil din konfigurasjon bli automatisk lastet i "
-"ditt netverk. Dette vil ta litt tid."
+"Quando você clicar \"Aplicar\", sua configuração será automaticamente "
+"carregada em sua rede.  Isto levará algum tempo."
 
 #: data/glade/wizard_testsource.glade:33 data/glade/wizard_tvcard.glade:72
 #: data/glade/wizard_webcam.glade:166
 msgid "_Width:"
-msgstr "_Bredde:"
+msgstr "_Largura:"
 
 #: data/glade/wizard_testsource.glade:62 data/glade/wizard_tvcard.glade:97
 #: data/glade/wizard_webcam.glade:119
 msgid "_Height:"
-msgstr "_Høyde:"
+msgstr "_Altura:"
 
 #: data/glade/wizard_testsource.glade:91 data/glade/wizard_tvcard.glade:166
 #: data/glade/wizard_webcam.glade:72
 msgid "F_ramerate:"
-msgstr "B_ilderate:"
+msgstr ""
 
 #: data/glade/wizard_testsource.glade:149
 msgid "_Pattern:"
-msgstr "_Mønster:"
+msgstr "_Padrão:"
 
 #: data/glade/wizard_testsource.glade:178
 msgid ""
 "Snow\n"
 "Black"
 msgstr ""
-"Snø\n"
-"Svart"
+"Chuvisco\n"
+"Preto"
 
 #: data/glade/wizard_tvcard.glade:38
 msgid ""
@@ -1074,26 +1125,20 @@ msgid ""
 "S-Video\n"
 "Composite3"
 msgstr ""
-"TV\n"
-"Composite1\n"
-"S-Video\n"
-"Composite3"
 
 #: data/glade/wizard_tvcard.glade:56
 msgid ""
 "Composite\n"
 "RCA"
 msgstr ""
-"Composite\n"
-"RCA"
 
 #: data/glade/wizard_tvcard.glade:213
 msgid "Video _source:"
-msgstr "Video_kilde:"
+msgstr "Fonte de _vídeo:"
 
 #: data/glade/wizard_tvcard.glade:237
 msgid "TV _norm:"
-msgstr "TV _norm:"
+msgstr "_Norma de TV:"
 
 #: data/glade/wizard_welcome.glade:36
 msgid ""
@@ -1102,13 +1147,7 @@ msgid ""
 "This wizard will guide you through the required steps to help you configure "
 "your streaming media server."
 msgstr ""
-"Velkommen til Flumotion konfigurasjons veiviser.\n"
+"Bem vindo ao wizard de configuração do Flumotion.\n"
 "\n"
-"Denne veiviser vil veilede deg gjenneom de nødvendige set for å konfigurere "
-"din streaming media server."
-
-#, fuzzy
-#~ msgid "Could not start the component."
-#~ msgstr ""
-#~ "Kunne ikke laste om komponent:\n"
-#~ "%s."
+"Este wizard vai guiá-lo através dos passos requeridos para ajudá-lo a "
+"configurar seu servidor de stream de mídia."
