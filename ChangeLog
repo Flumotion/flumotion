@@ -1,3 +1,12 @@
+2006-04-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/effects/colorbalance/colorbalance.py:
+	  Port colorbalance to work with 0.10 of GStreamer
+	* flumotion/component/producers/bttv/bttv.py:
+	  Add colorbalance effect for 0.10
+	* flumotion/component/producers/webcam/webcam.py:
+	  Add colorbalance effect for 0.10
+
 2006-04-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* po/ca.po:

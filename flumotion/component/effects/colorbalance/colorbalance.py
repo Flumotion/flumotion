@@ -27,19 +27,55 @@ from flumotion.component import feedcomponent
 class Colorbalance(feedcomponent.Effect):
     logCategory = "colorbalance"
 
-    def __init__(self, name, element, hue, saturation, brightness, contrast):
+    def __init__(self, name, element, hue, saturation, brightness, contrast, 
+        pipeline=None):
         """
         @param element: the GStreamer element supporting the colorbalance
                         interface
         @param hue: the colorbalance hue, as a percentage
         @type  hue: float
+        @param saturation: the colorbalance saturation, as a percentage
+        @type saturation: float
+        @param brightness: the colorbalance brightness, as a percentage
+        @type brightness: float
+        @param contrast: the colorbalance contrast, as a percentage
+        @type contrast: float
+        @param pipeline: the pipeline
+        @type pipeline: L{gst.Pipeline}
         """
+        self.debug("colorbalance init")
         feedcomponent.Effect.__init__(self, name)
         self._element = element
-        element.connect('state-change', self._source_state_changed_cb,
-            hue, saturation, brightness, contrast)
+        # In 0.8 there was a signal on the element, in 0.10 it is now a
+        # message on the bus
+        if gst.gst_version < (0,9):
+            element.connect('state-change', self._source_state_changed_cb,
+                hue, saturation, brightness, contrast)
+        else:
+            if pipeline:
+                bus = pipeline.get_bus()
+                bus.connect('message::state-changed', 
+                    self._bus_message_received_cb,
+                    hue, saturation, brightness, contrast)
+        
         self._channels = None
-                                       
+
+    # State change handling for 0.10
+    def _bus_message_received_cb(self, bus, message, hue, saturation, 
+        brightness, contrast):
+        """
+        @param bus: the message bus sending the message
+        @param message: the message received
+        """
+        t = message.type
+        if t == gst.MESSAGE_STATE_CHANGED and message.src == self._element:
+            (old, new, pending) = message.parse_state_changed()
+            # we have a state change
+            if old == gst.STATE_READY and new == gst.STATE_PAUSED:
+                self._setInitialColorBalance(hue, 
+                    saturation, brightness, contrast)
+            
+
     def effect_setColorBalanceProperty(self, which, value):
         """
         Set a color balance property.
@@ -100,7 +136,11 @@ class Colorbalance(feedcomponent.Effect):
             return
 
         self.debug('source is PAUSED, setting initial color balance properties')
-        self._channels = element.list_colorbalance_channels()
+
+        self._setInitialColorBalance(hue, saturation, brightness, contrast)
+    
+    def _setInitialColorBalance(self, hue, saturation, brightness, contrast):
+        self._channels = self._element.list_colorbalance_channels()
         self.debug('colorbalance channels: %d' % len(self._channels))
         if hue:
             self.effect_setColorBalanceProperty('Hue', hue)

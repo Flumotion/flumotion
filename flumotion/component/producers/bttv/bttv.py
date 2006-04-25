@@ -62,7 +62,6 @@ def call_on_state_change(element, from_state, to_state, proc, *args, **kwargs):
         while parent.get_parent():
             parent = parent.get_parent()
         b = parent.get_bus()
-        b.add_signal_watch()
         b.connect('message::state-changed', bus_watch_func)
 
 class BTTV(feedcomponent.ParseLaunchComponent):
@@ -96,15 +95,14 @@ class BTTV(feedcomponent.ParseLaunchComponent):
 
     def configure_pipeline(self, pipeline, properties):
         # create and add colorbalance effect
-        if gst.gst_version < (0,10):
-            source = pipeline.get_by_name('source')
-            hue = properties.get('hue', None)
-            saturation = properties.get('saturation', None)
-            brightness = properties.get('brightness', None)
-            contrast = properties.get('contrast', None)
-            cb = colorbalance.Colorbalance('outputColorbalance', source,
-                hue, saturation, brightness, contrast)
-            self.addEffect(cb)
+        source = pipeline.get_by_name('source')
+        hue = properties.get('hue', None)
+        saturation = properties.get('saturation', None)
+        brightness = properties.get('brightness', None)
+        contrast = properties.get('contrast', None)
+        cb = colorbalance.Colorbalance('outputColorbalance', source,
+            hue, saturation, brightness, contrast, pipeline)
+        self.addEffect(cb)
 
         # register state change notify to set channel and norm
         element = pipeline.get_by_name('source')
@@ -115,7 +113,7 @@ class BTTV(feedcomponent.ParseLaunchComponent):
             self.set_channel_and_norm, element, channel, norm)
     
     def set_channel_and_norm(self, element, channel, norm):
-        self.debug("bttv NULL->READY, setting channel %s and norm %s" % (
+        self.debug("bttv READY->PAUSED, setting channel %s and norm %s" % (
             channel, norm))
         if channel:
             c = element.find_channel_by_name(channel)

@@ -24,6 +24,7 @@ import gst
 from flumotion.common import gstreamer
 
 from flumotion.component import feedcomponent
+
 from flumotion.component.effects.colorbalance import colorbalance
 
 class Webcam(feedcomponent.ParseLaunchComponent):
@@ -68,12 +69,11 @@ class Webcam(feedcomponent.ParseLaunchComponent):
 
     def configure_pipeline(self, pipeline, properties):
         # create and add colorbalance effect
-        if gst.gst_version < (0,9):
-            source = pipeline.get_by_name('source')
-            hue = properties.get('hue', None)
-            saturation = properties.get('saturation', None)
-            brightness = properties.get('brightness', None)
-            contrast = properties.get('contrast', None)
-            cb = colorbalance.Colorbalance('outputColorbalance', source,
-                hue, saturation, brightness, contrast)
-            self.addEffect(cb)
+        source = pipeline.get_by_name('source')
+        hue = properties.get('hue', None)
+        saturation = properties.get('saturation', None)
+        brightness = properties.get('brightness', None)
+        contrast = properties.get('contrast', None)
+        cb = colorbalance.Colorbalance('outputColorbalance', source,
+            hue, saturation, brightness, contrast, pipeline)
+        self.addEffect(cb)
