@@ -106,5 +106,5 @@ class BouncerPortal(log.Loggable):
             keycard.avatarId = "admin-%06x" % self._adminCounter
             self._adminCounter += 1
 
-        return self.realm.requestAvatar(keycard.avatarId, mind, *ifaces)
+        return self.realm.requestAvatar(keycard.avatarId, keycard, mind, *ifaces)
 registerAdapter(_FPortalRoot, BouncerPortal, flavors.IPBRoot)

@@ -41,7 +41,7 @@ class TestAdminAvatar(unittest.TestCase):
         self.heaven = FakeHeaven(vishnu)
 
     def testHasRemoteReference(self):
-        avatar = admin.AdminAvatar(self.heaven, 'admin')
+        avatar = admin.AdminAvatar(self.heaven, 'admin', None)
         avatar.hasRemoteReference()
 
 if __name__ == '__main__':

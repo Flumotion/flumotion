@@ -1,3 +1,316 @@
+2006-05-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/plugs/adminaction.py
+	(AdminActionFileLogger.action): I can't convince myself that
+	keycards will always have usernames, so play it safe here.
+
+	* flumotion/manager/manager.py (Vishnu._addPlugs): We can have
+	more than one plug of a given type, why not. Suggestion from
+	Magnanimous Mike!
+
+	* flumotion/manager/manager.py (Vishnu.loadConfiguration): Add a
+	comment about the meaning of workerId == None.
+
+	* flumotion/common/planet.py (ManagerFlowState.__init__): Comment
+	the method's args.
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseManager):
+	Make sure that the plugs dict has an entry for every socket, even
+	if no <plugs> section is present.
+
+2006-04-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/log.py
+	(_handle, errorObject, warningObject, infoObject, debugObject) 
+	(logObject): Only splice if there are arguments to splice in.
+	Should ensure that no existing case fails.
+
+	* flumotion/common/log.py (errorObject, warningObject) 
+	(infoObject, debugObject, logObject): Interpret additional
+	arguments after the first string as parameters to be spliced into
+	the first as a format string.
+	(error, warning, info, debug, log): Adapt to allow format strings.
+	(Loggable.error, Loggable.warning, Loggable.info, Loggable.debug) 
+	(Loggable.log, Loggable.warningFailure, Loggable.logFunction):
+	Adapt to allow format strings.
+
+	* flumotion/test/test_log.py (LogFunctionTester.logFunction):
+	Update so that the logFunction can take more arguments.
+	(TestLog.testFormatStrings): Add new test for format strings +
+	values in the logger.
+
+2006-04-26  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/worker.py (WorkerListStore.__init__): Use the
+	new set=None idiom from flavors to simplify our code.
+
+	* flumotion/admin/multi.py (WatchedDict): New class, similar to
+	the WatchedList. Note that this infrastructure was only being used
+	by FGC, which hasn't been ported over from houston to multi yet.
+	(MultiAdminModel.admins): Changed from a list to a hash table of
+	managerId -> admin.
+	(MultiAdminModel.addManager.connected_cb, close_admin): Adapt for
+	changes.
+
+	* flumotion/admin/admin.py (AdminModel.__init__) 
+	(AdminModel.connectToHost, adminInfoStr): Create a managerId
+	string for the manager, whose intent it is to uniquely identify
+	the view that we have on the manager at the other end (read: the
+	manager itself, plus the permissions we have for our user). This
+	happened to be what adminInfoStr was before.
+
+	* flumotion/twisted/flavors.py (StateRemoteCache.addListener):
+	Make twice as useful to use and ten times more painful to
+	implement by adding support for None values to mean that the call
+	should be ignored. Useful suggestions for improving this
+	implementation would be good.
+	(StateRemoteCache.observe_set, StateRemoteCache.observe_append)
+	(StateRemoteCache.observe_remove): Update to only call the
+	set/append/remove if the function is there (non-false).
+
+	* flumotion/test/test_flavors.py
+	(TestFullListener.testStateAppendRemoveListener): Test positional
+	arguments here as well as the keyword arguments above.
+
+	* flumotion/test/test_common_planet.py (ListenerTest.setUp):
+	Properly ignore those parts of IStateListener that we don't
+	implement.
+
+2006-04-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/worker.py (WorkerListStore.__init__): Hm, it
+	seems we didn't actually implement IStateListener before.
+
+	* flumotion/twisted/flavors.py (StateRemoteCache): Make the set of
+	listeners a dict rather than a list.
+	(StateRemoteCache.addListener): Add keyword arguments for the
+	state set, append, and remove functions, so that listeners can
+	specify which functions to use if they want. The functions are
+	stored in the dict of listeners.
+	(StateRemoteCache.observe_set, StateRemoteCache.observe_append) 
+	(StateRemoteCache.observe_remove): Update for the changes of the
+	representation of the listener set.
+
+	* flumotion/test/test_flavors.py (TestFullListener): Add test for
+	the custom add/set/remove functions.
+	
+2006-04-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_flavors.py: Refactored so as not to use
+	unittest.deferredResult, avoids lots of nasty warnings with
+	twisted 2.2.
+
+	* flumotion/manager/manager.py (Vishnu.setConnectionInfo): Change
+	using_ssl to use_ssl.
+
+2006-04-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/plugs/Makefile.am (component_PYTHON): Fix
+	adminaction file name.
+
+	* flumotion/test/test_config.py
+	(TestConfig.testParseManagerWithPlugs): Update check for new
+	manager plug type.
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseManager):
+	Add the lifecycle socket to the list of sockets supported by the
+	manager.
+
+	* flumotion/component/plugs/plugs.xml: Declare the new plugs and
+	bundles here.
+
+	* flumotion/component/plugs/lifecycle.py: New file, defines a
+	socket for plugs that are started and stopped with the manager.
+	(ManagerLifecyclePrinter): Sample implementation of the
+	MangerLifecycle socket, printing things to the console.
+
+	* flumotion/component/plugs/Makefile.am (component_PYTHON): 
+	* conf/Makefile.am (EXTRA_DIST): Autotoolage.
+
+	* conf/managers/default/managerlifecycleprinter.xml: 
+	* conf/managers/default/adminactionfilelogger.xml: Add example
+	configs for the various manager plugs.
+
+	* flumotion/manager/manager.py (Vishnu.connectionInfo): New public
+	instance variable, contains a dict with the host, port, and
+	using_ssl of the connection the manager runs on.
+	(Vishnu.setConnectionInfo): A setter for connectionInfo.
+
+	* flumotion/manager/main.py (_startTCP, _startSSL): Let the Vishnu
+	instance know info about what connection it's serving on.
+
+2006-04-20  Andy Wingo  <wingo@pobox.com>
+
+	* common/setup.m4: Convert to use the AC_CONFIG_* infrastructure,
+	so that we can regenerate the output afterr a make clean. Involves
+	some exciting eval hackery, but it seems to be par for the course.
+
+2006-04-11  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/extern/SQuaLe.py: Remove, it's in squale CVS now.
+	* flumotion/extern/Makefile.am (flumotion_PYTHON): Fix for SQuaLe
+	move.
+
+	* env.in (PACKAGES): Add flumotion to the PACKAGES env var.
+
+	* flumotion/component/plugs/base.py (PlugDatabaseMixin): 
+	* flumotion/component/plugs/adminaction.py (DatabaseAdminActionLogger): 
+	* flumotion/component/plugs/loggers.py (DatabaseLogger): Move out
+	to the fsp module.
+
+	* flumotion/component/plugs/plugs.xml: Update for move.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspectiveMessageReceived): New method overriding
+	the one from pb.Avatar, runs admin action plugs before calling a
+	perspective_* method.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/plugs/adminaction.py: New file. Defines a
+	manager plug, AdminAction, that should get run when an admin
+	performs a remote call on the manager. Defines two implementations
+	of this plug, one that logs the call to a file, and another that
+	logs it to a database.
+
+	* flumotion/component/plugs/plugs.xml: Add adminaction bundle and
+	databaseadminlogger to registry.
+
+	* flumotion/component/plugs/Makefile.am (component_PYTHON): Add
+	adminactions.py.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu.__init__): Keep tabs on the
+	plugs as self.plugs = socket->list of plugs, like components.
+	(Vishnu._addPlugs): New function, instantiates plugs for the
+	manager.
+	(Vishnu.loadConfiguration): Call _addPlugs.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_manager_manager.py
+	(TestComponentMapper.testOneComponent)
+	(TestComponentHeaven.testGetComponent)
+	(TestComponentHeaven.testHasComponent)
+	(TestComponentHeaven.testCreateAvatar)
+	(TestVishnu._loginWorker):
+	* flumotion/test/test_manager_admin.py
+	(TestAdminAvatar.testHasRemoteReference):
+	* flumotion/test/test_manager_worker.py (TestHeaven.testAdd) 
+	(TestHeaven.testAttached): Adapt for passing the keycard around
+	when creating avatars.
+
+	* flumotion/test/test_pb.py (FakeTRealm): Renamed from FakeRealm
+	to indicate it presents a twisted-style interface.
+	(FakeFRealm): New fake realm, deriving from FakeTRealm, but taking
+	a keycard argument as well. For passing to
+	flumotion.twisted.portal.*Portal.
+	(FakePortalWrapperPlaintext.__init__)
+	(FakePortalWrapperCrypt.__init__): Check the twisted-style realm.
+	(Test_BouncerWrapper.setUp, Test_FPortalRoot.setUp) 
+	(Test_FPBClientFactory.setUp): Check the flumotion-style realm.
+
+	* flumotion/test/test_config.py
+	(TestConfig.testParseManagerWithBogusPlug)
+	(TestConfig.testParseManagerWithPlugs): New tests.
+	(regchunk): Add test manager plug to registry chunk.
+
+	* flumotion/common/config.py (ConfigEntryManager.__init__): Keep
+	track of plugs defined for the manager.
+	(ConfigEntryAtmosphere.__len__): New function, so that code can
+	just do "if conf.atmosphere" to test if the atmosphere has
+	components.
+	(FlumotionConfigXML.__init__): All planets have atmospheres now.
+	(FlumotionConfigXML.parse): Just update the list of components for
+	the atmosphere instead of replacing it. Loading a config snippet
+	adds to the existing configuration, it doesn't replace it.
+	(FlumotionConfigXML._parseAtmosphere): Return a dict of components
+	in the atmosphere instead of an atmosphere object.
+	(FlumotionConfigXML._parseManager): Parse plugs in a <manager>
+	section as well.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/plugs/base.py (ManagerPlug): Add base class
+	for plugs living in the manager.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/plugs/loggers.py (Logger): Descend from
+	ComponentPlug.
+	(DatabaseLogger): Use the database mixin. Adds fault tolerance
+	while reducing code, yay.
+
+	* flumotion/component/plugs/Makefile.am (component_PYTHON): Add
+	base.py.
+
+	* flumotion/component/plugs/plugs.xml: Add base.py to the
+	base-plugs bundle.
+
+	* flumotion/component/plugs/base.py: New file, factors out some
+	base interfaces for plugs. Also includes a mixin for plugs that
+	access databases.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu._makeBouncer)
+	(Vishnu._updateState, Vishnu._updateFlowDependencies): New
+	functions, factored out of loadConfiguration. Use reflectcall to
+	avoid importing flumotion.job.
+	(Vishnu.loadConfiguration): Simplify, and update for
+	_workerCreateComponents changes.
+	(Vishnu._addComponent): Debugging.
+	(Vishnu.setBouncer): Warn if the manager already has a bouncer,
+	but set anyway.
+	(Vishnu.componentCreate, Vishnu.workerAttached): Simplify, and
+	update for _workerCreateComponents changes.
+	(Vishnu._workerCreateComponents): Take the workerId as the arg,
+	not the avatar. Interpret None to mean any worker.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/job/job.py: createComponent moved to
+	common.reflectcall, update accordingly.
+
+	* flumotion/common/Makefile.am (flumotion_PYTHON): Add
+	reflectcall.py.
+
+	* flumotion/common/reflectcall.py: New file.
+	(reflectCallCatching): New function, factored out of
+	flumotion.job.job.createComponent. Uses reflect to load a module,
+	accesses a function in the module, and calls it, making sure all
+	errors raised are of the same kind.
+	(createComponent): Moved here from flumotion.job.job. Refactored
+	to use reflectCallCatching.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/planet.py (ManagerFlowState.__init__):
+	Interpret kwargs as prop-value pairs to set.
+
+2006-04-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/twisted/portal.py
+	(BouncerPortal._authenticateCallback): Add keycard to the
+	arguments passed to Dispatcher.requestAvatar.
+
+	* flumotion/manager/manager.py (Dispatcher.requestAvatar): Take
+	keycard argument, passing it along to createAvatarFor...
+	(Dispatcher.createAvatarFor): Take keycard argument, passing it
+	along to the heaven's createAvatar...
+
+	* flumotion/manager/base.py (ManagerHeaven.createAvatar): Take
+	keycard argument, passing it along to the avatar constructor...
+	(ManagerAvatar.__init__): Take keycard argument, setting it as
+	self.keycard. Booya.
+
+	* flumotion/manager/component.py (ComponentAvatar.__init__): Don't
+	interpret constructor arguments, just pass them on. Also logName
+	is set by the base class.
+
 2006-04-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/effects/colorbalance/colorbalance.py:

@@ -263,16 +263,14 @@ class ComponentAvatar(base.ManagerAvatar):
 
     _heartbeatCheckInterval = configure.heartbeatInterval * 2.5
 
-    def __init__(self, heaven, avatarId):
-        base.ManagerAvatar.__init__(self, heaven, avatarId)
+    def __init__(self, *args, **kwargs):
+        base.ManagerAvatar.__init__(self, *args, **kwargs)
         
         self.ports = {} # feedName -> port
         self.started = False
         self.starting = False
         self.jobState = None # retrieved after mind attached
         self.componentState = None # set by the vishnu by componentAttached
-
-        self.logName = avatarId
 
         self.lastHeartbeat = 0.0 # last time.time() of heartbeat
         self._HeartbeatCheckDC = None # started when we have the state

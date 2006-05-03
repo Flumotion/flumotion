@@ -67,12 +67,14 @@ def _startSSL(vishnu, host, port, pemFile):
     log.info('manager', 'Starting on port %d using SSL' % port)
     if not host == "":
         log.info('manager', 'Listening as host %s' % host)
+    vishnu.setConnectionInfo(host, port, True)
     reactor.listenSSL(port, vishnu.getFactory(), ctxFactory, interface=host)
 
 def _startTCP(vishnu, host, port):
     log.info('manager', 'Starting on port %d using TCP' % port)
     if not host == "":
         log.info('manager', 'Listening as host %s' % host)
+    vishnu.setConnectionInfo(host, port, False)
     reactor.listenTCP(port, vishnu.getFactory(), interface=host)
 
 def _error(message, reason):

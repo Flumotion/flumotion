@@ -16,22 +16,20 @@
              function="RequestStringToAdminLogger"/>
     </plug>
 
-    <plug socket="flumotion.component.plugs.loggers.Logger"
-          type="databaselogger">
-      <entry location="flumotion/component/plugs/loggers.py"
-             function="DatabaseLogger"/>
+    <plug socket="flumotion.component.plugs.adminaction.AdminAction"
+          type="adminactionfilelogger">
+      <entry location="flumotion/component/plugs/adminaction.py"
+             function="AdminActionFileLogger"/>
 
       <properties>
-        <property name="database-module" type="string" required="True"/>
-        <property name="feed-name" type="string"/>
-        <property name="table" type="string"/>
-        <property name="user" type="string"/>
-        <property name="password" type="string"/>
-        <property name="host" type="string"/>
-        <property name="port" type="int"/>
-        <property name="connect-timeout" type="int"/>
-        <property name="database" type="string"/>
+        <property name="logfile" type="string" required="true"/>
       </properties>
+    </plug>
+
+    <plug socket="flumotion.component.plugs.lifecycle.ManagerLifecycle"
+          type="managerlifecycleprinter">
+      <entry location="flumotion/component/plugs/lifecycle.py"
+             function="ManagerLifecyclePrinter"/>
     </plug>
   </plugs>
 
@@ -43,6 +41,7 @@
       <directories>
         <directory name="flumotion/component/plugs">
           <filename location="__init__.py" />
+          <filename location="base.py" />
         </directory>
       </directories>
     </bundle>
@@ -53,6 +52,26 @@
       <directories>
         <directory name="flumotion/component/plugs">
           <filename location="loggers.py" />
+        </directory>
+      </directories>
+    </bundle>
+    <bundle name="base-plugs-adminaction">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs">
+          <filename location="adminaction.py" />
+        </directory>
+      </directories>
+    </bundle>
+    <bundle name="base-plugs-lifecycle">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs">
+          <filename location="lifecycle.py" />
         </directory>
       </directories>
     </bundle>

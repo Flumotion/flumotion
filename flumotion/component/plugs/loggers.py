@@ -21,29 +21,15 @@
 
 import time
 
-from twisted.python import reflect
-
 from flumotion.common import errors, log
+from flumotion.component.plugs import base
 
 
-class Logger(log.Loggable):
+class Logger(base.ComponentPlug):
     """
-    Base class for logger implementations. Defines the logger API
-    methods.
+    Base class for logger implementations. Should be renamed to
+    StreamLogger later...
     """
-    def __init__(self, args):
-        self.args = args
-
-    def start(self, component):
-        pass
-
-    def stop(self, component):
-        pass
-
-    def restart(self, component):
-        self.stop(component)
-        self.start(component)
-
     def event(self, type, args):
         handler = getattr(self, 'event_' + type, None)
         if handler:
@@ -99,73 +85,3 @@ class ApacheLogger(Logger):
     def event_http_session_completed(self, args):
         self.file.write(_http_session_completed_to_apache_log(args))
         self.file.flush()
-
-class DatabaseLogger(Logger):
-    """
-    Plug to log events directly to a python DB-API v2.0 logging module.
-
-    Example schema that will work with this logger:
-    CREATE TABLE 'access' (
-       'feed_name' varchar(32) default NULL,
-       'ip' varchar(15) default NULL,
-       'session_time' datetime default NULL,
-       'session_duration' int(15) default NULL,
-       'session_bytes' int(15) default NULL,
-       'user_agent' varchar(30) default NULL,
-       'referrer' varchar(30) default NULL,
-    );
-    """
-
-    module = None
-    connection = None
-    operation = None
-    feed_id = None
-    cursor = None
-    sql_template = ("insert into %s (feed_name, ip, session_time, "
-                    "session_duration, session_bytes, user_agent, referrer) "
-                    "values (%%s, %%s, %%s, %%s, %%s, %%s, %%s)")
-    sql = None
-
-    translators = {'MySQLdb': {'password': 'passwd',
-                               'database': 'db'},
-                   'flumotion.extern.SQuaLe': {'database': 'connection_name'}}
-
-    def start(self, component):
-        props = self.args['properties']
-
-        modulename = props['database-module']
-        module = reflect.namedModule(modulename)
-
-        translator = self.translators.get(modulename, {})
-
-        kwargs = {}
-        for k in ('user', 'password', 'host', 'port', 'connect-timeout',
-                  'database'):
-            if k in props:
-                kwargs[translator.get(k,k)] = props[k]
-        c = module.connect(**kwargs)
-
-        self.sql = self.sql_template % props.get('table', 'access')
-        self.feed_name = props.get('feed-name', None)
-        self.module = module
-        self.connection = c
-        self.cursor = c.cursor()
-
-    def stop(self, component):
-        if self.cursor:
-            self.cursor.close()
-            self.cursor = None
-        if self.connection:
-            self.connection.close()
-            self.connection = None
-        self.module = None
-
-    def event_http_session_completed(self, args):
-        self.cursor.execute(self.sql,
-                            (self.feed_name,
-                             args['ip'],
-                             self.module.Timestamp(*args['time'][:6]),
-                             args['time-connected'],
-                             args['bytes-sent'],
-                             args['user-agent'],
-                             args['referer']))

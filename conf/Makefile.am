@@ -1,5 +1,7 @@
 EXTRA_DIST = 						\
         default.pem					\
-	managers/default/flows/ogg-test-theora.xml	\
+	managers/default/adminactionfilelogger.xml	\
+	managers/default/managerlifecycleprinter.xml	\
 	managers/default/planet.xml			\
+	managers/default/flows/ogg-test-theora.xml	\
 	workers/default.xml

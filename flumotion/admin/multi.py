@@ -62,6 +62,8 @@ def _make_watched(type, *mutators):
 
 WatchedList = _make_watched(list, 'append', 'insert', 'remove', 'pop',
                             'sort', 'reverse')
+WatchedDict = _make_watched(dict, '__setitem__', '__delitem__', 'pop',
+                            'popitem', 'update')
 
 
 class MultiAdminModel(log.Loggable):
@@ -69,7 +71,7 @@ class MultiAdminModel(log.Loggable):
 
     def __init__(self):
         # public
-        self.admins = WatchedList() # [AdminModel]
+        self.admins = WatchedDict() # {'host:port': AdminModel}
         # private
         self.listeners = []
 
@@ -94,10 +96,9 @@ class MultiAdminModel(log.Loggable):
     def addManager(self, host, port, use_insecure, user, auth_cb, error_cb):
         def connected_cb(admin):
             planet = admin.planet
-            name = planet.get('name')
-            self.info('Connected to manager %s' % name)
-            assert admin not in self.admins
-            self.admins.append(admin)
+            self.info('Connected to manager %s (planet %s)'
+                      % (admin.managerId, planet.get('name')))
+            self.admins[admin.managerId] = admin
             self.emit('addPlanet', admin, planet)
 
         auth = auth_cb()
@@ -109,8 +110,8 @@ class MultiAdminModel(log.Loggable):
 
     def close_admin(self, admin):
         self.info('Disconnected from manager')
-        if admin in self.admins:
-            self.admins.remove(admin)
+        if admin.managerId in self.admins:
+            del self.admins[admin.managerId]
             self.emit('removePlanet', admin, admin.planet)
         else:
             self.warning('Could not find admin model %r' % admin)

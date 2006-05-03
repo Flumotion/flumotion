@@ -177,6 +177,8 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self.passwd = password
         self.host = self.port = self.use_insecure = None
 
+        self.managerId = '<uninitialized>'
+
         self.state = 'disconnected'
         self.clientFactory = self._makeFactory(username, password)
         # 20 secs max for an admin to reconnect
@@ -197,6 +199,11 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self.host = host
         self.port = port
         self.use_insecure = use_insecure
+
+        # the intention here is to give an id unique to the manager --
+        # if a program is adminning multiple managers, this id should
+        # tell them apart (and identify duplicates)
+        self.managerId = '%s@%s:%d' % (self.user, self.host, self.port)
 
         if use_insecure:
             self.info('Connecting to manager %s:%d with TCP' % (host, port))
@@ -244,7 +251,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
 
     # FIXME: give these three sensible names
     def adminInfoStr(self):
-        return '%s@%s:%s' % (self.user, self.host, self.port)
+        return self.managerId
 
     def connectionInfoStr(self):
         return '%s:%s (%s)' % (self.host, self.port,

@@ -30,7 +30,7 @@ class TestHeaven(unittest.TestCase):
 
     def testAdd(self):
         h = worker.WorkerHeaven(None)
-        avatar = h.createAvatar('foo')
+        avatar = h.createAvatar('foo', None)
 
         assert 'foo' in [a.getName() for a in h.getAvatars()]
         assert isinstance(avatar, worker.WorkerAvatar)
@@ -43,6 +43,6 @@ class TestHeaven(unittest.TestCase):
 
     def testAttached(self):
         h = worker.WorkerHeaven(None)
-        avatar = h.createAvatar('foo')
+        avatar = h.createAvatar('foo', None)
 
         h.workerAttached(avatar)

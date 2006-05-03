@@ -27,8 +27,8 @@ class LogTester(log.Loggable):
     logCategory = 'testlog'
 
 class LogFunctionTester(log.Loggable):
-    def logFunction(self, message):
-        return "override " + message
+    def logFunction(self, format, *args):
+        return (("override " + format),) + args[1:]
 
 class TestLog(unittest.TestCase):
     def setUp(self):
@@ -81,6 +81,15 @@ class TestLog(unittest.TestCase):
         assert self.category == 'testlog'
         assert self.level == log.WARN
         assert self.message == 'also visible'
+  
+    def testFormatStrings(self):
+        log.setFluDebug("testlog:3")
+        log.addLogHandler(self.handler)
+        
+        self.tester.info("%d %s", 42, 'the answer')
+        assert self.category == 'testlog'
+        assert self.level == log.INFO
+        assert self.message == '42 the answer'
   
     def testLimitedError(self):
         log.setFluDebug("testlog:3")

@@ -79,6 +79,23 @@ class AdminAvatar(base.ManagerAvatar):
         if self.hasRemoteReference():
             self.mindCallRemote('log', category, type, message)
         
+    # override pb.Avatar implementation so we can run admin actions
+    def perspectiveMessageReceived(self, broker, message, args, kw):
+        args = broker.unserialize(args, self)
+        kw = broker.unserialize(kw, self)
+        method = getattr(self, "perspective_%s" % message)
+
+        socket = 'flumotion.component.plugs.adminaction.AdminAction'
+        for plug in self.vishnu.plugs[socket]:
+            plug.action(self, message, args, kw)
+
+        try:
+            state = method(*args, **kw)
+        except TypeError:
+            self.debug("%s didn't accept %s and %s" % (method, args, kw))
+            raise
+        return broker.serialize(state, self, method, args, kw)
+
     ### pb.Avatar IPerspective methods
     def perspective_getPlanetState(self):
         self.debug("returning planet state %r" % self.vishnu.state)

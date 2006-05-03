@@ -70,7 +70,7 @@ class ConfigEntryFlow:
 class ConfigEntryManager:
     "I represent a <manager> entry in a planet config file"
     def __init__(self, name, host, port, transport, certificate, bouncer,
-            fludebug):
+            fludebug, plugs):
         self.name = name
         self.host = host
         self.port = port
@@ -78,11 +78,15 @@ class ConfigEntryManager:
         self.certificate = certificate
         self.bouncer = bouncer
         self.fludebug = fludebug
+        self.plugs = plugs
 
 class ConfigEntryAtmosphere:
     "I represent a <atmosphere> entry in a planet config file"
     def __init__(self):
         self.components = {}
+
+    def __len__(self):
+        return len(self.components)
 
 # FIXME: rename
 class FlumotionConfigXML(fxml.Parser):
@@ -101,7 +105,7 @@ class FlumotionConfigXML(fxml.Parser):
     def __init__(self, filename, string=None):
         self.flows = []
         self.manager = None
-        self.atmosphere = None
+        self.atmosphere = ConfigEntryAtmosphere()
         if filename != None:
             self._repr = filename
         else:
@@ -149,7 +153,7 @@ class FlumotionConfigXML(fxml.Parser):
                 
             if node.nodeName == 'atmosphere':
                 entry = self._parseAtmosphere(node)
-                self.atmosphere = entry
+                self.atmosphere.components.update(entry)
             elif node.nodeName == 'flow':
                 entry = self._parseFlow(node)
                 self.flows.append(entry)
@@ -165,7 +169,7 @@ class FlumotionConfigXML(fxml.Parser):
         #   ...
         # </atmosphere>
 
-        atmosphere = ConfigEntryAtmosphere()
+        ret = {}
         for child in node.childNodes:
             if (child.nodeType == Node.TEXT_NODE or
                 child.nodeType == Node.COMMENT_NODE):
@@ -176,8 +180,8 @@ class FlumotionConfigXML(fxml.Parser):
             else:
                 raise ConfigError("unexpected 'atmosphere' node: %s" % child.nodeName)
 
-            atmosphere.components[component.name] = component
-        return atmosphere
+            ret[component.name] = component
+        return ret
      
     def _parseComponent(self, node, parent):
         """
@@ -325,6 +329,13 @@ class FlumotionConfigXML(fxml.Parser):
         certificate = None
         bouncer = None
         fludebug = None
+        plugs = {}
+
+        manager_sockets = \
+            ['flumotion.component.plugs.adminaction.AdminAction',
+             'flumotion.component.plugs.lifecycle.ManagerLifecycle']
+        for k in manager_sockets:
+            plugs[k] = []
 
         if node.hasAttribute('name'):
             name = str(node.getAttribute('name'))
@@ -352,6 +363,12 @@ class FlumotionConfigXML(fxml.Parser):
                     raise ConfigError(
                         "<manager> section can only have one <component>")
                 bouncer = self._parseComponent(child, 'manager')
+            elif child.nodeName == "plugs":
+                if noRegistry:
+                    continue
+
+                for k, v in self._parsePlugs(node, manager_sockets).items():
+                    plugs[k].extend(v)
             elif child.nodeName == "debug":
                 fludebug = self._nodeGetString("debug", child)
             else:
@@ -361,7 +378,7 @@ class FlumotionConfigXML(fxml.Parser):
             # FIXME: assert that it is a bouncer !
 
         return ConfigEntryManager(name, host, port, transport, certificate,
-            bouncer, fludebug)
+            bouncer, fludebug, plugs)
 
     def _nodeGetInt(self, name, node):
         try:

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-03 17:59+0100\n"
+"POT-Creation-Date: 2006-04-24 13:28+0200\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: cat\n"
@@ -14,26 +14,26 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: flumotion/admin/gtk/client.py:155
+#: flumotion/admin/gtk/client.py:154
 msgid "Not connected"
 msgstr "No conectat"
 
-#: flumotion/admin/gtk/client.py:183
+#: flumotion/admin/gtk/client.py:182
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Connectant amb %s:%s"
 
-#: flumotion/admin/gtk/client.py:268 flumotion/admin/gtk/client.py:332
+#: flumotion/admin/gtk/client.py:261 flumotion/admin/gtk/client.py:325
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Carregant UI per %s ..."
 
-#: flumotion/admin/gtk/client.py:350
+#: flumotion/admin/gtk/client.py:343
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Carregant tab %s per %s ..."
 
-#: flumotion/admin/gtk/client.py:369
+#: flumotion/admin/gtk/client.py:362
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s no té UI encara"
@@ -62,54 +62,54 @@ msgstr "Connexió en %s va ser rebutjada "
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Connexió a l'encarregat en %s va fallar (%s)."
 
-#: flumotion/admin/gtk/client.py:715
+#: flumotion/admin/gtk/client.py:713
 #, fuzzy, python-format
 msgid "Component %s is sad"
 msgstr "Component %s encara està dormint"
 
-#: flumotion/admin/gtk/client.py:721
+#: flumotion/admin/gtk/client.py:720
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Demostrar UI per a %s"
 
-#: flumotion/admin/gtk/client.py:741
+#: flumotion/admin/gtk/client.py:740
 #, python-format
 msgid "No UI for component %s"
 msgstr "Cap UI per al component %s"
 
-#: flumotion/admin/gtk/client.py:755
+#: flumotion/admin/gtk/client.py:746
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Component %s encara està dormint"
 
-#: flumotion/admin/gtk/client.py:765
+#: flumotion/admin/gtk/client.py:748
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Petició de UI per a %s ..."
 
-#: flumotion/admin/gtk/client.py:811
+#: flumotion/admin/gtk/client.py:801
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "El mag no pot funcionar perquè no s'entra a ningun treballador."
 
-#: flumotion/admin/gtk/client.py:852
+#: flumotion/admin/gtk/client.py:842
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Codi de component recarregant per a %s"
 
-#: flumotion/admin/gtk/client.py:883
+#: flumotion/admin/gtk/client.py:873
 msgid "No component selected."
 msgstr "Cap component seleccionat."
 
-#: flumotion/admin/gtk/client.py:900
+#: flumotion/admin/gtk/client.py:890
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "Fallat de %s al component de %s"
 
-#: flumotion/admin/gtk/client.py:927
+#: flumotion/admin/gtk/client.py:917
 msgid "Import Configuration..."
 msgstr "Importar la configuració..."
 
-#: flumotion/admin/gtk/client.py:940
+#: flumotion/admin/gtk/client.py:930
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -117,11 +117,11 @@ msgstr ""
 "L'arxiu ja existeix.\n"
 "sobreescriu ja? "
 
-#: flumotion/admin/gtk/client.py:962
+#: flumotion/admin/gtk/client.py:952
 msgid "Export Configuration..."
 msgstr "Exportar la configuració..."
 
-#: flumotion/admin/gtk/client.py:1006
+#: flumotion/admin/gtk/client.py:996
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -130,24 +130,24 @@ msgstr ""
 "No podia recarregar el component:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1016
+#: flumotion/admin/gtk/client.py:1006
 msgid "Reloading ..."
 msgstr "Recarregant..."
 
-#: flumotion/admin/gtk/client.py:1017
+#: flumotion/admin/gtk/client.py:1007
 msgid "Reloading client code"
 msgstr "Recarregant el codi del client"
 
-#: flumotion/admin/gtk/client.py:1019
+#: flumotion/admin/gtk/client.py:1009
 #, python-format
 msgid "Reloading %s code"
 msgstr "Recarregant %s del codi"
 
-#: flumotion/admin/gtk/client.py:1032
+#: flumotion/admin/gtk/client.py:1038
 msgid "About Flumotion"
 msgstr "Sobre Flumotion"
 
-#: flumotion/admin/gtk/client.py:1051
+#: flumotion/admin/gtk/client.py:1057
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -157,7 +157,7 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1056
+#: flumotion/admin/gtk/client.py:1062
 msgid "Authors"
 msgstr "Autors"
 
@@ -380,68 +380,72 @@ msgstr ""
 msgid "Component lost feed, reconnecting..."
 msgstr "Connexió perduda a l'encarregat, tornant a connectar ..."
 
-#: flumotion/component/consumers/httpstreamer/http.py:454
+#: flumotion/component/consumers/httpstreamer/http.py:465
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/http.glade:8
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:132
+#: flumotion/component/consumers/httpstreamer/http.glade:7
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:211
 msgid "Statistics"
 msgstr "Estadístiques"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:129
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:50
-msgid "Mime type:"
-msgstr "Tipus de l'acaroni:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:155
+#: flumotion/component/consumers/httpstreamer/http.glade:33
 msgid "<b>Stream</b>"
 msgstr "<b>Fluir</b>"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:180
+#: flumotion/component/consumers/httpstreamer/http.glade:58
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:56
+msgid "Mime type:"
+msgstr "Tipus de l'acaroni:"
+
+#: flumotion/component/consumers/httpstreamer/http.glade:84
 msgid "Uptime:"
 msgstr "Temps sobrepassat:"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:206
-#: flumotion/component/consumers/httpstreamer/http.glade:616
+#: flumotion/component/consumers/httpstreamer/http.glade:110
+#: flumotion/component/consumers/httpstreamer/http.glade:488
 msgid "Bit rate:"
 msgstr "Índex octeto:"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:232
-#: flumotion/component/consumers/httpstreamer/http.glade:642
+#: flumotion/component/consumers/httpstreamer/http.glade:136
+#: flumotion/component/consumers/httpstreamer/http.glade:514
 msgid "Total bytes:"
 msgstr "Octetos totals:"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:258
+#: flumotion/component/consumers/httpstreamer/http.glade:162
 msgid "<b>Clients</b>"
 msgstr "<b>Clients</b>"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:283
-msgid "Average:"
-msgstr "Terme mitjà:"
-
-#: flumotion/component/consumers/httpstreamer/http.glade:309
+#: flumotion/component/consumers/httpstreamer/http.glade:187
 msgid "Current:"
 msgstr "Actual:"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:335
+#: flumotion/component/consumers/httpstreamer/http.glade:213
+msgid "Average:"
+msgstr "Terme mitjà:"
+
+#: flumotion/component/consumers/httpstreamer/http.glade:239
 msgid "Peak:"
 msgstr "Bec:"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:412
+#: flumotion/component/consumers/httpstreamer/http.glade:313
 msgid "of"
 msgstr "de"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:491
+#: flumotion/component/consumers/httpstreamer/http.glade:389
 msgid "at"
 msgstr "en"
 
-#: flumotion/component/consumers/httpstreamer/http.glade:591
+#: flumotion/component/consumers/httpstreamer/http.glade:440
 msgid "<b>Client Consumption</b>"
 msgstr "<b>Consumició Del Client</b>"
 
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:134
+#: flumotion/component/consumers/httpstreamer/http.glade:655
+msgid "Web URL:"
+msgstr ""
+
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:213
 msgid "Log"
 msgstr "Log"
 
@@ -471,8 +475,29 @@ msgstr "Patró:"
 msgid "Pattern"
 msgstr "Patró"
 
-#: flumotion/manager/manager.py:548
+#: flumotion/manager/manager.py:568
 msgid "The component could not be started."
+msgstr ""
+
+#: flumotion/worker/worker.py:349
+#, fuzzy
+msgid "The component was killed.\n"
+msgstr "Cap component seleccionat."
+
+#: flumotion/worker/worker.py:351
+#, fuzzy
+msgid "The component crashed.\n"
+msgstr "Cap component seleccionat."
+
+#: flumotion/worker/worker.py:371
+msgid ""
+"However, no core dump was generated. You may need to configure the "
+"environment if you want to further debug this problem."
+msgstr ""
+
+#: flumotion/worker/worker.py:380
+#, python-format
+msgid "The core dump is '%s' on worker '%s'."
 msgstr ""
 
 #: flumotion/worker/checks/check.py:45
@@ -516,28 +541,40 @@ msgstr ""
 msgid "Synchronization between audio and video may not be correct.\n"
 msgstr ""
 
-#: flumotion/worker/checks/video08.py:159
-#: flumotion/worker/checks/video010.py:156
+#: flumotion/worker/checks/video08.py:161
+#: flumotion/worker/checks/video010.py:165
 #, fuzzy
 msgid "Device node /dev/raw1394 does not exist."
 msgstr "el node /dev/raw1394 del dispositiu no existeix "
 
-#: flumotion/worker/checks/video08.py:178
-#: flumotion/worker/checks/video010.py:174
+#: flumotion/worker/checks/video08.py:180
+#: flumotion/worker/checks/video010.py:191
 #, fuzzy
 msgid "No Firewire device found."
 msgstr "Cap dispositiu del firewire va detectar."
 
-#: flumotion/worker/checks/video08.py:184
-#: flumotion/worker/checks/video010.py:180
+#: flumotion/worker/checks/video08.py:183
+#: flumotion/worker/checks/video010.py:194
+msgid ""
+"Could not open Firewire device for reading. Check permissions on the device."
+msgstr ""
+
+#: flumotion/worker/checks/video08.py:190
+#: flumotion/worker/checks/video010.py:201
 #, fuzzy
 msgid "Could not probe Firewire device."
 msgstr "Comprovant dispositiu del firewire..."
 
-#: flumotion/worker/checks/video08.py:208
+#: flumotion/worker/checks/video08.py:214
 msgid ""
 "The ffmpegcolorspace element is too old. Please upgrade gst-plugins to "
 "version 0.8.5."
+msgstr ""
+
+#: flumotion/worker/checks/video010.py:187
+msgid ""
+"Could not find or open the Firewire device. Check the device node and its "
+"permissions."
 msgstr ""
 
 #: flumotion/test/test_i18n.py:57 flumotion/test/test_i18n.py:94

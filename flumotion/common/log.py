@@ -134,7 +134,7 @@ def scrubFilename(filename):
     
     return filename
 
-def _handle(level, object, category, message):
+def _handle(level, object, category, format, args):
     def getFileLine():
         # Return a tuple of (file, line) for the first stack entry
         # outside of log.py (which would be the caller of log)
@@ -146,6 +146,11 @@ def _handle(level, object, category, message):
             frame = frame.f_back
             
         return "Not found", 0
+
+    if args:
+        message = format % args
+    else:
+        message = format
 
     # first all the unlimited ones
     if _log_handlers:
@@ -169,49 +174,61 @@ def _handle(level, object, category, message):
         except TypeError:
             raise SystemError, "handler %r raised a TypeError" % handler
     
-def errorObject(object, cat, *args):
+def errorObject(object, cat, format, *args):
     """
     Log a fatal error message in the given category. \
     This will also raise a L{flumotion.common.errors.SystemError}.
     """
-    _handle(ERROR, object, cat, ' '.join(args))
+    _handle(ERROR, object, cat, format, args)
 
     # we do the import here because having it globally causes weird import
     # errors if our gstreactor also imports .log, which brings in errors
     # and pb stuff
     from flumotion.common.errors import SystemError
-    raise SystemError(' '.join(args))
+    if args:
+        raise SystemError(format % args)
+    else:
+        raise SystemError(format)
 
-def warningObject(object, cat, *args):
+def warningObject(object, cat, format, *args):
     """
     Log a warning message in the given category.
     This is used for non-fatal problems.
     """
-    _handle(WARN, object, cat, ' '.join(args))
+    _handle(WARN, object, cat, format, args)
 
-def infoObject(object, cat, *args):
+def infoObject(object, cat, format, *args):
     """
     Log an informational message in the given category.
     """
-    _handle(INFO, object, cat, ' '.join(args))
+    _handle(INFO, object, cat, format, args)
 
-def debugObject(object, cat, *args):
+def debugObject(object, cat, format, *args):
     """
     Log a debug message in the given category.
     """
-    _handle(DEBUG, object, cat, ' '.join(args))
+    _handle(DEBUG, object, cat, format, args)
 
-def logObject(object, cat, *args):
+def logObject(object, cat, format, *args):
     """
     Log a log message.  Used for debugging recurring events.
     """
-    _handle(LOG, object, cat, ' '.join(args))
+    _handle(LOG, object, cat, format, args)
 
-error = lambda cat, *args: errorObject(None, cat, *args)
-warning = lambda cat, *args: warningObject(None, cat, *args)
-info = lambda cat, *args: infoObject(None, cat, *args)
-debug = lambda cat, *args: debugObject(None, cat, *args)
-log = lambda cat, *args: logObject(None, cat, *args)
+def error(cat, format, *args):
+    errorObject(None, cat, format, *args)
+
+def warning(cat, format, *args):
+    warningObject(None, cat, format, *args)
+
+def info(cat, format, *args):
+    infoObject(None, cat, format, *args)
+
+def debug(cat, format, *args):
+    debugObject(None, cat, format, *args)
+
+def log(cat, format, *args):
+    logObject(None, cat, format, *args)
 
 #warningFailure = lambda failure: Loggable.warningFailure(None, '', failure)
 warningFailure = lambda failure: warning('', getFailureMessage(failure))
@@ -233,35 +250,35 @@ class Loggable:
         if _canShortcutLogging(self.logCategory, ERROR):
             return
         errorObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
+            *self.logFunction(*args))
         
     def warning(self, *args):
         """Log a warning.  Used for non-fatal problems."""
         if _canShortcutLogging(self.logCategory, WARN):
             return
         warningObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
+            *self.logFunction(*args))
         
     def info(self, *args):
         """Log an informational message.  Used for normal operation."""
         if _canShortcutLogging(self.logCategory, INFO):
             return
         infoObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
+            *self.logFunction(*args))
 
     def debug(self, *args):
         """Log a debug message.  Used for debugging."""
         if _canShortcutLogging(self.logCategory, DEBUG):
             return
         debugObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
+            *self.logFunction(*args))
 
     def log(self, *args):
         """Log a log message.  Used for debugging recurring events."""
         if _canShortcutLogging(self.logCategory, LOG):
             return
         logObject(self.logObjectName(), self.logCategory,
-            self.logFunction(*args))
+            *self.logFunction(*args))
 
     def warningFailure(self, failure):
         """
@@ -271,11 +288,11 @@ class Loggable:
         if _canShortcutLogging(self.logCategory, WARN):
             return
         warningObject(self.logObjectName(), self.logCategory,
-            self.logFunction(getFailureMessage(failure)))
+            *self.logFunction(getFailureMessage(failure)))
 
-    def logFunction(self, message):
+    def logFunction(self, *args):
         """Overridable log function.  Default just returns passed message."""
-        return message
+        return args
 
     def logObjectName(self):
         """Overridable object name function."""
@@ -332,6 +349,8 @@ class FluLogObserver(Loggable):
                     'text': text.replace("\n", "\n\t")
                   }
         msgStr = " [%(system)s] %(text)s\n" % fmtDict
+        # because msgstr can contain %, as in a backtrace, make sure we
+        # don't try to splice it
         method('twisted', msgStr)
 
     def ignoreErrors(self, *types):

@@ -78,7 +78,7 @@ class ListenerTest(unittest.TestCase):
     def setUp(self):
         self.mstate = planet.ManagerComponentState()
         self.astate = jelly.unjelly(jelly.jelly(self.mstate))
-        self.astate.addListener(self)
+        self.astate.addListener(self, append=None, remove=None)
         self.changes = []
 
     def stateSet(self, state, key, value):

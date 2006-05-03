@@ -52,13 +52,13 @@ class TestRoot(testclasses.TestManagerRoot):
         return self.state
 
     def remote_setStateName(self, name):
-        self.state.set('name', name)
+        return self.state.set('name', name)
 
     def remote_bearChild(self, name):
-        self.state.append('children', name)
+        return self.state.append('children', name)
 
     def remote_haveAdopted(self, name):
-        self.state.remove('children', name)
+        return self.state.remove('children', name)
 
 class TestStateSet(unittest.TestCase):
     def setUp(self):
@@ -66,7 +66,177 @@ class TestStateSet(unittest.TestCase):
         self.runServer()
 
     def tearDown(self):
-        unittest.deferredResult(self.stopServer())
+        return self.stopServer()
+        
+    # helper functions to start PB comms
+    def runClient(self):
+        f = pb.PBClientFactory()
+        self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
+        d = f.getRootObject()
+        d.addCallback(self.clientConnected)
+        return d
+        #.addCallbacks(self.connected, self.notConnected)
+        # self.id = reactor.callLater(10, self.timeOut)
+
+    def clientConnected(self, perspective):
+        self.perspective = perspective
+        self._dDisconnect = defer.Deferred()
+        perspective.notifyOnDisconnect(
+            lambda r: self._dDisconnect.callback(None))
+
+    def stopClient(self):
+        self.cport.disconnect()
+        return self._dDisconnect
+
+    def runServer(self):
+        factory = pb.PBServerFactory(TestRoot())
+        factory.unsafeTracebacks = 1
+        self.sport = reactor.listenTCP(0, factory, interface="127.0.0.1")
+        self.port = self.sport.getHost().port
+
+    def stopServer(self):
+        return self.sport.stopListening()
+
+    # actual tests
+    def testStateSet(self):
+        d = self.runClient()
+        d.addCallback(lambda _: self.perspective.callRemote('getState'))
+
+        def set_state(state):
+            d.state = state
+            self.failUnless(state)
+            self.failUnlessEqual(state.get('name'), 'lois')
+            self.assertRaises(KeyError, state.get, 'dad')
+            return self.perspective.callRemote('setStateName', 'clark')
+
+        def check_name(_):
+            self.failUnlessEqual(d.state.get('name'), 'clark')
+
+        d.addCallback(set_state)
+        d.addCallback(check_name)
+        d.addCallback(lambda _: self.stopClient())
+        return d
+
+    def testStateAppendRemove(self):
+        # start everything
+        d = self.runClient()
+        d.addCallback(lambda _: self.perspective.callRemote('getState'))
+
+        def set_state_and_bear_child(state):
+            d.state = state
+            self.failUnless(state)
+            self.failUnlessEqual(state.get('children'), [])
+            return self.perspective.callRemote('bearChild', 'robin')
+
+        def check_first_kid_and_bear_again(_):
+            self.failUnlessEqual(d.state.get('children'), ['robin'])
+            return self.perspective.callRemote('bearChild', 'robin')
+
+        def check_second_kid_and_give_away(_):
+            self.failUnlessEqual(d.state.get('children'), ['robin', 'robin'])
+            return self.perspective.callRemote('haveAdopted', 'robin')
+
+        def check_after_adopt_and_bear_again(_):
+            self.failUnlessEqual(d.state.get('children'), ['robin'])
+            return self.perspective.callRemote('bearChild', 'batman')
+
+        def check_third_kid_and_stop(_):
+            self.failUnlessEqual(d.state.get('children'), ['robin', 'batman'])
+            return self.stopClient()
+
+        d.addCallback(set_state_and_bear_child)
+        d.addCallback(check_first_kid_and_bear_again)
+        d.addCallback(check_second_kid_and_give_away)
+        d.addCallback(check_after_adopt_and_bear_again)
+        d.addCallback(check_third_kid_and_stop)
+        return d
+
+    def testStateWrongListener(self):
+        # start everything
+        d = self.runClient()
+        d.addCallback(lambda _: self.perspective.callRemote('getState'))
+
+        def got_state_and_stop(state):
+            self.assertRaises(NotImplementedError, state.addListener, FakeObject())
+            self.assertRaises(NotImplementedError, state.removeListener,
+                              FakeObject())
+            self.assertRaises(KeyError, state.removeListener, FakeListener())
+            return self.stopClient()
+
+        d.addCallback(got_state_and_stop)
+        return d
+
+    # listener interface
+    __implements__ = flavors.IStateListener,
+    
+    def stateSet(self, state, key, value):
+        self.changes.append(('set', state, key, value))
+
+    def stateAppend(self, state, key, value):
+        self.changes.append(('append', state, key, value))
+
+    def stateRemove(self, state, key, value):
+        self.changes.append(('remove', state, key, value))
+
+    # listener tests
+    def testStateSetListener(self):
+        # start everything and get the state
+        d = self.runClient()
+        d.addCallback(lambda _: self.perspective.callRemote('getState'))
+
+        # ask server to set the name
+        def add_listener_and_set_name(state):
+            d.state = state # monkeypatch
+            state.addListener(self)
+            return self.perspective.callRemote('setStateName', 'robin')
+
+        def check_results(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('set', d.state, 'name', 'robin'))
+            return self.stopClient()
+
+        d.addCallback(add_listener_and_set_name)
+        d.addCallback(check_results)
+        return d
+
+    def testStateAppendRemoveListener(self):
+        # start everything and get the state
+        d = self.runClient()
+        d.addCallback(lambda _: self.perspective.callRemote('getState'))
+
+        def add_listener_and_bear_child(state):
+            d.state = state # monkeypatch
+            state.addListener(self)
+            return self.perspective.callRemote('bearChild', 'robin')
+
+        def check_append_results_and_adopt_kid(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('append', d.state, 'children', 'robin'))
+            return self.perspective.callRemote('haveAdopted', 'robin')
+
+        def check_remove_results_and_bear_child(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('remove', d.state, 'children', 'robin'))
+            return self.perspective.callRemote('bearChild', 'batman')
+
+        def check_append_results_and_stop(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('append', d.state, 'children', 'batman'))
+            return self.stopClient()
+
+        d.addCallback(add_listener_and_bear_child)
+        d.addCallback(check_append_results_and_adopt_kid)
+        d.addCallback(check_remove_results_and_bear_child)
+        d.addCallback(check_append_results_and_stop)
+        return d
+
+class TestFullListener(unittest.TestCase):
+    def setUp(self):
+        self.changes = []
+        self.runServer()
+
+    def tearDown(self):
+        return self.stopServer()
         
     # helper functions to start PB comms
     def runClient(self):
@@ -99,147 +269,75 @@ class TestStateSet(unittest.TestCase):
         return d
 
     # actual tests
-    def testStateSet(self):
-        # start everything
-        unittest.deferredResult(self.runClient())
-        
-        # get the state
-        d = self.perspective.callRemote('getState')
-        state = unittest.deferredResult(d)
-
-        self.failUnless(state)
-        self.failUnlessEqual(state.get('name'), 'lois')
-        self.assertRaises(KeyError, state.get, 'dad')
-
-        # ask server to set the name
-        d = self.perspective.callRemote('setStateName', 'clark')
-        r = unittest.deferredResult(d)
-
-        self.failUnlessEqual(state.get('name'), 'clark')
-        unittest.deferredResult(self.stopClient())
-
-    def testStateAppendRemove(self):
-        # start everything
-        d = self.runClient()
-        unittest.deferredResult(d)
-        
-        # get the state
-        d = self.perspective.callRemote('getState')
-        state = unittest.deferredResult(d)
-
-        self.failUnless(state)
-        self.failUnlessEqual(state.get('children'), [])
-
-        # ask server to make children
-        d = self.perspective.callRemote('bearChild', 'robin')
-        r = unittest.deferredResult(d)
-
-        self.failUnlessEqual(state.get('children'), ['robin'])
-
-        # lists can have same member more than once
-        d = self.perspective.callRemote('bearChild', 'robin')
-        r = unittest.deferredResult(d)
-
-        self.failUnlessEqual(state.get('children'), ['robin', 'robin'])
-
-        # give one of them away
-        d = self.perspective.callRemote('haveAdopted', 'robin')
-        r = unittest.deferredResult(d)
-
-        self.failUnlessEqual(state.get('children'), ['robin'])
-
-        # add a different one
-        d = self.perspective.callRemote('bearChild', 'batman')
-        r = unittest.deferredResult(d)
-
-        self.failUnlessEqual(state.get('children'), ['robin', 'batman'])
-        unittest.deferredResult(self.stopClient())
-
-    def testStateWrongListener(self):
-        # start everything
-        d = self.runClient()
-        unittest.deferredResult(d)
-
-        # get the state
-        d = self.perspective.callRemote('getState')
-        state = unittest.deferredResult(d)
-
-        self.assertRaises(NotImplementedError, state.addListener, FakeObject())
-        self.assertRaises(NotImplementedError, state.removeListener,
-            FakeObject())
-        self.assertRaises(KeyError, state.removeListener, FakeListener())
-        unittest.deferredResult(self.stopClient())
-
-    # listener interface
     __implements__ = flavors.IStateListener,
     
-    def stateSet(self, state, key, value):
+    def customStateSet(self, state, key, value):
         self.changes.append(('set', state, key, value))
 
-    def stateAppend(self, state, key, value):
+    def customStateAppend(self, state, key, value):
         self.changes.append(('append', state, key, value))
 
-    def stateRemove(self, state, key, value):
+    def customStateRemove(self, state, key, value):
         self.changes.append(('remove', state, key, value))
 
     # listener tests
     def testStateSetListener(self):
-        # start everything
+        # start everything and get the state
         d = self.runClient()
-        unittest.deferredResult(d)
+        d.addCallback(lambda _: self.perspective.callRemote('getState'))
 
-        # get the state
-        d = self.perspective.callRemote('getState')
-        state = unittest.deferredResult(d)
+        # ask server to set the name
+        def add_listener_and_set_name(state):
+            d.state = state # monkeypatch
+            state.addListener(self,
+                              set=self.customStateSet,
+                              append=self.customStateAppend,
+                              remove=self.customStateRemove)
+            return self.perspective.callRemote('setStateName', 'robin')
 
-        state.addListener(self)
+        def check_results(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('set', d.state, 'name', 'robin'))
+            return self.stopClient()
 
-         # ask server to set the name
-        d = self.perspective.callRemote('setStateName', 'robin')
-        r = unittest.deferredResult(d)
-        c = self.changes.pop()
-        self.failUnlessEqual(c, ('set', state, 'name', 'robin'))
-        unittest.deferredResult(self.stopClient())
+        d.addCallback(add_listener_and_set_name)
+        d.addCallback(check_results)
+        return d
 
     def testStateAppendRemoveListener(self):
-        # start everything
+        # start everything and get the state
         d = self.runClient()
-        unittest.deferredResult(d)
-        
-        # get the state
-        d = self.perspective.callRemote('getState')
-        state = unittest.deferredResult(d)
+        d.addCallback(lambda _: self.perspective.callRemote('getState'))
 
-        state.addListener(self)
+        def add_listener_and_bear_child(state):
+            d.state = state # monkeypatch
+            # here test the positional-arguments code
+            state.addListener(self,
+                              None,
+                              self.customStateAppend,
+                              self.customStateRemove)
+            return self.perspective.callRemote('bearChild', 'robin')
 
-        # ask server to make children
-        d = self.perspective.callRemote('bearChild', 'robin')
-        r = unittest.deferredResult(d)
+        def check_append_results_and_adopt_kid(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('append', d.state, 'children', 'robin'))
+            return self.perspective.callRemote('haveAdopted', 'robin')
 
-        c = self.changes.pop()
-        self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
+        def check_remove_results_and_bear_child(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('remove', d.state, 'children', 'robin'))
+            return self.perspective.callRemote('bearChild', 'batman')
 
-        # lists can have same member more than once
-        d = self.perspective.callRemote('bearChild', 'robin')
-        r = unittest.deferredResult(d)
+        def check_append_results_and_stop(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('append', d.state, 'children', 'batman'))
+            return self.stopClient()
 
-        c = self.changes.pop()
-        self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
-
-        # give one of them away
-        d = self.perspective.callRemote('haveAdopted', 'robin')
-        r = unittest.deferredResult(d)
-
-        c = self.changes.pop()
-        self.failUnlessEqual(c, ('remove', state, 'children', 'robin'))
-
-        # add a different one
-        d = self.perspective.callRemote('bearChild', 'batman')
-        r = unittest.deferredResult(d)
-
-        c = self.changes.pop()
-        self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
-        unittest.deferredResult(self.stopClient())
+        d.addCallback(add_listener_and_bear_child)
+        d.addCallback(check_append_results_and_adopt_kid)
+        d.addCallback(check_remove_results_and_bear_child)
+        d.addCallback(check_append_results_and_stop)
+        return d
 
 class TestState(unittest.TestCase):
     def testStateAddKey(self):

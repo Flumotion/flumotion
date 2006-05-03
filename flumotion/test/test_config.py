@@ -56,6 +56,13 @@ regchunk = """
         <property name="rate" type="fraction" required="true"/>
       </properties>
     </plug>
+    <plug socket="flumotion.component.plugs.adminaction.AdminAction"
+          type="test-adminaction">
+      <entry location="qux/baz.py" function="Quxulator"/>
+      <properties>
+        <property name="foo" type="string" required="true"/>
+      </properties>
+    </plug>
   </plugs>
 </registry>"""
 
@@ -149,6 +156,46 @@ class TestConfig(unittest.TestCase):
         self.failUnless(conf.manager.bouncer)
         self.failUnless(conf.manager.bouncer.name)
         self.assertEquals(conf.manager.bouncer.name, "component-name")
+
+    def testParseManagerWithPlugs(self):
+        conf = config.FlumotionConfigXML(None,
+             """
+             <planet>
+               <manager name="aname">
+                 <plugs>
+                   <plug socket="flumotion.component.plugs.adminaction.AdminAction"
+                         type="test-adminaction">
+                     <property name="foo">bar</property>
+                   </plug>
+                 </plugs>
+               </manager>
+             </planet>""")
+        conf.parse()
+        self.failUnless(conf.manager)
+        self.failIf(conf.manager.bouncer)
+        self.failIf(conf.manager.host)
+        self.assertEquals(conf.manager.plugs,
+                          {'flumotion.component.plugs.adminaction.AdminAction':
+                           [{'type':'test-adminaction',
+                             'socket':
+                             'flumotion.component.plugs.adminaction.AdminAction',
+                             'properties': {'foo': 'bar'}}],
+                           'flumotion.component.plugs.lifecycle.ManagerLifecycle':
+                           []})
+
+    def testParseManagerWithBogusPlug(self):
+        conf = config.FlumotionConfigXML(None,
+             """
+             <planet>
+               <manager name="aname">
+                 <plugs>
+                   <plug socket="doesnotexist"
+                         type="frob">
+                   </plug>
+                 </plugs>
+               </manager>
+             </planet>""")
+        self.assertRaises(config.ConfigError, conf.parse)
 
     def testParseError(self):
         xml = '<planet><bad-node/></planet>'

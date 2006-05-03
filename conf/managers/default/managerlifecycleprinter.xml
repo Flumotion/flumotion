@@ -1,0 +1,9 @@
+<planet>
+  <manager name="planet">
+    <plugs>
+      <plug socket="flumotion.component.plugs.lifecycle.ManagerLifecycle"
+            type="managerlifecycleprinter">
+      </plug>
+    </plugs>
+  </manager>
+</planet>

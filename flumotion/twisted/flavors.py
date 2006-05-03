@@ -176,7 +176,7 @@ class StateRemoteCache(pb.RemoteCache):
     I am a remote cache of a state object.
     """
     def __init__(self):
-        self._listeners = []
+        self._listeners = {}
         # no constructor
         # pb.RemoteCache.__init__(self)
 
@@ -207,15 +207,58 @@ class StateRemoteCache(pb.RemoteCache):
         # when this is created through serialization from a JobCS,
         # __init__ does not seem to get called, so create self._listeners
         if not hasattr(self, '_listeners'):
-                self._listeners = []
+            self._listeners = {}
 
-    def addListener(self, listener):
+    def addListener(self, listener, *args, **kwargs):
+        """
+        Adds a listener to the remote cache.
+
+        By default, will call the stateSet, stateAppend, and stateRemove
+        methods on the listener object when changes occur. The caller
+        can specify alternate methods to use via the optional 'set',
+        'append', and 'remove' keyword arguments, which should be
+        callable objects or None to ignore the change notice.
+
+        @param listener: A new listener object that wants to receive
+        cache state change notifications.
+        @type listener: object implementing
+        L{flumotion.twisted.flavors.IStateListener}
+        """
         if not components.implements(listener, IStateListener):
             raise NotImplementedError(
                 '%r instance does not implement IStateListener' % listener)
 
+        # implementation complicated by the desire to allow set=None to
+        # ignore set events (same for append, remove) at the same time
+        # as allowing positional set, append, remove...
+        for k in kwargs:
+            if not k in ('set', 'append', 'remove'):
+                raise TypeError("addListener() got an unexpected keyword"
+                                "argument '%s'" % k)
+        if len(args) > 3:
+            raise TypeError('addListener() takes at most 5 arguments '
+                            '(%d given)' % (len(args) + 2))
+        for i, k in (2, 'remove'), (1, 'append'), (0, 'set'):
+            if k in kwargs:
+                if len(args) > i+1:
+                    raise TypeError("addListener() got multiple values "
+                                    "for keyword argument '%s'" % k)
+            elif len(args) > i:
+                kwargs[k] = args[i]
+
         self._ensureListeners()
-        self._listeners.append(listener)
+        procs = []
+        for k, attr in (('set', 'stateSet'), ('append', 'stateAppend'),
+                        ('remove', 'stateRemove')):
+            if k in kwargs:
+                procs.append(kwargs[k])
+            else:
+                if not hasattr(listener, attr):
+                    raise NotImplementedError('%r incorrectly implements '
+                                              'IStateListener, please fix'
+                                              % listener)
+                procs.append(getattr(listener, attr))
+        self._listeners[listener] = procs
 
     def removeListener(self, listener):
         if not components.implements(listener, IStateListener):
@@ -226,7 +269,7 @@ class StateRemoteCache(pb.RemoteCache):
         if listener not in self._listeners:
             raise KeyError(
                 '%r instance not registered as a listener' % listener)
-        self._listeners.remove(listener)
+        del self._listeners[listener]
 
     # pb.RemoteCache methods
     def setCopyableState(self, dict):
@@ -241,7 +284,9 @@ class StateRemoteCache(pb.RemoteCache):
         # notify our local listeners
         self._ensureListeners()
         for l in self._listeners:
-            l.stateSet(self, key, value)
+            stateSet = self._listeners[l][0]
+            if stateSet: 
+                stateSet(self, key, value)
 
     def observe_append(self, key, value):
         # if we also subclass from Cacheable, then we're a proxy, so proxy
@@ -253,7 +298,9 @@ class StateRemoteCache(pb.RemoteCache):
         # notify our local listeners
         self._ensureListeners()
         for l in self._listeners:
-            l.stateAppend(self, key, value)
+            stateAppend = self._listeners[l][1]
+            if stateAppend: 
+                stateAppend(self, key, value)
 
     def observe_remove(self, key, value):
         # if we also subclass from Cacheable, then we're a proxy, so proxy
@@ -269,4 +316,6 @@ class StateRemoteCache(pb.RemoteCache):
         # notify our local listeners
         self._ensureListeners()
         for l in self._listeners:
-            l.stateRemove(self, key, value)
+            stateRemove = self._listeners[l][2]
+            if stateRemove: 
+                stateRemove(self, key, value)

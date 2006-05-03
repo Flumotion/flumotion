@@ -33,7 +33,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
     """
     I am a base class for manager-side avatars to subclass from.
     """
-    def __init__(self, heaven, avatarId):
+    def __init__(self, heaven, avatarId, keycard):
         """
         @type heaven: L{flumotion.manager.base.ManagerHeaven}
         """
@@ -42,6 +42,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         self.logName = avatarId
         self.mind = None
         self.vishnu = heaven.vishnu
+        self.keycard = keycard
 
         self.debug("created new Avatar with id %s" % avatarId)
         
@@ -276,10 +277,14 @@ class ManagerHeaven(pb.Root, log.Loggable):
         self.avatars = {} # name -> avatar
        
     ### ManagerHeaven methods
-    def createAvatar(self, avatarId):
+    def createAvatar(self, avatarId, keycard):
         """
         Create a new administration avatar and manage it.
 
+        @param avatarId: the id to give to the new avatar.
+        @type  avatarId: string
+        @param keycard:  the credentials being used to log in
+        @type  keycard:  L{flumotion.common.keycards.KeyCard}
         @rtype:   L{flumotion.manager.admin.AdminAvatar}
         @returns: a new avatar for the admin client.
         """
@@ -287,7 +292,7 @@ class ManagerHeaven(pb.Root, log.Loggable):
         if self.avatars.has_key(avatarId):
             raise errors.AlreadyConnectedError(avatarId)
 
-        avatar = self.avatarClass(self, avatarId)
+        avatar = self.avatarClass(self, avatarId, keycard)
         
         self.avatars[avatarId] = avatar
         return avatar

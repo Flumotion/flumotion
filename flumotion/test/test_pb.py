@@ -48,7 +48,7 @@ class FakePortalWrapperPlaintext:
         self.broker = FakeBroker()
         self.checker = tcheckers.InMemoryUsernamePasswordDatabaseDontUse()
         self.checker.addUser("username", "password")
-        self.portal = portal.Portal(FakeRealm(), (self.checker, ))
+        self.portal = portal.Portal(FakeTRealm(), (self.checker, ))
 
 class FakePortalWrapperCrypt:
     # a fake wrapper with a checker that lets username, crypt(password, iq) in
@@ -56,7 +56,7 @@ class FakePortalWrapperCrypt:
         self.checker = checkers.CryptChecker()
         cryptPassword = crypt.crypt('password', 'iq')
         self.checker.addUser("username", cryptPassword)
-        self.portal = portal.Portal(FakeRealm(), (self.checker, ))
+        self.portal = portal.Portal(FakeTRealm(), (self.checker, ))
 
 # FIXME: using real portal
 class FakeBouncerPortal:
@@ -77,7 +77,7 @@ class FakeAvatar(tpb.Avatar):
     def logout(self):
         self.loggedOut = True
 
-class FakeRealm:
+class FakeTRealm:
     def __init__(self):
         self.avatar = FakeAvatar()
     def requestAvatar(self, avatarId, mind, *interfaces):
@@ -86,6 +86,10 @@ class FakeRealm:
         self.avatar.loggedIn = True
         # we can return a deferred, or return directly
         return defer.succeed((tpb.IPerspective, self.avatar, self.avatar.logout))
+
+class FakeFRealm(FakeTRealm):
+    def requestAvatar(self, avatarId, keycard, mind, *interfaces):
+        return FakeTRealm.requestAvatar(self, avatarId, mind, *interfaces)
 
 class FakeMind(tpb.Referenceable):
     pass
@@ -124,7 +128,7 @@ class Test_BouncerWrapper(unittest.TestCase):
 
         self.bouncer = htpasswdcrypt.HTPasswdCrypt()
         self.bouncer.setup(bouncerconf)
-        self.bouncerPortal = fportal.BouncerPortal(FakeRealm(), self.bouncer)
+        self.bouncerPortal = fportal.BouncerPortal(FakeFRealm(), self.bouncer)
         self.wrapper = pb._BouncerWrapper(self.bouncerPortal, broker)
         
     def testUACPPOk(self):
@@ -216,7 +220,7 @@ class Test_BouncerWrapper(unittest.TestCase):
 
 class Test_FPortalRoot(unittest.TestCase):
     def setUp(self):
-        self.bouncerPortal = fportal.BouncerPortal(FakeRealm(), 'bouncer')
+        self.bouncerPortal = fportal.BouncerPortal(FakeFRealm(), 'bouncer')
         self.root = pb._FPortalRoot(self.bouncerPortal)
 
     def testRootObject(self):
@@ -227,7 +231,7 @@ class Test_FPortalRoot(unittest.TestCase):
 # time for the big kahuna
 class Test_FPBClientFactory(unittest.TestCase):
     def setUp(self):
-        self.realm = FakeRealm()
+        self.realm = FakeFRealm()
         self.bouncer = htpasswdcrypt.HTPasswdCrypt()
         self.bouncer.setup(bouncerconf)
         self.portal = fportal.BouncerPortal(self.realm, self.bouncer)

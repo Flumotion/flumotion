@@ -1,6 +1,12 @@
 include $(top_srcdir)/common/python.mk
 
-component_PYTHON = __init__.py loggers.py
+component_PYTHON = \
+	__init__.py \
+	adminaction.py \
+	base.py \
+	lifecycle.py \
+	loggers.py
+
 componentdir = $(libdir)/flumotion/python/flumotion/component/plugs
 component_DATA = plugs.xml
 

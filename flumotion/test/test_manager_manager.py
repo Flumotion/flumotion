@@ -146,7 +146,7 @@ class TestComponentMapper(unittest.TestCase):
 
         # a componentAvatar gets created with this avatarId
         # lookup mapper and add
-        avatar = component.ComponentAvatar(self.heaven, id)
+        avatar = component.ComponentAvatar(self.heaven, id, None)
         m = self._mappers[id]
         m.avatar = avatar
         # insert an avatar -> mapper ref
@@ -187,7 +187,7 @@ class TestComponentHeaven(unittest.TestCase):
         self.heaven = component.ComponentHeaven(manager.Vishnu('test'))
 
     def testCreateAvatar(self):
-        p = self.heaven.createAvatar('foo-bar-baz')
+        p = self.heaven.createAvatar('foo-bar-baz', None)
         self.failUnless(isinstance(p, component.ComponentAvatar))
 
         #self.assertRaises(AssertionError,
@@ -203,12 +203,12 @@ class TestComponentHeaven(unittest.TestCase):
 
         
     def testGetComponent(self):
-        a = self.heaven.createAvatar('prod')
+        a = self.heaven.createAvatar('prod', None)
         self.assertEqual(self.heaven.getAvatar('prod'), a)
         a.cleanup()
 
     def testHasComponent(self):
-        a = self.heaven.createAvatar('prod')
+        a = self.heaven.createAvatar('prod', None)
         self.failUnless(self.heaven.hasAvatar('prod'))
 
         self.heaven.removeComponent(a)
@@ -361,8 +361,8 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         # log in a worker
         mind = FakeWorkerMind(self, avatarId)
 
-        tuple = self.vishnu.dispatcher.requestAvatar(avatarId, mind,
-            pb.IPerspective, interfaces.IWorkerMedium)
+        tuple = self.vishnu.dispatcher.requestAvatar(avatarId, None,
+            mind, pb.IPerspective, interfaces.IWorkerMedium)
 
         avatar = tuple[1]
 
@@ -388,8 +388,8 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         mind = FakeComponentMind(self, workerName, avatarId, type,
             moduleName, methodName, config)
 
-        tuple = self.vishnu.dispatcher.requestAvatar(avatarId, mind,
-            pb.IPerspective, interfaces.IComponentMedium)
+        tuple = self.vishnu.dispatcher.requestAvatar(avatarId, None,
+            mind, pb.IPerspective, interfaces.IComponentMedium)
 
         avatar = tuple[1]
 

@@ -131,11 +131,18 @@ class ManagerFlowState(flavors.StateCacheable):
      - parent:            L{ManagerPlanetState}
      - components (list): list of L{ManagerComponentState}
     """
-    def __init__(self):
+    def __init__(self, **kwargs):
+        """
+        ManagerFlowState constructor. Any keyword arguments are
+        intepreted as initial key-value pairs to set on the new
+        ManagerFlowState.
+        """
         flavors.StateCacheable.__init__(self)
         self.addKey('name')
         self.addKey('parent')
         self.addListKey('components')
+        for k, v in kwargs.items():
+            self.set(k, v)
 
     def empty(self):
         """

@@ -34,7 +34,7 @@ from twisted.spread import pb
 from twisted.cred import portal
 
 from flumotion.common import bundle, config, errors, interfaces, log, registry
-from flumotion.common import planet, common, dag, messages
+from flumotion.common import planet, common, dag, messages, reflectcall
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base
@@ -93,9 +93,9 @@ class Dispatcher(log.Loggable):
     # on the peer, allowing any object that has the mind to call back
     # to the piece that called login(),
     # which in our case is a component or an admin client.
-    def requestAvatar(self, avatarId, mind, *ifaces):
+    def requestAvatar(self, avatarId, keycard, mind, *ifaces):
         try:
-            avatar = self.createAvatarFor(avatarId, ifaces)
+            avatar = self.createAvatarFor(avatarId, keycard, ifaces)
             self.debug("returning Avatar: id %s, avatar %s" % (avatarId, avatar))
         except errors.AlreadyConnectedError, e:
             self.debug("component with id %s already logged in" % (avatarId))
@@ -123,12 +123,14 @@ class Dispatcher(log.Loggable):
         avatar.detached(mind)
         heaven.removeAvatar(avatarId)
 
-    def createAvatarFor(self, avatarId, ifaces):
+    def createAvatarFor(self, avatarId, keycard, ifaces):
         """
         Create an avatar from the heaven implementing the given interface.
 
         @type avatarId:  string
         @param avatarId: the name of the new avatar
+        @type keycard:   L{flumotion.common.keycards.KeyCard}
+        @param keycard:  the credentials being used to log in
         @type ifaces:    tuple of interfaces linked to heaven
         @param ifaces:   a list of heaven interfaces to get avatar from,
                          including pb.IPerspective
@@ -141,7 +143,7 @@ class Dispatcher(log.Loggable):
         for iface in ifaces:
             heaven = self._interfaceHeavens.get(iface, None)
             if heaven:
-                avatar = heaven.createAvatar(avatarId)
+                avatar = heaven.createAvatar(avatarId, keycard)
                 self._avatarHeavens[avatarId] = heaven
                 return avatar
 
@@ -196,6 +198,8 @@ class Vishnu(log.Loggable):
         self.state = planet.ManagerPlanetState()
         self.state.set('name', name)
 
+        self.plugs = {} # socket -> list of plugs
+
         self._dag = dag.DAG() # component dependency graph
         
         # create a portal so that I can be connected to, through our dispatcher
@@ -206,7 +210,14 @@ class Vishnu(log.Loggable):
         self.factory = pb.PBServerFactory(self.portal,
             unsafeTracebacks=unsafeTracebacks)
 
+        self.connectionInfo = {}
+        self.setConnectionInfo(None, None, None)
+
         self.configuration = None
+
+    def setConnectionInfo(self, host, port, use_ssl):
+        info = dict(host=host, port=port, use_ssl=use_ssl)
+        self.connectionInfo.update(info)
 
     def getConfiguration(self):
         """Returns the manager's configuration as a string suitable for
@@ -216,6 +227,106 @@ class Vishnu(log.Loggable):
             return self.configuration.export()
         else:
             return None
+
+    def _makeBouncer(self, conf):
+        if not (conf.manager and conf.manager.bouncer):
+            self.log('No bouncer')
+            return None
+
+        self.debug('going to start manager bouncer %s of type %s' % (
+            conf.manager.bouncer.name, conf.manager.bouncer.type))
+
+        defs = registry.getRegistry().getComponent(
+            conf.manager.bouncer.type)
+        entry = defs.getEntryByType('component')
+        # FIXME: use entry.getModuleName() (doesn't work atm?)
+        moduleName = defs.getSource()
+        methodName = entry.getFunction()
+        bouncer = reflectcall.createComponent(moduleName, methodName)
+
+        configDict = conf.manager.bouncer.getConfigDict()
+        bouncer.setup(configDict)
+
+        bouncer.debug('started')
+        return bouncer
+
+    def _updateState(self, conf):
+        self.debug('syncing up planet state with config')
+        added = [] # added components while parsing
+        
+        state = self.state
+        atmosphere = state.get('atmosphere')
+        for name, c in conf.atmosphere.components.items():
+            if name in [x.get('name') for x in atmosphere.get('components')]:
+                self.debug('atmosphere already has component %s' % name)
+            else:
+                added.append(self._addComponent(c, atmosphere))
+
+        flows = dict([(x.get('name'), x) for x in state.get('flows')])
+        for f in conf.flows:
+            try:
+                flow = flows[f.name]
+                self.debug('checking existing flow %s' % f.name)
+            except KeyError:
+                self.info('creating flow "%s"' % f.name)
+                flow = planet.ManagerFlowState(name=f.name, parent=state)
+                state.append('flows', flow)
+                
+            components = [x.get('name') for x in flow.get('components')]
+            for name, c in f.components.items():
+                if name in components:
+                    self.debug('component %s already in flow %s'
+                               % (c.name, f.name))
+                else:
+                    added.append(self._addComponent(c, flow))
+
+        return added
+
+    def _updateFlowDependencies(self, state):
+        self.debug('registering dependencies of %r' % state)
+        config = state.get('config')
+
+        if not config.has_key('source'):
+            return
+
+        # config['source'] is a list of strings whose format is
+        # "feeding-component:feed-name", where feed-name defaults to
+        # "default". We make this component depend on every feeding
+        # component.
+
+        def parseSource(s):
+            parts = s.split(':')
+            if len(parts) == 1:
+                parts.append('default')
+            return parts[0], parts[1]
+
+        for feeder, feed in [parseSource(x) for x in config['source']]:
+            flowName = state.get('parent').get('name')  
+            avatarId = common.componentPath(feeder, flowName)
+            feederState = self._componentMappers[avatarId].state
+            self.debug('depending %r on %r' % (state, feederState))
+            self._dag.addEdge(feederState, state)
+        
+    def _addPlugs(self, conf):
+        if not conf.manager:
+            return
+
+        for socket, plugs in conf.manager.plugs.items():
+            if not socket in self.plugs:
+                self.plugs[socket] = []
+
+            for args in plugs:
+                self.debug('loading plug type %s for socket %s'
+                           % (args['type'], socket))
+
+                defs = registry.getRegistry().getPlug(args['type'])
+                e = defs.getEntry()
+                call = reflectcall.reflectCallCatching
+            
+                plug = call(errors.ConfigError,
+                            e.getModuleName(), e.getFunction(), args)
+                self.plugs[socket].append(plug)
+                plug.start(self)
 
     # FIXME: do we want a filename to load config, or data directly ?
     # FIXME: well, I think we want to have an "object" with an "interface"
@@ -231,125 +342,30 @@ class Vishnu(log.Loggable):
         self.configuration = conf = config.FlumotionConfigXML(filename, data)
         conf.parse()
 
-        # scan filename for a bouncer component in the manager
         # FIXME: we should have a "running" state object layout similar
         # to config that we can then merge somehow with an .update method
-        if conf.manager and conf.manager.bouncer:
-            if self.bouncer:
-                self.warning("manager already had a bouncer")
-
-            self.debug('going to start manager bouncer %s of type %s' % (
-                conf.manager.bouncer.name, conf.manager.bouncer.type))
-            defs = registry.getRegistry().getComponent(
-                conf.manager.bouncer.type)
-            configDict = conf.manager.bouncer.getConfigDict()
-            # FIXME: this is terrible, we shouldn't be importing from
-            # anything outside of flumotion.common and flumotion.manager...
-            from flumotion.job import job
-            try:
-                entry = defs.getEntryByType('component')
-                # FIXME: use entry.getModuleName() (doesn't work atm?)
-                moduleName = defs.getSource()
-                methodName = entry.getFunction()
-            except KeyError:
-                self.warning('no "component" entry in registry of type %s, %s',
-                             type, 'falling back to createComponent')
-                moduleName = defs.getSource()
-                methodName = "createComponent"
-            bouncer = job.createComponent(moduleName, methodName)
-            bouncer.setup(configDict)
+        bouncer = self._makeBouncer(conf)
+        if bouncer:
             self.setBouncer(bouncer)
-            self.bouncer.debug('started')
-            log.info('manager', "Started manager's bouncer")
 
-        # now add stuff from the config that did not exist in self.state yet
-        self.debug('syncing up planet state with config')
-        added = [] # added components while parsing
+        self._addPlugs(conf)
+
+        for componentState in self._updateState(conf):
+            self._updateFlowDependencies(componentState)
+
+        # now start all components that need starting -- collecting into
+        # an temporary dict of the form {workerId => [components]}
+        # if workerName is None, we can start the component on any
+        # worker
+        to_start = {}
+        for c in self._getComponentsToStart():
+            workerId = c.get('workerRequested')
+            if not workerId in to_start:
+                to_start[workerId] = []
+            to_start[workerId].append(c)
         
-        if conf.atmosphere:
-            self.debug('checking atmosphere components %r' % conf.atmosphere.components)
-            for c in conf.atmosphere.components.values():
-                self.debug('checking atmosphere config component %s' % c.name)
-                isOurComponent = lambda x: x.get('name') == c.name
-                atmosphere = self.state.get('atmosphere')
-                l = filter(isOurComponent, atmosphere.get('components'))
-                if len(l) == 0:
-                    self.info('Adding component "%s" to atmosphere' % c.name)
-                    state = self._addComponent(c, atmosphere)
-                    added.append(state)
-
-        if conf.flows:
-            for f in conf.flows:
-                self.debug('checking flow %s' % f.name)
-                # check if we have this flow yet and add if not
-                isOurFlow = lambda x: x.get('name') == f.name
-                l = filter(isOurFlow, self.state.get('flows'))
-                if len(l) == 0:
-                    self.info('Creating flow "%s"' % f.name)
-                    flow = planet.ManagerFlowState()
-                    flow.set('name', f.name)
-                    flow.set('parent', self.state)
-                    self.state.append('flows', flow)
-                else:
-                    flow = l[0]
-                
-                for c in f.components.values():
-                    self.debug('checking config component %s' % c.name)
-                    isOurComponent = lambda x: x.get('name') == c.name
-                    l = filter(isOurComponent, flow.get('components'))
-                    if len(l) == 0:
-                        self.info('Adding component "%s" to flow "%s"' % (
-                            c.name, f.name))
-                        state = self._addComponent(c, flow)
-                        added.append(state)
-
-        # register dependencies of added components
-        for state in added:
-            self.debug('registering dependencies of %r' % state)
-            dict = state.get('config')
-
-            if not dict.has_key('source'):
-                continue
-
-            # source entries are feederName:
-            # componentName[:feedName], with feedName defaulting to default
-            list = dict['source']
-
-            # FIXME: there's a bug in config parsing - sometimes this gives us
-            # one string, and sometimes a list of one string, and sometimes
-            # a list
-            # we make this component depend on every component listed in
-            # source; they have the same parent by design
-            if isinstance(list, str):
-                list = [list, ]
-            for eater in list:
-                name = eater
-                if ':' in name:
-                    name = eater.split(':')[0]
-
-                flowName = state.get('parent').get('name')  
-                avatarId = common.componentPath(name, flowName)
-                parentState = self._componentMappers[avatarId].state
-                self.debug('depending %r on %r' % (state, parentState))
-                self._dag.addEdge(parentState, state)
-
-        # now start all components that need starting
-        components = self._getComponentsToStart()
-        for workerId in self.workerHeaven.avatars.keys():
-            # filter the ones that have no worker requested or a match
-            isRightWorker = lambda c: not (c.get('workerRequested') and
-            c.get('workerRequested') != workerId)
-            ours = filter(isRightWorker, components)
-
-            if not ours:
-                self.debug('no components scheduled for worker %s' % workerId)
-            else:
-                avatar = self.workerHeaven.avatars[workerId]
-                self._workerCreateComponents(avatar, ours)
-                # they're started, so remove them from the running list of
-                # components
-                for c in ours:
-                    components.remove(c)
+        for workerId, components in to_start.items():
+            self._workerCreateComponents(workerId, components)
  
     def _addComponent(self, config, parent):
         """
@@ -358,7 +374,8 @@ class Vishnu(log.Loggable):
         @returns: L{flumotion.common.planet.ManagerComponentState}
         """
 
-        self.debug('adding component %s' % config.name)
+        self.debug('adding component %s to %s'
+                   % (config.name, parent.get('name')))
         
         state = planet.ManagerComponentState()
         state.set('name', config.name)
@@ -403,6 +420,9 @@ class Vishnu(log.Loggable):
         """
         @type bouncer: L{flumotion.component.bouncers.bouncer.Bouncer}
         """
+        if self.bouncer:
+            self.warning("manager already had a bouncer, setting anyway")
+
         self.bouncer = bouncer
         self.portal.bouncer = bouncer
 
@@ -427,37 +447,17 @@ class Vishnu(log.Loggable):
                 "%r already has a pending mood %s" % moods.get(p).name)
 
         # find a worker this component can start on
-        worker = None
+        workerId = (componentState.get('workerName')
+                    or componentState.get('workerRequested'))
 
-        # prefer the worker name in the state if it's there - it's the name
-        # of the worker it last ran on
-        w = componentState.get('workerName')
-        if w:
-            if not self.workerHeaven.hasAvatar(w):
-                raise errors.ComponentNoWorkerError(
-                    "worker %s is not logged in" % w)
-            worker = self.workerHeaven.getAvatar(w)
-
-        # otherwise, check workerRequested, and find a matching worker
-        if not worker:
-            r = componentState.get('workerRequested')
-            if r:
-                if not self.workerHeaven.hasAvatar(r):
-                    raise errors.ComponentNoWorkerError(
-                        "worker %s is not logged in" % r)
-                worker = self.workerHeaven.getAvatar(r)
-            else:
-                # any worker will do
-                list = self.workerHeaven.getAvatars()
-                if list:
-                    worker = list[0]
-
-        if not worker:
+        if workerId and not workerId in self.workerHeaven.avatars:
             raise errors.ComponentNoWorkerError(
-                "Could not find any worker to start on")
-
-        # now that we have a worker, get going
-        return self._workerCreateComponents(worker, [componentState])
+                "worker %s is not logged in" % workerId)
+        elif not self.workerHeaven.avatars:
+            raise errors.ComponentNoWorkerError(
+                "no workers are logged in")
+        else:
+            return self._workerCreateComponents(workerId, [componentState])
 
     def componentAddMessage(self, avatarId, message):
         """
@@ -481,47 +481,49 @@ class Vishnu(log.Loggable):
         workerId = workerAvatar.avatarId
         self.debug('vishnu.workerAttached(): id %s' % workerId)
 
-        # get all components that are supposed to start on this worker
-        # FIXME: we start them one by one to make port assignment more
-        # deterministic
-        # FIXME: we should probably start them in the correct order,
-        # respecting the graph
-        components = self._getComponentsToStart()
-
-        # filter the ones that have no worker requested or a match
-        isRightWorker = lambda c: not (c.get('workerRequested') and
-            c.get('workerRequested') != workerId)
-        components = filter(isRightWorker, components)
+        # Create all components assigned to this worker. Note that the
+        # order of creation is unimportant, it's only the order of
+        # starting that matters (and that's different code).
+        components = [c for c in self._getComponentsToStart()
+                      if c.get('workerRequested') in (workerId, None)]
 
         if not components:
             self.debug('vishnu.workerAttached(): no components for this worker')
             return
 
-        self._workerCreateComponents(workerAvatar, components)
+        self._workerCreateComponents(workerId, components)
             
-    def _workerCreateComponents(self, workerAvatar, components):
+    def _workerCreateComponents(self, workerId, components):
         """
         Create the list of components on the given worker, sequentially, but
         in no specific order.
 
-        @type  workerAvatar: L{flumotion.manager.worker.WorkerAvatar}
-        @type  components:   list of
-                             L{flumotion.common.planet.ManagerComponentState}
+        @param workerId:   avatarId of the worker
+        @type  workerId:   string, or None to start it on any worker
+        @param components: components to start
+        @type  components: list of
+                           L{flumotion.common.planet.ManagerComponentState}
         """
-        names = [c.get('name') for c in components]
-        self.debug('creating components %r' % names)
-        
+        if not workerId:
+            if not self.workerHeaven.avatars:
+                self.debug('no workers yet, cannot start jobs yet')
+                return defer.succeed(None)
+            workerId = self.workerHeaven.avatars.keys()[0]
+
+        if not workerId in self.workerHeaven.avatars:
+            self.debug('worker %s not logged in yet, delaying '
+                       'component start' % workerId)
+            return defer.succeed(None)
+
+        workerAvatar = self.workerHeaven.avatars[workerId]
+
         d = defer.Deferred()
 
         for c in components:
-            componentName = c.get('name')
-            parentName = c.get('parent').get('name')
             type = c.get('type')
             config = c.get('config')
-            self.debug(
-                '_workerCreateComponents(): scheduling create of /%s/%s on %s' % (
-                parentName, componentName, workerAvatar.avatarId))
-            
+            self.debug('scheduling create of %s on %s'
+                       % (config['avatarId'], workerId))
             d.addCallback(self._workerCreateComponentDelayed,
                 workerAvatar, c, type, config)
 

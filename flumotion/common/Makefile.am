@@ -29,6 +29,7 @@ flumotion_PYTHON = \
 	package.py \
 	planet.py \
 	pygobject.py \
+	reflectcall.py \
 	registry.py \
 	reload.py \
 	setup.py \

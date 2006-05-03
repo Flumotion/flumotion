@@ -33,71 +33,14 @@ import resource
 
 from twisted.cred import credentials
 from twisted.internet import reactor
-from twisted.python import reflect, failure
+from twisted.python import failure
 from twisted.spread import pb
 
 from flumotion.common import config, errors, interfaces, log, registry, keycards
 from flumotion.common import medium, package
+from flumotion.common.reflectcall import createComponent
 from flumotion.component import component
 from flumotion.twisted.defer import defer_generator_method
-
-def createComponent(moduleName, methodName):
-    """
-    @param moduleName: name of the module to create the component from
-    @type  moduleName: string
-    @param methodName: the factory method to use to create the component
-    @type  methodName: string
-
-    Invokes the entry point for a component in the given module using the
-    given factory method, thus creating the component.
-
-    @rtype: L{flumotion.component.component.BaseComponent}
-    """
-    log.debug('component', 'Loading moduleName %s' % moduleName)
-    try:
-        module = reflect.namedAny(moduleName)
-    except ValueError:
-        raise errors.ComponentCreateError(
-            "module %s could not be found" % moduleName)
-    except ImportError, e:
-        raise errors.ComponentCreateError(
-            "module %s could not be imported (%s)" % (moduleName,
-                log.getExceptionMessage(e, filename='flumotion')))
-    except SyntaxError, e:
-        raise errors.ComponentCreateError(
-            "module %s has a syntax error in %s:%d" % (
-                moduleName, e.filename, e.lineno))
-    except Exception, e:
-        raise errors.ComponentCreateError(
-            "Exception %r during import of module %s (%r)" % (
-                e.__class__.__name__, moduleName, e.args))
-        
-    if not hasattr(module, methodName):
-        log.warning('job', 'no %s in module %s' % (methodName, moduleName))
-        return
-        
-    # Create the component with the specified configuration
-    # directives. Note that this can't really be moved from here
-    # since it gets called by the job from another process
-    # and we don't want to create it in the main process, since
-    # we're going to listen to ports and other stuff which should
-    # be separated from the main process.
-
-    log.debug('job', 'calling entry point %s.%s()' % (
-        moduleName, methodName))
-    try:
-        component = getattr(module, methodName)()
-    except errors.ComponentCreateError:
-        # already nicely formatted, so fall through
-        log.debug('job', 'letting ComponentCreateError fall through')
-        raise
-    except Exception, e:
-        msg = log.getExceptionMessage(e)
-        log.warning('job', msg)
-        log.warning('job', 'raising errors.ComponentCreateError')
-        raise errors.ComponentCreateError(msg)
-    log.debug('job', 'returning component %r' % component)
-    return component
 
 class JobMedium(medium.BaseMedium):
     """

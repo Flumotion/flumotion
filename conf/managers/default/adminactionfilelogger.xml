@@ -1,0 +1,10 @@
+<planet>
+  <manager name="planet">
+    <plugs>
+      <plug socket="flumotion.component.plugs.adminaction.AdminAction"
+            type="adminactionfilelogger">
+        <property name="logfile">/dev/stdout</property>
+      </plug>
+    </plugs>
+  </manager>
+</planet>
