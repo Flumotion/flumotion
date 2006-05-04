@@ -101,20 +101,23 @@ class MultiAdminModel(log.Loggable):
             self.admins[admin.managerId] = admin
             self.emit('addPlanet', admin, planet)
 
+        def disconnected_cb(admin):
+            self.info('Disconnected from manager')
+            if admin.managerId in self.admins:
+                del self.admins[admin.managerId]
+                self.emit('removePlanet', admin, admin.planet)
+            else:
+                self.warning('Could not find admin model %r' % admin)
+
         auth = auth_cb()
         if auth:
             a = admin.AdminModel(user, auth['passwd'])
             a.connectToHost(host, port, use_insecure)
             a.connect('connected', connected_cb)
-            a.connect('disconnected', self.close_admin)
+            a.connect('disconnected', disconnected_cb)
 
     def close_admin(self, admin):
-        self.info('Disconnected from manager')
-        if admin.managerId in self.admins:
-            del self.admins[admin.managerId]
-            self.emit('removePlanet', admin, admin.planet)
-        else:
-            self.warning('Could not find admin model %r' % admin)
+        admin.shutdown()
 
     def for_each_component(self, object, proc):
         '''Call a procedure on each component that is a child of OBJECT'''

@@ -1,3 +1,17 @@
+2006-05-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/multi.py
+	(MultiAdminModel.addManager.disconnected_cb, close_admin):
+	Refactor a bit so that close_admin is more of an action (by a user
+	of the admin client) and disconnected_cb is a reaction to a
+	disconnection. Calling close_admin will call shutdown on the
+	admin, so that it doesn't try to reconnect.
+
+	* flumotion/admin/admin.py (remote_shutdown): Remote method
+	removed, nothing ever calls it AFAICT.
+	(AdminModel.shutdown): New method, call it to shut down the
+	current connection to the manager, and to not try to reconnect.
+
 2006-05-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/plugs/adminaction.py

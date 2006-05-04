@@ -355,15 +355,18 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
     def stateRemove(self, state, key, value):
         self.debug("state remove on %r: key %s" % (state, key))
 
-    def remote_shutdown(self):
-        self.debug('shutting down')
-
     ### model functions; called by UI's to send requests to manager or comp
 
     ## view management functions
     # FIXME: what is this crap ? strings as enums ?
     def isConnected(self):
         return self.state == 'connected'
+
+    def shutdown(self):
+        self.debug('shutting down')
+        if self.state != 'disconnected':
+            self.clientFactory.disconnect()
+        self.clientFactory.stopTrying()
 
     def addView(self, view):
         # FIXME: implement an IAdminView interface
