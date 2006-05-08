@@ -30,13 +30,14 @@ import socket
 
 from twisted.internet import reactor, error, defer
 from twisted.web import server
+from twisted.cred import credentials
 
 from flumotion.component import feedcomponent
 from flumotion.common import bundle, common, gstreamer, errors, pygobject
-from flumotion.common import messages
+from flumotion.common import messages, netutils
 
 from flumotion.twisted import fdserver
-from flumotion.porter import porterclient
+from flumotion.component.porter import porterclient
 
 # proxy import
 from flumotion.component.component import moods
@@ -66,7 +67,7 @@ class Stats:
 
         self.hostname = "localhost"
         self.port = 0
-        self.mountPoint = ""
+        self.mountPoint = "/"
         
     def _updateAverage(self):
         # update running average of clients connected
@@ -122,7 +123,7 @@ class Stats:
         return self.average_client_number
 
     def getUrl(self):
-        return "http://%s:%d/%s" % (self.hostname, self.port, self.mountPoint) 
+        return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint) 
 
     def updateState(self, set):
         c = self
@@ -182,6 +183,34 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     def remote_rotateLog(self):
         self.comp.resource.rotateLogs()
 
+    def remote_getStreamData(self):
+        return self.comp.getStreamData()
+
+class HTTPPorterClientFactory(porterclient.PorterClientFactory):
+
+    def __init__(self, childFactory, mountPoint, do_start_deferred):
+        porterclient.PorterClientFactory.__init__(self, childFactory)
+        self._mountPoint = mountPoint
+        self._do_start_deferred = do_start_deferred
+
+    def _fireDeferred(self, r):
+        # If we still have the deferred, fire it (this happens after we've
+        # completed log in the _first_ time, not subsequent times)
+        if self._do_start_deferred:
+            self.debug("Firing initial deferred: should indicate that login is "
+                "complete")
+            self._do_start_deferred.callback(None)
+            self._do_start_deferred = None
+
+    def gotDeferredLogin(self, deferred):
+        # This is called when we start logging in to give us the deferred for
+        # the login process. Once we're logged in, we want to set our
+        # remote ref, then register our path with the porter, then (possibly)
+        # fire a different deferred
+        self.debug("Got deferred login, adding callbacks")
+        deferred.addCallback(self.medium.setRemoteReference)
+        deferred.addCallback(lambda r: self.registerPath(self._mountPoint))
+        deferred.addCallback(self._fireDeferred)
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
@@ -211,8 +240,19 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.caps = None
         self.resource = None
         self.mountPoint = None
-        self.port = None
         self.burst_on_connect = False
+
+        self.description = None
+
+        # Used if we've slaved to a porter.
+        self._pbclient = None
+        self._porterUsername = None
+        self._porterPassword = None
+        self._porterId = None
+        self._porterPath = None
+
+        # Or if we're a master, we open our own port.
+        self.port = None
 
         # handle regular updating
         self.needsUpdate = False
@@ -246,12 +286,23 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
         
         mountPoint = properties.get('mount_point', '')
-        if mountPoint.startswith('/'):
-            mountPoint = mountPoint[1:]
+        if not mountPoint.startswith('/'):
+            mountPoint = '/' + mountPoint
         self.mountPoint = mountPoint
-        # hostname for display purposes only currently
-        self.hostname = properties.get('hostname', socket.gethostname())
-        
+
+        # Hostname is used for a variety of purposes. We do a best-effort guess
+        # where nothing else is possible, but it's much preferable to just
+        # configure this
+        self.hostname = properties.get('hostname', None)
+        if not self.hostname:
+            # Don't call this nasty, nasty, probably flaky functon unless we
+            # need to.
+            self.hostname = netutils.guess_public_hostname()
+
+        self.description = properties.get('description', None)
+        if self.description is None:
+            self.description = "Flumotion Stream"
+ 
         # FIXME: tie these together more nicely
         self.resource = resources.HTTPStreamingResource(self)
 
@@ -301,9 +352,13 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.type = properties.get('type', 'master')
         if self.type == 'slave':
-            self.porterPath = properties['porter']
-            self.porter_username = properties['porter_user']
-            self.porter_password = properties['porter_pass']
+            if properties.has_key('porter_socket_path'):
+                self._porterPath = properties['porter_socket_path']
+                self._porterUsername = properties['porter_user']
+                self._porterPassword = properties['porter_pass']
+            else:
+                self._porterPath = None
+                self._porterId = "/atmosphere/" + properties['porter_name']
         else:
             self.port = int(properties.get('port', 8800))
 
@@ -347,6 +402,20 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if mime == 'multipart/x-mixed-replace':
             mime += ";boundary=ThisRandomString"
         return mime
+
+    def getUrl(self):
+        return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint)
+
+    def getStreamData(self):
+        m3ufile = "#EXTM3U\n" \
+                  "#EXTINF:-1:%s\n" \
+                  "%s" (self.description, self.getUrl())
+
+        return {
+                'protocol': 'HTTP',
+                'content-type': "audio/x-mpegurl",
+                'description' : m3ufile
+            }
     
     def add_client(self, fd):
         sink = self.get_element('sink')
@@ -439,32 +508,100 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     ### END OF THREAD-AWARE CODE
 
+    def failedSlavedStart(self, failure):
+        self.warning("Failed to start slaved streamer: %s" % failure)
+        m = messages.Error(T_(
+            N_("Porter '%s' not found, cannot slave this streamer to it."), 
+            self._porterId))
+        self.addMessage(m)
+        self.setMood(moods.sad)
+
+    def do_stop(self):
+        def stoppedStreamer(result):
+            self.setMood(moods.sleeping)
+            return result
+
+        if self.type == 'slave':
+            d = self._pbclient.deregisterPath(self.mountPoint)
+            d.addCallback(stoppedStreamer)
+            return d
+        else:
+            return feedcomponent.ParseLaunchComponent.do_stop(self)
+
     def do_start(self, *args, **kwargs):
+        def gotPorterDetails(porter):
+            (self._porterPath, self._porterUsername, 
+                self._porterPassword) = porter
+                
+            reactor.connectWith(fdserver.FDConnector, self._porterPath, 
+                self._pbclient, 10, checkPID=False)
+
+            creds = credentials.UsernamePassword(self._porterUsername, 
+                self._porterPassword)
+            self.debug("Starting porter login!")
+            self._pbclient.startLogin(creds, self.medium)
+
         root = resources.HTTPRoot()
-        root.putChild(self.mountPoint, self.resource)
+        # TwistedWeb wants the child path to not include the leading /
+        mount = self.mountPoint[1:]
+        root.putChild(mount, self.resource)
         
-        self.debug('Listening on %d' % self.port)
-        try:
-            if self.type == 'slave':
-                pbclient = porterclient.PorterClientFactory(
-                    self.porter_username, self.porter_password, 
-                    server.Site(resource=root))
+        if self.type == 'slave':
+            # Streamer is slaved to a porter.
 
-                reactor.connectWith(fdserver.FDConnector, self.porterPath,
-                    pbclient)
+            # We have two things we want to do in parallel:
+            #  - ParseLaunchComponent.do_start()
+            #  - get the porter details (either from locals, or via a 
+            #    remote call, then log in to the porter, then register
+            #    our mountpoint with the porter.
+            # So, we return a DeferredList with a deferred for each of
+            # these tasks. The second one's a bit tricky: we pass a dummy
+            # deferred to our PorterClientFactory that gets fired once
+            # we've done all of the tasks the first time (it's an 
+            # automatically-reconnecting client factory, and we only fire 
+            # this deferred the first time)
 
-                pbclient.registerPath(self.mountPoint)
+            d1 = feedcomponent.ParseLaunchComponent.do_start(self, 
+                *args, **kwargs)
+
+            d2 = defer.Deferred()
+            self._pbclient = HTTPPorterClientFactory(
+                server.Site(resource=root), self.mountPoint, d2)
+
+            dl = defer.DeferredList([d1, d2])
+
+            # Now we create another deferred for when we've got the porter
+            # info, which will (one way or another) get called. From that,
+            # we start actually logging in - eventually causing d2 to fire.
+            if not self._porterPath:
+                self.debug("Doing remote call to get porter details")
+                d = self.medium.callRemote("componentCallRemote",
+                    self._porterId, "getPorterDetails")
             else:
-                reactor.listenTCP(self.port, server.Site(resource=root))
+                self.debug("Creating dummy deferred")
+                d = defer.Deferred()
 
-            return feedcomponent.ParseLaunchComponent.do_start(self, *args,
-                                                               **kwargs)
-        except error.CannotListenError, e:
-            self.warning('Port %d is not available.' % self.port)
-            m = messages.Error(T_(N_(
-                "Network error: TCP port %d is not available."), self.port))
-            self.addMessage(m)
-            self.setMood(moods.sad)
-            return defer.fail(e)
+            d.addCallback(gotPorterDetails)
+            d.addErrback(self.failedSlavedStart)
+
+            if self._porterPath:
+                d.callback((self._porterPath, self._porterUsername, 
+                    self._porterPassword))
+
+            return dl
+        else:
+            # Streamer is standalone.
+            try:
+                self.debug('Listening on %d' % self.port)
+                reactor.listenTCP(self.port, server.Site(resource=root))
+                return feedcomponent.ParseLaunchComponent.do_start(self, *args, 
+                    **kwargs)
+            except error.CannotListenError, e:
+                self.warning('Port %d is not available.' % self.port)
+                m = messages.Error(T_(N_(
+                    "Network error: TCP port %d is not available."), self.port))
+                self.addMessage(m)
+                self.setMood(moods.sad)
+                return defer.fail(e)
 
 pygobject.type_register(MultifdSinkStreamer)

@@ -285,6 +285,7 @@ flumotion/component/converters/pipeline/Makefile
 flumotion/component/converters/overlay/Makefile
 flumotion/component/muxers/Makefile
 flumotion/component/plugs/Makefile
+flumotion/component/porter/Makefile
 flumotion/component/producers/Makefile
 flumotion/component/producers/audiotest/Makefile
 flumotion/component/producers/bttv/Makefile
@@ -304,7 +305,6 @@ flumotion/extern/pytrayicon/Makefile
 flumotion/job/Makefile
 flumotion/launch/Makefile
 flumotion/manager/Makefile
-flumotion/porter/Makefile
 flumotion/project/Makefile
 flumotion/service/Makefile
 flumotion/test/Makefile

@@ -29,7 +29,8 @@
         <property name="port" type="int" />
 
         <!-- If type is 'slave' -->
-        <property name="porter" type="string" />
+        <property name="porter_socket_path" type="string" />
+        <property name="porter_name" type="string" />
         <property name="porter_user" type="string" />
         <property name="porter_pass" type="string" />
 

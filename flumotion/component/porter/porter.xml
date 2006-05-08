@@ -1,0 +1,37 @@
+<registry>
+  <components>
+    <component type="porter"
+               base="flumotion/component/porter">
+
+      <source location="flumotion.component.porter.porter"/>
+
+      <entries>
+        <entry type="component" location="porter.py"
+               function="Porter"/>
+      </entries>
+
+      <properties>
+        <property name="username" type="string"/>
+        <property name="password" type="string"/>
+        <property name="socket_path" type="string"/>
+        <property name="port" type="int"/>
+      </properties>
+    </component>
+  </components>
+
+  <bundles>
+    <bundle name="porter">
+      <dependencies>
+        <dependency name="component-base" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/porter">
+          <filename location="porter.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+
+</registry> 
+

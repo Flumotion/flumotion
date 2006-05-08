@@ -26,6 +26,7 @@ flumotion_PYTHON = \
 	keycards.py \
 	medium.py \
 	messages.py \
+	netutils.py \
 	package.py \
 	planet.py \
 	pygobject.py \

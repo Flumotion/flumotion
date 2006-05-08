@@ -118,10 +118,60 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         self.debug("FPBClientFactory(): authenticated %r" % keycard)
         return keycard
 
+class ReconnectingPBClientFactory(pb.PBClientFactory, flog.Loggable,
+                                  protocol.ReconnectingClientFactory):
+    """
+    Reconnecting client factory for normal PB brokers.
+
+    Users of this factory call startLogin to start logging in, and should
+    override getLoginDeferred to get the deferred returned from the PB server
+    for each login attempt.
+    """
+
+    def __init__(self):
+        pb.PBClientFactory.__init__(self)
+        self._doingLogin = False
+
+    def clientConnectionFailed(self, connector, reason):
+        log.msg("connection failed, reason %r" % reason)
+        pb.PBClientFactory.clientConnectionFailed(self, connector, reason)
+        RCF = protocol.ReconnectingClientFactory
+        RCF.clientConnectionFailed(self, connector, reason)
+
+    def clientConnectionLost(self, connector, reason):
+        log.msg("connection lost, reason %r" % reason)
+        pb.PBClientFactory.clientConnectionLost(self, connector, reason,
+                                             reconnecting=True)
+        RCF = protocol.ReconnectingClientFactory
+        RCF.clientConnectionLost(self, connector, reason)
+
+    def clientConnectionMade(self, broker):
+        log.msg("connection made")
+        self.resetDelay()
+        pb.PBClientFactory.clientConnectionMade(self, broker)
+        if self._doingLogin:
+            d = self.login(self._credentials, self._client)
+            self.gotDeferredLogin(d)
+
+    def startLogin(self, credentials, client=None):
+        # store login info
+        self._credentials = credentials
+        self._client = client
+
+        self._doingLogin = True
+        
+    # methods to override
+
+    def gotDeferredLogin(self, deferred):
+        """
+        The deferred from login is now available.
+        """
+        raise NotImplementedError
+
 class ReconnectingFPBClientFactory(FPBClientFactory,
                                    protocol.ReconnectingClientFactory):
     """
-    Reconnecting client factory for FPB brokers.
+    Reconnecting client factory for FPB brokers (using keycards for login).
 
     Users of this factory call startLogin to start logging in.
     Override getLoginDeferred to get a handle to the deferred returned

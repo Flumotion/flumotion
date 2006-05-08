@@ -1,3 +1,162 @@
+2006-05-08  Michael Smith  <msmith@fluendo.com>
+
+	* configure.ac:
+	* flumotion/Makefile.am:
+	* flumotion/common/Makefile.am:
+	* flumotion/common/interfaces.py:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/manager/component.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/twisted/fdserver.py:
+	* flumotion/twisted/pb.py:
+	  Merge porter-1 to trunk
+
+2006-05-08  Michael Smith  <msmith@fluendo.com>
+	Merge trunk to porter branch (3199:3203)
+
+2006-05-08  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Allow setting an empty description
+
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  Change property name in registry as well (see previous commit)
+
+	* flumotion/component/porter/porter.py:
+	  Clarify comments on os.unlink() of socket, following testing.
+	  Raise NotImplementedError for some not implemented methods.
+
+2006-05-04  Michael Smith  <msmith@fluendo.com>
+
+	* conf/managers/default/flows/porter.xml:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Rename porter_id in config to porter_name, as it's a component name
+	  in the atmosphere, not an avatarId.
+
+2006-05-04  Michael Smith  <msmith@fluendo.com>
+	Merge trunk to porter branch (3041:3199)
+
+2006-05-04  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/porter/porter.py:
+	  Fix references to now-private variables.
+	  Add exception handling around os.unlink().
+	  Add some debug messages.
+
+	* flumotion/component/porter/porterclient.py:
+	  Use fpb.ReconnectingPBClientFactory instead of pb.PBClientFactory,
+	  so we can reconnect automatically if our porter vanishes.
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Adapt for automatic reconnection. Cleanup to not fire deferred
+	  returned from do_start() until we've logged into porter and
+	  registered ourselves successfully.
+
+	  Automatic reconnection doesn't work without an explicitly-configured
+	  porter socket path.
+	  
+
+2006-05-04  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/twisted/pb.py:
+	  Add a ReconnectingPBClientFactory that just adds reconnecting to the
+	  pb.PBClientFactory (plus the gotLoginDeferred()/startLogin APIs),
+	  so I don't have to deal with bouncers/keycards.
+
+2006-05-04  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/twisted/fdserver.py:
+	  Handle recvmesg() returning no message as CONNECTION_DONE, so that
+	  a terminated (on the server-side) connection is properly dropped by 
+	  twisted. 
+
+2006-05-03  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  Log a message when catching exceptions in component startup
+
+2006-05-03  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/porter/porter.py:
+	* flumotion/test/test_porter.py:
+	  Add some comments, remove some incorrect ones from test.
+
+2006-05-02  Michael Smith  <msmith@fluendo.com>
+
+	* conf/managers/default/flows/porter.xml:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  Renaming of config parameters as requested.
+
+	* flumotion/component/porter/porter.py:
+	* flumotion/component/porter/porter.xml:
+	  Rename config parameters, privitise a bunch of variables.
+
+	* flumotion/test/test_porter.py:
+	  Comment out a wrong line in the test that was failing. Need some
+	  explanation of the comment here?
+
+	* flumotion/twisted/fdserver.py:
+	  Import socket module (used in handling exceptions)
+
+2006-05-02  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/porter/porter.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_porter.py:
+	* flumotion/twisted/fdserver.py:
+	  Patch from Thomas: add tests, cosmetic changes.
+
+2006-05-02  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Implement remote_getStreamData() for http streamers.
+
+2006-05-02  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/Makefile.am:
+	* flumotion/common/netutils.py:
+	  Nasty functions to guess a public IP/hostname when one hasn't been
+	  explicitly configured.
+
+2006-04-24  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/porter/porterclient.py:
+	  Call startReading() earlier, now that I've convinced myself it's
+	  safe to do so. Avoids nasty errors from abusing twisted's internals.
+
+	* flumotion/twisted/fdserver.py:
+	  Rewrite a bit so it's closer to what twisted does, and so that it
+	  won't potentially drop FDs under heavy load.
+
+2006-04-24  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Clean up some of the comments here, which were out of date, wrong,
+	  misleading, or all of the above. 
+	  Move a couple of lines into a different order along with a comment:
+	  we don't ever want to use an FD as a key outside the lifetime of
+	  that file descriptor.
+
+2006-04-20  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Rename/privatise porter-related variables, declare earlier.
+
+	* flumotion/component/porter/porter.py:
+	* flumotion/component/porter/porterclient.py:
+	  Doc updates, some variable name changes.
+
+2006-04-19  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/porter/porter.py:
+	  Simplify porter Realm and Avatar some more.
+
 2006-05-04  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/multi.py

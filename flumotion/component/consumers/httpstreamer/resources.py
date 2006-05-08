@@ -349,19 +349,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.logWrite(fd, ip, request, stats)
         self.info('[fd %5d] Client from %s disconnected' % (fd, ip))
 
-        #self.debug('calling request.finish() on [fd %5d]' % fd)
-        #request.finish()
-        #self.debug('called request.finish() on [fd %5d]' % fd)
-        
-        # alternative method of finishing the request; since we already
-        # "stole" the fd, we don't rely on Twisted's Request anymore,
-        # we just loseConnection on the transport,
-        # and delete the Request object,
-        # hopefully triggering garbage collection on all its objects too
-
-        # by doing a callLater we hope to avoid any new clients getting
-        # this fd before we actually purged it completely, since this
-        # code is called from a signal handler.
+        # We can't call request.finish(), since we already "stole" the fd, we 
+        # just loseConnection on the transport directly, and delete the 
+        # Request object, as well as cleaning up the bouncer bits.
         if self.bouncerName and self._fdToKeycard.has_key(fd):
             id = self._fdToKeycard[fd].id
             del self._fdToKeycard[fd]
@@ -375,23 +365,13 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             del self._fdToDurationCall[fd]
 
         self.debug('[fd %5d] closing transport %r' % (fd, request.transport))
-        request.transport.loseConnection()
-        self.debug('[fd %5d] closed transport %r' % (fd, request.transport))
-
-        # FIXME: os.close is certainly wrong, since the actual socket
-        # will os.close the fd again during its garbage collection
-        #try:
-            #request.transport.close()
-        #except OSError, e:
-        #    if e.errno == errno.EBADF:
-        #        self.warning("Tried to close [fd %5d] which was not open" % fd)
-        #    else:
-        #        self.warning("Error closing [fd %5d]" % fd)
-        #        self.debug("error: %s (%d)" % (e.strerror, e.errno))
-
-        #del request
-
+        # This will close the underlying socket. We first remove the request
+        # from our fd->request map, since the moment we call this the fd might
+        # get re-added.
         del self._requests[fd]
+        request.transport.loseConnection()
+
+        self.debug('[fd %5d] closed transport %r' % (fd, request.transport))
 
     def _durationCallLater(self, fd):
         """

@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<planet>
+  <atmosphere>
+    <component name="porter" type="porter" worker="localhost">
+      <property name="port">8000</property>
+      <!-- We can configure a porter explicitly, with the following three
+           properties, or have it generate these itself at runtime.
+           Generally, you only want to configure these explicitly if you want
+           to connect to this porter from streams in a different planet.
+        -->
+      <!--
+      <property name="username">me</property>
+      <property name="password">unguessable</property>
+      <property name="socket_path">/tmp/portertest</property>
+      -->
+    </component>
+  </atmosphere>
+  <flow name="default">
+    <component name="video-source" type="videotest" worker="localhost">
+      <!-- properties -->
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
+    </component>
+    <component name="video-encoder" type="theora-encoder" worker="localhost">
+      <source>video-source</source>
+      <!-- properties -->
+      <property name="bitrate">400</property>
+    </component>
+    <component name="muxer-video" type="ogg-muxer" worker="localhost">
+      <source>video-encoder</source>
+    </component>
+    <component name="http-video" type="http-streamer" worker="localhost">
+      <source>muxer-video</source>
+      <!-- properties -->
+      <property name="bandwidth_limit">10</property>
+      <property name="burst_on_connect">True</property>
+      <property name="mount_point">/test1</property>
+
+      <!-- Configure this streamer as slaved to a porter named 'porter' -->
+      <property name="type">slave</property>
+      <property name="porter_name">porter</property>
+      <!-- If we have an explicitly configured porter, we need to give that
+           information here as well. If it's runtime-generated, we need only
+           specify the porter name, above -->
+      <!--
+      <property name="porter_socket_path">/tmp/portertest</property>
+      <property name="porter_user">me</property>
+      <property name="porter_pass">unguessable</property> 
+       -->
+    </component>
+  </flow>
+  <flow name="default2">
+    <component name="video-source" type="videotest" worker="localhost">
+      <!-- properties -->
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
+    </component>
+    <component name="video-encoder" type="theora-encoder" worker="localhost">
+      <source>video-source</source>
+      <!-- properties -->
+      <property name="bitrate">400</property>
+    </component>
+    <component name="muxer-video" type="ogg-muxer" worker="localhost">
+      <source>video-encoder</source>
+    </component>
+    <component name="http-video" type="http-streamer" worker="localhost">
+      <source>muxer-video</source>
+      <!-- properties -->
+      <property name="bandwidth_limit">10</property>
+      <property name="burst_on_connect">True</property>
+      <property name="mount_point">/test2</property>
+      <!-- This one is also slaved to 'porter', but on /test2 instead of /test 
+        -->
+      <property name="type">slave</property>
+      <property name="porter_name">porter</property>
+      <!--
+      <property name="porter_socket_path">/tmp/portertest</property>
+      <property name="porter_user">me</property>
+      <property name="porter_pass">unguessable</property> 
+      -->
+    </component>
+  </flow>
+</planet>

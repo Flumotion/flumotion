@@ -419,6 +419,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                 d.addCallback(lambda x: make_plugs())
                 return d
             except Exception, e:
+                self.debug("Exception while loading bundles: %s" % 
+                    log.getExceptionMessage(e))
                 return defer.fail(e)
 
         def checkErrorCallback(result):
@@ -465,6 +467,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             self.debug('start: returning value %s' % ret)
             return ret
         except Exception, e:
+            self.debug("Exception during component do_start: %s" % 
+                log.getExceptionMessage(e))
             return defer.fail(e)
         
     def stop(self):

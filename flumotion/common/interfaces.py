@@ -73,6 +73,12 @@ class IWorkerMedium(IMedium):
     """
     pass
 
+class IPorterMedium(IMedium):
+    """
+    I am an interface for porter client mediums interfacing with the porter.
+    """
+    pass
+
 class IJobMedium(IMedium):
     """
     I am an interface for job-side mediums interfacing with worker-side

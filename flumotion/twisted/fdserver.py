@@ -21,43 +21,43 @@
 
 from flumotion.extern.fdpass import fdpass
 
-from twisted.internet import unix
-from twisted.python import log
+from twisted.internet import unix, main
+from errno import EWOULDBLOCK
+
+import socket
 
 # Heavily based on 
 # http://twistedmatrix.com/trac/browser/sandbox/exarkun/copyover/server.py
 # and client.py
 # Thanks for the inspiration!
-class FDServer (unix.Server):
-    def sendFileDescriptor (self, fileno, data="\0"):
+
+class FDServer(unix.Server):
+    def sendFileDescriptor(self, fileno, data="\0"):
         return fdpass.writefds(self.fileno(), [fileno], data)
 
-class FDPort (unix.Port):
+class FDPort(unix.Port):
     transport = FDServer
 
-class FDClient (unix.Client):
+class FDClient(unix.Client):
     def doRead(self):
         if not self.connected:
             return
         try:
             (fds, message) = fdpass.readfds(self.fileno(), 64*1024)
-        except:
-            log.msg('recvmsg():')
-            log.err()
+        except socket.error, se:
+            if se.args[0] == EWOULDBLOCK:
+                return
+            else:
+                return main.CONNECTION_LOST
         else:
-            try:
-                # Sometimes we get a read with no data or control messages. 
-                # Ignore those. 
-                if len(fds) > 0:
-                    self.protocol.fileDescriptorsReceived(fds, message)
-                elif len(message) > 0:
-                    self.protocol.dataReceived(message)
-            except:
-                log.msg('protocol.fileDescriptorsReceived')
-                log.err()
-        return unix.Client.doRead(self)
+            if not message:
+                return main.CONNECTION_DONE
 
-class FDConnector (unix.Connector):
+            if len(fds) > 0:
+                return self.protocol.fileDescriptorsReceived(fds, message)
+            else:
+                return self.protocol.dataReceived(message)
+
+class FDConnector(unix.Connector):
     def _makeTransport(self):
         return FDClient (self.address, self, self.reactor)
-
