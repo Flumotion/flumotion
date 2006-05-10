@@ -409,7 +409,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def getStreamData(self):
         m3ufile = "#EXTM3U\n" \
                   "#EXTINF:-1:%s\n" \
-                  "%s" (self.description, self.getUrl())
+                  "%s" % (self.description, self.getUrl())
 
         return {
                 'protocol': 'HTTP',

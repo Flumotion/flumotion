@@ -1,5 +1,8 @@
 2006-05-10  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.getStreamData): Fix splice.
+
 	* flumotion/admin/multi.py (MultiAdminModel.addManager): Return
 	the AdminModel we create.
 
