@@ -1,3 +1,24 @@
+2006-05-10  Michael Smith  <msmith@fluendo.com>
+
+	* configure.ac:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/misc/Makefile.am:
+	* flumotion/component/misc/__init__.py:
+	* flumotion/component/misc/porter/Makefile.am:
+	* flumotion/component/misc/porter/porter.xml:
+	* flumotion/component/misc/repeater/Makefile.am:
+	* flumotion/component/misc/repeater/__init__.py:
+	* flumotion/component/misc/repeater/repeater.py:
+	* flumotion/component/misc/repeater/repeater.xml:
+	* flumotion/component/porter/Makefile.am:
+	* flumotion/component/porter/__init__.py:
+	* flumotion/component/porter/porter.py:
+	* flumotion/component/porter/porter.xml:
+	* flumotion/component/porter/porterclient.py:
+	  Create flumotion/component/misc directory, for misc components.
+	  Move porter into here.
+	  Add repeater component. 
+
 2006-05-08  Michael Smith  <msmith@fluendo.com>
 
 	* configure.ac:

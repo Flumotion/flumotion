@@ -283,9 +283,11 @@ flumotion/component/consumers/preview/Makefile
 flumotion/component/converters/Makefile
 flumotion/component/converters/pipeline/Makefile
 flumotion/component/converters/overlay/Makefile
+flumotion/component/misc/Makefile
+flumotion/component/misc/porter/Makefile
+flumotion/component/misc/repeater/Makefile
 flumotion/component/muxers/Makefile
 flumotion/component/plugs/Makefile
-flumotion/component/porter/Makefile
 flumotion/component/producers/Makefile
 flumotion/component/producers/audiotest/Makefile
 flumotion/component/producers/bttv/Makefile

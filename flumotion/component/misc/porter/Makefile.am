@@ -1,6 +1,6 @@
 include $(top_srcdir)/common/python.mk
 
-porterdir = $(libdir)/flumotion/python/flumotion/porter
+porterdir = $(libdir)/flumotion/python/flumotion/component/misc/porter
 
 porter_PYTHON = \
 	__init__.py 	\

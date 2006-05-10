@@ -1,0 +1,48 @@
+<registry>
+
+  <components>
+  
+    <component type="repeater" base="flumotion/component/misc/repeater">
+      <source location="flumotion.component.misc.repeater.repeater"/>
+      <eater name="default"/>
+      <feeder name="default"/>
+      <entries>
+        <entry type="component" location="repeater.py"
+               function="Repeater"/>
+      </entries>
+      <properties>
+      </properties>
+    </component>
+ 
+  </components>
+
+  <bundles>
+
+    <bundle name="repeater-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/misc/repeater">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="repeater-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="repeater-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/misc/repeater">
+                <filename location="repeater.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

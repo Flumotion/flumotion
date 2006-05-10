@@ -1,9 +1,9 @@
 <registry>
   <components>
     <component type="porter"
-               base="flumotion/component/porter">
+               base="flumotion/component/misc/porter">
 
-      <source location="flumotion.component.porter.porter"/>
+      <source location="flumotion.component.misc.porter.porter"/>
 
       <entries>
         <entry type="component" location="porter.py"
@@ -26,7 +26,7 @@
       </dependencies>
 
       <directories>
-        <directory name="flumotion/component/porter">
+        <directory name="flumotion/component/misc/porter">
           <filename location="porter.py" />
         </directory>
       </directories>
