@@ -1,3 +1,8 @@
+2006-05-10  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/multi.py (MultiAdminModel.addManager): Return
+	the AdminModel we create.
+
 2006-05-10  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/netutils.py:

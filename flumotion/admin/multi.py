@@ -71,7 +71,7 @@ class MultiAdminModel(log.Loggable):
 
     def __init__(self):
         # public
-        self.admins = WatchedDict() # {'host:port': AdminModel}
+        self.admins = WatchedDict() # {managerId: AdminModel}
         # private
         self.listeners = []
 
@@ -115,6 +115,7 @@ class MultiAdminModel(log.Loggable):
             a.connectToHost(host, port, use_insecure)
             a.connect('connected', connected_cb)
             a.connect('disconnected', disconnected_cb)
+            return a
 
     def close_admin(self, admin):
         admin.shutdown()
