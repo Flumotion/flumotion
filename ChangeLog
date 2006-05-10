@@ -1,5 +1,11 @@
 2006-05-10  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/common/netutils.py:
+	  len(struct('P', 0)) gives the length of a pointer, from python.
+	  I am a bad, bad, person.
+
+2006-05-10  Michael Smith  <msmith@fluendo.com>
+
 	* configure.ac:
 	* flumotion/component/Makefile.am:
 	* flumotion/component/misc/Makefile.am:
