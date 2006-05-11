@@ -49,11 +49,13 @@ from flumotion.common.pygobject import gsignal, gproperty
 
 # FIXME: keycard should be created and handed to factory instead
 class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
-    def __init__(self, medium, user, passwd):
+    def __init__(self, medium, user=None, passwd=None, keycard=None):
         """
-        @type medium:  AdminModel
-        @param user:   username to log in with
-        @param passwd: password to log in with
+        @type medium:   AdminModel
+        @param user:    username to log in with
+        @param passwd:  password to log in with
+        @param keycard: Credentials to log in with (optional, can be
+                        specified instead of user/passwd)
         """
         fpb.ReconnectingFPBClientFactory.__init__(self)
 
@@ -66,7 +68,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
         # FIXME: try more than one auth method
         #keycard = keycards.KeycardUACPP(user, passwd, 'localhost')
-        keycard = keycards.KeycardUACPCC(user, 'localhost')
+        if keycard is None:
+            keycard = keycards.KeycardUACPCC(user, 'localhost')
         # FIXME: decide on an admin name ?
         keycard.avatarId = "admin"
 
@@ -169,18 +172,20 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
     # Public instance variables (read-only)
     planet = None
 
-    def __init__(self, username, password):
+    def __init__(self, username=None, password=None, keycard=None):
         self.__gobject_init__()
         
         # All of these instance variables are private. Cuidado cabrones!
         self.user = username
         self.passwd = password
+        self.keycard = keycard
         self.host = self.port = self.use_insecure = None
 
         self.managerId = '<uninitialized>'
 
         self.state = 'disconnected'
-        self.clientFactory = self._makeFactory(username, password)
+        self.clientFactory = self._makeFactory(username, password,
+                                               keycard)
         # 20 secs max for an admin to reconnect
         self.clientFactory.maxDelay = 20
 
@@ -191,8 +196,8 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self._views = [] # all UI views I am serving
 
     # a method so mock testing frameworks can override it
-    def _makeFactory(self, username, password):
-        return AdminClientFactory(self, username, password)
+    def _makeFactory(self, username=None, password=None, keycard=None):
+        return AdminClientFactory(self, username, password, keycard)
 
     def connectToHost(self, host, port, use_insecure=False):
         'Connect to a host.'
@@ -203,14 +208,18 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         # the intention here is to give an id unique to the manager --
         # if a program is adminning multiple managers, this id should
         # tell them apart (and identify duplicates)
-        self.managerId = '%s@%s:%d' % (self.user, self.host, self.port)
+        self.managerId = '%s@%s:%d' % (self.user or
+                                       getattr(self.keycard, 'username',
+                                               '<unknown>'),
+                                       self.host, self.port)
+
+        self.info('Connecting to manager %s with %s',
+                  self.managerId, use_insecure and 'TCP' or 'SSL')
 
         if use_insecure:
-            self.info('Connecting to manager %s:%d with TCP' % (host, port))
             reactor.connectTCP(host, port, self.clientFactory)
         else:
             from twisted.internet import ssl
-            self.info('Connecting to manager %s:%d with SSL' % (host, port))
             reactor.connectSSL(host, port, self.clientFactory,
                                ssl.ClientContextFactory())
 
@@ -317,7 +326,8 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
         self._workerHeavenState = d.value()
         self.debug('got worker state')
         
-        writeConnection()
+        if self.user is not None and self.passwd is not None:
+            writeConnection()
         self.debug('Connected to manager and retrieved all state')
         self.state = 'connected'
         self.emit('connected')

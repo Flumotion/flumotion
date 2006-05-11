@@ -1,3 +1,14 @@
+2006-05-11  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/multi.py (MultiAdminModel.addManager): Allow a
+	keycard argument instead of user + auth_cb.
+
+	* flumotion/admin/admin.py (AdminClientFactory.__init__)
+	(AdminModel.__init__, _makeFactory, AdminModel.connectToHost)
+	(AdminModel.setRemoteReference): Add a bunch of optional arguments
+	so that we can login with a user-supplied keycard instead of
+	user/pass. Existing programs should still work tho.
+
 2006-05-11  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/twisted/http.py:
