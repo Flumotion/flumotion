@@ -1,3 +1,10 @@
+2006-05-11  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/twisted/http.py:
+	* flumotion/twisted/rtsp.py:
+	  Import a subset of RTSP support into core, so we can use it from
+	  multiple project modules.
+
 2006-05-10  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py
