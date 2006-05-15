@@ -37,7 +37,7 @@ from flumotion.common import bundle, common, gstreamer, errors, pygobject
 from flumotion.common import messages, netutils
 
 from flumotion.twisted import fdserver
-from flumotion.component.porter import porterclient
+from flumotion.component.misc.porter import porterclient
 
 # proxy import
 from flumotion.component.component import moods
@@ -251,7 +251,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._porterId = None
         self._porterPath = None
 
-        # Or if we're a master, we open our own port.
+        # Or if we're a master, we open our own port here. Also used for URLs
+        # in the porter case.
         self.port = None
 
         # handle regular updating
@@ -359,8 +360,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             else:
                 self._porterPath = None
                 self._porterId = "/atmosphere/" + properties['porter_name']
-        else:
-            self.port = int(properties.get('port', 8800))
+
+        self.port = int(properties.get('port', 8800))
 
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.name
@@ -579,14 +580,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                     self._porterId, "getPorterDetails")
             else:
                 self.debug("Creating dummy deferred")
-                d = defer.Deferred()
+                d = defer.succeed((self._porterPath, self._porterUsername, 
+                    self._porterPassword))
 
             d.addCallback(gotPorterDetails)
             d.addErrback(self.failedSlavedStart)
-
-            if self._porterPath:
-                d.callback((self._porterPath, self._porterUsername, 
-                    self._porterPassword))
 
             return dl
         else:
