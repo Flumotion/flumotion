@@ -64,13 +64,13 @@ class PorterAvatar(pb.Avatar, log.Loggable):
         self.log("Perspective called: deregistering path \"%s\"" % path)
         self.porter.deregisterPath(path, self)
 
-    def perspective_registerDefault(self):
+    def perspective_registerPrefix(self, prefix):
         self.log("Perspective called: registering default")
-        self.porter.registerDefault(self)
+        self.porter.registerPrefix(prefix, self)
 
-    def perspective_deregisterDefault(self):
+    def perspective_deregisterDefault(self, prefix):
         self.log("Perspective called: deregistering default")
-        self.porter.deregisterDefault(self)
+        self.porter.deregisterPrefix(prefix, self)
 
 class PorterRealm(log.Loggable):
     """
@@ -118,7 +118,7 @@ class Porter(component.BaseComponent, log.Loggable):
         # We maintain a map of path -> avatar (the underlying transport is
         # accessible from the avatar, we need this for FD-passing)
         self._mappings = {}
-        self._default = None # Initially no default destination
+        self._prefixes = {}
 
         self._socketlistener = None
 
@@ -164,21 +164,23 @@ class Porter(component.BaseComponent, log.Loggable):
         else:
             self.warning("Mapping not removed: no mapping found")
 
-    def registerDefault(self, avatar):
+    def registerPrefix(self, prefix, avatar):
         """
-        Register a default destination for all requests not directed to a
-        specifically-mapped path.
+        Register a destination for all requests directed to anything beginning
+        with a specified prefix. Where there are multiple matching prefixes, the
+        longest is selected.
 
         @param avatar: The avatar being registered
         @type  avatar: L{PorterAvatar}
         """
-        if self._default:
-            self.warning("Replacing existing default avatar")
 
-        self.debug("Setting default destination for porter")
-        self._default = avatar
+        self.debug("Setting prefix \"%s\" for porter", prefix)
+        if prefix in self._prefixes:
+            self.warn("Overwriting prefix")
 
-    def deregisterDefault(self, avatar):
+        self._prefixes[prefix] = avatar
+
+    def deregisterPrefix(self, prefix, avatar):
         """
         Attempt to deregister a default destination for all requests not 
         directed to a specifically-mapped path. This will only succeed if the
@@ -187,11 +189,27 @@ class Porter(component.BaseComponent, log.Loggable):
         @param avatar: The avatar being deregistered
         @type  avatar: L{PorterAvatar}
         """
-        if self._default == avatar:
-            self.debug("Removing default destination from porter")
-            self._default = None
+        if prefix not in self._prefixes:
+            self.warning("Mapping not removed: no mapping found")
+            return
+
+        if self._prefixes[prefix] == avatar:
+            self.debug("Removing prefix destination from porter")
+            del self._prefixes[prefix]
         else:
-            self.warning("Not removing default destination: expected avatar not found")
+            self.warning("Not removing prefix destination: expected avatar not found")
+
+    def findPrefixMatch(self, path):
+        found = None
+        # TODO: Horribly inefficient. Figure out a smart algorithm
+        for prefix in self._prefixes.keys():
+            self.debug("Checking: %r, %r" % (type(prefix), type(path)))
+            if (path.startswith(prefix) and (not found or len(found) < len(prefix))):
+                found = prefix
+        if found:
+            return self._prefixes[found]
+        else:
+            return None
 
     def findDestination(self, path):
         """
@@ -201,10 +219,9 @@ class Porter(component.BaseComponent, log.Loggable):
 
         if self._mappings.has_key(path):
             return self._mappings[path]
-        elif self._default:
-            return self._default
         else:
-            return None
+            return self.findPrefixMatch(path)
+
 
     def generateSocketPath(self):
         """
@@ -250,7 +267,7 @@ class Porter(component.BaseComponent, log.Loggable):
 
         self._port = int(props['port'])
         self._porterProtocol = props.get('protocol', 
-            'flumotion.component.porter.porter.HTTPPorterProtocol')
+            'flumotion.component.misc.porter.porter.HTTPPorterProtocol')
 
     def do_stop(self):
         if self._socketlistener:

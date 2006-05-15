@@ -118,11 +118,11 @@ class PorterMedium(medium.BaseMedium):
     def deregisterPath(self, path):
         return self.callRemote("deregisterPath", path)
 
-    def registerDefault(self):
-        return self.callRemote("registerDefault")
+    def registerPrefix(self, prefix):
+        return self.callRemote("registerPrefix", prefix)
 
-    def deregisterDefault(self):
-        return self.callRemote("deregisterDefault")
+    def deregisterPrefix(self, prefix):
+        return self.callRemote("deregisterPrefix", prefix)
         
 class PorterClientFactory(fpb.ReconnectingPBClientFactory):
     """
@@ -154,9 +154,15 @@ class PorterClientFactory(fpb.ReconnectingPBClientFactory):
     def deregisterPath(self, path):
         return self.medium.deregisterPath(path)
 
+    def registerPrefix(self, prefix):
+        return self.medium.registerPrefix(prefix)
+
+    def deregisterPrefix(self, prefix):
+        return self.medium.deregisterPrefix(prefix)
+
     def registerDefault(self):
-        return self.medium.registerDefault()
+        return self.medium.registerPrefix("/")
 
     def deregisterDefault(self):
-        return self.medium.deregisterDefault()
+        return self.medium.deregisterPrefix("/")
         
