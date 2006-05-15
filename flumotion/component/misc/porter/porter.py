@@ -263,7 +263,7 @@ class Porter(component.BaseComponent, log.Loggable):
 
         try:
             os.unlink(self._socketPath)
-        except Exception, e:
+        except:
             pass
 
         return component.BaseComponent.do_stop(self)

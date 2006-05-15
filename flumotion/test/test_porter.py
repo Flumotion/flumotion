@@ -25,7 +25,7 @@ from twisted.trial import unittest
 
 from twisted.web import server
 
-from flumotion.component.porter import porter
+from flumotion.component.misc.porter import porter
 
 class FakeTransport:
     connected = True

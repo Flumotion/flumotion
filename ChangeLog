@@ -1,3 +1,10 @@
+2006-05-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/test/test_porter.py:
+	  fix errors caught by pychecker
+
 2006-05-15  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
