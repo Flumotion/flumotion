@@ -68,7 +68,7 @@ class PorterAvatar(pb.Avatar, log.Loggable):
         self.log("Perspective called: registering default")
         self.porter.registerPrefix(prefix, self)
 
-    def perspective_deregisterDefault(self, prefix):
+    def perspective_deregisterPrefix(self, prefix):
         self.log("Perspective called: deregistering default")
         self.porter.deregisterPrefix(prefix, self)
 

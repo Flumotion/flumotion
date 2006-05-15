@@ -1,6 +1,11 @@
 2006-05-15  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/misc/porter/porter.py:
+	  Add deregisterPrefix method
+
+2006-05-15  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/misc/porter/porter.py:
 	* flumotion/component/misc/porter/porter.xml:
 	* flumotion/component/misc/porter/porterclient.py:
 	  Allow prefix matching in porter (needs an efficient algorithm)
