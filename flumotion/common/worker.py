@@ -26,7 +26,44 @@ Objects related to the state of workers.
 from twisted.spread import pb
 
 from flumotion.twisted import flavors
+from flumotion.common import log, errors
 
+class PortSet(log.Loggable):
+    """
+    A list of ports that keeps track of which are available for use on a
+    given machine.
+    """
+    def __init__(self, logName, ports):
+        self.logName = logName
+        self.ports = ports
+        self.used = [False] * len(ports)
+
+    def reservePorts(self, numPorts):
+        ret = []
+        while numPorts > 0:
+            if not False in self.used:
+                raise errors.ComponentStartError(
+                    'could not allocate port on worker %s' % self.logName)
+            i = self.used.index(False)
+            ret.append(self.ports[i])
+            self.used[i] = True
+            numPorts -= 1
+        return ret
+
+    def releasePorts(self, ports):
+        for p in ports:
+            try:
+                i = self.ports.index(p)
+                if self.used[i]:
+                    self.used[i] = False
+                else:
+                    self.warning('releasing unallocated port: %d' % p)
+            except ValueError:
+                self.warning('releasing unknown port: %d' % p)
+
+    def numFree(self):
+        return len(filter(lambda x: not x, self.used))
+    
 # worker heaven state proxy objects
 class ManagerWorkerHeavenState(flavors.StateCacheable):
     """

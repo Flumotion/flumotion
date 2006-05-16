@@ -34,42 +34,8 @@ from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import config, worker, common
 from flumotion.twisted.defer import defer_generator_method
 
-class PortSet(log.Loggable):
-    """
-    A list of ports that keeps track of which are available for use by a
-    given worker.
-    """
-    def __init__(self, workername, ports):
-        self.logName = workername
-        self.ports = ports
-        self.used = [False] * len(ports)
+PortSet = worker.PortSet
 
-    def reservePorts(self, numPorts):
-        ret = []
-        while numPorts > 0:
-            if not False in self.used:
-                raise errors.ComponentStartError(
-                    'could not allocate port on worker %s' % self.logName)
-            i = self.used.index(False)
-            ret.append(self.ports[i])
-            self.used[i] = True
-            numPorts -= 1
-        return ret
-
-    def releasePorts(self, ports):
-        for p in ports:
-            try:
-                i = self.ports.index(p)
-                if self.used[i]:
-                    self.used[i] = False
-                else:
-                    self.warning('releasing unallocated port: %d' % p)
-            except ValueError:
-                self.warning('releasing unknown port: %d' % p)
-
-    def numFree(self):
-        return len(filter(lambda x: not x, self.used))
-    
 class WorkerAvatar(base.ManagerAvatar):
     """
     I am an avatar created for a worker.

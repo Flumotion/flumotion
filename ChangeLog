@@ -1,3 +1,12 @@
+2006-05-16  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/worker.py (PortSet): Pull in from
+	flumotion.common.worker.
+
+	* flumotion/common/worker.py (PortSet): Moved here from
+	flumotion.worker.worker so that the FSP can use it to track ports
+	on a server with multiple workers.
+
 2006-05-15  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/misc/porter/porter.py:
