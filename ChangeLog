@@ -3,6 +3,8 @@
 	* flumotion/common/worker.py (ProcessProtocol): 
 	* flumotion/worker/worker.py (JobProcessProtocol): Rework to
 	export the guts of the process protocol in common/.
+	(JobProcessProtocol.processEnded): Add a kindergarten-specific
+	call here instead of in worker/.
 
 2006-05-16  Michael Smith  <msmith@fluendo.com>
 

@@ -57,7 +57,6 @@ class ProcessProtocol(protocol.ProcessProtocol):
         # status.value.status is the os.WAIT-like status value
         message = None
         obj = self.loggable
-        obj.removeKidByPid(self.pid)
         if status.value.exitCode is not None:
             obj.info("Reaped child with pid %d, exit value %d.",
                      self.pid, status.value.exitCode)

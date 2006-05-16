@@ -330,6 +330,8 @@ class JobProcessProtocol(worker.ProcessProtocol):
         kg = self.loggable
         signum = status.value.signal
 
+        kg.removeKidByPid(self.pid)
+
         if signum is not None:
             # we need to trigger a failure on the create deferred 
             # if the job received a signal before logging in to the worker;
