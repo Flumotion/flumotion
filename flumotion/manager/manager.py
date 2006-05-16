@@ -686,11 +686,29 @@ class Vishnu(log.Loggable):
 
         return list
 
+    def deleteComponent(self, componentState):
+        """
+        Empty the planet of the given component.
+
+        @returns: a deferred that will fire when all listeners have been
+        notified of the removal of the component.
+        """
+        self.debug('deleting component %r from state', componentState)
+        c = componentState
+        flow = componentState.get('parent')
+        if (c.get('moodPending') != None
+            or c.get('mood') is not moods.sleeping.value):
+            raise errors.BusyComponentError(c)
+
+        del self._componentMappers[self._componentMappers[c].id]
+        del self._componentMappers[c]
+        return flow.remove('components', c)
+        
     def deleteFlow(self, flowName):
         """
         Empty the planet of all components, and flows.
 
-        @returns: a deferred that will fire when the planet is empty.
+        @returns: a deferred that will fire when the flow is empty.
         """
 
         # first get all components to sleep

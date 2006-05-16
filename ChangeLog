@@ -1,5 +1,12 @@
 2006-05-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspective_deleteComponent): New remote method for
+	deleting components.
+
+	* flumotion/manager/manager.py (Vishnu.deleteComponent): New
+	method, deletes a component from the state.
+
 	* flumotion/common/worker.py (ProcessProtocol): 
 	* flumotion/worker/worker.py (JobProcessProtocol): Rework to
 	export the guts of the process protocol in common/.

@@ -275,6 +275,18 @@ class AdminAvatar(base.ManagerAvatar):
     def perspective_deleteFlow(self, flowName):
         return self.vishnu.deleteFlow(flowName)
 
+    def perspective_deleteComponent(self, componentState):
+        """Delete a component from the manager.
+
+        A component can only be deleted when it is sleeping or sad. It
+        is the caller's job to ensure this is the case; calling this
+        function on a running component will raise a ComponentBusyError.
+
+        @returns: a deferred that will fire when all listeners have been
+        notified of the component removal
+        """
+        return self.vishnu.deleteComponent(componentState)
+
     # Deprecated -- remove me when no one uses me any more
     def perspective_cleanComponents(self):
         return self.vishnu.emptyPlanet()
