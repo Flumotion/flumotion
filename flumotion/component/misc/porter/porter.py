@@ -128,6 +128,8 @@ class Porter(component.BaseComponent, log.Loggable):
         self._port = None
         self._porterProtocol = None
 
+        self._interface = ''
+
     def registerPath(self, path, avatar):
         """
         Register a path as being served by a streamer represented by this 
@@ -268,6 +270,7 @@ class Porter(component.BaseComponent, log.Loggable):
         self._port = int(props['port'])
         self._porterProtocol = props.get('protocol', 
             'flumotion.component.misc.porter.porter.HTTPPorterProtocol')
+        self._interface = props.get('interface', '')
 
     def do_stop(self):
         if self._socketlistener:
@@ -331,7 +334,8 @@ class Porter(component.BaseComponent, log.Loggable):
         factory = PorterProtocolFactory(self, proto)
         try:
             reactor.listenWith(
-                PassableServerPort, self._port, factory)
+                PassableServerPort, self._port, factory, 
+                    interface=self._interface)
             self.debug("Now listening on port %d" % self._port)
         except error.CannotListenError, e:
             self.warning("Failed to listen on port %d" % self._port)

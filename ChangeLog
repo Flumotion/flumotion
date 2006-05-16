@@ -1,3 +1,9 @@
+2006-05-16  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/misc/porter/porter.xml:
+	  Allow configuring network interface to listen on.
+
 2006-05-16  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/worker.py (PortSet): Pull in from
