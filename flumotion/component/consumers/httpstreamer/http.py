@@ -591,7 +591,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             # Streamer is standalone.
             try:
                 self.debug('Listening on %d' % self.port)
-                reactor.listenTCP(self.port, server.Site(resource=root))
+                host = self.hostname or ""
+                reactor.listenTCP(self.port, server.Site(resource=root), 
+                    interface=host)
                 return feedcomponent.ParseLaunchComponent.do_start(self, *args, 
                     **kwargs)
             except error.CannotListenError, e:
