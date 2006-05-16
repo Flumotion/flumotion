@@ -1,3 +1,9 @@
+2006-05-16  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/worker.py (ProcessProtocol): 
+	* flumotion/worker/worker.py (JobProcessProtocol): Rework to
+	export the guts of the process protocol in common/.
+
 2006-05-16  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:

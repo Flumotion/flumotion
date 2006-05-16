@@ -23,10 +23,95 @@
 Objects related to the state of workers.
 """
 
+import os
+import signal
+
 from twisted.spread import pb
+from twisted.internet import protocol
 
 from flumotion.twisted import flavors
-from flumotion.common import log, errors
+from flumotion.common import log, errors, messages
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
+
+class ProcessProtocol(protocol.ProcessProtocol):
+    def __init__(self, loggable, avatarId, processType, machine):
+        self.loggable = loggable
+        self.avatarId = avatarId
+        self.processType = processType # e.g., 'component'
+        self.machine = machine # e.g., 'worker 1'
+
+        self.setPid(None)
+
+    def setPid(self, pid):
+        self.pid = pid
+
+    def sendMessage(self, message):
+        raise NotImplementedError
+
+    def processEnded(self, status):
+        # vmethod implementation
+        # status is an instance of failure.Failure
+        # status.value is a twisted.internet.error.ProcessTerminated
+        # status.value.status is the os.WAIT-like status value
+        message = None
+        obj = self.loggable
+        obj.removeKidByPid(self.pid)
+        if status.value.exitCode is not None:
+            obj.info("Reaped child with pid %d, exit value %d.",
+                     self.pid, status.value.exitCode)
+        signum = status.value.signal
+
+        # SIGKILL is an explicit kill, and never generates a core dump.
+        # For any other signal we want to see if there is a core dump,
+        # and warn if not.
+        if signum is not None:
+            if signum == signal.SIGKILL:
+                obj.warning("Child with pid %d killed.", self.pid)
+                message = messages.Error(T_(N_("The %s was killed.\n"
+                                               % self.processType)))
+            else:
+                message = messages.Error(T_(N_("The %s crashed.\n"
+                                                % self.processType)),
+                    debug='Terminated with signal number %d' % signum)
+
+                # use some custom logging depending on signal
+                if signum == signal.SIGSEGV:
+                    obj.warning("Child with pid %d segfaulted.", self.pid)
+                elif signum == signal.SIGTRAP:
+                    # SIGTRAP occurs when registry is corrupt
+                    obj.warning("Child with pid %d received a SIGTRAP.",
+                                self.pid)
+                else:
+                    # if we find any of these, possibly special-case them too
+                    obj.info("Reaped child with pid %d signaled by "
+                             "signal %d.", self.pid, signum)
+                    
+                if not os.WCOREDUMP(status.value.status):
+                    obj.warning("No core dump generated. "
+                                "Were core dumps enabled at the start ?")
+                    message.add(T_(N_(
+                        "However, no core dump was generated. "
+                        "You may need to configure the environment "
+                        "if you want to further debug this problem.")))
+                else:
+                    obj.info("Core dumped.")
+                    corepath = os.path.join(os.getcwd(), 'core.%d' % self.pid)
+                    if os.path.exists(corepath):
+                        obj.info("Core file is probably '%s'." % corepath)
+                        message.add(T_(N_(
+                            "The core dump is '%s' on machine '%s'."),
+                            corepath, self.machine))
+                        # FIXME: add an action that runs gdb and produces a
+                        # backtrace; or produce it here and attach to the
+                        # message as debug info.
+
+        if message:
+            obj.debug('sending message to manager/admin')
+            self.sendMessage(message)
+
+        self.setPid(None)
 
 class PortSet(log.Loggable):
     """
