@@ -118,7 +118,10 @@ class WorkerConfigXML(log.Loggable):
                 continue
 
             if child.nodeName == "host":
-                host = str(child.firstChild.nodeValue)
+                if child.firstChild:
+                    host = str(child.firstChild.nodeValue)
+                else:
+                    host = 'localhost'
             elif child.nodeName == "port":
                 try:
                     port = int(child.firstChild.nodeValue)
@@ -158,11 +161,23 @@ class WorkerConfigXML(log.Loggable):
         
     def parseFeederports(self, node):
         # returns a list of allowed port numbers
-        # <feederports>[lower]-[upper]</feederports>
-
-        value = str(node.firstChild.nodeValue)
-        if not '-' in value:
-            raise ConfigError("feederports '%s' does not contain '-'" % value)
-        (lower, upper) = value.split('-')
-        ports = range(int(lower), int(upper) + 1)
+        # port := int
+        # port-range := port "-" port
+        # port-term := port | port-range
+        # port-list := "" | port-term | port-term "," port-list
+        # <feederports>port-list</feederports>
+        ports = []
+        if not node.firstChild:
+            return ports
+        terms = str(node.firstChild.nodeValue).split(',')
+        for term in terms:
+            if '-' in term:
+                (lower, upper) = [int(x) for x in term.split('-')]
+                for port in range(lower, upper+1):
+                    if port not in ports:
+                        ports.append(port)
+            else:
+                port = int(term)
+                if port not in ports:
+                    ports.append(port)
         return ports

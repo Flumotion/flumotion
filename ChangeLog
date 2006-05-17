@@ -1,3 +1,10 @@
+2006-05-17  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/config.py (WorkerConfigXML.parseManager):
+	Support an empty 'host' parameter == 'localhost'.
+	(WorkerConfigXML.parseFeederports): Support having an empty set of
+	feeder ports, as well as comma-separated feeder ports.
+
 2006-05-16  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/admin.py
