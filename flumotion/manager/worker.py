@@ -145,7 +145,11 @@ class WorkerHeaven(base.ManagerHeaven):
         """
         workerName = workerAvatar.getName()
         if not workerName in self.state.get('names'):
+            # wheee
+            host = workerAvatar.mind.broker.transport.getPeer().host
+            state = worker.ManagerWorkerState(name=workerName, host=host)
             self.state.append('names', workerName)
+            self.state.append('workers', state)
         else:
             # FIXME: what if it was already there ?
             self.warning('worker %s was already registered in the heaven' %
@@ -159,8 +163,11 @@ class WorkerHeaven(base.ManagerHeaven):
         """
         workerName = workerAvatar.getName()
         names = self.state.get('names')
-        if workerName in self.state.get('names'):
+        try:
             self.state.remove('names', workerName)
-        else:
+            for state in list(self.state.get('workers')):
+                if state.get('name') == workerName:
+                    self.state.remove('workers', state)
+        except ValueError:
             self.warning('worker %s was never registered in the heaven' %
                 workerName)

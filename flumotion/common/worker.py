@@ -155,8 +155,8 @@ class ManagerWorkerHeavenState(flavors.StateCacheable):
     """
     def __init__(self):
         flavors.StateCacheable.__init__(self)
-        # FIXME: later on we would want a dict of names -> cacheables ?
         self.addListKey('names', [])
+        self.addListKey('workers', []) # should be a dict
 
     def __repr__(self):
         return "%r" % self._dict
@@ -168,3 +168,26 @@ class AdminWorkerHeavenState(flavors.StateRemoteCache):
     pass
 
 pb.setUnjellyableForClass(ManagerWorkerHeavenState, AdminWorkerHeavenState)
+
+class ManagerWorkerState(flavors.StateCacheable):
+    """
+    I represent the state of a worker in the manager.
+    """
+    def __init__(self, **kwargs):
+        flavors.StateCacheable.__init__(self)
+        self.addKey('name')
+        self.addKey('host')
+        for k, v in kwargs.items():
+            self.set(k, v)
+
+    def __repr__(self):
+        return ("<ManagerWorkerState for %s on %s>"
+                % (self.get('name'), self.get('host')))
+
+class AdminWorkerState(flavors.StateRemoteCache):
+    """
+    I represent the state of a worker in the admin.
+    """
+    pass
+
+pb.setUnjellyableForClass(ManagerWorkerState, AdminWorkerState)

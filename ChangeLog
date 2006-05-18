@@ -1,3 +1,15 @@
+2006-05-18  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/worker.py (WorkerHeaven.workerDetached)
+	(WorkerHeaven.workerAttached): Manage 'workers' in the
+	WorkerHeavenState in addition to 'names'.
+
+	* flumotion/common/worker.py (ManagerWorkerState)
+	(AdminWorkerState): New state cacheable/caches, to hold more
+	detailed information about workers.
+	(ManagerWorkerHeavenState.__init__): Add a 'workers' key to hold
+	ManagerWorkerState instances.
+
 2006-05-17  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/config.py (WorkerConfigXML.parseManager):
