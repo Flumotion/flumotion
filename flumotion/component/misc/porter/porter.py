@@ -178,7 +178,7 @@ class Porter(component.BaseComponent, log.Loggable):
 
         self.debug("Setting prefix \"%s\" for porter", prefix)
         if prefix in self._prefixes:
-            self.warn("Overwriting prefix")
+            self.warning("Overwriting prefix")
 
         self._prefixes[prefix] = avatar
 
