@@ -1,5 +1,10 @@
 2006-05-22  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/test_manager_worker.py:
+	Fix failing TestHeaven.testAttached test.
+
+2006-05-22  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/misc/porter/porter.py:
 	Fix typo/use of wrong Loggable method.
 
