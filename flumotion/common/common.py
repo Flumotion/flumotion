@@ -140,7 +140,8 @@ def mergeImplements(*classes):
     return tuple(allYourBase)
 
 
-def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
+def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
+              directory='/'):
     '''
     This forks the current process into a daemon.
     The stdin, stdout, and stderr arguments are file names that
@@ -150,6 +151,8 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     Note that stderr is opened unbuffered, so
     if it shares a file with stdout then interleaved output
     may not appear in the order that you expect.
+
+    The fork will switch to the given directory.
     '''
 
     # first fork
@@ -162,7 +165,12 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
         sys.exit(1)
 
     # decouple from parent environment
-    os.chdir("/") 
+    try:
+        os.chdir(directory) 
+    except OSError, e: 
+        from flumotion.common import errors
+        raise errors.SystemError, "Failed to change directory to %s: %s" % (
+            directory, e.strerror)
     os.umask(0) 
     os.setsid() 
 

@@ -26,6 +26,7 @@ def get():
         homedir = os.environ['HOME']
         registrydir = os.path.join(homedir, '.flumotion')
         cachedir = os.path.join(homedir, '.flumotion')
+        daemondir = homedir
         def ensure(path):
             try:
                 os.listdir(path)
@@ -34,8 +35,11 @@ def get():
         ensure(registrydir)
         ensure(cachedir)
     except KeyError:
-        registrydir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion')
-        cachedir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion')
+        registrydir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion',
+            '.flumotion')
+        cachedir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion',
+            '.flumotion')
+        daemondir = os.path.join('@LOCALSTATEDIR@', 'cache', 'flumotion')
     except OSError, e:
         print 'Error making dir %s: %s' % (e.filename, e.strerror)
         print 'Things are probably going to break!'
@@ -44,6 +48,7 @@ def get():
         'isinstalled':   True,
         'cachedir':      cachedir,
         'configdir':     os.path.join('@SYSCONFDIR@', 'flumotion'),
+        'daemondir':     daemondir,
         'gladedir':      os.path.join('@DATADIR@', 'flumotion', 'glade'),
         'imagedir':      os.path.join('@DATADIR@', 'flumotion', 'image'),
         'localedatadir': os.path.join('@DATADIR@'),

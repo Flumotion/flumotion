@@ -155,6 +155,9 @@ def main(args):
                      action="store_true", dest="daemonize",
                      default=False,
                      help="run in background as a daemon")
+    group.add_option('', '--daemonize-to',
+                     action="store", dest="daemonizeTo",
+                     help="what directory to run from when daemonizing")
     parser.add_option_group(group)
     
     log.debug('manager', 'Parsing arguments (%r)' % ', '.join(args))
@@ -283,6 +286,12 @@ def main(args):
         raise errors.SystemError, message
 
     log.info('manager', 'Starting manager "%s"' % options.name)
+
+    if options.daemonizeTo and not options.daemonize:
+        sys.stderr.write(
+            'ERROR: --daemonize-to can only be used with -D/--daemonize.\n')
+        return 1
+
     if options.daemonize:
         log.info('manager', 'Daemonizing')
         common.ensureDir(configure.logdir, "log file")
@@ -297,7 +306,11 @@ def main(args):
         log.debug('manager', 'Further logging will be done to %s' % logPath)
 
         # here we daemonize; so we also change our pid
-        common.daemonize(stdout=logPath, stderr=logPath)
+        if not options.daemonizeTo:
+            options.daemonizeTo = '/'
+        common.daemonize(stdout=logPath, stderr=logPath,
+            directory=options.daemonizeTo)
+
         log.info('manager', 'Started daemon')
 
         # from now on I should keep running, whatever happens

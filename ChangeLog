@@ -1,3 +1,20 @@
+2006-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/configure/configure.py:
+	* flumotion/configure/installed.py.in:
+	* flumotion/configure/uninstalled.py.in:
+	  add "daemondir", which is where daemonized programs will run from
+	  core dumps will thus end up there if requested
+	* flumotion/common/common.py:
+	  add an argument to daemonize for the run directory
+	* flumotion/manager/main.py:
+	* flumotion/worker/main.py:
+	  add a --daemonize-to option, only allowed when -D/--daemonize is
+	  used
+	* flumotion/service/service.py:
+	  use the new --daemonize-to option
+	  Fixes #374
+
 2006-05-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_flavors.py:

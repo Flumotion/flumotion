@@ -35,6 +35,8 @@ and then access the variables from the configure module.  For example:
 @type cachedir:      string
 @var  configdir:     directory where configuration files are stored
 @type configdir:     string
+@var  daemondir:     directory where daemonized programs should run
+@type daemondir:     string
 @var  gladedir:      directory where glade files are stored
 @type gladedir:      string
 @var  logdir:        directory where log files are stored

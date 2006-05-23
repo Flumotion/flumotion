@@ -63,6 +63,9 @@ def main(args):
     group.add_option('-D', '--daemonize',
                      action="store_true", dest="daemonize",
                      help="run in background as a daemon")
+    group.add_option('', '--daemonize-to',
+                     action="store", dest="daemonizeTo",
+                     help="what directory to run from when daemonizing")
 
     group.add_option('-u', '--username',
                      action="store", type="string", dest="username",
@@ -179,13 +182,21 @@ def main(args):
     if options.debug:
         log.setFluDebug(options.debug)
 
+    if options.daemonizeTo and not options.daemonize:
+        sys.stderr.write(
+            'ERROR: --daemonize-to can only be used with -D/--daemonize.\n')
+        return 1
+
     if options.daemonize:
         common.ensureDir(configure.logdir, "log file")
         common.ensureDir(configure.rundir, "run file")
 
         logPath = os.path.join(configure.logdir, 'worker.%s.log' %
             options.name)
-        common.daemonize(stdout=logPath, stderr=logPath)
+        if not options.daemonizeTo:
+            options.daemonizeTo = '/'
+        common.daemonize(stdout=logPath, stderr=logPath,
+            directory=options.daemonizeTo)
         log.info('worker', 'Started daemon')
 
         # from now on I should keep running until killed, whatever happens
