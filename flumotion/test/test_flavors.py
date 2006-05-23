@@ -21,12 +21,25 @@
 
 import common
 import testclasses
+import twisted
 
 from twisted.trial import unittest
 
 from twisted.internet import reactor, defer
 from twisted.spread import pb
 from flumotion.twisted import flavors
+
+# Needed to work around trial in twisted 1.3 not working 
+# when deferreds are return values from test methods
+# the way to test < twisted 2.0 is to check if twisted.__version__
+# attribute exists
+class MethodWrapper:
+    def __init__(self, proc, im_class=None):
+        self._proc = proc
+        self.__name__ = proc.__name__
+        self.im_class = im_class
+    def __call__(self):
+        return unittest.defferredResult(self._proc(self))
 
 class TestStateCacheable(flavors.StateCacheable):
     pass
@@ -117,6 +130,8 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(check_name)
         d.addCallback(lambda _: self.stopClient())
         return d
+    if not hasattr(twisted,"__version__"):
+        testStateSet = MethodWrapper(testStateSet)
 
     def testStateAppendRemove(self):
         # start everything
@@ -151,6 +166,8 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(check_after_adopt_and_bear_again)
         d.addCallback(check_third_kid_and_stop)
         return d
+    if not hasattr(twisted,"__version__"):
+        testStateAppendRemove = MethodWrapper(testStateAppendRemove)
 
     def testStateWrongListener(self):
         # start everything
@@ -166,6 +183,9 @@ class TestStateSet(unittest.TestCase):
 
         d.addCallback(got_state_and_stop)
         return d
+    if not hasattr(twisted,"__version__"):
+        testStateWrongListener = MethodWrapper(testStateWrongListener)
+
 
     # listener interface
     __implements__ = flavors.IStateListener,
@@ -199,6 +219,9 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(add_listener_and_set_name)
         d.addCallback(check_results)
         return d
+    if not hasattr(twisted,"__version__"):
+        testStateSetListener = MethodWrapper(testStateSetListener)
+
 
     def testStateAppendRemoveListener(self):
         # start everything and get the state
@@ -230,6 +253,10 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(check_remove_results_and_bear_child)
         d.addCallback(check_append_results_and_stop)
         return d
+    if not hasattr(twisted,"__version__"):
+        testStateAppendRemoveListener = MethodWrapper(
+            testStateAppendRemoveListener)
+
 
 class TestFullListener(unittest.TestCase):
     def setUp(self):
@@ -305,6 +332,9 @@ class TestFullListener(unittest.TestCase):
         d.addCallback(add_listener_and_set_name)
         d.addCallback(check_results)
         return d
+    if not hasattr(twisted,"__version__"):
+        testStateSetListener = MethodWrapper(testStateSetListener)
+
 
     def testStateAppendRemoveListener(self):
         # start everything and get the state
@@ -340,6 +370,10 @@ class TestFullListener(unittest.TestCase):
         d.addCallback(check_remove_results_and_bear_child)
         d.addCallback(check_append_results_and_stop)
         return d
+    if not hasattr(twisted,"__version__"):
+        testStateAppendRemoveListener = MethodWrapper(
+            testStateAppendRemoveListener)
+
 
 class TestState(unittest.TestCase):
     def testStateAddKey(self):
