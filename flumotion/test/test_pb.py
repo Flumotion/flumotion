@@ -282,6 +282,8 @@ class Test_FPBClientFactory(unittest.TestCase):
         failure = unittest.deferredError(d)
         log.debug("trial", "got failure %r" % failure)
         tlog.flushErrors(error.UnauthorizedLogin)
+
+        c.disconnect()
         #failure.trap(error.UnauthorizedLogin)
         #self.clientDisconnect(factory, None)
         #from twisted.cred.error import UnauthorizedLogin
