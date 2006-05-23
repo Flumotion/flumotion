@@ -262,8 +262,12 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         ### FIXME: there's a window where Twisted could have removed the
         # fd because the client disconnected.  Catch EBADF correctly here.
         try:
+            # TODO: This is a non-blocking socket, we really should check
+            # return values here, or just let twisted handle all of this
+            # normally, and not hand off the fd until after twisted has
+            # finished writing the headers.
             os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
-            # tell Twisted we already wrote headers ourselves
+            # tell TwistedWeb we already wrote headers ourselves
             request.startedWriting = True
             return True
         except OSError, (no, s):
@@ -514,13 +518,16 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # the reactor
         # spiv told us to remove* on request.transport, and that works
         # then we figured out that a new request is only a Reader, so we
-        # remove the removedWriter
+        # remove the removedWriter - this is because we never write to the
+        # socket through twisted, only with direct os.write() calls from
+        # _writeHeaders.
         fd = fdi
         self.debug("taking away [fd %5d] from Twisted" % fd)
         reactor.removeReader(request.transport)
         #reactor.removeWriter(request.transport)
     
-        # check if it's really an open fd
+        # check if it's really an open fd (i.e. that twisted didn't close it
+        # before the removeReader() call)
         import fcntl
         try:
             fcntl.fcntl(fd, fcntl.F_GETFL)

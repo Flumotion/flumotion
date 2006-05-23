@@ -1,5 +1,10 @@
 2006-05-23  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Add some comments and a TODO.
+
+2006-05-23  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/test/test_pb.py:
 	  Fix one of the tests which was failing - disconnect the client so we
 	  don't have a dirty reactor.
