@@ -52,7 +52,9 @@ AC_PROG_LIBTOOL
 dnl check for python
 AS_PATH_PYTHON(2.3)
 
-AM_CHECK_PYTHON_HEADERS(HAVE_PYTHON_H=yes, HAVE_PYTHON_H=no)
+AM_CHECK_PYTHON_HEADERS(HAVE_PYTHON_H=yes, [
+  AC_MSG_ERROR([You need to install the Python development packages.])
+])
 
 dnl check for GStreamer
 PKG_CHECK_MODULES(GST_08, gstreamer-0.8 >= $GST_08_REQ,
