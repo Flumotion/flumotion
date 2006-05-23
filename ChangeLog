@@ -1,3 +1,10 @@
+2006-05-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/test_flavors.py:
+	Fix, so the tests actually get run.
+	* ChangeLog:
+	Fix Thomas's lack of full-stop.
+
 2006-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/redhat/flumotion:
@@ -19,7 +26,7 @@
 2006-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:
-	  we need Python.h to build fdpass
+	  we need Python.h to build fdpass.
 
 2006-05-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
