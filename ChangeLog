@@ -1,3 +1,8 @@
+2006-05-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/test_flavors.py:
+	Need to iterate reactor.
+
 2006-05-23  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

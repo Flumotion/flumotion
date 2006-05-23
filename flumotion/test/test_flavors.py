@@ -72,6 +72,7 @@ class TestStateSet(unittest.TestCase):
     def runClient(self):
         f = pb.PBClientFactory()
         self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
+        reactor.iterate()
         d = f.getRootObject()
         d.addCallback(self.clientConnected)
         return d
@@ -244,6 +245,7 @@ class TestFullListener(unittest.TestCase):
         self.cport = reactor.connectTCP("127.0.0.1", self.port, f)
         d = f.getRootObject()
         d.addCallback(self.clientConnected)
+        reactor.iterate()
         return d
         #.addCallbacks(self.connected, self.notConnected)
         # self.id = reactor.callLater(10, self.timeOut)
