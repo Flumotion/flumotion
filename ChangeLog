@@ -1,6 +1,12 @@
 2006-05-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_flavors.py:
+	Really fix the test on twisted < 2.  Detect twisted version better.
+	Remove reactor.iterate as it is not really needed.
+
+2006-05-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/test_flavors.py:
 	Hacks to get make test working with twisted < 2.
 
 2006-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
