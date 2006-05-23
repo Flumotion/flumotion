@@ -18,6 +18,13 @@ prog=/usr/sbin/flumotion
 lockdir=/var/lock/subsys
 logfile=/var/log/flumotion/service.log
 
+# to make sure our service log file is always owned by the correct user,
+# we touch it
+touch_logfile() {
+	touch $logfile
+	chown flumotion $logfile
+}
+
 # if arguments are specified, we only start/stop that service part
 start() {
 	if test "x$*" != "x"
@@ -71,6 +78,8 @@ stopone() {
 	type=$1
 	name=$2
 
+        touch_logfile
+
         RETVAL=0
 	lockfile=${lockdir}/flumotion.$type.$name.lock
 	if test -e ${lockfile}
@@ -86,14 +95,17 @@ stopone() {
 }
 
 status() {
+        touch_logfile
 	$prog status
 }
 
 clean() {
+        touch_logfile
 	$prog clean
 }
 
 list() {
+        touch_logfile
 	$prog list
 }
 

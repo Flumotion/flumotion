@@ -1,3 +1,10 @@
+2006-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/redhat/flumotion:
+	* flumotion/service/main.py:
+	  Make service script make sure that service.log is owned by
+	  flumotion.  Fixes #372, and some other details.
+
 2006-05-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_flavors.py:

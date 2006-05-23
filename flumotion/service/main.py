@@ -45,7 +45,7 @@ def main(args):
         options.configdir = configure.configdir
 
     if options.version:
-        print common.version("flumotion-worker")
+        print common.version("flumotion")
         return 0
 
     if options.debug:
@@ -53,8 +53,14 @@ def main(args):
 
     # if log file is specified, redirect stdout and stderr
     if options.logfile:
-        out = open(options.logfile, 'a+')
-        err = open(options.logfile, 'a+', 0)
+        try:
+            out = open(options.logfile, 'a+')
+            err = open(options.logfile, 'a+', 0)
+        except IOError, e:
+            sys.stderr.write("Could not open file '%s' for writing:\n%s\n" % (
+                options.logfile, e.args[1]))
+            sys.exit(1)
+
         os.dup2(out.fileno(), sys.stdout.fileno())
         os.dup2(err.fileno(), sys.stderr.fileno())
 
