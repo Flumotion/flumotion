@@ -294,6 +294,11 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         open file descriptors and fd reservation
         """
         limit = resource.getrlimit(resource.RLIMIT_NOFILE)
+        import sys
+        version = sys.version_info
+        # Bug in python 2.4.3, see http://sourceforge.net/tracker/index.php?func=detail&aid=1494314&group_id=5470&atid=105470
+        if version[:3] == (2,4,3):
+            fd_limit = 1024
         fd_limit = limit[0] - self.__reserve_fds__
         if self.maxclients != -1 and fd_limit >= self.maxclients:
             return self.maxclients
