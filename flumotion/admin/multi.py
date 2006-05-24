@@ -105,8 +105,8 @@ class MultiAdminModel(log.Loggable):
         def disconnected_cb(admin):
             self.info('Disconnected from manager')
             if admin.managerId in self.admins:
-                del self.admins[admin.managerId]
                 self.emit('removePlanet', admin, admin.planet)
+                del self.admins[admin.managerId]
             else:
                 self.warning('Could not find admin model %r' % admin)
 

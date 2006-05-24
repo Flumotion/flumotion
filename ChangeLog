@@ -1,3 +1,9 @@
+2006-05-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/multi.py
+	(MultiAdminModel.addManager.disconnected_cb): Keep the managerId
+	-> admin mapping around a little bit longer.
+
 2006-05-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/configure/configure.py:
