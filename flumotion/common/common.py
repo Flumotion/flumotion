@@ -235,13 +235,16 @@ def ensureDir(dir, description):
             raise errors.SystemError, "could not create %s directory %s" % (
                 description, dir)
 
-def getPidPath(type, name):
+def getPidPath(type, name=None):
     """
     Get the full path to the pid file for the given process type and name.
     """
-    return os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
+    if name:
+        return os.path.join(configure.rundir, '%s.%s.pid' % (type, name))
+    else:
+        return os.path.join(configure.rundir, '%s.pid' % type)
  
-def writePidFile(type, name):
+def writePidFile(type, name=None):
     """
     Write a pid file in the run directory, using the given process type
     and process name for the filename.
@@ -252,14 +255,14 @@ def writePidFile(type, name):
     file.write("%d\n" % pid)
     file.close()
  
-def deletePidFile(type, name):
+def deletePidFile(type, name=None):
     """
     Delete the pid file in the run directory, using the given process type
     and process name for the filename.
     """
     os.unlink(getPidPath(type, name))
  
-def getPid(type, name):
+def getPid(type, name=None):
     """
     Get the pid from the pid file in the run directory, using the given
     process type and process name for the filename.
@@ -268,6 +271,7 @@ def getPid(type, name):
     """
     
     pidPath = getPidPath(type, name)
+    log.log('common', 'pidfile for %s %s is %s' % (type, name, pidPath))
     if not os.path.exists(pidPath):
         return
     
@@ -323,7 +327,7 @@ def checkPidRunning(pid):
             raise
     return False
  
-def waitPidFile(type, name):
+def waitPidFile(type, name=None):
     """
     Wait for the given process type and name to have started and created
     a pid file.
