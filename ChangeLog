@@ -1,6 +1,11 @@
 2006-05-24  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Fix error in previous commit. FYA.
+
+2006-05-24  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
 	  Limit our max-users to 1024 - reserve_fds on python 2.4.3, due to a
 	  bug in that version.
 
