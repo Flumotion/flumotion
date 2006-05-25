@@ -1,5 +1,11 @@
 2006-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/admin.py:
+	  avoid exceptions.KeyError:
+	  'flumotion.component.plugs.adminaction.AdminAction'
+
+2006-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/main.py:
 	* flumotion/service/main.py:
 	* flumotion/worker/main.py:

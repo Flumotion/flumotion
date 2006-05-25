@@ -86,8 +86,9 @@ class AdminAvatar(base.ManagerAvatar):
         method = getattr(self, "perspective_%s" % message)
 
         socket = 'flumotion.component.plugs.adminaction.AdminAction'
-        for plug in self.vishnu.plugs[socket]:
-            plug.action(self, message, args, kw)
+        if self.vishnu.plugs.has_key(socket):
+            for plug in self.vishnu.plugs[socket]:
+                plug.action(self, message, args, kw)
 
         try:
             state = method(*args, **kw)
