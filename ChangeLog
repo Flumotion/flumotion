@@ -1,3 +1,12 @@
+2006-05-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/client.py:
+	  refactor some cleanup code, so that we properly set sensitivity
+	  of start/stop, as well as clearing our internal current_component
+	  state
+	* flumotion/test/test_parts.py:
+	  add a test for sensitivity
+
 2006-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/client.py:

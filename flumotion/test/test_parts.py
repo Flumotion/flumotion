@@ -108,6 +108,11 @@ class TestComponentsView(unittest.TestCase):
     def testNoneSelected(self):
         self.failIf(self.view.get_selected_name())
 
+    def testNoComponents(self):
+        # no components, so should be unable to start or stop any component
+        self.failIf(self.view.get_property('can-stop-any'))
+        self.failIf(self.view.get_property('can-start-any'))
+
     def testUpdate(self):
         components = {}
         c = self._createComponent(
@@ -118,7 +123,12 @@ class TestComponentsView(unittest.TestCase):
         components['two'] = c
         self.view.update(components)
         gtk.main_iteration()
+        # no component is sleeping, so cannot start any
+        self.failIf(self.view.get_property('can-start-any'))
+        self.failUnless(self.view.get_property('can-stop-any'),
+            "Should be able to stop component one")
 
+    # builds on testUpdate
     def testSelected(self):
         def assertSelected(view, state, test):
             name = state.get('name')

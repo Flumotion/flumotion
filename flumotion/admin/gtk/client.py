@@ -60,17 +60,19 @@ class Window(log.Loggable, gobject.GObject):
     def __init__(self, model):
         self.__gobject_init__()
         
-        self.current_component_state = None
-
         self.widgets = {}
         self.debug('creating UI')
         self._trayicon = None
+
+        # current component's UI;
+        # L{flumotion.component.base.admin_gtk.BaseAdminGtk}
+        self.current_component = None
+        self.current_component_state = None # its state
 
         self._create_ui()
 
         self._append_recent_connections()
 
-        self.current_component = None # the component we're showing UI for
         self._disconnected_dialog = None # set to a dialog if we're
                                          # disconnected
 
@@ -252,10 +254,13 @@ class Window(log.Loggable, gobject.GObject):
         @param entryPath:  absolute path to the cached base directory
         @param fileName:   path to the file with the entry point, under
                            entryPath
-        @param methodName: name of the method to instantiate the UI view
+        @param methodName: name of the method to instantiate the
+                           L{flumotion.component.base.admin_gtk.BaseAdminGtk}
+                           UI view
         @param data:       the python code to load
         """
         # methodName has historically been GUIClass
+
         instance = None
 
         name = state.get('name')
@@ -337,24 +342,30 @@ class Window(log.Loggable, gobject.GObject):
         notebook.show_all()
 
         # trigger node rendering
-        # FIXME: might be better to do these one by one, in order,
-        # so the status bar can show what happens
+        d = defer.Deferred()
+
         for node in nodes.values():
             mid = self.statusbar.push('notebook',
                 _("Loading tab %s for %s ...") % (node.title, name))
             node.statusbar = self.statusbar # hack
-            d = node.render()
+            self.debug('adding callback for %s node.render()' % node.title)
+            d.addCallback(lambda _, n: n.render(), node)
             d.addCallback(self._nodeRenderCallback, node.title,
-                instance, nodeWidgets, mid)
+                nodeWidgets, mid)
             d.addErrback(self._nodeRenderErrback, node.title)
 
+        d.addCallback(self._setCurrentComponentCallback, instance)
+
+        d.callback(None)
+        return d
+
     # called when one node gets rendered
-    def _nodeRenderCallback(self, widget, nodeName, gtkAdminInstance,
-        nodeWidgets, mid):
+    def _nodeRenderCallback(self, widget, nodeName, nodeWidgets, mid):
         # used by show_component
         self.debug("Got sub widget %r" % widget)
         self.statusbar.remove('notebook', mid)
 
+        # clear out any old node widgets with the same name
         table = nodeWidgets[nodeName]
         for w in table.get_children():
             table.remove(w)
@@ -370,12 +381,15 @@ class Window(log.Loggable, gobject.GObject):
         table.add(widget)
         widget.show()
 
-        self.current_component = gtkAdminInstance
-
     def _nodeRenderErrback(self, failure, nodeName):
         self.debug('Could not render node %s: %r, %s' % (nodeName,
             failure, failure.getErrorMessage()))
         self.warning('Could not render node %s' % nodeName)
+
+    def _setCurrentComponentCallback(self, _, instance):
+        self.debug('setting current_component to %r' % instance)
+        self.current_component = instance
+
 
     ### IAdminView interface methods: FIXME: create interface somewhere
     ## Confusingly enough, this procedure is called by remote objects to
@@ -538,21 +552,15 @@ class Window(log.Loggable, gobject.GObject):
             if key == 'names':
                 self.statusbar.set('main', 'Worker %s logged out.' % value)
         elif isinstance(state, planet.AdminFlowState):
+            # the basic admin client only looks at the "default" flow
             if state.get('name') != 'default':
                 return
+
             if key == 'components':
-                name = value.get('name')
-                self.debug('removing component %s' % name)
-                del self._components[name]
-                # FIXME: would be nicer to do this incrementally instead
-                self.update_components()
+                self._remove_component(value)
         elif isinstance(state, planet.AdminAtmosphereState):
             if key == 'components':
-                name = value.get('name')
-                self.debug('removing component %s' % name)
-                del self._components[name]
-                # FIXME: would be nicer to do this incrementally instead
-                self.update_components()
+                self._remove_component(value)
         elif isinstance(state, planet.AdminPlanetState):
             self.debug('something got removed from the planet')
             pass
@@ -563,8 +571,26 @@ class Window(log.Loggable, gobject.GObject):
                 current = self.components_view.get_selected_name()
                 if name == current:
                     self._messages_view.clear_message(value.id)
+            self._set_stop_start_component_sensitive()
         else:
             self.warning('stateRemove of key %s and value %r on unknown object %r' % (key, value, state))
+
+    def _remove_component(self, state):
+        name = state.get('name')
+        self.debug('removing component %s' % name)
+        del self._components[name]
+
+        # if this component was selected, clear selection
+        if self.current_component_state == state:
+            self.debug('removing currently selected component state')
+            self.current_component = None
+            self.current_component_state = None
+        # FIXME: would be nicer to do this incrementally instead
+        self.update_components()
+
+        # a component being removed means our selected component could
+        # have gone away
+        self._set_stop_start_component_sensitive()
 
     ### admin model callbacks
     def admin_connected_cb(self, admin):
@@ -678,6 +704,7 @@ class Window(log.Loggable, gobject.GObject):
         can_stop = bool(moodname and moodname!='sleeping' and moodname!='lost')
         d['menuitem_manage_stop_component'].set_sensitive(can_stop)
         d['toolbutton_stop_component'].set_sensitive(can_stop)
+        self.debug('can start %r, can stop %r' % (can_start, can_stop))
 
     # clear the component view in the sidepane.  Called when the current
     # component goes sleeping
