@@ -1,5 +1,12 @@
 2006-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/client.py:
+	  privatize and rename self._sidepane
+	  clear the sidepane when a component goes to sleeping.
+	  Fixes #263.
+
+2006-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/admin.py:
 	  avoid exceptions.KeyError:
 	  'flumotion.component.plugs.adminaction.AdminAction'

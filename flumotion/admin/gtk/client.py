@@ -153,7 +153,8 @@ class Window(log.Loggable, gobject.GObject):
         self._trayicon = trayicon.FluTrayIcon(self)
         self._trayicon.set_tooltip(_('Not connected'))
 
-        self.hpaned = widgets['hpaned']
+        # the widget containing the component view
+        self._sidepane = widgets['hpaned']
  
         window.connect('delete-event', self.close)
 
@@ -330,9 +331,9 @@ class Window(log.Loggable, gobject.GObject):
             notebook.append_page(table, gtk.Label(node.title))
             
         # put "loading" widget in
-        old = self.hpaned.get_child2()
-        self.hpaned.remove(old)
-        self.hpaned.add2(notebook)
+        old = self._sidepane.get_child2()
+        self._sidepane.remove(old)
+        self._sidepane.add2(notebook)
         notebook.show_all()
 
         # trigger node rendering
@@ -347,6 +348,7 @@ class Window(log.Loggable, gobject.GObject):
                 instance, nodeWidgets, mid)
             d.addErrback(self._nodeRenderErrback, node.title)
 
+    # called when one node gets rendered
     def _nodeRenderCallback(self, widget, nodeName, gtkAdminInstance,
         nodeWidgets, mid):
         # used by show_component
@@ -494,6 +496,7 @@ class Window(log.Loggable, gobject.GObject):
             if value == moods.sleeping.value:
                 if state.get('name') == current:
                     self._messages_view.clear()
+                    self._sidepane_clear()
 
     def stateAppend(self, state, key, value):
         if isinstance(state, worker.AdminWorkerHeavenState):
@@ -676,6 +679,15 @@ class Window(log.Loggable, gobject.GObject):
         d['menuitem_manage_stop_component'].set_sensitive(can_stop)
         d['toolbutton_stop_component'].set_sensitive(can_stop)
 
+    # clear the component view in the sidepane.  Called when the current
+    # component goes sleeping
+    def _sidepane_clear(self):
+        old = self._sidepane.get_child2()
+        self._sidepane.remove(old)
+        sub = gtk.Label("")
+        self._sidepane.add2(sub)
+        sub.show()
+
     ### ui callbacks
     def _components_view_has_selection_cb(self, view, state):
         if self.current_component_state:
@@ -695,11 +707,11 @@ class Window(log.Loggable, gobject.GObject):
         messages = state.get('messages')
         self._messages_view.clear()
         # no ui, clear; FIXME: do this nicer
-        old = self.hpaned.get_child2()
-        self.hpaned.remove(old)
+        old = self._sidepane.get_child2()
+        self._sidepane.remove(old)
         #sub = gtk.Label('%s does not have a UI yet' % name)
         sub = gtk.Label("")
-        self.hpaned.add2(sub)
+        self._sidepane.add2(sub)
         sub.show()
 
         if messages:
