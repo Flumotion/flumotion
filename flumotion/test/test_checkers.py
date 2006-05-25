@@ -91,7 +91,7 @@ class TestFlexibleWithoutPassword(unittest.TestCase):
         d = self.checker.requestAvatarId(cred)
         d.addCallback(credPlaintextCorrectCallback)
         if weHaveAnOldTwisted(): #T1.3
-            unittest.deferredResult(credPlaintextCorrectCallback)
+            unittest.deferredResult(d)
         else:
             return d
 
