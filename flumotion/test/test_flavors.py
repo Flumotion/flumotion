@@ -32,10 +32,7 @@ from flumotion.twisted import flavors
 
 #T1.3
 def weHaveAnOldTwisted():
-    if twisted.copyright.version < '2.0.0':
-        return True
-    else:
-        return False
+    return twisted.copyright.version < '2.0.0'
 
 class TestStateCacheable(flavors.StateCacheable):
     pass

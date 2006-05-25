@@ -1,3 +1,10 @@
+2006-05-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/test_flavors.py:
+	Make check for twisted version smaller.
+	* flumotion/test/test_pb.py:
+	Refactor to not give warnings on Twisted 2.2.
+
 2006-05-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:

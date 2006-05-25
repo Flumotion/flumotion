@@ -21,6 +21,7 @@
 
 import common
 from twisted.trial import unittest
+import twisted.copyright #T1.3
 
 import crypt
 
@@ -39,6 +40,10 @@ from flumotion.component.bouncers import htpasswdcrypt
 bouncerconf = {'name': 'testbouncer',
                'plugs': {},
                'properties': {'data': "user:qi1Lftt0GZC0o"}}
+
+#T1.3
+def weHaveAnOldTwisted():
+    return twisted.copyright.version < '2.0.0'
 
 ### lots of fake objects to have fun with
 
@@ -116,10 +121,17 @@ class TestTwisted_PortalAuthChallenger(unittest.TestCase):
     def testWrongPassword(self):
         # client is asked to respond, so generate the response
         response = tpb.respond(self.challenge, 'wrong')
-
         d = self.challenger.remote_respond(response, None)
-        failure = unittest.deferredError(d)
-        failure.trap(error.UnauthorizedLogin)
+        
+        def wrongPasswordErrback(wrongpasserror):
+            self.assert_(isinstance(wrongpasserror.type(), error.UnauthorizedLogin))
+
+        if weHaveAnOldTwisted(): #T1.3
+            failure = unittest.deferredError(d)
+            failure.trap(error.UnauthorizedLogin)
+        else:
+            d.addErrback(wrongPasswordErrback)
+            return d
 
 ### SHINY NEW FPB
 class Test_BouncerWrapper(unittest.TestCase):
@@ -136,15 +148,31 @@ class Test_BouncerWrapper(unittest.TestCase):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         d = self.wrapper.remote_login(keycard, mind,
             'twisted.spread.pb.IPerspective')
-        result = unittest.deferredResult(d)
-        self.assert_(isinstance(result, tpb.AsReferenceable))
+
+        def uacppOkCallback(result):
+            self.assert_(isinstance(result, tpb.AsReferenceable))
+            return result
+        
+        d.addCallback(uacppOkCallback)
+        if weHaveAnOldTwisted(): #1.3
+            result = unittest.deferredResult(d)
+        else:
+            return d
     
     def testUACPPWrongPassword(self):
         keycard = keycards.KeycardUACPP('user', 'tes', '127.0.0.1')
         d = self.wrapper.remote_login(keycard, "avatarId", 
             'twisted.spread.pb.IPerspective')
-        failure = unittest.deferredError(d)
-        failure.trap(error.UnauthorizedLogin)
+        
+        def uacppWrongPasswordErrback(wrongpasserror):
+            self.assert_(isinstance(wrongpasserror.type(), error.UnauthorizedLogin))
+        
+        if weHaveAnOldTwisted(): #T1.3
+            failure = unittest.deferredError(d)
+            failure.trap(error.UnauthorizedLogin)
+        else:
+            d.addErrback(uacppWrongPasswordErrback)
+            return d
 
     def testUACPCCOk(self):
         # create
@@ -153,17 +181,25 @@ class Test_BouncerWrapper(unittest.TestCase):
         # send
         d = self.wrapper.remote_login(keycard, None, 
             'twisted.spread.pb.IPerspective')
-        keycard = unittest.deferredResult(d)
-        self.assertEquals(keycard.state, keycards.REQUESTING)
-
-        # respond to challenge
-        keycard.setPassword('test')
-        d = self.wrapper.remote_login(keycard, None, 
-            'twisted.spread.pb.IPerspective')
-        # check if we have a referenceable
-        result = unittest.deferredResult(d)
-        self.assert_(isinstance(result, tpb.AsReferenceable))
-    
+        
+        def uacpccOkCallback(keycard):
+            self.assertEquals(keycard.state, keycards.REQUESTING)
+            # respond to challenge
+            keycard.setPassword('test')
+            d = self.wrapper.remote_login(keycard, None, 
+                'twisted.spread.pb.IPerspective')
+            def uacpccOkCallback2(result):
+                self.assert_(isinstance(result, tpb.AsReferenceable))
+                return result
+            d.addCallback(uacpccOkCallback2)
+            return d
+        
+        d.addCallback(uacpccOkCallback)
+        if weHaveAnOldTwisted(): #T1.3
+            unittest.deferredResult(d)
+        else:
+            return d
+            
     def testUACPCCWrongUser(self):
         # create
         keycard = keycards.KeycardUACPCC('wronguser', '127.0.0.1')
@@ -171,15 +207,26 @@ class Test_BouncerWrapper(unittest.TestCase):
         # send
         d = self.wrapper.remote_login(keycard, "avatarId", 
             'twisted.spread.pb.IPerspective')
-        keycard = unittest.deferredResult(d)
-        self.assertEquals(keycard.state, keycards.REQUESTING)
 
-        # respond to challenge
-        keycard.setPassword('test')
-        d = self.wrapper.remote_login(keycard, "avatarId",
-            'twisted.spread.pb.IPerspective')
-        failure = unittest.deferredError(d)
-        failure.trap(error.UnauthorizedLogin)
+        def uacpccWrongUserCallback(keycard):
+            self.assertEquals(keycard.state, keycards.REQUESTING)
+            # respond to challenge
+            keycard.setPassword('test')
+            d = self.wrapper.remote_login(keycard, "avatarId",
+                'twisted.spread.pb.IPerspective')
+            def uacpccWrongUserErrback(failure):
+                self.assert_(isinstance(failure.type(),
+                    error.UnauthorizedLogin))
+                return True
+            d.addErrback(uacpccWrongUserErrback)
+            return d
+        
+        d.addCallback(uacpccWrongUserCallback)
+        if weHaveAnOldTwisted(): #T1.3
+            result = unittest.deferredResult(d)
+            self.assertEquals(result, True)
+        else:
+            return d
 
     def testUACPCCWrongPassword(self):
         # create
@@ -188,15 +235,26 @@ class Test_BouncerWrapper(unittest.TestCase):
         # send
         d = self.wrapper.remote_login(keycard, "avatarId",
             'twisted.spread.pb.IPerspective')
-        keycard = unittest.deferredResult(d)
-        self.assertEquals(keycard.state, keycards.REQUESTING)
 
-        # respond to challenge
-        keycard.setPassword('wrong')
-        d = self.wrapper.remote_login(keycard, "avatarId",
-            'twisted.spread.pb.IPerspective')
-        failure = unittest.deferredError(d)
-        failure.trap(error.UnauthorizedLogin)
+        def uacpccWrongPasswordCallback(keycard):
+            self.assertEquals(keycard.state, keycards.REQUESTING)
+            # respond to challenge
+            keycard.setPassword('wrong')
+            d = self.wrapper.remote_login(keycard, "avatarId",
+                'twisted.spread.pb.IPerspective')
+            def uacpccWrongPasswordErrback(failure):
+                self.assert_(isinstance(failure.type(),
+                    error.UnauthorizedLogin))
+                return True
+            d.addErrback(uacpccWrongPasswordErrback)
+            return d
+
+        d.addCallback(uacpccWrongPasswordCallback)
+        if weHaveAnOldTwisted(): #T1.3
+            result = unittest.deferredResult(d)
+            self.assertEquals(result, True)
+        else:
+            return d
 
     def testUACPCCTamperWithChallenge(self):
         # create challenger
@@ -207,16 +265,26 @@ class Test_BouncerWrapper(unittest.TestCase):
         # submit for auth
         d = self.wrapper.remote_login(keycard, "avatarId",
             'twisted.spread.pb.IPerspective')
-        keycard = unittest.deferredResult(d)
-        self.assertEquals(keycard.state, keycards.REQUESTING)
 
-        # mess with challenge, respond to challenge and resubmit
-        keycard.challenge = "I am a h4x0r"
-        keycard.setPassword('test')
-        d = self.wrapper.remote_login(keycard, "avatarId",
-            'twisted.spread.pb.IPerspective')
-        failure = unittest.deferredError(d)
-        failure.trap(error.UnauthorizedLogin)
+        def uacpccTamperCallback(keycard):
+            self.assertEquals(keycard.state, keycards.REQUESTING)
+
+            # mess with challenge, respond to challenge and resubmit
+            keycard.challenge = "I am a h4x0r"
+            keycard.setPassword('test')
+            d = self.wrapper.remote_login(keycard, "avatarId",
+                'twisted.spread.pb.IPerspective')
+            def uacpccTamperErrback(failure):
+                self.assert_(isinstance(failure.type(),
+                    error.UnauthorizedLogin))
+            d.addErrback(uacpccTamperErrback)
+            return d
+
+        d.addCallback(uacpccTamperCallback)
+        if weHaveAnOldTwisted(): #T1.3
+            unittest.deferredResult(d)
+        else:
+            return d
 
 class Test_FPortalRoot(unittest.TestCase):
     def setUp(self):
@@ -255,8 +323,8 @@ class Test_FPBClientFactory(unittest.TestCase):
             reference.notifyOnDisconnect(lambda r: d.callback(None))
         factory.disconnect()
         if reference:
-            unittest.deferredResult(d)
- 
+            return d
+
     def testUACPPOk(self):
         factory = pb.FPBClientFactory()
 
@@ -265,12 +333,17 @@ class Test_FPBClientFactory(unittest.TestCase):
 
         # send 
         d = factory.login(keycard, 'MIND')
-        reactor.connectTCP("127.0.0.1", self.portno, factory)
-
-        # get result
-        result = unittest.deferredResult(d)
-        self.assert_(isinstance(result, tpb.RemoteReference))
-        self.clientDisconnect(factory, result)
+        c = reactor.connectTCP("127.0.0.1", self.portno, factory)
+        
+        def uacppOkCallback(result):
+            self.assert_(isinstance(result, tpb.RemoteReference))
+            return self.clientDisconnect(factory, result)
+        
+        d.addCallback(uacppOkCallback)
+        if weHaveAnOldTwisted():
+            result = unittest.deferredResult(d)
+        else:
+            return d
 
     def testUACPPWrongPassword(self):
         factory = pb.FPBClientFactory()
@@ -279,15 +352,19 @@ class Test_FPBClientFactory(unittest.TestCase):
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
 
         log.debug("trial", "wait for result")
-        failure = unittest.deferredError(d)
-        log.debug("trial", "got failure %r" % failure)
-        tlog.flushErrors(error.UnauthorizedLogin)
-
-        c.disconnect()
-        #failure.trap(error.UnauthorizedLogin)
-        #self.clientDisconnect(factory, None)
-        #from twisted.cred.error import UnauthorizedLogin
-
+        def uacppWrongPasswordErrback(failure):
+            # This is a CopiedFailure
+            self.assert_(failure.check(
+                "twisted.cred.error.UnauthorizedLogin"))
+            log.debug("trial", "got failure %r" % failure)
+            c.disconnect()
+            return True
+        if weHaveAnOldTwisted():
+            unittest.deferredError(d)
+        else:
+            d.addErrback(uacppWrongPasswordErrback)
+            return d
+        
     def testUACPCCOk(self):
         factory = pb.FPBClientFactory()
 
@@ -297,19 +374,26 @@ class Test_FPBClientFactory(unittest.TestCase):
         # send
         d = factory.login(keycard, 'MIND')
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-
-        # get result
-        keycard = unittest.deferredResult(d)
-        self.assertEquals(keycard.state, keycards.REQUESTING)
-
-        # respond to challenge
-        keycard.setPassword('test')
-        d = factory.login(keycard, 'MIND')
-
-        # check if we have a remote reference
-        result = unittest.deferredResult(d)
-        self.assert_(isinstance(result, tpb.RemoteReference))
-        self.clientDisconnect(factory, result)
+        
+        def uacpccOkCallback(keycard):
+            # get result
+            self.assertEquals(keycard.state, keycards.REQUESTING)
+            # respond to challenge
+            keycard.setPassword('test')
+            d = factory.login(keycard, 'MIND')
+            # check if we have a remote reference
+            def uacpccOkCallback2(result):
+                print "WOW"
+                self.assert_(isinstance(result, tpb.RemoteReference))
+                return self.clientDisconnect(factory, result)
+            d.addCallback(uacpccOkCallback2)
+            return d
+        
+        d.addCallback(uacpccOkCallback)
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            return d
 
     def testUACPCCWrongUser(self):
         factory = pb.FPBClientFactory()
@@ -320,19 +404,30 @@ class Test_FPBClientFactory(unittest.TestCase):
         # send
         d = factory.login(keycard, 'MIND')
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        keycard = unittest.deferredResult(d)
-        self.assertEquals(keycard.state, keycards.REQUESTING)
+        
+        def uacpccWrongUserCallback(keycard):
+            self.assertEquals(keycard.state, keycards.REQUESTING)
 
-        # respond to challenge
-        keycard.setPassword('test')
-        d = factory.login(keycard, 'MIND')
-
-        # find copied failure
-        p = unittest.deferredError(d)
-        self.failUnless(p.check("twisted.cred.error.UnauthorizedLogin"))
-        self.clientDisconnect(factory, None)
-        from twisted.cred.error import UnauthorizedLogin
-        tlog.flushErrors(UnauthorizedLogin)
+            # respond to challenge
+            keycard.setPassword('test')
+            d = factory.login(keycard, 'MIND')
+            
+            def uacpccWrongUserErrback(failure):
+                # find copied failure
+                self.failUnless(failure.check("twisted.cred.error.UnauthorizedLogin"))
+                from twisted.cred.error import UnauthorizedLogin
+                tlog.flushErrors(UnauthorizedLogin)
+                return self.clientDisconnect(factory, None)
+                #return True
+        
+            d.addErrback(uacpccWrongUserErrback)
+            return d
+        
+        d.addCallback(uacpccWrongUserCallback)
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            return d
 
     def testUACPCCWrongPassword(self):
         factory = pb.FPBClientFactory()
@@ -343,19 +438,30 @@ class Test_FPBClientFactory(unittest.TestCase):
         # send
         d = factory.login(keycard, 'MIND')
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
-        keycard = unittest.deferredResult(d)
-        self.assertEquals(keycard.state, keycards.REQUESTING)
+        
+        def uacpccWrongPasswordCallback(keycard):
+            self.assertEquals(keycard.state, keycards.REQUESTING)
 
-        # respond to challenge
-        keycard.setPassword('wrongpass')
-        d = factory.login(keycard, 'MIND')
+            # respond to challenge
+            keycard.setPassword('wrongpass')
+            d = factory.login(keycard, 'MIND')
 
-        # find copied failure
-        p = unittest.deferredError(d)
-        self.failUnless(p.check("twisted.cred.error.UnauthorizedLogin"))
-        self.clientDisconnect(factory, None)
-        from twisted.cred.error import UnauthorizedLogin
-        tlog.flushErrors(UnauthorizedLogin)
+            def uacpccWrongPasswordErrback(failure):
+                # find copied failure
+                self.failUnless(failure.check(
+                    "twisted.cred.error.UnauthorizedLogin"))
+                from twisted.cred.error import UnauthorizedLogin
+                tlog.flushErrors(UnauthorizedLogin)
+                return self.clientDisconnect(factory, None)
+            
+            d.addErrback(uacpccWrongPasswordErrback)
+            return d
+        
+        d.addCallback(uacpccWrongPasswordCallback)
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            return d
 
     def testUACPCCTamperWithChallenge(self):
         factory = pb.FPBClientFactory()
@@ -368,21 +474,30 @@ class Test_FPBClientFactory(unittest.TestCase):
         # send
         d = factory.login(keycard, 'MIND')
         c = reactor.connectTCP("127.0.0.1", self.portno, factory)
+        
+        def uacpccTamperCallback(keycard):
+            self.assertEquals(keycard.state, keycards.REQUESTING)
 
-        keycard = unittest.deferredResult(d)
-        self.assertEquals(keycard.state, keycards.REQUESTING)
+            # mess with challenge, respond to challenge and resubmit
+            keycard.challenge = "I am a h4x0r"
+            keycard.setPassword('test')
+            d = factory.login(keycard, 'MIND')
+            
+            def uacpccTamperErrback(failure):
+                # find copied failure
+                self.failUnless(failure.check(
+                    "twisted.cred.error.UnauthorizedLogin"))
+                from twisted.cred.error import UnauthorizedLogin
+                tlog.flushErrors(UnauthorizedLogin)
+                return self.clientDisconnect(factory, None)
 
-        # mess with challenge, respond to challenge and resubmit
-        keycard.challenge = "I am a h4x0r"
-        keycard.setPassword('test')
-        d = factory.login(keycard, 'MIND')
-
-        # find copied failure
-        p = unittest.deferredError(d)
-        self.failUnless(p.check("twisted.cred.error.UnauthorizedLogin"))
-        self.clientDisconnect(factory, None)
-        from twisted.cred.error import UnauthorizedLogin
-        tlog.flushErrors(UnauthorizedLogin)
+            d.addErrback(uacpccTamperErrback)
+            return d
+        d.addCallback(uacpccTamperCallback)
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            return d
 
 if __name__ == '__main__':
      unittest.main()
