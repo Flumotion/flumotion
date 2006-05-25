@@ -98,7 +98,7 @@ def _initialLoadConfig(vishnu, paths):
             _error(
                 "unknown component in configuration file\n'%s':" % path,
                 reason.args[0])
-        except Exception, e:
+         except Exception, e:
             # a re-raise here would be caught by twisted and only shows at
             # debug level 4 because that's where we hooked up twisted logging
             # so print a traceback before stopping the program
@@ -181,9 +181,10 @@ def main(args):
     planetFile = args[1]
     try:
         cfg = config.FlumotionConfigXML(planetFile)
-    except IOError:
-        sys.stderr.write("ERROR: Could not read configuration from '%s'.\n" %
+    except IOError, e:
+        sys.stderr.write("ERROR: Could not read configuration from '%s':\n" %
             planetFile)
+        sys.stderr.write("ERROR: %s\n" % e.strerror)
         return -1
     except errors.ConfigError, e:
         sys.stderr.write("ERROR: Could not read configuration from '%s':\n" %

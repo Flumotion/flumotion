@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-21 11:38-0300\n"
+"POT-Creation-Date: 2006-05-24 19:44+0200\n"
 "PO-Revision-Date: 2006-04-21 11:36-0300\n"
 "Last-Translator: Pablo Lorenzzoni <spectra@debian.org>\n"
 "Language-Team: pt_BR <spectra@debian.org>\n"
@@ -27,93 +27,93 @@ msgstr "Desconectado"
 msgid "Connecting to %s:%s"
 msgstr "Conectando em %s:%s"
 
-#: flumotion/admin/gtk/client.py:259 flumotion/admin/gtk/client.py:323
+#: flumotion/admin/gtk/client.py:261 flumotion/admin/gtk/client.py:325
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Carregando UI para %s ..."
 
-#: flumotion/admin/gtk/client.py:341
+#: flumotion/admin/gtk/client.py:343
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Carregando etiqueta %s para %s ..."
 
-#: flumotion/admin/gtk/client.py:360
+#: flumotion/admin/gtk/client.py:362
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s ainda não tem UI"
 
-#: flumotion/admin/gtk/client.py:572
+#: flumotion/admin/gtk/client.py:574
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administração do Flumotion"
 
-#: flumotion/admin/gtk/client.py:588
+#: flumotion/admin/gtk/client.py:590
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Conexão com o gerenciador perdida, reconectando ..."
 
-#: flumotion/admin/gtk/client.py:608
+#: flumotion/admin/gtk/client.py:610
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Conexão com o gerenciador em %s foi recusada."
 
-#: flumotion/admin/gtk/client.py:610
+#: flumotion/admin/gtk/client.py:612
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Conexão com %s foi recusada"
 
-#: flumotion/admin/gtk/client.py:623
+#: flumotion/admin/gtk/client.py:625
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Conexão com o gerenciador em %s falhou (%s)."
 
-#: flumotion/admin/gtk/client.py:711
+#: flumotion/admin/gtk/client.py:713
 #, python-format
 msgid "Component %s is sad"
 msgstr "Componente %s está triste"
 
-#: flumotion/admin/gtk/client.py:718
+#: flumotion/admin/gtk/client.py:720
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Mostrando UI para %s"
 
-#: flumotion/admin/gtk/client.py:738
+#: flumotion/admin/gtk/client.py:740
 #, python-format
 msgid "No UI for component %s"
 msgstr "Sem componente UI para %s"
 
-#: flumotion/admin/gtk/client.py:744
+#: flumotion/admin/gtk/client.py:746
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Componente %s ainda está dormindo"
 
-#: flumotion/admin/gtk/client.py:746
+#: flumotion/admin/gtk/client.py:748
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Solicitando UI para %s ..."
 
-#: flumotion/admin/gtk/client.py:799
+#: flumotion/admin/gtk/client.py:801
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "O wizard não pode ser executado porque não há workers conectados."
 
-#: flumotion/admin/gtk/client.py:840
+#: flumotion/admin/gtk/client.py:842
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Recarregando código do componente %s"
 
-#: flumotion/admin/gtk/client.py:871
+#: flumotion/admin/gtk/client.py:873
 msgid "No component selected."
 msgstr "Nenhum componente selecionado."
 
-#: flumotion/admin/gtk/client.py:888
+#: flumotion/admin/gtk/client.py:890
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "Erro ao %s componente %s"
 
-#: flumotion/admin/gtk/client.py:915
+#: flumotion/admin/gtk/client.py:917
 msgid "Import Configuration..."
 msgstr "Importar Configuração..."
 
-#: flumotion/admin/gtk/client.py:928
+#: flumotion/admin/gtk/client.py:930
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -121,11 +121,11 @@ msgstr ""
 "Arquivo já existente.\n"
 "Sobrescrever?"
 
-#: flumotion/admin/gtk/client.py:950
+#: flumotion/admin/gtk/client.py:952
 msgid "Export Configuration..."
 msgstr "Exportar Configuração..."
 
-#: flumotion/admin/gtk/client.py:994
+#: flumotion/admin/gtk/client.py:996
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -134,24 +134,24 @@ msgstr ""
 "Não foi possível recarregar o componente:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1004
+#: flumotion/admin/gtk/client.py:1006
 msgid "Reloading ..."
 msgstr "Recarregando ..."
 
-#: flumotion/admin/gtk/client.py:1005
+#: flumotion/admin/gtk/client.py:1007
 msgid "Reloading client code"
 msgstr "Recarregando código do cliente"
 
-#: flumotion/admin/gtk/client.py:1007
+#: flumotion/admin/gtk/client.py:1009
 #, python-format
 msgid "Reloading %s code"
 msgstr "Recarregando código de %s"
 
-#: flumotion/admin/gtk/client.py:1020
+#: flumotion/admin/gtk/client.py:1038
 msgid "About Flumotion"
 msgstr "Sobre o Flumotion"
 
-#: flumotion/admin/gtk/client.py:1039
+#: flumotion/admin/gtk/client.py:1057
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -161,7 +161,7 @@ msgstr ""
 "\n"
 "(C)·2004-2005·Fluendo·S.L."
 
-#: flumotion/admin/gtk/client.py:1044
+#: flumotion/admin/gtk/client.py:1062
 msgid "Authors"
 msgstr "Autores"
 
@@ -383,7 +383,7 @@ msgid "GStreamer error."
 msgstr "Erro no GStreamer."
 
 #: flumotion/component/feedcomponent08.py:252
-#: flumotion/manager/component.py:574
+#: flumotion/manager/component.py:572
 msgid "Could not start component."
 msgstr "Não foi possível iniciar o componente."
 
@@ -391,13 +391,18 @@ msgstr "Não foi possível iniciar o componente."
 msgid "Component lost feed, reconnecting..."
 msgstr "O componente perdeu alimentação, reconectando..."
 
-#: flumotion/component/consumers/httpstreamer/http.py:468
+#: flumotion/component/consumers/httpstreamer/http.py:515
+#, python-format
+msgid "Porter '%s' not found, cannot slave this streamer to it."
+msgstr ""
+
+#: flumotion/component/consumers/httpstreamer/http.py:602
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Erro de rede: porta TCP %d não está disponível."
 
 #: flumotion/component/consumers/httpstreamer/http.glade:7
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:212
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:211
 msgid "Statistics"
 msgstr "Estatísticas"
 
@@ -456,7 +461,7 @@ msgstr "<b>Comsumo de Cliente</b>"
 msgid "Web URL:"
 msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:214
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:213
 msgid "Log"
 msgstr ""
 
@@ -488,31 +493,9 @@ msgstr "Padrão:"
 msgid "Pattern"
 msgstr "Padrão"
 
-#: flumotion/manager/manager.py:564
+#: flumotion/manager/manager.py:566
 msgid "The component could not be started."
 msgstr "O componente não pode ser iniciado."
-
-#: flumotion/worker/worker.py:349
-#, fuzzy
-msgid "The component was killed.\n"
-msgstr "O componente crashou.\n"
-
-#: flumotion/worker/worker.py:351
-msgid "The component crashed.\n"
-msgstr "O componente crashou.\n"
-
-#: flumotion/worker/worker.py:371
-msgid ""
-"However, no core dump was generated. You may need to configure the "
-"environment if you want to further debug this problem."
-msgstr ""
-"Contudo, nenhum core-dump foi gerado. Você pode ter de configurar o ambiente "
-"se você quiser maiores informações de debug deste problema."
-
-#: flumotion/worker/worker.py:380
-#, python-format
-msgid "The core dump is '%s' on worker '%s'."
-msgstr "O core-dump é '%s' no worker '%s'."
 
 #: flumotion/worker/checks/check.py:45
 #, python-format
@@ -558,17 +541,17 @@ msgid "Synchronization between audio and video may not be correct.\n"
 msgstr "Sincronização entre audio e vídeo pode não estar correta.\n"
 
 #: flumotion/worker/checks/video08.py:161
-#: flumotion/worker/checks/video010.py:163
+#: flumotion/worker/checks/video010.py:165
 msgid "Device node /dev/raw1394 does not exist."
 msgstr "Node de dispositivo /dev/raw1394 não existe."
 
 #: flumotion/worker/checks/video08.py:180
-#: flumotion/worker/checks/video010.py:189
+#: flumotion/worker/checks/video010.py:191
 msgid "No Firewire device found."
 msgstr "Nenhum dispositivo Firewire encontrado."
 
 #: flumotion/worker/checks/video08.py:183
-#: flumotion/worker/checks/video010.py:192
+#: flumotion/worker/checks/video010.py:194
 msgid ""
 "Could not open Firewire device for reading. Check permissions on the device."
 msgstr ""
@@ -576,7 +559,7 @@ msgstr ""
 "permissões no dispositivo."
 
 #: flumotion/worker/checks/video08.py:190
-#: flumotion/worker/checks/video010.py:199
+#: flumotion/worker/checks/video010.py:201
 msgid "Could not probe Firewire device."
 msgstr "Não foi possível verificar dispositivo Firewire."
 
@@ -588,7 +571,7 @@ msgstr ""
 "O elemento ffmpegcolorspace é muito antigo. Por favor, atualize o gst-"
 "plugins paraversão 0.8.5."
 
-#: flumotion/worker/checks/video010.py:185
+#: flumotion/worker/checks/video010.py:187
 msgid ""
 "Could not find or open the Firewire device. Check the device node and its "
 "permissions."
@@ -1151,3 +1134,20 @@ msgstr ""
 "\n"
 "Este wizard vai guiá-lo através dos passos requeridos para ajudá-lo a "
 "configurar seu servidor de stream de mídia."
+
+#, fuzzy
+#~ msgid "The component was killed.\n"
+#~ msgstr "O componente crashou.\n"
+
+#~ msgid "The component crashed.\n"
+#~ msgstr "O componente crashou.\n"
+
+#~ msgid ""
+#~ "However, no core dump was generated. You may need to configure the "
+#~ "environment if you want to further debug this problem."
+#~ msgstr ""
+#~ "Contudo, nenhum core-dump foi gerado. Você pode ter de configurar o "
+#~ "ambiente se você quiser maiores informações de debug deste problema."
+
+#~ msgid "The core dump is '%s' on worker '%s'."
+#~ msgstr "O core-dump é '%s' no worker '%s'."

@@ -108,6 +108,10 @@ def main(args):
             raise errors.SystemError(
                 "Could not load configuration from %s: %s" % (
                 workerFile, value))
+        except IOError, e:
+            raise errors.SystemError(
+                "Could not load configuration from %s: %s" % (
+                workerFile, e.strerror))
 
         # now copy over stuff from config that is not set yet
         if not options.name and cfg.name:

@@ -1,3 +1,10 @@
+2006-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/main.py:
+	* flumotion/service/main.py:
+	* flumotion/worker/main.py:
+	  use IOError's strerror argument more
+
 2006-05-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_checkers.py:

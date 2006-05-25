@@ -58,7 +58,7 @@ def main(args):
             err = open(options.logfile, 'a+', 0)
         except IOError, e:
             sys.stderr.write("Could not open file '%s' for writing:\n%s\n" % (
-                options.logfile, e.args[1]))
+                options.logfile, e.strerror))
             sys.exit(1)
 
         os.dup2(out.fileno(), sys.stdout.fileno())

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-24 13:28+0200\n"
+"POT-Creation-Date: 2006-05-24 19:44+0200\n"
 "PO-Revision-Date: 2006-03-03 18:02+0000\n"
 "Last-Translator: Edward Hervey <edward@fluendo.com>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
@@ -384,7 +384,7 @@ msgid "GStreamer error."
 msgstr "Erreur interne à GStreamer."
 
 #: flumotion/component/feedcomponent08.py:252
-#: flumotion/manager/component.py:574
+#: flumotion/manager/component.py:572
 msgid "Could not start component."
 msgstr "Impossible de relancer le composant:"
 
@@ -392,7 +392,12 @@ msgstr "Impossible de relancer le composant:"
 msgid "Component lost feed, reconnecting..."
 msgstr "Connection au contremaître perdue, reconnection en cours..."
 
-#: flumotion/component/consumers/httpstreamer/http.py:465
+#: flumotion/component/consumers/httpstreamer/http.py:515
+#, python-format
+msgid "Porter '%s' not found, cannot slave this streamer to it."
+msgstr ""
+
+#: flumotion/component/consumers/httpstreamer/http.py:602
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Erreur de réseau: le port TCP %d n'est pas disponible."
@@ -489,30 +494,9 @@ msgstr "Motif:"
 msgid "Pattern"
 msgstr "Motif"
 
-#: flumotion/manager/manager.py:568
+#: flumotion/manager/manager.py:566
 msgid "The component could not be started."
 msgstr "Le composant n'a pas pu être démarré."
-
-#: flumotion/worker/worker.py:349
-#, fuzzy
-msgid "The component was killed.\n"
-msgstr "Aucun composant sélectionné."
-
-#: flumotion/worker/worker.py:351
-#, fuzzy
-msgid "The component crashed.\n"
-msgstr "Aucun composant sélectionné."
-
-#: flumotion/worker/worker.py:371
-msgid ""
-"However, no core dump was generated. You may need to configure the "
-"environment if you want to further debug this problem."
-msgstr ""
-
-#: flumotion/worker/worker.py:380
-#, python-format
-msgid "The core dump is '%s' on worker '%s'."
-msgstr ""
 
 #: flumotion/worker/checks/check.py:45
 #, python-format
@@ -1160,6 +1144,14 @@ msgstr ""
 "\n"
 "Cet assistant va vous guider à travers les étapes nécessaires pour la "
 "configuration de votre serveur de diffusion multimédia."
+
+#, fuzzy
+#~ msgid "The component was killed.\n"
+#~ msgstr "Aucun composant sélectionné."
+
+#, fuzzy
+#~ msgid "The component crashed.\n"
+#~ msgstr "Aucun composant sélectionné."
 
 #, fuzzy
 #~ msgid "Could not start the component."

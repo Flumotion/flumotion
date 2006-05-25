@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-24 13:28+0200\n"
+"POT-Creation-Date: 2006-05-24 19:44+0200\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: nl\n"
@@ -366,7 +366,7 @@ msgid "GStreamer error."
 msgstr ""
 
 #: flumotion/component/feedcomponent08.py:252
-#: flumotion/manager/component.py:574
+#: flumotion/manager/component.py:572
 #, fuzzy
 msgid "Could not start component."
 msgstr ""
@@ -378,7 +378,12 @@ msgstr ""
 msgid "Component lost feed, reconnecting..."
 msgstr "Conexión perdida al encargado, volviendo a conectar ..."
 
-#: flumotion/component/consumers/httpstreamer/http.py:465
+#: flumotion/component/consumers/httpstreamer/http.py:515
+#, python-format
+msgid "Porter '%s' not found, cannot slave this streamer to it."
+msgstr ""
+
+#: flumotion/component/consumers/httpstreamer/http.py:602
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr ""
@@ -473,29 +478,8 @@ msgstr "Patrón:"
 msgid "Pattern"
 msgstr "Patrón"
 
-#: flumotion/manager/manager.py:568
+#: flumotion/manager/manager.py:566
 msgid "The component could not be started."
-msgstr ""
-
-#: flumotion/worker/worker.py:349
-#, fuzzy
-msgid "The component was killed.\n"
-msgstr "Ningún componente seleccionado."
-
-#: flumotion/worker/worker.py:351
-#, fuzzy
-msgid "The component crashed.\n"
-msgstr "Ningún componente seleccionado."
-
-#: flumotion/worker/worker.py:371
-msgid ""
-"However, no core dump was generated. You may need to configure the "
-"environment if you want to further debug this problem."
-msgstr ""
-
-#: flumotion/worker/worker.py:380
-#, python-format
-msgid "The core dump is '%s' on worker '%s'."
 msgstr ""
 
 #: flumotion/worker/checks/check.py:45
@@ -1140,6 +1124,14 @@ msgstr ""
 "\n"
 "Deze wizard zal u door de nodige stappen leiden om u te helpen bij de "
 "configuratie van uw streaming media server."
+
+#, fuzzy
+#~ msgid "The component was killed.\n"
+#~ msgstr "Ningún componente seleccionado."
+
+#, fuzzy
+#~ msgid "The component crashed.\n"
+#~ msgstr "Ningún componente seleccionado."
 
 #, fuzzy
 #~ msgid "Could not start the component."
