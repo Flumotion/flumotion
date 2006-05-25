@@ -32,7 +32,7 @@ import gobject
 from twisted.spread import pb
 from twisted.internet import error, defer, reactor
 from twisted.cred import error as crederror
-from twisted.python import rebuild, reflect
+from twisted.python import rebuild, reflect, failure
 
 from flumotion.common import common, errors, interfaces, log, pygobject
 from flumotion.common import keycards, worker, planet, medium, package
@@ -141,7 +141,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             self.debug("emitted connection-refused")
 
         except Exception, e:
-            self.medium._defaultErrback(e)
+            self.medium._defaultErrback(failure.Failure(e))
 
     gotDeferredLogin = defer_generator_method(gotDeferredLogin)
         
@@ -472,14 +472,19 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
                                         element, property)
 
     ## reload methods for everything
-    def reload(self):
-        # XXX: reload admin.py too
+    def reloadAdmin(self):
         name = reflect.filenameToModuleName(__file__)
 
-        self.info("rebuilding '%s'" % name)
+        self.info('Reloading admin code')
+        self.debug("rebuilding '%s'" % name)
         rebuild.rebuild(sys.modules[name])
+        self.debug("reloading '%s'" % name)
+        reload.reload()
+        self.info('Reloaded admin code')
 
-        d = defer.execute(reload.reload)
+    def reload(self):
+        # XXX: reload admin.py too
+        d = defer.execute(self.reloadAdmin)
 
         d = d.addCallback(lambda result, self: self.reloadManager(), self)
         d.addErrback(self._defaultErrback)
@@ -490,6 +495,8 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             d.addErrback(self._defaultErrback)
         return d
 
+    # used by other admin clients
+    # FIXME: isn't it great how hard it is to guess what duckport is ?
     def reload_async(self, duckport):
         name = reflect.filenameToModuleName(__file__)
 

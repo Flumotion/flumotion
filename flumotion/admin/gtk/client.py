@@ -1022,6 +1022,9 @@ class Window(log.Loggable, gobject.GObject):
     def debug_reload_manager_cb(self, button):
         self.admin.reloadManager()
 
+    def debug_reload_admin_cb(self, button):
+        self.admin.reloadAdmin()
+
     def debug_reload_all_cb(self, button):
         # FIXME: move all of the reloads over to this dialog
         def _stop(dialog):

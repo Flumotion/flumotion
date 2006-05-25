@@ -1,5 +1,13 @@
 2006-05-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/admin.py:
+	  add reloadAdmin() method to only reload local admin code
+	* data/glade/admin.glade:
+	* flumotion/admin/gtk/client.py:
+	  allow calling the method from the UI
+
+2006-05-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	  refactor some cleanup code, so that we properly set sensitivity
 	  of start/stop, as well as clearing our internal current_component
