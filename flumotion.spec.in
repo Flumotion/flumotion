@@ -118,6 +118,7 @@ then
 <planet>
  
   <manager>
+    <!-- <debug>3</debug> -->
     <host>localhost</host>
 <!--
     <port>7531</port>
