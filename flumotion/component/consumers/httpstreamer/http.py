@@ -596,7 +596,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                     interface=host)
                 return feedcomponent.ParseLaunchComponent.do_start(self, *args, 
                     **kwargs)
-            except error.CannotListenError, e:
+            except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
                 self.warning(t)
                 m = messages.Error(T_(N_(
