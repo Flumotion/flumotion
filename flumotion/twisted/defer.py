@@ -77,19 +77,30 @@ def defer_generator(proc):
 
         def errback(failure, d):
             def raise_error():
-                k = failure.type
+                # failure.type will be the exception class for local
+                # failures and the string name of the exception class
+                # for remote failures (which might not exist in our
+                # namespace)
+                #
+                # failure.value will be the tuple of arguments to the
+                # exception in the local case, or a string
+                # representation of that in the remote case (see
+                # pb.CopyableFailure.getStateToCopy()).
+                #
+                # we can only reproduce a remote exception if the
+                # exception class is in our namespace, and it only takes
+                # one string argument. if either condition is not true,
+                # we wrap the strings in a default Exception.
+                k, v = failure.type, failure.value
                 if isinstance(k, str):
                     k = reflect.namedClass(k)
-                if not k:
-                    k = lambda v: Exception('%s: %r' % (failure.type, v))
                 try:
-                    e = k(failure.value)
-                except Exception, new_exception:
-                    e = Exception('%s: %r\n'
-                                  'Additionally, got %r when trying to '
-                                  'recreate exception of type %r'
-                                  % (failure.type, failure.value,
-                                     new_exception, k))
+                    if isinstance(v, tuple):
+                        e = k(*v)
+                    else:
+                        e = k(v)
+                except Exception:
+                    e = Exception('%s: %r' % (failure.type, v))
                 raise e
             d.value = raise_error
             generator_next()

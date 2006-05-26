@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-24 19:44+0200\n"
+"POT-Creation-Date: 2006-05-26 12:52+0200\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: cat\n"
@@ -14,102 +14,102 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: flumotion/admin/gtk/client.py:154
+#: flumotion/admin/gtk/client.py:156
 msgid "Not connected"
 msgstr "No conectat"
 
-#: flumotion/admin/gtk/client.py:182
+#: flumotion/admin/gtk/client.py:185
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Connectant amb %s:%s"
 
-#: flumotion/admin/gtk/client.py:261 flumotion/admin/gtk/client.py:325
+#: flumotion/admin/gtk/client.py:267 flumotion/admin/gtk/client.py:331
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Carregant UI per %s ..."
 
-#: flumotion/admin/gtk/client.py:343
+#: flumotion/admin/gtk/client.py:349
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Carregant tab %s per %s ..."
 
-#: flumotion/admin/gtk/client.py:362
+#: flumotion/admin/gtk/client.py:375
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s no té UI encara"
 
-#: flumotion/admin/gtk/client.py:574
+#: flumotion/admin/gtk/client.py:603
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administració de Flumotion"
 
-#: flumotion/admin/gtk/client.py:590
+#: flumotion/admin/gtk/client.py:619
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Connexió perduda a l'encarregat, tornant a connectar ..."
 
-#: flumotion/admin/gtk/client.py:610
+#: flumotion/admin/gtk/client.py:639
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Connexió a l'encarregat en %s va ser rebutjada."
 
-#: flumotion/admin/gtk/client.py:612
+#: flumotion/admin/gtk/client.py:641
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Connexió en %s va ser rebutjada "
 
-#: flumotion/admin/gtk/client.py:625
+#: flumotion/admin/gtk/client.py:654
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Connexió a l'encarregat en %s va fallar (%s)."
 
-#: flumotion/admin/gtk/client.py:713
+#: flumotion/admin/gtk/client.py:752
 #, fuzzy, python-format
 msgid "Component %s is sad"
 msgstr "Component %s encara està dormint"
 
-#: flumotion/admin/gtk/client.py:720
+#: flumotion/admin/gtk/client.py:759
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Demostrar UI per a %s"
 
-#: flumotion/admin/gtk/client.py:740
+#: flumotion/admin/gtk/client.py:779
 #, python-format
 msgid "No UI for component %s"
 msgstr "Cap UI per al component %s"
 
-#: flumotion/admin/gtk/client.py:746
+#: flumotion/admin/gtk/client.py:785
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Component %s encara està dormint"
 
-#: flumotion/admin/gtk/client.py:748
+#: flumotion/admin/gtk/client.py:787
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Petició de UI per a %s ..."
 
-#: flumotion/admin/gtk/client.py:801
+#: flumotion/admin/gtk/client.py:840
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "El mag no pot funcionar perquè no s'entra a ningun treballador."
 
-#: flumotion/admin/gtk/client.py:842
+#: flumotion/admin/gtk/client.py:881
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Codi de component recarregant per a %s"
 
-#: flumotion/admin/gtk/client.py:873
+#: flumotion/admin/gtk/client.py:912
 msgid "No component selected."
 msgstr "Cap component seleccionat."
 
-#: flumotion/admin/gtk/client.py:890
+#: flumotion/admin/gtk/client.py:929
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "Fallat de %s al component de %s"
 
-#: flumotion/admin/gtk/client.py:917
+#: flumotion/admin/gtk/client.py:956
 msgid "Import Configuration..."
 msgstr "Importar la configuració..."
 
-#: flumotion/admin/gtk/client.py:930
+#: flumotion/admin/gtk/client.py:969
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -117,11 +117,11 @@ msgstr ""
 "L'arxiu ja existeix.\n"
 "sobreescriu ja? "
 
-#: flumotion/admin/gtk/client.py:952
+#: flumotion/admin/gtk/client.py:991
 msgid "Export Configuration..."
 msgstr "Exportar la configuració..."
 
-#: flumotion/admin/gtk/client.py:996
+#: flumotion/admin/gtk/client.py:1038
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -130,24 +130,24 @@ msgstr ""
 "No podia recarregar el component:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1006
+#: flumotion/admin/gtk/client.py:1048
 msgid "Reloading ..."
 msgstr "Recarregant..."
 
-#: flumotion/admin/gtk/client.py:1007
+#: flumotion/admin/gtk/client.py:1049
 msgid "Reloading client code"
 msgstr "Recarregant el codi del client"
 
-#: flumotion/admin/gtk/client.py:1009
+#: flumotion/admin/gtk/client.py:1051
 #, python-format
 msgid "Reloading %s code"
 msgstr "Recarregant %s del codi"
 
-#: flumotion/admin/gtk/client.py:1038
+#: flumotion/admin/gtk/client.py:1080
 msgid "About Flumotion"
 msgstr "Sobre Flumotion"
 
-#: flumotion/admin/gtk/client.py:1057
+#: flumotion/admin/gtk/client.py:1099
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -157,7 +157,7 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1062
+#: flumotion/admin/gtk/client.py:1104
 msgid "Authors"
 msgstr "Autors"
 
@@ -671,18 +671,24 @@ msgid "Reload _Manager"
 msgstr "Recarregar _Encarregat "
 
 #: data/glade/admin.glade:253
-msgid "Reload _All"
+#, fuzzy
+msgid "Reload _Admin"
 msgstr "Recarregar_Tots"
 
-#: data/glade/admin.glade:262
+#: data/glade/admin.glade:274
+#, fuzzy
+msgid "Reload A_ll"
+msgstr "Recarregar_Tots"
+
+#: data/glade/admin.glade:294
 msgid "Start _Shell"
 msgstr "Començar _Pela"
 
-#: data/glade/admin.glade:287
+#: data/glade/admin.glade:319
 msgid "_Help"
 msgstr "_Ajuda"
 
-#: data/glade/admin.glade:324
+#: data/glade/admin.glade:356
 msgid "Open a stored configuration"
 msgstr "Obrir una configuració emmagatzemada"
 

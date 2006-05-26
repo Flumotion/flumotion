@@ -1,8 +1,8 @@
 2006-05-26  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/twisted/defer.py
-	(defer_generator.wrapper.errback.raise_error): Handle the case
-	whereby the exception being thrown has more than one initarg.
+	(defer_generator.wrapper.errback.raise_error): Catch all of the
+	cases in which we can't reproduce the remote error.
 
 2006-05-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
