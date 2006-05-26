@@ -597,11 +597,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 return feedcomponent.ParseLaunchComponent.do_start(self, *args, 
                     **kwargs)
             except error.CannotListenError, e:
-                self.warning('Port %d is not available.' % self.port)
+                t = 'Port %d is not available.' % self.port
+                self.warning(t)
                 m = messages.Error(T_(N_(
                     "Network error: TCP port %d is not available."), self.port))
                 self.addMessage(m)
                 self.setMood(moods.sad)
-                return defer.fail(e)
+                return defer.fail(errors.ComponentStartHandledError(t))
 
 pygobject.type_register(MultifdSinkStreamer)

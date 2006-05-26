@@ -122,9 +122,19 @@ class AdminAvatar(base.ManagerAvatar):
     def perspective_componentStop(self, componentState):
         """
         Stop the given component.
+        If the component was sad, we clear its sad state as well,
+        since the stop was explicitly requested by the admin.
         """
         self.debug('perspective_componentStop(%r)' % componentState)
-        return self.perspective_componentCallRemote(componentState, 'stop')
+        d = self.perspective_componentCallRemote(componentState, 'stop')
+        def clearSadCallback(result):
+            if componentState.get('mood') == planet.moods.sad.value:
+                self.debug('clearing sad mood after stopping component')
+                componentState.set('mood', planet.moods.sleeping.value)
+            return result
+        d.addCallback(clearSadCallback)
+
+        return d
         
     def perspective_componentRestart(self, componentState):
         """

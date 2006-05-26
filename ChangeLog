@@ -1,3 +1,15 @@
+2006-05-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/errors.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  add and use a ComponentStartHandledError to indicate we've
+	  handled the error in a satisfactory way, thus the manager
+	  needs to drop them.
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	  if the admin requests to stop a sad component, we can clear the
+	  sad state immediately after stopping, since the admin has seen it.
+
 2006-05-26  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/twisted/defer.py

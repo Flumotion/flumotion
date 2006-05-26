@@ -126,6 +126,13 @@ class ComponentStartError(ComponentError):
     remote_start call on a component.
     """
 
+class ComponentStartHandledError(ComponentStartError):
+    """
+    An error during starting of a component, that's already handled in a
+    different way (for example, through a message).
+    Can be raised during a remote_start call on a component.
+    """
+
 class UnknownComponentError(ComponentError):
     "A given component or component type does not exist"
 

@@ -568,6 +568,9 @@ class ComponentAvatar(base.ManagerAvatar):
         yield d
         try:
             d.value()
+        except errors.ComponentStartHandledError, e:
+            self.debug('already handled error while starting: %s' %
+                log.getExceptionMessage(e))
         except Exception, e:
             m = messages.Error(T_(N_("Could not start component.")),
                 debug = log.getExceptionMessage(e),
