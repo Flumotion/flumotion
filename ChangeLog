@@ -1,5 +1,26 @@
 2006-05-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/config.py:
+	  handle cases where we have empty nodes, like
+	  <property name="data" />
+	* flumotion/component/bouncers/bouncer.py:
+	  document base authenticate() method
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	  do_setup should return deferred failures instead of raising
+	* flumotion/component/component.py:
+	  assert this in the docs for do_setup()
+	* flumotion/manager/main.py:
+	  when doing log.error, catch the SystemError we'll be getting
+	  since it just gives a long traceback in the reactor
+	* flumotion/manager/manager.py:
+	  get a referred back when setting up the bouncer
+	  handle some failure cases better
+	* flumotion/twisted/portal.py:
+	  do not allow anonymous login when bouncer is missing
+	  earns us the enterprise 'highly securized' property
+
+2006-05-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	* flumotion/component/consumers/httpstreamer/http.py:
 	  add and use a ComponentStartHandledError to indicate we've

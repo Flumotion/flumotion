@@ -66,14 +66,14 @@ class HTPasswdCrypt(bouncer.Bouncer):
             self._data = props['data']
             log.debug('htpasswd', 'using in-line data for passwords')
         else:
-            raise config.ConfigError(
-                'HTPasswdCrypt config needs either a <data> or <filename> entry')
+            return defer.fail(config.ConfigError(
+                'HTPasswdCrypt needs either a <data> or <filename> entry'))
         # FIXME: generalize to a start method, possibly linked to mood
         if self._filename:
             try:
                 lines = open(self._filename).readlines()
             except IOError, e:
-                raise config.ConfigError(str(e))
+                return defer.fail(config.ConfigError(str(e)))
         else:
             lines = self._data.split("\n")
 
@@ -150,6 +150,7 @@ class HTPasswdCrypt(bouncer.Bouncer):
                 del self._challenges[keycard.id]
 
         # use the checker
+        self.debug('submitting keycard %r to checker' % keycard)
         d = self._checker.requestAvatarId(keycard)
         d.addCallback(self._requestAvatarIdCallback, keycard)
         d.addErrback(self._requestAvatarIdErrback, keycard)

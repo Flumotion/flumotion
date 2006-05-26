@@ -412,7 +412,10 @@ class FlumotionConfigXML(fxml.Parser):
     def _get_string_value(self, nodes):
         values = []
         for subnode in nodes:
-            data = subnode.childNodes[0].data
+            try:
+                data = subnode.childNodes[0].data
+            except IndexError:
+                continue
             # libxml always gives us unicode, even when we encode values
             # as strings. try to make normal strings again, unless that
             # isn't possible.
@@ -430,8 +433,11 @@ class FlumotionConfigXML(fxml.Parser):
     def _get_raw_string_value(self, nodes):
         values = []
         for subnode in nodes:
-            data = str(subnode.childNodes[0].data)
-            values.append(data)
+            try:
+                data = str(subnode.childNodes[0].data)
+                values.append(data)
+            except IndexError: # happens on a subnode without childNOdes
+                pass
 
         string = "".join(values)
         return [string, ]

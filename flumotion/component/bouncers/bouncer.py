@@ -89,6 +89,13 @@ class Bouncer(component.BaseComponent):
          
     # FIXME: do we need this at all in the base class ?
     def authenticate(self, keycard):
+        """
+        Authenticate the given keycard.
+        Can be overridden by subclasses.
+        Return the keycard with state AUTHENTICATED to authenticate,
+        with state REQUESTING to continue the authentication process,
+        or None to deny the keycard.
+        """
         if not components.implements(keycard, credentials.ICredentials):
             self.warning('keycard %r does not implement ICredentials', keycard)
             raise AssertionError

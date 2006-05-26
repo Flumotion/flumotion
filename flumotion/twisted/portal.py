@@ -64,17 +64,14 @@ class BouncerPortal(log.Loggable):
         @param ifaces:     a list of interfaces for the perspective that the
                            mind wishes to attach to
         
-        @returns: a deferred which will fire a tuple of
-                  (interface, avatarAspect, logout), or a failure.
+        @returns: a deferred, which will fire a tuple of
+                  (interface, avatarAspect, logout) or None.
         """
         self.debug("_login(keycard=%r, mind=%r, ifaces=%r)" % (
             keycard, mind, ifaces))
         if not self.bouncer:
-            # FIXME: do we really want anonymous login when no bouncer is
-            # present ?
-            self.warning("no bouncer, allowing anonymous in")
-            keycard.state = keycards.AUTHENTICATED
-            d = defer.succeed(keycard)
+            self.warning("no bouncer, refusing login")
+            return defer.succeed(None)
         else:
             d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
             
@@ -83,7 +80,8 @@ class BouncerPortal(log.Loggable):
 
     def _authenticateCallback(self, result, mind, *ifaces):
         # we either got a keycard as result, or None from the bouncer
-        self.debug("_authenticateCallback(result=%r, mind=%r, ifaces=%r)" % (result, mind, ifaces))
+        self.debug("_authenticateCallback(result=%r, mind=%r, ifaces=%r)" % (
+            result, mind, ifaces))
 
         if not result:
             # just like a checker, we return a failure object

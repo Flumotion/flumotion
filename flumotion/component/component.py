@@ -338,6 +338,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         Subclasses can implement me to set up the component before it is
         started.  It should set up the component, possibly opening files
         and resources.
+        Non-programming errors should not be raised, but returned as a
+        failing deferred.
 
         self.config will be set when this is called.
 

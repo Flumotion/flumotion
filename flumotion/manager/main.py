@@ -80,8 +80,14 @@ def _startTCP(vishnu, host, port):
 def _error(message, reason):
     msg = message
     if reason:
-        msg += " - reason: %s" % reason
-    log.error('manager', msg)
+        msg += "\n%s" % reason
+    # since our SystemError is going to be lost in the reactor, we may as well
+    # trap it here
+    # FIXME: maybe we should stop making this raise SystemErrror ?
+    try:
+        log.error('manager', msg)
+    except errors.SystemError:
+        pass
 
 def _initialLoadConfig(vishnu, paths):
     # this is used with a callLater for the initial config loading
