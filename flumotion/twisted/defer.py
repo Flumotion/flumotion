@@ -82,7 +82,15 @@ def defer_generator(proc):
                     k = reflect.namedClass(k)
                 if not k:
                     k = lambda v: Exception('%s: %r' % (failure.type, v))
-                raise k(failure.value)
+                try:
+                    e = k(failure.value)
+                except Exception, new_exception:
+                    e = Exception('%s: %r\n'
+                                  'Additionally, got %r when trying to '
+                                  'recreate exception of type %r'
+                                  % (failure.type, failure.value,
+                                     new_exception, k))
+                raise e
             d.value = raise_error
             generator_next()
 
