@@ -98,7 +98,7 @@ def _initialLoadConfig(vishnu, paths):
             _error(
                 "unknown component in configuration file\n'%s':" % path,
                 reason.args[0])
-         except Exception, e:
+        except Exception, e:
             # a re-raise here would be caught by twisted and only shows at
             # debug level 4 because that's where we hooked up twisted logging
             # so print a traceback before stopping the program
