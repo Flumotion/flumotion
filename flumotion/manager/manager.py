@@ -228,38 +228,6 @@ class Vishnu(log.Loggable):
         else:
             return None
 
-    def _makeBouncer(self, conf):
-        # returns a deferred, always
-        if not (conf.manager and conf.manager.bouncer):
-            self.log('No bouncer')
-            return defer.succeed(None)
-
-        self.debug('going to start manager bouncer %s of type %s' % (
-            conf.manager.bouncer.name, conf.manager.bouncer.type))
-
-        defs = registry.getRegistry().getComponent(
-            conf.manager.bouncer.type)
-        entry = defs.getEntryByType('component')
-        # FIXME: use entry.getModuleName() (doesn't work atm?)
-        moduleName = defs.getSource()
-        methodName = entry.getFunction()
-        bouncer = reflectcall.createComponent(moduleName, methodName)
-
-        configDict = conf.manager.bouncer.getConfigDict()
-        self.debug('setting up manager bouncer')
-        d = bouncer.setup(configDict)
-        def setupCallback(result):
-            bouncer.debug('started')
-            return bouncer
-        def setupErrback(failure):
-            failure.trap(errors.ConfigError)
-            self.warning('Configuration error in manager bouncer: %s' %
-                failure.value.args[0])
-            return None
-        d.addCallback(setupCallback)
-        d.addErrback(setupErrback)
-        return d
-
     def _updateState(self, conf):
         self.debug('syncing up planet state with config')
         added = [] # added components while parsing
@@ -356,6 +324,38 @@ class Vishnu(log.Loggable):
         # to config that we can then merge somehow with an .update method
         d = self._makeBouncer(conf)
         d.addCallback(self._makeBouncerCallback, conf)
+        return d
+
+    def _makeBouncer(self, conf):
+        # returns a deferred, always
+        if not (conf.manager and conf.manager.bouncer):
+            self.log('No bouncer')
+            return defer.succeed(None)
+
+        self.debug('going to start manager bouncer %s of type %s' % (
+            conf.manager.bouncer.name, conf.manager.bouncer.type))
+
+        defs = registry.getRegistry().getComponent(
+            conf.manager.bouncer.type)
+        entry = defs.getEntryByType('component')
+        # FIXME: use entry.getModuleName() (doesn't work atm?)
+        moduleName = defs.getSource()
+        methodName = entry.getFunction()
+        bouncer = reflectcall.createComponent(moduleName, methodName)
+
+        configDict = conf.manager.bouncer.getConfigDict()
+        self.debug('setting up manager bouncer')
+        d = bouncer.setup(configDict)
+        def setupCallback(result):
+            bouncer.debug('started')
+            return bouncer
+        def setupErrback(failure):
+            failure.trap(errors.ConfigError)
+            self.warning('Configuration error in manager bouncer: %s' %
+                failure.value.args[0])
+            return None
+        d.addCallback(setupCallback)
+        d.addErrback(setupErrback)
         return d
 
     def _makeBouncerCallback(self, bouncer, conf):
