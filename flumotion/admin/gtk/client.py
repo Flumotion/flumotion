@@ -382,8 +382,8 @@ class Window(log.Loggable, gobject.GObject):
         widget.show()
 
     def _nodeRenderErrback(self, failure, nodeName):
-        self.debug('Could not render node %s: %r, %s' % (nodeName,
-            failure, failure.getErrorMessage()))
+        self.debug('Could not render node %s: %s' % (nodeName,
+            log.getFailureMessage(failure)))
         self.warning('Could not render node %s' % nodeName)
 
     def _setCurrentComponentCallback(self, _, instance):
