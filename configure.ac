@@ -20,7 +20,6 @@ GST_08_SUPPORTED=true
 GST_010_SUPPORTED=true
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
-AC_SUBST(ACLOCAL_AMFLAGS, "-I common")
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common")
