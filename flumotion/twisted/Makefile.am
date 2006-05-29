@@ -13,7 +13,8 @@ flumotion_PYTHON = \
 	gtk2reactor.py \
 	pb.py \
 	portal.py \
-	reflect.py
+	reflect.py \
+	rtsp.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 
