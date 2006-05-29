@@ -91,7 +91,6 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         if not isinstance(peakTime, str):
             peakTime = time.strftime ("%c", time.localtime(peakTime))
             
-            self.debug('Converted peak time to %s' % peakTime)
         self.labels['clients-peak-time'].set_text(peakTime)
         
         for name in self.labels.keys():
