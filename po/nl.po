@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-26 12:52+0200\n"
+"POT-Creation-Date: 2006-05-26 15:49+0200\n"
 "PO-Revision-Date: 2006-04-13 18:27+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -379,7 +379,7 @@ msgid "GStreamer error."
 msgstr "GStreamer-fout."
 
 #: flumotion/component/feedcomponent08.py:252
-#: flumotion/manager/component.py:572
+#: flumotion/manager/component.py:575
 msgid "Could not start component."
 msgstr "Kon component niet starten."
 
@@ -392,7 +392,7 @@ msgstr "Component is voeding verloren, aan het herverbinden..."
 msgid "Porter '%s' not found, cannot slave this streamer to it."
 msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/http.py:602
+#: flumotion/component/consumers/httpstreamer/http.py:603
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Netwerkfout: TCP-poort %d is niet beschikbaar."
@@ -489,7 +489,7 @@ msgstr "Patroon:"
 msgid "Pattern"
 msgstr "Patroon"
 
-#: flumotion/manager/manager.py:566
+#: flumotion/manager/manager.py:580
 msgid "The component could not be started."
 msgstr "De component kon niet gestart worden."
 
