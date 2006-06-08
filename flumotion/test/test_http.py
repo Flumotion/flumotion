@@ -20,12 +20,12 @@
 # Headers in this file shall remain intact.
 
 from twisted.internet import defer
-from twisted.python import components
 from twisted.trial import unittest
 from twisted.web import server
 
 from flumotion.component.consumers.httpstreamer import resources
 from flumotion.common import interfaces, keycards
+from flumotion.twisted.defer import defer_generator_method
 
 # From twisted/test/proto_helpers.py
 import fcntl
@@ -36,6 +36,11 @@ try:
 except ImportError:
     #T1.3
     from twisted.protocols import http
+
+import twisted.copyright #T1.3
+#T1.3
+def weHaveAnOldTwisted():
+    return twisted.copyright.version[0] < '2'
 
 class PipeTransport:
     def __init__(self):
@@ -126,7 +131,10 @@ class TestHTTPStreamingResource(unittest.TestCase):
         # the request is not authorized
         d = resource.authenticate(request)
         d.addCallback(resource._authenticatedCallback, request)
-        unittest.deferredResult(d)
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            yield d
 
         error_code = http.UNAUTHORIZED
         self.assertEquals(request.headers.get('content-type', ''), 'text/html')
@@ -138,14 +146,20 @@ class TestHTTPStreamingResource(unittest.TestCase):
             'code': error_code,
             'error': http.RESPONSES[error_code]}
         self.assertEquals(request.data, expected)
+    assertUnauthorized = defer_generator_method(assertUnauthorized)
  
     def assertAuthorized(self, resource, request):
         # make the resource authenticate the request, and verify
         # the request is authorized
         d = resource.authenticate(request)
         d.addCallback(resource._authenticatedCallback, request)
-        unittest.deferredResult(d)
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            yield d
+
         self.failIfEquals(request.response, http.UNAUTHORIZED)
+    assertAuthorized = defer_generator_method(assertAuthorized)
 
     def testRenderNotReady(self):
         streamer = FakeStreamer()
