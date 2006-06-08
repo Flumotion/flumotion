@@ -26,7 +26,12 @@ from twisted.trial import unittest
 
 from flumotion.twisted import credentials
 from flumotion.twisted import compat
+from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import keycards
+import twisted.copyright #T1.3
+#T1.3
+def weHaveAnOldTwisted():
+    return twisted.copyright.version[0] < '2'
 
 class TestKeycardUACPP(unittest.TestCase):
     def testInit(self):
@@ -81,23 +86,47 @@ class TestKeycardSending(unittest.TestCase):
         port = self.m.run(Root)
         self.a = Admin()
         d = self.a.run(port)
-        unittest.deferredResult(d)
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            yield d
         self.w = Worker()
         d = self.w.run(port)
-        unittest.deferredResult(d)
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            yield d
+    setUp = defer_generator_method(setUp)
 
     def tearDown(self):
-        unittest.deferredResult(self.m.stop())
-        unittest.deferredResult(self.a.stop())
-        unittest.deferredResult(self.w.stop())
+        d = self.m.stop()
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            yield d
+        d = self.a.stop()
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            yield d
+        d = self.w.stop()
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            yield d
+    tearDown = defer_generator_method(tearDown)
 
     def testSend(self):
         d = self.a.perspective.callRemote('workerGetKeycard')
-        keycard = unittest.deferredResult(d)
-
-        # now send back the keycard to see what happens
-        d = self.a.perspective.callRemote('workerGiveKeycard', keycard)
-        result = unittest.deferredResult(d)
+        def getKeycardCallback(keycard):
+            # now send back the keycard to see what happens
+            d2 = self.a.perspective.callRemote('workerGiveKeycard', keycard)
+            return d2
+        d.addCallback(getKeycardCallback)
+        if weHaveAnOldTwisted():
+            result = unittest.deferredResult(d)
+        else:
+            return d
         
         # while writing this test, I came to the conclusion that since
         # this is a copyable, you really can't say much about the id's

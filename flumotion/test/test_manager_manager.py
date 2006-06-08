@@ -37,6 +37,11 @@ from flumotion.common import setup
 from flumotion.twisted import flavors
 from flumotion.twisted.compat import implements
 
+import twisted.copyright #T1.3
+#T1.3
+def weHaveAnOldTwisted():
+    return twisted.copyright.version[0] < '2'
+
 class MyListener(log.Loggable):
     # a helper object that you can get deferreds from that fire when
     # a certain state has a certain key set to a certain value
@@ -554,9 +559,14 @@ class TestVishnu(log.Loggable, unittest.TestCase):
 
         # clear out the complete planet
         d = self.vishnu.emptyPlanet()
-        unittest.deferredResult(d)
-
-        self.assertEqual(len(mappers.keys()), 0)
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+            self.assertEqual(len(mappers.keys()), 0)
+        else:
+            def verifyMappersIsZero(result):
+                self.assertEqual(len(mappers.keys()), 0)
+            d.addCallback(verifyMappersIsZero)
+            return d
 
     def _verifyConfigAndOneWorker(self):
         self.debug('verifying after having loaded config and started worker')
@@ -594,16 +604,24 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         l = MyListener()
         state.addListener(l)
         d = l.notifyOnSet(state, 'mood', moods.happy.value)
-        unittest.deferredResult(d)
-
-        self.assertEqual(state.get('mood'), moods.happy.value,
-            "mood of %s is not happy but %r" % (
-                m.state.get('name'), moods.get(state.get('mood'))))
- 
-        # verify the component avatars
-        self.failUnless(avatar.jobState)
-        self.failUnless(avatar.componentState)
-
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+            self.assertEqual(state.get('mood'), moods.happy.value,
+                "mood of %s is not happy but %r" % (
+                    m.state.get('name'), moods.get(state.get('mood'))))
+            # verify the component avatars
+            self.failUnless(avatar.jobState)
+            self.failUnless(avatar.componentState)
+        else:
+            def verifyMoodIsHappy(result):
+                self.assertEqual(state.get('mood'), moods.happy.value,
+                    "mood of %s is not happy but %r" % (
+                        m.state.get('name'), moods.get(state.get('mood'))))
+                # verify the component avatars
+                self.failUnless(avatar.jobState)
+                self.failUnless(avatar.componentState)
+            d.addCallback(verifyMoodIsHappy)
+        
     def _verifyConfigAndNoWorker(self):
         mappers = self.vishnu._componentMappers
 

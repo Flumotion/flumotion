@@ -26,6 +26,11 @@ from twisted.internet import reactor
 
 from flumotion.worker import worker
 
+import twisted.copyright #T1.3
+#T1.3
+def weHaveAnOldTwisted():
+    return twisted.copyright.version[0] < '2'
+
 class TestKid(unittest.TestCase):
     def testGetPid(self):
         kid = worker.Kid(1092, "kid", "http", "module", "method", {},
@@ -67,7 +72,11 @@ class TestWorkerClientFactory(unittest.TestCase):
         brain = worker.WorkerBrain(FakeOptions())
         factory = worker.WorkerClientFactory(brain)
 
-        unittest.deferredResult(brain.teardown())
+        d = brain.teardown()
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            return d
 
 class FakeRef:
     def notifyOnDisconnect(self, callback):
@@ -80,6 +89,10 @@ class TestWorkerMedium(unittest.TestCase):
         self.medium.setRemoteReference(FakeRef())
         self.assert_(self.medium.hasRemoteReference())
 
-        unittest.deferredResult(brain.teardown())
+        d = brain.teardown()
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            return d
 
 # FIXME: add tests to test signal handler ? Might not be so easy.

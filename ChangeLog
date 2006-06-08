@@ -1,6 +1,13 @@
 2006-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_keycards.py:
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_worker_worker.py:
+	Fix tests to work on twisted 2.4.
+
+2006-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/test_keycards.py:
         Fix keycards test to use new interface api.
 
 2006-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
