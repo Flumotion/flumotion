@@ -1,5 +1,10 @@
 2006-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/test_htpasswdcrypt.py:
+	Fix test to work on Twisted 2.4.
+
+2006-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/test/test_http.py:
 	Fix test to work on Twisted 2.4.
 
