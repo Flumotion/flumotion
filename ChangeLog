@@ -1,5 +1,10 @@
 2006-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/test_keycards.py:
+        Fix keycards test to use new interface api.
+
+2006-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/common/common.py:
 	Make mergeImplements work for new Interface API.
 	* flumotion/component/component.py:

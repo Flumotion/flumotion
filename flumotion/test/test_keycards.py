@@ -24,23 +24,22 @@ import testclasses
 
 from twisted.trial import unittest
 
-from twisted.python import components
-
 from flumotion.twisted import credentials
+from flumotion.twisted import compat
 from flumotion.common import keycards
 
 class TestKeycardUACPP(unittest.TestCase):
     def testInit(self):
         keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
-        self.failUnless(components.implements(
+        self.failUnless(compat.implementsInterface(
             keycard, credentials.IUsernameCryptPassword))
 
 class TestKeycardUACPCC(unittest.TestCase):
     def testInit(self):
         keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
         self.assertEquals(keycard.state, keycards.REQUESTING)
-        self.failUnless(components.implements(
+        self.failUnless(compat.implementsInterface(
             keycard, credentials.IUsernameCryptPassword))
         
 # test sending keycards back and forth
