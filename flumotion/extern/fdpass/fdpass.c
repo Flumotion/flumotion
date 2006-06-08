@@ -1,4 +1,4 @@
-/* 
+/*
  * Flumotion - a streaming media server
  * Copyright (C) 2004,2005,2006 Fluendo, S.L. (www.fluendo.com).
  * All rights reserved.
@@ -9,29 +9,29 @@
  * This file is distributed without any warranty; without even the implied
  * warranty of merchantability or fitness for a particular purpose.
  * See "LICENSE.GPL" in the source distribution for more information.
- * 
+ *
  * Licensees having purchased or holding a valid Flumotion Advanced
  * Streaming Server license may use this file in accordance with the
  * Flumotion Advanced Streaming Server Commercial License Agreement.
  * See "LICENSE.Flumotion" in the source distribution for more information.
- * 
+ *
  * Headers in this file shall remain intact.
  */
 
 /* fdpass.c:
  *
  * Simple python extension module to wrap sendmsg()/recvmsg() for sending
- * and receiving file descriptors over sockets. 
+ * and receiving file descriptors over sockets.
  *
- * Several such extensions exist; they all seem to wrap the wrong subset of 
+ * Several such extensions exist; they all seem to wrap the wrong subset of
  * these syscalls, or have incompatible licenses.
  *
- * Receive a socket message on fd 'socket', containing one or more fds and a 
+ * Receive a socket message on fd 'socket', containing one or more fds and a
  * message buffer. Limited to receiving MAX_RECEIVED_FDS fds. Reads a message
  * of up to 'size' bytes.
  * ([fd], buffer) = fdpass.readfds(socket, size)
  *
- * Write a socket message on fd 'socket', containing one or more fds and a 
+ * Write a socket message on fd 'socket', containing one or more fds and a
  * message buffer.
  * fdpass.writefds(socket, [fd], buffer)
  */
@@ -63,7 +63,7 @@ readfds(PyObject *self, PyObject *args)
   msg.msg_name = NULL;
   msg.msg_namelen = 0;
 
-  iov[0].iov_len = size; 
+  iov[0].iov_len = size;
   iov[0].iov_base = malloc (iov[0].iov_len);
   msg.msg_iov = iov;
   msg.msg_iovlen = 1;
@@ -134,7 +134,7 @@ writefds(PyObject *self, PyObject *args)
    *
    * The UNIX socket APIs are really messy. Anyway, here goes... Note that this
    * doesn't implement a version for Unixes with no msg.msg_control (see Stevens
-   * if we need to implement that later, it's pretty easy) 
+   * if we need to implement that later, it's pretty easy)
    */
   {
     struct msghdr msg;
@@ -153,13 +153,13 @@ writefds(PyObject *self, PyObject *args)
       msgptr->cmsg_level = SOL_SOCKET;
       /* The control message type for FD-passing is called SCM_RIGHTS for some
        * reason */
-      msgptr->cmsg_type = SCM_RIGHTS; 
+      msgptr->cmsg_type = SCM_RIGHTS;
 
       /* And the actual data: a single int, our passed fd. Convert from python
        * first, checking that it's valid.
        */
       fdobj = PyList_GetItem (list, i);
-      if (!PyInt_Check (fdobj)) 
+      if (!PyInt_Check (fdobj))
       {
         PyErr_SetString(PyExc_TypeError, "List value is not an integer");
         free (msg.msg_control);
@@ -177,9 +177,9 @@ writefds(PyObject *self, PyObject *args)
     msg.msg_name = NULL;
     msg.msg_namelen = 0;
 
-    /* Our I/O vector (this API allows for scatter-gather type messages) 
+    /* Our I/O vector (this API allows for scatter-gather type messages)
      * contains just a single entry - the message to pass along with our
-     * control data (which is the fds themselves 
+     * control data (which is the fds themselves
      */
     iov[0].iov_base = message;
     iov[0].iov_len = msglen;
@@ -201,16 +201,16 @@ writefds(PyObject *self, PyObject *args)
   return Py_BuildValue("i", ret);
 }
 
-static PyMethodDef methods[] = 
+static PyMethodDef methods[] =
 {
-    {"readfds", readfds, METH_VARARGS, 
+    {"readfds", readfds, METH_VARARGS,
         "Read a message over a socket, along with one or more FDs"},
     {"writefds", writefds, METH_VARARGS,
         "Write a message over a socket, along with one or more FDs"},
     {NULL, NULL, 0, NULL},
 };
 
-PyMODINIT_FUNC 
+PyMODINIT_FUNC
 initfdpass(void)
 {
   Py_InitModule ("fdpass", methods);
