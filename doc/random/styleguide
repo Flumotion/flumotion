@@ -7,3 +7,23 @@ UI
 - use kbit/s and Mbit/s
 - provide accelerators for controls
 
+API DOCS
+--------
+- We use epydoc and epydoc markup for API docs
+- list @param before @type: what it actually does is more useful to know
+  than the type
+- align the var/param name:
+  @param name:
+  @type  name:
+- align the content after the colons within a block
+- types are "str" and "bool", not string or boolean
+- separate @param from @rtype/@returns with an empty line
+- .callRemote calls and similar are interfaces between processes.
+  They should be documented with care, and it is good to add explain
+  how they get received on the other side, linking to the receiving object
+  base class
+- defer_generator_method screws up the docs for public methods, leaving them
+  without a docstring.  Avoid using defer_generator_method in public methods.
+- defer_generator_method screws up the docs for private methods, causing
+  private methods to be listed in the public API.  Avoid using
+  defer_generator_method in private methods.

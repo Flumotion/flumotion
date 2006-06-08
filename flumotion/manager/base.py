@@ -32,10 +32,24 @@ from flumotion.common import errors, interfaces, log, common
 class ManagerAvatar(pb.Avatar, log.Loggable):
     """
     I am a base class for manager-side avatars to subclass from.
+
+    @ivar avatarId: the id for this avatar, unique inside the heaven
+    @type avatarId: str
+    @ivar heaven:   the heaven this avatar is part of
+    @type heaven:   L{flumotion.manager.base.ManagerHeaven}
+    @ivar mind:     a remote reference to the client-side Medium
+    @type mind:     L{twisted.spread.pb.RemoteReference}
+    @ivar vishnu:   the vishnu that manages this avatar's heaven
+    @type vishnu:   L{flumotion.manager.manager.Vishnu}
     """
     def __init__(self, heaven, avatarId, keycard):
         """
-        @type heaven: L{flumotion.manager.base.ManagerHeaven}
+        @param heaven:   the heaven this avatar is part of
+        @type  heaven:   L{flumotion.manager.base.ManagerHeaven}
+        @param avatarId: id of the avatar to create
+        @type  avatarId: str
+        @param keycard: id of the avatar to create
+        @type  avatarId: str
         """
         self.heaven = heaven
         self.avatarId = avatarId
@@ -50,7 +64,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         """
         Check if the avatar has a remote reference to the peer.
 
-        @rtype: boolean
+        @rtype: bool
         """
         return self.mind != None
     
@@ -58,6 +72,9 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
     def mindCallRemote(self, name, *args, **kwargs):
         """
         Call the given remote method.
+
+        @param name: name of the remote method
+        @type  name: str
         """
         if not self.hasRemoteReference():
             self.warning(
@@ -126,6 +143,8 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
 
         Called through the manager's PB logout trigger calling
         L{flumotion.manager.manager.Dispatcher.removeAvatar}
+
+        @type mind: L{twisted.spread.pb.RemoteReference}
         """
         assert(self.mind == mind)
         self.debug('PB client from %s detached' % self.getClientAddress())
@@ -136,6 +155,9 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         """
         Get the IPv4 address of the machine the PB client is connecting from,
         as seen from the avatar.
+
+        @returns:  the IPv4 address the client is coming from, or None.
+        @rtype:   str or None
         """
         if self.mind:
             peer = self.mind.broker.transport.getPeer()
@@ -154,14 +176,14 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         starting with this bundle, in the correct order.
         Any of bundleName, fileName, moduleName may be given.
 
-        @type  bundleName: string or list of strings
+        @type  bundleName: str or list of str
         @param bundleName: the name of the bundle for fetching
-        @type  fileName:   string or list of strings
+        @type  fileName:   str or list of str
         @param fileName:   the name of the file requested for fetching
-        @type  moduleName: string or list of strings
+        @type  moduleName: str or list of str
         @param moduleName: the name of the module requested for import
 
-        @rtype: list of (string, string) tuples of (bundleName, md5sum)
+        @rtype: list of (str, str) tuples of (bundleName, md5sum)
         """
         bundleNames = []
         fileNames = []
@@ -228,10 +250,11 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         Get a list of (bundleName, md5sum) of all dependency bundles,
         starting with this bundle, in the correct order.
 
-        @type  filename: string
         @param filename: the name of the file in a bundle
+        @type  filename: str
 
-        @rtype: list of (string, string) tuples
+        @returns: list of (bundleName, md5sum) tuples
+        @rtype:   list of (str, str) tuples
         """
         self.debug('asked to get bundle sums for file %s' % filename)
         basket = self.vishnu.bundlerBasket
@@ -246,10 +269,11 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         """
         Get the zip files for the given list of bundles.
 
-        @type  bundles: list of string
         @param bundles: the names of the bundles to get
+        @type  bundles: list of str
 
-        @returns: a dictionary of name -> zip data
+        @returns: dictionary of bundleName -> zipdata
+        @rtype:   dict of str -> str
         """
         basket = self.vishnu.bundlerBasket
         zips = {}
@@ -264,29 +288,36 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
 class ManagerHeaven(pb.Root, log.Loggable):
     """
     I am a base class for heavens in the manager.
-    """
 
+    @cvar avatarClass: the class object this heaven instantiates avatars from.
+                       To be set in subclass.
+    @ivar avatars:     a dict of avatarId -> Avatar
+    @type avatars:     dict of str -> L{ManagerAvatar}
+    @ivar vishnu:      the Vishnu in control of all the heavens
+    @type vishnu:      L{flumotion.manager.manager.Vishnu}
+    """
     avatarClass = None
 
     def __init__(self, vishnu):
         """
-        @type vishnu: L{flumotion.manager.manager.Vishnu}
         @param vishnu: the Vishnu in control of all the heavens
+        @type  vishnu: L{flumotion.manager.manager.Vishnu}
         """
         self.vishnu = vishnu
-        self.avatars = {} # name -> avatar
+        self.avatars = {} # avatarId -> avatar
        
     ### ManagerHeaven methods
     def createAvatar(self, avatarId, keycard):
         """
-        Create a new administration avatar and manage it.
+        Create a new avatar and manage it.
 
-        @param avatarId: the id to give to the new avatar.
-        @type  avatarId: string
+        @param avatarId: id of the avatar to create
+        @type  avatarId: str
         @param keycard:  the credentials being used to log in
         @type  keycard:  L{flumotion.common.keycards.KeyCard}
-        @rtype:   L{flumotion.manager.admin.AdminAvatar}
-        @returns: a new avatar for the admin client.
+
+        @returns: a new avatar for the client
+        @rtype:   L{flumotion.manager.base.ManagerAvatar}
         """
         self.debug('creating new Avatar with name %s' % avatarId)
         if self.avatars.has_key(avatarId):
@@ -301,8 +332,8 @@ class ManagerHeaven(pb.Root, log.Loggable):
         """
         Stop managing the given avatar.
 
-        @type avatarId:  string
         @param avatarId: id of the avatar to remove
+        @type  avatarId: str
         """
         self.debug('removing Avatar with id %s' % avatarId)
         del self.avatars[avatarId]
@@ -311,10 +342,11 @@ class ManagerHeaven(pb.Root, log.Loggable):
         """
         Get the avatar with the given id.
 
-        @type  avatarId: string
         @param avatarId: id of the avatar to get
+        @type  avatarId: str
 
-        @rtype: L{ManagerAvatar}
+        @returns: the avatar with the given id
+        @rtype:   L{ManagerAvatar}
         """
         return self.avatars[avatarId]
 
@@ -322,11 +354,11 @@ class ManagerHeaven(pb.Root, log.Loggable):
         """
         Check if a component with that name is registered.
 
-        @type  avatarId: string
         @param avatarId: id of the avatar to check
+        @type  avatarId: str
 
-        @rtype:      boolean
-        @returns:    True if an avatar with that id is registered
+        @returns: True if an avatar with that id is registered
+        @rtype:   bool
         """
         return self.avatars.has_key(avatarId)
 
@@ -334,6 +366,7 @@ class ManagerHeaven(pb.Root, log.Loggable):
         """
         Get all avatars in this heaven.
 
-        @rtype: list of L{ManagerAvatar}
+        @returns: a list of all avatars in this heaven
+        @rtype:   list of L{ManagerAvatar}
         """
         return self.avatars.values()

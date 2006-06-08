@@ -50,6 +50,7 @@ class WorkerAvatar(base.ManagerAvatar):
         return self.avatarId
 
     def attached(self, mind):
+        # doc in base class
         self.info('worker "%s" logged in' % self.getName())
         base.ManagerAvatar.attached(self, mind)
 
@@ -63,15 +64,28 @@ class WorkerAvatar(base.ManagerAvatar):
     attached = defer_generator_method(attached)
 
     def detached(self, mind):
+        # doc in base class
         self.info('worker "%s" logged out' % self.getName())
         base.ManagerAvatar.detached(self, mind)
         self.heaven.workerDetached(self)
         self.vishnu.workerDetached(self)
     
     def reservePorts(self, numPorts):
+        """
+        Reserve the given number of ports on the worker.
+
+        @param numPorts: how many ports to reserve
+        @type  numPorts: int
+        """
         return self.portset.reservePorts(numPorts)
 
     def releasePorts(self, ports):
+        """
+        Release the given list of ports on the worker.
+    
+        @param ports: list of ports to release
+        @type  ports: list of int
+        """
         self.portset.releasePorts(ports)
 
     def createComponent(self, avatarId, type, config):
@@ -79,9 +93,9 @@ class WorkerAvatar(base.ManagerAvatar):
         Create a component of the given type with the given config.
 
         @param avatarId: avatarId the component should use to log in
-        @type  avatarId: string
+        @type  avatarId: str
         @param type:     type of the component to create
-        @type  type:     string
+        @type  type:     str
         @param config:   a configuration dictionary for the component
         @type  config:   dict
 

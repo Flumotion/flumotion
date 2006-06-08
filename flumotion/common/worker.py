@@ -135,6 +135,10 @@ class PortSet(log.Loggable):
         return ret
 
     def releasePorts(self, ports):
+        """
+        @param ports: list of ports to release
+        @type  ports: list of int
+        """
         for p in ports:
             try:
                 i = self.ports.index(p)

@@ -25,8 +25,6 @@ manager-side objects for components
 API Stability: semi-stable
 """
 
-__all__ = ['ComponentAvatar', 'ComponentHeaven']
-
 import time
 
 from twisted.spread import pb
@@ -53,8 +51,8 @@ class Feeder:
     """
     def __init__(self, feederName):
         """
-        @type  feederName: string
         @param feederName: the name of the feeder
+        @type  feederName: str
         """
         # we really do want a full feederName because that's how it's called
         # in the code
@@ -77,10 +75,11 @@ class Feeder:
         feeder in another component.  The function will be called when the
         other feeder is ready.
 
-        @type  feederName: string
-        @param feederName: the name of the feeder (componentName:feedName).
-        @param func: a function to run when the feeder is ready
-        @param args: arguments to the function
+        @param feederName: the name of the feeder (componentName:feedName)
+        @type  feederName: str
+        @param func:       a function to run when the feeder is ready
+        @type  func:       callable
+        @param args:       arguments to the function
         """
 
         if not self._dependencies.has_key(feederName):
@@ -92,8 +91,8 @@ class Feeder:
         """
         Give the feeder the component avatar that contains the feeder.
         
-        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         @param componentAvatar: avatar for the component containing this feeder
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         """
         assert not self.component
         self.component = componentAvatar
@@ -101,9 +100,9 @@ class Feeder:
 
     def setReadiness(self, readiness):
         """
-        @param readiness: bool
+        Set the feeder's readiness, triggering dependency functions.
 
-        Set the feeder to ready, triggering dependency functions.
+        @param readiness: bool
         """
         if self._ready == readiness:
             msg = 'readiness already is %r !' % readiness
@@ -124,12 +123,21 @@ class Feeder:
         self._dependencies = {}
 
     def isReady(self):
+        """
+        @rtype: bool
+        """
         return self._ready
 
     def hasComponentAvatar(self):
+        """
+        @rtype: bool
+        """
         return self.component != None
     
     def getFeedName(self):
+        """
+        @rtype: str
+        """
         return self.feedName
 
     def getName(self):
@@ -156,12 +164,12 @@ class FeederSet(log.Loggable):
 
     logCategory = 'feederset'
 
-    def __init__(self, flow):
+    def __init__(self, flowName):
         """
-        @type  flow: string
+        @type  flowName: str
         """
-        self.flow = flow
-        self.logName = flow
+        self.flow = flowName
+        self.logName = flowName
         self.feeders = {} # feederName -> Feeder
 
     def __getitem__(self, key):
@@ -232,8 +240,8 @@ class FeederSet(log.Loggable):
         Register a function and arguments to call when the feeder's readiness
         changes.
 
-        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         @param componentAvatar: the component to make dependant
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         @param feederName:      the name of the feeder to depend upon
         @param func:            function to run when feeder changes readiness.
                                 function takes (readiness, ComponentAvatar)
@@ -257,6 +265,11 @@ class ComponentAvatar(base.ManagerAvatar):
     Manager-side avatar for a component.
     Each component that logs in to the manager gets an avatar created for it
     in the manager.
+
+    @cvar jobState:       job state of this avatar's component
+    @type jobState:       L{flumotion.common.planet.ManagerJobState}
+    @cvar componentState: component state of this avatar's component
+    @type componentState: L{flumotion.common.planet.ManagerComponentState}
     """
 
     logCategory = 'comp-avatar'
@@ -265,15 +278,16 @@ class ComponentAvatar(base.ManagerAvatar):
     _heartbeatCheckInterval = configure.heartbeatInterval * 2.5
 
     def __init__(self, *args, **kwargs):
+        # doc in base class
         base.ManagerAvatar.__init__(self, *args, **kwargs)
         
-        self.ports = {} # feedName -> port
-        self.started = False
-        self.starting = False
-        self.jobState = None # retrieved after mind attached
         self.componentState = None # set by the vishnu by componentAttached
+        self.jobState = None # retrieved after mind attached
 
-        self.lastHeartbeat = 0.0 # last time.time() of heartbeat
+        self._ports = {} # feedName -> port
+        self._starting = False
+
+        self._lastHeartbeat = 0.0 # last time.time() of heartbeat
         self._HeartbeatCheckDC = None # started when we have the state
         
     # make sure we don't have stray pendingTimedCalls
@@ -298,11 +312,11 @@ class ComponentAvatar(base.ManagerAvatar):
             self._HeartbeatCheckDC.cancel()
         self._HeartbeatCheckDC = None
 
-        if self.ports:
+        if self._ports:
             self.vishnu.releasePortsOnWorker(self.getWorkerName(),
-                                             self.ports.values())
+                                             self._ports.values())
             
-        self.ports = {}
+        self._ports = {}
 
         self.jobState = None
         # if we're sad, we need an explicit cleanup to acknowledge the problem
@@ -315,8 +329,8 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         #self.log('checking heartbeat')
         # FIXME: only notify of LOST mood once !
-        if self.lastHeartbeat > 0 \
-            and time.time() - self.lastHeartbeat \
+        if self._lastHeartbeat > 0 \
+            and time.time() - self._lastHeartbeat \
                 > self._heartbeatCheckInterval \
             and self._getMoodValue() != moods.lost.value:
                 self.warning('heartbeat missing, component is lost')
@@ -368,6 +382,7 @@ class ComponentAvatar(base.ManagerAvatar):
         return failure
 
     def attached(self, mind):
+        # doc in base class
         self.info('component "%s" logged in' % self.avatarId)
         base.ManagerAvatar.attached(self, mind) # sets self.mind
         
@@ -407,6 +422,7 @@ class ComponentAvatar(base.ManagerAvatar):
             self._heartbeatCheck)
 
     def detached(self, mind):
+        # doc in base class
         self.vishnu.unregisterComponent(self)
         self.heaven.unregisterComponent(self)
 
@@ -441,7 +457,8 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Get a list of feeder names feeding this component.
 
-        Returns: a list of eater names, or the empty list.
+        @return: a list of eater names, or the empty list
+        @rtype:  list of str
         """
         if not self.jobState.hasKey('eaterNames'):
             return []
@@ -453,7 +470,8 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Get a list of feeder names (componentName:feedName) in this component.
 
-        Returns: a list of feeder names, or the empty list.
+        @return: a list of feeder names, or the empty list
+        @rtype:  list of str
         """
         # non-feed components don't have these keys
         if not self.jobState.hasKey('feederNames'):
@@ -465,31 +483,57 @@ class ComponentAvatar(base.ManagerAvatar):
     def getFeedPort(self, feedName):
         """
         Returns the port this feed is being fed on.
+
+        @rtype: int
         """
-        return self.ports[self.getName() + ':' + feedName]
+        return self._ports[self.getName() + ':' + feedName]
  
     def getRemoteManagerIP(self):
         """
         Get the IP address of the manager as seen by the component.
+
+        @rtype: str
         """
         return self.jobState.get('ip')
 
     def getWorkerName(self):
         """
         Return the name of the worker.
+
+        @rtype: str
         """
         return self.jobState.get('workerName')
 
     def getPid(self):
+        """
+        Return the PID of the component.
+
+        @rtype: int
+        """
         return self.jobState.get('pid')
 
     def getName(self):
+        """
+        Get the name of the component.
+
+        @rtype: str
+        """
         return self.componentState.get('name')
 
     def getParentName(self):
+        """
+        Get the name of the component's parent.
+
+        @rtype: str
+        """
         return self.componentState.get('parent').get('name')
 
     def getType(self):
+        """
+        Get the component type name of the component.
+
+        @rtype: str
+        """
         return self.componentState.get('type')
 
     def stop(self):
@@ -504,6 +548,10 @@ class ComponentAvatar(base.ManagerAvatar):
     def setup(self, config):
         """
         Set up the component with the given config.
+        Proxies to
+        L{flumotion.component.component.BaseComponentMedium.remote_setup}
+
+        @type  config: dict
         """
         def _setupErrback(failure, self):
             self._setMood(moods.sad)
@@ -521,17 +569,19 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Tell the component to start, possibly linking to other components.
 
-        @type eatersData:  tuple of (feedername, host, port) tuples
-                           of elements feeding our eaters
-        @type feedersData: tuple of (name, host) tuples of our feeding elements
+        @param eatersData:  tuple of (feedername, host, port) tuples
+                            of elements feeding our eaters
+        @type  eatersData:  tuple of (str, str, int) tuples
+        @param feedersData: tuple of (name, host) tuples of our feeding elements
+        @type  feedersData: tuple of (str, str) tuples
         """
         self.debug('ComponentAvatar.start(eatersData=%r, feedersData=%r)' % (
             eatersData, feedersData))
         for feedname, host, port in feedersData:
-            if feedname in self.ports:
+            if feedname in self._ports:
                 self.warning('feed %s already has port %d; trying to '
-                             'start anyway' % (feedname, self.ports[feedname]))
-            self.ports[feedname] = port
+                             'start anyway' % (feedname, self._ports[feedname]))
+            self._ports[feedname] = port
 
         config = self.componentState.get('config')
         master = config['clock-master'] # avatarId of the clock master comp
@@ -587,12 +637,12 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Set a property on an element.
 
-        @type element: string
-        @param element: the element to set the property on
-        @type property: string
+        @param element:  the element to set the property on
+        @type  element:  str
         @param property: the property to set
-        @type value: mixed
-        @param value: the value to set the property to
+        @type  property: str
+        @param value:    the value to set the property to
+        @type  value:    mixed
         """
         if not element:
             msg = "%s: no element specified" % self.avatarId
@@ -617,10 +667,10 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Get a property of an element.
 
-        @type element: string
-        @param element: the element to get the property of
-        @type property: string
+        @param element:  the element to get the property of
+        @type  element:  str
         @param property: the property to get
+        @type  property: str
         """
         if not element:
             msg = "%s: no element specified" % self.avatarId
@@ -663,6 +713,15 @@ class ComponentAvatar(base.ManagerAvatar):
 
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
     def authenticate(self, keycard):
+        """
+        Authenticate the given keycard.
+        Gets proxied to L{flumotion.component.bouncers.bouncer.""" \
+        """BouncerMedium.remote_authenticate}
+        The component should be a subclass of
+        L{flumotion.component.bouncers.bouncer.Bouncer}
+
+        @type  keycard: L{flumotion.common.keycards.Keycard}
+        """
         d = self.mindCallRemote('authenticate', keycard)
         d.addErrback(self._mindErrback)
         return d
@@ -671,6 +730,8 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Remove a keycard managed by this bouncer because the requester
         has gone.
+
+        @type  keycardId: str
         """
         self.debug('remotecalling removeKeycardId with id %s' % keycardId)
         d = self.mindCallRemote('removeKeycardId', keycardId)
@@ -681,6 +742,8 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Expire a keycard issued to this component because the bouncer decided
         to.
+
+        @type  keycardId: str
         """
         self.debug('remotecalling expireKeycard with id %s' % keycardId)
         d = self.mindCallRemote('expireKeycard', keycardId)
@@ -695,17 +758,23 @@ class ComponentAvatar(base.ManagerAvatar):
         feeder, starting them if all of their dependencies are ready.
 
         @param feedName: name of the feeder, e.g. "default".
-        @type  feedName: string
-        @param isReady: True if the feed is now ready, False otherwise.
-        @type  isReady: bool
+        @type  feedName: str
+        @param isReady:  True if the feed is now ready, False otherwise.
+        @type  isReady:  bool
         """
         assert isinstance(feedName, str)
         self.heaven.setFeederReadiness(self, feedName, isReady)
             
     def perspective_heartbeat(self, moodValue):
-        self.lastHeartbeat = time.time()
+        """
+        Called by the component to tell the manager that this component is
+        still alive and kicking.
+
+        @type  moodValue: int
+        """
+        self._lastHeartbeat = time.time()
         #log.log(self.avatarId,
-        #    "got heartbeat at %d" % int(self.lastHeartbeat))
+        #    "got heartbeat at %d" % int(self._lastHeartbeat))
         self._setMoodValue(moodValue)
 
     def perspective_error(self, element, error):
@@ -713,6 +782,13 @@ class ComponentAvatar(base.ManagerAvatar):
         self.heaven.removeComponent(self)
 
     def perspective_adminCallRemote(self, methodName, *args, **kwargs):
+        """
+        Call the given method on all connected admin clients.
+
+        @see: L{flumotion.manager.admin.AdminHeaven.avatarsCallRemote}
+
+        @type  methodName: str
+        """
         # proxies admin remote call from component's medium to admin heaven
         mapper = self.vishnu.getComponentMapper(self)
         componentState = mapper.state
@@ -740,7 +816,7 @@ class ComponentAvatar(base.ManagerAvatar):
         Authenticate the given keycard using the given bouncer.
         The bouncer needs to be part of the atmosphere.
 
-        @type  bouncerName: string
+        @type  bouncerName: str
         @param keycard:     keycard to authenticate
         """
         self.debug('asked to authenticate keycard %r using bouncer %s' % (
@@ -759,8 +835,9 @@ class ComponentAvatar(base.ManagerAvatar):
 
         This is requested by a component that created the keycard.
 
-        @type  bouncerName: string
+        @type  bouncerName: str
         @param keycardId:   id of keycard to remove
+        @type  keycardId:   str
         """
         self.debug('asked to remove keycard %s on bouncer %s' % (
             keycardId, bouncerName))
@@ -778,6 +855,13 @@ class ComponentAvatar(base.ManagerAvatar):
         issued to the given requester.
 
         This is called by the bouncer component that authenticated the keycard.
+
+        
+        @param requesterName: name (avatarId) of the component that originally
+                              requested authentication for the given keycardId
+        @type  requesterName: str
+        @param keycardId:     id of keycard to expire
+        @type  keycardId:     str
         """
         # FIXME: we should also be able to expire manager bouncer keycards
         if not self.heaven.hasAvatar(requesterName):
@@ -789,14 +873,18 @@ class ComponentAvatar(base.ManagerAvatar):
         componentAvatar = self.heaven.getAvatar(requesterName)
         return componentAvatar.expireKeycard(keycardId)
 
-    def perspective_reservePortsOnWorker(self, workerName, number_of_ports):
+    def perspective_reservePortsOnWorker(self, workerName, numberOfPorts):
         """
-        Request a number of ports on a particular worker.
+        Request reservation a number of ports on a particular worker.
+        This can be called from a job if it needs some ports itself.
 
-        This can be called from a job if it needs some ports itself
+        @param workerName:    name of the worker to reserve ports on
+        @type  workerName:    str
+        @param numberOfPorts: the number of ports to reserve
+        @type  numberOfPorts: int
         """
         ports = self.heaven.vishnu.reservePortsOnWorker(workerName, 
-            number_of_ports)
+            numberOfPorts)
         return ports
 
 class ComponentHeaven(base.ManagerHeaven):
@@ -810,10 +898,7 @@ class ComponentHeaven(base.ManagerHeaven):
     logCategory = 'comp-heaven'
     
     def __init__(self, vishnu):
-        """
-        @type vishnu:  L{flumotion.manager.manager.Vishnu}
-        @param vishnu: the Vishnu object this heaven belongs to
-        """
+        # doc in base class
         base.ManagerHeaven.__init__(self, vishnu)
         self._feederSets = {}
 
@@ -847,8 +932,8 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         Remove a component avatar from the heaven.
 
+        @param componentAvatar: the component to remove
         @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
-        @param componentAvatar: the component
         """
         self.removeAvatar(componentAvatar.avatarId)
         
@@ -857,11 +942,11 @@ class ComponentHeaven(base.ManagerHeaven):
         Retrieve the information about the feeders this component's eaters
         are eating from.
 
-        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         @param componentAvatar: the component
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
 
-        @rtype:           tuple with 3 items
-        @returns:         tuple of feeder name, host name and port, or None
+        @returns: tuple of feeder name, host name and port, or None
+        @rtype:   tuple of (str, str, int)
         """
 
         eaterFeederNames = componentAvatar.getEaters()
@@ -892,11 +977,11 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         Retrieves the data of feeders (feed producer elements) for a component.
 
-        @type  component: L{flumotion.manager.component.ComponentAvatar}
         @param component: the component
+        @type  component: L{flumotion.manager.component.ComponentAvatar}
 
-        @rtype:   tuple of doubles
         @returns: tuple of (name, host, port) for each feeder
+        @rtype:   tuple of (str, str, int) tuple
         """
 
         # get what we think is the IP address where the component is running
@@ -934,6 +1019,9 @@ class ComponentHeaven(base.ManagerHeaven):
         Check if the component can start up, and start it if it can.
         This depends on whether the components and feeders it depends on have
         started.
+
+        @param componentAvatar: the component to check
+        @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         """
         componentAvatar.debug('checkComponentStart')
         
@@ -944,10 +1032,10 @@ class ComponentHeaven(base.ManagerHeaven):
                 return
 
         # FIXME: change this to mood
-        if componentAvatar.starting:
+        if componentAvatar._starting:
             return
         
-        componentAvatar.starting = True
+        componentAvatar._starting = True
         self._startComponent(componentAvatar)
         
     def registerComponent(self, componentAvatar):
@@ -955,7 +1043,10 @@ class ComponentHeaven(base.ManagerHeaven):
         This function registers a component in the heaven.
         It is triggered when the mind is attached.
 
+        @param componentAvatar: the component to register
         @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
+
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         self.debug('heaven registering component %r' % componentAvatar)
 
@@ -1038,6 +1129,7 @@ class ComponentHeaven(base.ManagerHeaven):
         This function unregisters a component in the heaven.
         It is triggered when the mind is detached.
 
+        @param componentAvatar: the component to unregister
         @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
         """
         componentAvatar.debug('unregistering component')
@@ -1059,10 +1151,11 @@ class ComponentHeaven(base.ManagerHeaven):
         Tell the feeder set that the given feed on the given component is
         ready.
         
-        @type  componentAvatar: string
         @param componentAvatar: the component containing the feed
-        @type  feedName:        string
+        @type  componentAvatar: str
         @param feedName:        the feed set to ready
+        @type  feedName:        str
+        @param readiness:       whether this feed has become ready or not
         @type  readiness:       boolean
         """
 
@@ -1158,8 +1251,11 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         Get the master clock information from the given clock master component.
 
-        @param avatarId: the id of the clock master.
-        @param waiterId: the id of the requesting component.
+        @param avatarId: the id of the clock master
+        @type  avatarId: str
+        @param waiterId: the id of the requesting component
+        @type  waiterId: str
+
         @returns: a deferred firing an (ip, port, base_time) triple.
         @rtype:   L{twisted.internet.defer.Deferred}
         """
@@ -1176,3 +1272,4 @@ class ComponentHeaven(base.ManagerHeaven):
         ret = defer.Deferred()
         self._clockMasterWaiters[avatarId].append((ret, waiterId))
         return ret
+

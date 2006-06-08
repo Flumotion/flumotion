@@ -66,7 +66,7 @@ class AdminAvatar(base.ManagerAvatar):
         The list gets serialized to a list of
         L{flumotion.common.planet.AdminComponentState}
         
-        @rtype: C{list} of L{flumotion.common.planet.ManagerComponentState}
+        @rtype: list of L{planet.ManagerComponentState}
         """
         return self.vishnu.getComponentStates()
 
@@ -99,14 +99,29 @@ class AdminAvatar(base.ManagerAvatar):
 
     ### pb.Avatar IPerspective methods
     def perspective_getPlanetState(self):
+        """
+        Get the planet state.
+
+        @rtype: L{flumotion.common.planet.ManagerPlanetState}
+        """
         self.debug("returning planet state %r" % self.vishnu.state)
         return self.vishnu.state
 
     def perspective_getWorkerHeavenState(self):
+        """
+        Get the worker heaven state.
+
+        @rtype: L{flumotion.common.worker.ManagerWorkerHeavenState}
+        """
         self.debug("returning worker heaven state %r" % self.vishnu.state)
         return self.vishnu.workerHeaven.state
 
     def perspective_shutdown(self):
+        """
+        Shut down the manager.
+
+        @raise SystemExit: always
+        """
         print 'SHUTTING DOWN'
         reactor.stop()
         raise SystemExit
@@ -115,6 +130,8 @@ class AdminAvatar(base.ManagerAvatar):
         """
         Start the given component.  The component should be sleeping before
         this.
+
+        @type componentState: L{planet.ManagerComponentState}
         """
         self.debug('perspective_componentStart(%r)' % componentState)
         return self.vishnu.componentCreate(componentState)
@@ -124,6 +141,8 @@ class AdminAvatar(base.ManagerAvatar):
         Stop the given component.
         If the component was sad, we clear its sad state as well,
         since the stop was explicitly requested by the admin.
+
+        @type componentState: L{planet.ManagerComponentState}
         """
         self.debug('perspective_componentStop(%r)' % componentState)
         d = self.perspective_componentCallRemote(componentState, 'stop')
@@ -139,6 +158,8 @@ class AdminAvatar(base.ManagerAvatar):
     def perspective_componentRestart(self, componentState):
         """
         Restart the given component.
+
+        @type componentState: L{planet.ManagerComponentState}
         """
         self.debug('perspective_componentRestart(%r)' % componentState)
         d = self.perspective_componentStop(componentState)
@@ -151,7 +172,12 @@ class AdminAvatar(base.ManagerAvatar):
         """
         Call a method on the given component on behalf of an admin client.
         
-        @type componentState: L{flumotion.common.planet.ManagerComponentState}
+        @param componentState: state of the component to call the method on
+        @type  componentState: L{planet.ManagerComponentState}
+        @param methodName:     name of the method to call.  Gets proxied to
+                               L{flumotion.component.component.""" \
+                               """BaseComponentMedium}'s remote_(methodName)
+        @type  methodName:     str
         """
         assert isinstance(componentState, planet.ManagerComponentState)
 
@@ -190,10 +216,12 @@ class AdminAvatar(base.ManagerAvatar):
         This is used so that admin clients can call methods from the interface
         to the worker.
 
-        @type  workerName: string
-        @param workerName: the worker to call.
-        @type  methodName: string
-        @param methodName: the method to call on the worker.
+        @param workerName: the worker to call
+        @type  workerName: str
+        @param methodName: Name of the method to call.  Gets proxied to
+                           L{flumotion.worker.worker.WorkerMedium}'s
+                           remote_(methodName)
+        @type  methodName: str
         """
         
         self.debug('AdminAvatar.workerCallRemote(%r, %r)' % (
@@ -212,7 +240,7 @@ class AdminAvatar(base.ManagerAvatar):
         """
         Get the entry point for a piece of bundled code by the type.
 
-        Returns: a (filename, methodName) tuple, or raises a Failure.
+        Returns: a (filename, methodName) tuple, or raises a Failure
         """
         m = self.vishnu.getComponentMapper(componentState)
         componentName = componentState.get('name')
@@ -242,7 +270,12 @@ class AdminAvatar(base.ManagerAvatar):
         return (filename, entry.function)
 
     def perspective_reloadComponent(self, componentState):
-        """Reload modules in the given component."""
+        """
+        Reload modules in the given component.
+
+        @param componentState: state of the component to reload
+        @type  componentState: L{planet.ManagerComponentState}
+        """
         def _reloaded(result, self, name):
             self.info("reloaded component %s code" % name)
 
@@ -255,7 +288,9 @@ class AdminAvatar(base.ManagerAvatar):
         return d
 
     def perspective_reloadManager(self):
-        """Reload modules in the manager."""
+        """
+        Reload modules in the manager.
+        """
         import sys
         from twisted.python.rebuild import rebuild
         self.info('reloading manager code')
@@ -272,13 +307,14 @@ class AdminAvatar(base.ManagerAvatar):
         """
         Get the configuration of the manager as an XML string.
 
-        @returns: string
+        @rtype: str
         """
         return self.vishnu.getConfiguration()
 
     def perspective_loadConfiguration(self, xml):
         """
-        @type  xml: string
+        Load the given XML configuration into the manager.
+        @type  xml: str
         """
         self.info('loadConfiguration ...')
         self.vishnu.loadConfiguration(None, xml)
@@ -318,25 +354,22 @@ class AdminHeaven(base.ManagerHeaven):
     avatarClass = AdminAvatar
 
     def __init__(self, vishnu):
-        """
-        @type vishnu: L{flumotion.manager.manager.Vishnu}
-        @param vishnu: the Vishnu in control of all the heavens
-        """
+        # doc in base class
         base.ManagerHeaven.__init__(self, vishnu)
         #FIXME: don't add a log handler here until we have a good way
         #of filtering client-side again
         #log.addLogHandler(self.logHandler)
-        self.logcache = []
+        self._logcache = []
 
-    def logHandler(self, category, type, message):
-        self.logcache.append((category, type, message))
-        for avatar in self.getAvatars():
-            avatar.sendLog(category, type, message)
+    #def logHandler(self, category, type, message):
+    #    self.logcache.append((category, type, message))
+    #    for avatar in self.getAvatars():
+    #        avatar.sendLog(category, type, message)
 
-    def sendCache(self, avatar):
-        if not avatar.hasRemoteReference():
-            reactor.callLater(0.25, self.sendCache, avatar)
-            return
+    #def sendCache(self, avatar):
+    #    if not avatar.hasRemoteReference():
+    #        reactor.callLater(0.25, self.sendCache, avatar)
+    #        return
         
         # FIXME: do this on request only
         #self.debug('sending logcache to client (%d messages)' % len(self.logcache))
@@ -349,8 +382,10 @@ class AdminHeaven(base.ManagerHeaven):
         """
         Call a remote method on all AdminAvatars in this heaven.
 
-        @type methodName: string
+        @param methodName: Name of the method to call.  Gets proxied to
+                           L{flumotion.admin.admin.AdminModel}'s
+                           remote_(methodName)
+        @type  methodName: str
         """
         for avatar in self.getAvatars():
             avatar.mindCallRemote(methodName, *args, **kwargs)
-  

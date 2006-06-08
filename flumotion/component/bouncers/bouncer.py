@@ -39,6 +39,11 @@ class BouncerMedium(component.BaseComponentMedium):
 
     logCategory = 'bouncermedium'
     def remote_authenticate(self, keycard):
+        """
+        Authenticates the given keycard.
+
+        @type  keycard: L{flumotion.common.keycards.Keycard}
+        """
         return self.comp.authenticate(keycard)
 
     def remote_removeKeycardId(self, keycardId):
