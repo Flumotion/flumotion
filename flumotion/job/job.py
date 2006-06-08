@@ -41,6 +41,7 @@ from flumotion.common import medium, package
 from flumotion.common.reflectcall import createComponent
 from flumotion.component import component
 from flumotion.twisted.defer import defer_generator_method
+from flumotion.twisted.compat import implements
 
 class JobMedium(medium.BaseMedium):
     """
@@ -49,7 +50,7 @@ class JobMedium(medium.BaseMedium):
     """
     logCategory = 'jobmedium'
 
-    __implements__ = interfaces.IJobMedium,
+    implements(interfaces.IJobMedium)
 
     def __init__(self):
         self.avatarId = None

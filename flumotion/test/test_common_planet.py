@@ -26,6 +26,7 @@ from twisted.internet import reactor
 import common as mcommon
 
 from flumotion.twisted import flavors
+from flumotion.twisted.compat import implements
 from flumotion.common import planet
 
 from flumotion.common.planet import moods
@@ -73,7 +74,7 @@ class AllComponentStateTest(unittest.TestCase):
 # new one, instead of updating the old one.  Find a way to make the old
 # serialized object update first
 class ListenerTest(unittest.TestCase):
-    __implements__ = flavors.IStateListener
+    implements(flavors.IStateListener)
 
     def setUp(self):
         self.mstate = planet.ManagerComponentState()

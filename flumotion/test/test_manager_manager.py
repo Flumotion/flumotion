@@ -35,11 +35,12 @@ from flumotion.manager import component, manager
 from flumotion.common import log, planet, interfaces, common
 from flumotion.common import setup
 from flumotion.twisted import flavors
+from flumotion.twisted.compat import implements
 
 class MyListener(log.Loggable):
     # a helper object that you can get deferreds from that fire when
     # a certain state has a certain key set to a certain value
-    __implements__ = flavors.IStateListener
+    implements(flavors.IStateListener)
 
     def __init__(self):
         self._setters = {} # (state, key, value) tuple -> list of deferred

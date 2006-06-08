@@ -29,7 +29,7 @@ from twisted.trial import unittest
 from twisted.internet import reactor, defer
 from twisted.spread import pb
 from flumotion.twisted import flavors
-
+from flumotion.twisted.compat import implements
 #T1.3
 def weHaveAnOldTwisted():
     return twisted.copyright.version < '2.0.0'
@@ -44,7 +44,7 @@ pb.setUnjellyableForClass(TestStateCacheable, TestStateRemoteCache)
 class FakeObject: pass
 class FakeListener:
     # listener interface
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
     
     def stateSet(self, state, key, value): pass
     def stateAppend(self, state, key, value): pass
@@ -184,7 +184,7 @@ class TestStateSet(unittest.TestCase):
             return d
 
     # listener interface
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
     
     def stateSet(self, state, key, value):
         self.changes.append(('set', state, key, value))
@@ -294,7 +294,7 @@ class TestFullListener(unittest.TestCase):
         return d
 
     # actual tests
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
     
     def customStateSet(self, state, key, value):
         self.changes.append(('set', state, key, value))

@@ -27,6 +27,7 @@ from twisted.cred import credentials as tcredentials
 from twisted.spread import pb
 
 from flumotion.twisted import credentials
+from flumotion.twisted.compat import implements
 from flumotion.common import common
 
 # state enum values
@@ -40,7 +41,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
     I am the base class for keycards which together with credentials are
     a serializable object used in authentication inside Flumotion.
     """
-    __implements__ = common.mergeImplements(pb.Copyable, pb.RemoteCopy) + (tcredentials.ICredentials, )
+    implements(common.mergeImplements(pb.Copyable, pb.RemoteCopy) + (tcredentials.ICredentials, ))
 
     def __init__(self):
         self.bouncerName = None         # set by requester,decides which bouncer
@@ -86,7 +87,7 @@ class KeycardUACPP(Keycard, UCPP):
     I am a keycard with a username, plaintext password and IP address.
     I get authenticated against a crypt password.
     """
-    __implements__ = common.mergeImplements(Keycard, UCPP)
+    implements(common.mergeImplements(Keycard, UCPP))
     def __init__(self, username, password, address):
         UCPP.__init__(self, username, password)
         Keycard.__init__(self)
@@ -109,7 +110,7 @@ class KeycardUACPCC(Keycard, UCPCC):
     I am a keycard with a username and IP address.
     I get authenticated through challenge/response on a crypt password.
     """
-    __implements__ = common.mergeImplements(Keycard, UCPCC)
+    implements(common.mergeImplements(Keycard, UCPCC))
     def __init__(self, username, address):
         UCPCC.__init__(self, username)
         Keycard.__init__(self)
@@ -128,7 +129,7 @@ class KeycardToken(Keycard, credentials.Token):
     I am a keycard with a token and IP address.
     I get authenticated by token and maybe IP address.
     """
-    __implements__ = common.mergeImplements(Keycard,credentials.Token)
+    implements(common.mergeImplements(Keycard,credentials.Token))
 
     def __init__(self, token, address):
         credentials.Token.__init__(self, token)

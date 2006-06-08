@@ -24,6 +24,7 @@ Flumotion Twisted compatibility assistance
 """
 
 import warnings
+from twisted.copyright import version
 
 def filterWarnings(namespace, category):
     """
@@ -37,7 +38,6 @@ def filterWarnings(namespace, category):
     warnings.filterwarnings('ignore', category=c)
 
 def install_reactor(gtk=False):
-    from twisted.copyright import version
     if version[0] >= '2':
         from twisted.internet import gtk2reactor as Reactor
     else:
@@ -62,3 +62,37 @@ def install_reactor(gtk=False):
         from twisted.names import client
         # avoid spawning threads -- the normal resolver spawns threads
         reactor.installResolver(client.createResolver())
+
+def implementsInterface(object, interface):
+    if version[0] < '2':
+        from twisted.python import components
+        return components.implements(object, interface)
+    else:
+        return interface.providedBy(object)
+
+if version[0] < '2':
+    from twisted.python.components import Interface as OurLovelyInterface
+    import sys
+    
+    Interface = OurLovelyInterface
+
+    def implements(*interfaces):
+        frame = sys._getframe(1)
+        locals = frame.f_locals
+
+        # Try to make sure we were called from a class def
+        if (locals is frame.f_globals) or ('__module__' not in locals):
+            raise TypeError("implements can be used only from a class definition.")
+
+        if '__implements__' in locals:
+            raise TypeError("implements can be used only once in a class definition.")
+
+        locals['__implements__'] = interfaces
+
+
+else:
+    from zope.interface import Interface as OurLovelyInterface
+    from zope.interface import implements as OurLovelyImplements
+    
+    Interface = OurLovelyInterface
+    implements = OurLovelyImplements

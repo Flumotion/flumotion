@@ -29,6 +29,7 @@ from twisted.python import failure
 
 from flumotion.common import log
 from flumotion.twisted import credentials
+from flumotion.twisted.compat import implements
 
 # FIXME: give the manager's bouncer's checker to the flexcredchecker,
 # and forward to it
@@ -74,7 +75,7 @@ class CryptChecker(log.Loggable):
     """
     I check credentials using a crypt-based backend.
     """
-    __implements__ = (checkers.ICredentialsChecker, )
+    implements(checkers.ICredentialsChecker)
     credentialInterfaces = (credentials.IUsernameCryptPassword, )
 
     logCategory = 'cryptchecker'

@@ -37,6 +37,7 @@ from flumotion.common import gstreamer, pygobject, messages
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
+from flumotion.twisted.compat import implements
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
@@ -46,7 +47,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     I am a component-side medium for a FeedComponent to interface with
     the manager-side ComponentAvatar.
     """
-    __implements__ = interfaces.IComponentMedium,
+    implements(interfaces.IComponentMedium)
     logCategory = 'basecomponentmedium'
 
     def __init__(self, component):

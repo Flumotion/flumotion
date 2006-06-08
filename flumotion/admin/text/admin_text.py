@@ -23,6 +23,7 @@ import os
 
 from flumotion.common import errors, log
 from flumotion.twisted import flavors
+from flumotion.twisted.compat import implements
 
 class BaseAdminText(log.Loggable):
     """
@@ -30,7 +31,7 @@ class BaseAdminText(log.Loggable):
     I am a view on one component's properties.
     """
 
-    __implements__ = (flavors.IStateListener,)
+    implements(flavors.IStateListener)
 
     logCategory = "admintext"
     

@@ -41,7 +41,7 @@ from flumotion.manager import admin, component, worker, base
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 from flumotion.twisted.defer import defer_generator_method
-
+from flumotion.twisted.compat import implements
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
@@ -73,7 +73,7 @@ class Dispatcher(log.Loggable):
     the Avatar.
     """
     
-    __implements__ = portal.IRealm
+    implements(portal.IRealm)
 
     logCategory = 'dispatcher'
 

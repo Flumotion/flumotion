@@ -23,11 +23,10 @@
 Flumotion interfaces
 """
 
-from twisted.python import components
-
+from flumotion.twisted import compat
 
 # See also flumotion.medium.BaseMedium.
-class IMedium(components.Interface):
+class IMedium(compat.Interface):
     """
     I am a base interface for PB client-side mediums interfacing with
     manager-side avatars.
@@ -86,7 +85,7 @@ class IJobMedium(IMedium):
     """
     pass
 
-class IHeaven(components.Interface):
+class IHeaven(compat.Interface):
     """
     My implementors manage avatars logging in to the manager.
     """

@@ -41,8 +41,8 @@ from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
+from flumotion.twisted.compat import implements
 from flumotion.common.pygobject import gsignal
-
 
 class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     """
@@ -63,7 +63,8 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
 
         self.maxDelay = 10
         # get the interfaces implemented by the component medium class
-        self.interfaces = self.medium.__class__.__implements__
+        #FIXME: interface
+        #self.interfaces = self.medium.__class__.__implements__
 
         self.logName = component.name
         
@@ -125,7 +126,7 @@ class BaseComponentMedium(medium.BaseMedium):
     I have a remote reference to the manager's avatar to call upon.
     """
 
-    __implements__ = interfaces.IComponentMedium,
+    implements(interfaces.IComponentMedium)
     logCategory = 'basecompmedium'
 
     def __init__(self, component):

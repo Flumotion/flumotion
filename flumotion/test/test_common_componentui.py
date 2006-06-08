@@ -28,6 +28,7 @@ from twisted.internet import reactor
 from twisted.spread import pb
 
 from flumotion.twisted import flavors
+from flumotion.twisted.compat import implements
 from flumotion.common import componentui
 
 class FakeObject: pass
@@ -132,7 +133,7 @@ class TestStateSet(unittest.TestCase):
         self.failUnlessEqual(state.get('children'), ['batman', ])
 
     # listener interface
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
     
     def stateSet(self, state, key, value):
         self.changes.append(('set', state, key, value))

@@ -28,6 +28,7 @@ from twisted.internet import defer
 
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import log, interfaces, bundleclient, errors, common
+from flumotion.twisted.compat import implements
 
 class BaseMedium(pb.Referenceable, log.Loggable):
     """
@@ -42,7 +43,7 @@ class BaseMedium(pb.Referenceable, log.Loggable):
 
     # subclasses will need to set this to the specific medium type
     # tho...
-    __implements__ = (interfaces.IMedium, )
+    implements(interfaces.IMedium)
     logCategory = "basemedium"
 
     remote = None

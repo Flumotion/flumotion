@@ -44,6 +44,7 @@ from flumotion.configure import configure
 from flumotion.common import reload
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
+from flumotion.twisted.compat import implements
 
 from flumotion.common.pygobject import gsignal, gproperty
 
@@ -167,7 +168,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
 
     logCategory = 'adminmodel'
 
-    __implements__ = interfaces.IAdminMedium, flavors.IStateListener,
+    implements(interfaces.IAdminMedium, flavors.IStateListener)
 
     # Public instance variables (read-only)
     planet = None

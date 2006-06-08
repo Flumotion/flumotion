@@ -41,6 +41,7 @@ from flumotion.configure import configure
 from flumotion.common import errors, log, worker, planet, common, pygobject
 from flumotion.manager import admin # Register types
 from flumotion.twisted import flavors, reflect
+from flumotion.twisted.compat import implements
 from flumotion.ui import icons, trayicon
 
 from flumotion.common.planet import moods
@@ -52,7 +53,7 @@ class Window(log.Loggable, gobject.GObject):
     Also connects to the manager on the given host and port.
     '''
 
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
     
     logCategory = 'adminview'
     gsignal('connected')

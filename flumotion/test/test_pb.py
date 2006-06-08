@@ -34,6 +34,8 @@ from twisted.cred import portal, error
 
 from flumotion.twisted import checkers, credentials, pb
 from flumotion.twisted import portal as fportal
+from flumotion.twisted.compat import implements
+
 from flumotion.common import keycards, log
 from flumotion.component.bouncers import htpasswdcrypt
 
@@ -73,7 +75,7 @@ class FakeBouncerPortal:
         return self.bouncer.authenticate(keycard)
 
 class FakeAvatar(tpb.Avatar):
-    __implements__ = (tpb.IPerspective, )
+    implements(tpb.IPerspective)
     loggedIn = loggedOut = False
     
     def __init__(self):

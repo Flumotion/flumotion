@@ -29,9 +29,11 @@ import sys
 import gobject
 
 # Twisted Imports
-from twisted.python import log, threadable, runtime, failure, components
+from twisted.python import log, threadable, runtime, failure
 from twisted.internet.interfaces import IReactorFDSet
 
+from flumotion.twisted.compat import implements
+from flumotion.common import common
 # Sibling Imports
 from twisted.internet import main, error, default
 posixbase = default
@@ -65,7 +67,8 @@ class Gtk2Reactor(posixbase.PosixReactorBase):
     """GTK+-2 event loop reactor.
     """
 
-    __implements__ = (posixbase.PosixReactorBase.__implements__, IReactorFDSet)
+    implements(common.mergeImplements(posixbase.PosixReactorBase) +
+        (IReactorFDSet,))
 
     def __init__(self, useGtk=True):
         self.context = gobject.main_context_default()

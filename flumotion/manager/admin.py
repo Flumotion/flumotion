@@ -37,7 +37,7 @@ from flumotion.common import messages
 
 # make ComponentState proxyable
 from flumotion.twisted import flavors
-
+from flumotion.twisted.compat import implements
 from flumotion.common import componentui
 
 # FIXME: rename to Avatar since we are in the admin. namespace ?
@@ -314,7 +314,7 @@ class AdminHeaven(base.ManagerHeaven):
     """
 
     logCategory = "admin-heaven"
-    __implements__ = interfaces.IHeaven
+    implements(interfaces.IHeaven)
     avatarClass = AdminAvatar
 
     def __init__(self, vishnu):

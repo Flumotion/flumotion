@@ -36,6 +36,7 @@ from twisted.internet import defer
 from flumotion.common import errors, log, common
 from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
+from flumotion.twisted.compat import implements
 
 class BaseAdminGtk(log.Loggable):
     """
@@ -46,7 +47,7 @@ class BaseAdminGtk(log.Loggable):
     @ivar nodes: an ordered dict of name -> L{BaseAdminGtkNode}
     """
 
-    __implements__ = (flavors.IStateListener,)
+    implements(flavors.IStateListener)
 
     logCategory = "admingtk"
     gettext_domain = 'flumotion'

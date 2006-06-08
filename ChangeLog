@@ -1,3 +1,52 @@
+2006-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/common/common.py:
+	Make mergeImplements work for new Interface API.
+	* flumotion/component/component.py:
+	Remove evil attribute that is never used and move to new
+	Interface API.
+	* flumotion/test/test_twisted_compat.py:
+	Remove test for deprecated warnings as twisted 2.4.0 has removed
+	the depracations.  Add Interface and implements tests.
+	* flumotion/twisted/compat.py:
+	Add compatibility stuff for Interface, implements and
+	implementsInterface due to changes in twisted.
+	* flumotion/admin/admin.py:
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/gtk/parts.py:
+	* flumotion/admin/text/admin_text.py:
+	* flumotion/admin/text/view.py:
+	* flumotion/admin/text/greeter.py:
+	* flumotion/common/interfaces.py:
+	* flumotion/common/keycards.py:
+	* flumotion/common/medium.py:
+	* flumotion/common/planet.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/component/base/admin_text.py:
+	* flumotion/component/bouncers/admin_gtk.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/job/job.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_common.py:
+	* flumotion/test/test_common_componentui.py:
+	* flumotion/test/test_common_planet.py:
+	* flumotion/test/test_flavors.py:
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_pb.py:
+	* flumotion/twisted/checkers.py:
+	* flumotion/twisted/credentials.py:
+	* flumotion/twisted/flavors.py:
+	* flumotion/twisted/gtk2reactor.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/ui/trayicon.py:
+	* flumotion/wizard/worker.py:
+	* flumotion/worker/worker.py:
+	Use new API for Interface and implements.
+
 2006-05-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/config.py:

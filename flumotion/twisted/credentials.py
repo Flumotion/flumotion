@@ -29,12 +29,13 @@ import random
 
 from flumotion.common import log
 from twisted.cred import credentials
+from flumotion.twisted.compat import implements
 
 class Username:
     """
     I am your average username and password credentials.
     """
-    __implements__ = (credentials.IUsernamePassword, )
+    implements(credentials.IUsernamePassword)
     def __init__(self, username, password=''):
         self.username = username
         self.password = password
@@ -72,7 +73,7 @@ class UsernameCryptPasswordPlaintext:
     I implement IUsernameCryptPassword.
     """
     
-    __implements__ = (IUsernameCryptPassword, )
+    implements(IUsernameCryptPassword)
     def __init__(self, username, password):
         self.username = username
         self.password = password
@@ -93,7 +94,7 @@ class UsernameCryptPasswordCrypt:
     I implement IUsernameCryptPassword.
     """
     
-    __implements__ = (IUsernameCryptPassword, )
+    implements(IUsernameCryptPassword)
     def __init__(self, username, cryptPassword=None):
         self.username = username
         self.cryptPassword = cryptPassword
@@ -147,7 +148,7 @@ class UsernameCryptPasswordCryptChallenger:
     I implement IUsernameCryptPassword.
     """
     
-    __implements__ = (IUsernameCryptPassword, )
+    implements(IUsernameCryptPassword)
 
     def __init__(self, username):
         self.username = username
@@ -187,7 +188,7 @@ class IToken(credentials.ICredentials):
     """
 
 class Token:
-    __implements__ = (IToken,)
+    implements(IToken)
 
     def __init__(self, token):
         self.token = token

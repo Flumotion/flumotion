@@ -39,6 +39,7 @@ from flumotion.common import errors, interfaces, keycards, log, config, planet
 from flumotion.common import messages
 from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
+from flumotion.twisted.compat import implements
 from flumotion.common.planet import moods
 
 from flumotion.common.messages import N_
@@ -259,7 +260,7 @@ class ComponentAvatar(base.ManagerAvatar):
     """
 
     logCategory = 'comp-avatar'
-    __implements__ = flavors.IStateListener
+    implements(flavors.IStateListener)
 
     _heartbeatCheckInterval = configure.heartbeatInterval * 2.5
 
@@ -803,7 +804,7 @@ class ComponentHeaven(base.ManagerHeaven):
     I handle all registered components and provide avatars for them.
     """
 
-    __implements__ = interfaces.IHeaven
+    implements(interfaces.IHeaven)
     avatarClass = ComponentAvatar
 
     logCategory = 'comp-heaven'

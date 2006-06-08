@@ -33,8 +33,10 @@ from twisted.spread import pb
 from flumotion.twisted import compat
 compat.filterWarnings(components, 'ComponentsDeprecationWarning')
 
+from flumotion.twisted.compat import Interface
+
 ### Generice Cacheable/RemoteCache for state objects
-class IStateListener(components.Interface):
+class IStateListener(compat.Interface):
     """
     I am an interface for objects that want to listen to changes on
     cached states.
@@ -224,7 +226,7 @@ class StateRemoteCache(pb.RemoteCache):
         @type listener: object implementing
         L{flumotion.twisted.flavors.IStateListener}
         """
-        if not components.implements(listener, IStateListener):
+        if not compat.implementsInterface(listener, IStateListener):
             raise NotImplementedError(
                 '%r instance does not implement IStateListener' % listener)
 
@@ -261,7 +263,7 @@ class StateRemoteCache(pb.RemoteCache):
         self._listeners[listener] = procs
 
     def removeListener(self, listener):
-        if not components.implements(listener, IStateListener):
+        if not compat.implementsInterface(listener, IStateListener):
             raise NotImplementedError(
                 '%r instance does not implement IStateListener' % listener)
 

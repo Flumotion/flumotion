@@ -27,7 +27,7 @@ from twisted.internet import defer
 
 from flumotion.common import errors, componentui
 from flumotion.twisted import flavors
-
+from flumotion.twisted.compat import implements
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
 (
@@ -37,7 +37,7 @@ from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 ) = range(3)
 
 class KeycardsNode(BaseAdminGtkNode):
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
 
     def render(self):
         self._iters = {} # iter -> data dict mapping

@@ -30,7 +30,7 @@ import gtk
 from flumotion.configure import configure
 from flumotion.common import log, planet
 from flumotion.twisted import flavors
-
+from flumotion.twisted.compat import implements
 from flumotion.common.planet import moods
 
 class FluTrayIcon(log.Loggable):
@@ -40,7 +40,7 @@ class FluTrayIcon(log.Loggable):
     If I cannot create a tray icon, I will still be usable but not do anything.
     """
 
-    __implements__ = flavors.IStateListener, 
+    implements(flavors.IStateListener)
     
     logCategory = 'trayui'
     

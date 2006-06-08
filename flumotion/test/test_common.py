@@ -29,6 +29,7 @@ from twisted.spread import pb
 from twisted.internet import reactor, address
 
 from flumotion.common import common
+from flumotion.twisted.compat import implements,Interface
 
 class TestFormatStorage(unittest.TestCase):
     def testBytes(self):
@@ -108,14 +109,14 @@ class TestFormatTime(unittest.TestCase):
         value = week * 291 + day * 5 + hour * 13 + minute * 5
         assert common.formatTime(value) == "291 weeks 5 days 13:05"
 
-class I1: pass
-class I2: pass
+class I1(Interface): pass
+class I2(Interface): pass
 
 class A:
-    __implements__ = (I1, )
+    implements(I1)
 
 class B:
-    __implements__ = (I2, )
+    implements(I2)
     
 class C: pass
 

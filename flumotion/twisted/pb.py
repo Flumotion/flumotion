@@ -36,7 +36,7 @@ from flumotion.common import keycards
 from flumotion.common import log as flog
 from flumotion.twisted import reflect as freflect
 from flumotion.twisted import credentials as fcredentials
-
+from flumotion.twisted.compat import implements
 # TODO:
 #   merge FMCF back into twisted
 
@@ -235,7 +235,7 @@ class _FPortalRoot:
     Root object, used to login to bouncer.
     """
 
-    __implements__ = flavors.IPBRoot,
+    implements(flavors.IPBRoot)
     
     def __init__(self, bouncerPortal):
         self.bouncerPortal = bouncerPortal

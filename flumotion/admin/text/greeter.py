@@ -24,7 +24,7 @@
 from flumotion.admin import connections
 from flumotion.common import log
 from flumotion.twisted import flavors, reflect
-
+from flumotion.twisted.compat import implements
 from flumotion.admin.text import misc_curses
 from flumotion.admin.text import connection
 
@@ -33,7 +33,7 @@ import gobject
 import curses
 
 class AdminTextGreeter(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
     
     logCategory = 'admintextgreeter'
 

@@ -42,6 +42,7 @@ from flumotion.common import common, medium, messages, worker
 from flumotion.twisted import checkers
 from flumotion.twisted import pb as fpb
 from flumotion.twisted.defer import defer_generator_method
+from flumotion.twisted.compat import implements
 from flumotion.configure import configure
 
 factoryClass = fpb.ReconnectingFPBClientFactory
@@ -119,7 +120,7 @@ class WorkerMedium(medium.BaseMedium):
     
     logCategory = 'workermedium'
 
-    __implements__ = interfaces.IWorkerMedium,
+    implements(interfaces.IWorkerMedium)
     
     def __init__(self, brain, ports):
         self.brain = brain
@@ -630,7 +631,7 @@ class JobDispatcher:
     """
     I am a Realm inside the worker for forked jobs to log in to.
     """
-    __implements__ = portal.IRealm
+    implements(portal.IRealm)
     
     def __init__(self, root):
         """

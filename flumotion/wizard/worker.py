@@ -25,10 +25,10 @@ import gtk
 from flumotion.common import pygobject
 from flumotion.common.pygobject import gsignal
 from flumotion.twisted import flavors
-
+from flumotion.twisted.compat import implements
 
 class WorkerListStore(gtk.ListStore):
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
     gsignal('changed')
 
     def __init__(self, whs):

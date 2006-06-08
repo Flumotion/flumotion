@@ -33,14 +33,14 @@ from flumotion.admin.admin import AdminModel
 from flumotion.common import log, errors, worker, planet, common
 from flumotion.configure import configure
 from flumotion.twisted import flavors, reflect
-
+from flumotion.twisted.compat import implements
 from flumotion.common.planet import moods
 
 from flumotion.admin.text import misc_curses
 
 class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
 
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
     
     logCategory = 'admintextview'
 

@@ -32,6 +32,7 @@ import signal
 
 from twisted.python import reflect, rebuild, components
 from twisted.internet import address
+import twisted.copyright
 
 from flumotion.common import log
 
@@ -134,11 +135,18 @@ def mergeImplements(*classes):
     """
     Merge the __implements__ tuples of the given classes into one tuple.
     """
-    allYourBase = []
-    for clazz in classes:
-        allYourBase += getattr(clazz, '__implements__', ())
-    return tuple(allYourBase)
-
+    if twisted.copyright.version[0] < '2':
+        allYourBase = []
+        for clazz in classes:
+            allYourBase += getattr(clazz, '__implements__', ())
+        return tuple(allYourBase)
+    else:
+        allYourBase = ()
+        for clazz in classes:
+            interfaces = [i for i in clazz.__implemented__]
+            for interface in interfaces:
+                allYourBase += (interface,)
+        return allYourBase
 
 def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
               directory='/'):

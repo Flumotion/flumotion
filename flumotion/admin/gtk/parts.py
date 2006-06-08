@@ -30,7 +30,7 @@ import gtk.glade
 from flumotion.configure import configure
 from flumotion.common import log, planet, pygobject
 from flumotion.twisted import flavors
-
+from flumotion.twisted.compat import implements
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.pygobject import with_construct_properties
@@ -130,7 +130,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
     I present a view on the list of components logged in to the manager.
     """
     
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
 
     logCategory = 'components'
     

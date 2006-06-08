@@ -28,6 +28,7 @@ from twisted.spread import pb
 from twisted.internet import defer
 
 from flumotion.twisted import flavors
+from flumotion.twisted.compat import implements
 from flumotion.common import enum
 
 class ManagerPlanetState(flavors.StateCacheable):
@@ -199,7 +200,7 @@ class ManagerComponentState(flavors.StateCacheable):
       - messages (list)
     """
  
-    __implements__ = flavors.IStateListener,
+    implements(flavors.IStateListener)
     
     def __init__(self):
         flavors.StateCacheable.__init__(self)

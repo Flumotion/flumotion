@@ -111,7 +111,7 @@ class HTPasswdCrypt(bouncer.Bouncer):
     
     def authenticate(self, keycard):
         # FIXME: move checks up in the base class ?
-        if not components.implements(keycard, credentials.IUsernameCryptPassword):
+        if not compat.implementsInterface(keycard, credentials.IUsernameCryptPassword):
             self.warning('keycard %r does not implement IUsernameCryptPassword' % keycard)
         if not self.typeAllowed(keycard):
             self.warning('keycard %r not in type list %r' % (keycard, self.keycardClasses))
