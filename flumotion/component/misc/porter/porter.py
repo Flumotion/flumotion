@@ -27,7 +27,7 @@ from twisted.spread import pb
 from twisted.cred import portal
 
 from flumotion.common import medium, log, messages
-from flumotion.twisted import credentials, defer, fdserver, checkers
+from flumotion.twisted import credentials, fdserver, checkers
 from flumotion.twisted import reflect 
 
 from flumotion.component import component

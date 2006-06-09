@@ -1,3 +1,15 @@
+2006-06-09  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Methods to get load deltas from the streamer (implemnetation
+	  just stubbed out for now)
+
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/feedcomponent08.py:
+	* flumotion/component/misc/porter/porter.py:
+	  Clean up duplicate imports as pointed out by pyflakes
+
 2006-06-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_htpasswdcrypt.py:
