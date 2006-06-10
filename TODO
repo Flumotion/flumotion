@@ -1,3 +1,7 @@
+* EASY          put the type, moduleName, methodName, config set in
+		a dict - or possibly a real object - instead of passing all
+                these around in all functions
+
 * MEDIUM	expand config file format with <section> blocks so the
 		same set of properties can be repeated for, for example,
 		a streamer component

@@ -22,9 +22,7 @@
 import errno
 import optparse
 import os
-import signal
 import sys
-import time
 
 from twisted.internet import reactor
 
@@ -230,7 +228,7 @@ def main(args):
     elif options.transport == "ssl":
         from twisted.internet import ssl
         reactor.connectSSL(options.host, options.port,
-            brain.worker_client_factory,
+            brain.workerClientFactory,
             ssl.ClientContextFactory())
 
     log.info('worker',

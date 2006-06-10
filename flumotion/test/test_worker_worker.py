@@ -40,24 +40,23 @@ class TestKid(unittest.TestCase):
         self.assertEquals(kid.config, {})
         self.assertEquals(len(kid.bundles), 2)
 
-        self.assertEquals(kid.getPid(), 1092)
+        self.assertEquals(kid.pid, 1092)
 
 class TestKindergarten(unittest.TestCase):
     def testInit(self):
-        k = worker.Kindergarten({}, "", {})
-        self.assertEquals(k.options, {})
-        self.assertEquals(k.kids, {})
-        self.assert_(k.program)
+        kg = worker.Kindergarten({}, "", {})
+        self.assertEquals(kg.options, {})
+        self.assertEquals(kg._kids, {})
 
     def testRemoveKidByPid(self):
-        k = worker.Kindergarten({}, "", {})
-        k.kids['/swede/johan'] = worker.Kid(1, "/swede/johan", "http",
+        kg = worker.Kindergarten({}, "", {})
+        kg._kids['/swede/johan'] = worker.Kid(1, "/swede/johan", "http",
             "module", "method", {}, [('foo', 'bar')])
 
-        self.assertEquals(k.removeKidByPid(2), False)
+        self.assertEquals(kg.removeKidByPid(2), False)
 
-        self.assertEquals(k.removeKidByPid(1), True)
-        self.assertEquals(k.kids, {})
+        self.assertEquals(kg.removeKidByPid(1), True)
+        self.assertEquals(kg._kids, {})
 
 class FakeOptions:
     def __init__(self):

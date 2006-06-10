@@ -23,7 +23,6 @@
 worker-side objects to handle worker clients
 """
 
-import errno
 import os
 import signal
 import sys
@@ -55,20 +54,22 @@ class WorkerClientFactory(factoryClass):
         """
         @type brain: L{flumotion.worker.worker.WorkerBrain}
         """
-        self.manager_host = brain.manager_host
-        self.manager_port = brain.manager_port
-        self.medium = brain.medium
+        self._managerHost = brain.managerHost
+        self._managerPort = brain.managerPort
+        self._medium = brain.medium
         # doing this as a class method triggers a doc error
         factoryClass.__init__(self)
         # maximum 10 second delay for workers to attempt to log in again
         self.maxDelay = 10
         
     def startLogin(self, keycard):
-        factoryClass.startLogin(self, keycard, self.medium,
+        factoryClass.startLogin(self, keycard, self._medium,
             interfaces.IWorkerMedium)
         
-    # vmethod implementation
+    ### ReconnectingPBClientFactory methods
     def gotDeferredLogin(self, d):
+        # the deferred from the login is now available
+        # add some of our own to it
         def remoteDisconnected(remoteReference):
             if reactor.killed:
                 self.log('Connection to manager lost due to SIGINT shutdown')
@@ -80,7 +81,7 @@ class WorkerClientFactory(factoryClass):
             self.info("Logged in to manager")
             self.debug("remote reference %r" % reference)
            
-            self.medium.setRemoteReference(reference)
+            self._medium.setRemoteReference(reference)
             reference.notifyOnDisconnect(remoteDisconnected)
 
         def alreadyConnectedErrback(failure):
@@ -94,8 +95,8 @@ class WorkerClientFactory(factoryClass):
             
         def connectionRefusedErrback(failure):
             failure.trap(twisted.internet.error.ConnectionRefusedError)
-            self.error('Connection to %s:%d refused.' % (self.manager_host,
-                                                         self.manager_port))
+            self.error('Connection to %s:%d refused.' % (self._managerHost,
+                                                         self._managerPort))
                                                           
         def loginFailedErrback(failure):
             self.error('Login failed, reason: %s' % str(failure))
@@ -116,6 +117,8 @@ class WorkerClientFactory(factoryClass):
 class WorkerMedium(medium.BaseMedium):
     """
     I am a medium interfacing with the manager-side WorkerAvatar.
+
+    @type brain: L{WorkerBrain}
     """
     
     logCategory = 'workermedium'
@@ -123,8 +126,11 @@ class WorkerMedium(medium.BaseMedium):
     implements(interfaces.IWorkerMedium)
     
     def __init__(self, brain, ports):
+        """
+        @type brain: L{WorkerBrain}
+        """
         self.brain = brain
-        self.ports = ports
+        self._ports = ports
         
     ### pb.Referenceable method for the manager's WorkerAvatar
     def remote_getPorts(self):
@@ -132,9 +138,10 @@ class WorkerMedium(medium.BaseMedium):
         Gets the range of feed ports that this worker was configured to
         use.
 
-        @returns: a list of ports, as integers
+        @rtype:  list of int
+        @return: list of ports
         """
-        return self.ports
+        return self._ports
 
     def remote_create(self, avatarId, type, moduleName, methodName, config):
         """
@@ -142,13 +149,13 @@ class WorkerMedium(medium.BaseMedium):
         Will spawn a new job process to run the component in.
 
         @param avatarId:   avatar identification string
-        @type  avatarId:   string
+        @type  avatarId:   str
         @param type:       type of the component to create
-        @type  type:       string
+        @type  type:       str
         @param moduleName: name of the module to create the component from
-        @type  moduleName: string
+        @type  moduleName: str
         @param methodName: the factory method to use to create the component
-        @type  methodName: string
+        @type  methodName: str
         @param config:     a configuration dictionary for the component
         @type  config:     dict
 
@@ -159,7 +166,8 @@ class WorkerMedium(medium.BaseMedium):
         # from flumotion.common import debug
         # def write(indent, str, *args):
         #     print ('[%d]%s%s' % (os.getpid(), indent, str)) % args
-        # debug.trace_start(ignore_files_re='twisted/python/rebuild', write=write)
+        # debug.trace_start(ignore_files_re='twisted/python/rebuild',
+        #      write=write)
 
         self.info('Starting component "%s" of type "%s"' % (avatarId, type))
         self.debug('remote_create(): id %s, type %s, config %r' % (
@@ -205,9 +213,9 @@ class WorkerMedium(medium.BaseMedium):
         instantiated.
 
         @param elementNames:   names of the Gstreamer elements
-        @type  elementNames:   list of strings
+        @type  elementNames:   list of str
 
-        @rtype:   list of strings
+        @rtype:   list of str
         @returns: a list of instantiatable element names
         """
         self.debug('remote_checkElements: element names to check %r' % (
@@ -232,9 +240,9 @@ class WorkerMedium(medium.BaseMedium):
         Runs the given function in the given module with the given arguments.
         
         @param module:   module the function lives in
-        @type  module:   string
+        @type  module:   str
         @param function: function to run
-        @type  function: string
+        @type  function: str
 
         @returns: the return value of the given function in the module.
         """
@@ -301,6 +309,22 @@ class WorkerMedium(medium.BaseMedium):
 class Kid:
     """
     I am an abstraction of a job process started by the worker.
+
+    @cvar  pid:        PID of the child process
+    @type  pid:        int
+    @cvar  avatarId:   avatar identification string
+    @type  avatarId:   str
+    @cvar  type:       type of the component to create
+    @type  type:       str
+    @cvar  moduleName: name of the module to create the component from
+    @type  moduleName: str
+    @cvar  methodName: the factory method to use to create the component
+    @type  methodName: str
+    @cvar  config:     a configuration dictionary for the component
+    @type  config:     dict
+    @cvar  bundles:    ordered list of (bundleName, bundlePath) needed to
+                       create the component
+    @type  bundles:    list of (str, str)
     """
     def __init__(self, pid, avatarId, type, moduleName, methodName, config,
                  bundles):
@@ -312,19 +336,15 @@ class Kid:
         self.config = config
         self.bundles = bundles
 
-    # pid = protocol.transport.pid
-    def getPid(self):
-        return self.pid
-
 class JobProcessProtocol(worker.ProcessProtocol):
     def __init__(self, kindergarten, avatarId):
         worker.ProcessProtocol.__init__(self, kindergarten, avatarId,
                                         'component',
-                                        kindergarten.workerBrain.workerName)
+                                        kindergarten.brain.workerName)
 
     def sendMessage(self, message):
         kg = self.loggable
-        kg.workerBrain.callRemote('componentAddMessage', self.avatarId,
+        kg.brain.callRemote('componentAddMessage', self.avatarId,
                                   message)
 
     def processEnded(self, status):
@@ -339,11 +359,11 @@ class JobProcessProtocol(worker.ProcessProtocol):
             # otherwise the manager still thinks it's starting up when it's
             # dead.  If the job already attached to the worker however,
             # the create deferred will already have callbacked.
-            if kg.workerBrain.deferredCreateRegistered(self.avatarId):
+            if kg.brain.deferredCreateRegistered(self.avatarId):
                 text = "Component '%s' has received signal %d.  " \
                        "This is sometimes triggered by a corrupt " \
                        "GStreamer registry." % (self.avatarId, signum)
-                kg.workerBrain.deferredCreateFailed(self.avatarId, 
+                kg.brain.deferredCreateFailed(self.avatarId, 
                     errors.ComponentCreateError(text))
 
         # chain up
@@ -357,19 +377,20 @@ class Kindergarten(log.Loggable):
 
     logCategory = 'workerbrain' # thomas: I don't like Kindergarten
 
-    def __init__(self, options, socketPath, workerBrain):
+    def __init__(self, options, socketPath, brain):
         """
-        @param options: the optparse option instance of command-line options
-        @type  options: dict
-        @param socketPath: the path of the Unix domain socket for PB.
-        @param workerBrain: a reference to the workerBrain object.
+        @param options:     the optparse option instance of command-line options
+        @type  options:     dict
+        @param socketPath:  the path of the Unix domain socket for PB
+        @type  socketPath:  str
+        @param brain:       a reference to the worker brain
+        @type  brain:       L{WorkerBrain}
         """
-        dirname = os.path.split(os.path.abspath(sys.argv[0]))[0]
-        self.program = os.path.join(dirname, 'flumotion-worker')
-        self.kids = {} # avatarId -> Kid
+        self.brain = brain
         self.options = options
+
+        self._kids = {} # avatarId -> Kid
         self._socketPath = socketPath
-        self.workerBrain = workerBrain
         
     def play(self, avatarId, type, moduleName, methodName, config, bundles):
         """
@@ -380,18 +401,18 @@ class Kindergarten(log.Loggable):
         This will spawn a new flumotion-job process.
 
         @param avatarId:   avatarId the component should use to log in
-        @type  avatarId:   string
+        @type  avatarId:   str
         @param type:       type of component to start
-        @type  type:       string
+        @type  type:       str
         @param moduleName: name of the module to create the component from
-        @type  moduleName: string
+        @type  moduleName: str
         @param methodName: the factory method to use to create the component
-        @type  methodName: string
+        @type  methodName: str
         @param config:     a configuration dictionary for the component
         @type  config:     dict
         @param bundles:    ordered list of (bundleName, bundlePath) for this
                            component
-        @type bundles:     list of (str, str)
+        @type  bundles:    list of (str, str)
         """
         p = JobProcessProtocol(self, avatarId)
         executable = os.path.join(os.path.dirname(sys.argv[0]), 'flumotion-job')
@@ -418,8 +439,8 @@ class Kindergarten(log.Loggable):
                     '--leak-resolution=high', '--show-reachable=yes', 
                     'python'] + argv
 
-        childFDs={0:0, 1:1, 2:2}
-        env={}
+        childFDs = {0: 0, 1: 1, 2: 2}
+        env = {}
         env.update(os.environ)
         # FIXME: publicize log._FLU_DEBUG ?
         env['FLU_DEBUG'] = log._FLU_DEBUG
@@ -428,15 +449,15 @@ class Kindergarten(log.Loggable):
 
         p.setPid(process.pid)
 
-        self.kids[avatarId] = \
+        self._kids[avatarId] = \
             Kid(process.pid, avatarId, type, moduleName, methodName, config,
                 bundles)
 
     def getKid(self, avatarId):
-        return self.kids[avatarId]
+        return self._kids[avatarId]
     
     def getKids(self):
-        return self.kids.values()
+        return self._kids.values()
 
     def removeKidByPid(self, pid):
         """
@@ -446,11 +467,11 @@ class Kindergarten(log.Loggable):
         @returns: whether or not a kid with that pid was removed
         @rtype: boolean
         """
-        for path, kid in self.kids.items():
-            if kid.getPid() == pid:
+        for path, kid in self._kids.items():
+            if kid.pid == pid:
                 self.debug('Removing kid with name %s and pid %d' % (
                     path, pid))
-                del self.kids[path]
+                del self._kids[path]
                 return True
 
         self.warning('Asked to remove kid with pid %d but not found' % pid)
@@ -471,8 +492,17 @@ def _getSocketPath():
 # Similar to Vishnu, but for worker related classes
 class WorkerBrain(log.Loggable):
     """
-    I manage jobs and everything related.
+    I am the main object in the worker process, managing jobs and everything
+    related.
     I live in the main worker process.
+
+    @ivar keycard:             the keycard the worker used to log in to
+                               the manager
+    @type keycard              L{flumotion.common.keycards.Keycard}
+    @type kindergarten:        L{Kindergarten}
+    @type medium:              L{WorkerMedium}
+    @type jobHeaven:           L{JobHeaven}
+    @type workerClientFactory: L{WorkerClientFactory}
     """
 
     logCategory = 'workerbrain'
@@ -482,9 +512,21 @@ class WorkerBrain(log.Loggable):
         @param options: the optparsed dictionary of command-line options
         @type  options: an object with attributes
         """
-        self._port = None
-        self._oldSIGTERMHandler = None # stored by installSIGTERMHandler
         self.options = options
+        self.workerName = options.name
+        self.managerHost = options.host
+        self.managerPort = options.port
+        self.managerTransport = options.transport
+        
+        self.keycard = None
+        self.medium = WorkerMedium(self, self.options.feederports)
+        self._socketPath = _getSocketPath()
+        self.kindergarten = Kindergarten(options, self._socketPath, self)
+        self.jobHeaven = JobHeaven(self)
+        self.workerClientFactory = WorkerClientFactory(self)
+
+        self._port = None # port for unix domain socket, set from _setup
+        self._oldSIGTERMHandler = None # stored by installSIGTERMHandler
 
         # we used to ignore SIGINT from here on down, but actually
         # the reactor catches these properly in both 1.3 and 2.0,
@@ -492,42 +534,30 @@ class WorkerBrain(log.Loggable):
         # not catch it (because it compares to the default int handler)
         # signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-        self.manager_host = options.host
-        self.manager_port = options.port
-        self.manager_transport = options.transport
-
-        self.workerName = options.name
-        self.keycard = None
-        
-        self._socketPath = _getSocketPath()
-        self.kindergarten = Kindergarten(options, self._socketPath, self)
-        self.job_server_factory, self.job_heaven = self.setup()
-
-        self.medium = WorkerMedium(self, self.options.feederports)
-        self.worker_client_factory = WorkerClientFactory(self)
+        self._jobServerFactory = self._setupJobServerFactory()
 
         self._createDeferreds = {}
 
     def login(self, keycard):
         # called by worker/main.py
         self.keycard = keycard
-        self.worker_client_factory.startLogin(keycard)
+        self.workerClientFactory.startLogin(keycard)
                              
-    def setup(self):
-        # called from Init
-        root = JobHeaven(self)
-        dispatcher = JobDispatcher(root)
+    def _setupJobServerFactory(self):
+        # called from __init__
+        dispatcher = JobDispatcher(self.jobHeaven)
         # FIXME: we should hand a username and password to log in with to
         # the job process instead of allowing anonymous
         checker = checkers.FlexibleCredentialsChecker()
         checker.allowPasswordless(True)
         p = portal.Portal(dispatcher, [checker])
-        job_server_factory = pb.PBServerFactory(p)
+        f = pb.PBServerFactory(p)
         os.unlink(self._socketPath)
-        self._port = reactor.listenUNIX(self._socketPath, job_server_factory)
+        self._port = reactor.listenUNIX(self._socketPath, f)
 
-        return job_server_factory, root
+        return f
 
+    # FIXME: this is only called from the tests
     def teardown(self):
         """
         Clean up after setup()
@@ -565,7 +595,7 @@ class WorkerBrain(log.Loggable):
         self.info("Worker daemon received TERM signal, shutting down")
         self.debug("handling SIGTERM")
         self.debug("_SIGTERMHandler: shutting down jobheaven")
-        d = self.job_heaven.shutdown()
+        d = self.jobHeaven.shutdown()
 
         if self._oldSIGTERMHandler:
             if d:
@@ -582,6 +612,8 @@ class WorkerBrain(log.Loggable):
         Create and register a deferred for creating the given component.
         This deferred will be fired when the JobAvatar has instructed the
         job to create the component.
+
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         self.debug('making create deferred for %s' % avatarId)
         if avatarId in self._createDeferreds.keys():
@@ -637,7 +669,7 @@ class JobDispatcher:
         """
         @type root: L{flumotion.worker.worker.JobHeaven}
         """
-        self.root = root
+        self._root = root
         
     ### portal.IRealm methods
     # flumotion-worker job processes log in to us.
@@ -646,7 +678,7 @@ class JobDispatcher:
     # the avatar id is of the form /(parent)/(name) 
     def requestAvatar(self, avatarId, mind, *interfaces):
         if pb.IPerspective in interfaces:
-            avatar = self.root.createAvatar(avatarId)
+            avatar = self._root.createAvatar(avatarId)
             reactor.callLater(0, avatar.attached, mind)
             return pb.IPerspective, avatar, avatar.logout
         else:
@@ -661,11 +693,11 @@ class JobAvatar(pb.Avatar, log.Loggable):
     def __init__(self, heaven, avatarId):
         """
         @type  heaven:   L{flumotion.worker.worker.JobHeaven}
-        @type  avatarId: string
+        @type  avatarId: str
         """
-        self.heaven = heaven
         self.avatarId = avatarId
-        self.mind = None
+        self._heaven = heaven
+        self._mind = None
         self.debug("created new JobAvatar")
             
     def hasRemoteReference(self):
@@ -674,25 +706,25 @@ class JobAvatar(pb.Avatar, log.Loggable):
 
         @rtype: boolean
         """
-        return self.mind != None
+        return self._mind != None
 
     def attached(self, mind):
         """
         @param mind: reference to the job's JobMedium on which we can call
-        @type mind: L{twisted.spread.pb.RemoteReference}
+        @type  mind: L{twisted.spread.pb.RemoteReference}
         
         I am scheduled from the dispatcher's requestAvatar method.
         """
-        self.mind = mind
+        self._mind = mind
         self.log('Client attached mind %s' % mind)
-        host = self.heaven.brain.manager_host
-        port = self.heaven.brain.manager_port
-        transport = self.heaven.brain.manager_transport
+        host = self._heaven.brain.managerHost
+        port = self._heaven.brain.managerPort
+        transport = self._heaven.brain.managerTransport
 
-        kid = self.heaven.brain.kindergarten.getKid(self.avatarId)
+        kid = self._heaven.brain.kindergarten.getKid(self.avatarId)
 
-        d = self.mind.callRemote('bootstrap', self.heaven.getWorkerName(),
-            host, port, transport, self.heaven.getKeycard(), kid.bundles)
+        d = self._mind.callRemote('bootstrap', self._heaven.getWorkerName(),
+            host, port, transport, self._heaven.getKeycard(), kid.bundles)
 
         yield d
         d.value() # allow exceptions
@@ -702,37 +734,37 @@ class JobAvatar(pb.Avatar, log.Loggable):
         self.log('feedNames: %r' % feedNames)
 
         self.debug('asking job to create component with config %r' % kid.config)
-        d = self.mind.callRemote('create', kid.avatarId, kid.type,
+        d = self._mind.callRemote('create', kid.avatarId, kid.type,
             kid.moduleName, kid.methodName, kid.config)
 
         yield d
         try:
             d.value() # check for errors
             self.debug('job started component with avatarId %s' % kid.avatarId)
-            self.heaven.brain.deferredCreateTrigger(kid.avatarId)
+            self._heaven.brain.deferredCreateTrigger(kid.avatarId)
         except errors.ComponentCreateError, e:
             self.warning('could not create component %s of type %s: %r'
                          % (kid.avatarId, kid.type, e))
-            self.heaven.brain.deferredCreateFailed(kid.avatarId, e)
+            self._heaven.brain.deferredCreateFailed(kid.avatarId, e)
         except Exception, e:
             self.warning('unhandled remote error: type %s, message %s'
                          % (e.__class__.__name__, e))
-            self.heaven.brain.deferredCreateFailed(kid.avatarId, e)
+            self._heaven.brain.deferredCreateFailed(kid.avatarId, e)
     attached = defer_generator_method(attached)
 
     def logout(self):
         self.log('logout called, %s disconnected' % self.avatarId)
-        self.mind = None
+        self._mind = None
         
     def stop(self):
         """
         returns: a deferred marking completed stop.
         """
         self.debug('stopping %s' % self.avatarId)
-        if not self.mind:
+        if not self._mind:
             return defer.succeed(None)
         
-        return self.mind.callRemote('stop')
+        return self._mind.callRemote('stop')
         
     def remote_ready(self):
         pass
@@ -742,9 +774,14 @@ class JobHeaven(pb.Root, log.Loggable):
     """
     I am similar to but not quite the same as a manager-side Heaven.
     I manage avatars inside the worker for job processes spawned by the worker.
+
+    @type brain: L{WorkerBrain}
     """
     logCategory = "job-heaven"
     def __init__(self, brain):
+        """
+        @type brain: L{WorkerBrain}
+        """
         self.avatars = {}
         self.brain = brain
         

@@ -1,5 +1,18 @@
 2006-06-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* TODO:
+	* flumotion/test/test_worker_worker.py:
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	  update documentation
+	  privatize more variables
+	  remove some unused imports
+	  privatize and rename WorkerBrain.setup(), and make it return
+	  only the factory it creates
+	  use twisted naming
+
+2006-06-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/job/job.py:
 	  update documentation
 	  assigning self.component in remote_create makes it clearer where
