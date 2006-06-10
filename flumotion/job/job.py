@@ -47,6 +47,10 @@ class JobMedium(medium.BaseMedium):
     """
     I am a medium between the job and the worker's job avatar.
     I live in the job process.
+
+    @cvar component: the component this is a medium for; created as part of
+                     L{remote_create}
+    @type component: L{flumotion.component.component.BaseComponent}
     """
     logCategory = 'jobmedium'
 
@@ -56,11 +60,13 @@ class JobMedium(medium.BaseMedium):
         self.avatarId = None
         self.logName = None
         self.component = None
-        self._worker_name = None
-        self._manager_host = None
-        self._manager_port = None
-        self._manager_transport = None
-        self._manager_keycard = None
+
+        self._workerName = None
+        self._managerHost = None
+        self._managerPort = None
+        self._managerTransport = None
+        self._managerKeycard = None
+        self._componentClientFactory = None # from component to manager
 
     ### pb.Referenceable remote methods called on by the WorkerBrain
     def remote_bootstrap(self, workerName, host, port, transport, keycard,
@@ -78,7 +84,7 @@ class JobMedium(medium.BaseMedium):
         @param port:         port on which the manager is listening
         @type  port:         int
         @param transport:    'tcp' or 'ssl'
-        @type  transport:    string
+        @type  transport:    str
         @param keycard:      credentials used to log in to the manager
         @type  keycard:      L{flumotion.common.keycards.Keycard}
         @param packagePaths: ordered list of (package name, package path) tuples
@@ -92,11 +98,11 @@ class JobMedium(medium.BaseMedium):
         assert isinstance(packagePaths, list)
 
         self.debug('remote_bootstrap')
-        self._worker_name = workerName
-        self._manager_host = host
-        self._manager_port = port
-        self._manager_transport = transport
-        self._manager_keycard = keycard
+        self._workerName = workerName
+        self._managerHost = host
+        self._managerPort = port
+        self._managerTransport = transport
+        self._managerKeycard = keycard
         
         packager = package.getPackager()
         for name, path in packagePaths:
@@ -109,13 +115,13 @@ class JobMedium(medium.BaseMedium):
         I am called on by the worker's JobAvatar to create a component.
         
         @param avatarId:   avatarId for component to log in to manager
-        @type  avatarId:   string
+        @type  avatarId:   str
         @param type:       type of component to start
-        @type  type:       string
+        @type  type:       str
         @param moduleName: name of the module to create the component from
-        @type  moduleName: string
+        @type  moduleName: str
         @param methodName: the factory method to use to create the component
-        @type  methodName: string
+        @type  methodName: str
         @param config:     the configuration dictionary
         @type  config:     dict
         """
@@ -123,7 +129,8 @@ class JobMedium(medium.BaseMedium):
         self.avatarId = avatarId
         self.logName = avatarId
 
-        self._createComponent(avatarId, type, moduleName, methodName, config)
+        self.component = self._createComponent(avatarId, type, moduleName,
+            methodName, config)
 
     def remote_stop(self):
         self.debug('remote_stop() called')
@@ -176,13 +183,13 @@ class JobMedium(medium.BaseMedium):
         Log in to the manager with the given avatarId.
 
         @param avatarId:   avatarId component will use to log in to manager
-        @type  avatarId:   string
+        @type  avatarId:   str
         @param type:       type of component to start
-        @type  type:       string
+        @type  type:       str
         @param moduleName: name of the module that contains the entry point
-        @type  moduleName: string
+        @type  moduleName: str
         @param methodName: name of the factory method to create the component
-        @type  methodName: string
+        @type  methodName: str
         @param config:     the configuration dictionary
         @type  config:     dict
         """
@@ -220,46 +227,48 @@ class JobMedium(medium.BaseMedium):
             reactor.callLater(0.1, self.shutdown)
             raise errors.ComponentCreateError(msg)
 
-        comp.setWorkerName(self._worker_name)
+        comp.setWorkerName(self._workerName)
 
         # make component log in to manager
         self.debug('creating ComponentClientFactory')
-        manager_client_factory = component.ComponentClientFactory(comp)
-        self.debug('created ComponentClientFactory %r' %
-            manager_client_factory)
-        keycard = self._manager_keycard
+        managerClientFactory = component.ComponentClientFactory(comp)
+        self._componentClientFactory = managerClientFactory
+        self.debug('created ComponentClientFactory %r' % managerClientFactory)
+        keycard = self._managerKeycard
         keycard.avatarId = avatarId
-        manager_client_factory.startLogin(keycard)
+        managerClientFactory.startLogin(keycard)
 
-        host = self._manager_host
-        port = self._manager_port
-        transport = self._manager_transport
+        host = self._managerHost
+        port = self._managerPort
+        transport = self._managerTransport
         self.debug('logging in')
         if transport == "ssl":
             from twisted.internet import ssl
             self.info('Connecting to manager %s:%d with SSL' % (host, port))
-            reactor.connectSSL(host, port, manager_client_factory,
+            reactor.connectSSL(host, port, managerClientFactory,
                 ssl.ClientContextFactory())
         elif transport == "tcp":
             self.info('Connecting to manager %s:%d with TCP' % (host, port))
-            reactor.connectTCP(host, port, manager_client_factory)
+            reactor.connectTCP(host, port, managerClientFactory)
         else:
-            self.error('Unknown transport protocol %s' % self._manager_transport)
+            self.error('Unknown transport protocol %s' % self._managerTransport)
 
-        self.component_factory = manager_client_factory
-        self.component = comp
+        return comp
         
 class JobClientFactory(pb.PBClientFactory, log.Loggable):
     """
     I am a client factory that logs in to the WorkerBrain.
     I live in the flumotion-worker job process.
+
+    @cvar medium: the medium for the JobHeaven to access us through
+    @type medium: L{JobMedium}
     """
     logCategory = "job"
 
     def __init__(self, id):
         """
         @param id:      the avatar id used for logging into the workerbrain
-        @type  id:      string
+        @type  id:      str
         """
         pb.PBClientFactory.__init__(self)
         

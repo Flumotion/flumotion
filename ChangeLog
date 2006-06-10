@@ -1,7 +1,15 @@
+2006-06-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/job/job.py:
+	  update documentation
+	  assigning self.component in remote_create makes it clearer where
+	  this happens
+	  use twisted naming
+
 2006-06-09  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
-	  Methods to get load deltas from the streamer (implemnetation
+	  Methods to get load deltas from the streamer (implementation
 	  just stubbed out for now)
 
 	* flumotion/component/feedcomponent.py:
