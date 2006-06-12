@@ -457,5 +457,50 @@ class TestConfig(unittest.TestCase):
         conf = config.FlumotionConfigXML(None, xml)
         self.assertRaises(config.ConfigError, conf.parse)
 
+class AdminConfigTest(unittest.TestCase):
+    def testMinimal(self):
+        doc = ('<admin>'
+               '<plugs>'
+               '</plugs>'
+               '</admin>')
+        parser = config.AdminConfigParser((), None, string=doc)
+        parser.parse()
+        self.failUnless(parser.plugs == {}, 'expected empty plugset')
 
+    def testMinimal2(self):
+        doc = ('<admin>'
+               '<plugs>'
+               '</plugs>'
+               '</admin>')
+        parser = config.AdminConfigParser((), None, string=doc)
+        parser.parse()
+        self.failUnless(parser.plugs == {}, 'expected empty plugset')
 
+    def testMinimal3(self):
+        doc = ('<admin>'
+               '<plugs>'
+               '</plugs>'
+               '</admin>')
+        parser = config.AdminConfigParser(('foo.bar',), None, string=doc)
+        parser.parse()
+        self.failUnless(parser.plugs == {'foo.bar':[]}, parser.plugs)
+
+    def testUnknownPlug(self):
+        doc = ('<admin>'
+               '<plugs>'
+               '<plug type="plugdoesnotexist" socket="foo.bar">'
+               '</plug>'
+               '</plugs>'
+               '</admin>')
+        parser = config.AdminConfigParser(('foo.bar',), None, string=doc)
+        self.assertRaises(config.ConfigError, parser.parse)
+
+    def testUnknownSocket(self):
+        doc = ('<admin>'
+               '<plugs>'
+               '<plug type="frobulator" socket="baz">'
+               '</plug>'
+               '</plugs>'
+               '</admin>')
+        parser = config.AdminConfigParser(('foo.bar',), None, string=doc)
+        self.assertRaises(config.ConfigError, parser.parse)

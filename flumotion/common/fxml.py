@@ -21,6 +21,10 @@
 
 """
 Common routines to parsing XML.
+
+Flumotion deals with two basic kinds of XML: config and registry. They
+correspond to data and schema, more or less. This file defines some base
+parsing routines shared between both kinds of XML.
 """
 
 import sets
@@ -174,7 +178,7 @@ class Parser(log.Loggable):
                 continue
             try:
                 parser, handler = parsers[child.nodeName]
-                handler(parser(child))
             except KeyError:
                 raise ParserError("unexpected node in <%s>: %s"
                                   % (parent.nodeName, child))
+            handler(parser(child))

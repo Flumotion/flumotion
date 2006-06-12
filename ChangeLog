@@ -1,3 +1,19 @@
+2006-06-12  Andy Wingo  <wingo@pobox.com>
+
+	* fxml.py: Add some comments.
+	(Parser.parseFromTable): Call handler() outside of the try block
+	-- we don't want to catch just any old KeyError.
+
+	* config.py: Add a note about an XML format change we should do in
+	the future sometime.
+	(BaseConfigParser): New base class so that planet config and admin
+	config parsers can share code. Factored out of FlumotionConfigXML.
+	(FlumotionConfigXML): Use BaseConfigParser.
+	(AdminConfigParser): New class to parse admin config xml.
+
+	* test_config.py (AdminConfigTest): New test for the admin config
+	code.
+
 2006-06-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:

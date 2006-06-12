@@ -23,6 +23,10 @@
 parsing of configuration files
 """
 
+# Config XML FIXME: Make all <property> nodes be children of
+# <properties>; it's the only thing standing between now and a
+# table-driven, verifying config XML parser
+
 import os
 from xml.dom import minidom, Node
 from xml.parsers import expat
@@ -31,7 +35,6 @@ from twisted.python import reflect
 
 from flumotion.common import log, errors, common, registry, fxml
 
-# FIXME: move this to errors and adapt everywhere
 from errors import ConfigError
 
 class ConfigEntryComponent(log.Loggable):
@@ -88,8 +91,205 @@ class ConfigEntryAtmosphere:
     def __len__(self):
         return len(self.components)
 
-# FIXME: rename
-class FlumotionConfigXML(fxml.Parser):
+class BaseConfigParser(fxml.Parser):
+    def __init__(self, filename, string=None):
+        if filename != None:
+            self._repr = filename
+            self.path = os.path.split(filename)[0]
+        else:
+            self._repr = "<string>"
+            self.path = None
+
+        try:
+            self.doc = self.getRoot(filename, string)
+        except fxml.ParserError, e:
+            raise ConfigError("%s" % e)
+
+    def getPath(self):
+        return self.path
+
+    def export(self):
+        return self.doc.toxml()
+
+    def get_float_values(self, nodes):
+        return [float(subnode.childNodes[0].data) for subnode in nodes]
+
+    def get_int_values(self, nodes):
+        return [int(subnode.childNodes[0].data) for subnode in nodes]
+
+    def get_long_values(self, nodes):
+        return [long(subnode.childNodes[0].data) for subnode in nodes]
+
+    def get_bool_values(self, nodes):
+        valid = ['True', 'true', '1', 'Yes', 'yes']
+        return [subnode.childNodes[0].data in valid for subnode in nodes]
+
+    def get_string_values(self, nodes):
+        values = []
+        for subnode in nodes:
+            try:
+                data = subnode.childNodes[0].data
+            except IndexError:
+                continue
+            # libxml always gives us unicode, even when we encode values
+            # as strings. try to make normal strings again, unless that
+            # isn't possible.
+            try:
+                data = str(data)
+            except UnicodeEncodeError:
+                pass
+            if '\n' in data:
+                parts = [x.strip() for x in data.split('\n')]
+                data = ' '.join(parts)
+            values.append(data)
+
+        return values
+
+    def get_raw_string_values(self, nodes):
+        values = []
+        for subnode in nodes:
+            try:
+                data = str(subnode.childNodes[0].data)
+                values.append(data)
+            except IndexError: # happens on a subnode without childNOdes
+                pass
+
+        string = "".join(values)
+        return [string, ]
+     
+    def get_fraction_values(self, nodes):
+        def fraction_from_string(string):
+            parts = string.split('/')
+            if not len(parts) == 2:
+                raise ConfigError("Invalid fraction: %s", string)
+            return (int(parts[0]), int(parts[1]))
+        return [fraction_from_string(subnode.childNodes[0].data)
+                for subnode in nodes]
+
+    def parseProperties(self, node, properties, error):
+        """
+        Parse a <property>-containing node in a configuration XML file.
+        Ignores any subnode not named <property>.
+
+        @param node: The <properties> XML node to parse.
+        @type  node: L{xml.dom.Node}
+        @param properties: The set of valid properties.
+        @type  properties: list of
+        L{flumotion.common.registry.RegistryEntryProperty}
+        @param error: An exception factory for parsing errors.
+        @type  error: Callable that maps str => Exception.
+
+        @returns: The parsed properties, as a dict of name => value.
+        Absent optional properties will not appear in the dict.
+        """
+        # FIXME: non-validating, see first FIXME
+        # XXX: We might end up calling float(), which breaks
+        #      when using LC_NUMERIC when it is not C -- only in python
+        #      2.3 though, no prob in 2.4
+        import locale
+        locale.setlocale(locale.LC_NUMERIC, "C")
+
+        properties_given = {}
+        for subnode in node.childNodes:
+            if subnode.nodeName == 'property':
+                if not subnode.hasAttribute('name'):
+                    raise error("<property> must have a name attribute")
+                name = subnode.getAttribute('name')
+                if not name in properties_given:
+                    properties_given[name] = []
+                properties_given[name].append(subnode)
+                
+        property_specs = dict([(x.name, x) for x in properties])
+
+        config = {}
+        for name, nodes in properties_given.items():
+            if not name in property_specs:
+                raise error("%s: unknown property" % name)
+                
+            definition = property_specs[name]
+
+            if not definition.multiple and len(nodes) > 1:
+                raise error("%s: multiple value specified but not "
+                            "allowed" % name)
+
+            parsers = {'string': self.get_string_values,
+                       'rawstring': self.get_raw_string_values,
+                       'int': self.get_int_values,
+                       'long': self.get_long_values,
+                       'bool': self.get_bool_values,
+                       'float': self.get_float_values,
+                       'fraction': self.get_fraction_values}
+                       
+            if not definition.type in parsers:
+                raise error("%s: invalid property type %s"
+                            % (name, definition.type))
+                
+            values = parsers[definition.type](nodes)
+
+            if values == []:
+                continue
+            
+            if not definition.multiple:
+                values = values[0]
+            
+            config[name] = values
+            
+        for name, definition in property_specs.items():
+            if definition.isRequired() and not name in config:
+                raise error("%s: required but unspecified property"
+                            % name)
+
+        return config
+
+    def parsePlug(self, node):
+        # <plug socket=... type=...>
+        #   <property>
+        socket, type = self.parseAttributes(node, ('socket', 'type'))
+
+        try:
+            defs = registry.getRegistry().getPlug(type)
+        except KeyError:
+            raise ConfigError("unknown plug type: %s" % type)
+        
+        possible_node_names = ['property']
+        for subnode in node.childNodes:
+            if (subnode.nodeType == Node.COMMENT_NODE
+                or subnode.nodeType == Node.TEXT_NODE):
+                continue
+            elif subnode.nodeName not in possible_node_names:
+                raise ConfigError("Invalid subnode of <plug>: %s"
+                                  % subnode.nodeName)
+
+        property_specs = defs.getProperties()
+        def err(str):
+            return ConfigError('%s: %s' % (type, str))
+        properties = self.parseProperties(node, property_specs, err)
+
+        return {'type':type, 'socket':socket, 'properties':properties}
+
+    def parsePlugs(self, node, sockets):
+        # <plugs>
+        #  <plug>
+        # returns: dict of socket -> list of plugs
+        # where a plug is 'type'->str, 'socket'->str,
+        #  'properties'->dict of properties
+        plugs = {}
+        for socket in sockets:
+            plugs[socket] = []
+        def addplug(plug):
+            if plug['socket'] not in sockets:
+                raise ConfigError("Component does not support "
+                                  "sockets of type %s" % plug['socket'])
+            plugs[plug['socket']].append(plug)
+
+        parsers = {'plug': (self.parsePlug, addplug)}
+        self.parseFromTable(node, parsers)
+
+        return plugs
+
+# FIXME: rename to PlanetConfigParser or something (should include the
+# word 'planet' in the name)
+class FlumotionConfigXML(BaseConfigParser):
     """
     I represent a planet configuration file for Flumotion.
 
@@ -103,34 +303,16 @@ class FlumotionConfigXML(fxml.Parser):
     logCategory = 'config'
 
     def __init__(self, filename, string=None):
+        BaseConfigParser.__init__(self, filename, string)
+
         self.flows = []
         self.manager = None
         self.atmosphere = ConfigEntryAtmosphere()
-        if filename != None:
-            self._repr = filename
-        else:
-            self._repr = "<string>"
 
-        try:
-            self.doc = self.getRoot(filename, string)
-        except fxml.ParserError, e:
-            raise ConfigError("%s" % e)
-
-        if filename != None:
-            self.path = os.path.split(filename)[0]
-        else:
-            self.path = None
-            
         # We parse without asking for a registry so the registry doesn't
         # verify before knowing the debug level
         self.parse(noRegistry=True)
         
-    def getPath(self):
-        return self.path
-
-    def export(self):
-        return self.doc.toxml()
-
     def parse(self, noRegistry=False):
         # <planet>
         #     <manager>
@@ -248,8 +430,9 @@ class FlumotionConfigXML(fxml.Parser):
         properties = defs.getProperties()
 
         self.debug('Parsing component: %s' % name)
-        config['properties'] = self._parseProperties(node, name, type,
-            properties)
+        def err(str):
+            return ConfigError('%s: %s' % (name, str))
+        config['properties'] = self.parseProperties(node, properties, err)
 
         # fixme: all of the information except the worker is in the
         # config dict: why?
@@ -396,61 +579,6 @@ class FlumotionConfigXML(fxml.Parser):
             raise ConfigError("<%s> value not specified" % name)
         return value
 
-    def _get_float_value(self, nodes):
-        return [float(subnode.childNodes[0].data) for subnode in nodes]
-
-    def _get_int_value(self, nodes):
-        return [int(subnode.childNodes[0].data) for subnode in nodes]
-
-    def _get_long_value(self, nodes):
-        return [long(subnode.childNodes[0].data) for subnode in nodes]
-
-    def _get_bool_value(self, nodes):
-        valid = ['True', 'true', '1', 'Yes', 'yes']
-        return [subnode.childNodes[0].data in valid for subnode in nodes]
-
-    def _get_string_value(self, nodes):
-        values = []
-        for subnode in nodes:
-            try:
-                data = subnode.childNodes[0].data
-            except IndexError:
-                continue
-            # libxml always gives us unicode, even when we encode values
-            # as strings. try to make normal strings again, unless that
-            # isn't possible.
-            try:
-                data = str(data)
-            except UnicodeEncodeError:
-                pass
-            if '\n' in data:
-                parts = [x.strip() for x in data.split('\n')]
-                data = ' '.join(parts)
-            values.append(data)
-
-        return values
-
-    def _get_raw_string_value(self, nodes):
-        values = []
-        for subnode in nodes:
-            try:
-                data = str(subnode.childNodes[0].data)
-                values.append(data)
-            except IndexError: # happens on a subnode without childNOdes
-                pass
-
-        string = "".join(values)
-        return [string, ]
-     
-    def _get_fraction_value(self, nodes):
-        def fraction_from_string(string):
-            parts = string.split('/')
-            if not len(parts) == 2:
-                raise ConfigError("Invalid fraction: %s", string)
-            return (int(parts[0]), int(parts[1]))
-        return [fraction_from_string(subnode.childNodes[0].data)
-                for subnode in nodes]
-
     def _parseSources(self, node, defs):
         # <source>feeding-component:feed-name</source>
         eaters = dict([(x.getName(), x) for x in defs.getEaters()])
@@ -459,7 +587,7 @@ class FlumotionConfigXML(fxml.Parser):
         for subnode in node.childNodes:
             if subnode.nodeName == 'source':
                 nodes.append(subnode)
-        strings = self._get_string_value(nodes)
+        strings = self.get_string_values(nodes)
 
         # at this point we don't support assigning certain sources to
         # certain eaters -- a problem to fix later. for now take the
@@ -483,7 +611,7 @@ class FlumotionConfigXML(fxml.Parser):
         for subnode in node.childNodes:
             if subnode.nodeName == 'clock-master':
                 nodes.append(subnode)
-        bools = self._get_bool_value(nodes)
+        bools = self.get_bool_values(nodes)
 
         if len(bools) > 1:
             raise ConfigError("Only one <clock-master> node allowed")
@@ -493,121 +621,16 @@ class FlumotionConfigXML(fxml.Parser):
         else:
             return None
             
-    def _parsePlug(self, node, sockets):
-        # <plug socket=... type=...>
-        #   <property>
-        socket, type = self.parseAttributes(node, ('socket', 'type'))
-
-        if not socket in sockets:
-            raise ConfigError("Component does not support "
-                              "sockets of type %s" % socket)
-
-        try:
-            defs = registry.getRegistry().getPlug(type)
-        except KeyError:
-            raise ConfigError("unknown plug type: %s" % type)
-        
-        possible_node_names = ['property']
-        for subnode in node.childNodes:
-            if (subnode.nodeType == Node.COMMENT_NODE
-                or subnode.nodeType == Node.TEXT_NODE):
-                continue
-            elif subnode.nodeName not in possible_node_names:
-                raise ConfigError("Invalid subnode of <plug>: %s"
-                                  % subnode.nodeName)
-
-        property_specs = defs.getProperties()
-        properties = self._parseProperties(node, type, socket, property_specs)
-
-        return {'type':type, 'socket':socket, 'properties':properties}
-
     def _parsePlugs(self, node, sockets):
-        # <plugs>
-        #  <plug>
-        # returns: dict of socket -> list of plugs
-        # where a plug is 'type'->str, 'socket'->str,
-        #  'properties'->dict of properties
         plugs = {}
         for socket in sockets:
             plugs[socket] = []
         for subnode in node.childNodes:
             if subnode.nodeName == 'plugs':
-                for subsubnode in subnode.childNodes:
-                    if (subsubnode.nodeType == Node.COMMENT_NODE
-                        or subsubnode.nodeType == Node.TEXT_NODE):
-                        continue
-                    if subsubnode.nodeName != 'plug':
-                        raise ConfigError("<plugs> should only contain "
-                                          "<plug> subnodes")
-                    plug = self._parsePlug(subsubnode, sockets)
-                    plugs[plug['socket']].append(plug)
+                newplugs = self.parsePlugs(subnode, sockets)
+                for socket in sockets:
+                    plugs[socket].extend(newplugs[socket])
         return plugs
-
-    def _parseProperties(self, node, componentName, type, properties):
-        # XXX: We might end up calling float(), which breaks
-        #      when using LC_NUMERIC when it is not C -- only in python
-        #      2.3 though, no prob in 2.4
-        import locale
-        locale.setlocale(locale.LC_NUMERIC, "C")
-
-        properties_given = {}
-        for subnode in node.childNodes:
-            if subnode.nodeName == 'property':
-                if not subnode.hasAttribute('name'):
-                    raise ConfigError(
-                        "%s: <property> must have a name attribute" %
-                        componentName)
-                name = subnode.getAttribute('name')
-                if not name in properties_given:
-                    properties_given[name] = []
-                properties_given[name].append(subnode)
-                
-        property_specs = dict([(x.name, x) for x in properties])
-
-        config = {}
-        for name, nodes in properties_given.items():
-            if not name in property_specs:
-                    raise ConfigError(
-                        "%s: %s: unknown property" % (
-                            componentName, name))
-                
-            definition = property_specs[name]
-
-            if not definition.multiple and len(nodes) > 1:
-                raise ConfigError(
-                    "%s: %s: multiple value specified but not allowed" % (
-                        componentName, name))
-
-            parsers = {'string': self._get_string_value,
-                       'rawstring': self._get_raw_string_value,
-                       'int': self._get_int_value,
-                       'long': self._get_long_value,
-                       'bool': self._get_bool_value,
-                       'float': self._get_float_value,
-                       'fraction': self._get_fraction_value}
-                       
-            if not definition.type in parsers:
-                raise ConfigError(
-                    "%s: %s: invalid property type %s" % (
-                        componentName, name, definition.type))
-                
-            value = parsers[definition.type](nodes)
-
-            if value == []:
-                continue
-            
-            if not definition.multiple:
-                value = value[0]
-            
-            config[name] = value
-            
-        for name, definition in property_specs.items():
-            if definition.isRequired() and not name in config:
-                raise ConfigError(
-                    "%s: %s: required but unspecified property" % (
-                        componentName, name))
-
-        return config
 
     # FIXME: move to a config base class ?
     def getComponentEntries(self):
@@ -629,3 +652,40 @@ class FlumotionConfigXML(fxml.Parser):
                 entries[path] = c
 
         return entries
+
+class AdminConfigParser(BaseConfigParser):
+    """
+    Admin configuration file parser.
+    """
+    logCategory = 'config'
+
+    def __init__(self, sockets, filename, string=None):
+        BaseConfigParser.__init__(self, filename, string)
+        self.plugs = {}
+        for socket in sockets:
+            self.plugs[socket] = []
+        self._parsed = False
+        
+    def parse(self):
+        # <admin>
+        #   <plugs>
+        if self._parsed:
+            return
+        self._parsed = True
+
+        root = self.doc.documentElement
+        if not root.nodeName == 'admin':
+            raise ConfigError("unexpected root node': %s" % root.nodeName)
+        
+        def parseplugs(node):
+            return self.parsePlugs(node, self.plugs.keys())
+        def addplugs(plugs):
+            for socket in plugs:
+                try:
+                    self.plugs[socket].extend(plugs[socket])
+                except KeyError:
+                    raise ConfigError("Admin does not support "
+                                      "sockets of type %s" % socket)
+        parsers = {'plugs': (parseplugs, addplugs)}
+
+        self.parseFromTable(root, parsers)
