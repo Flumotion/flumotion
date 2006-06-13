@@ -60,7 +60,9 @@ def _startSSL(vishnu, host, port, pemFile):
     if not os.path.split(pemFile)[0]:
         pemFile = os.path.join(configure.configdir, pemFile)
     if not os.path.exists(pemFile):
-        log.error('manager', ".pem file %s does not exist" % pemFile)
+        log.error('manager', ".pem file %s does not exist.\n" \
+            "For more information, see \n" \
+            "http://www.flumotion.net/doc/flumotion/manual/html/chapter-security.html" % pemFile)
     log.debug('manager', 'Using PEM certificate file %s' % pemFile)
     ctxFactory = ServerContextFactory(pemFile)
     
