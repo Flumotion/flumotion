@@ -1,5 +1,8 @@
 2006-06-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/Makefile.am (flumotion_PYTHON): Install
+	connection.py.
+
 	* flumotion/common/connection.py: New file, implements a copyable
 	object describing a PB connection, and a function to parse a
 	string like user@host:7531 into this object.

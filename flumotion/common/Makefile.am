@@ -12,6 +12,7 @@ flumotion_PYTHON = \
 	boot.py \
 	bundle.py \
 	bundleclient.py \
+	connection.py \
 	common.py \
 	componentui.py \
 	config.py \
