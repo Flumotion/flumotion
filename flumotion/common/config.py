@@ -92,7 +92,10 @@ class ConfigEntryAtmosphere:
         return len(self.components)
 
 class BaseConfigParser(fxml.Parser):
-    def __init__(self, filename, string=None):
+    def __init__(self, filename=None, string=None):
+        self.add(filename=filename, string=string)
+
+    def add(self, filename=None, string=None):
         if filename != None:
             self._repr = filename
             self.path = os.path.split(filename)[0]
@@ -659,20 +662,17 @@ class AdminConfigParser(BaseConfigParser):
     """
     logCategory = 'config'
 
-    def __init__(self, sockets, filename, string=None):
-        BaseConfigParser.__init__(self, filename, string)
+    def __init__(self, sockets, filename=None, string=None):
         self.plugs = {}
         for socket in sockets:
             self.plugs[socket] = []
-        self._parsed = False
+
+        # will start the parse via self.add()
+        BaseConfigParser.__init__(self, filename=filename, string=string)
         
-    def parse(self):
+    def _parse(self):
         # <admin>
         #   <plugs>
-        if self._parsed:
-            return
-        self._parsed = True
-
         root = self.doc.documentElement
         if not root.nodeName == 'admin':
             raise ConfigError("unexpected root node': %s" % root.nodeName)
@@ -689,3 +689,7 @@ class AdminConfigParser(BaseConfigParser):
         parsers = {'plugs': (parseplugs, addplugs)}
 
         self.parseFromTable(root, parsers)
+
+    def add(self, filename=None, string=None):
+        BaseConfigParser.add(self, filename=filename, string=string)
+        self._parse()

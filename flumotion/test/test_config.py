@@ -464,7 +464,6 @@ class AdminConfigTest(unittest.TestCase):
                '</plugs>'
                '</admin>')
         parser = config.AdminConfigParser((), None, string=doc)
-        parser.parse()
         self.failUnless(parser.plugs == {}, 'expected empty plugset')
 
     def testMinimal2(self):
@@ -473,7 +472,6 @@ class AdminConfigTest(unittest.TestCase):
                '</plugs>'
                '</admin>')
         parser = config.AdminConfigParser((), None, string=doc)
-        parser.parse()
         self.failUnless(parser.plugs == {}, 'expected empty plugset')
 
     def testMinimal3(self):
@@ -482,7 +480,6 @@ class AdminConfigTest(unittest.TestCase):
                '</plugs>'
                '</admin>')
         parser = config.AdminConfigParser(('foo.bar',), None, string=doc)
-        parser.parse()
         self.failUnless(parser.plugs == {'foo.bar':[]}, parser.plugs)
 
     def testUnknownPlug(self):
@@ -492,8 +489,9 @@ class AdminConfigTest(unittest.TestCase):
                '</plug>'
                '</plugs>'
                '</admin>')
-        parser = config.AdminConfigParser(('foo.bar',), None, string=doc)
-        self.assertRaises(config.ConfigError, parser.parse)
+        self.assertRaises(config.ConfigError,
+                          lambda: config.AdminConfigParser(('foo.bar',),
+                                                           None, string=doc))
 
     def testUnknownSocket(self):
         doc = ('<admin>'
@@ -502,5 +500,6 @@ class AdminConfigTest(unittest.TestCase):
                '</plug>'
                '</plugs>'
                '</admin>')
-        parser = config.AdminConfigParser(('foo.bar',), None, string=doc)
-        self.assertRaises(config.ConfigError, parser.parse)
+        self.assertRaises(config.ConfigError,
+                          lambda: config.AdminConfigParser(('foo.bar',),
+                                                           None, string=doc))

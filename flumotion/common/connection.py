@@ -1,0 +1,102 @@
+# Flumotion - a streaming media server
+# Copyright (C) 2004,2005,2006 Fluendo, S.L. (www.fluendo.com).
+# All rights reserved.
+
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+
+"""
+Abstractions for dealing with PB connections.
+"""
+
+
+import sys
+import re
+
+from twisted.spread import pb
+
+from flumotion.common import common, keycards
+
+class PBConnectionInfo(pb.Copyable, pb.RemoteCopy):
+    """
+    I hold information on how to connect to a PB server somewhere. I can
+    be transferred over the wire.
+    """
+    __implements__ = common.mergeImplements(pb.Copyable, pb.RemoteCopy)
+
+    def __init__(self, host, port, use_ssl, keycard=None, username=None,
+        password=None):
+        self.host = host
+        self.port = port
+        self.use_ssl = use_ssl
+        if username or password:
+            assert keycard is None, \
+                   'Either give username/password or keycard, not both'
+            self.keycard = keycards.KeycardUACPP(username, password,
+                                                 None) 
+        else:
+            self.keycard = keycard
+
+    def __str__(self):
+        return '%s@%s:%d' % (getattr(self.keycard, 'username',
+                                     '<anonymous>'), self.host,
+                             self.port)
+
+pb.setUnjellyableForClass(PBConnectionInfo, PBConnectionInfo)
+
+_pat = re.compile('^(([^:@]*)(:([^:@]+))?@)?([^:@]+)(:([0-9]+))?$')
+def parsePBConnectionInfo(string, username='user', password='test',
+                          port=7531, use_ssl=True):
+    """
+    Parse a string representation of a PB connection into a
+    PBConnectionInfo object.
+
+    The expected format is [user[:pass]@]host[:port]. Only the host is
+    mandatory. The default values for username, password, and port will
+    be taken from the optional username, password and port arguments.
+
+    @param string: A string describing the PB connection.
+    @type  string: str
+    @param username: Default username, or 'user' if not given.
+    @type  username: str
+    @param password: Default password, or 'test' if not given.
+    @type  password: str
+    @param port: Default port, or 7531 if not given.
+    @type  port: int
+    @param use_ssl: Whether to use SSL, or True if not given. Note that
+    there is no syntax in the connection string for specifying whether
+    or not to use SSL; if you want to control this you will have to
+    provide another method.
+    @type  use_ssl: bool
+
+    @rtype L{PBConnectionInfo}
+    """
+    keycard = keycards.KeycardUACPP(username, password, None)
+    ret = PBConnectionInfo(None, port, use_ssl, keycard)
+    
+    matched = _pat.search(string)
+    if not matched:
+        raise TypeError('Invalid connection string: %s '
+                        '(looking for [user[:pass]@]host[/ssl|/tcp][:port])'
+                        % string)
+
+    groups = matched.groups()
+    for o, k, i, f in ((keycard, 'username', 1, str),
+                       (keycard, 'password', 3, str),
+                       (ret, 'host', 4, str),
+                       (ret, 'port', 6, int)):
+        if groups[i]:
+            setattr(o, k, f(groups[i]))
+    return ret

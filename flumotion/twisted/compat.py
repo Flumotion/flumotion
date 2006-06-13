@@ -70,6 +70,13 @@ def implementsInterface(object, interface):
     else:
         return interface.providedBy(object)
 
+def implementedBy(object):
+    if version[0] < '2':
+        return getattr(object, '__implements__', ())
+    else:
+        from zope.interface import implementedBy
+        return implementedBy(object)
+
 if version[0] < '2':
     from twisted.python.components import Interface as OurLovelyInterface
     import sys

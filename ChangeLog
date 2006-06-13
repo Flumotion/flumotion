@@ -1,3 +1,30 @@
+2006-06-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/connection.py: New file, implements a copyable
+	object describing a PB connection, and a function to parse a
+	string like user@host:7531 into this object.
+
+	* flumotion/common/config.py (BaseConfigParser.__init__):
+	`filename' really is optional, mark it as such.
+	(BaseConfigParser.add): Factor out setting the file to this new
+	public method.
+	(AdminConfigParser.__init__): Eviscerate. Yum.
+	(AdminConfigParser._parse): Privatize.
+	(AdminConfigParser.add): Go ahead and parse here.
+
+	* flumotion/twisted/compat.py (implementedBy): New compat wrapper
+	for zope.interface.implementedBy.
+
+	* flumotion/test/test_common_connection.py (TestConnection): Test
+	for connection parsing.
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/test/test_common_connection.py: New file, and
+	autotoolage.
+
+	* flumotion/test/test_config.py (AdminConfigTest): Fix to account
+	for parsing at construction-time.
+
 2006-06-12  Andy Wingo  <wingo@pobox.com>
 
 	* fxml.py: Add some comments.
