@@ -1,3 +1,13 @@
+2006-06-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/disker/disker.py:
+	  move link_setup() code to configure_pipeline(), which is
+	  part of the component protocol
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/feedcomponent08.py:
+	  remove calling link_setup() on subclasses, since all subclasses now
+	  use configure_pipeline() instead
+
 2006-06-14  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/worker/main.py:

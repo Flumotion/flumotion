@@ -397,12 +397,6 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('setting up feeders')
         self._setup_feeders(feedersData)
         
-        # call a child's link_setup() method if it has it
-        func = getattr(self, 'link_setup', None)
-        if func:
-            self.debug('calling function %r' % func)
-            func(eatersData, feedersData)
-            
         self.debug('setting pipeline to playing')
 
         if self.clock_provider:

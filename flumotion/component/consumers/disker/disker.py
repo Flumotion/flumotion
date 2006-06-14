@@ -197,8 +197,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 id=id, priority=40)
             self.state.append('messages', m)
 
-    # FIXME: move this to configure_pipeline (easy, just needs a test)
-    def link_setup(self, eaters, feeders):
+    def configure_pipeline(self, pipeline, properties):
+        self.debug('configure_pipeline for disker')
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
         # connect to client-removed so we can detect errors in file writing
