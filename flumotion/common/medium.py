@@ -28,6 +28,7 @@ from twisted.internet import defer
 
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import log, interfaces, bundleclient, errors, common
+from flumotion.common import messages
 from flumotion.twisted.compat import implements
 
 class BaseMedium(pb.Referenceable, log.Loggable):

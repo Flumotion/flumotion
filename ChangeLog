@@ -1,5 +1,11 @@
 2006-06-14  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/common/medium.py:
+	  Add newly-needed import, broken by addition of runBundledFunction to
+	  this file.
+
+2006-06-14  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/worker/main.py:
 	  worker_client_brain got renamed, so use the renamed one.
 
