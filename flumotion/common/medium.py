@@ -105,3 +105,74 @@ class BaseMedium(pb.Referenceable, log.Loggable):
         d = self.remote.callRemote(name, *args, **kwargs)
         d.addErrback(errback)
         return d
+
+    def runBundledFunction(self, module, function, *args, **kwargs):
+        """
+        Runs the given function in the given module with the given arguments.
+        
+        @param module:   module the function lives in
+        @type  module:   str
+        @param function: function to run
+        @type  function: str
+
+        @returns: the return value of the given function in the module.
+        """
+        self.debug('remote runFunction(%r, %r)' % (module, function))
+        d = self.bundleLoader.loadModule(module)
+        yield d
+
+        try:
+            mod = d.value()
+        except errors.NoBundleError:
+            msg = 'Failed to find bundle for module %s' % module
+            self.warning(msg)
+            raise errors.RemoteRunError(msg)
+        except Exception, e:
+            msg = 'Failed to load bundle for module %s' % module
+            self.debug("exception %r" % e)
+            self.warning(msg)
+            raise errors.RemoteRunError(msg)
+
+        try:
+            proc = getattr(mod, function)
+        except AttributeError:
+            msg = 'No procedure named %s in module %s' % (function, module)
+            self.warning(msg)
+            raise errors.RemoteRunError(msg)
+
+        try:
+            self.debug('calling %s.%s(%r, %r)' % (
+                module, function, args, kwargs))
+            d = proc(*args, **kwargs)
+        except Exception, e:
+            # FIXME: make e.g. GStreamerError nicely serializable, without
+            # printing ugly tracebacks
+            msg = ('calling %s.%s(*args=%r, **kwargs=%r) failed: %s' % (
+                module, function, args, kwargs,
+                log.getExceptionMessage(e)))
+            self.debug(msg)
+            raise errors.RemoteRunError(log.getExceptionMessage(e))
+ 
+        yield d
+
+        try:
+            # only if d was actually a deferred will we get here
+            # this is a bit nasty :/
+            result = d.value()
+            if not isinstance(result, messages.Result):
+                msg = 'function %r returned a non-Result %r' % (
+                    proc, result)
+                raise errors.RemoteRunError(msg)
+
+            self.debug('yielding result %r with failed %r' % (result,
+                result.failed))
+            yield result
+        except Exception, e:
+            # FIXME: make e.g. GStreamerError nicely serializable, without
+            # printing ugly tracebacks
+            msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s' % (
+                module, function, args, kwargs,
+                log.getExceptionMessage(e)))
+            self.debug(msg)
+            raise e
+    runBundledFunction = defer_generator_method(runBundledFunction)

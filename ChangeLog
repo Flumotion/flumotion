@@ -1,3 +1,15 @@
+2006-06-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/worker.py (WorkerMedium.remote_runFunction):
+	Call runBundledFunction.
+
+	* flumotion/common/medium.py (BaseMedium.runBundledFunction):
+	Moved back here from from flumotion.worker.worker, because fgc
+	uses it, and the flumotion admin should use it in the future. In
+	general you want a facility whereby a remote medium can run a
+	function from a bundled module; why make it specific? Reverts
+	[2776], pulling in the changes from [2778], [2805] and [2807].
+
 2006-06-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/main.py:
