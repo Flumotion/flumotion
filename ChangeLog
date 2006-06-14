@@ -1,3 +1,8 @@
+2006-06-14  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/worker/main.py:
+	  Fix more things broken by thomas's untested renaming.
+
 2006-06-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_common_messages.py:

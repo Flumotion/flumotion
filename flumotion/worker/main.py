@@ -256,7 +256,7 @@ def main(args):
 
     log.debug('worker', 'Reactor stopped')
 
-    pids = [kid.getPid() for kid in brain.kindergarten.getKids()]
+    pids = [kid.pid for kid in brain.kindergarten.getKids()]
     
     if pids:
         log.info('worker', 'Waiting for %d jobs to finish' % len(pids))
