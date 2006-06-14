@@ -682,9 +682,8 @@ msgid "Reload _Manager"
 msgstr "_Manager Herladen"
 
 #: data/glade/admin.glade:253
-#, fuzzy
 msgid "Reload _Admin"
-msgstr "_Alles Herladen"
+msgstr "A_dmin Herladen"
 
 #: data/glade/admin.glade:274
 #, fuzzy
