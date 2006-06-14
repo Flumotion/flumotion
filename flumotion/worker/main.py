@@ -224,7 +224,7 @@ def main(args):
     # connect the brain to the manager
     if options.transport == "tcp":
         reactor.connectTCP(options.host, options.port,
-            brain.worker_client_factory)
+            brain.workerClientFactory)
     elif options.transport == "ssl":
         from twisted.internet import ssl
         reactor.connectSSL(options.host, options.port,

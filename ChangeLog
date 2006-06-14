@@ -1,3 +1,8 @@
+2006-06-14  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/worker/main.py:
+	  worker_client_brain got renamed, so use the renamed one.
+
 2006-06-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/worker/worker.py (WorkerMedium.remote_runFunction):
