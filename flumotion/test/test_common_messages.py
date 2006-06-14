@@ -32,6 +32,12 @@ import gettext
 from flumotion.common import messages, log
 from flumotion.configure import configure
 from flumotion.twisted import flavors
+from flumotion.twisted.defer import defer_generator_method
+
+import twisted.copyright #T1.3
+#T1.3
+def weHaveAnOldTwisted():
+    return twisted.copyright.version[0] < '2'
 
 # markers
 from flumotion.common.messages import N_, ngettext
@@ -190,7 +196,12 @@ class PBSerializationTest(unittest.TestCase):
         self.runServer()
 
     def tearDown(self):
-        unittest.deferredResult(self.stopServer())
+        d = self.stopServer()
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+        else:
+            yield d
+    tearDown = defer_generator_method(tearDown)
         
     # helper functions to start PB comms
     def runClient(self):
@@ -230,126 +241,211 @@ class PBSerializationTest(unittest.TestCase):
         # should result in equal (but not necessarily the same) object
     
         # start everything
-        unittest.deferredResult(self.runClient())
-        
-        # get the message
-        d = self.perspective.callRemote('getSameTranslatable')
-        t1 = unittest.deferredResult(d)
-        self.failUnless(t1)
+        d = self.runClient()
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(self.runClient())
+            dd = self.perspective.callRemote('getSameTranslatable')
+            t1 = unittest.deferredResult(dd)
+            self.failUnless(t1)
 
-        # get it again
-        d = self.perspective.callRemote('getSameTranslatable')
-        t2 = unittest.deferredResult(d)
-        self.failUnless(t2)
+            # get it again
+            dd = self.perspective.callRemote('getSameTranslatable')
+            t2 = unittest.deferredResult(dd)
+            self.failUnless(t2)
 
-        # check if they proxied to objects that are equal, but different
-        self.assertEquals(t1, t2)
-        self.failUnless(t1 == t2)
-        self.failIf(t1 is t2)
+            # check if they proxied to objects that are equal, but different
+            self.assertEquals(t1, t2)
+            self.failUnless(t1 == t2)
+            self.failIf(t1 is t2)
          
-        # stop
-        unittest.deferredResult(self.stopClient())
+            # stop
+            unittest.deferredResult(self.stopClient())
+        else:
+            def runClientCallback(result):
+                # get the message
+                dd = self.perspective.callRemote('getSameTranslatable')
+                def getSameTranslatableCallback(t1):
+                    self.failUnless(t1)
+                    # get it again
+                    dd = self.perspective.callRemote('getSameTranslatable')
+                    def getSameTranslatableAgainCallback(t2):
+                        self.failUnless(t2)
+                        # check if they proxied to objects that are equal,
+                        # but different
+                        self.assertEquals(t1, t2)
+                        self.failUnless(t1 == t2)
+                        self.failIf(t1 is t2)
+         
+                        # stop
+                        d = self.stopClient()
+                        def stopClientCallback(res):
+                            pass
+                        d.addCallback(stopClientCallback)
+                        return d
+                    dd.addCallback(getSameTranslatableAgainCallback)
+                    return dd
+                dd.addCallback(getSameTranslatableCallback)
+                return dd
+            d.addCallback(runClientCallback)
+            return d
 
     def testGetEqualTranslatableTwice(self):
         # getting two different but equal translatable twice
         # will also result in equal (but not necessarily the same) object
     
         # start everything
-        unittest.deferredResult(self.runClient())
-        
-        # get the message
-        d = self.perspective.callRemote('getEqualTranslatable')
-        t1 = unittest.deferredResult(d)
-        self.failUnless(t1)
+        d = self.runClient()
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(self.runClient())
+            # get the message
+            d = self.perspective.callRemote('getEqualTranslatable')
+            t1 = unittest.deferredResult(d)
+            self.failUnless(t1)
 
-        # get it again
-        d = self.perspective.callRemote('getEqualTranslatable')
-        t2 = unittest.deferredResult(d)
-        self.failUnless(t2)
+            # get it again
+            d = self.perspective.callRemote('getEqualTranslatable')
+            t2 = unittest.deferredResult(d)
+            self.failUnless(t2)
 
-        # check if they proxied to objects that are equal, but different
-        self.assertEquals(t1, t2)
-        self.failUnless(t1 == t2)
-        self.failIf(t1 is t2)
+            # check if they proxied to objects that are equal, but different
+            self.assertEquals(t1, t2)
+            self.failUnless(t1 == t2)
+            self.failIf(t1 is t2)
          
-        # stop
-        unittest.deferredResult(self.stopClient())
+            # stop
+            unittest.deferredResult(self.stopClient())
+        else:
+            def runClientCallback(result):
+                d = self.perspective.callRemote('getEqualTranslatable')
+                def getEqualTranslatableCallback(t1):
+                    self.failUnless(t1)
+                    d = self.perspective.callRemote('getEqualTranslatable')
+                    def getEqualAgainCallback(t2):
+                        self.failUnless(t2)
+                        self.assertEquals(t1, t2)
+                        self.failUnless(t1 == t2)
+                        self.failIf(t1 is t2)
+                        d = self.stopClient()
+                        def stopClientCallback(res):
+                            pass
+                        d.addCallback(stopClientCallback)
+                        return d
+                    d.addCallback(getEqualAgainCallback)
+                    return d
+                d.addCallback(getEqualTranslatableCallback)
+                return d
+            d.addCallback(runClientCallback)
+            return d
+
 
     def testGetSameMessageTwice(self):
         # getting two proxied reference of the same ManagerMessage
         # should result in equal, but different objects
     
         # start everything
-        unittest.deferredResult(self.runClient())
-        
-        # get the message
-        d = self.perspective.callRemote('getMessage')
-        m1 = unittest.deferredResult(d)
+        d = self.runClient()
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(self.runClient())
+            # get the message
+            d = self.perspective.callRemote('getMessage')
+            t1 = unittest.deferredResult(d)
+            self.failUnless(t1)
 
-        self.failUnless(m1)
+            # get it again
+            d = self.perspective.callRemote('getMessage')
+            t2 = unittest.deferredResult(d)
+            self.failUnless(t2)
 
-        # get it again
-        d = self.perspective.callRemote('getMessage')
-        m2 = unittest.deferredResult(d)
-
-        self.failUnless(m2)
-
-        # check if they proxied to equal but different
-        self.assertEquals(m1, m2)
-        self.failUnless(m1 == m2)
-        self.failIf(m1 is m2)
+            # check if they proxied to objects that are equal, but different
+            self.assertEquals(t1, t2)
+            self.failUnless(t1 == t2)
+            self.failIf(t1 is t2)
          
-        # stop
-        unittest.deferredResult(self.stopClient())
+            # stop
+            unittest.deferredResult(self.stopClient())
+        else:
+            def runClientCallback(result):
+                d = self.perspective.callRemote('getMessage')
+                def getMessageCallback(m1):
+                    self.failUnless(m1)
+                    d = self.perspective.callRemote('getMessage')
+                    def getMessageAgainCallback(m2):
+                        self.failUnless(m2)
+                        self.assertEquals(m1, m2)
+                        self.failUnless(m1 == m2)
+                        self.failIf(m1 is m2)
+                        d = self.stopClient()
+                        def stopClientCallback(res):
+                            pass
+                        d.addCallback(stopClientCallback)
+                        return d
+                    d.addCallback(getMessageAgainCallback)
+                    return d
+                d.addCallback(getMessageCallback)
+                return d
+            d.addCallback(runClientCallback)
+            return d
 
     def testMessageAppendRemove(self):
         # this is what we eventually want; get the messages removed properly
         # from the list key
 
         # start everything
-        unittest.deferredResult(self.runClient())
+        d = self.runClient()
+
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
         
-        # get the state
-        d = self.perspective.callRemote('getState')
-        state = unittest.deferredResult(d)
+            # get the state
+            d = self.perspective.callRemote('getState')
+            state = unittest.deferredResult(d)
 
-        self.failUnless(state)
-        self.assertEqual(len(state.get('messages')), 0)
+            self.failUnless(state)
+            self.assertEqual(len(state.get('messages')), 0)
 
-        # ask server to append a message
-        d = self.perspective.callRemote('appendMessage')
-        r = unittest.deferredResult(d)
+            # ask server to append a message
+            d = self.perspective.callRemote('appendMessage')
+            r = unittest.deferredResult(d)
 
-        l = state.get('messages')
-        self.assertEquals(len(l), 1)
-        self.assertEquals(l[0].level, messages.INFO)
+            l = state.get('messages')
+            self.assertEquals(len(l), 1)
+            self.assertEquals(l[0].level, messages.INFO)
 
-        # ask server to append another message
-        d = self.perspective.callRemote('appendOtherMessage')
-        r = unittest.deferredResult(d)
+            # ask server to append another message
+            d = self.perspective.callRemote('appendOtherMessage')
+            r = unittest.deferredResult(d)
 
-        l = state.get('messages')
-        self.assertEquals(len(l), 2)
-        self.assertEquals(l[0].level, messages.INFO)
-        self.assertEquals(l[1].level, messages.WARNING)
+            l = state.get('messages')
+            self.assertEquals(len(l), 2)
+            self.assertEquals(l[0].level, messages.INFO)
+            self.assertEquals(l[1].level, messages.WARNING)
 
-        # ask server to remove other message
-        d = self.perspective.callRemote('removeOtherMessage')
-        r = unittest.deferredResult(d)
+            # ask server to remove other message
+            d = self.perspective.callRemote('removeOtherMessage')
+            r = unittest.deferredResult(d)
 
-        l = state.get('messages')
-        self.assertEquals(len(l), 1)
-        self.assertEquals(l[0].level, messages.INFO)
+            l = state.get('messages')
+            self.assertEquals(len(l), 1)
+            self.assertEquals(l[0].level, messages.INFO)
 
-        # ask server to remove first message
-        d = self.perspective.callRemote('removeMessage')
-        r = unittest.deferredResult(d)
+            # ask server to remove first message
+            d = self.perspective.callRemote('removeMessage')
+            r = unittest.deferredResult(d)
 
-        l = state.get('messages')
-        self.assertEquals(len(l), 0)
+            l = state.get('messages')
+            self.assertEquals(len(l), 0)
 
-        # stop
-        unittest.deferredResult(self.stopClient())
+            # stop
+            unittest.deferredResult(self.stopClient())
+        else:
+            def runClientCallback(result):
+                d = self.stopClient()
+                def stopClientCallback(res):
+                    pass
+                d.addCallback(stopClientCallback)
+                return d
+            d.addCallback(runClientCallback)
+            return d
 
 if __name__ == '__main__':
     unittest.main()

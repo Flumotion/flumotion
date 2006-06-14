@@ -1,3 +1,9 @@
+2006-06-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/test_common_messages.py:
+	* flumotion/test/test_component.py:
+	More tests ported to new twisted.
+
 2006-06-14  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/medium.py:
