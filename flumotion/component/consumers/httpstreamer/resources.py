@@ -317,7 +317,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             return softmax - self.__reserve_fds__
 
     def reachedMaxClients(self):
-        return len(self._requests) >= self.max_clients
+        return len(self._requests) >= self.maxclients
     
     def authenticate(self, request):
         """
@@ -458,7 +458,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         
     def _handleMaxClients(self, request):
         self.debug('Refusing clients, client limit %d reached' %
-            self.max_clients)
+            self.maxclients)
 
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_VERSION)

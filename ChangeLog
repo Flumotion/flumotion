@@ -1,3 +1,8 @@
+2006-06-15  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Use variables with better existingness.
+
 2006-06-15  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_common_componentui.py
