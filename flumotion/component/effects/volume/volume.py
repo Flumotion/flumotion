@@ -24,7 +24,15 @@ from flumotion.component import feedcomponent
 
 import gst
 
+# FIXME: it's illogical to have to provide level, but not volume.
+
 class Volume(feedcomponent.Effect):
+    """
+    I am an effect that can be added to any component that has a level
+    element and a volume element.
+
+    My component should implement setVolume() and getVolume()
+    """
     logCategory = "volume"
 
     def __init__(self, name, element, pipeline=None):
@@ -94,7 +102,14 @@ class Volume(feedcomponent.Effect):
         self.component.setVolume(value)
         # notify admin clients
         self.component.adminCallRemote("effectVolumeSet", self.name, value)
-                        
 
         return value
 
+    def effect_getVolume(self):
+        """
+        Gets current volume setting.
+
+        @return: what value the volume is set to
+        @rtype:  float (between 0.0 and 4.0)
+        """
+        return self.component.getVolume()

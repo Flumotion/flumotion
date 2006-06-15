@@ -7,6 +7,8 @@
       <entries>
         <entry type="component" location="audiotest.py"
                function="AudioTest"/>
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="AudioTestAdminGtk"/>
       </entries>
 
       <!-- priority to this clock so that when testing, clock choice is
@@ -47,6 +49,19 @@
                 <filename location="audiotest.py" />
             </directory>
         </directories>
+    </bundle>
+
+    <bundle name="audiotest-admin-gtk">
+      <dependencies>
+        <dependency name="audiotest-base" />
+        <dependency name="base-admin-gtk" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/producers/audiotest">
+          <filename location="admin_gtk.py" />
+        </directory>
+      </directories>
     </bundle>
 
   </bundles>

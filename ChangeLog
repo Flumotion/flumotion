@@ -1,3 +1,21 @@
+2006-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/effects/volume/admin_gtk.py:
+	  make the effect's ui query the initial volume first
+	* flumotion/component/base/admin_gtk.py:
+	  effect nodes should forward title
+	* flumotion/component/effects/volume/volume.py:
+	  add .getVolume(), document
+	* flumotion/component/producers/audiotest/Makefile.am:
+	* flumotion/component/producers/audiotest/admin_gtk.py:
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	  add a UI for the audiotest component, with a volume node
+	* flumotion/component/producers/soundcard/soundcard.py:
+	  add getVolume()
+	* po/POTFILES.in:
+	  add new admin_gtk.py
+
 2006-06-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/client.py:

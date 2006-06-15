@@ -84,3 +84,7 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
     def setVolume(self, value):
         self.debug("Volume set to: %d" % (value))
         self.warning("FIXME: soundcard.setVolume not implemented yet")
+
+    def getVolume(self):
+        self.warning("FIXME: soundcard.getVolume not implemented yet")
+        return 1.0

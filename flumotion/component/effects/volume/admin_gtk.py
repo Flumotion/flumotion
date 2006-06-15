@@ -65,8 +65,17 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         check = self.wtree.get_widget('volume-set-check')
         check.connect('toggled', self._check_toggled_cb)
 
-        return self.volume
+        # query for the effect's current volume setting
+        d = self.effectCallRemote("getVolume")
+        d.addCallback(self._getVolumeCallback)
+        d.addErrback(log.warningFailure)
+        return d
         
+    def _getVolumeCallback(self, result):
+        self.debug('got current volume %f' % result)
+        self.volumeSet(result)
+        return self.volume
+
     def volumeChanged(self, channel, peak, rms, decay):
         self.scale_volume.set_property('peak', clamp(peak, -90.0, 0.0))
         self.scale_volume.set_property('decay', clamp(decay, -90.0, 0.0))

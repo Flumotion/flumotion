@@ -23,6 +23,7 @@ import gst
 
 from flumotion.component import feedcomponent
 from flumotion.common import errors, gstreamer
+from flumotion.component.effects.volume import volume
 
 class AudioTest(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
@@ -31,18 +32,33 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
 
         if gst.gst_version < (0,9):
             is_live = 'sync=true'
-            source = 'sinesrc'
+            source = 'sinesrc name=src'
         else:
             is_live = 'is-live=true'
-            source = 'audiotestsrc'
+            source = 'audiotestsrc name=src'
 
         if not gstreamer.element_factory_exists(source):
             raise errors.MissingElementError(source)
 
-        return ('%s name=source %s ! audio/x-raw-int,rate=%d ! volume volume=%f'
+        return ('%s name=source %s ! audio/x-raw-int,rate=%d ! ' \
+            'volume name=volume volume=%f ! level name=level'
                 % (source, is_live, rate, volume))
 
     def configure_pipeline(self, pipeline, properties):
         element = self.get_element('source')
         if properties.has_key('freq'):
             element.set_property('freq', properties['freq'])
+
+        level = pipeline.get_by_name('level')
+        vol = volume.Volume('volume', level, pipeline)
+        self.addEffect(vol)
+
+    def setVolume(self, value):
+        self.debug("Volume set to %d" % value)
+        element = self.get_element('volume')
+        element.set_property('volume', value)
+
+    def getVolume(self):
+        element = self.get_element('volume')
+        return element.get_property('volume')
+    
