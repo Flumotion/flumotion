@@ -231,7 +231,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         deps = []
         for bundleName in bundleNames:
             thisdeps = basket.getDependencies(bundleName)
-            self.debug('dependencies of %s: %r' % (bundleName, thisdeps))
+            self.debug('dependencies of %s: %r' % (bundleName, thisdeps[1:]))
             deps.extend(thisdeps)
 
         sums = []

@@ -47,6 +47,10 @@ from flumotion.ui import icons, trayicon
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 
+from flumotion.common import messages
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
+
 class Window(log.Loggable, gobject.GObject):
     '''
     Creates the GtkWindow for the user interface.
@@ -298,9 +302,18 @@ class Window(log.Loggable, gobject.GObject):
 
         # check if we have the method
         if not hasattr(module, methodName):
-            self.warning('method %s not found in file %s' % (
-                methodName, fileName))
-            raise #FIXME: something appropriate
+            msg = 'method %s not found in file %s' % (
+                methodName, fileName)
+            self.warning(msg)
+
+            m = messages.Error(T_(
+                N_("This component has a UI bug.")),
+                    debug=msg,
+                    id=methodName)
+            self._messages_view.add_message(m)
+
+            # FIXME: something more detailed as an error ?
+            raise errors.FlumotionError(msg)
         klass = getattr(module, methodName)
 
         # instantiate the GUIClass

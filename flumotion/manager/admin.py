@@ -25,7 +25,7 @@ manager-side objects to handle administrative clients
 
 import os
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.spread import pb
 from twisted.python import failure
 
@@ -178,6 +178,8 @@ class AdminAvatar(base.ManagerAvatar):
                                L{flumotion.component.component.""" \
                                """BaseComponentMedium}'s remote_(methodName)
         @type  methodName:     str
+
+        @rtype: L{twisted.internet.defer.Deferred}
         """
         assert isinstance(componentState, planet.ManagerComponentState)
 
@@ -193,7 +195,7 @@ class AdminAvatar(base.ManagerAvatar):
         if methodName == "stop" and componentState.get('mood') == planet.moods.sad.value and not avatar:
             self.debug('asked to stop a sad component without avatar')
             componentState.set('mood', planet.moods.sleeping.value)
-            return
+            return defer.succeed(None)
         
         if not avatar:
             self.warning('No avatar for %s, cannot call remote' %

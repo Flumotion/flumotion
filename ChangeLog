@@ -1,3 +1,17 @@
+2006-06-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/client.py:
+	  If we can't instantiate the admin ui view, show us in the admin
+	  UI
+	* flumotion/manager/admin.py:
+	  perspective_... should return a deferred always
+	* flumotion/job/job.py:
+	  Since we are a proper spawn and not a fork, we can remove the
+	  os._exit() hack and let the reactor do .stop correctly.  Cleans
+	  up a bunch of shutdown failures.
+	* flumotion/manager/base.py:
+	  logging ourself as a dependency is confusing, so don't
+
 2006-06-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_http.py:
