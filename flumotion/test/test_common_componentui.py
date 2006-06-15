@@ -197,43 +197,36 @@ class TestStateSet(unittest.TestCase):
     # state causes a decache further up and so no changes to be
     # sent from the Cachable object.  This is only for Twisted 2.x
     def testSimpleStateListener(self):
+        def getStateCallback(state):
+            state.addListener(self)
+            self._state = state
+            return self.admin.perspective.callRemote('workerBearChild',
+                                                     'batman')
+
+        def workerBearChildCallback(res):
+            state = self._state
+            del self._state
+            self.failUnless(self.changes)
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
+            self.failIf(self.changes, self.changes)
+            state.removeListener(self)
+            del state
+
         self.reset()
         d = self.admin.perspective.callRemote('workerGetState')
-        if weHaveAnOldTwisted():
-            state = unittest.deferredResult(d)
-            pass
-        else:
-            def getStateCallback(state):
-                state.addListener(self)
-                # check state is fine before we continue
-                self.failUnless(state)
-                self.failUnless(state.hasKey('children'))
-                self.failIf(self.changes, self.changes)
+        d.addCallback(getStateCallback)
+        d.addCallback(workerBearChildCallback)
+        return d
 
-                # lets add a child
-                d = self.admin.perspective.callRemote('workerBearChild', 'batman')
-                def workerBearChildCallback(res):
-                    self.failUnless(self.changes)
-                    c = self.changes.pop()
-                    self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
-                    self.failIf(self.changes, self.changes)
-                    state.removeListener(self)
-                    #del state
-                d.addCallback(workerBearChildCallback)
-                return d
-            d.addCallback(getStateCallback)
-            return d
+    if weHaveAnOldTwisted():
+        testSimpleStateListener.skip = True
 
-    # With the deferred way, del state causes weird weird issues!
-    # I think twisted is looking at the callbacks and pre-empting the del
-    # and so decaching the object.  That's the only explanation I can think of
-    # after a lot of debugging!
-    def testStateListener(self):
-        # change state by appending children
-        self.reset()
-        # get the state
-        d = self.admin.perspective.callRemote('workerGetState')
-        if weHaveAnOldTwisted():
+    # change state by appending children get the state
+    if weHaveAnOldTwisted():
+        def testStateListener(self):
+            self.reset()
+            d = self.admin.perspective.callRemote('workerGetState')
             state = unittest.deferredResult(d)
 
             state.addListener(self)
@@ -263,47 +256,49 @@ class TestStateSet(unittest.TestCase):
             self.failIf(self.changes, self.changes)
             state.removeListener(self)
             del state
-        else:
+    else:
+        def testStateListener(self):
             def getStateCallback(state):
                 state.addListener(self)
+                self._state = state
                 self.failUnless(state)
                 self.failUnless(state.hasKey('children'))
                 self.failIf(self.changes, self.changes)
+                return self.admin.perspective.callRemote('workerBearChild', 'batman')
 
-                # change state by adding children
-                d = self.admin.perspective.callRemote('workerBearChild', 'batman')
+            def workerBearChildCallback(res):
+                state = self._state
+                self.failUnless(self.changes)
+                c = self.changes.pop()
+                self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
+                # make sure this is the only change
+                self.failIf(self.changes, self.changes)
+                return self.admin.perspective.callRemote('workerBearChild', 'robin')
 
-                def workerBearChildCallback(res):
-                    self.failUnless(self.changes)
-                    c = self.changes.pop()
-                    self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
-                    # make sure this is the only change
-                    self.failIf(self.changes, self.changes)
-                    
-                    d = self.admin.perspective.callRemote('workerBearChild', 'robin')
-                    def workerBearChildRobinCallback(res):
-                        self.failUnless(self.changes)
-                        c = self.changes.pop()
-                        self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
-                        self.failIf(self.changes, self.changes)
+            def workerBearChildRobinCallback(res):
+                state = self._state
+                self.failUnless(self.changes)
+                c = self.changes.pop()
+                self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
+                self.failIf(self.changes, self.changes)
+                return self.admin.perspective.callRemote('workerHaveAdopted', 'batman')
 
-                        d = self.admin.perspective.callRemote('workerHaveAdopted', 'batman')
-                        def workerHaveAdoptedCallback(res):
-                            self.failUnless(self.changes)
-                            c = self.changes.pop()
-                            self.failUnlessEqual(c, ('remove', state, 'children', 'batman'))
-                            self.failIf(self.changes, self.changes)
-                            state.removeListener(self)
-                            # NB: Read the note above the method
-                            print "Deleting state"
-                            #del state
-                        d.addCallback(workerHaveAdoptedCallback)
-                        return d
-                    d.addCallback(workerBearChildRobinCallback)
-                    return d
-                d.addCallback(workerBearChildCallback)
-                return d
+            def workerHaveAdoptedCallback(res):
+                state = self._state
+                del self._state
+                self.failUnless(self.changes)
+                c = self.changes.pop()
+                self.failUnlessEqual(c, ('remove', state, 'children', 'batman'))
+                self.failIf(self.changes, self.changes)
+                state.removeListener(self)
+                del state
+
+            self.reset()
+            d = self.admin.perspective.callRemote('workerGetState')
             d.addCallback(getStateCallback)
+            d.addCallback(workerBearChildCallback)
+            d.addCallback(workerBearChildRobinCallback)
+            d.addCallback(workerHaveAdoptedCallback)
             return d
 
     # With the deferred way, del state causes weird weird issues!
