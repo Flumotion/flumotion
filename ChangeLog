@@ -1,3 +1,9 @@
+2006-06-15  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Increase our soft fd limit to a higher value if possible, and if
+	  neccesary to meet the max clients setting.
+
 2006-06-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_common_componentui.py:

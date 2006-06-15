@@ -199,7 +199,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     def setUserLimit(self, limit):
         self.info('setting maxclients to %d' % limit)
-        self.maxclients = limit
+        self.maxclients = self.getMaxAllowedClients(limit)
+        # Log what we actually managed to set it to.
+        self.info('set maxclients to %d' % self.maxclients)
 
     def setBouncerName(self, bouncerName):
         self.bouncerName = bouncerName
@@ -288,27 +290,34 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         
         return True
 
-    def maxAllowedClients(self):
+    def getMaxAllowedClients(self, maxclients):
         """
         maximum number of allowed clients based on soft limit for number of
-        open file descriptors and fd reservation
+        open file descriptors and fd reservation. Increases soft limit to
+        hard limit if possible.
         """
-        limit = resource.getrlimit(resource.RLIMIT_NOFILE)
+        (softmax, hardmax) = resource.getrlimit(resource.RLIMIT_NOFILE)
         import sys
         version = sys.version_info
-        # Bug in python 2.4.3, see http://sourceforge.net/tracker/index.php?func=detail&aid=1494314&group_id=5470&atid=105470
-        if version[:3] == (2,4,3):
-            fd_limit = 1024 - self.__reserve_fds__
-        else:
-            fd_limit = limit[0] - self.__reserve_fds__
 
-        if self.maxclients != -1 and fd_limit >= self.maxclients:
-            return self.maxclients
+        if maxclients != -1:
+            neededfds = maxclients + self.__reserve_fds__
+
+            # Bug in python 2.4.3, see http://sourceforge.net/tracker/index.php?func=detail&aid=1494314&group_id=5470&atid=105470
+            if version[:3] == (2,4,3):
+                hardmax = 1024
+
+            if neededfds > softmax:
+                lim = min(neededfds, hardmax)
+                resource.setrlimit(resource.RLIMIT_NOFILE, (lim, hardmax))
+                return lim - self.__reserve_fds__
+            else:
+                return maxclients
         else:
-            return fd_limit
+            return softmax - self.__reserve_fds__
 
     def reachedMaxClients(self):
-        return len(self._requests) >= self.maxAllowedClients()
+        return len(self._requests) >= self.max_clients
     
     def authenticate(self, request):
         """
@@ -449,7 +458,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         
     def _handleMaxClients(self, request):
         self.debug('Refusing clients, client limit %d reached' %
-            self.maxAllowedClients())
+            self.max_clients)
 
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_VERSION)
