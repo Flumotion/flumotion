@@ -379,7 +379,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._callLaterId = reactor.callLater(1, self._checkUpdate)
 
     def getMaxClients(self):
-        return self.resource.maxAllowedClients()
+        return self.resource.maxclients
 
     def _notify_caps_cb(self, element, pad, param):
         caps = pad.get_negotiated_caps()
