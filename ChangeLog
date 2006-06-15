@@ -1,3 +1,15 @@
+2006-06-15  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/test_common_componentui.py:
+	  Port more tests away from unittest.deferredResult() etc.
+	  2 tests, testStateListener and testStateListenerIntermediate
+	  do weird things when having an explicit del of a RemoteCache
+	  inside the callback so the del's have been left commented.  Read
+	  the comments above the tests.
+
+	  Add a simpler test to expose this behaviour called
+	  testSimpleStateListener.
+
 2006-06-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/disker/disker.py:
