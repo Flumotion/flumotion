@@ -143,7 +143,13 @@ def mergeImplements(*classes):
     else:
         allYourBase = ()
         for clazz in classes:
-            interfaces = [i for i in clazz.__implemented__]
+            try:
+                interfaces = [i for i in clazz.__implemented__]
+            except AttributeError:
+                # with twisted 2.0.1, we get AttributeError with a simple
+                # class C: pass
+                # which does not have C.__implemented__
+                interfaces = []
             for interface in interfaces:
                 allYourBase += (interface,)
         return allYourBase
