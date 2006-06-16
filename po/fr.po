@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-15 12:40+0200\n"
+"POT-Creation-Date: 2006-06-16 16:47+0200\n"
 "PO-Revision-Date: 2006-03-03 18:02+0000\n"
 "Last-Translator: Edward Hervey <edward@fluendo.com>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
@@ -18,102 +18,107 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: flumotion/admin/gtk/client.py:157
+#: flumotion/admin/gtk/client.py:161
 msgid "Not connected"
 msgstr "Non connecté"
 
-#: flumotion/admin/gtk/client.py:186
+#: flumotion/admin/gtk/client.py:190
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Connexion à %s:%s"
 
-#: flumotion/admin/gtk/client.py:268 flumotion/admin/gtk/client.py:332
+#: flumotion/admin/gtk/client.py:272 flumotion/admin/gtk/client.py:345
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Chargement de l'interface de %s"
 
-#: flumotion/admin/gtk/client.py:350
+#: flumotion/admin/gtk/client.py:310
+#, fuzzy
+msgid "This component has a UI bug."
+msgstr "Aucun composant sélectionné."
+
+#: flumotion/admin/gtk/client.py:363
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Chargement de l'onglet %s pour %s"
 
-#: flumotion/admin/gtk/client.py:376
+#: flumotion/admin/gtk/client.py:389
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s n'a pas encore d'interface graphique"
 
-#: flumotion/admin/gtk/client.py:604
+#: flumotion/admin/gtk/client.py:617
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administration de Flumotion"
 
-#: flumotion/admin/gtk/client.py:620
+#: flumotion/admin/gtk/client.py:633
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Connection au contremaître perdue, reconnection en cours..."
 
-#: flumotion/admin/gtk/client.py:640
+#: flumotion/admin/gtk/client.py:653
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "La connexion au contremaître sur %s a été refusée."
 
-#: flumotion/admin/gtk/client.py:642
+#: flumotion/admin/gtk/client.py:655
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Connection à %s refusée."
 
-#: flumotion/admin/gtk/client.py:655
+#: flumotion/admin/gtk/client.py:668
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Connection au contremaître sur %s a echouée (%s)."
 
-#: flumotion/admin/gtk/client.py:753
+#: flumotion/admin/gtk/client.py:766
 #, python-format
 msgid "Component %s is sad"
 msgstr "Le composant %s est malheureux"
 
-#: flumotion/admin/gtk/client.py:760
+#: flumotion/admin/gtk/client.py:773
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Affichage de l'interface graphique pour %s"
 
-#: flumotion/admin/gtk/client.py:780
+#: flumotion/admin/gtk/client.py:793
 #, python-format
 msgid "No UI for component %s"
 msgstr "Pas d'interface graphique pour le composant %s"
 
-#: flumotion/admin/gtk/client.py:786
+#: flumotion/admin/gtk/client.py:799
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Le composant %s est encore en train de dormir"
 
-#: flumotion/admin/gtk/client.py:788
+#: flumotion/admin/gtk/client.py:801
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Demande de l'interface graphique pour %s ..."
 
-#: flumotion/admin/gtk/client.py:841
+#: flumotion/admin/gtk/client.py:854
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "L'assistant ne peut être executé car aucun ouvrier n'est connecté."
 
-#: flumotion/admin/gtk/client.py:882
+#: flumotion/admin/gtk/client.py:895
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Re-chargement du code de composant pour %s"
 
-#: flumotion/admin/gtk/client.py:913
+#: flumotion/admin/gtk/client.py:926
 msgid "No component selected."
 msgstr "Aucun composant sélectionné."
 
-#: flumotion/admin/gtk/client.py:930
+#: flumotion/admin/gtk/client.py:943
 #, python-format
 msgid "Failed to %s component %s"
 msgstr ""
 
-#: flumotion/admin/gtk/client.py:957
+#: flumotion/admin/gtk/client.py:970
 msgid "Import Configuration..."
 msgstr "Charger Configuration..."
 
-#: flumotion/admin/gtk/client.py:970
+#: flumotion/admin/gtk/client.py:983
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -121,11 +126,11 @@ msgstr ""
 "Le fichier existe déjà.\n"
 "Ecrire par dessus ?"
 
-#: flumotion/admin/gtk/client.py:992
+#: flumotion/admin/gtk/client.py:1005
 msgid "Export Configuration..."
 msgstr "Exporter la configuration..."
 
-#: flumotion/admin/gtk/client.py:1039
+#: flumotion/admin/gtk/client.py:1052
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -134,24 +139,24 @@ msgstr ""
 "Impossible de relancer le composant:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1049
+#: flumotion/admin/gtk/client.py:1062
 msgid "Reloading ..."
 msgstr "Re-chargement"
 
-#: flumotion/admin/gtk/client.py:1050
+#: flumotion/admin/gtk/client.py:1063
 msgid "Reloading client code"
 msgstr "Re-chargement du code du client"
 
-#: flumotion/admin/gtk/client.py:1052
+#: flumotion/admin/gtk/client.py:1065
 #, python-format
 msgid "Reloading %s code"
 msgstr "Re-chargement du code de %s"
 
-#: flumotion/admin/gtk/client.py:1081
+#: flumotion/admin/gtk/client.py:1094
 msgid "About Flumotion"
 msgstr "A propos de Flumotion"
 
-#: flumotion/admin/gtk/client.py:1100
+#: flumotion/admin/gtk/client.py:1113
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -161,7 +166,7 @@ msgstr ""
 "\n"
 "(C)·2004-2005·Fluendo·S.L."
 
-#: flumotion/admin/gtk/client.py:1105
+#: flumotion/admin/gtk/client.py:1118
 msgid "Authors"
 msgstr "Auteurs"
 
@@ -485,6 +490,11 @@ msgstr ""
 #, python-format
 msgid "Please upgrade '%s' to version %s."
 msgstr "Veuillez mettre à jour '%s' vers la version %s."
+
+#: flumotion/component/producers/audiotest/admin_gtk.py:31
+#, fuzzy
+msgid "Volume"
+msgstr "_Volume:"
 
 #: flumotion/component/producers/videotest/admin_gtk.py:34
 msgid "Pattern:"
@@ -1150,10 +1160,6 @@ msgstr ""
 "\n"
 "Cet assistant va vous guider à travers les étapes nécessaires pour la "
 "configuration de votre serveur de diffusion multimédia."
-
-#, fuzzy
-#~ msgid "The component was killed.\n"
-#~ msgstr "Aucun composant sélectionné."
 
 #, fuzzy
 #~ msgid "The component crashed.\n"

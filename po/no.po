@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-15 12:40+0200\n"
+"POT-Creation-Date: 2006-06-16 16:47+0200\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -14,102 +14,107 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: flumotion/admin/gtk/client.py:157
+#: flumotion/admin/gtk/client.py:161
 msgid "Not connected"
 msgstr "Ingen tilknyttning"
 
-#: flumotion/admin/gtk/client.py:186
+#: flumotion/admin/gtk/client.py:190
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Tilknyttet til %s:%s"
 
-#: flumotion/admin/gtk/client.py:268 flumotion/admin/gtk/client.py:332
+#: flumotion/admin/gtk/client.py:272 flumotion/admin/gtk/client.py:345
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Laster UI for %s ..."
 
-#: flumotion/admin/gtk/client.py:350
+#: flumotion/admin/gtk/client.py:310
+#, fuzzy
+msgid "This component has a UI bug."
+msgstr "Ingen komponent valgt."
+
+#: flumotion/admin/gtk/client.py:363
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Laster tab %s for %s ..."
 
-#: flumotion/admin/gtk/client.py:376
+#: flumotion/admin/gtk/client.py:389
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s har ikke noe UI enda"
 
-#: flumotion/admin/gtk/client.py:604
+#: flumotion/admin/gtk/client.py:617
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Flumotion Administrasjon"
 
-#: flumotion/admin/gtk/client.py:620
+#: flumotion/admin/gtk/client.py:633
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Mistet forbindelse med manager, kobler til på nytt ..."
 
-#: flumotion/admin/gtk/client.py:640
+#: flumotion/admin/gtk/client.py:653
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Forbindelsen til manager %s var ikke godkjent."
 
-#: flumotion/admin/gtk/client.py:642
+#: flumotion/admin/gtk/client.py:655
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Forbindelsen ble %s ikke akseptert."
 
-#: flumotion/admin/gtk/client.py:655
+#: flumotion/admin/gtk/client.py:668
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Forbindelsen til manager %s feilet (%s)."
 
-#: flumotion/admin/gtk/client.py:753
+#: flumotion/admin/gtk/client.py:766
 #, fuzzy, python-format
 msgid "Component %s is sad"
 msgstr "Komponent %s sover fortsatt"
 
-#: flumotion/admin/gtk/client.py:760
+#: flumotion/admin/gtk/client.py:773
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Viser grafisk grensesnitt for %s"
 
-#: flumotion/admin/gtk/client.py:780
+#: flumotion/admin/gtk/client.py:793
 #, python-format
 msgid "No UI for component %s"
 msgstr "Ikke noe grafisk grensesnitt for komponent %s"
 
-#: flumotion/admin/gtk/client.py:786
+#: flumotion/admin/gtk/client.py:799
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Komponent %s sover fortsatt"
 
-#: flumotion/admin/gtk/client.py:788
+#: flumotion/admin/gtk/client.py:801
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Anmoder of grafisk grensesnitt for %s ..."
 
-#: flumotion/admin/gtk/client.py:841
+#: flumotion/admin/gtk/client.py:854
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "Veiviseren kan ikke starte fordi ingen arbeidere er logget inn."
 
-#: flumotion/admin/gtk/client.py:882
+#: flumotion/admin/gtk/client.py:895
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Omlaster komponent kode for %s"
 
-#: flumotion/admin/gtk/client.py:913
+#: flumotion/admin/gtk/client.py:926
 msgid "No component selected."
 msgstr "Ingen komponent valgt."
 
-#: flumotion/admin/gtk/client.py:930
+#: flumotion/admin/gtk/client.py:943
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "Feilet å %s komponent %s"
 
-#: flumotion/admin/gtk/client.py:957
+#: flumotion/admin/gtk/client.py:970
 msgid "Import Configuration..."
 msgstr "Importer konfigurasjon..."
 
-#: flumotion/admin/gtk/client.py:970
+#: flumotion/admin/gtk/client.py:983
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -117,11 +122,11 @@ msgstr ""
 "Filen eksisterer allerede.\n"
 "Overskriv?"
 
-#: flumotion/admin/gtk/client.py:992
+#: flumotion/admin/gtk/client.py:1005
 msgid "Export Configuration..."
 msgstr "Eksporter konfigurasjon..."
 
-#: flumotion/admin/gtk/client.py:1039
+#: flumotion/admin/gtk/client.py:1052
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -130,24 +135,24 @@ msgstr ""
 "Kunne ikke laste om komponent:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1049
+#: flumotion/admin/gtk/client.py:1062
 msgid "Reloading ..."
 msgstr "Laster om..."
 
-#: flumotion/admin/gtk/client.py:1050
+#: flumotion/admin/gtk/client.py:1063
 msgid "Reloading client code"
 msgstr "Laster om klient kode"
 
-#: flumotion/admin/gtk/client.py:1052
+#: flumotion/admin/gtk/client.py:1065
 #, python-format
 msgid "Reloading %s code"
 msgstr "Laster om %s kode"
 
-#: flumotion/admin/gtk/client.py:1081
+#: flumotion/admin/gtk/client.py:1094
 msgid "About Flumotion"
 msgstr "Om Flumotion"
 
-#: flumotion/admin/gtk/client.py:1100
+#: flumotion/admin/gtk/client.py:1113
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -157,7 +162,7 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: flumotion/admin/gtk/client.py:1105
+#: flumotion/admin/gtk/client.py:1118
 msgid "Authors"
 msgstr "Forfattere"
 
@@ -471,6 +476,11 @@ msgstr ""
 #, python-format
 msgid "Please upgrade '%s' to version %s."
 msgstr ""
+
+#: flumotion/component/producers/audiotest/admin_gtk.py:31
+#, fuzzy
+msgid "Volume"
+msgstr "_Volum:"
 
 #: flumotion/component/producers/videotest/admin_gtk.py:34
 #, fuzzy
@@ -1133,10 +1143,6 @@ msgstr ""
 "\n"
 "Denne veiviser vil veilede deg gjenneom de nødvendige set for å konfigurere "
 "din streaming media server."
-
-#, fuzzy
-#~ msgid "The component was killed.\n"
-#~ msgstr "Ingen komponent valgt."
 
 #, fuzzy
 #~ msgid "The component crashed.\n"
