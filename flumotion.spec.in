@@ -16,6 +16,7 @@ Requires:	python-twisted >= 1.3.0
 Requires:	pygtk2 >= 2.4.0
 Requires:	python-imaging
 Requires:	pyOpenSSL
+Requires:       pkgconfig
 
 # for make-dummy-cert to work
 Requires(post):	openssl

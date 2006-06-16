@@ -1,5 +1,10 @@
 2006-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion.spec.in:
+	  require pkgconfig since we install a .pc file
+
+2006-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/effects/volume/admin_gtk.py:
 	  make the effect's ui query the initial volume first
 	* flumotion/component/base/admin_gtk.py:
