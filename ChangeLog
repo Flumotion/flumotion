@@ -1,5 +1,10 @@
 2006-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/audiotest/audiotest.py:
+	  That was pretty bad - the source already had a name
+
+2006-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion.spec.in:
 	  only create default manager/worker if
 	  $sysconfig/flumotion/(manager,worker) does not exist

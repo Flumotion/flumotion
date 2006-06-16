@@ -32,10 +32,10 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
 
         if gst.gst_version < (0,9):
             is_live = 'sync=true'
-            source = 'sinesrc name=src'
+            source = 'sinesrc'
         else:
             is_live = 'is-live=true'
-            source = 'audiotestsrc name=src'
+            source = 'audiotestsrc'
 
         if not gstreamer.element_factory_exists(source):
             raise errors.MissingElementError(source)
