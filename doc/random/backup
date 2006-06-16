@@ -1,0 +1,35 @@
+BACKUP MANAGER
+--------------
+To deal with manager upgrades, network outages, ..., it needs to be possible
+to have one or more backup managers running.
+
+To make this work, the state of the planet should be synchronized across
+managers.
+
+Use cases:
+
+- manager migration/upgrade:
+  - administrator starts admin client to manager A
+  - administrator creates a new manager B on another machine for this planet
+  - administrator migrates all components and workers, plus itself, to 
+    manager B
+  - administrator shuts down manager A
+
+- manager failover:
+  - manager A was started with a configuration
+  - manager B was started as a "slave" to manager A
+  - at some point, manager A crashes/gets stopped
+  - all components and workers and admins log in to backup manager B
+  - manager B can use cached state from A and new logins to reconstruct
+    the running config
+
+
+Ideas:
+- use RemoteCache, Cacheable to implement state
+- create class that subclasses both to implement mirrored states
+- have a component be the state "master", replicating its state cacheable
+  to the manager it is logged into
+- have the manager cache this state to other managers
+- have the manager have state of its own by combining all client state
+  plus its private state
+- partial manager failover:
