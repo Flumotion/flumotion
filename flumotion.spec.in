@@ -65,7 +65,7 @@ desktop-file-install \
   --delete-original \
   $RPM_BUILD_ROOT%{_datadir}/applications/flumotion-admin.desktop
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/workers
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion
 
 # install make-dummy-cert script
 install -d $RPM_BUILD_ROOT%{_datadir}/flumotion
@@ -111,8 +111,7 @@ fi
 
 # create a default planet config if no manager configs present
 # the default login will be user/test
-# FIXME: still need a way of specifying we really do not want a default manager
-if ! ls %{_sysconfdir}/flumotion/managers/*/*.xml >/dev/null 2>&1
+if ! test -e %{_sysconfdir}/flumotion/managers
 then
   mkdir -p %{_sysconfdir}/flumotion/managers/default/flows
   cat > %{_sysconfdir}/flumotion/managers/default/planet.xml <<EOF
@@ -141,9 +140,9 @@ fi
 
 # create a default worker config if no worker configs present
 # the default login will be user/test
-# FIXME: still need a way of specifying we really do not want a default worker
-if ! test -e %{_sysconfdir}/flumotion/*/default.xml
+if ! test -e %{_sysconfdir}/flumotion/workers
 then
+  mkdir -p %{_sysconfdir}/flumotion/workers
   cat > %{_sysconfdir}/flumotion/workers/default.xml <<EOF
 <worker>
  
