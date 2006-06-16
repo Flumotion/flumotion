@@ -1,6 +1,11 @@
 2006-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:
+	  create default manager config dir in post script
+
+2006-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion.spec.in:
 	  require pkgconfig since we install a .pc file
 
 2006-06-16  Thomas Vander Stichele  <thomas at apestaart dot org>

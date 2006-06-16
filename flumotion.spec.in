@@ -65,7 +65,6 @@ desktop-file-install \
   --delete-original \
   $RPM_BUILD_ROOT%{_datadir}/applications/flumotion-admin.desktop
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/managers/default/flows
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion/workers
 
 # install make-dummy-cert script
@@ -115,6 +114,7 @@ fi
 # FIXME: still need a way of specifying we really do not want a default manager
 if ! ls %{_sysconfdir}/flumotion/managers/*/*.xml >/dev/null 2>&1
 then
+  mkdir -p %{_sysconfdir}/flumotion/managers/default/flows
   cat > %{_sysconfdir}/flumotion/managers/default/planet.xml <<EOF
 <planet>
  
