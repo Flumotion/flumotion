@@ -67,21 +67,21 @@ def parsePBConnectionInfo(string, username='user', password='test',
     mandatory. The default values for username, password, and port will
     be taken from the optional username, password and port arguments.
 
-    @param string: A string describing the PB connection.
-    @type  string: str
+    @param string:   A string describing the PB connection.
+    @type  string:   str
     @param username: Default username, or 'user' if not given.
     @type  username: str
     @param password: Default password, or 'test' if not given.
     @type  password: str
-    @param port: Default port, or 7531 if not given.
-    @type  port: int
-    @param use_ssl: Whether to use SSL, or True if not given. Note that
-    there is no syntax in the connection string for specifying whether
-    or not to use SSL; if you want to control this you will have to
-    provide another method.
-    @type  use_ssl: bool
+    @param port:     Default port, or 7531 if not given.
+    @type  port:     int
+    @param use_ssl:  Whether to use SSL, or True if not given. Note that
+                     there is no syntax in the connection string for specifying
+                     whether or not to use SSL; if you want to control this you
+                     will have to provide another method.
+    @type  use_ssl:  bool
 
-    @rtype L{PBConnectionInfo}
+    @rtype: L{PBConnectionInfo}
     """
     keycard = keycards.KeycardUACPP(username, password, None)
     ret = PBConnectionInfo(None, port, use_ssl, keycard)
