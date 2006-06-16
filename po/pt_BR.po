@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-26 15:49+0200\n"
+"POT-Creation-Date: 2006-06-15 12:40+0200\n"
 "PO-Revision-Date: 2006-04-21 11:36-0300\n"
 "Last-Translator: Pablo Lorenzzoni <spectra@debian.org>\n"
 "Language-Team: pt_BR <spectra@debian.org>\n"
@@ -18,102 +18,102 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: flumotion/admin/gtk/client.py:156
+#: flumotion/admin/gtk/client.py:157
 msgid "Not connected"
 msgstr "Desconectado"
 
-#: flumotion/admin/gtk/client.py:185
+#: flumotion/admin/gtk/client.py:186
 #, python-format
 msgid "Connecting to %s:%s"
 msgstr "Conectando em %s:%s"
 
-#: flumotion/admin/gtk/client.py:267 flumotion/admin/gtk/client.py:331
+#: flumotion/admin/gtk/client.py:268 flumotion/admin/gtk/client.py:332
 #, python-format
 msgid "Loading UI for %s ..."
 msgstr "Carregando UI para %s ..."
 
-#: flumotion/admin/gtk/client.py:349
+#: flumotion/admin/gtk/client.py:350
 #, python-format
 msgid "Loading tab %s for %s ..."
 msgstr "Carregando etiqueta %s para %s ..."
 
-#: flumotion/admin/gtk/client.py:375
+#: flumotion/admin/gtk/client.py:376
 #, python-format
 msgid "%s does not have a UI yet"
 msgstr "%s ainda não tem UI"
 
-#: flumotion/admin/gtk/client.py:603
+#: flumotion/admin/gtk/client.py:604
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administração do Flumotion"
 
-#: flumotion/admin/gtk/client.py:619
+#: flumotion/admin/gtk/client.py:620
 msgid "Lost connection to manager, reconnecting ..."
 msgstr "Conexão com o gerenciador perdida, reconectando ..."
 
-#: flumotion/admin/gtk/client.py:639
+#: flumotion/admin/gtk/client.py:640
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "Conexão com o gerenciador em %s foi recusada."
 
-#: flumotion/admin/gtk/client.py:641
+#: flumotion/admin/gtk/client.py:642
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "Conexão com %s foi recusada"
 
-#: flumotion/admin/gtk/client.py:654
+#: flumotion/admin/gtk/client.py:655
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Conexão com o gerenciador em %s falhou (%s)."
 
-#: flumotion/admin/gtk/client.py:752
+#: flumotion/admin/gtk/client.py:753
 #, python-format
 msgid "Component %s is sad"
 msgstr "Componente %s está triste"
 
-#: flumotion/admin/gtk/client.py:759
+#: flumotion/admin/gtk/client.py:760
 #, python-format
 msgid "Showing UI for %s"
 msgstr "Mostrando UI para %s"
 
-#: flumotion/admin/gtk/client.py:779
+#: flumotion/admin/gtk/client.py:780
 #, python-format
 msgid "No UI for component %s"
 msgstr "Sem componente UI para %s"
 
-#: flumotion/admin/gtk/client.py:785
+#: flumotion/admin/gtk/client.py:786
 #, python-format
 msgid "Component %s is still sleeping"
 msgstr "Componente %s ainda está dormindo"
 
-#: flumotion/admin/gtk/client.py:787
+#: flumotion/admin/gtk/client.py:788
 #, python-format
 msgid "Requesting UI for %s ..."
 msgstr "Solicitando UI para %s ..."
 
-#: flumotion/admin/gtk/client.py:840
+#: flumotion/admin/gtk/client.py:841
 msgid "The wizard cannot be run because no workers are logged in."
 msgstr "O wizard não pode ser executado porque não há workers conectados."
 
-#: flumotion/admin/gtk/client.py:881
+#: flumotion/admin/gtk/client.py:882
 #, python-format
 msgid "Reloading component code for %s"
 msgstr "Recarregando código do componente %s"
 
-#: flumotion/admin/gtk/client.py:912
+#: flumotion/admin/gtk/client.py:913
 msgid "No component selected."
 msgstr "Nenhum componente selecionado."
 
-#: flumotion/admin/gtk/client.py:929
+#: flumotion/admin/gtk/client.py:930
 #, python-format
 msgid "Failed to %s component %s"
 msgstr "Erro ao %s componente %s"
 
-#: flumotion/admin/gtk/client.py:956
+#: flumotion/admin/gtk/client.py:957
 msgid "Import Configuration..."
 msgstr "Importar Configuração..."
 
-#: flumotion/admin/gtk/client.py:969
+#: flumotion/admin/gtk/client.py:970
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -121,11 +121,11 @@ msgstr ""
 "Arquivo já existente.\n"
 "Sobrescrever?"
 
-#: flumotion/admin/gtk/client.py:991
+#: flumotion/admin/gtk/client.py:992
 msgid "Export Configuration..."
 msgstr "Exportar Configuração..."
 
-#: flumotion/admin/gtk/client.py:1038
+#: flumotion/admin/gtk/client.py:1039
 #, python-format
 msgid ""
 "Could not reload component:\n"
@@ -134,24 +134,24 @@ msgstr ""
 "Não foi possível recarregar o componente:\n"
 "%s."
 
-#: flumotion/admin/gtk/client.py:1048
+#: flumotion/admin/gtk/client.py:1049
 msgid "Reloading ..."
 msgstr "Recarregando ..."
 
-#: flumotion/admin/gtk/client.py:1049
+#: flumotion/admin/gtk/client.py:1050
 msgid "Reloading client code"
 msgstr "Recarregando código do cliente"
 
-#: flumotion/admin/gtk/client.py:1051
+#: flumotion/admin/gtk/client.py:1052
 #, python-format
 msgid "Reloading %s code"
 msgstr "Recarregando código de %s"
 
-#: flumotion/admin/gtk/client.py:1080
+#: flumotion/admin/gtk/client.py:1081
 msgid "About Flumotion"
 msgstr "Sobre o Flumotion"
 
-#: flumotion/admin/gtk/client.py:1099
+#: flumotion/admin/gtk/client.py:1100
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -161,7 +161,7 @@ msgstr ""
 "\n"
 "(C)·2004-2005·Fluendo·S.L."
 
-#: flumotion/admin/gtk/client.py:1104
+#: flumotion/admin/gtk/client.py:1105
 msgid "Authors"
 msgstr "Autores"
 
@@ -170,14 +170,14 @@ msgid "Error"
 msgstr "Erro"
 
 #: flumotion/admin/gtk/message.py:35
-#: flumotion/test/test_common_messages.py:115
-#: flumotion/test/test_common_messages.py:152
+#: flumotion/test/test_common_messages.py:121
+#: flumotion/test/test_common_messages.py:158
 msgid "Warning"
 msgstr "Aviso"
 
-#: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:56
-#: flumotion/test/test_common_messages.py:150
-#: flumotion/test/test_common_messages.py:166
+#: flumotion/admin/gtk/message.py:36 flumotion/test/test_common_messages.py:62
+#: flumotion/test/test_common_messages.py:156
+#: flumotion/test/test_common_messages.py:172
 msgid "Note"
 msgstr "Nota"
 
@@ -365,7 +365,7 @@ msgstr ""
 msgid "Internal error: could not run check code on worker."
 msgstr "Erro interno: não pode executar código no worker."
 
-#: flumotion/component/feedcomponent.py:130
+#: flumotion/component/feedcomponent.py:131
 #, python-format
 msgid ""
 "The worker does not have the '%s' element installed.\n"
@@ -374,7 +374,7 @@ msgstr ""
 "O worker não tem o elemento '%s' instalado.\n"
 "Por favor, instale o plug-in necessário e reinicie o componente.\n"
 
-#: flumotion/component/feedcomponent.py:145
+#: flumotion/component/feedcomponent.py:146
 msgid "GStreamer error: could not parse component pipeline."
 msgstr "Erro no GStreamer: não pode parsear o pipeline do componente."
 
@@ -383,7 +383,7 @@ msgid "GStreamer error."
 msgstr "Erro no GStreamer."
 
 #: flumotion/component/feedcomponent08.py:252
-#: flumotion/manager/component.py:575
+#: flumotion/manager/component.py:626
 msgid "Could not start component."
 msgstr "Não foi possível iniciar o componente."
 
@@ -391,18 +391,18 @@ msgstr "Não foi possível iniciar o componente."
 msgid "Component lost feed, reconnecting..."
 msgstr "O componente perdeu alimentação, reconectando..."
 
-#: flumotion/component/consumers/httpstreamer/http.py:515
+#: flumotion/component/consumers/httpstreamer/http.py:536
 #, python-format
 msgid "Porter '%s' not found, cannot slave this streamer to it."
 msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/http.py:603
+#: flumotion/component/consumers/httpstreamer/http.py:624
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Erro de rede: porta TCP %d não está disponível."
 
 #: flumotion/component/consumers/httpstreamer/http.glade:7
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:211
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:210
 msgid "Statistics"
 msgstr "Estatísticas"
 
@@ -461,7 +461,7 @@ msgstr "<b>Comsumo de Cliente</b>"
 msgid "Web URL:"
 msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:213
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:212
 msgid "Log"
 msgstr ""
 
@@ -601,37 +601,37 @@ msgid_plural "I translated %d things"
 msgstr[0] ""
 msgstr[1] ""
 
-#: flumotion/test/test_common_messages.py:44
+#: flumotion/test/test_common_messages.py:50
 msgid "Something is really wrong."
 msgstr ""
 
-#: flumotion/test/test_common_messages.py:57
+#: flumotion/test/test_common_messages.py:63
 msgid "warning"
 msgstr ""
 
-#: flumotion/test/test_common_messages.py:61
-#: flumotion/test/test_common_messages.py:86
+#: flumotion/test/test_common_messages.py:67
+#: flumotion/test/test_common_messages.py:92
 #, python-format
 msgid "%s can be translated"
 msgstr ""
 
-#: flumotion/test/test_common_messages.py:68
+#: flumotion/test/test_common_messages.py:74
 #, python-format
 msgid "%s %d has %d thing"
 msgid_plural "%s %d has %d things"
 msgstr[0] ""
 msgstr[1] ""
 
-#: flumotion/test/test_common_messages.py:95
+#: flumotion/test/test_common_messages.py:101
 msgid "Something is really wrong. "
 msgstr ""
 
-#: flumotion/test/test_common_messages.py:96
+#: flumotion/test/test_common_messages.py:102
 #, python-format
 msgid "But does %s know what ?"
 msgstr ""
 
-#: flumotion/test/test_common_messages.py:128
+#: flumotion/test/test_common_messages.py:134
 msgid "uh oh"
 msgstr ""
 
