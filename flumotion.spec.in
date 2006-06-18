@@ -1,3 +1,9 @@
+%define         gst_minver      0.10.1
+%define         gstpb_minver    0.10.1
+%define         gstpy_minver    0.10.0
+%define         pygtk_minver    2.8.0
+%define         gstreamer       gstreamer
+
 Name:           @PACKAGE@
 Version:        @VERSION@
 Release:        @RELEASE@
@@ -10,10 +16,11 @@ Source:         http://www.flumotion.net/src/flumotion/%{name}-%{version}.tar.bz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Requires:	python >= 2.3
-Requires:	gstreamer >= 0.8.8
-Requires:	gstreamer-python >= 0.8.1
+Requires:	%{gstreamer} >= %{gst_minver}
+Requires:	%{gstreamer}-plugins-base >= %{gstpb_minver}
+Requires:	%{gstreamer}-python >= %{gstpy_minver}
 Requires:	python-twisted >= 1.3.0
-Requires:	pygtk2 >= 2.4.0
+Requires:	pygtk2 >= %{pygtk_minver}
 Requires:	python-imaging
 Requires:	pyOpenSSL
 Requires:       pkgconfig
@@ -21,11 +28,11 @@ Requires:       pkgconfig
 # for make-dummy-cert to work
 Requires(post):	openssl
 
-BuildRequires:	gstreamer-devel >= 0.8.5
-BuildRequires:	gstreamer-python >= 0.8.1
+BuildRequires:	%{gstreamer}-devel >= %{gst_minver}
+BuildRequires:	%{gstreamer}-python >= %{gstpy_minver}
 BuildRequires:	python-twisted >= 1.3.0
 BuildRequires:	python-devel >= 2.3
-BuildRequires:	pygtk2-devel >= 2.4.0
+BuildRequires:	pygtk2-devel >= %{pygtk_minver}
 BuildRequires:	gtk2-devel
 
 # docs
@@ -95,7 +102,11 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/cache/flumotion
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-/usr/sbin/useradd -s /sbin/nologin -r -d %{_datadir}/flumotion -M -r \
+/usr/sbin/useradd -s /sbin/nologin -r \
+	-d %{_localstatedir}/cache/flumotion -M -r \
+	flumotion > /dev/null 2> /dev/null || :
+# for old installs, we need to move the homedir
+/usr/sbin/usermod -d  %{_localstatedir}/cache/flumotion \
 	flumotion > /dev/null 2> /dev/null || :
 
 %post
@@ -220,6 +231,12 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Sun Jun 18 2006 Thomas Vander Stichele <thomas at apestaart dot org>
+- only create default worker if there is not /etc/flumotion/workers
+- only create default manager if there is not /etc/flumotion/managers
+- make gstreamer versions defines
+- change flumotion home directory to /var/cache/flumotion
+
 * Fri Jul 29 2005 Thomas Vander Stichele <thomas at apestaart dot org>
 - added translations
 
