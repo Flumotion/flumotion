@@ -1,6 +1,11 @@
 2006-06-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:
+	  sync with Extras spec file
+
+2006-06-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion.spec.in:
 	  updates to spec file for new home dir and default worker/manager
 
 2006-06-17  Thomas Vander Stichele  <thomas at apestaart dot org>

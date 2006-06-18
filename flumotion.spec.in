@@ -23,7 +23,7 @@ Requires:	python-twisted >= 1.3.0
 Requires:	pygtk2 >= %{pygtk_minver}
 Requires:	python-imaging
 Requires:	pyOpenSSL
-Requires:       pkgconfig
+Requires:	pkgconfig
 
 # for make-dummy-cert to work
 Requires(post):	openssl
@@ -64,6 +64,7 @@ rm -rf $RPM_BUILD_ROOT
 # final location
 make DESTDIR=$RPM_BUILD_ROOT install
 
+# desktop file
 desktop-file-install \
   --vendor fedora \
   --mode 644 \
@@ -86,11 +87,6 @@ install -m 755 \
 	doc/redhat/flumotion \
 	$RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
 
-# create a .flumotion in the new home
-# FIXME: needs to be done more gracefully
-
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/flumotion/.flumotion
-
 # create log and run and cache directory
 install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
 install -d $RPM_BUILD_ROOT%{_localstatedir}/run/flumotion
@@ -102,11 +98,11 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/cache/flumotion
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-/usr/sbin/useradd -s /sbin/nologin -r \
-	-d %{_localstatedir}/cache/flumotion -M -r \
+/usr/sbin/useradd -s /sbin/nologin \
+	-r -d %{_localstatedir}/cache/flumotion -M \
 	flumotion > /dev/null 2> /dev/null || :
 # for old installs, we need to move the homedir
-/usr/sbin/usermod -d  %{_localstatedir}/cache/flumotion \
+/usr/sbin/usermod -d %{_localstatedir}/cache/flumotion \
 	flumotion > /dev/null 2> /dev/null || :
 
 %post
@@ -219,10 +215,9 @@ fi
 %{_mandir}/man1/flumotion*.1*
 
 %{_datadir}/flumotion/glade
-%{_datadir}/flumotion/image   	  	 
-%{_datadir}/flumotion/make-dummy-cert  
+%{_datadir}/flumotion/image
+%{_datadir}/flumotion/make-dummy-cert
 %{_datadir}/flumotion/*.xsl
-%dir %attr(750,flumotion,root) %{_datadir}/flumotion/.flumotion
 
 %attr(750,flumotion,root) %{_sysconfdir}/flumotion
 %attr(750,flumotion,root) %{_localstatedir}/run/flumotion
