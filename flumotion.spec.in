@@ -1,8 +1,16 @@
+%if 0%{!?_with_gstreamer08:1}
 %define         gst_minver      0.10.1
 %define         gstpb_minver    0.10.1
 %define         gstpy_minver    0.10.0
 %define         pygtk_minver    2.8.0
-%define         gstreamer       gstreamer
+%else
+%define         gst_minver      0.8.8
+%define         gstp_minver     0.8.8
+%define         gstpy_minver    0.8.1
+%define         pygtk_minver    2.4.3
+%endif
+
+%{!?gstreamer:  %define         gstreamer       gstreamer}
 
 Name:           @PACKAGE@
 Version:        @VERSION@
@@ -17,8 +25,12 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Requires:	python >= 2.3
 Requires:	%{gstreamer} >= %{gst_minver}
-Requires:	%{gstreamer}-plugins-base >= %{gstpb_minver}
 Requires:	%{gstreamer}-python >= %{gstpy_minver}
+%if 0%{!?_with_gstreamer08:1}
+Requires:	%{gstreamer}-plugins-base >= %{gstpb_minver}
+%else
+Requires:	%{gstreamer}-plugins >= %{gstp_minver}
+%endif
 Requires:	python-twisted >= 1.3.0
 Requires:	pygtk2 >= %{pygtk_minver}
 Requires:	python-imaging
@@ -48,6 +60,18 @@ BuildRequires:	desktop-file-utils
 
 %description
 Flumotion, the Fluendo Streaming Server.
+
+Flumotion can work with GStreamer 0.8 and/or 0.10.
+
+By default it will build against the 0.10 GStreamer version.  To use 0.8
+instead, use:
+  --with gstreamer08
+
+To define the base name of GStreamer packages to build against
+(gstreamer, gstreamer08 or gstreamer010, depending on your distro), use e.g.:
+  --define 'gstreamer gstreamer010'
+These packages should of course match your choice of building or not building
+with gstreamer08.
 
 %prep
 %setup -q
