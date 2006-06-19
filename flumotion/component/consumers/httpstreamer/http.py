@@ -186,8 +186,8 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     def remote_getStreamData(self):
         return self.comp.getStreamData()
 
-    def remote_getLoadDeltas(self):
-        return self.comp.getLoadDeltas()
+    def remote_getLoadData(self):
+        return self.comp.getLoadData()
 
 class HTTPPorterClientFactory(porterclient.PorterClientFactory):
 
@@ -421,11 +421,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 'description' : m3ufile
             }
 
-    def getLoadDeltas(self):
+    def getLoadData(self):
         """
-        Return a tuple (deltaadded, deltaremoved) of our current estimate of
-        how much bitrate is added, removed due to client connections, 
-        disconnections, per second.
+        Return a tuple (deltaadded, deltaremoved, bytes_transferred, 
+        current_clients) of our current bandwidth and user values.
+        The deltas are estimates of how much bitrate is added, removed i
+        due to client connections, disconnections, per second.
         """
         # We calculate the estimated clients added/removed per second, then
         # multiply by the stream bitrate
@@ -437,7 +438,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         uptime          = self.getUptime()
         bitrate = bytes_received * 8 / uptime
 
-        return (deltaadded * bitrate, deltaremoved * bitrate)
+        bytes_sent      = self.getBytesSent()
+        clients_connected = self.getClients()
+
+        return (deltaadded * bitrate, deltaremoved * bitrate, bytes_sent, 
+            clients_connected)
     
     def add_client(self, fd):
         sink = self.get_element('sink')

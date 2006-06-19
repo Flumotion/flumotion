@@ -1,3 +1,8 @@
+2006-06-19  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Implement new getLoadData() remote call, remove old getLoadDeltas()
+
 2006-06-18  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:
