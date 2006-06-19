@@ -33,51 +33,7 @@ from twisted.internet import reactor, error
 from flumotion.manager import manager
 from flumotion.common import log, config, common, errors, setup
 from flumotion.configure import configure
-
-class ServerContextFactory(log.Loggable):
-
-    logCategory = "SSLServer"
-    
-    def __init__(self, pemFile):
-        self._pemFile = pemFile
-
-    def getContext(self):
-        """
-        Create an SSL context.
-        """
-        from OpenSSL import SSL
-        ctx = SSL.Context(SSL.SSLv23_METHOD)
-        try:
-            ctx.use_certificate_file(self._pemFile)
-            ctx.use_privatekey_file(self._pemFile)
-        except SSL.Error, e:
-            self.warning('SSL error: %r' % e.args)
-            self.error('Could not open certificate %s' % self._pemFile)
-        return ctx
-
-def _startSSL(vishnu, host, port, pemFile):
-    # if no path in pemFile, then look for it in the config directory
-    if not os.path.split(pemFile)[0]:
-        pemFile = os.path.join(configure.configdir, pemFile)
-    if not os.path.exists(pemFile):
-        log.error('manager', ".pem file %s does not exist.\n" \
-            "For more information, see \n" \
-            "http://www.flumotion.net/doc/flumotion/manual/html/chapter-security.html" % pemFile)
-    log.debug('manager', 'Using PEM certificate file %s' % pemFile)
-    ctxFactory = ServerContextFactory(pemFile)
-    
-    log.info('manager', 'Starting on port %d using SSL' % port)
-    if not host == "":
-        log.info('manager', 'Listening as host %s' % host)
-    vishnu.setConnectionInfo(host, port, True)
-    reactor.listenSSL(port, vishnu.getFactory(), ctxFactory, interface=host)
-
-def _startTCP(vishnu, host, port):
-    log.info('manager', 'Starting on port %d using TCP' % port)
-    if not host == "":
-        log.info('manager', 'Listening as host %s' % host)
-    vishnu.setConnectionInfo(host, port, False)
-    reactor.listenTCP(port, vishnu.getFactory(), interface=host)
+from flumotion.common import server
 
 def _error(message, reason):
     msg = message
@@ -284,11 +240,13 @@ def main(args):
     reactor.callLater(0, _initialLoadConfig, vishnu, paths)
     
     # set up server based on transport
+    myServer = server.Server(vishnu)
     try:
         if options.transport == "ssl":
-            _startSSL(vishnu, options.host, options.port, options.certificate)
+            myServer.startSSL(options.host, options.port, options.certificate,
+                configure.configdir)
         elif options.transport == "tcp":
-            _startTCP(vishnu, options.host, options.port)
+            myServer.startTCP(options.host, options.port)
     except error.CannotListenError, (interface, port, e):
         # e is a socket.error()
         message = "Could not listen on port %d: %s" % (port, e.args[1])

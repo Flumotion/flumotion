@@ -34,7 +34,7 @@ from twisted.spread import pb
 from twisted.cred import portal
 
 from flumotion.common import bundle, config, errors, interfaces, log, registry
-from flumotion.common import planet, common, dag, messages, reflectcall
+from flumotion.common import planet, common, dag, messages, reflectcall, server
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base
@@ -176,7 +176,11 @@ class Vishnu(log.Loggable):
     """
     I am the toplevel manager object that knows about all heavens and factories.
     """
+
+    implements(server.IServable)
+
     logCategory = "vishnu"
+
     def __init__(self, name, unsafeTracebacks=0):
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me

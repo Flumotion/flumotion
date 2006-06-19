@@ -34,6 +34,7 @@ flumotion_PYTHON = \
 	reflectcall.py \
 	registry.py \
 	reload.py \
+	server.py \
 	setup.py \
 	watched.py \
 	worker.py

@@ -1,3 +1,13 @@
+2006-06-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/Makefile.am:
+	* flumotion/common/server.py:
+	  factor out the code that runs a PB server on TCP or SSL into
+	  a new Server class ...
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	  ... and use it.
+
 2006-06-19  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
