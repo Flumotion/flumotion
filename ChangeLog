@@ -1,3 +1,12 @@
+2006-06-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/admin.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/manager.py:
+	  doc updates
+	* flumotion/worker/worker.py:
+	  a last 0.8 relic
+
 2006-06-20  Thomas Vander Stichele  <thomas (at) apestaart (dot) org>
 
 	* flumotion/common/boot.py.in:

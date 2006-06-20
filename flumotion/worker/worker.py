@@ -118,6 +118,7 @@ class WorkerMedium(medium.BaseMedium):
     """
     I am a medium interfacing with the manager-side WorkerAvatar.
 
+    @ivar brain: the worker brain
     @type brain: L{WorkerBrain}
     """
     
@@ -222,14 +223,10 @@ class WorkerMedium(medium.BaseMedium):
             elementNames,))
 
         list = []
-        # GST 0.8
         for name in elementNames:
-            # in 0.9.x, element_factory_make started
-            # raising gst.PluginNotFoundError
             try:
                 e = gst.element_factory_make(name)
-                if e:
-                    list.append(name)
+                list.append(name)
             except gst.PluginNotFoundError:
                 pass
         self.debug('remote_checkElements: returning elements names %r' % list)
@@ -438,12 +435,15 @@ class WorkerBrain(log.Loggable):
     related.
     I live in the main worker process.
 
-    @ivar keycard:             the keycard the worker used to log in to
-                               the manager
+    @ivar keycard:             the keycard worker used to log in to manager
     @type keycard              L{flumotion.common.keycards.Keycard}
+    @ivar kindergarten:
     @type kindergarten:        L{Kindergarten}
+    @ivar medium:
     @type medium:              L{WorkerMedium}
+    @ivar jobHeaven:
     @type jobHeaven:           L{JobHeaven}
+    @ivar workerClientFactory:
     @type workerClientFactory: L{WorkerClientFactory}
     """
 
@@ -717,6 +717,7 @@ class JobHeaven(pb.Root, log.Loggable):
     I am similar to but not quite the same as a manager-side Heaven.
     I manage avatars inside the worker for job processes spawned by the worker.
 
+    @ivar brain: the worker brain
     @type brain: L{WorkerBrain}
     """
     logCategory = "job-heaven"

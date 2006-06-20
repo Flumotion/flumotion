@@ -48,8 +48,6 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         @type  heaven:   L{flumotion.manager.base.ManagerHeaven}
         @param avatarId: id of the avatar to create
         @type  avatarId: str
-        @param keycard: id of the avatar to create
-        @type  avatarId: str
         """
         self.heaven = heaven
         self.avatarId = avatarId
@@ -314,7 +312,7 @@ class ManagerHeaven(pb.Root, log.Loggable):
         @param avatarId: id of the avatar to create
         @type  avatarId: str
         @param keycard:  the credentials being used to log in
-        @type  keycard:  L{flumotion.common.keycards.KeyCard}
+        @type  keycard:  L{flumotion.common.keycards.Keycard}
 
         @returns: a new avatar for the client
         @rtype:   L{flumotion.manager.base.ManagerAvatar}

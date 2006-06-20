@@ -129,7 +129,7 @@ class Dispatcher(log.Loggable):
 
         @type avatarId:  string
         @param avatarId: the name of the new avatar
-        @type keycard:   L{flumotion.common.keycards.KeyCard}
+        @type keycard:   L{flumotion.common.keycards.Keycard}
         @param keycard:  the credentials being used to log in
         @type ifaces:    tuple of interfaces linked to heaven
         @param ifaces:   a list of heaven interfaces to get avatar from,

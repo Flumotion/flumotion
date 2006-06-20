@@ -221,7 +221,7 @@ class AdminAvatar(base.ManagerAvatar):
         @param workerName: the worker to call
         @type  workerName: str
         @param methodName: Name of the method to call.  Gets proxied to
-                           L{flumotion.worker.worker.WorkerMedium}'s
+                           L{flumotion.worker.worker.WorkerMedium} 's
                            remote_(methodName)
         @type  methodName: str
         """
