@@ -1,3 +1,11 @@
+2006-06-20  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/porter/Makefile.am:
+	* flumotion/porter/__init__.py:
+	* flumotion/porter/porterclient.py:
+	  Delete this directory; all of this has been in
+	  flumotion/component/misc/porter for ages.
+
 2006-06-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/Makefile.am:
