@@ -1,3 +1,11 @@
+2006-06-20  Thomas Vander Stichele  <thomas (at) apestaart (dot) org>
+
+	* flumotion/common/boot.py.in:
+	  make the assert more helpful
+	* flumotion/test/common.py:
+	  set up gobject and gst before running tests, so we are guaranteed
+	  to have the gst-python version we actually support.
+
 2006-06-20  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:

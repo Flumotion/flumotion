@@ -26,6 +26,11 @@ flumotion.common.setup.setup()
 from flumotion.common import log
 log.logTwisted()
 
+# make sure we have the right gst-python version
+from flumotion.common import boot
+boot.init_gobject()
+boot.init_gst()
+
 import os
 
 # fdpass is a built module,  so it lives in builddir, while the package

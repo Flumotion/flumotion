@@ -77,7 +77,7 @@ def init_gst():
             'ERROR: Invalid FLU_GST_VERSION: "%s" ("0.10" expected)'
             % gst_version)
 
-    assert 'gobject' in sys.modules
+    assert 'gobject' in sys.modules, "Run init_gobject() first"
 
     import gobject
 
