@@ -45,13 +45,6 @@ def arg_filtered(proc, *args):
     return ret
 
 def call_on_state_change(element, from_state, to_state, proc, *args, **kwargs):
-    if gst.gst_version < (0,10):
-        def state_changed_cb(element, old, new):
-            proc(*args, **kwargs)
-        state_changed_cb = arg_filtered (state_changed_cb,
-            (1, from_state), (2, to_state))
-        element.connect('state-change', state_changed_cb)
-    else:
         def bus_watch_func(bus, message):
             proc(*args, **kwargs)
         bus_watch_func = arg_filtered(bus_watch_func,
@@ -78,10 +71,7 @@ class BTTV(feedcomponent.ParseLaunchComponent):
         #device_height = properties['device-height']
 
         framerate = properties.get('framerate', (25, 1))
-        if gst.gst_version < (0,9):
-            framerate_string = '%f' % (float(framerate[0]) / framerate[1])
-        else:
-            framerate_string = '%d/%d' % (framerate[0], framerate[1])
+        framerate_string = '%d/%d' % (framerate[0], framerate[1])
         
         pipeline = ('v4lsrc name=source device=%s copy-mode=true ! '
                     'video/x-raw-yuv,width=%d,height=%d ! videoscale ! '

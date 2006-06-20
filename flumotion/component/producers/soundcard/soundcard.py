@@ -57,23 +57,17 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
         # so we can add in correct elements on the fly
         # just adding audioscale and audioconvert always makes the soundcard
         # open in 1000 Hz, mono
-        if gst.gst_version < (0,9):
-            caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d,width=%d,signed=(boolean)TRUE,endianness=1234' % (rate, depth, channels, depth)
-            pipeline = '%s device=%s ! %s ! level name=volumelevel signal=true' % (element, device, caps)
-        else:
-            caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d' % (rate, depth, channels)
-            pipeline = '%s device=%s ! %s ! level name=volumelevel message=true' % (element, device, caps)
+        caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d' % (
+            rate, depth, channels)
+        pipeline = '%s device=%s ! %s ! level name=volumelevel message=true' % (
+            element, device, caps)
 
         return pipeline
 
     def configure_pipeline(self, pipeline, properties):
         # add volume effect
         comp_level = pipeline.get_by_name('volumelevel')
-        vol = None
-        if gst.gst_version < (0,9):
-            vol = volume.Volume('inputVolume', comp_level)
-        else:
-            vol = volume.Volume('inputVolume', comp_level, pipeline)
+        vol = volume.Volume('inputVolume', comp_level, pipeline)
         self.addEffect(vol)
 
     def state_changed_cb(self, element, old, new, trackLabel):

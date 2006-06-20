@@ -21,7 +21,6 @@
 
 import math
 
-import gst
 import gtk
         
 from twisted.internet import defer
@@ -485,34 +484,6 @@ class Overlay(WizardStep):
 
     can_overlay = True
 
-    def worker_changed_08(self):
-        d = self.workerRun('flumotion.worker.checks.video',
-            'check_ffmpegcolorspace_AYUV')
-        yield d
-        try:
-            if d.value():
-                self.wizard.require_elements(self.worker, 'pngdec', 'alphacolor',
-                    'videomixer', 'alpha', 'ffmpegcolorspace')
-            else:
-                t = T_(N_(
-"""This worker's ffmpegcolorspace plugin is older than 0.8.5.
-Please consider upgrading if your output video has a
-diagonal line in the image."""))
-                self.add_msg(messages.Info(t, id='overlay-old-colorspace'))
-                self.wizard.require_elements(self.worker, 'pngdec',
-                    'alphacolor', 'videomixer', 'alpha')
-            self.clear_msg('overlay-colorspace')
-        except errors.RemoteRunFailure, e:
-            self.wizard.block_next(True)
-            pass
-        except Exception, e:
-            self.wizard.block_next(True)
-            msg = messages.Error(T_(N_(
-                "Could not check features of the 'ffmpegcolorspace' element.")),
-                debug=repr(e), id='overlay-colorspace')
-            self.add_msg(msg)
-    worker_changed_08 = defer_generator_method(worker_changed_08)
-
     def worker_changed_010(self):
         d = self.wizard.check_elements(self.worker, 'pngenc',
             'ffmpegcolorspace', 'videomixer')
@@ -534,12 +505,7 @@ diagonal line in the image."""))
     worker_changed_010 = defer_generator_method(worker_changed_010)
 
     def worker_changed(self):
-        import gst
-
-        if gst.gst_version[1] == 8:
-            self.worker_changed_08()
-        else:
-            self.worker_changed_010()
+        self.worker_changed_010()
 
     def on_checkbutton_show_text_toggled(self, button):
         self.entry_text.set_sensitive(button.get_active())
@@ -700,10 +666,7 @@ class TestAudioSource(WizardStep):
     icon = 'soundcard.png'
     
     def worker_changed(self):
-        if gst.gst_version < (0,9):
-            self.wizard.require_elements(self.worker, 'sinesrc')
-        else:
-            self.wizard.require_elements(self.worker, 'audiotestsrc')
+        self.wizard.require_elements(self.worker, 'audiotestsrc')
 
     def before_show(self):
         self.combobox_samplerate.set_enum(AudioTestSamplerate)
@@ -906,10 +869,7 @@ class Vorbis(AudioEncoder):
     def worker_changed(self):
         self.debug('running Vorbis checks')
         print 'running Vorbis checks'
-        if gst.gst_version < (0, 9):
-            d = self.wizard.require_elements(self.worker, 'rawvorbisenc')
-        else:
-            d = self.wizard.require_elements(self.worker, 'vorbisenc')
+        d = self.wizard.require_elements(self.worker, 'vorbisenc')
 
         yield d
         d = self.workerRun('flumotion.worker.checks.encoder', 'checkVorbis')

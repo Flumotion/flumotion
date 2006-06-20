@@ -46,18 +46,12 @@ class Colorbalance(feedcomponent.Effect):
         self.debug("colorbalance init")
         feedcomponent.Effect.__init__(self, name)
         self._element = element
-        # In 0.8 there was a signal on the element, in 0.10 it is now a
-        # message on the bus
-        if gst.gst_version < (0,9):
-            element.connect('state-change', self._source_state_changed_cb,
+        if pipeline:
+            bus = pipeline.get_bus()
+            bus.connect('message::state-changed', 
+                self._bus_message_received_cb,
                 hue, saturation, brightness, contrast)
-        else:
-            if pipeline:
-                bus = pipeline.get_bus()
-                bus.connect('message::state-changed', 
-                    self._bus_message_received_cb,
-                    hue, saturation, brightness, contrast)
-        
+    
         self._channels = None
 
     # State change handling for 0.10
@@ -74,7 +68,6 @@ class Colorbalance(feedcomponent.Effect):
             if old == gst.STATE_READY and new == gst.STATE_PAUSED:
                 self._setInitialColorBalance(hue, 
                     saturation, brightness, contrast)
-            
 
     def effect_setColorBalanceProperty(self, which, value):
         """
@@ -129,16 +122,6 @@ class Colorbalance(feedcomponent.Effect):
 
         return retval
 
-    # called to set initial properties based on state change
-    def _source_state_changed_cb(self, element, old, new, 
-                                 hue, saturation, brightness, contrast):
-        if not (old == gst.STATE_READY and new == gst.STATE_PAUSED):
-            return
-
-        self.debug('source is PAUSED, setting initial color balance properties')
-
-        self._setInitialColorBalance(hue, saturation, brightness, contrast)
-    
     def _setInitialColorBalance(self, hue, saturation, brightness, contrast):
         self._channels = self._element.list_colorbalance_channels()
         self.debug('colorbalance channels: %d' % len(self._channels))

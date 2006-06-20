@@ -47,16 +47,10 @@ class Webcam(feedcomponent.ParseLaunchComponent):
             string += ",height=%d" % height
         if 'framerate' in properties:
             f = properties['framerate']
-            if gst.gst_version < (0,9):
-                string += ",framerate=(double)%f" % (float(f[0]) / f[1])
-            else:
-                string += ",framerate=(fraction)%d/%d" % (f[0], f[1])
+            string += ",framerate=(fraction)%d/%d" % (f[0], f[1])
 
         # create component
-        autoprobe = "autoprobe=false"
-        # added in gst-plugins 0.8.6
-        if gstreamer.element_factory_has_property('v4lsrc', 'autoprobe-fps'):
-            autoprobe += " autoprobe-fps=false"
+        autoprobe = "autoprobe=false autoprobe-fps=false"
         
         # FIXME: ffmpegcolorspace in the pipeline causes bad negotiation.
         # hack in 0.9 to work around, not in 0.8

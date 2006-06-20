@@ -23,10 +23,7 @@ from flumotion.worker.checks import check
 
 import gst
 
-if gst.gst_version[1] == 8:
-    from video08 import *
-else:
-    from video010 import *
+from video010 import *
 
 def checkTVCard(device, id='check-tvcard'):
     """
@@ -75,13 +72,8 @@ def checkWebcam(device, id):
         caps = element.get_pad("src").get_negotiated_caps()
         log.debug('check', 'negotiated caps: %s' % caps.to_string())
         s = caps[0]
-        # before 0.10 framerate was a double
-        if gst.gst_version[0] == 0 and gst.gst_version[1] < 9:
-            num = int(s['framerate'] * 16)
-            denom = 16
-        else:
-            num = s['framerate'].num
-            denom = s['framerate'].denom
+        num = s['framerate'].num
+        denom = s['framerate'].denom
 
         d = {
             'mime': s.get_name(),

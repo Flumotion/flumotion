@@ -1,8 +1,7 @@
 include $(top_srcdir)/common/python.mk
 
 component_PYTHON = \
-	__init__.py \
-	jukebox08.py
+	__init__.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/producers/jukebox
 component_DATA = jukebox.xml

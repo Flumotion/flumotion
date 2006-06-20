@@ -50,11 +50,7 @@ class FakeComponent:
 
 def run_it_a_little_while(p):
     p.set_state(gst.STATE_PLAYING)
-    if gst.gst_version < (0, 9):
-        for i in range(10):
-            p.iterate()
-    else:
-        m = p.get_bus().poll(gst.MESSAGE_EOS, -1)
+    m = p.get_bus().poll(gst.MESSAGE_EOS, -1)
     p.set_state(gst.STATE_NULL)
 
 class DeepNotify(unittest.TestCase):
@@ -72,12 +68,13 @@ class TestProperty(unittest.TestCase):
         self.failIf(b)
 
     def testHasPropertyValue(self):
-        b = gstreamer.element_factory_has_property_value('fakesrc', 'num-buffers', 1)
+        b = gstreamer.element_factory_has_property_value(
+            'fakesrc', 'num-buffers', 1)
         self.failUnless(b)
         # setting string values for enums only works in 0.10, or something
-        if gst.gst_version > (0, 9, 0):
-            b = gstreamer.element_factory_has_property_value('fakesrc', 'sizetype', 'fixed')
-            self.failUnless(b)
-            b = gstreamer.element_factory_has_property_value('fakesrc', 'sizetype', 'no-way')
-            self.failIf(b)
-     
+        b = gstreamer.element_factory_has_property_value(
+            'fakesrc', 'sizetype', 'fixed')
+        self.failUnless(b)
+        b = gstreamer.element_factory_has_property_value(
+            'fakesrc', 'sizetype', 'no-way')
+        self.failIf(b)

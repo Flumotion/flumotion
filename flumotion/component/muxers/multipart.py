@@ -29,10 +29,7 @@ class Multipart(feedcomponent.ParseLaunchComponent):
 
         pipeline = 'multipartmux name=muxer '
         for eater in sources:
-            if gst.gst_version < (0, 9):
-                tmpl = '{ @ eater:%s @ ! queue } ! muxer. '
-            else:
-                tmpl = '@ eater:%s @ ! queue ! muxer. '
+            tmpl = '@ eater:%s @ ! queue ! muxer. '
             pipeline += tmpl % eater
 
         pipeline += 'muxer.'

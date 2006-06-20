@@ -26,10 +26,6 @@ PYGTK_DIR = '@PYGTK_DIR@'
 
 PYGTK_BASE_REQ = '@PYGTK_BASE_REQ@'
 
-GST_08_SUPPORTED = '@GST_08_SUPPORTED@'
-PYGST_08_DIR = '@PYGST_08_DIR@'
-PYGTK_08_REQ = '@PYGTK_08_REQ@'
-
 GST_010_SUPPORTED = '@GST_010_SUPPORTED@'
 PYGST_010_DIR = '@PYGST_010_DIR@'
 PYGTK_010_REQ = '@PYGTK_010_REQ@'
@@ -70,18 +66,15 @@ def init_gst():
     is sane enough to be usable by us
     """
 
-    default_version = GST_010_SUPPORTED == 'yes' and '0.10' or '0.8'
+    default_version = GST_010_SUPPORTED == 'yes' and '0.10'
     gst_version = os.getenv('FLU_GST_VERSION', default_version)
 
-    if gst_version == '0.8':
-        pygst_dir = PYGST_08_DIR
-        pygtk_req = PYGTK_08_REQ
-    elif gst_version == '0.10':
+    if gst_version == '0.10':
         pygst_dir = PYGST_010_DIR
         pygtk_req = PYGTK_010_REQ
     else:
         raise SystemExit(
-            'ERROR: Invalid FLU_GST_VERSION: "%s" ("0.8" or "0.10" expected)'
+            'ERROR: Invalid FLU_GST_VERSION: "%s" ("0.10" expected)'
             % gst_version)
 
     assert 'gobject' in sys.modules

@@ -38,22 +38,9 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         # function.  PLEASE MAKE THE PAIN GO AWAY ? <- might not be
         # necessary still
 
-        # GST 0.8
-
         # we need an element that does RGBA -> AYUV so we can overlay png
         # this got added to ffmpegcolorspace in 0.8.5
         addalpha = 'ffmpegcolorspace'
-
-        import gst
-        if gst.gst_version < (0,9):
-            from flumotion.worker.checks import video
-            if not video.check_ffmpegcolorspace_AYUV():
-                # alphacolor element works too for the colorspace conversion,
-                # but has bugs for non-multiples of 4 or eight
-                addalpha = 'ffmpegcolorspace ! alpha'
-                log.info('Using gst-plugins older than 0.8.5, consider '
-                         'upgrading if you notice a diagonal green line '
-                         'in your video output.')
 
         source = self.config['source'][0]
         eater = '@ eater:%s @' % source

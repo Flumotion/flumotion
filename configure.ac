@@ -8,15 +8,10 @@ AUTHORS=$srcdir/AUTHORS
 
 AC_SUBST(PYGTK_BASE_REQ, 2.4.0)
 
-AC_SUBST(PYGTK_08_REQ, 2.4.0)
-AC_SUBST(PYGST_08_REQ, 0.8.0)
-AC_SUBST(GST_08_REQ, 0.8.7)
-
 AC_SUBST(PYGTK_010_REQ, 2.6.3)
 AC_SUBST(PYGST_010_REQ, 0.10.0)
 AC_SUBST(GST_010_REQ, 0.10.0.1)
 
-GST_08_SUPPORTED=true
 GST_010_SUPPORTED=true
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
@@ -56,19 +51,17 @@ AM_CHECK_PYTHON_HEADERS(HAVE_PYTHON_H=yes, [
 ])
 
 dnl check for GStreamer
-PKG_CHECK_MODULES(GST_08, gstreamer-0.8 >= $GST_08_REQ,
-    [GST_08_SUPPORTED=yes], [AC_MSG_RESULT([$GST_08_PKG_ERRORS]); GST_08_SUPPORTED=no])
 PKG_CHECK_MODULES(GST_010, gstreamer-0.10 >= $GST_010_REQ,
     [GST_010_SUPPORTED=yes], [AC_MSG_RESULT([$GST_010_PKG_ERRORS]); GST_010_SUPPORTED=no])
 
-if test $GST_08_SUPPORTED = "no" -a $GST_010_SUPPORTED = "no"; then
+if test $GST_010_SUPPORTED = "no"; then
   AC_MSG_ERROR([No GStreamer development packages found.
-Please install GStreamer development packages for version 0.8 or 0.10 (or both).
+Please install GStreamer development packages for version 0.10.
 Also, check your PKG_CONFIG_PATH.])
 fi  
 
 export PYTHONPATH=$PYGTK_DIR:$PYTHONPATH
-PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_08_REQ)
+PKG_CHECK_MODULES(PYGTK, pygtk-2.0 >= $PYGTK_010_REQ)
 PYGTK_DIR="`$PKG_CONFIG --variable=pyexecdir pygtk-2.0`"
 AC_SUBST(PYGTK_DIR)
 AC_MSG_NOTICE(Using pygtk installed in $PYGTK_DIR)
@@ -96,37 +89,12 @@ if test $GST_010_SUPPORTED = "yes"; then
   fi
 fi
 
-if test $GST_08_SUPPORTED = "no" -a $GST_010_SUPPORTED = "no"; then
+if test $GST_010_SUPPORTED = "no"; then
   AC_MSG_ERROR([No appropriate version of PyGTK installed. Correct the above
 errors and try again.])
 fi
 
 dnl checks for gst-python
-if test $GST_08_SUPPORTED = "yes"; then
-  PKG_CHECK_MODULES(PYGST_08, gst-python-0.8 >= $PYGST_08_REQ,
-      [PYGST_08_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.8`"
-       AC_SUBST(PYGST_08_DIR)
-       AC_MSG_NOTICE(Using gstreamer-python 0.8 installed in $PYGST_08_DIR)],
-      [AC_MSG_RESULT([$PYGST_08_PKG_ERRORS])
-       GST_08_SUPPORTED=no])
-
-  if test $GST_08_SUPPORTED = "yes"; then
-    saved_PYTHONPATH=$PYTHONPATH
-    export PYTHONPATH=$PYGST_08_DIR:$PYTHONPATH
-    AS_PYTHON_IMPORT([gst],,
-                     [AC_MSG_NOTICE([Unable to import gst-python 0.8 -- check your PYTHONPATH?])
-                      GST_08_SUPPORTED=no],,
-                     [assert gst.pygst_version[[1]] == 8])
-
-    if test $GST_08_SUPPORTED = "yes"; then
-      AS_PYTHON_IMPORT([gst, gst.interfaces],,
-                       [AC_MSG_NOTICE([You need to recompile gst-python 0.8 with gst.interfaces support])
-                        GST_08_SUPPORTED=no])
-      export PYTHONPATH=$saved_PYTHONPATH
-    fi
-  fi
-fi
-
 if test $GST_010_SUPPORTED = "yes"; then
   PKG_CHECK_MODULES(PYGST_010, gst-python-0.10 >= $PYGST_010_REQ,
       [PYGST_010_DIR="`$PKG_CONFIG --variable=pyexecdir gst-python-0.10`"
@@ -144,29 +112,17 @@ if test $GST_010_SUPPORTED = "yes"; then
                      [import pygst; pygst.require('0.10')],
                      [assert gst.pygst_version[[1]] == 10 or (gst.pygst_version[[1]] == 9 and gst.pygst_version[[2]] >= 7)])
 
-    if test $GST_08_SUPPORTED = "yes"; then
-      AS_PYTHON_IMPORT([gst, gst.interfaces],,
-                       [AC_MSG_NOTICE([You need to recompile gst-python 0.10 with gst.interfaces support])
-                        GST_010_SUPPORTED=no],
-                       [import pygst; pygst.require('0.10')])
-      export PYTHONPATH=$saved_PYTHONPATH
-    fi
   fi
 fi
 
-if test $GST_08_SUPPORTED = "no" -a $GST_010_SUPPORTED = "no"; then
+if test $GST_010_SUPPORTED = "no"; then
   AC_MSG_ERROR([No suitable gstreamer-python versions found. Correct the above
 errors and try again.])
 fi  
 
-AC_SUBST(GST_08_SUPPORTED)
 AC_SUBST(GST_010_SUPPORTED)
 
 FLU_PKG_CONFIG_REQUIRES="gstreamer-0.10 >= $GST_010_REQ"
-if test $GST_010_SUPPORTED = "no"
-then
-  FLU_PKG_CONFIG_REQUIRES="gstreamer-0.8 >= $GST_08_REQ"
-fi
 AC_SUBST(FLU_PKG_CONFIG_REQUIRES)
 
 dnl check stuff we can generate the tray icon with
@@ -293,7 +249,6 @@ flumotion/component/producers/Makefile
 flumotion/component/producers/audiotest/Makefile
 flumotion/component/producers/bttv/Makefile
 flumotion/component/producers/firewire/Makefile
-flumotion/component/producers/jukebox/Makefile
 flumotion/component/producers/pipeline/Makefile
 flumotion/component/producers/soundcard/Makefile
 flumotion/component/producers/videotest/Makefile
@@ -332,7 +287,6 @@ echo
 echo "configure: *** Flumotion has been configured with support for the"
 echo "               following versions of GStreamer:"
 echo
-echo "    GStreamer 0.8:  $GST_08_SUPPORTED"
 echo "    GStreamer 0.10: $GST_010_SUPPORTED"
 echo
 echo "If either version is disabled, check the configure output above to"

@@ -221,17 +221,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     logCategory = 'cons-http'
     
     # use select for test
-    if gst.gst_version < (0, 9):
-        pipe_template = 'multifdsink name=sink ' + \
-                                    'buffers-max=500 ' + \
-                                    'buffers-soft-max=250 ' + \
-                                    'recover-policy=3'
-    else:
-        pipe_template = 'multifdsink name=sink ' + \
-                                    'sync=false ' + \
-                                    'buffers-max=500 ' + \
-                                    'buffers-soft-max=250 ' + \
-                                    'recover-policy=3'
+    pipe_template = 'multifdsink name=sink ' + \
+                                'sync=false ' + \
+                                'buffers-max=500 ' + \
+                                'buffers-soft-max=250 ' + \
+                                'recover-policy=3'
 
     gsignal('client-removed', object, int, int, object)
     
@@ -329,16 +323,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             
         # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self._notify_caps_cb)
-
-        if gst.gst_version < (0, 9):
-            def sink_state_change_cb(element, old, state):
-                # when our sink is PLAYING, then we are HAPPY
-                # FIXME: add more moods
-                if state == gst.STATE_PLAYING:
-                    self.debug('Ready to serve clients')
-                    self.setMood(moods.happy)
-
-            sink.connect('state-change', sink_state_change_cb)
 
         # these are made threadsafe using idle_add in the handler
         sink.connect('client-removed', self._client_removed_cb)

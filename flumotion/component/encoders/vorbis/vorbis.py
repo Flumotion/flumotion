@@ -21,8 +21,4 @@
 
 import gst
 
-
-if gst.gst_version < (0, 9):
-    from vorbis08 import Vorbis
-else:
-    from vorbis010 import Vorbis
+from vorbis010 import Vorbis

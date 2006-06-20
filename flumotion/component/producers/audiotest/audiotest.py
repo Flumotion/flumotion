@@ -30,12 +30,8 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         rate = properties.get('rate', 8000)
         volume = properties.get('volume', 1.0)
 
-        if gst.gst_version < (0,9):
-            is_live = 'sync=true'
-            source = 'sinesrc'
-        else:
-            is_live = 'is-live=true'
-            source = 'audiotestsrc'
+        is_live = 'is-live=true'
+        source = 'audiotestsrc'
 
         if not gstreamer.element_factory_exists(source):
             raise errors.MissingElementError(source)

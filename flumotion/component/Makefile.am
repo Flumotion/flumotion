@@ -6,7 +6,6 @@ component_PYTHON = \
 	__init__.py \
 	component.py \
 	feedcomponent.py \
-	feedcomponent08.py \
 	feedcomponent010.py
 
 TAGS_FILES = $(component_PYTHON)

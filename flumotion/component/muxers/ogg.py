@@ -44,10 +44,7 @@ class Ogg(feedcomponent.ParseLaunchComponent):
             maxDelay, maxPageDelay)
 
         for eater in sources:
-            if gst.gst_version < (0, 9):
-                tmpl = '{ @ eater:%s @ ! queue max-size-buffers=16 } ! muxer. '
-            else:
-                tmpl = '@ eater:%s @ ! queue max-size-buffers=16 ! muxer. '
+            tmpl = '@ eater:%s @ ! queue max-size-buffers=16 ! muxer. '
             pipeline += tmpl % eater
                 
         pipeline += 'muxer.'

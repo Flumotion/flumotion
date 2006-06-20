@@ -28,10 +28,7 @@ class JPEG(feedcomponent.ParseLaunchComponent):
         framerate = ''
         if properties.has_key('framerate'):
             frac = properties['framerate']
-            if gst.gst_version < (0,9):
-                framerate = '(double)%f' % (float(frac[0])/frac[1])
-            else:
-                framerate = '(fraction)%d/%d' % (frac[0], frac[1])
+            framerate = '(fraction)%d/%d' % (frac[0], frac[1])
 
             framerate = (' ! videorate ! video/x-raw-yuv,framerate=%s '
                          % framerate)

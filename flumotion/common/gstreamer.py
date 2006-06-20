@@ -100,11 +100,8 @@ def element_factory_exists(name):
 
     @rtype: boolean
     """
-    if gst.gst_version < (0, 9):
-        factory = gst.registry_pool_find_feature(name, gst.ElementFactory)
-    else:
-        registry = gst.registry_get_default()
-        factory = registry.find_feature(name, gst.TYPE_ELEMENT_FACTORY)
+    registry = gst.registry_get_default()
+    factory = registry.find_feature(name, gst.TYPE_ELEMENT_FACTORY)
 
     if factory:
         return True
@@ -118,17 +115,9 @@ def get_plugin_version(plugin_name):
     @rtype: tuple of (major, minor, micro, [nano]), or None if it could not be
             found or determined
     """
-    __pychecker__ = 'no-moduleattr'
-
-    plugin = None
-
-    if gst.pygst_version >= (0, 9, 0):
-        plugin = gst.registry_get_default().find_plugin(plugin_name)
-    elif gst.pygst_version > (0, 8, 1):
-        # API added after gst-python 0.8.1 release
-        plugin = gst.registry_pool_find_plugin(plugin_name)
+    plugin = gst.registry_get_default().find_plugin(plugin_name)
 
     if not plugin:
         return None
-    else:
-        return plugin.get_version()
+
+    return plugin.get_version()

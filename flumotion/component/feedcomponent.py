@@ -110,10 +110,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.debug("effect: result: %r" % result)
         return result
 
-if gst.gst_version < (0, 9):
-    from feedcomponent08 import FeedComponent
-else:
-    from feedcomponent010 import FeedComponent
+from feedcomponent010 import FeedComponent
 
 FeedComponent.component_medium_class = FeedComponentMedium
 

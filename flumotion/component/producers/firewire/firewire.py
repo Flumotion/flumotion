@@ -89,57 +89,37 @@ class Firewire(feedcomponent.ParseLaunchComponent):
             
         # FIXME: might be nice to factor out dv1394src ! dvdec so we can replace it
         # with videotestsrc of the same size and PAR, so we can unittest the pipeline
-        if gst.gst_version < (0,9):
-            template = ('dv1394src ! dvdec name=dec drop-factor=%(df)d'
-                        '    ! video/x-raw-yuv,format=(fourcc)YUY2'
-                        '    ! videorate ! videoscale'
-                        '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
-                        '    ! videoscale'
-                        '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)s,format=(fourcc)YUY2'
-                        '    %(pp)s'
-                        '    ! @feeder::video@'
-                        '  dec. ! audio/x-raw-int ! volume name=setvolume'
-                        '    ! level name=volumelevel signal=true ! audiorate'
-                        '    ! @feeder::audio@'
-                        % dict(df=drop_factor, ih=interlaced_height,
-                               sq=square_pipe, pp=pad_pipe,
-                               sw=scaled_width, h=height,
-                               fr=('%f' % framerate_float)))
-        else:
-            # need a queue in case tcpserversink blocks somehow
-            template = ('dv1394src'
-                        '    ! queue leaky=2 max-size-time=1000000000'
-                        '    ! dvdemux name=demux'
-                        '  demux. ! dvdec drop-factor=%(df)d'
-                        '    ! video/x-raw-yuv,format=(fourcc)YUY2'
-                        '    ! videorate ! videoscale'
-                        '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
-                        '    ! videoscale'
-                        '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)s,format=(fourcc)YUY2'
-                        '    %(pp)s'
-                        '    ! @feeder::video@'
-                        '  demux. ! audio/x-raw-int ! volume name=setvolume'
-                        '    ! level name=volumelevel message=true ! audiorate'
-                        '    ! @feeder::audio@'
-                        % dict(df=drop_factor, ih=interlaced_height,
-                               sq=square_pipe, pp=pad_pipe,
-                               sw=scaled_width, h=height,
-                               fr=('%d/%d' % (framerate[0], framerate[1]))))
-    
+        # need a queue in case tcpserversink blocks somehow
+        template = ('dv1394src'
+                    '    ! queue leaky=2 max-size-time=1000000000'
+                    '    ! dvdemux name=demux'
+                    '  demux. ! dvdec drop-factor=%(df)d'
+                    '    ! video/x-raw-yuv,format=(fourcc)YUY2'
+                    '    ! videorate ! videoscale'
+                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
+                    '    ! videoscale'
+                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,framerate=%(fr)s,format=(fourcc)YUY2'
+                    '    %(pp)s'
+                    '    ! @feeder::video@'
+                    '  demux. ! audio/x-raw-int ! volume name=setvolume'
+                    '    ! level name=volumelevel message=true ! audiorate'
+                    '    ! @feeder::audio@'
+                    % dict(df=drop_factor, ih=interlaced_height,
+                           sq=square_pipe, pp=pad_pipe,
+                           sw=scaled_width, h=height,
+                           fr=('%d/%d' % (framerate[0], framerate[1]))))
+
         return template
 
     def configure_pipeline(self, pipeline, properties):
         self.volume = pipeline.get_by_name("setvolume")
         from flumotion.component.effects.volume import volume
         comp_level = pipeline.get_by_name('volumelevel')
-        if gst.gst_version < (0,9):
-            vol = volume.Volume('inputVolume', comp_level)
-        else:
-            vol = volume.Volume('inputVolume', comp_level, pipeline)
-            # catch bus message for when camera disappears
-            bus = pipeline.get_bus()
-            bus.add_signal_watch()
-            bus.connect('message::element', self._bus_message_received_cb)
+        vol = volume.Volume('inputVolume', comp_level, pipeline)
+        # catch bus message for when camera disappears
+        bus = pipeline.get_bus()
+        bus.add_signal_watch()
+        bus.connect('message::element', self._bus_message_received_cb)
 
         self.addEffect(vol)
 

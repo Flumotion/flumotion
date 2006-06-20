@@ -57,20 +57,14 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
 
         if 'framerate' in properties:
             framerate = properties['framerate']
-            if gst.gst_version < (0,9):
-                struct['framerate'] = float(framerate[0]) / framerate[1]
-            else:
-                struct['framerate'] = gst.Fraction(framerate[0], framerate[1])
+            struct['framerate'] = gst.Fraction(framerate[0], framerate[1])
 
         # If RGB, set something ffmpegcolorspace can convert.
         if format == 'video/x-raw-rgb':
             struct['red_mask'] = 0xff00
         caps = gst.Caps(struct)
         
-        if gst.gst_version < (0,9):
-            is_live = 'sync=true'
-        else:
-            is_live = 'is-live=true'
+        is_live = 'is-live=true'
 
         return 'videotestsrc %s name=source ! %s' % (is_live, caps)
         

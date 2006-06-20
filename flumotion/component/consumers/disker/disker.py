@@ -60,10 +60,7 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
         
 class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     component_medium_class = DiskerMedium
-    if gst.gst_version < (0,9):
-        pipe_template = 'multifdsink sync-clients=1 name=fdsink mode=1'
-    else:
-        pipe_template = 'multifdsink sync-method=1 name=fdsink mode=1 sync=false'
+    pipe_template = 'multifdsink sync-method=1 name=fdsink mode=1 sync=false'
     file_fd = None
     directory = None
     location = None
@@ -203,12 +200,5 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
         # connect to client-removed so we can detect errors in file writing
         sink.connect('client-removed', self._client_removed_cb)
-
-        if gst.gst_version < (0, 9):
-            def feeder_state_change_cb(element, old, state):
-                # FIXME: add more states
-                if state == gst.STATE_PLAYING:
-                    self.setMood(moods.happy)
-            sink.connect('state-change', feeder_state_change_cb)
 
 pygobject.type_register(Disker)
