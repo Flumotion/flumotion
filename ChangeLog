@@ -6,6 +6,47 @@
 	  set up gobject and gst before running tests, so we are guaranteed
 	  to have the gst-python version we actually support.
 
+2006-06-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/pychecker.mk:
+	* configure.ac:
+	* flumotion/common/boot.py.in:
+	* flumotion/common/gstreamer.py:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/component.xml:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	* flumotion/component/effects/colorbalance/colorbalance.py:
+	* flumotion/component/effects/volume/volume.py:
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/jpeg/jpeg.py:
+	* flumotion/component/encoders/vorbis/vorbis.py:
+	* flumotion/component/encoders/vorbis/vorbis.xml:
+	* flumotion/component/encoders/vorbis/vorbis08.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent08.py:
+	* flumotion/component/muxers/multipart.py:
+	* flumotion/component/muxers/ogg.py:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/bttv/bttv.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/jukebox/Makefile.am:
+	* flumotion/component/producers/jukebox/jukebox.xml:
+	* flumotion/component/producers/jukebox/jukebox08.py:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/component/producers/webcam/webcam.py:
+	* flumotion/test/test_common_gstreamer.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/worker/checks/Makefile.am:
+	* flumotion/worker/checks/package.xml:
+	* flumotion/worker/checks/video.py:
+	* flumotion/worker/checks/video08.py:
+	  remove support for GStreamer 0.8, but keep the infrastructure
+	  for supporting multiple versions.
+
 2006-06-20  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
