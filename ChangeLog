@@ -1,5 +1,11 @@
 2006-06-20  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Only listen on a specific interface if explicitly configured, not if
+	  we've guessed a hostname
+
+2006-06-20  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/porter/Makefile.am:
 	* flumotion/porter/__init__.py:
 	* flumotion/porter/porterclient.py:

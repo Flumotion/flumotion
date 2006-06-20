@@ -257,6 +257,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # Or if we're a master, we open our own port here. Also used for URLs
         # in the porter case.
         self.port = None
+        # We listen on this interface, if set.
+        self.iface = None
 
         # handle regular updating
         self.needsUpdate = False
@@ -298,8 +300,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # where nothing else is possible, but it's much preferable to just
         # configure this
         self.hostname = properties.get('hostname', None)
+        self.iface = self.hostname # We listen on this if explicitly configured,
+                                   # but not if it's only guessed at by the
+                                   # below code.
         if not self.hostname:
-            # Don't call this nasty, nasty, probably flaky functon unless we
+            # Don't call this nasty, nasty, probably flaky function unless we
             # need to.
             self.hostname = netutils.guess_public_hostname()
 
@@ -617,9 +622,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             # Streamer is standalone.
             try:
                 self.debug('Listening on %d' % self.port)
-                host = self.hostname or ""
+                iface = self.iface or ""
                 reactor.listenTCP(self.port, server.Site(resource=root), 
-                    interface=host)
+                    interface=iface)
                 return feedcomponent.ParseLaunchComponent.do_start(self, *args, 
                     **kwargs)
             except error.CannotListenError:
