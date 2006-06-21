@@ -1,3 +1,16 @@
+2006-06-21  Andy Wingo  <wingo@pobox.com>
+
+	* http.py (Stats.__init__): Add some instance vars for tracking
+	load deltas.
+	(Stats.clientRemoved, Stats.clientAdded): Keep count of total
+	clients added and removed.
+	(Stats.updateLoadDeltas): Method to call when you want to update
+	the load deltas info.
+	(Stats.getLoadDeltas): New method.
+	(MultifdSinkStreamer._checkUpdate): Update load deltas every so
+	often yo.
+	(MultifdSinkStreamer.getLoadData): Return actual load deltas.
+
 2006-06-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/admin.py:
