@@ -56,10 +56,15 @@ class Stats:
         self.sink = sink
         
         self.no_clients = 0        
+        self.clients_added_count = 0
+        self.clients_removed_count = 0
         self.start_time = time.time()
         # keep track of the highest number and the last epoch this was reached
         self.peak_client_number = 0 
         self.peak_epoch = self.start_time
+        self.load_deltas = [0, 0]
+        self._load_deltas_period = 10 # seconds
+        self._load_deltas_ongoing = [time.time(), 0, 0]
 
         # keep track of average clients by tracking last average and its time
         self.average_client_number = 0
@@ -91,6 +96,7 @@ class Stats:
         self._updateAverage()
 
         self.no_clients += 1
+        self.clients_added_count +=1
 
         # >= so we get the last epoch this peak was achieved
         if self.no_clients >= self.peak_client_number:
@@ -100,6 +106,19 @@ class Stats:
     def clientRemoved(self):
         self._updateAverage()
         self.no_clients -= 1
+        self.clients_removed_count +=1
+
+    def updateLoadDeltas(self):
+        oldtime, oldadd, oldremove = self._load_deltas_ongoing
+        add, remove = self.clients_added_count, self.clients_removed_count
+        now = time.time()
+        diff = float(now - oldtime)
+            
+        # we can be called very often, but only update the loaddeltas
+        # once every period
+        if diff > self._load_deltas_period:
+            self.load_deltas = [(add-oldadd)/diff, (remove-oldremove)/diff]
+            self._load_deltas_ongoing = [now, add, remove]
 
     def getBytesSent(self):
         return self.sink.get_property('bytes-served')
@@ -124,6 +143,9 @@ class Stats:
 
     def getUrl(self):
         return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint) 
+
+    def getLoadDeltas(self):
+        return self.load_deltas
 
     def updateState(self, set):
         c = self
@@ -361,6 +383,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     # UI code
     def _checkUpdate(self):
         self._tenSecondCount -= 1
+        self.updateLoadDeltas()
         if self.needsUpdate or self._tenSecondCount <= 0:
             self._tenSecondCount = 10
             self.needsUpdate = False
@@ -419,9 +442,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         """
         # We calculate the estimated clients added/removed per second, then
         # multiply by the stream bitrate
-        # Stubbed out for now...
-        deltaadded = 100
-        deltaremoved = 10
+        deltaadded, deltaremoved = self.getLoadDeltas()
 
         bytes_received  = self.getBytesReceived()
         uptime          = self.getUptime()
