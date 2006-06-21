@@ -1,5 +1,11 @@
 2006-06-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  remove deprecated attributes.  Prevents me from actually
+	  using them and then wondering why nothing changed.
+
+2006-06-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* po/POTFILES.in:
 	  remove 08 files
 

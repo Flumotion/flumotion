@@ -40,9 +40,6 @@
         <property name="user_limit" type="int" />
         <property name="bandwidth_limit" type="int" />
         <property name="burst_on_connect" type="bool" />
-        <!-- F0.2: deprecate -->
-        <property name="admin-password" type="string"/>
-        <property name="maxclients" type="int"/>
       </properties>
     </component>
   </components>
