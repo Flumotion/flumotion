@@ -19,11 +19,14 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.common import log
 from flumotion.extern.fdpass import fdpass
 
-from twisted.internet import unix, main
-from errno import EWOULDBLOCK
+from twisted.internet import unix, main, address
+from twisted.spread import pb
 
+import errno
+import os
 import socket
 
 # Heavily based on 
@@ -45,7 +48,7 @@ class FDClient(unix.Client):
         try:
             (fds, message) = fdpass.readfds(self.fileno(), 64*1024)
         except socket.error, se:
-            if se.args[0] == EWOULDBLOCK:
+            if se.args[0] == errno.EWOULDBLOCK:
                 return
             else:
                 return main.CONNECTION_LOST
@@ -61,3 +64,51 @@ class FDClient(unix.Client):
 class FDConnector(unix.Connector):
     def _makeTransport(self):
         return FDClient (self.address, self, self.reactor)
+
+class FDPassingBroker(pb.Broker, log.Loggable):
+    """
+    A pb.Broker subclass that handles FDs being passed (with associated data)
+    over the same connection as the normal PB data stream.
+    When an FD is seen, it creates new protocol objects for them from the 
+    childFactory attribute.
+
+    @param connectionClass: a subclass of L{twisted.internet.tcp.Connection}
+    """
+    # FIXME: looks like we can only use our own subclasses that take
+    # three __init__ args
+    def __init__(self, childFactory, connectionClass, **kwargs):
+        pb.Broker.__init__(self, **kwargs)
+
+        self.childFactory = childFactory
+        self._connectionClass = connectionClass
+
+    # This is the complex bit. If our underlying transport receives a file
+    # descriptor, this gets called - along with the data we got with the FD.
+    # We create an appropriate protocol object, and attach it to the reactor.
+    def fileDescriptorsReceived(self, fds, message):
+        if len(fds) == 1:
+            fd = fds[0]
+
+            # Note that we hardcode IPv4 here! 
+            sock = socket.fromfd(fd, socket.AF_INET, socket.SOCK_STREAM)
+
+            self.debug("Received FD %d->%d" % (fd, sock.fileno()))
+
+            # Undocumentedly (other than a comment in 
+            # Python/Modules/socketmodule.c), socket.fromfd() calls dup() on 
+            # the passed FD before it actually wraps it in a socket object. 
+            # So, we need to close the FD that we originally had...
+            os.close(fd)
+
+            peeraddr = sock.getpeername()
+           
+            # Based on bits in tcp.Port.doRead()
+            protocol = self.childFactory.buildProtocol(
+                address._ServerFactoryIPv4Address('TCP', 
+                     peeraddr[0], peeraddr[1]))
+
+            self._connectionClass(sock, protocol, message)
+        else:
+            self.warning("Unexpected: FD-passing message with len(fds) != 1")
+
+

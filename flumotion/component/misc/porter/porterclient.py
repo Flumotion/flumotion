@@ -24,8 +24,6 @@ from twisted.internet.tcp import Port, Connection
 from twisted.internet import reactor, address
 from twisted.cred import credentials
 
-from twisted.spread import pb
-
 from flumotion.common import medium, log
 from flumotion.twisted import defer, fdserver
 from flumotion.twisted import pb as fpb
@@ -33,7 +31,7 @@ from flumotion.twisted import pb as fpb
 import socket, os
 
 # Very similar to tcp.Server, but we need to call things in a different order
-class FDServer(Connection):
+class FDPorterServer(Connection):
     """
     A connection class for use with passed FDs.
     Similar to tcp.Server, but gets the initial FD from a different source,
@@ -63,48 +61,6 @@ class FDServer(Connection):
 
     def getPeer(self):
         return address.IPv4Address('TCP', *(self.socket.getpeername() + ('INET',)))
-
-class FDPassingBroker(pb.Broker, log.Loggable):
-    """
-    A pb.Broker subclass that handles FDs being passed (with associated data)
-    over the same connection as the normal PB data stream.
-    When an FD is seen, it creates new protocol objects for them from the 
-    childFactory attribute.
-    """
-
-    def __init__(self, childFactory, **kwargs):
-        pb.Broker.__init__(self, **kwargs)
-
-        self.childFactory = childFactory
-
-    # This is the complex bit. If our underlying transport receives a file
-    # descriptor, this gets called - along with the data we got with the FD.
-    # We create an appropriate protocol object, and attach it to the reactor.
-    def fileDescriptorsReceived(self, fds, message):
-        if len(fds) == 1:
-            fd = fds[0]
-
-            # Note that we hardcode IPv4 here! 
-            sock = socket.fromfd(fd, socket.AF_INET, socket.SOCK_STREAM)
-
-            self.debug("Received FD %d->%d" % (fd, sock.fileno()))
-
-            # Undocumentedly (other than a comment in 
-            # Python/Modules/socketmodule.c), socket.fromfd() calls dup() on 
-            # the passed FD before it actually wraps it in a socket object. 
-            # So, we need to close the FD that we originally had...
-            os.close(fd)
-
-            peeraddr = sock.getpeername()
-           
-            # Based on bits in tcp.Port.doRead()
-            protocol = self.childFactory.buildProtocol(
-                address._ServerFactoryIPv4Address('TCP', 
-                     peeraddr[0], peeraddr[1]))
-
-            FDServer(sock, protocol, message)
-        else:
-            self.warning("Unexpected: FD-passing message with len(fds) != 1")
 
 class PorterMedium(medium.BaseMedium):
     """
@@ -140,11 +96,11 @@ class PorterClientFactory(fpb.ReconnectingPBClientFactory):
 
         self.medium = PorterMedium()
 
-        self.protocol = FDPassingBroker
+        self.protocol = fdserver.FDPassingBroker
         self._childFactory = childFactory
 
     def buildProtocol(self, addr):
-        p = self.protocol(self._childFactory)
+        p = self.protocol(self._childFactory, FDPorterServer)
         p.factory = self
         return p
 
