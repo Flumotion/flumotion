@@ -1,3 +1,8 @@
+2006-06-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* po/POTFILES.in:
+	  remove 08 files
+
 2006-06-21  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/errors.py:

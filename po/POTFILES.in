@@ -9,7 +9,6 @@ flumotion/wizard/steps.py
 flumotion/wizard/step.py
 
 flumotion/component/feedcomponent.py
-flumotion/component/feedcomponent08.py
 
 flumotion/component/consumers/httpstreamer/http.py
 flumotion/component/consumers/httpstreamer/http.glade
@@ -27,7 +26,6 @@ flumotion/worker/worker.py
 
 flumotion/worker/checks/check.py
 flumotion/worker/checks/encoder.py
-flumotion/worker/checks/video08.py
 flumotion/worker/checks/video010.py
 
 flumotion/test/test_i18n.py
