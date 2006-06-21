@@ -1,5 +1,11 @@
 2006-06-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/twisted/fdserver.py:
+	  move Passable classes as well
+
+2006-06-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/porter/porterclient.py:
 	* flumotion/twisted/fdserver.py:
 	  Break out the FDPassingBroker, adding a second argument

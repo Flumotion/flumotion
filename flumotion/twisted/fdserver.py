@@ -22,7 +22,7 @@
 from flumotion.common import log
 from flumotion.extern.fdpass import fdpass
 
-from twisted.internet import unix, main, address
+from twisted.internet import unix, main, address, tcp
 from twisted.spread import pb
 
 import errno
@@ -110,5 +110,31 @@ class FDPassingBroker(pb.Broker, log.Loggable):
             self._connectionClass(sock, protocol, message)
         else:
             self.warning("Unexpected: FD-passing message with len(fds) != 1")
+
+class PassableServerConnection(tcp.Server):
+    """
+    A subclass of tcp.Server that permits passing the FDs used to other 
+    processes (by just calling close(2) rather than shutdown(2) on them)
+    """
+
+    def __init__(self, sock, protocol, client, server, sessionno):
+        tcp.Server.__init__(self, sock, protocol, client, server, sessionno)
+        self.keepSocketAlive = False
+
+    def _closeSocket(self):
+        # We override this (from tcp._SocketCloser) so that we can close sockets
+        # properly in the normal case, but once we've passed our socket on via
+        # the FD-channel, we just close() it (not calling shutdown() which will
+        # close the TCP channel without closing the FD itself)
+        if self.keepSocketAlive:
+            try:
+                self.socket.close()
+            except socket.error:
+                pass
+        else:
+            tcp.Server._closeSocket(self)
+
+class PassableServerPort(tcp.Port):
+    transport = PassableServerConnection
 
 
