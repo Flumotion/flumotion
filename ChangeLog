@@ -1,3 +1,11 @@
+2006-06-21  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/errors.py:
+	  Add a general-purpose WrongStateError.
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  declare a variable earlier.
+
 2006-06-21  Andy Wingo  <wingo@pobox.com>
 
 	* http.py (Stats.__init__): Add some instance vars for tracking

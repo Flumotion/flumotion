@@ -263,6 +263,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.description = None
 
+        self.type = None
+
         # Used if we've slaved to a porter.
         self._pbclient = None
         self._porterUsername = None

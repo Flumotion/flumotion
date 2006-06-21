@@ -88,6 +88,9 @@ class SystemError(pb.Error):
 class ReloadSyntaxError(pb.Error):
     "A syntax error during a reload of a module"
 
+class WrongStateError(pb.Error):
+    "The remote object was in the wrong state for this command"
+
 # component errors
 class ComponentError(pb.Error):
     "Error while doing something to a component"
