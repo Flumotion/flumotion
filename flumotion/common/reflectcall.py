@@ -47,16 +47,18 @@ def reflectCallCatching(err, moduleName, methodName, *args, **kwargs):
         module = reflect.namedModule(moduleName)
     except ValueError:
         raise err("module %s could not be found" % moduleName)
-    except ImportError, e:
-        raise err("module %s could not be imported (%s)"
-                  % (moduleName,
-                     log.getExceptionMessage(e, filename='flumotion')))
     except SyntaxError, e:
         raise err("module %s has a syntax error in %s:%d"
                   % (moduleName, e.filename, e.lineno))
+    except ImportError, e:
+        # FIXME: basically this is the same as the generic one below...
+        raise err("module %s could not be imported (%s)"
+                  % (moduleName,
+                     log.getExceptionMessage(e, filename='flumotion')))
     except Exception, e:
-        raise err("Exception %r during import of module %s (%r)"
-                  % (e.__class__.__name__, moduleName, e.args))
+        raise err("module %s could not be imported (%s)"
+                  % (moduleName,
+                     log.getExceptionMessage(e, filename='flumotion')))
         
     if not hasattr(module, methodName):
         raise err("module %s has no method named %s"
