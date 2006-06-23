@@ -232,6 +232,21 @@ class Vishnu(log.Loggable):
         else:
             return None
 
+    def getBundlerBasket(self):
+        """
+        Return a bundler basket to unbundle from.
+        If the registry files were updated since the last time, the
+        bundlerbasket will be rebuilt.
+
+        @since: 0.2.2
+        @rtype: L{flumotion.common.bundle.BundlerBasket}
+        """
+        if registry.getRegistry().rebuildNeeded():
+            self.info("Registry changed, rebuilding")
+            registry.getRegistry().verify()
+            self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
+        return self.bundlerBasket
+        
     def _updateState(self, conf):
         self.debug('syncing up planet state with config')
         added = [] # added components while parsing

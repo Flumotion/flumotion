@@ -134,6 +134,8 @@
 * HARD		clean up/refactor/document admin UI
                 + abstraction for better reuse
 
+* EASY		failures in admin_gtk code should result in a message as well
+
 - API cleanup:
 
 - manager/component.py:

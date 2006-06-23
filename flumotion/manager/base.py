@@ -205,7 +205,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
                 moduleNames.extend(moduleName)
             self.debug('asked to get bundle sums for modules %r' % moduleNames)
 
-        basket = self.vishnu.bundlerBasket
+        basket = self.vishnu.getBundlerBasket()
 
         # will raise an error if bundleName not known
         for fileName in fileNames:
@@ -255,7 +255,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         @rtype:   list of (str, str) tuples
         """
         self.debug('asked to get bundle sums for file %s' % filename)
-        basket = self.vishnu.bundlerBasket
+        basket = self.vishnu.getBundlerBasket()
         bundleName = basket.getBundlerNameByFile(filename)
         if not bundleName:
             self.warning('Did not find a bundle for file %s' % filename)
@@ -273,7 +273,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         @returns: dictionary of bundleName -> zipdata
         @rtype:   dict of str -> str
         """
-        basket = self.vishnu.bundlerBasket
+        basket = self.vishnu.getBundlerBasket()
         zips = {}
         for name in bundles:
             bundler = basket.getBundlerByName(name)
