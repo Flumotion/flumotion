@@ -1,6 +1,11 @@
 2006-06-23  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Import socket module to check attribute
+
+2006-06-23  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
 	  Disable special 2.4.3 bug workaround if the socket module has a 
 	  "has_2_4_3_patch" attribute.
 

@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import os
+import socket
 import time
 import errno
 import resource
