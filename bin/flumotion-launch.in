@@ -34,7 +34,7 @@ PROGRAM_PATH = 'flumotion.launch.main.main'
 try:
     # setup the project root
     dir = os.path.dirname(os.path.abspath(__file__))
-    if os.path.exists(os.path.join(dir, '.svn')):
+    if os.path.exists(os.path.join(dir, 'flumotion', '.svn')):
         root = os.path.split(dir)[0]
     else:
         root = os.path.join(LIBDIR, 'flumotion', 'python')

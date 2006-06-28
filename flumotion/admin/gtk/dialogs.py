@@ -74,6 +74,8 @@ class ErrorDialog(gtk.MessageDialog):
                  secondary_text=None):
         gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
             gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
+        b = self.action_area.get_children()[0]
+        b.set_name('ok_button')
         self.message = message
         if close_on_response:
             self.connect("response", lambda self, response: self.hide())
