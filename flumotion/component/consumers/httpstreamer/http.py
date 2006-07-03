@@ -570,7 +570,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def do_start(self, *args, **kwargs):
         def gotPorterDetails(porter):
             (self._porterPath, self._porterUsername, 
-                self._porterPassword) = porter
+                self._porterPassword, self.port) = porter
                 
             reactor.connectWith(fdserver.FDConnector, self._porterPath, 
                 self._pbclient, 10, checkPID=False)

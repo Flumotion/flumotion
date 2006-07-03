@@ -102,7 +102,8 @@ class PorterMedium(component.BaseComponentMedium):
         Return the location and login username/password for the porter
         as a tuple (path, username, password)
         """
-        return (self.comp._socketPath, self.comp._username, self.comp._password)
+        return (self.comp._socketPath, self.comp._username, 
+            self.comp._password, self.comp._port)
 
 class Porter(component.BaseComponent, log.Loggable):
     """
