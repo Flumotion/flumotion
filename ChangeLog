@@ -1,3 +1,9 @@
+2006-07-03  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Fix other caller of the gotPorterDetails callback to supply the port
+	  number correctly
+
 2006-07-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* bin/flumotion-admin-text.in:

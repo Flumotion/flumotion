@@ -620,7 +620,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             else:
                 self.debug("Creating dummy deferred")
                 d = defer.succeed((self._porterPath, self._porterUsername, 
-                    self._porterPassword))
+                    self._porterPassword, self.port))
 
             d.addCallback(gotPorterDetails)
             d.addErrback(self.failedSlavedStart)
