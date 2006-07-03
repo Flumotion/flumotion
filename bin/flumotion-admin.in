@@ -33,7 +33,6 @@ try:
     if os.path.exists(os.path.join(dir, '..', 'flumotion', '.svn')):
         root = os.path.split(dir)[0]
     else:
-        print "installed"
         root = os.path.join(LIBDIR, 'flumotion', 'python')
     sys.path.insert(0, root)
 
