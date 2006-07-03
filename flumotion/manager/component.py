@@ -1050,10 +1050,6 @@ class ComponentHeaven(base.ManagerHeaven):
         """
         self.debug('heaven registering component %r' % componentAvatar)
 
-        # tell the admin client
-        #componentName = componentAvatar.avatarId
-        #self.vishnu.adminHeaven.uiStateChanged(componentName, state)
-
         # ensure it has a parent -- the parent will be null if this is
         # an already-running worker connects to a freshly restarted
         # manager

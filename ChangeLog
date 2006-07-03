@@ -1,3 +1,9 @@
+2006-07-03  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/component.py
+	(ComponentHeaven.registerComponent): Remove some commented-out
+	code from 2004?
+
 2006-07-03  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/misc/porter/porter.py:
