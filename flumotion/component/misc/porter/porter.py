@@ -99,8 +99,8 @@ class PorterMedium(component.BaseComponentMedium):
 
     def remote_getPorterDetails(self):
         """
-        Return the location and login username/password for the porter
-        as a tuple (path, username, password)
+        Return the location, login username/password, and listening port for 
+        the porter as a tuple (path, username, password, port)
         """
         return (self.comp._socketPath, self.comp._username, 
             self.comp._password, self.comp._port)
