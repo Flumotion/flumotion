@@ -1,3 +1,17 @@
+2006-07-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* bin/flumotion-admin-text.in:
+	* bin/flumotion-admin.in:
+	* bin/flumotion-command.in:
+	* bin/flumotion-inspect.in:
+	* bin/flumotion-job.in:
+	* bin/flumotion-launch.in:
+	* bin/flumotion-manager.in:
+	* bin/flumotion-tester.in:
+	* bin/flumotion-worker.in:
+	* bin/flumotion.in:
+	  correctly go up the hierarchy.  Still doesn't work for kiwi.
+
 2006-07-03  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:

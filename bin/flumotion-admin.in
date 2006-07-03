@@ -30,9 +30,11 @@ PROGRAM_PATH = 'flumotion.admin.gtk.main.main'
 try:
     # setup the project root
     dir = os.path.dirname(os.path.abspath(__file__))
-    if os.path.exists(os.path.join(dir, 'flumotion', '.svn')):
+    print dir
+    if os.path.exists(os.path.join(dir, '..', 'flumotion', '.svn')):
         root = os.path.split(dir)[0]
     else:
+        print "installed"
         root = os.path.join(LIBDIR, 'flumotion', 'python')
     sys.path.insert(0, root)
 
