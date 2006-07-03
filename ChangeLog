@@ -1,3 +1,9 @@
+2006-07-03  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Add current_load to the tuple returned from getLoadData(), so that
+	  the cluster admin can use it to determine when to stop streamers.
+
 2006-07-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py

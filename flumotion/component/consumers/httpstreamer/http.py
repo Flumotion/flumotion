@@ -438,8 +438,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def getLoadData(self):
         """
         Return a tuple (deltaadded, deltaremoved, bytes_transferred, 
-        current_clients) of our current bandwidth and user values.
-        The deltas are estimates of how much bitrate is added, removed i
+        current_clients, current_load) of our current bandwidth and user values.
+        The deltas are estimates of how much bitrate is added, removed
         due to client connections, disconnections, per second.
         """
         # We calculate the estimated clients added/removed per second, then
@@ -452,9 +452,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         bytes_sent      = self.getBytesSent()
         clients_connected = self.getClients()
+        current_load = bitrate * clients_connected
 
         return (deltaadded * bitrate, deltaremoved * bitrate, bytes_sent, 
-            clients_connected)
+            clients_connected, current_load)
     
     def add_client(self, fd):
         sink = self.get_element('sink')
