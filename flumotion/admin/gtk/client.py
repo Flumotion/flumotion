@@ -161,7 +161,8 @@ class Window(log.Loggable, gobject.GObject):
         self._trayicon.set_tooltip(_('Not connected'))
 
         # the widget containing the component view
-        self._sidepane = widgets['hpaned']
+        self._component_view = widgets['component_view']
+        self._component_view_clear()
  
         window.connect('delete-event', self.close)
 
@@ -350,10 +351,7 @@ class Window(log.Loggable, gobject.GObject):
             notebook.append_page(table, gtk.Label(node.title))
             
         # put "loading" widget in
-        old = self._sidepane.get_child2()
-        self._sidepane.remove(old)
-        self._sidepane.add2(notebook)
-        notebook.show_all()
+        self._component_view_set_widget(notebook)
 
         # trigger node rendering
         d = defer.Deferred()
@@ -728,12 +726,16 @@ class Window(log.Loggable, gobject.GObject):
 
     # clear the component view in the sidepane.  Called when the current
     # component goes sleeping
-    def _sidepane_clear(self):
-        old = self._sidepane.get_child2()
-        self._sidepane.remove(old)
-        sub = gtk.Label("")
-        self._sidepane.add2(sub)
-        sub.show()
+    def _component_view_clear(self):
+        empty = gtk.Label("")
+        self._component_view_set_widget(empty)
+
+    # set the given widget in the component view
+    def _component_view_set_widget(self, widget):
+        for c in self._component_view.get_children():
+            self._component_view.remove(c)
+        self._component_view.add(widget)
+        widget.show_all()
 
     ### ui callbacks
     def _components_view_has_selection_cb(self, view, state):
@@ -753,13 +755,7 @@ class Window(log.Loggable, gobject.GObject):
         mood = state.get('mood')
         messages = state.get('messages')
         self._messages_view.clear()
-        # no ui, clear; FIXME: do this nicer
-        old = self._sidepane.get_child2()
-        self._sidepane.remove(old)
-        #sub = gtk.Label('%s does not have a UI yet' % name)
-        sub = gtk.Label("")
-        self._sidepane.add2(sub)
-        sub.show()
+        self._component_view_clear()
 
         if messages:
             for m in messages:

@@ -1,6 +1,14 @@
 2006-07-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/admin.glade:
+	  set border_width on VPane, and then remove the unneeded HBox
+	  that was used for padding
+	* flumotion/admin/gtk/client.py:
+	  create _component_view_set_widget() and use it
+
+2006-07-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/admin.glade:
 	  Change the window's size to not be minimum width and height,
 	  but default.  Also make it slightly bigger.
 	  create a VPaned to separate the messages view from the rest,
