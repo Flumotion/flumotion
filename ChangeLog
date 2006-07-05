@@ -1,3 +1,13 @@
+2006-07-05  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Assert that the pipeline is None before setting it. 
+	  This triggers when restarting a manager; without the assert we end
+	  up crashing in multifdsink.
+	  Need to figure out why we're setting a replacement pipeline, but
+	  this at least makes sure we get a clear assertion failure in python
+	  rather than nasty segfaults.
+
 2006-07-03  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:

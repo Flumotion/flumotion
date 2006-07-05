@@ -110,6 +110,7 @@ class FeedComponent(basecomponent.BaseComponent):
         Subclasses can override me.
         They should chain up first.
         """
+        assert self.pipeline == None
         self.pipeline = pipeline
         self.setup_pipeline()
  
