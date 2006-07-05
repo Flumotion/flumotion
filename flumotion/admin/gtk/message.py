@@ -61,6 +61,9 @@ class MessagesView(gtk.VBox):
     """
     I am a widget that can show messages.
     """
+    # I am a vbox with first row the label and icons,
+    # second row a separator
+    # and third row a text view
     def __init__(self):
         gtk.VBox.__init__(self)
 
@@ -68,19 +71,24 @@ class MessagesView(gtk.VBox):
         self.pack_start(h1, False, False, 0)
         self.label = gtk.Label()
         self.label.show()
-        h1.pack_start(self.label, False, False, 12)
+        h1.pack_start(self.label, False, False, 6)
+
+        # button box holding the message icons at the top right
         h2 = gtk.HBox()
-        h1.pack_end(h2, False, False, 12)
+        h1.pack_end(h2, False, False, 0)
         s = gtk.HSeparator()
-        self.pack_start(s, False, False, 3)
+        self.pack_start(s, False, False, 6)
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         sw.set_shadow_type(gtk.SHADOW_NONE)
         self.pack_start(sw, True, True, 0)
+
+        # text view shows the messages, plus debug information
+        # FIXME: needs to be hyperlinkable in the future
         tv = gtk.TextView()
         tv.set_wrap_mode(gtk.WRAP_WORD)
-        tv.set_left_margin(12)
-        tv.set_right_margin(12)
+        tv.set_left_margin(6)
+        tv.set_right_margin(6)
         tv.set_accepts_tab(False)
         tv.set_cursor_visible(False)
         tv.set_editable(False)

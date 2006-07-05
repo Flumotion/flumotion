@@ -165,7 +165,7 @@ class Window(log.Loggable, gobject.GObject):
  
         window.connect('delete-event', self.close)
 
-        self.components_view = parts.ComponentsView(widgets['component_view'])
+        self.components_view = parts.ComponentsView(widgets['components_view'])
         self.components_view.connect('has-selection', 
             self._components_view_has_selection_cb)
         self.components_view.connect('activated',
@@ -396,9 +396,15 @@ class Window(log.Loggable, gobject.GObject):
         widget.show()
 
     def _nodeRenderErrback(self, failure, nodeName):
-        self.debug('Could not render node %s: %s' % (nodeName,
-            log.getFailureMessage(failure)))
         self.warning('Could not render node %s' % nodeName)
+        msg = 'Could not render node %s: %s' % (nodeName,
+            log.getFailureMessage(failure))
+        self.debug(msg)
+        m = messages.Error(T_(
+                N_("This component has a UI bug in the %s tab."), nodeName),
+                    debug=msg,
+                    id=nodeName)
+        self._messages_view.add_message(m)
 
     def _setCurrentComponentCallback(self, _, instance):
         self.debug('setting current_component to %r' % instance)
@@ -1110,11 +1116,15 @@ class Window(log.Loggable, gobject.GObject):
         version.set_use_markup(True)
         version.show()
 
-        text = _('Flumotion is a streaming media server.\n\n(C) 2004-2005 Fluendo S.L.')
+        text = _('Flumotion is a streaming media server.\n\n'
+            '(C) 2004, 2005, 2006 Fluendo S.L.')
         authors = ('Andy Wingo',
                    'Johan Dahlin',
+                   'Mike Smith',
                    'Thomas Vander Stichele',
-                   'Wim Taymans')
+                   'Wim Taymans',
+                   'Zaheer Abbas Merali',
+        )
         text += '\n\n<small>' + _('Authors') + ':\n'
         for author in authors:
             text += '  %s\n' % author

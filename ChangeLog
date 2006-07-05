@@ -1,3 +1,25 @@
+2006-07-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/admin.glade:
+	  Change the window's size to not be minimum width and height,
+	  but default.  Also make it slightly bigger.
+	  create a VPaned to separate the messages view from the rest,
+	  so that it can be resized as needed.
+	  Adjust padding so that the textview lines up with the notebook
+	  and componentsview
+	  put the label inside a component_view vbox of 1, so we can
+	  later adjust the code to embed inside this vbox always
+	* flumotion/admin/gtk/parts.py:
+	  if no selection, do not traceback, just return None
+	* flumotion/admin/gtk/client.py:
+	  the widget we want is actually components_view - the view on the
+	  left on all components
+	  when we have a node render error, show a message
+	  add 2006, we're living it
+	  add other authors, they've earned it
+	* flumotion/admin/gtk/message.py:
+	  adjust padding to make text view and buttons line up
+
 2006-07-05  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:

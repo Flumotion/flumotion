@@ -286,6 +286,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
         @rtype: L{flumotion.common.component.AdminComponentState}
         """
         selection = self._view.get_selection()
+        if not selection:
+            return None
         sel = selection.get_selected()
         if not sel:
             return None
