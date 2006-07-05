@@ -134,8 +134,11 @@
 * HARD		clean up/refactor/document admin UI
                 + abstraction for better reuse
 
-* EASY		failures in admin_gtk code should result in a message as well
+* EASY		rename component_medium_class to componentMediumClass
 
+* MEDIUM	BaseAdminGtkNode implements getProp, setProp, callRemote,
+	 	exactly the same way as BaseAdminGtk -> pass it as parent
+		so it can call on parent's methods
 - API cleanup:
 
 - manager/component.py:

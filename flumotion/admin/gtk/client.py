@@ -437,6 +437,7 @@ class Window(log.Loggable, gobject.GObject):
             self.log("... but does not have method %s" % localMethodName)
             self.warning("Component view %s does not implement %s" % (
                 name, localMethodName))
+            self.debug('Component view is %r' % self.current_component)
             return
         self.log("... and executing")
         method = getattr(self.current_component, localMethodName)

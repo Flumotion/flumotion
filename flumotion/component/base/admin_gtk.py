@@ -238,8 +238,8 @@ class BaseAdminGtkNode(log.Loggable):
         d.addErrback(self.propertyErrback, self)
         return d
 
-    def callRemote(self, method_name, *args, **kwargs):
-        return self.admin.componentCallRemote(self.state, method_name,
+    def callRemote(self, methodName, *args, **kwargs):
+        return self.admin.componentCallRemote(self.state, methodName,
                                               *args, **kwargs)
        
     # FIXME: do this automatically if there is a gladeFile class attr set
