@@ -25,9 +25,31 @@ from flumotion.component import feedcomponent
 from flumotion.common import errors, gstreamer
 from flumotion.component.effects.volume import volume
 
+class AudioTestMedium(feedcomponent.FeedComponentMedium):
+    def __init__(self, comp):
+        feedcomponent.FeedComponentMedium.__init__(self, comp)
+
+    def remote_getAudioTestProperties(self):
+        return self.comp.getAudioTestProperties()
+
+    def remote_setFrequency(self, frequency):
+        """
+        @type frequency: int
+        """
+        return self.comp.setFrequency(frequency)
+
+    def remote_setWave(self, wave):
+        """
+        @type wave: int
+        """
+        return self.comp.setWave(wave)
+
 class AudioTest(feedcomponent.ParseLaunchComponent):
+    component_medium_class = AudioTestMedium
+
     def get_pipeline_string(self, properties):
         rate = properties.get('rate', 8000)
+        self.rate = rate
         volume = properties.get('volume', 1.0)
 
         is_live = 'is-live=true'
@@ -58,3 +80,28 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         element = self.get_element('volume')
         return element.get_property('volume')
     
+    def getAudioTestProperties(self):
+        """
+        Get and return the wave names, wave form number, frequency,
+        and maximum frequency.
+
+        @rtype: tuple of (list of str, int, int, int)
+        """
+        element = self.get_element('source')
+        # FIXME: figure out how to query the enum param spec
+        waveNames = ['Sine', 'Square', 'Saw', 'Triangle']
+    
+        wave = int(element.get_property('wave'))
+        freq = element.get_property('freq')
+        return (waveNames, wave, freq, self.rate)
+
+    # a notify on the freq property doesn't actually work, so do it like this
+    def setFrequency(self, frequency):
+        element = self.get_element('source')
+        element.set_property('freq', frequency)
+        self.medium.callRemote('adminCallRemote', 'frequencyChanged', frequency)
+
+    def setWave(self, wave):
+        element = self.get_element('source')
+        element.set_property('wave', wave)
+        self.medium.callRemote('adminCallRemote', 'waveChanged', wave)

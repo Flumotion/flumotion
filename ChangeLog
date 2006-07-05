@@ -1,5 +1,14 @@
 2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/audiotest/admin_gtk.py:
+	* flumotion/component/producers/audiotest/audiotest.glade:
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	  add a Node for audiotestsrc properties like wave (on which we
+	  cheat for now) and frequency
+
+2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* TODO:
 	  add some TODO notes
 	* flumotion/admin/gtk/client.py:

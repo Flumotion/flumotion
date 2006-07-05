@@ -42,6 +42,7 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="audiotest-base" />
+            <dependency name="volume-effect" />
         </dependencies>
 
         <directories>
@@ -55,11 +56,13 @@
       <dependencies>
         <dependency name="audiotest-base" />
         <dependency name="base-admin-gtk" />
+        <dependency name="volume-admin-gtk" />
       </dependencies>
 
       <directories>
         <directory name="flumotion/component/producers/audiotest">
           <filename location="admin_gtk.py" />
+          <filename location="audiotest.glade" />
         </directory>
       </directories>
     </bundle>
