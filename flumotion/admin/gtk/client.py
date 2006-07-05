@@ -529,7 +529,7 @@ class Window(log.Loggable, gobject.GObject):
             if value == moods.sleeping.value:
                 if state.get('name') == current:
                     self._messages_view.clear()
-                    self._sidepane_clear()
+                    self._component_view_clear()
 
     def stateAppend(self, state, key, value):
         if isinstance(state, worker.AdminWorkerHeavenState):
