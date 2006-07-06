@@ -1,5 +1,14 @@
 2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/porter/porterclient.py:
+	  remove unused import
+	* flumotion/twisted/fdserver.py:
+	  fix sole wrong docstring in a sea of missing docstrings
+	* flumotion/twisted/credentials.py:
+	  remove a sad cut and paste and paste again mistake
+
+2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_saltsha256.py:
 	  fix another test
 

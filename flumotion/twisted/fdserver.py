@@ -71,12 +71,13 @@ class FDPassingBroker(pb.Broker, log.Loggable):
     over the same connection as the normal PB data stream.
     When an FD is seen, it creates new protocol objects for them from the 
     childFactory attribute.
-
-    @param connectionClass: a subclass of L{twisted.internet.tcp.Connection}
     """
     # FIXME: looks like we can only use our own subclasses that take
     # three __init__ args
     def __init__(self, childFactory, connectionClass, **kwargs):
+        """
+        @param connectionClass: a subclass of L{twisted.internet.tcp.Connection}
+        """
         pb.Broker.__init__(self, **kwargs)
 
         self.childFactory = childFactory

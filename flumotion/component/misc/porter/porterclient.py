@@ -28,7 +28,7 @@ from flumotion.common import medium, log
 from flumotion.twisted import defer, fdserver
 from flumotion.twisted import pb as fpb
 
-import socket, os
+import socket
 
 # Very similar to tcp.Server, but we need to call things in a different order
 class FDPorterServer(Connection):

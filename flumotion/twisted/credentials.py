@@ -187,19 +187,6 @@ class UsernameCryptPasswordCryptChallenger:
         expected = cryptRespond(self.challenge, cryptPassword)
         return self.response == expected
 
-        cryptPassword = crypt.crypt(password, self.salt)
-        self.response = cryptRespond(self.challenge, cryptPassword)
-
-    def checkCryptPassword(self, cryptPassword):
-        """
-        Check credentials against the given cryptPassword.
-        """
-        if not self.response:
-            return False
-
-        expected = cryptRespond(self.challenge, cryptPassword)
-        return self.response == expected
-
 class IToken(credentials.ICredentials):
     """I encapsulate a token.
 
