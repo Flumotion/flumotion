@@ -115,7 +115,7 @@ class TestUsernameSha256PasswordCryptChallenger(unittest.TestCase):
         self.salt = 'iamsalt'
         # known good salted sha-256 password
         self.good = self.salt + \
-            '2f826124ada2b2cdf11f4fd427c9ca48deed49b41476266d8df8d2cf8612e'
+            '2f826124ada2b2cdf11f4fd427c9ca48de0ed49b41476266d8df08d2cf86120e'
 
     def testWithPlaintext(self):
         cred = CredUSPCC('user')

@@ -1,5 +1,12 @@
 2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_credentials.py:
+	* flumotion/twisted/credentials.py:
+	  make sure our zeros don't get dropped to the floor when converting
+	  a byte string to hex values
+
+2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/keycards.py:
 	* flumotion/component/bouncers/htpasswdcrypt.py:
 	* flumotion/component/bouncers/saltsha256.py:

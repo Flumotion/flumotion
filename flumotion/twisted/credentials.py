@@ -131,7 +131,7 @@ def dataToHex(data):
     """
     l = []
     for c in data:
-        l.append(str(hex(ord(c))[2:]))
+        l.append("%02x" % ord(c))
     return "".join(l)
         
 # copied from twisted.spread.pb.challenge()
