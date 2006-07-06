@@ -1,5 +1,10 @@
 2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_saltsha256.py:
+	  fix another test
+
+2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_credentials.py:
 	* flumotion/twisted/credentials.py:
 	  make sure our zeros don't get dropped to the floor when converting
