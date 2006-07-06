@@ -29,6 +29,7 @@ from flumotion.twisted import credentials
 CredCrypt = credentials.UsernameCryptPasswordCrypt
 CredPlaintext = credentials.UsernameCryptPasswordPlaintext
 CredUCPCC = credentials.UsernameCryptPasswordCryptChallenger
+CredUSPCC = credentials.UsernameSha256PasswordCryptChallenger
 
 class TestUsername(unittest.TestCase):
     def testWithPlaintext(self):
@@ -108,6 +109,46 @@ class TestUsernameCryptPasswordCryptChallenger(unittest.TestCase):
         # authenticator verifies against the known good password
         self.failIf(cred.checkCryptPassword('qi1Lftt0GZC0o'))
         self.failIf(cred.checkCryptPassword('boohoowrong'))
+
+class TestUsernameSha256PasswordCryptChallenger(unittest.TestCase):
+    def setUp(self):
+        self.salt = 'iamsalt'
+        # known good salted sha-256 password
+        self.good = self.salt + \
+            '2f826124ada2b2cdf11f4fd427c9ca48deed49b41476266d8df8d2cf8612e'
+
+    def testWithPlaintext(self):
+        cred = CredUSPCC('user')
+
+        # authenticator sets salt and challenge
+        cred.salt = self.salt
+        cred.challenge = credentials.cryptChallenge()
+
+
+        # initially, we didn't respond, so it should fail with the right result
+        self.failIf(cred.checkSha256Password(self.good))
+
+        # requester responds
+        cred.setPassword('test')
+
+        # authenticator verifies against the known good password
+        self.failUnless(cred.checkSha256Password(self.good))
+        self.failIf(cred.checkSha256Password('boohoowrong'))
+
+    def testWithPlaintextWrongPassword(self):
+        cred = CredUSPCC('user')
+
+        # authenticator sets salt and challenge
+        cred.salt = self.salt
+        cred.challenge = credentials.cryptChallenge()
+
+        # requester responds with wrong password
+        cred.setPassword('wrong')
+
+        # authenticator verifies against the known good password
+        self.failIf(cred.checkSha256Password(self.good))
+        self.failIf(cred.checkSha256Password('boohoowrong'))
+
 
 if __name__ == '__main__':
      unittest.main()

@@ -1,5 +1,18 @@
 2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/keycards.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	* flumotion/component/bouncers/saltsha256.xml:
+	* flumotion/test/test_credentials.py:
+	* flumotion/test/test_saltsha256.py:
+	* flumotion/twisted/checkers.py:
+	* flumotion/twisted/credentials.py:
+	  add credentials, keycard, checker, and bouncer for
+	  a salted SHA-256 password backend
+
+2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/producers/audiotest/admin_gtk.py:
 	* flumotion/component/producers/audiotest/audiotest.glade:
 	* flumotion/component/producers/audiotest/audiotest.py:

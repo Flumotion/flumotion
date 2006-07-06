@@ -114,3 +114,51 @@ class CryptChecker(log.Loggable):
             self.debug('user %s refused, not in database' %
                 credentials.username)
             return defer.fail(error.UnauthorizedLogin())
+
+class Sha256Checker(log.Loggable):
+    """
+    I check credentials using a SHA-256-based backend.
+    """
+    implements(checkers.ICredentialsChecker)
+    credentialInterfaces = (credentials.IUsernameSha256Password, )
+
+    logCategory = 'sha256checker'
+
+    def __init__(self, **users):
+        self.users = users
+
+    def addUser(self, username, salt, sha256Data):
+        """
+        Add the given username and password.
+
+        @param username:       name of the user to add
+        @type  username:       str
+        @param salt:           the salt for this user
+        @type  salt:           str
+        @param sha256Data:     the sha256 data for this user
+        @type  sha256Data:     str
+        """
+        self.debug('added user %s' % username)
+        self.users[username] = (salt, sha256Data)
+
+    def _cbSha256PasswordMatch(self, matched, username):
+        if matched:
+            self.debug('user %s authenticated' % username)
+            return username
+        else:
+            self.debug('user %s refused, password not matched' % username)
+            return failure.Failure(error.UnauthorizedLogin())
+
+    ### ICredentialsChecker methods
+    def requestAvatarId(self, credentials):
+        if credentials.username in self.users:
+            salt, data = self.users[credentials.username]
+            password = salt + data
+            return defer.maybeDeferred(
+                credentials.checkSha256Password,
+                password).addCallback(
+                self._cbSha256PasswordMatch, credentials.username)
+        else:
+            self.debug('user %s refused, not in database' %
+                credentials.username)
+            return defer.fail(error.UnauthorizedLogin())

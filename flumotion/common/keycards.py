@@ -144,3 +144,24 @@ class KeycardToken(Keycard, credentials.Token):
 
 pb.setUnjellyableForClass(KeycardToken, KeycardToken)
 
+USPCC = credentials.UsernameSha256PasswordCryptChallenger
+class KeycardUASPCC(Keycard, USPCC):
+    """
+    I am a keycard with a username and IP address.
+    I get authenticated through challenge/response on a SHA-256 password.
+    """
+    implements(common.mergeImplements(Keycard, USPCC))
+    def __init__(self, username, address):
+        USPCC.__init__(self, username)
+        Keycard.__init__(self)
+        self.address = address
+
+    def getData(self):
+        d = Keycard.getData(self)
+        d['username'] = self.username
+        d['address'] = self.address
+        return d
+
+pb.setUnjellyableForClass(KeycardUASPCC, KeycardUASPCC)
+
+

@@ -1,0 +1,22 @@
+<registry>
+  <components>
+    <component type="saltsha256"
+               base="flumotion/component/bouncers">
+
+      <source location="flumotion.component.bouncers.saltsha256"/>
+
+      <entries>
+        <entry type="component" location="saltsha256.py"
+               function="SaltSha256"/>
+      </entries>
+
+      <properties>
+        <property name="filename" type="string"/>
+        <property name="data" type="rawstring"/>
+        <property name="domain" type="string"/>
+      </properties>
+    </component>
+  </components>
+
+</registry> 
+

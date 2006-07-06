@@ -1,0 +1,122 @@
+# -*- Mode: Python; test-case-name: flumotion.test.test_saltsha256 -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2004,2005,2006 Fluendo, S.L. (www.fluendo.com).
+# All rights reserved.
+
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+import common
+from twisted.trial import unittest
+from twisted.internet import defer
+
+from flumotion.common import keycards
+from flumotion.component.bouncers import saltsha256
+
+import twisted.copyright #T1.3
+#T1.3
+def weHaveAnOldTwisted():
+    return twisted.copyright.version[0] < '2'
+
+bouncerconf = {'name': 'testbouncer',
+               'plugs': {},
+               'properties': {'data': "user:iamsalt:2f826124ada2b2cdf11f4fd427c9ca48deed49b41476266d8df8d2cf8612e"}}
+
+# this is a type that should not be allowed
+class TestWrongKeycardClass(unittest.TestCase):
+    def setUp(self):
+        self.bouncer = saltsha256.SaltSha256()
+
+    def testWrongKeycardClass(self):
+        keycard = keycards.Keycard()
+        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+        def wrongKeycardClassCallback(result):
+            self.failIf(result)
+        if weHaveAnOldTwisted():
+            result = unittest.deferredResult(d)
+            self.failIf(result)
+        else:
+            d.addCallback(wrongKeycardClassCallback)
+            return d
+
+class TestSaltSha256USCPCC(unittest.TestCase):
+    def setUp(self):
+        self.bouncer = saltsha256.SaltSha256()
+        self.bouncer.setup(bouncerconf)
+
+    def testOk(self):
+        # create challenger
+        keycard = keycards.KeycardUASPCC('user', '127.0.0.1')
+        self.assert_(keycard)
+        self.assertEquals(keycard.state, keycards.REQUESTING)
+
+        # submit for auth
+        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+        def okCallback(result):
+            self.assertEquals(result.state, keycards.REQUESTING)
+            # respond to challenge and resubmit
+            result.setPassword('test')
+            dd = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+            def authenticatedCallback(result):
+                self.assertEquals(result.state, keycards.AUTHENTICATED)
+            dd.addCallback(authenticatedCallback)
+            return dd
+            
+        if weHaveAnOldTwisted():
+            result = unittest.deferredResult(d)
+            self.assertEquals(result.state, keycards.REQUESTING)
+            # respond to challenge and resubmit
+            result.setPassword('test')
+            d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+            result = unittest.deferredResult(d)
+            self.assertEquals(result.state, keycards.AUTHENTICATED)
+        else:
+            d.addCallback(okCallback)
+            return d
+
+    def testTamperWithChallenge(self):
+        # create challenger
+        keycard = keycards.KeycardUASPCC('user', '127.0.0.1')
+        self.assert_(keycard)
+        self.assertEquals(keycard.state, keycards.REQUESTING)
+
+        # submit for auth
+        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+        def tamperCallback(result):
+            self.assertEquals(result.state, keycards.REQUESTING)
+            # mess with challenge, respond to challenge and resubmit
+            result.challenge = "I am a h4x0r"
+            result.setPassword('test')
+            dd = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+            def tamperAuthenticateCallback(result):
+                self.failIf(result)
+            dd.addCallback(tamperAuthenticateCallback)
+            return dd
+        if weHaveAnOldTwisted():
+            result = unittest.deferredResult(d)
+            self.assertEquals(result.state, keycards.REQUESTING)
+        
+            # mess with challenge, respond to challenge and resubmit
+            result.challenge = "I am a h4x0r"
+            result.setPassword('test')
+            d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+            result = unittest.deferredResult(d)
+            self.failIf(result)
+        else:
+            d.addCallback(tamperCallback)
+            return d
+if __name__ == '__main__':
+    unittest.main()
