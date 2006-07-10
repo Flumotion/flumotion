@@ -1,3 +1,22 @@
+2006-07-10  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/httpstreamer/http.xml: Remote
+	porter_name.
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.do_check): When in slave mode, we need all of
+	the porter props.
+	(MultifdSinkStreamer.configure_pipeline): Always get porter props
+	when in slave mode.
+	(MultifdSinkStreamer.do_start): No more autoconfiguration in
+	porter slave mode. Removes the only call to componentCallRemote in
+	the components.
+
+	* flumotion/manager/component.py
+	(ComponentAvatar.perspective_componentCallRemote): Removed. It's
+	too broad and has bad security implications. adminCallRemote is
+	next :)
+
 2006-07-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/porter/porterclient.py:

@@ -795,22 +795,6 @@ class ComponentAvatar(base.ManagerAvatar):
         self.vishnu.adminHeaven.avatarsCallRemote("componentCall",
             componentState, methodName, *args, **kwargs)
 
-    def perspective_componentCallRemote(self, componentAvatarId, methodName,
-        *args, **kwargs):
-        """
-        Call a method on a specified component.
-        """
-        if not self.heaven.hasAvatar(componentAvatarId):
-            self.warning("Remote call to component %s which does not exist" %
-                componentAvatarId)
-            raise errors.UnknownComponentError(componentAvatarId)
-
-        avatar = self.heaven.getAvatar(componentAvatarId)
-
-        d = avatar.mindCallRemote(methodName, *args, **kwargs)
-
-        return d
-
     def perspective_authenticate(self, bouncerName, keycard):
         """
         Authenticate the given keycard using the given bouncer.

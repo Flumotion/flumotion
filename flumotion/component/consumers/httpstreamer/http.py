@@ -269,7 +269,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._pbclient = None
         self._porterUsername = None
         self._porterPassword = None
-        self._porterId = None
         self._porterPath = None
 
         # Or if we're a master, we open our own port here. Also used for URLs
@@ -300,6 +299,14 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def get_pipeline_string(self, properties):
         return self.pipe_template
 
+    def do_check(self):
+        props = self.args['properties']
+        if props.get('type', 'master') == 'slave':
+            for k in 'socket_path', 'user', 'pass':
+                if not 'porter_'+k in props:
+                    msg = 'porter slave mode missing required property %s'%k
+                    return defer.fail(errors.ConfigError(msg))
+        
     def configure_pipeline(self, pipeline, properties):
         Stats.__init__(self, sink=self.get_element('sink'))
 
@@ -369,13 +376,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.type = properties.get('type', 'master')
         if self.type == 'slave':
-            if properties.has_key('porter_socket_path'):
-                self._porterPath = properties['porter_socket_path']
-                self._porterUsername = properties['porter_user']
-                self._porterPassword = properties['porter_pass']
-            else:
-                self._porterPath = None
-                self._porterId = "/atmosphere/" + properties['porter_name']
+            # already checked for these in do_check
+            self._porterPath = properties['porter_socket_path']
+            self._porterUsername = properties['porter_user']
+            self._porterPassword = properties['porter_pass']
 
         self.port = int(properties.get('port', 8800))
 
@@ -569,18 +573,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             return feedcomponent.ParseLaunchComponent.do_stop(self)
 
     def do_start(self, *args, **kwargs):
-        def gotPorterDetails(porter):
-            (self._porterPath, self._porterUsername, 
-                self._porterPassword, self.port) = porter
-                
-            reactor.connectWith(fdserver.FDConnector, self._porterPath, 
-                self._pbclient, 10, checkPID=False)
-
-            creds = credentials.UsernamePassword(self._porterUsername, 
-                self._porterPassword)
-            self.debug("Starting porter login!")
-            self._pbclient.startLogin(creds, self.medium)
-
         root = resources.HTTPRoot()
         # TwistedWeb wants the child path to not include the leading /
         mount = self.mountPoint[1:]
@@ -591,9 +583,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
             # We have two things we want to do in parallel:
             #  - ParseLaunchComponent.do_start()
-            #  - get the porter details (either from locals, or via a 
-            #    remote call, then log in to the porter, then register
-            #    our mountpoint with the porter.
+            #  - log in to the porter, then register our mountpoint with
+            #    the porter.
             # So, we return a DeferredList with a deferred for each of
             # these tasks. The second one's a bit tricky: we pass a dummy
             # deferred to our PorterClientFactory that gets fired once
@@ -610,20 +601,14 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
             dl = defer.DeferredList([d1, d2])
 
-            # Now we create another deferred for when we've got the porter
-            # info, which will (one way or another) get called. From that,
-            # we start actually logging in - eventually causing d2 to fire.
-            if not self._porterPath:
-                self.debug("Doing remote call to get porter details")
-                d = self.medium.callRemote("componentCallRemote",
-                    self._porterId, "getPorterDetails")
-            else:
-                self.debug("Creating dummy deferred")
-                d = defer.succeed((self._porterPath, self._porterUsername, 
-                    self._porterPassword, self.port))
+            # This will eventually cause d2 to fire
+            reactor.connectWith(fdserver.FDConnector, self._porterPath, 
+                self._pbclient, 10, checkPID=False)
 
-            d.addCallback(gotPorterDetails)
-            d.addErrback(self.failedSlavedStart)
+            creds = credentials.UsernamePassword(self._porterUsername, 
+                self._porterPassword)
+            self.debug("Starting porter login!")
+            self._pbclient.startLogin(creds, self.medium)
 
             return dl
         else:
