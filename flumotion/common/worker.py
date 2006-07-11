@@ -136,7 +136,7 @@ class PortSet(log.Loggable):
         return ret
 
     def setPortsUsed(self, ports):
-        for port in ports
+        for port in ports:
             try:
                 i = self.ports.index(port)
             except IndexError:
