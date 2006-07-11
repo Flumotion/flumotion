@@ -42,19 +42,22 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
     @ivar vishnu:   the vishnu that manages this avatar's heaven
     @type vishnu:   L{flumotion.manager.manager.Vishnu}
     """
-    def __init__(self, heaven, avatarId, keycard):
+    def __init__(self, heaven, avatarId, remoteIdentity):
         """
         @param heaven:   the heaven this avatar is part of
         @type  heaven:   L{flumotion.manager.base.ManagerHeaven}
         @param avatarId: id of the avatar to create
         @type  avatarId: str
+        @param remoteIdentity: manager-assigned identity object for this
+        avatar
+        @type  remoteIdentity: anything
         """
         self.heaven = heaven
         self.avatarId = avatarId
         self.logName = avatarId
         self.mind = None
         self.vishnu = heaven.vishnu
-        self.keycard = keycard
+        self.remoteIdentity = remoteIdentity
 
         self.debug("created new Avatar with id %s" % avatarId)
         
@@ -305,14 +308,15 @@ class ManagerHeaven(pb.Root, log.Loggable):
         self.avatars = {} # avatarId -> avatar
        
     ### ManagerHeaven methods
-    def createAvatar(self, avatarId, keycard):
+    def createAvatar(self, avatarId, remoteIdentity):
         """
         Create a new avatar and manage it.
 
         @param avatarId: id of the avatar to create
         @type  avatarId: str
-        @param keycard:  the credentials being used to log in
-        @type  keycard:  L{flumotion.common.keycards.Keycard}
+        @param remoteIdentity: the manager-side representation of the
+        remote identity
+        @type  remoteIdentity: anything
 
         @returns: a new avatar for the client
         @rtype:   L{flumotion.manager.base.ManagerAvatar}
@@ -321,7 +325,7 @@ class ManagerHeaven(pb.Root, log.Loggable):
         if self.avatars.has_key(avatarId):
             raise errors.AlreadyConnectedError(avatarId)
 
-        avatar = self.avatarClass(self, avatarId, keycard)
+        avatar = self.avatarClass(self, avatarId, remoteIdentity)
         
         self.avatars[avatarId] = avatar
         return avatar

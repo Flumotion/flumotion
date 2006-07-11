@@ -55,13 +55,10 @@ class AdminActionFileLogger(AdminAction):
         self.file.close()
         self.file = None
 
-    def action(self, avatar, method, args, kwargs):
+    def action(self, remoteIdentity, method, args, kwargs):
         # gaaaaah
-        peer = avatar.mind.broker.transport.getPeer()
-        s = ('[%04d-%02d-%02d %02d:%02d:%02d] %s@%s: %s: %r %r\n'
+        s = ('[%04d-%02d-%02d %02d:%02d:%02d] %s: %s: %r %r\n'
              % (time.gmtime()[:6] +
-                (getattr(avatar.keycard, 'username', None),
-                 common.addressGetHost(peer),
-                 method, args, kwargs)))
+                ((remoteIdentity, method, args, kwargs))))
         self.file.write(s)
         self.file.flush()

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+from StringIO import StringIO
+
 from twisted.trial import unittest
 
 from flumotion.common import config, registry, errors
@@ -69,22 +71,28 @@ regchunk = """
 reg = registry.getRegistry()
 reg.addFromString(regchunk)
 
+def ConfigXML(string):
+    f = StringIO(string)
+    conf = config.FlumotionConfigXML(f)
+    f.close()
+    return conf
+
 class TestConfig(unittest.TestCase):
     def testParseEmpty(self):
-        conf = config.FlumotionConfigXML(None, '<planet/>')
+        conf = ConfigXML('<planet/>')
         self.failIf(conf.getPath())
         self.failUnless(conf.export())
 
     def testParseWrongConfig(self):
         self.assertRaises(config.ConfigError,
-            config.FlumotionConfigXML, None, '<somethingorother/>')
+            ConfigXML, '<somethingorother/>')
 
     def testParseWrongSyntax(self):
         self.assertRaises(config.ConfigError,
-            config.FlumotionConfigXML, None, 'planet/>')
+            ConfigXML, 'planet/>')
 
     def testParseAtmosphere(self):
-        conf = config.FlumotionConfigXML(None,
+        conf = ConfigXML(
              """
              <planet>
                <atmosphere>
@@ -107,12 +115,12 @@ class TestConfig(unittest.TestCase):
                  <somethingwrong name="component-name" type="test-component"/>
                </atmosphere>
              </planet>"""
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
  
     def testParseComponent(self):
-        conf = config.FlumotionConfigXML(None,
+        conf = ConfigXML(
              """
              <planet>
                <flow name="default">
@@ -138,7 +146,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(dict.get('type'), 'test-component', dict['type'])
         
     def testParseManager(self):
-        conf = config.FlumotionConfigXML(None,
+        conf = ConfigXML(
              """
              <planet>
                <manager name="aname">
@@ -158,7 +166,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(conf.manager.bouncer.name, "component-name")
 
     def testParseManagerWithPlugs(self):
-        conf = config.FlumotionConfigXML(None,
+        conf = ConfigXML(
              """
              <planet>
                <manager name="aname">
@@ -181,10 +189,12 @@ class TestConfig(unittest.TestCase):
                              'flumotion.component.plugs.adminaction.AdminAction',
                              'properties': {'foo': 'bar'}}],
                            'flumotion.component.plugs.lifecycle.ManagerLifecycle':
+                           [],
+                           'flumotion.component.plugs.identity.IdentityProvider':
                            []})
 
     def testParseManagerWithBogusPlug(self):
-        conf = config.FlumotionConfigXML(None,
+        conf = ConfigXML(
              """
              <planet>
                <manager name="aname">
@@ -199,7 +209,7 @@ class TestConfig(unittest.TestCase):
 
     def testParseError(self):
         xml = '<planet><bad-node/></planet>'
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
 
@@ -207,7 +217,7 @@ class TestConfig(unittest.TestCase):
         xml = """<planet>
             <flow name="default"><component name="unused" type="not-existing"/></flow>
             </planet>"""
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(errors.UnknownComponentError, conf.parse)
 
@@ -216,7 +226,7 @@ class TestConfig(unittest.TestCase):
                 <component type="not-named"/>
               </flow>
             </planet>"""
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
 
@@ -225,7 +235,7 @@ class TestConfig(unittest.TestCase):
                 <component name="not-typed"/>
               </flow>
             </planet>"""
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
         
@@ -233,7 +243,7 @@ class TestConfig(unittest.TestCase):
         xml = """<planet>
             <flow><component name="unused" type="not-existing"/></flow>
             </planet>"""
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
 
@@ -242,7 +252,7 @@ class TestConfig(unittest.TestCase):
                 <component name="unused" type="not-existing"/>
               </flow>
             </planet>"""
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
 
@@ -251,7 +261,7 @@ class TestConfig(unittest.TestCase):
                 <component name="unused" type="not-existing"/>
               </flow>
             </planet>"""
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
 
@@ -260,7 +270,7 @@ class TestConfig(unittest.TestCase):
                 <wrongnode name="unused" type="not-existing"/>
               </flow>
             </planet>"""
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
 
@@ -270,7 +280,7 @@ class TestConfig(unittest.TestCase):
             <component name="first" type="test-component"></component>
             <component name="second" type="test-component"></component>
             </manager></planet>"""
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.failUnless(conf)
         self.assertRaises(config.ConfigError, conf.parse)
 
@@ -280,7 +290,7 @@ class TestConfig(unittest.TestCase):
                </manager>
              </planet>"""
         self.assertRaises(config.ConfigError,
-            config.FlumotionConfigXML, None, xml)
+            ConfigXML, xml)
 
         xml = """<planet>
                <manager name="aname">
@@ -288,7 +298,7 @@ class TestConfig(unittest.TestCase):
                </manager>
              </planet>"""
         self.assertRaises(config.ConfigError,
-            config.FlumotionConfigXML, None, xml)
+            ConfigXML, xml)
   
         xml = """<planet>
                <manager name="aname">
@@ -296,10 +306,10 @@ class TestConfig(unittest.TestCase):
                </manager>
              </planet>"""
         self.assertRaises(config.ConfigError,
-            config.FlumotionConfigXML, None, xml)
+            ConfigXML, xml)
    
     def testParseProperties(self):
-        planet = config.FlumotionConfigXML(None,
+        planet = ConfigXML(
              """<planet><flow name="default">
              <component name="component-name" type="test-component">
                <property name="one">string</property>
@@ -331,7 +341,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(conf['clock-master'], None)
 
     def testParsePlugs(self):
-        planet = config.FlumotionConfigXML(None,
+        planet = ConfigXML(
              """<planet><flow name="default">
              <component name="component-name" type="test-component">
                <plugs>
@@ -357,7 +367,7 @@ class TestConfig(unittest.TestCase):
                            'properties': {'rate': (3, 4)}})
 
     def testParseNoPlugs(self):
-        planet = config.FlumotionConfigXML(None,
+        planet = ConfigXML(
              """<planet><flow name="default">
              <component name="component-name" type="test-component">
              </component></flow>
@@ -371,7 +381,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(conf['plugs'], {'foo.bar': []})
 
     def testClockMasterAutoSelection(self):
-        planet = config.FlumotionConfigXML(None,
+        planet = ConfigXML(
              """<planet>
              <flow name="default">
              <component name="one" type="test-component-sync">
@@ -392,7 +402,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(conftwo['clock-master'], '/default/two')
 
     def testClockMasterUserSelection(self):
-        planet = config.FlumotionConfigXML(None,
+        planet = ConfigXML(
              """<planet>
              <flow name="default">
              <component name="one" type="test-component-sync">
@@ -414,7 +424,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(conftwo['clock-master'], '/default/one')
 
     def testClockMasterError(self):
-        planet = config.FlumotionConfigXML(None,
+        planet = ConfigXML(
              """<planet>
              <flow name="default">
              <component name="one" type="test-component-sync">
@@ -430,7 +440,7 @@ class TestConfig(unittest.TestCase):
         self.assertRaises(config.ConfigError, planet.parse)
 
     def testGetComponentEntries(self):
-        conf = config.FlumotionConfigXML(None,
+        conf = ConfigXML(
              """
              <planet>
                <atmosphere>
@@ -454,8 +464,14 @@ class TestConfig(unittest.TestCase):
                </flow>
              </planet>
              """
-        conf = config.FlumotionConfigXML(None, xml)
+        conf = ConfigXML(xml)
         self.assertRaises(config.ConfigError, conf.parse)
+
+def AdminConfig(sockets, string):
+    f = StringIO(string)
+    conf = config.AdminConfigParser(sockets, f)
+    f.close()
+    return conf
 
 class AdminConfigTest(unittest.TestCase):
     def testMinimal(self):
@@ -463,7 +479,7 @@ class AdminConfigTest(unittest.TestCase):
                '<plugs>'
                '</plugs>'
                '</admin>')
-        parser = config.AdminConfigParser((), None, string=doc)
+        parser = AdminConfig((), doc)
         self.failUnless(parser.plugs == {}, 'expected empty plugset')
 
     def testMinimal2(self):
@@ -471,7 +487,7 @@ class AdminConfigTest(unittest.TestCase):
                '<plugs>'
                '</plugs>'
                '</admin>')
-        parser = config.AdminConfigParser((), None, string=doc)
+        parser = AdminConfig((), doc)
         self.failUnless(parser.plugs == {}, 'expected empty plugset')
 
     def testMinimal3(self):
@@ -479,7 +495,7 @@ class AdminConfigTest(unittest.TestCase):
                '<plugs>'
                '</plugs>'
                '</admin>')
-        parser = config.AdminConfigParser(('foo.bar',), None, string=doc)
+        parser = AdminConfig(('foo.bar',), doc)
         self.failUnless(parser.plugs == {'foo.bar':[]}, parser.plugs)
 
     def testUnknownPlug(self):
@@ -490,8 +506,7 @@ class AdminConfigTest(unittest.TestCase):
                '</plugs>'
                '</admin>')
         self.assertRaises(config.ConfigError,
-                          lambda: config.AdminConfigParser(('foo.bar',),
-                                                           None, string=doc))
+                          lambda: AdminConfig(('foo.bar',), doc))
 
     def testUnknownSocket(self):
         doc = ('<admin>'
@@ -501,5 +516,4 @@ class AdminConfigTest(unittest.TestCase):
                '</plugs>'
                '</admin>')
         self.assertRaises(config.ConfigError,
-                          lambda: config.AdminConfigParser(('foo.bar',),
-                                                           None, string=doc))
+                          lambda: AdminConfig(('foo.bar',), doc))

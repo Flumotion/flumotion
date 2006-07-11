@@ -450,7 +450,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         __thisdir = os.path.dirname(os.path.abspath(__file__))
         file = os.path.join(__thisdir, 'test.xml')
         
-        self.vishnu.loadConfiguration(file)
+        self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
         s = self.vishnu.state
         
         l = s.get('flows')
@@ -463,7 +463,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
 
         # FIXME: why a second time ? Maybe to check that reloading doesn't
         # change things ?
-        self.vishnu.loadConfiguration(file)
+        self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
 
     def testConfigBeforeWorker(self):
         # test a config with three components being loaded before the worker
@@ -475,7 +475,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         __thisdir = os.path.dirname(os.path.abspath(__file__))
         file = os.path.join(__thisdir, 'test.xml')
         
-        self.vishnu.loadConfiguration(file)
+        self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
 
         # verify component mapper
         # 3 component states + avatarId's gotten from the config
@@ -532,7 +532,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         self.failUnlessEqual(len(self._components), 0)
         
         # load configuration
-        self.vishnu.loadConfiguration(file)
+        self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
 
         self._verifyConfigAndOneWorker()
         

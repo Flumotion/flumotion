@@ -26,6 +26,7 @@ parsing of registry, which holds component and bundle information
 import os
 import stat
 import errno
+from StringIO import StringIO
 
 from xml.dom import minidom, Node
 from xml.parsers import expat
@@ -589,19 +590,14 @@ class RegistryParser(fxml.Parser):
         return plugs
     
     ## Component registry specific functions
-    def parseRegistryFile(self, filename, string=None):
-        # FIXME: better separation of filename and string ?
+    def parseRegistryFile(self, file):
         """
-        Parse the given XML registry part file,
-        And add it to our registry.
-        If a string is given, the string overrides the given file.
+        @param file: The file to parse, either as an open file object,
+        or as the name of a file to open.
+        @type  file: str or file.
         """
-        self.filename = filename
-        # so we have something nice to print for parsing errors
-        if string:
-            self.filename = "<string>"
-
-        root = self.getRoot(self.filename, string)
+        self.filename = getattr(file, 'name', '<string>')
+        root = self.getRoot(file)
         node = root.documentElement
 
         if node.nodeName != 'registry':
@@ -702,10 +698,14 @@ class RegistryParser(fxml.Parser):
         return RegistryEntryBundleDirectory(name, filenames)
 
     ## Base registry specific functions
-    def parseRegistry(self, filename, string=None):
-        self.filename = filename
-
-        root = self.getRoot(filename, string)
+    def parseRegistry(self, file):
+        """
+        @param file: The file to parse, either as an open file object,
+        or as the name of a file to open.
+        @type  file: str or file.
+        """
+        self.filename = getattr(file, 'name', '<string>')
+        root = self.getRoot(file)
         self._parseRoot(root.documentElement)
 
     def getDirectories(self):
@@ -834,14 +834,22 @@ class ComponentRegistry(log.Loggable):
 
         self.verify()
     
-    def addFile(self, filename, string=None):
-        if filename.endswith('registry.xml'):
-            self.warning('%s seems to be an old registry in your tree, please remove it' % filename) 
-        self.debug('Adding file: %s' % filename)
-        self._parser.parseRegistryFile(filename, string)
+    def addFile(self, file):
+        """
+        @param file: The file to add, either as an open file object, or
+        as the name of a file to open.
+        @type  file: str or file.
+        """
+        if isinstance(file, str) and file.endswith('registry.xml'):
+            self.warning('%s seems to be an old registry in your tree, '
+                         'please remove it', file)
+        self.debug('Adding file: %r', file)
+        self._parser.parseRegistryFile(file)
         
     def addFromString(self, string):
-        self.addFile('<string>', string)
+        f = StringIO(string)
+        self.addFile(f)
+        f.close()
         
     def addRegistryPath(self, path, prefix='flumotion', force=False):
         """

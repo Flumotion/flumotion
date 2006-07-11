@@ -92,21 +92,30 @@ class ConfigEntryAtmosphere:
         return len(self.components)
 
 class BaseConfigParser(fxml.Parser):
-    def __init__(self, filename=None, string=None):
-        self.add(filename=filename, string=string)
+    def __init__(self, file):
+        """
+        @param file: The file to parse, either as an open file object,
+        or as the name of a file to open.
+        @type  file: str or file.
+        """
+        self.add(file)
 
-    def add(self, filename=None, string=None):
-        if filename != None:
-            self._repr = filename
-            self.path = os.path.split(filename)[0]
-        else:
-            self._repr = "<string>"
+    def add(self, file):
+        """
+        @param file: The file to parse, either as an open file object,
+        or as the name of a file to open.
+        @type  file: str or file.
+        """
+        try:
+            self.path = os.path.split(file.name)[0]
+        except AttributeError:
+            # for file objects without the name attribute, e.g. StringIO
             self.path = None
 
         try:
-            self.doc = self.getRoot(filename, string)
+            self.doc = self.getRoot(file)
         except fxml.ParserError, e:
-            raise ConfigError("%s" % e)
+            raise ConfigError("%s", e)
 
     def getPath(self):
         return self.path
@@ -305,8 +314,8 @@ class FlumotionConfigXML(BaseConfigParser):
     """
     logCategory = 'config'
 
-    def __init__(self, filename, string=None):
-        BaseConfigParser.__init__(self, filename, string)
+    def __init__(self, file):
+        BaseConfigParser.__init__(self, file)
 
         self.flows = []
         self.manager = None
@@ -519,7 +528,8 @@ class FlumotionConfigXML(BaseConfigParser):
 
         manager_sockets = \
             ['flumotion.component.plugs.adminaction.AdminAction',
-             'flumotion.component.plugs.lifecycle.ManagerLifecycle']
+             'flumotion.component.plugs.lifecycle.ManagerLifecycle',
+             'flumotion.component.plugs.identity.IdentityProvider']
         for k in manager_sockets:
             plugs[k] = []
 
@@ -662,13 +672,18 @@ class AdminConfigParser(BaseConfigParser):
     """
     logCategory = 'config'
 
-    def __init__(self, sockets, filename=None, string=None):
+    def __init__(self, sockets, file):
+        """
+        @param file: The file to parse, either as an open file object,
+        or as the name of a file to open.
+        @type  file: str or file.
+        """
         self.plugs = {}
         for socket in sockets:
             self.plugs[socket] = []
 
         # will start the parse via self.add()
-        BaseConfigParser.__init__(self, filename=filename, string=string)
+        BaseConfigParser.__init__(self, file)
         
     def _parse(self):
         # <admin>
@@ -690,6 +705,11 @@ class AdminConfigParser(BaseConfigParser):
 
         self.parseFromTable(root, parsers)
 
-    def add(self, filename=None, string=None):
-        BaseConfigParser.add(self, filename=filename, string=string)
+    def add(self, file):
+        """
+        @param file: The file to parse, either as an open file object,
+        or as the name of a file to open.
+        @type  file: str or file.
+        """
+        BaseConfigParser.add(self, file)
         self._parse()

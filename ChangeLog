@@ -1,3 +1,150 @@
+2006-07-11  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_config.py
+	(TestConfig.testParseManagerWithPlugs): Added a plug, update the
+	test...
+
+	* flumotion/manager/manager.py (Vishnu.computeIdentity): Fix
+	bicho.
+
+	* flumotion/test/test_manager_manager.py
+	(TestVishnu.testConfigAfterWorker)
+	(TestVishnu.testConfigBeforeWorker)
+	(TestVishnu.testLoadConfiguration): Fix for loadConfigurationXML
+	requiring the caller to provide its identity.
+
+2006-07-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/main.py (_initialLoadConfig): 
+	* flumotion/manager/manager.py (RUNNING_LOCALLY)
+	(Vishnu._makeBouncer, Vishnu._addManagerPlug)
+	(Vishnu._addComponent, Vishnu.loadConfigurationXML):
+	loadConfigurationXML can be called in two ways: from a remote
+	admin client, and during manager startup to parse XML files given
+	on the command line. In the latter case we don't want to go
+	through the adminaction mechanism. Make it so that bypassing the
+	adminaction checks must be explicitly requested.
+	(Vishnu.computeIdentity): Fall back to creating a remote identity
+	object.
+
+	* flumotion/component/plugs/identity.py
+	(ExampleIdentityProvider.computeIdentity): IdentityProviders have
+	to return instances of RemoteIdentity now.
+	(IdentityProvider.computeIdentity): Make sure this method is
+	implemented.
+
+	* flumotion/common/errors.py (InsufficientPrivilegesError): New
+	error, indicates that the remote caller does not have the
+	necessary privileges.
+
+	* flumotion/common/Makefile.am (flumotion_PYTHON): Dist.
+
+	* flumotion/common/identity.py: New file, implements a base class
+	for remote identities.
+
+2006-07-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/plugs/Makefile.am (component_PYTHON): Dist.
+
+	* flumotion/component/plugs/plugs.xml: 
+	* flumotion/component/plugs/identity.py: A sample implementation
+	of the IdentityProvider socket.
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseManager):
+	Support the IdentityProvider socket.
+
+	* conf/Makefile.am (EXTRA_DIST):
+	* conf/managers/default/exampleidentityprovider.xml: Plug file to
+	enable the exampleidentityprovider.
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspective_loadConfiguration): Give our
+	remoteIdentity so that loadConfiguration instrumentation works.
+
+	* flumotion/manager/manager.py (Vishnu._addManagerPlug): Split out
+	from _addManagerPlugs, instrumented for adminAction.
+	(Vishnu._makeBouncer): Instrument.
+	(Vishnu._addComponent): Instrument.
+	(Vishnu._updateStateFromConf): Pass along remoteIdentity to
+	_addComponent.
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspectiveMessageReceived): Pass our remoteIdentity,
+	not the avatar.
+
+	* flumotion/component/plugs/adminaction.py
+	(AdminActionFileLogger.action): Take a remoteIdentity, not an
+	avatar.
+
+	* flumotion/manager/main.py (_initialLoadConfig): Use the new
+	loadConfigurationXML.
+
+	* flumotion/manager/base.py (ManagerAvatar.__init__)
+	(ManagerHeaven.createAvatar): s/keycard/remoteIdentity/.
+
+	* flumotion/manager/manager.py (Dispatcher.createAvatarFor):
+	Instead of annotating the keycard and passing it around
+	everywhere, call a _createIdentity function to create a
+	manager-side object to describe the remote host. This identity
+	will be used for logging via the adminaction mechanism.
+	(Dispatcher.requestAvatar): Pass the remote host in addition to
+	the keycard to createAvatarFor.
+	(Dispatcher.__init__): Take a computeIdentity parameter, a
+	callable that will return an identity object.
+	(Vishnu.computeIdentity): New method, first tries to see if a plug
+	can give a suitable identity to the remote host, falling back on
+	the string 'user@host'.
+	(Vishnu.__init__): Give our computeIdentity to the dispatcher.
+	(Vishnu.adminAction): Take a remoteIdentity instead of the avatar.
+	(Vishnu._addManagerPlugs, Vishnu._updateStateFromConf)
+	(Vishnu._startComponents, Vishnu._loadConfiguration)
+	(Vishnu.loadConfigurationXML): Because we want to instrument
+	loadConfiguration more finely, we need to pass around the
+	remoteIdentity of the caller. Do so.
+
+	* flumotion/test/test_manager_manager.py
+	(TestVishnu.testConfigAfterWorker)
+	(TestVishnu.testConfigBeforeWorker)
+	(TestVishnu.testLoadConfiguration)
+	(TestVishnu.testLoadConfiguration): loadConfigurationXML, not
+	loadConfiguration.
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspectiveMessageReceived): Use vishnu.adminaction.
+	(AdminAvatar.perspective_loadConfiguration): loadConfigurationXML,
+	not loadConfiguration.
+
+	* flumotion/manager/manager.py (Vishnu.adminAction): New method to
+	encapsulate the adminaction plug mechanism.
+	(Vishnu._loadConfiguration, Vishnu.loadConfigurationXML): Split
+	loadConfiguration in two, one part that makes a config object, and
+	one that processes it. The one public interface is now
+	loadConfigurationXML. Reflowed all helper methods so that the
+	order of operations is more clear. Hopefully there are no semantic
+	changes here.
+
+	* flumotion/common/fxml.py (Parser.getRoot): Fix our
+	filename-vs-string mess by taking only file objects as sources of
+	XML. As a nicety, minidom allows a filename or a file object as
+	the argument to parse(), so allow that as well.
+
+	* flumotion/common/config.py (BaseConfigParser.__init__)
+	(BaseConfigParser.add, FlumotionConfigXML.__init__)
+	(AdminConfigParser.__init__, AdminConfigParser.add)
+	* flumotion/common/registry.py (RegistryParser.parseRegistryFile)
+	(RegistryParser.parseRegistry, ComponentRegistry.addFile)
+	(ComponentRegistry.addFromString)
+	* flumotion/manager/manager.py (Vishnu.loadConfiguration):
+	Update for fxml Parser cleanups.
+
+	* flumotion/test/test_config.py (AdminConfig, ConfigXML): Update
+	tests to use file api instead of string api.
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspective_loadConfiguration): The cleanups mean
+	that vishnu.loadConfiguration has to take a filename or a file
+	object; use StringIO to make a file object.
+
 2006-07-10  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/http.xml: Remote

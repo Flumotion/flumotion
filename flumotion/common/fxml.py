@@ -74,32 +74,24 @@ class Parser(log.Loggable):
     share code.
     """
     
-    def getRoot(self, filename=None, string=None):
+    def getRoot(self, file):
         """
         Return the root of the XML tree for the the string or filename
         passed as an argument. Raises fxml.ParserError if the XML could
         not be parsed.
 
-        @param filename: The path to the file to parse.
-        @type  filename: str or None.
-        @param string:   An in-memory string to parse, defaults to None.
-                         If you set this, a string will be parsed instead
-                         of a file.
-        @type  string:   str of None.
+        @param file: An open file object, or the name of a file. Note
+        that if you pass a file object, this function will leave the
+        file open.
+        @type  file: File object; can be a duck file like StringIO.
+        Alternately, the path of a file on disk.
         """
-        assert filename or string
+        self.debug('Parsing XML from %r', file)
         try:
-            if string:
-                self.debug('Parsing XML string')
-                filename = '<string>'
-                return minidom.parseString(string)
-            else:
-                self.debug('Parsing XML file: %s' % filename)
-                return minidom.parse(filename)
+            return minidom.parse(file)
         except expat.ExpatError, e:
-            raise ParserError('Error parsing XML file %s: %s: %s'
-                              % (filename, common.objRepr(e),
-                                 ' '.join(e.args)))
+            raise ParserError('Error parsing XML from %r: %s: %s',
+                              file, common.objRepr(e), ' '.join(e.args))
         
     def checkAttributes(self, node, required=None, optional=None):
         """

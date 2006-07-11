@@ -1,0 +1,9 @@
+<planet>
+  <manager name="planet">
+    <plugs>
+      <plug socket="flumotion.component.plugs.identity.IdentityProvider"
+            type="exampleidentityprovider">
+      </plug>
+    </plugs>
+  </manager>
+</planet>

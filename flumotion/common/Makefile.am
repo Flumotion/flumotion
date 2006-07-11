@@ -22,6 +22,7 @@ flumotion_PYTHON = \
 	errors.py \
 	fxml.py \
 	gstreamer.py \
+	identity.py \
 	interfaces.py \
 	log.py \
 	keycards.py \

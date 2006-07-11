@@ -24,6 +24,7 @@ manager-side objects to handle administrative clients
 """
 
 import os
+from StringIO import StringIO
 
 from twisted.internet import reactor, defer
 from twisted.spread import pb
@@ -85,10 +86,7 @@ class AdminAvatar(base.ManagerAvatar):
         kw = broker.unserialize(kw, self)
         method = getattr(self, "perspective_%s" % message)
 
-        socket = 'flumotion.component.plugs.adminaction.AdminAction'
-        if self.vishnu.plugs.has_key(socket):
-            for plug in self.vishnu.plugs[socket]:
-                plug.action(self, message, args, kw)
+        self.vishnu.adminAction(self.remoteIdentity, message, args, kw)
 
         try:
             state = method(*args, **kw)
@@ -319,7 +317,10 @@ class AdminAvatar(base.ManagerAvatar):
         @type  xml: str
         """
         self.info('loadConfiguration ...')
-        self.vishnu.loadConfiguration(None, xml)
+        f = StringIO(xml)
+        res = self.vishnu.loadConfigurationXML(f, self.remoteIdentity)
+        f.close()
+        return res
 
     def perspective_deleteFlow(self, flowName):
         return self.vishnu.deleteFlow(flowName)

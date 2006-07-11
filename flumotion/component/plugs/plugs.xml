@@ -31,6 +31,12 @@
       <entry location="flumotion/component/plugs/lifecycle.py"
              function="ManagerLifecyclePrinter"/>
     </plug>
+
+    <plug socket="flumotion.component.plugs.identity.IdentityProvider"
+          type="exampleidentityprovider">
+      <entry location="flumotion/component/plugs/identity.py"
+             function="ExampleIdentityProvider"/>
+    </plug>
   </plugs>
 
   <bundles>
@@ -72,6 +78,16 @@
       <directories>
         <directory name="flumotion/component/plugs">
           <filename location="lifecycle.py" />
+        </directory>
+      </directories>
+    </bundle>
+    <bundle name="base-plugs-identity">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs">
+          <filename location="identity.py" />
         </directory>
       </directories>
     </bundle>

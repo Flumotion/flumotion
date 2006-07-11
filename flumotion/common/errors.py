@@ -91,6 +91,9 @@ class ReloadSyntaxError(pb.Error):
 class WrongStateError(pb.Error):
     "The remote object was in the wrong state for this command"
 
+class InsufficientPrivilegesError(pb.Error):
+    "You do not have the necessary privileges to complete this operation"
+
 # component errors
 class ComponentError(pb.Error):
     "Error while doing something to a component"

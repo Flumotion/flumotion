@@ -53,7 +53,7 @@ def _initialLoadConfig(vishnu, paths):
     for path in paths:
         log.debug('manager', 'Loading configuration file from (%s)' % path)
         try:
-            vishnu.loadConfiguration(path)
+            vishnu.loadConfigurationXML(path, manager.RUNNING_LOCALLY)
         except config.ConfigError, reason:
             _error(
                 "configuration error in configuration file\n'%s':" % path,

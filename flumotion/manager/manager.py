@@ -35,6 +35,7 @@ from twisted.cred import portal
 
 from flumotion.common import bundle, config, errors, interfaces, log, registry
 from flumotion.common import planet, common, dag, messages, reflectcall, server
+from flumotion.common.identity import RemoteIdentity
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base
@@ -63,6 +64,8 @@ def _fint(*procs):
         return True
     return int
 
+RUNNING_LOCALLY = ('loadConfiguration being called from main.py, no '
+                   'need for authentication')
 
 # an internal class
 class Dispatcher(log.Loggable):
@@ -77,9 +80,10 @@ class Dispatcher(log.Loggable):
 
     logCategory = 'dispatcher'
 
-    def __init__(self):
+    def __init__(self, computeIdentity):
         self._interfaceHeavens = {} # interface -> heaven
         self._avatarHeavens = {} # avatarId -> heaven
+        self._computeIdentity = computeIdentity
         
     ### IRealm methods
 
@@ -94,8 +98,9 @@ class Dispatcher(log.Loggable):
     # to the piece that called login(),
     # which in our case is a component or an admin client.
     def requestAvatar(self, avatarId, keycard, mind, *ifaces):
+        host = common.addressGetHost(mind.broker.transport.getPeer())
         try:
-            avatar = self.createAvatarFor(avatarId, keycard, ifaces)
+            avatar = self.createAvatarFor(avatarId, keycard, host, ifaces)
             self.debug("returning Avatar: id %s, avatar %s" % (avatarId, avatar))
         except errors.AlreadyConnectedError, e:
             self.debug("component with id %s already logged in" % (avatarId))
@@ -123,27 +128,31 @@ class Dispatcher(log.Loggable):
         avatar.detached(mind)
         heaven.removeAvatar(avatarId)
 
-    def createAvatarFor(self, avatarId, keycard, ifaces):
+    def createAvatarFor(self, avatarId, keycard, remoteHost, ifaces):
         """
         Create an avatar from the heaven implementing the given interface.
 
-        @type avatarId:  string
-        @param avatarId: the name of the new avatar
-        @type keycard:   L{flumotion.common.keycards.Keycard}
-        @param keycard:  the credentials being used to log in
-        @type ifaces:    tuple of interfaces linked to heaven
-        @param ifaces:   a list of heaven interfaces to get avatar from,
-                         including pb.IPerspective
+        @type avatarId:    string
+        @param avatarId:   the name of the new avatar
+        @type keycard:     L{flumotion.common.keycards.Keycard}
+        @param keycard:    the credentials being used to log in
+        @type remoteHost:  str
+        @param remoteHost: the remote host
+        @type ifaces:      tuple of interfaces linked to heaven
+        @param ifaces:     a list of heaven interfaces to get avatar from,
+                           including pb.IPerspective
 
         @returns:        an avatar from the heaven managing the given interface.
         """
         if not pb.IPerspective in ifaces:
             raise errors.NoPerspectiveError(avatarId)
 
+        identity = self._computeIdentity(keycard, remoteHost)
+
         for iface in ifaces:
             heaven = self._interfaceHeavens.get(iface, None)
             if heaven:
-                avatar = heaven.createAvatar(avatarId, keycard)
+                avatar = heaven.createAvatar(avatarId, identity)
                 self._avatarHeavens[avatarId] = heaven
                 return avatar
 
@@ -184,7 +193,7 @@ class Vishnu(log.Loggable):
     def __init__(self, name, unsafeTracebacks=0):
         # create a Dispatcher which will hand out avatars to clients
         # connecting to me
-        self.dispatcher = Dispatcher()
+        self.dispatcher = Dispatcher(self.computeIdentity)
 
         self.workerHeaven = self._createHeaven(interfaces.IWorkerMedium,
                                                worker.WorkerHeaven)
@@ -247,37 +256,141 @@ class Vishnu(log.Loggable):
             self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
         return self.bundlerBasket
         
-    def _updateState(self, conf):
-        self.debug('syncing up planet state with config')
-        added = [] # added components while parsing
+    def adminAction(self, remoteIdentity, message, args, kw):
+        socket = 'flumotion.component.plugs.adminaction.AdminAction'
+        if self.plugs.has_key(socket):
+            for plug in self.plugs[socket]:
+                plug.action(remoteIdentity, message, args, kw)
+
+    def computeIdentity(self, keycard, host):
+        """
+        Compute a suitable identity for a remote host. First looks to
+        see if there is a
+        flumotion.component.plugs.identity.IdentityProvider plug
+        installed on the manager, falling back to user@host.
+
+        The identity is only used in the adminaction interface. An
+        example of its use is when you have an adminaction plug that
+        checks an admin's privileges before actually doing an action;
+        the identity object you use here might store the privileges that
+        the admin has.
+
+        @param keycard: the keycard that the remote host used to log in.
+        @type  keycard: L{flumotion.common.keycards.Keycard}
+        @param host: the ip of the remote host
+        @type  host: str
+
+        @rtype: L{flumotion.common.identity.RemoteIdentity}
+        """
+
+        socket = 'flumotion.component.plugs.identity.IdentityProvider'
+        if self.plugs.has_key(socket):
+            for plug in self.plugs[socket]:
+                identity = plug.computeIdentity(keycard, host)
+                if identity:
+                    return identity
+        username = getattr(keycard, 'username', None)
+        return RemoteIdentity(username, host)
+
+    def _makeBouncer(self, conf, remoteIdentity):
+        # returns a deferred, always
+        if not (conf.manager and conf.manager.bouncer):
+            self.log('No bouncer')
+            return defer.succeed(None)
+
+        self.debug('going to start manager bouncer %s of type %s' % (
+            conf.manager.bouncer.name, conf.manager.bouncer.type))
+
+        if remoteIdentity != RUNNING_LOCALLY:
+            self.adminAction(remoteIdentity, '_makeBouncer', (conf,), {})
+
+        defs = registry.getRegistry().getComponent(
+            conf.manager.bouncer.type)
+        entry = defs.getEntryByType('component')
+        # FIXME: use entry.getModuleName() (doesn't work atm?)
+        moduleName = defs.getSource()
+        methodName = entry.getFunction()
+        bouncer = reflectcall.createComponent(moduleName, methodName)
+
+        configDict = conf.manager.bouncer.getConfigDict()
+        self.debug('setting up manager bouncer')
+        d = bouncer.setup(configDict)
+        def setupCallback(result):
+            bouncer.debug('started')
+            self.setBouncer(bouncer)
+        def setupErrback(failure):
+            failure.trap(errors.ConfigError)
+            self.warning('Configuration error in manager bouncer: %s' %
+                failure.value.args[0])
+        d.addCallback(setupCallback)
+        d.addErrback(setupErrback)
+        return d
+
+    def _addManagerPlug(self, socket, args, remoteIdentity):
+        self.debug('loading plug type %s for socket %s'
+                   % (args['type'], socket))
+
+        if remoteIdentity != RUNNING_LOCALLY:
+            self.adminAction(remoteIdentity, '_addManagerPlug',
+                             (socket, args), {})
+
+        defs = registry.getRegistry().getPlug(args['type'])
+        e = defs.getEntry()
+        call = reflectcall.reflectCallCatching
+    
+        plug = call(errors.ConfigError,
+                    e.getModuleName(), e.getFunction(), args)
+        self.plugs[socket].append(plug)
+        plug.start(self)
+
+    def _addManagerPlugs(self, _, conf, remoteIdentity):
+        if not conf.manager:
+            return
+
+        for socket, plugs in conf.manager.plugs.items():
+            if not socket in self.plugs:
+                self.plugs[socket] = []
+
+            for args in plugs:
+                self._addManagerPlug(socket, args, remoteIdentity)
+
+    def _addComponent(self, config, parent, remoteIdentity):
+        """
+        Add a component state for the given component config entry.
+
+        @returns: L{flumotion.common.planet.ManagerComponentState}
+        """
+
+        self.debug('adding component %s to %s'
+                   % (config.name, parent.get('name')))
         
-        state = self.state
-        atmosphere = state.get('atmosphere')
-        for name, c in conf.atmosphere.components.items():
-            if name in [x.get('name') for x in atmosphere.get('components')]:
-                self.debug('atmosphere already has component %s' % name)
-            else:
-                added.append(self._addComponent(c, atmosphere))
+        if remoteIdentity != RUNNING_LOCALLY:
+            self.adminAction(remoteIdentity, '_addComponent',
+                             (config, parent), {})
 
-        flows = dict([(x.get('name'), x) for x in state.get('flows')])
-        for f in conf.flows:
-            try:
-                flow = flows[f.name]
-                self.debug('checking existing flow %s' % f.name)
-            except KeyError:
-                self.info('creating flow "%s"' % f.name)
-                flow = planet.ManagerFlowState(name=f.name, parent=state)
-                state.append('flows', flow)
-                
-            components = [x.get('name') for x in flow.get('components')]
-            for name, c in f.components.items():
-                if name in components:
-                    self.debug('component %s already in flow %s'
-                               % (c.name, f.name))
-                else:
-                    added.append(self._addComponent(c, flow))
+        state = planet.ManagerComponentState()
+        state.set('name', config.name)
+        state.set('type', config.getType())
+        state.set('workerRequested', config.worker)
+        state.set('mood', moods.sleeping.value)
+        state.set('config', config.getConfigDict())
 
-        return added
+        state.set('parent', parent)
+        parent.append('components', state)
+
+        avatarId = config.getConfigDict()['avatarId']
+
+        # add to mapper
+        m = ComponentMapper()
+        m.state = state
+        m.id = avatarId
+        self._componentMappers[state] = m
+        self._componentMappers[avatarId] = m
+
+        # add nodes to graph
+        self._dag.addNode(state)
+
+        return state
 
     def _updateFlowDependencies(self, state):
         self.debug('registering dependencies of %r' % state)
@@ -304,88 +417,44 @@ class Vishnu(log.Loggable):
             self.debug('depending %r on %r' % (state, feederState))
             self._dag.addEdge(feederState, state)
         
-    def _addPlugs(self, conf):
-        if not conf.manager:
-            return
+    def _updateStateFromConf(self, _, conf, remoteIdentity):
+        self.debug('syncing up planet state with config')
+        added = [] # added components while parsing
+        
+        state = self.state
+        atmosphere = state.get('atmosphere')
+        for name, c in conf.atmosphere.components.items():
+            if name in [x.get('name') for x in atmosphere.get('components')]:
+                self.debug('atmosphere already has component %s' % name)
+            else:
+                added.append(self._addComponent(c, atmosphere,
+                                                remoteIdentity))
 
-        for socket, plugs in conf.manager.plugs.items():
-            if not socket in self.plugs:
-                self.plugs[socket] = []
+        flows = dict([(x.get('name'), x) for x in state.get('flows')])
+        for f in conf.flows:
+            try:
+                flow = flows[f.name]
+                self.debug('checking existing flow %s' % f.name)
+            except KeyError:
+                self.info('creating flow "%s"' % f.name)
+                flow = planet.ManagerFlowState(name=f.name, parent=state)
+                state.append('flows', flow)
+                
+            components = [x.get('name') for x in flow.get('components')]
+            for name, c in f.components.items():
+                if name in components:
+                    self.debug('component %s already in flow %s'
+                               % (c.name, f.name))
+                else:
+                    added.append(self._addComponent(c, flow,
+                                                    remoteIdentity))
 
-            for args in plugs:
-                self.debug('loading plug type %s for socket %s'
-                           % (args['type'], socket))
-
-                defs = registry.getRegistry().getPlug(args['type'])
-                e = defs.getEntry()
-                call = reflectcall.reflectCallCatching
-            
-                plug = call(errors.ConfigError,
-                            e.getModuleName(), e.getFunction(), args)
-                self.plugs[socket].append(plug)
-                plug.start(self)
-
-    # FIXME: do we want a filename to load config, or data directly ?
-    # FIXME: well, I think we want to have an "object" with an "interface"
-    # FIXME: that gives you "the config", instead of this broken piece
-    def loadConfiguration(self, filename, data=None):
-        """
-        Load the configuration from the given filename, merging it on
-        top of the currently running configuration.
-        """
-        self.debug('loading configuration')
-        # FIXME: we should be able to create "wanted" config/state from
-        # something else than XML as well
-        self.configuration = conf = config.FlumotionConfigXML(filename, data)
-        conf.parse()
-
-        # FIXME: we should have a "running" state object layout similar
-        # to config that we can then merge somehow with an .update method
-        d = self._makeBouncer(conf)
-        d.addCallback(self._makeBouncerCallback, conf)
-        return d
-
-    def _makeBouncer(self, conf):
-        # returns a deferred, always
-        if not (conf.manager and conf.manager.bouncer):
-            self.log('No bouncer')
-            return defer.succeed(None)
-
-        self.debug('going to start manager bouncer %s of type %s' % (
-            conf.manager.bouncer.name, conf.manager.bouncer.type))
-
-        defs = registry.getRegistry().getComponent(
-            conf.manager.bouncer.type)
-        entry = defs.getEntryByType('component')
-        # FIXME: use entry.getModuleName() (doesn't work atm?)
-        moduleName = defs.getSource()
-        methodName = entry.getFunction()
-        bouncer = reflectcall.createComponent(moduleName, methodName)
-
-        configDict = conf.manager.bouncer.getConfigDict()
-        self.debug('setting up manager bouncer')
-        d = bouncer.setup(configDict)
-        def setupCallback(result):
-            bouncer.debug('started')
-            return bouncer
-        def setupErrback(failure):
-            failure.trap(errors.ConfigError)
-            self.warning('Configuration error in manager bouncer: %s' %
-                failure.value.args[0])
-            return None
-        d.addCallback(setupCallback)
-        d.addErrback(setupErrback)
-        return d
-
-    def _makeBouncerCallback(self, bouncer, conf):
-        if bouncer:
-            self.setBouncer(bouncer)
-
-        self._addPlugs(conf)
-
-        for componentState in self._updateState(conf):
+        for componentState in added:
             self._updateFlowDependencies(componentState)
 
+        return added
+
+    def _startComponents(self, _, conf, remoteIdentity):
         # now start all components that need starting -- collecting into
         # an temporary dict of the form {workerId => [components]}
         # if workerName is None, we can start the component on any
@@ -399,40 +468,32 @@ class Vishnu(log.Loggable):
         
         for workerId, components in to_start.items():
             self._workerCreateComponents(workerId, components)
+
+    def _loadConfiguration(self, conf, remoteIdentity):
+        d = self._makeBouncer(conf, remoteIdentity)
+        d.addCallback(self._addManagerPlugs, conf, remoteIdentity)
+        d.addCallback(self._updateStateFromConf, conf, remoteIdentity)
+        d.addCallback(self._startComponents, conf, remoteIdentity)
+        return d
  
-    def _addComponent(self, config, parent):
+    def loadConfigurationXML(self, file, remoteIdentity):
         """
-        Add a component state for the given component config entry.
-
-        @returns: L{flumotion.common.planet.ManagerComponentState}
-        """
-
-        self.debug('adding component %s to %s'
-                   % (config.name, parent.get('name')))
+        Load the configuration from the given XML, merging it on top of
+        the currently running configuration.
         
-        state = planet.ManagerComponentState()
-        state.set('name', config.name)
-        state.set('type', config.getType())
-        state.set('workerRequested', config.worker)
-        state.set('mood', moods.sleeping.value)
-        state.set('config', config.getConfigDict())
-
-        state.set('parent', parent)
-        parent.append('components', state)
-
-        avatarId = config.getConfigDict()['avatarId']
-
-        # add to mapper
-        m = ComponentMapper()
-        m.state = state
-        m.id = avatarId
-        self._componentMappers[state] = m
-        self._componentMappers[avatarId] = m
-
-        # add nodes to graph
-        self._dag.addNode(state)
-
-        return state
+        @param file: The file to parse, either as an open file object,
+        or as the name of a file to open.
+        @type  file: str or file.
+        @param remoteIdentity: The identity of the remote host making
+        this request, or None for debugging. This is used by the
+        adminaction logging mechanism in order to say who is performing
+        the action.
+        @type  remoteIdentity: anything
+        """
+        self.debug('loading configuration')
+        self.configuration = conf = config.FlumotionConfigXML(file)
+        conf.parse()
+        return self._loadConfiguration(conf, remoteIdentity)
 
     def _createHeaven(self, interface, klass):
         """

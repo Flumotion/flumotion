@@ -4,6 +4,7 @@ component_PYTHON = \
 	__init__.py \
 	adminaction.py \
 	base.py \
+	identity.py \
 	lifecycle.py \
 	loggers.py
 
