@@ -121,7 +121,7 @@ class TestStateSet(unittest.TestCase):
     def testStateSet(self):
         self.reset()
         # get the state
-        d = self.admin.perspective.callRemote('workerGetState')
+        d = self.admin.remoteRoot.callRemote('workerGetState')
         if weHaveAnOldTwisted():
             state = unittest.deferredResult(d)
 
@@ -132,7 +132,7 @@ class TestStateSet(unittest.TestCase):
             self.failUnlessEqual(state.get('name'), 'lois')
 
             # change state by setting the name
-            d = self.admin.perspective.callRemote('workerSetName', 'clark')
+            d = self.admin.remoteRoot.callRemote('workerSetName', 'clark')
             unittest.deferredResult(d)
 
             self.failUnlessEqual(state.get('name'), 'clark')
@@ -143,7 +143,7 @@ class TestStateSet(unittest.TestCase):
                 self.failUnless(state.hasKey('children'))
                 self.failUnlessEqual(state.get('name'), 'lois')
 
-                d = self.admin.perspective.callRemote('workerSetName', 'clark')
+                d = self.admin.remoteRoot.callRemote('workerSetName', 'clark')
 
                 def workerSetNameCallback(result):
                     self.failUnlessEqual(state.get('name'), 'clark')
@@ -156,14 +156,14 @@ class TestStateSet(unittest.TestCase):
         # change state by appending children
         self.reset()
         # get the state
-        d = self.admin.perspective.callRemote('workerGetState')
+        d = self.admin.remoteRoot.callRemote('workerGetState')
         if weHaveAnOldTwisted():
             state = unittest.deferredResult(d)
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
 
             # change state by adding children
-            d = self.admin.perspective.callRemote('workerBearChild', 'batman')
+            d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
             unittest.deferredResult(d)
 
             self.failUnlessEqual(state.get('children'), ['batman', ])
@@ -172,7 +172,7 @@ class TestStateSet(unittest.TestCase):
                 self.failUnless(state)
                 self.failUnless(state.hasKey('children'))
 
-                d = self.admin.perspective.callRemote('workerBearChild', 
+                d = self.admin.remoteRoot.callRemote('workerBearChild', 
                     'batman')
                 def workerBearChildCallback(result):
                     self.failUnlessEqual(state.get('children'), ['batman', ])
@@ -200,7 +200,7 @@ class TestStateSet(unittest.TestCase):
         def getStateCallback(state):
             state.addListener(self)
             self._state = state
-            return self.admin.perspective.callRemote('workerBearChild',
+            return self.admin.remoteRoot.callRemote('workerBearChild',
                                                      'batman')
 
         def workerBearChildCallback(res):
@@ -214,7 +214,7 @@ class TestStateSet(unittest.TestCase):
             del state
 
         self.reset()
-        d = self.admin.perspective.callRemote('workerGetState')
+        d = self.admin.remoteRoot.callRemote('workerGetState')
         d.addCallback(getStateCallback)
         d.addCallback(workerBearChildCallback)
         return d
@@ -226,7 +226,7 @@ class TestStateSet(unittest.TestCase):
     if weHaveAnOldTwisted():
         def testStateListener(self):
             self.reset()
-            d = self.admin.perspective.callRemote('workerGetState')
+            d = self.admin.remoteRoot.callRemote('workerGetState')
             state = unittest.deferredResult(d)
 
             state.addListener(self)
@@ -236,20 +236,20 @@ class TestStateSet(unittest.TestCase):
             self.failIf(self.changes, self.changes)
 
             # change state by adding children
-            d = self.admin.perspective.callRemote('workerBearChild', 'batman')
+            d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
             unittest.deferredResult(d)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
             # make sure this is the only change
             self.failIf(self.changes, self.changes)
 
-            d = self.admin.perspective.callRemote('workerBearChild', 'robin')
+            d = self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
             unittest.deferredResult(d)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
             self.failIf(self.changes, self.changes)
 
-            d = self.admin.perspective.callRemote('workerHaveAdopted', 'batman')
+            d = self.admin.remoteRoot.callRemote('workerHaveAdopted', 'batman')
             unittest.deferredResult(d)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('remove', state, 'children', 'batman'))
@@ -264,7 +264,7 @@ class TestStateSet(unittest.TestCase):
                 self.failUnless(state)
                 self.failUnless(state.hasKey('children'))
                 self.failIf(self.changes, self.changes)
-                return self.admin.perspective.callRemote('workerBearChild', 'batman')
+                return self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
 
             def workerBearChildCallback(res):
                 state = self._state
@@ -273,7 +273,7 @@ class TestStateSet(unittest.TestCase):
                 self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
                 # make sure this is the only change
                 self.failIf(self.changes, self.changes)
-                return self.admin.perspective.callRemote('workerBearChild', 'robin')
+                return self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
 
             def workerBearChildRobinCallback(res):
                 state = self._state
@@ -281,7 +281,7 @@ class TestStateSet(unittest.TestCase):
                 c = self.changes.pop()
                 self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
                 self.failIf(self.changes, self.changes)
-                return self.admin.perspective.callRemote('workerHaveAdopted', 'batman')
+                return self.admin.remoteRoot.callRemote('workerHaveAdopted', 'batman')
 
             def workerHaveAdoptedCallback(res):
                 state = self._state
@@ -294,7 +294,7 @@ class TestStateSet(unittest.TestCase):
                 del state
 
             self.reset()
-            d = self.admin.perspective.callRemote('workerGetState')
+            d = self.admin.remoteRoot.callRemote('workerGetState')
             d.addCallback(getStateCallback)
             d.addCallback(workerBearChildCallback)
             d.addCallback(workerBearChildRobinCallback)
@@ -308,7 +308,7 @@ class TestStateSet(unittest.TestCase):
         def testStateListenerIntermediate(self):
             self.reset()
             # get the state
-            d = self.admin.perspective.callRemote('workerGetState')
+            d = self.admin.remoteRoot.callRemote('workerGetState')
             state = unittest.deferredResult(d)
             state.addListener(self)
 
@@ -317,7 +317,7 @@ class TestStateSet(unittest.TestCase):
             self.failIf(self.changes, self.changes)
 
             # change state by adding children
-            d = self.admin.perspective.callRemote('workerBearChild', 'batman')
+            d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
             unittest.deferredResult(d)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('append', state, 'children', 'batman'))
@@ -329,19 +329,19 @@ class TestStateSet(unittest.TestCase):
             del state
 
             # get the state again
-            d = self.admin.perspective.callRemote('workerGetState')
+            d = self.admin.remoteRoot.callRemote('workerGetState')
             state = unittest.deferredResult(d)
 
             state.addListener(self)
             self.assertEquals(len(state.get('children')), 1)
 
-            d = self.admin.perspective.callRemote('workerBearChild', 'robin')
+            d = self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
             unittest.deferredResult(d)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('append', state, 'children', 'robin'))
             self.failIf(self.changes, self.changes)
 
-            d = self.admin.perspective.callRemote('workerHaveAdopted', 'batman')
+            d = self.admin.remoteRoot.callRemote('workerHaveAdopted', 'batman')
             unittest.deferredResult(d)
             c = self.changes.pop()
             self.failUnlessEqual(c, ('remove', state, 'children', 'batman'))
@@ -356,7 +356,7 @@ class TestStateSet(unittest.TestCase):
                 self.failUnless(state.hasKey('children'))
                 self.failIf(self.changes, self.changes)
                 self._state = state
-                return self.admin.perspective.callRemote('workerBearChild',
+                return self.admin.remoteRoot.callRemote('workerBearChild',
                     'batman')
                         
             def workerBearChildCallback(result):
@@ -371,13 +371,13 @@ class TestStateSet(unittest.TestCase):
                 self.assertEquals(len(state.get('children')), 1)
                 state.removeListener(self)
                 del state
-                return self.admin.perspective.callRemote('workerGetState')
+                return self.admin.remoteRoot.callRemote('workerGetState')
             
             def workerGetStateAgainCallback(state):
                 state.addListener(self)
                 self.assertEquals(len(state.get('children')), 1)
                 self._state = state
-                return self.admin.perspective.callRemote('workerBearChild',
+                return self.admin.remoteRoot.callRemote('workerBearChild',
                     'robin')
                 
             def workerBearChildAgainCallback(result):
@@ -388,7 +388,7 @@ class TestStateSet(unittest.TestCase):
                     'children', 'robin'))
                 self.failIf(self.changes, self.changes)
                 del state
-                return self.admin.perspective.callRemote(
+                return self.admin.remoteRoot.callRemote(
                     'workerHaveAdopted', 'batman')
                         
             def workerHaveAdoptedCallback(result):
@@ -403,7 +403,7 @@ class TestStateSet(unittest.TestCase):
                 del state
             
             # get the state again
-            d = self.admin.perspective.callRemote('workerGetState')
+            d = self.admin.remoteRoot.callRemote('workerGetState')
             d.addCallback(workerGetStateCallback)
             d.addCallback(workerBearChildCallback)
             d.addCallback(workerGetStateAgainCallback)
@@ -416,7 +416,7 @@ class TestStateSet(unittest.TestCase):
         # to work
         self.reset()
         # get the state
-        d = self.admin.perspective.callRemote('workerGetState')
+        d = self.admin.remoteRoot.callRemote('workerGetState')
         if weHaveAnOldTwisted():
             state = unittest.deferredResult(d)
 
@@ -428,7 +428,7 @@ class TestStateSet(unittest.TestCase):
             del state
 
             # change state by adding children
-            d = self.admin.perspective.callRemote('workerBearChild', 'batman')
+            d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
             unittest.deferredResult(d)
             self.failIf(self.changes)
         else:
@@ -440,7 +440,7 @@ class TestStateSet(unittest.TestCase):
                 del state
 
                 # change state by adding children
-                d = self.admin.perspective.callRemote('workerBearChild', 'batman')
+                d = self.admin.remoteRoot.callRemote('workerBearChild', 'batman')
                 def workerBearChildCallback(res):
                     self.failIf(self.changes)
                 d.addCallback(workerBearChildCallback)

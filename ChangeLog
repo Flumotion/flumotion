@@ -1,5 +1,11 @@
 2006-07-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_common_componentui.py:
+	* flumotion/test/test_keycards.py:
+	  perspective -> remoteRoot
+
+2006-07-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/testclasses.py:
 	  add a TestPB class that implements a PB connection with .send
 	  and .receive for easier testing

@@ -117,10 +117,10 @@ class TestKeycardSending(unittest.TestCase):
     tearDown = defer_generator_method(tearDown)
 
     def testSend(self):
-        d = self.a.perspective.callRemote('workerGetKeycard')
+        d = self.a.remoteRoot.callRemote('workerGetKeycard')
         def getKeycardCallback(keycard):
             # now send back the keycard to see what happens
-            d2 = self.a.perspective.callRemote('workerGiveKeycard', keycard)
+            d2 = self.a.remoteRoot.callRemote('workerGiveKeycard', keycard)
             return d2
         d.addCallback(getKeycardCallback)
         if weHaveAnOldTwisted():
