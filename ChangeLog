@@ -1,5 +1,8 @@
 2006-07-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/audiotest/Makefile.am
+	(component_DATA): Dist audiotest.glade.
+
 	* flumotion/test/test_config.py
 	(TestConfig.testParseManagerWithPlugs): Added a plug, update the
 	test...
