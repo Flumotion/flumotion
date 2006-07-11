@@ -117,6 +117,7 @@ class PortSet(log.Loggable):
     A list of ports that keeps track of which are available for use on a
     given machine.
     """
+    # not very efficient mkay
     def __init__(self, logName, ports):
         self.logName = logName
         self.ports = ports
@@ -134,6 +135,18 @@ class PortSet(log.Loggable):
             numPorts -= 1
         return ret
 
+    def setPortsUsed(self, ports):
+        for port in ports
+            try:
+                i = self.ports.index(port)
+            except IndexError:
+                self.warning('portset does not include port %d', port)
+            else:
+                if self.used[i]:
+                    self.warning('port %d already in use!', port)
+                else:
+                    self.used[i] = True
+        
     def releasePorts(self, ports):
         """
         @param ports: list of ports to release
@@ -150,7 +163,10 @@ class PortSet(log.Loggable):
                 self.warning('releasing unknown port: %d' % p)
 
     def numFree(self):
-        return len(filter(lambda x: not x, self.used))
+        return len(self.ports) - self.numUsed()
+    
+    def numUsed(self):
+        return len(filter(None, self.used))
     
 # worker heaven state proxy objects
 class ManagerWorkerHeavenState(flavors.StateCacheable):

@@ -1,5 +1,8 @@
 2006-07-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/worker.py (PortSet.setPortsUsed)
+	(PortSet.numUsed): New functions.
+
 	* flumotion/component/producers/audiotest/audiotest.py
 	(AudioTest):
 	* flumotion/component/producers/audiotest/admin_gtk.py
