@@ -45,6 +45,7 @@ EXTRA_DIST = 				\
 	test_porter.py	 		\
 	test_reflect.py 		\
 	test_registry.py 		\
+	test_testclasses.py 		\
 	test_twisted_compat.py 		\
 	test_ui_fgtk.py 		\
 	test_wizard.py 			\

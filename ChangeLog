@@ -1,3 +1,16 @@
+2006-07-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/testclasses.py:
+	  add a TestPB class that implements a PB connection with .send
+	  and .receive for easier testing
+	* flumotion/test/test_testclasses.py:
+	  add a test for our testclasses
+	  show possible implementation of Keycard using Cacheable/RemoteCache
+	  and still have a working observer, as well as control over the
+	  exact cached state
+	* flumotion/test/Makefile.am:
+	  add test_testclasses
+
 2006-07-11  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/worker.py (PortSet.setPortsUsed)
@@ -14,7 +27,7 @@
 
 	* flumotion/manager/component.py
 	(ComponentAvatar.perspective_adminCallRemote): Remove, not used
-	ant more.
+	any more.
 
 	* flumotion/admin/gtk/client.py (Window.componentCall):
 	* flumotion/admin/admin.py (AdminModel.remote_componentCall):
