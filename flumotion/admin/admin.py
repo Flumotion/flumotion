@@ -350,13 +350,6 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
     def remote_log(self, category, type, message):
         self.log('remote: %s: %s: %s' % (type, category, message))
         
-    def remote_componentCall(self, componentState, methodName, *args, **kwargs):
-        """
-        @todo 0.4: rename this method to remote_componentViewCall
-        """
-        self.callViews('componentCall',
-            componentState, methodName, *args, **kwargs)
-
     # IStateListener interface
     def stateSet(self, state, key, value):
         self.debug("state set on %r: key %s" % (state, key))

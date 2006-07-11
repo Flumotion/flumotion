@@ -334,7 +334,7 @@ class Effect(log.Loggable):
         @param name: the name of the effect
         """
         self.name = name
-        self.component = None # component owning this effect
+        self.setComponent(None)
 
     def setComponent(self, component):
         """
@@ -344,6 +344,17 @@ class Effect(log.Loggable):
         @type  component: L{FeedComponent}
         """                               
         self.component = component
+        self.setUIState(component and component.uiState or None)
+
+    def setUIState(self, state):
+        """
+        Set the given UI state on the effect. This method is ideal for
+        adding keys to the UI state.
+        
+        @param state: the UI state for the component to use.
+        @type  state: L{flumotion.common.componentui.ComponentUIState}
+        """                               
+        self.uiState = state
 
     def getComponent(self):
         """

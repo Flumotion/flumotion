@@ -300,7 +300,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return self.pipe_template
 
     def do_check(self):
-        props = self.args['properties']
+        props = self.config['properties']
         if props.get('type', 'master') == 'slave':
             for k in 'socket_path', 'user', 'pass':
                 if not 'porter_'+k in props:

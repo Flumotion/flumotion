@@ -68,14 +68,17 @@ class BaseAdminGtk(log.Loggable):
         self.uiState = None
         self.nodes = util.OrderedDict()
 
-        #mid = self.status_push('Getting component information ...')
-        def got_state(state):
-            state.addListener(self)
-            self.uiState = state
-            self.uiStateChanged(state)
         d = admin.componentCallRemote(state, 'getUIState')
-        d.addCallback(got_state)
+        d.addCallback(self.setUIState)
         
+    def setUIState(self, state):
+        self.debug('starting listening to state %r', state)
+        state.addListener(self)
+        self.uiState = state
+        for node in self.getNodes().values():
+            node.gotUIState(state)
+        self.uiStateChanged(state)
+
     def propertyErrback(self, failure, window):
         failure.trap(errors.PropertyError)
         self.warning("%s." % failure.getErrorMessage())
@@ -104,11 +107,6 @@ class BaseAdminGtk(log.Loggable):
         return self.admin.componentCallRemote(self.state, methodName,
                                               *args, **kwargs)
         
-    ### child class methods to be overridden
-    def setUIState(self, state):
-        # FIXME: what is this? who implements this?
-        raise NotImplementedError
-
     def propertyChanged(self, name, value):
         """
         Override this method to be notified of component's properties that
@@ -164,7 +162,9 @@ class BaseAdminGtk(log.Loggable):
         raise NotImplementedError
 
     def uiStateChanged(self, stateObject):
-        # default implementation
+        # so, this is still here, but I'd prefer people to (1) just use
+        # the nodes and not the global admin; and (2) use the state
+        # listener stuff more than the chunkier 'uistatechanged'
         pass
 
     def stateSet(self, object, key, value):
@@ -185,6 +185,9 @@ class BaseAdminGtkNode(log.Loggable):
     @type widget: L{gtk.Widget}
     @ivar wtree:  the widget tree representation for this node
     """
+
+    implements(flavors.IStateListener)
+
     logCategory = "admingtk"
     glade_file = None
     gettext_domain = 'flumotion'
@@ -205,6 +208,7 @@ class BaseAdminGtkNode(log.Loggable):
         self.nodes = util.OrderedDict()
         self.wtree = None
         self.widget = None
+        self.uiState = None
         
     def status_push(self, str):
         if self.statusbar:
@@ -277,13 +281,12 @@ class BaseAdminGtkNode(log.Loggable):
 
     def haveWidgetTree(self):
         """
-        I am called when the widget tree has been gotten from the glade file.
+        I am called when the widget tree has been gotten from the glade
+        file. Responsible for setting self.widget.
 
         Override me to act on it.
-
-        Returns: L{twisted.internet.defer.Deferred}
         """
-        return defer.succeed(None)
+        pass
 
     def propertyChanged(self, name, value):
         """
@@ -291,13 +294,38 @@ class BaseAdminGtkNode(log.Loggable):
         """
         self.debug("property %s changed to %r" % (name, value))
 
+    def gotUIState(self, state):
+        self.uiState = state
+        if self.widget:
+            self.setUIState(self.uiState)
+
+    def setUIState(self, state):
+        """
+        Called by the BaseAdminGtk when it gets the UI state and the GUI
+        is ready. Chain up if you provide your own implementation.
+        """
+        self.uiState = state
+        state.addListener(self)
+
+    def stateSet(self, state, key, value):
+        "Override me"
+        pass
+
+    def stateAppend(self, state, key, value):
+        "Override me"
+        pass
+
+    def stateRemove(self, state, key, value):
+        "Override me"
+        pass
+
     def render(self):
         """
         Render the GTK+ admin view for this component.
         
         Returns: a deferred returning the main widget for embedding
         """
-        if hasattr(self, 'glade_file'):
+        if self.glade_file:
             self.debug('render: loading glade file %s in text domain %s' % (
                 self.glade_file, self.gettext_domain))
             dl = self.loadGladeFile(self.glade_file, self.gettext_domain)
@@ -311,13 +339,16 @@ class BaseAdminGtkNode(log.Loggable):
                 yield gtk.Label("%s.  Kill the programmer." % msg)
 
             self.debug('render: calling haveWidgetTree')
-            dh = self.haveWidgetTree()
-            yield dh
+            self.haveWidgetTree()
             
         if not self.widget:
             self.debug('render: no self.widget, failing')
             yield defer.fail(IndexError)
             
+        if self.uiState:
+            self.debug('calling setUIState on the node')
+            self.setUIState(self.uiState)
+
         self.debug('render: yielding widget %s' % self.widget)
         yield self.widget
     render = defer_generator_method(render)

@@ -781,20 +781,6 @@ class ComponentAvatar(base.ManagerAvatar):
         self.error('error element=%s string=%s' % (element, error))
         self.heaven.removeComponent(self)
 
-    def perspective_adminCallRemote(self, methodName, *args, **kwargs):
-        """
-        Call the given method on all connected admin clients.
-
-        @see: L{flumotion.manager.admin.AdminHeaven.avatarsCallRemote}
-
-        @type  methodName: str
-        """
-        # proxies admin remote call from component's medium to admin heaven
-        mapper = self.vishnu.getComponentMapper(self)
-        componentState = mapper.state
-        self.vishnu.adminHeaven.avatarsCallRemote("componentCall",
-            componentState, methodName, *args, **kwargs)
-
     def perspective_authenticate(self, bouncerName, keycard):
         """
         Authenticate the given keycard using the given bouncer.

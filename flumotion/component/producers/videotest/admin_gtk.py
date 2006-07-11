@@ -23,43 +23,36 @@ from gettext import gettext as _
 
 import gtk
 
-from flumotion.common import errors
+from twisted.internet import defer
 
+from flumotion.common import errors
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
+from flumotion.ui import fgtk
+from flumotion.wizard import enums
 
 class PatternNode(BaseAdminGtkNode):
+    uiStateHandlers = None
+
     def render(self):
         # FIXME: gladify
         self.widget = gtk.Table(1, 2)
         label = gtk.Label(_("Pattern:"))
         self.widget.attach(label, 0, 1, 0, 1, 0, 0, 6, 6)
         label.show()
-        d = self.callRemote("getElementProperty", "source", "pattern")
-        d.addCallback(self.getPatternCallback)
-        d.addErrback(self.getPatternErrback)
-        d.addCallback(lambda result: self.widget)
-        return d
-
-    def getPatternCallback(self, result):
-        # FIXME: these need to be done there because only this piece of
-        # code gets executed, so imports higher up are not present here.
-        # find a better way for this.
-        from flumotion.ui import fgtk
-        from flumotion.wizard import enums
-        self.debug("got pattern %r" % result)
         self.combobox_pattern = fgtk.FComboBox()
         self.combobox_pattern.set_enum(enums.VideoTestPattern)
-        self.combobox_pattern.set_active(result)
         self.pattern_changed_id = self.combobox_pattern.connect('changed',
             self.cb_pattern_changed)
         self.widget.attach(self.combobox_pattern, 1, 2, 0, 1, 0, 0, 6, 6)
         self.combobox_pattern.show()
+        return BaseAdminGtkNode.render(self)
 
-    def getPatternErrback(self, failure):
-        # FIXME: this should throw up a nice error dialog with debug info
-        self.warning("Failure %s getting pattern: %s" % (
-            failure.type, failure.getErrorMessage()))
-        return None
+    def setUIState(self, state):
+        BaseAdminGtkNode.setUIState(self, state)
+        if not self.uiStateHandlers:
+            self.uiStateHandlers = {'pattern': self.patternSet}
+        for k, handler in self.uiStateHandlers.items():
+            handler(state.get(k))
 
     def cb_pattern_changed(self, combobox):
         def _setPatternErrback(failure):
@@ -71,23 +64,23 @@ class PatternNode(BaseAdminGtkNode):
         d = self.callRemote("setElementProperty", "source", "pattern", pattern)
         d.addErrback(_setPatternErrback)
 
-    def propertyChanged(self, name, value):
-        if name == "pattern":
-            self.debug("pattern changed to %r" % value)
-            c = self.combobox_pattern
-            id = self.pattern_changed_id
-            c.handler_block(id)
-            c.set_active(value)
-            c.handler_unblock(id)
+    def patternSet(self, value):
+        self.debug("pattern changed to %r" % value)
+        c = self.combobox_pattern
+        id = self.pattern_changed_id
+        c.handler_block(id)
+        c.set_active(value)
+        c.handler_unblock(id)
+
+    def stateSet(self, state, key, value):
+        handler = self.uiStateHandlers.get(key, None)
+        if handler:
+            handler(value)
 
 class VideoTestAdminGtk(BaseAdminGtk):
     def setup(self):
         # FIXME: have constructor take self instead ?
         pattern = PatternNode(self.state, self.admin, title=_("Pattern"))
         self.nodes['Pattern'] = pattern
-
-    def component_propertyChanged(self, name, value):
-        # FIXME: tie to correct node better
-        self.nodes['Pattern'].propertyChanged(name, value)
 
 GUIClass = VideoTestAdminGtk

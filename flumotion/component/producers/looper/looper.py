@@ -64,6 +64,12 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.pads_awaiting_block = []
         self.pads_to_link = []
         self.bus = None
+        self.uiState.addKey('info-location', '')
+        self.uiState.addKey('info-duration', 0)
+        self.uiState.addKey('info-audio', None)
+        self.uiState.addKey('info-video', None)
+        self.uiState.addKey('num-iterations', 0)
+        self.uiState.addKey('position', 0)
 
     def do_check(self):
         def on_result(result):
@@ -112,19 +118,19 @@ class Looper(feedcomponent.ParseLaunchComponent):
 
     def run_discoverer(self):
         def discovered(d, ismedia):
-            info = {}
-            info["location"] = self.filelocation
-            info["duration"] = max(d.audiolength, d.videolength)
+            self.uiState.set('info-location', self.filelocation)
+            self.uiState.set('info-duration',
+                             max(d.audiolength, d.videolength))
             if d.is_audio:
-                info["audio"] = "%d channel(s) %dHz" % (d.audiochannels,
-                                                        d.audiorate)
+                self.uiState.set('info-audio',
+                                 "%d channel(s) %dHz" % (d.audiochannels,
+                                                         d.audiorate))
             if d.is_video:
-                info["video"] = "%d x %d at %d/%d fps" % (d.videowidth,
-                                                          d.videoheight,
-                                                          d.videorate.num,
-                                                          d.videorate.denom)
-            self.fileinformation = info
-            self.adminCallRemote("haveFileInformation", info)
+                self.uiState.set('info-video',
+                                 "%d x %d at %d/%d fps" % (d.videowidth,
+                                                           d.videoheight,
+                                                           d.videorate.num,
+                                                           d.videorate.denom))
 
         from gst.extend import discoverer
         d = discoverer.Discoverer(self.filelocation)
@@ -134,7 +140,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
     def on_segment_done(self):
         self.do_seek(False)
         self.nbiterations += 1
-        self.adminCallRemote("numberIterationsChanged", self.nbiterations)
+        self.uiState.set('num-iterations', self.nbiterations)
         
     def on_pads_blocked(self):
         for src, sink in self.pads_to_link:
@@ -144,7 +150,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
             src.set_blocked_async(False, lambda *x: None)
         self.pads_to_link = []
         self.nbiterations = 0
-        self.adminCallRemote("numberIterationsChanged", self.nbiterations)
+        self.uiState.set('num-iterations', self.nbiterations)
         
     def configure_pipeline(self, pipeline, properties):
         def on_message(bus, message):
@@ -202,7 +208,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
             except:
                 self.debug("position query didn't succeed")
             else:
-                self.adminCallRemote("haveUpdatedPosition", pos)
+                self.uiState.set('position', pos)
             return True
 
         def on_start(result):

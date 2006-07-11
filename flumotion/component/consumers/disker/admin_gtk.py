@@ -27,24 +27,16 @@ from flumotion.common import errors
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
 class FilenameNode(BaseAdminGtkNode):
-    def render(self):
-        gladeFile = os.path.join('flumotion', 'component', 'consumers',
-            'disker', 'disker.glade')
-        d = self.loadGladeFile(gladeFile)
-        d.addCallback(self._loadGladeFileCallback)
-        return d
+    glade_file = os.path.join('flumotion', 'component', 'consumers',
+                              'disker', 'disker.glade')
 
-    def _loadGladeFileCallback(self, widgetTree):
-        self.wtree = widgetTree
+    def haveWidgetTree(self):
         self.labels = {}
-        self.filenameWidget = self.wtree.get_widget('filename-widget')
+        self.widget = self.wtree.get_widget('filename-widget')
         self.currentFilenameLabel = self.wtree.get_widget('label-current')
         button = self.wtree.get_widget('button-new')
         button.connect('clicked',self.cb_button_clicked)
-
-        self.callRemote('notifyState')
         self.shown = False
-        return self.filenameWidget
 
     def cb_button_clicked(self, button):
         d = self.callRemote("changeFilename")
@@ -55,8 +47,12 @@ class FilenameNode(BaseAdminGtkNode):
             failure.type, failure.getErrorMessage()))
         return None
 
-    def filenameChanged(self, filename):
-        self.currentFilenameLabel.set_text(filename)
+    def setUIState(self, state):
+        self.stateSet(state, 'filename', state.get('filename'))
+
+    def stateSet(self, state, key, value):
+        if key == 'filename':
+            self.currentFilenameLabel.set_text(value or '<waiting>')
     
 class DiskerAdminGtk(BaseAdminGtk):
     def setup(self):

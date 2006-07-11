@@ -10,12 +10,6 @@
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.plugs.loggers.Logger"
-          type="requeststringtoadminlogger">
-      <entry location="flumotion/component/plugs/loggers.py"
-             function="RequestStringToAdminLogger"/>
-    </plug>
-
     <plug socket="flumotion.component.plugs.adminaction.AdminAction"
           type="adminactionfilelogger">
       <entry location="flumotion/component/plugs/adminaction.py"

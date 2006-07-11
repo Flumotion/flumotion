@@ -40,11 +40,6 @@ T_ = messages.gettexter('flumotion')
 __all__ = ['Disker']
 
 class DiskerMedium(feedcomponent.FeedComponentMedium):
-    def __init__(self, comp):
-        feedcomponent.FeedComponentMedium.__init__(self, comp)
-
-        self.comp.connect('filename-changed', self._comp_ui_filename_changed_cb)
-
     # called when admin ui wants to change filename
     def remote_changeFilename(self):
         self.comp.change_filename()
@@ -53,11 +48,6 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
     def remote_notifyState(self):
         self.comp.update_ui_state()
 
-    # callback function for when component changes filename
-    # responsible for notifying admin UI that filename has changed
-    def _comp_ui_filename_changed_cb(self, comp, location):
-        self.callRemote('adminCallRemote', 'filenameChanged', location)
-        
 class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     component_medium_class = DiskerMedium
     pipe_template = 'multifdsink sync-method=1 name=fdsink mode=1 sync=false'
@@ -66,8 +56,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     location = None
     caps = None
 
-    # signal for changed filename which medium connects to
-    gsignal('filename-changed', str)
+    def init(self):
+        self.uiState.addKey('filename', None)
 
     def get_pipeline_string(self, properties):
         directory = properties['directory']
@@ -114,10 +104,6 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             mime += ";boundary=ThisRandomString"
         return mime
     
-    # sends signal so admin ui is notified of filename change
-    def update_ui_state(self):
-        self.emit('filename-changed', self.location)
-    
     def change_filename(self):
         self.debug("change_filename()")
         mime = self.get_mime()
@@ -157,7 +143,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
         self.file_fd = open(self.location, 'a')
         sink.emit('add', self.file_fd.fileno())
-        self.emit('filename-changed', self.location)
+        self.uiState.set('filename', self.location)
     
     def _notify_caps_cb(self, pad, param):
         caps = pad.get_negotiated_caps()
@@ -200,5 +186,5 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
         # connect to client-removed so we can detect errors in file writing
         sink.connect('client-removed', self._client_removed_cb)
-
+        
 pygobject.type_register(Disker)

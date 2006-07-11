@@ -26,7 +26,6 @@ import gst
 from flumotion.common import errors
 
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
-from twisted.internet import defer
 
 from flumotion.ui.glade import GladeWidget
 
@@ -44,34 +43,27 @@ class FileInfo(GladeWidget):
                               'flufileinfo.glade')
     duration = 0
 
-    def set_information(self, information):
-        """Set the file information"""
-        self.locationlabel.set_text(information["location"])
-        self.duration = information["duration"]
-        self.timelabel.set_text(time_to_string(self.duration))
-        if information.has_key("audio"):
-            self.audiolabel.set_text(information["audio"])
-        else:
-            self.audiolabel.set_text("<i>No audio</i>")
-        if information.has_key("video"):
-            self.videolabel.set_text(information["video"])
-        else:
-            self.videolabel.set_text("<i>No video</i>")
+    def set_location(self, location):
+        self.locationlabel.set_text(location)
+
+    def set_duration(self, duration):
+        self.duration = duration
+        self.timelabel.set_text(time_to_string(duration))
+
+    def set_audio(self, audio):
+        self.audiolabel.set_text(audio or "<i>No audio</i>")
+
+    def set_video(self, video):
+        self.videolabel.set_text(video or "<i>No video</i>")
 
 class LooperNode(BaseAdminGtkNode):
     logCategory = 'looper'
     
-    def render(self):
-        self.debug('rendering looper UI')
-        gladeFile = os.path.join('flumotion', 'component',
-                                 'producers', 'looper',
-                                 'looper.glade')
-        d = self.loadGladeFile(gladeFile)
-        d.addCallback(self._loadGladeFileCallback)
-        return d
+    uiStateHandlers = None
+    glade_file = os.path.join('flumotion', 'component', 'producers',
+                              'looper', 'looper.glade')
 
-    def _loadGladeFileCallback(self, widgetTree):
-        self.wtree = widgetTree
+    def haveWidgetTree(self):
         self.widget = self.wtree.get_widget('looper-widget')
         self.fileinfowidget = self.wtree.get_widget('fileinfowidget')
         self.numiterlabel = self.wtree.get_widget('iterationslabel')
@@ -79,14 +71,32 @@ class LooperNode(BaseAdminGtkNode):
         self.positionbar = self.wtree.get_widget('positionbar')
         self.restartbutton = self.wtree.get_widget('restartbutton')
         self.restartbutton.set_sensitive(False)
-        
-        d = self.callRemote("getNbIterations")
-        d.addCallback(self.numberIterationsChanged)
 
-        d = self.callRemote("getFileInformation")
-        d.addCallback(self.haveFileInformation)
-        
-        return defer.succeed(self.widget)
+    def setUIState(self, state):
+        BaseAdminGtkNode.setUIState(self, state)
+        if not self.uiStateHandlers:
+            self.uiStateHandlers = {'info-duration':
+                                    self.fileinfowidget.set_duration,
+                                    'info-location':
+                                    self.fileinfowidget.set_location,
+                                    'info-audio':
+                                    self.fileinfowidget.set_audio,
+                                    'info-video':
+                                    self.fileinfowidget.set_video,
+                                    'position': self.positionSet,
+                                    'num-iterations': self.numIterationsSet}
+        for k, handler in self.uiStateHandlers.items():
+            handler(state.get(k))
+
+    def positionSet(self, newposition):
+        self.log("got new position : %d" % newposition)
+        if self.fileinfowidget.duration:
+            percent = float(newposition % self.fileinfowidget.duration) / float(self.fileinfowidget.duration)
+            self.positionbar.set_fraction(percent)
+            self.positionbar.set_text(time_to_string(newposition % self.fileinfowidget.duration))
+
+    def numIterationsSet(self, numIterations):
+        self.numiterlabel.set_text(str(numIterations))
 
     def _restart_callback(self, result):
         pass
@@ -101,37 +111,14 @@ class LooperNode(BaseAdminGtkNode):
         d.addCallback(self._restart_callback)
         d.addErrback(self._restart_failed)
 
-    def haveFileInformation(self, fileinformation):
-        self.debug("got new information : %s" % fileinformation)
-        if fileinformation:
-            self.fileinfowidget.set_information(fileinformation)
-        
-    def haveUpdatedPosition(self, newposition):
-        self.log("got new position : %d" % newposition)
-        if self.fileinfowidget.duration:
-            percent = float(newposition % self.fileinfowidget.duration) / float(self.fileinfowidget.duration)
-            self.positionbar.set_fraction(percent)
-            self.positionbar.set_text(time_to_string(newposition % self.fileinfowidget.duration))
-
-    def numberIterationsChanged(self, nbiterations):
-        self.numiterlabel.set_text(str(nbiterations))
+    def stateSet(self, state, key, value):
+        handler = self.uiStateHandlers.get(key, None)
+        if handler:
+            handler(value)
 
 class LooperAdminGtk(BaseAdminGtk):
     def setup(self):
         looper = LooperNode(self.state, self.admin, title=_("Looper"))
         self.nodes['Looper'] = looper
-
-    def component_propertyChanged(self, name, value):
-        self.nodes['Looper'].propertyChanged(name, value)
-
-    def component_haveFileInformation(self, information):
-        if information:
-            self.nodes['Looper'].haveFileInformation(information)
-
-    def component_numberIterationsChanged(self, nbiterations):
-        self.nodes['Looper'].numberIterationsChanged(nbiterations)
-
-    def component_haveUpdatedPosition(self, newposition):
-        self.nodes['Looper'].haveUpdatedPosition(newposition)
 
 GUIClass = LooperAdminGtk

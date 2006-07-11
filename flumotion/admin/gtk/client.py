@@ -408,51 +408,6 @@ class Window(log.Loggable, gobject.GObject):
         self.debug('setting current_component to %r' % instance)
         self.current_component = instance
 
-
-    ### IAdminView interface methods: FIXME: create interface somewhere
-    ## Confusingly enough, this procedure is called by remote objects to
-    ## operate on the client ui. I think. It is *not* for calling
-    ## methods on the remote components. Should fix this sometime.
-    def componentCall(self, componentState, methodName, *args, **kwargs):
-        # FIXME: for now, we only allow calls to go through that have
-        # their UI currently displayed.  In the future, maybe we want
-        # to create all UI's at startup regardless and allow all messages
-        # to be processed, since they're here now anyway   
-        self.log("componentCall received for %r.%s ..." % (
-            componentState, methodName))
-        state = self.components_view.get_selected_state()
-        if not state:
-            self.log("... but no component selected")
-            return
-        if componentState != state:
-            self.log("... but component is different from displayed")
-            return
-        if not self.current_component:
-            self.log("... but component is not yet shown")
-            return
-        
-        name = state.get('name')
-        localMethodName = "component_%s" % methodName
-        if not hasattr(self.current_component, localMethodName):
-            self.log("... but does not have method %s" % localMethodName)
-            self.warning("Component view %s does not implement %s" % (
-                name, localMethodName))
-            self.debug('Component view is %r' % self.current_component)
-            return
-        self.log("... and executing")
-        method = getattr(self.current_component, localMethodName)
-
-        # call the method, catching all sorts of stuff
-        try:
-            result = method(*args, **kwargs)
-        except TypeError:
-            msg = "component method %s did not accept *a %s and **kwa %s (or TypeError)" % (
-                methodName, args, kwargs)
-            self.debug(msg)
-            raise errors.RemoteRunError(msg)
-        self.log("component: returning result: %r to caller" % result)
-        return result
-
     def componentCallRemoteStatus(self, state, pre, post, fail,
                                   methodName, *args, **kwargs):
         if not state:

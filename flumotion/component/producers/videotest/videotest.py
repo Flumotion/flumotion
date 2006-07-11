@@ -23,26 +23,11 @@ import gst
 
 from flumotion.component import feedcomponent
 
-class VideoTestMedium(feedcomponent.FeedComponentMedium):
-    def __init__(self, comp):
-        feedcomponent.FeedComponentMedium.__init__(self, comp)
-
-    def setup(self, config):
-        # called after component's setup
-        # connect to pattern notify
-        source = self.comp.get_element('source')
-        source.connect('notify::pattern', self.cb_pattern_notify)
-
-    def cb_pattern_notify(self, object, pspec):
-        pattern = object.get_property('pattern')
-        self.debug('pattern has changed, notifying')
-        self.callRemote('adminCallRemote', 'propertyChanged', 'pattern',
-            int(pattern))
-
 class VideoTest(feedcomponent.ParseLaunchComponent):
 
-    component_medium_class = VideoTestMedium
-    
+    def init(self):
+        self.uiState.addKey('pattern', 0)
+
     def get_pipeline_string(self, properties):
         format = properties.get('format', 'video/x-raw-yuv')
 
@@ -70,7 +55,11 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
         
     # Set properties
     def configure_pipeline(self, pipeline, properties):
+        def notify_pattern(obj, pspec):
+            self.uiState.set('pattern', int(obj.get_property('pattern')))
+
         source = self.get_element('source')
+        source.connect('notify::pattern', notify_pattern)
         if 'pattern' in properties:
             source.set_property('pattern', properties['pattern'])
 

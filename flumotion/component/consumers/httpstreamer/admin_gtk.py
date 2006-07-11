@@ -26,11 +26,6 @@ import gtk
 
 from gettext import gettext as _
 
-from flumotion.common import errors
-
-# FIXME: remove when we do a proper deferred
-from twisted.internet import defer
-
 from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 
 class StatisticsAdminGtkNode(BaseAdminGtkNode):
@@ -110,6 +105,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     def haveWidgetTree(self):
         self.labels = {}
         self.statistics = self.wtree.get_widget('statistics-widget')
+        self.widget = self.statistics
         for type in ('uptime', 'mime', 'bitrate', 'totalbytes', 'url'):
             self.registerLabel('stream-' + type)
         for type in ('current', 'average', 'max', 'peak', 'peak-time'):
@@ -190,27 +186,11 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         window.set_cursor(None)
             
     
-    
-class LogAdminGtkNode(BaseAdminGtkNode):
-    logCategory = 'logadmin'
-
-    def render(self):
-        w = gtk.TextView()
-        w.set_cursor_visible(False)
-        w.set_wrap_mode(gtk.WRAP_WORD)
-        self._buffer = w.get_buffer()
-        return defer.succeed(w)
-
-    def logMessage(self, message):
-        self._buffer.insert_at_cursor(message)
-
 class HTTPStreamerAdminGtk(BaseAdminGtk):
     def setup(self):
         statistics = StatisticsAdminGtkNode(self.state, self.admin, 
             _("Statistics"))
         self.nodes['Statistics'] = statistics
-        log = LogAdminGtkNode(self.state, self.admin, _('Log'))
-        self.nodes['Log'] = log
         # FIXME: maybe make a protocol instead of overriding
         return BaseAdminGtk.setup(self)
 

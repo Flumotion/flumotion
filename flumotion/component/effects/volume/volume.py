@@ -47,6 +47,13 @@ class Volume(feedcomponent.Effect):
         bus.add_signal_watch()
         bus.connect('message::element', self._bus_message_received_cb)
 
+    def setUIState(self, state):
+        feedcomponent.Effect.setUIState(self, state)
+        if state:
+            for k in 'peak', 'decay', 'rms':
+                state.addKey('volume-%s' % k, -100.0)
+            state.addKey('volume-volume', self.effect_getVolume())
+
     def _bus_message_received_cb(self, bus, message):
         """
         @param bus: the message bus sending the message
@@ -54,21 +61,23 @@ class Volume(feedcomponent.Effect):
         """
         if message.structure.get_name() == 'level':
             s = message.structure
-            # FIXME: have to fix the way we do channels' level display
-            # here and in the below 0.8 function
-            for i in range(0, len(s['peak'])):
-                peak = s['peak'][i]
-                decay = s['decay'][i]
-                rms = s['rms'][i]
-                try:
-                    frexp(rms)
-                    frexp(peak)
-                    frexp(decay)
-                except (SystemError, OverflowError, ValueError):
-                    # something confused log10() on the C side, punt
-                    rms = peak = decay = -100.0
-                self.component.adminCallRemote("volumeChanged",
-                    i, peak, rms, decay)
+            peak = list(s['peak'])
+            decay = list(s['decay'])
+            rms = list(s['rms'])
+            for l in peak, decay, rms:
+                for v in l:
+                    try:
+                        v = frexp(v)
+                    except (SystemError, OverflowError, ValueError):
+                        # something confused log10() on the C side, punt
+                        v = -100.0
+            if not self.uiState:
+                self.warning("effect %s doesn't have a uiState" %
+                             self.name)
+            else:
+                for k, v in ('peak', peak), ('decay', decay), ('rms', rms):
+                    self.uiState.set('volume-%s' % k, v)
+            
 
     def effect_setVolume(self, value):
         """
@@ -80,7 +89,7 @@ class Volume(feedcomponent.Effect):
         """
         self.component.setVolume(value)
         # notify admin clients
-        self.component.adminCallRemote("effectVolumeSet", self.name, value)
+        self.uiState.set('volume-volume', value)
 
         return value
 

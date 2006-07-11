@@ -1,5 +1,34 @@
 2006-07-11  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/producers/audiotest/audiotest.py
+	(AudioTest):
+	* flumotion/component/producers/audiotest/admin_gtk.py
+	(AudioTestAdminGtkNode): Port to use UIState.
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.do_check): Fix silly bug. Unclear how this
+	slipped past the test suites.
+
+	* flumotion/manager/component.py
+	(ComponentAvatar.perspective_adminCallRemote): Remove, not used
+	ant more.
+
+	* flumotion/admin/gtk/client.py (Window.componentCall):
+	* flumotion/admin/admin.py (AdminModel.remote_componentCall):
+	Removed, not called any more. Yay.
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py
+	(HTTPStreamerAdminGtk): Remove logging tab, it sucked and also
+	was completely bogus.
+
+	* flumotion/component/plugs/plugs.xml: 
+	* flumotion/component/plugs/loggers.py
+	(RequestStringToAdminLogger): Removed, uses an old interface
+	that's not going to be replaced. Also, completely the wrong
+	approach to statistics.
+
+2006-07-11  Andy Wingo  <wingo@pobox.com>
+
 	* flumotion/component/producers/audiotest/Makefile.am
 	(component_DATA): Dist audiotest.glade.
 
@@ -147,6 +176,84 @@
 	(AdminAvatar.perspective_loadConfiguration): The cleanups mean
 	that vishnu.loadConfiguration has to take a filename or a file
 	object; use StringIO to make a file object.
+
+2006-07-10  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/disker/disker.py (Disker): 
+	* flumotion/component/consumers/disker/admin_gtk.py
+	(FilenameNode): Fix for uiState.
+
+	* flumotion/component/producers/videotest/admin_gtk.py
+	(PatternNode.render): Fix print
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py
+	(StatisticsAdminGtkNode.haveWidgetTree): Make sure self.widget
+	gets set.
+
+	* flumotion/component/base/admin_gtk.py
+	(BaseAdminGtkNode.haveWidgetTree): Does not return anything any
+	more.
+	(BaseAdminGtkNode.render): All nodes have the glade_file attr,
+	it's a question of 'is it set' or not...
+
+	* flumotion/component/producers/looper/looper.py
+	* flumotion/component/producers/looper/admin_gtk.py (LooperNode)
+	(FileInfo): Use base glade support, and use UIState.
+
+	* flumotion/component/effects/volume/admin_gtk.py
+	(VolumeAdminGtkNode.haveWidgetTree): Use base glade support.
+
+	* flumotion/component/effects/colorbalance/admin_gtk.py
+	(ColorbalanceAdminGtkNode.haveWidgetTree): Use the base glade
+	support. Assume that the UI will be set up when setUIState is
+	called.
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.setUIState):
+	Call node.gotUIState instead of setUIState.
+	(BaseAdminGtkNode.gotUIState): New method, here to ensure that
+	setUIState is called only after the ui is properly set up.
+	(BaseAdminGtkNode.render): If we already got the UI state, call
+	setUIState. This means that all admin_gtk code should chain up to
+	render() at some point, if they provide a custom renderer.
+
+	* flumotion/component/producers/videotest/videotest.py
+	(VideoTest):
+	* flumotion/component/producers/videotest/admin_gtk.py
+	(PatternNode): Update for uiState.
+
+	* flumotion/component/effects/volume/volume.py (Volume): Update
+	for uiState.
+
+	* flumotion/component/effects/volume/admin_gtk.py
+	(VolumeAdminGtkNode): Update for uiState.
+
+2006-07-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/effects/colorbalance/colorbalance.py
+	(Colorbalance.setUIState): Add keys to the UI state here.
+	(Colorbalance.effect_setColorBalanceProperty): Don't do
+	callRemote, refactor to use the uistate instead. Also, interpret a
+	value of None to mean 'refresh the UI state'.
+	(effect_getColorBalanceProperties): Gone, we have the UI state
+	now.
+	(Colorbalance._setInitialColorBalance): Small refactoring.
+	
+	* flumotion/component/feedcomponent.py (Effect.setUIState): New
+	method, called by setComponent. The intention is to allow
+	subclasses to add keys to the ui state in this method.
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.setUIState):
+	Actually implement, and use it to add a listener on the state.
+	Chain up if you extend.
+	(BaseAdminGtkNode.stateRemove, BaseAdminGtkNode.stateAppend)
+	(BaseAdminGtkNode.stateSet, BaseAdminGtkNode.setUIState): New
+	methods. The node will now get the UI state and listen to it
+	automatically, users just have to override the statelistener
+	methods.
+
+	* flumotion/component/effects/colorbalance/admin_gtk.py
+	(ColorbalanceAdminGtkNode): Refactor to use the uistate to
+	communicate instead of remote calls. Also cleaned up a bit.
 
 2006-07-10  Andy Wingo  <wingo@pobox.com>
 

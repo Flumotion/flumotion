@@ -28,130 +28,76 @@ from flumotion.component.base import admin_gtk
 class ColorbalanceAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     logCategory = 'colorbalance'
 
-    def render(self):
-        self.debug('rendering colorbalance node')
-        file = 'flumotion/component/effects/colorbalance/colorbalance.glade'
-        d = self.loadGladeFile(file)
-        d.addCallback(self._loadGladeFileCallback)
-        
-        return d
+    glade_file = 'flumotion/component/effects/colorbalance/colorbalance.glade'
 
-    def _loadGladeFileCallback(self, widgetTree):
-        self.wtree = widgetTree
+    # FIXME: the scale and the spinbutton should just be using the same
+    # adjustment
+
+    def haveWidgetTree(self):
         self.widget = self.wtree.get_widget('widget-colorbalance')
-
-        d = self.effectCallRemote("getColorBalanceProperties")
-        d.addCallback(self.getColorBalancePropertiesCallback)
-        d.addErrback(self.getColorBalancePropertiesErrback)
-        d.addCallback(lambda result: self.widget)
-
-        return d
+        self._createUI()
         
-    def getColorBalancePropertiesCallback(self, result):
-        for i in result:
-            scale_widgetname = 'scale-%s' % i[0]
-            spinbutton_widgetname = 'spinbutton-%s' % i[0]
-            scale = self.wtree.get_widget(scale_widgetname.lower())
-            spinbutton = self.wtree.get_widget(spinbutton_widgetname.lower())
+    def _createUI(self):
+        for k in 'Hue', 'Saturation', 'Brightness', 'Contrast':
+            lower = k.lower()
+            scale = self.wtree.get_widget('scale-%s' % lower)
+            spinbutton = self.wtree.get_widget('spinbutton-%s' % lower)
 
-            scale.set_value(i[1])
-            spinbutton.set_value(i[1])
+            value = 0.0
+
+            scale.set_value(value)
+            spinbutton.set_value(value)
 
             scale_change_id = scale.connect('value-changed',
-                self.cb_colorbalance_change)
+                self.cb_colorbalance_change, k)
             spinbutton_change_id = spinbutton.connect('value-changed',
-                self.cb_colorbalance_change)
+                self.cb_colorbalance_change, k)
 
-            if i[0] == 'Hue':
-                self.scale_hue = scale
-                self.spinbutton_hue = spinbutton
-                self.hue_scale_change_id = scale_change_id
-                self.hue_spinbutton_change_id = spinbutton_change_id
-                
-            if i[0] == 'Saturation':
-                self.scale_saturation = scale
-                self.spinbutton_saturation = spinbutton
-                self.saturation_scale_change_id = scale_change_id
-                self.saturation_spinbutton_change_id = spinbutton_change_id
-               
-            if i[0] == 'Brightness':
-                self.scale_brightness = scale
-                self.spinbutton_brightness = spinbutton
-                self.brightness_scale_change_id = scale_change_id
-                self.brightness_spinbutton_change_id = spinbutton_change_id
+            setattr(self, 'scale_%s' % lower, scale)
+            setattr(self, 'spinbutton_%s' % lower, spinbutton)
+            setattr(self, '%s_scale_change_id' % lower, scale_change_id)
+            setattr(self, '%s_spinbutton_change_id' % lower, spinbutton_change_id)
 
-            if i[0] == 'Contrast':
-                self.scale_contrast = scale
-                self.spinbutton_contrast = spinbutton
-                self.contrast_scale_change_id = scale_change_id
-                self.contrast_spinbutton_change_id = spinbutton_change_id
-
-    def getColorBalancePropertiesErrback(self, failure):
-        self.warning("Failure %s getting color balance properties: %s" % (
-            failure.type, failure.getErrorMessage()))
-        return None
-    
-    def cb_colorbalance_change(self, widget):
+    def cb_colorbalance_change(self, widget, label):
         value = widget.get_value()
-        label = ""
-        if widget == self.scale_hue or widget == self.spinbutton_hue:
-            label = "Hue"
-        if widget == self.scale_saturation or widget == self.spinbutton_saturation: 
-            label = "Saturation"
-        if widget == self.scale_brightness or widget == self.spinbutton_brightness:
-            label = "Brightness"
-        if widget == self.scale_contrast or widget == self.spinbutton_contrast:
-            label = "Contrast"
         self.debug('changing colorbalance %s to %f' % (label, value))
         # we do a first propertyChanged so the spinbutton and scale are synced
         self.propertyChanged(label, value)
         self.debug('informing effect of change')
+
+        def errback(failure, label):
+            self.warning("Failure %s changing colorbalance %s: %s",
+                         failure.type, label, failure.getErrorMessage())
+        def callback(result, label):
+            self.debug("remote replied colorbalance %s changed to %f",
+                       label, result)
+
         d = self.effectCallRemote("setColorBalanceProperty", label, value)
-        d.addErrback(self.colorbalanceChangeErrback, label)
-        d.addCallback(self.colorbalanceChangeCallback, label)
+        d.addErrback(errback, label)
+        d.addCallback(callback, label)
 
-    def colorbalanceChangeErrback(self, failure, label):
-        self.warning("Failure %s changing colorbalance %s: %s" % (failure.type,
-            label, failure.getErrorMessage()))
+    def setUIState(self, state):
+        admin_gtk.EffectAdminGtkNode.setUIState(self, state)
+        for k in 'Hue', 'Saturation', 'Brightness', 'Contrast':
+            self.propertyChanged(k, state.get('colorbalance-%s' % k))
 
-    def colorbalanceChangeCallback(self, result, label):
-        self.debug("remote replied colorbalance %s changed to %f" % (
-            label, result))
-        # a notify from the effect through the manager will already set it
-        # for us, so we can leave it as handled
-        # self.propertyChanged(label, result)
+    def stateSet(self, state, key, value):
+        if key.startswith('colorbalance-'):
+            key = key[len('colorbalance-'):]
+            self.propertyChanged(key, value)
 
     def propertyChanged(self, name, value):
         self.debug('syncing colorbance property %s to %f' % (name, value))
 
-        scale_change_id = -1
-        if name == 'Hue':
-            scale = self.scale_hue
-            spinbutton = self.spinbutton_hue
-            scale_change_id = self.hue_scale_change_id
-            spinbutton_change_id = self.hue_spinbutton_change_id
-        if name == 'Saturation':
-            scale = self.scale_saturation
-            spinbutton = self.spinbutton_saturation
-            scale_change_id = self.saturation_scale_change_id
-            spinbutton_change_id = self.saturation_spinbutton_change_id
-        if name == 'Brightness':
-            scale = self.scale_brightness
-            spinbutton = self.spinbutton_brightness
-            scale_change_id = self.brightness_scale_change_id
-            spinbutton_change_id = self.brightness_spinbutton_change_id
-        if name == 'Contrast':
-            scale = self.scale_contrast
-            spinbutton = self.spinbutton_contrast
-            scale_change_id = self.contrast_scale_change_id
-            spinbutton_change_id = self.contrast_spinbutton_change_id
+        lower = name.lower()
+        scale = getattr(self, 'scale_%s' % lower)
+        spinbutton = getattr(self, 'spinbutton_%s' % lower)
+        scale_change_id = getattr(self, '%s_scale_change_id' % lower)
+        spinbutton_change_id = getattr(self, '%s_spinbutton_change_id' % lower)
 
-        # if we had an actual property change, process it and block signal
-        # emission while doing so
-        if scale_change_id != -1:
-            scale.handler_block(scale_change_id)
-            scale.set_value(value)
-            scale.handler_unblock(scale_change_id)
-            spinbutton.handler_block(spinbutton_change_id)
-            spinbutton.set_value(value)
-            spinbutton.handler_unblock(spinbutton_change_id)
+        scale.handler_block(scale_change_id)
+        scale.set_value(value)
+        scale.handler_unblock(scale_change_id)
+        spinbutton.handler_block(spinbutton_change_id)
+        spinbutton.set_value(value)
+        spinbutton.handler_unblock(spinbutton_change_id)

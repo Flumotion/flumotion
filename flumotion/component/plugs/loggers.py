@@ -46,25 +46,6 @@ def _http_session_completed_to_apache_log(args):
                args['response'], args['bytes-sent'], args['referer'],
                args['user-agent'], args['time-connected']))
 
-class RequestStringToAdminLogger(Logger):
-    """
-    Logger for passing apache-style request strings to the admin
-    """
-
-    medium = None
-    
-    def start(self, component):
-        self.medium = component.medium
-
-    def event_http_session_completed(self, args):
-        if not self.medium:
-            self.warning('Told to send log messages to the admin, '
-                         'but no medium')
-
-        # notify admin of this msg via the manager
-        self.medium.callRemote('adminCallRemote', 'logMessage',
-                               _http_session_completed_to_apache_log(args))
-        
 class ApacheLogger(Logger):
     filename = None
     file = None

@@ -39,18 +39,13 @@ def clamp(x, min, max):
 
 class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
     logCategory = 'volume'
+    glade_file = os.path.join('flumotion', 'component', 'effects',
+                              'volume', 'volume.glade')
 
-    def render(self):
-        self.debug('rendering volume node')
-        gladeFile = os.path.join('flumotion', 'component', 'effects',
-            'volume', 'volume.glade')
-        d = self.loadGladeFile(gladeFile)
-        d.addCallback(self._loadGladeFileCallback)
-        return d
+    uiStateHandlers = None
 
-    def _loadGladeFileCallback(self, widgetTree):
-        self.wtree = widgetTree
-        self.volume = self.wtree.get_widget('volume-widget')
+    def haveWidgetTree(self):
+        self.widget = self.wtree.get_widget('volume-widget')
         self.scale_volume = self.wtree.get_widget('level-widget')
         self._volume_set_label = self.wtree.get_widget('volume-set-label')
         self._volume_set_label.set_text('0')
@@ -65,19 +60,21 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
         check = self.wtree.get_widget('volume-set-check')
         check.connect('toggled', self._check_toggled_cb)
 
-        # query for the effect's current volume setting
-        d = self.effectCallRemote("getVolume")
-        d.addCallback(self._getVolumeCallback)
-        d.addErrback(log.warningFailure)
-        return d
-        
-    def _getVolumeCallback(self, result):
-        self.debug('got current volume %f' % result)
-        self.volumeSet(result)
-        return self.volume
+    def setUIState(self, state):
+        admin_gtk.EffectAdminGtkNode.setUIState(self, state)
+        if not self.uiStateHandlers:
+            self.uiStateHandlers = {'volume-volume': self.volumeSet,
+                                    'volume-peak': self.peakSet,
+                                    'volume-decay': self.decaySet}
+        for k, handler in self.uiStateHandlers.items():
+            handler(state.get(k))
 
-    def volumeChanged(self, channel, peak, rms, decay):
+    def peakSet(self, peak):
+        peak = sum(peak)/len(peak)
         self.scale_volume.set_property('peak', clamp(peak, -90.0, 0.0))
+
+    def decaySet(self, decay):
+        decay = sum(decay)/len(decay)
         self.scale_volume.set_property('decay', clamp(decay, -90.0, 0.0))
 
     # when volume has been set by another admin client
@@ -89,6 +86,11 @@ class VolumeAdminGtkNode(admin_gtk.EffectAdminGtkNode):
             dB = "%2.2f" % (20.0 * math.log10(volume))
         self._volume_set_label.set_text(dB)
         self._hscale.handler_unblock(self._scale_changed_id)
+
+    def stateSet(self, state, key, value):
+        handler = self.uiStateHandlers.get(key, None)
+        if handler:
+            handler(value)
 
     # run when the scale is moved by user
     def cb_volume_set(self, widget):

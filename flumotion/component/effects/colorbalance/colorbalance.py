@@ -54,6 +54,12 @@ class Colorbalance(feedcomponent.Effect):
     
         self._channels = None
 
+    def setUIState(self, state):
+        feedcomponent.Effect.setUIState(self, state)
+        if state:
+            for k in 'Hue', 'Saturation', 'Brightness', 'Contrast':
+                state.addKey('colorbalance-%s' % k, 0.0)
+
     # State change handling for 0.10
     def _bus_message_received_cb(self, bus, message, hue, saturation, 
         brightness, contrast):
@@ -83,56 +89,36 @@ class Colorbalance(feedcomponent.Effect):
 
         for i in self._channels:
             if i.label == which:
-                device_value = _percent_to_value(value,
-                    i.min_value, i.max_value)
-                self.debug("setting percentage: %.1f, value %d <= %d <= %d" % (
-                    value, i.min_value, device_value, i.max_value))
-                self._element.set_value(i, device_value)
+                if value:
+                    device_value = _percent_to_value(value,
+                        i.min_value, i.max_value)
+                    self.debug("setting percentage: %.1f, "
+                               "value %d <= %d <= %d",
+                               value, i.min_value, device_value,
+                               i.max_value)
+                    self._element.set_value(i, device_value)
                 device_value = self._element.get_value(i)
-                self.debug("actually set: %.1f, value %d <= %d <= %d" % (
-                    value, i.min_value, device_value, i.max_value))
                 percent = _value_to_percent(device_value,
                     i.min_value, i.max_value)
+                self.debug('device says %s=%.1f', i.label, percent)
                 # notify all others too
-                if not self.component:
-                    self.warning("effect %s doesn't have a component" %
+                if not self.uiState:
+                    self.warning("effect %s doesn't have a uiState" %
                         self.name)
                 else:
-                    self.component.adminCallRemote("effectPropertyChanged",
-                        self.name, which, percent)
+                    self.uiState.set('colorbalance-%s' % which, percent)
                 return percent
 
         # didn't find it
         return value
 
-    def effect_getColorBalanceProperties(self):
-        """
-        Returns: a list of (label, value) tuples.
-        """
-        retval = []
-        if not self._channels:
-            return retval
-        for i in self._channels:
-            self.debug('colorbalance %s: %d <= %d <= %d' % (
-                i.label, i.min_value, self._element.get_value(i), i.max_value))
-            percent_value = _value_to_percent(self._element.get_value(i),
-                 i.min_value, i.max_value)
-            self.debug('colorbalance value: %f' % percent_value)
-            retval.append([i.label, percent_value])
-
-        return retval
-
     def _setInitialColorBalance(self, hue, saturation, brightness, contrast):
         self._channels = self._element.list_colorbalance_channels()
         self.debug('colorbalance channels: %d' % len(self._channels))
-        if hue:
-            self.effect_setColorBalanceProperty('Hue', hue)
-        if saturation:
-            self.effect_setColorBalanceProperty('Saturation', saturation)
-        if brightness:
-            self.effect_setColorBalanceProperty('Brightness', brightness)
-        if contrast:
-            self.effect_setColorBalanceProperty('Contrast', contrast)
+        self.effect_setColorBalanceProperty('Hue', hue)
+        self.effect_setColorBalanceProperty('Saturation', saturation)
+        self.effect_setColorBalanceProperty('Brightness', brightness)
+        self.effect_setColorBalanceProperty('Contrast', contrast)
 
 def _value_to_percent(value, min, max):
     """
