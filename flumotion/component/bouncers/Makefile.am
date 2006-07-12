@@ -5,9 +5,10 @@ component_PYTHON = \
 	__init__.py \
 	admin_gtk.py \
 	htpasswdcrypt.py \
+	saltsha256.py \
 	bouncer.py
 
-component_DATA = htpasswdcrypt.xml bouncer.glade
+component_DATA = htpasswdcrypt.xml saltsha256.xml bouncer.glade
 
 
 TAGS_FILES = $(component_PYTHON)
