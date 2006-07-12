@@ -164,7 +164,7 @@ class Bouncer(component.BaseComponent):
         keycard = self._keycards[id]
 
         d = self.medium.callRemote(
-            'expireKeycard', keycard.requesterName, keycard.id)
+            'expireKeycard', keycard.requesterId, keycard.id)
         # we don't need to remove the keycard ourselves, since that's done
         # by the requester when the client is definately gone
 

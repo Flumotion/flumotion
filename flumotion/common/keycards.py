@@ -45,7 +45,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
 
     def __init__(self):
         self.bouncerName = None         # set by requester,decides which bouncer
-        self.requesterName = None       # who is requesting auth ?
+        self.requesterId = None       # who is requesting auth ?
         self.avatarId = None            # avatarId prefered by requester
         self.id = None                  # set by bouncer when authenticated
         self.duration = 0               # means unlimited
@@ -70,13 +70,13 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         """
         return {
             'id':        self.id,
-            'requester': self.requesterName,
+            'requester': self.requesterId,
             'domain':    self.domain
         }
         
     def __repr__(self):
         return "<%s for %r in state %s>" % (self.__class__.__name__,
-            self.requesterName, _statesEnum[self.state])
+            self.requesterId, _statesEnum[self.state])
 
 # class KeycardUACCP: username, address, crypt password
 #       from UsernameCryptPasswordCrypt

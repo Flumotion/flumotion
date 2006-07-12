@@ -135,7 +135,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self._domain = None            # used for auth challenge and on keycard
         self._issuer = HTTPAuthIssuer() # issues keycards; default for compat
         self.bouncerName = None
-        self.requesterName = streamer.getName() # avatarId of streamer component
+        self.requesterId = streamer.getName() # avatarId of streamer component
         
         self.maxclients = -1
         
@@ -207,8 +207,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def setBouncerName(self, bouncerName):
         self.bouncerName = bouncerName
 
-    def setRequesterName(self, requesterName):
-        self.requesterName = requesterName
+    def setRequesterId(self, requesterId):
+        self.requesterId = requesterId
 
     def setIssuerClass(self, issuerClass):
         # FIXME: in the future, we want to make this pluggable and have it
@@ -329,7 +329,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             self.debug('no keycard from issuer, firing None')
             return defer.succeed(None)
 
-        keycard.requesterName = self.requesterName
+        keycard.requesterId = self.requesterId
         keycard._fd = request.transport.fileno()
         
         if self.bouncerName == None:

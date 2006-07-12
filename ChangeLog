@@ -1,6 +1,15 @@
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* TODO:
+	* flumotion/common/keycards.py:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/manager/component.py:
+	  requesterName -> requesterId
+
+2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* TODO:
 	* flumotion/component/bouncers/bouncer.py:
 	* flumotion/component/component.py:
 	* flumotion/component/consumers/disker/disker.py:

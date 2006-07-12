@@ -822,7 +822,7 @@ class ComponentAvatar(base.ManagerAvatar):
         bouncerAvatar = self.heaven.getAvatar(avatarId)
         return bouncerAvatar.removeKeycardId(keycardId)
 
-    def perspective_expireKeycard(self, requesterName, keycardId):
+    def perspective_expireKeycard(self, requesterId, keycardId):
         """
         Expire a keycard (and thus the requester's connection)
         issued to the given requester.
@@ -830,20 +830,20 @@ class ComponentAvatar(base.ManagerAvatar):
         This is called by the bouncer component that authenticated the keycard.
 
         
-        @param requesterName: name (avatarId) of the component that originally
+        @param requesterId: name (avatarId) of the component that originally
                               requested authentication for the given keycardId
-        @type  requesterName: str
+        @type  requesterId: str
         @param keycardId:     id of keycard to expire
         @type  keycardId:     str
         """
         # FIXME: we should also be able to expire manager bouncer keycards
-        if not self.heaven.hasAvatar(requesterName):
+        if not self.heaven.hasAvatar(requesterId):
             self.warning('asked to expire keycard %s for requester %s, ' % (
-                keycardId, requesterName) +
+                keycardId, requesterId) +
                 'but no such component registered')
-            raise errors.UnknownComponentError(requesterName)
+            raise errors.UnknownComponentError(requesterId)
 
-        componentAvatar = self.heaven.getAvatar(requesterName)
+        componentAvatar = self.heaven.getAvatar(requesterId)
         return componentAvatar.expireKeycard(keycardId)
 
     def perspective_reservePortsOnWorker(self, workerName, numberOfPorts):

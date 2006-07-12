@@ -109,8 +109,6 @@
 * MEDIUM	when creating components in jobs, get the actual avatarId
 		in there in some other way than putting it in the config dict
 
-* EASY		change RequesterName to RequesterId
-
 * MEDIUM	block a feeding gst port, and have something eat from it ->
 		hangs in connect.  kill it -> process stays around
 
@@ -127,8 +125,7 @@
 * MEDIUM	run all worker checks in a spawned process - segfaults are less
 		painful that way.  maybe even start a job for it always
 
-* MEDIUM	when a component segfaults, have the worker tell the manager
-		that the component segfaulted and make it sad; maybe even allow
+* MEDIUM	when a component segfaults, allow
 		attaching gdb and filing a bug report
 
 * HARD		clean up/refactor/document admin UI
