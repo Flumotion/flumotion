@@ -1,27 +1,12 @@
-ideas on authentication
------------------------
-
-old system:
-
-workers:
-- worker creates a brain
-- worker tells reactor to use brain's client factory when connecting to manager
-- worker creates credentials
-- brain logs in to worker with those credentials
-- portal passes the credentials to the registered checker, which is
-  ManagerCredentialsChecker
-- requestAvatarId in the checker checks the credentials and returns deferred
-  which will return an avatarId, checkers.ANONYMOUS or raise a
-  Failure(UnauthorizedLogin)
-  - currently, components and admin interfaces are allowed anonymous
-  - others are chained to the parent's (FlexibleCredentialsChecker)
-    requestAvatarId, which currently allows anonymous 
-
-new system:
+FIRST READ
+----------
+Twisted's "cred" howto; in particular, credentials and credentials checkers
 
 IMPLEMENTATION
 --------------
 Credentials(twisted):
+- a collection of authentication information used in determining access
+
 - is an object implementing an ICredential-subclass interface
 - has a check... method, to be called with some data by the checker,
   where the credential interface is the "contract" deciding how this data
@@ -64,6 +49,9 @@ Credentials(twisted):
            hashes from the *same* password :)
 
 Checker(twisted):
+- an object that can perform authentication on credentials against an
+  authentication backend
+
 - is an object implementing an ICredentialChecker-subclass interface
 - is an object that can verify credentials of the interfaces that it has
   listed in credentialInterfaces
@@ -78,6 +66,9 @@ Checker(twisted):
            some challenge/response
   
 Keycard (flumotion):
+- an extension of the Credentials concept to allow using/transferring it over
+  PB connections
+
 - an object exchanged between a Bouncer and something needing authentication
   as a way to exchange information during the authentication setup process
   example: client connecting to an HTTP streamer
@@ -88,7 +79,8 @@ Keycard (flumotion):
   and pb.Copyable
 - keycard can eventually be given to a checker because it implements
   a subclass of ICredentials
-- the keycard implements a subclass of IKeycard, which is the "contract"
+- the keycard implements a subclass of the base Keycard class, which is the
+  "contract"
   between a bouncer and a requester which decides the mechanism of
   data exchange in the auth setup process
   example: a KeycardAddressUsernameCryptPasswordChallenger (KeycardAUCPC)
@@ -97,6 +89,8 @@ Keycard (flumotion):
            The requester sets a response on it by crypting the password
            using the given salt, then performing the response transformation
            on challenge + cryptPassword.
+- the keycard does *not* get serialized back to its original reference; it
+  should always be treated as a "new" object when receiving it over PB
 
 - Keycard base class:
   - has:

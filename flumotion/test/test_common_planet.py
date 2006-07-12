@@ -50,6 +50,7 @@ class AllComponentStateTest(unittest.TestCase):
     def setUp(self):
         self.mstate = planet.ManagerComponentState()
         self.astate = jelly.unjelly(jelly.jelly(self.mstate))
+        self.failUnless(isinstance(self.astate, planet.AdminComponentState))
 
     def mset(self, key, value):
         # helper function to set on manager state and propagate
