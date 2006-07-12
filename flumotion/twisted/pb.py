@@ -46,7 +46,7 @@ from flumotion.twisted.compat import implements
 ### Keycard-based FPB objects
 
 # we made three changes to the standard PBClientFactory:
-# 1) the root object has a getKeycardInterfaces() call that the server
+# 1) the root object has a getKeycardClasses() call that the server
 #    uses to tell clients about the interfaces it supports
 # 2) you can request a specific interface for the avatar to
 #    implement, instead of only IPerspective
@@ -77,14 +77,14 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
     medium = None
     perspectiveInterface = None # override in subclass
 
-    def getKeycardInterfaces(self):
+    def getKeycardClasses(self):
         """
         Ask the remote PB server for all the keycard interfaces it supports.
 
         @rtype: L{defer.Deferred} returning list of str
         """
         def getRootObjectCb(root):
-            return root.callRemote('getKeycardInterfaces')
+            return root.callRemote('getKeycardClasses')
 
         d = self.getRootObject()
         d.addCallback(getRootObjectCb)
@@ -111,9 +111,9 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         interfaces = [reflect.qual(interface)
                           for interface in interfaces]
             
-        def getKeycardInterfacesCb(keycardInterfaces):
-            self.debug('supported keycard interfaces: %r' % keycardInterfaces)
-            d = authenticator.issue(keycardInterfaces)
+        def getKeycardClassesCb(keycardClasses):
+            self.debug('supported keycard classes: %r' % keycardClasses)
+            d = authenticator.issue(keycardClasses)
             return d
 
         def issueCb(keycard):
@@ -121,8 +121,8 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
             self.debug('using keycard: %r' % self.keycard)
             return self.keycard
 
-        d = self.getKeycardInterfaces()
-        d.addCallback(getKeycardInterfacesCb)
+        d = self.getKeycardClasses()
+        d.addCallback(getKeycardClassesCb)
         d.addCallback(issueCb)
         d.addCallback(lambda r: self.getRootObject())
         d.addCallback(self._cbSendKeycard, authenticator, self.medium,
@@ -306,13 +306,13 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
         self.bouncerPortal = bouncerPortal
         self.broker = broker
 
-    def remote_getKeycardInterfaces(self):
+    def remote_getKeycardClasses(self):
         """
         @returns: the fully-qualified class names of supported keycard
                   interfaces
         @rtype:   list of str
         """
-        return self.bouncerPortal.getKeycardInterfaces()
+        return self.bouncerPortal.getKeycardClasses()
 
     def remote_login(self, keycard, mind, *interfaces):
         """
@@ -390,12 +390,12 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
-    def issue(self, keycardInterfaces):
+    def issue(self, keycardClasses):
         """
         Issue a keycard that implements one of the given interfaces.
 
-        @param keycardInterfaces: list of fully qualified interface classes
-        @type  keycardInterfaces: list of str
+        @param keycardClasses: list of fully qualified keycard classes
+        @type  keycardClasses: list of str
 
         @rtype: L{defer.Deferred} firing L{keycards.Keycard}
         """
@@ -415,14 +415,14 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         # expand to fully qualified names
         supported = [reflect.qual(k) for k in supported]
 
-        for i in keycardInterfaces:
+        for i in keycardClasses:
             if i in supported:
                 self.debug('Keycard interface %s supported, looking up' % i)
                 name = i.split(".")[-1]
                 methodName = "issue_%s" % name
                 method = getattr(self, methodName)
                 keycard = method()
-                self.debug('Issuing keycard %r for interface %s' % (
+                self.debug('Issuing keycard %r of class %s' % (
                     keycard, name))
                 keycard.avatarId = self.avatarId
                 return defer.succeed(keycard)

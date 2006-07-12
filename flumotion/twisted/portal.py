@@ -53,7 +53,7 @@ class BouncerPortal(log.Loggable):
         self.bouncer = bouncer
         self._adminCounter = 0
 
-    def getKeycardInterfaces(self):
+    def getKeycardClasses(self):
         """
         Return the Keycard interfaces supported by this portal's bouncer.
 

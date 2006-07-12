@@ -1,6 +1,13 @@
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/twisted/pb.py:
+	* flumotion/twisted/portal.py:
+	  change getKeycardInterfaces to getKeycardClasses.  That was pretty
+	  dumb.
+
+2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/pb.py:
 	  - add an Authenticator object that can issue keycards and respond
 	    to challenges on keycards, given the secret data necessary
 	  - use this authenticator as an argument to login and startLogin,
