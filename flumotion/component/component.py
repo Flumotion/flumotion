@@ -36,7 +36,7 @@ from twisted.spread import pb
 from twisted.python import reflect
 
 from flumotion.common import interfaces, errors, log, planet, medium, pygobject
-from flumotion.common import componentui, common, registry, messages
+from flumotion.common import componentui, common, registry, messages, interfaces
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.twisted import credentials
@@ -49,6 +49,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     I am a client factory for a component logging in to the manager.
     """
     logCategory = 'component'
+    perspectiveInterface = interfaces.IComponentMedium
     def __init__(self, component):
         """
         @param component: L{flumotion.component.component.BaseComponent}
@@ -114,10 +115,6 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         d.addErrback(alreadyLoggedInErrback)
         d.addErrback(loginFailedErrback)
 
-    def startLogin(self, keycard):
-        fpb.ReconnectingFPBClientFactory.startLogin(self, keycard, self.medium,
-                                                    interfaces.IComponentMedium)
-        
 # needs to be before BaseComponent because BaseComponent references it
 class BaseComponentMedium(medium.PingingMedium):
     """

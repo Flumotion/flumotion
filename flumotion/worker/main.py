@@ -29,7 +29,7 @@ from twisted.internet import reactor
 from flumotion.configure import configure
 from flumotion.common import log, keycards, common, errors
 from flumotion.worker import worker, config
-from flumotion.twisted import credentials
+from flumotion.twisted import pb
 
 def main(args):
     parser = optparse.OptionParser()
@@ -236,10 +236,13 @@ def main(args):
                                                        options.port,
                                                        options.transport.upper()))
 
-    keycard = keycards.KeycardUACPP(options.username, options.password,
-                                    'localhost')
-    keycard.avatarId = options.name
-    brain.login(keycard)
+    authenticator = pb.Authenticator(
+        username=options.username,
+        password=options.password,
+        address='localhost', # FIXME: why localhost ?
+        avatarId=options.name
+    )
+    brain.login(authenticator)
 
     reactor.addSystemEventTrigger('after', 'startup',
         brain.installSIGTERMHandler)

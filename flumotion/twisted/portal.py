@@ -27,7 +27,7 @@ from twisted.spread import flavors
 from twisted.internet import defer
 from twisted.cred import error
 from twisted.cred.portal import Portal
-from twisted.python import failure
+from twisted.python import failure, reflect
 from twisted.python.components import registerAdapter
 
 from flumotion.common import keycards, log, interfaces
@@ -53,6 +53,14 @@ class BouncerPortal(log.Loggable):
         self.bouncer = bouncer
         self._adminCounter = 0
 
+    def getKeycardInterfaces(self):
+        """
+        Return the Keycard interfaces supported by this portal's bouncer.
+
+        @rtype: list of str
+        """
+        return [reflect.qual(k) for k in self.bouncer.keycardClasses]
+            
     def login(self, keycard, mind, *ifaces):
         """
         Log in the keycard to the portal using the bouncer.

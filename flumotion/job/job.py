@@ -40,6 +40,7 @@ from flumotion.common import config, errors, interfaces, log, registry, keycards
 from flumotion.common import medium, package
 from flumotion.common.reflectcall import createComponent
 from flumotion.component import component
+from flumotion.twisted import pb as fpb
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.twisted.compat import implements
 
@@ -69,7 +70,7 @@ class JobMedium(medium.BaseMedium):
         self._componentClientFactory = None # from component to manager
 
     ### pb.Referenceable remote methods called on by the WorkerBrain
-    def remote_bootstrap(self, workerName, host, port, transport, keycard,
+    def remote_bootstrap(self, workerName, host, port, transport, authenticator,
             packagePaths):
         """
         I receive the information on how to connect to the manager. I also set
@@ -94,7 +95,7 @@ class JobMedium(medium.BaseMedium):
         assert isinstance(host, str)
         assert isinstance(port, int)
         assert transport in ('ssl', 'tcp')
-        assert isinstance(keycard, keycards.Keycard)
+        assert isinstance(authenticator, pb.RemoteReference)
         assert isinstance(packagePaths, list)
 
         self.debug('remote_bootstrap')
@@ -102,7 +103,7 @@ class JobMedium(medium.BaseMedium):
         self._managerHost = host
         self._managerPort = port
         self._managerTransport = transport
-        self._managerKeycard = keycard
+        self._authenticator = fpb.RemoteAuthenticator(authenticator)
         
         packager = package.getPackager()
         for name, path in packagePaths:
@@ -244,14 +245,13 @@ class JobMedium(medium.BaseMedium):
         managerClientFactory = component.ComponentClientFactory(comp)
         self._componentClientFactory = managerClientFactory
         self.debug('created ComponentClientFactory %r' % managerClientFactory)
-        keycard = self._managerKeycard
-        keycard.avatarId = avatarId
-        managerClientFactory.startLogin(keycard)
+        self._authenticator.avatarId = avatarId
+        managerClientFactory.startLogin(self._authenticator)
 
         host = self._managerHost
         port = self._managerPort
         transport = self._managerTransport
-        self.debug('logging in')
+        self.debug('logging in with authenticator %r' % self._authenticator)
         if transport == "ssl":
             from twisted.internet import ssl
             self.info('Connecting to manager %s:%d with SSL' % (host, port))
@@ -274,6 +274,7 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     @type medium: L{JobMedium}
     """
     logCategory = "job"
+    perspectiveInterface = interfaces.IJobMedium    
 
     def __init__(self, id):
         """

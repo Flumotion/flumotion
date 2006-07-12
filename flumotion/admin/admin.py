@@ -48,34 +48,18 @@ from flumotion.twisted.compat import implements
 
 from flumotion.common.pygobject import gsignal, gproperty
 
-# FIXME: keycard should be created and handed to factory instead
 class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
-    def __init__(self, medium, user=None, passwd=None, keycard=None):
+    perspectiveInterface = interfaces.IAdminMedium
+
+    def __init__(self, medium):
         """
         @type medium:   AdminModel
-        @param user:    username to log in with
-        @param passwd:  password to log in with
-        @param keycard: Credentials to log in with (optional, can be
-                        specified instead of user/passwd)
         """
         fpb.ReconnectingFPBClientFactory.__init__(self)
-
-        self.user = user
-        self.passwd = passwd
         self.medium = medium
         self.maxDelay = 20
 
         self.hasBeenConnected = 0
-
-        # FIXME: try more than one auth method
-        #keycard = keycards.KeycardUACPP(user, passwd, 'localhost')
-        if keycard is None:
-            keycard = keycards.KeycardUACPCC(user, 'localhost')
-        # FIXME: decide on an admin name ?
-        keycard.avatarId = "admin"
-
-        # start logging in
-        self.startLogin(keycard, medium, interfaces.IAdminMedium)
 
     def clientConnectionMade(self, broker):
       self.hasBeenConnected = 1
@@ -198,7 +182,13 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
 
     # a method so mock testing frameworks can override it
     def _makeFactory(self, username=None, password=None, keycard=None):
-        return AdminClientFactory(self, username, password, keycard)
+        # FIXME: this needs further refactoring, so we only ever pass
+        # an authenticator.  For that we need to fix all users of this
+        # class too
+        a = fpb.Authenticator(username=username, password=password)
+        factory = AdminClientFactory(self)
+        factory.startLogin(a)
+        return factory
 
     def connectToHost(self, host, port, use_insecure=False):
         'Connect to a host.'

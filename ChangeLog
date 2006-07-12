@@ -1,3 +1,33 @@
+2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/pb.py:
+	  - add an Authenticator object that can issue keycards and respond
+	    to challenges on keycards, given the secret data necessary
+	  - use this authenticator as an argument to login and startLogin,
+	    instead of the keycard directly.  Also always use self.medium
+	    as the client, and self.perspectiveInterface as the interface
+	    being requested
+	  - add a remote_getKeycardInterfaces to announce which keycards the
+	    manager supports
+	  - add a RemoteAuthenticator adapter that can be used to adapt
+	    the pb.RemoteReference for an Authenticator to the same
+	    Authenticator "interface"
+	* flumotion/twisted/portal.py:
+	  add getKeycardInterfaces()
+	* flumotion/admin/admin.py:
+	* flumotion/component/component.py:
+	  use the new startLogin with an authenticator
+	  add perspectiveInterface to the FPB.ClientFactory subclasses
+	* flumotion/worker/main.py:
+	* flumotion/worker/worker.py:
+	* flumotion/job/job.py:
+	  same as above;
+	  also change keycard to authenticator everywhere,
+	  and use the RemoteAuthenticator adapter in remote_bootstrap
+	* flumotion/test/test_pb.py:
+	  Test the new FPB, which uses authenticator
+	  Also add test for the saltsha256 bouncer
+
 2006-07-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py

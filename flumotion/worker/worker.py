@@ -50,21 +50,19 @@ class WorkerClientFactory(factoryClass):
     I am a client factory for the worker to log in to the manager.
     """
     logCategory = 'worker'
+    perspectiveInterface = interfaces.IWorkerMedium
+
     def __init__(self, brain):
         """
         @type brain: L{flumotion.worker.worker.WorkerBrain}
         """
         self._managerHost = brain.managerHost
         self._managerPort = brain.managerPort
-        self._medium = brain.medium
+        self.medium = brain.medium
         # doing this as a class method triggers a doc error
         factoryClass.__init__(self)
         # maximum 10 second delay for workers to attempt to log in again
         self.maxDelay = 10
-        
-    def startLogin(self, keycard):
-        factoryClass.startLogin(self, keycard, self._medium,
-            interfaces.IWorkerMedium)
         
     ### ReconnectingPBClientFactory methods
     def gotDeferredLogin(self, d):
@@ -81,7 +79,7 @@ class WorkerClientFactory(factoryClass):
             self.info("Logged in to manager")
             self.debug("remote reference %r" % reference)
            
-            self._medium.setRemoteReference(reference)
+            self.medium.setRemoteReference(reference)
             reference.notifyOnDisconnect(remoteDisconnected)
 
         def alreadyConnectedErrback(failure):
@@ -435,8 +433,8 @@ class WorkerBrain(log.Loggable):
     related.
     I live in the main worker process.
 
-    @ivar keycard:             the keycard worker used to log in to manager
-    @type keycard              L{flumotion.common.keycards.Keycard}
+    @ivar authenticator:       authenticator worker used to log in to manager
+    @type authenticator        L{flumotion.twisted.pb.Authenticator}
     @ivar kindergarten:
     @type kindergarten:        L{Kindergarten}
     @ivar medium:
@@ -460,7 +458,7 @@ class WorkerBrain(log.Loggable):
         self.managerPort = options.port
         self.managerTransport = options.transport
         
-        self.keycard = None
+        self.authenticator = None
         self.medium = WorkerMedium(self, self.options.feederports)
         self._socketPath = _getSocketPath()
         self.kindergarten = Kindergarten(options, self._socketPath, self)
@@ -480,11 +478,10 @@ class WorkerBrain(log.Loggable):
 
         self._createDeferreds = {}
 
-    def login(self, keycard):
-        # called by worker/main.py
-        self.keycard = keycard
-        self.workerClientFactory.startLogin(keycard)
-                             
+    def login(self, authenticator):
+        self.authenticator = authenticator
+        self.workerClientFactory.startLogin(authenticator)
+
     def _setupJobServerFactory(self):
         # called from __init__
         dispatcher = JobDispatcher(self.jobHeaven)
@@ -666,7 +663,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
         kid = self._heaven.brain.kindergarten.getKid(self.avatarId)
 
         d = self._mind.callRemote('bootstrap', self._heaven.getWorkerName(),
-            host, port, transport, self._heaven.getKeycard(), kid.bundles)
+            host, port, transport, self._heaven.getAuthenticator(), kid.bundles)
 
         yield d
         d.value() # allow exceptions
@@ -740,13 +737,13 @@ class JobHeaven(pb.Root, log.Loggable):
         dl.addCallback(lambda result: self.debug('Stopped all jobs'))
         return dl
 
-    def getKeycard(self):
+    def getAuthenticator(self):
         """
-        Gets the keycard that the worker used to log in to the manager.
+        Gets the authenticator that the worker used to log in to the manager.
 
-        @rtype: L{flumotion.common.keycards.Keycard}
+        @rtype: L{flumotion.twisted.pb.Authenticator}
         """
-        return self.brain.keycard
+        return self.brain.authenticator
 
     def getWorkerName(self):
         """
