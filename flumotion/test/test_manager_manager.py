@@ -507,13 +507,20 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         #pprint.pprint(mappers.keys())
         self.assertEqual(len(mappers.keys()), 8)
 
-        self._verifyComponentIdGone(id)
+        # We logged it out without it doing a clean shutdown, so it should now
+        # be lost.
+        self._verifyComponentIdGone(id, moods.lost)
 
         # log out the converter and verify
         id = '/testflow/converter-ogg-theora'
         m = mappers[id]
         avatar = self._components[id]
+        # Pretend this one is a clean, requested shutdown.
+        avatar._shutdown_requested = True
         self._logoutAvatar(avatar)
+
+        # We requested shutdown, so this should now be sleeping.
+        self._verifyComponentIdGone(id, moods.sleeping)
 
         self._verifyConfigAndNoWorker()
     testConfigBeforeWorker.skip = "Help, thomas..."
@@ -547,13 +554,19 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         #pprint.pprint(mappers.keys())
         self.assertEqual(len(mappers.keys()), 8)
 
-        self._verifyComponentIdGone(id)
+        # We logged it out without it doing a clean shutdown, so it should now
+        # be lost.
+        self._verifyComponentIdGone(id, moods.lost)
         
         # log out the converter and verify
         id = '/testflow/converter-ogg-theora'
         m = mappers[id]
         avatar = self._components[id]
+        # Pretend this one is a clean, requested shutdown.
+        avatar._shutdown_requested = True
         self._logoutAvatar(avatar)
+
+        self._verifyComponentIdGone(id, moods.sleeping)
 
         self._verifyConfigAndNoWorker()
 
@@ -630,7 +643,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         self._verifyComponentIdGone('/testflow/converter-ogg-theora')
         self._verifyComponentIdGone('/testflow/producer-video-test')
 
-    def _verifyComponentIdGone(self, id):
+    def _verifyComponentIdGone(self, id, expectedMood=None):
         # verify logged out components
         mappers = self.vishnu._componentMappers
         m = mappers[id]
@@ -643,8 +656,10 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         self.assertEqual(m.avatar, None)
         self.failUnless(m.state)
         state = m.state
-        self.assertEqual(state.get('mood'), moods.sleeping.value,
-            'mood is %s instead of sleeping' % moods.get(state.get('mood')))
+        if expectedMood: # Only check this if we had an expected mood passed
+            self.assertEqual(state.get('mood'), expectedMood.value,
+                'mood is %s instead of %s' % (moods.get(state.get('mood')),
+                expectedMood))
 
         # verify avatar state
         self.failIf(avatar.jobState)

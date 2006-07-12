@@ -1,5 +1,15 @@
 2006-07-12  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/test/test_manager_manager.py:
+	  Improve test so that we test both expected and unexpected logouts,
+	  and ensure that the state is correct (sleeping for expected, lost
+	  for unexpected) after this. 
+
+	* flumotion/test/test_worker_worker.py:
+	  Make FakeRef stub out a few other things.
+
+2006-07-12  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/twisted/pb.py:
 	  Move PingableAvatar here.
 

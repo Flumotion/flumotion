@@ -22,7 +22,7 @@
 import common
 from twisted.trial import unittest
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 
 from flumotion.worker import worker
 
@@ -80,6 +80,9 @@ class TestWorkerClientFactory(unittest.TestCase):
 class FakeRef:
     def notifyOnDisconnect(self, callback):
         pass
+
+    def callRemote(self, method, *args, **kwargs):
+        return defer.succeed(None)
 
 class TestWorkerMedium(unittest.TestCase):
     def testSetRemoteReference(self):
