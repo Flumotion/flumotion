@@ -1,5 +1,14 @@
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent.py:
+	* flumotion/job/job.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/component.py:
+	* flumotion/worker/feed.py:
+	  doc fixes
+
+2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* TODO:
 	* flumotion/common/keycards.py:
 	* flumotion/component/bouncers/bouncer.py:

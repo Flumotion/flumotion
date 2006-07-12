@@ -337,7 +337,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         @since: 0.3.1
 
         @returns: a deferred, returning a list of keycard class names
-        @rtype:   L{defer.Deferred} firing list of str
+        @rtype:   L{twisted.internet.defer.Deferred} firing list of str
         """
         list = self.vishnu.bouncer.keycardClasses
         return [reflect.qual(c) for c in list]

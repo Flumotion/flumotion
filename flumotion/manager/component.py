@@ -168,8 +168,8 @@ class FeederSet(log.Loggable):
 
     def __init__(self, flowName):
         """
-        @ivar flow: name of the flow this feederset manages feeds for
-        @type flow: str
+        @param flowName: name of the flow this feederset manages feeds for
+        @type  flowName: str
         """
         self.flow = flowName
         self.logName = flowName

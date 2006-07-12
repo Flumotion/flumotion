@@ -47,7 +47,7 @@ class ProxyManagerBouncer(log.Loggable):
     """
     def __init__(self, remote):
         """
-        @param medium: an object that has .callRemote()
+        @param remote: an object that has .callRemote()
         """
         self._remote = remote
 
@@ -245,7 +245,7 @@ class FeedMedium(pb.Referenceable, log.Loggable):
 
     @ivar component:   the component this is a feed client for
     @type component:   L{flumotion.component.feedcomponent.FeedComponent}
-    @ivar remote:       a reference to a L{FeedComponentAvatar}
+    @ivar remote:       a reference to a L{FeedAvatar}
     @type remote:       L{twisted.spread.pb.RemoteReference}
     """
     logCategory = 'feedmedium'

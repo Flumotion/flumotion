@@ -465,7 +465,7 @@ class Effect(log.Loggable):
         adding keys to the UI state.
         
         @param state: the UI state for the component to use.
-        @type  state: L{flumotion.common.componentui.ComponentUIState}
+        @type  state: L{flumotion.common.componentui.WorkerComponentUIState}
         """                               
         self.uiState = state
 

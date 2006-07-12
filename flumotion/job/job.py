@@ -81,18 +81,20 @@ class JobMedium(medium.BaseMedium):
         
         Called by the worker's JobAvatar.
         
-        @param workerName:   the name of the worker running this job
-        @type  workerName:   str
-        @param host:         the host that is running the manager
-        @type  host:         str
-        @param port:         port on which the manager is listening
-        @type  port:         int
-        @param transport:    'tcp' or 'ssl'
-        @type  transport:    str
-        @param keycard:      credentials used to log in to the manager
-        @type  keycard:      L{flumotion.common.keycards.Keycard}
-        @param packagePaths: ordered list of (package name, package path) tuples
-        @type  packagePaths: list of (str, str)
+        @param workerName:    the name of the worker running this job
+        @type  workerName:    str
+        @param host:          the host that is running the manager
+        @type  host:          str
+        @param port:          port on which the manager is listening
+        @type  port:          int
+        @param transport:     'tcp' or 'ssl'
+        @type  transport:     str
+        @param authenticator: remote reference to the worker-side authenticator
+        @type  authenticator: L{twisted.spread.pb.RemoteReference} to a
+                              L{flumotion.twisted.pb.Authenticator}
+        @param packagePaths:  ordered list of
+                              (package name, package path) tuples
+        @type  packagePaths:  list of (str, str)
         """
         assert isinstance(workerName, str)
         assert isinstance(host, str)
@@ -274,10 +276,11 @@ class JobClientBroker(pb.Broker, log.Loggable):
     over the same connection as the normal PB data stream.
     When an FD is seen, the FD should be added to a given eater or feeder
     element.
-
-    @param connectionClass: a subclass of L{twisted.internet.tcp.Connection}
     """
     def __init__(self, connectionClass, **kwargs):
+        """
+        @param connectionClass: a subclass of L{twisted.internet.tcp.Connection}
+        """
         pb.Broker.__init__(self, **kwargs)
 
         self._connectionClass = connectionClass
