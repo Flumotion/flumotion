@@ -1,3 +1,9 @@
+2006-07-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.failedSlaveStart): Removed, this code path is
+	gone now.
+
 2006-07-12  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/medium.py:

@@ -552,14 +552,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     ### END OF THREAD-AWARE CODE
 
-    def failedSlavedStart(self, failure):
-        self.warning("Failed to start slaved streamer: %s" % failure)
-        m = messages.Error(T_(
-            N_("Porter '%s' not found, cannot slave this streamer to it."), 
-            self._porterId))
-        self.addMessage(m)
-        self.setMood(moods.sad)
-
     def do_stop(self):
         def stoppedStreamer(result):
             self.setMood(moods.sleeping)
