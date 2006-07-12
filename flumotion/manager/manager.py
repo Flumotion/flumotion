@@ -849,10 +849,17 @@ class Vishnu(log.Loggable):
         self.debug('need to stop %d components: %r' % (
             len(components), components))
 
-        # FIXME: this is where we need some order
+        # FIXME: we should shut components down in the correct order (according
+        # to the dependency graph); this uses an undefined ordering.
         for c in components:
             avatar = self._componentMappers[c].avatar
-            d.addCallback(lambda result, a: a.stop(), avatar)
+            # If this has logged out, but isn't sleeping (so is sad or lost),
+            # we won't have an avatar. So, stop if it we can.
+            if avatar:
+                d.addCallback(lambda result, a: a.stop(), avatar)
+            else:
+                assert (c.get('mood') is moods.sad.value or 
+                    c.get('mood') is moods.lost.value)
 
         d.addCallback(self._emptyPlanetCallback)
 

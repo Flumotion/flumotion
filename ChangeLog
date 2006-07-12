@@ -1,5 +1,14 @@
 2006-07-12  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/common/medium.py:
+	  Remove bogus method.
+
+	* flumotion/manager/manager.py:
+	  When cleaning out the planet, we can only send stop() to components
+	  for which we have avatars - if it's lost or sad, we might not.
+
+2006-07-12  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/test/test_manager_manager.py:
 	  Improve test so that we test both expected and unexpected logouts,
 	  and ensure that the state is correct (sleeping for expected, lost

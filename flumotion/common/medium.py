@@ -216,10 +216,6 @@ class PingingMedium(BaseMedium):
         else:
             self._pingCheckDC = reactor.callLater(self._pingCheckInterval,
                                                   self._pingCheck)
-    def connectionLost(self, reason):
-        self.stopPinging()
-        BaseMedium.connectionLost(self, reason)
-
     def stopPinging(self):
         if self._pingCheckDC:
             self._pingCheckDC.cancel()
