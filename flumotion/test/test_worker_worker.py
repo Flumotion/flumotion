@@ -78,18 +78,28 @@ class TestWorkerClientFactory(unittest.TestCase):
             return d
 
 class FakeRef:
+    def __init__(self):
+        self._callbacks = []
+
     def notifyOnDisconnect(self, callback):
-        pass
+        self._callbacks.append(callback)
 
     def callRemote(self, method, *args, **kwargs):
         return defer.succeed(None)
+
+    def _disconnect(self):
+        for cb in self._callbacks:
+            cb(self)
 
 class TestWorkerMedium(unittest.TestCase):
     def testSetRemoteReference(self):
         brain = worker.WorkerBrain(FakeOptions())
         self.medium = worker.WorkerMedium(brain, [])
-        self.medium.setRemoteReference(FakeRef())
+        ref = FakeRef()
+        self.medium.setRemoteReference(ref)
         self.assert_(self.medium.hasRemoteReference())
+
+        ref._disconnect()
 
         d = brain.teardown()
         if weHaveAnOldTwisted():

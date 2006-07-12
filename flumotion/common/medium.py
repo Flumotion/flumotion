@@ -231,5 +231,9 @@ class PingingMedium(BaseMedium):
 
     def setRemoteReference(self, remote):
         BaseMedium.setRemoteReference(self, remote)
+        def stopPingingCb(x):
+            self.stopPinging()
+        self.remote.notifyOnDisconnect(stopPingingCb)
+
         self.startPinging(self._disconnect)
 

@@ -78,6 +78,13 @@ class FakeWorkerMind(FakeMind):
         # need to return the avatarId for comparison
         return avatarId
 
+class FakeVishnu:
+    def workerAttached(self, avatar):
+        pass
+
+    def workerDetached(self, avatar):
+        pass
+
 class TestHeaven(unittest.TestCase):
     def testConstructor(self):
         h = worker.WorkerHeaven(None)
@@ -97,10 +104,14 @@ class TestHeaven(unittest.TestCase):
         h = worker.WorkerHeaven(None)
 
     def testAttached(self):
-        h = worker.WorkerHeaven(None)
+        h = worker.WorkerHeaven(FakeVishnu())
         # need to create fake mind so workerAttached works
         mind = FakeWorkerMind(self, 'testworker')
         avatar = h.createAvatar('foo', None)
         avatar.attached(mind)
 
         h.workerAttached(avatar)
+
+        # Have to detach it to ensure cleanup happens.
+        avatar.detached(mind)
+

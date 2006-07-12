@@ -62,8 +62,6 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
 
         self.debug("created new Avatar with id %s" % avatarId)
 
-        self.startPingChecking(self.timeoutDisconnect)
-
     def timeoutDisconnect(self):
         if self.hasRemoteReference():
             self.debug("Disconnecting due to ping timeout")
@@ -146,6 +144,9 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
                 common.addressGetHost(tarzan),
                 common.addressGetHost(jane)))
         self.log('Client attached is mind %s' % mind)
+
+        # Now we have a remote reference, so start checking pings.
+        self.startPingChecking(self.timeoutDisconnect)
 
     def detached(self, mind):
         """

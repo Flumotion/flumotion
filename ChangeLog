@@ -1,3 +1,17 @@
+2006-07-12  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/medium.py:
+	  Stop pinging on remoteReference disconnection.
+
+	* flumotion/manager/base.py:
+	  Don't start ping-checking until we have an attached mind.
+
+	* flumotion/test/test_manager_manager.py:
+	* flumotion/test/test_manager_worker.py:
+	* flumotion/test/test_worker_worker.py:
+	  Fix tests to clean up properly so that we don't have unclear
+	  reactors.
+
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/bouncers/htpasswdcrypt.py:

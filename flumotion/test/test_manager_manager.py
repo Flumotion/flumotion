@@ -534,7 +534,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         file = os.path.join(__thisdir, 'test.xml')
 
         # log in worker
-        avatar = self._loginWorker('worker')
+        workerAvatar = avatar = self._loginWorker('worker')
         self.failUnlessEqual(len(self._workers), 1)
         self.failUnlessEqual(len(self._components), 0)
         
@@ -569,6 +569,9 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         self._verifyComponentIdGone(id, moods.sleeping)
 
         self._verifyConfigAndNoWorker()
+
+        # Now log out the worker.
+        self._logoutAvatar(workerAvatar)
 
         # clear out the complete planet
         d = self.vishnu.emptyPlanet()
