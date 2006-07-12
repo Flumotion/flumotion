@@ -75,8 +75,8 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         }
         
     def __repr__(self):
-        return "<%s in state %s>" % (self.__class__.__name__,
-            _statesEnum[self.state])
+        return "<%s for %r in state %s>" % (self.__class__.__name__,
+            self.requesterName, _statesEnum[self.state])
 
 # class KeycardUACCP: username, address, crypt password
 #       from UsernameCryptPasswordCrypt

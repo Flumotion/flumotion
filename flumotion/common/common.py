@@ -463,9 +463,75 @@ def addressGetPort(a):
 def componentPath(componentName, parentName):
     """
     Create a path string out of the name of a component and its parent.
+
+    @deprecated Use @componentId instead
     """
-    
     return '/%s/%s' % (parentName, componentName)
+
+def componentId(parentName, componentName):
+    """
+    Create a componentId based on the parentName and componentName.
+
+    @since: 0.3.1
+
+    @rtype: str
+    """
+    return '/%s/%s' % (parentName, componentName)
+
+def parseComponentId(componentId):
+    """
+    @since: 0.3.1
+
+    @rtype:  tuple of (str, str)
+    @return: tuple of (flowName, componentName)
+    """
+    list = componentId.split("/")
+    assert len(list) == 3
+    assert list[0] == ''
+    return (list[1], list[2])
+
+def feedId(componentName, feedName):
+    """
+    Create a feedId based on the componentName and feedName.
+
+    @since: 0.3.1
+
+    @rtype: str
+    """
+    return "%s:%s" % (componentName, feedName)
+
+def parseFeedId(feedId):
+    """
+    @since: 0.3.1
+
+    @rtype:  tuple of (str, str)
+    @return: tuple of (componentName, feedName)
+    """
+    list = feedId.split(":")
+    assert len(list) == 2
+    return (list[0], list[1])
+
+def fullFeedId(flowName, componentName, feedName):
+    """
+    Create a fullFeedId based on the flowName, componentName and feedName.
+
+    @since: 0.3.1
+
+    @rtype: str
+    """
+    return feedId(componentId(flowName, componentName), feedName)
+
+def parseFullFeedId(fullFeedId):
+    """
+    @since: 0.3.1
+
+    @rtype:  tuple of (str, str, str)
+    @return: tuple of (flowName, componentName, feedName)
+    """
+    list = fullFeedId.split(":")
+    assert len(list) == 2
+    flowName, componentName = parseComponentId(list[0])
+    return (flowName, componentName, list[1])
 
 def objRepr(object):
     """

@@ -299,7 +299,10 @@ class FakeWorkerMind(FakeMind):
         self.avatarId = avatarId
 
     def remote_getPorts(self):
-        return range(7600,7610)
+        return range(7600,7608)
+
+    def remote_getFeedServerPort(self):
+        return 7609
 
     def remote_create(self, avatarId, type, moduleName, methodName, config):
         self.debug('remote_create(%s): logging in component' % avatarId)
@@ -339,8 +342,8 @@ class FakeComponentMind(FakeMind):
     def remote_setup(self, config):
         self.debug('remote_setup(%r)' % config)
 
-    def remote_start(self, eatersData, feedersData, clocking):
-        self.debug('remote_start(%r, %r)' % (eatersData, feedersData))
+    def remote_start(self, clocking):
+        self.debug('remote_start(%r)' % clocking)
         self.testcase.failUnless(hasattr(self, 'state'))
         self.testcase.failUnless(hasattr(self.state, 'observe_set'))
         

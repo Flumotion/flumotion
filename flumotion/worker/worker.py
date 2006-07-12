@@ -38,11 +38,12 @@ import twisted.internet.error
 
 from flumotion.common import errors, interfaces, log, bundleclient
 from flumotion.common import common, medium, messages, worker
-from flumotion.twisted import checkers
+from flumotion.twisted import checkers, fdserver, compat
 from flumotion.twisted import pb as fpb
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.twisted.compat import implements
 from flumotion.configure import configure
+from flumotion.worker import feed
 
 factoryClass = fpb.ReconnectingFPBClientFactory
 class WorkerClientFactory(factoryClass):
@@ -140,7 +141,19 @@ class WorkerMedium(medium.PingingMedium):
         @rtype:  list of int
         @return: list of ports
         """
+        self.debug('REMOTE -> WORKER: remote_getPorts(): %r' % self._ports)
         return self._ports
+
+    def remote_getFeedServerPort(self):
+        """
+        Return the TCP port the Feed Server is listening on.
+
+        @rtype:  int
+        @return: TCP port number
+        """
+        port = self.brain.feedServerPort
+        self.debug('REMOTE -> WORKER: getFeedServerPort(): %d' % port)
+        return port
 
     def remote_create(self, avatarId, type, moduleName, methodName, config):
         """
@@ -167,7 +180,6 @@ class WorkerMedium(medium.PingingMedium):
         #     print ('[%d]%s%s' % (os.getpid(), indent, str)) % args
         # debug.trace_start(ignore_files_re='twisted/python/rebuild',
         #      write=write)
-
         self.info('Starting component "%s" of type "%s"' % (avatarId, type))
         self.debug('remote_create(): id %s, type %s, config %r' % (
             avatarId, type, config))
@@ -443,7 +455,11 @@ class WorkerBrain(log.Loggable):
     @type jobHeaven:           L{JobHeaven}
     @ivar workerClientFactory:
     @type workerClientFactory: L{WorkerClientFactory}
+    @ivar feedServerPort:      TCP port the Feed Server is listening on
+    @type feedServerPort:      int
     """
+
+    compat.implements(interfaces.IFeedServerParent)
 
     logCategory = 'workerbrain'
 
@@ -454,12 +470,14 @@ class WorkerBrain(log.Loggable):
         """
         self.options = options
         self.workerName = options.name
+
         self.managerHost = options.host
         self.managerPort = options.port
         self.managerTransport = options.transport
         
         self.authenticator = None
-        self.medium = WorkerMedium(self, self.options.feederports)
+        # the last one is reserved for our FeedServer
+        self.medium = WorkerMedium(self, self.options.feederports[:-1])
         self._socketPath = _getSocketPath()
         self.kindergarten = Kindergarten(options, self._socketPath, self)
         self.jobHeaven = JobHeaven(self)
@@ -474,7 +492,11 @@ class WorkerBrain(log.Loggable):
         # not catch it (because it compares to the default int handler)
         # signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-        self._jobServerFactory = self._setupJobServerFactory()
+        self._jobServerFactory, self._jobServerPort = self._setupJobServer()
+        self._feedServerFactory = feed.feedServerFactory(self)
+        port, portNumber = self._setupFeedServer()
+        self._feedServerPort = port
+        self.feedServerPort = portNumber
 
         self._createDeferreds = {}
 
@@ -482,7 +504,10 @@ class WorkerBrain(log.Loggable):
         self.authenticator = authenticator
         self.workerClientFactory.startLogin(authenticator)
 
-    def _setupJobServerFactory(self):
+    def _setupJobServer(self):
+        """
+        @returns: (factory, port)
+        """
         # called from __init__
         dispatcher = JobDispatcher(self.jobHeaven)
         # FIXME: we should hand a username and password to log in with to
@@ -491,10 +516,27 @@ class WorkerBrain(log.Loggable):
         checker.allowPasswordless(True)
         p = portal.Portal(dispatcher, [checker])
         f = pb.PBServerFactory(p)
-        os.unlink(self._socketPath)
-        self._port = reactor.listenUNIX(self._socketPath, f)
+        try:
+            os.unlink(self._socketPath)
+        except:
+            pass
 
-        return f
+        # Rather than a listenUNIX(), we use listenWith so that we can specify
+        # our particular Port, which creates Transports that we know how to
+        # pass FDs over.
+        port = reactor.listenWith(fdserver.FDPort, self._socketPath, f)
+
+        return f, port
+
+    def _setupFeedServer(self):
+        """
+        @returns: (port, portNumber)
+        """
+        # called from __init__
+        portNumber = self.options.feederports[-1]
+        self.debug('Listening for feed requests on TCP port %s' % portNumber)
+        port = reactor.listenTCP(portNumber, self._feedServerFactory)
+        return port, portNumber
 
     # FIXME: this is only called from the tests
     def teardown(self):
@@ -505,7 +547,9 @@ class WorkerBrain(log.Loggable):
                   the teardown is completed
         """
         self.debug("cleaning up port %r" % self._port)
-        return self._port.stopListening()
+        d = self._jobServerPort.stopListening()
+        d.addCallback(lambda r: self._feedServerPort.stopListening())
+        return d
 
     # override log.Loggable method so we don't traceback
     def error(self, message):
@@ -597,7 +641,24 @@ class WorkerBrain(log.Loggable):
         Check if a deferred create has been registered for the given avatarId.
         """
         return avatarId in self._createDeferreds.keys()
-  
+
+    ### IFeedServerParent methods
+    def feedToFD(self, componentId, feedName, fd):
+        """
+        Called from the FeedAvatar to pass a file descriptor on to
+        the job running the component for this feeder.
+        """
+        avatar = self.jobHeaven.avatars[componentId]
+        avatar.sendFeed(feedName, fd)
+
+    def eatFromFD(self, componentId, feedId, fd):
+        """
+        Called from the FeedAvatar to pass a file descriptor on to
+        the job running the given component.
+        """
+        avatar = self.jobHeaven.avatars[componentId]
+        avatar.receiveFeed(feedId, fd)
+   
 class JobDispatcher:
     """
     I am a Realm inside the worker for forked jobs to log in to.
@@ -635,6 +696,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
         @type  avatarId: str
         """
         self.avatarId = avatarId
+        self.logName = avatarId
         self._heaven = heaven
         self._mind = None
         self.debug("created new JobAvatar")
@@ -708,21 +770,42 @@ class JobAvatar(pb.Avatar, log.Loggable):
     def remote_ready(self):
         pass
 
+    def sendFeed(self, feedName, fd):
+        """
+        Tell the feeder to send the given feed to the given fd.
+        """
+        self.debug('Sending FD %d to component job to feed %s to fd' % (
+            fd, feedName))
+        self._mind.broker.transport.sendFileDescriptor(
+            fd, "sendFeed %s" % feedName)
+
+    def receiveFeed(self, feedId, fd):
+        """
+        Tell the feeder to receive the given feed from the given fd.
+        """
+        self.debug('Sending FD %d to component job to eat %s from fd' % (
+            fd, feedId))
+        self._mind.broker.transport.sendFileDescriptor(
+            fd, "receiveFeed %s" % feedId)
+
+
 ### this is a different kind of heaven, not IHeaven, for now...
 class JobHeaven(pb.Root, log.Loggable):
     """
     I am similar to but not quite the same as a manager-side Heaven.
     I manage avatars inside the worker for job processes spawned by the worker.
 
-    @ivar brain: the worker brain
-    @type brain: L{WorkerBrain}
+    @ivar avatars: dict of avatarId -> avatar
+    @type avatars: dict of str -> L{JobAvatar}
+    @ivar brain:   the worker brain
+    @type brain:   L{WorkerBrain}
     """
     logCategory = "job-heaven"
     def __init__(self, brain):
         """
         @type brain: L{WorkerBrain}
         """
-        self.avatars = {}
+        self.avatars = {} # componentId -> avatar
         self.brain = brain
         
     def createAvatar(self, avatarId):

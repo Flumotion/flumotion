@@ -282,6 +282,14 @@ class WorkerJobState(flavors.StateCacheable):
      - workerName:        string, name of the worker I'm running on
      - cpu:               float, CPU usage
      - messages:          list of L{flumotion.common.messages.Message}
+
+    In addition, if I am the state of a FeedComponent, then I also
+    have the following keys:
+    
+     - eaterNames:        list of feedId being eaten by the eaters
+     - feederNames:       list of feedId being fed by the feeders
+
+    @todo: change eaterNames and feederNames to eaterFeedIds and ...
     """
     def __init__(self):
         flavors.StateCacheable.__init__(self)

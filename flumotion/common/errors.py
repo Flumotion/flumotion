@@ -126,13 +126,24 @@ class ComponentSetupError(ComponentError):
     remote_setup call on a component.
     """
 
+class HandledException(Exception):
+    """
+    An exception that has already been adequately handled, but still needs
+    to be propagated to indicate failure to callers.
+
+    This allows callers and defgens to propagate gracefully without
+    doing a traceback, while still doing tracebacks for unhandled exceptions.
+
+    Only argument is the original exception or failure.
+    """
+
 class ComponentStartError(ComponentError):
     """
     An error during starting of a component.  Can be raised during a
     remote_start call on a component.
     """
 
-class ComponentStartHandledError(ComponentStartError):
+class ComponentStartHandledError(ComponentStartError, HandledException):
     """
     An error during starting of a component, that's already handled in a
     different way (for example, through a message).

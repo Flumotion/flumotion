@@ -100,6 +100,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
 
         @return: Deferred of RemoteReference to the perspective.
         """
+        assert authenticator, "I really do need an authenticator"
         interfaces = []
         if self.perspectiveInterface:
             self.debug('perspectiveInterface is %r' % self.perspectiveInterface)
@@ -310,7 +311,7 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
         """
         @returns: the fully-qualified class names of supported keycard
                   interfaces
-        @rtype:   list of str
+        @rtype:   L{defer.Deferred} firing list of str
         """
         return self.bouncerPortal.getKeycardClasses()
 

@@ -276,6 +276,7 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
             self.debug('emited connection-failed')
 
     def setRemoteReference(self, remoteReference):
+        self.debug("setRemoteReference %r" % remoteReference)
         def writeConnection():
             s = ''.join(['<connection>',
                          '<host>%s</host>' % self.host,

@@ -54,30 +54,24 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         
         return pipeline
 
-    # FIXME: move to configure_pipeline
-    def do_start(self, eatersData, feedersData, clocking):
+    def configure_pipeline(self, pipeline, properties):
         # create temp file
         (fd, self._filename) = tempfile.mkstemp('flumotion.png')
         os.close(fd)
 
-        props = self.config['properties']
-
         text = None
-        if props.get('show_text', False):
-            text = props.get('text', 'set the "text" property')
+        if properties.get('show_text', False):
+            text = properties.get('text', 'set the "text" property')
         genimg.generate_overlay(self._filename,
                                 text,
-                                props.get('fluendo_logo', False),
-                                props.get('cc_logo', False),
-                                props.get('xiph_logo', False),
-                                props['width'],
-                                props['height'])
+                                properties.get('fluendo_logo', False),
+                                properties.get('cc_logo', False),
+                                properties.get('xiph_logo', False),
+                                properties['width'],
+                                properties['height'])
         
         source = self.get_element('source')
         source.set_property('location', self._filename)
-
-        return feedcomponent.ParseLaunchComponent.do_start(self,
-            eatersData, feedersData, clocking)
 
     def do_stop(self):
         # clean up our temp file
@@ -86,6 +80,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
             os.unlink(self._filename)
             self._filename = None
         else:
-            self.debug('Temporary overlay already gone, did we not start up correctly ?')
+            self.debug('Temporary overlay already gone, " \
+                did we not start up correctly ?')
         return defer.succeed(None)
         

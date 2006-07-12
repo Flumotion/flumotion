@@ -34,17 +34,19 @@ from flumotion.common import errors, interfaces, log, registry
 from flumotion.common import config, worker, common
 from flumotion.twisted.defer import defer_generator_method
 
-PortSet = worker.PortSet
-
 class WorkerAvatar(base.ManagerAvatar):
     """
     I am an avatar created for a worker.
     A reference to me is given when logging in and requesting a worker avatar.
     I live in the manager.
+
+    @ivar feedServerPort: TCP port the feed server is listening on
+    @type feedServerPort: int
     """
     logCategory = 'worker-avatar'
 
-    portset = None
+    _portSet = None
+    feedServerPort = None
 
     def getName(self):
         return self.avatarId
@@ -54,10 +56,19 @@ class WorkerAvatar(base.ManagerAvatar):
         self.info('worker "%s" logged in' % self.getName())
         base.ManagerAvatar.attached(self, mind)
 
+        self.debug('MANAGER -> WORKER: getFeedServerPort()')
+        d = self.mindCallRemote('getFeedServerPort')
+        yield d
+        self.feedServerPort = d.value()
+        self.debug('WORKER -> MANAGER: getFeedServerPort(): %d' %
+            self.feedServerPort)
+
+        self.debug('MANAGER -> WORKER: getPorts()')
         d = self.mindCallRemote('getPorts')
         yield d
         ports = d.value()
-        self.portset = PortSet(self.avatarId, ports)
+        self.debug('WORKER -> MANAGER: getPorts(): %r' % ports)
+        self._portSet = worker.PortSet(self.avatarId, ports)
 
         self.heaven.workerAttached(self)
         self.vishnu.workerAttached(self)
@@ -77,7 +88,7 @@ class WorkerAvatar(base.ManagerAvatar):
         @param numPorts: how many ports to reserve
         @type  numPorts: int
         """
-        return self.portset.reservePorts(numPorts)
+        return self._portSet.reservePorts(numPorts)
 
     def releasePorts(self, ports):
         """
@@ -86,7 +97,7 @@ class WorkerAvatar(base.ManagerAvatar):
         @param ports: list of ports to release
         @type  ports: list of int
         """
-        self.portset.releasePorts(ports)
+        self._portSet.releasePorts(ports)
 
     def createComponent(self, avatarId, type, config):
         """

@@ -85,6 +85,13 @@ class IJobMedium(IMedium):
     """
     pass
 
+class IFeedMedium(IMedium):
+    """
+    I am an interface for mediums in a job or manager interfacing with feed
+    avatars.
+    """
+    pass
+
 class IHeaven(compat.Interface):
     """
     My implementors manage avatars logging in to the manager.
@@ -101,4 +108,15 @@ class IHeaven(compat.Interface):
     def removeAvatar(self, avatarId):
         """
         Remove the avatar with the given Id from the heaven.
+        """
+
+class IFeedServerParent(compat.Interface):
+    """
+    I am an interface for objects that manage a FeedServer, allowing the
+    FeedServer to hand off file descriptors to eaters and feeders managed
+    by the parent.
+    """
+    def feedToFD(self, componentId, feedName, fd):
+        """
+        Make the component feed the given feed to the fd.
         """

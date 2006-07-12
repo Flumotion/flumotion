@@ -1,0 +1,41 @@
+Notes about FeedComponents and how they connect
+-----------------------------------------------
+- a FeedComponent has a simple interface; on top of the usual
+  BaseComponent protocol, it adds two methods:
+  feedToFD(self, feedName, fd)
+  eatFromFD(self, feedId, fd)
+- a user of a FeedComponent (a Medium, or whatever flumotion-launch uses)
+  is responsible for callling feedToFD on component1 eatFromFD on component2
+  to connect a feeder to an eater
+- a worker has an FPB.ServerFactory to expose feeds of its components over
+the network
+- through this server, a reference to a FeedAvatar can be obtained;
+  on this reference, sendFeed and receiveFeed can be remote-called
+  - this will result in the PB connection's underlying socket to be used
+    for actual GStreamer data passing
+- the FeedServer needs to pass the fd of this connection through the
+  worker-job PB connection to the correct job
+- connection between a feeder and an eater can be made initially in both
+  directions
+
+Connecting downstream (from feeder to eater):
+---------------------------------------------
+- see feed-eatfrom.svg
+- in the manager, ComponentAvatar.eatFrom(fullFeedId, host, port) is called
+  on the component avatar whose eater it wants to connect
+  (remote call (1))
+- the job-side FeedComponentMedium will login to the remote FeedServer
+  that has the feeder for the given fullFeedId, then call sendFeed
+  (remote call (2))
+- the FeedAvatar of the remote worker will respond by calling sendFeedReply
+  (remote call (3))
+  the eater's FeedMedium will stop reading from the transport, then callLater
+  (to allow the return value to be proxied back to the feeder's FeedAvatar)
+  to flush, stopWriting, and hand off the FD to the component
+  the feeder's FeedAvatar will, when it gets the reply from (3),
+  stop reading and writing from the transport.  Then it takes the fd,
+  and sends an fd-passing message over the worker->job PB connection.
+  The JobMedium receives the message, and calls feedToFD() on the component
+- at this point, the feeder and the eater are both connected, and the eater
+  will receive the stream from the feeder
+  

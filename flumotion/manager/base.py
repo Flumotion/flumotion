@@ -25,7 +25,7 @@ common classes and code to support manager-side objects
 
 from twisted.internet import reactor
 from twisted.spread import pb
-from twisted.python import failure
+from twisted.python import failure, reflect
 
 from flumotion.common import errors, interfaces, log, common
 from flumotion.twisted import pb as fpb
@@ -297,6 +297,50 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
                                            % (name,))
             zips[name] = bundler.bundle().getZip()
         return zips
+
+    def perspective_authenticate(self, bouncerName, keycard):
+        """
+        Authenticate the given keycard.
+        If no bouncerName given, authenticate against the manager's bouncer.
+        If a bouncerName is given, authenticate against the given bouncer
+        in the atmosphere.
+
+        @since: 0.3.1
+
+        @param bouncerName: the name of the atmosphere bouncer, or None
+        @type  bouncerName: str or None
+        @param keycard:     the keycard to authenticate
+        @type  keycard:     L{flumotion.common.keycards.Keycard}
+
+        @returns: a deferred, returning the keycard or None.
+        """
+        if not bouncerName:
+            self.debug(
+                'asked to authenticate keycard %r using manager bouncer' %
+                    keycard)
+            return self.vishnu.bouncer.authenticate(keycard)
+
+        self.debug('asked to authenticate keycard %r using bouncer %s' % (
+            keycard, bouncerName))
+        avatarId = common.componentPath(bouncerName, 'atmosphere')
+        if not self.heaven.hasAvatar(avatarId):
+            self.warning('No bouncer with id %s registered' % avatarId)
+            raise errors.UnknownComponentError(avatarId)
+
+        bouncerAvatar = self.heaven.getAvatar(avatarId)
+        return bouncerAvatar.authenticate(keycard)
+
+    def perspective_getKeycardClasses(self):
+        """
+        Get the keycard classes the manager's bouncer can authenticate.
+
+        @since: 0.3.1
+
+        @returns: a deferred, returning a list of keycard class names
+        @rtype:   L{defer.Deferred} firing list of str
+        """
+        list = self.vishnu.bouncer.keycardClasses
+        return [reflect.qual(c) for c in list]
 
 class ManagerHeaven(pb.Root, log.Loggable):
     """

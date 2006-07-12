@@ -1,0 +1,45 @@
+NAMING of OBJECTS
+-----------------
+
+- component:
+  - has a name, componentName
+    - name is unique within the parent
+    - component is child of a flow or the atmosphere
+  - componentId:
+    - /(parentName)/(componentName)
+    - unique within the manager
+
+- flow:
+  - cannot be named "atmosphere"
+
+- feed:
+  - has a feedName, unique within the set of feeded feeds in a component;
+    (in code/config where it's not explicitly specified, it defaults to
+     "default")
+    (Note, there could be an eater eating a feed with the same name, coming
+     from a different component.  Don't key both eaters and feeders in a
+     component on only the feedName !)
+  - has a feedId, which is unique in the flow
+    (componentName):(feedName)
+  - ? has a fullFeedId, which is unique in the manager:
+    (componentId):(feedName), or
+    /(parentName)/(componentName)/(feedName)
+
+- elements:
+  - eater: has an element name
+      eater:(feedId), or eater:(componentName):(feedName)
+      where componentName is the name of the component *producing* the feed
+
+  - feeder: same, but with feeder: prefix
+      and componentName is the name of the component this feeder is part of
+
+- feedserver:
+  - allows feedclients to eat from a feeder or feed to an eater accessible
+    through the feedserver
+  - to eat from a feeder, all you need is the fullFeedId:
+    - componentId identifies the actual component (since a feedserver can
+      be serving for multiple flows, the parentName is also needed)
+    - feedName identifies the feed being fed
+  - to feed to an eater, you need:
+    - componentId of the component you want to feed to
+    - feedId of the feed being fed

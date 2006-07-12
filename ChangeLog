@@ -1,5 +1,122 @@
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	Merge the feed-1 branch:
+	* flumotion/common/interfaces.py:
+	  add IFeedMedium and IFeedServerParent
+	* flumotion/worker/feed.py:
+	  - actually add all objects - FeedComponentAvatar,
+	    FeedClient, ... and the feedServerFactory method
+	  - implement perspective_receiveFeed and perspective_sendFeed
+	  - implement FeedAvatar (FeedServer-side object) and FeedClient
+	  - rename internal dispatcher class; the idea is that a manager
+	    could use its dispatcher, with a FeedHeaven, to proxy feeds
+	    between components
+	  - make ProxyManagerBouncer get keycardClasses remotely
+	    add perspectiveInterface
+	* flumotion/worker/Makefile.am:
+	  add feed.py
+	* flumotion/test/test_worker_worker.py:
+	  fix test by adding a port to FakeOptions
+
+	* flumotion/component/feedcomponent010.py:
+	  - use fdsrc and multifdsink for feeders and eaters
+	    remove _setup_eaters() and _setup_feeders() - now handled
+	    outside of component
+	  - add FeedToFD() and EatFromFD(), which are the new
+	    interface points for making a component connect
+	    to the outside
+	  - change link()
+	* flumotion/component/feedcomponent.py:
+	  - change do_start() to remove eaters/feedersData
+	  - change ClientFactory to new interface
+	  - implement remote_feedTo and remote_eatFrom
+
+	* flumotion/worker/worker.py:
+	  - add remote_getFeedServerPort()
+	  - give the medium all but the last feeder port, which we
+	    use for the FeedServer
+	  - listen with fdserver.FDPort for the job server, so
+	    we can pass fd's
+	  - add WorkerBrain's IFeedServerParent methods:
+	    eatFromFD and feedToFD
+	  - add JobAvatar.receiveFeed
+	  - store feedserver's port object so we can shutdown properly
+	  - document JobHeaven.avatars so we are free to use it as public
+	    API
+	* flumotion/job/job.py:
+	  Use a JobClientBroker that can receive fd's
+	  handle getting a receiveFeed and sendFeed message
+	* flumotion/job/main.py:
+	  connect our job client with fdserver.FDConnector so we
+	  can receive fd's
+	* flumotion/manager/worker.py:
+	  privatize portSet
+	  get the FeedServerPort and use it instead of previous
+	  separate reservedPorts
+	* flumotion/manager/manager.py:
+	  - factor out a getWorker, add a method to get feedServerPort
+	  - add a warning for when a worker is already logged out when
+	    we're trying to shut down a component
+	* flumotion/manager/component.py:
+	  - clean up naming confusion in FeederSet and related, it
+	    deals with feedId (componentName:feedName) now
+	  - Use eatFrom() or feedTo() before start() to link components
+	  - break out eatFrom into its own method, since we
+	    are going to use it for reconnecting as well,
+	    besides using feedTo too
+	  - move the connecting of a component's eater to before the start
+	    method
+	  - remove feedersData, it's irrelevant now that the
+	    component itself doesn't do the listening anymore for its
+	    feeders
+	  - implement both upstream and downstream connection, both work
+	* flumotion/common/common.py:
+	  add methods to deal with feedId, fullFeedId, componentId
+	* flumotion/common/keycards.py:
+	  also log the requesterName in our __repr__
+	* flumotion/common/planet.py:
+	  add documentation about eaterNames and feederNames keys
+	* flumotion/component/converters/overlay/overlay.py:
+	  replace do_start() implementation with configure_pipeline()
+
+	* flumotion/common/errors.py:
+	  add HandledException
+	* flumotion/twisted/defer.py:
+	  fix errback-of-last-resort, to not trigger it if the
+	  failure is due to a HandledException
+
+	* flumotion/twisted/pb.py:
+	  add an assert for our sanity
+	  change docstring
+	* flumotion/twisted/portal.py:
+	  getKeycardInterfaces() now returns a deferred
+	* flumotion/component/component.py:
+	  make startLogin take an authenticator now
+	  change setKeycard to setAuthenticator
+	* flumotion/manager/base.py:
+	  add a method to get the manager bouncer's getKeycardClasses()
+
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_pbstream.py:
+	  add a test that tests our way of switching from PB
+	  to GStreamer data protocol streaming over the underlying
+	  connection
+	* flumotion/test/test_manager_manager.py:
+	  fix test by adding method to FakeWorkerMind
+
+	* doc/random/naming:
+	  docs about naming of objects, so we can start cleaning up
+	  some variable names used everywhere
+	  add notes on feedserver and how to name things to request
+	* doc/random/feed:
+	  add notes on the current way of connecting eaters and feeders
+
+	* flumotion/admin/admin.py:
+	* flumotion/common/medium.py:
+	  add some debug
+
+2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/twisted/pb.py:
 	* flumotion/twisted/portal.py:
 	  change getKeycardInterfaces to getKeycardClasses.  That was pretty
@@ -611,6 +728,14 @@
 	  the latest information
 
 	Fixes #388
+
+2006-06-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/base.py:
+	* flumotion/manager/component.py:
+	  move perspective_authenticate() to the base class
+	  also allow for a None bouncerName, in which case the manager will
+	  use its bouncer to authenticate against
 
 2006-06-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 

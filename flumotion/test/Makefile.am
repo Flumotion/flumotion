@@ -42,6 +42,7 @@ EXTRA_DIST = 				\
 	test_manager_worker.py		\
 	test_parts.py	 		\
 	test_pb.py	 		\
+	test_pbstream.py		\
 	test_porter.py	 		\
 	test_reflect.py 		\
 	test_registry.py 		\

@@ -40,7 +40,10 @@ from flumotion.common import config, errors, interfaces, log, registry, keycards
 from flumotion.common import medium, package
 from flumotion.common.reflectcall import createComponent
 from flumotion.component import component
+
+from flumotion.twisted import fdserver
 from flumotion.twisted import pb as fpb
+
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.twisted.compat import implements
 
@@ -265,6 +268,32 @@ class JobMedium(medium.BaseMedium):
 
         return comp
         
+class JobClientBroker(pb.Broker, log.Loggable):
+    """
+    A pb.Broker subclass that handles FDs being passed (with associated data)
+    over the same connection as the normal PB data stream.
+    When an FD is seen, the FD should be added to a given eater or feeder
+    element.
+
+    @param connectionClass: a subclass of L{twisted.internet.tcp.Connection}
+    """
+    def __init__(self, connectionClass, **kwargs):
+        pb.Broker.__init__(self, **kwargs)
+
+        self._connectionClass = connectionClass
+
+    def fileDescriptorsReceived(self, fds, message):
+        # file descriptors get delivered to the component
+        self.debug('received fds %r, message %r' % (fds, message))
+        if message.startswith('sendFeed '):
+            feedName = message[len('sendFeed '):]
+            self.factory.medium.component.feedToFD(feedName, fds[0])
+        if message.startswith('receiveFeed '):
+            feedId = message[len('receiveFeed '):]
+            self.factory.medium.component.eatFromFD(feedId, fds[0])
+        else:
+            self.warning('Unknown message received: %r' % message)
+
 class JobClientFactory(pb.PBClientFactory, log.Loggable):
     """
     I am a client factory that logs in to the WorkerBrain.
@@ -286,8 +315,16 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
         self.medium = JobMedium()
         self.logName = id
         self.login(id)
+
+        # use an FD-passing broker instead
+        self.protocol = JobClientBroker
             
     ### pb.PBClientFactory methods
+    def buildProtocol(self, addr):
+        p = self.protocol(fdserver.FDServer)
+        p.factory = self
+        return p
+
     # FIXME: might be nice if jobs got a password to use to log in to brain
     def login(self, username):
         self.info('Logging in to worker')

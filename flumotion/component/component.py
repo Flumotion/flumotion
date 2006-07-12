@@ -115,23 +115,32 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         d.addErrback(alreadyLoggedInErrback)
         d.addErrback(loginFailedErrback)
 
+    # we want to save the authenticator
+    def startLogin(self, authenticator):
+        self.medium.setAuthenticator(authenticator)
+        return fpb.ReconnectingFPBClientFactory.startLogin(self, authenticator)
+
 # needs to be before BaseComponent because BaseComponent references it
 class BaseComponentMedium(medium.PingingMedium):
     """
     I am a medium interfacing with a manager-side avatar.
     I implement a Referenceable for the manager's avatar to call on me.
     I have a remote reference to the manager's avatar to call upon.
+    I am created by the L{ComponentClientFactory}.
+
+    @cvar authenticator: the authenticator used to log in to manager
+    @type authenticator: L{flumotion.twisted.pb.Authenticator}
     """
 
     implements(interfaces.IComponentMedium)
-    logCategory = 'basecompmedium'
+    logCategory = 'basecompmed'
 
     def __init__(self, component):
         """
         @param component: L{flumotion.component.component.BaseComponent}
         """
         self.comp = component
-        self.logName = component.name
+        self.authenticator = None
 
         self.reactor_stopped = False
         
@@ -153,6 +162,17 @@ class BaseComponentMedium(medium.PingingMedium):
         res = socket.gethostbyname(host)
         self.debug("getIP(): we think the manager's IP is %r" % res)
         return res
+
+    def setAuthenticator(self, authenticator):
+        """
+        Set the authenticator the client factory has used to log in to the
+        manager.  Can be reused by the component's medium to make
+        feed connections which also get authenticated by the manager's
+        bouncer.
+
+        @type  authenticator: L{flumotion.twisted.pb.Authenticator}
+        """
+        self.authenticator = authenticator
 
     ### pb.Referenceable remote methods
     ### called from manager by our avatar
@@ -254,8 +274,10 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
     """
     I am the base class for all Flumotion components.
 
-    @ivar name: the name of the component
-    @type name: string
+    @ivar name:   the name of the component
+    @type name:   string
+    @ivar medium: the component's medium
+    @cvar medium: L{BaseComponentMedium}
 
     @cvar component_medium_class: the medium class to use for this component
     @type component_medium_class: child class of L{BaseComponentMedium}
@@ -432,6 +454,9 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                 raise errors.ComponentSetupError()
 
         self._setConfig(config)
+        # now we have a name, set it on the medium too
+        if self.medium:
+            self.medium.logName = self.getName()
         d = setup_plugs()
         d.addCallback(lambda r: self.do_check())
         d.addCallback(checkErrorCallback)
@@ -462,7 +487,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             start_plugs()
             ret = self.do_start(*args, **kwargs)
             assert isinstance(ret, defer.Deferred), \
-                   "do_start must return a deferred"
+                   "do_start %r must return a deferred" % self.do_start
             self.debug('start: returning value %s' % ret)
             return ret
         except Exception, e:

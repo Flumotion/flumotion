@@ -31,7 +31,7 @@ from twisted.internet import reactor
 from flumotion.configure import configure
 from flumotion.common import log, keycards, common, errors
 from flumotion.job import job
-from flumotion.twisted import credentials
+from flumotion.twisted import credentials, fdserver
 
 def main(args):
     parser = optparse.OptionParser()
@@ -62,7 +62,8 @@ def main(args):
     log.info('job', 'Connecting to worker on socket %s' % (socket))
 
     job_factory = job.JobClientFactory(avatarId)
-    c = reactor.connectUNIX(socket, job_factory)
+    c = reactor.connectWith(fdserver.FDConnector, socket, job_factory,
+        10, checkPID=False)
     log.info('job', 'Started job on pid %d' % os.getpid())
 
     # should probably move this to boot

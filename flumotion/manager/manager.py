@@ -914,6 +914,17 @@ class Vishnu(log.Loggable):
 
         return components
 
+    def _getWorker(self, workerName):
+        # returns the WorkerAvatar with the given name
+        if not workerName in self.workerHeaven.avatars:
+            raise errors.ComponentNoWorkerError("Worker %s not logged in?"
+                                                % workerName)
+
+        return self.workerHeaven.avatars[workerName]
+
+    def getWorkerFeedServerPort(self, workerName):
+        return self._getWorker(workerName).feedServerPort
+    
     def reservePortsOnWorker(self, workerName, numPorts):
         """
         Requests a number of ports on the worker named workerName. The
@@ -922,23 +933,17 @@ class Vishnu(log.Loggable):
 
         @returns: a list of ports as integers
         """
-        if not workerName in self.workerHeaven.avatars:
-            raise errors.ComponentNoWorkerError("Worker %s not logged in?"
-                                                % workerName)
-
-        return self.workerHeaven.avatars[workerName].reservePorts(numPorts)
+        return self._getWorker(workerName).reservePorts(numPorts)
         
     def releasePortsOnWorker(self, workerName, ports):
         """
         Tells the manager that the given ports are no longer being used,
         and may be returned to the allocation pool.
         """
-        if not workerName in self.workerHeaven.avatars:
-            self.warning("Worker %s appears to have logged out, not releasing"
-                       % workerName)
-            return
-
-        return self.workerHeaven.avatars[workerName].releasePorts(ports)
+        try:
+            return self._getWorker(workerName).releasePorts(ports)
+        except errors.ComponentNoWorkerError, e:
+            self.warning('could not release ports: %r' % e.args)
         
     def getComponentMapper(self, object):
         """

@@ -27,6 +27,7 @@ from twisted.internet import reactor, defer
 from flumotion.component import component as basecomponent
 from flumotion.common import common, errors, pygobject, messages
 from flumotion.common import gstreamer
+from flumotion.worker import feed
 
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
@@ -40,8 +41,8 @@ class FeedComponent(basecomponent.BaseComponent):
     I am a base class for all Flumotion feed components.
     """
     # keep these as class variables for the tests
-    EATER_TMPL = 'tcpclientsrc name=%(name)s'
-    FEEDER_TMPL = 'tcpserversink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
+    EATER_TMPL = 'fdsrc name=%(name)s ! gdpdepay'
+    FEEDER_TMPL = 'gdppay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
 
     logCategory = 'feedcomponent'
 
@@ -262,61 +263,6 @@ class FeedComponent(basecomponent.BaseComponent):
         if retval != gst.STATE_CHANGE_SUCCESS:
             self.warning('Setting pipeline to NULL failed')
 
-    def _setup_eaters(self, eatersData):
-        """
-        Set up the feeded GStreamer elements in our pipeline based on
-        information in the tuple.  For each feeded element in the tuple,
-        it sets the host and port of the feeder on the feeded element.
-
-        @type eatersData: list
-        @param eatersData: list of (feederName, host, port) tuples
-        """
-        if not self.pipeline:
-            raise errors.NotReadyError('No pipeline')
-        
-        # Setup all eaters
-        for feederName, host, port in eatersData:
-            self.debug('Going to connect to feeder %s (%s:%d)' % (feederName, host, port))
-            name = 'eater:' + feederName
-            eater = self.get_element(name)
-            assert eater, 'No eater element named %s in pipeline' % name
-            assert isinstance(eater, gst.Element)
-            
-            eater.set_property('host', host)
-            eater.set_property('port', port)
-            eater.set_property('protocol', 'gdp')
-
-    def _setup_feeders(self, feedersData):
-        """
-        Set up the feeding GStreamer elements in our pipeline based on
-        information in the tuple.  For each feeding element in the tuple,
-        it sets the host and port it will listen as.
-
-        @type  feedersData: tuple
-        @param feedersData: a list of (feederName, host, port) tuples.
-        """
- 
-        if not self.pipeline:
-            raise errors.NotReadyError('No pipeline')
-
-        self.debug("_setup_feeders: feedersData %r" % feedersData)
-
-        for feeder in self.feeder_names:
-            assert feeder in [x[0] for x in feedersData], \
-                   "feedersData does not mention feeder %s" % feeder
-
-        for feeder_name, host, port in feedersData:
-            self.debug('Going to listen on feeder %s (%s:%d)' % (
-                feeder_name, host, port))
-            name = 'feeder:' + feeder_name
-            feeder = self.get_element(name)
-            assert feeder, 'No feeder element named %s in pipeline' % name
-            assert isinstance(feeder, gst.Element)
-
-            feeder.set_property('host', host)
-            feeder.set_property('port', port)
-            feeder.set_property('protocol', 'gdp')
-
     def cleanup(self):
         self.debug("cleaning up")
         
@@ -377,29 +323,16 @@ class FeedComponent(basecomponent.BaseComponent):
 
         return (ip, port, base_time)
 
-    # FIXME: rename the comment, unambiguate it, and comment on it
-    # FIXME: rename, unambiguate and comment
-    def link(self, eatersData, feedersData):
+    # FIXME: rename, since this just starts the pipeline,
+    # and linking is done by the manager
+    def link(self):
         """
         Make the component eat from the feeds it depends on and start
         producing feeds itself.
 
-        @param eatersData: list of (feederName, host, port) tuples to eat from
-        @param feedersData: list of (feederName, host, port) tuples to
-        use as feeders
+        @rtype: L{twisted.internet.defer.Deferred}
         """
-        # if we have eaters waiting, we start out hungry, else waking
-        self.setMood(moods.waking)
-
-        self.debug('manager asks us to link')
-        self.debug('setting up eaters')
-        self._setup_eaters(eatersData)
-
-        self.debug('setting up feeders')
-        self._setup_feeders(feedersData)
-        
-        self.debug('setting pipeline to playing')
-
+        # set pipeline to playing, and provide clock if asked for
         if self.clock_provider:
             self.clock_provider.set_property('active', True)
         self.pipeline.set_state(gst.STATE_PLAYING)
@@ -468,4 +401,31 @@ class FeedComponent(basecomponent.BaseComponent):
                    (property, element_name, value))
         pygobject.gobject_set_property(element, property, value)
     
+    ### methods to connect component eaters and feeders
+    def feedToFD(self, feedName, fd):
+        """
+        @param feedName: name of the feed to feed to the given fd.
+        @type  feedName: str
+        @param fd:       the file descriptor to feed to
+        @type  fd:       int
+        """
+        self.debug('FeedToFD(%s, %d)' % (feedName, fd))
+        elementName = "feeder:%s" % common.feedId(self.name, feedName)
+        element = self.get_element(elementName)
+        element.emit('add', fd)
+
+    def eatFromFD(self, feedId, fd):
+        """
+        @param feedId: feed id (componentName:feedName) to eat from through
+                       the given fd
+        @type  feedId: str
+        @param fd:     the file descriptor to eat from
+        @type  fd:     int
+        """
+        self.debug('EatFromFD(%s, %d)' % (feedId, fd))
+        elementName = "eater:%s" % feedId
+        self.debug('looking up element %s' % elementName)
+        element = self.get_element(elementName)
+        element.set_property('fd', fd)
+
 pygobject.type_register(FeedComponent)

@@ -41,8 +41,10 @@ class BaseMedium(pb.Referenceable, log.Loggable):
     Used by admin/worker/component to talk to manager's vishnu,
     and by job to talk to worker's brain.
 
-    @ivar remoteReference: L{twisted.spread.pb.RemoteReference}
-    @ivar bundleLoader: L{flumotion.common.bundleclient.BundleLoader}
+    @ivar remote:       a remote reference to the server-side object on
+                        which perspective_(methodName) methods can be called
+    @type remote:       L{twisted.spread.pb.RemoteReference}
+    @type bundleLoader: L{flumotion.common.bundleclient.BundleLoader}
     """
 
     # subclasses will need to set this to the specific medium type
@@ -186,6 +188,7 @@ class PingingMedium(BaseMedium):
     _pingCheckInterval = configure.heartbeatInterval * 2.5
 
     def startPinging(self, disconnect):
+        self.debug('startPinging')
         self._lastPingback = time.time()
         if hasattr(self, '_pingDisconnect'):
             return

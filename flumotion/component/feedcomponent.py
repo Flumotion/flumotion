@@ -39,6 +39,8 @@ from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal
 from flumotion.twisted.compat import implements
 
+# FIXME: maybe move feed to component ?
+from flumotion.worker import feed
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
@@ -48,13 +50,22 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     the manager-side ComponentAvatar.
     """
     implements(interfaces.IComponentMedium)
-    logCategory = 'basecomponentmedium'
+    logCategory = 'feedcompmed'
 
     def __init__(self, component):
         """
         @param component: L{flumotion.component.feedcomponent.FeedComponent}
         """
         basecomponent.BaseComponentMedium.__init__(self, component)
+
+        self._feederFeedServer = {} # fullFeedId -> (host, port) tuple
+                                    # for remote feeders
+        self._feederClientFactory = {} # fullFeedId -> client factory
+        self._eaterFeedServer = {}  # fullFeedId -> (host, port) tuple
+                                    # for remote eaters
+        self._eaterClientFactory = {} # (componentId, feedId) -> client factory
+        self._eaterTransport = {}     # (componentId, feedId) -> transport
+        self.logName = component.name
 
         def on_feed_ready(component, feedName, isReady):
             self.callRemote('feedReady', feedName, isReady)
@@ -76,6 +87,111 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         
     def remote_setElementProperty(self, elementName, property, value):
         self.comp.set_element_property(elementName, property, value)
+
+    def remote_eatFrom(self, fullFeedId, host, port):
+        """
+        Tell the component the host and port for the FeedServer through which
+        it can connect a local eater to a remote feeder to eat the given
+        fullFeedId.
+
+        Called on by the manager-side ComponentAvatar.
+        """
+        self.debug('remote --> COMPONENT: remote_eatFrom(%s, %s, %d)' % (
+            fullFeedId, host, port))
+        self._feederFeedServer[fullFeedId] = (host, port)
+        client = feed.FeedMedium(self.comp)
+        factory = feed.FeedClientFactory(client)
+        # FIXME: maybe copy keycard instead, so we can change requester ?
+        self.debug('connecting to FeedServer on %s:%d' % (host, port))
+        reactor.connectTCP(host, port, factory)
+        d = factory.login(self.authenticator)
+        self._feederClientFactory[fullFeedId] = factory
+        def loginCb(remoteRef):
+            self.debug('logged in to feedserver, remoteRef %r' % remoteRef)
+            client.setRemoteReference(remoteRef)
+            # now call on the remoteRef to eat
+            self.debug(
+                'COMPONENT --> feedserver: sendFeed(%s)' % fullFeedId)
+            d = remoteRef.callRemote('sendFeed', fullFeedId)
+
+            def sendFeedCb(result):
+                self.debug('COMPONENT <-- feedserver: sendFeed(%s): %r' % (
+                    fullFeedId, result))
+                self.debug(
+                    'remote <-- COMPONENT: remote_eatFrom(%s, %s, %d): None' % (
+                            fullFeedId, host, port))
+                return None
+
+            d.addCallback(sendFeedCb)
+            return d
+
+        def loginEb(failure):
+            self.debug(
+                'remote <-- COMPONENT: remote_eatFrom(%s, %s, %d): Failure' % (
+                    fullFeedId, host, port))
+            return failure
+
+        d.addCallback(loginCb)
+        d.addErrback(loginEb)
+        return d
+
+    def remote_feedTo(self, componentId, feedId, host, port):
+        """
+        Tell the component to feed the given feed to the receiving component
+        accessible through the FeedServer on the given host and port.
+
+        Called on by the manager-side ComponentAvatar.
+        """
+        # FIXME: check if this overwrites current config, and adapt if it
+        # does
+        self.debug('remote --> COMPONENT: remote_feedTo(%s, %s, %s, %d)' % (
+            componentId, feedId, host, port))
+        self._eaterFeedServer[(componentId, feedId)] = (host, port)
+        client = feed.FeedMedium(self.comp)
+        factory = feed.FeedClientFactory(client)
+        # FIXME: maybe copy keycard instead, so we can change requester ?
+        self.debug('connecting to FeedServer on %s:%d' % (host, port))
+        reactor.connectTCP(host, port, factory)
+        d = factory.login(self.authenticator)
+        self._eaterClientFactory[(componentId, feedId)] = factory
+        def loginCb(remoteRef):
+            self.debug('logged in to feedserver, remoteRef %r' % remoteRef)
+            client.setRemoteReference(remoteRef)
+            # now call on the remoteRef to eat
+            self.debug(
+                'COMPONENT --> feedserver: receiveFeed(%s, %s)' % (
+                    componentId, feedId))
+            d = remoteRef.callRemote('receiveFeed', componentId, feedId)
+
+            def receiveFeedCb(result):
+                self.debug(
+                    'COMPONENT <-- feedserver: receiveFeed(%s, %s): %r' % (
+                    componentId, feedId, result))
+                componentName, feedName = common.parseFeedId(feedId)
+                t = remoteRef.broker.transport
+                self._eaterTransport[(componentId, feedId)] = t
+                remoteRef.broker.transport = None
+                fd = t.fileno()
+                self.debug('Telling component to feed feedName %s to fd %d'% (
+                    feedName, fd))
+                self.comp.feedToFD(feedName, fd)
+                
+                self.debug(
+                    'remote <-- COMPONENT: remote_feedTo(%s, %s, %s, %d): %r' %
+                        (componentId, feedId, host, port, remoteRef))
+
+            d.addCallback(receiveFeedCb)
+            return d
+
+        def loginEb(failure):
+            self.debug(
+                'remote <-- COMPONENT: remote_feedTo(%s, %s, %s, %d): Failure' %
+                    (componentId, feedId, host, port))
+            return failure
+
+        d.addCallback(loginCb)
+        d.addErrback(loginEb)
+        return d
 
     def remote_provideMasterClock(self, port):
         """
@@ -291,29 +407,26 @@ class ParseLaunchComponent(FeedComponent):
         return pipeline
 
     ### BaseComponent interface implementation
-    def do_start(self, eatersData, feedersData, clocking):
+    def do_start(self, clocking):
         """
-        Tell the component to start, linking itself to other components.
+        Tell the component to start.
+        Whatever is using the component is responsible for making sure all
+        eaters have received their file descriptor to eat from.
 
-        @type eatersData:  list of (feedername, host, port) tuples of elements
-                           feeding our eaters.
-        @type feedersData: list of (name, host, port) tuples on which to
-                           produce data.
         @param clocking: tuple of (ip, port, base_time) of a master clock,
                          or None not to slave the clock
         @type  clocking: tuple(str, int, long) or None.
         """
         self.debug('ParseLaunchComponent.start')
-        self.debug('start with eaters data %s and feeders data %s' % (
-            eatersData, feedersData))
         if clocking:
-            self.info('slaving to master clock on %s:%d with base time %d' % clocking)
+            self.info('slaving to master clock on %s:%d with base time %d' %
+                clocking)
         self.setMood(moods.waking)
 
         if clocking:
             self.set_master_clock(*clocking)
 
-        self.link(eatersData, feedersData)
+        self.link()
 
         return defer.succeed(None)
 

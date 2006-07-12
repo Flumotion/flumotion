@@ -22,6 +22,9 @@
 from twisted.internet import defer
 from twisted.python import reflect
 
+# FIXME: this is for HandledException - maybe it should move here instead ?
+from flumotion.common import errors
+
 # See flumotion.test.test_defer for examples
 def defer_generator(proc):
     def wrapper(*args, **kwargs):
@@ -54,9 +57,14 @@ def defer_generator(proc):
 
         # Add errback-of-last-resort
         def default_errback(failure, d):
+            # an already handled exception just gets propagated up without
+            # doing a traceback
+            if failure.check(errors.HandledException):
+                return failure
+            
             def print_traceback(f):
                 import traceback
-                print 'flumotion.twisted.defer.py: ' + \
+                print 'flumotion.twisted.defer: ' + \
                     'Unhandled error calling', proc.__name__, ':', f.type
                 traceback.print_exc()
             with_saved_callbacks (lambda: d.addErrback(print_traceback))

@@ -57,9 +57,10 @@ class BouncerPortal(log.Loggable):
         """
         Return the Keycard interfaces supported by this portal's bouncer.
 
-        @rtype: list of str
+        @rtype: L{defer.Deferred} firing list of str
         """
-        return [reflect.qual(k) for k in self.bouncer.keycardClasses]
+        list = [reflect.qual(k) for k in self.bouncer.keycardClasses]
+        return defer.succeed(list)
             
     def login(self, keycard, mind, *ifaces):
         """
