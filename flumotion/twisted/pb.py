@@ -101,6 +101,7 @@ class FPBClientFactory(pb.PBClientFactory, flog.Loggable):
         @return: Deferred of RemoteReference to the perspective.
         """
         assert authenticator, "I really do need an authenticator"
+        assert not isinstance(authenticator, keycards.Keycard)
         interfaces = []
         if self.perspectiveInterface:
             self.debug('perspectiveInterface is %r' % self.perspectiveInterface)
@@ -209,11 +210,13 @@ class ReconnectingPBClientFactory(pb.PBClientFactory, flog.Loggable,
         self.resetDelay()
         pb.PBClientFactory.clientConnectionMade(self, broker)
         if self._doingLogin:
-            d = self.login(self._authenticator)
+            d = self.login(self._credentials, self._client)
             self.gotDeferredLogin(d)
 
-    def startLogin(self, authenticator):
-        self._authenticator = authenticator
+    def startLogin(self, credentials, client=None):
+        self._credentials = credentials
+        self._client = client
+
         self._doingLogin = True
         
     # methods to override
@@ -256,26 +259,20 @@ class ReconnectingFPBClientFactory(FPBClientFactory,
         self.resetDelay()
         FPBClientFactory.clientConnectionMade(self, broker)
         if self._doingLogin:
-            d = self.login(self._keycard)
+            d = self.login(self._authenticator)
             self.gotDeferredLogin(d)
 
-    def startLogin(self, keycard):
-        # store login info
-        self._keycard = keycard
-
+    def startLogin(self, authenticator):
+        assert not isinstance(authenticator, keycards.Keycard)
+        self._authenticator = authenticator
         self._doingLogin = True
         
     # methods to override
-
     def gotDeferredLogin(self, deferred):
         """
         The deferred from login is now available.
         """
         raise NotImplementedError
-
-    #def failedToGetPerspective(self, why):
-    #    self.stopTrying() # logging in harder won't help
-
 
 ### FIXME: this code is an adaptation of twisted/spread/pb.py
 # it allows you to login to a FPB server requesting interfaces other than

@@ -1,5 +1,11 @@
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/pb.py:
+	  put back normal login/startLogin of ReconnectingPBClientFactory
+	  add asserts to not get keycards in the FPB ClientFactory classes
+
+2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	Merge the feed-1 branch:
 	* flumotion/common/interfaces.py:
 	  add IFeedMedium and IFeedServerParent
