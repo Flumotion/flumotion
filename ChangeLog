@@ -1,3 +1,12 @@
+2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	  reorder to prefer the challenger-based keycard
+	* flumotion/component/bouncers/saltsha256.py:
+	  check for the right interface
+	* flumotion/component/bouncers/bouncer.py:
+	  document
+
 2006-07-12  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/medium.py:

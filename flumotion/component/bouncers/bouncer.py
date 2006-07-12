@@ -67,10 +67,16 @@ class BouncerMedium(component.BaseComponentMedium):
         return []
 
 class Bouncer(component.BaseComponent):
-    keycardClasses = ()
-
-    component_medium_class = BouncerMedium
+    """
+    I am the base class for all bouncers.
     
+    @cvar keycardClasses: tuple of all classes of keycards this bouncer can
+                          authenticate, in order of preference
+    @type keycardClasses: tuple of L{flumotion.common.keycards.Keycard}
+                          class objects
+    """
+    keycardClasses = ()
+    component_medium_class = BouncerMedium
     logCategory = 'bouncer'
 
     def init(self):

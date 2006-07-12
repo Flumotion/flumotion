@@ -117,9 +117,9 @@ class SaltSha256(bouncer.Bouncer):
     def authenticate(self, keycard):
         # FIXME: move checks up in the base class ?
         if not compat.implementsInterface(keycard,
-                credentials.IUsernameCryptPassword):
+                credentials.IUsernameSha256Password):
             self.warning(
-                'keycard %r does not implement IUsernameCryptPassword' %
+                'keycard %r does not implement IUsernameSha256Password' %
                     keycard)
         if not self.typeAllowed(keycard):
             self.warning('keycard %r not in type list %r' % (

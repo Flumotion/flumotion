@@ -44,7 +44,8 @@ __all__ = ['HTPasswdCrypt']
 class HTPasswdCrypt(bouncer.Bouncer):
 
     logCategory = 'htpasswdcrypt'
-    keycardClasses = (keycards.KeycardUACPP, keycards.KeycardUACPCC)
+    # challenger type first, because it's more secure thus preferable
+    keycardClasses = (keycards.KeycardUACPCC, keycards.KeycardUACPP)
 
     def init(self):
         self._filename = None
