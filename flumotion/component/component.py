@@ -59,7 +59,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         
         self.component = component
         # make a medium to interface with the manager
-        self.medium = component.component_medium_class(component)
+        self.medium = component.componentMediumClass(component)
         component.setMedium(self.medium)
 
         self.maxDelay = 10
@@ -277,15 +277,14 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
     @ivar name:   the name of the component
     @type name:   string
     @ivar medium: the component's medium
-    @cvar medium: L{BaseComponentMedium}
+    @type medium: L{BaseComponentMedium}
 
-    @cvar component_medium_class: the medium class to use for this component
-    @type component_medium_class: child class of L{BaseComponentMedium}
+    @cvar componentMediumClass: the medium class to use for this component
+    @type componentMediumClass: child class of L{BaseComponentMedium}
     """
 
     logCategory = 'basecomp'
-
-    component_medium_class = BaseComponentMedium
+    componentMediumClass = BaseComponentMedium
     
     def __init__(self):
         # FIXME: name is unique where ? only in flow, so not in worker

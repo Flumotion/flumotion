@@ -228,7 +228,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
 from feedcomponent010 import FeedComponent
 
-FeedComponent.component_medium_class = FeedComponentMedium
+FeedComponent.componentMediumClass = FeedComponentMedium
 
 class ParseLaunchComponent(FeedComponent):
     'A component using gst-launch syntax'

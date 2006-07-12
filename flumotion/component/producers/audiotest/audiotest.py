@@ -39,7 +39,7 @@ class AudioTestMedium(feedcomponent.FeedComponentMedium):
         return self.comp.setWave(wave)
 
 class AudioTest(feedcomponent.ParseLaunchComponent):
-    component_medium_class = AudioTestMedium
+    componentMediumClass = AudioTestMedium
 
     def init(self):
         self.uiState.addKey('wave-names',

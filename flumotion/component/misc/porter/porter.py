@@ -113,7 +113,7 @@ class Porter(component.BaseComponent, log.Loggable):
     (along with some amount of already-read data) to the appropriate streamer.
     """
 
-    component_medium_class = PorterMedium
+    componentMediumClass = PorterMedium
 
     def init(self):
         # We maintain a map of path -> avatar (the underlying transport is

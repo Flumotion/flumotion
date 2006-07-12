@@ -76,7 +76,7 @@ class Bouncer(component.BaseComponent):
                           class objects
     """
     keycardClasses = ()
-    component_medium_class = BouncerMedium
+    componentMediumClass = BouncerMedium
     logCategory = 'bouncer'
 
     def init(self):

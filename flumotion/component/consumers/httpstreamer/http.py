@@ -251,7 +251,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     gsignal('client-removed', object, int, int, object)
     
-    component_medium_class = HTTPMedium
+    componentMediumClass = HTTPMedium
 
     def init(self):
         reactor.debug = True
@@ -372,7 +372,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self.resource.setDomain(properties['domain'])
 
         if self.config.has_key('avatarId'):
-            self.resource.setRequesterName(self.config['avatarId'])
+            self.resource.setRequesterId(self.config['avatarId'])
 
         self.type = properties.get('type', 'master')
         if self.type == 'slave':

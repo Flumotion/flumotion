@@ -49,7 +49,7 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
         self.comp.update_ui_state()
 
 class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
-    component_medium_class = DiskerMedium
+    componentMediumClass = DiskerMedium
     pipe_template = 'multifdsink sync-method=1 name=fdsink mode=1 sync=false'
     file_fd = None
     directory = None

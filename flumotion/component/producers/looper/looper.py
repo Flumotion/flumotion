@@ -54,7 +54,7 @@ class LooperMedium(feedcomponent.FeedComponentMedium):
 
 class Looper(feedcomponent.ParseLaunchComponent):
 
-    component_medium_class = LooperMedium
+    componentMediumClass = LooperMedium
 
     def init(self):
         self.initial_seek = False

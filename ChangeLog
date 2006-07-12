@@ -1,5 +1,18 @@
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* TODO:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/looper/looper.py:
+	  finally rename to componentMediumClass
+
+2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/twisted/pb.py:
 	  put back normal login/startLogin of ReconnectingPBClientFactory
 	  add asserts to not get keycards in the FPB ClientFactory classes
