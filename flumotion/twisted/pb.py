@@ -25,13 +25,16 @@ Flumotion Perspective Broker using keycards
 Inspired by L{twisted.spread.pb}
 """
 
+import time
+
 from twisted.cred import checkers, credentials, error
 from twisted.cred.portal import IRealm, Portal
-from twisted.internet import protocol, defer
+from twisted.internet import protocol, defer, reactor
 from twisted.python import log, reflect, failure
 from twisted.spread import pb, flavors
 from twisted.spread.pb import PBClientFactory
 
+from flumotion.configure import configure
 from flumotion.common import keycards
 from flumotion.common import log as flog
 from flumotion.twisted import reflect as freflect
@@ -293,4 +296,31 @@ class _BouncerWrapper(pb.Referenceable, flog.Loggable):
     def _loggedIn(self, (interface, perspective, logout)):
         self.broker.notifyOnDisconnect(logout)
         return pb.AsReferenceable(perspective, "perspective")
+
+class PingableAvatar(pb.Avatar, flog.Loggable):
+    _pingCheckInterval = configure.heartbeatInterval * 2.5
+
+    def perspective_ping(self):
+        self._lastPing = time.time()
+        return defer.succeed(True)
+
+    def startPingChecking(self, disconnect):
+        self._lastPing = time.time()
+        self._pingCheckDisconnect = disconnect
+        self._pingCheck()
+
+    def _pingCheck(self):
+        self._pingCheckDC = None
+        if time.time() - self._lastPing > self._pingCheckInterval:
+            self.info('no ping in %f seconds, closing connection',
+                      self._pingCheckInterval)
+            self._pingCheckDisconnect()
+        else:
+            self._pingCheckDC = reactor.callLater(self._pingCheckInterval,
+                                                  self._pingCheck)
+
+    def stopPingChecking(self):
+        if self._pingCheckDC:
+            self._pingCheckDC.cancel()
+        self._pingCheckDC = None
 

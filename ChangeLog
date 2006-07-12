@@ -1,3 +1,51 @@
+2006-07-12  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/twisted/pb.py:
+	  Move PingableAvatar here.
+
+	* flumotion/common/medium.py:
+	  Move PingingMedium here.
+
+	* flumotion/admin/admin.py:
+	  Subclass from PingingMedium
+
+	* flumotion/component/component.py:
+	  Add a rather ugly hack to note here when we've stopped the reactor,
+	  so that we can avoid calling reactor.stop() twice (which fails
+	  badly).
+
+	  Make BaseComponentMedium subclass PingingMedium. 
+
+	  Remove heartbeats, as these are now done by the PingingMedium
+	  automatically.
+
+	* flumotion/job/job.py:
+	  When shutting down (in a system event trigger), do a remote call to
+	  the manager to tell it that we're doing a clean shutdown.
+
+	  Ensure we don't stop the reactor twice.
+
+	* flumotion/job/main.py:
+	  Add the system event trigger
+
+	* flumotion/manager/base.py:
+	  Manager-side avatars are all PingableAvatars, now.
+	  
+	* flumotion/manager/component.py:
+	  Remove manager side of heartbeats, now done by lower-level classes.
+
+	  When a component disconnects, if the shutdown was 'clean' (as 
+	  notified by the component telling us with a remote call before it 
+	  shuts down), set mood to sleeping. For any other shutdown, mood
+	  becomes lost (in both cases, we never clear a 'sad' mood, though).
+
+	  Ensures mood transitions in all cases end up, correctly, in
+	  sleeping, lost, or sad (and importantly, we never go through
+	  sleeping on the way to sad now!)
+
+	* flumotion/worker/worker.py:
+	  Use PingingMedium
+
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/random/authentication:

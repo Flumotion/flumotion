@@ -23,12 +23,15 @@
 Contains the base class for PB client-side mediums.
 """
 
+import time
+
 from twisted.spread import pb
-from twisted.internet import defer
+from twisted.internet import defer, reactor
 
 from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import log, interfaces, bundleclient, errors, common
 from flumotion.common import messages
+from flumotion.configure import configure
 from flumotion.twisted.compat import implements
 
 class BaseMedium(pb.Referenceable, log.Loggable):
@@ -177,3 +180,60 @@ class BaseMedium(pb.Referenceable, log.Loggable):
             self.debug(msg)
             raise e
     runBundledFunction = defer_generator_method(runBundledFunction)
+
+class PingingMedium(BaseMedium):
+    _pingInterval = configure.heartbeatInterval
+    _pingCheckInterval = configure.heartbeatInterval * 2.5
+
+    def startPinging(self, disconnect):
+        self._lastPingback = time.time()
+        if hasattr(self, '_pingDisconnect'):
+            return
+        self._pingDisconnect = disconnect
+        self._ping()
+        self._pingCheck()
+
+    def _ping(self):
+        def pingback(result):
+            self._lastPingback = time.time()
+
+        if self.remote:
+            d = self.callRemote('ping')
+            d.addCallback(pingback)
+        else:
+            self.info('tried to ping, but disconnected yo')
+
+        self._pingDC = reactor.callLater(self._pingInterval,
+                                         self._ping)
+
+    def _pingCheck(self):
+        self._pingCheckDC = None
+        if (self.remote and
+            (time.time() - self._lastPingback > self._pingCheckInterval)):
+            self.info('no pingback in %f seconds, closing connection',
+                      self._pingCheckInterval)
+            self._pingDisconnect()
+        else:
+            self._pingCheckDC = reactor.callLater(self._pingCheckInterval,
+                                                  self._pingCheck)
+    def connectionLost(self, reason):
+        self.stopPinging()
+        BaseMedium.connectionLost(self, reason)
+
+    def stopPinging(self):
+        if self._pingCheckDC:
+            self._pingCheckDC.cancel()
+        self._pingCheckDC = None
+
+        if self._pingDC:
+            self._pingDC.cancel()
+        self._pingDC = None
+
+    def _disconnect(self):
+        if self.remote:
+            self.remote.broker.transport.loseConnection()
+
+    def setRemoteReference(self, remote):
+        BaseMedium.setRemoteReference(self, remote)
+        self.startPinging(self._disconnect)
+

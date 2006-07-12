@@ -28,8 +28,9 @@ from twisted.spread import pb
 from twisted.python import failure
 
 from flumotion.common import errors, interfaces, log, common
+from flumotion.twisted import pb as fpb
 
-class ManagerAvatar(pb.Avatar, log.Loggable):
+class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
     """
     I am a base class for manager-side avatars to subclass from.
 
@@ -60,6 +61,15 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         self.remoteIdentity = remoteIdentity
 
         self.debug("created new Avatar with id %s" % avatarId)
+
+        self.startPingChecking(self.timeoutDisconnect)
+
+    def timeoutDisconnect(self):
+        if self.hasRemoteReference():
+            self.debug("Disconnecting due to ping timeout")
+            self.mind.broker.transport.loseConnection()
+        else:
+            self.debug("Ping timeout, but already disconnected")
         
     def hasRemoteReference(self):
         """
@@ -149,6 +159,7 @@ class ManagerAvatar(pb.Avatar, log.Loggable):
         """
         assert(self.mind == mind)
         self.debug('PB client from %s detached' % self.getClientAddress())
+        self.stopPingChecking()
         self.mind = None
         self.log('Client detached is mind %s' % mind)
 

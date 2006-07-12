@@ -81,6 +81,9 @@ def main(args):
         except ImportError, e:
             print ('Profiling requested, but statprof is not available (%s)'
                    % e)
+
+    reactor.addSystemEventTrigger('before', 'shutdown', 
+        job_factory.medium.shutdownHandler)
     
     log.debug('job', 'Starting reactor')
     reactor.run()

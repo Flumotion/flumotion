@@ -114,7 +114,7 @@ class WorkerClientFactory(factoryClass):
         print >> sys.stderr, 'ERROR: %s' % message
         reactor.stop()
 
-class WorkerMedium(medium.BaseMedium):
+class WorkerMedium(medium.PingingMedium):
     """
     I am a medium interfacing with the manager-side WorkerAvatar.
 

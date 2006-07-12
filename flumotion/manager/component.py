@@ -275,8 +275,6 @@ class ComponentAvatar(base.ManagerAvatar):
     logCategory = 'comp-avatar'
     implements(flavors.IStateListener)
 
-    _heartbeatCheckInterval = configure.heartbeatInterval * 2.5
-
     def __init__(self, *args, **kwargs):
         # doc in base class
         base.ManagerAvatar.__init__(self, *args, **kwargs)
@@ -287,8 +285,7 @@ class ComponentAvatar(base.ManagerAvatar):
         self._ports = {} # feedName -> port
         self._starting = False
 
-        self._lastHeartbeat = 0.0 # last time.time() of heartbeat
-        self._HeartbeatCheckDC = None # started when we have the state
+        self._shutdown_requested = False
         
     # make sure we don't have stray pendingTimedCalls
     def __del__(self):
@@ -308,10 +305,6 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Clean up when detaching.
         """
-        if self._HeartbeatCheckDC:
-            self._HeartbeatCheckDC.cancel()
-        self._HeartbeatCheckDC = None
-
         if self._ports:
             self.vishnu.releasePortsOnWorker(self.getWorkerName(),
                                              self._ports.values())
@@ -319,24 +312,19 @@ class ComponentAvatar(base.ManagerAvatar):
         self._ports = {}
 
         self.jobState = None
-        # if we're sad, we need an explicit cleanup to acknowledge the problem
-        if not self._getMoodValue() == moods.sad.value:
-            self._setMood(moods.sleeping)
 
-    def _heartbeatCheck(self):
-        """
-        Check if we received the heartbeat lately.  Set mood to LOST if not.
-        """
-        #self.log('checking heartbeat')
-        # FIXME: only notify of LOST mood once !
-        if self._lastHeartbeat > 0 \
-            and time.time() - self._lastHeartbeat \
-                > self._heartbeatCheckInterval \
-            and self._getMoodValue() != moods.lost.value:
-                self.warning('heartbeat missing, component is lost')
+        # At this point, change our mood:
+        # if we're sad, we remain sad, always. Otherwise, if we shut down due
+        # to an explicit manager request, go to sleeping. Otherwise, go to
+        # lost, because it got disconnected for an unknown reason (probably
+        # network related)
+        if not self._getMoodValue() == moods.sad.value:
+            if self._shutdown_requested:
+                self.debug("Shutdown was requested, component now sleeping")
+                self._setMood(moods.sleeping)
+            else:
+                self.debug("Shutdown was NOT requested, component now lost")
                 self._setMood(moods.lost)
-        self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
-            self._heartbeatCheck)
 
     def _setMood(self, mood):
         if not self.componentState:
@@ -416,10 +404,6 @@ class ComponentAvatar(base.ManagerAvatar):
         # make heaven register component
         self.heaven.registerComponent(self)
         self.vishnu.registerComponent(self)
-
-        # start scheduling callbacks for heartbeat
-        self._HeartbeatCheckDC = reactor.callLater(self._heartbeatCheckInterval,
-            self._heartbeatCheck)
 
     def detached(self, mind):
         # doc in base class
@@ -764,18 +748,14 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         assert isinstance(feedName, str)
         self.heaven.setFeederReadiness(self, feedName, isReady)
-            
-    def perspective_heartbeat(self, moodValue):
-        """
-        Called by the component to tell the manager that this component is
-        still alive and kicking.
 
-        @type  moodValue: int
+    def perspective_cleanShutdown(self):
         """
-        self._lastHeartbeat = time.time()
-        #log.log(self.avatarId,
-        #    "got heartbeat at %d" % int(self._lastHeartbeat))
-        self._setMoodValue(moodValue)
+        Called by a component to tell the manager that it's shutting down
+        cleanly (and thus should go to sleeping, rather than lost or sad)
+        """
+        self.debug("shutdown is clean, shouldn't go to lost")
+        self._shutdown_requested = True
 
     def perspective_error(self, element, error):
         self.error('error element=%s string=%s' % (element, error))

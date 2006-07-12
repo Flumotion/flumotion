@@ -148,7 +148,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         
 # FIXME: stop using signals, we can provide a richer interface with actual
 # objects and real interfaces for the views a model communicates with
-class AdminModel(medium.BaseMedium, gobject.GObject):
+class AdminModel(medium.PingingMedium, gobject.GObject):
     """
     I live in the admin client.
     I am a data model for any admin view implementing a UI to
@@ -304,7 +304,7 @@ class AdminModel(medium.BaseMedium, gobject.GObject):
             h.close()
 
         # chain up
-        medium.BaseMedium.setRemoteReference(self, remoteReference)
+        medium.PingingMedium.setRemoteReference(self, remoteReference)
 
         # fixme: push the disconnect notification upstream
         def remoteDisconnected(remoteReference):

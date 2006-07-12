@@ -119,7 +119,7 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
                                                     interfaces.IComponentMedium)
         
 # needs to be before BaseComponent because BaseComponent references it
-class BaseComponentMedium(medium.BaseMedium):
+class BaseComponentMedium(medium.PingingMedium):
     """
     I am a medium interfacing with a manager-side avatar.
     I implement a Referenceable for the manager's avatar to call on me.
@@ -135,6 +135,8 @@ class BaseComponentMedium(medium.BaseMedium):
         """
         self.comp = component
         self.logName = component.name
+
+        self.reactor_stopped = False
         
     ### our methods
     def setup(self, config):
@@ -208,8 +210,8 @@ class BaseComponentMedium(medium.BaseMedium):
         reactor.callLater(0, self._destroyCallLater)
 
     def _destroyCallLater(self):
-        self.debug('_destroyCalllater: losing connection and stopping reactor')
-        self.remote.broker.transport.loseConnection()
+        self.debug('_destroyCalllater: stopping reactor')
+        self.reactor_stopped = True
         reactor.stop()
 
     def remote_reloadComponent(self):
@@ -265,7 +267,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
     logCategory = 'basecomp'
 
     component_medium_class = BaseComponentMedium
-    _heartbeatInterval = configure.heartbeatInterval
     
     def __init__(self):
         # FIXME: name is unique where ? only in flow, so not in worker
@@ -301,7 +302,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.state.set('mood', moods.sleeping.value)
         self.state.set('pid', os.getpid())
 
-        self._HeartbeatDC = None
         self.medium = None # the medium connecting us to the manager's avatar
  
         self.uiState = componentui.WorkerComponentUIState()
@@ -454,7 +454,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         """
         self.debug('BaseComponent.start')
         self.setMood(moods.waking)
-        self.startHeartbeat()
 
         def start_plugs():
             for socket, plugs in self.plugs.items():
@@ -492,19 +491,10 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.setMood(moods.waking)
         for message in self.state.get('messages'):
             self.state.remove('messages', message)
-        self.stopHeartbeat()
 
         d = self.do_stop()
         d.addCallback(stop_plugs)
         return d
-
-    # FIXME: privatize
-    def startHeartbeat(self):
-        """
-        Start sending heartbeats.
-        """
-        self.debug('start sending heartbeats')
-        self._heartbeat()
 
     ### GObject methods
     def emit(self, name, *args):
@@ -527,9 +517,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
     def setMedium(self, medium):
         assert isinstance(medium, BaseComponentMedium)
         self.medium = medium
-        # send a heartbeat right now
-        if self._HeartbeatDC:
-            self._HeartbeatDC.reset(0)
 
     def setMood(self, mood):
         """
@@ -547,9 +534,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         self.debug('MOOD changed to %r' % mood)
         self.state.set('mood', mood.value)
-        # send a heartbeat right now
-        if self._HeartbeatDC:
-            self._HeartbeatDC.reset(0)
         
     def addMessage(self, message):
         """
@@ -590,31 +574,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                    "Can't change name while running"
         self.config = config
         self.name = config['name']
-
-    # FIXME: privatize
-    def stopHeartbeat(self):
-        """
-        Stop sending heartbeats.
-        """
-        self.debug('stop sending heartbeats')
-        if self._HeartbeatDC:
-            self.debug('canceling pending heartbeat')
-            self._HeartbeatDC.cancel()
-        self._HeartbeatDC = None
-         
-    def _heartbeat(self):
-        """
-        Send heartbeat to manager and reschedule.
-        """
-        #self.log('Sending heartbeat')
-        if self.medium:
-            d = self.medium.callRemote('heartbeat', self.state.get('mood'))
-            def trap_not_connected(failure):
-                failure.trap(errors.NotConnectedError)
-            d.addErrback(trap_not_connected)
-
-        self._HeartbeatDC = reactor.callLater(self._heartbeatInterval,
-            self._heartbeat)
 
         # update CPU time stats
         nowTime = time.time()

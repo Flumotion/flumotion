@@ -138,22 +138,32 @@ class JobMedium(medium.BaseMedium):
         # nicely
         reactor.callLater(0, self.shutdown)
 
+    def shutdownHandler(self):
+        if self.component:
+            medium = self.component.medium
+            if medium.hasRemoteReference():
+                d = medium.callRemote("cleanShutdown")
+                return d
+        return None
+
     ### our methods
     def shutdown(self):
         """
         Shut down the job process completely, cleaning up the component
         so the reactor can be left from.
         """
+        reactorAlreadyStopped = False
         if self.component:
             self.debug('stopping component')
             self.component.stop()
+            if self.component.medium and self.component.medium.reactor_stopped:
+                reactorAlreadyStopped = True
             self.debug('stopped component')
-        self.debug('stopping reactor')
-        reactor.stop()
-        self.debug('reactor stopped, exiting process')
 
-        # FIXME: temporary hack
-        os._exit(0)
+        if not reactorAlreadyStopped:
+            self.debug('stopping reactor')
+            reactor.stop()
+            self.debug('reactor stopped, exiting process')
 
     def _setNice(self, nice):
         if not nice:
@@ -298,6 +308,8 @@ class JobClientFactory(pb.PBClientFactory, log.Loggable):
     
     # the only way stopFactory can be called is if the WorkerBrain closes
     # the pb server.  Ideally though we would have gotten a notice before.
+    # This ensures we shut down the component/job in ALL cases where the worker
+    # goes away.
     def stopFactory(self):
         self.debug('shutting down medium')
         self.medium.shutdown()
