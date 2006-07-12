@@ -407,7 +407,7 @@ class FlumotionConfigXML(BaseConfigParser):
         config = { 'name': name,
                    'parent': parent,
                    'type': type,
-                   'avatarId': common.componentPath(name, parent)
+                   'avatarId': common.componentId(parent, name)
                  }
 
         try:
@@ -656,12 +656,12 @@ class FlumotionConfigXML(BaseConfigParser):
         entries = {}
         if self.atmosphere and self.atmosphere.components:
             for c in self.atmosphere.components.values():
-                path = common.componentPath(c.name, 'atmosphere')
+                path = common.componentId('atmosphere', c.name)
                 entries[path] = c
             
         for flowEntry in self.flows:
             for c in flowEntry.components.values():
-                path = common.componentPath(c.name, c.parent)
+                path = common.componentId(c.parent, c.name)
                 entries[path] = c
 
         return entries

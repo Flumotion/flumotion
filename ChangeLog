@@ -1,5 +1,16 @@
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/common.py:
+	  "depreciate" componentPath - blame pychecker
+	* flumotion/common/config.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_common.py:
+	* flumotion/test/test_manager_manager.py:
+	  remove all users of componentPath
+
+2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent.py:
 	* flumotion/job/job.py:
 	* flumotion/manager/base.py:

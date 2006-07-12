@@ -151,7 +151,7 @@ class TestArgRepr(unittest.TestCase):
 
 class TestComponentPath(unittest.TestCase):
     def testPath(self):
-        self.assertEqual(common.componentPath('Cain', 'Adam'), '/Adam/Cain')
+        self.assertEqual(common.componentId('Adam', 'Cain'), '/Adam/Cain')
         
     def testArg(self):
         self.assertEqual(common.argRepr((1, '2')), "1, '2'")

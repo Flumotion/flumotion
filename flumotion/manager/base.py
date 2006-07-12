@@ -322,7 +322,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
 
         self.debug('asked to authenticate keycard %r using bouncer %s' % (
             keycard, bouncerName))
-        avatarId = common.componentPath(bouncerName, 'atmosphere')
+        avatarId = common.componentId('atmosphere', bouncerName)
         if not self.heaven.hasAvatar(avatarId):
             self.warning('No bouncer with id %s registered' % avatarId)
             raise errors.UnknownComponentError(avatarId)

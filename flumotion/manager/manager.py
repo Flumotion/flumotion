@@ -410,9 +410,9 @@ class Vishnu(log.Loggable):
                 parts.append('default')
             return parts[0], parts[1]
 
-        for feeder, feed in [parseSource(x) for x in config['source']]:
+        for componentName, feed in [parseSource(x) for x in config['source']]:
             flowName = state.get('parent').get('name')  
-            avatarId = common.componentPath(feeder, flowName)
+            avatarId = common.componentId(flowName, componentName)
             feederState = self._componentMappers[avatarId].state
             self.debug('depending %r on %r' % (state, feederState))
             self._dag.addEdge(feederState, state)

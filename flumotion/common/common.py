@@ -464,7 +464,7 @@ def componentPath(componentName, parentName):
     """
     Create a path string out of the name of a component and its parent.
 
-    @deprecated Use @componentId instead
+    @depreciated: Use @componentId instead
     """
     return '/%s/%s' % (parentName, componentName)
 

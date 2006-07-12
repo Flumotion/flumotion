@@ -87,7 +87,7 @@ class FakeComponentAvatar(log.Loggable):
                  listen_host='127.0.0.1'):
         self.name = name
         self.parent = parent
-        self.avatarId = common.componentPath(name, parent)
+        self.avatarId = common.componentId(parent, name)
         self.eaters = eaters
         self.port = port
         self.listen_host = listen_host
