@@ -37,17 +37,18 @@ class PBConnectionInfo(pb.Copyable, pb.RemoteCopy):
     """
     __implements__ = common.mergeImplements(pb.Copyable, pb.RemoteCopy)
 
-    def __init__(self, host, port, use_ssl, authenticator=None, **kw):
+    def __init__(self, host, port, use_ssl, authenticator):
         self.host = host
         self.port = port
         self.use_ssl = use_ssl
-        self.authenticator = authenticator or fpb.Authenticator()
-        for k, v in kw.items():
-            setattr(self.authenticator, k, v)
+        self.authenticator = authenticator
 
     def __str__(self):
-        return '%s@%s:%d' % (self.authenticator.username or '<anonymous>',
-                             self.host, self.port)
+        if self.authenticator:
+            return '%s@%s:%d' % (self.authenticator.username,
+                                 self.host, self.port)
+        else:
+            return '<anonymous>@%s:%d' % (self.host, self.port)
 
 pb.setUnjellyableForClass(PBConnectionInfo, PBConnectionInfo)
 
