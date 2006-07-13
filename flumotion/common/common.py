@@ -379,56 +379,6 @@ def waitForTerm():
     waiter = Waiter()
     waiter.sleep()
 
-def checkPortFree(port):
-    """
-    Check if the given local port is free to accept on.
-
-    @type port: int
-
-    @rtype: boolean
-    """
-    assert type(port) == int
-    fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        fd.bind(('', port))
-    except socket.error:
-        return False
-    
-    return True
-    
-def getFirstFreePort(startPort):
-    """
-    Get the first free port, starting from the given port.
-
-    @type startPort: int
-
-    @rtype: int
-    """
-    port = startPort
-    while 1:
-        if checkPortFree(port):
-            return port
-        port += 1
-
-def checkRemotePort(host, port):
-    """
-    Check if the given remote host/port is accepting connections.
-
-    @type port: int
-
-    @rtype: boolean
-    """
-    assert type(port) == int
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.connect((host, port))
-    except socket.error:
-        s.close()
-        return False
-    
-    s.close()
-    return True
-
 def addressGetHost(a):
     """
     Get the host name of an IPv4 address.

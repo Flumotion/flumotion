@@ -1,3 +1,10 @@
+2006-07-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/common.py (checkPortFree, getFirstFreePort)
+	(checkRemotePort): 
+	* flumotion/test/test_common.py (TestPort): Remove fundamentally
+	broken code.
+
 2006-07-12  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/common.py:
