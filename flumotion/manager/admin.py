@@ -86,7 +86,9 @@ class AdminAvatar(base.ManagerAvatar):
         kw = broker.unserialize(kw, self)
         method = getattr(self, "perspective_%s" % message)
 
-        self.vishnu.adminAction(self.remoteIdentity, message, args, kw)
+        benignMethods = ('ping',)
+        if message not in benignMethods:
+            self.vishnu.adminAction(self.remoteIdentity, message, args, kw)
 
         try:
             state = method(*args, **kw)
