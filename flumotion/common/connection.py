@@ -27,7 +27,8 @@ import re
 
 from twisted.spread import pb
 
-from flumotion.common import common, keycards
+from flumotion.common import common
+from flumotion.twisted import pb as fpb
 
 class PBConnectionInfo(pb.Copyable, pb.RemoteCopy):
     """
@@ -36,23 +37,17 @@ class PBConnectionInfo(pb.Copyable, pb.RemoteCopy):
     """
     __implements__ = common.mergeImplements(pb.Copyable, pb.RemoteCopy)
 
-    def __init__(self, host, port, use_ssl, keycard=None, username=None,
-        password=None):
+    def __init__(self, host, port, use_ssl, authenticator=None, **kw):
         self.host = host
         self.port = port
         self.use_ssl = use_ssl
-        if username or password:
-            assert keycard is None, \
-                   'Either give username/password or keycard, not both'
-            self.keycard = keycards.KeycardUACPP(username, password,
-                                                 None) 
-        else:
-            self.keycard = keycard
+        self.authenticator = authenticator or fpb.Authenticator()
+        for k, v in kw.items():
+            setattr(self.authenticator, k, v)
 
     def __str__(self):
-        return '%s@%s:%d' % (getattr(self.keycard, 'username',
-                                     '<anonymous>'), self.host,
-                             self.port)
+        return '%s@%s:%d' % (self.authenticator.username or '<anonymous>',
+                             self.host, self.port)
 
 pb.setUnjellyableForClass(PBConnectionInfo, PBConnectionInfo)
 
@@ -83,8 +78,8 @@ def parsePBConnectionInfo(string, username='user', password='test',
 
     @rtype: L{PBConnectionInfo}
     """
-    keycard = keycards.KeycardUACPP(username, password, None)
-    ret = PBConnectionInfo(None, port, use_ssl, keycard)
+    auth = fpb.Authenticator(username=username, password=password)
+    ret = PBConnectionInfo(None, port, use_ssl, auth)
     
     matched = _pat.search(string)
     if not matched:
@@ -93,8 +88,8 @@ def parsePBConnectionInfo(string, username='user', password='test',
                         % string)
 
     groups = matched.groups()
-    for o, k, i, f in ((keycard, 'username', 1, str),
-                       (keycard, 'password', 3, str),
+    for o, k, i, f in ((auth, 'username', 1, str),
+                       (auth, 'password', 3, str),
                        (ret, 'host', 4, str),
                        (ret, 'port', 6, int)):
         if groups[i]:

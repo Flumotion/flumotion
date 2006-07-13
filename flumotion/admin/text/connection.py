@@ -21,19 +21,19 @@
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.text.view import AdminTextView
-from flumotion.twisted import flavors, reflect
+from flumotion.twisted import flavors, reflect, pb as fpb
 from flumotion.common import errors
 
 from twisted.internet import reactor
 
-def connect_to_manager(stdscr, hostname, port, insecure, username, 
-password):
+def connect_to_manager(stdscr, hostname, port, insecure, username, password):
     stdscr.addstr(0,0,"Connecting to %s:%d with username %s " % 
-(hostname, port, username))
+                  (hostname, port, username))
     stdscr.clrtobot()
     stdscr.refresh()
 
-    model = AdminModel(username, password)
+    authenticator = fpb.Authenticator(username=username, password=password)
+    model = AdminModel(authenticator)
     d = model.connectToHost(hostname, port, insecure)
 
     def outputError(str):

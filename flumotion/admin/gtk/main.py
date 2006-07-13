@@ -33,6 +33,7 @@ from flumotion.admin.gtk import dialogs
 from flumotion.admin.gtk.client import Window
 from flumotion.common import log, errors
 from flumotion.configure import configure
+from flumotion.twisted import pb as fpb
 
 def _runInterface(conf_file, options, thegreeter=None):
     if conf_file:
@@ -49,7 +50,9 @@ def _runInterface(conf_file, options, thegreeter=None):
         return
     g.set_sensitive(False)
 
-    model = AdminModel(state['user'], state['passwd'])
+    authenticator = fpb.Authenticator(username=state['user'],
+                                      password=state['passwd'])
+    model = AdminModel(authenticator)
     d = model.connectToHost(state['host'], state['port'], state['use_insecure'])
 
     def connected(model, greeter):

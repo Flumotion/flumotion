@@ -157,20 +157,17 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
     # Public instance variables (read-only)
     planet = None
 
-    def __init__(self, username=None, password=None, keycard=None):
+    def __init__(self, authenticator):
         self.__gobject_init__()
         
         # All of these instance variables are private. Cuidado cabrones!
-        self.user = username
-        self.passwd = password
-        self.keycard = keycard
+        self.authenticator = authenticator
         self.host = self.port = self.use_insecure = None
 
         self.managerId = '<uninitialized>'
 
         self.state = 'disconnected'
-        self.clientFactory = self._makeFactory(username, password,
-                                               keycard)
+        self.clientFactory = self._makeFactory(authenticator)
         # 20 secs max for an admin to reconnect
         self.clientFactory.maxDelay = 20
 
@@ -181,13 +178,12 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         self._views = [] # all UI views I am serving
 
     # a method so mock testing frameworks can override it
-    def _makeFactory(self, username=None, password=None, keycard=None):
+    def _makeFactory(self, authenticator):
         # FIXME: this needs further refactoring, so we only ever pass
         # an authenticator.  For that we need to fix all users of this
         # class too
-        a = fpb.Authenticator(username=username, password=password)
         factory = AdminClientFactory(self)
-        factory.startLogin(a)
+        factory.startLogin(authenticator)
         return factory
 
     def connectToHost(self, host, port, use_insecure=False):
@@ -199,10 +195,9 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         # the intention here is to give an id unique to the manager --
         # if a program is adminning multiple managers, this id should
         # tell them apart (and identify duplicates)
-        self.managerId = '%s@%s:%d' % (self.user or
-                                       getattr(self.keycard, 'username',
-                                               '<unknown>'),
-                                       self.host, self.port)
+        self.managerId = ('%s@%s:%d'
+                          % (self.authenticator.username or '<unknown>',
+                             self.host, self.port))
 
         self.info('Connecting to manager %s with %s',
                   self.managerId, use_insecure and 'TCP' or 'SSL')
@@ -278,14 +273,18 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
     def setRemoteReference(self, remoteReference):
         self.debug("setRemoteReference %r" % remoteReference)
         def writeConnection():
+            if not (self.authenticator.username
+                    and self.authenticator.password):
+                self.log('not caching connection information')
+                return
             s = ''.join(['<connection>',
                          '<host>%s</host>' % self.host,
                          '<manager>%s</manager>' % self.planet.get('name'),
                          '<port>%d</port>' % self.port,
                          '<use_insecure>%d</use_insecure>' 
                          % (self.use_insecure and 1 or 0),
-                         '<user>%s</user>' % self.user,
-                         '<passwd>%s</passwd>' % self.passwd,
+                         '<user>%s</user>' % self.authenticator.username,
+                         '<passwd>%s</passwd>' % self.authenticator.password,
                          '</connection>'])
             
             sum = md5.new(s).hexdigest()
@@ -317,9 +316,9 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         yield d
         self._workerHeavenState = d.value()
         self.debug('got worker state')
-        
-        if self.user is not None and self.passwd is not None:
-            writeConnection()
+
+        writeConnection()
+
         self.debug('Connected to manager and retrieved all state')
         self.state = 'connected'
         self.emit('connected')

@@ -20,7 +20,8 @@
 # Headers in this file shall remain intact.
 
 
-from flumotion.common import log, planet, keycards
+from flumotion.twisted import pb as fpb
+from flumotion.common import log, planet
 from flumotion.admin import admin
 
 
@@ -93,8 +94,7 @@ class MultiAdminModel(log.Loggable):
         self.listeners.append(obj)
 
     # Public
-    def addManager(self, host, port, use_insecure, user=None,
-                   auth_cb=None, error_cb=None, keycard=None):
+    def addManager(self, host, port, use_insecure, authenticator):
         def connected_cb(admin):
             planet = admin.planet
             self.info('Connected to manager %s (planet %s)'
@@ -110,13 +110,7 @@ class MultiAdminModel(log.Loggable):
             else:
                 self.warning('Could not find admin model %r' % admin)
 
-        if keycard is None:
-            auth = auth_cb()
-            if not auth:
-                return None
-            a = admin.AdminModel(user, auth['passwd'])
-        else:
-            a = admin.AdminModel(keycard=keycard)
+        a = admin.AdminModel(authenticator)
 
         a.connectToHost(host, port, use_insecure)
         a.connect('connected', connected_cb)

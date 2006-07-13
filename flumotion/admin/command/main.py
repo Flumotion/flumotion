@@ -32,6 +32,7 @@ from flumotion.common import log, errors
 # make Message proxyable
 from flumotion.common import messages
 from flumotion.configure import configure
+from flumotion.twisted import pb as fpb
 
 from flumotion.admin.command.commands import commands
 
@@ -91,7 +92,9 @@ def parse_commands(args):
     return command
 
 def setup_reactor(connection):
-    model = AdminModel(connection['user'], connection['passwd'])
+    auth = fpb.Authenticator(username=connection['user'],
+                             password=connection['passwd'])
+    model = AdminModel(auth)
     d = model.connectToHost(connection['host'], connection['port'],
                             connection['use_insecure'])
 
