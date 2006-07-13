@@ -286,10 +286,10 @@ class BundlerBasket:
         @type dependencies: list of strings
         """
         # note that a bundler doesn't necessarily need to be registered yet
-        if not self._graph.hasObject(depender):
+        if not self._graph.hasNode(depender):
             self._graph.addNode(depender)
         for dep in dependencies:
-            if not self._graph.hasObject(dep):
+            if not self._graph.hasNode(dep):
                 self._graph.addNode(dep)
             self._graph.addEdge(depender, dep)
 

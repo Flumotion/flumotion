@@ -38,7 +38,7 @@ from flumotion.common import planet, common, dag, messages, reflectcall, server
 from flumotion.common.identity import RemoteIdentity
 from flumotion.common.planet import moods
 from flumotion.configure import configure
-from flumotion.manager import admin, component, worker, base
+from flumotion.manager import admin, component, worker, base, depgraph
 from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 from flumotion.twisted.defer import defer_generator_method
@@ -213,7 +213,7 @@ class Vishnu(log.Loggable):
 
         self.plugs = {} # socket -> list of plugs
 
-        self._dag = dag.DAG() # component dependency graph
+        self._depgraph = depgraph.DepGraph()
         
         # create a portal so that I can be connected to, through our dispatcher
         # implementing the IRealm and a bouncer
@@ -354,7 +354,7 @@ class Vishnu(log.Loggable):
             for args in plugs:
                 self._addManagerPlug(socket, args, remoteIdentity)
 
-    def _addComponent(self, config, parent, remoteIdentity):
+    def _addComponent(self, conf, parent, remoteIdentity):
         """
         Add a component state for the given component config entry.
 
@@ -362,23 +362,23 @@ class Vishnu(log.Loggable):
         """
 
         self.debug('adding component %s to %s'
-                   % (config.name, parent.get('name')))
+                   % (conf.name, parent.get('name')))
         
         if remoteIdentity != RUNNING_LOCALLY:
             self.adminAction(remoteIdentity, '_addComponent',
-                             (config, parent), {})
+                             (conf, parent), {})
 
         state = planet.ManagerComponentState()
-        state.set('name', config.name)
-        state.set('type', config.getType())
-        state.set('workerRequested', config.worker)
+        state.set('name', conf.name)
+        state.set('type', conf.getType())
+        state.set('workerRequested', conf.worker)
         state.set('mood', moods.sleeping.value)
-        state.set('config', config.getConfigDict())
+        state.set('config', conf.getConfigDict())
 
         state.set('parent', parent)
         parent.append('components', state)
 
-        avatarId = config.getConfigDict()['avatarId']
+        avatarId = conf.getConfigDict()['avatarId']
 
         # add to mapper
         m = ComponentMapper()
@@ -387,36 +387,23 @@ class Vishnu(log.Loggable):
         self._componentMappers[state] = m
         self._componentMappers[avatarId] = m
 
-        # add nodes to graph
-        self._dag.addNode(state)
-
         return state
 
     def _updateFlowDependencies(self, state):
         self.debug('registering dependencies of %r' % state)
-        config = state.get('config')
 
-        if not config.has_key('source'):
-            return
+        self._depgraph.addComponent(state)
 
-        # config['source'] is a list of strings whose format is
-        # "feeding-component:feed-name", where feed-name defaults to
-        # "default". We make this component depend on every feeding
-        # component.
+        conf = state.get('config')
 
-        def parseSource(s):
-            parts = s.split(':')
-            if len(parts) == 1:
-                parts.append('default')
-            return parts[0], parts[1]
+        # If this component has the same id as the clock-master, then it is the
+        # clock master; add to the dependency graph.
+        componentAvatarId = common.componentId(
+            state.get('parent').get('name'), state.get('name'))
 
-        for componentName, feed in [parseSource(x) for x in config['source']]:
-            flowName = state.get('parent').get('name')  
-            avatarId = common.componentId(flowName, componentName)
-            feederState = self._componentMappers[avatarId].state
-            self.debug('depending %r on %r' % (state, feederState))
-            self._dag.addEdge(feederState, state)
-        
+        if componentAvatarId == conf['clock-master']:
+            self._depgraph.addClockMaster(state)
+
     def _updateStateFromConf(self, _, conf, remoteIdentity):
         self.debug('syncing up planet state with config')
         added = [] # added components while parsing
@@ -452,6 +439,8 @@ class Vishnu(log.Loggable):
         for componentState in added:
             self._updateFlowDependencies(componentState)
 
+        self._depgraph.mapEatersToFeeders()
+
         return added
 
     def _startComponents(self, _, conf, remoteIdentity):
@@ -460,7 +449,7 @@ class Vishnu(log.Loggable):
         # if workerName is None, we can start the component on any
         # worker
         to_start = {}
-        for c in self._getComponentsToStart():
+        for c in self._getComponentsToCreate():
             workerId = c.get('workerRequested')
             if not workerId in to_start:
                 to_start[workerId] = []
@@ -575,10 +564,13 @@ class Vishnu(log.Loggable):
         workerId = workerAvatar.avatarId
         self.debug('vishnu.workerAttached(): id %s' % workerId)
 
+        self._depgraph.addWorker(workerId)
+        self._depgraph.setWorkerStarted(workerId)
+
         # Create all components assigned to this worker. Note that the
         # order of creation is unimportant, it's only the order of
         # starting that matters (and that's different code).
-        components = [c for c in self._getComponentsToStart()
+        components = [c for c in self._getComponentsToCreate()
                       if c.get('workerRequested') in (workerId, None)]
 
         if not components:
@@ -615,11 +607,11 @@ class Vishnu(log.Loggable):
 
         for c in components:
             type = c.get('type')
-            config = c.get('config')
+            conf = c.get('config')
             self.debug('scheduling create of %s on %s'
-                       % (config['avatarId'], workerId))
+                       % (conf['avatarId'], workerId))
             d.addCallback(self._workerCreateComponentDelayed,
-                workerAvatar, c, type, config)
+                workerAvatar, c, type, conf)
 
         d.addCallback(lambda result: self.debug(
             '_workerCreateComponents(): completed setting up create chain'))
@@ -631,11 +623,11 @@ class Vishnu(log.Loggable):
         return d
 
     def _workerCreateComponentDelayed(self, result, workerAvatar,
-            componentState, type, config):
+            componentState, type, conf):
 
-        avatarId = config['avatarId']
+        avatarId = conf['avatarId']
 
-        d = workerAvatar.createComponent(avatarId, type, config)
+        d = workerAvatar.createComponent(avatarId, type, conf)
         # FIXME: here we get the avatar Id of the component we wanted
         # started, so now attach it to the planetState's component state
         d.addCallback(self._createCallback, componentState)
@@ -669,24 +661,25 @@ class Vishnu(log.Loggable):
         # called when a worker logs out
         workerId = workerAvatar.avatarId
         self.debug('vishnu.workerDetached(): id %s' % workerId)
+        self._depgraph.setWorkerStopped(workerId)
 
-    def _configToComponentState(self, config, avatar):
+    def _configToComponentState(self, conf, avatar):
         assert not avatar.avatarId in self._componentMappers.keys()
 
         state = planet.ManagerComponentState()
-        state.set('name', config['name'])
-        state.set('type', config['type'])
+        state.set('name', conf['name'])
+        state.set('type', conf['type'])
         state.set('workerRequested', None)
         state.set('mood', moods.waking.value)
-        state.set('config', config)
+        state.set('config', conf)
 
         # check if we have this flow yet and add if not
-        isOurFlow = lambda x: x.get('name') == config['parent']
+        isOurFlow = lambda x: x.get('name') == conf['parent']
         flow = _first(self.state.get('flows'), isOurFlow)
         if not flow:
-            self.info('Creating flow "%s"' % config['parent'])
+            self.info('Creating flow "%s"' % conf['parent'])
             flow = planet.ManagerFlowState()
-            flow.set('name', config['parent'])
+            flow.set('name', conf['parent'])
             flow.set('parent', self.state)
             self.state.append('flows', flow)
 
@@ -699,9 +692,6 @@ class Vishnu(log.Loggable):
         m.id = avatar.avatarId
         self._componentMappers[m.state] = m
         self._componentMappers[m.id] = m
-
-        # add nodes to graph
-        self._dag.addNode(state)
 
         return self.componentAttached(avatar)
 
@@ -719,10 +709,14 @@ class Vishnu(log.Loggable):
 
         # attach componentstate to avatar
         componentAvatar.componentState = m.state
+
+        self._depgraph.setJobStarted(componentAvatar.componentState)
+
         return defer.succeed(None)
 
     def componentDetached(self, componentAvatar):
         # called when the component has detached
+        self._depgraph.setJobStopped(componentAvatar.componentState)
 
         # detach componentstate fom avatar
         componentAvatar.componentState = None
@@ -800,9 +794,9 @@ class Vishnu(log.Loggable):
         
     def deleteFlow(self, flowName):
         """
-        Empty the planet of all components, and flows.
+        Empty the planet of a flow.
 
-        @returns: a deferred that will fire when the flow is empty.
+        @returns: a deferred that will fire when the flow is removed.
         """
 
         # first get all components to sleep
@@ -817,6 +811,7 @@ class Vishnu(log.Loggable):
             raise errors.BusyComponentError(_first(components, pred))
 
         for c in components:
+            self._depgraph.removeComponent(c)
             del self._componentMappers[self._componentMappers[c].id]
             del self._componentMappers[c]
         yield flow.empty()
@@ -876,6 +871,9 @@ class Vishnu(log.Loggable):
             len(components))
 
         for c in components:
+            # remove from depgraph
+            self._depgraph.removeComponent(c)
+
             if c.get('mood') is not moods.sleeping.value:
                 self.warning('Component %s is not sleeping' % c.get('name'))
             # clear mapper; remove componentstate and id
@@ -902,7 +900,7 @@ class Vishnu(log.Loggable):
         dl = defer.DeferredList(list)
         return dl
        
-    def _getComponentsToStart(self):
+    def _getComponentsToCreate(self):
         # return a list of components that are sleeping and not pending
         components = self.state.getComponents()
 

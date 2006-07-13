@@ -251,10 +251,6 @@ class TestComponentHeaven(unittest.TestCase):
         a3 = FakeComponentAvatar(name='baz', port=1001, listen_host='baz-host')
         self.heaven.avatars[a2.avatarId] = a3
 
-        set = self.heaven._getFeederSet(a)
-        set.addFeeders(a2)
-        set.addFeeders(a3)
-
 class FakeTransport:
     def getPeer(self):
         from twisted.internet.address import IPv4Address
@@ -340,7 +336,7 @@ class FakeComponentMind(FakeMind):
         return ("127.0.0.1", port, 0L)
 
     def remote_setup(self, config):
-        self.debug('remote_setup(%r)' % config)
+        self.debug('remote_setup(%r)', config)
 
     def remote_start(self, clocking):
         self.debug('remote_start(%r)' % clocking)
@@ -468,6 +464,23 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         # change things ?
         self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
 
+        # now lets empty planet and make sure theres nothing in the depgraph
+        d = self.vishnu.emptyPlanet()
+
+        def verifyEmptyDAG(result):
+            # remove worker streamer that is set as the worker for http-streamer
+            # in test.xml
+            self.vishnu._depgraph.removeWorker("streamer")
+            # make sure the depgraph is empty
+            self.assertEqual(self.vishnu._depgraph._dag._nodes,{})
+
+        if weHaveAnOldTwisted():
+            unittest.deferredResult(d)
+            verifyEmptyDAG(None)
+        else:
+            d.addCallback(verifyEmptyDAG)
+            return d
+
     def testConfigBeforeWorker(self):
         # test a config with three components being loaded before the worker
         # logs in
@@ -484,18 +497,24 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         # 3 component states + avatarId's gotten from the config
         self.assertEqual(len(mappers.keys()), 6)
 
-        # verify dag edges
+        # verify depgraph
         id = '/testflow/producer-video-test'
         state = mappers[id].state
-        assert not state, state
-        o = self.vishnu._dag.getOffspring(state)
-        names = [s.get('name') for s in o]
+        assert state, state
+        dag = self.vishnu._depgraph._dag
+        o = dag.getOffspringTyped(state, self.vishnu._depgraph.COMPONENTSTART)
+        names = [s.get('name') for s,t in o]
         self.failIf('producer-video-test' in names)
         self.failUnless('converter-ogg-theora' in names)
         self.failUnless('streamer-ogg-theora' in names)
+
+        # verify that nothing should be started
+        start = self.vishnu._depgraph.whatShouldBeStarted()
+        # should be nothing because we have no worker
+        assert start == []
         
         # log in a worker and verify components get started
-        avatar = self._loginWorker('worker')
+        avatar = workerAvatar = self._loginWorker('worker')
 
         self._verifyConfigAndOneWorker()
 
@@ -526,7 +545,10 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         self._verifyComponentIdGone(id, moods.sleeping)
 
         self._verifyConfigAndNoWorker()
-    testConfigBeforeWorker.skip = "Help, thomas..."
+
+        # Now log out the worker.
+        self._logoutAvatar(workerAvatar)
+
 
     def testConfigAfterWorker(self):
         # test a config with three components being loaded after the worker
@@ -578,12 +600,25 @@ class TestVishnu(log.Loggable, unittest.TestCase):
 
         # clear out the complete planet
         d = self.vishnu.emptyPlanet()
+
+        def removeWorkersAndCheckDAG(result):
+            # make sure the depgraph is empty
+            # remove worker 'streamer' that is set as the worker for 
+            # http-streamer in test.xml
+            # and remove worker 'worker' that was logged in, in this test
+            self.vishnu._depgraph.removeWorker("streamer")
+            self.vishnu._depgraph.removeWorker("worker")
+
+            self.assertEqual(self.vishnu._depgraph._dag._nodes,{})
+
         if weHaveAnOldTwisted():
             unittest.deferredResult(d)
             self.assertEqual(len(mappers.keys()), 0)
+            removeWorkersAndCheckDAG(None)
         else:
             def verifyMappersIsZero(result):
                 self.assertEqual(len(mappers.keys()), 0)
+            d.addCallback(removeWorkersAndCheckDAG)
             d.addCallback(verifyMappersIsZero)
             return d
 

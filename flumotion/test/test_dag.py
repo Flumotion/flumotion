@@ -38,7 +38,7 @@ class TestDAG(unittest.TestCase):
         sorted = dag.topological_sort(nodes, edges)
 
         for order in orderings:
-            positions = [sorted.index(x) for x in order]
+            positions = [sorted.index((x,0)) for x in order]
             positions_sorted = list(positions)
             positions_sorted.sort()
             self.failUnless(positions == positions_sorted)
@@ -128,6 +128,11 @@ class TestDAG(unittest.TestCase):
         for n in ['enoch', 'irad']:
             self.failUnless(n in offspring)
 
+        ancestors = graph.getAncestors('irad')
+        self.assertEquals(len(ancestors), 4)
+        for n in ['enoch', 'cain', 'adam', 'eve']:
+            self.failUnless(n in ancestors)
+
     def testUniqueChildren(self):
         # test whether we get a list of unique children even through
         # common ancestry
@@ -173,7 +178,7 @@ class TestDAG(unittest.TestCase):
         # the example
         # even though multiple answers are possible, the preferred order
         # makes sure we get the one result we want
-        nodes = graph._sortPreferred([1, 2, 3, 4, 5, 6, 9, 8, 7])
+        nodes = graph._sortPreferred([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0), (9,0), (8,0), (7,0)])
         sorted = [node.object for node in nodes]
         self.assertEquals(sorted, [7, 9, 1, 4, 6, 5, 8, 2, 3])
 
@@ -182,7 +187,7 @@ class TestDAG(unittest.TestCase):
         counts = [(1, 14), (2, 5), (3, 4), (6, 13), (8, 11), (7, 12),
                   (17, 18), (9, 10), (15, 16)]
         for i in range(1,10):
-            n = graph.nodes[i]
+            n = graph._nodes[(i,0)]
             begin, end = counts[i - 1]
             self.assertEquals(graph._begin[n], begin)
             self.assertEquals(graph._end[n], end)
@@ -224,11 +229,11 @@ class TestPlanet(unittest.TestCase):
         graph.addNode(fau, feeder)
         graph.addNode(fvi, feeder)
 
-        graph.addEdge(weu, kpr)
-        graph.addEdge(kpr, fau)
-        graph.addEdge(kpr, fvi)
-        graph.addEdge(fau, cpr)
-        graph.addEdge(fvi, cpr)
+        graph.addEdge(weu, kpr, worker, kid)
+        graph.addEdge(kpr, fau, kid, feeder)
+        graph.addEdge(kpr, fvi, kid, feeder)
+        graph.addEdge(fau, cpr, feeder, component)
+        graph.addEdge(fvi, cpr, feeder, component)
 
         kcv = FakeKid('converter')
         ccv = FakeComponent('converter')
@@ -240,14 +245,14 @@ class TestPlanet(unittest.TestCase):
         graph.addNode(evi, eater)
         graph.addNode(fen, feeder)
 
-        graph.addEdge(weu, kcv)
-        graph.addEdge(kcv, fen)
-        graph.addEdge(kcv, evi)
-        graph.addEdge(fen, ccv)
-        graph.addEdge(evi, ccv)
+        graph.addEdge(weu, kcv, worker, kid)
+        graph.addEdge(kcv, fen, kid, feeder)
+        graph.addEdge(kcv, evi, kid, eater)
+        graph.addEdge(fen, ccv, feeder, component)
+        graph.addEdge(evi, ccv, eater, component)
 
         # link from producer to converter
-        graph.addEdge(fvi, evi)
+        graph.addEdge(fvi, evi, feeder, eater)
 
         # consumer
         kcs = FakeKid('consumer')
@@ -256,15 +261,14 @@ class TestPlanet(unittest.TestCase):
 
         graph.addNode(kcs, kid)
         graph.addNode(ccs, component)
-        graph.addNode(een, feeder)
+        graph.addNode(een, eater)
 
-        graph.addEdge(wus, kcs)
-        graph.addEdge(kcs, een)
-        graph.addEdge(een, ccs)
+        graph.addEdge(wus, kcs, worker, kid)
+        graph.addEdge(kcs, een, kid, eater)
+        graph.addEdge(een, ccs, eater, component)
 
         # link from converter to consumer
-        graph.addEdge(fen, een)
-
+        graph.addEdge(fen, een, feeder, eater)
         # tester
         kte = FakeKid('tester')
         cte = FakeComponent('tester')
@@ -272,19 +276,19 @@ class TestPlanet(unittest.TestCase):
         graph.addNode(kte, kid)
         graph.addNode(cte, component)
 
-        graph.addEdge(ccs, cte)
+        graph.addEdge(ccs, cte, component, component)
 
         # test offspring filtered
         
         # all components depend on the european worker
-        list = graph.getOffspring(weu, component)
+        list = graph.getOffspringTyped(weu, worker, component)
         self.assertEquals(len(list), 4)
-        for c in [cpr, ccv, ccs, cte]:
+        for c in [(cpr, component), (ccv, component), (ccs, component), (cte, component)]:
             self.failUnless(c in list)
 
         # only streamer and tester depend on the us worker
-        list = graph.getOffspring(wus, component)
+        list = graph.getOffspringTyped(wus, worker, component)
         self.assertEquals(len(list), 2)
-        for c in [ccs, cte]:
+        for c in [(ccs, component), (cte, component)]:
             self.failUnless(c in list)
 

@@ -1,3 +1,23 @@
+2006-07-13  Michael Smith  <msmith@fluendo.com>
+
+	* doc/random/component-initialization-protocol:
+	* flumotion/common/bundle.py:
+	* flumotion/common/dag.py:
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/manager/Makefile.am:
+	* flumotion/manager/component.py:
+	* flumotion/manager/depgraph.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_dag.py:
+	* flumotion/test/test_manager_depgraph.py:
+	* flumotion/test/test_manager_manager.py:
+
+	  Merge component-dependencies. Mostly a manual merge (apart from
+	  pre-existing files), as other code had changed a lot.
+
 2006-07-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/command/main.py (setup_reactor): Update for

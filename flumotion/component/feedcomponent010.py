@@ -21,6 +21,7 @@
 
 import gst
 import gobject
+import time
 
 from twisted.internet import reactor, defer
 
@@ -43,6 +44,14 @@ class FeedComponent(basecomponent.BaseComponent):
     # keep these as class variables for the tests
     EATER_TMPL = 'fdsrc name=%(name)s ! gdpdepay'
     FEEDER_TMPL = 'gdppay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
+
+    # how often to add the buffer probe
+    BUFFER_PROBE_ADD_FREQUENCY = 5
+
+    # how often to check that a buffer has arrived recently
+    BUFFER_CHECK_FREQUENCY = 10
+
+    BUFFER_TIME_THRESHOLD = 30
 
     logCategory = 'feedcomponent'
 
@@ -73,7 +82,15 @@ class FeedComponent(basecomponent.BaseComponent):
         self.feed_names = []
         self.feeder_names = []
 
+        self.last_buffer_time = 0
+
+        reactor.callLater(self.BUFFER_CHECK_FREQUENCY,
+            self._check_for_buffer_data)
+
     def do_setup(self):
+        """
+        Sets up component.
+        """
         eater_config = self.config.get('source', [])
         feeder_config = self.config.get('feed', [])
 
@@ -228,6 +245,7 @@ class FeedComponent(basecomponent.BaseComponent):
         elif t == gst.MESSAGE_EOS:
             if src == self.pipeline:
                 self.info('End-of-stream in pipeline, stopping')
+                self.setMood(moods.sad)
                 self.cleanup()
         else:
             self.log('message received: %r' % message)
@@ -347,17 +365,48 @@ class FeedComponent(basecomponent.BaseComponent):
                 self.warning('No element named %s in pipeline' % name)
                 continue
             pad = eater.get_pad("src")
-            self._probe_ids[name] = pad.add_buffer_probe(self._buffer_probe_cb,
-                name)
+            self._add_buffer_probe(pad, name)
+
+    def _add_buffer_probe(self, pad, name):
+        self.debug("Adding new scheduled buffer probe for %s" % name)
+        self._probe_ids[name] = pad.add_buffer_probe(self._buffer_probe_cb,
+            name)
 
     def _buffer_probe_cb(self, pad, buffer, name):
         # log info about first incoming buffer, then remove ourselves
-        self.debug('first buffer probe on eater %s has timestamp %.3f' % (
+        self.debug('buffer probe on eater %s has timestamp %.3f' % (
             name, float(buffer.timestamp) / gst.SECOND))
+        # now store the last buffer received time
+        self.last_buffer_time = time.time()
         if self._probe_ids[name]:
             pad.remove_buffer_probe(self._probe_ids[name])
             self._probe_ids[name] = None
+            # add buffer probe every BUFFER_PROBE_ADD_FREQUENCY seconds
+            reactor.callLater(self.BUFFER_PROBE_ADD_FREQUENCY,
+                self._add_buffer_probe, pad, name)
+
         return True
+
+    def _check_for_buffer_data(self):
+        """
+        Check that buffers are being received.
+        I am used as a check run every x seconds and set mood to hungry if no
+        buffer received within BUFFER_TIME_THRESHOLD and set mood to happy if
+        a buffer has been received in that threshold but component is hungry
+        """
+        if self.last_buffer_time > 0:
+            current_time = time.time()
+            if self.getMood() == moods.happy \
+            and current_time > self.last_buffer_time + \
+            self.BUFFER_TIME_THRESHOLD:
+                self.setMood(moods.hungry)
+            elif self.getMood() == moods.hungry:
+                # we are hungry but we have a recent buffer
+                # so set to happy
+                self.setMood(moods.happy)
+        reactor.callLater(self.BUFFER_CHECK_FREQUENCY,
+            self._check_for_buffer_data)
+
         
     def get_element(self, element_name):
         assert self.pipeline
@@ -426,6 +475,8 @@ class FeedComponent(basecomponent.BaseComponent):
         elementName = "eater:%s" % feedId
         self.debug('looking up element %s' % elementName)
         element = self.get_element(elementName)
+        #noreallymyfd = int(fd)
+        #element.set_property('fd', noreallymyfd)
         element.set_property('fd', fd)
 
 pygobject.type_register(FeedComponent)

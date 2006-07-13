@@ -40,7 +40,7 @@ to report state through.
 The implementation calls every init() method of any of the subclasses
 in the hierarchy.
 
-BaseComponent.setup(self, config)
+BaseComponent.setup(self, config, *args, **kwargs)
 ---------------------------------
 Invoked by manager through medium.
 sets self.config
@@ -96,7 +96,7 @@ method should go to sad and raise ComponentSetupError itself.
 If there is nothing, or only warnings, the method should return a result.
 After this call, the component should be ready to set up.
 
-BaseComponent.do_setup(self)
+BaseComponent.do_setup(self, *args, **kwargs)
 ----------------------------
 This method has no requirements. It is implementation-specific.
 After this call, the component should have created all resources and
@@ -123,10 +123,11 @@ pipeline.
 Implementations
 ---------------
 
-FeedComponent.do_setup(self)
+FeedComponent.do_setup(self, eatersData, feedersData)
 -------------------------
-This method will instantiate a pipeline first, then allow the object a
-chance to do any further initialization after the pipeline is created.
+This method will instantiate a pipeline first, and set up the eaters' and
+feeders' hostnames and ports then allow the object a chance to do any further
+initialization after the pipeline is created.
 It does this by calling the following two methods:
 
   FeedComponent.create_pipeline(self)

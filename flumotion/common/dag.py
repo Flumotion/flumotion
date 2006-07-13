@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 """
-Direct Acyclic Graph class and functionality
+Directed Acyclic Graph class and functionality
 """
 
 class CycleError(Exception):
@@ -52,13 +52,13 @@ class Node:
 
 class DAG:
     """
-    I represent a Direct Acyclic Graph.
+    I represent a Directed Acyclic Graph.
 
     You can add objects to me as Nodes and then express dependency by
     adding edges.
     """
     def __init__(self):
-        self.nodes = {} # map of object -> Node
+        self._nodes = {} # map of (object, type) -> NodeX    
         self._tainted = False # True after add/remove and no cycle check done
 
         # topological sort stuff
@@ -67,45 +67,101 @@ class DAG:
         self._end = {} # node -> end count
         self._hasZeroEnd = [] # list of nodes that have end set to zero
 
-    def _assertExists(self, object):
-        if not self.hasObject(object):
+    def _assertExists(self, object, type=0):
+        if not self.hasNode(object, type):
             raise KeyError("No node for %r" % object)
 
     def addNode(self, object, type=0):
-        if self.hasObject(object):
-            raise KeyError("Node for %r already exists" % object)
+        """
+        I add a node to the DAG.
+
+        @param object: An object to put in the DAG.
+        @param type: An optional type for the object.
+        @type type: Integer
+        """
+        if self.hasNode(object, type):
+            raise KeyError("Node for %r already exists with type %d" % (
+                object, type))
 
         n = Node(object, type)
-        self.nodes[object] = n
+        self._nodes[(object,type)] = n
 
-    def hasObject(self, object):
-        return object in self.nodes.keys()
+    def hasNode(self, object, type=0):
+        """
+        I check if a node exists in the DAG.
 
-    def removeNode(self, object):
-        if not self.hasObject(object):
-            raise KeyError("Node for %r does not exist" % object)
+        @param object: The object to check existence of.
+        @param type: An optional type for the object to check.
+        @type type: Integer
 
-        # FIXME: implement
-        pass
+        @rtype: Boolean
+        """
+        if (object,type) in self._nodes.keys():
+            return True
+        return False
+
+    def removeNode(self, object, type=0):
+        """
+        I remove a node that exists in the DAG.  I also remove any edges
+        pointing to this node.
+
+        @param object: The object to remove.
+        @param type: The type of object to remove (optional).
+        @type type: Integer
+        """
+        if not self.hasNode(object,type):
+            raise KeyError("Node for %r with type %d does not exist" % (
+                object, type))
+        node = self._getNode(object, type)
+
+        # go through all the nodes and remove edges that end in this node
+        for somenodeobj,somenodetype in self._nodes:
+            somenode = self._nodes[(somenodeobj,somenodetype)]
+            if node in somenode.children:
+                self.removeEdge(somenodeobj,object,somenodetype,type)
+        
+        del self._nodes[(object,type)]
+        
+    def _getNode(self, object, type=0):
+        value = self._nodes[(object,type)]
+        return value
+
     
-    def addEdge(self, parent, child):
-        self._assertExists(parent)
-        self._assertExists(child)
-        np = self.nodes[parent]
-        nc = self.nodes[child]
+    def addEdge(self, parent, child, parenttype=0, childtype=0):
+        """
+        I add an edge between two nodes in the DAG.
+
+        @param parent: The object that is to be the parent.
+        @param child: The object that is to be the child.
+        @param parenttype: The type of the parent object (optional).
+        @param childtype: The type of the child object (optional).
+        """
+        self._assertExists(parent, parenttype)
+        self._assertExists(child, childtype)
+        np = self._getNode(parent, parenttype)
+        nc = self._getNode(child, childtype)
         
         if nc in np.children:
-            raise KeyError("%r is already a child of %r" % (child, parent))
+            raise KeyError("%r of type %d is already a child of %r of type %d" % (
+                child, childtype, parent, parenttype))
 
         self._tainted = True
         np.children.append(nc)
         nc.parents.append(np)
 
-    def removeEdge(self, parent, child):
-        self._assertExists(parent)
-        self._assertExists(child)
-        np = self.nodes[parent]
-        nc = self.nodes[child]
+    def removeEdge(self, parent, child, parenttype=0, childtype=0):
+        """
+        I remove an edge between two nodes in the DAG.
+
+        @param parent: The object that is the parent,
+        @param child: The object that is the child.
+        @param parenttype: The type of the parent object (optional).
+        @param childtype: The type of the child object (optional).
+        """
+        self._assertExists(parent, parenttype)
+        self._assertExists(child, childtype)
+        np = self._nodes[(parent, parenttype)]
+        nc = self._nodes[(child, childtype)]
         
         if nc not in np.children:
             raise KeyError("%r is not a child of %r" % (child, parent))
@@ -114,34 +170,101 @@ class DAG:
         np.children.remove(nc)
         nc.parents.remove(np)
 
-    def getChildren(self, object, types=None):
+    def getChildrenTyped(self, object, objtype=0, types=None):
         """
-        Return a list of objects that are direct children of this object.
+        I return a list of (object,type) tuples that are direct children of 
+        this object,objtype.
 
-        @rtype: list of object
+        @param object: object to return children of.
+        @param objtype: type of object (optional).
+        @type objtype: Integer
+        @param types: a list of types of children that you want. None means all.
+        @type types: list of Integers
+        
+        @rtype: list of (object,Integer)
         """
-        self._assertExists(object)
-        node = self.nodes[object]
+        self._assertExists(object, objtype)
+        node = self._getNode(object, objtype)
 
         l = node.children
         if types:
             l = filter(lambda n: n.type in types, l)
 
-        return [n.object for n in l]
+        return [(n.object, n.type) for n in l]
 
-    def getParents(self, object, types=None):
-        self._assertExists(object)
-        node = self.nodes[object]
+    def getChildren(self, object, objtype=0, types=None):
+        """
+        I return a list of objects that are direct children of this
+        object,objtype.
+
+        @param object: object to return children of.
+        @param objtype: type of object (optional).
+        @type objtype: Integer
+        @param types: a list of types of children that you want. None means all.
+        @type types: list of Integers
+
+        @rtype: list of objects
+        """
+        typedchildren = self.getChildrenTyped(object, objtype, types)
+        
+        ret = [n[0] for n in typedchildren]
+        return ret
+
+    def getParentsTyped(self, object, objtype=0, types=None):
+        """
+        I return a list of (object, type) tuples that are direct parents of
+        this object,objtype.
+
+        @param object: object to return parents of.
+        @param objtype: type of object (optional).
+        @type objtype: Integer
+        @param types: a list of types of parents that you want. None means all.
+        @type types: list of Integers
+
+        @rtype list of (object,Integer)
+        """
+        self._assertExists(object, objtype)
+        node = self._getNode(object,objtype)
         
         l = node.parents
         if types:
             l = filter(lambda n: n.type in types, l)
 
-        return [n.object for n in l]
+        return [(n.object, n.type) for n in l]
+
+    def getParents(self, object, objtype=0, types=None):
+        """
+        I return a list of objects that are direct parents of this 
+        object,objtype.
+
+        @param object: object to return parents of.
+        @param objtype: type of object (optional).
+        @type objtype: Integer
+        @param types: a list of types of parents that you want. None means all.
+        @type types: list of Integers
+
+        @rtype list of (object,Integer)
+        """
+        typedparents = self.getParentsTyped(object, objtype, types)
+        ret = [n[0] for n in typedparents]
+        return ret
+
         
-    def getOffspring(self, object, *types):
-        self._assertExists(object)
-        node = self.nodes[object]
+    def getOffspringTyped(self, object, objtype=0, *types):
+        """
+        I return a list of (object,type) tuples that are offspring of 
+        this object,objtype.
+
+        @param object: object to return children of.
+        @param objtype: type of object (optional).
+        @type objtype: Integer
+        @param types: a list of types of children that you want. None means all.
+        @type types: list of Integers
+        
+        @rtype: list of (object,Integer)
+        """
+        self._assertExists(object, objtype)
+        node = self._getNode(object, objtype)
 
         # if we don't have children, don't bother trying
         if not node.children:
@@ -174,25 +297,118 @@ class DAG:
         ret = []
         for n in sorted:
             if n in offspring:
-                ret.append(n.object)
+                ret.append((n.object, n.type))
 
         return ret
 
-    def getAncestors(self, object):
-        pass
+    def getOffspring(self, object, objtype=0, *types):
+        """
+        I return a list of objects that are offspring of this
+        object,objtype.
 
-    def isFloating(self, object):
+        @param object: object to return children of.
+        @param objtype: type of object (optional).
+        @type objtype: Integer
+        @param types: types of children that you want offspring returned of.
+
+        @rtype: list of objects
         """
-        Returns whether the object is floating: no parents and no children.
+
+        typedoffspring = self.getOffspringTyped(object, objtype, *types)
+
+        ret = []
+        ret = [n[0] for n in typedoffspring]
+
+        return ret
+
+
+    def getAncestorsTyped(self, object, objtype=0, *types):
         """
-        self._assertExists(object)
-        node = self.nodes[object]
+        I return a list of (object,type) tuples that are ancestors of 
+        this object,objtype.
+
+        @param object: object to return ancestors of.
+        @param objtype: type of object (optional).
+        @type objtype: Integer
+        @param types: types of ancestors that you want ancestors of.
+        
+        @rtype: list of (object,Integer)
+        """
+        self._assertExists(object, objtype)
+        node = self._getNode(object, objtype)
+
+        # if we don't have children, don't bother trying
+        if not node.parents:
+            return []
+
+        # catches CycleError as well
+        sorted = self._sortPreferred()
+
+        # start by adding our node to our to be expanded list
+        list = [node]
+        ancestors = []
+        expand = True
+        # as long as we need to expand, loop over all offspring ...
+        while expand:
+            expand = False
+            for n in list:
+                if n.parents:
+                    # .. and for every item add all of its children
+                    # which triggers requiring further expansion
+                    expand = True
+                    list.remove(n)
+                    list.extend(n.parents)
+                    ancestors.extend(n.parents)
+
+        # filter offspring by types
+        if types:
+            ancestors = filter(lambda n: n.type in types, ancestors)
+
+        # now that we have all offspring, return a sorted list of them
+        ret = []
+        for n in sorted:
+            if n in ancestors:
+                ret.append((n.object, n.type))
+
+        return ret
+
+    def getAncestors(self, object, objtype=0, *types):
+        """
+        I return a list of objects that are ancestors of this object,objtype.
+
+        @param object: object to return ancestors of.
+        @param objtype: type of object (optional).
+        @type objtype: Integer
+        @param types: types of ancestors that you want returned.
+        
+        @rtype: list of objects
+        """
+        typedancestors = self.getAncestorsTyped(object, objtype, *types)
+
+        ret = []
+        ret = [n[0] for n in typedancestors]
+
+        return ret
+
+
+    def isFloating(self, object, objtype=0):
+        """
+        I return whether the object is floating: no parents and no children.
+
+        @param object: object to check if floating.
+        @param objtype: type of object (optional).
+        @type objtype: Integer
+        
+        @rtype: Boolean
+        """
+        self._assertExists(object, objtype)
+        node = self._getNode(object, objtype)
 
         return node.isFloating()
 
     def hasCycle(self):
         """
-        Returns whether or not the graph has a cycle.
+        I return whether or not the graph has a cycle.
 
         If it has, some operations on it will fail and raise CycleError.
         """
@@ -200,29 +416,32 @@ class DAG:
 
     def sort(self):
         """
-        Return a topologically sorted list of objects.
+        I return a topologically sorted list of objects.
 
-        @rtype: list of object
+        @rtype: list of (object,type)
         """
-        return [node.object for node in self._sortPreferred()]
+        return [(node.object, node.type) for node in self._sortPreferred()]
         
     def _sortPreferred(self, list=None):
         """
-        Return a topologically sorted list of nodes, using list as a
+        I return a topologically sorted list of nodes, using list as a
         preferred order for the algorithm.
 
-        @rtype: list of L{Node}
+        @param list: a list of (object,type) tuples in preference order
+        @type list: list of (object,type)
+
+        @rtype: list of {Node}
         """
 
         self._count = 0
-        for n in self.nodes.values():
+        for n in self._nodes.values():
             self._begin[n] = 0
             self._end[n] = 0
-            if list: assert n.object in list
+            if list: assert (n.object, n.type) in list
         if list:
-            self._hasZeroEnd = [self.nodes[object] for object in list]
+            self._hasZeroEnd = [self._nodes[(n[0], n[1])] for n in list]
         else:
-            self._hasZeroEnd = self.nodes.values()
+            self._hasZeroEnd = self._nodes.values()
 
         while self._hasZeroEnd:
             node = self._hasZeroEnd[0]
@@ -270,6 +489,20 @@ class DAG:
             self._hasZeroEnd.remove(node)
 
         #print "done _dfs for object %r" % node.object
+
+    def getAllNodesByType(self, type):
+        """
+        I return all the objects with node type specified by type
+
+        @rtype: list of object
+        """
+        ret = []
+        for node in self._nodes.keys():
+            if node[1] == type:
+                ret.append(self._nodes[node].object)
+
+        return ret
+        
 
 def topological_sort(items, partial_order):
     """

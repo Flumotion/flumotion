@@ -38,6 +38,7 @@ EXTRA_DIST = 				\
 	test_keycards.py 		\
 	test_log.py 			\
 	test_manager_admin.py 		\
+	test_manager_depgraph.py	\
 	test_manager_manager.py 	\
 	test_manager_worker.py		\
 	test_parts.py	 		\

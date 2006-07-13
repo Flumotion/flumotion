@@ -392,7 +392,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
  
     ### BaseComponent implementation related to compoment protocol
     ### called by manager through medium
-    def setup(self, config):
+    def setup(self, config, *args, **kwargs):
         """
         Sets up the component with the given config.  Called by the manager
         through the medium.
@@ -452,6 +452,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                 self.warning('Running checks made the component sad.')
                 raise errors.ComponentSetupError()
 
+        self.debug("setup() called with config %r", config)
         self._setConfig(config)
         # now we have a name, set it on the medium too
         if self.medium:
@@ -555,6 +556,13 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         self.debug('MOOD changed to %r' % mood)
         self.state.set('mood', mood.value)
+
+    def getMood(self):
+        """
+        Gets the mood on the component.
+        """
+        return self.state.get('mood')
+
         
     def addMessage(self, message):
         """
