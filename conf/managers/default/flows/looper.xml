@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<planet>
+  <flow name="default">
+    <component name="looper" type="looper" worker="localhost">
+      <!-- properties -->
+      <property name="location">/home/wingo/media/vilanova_presentation.ogg</property>
+    </component>
+    <component name="video-encoder" type="theora-encoder" worker="localhost">
+      <source>looper:video</source>
+      <!-- properties -->
+      <property name="bitrate">400</property>
+    </component>
+    <component name="muxer-video" type="ogg-muxer" worker="localhost">
+      <source>video-encoder</source>
+    </component>
+    <component name="http-video" type="http-streamer" worker="localhost">
+      <source>muxer-video</source>
+      <!-- properties -->
+      <property name="bandwidth_limit">10</property>
+      <property name="burst_on_connect">True</property>
+      <property name="mount_point">/</property>
+      <property name="port">8800</property>
+      <property name="user_limit">1024</property>
+    </component>
+  </flow>
+</planet>
