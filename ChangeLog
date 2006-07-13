@@ -1,5 +1,10 @@
 2006-07-13  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/manager/manager.py:
+	  remove component from depgraph in deleteComponent.
+
+2006-07-13  Michael Smith  <msmith@fluendo.com>
+
 	* doc/random/component-initialization-protocol:
 	* flumotion/common/bundle.py:
 	* flumotion/common/dag.py:

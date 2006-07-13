@@ -788,6 +788,8 @@ class Vishnu(log.Loggable):
             or c.get('mood') is not moods.sleeping.value):
             raise errors.BusyComponentError(c)
 
+        self._depgraph.removeComponent(c)
+
         del self._componentMappers[self._componentMappers[c].id]
         del self._componentMappers[c]
         return flow.remove('components', c)
