@@ -1,3 +1,9 @@
+2006-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	  move the buffer frequency callLater start to a later stage than
+	  init.  Fixes tests for twisted 2.0.1 and 2.1.0
+
 2006-07-14  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/component.py:

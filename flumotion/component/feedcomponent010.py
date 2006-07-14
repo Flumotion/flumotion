@@ -84,9 +84,6 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self.last_buffer_time = 0
 
-        reactor.callLater(self.BUFFER_CHECK_FREQUENCY,
-            self._check_for_buffer_data)
-
     def do_setup(self):
         """
         Sets up component.
@@ -269,6 +266,10 @@ class FeedComponent(basecomponent.BaseComponent):
         sig_id = self.pipeline.connect('deep-notify',
                                        gstreamer.verbose_deep_notify_cb, self)
         self.pipeline_signals.append(sig_id)
+
+        # check for buffers
+        reactor.callLater(self.BUFFER_CHECK_FREQUENCY,
+            self._check_for_buffer_data)
 
     def pipeline_stop(self):
         if not self.pipeline:
