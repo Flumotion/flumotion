@@ -29,13 +29,19 @@ reviewed.
 Naming
 ======
 - classes should be named with CapitalizedWords
-- methods and functions should be named in the same style as the libraries
-  on the same interface level
+- methods, functions and attributes should be named in the same style as the
+  libraries on the same interface level
   e.g. GStreamer, GObject and GTK+ subclasses with underscore_method,
   but Twisted-style classes with lowerCamelCaseMethod
-  When these two conflict, prefer lowerCamelCaseMethod
-  In general, Flumotion follows lowerCamelCaseMethod
-  This goes for regular functions too
+  When these two conflict:
+  - prefer lowerCamelCaseMethod
+  - prefer the outward interface you present
+    (ie, if you use GStreamer internally, but present a GStreamer-agnostic
+     abstraction to your users, then use the Twisted style)
+  In general, Flumotion follows Twisted styel: lowerCamelCaseMethod
+  This goes for regular functions and variables too
 - some Twisted-style methods have a special form of (action)_lowerCamelCase;
   e.g. perspective_, remote_, do_
+- Twisted coding standard:
+  http://twistedmatrix.com/projects/core/documentation/howto/policy/coding-standard.html
 
