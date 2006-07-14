@@ -356,7 +356,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self.clock_provider.set_property('active', True)
         self.pipeline.set_state(gst.STATE_PLAYING)
 
-        # attach one-time buffer-probe callbacks for each eater
+        # attach buffer-probe callbacks for each eater
         for eaterName in self.get_eater_names():
             self.debug('adding buffer probe for eater %s' % eaterName)
             name = "eater:%s" % eaterName
@@ -366,16 +366,23 @@ class FeedComponent(basecomponent.BaseComponent):
                 self.warning('No element named %s in pipeline' % name)
                 continue
             pad = eater.get_pad("src")
-            self._add_buffer_probe(pad, name)
+            self._add_buffer_probe(pad, name, firstTime=True)
 
-    def _add_buffer_probe(self, pad, name):
-        self.debug("Adding new scheduled buffer probe for %s" % name)
+    def _add_buffer_probe(self, pad, name, firstTime=False):
+        # attached from above, and called again every
+        # BUFFER_PROBE_ADD_FREQUENCY seconds
+        method = self.log
+        if firstTime: method = self.debug
+        method("Adding new scheduled buffer probe for %s" % name)
         self._probe_ids[name] = pad.add_buffer_probe(self._buffer_probe_cb,
-            name)
+            name, firstTime)
 
-    def _buffer_probe_cb(self, pad, buffer, name):
-        # log info about first incoming buffer, then remove ourselves
-        self.debug('buffer probe on eater %s has timestamp %.3f' % (
+    def _buffer_probe_cb(self, pad, buffer, name, firstTime=False):
+        # log info about first incoming buffer for this check interval,
+        # then remove ourselves
+        method = self.log
+        if firstTime: method = self.debug
+        method('buffer probe on eater %s has timestamp %.3f' % (
             name, float(buffer.timestamp) / gst.SECOND))
         # now store the last buffer received time
         self.last_buffer_time = time.time()

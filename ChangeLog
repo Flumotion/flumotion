@@ -1,6 +1,14 @@
 2006-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent010.py:
+	  log the first buffer probe at debug level, and all the others
+	  at log, since we do not want to clutter our logs.
+	  In the future, we may want to also go back to debug level after
+	  a reconnect
+
+2006-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py:
 	  move the buffer frequency callLater start to a later stage than
 	  init.  Fixes tests for twisted 2.0.1 and 2.1.0
 
