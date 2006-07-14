@@ -1,5 +1,10 @@
 2006-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  add more debugging about burst-on-connect
+
+2006-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent010.py:
 	  log the first buffer probe at debug level, and all the others
 	  at log, since we do not want to clutter our logs.

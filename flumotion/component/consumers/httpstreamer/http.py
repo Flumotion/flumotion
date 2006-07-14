@@ -344,12 +344,16 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.burst_on_connect = properties.get('burst_on_connect', False)
         sink = self.get_element('sink')
         if gstreamer.element_factory_has_property('multifdsink', 'sync-method'):
+            self.debug("multifdsink has new sync-method property")
             if self.burst_on_connect:
+                self.debug("burst-on-connect, setting sync-method 2")
                 sink.set_property('sync-method', 2)
             else:
+                self.debug("no burst-on-connect, setting sync-method 0")
                 sink.set_property('sync-method', 0)
         else:
             # old property; does sync-to-keyframe
+            self.debug("multifdsink has old sync-clients property")
             sink.set_property('sync-clients', self.burst_on_connect)
             
         # FIXME: these should be made threadsafe if we use GstThreads
