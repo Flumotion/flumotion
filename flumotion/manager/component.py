@@ -222,7 +222,7 @@ class ComponentAvatar(base.ManagerAvatar):
                 # callback any deferreds waiting on this
                 for d in self._happydefers:
                     d.callback(True)
-                del self._happydefers
+                self._happydefers = []
 
     def stateAppend(self, state, key, value):
         pass
