@@ -124,7 +124,6 @@ class TestUsernameSha256PasswordCryptChallenger(unittest.TestCase):
         cred.salt = self.salt
         cred.challenge = credentials.cryptChallenge()
 
-
         # initially, we didn't respond, so it should fail with the right result
         self.failIf(cred.checkSha256Password(self.good))
 

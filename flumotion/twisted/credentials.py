@@ -222,7 +222,7 @@ class IUsernameSha256Password(credentials.ICredentials):
                                                                                 
         @param sha256Password: The correct SHA-256 password against which to
         check.
-                                                                                
+
         @return: a deferred which becomes, or a boolean indicating if the
         password matches.
         """
