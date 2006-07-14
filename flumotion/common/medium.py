@@ -186,11 +186,13 @@ class BaseMedium(pb.Referenceable, log.Loggable):
 class PingingMedium(BaseMedium):
     _pingInterval = configure.heartbeatInterval
     _pingCheckInterval = configure.heartbeatInterval * 2.5
+    _pingDC = None
 
     def startPinging(self, disconnect):
         self.debug('startPinging')
         self._lastPingback = time.time()
-        if hasattr(self, '_pingDisconnect'):
+        if self._pingDC:
+            self.debug("Cannot start pinging, already pinging")
             return
         self._pingDisconnect = disconnect
         self._ping()

@@ -1,3 +1,9 @@
+2006-07-14  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/medium.py:
+	  Make the check for startPinging being called multiple times more
+	  sane. Fixes pinging after a disconnect/reconnect.
+
 2006-07-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/admin.py
