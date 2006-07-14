@@ -189,6 +189,10 @@ class PingingMedium(BaseMedium):
     _pingDC = None
 
     def startPinging(self, disconnect):
+        """
+        @param disconnect: a method to call when we do not get ping replies
+        @type  disconnect: callable
+        """
         self.debug('startPinging')
         self._lastPingback = time.time()
         if self._pingDC:
@@ -201,8 +205,10 @@ class PingingMedium(BaseMedium):
     def _ping(self):
         def pingback(result):
             self._lastPingback = time.time()
+            self.log('pinged, pingback at %r' % self._lastPingback)
 
         if self.remote:
+            self.log('pinging')
             d = self.callRemote('ping')
             d.addCallback(pingback)
         else:
@@ -237,6 +243,7 @@ class PingingMedium(BaseMedium):
     def setRemoteReference(self, remote):
         BaseMedium.setRemoteReference(self, remote)
         def stopPingingCb(x):
+            self.debug('stop pinging')
             self.stopPinging()
         self.remote.notifyOnDisconnect(stopPingingCb)
 
