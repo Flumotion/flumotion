@@ -64,11 +64,11 @@ class SaltSha256(bouncer.Bouncer):
         props = conf['properties']
         if props.has_key('filename'):
             self._filename = props['filename']
-            log.debug('htpasswd', 'using file %s for passwords' %
+            self.debug('using file %s for passwords' %
                 self._filename)
         elif props.has_key('data'):
             self._data = props['data']
-            log.debug('htpasswd', 'using in-line data for passwords')
+            self.debug('using in-line data for passwords')
         else:
             return defer.fail(config.ConfigError(
                 'PasswdSaltSha256 needs either a <data> or <filename> entry'))

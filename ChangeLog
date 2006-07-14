@@ -1,5 +1,11 @@
 2006-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	  fix debugging
+
+2006-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/medium.py:
 	  add some debug and docs
 
