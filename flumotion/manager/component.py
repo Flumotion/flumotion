@@ -845,7 +845,7 @@ class ComponentHeaven(base.ManagerHeaven):
         deplist = self.vishnu._depgraph.whatShouldBeStarted()
         self.debug("Listing deplist")
         if not deplist:
-            self.debug("Nothing needs to be setup or started!!!!")
+            self.debug("Nothing needs to be setup or started!")
             return
         for dep in deplist:
             self.debug("Deplist: %r,%r" % (dep[0], dep[1]))

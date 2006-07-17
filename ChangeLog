@@ -1,6 +1,11 @@
 2006-07-17  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/component.py:
+	  Remove superfluous exclamation marks.
+
+2006-07-17  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/component.py:
 	  Downstream connection doesn't work reliably currently due to races.
 	  Change to upstream for now so we can do testing.
 
