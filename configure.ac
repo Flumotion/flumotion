@@ -241,6 +241,7 @@ flumotion/component/converters/Makefile
 flumotion/component/converters/pipeline/Makefile
 flumotion/component/converters/overlay/Makefile
 flumotion/component/misc/Makefile
+flumotion/component/misc/gdptestsrc/Makefile
 flumotion/component/misc/porter/Makefile
 flumotion/component/misc/repeater/Makefile
 flumotion/component/muxers/Makefile

@@ -1,5 +1,10 @@
 2006-07-17  Michael Smith  <msmith@fluendo.com>
 
+	* configure.ac:
+	  Add new makefile to configure.ac
+
+2006-07-17  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/misc/Makefile.am:
 	* flumotion/component/misc/gdptestsrc/Makefile.am:
 	* flumotion/component/misc/gdptestsrc/Makefile.in:
