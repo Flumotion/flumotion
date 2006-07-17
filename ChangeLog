@@ -1,5 +1,16 @@
 2006-07-17  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/misc/Makefile.am:
+	* flumotion/component/misc/gdptestsrc/Makefile.am:
+	* flumotion/component/misc/gdptestsrc/Makefile.in:
+	* flumotion/component/misc/gdptestsrc/__init__.py:
+	* flumotion/component/misc/gdptestsrc/gdptestsrc.py:
+	* flumotion/component/misc/gdptestsrc/gdptestsrc.xml:
+	  Add gdptestsrc element which uses a tcpclientsrc ! gdpdepay pipeline
+	  to feed a flumotion flow.
+
+2006-07-17  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/manager/component.py:
 	  Remove superfluous exclamation marks.
 
