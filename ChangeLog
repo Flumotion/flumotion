@@ -1,3 +1,9 @@
+2006-07-17  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/component.py:
+	  Downstream connection doesn't work reliably currently due to races.
+	  Change to upstream for now so we can do testing.
+
 2006-07-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/http.py:

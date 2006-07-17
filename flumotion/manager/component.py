@@ -781,7 +781,7 @@ class ComponentHeaven(base.ManagerHeaven):
             # FIXME: ideally we would get this from the config
             # downstream makes more sense since it's more likely
             # for a producer to be behind NAT
-            connection = "downstream"
+            connection = "upstream"
 
             if connection == "upstream":
                 self.debug('connecting from eater to feeder')
@@ -832,7 +832,6 @@ class ComponentHeaven(base.ManagerHeaven):
                     self._addMessage(m)
                     self._setMood(moods.sad)
                     raise errors.ComponentStartHandledError
-
 
         componentAvatar.debug('starting component')
         try:
