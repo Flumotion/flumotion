@@ -46,12 +46,14 @@ def main(args):
     group = optparse.OptionGroup(parser, "worker options")
     group.add_option('-H', '--host',
                      action="store", type="string", dest="host",
-                     help="manager to connect to [default localhost]")
+                     help="manager host to connect to [default localhost]")
     defaultSSLPort = configure.defaultSSLManagerPort
     defaultTCPPort = configure.defaultTCPManagerPort
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
-                     help="port to listen on [default %d (ssl) or %d (tcp)]" % (defaultSSLPort, defaultTCPPort))
+                     help="manager port to connect to " \
+                        "[default %d (ssl) or %d (tcp)]" % (
+                        defaultSSLPort, defaultTCPPort))
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
                      help="transport protocol to use (tcp/ssl) [default ssl]")
