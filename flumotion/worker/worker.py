@@ -152,7 +152,7 @@ class WorkerMedium(medium.PingingMedium):
         @return: TCP port number
         """
         port = self.brain.feedServerPort
-        self.debug('REMOTE -> WORKER: getFeedServerPort(): %d' % port)
+        self.debug('REMOTE -> WORKER: getFeedServerPort(): %r' % port)
         return port
 
     def remote_create(self, avatarId, type, moduleName, methodName, config):
@@ -494,9 +494,11 @@ class WorkerBrain(log.Loggable):
 
         self._jobServerFactory, self._jobServerPort = self._setupJobServer()
         self._feedServerFactory = feed.feedServerFactory(self)
-        port, portNumber = self._setupFeedServer()
-        self._feedServerPort = port
-        self.feedServerPort = portNumber
+
+        # set up feed server if we have the feederports for it
+        self._feedServerPort = None # twisted port
+        self.feedServerPort = None # port number
+        self._setupFeedServer()
 
         self._createDeferreds = {}
 
@@ -533,10 +535,16 @@ class WorkerBrain(log.Loggable):
         @returns: (port, portNumber)
         """
         # called from __init__
-        portNumber = self.options.feederports[-1]
-        self.debug('Listening for feed requests on TCP port %s' % portNumber)
-        port = reactor.listenTCP(portNumber, self._feedServerFactory)
-        return port, portNumber
+        try:
+            self.feedServerPort = self.options.feederports[-1]
+        except IndexError:
+            self.info('Not starting feed server because no port is configured')
+            return
+
+        self.debug('Listening for feed requests on TCP port %s' %
+            self.feedServerPort)
+        self._feedServerPort = reactor.listenTCP(
+            self.feedServerPort, self._feedServerFactory)
 
     # FIXME: this is only called from the tests
     def teardown(self):

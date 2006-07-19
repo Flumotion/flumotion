@@ -59,8 +59,9 @@ class WorkerAvatar(base.ManagerAvatar):
         self.debug('MANAGER -> WORKER: getFeedServerPort()')
         d = self.mindCallRemote('getFeedServerPort')
         yield d
+        # this can be None if no feed server is configured
         self.feedServerPort = d.value()
-        self.debug('WORKER -> MANAGER: getFeedServerPort(): %d' %
+        self.debug('WORKER -> MANAGER: getFeedServerPort(): %r' %
             self.feedServerPort)
 
         self.debug('MANAGER -> WORKER: getPorts()')

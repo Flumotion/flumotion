@@ -85,6 +85,14 @@ def main(args):
     log.debug('worker', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
+    # verbose overrides --debug; is only a command-line option
+    if options.verbose:
+        options.debug = "*:3"
+ 
+    # apply the command-line debug level if is given through --verbose or -d
+    if options.debug:
+        log.setFluDebug(options.debug)
+
     # translate feederports string to range
     if options.feederports:
         if not '-' in options.feederports:
@@ -92,12 +100,7 @@ def main(args):
                 options.feederports)
         (lower, upper) = options.feederports.split('-')
         options.feederports = range(int(lower), int(upper) + 1)
-        log.debug('worker', 'Setting feederports %r' % options.feederports)
 
-    # verbose overrides --debug
-    if options.verbose:
-        options.debug = "*:3"
- 
     # check if a config file was specified; if so, parse config and copy over
     if len(args) > 1:
         workerFile = args[1]
@@ -140,9 +143,11 @@ def main(args):
                 'Setting password [%s]' % ("*" * len(options.password)))
 
         # feederports: list of allowed ports
-        if not options.feederports and cfg.feederports:
+        # XML could specify it as empty, meaning "don't use any"
+        if not options.feederports and cfg.feederports is not None:
             options.feederports = cfg.feederports
-            log.debug('worker', 'Setting feederports %r' % options.feederports)
+        if options.feederports is not None:
+            log.debug('worker', 'Using feederports %r' % options.feederports)
 
         # general
         # command-line debug > environment debug > config file debug
@@ -169,8 +174,10 @@ def main(args):
             import socket
             options.name = socket.gethostname()
 
-    if not options.feederports:
+    if options.feederports is None:
         options.feederports = configure.defaultGstPortRange
+        log.debug('worker', 'Using default feederports %r' %
+            options.feederports)
 
     # check for wrong options/arguments
     if not options.transport in ['ssl', 'tcp']:
@@ -183,6 +190,7 @@ def main(args):
         print common.version("flumotion-worker")
         return 0
 
+    # reset FLU_DEBUG which could be different after parsing XML file
     if options.debug:
         log.setFluDebug(options.debug)
 
