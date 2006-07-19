@@ -54,15 +54,49 @@ class DepGraph(log.Loggable):
     logCategory = "depgraph"
 
     (WORKER, JOB, COMPONENTSETUP, CLOCKMASTER, COMPONENTSTART) = range(0,5)
+    typeNames = ("WORKER", "JOB", "COMPONENTSETUP", "CLOCKMASTER",
+        "COMPONENTSTART")
     
     def __init__(self):
         self._dag = dag.DAG()
         self._state = {}
 
     def _addNode(self, component, type):
+        self.debug("Adding node %r of type %d (%s)" % (component, type,
+            self.typeNames[type]))
         self._dag.addNode(component, type)
         self._state[(component,type)] = False
-        self.debug("Adding node %r of type %d" % (component, type))
+
+    def _addEdge(self, parent, child, parentType, childType):
+        self.debug("Adding edge %r of type %d (%s) to %r of type %d (%s)" % (
+            parent, parentType, self.typeNames[parentType],
+            child, childType, self.typeNames[childType]))
+        self._dag.addEdge(parent, child, parentType, childType)
+
+    def addClockMaster(self, component):
+        """
+        I set a component to be the clock master in the dependency
+        graph.  This component must have already been added to the
+        dependency graph.
+
+        @param component: the component to set as the clock master
+        @type  component: L{flumotion.manager.component.ComponentAvatar}
+        """
+        if self._dag.hasNode(component, self.JOB):
+            self._addNode(component, self.CLOCKMASTER)
+            self._addEdge(component, component, self.COMPONENTSETUP, 
+                self.CLOCKMASTER)
+        
+            # now go through all the component starts and make them dep on the
+            # clock master
+            startnodes = self._dag.getAllNodesByType(self.COMPONENTSTART)
+            for start in startnodes:
+                # only add if they share the same parent flow
+                if start.get('parent') == component.get('parent'):
+                    self._addEdge(component, start, self.CLOCKMASTER, 
+                        self.COMPONENTSTART)
+        else:
+            raise KeyError("Component %r has not been added" % component)
 
     def addComponent(self, component):
         """
@@ -75,61 +109,28 @@ class DepGraph(log.Loggable):
         @param component: component object to add
         @type component: L{flumotion.common.planet.ManagerComponentState}
         """
+        self.debug('adding component %r to depgraph' % component)
         self._addNode(component, self.JOB)
         self._addNode(component, self.COMPONENTSTART)
         self._addNode(component, self.COMPONENTSETUP)
-        self._dag.addEdge(component, component, self.JOB, self.COMPONENTSETUP)
+        self._addEdge(component, component, self.JOB, self.COMPONENTSETUP)
         workername = component.get('workerRequested')
         if workername:
             self.addWorker(workername)
             self.setComponentWorker(component, workername)
-        self._dag.addEdge(component, component, self.COMPONENTSETUP, 
+        self._addEdge(component, component, self.COMPONENTSETUP, 
             self.COMPONENTSTART)
-
-    def addClockMaster(self, component):
-        """
-        I set a component to be the clock master in the dependency
-        graph.  This component must have already been added to the
-        dependency graph.
-
-        @param component: the component to set as the clock master
-        @type component: L{flumotion.manager.component.ComponentAvatar}
-        """
-        if self._dag.hasNode(component, self.JOB):
-            self._addNode(component, self.CLOCKMASTER)
-            self._dag.addEdge(component, component, self.COMPONENTSETUP, 
-                self.CLOCKMASTER)
-        
-            # now go through all the component starts and make them dep on the
-            # clock master
-            startnodes = self._dag.getAllNodesByType(self.COMPONENTSTART)
-            for start in startnodes:
-                # only add if they share the same parent flow
-                if start.get('parent') == component.get('parent'):
-                    self._dag.addEdge(component, start, self.CLOCKMASTER, 
-                        self.COMPONENTSTART)
-        else:
-            raise KeyError("Component %r has not been added" % component)
 
     def addWorker(self, worker):
         """
         I add a worker to the dependency graph.
 
         @param worker: the worker to add
-        @type worker: String
+        @type  worker: str
         """
+        self.debug('adding worker %s' % worker)
         if not self._dag.hasNode(worker, self.WORKER):
             self._addNode(worker, self.WORKER)
-
-    def removeWorker(self, worker):
-        """
-        I remove a worker from the dependency graph.
-
-        @param worker: the worker to remove
-        @type worker: String
-        """
-        if self._dag.hasNode(worker, self.WORKER):
-            self._dag.removeNode(worker, self.WORKER)
 
     def removeComponent(self, component):
         """
@@ -139,6 +140,7 @@ class DepGraph(log.Loggable):
         @param component: the component to remove
         @type component:  L{flumotion.manager.component.ComponentAvatar}
         """
+        self.debug('removing component %r from depgraph' % component)
         if self._dag.hasNode(component, self.CLOCKMASTER):
             self._dag.removeNode(component, self.CLOCKMASTER)
         if self._dag.hasNode(component, self.COMPONENTSTART):
@@ -147,6 +149,17 @@ class DepGraph(log.Loggable):
             self._dag.removeNode(component, self.COMPONENTSETUP)
         if self._dag.hasNode(component, self.JOB):
             self._dag.removeNode(component, self.JOB)
+
+    def removeWorker(self, worker):
+        """
+        I remove a worker from the dependency graph.
+
+        @param worker: the worker to remove
+        @type  worker: str
+        """
+        self.debug('removing worker %s' % worker)
+        if self._dag.hasNode(worker, self.WORKER):
+            self._dag.removeNode(worker, self.WORKER)
 
     def setComponentWorker(self, component, worker):
         """
@@ -159,7 +172,7 @@ class DepGraph(log.Loggable):
         """
         if self._dag.hasNode(worker, self.WORKER) and (
             self._dag.hasNode(component, self.JOB)):
-            self._dag.addEdge(worker, component, self.WORKER, self.JOB)
+            self._addEdge(worker, component, self.WORKER, self.JOB)
         else:
             raise KeyError("Worker %s or Component %r not in dependency graph" %
                 (worker, component))
@@ -186,9 +199,9 @@ class DepGraph(log.Loggable):
         
                 list = dict['source']
 
-                # FIXME: there's a bug in config parsing - sometimes this gives us
-                # one string, and sometimes a list of one string, and sometimes
-                # a list
+                # FIXME: there's a bug in config parsing - sometimes this gives
+                # us one string, and sometimes a list of one string, and
+                # sometimes a list
                 if isinstance(list, str):
                     list = [list, ]
                 for eater in list:
@@ -197,16 +210,15 @@ class DepGraph(log.Loggable):
                     # name[0] is the name of the feeder component
                     # find the feeder
                     for feedercomp in compsetups:
-                            
                         #name = "%s:default" % eater
                         #self.debug("eater %s being added with name %s" % (eater,name))
                         #eat = Eater(name, component)
                         #self._addNode(eat, self.EATER)
-                        #self._dag.addEdge(eat, component, self.EATER, 
+                        #self._addEdge(eat, component, self.EATER, 
                         #    self.COMPONENTREADY)
                         if feedercomp.get("name") == name[0]:
                             try:
-                                self._dag.addEdge(feedercomp, eatercomp, 
+                                self._addEdge(feedercomp, eatercomp, 
                                     self.COMPONENTSETUP, self.COMPONENTSETUP)
                             except KeyError:
                                 # this happens when edge is already there, 
@@ -215,7 +227,7 @@ class DepGraph(log.Loggable):
                                 pass
                             feederfound = True
                             try:
-                                self._dag.addEdge(feedercomp, eatercomp,
+                                self._addEdge(feedercomp, eatercomp,
                                     self.COMPONENTSTART, self.COMPONENTSTART)
                             except KeyError:
                                 pass
@@ -236,29 +248,30 @@ class DepGraph(log.Loggable):
         # then remove ones that are workers who are False, and their offspring
         # then remove ones that are jobs who are False, and their offspring
         # also remove eaters who's feeders havent started
-        tobestarted_temp = self._dag.sort()
-        tobestarted = tobestarted_temp[:]
-        for obj in tobestarted_temp:
-            if obj in tobestarted:
+        toBeStarted = self._dag.sort()
+        # we want to loop over all objects, so we loop over a copy
+        for obj in toBeStarted[:]:
+            if obj in toBeStarted:
                 if self._state[obj]:
-                    del tobestarted[tobestarted.index(obj)]
+                    toBeStarted.remove(obj)
                 elif obj[1] == self.WORKER:
                     # this is a worker not started
                     # lets remove it and its 
                     # offspring
-                    worker_offspring = self._dag.getOffspringTyped(obj[0], obj[1])
+                    worker_offspring = self._dag.getOffspringTyped(
+                        obj[0], obj[1])
                     for offspring in worker_offspring:
-                        if offspring in tobestarted:
-                            del tobestarted[tobestarted.index(offspring)]
-                    del tobestarted[tobestarted.index(obj)]
+                        if offspring in toBeStarted:
+                            toBeStarted.remove(offspring)
+                    toBeStarted.remove(obj)
                 elif obj[1] == self.JOB:
                     job_offspring = self._dag.getOffspringTyped(obj[0], obj[1])
                     for offspring in job_offspring:
-                        if offspring in tobestarted:
-                            del tobestarted[tobestarted.index(offspring)]
-                    del tobestarted[tobestarted.index(obj)]
+                        if offspring in toBeStarted:
+                            toBeStarted.remove(offspring)
+                    toBeStarted.remove(obj)
         
-        return tobestarted
+        return toBeStarted
 
     def _setState(self, object, type, value):
         self.debug("Setting state of (%r,%d) to %d" % (object, type, value))

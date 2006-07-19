@@ -1,3 +1,9 @@
+2006-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/dag.py:
+	* flumotion/manager/depgraph.py:
+	  style and debug changes, before actually changing logic
+
 2006-07-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/connections.py

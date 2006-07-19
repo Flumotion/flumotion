@@ -69,7 +69,7 @@ class DAG:
 
     def _assertExists(self, object, type=0):
         if not self.hasNode(object, type):
-            raise KeyError("No node for %r" % object)
+            raise KeyError("No node for object %r, type %r" % (object, type))
 
     def addNode(self, object, type=0):
         """
@@ -84,7 +84,7 @@ class DAG:
                 object, type))
 
         n = Node(object, type)
-        self._nodes[(object,type)] = n
+        self._nodes[(object, type)] = n
 
     def hasNode(self, object, type=0):
         """
@@ -96,7 +96,7 @@ class DAG:
 
         @rtype: Boolean
         """
-        if (object,type) in self._nodes.keys():
+        if (object, type) in self._nodes.keys():
             return True
         return False
 
@@ -109,21 +109,21 @@ class DAG:
         @param type: The type of object to remove (optional).
         @type type: Integer
         """
-        if not self.hasNode(object,type):
+        if not self.hasNode(object, type):
             raise KeyError("Node for %r with type %d does not exist" % (
                 object, type))
         node = self._getNode(object, type)
 
         # go through all the nodes and remove edges that end in this node
         for somenodeobj,somenodetype in self._nodes:
-            somenode = self._nodes[(somenodeobj,somenodetype)]
+            somenode = self._nodes[(somenodeobj, somenodetype)]
             if node in somenode.children:
-                self.removeEdge(somenodeobj,object,somenodetype,type)
+                self.removeEdge(somenodeobj, object, somenodetype, type)
         
-        del self._nodes[(object,type)]
+        del self._nodes[(object, type)]
         
     def _getNode(self, object, type=0):
-        value = self._nodes[(object,type)]
+        value = self._nodes[(object, type)]
         return value
 
     
@@ -172,7 +172,7 @@ class DAG:
 
     def getChildrenTyped(self, object, objtype=0, types=None):
         """
-        I return a list of (object,type) tuples that are direct children of 
+        I return a list of (object, type) tuples that are direct children of 
         this object,objtype.
 
         @param object: object to return children of.
@@ -252,7 +252,7 @@ class DAG:
         
     def getOffspringTyped(self, object, objtype=0, *types):
         """
-        I return a list of (object,type) tuples that are offspring of 
+        I return a list of (object, type) tuples that are offspring of 
         this object,objtype.
 
         @param object: object to return children of.
@@ -324,7 +324,7 @@ class DAG:
 
     def getAncestorsTyped(self, object, objtype=0, *types):
         """
-        I return a list of (object,type) tuples that are ancestors of 
+        I return a list of (object, type) tuples that are ancestors of 
         this object,objtype.
 
         @param object: object to return ancestors of.
@@ -418,7 +418,7 @@ class DAG:
         """
         I return a topologically sorted list of objects.
 
-        @rtype: list of (object,type)
+        @rtype: list of (object, type)
         """
         return [(node.object, node.type) for node in self._sortPreferred()]
         
@@ -427,8 +427,8 @@ class DAG:
         I return a topologically sorted list of nodes, using list as a
         preferred order for the algorithm.
 
-        @param list: a list of (object,type) tuples in preference order
-        @type list: list of (object,type)
+        @param list: a list of (object, type) tuples in preference order
+        @type list: list of (object, type)
 
         @rtype: list of {Node}
         """
