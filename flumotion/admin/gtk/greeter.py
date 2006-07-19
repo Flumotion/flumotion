@@ -126,7 +126,13 @@ class LoadConnection(wizard.WizardStep):
         self.button_next.emit('clicked')
 
     def on_next(self, state):
-        state.update(self.connections.get_selected())
+        info = self.connections.get_selected()
+        for k,v in (('host', info.host), ('port', info.port),
+                    ('use_insecure', not info.use_ssl),
+                    ('user', info.authenticator.username),
+                    ('passwd', info.authenticator.password)):
+            state[k] = v
+        print state
         return '*finished*'
 
     def setup(self, state, available_pages):

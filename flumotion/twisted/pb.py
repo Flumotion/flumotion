@@ -480,6 +480,8 @@ class RemoteAuthenticator:
     """
 
     avatarId = None # not serialized
+    username = None # for convenience, will always be None
+    password = None # for convenience, will always be None
 
     def __init__(self, remoteReference):
         self._remote = remoteReference

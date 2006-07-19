@@ -24,6 +24,8 @@ import os
 from xml.dom import minidom, Node
 
 from flumotion.configure import configure
+from flumotion.common import connection
+from flumotion.twisted import pb as fpb
 
 def get_recent_connections():
     def parse_connection(f):
@@ -35,9 +37,11 @@ def get_recent_connections():
             state[n.nodeName] = n.childNodes[0].wholeText
         state['port'] = int(state['port'])
         state['use_insecure'] = (state['use_insecure'] != '0')
-        return state
-    def human_readable(state):
-        return '%s@%s:%d' % (state['user'], state['host'], state['port'])
+        authenticator = fpb.Authenticator(username=state['user'],
+                                          password=state['passwd'])
+        return connection.PBConnectionInfo(state['host'], state['port'],
+                                           not state['use_insecure'],
+                                           authenticator)
 
     try:
         # DSU, or as perl folks call it, a Schwartz Transform
@@ -52,9 +56,9 @@ def get_recent_connections():
         for f in [x[1] for x in files]:
             try:
                 state = parse_connection(f)
-                ret.append({'name': human_readable(state),
+                ret.append({'name': str(state),
                             'file': f,
-                            'state': state})
+                            'info': state})
             except Exception, e:
                 print 'Error parsing %s: %r' % (f, e)
                 raise

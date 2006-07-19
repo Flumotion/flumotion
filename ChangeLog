@@ -1,3 +1,26 @@
+2006-07-19  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/connections.py
+	(get_recent_connections.parse_connection): Read into a
+	PBConnectionInfo, not a funny dict.
+	(get_recent_connections): 'info' not 'state'.
+
+	* flumotion/admin/gtk/connections.py
+	(Connections._populate_liststore): admin.connections changed
+	'state' to 'info', adjust accordingly...
+
+	* flumotion/admin/gtk/greeter.py (LoadConnection.on_next): The
+	recent connections will give us a PBConnectionInfo; convert to our
+	native dict storage.
+
+	* flumotion/twisted/pb.py (RemoteAuthenticator.username)
+	(RemoteAuthenticator.password): Add attributes for convenience;
+	should be part of the interface at some point. Will always be
+	None.
+
+	* env.in (src_dir): Change to build_dir. Dunno how the full path
+	to srcdir can be gotten.
+
 2006-07-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/worker.py:

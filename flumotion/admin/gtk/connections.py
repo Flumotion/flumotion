@@ -76,7 +76,7 @@ class Connections(GladeWidget):
         for x in connections.get_recent_connections():
             i = self.model.append()
             self.model.set(i, self.STR_COL, x['name'], self.FILE_COL, x['file'],
-                           self.STATE_COL, x['state'])
+                           self.STATE_COL, x['info'])
 
     def _clear_iter(self, i):
         os.unlink(self.model.get_value(i, self.FILE_COL))
