@@ -145,6 +145,21 @@ def do_invoke(model, quit, avatarId, methodName):
     quit()
 do_invoke = defer_generator(do_invoke)
 
+def do_loadconfiguration(model, quit, confFile):
+    print 'Loading configuration from file: %s' % confFile
+
+    f = open(confFile, 'r')
+    configurationXML = f.read()
+    f.close()
+
+    d = model.callRemote('loadConfiguration', configurationXML)
+    yield d
+    d.value()
+    print 'Configuration loaded successfully.'
+
+    quit()
+do_loadconfiguration = defer_generator(do_loadconfiguration)
+
 commands = (('getprop',
              'gets a property on a component',
              (('component-path', utils.avatarId),
@@ -174,5 +189,10 @@ commands = (('getprop',
              (('component-path', utils.avatarId),
               ('method-name', str)),
              do_invoke),
+            ('loadconfiguration',
+             'load configuration into the manager',
+             (('conf-file', str),
+              ),
+             do_loadconfiguration),
             )
 

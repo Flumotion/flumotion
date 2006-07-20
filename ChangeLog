@@ -1,5 +1,8 @@
 2006-07-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/commands.py (do_loadconfiguration): Add
+	a new command.
+
 	* flumotion/common/connection.py (PBConnectionInfo.__str__): In
 	the case that we have no username, don't prepend user@.
 
