@@ -6,6 +6,17 @@
 
 2006-07-19  Andy Wingo  <wingo@pobox.com>
 
+	* main.py (parse_options): Update for config parsing changes.
+
+	* controller.py (HoustonController.update_recent_connections):
+	recent will return a PBConnectionInfo now.
+	(HoustonController.open_connection): No more auth callback, later
+	for manual connections we should make a different kind of
+	authenticator. Future work...
+
+	* dialogs.py (OpenConnectionDialog.get_state): Update for
+	PBConnectionInfo auth changes.
+
 	* flumotion/admin/connections.py
 	(get_recent_connections.parse_connection): Read into a
 	PBConnectionInfo, not a funny dict.

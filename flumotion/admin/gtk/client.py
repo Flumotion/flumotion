@@ -184,12 +184,12 @@ class Window(log.Loggable, gobject.GObject):
 
         return window
 
-    def on_open_connection(self, config):
-        model = AdminModel(config['user'], config['passwd'])
-        d = model.connectToHost(config['host'], config['port'],
-                                config['use_insecure'])
+    def on_open_connection(self, connectionInfo):
+        i = connectionInfo
+        model = AdminModel(i.authenticator)
+        d = model.connectToHost(i.host, i.port, not i.use_ssl)
         self._trayicon.set_tooltip(_("Connecting to %s:%s") %
-            (config['host'], config['port']))
+            (i.host, i.port))
 
         def connected(model):
             self.window.set_sensitive(True)
@@ -198,15 +198,15 @@ class Window(log.Loggable, gobject.GObject):
 
         def refused(failure):
             failure.trap(errors.ConnectionRefusedError)
-            dialogs.connection_refused_modal_message(config['host'],
+            dialogs.connection_refused_modal_message(i.host,
                                                      self.window)
             self.window.set_sensitive(True)
 
         d.addCallback(connected).addErrback(refused)
         self.window.set_sensitive(False)
 
-    def on_recent_activate(self, widget, state):
-        self.on_open_connection(state)
+    def on_recent_activate(self, widget, connectionInfo):
+        self.on_open_connection(connectionInfo)
 
     def _append_recent_connections(self):
         menu = self.widgets['connection_menu'].get_submenu()
@@ -229,7 +229,7 @@ class Window(log.Loggable, gobject.GObject):
             gtk.MenuShell.append(menu, i) # $%^&* pychecker
         def append_txt(c, n):
             i = gtk.MenuItem(c['name'])
-            i.connect('activate', self.on_recent_activate, c['state'])
+            i.connect('activate', self.on_recent_activate, c['info'])
             append(i)
             
         append(gtk.SeparatorMenuItem())
@@ -908,9 +908,9 @@ class Window(log.Loggable, gobject.GObject):
  
  
     # menubar/toolbar callbacks
-    def on_have_connection(self, d, state):
+    def on_have_connection(self, d, connectionInfo):
         d.destroy()
-        self.on_open_connection(state)
+        self.on_open_connection(connectionInfo)
 
     def file_open_cb(self, button):
         d = gtkconnections.ConnectionsDialog(self.window)
