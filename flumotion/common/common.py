@@ -25,7 +25,6 @@ small common functions used by all processes
 
 import errno
 import os 
-import socket
 import sys
 import time
 import signal
