@@ -1,3 +1,9 @@
+2006-07-20  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/job/job.py:
+	  Don't give a warning about 'unknown message' for every sendFeed -
+	  use elif rather than if.
+
 2006-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/multi.py:

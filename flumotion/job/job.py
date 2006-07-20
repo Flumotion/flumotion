@@ -291,7 +291,7 @@ class JobClientBroker(pb.Broker, log.Loggable):
         if message.startswith('sendFeed '):
             feedName = message[len('sendFeed '):]
             self.factory.medium.component.feedToFD(feedName, fds[0])
-        if message.startswith('receiveFeed '):
+        elif message.startswith('receiveFeed '):
             feedId = message[len('receiveFeed '):]
             self.factory.medium.component.eatFromFD(feedId, fds[0])
         else:
