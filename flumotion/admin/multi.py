@@ -110,11 +110,19 @@ class MultiAdminModel(log.Loggable):
             else:
                 self.warning('Could not find admin model %r' % admin)
 
+        def connection_refused_cb(admin):
+            self.info('Connection to %s:%d refused.' % (host, port))
+
+        def connection_failed_cb(admin, string):
+            self.info('Connection to %s:%d failed: %s' % (host, port, string))
+
         a = admin.AdminModel(authenticator)
 
         a.connectToHost(host, port, use_insecure)
         a.connect('connected', connected_cb)
         a.connect('disconnected', disconnected_cb)
+        a.connect('connection-refused', connection_refused_cb)
+        a.connect('connection-failed', connection_failed_cb)
         return a
 
     def close_admin(self, admin):

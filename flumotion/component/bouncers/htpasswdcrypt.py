@@ -121,6 +121,7 @@ class HTPasswdCrypt(bouncer.Bouncer):
         # at this point we add it so there's an ID for challenge-response
         self.addKeycard(keycard)
 
+        self.debug('Got keycard to authenticate for user %s' % keycard.username)
         # check if the keycard is ready for the checker, based on the type
         if isinstance(keycard, keycards.KeycardUACPCC):
             # Check if we need to challenge it
