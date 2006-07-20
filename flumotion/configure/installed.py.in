@@ -56,5 +56,6 @@ def get():
         'pythondir':     os.path.join('@LIBDIR@', 'flumotion', 'python'),
         'registrydir':   registrydir,
         'rundir':        os.path.join('@LOCALSTATEDIR@', 'run', 'flumotion'),
+        'sbindir':       '@SBINDIR@',
         'version':       '@VERSION@',
     }

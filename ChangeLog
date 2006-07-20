@@ -1,3 +1,11 @@
+2006-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* flumotion/configure/configure.py:
+	* flumotion/configure/installed.py.in:
+	* flumotion/configure/uninstalled.py.in:
+	  add sbindir so other code can find the flumotion service program
+
 2006-07-20  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/command/main.py (main): Update for

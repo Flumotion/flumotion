@@ -58,11 +58,6 @@ def install_reactor(gtk=False):
     reactor.addSystemEventTrigger('before', 'startup', setkilled, False)
     reactor.addSystemEventTrigger('before', 'shutdown', setkilled, True)
 
-    if version[0] >= '2':
-        from twisted.names import client
-        # avoid spawning threads -- the normal resolver spawns threads
-        reactor.installResolver(client.createResolver())
-
 def implementsInterface(object, interface):
     if version[0] < '2':
         from twisted.python import components
