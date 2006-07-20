@@ -134,6 +134,9 @@
 * MEDIUM	BaseAdminGtkNode implements getProp, setProp, callRemote,
 	 	exactly the same way as BaseAdminGtk -> pass it as parent
 		so it can call on parent's methods
+
+* EASY		depgraph add/removeEdge arguments should be c, t, c, t
+		and not c, c, t, t
 - API cleanup:
 
 - manager/component.py:
