@@ -76,12 +76,11 @@ class DAG(log.Loggable):
         """
         I add a node to the DAG.
 
-        @param object: An object to put in the DAG.
-        @param type: An optional type for the object.
-        @type type: Integer
+        @param object: object to put in the DAG
+        @param type:   optional type for the object
         """
         if self.hasNode(object, type):
-            raise KeyError("Node for %r already exists with type %d" % (
+            raise KeyError("Node for %r already exists with type %r" % (
                 object, type))
 
         n = Node(object, type)
@@ -108,13 +107,12 @@ class DAG(log.Loggable):
 
         @param object: The object to remove.
         @param type: The type of object to remove (optional).
-        @type type: Integer
         """
         if not self.hasNode(object, type):
-            raise KeyError("Node for %r with type %d does not exist" % (
+            raise KeyError("Node for %r with type %r does not exist" % (
                 object, type))
         node = self._getNode(object, type)
-        self.debug("Removing node (%r, %d)" % (object, type))
+        self.debug("Removing node (%r, %r)" % (object, type))
         # go through all the nodes and remove edges that end in this node
         for somenodeobj,somenodetype in self._nodes:
             somenode = self._nodes[(somenodeobj, somenodetype)]
@@ -143,8 +141,9 @@ class DAG(log.Loggable):
         nc = self._getNode(child, childtype)
         
         if nc in np.children:
-            raise KeyError("%r of type %d is already a child of %r of type %d" % (
-                child, childtype, parent, parenttype))
+            raise KeyError(
+                "%r of type %r is already a child of %r of type %r" % (
+                    child, childtype, parent, parenttype))
 
         self._tainted = True
         np.children.append(nc)
@@ -166,11 +165,11 @@ class DAG(log.Loggable):
         
         if nc not in np.children:
             raise KeyError("%r is not a child of %r" % (child, parent))
-        self.debug("Removing edge (%r,%d) -> (%r,%d)" % (parent, parenttype, 
+        self.debug("Removing edge (%r ,%r) -> (%r, %r)" % (parent, parenttype, 
             child, childtype))
         self._tainted = True
         np.children.remove(nc)
-        self.debug("Children now: %r" % np.children)
+        self.log("Children now: %r" % np.children)
         nc.parents.remove(np)
 
     def getChildrenTyped(self, object, objtype=0, types=None):
@@ -268,10 +267,10 @@ class DAG(log.Loggable):
         """
         self._assertExists(object, objtype)
         node = self._getNode(object, objtype)
-        self.debug("Getting offspring for (%r,%d)" % (object, objtype))
+        self.log("Getting offspring for (%r, %r)" % (object, objtype))
         # if we don't have children, don't bother trying
         if not node.children:
-            self.debug("Returning nothing")
+            self.log("Returning nothing")
             return []
 
         # catches CycleError as well
@@ -304,7 +303,7 @@ class DAG(log.Loggable):
                 ret.append((n.object, n.type))
         
         for node in ret:
-            self.debug("Offspring: (%r,%d)" % (node[0], node[1]))
+            self.log("Offspring: (%r, %r)" % (node[0], node[1]))
         return ret
 
     def getOffspring(self, object, objtype=0, *types):
@@ -428,7 +427,7 @@ class DAG(log.Loggable):
         """
         return [(node.object, node.type) for node in self._sortPreferred()]
         
-    def _sortPreferred(self, list=None):
+    def _sortPreferred(self, list=None, clearState=True):
         """
         I return a topologically sorted list of nodes, using list as a
         preferred order for the algorithm.
@@ -438,7 +437,6 @@ class DAG(log.Loggable):
 
         @rtype: list of {Node}
         """
-
         self._count = 0
         for n in self._nodes.values():
             self._begin[n] = 0
@@ -451,7 +449,7 @@ class DAG(log.Loggable):
 
         while self._hasZeroEnd:
             node = self._hasZeroEnd[0]
-            self.debug("working on node (%r,%d)" % (
+            self.log("working on node (%r, %r)" % (
                 node.object,node.type))
             self._dfs(node)
 
@@ -462,16 +460,16 @@ class DAG(log.Loggable):
 
         l.sort()
         l.reverse()
-        ret = [node for count, node in l]
-        self._begin = {}
-        self._end = {}
-        self._hasZeroEnd = []
-        return ret
+        if clearState:
+            self._begin = {}
+            self._end = {}
+            self._hasZeroEnd = []
+        return [node for count, node in l]
 
     def _dfs(self, node):
         # perform depth first search
 
-        self.debug("doing _dfs for object (%r,%d)" % (node.object
+        self.log("doing _dfs for object (%r, %r)" % (node.object
             ,node.type))
         self._count += 1
         
@@ -490,18 +488,19 @@ class DAG(log.Loggable):
         for n in node.children:
             if self._begin[n] > 0:
                 continue
-            self.debug("calling _dfs for object (%r,%d) because beginzero" % (
+            self.log("calling _dfs for object (%r, %r) because beginzero" % (
                 n.object, n.type))
             self._dfs(n)
-            self.debug("called _dfs for object (%r,%d)" % (n.object,n.type))
+            self.log("called _dfs for object (%r, %r)" % (n.object, n.type))
             
         self._count += 1
         self._end[node] = self._count
         if node in self._hasZeroEnd:
-            self.debug("removing for object (%r,%d)" % (node.object,node.type))
+            self.log("removing for object (%r, %r)" % (
+                node.object, node.type))
             self._hasZeroEnd.remove(node)
 
-        self.debug("done _dfs for object (%r,%d)" % (node.object, node.type))
+        self.log("done _dfs for object (%r, %r)" % (node.object, node.type))
 
     def getAllNodesByType(self, type):
         """

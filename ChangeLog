@@ -1,5 +1,23 @@
 2006-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/dag.py:
+	  DAG was never intended to only take int types, so use %r
+	  everywhere for type
+	  Move some debugging to log, it's too verbose otherwise
+	* flumotion/manager/depgraph.py:
+	  use strings for type, makes debug a lot more readable
+	  add a FIXME for a very doubtful two lines of code
+	  speed up turning downstream components to hungry when we
+	  stop a component
+	* flumotion/manager/component.py:
+	  use strings for type, makes debug a lot more readable
+	* flumotion/test/test_dag.py:
+	* flumotion/test/test_manager_depgraph.py:
+	* flumotion/test/test_manager_manager.py:
+	  Fix tests as well
+
+2006-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/component.py:
 	  add a doc
 	* flumotion/component/feedcomponent010.py:

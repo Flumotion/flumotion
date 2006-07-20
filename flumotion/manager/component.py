@@ -852,7 +852,7 @@ class ComponentHeaven(base.ManagerHeaven):
 
         dep, deptype = deplist[0]
         if dep:
-            if deptype == self.vishnu._depgraph.COMPONENTSETUP:
+            if deptype == "COMPONENTSETUP":
                 self.debug("Component %s to be setup" % dep.get("name"))
                 componentAvatar = self.getComponentAvatarForState(dep)
                 if componentAvatar:
@@ -865,7 +865,7 @@ class ComponentHeaven(base.ManagerHeaven):
                     return
                 else:
                     self.debug("Component %s to be setup but has no avatar yet" % dep.get("name"))
-            elif deptype == self.vishnu._depgraph.COMPONENTSTART:
+            elif deptype == "COMPONENTSTART":
                 self.debug("Component %s to be started!" % dep.get("name"))
                 componentAvatar = self.getComponentAvatarForState(dep)
                 if not componentAvatar._starting:
@@ -878,7 +878,7 @@ class ComponentHeaven(base.ManagerHeaven):
                 else:
                     self.log("Component is already starting")
                     return
-            elif deptype == self.vishnu._depgraph.CLOCKMASTER:
+            elif deptype == "CLOCKMASTER":
                 self.debug("Component %s to be clock master!" % dep.get("name"))
                 componentAvatar = self.getComponentAvatarForState(dep)
                 if componentAvatar:

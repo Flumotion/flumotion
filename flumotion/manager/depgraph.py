@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 from flumotion.common import dag, log, registry
+from flumotion.common.planet import moods
 
 import string
 
@@ -53,8 +54,6 @@ class DepGraph(log.Loggable):
     """
     logCategory = "depgraph"
 
-    (WORKER, JOB, COMPONENTSETUP, CLOCKMASTER, COMPONENTSTART) = range(0,5)
-    types = range(0, 5)
     typeNames = ("WORKER", "JOB", "COMPONENTSETUP", "CLOCKMASTER",
         "COMPONENTSTART")
     
@@ -63,28 +62,24 @@ class DepGraph(log.Loggable):
         self._state = {}
 
     def _addNode(self, component, type):
-        self.debug("Adding node %r of type %d (%s)" % (component, type,
-            self.typeNames[type]))
+        # type: str
+        self.debug("Adding node %r of type %s" % (component, type))
         self._dag.addNode(component, type)
         self._state[(component, type)] = False
 
     def _removeNode(self, component, type):
-        self.debug("Removing node %r of type %d (%s)" % (component, type,
-            self.typeNames[type]))
+        self.debug("Removing node %r of type %s" % (component, type))
         self._dag.removeNode(component, type)
 
     def _addEdge(self, parent, child, parentType, childType):
-        self.debug("Adding edge %r of type %d (%s) to %r of type %d (%s)" % (
-            parent, parentType, self.typeNames[parentType],
-            child, childType, self.typeNames[childType]))
+        self.debug("Adding edge %r of type %s to %r of type %s" % (
+            parent, parentType, child, childType))
         self._dag.addEdge(parent, child, parentType, childType)
 
     def _removeEdge(self, parent, child, parentType, childType):
-        self.debug("Removing edge %r of type %d (%s) to %r of type %d (%s)" % (
-            parent, parentType, self.typeNames[parentType],
-            child, childType, self.typeNames[childType]))
+        self.debug("Removing edge %r of type %s to %r of type %s" % (
+            parent, parentType, child, childType))
         self._dag.removeEdge(parent, child, parentType, childType)
-
 
     def addClockMaster(self, component):
         """
@@ -95,19 +90,19 @@ class DepGraph(log.Loggable):
         @param component: the component to set as the clock master
         @type  component: L{flumotion.manager.component.ComponentAvatar}
         """
-        if self._dag.hasNode(component, self.JOB):
-            self._addNode(component, self.CLOCKMASTER)
-            self._addEdge(component, component, self.COMPONENTSETUP, 
-                self.CLOCKMASTER)
+        if self._dag.hasNode(component, "JOB"):
+            self._addNode(component, "CLOCKMASTER")
+            self._addEdge(component, component, "COMPONENTSETUP",
+                "CLOCKMASTER")
         
             # now go through all the component starts and make them dep on the
             # clock master
-            startnodes = self._dag.getAllNodesByType(self.COMPONENTSTART)
+            startnodes = self._dag.getAllNodesByType("COMPONENTSTART")
             for start in startnodes:
                 # only add if they share the same parent flow
                 if start.get('parent') == component.get('parent'):
-                    self._addEdge(component, start, self.CLOCKMASTER, 
-                        self.COMPONENTSTART)
+                    self._addEdge(component, start, "CLOCKMASTER", 
+                        "COMPONENTSTART")
         else:
             raise KeyError("Component %r has not been added" % component)
 
@@ -123,16 +118,16 @@ class DepGraph(log.Loggable):
         @type component: L{flumotion.common.planet.ManagerComponentState}
         """
         self.debug('adding component %r to depgraph' % component)
-        self._addNode(component, self.JOB)
-        self._addNode(component, self.COMPONENTSTART)
-        self._addNode(component, self.COMPONENTSETUP)
-        self._addEdge(component, component, self.JOB, self.COMPONENTSETUP)
+        self._addNode(component, "JOB")
+        self._addNode(component, "COMPONENTSTART")
+        self._addNode(component, "COMPONENTSETUP")
+        self._addEdge(component, component, "JOB", "COMPONENTSETUP")
         workername = component.get('workerRequested')
         if workername:
             self.addWorker(workername)
             self.setComponentWorker(component, workername)
-        self._addEdge(component, component, self.COMPONENTSETUP, 
-            self.COMPONENTSTART)
+        self._addEdge(component, component, "COMPONENTSETUP", 
+            "COMPONENTSTART")
 
     def addWorker(self, worker):
         """
@@ -142,8 +137,8 @@ class DepGraph(log.Loggable):
         @type  worker: str
         """
         self.debug('adding worker %s' % worker)
-        if not self._dag.hasNode(worker, self.WORKER):
-            self._addNode(worker, self.WORKER)
+        if not self._dag.hasNode(worker, "WORKER"):
+            self._addNode(worker, "WORKER")
 
     def removeComponent(self, component):
         """
@@ -154,7 +149,7 @@ class DepGraph(log.Loggable):
         @type component:  L{flumotion.manager.component.ComponentAvatar}
         """
         self.debug('removing component %r from depgraph' % component)
-        for type in self.types:
+        for type in self.typeNames:
             if self._dag.hasNode(component, type):
                 self._removeNode(component, type)
                 del self._state[(component, type)]
@@ -167,9 +162,9 @@ class DepGraph(log.Loggable):
         @type  worker: str
         """
         self.debug('removing worker %s' % worker)
-        if self._dag.hasNode(worker, self.WORKER):
-            self._dag.removeNode(worker, self.WORKER)
-            del self._state[(worker, self.WORKER)]
+        if self._dag.hasNode(worker, "WORKER"):
+            self._dag.removeNode(worker, "WORKER")
+            del self._state[(worker, "WORKER")]
 
     def setComponentWorker(self, component, worker):
         """
@@ -180,9 +175,9 @@ class DepGraph(log.Loggable):
         @param worker: the worker to set it to
         @type worker: String
         """
-        if self._dag.hasNode(worker, self.WORKER) and (
-            self._dag.hasNode(component, self.JOB)):
-            self._addEdge(worker, component, self.WORKER, self.JOB)
+        if self._dag.hasNode(worker, "WORKER") and (
+            self._dag.hasNode(component, "JOB")):
+            self._addEdge(worker, component, "WORKER", "JOB")
         else:
             raise KeyError("Worker %s or Component %r not in dependency graph" %
                 (worker, component))
@@ -193,7 +188,7 @@ class DepGraph(log.Loggable):
         I am called once whole flow has been added so I can add edges to the
         dag between eaters and feeders.
         """
-        compsetups = self._dag.getAllNodesByType(self.COMPONENTSETUP)
+        compsetups = self._dag.getAllNodesByType("COMPONENTSETUP")
         #eaters = self._dag.getAllNodesByType(self.EATER)
         
         for eatercomp in compsetups:
@@ -229,7 +224,7 @@ class DepGraph(log.Loggable):
                         if feedercomp.get("name") == name[0]:
                             try:
                                 self._addEdge(feedercomp, eatercomp, 
-                                    self.COMPONENTSETUP, self.COMPONENTSETUP)
+                                    "COMPONENTSETUP", "COMPONENTSETUP")
                             except KeyError:
                                 # this happens when edge is already there, 
                                 # possible to have 2 feeders on one component
@@ -238,7 +233,7 @@ class DepGraph(log.Loggable):
                             feederfound = True
                             try:
                                 self._addEdge(feedercomp, eatercomp,
-                                    self.COMPONENTSTART, self.COMPONENTSTART)
+                                    "COMPONENTSTART", "COMPONENTSTART")
                             except KeyError:
                                 pass
                     if not feederfound:
@@ -262,10 +257,10 @@ class DepGraph(log.Loggable):
         # we want to loop over all objects, so we loop over a copy
         for obj in toBeStarted[:]:
             if obj in toBeStarted:
-                self.debug("toBeStarted: testing (%r,%d)", obj[0], obj[1])
+                self.debug("toBeStarted: testing (%r, %r)", obj[0], obj[1])
                 if self._state[obj]:
                     toBeStarted.remove(obj)
-                elif obj[1] == self.WORKER:
+                elif obj[1] == "WORKER":
                     # This is a worker not started.
                     # Let's remove it and its offspring
                     worker_offspring = self._dag.getOffspringTyped(
@@ -274,7 +269,7 @@ class DepGraph(log.Loggable):
                         if offspring in toBeStarted:
                             toBeStarted.remove(offspring)
                     toBeStarted.remove(obj)
-                elif obj[1] == self.JOB:
+                elif obj[1] == "JOB":
                     job_offspring = self._dag.getOffspringTyped(obj[0], obj[1])
                     for offspring in job_offspring:
                         if offspring in toBeStarted:
@@ -284,18 +279,32 @@ class DepGraph(log.Loggable):
         return toBeStarted
 
     def _setState(self, object, type, value):
-        self.debug("Setting state of (%r,%d) to %d" % (object, type, value))
+        self.debug("Setting state of (%r, %s) to %d" % (
+            object, type, value))
         self._state[(object,type)] = value
         # if making state False, should make its offspring False
         # if the object is the same
         if not value:
-            self.debug("Setting state of (%r,%d) offspring to %d" %
+            self.debug("Setting state of all (%r, %s)'s offspring to %d" %
                 (object, type, value))
             offspring = self._dag.getOffspringTyped(object, type)
             for kid in offspring:
-                self.debug("Setting state of (%r) offspring to %d", kid, value)
+                self.debug("Setting state of offspring (%r) to %d", kid, value)
+                # FIXME: what does this do ?
+                # a) why compare kid[0] to object ?
+                # b) why does the state get set to False, not value ?
+                # c) why does the debug line lie about what's done ?
                 if kid[0] == object:
                     self._state[kid] = False
+
+                # if COMPONENTSTART state on offspring is set to FALSE,
+                # and the component is happy, then we set it to hungry;
+                # that is what will happen soon enough anyway
+                if kid[1] == "COMPONENTSTART" and kid[0] != object:
+                    if kid[0].get('mood') == moods.happy.value:
+                        self.debug('Setting downstream component %r to hungry' %
+                            kid[0])
+                        kid[0].set('mood', moods.hungry.value)
 
     def setComponentStarted(self, component):
         """
@@ -304,7 +313,7 @@ class DepGraph(log.Loggable):
         @param component: the component to set COMPONENTSTART to True for
         @type component: L{flumotion.common.planet.ManagerComponentState}
         """
-        self._setState(component, self.COMPONENTSTART, True)
+        self._setState(component, "COMPONENTSTART", True)
 
     def setComponentNotStarted(self, component):
         """
@@ -314,7 +323,7 @@ class DepGraph(log.Loggable):
         @type component: L{flumotion.common.planet.ManagerComponentState}
         """
 
-        self._setState(component, self.COMPONENTSTART, False)
+        self._setState(component, "COMPONENTSTART", False)
 
     def setComponentSetup(self, component):
         """
@@ -324,7 +333,7 @@ class DepGraph(log.Loggable):
         @type component: L{flumotion.common.planet.ManagerComponentState}
         """
 
-        self._setState(component, self.COMPONENTSETUP, True)
+        self._setState(component, "COMPONENTSETUP", True)
 
     def setComponentNotSetup(self, component):
         """
@@ -334,7 +343,7 @@ class DepGraph(log.Loggable):
         @type component: L{flumotion.common.planet.ManagerComponentState}
         """
 
-        self._setState(component, self.COMPONENTSETUP, False)
+        self._setState(component, "COMPONENTSETUP", False)
 
 
     def setJobStarted(self, component):
@@ -344,7 +353,7 @@ class DepGraph(log.Loggable):
         @param component: the component to set JOB to True for
         @type component: L{flumotion.common.planet.ManagerComponentState}
         """
-        self._setState(component, self.JOB, True)
+        self._setState(component, "JOB", True)
 
     def setJobStopped(self, component):
         """
@@ -353,7 +362,7 @@ class DepGraph(log.Loggable):
         @param component: the component to set JOB to False for
         @type component: L{flumotion.common.planet.ManagerComponentState}
         """
-        self._setState(component, self.JOB, False)
+        self._setState(component, "JOB", False)
 
     def setWorkerStarted(self, worker):
         """
@@ -362,7 +371,7 @@ class DepGraph(log.Loggable):
         @param worker: the component to set WORKER to True for
         @type worker: String
         """
-        self._setState(worker, self.WORKER, True)
+        self._setState(worker, "WORKER", True)
 
     def setWorkerStopped(self, worker):
         """
@@ -371,7 +380,7 @@ class DepGraph(log.Loggable):
         @param worker: the component to set WORKER to False for
         @type worker: String
         """
-        self._setState(worker, self.WORKER, False)
+        self._setState(worker, "WORKER", False)
     
     def setClockMasterStarted(self, component):
         """
@@ -380,7 +389,7 @@ class DepGraph(log.Loggable):
         @param component: the component to set CLOCKMASTER to True for
         @type component: {flumotion.common.planet.ManagerComponentState}
         """
-        self._setState(component, self.CLOCKMASTER, True)
+        self._setState(component, "CLOCKMASTER", True)
 
     def setClockMasterStopped(self, component):
         """
@@ -390,4 +399,4 @@ class DepGraph(log.Loggable):
         @type component: {flumotion.common.planet.ManagerComponentState}
         """
 
-        self._setState(component, self.CLOCKMASTER, False)
+        self._setState(component, "CLOCKMASTER", False)

@@ -178,7 +178,8 @@ class TestDAG(unittest.TestCase):
         # the example
         # even though multiple answers are possible, the preferred order
         # makes sure we get the one result we want
-        nodes = graph._sortPreferred([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0), (9,0), (8,0), (7,0)])
+        nodes = graph._sortPreferred([(1,0), (2,0), (3,0), (4,0), (5,0),
+            (6,0), (9,0), (8,0), (7,0)], clearState=False)
         sorted = [node.object for node in nodes]
         self.assertEquals(sorted, [7, 9, 1, 4, 6, 5, 8, 2, 3])
 
@@ -186,9 +187,11 @@ class TestDAG(unittest.TestCase):
         # reference begin and end value for each item - see example
         counts = [(1, 14), (2, 5), (3, 4), (6, 13), (8, 11), (7, 12),
                   (17, 18), (9, 10), (15, 16)]
-        for i in range(1,10):
-            n = graph._nodes[(i,0)]
+        for i in range(1, 10):
+            n = graph._nodes[(i, 0)]
             begin, end = counts[i - 1]
+            self.failUnless(n in graph._begin,
+                "n %r not in graph._begin %r" % (n, graph._begin))
             self.assertEquals(graph._begin[n], begin)
             self.assertEquals(graph._end[n], end)
 

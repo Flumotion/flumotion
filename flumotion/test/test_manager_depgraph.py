@@ -78,37 +78,37 @@ class testDepGraph(unittest.TestCase):
         # now check depgraph is correct
         startorder = dg._dag.sort()
         # check worker is the first node in the depgraph
-        self.failUnless(startorder[0] == ("default", dg.WORKER))
+        self.failUnless(startorder[0] == ("default", "WORKER"))
         # now check that the jobs are before the componentsetup
         # and componentsetup before componentready
         # and componentsetup before the eaters and feeders in that component
         # and eaters and feeders before componentready
         # and componentready before any clock master in that component
         for node in startorder:
-            if node[1] == dg.JOB:
+            if node[1] == "JOB":
                 jobindex = startorder.index(node)
                 for postnode in startorder:
-                    if postnode == (node[0], dg.COMPONENTSETUP):
+                    if postnode == (node[0], "COMPONENTSETUP"):
                         postindex = startorder.index(postnode)
                         self.failUnless(postindex > jobindex)
-                    elif postnode == (node[0], dg.CLOCKMASTER):
+                    elif postnode == (node[0], "CLOCKMASTER"):
                         postindex = startorder.index(postnode)
                         self.failUnless(postindex > jobindex)
             # now check that the clock master is before all the component happy
-            elif node[1] == dg.CLOCKMASTER:
+            elif node[1] == "CLOCKMASTER":
                 clockindex = startorder.index(node)
                 for happynode in startorder:
-                    if happynode[1] == dg.COMPONENTSTART:
+                    if happynode[1] == "COMPONENTSTART":
                         happyindex = startorder.index(happynode)
                         self.failUnless(happyindex > clockindex)
         
             # now check that componentsetup before componentstart
             # also check the feeders are before their respective eaters
-            elif node[1] == dg.COMPONENTSETUP:
+            elif node[1] == "COMPONENTSETUP":
                 setupindex = startorder.index(node)
                 # feeders = 
                 for postnode in startorder:
-                    if postnode == (node[0], dg.COMPONENTSTART):
+                    if postnode == (node[0], "COMPONENTSTART"):
                         postindex = startorder.index(postnode)
                         self.failUnless(postindex > jobindex)
                     #elif postnode[1] == dg.EATER and postnode[0].component == node[0]:
@@ -130,7 +130,7 @@ class testDepGraph(unittest.TestCase):
         #dg.setJobStarted(videotest)
         #tobestarted = dg.whatShouldBeStarted()
         #self.assertEquals(len(tobestarted), len(startorder)-2)
-        #self.failUnless((videotest, dg.JOB) not in tobestarted)
+        #self.failUnless((videotest, "JOB") not in tobestarted)
 
         dg.setJobStarted(videoenc)
         dg.setJobStarted(muxer)
@@ -187,8 +187,8 @@ class testDepGraph(unittest.TestCase):
         started = dg.whatShouldBeStarted()
         assert(len(started) == 0)
         # let's make sure worker has no children
-        assert(dg._dag.hasNode("default", dg.WORKER))
-        workerchildren = dg._dag.getChildrenTyped("default", dg.WORKER)
+        assert(dg._dag.hasNode("default", "WORKER"))
+        workerchildren = dg._dag.getChildrenTyped("default", "WORKER")
         assert(len(workerchildren) == 0)
         # make sure there are no nodes with children
         for node in dg._dag._nodes.values():
@@ -218,30 +218,30 @@ class testDepGraph(unittest.TestCase):
         # and componentsetup before componentready
         # and componentready before any clock master in that component
         for node in startorder:
-            if node[1] == dg.JOB:
+            if node[1] == "JOB":
                 jobindex = startorder.index(node)
                 for postnode in startorder:
-                    if postnode == (node[0], dg.COMPONENTSETUP):
+                    if postnode == (node[0], "COMPONENTSETUP"):
                         postindex = startorder.index(postnode)
                         self.failUnless(postindex > jobindex)
-                    elif postnode == (node[0], dg.CLOCKMASTER):
+                    elif postnode == (node[0], "CLOCKMASTER"):
                         postindex = startorder.index(postnode)
                         self.failUnless(postindex > jobindex)
             # now check that the clock master is before all the component happy
-            elif node[1] == dg.CLOCKMASTER:
+            elif node[1] == "CLOCKMASTER":
                 clockindex = startorder.index(node)
                 for happynode in startorder:
-                    if happynode[1] == dg.COMPONENTSTART:
+                    if happynode[1] == "COMPONENTSTART":
                         happyindex = startorder.index(happynode)
                         self.failUnless(happyindex > clockindex)
         
             # now check that componentsetup before componentstart
             # also check the feeders are before their respective eaters
-            elif node[1] == dg.COMPONENTSETUP:
+            elif node[1] == "COMPONENTSETUP":
                 setupindex = startorder.index(node)
                 # feeders = 
                 for postnode in startorder:
-                    if postnode == (node[0], dg.COMPONENTSTART):
+                    if postnode == (node[0], "COMPONENTSTART"):
                         postindex = startorder.index(postnode)
                         self.failUnless(postindex > jobindex)
 

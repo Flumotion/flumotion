@@ -502,7 +502,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         state = mappers[id].state
         assert state, state
         dag = self.vishnu._depgraph._dag
-        o = dag.getOffspringTyped(state, self.vishnu._depgraph.COMPONENTSTART)
+        o = dag.getOffspringTyped(state, "COMPONENTSTART")
         names = [s.get('name') for s,t in o]
         self.failIf('producer-video-test' in names)
         self.failUnless('converter-ogg-theora' in names)
