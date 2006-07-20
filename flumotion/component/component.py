@@ -560,6 +560,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
     def getMood(self):
         """
         Gets the mood on the component.
+
+        @rtype: int
         """
         return self.state.get('mood')
 

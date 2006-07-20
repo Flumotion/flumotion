@@ -49,9 +49,9 @@ class FeedComponent(basecomponent.BaseComponent):
     BUFFER_PROBE_ADD_FREQUENCY = 5
 
     # how often to check that a buffer has arrived recently
-    BUFFER_CHECK_FREQUENCY = 10
+    BUFFER_CHECK_FREQUENCY = 5
 
-    BUFFER_TIME_THRESHOLD = 30
+    BUFFER_TIME_THRESHOLD = 5
 
     logCategory = 'feedcomponent'
 
@@ -402,15 +402,20 @@ class FeedComponent(basecomponent.BaseComponent):
         buffer received within BUFFER_TIME_THRESHOLD and set mood to happy if
         a buffer has been received in that threshold but component is hungry
         """
+        self.log('_check_for_buffer_data: last time %r' % self.last_buffer_time)
         if self.last_buffer_time > 0:
             current_time = time.time()
-            if self.getMood() == moods.happy \
-            and current_time > self.last_buffer_time + \
-            self.BUFFER_TIME_THRESHOLD:
+            delta = current_time - self.last_buffer_time
+            if self.getMood() == moods.happy.value \
+            and delta > self.BUFFER_TIME_THRESHOLD:
+                self.info('No data received for %r seconds, turning hungry' %
+                    self.BUFFER_TIME_THRESHOLD)
                 self.setMood(moods.hungry)
-            elif self.getMood() == moods.hungry:
+            if self.getMood() == moods.hungry.value \
+            and delta < self.BUFFER_TIME_THRESHOLD:
                 # we are hungry but we have a recent buffer
                 # so set to happy
+                self.info('Received data again, turning happy')
                 self.setMood(moods.happy)
         reactor.callLater(self.BUFFER_CHECK_FREQUENCY,
             self._check_for_buffer_data)
