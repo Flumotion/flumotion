@@ -24,7 +24,7 @@ import os
 from xml.dom import minidom, Node
 
 from flumotion.configure import configure
-from flumotion.common import connection
+from flumotion.common import connection, errors
 from flumotion.twisted import pb as fpb
 
 def get_recent_connections():
@@ -67,4 +67,54 @@ def get_recent_connections():
         print 'Error: %s: %s' % (e.strerror, e.filename)
         return []
 
+def parsePBConnectionInfo(string, use_ssl=True,
+                          defaultPort=configure.defaultSSLManagerPort):
+    """The same as L{flumotion.common.connection.parsePBConnectionInfo},
+    but fills in missing information from the recent connections cache 
+    if possible.
+    """
+    recent = get_recent_connections()
+    if not string:
+        if recent:
+            return recent[0]['info']
+        else:
+            raise errors.OptionError('No string given and no recent '
+                                     'connections to use')
 
+    info = connection.parsePBConnectionInfo(string, username=None,
+                                            password=None,
+                                            port=defaultPort,
+                                            use_ssl=use_ssl)
+
+    def compatible(i1, i2):
+        if i1.port and i1.port != i2.port:
+            return False
+        if i1.use_ssl != i2.use_ssl:
+            return False
+        a1, a2 = i1.authenticator, i2.authenticator
+        if a1.username and a1.username != a2.username:
+            return False
+        if a1.password and a1.password != a2.password:
+            return False
+        return True
+
+    if not info.authenticator.username:
+        for c in recent:
+            recent = c['info']
+            if compatible(info, recent):
+                info.authenticator.username = recent.authenticator.username
+                info.authenticator.password = recent.authenticator.password
+                break
+    elif not info.authenticator.password:
+        for c in recent:
+            recent = c['info']
+            if compatible(info, recent):
+                info.authenticator.password = recent.authenticator.password
+                break
+    if not (info.authenticator.username and info.authenticator.password):
+        raise errors.OptionError('You are connecting to %s for the '
+                                 'first time; please specify a user and '
+                                 'password (e.g. user:test@%s).'
+                                 % (manager_string, manager_string))
+    else:
+        return info

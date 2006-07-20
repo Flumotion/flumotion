@@ -91,12 +91,9 @@ def parse_commands(args):
 
     return command
 
-def setup_reactor(connection):
-    auth = fpb.Authenticator(username=connection['user'],
-                             password=connection['passwd'])
-    model = AdminModel(auth)
-    d = model.connectToHost(connection['host'], connection['port'],
-                            connection['use_insecure'])
+def setup_reactor(info):
+    model = AdminModel(info.authenticator)
+    d = model.connectToHost(info.host, info.port, not info.use_ssl)
 
     def refused(failure):
         failure.trap(errors.ConnectionRefusedError)
@@ -115,66 +112,6 @@ def setup_reactor(connection):
     return d
 
 pat = re.compile('^(([^:@]*)(:([^:@]+))?@)?([^:@]+)(:([0-9]+))?$')
-
-def parse_connection(manager_string, use_insecure):
-    recent = connections.get_recent_connections()
-
-    if manager_string:
-        matched = pat.search(manager_string)
-        if not matched:
-            err('invalid manager string: %s '
-                '(looking for [user[:pass]@]host[:port])'
-                % manager_string)
-
-        groups = matched.groups()
-        ret = {}
-        for k, v in (('user', 1),
-                     ('passwd', 3),
-                     ('host', 4),
-                     ('port', 6)):
-            ret[k] = groups[v]
-        ret['use_insecure'] = bool(use_insecure)
-        if ret['port']:
-            ret['port'] = int(ret['port'])
-        else:
-            if use_insecure:
-                ret['port'] = configure.defaultTCPManagerPort
-            else:
-                ret['port'] = configure.defaultSSLManagerPort
-
-        def compatible(d1, d2, *keys):
-            for k in keys:
-                if d1[k] and d1[k] != d2[k]:
-                    return False
-            return True
-
-        if not ret['user']:
-            for c in recent:
-                state = c['state']
-                if compatible(ret, state, 'host', 'port', 'use_insecure'):
-                    ret['user'] = state['user']
-                    ret['passwd'] = state['passwd']
-                    break
-        elif not ret['passwd']:
-            for c in recent:
-                state = c['state']
-                if compatible(ret, state, 'host', 'port', 'use_insecure',
-                              'user'):
-                    ret['passwd'] = state['passwd']
-                    break
-        if not (ret['user'] and ret['passwd']):
-            err('You are connecting to %s for the first time; please '
-                'specify a user and password (e.g. user:test@%s).'
-                % (manager_string, manager_string))
-
-        for k, v in ret.items():
-            assert v is not None, '%s unset, internal error' % k
-
-        return ret
-    elif recent:
-        return recent[0]['state']
-    else:
-        err('Missing --manager, and no recent connections to use.')
 
 def main(args):
     parser = optparse.OptionParser()
@@ -208,7 +145,8 @@ def main(args):
     if options.usage or not args[1:]:
         usage(args)
 
-    connection = parse_connection(options.manager, options.no_ssl)
+    connection = connections.parsePBConnectionInfo(options.manager,
+                                                   not options.no_ssl)
 
     command = parse_commands(args)
     quit = lambda: reactor.callLater(0, reactor.stop)

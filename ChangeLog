@@ -1,3 +1,12 @@
+2006-07-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/command/main.py (main): Update for
+	PBConnectionInfo changes.
+
+	* flumotion/admin/connections.py (parsePBConnectionInfo): New
+	parser, the same as common.connection variant but with some
+	special lovin from the connections cache.
+
 2006-07-20  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/depgraph.py:
