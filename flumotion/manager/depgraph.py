@@ -241,13 +241,13 @@ class DepGraph(log.Loggable):
         @rtype: List of (object,type)
         @returns a list of nodes that should be started, in order
         """
-        # a bit tricky because workers cant be started by manager
+        # A bit tricky because workers can't be started by manager,
         # and jobs are started automatically when worker is attached
-        # so we get all the stuff sorted by depgraph
-        # then remove ones that are already have state of True
-        # then remove ones that are workers who are False, and their offspring
-        # then remove ones that are jobs who are False, and their offspring
-        # also remove eaters who's feeders havent started
+        # So we get all the stuff sorted by depgraph,
+        # then remove ones that are already have state of True,
+        # then remove ones that are workers who are False, and their offspring,
+        # then remove ones that are jobs who are False, and their offspring,
+        # and also remove eaters whose feeders haven't started.
         toBeStarted = self._dag.sort()
         # we want to loop over all objects, so we loop over a copy
         for obj in toBeStarted[:]:
@@ -255,9 +255,8 @@ class DepGraph(log.Loggable):
                 if self._state[obj]:
                     toBeStarted.remove(obj)
                 elif obj[1] == self.WORKER:
-                    # this is a worker not started
-                    # lets remove it and its 
-                    # offspring
+                    # This is a worker not started.
+                    # Let's remove it and its offspring
                     worker_offspring = self._dag.getOffspringTyped(
                         obj[0], obj[1])
                     for offspring in worker_offspring:
@@ -283,6 +282,7 @@ class DepGraph(log.Loggable):
                 (object, type, value))
             offspring = self._dag.getOffspringTyped(object, type)
             for kid in offspring:
+                self.debug("Setting state of (%r) offspring to %d", kid, value)
                 if kid[0] == object:
                     self._state[kid] = False
 
