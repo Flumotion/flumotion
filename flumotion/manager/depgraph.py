@@ -54,6 +54,7 @@ class DepGraph(log.Loggable):
     logCategory = "depgraph"
 
     (WORKER, JOB, COMPONENTSETUP, CLOCKMASTER, COMPONENTSTART) = range(0,5)
+    types = range(0, 5)
     typeNames = ("WORKER", "JOB", "COMPONENTSETUP", "CLOCKMASTER",
         "COMPONENTSTART")
     
@@ -65,13 +66,25 @@ class DepGraph(log.Loggable):
         self.debug("Adding node %r of type %d (%s)" % (component, type,
             self.typeNames[type]))
         self._dag.addNode(component, type)
-        self._state[(component,type)] = False
+        self._state[(component, type)] = False
+
+    def _removeNode(self, component, type):
+        self.debug("Removing node %r of type %d (%s)" % (component, type,
+            self.typeNames[type]))
+        self._dag.removeNode(component, type)
 
     def _addEdge(self, parent, child, parentType, childType):
         self.debug("Adding edge %r of type %d (%s) to %r of type %d (%s)" % (
             parent, parentType, self.typeNames[parentType],
             child, childType, self.typeNames[childType]))
         self._dag.addEdge(parent, child, parentType, childType)
+
+    def _removeEdge(self, parent, child, parentType, childType):
+        self.debug("Removing edge %r of type %d (%s) to %r of type %d (%s)" % (
+            parent, parentType, self.typeNames[parentType],
+            child, childType, self.typeNames[childType]))
+        self._dag.removeEdge(parent, child, parentType, childType)
+
 
     def addClockMaster(self, component):
         """
@@ -141,14 +154,10 @@ class DepGraph(log.Loggable):
         @type component:  L{flumotion.manager.component.ComponentAvatar}
         """
         self.debug('removing component %r from depgraph' % component)
-        if self._dag.hasNode(component, self.CLOCKMASTER):
-            self._dag.removeNode(component, self.CLOCKMASTER)
-        if self._dag.hasNode(component, self.COMPONENTSTART):
-            self._dag.removeNode(component, self.COMPONENTSTART)
-        if self._dag.hasNode(component, self.COMPONENTSETUP):
-            self._dag.removeNode(component, self.COMPONENTSETUP)
-        if self._dag.hasNode(component, self.JOB):
-            self._dag.removeNode(component, self.JOB)
+        for type in self.types:
+            if self._dag.hasNode(component, type):
+                self._removeNode(component, type)
+                del self._state[(component, type)]
 
     def removeWorker(self, worker):
         """
@@ -160,6 +169,7 @@ class DepGraph(log.Loggable):
         self.debug('removing worker %s' % worker)
         if self._dag.hasNode(worker, self.WORKER):
             self._dag.removeNode(worker, self.WORKER)
+            del self._state[(worker, self.WORKER)]
 
     def setComponentWorker(self, component, worker):
         """
@@ -252,6 +262,7 @@ class DepGraph(log.Loggable):
         # we want to loop over all objects, so we loop over a copy
         for obj in toBeStarted[:]:
             if obj in toBeStarted:
+                self.debug("toBeStarted: testing (%r,%d)", obj[0], obj[1])
                 if self._state[obj]:
                     toBeStarted.remove(obj)
                 elif obj[1] == self.WORKER:

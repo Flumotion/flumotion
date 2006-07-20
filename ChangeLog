@@ -1,3 +1,18 @@
+2006-07-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* TODO:
+	* flumotion/common/dag.py:
+	Added logging.  Remove references to nodes that may not exist
+	anymore, which end up actually being added to the sorted list.
+	* flumotion/manager/depgraph.py:
+	More debug.  Also remove dag nodes from _state when the component
+	and worker are removed.
+	* flumotion/test/test_manager_depgraph.py:
+	Added test that adds components, removes them, adds them again.
+	* flumotion/test/test_pb.py:
+	Remove un-needed print statement.
+	Fixes #408.
+
 2006-07-20  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/job/job.py:

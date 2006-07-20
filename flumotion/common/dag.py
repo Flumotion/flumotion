@@ -22,6 +22,7 @@
 """
 Directed Acyclic Graph class and functionality
 """
+from flumotion.common import log
 
 class CycleError(Exception):
     """
@@ -50,7 +51,7 @@ class Node:
 
         return True
 
-class DAG:
+class DAG(log.Loggable):
     """
     I represent a Directed Acyclic Graph.
 
@@ -113,7 +114,7 @@ class DAG:
             raise KeyError("Node for %r with type %d does not exist" % (
                 object, type))
         node = self._getNode(object, type)
-
+        self.debug("Removing node (%r, %d)" % (object, type))
         # go through all the nodes and remove edges that end in this node
         for somenodeobj,somenodetype in self._nodes:
             somenode = self._nodes[(somenodeobj, somenodetype)]
@@ -165,9 +166,11 @@ class DAG:
         
         if nc not in np.children:
             raise KeyError("%r is not a child of %r" % (child, parent))
-
+        self.debug("Removing edge (%r,%d) -> (%r,%d)" % (parent, parenttype, 
+            child, childtype))
         self._tainted = True
         np.children.remove(nc)
+        self.debug("Children now: %r" % np.children)
         nc.parents.remove(np)
 
     def getChildrenTyped(self, object, objtype=0, types=None):
@@ -265,9 +268,10 @@ class DAG:
         """
         self._assertExists(object, objtype)
         node = self._getNode(object, objtype)
-
+        self.debug("Getting offspring for (%r,%d)" % (object, objtype))
         # if we don't have children, don't bother trying
         if not node.children:
+            self.debug("Returning nothing")
             return []
 
         # catches CycleError as well
@@ -298,7 +302,9 @@ class DAG:
         for n in sorted:
             if n in offspring:
                 ret.append((n.object, n.type))
-
+        
+        for node in ret:
+            self.debug("Offspring: (%r,%d)" % (node[0], node[1]))
         return ret
 
     def getOffspring(self, object, objtype=0, *types):
@@ -445,7 +451,8 @@ class DAG:
 
         while self._hasZeroEnd:
             node = self._hasZeroEnd[0]
-            #print "working on node %r for object %r" % (node, node.object)
+            self.debug("working on node (%r,%d)" % (
+                node.object,node.type))
             self._dfs(node)
 
         # get a list of dictionary keys sorted in decreasing value order
@@ -455,12 +462,17 @@ class DAG:
 
         l.sort()
         l.reverse()
-        return [node for count, node in l]
+        ret = [node for count, node in l]
+        self._begin = {}
+        self._end = {}
+        self._hasZeroEnd = []
+        return ret
 
     def _dfs(self, node):
         # perform depth first search
 
-        #print "doing _dfs for object %r" % node.object
+        self.debug("doing _dfs for object (%r,%d)" % (node.object
+            ,node.type))
         self._count += 1
         
         self._begin[node] = self._count
@@ -478,17 +490,18 @@ class DAG:
         for n in node.children:
             if self._begin[n] > 0:
                 continue
-            #print "calling _dfs for object %r because beginzero" % n.object
+            self.debug("calling _dfs for object (%r,%d) because beginzero" % (
+                n.object, n.type))
             self._dfs(n)
-            #print "called _dfs for object %r" % n.object
+            self.debug("called _dfs for object (%r,%d)" % (n.object,n.type))
             
         self._count += 1
         self._end[node] = self._count
         if node in self._hasZeroEnd:
-            #print "removing for object %r" % node.object
+            self.debug("removing for object (%r,%d)" % (node.object,node.type))
             self._hasZeroEnd.remove(node)
 
-        #print "done _dfs for object %r" % node.object
+        self.debug("done _dfs for object (%r,%d)" % (node.object, node.type))
 
     def getAllNodesByType(self, type):
         """

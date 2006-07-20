@@ -24,7 +24,7 @@ import common
 from twisted.trial import unittest
 
 from flumotion.manager.depgraph import DepGraph
-from flumotion.common import planet
+from flumotion.common import planet, log
 
 class testDepGraph(unittest.TestCase):
     def _createComponent(self, defs):
@@ -155,5 +155,93 @@ class testDepGraph(unittest.TestCase):
         # lets be naughty and try to mapEatersToFeeders before whole flow is in
         self.assertRaises(KeyError, dg.mapEatersToFeeders)
 
+    def testCleaningDepgraph(self):
+        dg = DepGraph()
+        videotest_defs = ["video-test", "videotest", "default", 
+            ["video-test:default"], [] ]
+        videoenc_defs = ["video-encoder", "theora-encoder", "default",
+            ["video-encoder:default"], ["video-test:default"] ]
+        muxer_defs = ["muxer-video", "ogg-muxer", "default",
+            ["muxer-video:default"], ["video-encoder:default"] ]
+        streamer_defs = ["http-video", "http-streamer", "default", [],
+            ["muxer-video:default"]]
         
+        videotest = self._createComponent(videotest_defs)
+        videoenc = self._createComponent(videoenc_defs)
+        muxer = self._createComponent(muxer_defs)
+        streamer = self._createComponent(streamer_defs)
         
+        dg.addComponent(videotest)
+        dg.addComponent(videoenc)
+        dg.addComponent(muxer)
+        dg.addComponent(streamer)
+        dg.addClockMaster(videotest)
+        dg.mapEatersToFeeders()
+        
+        # now cleanup depgraph
+        dg.removeComponent(videotest)
+        dg.removeComponent(streamer)
+        dg.removeComponent(muxer)
+        dg.removeComponent(videoenc)
+
+        started = dg.whatShouldBeStarted()
+        assert(len(started) == 0)
+        # let's make sure worker has no children
+        assert(dg._dag.hasNode("default", dg.WORKER))
+        workerchildren = dg._dag.getChildrenTyped("default", dg.WORKER)
+        assert(len(workerchildren) == 0)
+        # make sure there are no nodes with children
+        for node in dg._dag._nodes.values():
+            assert(len(node.children) == 0)
+            assert(len(node.parents) == 0)
+        # make sure offspring is 0
+        for node in dg._dag._nodes:
+            assert(dg._dag.getOffspringTyped(node[0], node[1]) == [])
+        # sort and see if everything is fine
+        for node in dg._dag.sort():
+            assert(dg._dag.hasNode(node[0], node[1]))
+        
+        dg.addComponent(videotest)
+        dg.addComponent(videoenc)
+        dg.addComponent(muxer)
+        dg.addComponent(streamer)
+        dg.addClockMaster(videotest)
+        dg.mapEatersToFeeders()
+        
+        # Nothing should be started yet, because no workers logged in
+        tobestarted = dg.whatShouldBeStarted()
+        self.assertEquals(len(tobestarted), 0)
+        dg.setWorkerStarted("default")
+
+        startorder = dg.whatShouldBeStarted()
+        # now check that the jobs are before the componentsetup
+        # and componentsetup before componentready
+        # and componentready before any clock master in that component
+        for node in startorder:
+            if node[1] == dg.JOB:
+                jobindex = startorder.index(node)
+                for postnode in startorder:
+                    if postnode == (node[0], dg.COMPONENTSETUP):
+                        postindex = startorder.index(postnode)
+                        self.failUnless(postindex > jobindex)
+                    elif postnode == (node[0], dg.CLOCKMASTER):
+                        postindex = startorder.index(postnode)
+                        self.failUnless(postindex > jobindex)
+            # now check that the clock master is before all the component happy
+            elif node[1] == dg.CLOCKMASTER:
+                clockindex = startorder.index(node)
+                for happynode in startorder:
+                    if happynode[1] == dg.COMPONENTSTART:
+                        happyindex = startorder.index(happynode)
+                        self.failUnless(happyindex > clockindex)
+        
+            # now check that componentsetup before componentstart
+            # also check the feeders are before their respective eaters
+            elif node[1] == dg.COMPONENTSETUP:
+                setupindex = startorder.index(node)
+                # feeders = 
+                for postnode in startorder:
+                    if postnode == (node[0], dg.COMPONENTSTART):
+                        postindex = startorder.index(postnode)
+                        self.failUnless(postindex > jobindex)
+

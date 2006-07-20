@@ -429,7 +429,6 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
             d = factory.login(keycard, 'MIND')
             # check if we have a remote reference
             def uacpccOkCallback2(result):
-                print "WOW"
                 self.assert_(isinstance(result, tpb.RemoteReference))
                 return self.clientDisconnect(factory, result)
             d.addCallback(uacpccOkCallback2)
