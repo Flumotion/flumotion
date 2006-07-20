@@ -5,6 +5,9 @@
 	* flumotion/configure/installed.py.in:
 	* flumotion/configure/uninstalled.py.in:
 	  add sbindir so other code can find the flumotion service program
+	* flumotion/twisted/compat.py:
+	  do not try to avoid the threaded resolver.  This fixes resolving
+	  for Mike and me from the admin clients.
 
 2006-07-20  Andy Wingo  <wingo@pobox.com>
 
