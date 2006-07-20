@@ -1,5 +1,12 @@
 2006-07-20  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/connection.py (PBConnectionInfo.__str__): In
+	the case that we have no username, don't prepend user@.
+
+	* flumotion/admin/admin.py (AdminModel.connectToHost): Do what we
+	should have done ages ago, make the managerId directly from a
+	PBConnectionInfo.
+
 	* flumotion/admin/gtk/client.py (Window.on_open_connection)
 	(Window.on_recent_activate)
 	(Window._append_recent_connections.append_txt)

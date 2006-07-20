@@ -44,11 +44,11 @@ class PBConnectionInfo(pb.Copyable, pb.RemoteCopy):
         self.authenticator = authenticator
 
     def __str__(self):
-        if self.authenticator:
+        if self.authenticator and self.authenticator.username:
             return '%s@%s:%d' % (self.authenticator.username,
                                  self.host, self.port)
         else:
-            return '<anonymous>@%s:%d' % (self.host, self.port)
+            return '%s:%d' % (self.host, self.port)
 
 pb.setUnjellyableForClass(PBConnectionInfo, PBConnectionInfo)
 

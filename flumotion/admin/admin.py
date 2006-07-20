@@ -41,7 +41,7 @@ from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
 
 from flumotion.configure import configure
-from flumotion.common import reload
+from flumotion.common import reload, connection
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
 from flumotion.twisted.compat import implements
@@ -195,9 +195,9 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         # the intention here is to give an id unique to the manager --
         # if a program is adminning multiple managers, this id should
         # tell them apart (and identify duplicates)
-        self.managerId = ('%s@%s:%d'
-                          % (self.authenticator.username or '<unknown>',
-                             self.host, self.port))
+        info = connection.PBConnectionInfo(host, port, not use_insecure,
+                                           self.authenticator)
+        self.managerId = str(info)
 
         self.info('Connecting to manager %s with %s',
                   self.managerId, use_insecure and 'TCP' or 'SSL')
