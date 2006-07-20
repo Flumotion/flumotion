@@ -1,3 +1,11 @@
+2006-07-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/client.py (Window.on_open_connection)
+	(Window.on_recent_activate)
+	(Window._append_recent_connections.append_txt)
+	(on_have_connection): Update for authenticator/PBConnectionInfo
+	changes.
+
 2006-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/dag.py:
