@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_dag -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_manager_depgraph -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -43,7 +43,6 @@ class Eater:
         self.eaterName = eaterName
         self.component = component
         self.feeder = None
-    
 
 class DepGraph(log.Loggable):
     """
@@ -115,7 +114,7 @@ class DepGraph(log.Loggable):
         Requirement: worker must already be assigned to component
 
         @param component: component object to add
-        @type component: L{flumotion.common.planet.ManagerComponentState}
+        @type  component: L{flumotion.common.planet.ManagerComponentState}
         """
         self.debug('adding component %r to depgraph' % component)
         self._addNode(component, "JOB")
@@ -171,9 +170,9 @@ class DepGraph(log.Loggable):
         I assign a component to a specific worker.
 
         @param component: the component
-        @type component: L{flumotion.common.planet.ManagerComponentState}
-        @param worker: the worker to set it to
-        @type worker: String
+        @type  component: L{flumotion.common.planet.ManagerComponentState}
+        @param worker:    the worker to set it to
+        @type  worker:    str
         """
         if self._dag.hasNode(worker, "WORKER") and (
             self._dag.hasNode(component, "JOB")):
@@ -242,9 +241,10 @@ class DepGraph(log.Loggable):
 
     def whatShouldBeStarted(self):
         """
-        I return a list of things that can and should be started now
-        @rtype: List of (object,type)
-        @returns a list of nodes that should be started, in order
+        I return a list of things that can and should be started now.
+
+        @return: a list of nodes that should be started, in order
+        @rtype:  list of (object, str)
         """
         # A bit tricky because workers can't be started by manager,
         # and jobs are started automatically when worker is attached
@@ -311,7 +311,7 @@ class DepGraph(log.Loggable):
         Set a COMPONENTSTART node to have state of True
 
         @param component: the component to set COMPONENTSTART to True for
-        @type component: L{flumotion.common.planet.ManagerComponentState}
+        @type  component: L{flumotion.common.planet.ManagerComponentState}
         """
         self._setState(component, "COMPONENTSTART", True)
 
@@ -320,7 +320,7 @@ class DepGraph(log.Loggable):
         Set a COMPONENTSTART node to have state of False
 
         @param component: the component to set COMPONENTSTART to False for
-        @type component: L{flumotion.common.planet.ManagerComponentState}
+        @type  component: L{flumotion.common.planet.ManagerComponentState}
         """
 
         self._setState(component, "COMPONENTSTART", False)
@@ -330,7 +330,7 @@ class DepGraph(log.Loggable):
         Set a COMPONENTSETUP node to have state of True
 
         @param component: the component to set COMPONENTSETUP to True for
-        @type component: L{flumotion.common.planet.ManagerComponentState}
+        @type  component: L{flumotion.common.planet.ManagerComponentState}
         """
 
         self._setState(component, "COMPONENTSETUP", True)
@@ -340,7 +340,7 @@ class DepGraph(log.Loggable):
         Set a COMPONENTSETUP node to have state of False
 
         @param component: the component to set COMPONENTSETUP to True for
-        @type component: L{flumotion.common.planet.ManagerComponentState}
+        @type  component: L{flumotion.common.planet.ManagerComponentState}
         """
 
         self._setState(component, "COMPONENTSETUP", False)
@@ -351,7 +351,7 @@ class DepGraph(log.Loggable):
         Set a JOB node to have state of True
 
         @param component: the component to set JOB to True for
-        @type component: L{flumotion.common.planet.ManagerComponentState}
+        @type  component: L{flumotion.common.planet.ManagerComponentState}
         """
         self._setState(component, "JOB", True)
 
@@ -360,7 +360,7 @@ class DepGraph(log.Loggable):
         Set a JOB node to have state of False
 
         @param component: the component to set JOB to False for
-        @type component: L{flumotion.common.planet.ManagerComponentState}
+        @type  component: L{flumotion.common.planet.ManagerComponentState}
         """
         self._setState(component, "JOB", False)
 
@@ -369,7 +369,7 @@ class DepGraph(log.Loggable):
         Set a WORKER node to have state of True
 
         @param worker: the component to set WORKER to True for
-        @type worker: String
+        @type  worker: str
         """
         self._setState(worker, "WORKER", True)
 
@@ -378,7 +378,7 @@ class DepGraph(log.Loggable):
         Set a WORKER node to have state of False
 
         @param worker: the component to set WORKER to False for
-        @type worker: String
+        @type  worker: str
         """
         self._setState(worker, "WORKER", False)
     
@@ -387,7 +387,7 @@ class DepGraph(log.Loggable):
         Set a CLOCKMASTER node to have state of True
 
         @param component: the component to set CLOCKMASTER to True for
-        @type component: {flumotion.common.planet.ManagerComponentState}
+        @type  component: {flumotion.common.planet.ManagerComponentState}
         """
         self._setState(component, "CLOCKMASTER", True)
 
@@ -396,7 +396,7 @@ class DepGraph(log.Loggable):
         Set a CLOCKMASTER node to have state of False
 
         @param component: the component to set CLOCKMASTER to True for
-        @type component: {flumotion.common.planet.ManagerComponentState}
+        @type  component: {flumotion.common.planet.ManagerComponentState}
         """
 
         self._setState(component, "CLOCKMASTER", False)
