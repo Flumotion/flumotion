@@ -301,6 +301,9 @@ class FeedComponent(basecomponent.BaseComponent):
         if self.pipeline:
             self.cleanup()
         self.debug('Stopped')
+        # as noted in the base implementation, we are responsible for
+        # setting mood to sleeping
+        self.setMood(moods.sleeping)
         return defer.succeed(None)
 
     def set_master_clock(self, ip, port, base_time):

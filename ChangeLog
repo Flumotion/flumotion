@@ -1,5 +1,10 @@
 2006-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent010.py:
+	  respect the do_stop() protocol
+
+2006-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/admin.py:
 	* flumotion/manager/manager.py:
 	  move implementation of stopping a component to Vishnu;
