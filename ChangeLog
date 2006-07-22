@@ -1,5 +1,13 @@
 2006-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/admin.py:
+	* flumotion/manager/manager.py:
+	  move implementation of stopping a component to Vishnu;
+	  an admin avatar should not implement component-specific
+	  behaviour
+
+2006-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	* flumotion/common/dag.py:
 	  doc fixes

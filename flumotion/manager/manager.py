@@ -70,7 +70,7 @@ RUNNING_LOCALLY = ('loadConfiguration being called from main.py, no '
 # an internal class
 class Dispatcher(log.Loggable):
     """
-    I implement L{portal.IRealm}.
+    I implement L{twisted.cred.portal.IRealm}.
     I make sure that when a L{pb.Avatar} is requested through me, the
     Avatar being returned knows about the mind (client) requesting
     the Avatar.
@@ -184,6 +184,9 @@ class ComponentMapper:
 class Vishnu(log.Loggable):
     """
     I am the toplevel manager object that knows about all heavens and factories.
+
+    @cvar dispatcher: dispatcher to create avatars
+    @type dispatcher: L{Dispatcher}
     """
 
     implements(server.IServable)
@@ -541,6 +544,32 @@ class Vishnu(log.Loggable):
                 "no workers are logged in")
         else:
             return self._workerCreateComponents(workerId, [componentState])
+
+    def componentStop(self, componentState):
+        """
+        Stop the given component.
+        If the component was sad, we clear its sad state as well,
+        since the stop was explicitly requested by the admin.
+
+        @type componentState: L{planet.ManagerComponentState}
+
+        @rtype: L{defer.Deferred}
+        """
+        self.debug('componentStop(%r)' % componentState)
+        avatar = self.getComponentMapper(componentState).avatar
+        if componentState.get('mood') == moods.sad.value and not avatar:
+            self.debug('asked to stop a sad component without avatar')
+            componentState.set('mood', planet.moods.sleeping.value)
+            return defer.succeed(None)
+
+        d = avatar.mindCallRemote('stop')
+        def clearSadCallback(result):
+            if componentState.get('mood') == planet.moods.sad.value:
+                self.debug('clearing sad mood after stopping component')
+                componentState.set('mood', planet.moods.sleeping.value)
+            return result
+        d.addCallback(clearSadCallback)
+        return d
 
     def componentAddMessage(self, avatarId, message):
         """

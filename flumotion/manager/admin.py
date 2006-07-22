@@ -145,15 +145,7 @@ class AdminAvatar(base.ManagerAvatar):
         @type componentState: L{planet.ManagerComponentState}
         """
         self.debug('perspective_componentStop(%r)' % componentState)
-        d = self.perspective_componentCallRemote(componentState, 'stop')
-        def clearSadCallback(result):
-            if componentState.get('mood') == planet.moods.sad.value:
-                self.debug('clearing sad mood after stopping component')
-                componentState.set('mood', planet.moods.sleeping.value)
-            return result
-        d.addCallback(clearSadCallback)
-
-        return d
+        return self.vishnu.componentStop(componentState)
         
     def perspective_componentRestart(self, componentState):
         """
@@ -190,13 +182,6 @@ class AdminAvatar(base.ManagerAvatar):
         m = self.vishnu.getComponentMapper(componentState)
         avatar = m.avatar
 
-        # if the component is sad, not running, and we're asked to stop it,
-        # do so so the state gets cleared
-        if methodName == "stop" and componentState.get('mood') == planet.moods.sad.value and not avatar:
-            self.debug('asked to stop a sad component without avatar')
-            componentState.set('mood', planet.moods.sleeping.value)
-            return defer.succeed(None)
-        
         if not avatar:
             self.warning('No avatar for %s, cannot call remote' %
                 componentState.get('name'))
