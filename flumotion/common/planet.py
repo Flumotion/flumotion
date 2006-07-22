@@ -188,11 +188,11 @@ class ManagerComponentState(flavors.StateCacheable):
 
     I have the following keys of my own:
 
-     - name:              string, name of the component, unique in the parent
+     - name:              str; name of the component, unique in the parent
      - parent:            L{ManagerFlowState} or L{ManagerAtmosphereState}
-     - type:              string, type of the component
+     - type:              str, type of the component
      - moodPending:       int, the mood value the component is being set to
-     - workerRequested:   string, name of the worker this component is
+     - workerRequested:   str, name of the worker this component is
                           requested to be started on.
 
     I proxy the following keys from the serialized L{WorkerJobState}:
