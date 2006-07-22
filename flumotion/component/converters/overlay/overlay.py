@@ -80,7 +80,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
             os.unlink(self._filename)
             self._filename = None
         else:
-            self.debug('Temporary overlay already gone, " \
-                did we not start up correctly ?')
+            self.debug("Temporary overlay already gone, " \
+                "did we not start up correctly ?")
         return defer.succeed(None)
         
