@@ -1,3 +1,9 @@
+2006-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
+	* flumotion/common/dag.py:
+	  doc fixes
+
 2006-07-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/depgraph.py:

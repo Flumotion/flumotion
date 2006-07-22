@@ -419,7 +419,9 @@ def componentPath(componentName, parentName):
 
 def componentId(parentName, componentName):
     """
-    Create a componentId based on the parentName and componentName.
+    Create a C{componentId} based on the C{parentName} and C{componentName}.
+
+    A C{componentId} uniquely identifies a component within a planet.
 
     @since: 0.3.1
 
@@ -441,7 +443,10 @@ def parseComponentId(componentId):
 
 def feedId(componentName, feedName):
     """
-    Create a feedId based on the componentName and feedName.
+    Create a C{feedId} based on the C{componentName} and C{feedName}.
+
+    A C{feedId} uniquely identifies a feed within a flow or atmosphere.
+    It identifies the feed from a feeder to an eater.
 
     @since: 0.3.1
 
@@ -462,7 +467,10 @@ def parseFeedId(feedId):
 
 def fullFeedId(flowName, componentName, feedName):
     """
-    Create a fullFeedId based on the flowName, componentName and feedName.
+    Create a C{fullFeedId} based on the C{flowName}, C{componentName} and
+    C{feedName}.
+
+    A C{fullFeedId} uniquely identifies a feed within a planet.
 
     @since: 0.3.1
 

@@ -177,13 +177,13 @@ class DAG(log.Loggable):
         I return a list of (object, type) tuples that are direct children of 
         this object,objtype.
 
-        @param object: object to return children of.
-        @param objtype: type of object (optional).
-        @type objtype: Integer
-        @param types: a list of types of children that you want. None means all.
-        @type types: list of Integers
+        @param  object:  object to return children of
+        @param  objtype: type of object (optional)
+        @param  types:   a list of types of children that you want.
+                         None means all.
+        @type   types:   list
         
-        @rtype: list of (object,Integer)
+        @rtype: list of (object, object)
         """
         self._assertExists(object, objtype)
         node = self._getNode(object, objtype)
@@ -215,15 +215,15 @@ class DAG(log.Loggable):
     def getParentsTyped(self, object, objtype=0, types=None):
         """
         I return a list of (object, type) tuples that are direct parents of
-        this object,objtype.
+        this object, objtype.
 
-        @param object: object to return parents of.
-        @param objtype: type of object (optional).
-        @type objtype: Integer
-        @param types: a list of types of parents that you want. None means all.
-        @type types: list of Integers
+        @param object:  object to return parents of
+        @param objtype: type of object (optional)
+        @param types:   A list of types of parents that you want.
+                        None means all.
+        @type  types:   list or None
 
-        @rtype list of (object,Integer)
+        @rtype: list of (object, object)
         """
         self._assertExists(object, objtype)
         node = self._getNode(object,objtype)
@@ -237,15 +237,14 @@ class DAG(log.Loggable):
     def getParents(self, object, objtype=0, types=None):
         """
         I return a list of objects that are direct parents of this 
-        object,objtype.
+        object, objtype.
 
-        @param object: object to return parents of.
-        @param objtype: type of object (optional).
-        @type objtype: Integer
-        @param types: a list of types of parents that you want. None means all.
-        @type types: list of Integers
+        @param object:  object to return parents of.
+        @param objtype: type of object (optional)
+        @param types:   List of types of parents that you want. None means all.
+        @type  types:   list
 
-        @rtype list of (object,Integer)
+        @rtype: list of (object, object)
         """
         typedparents = self.getParentsTyped(object, objtype, types)
         ret = [n[0] for n in typedparents]
