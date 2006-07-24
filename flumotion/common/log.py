@@ -251,7 +251,7 @@ def errorObject(object, cat, format, *args):
     Log a fatal error message in the given category.
     This will also raise a L{flumotion.common.errors.SystemError}.
     """
-    _handle(ERROR, object, cat, format, args)
+    doLog(ERROR, object, cat, format, args)
 
     # we do the import here because having it globally causes weird import
     # errors if our gstreactor also imports .log, which brings in errors
@@ -267,25 +267,25 @@ def warningObject(object, cat, format, *args):
     Log a warning message in the given category.
     This is used for non-fatal problems.
     """
-    _handle(WARN, object, cat, format, args)
+    doLog(WARN, object, cat, format, args)
 
 def infoObject(object, cat, format, *args):
     """
     Log an informational message in the given category.
     """
-    _handle(INFO, object, cat, format, args)
+    doLog(INFO, object, cat, format, args)
 
 def debugObject(object, cat, format, *args):
     """
     Log a debug message in the given category.
     """
-    _handle(DEBUG, object, cat, format, args)
+    doLog(DEBUG, object, cat, format, args)
 
 def logObject(object, cat, format, *args):
     """
     Log a log message.  Used for debugging recurring events.
     """
-    _handle(LOG, object, cat, format, args)
+    doLog(LOG, object, cat, format, args)
 
 def error(cat, format, *args):
     errorObject(None, cat, format, *args)
@@ -373,7 +373,7 @@ class Loggable:
         if _canShortcutLogging(self.logCategory, level):
             return {}
         args = self.logFunction(*args)
-        return _handle(level, self.logObjectName(), self.logCategory,
+        return doLog(level, self.logObjectName(), self.logCategory,
             format, args, where=where, **kwargs)
 
     def warningFailure(self, failure):
