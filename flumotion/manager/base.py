@@ -43,6 +43,8 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
     @ivar vishnu:   the vishnu that manages this avatar's heaven
     @type vishnu:   L{flumotion.manager.manager.Vishnu}
     """
+    remoteLogName = 'medium'
+
     def __init__(self, heaven, avatarId, remoteIdentity):
         """
         @param heaven:   the heaven this avatar is part of
@@ -80,11 +82,19 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
     # FIXME: we probably need to return Failure objects when something is wrong
     def mindCallRemote(self, name, *args, **kwargs):
         """
-        Call the given remote method.
+        Call the given remote method, and log calling and returning nicely.
 
         @param name: name of the remote method
         @type  name: str
         """
+        level = log.DEBUG
+        if name == 'ping': level = log.LOG
+        debugClass = str(self.__class__).split(".")[-1].upper()
+        startArgs = [self.remoteLogName, debugClass, name]
+        format, debugArgs = log.getFormatArgs(
+            '%s --> %s: callRemote(%s, ', startArgs,
+            ')', (), args, kwargs)
+        logKwArgs = self.doLog(level, -2, format, *debugArgs)
         if not self.hasRemoteReference():
             self.warning(
                 "Can't call remote method %s, no mind, except a local Traceback"
@@ -108,6 +118,22 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
                 name, str(e.__class__), ", ".join(e.args)))
             return
 
+        def callback(result):
+            format, debugArgs = log.getFormatArgs(
+                '%s <-- %s: callRemote(%s', startArgs,
+                '): %r', (result, ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return result
+
+        def errback(failure):
+            format, debugArgs = log.getFormatArgs(
+                '%s <-- %s: callRemote(%s', startArgs,
+                '): %r', (failure, ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return failure
+
+        d.addCallback(callback)
+        d.addErrback(errback)
         d.addErrback(self._mindCallRemoteErrback, name)
         # FIXME: is there some way we can register an errback as the
         # LAST to call as a general fallback ?

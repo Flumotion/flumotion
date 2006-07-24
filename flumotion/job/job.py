@@ -57,6 +57,7 @@ class JobMedium(medium.BaseMedium):
     @type component: L{flumotion.component.component.BaseComponent}
     """
     logCategory = 'jobmedium'
+    remoteLogName = 'jobavatar'
 
     implements(interfaces.IJobMedium)
 
@@ -103,7 +104,6 @@ class JobMedium(medium.BaseMedium):
         assert isinstance(authenticator, pb.RemoteReference)
         assert isinstance(packagePaths, list)
 
-        self.debug('remote_bootstrap')
         self._workerName = workerName
         self._managerHost = host
         self._managerPort = port
@@ -131,7 +131,6 @@ class JobMedium(medium.BaseMedium):
         @param config:     the configuration dictionary
         @type  config:     dict
         """
-        self.debug('remote_create, avatarId %s' % avatarId)
         self.avatarId = avatarId
         self.logName = avatarId
 
@@ -139,7 +138,6 @@ class JobMedium(medium.BaseMedium):
             methodName, config)
 
     def remote_stop(self):
-        self.debug('remote_stop() called')
         # stop reactor from a callLater so this remote method finishes
         # nicely
         reactor.callLater(0, self.shutdown)

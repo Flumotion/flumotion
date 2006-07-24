@@ -1,3 +1,27 @@
+2006-07-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/pb.py:
+	  add a Referenceable and Avatar that is also loggable, so we can
+	  hook into remoteMessageReceived for logging
+	* flumotion/common/medium.py:
+	  subclass BaseMedium from our new Referenceable
+	* flumotion/common/log.py:
+	  add getFileLine as a public method
+	  add getFormatArgs to aid in creating format and args string for
+	  debug statements without interpolating variables
+	  expose _handle() as doLog()
+	  add Loggable.doLog(), allowing more control over file and line it
+	  shows
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/worker/worker.py:
+	* flumotion/worker/feed.py:
+	* flumotion/manager/component.py:
+	* flumotion/job/job.py:
+	  remove debug lines that are now done for us
+	* flumotion/manager/base.py:
+	  add debugging to ManagerAvatar
+
 2006-07-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent010.py:

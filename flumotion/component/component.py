@@ -187,8 +187,6 @@ class BaseComponentMedium(medium.PingingMedium):
         # we can only get the IP after we have a remote reference, so add it
         # here
         self.comp.state.set('ip', self.getIP())
-        self.debug('remote_getState of f: returning %r' % self.comp.state)
-
         return self.comp.state
         
     def remote_getConfig(self):
@@ -198,7 +196,6 @@ class BaseComponentMedium(medium.PingingMedium):
         @rtype:   dict
         @returns: component's current configuration
         """
-        self.debug('remote_getConfig of f: returning %r' % self.comp.config)
         return self.comp.config
         
     def remote_setup(self, config):
@@ -206,13 +203,11 @@ class BaseComponentMedium(medium.PingingMedium):
         Set up the component and the component's medium with the given config,
         in that order.
         """
-        self.debug('remote_setup(%r)' % config)
         d = self.comp.setup(config)
         d.addCallback(lambda r, c: self.setup(c), config)
         return d
         
     def remote_start(self, *args, **kwargs):
-        self.debug('remote_start(args=%r, kwargs=%r)' % (args, kwargs))
         return self.comp.start(*args, **kwargs)
        
     def remote_stop(self):

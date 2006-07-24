@@ -75,7 +75,7 @@ class ProxyManagerBouncerPortal(fportal.BouncerPortal):
         d = self.bouncer.getKeycardClasses()
         return d
 
-class FeedAvatar(pb.Avatar, log.Loggable):
+class FeedAvatar(fpb.Avatar):
     """
     I am an avatar in a FeedServer for components that log in and request
     to eat from or feed to one of my components.
@@ -83,6 +83,7 @@ class FeedAvatar(pb.Avatar, log.Loggable):
     My mind is a reference to a L{FeedMedium}
     """
     logCategory = "feed-avatar"
+    remoteLogName = "feedmedium"
 
     def __init__(self, feedServerParent):
         """
@@ -236,7 +237,7 @@ class FeedClientFactory(fpb.FPBClientFactory, log.Loggable):
 
 
 # not a BaseMedium because we are going to do strange things to the transport
-class FeedMedium(pb.Referenceable, log.Loggable):
+class FeedMedium(fpb.Referenceable):
     """
     I am a client for a Feed Server.
 
@@ -249,6 +250,7 @@ class FeedMedium(pb.Referenceable, log.Loggable):
     @type remote:       L{twisted.spread.pb.RemoteReference}
     """
     logCategory = 'feedmedium'
+    remoteLogName = 'feedserver'
     compat.implements(interfaces.IFeedMedium)
 
     remote = None
@@ -272,15 +274,11 @@ class FeedMedium(pb.Referenceable, log.Loggable):
         return self.remote.callRemote(name, args, kwargs)
 
     def remote_sendFeedReply(self, fullFeedId):
-        self.debug('feedserver --> FEEDCLIENT: remote_sendFeedReply(%s)' %
-            fullFeedId)
         t = self.remote.broker.transport
         # make sure we stop receiving PB messages
         self.debug('stop reading from transport')
         t.stopReading()
         reactor.callLater(0, self._doFeedTo, fullFeedId, t)
-        self.debug('feedserver <-- FEEDCLIENT: remote_sendFeedReply(%s): None' %
-            fullFeedId)
 
     def _doFeedTo(self, fullFeedId, t):
         self.debug('flushing PB write queue')

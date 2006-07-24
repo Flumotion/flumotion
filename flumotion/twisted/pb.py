@@ -498,7 +498,132 @@ class RemoteAuthenticator:
     def respond(self, keycard):
         return self._remote.callRemote('respond', keycard)
 
-class PingableAvatar(pb.Avatar, flog.Loggable):
+
+class Referenceable(pb.Referenceable, flog.Loggable):
+    """
+    @cvar remoteLogName: name to use to log the other side of the connection
+    @type remoteLogName: str
+    """
+    logCategory = 'referenceable'
+    remoteLogName = 'remote'
+
+
+    # a referenceable that logs receiving remote messages
+    def remoteMessageReceived(self, broker, message, args, kwargs):
+        args = broker.unserialize(args)
+        kwargs = broker.unserialize(kwargs)
+        method = getattr(self, "remote_%s" % message, None)
+        if method is None:
+            raise pb.NoSuchMethod("No such method: remote_%s" % (message,))
+
+        level = flog.DEBUG
+        if message == 'ping': level = flog.LOG
+
+        debugClass = self.logCategory.upper()
+        # all this malarkey is to avoid actually interpolating variables
+        # if it is not needed
+        startArgs = [self.remoteLogName, debugClass, message]
+        format, debugArgs = flog.getFormatArgs(
+            '%s --> %s: remote_%s(', startArgs,
+            ')', (), args, kwargs)
+        # log going into the method
+        logKwArgs = self.doLog(level, method, format, *debugArgs)
+
+        # invoke the remote_ method
+        try:
+            state = method(*args, **kwargs)
+        except TypeError:
+            self.warning("%s didn't accept %s and %s" % (method, args, kwargs))
+            raise
+
+        # log coming out of the method
+        if isinstance(state, defer.Deferred):
+            # for a deferred, we currently can't log a better location than
+            # the def line for the function/instance that we called above
+            def callback(result):
+                format, debugArgs = flog.getFormatArgs(
+                    '%s <-- %s: remote_%s(', startArgs,
+                    '): %r', (result, ), args, kwargs)
+                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+                return result
+            def errback(failure):
+                format, debugArgs = flog.getFormatArgs(
+                    '%s <-- %s: remote_%s(', startArgs,
+                    '): failure %r', (failure, ), args, kwargs)
+                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+                return failure
+
+            state.addCallback(callback)
+            state.addErrback(errback)
+        else:
+            format, debugArgs = flog.getFormatArgs(
+                '%s <-- %s: remote_%s(', startArgs,
+                '): %r', (state, ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+
+        return broker.serialize(state, self.perspective)
+
+class Avatar(pb.Avatar, flog.Loggable):
+    """
+    @cvar remoteLogName: name to use to log the other side of the connection
+    @type remoteLogName: str
+    """
+    logCategory = 'avatar'
+    remoteLogName = 'remote'
+
+    # a referenceable that logs receiving remote messages
+    def perspectiveMessageReceived(self, broker, message, args, kwargs):
+        args = broker.unserialize(args)
+        kwargs = broker.unserialize(kwargs)
+        method = getattr(self, "perspective_%s" % message, None)
+        if method is None:
+            raise pb.NoSuchMethod("No such method: perspective_%s" % (message,))
+
+        level = flog.DEBUG
+        if message == 'ping': level = flog.LOG
+        debugClass = self.logCategory.upper()
+        startArgs = [self.remoteLogName, debugClass, message]
+        format, debugArgs = flog.getFormatArgs(
+            '%s --> %s: perspective_%s(', startArgs,
+            ')', (), args, kwargs)
+        # log going into the method
+        logKwArgs = self.doLog(level, method, format, *debugArgs)
+
+        # invoke the perspective_ method
+        try:
+            state = method(*args, **kwargs)
+        except TypeError:
+            self.debug("%s didn't accept %s and %s" % (method, args, kwargs))
+            raise
+
+        # log coming out of the method
+        if isinstance(state, defer.Deferred):
+            # for a deferred, we currently can't log a better location than
+            # the def line for the function/instance that we called above
+            def callback(result):
+                format, debugArgs = flog.getFormatArgs(
+                    '%s <-- %s: perspective_%s(', startArgs,
+                    '): %r', (result, ), args, kwargs)
+                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+                return result
+            def errback(failure):
+                format, debugArgs = flog.getFormatArgs(
+                    '%s <-- %s: perspective_%s(', startArgs,
+                    '): failure %r', (failure, ), args, kwargs)
+                self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+                return failure
+
+            state.addCallback(callback)
+            state.addErrback(errback)
+        else:
+            format, debugArgs = flog.getFormatArgs(
+                '%s <-- %s: perspective_%s(', startArgs,
+                '): %r', (state, ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+
+        return broker.serialize(state, self, method, args, kwargs)
+
+class PingableAvatar(Avatar):
     _pingCheckInterval = configure.heartbeatInterval * 2.5
 
     def perspective_ping(self):

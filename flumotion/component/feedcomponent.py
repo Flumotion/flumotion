@@ -51,6 +51,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
     """
     implements(interfaces.IComponentMedium)
     logCategory = 'feedcompmed'
+    remoteLogName = 'feedserver'
 
     def __init__(self, component):
         """
@@ -96,8 +97,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         Called on by the manager-side ComponentAvatar.
         """
-        self.debug('remote --> COMPONENT: remote_eatFrom(%s, %s, %d)' % (
-            fullFeedId, host, port))
         self._feederFeedServer[fullFeedId] = (host, port)
         client = feed.FeedMedium(self.comp)
         factory = feed.FeedClientFactory(client)
@@ -117,22 +116,13 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             def sendFeedCb(result):
                 self.debug('COMPONENT <-- feedserver: sendFeed(%s): %r' % (
                     fullFeedId, result))
-                self.debug(
-                    'remote <-- COMPONENT: remote_eatFrom(%s, %s, %d): None' % (
-                            fullFeedId, host, port))
+                # FIXME: why does this not return result ?
                 return None
 
             d.addCallback(sendFeedCb)
             return d
 
-        def loginEb(failure):
-            self.debug(
-                'remote <-- COMPONENT: remote_eatFrom(%s, %s, %d): Failure' % (
-                    fullFeedId, host, port))
-            return failure
-
         d.addCallback(loginCb)
-        d.addErrback(loginEb)
         return d
 
     def remote_feedTo(self, componentId, feedId, host, port):
@@ -144,8 +134,6 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         # FIXME: check if this overwrites current config, and adapt if it
         # does
-        self.debug('remote --> COMPONENT: remote_feedTo(%s, %s, %s, %d)' % (
-            componentId, feedId, host, port))
         self._eaterFeedServer[(componentId, feedId)] = (host, port)
         client = feed.FeedMedium(self.comp)
         factory = feed.FeedClientFactory(client)
@@ -176,21 +164,10 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
                     feedName, fd))
                 self.comp.feedToFD(feedName, fd)
                 
-                self.debug(
-                    'remote <-- COMPONENT: remote_feedTo(%s, %s, %s, %d): %r' %
-                        (componentId, feedId, host, port, remoteRef))
-
             d.addCallback(receiveFeedCb)
             return d
 
-        def loginEb(failure):
-            self.debug(
-                'remote <-- COMPONENT: remote_feedTo(%s, %s, %s, %d): Failure' %
-                    (componentId, feedId, host, port))
-            return failure
-
         d.addCallback(loginCb)
-        d.addErrback(loginEb)
         return d
 
     def remote_provideMasterClock(self, port):

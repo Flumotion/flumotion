@@ -148,7 +148,8 @@ class ComponentAvatar(base.ManagerAvatar):
         if ignores:
             if failure.check(*ignores):
                return failure
-        self.warning("Unhandled remote call error: %s" % failure.getErrorMessage())
+        self.warning("Unhandled remote call error: %s" %
+            failure.getErrorMessage())
         self.warning("raising '%s'" % str(failure.type))
         return failure
 
@@ -437,44 +438,11 @@ class ComponentAvatar(base.ManagerAvatar):
     start = defer_generator_method(start)
 
     def eatFrom(self, fullFeedId, host, port):
-        self.debug('COMPONENTAVATAR --> componentmedium: '
-            'callRemote(eatFrom, %s, %s, %d)' % (fullFeedId, host, port))
         d = self.mindCallRemote('eatFrom', fullFeedId, host, port)
-
-        def callback(result):
-            self.debug('COMPONENTAVATAR <-- componentmedium: '
-                'callRemote(eatFrom, %s, %s, %d): %r' % (
-                fullFeedId, host, port, result))
-            return result
-
-        def errback(failure):
-            self.debug('COMPONENTAVATAR <-- componentmedium: '
-                'callRemote(eatFrom, %s, %s, %d): Failure %r' % (
-                fullFeedId, host, port, failure))
-            return failure
-        d.addCallback(callback)
-        d.addErrback(errback)
         return d
 
     def feedTo(self, componentId, feedId, host, port):
-        self.debug('COMPONENTAVATAR --> componentmedium: '
-            'callRemote(feedTo, %s, %s, %s, %d)' % (
-                componentId, feedId, host, port))
         d = self.mindCallRemote('feedTo', componentId, feedId, host, port)
-
-        def callback(result):
-            self.debug('COMPONENTAVATAR <-- componentmedium: '
-                'callRemote(feedTo, %s, %s, %s, %d): %r' % (
-                    componentId, feedId, host, port, result))
-            return result
-
-        def errback(failure):
-            self.debug('COMPONENTAVATAR <-- componentmedium: '
-                'callRemote(feedTo, %s, %s, %s, %d): %r' % (
-                    componentId, feedId, host, port, failure))
-            return failure
-        d.addCallback(callback)
-        d.addErrback(errback)
         return d
   
     def setElementProperty(self, element, property, value):
@@ -861,12 +829,15 @@ class ComponentHeaven(base.ManagerHeaven):
                         d = self.setupComponent(componentAvatar)
                         d.addCallback(self._tryWhatCanBeStarted)
                     else:
-                        self.debug("Component %s on way to being setup" % dep.get("name"))
+                        self.debug("Component %s on way to being setup" %
+                            dep.get("name"))
                     return
                 else:
-                    self.debug("Component %s to be setup but has no avatar yet" % dep.get("name"))
+                    self.debug(
+                        "Component %s to be setup but has no avatar yet" %
+                            dep.get("name"))
             elif deptype == "COMPONENTSTART":
-                self.debug("Component %s to be started!" % dep.get("name"))
+                self.debug("Component %s to be started" % dep.get("name"))
                 componentAvatar = self.getComponentAvatarForState(dep)
                 if not componentAvatar._starting:
                     componentAvatar._starting = True

@@ -141,7 +141,6 @@ class WorkerMedium(medium.PingingMedium):
         @rtype:  list of int
         @return: list of ports
         """
-        self.debug('REMOTE -> WORKER: remote_getPorts(): %r' % self._ports)
         return self._ports
 
     def remote_getFeedServerPort(self):
@@ -152,7 +151,6 @@ class WorkerMedium(medium.PingingMedium):
         @return: TCP port number
         """
         port = self.brain.feedServerPort
-        self.debug('REMOTE -> WORKER: getFeedServerPort(): %r' % port)
         return port
 
     def remote_create(self, avatarId, type, moduleName, methodName, config):
@@ -181,8 +179,6 @@ class WorkerMedium(medium.PingingMedium):
         # debug.trace_start(ignore_files_re='twisted/python/rebuild',
         #      write=write)
         self.info('Starting component "%s" of type "%s"' % (avatarId, type))
-        self.debug('remote_create(): id %s, type %s, config %r' % (
-            avatarId, type, config))
 
         # set up bundles as we need to have a pb connection to download
         # the modules -- can't do that in the kid yet.

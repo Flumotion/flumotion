@@ -34,6 +34,7 @@ import sys
 import os
 import fnmatch
 import time
+import types
 import traceback
 
 # environment variables controlling levels for each category
@@ -134,18 +135,82 @@ def scrubFilename(filename):
     
     return filename
 
-def _handle(level, object, category, format, args):
-    def getFileLine():
-        # Return a tuple of (file, line) for the first stack entry
-        # outside of log.py (which would be the caller of log)
-        frame = sys._getframe()
-        while frame:
-            co = frame.f_code
+def getFileLine(where=-1):
+    """
+    Return the filename and line number for the given location.
+    
+    If where is a negative integer, look for the code entry in the current
+    stack that is the given number of frames above this module.
+    If where is a function, look for the code entry of the function.
+
+    @param where: how many frames to go back up, or function
+    @type  where: int (negative) or function
+
+    @return: tuple of (file, line)
+    @rtype:  tuple of (str, int)
+    """
+    co = None
+    lineno = None
+    
+    if isinstance(where, types.FunctionType):
+        co = where.func_code
+        lineno = co.co_firstlineno
+    elif isinstance(where, types.MethodType):
+        co = where.im_func.func_code
+        lineno = co.co_firstlineno
+    else:
+        stackFrame = sys._getframe()
+        while stackFrame:
+            co = stackFrame.f_code
             if not co.co_filename.endswith('log.py'):
-                return scrubFilename(co.co_filename), frame.f_lineno
-            frame = frame.f_back
-            
-        return "Not found", 0
+                # wind up the stack according to frame
+                while where < -1:
+                    stackFrame = stackFrame.f_back
+                    where += 1
+                co = stackFrame.f_code
+                lineno = stackFrame.f_lineno
+                break
+            stackFrame = stackFrame.f_back
+
+    if not co:
+        return "<unknown file>", 0
+
+    return scrubFilename(co.co_filename), lineno
+
+def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
+    """
+    Helper function to create a format and args to use for logging.
+    This avoids needlessly interpolating variables.
+    """
+    debugArgs = startArgs[:]
+    debugArgs.extend(list(args))
+    for items in kwargs.items():
+        debugArgs.extend(items)
+    debugArgs.extend(endArgs)
+    format = startFormat \
+              + ', '.join(('%s', ) * len(args)) \
+              + ', '.join(('%s=%r, ', ) * len(kwargs)) \
+              + endFormat
+    return format, debugArgs
+
+def doLog(level, object, category, format, args, where=-1,
+    file=None, line=None):
+    """
+    @param where: what to log file and line number for;
+                  -1 for one frame above log.py; -2 and down for higher up
+                   a function for a (future) code object
+    @type  where: int or callable
+    @param file:  file to show the message as coming from, if caller knows best
+    @type  file:  str
+    @param line:  line to show the message as coming from, if caller knows best
+    @type  line:  int
+
+    return: dict of calculated variables, if they needed calculating.
+            currently contains file and line; this prevents us from
+            doing this work in the caller when it isn't needed because
+            of the debug level
+    """
+    ret = {}
 
     if args:
         message = format % args
@@ -154,7 +219,10 @@ def _handle(level, object, category, format, args):
 
     # first all the unlimited ones
     if _log_handlers:
-        (file, line) = getFileLine()
+        if file is None and line is None:
+            (file, line) = getFileLine(where=where)
+        ret['file'] = file
+        ret['line'] = line
         for handler in _log_handlers:
             try:
                 handler(level, object, category, file, line, message)
@@ -162,21 +230,25 @@ def _handle(level, object, category, format, args):
                 raise SystemError, "handler %r raised a TypeError" % handler
 
     if level > getCategoryLevel(category):
-        return
-
-    # set this a second time, just in case there weren't unlimited
-    # loggers there before
-    (file, line) = getFileLine()
+        return ret
 
     for handler in _log_handlers_limited:
+        # set this a second time, just in case there weren't unlimited
+        # loggers there before
+        if file is None and line is None:
+            (file, line) = getFileLine(where=where)
+        ret['file'] = file
+        ret['line'] = line
         try:
             handler(level, object, category, file, line, message)
         except TypeError:
             raise SystemError, "handler %r raised a TypeError" % handler
+
+        return ret
     
 def errorObject(object, cat, format, *args):
     """
-    Log a fatal error message in the given category. \
+    Log a fatal error message in the given category.
     This will also raise a L{flumotion.common.errors.SystemError}.
     """
     _handle(ERROR, object, cat, format, args)
@@ -279,6 +351,30 @@ class Loggable:
             return
         logObject(self.logObjectName(), self.logCategory,
             *self.logFunction(*args))
+
+    def doLog(self, level, where, format, *args, **kwargs):
+        """
+        Log a message at the given level, with the possibility of going
+        higher up in the stack.
+
+        @param level: log level
+        @type  level: int
+        @param where: how many frames to go back from the last log frame;
+                      or a function (to log for a future call)
+        @type  where: int (negative), or function
+
+        @param kwargs: a dict of pre-calculated values from a previous
+                       doLog call
+
+        @return: a dict of calculated variables, to be reused in a
+                 call to doLog that should show the same location
+        @rtype:  dict
+        """
+        if _canShortcutLogging(self.logCategory, level):
+            return {}
+        args = self.logFunction(*args)
+        return _handle(level, self.logObjectName(), self.logCategory,
+            format, args, where=where, **kwargs)
 
     def warningFailure(self, failure):
         """

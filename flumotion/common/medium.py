@@ -33,8 +33,9 @@ from flumotion.common import log, interfaces, bundleclient, errors, common
 from flumotion.common import messages
 from flumotion.configure import configure
 from flumotion.twisted.compat import implements
+from flumotion.twisted import pb as fpb
 
-class BaseMedium(pb.Referenceable, log.Loggable):
+class BaseMedium(fpb.Referenceable):
     """
     I am a base interface for PB clients interfacing with PB server-side
     avatars.
@@ -51,6 +52,7 @@ class BaseMedium(pb.Referenceable, log.Loggable):
     # tho...
     implements(interfaces.IMedium)
     logCategory = "basemedium"
+    remoteLogName = "baseavatar"
 
     remote = None
     bundleLoader = None
@@ -98,17 +100,36 @@ class BaseMedium(pb.Referenceable, log.Loggable):
 
         Gets serialized to server-side perspective_ methods.
         """
+        level = log.DEBUG
+        if name == "ping": level = log.LOG
+        debugClass = str(self.__class__).split(".")[-1].upper()
+        startArgs = [self.remoteLogName, debugClass, name]
+        format, debugArgs = log.getFormatArgs(
+            '%s --> %s: callRemote(%s, ', startArgs,
+            ')', (), args, kwargs)
+        logKwArgs = self.doLog(level, -2, format, *debugArgs)
+
         if not self.remote:
             self.warning('Tried to callRemote(%s), but we are disconnected'
                          % name)
             return defer.fail(errors.NotConnectedError())
         
+        def callback(result):
+            format, debugArgs = log.getFormatArgs(
+                '%s <-- %s: callRemote(%s', startArgs,
+                '): %r', (result, ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return result
+
         def errback(failure):
-            # shouldn't be a warning, since this a common occurrence
-            # when running worker tests
-            self.debug('callRemote(%s) failed: %r' % (name, failure))
-            failure.trap(pb.PBConnectionLost)
+            format, debugArgs = log.getFormatArgs(
+                '%s <-- %s: callRemote(%s', startArgs,
+                '): %r', (failure, ), args, kwargs)
+            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            return failure
+
         d = self.remote.callRemote(name, *args, **kwargs)
+        d.addCallback(callback)
         d.addErrback(errback)
         return d
 
