@@ -45,3 +45,7 @@ Naming
 - Twisted coding standard:
   http://twistedmatrix.com/projects/core/documentation/howto/policy/coding-standard.html
 
+Modules
+=======
+
+- the docstring should come before imports; otherwise it does not work
