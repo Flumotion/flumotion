@@ -74,6 +74,7 @@ def pipelineFactory(pipeline, eaters=None, feeders=None):
         res = None
         try:
             res = t.parse_pipeline(pipeline)
+            t.stop()
             d.callback(res)
         except Exception, e:
             d.errback(e)
@@ -92,6 +93,9 @@ class TestExpandElementName(unittest.TestCase):
         else:
             yield d
     setUp = defer_generator_method(setUp)
+
+    def tearDown(self):
+        self.p.stop()
 
     def testSpaces(self):
         try:
@@ -164,6 +168,9 @@ class TestExpandElementNames(unittest.TestCase):
         else:
             yield d
     setUp = defer_generator_method(setUp)
+
+    def tearDown(self):
+        self.p.stop()
 
     def testOddDelimeters(self):
         try:

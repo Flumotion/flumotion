@@ -1,3 +1,17 @@
+2006-07-26  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  Fix CPU updating by adding a callLater loop.
+	  Cancel cpu updating callLater in BaseComponent.stop()
+
+	* flumotion/test/test_component.py:
+	* flumotion/test/test_component_init.py:
+	* flumotion/test/test_htpasswdcrypt.py:
+	* flumotion/test/test_pb.py:
+	* flumotion/test/test_saltsha256.py:
+	  Update tests to stop components they create so we don't have
+	  callLaters lying around which trial dislikes.
+
 2006-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/parts.py:

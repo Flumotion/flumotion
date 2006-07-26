@@ -152,6 +152,9 @@ class Test_BouncerWrapper(unittest.TestCase):
         self.bouncer.setup(htpasswdcryptConf)
         self.bouncerPortal = fportal.BouncerPortal(FakeFRealm(), self.bouncer)
         self.wrapper = pb._BouncerWrapper(self.bouncerPortal, broker)
+
+    def tearDown(self):
+        self.bouncer.stop()
         
     def testUACPPOk(self):
         mind = FakeMind()
@@ -348,6 +351,7 @@ class Test_FPBClientFactory(unittest.TestCase):
         log._getTheFluLogObserver().ignoreErrors(error.UnauthorizedLogin)
 
     def tearDown(self):
+        self.bouncer.stop()
         tlog.flushErrors(error.UnauthorizedLogin)
         log._getTheFluLogObserver().clearIgnores()
         self.port.stopListening()

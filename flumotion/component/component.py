@@ -327,6 +327,9 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
 
         self.plugs = {}
 
+        # Start the cpu-usage updating.
+        self._cpuCallLater = reactor.callLater(5, self._updateCPUUsage)
+
     def do_check(self):
         """
         Subclasses can implement me to run any checks before the component
@@ -509,6 +512,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         for message in self.state.get('messages'):
             self.state.remove('messages', message)
 
+        self._cpuCallLater.cancel()
+
         d = self.do_stop()
         d.addCallback(stop_plugs)
         return d
@@ -601,6 +606,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.config = config
         self.name = config['name']
 
+    def _updateCPUUsage(self):
         # update CPU time stats
         nowTime = time.time()
         nowClock = time.clock()
@@ -615,5 +621,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.lastTime = nowTime
         self.lastClock = nowClock
 
+        self._cpuCallLater = reactor.callLater(5, self._updateCPUUsage)
 
 pygobject.type_register(BaseComponent)

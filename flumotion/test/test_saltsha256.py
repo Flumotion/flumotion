@@ -44,6 +44,9 @@ class TestWrongKeycardClass(unittest.TestCase):
     def setUp(self):
         self.bouncer = saltsha256.SaltSha256()
 
+    def tearDown(self):
+        self.bouncer.stop()
+
     def testWrongKeycardClass(self):
         keycard = keycards.Keycard()
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
@@ -60,6 +63,9 @@ class TestSaltSha256USCPCC(unittest.TestCase):
     def setUp(self):
         self.bouncer = saltsha256.SaltSha256()
         self.bouncer.setup(bouncerconf)
+
+    def tearDown(self):
+        self.bouncer.stop()
 
     def testOk(self):
         # create challenger

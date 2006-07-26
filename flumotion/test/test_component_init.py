@@ -51,5 +51,7 @@ class TestInit(unittest.TestCase):
             component = job.createComponent(moduleName, methodName)
             self.failUnless(component)
 
+            component.stop()
+
 if __name__ == '__main__':
     unittest.main()

@@ -40,6 +40,9 @@ class TestHTPasswdCryptKeycard(unittest.TestCase):
     def setUp(self):
         self.bouncer = htpasswdcrypt.HTPasswdCrypt()
 
+    def tearDown(self):
+        self.bouncer.stop()
+
     def testWrongKeycardClass(self):
         keycard = keycards.Keycard()
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
@@ -58,6 +61,7 @@ class TestHTPasswdCryptUACPP(unittest.TestCase):
         self.bouncer.setup(bouncerconf)
 
     def tearDown(self):
+        self.bouncer.stop()
         del self.bouncer
         
     def testInit(self):
@@ -103,6 +107,9 @@ class TestHTPasswdCryptUACPCC(unittest.TestCase):
     def setUp(self):
         self.bouncer = htpasswdcrypt.HTPasswdCrypt()
         self.bouncer.setup(bouncerconf)
+
+    def tearDown(self):
+        self.bouncer.stop()
 
     def testOk(self):
         # create challenger
