@@ -1,5 +1,13 @@
 2006-07-26  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/feedcomponent010.py:
+	  Make the interval for checking for recent-buffers 2.5 times the
+	  interval we use for getting the buffer.
+	  Having them the same frequently causes components to spuriously go
+	  hungry, then back to happy shortly after.
+
+2006-07-26  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/component.py:
 	  Fix CPU updating by adding a callLater loop.
 	  Cancel cpu updating callLater in BaseComponent.stop()

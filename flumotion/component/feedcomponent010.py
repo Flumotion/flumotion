@@ -49,9 +49,9 @@ class FeedComponent(basecomponent.BaseComponent):
     BUFFER_PROBE_ADD_FREQUENCY = 5
 
     # how often to check that a buffer has arrived recently
-    BUFFER_CHECK_FREQUENCY = 5
+    BUFFER_CHECK_FREQUENCY = BUFFER_PROBE_ADD_FREQUENCY * 2.5
 
-    BUFFER_TIME_THRESHOLD = 5
+    BUFFER_TIME_THRESHOLD = BUFFER_CHECK_FREQUENCY
 
     logCategory = 'feedcomponent'
 
