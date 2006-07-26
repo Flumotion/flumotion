@@ -607,6 +607,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         deltaTime = nowTime - self.lastTime
         deltaClock = nowClock - self.lastClock
         CPU = deltaClock/deltaTime
+        self.log('latest CPU use: %r' % CPU)
         self.state.set('cpu', CPU)
         deltaTime = nowTime - self.baseTime
         deltaClock = nowClock

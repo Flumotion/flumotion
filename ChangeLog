@@ -1,3 +1,10 @@
+2006-07-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/parts.py:
+	  actually update the CPU usage column when we receive an update
+	* flumotion/component/component.py:
+	  add a log line
+
 2006-07-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/twisted/pb.py:

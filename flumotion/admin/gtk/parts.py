@@ -393,6 +393,8 @@ class ComponentsView(log.Loggable, gobject.GObject):
                 self._model.set(iter, COL_NAME, value)
         elif key == 'workerName':
             self._updateWorker(iter, state)
+        elif key == 'cpu':
+            self._model.set(iter, COL_CPU, value)
 
     # FIXME: proxy messages to message area
     def stateAppend(self, state, key, value):
