@@ -398,7 +398,6 @@ class ParseLaunchComponent(FeedComponent):
         if clocking:
             self.info('slaving to master clock on %s:%d with base time %d' %
                 clocking)
-        self.setMood(moods.waking)
 
         if clocking:
             self.set_master_clock(*clocking)

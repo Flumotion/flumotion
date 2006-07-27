@@ -83,10 +83,6 @@ class ComponentAvatar(base.ManagerAvatar):
         self.feeder_names = []
         self.eater_names = []
         
-    # make sure we don't have stray pendingTimedCalls
-    def __del__(self):
-        self.cleanup()
-        
     ### python methods
     def __repr__(self):
         if self.componentState:
@@ -108,19 +104,6 @@ class ComponentAvatar(base.ManagerAvatar):
         self._ports = {}
 
         self.jobState = None
-
-        # At this point, change our mood:
-        # if we're sad, we remain sad, always. Otherwise, if we shut down due
-        # to an explicit manager request, go to sleeping. Otherwise, go to
-        # lost, because it got disconnected for an unknown reason (probably
-        # network related)
-        if not self._getMoodValue() == moods.sad.value:
-            if self._shutdown_requested:
-                self.debug("Shutdown was requested, component now sleeping")
-                self._setMood(moods.sleeping)
-            else:
-                self.debug("Shutdown was NOT requested, component now lost")
-                self._setMood(moods.lost)
 
     def _setMood(self, mood):
         if not self.componentState:
@@ -172,6 +155,9 @@ class ComponentAvatar(base.ManagerAvatar):
         base.ManagerAvatar.attached(self, mind) # sets self.mind
         
         self.vishnu.componentAttached(self)
+        # We're attached, so set a mood indicating that (we can't do this before
+        # vishnu.componentAttached())
+        self._setMood(moods.waking)
 
         self.debug('mind %r attached, calling remote _getState()' % self.mind)
         self._getState()
@@ -209,10 +195,24 @@ class ComponentAvatar(base.ManagerAvatar):
 
         self.info('component "%s" logged out' % self.avatarId)
 
+        # Now, we're detached: set our state to sleeping (or lost). 
+        # Do this before vishnu.componentDetached() severs our association 
+        # with our componentState. Also, don't ever remove 'sad' here.
+        # If we shut down due to an explicit manager request, go to sleeping. 
+        # Otherwise, go to lost, because it got disconnected for an unknown 
+        # reason (probably network related)
+        if not self._getMoodValue() == moods.sad.value:
+            if self._shutdown_requested:
+                self.debug("Shutdown was requested, component now sleeping")
+                self._setMood(moods.sleeping)
+            else:
+                self.debug("Shutdown was NOT requested, component now lost")
+                self._setMood(moods.lost)
+
         self.vishnu.componentDetached(self)
         base.ManagerAvatar.detached(self, mind)
 
-        self.cleanup() # callback and state done at end
+        self.cleanup() # callback done at end
  
     # IStateListener methods
     def stateSet(self, state, key, value):
@@ -954,9 +954,6 @@ class ComponentHeaven(base.ManagerHeaven):
         if conf['clock-master'] == componentAvatar.avatarId:
             # houston, we have a master clock
             self.removeMasterClock(componentAvatar)
-
-        # clean up component
-        componentAvatar.cleanup()
 
     def provideMasterClock(self, componentAvatar):
         """

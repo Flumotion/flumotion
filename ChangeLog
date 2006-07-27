@@ -1,3 +1,18 @@
+2006-07-27  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	  Cleanup of mood handling: transitions to/from sleeping MUST only be
+	  done by the manager, not by a component. Fixes #426.
+	  
+	  Also fix a cleanup issue if stop gets called multiple times on a
+	  component.
+
+
 2006-07-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:

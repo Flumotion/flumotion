@@ -312,7 +312,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         self.name = None
         
         #self.state.set('name', name)
-        self.state.set('mood', moods.sleeping.value)
         self.state.set('pid', os.getpid())
 
         self.medium = None # the medium connecting us to the manager's avatar
@@ -378,14 +377,12 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
        
     def do_stop(self):
         """
-        BaseComponent vmethod for stopping. If you override this
-        method, you are responsible for arranging that the component
-        becomes sleeping.
+        BaseComponent vmethod for stopping.
+        The component should do any cleanup it needs, but must not set the
+        component's mood to sleeping.
 
         @Returns: L{twisted.internet.defer.Deferred}
         """
-        # default behavior
-        self.setMood(moods.sleeping)
         return defer.succeed(None)
  
     ### BaseComponent implementation related to compoment protocol
@@ -473,7 +470,6 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         Again, don't override this method. Thanks.
         """
         self.debug('BaseComponent.start')
-        self.setMood(moods.waking)
 
         def start_plugs():
             for socket, plugs in self.plugs.items():
@@ -512,7 +508,9 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         for message in self.state.get('messages'):
             self.state.remove('messages', message)
 
-        self._cpuCallLater.cancel()
+        if self._cpuCallLater:
+            self._cpuCallLater.cancel()
+            self._cpuCallLater = None
 
         d = self.do_stop()
         d.addCallback(stop_plugs)

@@ -704,7 +704,6 @@ class Vishnu(log.Loggable):
         state.set('name', conf['name'])
         state.set('type', conf['type'])
         state.set('workerRequested', None)
-        state.set('mood', moods.waking.value)
         state.set('config', conf)
 
         # check if we have this flow yet and add if not
@@ -785,10 +784,6 @@ class Vishnu(log.Loggable):
             self.warning('Could not remove jobState for %r' % componentAvatar)
         m.jobState = None
         
-        # if the component was sad, keep it sad.  It still needs manual
-        # admin intervention.
-        if m.state.get('mood') != moods.sad.value:   
-            m.state.set('mood', moods.sleeping.value)
         m.state.set('pid', None)
         m.state.set('cpu', None)
         m.state.set('workerName', None)
