@@ -556,6 +556,11 @@ class Vishnu(log.Loggable):
         @rtype: L{defer.Deferred}
         """
         self.debug('componentStop(%r)' % componentState)
+        # clear all messages
+        for m in componentState.get('messages'):
+            self.debug('Removing message %r' % m)
+            componentState.remove('messages', m)
+
         avatar = self.getComponentMapper(componentState).avatar
         if componentState.get('mood') == moods.sad.value and not avatar:
             self.debug('asked to stop a sad component without avatar')
