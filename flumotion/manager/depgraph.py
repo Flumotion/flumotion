@@ -257,7 +257,8 @@ class DepGraph(log.Loggable):
         # we want to loop over all objects, so we loop over a copy
         for obj in toBeStarted[:]:
             if obj in toBeStarted:
-                self.debug("toBeStarted: testing (%r, %r)", obj[0], obj[1])
+                self.log("toBeStarted: checking if (%r, %r) needs starting",
+                    obj[0], obj[1])
                 if self._state[obj]:
                     toBeStarted.remove(obj)
                 elif obj[1] == "WORKER":
@@ -279,7 +280,7 @@ class DepGraph(log.Loggable):
         return toBeStarted
 
     def _setState(self, object, type, value):
-        self.debug("Setting state of (%r, %s) to %d" % (
+        self.doLog(log.DEBUG, -2, "Setting state of (%r, %s) to %d" % (
             object, type, value))
         self._state[(object,type)] = value
         # if making state False, should make its offspring False
@@ -362,6 +363,8 @@ class DepGraph(log.Loggable):
         @param component: the component to set JOB to False for
         @type  component: L{flumotion.common.planet.ManagerComponentState}
         """
+        self.doLog(log.DEBUG, -2, "Setting component's job %r to FALSE" %
+            component)
         self._setState(component, "JOB", False)
 
     def setWorkerStarted(self, worker):

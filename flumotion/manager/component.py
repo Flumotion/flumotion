@@ -45,10 +45,14 @@ T_ = messages.gettexter('flumotion')
 
 class ComponentAvatar(base.ManagerAvatar):
     """
-    Manager-side avatar for a component.
+    I am a Manager-side avatar for a component.
+    I live in the L{ComponentHeaven}.
+
     Each component that logs in to the manager gets an avatar created for it
     in the manager.
 
+    @cvar avatarId:       the L{componentId<common.componentId>}
+    @type avatarId:       str
     @cvar jobState:       job state of this avatar's component
     @type jobState:       L{flumotion.common.planet.ManagerJobState}
     @cvar componentState: component state of this avatar's component
@@ -267,7 +271,8 @@ class ComponentAvatar(base.ManagerAvatar):
     # FIXME: rename to something like getEaterFeeders()
     def getEaters(self):
         """
-        Get a list of feedId's for feeds this component wants to eat from.
+        Get a list of L{feedId<flumotion.common.common.feedId>}s
+        for feeds this component wants to eat from.
 
         @return: a list of feedId's, or the empty list
         @rtype:  list of str
@@ -280,9 +285,11 @@ class ComponentAvatar(base.ManagerAvatar):
     
     def getFeeders(self):
         """
-        Get a list of feedId's (componentName:feedName) in this component.
-        Obviously, the componentName will be the same for all of them, since
-        it's the name of this component, but we return the feedId to be
+        Get a list of L{feedId<flumotion.common.common.feedId>}s that this
+        component has feeders for.
+
+        Obviously, the componentName part will be the same for all of them,
+        since it's the name of this component, but we return the feedId to be
         similar to getEaters.
 
         @return: a list of feedId's, or the empty list
@@ -368,7 +375,7 @@ class ComponentAvatar(base.ManagerAvatar):
         Proxies to
         L{flumotion.component.component.BaseComponentMedium.remote_setup}
 
-        @type  config: dict
+        @type  conf: dict
         """
         def _setupErrback(failure, self):
             self._setMood(moods.sad)
@@ -649,7 +656,8 @@ class ComponentAvatar(base.ManagerAvatar):
 
 class ComponentHeaven(base.ManagerHeaven):
     """
-    I handle all registered components and provide avatars for them.
+    I handle all registered components and provide L{ComponentAvatar}s
+    for them.
     """
 
     implements(interfaces.IHeaven)
@@ -1062,6 +1070,13 @@ class ComponentHeaven(base.ManagerHeaven):
         return ret
 
     def getComponentAvatarForState(self, state):
+        """
+        Return a component avatar for the given state.
+
+        @type state: L{flumotion.common.planet.ManagerComponentState}
+
+        @rtype: L{ComponentAvatar}
+        """
         if state in self.vishnu._componentMappers:
             return self.vishnu._componentMappers[state].avatar
         else:

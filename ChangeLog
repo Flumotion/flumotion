@@ -1,5 +1,11 @@
 2006-07-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/component.py:
+	* flumotion/manager/depgraph.py:
+	  doc and debug fixes
+
+2006-07-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/manager.py:
 	  remove messages when asked to stop a component; fixes #410
 
