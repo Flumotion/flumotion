@@ -44,7 +44,11 @@ class PBConnectionInfo(pb.Copyable, pb.RemoteCopy):
         self.authenticator = authenticator
 
     def __str__(self):
-        if self.authenticator and self.authenticator.username:
+        # have to use getattr in the case that the authenticator was
+        # transferred over the wire, because the remote reference is not
+        # an authenticator
+        if (self.authenticator
+            and getattr(self.authenticator, 'username', None)):
             return '%s@%s:%d' % (self.authenticator.username,
                                  self.host, self.port)
         else:
