@@ -1,3 +1,8 @@
+2006-08-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/admin.py:
+	  log perspectiveMessageReceived for admin avatars
+
 2006-07-31  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/connection.py (PBConnectionInfo.__str__): Fix
