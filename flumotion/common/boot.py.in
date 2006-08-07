@@ -132,10 +132,23 @@ def boot(path, gtk=False):
     from flumotion.common import log
     log.logTwisted()
 
+    if os.getenv('FLU_PROFILE'):
+        def catching(proc, *args, **kwargs):
+            import statprof
+            statprof.start()
+            try:
+                return proc(*args, **kwargs)
+            finally:
+                statprof.stop()
+                statprof.display()
+    else:
+        def catching(proc, *args, **kwargs):
+            return proc(*args, **kwargs)
+        
     main = reflect.namedAny(path)
     
     try:
-        sys.exit(main(sys.argv))
+        sys.exit(catching(main, sys.argv))
     except errors.SystemError, e:
         print 'ERROR:', e
         sys.exit(1)
