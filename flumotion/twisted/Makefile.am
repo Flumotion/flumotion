@@ -11,6 +11,7 @@ flumotion_PYTHON = \
 	fdserver.py \
 	flavors.py \
 	gtk2reactor.py \
+	http.py \
 	pb.py \
 	portal.py \
 	reflect.py \
