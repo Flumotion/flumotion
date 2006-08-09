@@ -1,7 +1,20 @@
 2006-08-09  Andy Wingo  <wingo@pobox.com>
 
-	* flumotion/component/misc/porter/porter.xml: Add a comment.
+	* flumotion/component/misc/porter/porter.py
+	(PorterMedium.remote_getPorterDetails): Report the iptables-port,
+	not the port we actually listen on.
+	(Porter.init): 
+	(Porter.do_setup): Get iptables-port from the config, defaulting
+	to props['port'].
 
+	* flumotion/component/misc/porter/porter.xml: New optional
+	property iptables-port, for e.g listening on port 8800 but saying
+	we listen on 80, because iptables redirects 80->8800.
+
+2006-08-09  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/misc/porter/porter.xml: Add a comment.
+	
 	* flumotion/component/misc/porter/porter.py
 	(PorterMedium.remote_getPorterDetails): Also return the interface
 	the porter is listening on.

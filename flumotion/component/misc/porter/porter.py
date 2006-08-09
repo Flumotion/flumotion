@@ -104,7 +104,8 @@ class PorterMedium(component.BaseComponentMedium):
         password, port, interface).
         """
         return (self.comp._socketPath, self.comp._username, 
-            self.comp._password, self.comp._port, self.comp._interface)
+                self.comp._password, self.comp._iptablesPort,
+                self.comp._interface) 
 
 class Porter(component.BaseComponent, log.Loggable):
     """
@@ -128,6 +129,7 @@ class Porter(component.BaseComponent, log.Loggable):
         self._username = None
         self._password = None
         self._port = None
+        self._iptablesPort = None
         self._porterProtocol = None
 
         self._interface = ''
@@ -270,6 +272,7 @@ class Porter(component.BaseComponent, log.Loggable):
             self._socketPath = self.generateSocketPath()
 
         self._port = int(props['port'])
+        self._iptablesPort = int(props.get('iptables-port', self._port))
         self._porterProtocol = props.get('protocol', 
             'flumotion.component.misc.porter.porter.HTTPPorterProtocol')
         self._interface = props.get('interface', '')

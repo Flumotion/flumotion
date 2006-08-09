@@ -15,6 +15,9 @@
         <property name="password" type="string"/>
         <property name="socket_path" type="string"/>
         <property name="port" type="int"/>
+        <!-- when an admin asks, via getPorterDetails, what our port is, we will
+             report this one. allows for e.g. iptables to redirect 80 -> 8800. -->
+        <property name="iptables-port" type="int"/>
         <property name="interface" type="string"/> <!-- ip or hostname -->
         <property name="protocol" type="string"/>
       </properties>
