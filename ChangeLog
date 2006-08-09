@@ -1,3 +1,11 @@
+2006-08-09  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/misc/porter/porter.xml: Add a comment.
+
+	* flumotion/component/misc/porter/porter.py
+	(PorterMedium.remote_getPorterDetails): Also return the interface
+	the porter is listening on.
+
 2006-08-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/twisted/Makefile.am:
