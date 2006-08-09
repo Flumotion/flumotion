@@ -1,3 +1,8 @@
+2006-08-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
+	  fix docstring
+
 2006-08-09  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/misc/porter/porter.py
