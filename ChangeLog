@@ -1,5 +1,13 @@
 2006-08-14  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_twisted_integration.py
+	(IntegrationPlanExecuteTest.testUnexpectedExitCode): Remove some
+	debugging cruft.
+
+	* flumotion/twisted/integration.py (Process.start): Reorder an
+	addCallback to account for the case in which the deferred already
+	fired. Fixes a wee bug. Remove all this prints in this file.
+
 	* flumotion/test/test_twisted_integration.py: Unit test for
 	integration framework.
 

@@ -215,12 +215,16 @@ class Process:
         stdout.close()
         stderr.close()
 
+        # it's possible the process *already* exited, from within the
+        # spawnProcess itself. So set our state to STARTED, *then*
+        # attach the callback.
+        self.pid = process.pid
+        self.state = self.STARTED
+
         def got_exit(res):
             self.state = self.STOPPED 
             return res
-        self.protocol.getDeferred().addCallbacks(got_exit, got_exit)
-        self.pid = process.pid
-        self.state = self.STARTED
+        self.protocol.getDeferred().addCallback(got_exit)
 
     def kill(self, sig=signal.SIGTERM):
         assert self.state == self.STARTED
@@ -278,7 +282,6 @@ class PlanExecutor:
 
     def _checkProcesses(self, failure=None):
         if self.processes:
-            print 'processes:', self.processes
             e = ProcessesStillRunningException(self.processes)
             dlist = []
             # reap all processes, and once we have them reaped, errback

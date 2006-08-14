@@ -166,12 +166,8 @@ class IntegrationPlanExecuteTest(unittest.TestCase):
         p = plan.spawn('false')
         plan.wait(p, 0)
         d = plan.execute()
-        def errback(err):
-            print err
-            if err.type != integration.UnexpectedExitCodeException:
-                return err
         d.addErrback(errback)
-        #self.failUnlessFailure(d, integration.UnexpectedExitCodeException)
+        self.failUnlessFailure(d, integration.UnexpectedExitCodeException)
         d.addCallback(lambda _: plan._cleanOutputDir())
         return d
 
