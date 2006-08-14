@@ -49,6 +49,7 @@ EXTRA_DIST = 				\
 	test_registry.py 		\
 	test_testclasses.py 		\
 	test_twisted_compat.py 		\
+	test_twisted_integration.py 	\
 	test_ui_fgtk.py 		\
 	test_wizard.py 			\
 	test_workerconfig.py

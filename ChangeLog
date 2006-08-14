@@ -1,3 +1,17 @@
+2006-08-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_twisted_integration.py: Unit test for
+	integration framework.
+
+	* flumotion/twisted/integration.py: New file, implements a
+	framework for spawning processes from within unit tests, so you
+	can use trial to make integration tests. See the docstring for
+	more info. Still a couple of bugs to iron out.
+
+	* flumotion/test/Makefile.am (EXTRA_DIST): 
+	* flumotion/twisted/Makefile.am (flumotion_PYTHON): Requisite
+	autotoolage.
+
 2006-08-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/log.py:
