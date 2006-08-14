@@ -58,7 +58,7 @@ class IntegrationProcessTest(unittest.TestCase):
                                 self.tempdir)
         assert p.state == p.NOT_STARTED
         p.start()
-        assert p.state == p.STARTED
+        assert p.state != p.NOT_STARTED
         return p.wait(0)
 
     @_call_in_reactor

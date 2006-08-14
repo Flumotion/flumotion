@@ -4,6 +4,9 @@
 	(IntegrationPlanExecuteTest.testUnexpectedExitCode): Remove some
 	debugging cruft.
 	(IntegrationPlanExecuteTest.testUnexpectedExitCode): BPB.
+	(IntegrationProcessTest.testTransientProcess): Because we can
+	immediately be STOPPED for short-lived processes, relax this check
+	to != NOT_STARTED.
 
 	* flumotion/twisted/integration.py (Process.start): Reorder an
 	addCallback to account for the case in which the deferred already
