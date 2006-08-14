@@ -52,6 +52,17 @@ class IntegrationProcessTest(unittest.TestCase):
                 os.rmdir(os.path.join(root, name))
         os.rmdir(self.tempdir)
 
+    if not getattr(unittest.TestCase, 'failUnlessFailure', None):
+        def failUnlessFailure(self, d, type):
+            def unexpected(res):
+                self.fail('Expected exception %s, but got '
+                          'result %r.' % (type, res))
+                raise AssertionError
+            def errback(failure):
+                failure.trap(type)
+            d.addErrback(errback)
+            d.addCallbacks(unexpected, unexpected)
+
     @_call_in_reactor
     def testTransientProcess(self):
         p = integration.Process('echo', ('echo', 'hello world'),

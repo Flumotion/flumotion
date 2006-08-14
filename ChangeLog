@@ -7,6 +7,8 @@
 	(IntegrationProcessTest.testTransientProcess): Because we can
 	immediately be STOPPED for short-lived processes, relax this check
 	to != NOT_STARTED.
+	(IntegrationProcessTest.failUnlessFailure): Implement if not
+	present.
 
 	* flumotion/twisted/integration.py (Process.start): Reorder an
 	addCallback to account for the case in which the deferred already
