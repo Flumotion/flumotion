@@ -3,6 +3,7 @@
 	* flumotion/test/test_twisted_integration.py
 	(IntegrationPlanExecuteTest.testUnexpectedExitCode): Remove some
 	debugging cruft.
+	(IntegrationPlanExecuteTest.testUnexpectedExitCode): BPB.
 
 	* flumotion/twisted/integration.py (Process.start): Reorder an
 	addCallback to account for the case in which the deferred already
