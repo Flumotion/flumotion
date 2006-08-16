@@ -53,6 +53,7 @@ class IntegrationProcessTest(unittest.TestCase):
         os.rmdir(self.tempdir)
 
     if not getattr(unittest.TestCase, 'failUnlessFailure', None):
+        # FIXME: T2.0
         def failUnlessFailure(self, d, type):
             def unexpected(res):
                 self.fail('Expected exception %s, but got '
@@ -63,7 +64,6 @@ class IntegrationProcessTest(unittest.TestCase):
             d.addErrback(errback)
             d.addCallbacks(unexpected, unexpected)
 
-    @_call_in_reactor
     def testTransientProcess(self):
         p = integration.Process('echo', ('echo', 'hello world'),
                                 self.tempdir)
@@ -71,8 +71,8 @@ class IntegrationProcessTest(unittest.TestCase):
         p.start()
         assert p.state != p.NOT_STARTED
         return p.wait(0)
+    testTransientProcess = _call_in_reactor(testTransientProcess)
 
-    @_call_in_reactor
     def testTimeOut(self):
         p = integration.Process('cat', ('cat', '/dev/random'),
                                 self.tempdir)
@@ -93,8 +93,8 @@ class IntegrationProcessTest(unittest.TestCase):
         d.addCallback(cleanup)
         self.failUnlessFailure(d, error.ProcessTerminated)
         return d
+    testTimeOut = _call_in_reactor(testTimeOut)
         
-    @_call_in_reactor
     def testKill(self):
         p = integration.Process('cat', ('cat', '/dev/random'),
                                 self.tempdir)
@@ -104,6 +104,7 @@ class IntegrationProcessTest(unittest.TestCase):
         p.kill()
         d = p.wait(None)
         return d
+    testKill = _call_in_reactor(testKill)
 
 
 class IntegrationPlanGenerationTest(unittest.TestCase):
@@ -191,30 +192,35 @@ class IntegrationPlanExecuteTest(unittest.TestCase):
         return d
 
 class IntegrationTestDecoratorTest(unittest.TestCase):
-    @integration.test
+    #@integration.test <- FIXME: P2.3
     def testTransientProcess(self, plan):
         p = plan.spawn('echo', 'foo')
         plan.wait(p, 0)
+    testTransientProcess = integration.test(testTransientProcess)
 
-    @integration.test
+    #@integration.test
     def testParallelWait(self, plan):
         p1, p2 = plan.spawnPar(('echo', 'foo'),
                                ('echo', 'bar'))
         plan.waitPar((p1, 0),
                      (p2, 0))
+    testParallelWait = integration.test(testParallelWait)
 
-    @integration.test
+    #@integration.test
     def testFalse(self, plan):
         p = plan.spawn('false')
         plan.wait(p, 1)
+    testFalse = integration.test(testFalse)
 
-    @integration.test
+    #@integration.test
     def testKill(self, plan):
         p = plan.spawn('cat', '/dev/random')
         plan.kill(p)
+    testKill = integration.test(testKill)
 
-    @integration.test
+    #@integration.test
     def testParallelStartAndKill(self, plan):
         p1, p2 = plan.spawnPar(('cat', '/dev/random'),
                                ('cat', '/dev/random'))
         plan.kill(p1, p2)
+    testParallelStartAndKill = integration.test(testParallelStartAndKill)
