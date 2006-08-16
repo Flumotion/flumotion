@@ -121,8 +121,7 @@ class IntegrationPlanGenerationTest(unittest.TestCase):
             self.fail()
         
     def testTransientProcess(self):
-        plan = integration.Plan('IntegrationPlanGenerationTest',
-                                'testTransientProcess')
+        plan = integration.Plan(self, 'testTransientProcess')
         process = plan.spawn('echo', 'hello world')
         plan.wait(process, 0)
         self.assertPlansEqual(plan.ops, [(plan.vm.checkExits, ()),
@@ -132,8 +131,7 @@ class IntegrationPlanGenerationTest(unittest.TestCase):
         plan._cleanOutputDir()
 
     def testKill(self):
-        plan = integration.Plan('IntegrationPlanGenerationTest',
-                                'testKill')
+        plan = integration.Plan(self, 'testKill')
         process = plan.spawn('cat', '/dev/random')
         plan.kill(process)
         self.assertPlansEqual(plan.ops, [(plan.vm.checkExits, ()),
@@ -145,22 +143,19 @@ class IntegrationPlanGenerationTest(unittest.TestCase):
 
 class IntegrationPlanExecuteTest(unittest.TestCase):
     def testTransientProcess(self):
-        plan = integration.Plan('IntegrationPlanExecuteTest',
-                                'testTransientProcess')
+        plan = integration.Plan(self, 'testTransientProcess')
         process = plan.spawn('echo', 'hello world')
         plan.wait(process, 0)
         return plan.execute()
 
     def testKill(self):
-        plan = integration.Plan('IntegrationPlanExecuteTest',
-                                'testKill')
+        plan = integration.Plan(self, 'testKill')
         process = plan.spawn('cat', '/dev/random')
         plan.kill(process)
         return plan.execute()
 
     def testUnexpectedProcessExit(self):
-        plan = integration.Plan('IntegrationPlanExecuteTest',
-                                'testUnexpectedProcessExit')
+        plan = integration.Plan(self, 'testUnexpectedProcessExit')
         processes = []
         processes.append(plan.spawn('echo', 'foo'))
         processes.append(plan.spawn('sleep', '5'))
@@ -172,8 +167,7 @@ class IntegrationPlanExecuteTest(unittest.TestCase):
         return d
 
     def testUnexpectedExitCode(self):
-        plan = integration.Plan('IntegrationPlanExecuteTest',
-                                'testUnexpectedExitCode')
+        plan = integration.Plan(self, 'testUnexpectedExitCode')
         processes = []
         p = plan.spawn('false')
         plan.wait(p, 0)
@@ -183,8 +177,7 @@ class IntegrationPlanExecuteTest(unittest.TestCase):
         return d
 
     def testProcessesStillRunning(self):
-        plan = integration.Plan('IntegrationPlanExecuteTest',
-                                'testProcessesStillRunning')
+        plan = integration.Plan(self, 'testProcessesStillRunning')
         p = plan.spawn('sleep', '5')
         d = plan.execute()
         self.failUnlessFailure(d, integration.ProcessesStillRunningException)

@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 
+import sys
 import os
 import signal
 import time
@@ -320,24 +321,34 @@ class PlanExecutor:
         reactor.callLater(0, d.callback, None)
         return d
 
+def _classNameToFileName(c):
+    moduleName = c.__module__
+    relPath = sys.modules[moduleName].__file__
+    for path in sys.path:
+        absPath = os.path.join(path, relPath)
+        if os.access(absPath, os.R_OK):
+            return absPath
+    raise AssertionError('should not get here')
+
 class Plan:
-    def __init__(self, testCaseName, testName):
+    def __init__(self, testCase, testName):
         self.name = testName
-        self.testCaseName = testCaseName # this is the class
+        self.testCaseName = testCase.__class__.__name__
         self.processes = {}
-        self.outputDir = self._makeOutputDir()
+        testDir = os.path.dirname(_classNameToFileName(testCase))
+        self.outputDir = self._makeOutputDir(testDir)
 
         # put your boots on monterey jacks, cause this gravy just made a
         # virtual machine whose instructions are python methods
         self.vm = PlanExecutor()
         self.ops = []
 
-    def _makeOutputDir(self):
+    def _makeOutputDir(self, testDir):
         while True:
             try:
                 tail = '%s-%s-%d' % (self.testCaseName, self.name,
                                      int(time.time()))
-                outputDir = os.path.join(os.getcwd(), tail)
+                outputDir = os.path.join(testDir, tail)
                 os.mkdir(outputDir)
                 return outputDir
             except OSError, e:
@@ -412,7 +423,7 @@ class Plan:
 def test(proc):
     testName = proc.__name__
     def wrappedtest(self):
-        plan = Plan(self.__class__.__name__, testName)
+        plan = Plan(self, testName)
         proc(self, plan)
         return plan.execute()
     wrappedtest.__name__ = testName

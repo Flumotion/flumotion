@@ -1,6 +1,22 @@
 2006-08-16  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_twisted_integration.py
+	(IntegrationPlanGenerationTest.testTransientProcess)
+	(IntegrationPlanGenerationTest.testKill)
+	(IntegrationPlanExecuteTest.testTransientProcess)
+	(IntegrationPlanExecuteTest.testKill)
+	(IntegrationPlanExecuteTest.testUnexpectedProcessExit)
+	(IntegrationPlanExecuteTest.testUnexpectedExitCode)
+	(IntegrationPlanExecuteTest.testProcessesStillRunning): Update for
+	Plan initargs.
+
+	* flumotion/twisted/integration.py (Plan.__init__): Take the test
+	case instead of its name, so that we can output our logs in the
+	correct directory.
+	(_classNameToFileName): New happy function.
+	(test.wrappedtest): Create a Plan with the proper initargs.
+
+	* flumotion/test/test_twisted_integration.py
 	(IntegrationProcessTest.testTransientProcess)
 	(IntegrationProcessTest.testTimeOut)
 	(IntegrationProcessTest.testKill)
