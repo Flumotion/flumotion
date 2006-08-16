@@ -1,5 +1,10 @@
 2006-08-16  Andy Wingo  <wingo@pobox.com>
 
+	* common/setup.m4: No ac_dest in autoconf 2.60; but we do have
+	ac_file.
+	(setup): Return the package path, in case any script wants to know
+	the srcdir.
+
 	* flumotion/manager/main.py (main): Return 1 on all argument
 	errors.
 
