@@ -17,6 +17,8 @@ dnl PROJECT:       the name of the project
 AC_DEFUN([FLUMOTION_SETUP], [
   AC_CONFIG_COMMANDS($1,
     [
+# automake 2.60 help
+if test "x$ac_dest" = "x"; then ac_dest=$ac_file; fi
 flu_var_prefix=`echo "$ac_dest" | sed -e 's/[[^a-zA-Z_0-9]]/_/g'`
 eval _RELATIVE_PATH=\$${flu_var_prefix}_RELATIVE_PATH
 eval _PREAMBLE=\$${flu_var_prefix}_PREAMBLE
@@ -46,7 +48,7 @@ def setup():
     global _setup
 
     if _setup:
-        return
+        return _setup
 
     # make sure we find the original flumotion dir always and firstly
     if not FLU_DIR in sys.path:
@@ -92,7 +94,8 @@ def setup():
     log.debug('setup', 'registering our package path %s' % __packagePath)
     package.getPackager().registerPackagePath(__packagePath, PROJECT)
 
-    _setup = True
+    _setup = __packagePath
+    return _setup
 END
 ],
     [  flu_var_prefix=`echo $1 | sed -e 's/[[^a-zA-Z_0-9]]/_/g'`
