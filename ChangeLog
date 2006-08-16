@@ -1,5 +1,8 @@
 2006-08-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/main.py (main): Return 1 on all argument
+	errors.
+
 	* flumotion/test/test_twisted_integration.py
 	(IntegrationPlanGenerationTest.testTransientProcess)
 	(IntegrationPlanGenerationTest.testKill)

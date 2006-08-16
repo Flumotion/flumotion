@@ -140,7 +140,7 @@ def main(args):
     if len(args) <= 1:
         log.warning('manager', 'Please specify a planet configuration file')
         sys.stderr.write("Please specify a planet configuration file.\n")
-        return -1
+        return 1
 
     planetFile = args[1]
     try:
@@ -149,12 +149,12 @@ def main(args):
         sys.stderr.write("ERROR: Could not read configuration from '%s':\n" %
             planetFile)
         sys.stderr.write("ERROR: %s\n" % e.strerror)
-        return -1
+        return 1
     except errors.ConfigError, e:
         sys.stderr.write("ERROR: Could not read configuration from '%s':\n" %
             planetFile)
         sys.stderr.write("ERROR: %s\n" % e.args[0])
-        return -1
+        return 1
 
     # now copy over stuff from config that is not set yet
     if cfg.manager:
