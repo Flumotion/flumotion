@@ -215,5 +215,6 @@ class IntegrationTestDecoratorTest(unittest.TestCase):
     def testParallelStartAndKill(self, plan):
         p1, p2 = plan.spawnPar(('cat', '/dev/random'),
                                ('cat', '/dev/random'))
-        plan.kill(p1, p2)
+        plan.kill(p1)
+        plan.kill(p2)
     testParallelStartAndKill = integration.test(testParallelStartAndKill)

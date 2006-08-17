@@ -255,6 +255,7 @@ class PlanExecutor:
 
     def __init__(self):
         self.processes = []
+        self.timeout = 20
 
     def spawn(self, process):
         assert process not in self.processes
@@ -277,7 +278,7 @@ class PlanExecutor:
         assert process in self.processes
         def remove_from_processes_list(_):
             self.processes.remove(process)
-        d = process.wait(exitCode)
+        d = process.wait(exitCode, timeout=self.timeout)
         d.addCallback(remove_from_processes_list)
         return d
 
@@ -303,7 +304,8 @@ class PlanExecutor:
             return d
         return failure
             
-    def run(self, ops):
+    def run(self, ops, timeout=20):
+        self.timeout = timeout
         d = defer.Deferred()
         def run_op(_, op):
             # print 'Last result: %r' % (_,)
@@ -342,6 +344,7 @@ class Plan:
         # virtual machine whose instructions are python methods
         self.vm = PlanExecutor()
         self.ops = []
+        self.timeout = 20
 
     def _makeOutputDir(self, testDir):
         while True:
@@ -381,6 +384,9 @@ class Plan:
     def _appendOp(self, *args):
         self.ops.append(args)
 
+    def setTimeout(self, timeout):
+        self.timeout = timeout
+
     def spawn(self, command, *args):
         allArgs = (command,) + args
         process, = self.spawnPar(allArgs)
@@ -409,14 +415,13 @@ class Plan:
         for process, status in processStatusPairs:
             self._appendOp(self.vm.wait, process, status)
 
-    def kill(self, *processes):
+    def kill(self, process, status=None):
         self._appendOp(self.vm.checkExits, ())
-        for process in processes:
-            self._appendOp(self.vm.kill, process)
-            self._appendOp(self.vm.wait, process, None)
+        self._appendOp(self.vm.kill, process)
+        self._appendOp(self.vm.wait, process, status)
 
     def execute(self):
-        d = self.vm.run(self.ops)
+        d = self.vm.run(self.ops, timeout=self.timeout)
         d.addCallback(lambda _: self._cleanOutputDir())
         return d
 

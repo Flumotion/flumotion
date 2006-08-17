@@ -1,3 +1,14 @@
+2006-08-17  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_twisted_integration.py
+	(IntegrationTestDecoratorTest.testParallelStartAndKill): Update
+	for new kill semantics.
+
+	* flumotion/twisted/integration.py (Plan.kill): Change to only
+	kill one process, with an optional wait status. status=None, the
+	default, means that the signal handler kills the program. status=0
+	means that the app caught the signal and returned 0.
+
 2006-08-16  Andy Wingo  <wingo@pobox.com>
 
 	* common/setup.m4: No ac_dest in autoconf 2.60; but we do have
