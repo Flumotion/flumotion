@@ -1,5 +1,11 @@
 2006-08-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/component.py:
+	  a component logging in could already be running, so don't set the
+	  mood to waking on login
+
+2006-08-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/common.mk:
 	  remove -R from trial for coverage
 

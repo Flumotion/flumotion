@@ -155,9 +155,9 @@ class ComponentAvatar(base.ManagerAvatar):
         base.ManagerAvatar.attached(self, mind) # sets self.mind
         
         self.vishnu.componentAttached(self)
-        # We're attached, so set a mood indicating that (we can't do this before
-        # vishnu.componentAttached())
-        self._setMood(moods.waking)
+
+        # the component logging in can already be a running component, so
+        # do not do anything to the mood
 
         self.debug('mind %r attached, calling remote _getState()' % self.mind)
         self._getState()
