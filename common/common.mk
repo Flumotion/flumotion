@@ -8,6 +8,9 @@ check-docs:
 
 coverage:
 	@trial --coverage flumotion.test
+	make show-coverage
+
+show-coverage:
 	@test ! -z "$(COVERAGE_MODULES)" ||				\
 	(echo Define COVERAGE_MODULES in your Makefile.am; exit 1)
 	@keep="";							\
