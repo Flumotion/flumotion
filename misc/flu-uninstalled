@@ -4,25 +4,24 @@
 
 # this script is run -i so that PS1 doesn't get cleared
 
-# change this variable to a different location depending on where you
-# store your cvs checkouts
-
-MYFLU=$HOME/flu
-
-# extract version from $0
-# if this script is called "flu-head" then version will be "head"
-VERSION=`echo $0 | sed s/.*flu-//g`
-
-# base path under which dirs are installed
-FLU=$MYFLU/$VERSION
-if test ! -e $FLU/flumotion; then
-  echo "$FLU/flumotion does not exist !"
-  exit
+self=$0
+absolute=$self
+if test -L $absolute
+then
+  # find what the symlink points to
+  absolute=`stat $absolute -c %N -t | sed 's/^.* -> .//g' | sed 's/.$//g'`
 fi
+MISCDIR=`dirname $absolute`
+BASEDIR=`cd $MISCDIR/.. && pwd`
 
-export PYTHONPATH=$FLU/flumotion:$PYTHONPATH
-export PATH=$FLU/flumotion/bin:$PATH
-export PKG_CONFIG_PATH=$FLU/flumotion/pkgconfig:$PKG_CONFIG_PATH
+# extract project and version from $0
+# if this script is called "...-head" then version will be "head"
+PROJECT=`basename $self | sed s/-.*//g`
+VERSION=`basename $self | sed s/.*-//g`
+
+export PYTHONPATH=$BASEDIR/flumotion:$PYTHONPATH
+export PATH=$BASEDIR/flumotion/bin:$PATH
+export PKG_CONFIG_PATH=$BASEDIR/flumotion/pkgconfig:$PKG_CONFIG_PATH
 
 # if we got a command, run it, else start a shell
 if test ! -z "$1";
@@ -33,5 +32,5 @@ fi
 
 # set up prompt to help us remember we're in a subshell, cd to
 # the flumotion dir and start $SHELL
-cd $FLU/flumotion
+cd $BASEDIR
 PS1="[flu-$VERSION] $PS1" $SHELL
