@@ -2,6 +2,7 @@
 
 	* flumotion/twisted/integration.py (test): For old twisted, return
 	unittest.deferredResult. Cope with older python as well.
+	(test.wrappedtest): BPB.
 
 	* flumotion/twisted/integration.py (Plan.__init__): Attempt to
 	pass distcheck via using trial's temp dir for logging. Don't

@@ -415,6 +415,7 @@ def test(proc):
         proc(self, plan)
         if twisted.copyright.version < '2.0':
             # FIXME T1.3
+            from twisted.trial import unittest
             return unittest.deferredResult(plan.execute())
         else:
             return plan.execute()
