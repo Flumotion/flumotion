@@ -280,8 +280,8 @@ class FakeMind(log.Loggable):
                     name, result))
                 return defer.succeed(result)
             except Exception, e:
-                self.warning('callRemote(%s) failed with %s: %s' % (
-                    name, str(e.__class__), ", ".join(e.args)))
+                self.warning('callRemote(%s) failed with %s' % (
+                    name, log.getExceptionMessage(e)))
                 return defer.fail(e)
         else:
             raise AttributeError('no method %s on self %r' % (name, self))
@@ -314,6 +314,8 @@ class FakeComponentMind(FakeMind):
     def __init__(self, testcase, workerName, avatarId, type,
         moduleName, methodName, config):
         FakeMind.__init__(self, testcase)
+        self.avatarId = avatarId
+        self.logName = avatarId
 
         self.info('Creating component mind for %s' % avatarId)
         state = planet.ManagerJobState()
@@ -415,6 +417,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
 
     def _logoutAvatar(self, avatar):
         # log out avatar
+        self.debug('_logoutAvatar %r' % avatar)
         logout = avatar._tuple[2]
         mind = avatar._mind
         avatarId = avatar._avatarId

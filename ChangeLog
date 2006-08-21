@@ -1,3 +1,10 @@
+2006-08-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/client.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_manager_manager.py:
+	  doc, indentation, and logging changes
+
 2006-08-21  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/twisted/integration.py (test): For old twisted, return

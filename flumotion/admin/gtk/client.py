@@ -889,7 +889,7 @@ class Window(log.Loggable, gobject.GObject):
             return None
 
         mid = self.statusbar.push('main', "%s component %s" % (doing, name))
-        d = self.admin.callRemote('component'+action, state)
+        d = self.admin.callRemote('component' + action, state)
 
         def _actionCallback(result, self, mid):
             self.statusbar.remove('main', mid)

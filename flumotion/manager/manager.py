@@ -185,8 +185,14 @@ class Vishnu(log.Loggable):
     """
     I am the toplevel manager object that knows about all heavens and factories.
 
-    @cvar dispatcher: dispatcher to create avatars
-    @type dispatcher: L{Dispatcher}
+    @cvar dispatcher:      dispatcher to create avatars
+    @type dispatcher:      L{Dispatcher}
+    @cvar workerHeaven:    the worker heaven
+    @type workerHeaven:    L{worker.WorkerHeaven}
+    @cvar componentHeaven: the component heaven
+    @type componentHeaven: L{component.ComponentHeaven}
+    @cvar adminHeaven:     the admin heaven
+    @type adminHeaven:     L{admin.AdminHeaven}
     """
 
     implements(server.IServable)
@@ -525,7 +531,8 @@ class Vishnu(log.Loggable):
         """
         m = componentState.get('mood')
         if m != moods.sleeping.value:
-            raise errors.ComponentMoodError("%r not sleeping" % componentState)
+            raise errors.ComponentMoodError("%r not sleeping but %s" % (
+                componentState, moods.get(m).name))
 
         p = componentState.get('moodPending')
         if p != None:
