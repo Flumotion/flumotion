@@ -25,6 +25,7 @@ import os
 import signal
 
 from twisted.python import failure
+import twisted.copyright
 from twisted.internet import reactor, protocol, defer
 
 
@@ -412,6 +413,14 @@ def test(proc):
     def wrappedtest(self):
         plan = Plan(self, testName)
         proc(self, plan)
-        return plan.execute()
-    wrappedtest.__name__ = testName
+        if twisted.copyright.version < '2.0':
+            # FIXME T1.3
+            return unittest.deferredResult(plan.execute())
+        else:
+            return plan.execute()
+    try:
+        wrappedtest.__name__ = testName
+    except Exception:
+        # can only set procedure names in python >= 2.4
+        pass
     return wrappedtest
