@@ -13,15 +13,16 @@ then
 fi
 MISCDIR=`dirname $absolute`
 BASEDIR=`cd $MISCDIR/.. && pwd`
+ONEUPDIR=`cd $BASEDIR/.. && pwd`
 
 # extract project and version from $0
 # if this script is called "...-head" then version will be "head"
 PROJECT=`basename $self | sed s/-.*//g`
 VERSION=`basename $self | sed s/.*-//g`
 
-export PYTHONPATH=$BASEDIR/flumotion:$PYTHONPATH
-export PATH=$BASEDIR/flumotion/bin:$PATH
-export PKG_CONFIG_PATH=$BASEDIR/flumotion/pkgconfig:$PKG_CONFIG_PATH
+export PYTHONPATH=$ONEUPDIR/flumotion:$PYTHONPATH
+export PATH=$ONEUPDIR/flumotion/bin:$PATH
+export PKG_CONFIG_PATH=$ONEUPDIR/flumotion/pkgconfig:$PKG_CONFIG_PATH
 
 # if we got a command, run it, else start a shell
 if test ! -z "$1";
