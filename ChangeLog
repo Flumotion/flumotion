@@ -1,5 +1,10 @@
 2006-08-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/boot.py.in:
+	  suppress pychecker warning about redefining catching
+
+2006-08-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/client.py:
 	* flumotion/manager/manager.py:
 	* flumotion/test/test_manager_manager.py:

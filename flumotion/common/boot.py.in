@@ -132,6 +132,9 @@ def boot(path, gtk=False):
     from flumotion.common import log
     log.logTwisted()
 
+    # we redefine catching
+    __pychecker__ = 'no-reuseattr'
+
     if os.getenv('FLU_PROFILE'):
         def catching(proc, *args, **kwargs):
             import statprof
