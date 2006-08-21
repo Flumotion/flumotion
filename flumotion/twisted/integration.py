@@ -23,7 +23,6 @@
 import sys
 import os
 import signal
-import time
 
 from twisted.python import failure
 from twisted.internet import reactor, protocol, defer
@@ -34,8 +33,8 @@ Framework for writing automated integration tests.
 
 This module provides a way of writing automated integration tests from
 within Twisted's unit testing framework, trial. Test cases are
-constructed as L{integration.TestCase} classes, a subclass of the normal
-trial L{twisted.trial.unittest.TestCase} class.
+constructed as subclasses of the normal trial
+L{twisted.trial.unittest.TestCase} class.
 
 Integration tests look like normal test methods, except that they are
 decorated with L{integration.test}, take an extra "plan" argument, and
@@ -208,8 +207,10 @@ class Process:
         # termination instead of the twisted nice termination, but
         # that's better than the kid missing the signal.
         termHandler = signal.signal(signal.SIGTERM, signal.SIG_DFL)
+        env = dict(os.environ)
+        env['FLU_DEBUG'] = '5'
         process = reactor.spawnProcess(self.protocol, self.argv[0],
-                                       env=None, args=self.argv,
+                                       env=env, args=self.argv,
                                        childFDs=childFDs)
         signal.signal(signal.SIGTERM, termHandler)
         # close our handles on the log files
@@ -323,22 +324,12 @@ class PlanExecutor:
         reactor.callLater(0, d.callback, None)
         return d
 
-def _classNameToFileName(c):
-    moduleName = c.__module__
-    relPath = sys.modules[moduleName].__file__
-    for path in sys.path:
-        absPath = os.path.join(path, relPath)
-        if os.access(absPath, os.R_OK):
-            return absPath
-    raise AssertionError('should not get here')
-
 class Plan:
     def __init__(self, testCase, testName):
         self.name = testName
         self.testCaseName = testCase.__class__.__name__
         self.processes = {}
-        testDir = os.path.dirname(_classNameToFileName(testCase))
-        self.outputDir = self._makeOutputDir(testDir)
+        self.outputDir = self._makeOutputDir(os.getcwd())
 
         # put your boots on monterey jacks, cause this gravy just made a
         # virtual machine whose instructions are python methods
@@ -347,19 +338,10 @@ class Plan:
         self.timeout = 20
 
     def _makeOutputDir(self, testDir):
-        while True:
-            try:
-                tail = '%s-%s-%d' % (self.testCaseName, self.name,
-                                     int(time.time()))
-                outputDir = os.path.join(testDir, tail)
-                os.mkdir(outputDir)
-                return outputDir
-            except OSError, e:
-                if e.errno == 17: # EEXISTS
-                    time.sleep(1)
-                    continue
-                else:
-                    raise
+        tail = '%s-%s' % (self.testCaseName, self.name)
+        outputDir = os.path.join(testDir, tail)
+        os.mkdir(outputDir)
+        return outputDir
 
     def _cleanOutputDir(self):
         for root, dirs, files in os.walk(self.outputDir, topdown=False):

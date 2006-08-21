@@ -1,3 +1,9 @@
+2006-08-21  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/twisted/integration.py (Plan.__init__): Attempt to
+	pass distcheck via using trial's temp dir for logging. Don't
+	bother appending the time, trial ensures we are in a pristine dir.
+
 2006-08-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:
