@@ -19,15 +19,12 @@
 
 # Headers in this file shall remain intact.
 
-
-import sys
 import os
 import signal
 
 from twisted.python import failure
 import twisted.copyright
 from twisted.internet import reactor, protocol, defer
-
 
 """
 Framework for writing automated integration tests.
@@ -86,7 +83,6 @@ successful completion of the test case, the log directory will be
 deleted.
 """
 
-
 # Twisted's reactor.iterate() is defined like this:
 #
 #     def iterate(self, delay=0):
@@ -108,7 +104,6 @@ deleted.
 # is the case with SIGCHLD. So we monkeypatch the reactor to always wake
 # the waker. This is twisted bug #1997.
 reactor.wakeUp = lambda: reactor.waker and reactor.waker.wakeUp()
-
 
 class UnexpectedExitCodeException(Exception):
     def __init__(self, process, expectedCode, actualCode):
