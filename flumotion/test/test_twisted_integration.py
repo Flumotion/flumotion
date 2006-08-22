@@ -37,21 +37,30 @@ def _call_in_reactor(proc):
         d.addCallback(lambda _: proc(self))
         reactor.callLater(0, d.callback, True)
         return d
-    test.__name__ = proc.__name__
+    try:
+        test.__name__ = proc.__name__
+    except Exception:
+        # can only set procedure names in python >= 2.4
+        pass
     return test
 
-class IntegrationProcessTest(unittest.TestCase):
-    def setUp(self):
-        self.tempdir = tempfile.mkdtemp()
+if type(unittest.TestCase) != type:
+    # FIXME: T1.3
+    def _deferred_result(proc):
+        def test(self):
+            d = proc(self)
+            return unittest.deferredResult(d)
+        try:
+            test.__name__ = proc.__name__
+        except Exception:
+            # can only set procedure names in python >= 2.4
+            pass
+        return test
+else:
+    _deferred_result = lambda proc: proc
+    
 
-    def tearDown(self):
-        for root, dirs, files in os.walk(self.tempdir, topdown=False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        os.rmdir(self.tempdir)
-
+class CompatTestCase(unittest.TestCase):
     if not getattr(unittest.TestCase, 'failUnlessFailure', None):
         # FIXME: T2.0
         def failUnlessFailure(self, d, type):
@@ -64,6 +73,18 @@ class IntegrationProcessTest(unittest.TestCase):
             d.addCallbacks(unexpected, errback)
             d.addErrback(unexpected)
 
+class IntegrationProcessTest(CompatTestCase):
+    def setUp(self):
+        self.tempdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        for root, dirs, files in os.walk(self.tempdir, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        os.rmdir(self.tempdir)
+
     def testTransientProcess(self):
         p = integration.Process('echo', ('echo', 'hello world'),
                                 self.tempdir)
@@ -72,6 +93,7 @@ class IntegrationProcessTest(unittest.TestCase):
         assert p.state != p.NOT_STARTED
         return p.wait(0)
     testTransientProcess = _call_in_reactor(testTransientProcess)
+    testTransientProcess = _deferred_result(testTransientProcess)
 
     def testTimeOut(self):
         p = integration.Process('cat', ('cat', '/dev/random'),
@@ -94,6 +116,7 @@ class IntegrationProcessTest(unittest.TestCase):
         self.failUnlessFailure(d, error.ProcessTerminated)
         return d
     testTimeOut = _call_in_reactor(testTimeOut)
+    testTimeOut = _deferred_result(testTimeOut)
         
     def testKill(self):
         p = integration.Process('cat', ('cat', '/dev/random'),
@@ -105,9 +128,10 @@ class IntegrationProcessTest(unittest.TestCase):
         d = p.wait(None)
         return d
     testKill = _call_in_reactor(testKill)
+    testKill = _deferred_result(testKill)
 
 
-class IntegrationPlanGenerationTest(unittest.TestCase):
+class IntegrationPlanGenerationTest(CompatTestCase):
     def assertPlansEqual(self, expected, got):
         if got != expected:
             # pretty-print first
@@ -141,18 +165,20 @@ class IntegrationPlanGenerationTest(unittest.TestCase):
                                          (plan.vm.wait, process, None)])
         plan._cleanOutputDir()
 
-class IntegrationPlanExecuteTest(unittest.TestCase):
+class IntegrationPlanExecuteTest(CompatTestCase):
     def testTransientProcess(self):
         plan = integration.Plan(self, 'testTransientProcess')
         process = plan.spawn('echo', 'hello world')
         plan.wait(process, 0)
         return plan.execute()
+    testTransientProcess = _deferred_result(testTransientProcess)
 
     def testKill(self):
         plan = integration.Plan(self, 'testKill')
         process = plan.spawn('cat', '/dev/random')
         plan.kill(process)
         return plan.execute()
+    testKill = _deferred_result(testKill)
 
     def testUnexpectedProcessExit(self):
         plan = integration.Plan(self, 'testUnexpectedProcessExit')
@@ -165,6 +191,7 @@ class IntegrationPlanExecuteTest(unittest.TestCase):
         self.failUnlessFailure(d, integration.UnexpectedExitException)
         d.addCallback(lambda _: plan._cleanOutputDir())
         return d
+    testUnexpectedProcessExit = _deferred_result(testUnexpectedProcessExit)
 
     def testUnexpectedExitCode(self):
         plan = integration.Plan(self, 'testUnexpectedExitCode')
@@ -175,6 +202,7 @@ class IntegrationPlanExecuteTest(unittest.TestCase):
         self.failUnlessFailure(d, integration.UnexpectedExitCodeException)
         d.addCallback(lambda _: plan._cleanOutputDir())
         return d
+    testUnexpectedExitCode = _deferred_result(testUnexpectedExitCode)
 
     def testProcessesStillRunning(self):
         plan = integration.Plan(self, 'testProcessesStillRunning')
@@ -183,8 +211,10 @@ class IntegrationPlanExecuteTest(unittest.TestCase):
         self.failUnlessFailure(d, integration.ProcessesStillRunningException)
         d.addCallback(lambda _: plan._cleanOutputDir())
         return d
+    testProcessesStillRunning = _deferred_result(testProcessesStillRunning)
 
-class IntegrationTestDecoratorTest(unittest.TestCase):
+# the decorator handles compat issues
+class IntegrationTestDecoratorTest(CompatTestCase):
     #@integration.test <- FIXME: P2.3
     def testTransientProcess(self, plan):
         p = plan.spawn('echo', 'foo')

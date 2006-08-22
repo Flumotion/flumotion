@@ -1,5 +1,28 @@
 2006-08-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/integration.py (ProcessProtocol.processEnded):
+	More debugging.
+	(PlanExecutor._checkProcesses): Debugging, and make sure we don't
+	callback a Failure -- that would put us down the errback side.
+	(test): Set timeout attr to None, so trial never times out on our
+	behalf.
+
+	* flumotion/test/test_twisted_integration.py (_call_in_reactor):
+	Be P2.3-friendly.
+	(_deferred_result): New decorator for deferred results, to handle
+	T1.3.
+	(CompatTestCase): New base class, makes sure failUnlessFailure is
+	there. Other test cases derive from this now.
+	(IntegrationProcessTest.testTransientProcess)
+	(IntegrationProcessTest.testTimeOut)
+	(IntegrationProcessTest.testKill)
+	(IntegrationPlanExecuteTest.testTransientProcess)
+	(IntegrationPlanExecuteTest.testKill)
+	(IntegrationPlanExecuteTest.testUnexpectedProcessExit)
+	(IntegrationPlanExecuteTest.testUnexpectedExitCode)
+	(IntegrationPlanExecuteTest.testProcessesStillRunning): Use the
+	_deferred_result decorator.
+
 	* flumotion/test/test_twisted_integration.py
 	(IntegrationProcessTest.failUnlessFailure): Fix my broken fallback
 	failUnlessFailure implementation.

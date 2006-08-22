@@ -176,11 +176,12 @@ class ProcessProtocol(protocol.ProcessProtocol):
         self.exitDeferred.errback(TimeoutException())
         
     def processEnded(self, status):
+        info('process ended with status %r, exit code %r', status, status.value.exitCode)
         if self.timedOut:
             warning('already timed out??')
             print 'already timed out quoi?'
         else:
-            info('process ended with status %r', status)
+            info('process ended with status %r, exit code %r', status, status.value.exitCode)
             self.exitDeferred.callback(status.value.exitCode)
 
 class Process:
@@ -306,6 +307,8 @@ class PlanExecutor:
 
     def _checkProcesses(self, failure=None):
         if self.processes:
+            warning('processes still running at end of test: %r',
+                    self.processes)
             e = ProcessesStillRunningException(self.processes)
             dlist = []
             # reap all processes, and once we have them reaped, errback
@@ -314,7 +317,9 @@ class PlanExecutor:
                     continue
                 d = defer.Deferred()
                 dlist.append(d)
-                p.protocol.processEnded = d.callback
+                def callbacker(d):
+                    return lambda status: d.callback(status.value.exitCode)
+                p.protocol.processEnded = callbacker(d)
                 p.kill(sig=signal.SIGKILL)
             d = defer.DeferredList(dlist)
             def error(_):
@@ -435,6 +440,7 @@ def test(proc):
         proc(self, plan)
         if twisted.copyright.version < '2.0':
             # FIXME T1.3
+            info('using deferredResult for old trial')
             from twisted.trial import unittest
             return unittest.deferredResult(plan.execute())
         else:
@@ -444,4 +450,6 @@ def test(proc):
     except Exception:
         # can only set procedure names in python >= 2.4
         pass
+    # trial should never time out on our behalf
+    wrappedtest.timeout = None
     return wrappedtest
