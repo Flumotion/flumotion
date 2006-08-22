@@ -1,3 +1,14 @@
+2006-08-22  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/command/utils.py (find_component): Find
+	components in the atmosphere as appropriate.
+
+	* flumotion/twisted/integration.py (_which): IMF structural
+	adjustment.
+	(log, debug, info, warning, error): New wrappers. Use em in a
+	bunch of places. This way you can run trial with
+	FLU_DEBUG=integration:5 and see what's going on.
+
 2006-08-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/boot.py.in:

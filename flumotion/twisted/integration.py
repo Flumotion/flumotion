@@ -25,6 +25,7 @@ import signal
 from twisted.python import failure
 import twisted.copyright
 from twisted.internet import reactor, protocol, defer
+from flumotion.common import log as flog
 
 """
 Framework for writing automated integration tests.
@@ -105,6 +106,27 @@ deleted.
 # the waker. This is twisted bug #1997.
 reactor.wakeUp = lambda: reactor.waker and reactor.waker.wakeUp()
 
+def log(format, *args):
+    flog.doLog(flog.LOG, None, 'integration', format, args, -2)
+def debug(format, *args):
+    flog.doLog(flog.DEBUG, None, 'integration', format, args, -2)
+def info(format, *args):
+    flog.doLog(flog.INFO, None, 'integration', format, args, -2)
+def warning(format, *args):
+    flog.doLog(flog.WARNING, None, 'integration', format, args, -2)
+def error(format, *args):
+    flog.doLog(flog.ERROR, None, 'integration', format, args, -2)
+
+def _which(executable):
+    if os.sep in executable:
+        if os.access(os.path.abspath(executable), os.X_OK):
+            return os.path.abspath(executable)
+    elif os.getenv('PATH'):
+        for path in os.getenv('PATH').split(os.pathsep):
+            if os.access(os.path.join(path, executable), os.X_OK):
+                return os.path.join(path, executable)
+    raise CommandNotFoundException(executable)
+
 class UnexpectedExitCodeException(Exception):
     def __init__(self, process, expectedCode, actualCode):
         Exception.__init__(self)
@@ -140,16 +162,6 @@ class ProcessesStillRunningException(Exception):
 class TimeoutException(Exception):
     pass
 
-def which(executable):
-    if os.sep in executable:
-        if os.access(os.path.abspath(executable), os.X_OK):
-            return os.path.abspath(executable)
-    elif os.getenv('PATH'):
-        for path in os.getenv('PATH').split(os.pathsep):
-            if os.access(os.path.join(path, executable), os.X_OK):
-                return os.path.join(path, executable)
-    raise CommandNotFoundException(executable)
-
 class ProcessProtocol(protocol.ProcessProtocol):
     def __init__(self):
         self.exitDeferred = defer.Deferred()
@@ -159,13 +171,16 @@ class ProcessProtocol(protocol.ProcessProtocol):
         return self.exitDeferred
 
     def timeout(self):
+        info('forcing timeout for process protocol %r', self)
         self.timedOut = True
         self.exitDeferred.errback(TimeoutException())
         
     def processEnded(self, status):
         if self.timedOut:
+            warning('already timed out??')
             print 'already timed out quoi?'
         else:
+            info('process ended with status %r', status)
             self.exitDeferred.callback(status.value.exitCode)
 
 class Process:
@@ -173,13 +188,15 @@ class Process:
 
     def __init__(self, name, argv, testDir):
         self.name = name
-        self.argv = (which(argv[0]),) + argv[1:]
+        self.argv = (_which(argv[0]),) + argv[1:]
         self.testDir = testDir
 
         self.pid = None
         self.protocol = None
         self.state = self.NOT_STARTED
         self._timeoutDC = None
+
+        log('created process object %r', self)
 
     def start(self):
         assert self.state == self.NOT_STARTED
@@ -202,6 +219,7 @@ class Process:
         # in the parent in which SIGTERM will cause immediate
         # termination instead of the twisted nice termination, but
         # that's better than the kid missing the signal.
+        info('spawning process %r, argv=%r', self, self.argv)
         termHandler = signal.signal(signal.SIGTERM, signal.SIG_DFL)
         env = dict(os.environ)
         env['FLU_DEBUG'] = '5'
@@ -221,23 +239,30 @@ class Process:
 
         def got_exit(res):
             self.state = self.STOPPED 
+            info('process %r has stopped', self)
             return res
         self.protocol.getDeferred().addCallback(got_exit)
 
     def kill(self, sig=signal.SIGTERM):
         assert self.state == self.STARTED
+        info('killing process %r, signal %d', self, sig)
         os.kill(self.pid, sig)
 
     def wait(self, status, timeout=20):
         assert self.state != self.NOT_STARTED
+        info('waiting for process %r to exit', self)
         d = self.protocol.getDeferred()
         def got_exit(res):
+            debug('process %r exited with status %d', self, res)
             if res != status:
+                warning('expected exit code %r for process %r, but got %r',
+                        status, self, res)
                 raise UnexpectedExitCodeException(self, status, res)
         d.addCallback(got_exit)
         if self.state == self.STARTED:
             self._timeoutDC = reactor.callLater(timeout, self.protocol.timeout)
             def cancel_timeout(res):
+                debug('cancelling timeout for %r', self)
                 if self._timeoutDC.active():
                     self._timeoutDC.cancel()
                 return res
