@@ -189,6 +189,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 'method': request.method,
                 'uri': request.uri,
                 'username': '-', # FIXME: put the httpauth name
+                'get-parameters': request.args,
                 'clientproto': request.clientproto,
                 'response': request.code,
                 'bytes-sent': bytes_sent,

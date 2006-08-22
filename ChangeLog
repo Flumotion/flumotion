@@ -1,5 +1,9 @@
 2006-08-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/consumers/httpstreamer/resources.py
+	(HTTPStreamingResource.logWrite): Log the already-parsed get
+	parameters as well.
+
 	* flumotion/twisted/integration.py (test): Sigh, it seems trial
 	2.4 requires a timeout.
 
