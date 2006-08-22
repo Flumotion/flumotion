@@ -61,8 +61,8 @@ class IntegrationProcessTest(unittest.TestCase):
                 raise AssertionError
             def errback(failure):
                 failure.trap(type)
-            d.addErrback(errback)
-            d.addCallbacks(unexpected, unexpected)
+            d.addCallbacks(unexpected, errback)
+            d.addErrback(unexpected)
 
     def testTransientProcess(self):
         p = integration.Process('echo', ('echo', 'hello world'),

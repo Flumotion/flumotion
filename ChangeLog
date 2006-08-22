@@ -1,5 +1,9 @@
 2006-08-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/test_twisted_integration.py
+	(IntegrationProcessTest.failUnlessFailure): Fix my broken fallback
+	failUnlessFailure implementation.
+
 	* flumotion/twisted/integration.py (Process.wait.got_exit): Status
 	can be None, change the format string.
 	(warning): For some reason, the level is WARN and not WARNING.
