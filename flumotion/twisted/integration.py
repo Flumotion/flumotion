@@ -113,7 +113,7 @@ def debug(format, *args):
 def info(format, *args):
     flog.doLog(flog.INFO, None, 'integration', format, args, -2)
 def warning(format, *args):
-    flog.doLog(flog.WARNING, None, 'integration', format, args, -2)
+    flog.doLog(flog.WARN, None, 'integration', format, args, -2)
 def error(format, *args):
     flog.doLog(flog.ERROR, None, 'integration', format, args, -2)
 

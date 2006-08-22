@@ -2,6 +2,8 @@
 
 	* flumotion/twisted/integration.py (Process.wait.got_exit): Status
 	can be None, change the format string.
+	(warning): For some reason, the level is WARN and not WARNING.
+	This is crazy.
 
 	* flumotion/admin/command/utils.py (find_component): Find
 	components in the atmosphere as appropriate.
