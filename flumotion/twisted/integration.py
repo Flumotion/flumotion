@@ -450,6 +450,7 @@ def test(proc):
     except Exception:
         # can only set procedure names in python >= 2.4
         pass
-    # trial should never time out on our behalf
-    wrappedtest.timeout = None
+    # trial seems to require a timeout, at least in twisted 2.4, so give
+    # it a nice one
+    wrappedtest.timeout = 666
     return wrappedtest
