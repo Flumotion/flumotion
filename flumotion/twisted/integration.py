@@ -253,7 +253,7 @@ class Process:
         info('waiting for process %r to exit', self)
         d = self.protocol.getDeferred()
         def got_exit(res):
-            debug('process %r exited with status %d', self, res)
+            debug('process %r exited with status %r', self, res)
             if res != status:
                 warning('expected exit code %r for process %r, but got %r',
                         status, self, res)

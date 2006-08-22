@@ -1,5 +1,8 @@
 2006-08-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/twisted/integration.py (Process.wait.got_exit): Status
+	can be None, change the format string.
+
 	* flumotion/admin/command/utils.py (find_component): Find
 	components in the atmosphere as appropriate.
 
