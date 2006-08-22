@@ -1,5 +1,13 @@
 2006-08-22  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/plugs/loggers.py
+	(_http_session_completed_to_apache_log): Assume that 'username' is
+	in the args, and comment on the role of ident.
+
+	* flumotion/component/consumers/httpstreamer/resources.py
+	(HTTPStreamingResource.logWrite): Add 'username' to args, with the
+	intention of filling it in properly later.
+
 	* flumotion/twisted/integration.py (ProcessProtocol.processEnded):
 	More debugging.
 	(PlanExecutor._checkProcesses): Debugging, and make sure we don't

@@ -36,12 +36,13 @@ class Logger(base.ComponentPlug):
             handler(args)
 
 def _http_session_completed_to_apache_log(args):
+    # ident is something that should in theory come from identd but in
+    # practice is never there
     ident = '-'
-    username = '-'
     date = time.strftime('%d/%b/%Y:%H:%M:%S +0000', args['time'])
 
     return ("%s %s %s [%s] \"%s %s %s\" %d %d %s \"%s\" %d\n"
-            % (args['ip'], ident, username, date,
+            % (args['ip'], ident, args['username'], date,
                args['method'], args['uri'], args['clientproto'],
                args['response'], args['bytes-sent'], args['referer'],
                args['user-agent'], args['time-connected']))
