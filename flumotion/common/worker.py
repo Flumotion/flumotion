@@ -172,6 +172,11 @@ class PortSet(log.Loggable):
 class ManagerWorkerHeavenState(flavors.StateCacheable):
     """
     I represent the state of the worker heaven on the manager.
+
+    I have the following keys:
+
+    - names   (list)
+    - workers (list): list of L{ManagerWorkerState}
     """
     def __init__(self):
         flavors.StateCacheable.__init__(self)
@@ -184,6 +189,7 @@ class ManagerWorkerHeavenState(flavors.StateCacheable):
 class AdminWorkerHeavenState(flavors.StateRemoteCache):
     """
     I represent the state of the worker heaven in the admin.
+    See L{ManagerWorkerHeavenState}
     """
     pass
 
@@ -192,6 +198,9 @@ pb.setUnjellyableForClass(ManagerWorkerHeavenState, AdminWorkerHeavenState)
 class ManagerWorkerState(flavors.StateCacheable):
     """
     I represent the state of a worker in the manager.
+
+    - name: name of the worker
+    - host: the IP address of the worker as seen by the manager
     """
     def __init__(self, **kwargs):
         flavors.StateCacheable.__init__(self)
@@ -207,6 +216,8 @@ class ManagerWorkerState(flavors.StateCacheable):
 class AdminWorkerState(flavors.StateRemoteCache):
     """
     I represent the state of a worker in the admin.
+
+    See L{ManagerWorkerState}
     """
     pass
 
