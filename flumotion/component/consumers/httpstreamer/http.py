@@ -433,14 +433,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint)
 
     def getStreamData(self):
-        m3ufile = "#EXTM3U\n" \
-                  "#EXTINF:-1:%s\n" \
-                  "%s" % (self.description, self.getUrl())
-
         return {
                 'protocol': 'HTTP',
-                'content-type': "audio/x-mpegurl",
-                'description' : m3ufile
+                'description': self.description,
+                'url' : self.getUrl()
             }
 
     def getLoadData(self):
