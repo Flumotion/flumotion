@@ -241,8 +241,8 @@ class FeedComponent(basecomponent.BaseComponent):
             self.state.append('messages', m)
         elif t == gst.MESSAGE_EOS:
             if src == self.pipeline:
-                self.info('End-of-stream in pipeline, stopping')
-                self.setMood(moods.sad)
+                self.info('End-of-stream in pipeline, going hungry')
+                self.setMood(moods.hungry)
                 self.cleanup()
         else:
             self.log('message received: %r' % message)

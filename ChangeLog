@@ -1,3 +1,9 @@
+2006-08-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Set mood of component to hungry instead of sad when receiving
+	an EOS.  The EOS is caused when it disconnects from it's feeder.
+
 2006-08-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/boot.py.in:
