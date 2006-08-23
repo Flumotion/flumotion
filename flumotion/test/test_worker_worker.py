@@ -33,11 +33,11 @@ def weHaveAnOldTwisted():
 
 class TestKid(unittest.TestCase):
     def testGetPid(self):
-        kid = worker.Kid(1092, "kid", "http", "module", "method", {},
+        kid = worker.Kid(1092, "kid", "http", "module", "method", 5,
             [('belgian', '/opt/ion/al'), ('american', '/ess/en/tial')])
         self.assertEquals(kid.avatarId, "kid")
         self.assertEquals(kid.type, "http")
-        self.assertEquals(kid.config, {})
+        self.assertEquals(kid.nice, 5)
         self.assertEquals(len(kid.bundles), 2)
 
         self.assertEquals(kid.pid, 1092)

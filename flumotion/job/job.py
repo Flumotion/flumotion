@@ -116,7 +116,7 @@ class JobMedium(medium.BaseMedium):
             self.log('... from path %s' % path)
             packager.registerPackagePath(path, name)
 
-    def remote_create(self, avatarId, type, moduleName, methodName, config):
+    def remote_create(self, avatarId, type, moduleName, methodName, nice=0):
         """
         I am called on by the worker's JobAvatar to create a component.
         
@@ -128,14 +128,14 @@ class JobMedium(medium.BaseMedium):
         @type  moduleName: str
         @param methodName: the factory method to use to create the component
         @type  methodName: str
-        @param config:     the configuration dictionary
-        @type  config:     dict
+        @param nice:       the nice level
+        @type  nice:       int
         """
         self.avatarId = avatarId
         self.logName = avatarId
 
         self.component = self._createComponent(avatarId, type, moduleName,
-            methodName, config)
+            methodName, nice)
 
     def remote_stop(self):
         # stop reactor from a callLater so this remote method finishes
@@ -190,8 +190,7 @@ class JobMedium(medium.BaseMedium):
             
         resource.setrlimit(resource.RLIMIT_CORE, (hard, hard))
         
-    # FIXME: we only use "nice" from config anymore
-    def _createComponent(self, avatarId, type, moduleName, methodName, config):
+    def _createComponent(self, avatarId, type, moduleName, methodName, nice=0):
         """
         Create a component of the given type.
         Log in to the manager with the given avatarId.
@@ -204,22 +203,16 @@ class JobMedium(medium.BaseMedium):
         @type  moduleName: str
         @param methodName: name of the factory method to create the component
         @type  methodName: str
-        @param config:     the configuration dictionary
-        @type  config:     dict
+        @param nice:       the nice level to run with
+        @type  nice:       int
         """
-        
-        self.debug('_createComponent(): config dictionary is: %r' % config)
-
         self.info('Creating component "%s" of type "%s"' % (avatarId, type))
         #self.info('setting up signals')
         #signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-        self._setNice(config.get('nice', 0))
+        self._setNice(nice)
         self._enableCoreDumps()
         
-        # FIXME: we put avatarId in the config for now
-        # but it'd be nicer to do this outside of config, so do this
-        config['avatarId'] = avatarId
         try:
             comp = createComponent(moduleName, methodName)
         except Exception, e:

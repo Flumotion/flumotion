@@ -153,9 +153,9 @@ class WorkerMedium(medium.PingingMedium):
         port = self.brain.feedServerPort
         return port
 
-    def remote_create(self, avatarId, type, moduleName, methodName, config):
+    def remote_create(self, avatarId, type, moduleName, methodName, nice=0):
         """
-        Start a component of the given type with the given config dict.
+        Start a component of the given type with the given nice level.
         Will spawn a new job process to run the component in.
 
         @param avatarId:   avatar identification string
@@ -166,8 +166,8 @@ class WorkerMedium(medium.PingingMedium):
         @type  moduleName: str
         @param methodName: the factory method to use to create the component
         @type  methodName: str
-        @param config:     a configuration dictionary for the component
-        @type  config:     dict
+        @param nice:       nice level
+        @type  nice:       int
 
         @returns: a deferred fired when the process has started and created
                   the component
@@ -199,7 +199,7 @@ class WorkerMedium(medium.PingingMedium):
 
         # spawn the job process
         self.brain.kindergarten.play(avatarId, type, moduleName, methodName,
-            config, bundles)
+            nice, bundles)
 
         yield d
 
@@ -265,20 +265,20 @@ class Kid:
     @type  moduleName: str
     @cvar  methodName: the factory method to use to create the component
     @type  methodName: str
-    @cvar  config:     a configuration dictionary for the component
-    @type  config:     dict
+    @cvar  nice:       the nice level to run the kid as
+    @type  nice:       int
     @cvar  bundles:    ordered list of (bundleName, bundlePath) needed to
                        create the component
     @type  bundles:    list of (str, str)
     """
-    def __init__(self, pid, avatarId, type, moduleName, methodName, config,
+    def __init__(self, pid, avatarId, type, moduleName, methodName, nice,
                  bundles):
         self.pid = pid 
         self.avatarId = avatarId
         self.type = type
         self.moduleName = moduleName
         self.methodName = methodName
-        self.config = config
+        self.nice = nice
         self.bundles = bundles
 
 class JobProcessProtocol(worker.ProcessProtocol):
@@ -337,11 +337,11 @@ class Kindergarten(log.Loggable):
         self._kids = {} # avatarId -> Kid
         self._socketPath = socketPath
         
-    def play(self, avatarId, type, moduleName, methodName, config, bundles):
+    def play(self, avatarId, type, moduleName, methodName, nice, bundles):
         """
         Create a kid and make it "play" by starting a job.
-        Starts a component with the given name, of the given type, and
-        the given config dictionary.
+        Starts a component with the given name, of the given type, with
+        the given nice level.
 
         This will spawn a new flumotion-job process.
 
@@ -353,8 +353,8 @@ class Kindergarten(log.Loggable):
         @type  moduleName: str
         @param methodName: the factory method to use to create the component
         @type  methodName: str
-        @param config:     a configuration dictionary for the component
-        @type  config:     dict
+        @param nice:       nice level
+        @type  nice:       int
         @param bundles:    ordered list of (bundleName, bundlePath) for this
                            component
         @type  bundles:    list of (str, str)
@@ -395,7 +395,7 @@ class Kindergarten(log.Loggable):
         p.setPid(process.pid)
 
         self._kids[avatarId] = \
-            Kid(process.pid, avatarId, type, moduleName, methodName, config,
+            Kid(process.pid, avatarId, type, moduleName, methodName, nice,
                 bundles)
 
     def getKid(self, avatarId):
@@ -734,13 +734,11 @@ class JobAvatar(pb.Avatar, log.Loggable):
         yield d
         d.value() # allow exceptions
 
-        # we got kid.config through WorkerMedium.remote_start from the manager
-        feedNames = kid.config.get('feed', [])
-        self.log('feedNames: %r' % feedNames)
-
-        self.debug('asking job to create component with config %r' % kid.config)
+        self.debug(
+            "asking job to create component with avatarId %s, type %s" % (
+                kid.avatarId, kid.type))
         d = self._mind.callRemote('create', kid.avatarId, kid.type,
-            kid.moduleName, kid.methodName, kid.config)
+            kid.moduleName, kid.methodName, kid.nice)
 
         yield d
         try:

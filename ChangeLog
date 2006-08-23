@@ -1,3 +1,15 @@
+2006-08-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/job/job.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/worker/worker.py:
+	  remote_create only needs the nice level, not the whole config
+	  Fixes a long-standing FIXME and allows me to tighten down the
+	  component protocol
+	* flumotion/test/test_worker_worker.py:
+	  fix test for removal of .config and adding of .nice
+
 2006-08-23  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/configure/configure.py: 

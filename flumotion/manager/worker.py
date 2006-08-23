@@ -100,22 +100,22 @@ class WorkerAvatar(base.ManagerAvatar):
         """
         self._portSet.releasePorts(ports)
 
-    def createComponent(self, avatarId, type, conf):
+    def createComponent(self, avatarId, type, nice):
         """
-        Create a component of the given type with the given config.
+        Create a component of the given type with the given nice level.
 
         @param avatarId: avatarId the component should use to log in
         @type  avatarId: str
         @param type:     type of the component to create
         @type  type:     str
-        @param conf:     a configuration dictionary for the component
-        @type  conf:     dict
+        @param nice:     the nice level to create the component at
+        @type  nice:     int
 
         @returns: a deferred that will give the avatarId the component
                   will use to log in to the manager
         """
-        self.debug('creating %s (%s) on worker %s with config %r' % (
-            avatarId, type, self.avatarId, conf))
+        self.debug('creating %s (%s) on worker %s with nice level %d' % (
+            avatarId, type, self.avatarId, nice))
         defs = registry.getRegistry().getComponent(type)
         try:
             entry = defs.getEntryByType('component')
@@ -130,7 +130,7 @@ class WorkerAvatar(base.ManagerAvatar):
 
         self.debug('call remote create')
         return self.mindCallRemote('create', avatarId, type, moduleName,
-            methodName, conf)
+            methodName, nice)
 
     ### IPerspective methods, called by the worker's component
     def perspective_componentAddMessage(self, avatarId, message):

@@ -667,8 +667,9 @@ class Vishnu(log.Loggable):
             componentState, type, conf):
 
         avatarId = conf['avatarId']
+        nice = conf.get('nice', 0)
 
-        d = workerAvatar.createComponent(avatarId, type, conf)
+        d = workerAvatar.createComponent(avatarId, type, nice)
         # FIXME: here we get the avatar Id of the component we wanted
         # started, so now attach it to the planetState's component state
         d.addCallback(self._createCallback, componentState)
