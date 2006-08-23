@@ -1,3 +1,10 @@
+2006-08-23  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/test/test_porter.py:
+	  Write tests for a private bug report.
+	  Ensure that we handle (i.e. ignore) GET parameters in the porter
+	  HTTP parser.
+
 2006-08-22  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/httpstreamer/resources.py

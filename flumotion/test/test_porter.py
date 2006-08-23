@@ -130,3 +130,36 @@ class TestHTTPPorterProtocol(unittest.TestCase):
         self.failUnless(self.p.foundDestination)
         self.failIf(self.t.written)
 
+class TestHTTPPorterProtocolParser(unittest.TestCase):
+    def setUp(self):
+        self.p = FakePorter()
+        self.pp = porter.HTTPPorterProtocol(self.p)
+
+    def testSimpleParse(self):
+        result = self.pp.parseLine('GET /test HTTP/1.0\r\n')
+        self.assertEquals(result, '/test')
+
+        result = self.pp.parseLine('GET /test HTTP/1.1\n')
+        self.assertEquals(result, '/test')
+
+        result = self.pp.parseLine('GET / HTTP/1.0\r\n')
+        self.assertEquals(result, '/')
+
+    def testParseWithHost(self):
+        result = self.pp.parseLine('GET http://some.server.somewhere/test HTTP/1.1\n')
+        self.assertEquals(result, '/test')
+
+        result = self.pp.parseLine('GET http://some.server.somewhere:1234/ HTTP/1.1\n')
+        self.assertEquals(result, '/')
+
+    def testParseWithParams(self):
+        result = self.pp.parseLine('GET http://some.server.somewhere:1234/test?arg1=val1&arg2=val2 HTTP/1.1\n')
+        self.assertEquals(result, '/test')
+
+        result = self.pp.parseLine('GET /test?arg1=val1&arg2=val2 HTTP/1.1\n')
+        self.assertEquals(result, '/test')
+
+        result = self.pp.parseLine('GET /?arg1=val1&arg2=val2 HTTP/1.1\n')
+        self.assertEquals(result, '/')
+    
+
