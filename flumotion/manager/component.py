@@ -85,10 +85,11 @@ class ComponentAvatar(base.ManagerAvatar):
         
     ### python methods
     def __repr__(self):
+        mood = '(unknown)'
         if self.componentState:
-            mood = moods.get(self.componentState.get('mood')).name
-        else:
-            mood = '(unknown)'
+            moodValue = self.componentState.get('mood')
+            if moodValue is not None:
+                mood = moods.get(moodValue).name
         return '<%s %s (mood %s)>' % (self.__class__.__name__,
                                       self.avatarId, mood)
 
