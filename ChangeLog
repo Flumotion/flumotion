@@ -1,3 +1,10 @@
+2006-08-23  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/configure/configure.py: 
+	* flumotion/configure/uninstalled.py.in (get): 
+	* flumotion/configure/installed.py.in (get): Add 'bindir' as a
+	conf variable.
+
 2006-08-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:

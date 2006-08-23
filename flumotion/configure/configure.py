@@ -49,6 +49,8 @@ and then access the variables from the configure module.  For example:
 @type registrydir:   string
 @var  rundir:        directory where the run/pid files are stored
 @type rundir:        string
+@var  bindir:        directory where the flumotion executables live
+@type bindir:        string
 @var  sbindir:       directory where the flumotion service program lives
 @type sbindir:       string
 
