@@ -116,12 +116,21 @@ def init_gst():
     from flumotion.configure import configure
     configure.gst_version = gst_version
 
-def boot(path, gtk=False):
+def boot(path, gtk=False, gst=True):
     from flumotion.twisted import compat
 
-    init_gobject()
-    init_gst()
+    if gtk or gst:
+        init_gobject()
+
+    if gst:
+        init_gst()
+
+    # installing the reactor could override our packager's import hooks ...
     compat.install_reactor(gtk)
+
+    # ... so we install them again here to be safe
+    from flumotion.common import package
+    package.getPackager().install()
 
     from flumotion.twisted import reflect
     from flumotion.common import errors

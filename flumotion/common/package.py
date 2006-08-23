@@ -72,13 +72,18 @@ class Packager(log.Loggable):
     def __init__(self):
         self._paths = {} # key -> package path registered with that key
         self._packages = {} # package name -> keys for that package
-        
+        self.install()
+
+    def install(self):
+        """
+        Install our custom importer that uses bundled packages.
+        """
+        self.debug('installing custom importer')
         self._hooks = PackageHooks()
         self._hooks.packager = self
         self._importer = ihooks.ModuleImporter()
         self._importer.set_hooks(self._hooks)
         self._importer.install()
-        self.debug('installing custom importer')
 
     def getPathsForPackage(self, packageName):
         """

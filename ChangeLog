@@ -1,3 +1,14 @@
+2006-08-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/boot.py.in:
+	  reinstall our packager's import hooks
+	  after installing the reactor
+	* flumotion/common/package.py:
+	  factor out a Packager.install() method so we can reinstall the
+	  import hooks
+	* flumotion/twisted/compat.py:
+	  add a note about the reactor overriding import hooks
+
 2006-08-23  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/twisted/integration.py (TimeoutException): Take some

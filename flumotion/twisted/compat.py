@@ -43,6 +43,7 @@ def install_reactor(gtk=False):
     else:
         from flumotion.twisted import gtk2reactor as Reactor
 
+    # FIXME: this overrides importhooks, but I haven't figured out why yet
     Reactor.install(useGtk=gtk)
 
     # this monkeypatched var exists to let reconnecting factories know
