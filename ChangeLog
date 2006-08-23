@@ -3,6 +3,8 @@
 	* flumotion/common/boot.py.in:
 	  reinstall our packager's import hooks
 	  after installing the reactor
+	  also, allow specifying whether we want gst as part of the boot
+	  process, so we can disable it for programs that don't need it
 	* flumotion/common/package.py:
 	  factor out a Packager.install() method so we can reinstall the
 	  import hooks
