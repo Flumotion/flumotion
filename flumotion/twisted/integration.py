@@ -160,7 +160,13 @@ class ProcessesStillRunningException(Exception):
                 % (self.processes,))
 
 class TimeoutException(Exception):
-    pass
+    def __init__(self, process, status):
+        self.process = process
+        self.status = status
+
+    def __str__(self):
+        return ('Timed out waiting for %r to exit with status %r'
+                % (self.process, self.status))
 
 class ProcessProtocol(protocol.ProcessProtocol):
     def __init__(self):
@@ -170,10 +176,10 @@ class ProcessProtocol(protocol.ProcessProtocol):
     def getDeferred(self):
         return self.exitDeferred
 
-    def timeout(self):
+    def timeout(self, process, status):
         info('forcing timeout for process protocol %r', self)
         self.timedOut = True
-        self.exitDeferred.errback(TimeoutException())
+        self.exitDeferred.errback(TimeoutException(process, status))
         
     def processEnded(self, status):
         info('process ended with status %r, exit code %r', status, status.value.exitCode)
@@ -261,7 +267,10 @@ class Process:
                 raise UnexpectedExitCodeException(self, status, res)
         d.addCallback(got_exit)
         if self.state == self.STARTED:
-            self._timeoutDC = reactor.callLater(timeout, self.protocol.timeout)
+            self._timeoutDC = reactor.callLater(timeout,
+                                                self.protocol.timeout,
+                                                self,
+                                                status)
             def cancel_timeout(res):
                 debug('cancelling timeout for %r', self)
                 if self._timeoutDC.active():

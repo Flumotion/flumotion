@@ -1,3 +1,15 @@
+2006-08-23  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/twisted/integration.py (TimeoutException): Take some
+	args so our __str__ can be more useful.
+	(ProcessProtocol.timeout, Process.wait): Pass around more context
+	so we can annotate our errors better.
+
+	* flumotion/configure/configure.py: 
+	* flumotion/configure/uninstalled.py.in (get): 
+	* flumotion/configure/installed.py.in (get): Add 'bindir' as a
+	conf variable.
+
 2006-08-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/job/job.py:
@@ -9,13 +21,6 @@
 	  component protocol
 	* flumotion/test/test_worker_worker.py:
 	  fix test for removal of .config and adding of .nice
-
-2006-08-23  Andy Wingo  <wingo@pobox.com>
-
-	* flumotion/configure/configure.py: 
-	* flumotion/configure/uninstalled.py.in (get): 
-	* flumotion/configure/installed.py.in (get): Add 'bindir' as a
-	conf variable.
 
 2006-08-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
