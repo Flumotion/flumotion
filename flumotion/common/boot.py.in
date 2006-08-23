@@ -117,6 +117,7 @@ def init_gst():
     configure.gst_version = gst_version
 
 def boot(path, gtk=False, gst=True):
+    from flumotion.twisted import compat
     if gtk or gst:
         init_gobject()
 
