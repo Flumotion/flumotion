@@ -111,7 +111,7 @@ class CryptChecker(log.Loggable):
                 self.users[credentials.username]).addCallback(
                 self._cbCryptPasswordMatch, credentials.username)
         else:
-            self.debug('user %s refused, not in database' %
+            self.debug("user '%s' refused, not in storage backend" %
                 credentials.username)
             return defer.fail(error.UnauthorizedLogin())
 

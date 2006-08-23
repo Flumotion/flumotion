@@ -45,7 +45,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
 
     def __init__(self):
         self.bouncerName = None         # set by requester,decides which bouncer
-        self.requesterId = None       # who is requesting auth ?
+        self.requesterId = None         # who is requesting auth ?
         self.avatarId = None            # avatarId prefered by requester
         self.id = None                  # set by bouncer when authenticated
         self.duration = 0               # means unlimited
@@ -75,7 +75,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         }
         
     def __repr__(self):
-        return "<%s for %r in state %s>" % (self.__class__.__name__,
+        return "<%s for requesterId %r in state %s>" % (self.__class__.__name__,
             self.requesterId, _statesEnum[self.state])
 
 # class KeycardUACCP: username, address, crypt password
@@ -98,6 +98,11 @@ class KeycardUACPP(Keycard, UCPP):
         d['username'] = self.username
         d['address'] = self.address
         return d
+
+    def __repr__(self):
+        return "<%s %s@%s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.username, self.address,
+            self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardUACPP, KeycardUACPP)
 
@@ -122,6 +127,11 @@ class KeycardUACPCC(Keycard, UCPCC):
         d['address'] = self.address
         return d
 
+    def __repr__(self):
+        return "<%s %s@%s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.username, self.address,
+            self.requesterId, _statesEnum[self.state])
+
 pb.setUnjellyableForClass(KeycardUACPCC, KeycardUACPCC)
 
 class KeycardToken(Keycard, credentials.Token):
@@ -141,6 +151,11 @@ class KeycardToken(Keycard, credentials.Token):
         d['token'] = self.token
         d['address'] = self.address
         return d
+
+    def __repr__(self):
+        return "<%s token %s @%s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.token, self.address,
+            self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardToken, KeycardToken)
 
@@ -162,6 +177,9 @@ class KeycardUASPCC(Keycard, USPCC):
         d['address'] = self.address
         return d
 
+    def __repr__(self):
+        return "<%s %s@%s for requesterId %r in state %s>" % (
+            self.__class__.__name__, self.username, self.address,
+            self.requesterId, _statesEnum[self.state])
+
 pb.setUnjellyableForClass(KeycardUASPCC, KeycardUASPCC)
-
-
