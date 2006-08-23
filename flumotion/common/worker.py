@@ -175,7 +175,7 @@ class ManagerWorkerHeavenState(flavors.StateCacheable):
 
     I have the following keys:
 
-    - names   (list)
+    - names   (list): list of worker names that we have state for
     - workers (list): list of L{ManagerWorkerState}
     """
     def __init__(self):
