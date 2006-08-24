@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-import common
+from common import deferred_result
 
 from twisted.trial import unittest
 
@@ -361,32 +361,39 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         self._components = {} # id -> avatar
 
     # helper functions
+    def _requestAvatar(self, avatarId, mind, iface, avatarDict):
+        d = self.vishnu.dispatcher.requestAvatar(avatarId, None,
+            mind, pb.IPerspective, iface)
+
+        def got_result(tup):
+            avatar = tup[1]
+
+            # hack for cleanup
+            avatar._tuple = tup
+            avatar._mind = mind
+            avatar._avatarId = avatarId
+
+            # trigger attached
+            # twisted 2.2.0 TestCase does not have a runReactor method
+            # and according to twisted changeset 15556 it was always
+            # deprecated
+            from twisted.internet import reactor
+            reactor.iterate()
+            avatarDict[avatarId] = avatar
+            return avatar
+        d.addCallback(got_result)
+        return d
+        
     def _loginWorker(self, avatarId):
         # create a worker and log it in
         # return the avatar
 
         # log in a worker
-        mind = FakeWorkerMind(self, avatarId)
-
-        tuple = self.vishnu.dispatcher.requestAvatar(avatarId, None,
-            mind, pb.IPerspective, interfaces.IWorkerMedium)
-
-        avatar = tuple[1]
-
-        # hack for cleanup
-        avatar._tuple = tuple
-        avatar._mind = mind
-        avatar._avatarId = avatarId
-
-        # trigger attached
-        # twisted 2.2.0 TestCase does not have a runReactor method
-        # and according to twisted changeset 15556 it was always
-        # deprecated
-        from twisted.internet import reactor
-        reactor.iterate()
-        self._workers[avatarId] = avatar
-        return avatar
-
+        return self._requestAvatar(avatarId,
+                                   FakeWorkerMind(self, avatarId), 
+                                   interfaces.IWorkerMedium,
+                                   self._workers)
+        
     def _loginComponent(self, workerName, avatarId, type, moduleName,
         methodName, config):
         # create a component and log it in
@@ -394,26 +401,9 @@ class TestVishnu(log.Loggable, unittest.TestCase):
 
         mind = FakeComponentMind(self, workerName, avatarId, type,
             moduleName, methodName, config)
-
-        tuple = self.vishnu.dispatcher.requestAvatar(avatarId, None,
-            mind, pb.IPerspective, interfaces.IComponentMedium)
-
-        avatar = tuple[1]
-
-        # hack for cleanup
-        avatar._tuple = tuple
-        avatar._mind = mind
-        avatar._avatarId = avatarId
-
-        # trigger attached
-        # twisted 2.2.0 TestCase does not have a runReactor method
-        # and according to twisted changeset 15556 it was always
-        # deprecated
-        from twisted.internet import reactor
-        reactor.iterate()
-    
-        self._components[avatarId] = avatar
-        return avatar
+        return self._requestAvatar(avatarId, mind,
+                                   interfaces.IComponentMedium,
+                                   self._components)
 
     def _logoutAvatar(self, avatar):
         # log out avatar
@@ -422,7 +412,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         mind = avatar._mind
         avatarId = avatar._avatarId
 
-        logout(avatar, mind, avatarId)
+        logout(avatarId, avatar, mind)
         
         # trigger detached
         # twisted 2.2.0 TestCase does not have a runReactor method
@@ -435,18 +425,22 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         names = self.vishnu.workerHeaven.state.get('names')
         self.failUnlessEqual(len(names), 0)
 
-        avatar = self._loginWorker('worker')
+        def got_avatar(avatar):
+            # check
+            names = self.vishnu.workerHeaven.state.get('names')
+            self.failUnlessEqual(len(names), 1)
+            self.failUnless('worker' in names)
 
-        # check
-        names = self.vishnu.workerHeaven.state.get('names')
-        self.failUnlessEqual(len(names), 1)
-        self.failUnless('worker' in names)
+            self._logoutAvatar(avatar)
 
-        self._logoutAvatar(avatar)
+            # check
+            names = self.vishnu.workerHeaven.state.get('names')
+            self.failUnlessEqual(len(names), 0)
 
-        # check
-        names = self.vishnu.workerHeaven.state.get('names')
-        self.failUnlessEqual(len(names), 0)
+        d = self._loginWorker('worker')
+        d.addCallback(got_avatar)
+        return d
+    testWorker = deferred_result(testWorker)
 
     def testLoadConfiguration(self):
         __thisdir = os.path.dirname(os.path.abspath(__file__))
@@ -494,115 +488,120 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         __thisdir = os.path.dirname(os.path.abspath(__file__))
         file = os.path.join(__thisdir, 'test.xml')
         
-        self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
+        def confLoaded(_):
+            # verify component mapper
+            # 3 component states + avatarId's gotten from the config
+            self.assertEqual(len(mappers.keys()), 6)
 
-        # verify component mapper
-        # 3 component states + avatarId's gotten from the config
-        self.assertEqual(len(mappers.keys()), 6)
+            # verify depgraph
+            id = '/testflow/producer-video-test'
+            state = mappers[id].state
+            assert state, state
+            dag = self.vishnu._depgraph._dag
+            o = dag.getOffspringTyped(state, "COMPONENTSTART")
+            names = [s.get('name') for s,t in o]
+            self.failIf('producer-video-test' in names)
+            self.failUnless('converter-ogg-theora' in names)
+            self.failUnless('streamer-ogg-theora' in names)
 
-        # verify depgraph
-        id = '/testflow/producer-video-test'
-        state = mappers[id].state
-        assert state, state
-        dag = self.vishnu._depgraph._dag
-        o = dag.getOffspringTyped(state, "COMPONENTSTART")
-        names = [s.get('name') for s,t in o]
-        self.failIf('producer-video-test' in names)
-        self.failUnless('converter-ogg-theora' in names)
-        self.failUnless('streamer-ogg-theora' in names)
+            # verify that nothing should be started
+            start = self.vishnu._depgraph.whatShouldBeStarted()
+            # should be nothing because we have no worker
+            assert start == []
+            
+            # log in a worker and verify components get started
+            return self._loginWorker('worker')
 
-        # verify that nothing should be started
-        start = self.vishnu._depgraph.whatShouldBeStarted()
-        # should be nothing because we have no worker
-        assert start == []
+        def gotWorker(workerAvatar):
+            d = self._verifyConfigAndOneWorker()
+            d.addCallback(lambda _: workerAvatar)
+            return d
         
-        # log in a worker and verify components get started
-        avatar = workerAvatar = self._loginWorker('worker')
+        def confChecked(workerAvatar):
+            # log out the producer and verify the mapper
+            id = '/testflow/producer-video-test'
+            avatar = self._components[id]
+            m = mappers[avatar]
 
-        self._verifyConfigAndOneWorker()
+            self._logoutAvatar(avatar)
 
-        # log out the producer and verify the mapper
-        id = '/testflow/producer-video-test'
-        avatar = self._components[id]
-        m = mappers[avatar]
+            #import pprint
+            #pprint.pprint(mappers.keys())
+            self.assertEqual(len(mappers.keys()), 8)
 
-        self._logoutAvatar(avatar)
+            # We logged it out without it doing a clean shutdown, so it should now
+            # be lost.
+            self._verifyComponentIdGone(id, moods.lost)
 
-        #import pprint
-        #pprint.pprint(mappers.keys())
-        self.assertEqual(len(mappers.keys()), 8)
+            # log out the converter and verify
+            id = '/testflow/converter-ogg-theora'
+            m = mappers[id]
+            avatar = self._components[id]
+            # Pretend this one is a clean, requested shutdown.
+            avatar._shutdown_requested = True
+            self._logoutAvatar(avatar)
 
-        # We logged it out without it doing a clean shutdown, so it should now
-        # be lost.
-        self._verifyComponentIdGone(id, moods.lost)
+            # We requested shutdown, so this should now be sleeping.
+            self._verifyComponentIdGone(id, moods.sleeping)
 
-        # log out the converter and verify
-        id = '/testflow/converter-ogg-theora'
-        m = mappers[id]
-        avatar = self._components[id]
-        # Pretend this one is a clean, requested shutdown.
-        avatar._shutdown_requested = True
-        self._logoutAvatar(avatar)
+            self._verifyConfigAndNoWorker()
 
-        # We requested shutdown, so this should now be sleeping.
-        self._verifyComponentIdGone(id, moods.sleeping)
+            # Now log out the worker.
+            self._logoutAvatar(workerAvatar)
 
-        self._verifyConfigAndNoWorker()
-
-        # Now log out the worker.
-        self._logoutAvatar(workerAvatar)
-
+        d = self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
+        d.addCallback(confLoaded)
+        d.addCallback(gotWorker)
+        d.addCallback(confChecked)
+        return d
+    testConfigBeforeWorker = deferred_result(testConfigBeforeWorker)
 
     def testConfigAfterWorker(self):
         # test a config with three components being loaded after the worker
         # logs in
-        mappers = self.vishnu._componentMappers
-
-        __thisdir = os.path.dirname(os.path.abspath(__file__))
-        file = os.path.join(__thisdir, 'test.xml')
-
-        # log in worker
-        workerAvatar = avatar = self._loginWorker('worker')
-        self.failUnlessEqual(len(self._workers), 1)
-        self.failUnlessEqual(len(self._components), 0)
+        def loadConfigAndOneWorker(workerAvatar):
+            self.failUnlessEqual(len(self._workers), 1)
+            self.failUnlessEqual(len(self._components), 0)
+            
+            # load configuration
+            d = self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
+            d.addCallback(lambda _: self._verifyConfigAndOneWorker())
+            d.addCallback(lambda _: workerAvatar)
+            return d
         
-        # load configuration
-        self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
+        def logoutComponent(workerAvatar):
+            # log out the producer and verify the mapper
+            id = '/testflow/producer-video-test'
+            avatar = self._components[id]
+            m = mappers[avatar]
 
-        self._verifyConfigAndOneWorker()
-        
-        # log out the producer and verify the mapper
-        id = '/testflow/producer-video-test'
-        avatar = self._components[id]
-        m = mappers[avatar]
+            self._logoutAvatar(avatar)
 
-        self._logoutAvatar(avatar)
+            #import pprint
+            #pprint.pprint(mappers.keys())
+            self.assertEqual(len(mappers.keys()), 8)
 
-        #import pprint
-        #pprint.pprint(mappers.keys())
-        self.assertEqual(len(mappers.keys()), 8)
+            # We logged it out without it doing a clean shutdown, so it should now
+            # be lost.
+            self._verifyComponentIdGone(id, moods.lost)
+            
+            # log out the converter and verify
+            id = '/testflow/converter-ogg-theora'
+            m = mappers[id]
+            avatar = self._components[id]
+            # Pretend this one is a clean, requested shutdown.
+            avatar._shutdown_requested = True
+            self._logoutAvatar(avatar)
 
-        # We logged it out without it doing a clean shutdown, so it should now
-        # be lost.
-        self._verifyComponentIdGone(id, moods.lost)
-        
-        # log out the converter and verify
-        id = '/testflow/converter-ogg-theora'
-        m = mappers[id]
-        avatar = self._components[id]
-        # Pretend this one is a clean, requested shutdown.
-        avatar._shutdown_requested = True
-        self._logoutAvatar(avatar)
+            self._verifyComponentIdGone(id, moods.sleeping)
 
-        self._verifyComponentIdGone(id, moods.sleeping)
+            self._verifyConfigAndNoWorker()
 
-        self._verifyConfigAndNoWorker()
+            # Now log out the worker.
+            self._logoutAvatar(workerAvatar)
 
-        # Now log out the worker.
-        self._logoutAvatar(workerAvatar)
-
-        # clear out the complete planet
-        d = self.vishnu.emptyPlanet()
+        def emptyPlanet(_):
+            return self.vishnu.emptyPlanet()
 
         def removeWorkersAndCheckDAG(result):
             # make sure the depgraph is empty
@@ -613,17 +612,20 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             self.vishnu._depgraph.removeWorker("worker")
 
             self.assertEqual(self.vishnu._depgraph._dag._nodes,{})
-
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
+        def verifyMappersIsZero(result):
             self.assertEqual(len(mappers.keys()), 0)
-            removeWorkersAndCheckDAG(None)
-        else:
-            def verifyMappersIsZero(result):
-                self.assertEqual(len(mappers.keys()), 0)
-            d.addCallback(removeWorkersAndCheckDAG)
-            d.addCallback(verifyMappersIsZero)
-            return d
+
+        mappers = self.vishnu._componentMappers
+        __thisdir = os.path.dirname(os.path.abspath(__file__))
+        file = os.path.join(__thisdir, 'test.xml')
+        d = self._loginWorker('worker')
+        d.addCallback(loadConfigAndOneWorker)
+        d.addCallback(logoutComponent)
+        d.addCallback(emptyPlanet)
+        d.addCallback(removeWorkersAndCheckDAG)
+        d.addCallback(verifyMappersIsZero)
+        return d
+    testConfigAfterWorker = deferred_result(testConfigAfterWorker)
 
     def _verifyConfigAndOneWorker(self):
         self.debug('verifying after having loaded config and started worker')
@@ -661,23 +663,16 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         l = MyListener()
         state.addListener(l)
         d = l.notifyOnSet(state, 'mood', moods.happy.value)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
+
+        def verifyMoodIsHappy(result):
             self.assertEqual(state.get('mood'), moods.happy.value,
-                "mood of %s is not happy but %r" % (
-                    m.state.get('name'), moods.get(state.get('mood'))))
+                             "mood of %s is not happy but %r" % (
+                m.state.get('name'), moods.get(state.get('mood'))))
             # verify the component avatars
             self.failUnless(avatar.jobState)
             self.failUnless(avatar.componentState)
-        else:
-            def verifyMoodIsHappy(result):
-                self.assertEqual(state.get('mood'), moods.happy.value,
-                    "mood of %s is not happy but %r" % (
-                        m.state.get('name'), moods.get(state.get('mood'))))
-                # verify the component avatars
-                self.failUnless(avatar.jobState)
-                self.failUnless(avatar.componentState)
-            d.addCallback(verifyMoodIsHappy)
+        d.addCallback(verifyMoodIsHappy)
+        return d
         
     def _verifyConfigAndNoWorker(self):
         mappers = self.vishnu._componentMappers

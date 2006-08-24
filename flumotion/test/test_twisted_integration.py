@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 
+import common
 import os
 import signal
 import tempfile
@@ -44,20 +45,7 @@ def _call_in_reactor(proc):
         pass
     return test
 
-if type(unittest.TestCase) != type:
-    # FIXME: T1.3
-    def _deferred_result(proc):
-        def test(self):
-            d = proc(self)
-            return unittest.deferredResult(d)
-        try:
-            test.__name__ = proc.__name__
-        except Exception:
-            # can only set procedure names in python >= 2.4
-            pass
-        return test
-else:
-    _deferred_result = lambda proc: proc
+_deferred_result = common.deferred_result
     
 
 class CompatTestCase(unittest.TestCase):

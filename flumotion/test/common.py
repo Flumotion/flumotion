@@ -42,3 +42,18 @@ if i > -1:
     fdpass.__path__.append(os.path.join(top_builddir, 'flumotion', 'extern',
         'fdpass'))
 
+import unittest
+if type(unittest.TestCase) != type:
+    # FIXME: T1.3
+    def deferred_result(proc):
+        def test(self):
+            d = proc(self)
+            return unittest.deferredResult(d)
+        try:
+            test.__name__ = proc.__name__
+        except Exception:
+            # can only set procedure names in python >= 2.4
+            pass
+        return test
+else:
+    deferred_result = lambda proc: proc

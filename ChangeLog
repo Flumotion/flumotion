@@ -1,3 +1,29 @@
+2006-08-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py
+	(Dispatcher.createAvatarFor.got_identity): Fix indentation error.
+	(Vishnu.computeIdentity): Always return a deferred.
+
+	* flumotion/test/test_twisted_integration.py (_deferred_result):
+	Pull from common.py.
+
+	* flumotion/test/test_manager_manager.py
+	(TestVishnu._requestAvatar): New helper method.
+	(TestVishnu._loginWorker, TestVishnu._loginComponent): Use
+	_requestAvatar, return a deferred now.
+	(TestVishnu._logoutAvatar): Rearrange arg order to correspond to
+	manager.py.
+	(TestVishnu.testConfigBeforeWorker): 
+	(TestVishnu.testConfigAfterWorker)
+	(TestVishnu._verifyConfigAndOneWorker): 
+	(TestVishnu.testWorker): Adapt to deferred avatars.
+
+	* flumotion/test/common.py (deferred_result): New function, a
+	decorator for tests that return deferreds that will make T1.3
+	happy.
+	(deferred_result): Decorator to handle old twisted deferred
+	returns.
+
 2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/component.py:

@@ -99,6 +99,10 @@ class Dispatcher(log.Loggable):
     # which in our case is a component or an admin client.
     def requestAvatar(self, avatarId, keycard, mind, *ifaces):
         def got_avatar(avatar):
+            # OK so this is byzantine, but test_manager_manager actually
+            # uses these kwargs to set its own info. so don't change
+            # these args or their order or you will break your test
+            # suite.
             def cleanup(avatarId=avatarId, avatar=avatar, mind=mind):
                 self.removeAvatar(avatarId, avatar, mind)
             # schedule a perspective attached for after this function
@@ -154,8 +158,8 @@ class Dispatcher(log.Loggable):
                     avatar = heaven.createAvatar(avatarId, identity)
                     self._avatarHeavens[avatarId] = heaven
                     return avatar
-                raise errors.NoPerspectiveError("%s requesting iface %r"
-                                                % (avatarId, repr(ifaces)))
+            raise errors.NoPerspectiveError("%s requesting iface %r",
+                                            avatarId, ifaces)
             
 
         if not pb.IPerspective in ifaces:
@@ -294,7 +298,8 @@ class Vishnu(log.Loggable):
         @param host: the ip of the remote host
         @type  host: str
 
-        @rtype: L{flumotion.common.identity.RemoteIdentity}
+        @rtype: a deferred that will fire a
+        L{flumotion.common.identity.RemoteIdentity}
         """
 
         socket = 'flumotion.component.plugs.identity.IdentityProvider'
@@ -304,7 +309,7 @@ class Vishnu(log.Loggable):
                 if identity:
                     return identity
         username = getattr(keycard, 'username', None)
-        return RemoteIdentity(username, host)
+        return defer.succeed(RemoteIdentity(username, host))
 
     def _makeBouncer(self, conf, remoteIdentity):
         # returns a deferred, always
