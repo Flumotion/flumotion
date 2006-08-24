@@ -21,6 +21,8 @@
 
 from twisted.trial import unittest
 
+import common
+
 from flumotion.common import bundle
 import tempfile
 import os

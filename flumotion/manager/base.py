@@ -121,7 +121,7 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         def callback(result):
             format, debugArgs = log.getFormatArgs(
                 '%s <-- %s: callRemote(%s', startArgs,
-                '): %r', (result, ), args, kwargs)
+                '): %r', (log.ellipsize(result), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
             return result
 

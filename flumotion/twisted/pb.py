@@ -543,7 +543,7 @@ class Referenceable(pb.Referenceable, flog.Loggable):
             def callback(result):
                 format, debugArgs = flog.getFormatArgs(
                     '%s <-- %s: remote_%s(', startArgs,
-                    '): %r', (result, ), args, kwargs)
+                    '): %r', (flog.ellipsize(result), ), args, kwargs)
                 self.doLog(level, -1, format, *debugArgs, **logKwArgs)
                 return result
             def errback(failure):
@@ -558,7 +558,7 @@ class Referenceable(pb.Referenceable, flog.Loggable):
         else:
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: remote_%s(', startArgs,
-                '): %r', (state, ), args, kwargs)
+                '): %r', (flog.ellipsize(state), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
 
         return broker.serialize(state, self.perspective)
@@ -603,7 +603,7 @@ class Avatar(pb.Avatar, flog.Loggable):
             def callback(result):
                 format, debugArgs = flog.getFormatArgs(
                     '%s <-- %s: perspective_%s(', startArgs,
-                    '): %r', (result, ), args, kwargs)
+                    '): %r', (flog.ellipsize(result), ), args, kwargs)
                 self.doLog(level, -1, format, *debugArgs, **logKwArgs)
                 return result
             def errback(failure):
@@ -618,7 +618,7 @@ class Avatar(pb.Avatar, flog.Loggable):
         else:
             format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: perspective_%s(', startArgs,
-                '): %r', (state, ), args, kwargs)
+                '): %r', (flog.ellipsize(state), ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)
 
         return broker.serialize(state, self, method, args, kwargs)

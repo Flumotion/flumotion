@@ -340,7 +340,6 @@ class AdminAvatar(base.ManagerAvatar):
         Load the given XML configuration into the manager.
         @type  xml: str
         """
-        self.info('loadConfiguration ...')
         f = StringIO(xml)
         res = self.vishnu.loadConfigurationXML(f, self.remoteIdentity)
         f.close()

@@ -177,13 +177,26 @@ def getFileLine(where=-1):
 
     return scrubFilename(co.co_filename), lineno
 
+def ellipsize(o):
+    """
+    Ellipsize the representation of the given object.
+    """
+    r = repr(o)
+    if len(r) < 800:
+        return r
+
+    r = r[:60] + ' ... ' + r[-15:]
+    return r
+ 
 def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
     """
     Helper function to create a format and args to use for logging.
     This avoids needlessly interpolating variables.
     """
     debugArgs = startArgs[:]
-    debugArgs.extend(list(args))
+    for a in args:
+        debugArgs.append(ellipsize(a))
+
     for items in kwargs.items():
         debugArgs.extend(items)
     debugArgs.extend(endArgs)

@@ -1,5 +1,17 @@
 2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/log.py:
+	  add ellipsize function for long (+8 lines) strings
+	* flumotion/common/medium.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/base.py:
+	* flumotion/twisted/pb.py:
+	  use it.  This makes sure we don't see complete .pyc files in our logs
+	* flumotion/test/test_bundle.py:
+	  allow for logging
+
+2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/manager.py:
 	  actually set moodPending, to make sure we don't start a component
 	  more than once.  This fits with all the code that checks moodPending.
