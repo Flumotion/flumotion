@@ -1,3 +1,10 @@
+2006-08-24  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  Add a hack to figure out the name of a component that hasn't been
+	  set up (because it never logged in) when printing out a login
+	  failure message.
+
 2006-08-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py (Dispatcher.createAvatarFor):

@@ -255,6 +255,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def init(self):
         reactor.debug = True
+        self.debug("HTTP streamer initialising")
 
         self.caps = None
         self.resource = None
