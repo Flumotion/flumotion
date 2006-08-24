@@ -1,3 +1,8 @@
+2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/component.py:
+	  error()'s prototype has changed at some point, so fix our override
+
 2006-08-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py

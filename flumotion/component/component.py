@@ -70,7 +70,11 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
         self.logName = component.name
         
     # override log.Loggable method so we don't traceback
-    def error(self, message):
+    def error(self, format, *args):
+        if args:
+            message = format % args
+        else:
+            message = format
         self.warning('Shutting down because of %s' % message)
         print >> sys.stderr, 'ERROR: [%d] %s' % (os.getpid(), message)
         # FIXME: do we need to make sure that this cannot shut down the
