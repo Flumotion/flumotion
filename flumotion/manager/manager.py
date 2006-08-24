@@ -106,10 +106,10 @@ class Dispatcher(log.Loggable):
             # blindly so cleanup can be guaranteed
             reactor.callLater(0, avatar.attached, mind)
             return (pb.IPerspective, avatar, cleanup)
-        def got_error(res):
+        def got_error(failure):
             failure.trap(errors.AlreadyConnectedError)
             self.info("component with id %s already logged in" % (avatarId))
-            return res
+            return failure
 
         host = common.addressGetHost(mind.broker.transport.getPeer())
         d = self.createAvatarFor(avatarId, keycard, host, ifaces)
