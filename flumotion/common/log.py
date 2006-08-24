@@ -639,9 +639,8 @@ def getExceptionMessage(exception, frame=-1, filename=None):
     msg = ""
     # a shortcut to extract a useful message out of most flumotion errors
     # for now
-    if len(exception.args) == 1 and exception.args[0] and \
-            isinstance(exception.args[0], str):
-        msg = ": %s" % exception.args[0]
+    if str(exception):
+        msg = ": %s" % str(exception)
     return "exception %(exc)s at %(filename)s:%(line)s: %(func)s()%(msg)s" % locals()
 
 def getFailureMessage(failure):

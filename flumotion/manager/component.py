@@ -878,6 +878,11 @@ class ComponentHeaven(base.ManagerHeaven):
                     d = self._startComponent(componentAvatar)
                     d.addErrback(log.warningFailure, swallow=False)
                     def errback(failure):
+                        if failure.check(errors.ComponentStartHandledError):
+                            self.debug('failure %r already handled' % failure)
+                            return
+                        self.debug('showing error message for failure %r' %
+                            failure)
                         m = messages.Error(T_(
                             N_("Could not start component.")),
                             debug=log.getFailureMessage(failure),
