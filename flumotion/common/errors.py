@@ -96,7 +96,11 @@ class InsufficientPrivilegesError(pb.Error):
 
 # component errors
 class ComponentError(pb.Error):
-    "Error while doing something to a component"
+    """
+    Error while doing something to a component.
+
+    args[0]: ComponentState
+    """
     
 # FIXME: rename, component first
 class SleepingComponentError(ComponentError):
@@ -112,7 +116,12 @@ class ComponentNoWorkerError(ComponentError):
     "Component does not have its worker available"
 
 class BusyComponentError(ComponentError):
-    "Component is busy doing something"
+    """
+    Component is busy doing something.
+
+    args[0]: ComponentState
+    args[1]: str
+    """
 
 class ComponentCreateError(ComponentError):
     """

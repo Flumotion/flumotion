@@ -865,6 +865,10 @@ class ComponentHeaven(base.ManagerHeaven):
                 if not componentAvatar._starting:
                     componentAvatar._starting = True
                     happyd = defer.Deferred()
+                    # since we've reached happy, we should clear the pending
+                    # mood - it is done transitioning
+                    happyd.addCallback(lambda r, s: s.set(
+                        'moodPending', None), componentAvatar.componentState)
                     # add callback because nodes that can be
                     # started as a result of this component being
                     # happy may not be in list when not.

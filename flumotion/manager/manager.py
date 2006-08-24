@@ -580,7 +580,7 @@ class Vishnu(log.Loggable):
             self.debug('Removing message %r' % m)
             componentState.remove('messages', m)
 
-        componentState.set('moodPending', moods.sleeping.value)
+        componentState.set('moodPending', None)
 
         avatar = self.getComponentMapper(componentState).avatar
         if componentState.get('mood') == moods.sad.value and not avatar:
@@ -890,7 +890,9 @@ class Vishnu(log.Loggable):
         isPending = lambda c: c.get('moodPending') != None
         components = filter(isPending, components)
         if len(components) > 0:
-            raise errors.BusyComponentError(components[0])
+            state = components[0]
+            raise errors.BusyComponentError(state, 
+                "moodPending is %s" % moods.get(state.get('moodPending')))
 
         # filter out the ones that aren't sleeping and stop them
         components = self.getComponentStates()

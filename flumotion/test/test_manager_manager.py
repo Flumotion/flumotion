@@ -346,6 +346,15 @@ class FakeComponentMind(FakeMind):
         self.testcase.failUnless(hasattr(self.state, 'observe_set'))
         
         self.state.observe_set('mood', moods.happy.value)
+
+    def remote_eatFrom(self, fullFeedId, host, port):
+        # pretend this works
+        return
+
+    def remote_feedTo(self, componentId, feedId, host, port):
+        # pretend this works
+        return
+    
     
 class TestVishnu(log.Loggable, unittest.TestCase):
 
@@ -529,8 +538,8 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             #pprint.pprint(mappers.keys())
             self.assertEqual(len(mappers.keys()), 8)
 
-            # We logged it out without it doing a clean shutdown, so it should now
-            # be lost.
+            # We logged it out without it doing a clean shutdown, so it should
+            # now be lost.
             self._verifyComponentIdGone(id, moods.lost)
 
             # log out the converter and verify
@@ -560,6 +569,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         # test a config with three components being loaded after the worker
         # logs in
         def loadConfigAndOneWorker(workerAvatar):
+            log.debug('unittest', 'loadConfigAndOneWorker')
             self.failUnlessEqual(len(self._workers), 1)
             self.failUnlessEqual(len(self._components), 0)
             
@@ -570,6 +580,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             return d
         
         def logoutComponent(workerAvatar):
+            log.debug('unittest', 'logoutComponent: producer')
             # log out the producer and verify the mapper
             id = '/testflow/producer-video-test'
             avatar = self._components[id]
@@ -581,11 +592,12 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             #pprint.pprint(mappers.keys())
             self.assertEqual(len(mappers.keys()), 8)
 
-            # We logged it out without it doing a clean shutdown, so it should now
-            # be lost.
+            # We logged it out without it doing a clean shutdown, so it should
+            # now be lost.
             self._verifyComponentIdGone(id, moods.lost)
             
             # log out the converter and verify
+            log.debug('unittest', 'logoutComponent: converter')
             id = '/testflow/converter-ogg-theora'
             m = mappers[id]
             avatar = self._components[id]
@@ -595,9 +607,11 @@ class TestVishnu(log.Loggable, unittest.TestCase):
 
             self._verifyComponentIdGone(id, moods.sleeping)
 
+            log.debug('unittest', 'logoutComponent: _verifyConfigAndNoWorker')
             self._verifyConfigAndNoWorker()
 
             # Now log out the worker.
+            log.debug('unittest', 'logoutComponent: _logoutAvatar')
             self._logoutAvatar(workerAvatar)
 
         def emptyPlanet(_):
@@ -682,7 +696,8 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         self._verifyComponentIdGone('/testflow/converter-ogg-theora')
         self._verifyComponentIdGone('/testflow/producer-video-test')
 
-    def _verifyComponentIdGone(self, id, expectedMood=None):
+    def _verifyComponentIdGone(self, id, expectedMood=None,
+            expectedMoodPending=None):
         # verify logged out components
         mappers = self.vishnu._componentMappers
         m = mappers[id]
@@ -697,8 +712,19 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         state = m.state
         if expectedMood: # Only check this if we had an expected mood passed
             self.assertEqual(state.get('mood'), expectedMood.value,
-                'mood is %s instead of %s' % (moods.get(state.get('mood')),
-                expectedMood))
+                '%s: mood is %s instead of %s' % (id,
+                    moods.get(state.get('mood')), expectedMood))
+
+        # always check moodPending
+        moodPendingValue = state.get('moodPending')
+        expectedValue = expectedMoodPending
+        if expectedMoodPending is not None:
+            expectedValue = expectedMoodPending.value
+        self.assertEqual(moodPendingValue, expectedValue,
+            '%s: moodPending is %r instead of %r' % (id,
+                moodPendingValue is not None \
+                    and moods.get(moodPendingValue) or 'None',
+                expectedMoodPending))
 
         # verify avatar state
         self.failIf(avatar.jobState)

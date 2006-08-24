@@ -1,5 +1,18 @@
 2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	  clarify args of ComponentError and BusyComponentError
+	* flumotion/manager/component.py:
+	  a component turning happy should clear its moodPending
+	* flumotion/manager/manager.py:
+	  reset moodPending when logging out
+	* flumotion/test/test_manager_manager.py:
+	  add fake eatFrom/feedTo
+	  verify moodPending
+	  fix test
+
+2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/log.py:
 	  clean up warningFailure, documenting it, and adding a
 	  swallow boolean, that controls whether we propagate the failure or
