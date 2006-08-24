@@ -315,8 +315,17 @@ def debug(cat, format, *args):
 def log(cat, format, *args):
     logObject(None, cat, format, *args)
 
-#warningFailure = lambda failure: Loggable.warningFailure(None, '', failure)
-warningFailure = lambda failure: warning('', getFailureMessage(failure))
+def warningFailure(failure, swallow=True):
+    """
+    Log a warning about a Failure. Useful as an errback handler:
+    d.addErrback(warningFailure)
+
+    @param swallow: whether to swallow the failure or not
+    @type  swallow: bool
+    """
+    warning('', getFailureMessage(failure))
+    if not swallow:
+        return failure
 
 class Loggable:
     """
@@ -389,15 +398,22 @@ class Loggable:
         return doLog(level, self.logObjectName(), self.logCategory,
             format, args, where=where, **kwargs)
 
-    def warningFailure(self, failure):
+    def warningFailure(self, failure, swallow=True):
         """
         Log a warning about a Failure. Useful as an errback handler:
         d.addErrback(self.warningFailure)
+
+        @param swallow: whether to swallow the failure or not
+        @type  swallow: bool
         """
         if _canShortcutLogging(self.logCategory, WARN):
-            return
+            if swallow:
+                return
+            return failure
         warningObject(self.logObjectName(), self.logCategory,
             *self.logFunction(getFailureMessage(failure)))
+        if not swallow:
+            return failure
 
     def logFunction(self, *args):
         """Overridable log function.  Default just returns passed message."""

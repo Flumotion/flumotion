@@ -872,7 +872,7 @@ class ComponentHeaven(base.ManagerHeaven):
                     componentAvatar._happydefers.append(happyd)
 
                     d = self._startComponent(componentAvatar)
-                    d.addErrback(log.warningFailure)
+                    d.addErrback(log.warningFailure, swallow=False)
                     def errback(failure):
                         m = messages.Error(T_(
                             N_("Could not start component.")),

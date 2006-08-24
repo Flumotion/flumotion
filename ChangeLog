@@ -1,6 +1,16 @@
 2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/log.py:
+	  clean up warningFailure, documenting it, and adding a
+	  swallow boolean, that controls whether we propagate the failure or
+	  not
+	* flumotion/manager/component.py:
+	  use swallow, so that our second errback can still function and
+	  throw up a decent message when we can't start a component
+
+2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
 	  add ellipsize function for long (+8 lines) strings
 	* flumotion/common/medium.py:
 	* flumotion/manager/admin.py:
