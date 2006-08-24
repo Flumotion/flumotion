@@ -221,7 +221,6 @@ class ManagerComponentState(flavors.StateCacheable):
 
     def __repr__(self):
         return "<ManagerComponentState %s>" % self._dict['name']
-        #return "%r" % self._dict
 
     def setJobState(self, jobState):
         """
@@ -264,7 +263,8 @@ class AdminComponentState(flavors.StateRemoteCache):
     I represent the state of a component in the admin client.
     See L{ManagerComponentState}.
     """
-    pass
+    def __repr__(self):
+        return "<AdminComponentState %s>" % self._dict['name']
 
 pb.setUnjellyableForClass(ManagerComponentState, AdminComponentState)
 
