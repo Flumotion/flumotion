@@ -314,7 +314,7 @@ class Vishnu(log.Loggable):
     def _makeBouncer(self, conf, remoteIdentity):
         # returns a deferred, always
         if not (conf.manager and conf.manager.bouncer):
-            self.log('No bouncer')
+            self.log('no bouncer in config')
             return defer.succeed(None)
 
         self.debug('going to start manager bouncer %s of type %s' % (
@@ -467,17 +467,19 @@ class Vishnu(log.Loggable):
         # an temporary dict of the form {workerId => [components]}
         # if workerName is None, we can start the component on any
         # worker
-        to_start = {}
+        componentsToStart = {}
         for c in self._getComponentsToCreate():
             workerId = c.get('workerRequested')
-            if not workerId in to_start:
-                to_start[workerId] = []
-            to_start[workerId].append(c)
+            if not workerId in componentsToStart:
+                componentsToStart[workerId] = []
+            componentsToStart[workerId].append(c)
+        self.debug('_startComponents: componentsToStart %r' % componentsToStart)
         
-        for workerId, components in to_start.items():
-            self._workerCreateComponents(workerId, components)
+        for workerId, componentStates in componentsToStart.items():
+            self._workerCreateComponents(workerId, componentStates)
 
     def _loadConfiguration(self, conf, remoteIdentity):
+        # makeBouncer only makes a bouncer if there is one in the config
         d = self._makeBouncer(conf, remoteIdentity)
         d.addCallback(self._addManagerPlugs, conf, remoteIdentity)
         d.addCallback(self._updateStateFromConf, conf, remoteIdentity)
@@ -578,6 +580,8 @@ class Vishnu(log.Loggable):
             self.debug('Removing message %r' % m)
             componentState.remove('messages', m)
 
+        componentState.set('moodPending', moods.sleeping.value)
+
         avatar = self.getComponentMapper(componentState).avatar
         if componentState.get('mood') == moods.sad.value and not avatar:
             self.debug('asked to stop a sad component without avatar')
@@ -641,6 +645,8 @@ class Vishnu(log.Loggable):
         @type  components: list of
                            L{flumotion.common.planet.ManagerComponentState}
         """
+        self.debug("_workerCreateComponents: workerId %r, components %r" % (
+            workerId, components))
         if not workerId:
             if not self.workerHeaven.avatars:
                 self.debug('no workers yet, cannot start jobs yet')
@@ -678,6 +684,10 @@ class Vishnu(log.Loggable):
 
         avatarId = conf['avatarId']
         nice = conf.get('nice', 0)
+
+        # we set the moodPending to HAPPY, so this component only gets
+        # asked to start once
+        componentState.set('moodPending', moods.happy.value)
 
         d = workerAvatar.createComponent(avatarId, type, nice)
         # FIXME: here we get the avatar Id of the component we wanted
@@ -950,6 +960,9 @@ class Vishnu(log.Loggable):
         return dl
        
     def _getComponentsToCreate(self):
+        """
+        @rtype: list of L{flumotion.common.planet.ManagerComponentState}
+        """
         # return a list of components that are sleeping and not pending
         components = self.state.getComponents()
 

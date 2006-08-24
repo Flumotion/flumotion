@@ -1,3 +1,11 @@
+2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/manager.py:
+	  actually set moodPending, to make sure we don't start a component
+	  more than once.  This fits with all the code that checks moodPending.
+	  Solves the problem of having components being started more than once
+	  if we have multiple loadConfiguration calls in a row.
+
 2006-08-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/manager/component.py:
