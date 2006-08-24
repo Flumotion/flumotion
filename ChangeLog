@@ -1,3 +1,15 @@
+2006-08-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Dispatcher.createAvatarFor):
+	Change to return a deferred, because computeIdentity returns a
+	deferred.
+	(Dispatcher.requestAvatar): Change to return a deferred instead of
+	an immediate value.
+
+	* flumotion/component/plugs/identity.py
+	(ExampleIdentityProvider.computeIdentity): Change this protocol to
+	return a deferred instead of an immediate result.
+
 2006-08-23  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:

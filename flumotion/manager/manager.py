@@ -98,21 +98,23 @@ class Dispatcher(log.Loggable):
     # to the piece that called login(),
     # which in our case is a component or an admin client.
     def requestAvatar(self, avatarId, keycard, mind, *ifaces):
+        def got_avatar(avatar):
+            def cleanup(avatarId=avatarId, avatar=avatar, mind=mind):
+                self.removeAvatar(avatarId, avatar, mind)
+            # schedule a perspective attached for after this function
+            # FIXME: there needs to be a way to not have to do a callLater
+            # blindly so cleanup can be guaranteed
+            reactor.callLater(0, avatar.attached, mind)
+            return (pb.IPerspective, avatar, cleanup)
+        def got_error(res):
+            failure.trap(errors.AlreadyConnectedError)
+            self.info("component with id %s already logged in" % (avatarId))
+            return res
+
         host = common.addressGetHost(mind.broker.transport.getPeer())
-        try:
-            avatar = self.createAvatarFor(avatarId, keycard, host, ifaces)
-            self.debug("returning Avatar: id %s, avatar %s" % (avatarId, avatar))
-        except errors.AlreadyConnectedError, e:
-            self.debug("component with id %s already logged in" % (avatarId))
-            return defer.fail(failure.Failure(e))
-
-        # schedule a perspective attached for after this function
-        # FIXME: there needs to be a way to not have to do a callLater
-        # blindly so cleanup can be guaranteed
-        reactor.callLater(0, avatar.attached, mind)
-
-        return (pb.IPerspective, avatar,
-                lambda a=avatar, m=mind, i=avatarId: self.removeAvatar(i, a, m))
+        d = self.createAvatarFor(avatarId, keycard, host, ifaces)
+        d.addCallbacks(got_avatar, got_error)
+        return d
 
     ### our methods
 
@@ -142,23 +144,26 @@ class Dispatcher(log.Loggable):
         @param ifaces:     a list of heaven interfaces to get avatar from,
                            including pb.IPerspective
 
-        @returns:        an avatar from the heaven managing the given interface.
+        @returns:          a deferred that will fire with an avatar from
+                           the heaven managing the given interface.
         """
+        def got_identity(identity):
+            for iface in ifaces:
+                heaven = self._interfaceHeavens.get(iface, None)
+                if heaven:
+                    avatar = heaven.createAvatar(avatarId, identity)
+                    self._avatarHeavens[avatarId] = heaven
+                    return avatar
+                raise errors.NoPerspectiveError("%s requesting iface %r"
+                                                % (avatarId, repr(ifaces)))
+            
+
         if not pb.IPerspective in ifaces:
             raise errors.NoPerspectiveError(avatarId)
+        d = self._computeIdentity(keycard, remoteHost)
+        d.addCallback(got_identity)
+        return d
 
-        identity = self._computeIdentity(keycard, remoteHost)
-
-        for iface in ifaces:
-            heaven = self._interfaceHeavens.get(iface, None)
-            if heaven:
-                avatar = heaven.createAvatar(avatarId, identity)
-                self._avatarHeavens[avatarId] = heaven
-                return avatar
-
-        raise errors.NoPerspectiveError("%s requesting iface %r" % (
-            avatarId, repr(ifaces)))
-        
     def registerHeaven(self, heaven, interface):
         """
         Register a Heaven as managing components with the given interface.

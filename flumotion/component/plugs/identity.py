@@ -22,6 +22,8 @@
 
 import random
 
+from flumotion.twisted import defer
+
 from flumotion.common.identity import RemoteIdentity
 from flumotion.component.plugs import base
 
@@ -42,5 +44,6 @@ class ExampleIdentityProvider(IdentityProvider):
     """
 
     def computeIdentity(self, keycard, remoteHost):
-        return RemoteIdentity(random.choice(['larry', 'curly', 'moe']),
-                              random.choice(['chicago', 'detroit']))
+        i = RemoteIdentity(random.choice(['larry', 'curly', 'moe']),
+                           random.choice(['chicago', 'detroit']))
+        return defer.succeed(i)
