@@ -818,15 +818,26 @@ class ComponentHeaven(base.ManagerHeaven):
     _startComponent = defer_generator_method(_startComponent)
 
     def _tryWhatCanBeStarted(self, result=True):
+        """
+        I try to start nodes in the depgraph if they should be started.  I am
+        a recursive method, because the depgraph's list of what should be
+        started may change when nodes start/stop.
+        
+        @param result: only needed because this method is added as a callback
+        """
         self.debug("tryWhatCanBeStarted")
         deplist = self.vishnu._depgraph.whatShouldBeStarted()
         self.debug("Listing deplist")
+
         if not deplist:
             self.debug("Nothing needs to be setup or started!")
             return
         for dep in deplist:
             self.debug("Deplist: %r,%r" % (dep[0], dep[1]))
 
+        # We only take the first item in the depgraph's list of what should
+        # be started and in this iteration of this method, it will only try
+        # and start this particular node. 
         dep, deptype = deplist[0]
         if dep:
             if deptype == "COMPONENTSETUP":
@@ -836,6 +847,9 @@ class ComponentHeaven(base.ManagerHeaven):
                     if not componentAvatar._beingSetup:
                         componentAvatar._beingSetup = True
                         d = self.setupComponent(componentAvatar)
+                        # add callback because nodes that can be
+                        # started as a result of this component being
+                        # setup may not be in list when not.
                         d.addCallback(self._tryWhatCanBeStarted)
                     else:
                         self.debug("Component %s on way to being setup" %
@@ -851,6 +865,9 @@ class ComponentHeaven(base.ManagerHeaven):
                 if not componentAvatar._starting:
                     componentAvatar._starting = True
                     happyd = defer.Deferred()
+                    # add callback because nodes that can be
+                    # started as a result of this component being
+                    # happy may not be in list when not.
                     happyd.addCallback(self._tryWhatCanBeStarted)
                     componentAvatar._happydefers.append(happyd)
 
@@ -875,6 +892,9 @@ class ComponentHeaven(base.ManagerHeaven):
                     if not componentAvatar._providingClock:
                         componentAvatar._providingClock = True
                         d = self.provideMasterClock(componentAvatar)
+                        # add callback because nodes that can be
+                        # started as a result of this component providing
+                        # master clock may not be in list when not.
                         d.addCallback(self._tryWhatCanBeStarted)
                     else:
                         self.debug("Component %s on way to clock mastering", 
@@ -882,7 +902,10 @@ class ComponentHeaven(base.ManagerHeaven):
                     return
             else:
                 self.debug("Unknown dependency type")
-
+            # Possible FIXME because this method is already attached
+            # as a callback for when components get setup, become
+            # happy and master clock been provided, why
+            # should we run this method again here?
             self._tryWhatCanBeStarted()
 
     def _setupComponent(self, componentAvatar):
