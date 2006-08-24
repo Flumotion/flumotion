@@ -604,6 +604,7 @@ class WorkerBrain(log.Loggable):
         """
         self.debug('making create deferred for %s' % avatarId)
         if avatarId in self._createDeferreds.keys():
+            self.debug('already have a create deferred for %s' % avatarId)
             raise errors.ComponentAlreadyStartingError(avatarId)
 
         d = defer.Deferred()

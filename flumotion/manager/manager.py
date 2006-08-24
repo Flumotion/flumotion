@@ -693,11 +693,11 @@ class Vishnu(log.Loggable):
         # FIXME: make ConfigError copyable so we can .check() it here
         # and print a nicer warning
         self.warning('failed to create component %s: %s'
-                  % (state.get('name'), failure.getErrorMessage()))
+                  % (state.get('name'), log.getFailureMessage(failure)))
 
         message = messages.Error(T_(
             N_("The component could not be started.")),
-                debug=failure.getErrorMessage())
+                debug=log.getFailureMessage(failure))
 
         state.set('mood', moods.sad.value)
         state.append('messages', message)

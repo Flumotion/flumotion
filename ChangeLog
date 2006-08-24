@@ -1,3 +1,11 @@
+2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/component.py:
+	  add a generic error message for not being able to start a component
+	* flumotion/manager/manager.py:
+	* flumotion/worker/worker.py:
+	  log.getFailureMessage() is slightly more useful
+
 2006-08-24  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/component.py:

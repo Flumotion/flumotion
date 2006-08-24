@@ -437,7 +437,7 @@ class ComponentAvatar(base.ManagerAvatar):
         except Exception, e:
             m = messages.Error(T_(N_("Could not start component.")),
                 debug = log.getExceptionMessage(e),
-                id = "component-start")
+                id="component-start")
             self._addMessage(m)
             self.warning("Could not make component start, reason %s"
                        % log.getExceptionMessage(e))
@@ -854,7 +854,17 @@ class ComponentHeaven(base.ManagerHeaven):
                     happyd.addCallback(self._tryWhatCanBeStarted)
                     componentAvatar._happydefers.append(happyd)
 
-                    self._startComponent(componentAvatar)
+                    d = self._startComponent(componentAvatar)
+                    d.addErrback(log.warningFailure)
+                    def errback(failure):
+                        m = messages.Error(T_(
+                            N_("Could not start component.")),
+                            debug=log.getFailureMessage(failure),
+                            id="component-start-%s" % componentAvatar.avatarId)
+                        componentAvatar._addMessage(m)
+                        componentAvatar._setMood(moods.sad)
+                        raise errors.ComponentStartHandledError(failure)
+                    d.addErrback(errback)
                 else:
                     self.log("Component is already starting")
                     return
