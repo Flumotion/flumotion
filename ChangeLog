@@ -1,5 +1,14 @@
 2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/log.py:
+	  do not log an empty Exception.args[0]
+	* flumotion/manager/component.py:
+	  also add ConnectError (No route to host) as something to show an
+	  error message for. Log the frame inside this file, so we do not
+	  see a defgen frame.
+
+2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	  clarify args of ComponentError and BusyComponentError
 	* flumotion/manager/component.py:

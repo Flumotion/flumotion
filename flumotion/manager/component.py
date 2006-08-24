@@ -775,11 +775,11 @@ class ComponentHeaven(base.ManagerHeaven):
                 yield d
                 try:
                     d.value()
-                except error.ConnectionRefusedError, e:
+                except (error.ConnectError, error.ConnectionRefusedError), e:
                     m = messages.Error(T_(
                         N_("Could not connect component to %s:%d for feed %s."),
                             host, port, fullFeedId),
-                        debug=log.getExceptionMessage(e),
+                        debug=log.getExceptionMessage(e, filename='component'),
                         id="component-start-%s" % fullFeedId)
                     # FIXME: make addMessage and setMood public
                     componentAvatar._addMessage(m)
