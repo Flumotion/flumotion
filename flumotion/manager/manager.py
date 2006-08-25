@@ -773,6 +773,15 @@ class Vishnu(log.Loggable):
 
         self._depgraph.setJobStarted(componentAvatar.componentState)
 
+        # If this is a reconnecting component, we might also need to set the
+        # component as setup and/or started
+        if m.state.get('mood') == moods.happy.value:
+            # TODO: We don't detect that a component was setup but not started,
+            # here. That means if we get a reconnect in that (relatively small)
+            # window, we'll fail.
+            self._depgraph.setComponentSetup(componentAvatar.componentState)
+            self._depgraph.setComponentStarted(componentAvatar.componentState)
+
         return defer.succeed(None)
 
     def componentDetached(self, componentAvatar):

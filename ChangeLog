@@ -1,3 +1,11 @@
+2006-08-25  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  When a component attaches to the manager, if it already has a happy
+	  mood, set the depgraph setup and start nodes to true.
+	  Avoids trying to re-setup/restart components that are already
+	  running.
+
 2006-08-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* doc/random/component-dependencies/depgraph-scenario2.dia:
