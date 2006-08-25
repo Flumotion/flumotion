@@ -1,3 +1,11 @@
+2006-08-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/component.py:
+	  when handling direct dependencies that can be changed, handle
+	  all of them, not just the first one.  This allows other
+	  non-depending components to start even if the first one ran
+	  into an error.
+
 2006-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/log.py:

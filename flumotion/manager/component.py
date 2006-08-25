@@ -835,82 +835,81 @@ class ComponentHeaven(base.ManagerHeaven):
         for dep in deplist:
             self.debug("Deplist: %r,%r" % (dep[0], dep[1]))
 
-        # We only take the first item in the depgraph's list of what should
-        # be started and in this iteration of this method, it will only try
-        # and start this particular node. 
-        dep, deptype = deplist[0]
-        if dep:
-            if deptype == "COMPONENTSETUP":
-                self.debug("Component %s to be setup" % dep.get("name"))
-                componentAvatar = self.getComponentAvatarForState(dep)
-                if componentAvatar:
-                    if not componentAvatar._beingSetup:
-                        componentAvatar._beingSetup = True
-                        d = self.setupComponent(componentAvatar)
+        # we handle all direct dependencies;
+        # an error for one of them shouldn't stop handling the others
+        for dep, deptype in deplist:
+            if dep:
+                if deptype == "COMPONENTSETUP":
+                    self.debug("Component %s to be setup" % dep.get("name"))
+                    componentAvatar = self.getComponentAvatarForState(dep)
+                    if componentAvatar:
+                        if not componentAvatar._beingSetup:
+                            componentAvatar._beingSetup = True
+                            d = self.setupComponent(componentAvatar)
+                            # add callback because nodes that can be
+                            # started as a result of this component being
+                            # setup may not be in list when not.
+                            d.addCallback(self._tryWhatCanBeStarted)
+                        else:
+                            self.debug("Component %s on way to being setup" %
+                                dep.get("name"))
+                        return
+                    else:
+                        self.debug(
+                            "Component %s to be setup but has no avatar yet" %
+                                dep.get("name"))
+                elif deptype == "COMPONENTSTART":
+                    self.debug("Component %s to be started" % dep.get("name"))
+                    componentAvatar = self.getComponentAvatarForState(dep)
+                    if not componentAvatar._starting:
+                        componentAvatar._starting = True
+                        happyd = defer.Deferred()
+                        # since we've reached happy, we should clear the pending
+                        # mood - it is done transitioning
+                        happyd.addCallback(lambda r, s: s.set(
+                            'moodPending', None), componentAvatar.componentState)
                         # add callback because nodes that can be
                         # started as a result of this component being
-                        # setup may not be in list when not.
-                        d.addCallback(self._tryWhatCanBeStarted)
-                    else:
-                        self.debug("Component %s on way to being setup" %
-                            dep.get("name"))
-                    return
-                else:
-                    self.debug(
-                        "Component %s to be setup but has no avatar yet" %
-                            dep.get("name"))
-            elif deptype == "COMPONENTSTART":
-                self.debug("Component %s to be started" % dep.get("name"))
-                componentAvatar = self.getComponentAvatarForState(dep)
-                if not componentAvatar._starting:
-                    componentAvatar._starting = True
-                    happyd = defer.Deferred()
-                    # since we've reached happy, we should clear the pending
-                    # mood - it is done transitioning
-                    happyd.addCallback(lambda r, s: s.set(
-                        'moodPending', None), componentAvatar.componentState)
-                    # add callback because nodes that can be
-                    # started as a result of this component being
-                    # happy may not be in list when not.
-                    happyd.addCallback(self._tryWhatCanBeStarted)
-                    componentAvatar._happydefers.append(happyd)
+                        # happy may not be in list when not.
+                        happyd.addCallback(self._tryWhatCanBeStarted)
+                        componentAvatar._happydefers.append(happyd)
 
-                    d = self._startComponent(componentAvatar)
-                    d.addErrback(log.warningFailure, swallow=False)
-                    def errback(failure):
-                        if failure.check(errors.ComponentStartHandledError):
-                            self.debug('failure %r already handled' % failure)
-                            return
-                        self.debug('showing error message for failure %r' %
-                            failure)
-                        m = messages.Error(T_(
-                            N_("Could not start component.")),
-                            debug=log.getFailureMessage(failure),
-                            id="component-start-%s" % componentAvatar.avatarId)
-                        componentAvatar._addMessage(m)
-                        componentAvatar._setMood(moods.sad)
-                        raise errors.ComponentStartHandledError(failure)
-                    d.addErrback(errback)
-                else:
-                    self.log("Component is already starting")
-                    return
-            elif deptype == "CLOCKMASTER":
-                self.debug("Component %s to be clock master!" % dep.get("name"))
-                componentAvatar = self.getComponentAvatarForState(dep)
-                if componentAvatar:
-                    if not componentAvatar._providingClock:
-                        componentAvatar._providingClock = True
-                        d = self.provideMasterClock(componentAvatar)
-                        # add callback because nodes that can be
-                        # started as a result of this component providing
-                        # master clock may not be in list when not.
-                        d.addCallback(self._tryWhatCanBeStarted)
+                        d = self._startComponent(componentAvatar)
+                        d.addErrback(log.warningFailure, swallow=False)
+                        def errback(failure):
+                            if failure.check(errors.ComponentStartHandledError):
+                                self.debug('failure %r already handled' % failure)
+                                return
+                            self.debug('showing error message for failure %r' %
+                                failure)
+                            m = messages.Error(T_(
+                                N_("Could not start component.")),
+                                debug=log.getFailureMessage(failure),
+                                id="component-start-%s" % componentAvatar.avatarId)
+                            componentAvatar._addMessage(m)
+                            componentAvatar._setMood(moods.sad)
+                            raise errors.ComponentStartHandledError(failure)
+                        d.addErrback(errback)
                     else:
-                        self.debug("Component %s on way to clock mastering", 
-                            dep.get("name"))
-                    return
-            else:
-                self.debug("Unknown dependency type")
+                        self.log("Component is already starting")
+                        return
+                elif deptype == "CLOCKMASTER":
+                    self.debug("Component %s to be clock master!" % dep.get("name"))
+                    componentAvatar = self.getComponentAvatarForState(dep)
+                    if componentAvatar:
+                        if not componentAvatar._providingClock:
+                            componentAvatar._providingClock = True
+                            d = self.provideMasterClock(componentAvatar)
+                            # add callback because nodes that can be
+                            # started as a result of this component providing
+                            # master clock may not be in list when not.
+                            d.addCallback(self._tryWhatCanBeStarted)
+                        else:
+                            self.debug("Component %s on way to clock mastering", 
+                                dep.get("name"))
+                        return
+                else:
+                    self.debug("Unknown dependency type")
             # Possible FIXME because this method is already attached
             # as a callback for when components get setup, become
             # happy and master clock been provided, why
