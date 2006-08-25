@@ -1,5 +1,10 @@
 2006-08-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* doc/random/component-dependencies/depgraph-scenario2.dia:
+	Update to new depgraph semantics.
+
+2006-08-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* doc/random/component-dependencies/depgraph-scenario1.dia:
 	Add missing dep lines between COMPONENTSTART nodes.
 
