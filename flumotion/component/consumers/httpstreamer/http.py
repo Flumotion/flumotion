@@ -212,7 +212,6 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         return self.comp.getLoadData()
 
 class HTTPPorterClientFactory(porterclient.PorterClientFactory):
-
     def __init__(self, childFactory, mountPoint, do_start_deferred):
         porterclient.PorterClientFactory.__init__(self, childFactory)
         self._mountPoint = mountPoint
@@ -480,7 +479,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     # handle the thread deserializing queues
     def _handleQueue(self):
-
         # handle added clients; added first because otherwise removed fd's
         # are re-used before we handle added
         self._added_lock.acquire()

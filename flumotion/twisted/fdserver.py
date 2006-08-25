@@ -46,7 +46,7 @@ class FDClient(unix.Client):
         if not self.connected:
             return
         try:
-            (fds, message) = fdpass.readfds(self.fileno(), 64*1024)
+            (fds, message) = fdpass.readfds(self.fileno(), 64 * 1024)
         except socket.error, se:
             if se.args[0] == errno.EWOULDBLOCK:
                 return
@@ -63,12 +63,12 @@ class FDClient(unix.Client):
 
 class FDConnector(unix.Connector):
     def _makeTransport(self):
-        return FDClient (self.address, self, self.reactor)
+        return FDClient(self.address, self, self.reactor)
 
 class FDPassingBroker(pb.Broker, log.Loggable):
     """
-    A pb.Broker subclass that handles FDs being passed (with associated data)
-    over the same connection as the normal PB data stream.
+    A pb.Broker subclass that handles FDs being passed to it (with associated
+    data) over the same connection as the normal PB data stream.
     When an FD is seen, it creates new protocol objects for them from the 
     childFactory attribute.
     """
@@ -137,5 +137,3 @@ class PassableServerConnection(tcp.Server):
 
 class PassableServerPort(tcp.Port):
     transport = PassableServerConnection
-
-
