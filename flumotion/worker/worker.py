@@ -257,7 +257,7 @@ class WorkerMedium(medium.PingingMedium):
         manager soon after I attach to it.  This is needed on reconnects
         so that the manager knows what components it needs to start on me.
 
-        @returns a list of componentAvatarIds
+        @returns: a list of componentAvatarIds
         """
         return self.brain.kindergarten.getKidAvatarIds()
 
