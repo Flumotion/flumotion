@@ -306,6 +306,9 @@ class FakeWorkerMind(FakeMind):
             avatarId, moduleName, methodName, type, config)
         # need to return the avatarId for comparison
         return avatarId
+    
+    def remote_getComponents(self):
+        return []
 
 class FakeComponentMind(FakeMind):
 

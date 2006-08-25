@@ -979,9 +979,6 @@ class ComponentHeaven(base.ManagerHeaven):
             state.set('parent', flow)
             flow.append('components', state)
 
-        # lets check if this component is at the start of the depgraph
-        self._tryWhatCanBeStarted()
-
     def unregisterComponent(self, componentAvatar):
         """
         This function unregisters a component in the heaven.

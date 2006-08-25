@@ -628,11 +628,40 @@ class Vishnu(log.Loggable):
         components = [c for c in self._getComponentsToCreate()
                       if c.get('workerRequested') in (workerId, None)]
 
-        if not components:
-            self.debug('vishnu.workerAttached(): no components for this worker')
-            return
+        # So now, check what components worker is running
+        # so we can remove them from this components list
+        # also add components we have that are lost but not
+        # in list given by worker
+        d = workerAvatar.getComponents()
+        def workerAvatarComponentListReceived(workerComponents):
+            lostComponents = [c for c in self.getComponentStates()
+                              if c.get('workerRequested') == workerId and \
+                                 c.get('mood') == moods.lost.value]
+            for comp in workerComponents:
+                # comp is an avatarId string
+                # components is a list of {ManagerComponentState}
+                if comp in self._componentMappers:
+                    compState = self._componentMappers[comp].state
+                    if compState in components:
+                        components.remove(compState)
+                    if compState in lostComponents:
+                        lostComponents.remove(compState)
+            
+            for compState in lostComponents:
+                self.info("Component %s is lost is meant to be running on "
+                    " worker %s that has now logged in.  However worker is"
+                    " not running this component, so we are going to tell"
+                    " worker to create this component." % 
+                    (self._componentMappers[compState].id, workerId))
 
-        self._workerCreateComponents(workerId, components)
+            allComponents = components + lostComponents
+
+            if not allComponents:
+                self.debug('vishnu.workerAttached(): no components for this worker')
+                return
+        
+            self._workerCreateComponents(workerId, allComponents)
+        d.addCallback(workerAvatarComponentListReceived)
             
     def _workerCreateComponents(self, workerId, components):
         """
@@ -759,6 +788,7 @@ class Vishnu(log.Loggable):
     def componentAttached(self, componentAvatar):
         # called when a component logs in and gets a component avatar created
         id = componentAvatar.avatarId
+        self.debug("%s component attached", id)
         if not id in self._componentMappers.keys():
             # the manager quit and the component is logging back in
             d = componentAvatar.mindCallRemote('getConfig')
@@ -770,17 +800,6 @@ class Vishnu(log.Loggable):
 
         # attach componentstate to avatar
         componentAvatar.componentState = m.state
-
-        self._depgraph.setJobStarted(componentAvatar.componentState)
-
-        # If this is a reconnecting component, we might also need to set the
-        # component as setup and/or started
-        if m.state.get('mood') == moods.happy.value:
-            # TODO: We don't detect that a component was setup but not started,
-            # here. That means if we get a reconnect in that (relatively small)
-            # window, we'll fail.
-            self._depgraph.setComponentSetup(componentAvatar.componentState)
-            self._depgraph.setComponentStarted(componentAvatar.componentState)
 
         return defer.succeed(None)
 
@@ -804,8 +823,19 @@ class Vishnu(log.Loggable):
         # attach jobState to state
         m.state.setJobState(jobState)
 
+        self._depgraph.setJobStarted(m.state)
+        # If this is a reconnecting component, we might also need to set the
+        # component as setup and/or started
+        if m.state.get('mood') == moods.happy.value:
+            # TODO: We don't detect that a component was setup but not started,
+            # here. That means if we get a reconnect in that (relatively small)
+            # window, we'll fail.
+            self.debug("Component %s is already in happy.  Set depgraph approprioately", componentAvatar.avatarId)
+            self._depgraph.setComponentSetup(m.state)
+            self._depgraph.setComponentStarted(m.state)
         self.debug('vishnu registered component %r' % componentAvatar)
-        
+        self.componentHeaven._tryWhatCanBeStarted()
+
     def unregisterComponent(self, componentAvatar):
         # called when the component is logging out
         # clear up jobState and avatar

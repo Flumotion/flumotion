@@ -132,6 +132,17 @@ class WorkerAvatar(base.ManagerAvatar):
         return self.mindCallRemote('create', avatarId, type, moduleName,
             methodName, nice)
 
+    def getComponents(self):
+        """
+        Get a list of components that the worker is running.
+
+        @returns: a deferred that will give the avatarIds running on the
+                  worker
+        """
+        self.debug('getting component list from worker %s' % 
+            self.avatarId)
+        return self.mindCallRemote('getComponents')
+
     ### IPerspective methods, called by the worker's component
     def perspective_componentAddMessage(self, avatarId, message):
         """

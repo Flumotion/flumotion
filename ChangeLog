@@ -1,3 +1,31 @@
+2006-08-25  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/manager/component.py:
+	Remove call to tryWhatCanBeStarted when component attaches, because
+	we moved it to a similar place in vishnu where the depgraph
+	setting is happening.
+	* flumotion/manager/manager.py:
+	When worker attaches, check what components worker has running
+	so manager does not attempt to start them.  Also make worker
+	create any components that are lost but assigned for that worker
+	and are not components worker already has running.  Useful when
+	machine worker is running on has an unclean shutdown/power outage.
+
+	Move depgraph setting on component attach to after we are guaranteed
+	we have received the job state and hence the mood any components
+	have before this connection to manager.  Fixes a race.
+	* flumotion/manager/worker.py:
+	Add remote method so that manager can query worker for what
+	components it has.  Useful when worker re-connects after network
+	failure so manager does not try and setup/start the components.
+	* flumotion/test/test_manager_manager.py:
+	Add stub method for getting components worker has.
+	* flumotion/worker/worker.py:
+	Add remote method so that manager can query worker for what
+	components it has.  Useful when worker re-connects after
+	network failure so manager does not try and setup/start the
+	components.
+
 2006-08-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

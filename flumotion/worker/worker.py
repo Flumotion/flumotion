@@ -251,6 +251,16 @@ class WorkerMedium(medium.PingingMedium):
         """
         return self.runBundledFunction(module, function, *args, **kwargs)
 
+    def remote_getComponents(self):
+        """
+        I return a list of componentAvatarIds, I have.  I am called by the
+        manager soon after I attach to it.  This is needed on reconnects
+        so that the manager knows what components it needs to start on me.
+
+        @returns a list of componentAvatarIds
+        """
+        return self.brain.kindergarten.getKidAvatarIds()
+
 class Kid:
     """
     I am an abstraction of a job process started by the worker.
@@ -403,6 +413,9 @@ class Kindergarten(log.Loggable):
     
     def getKids(self):
         return self._kids.values()
+
+    def getKidAvatarIds(self):
+        return self._kids.keys()
 
     def removeKidByPid(self, pid):
         """
