@@ -19,12 +19,14 @@
 
 # Headers in this file shall remain intact.
 
+import common
+
 from twisted.internet import defer
 from twisted.trial import unittest
 from twisted.web import server
 
 from flumotion.component.consumers.httpstreamer import resources
-from flumotion.common import interfaces, keycards
+from flumotion.common import interfaces, keycards, log
 from flumotion.twisted.defer import defer_generator_method
 
 # From twisted/test/proto_helpers.py
@@ -63,6 +65,8 @@ class PipeTransport:
 class FakeRequest:
     transport = PipeTransport()
     method = 'GET'
+    uri = 'http://fake/'
+
     def __init__(self, **kwargs):
         self.headers = {}
         self.response = -1
@@ -74,6 +78,11 @@ class FakeRequest:
 
         # fake out request.transport.fileno
         self.fdIncoming = 3
+
+        # copied from test_web.DummyRequest
+        self.sitepath = []
+        self.prepath = []
+        self.postpath = ['']
 
         self.__dict__.update(kwargs)
         
@@ -262,3 +271,52 @@ class TestHTTPStreamingResource(unittest.TestCase):
         #assert request.headers['Server'] == HTTP_VERSION
         #assert request.headers['Date'] == 'FakeDate'
         #assert request.headers['Content-Type'] == 'application/x-ogg'
+
+class TestHTTPRoot(unittest.TestCase):
+    def testRenderRootStreamer(self):
+        # a streamer that is at /
+        root = resources.HTTPRoot()
+        site = server.Site(resource=root)
+
+        streamer = FakeStreamer()
+        resource = resources.HTTPStreamingResource(streamer)
+        root.putChild('', resource)
+
+        log.debug('unittest', 'requesting root, should work')
+        request = FakeRequest(ip='')
+        r = site.getResourceFor(request)
+        self.assertEquals(r, resource)
+        output = r.render(request)
+        self.assertEquals(output,  server.NOT_DONE_YET)
+
+        # a request for a/b should give 404
+        log.debug('unittest', 'requesting a/b, should 404')
+        request = FakeRequest(ip='', postpath=['a', 'b'])
+        r = site.getResourceFor(request)
+        output = r.render(request)
+        self.assertEquals(request.response,  http.NOT_FOUND)
+
+
+    def testRenderTreeStreamer(self):
+        # a streamer that is at /a/b
+        root = resources.HTTPRoot()
+        site = server.Site(resource=root)
+
+        streamer = FakeStreamer()
+        resource = resources.HTTPStreamingResource(streamer)
+        root.putChild('a/b', resource)
+
+        # a request for root should give 404
+        log.debug('unittest', 'requesting root, should 404')
+        request = FakeRequest(ip='')
+        r = site.getResourceFor(request)
+        output = r.render(request)
+        self.assertEquals(request.response,  http.NOT_FOUND)
+
+        # a request for a/b should work
+        log.debug('unittest', 'requesting a/b, should work')
+        request = FakeRequest(ip='', postpath=['a', 'b'])
+        r = site.getResourceFor(request)
+        self.assertEquals(r, resource)
+        output = r.render(request)
+        self.assertEquals(output,  server.NOT_DONE_YET)

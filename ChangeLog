@@ -1,3 +1,11 @@
+2006-08-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Our streamer component never supported non-root URI's.
+	  Add handling for it...
+	* flumotion/test/test_http.py:
+	  ... and a test.
+
 2006-08-25  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:
