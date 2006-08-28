@@ -17,6 +17,7 @@
           <filename location="bouncers/__init__.py" />
           <filename location="effects/__init__.py" />
           <filename location="base/__init__.py" />
+          <filename location="misc/__init__.py" />
         </directory>
       </directories>
     </bundle>

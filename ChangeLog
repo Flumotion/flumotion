@@ -1,5 +1,10 @@
 2006-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/component.xml:
+	Add misc/__init__.py to component-base bundle.
+
+2006-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	Import porterclient.
 	* flumotion/component/consumers/httpstreamer/http.xml:
