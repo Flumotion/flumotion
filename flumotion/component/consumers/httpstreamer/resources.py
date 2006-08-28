@@ -138,7 +138,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.bouncerName = None
         self.requesterId = streamer.getName() # avatarId of streamer component
         
-        self.maxclients = -1
+        self.maxclients = self.getMaxAllowedClients(-1)
         
         self.loggers = \
             streamer.plugs['flumotion.component.plugs.loggers.Logger']
@@ -321,7 +321,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             return softmax - self.__reserve_fds__
 
     def reachedMaxClients(self):
-        return len(self._requests) >= self.maxclients
+        return len(self._requests) >= self.maxclients and self.maxclients >= 0
     
     def authenticate(self, request):
         """

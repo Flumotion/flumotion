@@ -1,3 +1,11 @@
+2006-08-28  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Don't treat maxclients == -1 as meaning no client is allowed; this
+	  means there's no max set.
+	  However... don't set maxclient to -1 by default; default to using
+	  the system soft limit - reserve.
+
 2006-08-28  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/common.py: Fix a screwup.
