@@ -1,6 +1,11 @@
 2006-08-28  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:
+	  Improve correctness of debug output.
+
+2006-08-28  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
 	  Fix typo.
 
 2006-08-28  Michael Smith  <msmith@fluendo.com>
