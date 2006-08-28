@@ -107,16 +107,8 @@ class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
                                                           
         def alreadyLoggedInErrback(failure):
             failure.trap(errors.AlreadyConnectedError)
-            # If we fail to connect (on the initial connection attempt), we 
-            # won't have a name set yet. In that case, figure it out from 
-            # avatarId, so we can give a decent  error message.
-            name = self.component.name
-            if not name:
-                # Nasty hack!
-                name = common.parseComponentId(
-                    self.medium.authenticator.avatarId)[1]
-
-            self.error('Component named %s is already logged in.', name)
+            self.error('Component with id %s is already logged in.',
+                self.medium.authenticator.avatarId)
                                                           
         def loginFailedErrback(failure):
             self.error('Login failed, reason: %s' % failure)
