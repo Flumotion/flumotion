@@ -1,3 +1,10 @@
+2006-08-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/twisted/integration.py (Plan._makeOutputDir): Ensure
+	that the test directory exists before making subdirs in it. Should
+	fix twisted 2.0.1 build failures, where trial logs into
+	/tmp/tmpXXXXXX instead of ./_trial_temp.
+
 2006-08-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

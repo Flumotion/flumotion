@@ -373,6 +373,11 @@ class Plan:
         self.timeout = 20
 
     def _makeOutputDir(self, testDir):
+        # ensure that testDir exists
+        try:
+            os.mkdir(testDir)
+        except OSError:
+            pass
         tail = '%s-%s' % (self.testCaseName, self.name)
         outputDir = os.path.join(testDir, tail)
         os.mkdir(outputDir)
