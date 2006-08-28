@@ -549,7 +549,8 @@ class Vishnu(log.Loggable):
         p = componentState.get('moodPending')
         if p != None:
             raise errors.ComponentMoodError(
-                "%r already has a pending mood %s" % moods.get(p).name)
+                "%r already has a pending mood %s" % (
+                    componentState, moods.get(p).name))
 
         # find a worker this component can start on
         workerId = (componentState.get('workerName')
