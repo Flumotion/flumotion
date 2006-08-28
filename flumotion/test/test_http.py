@@ -312,8 +312,8 @@ class TestHTTPRoot(unittest.TestCase):
         output = r.render(request)
         self.assertEquals(request.response,  http.NOT_FOUND)
 
-        # a request for a/b should work
-        log.debug('unittest', 'requesting a/b, should work')
+        # a request for a should work
+        log.debug('unittest', 'requesting a, should work')
         request = FakeRequest(ip='', postpath=['a'])
         r = site.getResourceFor(request)
         self.assertEquals(r, resource)
