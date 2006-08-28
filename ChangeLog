@@ -1,5 +1,10 @@
 2006-08-28  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/component.py:
+	  Improve comment that was a bit confusing.
+
+2006-08-28  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/resources.py:
 	  Don't treat maxclients == -1 as meaning no client is allowed; this
 	  means there's no max set.
