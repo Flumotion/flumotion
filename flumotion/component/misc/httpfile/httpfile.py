@@ -127,7 +127,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             if path is None: 
                 msg = "missing required property 'path_to_file'"
                 return defer.fail(errors.ConfigError(msg)) 
-                if not os.path.isfile(path):
-                    msg = "the file specified in 'path_to_file': %s does not" \
-                        "exist or is not a file" % path
-                    return defer.fail(errors.ConfigError(msg)) 
+            if not os.path.isfile(path):
+                msg = "the file specified in 'path_to_file': %s does not" \
+                    "exist or is not a file" % path
+                return defer.fail(errors.ConfigError(msg)) 

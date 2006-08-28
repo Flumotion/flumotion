@@ -1,6 +1,11 @@
 2006-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/httpfile/httpfile.py:
+	Check for file existing could never be run, duh!
+
+2006-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/httpfile/httpfile.py:
 	Forgot an import.  Bad me.
 
 2006-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
