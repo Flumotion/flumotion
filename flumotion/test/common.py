@@ -42,7 +42,7 @@ if i > -1:
     fdpass.__path__.append(os.path.join(top_builddir, 'flumotion', 'extern',
         'fdpass'))
 
-import unittest
+from twisted.trial import unittest
 if type(unittest.TestCase) != type:
     # FIXME: T1.3
     def deferred_result(proc):

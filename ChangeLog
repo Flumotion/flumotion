@@ -1,5 +1,7 @@
 2006-08-28  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/test/common.py: Fix a screwup.
+
 	* flumotion/twisted/integration.py (Plan._makeOutputDir): Ensure
 	that the test directory exists before making subdirs in it. Should
 	fix twisted 2.0.1 build failures, where trial logs into
