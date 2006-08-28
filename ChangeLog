@@ -1,3 +1,10 @@
+2006-08-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/test/test_http.py:
+	  add a test for requesting a direct root child, and fix the bug
+	  exposed by it.
+
 2006-08-28  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:

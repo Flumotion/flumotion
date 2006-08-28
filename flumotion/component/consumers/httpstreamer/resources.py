@@ -575,10 +575,9 @@ class HTTPRoot(web_resource.Resource, log.Loggable):
         # we override this method so that we can look up tree resources
         # directly without having their parents.
         # There's probably a more Twisted way of doing this, but ...
-        fullPath = ''
-        if path:
-            fullPath = path + '/'
-        fullPath += string.join(request.postpath, '/')
+        fullPath = path
+        if request.postpath:
+            fullPath += '/' + string.join(request.postpath, '/')
         self.debug("Incoming request %r for path %s" % (request, fullPath))
         r = web_resource.Resource.getChildWithDefault(self, fullPath, request)
         self.debug("Returning resource %r" % r)
