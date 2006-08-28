@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 import os
+import string
 
 from flumotion.component import component
 from flumotion.common import log, messages, errors
