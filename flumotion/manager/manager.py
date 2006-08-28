@@ -655,8 +655,8 @@ class Vishnu(log.Loggable):
             allComponents = components + lostComponents
 
             if not allComponents:
-                self.debug('vishnu.workerAttached(): no components for this "
-                    "worker')
+                self.debug('vishnu.workerAttached(): no components for this '
+                    'worker')
                 return
         
             self._workerCreateComponents(workerId, allComponents)
