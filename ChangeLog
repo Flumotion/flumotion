@@ -1,3 +1,14 @@
+2006-08-28  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	  Set mood to 'waking' when setup() is called. 
+
+	* flumotion/manager/manager.py:
+	  Note a waking component (on login) as having already been set up,
+	  but not started.
+	  A 'hungry' component is setup and started.
+	  Improve some log lines.
+
 2006-08-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/worker/worker.py:

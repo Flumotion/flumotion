@@ -648,16 +648,15 @@ class Vishnu(log.Loggable):
                         lostComponents.remove(compState)
             
             for compState in lostComponents:
-                self.info("Component %s is lost is meant to be running on "
-                    " worker %s that has now logged in.  However worker is"
-                    " not running this component, so we are going to tell"
-                    " worker to create this component." % 
+                self.info("Component %s was lost but is running on worker %r "
+                    "that logged in. Not starting again.",
                     (self._componentMappers[compState].id, workerId))
 
             allComponents = components + lostComponents
 
             if not allComponents:
-                self.debug('vishnu.workerAttached(): no components for this worker')
+                self.debug('vishnu.workerAttached(): no components for this "
+                    "worker')
                 return
         
             self._workerCreateComponents(workerId, allComponents)
@@ -825,14 +824,19 @@ class Vishnu(log.Loggable):
 
         self._depgraph.setJobStarted(m.state)
         # If this is a reconnecting component, we might also need to set the
-        # component as setup and/or started
-        if m.state.get('mood') == moods.happy.value:
-            # TODO: We don't detect that a component was setup but not started,
-            # here. That means if we get a reconnect in that (relatively small)
-            # window, we'll fail.
-            self.debug("Component %s is already in happy.  Set depgraph approprioately", componentAvatar.avatarId)
+        # component as setup and/or started.
+        # If mood is happy or hungry, then the component is running.
+        mood = m.state.get('mood')
+        if mood == moods.happy.value or mood == moods.hungry.value:
+            self.debug("Component %s is already in mood %s.  Set depgraph "
+                "appropriately", moods.get(mood).name, componentAvatar.avatarId)
             self._depgraph.setComponentSetup(m.state)
             self._depgraph.setComponentStarted(m.state)
+        elif mood == moods.waking.value:
+            self.debug("Component %s is waking, noting in depgraph", 
+                componentAvatar.avatarId)
+            self._depgraph.setComponentSetup(m.state)
+
         self.debug('vishnu registered component %r' % componentAvatar)
         self.componentHeaven._tryWhatCanBeStarted()
 

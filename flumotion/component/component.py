@@ -460,6 +460,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
                 raise errors.ComponentSetupError()
 
         self.debug("setup() called with config %r", config)
+        self.setMood(moods.waking)
         self._setConfig(config)
         # now we have a name, set it on the medium too
         if self.medium:
