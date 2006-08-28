@@ -648,15 +648,15 @@ class Vishnu(log.Loggable):
                         lostComponents.remove(compState)
             
             for compState in lostComponents:
-                self.info("Lost component %s is not running on worker %r where "
-                    "it was previously running, so restarting.",
-                    (self._componentMappers[compState].id, workerId))
+                self.info(
+                    "Restarting previously lost component %s on worker %s",
+                    self._componentMappers[compState].id, workerId)
 
             allComponents = components + lostComponents
 
             if not allComponents:
-                self.debug('vishnu.workerAttached(): no components for this '
-                    'worker')
+                self.debug(
+                    "vishnu.workerAttached(): no components for this worker")
                 return
         
             self._workerCreateComponents(workerId, allComponents)
