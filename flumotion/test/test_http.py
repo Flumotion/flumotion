@@ -282,15 +282,15 @@ class TestHTTPRoot(unittest.TestCase):
         resource = resources.HTTPStreamingResource(streamer)
         root.putChild('', resource)
 
-        log.debug('unittest', 'requesting root, should work')
+        log.debug('unittest', 'requesting /, should work')
         request = FakeRequest(ip='')
         r = site.getResourceFor(request)
         self.assertEquals(r, resource)
         output = r.render(request)
         self.assertEquals(output,  server.NOT_DONE_YET)
 
-        # a request for a/b should give 404
-        log.debug('unittest', 'requesting a/b, should 404')
+        # a request for /a/b should give 404
+        log.debug('unittest', 'requesting /a/b, should 404')
         request = FakeRequest(ip='', postpath=['a', 'b'])
         r = site.getResourceFor(request)
         output = r.render(request)
@@ -305,23 +305,23 @@ class TestHTTPRoot(unittest.TestCase):
         resource = resources.HTTPStreamingResource(streamer)
         root.putChild('a', resource)
 
-        # a request for root should give 404
-        log.debug('unittest', 'requesting root, should 404')
+        # a request for / should give 404
+        log.debug('unittest', 'requesting /, should 404')
         request = FakeRequest(ip='')
         r = site.getResourceFor(request)
         output = r.render(request)
         self.assertEquals(request.response,  http.NOT_FOUND)
 
-        # a request for a should work
-        log.debug('unittest', 'requesting a, should work')
+        # a request for /a should work
+        log.debug('unittest', 'requesting /a, should work')
         request = FakeRequest(ip='', postpath=['a'])
         r = site.getResourceFor(request)
         self.assertEquals(r, resource)
         output = r.render(request)
         self.assertEquals(output,  server.NOT_DONE_YET)
 
-        # a request for a/b should give 404
-        log.debug('unittest', 'requesting a/b, should 404')
+        # a request for /a/b should give 404
+        log.debug('unittest', 'requesting /a/b, should 404')
         request = FakeRequest(ip='', postpath=['a', 'b'])
         r = site.getResourceFor(request)
         output = r.render(request)
@@ -336,15 +336,15 @@ class TestHTTPRoot(unittest.TestCase):
         resource = resources.HTTPStreamingResource(streamer)
         root.putChild('a/b', resource)
 
-        # a request for root should give 404
-        log.debug('unittest', 'requesting root, should 404')
+        # a request for / should give 404
+        log.debug('unittest', 'requesting /, should 404')
         request = FakeRequest(ip='')
         r = site.getResourceFor(request)
         output = r.render(request)
         self.assertEquals(request.response,  http.NOT_FOUND)
 
-        # a request for a/b should work
-        log.debug('unittest', 'requesting a/b, should work')
+        # a request for /a/b should work
+        log.debug('unittest', 'requesting /a/b, should work')
         request = FakeRequest(ip='', postpath=['a', 'b'])
         r = site.getResourceFor(request)
         self.assertEquals(r, resource)
