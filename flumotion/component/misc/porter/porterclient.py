@@ -121,4 +121,35 @@ class PorterClientFactory(fpb.ReconnectingPBClientFactory):
 
     def deregisterDefault(self):
         return self.medium.deregisterPrefix("/")
-        
+
+class HTTPPorterClientFactory(PorterClientFactory):
+    def __init__(self, childFactory, mountPoints, do_start_deferred):
+        """
+        @param mountPoints: a list of mountPoint strings that should be
+                            registered to the porter
+        """
+        PorterClientFactory.__init__(self, childFactory)
+        self._mountPoints = mountPoints
+        self._do_start_deferred = do_start_deferred
+
+    def _fireDeferred(self, r):
+        # If we still have the deferred, fire it (this happens after we've
+        # completed log in the _first_ time, not subsequent times)
+        if self._do_start_deferred:
+            self.debug("Firing initial deferred: should indicate that login is "
+                "complete")
+            self._do_start_deferred.callback(None)
+            self._do_start_deferred = None
+
+    def gotDeferredLogin(self, deferred):
+        # This is called when we start logging in to give us the deferred for
+        # the login process. Once we're logged in, we want to set our
+        # remote ref, then register our path with the porter, then (possibly)
+        # fire a different deferred
+        self.debug("Got deferred login, adding callbacks")
+        deferred.addCallback(self.medium.setRemoteReference)
+        for mount in self._mountPoints:
+            self.debug("Registering mount point %s with porter", mount)
+            deferred.addCallback(lambda r,m: self.registerPath(m), 
+                mount)
+        deferred.addCallback(self._fireDeferred)

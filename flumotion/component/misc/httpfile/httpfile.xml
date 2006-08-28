@@ -1,0 +1,55 @@
+<registry>
+
+  <components>
+  
+    <component type="httpfile" base="flumotion/component/misc/httpfile">
+      <source location="flumotion.component.misc.httpfile.httpfile" />
+      <entries>
+        <entry type="component" location="httpfile.py"
+               function="HTTPFileStreamer" />
+      </entries>
+      <properties>
+        <property name="port" type="int" />
+        <property name="mount_point" type="string" />
+		<property name="path_to_file" type="string" />
+        <property name="type" type="string" />
+		
+        <!-- If type is 'slave' -->
+        <property name="porter_socket_path" type="string" />
+        <property name="porter_user" type="string" />
+        <property name="porter_pass" type="string" />
+      </properties>
+    </component>
+ 
+  </components>
+
+  <bundles>
+
+    <bundle name="httpfile-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/misc/httpfile">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="httpfile-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="httpfile-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/misc/httpfile">
+                <filename location="httpfile.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

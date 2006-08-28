@@ -12,6 +12,7 @@ clean-local:
 SUBDIRS = \
 	porter \
 	repeater \
-	gdptestsrc
+	gdptestsrc \
+	httpfile
 
 EXTRA_DIST = $(misc_DATA)

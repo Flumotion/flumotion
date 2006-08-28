@@ -175,7 +175,6 @@ class Stats:
         set('consumption-bitrate-raw', bitspeed)
         set('consumption-totalbytes-raw', bytes_sent)
 
-
 class HTTPMedium(feedcomponent.FeedComponentMedium):
     def __init__(self, comp):
         """
@@ -210,31 +209,6 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
 
     def remote_getLoadData(self):
         return self.comp.getLoadData()
-
-class HTTPPorterClientFactory(porterclient.PorterClientFactory):
-    def __init__(self, childFactory, mountPoint, do_start_deferred):
-        porterclient.PorterClientFactory.__init__(self, childFactory)
-        self._mountPoint = mountPoint
-        self._do_start_deferred = do_start_deferred
-
-    def _fireDeferred(self, r):
-        # If we still have the deferred, fire it (this happens after we've
-        # completed log in the _first_ time, not subsequent times)
-        if self._do_start_deferred:
-            self.debug("Firing initial deferred: should indicate that login is "
-                "complete")
-            self._do_start_deferred.callback(None)
-            self._do_start_deferred = None
-
-    def gotDeferredLogin(self, deferred):
-        # This is called when we start logging in to give us the deferred for
-        # the login process. Once we're logged in, we want to set our
-        # remote ref, then register our path with the porter, then (possibly)
-        # fire a different deferred
-        self.debug("Got deferred login, adding callbacks")
-        deferred.addCallback(self.medium.setRemoteReference)
-        deferred.addCallback(lambda r: self.registerPath(self._mountPoint))
-        deferred.addCallback(self._fireDeferred)
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
@@ -306,7 +280,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 if not 'porter_'+k in props:
                     msg = 'porter slave mode missing required property %s'%k
                     return defer.fail(errors.ConfigError(msg))
-        
+    
     def configure_pipeline(self, pipeline, properties):
         Stats.__init__(self, sink=self.get_element('sink'))
 
@@ -320,7 +294,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if not mountPoint.startswith('/'):
             mountPoint = '/' + mountPoint
         self.mountPoint = mountPoint
-
+        
         # Hostname is used for a variety of purposes. We do a best-effort guess
         # where nothing else is possible, but it's much preferable to just
         # configure this
@@ -562,7 +536,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         # TwistedWeb wants the child path to not include the leading /
         mount = self.mountPoint[1:]
         root.putChild(mount, self.resource)
-        
         if self.type == 'slave':
             # Streamer is slaved to a porter.
 
@@ -581,9 +554,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 *args, **kwargs)
 
             d2 = defer.Deferred()
-            self._pbclient = HTTPPorterClientFactory(
-                server.Site(resource=root), self.mountPoint, d2)
-
+            mountpoints = [self.mountPoint]
+            self._pbclient = porterclient.HTTPPorterClientFactory(
+                server.Site(resource=root), mountpoints, d2)
             dl = defer.DeferredList([d1, d2])
 
             # This will eventually cause d2 to fire

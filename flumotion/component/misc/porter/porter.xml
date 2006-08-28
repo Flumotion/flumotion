@@ -25,15 +25,37 @@
   </components>
 
   <bundles>
-    <bundle name="porter">
+    <bundle name="porter-base">
       <dependencies>
         <dependency name="component-base" />
       </dependencies>
 
       <directories>
         <directory name="flumotion/component/misc/porter">
-          <filename location="porter.py" />
+          <filename location="__init__.py" />
         </directory>
+      </directories>
+    </bundle>
+    <bundle name="porter">
+      <dependencies>
+        <dependency name="porter-base" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/misc/porter">
+	  <filename location="porter.py" />
+	</directory>
+      </directories>
+    </bundle>
+    <bundle name="porterclient">
+      <dependencies>
+        <dependency name="porter-base" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/misc/porter">
+	  <filename location="porterclient.py" />
+	</directory>
       </directories>
     </bundle>
   </bundles>

@@ -1,3 +1,21 @@
+2006-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	Import porterclient.
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	Add bundle dependency on porterclient.
+	* configure.ac:
+	* flumotion/component/misc/Makefile.am:
+	* flumotion/component/misc/httpfile/Makefile.am:
+	* flumotion/component/misc/httpfile/__init__.py:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/component/misc/httpfile/httpfile.xml:
+	Add new component to serve static files over HTTP.
+	* flumotion/component/misc/porter/porterclient.py:
+	Move HTTPPorterClientFactory to porterclient.
+	* flumotion/component/misc/porter/porter.xml:
+	Add porterclient bundle.
+
 2006-08-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/manager.py:
