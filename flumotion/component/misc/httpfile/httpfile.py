@@ -32,6 +32,22 @@ from twisted.cred import credentials
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
+#copied from f.c.c.httpstreamer.resources
+class HTTPRoot(resource.Resource, log.Loggable):
+    logCategory = "httproot"
+
+    def getChildWithDefault(self, path, request):
+        # we override this method so that we can look up tree resources
+        # directly without having their parents.
+        # There's probably a more Twisted way of doing this, but ...
+        fullPath = path
+        if request.postpath:
+            fullPath += '/' + string.join(request.postpath, '/')
+        self.debug("Incoming request %r for path %s" % (request, fullPath))
+        r = resource.Resource.getChildWithDefault(self, fullPath, request)
+        self.debug("Returning resource %r" % r)
+        return r
+
 class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     def init(self):
         self.mountPoint = None
@@ -58,7 +74,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         return component.BaseComponent.do_stop(self)
 
     def do_start(self, *args, **kwargs):
-        root = resource.Resource()
+        root = HTTPRoot()
 
         # TwistedWeb wants the child path to not include the leading /
         mount = self.mountPoint[1:]

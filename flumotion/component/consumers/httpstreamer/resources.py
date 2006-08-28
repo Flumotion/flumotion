@@ -568,6 +568,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     render_GET = _render
     render_HEAD = _render
 
+# this is copied into httpfile component, if there's a fix here
+# please apply there also
 class HTTPRoot(web_resource.Resource, log.Loggable):
     logCategory = "httproot"
 

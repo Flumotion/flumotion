@@ -1,5 +1,12 @@
 2006-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	Copy Thomas's hacked subclass of Resource to httpfile
+	so we can also handle non root dir urls in httpfile.
+
+2006-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/component.xml:
 	Add misc/__init__.py to component-base bundle.
 
