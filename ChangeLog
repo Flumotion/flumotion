@@ -1,3 +1,10 @@
+2006-08-29  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/misc/repeater/repeater.py
+	(Repeater.get_pipeline_string): This component was 25% buggy. And
+	the other 75% was boilerplate. Don't overload the logs with a
+	verbose message for every buffer.
+
 2006-08-29  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

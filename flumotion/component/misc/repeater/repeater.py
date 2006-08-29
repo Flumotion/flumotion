@@ -23,5 +23,5 @@ from flumotion.component import feedcomponent
 
 class Repeater(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
-        return 'identity'
+        return 'identity silent=true'
 
