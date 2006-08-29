@@ -1,3 +1,11 @@
+2006-08-29  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	No longer using this ugly hack in httpfile.
+	* flumotion/component/misc/httpfile/httpfile.py:
+	Use twisted's preferred way of having a tree of resources instead
+	of Thomas's ugly hack.
+
 2006-08-29  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/producers/firewire/firewire.py

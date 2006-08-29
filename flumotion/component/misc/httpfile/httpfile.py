@@ -33,22 +33,6 @@ from twisted.cred import credentials
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
-#copied from f.c.c.httpstreamer.resources
-class HTTPRoot(resource.Resource, log.Loggable):
-    logCategory = "httproot"
-
-    def getChildWithDefault(self, path, request):
-        # we override this method so that we can look up tree resources
-        # directly without having their parents.
-        # There's probably a more Twisted way of doing this, but ...
-        fullPath = path
-        if request.postpath:
-            fullPath += '/' + string.join(request.postpath, '/')
-        self.debug("Incoming request %r for path %s" % (request, fullPath))
-        r = resource.Resource.getChildWithDefault(self, fullPath, request)
-        self.debug("Returning resource %r" % r)
-        return r
-
 class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     def init(self):
         self.mountPoint = None
@@ -75,11 +59,19 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         return component.BaseComponent.do_stop(self)
 
     def do_start(self, *args, **kwargs):
-        root = HTTPRoot()
-
+        #root = HTTPRoot()
+        root = resource.Resource()
         # TwistedWeb wants the child path to not include the leading /
         mount = self.mountPoint[1:]
-        root.putChild(mount, static.File(self.filePath))
+        # split path on / and add iteratively twisted.web resources
+        children = string.split(mount, '/')
+        current_resource = root
+        for child in children[:-1]:
+            res = resource.Resource()
+            current_resource.putChild(child, res)
+            current_resource = res
+        current_resource.putChild(children[-1:][0], static.File(self.filePath))
+        #root.putChild(mount, HTTPStaticFile(self.filePath))
         if self.type == 'slave':
             # Streamer is slaved to a porter.
             d = defer.Deferred()
