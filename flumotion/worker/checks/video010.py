@@ -70,12 +70,12 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None):
             retval = check_proc(element)
             resolution.callback(retval)
         except check.CheckProcError, e:
-            log.debug('CheckProcError when running %r: %r' % (check_proc,
-                e.data))
+            log.debug('check', 'CheckProcError when running %r: %r',
+                      check_proc, e.data)
             resolution.errback(errors.RemoteRunError(e.data))
         except Exception, e:
-            log.debug('Unhandled exception while running %r: %r' % (check_proc,
-                e))
+            log.debug('check', 'Unhandled exception while running %r: %r',
+                      check_proc, e)
             resolution.errback(errors.RemoteRunError(
                 log.getExceptionMessage(e)))
         # set pipeline state to NULL so worker does not consume
@@ -157,7 +157,7 @@ def check1394(id):
         h = s['height']
         par = s['pixel-aspect-ratio']
         result = dict(width=w, height=h, par=(par.num, par.denom))
-        log.debug('returning dict %r' % result)
+        log.debug('check', 'returning dict %r' % result)
         return result
         
     # first check if the obvious device node exists

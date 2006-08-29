@@ -1,3 +1,9 @@
+2006-08-29  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/checks/video010.py (do_element_check.run_check)
+	(check1394.do_check): Fix bogus log.debug() calls that caused
+	errors.
+
 2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_pbstream.py:
