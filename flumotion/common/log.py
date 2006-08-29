@@ -207,7 +207,7 @@ def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
     return format, debugArgs
 
 def doLog(level, object, category, format, args, where=-1,
-          file=None, line=None):
+    file=None, line=None):
     """
     @param where: what to log file and line number for;
                   -1 for one frame above log.py; -2 and down for higher up

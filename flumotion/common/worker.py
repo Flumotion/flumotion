@@ -175,8 +175,8 @@ class ManagerWorkerHeavenState(flavors.StateCacheable):
 
     I have the following keys:
 
-    - names   (list): list of worker names that we have state for
-    - workers (list): list of L{ManagerWorkerState}
+     - names   (list): list of worker names that we have state for
+     - workers (list): list of L{ManagerWorkerState}
     """
     def __init__(self):
         flavors.StateCacheable.__init__(self)
@@ -199,8 +199,8 @@ class ManagerWorkerState(flavors.StateCacheable):
     """
     I represent the state of a worker in the manager.
 
-    - name: name of the worker
-    - host: the IP address of the worker as seen by the manager
+     - name: name of the worker
+     - host: the IP address of the worker as seen by the manager
     """
     def __init__(self, **kwargs):
         flavors.StateCacheable.__init__(self)
