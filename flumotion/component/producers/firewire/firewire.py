@@ -123,6 +123,8 @@ class Firewire(feedcomponent.ParseLaunchComponent):
 
         self.addEffect(vol)
 
+    def getVolume(self):
+        return self.volume.get_property('volume')
         
     def setVolume(self, value):
         """
