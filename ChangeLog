@@ -1,3 +1,78 @@
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/feed.py:
+	  use transport.loseConnection() instead
+
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/feed.py:
+	* flumotion/worker/worker.py:
+	  if we can't hand off the fd to the job because the mind is gone,
+	  bubble up a False result, and use it to drop all references to
+	  the transport.
+
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	  comment on the FIXME
+
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	  add an event probe for EOS and swallow it - reconnect will be
+	  triggered due to buffer probe.
+	  There may be a better way to deal with this though.
+
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	  further fix feed reconnection for stopped upstream components:
+	  - handle fdsrc EOS in bus handler by reconnecting
+	  - in _checkEater(), try to reconnect even if the lastTime was
+	    set to 0
+	  - in eaterDisconnected(), reset lastTime to 0 to make sure
+	    our checkEater() doesn't spuriously mark the feed as connected
+	    again just because we received data right before the disconnect
+
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	  implement feed reconnection for eaters:
+	  - make checks for receiving data per-eater instead of global
+	  - rename to _checkEater, and keep track of callLater state
+	    so we can use this method both as a callLater and a normal method
+	  - add overridable vmethods eaterDisconnected and eaterConnected,
+	    which by default set to hungry if any eater is disconnected,
+	    and happy otherwise.  Subclasses can override this behaviour here.
+	  - _checkEater will also re-attempt connection if the previous
+	    reconnection did not result in receiving new data in the eater 
+	  - add a _reconnectEater method that properly reconnects, and
+	    tracks state of connection attempts
+	  - fixed EatFromFD() to handle the case where fdsrc is already in
+	    PAUSED/PLAYING; where it doesn't accept a change of fd, by
+	    taking fdsrc out, changing state, adding, and reinserting
+
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent.py:
+	  key the feederFeedServer on feedId instead
+
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/worker.py:
+	  handle the case where a job is gone by closing the fd,
+	  which indicates EOS
+
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/manager.py:
+	  fix args error in exception
+
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/component.py:
+	  when setup fails, give us a UI error message
+
 2006-08-29  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/misc/repeater/repeater.py
@@ -68,6 +143,18 @@
 	Move HTTPPorterClientFactory to porterclient.
 	* flumotion/component/misc/porter/porter.xml:
 	Add porterclient bundle.
+
+2006-08-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	  make hungry-because-of-eos sticky
+
+2006-08-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/manager.py:
+	  a lost component should also be stoppable.  Not yet sure
+	  what should happen if the manager thinks it is "stopped", and
+	  then the lost component logs back in though.
 
 2006-08-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 

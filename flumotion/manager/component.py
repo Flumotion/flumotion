@@ -395,6 +395,7 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         Tell the component to start, possibly linking to other components.
         """
+        self.debug('start')
         conf = self.componentState.get('config')
         master = conf['clock-master'] # avatarId of the clock master comp
         clocking = None
@@ -936,8 +937,15 @@ class ComponentHeaven(base.ManagerHeaven):
             # now not being setup
             componentAvatar._beingSetup = False
         except Exception, e:
-            self.warning('setup failed:%s' % log.getExceptionMessage(e))
+            self.warning('setup failed: %s' % log.getExceptionMessage(e))
+            m = messages.Error(T_(
+                N_("Could not setup component.")),
+                debug=log.getExceptionMessage(e),
+                id="component-setup-%s" % componentAvatar.avatarId)
+            componentAvatar._addMessage(m)
+            componentAvatar._setMood(moods.sad)
             raise errors.FlumotionError('Could not set up component')
+ 
     setupComponent = defer_generator_method(_setupComponent)
         
     def registerComponent(self, componentAvatar):

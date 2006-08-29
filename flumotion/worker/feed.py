@@ -133,8 +133,13 @@ class FeedAvatar(fpb.Avatar):
         self.debug("Attempting to send FD: %d" % t.fileno())
         
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
-        self._feedServerParent.feedToFD(
-            common.componentId(flowName, componentName), feedName, t.fileno())
+        if not self._feedServerParent.feedToFD(
+            common.componentId(flowName, componentName), feedName, t.fileno()):
+            # unsetting the transport should cause it to get garbage-collected
+            # faster, which will close the file descriptor and trigger EOS
+            # on the other side
+            self.debug("Could not feedToFD, deleting transport")
+            self._transport.loseConnection()
 
     def perspective_receiveFeed(self, componentId, feedId):
         """
@@ -261,6 +266,7 @@ class FeedMedium(fpb.Referenceable):
         @type  component: L{flumotion.component.feedcomponent.FeedComponent}
         """
         self.component = component
+        self.logName = component.name
         self._transports = {} # fullFeedId -> transport
 
     ### IMedium methods

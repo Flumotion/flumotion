@@ -665,9 +665,11 @@ class WorkerBrain(log.Loggable):
         """
         Called from the FeedAvatar to pass a file descriptor on to
         the job running the component for this feeder.
+
+        @returns: whether the fd was successfully handed off to the component.
         """
         avatar = self.jobHeaven.avatars[componentId]
-        avatar.sendFeed(feedName, fd)
+        return avatar.sendFeed(feedName, fd)
 
     def eatFromFD(self, componentId, feedId, fd):
         """
@@ -789,11 +791,23 @@ class JobAvatar(pb.Avatar, log.Loggable):
     def sendFeed(self, feedName, fd):
         """
         Tell the feeder to send the given feed to the given fd.
+
+        @returns: whether the fd was successfully handed off to the component.
         """
         self.debug('Sending FD %d to component job to feed %s to fd' % (
             fd, feedName))
-        self._mind.broker.transport.sendFileDescriptor(
-            fd, "sendFeed %s" % feedName)
+
+        # it is possible that the component has logged out, in which case
+        # we don't have a _mind.  Trying to check for this earlier only
+        # introduces a race, so we handle it here by triggering a disconnect
+        # on the fd.
+        if self._mind:
+            self._mind.broker.transport.sendFileDescriptor(
+                fd, "sendFeed %s" % feedName)
+            return True
+
+        self.debug('my mind is gone, trigger disconnect')
+        return False
 
     def receiveFeed(self, feedId, fd):
         """

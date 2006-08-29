@@ -67,7 +67,7 @@ class BaseMedium(fpb.Referenceable):
         self.debug('%r.setRemoteReference: %r' % (self, remoteReference))
         self.remote = remoteReference
         def nullRemote(x):
-            self.info('%r: disconnected from %r' % (self, self.remote))
+            self.debug('%r: disconnected from %r' % (self, self.remote))
             self.remote = None
         self.remote.notifyOnDisconnect(nullRemote)
 

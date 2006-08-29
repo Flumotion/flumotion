@@ -584,16 +584,26 @@ class Vishnu(log.Loggable):
         componentState.set('moodPending', None)
 
         avatar = self.getComponentMapper(componentState).avatar
-        if componentState.get('mood') == moods.sad.value and not avatar:
-            self.debug('asked to stop a sad component without avatar')
-            componentState.set('mood', planet.moods.sleeping.value)
-            return defer.succeed(None)
+        if not avatar:
+            if componentState.get('mood') == moods.sad.value:
+                self.debug('asked to stop a sad component without avatar')
+                componentState.set('mood', moods.sleeping.value)
+                return defer.succeed(None)
+            if componentState.get('mood') == moods.lost.value:
+                self.debug('asked to stop a lost component without avatar')
+                componentState.set('mood', moods.sleeping.value)
+                return defer.succeed(None)
+
+            msg = 'asked to stop a component without avatar in mood %s' % \
+                    moods.get(componentState.get('mood'))
+            self.warning(msg)
+            return defer.fail(errors.ComponentError(msg))
 
         d = avatar.mindCallRemote('stop')
         def clearSadCallback(result):
-            if componentState.get('mood') == planet.moods.sad.value:
+            if componentState.get('mood') == moods.sad.value:
                 self.debug('clearing sad mood after stopping component')
-                componentState.set('mood', planet.moods.sleeping.value)
+                componentState.set('mood', moods.sleeping.value)
             return result
         d.addCallback(clearSadCallback)
         return d

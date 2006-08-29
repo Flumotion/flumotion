@@ -454,7 +454,7 @@ class FluLogObserver(Loggable):
                 self.log("Failure %r" % f)
 
                 method = debug # tracebacks from errors at debug level
-                msg = "A python traceback occurred."
+                msg = "A twisted traceback occurred."
                 if getCategoryLevel("twisted") < WARN:
                     msg += "  Run with debug level >= 2 to see the traceback."
                 # and an additional warning

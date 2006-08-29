@@ -59,7 +59,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         """
         basecomponent.BaseComponentMedium.__init__(self, component)
 
-        self._feederFeedServer = {} # fullFeedId -> (host, port) tuple
+        self._feederFeedServer = {} # FeedId -> (fullFeedId, host, port) tuple
                                     # for remote feeders
         self._feederClientFactory = {} # fullFeedId -> client factory
         self._eaterFeedServer = {}  # fullFeedId -> (host, port) tuple
@@ -97,7 +97,20 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
 
         Called on by the manager-side ComponentAvatar.
         """
-        self._feederFeedServer[fullFeedId] = (host, port)
+        # we key on the feedId because a component is part of only one flow,
+        # and doesn't even know the flow name it is part of.
+        flowName, componentName, feedName = common.parseFullFeedId(fullFeedId)
+        feedId = common.feedId(componentName, feedName)
+        self._feederFeedServer[feedId] = (fullFeedId, host, port)
+        # FIXME: drop connection if we already had one
+        return self.connectEater(feedId)
+
+    def connectEater(self, feedId):
+        """
+        Actually eat the given feed.
+        Used on initial connection, and for reconnecting.
+        """
+        (fullFeedId, host, port) = self._feederFeedServer[feedId]
         client = feed.FeedMedium(self.comp)
         factory = feed.FeedClientFactory(client)
         # FIXME: maybe copy keycard instead, so we can change requester ?
