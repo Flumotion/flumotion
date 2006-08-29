@@ -22,6 +22,7 @@
 import common
 from twisted.trial import unittest
 
+import os
 import sys
 
 # needed so we can have multifdsink streaming thread signal handlers
@@ -76,6 +77,14 @@ class Client(pb.Referenceable, log.Loggable):
         self._id = self.sink.connect('handoff', self._handoff_cb)
         self.deferred = defer.Deferred() # fired when we receive a buffer
 
+        srcpad = self.src.get_pad("src")
+        srcpad.add_event_probe(self._probe_cb)
+
+    def _probe_cb(self, pad, event):
+        if event.type == gst.EVENT_EOS:
+            self.debug('eos received, stopping')
+            reactor.callFromThread(self.callback, "eos")
+
     def _handoff_cb(self, sink, buffer, pad):
         # called once, and only once
         self.debug("buffer received, stopping")
@@ -83,12 +92,16 @@ class Client(pb.Referenceable, log.Loggable):
         self._id = None
         # we get executed from the streaming thread, so we want to
         # callback our deferred from the reactor thread
-        reactor.callFromThread(self.callback)
+        reactor.callFromThread(self.callback, "handoff")
 
-    def callback(self):
+    def callback(self, reason):
         # fire our deferred
-        self.deferred.callback(None)
-        self.deferred = None
+        if self.deferred:
+            self.debug('firing callback because of %s' % reason)
+            self.deferred.callback(None)
+            self.deferred = None
+        else:
+            self.debug('deferred already fired, ignoring %s' % reason)
 
     def connected(self, perspective):
         self.debug("got perspective ref: %r" % perspective)
@@ -157,10 +170,13 @@ class Client(pb.Referenceable, log.Loggable):
 class Server(log.Loggable):
     logCategory = "server"
 
-    def __init__(self):
+    def __init__(self, immediateStop=False):
+        # if immediateStop is True, the server will not actually hand off the
+        # fd to multifdsink, but close it immediately
         self.pipeline = None
         self.client = None
         self.sink = None
+        self.immediateStop = immediateStop
 
     def start(self):
         self.pipeline = gst.parse_launch("audiotestsrc ! audioconvert ! vorbisenc ! oggmux ! gdppay ! multifdsink name=sink")
@@ -194,6 +210,8 @@ class Dispatcher(log.Loggable):
 class ClientAvatar(pb.Avatar, log.Loggable):
     logCategory = "clientavatar"
     # server-side object for client handling
+    # if immediateStop, do not actually stream but try to shut down
+    # the streaming immediately
     def __init__(self, server):
         self.server = server
         server.client = self
@@ -236,8 +254,12 @@ class ClientAvatar(pb.Avatar, log.Loggable):
         # sneaky !
         self.transport = t
         self.mind.broker.transport = None
-        self.debug("adding fd %d to multifdsink" % fd)
-        self.server.sink.emit('add', fd)
+        if self.server.immediateStop:
+            self.debug('immediateStop, closing fd')
+            os.close(fd)
+        else:
+            self.debug("adding fd %d to multifdsink" % fd)
+            self.server.sink.emit('add', fd)
 
 class TestClientEater(unittest.TestCase):
     def startClient(self):
@@ -252,8 +274,8 @@ class TestClientEater(unittest.TestCase):
 
         return client
 
-    def startServer(self):
-        server = Server()
+    def startServer(self, immediateStop=False):
+        server = Server(immediateStop)
         server.start()
         p = portal.Portal(Dispatcher(server))
         p.registerChecker(checkers.InMemoryUsernamePasswordDatabaseDontUse(
@@ -266,6 +288,29 @@ class TestClientEater(unittest.TestCase):
     def testRun(self):
         d = defer.Deferred()
         s = self.startServer()
+        c = self.startClient()
+        def stop(result):
+            log.debug("main", "stop")
+            gst.debug("main: stop")
+            log.debug("main", "stop server")
+            gst.debug("main: stop server")
+            s.stop()
+            log.debug("main", "stop client")
+            gst.debug("main: stop client")
+            c.stop()
+            self.clientFactory.disconnect()
+            self.serverPort.stopListening()
+            log.debug("main", "stop test")
+            # stop the test
+            d.callback(None)
+        c.deferred.addCallback(stop)
+        return d
+
+    def testRunImmediateStop(self):
+        # this test shows that we can also stop the stream immediately
+        # without handing off the fd to GStreamer
+        d = defer.Deferred()
+        s = self.startServer(immediateStop=True)
         c = self.startClient()
         def stop(result):
             log.debug("main", "stop")

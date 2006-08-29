@@ -1,3 +1,9 @@
+2006-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_pbstream.py:
+	  Show that we can also stop streaming before handing off the fd
+	  to multifdsink
+
 2006-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/httpfile/httpfile.py:
