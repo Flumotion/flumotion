@@ -587,7 +587,6 @@ class FeedComponent(basecomponent.BaseComponent):
         @type  fd:     int
         """
         self.debug('EatFromFD(%s, %d)' % (feedId, fd))
-        elementName = "eater:%s" % feedId
         eaterName = "eater:%s" % feedId
         self.debug('looking up element %s' % eaterName)
         element = self.get_element(eaterName)
