@@ -1,5 +1,11 @@
 2006-08-30  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/main.py (command_usage)
+	(parse_commands): Support optional arguments to commands.
+
+	* flumotion/admin/command/commands.py (commands)
+	(do_loadconfiguration): Add an optional 'save-as' argument.
+
 	* flumotion/manager/admin.py
 	(AdminAvatar.perspective_loadConfiguration): Accept an optional
 	saveAs argument that will save the XML fragment to a file in the

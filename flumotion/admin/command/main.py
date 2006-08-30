@@ -47,8 +47,11 @@ def command_usage():
     for name, desc, argspecs, proc in commands:
         sys.stdout.write('  %s -- %s\n' % (name, desc))
         sys.stdout.write('    usage: %s' % name)
-        for name, pred in argspecs:
-            sys.stdout.write(' %s' % name.upper())
+        for spec in argspecs:
+            if len(spec) > 2:
+                sys.stdout.write(' [%s]' % spec[0].upper())
+            else:
+                sys.stdout.write(' %s' % spec[0].upper())
         sys.stdout.write('\n')
 
 def usage(args, exitval=0):
@@ -70,19 +73,38 @@ def parse_commands(args):
     commandspec = matching[0]
 
     argspecs = commandspec[2]
-    if len(args[2:]) != len(argspecs):
-        print 'Error: Invalid arguments to operation %s: %r' % (op, args[2:])
+    reqspecs = [spec for spec in argspecs if len(spec) < 3]
+    nreq = len(reqspecs)
+    optspecs = argspecs[nreq:]
+    nopt = len(optspecs)
+
+    # pop off argv[0] and the command name
+    cargs = args[2:]
+
+    if len(cargs) < nreq or len(cargs) > nreq + nopt:
+        print 'Error: Invalid arguments to operation %s: %r' % (op, cargs)
         usage(args, exitval=1)
 
     vals = []
-    for argspec, arg in zip(argspecs, args[2:]):
-        name, parse = argspec
+    for name, parse in reqspecs:
+        arg = cargs.pop(0)
         try:
             vals.append(parse(arg))
         except Exception:
             err('Error: Operation %s\'s arg %s="%s" could not be '
                 'parsed as type "%s"'
                 % (op, name, arg, parse.__name__))
+    for name, parse, default in optspecs:
+        if cargs:
+            arg = cargs.pop(0)
+            try:
+                vals.append(parse(arg))
+            except Exception:
+                err('Error: Operation %s\'s arg %s="%s" could not be '
+                    'parsed as type "%s"'
+                    % (op, name, arg, parse.__name__))
+        else:
+            vals.append(default)
 
     proc = commandspec[3]
 

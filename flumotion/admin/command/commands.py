@@ -37,9 +37,10 @@ __all__ = ['commands']
 # command-desc := str
 # command-proc := f(model, quit, *args) -> None
 # arguments := (arg-spec, arg-spec...)
-# arg-spec := (arg-name, arg-parser)
+# arg-spec := (arg-name, arg-parser, arg-default?)
 # arg-name := str
 # arg-parser := f(x) -> Python value or exception
+# arg-default := any python value
 
 
 def do_getprop(model, quit, avatarId, propname):
@@ -145,17 +146,20 @@ def do_invoke(model, quit, avatarId, methodName):
     quit()
 do_invoke = defer_generator(do_invoke)
 
-def do_loadconfiguration(model, quit, confFile):
+def do_loadconfiguration(model, quit, confFile, saveAs):
     print 'Loading configuration from file: %s' % confFile
 
     f = open(confFile, 'r')
     configurationXML = f.read()
     f.close()
 
-    d = model.callRemote('loadConfiguration', configurationXML)
+    d = model.callRemote('loadConfiguration', configurationXML,
+                         saveAs=saveAs)
     yield d
     d.value()
     print 'Configuration loaded successfully.'
+    if saveAs:
+        print 'Additionally, the configuration XML was saved on the manager.'
 
     quit()
 do_loadconfiguration = defer_generator(do_loadconfiguration)
@@ -192,6 +196,7 @@ commands = (('getprop',
             ('loadconfiguration',
              'load configuration into the manager',
              (('conf-file', str),
+              ('save-as', str, None),
               ),
              do_loadconfiguration),
             )
