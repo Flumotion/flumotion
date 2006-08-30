@@ -23,12 +23,15 @@
 manager-side objects to handle administrative clients
 """
 
+import re
 import os
 from StringIO import StringIO
 
 from twisted.internet import reactor, defer
 from twisted.spread import pb
 from twisted.python import failure
+
+from flumotion.configure import configure
 
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, planet, registry
@@ -335,14 +338,58 @@ class AdminAvatar(base.ManagerAvatar):
         """
         return self.vishnu.getConfiguration()
 
-    def perspective_loadConfiguration(self, xml):
+    def perspective_loadConfiguration(self, xml, saveAs=None):
         """
-        Load the given XML configuration into the manager.
+        Load the given XML configuration into the manager. If the
+        optional saveAs parameter is passed, the XML snippet will be
+        saved to disk in the manager's flows directory.
+
+        @param xml: the XML configuration snippet.
         @type  xml: str
+        @param saveAs: The name of a file to save the XML as.
+        @type  saveAs: str
         """
+
+        if saveAs:
+            def ensure_sane(name):
+                if not re.match('^[a-zA-Z0-9_-]+$', name):
+                    raise errors.ConfigError, \
+                          'Invalid planet or saveAs name: %s' % name
+            
+            planetName = self.vishnu.state.get('name')
+            ensure_sane(planetName)
+            ensure_sane(saveAs)
+            dir = os.path.join(configure.configdir, "managers",
+                               planetName, "flows")
+            self.debug('told to save flow as %s/%s.xml', dir, saveAs)
+            try: 
+                os.makedirs(dir, 0770) 
+            except OSError, e: 
+                if e.errno != 17: # 17 == EEXIST
+                    raise e
+            prev = os.umask(0007)
+            output = open(os.path.join(dir, saveAs + '.xml'), 'a')
+            os.umask(prev)
+ 
         f = StringIO(xml)
         res = self.vishnu.loadConfigurationXML(f, self.remoteIdentity)
         f.close()
+
+        if saveAs:
+            def success(res):
+                self.debug('loadConfiguration succeeded, writing flow to %r',
+                           output)
+                output.truncate(0)
+                output.write(xml)
+                output.close()
+                return res
+            def failure(res):
+                self.debug('loadConfiguration failed, leaving %r as it was',
+                           output)
+                output.close()
+                return res
+            res.addCallbacks(success, failure)
+
         return res
 
     def perspective_deleteFlow(self, flowName):

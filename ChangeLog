@@ -1,3 +1,10 @@
+2006-08-30  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/admin.py
+	(AdminAvatar.perspective_loadConfiguration): Accept an optional
+	saveAs argument that will save the XML fragment to a file in the
+	manager's flows directory.
+
 2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/dag.py:
