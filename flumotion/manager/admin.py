@@ -338,6 +338,36 @@ class AdminAvatar(base.ManagerAvatar):
         """
         return self.vishnu.getConfiguration()
 
+    def _saveFlowFile(self, filename):
+        """Opens a file that the flow should be written to.
+
+        Note that the returned file object might be an existing file,
+        opened in append mode; if the loadConfiguration operation
+        succeeds, the file should first be truncated before writing.
+        """
+        self.vishnu.adminAction(self.remoteIdentity,
+                                '_saveFlowFile', (), {})
+        def ensure_sane(name):
+            if not re.match('^[a-zA-Z0-9_-]+$', name):
+                raise errors.ConfigError, \
+                      'Invalid planet or saveAs name: %s' % name
+        
+        planetName = self.vishnu.state.get('name')
+        ensure_sane(planetName)
+        ensure_sane(filename)
+        dir = os.path.join(configure.configdir, "managers",
+                           planetName, "flows")
+        self.debug('told to save flow as %s/%s.xml', dir, filename)
+        try: 
+            os.makedirs(dir, 0770) 
+        except OSError, e: 
+            if e.errno != 17: # 17 == EEXIST
+                raise e
+        prev = os.umask(0007)
+        output = open(os.path.join(dir, filename + '.xml'), 'a')
+        os.umask(prev)
+        return output
+
     def perspective_loadConfiguration(self, xml, saveAs=None):
         """
         Load the given XML configuration into the manager. If the
@@ -351,25 +381,7 @@ class AdminAvatar(base.ManagerAvatar):
         """
 
         if saveAs:
-            def ensure_sane(name):
-                if not re.match('^[a-zA-Z0-9_-]+$', name):
-                    raise errors.ConfigError, \
-                          'Invalid planet or saveAs name: %s' % name
-            
-            planetName = self.vishnu.state.get('name')
-            ensure_sane(planetName)
-            ensure_sane(saveAs)
-            dir = os.path.join(configure.configdir, "managers",
-                               planetName, "flows")
-            self.debug('told to save flow as %s/%s.xml', dir, saveAs)
-            try: 
-                os.makedirs(dir, 0770) 
-            except OSError, e: 
-                if e.errno != 17: # 17 == EEXIST
-                    raise e
-            prev = os.umask(0007)
-            output = open(os.path.join(dir, saveAs + '.xml'), 'a')
-            os.umask(prev)
+            output = self._saveFlowFile(saveAs)
  
         f = StringIO(xml)
         res = self.vishnu.loadConfigurationXML(f, self.remoteIdentity)

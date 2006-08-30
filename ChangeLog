@@ -1,3 +1,9 @@
+2006-08-30  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/admin.py (AdminAvatar._saveFlowFile): Break
+	out from loadConfiguration so that we can instrument it as an
+	admin action.
+
 2006-08-30  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:
