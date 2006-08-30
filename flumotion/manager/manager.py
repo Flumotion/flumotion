@@ -605,6 +605,11 @@ class Vishnu(log.Loggable):
                 self.debug('clearing sad mood after stopping component')
                 componentState.set('mood', moods.sleeping.value)
             return result
+        def clearAvatarFlags(result):
+            avatar._starting = False
+            avatar._beingSetup = False
+            return result
+        d.addCallback(clearAvatarFlags)
         d.addCallback(clearSadCallback)
         return d
 
