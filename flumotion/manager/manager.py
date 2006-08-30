@@ -643,7 +643,6 @@ class Vishnu(log.Loggable):
         # starting that matters (and that's different code).
         components = [c for c in self._getComponentsToCreate()
                       if c.get('workerRequested') in (workerId, None)]
-
         # So now, check what components worker is running
         # so we can remove them from this components list
         # also add components we have that are lost but not
@@ -670,6 +669,7 @@ class Vishnu(log.Loggable):
                 # We set mood to sleeping first. This allows things to 
                 # distinguish between a newly-started component and a lost 
                 # component logging back in.
+                compState.set('moodPending', None)
                 compState.set('mood', moods.sleeping.value)
 
             allComponents = components + lostComponents
@@ -878,6 +878,7 @@ class Vishnu(log.Loggable):
         m.state.set('pid', None)
         m.state.set('cpu', None)
         m.state.set('workerName', None)
+        m.state.set('moodPending', None)
 
         # unmap avatar
         del self._componentMappers[m.avatar]

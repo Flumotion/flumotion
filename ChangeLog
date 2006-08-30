@@ -1,3 +1,11 @@
+2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/common/dag.py:
+	Remove more un-needed log lines.
+	* flumotion/manager/manager.py:
+	Reset mood pending when component unregisters, or about
+	to tell worker to create a really lost component.
+
 2006-08-30  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/admin.py (AdminAvatar._saveFlowFile): Break

@@ -448,8 +448,6 @@ class DAG(log.Loggable):
 
         while self._hasZeroEnd:
             node = self._hasZeroEnd[0]
-            self.log("working on node (%r, %r)" % (
-                node.object,node.type))
             self._dfs(node)
 
         # get a list of dictionary keys sorted in decreasing value order
@@ -468,8 +466,6 @@ class DAG(log.Loggable):
     def _dfs(self, node):
         # perform depth first search
 
-        self.log("doing _dfs for object (%r, %r)" % (node.object
-            ,node.type))
         self._count += 1
         
         self._begin[node] = self._count
@@ -492,11 +488,7 @@ class DAG(log.Loggable):
         self._count += 1
         self._end[node] = self._count
         if node in self._hasZeroEnd:
-            self.log("removing for object (%r, %r)" % (
-                node.object, node.type))
             self._hasZeroEnd.remove(node)
-
-        self.log("done _dfs for object (%r, %r)" % (node.object, node.type))
 
     def getAllNodesByType(self, type):
         """
