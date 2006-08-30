@@ -1,3 +1,12 @@
+2006-08-30  Michael Smith  <msmith@fluendo.com>
+
+	* bin/flumotion-manager.in:
+	  Don't use gstreamer in the manager.
+
+	* flumotion/manager/main.py:
+	  Don't print out gstreamer-related variables in the manager, since
+	  we're not importing it.
+
 2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/command/commands.py:

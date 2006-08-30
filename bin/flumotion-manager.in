@@ -42,7 +42,7 @@ try:
 
     # and boot!
     from flumotion.common import boot
-    boot.boot(PROGRAM_PATH)
+    boot.boot(PROGRAM_PATH, gst=False)
 
 except KeyboardInterrupt:
     print 'Interrupted'
