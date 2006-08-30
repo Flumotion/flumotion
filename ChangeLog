@@ -1,3 +1,14 @@
+2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* configure.ac:
+	Forgot to add in my last commit.
+	* flumotion/test/integration/__init__.py:
+	Whoops, forgot to add this file.
+	* flumotion/test/integration/common.py:
+	Add some helper methods to base class
+	* flumotion/test/integration/test_qa.py:
+	Add Videotest with no overlay integration test.
+
 2006-08-30  Michael Smith  <msmith@fluendo.com>
 
 	* bin/flumotion-manager.in:

@@ -271,6 +271,7 @@ flumotion/manager/Makefile
 flumotion/project/Makefile
 flumotion/service/Makefile
 flumotion/test/Makefile
+flumotion/test/integration/Makefile
 flumotion/tester/Makefile
 flumotion/twisted/Makefile
 flumotion/ui/Makefile

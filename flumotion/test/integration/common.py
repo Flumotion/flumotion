@@ -72,6 +72,16 @@ class FlumotionManagerWorkerTest(unittest.TestCase):
         f.close()
         self.__cleanfiles.append(name)
 
+    def loadConfiguration(self, plan, filename):
+        c = plan.spawn('flumotion-command', '-m', 'user:test@localhost:12532',
+            'loadconfiguration', filename)
+        plan.wait(c, 0)
+
+    def waitForHappyComponent(self, plan, componentName):
+        happy = plan.spawn('wait-for-component-mood', 
+            'user:test@localhost:12532', componentName, 'happy')
+        plan.wait(happy, 0)
+
     def setUp(self):
         self.__cleanfiles = []
         self.makeFile('planet.xml', managerXML)
