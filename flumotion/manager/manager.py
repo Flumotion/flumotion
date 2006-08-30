@@ -667,6 +667,10 @@ class Vishnu(log.Loggable):
                 self.info(
                     "Restarting previously lost component %s on worker %s",
                     self._componentMappers[compState].id, workerId)
+                # We set mood to sleeping first. This allows things to 
+                # distinguish between a newly-started component and a lost 
+                # component logging back in.
+                compState.set('mood') = moods.sleeping.value
 
             allComponents = components + lostComponents
 

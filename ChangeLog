@@ -1,3 +1,9 @@
+2006-08-30  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  If a worker logs in and we detect that lost components are gone,
+	  set them to sleeping before restarting them.
+
 2006-08-30  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/command/main.py (command_usage)
