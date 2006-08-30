@@ -1,5 +1,21 @@
 2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/admin/command/commands.py:
+	Add command to show workers logged into a manager.
+	* flumotion/component/misc/httpfile/httpfile.py:
+	Work properly when not using a porter.
+	* flumotion/test/integration/Makefile.am:
+	* flumotion/test/integration/common.py:
+	* flumotion/test/integration/test_qa.py:
+	Add some simple integration tests.
+	* scripts/wait-for-component-mood:
+	* scripts/wait-for-http-port:
+	* scripts/wait-for-show-planet:
+	* scripts/wait-for-worker:
+	Add some scripts for the integration tests.
+
+2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/common/dag.py:
 	Remove more un-needed log lines.
 	* flumotion/manager/manager.py:

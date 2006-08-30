@@ -47,6 +47,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.mountPoint = mountPoint
         self.filePath = props.get('path_to_file')
         self.type = props.get('type', 'master')
+        self.port = props.get('port', None)
         if self.type == 'slave':
             # already checked for these in do_check
             self._porterPath = props['porter_socket_path']
@@ -72,9 +73,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             current_resource = res
         current_resource.putChild(children[-1:][0], static.File(self.filePath))
         #root.putChild(mount, HTTPStaticFile(self.filePath))
+        d = defer.Deferred()
         if self.type == 'slave':
             # Streamer is slaved to a porter.
-            d = defer.Deferred()
             self._pbclient = porterclient.HTTPPorterClientFactory(
                 server.Site(resource=root), [self.mountPoint], d)
             # This will eventually cause d to fire
@@ -84,20 +85,13 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 self._porterPassword)
             self.debug("Starting porter login!")
             self._pbclient.startLogin(creds, self.medium)
-            # we are responsible for setting component happy
-            def setComponentHappy(result):
-                self.setMood(moods.happy)
-                return result
-            d.addCallback(setComponentHappy)
-            return d
         else:
             # File Streamer is standalone.
             try:
-                self.debug('Listening on %d' % self.port)
+                self.debug('Listening on %s' % self.port)
                 iface = ""
                 reactor.listenTCP(self.port, server.Site(resource=root), 
                     interface=iface)
-                return defer.succeed(None)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
                 self.warning(t)
@@ -106,7 +100,15 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 self.addMessage(m)
                 self.setMood(moods.sad)
                 return defer.fail(errors.ComponentStartHandledError(t))
-    
+            # fire callback so component gets happy
+            d.callback(None)
+        # we are responsible for setting component happy
+        def setComponentHappy(result):
+            self.setMood(moods.happy)
+            return result
+        d.addCallback(setComponentHappy)
+        return d
+
     def do_check(self):
         props = self.config['properties']
         if props.get('type', 'master') == 'slave':
@@ -114,6 +116,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 if not 'porter_'+k in props:
                     msg = 'porter slave mode missing required property %s'%k
                     return defer.fail(errors.ConfigError(msg))
+        else:
+            if not 'port' in props:
+                msg = "porter master mode missing required property 'port'"
+                return defer.fail(errors.ConfigError(msg))
+
         if props.get('mount_point', None) is not None: 
             path = props.get('path_to_file', None) 
             if path is None: 

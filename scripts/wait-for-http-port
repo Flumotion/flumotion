@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+url=$1
+
+while true; do
+  if wget --tries=0 --retry-connrefused --wait=1 \
+      --output-document=/dev/stdout --no-check-certificate \
+      $url
+  then exit 0; fi
+done

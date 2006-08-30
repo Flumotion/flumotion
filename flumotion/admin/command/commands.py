@@ -164,6 +164,16 @@ def do_loadconfiguration(model, quit, confFile, saveAs):
     quit()
 do_loadconfiguration = defer_generator(do_loadconfiguration)
 
+def do_showworkers(model, quit):
+    d = model.callRemote('getWorkerHeavenState')
+    yield d
+    whs = d.value()
+
+    for worker in whs.get('workers'):
+        print "%s: %s" % (worker.get('name'), worker.get('host'))
+    quit()
+do_showworkers = defer_generator(do_showworkers)
+
 commands = (('getprop',
              'gets a property on a component',
              (('component-path', utils.avatarId),
@@ -188,6 +198,10 @@ commands = (('getprop',
              (('component-path', utils.avatarId),
               ),
              do_showcomponent),
+            ('showworkers',
+             'shows all the workers that are logged into the manager',
+             (),
+             do_showworkers),
             ('invoke',
              'invoke a component method',
              (('component-path', utils.avatarId),

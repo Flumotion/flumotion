@@ -1,0 +1,95 @@
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2004,2005,2006 Fluendo, S.L. (www.fluendo.com).
+# All rights reserved.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+from twisted.internet import reactor
+from twisted.trial import unittest
+
+import os
+import string
+
+from flumotion.common import boot
+boot.init_gobject()
+boot.init_gst()
+
+top_src_dir = string.join(string.split(__file__,'/')[:-4],'/')
+# munge the path to include builddir/bin/ and scripts/; also add
+# FLU_PROJECT_PATH to the env so that spawned processes pick it up
+def mungeEnv():
+    from flumotion.configure import configure
+    os.environ['PATH'] =  top_src_dir + '/bin:' + os.environ['PATH']
+    os.environ['PATH'] = top_src_dir + '/scripts:' + os.environ['PATH']
+    os.environ['PATH'] = configure.bindir + ':' + os.environ['PATH']
+mungeEnv()
+
+
+managerXML = """<!-- -*- Mode: XML -*- -->
+<planet>
+  <manager name="planet">
+    <!-- <host></host> -->
+    <debug>4</debug>
+    <port>12532</port>
+    <component name="manager-bouncer" type="htpasswdcrypt">
+      <property name="data"><![CDATA[
+user:PSfNpHTkpTx1M
+]]></property>
+    </component>
+  </manager>
+</planet>
+"""
+
+workerXML = """
+<worker name="default">
+  <manager>
+    <host>127.0.0.1</host>
+    <port>12532</port>
+    <transport>ssl</transport>
+  </manager>
+
+  <authentication type="plaintext">
+    <username>user</username>
+    <password>test</password>
+  </authentication>
+
+  <feederports>12000-12010</feederports>
+</worker>
+"""
+
+class FlumotionManagerWorkerTest(unittest.TestCase):
+    def makeFile(self, name, content):
+        f = open(name, 'w')
+        f.write(content)
+        f.close()
+        self.__cleanfiles.append(name)
+
+    def setUp(self):
+        self.__cleanfiles = []
+        self.makeFile('planet.xml', managerXML)
+        self.makeFile('worker.xml', workerXML)
+
+    def spawnAndWaitManagerWorker(self, plan):
+        m = plan.spawn('flumotion-manager', 'planet.xml')
+        p = plan.spawn('wait-for-show-planet',
+                       'user:test@localhost:12532')
+        plan.wait(p, 0)
+        w = plan.spawn('flumotion-worker', 'worker.xml')
+        wfw = plan.spawn('wait-for-worker',
+                         'user:test@localhost:12532',
+                         'default')
+        plan.wait(wfw, 0)
+        return m, w
+
+    def tearDown(self):
+        for f in self.__cleanfiles:
+            os.remove(f)
+        self.__cleanfiles = []

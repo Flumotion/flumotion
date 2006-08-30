@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+manager=$1
+workername=$2
+
+while true; do
+  if flumotion-command -m $manager showworkers | grep $2; then
+    exit 0
+  fi
+  sleep 1
+done
