@@ -670,7 +670,7 @@ class Vishnu(log.Loggable):
                 # We set mood to sleeping first. This allows things to 
                 # distinguish between a newly-started component and a lost 
                 # component logging back in.
-                compState.set('mood') = moods.sleeping.value
+                compState.set('mood', moods.sleeping.value)
 
             allComponents = components + lostComponents
 
