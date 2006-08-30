@@ -17,6 +17,7 @@ from twisted.trial import unittest
 
 import os
 import string
+import random
 
 from flumotion.common import boot
 boot.init_gobject()
@@ -38,7 +39,7 @@ managerXML = """<!-- -*- Mode: XML -*- -->
   <manager name="planet">
     <!-- <host></host> -->
     <debug>4</debug>
-    <port>12532</port>
+    <port>%d</port>
     <component name="manager-bouncer" type="htpasswdcrypt">
       <property name="data"><![CDATA[
 user:PSfNpHTkpTx1M
@@ -52,7 +53,7 @@ workerXML = """
 <worker name="default">
   <manager>
     <host>127.0.0.1</host>
-    <port>12532</port>
+    <port>%d</port>
     <transport>ssl</transport>
   </manager>
 
@@ -61,7 +62,7 @@ workerXML = """
     <password>test</password>
   </authentication>
 
-  <feederports>12000-12010</feederports>
+  <feederports>%d-%d</feederports>
 </worker>
 """
 
@@ -73,28 +74,32 @@ class FlumotionManagerWorkerTest(unittest.TestCase):
         self.__cleanfiles.append(name)
 
     def loadConfiguration(self, plan, filename):
-        c = plan.spawn('flumotion-command', '-m', 'user:test@localhost:12532',
-            'loadconfiguration', filename)
+        c = plan.spawn('flumotion-command', '-m', 'user:test@localhost:%d' % 
+            self.managerPort, 'loadconfiguration', filename)
         plan.wait(c, 0)
 
     def waitForHappyComponent(self, plan, componentName):
         happy = plan.spawn('wait-for-component-mood', 
-            'user:test@localhost:12532', componentName, 'happy')
+            'user:test@localhost:%d' % self.managerPort, 
+            componentName, 'happy')
         plan.wait(happy, 0)
 
     def setUp(self):
         self.__cleanfiles = []
-        self.makeFile('planet.xml', managerXML)
-        self.makeFile('worker.xml', workerXML)
+        self.managerPort =  random.randrange(12530,12550)
+        self.startWorkerPort = random.randrange(12000, 12529)
+        self.makeFile('planet.xml', managerXML % self.managerPort)
+        self.makeFile('worker.xml', workerXML % (self.managerPort,
+            self.startWorkerPort, self.startWorkerPort+2))
 
     def spawnAndWaitManagerWorker(self, plan):
         m = plan.spawn('flumotion-manager', 'planet.xml')
         p = plan.spawn('wait-for-show-planet',
-                       'user:test@localhost:12532')
+                       'user:test@localhost:%d' % self.managerPort)
         plan.wait(p, 0)
         w = plan.spawn('flumotion-worker', 'worker.xml')
         wfw = plan.spawn('wait-for-worker',
-                         'user:test@localhost:12532',
+                         'user:test@localhost:%d' % self.managerPort,
                          'default')
         plan.wait(wfw, 0)
         return m, w

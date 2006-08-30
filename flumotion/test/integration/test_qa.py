@@ -16,6 +16,7 @@
 import common
 import time
 import os
+import random
 
 from twisted.trial import unittest
 from flumotion.twisted import integration
@@ -24,13 +25,13 @@ httpFileXML = """<?xml version="1.0" ?>
 <planet>
   <flow name="default">
     <component type="httpfile" name="httpfile" worker="default">
-      <property name="port">12802</property>
+      <property name="port">%d</property>
       <property name="mount_point">/blah</property>
       <property name="path_to_file">%s</property>
       <property name="type">master</property>
     </component>
   </flow>
-</planet>""" % __file__
+</planet>"""
 
 videoTestNoOverlayXML = """<?xml version="1.0" ?>
 <planet>
@@ -57,7 +58,7 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
       <property name="bandwidth_limit">10</property>
       <property name="burst_on_connect">True</property>
       <property name="mount_point">/</property>
-      <property name="port">12802</property>
+      <property name="port">%d</property>
       <property name="user_limit">1024</property>
     </component>
     <component name="disk-video" project="flumotion" type="disker" version="0.3.0.1" worker="default">
@@ -68,7 +69,7 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
       <property name="time">43200</property>
     </component>
   </flow>
-</planet>""" % os.getcwd()
+</planet>"""
 
 class TestFlumotion(common.FlumotionManagerWorkerTest):
     def testManagerWorker(self, plan):
@@ -79,11 +80,14 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
     
     def testHttpFile(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
-        self.makeFile('httpfile-config.xml', httpFileXML)
+        httpPort = random.randrange(12800,12899)
+        self.makeFile('httpfile-config.xml', httpFileXML % (httpPort, 
+            __file__))
         self.loadConfiguration(plan, 'httpfile-config.xml')
         self.waitForHappyComponent(plan, '/default/httpfile')
         # wait for httpfile
-        h = plan.spawn('wait-for-http-port', 'http://localhost:12802/blah')
+        h = plan.spawn('wait-for-http-port', 'http://localhost:%d/blah' % (
+            httpPort))
         plan.wait(h, 0)
         plan.kill(w, 0)
         plan.kill(m, 0)
@@ -91,9 +95,12 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
 
     def testVideoTestNoOverlay(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
-        self.makeFile('videotest-nooverlay.xml', videoTestNoOverlayXML)
+        httpPort = random.randrange(12800,12899)
+        self.makeFile('videotest-nooverlay.xml', videoTestNoOverlayXML % (
+            httpPort, os.getcwd()))
         self.loadConfiguration(plan, 'videotest-nooverlay.xml')
         self.waitForHappyComponent(plan, '/default/http-video')
+        self.waitForHappyComponent(plan, '/default/disk-video')
         plan.kill(w, 0)
         plan.kill(m, 0)
     testVideoTestNoOverlay = integration.test(testVideoTestNoOverlay)

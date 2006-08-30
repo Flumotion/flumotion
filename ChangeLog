@@ -1,5 +1,12 @@
 2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/integration/common.py:
+	* flumotion/test/integration/test_qa.py:
+	Use random ports within a range so concurrent buildbots
+	running the test have a low chance of clashing ports.
+
+2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* configure.ac:
 	Forgot to add in my last commit.
 	* flumotion/test/integration/__init__.py:
