@@ -487,10 +487,7 @@ class DAG(log.Loggable):
         for n in node.children:
             if self._begin[n] > 0:
                 continue
-            self.log("calling _dfs for object (%r, %r) because beginzero" % (
-                n.object, n.type))
             self._dfs(n)
-            self.log("called _dfs for object (%r, %r)" % (n.object, n.type))
             
         self._count += 1
         self._end[node] = self._count

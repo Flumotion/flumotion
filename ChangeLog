@@ -1,5 +1,12 @@
 2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/common/dag.py:
+	Remove unneeded dag log lines.
+	* flumotion/manager/component.py:
+	Make line under 80 characters width.
+
+2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/manager/manager.py:
 	Clear avatar flags after component has stopped.
 
