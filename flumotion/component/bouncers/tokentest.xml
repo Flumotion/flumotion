@@ -1,0 +1,20 @@
+<registry>
+  <components>
+    <component type="tokentestbouncer"
+               base="flumotion/component/bouncers">
+
+      <source location="flumotion.component.bouncers.tokentestbouncer"/>
+
+      <entries>
+        <entry type="component" location="tokentestbouncer.py"
+               function="TokenTestBouncer"/>
+      </entries>
+
+      <properties>
+        <property name="authorized-token" type="string" required="True"/>
+      </properties>
+    </component>
+  </components>
+
+</registry> 
+

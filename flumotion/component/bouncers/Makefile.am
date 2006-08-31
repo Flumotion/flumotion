@@ -4,11 +4,12 @@ componentdir = $(libdir)/flumotion/python/flumotion/component/bouncers
 component_PYTHON = \
 	__init__.py \
 	admin_gtk.py \
+	bouncer.py \
 	htpasswdcrypt.py \
 	saltsha256.py \
-	bouncer.py
+	tokentest.py
 
-component_DATA = htpasswdcrypt.xml saltsha256.xml bouncer.glade
+component_DATA = htpasswdcrypt.xml saltsha256.xml bouncer.glade tokentest.xml
 
 
 TAGS_FILES = $(component_PYTHON)

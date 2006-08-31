@@ -1,3 +1,11 @@
+2006-08-31  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/bouncers/Makefile.am (component_PYTHON): 
+	* flumotion/component/bouncers/tokentest.xml: 
+	* flumotion/component/bouncers/tokentest.py
+	(TokenTestBouncer.authenticate): New bouncer, only allows requests
+	with a certain token through.
+
 2006-08-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/save.py:
