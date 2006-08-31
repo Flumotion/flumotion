@@ -1,5 +1,13 @@
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/integration/test_qa.py:
+	Add test to check whether token bouncing works.
+	* scripts/check-token-for-http:
+	Add test that does 2 requests, one with a correct token
+	and one with an incorrect token.
+
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/test/integration/common.py:
 	configure.bindir is top_src_dir/bin.
 

@@ -71,6 +71,44 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
   </flow>
 </planet>"""
 
+videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
+<planet>
+  <atmosphere>
+    <component name="tokenbouncer" project="flumotion" type="tokentestbouncer" version="0.3.0.1" worker="default">
+      <property name="authorized-token">test</property>
+    </component>
+  </atmosphere>
+  <flow name="default">
+    <component name="video-source" project="flumotion" type="videotest" version="0.3.0.1" worker="default">
+      <!-- properties -->
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
+    </component>
+    <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
+      <source>video-source</source>
+      <!-- properties -->
+      <property name="bitrate">400</property>
+    </component>
+    <component name="muxer-video" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
+      <source>video-encoder</source>
+    </component>
+    <component name="http-video" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
+      <source>muxer-video</source>
+      <!-- properties -->
+      <property name="bandwidth_limit">10</property>
+      <property name="burst_on_connect">True</property>
+      <property name="mount_point">/</property>
+      <property name="port">%d</property>
+      <property name="user_limit">1024</property>
+      <property name="issuer">HTTPTokenIssuer</property>
+      <property name="bouncer">tokenbouncer</property>
+    </component>
+  </flow>
+</planet>"""
+
 class TestFlumotion(common.FlumotionManagerWorkerTest):
     def testManagerWorker(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
@@ -112,3 +150,19 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         plan.kill(w, 0)
         plan.kill(m, 0)
     testVideoTestNoOverlay = integration.test(testVideoTestNoOverlay)
+
+    def testVideoTestNoOverlayWithTokenBouncer(self, plan):
+        m, w = self.spawnAndWaitManagerWorker(plan)
+        httpPort = random.randrange(12800, 12899)
+        self.makeFile('tokenbouncer.xml', 
+            videoTestNoOverlayWithTokenBouncerXML % httpPort)
+        self.loadConfiguration(plan, 'tokenbouncer.xml')
+        self.waitForHappyComponent(plan, '/default/http-video')
+        self.waitForHappyComponent(plan, '/atmosphere/tokenbouncer')
+        h = plan.spawn('check-token-for-http', 'http://localhost:%d/' % (
+            httpPort,), 'test', 'badtoken')
+        plan.wait(h, 0)
+        plan.kill(w, 0)
+        plan.kill(m, 0)
+    testVideoTestNoOverlayWithTokenBouncer = integration.test(
+        testVideoTestNoOverlayWithTokenBouncer)
