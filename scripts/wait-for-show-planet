@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 manager=$1
-
 while true; do
   if flumotion-command -m $manager showplanet | grep atmosphere; then
     exit 0

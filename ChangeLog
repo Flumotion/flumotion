@@ -1,3 +1,12 @@
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* scripts/wait-for-component-mood:
+	* scripts/wait-for-http-port:
+	* scripts/wait-for-show-planet:
+	* scripts/wait-for-worker:
+	Stupid svn won't let me commit my propsets of svn:executable
+	so had to modify the files too.
+
 2006-08-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/integration/common.py:
