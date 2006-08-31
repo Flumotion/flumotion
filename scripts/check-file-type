@@ -2,6 +2,13 @@
 set -e
 filename=$1
 filetype=$2
+# make sure file is not empty
+while true; do
+  if stat $filename | grep empty; then
+    continue;
+  else break;
+  fi
+done
 if file $filename | grep $filetype
 then exit 0;
 else exit 1;

@@ -149,6 +149,61 @@ audioTestXML="""<?xml version="1.0" ?>
   </flow>
 </planet>"""
 
+videoTestXML = """<?xml version="1.0" ?>
+<planet>
+  <flow name="default">
+    <component name="video-source" project="flumotion" type="videotest" version="0.3.0.1" worker="default">
+
+      <property name="format">video/x-raw-yuv</property>
+      <property name="framerate">50/10</property>
+      <property name="height">240</property>
+      <property name="pattern">0</property>
+      <property name="width">320</property>
+    </component>
+
+    <component name="video-overlay" project="flumotion" type="overlay" version="0.3.0.1" worker="default">
+      <source>video-source</source>
+
+      <property name="cc_logo">True</property>
+      <property name="fluendo_logo">True</property>
+      <property name="height">240</property>
+      <property name="show_text">True</property>
+      <property name="text">Fluendo</property>
+      <property name="width">320</property>
+      <property name="xiph_logo">True</property>
+    </component>
+
+    <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
+      <source>video-overlay</source>
+
+      <property name="bitrate">400</property>
+    </component>
+
+    <component name="muxer-video" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
+      <source>video-encoder</source>
+    </component>
+
+    <component name="http-video" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
+      <source>muxer-video</source>
+
+      <property name="bandwidth_limit">10</property>
+      <property name="burst_on_connect">True</property>
+      <property name="mount_point">/</property>
+      <property name="port">%d</property>
+      <property name="user_limit">1024</property>
+    </component>
+
+    <component name="disk-video" project="flumotion" type="disker" version="0.3.0.1" worker="default">
+      <source>muxer-video</source>
+
+      <property name="directory">%s</property>
+      <property name="rotateType">time</property>
+      <property name="time">43200</property>
+    </component>
+
+  </flow>
+</planet>"""
+
 class TestFlumotion(common.FlumotionManagerWorkerTest):
     def testManagerWorker(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
@@ -226,3 +281,22 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         plan.kill(w, 0)
         plan.kill(m, 0)
     testAudioTest = integration.test(testAudioTest)
+
+    def testVideoTestWithOverlay(self, plan):
+        m, w = self.spawnAndWaitManagerWorker(plan)
+        httpPort = random.randrange(12800, 12899)
+        self.makeFile('videotest.xml',
+            videoTestXML % (httpPort, os.getcwd()))
+        self.loadConfiguration(plan, 'videotest.xml')
+        self.waitForHappyComponent(plan, '/default/http-video')
+        self.waitForHappyComponent(plan, '/default/disk-video')
+        h = plan.spawn('wait-for-http-headers', 'http://localhost:%d/' % (
+            httpPort,))
+        plan.wait(h, 0)
+        # now check files saved by disker
+        cft = plan.spawn('check-file-type',
+            os.path.join(os.getcwd(), 'disk-video*.ogg'), 'Ogg')
+        plan.wait(cft, 0)
+        plan.kill(w, 0)
+        plan.kill(m, 0)
+    testVideoTestWithOverlay = integration.test(testVideoTestWithOverlay)

@@ -1,3 +1,10 @@
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/integration/test_qa.py:
+	Add integration test of videotest with overlay.
+	* scripts/check-file-type:
+	Wait for file to be non-empty before checking file type.
+
 2006-08-31  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/base.py:
