@@ -45,7 +45,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         if not mountPoint.startswith('/'):
             mountPoint = '/' + mountPoint
         self.mountPoint = mountPoint
-        self.filePath = props.get('path_to_file')
+        self.filePath = props.get('path')
         self.type = props.get('type', 'master')
         self.port = props.get('port', None)
         if self.type == 'slave':
@@ -113,8 +113,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         props = self.config['properties']
         if props.get('type', 'master') == 'slave':
             for k in 'socket_path', 'user', 'pass':
-                if not 'porter_'+k in props:
-                    msg = 'porter slave mode missing required property %s'%k
+                if not 'porter_' + k in props:
+                    msg = 'porter slave mode missing required property %s' % k
                     return defer.fail(errors.ConfigError(msg))
         else:
             if not 'port' in props:
@@ -122,11 +122,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 return defer.fail(errors.ConfigError(msg))
 
         if props.get('mount_point', None) is not None: 
-            path = props.get('path_to_file', None) 
+            path = props.get('path', None) 
             if path is None: 
-                msg = "missing required property 'path_to_file'"
+                msg = "missing required property 'path'"
                 return defer.fail(errors.ConfigError(msg)) 
             if not os.path.isfile(path):
-                msg = "the file specified in 'path_to_file': %s does not" \
+                msg = "the file specified in 'path': %s does not" \
                     "exist or is not a file" % path
                 return defer.fail(errors.ConfigError(msg)) 

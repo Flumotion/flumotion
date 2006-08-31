@@ -27,7 +27,7 @@ httpFileXML = """<?xml version="1.0" ?>
     <component type="httpfile" name="httpfile" worker="default">
       <property name="port">%d</property>
       <property name="mount_point">/blah</property>
-      <property name="path_to_file">%s</property>
+      <property name="path">%s</property>
       <property name="type">master</property>
     </component>
   </flow>

@@ -11,7 +11,7 @@
       <properties>
         <property name="port" type="int" />
         <property name="mount_point" type="string" />
-		<property name="path_to_file" type="string" />
+        <property name="path" type="string" />
         <property name="type" type="string" />
 		
         <!-- If type is 'slave' -->

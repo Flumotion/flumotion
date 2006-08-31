@@ -1,3 +1,10 @@
+2006-08-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/component/misc/httpfile/httpfile.xml:
+	* flumotion/test/integration/test_qa.py:
+	  rename path_to_file to path
+
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/manager/depgraph.py:
