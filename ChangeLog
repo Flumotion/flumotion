@@ -1,7 +1,7 @@
 2006-08-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/wizard/save.py:
-	  don't save properties components, it's really annoying when
+	  don't save properties comments, it's really annoying when
 	  you want to comment out blocks of components
 	  add some spacing, makes it easier to read
 
