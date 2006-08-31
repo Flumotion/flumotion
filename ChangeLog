@@ -1,5 +1,10 @@
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/manager/depgraph.py:
+	Whoops, we were letting too many nodes through in whatShouldBeStarted.
+
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* scripts/wait-for-http-headers:
 	Forgot to add this script. Whoops.
 

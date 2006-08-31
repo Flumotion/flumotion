@@ -252,7 +252,7 @@ class DepGraph(log.Loggable):
         # then remove ones that are already have state of True,
         # then remove ones that are workers who are False, and their offspring,
         # then remove ones that are jobs who are False, and their offspring,
-        # and also remove eaters whose feeders haven't started.
+        # and also remove nodes that are offspring of nodes with state of False
         toBeStarted = self._dag.sort()
         # we want to loop over all objects, so we loop over a copy
         for obj in toBeStarted[:]:
@@ -276,6 +276,11 @@ class DepGraph(log.Loggable):
                         if offspring in toBeStarted:
                             toBeStarted.remove(offspring)
                     toBeStarted.remove(obj)
+                else:
+                    offspring = self._dag.getOffspringTyped(obj[0], obj[1])
+                    for child in offspring:
+                        if child in toBeStarted:
+                            toBeStarted.remove(child)
         
         return toBeStarted
 
