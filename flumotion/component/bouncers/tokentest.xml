@@ -3,10 +3,10 @@
     <component type="tokentestbouncer"
                base="flumotion/component/bouncers">
 
-      <source location="flumotion.component.bouncers.tokentestbouncer"/>
+      <source location="flumotion.component.bouncers.tokentest"/>
 
       <entries>
-        <entry type="component" location="tokentestbouncer.py"
+        <entry type="component" location="tokentest.py"
                function="TokenTestBouncer"/>
       </entries>
 

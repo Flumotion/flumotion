@@ -40,7 +40,7 @@ class TokenTestBouncer(bouncer.Bouncer):
 
     def do_setup(self):
         props = self.config['properties']
-        self._authtoken = props['authorized-token']:
+        self._authtoken = props['authorized-token']
         return defer.succeed(None)
    
     def authenticate(self, keycard):
