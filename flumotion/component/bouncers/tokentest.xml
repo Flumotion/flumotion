@@ -15,6 +15,17 @@
       </properties>
     </component>
   </components>
-
+  <bundles>
+    <bundle name="tokentest-base">
+      <dependencies>
+        <dependency name="component" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers">
+          <filename location="tokentest.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
 </registry> 
 

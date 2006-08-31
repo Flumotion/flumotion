@@ -1,5 +1,10 @@
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/bouncers/tokentest.xml:
+	Add bundle definitions to test token bouncer.
+
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/bouncers/tokentest.py:
 	* flumotion/component/bouncers/tokentest.xml:
 	Fix wingo's b0rked commit.
