@@ -86,7 +86,7 @@ class Component(log.Loggable):
             s += "      <source>%s</source>\n" % sourceName
                     
         if self.props:
-            s += "      <!-- properties -->\n"
+            s += "\n"
             property_names = self.props.keys()
             property_names.sort()
             
@@ -346,7 +346,7 @@ class WizardSaver:
         s = '<planet>\n'
         s += '  <flow name="%s">\n' % self.wizard.flowName
         for component in components:
-            s += component.toXML(self.registry)
+            s += component.toXML(self.registry) + "\n"
         s += '  </flow>\n'
         s += '</planet>\n'
 
