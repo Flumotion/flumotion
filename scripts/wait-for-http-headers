@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+url=$1
+while true; do
+  if curl -I --retry 0 $url
+  then exit 0; fi
+done

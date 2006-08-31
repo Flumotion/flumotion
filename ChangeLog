@@ -1,5 +1,10 @@
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* scripts/wait-for-http-headers:
+	Forgot to add this script. Whoops.
+
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/test/integration/test_qa.py:
 	Add integration test of videotest with overlay.
 	* scripts/check-file-type:
