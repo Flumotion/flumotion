@@ -28,7 +28,6 @@ top_src_dir = string.join(string.split(__file__,'/')[:-4],'/')
 # FLU_PROJECT_PATH to the env so that spawned processes pick it up
 def mungeEnv():
     from flumotion.configure import configure
-    os.environ['PATH'] =  top_src_dir + '/bin:' + os.environ['PATH']
     os.environ['PATH'] = top_src_dir + '/scripts:' + os.environ['PATH']
     os.environ['PATH'] = configure.bindir + ':' + os.environ['PATH']
 mungeEnv()
