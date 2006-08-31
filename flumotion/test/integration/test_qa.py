@@ -101,6 +101,14 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         self.loadConfiguration(plan, 'videotest-nooverlay.xml')
         self.waitForHappyComponent(plan, '/default/http-video')
         self.waitForHappyComponent(plan, '/default/disk-video')
+        h = plan.spawn('wait-for-http-headers', 'http://localhost:%d/' % (
+            httpPort,))
+        plan.wait(h, 0)
+        # now check files saved by disker
+        cft = plan.spawn('check-file-type', 
+            os.path.join(os.getcwd(), "disk-video*.ogg"),
+            'Ogg')
+        plan.wait(cft, 0)
         plan.kill(w, 0)
         plan.kill(m, 0)
     testVideoTestNoOverlay = integration.test(testVideoTestNoOverlay)

@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+filename=$1
+filetype=$2
+if file $filename | grep $filetype
+then exit 0;
+else exit 1;
+fi
