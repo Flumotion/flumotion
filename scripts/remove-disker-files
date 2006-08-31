@@ -1,0 +1,5 @@
+#!/bin/bash
+manager=$1
+disker=$2
+filename=`flumotion-command -m $manager getprop $2 filename`
+rm -f $filename

@@ -1,5 +1,18 @@
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/admin/command/commands.py:
+	Actually output success when invoke runs successfully.
+	* flumotion/test/integration/test_qa.py:
+	Remove files correctly.
+	* scripts/check-disker-file-type:
+	Check file type of file currently being written to by disker.
+	* scripts/check-file-type:
+	No longer needed.
+	* scripts/remove-disker-files:
+	Script to remove the file currently being written to by disker.
+
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/test/Makefile.am:
 	Fix disting of integration Makefile.
 

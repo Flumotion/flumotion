@@ -238,10 +238,13 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
             httpPort,))
         plan.wait(h, 0)
         # now check files saved by disker
-        cft = plan.spawn('check-file-type', 
-            os.path.join(os.getcwd(), "disk-video*.ogg"),
-            'Ogg')
+        cft = plan.spawn('check-disker-file-type', 'Ogg', 
+            'user:test@localhost:%d' % self.managerPort, '/default/disk-video')
         plan.wait(cft, 0)
+        # clean up disk files
+        clean = plan.spawn('remove-disker-files', 'user:test@localhost:%d' % (
+            self.managerPort,), '/default/disk-video')
+        plan.wait(clean, 0)
         plan.kill(w, 0)
         plan.kill(m, 0)
     testVideoTestNoOverlay = integration.test(testVideoTestNoOverlay)
@@ -274,10 +277,14 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
             httpPort,))
         plan.wait(h, 0)
         # now check files saved by disker
-        cft = plan.spawn('check-file-type', 
-            os.path.join(os.getcwd(), "disk-audio*.ogg"),
-            'Ogg')
+        cft = plan.spawn('check-disker-file-type', 'Ogg', 
+            'user:test@localhost:%d' % self.managerPort, '/default/disk-audio')
         plan.wait(cft, 0)
+        # clean up disk files
+        clean = plan.spawn('remove-disker-files', 'user:test@localhost:%d' % (
+            self.managerPort,), '/default/disk-audio')
+        plan.wait(clean, 0)
+
         plan.kill(w, 0)
         plan.kill(m, 0)
     testAudioTest = integration.test(testAudioTest)
@@ -293,10 +300,15 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         h = plan.spawn('wait-for-http-headers', 'http://localhost:%d/' % (
             httpPort,))
         plan.wait(h, 0)
-        # now check files saved by disker
-        cft = plan.spawn('check-file-type',
-            os.path.join(os.getcwd(), 'disk-video*.ogg'), 'Ogg')
+        # change filename with disker
+        cft = plan.spawn('check-disker-file-type', 'Ogg', 
+            'user:test@localhost:%d' % self.managerPort, '/default/disk-video')
         plan.wait(cft, 0)
+        # clean up disk files
+        clean = plan.spawn('remove-disker-files', 'user:test@localhost:%d' % (
+            self.managerPort,), '/default/disk-video')
+        plan.wait(clean, 0)
+
         plan.kill(w, 0)
         plan.kill(m, 0)
     testVideoTestWithOverlay = integration.test(testVideoTestWithOverlay)
