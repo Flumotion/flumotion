@@ -45,7 +45,7 @@ class TokenTestBouncer(bouncer.Bouncer):
    
     def authenticate(self, keycard):
         # FIXME: move checks up in the base class ?
-        if not compat.implements(keycard, IToken):
+        if not compat.implementsInterface(keycard, IToken):
             self.warning('keycard %r does not implement IToken' % keycard)
             return defer.succeed(None)
         if not self.typeAllowed(keycard):
@@ -53,9 +53,9 @@ class TokenTestBouncer(bouncer.Bouncer):
                 keycard, self.keycardClasses))
             return defer.succeed(None)
 
-        self.debug('authenticating keycard from requester %s with token %s' % (
-            keycard.requesterName, keycard.getData()['token']))
         keycard_data = keycard.getData()
+        self.debug('authenticating keycard from requester %s with token %s' % (
+            keycard_data['address'], keycard_data['token']))
 
         if keycard_data['token'] == self._authtoken:
             # authenticated, so return the keycard with state authenticated
