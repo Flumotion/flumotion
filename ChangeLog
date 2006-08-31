@@ -1,6 +1,11 @@
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/integration/test_qa.py:
+	Add test for default wizard audiotest with disker.
+
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/integration/test_qa.py:
 	Add test to check whether token bouncing works.
 	* scripts/check-token-for-http:
 	Add test that does 2 requests, one with a correct token

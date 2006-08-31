@@ -109,6 +109,46 @@ videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
   </flow>
 </planet>"""
 
+audioTestXML="""<?xml version="1.0" ?>
+<planet>
+  <flow name="default">
+    <component name="audio-source" project="flumotion" type="audiotest" version="0.3.0.1" worker="default">
+
+      <property name="freq">440</property>
+      <property name="rate">8000</property>
+      <property name="volume">1.0</property>
+    </component>
+
+    <component name="audio-encoder" project="flumotion" type="vorbis-encoder" version="0.3.0.1" worker="default">
+      <source>audio-source</source>
+
+      <property name="quality">0.5</property>
+    </component>
+
+    <component name="muxer-audio" project="flumotion" type="ogg-muxer" version="0.3.0.1" worker="default">
+      <source>audio-encoder</source>
+    </component>
+    <component name="http-audio" project="flumotion" type="http-streamer" version="0.3.0.1" worker="default">
+      <source>muxer-audio</source>
+
+      <property name="bandwidth_limit">10</property>
+      <property name="burst_on_connect">True</property>
+      <property name="mount_point">/</property>
+      <property name="port">%d</property>
+      <property name="user_limit">1024</property>
+    </component>
+
+    <component name="disk-audio" project="flumotion" type="disker" version="0.3.0.1" worker="default">
+      <source>muxer-audio</source>
+
+      <property name="directory">%s</property>
+      <property name="rotateType">time</property>
+      <property name="time">43200</property>
+    </component>
+
+  </flow>
+</planet>"""
+
 class TestFlumotion(common.FlumotionManagerWorkerTest):
     def testManagerWorker(self, plan):
         m, w = self.spawnAndWaitManagerWorker(plan)
@@ -166,3 +206,23 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         plan.kill(m, 0)
     testVideoTestNoOverlayWithTokenBouncer = integration.test(
         testVideoTestNoOverlayWithTokenBouncer)
+
+    def testAudioTest(self, plan):
+        m, w = self.spawnAndWaitManagerWorker(plan)
+        httpPort = random.randrange(12800, 12899)
+        self.makeFile('audiotest.xml',
+            audioTestXML % (httpPort, os.getcwd()))
+        self.loadConfiguration(plan, 'audiotest.xml')
+        self.waitForHappyComponent(plan, '/default/http-audio')
+        self.waitForHappyComponent(plan, '/default/disk-audio')
+        h = plan.spawn('wait-for-http-headers', 'http://localhost:%d/' % (
+            httpPort,))
+        plan.wait(h, 0)
+        # now check files saved by disker
+        cft = plan.spawn('check-file-type', 
+            os.path.join(os.getcwd(), "disk-audio*.ogg"),
+            'Ogg')
+        plan.wait(cft, 0)
+        plan.kill(w, 0)
+        plan.kill(m, 0)
+    testAudioTest = integration.test(testAudioTest)
