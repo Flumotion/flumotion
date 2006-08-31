@@ -1,5 +1,15 @@
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/manager/component.py:
+	Should not return, now that we iterate over the deplist rather
+	than take the first item.
+	Also remove the call to _tryWhatCanBeStarted now that the returns
+	have been removed.
+	* flumotion/test/integration/test_qa.py:
+	Skip videotest with overlay integration test.
+
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/admin/command/commands.py:
 	Actually output success when invoke runs successfully.
 	* flumotion/test/integration/test_qa.py:

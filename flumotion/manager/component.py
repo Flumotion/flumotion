@@ -852,12 +852,12 @@ class ComponentHeaven(base.ManagerHeaven):
                             # setup may not be in list when not.
                             d.addCallback(self._tryWhatCanBeStarted)
                         else:
-                            self.debug("Component %s on way to being setup" %
+                            self.debug(
+                                "Component %s already on way to being setup",
                                 dep.get("name"))
-                        return
                     else:
                         self.debug(
-                            "Component %s to be setup but has no avatar yet" %
+                            "Component %s to be setup but has no avatar yet",
                                 dep.get("name"))
                 elif deptype == "COMPONENTSTART":
                     self.debug("Component %s to be started" % dep.get("name"))
@@ -894,9 +894,9 @@ class ComponentHeaven(base.ManagerHeaven):
                         d.addErrback(errback)
                     else:
                         self.log("Component is already starting")
-                        return
                 elif deptype == "CLOCKMASTER":
-                    self.debug("Component %s to be clock master!" % dep.get("name"))
+                    self.debug("Component %s to be clock master!",
+                        dep.get("name"))
                     componentAvatar = self.getComponentAvatarForState(dep)
                     if componentAvatar:
                         if not componentAvatar._providingClock:
@@ -907,16 +907,11 @@ class ComponentHeaven(base.ManagerHeaven):
                             # master clock may not be in list when not.
                             d.addCallback(self._tryWhatCanBeStarted)
                         else:
-                            self.debug("Component %s on way to clock mastering", 
+                            self.debug(
+                                "Component %s already on way to clock master", 
                                 dep.get("name"))
-                        return
                 else:
                     self.debug("Unknown dependency type")
-            # Possible FIXME because this method is already attached
-            # as a callback for when components get setup, become
-            # happy and master clock been provided, why
-            # should we run this method again here?
-            self._tryWhatCanBeStarted()
 
     def _setupComponent(self, componentAvatar):
         # set up the component
