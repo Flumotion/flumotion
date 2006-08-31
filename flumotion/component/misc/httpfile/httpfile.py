@@ -51,8 +51,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         if self.type == 'slave':
             # already checked for these in do_check
             self._porterPath = props['porter_socket_path']
-            self._porterUsername = props['porter_user']
-            self._porterPassword = props['porter_pass']
+            self._porterUsername = props['porter_username']
+            self._porterPassword = props['porter_password']
         
     def do_stop(self):
         if self.type == 'slave':
@@ -112,13 +112,13 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     def do_check(self):
         props = self.config['properties']
         if props.get('type', 'master') == 'slave':
-            for k in 'socket_path', 'user', 'pass':
+            for k in 'socket_path', 'username', 'password':
                 if not 'porter_' + k in props:
-                    msg = 'porter slave mode missing required property %s' % k
+                    msg = ' slave mod, missing required property %s' % k
                     return defer.fail(errors.ConfigError(msg))
         else:
             if not 'port' in props:
-                msg = "porter master mode missing required property 'port'"
+                msg = "master mode, missing required property 'port'"
                 return defer.fail(errors.ConfigError(msg))
 
         if props.get('mount_point', None) is not None: 

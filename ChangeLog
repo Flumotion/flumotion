@@ -1,5 +1,15 @@
 2006-08-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/component/misc/httpfile/httpfile.xml:
+	  make porter_ properties consistent
+	  there is no porter master mode, there is only master mode where
+	  there is no porter
+
+2006-08-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpfile/httpfile.py:
 	* flumotion/component/misc/httpfile/httpfile.xml:
 	* flumotion/test/integration/test_qa.py:

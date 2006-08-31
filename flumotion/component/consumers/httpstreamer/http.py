@@ -276,9 +276,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def do_check(self):
         props = self.config['properties']
         if props.get('type', 'master') == 'slave':
-            for k in 'socket_path', 'user', 'pass':
-                if not 'porter_'+k in props:
-                    msg = 'porter slave mode missing required property %s'%k
+            for k in 'socket_path', 'username', 'password':
+                if not 'porter_' + k in props:
+                    msg = 'slave mode, missing required property %s' % k
                     return defer.fail(errors.ConfigError(msg))
     
     def configure_pipeline(self, pipeline, properties):
@@ -356,8 +356,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if self.type == 'slave':
             # already checked for these in do_check
             self._porterPath = properties['porter_socket_path']
-            self._porterUsername = properties['porter_user']
-            self._porterPassword = properties['porter_pass']
+            self._porterUsername = properties['porter_username']
+            self._porterPassword = properties['porter_password']
 
         self.port = int(properties.get('port', 8800))
 

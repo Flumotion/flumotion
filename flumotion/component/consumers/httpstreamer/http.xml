@@ -30,8 +30,8 @@
 
         <!-- If type is 'slave' -->
         <property name="porter_socket_path" type="string" />
-        <property name="porter_user" type="string" />
-        <property name="porter_pass" type="string" />
+        <property name="porter_username" type="string" />
+        <property name="porter_password" type="string" />
 
         <!-- Hostname currently for display purposes -->
         <property name="hostname" type="string" />
