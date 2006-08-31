@@ -18,7 +18,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
-
+import os
 
 from flumotion.twisted.defer import defer_generator
 from flumotion.admin.command import utils
@@ -27,6 +27,24 @@ from flumotion.common import errors
 
 
 __all__ = ['commands']
+
+# copied from flumotion/twisted/integration.py
+class CommandNotFoundException(Exception):
+    def __init__(self, command):
+        Exception.__init__(self)
+        self.command = command
+    def __str__(self):
+        return 'Command %r not found in the PATH.' % self.command
+
+def _which(executable):
+    if os.sep in executable:
+        if os.access(os.path.abspath(executable), os.X_OK):
+            return os.path.abspath(executable)
+    elif os.getenv('PATH'):
+        for path in os.getenv('PATH').split(os.pathsep):
+            if os.access(os.path.join(path, executable), os.X_OK):
+                return os.path.join(path, executable)
+    raise CommandNotFoundException(executable)
 
 
 # it's probably time to move this stuff into classes...
@@ -92,10 +110,10 @@ def do_getmood(model, quit, avatarId):
     if c:
         mood = c.get('mood')
         try:
-            import os
+            _which('cowsay')
             os.spawnlp(os.P_WAIT, 'cowsay', 'cowsay',
                        "%s is %s" % (c.get('name'), moods[mood].name))
-        except Exception:
+        except CommandNotFoundException:
             print "%s is %s" % (c.get('name'), moods[mood].name)
 
     quit()

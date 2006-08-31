@@ -1,5 +1,11 @@
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/admin/command/commands.py:
+	Actually output something if someone does not have cowsay
+	installed.
+
+2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* scripts/wait-for-component-mood:
 	* scripts/wait-for-http-port:
 	* scripts/wait-for-show-planet:
