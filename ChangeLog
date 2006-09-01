@@ -1,3 +1,13 @@
+2006-09-01  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/worker/feed.py:
+	* flumotion/worker/worker.py:
+	  Use PassableServerPort so we can actually shut down feed-server-side
+	  copies of the FD after passing to the job.
+	  Avoids leaking FDs.
+	  There's a lot of possible cleanup when we do things this way,
+	  leaving that for another patch.
+
 2006-09-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/worker/checks/video.py:

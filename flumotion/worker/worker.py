@@ -552,8 +552,9 @@ class WorkerBrain(log.Loggable):
 
         self.debug('Listening for feed requests on TCP port %s' %
             self.feedServerPort)
-        self._feedServerPort = reactor.listenTCP(
-            self.feedServerPort, self._feedServerFactory)
+        self._feedServerPort = reactor.listenWith(
+            fdserver.PassableServerPort, self.feedServerPort, 
+            self._feedServerFactory)
 
     # FIXME: this is only called from the tests
     def teardown(self):
