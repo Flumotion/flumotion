@@ -48,7 +48,8 @@ class BusResolution(fdefer.Resolution):
             self.pipeline.set_state(gst.STATE_NULL)
             self.pipeline = None
 
-def do_element_check(pipeline_str, element_name, check_proc, state=None):
+def do_element_check(pipeline_str, element_name, check_proc, state=None,
+    set_state_deferred=False):
     """
     Parse the given pipeline and set it to the given state.
     When the bin reaches that state, perform the given check function on the
@@ -59,7 +60,9 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None):
     @param check_proc: a function to call with the GstElement as argument.
     @param state: an unused keyword parameter that will be removed when
     support for GStreamer 0.8 is dropped.
-
+    @param set_state_deferred: a flag to say whether the set_state is run in
+    a deferToThread
+    @type set_state_deferred: bool
     @returns: a deferred that will fire with the result of check_proc, or
               fail.
     @rtype: L{twisted.internet.defer.Deferred}
@@ -126,11 +129,15 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None):
     resolution.watch_id = watch_id
     resolution.pipeline = pipeline
     log.debug('check', 'setting state to playing')
-    d = deferToThread(pipeline.set_state, gst.STATE_PLAYING)
-    def stateChanged(res):
+    if set_state_deferred:
+        d = deferToThread(pipeline.set_state, gst.STATE_PLAYING)
+        def stateChanged(res):
+            return resolution.d
+        d.addCallback(stateChanged)
+        return d
+    else:
+        pipeline.set_state(gst.STATE_PLAYING)
         return resolution.d
-    d.addCallback(stateChanged)
-    return d
 
 def check1394(id):
     """

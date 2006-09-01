@@ -98,7 +98,8 @@ def checkWebcam(device, id):
 
     pipeline = 'v4lsrc name=source device=%s %s ! fakesink' % (device,
         autoprobe)
-    d = do_element_check(pipeline, 'source', get_device_name, state=gst.STATE_PAUSED)
+    d = do_element_check(pipeline, 'source', get_device_name, 
+        state=gst.STATE_PAUSED, set_state_deferred=True)
 
     d.addCallback(check.callbackResult, result)
     d.addErrback(check.errbackNotFoundResult, result, id, device)
