@@ -2,8 +2,7 @@
 # include from flumotion/test/Makefile.am
 
 trial: rm-trial-test-log
-	srcdir=`cd $(top_srcdir); pwd`;
-	@PYTHONPATH=$(srcdir):$(PYTHONPATH)				\
+	@PYTHONPATH=`cd $(top_srcdir); pwd`:$(PYTHONPATH)		\
 		trial flumotion.test 2>&1		 		\
 		| tee trial.test.log;					\
 	if test $${PIPESTATUS[0]} -eq 0;				\

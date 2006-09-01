@@ -1,6 +1,11 @@
 2006-09-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* common/trial.mk:
+	Fix properly!
+
+2006-09-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* common/trial.mk:
 	Fix pythonpath for running tests by using an absolute path.
 
 2006-08-31  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
