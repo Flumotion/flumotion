@@ -1,5 +1,12 @@
 2006-09-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/worker/checks/video010.py:
+	Setting state to PLAYING can take a lot longer than 12.5 seconds
+	so run in a separate thread.  12.5 seconds is our ping timeout.
+	This fixes the Webcam worker check for example.
+
+2006-09-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* common/trial.mk:
 	Fix properly!
 

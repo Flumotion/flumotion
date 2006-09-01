@@ -24,9 +24,9 @@ import os
 import gobject
 import gst
 import gst.interfaces
+from twisted.internet.threads import deferToThread
 
 from twisted.internet import defer, reactor
-
 from flumotion.common import gstreamer, errors, log, messages
 from flumotion.twisted import defer as fdefer
 
@@ -114,6 +114,7 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None):
     log.debug('check', 'parsing pipeline %s' % pipeline_str)
     try:
         pipeline = gst.parse_launch(pipeline_str)
+        log.debug('check', 'parsed pipeline %s' % pipeline_str)
     except gobject.GError, e:
         resolution.errback(errors.GStreamerError(e.message))
         return resolution.d
@@ -124,10 +125,12 @@ def do_element_check(pipeline_str, element_name, check_proc, state=None):
 
     resolution.watch_id = watch_id
     resolution.pipeline = pipeline
-    
-    pipeline.set_state(gst.STATE_PLAYING)
-
-    return resolution.d
+    log.debug('check', 'setting state to playing')
+    d = deferToThread(pipeline.set_state, gst.STATE_PLAYING)
+    def stateChanged(res):
+        return resolution.d
+    d.addCallback(stateChanged)
+    return d
 
 def check1394(id):
     """
@@ -208,4 +211,3 @@ def check1394(id):
     d.addErrback(errbackResult)
 
     return d
-
