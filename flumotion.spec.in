@@ -199,7 +199,6 @@ EOF
 fi
 
 %preun
-/sbin/chkconfig --del flumotion
 # if removal and not upgrade, stop the processes, clean up locks
 if [ $1 -eq 0 ]
 then
@@ -207,6 +206,8 @@ then
 
   rm -rf %{_localstatedir}/lock/flumotion*
   rm -rf %{_localstatedir}/run/flumotion*
+
+  /sbin/chkconfig --del flumotion
 fi
 
 # Think about this first, we don't really want to stop everything
