@@ -1,5 +1,12 @@
 2006-09-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/test_manager_manager.py:
+	Fix test that checks the depgraph.  We now will have 
+	component, CLOCKMASTER as offspring from 
+	component, COMPONENTSTART.
+
+2006-09-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/test/test_manager_depgraph.py:
 	Fix test that tests the depgraph to use the changed behaviour from
 	previous commit.

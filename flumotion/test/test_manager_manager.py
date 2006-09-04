@@ -504,7 +504,6 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             # verify component mapper
             # 3 component states + avatarId's gotten from the config
             self.assertEqual(len(mappers.keys()), 6)
-
             # verify depgraph
             id = '/testflow/producer-video-test'
             state = mappers[id].state
@@ -512,7 +511,6 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             dag = self.vishnu._depgraph._dag
             o = dag.getOffspringTyped(state, "COMPONENTSTART")
             names = [s.get('name') for s,t in o]
-            self.failIf('producer-video-test' in names)
             self.failUnless('converter-ogg-theora' in names)
             self.failUnless('streamer-ogg-theora' in names)
 
