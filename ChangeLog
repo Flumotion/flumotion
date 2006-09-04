@@ -1,3 +1,9 @@
+2006-09-04  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Set pipeline to PAUSED/PLAYING to trigger base_time redistribution
+	  within the pipeline, since we're managing it manually.
+
 2006-09-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test_manager_manager.py:

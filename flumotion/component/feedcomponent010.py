@@ -353,8 +353,9 @@ class FeedComponent(basecomponent.BaseComponent):
         return defer.succeed(None)
 
     def set_master_clock(self, ip, port, base_time):
-        self.debug("Master clock set to %s:%d with base_time %s", ip, port,
+        self.debug("Master clock set to %s:%d with base_time %s", ip, port, 
             gst.TIME_ARGS(base_time))
+
         clock = gst.NetClientClock(None, ip, port, base_time)
         self.pipeline.set_base_time(base_time)
         self.pipeline.use_clock(clock)
@@ -384,6 +385,13 @@ class FeedComponent(basecomponent.BaseComponent):
         
         base_time = clock.get_time()
         self.pipeline.set_base_time(base_time)
+
+        # TODO: Find a neater solution?
+        # Clock base_time distribution only happens during state changes, so
+        # simply setting it on the pipeline is insufficient.
+        self.pipeline.set_state(gst.STATE_PAUSED)
+        self.pipeline.get_state(gst.CLOCK_TIME_NONE)
+        self.pipeline.set_state(gst.STATE_PLAYING)
 
         self.debug('provided master clock from %r, base time %s'
                    % (clock, gst.TIME_ARGS(base_time)))
