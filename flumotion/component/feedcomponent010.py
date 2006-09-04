@@ -353,6 +353,8 @@ class FeedComponent(basecomponent.BaseComponent):
         return defer.succeed(None)
 
     def set_master_clock(self, ip, port, base_time):
+        self.debug("Master clock set to %s:%d with base_time %s", ip, port,
+            gst.TIME_ARGS(base_time))
         clock = gst.NetClientClock(None, ip, port, base_time)
         self.pipeline.set_base_time(base_time)
         self.pipeline.use_clock(clock)

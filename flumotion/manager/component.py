@@ -399,7 +399,7 @@ class ComponentAvatar(base.ManagerAvatar):
         conf = self.componentState.get('config')
         master = conf['clock-master'] # avatarId of the clock master comp
         clocking = None
-        if master:
+        if master != self.avatarId and master != None:
             self.debug('Need to synchronize with clock master %r' % master)
             d = self.heaven.getMasterClockInfo(master, self.avatarId)
             yield d
@@ -743,15 +743,7 @@ class ComponentHeaven(base.ManagerHeaven):
         state = componentAvatar.componentState
         conf = state.get('config')
     
-        self.debug('master clock is %s, we are component %s' %
-            (conf['clock-master'], componentAvatar.avatarId))
-        # provide master clock if needed
-        if conf['clock-master'] == componentAvatar.avatarId:
-            # houston, we have a master clock
-            self.debug('telling component %s to be the clock master' %
-                componentAvatar.avatarId)
-            yield self.provideMasterClock(componentAvatar)
-
+        
         # connect the component's eaters
         eatersData = self._getComponentEatersData(componentAvatar)
         for fullFeedId in eatersData:
