@@ -1,3 +1,9 @@
+2006-09-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	ASF should not send a Pragma header with features=broadcast.
+	This allows WMP to play asf streams on port 80 on FQDN'd urls.
+
 2006-09-05  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/worker/feed.py:

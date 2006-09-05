@@ -258,11 +258,13 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         setHeader('Content-type', content)
         
         # ASF needs a Pragma header for live broadcasts
-        if content in [
-            "video/x-ms-asf",
-            "audio/x-ms-asf",
-        ]:
-            setHeader('Pragma', 'features=broadcast')
+        # Apparently ASF breaks on WMP port 80 if you use the pragma header
+        # - Sep 5 2006
+        #if content in [
+        #    "video/x-ms-asf",
+        #    "audio/x-ms-asf",
+        #]:
+            #setHeader('Pragma', 'features=broadcast')
             
         #self.debug('setting Content-type to %s' % mime)
         ### FIXME: there's a window where Twisted could have removed the
