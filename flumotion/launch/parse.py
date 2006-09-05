@@ -393,16 +393,8 @@ def parse_args(args):
                          'plugs': {socket name => plug config}}
     """
 
-    components = []
-    properties = {}
-    plugs = {}
-
     if not args:
         err('Usage: flumotion-launch COMPONENT [! COMPONENT]...')
-
-    # components: [(name, type), ...]
-    # properties: {componentname=>{prop=>value, ..}, ..}
-    # plugs: {componentname=>[(plugtype,{prop=>value, ..}), ...], ...}
 
     components = ComponentStore()
         

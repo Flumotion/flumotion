@@ -1,5 +1,7 @@
 2006-09-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/parse.py (parse_args): Remove some unused vars.
+
 	* flumotion/launch/main.py: Document via a docstring. Refactor to
 	use the flumotion.launch.parse library. Update for changes in
 	component startup: components connect over pipes instead of TCP
