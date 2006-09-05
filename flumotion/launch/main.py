@@ -19,315 +19,81 @@
 
 # Headers in this file shall remain intact.
 
+
+"""
+Flumotion-launch: A gst-launch analog for Flumotion.
+
+The goal of flumotion-launch is to provide an easy way for testing
+flumotion components, without involving much of Flumotion's core code.
+
+Flumotion-launch takes a terse gst-launch-like syntax, translates that
+into a component graph, and starts the components. An example would be:
+
+  flumotion-launch videotest ! theora-encoder ! ogg-muxer ! http-streamer
+
+You can also set properties:
+
+  flumotion-launch videotest framerate=15/2
+
+You can link specific feeders as well:
+
+  flumotion-launch firewire .audio ! vorbis-encoder
+
+Components can be backreferenced using their names:
+
+  flumotion-launch videotest audiotest videotest0. ! ogg-muxer \
+                   audiotest0. ! ogg-muxer0.
+
+In addition, components can have plugs:
+
+  flumotion-launch http-streamer /apachelogger,logfile=/dev/stdout
+
+Flumotion-launch explicitly avoids much of Flumotion's core logic. It
+does not import flumotion.manager, flumotion.admin, or flumotion.worker.
+There is no depgraph, no feed server, no job process. Although it might
+be useful in the future to add a way to use the standard interfaces to
+start components via admin, manager, worker, and job instances, this
+low-level interface is useful in debugging problems and should be kept.
+"""
+
+
 import optparse
+import os
 import sys
 
 from twisted.python import reflect
 from twisted.internet import reactor, defer
 
-from flumotion.common import log, common, registry, dag, errors
-from flumotion.twisted.defer import defer_generator
+from flumotion.common import log, common, registry, errors
+
+from flumotion.launch import parse
 
 def err(x):
     sys.stderr.write(x + '\n')
     raise SystemExit(1)
 
-def resolve_links(links, components):
-    reg = registry.getRegistry()
-    for link in links:
-        compname = link[0]
-        comptype = [x[1] for x in components if x[0]==compname][0]
-        compreg = reg.getComponent(comptype)
-        if link[1]:
-            if not link[1] in compreg.getFeeders():
-                err('Component %s has no feeder named %s' % (compname, link[1]))
-            # leave link[1] unchanged
-        else:
-            if not compreg.getFeeders():
-                err('Component %s has no feeders' % compname)
-            link[1] = compreg.getFeeders()[0]
-    
-    for link in links:
-        compname = link[2]
-        comptype = [x[1] for x in components if x[0]==compname][0]
-        compreg = reg.getComponent(comptype)
-        eaters = compreg.getEaters()
-        if link[3]:
-            if not link[3] in [x.getName() for x in eaters]:
-                err('Component %s has no eater named %s' % (compname, link[3]))
-            # leave link[1] unchanged
-        else:
-            if not eaters:
-                err('Component %s has no eaters' % compname)
-            link[3] = eaters[0].getName()
-    
-    #for link in links:
-    #    print '%s:%s => %s:%s' % tuple(link)
 
-def find(l, pred):
-    return filter(pred, l)[0]
-
-def sort_components(links, components):
-    sorted = dag.topological_sort([x[0] for x in components],
-                                  [(x[0], x[2]) for x in links])
-    sorted = [find(components, lambda p: p[0] == x) for x in sorted]
-    return sorted
-
-def parse_args(args):
-    links = []
-    components = []
-    properties = {}
-    plugs = {}
-
-    if not args:
-        err('Usage: flumotion-launch COMPONENT [! COMPONENT]...')
-
-    # components: [(name, type), ...]
-    # links: [(feedercomponentname, feeder, eatercomponentname, eater), ...]
-    # properties: {componentname=>{prop=>value, ..}, ..}
-    # plugs: {componentname=>[(plugtype,{prop=>value, ..}), ...], ...}
-
-    _names = {}
-    def add_component(type):
-        i = _names.get(type, 0)
-        _names[type] = i + 1
-        name = '%s%d' % (type, i)
-        components.append((name, type))
-        properties[name] = {}
-        plugs[name] = []
-        
-    def last_component():
-        return components[-1][0]
-
-    link_tmp = []
-    def link(feedercompname=None, feeder=None, eatercompname=None, eater=None):
-        if feedercompname:
-            assert not link_tmp
-            tmp = [feedercompname, feeder, eatercompname, eater]
-            link_tmp.append(tmp)
-        elif feeder:
-            err('how did i get here?')
-        elif eatercompname:
-            if not link_tmp:
-                err('Invalid grammar: trying to link, but no feeder component')
-            link_tmp[0][2] = eatercompname
-            if eater:
-                link_tmp[0][3] = eater
-        elif eater:
-            if not link_tmp:
-                err('Invalid grammar: trying to link, but no feeder component')
-            link_tmp[0][3] = eater
-        else:
-             # no args, which is what happens when ! is seen
-            if not link_tmp:
-                link_tmp.append([last_component(), None, None, None])
-            else:
-                if not link_tmp[0][0]:
-                    link_tmp[0][0] = last_component()
-            
-        if link_tmp and link_tmp[0][0] and link_tmp[0][2]:
-            links.append(link_tmp[0])
-            del link_tmp[0]
-
-    args.reverse() # so we can pop from the tail
-
-    while args:
-        x = args.pop().strip()
-        if x == '!':
-            if not components:
-                err('Invalid grammar: `!\' without feeder component')
-            link()
-        elif x[0] == '/':
-            # a plug
-            plugargs = x.split(',')
-            plug = plugargs.pop(0)[1:]
-            if link_tmp or not components:
-                err('Invalid grammar: Plug %s does not follow a component'
-                    % plug)
-            props = {}
-            for x in plugargs:
-                prop = x[:x.index('=')]
-                val = x[x.index('=')+1:]
-                if not prop or not val:
-                    err('Invalid plug property setting: %s' % x)
-                props[prop] = val
-            plugs[last_component()].append((plug, props))
-        elif x.find('=') != -1:
-            prop = x[:x.index('=')]
-            val = x[x.index('=')+1:]
-            if not prop or not val:
-                err('Invalid property setting: %s' % x)
-            if link_tmp or not components:
-                err('Invalid grammar: Property %s does not follow a component'
-                    % x)
-            properties[last_component()][prop] = val
-        elif x.find('.') != -1:
-            t = x.split('.')
-            if len(t) != 2:
-                err('Invalid grammar: bad eater/feeder specification: %s' % x)
-            t = [z or None for z in t]
-            if link_tmp:
-                link(eatercompname=t[0], eater=t[1])
-            elif components:
-                link(feedercompname=t[0] or last_component(), feeder=t[1])
-            else:
-                err('Invalid grammar: trying to link from feeder %s but '
-                    'no feeder component' % x)
-        else:
-            add_component(x)
-            if link_tmp:
-                link(eatercompname=last_component())
-    if link_tmp:
-        err('Invalid grammar: uncompleted link from %s.%s')
-        
-    for x in links:
-        assert x[0] and x[2]
-        if not x[0] in properties.keys():
-            err('Invalid grammar: no feeder component %s to link from' % x[0])
-        if not x[2] in properties.keys():
-            err('Invalid grammar: no eater component %s to link to' % x[2])
-
-    resolve_links(links, components)
-
-    components = sort_components(links, components)
-
-    return components, links, properties, plugs
-
-def parse_properties(cname, strings, specs):
-    # cname: string, name of the component
-    # strings: {'name':'val', ...}
-    # specs: list of flumotion.common.registry.RegistryEntryProperties
-    def parse_fraction(v):
-        split = v.split('/')
-        assert len(split) == 2, \
-               "Fraction values should be in the form N/D"
-        return (int(split[0]), int(split[1]))
-
-    ret = {}
-    compprops = dict([(x.getName(), x) for x in specs])
-
-    for k, v in strings.items():
-        if k not in compprops:
-            err('Component %s has no such property `%s\'' % (cname, k))
-
-        t = compprops[k].getType()
-        parsers = {'int': int,
-                   'long': long,
-                   'float': float,
-                   'bool': bool,
-                   'string': str,
-                   'fraction': parse_fraction}
-
-        try:
-            parser = parsers[t]
-        except KeyError:
-            err('Unknown type `%s\' of property %s in component %s'
-                % (t, k, cname))
-
-        val = parser(v)
-
-        if compprops[k].isMultiple():
-            if not k in ret:
-                ret[k] = []
-            ret[k].append(val)
-        else:
-            ret[k] = val
-
-    for k, v in compprops.items():
-        if v.isRequired() and not k in ret:
-            err('Component %s missing required property `%s\' of type %s'
-                % (cname, k, v.getType()))
-
-    return ret
-
-
-# FIXME: this duplicates code from
-# flumotion.common.config.ConfigEntryComponent, among other things. If
-# the code from f.c.c could be factored into something more like a
-# library that would be good.
 class ComponentWrapper(object):
-    name = None
-    type = None
-    prototype = None
-    procedure = None
-    config = None
-    component = None
-    feeders = None
-
-    def __init__(self, name, type, properties, feeders, plugs):
-        self.name = name
-        self.type = type
-
-        r = registry.getRegistry()
-        if not r.hasComponent(type):
-            err('Unknown component type: %s' % type)
-
-        c = r.getComponent(type)
-        config = {'name': name}
-        
-        self.feeders = c.getFeeders()
-
-        config['properties'] = parse_properties(name, properties,
-                                                c.getProperties())
-
-        eaters = c.getEaters()
-        if eaters:
-            required = True in [x.getRequired() for x in eaters]
-            multiple = True in [x.getMultiple() for x in eaters]
-            if required and not feeders:
-                err('Component %s wants to eat but you didn\'t give it '
-                    'food' % name)
-            if not multiple and len(feeders) > 1:
-                err('Component %s can only eat from one feeder' % name)
-            if feeders:
-                config['source'] = feeders
-            else:
-                # don't even set config['source']
-                pass
-        else:
-            if feeders:
-                err('Component %s can\'t feed from anything' % name)
-            
+    def __init__(self, config):
+        self.name = config['name']
         self.config = config
+        self.procedure = self._getProcedure(config['type'])
+        self.component = None
 
-        # fixme: 'feed' is not strictly necessary in config
-        config['feed'] = c.getFeeders()
-
-        # not used by the component -- see notes in _parseComponent in
-        # config.py
-        if c.getNeedsSynchronization():
-            config['clock-master'] = c.getClockPriority()
-        else:
-            config['clock-master'] = None
-
-        config['plugs'] = {}
-        for socket in c.getSockets():
-            config['plugs'][socket] = []
-        for plugtype, plugprops in plugs:
-            if not r.hasPlug(plugtype):
-                err('Unknown plug type: %s' % plugtype)
-            spec = r.getPlug(plugtype)
-            socket = spec.getSocket()
-            if not socket in config['plugs']:
-                err('Cannot add plug %s to component %s: '
-                    'sockets of type %s not supported'
-                    % (plugtype, name, socket))
-            props = parse_properties(plugtype, plugprops, spec.getProperties())
-            plug = {'type': plugtype, 'socket': socket,
-                    'properties': props}
-            config['plugs'][socket].append(plug)
-                
+    def _getProcedure(self, type):
+        r = registry.getRegistry()
+        c = r.getComponent(type)
         try:
             entry = c.getEntryByType('component')
         except KeyError:
-            err('Component %s has no component entry' % name)
+            err('Component %s has no component entry' % self.name)
         importname = entry.getModuleName(c.getBase())
         try:
             module = reflect.namedAny(importname)
         except Exception, e:
             err('Could not load module %s for component %s: %s'
-                % (importname, name, e))
-        self.procedure = getattr(module, entry.getFunction())
+                % (importname, self.name, e))
+        return getattr(module, entry.getFunction())
 
     def instantiate(self):
         self.component = self.procedure()
@@ -342,18 +108,38 @@ class ComponentWrapper(object):
             ret = ("127.0.0.1", ret[1], ret[2])
         return ret
 
-    def start(self, eatersdata, feedersdata, clocking):
-        return self.component.start(eatersdata, feedersdata, clocking)
+    def start(self, clocking):
+        return self.component.start(clocking)
 
     def stop(self):
         return self.component.stop()
+
+    def feedToFD(self, feedName, fd):
+        return self.component.feedToFD(feedName, fd)
+
+    def eatFromFD(self, feedId, fd):
+        return self.component.eatFromFD(feedId, fd)
+
+def make_pipes(wrappers):
+    fds = {} # feedcompname:feeder => (fd, start())
+    wrappersByName = dict([(wrapper.name, wrapper)
+                           for wrapper in wrappers])
+    def starter(wrapper, feedName, write):
+        return lambda: wrapper.feedToFD(feedName, write)
+    for wrapper in wrappers:
+        for source in wrapper.config.get('source', []):
+            compName, feedName = source.split(':')
+            read, write = os.pipe()
+            start = starter(wrappersByName[compName], feedName, write)
+            fds[source] = (read, start)
+    return fds
 
 def DeferredDelay(time, val):
     d = defer.Deferred()
     reactor.callLater(time, d.callback, val)
     return d
 
-def start_components(wrappers, feed_ports, links, delay):
+def start_components(wrappers, fds, delay):
     # figure out the links and start the components
 
     # first phase: instantiation and setup
@@ -391,15 +177,13 @@ def start_components(wrappers, feed_ports, links, delay):
 
     def do_start(synchronization, wrapper):
         need_sync, clocking = synchronization
-        eatersdata = [('%s:%s' % (x[0], x[1]), 'localhost',
-                       feed_ports[x[0]][x[1]])
-                      for x in links if x[2] == wrapper.name]
-        feedersdata = [('%s:%s' % (wrapper.name, x), 'localhost', p)
-                       for x, p in feed_ports[wrapper.name].items()]
 
         # start it up, with clocking data only if it needs it
-        d = wrapper.start(eatersdata, feedersdata,
-                          wrapper in need_sync and clocking or None)
+        for source in wrapper.config.get('source', []):
+            read, start = fds[source]
+            wrapper.eatFromFD(source, read)
+            start()
+        d = wrapper.start(wrapper in need_sync and clocking or None)
         d.addCallback(lambda val: synchronization)
         return d
 
@@ -466,30 +250,21 @@ def main(args):
     else:
         delay = 0.
 
-    components, links, properties, plugs = parse_args(args[1:])
+    # note parser versus parse
+    configs = parse.parse_args(args[1:])
 
     # load the modules, make the component
-    wrappers = []
-    for name, type in components:
-        feeders = ['%s:%s' % (x[0], x[1]) for x in links if x[2] == name]
-        wrappers.append(ComponentWrapper(name, type, properties[name],
-                                         feeders, plugs[name]))
+    wrappers = [ComponentWrapper(config) for config in configs]
 
-    # assign feed ports
-    port = 7600
-    feed_ports = {}
-    for wrapper in wrappers:
-        feed_ports[wrapper.name] = {}
-        for feeder in wrapper.feeders:
-            feed_ports[wrapper.name][feeder] = port
-            print '%s:%s feeds on port %d' % (wrapper.name, feeder, port)
-            port += 1
-    
+    # make socket pairs
+    fds = make_pipes(wrappers)
+
     reactor.running = False
     reactor.failure = False
     reactor.callLater(0, lambda: setattr(reactor, 'running', True))
 
-    d = start_components(wrappers, feed_ports, links, delay)
+    d = start_components(wrappers, fds, delay)
+
     def errback(failure):
         print "Error occurred: %s" % failure.getErrorMessage()
         failure.printDetailedTraceback()

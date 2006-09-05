@@ -1,5 +1,14 @@
 2006-09-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py: Document via a docstring. Refactor to
+	use the flumotion.launch.parse library. Update for changes in
+	component startup: components connect over pipes instead of TCP
+	ports.
+
+	* flumotion/launch/parse.py: New file, exports one function that
+	takes an argv fragment and returns an ordered list of config
+	dicts. Refactorage.
+
 	* flumotion/test/test_dag.py (TestDAG.testSort): Fix broken test.
 
 	* flumotion/common/dag.py (topological_sort): Fix return to follow

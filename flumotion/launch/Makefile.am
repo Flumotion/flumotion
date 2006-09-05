@@ -5,7 +5,8 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/launch
 flumotion_PYTHON = \
 	__init__.py 	\
 	inspect.py \
-	main.py
+	main.py \
+	parse.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 
