@@ -1,6 +1,22 @@
 2006-09-05  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
+	* flumotion/manager/depgraph.py:
+	* flumotion/test/test_manager_depgraph.py:
+	* flumotion/test/test_manager_manager.py:
+	  Revert recent depgraph changes, so we again set up clock masters
+	  before starting them.
+
+	  Now, in provide_master_clock, set the pipeline to PAUSED before
+	  trying to get the pipeline clock, to ensure we get the correct
+	  clock. Add some generic infrastructure to wait for a particular 
+	  state change.
+
+	  Fixes #447.
+
+2006-09-05  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
 	  Add buffer and event probes before starting the pipeline, not
 	  after. Fix up some comments/log lines.
 

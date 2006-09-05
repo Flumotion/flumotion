@@ -100,10 +100,7 @@ class testDepGraph(unittest.TestCase):
                 for happynode in startorder:
                     if happynode[1] == "COMPONENTSTART":
                         happyindex = startorder.index(happynode)
-                        if happynode[0] != node[0]:
-                            self.failUnless(happyindex > clockindex)
-                        else:
-                            self.failUnless(clockindex > happyindex)
+                        self.failUnless(happyindex > clockindex)
         
             # now check that componentsetup before componentstart
             # also check the feeders are before their respective eaters

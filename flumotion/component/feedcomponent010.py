@@ -87,6 +87,9 @@ class FeedComponent(basecomponent.BaseComponent):
         # checkEaterDC,
         self._eaterStatus = {}
 
+        # statechange -> [ deferred ]
+        self._stateChangeDeferreds = {}
+
     def do_setup(self):
         """
         Sets up component.
@@ -248,6 +251,31 @@ class FeedComponent(basecomponent.BaseComponent):
     def get_pipeline(self):
         return self.pipeline
 
+    def _addStateChangeDeferred(self, statechange):
+        if statechange not in self._stateChangeDeferreds:
+            self._stateChangeDeferreds[statechange] = []
+
+        d = defer.Deferred()
+        self._stateChangeDeferreds[statechange].append(d)
+
+        return d
+
+    # GstPython should have something for this, but doesn't.
+    def _getStateChange(self, old, new):
+        if old == gst.STATE_NULL and new == gst.STATE_READY:
+            return gst.STATE_CHANGE_NULL_TO_READY
+        elif old == gst.STATE_READY and new == gst.STATE_PAUSED:
+            return gst.STATE_CHANGE_READY_TO_PAUSED
+        elif old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
+            return gst.STATE_CHANGE_PAUSED_TO_PLAYING
+        elif old == gst.STATE_PLAYING and new == gst.STATE_PAUSED:
+            return gst.STATE_CHANGE_PLAYING_TO_PAUSED
+        elif old == gst.STATE_PAUSED and new == gst.STATE_READY:
+            return gst.STATE_CHANGE_PAUSED_TO_READY
+        elif old == gst.STATE_READY and new == gst.STATE_NULL:
+            return gst.STATE_CHANGE_READY_TO_NULL
+        else:
+            return 0
        
     def bus_watch_func(self, bus, message):
         t = message.type
@@ -262,6 +290,14 @@ class FeedComponent(basecomponent.BaseComponent):
                     % (src, old.value_nick, new.value_nick)) 
                 if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
                     self.setMood(moods.happy)
+
+                change = self._getStateChange(old,new)
+                if change in self._stateChangeDeferreds:
+                    dlist = self._stateChangeDeferreds[change]
+                    for d in dlist:
+                        d.callback(None)
+                    del self._stateChangeDeferreds[change]
+
             elif src.get_name() in ['feeder:'+n for n in self.feeder_names]:
                 if old == gst.STATE_PAUSED and new == gst.STATE_PLAYING:
                     self.debug('feeder %s is now feeding' % src.get_name())
@@ -366,6 +402,26 @@ class FeedComponent(basecomponent.BaseComponent):
 
         @returns: (ip, port, base_time) triple.
         """
+        def pipelinePaused(r):
+            clock = self.pipeline.get_clock()
+            # make sure the pipeline sticks with this clock
+            self.pipeline.use_clock(clock)
+
+            self.clock_provider = gst.NetTimeProvider(clock, None, port)
+            # small window here but that's ok
+            self.clock_provider.set_property('active', False)
+        
+            base_time = clock.get_time()
+            self.pipeline.set_base_time(base_time)
+
+            self.debug('provided master clock from %r, base time %s'
+                       % (clock, gst.TIME_ARGS(base_time)))
+
+            # FIXME: this is always localhost, no ? Not sure if this is useful
+            ip = self.state.get('ip')
+
+            return (ip, port, base_time)
+
         if not self.pipeline:
             self.warning('No self.pipeline, cannot provide master clock')
             # FIXME: should we have a NoSetupError() for cases where setup
@@ -375,31 +431,15 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning('already had a clock provider, removing it')
             self.clock_provider = None
 
-        clock = self.pipeline.get_clock()
-        # make sure the pipeline sticks with this clock
-        self.pipeline.use_clock(clock)
+        # We need to be >= PAUSED to get the correct clock, in general
+        self.info ("Setting pipeline to PAUSED")
 
-        self.clock_provider = gst.NetTimeProvider(clock, None, port)
-        # small window here but that's ok
-        self.clock_provider.set_property('active', False)
-        
-        base_time = clock.get_time()
-        self.pipeline.set_base_time(base_time)
-
-        # TODO: Find a neater solution?
-        # Clock base_time distribution only happens during state changes, so
-        # simply setting it on the pipeline is insufficient.
+        d = self._addStateChangeDeferred(gst.STATE_CHANGE_READY_TO_PAUSED)
         self.pipeline.set_state(gst.STATE_PAUSED)
-        self.pipeline.get_state(gst.CLOCK_TIME_NONE)
-        self.pipeline.set_state(gst.STATE_PLAYING)
 
-        self.debug('provided master clock from %r, base time %s'
-                   % (clock, gst.TIME_ARGS(base_time)))
+        d.addCallback(pipelinePaused)
 
-        # FIXME: this is always localhost, no ? Not sure if this is useful
-        ip = self.state.get('ip')
-
-        return (ip, port, base_time)
+        return d
 
     # FIXME: rename, since this just starts the pipeline,
     # and linking is done by the manager

@@ -91,7 +91,7 @@ class DepGraph(log.Loggable):
         """
         if self._dag.hasNode(component, "JOB"):
             self._addNode(component, "CLOCKMASTER")
-            self._addEdge(component, component, "COMPONENTSTART",
+            self._addEdge(component, component, "COMPONENTSETUP",
                 "CLOCKMASTER")
         
             # now go through all the component starts and make them dep on the
@@ -99,8 +99,7 @@ class DepGraph(log.Loggable):
             startnodes = self._dag.getAllNodesByType("COMPONENTSTART")
             for start in startnodes:
                 # only add if they share the same parent flow
-                if start.get('parent') == component.get('parent') and \
-                    component != start:
+                if start.get('parent') == component.get('parent'):
                     self._addEdge(component, start, "CLOCKMASTER", 
                         "COMPONENTSTART")
         else:
