@@ -210,6 +210,9 @@ class RegistryEntryBundle:
     def getProject(self):
         return self.project
 
+    def getUnder(self):
+        return self.under
+
     def getBaseDir(self):
         if self.project == 'flumotion':
             return getattr(configure, self.under)
@@ -1068,8 +1071,8 @@ class ComponentRegistry(log.Loggable):
         # bundles
         w(2, '<bundles>')
         for bundle in self.getBundles():
-            w(4, '<bundle name="%s" project="%s">' % (
-                bundle.getName(), bundle.getProject()))
+            w(4, '<bundle name="%s" under="%s" project="%s">' % (
+                bundle.getName(), bundle.getUnder(), bundle.getProject()))
 
             dependencies = bundle.getDependencies()
             if dependencies:

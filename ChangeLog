@@ -1,3 +1,10 @@
+2006-09-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	  add a getUnder() accessor
+	  use it when writing out the registry, so it finds the locale files
+	  correctly and doesn't warn and rebuild on it
+
 2006-09-05  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:
