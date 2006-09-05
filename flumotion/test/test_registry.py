@@ -245,7 +245,7 @@ class TestRegistry(unittest.TestCase):
   </plugs>
 
   <bundles>
-    <bundle name="test-bundle" project="flumotion">
+    <bundle name="test-bundle" under="pythondir" project="flumotion">
       <dependencies>
         <dependency name="test-dependency"/>
       </dependencies>
