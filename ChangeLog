@@ -1,3 +1,10 @@
+2006-09-05  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_dag.py (TestDAG.testSort): Fix broken test.
+
+	* flumotion/common/dag.py (topological_sort): Fix return to follow
+	docs, broken since the depgraph merge.
+
 2006-09-04  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:

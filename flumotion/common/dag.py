@@ -521,4 +521,4 @@ def topological_sort(items, partial_order):
     for a,b in partial_order:
         graph.addEdge(a, b)
 
-    return graph.sort()
+    return [v for v, t in graph.sort()]

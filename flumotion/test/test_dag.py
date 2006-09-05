@@ -38,7 +38,7 @@ class TestDAG(unittest.TestCase):
         sorted = dag.topological_sort(nodes, edges)
 
         for order in orderings:
-            positions = [sorted.index((x,0)) for x in order]
+            positions = [sorted.index(x) for x in order]
             positions_sorted = list(positions)
             positions_sorted.sort()
             self.failUnless(positions == positions_sorted)
