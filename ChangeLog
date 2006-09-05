@@ -1,3 +1,8 @@
+2006-09-05  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/worker/feed.py:
+	  Clean up feedserver FD/transport dropping. Fixes #446
+
 2006-09-05  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/main.py: One more doc line.

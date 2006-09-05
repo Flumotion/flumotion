@@ -24,7 +24,7 @@ implementation of a PB Server through which other components can request
 to eat from or feed to this worker's components.
 """
 
-from twisted.internet import reactor, defer
+from twisted.internet import reactor, defer, main
 from twisted.cred import error
 from twisted.python import components, failure, reflect
 from twisted.spread import pb
@@ -122,12 +122,11 @@ class FeedAvatar(fpb.Avatar):
         self.debug(
             'FEEDSERVER <-- remote: callRemote(sendFeedReply, %s): %r' % (
                 fullFeedId, result))
+        # Remove this from the reactor; we mustn't read or write from it from
+        # here on
         t = self._mind.broker.transport
         t.stopReading()
         t.stopWriting()
-        # this keeps a ref around, so the socket will not get closed
-        self._transport = t
-        self._mind.broker.transport = None
 
         # hand off the fd to the component
         self.debug("Attempting to send FD: %d" % t.fileno())
@@ -137,8 +136,12 @@ class FeedAvatar(fpb.Avatar):
             common.componentId(flowName, componentName), feedName, t.fileno()):
             t.keepSocketAlive = True
 
-        t.loseConnection()
+        # We removed the transport from the reactor before sending the FD; now
+        # we want a complete and immediate cleanup of the socket, which 
+        # loseConnection() doesn't do.
+        t.connectionLost(failure.Failure(main.CONNECTION_DONE))
 
+    # TODO: receiveFeed is bitrotten. Clean it up.
     def perspective_receiveFeed(self, componentId, feedId):
         """
         Called when the PB client wants to send the given feedId to the
@@ -289,7 +292,9 @@ class FeedMedium(fpb.Referenceable):
         t.doWrite()
         self.debug('stop writing to transport')
         t.stopWriting()
-        # store the transport so a ref to the socket is kept around
+        # store the transport so a ref to the socket is kept around. If we
+        # get reconnected, this'll be overwritten, and the socket will be 
+        # collected, and closed
         self._transports[fullFeedId] = t
         self.remote.broker.transport = None
         # pass the fd to the component to eat from
@@ -297,3 +302,4 @@ class FeedMedium(fpb.Referenceable):
         self.debug('telling component to eat from fd %d' % fd)
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
         self.component.eatFromFD(common.feedId(componentName, feedName), fd)
+
