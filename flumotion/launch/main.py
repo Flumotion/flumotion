@@ -38,6 +38,7 @@ You can also set properties:
 You can link specific feeders as well:
 
   flumotion-launch firewire .audio ! vorbis-encoder
+  flumotion-launch firewire firewire0.audio ! vorbis-encoder
 
 Components can be backreferenced using their names:
 

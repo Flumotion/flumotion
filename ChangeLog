@@ -1,5 +1,7 @@
 2006-09-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/launch/main.py: One more doc line.
+
 	* flumotion/launch/parse.py (parse_args): Remove some unused vars.
 
 	* flumotion/launch/main.py: Document via a docstring. Refactor to
