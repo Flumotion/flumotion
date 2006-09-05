@@ -1,3 +1,9 @@
+2006-09-05  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	  Add buffer and event probes before starting the pipeline, not
+	  after. Fix up some comments/log lines.
+
 2006-09-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/registry.py:

@@ -413,11 +413,10 @@ class FeedComponent(basecomponent.BaseComponent):
         # set pipeline to playing, and provide clock if asked for
         if self.clock_provider:
             self.clock_provider.set_property('active', True)
-        self.pipeline.set_state(gst.STATE_PLAYING)
 
-        # attach buffer-probe callbacks for each eater
+        # attach event-probe callbacks for each eater
         for feedId in self.get_eater_names():
-            self.debug('adding buffer probe for eater of %s' % feedId)
+            self.debug('adding event probe for eater of %s' % feedId)
             name = "eater:%s" % feedId
             eater = self.get_element(name)
             # FIXME: should probably raise
@@ -425,8 +424,10 @@ class FeedComponent(basecomponent.BaseComponent):
                 self.warning('No element named %s in pipeline' % name)
                 continue
             pad = eater.get_pad("src")
-            self._add_buffer_probe(pad, feedId, firstTime=True)
             pad.add_event_probe(self._eater_event_probe_cb, feedId)
+            self._add_buffer_probe(pad, feedId, firstTime=True)
+
+        self.pipeline.set_state(gst.STATE_PLAYING)
 
     def _add_buffer_probe(self, pad, feedId, firstTime=False):
         # attached from above, and called again every
