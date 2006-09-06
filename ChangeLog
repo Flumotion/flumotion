@@ -1,5 +1,10 @@
 2006-09-06  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/test/integration/test_qa.py:
+	  Unskip disker test, disker now works with a fixed multifdsink.
+
+2006-09-06  Michael Smith  <msmith@fluendo.com>
+
 	* doc/random/component-initialization-protocol:
 	  Update for information about master/slave clocks
 
