@@ -1,5 +1,10 @@
 2006-09-06  Michael Smith  <msmith@fluendo.com>
 
+	* doc/random/component-initialization-protocol:
+	  Update for information about master/slave clocks
+
+2006-09-06  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/launch/main.py:
 	  Fix -launch for master clock changes.
 

@@ -133,6 +133,20 @@ It does this by calling the following two methods:
   FeedComponent.create_pipeline(self)
   FeedComponent.set_pipeline(self, pipeline)
 
+FeedComponent.provide_master_clock(self, port)
+----------------------------------------------
+If a component is selected as a master clock, this method will be called
+after setup (and before start), and will create a gst.NetTimeProvider() on 
+the given port to provide the flumotion flow master clock.
+
+FeedComponent.set_master_clock(self, ip, port, base_time)
+---------------------------------------------------------
+For components that require a clock, but either do cannot provide a clock, or
+are not selected as the master clock, this method will be called to tell the
+component about the clock to slave to; a gst.NetClientClock will be created
+to slave to this master.
+This will be called between setup and start for the component.
+
 Interface
 ---------
 
