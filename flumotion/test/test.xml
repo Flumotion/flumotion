@@ -1,13 +1,13 @@
 <planet>
 
   <flow name="testflow">
-    <component name="producer-video-test" type="pipeline-producer">
+    <component name="producer-video-test" type="pipeline-producer" worker="worker">
       <property name="pipeline">
   videotestsrc ! video/x-raw-yuv,width=320,height=240,framerate=5.0,format=(fourcc)I420
       </property>
     </component>
   
-    <component name="converter-ogg-theora" type="pipeline-converter">
+    <component name="converter-ogg-theora" type="pipeline-converter" worker="worker">
       <source>producer-video-test</source>
       <property name="pipeline">
   ffmpegcolorspace ! theoraenc keyframe-force=5 ! oggmux

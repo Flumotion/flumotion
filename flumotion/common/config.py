@@ -35,7 +35,7 @@ from twisted.python import reflect
 
 from flumotion.common import log, errors, common, registry, fxml
 
-from errors import ConfigError
+from errors import ConfigError, ComponentWorkerConfigError
 
 class ConfigEntryComponent(log.Loggable):
     "I represent a <component> entry in a planet config file"
@@ -377,13 +377,13 @@ class FlumotionConfigXML(BaseConfigParser):
             ret[component.name] = component
         return ret
      
-    def _parseComponent(self, node, parent):
+    def _parseComponent(self, node, parent, forManager=False):
         """
         Parse a <component></component> block.
 
         @rtype: L{ConfigEntryComponent}
         """
-        # <component name="..." type="..." worker="">
+        # <component name="..." type="..." worker="...">
         #   <source>*
         #   <property name="name">value</property>*
         # </component>
@@ -392,12 +392,22 @@ class FlumotionConfigXML(BaseConfigParser):
             raise ConfigError("<component> must have a name attribute")
         if not node.hasAttribute('type'):
             raise ConfigError("<component> must have a type attribute")
+        if forManager:
+            if node.hasAttribute('worker'):
+                raise ComponentWorkerConfigError("components in manager"
+                                                 "cannot have workers")
+        else:
+            if (not node.hasAttribute('worker')
+                or not node.getAttribute('worker')):
+                # new since 0.3, give it a different error
+                raise ComponentWorkerConfigError("<component> must have a"
+                                                 " worker attribute")
 
         type = str(node.getAttribute('type'))
         name = str(node.getAttribute('name'))
-
-        worker = None
-        if node.hasAttribute('worker'):
+        if forManager:
+            worker = None
+        else:
             worker = str(node.getAttribute('worker'))
 
         # FIXME: flumotion-launch does not define parent, type, or
@@ -558,7 +568,8 @@ class FlumotionConfigXML(BaseConfigParser):
                 if bouncer:
                     raise ConfigError(
                         "<manager> section can only have one <component>")
-                bouncer = self._parseComponent(child, 'manager')
+                bouncer = self._parseComponent(child, 'manager',
+                                               forManager=True)
             elif child.nodeName == "plugs":
                 if noRegistry:
                     continue

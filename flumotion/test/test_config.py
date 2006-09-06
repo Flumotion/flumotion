@@ -91,12 +91,32 @@ class TestConfig(unittest.TestCase):
         self.assertRaises(config.ConfigError,
             ConfigXML, 'planet/>')
 
-    def testParseAtmosphere(self):
+    def testParseComponentNoWorker(self):
         conf = ConfigXML(
              """
              <planet>
                <atmosphere>
                  <component name="component-name" type="test-component"/>
+               </atmosphere>
+             </planet>""")
+        self.assertRaises(config.ComponentWorkerConfigError, conf.parse)
+        conf = ConfigXML(
+             """
+             <planet>
+               <atmosphere>
+                 <component name="component-name" type="test-component"
+                            worker=""/>
+               </atmosphere>
+             </planet>""")
+        self.assertRaises(config.ComponentWorkerConfigError, conf.parse)
+
+    def testParseAtmosphere(self):
+        conf = ConfigXML(
+             """
+             <planet>
+               <atmosphere>
+                 <component name="component-name" type="test-component"
+                            worker="foo"/>
                </atmosphere>
              </planet>""")
         self.failIf(conf.atmosphere)
@@ -112,7 +132,8 @@ class TestConfig(unittest.TestCase):
         xml = """
              <planet>
                <atmosphere>
-                 <somethingwrong name="component-name" type="test-component"/>
+                 <somethingwrong name="component-name" type="test-component"
+                                 worker="foo"/>
                </atmosphere>
              </planet>"""
         conf = ConfigXML(xml)
@@ -124,7 +145,8 @@ class TestConfig(unittest.TestCase):
              """
              <planet>
                <flow name="default">
-                 <component name="component-name" type="test-component"/>
+                 <component name="component-name" type="test-component"
+                            worker="foo"/>
                </flow>
              </planet>
              """)
@@ -140,7 +162,7 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(component.type, 'test-component')
         self.assertEquals(component.getType(), 'test-component')
         self.assertEquals(component.getParent(), 'default')
-        self.assertEquals(component.getWorker(), None)
+        self.assertEquals(component.getWorker(), 'foo')
         dict = component.getConfigDict()
         self.assertEquals(dict.get('name'), 'component-name', dict['name'])
         self.assertEquals(dict.get('type'), 'test-component', dict['type'])
@@ -215,7 +237,9 @@ class TestConfig(unittest.TestCase):
 
     def testParseComponentError(self):
         xml = """<planet>
-            <flow name="default"><component name="unused" type="not-existing"/></flow>
+            <flow name="default">
+            <component name="unused" type="not-existing" worker="foo"/>
+            </flow>
             </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
@@ -223,7 +247,7 @@ class TestConfig(unittest.TestCase):
 
         xml = """<planet>
               <flow name="default">
-                <component type="not-named"/>
+                <component type="not-named" worker="foo"/>
               </flow>
             </planet>"""
         conf = ConfigXML(xml)
@@ -232,7 +256,7 @@ class TestConfig(unittest.TestCase):
 
         xml = """<planet>
               <flow name="default">
-                <component name="not-typed"/>
+                <component name="not-typed" worker="foo"/>
               </flow>
             </planet>"""
         conf = ConfigXML(xml)
@@ -241,7 +265,9 @@ class TestConfig(unittest.TestCase):
         
     def testParseFlowError(self):
         xml = """<planet>
-            <flow><component name="unused" type="not-existing"/></flow>
+            <flow>
+            <component name="unused" type="not-existing" worker="foo"/>
+            </flow>
             </planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
@@ -249,7 +275,7 @@ class TestConfig(unittest.TestCase):
 
         xml = """<planet>
               <flow name="manager">
-                <component name="unused" type="not-existing"/>
+                <component name="unused" type="not-existing" worker="foo"/>
               </flow>
             </planet>"""
         conf = ConfigXML(xml)
@@ -258,7 +284,7 @@ class TestConfig(unittest.TestCase):
 
         xml = """<planet>
               <flow name="atmosphere">
-                <component name="unused" type="not-existing"/>
+                <component name="unused" type="not-existing" worker="foo"/>
               </flow>
             </planet>"""
         conf = ConfigXML(xml)
@@ -267,7 +293,7 @@ class TestConfig(unittest.TestCase):
 
         xml = """<planet>
               <flow name="wrongcomponentnode">
-                <wrongnode name="unused" type="not-existing"/>
+                <wrongnode name="unused" type="not-existing" worker="foo"/>
               </flow>
             </planet>"""
         conf = ConfigXML(xml)
@@ -277,8 +303,8 @@ class TestConfig(unittest.TestCase):
 
     def testParseManagerError(self):
         xml = """<planet><manager>
-            <component name="first" type="test-component"></component>
-            <component name="second" type="test-component"></component>
+            <component name="first" type="test-component" worker="foo"/>
+            <component name="second" type="test-component" worker="foo"/>
             </manager></planet>"""
         conf = ConfigXML(xml)
         self.failUnless(conf)
@@ -311,7 +337,7 @@ class TestConfig(unittest.TestCase):
     def testParseProperties(self):
         planet = ConfigXML(
              """<planet><flow name="default">
-             <component name="component-name" type="test-component">
+             <component name="component-name" type="test-component" worker="foo">
                <property name="one">string</property>
                <property name="two">1</property>
                <property name="three">2.5</property>
@@ -343,7 +369,8 @@ class TestConfig(unittest.TestCase):
     def testParsePlugs(self):
         planet = ConfigXML(
              """<planet><flow name="default">
-             <component name="component-name" type="test-component">
+             <component name="component-name" type="test-component"
+                        worker="foo">
                <plugs>
                  <plug socket="foo.bar" type="frobulator">
                    <property name="rate">3/4</property>
@@ -369,7 +396,8 @@ class TestConfig(unittest.TestCase):
     def testParseNoPlugs(self):
         planet = ConfigXML(
              """<planet><flow name="default">
-             <component name="component-name" type="test-component">
+             <component name="component-name" type="test-component"
+                        worker="foo">
              </component></flow>
              </planet>""")
         self.failIf(planet.flows)
@@ -384,9 +412,10 @@ class TestConfig(unittest.TestCase):
         planet = ConfigXML(
              """<planet>
              <flow name="default">
-             <component name="one" type="test-component-sync">
+             <component name="one" type="test-component-sync" worker="foo">
              </component>
-             <component name="two" type="test-component-sync-provider">
+             <component name="two" type="test-component-sync-provider"
+                        worker="foo">
              </component>
              </flow>
              </planet>""")
@@ -405,10 +434,11 @@ class TestConfig(unittest.TestCase):
         planet = ConfigXML(
              """<planet>
              <flow name="default">
-             <component name="one" type="test-component-sync">
+             <component name="one" type="test-component-sync" worker="foo">
                <clock-master>yes</clock-master>
              </component>
-             <component name="two" type="test-component-sync-provider">
+             <component name="two" type="test-component-sync-provider"
+                        worker="foo">
              </component>
              </flow>
              </planet>""")
@@ -427,10 +457,11 @@ class TestConfig(unittest.TestCase):
         planet = ConfigXML(
              """<planet>
              <flow name="default">
-             <component name="one" type="test-component-sync">
+             <component name="one" type="test-component-sync" worker="foo">
                <clock-master>yes</clock-master>
              </component>
-             <component name="two" type="test-component-sync-provider">
+             <component name="two" type="test-component-sync-provider"
+                        worker="foo">
                <clock-master>yes</clock-master>
              </component>
              </flow>
@@ -444,10 +475,12 @@ class TestConfig(unittest.TestCase):
              """
              <planet>
                <atmosphere>
-                 <component name="atmocomp" type="test-component"/>
+                 <component name="atmocomp" type="test-component"
+                            worker="foo"/>
                </atmosphere>
                <flow name="default">
-                 <component name="flowcomp" type="test-component"/>
+                 <component name="flowcomp" type="test-component"
+                            worker="foo"/>
                </flow>
              </planet>
              """)
@@ -460,7 +493,8 @@ class TestConfig(unittest.TestCase):
         xml = """
              <planet>
                <flow name="atmosphere">
-                 <component name="flowcomp" type="test-component"/>
+                 <component name="flowcomp" type="test-component"
+                            worker="foo"/>
                </flow>
              </planet>
              """

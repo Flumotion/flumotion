@@ -1,3 +1,26 @@
+2006-09-06  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test.xml: Specify worker for all components.
+
+	* flumotion/test/test_manager_manager.py
+	(TestVishnu.testLoadConfiguration.verifyEmptyDAG): Given that we
+	specify a worker for all components, remove that dep from the
+	graph as well.
+
+	* flumotion/common/config.py (FlumotionConfigXML._parseComponent)
+	(FlumotionConfigXML._parseManager): Make sure that <component>
+	nodes have a worker attribute, except if we are parsing a bouncer
+	component for a manager, in which case the worker attribute can't
+	be present. (Got it?)
+
+	* flumotion/test/test_config.py
+	(TestConfig.testParseComponentNoWorker): Add a new test, ensuring
+	that all component entries have non-null worker attributes. Adapt
+	the other tests so that they do specify a worker.
+
+	* flumotion/common/errors.py (ComponentWorkerConfigError): New
+	error.
+
 2006-09-06  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/test/integration/test_qa.py:

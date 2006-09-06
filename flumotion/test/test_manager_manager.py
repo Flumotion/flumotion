@@ -477,9 +477,9 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         d = self.vishnu.emptyPlanet()
 
         def verifyEmptyDAG(result):
-            # remove worker streamer that is set as the worker for http-streamer
-            # in test.xml
+            # remove workers that components in test.xml depend on
             self.vishnu._depgraph.removeWorker("streamer")
+            self.vishnu._depgraph.removeWorker("worker")
             # make sure the depgraph is empty
             self.assertEqual(self.vishnu._depgraph._dag._nodes,{})
 

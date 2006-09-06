@@ -31,6 +31,8 @@ class ConfigError(Exception):
     "Error during parsing of configuration"
 class NoProjectError(Exception):
     "The given project does not exist"
+class ComponentWorkerConfigError(ConfigError):
+    "Problem with presence of <component> 'worker' attribute"
 
 # connection errors
 class ConnectionError(pb.Error):
