@@ -101,13 +101,16 @@ class ComponentWrapper(object):
         return self.component.setup(self.config)
 
     def provideMasterClock(self, port):
-        ret = self.component.provide_master_clock(port)
-        # grrrrr! for some reason getting the ip requires being
-        # connected? I suppose it *is* always my ip relative to ip X
-        # though...
-        if not ret[0]:
-            ret = ("127.0.0.1", ret[1], ret[2])
-        return ret
+        def replaceIP(ret):
+            # grrrrr! for some reason getting the ip requires being
+            # connected? I suppose it *is* always my ip relative to ip X
+            # though...
+            if not ret[0]:
+                ret = ("127.0.0.1", ret[1], ret[2])
+            return ret
+            
+        d = self.component.provide_master_clock(port)
+        return d
 
     def start(self, clocking):
         return self.component.start(clocking)
@@ -162,10 +165,13 @@ def start_components(wrappers, fds, delay):
         need_sync = [x[1] for x in need_sync]
 
         if need_sync:
+            def addNeedSync(clocking):
+                return need_sync, clocking
             master = need_sync.pop(0)
             print "Telling", master.name, "to provide the master clock."
-            clocking = master.provideMasterClock(7600 - 1) # hack!
-            return need_sync, clocking
+            d = master.provideMasterClock(7600 - 1) # hack!
+            d.addCallback(addNeedSync)
+            return d 
         else:
             return None, None
 
