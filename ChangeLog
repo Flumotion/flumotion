@@ -1,3 +1,11 @@
+2006-09-07  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/base.py:
+	* flumotion/manager/manager.py:
+	  Restarting components was racy, and usually failed, because we
+	  didn't wait for the component to actually be logged out. Do so.
+	  Fixes #450.
+
 2006-09-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/command/commands.py:

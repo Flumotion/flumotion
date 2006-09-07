@@ -23,7 +23,7 @@
 common classes and code to support manager-side objects
 """
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.spread import pb
 from twisted.python import failure, reflect
 
@@ -61,8 +61,20 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         self.mind = None
         self.vishnu = heaven.vishnu
         self.remoteIdentity = remoteIdentity
+        self._detachedD = None # deferred to fire when the avatar's mind is 
+                               # detached
 
         self.debug("created new Avatar with id %s" % avatarId)
+
+    def disconnect(self):
+        if self.mind:
+            self.debug("Avatar %r disconnecting", self.avatarId)
+            self._detachedD = defer.Deferred()
+            self.mind.broker.transport.loseConnection()
+            return self._detachedD
+        else:
+            self.debug("Avatar %r is already disconnected", self.avatarId)
+            return defer.succeed(True)
 
     def timeoutDisconnect(self):
         if self.hasRemoteReference():
@@ -189,6 +201,9 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
         self.stopPingChecking()
         self.mind = None
         self.log('Client detached is mind %s' % mind)
+        if self._detachedD:
+            self._detachedD.callback(None)
+            self._detachedD = None
 
     def getClientAddress(self):
         """

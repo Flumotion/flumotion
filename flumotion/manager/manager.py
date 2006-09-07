@@ -581,7 +581,8 @@ class Vishnu(log.Loggable):
             self.debug('Removing message %r' % m)
             componentState.remove('messages', m)
 
-        componentState.set('moodPending', None)
+        if componentState.get('moodPending') != None:
+            raise errors.BusyComponentError(componentState)
 
         avatar = self.getComponentMapper(componentState).avatar
         if not avatar:
@@ -609,8 +610,13 @@ class Vishnu(log.Loggable):
             avatar._starting = False
             avatar._beingSetup = False
             return result
+        def disconnectComponent(result):
+            return avatar.disconnect()
+
         d.addCallback(clearAvatarFlags)
         d.addCallback(clearSadCallback)
+        d.addCallback(disconnectComponent)
+
         return d
 
     def componentAddMessage(self, avatarId, message):
@@ -825,9 +831,11 @@ class Vishnu(log.Loggable):
     def componentDetached(self, componentAvatar):
         # called when the component has detached
         self._depgraph.setJobStopped(componentAvatar.componentState)
+        componentAvatar.componentState.set('moodPending', None)
 
         # detach componentstate fom avatar
         componentAvatar.componentState = None
+
         
     def registerComponent(self, componentAvatar):
         # called when the jobstate is retrieved
@@ -856,6 +864,9 @@ class Vishnu(log.Loggable):
             self.debug("Component %s is waking, noting in depgraph", 
                 componentAvatar.avatarId)
             self._depgraph.setComponentSetup(m.state)
+        # TODO: When a new component logs in, we should immediately be in state
+        # 'waking'. However, we need to distinguish between setup and not-setup
+        # waking components.
 
         self.debug('vishnu registered component %r' % componentAvatar)
         self.componentHeaven._tryWhatCanBeStarted()
