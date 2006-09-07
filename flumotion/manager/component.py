@@ -382,7 +382,6 @@ class ComponentAvatar(base.ManagerAvatar):
             self._setMood(moods.sad)
             return failure
 
-        self.debug('remote call setup(config=%r)' % conf)
         d = self.mindCallRemote('setup', conf)
         d.addErrback(_setupErrback, self)
         return d
