@@ -465,8 +465,6 @@ class Vishnu(log.Loggable):
     def _startComponents(self, _, conf, remoteIdentity):
         # now start all components that need starting -- collecting into
         # an temporary dict of the form {workerId => [components]}
-        # if workerName is None, we can start the component on any
-        # worker
         componentsToStart = {}
         for c in self._getComponentsToCreate():
             workerId = c.get('workerRequested')
@@ -556,12 +554,9 @@ class Vishnu(log.Loggable):
         workerId = (componentState.get('workerName')
                     or componentState.get('workerRequested'))
 
-        if workerId and not workerId in self.workerHeaven.avatars:
+        if not workerId in self.workerHeaven.avatars:
             raise errors.ComponentNoWorkerError(
                 "worker %s is not logged in" % workerId)
-        elif not self.workerHeaven.avatars:
-            raise errors.ComponentNoWorkerError(
-                "no workers are logged in")
         else:
             return self._workerCreateComponents(workerId, [componentState])
 
@@ -694,18 +689,13 @@ class Vishnu(log.Loggable):
         in no specific order.
 
         @param workerId:   avatarId of the worker
-        @type  workerId:   string, or None to start it on any worker
+        @type  workerId:   string
         @param components: components to start
         @type  components: list of
                            L{flumotion.common.planet.ManagerComponentState}
         """
         self.debug("_workerCreateComponents: workerId %r, components %r" % (
             workerId, components))
-        if not workerId:
-            if not self.workerHeaven.avatars:
-                self.debug('no workers yet, cannot start jobs yet')
-                return defer.succeed(None)
-            workerId = self.workerHeaven.avatars.keys()[0]
 
         if not workerId in self.workerHeaven.avatars:
             self.debug('worker %s not logged in yet, delaying '
@@ -785,6 +775,8 @@ class Vishnu(log.Loggable):
         state = planet.ManagerComponentState()
         state.set('name', conf['name'])
         state.set('type', conf['type'])
+        # FIXME: since now we require all component XML configs to have
+        # requested workers, what does this mean?
         state.set('workerRequested', None)
         state.set('config', conf)
 

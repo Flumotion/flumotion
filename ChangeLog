@@ -1,3 +1,14 @@
+2006-09-07  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/parts.py (ComponentMenu.__init__): Remove
+	restart menu item; stop and start should be good enough for
+	anyone, with their 640k.
+
+	* flumotion/manager/manager.py (Vishnu._startComponents)
+	(Vishnu._workerCreateComponents, Vishnu._configToComponentState):
+	Remove some old code that assumed that workerRequested could be
+	None.
+
 2006-09-07  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/base.py:
