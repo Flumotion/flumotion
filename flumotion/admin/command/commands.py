@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 import os
-import time
 
 from flumotion.twisted.defer import defer_generator
 from flumotion.admin.command import utils
@@ -224,82 +223,86 @@ class MoodListener:
     def stateRemove(self, object, key, value):
         pass
 
-
-def do_stopcomponent(model, quit, avatarId):
+# FIXME: nicer to rewrite do_stop, do_start and do_delete to run some common 
+# code
+def do_avatar_action(model, quit, avatarPath, action):
+    """
+    @type action: a tuple of (actionName, remoteCall, moods, checkMoodFunc)
+    """
     d = model.callRemote('getPlanetState')
     yield d
     planet = d.value()
-    c = utils.find_component(planet, avatarId)
-    if c:
-        if moods.can_stop(moods[c.get('mood')]):
-            d = model.callRemote('componentStop', c)
-            yield d
-            d.value()
-            # wait for component to be sleeping
-            listener = MoodListener()
-            d = listener.waitOnMood((moods.sleeping,))
-            c.addListener(listener)
-            yield d
-            d.value()
-            print "Component now stopped. Now in mood %s" % (
-                moods[c.get('mood')].name,)
+    components = []
+    if avatarPath[0] == 'flow':
+        flows = planet.get('flows')
+        flow_to_act = None
+        for f in flows:
+            if avatarPath[1] == f.get('name'):
+                flow_to_act = f
+        if flow_to_act == None:
+            print "The flow %s is not found." % avatarPath[1]
+            quit()
         else:
-            print "Cannot stop component.  Component is in mood %s." % (
-                moods[c.get('mood')].name,)
+            components = flow_to_act.get('components')
+    elif avatarPath[0] == 'atmosphere':
+        components = planet.get('atmosphere').get('components')
+    elif avatarPath[0] == 'root':
+        flows = planet.get('flows')
+        for f in flows:
+            components = components + f.get('components')
+        components = components + planet.get('atmosphere').get('components')
     else:
-        print "Cannot find component %s." % avatarId
-    quit()
-do_stopcomponent = defer_generator(do_stopcomponent)
+        c = utils.find_component(planet, avatarPath[1:])
+        components.append(c)
 
-def do_startcomponent(model, quit, avatarId):
-    d = model.callRemote('getPlanetState')
-    yield d
-    planet = d.value()
-    c = utils.find_component(planet, avatarId)
-    if c:
-        if moods.can_start(moods[c.get('mood')]):
-            d = model.callRemote('componentStart', c)
-            yield d
-            d.value()
-            # wait for component to be happy or sad
-            listener = MoodListener()
-            d = listener.waitOnMood((moods.happy, moods.sad))
-            c.addListener(listener)
-            yield d
-            d.value()
-            mood = moods[c.get('mood')]
-            if mood == moods.sad:
-                print "Component now in sad state!"
-            elif mood == moods.happy:
-                print "Component now started and happy."
+    if len(components) > 0:
+        def actionComponent(c):
+            if action[3](moods[c.get('mood')]):
+                return model.callRemote(action[1], c)
             else:
-                print "Component in unexpected state: %s." % mood.name
+                print "Cannot %s component /%s/%s, it is in mood: %s." % (
+                    action[0],
+                    c.get("parent").get("name"), c.get("name"), 
+                    moods[c.get("mood")].name)
+                return None
+        dl = []
+        for comp in components:
+            actD = actionComponent(comp)
+            # maybeDeferred won't work here due to python lexicals
+            if actD:
+                dl.append(actD)
+                if action[2]:
+                    # wait for component to be in certain moods
+                    listener = MoodListener()
+                    waitForMoodD = listener.waitOnMood(action[2])
+                    comp.addListener(listener)
+                    dl.append(waitForMoodD)
+        d = defer.DeferredList(dl)
+        yield d
+        d.value()
+        if avatarPath[0] == 'flow':
+            print "Components in flow now completed action %s." % action[0]
+        elif avatarPath[0] == 'atmosphere':
+            print "Components in atmosphere now completed action %s." % (
+                action[0],)
+        elif avatarPath[0] == 'root':
+            print "Components in / now completed action %s." % action[0]
         else:
-            print "Cannot start component.  Component is in mood %s." % (
-                moods[c.get('mood')].name,)
-    else:
-        print "Cannot find component %s." % avatarId
+            print "Component now completed action %s." % action[0]
     quit()
-do_startcomponent = defer_generator(do_startcomponent)
+do_avatar_action = defer_generator(do_avatar_action)
 
-def do_deletecomponent(model, quit, avatarId):
-    d = model.callRemote('getPlanetState')
-    yield d
-    planet = d.value()
-    c = utils.find_component(planet, avatarId)
-    if c:
-        if not moods.can_stop(moods[c.get('mood')]):
-            d = model.callRemote('deleteComponent', c)
-            yield d
-            d.value()
-            print "Component is now deleted."
-        else:
-            print "Cannot delete component.  Component is in mood %s." % (
-                moods[c.get('mood')].name,)
-    else:
-        print "Cannot find component %s." % avatarId
-    quit()
-do_deletecomponent = defer_generator(do_deletecomponent)
+def do_stop(model, quit, avatarPath):
+    return do_avatar_action(model, quit, avatarPath, ('stop', 'componentStop',
+        (moods.sleeping,), moods.can_stop))
+
+def do_start(model, quit, avatarPath):
+    return do_avatar_action(model, quit, avatarPath, ('start', 'componentStart',
+        (moods.happy, moods.sad), moods.can_start))
+
+def do_delete(model, quit, avatarPath):
+    return do_avatar_action(model, quit, avatarPath, ('delete', 
+        'deleteComponent', None, lambda m: not moods.can_stop(m)))
 
 commands = (('getprop',
              'gets a property on a component',
@@ -340,19 +343,19 @@ commands = (('getprop',
               ('save-as', str, None),
               ),
              do_loadconfiguration),
-            ('stopcomponent',
-             'stops a componment',
-             (('component-path', utils.avatarId),
+            ('stop',
+             'stops a component, flow or all flows',
+             (('path', utils.avatarPath),
              ),
-             do_stopcomponent),
-            ('startcomponent',
-             'starts a componment',
-             (('component-path', utils.avatarId),
+             do_stop),
+            ('start',
+             'starts a componment, all components in a flow or all flows',
+             (('path', utils.avatarPath),
              ),
-             do_startcomponent),
-            ('deletecomponent',
-             'deletes a component',
-             (('component-path', utils.avatarId),
+             do_start),
+            ('delete',
+             'deletes a component, all components in a flow or all flows',
+             (('path', utils.avatarPath),
              ),
-             do_deletecomponent)
+             do_delete)
             )

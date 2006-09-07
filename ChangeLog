@@ -1,3 +1,14 @@
+2006-09-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/command/commands.py:
+	Make delete, stop and start more general doing actions on
+	components, flows, the whole atmosphere or all (root).
+	Refactor into one method.  Rename commands in flumotion-command.
+	* flumotion/admin/command/utils.py:
+	Add utility method that will parse an avatar path and return
+	a list that identifies the type of avatar path and the rest
+	of the avatar.
+
 2006-09-07  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/gtk/parts.py (ComponentMenu.__init__): Remove

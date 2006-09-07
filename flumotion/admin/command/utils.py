@@ -19,10 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-
 from flumotion.twisted.defer import defer_generator
 from flumotion.common import componentui, errors
-
 
 def avatarId(string):
     split = string.split('/')
@@ -30,6 +28,20 @@ def avatarId(string):
     assert not split[0]
     return split[1:]
 
+def avatarPath(string):
+    split = string.split('/')
+    assert not split[0]
+    assert len(split) > 0 and len(split) < 4
+    if len(split) == 3:
+        return ['component'] + split[1:]
+    elif len(split) == 2:
+        if split[1] == 'atmosphere':
+            return ['atmosphere']
+        elif split[1] == '':
+            return ['root']
+        else:
+            return ['flow'] + split[1:]
+    
 def find_component(planet, avatarId):
     if avatarId[0] == 'atmosphere':
         for c in planet.get('atmosphere').get('components'):
