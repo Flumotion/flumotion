@@ -19,12 +19,15 @@
 
 # Headers in this file shall remain intact.
 import os
+import time
 
 from flumotion.twisted.defer import defer_generator
 from flumotion.admin.command import utils
 from flumotion.common.planet import moods
 from flumotion.common import errors
-
+from flumotion.twisted import flavors
+from flumotion.twisted.compat import implements
+from twisted.internet import defer
 
 __all__ = ['commands']
 
@@ -142,6 +145,7 @@ def do_showcomponent(model, quit, avatarId):
     quit()
 do_showcomponent = defer_generator(do_showcomponent)
 
+
 def do_invoke(model, quit, avatarId, methodName):
     d = model.callRemote('getPlanetState')
     yield d
@@ -194,6 +198,90 @@ def do_showworkers(model, quit):
     quit()
 do_showworkers = defer_generator(do_showworkers)
 
+class MoodListener:
+    implements(flavors.IStateListener)
+    
+    def __init__(self):
+        self._moodDefer = None
+        self._moodFinal = None
+
+    def waitOnMood(self, moods):
+        """
+        @type moods: tuple of moods
+        """
+        self._moodDefer = defer.Deferred()
+        self._moodsFinal = moods
+        return self._moodDefer
+
+    def stateSet(self, object, key, value):
+        if self._moodDefer:
+            if key == 'mood' and moods[value] in self._moodsFinal:
+                self._moodDefer.callback(moods[value])
+                
+    def stateAppend(self, object, key, value):
+        pass
+
+    def stateRemove(self, object, key, value):
+        pass
+
+
+def do_stopcomponent(model, quit, avatarId):
+    d = model.callRemote('getPlanetState')
+    yield d
+    planet = d.value()
+    c = utils.find_component(planet, avatarId)
+    if c:
+        if moods.can_stop(moods[c.get('mood')]):
+            d = model.callRemote('componentStop', c)
+            yield d
+            d.value()
+            # wait for component to be sleeping
+            listener = MoodListener()
+            d = listener.waitOnMood((moods.sleeping,))
+            c.addListener(listener)
+            yield d
+            d.value()
+            print "Component now stopped. Now in mood %s" % (
+                moods[c.get('mood')].name,)
+        else:
+            print "Cannot stop component.  Component is in mood %s." % (
+                moods[c.get('mood')].name,)
+    else:
+        print "Cannot find component %s." % avatarId
+    quit()
+do_stopcomponent = defer_generator(do_stopcomponent)
+
+def do_startcomponent(model, quit, avatarId):
+    d = model.callRemote('getPlanetState')
+    yield d
+    planet = d.value()
+    c = utils.find_component(planet, avatarId)
+    if c:
+        if moods.can_start(moods[c.get('mood')]):
+            d = model.callRemote('componentStart', c)
+            yield d
+            d.value()
+            # wait for component to be happy or sad
+            listener = MoodListener()
+            d = listener.waitOnMood((moods.happy, moods.sad))
+            c.addListener(listener)
+            yield d
+            d.value()
+            mood = moods[c.get('mood')]
+            if mood == moods.sad:
+                print "Component now in sad state!"
+            elif mood == moods.happy:
+                print "Component now started and happy."
+            else:
+                print "Component in unexpected state: %s." % mood.name
+        else:
+            print "Cannot start component.  Component is in mood %s." % (
+                moods[c.get('mood')].name,)
+    else:
+        print "Cannot find component %s." % avatarId
+    quit()
+do_startcomponent = defer_generator(do_startcomponent)
+
 commands = (('getprop',
              'gets a property on a component',
              (('component-path', utils.avatarId),
@@ -233,5 +321,13 @@ commands = (('getprop',
               ('save-as', str, None),
               ),
              do_loadconfiguration),
-            )
-
+            ('stopcomponent',
+             'stops a componment',
+             (('component-path', utils.avatarId),
+             ),
+             do_stopcomponent),
+            ('startcomponent',
+             'starts a componment',
+             (('component-path', utils.avatarId),
+             ),
+             do_startcomponent))

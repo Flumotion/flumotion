@@ -1,3 +1,9 @@
+2006-09-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/command/commands.py:
+	Add startcomponent and stopcomponent to our lovely array of
+	commands that flumotion-command can execute.
+
 2006-09-06  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test.xml: Specify worker for all components.
