@@ -282,6 +282,25 @@ def do_startcomponent(model, quit, avatarId):
     quit()
 do_startcomponent = defer_generator(do_startcomponent)
 
+def do_deletecomponent(model, quit, avatarId):
+    d = model.callRemote('getPlanetState')
+    yield d
+    planet = d.value()
+    c = utils.find_component(planet, avatarId)
+    if c:
+        if not moods.can_stop(moods[c.get('mood')]):
+            d = model.callRemote('deleteComponent', c)
+            yield d
+            d.value()
+            print "Component is now deleted."
+        else:
+            print "Cannot delete component.  Component is in mood %s." % (
+                moods[c.get('mood')].name,)
+    else:
+        print "Cannot find component %s." % avatarId
+    quit()
+do_deletecomponent = defer_generator(do_deletecomponent)
+
 commands = (('getprop',
              'gets a property on a component',
              (('component-path', utils.avatarId),
@@ -330,4 +349,10 @@ commands = (('getprop',
              'starts a componment',
              (('component-path', utils.avatarId),
              ),
-             do_startcomponent))
+             do_startcomponent),
+            ('deletecomponent',
+             'deletes a component',
+             (('component-path', utils.avatarId),
+             ),
+             do_deletecomponent)
+            )
