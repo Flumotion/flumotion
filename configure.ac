@@ -82,16 +82,6 @@ else
   AC_MSG_NOTICE([Not trying to import gtk.glade because DISPLAY is unset])
 fi
 
-if test $GST_010_SUPPORTED = "yes"; then
-  AC_MSG_CHECKING([if found PyGTK version is new enough to support GStreamer 0.10])
-  if test "$PYGTK_VERSION" \< $PYGTK_010_REQ; then
-    AC_MSG_RESULT([no, $PYGTK_VERSION < $PYGTK_010_REQ])
-    GST_010_SUPPORTED=no
-  else
-    AC_MSG_RESULT([yes, $PYGTK_VERSION >= $PYGTK_010_REQ])
-  fi
-fi
-
 if test $GST_010_SUPPORTED = "no"; then
   AC_MSG_ERROR([No appropriate version of PyGTK installed. Correct the above
 errors and try again.])

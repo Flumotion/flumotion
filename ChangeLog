@@ -1,3 +1,10 @@
+2006-09-08  Michael Smith  <msmith@fluendo.com>
+
+	* configure.ac:
+	  Check for PyGTK didn't work since I upgraded to 2.10.x, since it was
+	  a string comparison. Since we have a check for the appropriate
+	  version already there, ~10 lines above, just delete that.
+
 2006-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/integration/test_qa.py:
