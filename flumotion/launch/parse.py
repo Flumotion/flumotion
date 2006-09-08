@@ -61,8 +61,8 @@ class Component(object):
     def verify_source(self):
         eaters = self._reg.getEaters()
         if eaters:
-            required = True in [x.getRequired() for x in eaters]
-            multiple = True in [x.getMultiple() for x in eaters]
+            required = [x for x in eaters if x.getRequired()]
+            multiple = [x for x in eaters if x.getMultiple()]
             if required and not self.source:
                 err('Component %s wants to eat but you didn\'t give it '
                     'food' % self.name)
@@ -384,13 +384,13 @@ def parse_args(args):
     A component config is what we will pass to a component when we
     create it. It is a dict:
 
-    component config := {'name': component name,
-                         'type': component type,
-                         'properties': {property name => property value},
-                         'feed': [feeder name,...],
-                         ('source': [feeder name,...],)?
-                         'clock-master': clock master or None,
-                         'plugs': {socket name => plug config}}
+     - 'name':         component name
+     - 'type':         component type
+     - 'properties':   dict of property name => property value
+     - 'feed':         list of [feeder name,...]
+     - 'source':       list of [feeder name,...], (optional)
+     - 'clock-master': clock master or None
+     - 'plugs':        dict of socket name => plug config
     """
 
     if not args:

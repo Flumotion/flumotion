@@ -27,25 +27,25 @@ The goal of flumotion-launch is to provide an easy way for testing
 flumotion components, without involving much of Flumotion's core code.
 
 Flumotion-launch takes a terse gst-launch-like syntax, translates that
-into a component graph, and starts the components. An example would be:
+into a component graph, and starts the components. An example would be::
 
   flumotion-launch videotest ! theora-encoder ! ogg-muxer ! http-streamer
 
-You can also set properties:
+You can also set properties::
 
   flumotion-launch videotest framerate=15/2
 
-You can link specific feeders as well:
+You can link specific feeders as well::
 
   flumotion-launch firewire .audio ! vorbis-encoder
   flumotion-launch firewire firewire0.audio ! vorbis-encoder
 
-Components can be backreferenced using their names:
+Components can be backreferenced using their names::
 
   flumotion-launch videotest audiotest videotest0. ! ogg-muxer \
                    audiotest0. ! ogg-muxer0.
 
-In addition, components can have plugs:
+In addition, components can have plugs::
 
   flumotion-launch http-streamer /apachelogger,logfile=/dev/stdout
 

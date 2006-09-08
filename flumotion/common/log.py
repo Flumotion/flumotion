@@ -210,18 +210,18 @@ def doLog(level, object, category, format, args, where=-1,
     file=None, line=None):
     """
     @param where: what to log file and line number for;
-                  -1 for one frame above log.py; -2 and down for higher up
-                   a function for a (future) code object
+                  -1 for one frame above log.py; -2 and down for higher up;
+                  a function for a (future) code object
     @type  where: int or callable
     @param file:  file to show the message as coming from, if caller knows best
     @type  file:  str
     @param line:  line to show the message as coming from, if caller knows best
     @type  line:  int
 
-    return: dict of calculated variables, if they needed calculating.
-            currently contains file and line; this prevents us from
-            doing this work in the caller when it isn't needed because
-            of the debug level
+    @return: dict of calculated variables, if they needed calculating.
+             currently contains file and line; this prevents us from
+             doing this work in the caller when it isn't needed because
+             of the debug level
     """
     ret = {}
 

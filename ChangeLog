@@ -1,3 +1,11 @@
+2006-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/log.py:
+	  fix docstring
+	* flumotion/launch/main.py:
+	* flumotion/launch/parse.py:
+	  appease pychecker and fix docstrings
+
 2006-09-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/command/commands.py:
