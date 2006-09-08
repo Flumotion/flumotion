@@ -40,9 +40,9 @@ videoTestNoOverlayXML = """<?xml version="1.0" ?>
       <!-- properties -->
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
-      <property name="height">240</property>
+      <property name="height">24</property>
       <property name="pattern">0</property>
-      <property name="width">320</property>
+      <property name="width">32</property>
     </component>
     <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
       <source>video-source</source>
@@ -83,9 +83,9 @@ videoTestNoOverlayWithTokenBouncerXML = """<?xml version="1.0" ?>
       <!-- properties -->
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
-      <property name="height">240</property>
+      <property name="height">24</property>
       <property name="pattern">0</property>
-      <property name="width">320</property>
+      <property name="width">32</property>
     </component>
     <component name="video-encoder" project="flumotion" type="theora-encoder" version="0.3.0.1" worker="default">
       <source>video-source</source>
@@ -156,9 +156,9 @@ videoTestXML = """<?xml version="1.0" ?>
 
       <property name="format">video/x-raw-yuv</property>
       <property name="framerate">50/10</property>
-      <property name="height">240</property>
+      <property name="height">120</property>
       <property name="pattern">0</property>
-      <property name="width">320</property>
+      <property name="width">160</property>
     </component>
 
     <component name="video-overlay" project="flumotion" type="overlay" version="0.3.0.1" worker="default">
@@ -232,6 +232,8 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         self.makeFile('videotest-nooverlay.xml', videoTestNoOverlayXML % (
             httpPort, os.getcwd()))
         self.loadConfiguration(plan, 'videotest-nooverlay.xml')
+        self.waitForHappyComponent(plan, '/default/video-source')
+        self.waitForHappyComponent(plan, '/default/muxer-video')
         self.waitForHappyComponent(plan, '/default/http-video')
         self.waitForHappyComponent(plan, '/default/disk-video')
         h = plan.spawn('wait-for-http-headers', 'http://localhost:%d/' % (
@@ -255,6 +257,8 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         self.makeFile('tokenbouncer.xml', 
             videoTestNoOverlayWithTokenBouncerXML % httpPort)
         self.loadConfiguration(plan, 'tokenbouncer.xml')
+        self.waitForHappyComponent(plan, '/default/video-source')
+        self.waitForHappyComponent(plan, '/default/muxer-video')
         self.waitForHappyComponent(plan, '/default/http-video')
         self.waitForHappyComponent(plan, '/atmosphere/tokenbouncer')
         h = plan.spawn('check-token-for-http', 'http://localhost:%d/' % (
@@ -295,6 +299,8 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         self.makeFile('videotest.xml',
             videoTestXML % (httpPort, os.getcwd()))
         self.loadConfiguration(plan, 'videotest.xml')
+        self.waitForHappyComponent(plan, '/default/video-source')
+        self.waitForHappyComponent(plan, '/default/muxer-video')
         self.waitForHappyComponent(plan, '/default/http-video')
         self.waitForHappyComponent(plan, '/default/disk-video')
         h = plan.spawn('wait-for-http-headers', 'http://localhost:%d/' % (

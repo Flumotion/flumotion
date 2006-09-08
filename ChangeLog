@@ -1,5 +1,13 @@
 2006-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/integration/test_qa.py:
+	  make the tests a little less taxing on slower hardware by reducing
+	  sizes
+	  wait for some of the first components as well to be able to
+	  distinguish where it fails
+
+2006-09-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/log.py:
 	  fix docstring
 	* flumotion/launch/main.py:
