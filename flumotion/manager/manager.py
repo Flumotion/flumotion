@@ -424,6 +424,11 @@ class Vishnu(log.Loggable):
             self._depgraph.addClockMaster(state)
 
     def _updateStateFromConf(self, _, conf, remoteIdentity):
+        """
+        Add a new config object into the planet state.
+        Returns a list of all components added
+        """
+
         self.debug('syncing up planet state with config')
         added = [] # added components while parsing
         
@@ -462,11 +467,11 @@ class Vishnu(log.Loggable):
 
         return added
 
-    def _startComponents(self, _, conf, remoteIdentity):
+    def _startComponents(self, components, conf, remoteIdentity):
         # now start all components that need starting -- collecting into
         # an temporary dict of the form {workerId => [components]}
         componentsToStart = {}
-        for c in self._getComponentsToCreate():
+        for c in components:
             workerId = c.get('workerRequested')
             if not workerId in componentsToStart:
                 componentsToStart[workerId] = []

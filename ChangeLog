@@ -1,3 +1,9 @@
+2006-09-12  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  Don't start components on loading a configuration unless those
+	  components were in the loaded config.
+
 2006-09-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/test.xml:
