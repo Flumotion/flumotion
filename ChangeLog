@@ -1,3 +1,24 @@
+2006-09-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/launch/main.py (start_components.do_start): Fix a bug
+	when running pipelines with no clocking-requiring components.
+
+	* flumotion/component/consumers/httpstreamer/http.xml: 
+	* flumotion/component/consumers/httpstreamer/http.py
+	(MultifdSinkStreamer.getStreamData): Support pluggable
+	getStreamData() on the new StreamDataProvider socket.
+
+	* flumotion/component/misc/httpfile/httpfile.xml: 
+	* flumotion/component/misc/httpfile/httpfile.py: Support the
+	logging socket, and require the 'path' property. Test via
+	`flumotion-launch httpfile path=/etc/passwd
+	/apachelogger,logfile=/dev/stdout'.
+
+	* flumotion/component/plugs/Makefile.am (component_PYTHON): 
+	* flumotion/component/plugs/plugs.xml: 
+	* flumotion/component/plugs/streamdata.py: New plug/socket,
+	providing pluggability for streamers' getStreamData() method.
+
 2006-09-12  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/manager/manager.py:

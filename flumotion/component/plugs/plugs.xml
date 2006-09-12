@@ -31,6 +31,17 @@
       <entry location="flumotion/component/plugs/identity.py"
              function="ExampleIdentityProvider"/>
     </plug>
+
+    <plug socket="flumotion.component.plugs.streamdata.StreamDataProvider"
+          type="examplestreamdataprovider">
+      <entry location="flumotion/component/plugs/streamdata.py"
+             function="ExampleStreamDataProvider"/>
+
+      <properties>
+        <property name="description" type="string" required="true"/>
+      </properties>
+    </plug>
+
   </plugs>
 
   <bundles>
@@ -82,6 +93,16 @@
       <directories>
         <directory name="flumotion/component/plugs">
           <filename location="identity.py" />
+        </directory>
+      </directories>
+    </bundle>
+    <bundle name="base-plugs-streamdata">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs">
+          <filename location="streamdata.py" />
         </directory>
       </directories>
     </bundle>

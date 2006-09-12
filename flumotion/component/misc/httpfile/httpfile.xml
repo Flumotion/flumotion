@@ -8,10 +8,13 @@
         <entry type="component" location="httpfile.py"
                function="HTTPFileStreamer" />
       </entries>
+      <sockets>
+        <socket type="flumotion.component.plugs.loggers.Logger"/>
+      </sockets>
       <properties>
         <property name="port" type="int" />
         <property name="mount_point" type="string" />
-        <property name="path" type="string" />
+        <property name="path" type="string" required="true" />
         <property name="type" type="string" />
 		
         <!-- If type is 'slave' -->

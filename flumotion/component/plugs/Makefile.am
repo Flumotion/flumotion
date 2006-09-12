@@ -6,7 +6,8 @@ component_PYTHON = \
 	base.py \
 	identity.py \
 	lifecycle.py \
-	loggers.py
+	loggers.py \
+	streamdata.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/plugs
 component_DATA = plugs.xml

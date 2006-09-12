@@ -19,13 +19,14 @@
 
 # Headers in this file shall remain intact.
 import os
+import time
 import string
 
 from flumotion.component import component
 from flumotion.common import log, messages, errors
 from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
-from twisted.web import resource, static, server
+from twisted.web import resource, static, server, http
 from twisted.internet import defer, reactor, error
 from flumotion.twisted import fdserver
 from twisted.cred import credentials
@@ -33,11 +34,48 @@ from twisted.cred import credentials
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
+class RequestWrapper:
+    def __init__(self, request, finished):
+        self.__dict__['request'] = request
+        self.__dict__['__written'] = 0
+        self.__dict__['__start_time'] = time.time()
+        self.__dict__['__finished'] = finished
+
+    def __getattr__(self, key):
+        return getattr(self.request, key)
+
+    def __setattr__(self, key, val):
+        if key in self.__dict__:
+            self.__dict__[key] = val
+        else:
+            setattr(self.request, key, val)
+
+    def write(self, data):
+        self.__dict__['__written'] += len(data)
+        return self.request.write(data)
+        
+    def finish(self):
+        self.__dict__['__finished'](self.request,
+                                    self.__dict__['__written'],
+                                    time.time() -
+                                    self.__dict__['__start_time'])
+        return self.request.finish()
+
+class File(static.File):
+    def __init__(self, path, requestFinished):
+        static.File.__init__(self, path)
+        self._requestFinished = requestFinished
+
+    def render(self, request):
+        rapper = RequestWrapper(request, self._requestFinished)
+        return static.File.render(self, rapper)
+
 class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     def init(self):
         self.mountPoint = None
         self.type = None
         self.port = None
+        self.loggers = []
 
     def do_setup(self):
         props = self.config['properties']
@@ -47,12 +85,14 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.mountPoint = mountPoint
         self.filePath = props.get('path')
         self.type = props.get('type', 'master')
-        self.port = props.get('port', None)
+        self.port = props.get('port', 8801)
         if self.type == 'slave':
             # already checked for these in do_check
             self._porterPath = props['porter_socket_path']
             self._porterUsername = props['porter_username']
             self._porterPassword = props['porter_password']
+        self.loggers = \
+            self.plugs['flumotion.component.plugs.loggers.Logger']
         
     def do_stop(self):
         if self.type == 'slave':
@@ -71,7 +111,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             res = resource.Resource()
             current_resource.putChild(child, res)
             current_resource = res
-        current_resource.putChild(children[-1:][0], static.File(self.filePath))
+        fileResource = File(self.filePath, self._requestFinished)
+        current_resource.putChild(children[-1:][0], fileResource)
         #root.putChild(mount, HTTPStaticFile(self.filePath))
         d = defer.Deferred()
         if self.type == 'slave':
@@ -130,3 +171,22 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 msg = "the file specified in 'path': %s does not " \
                     "exist or is not a file" % path
                 return defer.fail(errors.ConfigError(msg)) 
+
+    def _requestFinished(self, request, bytesWritten, timeConnected):
+        headers = request.getAllHeaders()
+
+        args = {'ip': request.getClientIP(),
+                'time': time.gmtime(),
+                'method': request.method,
+                'uri': request.uri,
+                'username': '-', # FIXME: put the httpauth name
+                'get-parameters': request.args,
+                'clientproto': request.clientproto,
+                'response': request.code,
+                'bytes-sent': bytesWritten,
+                'referer': headers.get('referer', None),
+                'user-agent': headers.get('user-agent', None),
+                'time-connected': timeConnected}
+
+        for logger in self.loggers:
+            logger.event('http_session_completed', args)

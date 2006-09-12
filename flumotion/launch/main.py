@@ -190,7 +190,9 @@ def start_components(wrappers, fds, delay):
             read, start = fds[source]
             wrapper.eatFromFD(source, read)
             start()
-        d = wrapper.start(wrapper in need_sync and clocking or None)
+        if (not need_sync) or (wrapper not in need_sync) or (not clocking):
+            clocking = None
+        d = wrapper.start(clocking)
         d.addCallback(lambda val: synchronization)
         return d
 
