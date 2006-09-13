@@ -1,3 +1,14 @@
+2006-09-13  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/test/integration/Makefile.am:
+	* flumotion/test/integration/common.py:
+	Add helper methods to stop all and start all components in a 
+	manager.
+	* flumotion/test/integration/test_qa.py:
+	Remove unneeded import.
+	* flumotion/test/integration/test_torture.py:
+	Create test that stops and starts all components many times.
+
 2006-09-13  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/misc/httpfile/httpfile.py
