@@ -1,3 +1,9 @@
+2006-09-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/misc/httpfile/httpfile.py
+	(RequestWrapper.request):
+	* flumotion/component/plugs/streamdata.py: Pacify pychecker.
+
 2006-09-12  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/launch/main.py (start_components.do_start): Fix a bug

@@ -16,7 +16,6 @@
 
 # Headers in this file shall remain intact.
 
-import time
 
 from flumotion.component.plugs import base
 

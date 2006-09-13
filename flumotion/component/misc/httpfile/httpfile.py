@@ -35,6 +35,7 @@ from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
 class RequestWrapper:
+    request = None
     def __init__(self, request, finished):
         self.__dict__['request'] = request
         self.__dict__['__written'] = 0
