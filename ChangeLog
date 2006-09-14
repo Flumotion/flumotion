@@ -1,3 +1,9 @@
+2006-09-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Add event probe to each gdpdepay's src pad to filter subsequent
+	new segment events.
+
 2006-09-13  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/test/integration/Makefile.am:

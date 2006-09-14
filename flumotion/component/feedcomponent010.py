@@ -42,7 +42,7 @@ class FeedComponent(basecomponent.BaseComponent):
     I am a base class for all Flumotion feed components.
     """
     # keep these as class variables for the tests
-    EATER_TMPL = 'fdsrc name=%(name)s ! gdpdepay'
+    EATER_TMPL = 'fdsrc name=%(name)s ! gdpdepay name=%(name)s-depay'
     FEEDER_TMPL = 'gdppay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
 
     # how often to add the buffer probe
@@ -89,6 +89,8 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # statechange -> [ deferred ]
         self._stateChangeDeferreds = {}
+
+        self._gotFirstNewSegment = {}
 
     def do_setup(self):
         """
@@ -465,6 +467,12 @@ class FeedComponent(basecomponent.BaseComponent):
                 continue
             pad = eater.get_pad("src")
             pad.add_event_probe(self._eater_event_probe_cb, feedId)
+            gdp_version = gstreamer.get_plugin_version('gdp')
+            if float(gdp_version[5:]) < 10.1:
+                depay = self.get_element("%s-depay" % name)
+                depaysrc = depay.get_pad("src")
+                depaysrc.add_event_probe(self._depay_eater_event_probe_cb, 
+                    feedId)
             self._add_buffer_probe(pad, feedId, firstTime=True)
 
         self.pipeline.set_state(gst.STATE_PLAYING)
@@ -524,6 +532,7 @@ class FeedComponent(basecomponent.BaseComponent):
         if status['lastTime'] > 0:
             delta = currentTime - status['lastTime']
 
+            self.debug('Delta: %r', delta)
             if feedId not in self._unconnectedEaters \
             and delta > self.BUFFER_TIME_THRESHOLD:
                 self.debug(
@@ -672,7 +681,20 @@ class FeedComponent(basecomponent.BaseComponent):
             # and we can't recover from that later.  Instead, fdsrc will be
             # taken out and given a new fd on the next eatFromFD call.
             return False
+        return True
 
+    def _depay_eater_event_probe_cb(self, pad, event, feedId):
+        if event.type == gst.EVENT_NEWSEGMENT:
+            # We do this because we know gdppay/gdpdepay screw up on 2nd
+            # newsegments
+            if feedId in self._gotFirstNewSegment:
+                self.info(
+                    "Subsequent new segment event received on depay on "
+                    " feed %s" % feedId)
+                # swallow
+                return False
+            else:
+                self._gotFirstNewSegment[feedId] = True
         return True
 
 pygobject.type_register(FeedComponent)
