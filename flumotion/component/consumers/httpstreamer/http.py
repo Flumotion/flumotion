@@ -215,13 +215,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     # this object is given to the HTTPMedium as comp
     logCategory = 'cons-http'
     
-    # use select for test
     pipe_template = 'multifdsink name=sink ' + \
                                 'sync=false ' + \
-                                'buffers-max=500 ' + \
-                                'buffers-soft-max=250 ' + \
                                 'recover-policy=3'
-
     gsignal('client-removed', object, int, int, object)
     
     componentMediumClass = HTTPMedium
@@ -280,6 +276,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 if not 'porter_' + k in props:
                     msg = 'slave mode, missing required property %s' % k
                     return defer.fail(errors.ConfigError(msg))
+
+        # tcp is where multifdsink is
+        version = gstreamer.get_plugin_version('tcp') 
+        if version < (0,10,9,1):
+            return defer.fail(
+                errors.PropertyError("multifdsink version too old"))
     
     def configure_pipeline(self, pipeline, properties):
         Stats.__init__(self, sink=self.get_element('sink'))
@@ -316,19 +318,49 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         # check how to set client sync mode
         self.burst_on_connect = properties.get('burst_on_connect', False)
+        self.burst_size = properties.get('burst_size', 0)
         sink = self.get_element('sink')
-        if gstreamer.element_factory_has_property('multifdsink', 'sync-method'):
-            self.debug("multifdsink has new sync-method property")
-            if self.burst_on_connect:
-                self.debug("burst-on-connect, setting sync-method 2")
-                sink.set_property('sync-method', 2)
+        self.debug("multifdsink has new sync-method property")
+        if self.burst_on_connect:
+            if self.burst_size:
+                # If we have a burst-size set, use modern 
+                # needs-recent-multifdsink behaviour to have complex bursting.
+                # In this mode, we burst a configurable minimum, plus extra 
+                # so we start from a keyframe (or less if we don't have a 
+                # keyframe available)
+                sink.set_property('sync-method', 4) # burst-keyframe
+                sink.set_property('burst-unit', 3) # bytes
+                sink.set_property('burst-value', self.burst_size * 1024)
+
+                # To use burst-on-connect, we need to ensure that multifdsink
+                # has a minimum amount of data available - assume 512 kB beyond
+                # the burst amount so that we should have a keyframe available
+                sink.set_property('bytes-min', (self.burst_size + 512) * 1024)
+                
+                # And then we need a maximum still further above that - the
+                # exact value doesn't matter too much, but we want it reasonably
+                # small to limit memory usage. multifdsink doesn't give us much
+                # control here, we can only specify the max values in buffers.
+                # We assume each buffer is close enough to 4kB - true for asf
+                # and ogg, at least
+                sink.set_property('buffers-soft-max', 
+                    (self.burst_size + 1024) / 4)
+                sink.set_property('buffers-max',
+                    (self.burst_size + 2048) / 4)
+                
             else:
-                self.debug("no burst-on-connect, setting sync-method 0")
-                sink.set_property('sync-method', 0)
+                # Old behaviour; simple burst-from-latest-keyframe
+                self.debug("simple burst-on-connect, setting sync-method 2")
+                sink.set_property('sync-method', 2)
+
+                sink.set_property('buffers-soft-max', 250)
+                sink.set_property('buffers-max', 500)
         else:
-            # old property; does sync-to-keyframe
-            self.debug("multifdsink has old sync-clients property")
-            sink.set_property('sync-clients', self.burst_on_connect)
+            self.debug("no burst-on-connect, setting sync-method 0")
+            sink.set_property('sync-method', 0)
+
+            sink.set_property('buffers-soft-max', 250)
+            sink.set_property('buffers-max', 500)
             
         # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self._notify_caps_cb)

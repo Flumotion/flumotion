@@ -40,6 +40,7 @@
         <property name="user_limit" type="int" />
         <property name="bandwidth_limit" type="int" />
         <property name="burst_on_connect" type="bool" />
+        <property name="burst_size" type="int" />
       </properties>
     </component>
   </components>

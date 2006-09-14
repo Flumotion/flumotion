@@ -1,3 +1,11 @@
+2006-09-14  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  Add burst-size property, in kB.
+	  When set, use this to configure streamers using new multifdsink
+	  burst modes.
+
 2006-09-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/gstreamer.py:
