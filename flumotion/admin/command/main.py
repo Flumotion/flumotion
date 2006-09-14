@@ -75,13 +75,16 @@ def parse_commands(args):
     argspecs = commandspec[2]
     reqspecs = [spec for spec in argspecs if len(spec) < 3]
     nreq = len(reqspecs)
-    optspecs = argspecs[nreq:]
+    optspecs = [spec for spec in argspecs if len(spec) == 3 or \
+        len(spec) > 3 and not spec[3]]
     nopt = len(optspecs)
+
+    vararg = filter(lambda spec: len(spec) > 3 and spec[3], argspecs)
 
     # pop off argv[0] and the command name
     cargs = args[2:]
 
-    if len(cargs) < nreq or len(cargs) > nreq + nopt:
+    if len(cargs) < nreq or len(cargs) > nreq + nopt and not vararg:
         print 'Error: Invalid arguments to operation %s: %r' % (op, cargs)
         usage(args, exitval=1)
 
@@ -105,6 +108,9 @@ def parse_commands(args):
                     % (op, name, arg, parse.__name__))
         else:
             vals.append(default)
+
+    if vararg:
+        vals.extend(cargs)
 
     proc = commandspec[3]
 
