@@ -198,7 +198,7 @@ def do_invoke(model, quit, avatarId, methodName, *args):
         yield None
 
     if args:
-        args = _parse_typed_args(args)
+        args = _parse_typed_args(args[0], args[1:])
         if args is None:
             yield None
 
