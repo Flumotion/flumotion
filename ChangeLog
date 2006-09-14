@@ -1,3 +1,12 @@
+2006-09-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/command/commands.py (_parse_typed_args): New
+	exciting typed args parser.
+	(do_invoke): Use the args parser to allow e.g. "invoke
+	/default/foo fooCommand is(ss) 4 foo bar baz", which will do a
+	componentCallRemote on /default/foo with the args (4, 'foo',
+	('bar', 'baz')).
+
 2006-09-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent010.py:

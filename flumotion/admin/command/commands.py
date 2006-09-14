@@ -144,8 +144,51 @@ def do_showcomponent(model, quit, avatarId):
     quit()
 do_showcomponent = defer_generator(do_showcomponent)
 
+class ParseException(Exception):
+    pass
 
-def do_invoke(model, quit, avatarId, methodName):
+def _parse_typed_args(spec, args):
+    def _do_parse_typed_args(spec, args):
+        accum = []
+        while spec:
+            argtype = spec.pop(0)
+            parsers = {'i': int, 's': str}
+            if argtype == ')':
+                return tuple(accum)
+            elif argtype == '(':
+                accum.append(_do_parse_typed_args(spec, args))
+            elif argtype not in parsers:
+                raise ParseException('Unknown argument type: %r'
+                                     % argtype)
+            else:
+                parser = parsers[argtype]
+                try:
+                    arg = args.pop(0)
+                except IndexError:
+                    raise ParseException('Missing argument of type %r'
+                                         % parser)
+                try:
+                    accum.append(parser(arg))
+                except Exception, e:
+                    raise ParseException('Failed to parse %s as %r: %s'
+                                         % (arg, parser, e))
+            
+    spec = list(spec) + [')']
+    args = list(args)
+
+    try:
+        res = _do_parse_typed_args(spec, args)
+    except ParseException, e:
+        print e.args[0]
+        return None
+
+    if args:
+        print 'Left over arguments:', args
+        return None
+    else:
+        return res
+
+def do_invoke(model, quit, avatarId, methodName, *args):
     d = model.callRemote('getPlanetState')
     yield d
     planet = d.value()
@@ -154,7 +197,12 @@ def do_invoke(model, quit, avatarId, methodName):
         print "Could not find component %r" % avatarId
         yield None
 
-    d = model.componentCallRemote(c, methodName)
+    if args:
+        args = _parse_typed_args(args)
+        if args is None:
+            yield None
+
+    d = model.componentCallRemote(c, methodName, *args)
     yield d
 
     try:
