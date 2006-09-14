@@ -33,7 +33,7 @@ def checkOgg():
     """
     result = messages.Result()
     version = gstreamer.get_plugin_version('ogg')
-    if version >= "0.10.3" and version < "0.10.4":
+    if version[2] >= 3 and version[2] < 4:
         m = messages.Warning(T_(
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
                version, 'ogg'),

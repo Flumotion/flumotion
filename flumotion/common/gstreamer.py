@@ -41,7 +41,7 @@ def caps_repr(caps):
         return 'streamheader=<...>'
     else:
         return value
-        
+
 def verbose_deep_notify_cb(object, orig, pspec, component):
     """
     A default deep-notify signal handler for pipelines.
@@ -112,7 +112,7 @@ def get_plugin_version(plugin_name):
     """
     Find the version of the given plugin.
 
-    @rtype: tuple of (major, minor, micro, [nano]), or None if it could not be
+    @rtype: tuple of (major, minor, micro, nano), or None if it could not be
             found or determined
     """
     plugin = gst.registry_get_default().find_plugin(plugin_name)
@@ -120,4 +120,7 @@ def get_plugin_version(plugin_name):
     if not plugin:
         return None
 
-    return plugin.get_version()
+    versionTuple = tuple(plugin.get_version().split('.'))
+    if len(versionTuple) < 4:
+        versionTuple = versionTuple + (0,)
+    return versionTuple

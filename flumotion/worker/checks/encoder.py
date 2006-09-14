@@ -33,7 +33,7 @@ def checkVorbis():
     """
     result = messages.Result()
     version = gstreamer.get_plugin_version('vorbis')
-    if version >= "0.10.0" and version < "0.10.3":
+    if version[2] >= 0 and version[2] < 3:
         m = messages.Warning(T_(
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
                version, 'vorbis'),
@@ -54,7 +54,7 @@ def checkTheora():
     """
     result = messages.Result()
     version = gstreamer.get_plugin_version('theora')
-    if version >= "0.10.0" and version < "0.10.3":
+    if version[2] >= 0 and version[2] < 3:
         m = messages.Warning(T_(
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
                version, 'theora'),

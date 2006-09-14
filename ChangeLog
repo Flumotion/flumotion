@@ -1,3 +1,15 @@
+2006-09-14  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/common/gstreamer.py:
+	Make get_plugin_version return a tuple not a string.  Make nano
+	non-optional in the return value.
+	* flumotion/component/feedcomponent010.py:
+	Use fixed get_plugin_version.
+	* flumotion/component/muxers/checks.py:
+	Use fixed get_plugin_version.
+	* flumotion/worker/checks/encoder.py:
+	Use fixed get_plugin_version.
+
 2006-09-14  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/admin/command/commands.py:
@@ -17,7 +29,10 @@
 
 	* flumotion/component/feedcomponent010.py:
 	Add event probe to each gdpdepay's src pad to filter subsequent
-	new segment events.
+	new segment events.  This worksaround bugs in gdp's handling
+	of 2nd (and after) newsegment events with changed caps after.
+	This fixes issues with reconnection to upstream components that
+	have been re-started
 
 2006-09-13  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 

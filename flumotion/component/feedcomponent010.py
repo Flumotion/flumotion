@@ -468,7 +468,8 @@ class FeedComponent(basecomponent.BaseComponent):
             pad = eater.get_pad("src")
             pad.add_event_probe(self._eater_event_probe_cb, feedId)
             gdp_version = gstreamer.get_plugin_version('gdp')
-            if float(gdp_version[5:]) < 10.1:
+            if gdp_version[2] < 11 and not (gdp_version[2] == 10 and \
+                                            gdp_version[3] > 0):
                 depay = self.get_element("%s-depay" % name)
                 depaysrc = depay.get_pad("src")
                 depaysrc.add_event_probe(self._depay_eater_event_probe_cb, 
