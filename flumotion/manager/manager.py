@@ -854,7 +854,7 @@ class Vishnu(log.Loggable):
         mood = m.state.get('mood')
         if mood == moods.happy.value or mood == moods.hungry.value:
             self.debug("Component %s is already in mood %s.  Set depgraph "
-                "appropriately", moods.get(mood).name, componentAvatar.avatarId)
+                "appropriately", componentAvatar.avatarId, moods.get(mood).name)
             self._depgraph.setComponentSetup(m.state)
             self._depgraph.setComponentStarted(m.state)
         elif mood == moods.waking.value:
