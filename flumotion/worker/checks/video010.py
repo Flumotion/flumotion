@@ -192,7 +192,7 @@ def check1394(id):
                     # dv1394src was fixed after gst-plugins-good 0.10.2
                     # to distinguish NOT_FOUND and OPEN_READ
                     version = gstreamer.get_plugin_version('1394')
-                    if version >= "0.10.0" and version <= "0.10.2":
+                    if version >= (0,10,0,0) and version <= (0,10,2,0):
                         m = messages.Error(T_(
                             N_("Could not find or open the Firewire device. "
                                "Check the device node and its permissions.")))

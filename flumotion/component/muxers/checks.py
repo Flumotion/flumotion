@@ -18,7 +18,7 @@
 # See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
-
+import string
 from twisted.internet import defer
 
 from flumotion.worker.checks import check
@@ -33,10 +33,10 @@ def checkOgg():
     """
     result = messages.Result()
     version = gstreamer.get_plugin_version('ogg')
-    if version[2] >= 3 and version[2] < 4:
+    if version >= (0,10,3,0) and version < (0,10,4,0):
         m = messages.Warning(T_(
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
-               version, 'ogg'),
+               string.join([str(x) for x in version], '.'), 'ogg'),
             id = 'ogg-check')
         m.add(T_(N_("The generated Ogg stream will not be fully compliant, "
             "and possibly not even play correctly.\n")))

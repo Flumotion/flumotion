@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+import string
 from twisted.internet import defer
 
 from flumotion.worker.checks import check
@@ -33,10 +34,10 @@ def checkVorbis():
     """
     result = messages.Result()
     version = gstreamer.get_plugin_version('vorbis')
-    if version[2] >= 0 and version[2] < 3:
+    if version >= (0,10,0,0) and version < (0,10,3,0):
         m = messages.Warning(T_(
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
-               version, 'vorbis'),
+               string.join([str(x) for x in version], '.'), 'vorbis'),
             id = 'vorbis-check')
         m.add(T_(N_(
             "Synchronization between audio and video may not be correct.\n")))
@@ -54,10 +55,10 @@ def checkTheora():
     """
     result = messages.Result()
     version = gstreamer.get_plugin_version('theora')
-    if version[2] >= 0 and version[2] < 3:
+    if version >= (0,10,0,0) and version < (0,10,3,0):
         m = messages.Warning(T_(
             N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
-               version, 'theora'),
+               string.join([str(x) for x in version], '.'), 'theora'),
             id = 'theora-check')
         m.add(T_(N_(
             "Synchronization between audio and video may not be correct.\n")))

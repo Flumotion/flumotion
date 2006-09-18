@@ -1,5 +1,12 @@
 2006-09-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/muxers/checks.py:
+	* flumotion/worker/checks/encoder.py:
+	* flumotion/worker/checks/video010.py:
+	Fix checks to use get_plugin_version correctly.
+
+2006-09-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/common/gstreamer.py:
 	Actually make get_plugin_version return a tuple of integers
 	not strings.
