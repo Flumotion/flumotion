@@ -1,3 +1,9 @@
+2006-09-18  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Fix cortado problems due to porter redirections and persistent
+	  connections.
+
 2006-09-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/muxers/checks.py:

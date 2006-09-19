@@ -69,6 +69,10 @@ class File(static.File):
 
     def render(self, request):
         rapper = RequestWrapper(request, self._requestFinished)
+        # Specify that the client should close the connection; further 
+        # requests on this server might actually go to a different process 
+        # because of the porter
+        rapper.setHeader('Connection', 'close')
         return static.File.render(self, rapper)
 
 class HTTPFileStreamer(component.BaseComponent, log.Loggable):
