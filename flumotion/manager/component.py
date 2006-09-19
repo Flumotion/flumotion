@@ -763,6 +763,16 @@ class ComponentHeaven(base.ManagerHeaven):
                 host = feederAvatar.getClientAddress()
                 port = feederAvatar.getFeedServerPort()
 
+                # FIXME: until network map is implemented, hack to
+                # assume that connections from what appears to us to be
+                # the same IP go through localhost instead. Allows
+                # connections between components on a worker behind a
+                # firewall, but not between components running on
+                # different workers, both behind a firewall
+                eaterHost = componentAvatar.mind.broker.transport.getPeer().host
+                if eaterHost == host:
+                    host = '127.0.0.1'
+
                 d = componentAvatar.eatFrom(fullFeedId, host, port)
                 yield d
                 try:
