@@ -1,3 +1,10 @@
+2006-09-19  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/service/service.py:
+	  do not set name with -n on worker/manager because they already have
+	  sensible ways of figuring it out if not specified, and when
+	  the worker does specify it it should take precedence
+
 2006-09-19  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/component.py
