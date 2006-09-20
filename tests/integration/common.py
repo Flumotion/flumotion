@@ -23,14 +23,25 @@ from flumotion.common import boot
 boot.init_gobject()
 boot.init_gst()
 
-top_src_dir = string.join(string.split(__file__,'/')[:-4],'/')
+parts = [os.path.sep, ] + string.split(__file__, os.path.sep)[:-3]
+top_src_dir = os.path.join(*parts)
+
+import flumotion.common.setup
+# logging
+flumotion.common.setup.setup()
+
+from flumotion.common import log
+log.debug('integration', 'top_src_dir is %s' % top_src_dir)
+
 # munge the path to include builddir/bin/ and scripts/; also add
 # FLU_PROJECT_PATH to the env so that spawned processes pick it up
 def mungeEnv():
     from flumotion.configure import configure
-    os.environ['PATH'] = top_src_dir + '/scripts:' + os.environ['PATH']
+    os.environ['PATH'] = os.path.join(top_src_dir, 'scripts') + ':' \
+        + os.environ['PATH']
     os.environ['PATH'] = configure.bindir + ':' + os.environ['PATH']
 mungeEnv()
+log.debug('integration', 'PATH is %s' % os.environ['PATH'])
 
 
 managerXML = """<!-- -*- Mode: XML -*- -->

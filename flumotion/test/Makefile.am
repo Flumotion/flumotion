@@ -9,8 +9,6 @@ flumotion_PYTHON =			\
 	testclasses.py			\
 	gtkunit.py
 
-SUBDIRS = integration
-
 EXTRA_DIST = 				\
 	test.xml			\
 	test_admin_multi.py		\

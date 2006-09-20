@@ -261,7 +261,6 @@ flumotion/manager/Makefile
 flumotion/project/Makefile
 flumotion/service/Makefile
 flumotion/test/Makefile
-flumotion/test/integration/Makefile
 flumotion/tester/Makefile
 flumotion/twisted/Makefile
 flumotion/ui/Makefile
@@ -275,6 +274,8 @@ doc/man/Makefile
 pkgconfig/Makefile
 pkgconfig/flumotion.pc
 pkgconfig/flumotion-uninstalled.pc
+tests/Makefile
+tests/integration/Makefile
 flumotion.spec
 po/Makefile.in
 )

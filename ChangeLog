@@ -1,3 +1,18 @@
+2006-09-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
+	* configure.ac:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/integration/Makefile.am:
+	* flumotion/test/integration/__init__.py:
+	* flumotion/test/integration/common.py:
+	* flumotion/test/integration/test_qa.py:
+	* flumotion/test/integration/test_torture.py:
+	  Move integration outside of flumotion.test so we can separate it
+	  from the unit test suite
+	* tests/integration/common.py:
+	  clean up the ugly path code a little bit
+
 2006-09-20  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/httpstreamer/http.py:
