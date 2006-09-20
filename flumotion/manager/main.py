@@ -182,6 +182,10 @@ def main(args):
             log.debug('manager', 'Setting debug level to config file value %s' %
                 options.debug)
 
+    # set debug level as soon as we can after deciding
+    if options.debug:
+        log.setFluDebug(options.debug)
+
     # set default values for all unset options
     if not options.host:
         options.host = "" # needed for bind to work
@@ -214,10 +218,6 @@ def main(args):
         sys.stderr.write('ERROR: wrong transport %s, must be ssl or tcp\n' %
             options.transport)
         return 1
-
-    # handle all other options
-    if options.debug:
-        log.setFluDebug(options.debug)
 
     # register package path
     setup.setupPackagePath()
