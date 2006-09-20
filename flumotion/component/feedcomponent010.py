@@ -533,7 +533,6 @@ class FeedComponent(basecomponent.BaseComponent):
         if status['lastTime'] > 0:
             delta = currentTime - status['lastTime']
 
-            self.debug('Delta: %r', delta)
             if feedId not in self._unconnectedEaters \
             and delta > self.BUFFER_TIME_THRESHOLD:
                 self.debug(
