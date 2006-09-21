@@ -636,6 +636,15 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('FeedToFD(%s, %d)' % (feedName, fd))
         elementName = "feeder:%s" % common.feedId(self.name, feedName)
         element = self.get_element(elementName)
+        if not element:
+            msg = "Cannot find feeder element named '%s'" % elementName
+            id = "feedToFD-%s" % feedName
+            m = messages.Warning(T_(N_("Internal Flumotion error.")),
+                debug=msg, id=id, priority=40)
+            self.state.append('messages', m)
+            self.warning(msg)
+            return False
+
         element.emit('add', fd)
 
     def eatFromFD(self, feedId, fd):

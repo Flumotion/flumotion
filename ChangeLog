@@ -1,5 +1,12 @@
 2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent010.py:
+	  Show a warning if someone requests a feed from us that we
+	  don't have.  Ideally one should not get here - this should
+	  be caught in the manager, but this is a last line of defense.
+
+2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	  every assert should have a useful message
 
