@@ -1,0 +1,21 @@
+Manager Configuration
+---------------------
+- configuration consists of one or more XML snippets
+- each snippet is a <planet> node
+- snippets can be loaded:
+  - at start-up (on the command-line)
+  - at runtime (through the AdminMedium interface)
+- both call Vishnu.loadConfigurationXML
+  - this calls:
+    makeBouncer, addManagerPlugs, updateStateFromConf, and startComponents
+- each snippet adds to previous snippets
+- components with the same name in the same parent should "overwrite" the
+  previous ones
+- on each load, consistency should be checked:
+  - before parsing, is the XML valid ?
+  - after parsing, is the cumulative configuration valid ?
+    - do the feedId's referenced by <source> tags exist ?
+      (FIXME: right now, updateStateFromConf calls mapEatersToFeeders, which
+       checks for components referenced by source tags that do not exist)
+
+
