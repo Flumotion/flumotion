@@ -28,7 +28,11 @@ from twisted.spread import pb
 class OptionError(Exception):
     "Error in options"
 class ConfigError(Exception):
-    "Error during parsing of configuration"
+    """
+    Error during parsing of configuration
+
+    args[0]: str
+    """
 class NoProjectError(Exception):
     "The given project does not exist"
 class ComponentWorkerConfigError(ConfigError):

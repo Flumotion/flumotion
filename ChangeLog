@@ -1,3 +1,14 @@
+2006-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/configuration:
+	  update notes
+	* flumotion/common/config.py:
+	* flumotion/common/errors.py:
+	* flumotion/common/fxml.py:
+	  make ConfigError and ParserError more strictly defined in
+	  arguments; obviously it was necessary, because a broken XML
+	  resulted in a useless error message
+
 2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/identity.py:

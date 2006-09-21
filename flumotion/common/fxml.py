@@ -60,8 +60,11 @@ class Box:
 
 
 class ParserError(Exception):
-    "Error during parsing of XML."
+    """
+    Error during parsing of XML.
 
+    args[0]: str
+    """
 
 class Parser(log.Loggable):
     """
@@ -90,8 +93,8 @@ class Parser(log.Loggable):
         try:
             return minidom.parse(file)
         except expat.ExpatError, e:
-            raise ParserError('Error parsing XML from %r: %s: %s',
-                              file, common.objRepr(e), ' '.join(e.args))
+            raise ParserError('Error parsing XML from %r: %s' % (
+                              file, log.getExceptionMessage(e)))
         
     def checkAttributes(self, node, required=None, optional=None):
         """

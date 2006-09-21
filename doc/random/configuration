@@ -17,5 +17,8 @@ Manager Configuration
     - do the feedId's referenced by <source> tags exist ?
       (FIXME: right now, updateStateFromConf calls mapEatersToFeeders, which
        checks for components referenced by source tags that do not exist)
-
+- errors at any stage should also be viewable from admin clients:
+  - component-specific config errors can be added as messages to the components
+  - manager-global config errors can be added as messages to the toplevel
+    planet object
 

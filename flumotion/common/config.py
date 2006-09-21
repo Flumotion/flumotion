@@ -115,7 +115,7 @@ class BaseConfigParser(fxml.Parser):
         try:
             self.doc = self.getRoot(file)
         except fxml.ParserError, e:
-            raise ConfigError("%s", e)
+            raise ConfigError(e.args[0])
 
     def getPath(self):
         return self.path
