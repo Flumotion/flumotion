@@ -1,6 +1,5 @@
 NAMING of OBJECTS
 -----------------
-
 - component:
   - has a name, componentName
     - name is unique within the parent
@@ -43,3 +42,12 @@ NAMING of OBJECTS
   - to feed to an eater, you need:
     - componentId of the component you want to feed to
     - feedId of the feed being fed
+
+- worker:
+  - has a name that is only unique for a given manager
+  - ie, two workers on the same machine can have the same name but log in
+    to different managers
+  - can be set with --name, XML config
+  - the service script needs to operate on id's that are unique, since
+    it deals with log files, lock files, run files, ...
+    -> flumotion-worker has an option "--service-name" to set this

@@ -115,6 +115,10 @@ def main(args):
     group.add_option('-n', '--name',
                      action="store", type="string", dest="name",
                      help="manager name")
+    group.add_option('-s', '--service-name',
+                     action="store", type="string", dest="serviceName",
+                     help="name to use for log and pid files "
+                          "when run as a daemon")
     group.add_option('-D', '--daemonize',
                      action="store_true", dest="daemonize",
                      default=False,
@@ -257,17 +261,30 @@ def main(args):
             'ERROR: --daemonize-to can only be used with -D/--daemonize.\n')
         return 1
 
+    if options.serviceName and not options.daemonize:
+        sys.stderr.write(
+            'ERROR: --service-name can only be used with -D/--daemonize.\n')
+        return 1
+
+    log.info('manager', "Manager '%s' starting" % options.name)
+
     if options.daemonize:
-        log.info('manager', 'Daemonizing')
+        if not options.serviceName:
+            options.serviceName = options.name
+
         common.ensureDir(configure.logdir, "log file")
         common.ensureDir(configure.rundir, "run file")
                 
-        if common.getPid('manager', options.name):
-            raise errors.SystemError, \
-                'A manager with name %s is already running' % options.name
+        if common.getPid('manager', options.serviceName):
+            raise errors.SystemError(
+                "A manager service '%s' is already running" %
+                    options.serviceName)
+
+        log.info('manager', "Manager service '%s' daemonizing" %
+            options.serviceName)
 
         logPath = os.path.join(configure.logdir,
-            'manager.%s.log' % options.name)
+            'manager.%s.log' % options.serviceName)
         log.debug('manager', 'Further logging will be done to %s' % logPath)
 
         # here we daemonize; so we also change our pid
@@ -279,8 +296,8 @@ def main(args):
         log.info('manager', 'Started daemon')
 
         # from now on I should keep running, whatever happens
-        log.debug('manager', 'writing pid file')
-        common.writePidFile('manager', options.name)
+        path = common.writePidFile('manager', options.serviceName)
+        log.debug('manager', 'written pid file %s' % path)
 
     # go into the reactor main loop
     log.info('manager', 'Started manager "%s"' % options.name)
@@ -294,9 +311,9 @@ def main(args):
 
     # we exited, so we're done
     if options.daemonize:
-        log.debug('manager', 'deleting pid file')
-        common.deletePidFile('manager', options.name)
+        path = common.deletePidFile('manager', options.serviceName)
+        log.debug('manager', 'deleted pid file %s' % path)
 
-    log.info('manager', 'Stopping manager "%s"' % options.name)
+    log.info('manager', "Stopping manager '%s'" % options.name)
 
     return 0

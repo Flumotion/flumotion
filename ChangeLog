@@ -1,5 +1,16 @@
 2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/random/naming:
+	* flumotion/common/common.py:
+	* flumotion/manager/main.py:
+	* flumotion/worker/main.py:
+	* flumotion/service/service.py:
+	  add a --service-name argument from which names of log and pid files
+	  are derived when daemonized.
+	  Make the code and logging more consistent and useful 
+
+2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/worker.py:
 	  properly trap an out-of-date manager we can't log in to.
 

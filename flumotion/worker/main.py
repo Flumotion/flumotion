@@ -60,6 +60,10 @@ def main(args):
     group.add_option('-n', '--name',
                      action="store", type="string", dest="name",
                      help="worker name to use in the manager")
+    group.add_option('-s', '--service-name',
+                     action="store", type="string", dest="serviceName",
+                     help="name to use for log and pid files "
+                          "when run as a daemon")
     group.add_option('-D', '--daemonize',
                      action="store_true", dest="daemonize",
                      help="run in background as a daemon")
@@ -202,21 +206,42 @@ def main(args):
             'ERROR: --daemonize-to can only be used with -D/--daemonize.\n')
         return 1
 
+    if options.serviceName and not options.daemonize:
+        sys.stderr.write(
+            'ERROR: --service-name can only be used with -D/--daemonize.\n')
+        return 1
+
     log.info('worker', "Worker '%s' starting" % options.name) 
+
     if options.daemonize:
+        if not options.serviceName:
+            options.serviceName = options.name
+
         common.ensureDir(configure.logdir, "log file")
         common.ensureDir(configure.rundir, "run file")
 
-        logPath = os.path.join(configure.logdir, 'worker.%s.log' %
-            options.name)
+        if common.getPid('worker', options.serviceName):
+            raise errors.SystemError(
+                "A worker service '%s' is already running" %
+                    options.serviceName)
+
+        log.info('worker', "Worker service '%s' daemonizing" %
+            options.serviceName) 
+
+        logPath = os.path.join(configure.logdir,
+            'worker.%s.log' % options.serviceName)
+        log.debug('worker', 'Further logging will be done to %s' % logPath)
+
+        # here we daemonize; so we also change our pid
         if not options.daemonizeTo:
             options.daemonizeTo = '/'
         common.daemonize(stdout=logPath, stderr=logPath,
             directory=options.daemonizeTo)
+
         log.info('worker', 'Started daemon')
 
         # from now on I should keep running until killed, whatever happens
-        path = common.writePidFile('worker', options.name)
+        path = common.writePidFile('worker', options.serviceName)
         log.debug('worker', 'written pid file %s' % path)
 
     # register all package paths (FIXME: this should go away when
@@ -293,10 +318,11 @@ def main(args):
         log.info('worker', 'Job with pid %d finished' % pid)
         pids.remove(pid)
 
+    # we exited, so we're done
     if options.daemonize:
-        log.debug('worker', 'deleting pid file')
-        common.deletePidFile('worker', options.name)
+        path = common.deletePidFile('worker', options.serviceName)
+        log.debug('worker', 'deleted pid file %s' % path)
 
-    log.info('worker', 'All jobs finished, stopping worker')
+    log.info('worker', "Stopping worker '%s'" % options.name)
 
     return 0

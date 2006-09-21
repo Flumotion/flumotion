@@ -277,8 +277,13 @@ def deletePidFile(type, name=None):
     """
     Delete the pid file in the run directory, using the given process type
     and process name for the filename.
+
+    @rtype:   str
+    @returns: full path to the pid file that was written
     """
-    os.unlink(getPidPath(type, name))
+    path = getPidPath(type, name)
+    os.unlink(path)
+    return path
  
 def getPid(type, name=None):
     """

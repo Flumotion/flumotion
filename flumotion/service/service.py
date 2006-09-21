@@ -237,8 +237,9 @@ class Servicer(log.Loggable):
                 raise errors.SystemError, \
                     "Manager %s is dead (stale pid %d)" % (name, pid)
             
-        command = "flumotion-manager -D --daemonize-to %s %s %s" % (
-            configure.daemondir, planetFile, " ".join(flowFiles))
+        command = "flumotion-manager -D --daemonize-to %s " \
+            "--service-name %s %s %s" % (
+            configure.daemondir, name, planetFile, " ".join(flowFiles))
         self.debug("starting process %s" % command)
         retval = self.startProcess(command)
 
@@ -281,8 +282,9 @@ class Servicer(log.Loggable):
         # we are sure the worker is not running and there's no pid file
         self.info("Loading worker %s" % workerFile)
 
-        command = "flumotion-worker -D --daemonize-to %s %s" % (
-            configure.daemondir, workerFile)
+        command = "flumotion-worker -D --daemonize-to %s " \
+            "--service-name %s %s" % (
+                configure.daemondir, name, workerFile)
         retval = self.startProcess(command)
 
         if retval == 0:
