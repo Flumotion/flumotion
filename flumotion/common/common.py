@@ -472,7 +472,7 @@ def parseFeedId(feedId):
     @return: tuple of (componentName, feedName)
     """
     list = feedId.split(":")
-    assert len(list) == 2
+    assert len(list) == 2, "feedId %s should contain exactly one ':'" % feedId
     return (list[0], list[1])
 
 def fullFeedId(flowName, componentName, feedName):
