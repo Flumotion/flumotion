@@ -1,5 +1,19 @@
 2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/identity.py:
+	* flumotion/component/plugs/identity.py:
+	* flumotion/component/plugs/adminaction.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/main.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_manager_manager.py:
+	  "anything" is not really a good alternative to a decent interface.
+	  And really, we are dealing with identities that can be either
+	  local or remote; so implement it as such.
+	  Disambiguate remoteIdentity where appropriate.
+
+2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpfile/httpfile.py:
 	  Make pychecker happy.  Lament the absence of documentation
 	  or comments.

@@ -35,6 +35,15 @@ class IdentityProvider(base.ManagerPlug):
     information.
     """
     def computeIdentity(self, keycard, remoteHost):
+        """
+        @param keycard:    the keycard that the remote host used to log in.
+        @type  keycard:    L{flumotion.common.keycards.Keycard}
+        @param remoteHost: the ip of the remote host
+        @type  remoteHost: str
+
+        @rtype: a deferred that will fire a
+                L{flumotion.common.identity.RemoteIdentity}
+        """
         raise NotImplementedError
 
 class ExampleIdentityProvider(IdentityProvider):

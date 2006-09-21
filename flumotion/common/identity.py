@@ -20,20 +20,42 @@
 # Headers in this file shall remain intact.
 
 """
-Manager-side representations of the identity of an avatar.
+Manager-side identities of objects that can request operations from the manager.
 """
 
-class RemoteIdentity(object):
+class Identity:
     """
-    Representation of the identity of a remote avatar.
+    I represent the identity of an object that can ask the manager to
+    perform functions.
 
-    This object only exists for the AdminAction socket, defined in
-    L{flumotion.component.plugs.adminaction}. This base class exists to
-    hold the username and host of the remote avatar, and also to serve
-    as a point of extensibility for the IdentityProvider socket, defined
-    in L{flumotion.component.plugs.identity}.
+    I exist for the AdminAction socket, defined in
+    L{flumotion.component.plugs.adminaction}, so that specific actions
+    can be taken when I request to perform a function.
+
+    I serve as a point of extensibility for the IdentityProvider socket,
+    defined in L{flumotion.component.plugs.identity}.
+
+    Subclasses should only implement __str__
     """
+    def __str__(self):
+        raise NotImplementedError
 
+class LocalIdentity(Identity):
+    """
+    I represent a local identity.
+    """
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return "<%s>" % self.name
+
+class RemoteIdentity(Identity):
+    """
+    I represent the identity of a remote avatar.
+
+    I hold the username and host of the remote avatar.
+    """
     def __init__(self, username, host):
         self.username = username
         self.host = host

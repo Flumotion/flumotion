@@ -47,13 +47,13 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
 
     def __init__(self, heaven, avatarId, remoteIdentity):
         """
-        @param heaven:   the heaven this avatar is part of
-        @type  heaven:   L{flumotion.manager.base.ManagerHeaven}
-        @param avatarId: id of the avatar to create
-        @type  avatarId: str
+        @param heaven:         the heaven this avatar is part of
+        @type  heaven:         L{flumotion.manager.base.ManagerHeaven}
+        @param avatarId:       id of the avatar to create
+        @type  avatarId:       str
         @param remoteIdentity: manager-assigned identity object for this
-        avatar
-        @type  remoteIdentity: anything
+                               avatar
+        @type  remoteIdentity: L{flumotion.common.identity.RemoteIdentity}
         """
         self.heaven = heaven
         self.avatarId = avatarId
@@ -409,11 +409,11 @@ class ManagerHeaven(pb.Root, log.Loggable):
         """
         Create a new avatar and manage it.
 
-        @param avatarId: id of the avatar to create
-        @type  avatarId: str
+        @param avatarId:       id of the avatar to create
+        @type  avatarId:       str
         @param remoteIdentity: the manager-side representation of the
-        remote identity
-        @type  remoteIdentity: anything
+                               remote identity
+        @type  remoteIdentity: L{flumotion.common.identity.RemoteIdentity}
 
         @returns: a new avatar for the client
         @rtype:   L{flumotion.manager.base.ManagerAvatar}

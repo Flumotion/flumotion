@@ -23,6 +23,11 @@
 manager implementation and related classes
 
 API Stability: semi-stable
+
+@var  LOCAL_IDENTITY: an identity for the manager itself; can be used
+                      to compare against to verify that the manager
+                      requested an action
+@type LOCAL_IDENTITY: L{LocalIdentity}
 """
 
 __all__ = ['ManagerServerFactory', 'Vishnu']
@@ -35,7 +40,7 @@ from twisted.cred import portal
 
 from flumotion.common import bundle, config, errors, interfaces, log, registry
 from flumotion.common import planet, common, dag, messages, reflectcall, server
-from flumotion.common.identity import RemoteIdentity
+from flumotion.common.identity import RemoteIdentity, LocalIdentity
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base, depgraph
@@ -45,6 +50,8 @@ from flumotion.twisted.defer import defer_generator_method
 from flumotion.twisted.compat import implements
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
+
+LOCAL_IDENTITY = LocalIdentity('manager')
 
 def _find(list, value, proc=lambda x: x):
     return list[[proc(x) for x in list].index(value)]
@@ -64,8 +71,6 @@ def _fint(*procs):
         return True
     return int
 
-RUNNING_LOCALLY = ('loadConfiguration being called from main.py, no '
-                   'need for authentication')
 
 # an internal class
 class Dispatcher(log.Loggable):
@@ -81,6 +86,12 @@ class Dispatcher(log.Loggable):
     logCategory = 'dispatcher'
 
     def __init__(self, computeIdentity):
+        """
+        @param computeIdentity: see L{Vishnu.computeIdentity}
+        @type  computeIdentity: callable
+        """
+        # FIXME: Is passing a callable to a constructor offending anyone
+        # else's sense of aesthetics ?
         self._interfaceHeavens = {} # interface -> heaven
         self._avatarHeavens = {} # avatarId -> heaven
         self._computeIdentity = computeIdentity
@@ -138,34 +149,35 @@ class Dispatcher(log.Loggable):
         """
         Create an avatar from the heaven implementing the given interface.
 
-        @type avatarId:    string
+        @type  avatarId:   str
         @param avatarId:   the name of the new avatar
-        @type keycard:     L{flumotion.common.keycards.Keycard}
+        @type  keycard:    L{flumotion.common.keycards.Keycard}
         @param keycard:    the credentials being used to log in
-        @type remoteHost:  str
+        @type  remoteHost: str
         @param remoteHost: the remote host
-        @type ifaces:      tuple of interfaces linked to heaven
+        @type  ifaces:     tuple of interfaces linked to heaven
         @param ifaces:     a list of heaven interfaces to get avatar from,
                            including pb.IPerspective
 
-        @returns:          a deferred that will fire with an avatar from
+        @returns:          a deferred that will fire an avatar from
                            the heaven managing the given interface.
         """
-        def got_identity(identity):
+        def gotIdentity(identity):
             for iface in ifaces:
                 heaven = self._interfaceHeavens.get(iface, None)
                 if heaven:
                     avatar = heaven.createAvatar(avatarId, identity)
+                    self.debug('Created avatar %r for identity %r' % (
+                        avatar, identity))
                     self._avatarHeavens[avatarId] = heaven
                     return avatar
             raise errors.NoPerspectiveError("%s requesting iface %r",
                                             avatarId, ifaces)
             
-
         if not pb.IPerspective in ifaces:
             raise errors.NoPerspectiveError(avatarId)
         d = self._computeIdentity(keycard, remoteHost)
-        d.addCallback(got_identity)
+        d.addCallback(gotIdentity)
         return d
 
     def registerHeaven(self, heaven, interface):
@@ -274,13 +286,16 @@ class Vishnu(log.Loggable):
             self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
         return self.bundlerBasket
         
-    def adminAction(self, remoteIdentity, message, args, kw):
+    def adminAction(self, identity, message, args, kw):
+        """
+        @param identity: L{flumotion.common.identity.Identity}
+        """
         socket = 'flumotion.component.plugs.adminaction.AdminAction'
         if self.plugs.has_key(socket):
             for plug in self.plugs[socket]:
-                plug.action(remoteIdentity, message, args, kw)
+                plug.action(identity, message, args, kw)
 
-    def computeIdentity(self, keycard, host):
+    def computeIdentity(self, keycard, remoteHost):
         """
         Compute a suitable identity for a remote host. First looks to
         see if there is a
@@ -293,25 +308,25 @@ class Vishnu(log.Loggable):
         the identity object you use here might store the privileges that
         the admin has.
 
-        @param keycard: the keycard that the remote host used to log in.
-        @type  keycard: L{flumotion.common.keycards.Keycard}
-        @param host: the ip of the remote host
-        @type  host: str
+        @param keycard:    the keycard that the remote host used to log in.
+        @type  keycard:    L{flumotion.common.keycards.Keycard}
+        @param remoteHost: the ip of the remote host
+        @type  remoteHost: str
 
         @rtype: a deferred that will fire a
-        L{flumotion.common.identity.RemoteIdentity}
+                L{flumotion.common.identity.RemoteIdentity}
         """
 
         socket = 'flumotion.component.plugs.identity.IdentityProvider'
         if self.plugs.has_key(socket):
             for plug in self.plugs[socket]:
-                identity = plug.computeIdentity(keycard, host)
+                identity = plug.computeIdentity(keycard, remoteHost)
                 if identity:
                     return identity
         username = getattr(keycard, 'username', None)
-        return defer.succeed(RemoteIdentity(username, host))
+        return defer.succeed(RemoteIdentity(username, remoteHost))
 
-    def _makeBouncer(self, conf, remoteIdentity):
+    def _makeBouncer(self, conf, identity):
         # returns a deferred, always
         if not (conf.manager and conf.manager.bouncer):
             self.log('no bouncer in config')
@@ -320,8 +335,8 @@ class Vishnu(log.Loggable):
         self.debug('going to start manager bouncer %s of type %s' % (
             conf.manager.bouncer.name, conf.manager.bouncer.type))
 
-        if remoteIdentity != RUNNING_LOCALLY:
-            self.adminAction(remoteIdentity, '_makeBouncer', (conf,), {})
+        if identity != LOCAL_IDENTITY:
+            self.adminAction(identity, '_makeBouncer', (conf,), {})
 
         defs = registry.getRegistry().getComponent(
             conf.manager.bouncer.type)
@@ -345,13 +360,12 @@ class Vishnu(log.Loggable):
         d.addErrback(setupErrback)
         return d
 
-    def _addManagerPlug(self, socket, args, remoteIdentity):
+    def _addManagerPlug(self, socket, args, identity):
         self.debug('loading plug type %s for socket %s'
                    % (args['type'], socket))
 
-        if remoteIdentity != RUNNING_LOCALLY:
-            self.adminAction(remoteIdentity, '_addManagerPlug',
-                             (socket, args), {})
+        if identity != LOCAL_IDENTITY:
+            self.adminAction(identity, '_addManagerPlug', (socket, args), {})
 
         defs = registry.getRegistry().getPlug(args['type'])
         e = defs.getEntry()
@@ -362,7 +376,7 @@ class Vishnu(log.Loggable):
         self.plugs[socket].append(plug)
         plug.start(self)
 
-    def _addManagerPlugs(self, _, conf, remoteIdentity):
+    def _addManagerPlugs(self, _, conf, identity):
         if not conf.manager:
             return
 
@@ -371,9 +385,9 @@ class Vishnu(log.Loggable):
                 self.plugs[socket] = []
 
             for args in plugs:
-                self._addManagerPlug(socket, args, remoteIdentity)
+                self._addManagerPlug(socket, args, identity)
 
-    def _addComponent(self, conf, parent, remoteIdentity):
+    def _addComponent(self, conf, parent, identity):
         """
         Add a component state for the given component config entry.
 
@@ -383,9 +397,8 @@ class Vishnu(log.Loggable):
         self.debug('adding component %s to %s'
                    % (conf.name, parent.get('name')))
         
-        if remoteIdentity != RUNNING_LOCALLY:
-            self.adminAction(remoteIdentity, '_addComponent',
-                             (conf, parent), {})
+        if identity != LOCAL_IDENTITY:
+            self.adminAction(identity, '_addComponent', (conf, parent), {})
 
         state = planet.ManagerComponentState()
         state.set('name', conf.name)
@@ -423,7 +436,7 @@ class Vishnu(log.Loggable):
         if componentAvatarId == conf['clock-master']:
             self._depgraph.addClockMaster(state)
 
-    def _updateStateFromConf(self, _, conf, remoteIdentity):
+    def _updateStateFromConf(self, _, conf, identity):
         """
         Add a new config object into the planet state.
         Returns a list of all components added
@@ -438,8 +451,7 @@ class Vishnu(log.Loggable):
             if name in [x.get('name') for x in atmosphere.get('components')]:
                 self.debug('atmosphere already has component %s' % name)
             else:
-                added.append(self._addComponent(c, atmosphere,
-                                                remoteIdentity))
+                added.append(self._addComponent(c, atmosphere, identity))
 
         flows = dict([(x.get('name'), x) for x in state.get('flows')])
         for f in conf.flows:
@@ -457,8 +469,7 @@ class Vishnu(log.Loggable):
                     self.debug('component %s already in flow %s'
                                % (c.name, f.name))
                 else:
-                    added.append(self._addComponent(c, flow,
-                                                    remoteIdentity))
+                    added.append(self._addComponent(c, flow, identity))
 
         for componentState in added:
             self._updateFlowDependencies(componentState)
@@ -467,7 +478,7 @@ class Vishnu(log.Loggable):
 
         return added
 
-    def _startComponents(self, components, conf, remoteIdentity):
+    def _startComponents(self, components, conf, identity):
         # now start all components that need starting -- collecting into
         # an temporary dict of the form {workerId => [components]}
         componentsToStart = {}
@@ -481,32 +492,31 @@ class Vishnu(log.Loggable):
         for workerId, componentStates in componentsToStart.items():
             self._workerCreateComponents(workerId, componentStates)
 
-    def _loadConfiguration(self, conf, remoteIdentity):
+    def _loadConfiguration(self, conf, identity):
         # makeBouncer only makes a bouncer if there is one in the config
-        d = self._makeBouncer(conf, remoteIdentity)
-        d.addCallback(self._addManagerPlugs, conf, remoteIdentity)
-        d.addCallback(self._updateStateFromConf, conf, remoteIdentity)
-        d.addCallback(self._startComponents, conf, remoteIdentity)
+        d = self._makeBouncer(conf, identity)
+        d.addCallback(self._addManagerPlugs, conf, identity)
+        d.addCallback(self._updateStateFromConf, conf, identity)
+        d.addCallback(self._startComponents, conf, identity)
         return d
  
-    def loadConfigurationXML(self, file, remoteIdentity):
+    def loadConfigurationXML(self, file, identity):
         """
         Load the configuration from the given XML, merging it on top of
         the currently running configuration.
         
-        @param file: The file to parse, either as an open file object,
-        or as the name of a file to open.
-        @type  file: str or file.
-        @param remoteIdentity: The identity of the remote host making
-        this request, or None for debugging. This is used by the
-        adminaction logging mechanism in order to say who is performing
-        the action.
-        @type  remoteIdentity: anything
+        @param file:     file to parse, either as an open file object,
+                         or as the name of a file to open
+        @type  file:     str or file
+        @param identity: The identity making this request.. This is used by the
+                         adminaction logging mechanism in order to say who is
+                         performing the action.
+        @type  identity: L{flumotion.common.identity.Identity}
         """
         self.debug('loading configuration')
         self.configuration = conf = config.FlumotionConfigXML(file)
         conf.parse()
-        return self._loadConfiguration(conf, remoteIdentity)
+        return self._loadConfiguration(conf, identity)
 
     def _createHeaven(self, interface, klass):
         """

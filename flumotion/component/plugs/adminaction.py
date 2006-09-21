@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_http -*-
+# -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -34,7 +34,13 @@ class AdminAction(base.ManagerPlug):
     has the right permissions, and some others might want to log the
     action to a database. Defines the admin action API methods.
     """
-    def action(self, avatar, method, args, kwargs):
+    def action(self, identity, method, args, kwargs):
+        """
+        @type  identity: L{flumotion.common.identity.Identity}
+        @type  method:   str
+        @type  args:     list
+        @type  kwargs:   dict
+        """
         raise NotImplementedError('subclasses have to override me')
 
 
@@ -55,10 +61,10 @@ class AdminActionFileLogger(AdminAction):
         self.file.close()
         self.file = None
 
-    def action(self, remoteIdentity, method, args, kwargs):
+    def action(self, identity, method, args, kwargs):
         # gaaaaah
         s = ('[%04d-%02d-%02d %02d:%02d:%02d] %s: %s: %r %r\n'
              % (time.gmtime()[:6] +
-                ((remoteIdentity, method, args, kwargs))))
+                ((identity, method, args, kwargs))))
         self.file.write(s)
         self.file.flush()

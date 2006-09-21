@@ -458,7 +458,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         __thisdir = os.path.dirname(os.path.abspath(__file__))
         file = os.path.join(__thisdir, 'test.xml')
         
-        self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
+        self.vishnu.loadConfigurationXML(file, manager.LOCAL_IDENTITY)
         s = self.vishnu.state
         
         l = s.get('flows')
@@ -471,7 +471,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
 
         # FIXME: why a second time ? Maybe to check that reloading doesn't
         # change things ?
-        self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
+        self.vishnu.loadConfigurationXML(file, manager.LOCAL_IDENTITY)
 
         # now lets empty planet and make sure theres nothing in the depgraph
         d = self.vishnu.emptyPlanet()
@@ -560,7 +560,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             # Now log out the worker.
             self._logoutAvatar(workerAvatar)
 
-        d = self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
+        d = self.vishnu.loadConfigurationXML(file, manager.LOCAL_IDENTITY)
         d.addCallback(confLoaded)
         d.addCallback(gotWorker)
         d.addCallback(confChecked)
@@ -576,7 +576,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
             self.failUnlessEqual(len(self._components), 0)
             
             # load configuration
-            d = self.vishnu.loadConfigurationXML(file, manager.RUNNING_LOCALLY)
+            d = self.vishnu.loadConfigurationXML(file, manager.LOCAL_IDENTITY)
             d.addCallback(lambda _: self._verifyConfigAndOneWorker())
             d.addCallback(lambda _: workerAvatar)
             return d
