@@ -1,5 +1,14 @@
 2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/registry.py:
+	  handle the case where FLU_PROJECT_PATH points to non-project
+	  directories, or directories that were in the registry before
+	  no longer exist, by making some methods return False if the
+	  path is not a registry path, and consequently removing them from
+	  the parser.
+
+2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/naming:
 	* flumotion/common/common.py:
 	* flumotion/manager/main.py:

@@ -343,7 +343,7 @@ class RegistryParser(fxml.Parser):
         
     def clean(self):
         self._components = {}
-        self._directories = {}
+        self._directories = {} # path -> RegistryDirectory
         self._bundles = {}
         self._plugs = {}
         
@@ -725,6 +725,14 @@ class RegistryParser(fxml.Parser):
         """
         self._directories[directory.getPath()] = directory
 
+    def removeDirectoryByPath(self, path):
+        """
+        Remove a directory from the parser given the path.
+        Used when the path does not actually contain any registry information.
+        """
+        if path in self._directories.keys():
+            del self._directories[path]
+
     def _parseRoot(self, node, disallowed=None):
         # <components>...</components>*
         # <plugs>...</plugs>*
@@ -775,6 +783,9 @@ class RegistryDirectory:
         self._prefix = prefix
         self._files = self._getFileList(os.path.join(path, prefix))
         
+    def __repr__(self):
+        return "<RegistryDirectory %s>" % self._path
+
     def _getFileList(self, root):
         """
         Get all files ending in .xml from all directories under the given root.
@@ -784,7 +795,6 @@ class RegistryDirectory:
         
         @returns: a list of .xml files, relative to the given root directory
         """
-
         files = []
         
         if os.path.exists(root):
@@ -809,6 +819,7 @@ class RegistryDirectory:
         return files
 
     def lastModified(self):
+        assert self._files, "Path %s does not have registry files" % self._path
         return max(map(_getMTime, self._files))
 
     def getFiles(self):
@@ -865,10 +876,18 @@ class ComponentRegistry(log.Loggable):
 
         @param path: a full path containing a 'flumotion' directory,
                      which will be scanned for registry files.
+
+        @rtype:   bool
+        @returns: whether the path could be added
         """
         self.debug('path %s, prefix %s, force %r' % (path, prefix, force))
         if not os.path.exists(path):
-            return
+            self.warning("Cannot add non-existent path '%s' to registry" % path)
+            return False
+        if not os.path.exists(os.path.join(path, prefix)):
+            self.warning("Cannot add path '%s' to registry "
+                "since it does not contain prefix '%s'" % (path, prefix))
+            return False
 
         directory = self._parser._directories.get(path, None)
         if not force and directory:
@@ -879,7 +898,7 @@ class ComponentRegistry(log.Loggable):
             if dTime < fTime:
                 self.debug('%s has not been changed since last registry parse' %
                     path)
-                return
+                return True
         
         # registry path was either not watched or updated, or a force was
         # asked, so reparse
@@ -890,6 +909,7 @@ class ComponentRegistry(log.Loggable):
         map(self.addFile, files)
         
         self._parser.addDirectory(registryPath)
+        return True
         
     def isEmpty(self):
         return len(self._parser._components) == 0
@@ -1169,8 +1189,10 @@ class ComponentRegistry(log.Loggable):
             registryPaths += paths.split(':')
         
         # get the list of all paths used to construct the old registry
-        oldRegistryPaths = [dir.getPath()
-                                  for dir in self.getDirectories()]
+        oldRegistryPaths = [dir.getPath() for dir in self.getDirectories()]
+        # only accept paths that actually exist
+        oldRegistryPaths = [p for p in oldRegistryPaths if os.path.exists(p)]
+
         self.debug('previously scanned registry paths: %s' % 
             ", ".join(oldRegistryPaths))
 
@@ -1188,8 +1210,9 @@ class ComponentRegistry(log.Loggable):
         if force:
             self.clean()
         
-        for directory in registryPaths:
-            self.addRegistryPath(directory, force=force)
+        for path in registryPaths:
+            if not self.addRegistryPath(path, force=force):
+                self._parser.removeDirectoryByPath(path)
 
         self.save(force)
 
