@@ -430,6 +430,10 @@ class ComponentMenu(gtk.Menu):
 
         self.set_title(_('Component'))
 
+        i = gtk.MenuItem(_('_Restart')) 
+        self.append(i) 
+        self._items['restart'] = i 
+
         i = gtk.MenuItem(_('_Start'))
         mood = moods.get(state.get('mood'))
         if mood == moods.happy:

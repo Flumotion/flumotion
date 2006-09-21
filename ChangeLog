@@ -1,5 +1,12 @@
 2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/parts.py:
+	  Put back restart option, I used it, removal was not discussed,
+	  the commit removing it was mixed with something completely
+	  unrelated, and the ChangeLog entry for it was crap.
+
+2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/registry.py:
 	  handle the case where FLU_PROJECT_PATH points to non-project
 	  directories, or directories that were in the registry before
