@@ -391,7 +391,7 @@ class Vishnu(log.Loggable):
         """
         Add a component state for the given component config entry.
 
-        @returns: L{flumotion.common.planet.ManagerComponentState}
+        @rtype: L{flumotion.common.planet.ManagerComponentState}
         """
 
         self.debug('adding component %s to %s'
@@ -439,7 +439,9 @@ class Vishnu(log.Loggable):
     def _updateStateFromConf(self, _, conf, identity):
         """
         Add a new config object into the planet state.
-        Returns a list of all components added
+
+        @returns: a list of all components added
+        @rtype:   list of L{flumotion.common.planet.ManagerComponentState}
         """
 
         self.debug('syncing up planet state with config')
