@@ -1,5 +1,11 @@
 2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Make pychecker happy.  Lament the absence of documentation
+	  or comments.
+
+2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/admin.py:
 	* flumotion/twisted/pb.py:
 	  a pb.Error is a serializable exception; as a reply to a remote

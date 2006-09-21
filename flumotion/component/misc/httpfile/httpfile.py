@@ -34,6 +34,9 @@ from twisted.cred import credentials
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
+# FIXME: argggggh, how hard is it to *document* a class or at least give
+# a passing hint on *why* it gets created so someone has at least a
+# fighting chance to fix problems with it ?
 class RequestWrapper:
     request = None
     def __init__(self, request, finished):
@@ -63,6 +66,8 @@ class RequestWrapper:
         return self.request.finish()
 
 class File(static.File):
+    __pychecker__ = 'no-objattrs'
+
     def __init__(self, path, requestFinished):
         static.File.__init__(self, path)
         self._requestFinished = requestFinished
