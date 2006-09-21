@@ -97,6 +97,17 @@ class WorkerClientFactory(factoryClass):
             self.error('Connection to %s:%d refused.' % (self._managerHost,
                                                          self._managerPort))
                                                           
+        def NoSuchMethodErrback(failure):
+            failure.trap(twisted.spread.flavors.NoSuchMethod)
+            # failure.value is a str
+            if failure.value.find('remote_getKeycardClasses') > -1:
+                self.error(
+                    "Manager %s:%d is older than version 0.3.0.  "
+                    "Please upgrade." % (self._managerHost, self._managerPort))
+                return
+
+            return failure
+
         def loginFailedErrback(failure):
             self.error('Login failed, reason: %s' % str(failure))
 
@@ -104,6 +115,7 @@ class WorkerClientFactory(factoryClass):
         d.addErrback(accessDeniedErrback)
         d.addErrback(connectionRefusedErrback)
         d.addErrback(alreadyConnectedErrback)
+        d.addErrback(NoSuchMethodErrback)
         d.addErrback(loginFailedErrback)
             
     # override log.Loggable method so we don't traceback

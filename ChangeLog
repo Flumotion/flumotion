@@ -1,5 +1,10 @@
 2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/worker.py:
+	  properly trap an out-of-date manager we can't log in to.
+
+2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	  make writePidFile return the path to the pid file
 	* flumotion/worker/main.py:
