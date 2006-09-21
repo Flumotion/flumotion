@@ -581,7 +581,11 @@ class Vishnu(log.Loggable):
             self.debug('Removing message %r' % m)
             componentState.remove('messages', m)
 
-        if componentState.get('moodPending') != None:
+        # We permit stopping a component even if it has a pending mood of
+        # happy, so that if it never gets to happy, we can still stop it.
+        if (componentState.get('moodPending') != None and
+            componentState.get('moodPending') != moods.happy.value):
+            self.debug("Pending mood is %r", componentState.get('moodPending'))
             raise errors.BusyComponentError(componentState)
 
         avatar = self.getComponentMapper(componentState).avatar

@@ -1,3 +1,9 @@
+2006-09-21  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/manager/manager.py:
+	  Backport to trunk: allow stopping components that are trying to
+	  start, but haven't succeeded or explicitly failed.
+
 2006-09-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:
