@@ -261,12 +261,17 @@ def writePidFile(type, name=None):
     """
     Write a pid file in the run directory, using the given process type
     and process name for the filename.
+
+    @rtype:   str
+    @returns: full path to the pid file that was written
     """
     ensureDir(configure.rundir, "rundir")
     pid = os.getpid()
-    file = open(getPidPath(type, name), 'w')
+    path = getPidPath(type, name)
+    file = open(path, 'w')
     file.write("%d\n" % pid)
     file.close()
+    return path
  
 def deletePidFile(type, name=None):
     """

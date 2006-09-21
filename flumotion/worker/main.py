@@ -170,9 +170,12 @@ def main(args):
     if not options.name:
         if options.host == 'localhost':
             options.name = 'localhost'
+            log.debug('worker', 'Setting worker name localhost')
         else:
             import socket
             options.name = socket.gethostname()
+            log.debug('worker', 'Setting worker name %s (from hostname)' %
+                options.name)
 
     if options.feederports is None:
         options.feederports = configure.defaultGstPortRange
@@ -199,6 +202,7 @@ def main(args):
             'ERROR: --daemonize-to can only be used with -D/--daemonize.\n')
         return 1
 
+    log.info('worker', "Worker '%s' starting" % options.name) 
     if options.daemonize:
         common.ensureDir(configure.logdir, "log file")
         common.ensureDir(configure.rundir, "run file")
@@ -212,8 +216,8 @@ def main(args):
         log.info('worker', 'Started daemon')
 
         # from now on I should keep running until killed, whatever happens
-        log.debug('worker', 'writing pid file')
-        common.writePidFile('worker', options.name)
+        path = common.writePidFile('worker', options.name)
+        log.debug('worker', 'written pid file %s' % path)
 
     # register all package paths (FIXME: this should go away when
     # components come from manager)
