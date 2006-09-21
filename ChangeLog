@@ -1,5 +1,17 @@
 2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/admin.py:
+	* flumotion/twisted/pb.py:
+	  a pb.Error is a serializable exception; as a reply to a remote
+	  method, it is similar to a Failure and should be logged.
+
+2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/feed.py:
+	  remove debug lines that are now done for us on a lower level
+
+2006-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/feedcomponent010.py:
 	  Show a warning if someone requests a feed from us that we
 	  don't have.  Ideally one should not get here - this should
