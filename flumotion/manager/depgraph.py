@@ -19,10 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import dag, log, registry
+from flumotion.common import dag, log, registry, errors, common
 from flumotion.common.planet import moods
-
-import string
 
 class Feeder:
     """
@@ -180,64 +178,63 @@ class DepGraph(log.Loggable):
         else:
             raise KeyError("Worker %s or Component %r not in dependency graph" %
                 (worker, component))
-    
 
     def mapEatersToFeeders(self):
         """
-        I am called once whole flow has been added so I can add edges to the
-        dag between eaters and feeders.
-        """
-        compsetups = self._dag.getAllNodesByType("COMPONENTSETUP")
-        #eaters = self._dag.getAllNodesByType(self.EATER)
-        
-        for eatercomp in compsetups:
-            # for this component setup, go through all the feeders in it
-            dict = eatercomp.get('config')
+        I am called once a piece of configuration has been added,
+        so I can add edges to the DAG for each feed from the
+        feeding component to the eating component.
 
-            if not dict.has_key('source'):
-            # no eaters
-                self.debug("Component %r has no eaters" % eatercomp)
-            else:
-                # source entries are componentName[:feedName]
-                # with feedName defaulting to default
+        @raises L{errors.ComponentConfigError}: if a component is
+                                                misconfigured and eats from
+                                                a non-existant component
+        """
+        toSetup = self._dag.getAllNodesByType("COMPONENTSETUP")
         
-                list = dict['source']
+        for eatingComponent in toSetup:
+            # for this component setup, go through all the feeders in it
+            config = eatingComponent.get('config')
+
+            if not config.has_key('source'):
+                # no eaters
+                self.debug("Component %r has no eaters" % eatingComponent)
+            else:
+                # source is a list of componentName[:feedName]
+                # with feedName defaulting to default
+                # FIXME: maybe source should really be eaters and contain
+                # a list of feedId
+                list = config['source']
 
                 # FIXME: there's a bug in config parsing - sometimes this gives
                 # us one string, and sometimes a list of one string, and
                 # sometimes a list
                 if isinstance(list, str):
                     list = [list, ]
-                for eater in list:
-                    feederfound = False
-                    name = string.split(eater,':')
-                    # name[0] is the name of the feeder component
+
+                for source in list:
+                    feederFound = False
+                    feederComponentName = source.split(':')[0]
                     # find the feeder
-                    for feedercomp in compsetups:
-                        #name = "%s:default" % eater
-                        #self.debug("eater %s being added with name %s" % (eater,name))
-                        #eat = Eater(name, component)
-                        #self._addNode(eat, self.EATER)
-                        #self._addEdge(eat, component, self.EATER, 
-                        #    self.COMPONENTREADY)
-                        if feedercomp.get("name") == name[0]:
+                    for feedingComponent in toSetup:
+                        if feedingComponent.get("name") == feederComponentName:
+                            feederFound = True
                             try:
-                                self._addEdge(feedercomp, eatercomp, 
+                                self._addEdge(feedingComponent, eatingComponent,
                                     "COMPONENTSETUP", "COMPONENTSETUP")
                             except KeyError:
-                                # this happens when edge is already there, 
-                                # possible to have 2 feeders on one component
-                                # go to 2 eaters on another component
+                                # it is possible for a component to have
+                                # two eaters, each eating from feeders on
+                                # one other component
                                 pass
-                            feederfound = True
                             try:
-                                self._addEdge(feedercomp, eatercomp,
+                                self._addEdge(feedingComponent, eatingComponent,
                                     "COMPONENTSTART", "COMPONENTSTART")
                             except KeyError:
                                 pass
-                    if not feederfound:
-                        raise KeyError("Eater %s has no mapped feeder" % 
-                            eater)
+
+                    if not feederFound:
+                        raise errors.ComponentConfigError(eatingComponent,
+                            "No feeder exists for eater %s" % source)
 
     def whatShouldBeStarted(self):
         """
