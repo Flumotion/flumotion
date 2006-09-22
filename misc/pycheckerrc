@@ -166,7 +166,13 @@ usesExec = 0
 ignoreStandardLibrary = 1
 
 # ignore warnings from the list of modules
-blacklist = ['gtk', 'twisted', 'twisted.python', 'pyexpat']
+blacklist = [
+    'gtk', 'twisted', 'twisted.python', 'pyexpat',
+    'zope.interface', 'zope.interface.declarations',
+    '_interface_coptimizations',
+#warning: couldn't find real module for class xml.parsers.expat.ExpatError (module name: xml.parsers.expat)
+    'xml.parsers.expat',
+]
 
 # ignore global variables not used if name is one of these values
 variablesToIgnore = ['__version__', '__warningregistry__', '__all__', '__credits__', '__test__', '__author__', '__email__', '__revision__']
