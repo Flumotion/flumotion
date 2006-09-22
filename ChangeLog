@@ -1,5 +1,10 @@
 2006-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/worker/checks/video010.py:
+	  remove unused import
+
+2006-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/configuration:
 	  update notes
 	* flumotion/common/config.py:

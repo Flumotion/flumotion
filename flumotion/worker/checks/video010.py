@@ -26,7 +26,7 @@ import gst
 import gst.interfaces
 from twisted.internet.threads import deferToThread
 
-from twisted.internet import defer, reactor
+from twisted.internet import defer
 from flumotion.common import gstreamer, errors, log, messages
 from flumotion.twisted import defer as fdefer
 
