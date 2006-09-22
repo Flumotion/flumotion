@@ -12,5 +12,8 @@ component_PYTHON = \
 	main.py \
 	wizard.py
 
+all-local:
+	if test -e videotest.pyc; then rm videotest.pyc; fi
+
 clean-local:
 	rm -rf *.pyc *.pyo
