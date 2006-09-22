@@ -21,7 +21,7 @@
              size="7195007" md5sum="70ada9f65742ab2c77a96bcd6dffd9b1" />
   </tarball>
 
-  <cvsmodule id="glib" cvsroot="gnome.org" revision="glib-2-6">
+  <cvsmodule id="glib" cvsroot="gnome.org" revision="glib-2-10">
 <!--
     <dependencies>
       <dep package="gtk-doc" />
@@ -35,7 +35,7 @@
     </dependencies>
   </cvsmodule>
 
-  <cvsmodule id="gtk+" cvsroot="gnome.org" revision="gtk-2-6">
+  <cvsmodule id="gtk+" cvsroot="gnome.org" revision="gtk-2-8">
     <dependencies>
       <dep package="glib" />
       <dep package="pango" />
@@ -48,28 +48,37 @@
 
   <cvsmodule id="gstreamer" cvsroot="gstreamer.freedesktop.org"
              autogenargs="--disable-plugin-builddir --disable-tests --disable-docs-build"
-             revision="RELEASE-0_8_10">
+             revision="RELEASE-0_10_10">
   </cvsmodule>
 
-  <cvsmodule id="gst-plugins" cvsroot="gstreamer.freedesktop.org"
+  <cvsmodule id="gst-plugins-base" cvsroot="gstreamer.freedesktop.org"
              autogenargs="--disable-tests --disable-docs-build"
-             revision="RELEASE-0_8_10">
+             revision="RELEASE-0_10_10">
     <dependencies>
       <dep package="gstreamer" />
     </dependencies>
   </cvsmodule>
 
-  <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_6_2">
+  <cvsmodule id="gst-plugins-good" cvsroot="gstreamer.freedesktop.org"
+             autogenargs="--disable-tests --disable-docs-build"
+             revision="RELEASE-0_10_3">
+    <dependencies>
+      <dep package="gst-plugins-base" />
+    </dependencies>
+  </cvsmodule>
+
+
+  <cvsmodule id="pygtk" cvsroot="gnome.org" revision="PYGTK_2_8_4">
     <dependencies>
       <dep package="gtk+" />
     </dependencies>
   </cvsmodule>
  
   <cvsmodule id="gst-python" cvsroot="gstreamer.freedesktop.org"
-             revision="RELEASE-0_8_1">
+             revision="RELEASE-0_10_4">
     <dependencies>
       <dep package="gstreamer" />
-      <dep package="gst-plugins" />
+      <dep package="gst-plugins-base" />
       <dep package="pygtk" />
     </dependencies>
   </cvsmodule>
@@ -78,6 +87,7 @@
    module="flumotion/trunk" checkoutdir="flumotion">
     <dependencies>
       <dep package="gst-python" />
+      <dep package="gst-plugins-good" />
     </dependencies>
   </svnmodule>
 

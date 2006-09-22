@@ -217,4 +217,7 @@ suppressions = {
   # FIXME: the import there is for registering steps; do an actual method
   'flumotion.wizard.wizard.Wizard': "no-import",
 #  'flumotion.twisted.defer.defer_generator': "self=wrapperself",
+# deferToThread imports reactor, which e.g. flumotion.worker.checks.video010
+# does as well
+  'twisted.internet.threads.deferToThread' : "no-shadow",
 }
