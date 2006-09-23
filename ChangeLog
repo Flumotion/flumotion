@@ -1,5 +1,10 @@
 2006-09-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/connections.py:
+	  another real bug caught by pychecker
+
+2006-09-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/job/main.py:
 	* flumotion/launch/inspect.py:
 	* flumotion/manager/worker.py:

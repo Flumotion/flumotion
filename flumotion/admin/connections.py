@@ -67,21 +67,21 @@ def get_recent_connections():
         print 'Error: %s: %s' % (e.strerror, e.filename)
         return []
 
-def parsePBConnectionInfo(string, use_ssl=True,
+def parsePBConnectionInfo(managerString, use_ssl=True,
                           defaultPort=configure.defaultSSLManagerPort):
     """The same as L{flumotion.common.connection.parsePBConnectionInfo},
     but fills in missing information from the recent connections cache 
     if possible.
     """
     recent = get_recent_connections()
-    if not string:
+    if not managerString:
         if recent:
             return recent[0]['info']
         else:
             raise errors.OptionError('No string given and no recent '
                                      'connections to use')
 
-    info = connection.parsePBConnectionInfo(string, username=None,
+    info = connection.parsePBConnectionInfo(managerString, username=None,
                                             password=None,
                                             port=defaultPort,
                                             use_ssl=use_ssl)
@@ -115,6 +115,6 @@ def parsePBConnectionInfo(string, use_ssl=True,
         raise errors.OptionError('You are connecting to %s for the '
                                  'first time; please specify a user and '
                                  'password (e.g. user:test@%s).'
-                                 % (manager_string, manager_string))
+                                 % (managerString, managerString))
     else:
         return info
