@@ -50,10 +50,7 @@ class BaseAdminGtk(log.Loggable):
     implements(flavors.IStateListener)
 
     logCategory = "admingtk"
-    gettext_domain = 'flumotion'
     
-    state = admin = nodes = 'hello pychecker'
-
     def __init__(self, state, admin):
         """
         @param state: state of component this is a UI for

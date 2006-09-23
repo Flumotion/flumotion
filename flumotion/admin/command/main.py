@@ -20,7 +20,6 @@
 # Headers in this file shall remain intact.
 
 import optparse
-import os
 import sys
 import re
 

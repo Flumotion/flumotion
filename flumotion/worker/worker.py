@@ -243,7 +243,7 @@ class WorkerMedium(medium.PingingMedium):
         list = []
         for name in elementNames:
             try:
-                e = gst.element_factory_make(name)
+                gst.element_factory_make(name)
                 list.append(name)
             except gst.PluginNotFoundError:
                 pass

@@ -23,9 +23,7 @@
 model abstraction for administration clients supporting different views
 """
 
-import os
 import sys
-import md5
 
 import gobject
 

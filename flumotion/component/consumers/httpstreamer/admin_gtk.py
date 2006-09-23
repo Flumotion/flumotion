@@ -38,7 +38,7 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         self._stats = None
         self._hasgnomevfs = False
         try:
-            import gnomevfs
+            __import__('gnomevfs')
             self._hasgnomevfs = True
         except:
             pass

@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import os
-
 from flumotion.common import errors, log
 from flumotion.twisted import flavors
 from flumotion.twisted.compat import implements

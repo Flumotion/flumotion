@@ -151,7 +151,9 @@ emptySlots = 1
 intDivide = 1
 
 # check if local variable shadows a global
-shadows = 1
+# disabled because it doesn't give useful output:
+# test_input/test24.py:11: Local variable (shadow) shadows global defined on line 0 in file <unknown>
+shadows = 0
 
 # check if a variable shadows a builtin
 shadowBuiltins = 0

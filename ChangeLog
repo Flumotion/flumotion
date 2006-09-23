@@ -1,3 +1,21 @@
+2006-09-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/job/main.py:
+	* flumotion/launch/inspect.py:
+	* flumotion/manager/worker.py:
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/worker/worker.py:
+	* flumotion/component/base/admin_gtk.py:
+	* flumotion/admin/command/main.py:
+	* flumotion/admin/text/admin_text.py:
+	* flumotion/admin/text/main.py:
+	* flumotion/component/base/admin_text.py:
+	* flumotion/admin/admin.py:
+	  various pychecker-assisted cleanups
+	* misc/pycheckerrc:
+	  disable shadows, since the output it gives does not help you fix
+	  the problem
+
 2006-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/worker/checks/video010.py:

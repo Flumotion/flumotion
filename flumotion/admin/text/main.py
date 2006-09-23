@@ -20,13 +20,9 @@
 # Headers in this file shall remain intact.
 
 import optparse
-import sys
-import gobject
-import os
 
 from twisted.internet import reactor
 from twisted.python import rebuild
-
 
 from flumotion.common import log, errors, worker, planet, common
 
@@ -41,9 +37,7 @@ from flumotion.twisted import flavors, reflect
 from flumotion.admin.text import connection
 from flumotion.admin.text.greeter import AdminTextGreeter
 
-import string
 import curses
-
 
 def cleanup_curses(stdscr):
     curses.nocbreak()

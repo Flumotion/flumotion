@@ -61,7 +61,6 @@ def main(args):
         log.setFluDebug(options.debug)
 
     r = registry.getRegistry()
-    bb = r.makeBundlerBasket()
 
     if len(args) == 1:
         # print all components

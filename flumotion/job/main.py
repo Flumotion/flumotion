@@ -19,10 +19,8 @@
 
 # Headers in this file shall remain intact.
 
-import errno
 import optparse
 import os
-import signal
 import sys
 import time
 
@@ -62,7 +60,7 @@ def main(args):
     log.info('job', 'Connecting to worker on socket %s' % (socket))
 
     job_factory = job.JobClientFactory(avatarId)
-    c = reactor.connectWith(fdserver.FDConnector, socket, job_factory,
+    reactor.connectWith(fdserver.FDConnector, socket, job_factory,
         10, checkPID=False)
     log.info('job', 'Started job on pid %d' % os.getpid())
 

@@ -23,9 +23,6 @@
 manager-side objects to handle worker clients
 """
 
-import socket
-
-from twisted.spread import pb
 from twisted.internet import defer
 
 # FIXME: rename to base
@@ -199,7 +196,6 @@ class WorkerHeaven(base.ManagerHeaven):
         @type  workerAvatar: L{WorkerAvatar}
         """
         workerName = workerAvatar.getName()
-        names = self.state.get('names')
         try:
             self.state.remove('names', workerName)
             for state in list(self.state.get('workers')):
