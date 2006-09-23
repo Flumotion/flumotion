@@ -101,14 +101,6 @@ class ComponentWrapper(object):
         return self.component.setup(self.config)
 
     def provideMasterClock(self, port):
-        def replaceIP(ret):
-            # grrrrr! for some reason getting the ip requires being
-            # connected? I suppose it *is* always my ip relative to ip X
-            # though...
-            if not ret[0]:
-                ret = ("127.0.0.1", ret[1], ret[2])
-            return ret
-            
         d = self.component.provide_master_clock(port)
         return d
 
