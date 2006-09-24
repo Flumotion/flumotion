@@ -31,7 +31,7 @@ from flumotion.common import log, keycards, common, errors
 from flumotion.worker import worker, config
 from flumotion.twisted import pb
 
-def main(args):
+def _createParser():
     parser = optparse.OptionParser()
     parser.add_option('-d', '--debug',
                       action="store", type="string", dest="debug",
@@ -47,13 +47,12 @@ def main(args):
     group.add_option('-H', '--host',
                      action="store", type="string", dest="host",
                      help="manager host to connect to [default localhost]")
-    defaultSSLPort = configure.defaultSSLManagerPort
-    defaultTCPPort = configure.defaultTCPManagerPort
     group.add_option('-P', '--port',
                      action="store", type="int", dest="port",
                      help="manager port to connect to " \
                         "[default %d (ssl) or %d (tcp)]" % (
-                        defaultSSLPort, defaultTCPPort))
+                        configure.defaultSSLManagerPort,
+                        configure.defaultTCPManagerPort))
     group.add_option('-T', '--transport',
                      action="store", type="string", dest="transport",
                      help="transport protocol to use (tcp/ssl) [default ssl]")
@@ -85,7 +84,11 @@ def main(args):
                      help="range of feeder ports to use")
 
     parser.add_option_group(group)
+
+    return parser
     
+def main(args):
+    parser = _createParser()
     log.debug('worker', 'Parsing arguments (%r)' % ', '.join(args))
     options, args = parser.parse_args(args)
 
@@ -166,9 +169,9 @@ def main(args):
         options.transport = 'ssl'
     if not options.port:
         if options.transport == "tcp":
-            options.port = defaultTCPPort
+            options.port = configure.defaultTCPManagerPort
         elif options.transport == "ssl":
-            options.port = defaultSSLPort
+            options.port = configure.defaultSSLManagerPort
 
     # set a default name if none is given
     if not options.name:
