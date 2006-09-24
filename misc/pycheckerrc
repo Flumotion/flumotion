@@ -171,6 +171,7 @@ ignoreStandardLibrary = 1
 blacklist = [
     'gtk', 'twisted', 'twisted.python', 'pyexpat',
     'zope.interface', 'zope.interface.declarations',
+    'zope.interface.interface',
     '_interface_coptimizations',
 #warning: couldn't find real module for class xml.parsers.expat.ExpatError (module name: xml.parsers.expat)
     'xml.parsers.expat',
