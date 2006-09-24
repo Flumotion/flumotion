@@ -82,7 +82,7 @@ class FeedAvatar(fpb.Avatar):
 
     My mind is a reference to a L{FeedMedium}
     """
-    logCategory = "feed-avatar"
+    logCategory = "feedavatar"
     remoteLogName = "feedmedium"
 
     def __init__(self, feedServerParent):
@@ -106,22 +106,13 @@ class FeedAvatar(fpb.Avatar):
         """
         Called when the PB client wants us to send them the given feed.
         """
-        self.debug('remote --> FEEDSERVER: perspective_sendFeed(%s)' %
-            fullFeedId)
         # the PB message needs to be sent from the side that has the feeder
         # for proper switching, so we call back as a reply
-        self.debug('FEEDSERVER --> remote: callRemote(sendFeedReply, %s)' %
-            fullFeedId)
         d = self._mind.callRemote('sendFeedReply', fullFeedId)
         d.addCallback(self._sendFeedReplyCb, fullFeedId)
-        self.debug('remote <-- FEEDSERVER: perspective_sendFeed(%s): None' %
-            fullFeedId)
 
     def _sendFeedReplyCb(self, result, fullFeedId):
         # compare with startStreaming in prototype
-        self.debug(
-            'FEEDSERVER <-- remote: callRemote(sendFeedReply, %s): %r' % (
-                fullFeedId, result))
         # Remove this from the reactor; we mustn't read or write from it from
         # here on
         t = self._mind.broker.transport
@@ -147,8 +138,6 @@ class FeedAvatar(fpb.Avatar):
         Called when the PB client wants to send the given feedId to the
         given component
         """
-        self.debug('remote --> FEEDSERVER: perspective_receiveFeed(%s, %s)' % (
-            componentId, feedId))
         # we need to make sure our result goes back, so only stop reading
         t = self._mind.broker.transport
         t.stopReading()
