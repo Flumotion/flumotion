@@ -476,7 +476,17 @@ class Vishnu(log.Loggable):
         for componentState in added:
             self._updateFlowDependencies(componentState)
 
-        self._depgraph.mapEatersToFeeders()
+        try:
+            self._depgraph.mapEatersToFeeders()
+        except errors.ComponentConfigError, e:
+            state = e.args[0]
+            debug = e.args[1]
+            message = messages.Error(T_(
+                N_("The component is misconfigured.")),
+                    debug=debug)
+            state.append('messages', message)
+            state.set('mood', moods.sad.value)
+            raise e
 
         return added
 
@@ -639,6 +649,7 @@ class Vishnu(log.Loggable):
         """
         Set the given message on the given component's state.
         Can be called e.g. by a worker to report on a crashed component.
+        Sets the mood to sad if it is an error message.
         """
         if not avatarId in self._componentMappers:
             self.warning('asked to set a message on non-mapped component %s' %

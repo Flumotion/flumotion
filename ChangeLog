@@ -1,5 +1,15 @@
 2006-09-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	  add a ComponentConfigError ...
+	* flumotion/manager/manager.py:
+	  ... and catch, showing a nice error message
+	* flumotion/manager/component.py:
+	  also show a nice error message when we're asked for a feederAvatar
+	  that we don't have
+
+2006-09-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/feed.py:
 	  remove debug lines we don't need anymore
 

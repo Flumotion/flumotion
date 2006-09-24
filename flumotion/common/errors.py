@@ -129,6 +129,14 @@ class BusyComponentError(ComponentError):
     args[1]: str
     """
 
+class ComponentConfigError(ComponentError):
+    """
+    An error in the configuration of the component.
+
+    args[0]: ComponentState
+    args[1]: str
+    """
+
 class ComponentCreateError(ComponentError):
     """
     An error during creation of a component.  Can be raised during a

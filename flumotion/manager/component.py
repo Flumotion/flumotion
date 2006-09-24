@@ -759,6 +759,15 @@ class ComponentHeaven(base.ManagerHeaven):
                     fullFeedId)
                 avatarId = common.componentId(flowName, componentName)
                 feederAvatar = self.getAvatar(avatarId)
+                if not feederAvatar:
+                    m = messages.Error(T_(
+                        N_("Configuration problem.")),
+                        debug="No component '%s'." % avatarId,
+                        id="component-start-%s" % fullFeedId)
+                    # FIXME: make addMessage and setMood public
+                    componentAvatar._addMessage(m)
+                    componentAvatar._setMood(moods.sad)
+ 
                 # FIXME: get from network map instead
                 host = feederAvatar.getClientAddress()
                 port = feederAvatar.getFeedServerPort()
