@@ -24,7 +24,8 @@ model abstraction for administration clients supporting different views
 """
 
 import sys
-
+import os
+import md5
 import gobject
 
 from twisted.spread import pb
