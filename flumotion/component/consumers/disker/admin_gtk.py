@@ -48,6 +48,7 @@ class FilenameNode(BaseAdminGtkNode):
         return None
 
     def setUIState(self, state):
+        super(FilenameNode, self).setUIState(state)
         self.stateSet(state, 'filename', state.get('filename'))
 
     def stateSet(self, state, key, value):
@@ -58,11 +59,13 @@ class DiskerAdminGtk(BaseAdminGtk):
     def setup(self):
         filename = FilenameNode(self.state, self.admin)
         self._nodes = {'Filename' : filename}
+        return BaseAdminGtk.setup(self)
 
     def getNodes(self):
         return self._nodes
 
-    def component_filenameChanged(self, filename):
-        self._nodes['Filename'].filenameChanged(filename)
+    def setUIState(self, state):
+        super(DiskerAdminGtk, self).setUIState(state)
+        self._nodes['Filename'].setUIState(state)
 
 GUIClass = DiskerAdminGtk

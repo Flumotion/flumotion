@@ -1,3 +1,9 @@
+2006-09-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	Actually update filename when uiState changes rather
+	than just at time of getting ui state.
+
 2006-09-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* Makefile.am:
