@@ -24,7 +24,7 @@ import common
 from twisted.trial import unittest
 
 from flumotion.manager.depgraph import DepGraph
-from flumotion.common import planet, log
+from flumotion.common import planet, log, errors
 
 class testDepGraph(unittest.TestCase):
     def _createComponent(self, defs):
@@ -153,7 +153,7 @@ class testDepGraph(unittest.TestCase):
         dg.addComponent(videotest)
         dg.addComponent(muxer)
         # lets be naughty and try to mapEatersToFeeders before whole flow is in
-        self.assertRaises(KeyError, dg.mapEatersToFeeders)
+        self.assertRaises(errors.ComponentConfigError, dg.mapEatersToFeeders)
 
     def testCleaningDepgraph(self):
         dg = DepGraph()
