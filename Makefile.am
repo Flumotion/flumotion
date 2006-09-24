@@ -5,6 +5,7 @@ ACLOCAL_AMFLAGS = -I m4 -I common
 
 include $(srcdir)/common/common.mk
 include $(srcdir)/common/pychecker.mk
+include $(srcdir)/common/rpm.mk
 
 SUBDIRS = . bin conf data flumotion doc common pkgconfig tests po
 
@@ -24,8 +25,10 @@ clean-local: locale-uninstalled-clean
 # same for any gtk stuff - keep it low
 
 PYCHECKER_WHITELIST = \
+	    flumotion/admin/text/*.py		\
 	    flumotion/component/*.py 		\
 	    flumotion/admin/*.py		\
+	    flumotion/admin/command/*.py	\
 	    flumotion/common/*.py		\
 	    flumotion/configure/*.py		\
 	    flumotion/job/*.py 			\
@@ -38,10 +41,9 @@ PYCHECKER_WHITELIST = \
 	    flumotion/ui/*.py			\
 	    flumotion/component/*/*.py		\
 	    flumotion/component/*/*/*.py	\
+	    flumotion/porter/*.py		\
 	    flumotion/wizard/*.py	 	\
-	    flumotion/admin/*/*.py		\
-	    flumotion/admin/*/*/*.py		\
-	    flumotion/porter/*.py
+	    flumotion/admin/gtk.py
 
 PYCHECKER_BLACKLIST = \
             flumotion/common/gstreamer.py	\

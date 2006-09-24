@@ -10,6 +10,7 @@ EXTRA_DIST = \
 	locale.mk 		\
 	python.mk 		\
 	pychecker.mk		\
+	rpm.mk			\
 	setup.m4		\
 	trial.mk		\
 	twisted-module.m4	\

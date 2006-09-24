@@ -1,5 +1,12 @@
 2006-09-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	* common/Makefile.am:
+	* common/rpm.mk:
+	  add an "rpm" target that builds rpms
+
+2006-09-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/main.py:
 	  break out a _createParser() function
 
