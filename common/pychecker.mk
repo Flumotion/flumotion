@@ -16,7 +16,7 @@ endif
 pychecker_setup = `ls $(top_srcdir)/misc/setup.py 2> /dev/null`
 pychecker_help = `ls $(top_srcdir)/misc/pycheckerhelp.py 2> /dev/null`
 pychecker =					\
-	pychecker -Q -F misc/pycheckerrc	\
+	pychecker -F misc/pycheckerrc		\
 	$(pychecker_setup)			\
 	$(pychecker_help)
 
