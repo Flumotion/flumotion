@@ -97,6 +97,12 @@ list, and the subsequent imports it does breaks in the import code:
     if '.' in pname:
 TypeError: iterable argument required
 
+FIXME: This seems to have been a bug with gst-python
+(http://bugzilla.gnome.org/show_bug.cgi?id=357310) uninstalled and pygtk, and
+I'm not sure this still applies to the case mentioned above now.
+I could only reproduce it without the bug fixed, and with also "import gtk"
+at the top
+
 TODO
 ----
 - it would be very nice if any flumotion module can be run against any
