@@ -25,8 +25,6 @@ Base classes for component UI's using GTK+
 
 import os
 
-import gettext
-
 import gtk
 import gtk.glade
 
