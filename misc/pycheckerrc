@@ -5,6 +5,12 @@
 # If $HOME is not set, it will look in the current directory.
 #
 
+# list of evil C extensions that crash the interpreter
+evil = []
+
+# ignore import errors
+ignoreImportErrors = 0
+
 # unused imports
 importUsed = 1
 
@@ -229,4 +235,6 @@ suppressions = {
 # deferToThread imports reactor, which e.g. flumotion.worker.checks.video010
 # does as well
   'twisted.internet.threads.deferToThread' : "no-shadow",
+  # FIXME: doing this inline doesn't seem to work
+  'flumotion.component.producers.looper.admin_gtk.py': 'no-classattr',
 }
