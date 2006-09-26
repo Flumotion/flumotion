@@ -13,10 +13,13 @@ endif
 # and
 # PYCHECKER_BLACKLIST
 
+# can be overrridden by user
+PYCHECKER = pychecker
+
 pychecker_setup = `ls $(top_srcdir)/misc/setup.py 2> /dev/null`
 pychecker_help = `ls $(top_srcdir)/misc/pycheckerhelp.py 2> /dev/null`
 pychecker =					\
-	pychecker -F misc/pycheckerrc		\
+	$(PYCHECKER) -F misc/pycheckerrc	\
 	$(pychecker_setup)			\
 	$(pychecker_help)
 
