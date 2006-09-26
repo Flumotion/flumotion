@@ -66,7 +66,7 @@ def _initialLoadConfig(vishnu, paths):
             # a re-raise here would be caught by twisted and only shows at
             # debug level 4 because that's where we hooked up twisted logging
             # so print a traceback before stopping the program
-            traceback.print_tb(sys.exc_traceback)
+            traceback.print_tb(sys.exc_info()[2])
             _error("failed to load planet configuration '%s':" % path,
                 "%s: %s" % (e.__class__, str(e)))
 

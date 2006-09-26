@@ -1,5 +1,11 @@
 2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/main.py:
+	  Replace something that has been deprecated since Python 1.5 (!)
+	  Thank you pychecker.
+
+2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/worker.py:
 	  use ones and zeroes
 
