@@ -21,8 +21,6 @@
 Abstractions for dealing with PB connections.
 """
 
-
-import sys
 import re
 
 from twisted.spread import pb

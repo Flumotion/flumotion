@@ -21,8 +21,6 @@
 
 import optparse
 import os
-import sys
-import time
 
 from twisted.internet import reactor
 

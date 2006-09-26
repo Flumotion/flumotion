@@ -24,8 +24,6 @@ model abstraction for administration clients supporting different views
 """
 
 import sys
-import os
-import md5
 import gobject
 
 from twisted.spread import pb
@@ -286,6 +284,8 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
                          '<passwd>%s</passwd>' % self.authenticator.password,
                          '</connection>'])
             
+            import os
+            import md5
             sum = md5.new(s).hexdigest()
             f = os.path.join(configure.registrydir, '%s.connection' % sum)
             h = open(f, 'w')

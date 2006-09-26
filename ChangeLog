@@ -1,3 +1,14 @@
+2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	  move imports inside defgen
+	* flumotion/common/connection.py:
+	* flumotion/job/main.py:
+	  remove imports
+	* flumotion/component/muxers/checks.py:
+	  respect coding style - no idea how Zaheer got the periods in
+	  the other branch :)
+
 2006-09-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
