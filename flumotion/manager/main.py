@@ -249,9 +249,10 @@ def main(args):
                 configure.configdir)
         elif options.transport == "tcp":
             myServer.startTCP(options.host, options.port)
-    except error.CannotListenError, (interface, port, e):
+    except error.CannotListenError, e:
         # e is a socket.error()
-        message = "Could not listen on port %d: %s" % (port, e.args[1])
+        message = "Could not listen on port %d: %s" % (
+            e.port, e.socketError.args[1])
         raise errors.SystemError, message
 
     log.info('manager', 'Starting manager "%s"' % options.name)

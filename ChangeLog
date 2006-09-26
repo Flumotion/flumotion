@@ -1777,6 +1777,11 @@
 
 2006-07-19  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/main.py:
+	  use CannotListenError correctly
+
+2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/worker.py:
 	* flumotion/worker/main.py:
 	* flumotion/worker/worker.py:
