@@ -1,5 +1,10 @@
 2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/worker.py:
+	  use ones and zeroes
+
+2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	  move imports inside defgen
 	* flumotion/common/connection.py:

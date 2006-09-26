@@ -121,17 +121,17 @@ class PortSet(log.Loggable):
     def __init__(self, logName, ports):
         self.logName = logName
         self.ports = ports
-        self.used = [False] * len(ports)
+        self.used = [0] * len(ports)
 
     def reservePorts(self, numPorts):
         ret = []
         while numPorts > 0:
-            if not False in self.used:
+            if not 0 in self.used:
                 raise errors.ComponentStartError(
                     'could not allocate port on worker %s' % self.logName)
-            i = self.used.index(False)
+            i = self.used.index(0)
             ret.append(self.ports[i])
-            self.used[i] = True
+            self.used[i] = 1
             numPorts -= 1
         return ret
 
@@ -145,7 +145,7 @@ class PortSet(log.Loggable):
                 if self.used[i]:
                     self.warning('port %d already in use!', port)
                 else:
-                    self.used[i] = True
+                    self.used[i] = 1
         
     def releasePorts(self, ports):
         """
@@ -156,7 +156,7 @@ class PortSet(log.Loggable):
             try:
                 i = self.ports.index(p)
                 if self.used[i]:
-                    self.used[i] = False
+                    self.used[i] = 0
                 else:
                     self.warning('releasing unallocated port: %d' % p)
             except ValueError:
