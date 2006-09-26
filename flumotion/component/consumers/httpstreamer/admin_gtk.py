@@ -153,9 +153,11 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         if event.button == 1:
             url = widget.get_children()[0].get_text()
             import gnomevfs
-            app_to_run = gnomevfs.mime_get_default_application(self._stats.get('stream-mime'))
-            if app_to_run:
-                os.system("%s %s &" % (app_to_run[2],url))
+            if self._stats:
+                app_to_run = gnomevfs.mime_get_default_application(
+                    self._stats.get('stream-mime'))
+                if app_to_run:
+                    os.system("%s %s &" % (app_to_run[2],url))
         elif event.button == 3:
             self._streamurl_popupmenu.popup(None, None, None, event.button, event.time)
         
@@ -164,9 +166,11 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
     def _streamurl_openlink(self, widget, eventbox):
         url = eventbox.get_children()[0].get_text()
         import gnomevfs
-        app_to_run = gnomevfs.mime_get_default_application(self._stats.get('stream-mime'))
-        if app_to_run:
-            os.system("%s %s &" % (app_to_run[2],url))
+        if self._stats:
+            app_to_run = gnomevfs.mime_get_default_application(
+                self._stats.get('stream-mime'))
+            if app_to_run:
+                os.system("%s %s &" % (app_to_run[2],url))
 
     # signal handler for copy link menu item activation
     # eventbox is the eventbox that contains the label the url is in

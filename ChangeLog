@@ -1,5 +1,10 @@
 2006-09-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	Check we have _stats before using it.
+
+2006-09-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* configure.ac:
 	Bump twisted requirement to 2.0.1.
 
