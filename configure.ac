@@ -165,7 +165,7 @@ AS_PYTHON_IMPORT(twisted,
   prog="
 import sys
 import twisted.copyright
-minver = '1.3.0'
+minver = '2.0.1'
 if twisted.copyright.version < minver:
     sys.exit(1)
 sys.exit(0)
@@ -175,11 +175,11 @@ sys.exit(0)
     AC_MSG_RESULT(found)
   else
     AC_MSG_RESULT(too old)
-    AC_MSG_ERROR([You need at least version 1.3.0 of Twisted])
+    AC_MSG_ERROR([You need at least version 2.0.1 of Twisted])
   fi
   ]
   ,
-  AC_MSG_ERROR([You need at least version 1.3.0 of Twisted])
+  AC_MSG_ERROR([You need at least version 2.0.1 of Twisted])
 )
 
 TWISTED_MODULE([twisted.names])
