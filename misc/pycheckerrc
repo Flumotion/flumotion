@@ -82,7 +82,10 @@ stringIteration = 1
 callingAttribute = 0
 
 # class attribute does not exist
-classAttrExists = 1
+# FIXME: need to fix bug in pychecker so we can disable this per admin_gtk
+# class
+# classAttrExists = 1
+classAttrExists = 0
 
 # First argument to methods
 methodArgName = 'self'
