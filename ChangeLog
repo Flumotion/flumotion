@@ -1,5 +1,15 @@
 2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/config.py:
+	  use list length 0 as False to check multiple and required
+
+2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/main.py:
+	  use CannotListenError correctly
+
+2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/manager/main.py:
 	  Replace something that has been deprecated since Python 1.5 (!)
 	  Thank you pychecker.
@@ -1776,11 +1786,6 @@
 	to srcdir can be gotten.
 
 2006-07-19  Thomas Vander Stichele  <thomas at apestaart dot org>
-
-	* flumotion/manager/main.py:
-	  use CannotListenError correctly
-
-2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/worker.py:
 	* flumotion/worker/main.py:

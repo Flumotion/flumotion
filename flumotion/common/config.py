@@ -616,8 +616,8 @@ class FlumotionConfigXML(BaseConfigParser):
         # at this point we don't support assigning certain sources to
         # certain eaters -- a problem to fix later. for now take the
         # union of the properties.
-        required = True in [x.getRequired() for x in eaters.values()]
-        multiple = True in [x.getMultiple() for x in eaters.values()]
+        required = True in [x for x in eaters.values() if x.getRequired()]
+        multiple = True in [x for x in eaters.values() if x.getMultiple()]
 
         if len(strings) == 0 and required:
             raise ConfigError("Component %s wants to eat on %s, but no "
