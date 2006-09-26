@@ -52,9 +52,13 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         label.show()
 
     def setStats(self, stats):
+        # Set _stats regardless of if condition
+        # Used to be a race where _stats was
+        # not set if widget tree was gotten before
+        # ui state
+        self._stats = stats
         if not hasattr(self, 'statistics'):
             # widget tree not created yet
-            self._stats = stats
             return
 
         self.updateLabels(stats)
