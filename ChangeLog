@@ -1,3 +1,14 @@
+2006-09-27  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/common/medium.py:
+	Refactor runBundledFunction to not be a defer generator.
+	Essential for debugging issues.
+	* flumotion/wizard/steps.py:
+	Refactor runChecks to not be a defer generator.
+	Essential for debugging issues.
+	* flumotion/worker/checks/check.py:
+	Fix log line to actually send the log category.
+
 2006-09-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/config.py:

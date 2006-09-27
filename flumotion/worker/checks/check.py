@@ -63,7 +63,7 @@ def handleGStreamerDeviceError(failure, device):
     elif failure.check(errors.GStreamerError):
             m = messages.Error(T_(N_("Internal GStreamer error.")),
                 debug=debugFailure(failure))
-    log.debug('handleGStreamerError: returning %r' % m)
+    log.debug('check', 'handleGStreamerError: returning %r' % m)
     return m
 
 def debugFailure(failure):
