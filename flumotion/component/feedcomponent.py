@@ -198,6 +198,10 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         return self.comp.provide_master_clock(port)
 
     def remote_effect(self, effectName, methodName, *args, **kwargs):
+        """
+        Invoke the given methodName on the given effectName in this component.
+        The effect should implement effect_(methodName) to receive the call.
+        """
         self.debug("calling %s on effect %s" % (methodName, effectName))
         if not effectName in self.comp.effects:
             raise errors.UnknownEffectError(effectName)

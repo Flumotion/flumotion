@@ -238,9 +238,11 @@ class AdminAvatar(base.ManagerAvatar):
         try:
             return avatar.mindCallRemote(methodName, *args, **kwargs)
         except Exception, e:
-            msg = "exception on remote call %s: %s" % (methodName, str(e))
+            msg = "exception on remote call %s: %s" % (methodName,
+                log.getExceptionMessage(e))
             self.warning(msg)
-            raise errors.RemoteMethodError(str(e))
+            raise errors.RemoteMethodError(methodName, 
+                log.getExceptionMessage(e))
 
     def perspective_workerCallRemote(self, workerName, methodName,
                                      *args, **kwargs):
@@ -266,8 +268,10 @@ class AdminAvatar(base.ManagerAvatar):
         try:
             return workerAvatar.mindCallRemote(methodName, *args, **kwargs)
         except Exception, e:
-            self.warning("exception on remote call: %s" % str(e))
-            return failure.Failure(errors.RemoteMethodError(str(e)))
+            self.warning("exception on remote call: %s" %
+                log.getExceptionMessage(e))
+            return failure.Failure(errors.RemoteMethodError(methodName,
+                log.getExceptionMessage(e)))
         
     def perspective_getEntryByType(self, componentState, type):
         """

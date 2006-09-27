@@ -123,7 +123,7 @@ class WizardStep(GladeWidget, log.Loggable):
 
             if result.failed:
                 self.debug('... that failed')
-                raise errors.RemoteRunFailure('Result failed')
+                raise errors.RemoteRunFailure(function, 'Result failed')
             self.debug('... that succeeded')
             return result.value
 
@@ -139,7 +139,7 @@ class WizardStep(GladeWidget, log.Loggable):
                 N_("Internal error: could not run check code on worker.")),
                 debug=debug)
             self.add_msg(msg)
-            raise errors.RemoteRunError('Internal error.')
+            raise errors.RemoteRunError(function, 'Internal error.')
             
         d.addErrback(errback)
         d.addCallback(callback)

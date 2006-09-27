@@ -24,7 +24,7 @@ common classes and code to support manager-side objects
 """
 
 from twisted.internet import reactor, defer
-from twisted.spread import pb
+from twisted.spread import pb, flavors
 from twisted.python import failure, reflect
 
 from flumotion.common import errors, interfaces, log, common
@@ -153,12 +153,22 @@ class ManagerAvatar(fpb.PingableAvatar, log.Loggable):
 
     def _mindCallRemoteErrback(self, f, name):
         if f.check(AttributeError):
-            # FIXME: what if the code raised an actual AttributeError ?
-            # file an issue for twisted
-            # this was done and resolved, can't remember the number now
+            from twisted.spread import flavors
+            if hasattr(flavors, 'NoSuchMethod'):
+                if f.check(flavors.NoSuchMethod):
+                    self.warning("No such remote method '%s'" % name)
+                    raise errors.NoMethodError(name)
+                else:
+                    raise errors.RemoteRunFailure(name,
+                        debug=log.getFailureMessage(f))
+
+            # revision #13473 of Twisted added NoSuchMethod
+            # this is an older version, so we don't know the difference.
             self.warning("No such remote method '%s', or AttributeError "
-                "while executing remote method" % name)
-            return failure.Failure(errors.NoMethodError(name))
+                "while executing remote method (%s)" % (
+                    name, log.getFailureMessage(f)))
+            raise errors.NoMethodError(name,
+                debug=log.getFailureMessage(f))
 
         self.debug("Failure on remote call %s: %r, %s" % (name,
              f, f.getErrorMessage()))

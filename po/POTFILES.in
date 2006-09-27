@@ -1,3 +1,5 @@
+flumotion/admin/admin.py
+
 flumotion/admin/gtk/client.py
 flumotion/admin/gtk/message.py
 flumotion/admin/gtk/greeter.py

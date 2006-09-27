@@ -62,7 +62,26 @@ class PipelineParseError(pb.Error):
 
 # remote method errors
 class RemoteMethodError(pb.Error):
-    "Generic remote method error"
+    """
+    Generic remote method error.
+
+    @ivar methodName: name of the method
+    @type methodName: str
+    @ivar debug:      optional additional debug message
+    @type debug:      str
+    """
+    def __init__(self, methodName, debug=None):
+        self.methodName = methodName
+        self.debug = debug
+        # work like a normal Exception too
+        self.args = (methodName, debug)
+
+    # this allows us to decide how it gets serialized
+    def __str__(self):
+        msg = "%s on method '%s'" % (self.__class__.__name__, self.methodName)
+        if self.debug:
+            msg += " (%s)" % self.debug
+        return msg
 
 class RemoteRunError(RemoteMethodError):
     "Error while running remote code, before getting a result"

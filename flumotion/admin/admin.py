@@ -32,7 +32,7 @@ from twisted.cred import error as crederror
 from twisted.python import rebuild, reflect, failure
 
 from flumotion.common import common, errors, interfaces, log, pygobject
-from flumotion.common import keycards, worker, planet, medium, package
+from flumotion.common import keycards, worker, planet, medium, package, messages
 # serializable worker and component state
 from flumotion.twisted import flavors
 from flumotion.twisted.defer import defer_generator_method
@@ -44,6 +44,9 @@ from flumotion.twisted import pb as fpb
 from flumotion.twisted.compat import implements
 
 from flumotion.common.pygobject import gsignal, gproperty
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
     perspectiveInterface = interfaces.IAdminMedium
@@ -403,8 +406,25 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
                             componentState, methodName,
                             *args, **kwargs)
         d.addCallback(self._callRemoteCallback, methodName, componentName)
-        d.addErrback(self._callRemoteErrback, "component",
-                     componentName, methodName)
+        def errback(failure):
+            msg = None
+            if failure.check(errors.NoMethodError):
+                msg = "Remote method '%s' does not exist." % methodName
+                msg += "\n" + failure.value
+            else:
+                msg = failure.value
+
+            # FIXME: we probably need a nicer way of getting component
+            # messages shown from the admin model, but this allows us to
+            # make sure every type of admin has these messages
+            self.warning(msg)
+            m = messages.Warning(T_(N_("Internal error in component.")),
+                debug=msg)
+            componentState.observe_append('messages', m)
+            return failure
+
+        d.addErrback(errback)
+        # FIXME: dialog for other errors ?
         return d
 
     def _callRemoteCallback(self, result, methodName, componentName):
@@ -432,9 +452,10 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         return d
 
     def _callRemoteErrback(self, failure, type, name, methodName):
+        print "THOMAS: errback: failure %r" % failure
         if failure.check(errors.NoMethodError):
-            self.warning("method %s on %s does not exist, component bug" % (
-                methodName, name))
+            self.warning("method '%s' on component '%s' does not exist, "
+                "component bug" % (methodName, name))
         else:
             self.debug("passing through failure on remote call to %s(%s): %r" %
                 (name, methodName, failure))

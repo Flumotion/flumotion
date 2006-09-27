@@ -1,3 +1,30 @@
+2006-09-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	  catch errors on remote component calls, and display a reasonable
+	  Warning message for them so we know what to fix.
+	* flumotion/common/errors.py:
+	  document the expected arguments for RemoteMethodError,	
+	  taking the method name as the first argument
+	* flumotion/wizard/step.py:
+	  follow this change through
+	* flumotion/component/feedcomponent.py:
+	  document remote_effect
+	* flumotion/manager/admin.py:
+	  use the more useful log.getExceptionMessage
+	* flumotion/manager/base.py:
+	  check for the difference between AttributeError and NoSuchMethod
+	  if we can
+	* po/POTFILES.in:
+	  add flumotion/admin/admin.py for translation
+	  (port from 0.2 patch)
+
+2006-09-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/worker/worker.py:
+	  unravel defgen so we can actually see where problems are
+	  pass through a RemoteRunError, it's already wrapped
+
 2006-09-27  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/medium.py:
