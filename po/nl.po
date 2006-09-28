@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-07-13 12:37+0200\n"
+"POT-Creation-Date: 2006-09-28 13:01+0200\n"
 "PO-Revision-Date: 2006-04-13 18:27+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -15,6 +15,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: flumotion/admin/admin.py:421
+msgid "Internal error in component."
+msgstr ""
 
 #: flumotion/admin/gtk/client.py:161
 msgid "Not connected"
@@ -239,7 +243,7 @@ msgstr "Kies een verbinding uit de onderstaande lijst."
 msgid "Mood"
 msgstr "Humeur"
 
-#: flumotion/admin/gtk/parts.py:176 flumotion/admin/gtk/parts.py:429
+#: flumotion/admin/gtk/parts.py:176 flumotion/admin/gtk/parts.py:431
 msgid "Component"
 msgstr "Component"
 
@@ -251,23 +255,23 @@ msgstr "Worker"
 msgid "[any worker]"
 msgstr "[willekeurige worker]"
 
-#: flumotion/admin/gtk/parts.py:431
+#: flumotion/admin/gtk/parts.py:433
 msgid "_Restart"
 msgstr "_Herstart"
 
-#: flumotion/admin/gtk/parts.py:435
+#: flumotion/admin/gtk/parts.py:437
 msgid "_Start"
 msgstr "_Start"
 
-#: flumotion/admin/gtk/parts.py:442
+#: flumotion/admin/gtk/parts.py:444
 msgid "St_op"
 msgstr "St_op"
 
-#: flumotion/admin/gtk/parts.py:450
+#: flumotion/admin/gtk/parts.py:452
 msgid "Reload _code"
 msgstr "Herlaad _code"
 
-#: flumotion/admin/gtk/parts.py:454
+#: flumotion/admin/gtk/parts.py:456
 msgid "_Modify element property ..."
 msgstr "_Wijzig elementeigenschap ..."
 
@@ -291,7 +295,7 @@ msgstr ""
 "Alle workers zijn afgemeld.\n"
 "Verifieer of uw Flumotion-netwerk correct draait en probeer opnieuw."
 
-#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:493
+#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:490
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
@@ -340,11 +344,11 @@ msgstr "%dx%d, %d/%d pixelaspectverhouding"
 msgid "Checking for Firewire device..."
 msgstr "Bezig met detecteren Vuurdraadapparaat..."
 
-#: flumotion/wizard/steps.py:405
+#: flumotion/wizard/steps.py:402
 msgid "Probing webcam, this can take a while..."
 msgstr "Webcam aan het onderzoeken, dit kan even duren..."
 
-#: flumotion/wizard/steps.py:497
+#: flumotion/wizard/steps.py:494
 msgid ""
 "\n"
 "\n"
@@ -358,7 +362,7 @@ msgstr ""
 msgid "Internal error: could not run check code on worker."
 msgstr "Interne fout: kon check-code niet uitvoeren op worker."
 
-#: flumotion/component/feedcomponent.py:244
+#: flumotion/component/feedcomponent.py:238
 #, python-format
 msgid ""
 "The worker does not have the '%s' element installed.\n"
@@ -367,17 +371,17 @@ msgstr ""
 "Het '%s'-element is niet geïnstalleerd op de worker.\n"
 "Gelieve de nodige plug-in te installeren en de component te herstarten.\n"
 
-#: flumotion/component/feedcomponent.py:259
+#: flumotion/component/feedcomponent.py:253
 msgid "GStreamer error: could not parse component pipeline."
 msgstr "GStreamer-fout: kon de component-pijplijn niet verwerken."
 
-#: flumotion/component/consumers/httpstreamer/http.py:619
+#: flumotion/component/consumers/httpstreamer/http.py:622
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Netwerkfout: TCP-poort %d is niet beschikbaar."
 
 #: flumotion/component/consumers/httpstreamer/http.glade:7
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:192
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:200
 msgid "Statistics"
 msgstr "Statistieken"
 
@@ -437,7 +441,7 @@ msgid "Web URL:"
 msgstr ""
 
 #: flumotion/component/muxers/checks.py:38
-#: flumotion/worker/checks/encoder.py:38 flumotion/worker/checks/encoder.py:59
+#: flumotion/worker/checks/encoder.py:39 flumotion/worker/checks/encoder.py:60
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
 msgstr "Versie %s van de '%s' GStreamer-plug-in heeft een fout.\n"
@@ -451,7 +455,7 @@ msgstr ""
 "zelfs niet afspelen.\n"
 
 #: flumotion/component/muxers/checks.py:43
-#: flumotion/worker/checks/encoder.py:44 flumotion/worker/checks/encoder.py:65
+#: flumotion/worker/checks/encoder.py:45 flumotion/worker/checks/encoder.py:66
 #, python-format
 msgid "Please upgrade '%s' to version %s."
 msgstr "Gelieve '%s' te vernieuwen naar versie %s."
@@ -474,23 +478,38 @@ msgstr "Patroon:"
 msgid "Pattern"
 msgstr "Patroon"
 
-#: flumotion/manager/component.py:610
+#: flumotion/manager/component.py:438 flumotion/manager/component.py:898
 msgid "Could not start component."
 msgstr "Kon component niet starten."
 
-#: flumotion/manager/component.py:1009
+#: flumotion/manager/component.py:764
+#, fuzzy
+msgid "Configuration problem."
+msgstr "Configuratie invoeren..."
+
+#: flumotion/manager/component.py:791
 #, fuzzy, python-format
 msgid "Could not connect component to %s:%d for feed %s."
 msgstr ""
 "Kon component niet herladen:\n"
 "%s."
 
-#: flumotion/manager/component.py:1034
+#: flumotion/manager/component.py:816
 #, python-format
 msgid "Could not connect to %s:%d for feed %s."
 msgstr ""
 
-#: flumotion/manager/manager.py:660
+#: flumotion/manager/component.py:948
+#, fuzzy
+msgid "Could not setup component."
+msgstr "Kon component niet starten."
+
+#: flumotion/manager/manager.py:485
+#, fuzzy
+msgid "The component is misconfigured."
+msgstr "De component is neergestort.\n"
+
+#: flumotion/manager/manager.py:790
 msgid "The component could not be started."
 msgstr "De component kon niet gestart worden."
 
@@ -531,15 +550,15 @@ msgstr "Kon toestel '%s' niet onderzoeken."
 msgid "No device found on %s."
 msgstr "Geen toestel gevonden op %s."
 
-#: flumotion/worker/checks/encoder.py:42 flumotion/worker/checks/encoder.py:63
+#: flumotion/worker/checks/encoder.py:43 flumotion/worker/checks/encoder.py:64
 msgid "Synchronization between audio and video may not be correct.\n"
 msgstr "Synchronisatie tussen audio en video kan mogelijks fout zijn.\n"
 
-#: flumotion/worker/checks/video010.py:165
+#: flumotion/worker/checks/video010.py:175
 msgid "Device node /dev/raw1394 does not exist."
 msgstr "Apparaat /dev/raw1394 bestaat niet."
 
-#: flumotion/worker/checks/video010.py:187
+#: flumotion/worker/checks/video010.py:197
 msgid ""
 "Could not find or open the Firewire device. Check the device node and its "
 "permissions."
@@ -547,18 +566,18 @@ msgstr ""
 "Kan Firewire-toestel niet vinden of openen.  Verifieer het apparaat en de "
 "toelatingen ervan."
 
-#: flumotion/worker/checks/video010.py:191
+#: flumotion/worker/checks/video010.py:201
 msgid "No Firewire device found."
 msgstr "Geen Vuurdraadapparaat gedetecteerd."
 
-#: flumotion/worker/checks/video010.py:194
+#: flumotion/worker/checks/video010.py:204
 msgid ""
 "Could not open Firewire device for reading. Check permissions on the device."
 msgstr ""
 "Kan Firewire-toestel niet openen om te lezen.  Verifieer toelatingen op het "
 "toestel."
 
-#: flumotion/worker/checks/video010.py:201
+#: flumotion/worker/checks/video010.py:211
 msgid "Could not probe Firewire device."
 msgstr "Kon Vuurdraadapparaat niet onderzoeken."
 
@@ -1164,9 +1183,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Het ffmpegcolorspace-element is te oud. Gelieve gst-plugins aan te passen "
 #~ "naar versie 0.8.5."
-
-#~ msgid "The component crashed.\n"
-#~ msgstr "De component is neergestort.\n"
 
 #~ msgid ""
 #~ "However, no core dump was generated. You may need to configure the "

@@ -6,13 +6,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-07-13 12:37+0200\n"
+"POT-Creation-Date: 2006-09-28 13:01+0200\n"
 "PO-Revision-Date: 2006-01-10 22:34+0100\n"
 "Last-Translator: Noelle Moutte <noelle@moutte.net>\n"
 "Language-Team: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: flumotion/admin/admin.py:421
+msgid "Internal error in component."
+msgstr ""
 
 #: flumotion/admin/gtk/client.py:161
 msgid "Not connected"
@@ -238,7 +242,7 @@ msgstr "Elija por favor una conexión de la caja abajo."
 msgid "Mood"
 msgstr "Humor"
 
-#: flumotion/admin/gtk/parts.py:176 flumotion/admin/gtk/parts.py:429
+#: flumotion/admin/gtk/parts.py:176 flumotion/admin/gtk/parts.py:431
 msgid "Component"
 msgstr "Componente"
 
@@ -250,23 +254,23 @@ msgstr "Trabajador"
 msgid "[any worker]"
 msgstr ""
 
-#: flumotion/admin/gtk/parts.py:431
+#: flumotion/admin/gtk/parts.py:433
 msgid "_Restart"
 msgstr "_Recomenzar"
 
-#: flumotion/admin/gtk/parts.py:435
+#: flumotion/admin/gtk/parts.py:437
 msgid "_Start"
 msgstr "_Comenzar"
 
-#: flumotion/admin/gtk/parts.py:442
+#: flumotion/admin/gtk/parts.py:444
 msgid "St_op"
 msgstr "Pa_rar"
 
-#: flumotion/admin/gtk/parts.py:450
+#: flumotion/admin/gtk/parts.py:452
 msgid "Reload _code"
 msgstr "Recargar _el código"
 
-#: flumotion/admin/gtk/parts.py:454
+#: flumotion/admin/gtk/parts.py:456
 msgid "_Modify element property ..."
 msgstr "_Modificar la característica del elemento ..."
 
@@ -288,7 +292,7 @@ msgid ""
 "Make sure your Flumotion network is running properly and try again."
 msgstr ""
 
-#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:493
+#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:490
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
@@ -331,11 +335,11 @@ msgstr "%dx%d, %d/%d cociente de aspecto del pixel"
 msgid "Checking for Firewire device..."
 msgstr "Comprobando dispositivo del firewire..."
 
-#: flumotion/wizard/steps.py:405
+#: flumotion/wizard/steps.py:402
 msgid "Probing webcam, this can take a while..."
 msgstr ""
 
-#: flumotion/wizard/steps.py:497
+#: flumotion/wizard/steps.py:494
 msgid ""
 "\n"
 "\n"
@@ -346,24 +350,24 @@ msgstr ""
 msgid "Internal error: could not run check code on worker."
 msgstr ""
 
-#: flumotion/component/feedcomponent.py:244
+#: flumotion/component/feedcomponent.py:238
 #, python-format
 msgid ""
 "The worker does not have the '%s' element installed.\n"
 "Please install the necessary plug-in and restart the component.\n"
 msgstr ""
 
-#: flumotion/component/feedcomponent.py:259
+#: flumotion/component/feedcomponent.py:253
 msgid "GStreamer error: could not parse component pipeline."
 msgstr ""
 
-#: flumotion/component/consumers/httpstreamer/http.py:619
+#: flumotion/component/consumers/httpstreamer/http.py:622
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr ""
 
 #: flumotion/component/consumers/httpstreamer/http.glade:7
-#: flumotion/component/consumers/httpstreamer/admin_gtk.py:192
+#: flumotion/component/consumers/httpstreamer/admin_gtk.py:200
 msgid "Statistics"
 msgstr "Estadísticas"
 
@@ -423,7 +427,7 @@ msgid "Web URL:"
 msgstr ""
 
 #: flumotion/component/muxers/checks.py:38
-#: flumotion/worker/checks/encoder.py:38 flumotion/worker/checks/encoder.py:59
+#: flumotion/worker/checks/encoder.py:39 flumotion/worker/checks/encoder.py:60
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in contains a bug.\n"
 msgstr ""
@@ -435,7 +439,7 @@ msgid ""
 msgstr ""
 
 #: flumotion/component/muxers/checks.py:43
-#: flumotion/worker/checks/encoder.py:44 flumotion/worker/checks/encoder.py:65
+#: flumotion/worker/checks/encoder.py:45 flumotion/worker/checks/encoder.py:66
 #, python-format
 msgid "Please upgrade '%s' to version %s."
 msgstr ""
@@ -458,26 +462,43 @@ msgstr "Patrón:"
 msgid "Pattern"
 msgstr "Patrón"
 
-#: flumotion/manager/component.py:610
+#: flumotion/manager/component.py:438 flumotion/manager/component.py:898
 #, fuzzy
 msgid "Could not start component."
 msgstr ""
 "No podía recargar el componente:\n"
 "%s."
 
-#: flumotion/manager/component.py:1009
+#: flumotion/manager/component.py:764
+#, fuzzy
+msgid "Configuration problem."
+msgstr "Importar la configuración..."
+
+#: flumotion/manager/component.py:791
 #, fuzzy, python-format
 msgid "Could not connect component to %s:%d for feed %s."
 msgstr ""
 "No podía recargar el componente:\n"
 "%s."
 
-#: flumotion/manager/component.py:1034
+#: flumotion/manager/component.py:816
 #, python-format
 msgid "Could not connect to %s:%d for feed %s."
 msgstr ""
 
-#: flumotion/manager/manager.py:660
+#: flumotion/manager/component.py:948
+#, fuzzy
+msgid "Could not setup component."
+msgstr ""
+"No podía recargar el componente:\n"
+"%s."
+
+#: flumotion/manager/manager.py:485
+#, fuzzy
+msgid "The component is misconfigured."
+msgstr "Ningún componente seleccionado."
+
+#: flumotion/manager/manager.py:790
 msgid "The component could not be started."
 msgstr ""
 
@@ -518,32 +539,32 @@ msgstr ""
 msgid "No device found on %s."
 msgstr ""
 
-#: flumotion/worker/checks/encoder.py:42 flumotion/worker/checks/encoder.py:63
+#: flumotion/worker/checks/encoder.py:43 flumotion/worker/checks/encoder.py:64
 msgid "Synchronization between audio and video may not be correct.\n"
 msgstr ""
 
-#: flumotion/worker/checks/video010.py:165
+#: flumotion/worker/checks/video010.py:175
 #, fuzzy
 msgid "Device node /dev/raw1394 does not exist."
 msgstr "apparaat /dev/raw1394 bestaat niet"
 
-#: flumotion/worker/checks/video010.py:187
+#: flumotion/worker/checks/video010.py:197
 msgid ""
 "Could not find or open the Firewire device. Check the device node and its "
 "permissions."
 msgstr ""
 
-#: flumotion/worker/checks/video010.py:191
+#: flumotion/worker/checks/video010.py:201
 #, fuzzy
 msgid "No Firewire device found."
 msgstr "Ningún dispositivo del firewire detectó."
 
-#: flumotion/worker/checks/video010.py:194
+#: flumotion/worker/checks/video010.py:204
 msgid ""
 "Could not open Firewire device for reading. Check permissions on the device."
 msgstr ""
 
-#: flumotion/worker/checks/video010.py:201
+#: flumotion/worker/checks/video010.py:211
 #, fuzzy
 msgid "Could not probe Firewire device."
 msgstr "Comprobando dispositivo del firewire..."
@@ -1143,10 +1164,6 @@ msgstr ""
 
 #~ msgid "Log"
 #~ msgstr "Log"
-
-#, fuzzy
-#~ msgid "The component crashed.\n"
-#~ msgstr "Ningún componente seleccionado."
 
 #, fuzzy
 #~ msgid "Could not start the component."
