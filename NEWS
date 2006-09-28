@@ -1,22 +1,27 @@
-This is Flumotion 0.2.0, "San Telmo".
+This is Flumotion 0.3.1, "La Merce".
 
 IMPORTANT NOTE:
 
-The XML config format was changed for components.  They should now list
-each of their properties in a
-<property name="propname"> section instead of just having
-<propname></propname>.  Also, the <feed> nodes are gone.
+This is an unstable version of Flumotion on the 0.3 development branch.
+If you are looking for a stable Flumotion, use one of the 0.2 releases.
 
-This must also be done in the manager section where it's using a bouncer
-component.
+Features since 0.2.2:
 
-You can upgrade your planet config files using xsltproc and the
-included stylesheet:
+- dropped support for GStreamer 0.10
+- dropped support for Twisted 1.3.0
+- workers only expose one TCP port for feeds now
+- porter component allows sharing one TCP port for all streamers
+- added plugs and sockets for finer-grained extensibility
+- added a static file serving component
+- workers and jobs reconnect on network failures
+- components reconnect feeds on network failures
+- added integration test framework
 
-    xsltproc $datadir/upgrade-to-0.2.0.xsl planet.xml > new.xml
+Bugs fixed since 0.2.2:
 
-Where $datadir is the datadir passed to configure, or the "data" directory
-in the Flumotion source tarball.
+- 327 : Clock slaves can start up before the clock provider
+- 332 : Patch for valgrinding jobs
+- 359 : Components that fail to start can't be restarted later
 
 Features since 0.1.10:
 

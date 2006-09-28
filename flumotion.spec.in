@@ -218,7 +218,7 @@ fi
 
 %files -f flumotion.lang
 %defattr(-,root,root,-)
-%doc ChangeLog COPYING README AUTHORS
+%doc ChangeLog COPYING README AUTHORS flumotion.doap
 %doc doc/reference/html
 %doc conf
 %{_bindir}/flumotion-manager

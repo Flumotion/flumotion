@@ -14,6 +14,7 @@ EXTRA_DIST = \
 	LICENSE.GPL \
 	LICENSE.Flumotion \
 	flumotion.spec \
+	flumotion.doap \
 	misc/pycheckerhelp.py
 
 all-local: locale-uninstalled

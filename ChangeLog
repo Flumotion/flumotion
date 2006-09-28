@@ -1,3 +1,15 @@
+=== release 0.3.1 ===
+
+2006-09-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
+	* NEWS:
+	* RELEASE:
+	* configure.ac:
+	* flumotion.doap:
+	* flumotion.spec.in:
+	  releasing 0.3.1, "La Merce"
+
 2006-09-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/admin.py:
