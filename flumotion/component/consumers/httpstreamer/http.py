@@ -274,7 +274,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if props.get('type', 'master') == 'slave':
             for k in 'socket_path', 'username', 'password':
                 if not 'porter_' + k in props:
-                    msg = 'slave mode, missing required property %s' % k
+                    msg = "slave mode, missing required property 'socket_%s'" % k
                     return defer.fail(errors.ConfigError(msg))
 
         # tcp is where multifdsink is
