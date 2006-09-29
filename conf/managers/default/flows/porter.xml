@@ -2,7 +2,7 @@
 <planet>
   <atmosphere>
     <component name="porter" type="porter" worker="localhost">
-      <property name="port">8000</property>
+      <property name="port">8800</property>
       <!-- We can configure a porter explicitly, with the following three
            properties, or have it generate these itself at runtime.
            Generally, you only want to configure these explicitly if you want
