@@ -1,3 +1,8 @@
+2006-10-03  Andy Wingo  <wingo@pobox.com>
+
+	* configure.ac: Comment out the bit about multiple versions of
+	gstreamer.
+
 2006-09-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* configure.ac:

@@ -278,13 +278,13 @@ flumotion.spec
 po/Makefile.in
 )
 
-echo
-echo "configure: *** Flumotion has been configured with support for the"
-echo "               following versions of GStreamer:"
-echo
-echo "    GStreamer 0.10: $GST_010_SUPPORTED"
-echo
-echo "If either version is disabled, check the configure output above to"
-echo "determine the cause of the problem, and re-run the configure"
-echo "script after installing the necessary dependencies."
-echo
+dnl echo
+dnl echo "configure: *** Flumotion has been configured with support for the"
+dnl echo "               following versions of GStreamer:"
+dnl echo
+dnl echo "    GStreamer 0.10: $GST_010_SUPPORTED"
+dnl echo
+dnl echo "If either version is disabled, check the configure output above to"
+dnl echo "determine the cause of the problem, and re-run the configure"
+dnl echo "script after installing the necessary dependencies."
+dnl echo
