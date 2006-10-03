@@ -1,5 +1,9 @@
 2006-10-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/steps.py:
+	* flumotion/common/medium.py: Revert bits about defer_generator
+	removal from [3889], they caused errors in f-g-c.
+
 	* configure.ac: Comment out the bit about multiple versions of
 	gstreamer.
 

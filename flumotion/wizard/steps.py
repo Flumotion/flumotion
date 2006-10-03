@@ -341,7 +341,9 @@ class FireWire(VideoSource):
         self.add_msg(msg)
         d = self.workerRun('flumotion.worker.checks.video', 'check1394',
             id='firewire-check')
-        def workerRunCallback(options):
+        yield d
+        try:
+            options = d.value()
             self.clear_msg('firewire-check')
             self.dims = (options['width'], options['height'])
             self.par = options['par']
@@ -354,8 +356,9 @@ class FireWire(VideoSource):
             self.combobox_scaled_height.set_active(1)
             self.set_sensitive(True)
             self.on_update_output_format()
-        d.addCallback(workerRunCallback)
-        return d
+        except errors.RemoteRunFailure:
+            pass
+    run_checks = defer_generator_method(run_checks)
 
 class Webcam(VideoSource):
     name = 'Webcam'

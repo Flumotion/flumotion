@@ -25,8 +25,10 @@ Contains the base class for PB client-side mediums.
 
 import time
 
+from twisted.spread import pb
 from twisted.internet import defer, reactor
 
+from flumotion.twisted.defer import defer_generator_method
 from flumotion.common import log, interfaces, bundleclient, errors, common
 from flumotion.common import messages
 from flumotion.configure import configure
@@ -144,66 +146,63 @@ class BaseMedium(fpb.Referenceable):
         """
         self.debug('remote runFunction(%r, %r)' % (module, function))
         d = self.bundleLoader.loadModule(module)
-        def loadModuleCallback(mod):
-            try:
-                def runProcCallback(result):
-                    if not isinstance(result, messages.Result):
-                        msg = 'function %r returned a non-Result %r' % (
-                            proc, result)
-                        raise errors.RemoteRunError(msg)
-                    self.debug('returning result %r with failed %r' % (result,
-                        result.failed))
-                    return result
-                def runProcErrback(failure):
-                    # FIXME: make e.g. GStreamerError nicely serializable, without
-                    # printing ugly tracebacks
-                    msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s' % (
-                        module, function, args, kwargs,
-                        failure.getErrorMessage()))
-                    self.debug(msg)
-                    self.debug(failure.getTraceback())
-                    raise errors.RemoteRunError(msg)
+        yield d
 
-                proc = getattr(mod, function)
-                self.debug('calling %s.%s(%r, %r)' % (
-                    module, function, args, kwargs))
-                d = defer.maybeDeferred(proc, *args, **kwargs)
-                d.addCallback(runProcCallback)
-                d.addErrback(runProcErrback)
-                return d
-
-            except AttributeError:
-                msg = 'No procedure named %s in module %s' % (function, module)
-                self.warning(msg)
-                raise errors.RemoteRunError(msg)
-            except Exception, e:
-                # FIXME: make e.g. GStreamerError nicely serializable, without
-                # printing ugly tracebacks
-                msg = ('calling %s.%s(*args=%r, **kwargs=%r) failed: %s' % (
-                    module, function, args, kwargs,
-                    log.getExceptionMessage(e)))
-                self.debug(msg)
-                raise errors.RemoteRunError(log.getExceptionMessage(e))
-
-        def loadModuleNotFoundErrback(failure):
-            failure.trap(errors.NoBundleError)
+        try:
+            mod = d.value()
+        except errors.NoBundleError:
             msg = 'Failed to find bundle for module %s' % module
             self.warning(msg)
             raise errors.RemoteRunError(msg)
-        
-        def loadModuleLoadFailErrback(failure):
-            # If already a RemoteRunError, raise it
-            if failure.type == errors.RemoteRunError:
-                failure.raiseException()
+        except Exception, e:
             msg = 'Failed to load bundle for module %s' % module
-            self.debug("exception %r %r" % (failure.getErrorMessage(),
-                failure.type))
+            self.debug("exception %r" % e)
             self.warning(msg)
             raise errors.RemoteRunError(msg)
-        d.addCallback(loadModuleCallback)
-        d.addErrback(loadModuleNotFoundErrback)
-        d.addErrback(loadModuleLoadFailErrback)
-        return d
+
+        try:
+            proc = getattr(mod, function)
+        except AttributeError:
+            msg = 'No procedure named %s in module %s' % (function, module)
+            self.warning(msg)
+            raise errors.RemoteRunError(msg)
+
+        try:
+            self.debug('calling %s.%s(%r, %r)' % (
+                module, function, args, kwargs))
+            d = proc(*args, **kwargs)
+        except Exception, e:
+            # FIXME: make e.g. GStreamerError nicely serializable, without
+            # printing ugly tracebacks
+            msg = ('calling %s.%s(*args=%r, **kwargs=%r) failed: %s' % (
+                module, function, args, kwargs,
+                log.getExceptionMessage(e)))
+            self.debug(msg)
+            raise errors.RemoteRunError(log.getExceptionMessage(e))
+ 
+        yield d
+
+        try:
+            # only if d was actually a deferred will we get here
+            # this is a bit nasty :/
+            result = d.value()
+            if not isinstance(result, messages.Result):
+                msg = 'function %r returned a non-Result %r' % (
+                    proc, result)
+                raise errors.RemoteRunError(msg)
+
+            self.debug('yielding result %r with failed %r' % (result,
+                result.failed))
+            yield result
+        except Exception, e:
+            # FIXME: make e.g. GStreamerError nicely serializable, without
+            # printing ugly tracebacks
+            msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s' % (
+                module, function, args, kwargs,
+                log.getExceptionMessage(e)))
+            self.debug(msg)
+            raise e
+    runBundledFunction = defer_generator_method(runBundledFunction)
 
 class PingingMedium(BaseMedium):
     _pingInterval = configure.heartbeatInterval
