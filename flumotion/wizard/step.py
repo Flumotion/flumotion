@@ -117,6 +117,15 @@ class WizardStep(GladeWidget, log.Loggable):
         def callback(result):
             self.debug('workerRun callbacked a result')
             self.clear_msg(function)
+
+            if not isinstance(result, messages.Result):
+                msg = messages.Error(T_(
+                    N_("Internal error: could not run check code on worker.")),
+                    debug=('function %r returned a non-Result %r'
+                           % (function, result)))
+                self.add_msg(msg)
+                raise errors.RemoteRunError(function, 'Internal error.')
+
             for m in result.messages:
                 self.debug('showing msg %r' % m)
                 self.add_msg(m)

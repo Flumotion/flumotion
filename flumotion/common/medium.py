@@ -137,6 +137,17 @@ class BaseMedium(fpb.Referenceable):
         """
         Runs the given function in the given module with the given arguments.
         
+        If we can't find the bundle for the given module, or if the
+        given module does not contain the requested function, we will
+        raise L{flumotion.common.errors.RemoteRunError} (perhaps a
+        poorly chosen error). If importing the module or running the
+        function raises an exception, that exception will be passed
+        through unmodified.
+
+        Callers that expect to return their result over a PB connection
+        should catch nonserializable exceptions so as to prevent nasty
+        backtraces in the logs.
+
         @param module:   module the function lives in
         @type  module:   str
         @param function: function to run
@@ -155,10 +166,9 @@ class BaseMedium(fpb.Referenceable):
             self.warning(msg)
             raise errors.RemoteRunError(msg)
         except Exception, e:
-            msg = 'Failed to load bundle for module %s' % module
-            self.debug("exception %r" % e)
-            self.warning(msg)
-            raise errors.RemoteRunError(msg)
+            self.warning('Exception raised while loading bundle for '
+                         'module %s: %s', module, e)
+            raise
 
         try:
             proc = getattr(mod, function)
@@ -172,36 +182,25 @@ class BaseMedium(fpb.Referenceable):
                 module, function, args, kwargs))
             d = proc(*args, **kwargs)
         except Exception, e:
-            # FIXME: make e.g. GStreamerError nicely serializable, without
-            # printing ugly tracebacks
-            msg = ('calling %s.%s(*args=%r, **kwargs=%r) failed: %s' % (
-                module, function, args, kwargs,
-                log.getExceptionMessage(e)))
-            self.debug(msg)
-            raise errors.RemoteRunError(log.getExceptionMessage(e))
+            self.warning('Exception raised while calling '
+                         '%s.%s(*args=%r, **kwargs=%r): %s',
+                         module, function, args, kwargs,
+                         log.getExceptionMessage(e))
+            raise
  
+        # at this point, we have our result. it could be a value or a
+        # deferred. in the latter case we will need to yield again.
         yield d
 
+        # only if d was actually a deferred will we get here
         try:
-            # only if d was actually a deferred will we get here
-            # this is a bit nasty :/
-            result = d.value()
-            if not isinstance(result, messages.Result):
-                msg = 'function %r returned a non-Result %r' % (
-                    proc, result)
-                raise errors.RemoteRunError(msg)
-
-            self.debug('yielding result %r with failed %r' % (result,
-                result.failed))
-            yield result
+            yield d.value()
         except Exception, e:
-            # FIXME: make e.g. GStreamerError nicely serializable, without
-            # printing ugly tracebacks
-            msg = ('%s.%s(*args=%r, **kwargs=%r) failed: %s' % (
-                module, function, args, kwargs,
-                log.getExceptionMessage(e)))
-            self.debug(msg)
-            raise e
+            self.warning('Deferred failure from '
+                         '%s.%s(*args=%r, **kwargs=%r): %s',
+                         module, function, args, kwargs,
+                         log.getExceptionMessage(e))
+            raise
     runBundledFunction = defer_generator_method(runBundledFunction)
 
 class PingingMedium(BaseMedium):

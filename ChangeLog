@@ -1,5 +1,14 @@
 2006-10-03  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/wizard/step.py (WizardStep.workerRun.callback): Move
+	the deferred-results-must-be-Result-instances code here from the
+	generic version, as is appropriate.
+
+	* flumotion/common/medium.py (BaseMedium.runBundledFunction): Doc
+	more. Only wrap some specific exceptions; in the case of e.g. a
+	syntax error or some exception running the proc, pass the original
+	error unmolested.
+
 	* flumotion/wizard/steps.py:
 	* flumotion/common/medium.py: Revert bits about defer_generator
 	removal from [3889], they caused errors in f-g-c.
