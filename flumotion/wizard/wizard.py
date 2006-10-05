@@ -368,6 +368,62 @@ class Wizard(GladeWindow, log.Loggable):
 
         return d
 
+    def check_import(self, workerName, moduleName):
+        """
+        Check if the given module can be imported.
+
+        @param workerName:  name of the worker to check on
+        @param moduleName:  name of the module to import
+
+        @returns: a deferred returning None or Failure.
+        """
+        if not self._admin:
+            self.debug('No admin connected, not checking presence of elements')
+            return
+        
+        d = self._admin.checkImport(workerName, moduleName)
+        return d
+
+
+    def require_import(self, workerName, moduleName, projectName=None,
+                       projectURL=None):
+        """
+        Require that the given module can be imported on the given worker.
+        If the module cannot be imported, an error message is
+        posted and the next button remains blocked.
+
+        @param workerName:  name of the worker to check on
+        @param moduleName:  name of the module to import
+        @param projectName: name of the module to import
+        @param projectURL:  URL of the project
+        """
+        if not self._admin:
+            self.debug('No admin connected, not checking presence of elements')
+            return
+        
+        self.debug('requiring module %s' % moduleName)
+        def _checkImportErrback(failure):
+                self.warning('could not import %s', moduleName)
+                message = messages.Error(T_(N_(
+                    "Worker '%s' cannot import module '%s'."),
+                    workerName, moduleName))
+                if projectName:
+                    message.add(T_(N_("\n"
+                        "This module is part of '%s'."), projectName))
+                if projectURL:
+                    message.add(T_(N_("\n"
+                        "The project's homepage is %s"), projectURL))
+                message.add(T_(N_("\n\n"
+                    "You will not be able to go forward using this worker.")))
+                self.block_next(True)
+                message.id = 'module-%s' % moduleName
+                self.add_msg(message)
+        
+        d = self.check_import(workerName, moduleName)
+        d.addErrback(_checkImportErrback)
+        return d
+
+
     def _setup_worker(self, step, worker):
         # get name of active worker
         self.debug('%r setting worker to %s' % (step, worker))

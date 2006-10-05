@@ -609,7 +609,12 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         d = self.workerCallRemote(workerName, 'checkElements', elements)
         d.addErrback(self._defaultErrback)
         return d
-    
+
+    def checkImport(self, workerName, moduleName):
+        d = self.workerCallRemote(workerName, 'checkImport', moduleName)
+        d.addErrback(self._defaultErrback)
+        return d
+     
     def workerRun(self, workerName, moduleName, functionName, *args, **kwargs):
         """
         Run the given function and args on the given worker. If the

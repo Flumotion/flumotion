@@ -250,6 +250,20 @@ class WorkerMedium(medium.PingingMedium):
         self.debug('remote_checkElements: returning elements names %r' % list)
         return list
 
+    def remote_checkImport(self, moduleName):
+        """
+        Checks if the given module can be imported.
+
+        @param moduleName: name of the module to check
+        @type  moduleName: str
+
+        @returns: None or Failure
+        """
+        self.debug('remote_checkImport: %s', moduleName)
+        # FIXME: maybe find a nice way to check if we can import
+        # without importing ?
+        __import__(moduleName) 
+
     def remote_runFunction(self, module, function, *args, **kwargs):
         """
         Runs the given function in the given module with the given arguments.

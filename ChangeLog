@@ -1,3 +1,14 @@
+2006-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/admin.py:
+	* flumotion/wizard/steps.py:
+	* flumotion/wizard/wizard.py:
+	* flumotion/worker/worker.py:
+	  Implement functions needed to support checking if a worker
+	  can import given modules.
+	  Use it to check for PIL in the wizard, linking to the website.
+	* TODO: add a note about the message area
+
 2006-10-03  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/wizard/step.py (WizardStep.workerRun.callback): Move

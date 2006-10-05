@@ -484,10 +484,16 @@ class Overlay(WizardStep):
 
     can_overlay = True
 
+
     def worker_changed_010(self):
+        self.can_overlay = False
+        self.set_sensitive(False)
+
+        # first check elements
         d = self.wizard.check_elements(self.worker, 'pngenc',
             'ffmpegcolorspace', 'videomixer')
         yield d
+
         elements = d.value()
         if elements:
             f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
@@ -496,12 +502,17 @@ class Overlay(WizardStep):
             message = messages.Warning(T_(f, self.worker, "', '".join(elements)),                id='overlay')
             message.add(T_(N_("\n\nClick Next to proceed without overlay.")))
             self.add_msg(message)
-            self.can_overlay = False
-            self.set_sensitive(False)
         else:
             self.clear_msg('overlay')
             self.can_overlay = True
             self.set_sensitive(True)
+
+        # now check import
+        d = self.wizard.require_import(self.worker, 'PIL',
+            'Python Imaging Library',
+            'http://www.pythonware.com/products/pil/')
+        yield d
+
     worker_changed_010 = defer_generator_method(worker_changed_010)
 
     def worker_changed(self):

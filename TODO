@@ -137,6 +137,9 @@
 
 * EASY		depgraph add/removeEdge arguments should be c, t, c, t
 		and not c, c, t, t
+
+* MEDIUM	find a way for the message area to contain hyperlinks
+		and make the PIL error hyperlinked
 - API cleanup:
 
 - manager/component.py:
