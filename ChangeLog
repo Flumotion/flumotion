@@ -1,5 +1,12 @@
 2006-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/admin.glade:
+	  remove translatibility of an unused string
+	* po/nl.po:
+	  update
+
+2006-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/errors.py:
 	* flumotion/component/component.py:
 	* flumotion/manager/component.py:

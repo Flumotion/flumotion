@@ -5,10 +5,10 @@
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: flumotion 0.2.0\n"
+"Project-Id-Version: flumotion 0.3.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-28 13:01+0200\n"
-"PO-Revision-Date: 2006-04-13 18:27+0200\n"
+"POT-Creation-Date: 2006-10-06 15:36+0200\n"
+"PO-Revision-Date: 2006-10-06 15:37+0200\n"
 "Last-Translator: Thomas Vander Stichele <thomas at fluendo dot com>\n"
 "Language-Team: nl\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: flumotion/admin/admin.py:421
 msgid "Internal error in component."
-msgstr ""
+msgstr "Interne fout in component."
 
 #: flumotion/admin/gtk/client.py:161
 msgid "Not connected"
@@ -35,9 +35,8 @@ msgid "Loading UI for %s ..."
 msgstr "UI aan het laden voor %s ..."
 
 #: flumotion/admin/gtk/client.py:311
-#, fuzzy
 msgid "This component has a UI bug."
-msgstr "De component is neergestort.\n"
+msgstr "De component heeft een bug in de gebruikersinterface."
 
 #: flumotion/admin/gtk/client.py:361
 #, python-format
@@ -50,9 +49,9 @@ msgid "%s does not have a UI yet"
 msgstr "%s heeft nog geen UI"
 
 #: flumotion/admin/gtk/client.py:402
-#, fuzzy, python-format
+#, python-format
 msgid "This component has a UI bug in the %s tab."
-msgstr "De component is neergestort.\n"
+msgstr "De component heeft een bug in de gebruikersinterface in de %s-tab."
 
 #: flumotion/admin/gtk/client.py:577
 #, python-format
@@ -165,7 +164,6 @@ msgid "About Flumotion"
 msgstr "Over Flumotion"
 
 #: flumotion/admin/gtk/client.py:1071
-#, fuzzy
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -173,7 +171,7 @@ msgid ""
 msgstr ""
 "Flumotion is een streaming media server.\n"
 "\n"
-"(C) 2004-2005 Fluendo S.L."
+"(C) 2004, 2005, 2006 Fluendo S.L."
 
 #: flumotion/admin/gtk/client.py:1080
 msgid "Authors"
@@ -295,7 +293,7 @@ msgstr ""
 "Alle workers zijn afgemeld.\n"
 "Verifieer of uw Flumotion-netwerk correct draait en probeer opnieuw."
 
-#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:490
+#: flumotion/wizard/wizard.py:352 flumotion/wizard/steps.py:499
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
@@ -312,7 +310,7 @@ msgstr ""
 "Gelieve de ontbrekende GStreamer plug-ins te installeren voor deze elementen "
 "en de worker te herstarten."
 
-#: flumotion/wizard/wizard.py:360
+#: flumotion/wizard/wizard.py:360 flumotion/wizard/wizard.py:416
 msgid ""
 "\n"
 "\n"
@@ -321,6 +319,29 @@ msgstr ""
 "\n"
 "\n"
 "U kan niet verder gaan."
+
+#: flumotion/wizard/wizard.py:408
+#, python-format
+msgid "Worker '%s' cannot import module '%s'."
+msgstr "Werker '%s' kan module '%s' niet importeren."
+
+#: flumotion/wizard/wizard.py:411
+#, python-format
+msgid ""
+"\n"
+"This module is part of '%s'."
+msgstr ""
+"\n"
+"Deze module maakt deel uit van '%s'."
+
+#: flumotion/wizard/wizard.py:414
+#, python-format
+msgid ""
+"\n"
+"The project's homepage is %s"
+msgstr ""
+"\n"
+"De thuispagina van het project is %s"
 
 #: flumotion/wizard/steps.py:83
 msgid "If you want to stream video"
@@ -344,11 +365,11 @@ msgstr "%dx%d, %d/%d pixelaspectverhouding"
 msgid "Checking for Firewire device..."
 msgstr "Bezig met detecteren Vuurdraadapparaat..."
 
-#: flumotion/wizard/steps.py:402
+#: flumotion/wizard/steps.py:405
 msgid "Probing webcam, this can take a while..."
 msgstr "Webcam aan het onderzoeken, dit kan even duren..."
 
-#: flumotion/wizard/steps.py:494
+#: flumotion/wizard/steps.py:503
 msgid ""
 "\n"
 "\n"
@@ -358,9 +379,13 @@ msgstr ""
 "\n"
 "Klik Volgende om verder te gaan zonder transparante overleg."
 
-#: flumotion/wizard/step.py:139
+#: flumotion/wizard/step.py:123 flumotion/wizard/step.py:148
 msgid "Internal error: could not run check code on worker."
 msgstr "Interne fout: kon check-code niet uitvoeren op worker."
+
+#: flumotion/component/component.py:469 flumotion/manager/component.py:952
+msgid "Could not setup component."
+msgstr "Kon component niet instellen."
 
 #: flumotion/component/feedcomponent.py:238
 #, python-format
@@ -438,7 +463,7 @@ msgstr "<b>Cliëntverbruik</b>"
 
 #: flumotion/component/consumers/httpstreamer/http.glade:655
 msgid "Web URL:"
-msgstr ""
+msgstr "Web-URL:"
 
 #: flumotion/component/muxers/checks.py:38
 #: flumotion/worker/checks/encoder.py:39 flumotion/worker/checks/encoder.py:60
@@ -461,14 +486,12 @@ msgid "Please upgrade '%s' to version %s."
 msgstr "Gelieve '%s' te vernieuwen naar versie %s."
 
 #: flumotion/component/producers/audiotest/admin_gtk.py:89
-#, fuzzy
 msgid "Volume"
-msgstr "V_olume:"
+msgstr "Volume"
 
 #: flumotion/component/producers/audiotest/admin_gtk.py:92
-#, fuzzy
 msgid "Audio Test"
-msgstr "Audio & Video"
+msgstr "Audio Test"
 
 #: flumotion/component/producers/videotest/admin_gtk.py:39
 msgid "Pattern:"
@@ -483,31 +506,22 @@ msgid "Could not start component."
 msgstr "Kon component niet starten."
 
 #: flumotion/manager/component.py:764
-#, fuzzy
 msgid "Configuration problem."
-msgstr "Configuratie invoeren..."
+msgstr "Configuratieprobleem."
 
 #: flumotion/manager/component.py:791
-#, fuzzy, python-format
+#, python-format
 msgid "Could not connect component to %s:%d for feed %s."
-msgstr ""
-"Kon component niet herladen:\n"
-"%s."
+msgstr "Kon component niet verbinden met %s:%d voor feed %s."
 
 #: flumotion/manager/component.py:816
 #, python-format
 msgid "Could not connect to %s:%d for feed %s."
-msgstr ""
-
-#: flumotion/manager/component.py:948
-#, fuzzy
-msgid "Could not setup component."
-msgstr "Kon component niet starten."
+msgstr "Kon geen verbinding maken met %s:%d voor feed %s."
 
 #: flumotion/manager/manager.py:485
-#, fuzzy
 msgid "The component is misconfigured."
-msgstr "De component is neergestort.\n"
+msgstr "De component is fout geconfigureerd."
 
 #: flumotion/manager/manager.py:790
 msgid "The component could not be started."
@@ -694,7 +708,6 @@ msgid "Reload _Admin"
 msgstr "A_dmin Herladen"
 
 #: data/glade/admin.glade:274
-#, fuzzy
 msgid "Reload A_ll"
 msgstr "_Alles Herladen"
 
@@ -709,10 +722,6 @@ msgstr "_Help"
 #: data/glade/admin.glade:357
 msgid "Open a stored configuration"
 msgstr "Opgeslagen configuratie openen"
-
-#: data/glade/admin.glade:499
-msgid "Here is where the component ui will end up in the end"
-msgstr ""
 
 #: data/glade/admin-wizard.glade:8 data/glade/wizard.glade:8
 msgid "Flumotion Configuration Wizard"
