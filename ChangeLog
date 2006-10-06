@@ -1,5 +1,16 @@
 2006-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/errors.py:
+	* flumotion/component/component.py:
+	* flumotion/manager/component.py:
+	* po/POTFILES.in:
+	  Catch exceptions during do_setup locally at the component, and
+	  add the message there, so we know what to fix.  From that point on,
+	  treat it as handled everywhere.  Create an error for handled setup
+	  errors.  Add to translations.
+
+2006-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/admin.py:
 	* flumotion/wizard/steps.py:
 	* flumotion/wizard/wizard.py:

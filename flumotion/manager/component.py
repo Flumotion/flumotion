@@ -942,6 +942,10 @@ class ComponentHeaven(base.ManagerHeaven):
             self.vishnu._depgraph.setComponentSetup(state)
             # now not being setup
             componentAvatar._beingSetup = False
+        except errors.HandledException, e:
+            self.warning('setup failed, already handled: %s' % 
+                log.getExceptionMessage(e))
+            raise e
         except Exception, e:
             self.warning('setup failed: %s' % log.getExceptionMessage(e))
             m = messages.Error(T_(

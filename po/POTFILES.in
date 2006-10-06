@@ -10,6 +10,7 @@ flumotion/wizard/wizard.py
 flumotion/wizard/steps.py
 flumotion/wizard/step.py
 
+flumotion/component/component.py
 flumotion/component/feedcomponent.py
 
 flumotion/component/consumers/httpstreamer/http.py

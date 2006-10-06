@@ -185,6 +185,13 @@ class ComponentStartError(ComponentError):
     remote_start call on a component.
     """
 
+class ComponentSetupHandledError(ComponentSetupError, HandledException):
+    """
+    An error during setup of a component, that's already handled in a
+    different way (for example, through a message).
+    Can be raised during a remote_setup call on a component.
+    """
+
 class ComponentStartHandledError(ComponentStartError, HandledException):
     """
     An error during starting of a component, that's already handled in a

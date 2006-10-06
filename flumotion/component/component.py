@@ -44,6 +44,9 @@ from flumotion.twisted import pb as fpb
 from flumotion.twisted.compat import implements
 from flumotion.common.pygobject import gsignal
 
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
+
 class ComponentClientFactory(fpb.ReconnectingFPBClientFactory):
     """
     I am a client factory for a component logging in to the manager.
@@ -461,6 +464,17 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         d.addCallback(lambda r: self.do_check())
         d.addCallback(checkErrorCallback)
         d.addCallback(lambda r: self.do_setup())
+        def setupErrback(failure):
+            m = messages.Error(T_(
+                N_("Could not setup component.")),
+                debug=log.getFailureMessage(failure),
+                id="component-setup-%s" % self.name)
+            self.state.append('messages', m)
+            self.setMood(moods.sad)
+            raise errors.ComponentSetupHandledError(
+                'Could not set up component')
+
+        d.addErrback(setupErrback)
         return d
 
     def start(self, *args, **kwargs):
