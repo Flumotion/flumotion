@@ -21,6 +21,8 @@
 
 import gst
 import gobject
+
+import os
 import time
 
 from twisted.internet import reactor, defer
@@ -649,6 +651,10 @@ class FeedComponent(basecomponent.BaseComponent):
 
     def eatFromFD(self, feedId, fd):
         """
+        Tell the component to eat the given feedId from the given fd.
+        The component takes over the ownership of the fd, closing it when
+        no longer eating.
+
         @param feedId: feed id (componentName:feedName) to eat from through
                        the given fd
         @type  feedId: str
@@ -674,6 +680,8 @@ class FeedComponent(basecomponent.BaseComponent):
             srcpad.unlink(sinkpad)
             self.pipeline.remove(element)
             element.set_state(gst.STATE_READY)
+            old = element.get_property('fd')
+            os.close(old)
             element.set_property('fd', fd)
             self.pipeline.add(element)
             srcpad.link(sinkpad)
