@@ -836,6 +836,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
         self.debug('my mind is gone, trigger disconnect')
         return False
 
+    # FIXME: why do we ignore return value of sendFileDescriptor???
     def receiveFeed(self, feedId, fd):
         """
         Tell the feeder to receive the given feed from the given fd.
