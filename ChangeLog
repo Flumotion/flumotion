@@ -3,7 +3,7 @@
 	* flumotion/component/feedcomponent010.py:
 	  EatFromFD takes ownership of fd's and thus should close them
 	  when they get replaced.
-	  Fixes #447.
+	  Fixes #477.
 
 2006-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
