@@ -1,3 +1,11 @@
+2006-10-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/worker/feed.py:
+	* flumotion/worker/worker.py:
+	Fix leak of fds in feedserver.  Fixes bug #479.
+	Add comments to prevent people using the broken
+	receiveFeed methods without fixing them.
+
 2006-10-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/worker.py:

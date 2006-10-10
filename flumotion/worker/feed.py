@@ -143,6 +143,8 @@ class FeedAvatar(fpb.Avatar):
         t.stopReading()
         reactor.callLater(0, self._doReceiveFeed, componentId, feedId)
 
+    # FIXME: receiveFeed is broken and this method below will
+    # probably leak fds.  Fix before using.
     def _doReceiveFeed(self, componentId, feedId):
         t = self._mind.broker.transport
         self.debug('flushing PB write queue')
@@ -157,7 +159,8 @@ class FeedAvatar(fpb.Avatar):
         fd = t.fileno()
         self.debug('telling component %s to eat feedId %s from fd %d' % (
             componentId, feedId, fd))
-        self._feedServerParent.eatFromFD(componentId, feedId, fd)
+        if not self._feedServerParent.eatFromFD(componentId, feedId, fd):
+            self.debug("unsuccessful request to eatFromFD.")
 
 # an internal class; used by the worker to create avatars for Feed clients
 class _WorkerFeedDispatcher(log.Loggable):

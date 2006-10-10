@@ -702,9 +702,11 @@ class WorkerBrain(log.Loggable):
         """
         Called from the FeedAvatar to pass a file descriptor on to
         the job running the given component.
+
+        @returns: whether the fd was successfully handed off to the component.
         """
         avatar = self.jobHeaven.avatars[componentId]
-        avatar.receiveFeed(feedId, fd)
+        return avatar.receiveFeed(feedId, fd)
    
 class JobDispatcher:
     """
@@ -829,10 +831,16 @@ class JobAvatar(pb.Avatar, log.Loggable):
         # introduces a race, so we handle it here by triggering a disconnect
         # on the fd.
         if self._mind:
-            self._mind.broker.transport.sendFileDescriptor(
-                fd, "sendFeed %s" % feedName)
-            return True
-
+            try:
+                self._mind.broker.transport.sendFileDescriptor(
+                    fd, "sendFeed %s" % feedName)
+                return True
+            except exceptions.RunTimeError:
+                # RuntimeError is what is thrown by the C code doing this
+                # when there are issues
+                self.debug("We got a Runtime Error %s sending file descriptors.",
+                    e)
+                return False
         self.debug('my mind is gone, trigger disconnect')
         return False
 
@@ -840,12 +848,21 @@ class JobAvatar(pb.Avatar, log.Loggable):
     def receiveFeed(self, feedId, fd):
         """
         Tell the feeder to receive the given feed from the given fd.
+
+        @returns: whether the fd was successfully handed off to the component.
         """
         self.debug('Sending FD %d to component job to eat %s from fd' % (
             fd, feedId))
-        self._mind.broker.transport.sendFileDescriptor(
-            fd, "receiveFeed %s" % feedId)
-
+        try:
+            self._mind.broker.transport.sendFileDescriptor(
+                fd, "receiveFeed %s" % feedId)
+            return True
+        except exceptions.RunTimeError, e:
+            # RuntimeError is what is thrown by the C code doing this
+            # when there are issues
+            self.debug("We got a Runtime Error %s sending file descriptors.",
+                e)
+            return False
 
 ### this is a different kind of heaven, not IHeaven, for now...
 class JobHeaven(pb.Root, log.Loggable):
