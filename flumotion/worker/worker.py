@@ -836,7 +836,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
                 self._mind.broker.transport.sendFileDescriptor(
                     fd, "sendFeed %s" % feedName)
                 return True
-            except exceptions.RunTimeError, e:
+            except exceptions.RuntimeError, e:
                 # RuntimeError is what is thrown by the C code doing this
                 # when there are issues
                 self.debug("We got a Runtime Error %s sending file descriptors.",
@@ -858,7 +858,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
             self._mind.broker.transport.sendFileDescriptor(
                 fd, "receiveFeed %s" % feedId)
             return True
-        except exceptions.RunTimeError, e:
+        except exceptions.RuntimeError, e:
             # RuntimeError is what is thrown by the C code doing this
             # when there are issues
             self.debug("We got a Runtime Error %s sending file descriptors.",

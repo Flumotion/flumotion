@@ -1,6 +1,11 @@
 2006-10-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/worker/worker.py:
+	RuntimeError has no capital T. duh!
+
+2006-10-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/worker/worker.py:
 	Fix missing import and exception variable.
 
 2006-10-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
