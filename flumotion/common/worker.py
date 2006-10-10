@@ -36,11 +36,11 @@ from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
 class ProcessProtocol(protocol.ProcessProtocol):
-    def __init__(self, loggable, avatarId, processType, machine):
+    def __init__(self, loggable, avatarId, processType, where):
         self.loggable = loggable
         self.avatarId = avatarId
         self.processType = processType # e.g., 'component'
-        self.machine = machine # e.g., 'worker 1'
+        self.where = where # e.g., 'worker 1'
 
         self.setPid(None)
 
@@ -100,8 +100,8 @@ class ProcessProtocol(protocol.ProcessProtocol):
                     if os.path.exists(corepath):
                         obj.info("Core file is probably '%s'." % corepath)
                         message.add(T_(N_(
-                            "The core dump is '%s' on machine '%s'."),
-                            corepath, self.machine))
+                            "The core dump is '%s' on the host running  '%s'."),
+                            corepath, self.where))
                         # FIXME: add an action that runs gdb and produces a
                         # backtrace; or produce it here and attach to the
                         # message as debug info.
