@@ -1,5 +1,10 @@
 2006-10-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/worker/worker.py:
+	Fix missing import and exception variable.
+
+2006-10-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/worker/feed.py:
 	* flumotion/worker/worker.py:
 	Fix leak of fds in feedserver.  Fixes bug #479.

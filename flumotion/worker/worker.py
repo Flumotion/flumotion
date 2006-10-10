@@ -26,6 +26,7 @@ worker-side objects to handle worker clients
 import os
 import signal
 import sys
+import exceptions
 
 import gst
 import gst.interfaces
@@ -835,7 +836,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
                 self._mind.broker.transport.sendFileDescriptor(
                     fd, "sendFeed %s" % feedName)
                 return True
-            except exceptions.RunTimeError:
+            except exceptions.RunTimeError, e:
                 # RuntimeError is what is thrown by the C code doing this
                 # when there are issues
                 self.debug("We got a Runtime Error %s sending file descriptors.",
