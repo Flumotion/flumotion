@@ -378,12 +378,12 @@ class ComponentAvatar(base.ManagerAvatar):
 
         @type  conf: dict
         """
-        def _setupErrback(failure, self):
+        def _setupErrback(failure):
             self._setMood(moods.sad)
             return failure
 
         d = self.mindCallRemote('setup', conf)
-        d.addErrback(_setupErrback, self)
+        d.addErrback(_setupErrback)
         return d
 
     # This function tells the component to start

@@ -39,8 +39,20 @@
         <property name="domain" type="string" />
         <property name="user_limit" type="int" />
         <property name="bandwidth_limit" type="int" />
+
+        <!-- Burst on connect options. Defaults to off.
+             If just burst_on_connect is specified, this gives a simple 
+             burst-from-latest keyframe (so no effect for audio streams).
+
+             Additionally, you MAY specify either (not both) of burst_size,
+             burst_time. burst_size gives a minimum target burst in kB (it can
+             be larger to start from a keyframe).
+             burst_time gives a target burst time in seconds (but requires
+             gst-plugins-base 0.10.11 or later).
+          -->
         <property name="burst_on_connect" type="bool" />
         <property name="burst_size" type="int" />
+        <property name="burst_time" type="float" />
       </properties>
     </component>
   </components>
@@ -77,7 +89,8 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="httpstreamer-base" />
-			<dependency name="porterclient" />
+            <dependency name="base-component-http" />
+            <dependency name="porterclient" />
         </dependencies>
 
         <directories>

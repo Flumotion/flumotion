@@ -45,6 +45,9 @@ class ConnectionError(pb.Error):
 class NotConnectedError(ConnectionError):
     "Not connected"
 
+class NotAuthenticatedError(ConnectionError):
+    "Not authenticated"
+
 class ConnectionRefusedError(ConnectionError):
     "Connection refused"
 

@@ -68,5 +68,5 @@ class TokenTestBouncer(bouncer.Bouncer):
             return defer.succeed(keycard)
 
         else:
-            self.info('keycard %r unauthorized, returning Nonw')
+            self.info('keycard %r unauthorized, returning None')
             return defer.succeed(None)

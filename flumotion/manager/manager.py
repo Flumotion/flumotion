@@ -627,21 +627,16 @@ class Vishnu(log.Loggable):
             return defer.fail(errors.ComponentError(msg))
 
         d = avatar.mindCallRemote('stop')
-        def clearSadCallback(result):
+        def cleanupAndDisconnectComponent(result):
             if componentState.get('mood') == moods.sad.value:
                 self.debug('clearing sad mood after stopping component')
                 componentState.set('mood', moods.sleeping.value)
-            return result
-        def clearAvatarFlags(result):
             avatar._starting = False
             avatar._beingSetup = False
-            return result
-        def disconnectComponent(result):
+
             return avatar.disconnect()
 
-        d.addCallback(clearAvatarFlags)
-        d.addCallback(clearSadCallback)
-        d.addCallback(disconnectComponent)
+        d.addCallback(cleanupAndDisconnectComponent)
 
         return d
 
@@ -850,6 +845,12 @@ class Vishnu(log.Loggable):
         # attach componentstate to avatar
         componentAvatar.componentState = m.state
 
+        # Now that we have attached a component, we must set the mood to
+        # waking (if it's currently sleeping). At this point, this is still the
+        # manager's copy; the JobState is not yet attached.
+        if m.state.get('mood') == moods.sleeping.value:
+            m.state.set('mood', moods.waking.value)
+
         return defer.succeed(None)
 
     def componentDetached(self, componentAvatar):
@@ -874,9 +875,14 @@ class Vishnu(log.Loggable):
         # attach jobState to state
         m.state.setJobState(jobState)
 
+        # Now that the JobState is attached, it might have overridden our
+        # mood to sleeping; we MUST be waking; so we reset it here if required.
+        if m.state.get('mood') == moods.sleeping.value:
+            m.state.set('mood', moods.waking.value)
+
         self._depgraph.setJobStarted(m.state)
         # If this is a reconnecting component, we might also need to set the
-        # component as setup and/or started.
+        # component as started.
         # If mood is happy or hungry, then the component is running.
         mood = m.state.get('mood')
         if mood == moods.happy.value or mood == moods.hungry.value:
@@ -884,13 +890,6 @@ class Vishnu(log.Loggable):
                 "appropriately", componentAvatar.avatarId, moods.get(mood).name)
             self._depgraph.setComponentSetup(m.state)
             self._depgraph.setComponentStarted(m.state)
-        elif mood == moods.waking.value:
-            self.debug("Component %s is waking, noting in depgraph", 
-                componentAvatar.avatarId)
-            self._depgraph.setComponentSetup(m.state)
-        # TODO: When a new component logs in, we should immediately be in state
-        # 'waking'. However, we need to distinguish between setup and not-setup
-        # waking components.
 
         self.debug('vishnu registered component %r' % componentAvatar)
         self.componentHeaven._tryWhatCanBeStarted()

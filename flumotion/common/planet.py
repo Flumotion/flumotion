@@ -195,6 +195,11 @@ class ManagerComponentState(flavors.StateCacheable):
      - workerRequested:   str, name of the worker this component is
                           requested to be started on.
 
+    It also has a special key, 'mood'. This acts as a proxy for the mood
+    in the L{WorkerJobState}, when there is a job attached (the job's copy
+    is authoritative when it connects), and is controlled independently at 
+    other times.
+
     I proxy the following keys from the serialized L{WorkerJobState}:
       - mood, ip, pid, workerName, cpu
       - messages (list)

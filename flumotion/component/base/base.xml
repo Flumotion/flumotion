@@ -22,5 +22,16 @@
         </directory>
       </directories>
     </bundle>
+    <bundle name="base-component-http">
+      <dependencies>
+        <dependency name="flumotion" />
+        <dependency name="component-base" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/base">
+          <filename location="http.py" />
+        </directory>
+      </directories>
+    </bundle>
   </bundles>
 </registry> 

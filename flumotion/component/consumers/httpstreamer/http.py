@@ -257,6 +257,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._removed_lock = thread.allocate_lock()
         self._removed_queue = []
 
+        self._pending_removals = {}
+
         for i in ('stream-mime', 'stream-uptime', 'stream-bitrate',
                   'stream-totalbytes', 'clients-current', 'clients-max',
                   'clients-peak', 'clients-peak-time', 'clients-average',
@@ -277,52 +279,49 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                     msg = "slave mode, missing required property 'socket_%s'" % k
                     return defer.fail(errors.ConfigError(msg))
 
+        if 'burst_size' in props and 'burst_time' in props:
+            msg = 'both burst_size and burst_time set, cannot satisfy'
+            return defer.fail(errors.ConfigError(msg))
+
         # tcp is where multifdsink is
         version = gstreamer.get_plugin_version('tcp') 
         if version < (0,10,9,1):
             return defer.fail(
                 errors.PropertyError("multifdsink version too old"))
-    
-    def configure_pipeline(self, pipeline, properties):
-        Stats.__init__(self, sink=self.get_element('sink'))
 
-        # FIXME: call self._callLaterId.cancel() somewhere on shutdown
-        self._callLaterId = reactor.callLater(1, self._checkUpdate)
+    def time_bursting_supported(self, sink):
+        try:
+            sink.get_property('units-max')
+            return True
+        except TypeError:
+            return False
 
-        # FIXME: do a .cancel on this Id somewhere
-        self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
-        
-        mountPoint = properties.get('mount_point', '')
-        if not mountPoint.startswith('/'):
-            mountPoint = '/' + mountPoint
-        self.mountPoint = mountPoint
-        
-        # Hostname is used for a variety of purposes. We do a best-effort guess
-        # where nothing else is possible, but it's much preferable to just
-        # configure this
-        self.hostname = properties.get('hostname', None)
-        self.iface = self.hostname # We listen on this if explicitly configured,
-                                   # but not if it's only guessed at by the
-                                   # below code.
-        if not self.hostname:
-            # Don't call this nasty, nasty, probably flaky function unless we
-            # need to.
-            self.hostname = netutils.guess_public_hostname()
-
-        self.description = properties.get('description', None)
-        if self.description is None:
-            self.description = "Flumotion Stream"
- 
-        # FIXME: tie these together more nicely
-        self.resource = resources.HTTPStreamingResource(self)
-
-        # check how to set client sync mode
-        self.burst_on_connect = properties.get('burst_on_connect', False)
-        self.burst_size = properties.get('burst_size', 0)
-        sink = self.get_element('sink')
-        self.debug("multifdsink has new sync-method property")
+    def setup_burst_mode(self, sink):
         if self.burst_on_connect:
-            if self.burst_size:
+            if self.burst_time and self.time_bursting_supported(sink):
+                self.debug("Configuring burst mode for %f second burst", 
+                    self.burst_time)
+                # Set a burst for configurable minimum time, plus extra to
+                # start from a keyframe if needed.
+                sink.set_property('sync-method', 4) # burst-keyframe
+                sink.set_property('burst-unit', 2) # time
+                sink.set_property('burst-value', 
+                    long(self.burst_time * gst.SECOND))
+
+                # We also want to ensure that we have sufficient data available
+                # to satisfy this burst; and an appropriate maximum, all 
+                # specified in units of time.
+                sink.set_property('time-min', 
+                    long((self.burst_time + 5) * gst.SECOND))
+
+                sink.set_property('unit-type', 2) # time
+                sink.set_property('units-soft-max',
+                    long((self.burst_time + 8) * gst.SECOND))
+                sink.set_property('units-max',
+                    long((self.burst_time + 10) * gst.SECOND))
+            elif self.burst_size:
+                self.debug("Configuring burst mode for %d kB burst", 
+                    self.burst_size)
                 # If we have a burst-size set, use modern 
                 # needs-recent-multifdsink behaviour to have complex bursting.
                 # In this mode, we burst a configurable minimum, plus extra 
@@ -361,13 +360,58 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
             sink.set_property('buffers-soft-max', 250)
             sink.set_property('buffers-max', 500)
-            
+    
+    def configure_pipeline(self, pipeline, properties):
+        Stats.__init__(self, sink=self.get_element('sink'))
+
+        # FIXME: call self._callLaterId.cancel() somewhere on shutdown
+        self._callLaterId = reactor.callLater(1, self._checkUpdate)
+
+        # FIXME: do a .cancel on this Id somewhere
+        self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
+        
+        mountPoint = properties.get('mount_point', '')
+        if not mountPoint.startswith('/'):
+            mountPoint = '/' + mountPoint
+        self.mountPoint = mountPoint
+        
+        # Hostname is used for a variety of purposes. We do a best-effort guess
+        # where nothing else is possible, but it's much preferable to just
+        # configure this
+        self.hostname = properties.get('hostname', None)
+        self.iface = self.hostname # We listen on this if explicitly configured,
+                                   # but not if it's only guessed at by the
+                                   # below code.
+        if not self.hostname:
+            # Don't call this nasty, nasty, probably flaky function unless we
+            # need to.
+            self.hostname = netutils.guess_public_hostname()
+
+        self.description = properties.get('description', None)
+        if self.description is None:
+            self.description = "Flumotion Stream"
+ 
+        # FIXME: tie these together more nicely
+        self.resource = resources.HTTPStreamingResource(self)
+
+        # check how to set client sync mode
+        sink = self.get_element('sink')
+        self.burst_on_connect = properties.get('burst_on_connect', False)
+        self.burst_size = properties.get('burst_size', 0)
+        self.burst_time = properties.get('burst_time', 0.0)
+
+        self.setup_burst_mode(sink)
+
         # FIXME: these should be made threadsafe if we use GstThreads
         sink.connect('deep-notify::caps', self._notify_caps_cb)
 
         # these are made threadsafe using idle_add in the handler
-        sink.connect('client-removed', self._client_removed_cb)
         sink.connect('client-added', self._client_added_cb)
+
+        # We now require a sufficiently recent multifdsink anyway that we can
+        # use the new client-fd-removed signal
+        sink.connect('client-fd-removed', self._client_fd_removed_cb)
+        sink.connect('client-removed', self._client_removed_cb)
 
         if properties.has_key('user_limit'):
             self.resource.setUserLimit(int(properties['user_limit']))
@@ -528,15 +572,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             (fd, thread.get_ident(), reason)) 
         if reason.value_name == 'GST_CLIENT_STATUS_ERROR':
             self.warning('[fd %5d] Client removed because of write error' % fd)
-        if reason.value_name == 'GST_CLIENT_STATUS_DUPLICATE':
-            # a _removed because of DUPLICATE never had the _added signaled
-            # in the first place, so we shouldn't update stats for it and just
-            # fughedaboudit
-            self.warning('[fd %5d] Client refused because the same fd is already registered' % fd)
-            return
 
-        # Johan will trap GST_CLIENT_STATUS_ERROR here someday
-        # because STATUS_ERROR seems to have already closed the fd somewhere
         self.emit('client-removed', sink, fd, reason, stats)
         Stats.clientRemoved(self)
         # FIXME: GIL problem, don't update UI for now
@@ -551,12 +587,19 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._added_queue.append((sink, fd))
         self._added_lock.release()
 
+    # We now use both client-removed and client-fd-removed. We call get-stats
+    # from the first callback ('client-removed'), but don't actually start
+    # removing the client until we get 'client-fd-removed'. This ensures that
+    # there's no window in which multifdsink still knows about the fd, but we've    # actually closed it, so we no longer get spurious duplicates.
     # this can be called from both application and streaming thread !
     def _client_removed_cb(self, sink, fd, reason):
-        self._removed_lock.acquire()
-        # used to be commented out to see if it solves GIL problems
         stats = sink.emit('get-stats', fd)
-        #stats = None
+        self._pending_removals[fd] = (stats, reason)
+
+    # this can be called from both application and streaming thread !
+    def _client_fd_removed_cb(self, sink, fd):
+        self._removed_lock.acquire()
+        (stats, reason) = self._pending_removals.pop(fd)
         self._removed_queue.append((sink, fd, reason, stats))
         self._removed_lock.release()
 

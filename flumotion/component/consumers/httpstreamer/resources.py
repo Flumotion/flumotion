@@ -42,6 +42,8 @@ from flumotion.common import errors
 
 from flumotion.common import common, log, keycards
 
+from flumotion.component.base import http as httpbase
+
 __all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
 
 HTTP_NAME = 'FlumotionHTTPServer'
@@ -60,58 +62,9 @@ ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 
 HTTP_SERVER = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 
-### This is new Issuer code that eventually should move to e.g.
-### flumotion.common.keycards or related
-
-class Issuer(log.Loggable):
-    """
-    I am a base class for all Issuers.
-    An issuer issues keycards of a given class based on an object
-    (incoming HTTP request, ...)
-    """
-    def issue(self, *args, **kwargs):
-        """
-        Return a keycard, or None, based on the given arguments. 
-        """
-        raise NotImplementedError
-
-class HTTPAuthIssuer(Issuer):
-    """
-    I create L{flumotion.common.keycards.KeycardUACPP} keycards based on
-    an incoming L{twisted.protocols.http.Request} request's standard
-    HTTP authentication information.
-    """
-    def issue(self, request):
-        # for now, we're happy with a UACPP keycard; the password arrives
-        # plaintext anyway
-        keycard = keycards.KeycardUACPP(
-            request.getUser(),
-            request.getPassword(), request.getClientIP())
-        self.debug('Asking for authentication, user %s, password %s, ip %s' % (
-            keycard.username, keycard.password, keycard.address))
-        return keycard
- 
-class HTTPTokenIssuer(Issuer):
-    """
-    I create L{flumotion.common.keycards.KeycardToken} keycards based on
-    an incoming L{twisted.protocols.http.Request} request's GET "token"
-    parameter.
-    """
-    def issue(self, request):
-        if not 'token' in request.args.keys():
-            return None
-
-        # args can have lists as values, if more than one specified
-        token = request.args['token']
-        if not isinstance(token, str):
-            token = token[0]
-        
-        keycard = keycards.KeycardToken(token,
-            request.getClientIP())
-        return keycard
- 
 ### the Twisted resource that handles the base URL
-class HTTPStreamingResource(web_resource.Resource, log.Loggable):
+class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
+    log.Loggable):
 
     __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
 
@@ -130,13 +83,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.streamer = streamer
         
         self._requests = {}            # request fd -> Request
-        self._fdToKeycard = {}         # request fd -> Keycard
-        self._idToKeycard = {}         # keycard id -> Keycard
-        self._fdToDurationCall = {}    # request fd -> IDelayedCall for duration
-        self._domain = None            # used for auth challenge and on keycard
-        self._issuer = HTTPAuthIssuer() # issues keycards; default for compat
-        self.bouncerName = None
-        self.requesterId = streamer.getName() # avatarId of streamer component
         
         self.maxclients = self.getMaxAllowedClients(-1)
         
@@ -144,6 +90,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             streamer.plugs['flumotion.component.plugs.loggers.Logger']
             
         web_resource.Resource.__init__(self)
+        httpbase.HTTPAuthentication.__init__(self, streamer)
 
     def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
         # this is the callback attached to our flumotion component,
@@ -165,15 +112,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             self.debug('rotating logger %r' % logger)
             logger.rotate()
             
-    def setDomain(self, domain):
-        """
-        Set a domain name on the resource, used in HTTP auth challenges and
-        on the keycard.
-        
-        @type domain: string
-        """
-        self._domain = domain
-        
     def logWrite(self, fd, ip, request, stats):
 
         headers = request.getAllHeaders()
@@ -206,22 +144,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.maxclients = self.getMaxAllowedClients(limit)
         # Log what we actually managed to set it to.
         self.info('set maxclients to %d' % self.maxclients)
-
-    def setBouncerName(self, bouncerName):
-        self.bouncerName = bouncerName
-
-    def setRequesterId(self, requesterId):
-        self.requesterId = requesterId
-
-    def setIssuerClass(self, issuerClass):
-        # FIXME: in the future, we want to make this pluggable and have it
-        # look up somewhere ?
-        if issuerClass == 'HTTPTokenIssuer':
-            self._issuer = HTTPTokenIssuer()
-        elif issuerClass == 'HTTPAuthIssuer':
-            self._issuer = HTTPAuthIssuer()
-        else:
-            raise ValueError, "issuerClass %s not accepted" % issuerClass
 
     # FIXME: rename to writeHeaders
     """
@@ -325,26 +247,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def reachedMaxClients(self):
         return len(self._requests) >= self.maxclients and self.maxclients >= 0
     
-    def authenticate(self, request):
-        """
-        Returns: a deferred returning a keycard or None
-        """
-        keycard = self._issuer.issue(request)
-        if not keycard:
-            self.debug('no keycard from issuer, firing None')
-            return defer.succeed(None)
-
-        keycard.requesterId = self.requesterId
-        keycard._fd = request.transport.fileno()
-        
-        if self.bouncerName == None:
-            self.debug('no bouncer, accepting')
-            return defer.succeed(keycard)
-
-        keycard.setDomain(self._domain)
-        self.debug('sending keycard to bouncer %r' % self.bouncerName)
-        return self.streamer.medium.authenticate(self.bouncerName, keycard)
-
     def _addClient(self, request):
         """
         Add a request, so it can be used for statistics.
@@ -377,18 +279,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         # We can't call request.finish(), since we already "stole" the fd, we 
         # just loseConnection on the transport directly, and delete the 
-        # Request object, as well as cleaning up the bouncer bits.
-        if self.bouncerName and self._fdToKeycard.has_key(fd):
-            id = self._fdToKeycard[fd].id
-            del self._fdToKeycard[fd]
-            del self._idToKeycard[id]
-            self.debug('[fd %5d] asking bouncer %s to remove keycard id %s' % (
-                fd, self.bouncerName, id))
-            self.streamer.medium.removeKeycardId(self.bouncerName, id)
-        if self._fdToDurationCall.has_key(fd):
-            self.debug('[fd %5d] canceling later expiration call' % fd)
-            self._fdToDurationCall[fd].cancel()
-            del self._fdToDurationCall[fd]
+        # Request object, after cleaning up the bouncer bits.
+        self.cleanupAuth(fd)
 
         self.debug('[fd %5d] closing transport %r' % (fd, request.transport))
         # This will close the underlying socket. We first remove the request
@@ -399,35 +291,20 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         self.debug('[fd %5d] closed transport %r' % (fd, request.transport))
 
-    def _durationCallLater(self, fd):
-        """
-        Expire a client due to a duration expiration.
-        """
-        self.debug('[fd %5d] duration exceeded, expiring client' % fd)
-
-        # we're called from a callLater, so we've already run; just delete
-        if self._fdToDurationCall.has_key(fd):
-            del self._fdToDurationCall[fd]
-            
-        self.debug('[fd %5d] asking streamer to remove client' % fd)
+    def clientDone(self, fd):
         self.streamer.remove_client(fd)
 
-    def expireKeycard(self, keycardId):
-        """
-        Expire a client's connection associated with the keycard Id.
-        """
-        keycard = self._idToKeycard[keycardId]
-        fd = keycard._fd
+    def handleAuthenticatedRequest(self, res, request):
+        if request.method == 'GET':
+            self._handleNewClient(request)
+        elif request.method == 'HEAD':
+            self.debug('handling HEAD request')
+            self._writeHeaders(request)
+            request.finish()
+        else:
+            raise AssertionError
 
-        self.debug('[fd %5d] expiring client' % fd)
-
-        if self._fdToDurationCall.has_key(fd):
-            self.debug('[fd %5d] canceling later expiration call' % fd)
-            self._fdToDurationCall[fd].cancel()
-            del self._fdToDurationCall[fd]
-
-        self.debug('[fd %5d] asking streamer to remove client' % fd)
-        self.streamer.remove_client(fd)
+        return res
 
     ### resource.Resource methods
 
@@ -449,14 +326,17 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             return self._handleMaxClients(request)
 
         self.debug('_render(): asked for (possible) authentication')
-        d = self.authenticate(request)
-        d.addCallback(self._authenticatedCallback, request)
-        d.addErrback(self._authenticatedErrback, request)
+        d = self.startAuthentication(request)
+        d.addCallback(self.handleAuthenticatedRequest, request)
 
         # we MUST return this from our _render.
-        # FIXME: check if this is true
-        # FIXME: check how we later handle not authorized
         return server.NOT_DONE_YET
+
+    def authenticateKeycard(self, bouncerName, keycard):
+        return self.streamer.medium.authenticate(bouncerName, keycard)
+
+    def cleanupKeycard(self, bouncerName, keycard):
+        return self.streamer.medium.removeKeycardId(bouncerName, keycard.id)
 
     def _handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')
@@ -474,59 +354,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         
         return ERROR_TEMPLATE % {'code': error_code,
                                  'error': http.RESPONSES[error_code]}
-
-    def _authenticatedCallback(self, keycard, request):
-        # !: since we are a callback, the incoming fd might have gone away
-        # and closed
-        self.debug('_authenticatedCallback: keycard %r' % keycard)
-        if not keycard:
-            self._handleUnauthorized(request)
-            return
-
-        # properly authenticated
-        if request.method == 'GET':
-            fd = request.transport.fileno()
-
-            if self.bouncerName:
-                self._fdToKeycard[fd] = keycard
-                self._idToKeycard[keycard.id] = keycard
-
-            if keycard.duration:
-                self.debug('new connection on %d will expire in %f seconds' % (
-                    fd, keycard.duration))
-                self._fdToDurationCall[fd] = reactor.callLater(
-                    keycard.duration, self._durationCallLater, fd)
-
-            self._handleNewClient(request)
-
-        elif request.method == 'HEAD':
-            self.debug('handling HEAD request')
-            self._writeHeaders(request)
-            request.finish()
-        else:
-            raise AssertionError
-
-    def _authenticatedErrback(self, failure, request):
-        failure.trap(errors.UnknownComponentError)
-        self._handleUnauthorized(request)
-        
-    def _handleUnauthorized(self, request):
-        self.debug('client from %s is unauthorized' % (request.getClientIP()))
-        request.setHeader('content-type', 'text/html')
-        request.setHeader('server', HTTP_VERSION)
-        if self._domain:
-            request.setHeader('WWW-Authenticate',
-                              'Basic realm="%s"' % self._domain)
-            
-        error_code = http.UNAUTHORIZED
-        request.setResponseCode(error_code)
-        
-        # we have to write data ourselves,
-        # since we already returned NOT_DONE_YET
-        html = ERROR_TEMPLATE % {'code': error_code,
-                                 'error': http.RESPONSES[error_code]}
-        request.write(html)
-        request.finish()
 
     def _handleNewClient(self, request):
         # everything fulfilled, serve to client

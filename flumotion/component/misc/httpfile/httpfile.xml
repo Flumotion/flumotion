@@ -10,12 +10,18 @@
       </entries>
       <sockets>
         <socket type="flumotion.component.plugs.loggers.Logger"/>
+        <socket type="flumotion.component.plugs.streamdata.StreamDataProvider"/>
       </sockets>
       <properties>
         <property name="port" type="int" />
+        <property name="hostname" type="string" />
+         <!-- Warning: mount_point of / is broken -->
         <property name="mount_point" type="string" />
         <property name="path" type="string" required="true" />
         <property name="type" type="string" />
+
+        <property name="bouncer" type="string" />
+        <property name="issuer" type="string" />
 		
         <!-- If type is 'slave' -->
         <property name="porter_socket_path" type="string" />
@@ -43,6 +49,7 @@
     <bundle name="httpfile-component">
         <dependencies>
             <dependency name="component" />
+            <dependency name="base-component-http" />
             <dependency name="httpfile-base" />
         </dependencies>
 

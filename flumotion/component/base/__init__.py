@@ -20,5 +20,5 @@
 # Headers in this file shall remain intact.
 
 """
-Base classes for components and their ui's.
+Base classes for components and their UIs.
 """

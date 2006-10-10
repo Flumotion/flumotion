@@ -1,3 +1,25 @@
+2006-10-10  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/errors.py:
+	* flumotion/common/planet.py:
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/base/__init__.py:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/bouncers/tokentest.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/component/misc/httpfile/httpfile.xml:
+	* flumotion/component/misc/porter/porterclient.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	  Merge mike-http-improvements-1 to trunk.
+	  Adds support for on-demand streaming for the platform, improves
+	  http streaming (bursting, mostly, and some bugfixes), and some core
+	  fixes for managing component moods.
+
 2006-10-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/worker/worker.py:

@@ -148,7 +148,8 @@ class FeedComponent(basecomponent.BaseComponent):
         Subclasses can override me.
         They should chain up first.
         """
-        assert self.pipeline == None
+        if self.pipeline:
+            self.cleanup()
         self.pipeline = pipeline
         self.setup_pipeline()
  
@@ -247,11 +248,6 @@ class FeedComponent(basecomponent.BaseComponent):
         """
         return self.feed_names
 
-    def restart(self):
-        self.debug('restarting')
-        self.cleanup()
-        self.setup_pipeline()
-       
     def get_pipeline(self):
         return self.pipeline
 

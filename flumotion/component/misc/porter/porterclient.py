@@ -123,13 +123,14 @@ class PorterClientFactory(fpb.ReconnectingPBClientFactory):
         return self.medium.deregisterPrefix("/")
 
 class HTTPPorterClientFactory(PorterClientFactory):
-    def __init__(self, childFactory, mountPoints, do_start_deferred):
+    def __init__(self, childFactory, mountPoints, do_start_deferred, prefixes=[]):
         """
         @param mountPoints: a list of mountPoint strings that should be
                             registered to the porter
         """
         PorterClientFactory.__init__(self, childFactory)
         self._mountPoints = mountPoints
+        self._prefixes = prefixes
         self._do_start_deferred = do_start_deferred
 
     def _fireDeferred(self, r):
@@ -151,5 +152,9 @@ class HTTPPorterClientFactory(PorterClientFactory):
         for mount in self._mountPoints:
             self.debug("Registering mount point %s with porter", mount)
             deferred.addCallback(lambda r,m: self.registerPath(m), 
+                mount)
+        for mount in self._prefixes:
+            self.debug("Registering mount prefix %s with porter", mount)
+            deferred.addCallback(lambda r,m: self.registerPrefix(m), 
                 mount)
         deferred.addCallback(self._fireDeferred)
