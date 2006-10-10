@@ -840,7 +840,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
                 # RuntimeError is what is thrown by the C code doing this
                 # when there are issues
                 self.debug("We got a Runtime Error %s sending file descriptors.",
-                    e)
+                    log.getExceptionMessage(e))
                 return False
         self.debug('my mind is gone, trigger disconnect')
         return False
@@ -862,7 +862,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
             # RuntimeError is what is thrown by the C code doing this
             # when there are issues
             self.debug("We got a Runtime Error %s sending file descriptors.",
-                e)
+                log.getExceptionMessage(e))
             return False
 
 ### this is a different kind of heaven, not IHeaven, for now...
