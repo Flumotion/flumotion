@@ -412,7 +412,7 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
                 msg = "Remote method '%s' does not exist." % methodName
                 msg += "\n" + failure.value
             else:
-                msg = failure.value
+                msg = log.getFailureMessage(failure)
 
             # FIXME: we probably need a nicer way of getting component
             # messages shown from the admin model, but this allows us to
