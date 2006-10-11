@@ -890,6 +890,11 @@ class Vishnu(log.Loggable):
                 "appropriately", componentAvatar.avatarId, moods.get(mood).name)
             self._depgraph.setComponentSetup(m.state)
             self._depgraph.setComponentStarted(m.state)
+            if self._depgraph.isAClockMaster(m.state):
+                self.log("Component %s is a clock master and is happy/hungry "
+                    "so must already be providing clock master",
+                    componentAvatar.avatarId)
+                self._depgraph.setClockMasterStarted(m.state)
 
         self.debug('vishnu registered component %r' % componentAvatar)
         self.componentHeaven._tryWhatCanBeStarted()

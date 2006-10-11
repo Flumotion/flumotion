@@ -432,14 +432,23 @@ class FeedComponent(basecomponent.BaseComponent):
             self.clock_provider = None
 
         # We need to be >= PAUSED to get the correct clock, in general
-        self.info ("Setting pipeline to PAUSED")
+        (ret, state, pending) = self.pipeline.get_state(0)
+        if state != gst.STATE_PAUSED and state != gst.STATE_PLAYING:
+            self.info ("Setting pipeline to PAUSED")
 
-        d = self._addStateChangeDeferred(gst.STATE_CHANGE_READY_TO_PAUSED)
-        self.pipeline.set_state(gst.STATE_PAUSED)
+            d = self._addStateChangeDeferred(gst.STATE_CHANGE_READY_TO_PAUSED)
+            d.addCallback(pipelinePaused)
 
-        d.addCallback(pipelinePaused)
-
-        return d
+            self.pipeline.set_state(gst.STATE_PAUSED)
+            return d
+        else:
+            self.info ("Pipeline already started, retrieving clocking")
+            # Just return the already set up info, as a fired deferred
+            ip = self.state.get('ip')
+            base_time = self.pipeline.get_base_time()
+            d = defer.Deferred()
+            d.callback((ip, port, base_time))
+            return d
 
     # FIXME: rename, since this just starts the pipeline,
     # and linking is done by the manager

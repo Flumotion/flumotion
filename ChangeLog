@@ -1,3 +1,13 @@
+2006-10-11  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/manager/depgraph.py:
+	* flumotion/manager/manager.py:
+	  Handle reconnecting clock-masters properly in the depgraph.
+	  Avoid pausing an already-running pipeline when asked for clocking
+	  information.
+	  Fixes #480.
+
 2006-10-10  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/errors.py:

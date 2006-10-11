@@ -403,5 +403,13 @@ class DepGraph(log.Loggable):
         @param component: the component to set CLOCKMASTER to True for
         @type  component: {flumotion.common.planet.ManagerComponentState}
         """
-
         self._setState(component, "CLOCKMASTER", False)
+
+    def isAClockMaster(self, component):
+        """
+        Checks if component has a CLOCKMASTER node
+
+        @param component: the component to check if CLOCKMASTER node exists
+        @type component: {flumotion.common.planet.ManagerComponentState}
+        """
+        return self._dag.hasNode(component, "CLOCKMASTER")
