@@ -1,6 +1,11 @@
 2006-10-11  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/misc/httpfile/httpfile.py:
+	  Remove duplicate copy of method.
+
+2006-10-11  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/misc/httpfile/httpfile.py:
 	  Hack to override connectionLost on the wrapped request, call
 	  requestFinished from there, so we log incomplete requests.
 

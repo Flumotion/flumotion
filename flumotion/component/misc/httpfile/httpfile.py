@@ -77,12 +77,6 @@ class RequestWrapper:
                                     time.time() -
                                     self.__dict__['__start_time'])
 
-    def connectionLost(self, reason):
-        self.__dict__['__finished'](self.request,
-                                    self.__dict__['__written'],
-                                    time.time() -
-                                    self.__dict__['__start_time'])
-
 class File(static.File, log.Loggable):
     __pychecker__ = 'no-objattrs'
 
