@@ -1,5 +1,11 @@
 2006-10-11  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Hack to override connectionLost on the wrapped request, call
+	  requestFinished from there, so we log incomplete requests.
+
+2006-10-11  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/feedcomponent010.py:
 	* flumotion/manager/depgraph.py:
 	* flumotion/manager/manager.py:

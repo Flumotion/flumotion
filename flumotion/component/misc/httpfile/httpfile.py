@@ -47,6 +47,10 @@ class RequestWrapper:
         self.__dict__['__start_time'] = time.time()
         self.__dict__['__finished'] = finished
 
+        # The HTTPChannel has a reference to the actual request object, and
+        # we need to override connectionLost for incomplete requests. Be evil.
+        request.connectionLost = self.connectionLost
+
     def __getattr__(self, key):
         return getattr(self.request, key)
 
@@ -66,6 +70,18 @@ class RequestWrapper:
                                     time.time() -
                                     self.__dict__['__start_time'])
         return self.request.finish()
+
+    def connectionLost(self, reason):
+        self.__dict__['__finished'](self.request,
+                                    self.__dict__['__written'],
+                                    time.time() -
+                                    self.__dict__['__start_time'])
+
+    def connectionLost(self, reason):
+        self.__dict__['__finished'](self.request,
+                                    self.__dict__['__written'],
+                                    time.time() -
+                                    self.__dict__['__start_time'])
 
 class File(static.File, log.Loggable):
     __pychecker__ = 'no-objattrs'
