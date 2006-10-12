@@ -21,7 +21,7 @@
 
 import time
 
-from flumotion.common import errors, log
+from flumotion.common import errors
 from flumotion.component.plugs import base
 
 
@@ -61,8 +61,9 @@ class ApacheLogger(Logger):
                                          % (self.filename, data[1]))
 
     def stop(self, component):
-        self.file.close()
-        self.file = None
+        if self.file:
+            self.file.close()
+            self.file = None
 
     def event_http_session_completed(self, args):
         self.file.write(_http_session_completed_to_apache_log(args))
