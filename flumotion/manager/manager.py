@@ -800,6 +800,17 @@ class Vishnu(log.Loggable):
         assert not avatar.avatarId in self._componentMappers.keys()
 
         state = planet.ManagerComponentState()
+
+        # ok unfortunately there is a window in which a component does
+        # not have a config. accept that so that an admin can stop this
+        # component.
+        if conf is None:
+            flowName, compName = common.parseComponentId(avatar.avatarId)
+            conf = {'name': compName,
+                    'parent': flowName,
+                    'type': 'unknown-component',
+                    'properties': {}}
+
         state.set('name', conf['name'])
         state.set('type', conf['type'])
         # FIXME: since now we require all component XML configs to have

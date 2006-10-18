@@ -203,7 +203,11 @@ class BaseComponentMedium(medium.PingingMedium):
         @rtype:   dict
         @returns: component's current configuration
         """
-        return self.comp.config
+        try:
+            return self.comp.config
+        except AttributeError:
+            self.info('getConfig on a component that was not set up!')
+            return None
         
     def remote_setup(self, config):
         """
@@ -350,7 +354,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         error message, this method should set the mood to sad and raise the
         error on its own.
 
-        self.config will be set when this is called.
+        self.config will be set before this is called.
 
         @Returns: L{twisted.internet.defer.Deferred}
         """
@@ -364,7 +368,7 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         Non-programming errors should not be raised, but returned as a
         failing deferred.
 
-        self.config will be set when this is called.
+        self.config will be set before this is called.
 
         @Returns: L{twisted.internet.defer.Deferred}
         """

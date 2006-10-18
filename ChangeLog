@@ -1,3 +1,13 @@
+2006-10-18  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu._configToComponentState):
+	Allow conf == None so that we can stop this component.
+
+	* flumotion/component/component.py (BaseComponent.do_check)
+	(BaseComponent.do_setup): Better worded docs.
+	(BaseComponentMedium.remote_getConfig): Return None as the config
+	if the component did not get fully set up.
+
 2006-10-12  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/plugs/loggers.py:
