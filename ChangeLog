@@ -1,3 +1,8 @@
+2006-10-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/porter/porter.py:
+	  not sure why we were logging the type of str
+
 2006-10-18  Andy Wingo  <wingo@pobox.com>
 
 	* tools/analyze-flu-log: New script, analyzes flumotion logs.

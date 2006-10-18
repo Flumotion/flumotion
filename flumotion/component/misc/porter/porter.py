@@ -209,7 +209,7 @@ class Porter(component.BaseComponent, log.Loggable):
         found = None
         # TODO: Horribly inefficient. Figure out a smart algorithm
         for prefix in self._prefixes.keys():
-            self.debug("Checking: %r, %r" % (type(prefix), type(path)))
+            self.debug("Checking: %r, %r" % (prefix, path))
             if (path.startswith(prefix) and (not found or len(found) < len(prefix))):
                 found = prefix
         if found:
