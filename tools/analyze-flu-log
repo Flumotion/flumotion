@@ -1,0 +1,196 @@
+#!/usr/bin/env python
+
+import datetime
+import optparse
+import re
+import time
+import sys
+
+capitals = r'([A-Z]+)'
+qstring = r'([^" ]+|"(([^"]|\")+)")'
+nonspace = r'([^ ]+)'
+digits_and_dots = r'([\d\.]+)'
+bracketed = r'\[([^\]]+)\]'
+digits = r'(\d+)'
+digits_maybe_hyphen = r'([-\d]+)'
+
+log_re = re.compile(r'^([A-Z]+) +'
+                    r'\[(\d+)\] +'
+                    r'("([^"]+)" +)?'
+                    r'([^ ]+) +'
+                    r'([A-Z][a-z][a-z] \d\d \d\d:\d\d:\d\d) +'
+                    r'([^ ].*)$')
+
+level_names = ('ERROR', 'WARN', 'INFO', 'DEBUG', 'LOG')
+levels = dict([(name, i+1) for i, name in enumerate(level_names)])
+
+last_line = None
+def parse_line(l):
+    global last_line
+    try:
+        m = log_re.match(l)
+        g = m.groups()
+        parsed = {'level': levels[g[0]],
+                  'pid': int(g[1]),
+                  'logname': g[3],
+                  'object': g[4],
+                  'date': time.mktime(time.strptime(g[5], '%b %d %H:%M:%S')),
+                  'message': g[6]}
+        last_line = dict(parsed)
+        return parsed
+
+    except Exception, e:
+        # try to get sane values
+        if last_line:
+            parsed = dict(last_line)
+        else:
+            parsed =  {'pid': -1, 'logname':None,
+                       'object': None, 'date': None}
+        parsed['level'] = None
+        parsed['message'] = l
+        return parsed
+
+class StatsAnalyzer(object):
+    def __init__(self):
+        raise NotImplementedError
+
+    def linein(self, line):
+        raise NotImplementedError
+
+    def print_summary(self):
+        raise NotImplementedError
+
+class BasicStatsAnalyzer(StatsAnalyzer):
+    def __init__(self):
+        self.numlines = 0
+        self.numlevel = dict([(level, 0) for level in range(1,6)])
+        self.numlevel[None] = 0
+        self.mintime = None
+        self.maxtime = None
+
+    def linein(self, line):
+        self.numlines += 1
+        self.numlevel[line['level']] += 1
+        if line['date']:
+            # we know they are sorted chronologically
+            if not self.mintime:
+                self.mintime = line['date']
+            self.maxtime = line['date']
+
+    def print_summary(self):
+        print
+        print 'Basic statistical analysis'
+        print
+        if self.mintime:
+            print 'Start time:', time.strftime("%b %d %H:%M:%S",
+                                               time.localtime(self.mintime))
+            print 'Stop time:', time.strftime("%b %d %H:%M:%S",
+                                               time.localtime(self.maxtime))
+            dt = datetime.datetime.fromtimestamp
+            print 'Duration:', str(dt(self.maxtime) - dt(self.mintime))
+        print 'Number of lines:', self.numlines
+        print 'Level distribution:'
+        for level_name in level_names:
+            print ('             %05s: %d'
+                   % (level_name, self.numlevel[levels[level_name]]))
+        print '      Unrecognized: %d' % self.numlevel[None]
+
+class HistogramAnalyzer(StatsAnalyzer):
+    def __init__(self):
+        self.linehist = {}
+        self.lasttime = -(1<<32)
+
+    def make_bucket(self):
+        return {'numlines': 0}
+
+    def set_lasttime(self, t):
+        # round to half-hour
+        date = time.localtime(t)
+        date = list(date)
+        if date[5] > 30:
+            date[5] = 30
+        date[6] = 0
+        self.lasttime = int(time.mktime(date))
+        self.linehist[self.lasttime] = self.make_bucket()
+
+    def get_bucket(self, t):
+        # half-hour buckets
+        if t:
+            if t > self.lasttime + 1800:
+                self.set_lasttime(t)
+            return self.linehist[self.lasttime]
+        else:
+            # might drop initial lines on the floor, but that's ok
+            return self.linehist.get(self.lasttime, self.make_bucket())
+
+    def linein(self, line):
+        bucket = self.get_bucket(line['date'])
+        bucket['numlines'] += 1
+
+    def print_summary(self):
+        print
+        print 'Time distribution of log lines'
+        print
+
+        bkeys = list(self.linehist.keys())
+        bkeys.sort()
+        maxlines = 0
+        for bucket in self.linehist.itervalues():
+            if bucket['numlines'] > maxlines:
+                maxlines = bucket['numlines']
+        starsize = int(maxlines / 40.)
+
+        for k in bkeys:
+            bucket = self.linehist[k]
+            print ('    %s: %04d %s'
+                   % (time.strftime("%b %d %H:%M:%S", time.localtime(k)),
+                      bucket['numlines'], (bucket['numlines']/starsize)*'*'))
+
+def analyze(f, basic_stats=False, histogram=False):
+    f.seek(0)
+
+    analyzers = []
+    if basic_stats:
+        analyzers.append(BasicStatsAnalyzer())
+    if histogram:
+        analyzers.append(HistogramAnalyzer())
+    if not analyzers:
+        print >>sys.stderr, \
+              "No analyzers specified, try %s --help" % (sys.argv[0],)
+        return
+
+    for line in f:
+        parsed = parse_line(line)
+        for a in analyzers:
+            a.linein(parsed)
+        
+    for a in analyzers:
+        a.print_summary()
+
+def main(args):
+    parser = optparse.OptionParser(usage="usage: %prog [options] LOGFILE")
+    parser.add_option('', '--basic-stats',
+                      action="store_true", dest="basic_stats",
+                      help="output some basic statistics on the file")
+    parser.add_option('', '--histogram',
+                      action="store_true", dest="histogram",
+                      help="output a histogram of debug statements")
+    options, args = parser.parse_args(args)
+
+    if len(args) != 2:
+        print >>sys.stderr, ("usage: %s LOGFILE" % (args[0],))
+        return 1
+    filename = args[1]
+    try:
+        log = open(filename, 'r')
+    except IOError, e:
+        print >>sys.stderr, ("Error opening log file %s: %s"
+                             % (filename, e))
+        return 1
+
+    analyze(log,
+            basic_stats=options.basic_stats,
+            histogram=options.histogram)
+    
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

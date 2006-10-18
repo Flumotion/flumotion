@@ -1,5 +1,8 @@
 2006-10-18  Andy Wingo  <wingo@pobox.com>
 
+	* tools/analyze-flu-log: New script, analyzes flumotion logs.
+	Geto.
+
 	* flumotion/manager/manager.py (Vishnu._configToComponentState):
 	Allow conf == None so that we can stop this component.
 
