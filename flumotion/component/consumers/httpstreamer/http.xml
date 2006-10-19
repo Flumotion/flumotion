@@ -39,6 +39,7 @@
         <property name="domain" type="string" />
         <property name="user_limit" type="int" />
         <property name="bandwidth_limit" type="int" />
+        <property name="duration" type="float" />
 
         <!-- Burst on connect options. Defaults to off.
              If just burst_on_connect is specified, this gives a simple 

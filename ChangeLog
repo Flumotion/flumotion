@@ -1,5 +1,10 @@
 2006-10-19  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  Forgot to add new property to XML.
+
+2006-10-19  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	  Revert incorrect part of change due to copy-paste malfunction.
 
