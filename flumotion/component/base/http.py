@@ -116,6 +116,8 @@ class HTTPAuthentication(log.Loggable):
         self._issuer = HTTPAuthIssuer() # issues keycards; default for compat
         self.bouncerName = None
         self.requesterId = component.getName() # avatarId of streamer component
+        self._defaultDuration = None   # default duration to use if the keycard
+                                       # doesn't specify one.
         
     def setDomain(self, domain):
         """
@@ -131,6 +133,9 @@ class HTTPAuthentication(log.Loggable):
 
     def setRequesterId(self, requesterId):
         self.requesterId = requesterId
+
+    def setDefaultDuration(self, defaultDuration):
+        self._defaultDuration = defaultDuration
 
     def setIssuerClass(self, issuerClass):
         # FIXME: in the future, we want to make this pluggable and have it
@@ -242,11 +247,13 @@ class HTTPAuthentication(log.Loggable):
                 self._fdToKeycard[fd] = keycard
                 self._idToKeycard[keycard.id] = keycard
 
-            if keycard.duration:
+            duration = keycard.duration or self._defaultDuration
+
+            if duration:
                 self.debug('new connection on %d will expire in %f seconds' % (
-                    fd, keycard.duration))
+                    fd, duration))
                 self._fdToDurationCall[fd] = reactor.callLater(
-                    keycard.duration, self._durationCallLater, fd)
+                    duration, self._durationCallLater, fd)
 
         return None
 
