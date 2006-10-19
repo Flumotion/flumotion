@@ -1,5 +1,10 @@
 2006-10-19  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Revert incorrect part of change due to copy-paste malfunction.
+
+2006-10-19  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/base/http.py:
 	* flumotion/component/consumers/httpstreamer/http.py:
 	  Add 'duration' parameter to set a default connection duration when
