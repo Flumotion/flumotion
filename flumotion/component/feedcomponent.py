@@ -170,7 +170,11 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
                     componentId, feedId, result))
                 componentName, feedName = common.parseFeedId(feedId)
                 t = remoteRef.broker.transport
-                self._eaterTransport[(componentId, feedId)] = t
+                t.stopReading()
+                t.stopWriting()
+
+                key = (componentId, feedId)
+                self._eaterTransport[key] = t
                 remoteRef.broker.transport = None
                 fd = t.fileno()
                 self.debug('Telling component to feed feedName %s to fd %d'% (
@@ -246,6 +250,16 @@ class ParseLaunchComponent(FeedComponent):
 
         try:
             pipeline = gst.parse_launch(self.pipeline_string)
+
+            # Connect to the client-fd-removed signal on each feeder, so we
+            # can clean up properly.
+            feeder_element_names = map(lambda n: "feeder:" + n, 
+                self.feeder_names)
+            for feeder in feeder_element_names:
+                element = pipeline.get_by_name(feeder)
+                element.connect('client-fd-removed', self.removeFDCallback)
+                self.debug("Connected %s to removeFDCallback", feeder)
+
             return pipeline
         except gobject.GError, e:
             self.warning('Could not parse pipeline: %s' % e.message)

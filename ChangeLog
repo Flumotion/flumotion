@@ -1,5 +1,15 @@
 2006-10-19  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/job/job.py:
+	  More FD leaks! Oh, the pain!
+	  Connect to client-fd-removed signal on multifdsink; call a
+	  user-supplied cleanup function when that's triggered. In the current
+	  case, just close the fd.
+
+2006-10-19  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/http.xml:
 	  Forgot to add new property to XML.
 

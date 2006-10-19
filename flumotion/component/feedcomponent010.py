@@ -94,6 +94,8 @@ class FeedComponent(basecomponent.BaseComponent):
 
         self._gotFirstNewSegment = {}
 
+        self._fdCleanup = {} # fd -> callable mapping for multifdsink
+
     def do_setup(self):
         """
         Sets up component.
@@ -633,12 +635,14 @@ class FeedComponent(basecomponent.BaseComponent):
         pygobject.gobject_set_property(element, property, value)
     
     ### methods to connect component eaters and feeders
-    def feedToFD(self, feedName, fd):
+    def feedToFD(self, feedName, fd, cleanup):
         """
         @param feedName: name of the feed to feed to the given fd.
         @type  feedName: str
         @param fd:       the file descriptor to feed to
         @type  fd:       int
+        @param cleanup:  the function to call when the FD is no longer feeding
+        @type  cleanup:  callable
         """
         self.debug('FeedToFD(%s, %d)' % (feedName, fd))
         elementName = "feeder:%s" % common.feedId(self.name, feedName)
@@ -652,7 +656,22 @@ class FeedComponent(basecomponent.BaseComponent):
             self.warning(msg)
             return False
 
+        self.debug("fdcleanup registered")
+        self._fdCleanup[fd] = cleanup
         element.emit('add', fd)
+
+    def removeFDCallback(self, sink, fd):
+        """
+        Called (as a signal callback) when the FD is no longer in use by
+        multifdsink.
+        This will call the registered callable on the fd.
+        """
+        if fd in self._fdCleanup:
+            self.debug("calling cleanup func")
+            self._fdCleanup[fd](fd)
+            del self.fdCleanup[fd]
+        else:
+            self.debug("No  cleanup func!")
 
     def eatFromFD(self, feedId, fd):
         """
