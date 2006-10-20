@@ -33,17 +33,26 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         # of the data, we'll rebuild the pipeline.
         def have_caps(tf, prob, caps):
             capsname = caps[0].get_name()
+            # We should add appropriate parsers for any given format here. For
+            # some it's critical for this to work at all, for others it's needed
+            # for timestamps (thus for things like time-based burst-on-connect)
+            # Currently, we only handle ogg. 
+            parser = None
             if capsname == 'application/ogg':
+                parser = gst.element_factory_make('oggparse')
+            elif capsname == 'audio/mpeg':
+                parser = gst.element_factory_make('mp3parse')
 
-                oggparse = gst.element_factory_make('oggparse')
-                oggparse.set_state(gst.STATE_PLAYING)
-                pipeline.add(oggparse)
-                # Relink...
+            if parser:
+                parser.set_state(gst.STATE_PLAYING)
+                pipeline.add(parser)
+                # Relink - unlink typefind from the bits that follow it (the
+                # gdp payloader), link in the parser, relink to the payloader.
                 pad = tf.get_pad('src')
                 peer = pad.get_peer()
                 pad.unlink(peer)
-                tf.link(oggparse)
-                oggparse.link(peer.get_parent())
+                tf.link(parser)
+                parser.link(peer.get_parent())
 
         src = pipeline.get_by_name('src')
         src.set_property('location',  properties['url'])
