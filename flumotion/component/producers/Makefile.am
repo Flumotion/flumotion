@@ -14,6 +14,7 @@ SUBDIRS = \
 	audiotest \
 	bttv \
 	firewire \
+	icecast \
 	pipeline \
 	soundcard \
 	videotest \

@@ -1,0 +1,49 @@
+<registry>
+  <components>
+    <component type="icecast"
+               base="flumotion/component/producers/icecast">
+      <source location="flumotion.component.producers.icecast.icecast"/>
+
+      <feeder name="default"/>
+
+      <entries>
+        <entry type="component" location="icecast.py"
+               function="Icecast"/>
+      </entries>
+
+      <properties>
+        <property name="url" type="string" required="true"/>
+      </properties>
+    </component>
+  </components>
+
+  <bundles>
+
+    <bundle name="icecast-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/icecast">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="icecast-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="icecast-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/icecast">
+                <filename location="icecast.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

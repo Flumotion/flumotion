@@ -1,3 +1,14 @@
+2006-10-20  Michael Smith  <msmith@fluendo.com>
+
+	* configure.ac:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/icecast/Makefile.am:
+	* flumotion/component/producers/icecast/__init__.py:
+	* flumotion/component/producers/icecast/icecast.py:
+	* flumotion/component/producers/icecast/icecast.xml:
+	  Add new component to relay streams from icecast.
+	  Currently only tested with ogg; has problems after chain boundaries.
+
 2006-10-19  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent.py:

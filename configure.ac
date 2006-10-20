@@ -242,6 +242,7 @@ flumotion/component/producers/Makefile
 flumotion/component/producers/audiotest/Makefile
 flumotion/component/producers/bttv/Makefile
 flumotion/component/producers/firewire/Makefile
+flumotion/component/producers/icecast/Makefile
 flumotion/component/producers/pipeline/Makefile
 flumotion/component/producers/soundcard/Makefile
 flumotion/component/producers/videotest/Makefile
