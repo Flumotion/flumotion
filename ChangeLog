@@ -1,3 +1,11 @@
+2006-10-23  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/common/errors.py:
+	* flumotion/manager/component.py:
+	  Patch from s.merle@gmail.com:
+	  Properly handle both synchronous and async errors when
+	  starting/setting up components, consistently.
+
 2006-10-20  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/producers/icecast/icecast.py:

@@ -165,12 +165,6 @@ class ComponentCreateError(ComponentError):
     remote_create call on a worker.
     """
 
-class ComponentSetupError(ComponentError):
-    """
-    An error during setup of a component.  Can be raised during a
-    remote_setup call on a component.
-    """
-
 class HandledException(Exception):
     """
     An exception that has already been adequately handled, but still needs
@@ -180,6 +174,12 @@ class HandledException(Exception):
     doing a traceback, while still doing tracebacks for unhandled exceptions.
 
     Only argument is the original exception or failure.
+    """
+
+class ComponentSetupError(ComponentError):
+    """
+    An error during setup of a component.  Can be raised during a
+    remote_setup call on a component.
     """
 
 class ComponentStartError(ComponentError):
