@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+import errno
 import os
 import time
 
@@ -143,6 +144,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             self.file_fd.flush()
             sink.emit('remove', self.file_fd.fileno())
             self.file_fd = None
+            if self.symlink_to_last_recording:
+                self.update_symlink(self.location,
+                                    self.symlink_to_last_recording)
 
         date = time.strftime('%Y%m%d-%H%M%S', time.localtime())
         self.location = os.path.join(self.directory,
@@ -153,6 +157,32 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.uiState.set('filename', self.location)
         self.uiState.set('recording', True)
 
+        if self.symlink_to_current_recording:
+            self.update_symlink(self.location,
+                                self.symlink_to_current_recording)
+
+    def update_symlink(self, src, dest):
+        if not dest.startswith('/'):
+            dest = os.path.join(self.directory, dest)
+        self.debug("updating symbolic link %s to point to %s", src, dest)
+        try:
+            try:
+                os.symlink(src, dest)
+            except OSError, e:
+                if e.errno == errno.EEXIST and os.path.islink(dest):
+                    os.unlink(dest)
+                    os.symlink(src, dest)
+                else:
+                    raise
+        except Exception, e:
+            self.info("Failed to update link %s: %s", dest,
+                      log.getExceptionMessage(e))
+            m = messages.Warning(T_(N_("Failed to update symbolic link "
+                                       "%s. Check your permissions."
+                                       % (dest,))),
+                                 debug=log.getExceptionMessage(e))
+            self.state.append('messages', m)
+            
     def stop_recording(self): 
         sink = self.get_element('fdsink') 
         if sink.get_state() == gst.STATE_NULL: 
@@ -164,7 +194,11 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             self.file_fd = None 
             self.uiState.set('filename', None) 
             self.uiState.set('recording', False) 
-    
+
+            if self.symlink_to_last_recording:
+                self.update_symlink(self.location,
+                                    self.symlink_to_last_recording)
+                            
     def _notify_caps_cb(self, pad, param):
         caps = pad.get_negotiated_caps()
         if caps == None:
@@ -204,6 +238,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     def configure_pipeline(self, pipeline, properties):
         self.debug('configure_pipeline for disker')
+        self.symlink_to_last_recording = \
+            properties.get('symlink-to-last-recording', None)
+        self.symlink_to_current_recording = \
+            properties.get('symlink-to-current-recording', None)
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
         # connect to client-removed so we can detect errors in file writing

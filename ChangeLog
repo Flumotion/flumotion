@@ -1,3 +1,16 @@
+2006-10-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/consumers/disker/disker.py
+	(Disker.update_symlink): Implement the symlink updating.
+	(Disker.change_filename, Disker.stop_recording)
+	(Disker.configure_pipeline): Plumb in the symlink code.
+
+	* flumotion/component/consumers/disker/disker.xml: Add two new
+	properties, symlink-to-current-recording and
+	symlink-to-last-recording. If given they will keep the named
+	symlinks up to date with the current and/or last recording,
+	respectively.
+
 2006-10-24  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/disker/disker.py:
