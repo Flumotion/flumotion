@@ -1,3 +1,14 @@
+2006-10-24  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_manager_manager.py
+	(FakeComponentMind.remote_getConfig): Implement getConfig.
+	(_logoutAvatar, TestVishnu._requestAvatar.got_result): A little
+	more cleverness here.
+	(MyListener.stateSet): Although deferred does indeed start with d,
+	it is formatted using %s.
+
+	* tools/analyze-flu-log (log_re): Fix PID parsing.
+
 2006-10-24  Edward Hervey  <edward@fluendo.com>
 
 	* flumotion/component/producers/unixdomain:

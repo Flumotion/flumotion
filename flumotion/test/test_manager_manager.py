@@ -73,7 +73,7 @@ class MyListener(log.Loggable):
         if t in self._setters.keys():
             list = self._setters[t]
             for d in list:
-                self.debug("firing deferred %d" % d)
+                self.debug("firing deferred %s" % d)
                 d.callback(None)
             del self._setters[t]
 
@@ -319,6 +319,7 @@ class FakeComponentMind(FakeMind):
         FakeMind.__init__(self, testcase)
         self.avatarId = avatarId
         self.logName = avatarId
+        self.config = None
 
         self.info('Creating component mind for %s' % avatarId)
         state = planet.ManagerJobState()
@@ -337,11 +338,15 @@ class FakeComponentMind(FakeMind):
         self.debug('remote_getState: returning %r' % self.state)
         return self.state
 
+    def remote_getConfig(self):
+        return self.config
+
     def remote_provideMasterClock(self, port):
         return ("127.0.0.1", port, 0L)
 
     def remote_setup(self, config):
         self.debug('remote_setup(%r)', config)
+        self.config = config
 
     def remote_start(self, clocking):
         self.debug('remote_start(%r)' % clocking)
@@ -377,11 +382,9 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         d = self.vishnu.dispatcher.requestAvatar(avatarId, None,
             mind, pb.IPerspective, iface)
 
-        def got_result(tup):
-            avatar = tup[1]
-
+        def got_result((iface, avatar, cleanup)):
             # hack for cleanup
-            avatar._tuple = tup
+            avatar._cleanup = cleanup
             avatar._mind = mind
             avatar._avatarId = avatarId
 
@@ -420,7 +423,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
     def _logoutAvatar(self, avatar):
         # log out avatar
         self.debug('_logoutAvatar %r' % avatar)
-        logout = avatar._tuple[2]
+        logout = avatar._cleanup
         mind = avatar._mind
         avatarId = avatar._avatarId
 
