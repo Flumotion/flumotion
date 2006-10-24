@@ -19,6 +19,7 @@ SUBDIRS = \
 	soundcard \
 	videotest \
 	webcam \
-	looper
+	looper \
+	unixdomain
 
 EXTRA_DIST = $(consumers_DATA)

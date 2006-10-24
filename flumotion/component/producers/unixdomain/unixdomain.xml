@@ -1,0 +1,48 @@
+<registry>
+
+  <components>
+  
+    <component type="unixdomain" base="flumotion/component/producers/unixdomain">
+      <source location="flumotion.component.producers.unixdomain.unixdomain"/>
+      <feeder name="default"/>
+      <entries>
+        <entry type="component" location="unixdomain.py"
+               function="UnixDomainProvider"/>
+      </entries>
+      <properties>
+        <property name="path" type="string"/>
+      </properties>
+    </component>
+ 
+  </components>
+
+  <bundles>
+
+    <bundle name="unixdomain-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/unixdomain">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="unixdomain-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="unixdomain-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/unixdomain">
+                <filename location="unixdomain.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry> 

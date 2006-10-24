@@ -1,3 +1,16 @@
+2006-10-24  Edward Hervey  <edward@fluendo.com>
+
+	* configure.ac:
+	* flumotion/component/producers/Makefile.am:
+	* flumotion/component/producers/unixdomain:
+	* flumotion/component/producers/unixdomain/Makefile.am:
+	* flumotion/component/producers/unixdomain/__init__.py:
+	* flumotion/component/producers/unixdomain/unixdomain.py:
+	* flumotion/component/producers/unixdomain/unixdomain.xml:
+	  Add new component for receiving data from a unix domain socket.
+	  The component creates the socket and waits for incoming gdp-payloaded
+	  data.
+
 2006-10-23  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/errors.py:
