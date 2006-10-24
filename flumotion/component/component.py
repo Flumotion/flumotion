@@ -206,7 +206,7 @@ class BaseComponentMedium(medium.PingingMedium):
         try:
             return self.comp.config
         except AttributeError:
-            self.info('getConfig on a component that was not set up!')
+            self.debug('getConfig(), but component is not set up yet')
             return None
         
     def remote_setup(self, config):
@@ -469,6 +469,8 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
         d.addCallback(checkErrorCallback)
         d.addCallback(lambda r: self.do_setup())
         def setupErrback(failure):
+            self.warning('Could not set up component: %s',
+                         log.getFailureMessage(failure))
             m = messages.Error(T_(
                 N_("Could not setup component.")),
                 debug=log.getFailureMessage(failure),

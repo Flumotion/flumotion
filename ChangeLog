@@ -1,5 +1,32 @@
 2006-10-24  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/manager/component.py (ComponentAvatar.__init__):
+	Update docs.
+	(ComponentAvatar.attached): No need to get the jobstate,
+	Vishnu.componentAttached does it for us now.
+	(ComponentHeaven.registerComponent): Nothing to do anymore.
+
+	* flumotion/manager/base.py (ManagerHeaven.createAvatar): More
+	debugging.
+
+	* flumotion/manager/manager.py (Vishnu.componentAttached,
+	(Vishnu.componentDetached, Vishnu._getComponentState): Rework what
+	happens when a component is attached so that we always ask, first
+	thing, what the component's config and jobstate are. This allows
+	us to get a mood early, reduces the number of not-quite-set-up
+	states, and allows us to see if a component is running with an old
+	config or not.
+	(Vishnu.registerComponent): Remove lots of code, now folded into
+	_getComponentState.
+
+	These changes help manager restart to work in more cases. Also,
+	atmosphere components are now properly put into the atmosphere
+	instead of a flow named atmosphere.
+
+	* flumotion/component/component.py
+	(BaseComponentMedium.remote_getConfig): Less hysteric log.
+	(BaseComponent.setup.setupErrback): More debugging.
+
 	* flumotion/test/test_manager_manager.py
 	(FakeComponentMind.remote_getConfig): Implement getConfig.
 	(_logoutAvatar, TestVishnu._requestAvatar.got_result): A little

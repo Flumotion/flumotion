@@ -430,6 +430,8 @@ class ManagerHeaven(pb.Root, log.Loggable):
         """
         self.debug('creating new Avatar with name %s' % avatarId)
         if self.avatars.has_key(avatarId):
+            self.warning('an avatar named %s is already logged in' %
+                         avatarId)
             raise errors.AlreadyConnectedError(avatarId)
 
         avatar = self.avatarClass(self, avatarId, remoteIdentity)

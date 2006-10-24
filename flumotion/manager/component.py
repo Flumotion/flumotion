@@ -68,7 +68,7 @@ class ComponentAvatar(base.ManagerAvatar):
         base.ManagerAvatar.__init__(self, *args, **kwargs)
         
         self.componentState = None # set by the vishnu by componentAttached
-        self.jobState = None # retrieved after mind attached
+        self.jobState = None # set by the vishnu by componentAttached
 
         # these flags say when this component is in the middle of doing stuff
         # starting, setup and providing master clock respectively
@@ -156,39 +156,13 @@ class ComponentAvatar(base.ManagerAvatar):
         self.info('component "%s" logged in' % self.avatarId)
         base.ManagerAvatar.attached(self, mind) # sets self.mind
         
-        self.vishnu.componentAttached(self)
-
-        # the component logging in can already be a running component, so
-        # do not do anything to the mood
-
-        self.debug('mind %r attached, calling remote _getState()' % self.mind)
-        self._getState()
-
-    def _getState(self):
-        d = self.mindCallRemote('getState')
-        d.addCallback(self._mindGetStateCallback)
-        d.addErrback(self._mindPipelineErrback)
-        #d.addErrback(self._mindErrback)
-
-        # FIXME: return d to serialize ?
-
-    def _mindGetStateCallback(self, state): 
-        # called after the mind has attached.
-        # state: L{flumotion.common.planet.ManagerJobState}
-        if not state:
-            # how in god's name is this possible?
-            self.warning('no state received yet, rescheduling')
-            reactor.callLater(1, self._getState)
-            return None
-            
-        assert isinstance(state, planet.ManagerJobState)
-        self.debug('received state: %r' % state)
-        self.jobState = state
-        # make the component avatar a listener to state changes
-        state.addListener(self)
+        d = self.vishnu.componentAttached(self)
+        # listen to the mood so we can tell the depgraph
+        d.addCallback(lambda _: self.jobState.addListener(self))
         # make heaven register component
-        self.heaven.registerComponent(self)
-        self.vishnu.registerComponent(self)
+        d.addCallback(lambda _: self.heaven.registerComponent(self))
+        d.addCallback(lambda _: self.vishnu.registerComponent(self))
+        return d
 
     def detached(self, mind):
         # doc in base class
@@ -238,12 +212,6 @@ class ComponentAvatar(base.ManagerAvatar):
         pass
                 
     # my methods
-    def _mindPipelineErrback(self, failure):
-        failure.trap(errors.PipelineParseError)
-        self.error('Invalid pipeline for component')
-        self.mindCallRemote('stop')
-        return None
-
     def parseEaterConfig(self, eater_config):
         # the source feeder names come from the config
         # they are specified under <component> as <source> elements in XML
@@ -443,7 +411,7 @@ class ComponentAvatar(base.ManagerAvatar):
             self.warning("Could not make component start, reason %s"
                        % log.getExceptionMessage(e))
             self._setMood(moods.sad)
-            raise e
+            raise
     start = defer_generator_method(start)
 
     def eatFrom(self, fullFeedId, host, port):
@@ -1020,37 +988,9 @@ class ComponentHeaven(base.ManagerHeaven):
 
         @param componentAvatar: the component to register
         @type  componentAvatar: L{flumotion.manager.component.ComponentAvatar}
-
-        @rtype: L{twisted.internet.defer.Deferred}
         """
         self.debug('heaven registering component %r' % componentAvatar)
-
-        # ensure it has a parent -- the parent will be null if this is
-        # an already-running worker connects to a freshly restarted
-        # manager
-        state = componentAvatar.componentState
-        if not state:
-            self.warning('Implement manager connection sniffing')
-            return
-
-        if not state.get('parent'):
-            # parent is normally set by the manager when creating a flow
-            # from an xml file. in this case we get a state, and
-            # reconstruct the parent. unfortunately we have to do it by
-            # parsing the avatar id, but hey, life isn't perfect.
-            flowName = componentAvatar.avatarId.split('/')[1]
-            flows = self.vishnu.state.get('flows')
-            try:
-                flow = dict([(x.get('name'),x) for x in flows])[flowName]
-            except KeyError:
-                # FIXME: this is just copied from manager.py
-                self.info('Creating flow "%s"' % flowName)
-                flow = planet.ManagerFlowState()
-                flow.set('name', flowName)
-                flow.set('parent', self.vishnu.state)
-                self.vishnu.state.append('flows', flow)
-            state.set('parent', flow)
-            flow.append('components', state)
+        # nothing to do
 
     def unregisterComponent(self, componentAvatar):
         """

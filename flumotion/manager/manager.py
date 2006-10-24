@@ -796,116 +796,138 @@ class Vishnu(log.Loggable):
         self.debug('vishnu.workerDetached(): id %s' % workerId)
         self._depgraph.setWorkerStopped(workerId)
 
-    def _configToComponentState(self, conf, avatar):
-        assert not avatar.avatarId in self._componentMappers.keys()
+    def _getComponentState(self, deferredListResult, avatar):
+        # a component just logged in with good credentials. we fetched
+        # its config and job state. now there are two possibilities:
+        #  (1) we were waiting for such a component to start. There is a
+        #      ManagerComponentState and an avatarId in the
+        #      componentMappers waiting for us.
+        #  (2) we don't know anything about this component, but since it
+        #      logged in, we will deal with it, at least allowing the
+        #      admin to control it.
 
-        state = planet.ManagerComponentState()
+        def verifyExistingComponentState(jobState, state):
+            # condition (1)
+            state.setJobState(jobState)
 
-        # ok unfortunately there is a window in which a component does
-        # not have a config. accept that so that an admin can stop this
-        # component.
-        if conf is None:
-            flowName, compName = common.parseComponentId(avatar.avatarId)
-            conf = {'name': compName,
-                    'parent': flowName,
-                    'type': 'unknown-component',
-                    'properties': {}}
+            if conf and state.get('config') != conf:
+                message = messages.Warning(T_(
+                    N_("Component logged in with stale configuration. "
+                       "Consider restarting this component.")),
+                    debug=("Expected\n%r\n, but got\n%r" %
+                           (state.get('config'), conf)))
+                state.append('messages', message)
+            # if conf is None, then we just created the component and
+            # it's not set up yet
 
-        state.set('name', conf['name'])
-        state.set('type', conf['type'])
-        # FIXME: since now we require all component XML configs to have
-        # requested workers, what does this mean?
-        state.set('workerRequested', None)
-        state.set('config', conf)
+        def makeNewComponentState(conf):
+            # condition (2)
+            state = planet.ManagerComponentState()
+            state.setJobState(jobState)
 
-        # check if we have this flow yet and add if not
-        isOurFlow = lambda x: x.get('name') == conf['parent']
-        flow = _first(self.state.get('flows'), isOurFlow)
-        if not flow:
-            self.info('Creating flow "%s"' % conf['parent'])
-            flow = planet.ManagerFlowState()
-            flow.set('name', conf['parent'])
-            flow.set('parent', self.state)
-            self.state.append('flows', flow)
+            if conf:
+                flowName, compName = conf['parent'], conf['name']
+            else:
+                # unfortunately there is a window in which a component does
+                # not have a config. accept that so that an admin can stop
+                # this component.
+                flowName, compName = common.parseComponentId(avatar.avatarId)
+                conf = {'name': compName,
+                        'parent': flowName,
+                        'type': 'unknown-component',
+                        'properties': {}}
 
-        state.set('parent', flow)
-        flow.append('components', state)
+            state.set('name', compName)
+            state.set('type', conf['type'])
+            state.set('workerRequested', jobState.get('workerName'))
+            state.set('config', conf)
 
-        # add to mapper
-        m = ComponentMapper()
-        m.state = state
-        m.id = avatar.avatarId
-        self._componentMappers[m.state] = m
-        self._componentMappers[m.id] = m
+            # check if we have this flow yet and add if not
+            if flowName == 'atmosphere':
+                # treat the atmosphere like a flow, although it's not
+                flow = self.state.get('atmosphere')
+            else:
+                flow = _first(self.state.get('flows'),
+                              lambda x: x.get('name') == flowName)
+            if not flow:
+                self.info('Creating flow "%s"' % flowName)
+                flow = planet.ManagerFlowState()
+                flow.set('name', flowName)
+                flow.set('parent', self.state)
+                self.state.append('flows', flow)
 
-        return self.componentAttached(avatar)
+            state.set('parent', flow)
+            flow.append('components', state)
 
-    def componentAttached(self, componentAvatar):
-        # called when a component logs in and gets a component avatar created
-        id = componentAvatar.avatarId
-        self.debug("%s component attached", id)
-        if not id in self._componentMappers.keys():
-            # the manager quit and the component is logging back in
-            d = componentAvatar.mindCallRemote('getConfig')
-            d.addCallback(self._configToComponentState, componentAvatar)
-            return d
-        m = self._componentMappers[id]
-        m.avatar = componentAvatar
-        self._componentMappers[componentAvatar] = m
+            # add to mapper
+            m = ComponentMapper()
+            m.state = state
+            m.id = avatar.avatarId
+            self._componentMappers[m.state] = m
+            self._componentMappers[m.id] = m
 
-        # attach componentstate to avatar
-        componentAvatar.componentState = m.state
+        (_success1, conf), (_success2, jobState) = deferredListResult
+        m = self.getComponentMapper(avatar.avatarId)
 
-        # Now that we have attached a component, we must set the mood to
-        # waking (if it's currently sleeping). At this point, this is still the
-        # manager's copy; the JobState is not yet attached.
-        if m.state.get('mood') == moods.sleeping.value:
-            m.state.set('mood', moods.waking.value)
+        if m:
+            verifyExistingComponentState(jobState, m.state)
+        else:
+            makeNewComponentState(conf)
 
-        return defer.succeed(None)
-
-    def componentDetached(self, componentAvatar):
-        # called when the component has detached
-        self._depgraph.setJobStopped(componentAvatar.componentState)
-        componentAvatar.componentState.set('moodPending', None)
-
-        # detach componentstate fom avatar
-        componentAvatar.componentState = None
-
-        
-    def registerComponent(self, componentAvatar):
-        # called when the jobstate is retrieved
-        self.debug('vishnu registering component %r' % componentAvatar)
-
-        # map jobState
-        jobState = componentAvatar.jobState
-        m = self._componentMappers[componentAvatar]
-        m.jobState = jobState
-        self._componentMappers[jobState] = m
-
-        # attach jobState to state
-        m.state.setJobState(jobState)
+        m = self.getComponentMapper(avatar.avatarId)
 
         # Now that the JobState is attached, it might have overridden our
         # mood to sleeping; we MUST be waking; so we reset it here if required.
         if m.state.get('mood') == moods.sleeping.value:
             m.state.set('mood', moods.waking.value)
 
-        self._depgraph.setJobStarted(m.state)
+        m.avatar = avatar
+        self._componentMappers[m.avatar] = m
+        avatar.componentState = m.state
+        avatar.jobState = jobState
+        m.jobState = jobState
+        self._componentMappers[jobState] = m
+
+    def componentAttached(self, componentAvatar):
+        # called when a component logs in and gets a component avatar created
+        id = componentAvatar.avatarId
+        self.debug("%s component attached", id)
+        d = defer.DeferredList([componentAvatar.mindCallRemote('getConfig'),
+                                componentAvatar.mindCallRemote('getState')],
+                               fireOnOneErrback=True)
+        d.addCallback(self._getComponentState, componentAvatar)
+        return d
+
+    def componentDetached(self, componentAvatar):
+        # called when the component has detached
+        self.debug("%s component detached", componentAvatar.avatarId)
+        self._depgraph.setJobStopped(componentAvatar.componentState)
+        componentAvatar.componentState.set('moodPending', None)
+
+        # detach componentstate fom avatar
+        componentAvatar.componentState = None
+        componentAvatar.jobState = None
+
+    def registerComponent(self, componentAvatar):
+        # called when the jobstate is retrieved
+        self.debug('vishnu registering component %r' % componentAvatar)
+
+        state = componentAvatar.componentState
+        self._depgraph.setJobStarted(state)
         # If this is a reconnecting component, we might also need to set the
         # component as started.
         # If mood is happy or hungry, then the component is running.
-        mood = m.state.get('mood')
+        mood = state.get('mood')
         if mood == moods.happy.value or mood == moods.hungry.value:
             self.debug("Component %s is already in mood %s.  Set depgraph "
                 "appropriately", componentAvatar.avatarId, moods.get(mood).name)
-            self._depgraph.setComponentSetup(m.state)
-            self._depgraph.setComponentStarted(m.state)
-            if self._depgraph.isAClockMaster(m.state):
+            self._depgraph.setComponentSetup(state)
+            self._depgraph.setComponentStarted(state)
+            if self._depgraph.isAClockMaster(state):
                 self.log("Component %s is a clock master and is happy/hungry "
                     "so must already be providing clock master",
                     componentAvatar.avatarId)
-                self._depgraph.setClockMasterStarted(m.state)
+                self._depgraph.setClockMasterStarted(state)
 
         self.debug('vishnu registered component %r' % componentAvatar)
         self.componentHeaven._tryWhatCanBeStarted()
