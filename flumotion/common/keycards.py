@@ -42,7 +42,6 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
     a serializable object used in authentication inside Flumotion.
     """
     implements(common.mergeImplements(pb.Copyable, pb.RemoteCopy) + (tcredentials.ICredentials, ))
-
     def __init__(self):
         self.bouncerName = None         # set by requester,decides which bouncer
         self.requesterId = None         # who is requesting auth ?
@@ -59,7 +58,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         @type domain: string
         """
         self.domain = domain
-
+    
     def getData(self):
         """
         Return a dictionary of the viewable data on the keycard that can be
@@ -73,11 +72,15 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
             'requester': self.requesterId,
             'domain':    self.domain
         }
-        
+       
     def __repr__(self):
         return "<%s for requesterId %r in state %s>" % (self.__class__.__name__,
             self.requesterId, _statesEnum[self.state])
 
+class KeycardGeneric(Keycard, object):
+    pass
+
+pb.setUnjellyableForClass(KeycardGeneric, KeycardGeneric)
 # class KeycardUACCP: username, address, crypt password
 #       from UsernameCryptPasswordCrypt
 

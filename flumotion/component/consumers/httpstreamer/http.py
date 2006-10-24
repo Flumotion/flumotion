@@ -34,7 +34,7 @@ from twisted.cred import credentials
 
 from flumotion.component import feedcomponent
 from flumotion.common import bundle, common, gstreamer, errors, pygobject
-from flumotion.common import messages, netutils
+from flumotion.common import messages, netutils, log
 
 from flumotion.twisted import fdserver
 from flumotion.component.misc.porter import porterclient
@@ -186,7 +186,9 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         """
         @rtype: L{twisted.internet.defer.Deferred} firing a keycard or None.
         """
-        return self.callRemote('authenticate', bouncerName, keycard)
+        d = self.callRemote('authenticate', bouncerName, keycard)
+        d.addErrback(log.warningFailure)
+        return d
 
     def removeKeycardId(self, bouncerName, keycardId):
         """

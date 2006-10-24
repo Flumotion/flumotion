@@ -62,6 +62,17 @@ class Issuer(log.Loggable):
         """
         raise NotImplementedError
 
+class HTTPGenericIssuer(Issuer):
+    """
+    I create L{flumotion.common.keycards.Keycard} based on just a
+    standard HTTP request.  Useful for authenticating based on
+    server-side checks such as time, rather than client credentials.
+    """
+    def issue(self, request):
+        keycard = keycards.KeycardGeneric()
+        self.debug("Asking for authentication, generic HTTP")
+        return keycard
+
 class HTTPAuthIssuer(Issuer):
     """
     I create L{flumotion.common.keycards.KeycardUACPP} keycards based on
@@ -144,6 +155,8 @@ class HTTPAuthentication(log.Loggable):
             self._issuer = HTTPTokenIssuer()
         elif issuerClass == 'HTTPAuthIssuer':
             self._issuer = HTTPAuthIssuer()
+        elif issuerClass == 'HTTPGenericIssuer':
+            self._issuer = HTTPGenericIssuer()
         else:
             raise ValueError, "issuerClass %s not accepted" % issuerClass
 

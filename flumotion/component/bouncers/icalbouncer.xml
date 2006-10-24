@@ -1,0 +1,31 @@
+<registry>
+  <components>
+    <component type="icalbouncer"
+               base="flumotion/component/bouncers">
+
+      <source location="flumotion.component.bouncers.icalbouncer"/>
+
+      <entries>
+        <entry type="component" location="icalbouncer.py"
+               function="IcalBouncer"/>
+      </entries>
+
+      <properties>
+        <property name="ics-file" type="string" required="True"/>
+      </properties>
+    </component>
+  </components>
+  <bundles>
+    <bundle name="icalbouncer-base">
+      <dependencies>
+        <dependency name="component" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers">
+          <filename location="icalbouncer.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry> 
+

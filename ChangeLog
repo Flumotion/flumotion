@@ -1,3 +1,17 @@
+2006-10-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/common/keycards.py:
+	Add generic keycard.
+	* flumotion/component/base/http.py:
+	Add a generic keycard issuer.
+	* flumotion/component/bouncers/Makefile.am:
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/component/bouncers/icalbouncer.xml:
+	New component: icalbouncer.  This restricts access to times 
+	during events specified in an ics file.
+	* flumotion/component/consumers/httpstreamer/http.py:
+	Handle a failure in running the authenticate with a warning in the log.
+
 2006-10-24  Edward Hervey  <edward@fluendo.com>
 
 	* configure.ac:
