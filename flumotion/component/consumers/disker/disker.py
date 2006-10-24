@@ -40,7 +40,13 @@ T_ = messages.gettexter('flumotion')
 __all__ = ['Disker']
 
 class DiskerMedium(feedcomponent.FeedComponentMedium):
-    # called when admin ui wants to change filename
+    # called when admin ui wants to stop recording. call changeFilename to 
+    # restart
+    def remote_stopRecording(self): 
+        self.comp.stop_recording() 
+
+    # called when admin ui wants to change filename (this starts recording if
+    # the disker isn't currently writing to disk)
     def remote_changeFilename(self):
         self.comp.change_filename()
 
@@ -58,6 +64,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     def init(self):
         self.uiState.addKey('filename', None)
+        self.uiState.addKey('recording', False)
 
     def get_pipeline_string(self, properties):
         directory = properties['directory']
@@ -144,6 +151,19 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.file_fd = open(self.location, 'a')
         sink.emit('add', self.file_fd.fileno())
         self.uiState.set('filename', self.location)
+        self.uiState.set('recording', True)
+
+    def stop_recording(self): 
+        sink = self.get_element('fdsink') 
+        if sink.get_state() == gst.STATE_NULL: 
+            sink.set_state(gst.STATE_READY) 
+
+        if self.file_fd: 
+            self.file_fd.flush() 
+            sink.emit('remove', self.file_fd.fileno()) 
+            self.file_fd = None 
+            self.uiState.set('filename', None) 
+            self.uiState.set('recording', False) 
     
     def _notify_caps_cb(self, pad, param):
         caps = pad.get_negotiated_caps()
@@ -162,7 +182,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.caps = caps
 
         if new:
-            reactor.callLater(0, self.change_filename)
+            props = self.config['properties']
+            if props.get('start-recording', True):
+                reactor.callLater(0, self.change_filename)
 
     # callback for when a client is removed so we can figure out
     # errors

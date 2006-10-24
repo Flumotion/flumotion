@@ -18,6 +18,7 @@
       <properties>
         <property name="directory" type="string" required="yes" />
         <property name="rotateType" type="string" required="yes" />
+        <property name="start-recording" type="boolean" required="no" />
         <property name="size" type="long"/>
         <property name="time" type="long"/>
       </properties>

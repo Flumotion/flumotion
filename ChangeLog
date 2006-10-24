@@ -1,5 +1,13 @@
 2006-10-24  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/disker/disker.xml:
+	  Merge part of #486 (not all yet). Adds remote stopRecording method,
+	  and start-recording property which can be used to disable the disker
+	  starting writing when started.
+
+2006-10-24  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/feedcomponent010.py:
 	  Change variable name to be more similar to the other uses of the
 	  same variable.
