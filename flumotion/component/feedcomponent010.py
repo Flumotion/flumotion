@@ -669,7 +669,7 @@ class FeedComponent(basecomponent.BaseComponent):
         if fd in self._fdCleanup:
             self.debug("calling cleanup func")
             self._fdCleanup[fd](fd)
-            del self.fdCleanup[fd]
+            del self._fdCleanup[fd]
         else:
             self.debug("No  cleanup func!")
 
