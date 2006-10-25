@@ -1,3 +1,14 @@
+2006-10-25  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	  Started to fix this so that you can upload an ical file, but
+	  incomplete...
+
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/disker/disker.xml:
+	  Add a property to give a filename for an ics file to load.
+	  Fix logic so that recurrences work.
+
 2006-10-25  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/admin.py

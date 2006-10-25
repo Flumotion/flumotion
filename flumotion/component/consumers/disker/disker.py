@@ -60,7 +60,7 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
     def remote_changeFilename(self):
         self.comp.change_filename()
 
-    def remote_scheduleRecording(self, ical):
+    def remote_scheduleRecordings(self, ical):
         self.comp.parse_ical(ical)
 
     # called when admin ui wants updated state (current filename info)
@@ -228,10 +228,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
 
-        if new:
-            props = self.config['properties']
-            if props.get('start-recording', True):
-                reactor.callLater(0, self.change_filename)
+        if new and self._recordAtStart:
+            reactor.callLater(0, self.change_filename)
 
     # callback for when a client is removed so we can figure out
     # errors
@@ -255,6 +253,13 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             properties.get('symlink-to-last-recording', None)
         self.symlink_to_current_recording = \
             properties.get('symlink-to-current-recording', None)
+        self._recordAtStart = properties.get('start-recording', True)
+        icalfn = properties.get('ical-schedule')
+        if icalfn:
+            ical = open(icalfn, "rb").read()
+            self.parse_ical(ical)
+            self._recordAtStart = False
+
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
         # connect to client-removed so we can detect errors in file writing
@@ -282,7 +287,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             startSecs = start.days * 86400 + start.seconds
             self.debug("scheduling a recording %d seconds away", startSecs)
             reactor.callLater(startSecs, 
-                self.start_scheduled_recording, startRecurRule)
+                self.start_scheduled_recording, startRecurRule, whenStart)
             # create a dateutil.rrule from the recurrence rule
             endRecurRule = None
             if recur:
@@ -290,31 +295,36 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             end = whenEnd - datetime.now()
             endSecs = end.days * 86400 + end.seconds
             reactor.callLater(endSecs, 
-                self.stop_scheduled_recording, endRecurRule)
+                self.stop_scheduled_recording, endRecurRule, whenEnd)
         else:
             self.warning("attempt to schedule in the past!")
 
-    def start_scheduled_recording(self, recurRule):
+    def start_scheduled_recording(self, recurRule, when):
         self.change_filename()
         if recurRule:
-            recurInterval = recurRule.after(datetime.now()) - datetime.now()
+            now = datetime.now()
+            nextTime = recurRule.after(when)
+            recurInterval = nextTime - now
+            self.debug("recurring start interval: %r", recurInterval)
             recurIntervalSeconds = recurInterval.days * 86400 + \
                 recurInterval.seconds
             self.debug("recurring start in %d seconds", recurIntervalSeconds)
             reactor.callLater(recurIntervalSeconds, 
                 self.start_scheduled_recording,
-                recurRule)
+                recurRule, nextTime)
 
-    def stop_scheduled_recording(self, recurRule):
+    def stop_scheduled_recording(self, recurRule, when):
         self.stop_recording()
         if recurRule:
-            recurInterval = recurRule.after(datetime.now()) - datetime.now()
+            now = datetime.now()
+            nextTime = recurRule.after(when)
+            recurInterval = nextTime - now
             recurIntervalSeconds = recurInterval.days * 86400 + \
                 recurInterval.seconds
             self.debug("recurring stop in %d seconds", recurIntervalSeconds)
             reactor.callLater(recurIntervalSeconds, 
                 self.stop_scheduled_recording,
-                recurRule)
+                recurRule, nextTime)
 
     def parse_ical(self, icsStr):
         if HAS_ICAL:

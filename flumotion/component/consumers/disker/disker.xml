@@ -21,6 +21,7 @@
         <property name="start-recording" type="boolean" required="no" />
         <property name="symlink-to-last-recording" type="string" required="no" />
         <property name="symlink-to-current-recording" type="string" required="no" />
+        <property name="ical-schedule" type="string" required="no" />
         <property name="size" type="long"/>
         <property name="time" type="long"/>
       </properties>

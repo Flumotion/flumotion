@@ -45,7 +45,6 @@ class FilenameNode(BaseAdminGtkNode):
         newbutton.connect('clicked',self.cb_changefile_button_clicked)
         self.stopbutton = self.wtree.get_widget('button-stop')
         self.stopbutton.connect('clicked', self.cb_stop_button_clicked)
-        self.shown = False
         if self.hasIcal:
             self.addScheduleWidget()
 
@@ -89,7 +88,7 @@ class FilenameNode(BaseAdminGtkNode):
                 self.stopbutton.set_sensitive(value)
         if key == 'can-schedule' and value:
             self.hasIcal = True
-            if self.shown:
+            if self.widget:
                 self.addScheduleWidget()
 
     def addScheduleWidget(self):
@@ -111,9 +110,13 @@ class FilenameNode(BaseAdminGtkNode):
 
     def cb_schedule_recordings(self, widget):
         filename = self.filechooser.get_filename()
-        icsStr = open(filename, "rb").read()
-        d = self.callRemote("scheduleRecordings", icsStr)
-        d.addErrback(self.scheduleRecordingsErrback)
+        self.debug("filename is %r, uri %r, %r", filename, self.filechooser.get_uri(), self.filechooser)
+        if filename:
+            icsStr = open(filename, "rb").read()
+            d = self.callRemote("scheduleRecordings", icsStr)
+            d.addErrback(self.scheduleRecordingsErrback)
+        else:
+            self.warning("No filename selected")
 
     def scheduleRecordingsErrback(self, failure):
         self.warning("Failure %s scheduling recordings: %s" % (
