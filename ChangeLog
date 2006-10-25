@@ -1,3 +1,11 @@
+2006-10-25  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	* flumotion/component/consumers/disker/disker.glade:
+	* flumotion/component/consumers/disker/disker.py:
+	  Commit ical code from zaheer, so we can deploy it. Needs some
+	  further work, but this is ok for now.
+
 2006-10-24  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/consumers/disker/disker.py

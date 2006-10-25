@@ -22,6 +22,7 @@
 import errno
 import os
 import time
+from datetime import datetime
 
 import gobject
 import gst
@@ -40,6 +41,14 @@ T_ = messages.gettexter('flumotion')
 
 __all__ = ['Disker']
 
+try:
+    # icalendar and dateutil modules needed for scheduling recordings
+    from icalendar import Calendar
+    from dateutil import rrule
+    HAS_ICAL = True
+except:
+    HAS_ICAL = False
+
 class DiskerMedium(feedcomponent.FeedComponentMedium):
     # called when admin ui wants to stop recording. call changeFilename to 
     # restart
@@ -50,6 +59,9 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
     # the disker isn't currently writing to disk)
     def remote_changeFilename(self):
         self.comp.change_filename()
+
+    def remote_scheduleRecording(self, ical):
+        self.comp.parse_ical(ical)
 
     # called when admin ui wants updated state (current filename info)
     def remote_notifyState(self):
@@ -66,6 +78,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     def init(self):
         self.uiState.addKey('filename', None)
         self.uiState.addKey('recording', False)
+        self.uiState.addKey('can-schedule', HAS_ICAL)
 
     def get_pipeline_string(self, properties):
         directory = properties['directory']
@@ -246,5 +259,76 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
         # connect to client-removed so we can detect errors in file writing
         sink.connect('client-removed', self._client_removed_cb)
+
+    # add code that lets recordings be schedules
+    # TODO: resolve overlapping events
+    def schedule_recording(self, whenStart, whenEnd, recur=None):
+        """
+        Sets a recording to start at a time in the future for a specified
+        duration.
+        @param whenStart time of when to start recording
+        @type whenStart datetime
+        @param whenEnd time of when to end recording
+        @type whenEnd datetime
+        @param recur recurrence rule
+        @type recur icalendar.props.vRecur
+        """
+        if datetime.now() < whenStart:
+            # create a dateutil.rrule from the recurrence rule
+            startRecurRule = None
+            if recur:
+                startRecurRule = rrule.rrulestr(recur.ical(), dtstart=whenStart)
+            start = whenStart - datetime.now()
+            startSecs = start.days * 86400 + start.seconds
+            self.debug("scheduling a recording %d seconds away", startSecs)
+            reactor.callLater(startSecs, 
+                self.start_scheduled_recording, startRecurRule)
+            # create a dateutil.rrule from the recurrence rule
+            endRecurRule = None
+            if recur:
+                endRecurRule = rrule.rrulestr(recur.ical(), dtstart=whenEnd) 
+            end = whenEnd - datetime.now()
+            endSecs = end.days * 86400 + end.seconds
+            reactor.callLater(endSecs, 
+                self.stop_scheduled_recording, endRecurRule)
+        else:
+            self.warning("attempt to schedule in the past!")
+
+    def start_scheduled_recording(self, recurRule):
+        self.change_filename()
+        if recurRule:
+            recurInterval = recurRule.after(datetime.now()) - datetime.now()
+            recurIntervalSeconds = recurInterval.days * 86400 + \
+                recurInterval.seconds
+            self.debug("recurring start in %d seconds", recurIntervalSeconds)
+            reactor.callLater(recurIntervalSeconds, 
+                self.start_scheduled_recording,
+                recurRule)
+
+    def stop_scheduled_recording(self, recurRule):
+        self.stop_recording()
+        if recurRule:
+            recurInterval = recurRule.after(datetime.now()) - datetime.now()
+            recurIntervalSeconds = recurInterval.days * 86400 + \
+                recurInterval.seconds
+            self.debug("recurring stop in %d seconds", recurIntervalSeconds)
+            reactor.callLater(recurIntervalSeconds, 
+                self.stop_scheduled_recording,
+                recurRule)
+
+    def parse_ical(self, icsStr):
+        if HAS_ICAL:
+            cal = Calendar.from_string(icsStr)
+            for event in cal.walk('vevent'):
+                dtstart = event.decoded('dtstart', '')
+                dtend = event.decoded('dtend', '')
+                self.debug("event parsed with start: %r end: %r", dtstart, dtend)
+                recur = event.get('rrule', None)
+                if dtstart and dtend:
+                    self.schedule_recording(dtstart, dtend, recur)
+        else:
+            self.warning("Cannot parse ICAL; neccesary modules not installed")
+
+
         
 pygobject.type_register(Disker)
