@@ -1,3 +1,28 @@
+2006-10-25  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/worker/worker.py (JobHeaven.lostAvatar): Track when
+	jobs go away, not just when they are added.
+	(JobAvatar.perspective_cleanShutdown)
+	(WorkerBrain.deferredShutdownRegistered)
+	(WorkerBrain.deferredShutdownTrigger)
+	(WorkerBrain.deferredShutdown): Add infrastructure to track
+	whether a job is in the process of shutting down, so that if the
+	manager finds out the job is gone before we do and subsequently
+	asks for the component to start, that we accept that request, and
+	handle it when we eventually reap the job.
+	(WorkerBrain.deferredCreate): Refuse to start a job that we
+	already have running, unless it is already in the process of
+	shutting down.
+	(JobProcessProtocol.processEnded): Tell the heaven to lose its
+	avatar. Also tell the workerbrain that the job was reaped, if a
+	deferred shutdown was registered.
+
+	* flumotion/job/job.py (JobMedium.shutdownHandler): Normally if
+	the worker is asked to start a component that it already has, it
+	refuses. However when we're being shutdown there's an unavoidable
+	race between the manager and worker finding out about the
+	component logging out.
+	
 2006-10-25  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/consumers/disker/disker.py:

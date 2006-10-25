@@ -32,7 +32,7 @@ import resource
 # import traceback
 
 from twisted.cred import credentials
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.python import failure
 from twisted.spread import pb
 
@@ -143,12 +143,17 @@ class JobMedium(medium.BaseMedium):
         reactor.callLater(0, self.shutdown)
 
     def shutdownHandler(self):
+        dlist = []
+        if self.hasRemoteReference():
+            # tell the worker we are shutting down
+            dlist.append(self.callRemote("cleanShutdown"))
         if self.component:
             medium = self.component.medium
             if medium.hasRemoteReference():
-                d = medium.callRemote("cleanShutdown")
-                return d
-        return None
+                dlist.append(medium.callRemote("cleanShutdown"))
+
+        # might call back immediately if we aren't connected to anything
+        return defer.DeferredList(dlist, fireOnOneErrback=True)
 
     ### our methods
     def shutdown(self):

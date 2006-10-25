@@ -348,6 +348,10 @@ class JobProcessProtocol(worker.ProcessProtocol):
                 kg.brain.deferredCreateFailed(self.avatarId, 
                     errors.ComponentCreateError(text))
 
+        kg.brain.jobHeaven.lostAvatar(self.avatarId)
+        if kg.brain.deferredShutdownRegistered(self.avatarId):
+            kg.brain.deferredShutdownTrigger(self.avatarId)
+
         # chain up
         worker.ProcessProtocol.processEnded(self, status)
         
@@ -536,7 +540,10 @@ class WorkerBrain(log.Loggable):
         self.feedServerPort = None # port number
         self._setupFeedServer()
 
-        self._createDeferreds = {}
+        self._createDeferreds = {} # avatarId => deferred that will fire
+                                   # when the job attaches
+        self._shutdownDeferreds = {} # avatarId => deferred for shutting
+                                   # down jobs; fires when job is reaped
 
     def login(self, authenticator):
         self.authenticator = authenticator
@@ -644,12 +651,37 @@ class WorkerBrain(log.Loggable):
         @rtype: L{twisted.internet.defer.Deferred}
         """
         self.debug('making create deferred for %s' % avatarId)
-        if avatarId in self._createDeferreds.keys():
-            self.debug('already have a create deferred for %s' % avatarId)
-            raise errors.ComponentAlreadyStartingError(avatarId)
 
         d = defer.Deferred()
-        self.debug('registering deferredCreate for %s' % avatarId)
+
+        # the question of "what jobs do we know about" is answered in
+        # three places: the create deferreds hash, the avatar list in
+        # the jobheaven, and the shutdown deferreds hash. there are four
+        # possible answers:
+        if avatarId in self._createDeferreds:
+            # (1) a job is already starting: it is in the
+            # createdeferreds hash
+            self.info('already have a create deferred for %s', avatarId)
+            raise errors.ComponentAlreadyStartingError(avatarId)
+        elif avatarId in self._shutdownDeferreds:
+            # (2) a job is shutting down; note it is also in
+            # heaven.avatars
+            self.debug('waiting for previous %s to shut down like it '
+                       'said it would', avatarId)
+            def ensureShutdown(res,
+                               shutdown=self._shutdownDeferreds[avatarId]):
+                shutdown.addCallback(lambda _: res)
+                return shutdown
+            d.addCallback(ensureShutdown)
+        elif avatarId in self.jobHeaven.avatars:
+            # (3) a job is running fine
+            self.info('avatar named %s already running', avatarId)
+            raise errors.ComponentCreateError(avatarId)
+        else:
+            # (4) it's new; we know of nothing with this avatarId
+            pass
+
+        self.debug('registering deferredCreate for %s', avatarId)
         self._createDeferreds[avatarId] = d
         return d
 
@@ -659,7 +691,7 @@ class WorkerBrain(log.Loggable):
         component.
         """
         self.debug('triggering create deferred for %s' % avatarId)
-        if not avatarId in self._createDeferreds.keys():
+        if not avatarId in self._createDeferreds:
             self.warning('No create deferred registered for %s' % avatarId)
             return
 
@@ -674,7 +706,7 @@ class WorkerBrain(log.Loggable):
         from the list of pending creates.
         """
         self.debug('create deferred failed for %s' % avatarId)
-        if not avatarId in self._createDeferreds.keys():
+        if not avatarId in self._createDeferreds:
             self.warning('No create deferred registered for %s' % avatarId)
             return
 
@@ -686,7 +718,46 @@ class WorkerBrain(log.Loggable):
         """
         Check if a deferred create has been registered for the given avatarId.
         """
-        return avatarId in self._createDeferreds.keys()
+        return avatarId in self._createDeferreds
+
+    def deferredShutdown(self, avatarId):
+        """
+        Create and register a deferred for notifying the worker of a
+        clean job shutdown. This deferred will be fired when the job is
+        reaped.
+
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        self.debug('making shutdown deferred for %s' % avatarId)
+
+        if avatarId in self._shutdownDeferreds:
+            self.warning('already have a shutdown deferred for %s',
+                         avatarId)
+            return self._shutdownDeferreds[avatarId]
+        else:
+            self.debug('registering deferredShutdown for %s', avatarId)
+            d = defer.Deferred()
+            self._shutdownDeferreds[avatarId] = d
+            return d
+
+    def deferredShutdownTrigger(self, avatarId):
+        """
+        Trigger a previously registered deferred for creating up the given
+        component.
+        """
+        self.debug('triggering shutdown deferred for %s', avatarId)
+        if not avatarId in self._shutdownDeferreds:
+            self.warning('No shutdown deferred registered for %s', avatarId)
+            return
+
+        d = self._shutdownDeferreds.pop(avatarId)
+        d.callback(avatarId)
+
+    def deferredShutdownRegistered(self, avatarId):
+        """
+        Check if a deferred shutdown has been registered for the given avatarId.
+        """
+        return avatarId in self._shutdownDeferreds
 
     ### IFeedServerParent methods
     def feedToFD(self, componentId, feedName, fd):
@@ -865,6 +936,16 @@ class JobAvatar(pb.Avatar, log.Loggable):
                 log.getExceptionMessage(e))
             return False
 
+    def perspective_cleanShutdown(self):
+        """
+        This notification from the job process will be fired when it is
+        shutting down, so that although the process might still be
+        around, we know it's OK to accept new start requests for this
+        avatar ID.
+        """
+        self.info("component %s shutting down cleanly", self.avatarId)
+        self._heaven.brain.deferredShutdown(self.avatarId)
+
 ### this is a different kind of heaven, not IHeaven, for now...
 class JobHeaven(pb.Root, log.Loggable):
     """
@@ -888,6 +969,13 @@ class JobHeaven(pb.Root, log.Loggable):
         avatar = JobAvatar(self, avatarId)
         self.avatars[avatarId] = avatar
         return avatar
+
+    def lostAvatar(self, avatarId):
+        if avatarId not in self.avatars:
+            self.warning("some programmer is telling me about an avatar "
+                         "I have no idea about: %s", avatarId)
+        else:
+            return self.avatars.pop(avatarId)
 
     def shutdown(self):
         self.debug('Shutting down JobHeaven')
