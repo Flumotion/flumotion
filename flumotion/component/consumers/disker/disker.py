@@ -278,21 +278,30 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         @param recur recurrence rule
         @type recur icalendar.props.vRecur
         """
-        if datetime.now() < whenStart:
-            # create a dateutil.rrule from the recurrence rule
-            startRecurRule = None
-            if recur:
-                startRecurRule = rrule.rrulestr(recur.ical(), dtstart=whenStart)
-            start = whenStart - datetime.now()
+        now = datetime.now()
+
+        startRecurRule = None
+        endRecurRule = None
+
+        if recur:
+            self.debug("Have a recurrence rule, parsing")
+            # create dateutil.rrule from the recurrence rules
+            startRecurRule = rrule.rrulestr(recur.ical(), dtstart=whenStart)
+            endRecurRule = rrule.rrulestr(recur.ical(), dtstart=whenEnd) 
+            if now >= whenStart:
+                self.debug("Initial start before now (%r), finding new starts",
+                    whenStart)
+                whenStart = startRecurRule.after(now)
+                whenEnd = endRecurRule.after(now)
+                self.debug("New start is now %r", whenStart)
+
+        if now < whenStart:
+            start = whenStart - now
             startSecs = start.days * 86400 + start.seconds
             self.debug("scheduling a recording %d seconds away", startSecs)
             reactor.callLater(startSecs, 
                 self.start_scheduled_recording, startRecurRule, whenStart)
-            # create a dateutil.rrule from the recurrence rule
-            endRecurRule = None
-            if recur:
-                endRecurRule = rrule.rrulestr(recur.ical(), dtstart=whenEnd) 
-            end = whenEnd - datetime.now()
+            end = whenEnd - now
             endSecs = end.days * 86400 + end.seconds
             reactor.callLater(endSecs, 
                 self.stop_scheduled_recording, endRecurRule, whenEnd)

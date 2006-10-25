@@ -1,5 +1,10 @@
 2006-10-25  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/disker/disker.py:
+	  Make recurrence rules work if the initial time is in the past.
+
+2006-10-25  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/disker/admin_gtk.py:
 	  Started to fix this so that you can upload an ical file, but
 	  incomplete...
