@@ -291,9 +291,13 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
             import md5
             sum = md5.new(s).hexdigest()
             f = os.path.join(configure.registrydir, '%s.connection' % sum)
-            h = open(f, 'w')
-            h.write(s)
-            h.close()
+            try:
+                h = open(f, 'w')
+                h.write(s)
+                h.close()
+            except Exception, e:
+                self.info('failed to write connection cache file %s: %s',
+                          f, log.getExceptionMessage(e))
 
         # chain up
         medium.PingingMedium.setRemoteReference(self, remoteReference)
