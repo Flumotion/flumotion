@@ -1,3 +1,29 @@
+2006-10-26  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/registry.py (RegistryWriter): Factor out of
+	ComponentRegistry.
+	(ComponentRegistry.dump): Use the registry writer.
+	(RegistrySubsetWriter): New class, writes out only the subset of
+	the registry that is provided by the given bundles.
+
+	* flumotion/common/bundle.py (MergedBundler): New object,
+	extending the Bundler class to also package up bundles in addition
+	to just files. The effect is that when you call bundle() on a
+	MergedBundler, you get one zip with a union of all subbundles'
+	contents, in addition to any loose files that you added.
+	(makeBundleFromLoadedModules): New exciting function, outputs a
+	zip file and a registry fragment corresponding to a subset of
+	loaded modules. For example:
+	FLU_ATEXIT='flumotion.common.bundle.makeBundleFromLoadedModules \
+	/tmp/flumotion.zip /tmp/flumotion.xml flumotion' \
+	bin/flumotion-launch videotest
+
+	* flumotion/common/boot.py.in (boot): Support another environment
+	variable, FLU_ATEXIT, that specifies a function to call just
+	before exiting. Any arguments to the function should be given as
+	space-delimited strings. For example, FLU_ATEXIT='a.b.c d e f'
+	will evaluate a.b.c("d", "e", "f").
+
 2006-10-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/disker/disker.py:

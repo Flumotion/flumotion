@@ -832,6 +832,162 @@ class RegistryDirectory:
     def getPath(self):
         return self._path
     
+class RegistryWriter(log.Loggable):
+    def __init__(self, components, plugs, bundles, directories):
+        """
+        @param components: components to write
+        @type  components: list of L{RegistryEntryComponent}
+        @param plugs: plugs to write
+        @type  plugs: list of L{RegistryEntryPlug}
+        @param bundles: bundles to write
+        @type  bundles: list of L{RegistryEntryBundle}
+        @param directories: directories to write
+        @type  directories: list of L{RegistryEntryDirectory}
+        """
+        self.components = components
+        self.plugs = plugs
+        self.bundles = bundles
+        self.directories = directories
+
+    def dump(self, fd):
+        """
+        Dump the cache of components to the given opened file descriptor.
+
+        @type  fd: integer
+        @param fd: open file descriptor to write to
+        """
+        
+        def w(i, msg):
+            print >> fd, ' '*i + msg
+            
+        w(0, '<registry>')
+        w(0, '')
+
+        # Write components
+        w(2, '<components>')
+        w(0, '')
+        for component in self.components:
+            w(4, '<component type="%s" base="%s">' % (component.getType(),
+                component.getBase()))
+
+            w(6, '<source location="%s"/>' % component.getSource())
+            for x in component.getEaters():
+                w(6, '<eater name="%s" required="%s" multiple="%s"/>'
+                  % (x.getName(), x.getRequired() and "yes" or "no",
+                     x.getMultiple() and "yes" or "no"))
+            for x in component.getFeeders():
+                w(6, '<feeder name="%s"/>' % x)
+            w(6, '<synchronization required="%s" clock-priority="%d"/>'
+              % (component.getNeedsSynchronization() and "yes" or "no",
+                 component.getClockPriority()))
+
+            sockets = component.getSockets()
+            if sockets:
+                w(6, '<sockets>')
+                for socket in sockets:
+                    w(8, '<socket type="%s"/>' % socket)
+                w(6, '</sockets>')
+
+            w(6, '<properties>')
+            for prop in component.getProperties():
+                w(8, '<property name="%s" type="%s" required="%s" multiple="%s"/>' % (
+                    prop.getName(),
+                    prop.getType(),
+                    prop.isRequired(),
+                    prop.isMultiple()))
+            w(6, '</properties>')
+
+            files = component.getFiles()
+            if files:
+                w(6, '<files>')
+                for file in files:
+                    w(8, '<file name="%s" type="%s"/>' % (
+                        file.getName(),
+                        file.getType()))
+                w(6, '</files>')
+
+            entries = component.getEntries()
+            if entries:
+                w(6, '<entries>')
+                for entry in entries:
+                    w(8, '<entry type="%s" location="%s" function="%s"/>' % (
+                        entry.getType(),
+                        entry.getLocation(),
+                        entry.getFunction()))
+                w(6, '</entries>')
+            w(4, '</component>')
+            w(0, '')
+                
+        w(2, '</components>')
+        w(0, '')
+
+        # Write plugs
+        w(2, '<plugs>')
+        w(0, '')
+        for plug in self.plugs:
+            w(4, '<plug type="%s" socket="%s">'
+              % (plug.getType(), plug.getSocket()))
+
+            entry = plug.getEntry()
+            w(6, ('<entry location="%s" function="%s"/>'
+                  % (entry.getLocation(), entry.getFunction())))
+
+            w(6, '<properties>')
+            for prop in plug.getProperties():
+                w(8, ('<property name="%s" type="%s" required="%s" multiple="%s"/>'
+                      % (prop.getName(),
+                         prop.getType(),
+                         prop.isRequired(),
+                         prop.isMultiple())))
+            w(6, '</properties>')
+
+            w(4, '</plug>')
+            w(0, '')
+                
+        w(2, '</plugs>')
+        w(0, '')
+
+        # bundles
+        w(2, '<bundles>')
+        for bundle in self.bundles:
+            w(4, '<bundle name="%s" under="%s" project="%s">' % (
+                bundle.getName(), bundle.getUnder(), bundle.getProject()))
+
+            dependencies = bundle.getDependencies()
+            if dependencies:
+                w(6, '<dependencies>')
+                for dependency in dependencies:
+                    w(8, '<dependency name="%s"/>' % dependency)
+                w(6, '</dependencies>')
+
+            dirs = bundle.getDirectories()
+            if dirs:
+                w(6, '<directories>')
+                for dir in dirs:
+                    w(8, '<directory name="%s">' % dir.getName())
+                    for filename in dir.getFiles():
+                        w(10, '<filename location="%s" relative="%s"/>' % (
+                            filename.getLocation(), filename.getRelative()))
+                    w(8, '</directory>')
+                w(6, '</directories>')
+                
+            w(4, '</bundle>')
+            w(0, '')
+        w(2, '</bundles>')
+
+
+        # Directories
+        directories = self.directories
+        if directories:
+            w(2, '<directories>')
+            w(0, '')
+            for d in directories:
+                w(4, '<directory filename="%s"/>' % d.getPath())
+            w(2, '</directories>')
+            w(0, '')
+        
+        w(0, '</registry>')
+
 class ComponentRegistry(log.Loggable):
     """Registry, this is normally not instantiated."""
     
@@ -997,137 +1153,9 @@ class ComponentRegistry(log.Loggable):
         @type  fd: integer
         @param fd: open file descriptor to write to
         """
-        
-        def w(i, msg):
-            print >> fd, ' '*i + msg
-            
-        w(0, '<registry>')
-        w(0, '')
-
-        # Write components
-        w(2, '<components>')
-        w(0, '')
-        for component in self.getComponents():
-            w(4, '<component type="%s" base="%s">' % (component.getType(),
-                component.getBase()))
-
-            w(6, '<source location="%s"/>' % component.getSource())
-            for x in component.getEaters():
-                w(6, '<eater name="%s" required="%s" multiple="%s"/>'
-                  % (x.getName(), x.getRequired() and "yes" or "no",
-                     x.getMultiple() and "yes" or "no"))
-            for x in component.getFeeders():
-                w(6, '<feeder name="%s"/>' % x)
-            w(6, '<synchronization required="%s" clock-priority="%d"/>'
-              % (component.getNeedsSynchronization() and "yes" or "no",
-                 component.getClockPriority()))
-
-            sockets = component.getSockets()
-            if sockets:
-                w(6, '<sockets>')
-                for socket in sockets:
-                    w(8, '<socket type="%s"/>' % socket)
-                w(6, '</sockets>')
-
-            w(6, '<properties>')
-            for prop in component.getProperties():
-                w(8, '<property name="%s" type="%s" required="%s" multiple="%s"/>' % (
-                    prop.getName(),
-                    prop.getType(),
-                    prop.isRequired(),
-                    prop.isMultiple()))
-            w(6, '</properties>')
-
-            files = component.getFiles()
-            if files:
-                w(6, '<files>')
-                for file in files:
-                    w(8, '<file name="%s" type="%s"/>' % (
-                        file.getName(),
-                        file.getType()))
-                w(6, '</files>')
-
-            entries = component.getEntries()
-            if entries:
-                w(6, '<entries>')
-                for entry in entries:
-                    w(8, '<entry type="%s" location="%s" function="%s"/>' % (
-                        entry.getType(),
-                        entry.getLocation(),
-                        entry.getFunction()))
-                w(6, '</entries>')
-            w(4, '</component>')
-            w(0, '')
-                
-        w(2, '</components>')
-        w(0, '')
-
-        # Write plugs
-        w(2, '<plugs>')
-        w(0, '')
-        for plug in self.getPlugs():
-            w(4, '<plug type="%s" socket="%s">'
-              % (plug.getType(), plug.getSocket()))
-
-            entry = plug.getEntry()
-            w(6, ('<entry location="%s" function="%s"/>'
-                  % (entry.getLocation(), entry.getFunction())))
-
-            w(6, '<properties>')
-            for prop in plug.getProperties():
-                w(8, ('<property name="%s" type="%s" required="%s" multiple="%s"/>'
-                      % (prop.getName(),
-                         prop.getType(),
-                         prop.isRequired(),
-                         prop.isMultiple())))
-            w(6, '</properties>')
-
-            w(4, '</plug>')
-            w(0, '')
-                
-        w(2, '</plugs>')
-        w(0, '')
-
-        # bundles
-        w(2, '<bundles>')
-        for bundle in self.getBundles():
-            w(4, '<bundle name="%s" under="%s" project="%s">' % (
-                bundle.getName(), bundle.getUnder(), bundle.getProject()))
-
-            dependencies = bundle.getDependencies()
-            if dependencies:
-                w(6, '<dependencies>')
-                for dependency in dependencies:
-                    w(8, '<dependency name="%s"/>' % dependency)
-                w(6, '</dependencies>')
-
-            dirs = bundle.getDirectories()
-            if dirs:
-                w(6, '<directories>')
-                for dir in dirs:
-                    w(8, '<directory name="%s">' % dir.getName())
-                    for filename in dir.getFiles():
-                        w(10, '<filename location="%s" relative="%s"/>' % (
-                            filename.getLocation(), filename.getRelative()))
-                    w(8, '</directory>')
-                w(6, '</directories>')
-                
-            w(4, '</bundle>')
-            w(0, '')
-        w(2, '</bundles>')
-
-
-        # Directories
-        directories = self.getDirectories()
-        if directories:
-            w(2, '<directories>')
-            w(0, '')
-            for d in directories:
-                w(4, '<directory filename="%s"/>' % d.getPath())
-            w(2, '</directories>')
-            w(0, '')
-        
-        w(0, '</registry>')
+        writer = RegistryWriter(self.getComponents(), self.getPlugs(),
+                                self.getBundles(), self.getDirectories())
+        writer.dump(fd)
 
     def clean(self):
         """
@@ -1215,6 +1243,52 @@ class ComponentRegistry(log.Loggable):
                 self._parser.removeDirectoryByPath(path)
 
         self.save(force)
+
+class RegistrySubsetWriter(RegistryWriter):
+    def __init__(self, fromRegistry=None, onlyBundles=None):
+        """
+        @param fromRegistry: The registry to subset, or the default.
+        @type  fromRegistry: L{ComponentRegistry}
+        @param onlyBundles: If given, only include the subset of the
+        registry that is provided by bundles whose names are in this
+        list.
+        @type  onlyBundles: list of str
+        """
+        self.fromRegistry = fromRegistry
+        self.onlyBundles = onlyBundles
+
+    def dump(self, fd):
+        reg = self.fromRegistry or getRegistry()
+        pred = None
+        if self.onlyBundles is not None:
+            pred = lambda b: b.name in self.onlyBundles
+        bundles = filter(pred, reg.getBundles())
+
+        bundledfiles = {}
+        for b in bundles:
+            for d in b.getDirectories():
+                for f in d.getFiles():
+                    filename = os.path.join(d.getName(), f.getLocation())
+                    bundledfiles[filename] = b
+
+        def fileIsBundled(basedir, filename):
+            return os.path.join(basedir, filename) in bundledfiles
+
+        pred = lambda c: (filter(lambda f: fileIsBundled(c.getBase(),
+                                                         f.getFilename()),
+                                 c.getFiles())
+                          or filter(lambda e: fileIsBundled(c.getBase(),
+                                                            e.getLocation()),
+                                    c.getEntries()))
+        components = filter(pred, reg.getComponents())
+
+        pred = lambda p: p.getEntry().getLocation() in bundledfiles
+        plugs = filter(pred, reg.getPlugs())
+
+        directories = [] # no need for this
+
+        regwriter = RegistryWriter(components, plugs, bundles, directories)
+        regwriter.dump(fd)
 
 __registry = None
 

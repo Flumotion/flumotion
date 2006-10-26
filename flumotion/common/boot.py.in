@@ -153,6 +153,20 @@ def boot(path, gtk=False, gst=True, installReactor=True):
             finally:
                 statprof.stop()
                 statprof.display()
+    elif os.getenv('FLU_ATEXIT'):
+        def catching(proc, *args, **kwargs):
+            env = os.getenv('FLU_ATEXIT').split(' ')
+            fqfn = env.pop(0)
+            log.info('atexit', 'FLU_ATEXIT set, will call %s(*%r) on exit',
+                     fqfn, env)
+            atexitproc = reflect.namedAny(fqfn)
+
+            try:
+                return proc(*args, **kwargs)
+            finally:
+                log.info('atexit', 'trying to call %r(*%r)',
+                         atexitproc, env)
+                atexitproc(*env)
     else:
         def catching(proc, *args, **kwargs):
             return proc(*args, **kwargs)
