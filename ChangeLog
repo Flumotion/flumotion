@@ -1,6 +1,11 @@
 2006-10-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/disker/disker.py:
+	Use the summary of the event in the vCalendar as the filenameTemplate.
+
+2006-10-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/consumers/disker/disker.py:
 	Add optional property to changeFilename where the filename template
 	as a strftime formatted string can be passed.
 	Example flumotion-command use: 

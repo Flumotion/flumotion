@@ -128,7 +128,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     
     def change_filename(self, filenameTemplate=None):
         """
-        @param filenameTemplate: stftime formatted string to decide filename
+        @param filenameTemplate: strftime formatted string to decide filename
         """
         self.debug("change_filename()")
         mime = self.get_mime()
@@ -275,7 +275,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     # add code that lets recordings be schedules
     # TODO: resolve overlapping events
-    def schedule_recording(self, whenStart, whenEnd, recur=None):
+    def schedule_recording(self, whenStart, whenEnd, recur=None, 
+                           filenameTemplate=None):
         """
         Sets a recording to start at a time in the future for a specified
         duration.
@@ -285,6 +286,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         @type whenEnd datetime
         @param recur recurrence rule
         @type recur icalendar.props.vRecur
+        @param filenameTemplate strftime formatted string to decide filename
+        @type filenameTemplate string
         """
         now = datetime.now()
 
@@ -308,7 +311,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             startSecs = start.days * 86400 + start.seconds
             self.debug("scheduling a recording %d seconds away", startSecs)
             reactor.callLater(startSecs, 
-                self.start_scheduled_recording, startRecurRule, whenStart)
+                self.start_scheduled_recording, startRecurRule, whenStart,
+                filenameTemplate)
             end = whenEnd - now
             endSecs = end.days * 86400 + end.seconds
             reactor.callLater(endSecs, 
@@ -316,8 +320,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         else:
             self.warning("attempt to schedule in the past!")
 
-    def start_scheduled_recording(self, recurRule, when):
-        self.change_filename()
+    def start_scheduled_recording(self, recurRule, when, filenameTemplate):
+        self.change_filename(filenameTemplate)
         if recurRule:
             now = datetime.now()
             nextTime = recurRule.after(when)
@@ -328,7 +332,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             self.debug("recurring start in %d seconds", recurIntervalSeconds)
             reactor.callLater(recurIntervalSeconds, 
                 self.start_scheduled_recording,
-                recurRule, nextTime)
+                recurRule, nextTime, filenameTemplate)
 
     def stop_scheduled_recording(self, recurRule, when):
         self.stop_recording()
@@ -349,10 +353,12 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             for event in cal.walk('vevent'):
                 dtstart = event.decoded('dtstart', '')
                 dtend = event.decoded('dtend', '')
-                self.debug("event parsed with start: %r end: %r", dtstart, dtend)
+                summary = event.decoded('summary', None)
+                self.debug("event parsed with start: %r end: %r and summary: %s"
+                           , dtstart, dtend, summary)
                 recur = event.get('rrule', None)
                 if dtstart and dtend:
-                    self.schedule_recording(dtstart, dtend, recur)
+                    self.schedule_recording(dtstart, dtend, recur, summary)
         else:
             self.warning("Cannot parse ICAL; neccesary modules not installed")
 
