@@ -1,5 +1,12 @@
 2006-10-26  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Roughly identical patch for httpfile component: adds
+	  updatePorterDetails. We should factor out a bunch of common code
+	  between these two...
+
+2006-10-26  Michael Smith  <msmith@fluendo.com>
+
 	* conf/managers/default/flows/porter.xml:
 	  Updated example.
 

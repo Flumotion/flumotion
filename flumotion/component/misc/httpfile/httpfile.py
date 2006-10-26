@@ -236,6 +236,9 @@ class HTTPFileMedium(component.BaseComponentMedium):
     def remote_getLoadData(self):
         return self.comp.getLoadData()
 
+    def remote_updatePorterDetails(self, path, username, password):
+        return self.comp.updatePorterDetails(path, username, password)
+
 class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication, 
     log.Loggable):
 
@@ -288,6 +291,35 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             return self._pbclient.deregisterPath(self.mountPoint)
         return component.BaseComponent.do_stop(self)
 
+    def updatePorterDetails(self, path, username, password):
+        """
+        Provide a new set of porter login information, for when we're in slave
+        mode and the porter changes.
+        If we're currently connected, this won't disconnect - it'll just change
+        the information so that next time we try and connect we'll use the
+        new ones
+        """
+        if self.type == 'slave':
+            self._porterUsername = username
+            self._porterPassword = password
+
+            creds = credentials.UsernamePassword(self._porterUsername, 
+                self._porterPassword)
+            self._pbclient.startLogin(creds, self.medium)
+
+            # If we've changed paths, we must do some extra work.
+            if path != self._porterPath:
+                self._porterPath = path
+                self._pbclient.stopTrying() # Stop trying to connect with the
+                                            # old connector.
+                self._pbclient.resetDelay()
+                reactor.connectWith(
+                    fdserver.FDConnector, self._porterPath, 
+                    self._pbclient, 10, checkPID=False)
+        else:
+            raise errors.WrongStateError(
+                "Can't specify porter details in master mode")
+
     def do_start(self, *args, **kwargs):
         #root = HTTPRoot()
         root = resource.Resource()
@@ -315,13 +347,13 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                 self._pbclient = porterclient.HTTPPorterClientFactory(
                     server.Site(resource=root), [], d, 
                     prefixes=[self.mountPoint])
+            creds = credentials.UsernamePassword(self._porterUsername, 
+                self._porterPassword)
+            self._pbclient.startLogin(creds, self.medium)
+            self.debug("Starting porter login!")
             # This will eventually cause d to fire
             reactor.connectWith(fdserver.FDConnector, self._porterPath, 
                 self._pbclient, 10, checkPID=False)
-            creds = credentials.UsernamePassword(self._porterUsername, 
-                self._porterPassword)
-            self.debug("Starting porter login!")
-            self._pbclient.startLogin(creds, self.medium)
         else:
             # File Streamer is standalone.
             try:
