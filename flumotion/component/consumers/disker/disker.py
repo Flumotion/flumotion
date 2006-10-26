@@ -26,6 +26,7 @@ from datetime import datetime
 
 import gobject
 import gst
+import time
 
 from twisted.internet import reactor
 
@@ -50,15 +51,15 @@ except:
     HAS_ICAL = False
 
 class DiskerMedium(feedcomponent.FeedComponentMedium):
-    # called when admin ui wants to stop recording. call changeFilename to 
+    # called when admin ui wants to stop recording. call changeFilename to
     # restart
-    def remote_stopRecording(self): 
-        self.comp.stop_recording() 
+    def remote_stopRecording(self):
+        self.comp.stop_recording()
 
     # called when admin ui wants to change filename (this starts recording if
     # the disker isn't currently writing to disk)
-    def remote_changeFilename(self):
-        self.comp.change_filename()
+    def remote_changeFilename(self, filenameTemplate=None):
+        self.comp.change_filename(filenameTemplate)
 
     def remote_scheduleRecordings(self, ical):
         self.comp.parse_ical(ical)
@@ -125,7 +126,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             mime += ";boundary=ThisRandomString"
         return mime
     
-    def change_filename(self):
+    def change_filename(self, filenameTemplate=None):
+        """
+        @param filenameTemplate: stftime formatted string to decide filename
+        """
         self.debug("change_filename()")
         mime = self.get_mime()
         if mime == 'application/ogg':
@@ -161,15 +165,20 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self.update_symlink(self.location,
                                     self.symlink_to_last_recording)
 
-        date = time.strftime('%Y%m%d-%H%M%S', time.localtime())
-        self.location = os.path.join(self.directory,
-                                     '%s.%s.%s' % (self.getName(), date, ext))
+        filename = ""
+        if not filenameTemplate:
+            date = time.strftime('%Y%m%d-%H%M%S', time.localtime())
+            filename = '%s.%s.%s' % (self.getName(), date, ext)
+        else:
+            filename = "%s.%s" % (time.strftime(filenameTemplate,
+                time.localtime()), ext)
+        self.location = os.path.join(self.directory, filename)
 
         self.file_fd = open(self.location, 'a')
         sink.emit('add', self.file_fd.fileno())
         self.uiState.set('filename', self.location)
         self.uiState.set('recording', True)
-
+    
         if self.symlink_to_current_recording:
             self.update_symlink(self.location,
                                 self.symlink_to_current_recording)
@@ -195,23 +204,22 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                                        % (dest,))),
                                  debug=log.getExceptionMessage(e))
             self.state.append('messages', m)
-            
-    def stop_recording(self): 
-        sink = self.get_element('fdsink') 
-        if sink.get_state() == gst.STATE_NULL: 
-            sink.set_state(gst.STATE_READY) 
 
-        if self.file_fd: 
-            self.file_fd.flush() 
-            sink.emit('remove', self.file_fd.fileno()) 
-            self.file_fd = None 
-            self.uiState.set('filename', None) 
-            self.uiState.set('recording', False) 
+    def stop_recording(self):
+        sink = self.get_element('fdsink')
+        if sink.get_state() == gst.STATE_NULL:
+            sink.set_state(gst.STATE_READY)
 
+        if self.file_fd:
+            self.file_fd.flush()
+            sink.emit('remove', self.file_fd.fileno())
+            self.file_fd = None
+            self.uiState.set('filename', None)
+            self.uiState.set('recording', False)
             if self.symlink_to_last_recording:
                 self.update_symlink(self.location,
                                     self.symlink_to_last_recording)
-                            
+
     def _notify_caps_cb(self, pad, param):
         caps = pad.get_negotiated_caps()
         if caps == None:
@@ -348,6 +356,4 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         else:
             self.warning("Cannot parse ICAL; neccesary modules not installed")
 
-
-        
 pygobject.type_register(Disker)
