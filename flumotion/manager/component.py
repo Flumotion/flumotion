@@ -711,7 +711,6 @@ class ComponentHeaven(base.ManagerHeaven):
         state = componentAvatar.componentState
         conf = state.get('config')
     
-        
         # connect the component's eaters
         eatersData = self._getComponentEatersData(componentAvatar)
         for fullFeedId in eatersData:

@@ -262,6 +262,8 @@ class ReconnectingFPBClientFactory(FPBClientFactory,
             d = self.login(self._authenticator)
             self.gotDeferredLogin(d)
 
+    # TODO: This is a poorly named method; it just provides the appropriate
+    # authentication information, and doesn't actually _start_ login at all.
     def startLogin(self, authenticator):
         assert not isinstance(authenticator, keycards.Keycard)
         self._authenticator = authenticator

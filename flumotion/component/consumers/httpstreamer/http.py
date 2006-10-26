@@ -212,6 +212,9 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     def remote_getLoadData(self):
         return self.comp.getLoadData()
 
+    def remote_updatePorterDetails(self, path, username, password):
+        return self.comp.updatePorterDetails(path, username, password)
+
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     # this object is given to the HTTPMedium as comp
@@ -616,6 +619,35 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         else:
             return feedcomponent.ParseLaunchComponent.do_stop(self)
 
+    def updatePorterDetails(self, path, username, password):
+        """
+        Provide a new set of porter login information, for when we're in slave
+        mode and the porter changes.
+        If we're currently connected, this won't disconnect - it'll just change
+        the information so that next time we try and connect we'll use the
+        new ones
+        """
+        if self.type == 'slave':
+            self._porterUsername = username
+            self._porterPassword = password
+
+            creds = credentials.UsernamePassword(self._porterUsername, 
+                self._porterPassword)
+            self._pbclient.startLogin(creds, self.medium)
+
+            # If we've changed paths, we must do some extra work.
+            if path != self._porterPath:
+                self._porterPath = path
+                self._pbclient.stopTrying() # Stop trying to connect with the
+                                            # old connector.
+                self._pbclient.resetDelay()
+                reactor.connectWith(
+                    fdserver.FDConnector, self._porterPath, 
+                    self._pbclient, 10, checkPID=False)
+        else:
+            raise errors.WrongStateError(
+                "Can't specify porter details in master mode")
+
     def do_start(self, *args, **kwargs):
         root = resources.HTTPRoot()
         # TwistedWeb wants the child path to not include the leading /
@@ -642,18 +674,18 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             mountpoints = [self.mountPoint]
             self._pbclient = porterclient.HTTPPorterClientFactory(
                 server.Site(resource=root), mountpoints, d2)
-            dl = defer.DeferredList([d1, d2])
-
-            # This will eventually cause d2 to fire
-            reactor.connectWith(fdserver.FDConnector, self._porterPath, 
-                self._pbclient, 10, checkPID=False)
 
             creds = credentials.UsernamePassword(self._porterUsername, 
                 self._porterPassword)
-            self.debug("Starting porter login!")
             self._pbclient.startLogin(creds, self.medium)
 
-            return dl
+            self.debug("Starting porter login!")
+            # This will eventually cause d2 to fire
+            reactor.connectWith(
+                fdserver.FDConnector, self._porterPath, 
+                self._pbclient, 10, checkPID=False)
+
+            return defer.DeferredList([d1, d2])
         else:
             # Streamer is standalone.
             try:
