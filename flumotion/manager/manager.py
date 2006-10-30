@@ -612,13 +612,18 @@ class Vishnu(log.Loggable):
 
         avatar = self.getComponentMapper(componentState).avatar
         if not avatar:
+            # reset moodPending if asked to stop without an avatar
+            # because we changed above to allow stopping even if
+            # moodPending is happy
             if componentState.get('mood') == moods.sad.value:
                 self.debug('asked to stop a sad component without avatar')
                 componentState.set('mood', moods.sleeping.value)
+                componentState.set('moodPending', None)
                 return defer.succeed(None)
             if componentState.get('mood') == moods.lost.value:
                 self.debug('asked to stop a lost component without avatar')
                 componentState.set('mood', moods.sleeping.value)
+                componentState.set('moodPending', None)
                 return defer.succeed(None)
 
             msg = 'asked to stop a component without avatar in mood %s' % \
@@ -1101,15 +1106,15 @@ class Vishnu(log.Loggable):
         """
         @rtype: list of L{flumotion.common.planet.ManagerComponentState}
         """
-        # return a list of components that are sleeping and not pending
+        # return a list of components that are sleeping
         components = self.state.getComponents()
 
-        # filter the ones that are sleeping and not pending
+        # filter the ones that are sleeping
+        # NOTE: now sleeping indicates that there is no existing job
+        # as when jobs are created, mood becomes waking, so no need to
+        # filter on moodPending
         isSleeping = lambda c: c.get('mood') == moods.sleeping.value
         components = filter(isSleeping, components)
-        isNotPending = lambda c: c.get('moodPending') == None
-        components = filter(isNotPending, components)
-
         return components
 
     def _getWorker(self, workerName):

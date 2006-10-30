@@ -1,3 +1,12 @@
+2006-10-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/manager/manager.py:
+	When you stop a lost or sad component that has mood pending of
+	happy, then reset moodPending to None.
+	When a worker logs in, it should be told to start all components
+	that are sleeping.  moodPending should not need to be checked because
+	when a job is created, mood is set to waking.
+
 2006-10-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/as-ac-expand.m4:
