@@ -1076,6 +1076,7 @@ class Disk(WizardStep):
         self.radiobutton_has_time.set_active(True)
         self.spinbutton_time.set_value(12)
         self.combobox_time_list.set_active(RotateTime.Hours)
+        self.checkbutton_record_at_startup.set_active(True)
 
     # This is bound to both radiobutton_has_size and radiobutton_has_time
     def on_radiobutton_rotate_toggled(self, button):
@@ -1121,7 +1122,8 @@ class Disk(WizardStep):
                 options['size'] = long(self.spinbutton_size.get_value() * unit)
 
         options['directory'] = self.entry_location.get_text()
-        
+        options['start-recording'] = \
+            self.checkbutton_record_at_startup.get_active()
         return options
     
     def get_next(self):
