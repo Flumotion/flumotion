@@ -206,9 +206,10 @@ def do_invoke(model, quit, avatarId, methodName, *args):
     yield d
 
     try:
-        d.value()
+        v = d.value()
         print "Invoke of %s on %s was successful." % (methodName, 
             avatarId[1])
+        print v
     except errors.NoMethodError:
         print "No method '%s' on component '%s'" % (methodName, avatarId)
     except Exception, e:
