@@ -1,3 +1,7 @@
+2006-11-01  Andy Wingo  <wingo@pobox.com>
+
+	* common/setup.m4: Fix the m4 for internal autoconf churn, again.
+
 2006-10-31  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/command/commands.py:

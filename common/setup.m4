@@ -18,8 +18,8 @@ AC_DEFUN([FLUMOTION_SETUP], [
   AC_CONFIG_COMMANDS($1,
     [
 # automake 2.60 help
-if test "x$ac_dest" = "x"; then ac_dest=$ac_file; fi
-flu_var_prefix=`echo "$ac_dest" | sed -e 's/[[^a-zA-Z_0-9]]/_/g'`
+if test "x$ac_file" != "x"; then dest=$ac_file; else dest=$ac_dest; fi
+flu_var_prefix=`echo "$dest" | sed -e 's/[[^a-zA-Z_0-9]]/_/g'`
 eval _RELATIVE_PATH=\$${flu_var_prefix}_RELATIVE_PATH
 eval _PREAMBLE=\$${flu_var_prefix}_PREAMBLE
 eval _FLUMOTION_DIR=\$${flu_var_prefix}_FLUMOTION_DIR
@@ -27,7 +27,6 @@ eval _PROJECT=\$${flu_var_prefix}_PROJECT
 
 dirpart=`dirname "$_RELATIVE_PATH" 2> /dev/null`
 mkdir -p $dirpart
-
 cat > $_RELATIVE_PATH <<END
 $_PREAMBLE
 
