@@ -206,6 +206,48 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
     os.dup2(so.fileno(), sys.stdout.fileno())
     os.dup2(se.fileno(), sys.stderr.fileno())
 
+def daemonizeHelper(processType, daemonizeTo='/', processName=None):
+    """
+    Daemonize a process, writing log files and PID files to conventional
+    locations.
+
+    @param processType: The process type, for example 'worker'. Used
+    as part of the log file and PID file names.
+    @type  processType: str
+    @param daemonizeTo: The directory that the daemon should run in.
+    @type  daemonizeTo: str
+    @param processName: The service name of the process. Used to
+    disambiguate different instances of the same daemon.
+    @type  processName: str
+    """
+    ensureDir(configure.logdir, "log file")
+    ensureDir(configure.rundir, "run file")
+
+    if getPid(processType, processName):
+        raise SystemError(
+            "A %s service named '%s' is already running"
+            % (processType, processName or processType))
+
+    log.info(processType, "%s service named '%s' daemonizing",
+             processType, processName)
+
+    if processName:
+        logPath = os.path.join(configure.logdir,
+                               '%s.%s.log' % (processType, processName))
+    else:
+        logPath = os.path.join(configure.logdir,
+                               '%s.log' % (processType,))
+    log.debug(processType, 'Further logging will be done to %s', logPath)
+
+    # here we daemonize; so we also change our pid
+    daemonize(stdout=logPath, stderr=logPath, directory=daemonizeTo)
+
+    log.info(processType, 'Started daemon')
+
+    # from now on I should keep running until killed, whatever happens
+    path = writePidFile(processType, processName)
+    log.debug(processType, 'written pid file %s', path)
+    
 def argRepr(args=(), kwargs={}, max=-1):
     """
     Return a string representing the given args.

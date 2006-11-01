@@ -1,5 +1,8 @@
 2006-11-01  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/common/common.py (daemonizeHelper): New function,
+	handles the PID file / log file foo.
+
 	* common/setup.m4: Fix the m4 for internal autoconf churn, again.
 
 2006-10-31  Thomas Vander Stichele  <thomas at apestaart dot org>
