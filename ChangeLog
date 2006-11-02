@@ -1,3 +1,9 @@
+2006-11-02  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Since we send Connection: close, we must close the connection after
+	  the request.
+
 2006-11-01  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/common.py (daemonizeHelper): New function,

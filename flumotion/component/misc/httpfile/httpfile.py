@@ -65,6 +65,10 @@ class RequestWrapper:
         return self.request.write(data)
         
     def finish(self):
+        # We sent Connection: close, so honour that and actually close the
+        # connection. That should cause connectionLost to be called, from where
+        # we will then log the request.
+        self.transport.loseConnection()
         self.__dict__['__finished'](self.request,
                                     self.__dict__['__written'],
                                     time.time() -
