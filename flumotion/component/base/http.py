@@ -19,6 +19,9 @@
 
 # Headers in this file shall remain intact.
 
+import struct
+import socket
+
 from twisted.web import http, server
 from twisted.web import resource as web_resource
 from twisted.internet import reactor, defer
@@ -292,4 +295,32 @@ class HTTPAuthentication(log.Loggable):
                                  'error': http.RESPONSES[error_code]}
         request.write(html)
         request.finish()
+
+class LogFilter:
+    def __init__(self):
+        self.filters = [] # list of (network, mask)
+
+    def addIPFilter(self, filter):
+        """
+        Add an IP filter of the form IP/prefix-length (CIDR syntax)
+        """
+        (net, prefixlen) = filter.split('/')
+        prefixlen = int(prefixlen)
+
+        mask = ~((1 << (32 - prefixlen)) - 1)
+        net = struct.unpack(">I", socket.inet_pton(socket.AF_INET, net))[0]
+        net = net & mask # just in case
+
+        self.filters.append((net, mask))
+
+    def isInRange(self, ip):
+        """
+        Return true if ip is in any of the defined network(s) for this filter
+        """
+        # Handles IPv4 only.
+        realip = struct.unpack(">I", socket.inet_pton(socket.AF_INET, ip))[0]
+        for f in self.filters:
+            if (realip & f[1]) == f[0]:
+                return True
+        return False
 

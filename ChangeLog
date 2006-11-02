@@ -1,5 +1,11 @@
 2006-11-02  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/base/http.py:
+	  Add a class to filter IPs based on networks, for use in http
+	  logging.
+
+2006-11-02  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/misc/httpfile/httpfile.py:
 	  Fix stale comment.
 
