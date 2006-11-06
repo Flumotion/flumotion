@@ -1,5 +1,10 @@
 2006-11-06  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  *cough* BPB.
+
+2006-11-06  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/base/http.py:
 	  Improve parser; allow specifying single IPs, raise ConfigError if
 	  invalid.

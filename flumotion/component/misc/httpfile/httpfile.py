@@ -423,7 +423,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         headers = request.getAllHeaders()
 
         ip = request.getClientIP()
-        if self.logfilter or not self.logfilter.isInRange(ip):
+        if not self.logfilter or not self.logfilter.isInRange(ip):
             args = {'ip': ip,
                     'time': time.gmtime(),
                     'method': request.method,
