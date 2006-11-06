@@ -1,5 +1,13 @@
 2006-11-06  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/base/http.py:
+	  Improve parser; allow specifying single IPs, raise ConfigError if
+	  invalid.
+	* flumotion/test/test_logfilter.py:
+	  Tests for logfilter parser.
+
+2006-11-06  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/test/test_config.py:
 	  Now that I'm using multiple=yes in configs, add testing that to the
 	  config parser test.

@@ -302,13 +302,28 @@ class LogFilter:
 
     def addIPFilter(self, filter):
         """
-        Add an IP filter of the form IP/prefix-length (CIDR syntax)
+        Add an IP filter of the form IP/prefix-length (CIDR syntax), or just
+        a single IP address
         """
-        (net, prefixlen) = filter.split('/')
-        prefixlen = int(prefixlen)
+        definition = filter.split('/')
+        if len(definition) == 2:
+            (net, prefixlen) = definition
+            prefixlen = int(prefixlen)
+        elif len(definition) == 1:
+            net = definition[0]
+            prefixlen = 32
+        else:
+            raise errors.ConfigError(
+                "Cannot parse filter definition %s" % filter)
+
+        if prefixlen < 0 or prefixlen > 32:
+            raise errors.ConfigError("Invalid prefix length")
 
         mask = ~((1 << (32 - prefixlen)) - 1)
-        net = struct.unpack(">I", socket.inet_pton(socket.AF_INET, net))[0]
+        try:
+            net = struct.unpack(">I", socket.inet_pton(socket.AF_INET, net))[0]
+        except:
+            raise errors.ConfigError("Failed to parse network address %s" % net)
         net = net & mask # just in case
 
         self.filters.append((net, mask))
