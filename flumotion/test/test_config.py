@@ -39,6 +39,7 @@ regchunk = """
         <property name="five" type="bool"/>
         <property name="six" type="long"/>
         <property name="seven" type="fraction"/>
+        <property name="eight" type="int" multiple="yes" />
       </properties>
       <sockets>
         <socket type="foo.bar"/>
@@ -345,6 +346,8 @@ class TestConfig(unittest.TestCase):
                <property name="five">True</property>
                <property name="six">3981391981389138998131389L</property>
                <property name="seven">30000/1001</property>
+               <property name="eight">1</property>
+               <property name="eight">2</property>
              </component></flow>
              </planet>""")
         self.failIf(planet.flows)
@@ -361,6 +364,7 @@ class TestConfig(unittest.TestCase):
         self.failUnless(props.get('five'))
         self.assertEquals(props.get('six'), 3981391981389138998131389L)
         self.assertEquals(props.get('seven'), (30000, 1001))
+        self.assertEquals(props.get('eight'), [1,2])
 
         # should be none -- no master in a pipeline that doesn't need
         # synchronization

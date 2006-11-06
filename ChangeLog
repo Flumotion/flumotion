@@ -1,5 +1,11 @@
 2006-11-06  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/test/test_config.py:
+	  Now that I'm using multiple=yes in configs, add testing that to the
+	  config parser test.
+
+2006-11-06  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	* flumotion/component/consumers/httpstreamer/http.xml:
 	* flumotion/component/consumers/httpstreamer/resources.py:
