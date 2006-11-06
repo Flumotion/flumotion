@@ -88,6 +88,8 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         
         self.loggers = \
             streamer.plugs['flumotion.component.plugs.loggers.Logger']
+
+        self.logfilter = None
             
         web_resource.Resource.__init__(self)
         httpbase.HTTPAuthentication.__init__(self, streamer)
@@ -103,6 +105,9 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
 
     def setRoot(self, path):
         self.putChild(path, self)
+
+    def setLogFilter(self, logfilter):
+        self.logfilter = logfilter
         
     def rotateLogs(self):
         """
@@ -258,6 +263,16 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         fd = request.transport.fileno()
         self._requests[fd] = request
 
+    def _logRequestFromIP(self, ip):
+        """
+        Returns whether we want to log a request from this IP; allows us to
+        filter requests from automated monitoring systems.
+        """
+        if self.logfilter:
+            return not self.logfilter.isInRange(ip)
+        else:
+            return True
+
     def _removeClient(self, request, fd, stats):
         """
         Removes a request and add logging.
@@ -274,7 +289,8 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
         """
 
         ip = request.getClientIP()
-        self.logWrite(fd, ip, request, stats)
+        if self._logRequestFromIP(ip):
+            self.logWrite(fd, ip, request, stats)
         self.info('[fd %5d] Client from %s disconnected' % (fd, ip))
 
         # We can't call request.finish(), since we already "stole" the fd, we 

@@ -22,6 +22,8 @@
 
         <property name="bouncer" type="string" />
         <property name="issuer" type="string" />
+   
+        <property name="ip-filter" type="string" multiple="yes" />
 		
         <!-- If type is 'slave' -->
         <property name="porter_socket_path" type="string" />

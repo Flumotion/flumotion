@@ -41,6 +41,11 @@
         <property name="bandwidth_limit" type="int" />
         <property name="duration" type="float" />
 
+        <!-- IP-based filtering for logs; commonly used to filter out 
+             automated-tester IPs from the logs. Values should be of the form
+             network-address/prefix-length, e.g. "192.168.1.0/24" -->
+        <property name="ip-filter" type="string" multiple="yes"/>
+
         <!-- Burst on connect options. Defaults to off.
              If just burst_on_connect is specified, this gives a simple 
              burst-from-latest keyframe (so no effect for audio streams).

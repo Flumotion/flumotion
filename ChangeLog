@@ -1,3 +1,12 @@
+2006-11-06  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/component/misc/httpfile/httpfile.xml:
+	  Add IP-filters for logging if configured.
+
 2006-11-02  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/base/http.py:

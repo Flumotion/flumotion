@@ -44,6 +44,7 @@ from flumotion.component.component import moods
 from flumotion.common.pygobject import gsignal
 
 from flumotion.component.consumers.httpstreamer import resources
+from flumotion.component.base import http
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
@@ -435,6 +436,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         if self.config.has_key('avatarId'):
             self.resource.setRequesterId(self.config['avatarId'])
+
+        if properties.has_key('ip-filter'):
+            filter = http.LogFilter()
+            for f in properties['ip-filter']:
+                filter.addIPFilter(f)
+            self.resource.addLogFilter(filter)
 
         self.type = properties.get('type', 'master')
         if self.type == 'slave':

@@ -257,6 +257,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self.port = None
         self.hostname = None
         self.loggers = []
+        self.logfilter = None
 
         self._singleFile = False
         self._connected_clients = 0
@@ -288,6 +289,11 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             self.setBouncerName(props['bouncer'])
         if 'issuer' in props:
             self.setIssuerClass(props['issuer'])
+        if 'ip-filter' in props:
+            filter = http.LogFilter()
+            for f in props['ip-filter']:
+                filter.addIPFilter(f)
+            self.logfilter = filter
         
     def do_stop(self):
         if self.type == 'slave':
@@ -416,21 +422,23 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
     def _requestFinished(self, request, bytesWritten, timeConnected):
         headers = request.getAllHeaders()
 
-        args = {'ip': request.getClientIP(),
-                'time': time.gmtime(),
-                'method': request.method,
-                'uri': request.uri,
-                'username': '-', # FIXME: put the httpauth name
-                'get-parameters': request.args,
-                'clientproto': request.clientproto,
-                'response': request.code,
-                'bytes-sent': bytesWritten,
-                'referer': headers.get('referer', None),
-                'user-agent': headers.get('user-agent', None),
-                'time-connected': timeConnected}
+        ip = request.getClientIP()
+        if self.logfilter or not self.logfilter.isInRange(ip):
+            args = {'ip': ip,
+                    'time': time.gmtime(),
+                    'method': request.method,
+                    'uri': request.uri,
+                    'username': '-', # FIXME: put the httpauth name
+                    'get-parameters': request.args,
+                    'clientproto': request.clientproto,
+                    'response': request.code,
+                    'bytes-sent': bytesWritten,
+                    'referer': headers.get('referer', None),
+                    'user-agent': headers.get('user-agent', None),
+                    'time-connected': timeConnected}
 
-        for logger in self.loggers:
-            logger.event('http_session_completed', args)
+            for logger in self.loggers:
+                logger.event('http_session_completed', args)
 
         self._connected_clients -= 1
         self._total_bytes_written += bytesWritten
