@@ -1,3 +1,8 @@
+2006-11-07  Michael Smith  <msmith@fluendo.com>
+
+	* tools/theora-bench.py:
+	  Incomplete benchmarking/graphing/awesomeifying tool.
+
 2006-11-06  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/misc/httpfile/httpfile.py:
