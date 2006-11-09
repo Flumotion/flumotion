@@ -1,3 +1,9 @@
+2006-11-09  Andy Wingo  <wingo@pobox.com>
+
+	* tools/analyze-flu-log (HistogramAnalyzer): Fix to align buckets
+	with the half-hours, and to properly record 0 lines for empty
+	buckets.
+
 2006-11-07  Michael Smith  <msmith@fluendo.com>
 
 	* tools/theora-bench.py:
