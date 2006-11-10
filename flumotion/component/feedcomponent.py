@@ -347,14 +347,15 @@ class ParseLaunchComponent(FeedComponent):
             blocks[i] = self._expandElementName(blocks[i].strip())
         return "@".join(blocks)
   
-    def parse_tmpl(self, pipeline, names, template, format):
+    def parse_tmpl(self, pipeline, names, template_func, format):
         """
         Expand the given pipeline string representation by substituting
         blocks between '@' with a filled-in template.
 
         @param pipeline: a pipeline string representation with variables
         @param names: the element names to substitute for @...@ segments
-        @param template: the template to use for element factory info
+        @param template_func: function to call to get the template to use for 
+                              element factory info
         @param format: the format to use when substituting
 
         Returns: a new pipeline string representation.
@@ -365,6 +366,7 @@ class ParseLaunchComponent(FeedComponent):
 
         if len(names) == 1:
             part_name = names[0]
+            template = template_func(part_name)
             named = template % {'name': part_name}
             if pipeline.find(part_name) != -1:
                 pipeline = pipeline.replace(deli + part_name + deli, named)
@@ -376,6 +378,7 @@ class ParseLaunchComponent(FeedComponent):
                 if pipeline.find(part_name) == -1:
                     raise TypeError, "%s needs to be specified in the pipeline '%s'" % (part_name, pipeline)
             
+                template = template_func(part)
                 pipeline = pipeline.replace(part_name,
                     template % {'name': part})
         return pipeline
@@ -402,10 +405,10 @@ class ParseLaunchComponent(FeedComponent):
         pipeline = self._expandElementNames(pipeline)
         
         pipeline = self.parse_tmpl(pipeline, eater_element_names,
-                                   self.EATER_TMPL,
+                                   self.get_eater_template,
                                    '%(tmpl)s ! %(pipeline)s') 
         pipeline = self.parse_tmpl(pipeline, feeder_element_names,
-                                   self.FEEDER_TMPL,
+                                   self.get_feeder_template,
                                    '%(pipeline)s ! %(tmpl)s') 
         pipeline = " ".join(pipeline.split())
         
@@ -413,6 +416,23 @@ class ParseLaunchComponent(FeedComponent):
         assert self.DELIMITER not in pipeline
         
         return pipeline
+
+    def get_eater_template(self, eaterName):
+        queue = self.get_queue_string(eaterName)
+        if not queue:
+            return self.FDSRC_TMPL + ' ! ' + self.DEPAY_TMPL
+        else:
+            return self.FDSRC_TMPL + ' ! ' + queue  + ' ! ' + self.DEPAY_TMPL
+
+    def get_feeder_template(self, eaterName):
+        return self.FEEDER_TMPL
+
+    def get_queue_string(self, eaterName):
+        """
+        Return a parse-launch description of a queue, if this component
+        wants an input queue on this eater, or None if not
+        """
+        return None
 
     ### BaseComponent interface implementation
     def do_start(self, clocking):
@@ -483,4 +503,62 @@ class Effect(log.Loggable):
         @rtype:  L{FeedComponent}
         """                               
         return self.component
+
+class MultiInputParseLaunchComponent(ParseLaunchComponent):
+    """
+    This class provides for multi-input ParseLaunchComponents, such as muxers,
+    with a queue attached to each input.
+    """
+    QUEUE_SIZE_BUFFERS = 16
+
+    def get_muxer_string(self, properties):
+        """
+        Return a gst-parse description of the muxer, which must be named 'muxer'
+        """
+        raise errors.NotImplementedError("Implement in a subclass")
+
+    def get_queue_string(self, eaterName):
+        return "queue name=%s-queue max-size-buffers=%d" % (eaterName, 
+            self.QUEUE_SIZE_BUFFERS)
+
+    def get_pipeline_string(self, properties):
+        sources = self.config['source']
+
+        pipeline = self.get_muxer_string(properties) + ' '
+        for eater in sources:
+            tmpl = '@ eater:%s @ ! muxer. '
+            pipeline += tmpl % eater
+
+        pipeline += 'muxer.'
+
+        return pipeline
+
+    def unblock_eater(self, feedId):
+        # Firstly, ensure that any push in progress is guaranteed to return,
+        # by temporarily enlarging the queue
+        queuename = "eater:%s-queue" % feedId
+        queue = self.pipeline.get_by_name(queuename)
+
+        size = queue.get_property("max-size-buffers")
+        queue.set_property("max-size-buffers", size + 1)
+
+        # So, now it's guaranteed to return. However, we want to return the 
+        # queue size to its original value. Doing this in a thread-safe manner
+        # is rather tricky...
+        def _block_cb(pad, blocked):
+            pass
+        def _underrun_cb(element):
+            # The queue lock isn't held when this is called, so we block our
+            # sinkpad, then re-check the current level.
+            pad = element.get_pad("sink")
+            pad.set_blocked_async(True, _block_cb)
+            level = element.get_property("current-level-buffers")
+            if level < self.QUEUE_SIZE_BUFFERS:
+                element.set_property('max-size-buffers', 
+                    self.QUEUE_SIZE_BUFFERS)
+                element.disconnect(signalid)
+            pad.set_blocked_async(False, _block_cb)
+
+        signalid = queue.connect("underrun", _underrun_cb)
+
 

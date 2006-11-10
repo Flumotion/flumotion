@@ -44,7 +44,9 @@ class FeedComponent(basecomponent.BaseComponent):
     I am a base class for all Flumotion feed components.
     """
     # keep these as class variables for the tests
-    EATER_TMPL = 'fdsrc name=%(name)s ! gdpdepay name=%(name)s-depay'
+    FDSRC_TMPL = 'fdsrc name=%(name)s'
+    DEPAY_TMPL = 'gdpdepay name=%(name)s-depay'
+    EATER_TMPL = FDSRC_TMPL + ' ! ' + DEPAY_TMPL
     FEEDER_TMPL = 'gdppay ! multifdsink sync=false name=%(name)s buffers-max=500 buffers-soft-max=450 recover-policy=1'
 
     # how often to add the buffer probe
@@ -698,20 +700,42 @@ class FeedComponent(basecomponent.BaseComponent):
 
             # we unlink fdsrc from its peer, take it out of the pipeline
             # so we can set it to READY without having it send EOS,
-            # then switch fd and put it back in
+            # then switch fd and put it back in.
+            # To do this safely, we first block fdsrc:src, then let the 
+            # component do any neccesary unlocking (needed for multi-input
+            # elements)
             srcpad = element.get_pad('src')
+            
+            def _block_cb(pad, blocked):
+                pass
+            srcpad.set_blocked_async(True, _block_cb)
+            self.unblock_eater(feedId)
+
+            # Now, we can switch FD with this mess
             sinkpad = srcpad.get_peer()
             srcpad.unlink(sinkpad)
             self.pipeline.remove(element)
+            self.log("setting to ready")
             element.set_state(gst.STATE_READY)
+            self.log("setting to ready complete!!!")
             old = element.get_property('fd')
             os.close(old)
             element.set_property('fd', fd)
             self.pipeline.add(element)
             srcpad.link(sinkpad)
             element.set_state(gst.STATE_PLAYING)
+            # We're done; unblock the pad
+            srcpad.set_blocked_async(False, _block_cb)
         else:
             element.set_property('fd', fd)
+
+    def unblock_eater(self, feedId):
+        """
+        After this function returns, the stream lock for this eater must have
+        been released. If your component needs to do something here, override
+        this method.
+        """
+        pass
 
     def _eater_event_probe_cb(self, pad, event, feedId):
         if event.type == gst.EVENT_EOS:    

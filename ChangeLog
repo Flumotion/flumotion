@@ -1,3 +1,17 @@
+2006-11-10  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/muxers/ogg.py:
+	Redesign the way we build muxer pipelines, so we have a queue directly
+	after the fdsrc, not after gdpdepay.
+
+	Then, allow components to interceed in reconnection. Implement this
+	for muxers, so they can unlock things stuck in queue.
+
+	This prevents muxer deadlocks on reconnection attempts.
+
+
 2006-11-09  Andy Wingo  <wingo@pobox.com>
 
 	* tools/analyze-flu-log (HistogramAnalyzer): Fix to align buckets
