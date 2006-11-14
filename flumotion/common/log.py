@@ -499,7 +499,7 @@ def _getTheFluLogObserver():
 
 def stderrHandler(level, object, category, file, line, message):
     """
-    A log handler that writes to stdout.
+    A log handler that writes to stderr.
 
     @type level:    string
     @type object:   string (or None)
@@ -569,6 +569,42 @@ def init():
     addLogHandler(stderrHandler, limited=True)
 
     _initialized = True
+
+_stdout = None
+_stderr = None
+def reopenOutputFiles():
+    """
+    Reopens the stdout and stderr output files, as set by
+    L{flumotion.common.log.outputToFiles}.
+    """
+    assert _stdout and _stderr
+    so = open(_stdout, 'a+')
+    se = open(_stderr, 'a+', 0)
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
+    log.debug('log', 'opened log %r', stderr)
+
+def outputToFiles(stdout, stderr):
+    """
+    Redirect stdout and stderr to named files.
+
+    Records the file names so that a future call to reopenOutputFiles()
+    can open the same files. Installs a SIGHUP handler that will reopen
+    the output files.
+
+    Note that stderr is opened unbuffered, so if it shares a file with
+    stdout then interleaved output may not appear in the order that you
+    expect.
+    """
+    global _stdout, _stderr
+    _stdout, _stderr = stdout, stderr
+    reopenOutputFiles()
+
+    def sighup(signum, frame):
+        self.info("Received SIGHUP, reopening logs")
+        reopenOutputFiles()
+
+    signal.signal(signal.SIGHUP, sighup)
 
 _initializedTwisted = False
 

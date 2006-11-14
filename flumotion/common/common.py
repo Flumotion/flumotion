@@ -161,9 +161,6 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
     will be opened and be used to replace the standard file descriptors
     in sys.stdin, sys.stdout, and sys.stderr.
     These arguments are optional and default to /dev/null.
-    Note that stderr is opened unbuffered, so
-    if it shares a file with stdout then interleaved output
-    may not appear in the order that you expect.
 
     The fork will switch to the given directory.
     '''
@@ -200,11 +197,8 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null',
     
     # Redirect standard file descriptors.
     si = open(stdin, 'r')
-    so = open(stdout, 'a+')
-    se = open(stderr, 'a+', 0)
     os.dup2(si.fileno(), sys.stdin.fileno())
-    os.dup2(so.fileno(), sys.stdout.fileno())
-    os.dup2(se.fileno(), sys.stderr.fileno())
+    log.outputToFiles(stdout, stderr)
 
 def daemonizeHelper(processType, daemonizeTo='/', processName=None):
     """

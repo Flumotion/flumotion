@@ -1,3 +1,13 @@
+2006-11-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/log.py (stderrHandler): Fix doc.
+	(reopenOutputFiles): New function, um, reopens output files.
+	(outputToFiles): New function, redirects stdout and stderr, and
+	installs a SIGHUP handler to call reopenOutputFiles().
+
+	* flumotion/common/common.py (daemonize): Just handle stdin here,
+	stdout and stderr handled by log.outputToFiles.
+
 2006-11-10  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent.py:
