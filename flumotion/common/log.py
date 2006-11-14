@@ -577,12 +577,15 @@ def reopenOutputFiles():
     Reopens the stdout and stderr output files, as set by
     L{flumotion.common.log.outputToFiles}.
     """
-    assert _stdout and _stderr
+    if not (_stdout and _stderr):
+        debug('log', 'told to reopen log files, but log files not set')
+        return
+
     so = open(_stdout, 'a+')
     se = open(_stderr, 'a+', 0)
     os.dup2(so.fileno(), sys.stdout.fileno())
     os.dup2(se.fileno(), sys.stderr.fileno())
-    log.debug('log', 'opened log %r', _stderr)
+    debug('log', 'opened log %r', _stderr)
 
 def outputToFiles(stdout, stderr):
     """
@@ -601,9 +604,10 @@ def outputToFiles(stdout, stderr):
     reopenOutputFiles()
 
     def sighup(signum, frame):
-        info("Received SIGHUP, reopening logs")
+        info('log', "Received SIGHUP, reopening logs")
         reopenOutputFiles()
 
+    debug('log', 'installing SIGHUP handler')
     import signal
     signal.signal(signal.SIGHUP, sighup)
 

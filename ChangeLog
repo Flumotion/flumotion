@@ -5,6 +5,7 @@
 	(outputToFiles): New function, redirects stdout and stderr, and
 	installs a SIGHUP handler to call reopenOutputFiles().
 	(reopenOutputFiles, outputToFiles): So little code, so many bugs!
+	Final fixor.
 
 	* flumotion/common/common.py (daemonize): Just handle stdin here,
 	stdout and stderr handled by log.outputToFiles.
