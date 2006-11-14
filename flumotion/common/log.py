@@ -582,7 +582,7 @@ def reopenOutputFiles():
     se = open(_stderr, 'a+', 0)
     os.dup2(so.fileno(), sys.stdout.fileno())
     os.dup2(se.fileno(), sys.stderr.fileno())
-    log.debug('log', 'opened log %r', stderr)
+    log.debug('log', 'opened log %r', _stderr)
 
 def outputToFiles(stdout, stderr):
     """
@@ -601,9 +601,10 @@ def outputToFiles(stdout, stderr):
     reopenOutputFiles()
 
     def sighup(signum, frame):
-        self.info("Received SIGHUP, reopening logs")
+        info("Received SIGHUP, reopening logs")
         reopenOutputFiles()
 
+    import signal
     signal.signal(signal.SIGHUP, sighup)
 
 _initializedTwisted = False
