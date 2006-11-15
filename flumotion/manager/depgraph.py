@@ -114,6 +114,11 @@ class DepGraph(log.Loggable):
         @param component: component object to add
         @type  component: L{flumotion.common.planet.ManagerComponentState}
         """
+        if self._dag.hasNode(component, "JOB"):
+            self.debug('component %r already in depgraph, ignoring',
+                       component)
+            return
+        
         self.debug('adding component %r to depgraph' % component)
         self._addNode(component, "JOB")
         self._addNode(component, "COMPONENTSTART")

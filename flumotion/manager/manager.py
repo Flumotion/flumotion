@@ -881,6 +881,9 @@ class Vishnu(log.Loggable):
 
         m = self.getComponentMapper(avatar.avatarId)
 
+        # make sure the component is in the depgraph
+        self._depgraph.addComponent(m.state)
+
         # Now that the JobState is attached, it might have overridden our
         # mood to sleeping; we MUST be waking; so we reset it here if required.
         if m.state.get('mood') == moods.sleeping.value:

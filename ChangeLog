@@ -1,3 +1,12 @@
+2006-11-15  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu._getComponentState): Add
+	the component to the depgraph. Fixes a bug in manager restart with
+	components not in the config.
+
+	* flumotion/manager/depgraph.py (DepGraph.addComponent): Allow
+	this function to be called when a component is already added.
+
 2006-11-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/common/log.py (stderrHandler): Fix doc.
