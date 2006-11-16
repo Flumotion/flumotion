@@ -1,5 +1,17 @@
 2006-11-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/command/main.py (setup_reactor.failed): Print
+	out unanticipated exceptions as well as connection failure/refusal
+	messages.
+
+	* flumotion/admin/admin.py (AdminModel): New signal,
+	'connection-error', for unanticipated errors when connecting.
+	(AdminClientFactory.gotDeferredLogin): Emit 'connection-error' on
+	the model if there is an uncaught exception, rather than only
+	logging the exception.
+	(AdminModel.connectToHost): Connect to 'connection-error' so that
+	we can errback on the connectToHost deferred.
+
 	* data/glade/wizard_firewire.glade: Mark a couple of frames as
 	expand=false. Fixes odd spacing in the wizard.
 

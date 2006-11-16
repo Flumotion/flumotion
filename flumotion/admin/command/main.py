@@ -122,18 +122,17 @@ def setup_reactor(info):
     model = AdminModel(info.authenticator)
     d = model.connectToHost(info.host, info.port, not info.use_ssl)
 
-    def refused(failure):
-        failure.trap(errors.ConnectionRefusedError)
-        print "Manager refused connection. Check your user and password."
-        raise
-
     def failed(failure):
-        failure.trap(errors.ConnectionFailedError)
-        message = "".join(failure.value.args)
-        print "Connection to manager failed: %s" % message
-        raise
+        if failure.check(errors.ConnectionRefusedError):
+            print "Manager refused connection. Check your user and password."
+        elif failure.check(errors.ConnectionFailedError):
+            message = "".join(failure.value.args)
+            print "Connection to manager failed: %s" % message
+        else:
+            print ("Exception while connecting to manager: %s"
+                   % log.getFailureMessage(failure))
+        return failure
 
-    d.addErrback(refused)
     d.addErrback(failed)
 
     return d

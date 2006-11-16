@@ -126,6 +126,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             self.debug("emitted connection-refused")
 
         except Exception, e:
+            self.medium.emit('connection-error', e)
             self.medium._defaultErrback(failure.Failure(e))
 
     gotDeferredLogin = defer_generator_method(gotDeferredLogin)
@@ -145,6 +146,7 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
     gsignal('disconnected')
     gsignal('connection-refused')
     gsignal('connection-failed', str)
+    gsignal('connection-error', object)
     gsignal('component-property-changed', str, str, object)
     gsignal('reloading', str)
     gsignal('message', str)
@@ -221,6 +223,10 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
             map(model.disconnect, ids)
             d.errback(errors.ConnectionFailedError(reason))
 
+        def connection_error(model, exception, d, ids):
+            map(model.disconnect, ids)
+            d.errback(exception)
+
         d = defer.Deferred()
         ids = []
         ids.append(self.connect('connected', connected, d, ids))
@@ -228,6 +234,8 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
                                 connection_refused, d, ids))
         ids.append(self.connect('connection-failed',
                                 connection_failed, d, ids))
+        ids.append(self.connect('connection-error',
+                                connection_error, d, ids))
         return d
 
     # default Errback
