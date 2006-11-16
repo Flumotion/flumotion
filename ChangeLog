@@ -1,3 +1,8 @@
+2006-11-16  Andy Wingo  <wingo@pobox.com>
+
+	* data/glade/wizard_firewire.glade: Mark a couple of frames as
+	expand=false. Fixes odd spacing in the wizard.
+
 2006-11-15  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/manager/manager.py (Vishnu._getComponentState): Add
