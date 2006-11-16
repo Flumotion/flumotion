@@ -74,13 +74,14 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             self.debug('DNS lookup error')
             self.medium.connectionFailed(reason)
             return
-        elif reason.check(error.ConnectionRefusedError):
+        elif (reason.check(error.ConnectionRefusedError)
+              or reason.check(error.ConnectError)):
             # If we're logging in for the first time, we want to make this a
             # real error; we present a dialog, etc. 
             # However, if we fail later on (e.g. manager shut down, and 
             # hasn't yet been restarted), we want to keep trying to reconnect,
             # so we just log a message.
-            self.debug("Connection refused error")
+            self.debug("Error connecting: %s", log.getFailureMessage(reason))
             if not self.hasBeenConnected:
                 self.medium.connectionFailed(reason)
                 return
@@ -265,18 +266,20 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         assert self.planet
         return '%s (%s:%s)' % (self.planet.get('name'), self.host, self.port)
 
-    def connectionFailed(self, reason):
+    def connectionFailed(self, failure):
         # called by client factory
-        if reason.check(error.DNSLookupError):
-            self.debug('emitting connection-failed')
-            self.emit('connection-failed', "Could not look up host '%s'." %
-                self.host)
-            self.debug('emited connection-failed')
-        if reason.check(error.ConnectionRefusedError):
-            self.debug('emitting connection-failed')
-            self.emit('connection-failed', "Could not connect to host '%s' on port %d." %
-                (self.host, self.port))
-            self.debug('emited connection-failed')
+        if failure.check(error.DNSLookupError):
+            message = "Could not look up host '%s'." % self.host
+        elif (failure.check(error.ConnectionRefusedError)
+              or failure.check(error.ConnectionRefusedError)):
+            message = ("Could not connect to host '%s' on port %d."
+                       % (self.host, self.port))
+        else:
+            message = ("Unexpected failure.\nDebug information: %s"
+                       % log.getFailureMessage (failure))
+        self.debug('emitting connection-failed')
+        self.emit('connection-failed', message)
+        self.debug('emitted connection-failed')
 
     def setRemoteReference(self, remoteReference):
         self.debug("setRemoteReference %r" % remoteReference)

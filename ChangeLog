@@ -1,5 +1,12 @@
 2006-11-16  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py
+	(AdminClientFactory.clientConnectionFailed): Treat ConnectErrors
+	like ConnectionRefusedErrors, so that we can catch e.g. "no route
+	to host".
+	(AdminModel.connectionFailed): Handle all kinds of failures, not
+	just two.
+
 	* flumotion/admin/command/main.py (setup_reactor.failed): Print
 	out unanticipated exceptions as well as connection failure/refusal
 	messages.
