@@ -1,6 +1,11 @@
 2006-11-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/httpfile/admin_gtk.py:
+	Thanks pychecker.
+
+2006-11-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/httpfile/admin_gtk.py:
 	* flumotion/component/misc/httpfile/httpfile.glade:
 	* flumotion/component/misc/httpfile/httpfile.py:
 	* flumotion/component/misc/httpfile/httpfile.xml:

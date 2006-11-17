@@ -20,8 +20,6 @@
 # Headers in this file shall remain intact.
 
 import os
-import time
-
 import gtk
 
 from gettext import gettext as _
