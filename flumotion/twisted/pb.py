@@ -598,7 +598,7 @@ class Avatar(pb.Avatar, flog.Loggable):
             self.debug("%s didn't accept %s and %s" % (method, args, kwargs))
             raise
         except pb.Error, e:
-            format, debugArgs = log.getFormatArgs(
+            format, debugArgs = flog.getFormatArgs(
                 '%s <-- %s: perspective_%s(', startArgs,
                 '): pb.Error %r', (e, ), args, kwargs)
             self.doLog(level, -1, format, *debugArgs, **logKwArgs)

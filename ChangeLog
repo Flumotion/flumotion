@@ -1,5 +1,10 @@
 2006-11-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/pb.py:
+	  Fix getFormatArgs module call
+
+2006-11-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/launch/main.py:
 	  Fix flumotion-launch.
 
