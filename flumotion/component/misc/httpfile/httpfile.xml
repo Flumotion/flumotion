@@ -7,6 +7,8 @@
       <entries>
         <entry type="component" location="httpfile.py"
                function="HTTPFileStreamer" />
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
       </entries>
       <sockets>
         <socket type="flumotion.component.plugs.loggers.Logger"/>
@@ -58,6 +60,19 @@
         <directories>
             <directory name="flumotion/component/misc/httpfile">
                 <filename location="httpfile.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="httpfile-admin-gtk">
+        <dependencies>
+            <dependency name="base-admin-gtk" />
+            <dependency name="httpfile-base" />
+        </dependencies>
+        <directories>
+            <directory name="flumotion/component/misc/httpfile">
+                <filename location="admin_gtk.py" />
+                <filename location="httpfile.glade" />
             </directory>
         </directories>
     </bundle>

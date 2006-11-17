@@ -264,6 +264,10 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self._total_bytes_written = 0
         self._transfersInProgress = {} # {request->(offset, FileTransfer)}
 
+        # store number of connected clients
+        self.uiState.addKey("connected-clients", 0)
+        self.uiState.addKey("bytes-transferred", 0)
+
     def do_setup(self):
         props = self.config['properties']
         mountPoint = props.get('mount_point', '')
@@ -418,6 +422,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
     def _requestStarted(self, request):
         self._connected_clients += 1
+        self.uiState.set("connected-clients", self._connected_clients)
 
     def _requestFinished(self, request, bytesWritten, timeConnected):
         headers = request.getAllHeaders()
@@ -441,7 +446,11 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                 logger.event('http_session_completed', args)
 
         self._connected_clients -= 1
+        self.uiState.set("connected-clients", self._connected_clients)
+
         self._total_bytes_written += bytesWritten
+        self.uiState.set("bytes-transferred", self._total_bytes_written)
+
         if request in self._transfersInProgress:
             del self._transfersInProgress[request]
 

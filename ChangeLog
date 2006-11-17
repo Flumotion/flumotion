@@ -1,3 +1,12 @@
+2006-11-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/httpfile/admin_gtk.py:
+	* flumotion/component/misc/httpfile/httpfile.glade:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/component/misc/httpfile/httpfile.xml:
+	Add basic httpfile UI to show current clients and total bytes
+	consumed.
+
 2006-11-16  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/admin/admin.py
