@@ -111,7 +111,7 @@ class ComponentWrapper(object):
         return self.component.stop()
 
     def feedToFD(self, feedName, fd):
-        return self.component.feedToFD(feedName, fd)
+        return self.component.feedToFD(feedName, fd, os.close)
 
     def eatFromFD(self, feedId, fd):
         return self.component.eatFromFD(feedId, fd)
