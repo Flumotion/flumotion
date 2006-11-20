@@ -1,5 +1,11 @@
 2006-11-20  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/manager/depgraph.py:
+	  Remove hungry-override of component moods, which results in
+	  incorrect moods in manager being shown in admin clients.
+
+2006-11-20  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/http.py:
 	* flumotion/component/misc/httpfile/httpfile.py:
 	  If stop() is called without start() having been called, don't

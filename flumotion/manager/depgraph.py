@@ -301,17 +301,6 @@ class DepGraph(log.Loggable):
                 if kid[0] == object:
                     self._state[kid] = False
 
-                # if COMPONENTSTART state on offspring is set to FALSE,
-                # and the component is happy, then we set it to hungry;
-                # that is what will happen soon enough anyway
-                # FIXME: This code is somewhat bogus; we should have the 
-                # component set itself to the appropriate mood.
-                if kid[1] == "COMPONENTSTART" and kid[0] != object:
-                    if kid[0].get('mood') == moods.happy.value:
-                        self.debug('Setting downstream component %r to hungry' %
-                            kid[0])
-                        kid[0].set('mood', moods.hungry.value)
-
     def setComponentStarted(self, component):
         """
         Set a COMPONENTSTART node to have state of True
