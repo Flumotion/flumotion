@@ -621,7 +621,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     ### END OF THREAD-AWARE CODE
 
     def do_stop(self):
-        if self.type == 'slave':
+        if self.type == 'slave' and self._pbclient:
             return self._pbclient.deregisterPath(self.mountPoint)
         else:
             return feedcomponent.ParseLaunchComponent.do_stop(self)

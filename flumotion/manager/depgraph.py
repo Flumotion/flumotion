@@ -298,16 +298,14 @@ class DepGraph(log.Loggable):
             offspring = self._dag.getOffspringTyped(object, type)
             for kid in offspring:
                 self.debug("Setting state of offspring (%r) to %d", kid, value)
-                # FIXME: what does this do ?
-                # a) why compare kid[0] to object ?
-                # b) why does the state get set to False, not value ?
-                # c) why does the debug line lie about what's done ?
                 if kid[0] == object:
                     self._state[kid] = False
 
                 # if COMPONENTSTART state on offspring is set to FALSE,
                 # and the component is happy, then we set it to hungry;
                 # that is what will happen soon enough anyway
+                # FIXME: This code is somewhat bogus; we should have the 
+                # component set itself to the appropriate mood.
                 if kid[1] == "COMPONENTSTART" and kid[0] != object:
                     if kid[0].get('mood') == moods.happy.value:
                         self.debug('Setting downstream component %r to hungry' %

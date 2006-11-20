@@ -268,6 +268,8 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self._total_bytes_written = 0
         self._transfersInProgress = {} # {request->(offset, FileTransfer)}
 
+        self._pbclient = None
+
         # store number of connected clients
         self.uiState.addKey("connected-clients", 0)
         self.uiState.addKey("bytes-transferred", 0)
@@ -304,8 +306,9 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             self.logfilter = filter
         
     def do_stop(self):
-        if self.type == 'slave':
+        if self.type == 'slave' and self._pbclient:
             return self._pbclient.deregisterPath(self.mountPoint)
+
         return component.BaseComponent.do_stop(self)
 
     def updatePorterDetails(self, path, username, password):
