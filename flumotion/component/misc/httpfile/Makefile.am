@@ -14,4 +14,4 @@ TAGS_FILES = $(httpfile_PYTHON)
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(httpfile_PYTHON) $(httpfile_DATA)
+EXTRA_DIST = $(httpfile_PYTHON) $(httpfile_DATA) httpfile.glade

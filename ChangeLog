@@ -1,6 +1,11 @@
 2006-11-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/httpfile/Makefile.am:
+	Dist the glade file too.  Should fix the build really!
+
+2006-11-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/httpfile/Makefile.am:
 	Actually dist the admin_gtk.  Should fix the build.
 
 2006-11-20  Andy Wingo  <wingo@pobox.com>
