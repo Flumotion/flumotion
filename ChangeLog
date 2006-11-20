@@ -1,3 +1,14 @@
+2006-11-20  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/manager/manager.py (Vishnu._createErrback): If the
+	worker claims to have a component that we don't know about, treat
+	it as lost. This is clever and true!
+
+	* flumotion/worker/worker.py (WorkerBrain.deferredCreate): 
+	* flumotion/common/errors.py (ComponentAlreadyRunningError): New
+	error, can be raised by a worker if it knows that it has a job
+	running that perhaps the manager does not know about.
+
 2006-11-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/twisted/pb.py:

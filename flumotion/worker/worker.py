@@ -676,7 +676,7 @@ class WorkerBrain(log.Loggable):
         elif avatarId in self.jobHeaven.avatars:
             # (3) a job is running fine
             self.info('avatar named %s already running', avatarId)
-            raise errors.ComponentCreateError(avatarId)
+            raise errors.ComponentAlreadyRunningError(avatarId)
         else:
             # (4) it's new; we know of nothing with this avatarId
             pass

@@ -137,6 +137,9 @@ class SleepingComponentError(ComponentError):
 class ComponentAlreadyStartingError(ComponentError):
     "Component told to start, but is already starting"
 
+class ComponentAlreadyRunningError(ComponentError):
+    "Component told to start, but is already running"
+
 class ComponentMoodError(ComponentError):
     "Component is in the wrong mood to perform the given function"
 

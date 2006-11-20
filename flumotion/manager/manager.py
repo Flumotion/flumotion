@@ -786,12 +786,17 @@ class Vishnu(log.Loggable):
         self.warning('failed to create component %s: %s'
                   % (state.get('name'), log.getFailureMessage(failure)))
 
-        message = messages.Error(T_(
-            N_("The component could not be started.")),
+        if failure.check(errors.ComponentAlreadyRunningError):
+            self.info('component eappears to be running already; '
+                      'treating it as lost')
+            state.set('mood', moods.lost.value)
+        else:
+            message = messages.Error(T_(
+                N_("The component could not be started.")),
                 debug=log.getFailureMessage(failure))
 
-        state.set('mood', moods.sad.value)
-        state.append('messages', message)
+            state.set('mood', moods.sad.value)
+            state.append('messages', message)
 
         return None
 
