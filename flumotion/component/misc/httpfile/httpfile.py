@@ -74,6 +74,8 @@ class RequestWrapper:
                                     self.__dict__['__start_time'])
         return self.request.finish()
 
+    # This is ONLY called by HTTPChannel if the request is still in progress.
+    # If we made it to finish(), then it's not called.
     def connectionLost(self, reason):
         self.__dict__['__finished'](self.request,
                                     self.__dict__['__written'],
@@ -258,6 +260,8 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self.hostname = None
         self.loggers = []
         self.logfilter = None
+
+        self.description = 'On-Demand Flumotion Stream',
 
         self._singleFile = False
         self._connected_clients = 0
@@ -465,7 +469,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         else:
             return {
                 'protocol': 'HTTP',
-                'description': 'On-Demand Flumotion Stream',
+                'description': self.description,
                 'url' : self.getUrl()
                 }
 
@@ -481,7 +485,6 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             bytesTransferred += transfer.written - offset
 
         return (0, 0, bytesTransferred, self._connected_clients, 0)
-
 
     # Override HTTPAuthentication methods
     def authenticateKeycard(self, bouncerName, keycard):
