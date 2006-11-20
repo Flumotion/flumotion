@@ -441,7 +441,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             filter = http.LogFilter()
             for f in properties['ip-filter']:
                 filter.addIPFilter(f)
-            self.resource.addLogFilter(filter)
+            self.resource.setLogFilter(filter)
 
         self.type = properties.get('type', 'master')
         if self.type == 'slave':
