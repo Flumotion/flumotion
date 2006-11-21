@@ -1,5 +1,10 @@
 2006-11-21  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Fewer typos. More workingness!
+
+2006-11-21  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/base/http.py:
 	  id is a builtin function. Python is my nemesisisis.
 	* flumotion/component/consumers/httpstreamer/resources.py:

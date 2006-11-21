@@ -97,7 +97,7 @@ class HTTPStreamingResource(web_resource.Resource, httpbase.HTTPAuthentication,
     def _streamer_client_removed_cb(self, streamer, sink, fd, reason, stats):
         # this is the callback attached to our flumotion component,
         # not the GStreamer element
-        if fd in self_requests:
+        if fd in self._requests:
             request = self._requests[fd]
             self._removeClient(request, fd, stats)
         else:
