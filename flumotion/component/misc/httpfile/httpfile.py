@@ -33,188 +33,52 @@ from twisted.internet import defer, reactor, error
 from flumotion.twisted import fdserver
 from twisted.cred import credentials
 
+from flumotion.component.misc.httpfile import file
+
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
 
-# FIXME: argggggh, how hard is it to *document* a class or at least give
-# a passing hint on *why* it gets created so someone has at least a
-# fighting chance to fix problems with it ?
-class RequestWrapper:
-    request = None
-    def __init__(self, request, finished):
-        self.__dict__['request'] = request
-        self.__dict__['__written'] = 0
-        self.__dict__['__start_time'] = time.time()
-        self.__dict__['__finished'] = finished
+class CancellableRequest(server.Request):
 
-        # The HTTPChannel has a reference to the actual request object, and
-        # we need to override connectionLost for incomplete requests. Be evil.
-        request.connectionLost = self.connectionLost
+    def __init__(self, channel, queued):
+        server.Request.__init__(self, channel, queued)
 
-    def __getattr__(self, key):
-        return getattr(self.request, key)
+        self._component = channel.factory.component
+        self._completed = False
 
-    def __setattr__(self, key, val):
-        if key in self.__dict__:
-            self.__dict__[key] = val
-        else:
-            setattr(self.request, key, val)
+        self._bytes_written = 0
+        self._start_time = time.time()
+        self._lastTimeWritten = self._start_time
+
+        self._component.requestStarted(self)
 
     def write(self, data):
-        self.__dict__['__written'] += len(data)
-        return self.request.write(data)
+        server.Request.write(self, data)
+
+        self._bytes_written += len(data)
+        self._lastTimeWritten = time.time()
         
     def finish(self):
-        # We sent Connection: close, so honour that and actually close the
-        # connection. 
-        self.transport.loseConnection()
-        self.__dict__['__finished'](self.request,
-                                    self.__dict__['__written'],
-                                    time.time() -
-                                    self.__dict__['__start_time'])
-        return self.request.finish()
+        server.Request.finish(self)
+        self.requestCompleted()
 
-    # This is ONLY called by HTTPChannel if the request is still in progress.
-    # If we made it to finish(), then it's not called.
     def connectionLost(self, reason):
-        self.__dict__['__finished'](self.request,
-                                    self.__dict__['__written'],
-                                    time.time() -
-                                    self.__dict__['__start_time'])
+        server.Request.connectionLost(self, reason)
+        self.requestCompleted()
 
-class File(static.File, log.Loggable):
-    __pychecker__ = 'no-objattrs'
+    def requestCompleted(self):
+        if not self._completed:
+            self._component.requestFinished(self, self._bytes_written, 
+                time.time() - self._start_time)
+            self._completed = True
+    
+class Site(server.Site):
+    requestFactory = CancellableRequest
 
-    def __init__(self, path, requestStarted, requestFinished, component):
-        static.File.__init__(self, path)
-        self._requestStarted = requestStarted
-        self._requestFinished = requestFinished
+    def __init__(self, resource, component):
+        server.Site.__init__(self, resource)
+
         self.component = component
-
-    def render(self, request):
-        def terminateSimpleRequest(res, request):
-            if res != server.NOT_DONE_YET:
-                request.finish()
-
-        rapper = RequestWrapper(request, self._requestFinished)
-        self._requestStarted(rapper)
-
-        d = self.component.startAuthentication(rapper)
-        d.addCallback(self.renderAuthenticated, rapper)
-        d.addCallback(terminateSimpleRequest, rapper)
-
-        return server.NOT_DONE_YET
-
-    def renderAuthenticated(self, res, request):
-        """ 
-        Now that we're authenticated (or authentication wasn't requested), 
-        write the file (or appropriate other response) to the client.
-        We override static.File to implement Range requests, and to get access
-        to the transfer object to abort it later; the bulk of this is a direct
-        copy, though.
-        """
-        self.restat()
-
-        if self.type is None:
-            self.type, self.encoding = static.getTypeAndEncoding(
-                self.basename(), self.contentTypes, self.contentEncodings, 
-                self.defaultType)
-
-        if not self.exists():
-            self.debug("Couldn't find resource %s", self.basename())
-            return self.childNotFound.render(request)
-
-        if self.isdir():
-            return self.redirect(request)
-
-        # Different headers not normally set in static.File...        
-        # Specify that the client should close the connection; further 
-        # requests on this server might actually go to a different process 
-        # because of the porter
-        request.setHeader('Connection', 'close')
-        # We can do range requests, in bytes.
-        request.setHeader('Accept-Ranges', 'bytes')
-
-        if self.type:
-            request.setHeader('content-type', self.type)
-        if self.encoding:
-            request.setHeader('content-encoding', self.encoding)
-
-        try:
-            f = self.openForReading()
-        except IOError, e:
-            import errno
-            if e[0] == errno.EACCES:
-                return weberror.ForbiddenResource().render(request)
-            else:
-                raise
-
-        if request.setLastModified(self.getmtime()) is http.CACHED:
-            return ''
-
-        tsize = fsize = size = self.getFileSize()
-        range = request.getHeader('range')
-        start = 0
-        if range is not None:
-            # TODO: Add a unit test - or several - for this stuff.
-            # We have a partial-data request...
-            # Some variables... we start at byte offset 'start', end at byte 
-            # offset 'end'. fsize is the number of bytes we're sending. tsize 
-            # is the total size of the file. 'size' is the byte offset we will
-            # stop at, plus 1.
-            bytesrange = string.split(range, '=')
-            if len(bytesrange) != 2:
-                request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
-                return ''
-
-            start, end = string.split(bytesrange[1], '-', 1)
-            if start:
-                start = int(start)
-                f.seek(start)
-                if end:
-                    end = int(end)
-                else:
-                    end = size - 1
-                fsize = end - start + 1
-            elif end:
-                lastbytes = int(end)
-                if size < lastbytes:
-                    lastbytes = size
-                start = size - lastbytes
-                f.seek(start)
-                fsize = lastbytes
-                end = size - 1
-            else:
-                request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
-                return ''
-            size = end + 1
-
-            request.setResponseCode(http.PARTIAL_CONTENT)
-            request.setHeader('Content-Range', "bytes %d-%d/%d" % 
-                (start, end, tsize))
-
-        request.setHeader("Content-Length", str(fsize))
-
-        if request.method == 'HEAD':
-             return ''
-           
-        self.transfer = static.FileTransfer(f, size, request)
-        self.component.addFileTransfer(request, start, self.transfer)
-
-        return server.NOT_DONE_YET
-
-    def directoryListing(self):
-        # disallow directory listings
-        return self.childNotFound
-
-    def createSimilarFile(self, path):
-        self.debug("createSimilarFile at %r", path)
-        f = self.__class__(path, self._requestStarted, 
-            self._requestFinished, self.component)
-        f.processors = self.processors
-        f.indexNames = self.indexNames[:]
-        f.childNotFound = self.childNotFound
-        return f
 
 class HTTPFileMedium(component.BaseComponentMedium):
     def __init__(self, comp):
@@ -249,6 +113,9 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
     componentMediumClass = HTTPFileMedium
 
+    REQUEST_TIMEOUT = 30 # Time out requests after this many seconds of 
+                         # inactivity
+
     def __init__(self):
        component.BaseComponent.__init__(self)
        httpbase.HTTPAuthentication.__init__(self, self)
@@ -264,9 +131,8 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         self.description = 'On-Demand Flumotion Stream',
 
         self._singleFile = False
-        self._connected_clients = 0
+        self._connected_clients = []
         self._total_bytes_written = 0
-        self._transfersInProgress = {} # {request->(offset, FileTransfer)}
 
         self._pbclient = None
 
@@ -352,20 +218,21 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             res = resource.Resource()
             current_resource.putChild(child, res)
             current_resource = res
-        fileResource = File(self.filePath, self._requestStarted, 
-            self._requestFinished, self)
+        fileResource = file.File(self.filePath, self)
         self.debug("Putting File resource at %r", children[-1:][0])
         current_resource.putChild(children[-1:][0], fileResource)
-        #root.putChild(mount, HTTPStaticFile(self.filePath))
+
+        reactor.callLater(self.REQUEST_TIMEOUT, self._timeoutRequests)
+
         d = defer.Deferred()
         if self.type == 'slave':
             # Streamer is slaved to a porter.
             if self._singleFile:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
-                    server.Site(resource=root), [self.mountPoint], d)
+                    Site(root, self), [self.mountPoint], d)
             else:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
-                    server.Site(resource=root), [], d, 
+                    Site(root, self), [], d, 
                     prefixes=[self.mountPoint])
             creds = credentials.UsernamePassword(self._porterUsername, 
                 self._porterPassword)
@@ -379,7 +246,7 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             try:
                 self.debug('Listening on %s' % self.port)
                 iface = ""
-                reactor.listenTCP(self.port, server.Site(resource=root), 
+                reactor.listenTCP(self.port, Site(root, self),
                     interface=iface)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
@@ -424,14 +291,20 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
                     "not exist or is neither a file nor directory" % path
                 return defer.fail(errors.ConfigError(msg)) 
 
-    def addFileTransfer(self, request, offset, transfer):
-        self._transfersInProgress[request] = (offset, transfer)
+    def _timeoutRequests(self):
+        now = time.time()
+        for request in self._connected_clients:
+            if now - request._lastTimeWritten > self.REQUEST_TIMEOUT:
+                self.debug("Timing out connection")
+                request.channel.transport.loseConnection()
 
-    def _requestStarted(self, request):
-        self._connected_clients += 1
+        reactor.callLater(self.REQUEST_TIMEOUT, self._timeoutRequests)
+            
+    def requestStarted(self, request):
+        self._connected_clients.append(request)
         self.uiState.set("connected-clients", self._connected_clients)
 
-    def _requestFinished(self, request, bytesWritten, timeConnected):
+    def requestFinished(self, request, bytesWritten, timeConnected):
         headers = request.getAllHeaders()
 
         ip = request.getClientIP()
@@ -452,14 +325,12 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
             for logger in self.loggers:
                 logger.event('http_session_completed', args)
 
-        self._connected_clients -= 1
-        self.uiState.set("connected-clients", self._connected_clients)
+        self._connected_clients.remove(request)
+
+        self.uiState.set("connected-clients", len(self._connected_clients))
 
         self._total_bytes_written += bytesWritten
         self.uiState.set("bytes-transferred", self._total_bytes_written)
-
-        if request in self._transfersInProgress:
-            del self._transfersInProgress[request]
 
     def getUrl(self):
         return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint)
@@ -484,10 +355,11 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         them as zero.
         """
         bytesTransferred = self._total_bytes_written
-        for (offset, transfer) in self._transfersInProgress.values():
-            bytesTransferred += transfer.written - offset
+        for request in self._connected_clients:
+            if request.transfer:
+                bytesTransferred += request.transfer.bytesSent
 
-        return (0, 0, bytesTransferred, self._connected_clients, 0)
+        return (0, 0, bytesTransferred, len(self._connected_clients), 0)
 
     # Override HTTPAuthentication methods
     def authenticateKeycard(self, bouncerName, keycard):

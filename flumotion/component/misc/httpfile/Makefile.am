@@ -5,6 +5,7 @@ httpfiledir = $(libdir)/flumotion/python/flumotion/component/misc/httpfile
 httpfile_PYTHON = \
 	__init__.py 	\
 	httpfile.py	\
+	file.py         \
 	admin_gtk.py
 
 httpfile_DATA = httpfile.xml

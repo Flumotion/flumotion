@@ -1,5 +1,13 @@
 2006-11-21  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/misc/httpfile/Makefile.am:
+	* flumotion/component/misc/httpfile/file.py:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Redesign httpfile. Pull more of static.File into our local copy.
+	  Use a proper subclass instead of Evil Wrapper Hacks.
+
+2006-11-21  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/consumers/httpstreamer/resources.py:
 	  Fewer typos. More workingness!
 
