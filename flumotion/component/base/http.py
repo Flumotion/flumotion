@@ -198,9 +198,9 @@ class HTTPAuthentication(log.Loggable):
         if self.bouncerName and self._fdToKeycard.has_key(fd):
             keycard = self._fdToKeycard[fd]
             del self._fdToKeycard[fd]
-            del self._idToKeycard[id]
+            del self._idToKeycard[keycard.id]
             self.debug('[fd %5d] asking bouncer %s to remove keycard id %s' % (
-                fd, self.bouncerName, id))
+                fd, self.bouncerName, keycard.id))
             self.cleanupKeycard(self.bouncerName, keycard)
         if self._fdToDurationCall.has_key(fd):
             self.debug('[fd %5d] canceling later expiration call' % fd)
