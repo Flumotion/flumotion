@@ -45,6 +45,7 @@ class CancellableRequest(server.Request):
 
         self._component = channel.factory.component
         self._completed = False
+        self._transfer = None
 
         self._bytes_written = 0
         self._start_time = time.time()
@@ -60,6 +61,9 @@ class CancellableRequest(server.Request):
         
     def finish(self):
         server.Request.finish(self)
+
+        # We sent Connection: close, so we must close the connection
+        self.transport.loseConnection()
         self.requestCompleted()
 
     def connectionLost(self, reason):
@@ -296,7 +300,12 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         for request in self._connected_clients:
             if now - request._lastTimeWritten > self.REQUEST_TIMEOUT:
                 self.debug("Timing out connection")
-                request.channel.transport.loseConnection()
+                # Apparently this is private API. However, calling 
+                # loseConnection is not sufficient - it won't drop the
+                # connection until the send queue is empty, which might never 
+                # happen for an uncooperative client
+                request.channel.transport.connectionLost(
+                    errors.TimeoutException())
 
         reactor.callLater(self.REQUEST_TIMEOUT, self._timeoutRequests)
             
@@ -356,8 +365,8 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         """
         bytesTransferred = self._total_bytes_written
         for request in self._connected_clients:
-            if request.transfer:
-                bytesTransferred += request.transfer.bytesSent
+            if request._transfer:
+                bytesTransferred += request._transfer.bytesSent
 
         return (0, 0, bytesTransferred, len(self._connected_clients), 0)
 

@@ -1,5 +1,12 @@
 2006-11-21  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/common/errors.py:
+	* flumotion/component/misc/httpfile/file.py:
+	* flumotion/component/misc/httpfile/httpfile.py:
+	  Make client timeouts work.
+
+2006-11-21  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/misc/httpfile/Makefile.am:
 	* flumotion/component/misc/httpfile/file.py:
 	* flumotion/component/misc/httpfile/httpfile.py:

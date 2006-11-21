@@ -218,6 +218,9 @@ class FlumotionError(pb.Error):
 class NoBundleError(pb.Error):
     "The requested bundle was not found"
 
+class TimeoutException(Exception):
+    "Timed out"
+
 # serializable GStreamer errors
 class GStreamerError(pb.Error):
     "Generic GStreamer error"

@@ -50,8 +50,6 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
         self.component = component
 
-        self.transfer = None
-
     def getChild(self, path, request):
         self.restat()
 
@@ -177,7 +175,7 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         if request.method == 'HEAD':
              return ''
            
-        self.transfer = FileTransfer(f, size, request)
+        request._transfer = FileTransfer(f, size, request)
 
         return server.NOT_DONE_YET
 
