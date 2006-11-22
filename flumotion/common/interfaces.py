@@ -58,6 +58,21 @@ class IComponentMedium(IMedium):
     """
     pass
 
+class IStreamingComponent(compat.Interface):
+    """
+    An interface for streaming components, for plugs that require a streaming
+    component of some sort to use.
+    """
+    def getUrl(self):
+        """
+        Return a URL that the streaming component is streaming.
+        """
+
+    def getDescription(self):
+        """
+        Return a description of the stream from this component.
+        """
+
 class IAdminMedium(IMedium):
     """
     I am an interface for admin-side mediums interfacing with manager-side

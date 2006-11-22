@@ -34,9 +34,10 @@ from twisted.cred import credentials
 
 from flumotion.component import feedcomponent
 from flumotion.common import bundle, common, gstreamer, errors, pygobject
-from flumotion.common import messages, netutils, log
+from flumotion.common import messages, netutils, log, interfaces
 
 from flumotion.twisted import fdserver
+from flumotion.twisted.compat import implements
 from flumotion.component.misc.porter import porterclient
 
 # proxy import
@@ -218,6 +219,8 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
 
 ### the actual component is a streamer using multifdsink
 class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
+    implements(interfaces.IStreamingComponent)
+
     # this object is given to the HTTPMedium as comp
     logCategory = 'cons-http'
     
@@ -273,6 +276,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                   'consumption-bitrate-raw', 'consumption-totalbytes-raw',
                   'stream-url'):
             self.uiState.addKey(i, None)
+
+    def getDescription(self):
+        return self.description
 
     def get_pipeline_string(self, properties):
         return self.pipe_template

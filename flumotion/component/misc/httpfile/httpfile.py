@@ -23,7 +23,7 @@ import time
 import string
 
 from flumotion.component import component
-from flumotion.common import log, messages, errors, netutils
+from flumotion.common import log, messages, errors, netutils, interfaces
 from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
 from flumotion.component.base import http as httpbase
@@ -31,6 +31,7 @@ from twisted.web import resource, static, server, http
 from twisted.web import error as weberror
 from twisted.internet import defer, reactor, error
 from flumotion.twisted import fdserver
+from flumotion.twisted.compat import implements
 from twisted.cred import credentials
 
 from flumotion.component.misc.httpfile import file
@@ -114,6 +115,7 @@ class HTTPFileMedium(component.BaseComponentMedium):
 
 class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication, 
     log.Loggable):
+    implements(interfaces.IStreamingComponent)
 
     componentMediumClass = HTTPFileMedium
 
@@ -143,6 +145,9 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
         # store number of connected clients
         self.uiState.addKey("connected-clients", 0)
         self.uiState.addKey("bytes-transferred", 0)
+
+    def getDescription(self):
+        return self.description
 
     def do_setup(self):
         props = self.config['properties']
