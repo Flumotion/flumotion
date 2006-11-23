@@ -1,3 +1,9 @@
+2006-11-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpfile/Makefile.am:
+	  Autotools is not *that* hard to get right, there's lots of
+	  examples in the tree!
+
 2006-11-22  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/common/interfaces.py:

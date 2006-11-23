@@ -8,11 +8,11 @@ httpfile_PYTHON = \
 	file.py         \
 	admin_gtk.py
 
-httpfile_DATA = httpfile.xml
+httpfile_DATA = httpfile.xml httpfile.glade
 
 TAGS_FILES = $(httpfile_PYTHON)
 
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(httpfile_PYTHON) $(httpfile_DATA) httpfile.glade
+EXTRA_DIST = $(httpfile_PYTHON) $(httpfile_DATA)
