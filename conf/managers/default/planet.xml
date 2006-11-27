@@ -13,7 +13,7 @@ FIXME: would be nice if we find a way to have this be overridden by either
 env var or cmd line option
     <debug>5</debug>
 -->
-    <component name="manager-bouncer" type="htpasswdcrypt">
+    <component name="manager-bouncer" type="htpasswdcrypt-bouncer">
       <property name="data"><![CDATA[
 user:PSfNpHTkpTx1M
 ]]></property>

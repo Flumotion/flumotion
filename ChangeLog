@@ -1,5 +1,10 @@
 2006-11-27  Michael Smith  <msmith@fluendo.com>
 
+	* conf/managers/default/planet.xml:
+	  Fix default planet.xml for The Great Breakage^wRenaming
+
+2006-11-27  Michael Smith  <msmith@fluendo.com>
+
 	* data/upgrade-to-0.3.2.xsl:
 	* flumotion/component/misc/porter/porter.py:
 	* flumotion/component/misc/porter/porter.xml:
