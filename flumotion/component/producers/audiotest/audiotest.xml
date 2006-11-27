@@ -1,28 +1,34 @@
 <registry>
 
   <components>
-    <component type="audiotest" base="flumotion/component/producers/audiotest">
-      <source location="flumotion.component.producers.audiotest.audiotest"/>
+
+    <component type="audiotest-producer"
+               base="flumotion/component/producers/audiotest"
+               description="Produces a test signal.">
+      <source location="flumotion.component.producers.audiotest.audiotest" />
       <feeder name="default"/>
+
       <entries>
         <entry type="component" location="audiotest.py"
-               function="AudioTest"/>
+               function="AudioTest" />
         <entry type="admin/gtk" location="admin_gtk.py"
-               function="AudioTestAdminGtk"/>
+               function="AudioTestAdminGtk" />
       </entries>
 
       <!-- priority to this clock so that when testing, clock choice is
            deterministic -->
-      <synchronization required="yes" clock-priority="110"/>
+      <synchronization required="yes" clock-priority="110" />
 
       <properties>
-        <property name="volume" type="float"/>
-        <property name="rate" type="int"/>
-        <property name="freq" type="int"/>
+        <property name="volume" type="float" />
+        <property name="rate" type="int"
+                  description="samplerate (in Hz)" />
+        <property name="frequency" type="int"
+                  description="frequency of test signal (in Hz)" />
       </properties>
     </component>
-  </components>
 
+  </components>
 
   <bundles>
 

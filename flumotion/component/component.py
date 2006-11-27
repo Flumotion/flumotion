@@ -601,6 +601,36 @@ class BaseComponent(common.InitMixin, log.Loggable, gobject.GObject):
             self.debug('error message, turning sad')
             self.setMood(moods.sad)
         
+    def fixRenamedProperties(self, properties, list):
+        """
+        Fix properties that have been renamed from a previous version,
+        and add a warning for them.
+
+        @param properties: properties; will be modified as a result.
+        @type  properties: dict
+        @param list:       list of (old, new) tuples of property names.
+        @type  list:       list of tuple of (str, str)
+        """
+        found = []
+        for old, new in list:
+            if properties.has_key(old):
+                found.append((old, new))
+
+        if found:
+            m = messages.Warning(T_(N_(
+                "Your configuration uses deprecated properties.  "
+                "Please update your configuration and correct them.\n")),
+                id = "deprecated")
+            for old, new in found:
+                m.add(T_(N_(
+                "Please rename '%s' to '%s'.\n"),
+                        old, new))
+                self.debug("Setting new property '%s' to %r", new,
+                    properties[old])
+                properties[new] = properties[old]
+                del properties[old]
+            self.addMessage(m)
+
     def adminCallRemote(self, methodName, *args, **kwargs):
         """
         Call a remote method on all admin client views on this component.

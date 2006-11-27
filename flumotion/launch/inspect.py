@@ -83,6 +83,9 @@ def main(args):
             c = r.getComponent(cname)
             print '\nComponent:'
             print '  %s' % cname
+            desc = c.getDescription()
+            if desc:
+                print '  %s' % desc
             print '\nSource:'
             print '  %s' % c.getSource()
             print '  in %s' % c.getBase()
@@ -114,10 +117,13 @@ def main(args):
             print '\nProperties:'
             if properties:
                 for k, v in properties:
+                    desc = v.getDescription()
                     print ('  %s: type %s, %s%s'
                            % (k, v.getType(),
                               v.isRequired() and 'required' or 'optional',
                               v.isMultiple() and ', multiple ok' or ''))
+                    if desc:
+                        print '  %s  %s' % (' ' * len(k), desc)
             sockets = c.getSockets()
             print '\nSockets:'
             for socket in sockets:

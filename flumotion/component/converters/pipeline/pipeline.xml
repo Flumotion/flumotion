@@ -2,16 +2,18 @@
 
   <components>
     <component type="pipeline-converter"
-               base="flumotion/component/converters/pipeline">
-      <source location="flumotion.component.converters.pipeline.pipeline"/>
-      <eater name="default"/>
-      <feeder name="default"/>
+               base="flumotion/component/converters/pipeline"
+               description="Generic GStreamer pipeline converter">
+      <source location="flumotion.component.converters.pipeline.pipeline" />
+      <eater name="default" />
+      <feeder name="default" />
       <entries>
         <entry type="component" location="pipeline.py"
-               function="Converter"/>
+               function="Converter" />
       </entries>
       <properties>
-        <property name="pipeline" type="string" required="yes"/>
+        <property name="pipeline" type="string" required="yes"
+                  description="Partial GStreamer pipeline to use" />
       </properties>
     </component>
   </components>

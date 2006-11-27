@@ -266,6 +266,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self._removed_lock = thread.allocate_lock()
         self._removed_queue = []
 
+        self._updateCallLaterId = None
+        self._queueCallLaterId = None
+
         self._pending_removals = {}
 
         for i in ('stream-mime', 'stream-uptime', 'stream-bitrate',
@@ -297,9 +300,18 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         # tcp is where multifdsink is
         version = gstreamer.get_plugin_version('tcp') 
-        if version < (0,10,9,1):
+        if version < (0, 10, 9, 1):
+            m = messages.Error(T_(N_(
+                "Version %s of the '%s' GStreamer plug-in is too old.\n"),
+                    ".".join(version), 'multifdsink'))
+            m.add(T_(N_("Please upgrade '%s' to version %s."),
+                'gst-plugins-base', '0.10.10'))
+            self.addMessage(m)
+            self.setMood(moods.sad)
+
             return defer.fail(
-                errors.PropertyError("multifdsink version too old"))
+                errors.ComponentSetupHandledError(
+                    "multifdsink version not newer than 0.10.9.1"))
 
     def time_bursting_supported(self, sink):
         try:
@@ -339,8 +351,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 # In this mode, we burst a configurable minimum, plus extra 
                 # so we start from a keyframe (or less if we don't have a 
                 # keyframe available)
-                sink.set_property('sync-method', 4) # burst-keyframe
-                sink.set_property('burst-unit', 3) # bytes
+                sink.set_property('sync-method', 'burst-keyframe')
+                sink.set_property('burst-unit', 'bytes')
                 sink.set_property('burst-value', self.burst_size * 1024)
 
                 # To use burst-on-connect, we need to ensure that multifdsink
@@ -376,13 +388,23 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def configure_pipeline(self, pipeline, properties):
         Stats.__init__(self, sink=self.get_element('sink'))
 
-        # FIXME: call self._callLaterId.cancel() somewhere on shutdown
-        self._callLaterId = reactor.callLater(1, self._checkUpdate)
-
-        # FIXME: do a .cancel on this Id somewhere
+        self._updateCallLaterId = reactor.callLater(1, self._checkUpdate)
         self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
-        
-        mountPoint = properties.get('mount_point', '')
+
+        # F0.6: remove backwards-compatible properties
+        self.fixRenamedProperties(properties, [
+            ('issuer',             'issuer-class'),
+            ('mount_point',        'mount-point'),
+            ('porter_socket_path', 'porter-socket-path'),
+            ('porter_username',    'porter-username'),
+            ('porter_password',    'porter-password'),
+            ('user_limit',         'client-limit'),
+            ('bandwidth_limit',    'bandwidth-limit'),
+            ('burst_on_connect',   'burst-on-connect'),
+            ('burst_size',         'burst-size'),
+            ])
+
+        mountPoint = properties.get('mount-point', '')
         if not mountPoint.startswith('/'):
             mountPoint = '/' + mountPoint
         self.mountPoint = mountPoint
@@ -408,9 +430,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         # check how to set client sync mode
         sink = self.get_element('sink')
-        self.burst_on_connect = properties.get('burst_on_connect', False)
-        self.burst_size = properties.get('burst_size', 0)
-        self.burst_time = properties.get('burst_time', 0.0)
+        self.burst_on_connect = properties.get('burst-on-connect', False)
+        self.burst_size = properties.get('burst-size', 0)
+        self.burst_time = properties.get('burst-time', 0.0)
 
         self.setup_burst_mode(sink)
 
@@ -425,14 +447,14 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         sink.connect('client-fd-removed', self._client_fd_removed_cb)
         sink.connect('client-removed', self._client_removed_cb)
 
-        if properties.has_key('user_limit'):
-            self.resource.setUserLimit(int(properties['user_limit']))
-            
+        if properties.has_key('client-limit'):
+            self.resource.setUserLimit(int(properties['client-limit']))
+
         if properties.has_key('bouncer'):
             self.resource.setBouncerName(properties['bouncer'])
 
-        if properties.has_key('issuer'):
-            self.resource.setIssuerClass(properties['issuer'])
+        if properties.has_key('issuer-class'):
+            self.resource.setIssuerClass(properties['issuer-class'])
 
         if properties.has_key('duration'):
             self.resource.setDefaultDuration(float(properties['duration']))
@@ -452,9 +474,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.type = properties.get('type', 'master')
         if self.type == 'slave':
             # already checked for these in do_check
-            self._porterPath = properties['porter_socket_path']
-            self._porterUsername = properties['porter_username']
-            self._porterPassword = properties['porter_password']
+            self._porterPath = properties['porter-socket-path']
+            self._porterUsername = properties['porter-username']
+            self._porterPassword = properties['porter-password']
 
         self.port = int(properties.get('port', 8800))
 
@@ -469,7 +491,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
             self._tenSecondCount = 10
             self.needsUpdate = False
             self.update_ui_state()
-        self._callLaterId = reactor.callLater(1, self._checkUpdate)
+        self._updateCallLaterId = reactor.callLater(1, self._checkUpdate)
 
     def getMaxClients(self):
         return self.resource.maxclients
@@ -627,6 +649,13 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     ### END OF THREAD-AWARE CODE
 
     def do_stop(self):
+        if self._queueCallLaterId:
+            self._queueCallLaterId.cancel()
+            self._queueCallLaterId = None
+        if self._updateCallLaterId:
+            self._updateCallLaterId.cancel()
+            self._updateCallLaterId = None
+
         if self.type == 'slave' and self._pbclient:
             return self._pbclient.deregisterPath(self.mountPoint)
         else:

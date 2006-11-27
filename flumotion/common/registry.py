@@ -39,18 +39,16 @@ __all__ = ['ComponentRegistry', 'registry']
 def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
 
-_istrue = fxml.istrue
-
 class RegistryEntryComponent:
     """
     I represent a <component> entry in the registry
     """
     # RegistryEntryComponent has a constructor with a lot of arguments,
     # but that's ok here. Allow it through pychecker.
-    __pychecker__ = 'maxargs=13'
+    __pychecker__ = 'maxargs=14'
 
     def __init__(self, filename, type, 
-                 source, base, properties, files,
+                 source, description, base, properties, files,
                  entries, eaters, feeders, needs_sync, clock_priority,
                  sockets):
         """
@@ -66,6 +64,10 @@ class RegistryEntryComponent:
         self.filename = filename
         self.type = type
         self.source = source
+        self.description = description
+        # we don't want to end up with the string "None"
+        if not self.description:
+            self.description = ""
         self.base = base
         self.properties = properties
         self.files = files
@@ -119,6 +121,9 @@ class RegistryEntryComponent:
 
     def getBase(self):
         return self.base
+
+    def getDescription(self):
+        return self.description
 
     def getSource(self):
         return self.source
@@ -246,9 +251,13 @@ class RegistryEntryBundleFilename:
 
 class RegistryEntryProperty:
     "This class represents a <property> entry in the registry"
-    def __init__(self, name, type, required=False, multiple=False):
+    def __init__(self, name, type, description, required=False, multiple=False):
         self.name = name
         self.type = type
+        self.description = description
+        # we don't want to end up with the string "None"
+        if not self.description:
+            self.description = ""
         self.required = required
         self.multiple = multiple
 
@@ -260,6 +269,9 @@ class RegistryEntryProperty:
 
     def getType(self):
         return self.type
+
+    def getDescription(self):
+        return self.description
     
     def isRequired(self):
         return self.required
@@ -374,7 +386,7 @@ class RegistryParser(fxml.Parser):
         return components
     
     def _parseComponent(self, node):
-        # <component type="..." base="...">
+        # <component type="..." base="..." description="...">
         #   <source>
         #   <eater>
         #   <feeder>
@@ -385,7 +397,8 @@ class RegistryParser(fxml.Parser):
         # </component>
         
         #FIXME: make sure base is in all components
-        type, baseDir = self.parseAttributes(node, ('type',), ('base',))
+        type, baseDir, description = self.parseAttributes(node,
+            required=('type', ), optional=('base', 'description'))
 
         files = []
         source = fxml.Box(None)
@@ -421,7 +434,7 @@ class RegistryParser(fxml.Parser):
         needs_sync, clock_priority = synchronization.unbox()
 
         return RegistryEntryComponent(self.filename,
-                                      type, source, baseDir,
+                                      type, source, description, baseDir,
                                       properties, files,
                                       entries, eaters, feeders,
                                       needs_sync, clock_priority,
@@ -436,12 +449,12 @@ class RegistryParser(fxml.Parser):
         # <property name="..." type="" required="yes/no" multiple="yes/no"/>
         # returns: RegistryEntryProperty
 
-        attrs = self.parseAttributes(node, ('name', 'type'),
-                                     ('required', 'multiple'))
-        name, type, required, multiple = attrs
-        required = _istrue(required)
-        multiple = _istrue(multiple)
-        return RegistryEntryProperty(name, type, required=required,
+        attrs = self.parseAttributes(node, required=('name', 'type'),
+            optional=('required', 'multiple', 'description'))
+        name, type, required, multiple, description = attrs
+        required = common.strToBool(required)
+        multiple = common.strToBool(multiple)
+        return RegistryEntryProperty(name, type, description, required=required,
                                      multiple=multiple)
 
     def _parseProperties(self, node):
@@ -528,8 +541,8 @@ class RegistryParser(fxml.Parser):
         attrs = self.parseAttributes(node, ('name',), ('required', 'multiple'))
         name, required, multiple = attrs
         # only required defaults to True
-        required = _istrue(required or 'True')
-        multiple = _istrue(multiple)
+        required = common.strToBool(required or 'True')
+        multiple = common.strToBool(multiple)
 
         return RegistryEntryEater(name, required, multiple)
 
@@ -542,7 +555,7 @@ class RegistryParser(fxml.Parser):
         # <synchronization [required="yes/no"] [clock-priority="100"]/>
         attrs = self.parseAttributes(node, (), ('required', 'clock-priority'))
         required, clock_priority = attrs
-        required = _istrue(required)
+        required = common.strToBool(required)
         clock_priority = int(clock_priority or '100')
         return required, clock_priority
 
@@ -867,8 +880,9 @@ class RegistryWriter(log.Loggable):
         w(2, '<components>')
         w(0, '')
         for component in self.components:
-            w(4, '<component type="%s" base="%s">' % (component.getType(),
-                component.getBase()))
+            w(4, '<component type="%s" base="%s"' % (
+                component.getType(), component.getBase()))
+            w(4, '           description="%s">' % component.getDescription())
 
             w(6, '<source location="%s"/>' % component.getSource())
             for x in component.getEaters():
@@ -890,11 +904,12 @@ class RegistryWriter(log.Loggable):
 
             w(6, '<properties>')
             for prop in component.getProperties():
-                w(8, '<property name="%s" type="%s" required="%s" multiple="%s"/>' % (
-                    prop.getName(),
-                    prop.getType(),
-                    prop.isRequired(),
-                    prop.isMultiple()))
+                w(8, ('<property name="%s" type="%s"'
+                      % (prop.getName(), prop.getType())))
+                w(8, ('          description="%s"'
+                      % (prop.getDescription(),)))
+                w(8, ('          required="%s" multiple="%s"/>'
+                      % (prop.isRequired(), prop.isMultiple())))
             w(6, '</properties>')
 
             files = component.getFiles()
@@ -934,11 +949,11 @@ class RegistryWriter(log.Loggable):
 
             w(6, '<properties>')
             for prop in plug.getProperties():
-                w(8, ('<property name="%s" type="%s" required="%s" multiple="%s"/>'
-                      % (prop.getName(),
-                         prop.getType(),
-                         prop.isRequired(),
-                         prop.isMultiple())))
+                w(8, ('<property name="%s" type="%s"' % (
+                      prop.getName(), prop.getType())))
+                w(8, ('          description="%s"' % prop.getDescription()))
+                w(8, ('          required="%s" multiple="%s"/>' % (
+                         prop.isRequired(), prop.isMultiple())))
             w(6, '</properties>')
 
             w(4, '</plug>')
@@ -1021,14 +1036,10 @@ class ComponentRegistry(log.Loggable):
         self.addFile(f)
         f.close()
         
-    def addRegistryPath(self, path, prefix='flumotion', force=False):
+    def addRegistryPath(self, path, prefix='flumotion'):
         """
-        Add a registry path to this registry.
-
-        If force is False, the registry path will only be re-scanned
-        if the directory has been modified since the last scan.
-        If force is True, then the registry path will be parsed regardless
-        of the modification time.
+        Add a registry path to this registry, scanning it for registry
+        snippets.
 
         @param path: a full path containing a 'flumotion' directory,
                      which will be scanned for registry files.
@@ -1036,7 +1047,7 @@ class ComponentRegistry(log.Loggable):
         @rtype:   bool
         @returns: whether the path could be added
         """
-        self.debug('path %s, prefix %s, force %r' % (path, prefix, force))
+        self.debug('path %s, prefix %s' % (path, prefix))
         if not os.path.exists(path):
             self.warning("Cannot add non-existent path '%s' to registry" % path)
             return False
@@ -1045,17 +1056,6 @@ class ComponentRegistry(log.Loggable):
                 "since it does not contain prefix '%s'" % (path, prefix))
             return False
 
-        directory = self._parser._directories.get(path, None)
-        if not force and directory:
-            # if directory is watched in the registry, and it hasn't been
-            # updated, everything's fine
-            dTime = directory.lastModified()
-            fTime = _getMTime(self.filename)
-            if dTime < fTime:
-                self.debug('%s has not been changed since last registry parse' %
-                    path)
-                return True
-        
         # registry path was either not watched or updated, or a force was
         # asked, so reparse
         self.info('Scanning registry path %s' % path)
@@ -1235,12 +1235,29 @@ class ComponentRegistry(log.Loggable):
         else:
             self.debug('registry paths are still the same')
 
+        # check if any of the directories has been modified after the cache
+        # we check times here instead of in addRegistryPath so we can
+        # self.clean() if we now we need to rebuild before adding any
+        for path in registryPaths:
+            directory = self._parser._directories.get(path, None)
+            if directory:
+                # if directory is watched in the registry, and it hasn't been
+                # updated, everything's fine
+                dTime = directory.lastModified()
+                fTime = _getMTime(self.filename)
+                if dTime < fTime:
+                    self.debug('%s not changed since last registry parse' %
+                        path)
+                else:
+                    self.debug('%s has changed since last registry parse' %
+                        path)
+                    force = True
+     
         if force:
             self.clean()
-        
-        for path in registryPaths:
-            if not self.addRegistryPath(path, force=force):
-                self._parser.removeDirectoryByPath(path)
+            for path in registryPaths:
+                if not self.addRegistryPath(path):
+                    self._parser.removeDirectoryByPath(path)
 
         self.save(force)
 

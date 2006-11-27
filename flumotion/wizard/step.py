@@ -81,7 +81,11 @@ class WizardStep(GladeWidget, log.Loggable):
         for w in self.iterate_widgets():
             if hasattr(w, 'get_state') and w != self:
                 # only fgtk widgets implement get_state
-                key = w.get_name().split('_', 1)[1]
+                # every widget that implements get_state automatically becomes
+                # a property
+                # spinbutton_some_property -> some-property 
+                name = '-'.join(w.get_name().split('_'))
+                key = name.split('-', 1)[1]
                 state_dict[key] = w.get_state()
 
         return state_dict

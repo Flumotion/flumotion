@@ -2,16 +2,17 @@
 
   <components>
   
-    <component type="speex-encoder" base="flumotion/component/encoders/speex">
-      <source location="flumotion.component.encoders.speex.speex"/>
-      <eater name="default"/>
-      <feeder name="default"/>
+    <component type="speex-encoder" base="flumotion/component/encoders/speex"
+               description="Encodes a raw audio feed using the Speex speech codec.">
+      <source location="flumotion.component.encoders.speex.speex" />
+      <eater name="default" />
+      <feeder name="default" />
       <entries>
-        <entry type="component" location="speex.py"
-               function="Speex"/>
+        <entry type="component" location="speex.py" function="Speex" />
       </entries>
       <properties>
-        <property name="bitrate" type="int"/>
+        <property name="bitrate" type="int"
+                  description="Encoding bitrate (in bits per second)" />
       </properties>
     </component>
  

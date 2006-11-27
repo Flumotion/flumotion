@@ -2,21 +2,28 @@
 
   <components>
   
-    <component type="theora-encoder" base="flumotion/component/encoders/theora">
-      <source location="flumotion.component.encoders.theora.theora"/>
-      <eater name="default"/>
-      <feeder name="default"/>
+    <component type="theora-encoder" base="flumotion/component/encoders/theora"
+               description="Encode a raw video feed using Xiph's Theora codec." >
+      <source location="flumotion.component.encoders.theora.theora" />
+      <eater name="default" />
+      <feeder name="default" />
       <entries>
         <entry type="component" location="theora.py"
                function="Theora"/>
       </entries>
       <properties>
-        <property name="bitrate" type="int"/>
-        <property name="quality" type="int"/>
+        <property name="bitrate" type="int"
+                  description="Bitrate to encode at (in bps)" />
+        <property name="quality" type="int"
+                  description="Encoding quality (0-63, if not using bitrate)" />
         <property name="keyframe-threshold" type="int" />
-        <property name="keyframe-mindistance" type="int" />
-        <property name="keyframe-maxdistance" type="int" />
-        <property name="quick-compress" type="int" />
+        <property name="keyframe-mindistance" type="int"
+                  description="Minimum distance between keyframes (in frames)" />
+        <property name="keyframe-maxdistance" type="int"
+                  description="Maximum distance between keyframes (in frames)" />
+        <property name="quick-compress" type="bool"
+                  description="Whether to use quick, lower-quality compression
+"/>
         <property name="noise-sensitivity" type="int" />
       </properties>
     </component>

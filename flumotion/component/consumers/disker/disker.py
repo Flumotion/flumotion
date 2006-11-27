@@ -86,18 +86,33 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     
         self.directory = directory
 
-        rotateType = properties['rotateType']
+        self.fixRenamedProperties(properties, [('rotateType', 'rotate-type')])
+
+        rotateType = properties['rotate-type']
         if rotateType == 'size':
             self.setSizeRotate(properties['size'])
         elif rotateType == 'time':
             self.setTimeRotate(properties['time'])
+        else:
+            m = messages.Error(T_(N_(
+                "The configuration property 'rotate-type' should be set to "
+                "'size' or 'time', not '%s'.  Please fix the configuration."),
+                    rotateType), id='rotate-type')
+            self.addMessage(m)
+        # FIXME: should add a way of saying "do first cycle at this time"
 
         return self.pipe_template
 
     def setTimeRotate(self, time):
+        """
+        @param time: duration of file (in seconds)
+        """
         reactor.callLater(time, self._rotateTimeCallback, time)
 
     def setSizeRotate(self, size):
+        """
+        @param size: size of file (in bytes)
+        """
         reactor.callLater(5, self._rotateSizeCallback, size)
         
     def _rotateTimeCallback(self, time):

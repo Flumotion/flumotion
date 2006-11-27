@@ -34,14 +34,6 @@ from xml.parsers import expat
 
 from flumotion.common import log, common
 
-
-def istrue(value):
-    if value in ('True', 'true', '1', 'yes'):
-        return True
-
-    return False
-
-
 class Box:
     """
     Object designed to wrap, or "box", any value. Useful mostly in the
@@ -145,7 +137,11 @@ class Parser(log.Loggable):
         for k in (required or ()) + (optional or ()):
             if node.hasAttribute(k):
                 # expat always gives us unicode; we always want str
-                out.append(str(node.getAttribute(k)))
+                a = node.getAttribute(k)
+                if a:
+                    out.append(str(a))
+                else:
+                    out.append(None)
             else:
                 out.append(None)
         return out

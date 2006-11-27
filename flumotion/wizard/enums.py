@@ -66,9 +66,9 @@ AudioDevice = enum.EnumClass('AudioDevice',
                               'Unused'
                              ),
                         component_type=(
-                                        'audiotest',
-                                        'soundcard',
-                                        'firewire'
+                                        'audiotest-producer',
+                                        'soundcard-producer',
+                                        'firewire-producer'
                                         ))
 # TVCard
 TVCardDevice = enum.EnumClass('TVCardDevice', ('/dev/video0',

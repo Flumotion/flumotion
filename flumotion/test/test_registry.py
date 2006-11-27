@@ -27,8 +27,7 @@ import warnings
 import tempfile
 warnings.filterwarnings('ignore', category=FutureWarning)
 
-from flumotion.common import registry, fxml
-_istrue = fxml.istrue
+from flumotion.common import registry, fxml, common
 
 class TestRegistry(unittest.TestCase):
     def setUp(self):
@@ -41,15 +40,15 @@ class TestRegistry(unittest.TestCase):
         self.failUnless(isinstance(reg, registry.ComponentRegistry))
         
     def testIsTrue(self):
-        self.failUnless(_istrue('True'))
-        self.failUnless(_istrue('true'))
-        self.failUnless(_istrue('1'))
-        self.failUnless(_istrue('yes'))
-        self.failIf(_istrue('False') )
-        self.failIf(_istrue('false') )
-        self.failIf(_istrue('0') )
-        self.failIf(_istrue('no') )
-        self.failIf(_istrue('I am a monkey') )
+        self.failUnless(common.strToBool('True'))
+        self.failUnless(common.strToBool('true'))
+        self.failUnless(common.strToBool('1'))
+        self.failUnless(common.strToBool('yes'))
+        self.failIf(common.strToBool('False') )
+        self.failIf(common.strToBool('false') )
+        self.failIf(common.strToBool('0') )
+        self.failIf(common.strToBool('no') )
+        self.failIf(common.strToBool('I am a monkey') )
 
     def testgetMTime(self):
         mtime = registry._getMTime(__file__)
@@ -98,7 +97,7 @@ class TestRegistry(unittest.TestCase):
   <components>
     <component type="component">
       <properties>
-        <property name="source" type="string" required="yes" multiple="yes"/>
+        <property name="source" type="string" required="yes" multiple="yes" description="a source property" />
       </properties>
     </component>
   </components>
@@ -111,6 +110,7 @@ class TestRegistry(unittest.TestCase):
         prop = props[0]
         self.assertEquals(prop.getName(), 'source')
         self.assertEquals(prop.getType(), 'string')
+        self.assertEquals(prop.getDescription(), 'a source property')
         self.failUnless(prop.isRequired())
         self.failUnless(prop.isMultiple())
 
@@ -179,7 +179,8 @@ class TestRegistry(unittest.TestCase):
         xml = """
 <registry>
   <components>
-    <component type="bar" base="base/dir">
+    <component type="bar" base="base/dir"
+               description="A bar component.">
       <entries>
         <entry type="test/test" location="loc" function="main"/>
       </entries>
@@ -189,7 +190,7 @@ class TestRegistry(unittest.TestCase):
     <plug type="baz" socket="frogger">
       <entry location="loc" function="main"/>
       <properties>
-        <property name="qux" type="string"/>
+        <property name="qux" type="string" description="a quxy property"/>
       </properties>
     </plug>
   </plugs>
@@ -221,7 +222,8 @@ class TestRegistry(unittest.TestCase):
 
   <components>
 
-    <component type="bar" base="base/dir">
+    <component type="bar" base="base/dir"
+               description="A bar component.">
       <source location="None"/>
       <synchronization required="no" clock-priority="100"/>
       <properties>
@@ -238,7 +240,9 @@ class TestRegistry(unittest.TestCase):
     <plug type="baz" socket="frogger">
       <entry location="loc" function="main"/>
       <properties>
-        <property name="qux" type="string" required="False" multiple="False"/>
+        <property name="qux" type="string"
+                  description="a quxy property"
+                  required="False" multiple="False"/>
       </properties>
     </plug>
 
@@ -271,17 +275,18 @@ class TestRegistry(unittest.TestCase):
             i = i + 1
             d = datalines.pop()
             t = targetlines.pop()
-            self.assertEquals(t, d, "line %d: '%s' != '%s'" % (i, d, t))
+            self.assertEquals(t, d, "line %d: '%s' != expected '%s'" % (
+                i, d, t))
             
 class TestComponentEntry(unittest.TestCase):
     def setUp(self):
         self.file = registry.RegistryEntryFile('gui-filename', 'type')
         rec = registry.RegistryEntryComponent
-        self.entry = rec('filename', 'type', 'source', 'base', 
+        self.entry = rec('filename', 'type', 'source', 'description', 'base', 
                          ['prop'], [self.file], {}, [], [], False, 100, [])
-        self.empty_entry = rec('filename', 'type', 'source', 'base',
+        self.empty_entry = rec('filename', 'type', 'source', 'description', 'base',
                                ['prop'], [], {}, [], [], True, 130, [])
-        self.multiple_entry = rec('filename', 'type', 'source', 'base', ['prop'],
+        self.multiple_entry = rec('filename', 'type', 'source', 'description', 'base', ['prop'],
                                   [self.file, self.file], {}, [], [],
                                   False, 100, [])
 

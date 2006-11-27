@@ -1,22 +1,37 @@
 <registry>
   <components>
-    <component type="saltsha256"
-               base="flumotion/component/bouncers">
+    <component type="saltsha256-bouncer"
+               base="flumotion/component/bouncers"
+               description="Bouncer using salted sha256 passwords.">
 
-      <source location="flumotion.component.bouncers.saltsha256"/>
+      <source location="flumotion.component.bouncers.saltsha256" />
 
       <entries>
         <entry type="component" location="saltsha256.py"
-               function="SaltSha256"/>
+               function="SaltSha256" />
       </entries>
 
       <properties>
-        <property name="filename" type="string"/>
-        <property name="data" type="rawstring"/>
-        <property name="domain" type="string"/>
+        <property name="filename" type="string"
+                  description="An htpasswd-like file to use as a backend" />
+        <property name="data" type="rawstring"
+                  description="In-line htpasswd-like data to use as a backend" />
       </properties>
     </component>
   </components>
 
-</registry> 
+  <bundles>
+    <bundle name="saltsha256-component">
+      <dependencies>
+        <dependency name="component-base" />
+      </dependencies>
 
+      <directories>
+        <directory name="flumotion/component/bouncers">
+          <filename location="saltsha256.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+
+</registry> 

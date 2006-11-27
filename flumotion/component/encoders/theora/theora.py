@@ -20,6 +20,10 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component import feedcomponent
+from flumotion.common import messages
+
+from flumotion.common.messages import N_
+T_ = messages.gettexter('flumotion')
 
 class Theora(feedcomponent.ParseLaunchComponent):
     def do_check(self):
@@ -50,9 +54,30 @@ class Theora(feedcomponent.ParseLaunchComponent):
                  ('keyframe-maxdistance', 'keyframe-force'),
                  'noise-sensitivity')
 
+        # F0.6: remove this code
+        # before 0.3.2, bitrate was interpreted as kbps, inconsistent
+        # with other flumotion components
+        # safe to assume that nobody will want less than 10 kbit/sec
+        # also, MikeS *requires* a kbit/sec to be seen as 1000 bit/sec
+        if 'bitrate' in properties:
+            if properties['bitrate'] < 10000:
+                self.addMessage(
+                    messages.Warning(T_(N_(
+                        "Your configuration uses 'bitrate' expressed in "
+                        "kbit/sec.  Please convert it to a value in bit/sec by "
+                        "multiplying the value by 1000.")), id='bitrate'))
+                properties['bitrate'] *= 1000
+
+        # FIXME: GStreamer 0.10 has bitrate in kbps, inconsistent
+        # with all other elements, so fix it up
+        if 'bitrate' in properties:
+                properties['bitrate'] = int(properties['bitrate'] / 10000)
+
         for p in props:
             pproperty = isinstance(p, tuple) and p[0] or p
             eproperty = isinstance(p, tuple) and p[1] or p
 
             if pproperty in properties:
+                self.debug('Setting GStreamer property %s to %r' % (
+                    eproperty, properties[pproperty]))
                 element.set_property(eproperty, properties[pproperty])

@@ -48,8 +48,14 @@ class Firewire(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, props):
         width = props.get('width', 240)
         height = props.get('height', int(576 * width/720.)) # assuming PAL :-/
-        scaled_width = props.get('scaled_width', width)
-        is_square = props.get('is_square', False)
+
+        # F0.6: remove backwards-compatible properties
+        self.fixRenamedProperties(props, [
+            ('scaled_width', 'scaled-width'),
+            ('is_square',    'is-square'),
+            ])
+        scaled_width = props.get('scaled-width', width)
+        is_square = props.get('is-square',  False)
         framerate = props.get('framerate', (30, 2))
         framerate_float = float(framerate[0]) / framerate[1]
 
@@ -73,8 +79,8 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         # so codecs are happy; it's unrelated to the aspect ratio correction
         # to get to 4:3 or 16:9
         if scale_correction > 0:
-            # videobox in 0.8.8 has a stride problem outputting AYUV with odd width
-            # I420 works fine, but is slower when overlay is used
+            # videobox in 0.8.8 has a stride problem outputting AYUV with odd
+            # width I420 works fine, but is slower when overlay is used
 
             pad_pipe = '! ffmpegcolorspace ! videobox right=-%d ! video/x-raw-yuv,format=(fourcc)I420 ' % scale_correction
         else:
@@ -87,8 +93,9 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         else:
             interlaced_height = 288
             
-        # FIXME: might be nice to factor out dv1394src ! dvdec so we can replace it
-        # with videotestsrc of the same size and PAR, so we can unittest the pipeline
+        # FIXME: might be nice to factor out dv1394src ! dvdec so we can
+        # replace it with videotestsrc of the same size and PAR, so we can
+        # unittest the pipeline
         # need a queue in case tcpserversink blocks somehow
         template = ('dv1394src'
                     '    ! queue leaky=2 max-size-time=1000000000'
@@ -158,14 +165,14 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     if s['current-device-change'] == 1:
                         # connected
                         m = messages.Info(T_(N_(
-                            "The camera has now been reconnected")),
+                            "The camera has now been reconnected.")),
                             id="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)
                     elif s['current-device-change'] == -1:
                         # disconnected
                         m = messages.Warning(T_(N_(
-                            "The camera has been disconnected")),
+                            "The camera has been disconnected.")),
                             id="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)

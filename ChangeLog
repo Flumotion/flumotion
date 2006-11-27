@@ -1,3 +1,123 @@
+2006-11-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  fix layout of generated registry code and fix test
+
+2006-11-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  fix two problems caught by pychecker
+
+2006-11-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/feedcomponent010.py:
+	  fix cleanup problems in these two files that were brought out
+	  by writing a unit test for component setup
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_component_httpstreamer.py:
+	  add a test for the property renaming
+
+2006-11-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* DONE:
+	  add httpfile issuer -> issuerClass
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  fix some properties that I had mangled for testing
+	* flumotion/component/misc/httpfile/httpfile.py:
+	* flumotion/component/misc/httpfile/httpfile.xml:
+	  issuer -> issuerClass
+	  document some more properties
+
+2006-11-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	  fix a syntax error
+
+2006-11-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/upgrade-to-0.3.2.xsl:
+	  add another property added by Mike on trunk
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/consumers/httpstreamer/http.xml:
+	  Fix up merge conflicts
+
+2006-11-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/upgrade-to-0.3.2.xsl:
+	  fix up theora bitrate if it's below 10000 to convert to bps
+	* flumotion/component/component.py:
+	  add fixRenamedProperties to deal with properties that have
+	  been deprecated and renamed.
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/http.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	  Use it to deal with the renamed properties almost transparently.
+	* flumotion/component/encoders/theora/theora.py:
+	  'bitrate' property below 10000 gets treated as deprecated,
+	  and converted.
+
+2006-11-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/upgrade-to-0.3.2.xsl:
+	  Mike helped me fix my xslt for the bitrate property
+
+2006-11-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* DONE:
+	* flumotion/component/producers/videotest/videotest.xml:
+	  added videotest->videotest-producer
+	* data/upgrade-to-0.3.2.xsl:
+	  added a first stab at the stylesheet to convert our xml configs
+	  to the new names; only needs a solution for theora-encoder's
+	  bitrate unit change
+
+2006-10-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/encoders/theora/theora.py:
+	  make bitrate be in bps, like all other components
+
+2006-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
+	  add strToBool
+	* flumotion/common/fxml.py:
+	  remove istrue
+	* flumotion/common/registry.py:
+	  use strToBool
+	* flumotion/launch/parse.py:
+	  use strToBool, so things like quality=False actually works
+
+2006-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/registry.py:
+	  Move time-checking code on registry directories before addRegistry.
+	  This fixes a bug where renaming a component leaves both old and new
+	  name in the registry.
+
+2006-10-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/wizard/step.py:
+	  fix up the code that automatically gets state from widgets
+	  because our options are now dashed, not underscored
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/steps.py:
+	  adapt to new dashed properties
+	  name components something-type
+
+2006-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/fxml.py:
+	* flumotion/common/registry.py:
+	  allow for description on component and property
+	  prettify xml output
+	* flumotion/test/test_registry.py:
+	  add tests for it
+	* flumotion/launch/inspect.py:
+	  show descriptions
+
 2006-11-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/httpfile/Makefile.am:

@@ -1,7 +1,8 @@
 <registry>
   <components>
-    <component type="firewire"
-               base="flumotion/component/producers/firewire">
+    <component type="firewire-producer"
+               base="flumotion/component/producers/firewire"
+               description="Produce raw feeds from a Firewire/DV device.">
       <source location="flumotion.component.producers.firewire.firewire" />
       <feeder name="audio"/>
       <feeder name="video"/>
@@ -15,11 +16,16 @@
       <synchronization required="yes" clock-priority="160"/>
 
       <properties>
-        <property name="height" type="int" />
-        <property name="width" type="int" />
-        <property name="scaled_width" type="int" />
-        <property name="is_square" type="bool" />
-        <property name="framerate" type="fraction" />
+        <property name="height" type="int"
+                  description="The height to scale to" />
+        <property name="width" type="int"
+                  description="The final width, including correction" />
+        <property name="scaled-width" type="int"
+                  description="The width to scale to before correcting" />
+        <property name="is-square" type="bool"
+                  description="Whether to scale to a 1:1 pixel aspect ratio" />
+        <property name="framerate" type="fraction"
+                  description="The framerate (in fps) "/>
       </properties>
     </component>
   </components>

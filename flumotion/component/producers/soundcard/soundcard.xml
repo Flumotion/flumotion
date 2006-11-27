@@ -1,8 +1,9 @@
 <registry>
   <components>
-    <component type="soundcard"
-    	       base="flumotion/component/producers/soundcard">
-      <source location="flumotion.component.producers.soundcard.soundcard"/>
+    <component type="soundcard-producer"
+    	       base="flumotion/component/producers/soundcard"
+               description="Capture a raw audio feed from a soundcard.">
+      <source location="flumotion.component.producers.soundcard.soundcard" />
 
       <feeder name="default"/>
 
@@ -15,11 +16,16 @@
                function="GUIClass"/>
       </entries>
       <properties>
-        <property name="source-element" type="string"/>
-        <property name="device" type="string"/>
-        <property name="channels" type="int"/>
-        <property name="depth" type="int"/>
-        <property name="rate" type="int"/>
+        <property name="source-element" type="string"
+                  description="The GStreamer element factory to use as source" />
+        <property name="device" type="string"
+                  description="The device property to use for the source element" />
+        <property name="channels" type="int"
+                  description="Number of channels to capture (default 2)" />
+        <property name="depth" type="int"
+                  description="Bit depth to use (default 16)" />
+        <property name="rate" type="int"
+                  description="Samplerate to capture at (in Hz, default 44100)" />
       </properties>
     </component>
   </components>

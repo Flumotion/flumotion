@@ -2,17 +2,20 @@
 
   <components>
   
-    <component type="jpeg-encoder" base="flumotion/component/encoders/jpeg">
-      <source location="flumotion.component.encoders.jpeg.jpeg"/>
-      <eater name="default"/>
-      <feeder name="default"/>
+    <component type="jpeg-encoder" base="flumotion/component/encoders/jpeg"
+               description="Encodes raw video feed to JPEG frames.">
+      <source location="flumotion.component.encoders.jpeg.jpeg" />
+      <eater name="default" />
+      <feeder name="default" />
       <entries>
         <entry type="component" location="jpeg.py"
-               function="JPEG"/>
+               function="JPEG" />
       </entries>
       <properties>
-        <property name="quality" type="int"/>
-        <property name="framerate" type="fraction"/>
+        <property name="quality" type="int"
+                  description="Quality of JPEG encoding (from 0 to 100 %)" />
+        <property name="framerate" type="fraction"
+                  description="Framerate to encode at" />
       </properties>
     </component>
  

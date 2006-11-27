@@ -27,3 +27,26 @@ API DOCS
 - defer_generator_method screws up the docs for private methods, causing
   private methods to be listed in the public API.  Avoid using
   defer_generator_method in private methods.
+
+COMPONENTS
+----------
+- component types should always be lowercase, and consist of two
+  dash-separated words.
+  (FIXME: is there a need to have more than one word for the first part ?
+   The last part should always be one word though)
+  The first part should describe what medium or type it handles
+  within the class, and distinguish from others within that class.
+  e.g. firewire-producer, webcam-producer, tvcard-producer, loop-producer,
+       ...
+  The second part should be the class of component:
+  producer, converter, consumer, muxer, encoder, bouncer, ...
+- property names should always be lowercase and dash-separated.
+  example: burst-on-connect, buffer-size, buffer-time
+- property entries should have a full sentence describing them so
+  flumotion-inspect can display this information
+- directory layout:
+  - components always go under flumotion/component
+  - underneath that, they should go in a subdirectory according to class,
+    or misc/
+  - under that, they can go in files matching the first part of the type,
+    or in a separate subdirectory for the component on its own

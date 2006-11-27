@@ -1,32 +1,36 @@
 <registry>
   <components>
-    <component type="tv-card"
-               base="flumotion/component/producers/bttv">
-      <source location="flumotion.component.producers.bttv.bttv"/>
+    <component type="tvcard-producer"
+               base="flumotion/component/producers/bttv"
+              description="A producer that captures a raw video feed from a TV card.">
+      <source location="flumotion.component.producers.bttv.bttv" />
 
-      <feeder name="default"/>
+      <feeder name="default" />
 
       <entries>
         <entry type="component" location="bttv.py"
-               function="BTTV"/>
+               function="BTTV" />
         <entry type="admin/gtk" location="admin_gtk.py"
-               function="GUIClass"/>
+               function="GUIClass" />
       </entries>
       
       <synchronization required="yes" />
 
       <properties>
-        <property name="device" type="string" required="yes"/>
-        <property name="channel" type="string" required="no"/>
-        <property name="signal" type="string" required="no"/>
-        <property name="height" type="int"/>
-        <property name="width" type="int"/>
-        <property name="framerate" type="fraction"/>
+        <property name="device" type="string" required="yes"
+                  description="Path to the device node" />
+        <property name="channel" type="string" required="no"
+                  description="Input channel (TV/Composite1/S-Video/...)" />
+        <property name="signal" type="string" required="no"
+                  description="Signal type (PAL/SECAM/NTSC/...)" />
+        <property name="height" type="int" />
+        <property name="width" type="int" />
+        <property name="framerate" type="fraction" />
 <!-- FIXME: get these into an effect namespace ? -->
-        <property name="hue" type="int" required="no"/>
-        <property name="saturation" type="int" required="no"/>
-        <property name="brightness" type="int" required="no"/>
-        <property name="contrast" type="int" required="no"/>
+        <property name="hue" type="int" required="no" />
+        <property name="saturation" type="int" required="no" />
+        <property name="brightness" type="int" required="no" />
+        <property name="contrast" type="int" required="no" />
 
       </properties>
     </component>

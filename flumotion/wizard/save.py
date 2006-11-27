@@ -52,8 +52,8 @@ class Component(log.Loggable):
     def getFeeders(self):
         s = []
         for source in self.feeders:
-            if source.type == 'firewire':
-                if self.name in ('video-encoder', 'video-overlay'):
+            if source.type == 'firewire-producer':
+                if self.name in ('encoder-video', 'overlay-video'):
                     feed = 'video'
                 else:
                     feed = 'audio'
@@ -95,7 +95,7 @@ class Component(log.Loggable):
                 # FIXME: warn if a property name is not in the registry
                 # change to a more visible warning once we fix all of these
                 if not regentry.hasProperty(name):
-                    self.debug('WARNING: property named %s in component '
+                    self.warning('property named %s in component '
                         'config, but not in registry.  Fix wizard !' % name)
                     continue
                 value = self.props[name]
@@ -110,7 +110,8 @@ class Component(log.Loggable):
         for eater in self.eaters:
             eater.printTree(indent+1)
 
-class WizardSaver:
+class WizardSaver(log.Loggable):
+    logCategory = 'wizard-saver'
     def __init__(self, wizard):
         self.wizard = wizard
         self.registry = registry.getRegistry()
@@ -127,31 +128,31 @@ class WizardSaver:
             props = {}
             worker = self.wizard['Source'].worker
 
-        return Component('video-source', source.component_type, props, worker)
+        return Component('producer-video', source.component_type, props, worker)
 
     def getVideoOverlay(self, show_logo):
         # At this point we already know that we should overlay something
         step = self.wizard['Overlay']
         properties = step.get_component_properties()
         if show_logo:
-            properties['fluendo_logo'] = True
+            properties['fluendo-logo'] = True
             encoding_options = self.wizard.get_step_options('Encoding')
             if (encoding_options['format'] == enums.EncodingFormat.Ogg or
                 encoding_options['video'] == enums.EncodingVideo.Theora):
-                properties['xiph_logo'] = True
+                properties['xiph-logo'] = True
 
             license_options = self.wizard.get_step_options('Content License')
-            if (license_options['set_license']
+            if (license_options['set-license']
                 and license_options['license'] == enums.LicenseType.CC):
-                properties['cc_logo'] = True
+                properties['cc-logo'] = True
             
-        return Component('video-overlay', 'overlay', properties, step.worker)
+        return Component('overlay-video', 'overlay', properties, step.worker)
         
     def getVideoEncoder(self):
         options = self.wizard.get_step_options('Encoding')
         encoder = options['video']
         encoder_step = self.wizard[encoder.step]
-        return Component('video-encoder', encoder.component_type,
+        return Component('encoder-video', encoder.component_type,
                          encoder_step.get_component_properties(),
                          encoder_step.worker)
 
@@ -176,7 +177,7 @@ class WizardSaver:
         else:
             worker = self.wizard['Source'].worker
         
-        return Component('audio-source', source.component_type, props, worker)
+        return Component('producer-audio', source.component_type, props, worker)
 
     def getAudioEncoder(self):
         options = self.wizard.get_step_options('Encoding')
@@ -191,7 +192,7 @@ class WizardSaver:
             props = encoder_step.get_component_properties()
             worker = encoder_step.worker
             
-        return Component('audio-encoder', encoder.component_type, props, worker)
+        return Component('encoder-audio', encoder.component_type, props, worker)
 
     def getMuxer(self, name):
         options = self.wizard.get_step_options('Encoding')
@@ -202,9 +203,9 @@ class WizardSaver:
 
     def handleVideo(self, components):
         overlay_options = self.wizard.get_step_options('Overlay')
-        has_overlay = (overlay_options['can_overlay'] and
-                       (overlay_options['show_logo'] or
-                        overlay_options['show_text']))
+        has_overlay = (overlay_options['can-overlay'] and
+                       (overlay_options['show-logo'] or
+                        overlay_options['show-text']))
         
         video_source =  self.getVideoSource()
         components.append(video_source)
@@ -213,7 +214,7 @@ class WizardSaver:
         video_encoder = self.getVideoEncoder()
             
         if has_overlay:
-            video_overlay = self.getVideoOverlay(overlay_options['show_logo'])
+            video_overlay = self.getVideoOverlay(overlay_options['show-logo'])
             components.append(video_overlay)
                 
         if video_overlay != None:
@@ -238,8 +239,8 @@ class WizardSaver:
     
     def handleConsumers(self, components, audio_encoder, video_encoder):
         cons_options = self.wizard.get_step_options('Consumption')
-        has_audio = self.wizard.get_step_option('Source', 'has_audio')
-        has_video = self.wizard.get_step_option('Source', 'has_video')
+        has_audio = self.wizard.get_step_option('Source', 'has-audio')
+        has_video = self.wizard.get_step_option('Source', 'has-video')
 
         audio_muxer = None
         if has_audio:
@@ -262,46 +263,46 @@ class WizardSaver:
             both_muxer.link(audio_encoder)
             
             if cons_options['http']:
-                if cons_options['http_audio_video']:
-                    steps.append(('http_audio_video', 'http-audio-video',
+                if cons_options['http-audio-video']:
+                    steps.append(('http-audio-video',
                                   'http-streamer',
                                   'HTTP Streamer (audio & video)', both_muxer))
-                if cons_options['http_audio']:
-                    steps.append(('http_audio', 'http-audio', 'http-streamer',
+                if cons_options['http-audio']:
+                    steps.append(('http-audio', 'http-streamer',
                                   'HTTP Streamer (audio only)', audio_muxer))
-                if cons_options['http_video']:
-                    steps.append(('http_video', 'http-video', 'http-streamer',
+                if cons_options['http-video']:
+                    steps.append(('http-video', 'http-streamer',
                                   'HTTP Streamer (video only)', video_muxer))
             if cons_options['disk']:
-                if cons_options['disk_audio_video']:
-                    steps.append(('disk_audio_video', 'disk-audio-video',
-                                  'disker', 'Disk (audio & video)',
+                if cons_options['disk-audio-video']:
+                    steps.append(('disk-audio-video',
+                                  'disk-consumer', 'Disk (audio & video)',
                                   both_muxer))
-                if cons_options['disk_audio']:
-                    steps.append(('disk_audio', 'disk-audio', 'disker',
+                if cons_options['disk-audio']:
+                    steps.append(('disk-audio', 'disk-consumer',
                                   'Disk (audio only)', audio_muxer))
-                if cons_options['disk_video']:
-                    steps.append(('disk_video', 'disk-video', 'disker',
+                if cons_options['disk-video']:
+                    steps.append(('disk-video', 'disk-consumer',
                                   'Disk (video only)', video_muxer))
         elif has_video and not has_audio:
             if cons_options['http']:
-                steps.append(('http_video', 'http-video', 'http-streamer',
+                steps.append(('http-video', 'http-streamer',
                               'HTTP Streamer (video only)', video_muxer))
             if cons_options['disk']:
-                steps.append(('disk_video', 'disk-video', 'disker',
+                steps.append(('disk-video', 'disk-consumer',
                               'Disk (video only)', video_muxer))
         elif has_audio and not has_video:
             if cons_options['http']:
-                steps.append(('http_audio', 'http-audio', 'http-streamer',
+                steps.append(('http-audio', 'http-streamer',
                               'HTTP Streamer (audio only)', audio_muxer))
             if cons_options['disk']:
-                steps.append(('disk_audio', 'disk-audio', 'disker',
+                steps.append(('disk-audio', 'disk-consumer',
                               'Disk (audio only)', audio_muxer))
         else:
             raise AssertionError
 
-        for key, name, type, step_name, muxer in steps:
-            if not cons_options.has_key(key):
+        for name, type, step_name, muxer in steps:
+            if not cons_options.has_key(name):
                 continue
             step = self.wizard[step_name]
             consumer = Component(name, type, step.get_component_properties(),
@@ -319,8 +320,8 @@ class WizardSaver:
 
     def getComponents(self):
         source_options = self.wizard.get_step_options('Source')
-        has_video = source_options['has_video']
-        has_audio = source_options['has_audio']
+        has_video = source_options['has-video']
+        has_audio = source_options['has-audio']
 
         components = []
         
@@ -342,6 +343,7 @@ class WizardSaver:
     def getXML(self):
         # FIXME: allow for naming flows !
         components = self.getComponents()
+        self.debug('Got %d components' % len(components))
         
         s = '<planet>\n'
         s += '  <flow name="%s">\n' % self.wizard.flowName
@@ -351,4 +353,3 @@ class WizardSaver:
         s += '</planet>\n'
 
         return s
-

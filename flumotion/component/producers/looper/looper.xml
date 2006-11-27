@@ -1,7 +1,9 @@
 <registry>
   <components>
-    <component type="looper"
-               base="flumotion/component/producers/looper">
+    <component type="loop-producer"
+               base="flumotion/component/producers/looper"
+               description="Produces a raw audio/video feed from an Ogg file,
+looping continuously.">
       <source location="flumotion.component.producers.looper.looper" />
       <feeder name="audio"/>
       <feeder name="video"/>
@@ -17,10 +19,14 @@
       <synchronization required="yes" clock-priority="110" />
 
       <properties>
-        <property name="height" type="int" />
-        <property name="width" type="int" />
-        <property name="framerate" type="fraction" />
-	<property name="location" type="string" required="yes" />
+        <property name="height" type="int"
+                  description="Height to scale the video to" />
+        <property name="width" type="int"
+                  description="Width to scale the video to" />
+        <property name="framerate" type="fraction"
+                  description="Framerate to output" />
+        <property name="location" type="string" required="yes"
+                  description="Location of the source file to loop" />
       </properties>
     </component>
   </components>

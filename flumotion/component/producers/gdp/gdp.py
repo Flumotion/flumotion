@@ -21,7 +21,7 @@
 
 from flumotion.component import feedcomponent
 
-class GDPTestSrc(feedcomponent.ParseLaunchComponent):
+class GDPProducer(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
         host = properties['host']
         port = properties['port']

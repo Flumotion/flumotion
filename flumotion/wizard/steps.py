@@ -231,7 +231,7 @@ class FireWire(VideoSource):
 
     # options detected from the device:
     dims = None
-    factors = (1,2,3,4,6,8)
+    factors = (1, 2, 3, 4, 6, 8)
     input_heights = None
     input_widths = None
     par = None
@@ -324,9 +324,9 @@ class FireWire(VideoSource):
         options = {} # VideoSource.get_state(self)
         d = self._get_width_height()
         options['height'] = d['oh']
-        options['scaled_width'] = d['sw']
+        options['scaled-width'] = d['sw']
         options['width'] = d['ow']
-        options['is_square'] = self.is_square
+        options['is-square'] = self.is_square
         options['framerate'] = \
             _fraction_from_float(self.spinbutton_framerate.get_value(), 2)
         return options
@@ -529,7 +529,7 @@ class Overlay(WizardStep):
         if self.checkbutton_show_text:
             options['text'] = self.entry_text.get_text()
 
-        options['can_overlay'] = self.can_overlay
+        options['can-overlay'] = self.can_overlay
 
         # XXX: Serious refactoring needed.
         video_options = self.wizard.get_step_options('Source')
@@ -543,7 +543,7 @@ class Overlay(WizardStep):
         return options
 
     def get_next(self):
-        if self.wizard.get_step_option('Source', 'has_audio'):
+        if self.wizard.get_step_option('Source', 'has-audio'):
             audio_source = self.wizard.get_step_option('Source', 'audio')            
             if audio_source == AudioDevice.Soundcard:
                 return 'Soundcard'
@@ -685,7 +685,7 @@ class TestAudioSource(WizardStep):
 
     def get_state(self):
         return {
-            'freq': int(self.spinbutton_freq.get_value()),
+            'frequency': int(self.spinbutton_freq.get_value()),
             'volume': float(self.spinbutton_volume.get_value()),
             'rate': self.combobox_samplerate.get_int()
         }
@@ -734,11 +734,11 @@ class Conversion(WizardSection):
                                                  EncodingVideo.JPEG)
             self.combobox_audio.set_multi_active(EncodingAudio.Mulaw)
 
-        has_audio = self.wizard.get_step_option('Source', 'has_audio')
+        has_audio = self.wizard.get_step_option('Source', 'has-audio')
         self.combobox_audio.set_property('visible', has_audio)
         self.label_audio.set_property('visible', has_audio)
             
-        has_video = self.wizard.get_step_option('Source', 'has_video')
+        has_video = self.wizard.get_step_option('Source', 'has-video')
         self.combobox_video.set_property('visible', has_video)
         self.label_video.set_property('visible', has_video)
     verify = defer_generator_method(verify)
@@ -747,7 +747,7 @@ class Conversion(WizardSection):
         self.verify()
 
     def get_audio_page(self):
-        if self.wizard.get_step_option('Source', 'has_audio'):
+        if self.wizard.get_step_option('Source', 'has-audio'):
             codec = self.combobox_audio.get_enum()
             if codec == EncodingAudio.Vorbis:
                 return 'Vorbis'
@@ -759,7 +759,7 @@ class Conversion(WizardSection):
         return None
         
     def get_next(self):
-        if self.wizard.get_step_option('Source', 'has_video'):
+        if self.wizard.get_step_option('Source', 'has-video'):
             codec = self.combobox_video.get_enum()
             if codec == EncodingVideo.Theora:
                 return 'Theora'
@@ -767,7 +767,7 @@ class Conversion(WizardSection):
                 return 'Smoke'
             elif codec == EncodingVideo.JPEG:
                 return 'JPEG'
-        elif self.wizard.get_step_option('Source', 'has_audio'):
+        elif self.wizard.get_step_option('Source', 'has-audio'):
             return self.get_audio_page()
         else:
             return None
@@ -963,8 +963,8 @@ class Consumption(WizardSection):
                 self.wizard.block_next(False)
 
     def activated(self):
-        has_audio = self.wizard.get_step_option('Source', 'has_audio')
-        has_video = self.wizard.get_step_option('Source', 'has_video')
+        has_audio = self.wizard.get_step_option('Source', 'has-audio')
+        has_video = self.wizard.get_step_option('Source', 'has-video')
         has_both = has_audio and has_video
 
         # Most of the options only makes sense if we selected audio
@@ -978,8 +978,8 @@ class Consumption(WizardSection):
 
     def get_next(self, step=None):
         items = []
-        has_audio = self.wizard.get_step_option('Source', 'has_audio')
-        has_video = self.wizard.get_step_option('Source', 'has_video')
+        has_audio = self.wizard.get_step_option('Source', 'has-audio')
+        has_video = self.wizard.get_step_option('Source', 'has-video')
 
         if has_audio and has_video:
             if self.checkbutton_http:
@@ -1038,8 +1038,8 @@ class HTTP(WizardStep):
     def get_state(self):
         options = WizardStep.get_state(self)
 
-        options['bandwidth_limit'] = int(options['bandwidth_limit'])
-        options['user_limit'] = int(options['user_limit'])
+        options['bandwidth-limit'] = int(options['bandwidth-limit'])
+        options['user-limit'] = int(options['user-limit'])
         options['port'] = int(options['port'])
  
         return options
@@ -1110,14 +1110,14 @@ class Disk(WizardStep):
     def get_state(self):
         options = {}
         if not self.checkbutton_rotate:
-            options['rotateType'] = 'none'
+            options['rotate-type'] = 'none'
         else:
             if self.radiobutton_has_time:
-                options['rotateType'] = 'time'
+                options['rotate-type'] = 'time'
                 unit = self.combobox_time_list.get_enum().unit
                 options['time'] = long(self.spinbutton_time.get_value() * unit)
             elif self.radiobutton_has_size:
-                options['rotateType'] = 'size'
+                options['rotate-type'] = 'size'
                 unit = self.combobox_size_list.get_enum().unit
                 options['size'] = long(self.spinbutton_size.get_value() * unit)
 

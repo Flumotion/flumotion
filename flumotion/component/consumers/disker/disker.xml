@@ -1,29 +1,33 @@
 <registry>
   <components>
-    <component type="disker"
-               base="flumotion/component/consumers/disker">
-      <source location="flumotion.component.consumers.disker.disker"/>
+    <component type="disk-consumer"
+               base="flumotion/component/consumers/disker"
+               description="Archives a stream to disk.">
+      <source location="flumotion.component.consumers.disker.disker" />
 
-      <eater name="default"/>
+      <eater name="default" />
 
       <entries>
         <entry type="component" location="disker.py"
-               function="Disker"/>
+               function="Disker" />
         <entry type="admin/gtk" location="admin_gtk.py"
-               function="GUIClass"/>
+               function="GUIClass" />
         <entry type="admin/text" location="admin_text.py"
               function="UIClass" />
       </entries>
       
       <properties>
         <property name="directory" type="string" required="yes" />
-        <property name="rotateType" type="string" required="yes" />
+        <property name="rotate-type" type="string" required="yes"
+                  description="'size' or 'time'"/>
+        <property name="size" type="long"
+                  description="Maximum size of each file (in bytes)" />
+        <property name="time" type="long"
+                  description="Maximum duration of each file (in seconds)" />
         <property name="start-recording" type="bool" required="no" />
         <property name="symlink-to-last-recording" type="string" required="no" />
         <property name="symlink-to-current-recording" type="string" required="no" />
         <property name="ical-schedule" type="string" required="no" />
-        <property name="size" type="long"/>
-        <property name="time" type="long"/>
       </properties>
     </component>
   </components>

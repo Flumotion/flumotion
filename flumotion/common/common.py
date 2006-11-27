@@ -697,3 +697,14 @@ class InitMixin(object):
 
     def __init__(self, *args, **kwargs):
         call_each_method_reversed(self, 'init', *args, **kwargs)
+
+def strToBool(string):
+    """
+    @type  string: str
+
+    @return: True if the string represents a value we interpret as true.
+    """
+    if string in ('True', 'true', '1', 'yes'):
+        return True
+
+    return False

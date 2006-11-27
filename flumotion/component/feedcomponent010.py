@@ -385,6 +385,13 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline_signals = []
         self.bus_watch_id = None
 
+        # clean up checkEater callLaters
+        for feedId in self.eater_names:
+            status = self._eaterStatus[feedId]
+            if status['checkEaterDC']:
+                status['checkEaterDC'].cancel()
+                status['checkEaterDC'] = None
+
     def do_stop(self):
         self.debug('Stopping')
         if self.pipeline:

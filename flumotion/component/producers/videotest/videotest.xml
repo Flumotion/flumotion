@@ -1,35 +1,38 @@
 <registry>
   <components>
-    <component type="videotest"
-               base="flumotion/component/producers/videotest">
-      <source location="flumotion.component.producers.videotest.videotest"/>
+    <component type="videotest-producer"
+               base="flumotion/component/producers/videotest"
+               description="Produces a raw video feed with a test signal.">
+      <source location="flumotion.component.producers.videotest.videotest" />
 
-      <feeder name="default"/>
+      <feeder name="default" />
 
       <synchronization required="yes" />
 
       <entries>
         <entry type="component" location="videotest.py"
-               function="VideoTest"/>
+               function="VideoTest" />
         <entry type="admin/gtk" location="admin_gtk.py"
-               function="GUIClass"/>
+               function="GUIClass" />
         <entry type="admin/text" location="admin_text.py"
-               function="UIClass"/>
+               function="UIClass" />
       </entries>
 
       <properties>
-        <property name="height" type="int"/>
-        <property name="width" type="int"/>
-        <property name="framerate" type="fraction"/>
-        <property name="format" type="string"/>
-        <property name="pattern" type="int"/>
+        <property name="height" type="int" />
+        <property name="width" type="int" />
+        <property name="framerate" type="fraction" />
+        <property name="format" type="string"
+                  description="Video format" />
+        <property name="pattern" type="int"
+                  description="Test pattern to show (smpte/snow/black/..." />
       </properties>
     </component>
   </components>
 
   <bundles>
 
-    <bundle name="videotest-base">
+    <bundle name="videotest-producer-base">
         <dependencies>
             <dependency name="component-base" />
         </dependencies>
@@ -41,9 +44,9 @@
         </directories>
     </bundle>
 
-    <bundle name="videotest-admin-gtk">
+    <bundle name="videotest-producer-admin-gtk">
       <dependencies>
-        <dependency name="videotest-base" />
+        <dependency name="videotest-producer-base" />
         <dependency name="base-admin-gtk" />
       </dependencies>
 
@@ -53,9 +56,9 @@
         </directory>
       </directories>
     </bundle>
-    <bundle name="videotest-admin-text">
+    <bundle name="videotest-producer-admin-text">
       <dependencies>
-        <dependency name="videotest-base" />
+        <dependency name="videotest-producer-base" />
         <dependency name="base-admin-text" />
       </dependencies>
       <directories>
@@ -64,10 +67,10 @@
         </directory>
       </directories>
     </bundle>
-    <bundle name="videotest-component">
+    <bundle name="videotest-producer-component">
         <dependencies>
             <dependency name="component" />
-            <dependency name="videotest-base" />
+            <dependency name="videotest-producer-base" />
         </dependencies>
 
         <directories>

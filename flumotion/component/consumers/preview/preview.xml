@@ -1,7 +1,8 @@
 <registry>
   <components>
-    <component type="preview"
-               base="flumotion/component/consumers/preview">
+    <component type="preview-consumer"
+               base="flumotion/component/consumers/preview"
+               description="Play back an encoded feed (currently only video)">
       <source location="flumotion.component.consumers.preview.preview"/>
 
       <eater name="default"/>

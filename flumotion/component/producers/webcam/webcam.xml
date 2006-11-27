@@ -1,10 +1,11 @@
 <registry>
   <components>
-    <component type="web-camera"
-               base="flumotion/component/producers/webcam">
+    <component type="webcam-producer"
+               base="flumotion/component/producers/webcam"
+               description="Produces a raw video feed from a webcam.">
       <source location="flumotion.component.producers.webcam.webcam" />
 
-      <feeder name="default"/>
+      <feeder name="default" />
 
       <synchronization required="yes" />
 
@@ -16,10 +17,13 @@
       </entries>
 
       <properties>
-        <property name="device" type="string" required="yes"/>
+        <property name="device" type="string" required="yes"
+                  description="Path to device node to capture from" />
 
-        <property name="mime" type="string" />
-        <property name="format" type="string" />
+        <property name="mime" type="string"
+                  description="Mime type of video to produce (e.g. video/x-raw-yuv" />
+        <property name="format" type="string"
+                  description="Colorspace fourcc to capture in" />
 
         <property name="width" type="int" />
         <property name="height" type="int" />

@@ -1,17 +1,19 @@
 <registry>
   <components>
     <component type="tokentestbouncer"
-               base="flumotion/component/bouncers">
+               base="flumotion/component/bouncers"
+               description="A test bouncer that only allows one token.">
 
-      <source location="flumotion.component.bouncers.tokentest"/>
+      <source location="flumotion.component.bouncers.tokentest" />
 
       <entries>
         <entry type="component" location="tokentest.py"
-               function="TokenTestBouncer"/>
+               function="TokenTestBouncer" />
       </entries>
 
       <properties>
-        <property name="authorized-token" type="string" required="True"/>
+        <property name="authorized-token" type="string" required="True"
+                  description="The token that is authorized" />
       </properties>
     </component>
   </components>

@@ -30,7 +30,6 @@ import sys
 
 from flumotion.common import log, common, dag, registry
 
-
 __all__ = ['parse_args']
 
 
@@ -90,7 +89,7 @@ class Component(object):
             parsers = {'int': int,
                        'long': long,
                        'float': float,
-                       'bool': bool,
+                       'bool': common.strToBool,
                        'string': str,
                        'fraction': parse_fraction}
 

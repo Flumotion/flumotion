@@ -2,18 +2,20 @@
 
   <components>
     <component type="pipeline-producer"
-               base="flumotion/component/producers/pipeline">
-      <source location="flumotion.component.producers.pipeline.pipeline"/>
-      <feeder name="default"/>
+               base="flumotion/component/producers/pipeline"
+               description="Generic GStreamer pipeline converter">
+      <source location="flumotion.component.producers.pipeline.pipeline" />
+      <feeder name="default" />
       <entries>
         <entry type="component" location="pipeline.py"
-               function="Producer"/>
+               function="Producer" />
       </entries>
 
       <synchronization required="yes" />
 
       <properties>
-        <property name="pipeline" type="string" required="yes"/>
+        <property name="pipeline" type="string" required="yes"
+                  description="Partial GStreamer pipeline to use" />
       </properties>
     </component>
   </components>
