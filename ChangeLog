@@ -1,3 +1,10 @@
+2006-11-27  Michael Smith  <msmith@fluendo.com>
+
+	* data/upgrade-to-0.3.2.xsl:
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/misc/porter/porter.xml:
+	  socket_path -> socket-path for porter component.
+
 2006-11-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/registry.py:

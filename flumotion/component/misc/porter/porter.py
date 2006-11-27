@@ -254,14 +254,17 @@ class Porter(component.BaseComponent, log.Loggable):
 
     def do_setup(self):
         props = self.config['properties']
+
+        self.fixRenamedProperties(props, 
+            [('socket_path',        'socket-path')])
     
         # We can operate in two modes: explicitly configured (neccesary if you
         # want to handle connections from components in other managers), and
         # self-configured (which is sufficient for slaving only streamers
         # within this manager
-        if props.has_key('socket_path'):
+        if props.has_key('socket-path'):
             # Explicitly configured
-            self._socketPath = props['socket_path']
+            self._socketPath = props['socket-path']
             self._username = props['username']
             self._password = props['password']
         else:

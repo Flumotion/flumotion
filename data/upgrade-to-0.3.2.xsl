@@ -65,6 +65,8 @@
           >issuer-class</xsl:when>
         <xsl:when test=". = 'mount_point'"
           >mount-point</xsl:when>
+        <xsl:when test=". = 'socket_path'"
+          >socket-path</xsl:when>
         <xsl:when test=". = 'porter_socket_path'"
           >porter-socket-path</xsl:when>
         <xsl:when test=". = 'porter_username'"
