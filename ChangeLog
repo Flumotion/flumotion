@@ -1,3 +1,9 @@
+2006-11-28  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/wizard/save.py (WizardSaver.getVideoOverlay): 
+	* flumotion/wizard/enums.py (VideoDevice): Fix some parts of the
+	wizard for The Breaking Of The Code Coherence. Oh the taint!
+
 2006-11-27  Michael Smith  <msmith@fluendo.com>
 
 	* conf/managers/default/planet.xml:

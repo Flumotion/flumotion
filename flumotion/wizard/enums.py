@@ -42,10 +42,10 @@ VideoDevice = enum.EnumClass('VideoDevice',
                               'Firewire'
                              ),
                         component_type=(
-                                        'videotest',
-                                        'web-camera',
-                                        'tv-card',
-                                        'firewire'
+                                        'videotest-producer',
+                                        'webcam-producer',
+                                        'tvcard-producer',
+                                        'firewire-producer'
                                         ),
                         element_names=(
                                        ('videotestsrc',),

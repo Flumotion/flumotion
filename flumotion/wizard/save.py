@@ -146,7 +146,8 @@ class WizardSaver(log.Loggable):
                 and license_options['license'] == enums.LicenseType.CC):
                 properties['cc-logo'] = True
             
-        return Component('overlay-video', 'overlay', properties, step.worker)
+        return Component('overlay-video', 'overlay-converter',
+                         properties, step.worker)
         
     def getVideoEncoder(self):
         options = self.wizard.get_step_options('Encoding')
