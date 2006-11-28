@@ -760,7 +760,7 @@ class WorkerBrain(log.Loggable):
         return avatarId in self._shutdownDeferreds
 
     ### IFeedServerParent methods
-    def feedToFD(self, componentId, feedName, fd):
+    def feedToFD(self, componentId, feedName, fd, eaterId):
         """
         Called from the FeedAvatar to pass a file descriptor on to
         the job running the component for this feeder.
@@ -768,7 +768,7 @@ class WorkerBrain(log.Loggable):
         @returns: whether the fd was successfully handed off to the component.
         """
         avatar = self.jobHeaven.avatars[componentId]
-        return avatar.sendFeed(feedName, fd)
+        return avatar.sendFeed(feedName, fd, eaterId)
 
     def eatFromFD(self, componentId, feedId, fd):
         """
@@ -889,7 +889,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
     def remote_ready(self):
         pass
 
-    def sendFeed(self, feedName, fd):
+    def sendFeed(self, feedName, fd, eaterId):
         """
         Tell the feeder to send the given feed to the given fd.
 
@@ -905,7 +905,7 @@ class JobAvatar(pb.Avatar, log.Loggable):
         if self._mind:
             try:
                 self._mind.broker.transport.sendFileDescriptor(
-                    fd, "sendFeed %s" % feedName)
+                    fd, "sendFeed %s %s" % (feedName, eaterId))
                 return True
             except exceptions.RuntimeError, e:
                 # RuntimeError is what is thrown by the C code doing this

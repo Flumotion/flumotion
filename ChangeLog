@@ -1,5 +1,159 @@
 2006-11-28  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/base/admin_gtk.py (StateWatcher)
+	(PlumbingAdminGtkNode.addFeeder)
+	(PlumbingAdminGtkNode.addFeederClient)
+	(PlumbingAdminGtkNode.removeFeederClient)
+	(PlumbingAdminGtkNode.setUIState): Expect a list key instead of a
+	dict key.
+
+	* flumotion/component/feedcomponent010.py (Feeder.__init__)
+	(Feeder.addClient, Feeder.removeClient, FeedComponent.init)
+	(FeedComponent.do_setup): Use list keys instead of dict keys for
+	now, making migration a bit easier.
+
+	* flumotion/twisted/flavors.py (StateCacheable.setitem)
+	(StateCacheable.delitem): Rename from dictSet/dictRemove to be
+	more consistent with python's dicts.
+
+	* flumotion/twisted/flavors.py (StateCacheable.dictRemove): Be a
+	bit more clear in the docs.
+
+2006-11-27  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/admin/gtk/client.py
+	(Window._components_view_has_selection_cb): Make a generic admin
+	UI if the component does not provide one.
+
+	* flumotion/component/base/admin_gtk.py
+	(PlumbingAdminGtkNode.setFeederClientBytesRead): Byte me
+
+	* flumotion/component/base/plumbing.glade: 
+	* flumotion/component/base/base.xml: 
+	* flumotion/component/base/Makefile.am (component_DATA): Add the
+	glade file.
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.setup): Add
+	a "plumbing" node to all admin uis.
+	(StateWatcher): Experimental class to help out with recursive
+	state watching. Not really sure what to do with it tho.
+	(PlumbingAdminGtkNode): New crazy UI to see what's going on with
+	low-level thingses on elements.
+
+	* flumotion/component/producers/videotest/admin_gtk.py
+	(VideoTestAdminGtk.setup): 
+	* flumotion/component/producers/audiotest/admin_gtk.py
+	(AudioTestAdminGtk.setup): Use the stock .nodes attribute, and
+	chain up correctly.
+
+2006-11-23  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/job/job.py (JobClientBroker.fileDescriptorsReceived):
+	Pass along the eaterId to the component.
+	(JobClientBroker.fileDescriptorsReceived): Cope with older
+	workers. Also this is my best hack of the last couple weeks!
+
+	* flumotion/worker/feed.py (FeedAvatar.__init__)
+	(FeedAvatar._sendFeedReplyCb)
+	(_WorkerFeedDispatcher.requestAvatar): Take advantage of the
+	avatarId on the keycard to identify the feeder client.
+
+	* flumotion/worker/worker.py (WorkerBrain.feedToFD)
+	(JobAvatar.sendFeed): Take an extra argument from the feed server,
+	the eaterId. Send it to the component via the message in
+	sendFileDescriptor.
+
+	* flumotion/component/feedcomponent010.py (Feeder, FeederClient):
+	New classes, keep track of statistics about feeders and their
+	clients. Export a uiState object.
+	(FeedComponent.init, FeedComponent.do_setup): Set up the Feeders
+	as soon as we know about them.
+	(FeedComponent.setup_pipeline)
+	(FeedComponent._feeder_probe_calllater): Every so often, check the
+	stats from multifdsink so we can see e.g. the number of dropped
+	buffers.
+	(FeedComponent.feedToFD, FeedComponent.removeFDCallback): Add and
+	remove feeder clients as appropriate. feedToFD now takes an
+	optional eaterId argument, to identify the feeder client.
+
+	* flumotion/admin/command/commands.py
+	(do_showcomponent.show_uistate): Recursive UI state printing woo.
+
+	* flumotion/twisted/flavors.py (StateCacheable.addListKey)
+	(StateCacheable.addDictKey): Stricter check for default value;
+	otherwise passing an initial value of [] or {} was not respected,
+	resulting in the creation of a separate object.
+
+2006-11-22  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_flavors.py (TestRoot.remote_haggis): Remove
+	dup bearChild
+
+	* flumotion/admin/text/view.py (AdminTextView.update_components):
+	Pychecker fix.
+
+	* flumotion/test/test_flavors.py
+	(TestStateSet.testStateDictListener)
+	(TestState.testStateDictAppendRemove, TestStateSet.listen): Add
+	some testes.
+
+	* flumotion/twisted/flavors.py (StateCacheable.addDictKey)
+	(StateCacheable.dictSet, StateCacheable.dictRemove)
+	(StateRemoteCache.addListener, StateRemoteCache.observe_dictSet)
+	(StateRemoteCache.observe_dictRemove): Implement dict keys in
+	statecache/statecacheable objects.
+
+	* flumotion/twisted/flavors.py (StateRemoteCache.addListener): In
+	a nod to compatibility with many managers running different
+	versions, allow old behavior, with a warning.
+	(StateRemoteCache.addListener): Cache objects are not loggable...
+
+	* flumotion/twisted/flavors.py (StateRemoteCache.addListener):
+	Simplify by requiring callers to pass in event handlers for 'set',
+	'append', and 'remove' events. This means that callers don't have
+	to implement a specific interface any more.
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.setUIState)
+	(BaseAdminGtkNode.setUIState): Update for new API.
+	(EffectAdminGtkNode): Doc fix.
+
+	* flumotion/ui/trayicon.py (FluTrayIcon.update): 
+	* flumotion/manager/component.py (ComponentAvatar.attached): 
+	* flumotion/component/bouncers/admin_gtk.py
+	(KeycardsNode._gotStateCallback):
+	* flumotion/wizard/worker.py (WorkerListStore.__init__): 
+	* flumotion/common/planet.py (ManagerComponentState.setJobState):
+	Update for new API.
+
+	* flumotion/admin/command/commands.py (MoodListener)
+	(do_avatar_action): Update to take advantage of new API. Increase
+	evil in the world.
+
+	* flumotion/admin/gtk/client.py (Window.setPlanetState)
+	(Window._components_view_has_selection_cb): 
+	* flumotion/admin/gtk/parts.py (ComponentsView.update): 
+	* flumotion/admin/text/view.py (AdminTextView.update_components)
+	(AdminTextView.setPlanetState): Update to comform to and take
+	advantage of newer API.
+
+	* flumotion/test/test_manager_manager.py (MyListener.__init__)
+	(TestVishnu._verifyConfigAndOneWorker): 
+	* flumotion/test/test_common_planet.py (setUp): 
+	* flumotion/test/test_flavors.py
+	(TestStateSet.testStateWrongListener.got_state_and_stop)
+	(TestStateSet.listen, TestStateSet.testStateSetListener)
+	(TestStateSet.testStateAppendRemoveListener)
+	(TestFullListener.testStateAppendRemoveListener)
+	(TestFullListener.testStateSetListener):
+	* flumotion/test/test_common_componentui.py (TestStateSet.listen)
+	(TestStateSet.testSimpleStateListener)
+	(TestStateSet.testStateListener)
+	(TestStateSet.testStateListenerIntermediate)
+	(TestStateSet.testStateSaveReference): Adapt tests to new
+	requirements of statecache API.
+
+2006-11-28  Andy Wingo  <wingo@pobox.com>
+
 	* flumotion/wizard/save.py (WizardSaver.getVideoOverlay): 
 	* flumotion/wizard/enums.py (VideoDevice): Fix some parts of the
 	wizard for The Breaking Of The Code Coherence. Oh the taint!

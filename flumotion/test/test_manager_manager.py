@@ -47,8 +47,9 @@ class MyListener(log.Loggable):
     # a certain state has a certain key set to a certain value
     implements(flavors.IStateListener)
 
-    def __init__(self):
+    def __init__(self, state):
         self._setters = {} # (state, key, value) tuple -> list of deferred
+        state.addListener(self, set=self.stateSet)
         
     def notifyOnSet(self, state, key, value):
         self.debug("notify on state %r key %r set to value %r" % (
@@ -76,9 +77,6 @@ class MyListener(log.Loggable):
                 self.debug("firing deferred %s" % d)
                 d.callback(None)
             del self._setters[t]
-
-    def stateAppend(self, object, key, value): pass
-    def stateRemove(self, object, key, value): pass
     
 class FakeComponentAvatar(log.Loggable):
     ### since we fake out componentavatar, eaters need to be specified fully
@@ -679,8 +677,7 @@ class TestVishnu(log.Loggable, unittest.TestCase):
         self.failUnless(m.jobState)
 
         state = m.jobState
-        l = MyListener()
-        state.addListener(l)
+        l = MyListener(state)
         d = l.notifyOnSet(state, 'mood', moods.happy.value)
 
         def verifyMoodIsHappy(result):

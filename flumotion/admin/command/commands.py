@@ -23,7 +23,7 @@ import os
 from flumotion.twisted.defer import defer_generator
 from flumotion.admin.command import utils
 from flumotion.common.planet import moods
-from flumotion.common import errors
+from flumotion.common import errors, log, componentui
 from flumotion.twisted import flavors
 from flumotion.twisted.compat import implements
 from twisted.internet import defer
@@ -122,6 +122,26 @@ def do_getmood(model, quit, avatarId):
 do_getmood = defer_generator(do_getmood)
 
 def do_showcomponent(model, quit, avatarId):
+    def show_uistate(k, v, indent=0):
+        if isinstance(v, list):
+            show_uistate(k, '<list>', indent)
+            for x in v:
+                show_uistate(None, x, indent+4)
+        elif isinstance(v, dict):
+            show_uistate(k, '<dict>', indent)
+            keys = v.keys()
+            keys.sort()
+            for k in keys:
+                show_uistate(k, v[k], indent+4)
+        elif isinstance(v, componentui.AdminComponentUIState):
+            show_uistate(k, '<uistate>', indent)
+            keys = v.keys()
+            keys.sort()
+            for k in keys:
+                show_uistate(k, v.get(k), indent+4)
+        else:
+            print '%s%s%s' % (' '*indent, k and k+': ' or '', v)
+        
     d = model.callRemote('getPlanetState')
     yield d
     planet = d.value()
@@ -134,13 +154,14 @@ def do_showcomponent(model, quit, avatarId):
             print '    %s: %r' % (k, c.get(k))
         d = utils.get_component_uistate(model, avatarId, c, quiet=True)
         yield d
-        ui = d.value()
-        if ui:
-            print '\nUI state:'
-            keys = ui.keys()
-            keys.sort()
-            for k in keys:
-                print '    %s: %r' % (k, ui.get(k))
+        try:
+            ui = d.value()
+            if ui:
+                print
+                show_uistate('UI state', ui)
+        except Exception, e:
+            print 'Error while retrieving UI state:', \
+                  log.getExceptionMessage(e)
     quit()
 do_showcomponent = defer_generator(do_showcomponent)
 
@@ -246,32 +267,15 @@ def do_showworkers(model, quit):
     quit()
 do_showworkers = defer_generator(do_showworkers)
 
-class MoodListener:
-    implements(flavors.IStateListener)
-    
-    def __init__(self):
-        self._moodDefer = None
-        self._moodFinal = None
-
-    def waitOnMood(self, moods):
-        """
-        @type moods: tuple of moods
-        """
-        self._moodDefer = defer.Deferred()
+class MoodListener(defer.Deferred):
+    def __init__(self, moods, state):
         self._moodsFinal = moods
-        return self._moodDefer
+        state.addListener(self, self.stateSet)
 
     def stateSet(self, object, key, value):
-        if self._moodDefer:
-            if key == 'mood' and moods[value] in self._moodsFinal:
-                self._moodDefer.callback(moods[value])
+        if key == 'mood' and moods[value] in self._moodsFinal:
+            self.callback(moods[value])
                 
-    def stateAppend(self, object, key, value):
-        pass
-
-    def stateRemove(self, object, key, value):
-        pass
-
 # FIXME: nicer to rewrite do_stop, do_start and do_delete to run some common 
 # code
 def do_avatar_action(model, quit, avatarPath, action):
@@ -322,10 +326,7 @@ def do_avatar_action(model, quit, avatarPath, action):
                 dl.append(actD)
                 if action[2]:
                     # wait for component to be in certain moods
-                    listener = MoodListener()
-                    waitForMoodD = listener.waitOnMood(action[2])
-                    comp.addListener(listener)
-                    dl.append(waitForMoodD)
+                    dl.append(MoodListener(action[2], comp))
         d = defer.DeferredList(dl)
         yield d
         d.value()

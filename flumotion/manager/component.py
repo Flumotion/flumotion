@@ -61,7 +61,6 @@ class ComponentAvatar(base.ManagerAvatar):
     """
 
     logCategory = 'comp-avatar'
-    implements(flavors.IStateListener)
 
     def __init__(self, *args, **kwargs):
         # doc in base class
@@ -158,7 +157,8 @@ class ComponentAvatar(base.ManagerAvatar):
         
         d = self.vishnu.componentAttached(self)
         # listen to the mood so we can tell the depgraph
-        d.addCallback(lambda _: self.jobState.addListener(self))
+        d.addCallback(lambda _: self.jobState.addListener(self,
+                                                          set=self.stateSet))
         # make heaven register component
         d.addCallback(lambda _: self.heaven.registerComponent(self))
         d.addCallback(lambda _: self.vishnu.registerComponent(self))
@@ -205,12 +205,6 @@ class ComponentAvatar(base.ManagerAvatar):
                     d.callback(True)
                 self._happydefers = []
 
-    def stateAppend(self, state, key, value):
-        pass
-
-    def stateRemove(self, state, key, value):
-        pass
-                
     # my methods
     def parseEaterConfig(self, eater_config):
         # the source feeder names come from the config

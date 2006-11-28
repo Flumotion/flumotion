@@ -205,8 +205,6 @@ class ManagerComponentState(flavors.StateCacheable):
       - messages (list)
     """
  
-    implements(flavors.IStateListener)
-    
     def __init__(self):
         flavors.StateCacheable.__init__(self)
         # our additional keys
@@ -239,7 +237,17 @@ class ManagerComponentState(flavors.StateCacheable):
             v = jobState.get(key)
             if v != None:
                 self.set(key, v)
-        jobState.addListener(self)
+                
+        # only proxy keys we want proxied; eaterNames and feederNames
+        # are ignored for example
+        def proxy(attr):
+            def event(state, key, value):
+                if key in _jobStateKeys:
+                    getattr(self, attr)(key, value)
+            return event
+
+        jobState.addListener(self, proxy('set'), proxy('append'),
+                             proxy('remove'))
 
     def clearJobState(self):
         """
@@ -247,21 +255,6 @@ class ManagerComponentState(flavors.StateCacheable):
         """
         self._jobState.removeListener(self)
         self._jobState = None
-
-    # IStateListener interface
-    # only proxy keys we want proxied; eaterNames and feederNames are ignored
-    # for example
-    def stateAppend(self, state, key, value):
-        if key in _jobStateListKeys:
-            self.append(key, value)
-
-    def stateRemove(self, state, key, value):
-        if key in _jobStateListKeys:
-            self.remove(key, value)
-
-    def stateSet(self, state, key, value):
-        if key in _jobStateKeys:
-            self.set(key, value)
 
 class AdminComponentState(flavors.StateRemoteCache):
     """

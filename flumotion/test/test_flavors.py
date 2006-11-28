@@ -55,10 +55,23 @@ class TestRoot(testclasses.TestManagerRoot):
         self.state = TestStateCacheable()
         self.state.addKey('name', 'lois')
         self.state.addListKey('children')
+        self.state.addDictKey('nationalities')
         return self.state
 
     def remote_setStateName(self, name):
         return self.state.set('name', name)
+
+    def remote_haggis(self):
+        return self.state.setitem('nationalities',
+                                  'mary queen of scots', 'scotland')
+
+    def remote_emigrate(self):
+        return self.state.setitem('nationalities',
+                                  'mary queen of scots', 'norway')
+
+    def remote_coup(self):
+        return self.state.delitem('nationalities',
+                                     'mary queen of scots')
 
     def remote_bearChild(self, name):
         return self.state.append('children', name)
@@ -171,10 +184,8 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(lambda _: self.perspective.callRemote('getState'))
 
         def got_state_and_stop(state):
-            self.assertRaises(NotImplementedError, state.addListener, FakeObject())
-            self.assertRaises(NotImplementedError, state.removeListener,
-                              FakeObject())
-            self.assertRaises(KeyError, state.removeListener, FakeListener())
+            self.assertRaises(Exception, state.addListener, FakeObject())
+            self.assertRaises(KeyError, state.removeListener, FakeObject())
             return self.stopClient()
 
         d.addCallback(got_state_and_stop)
@@ -183,17 +194,12 @@ class TestStateSet(unittest.TestCase):
         else:
             return d
 
-    # listener interface
-    implements(flavors.IStateListener)
-    
-    def stateSet(self, state, key, value):
-        self.changes.append(('set', state, key, value))
-
-    def stateAppend(self, state, key, value):
-        self.changes.append(('append', state, key, value))
-
-    def stateRemove(self, state, key, value):
-        self.changes.append(('remove', state, key, value))
+    def listen(self, state):
+        def event(type):
+            return lambda *x: self.changes.append((type,) + x)
+        state.addListener(self, event('set'), event('append'),
+                          event('remove'), event('setitem'),
+                          event('delitem'))
 
     # listener tests
     def testStateSetListener(self):
@@ -204,7 +210,7 @@ class TestStateSet(unittest.TestCase):
         # ask server to set the name
         def add_listener_and_set_name(state):
             d.state = state # monkeypatch
-            state.addListener(self)
+            self.listen(state)
             return self.perspective.callRemote('setStateName', 'robin')
 
         def check_results(_):
@@ -226,7 +232,7 @@ class TestStateSet(unittest.TestCase):
 
         def add_listener_and_bear_child(state):
             d.state = state # monkeypatch
-            state.addListener(self)
+            self.listen(state)
             return self.perspective.callRemote('bearChild', 'robin')
 
         def check_append_results_and_adopt_kid(_):
@@ -248,6 +254,44 @@ class TestStateSet(unittest.TestCase):
         d.addCallback(check_append_results_and_adopt_kid)
         d.addCallback(check_remove_results_and_bear_child)
         d.addCallback(check_append_results_and_stop)
+        if weHaveAnOldTwisted(): #T1.3
+            return unittest.deferredResult(d)
+        else:
+            return d
+
+    def testStateDictListener(self):
+        # start everything and get the state
+        d = self.runClient()
+        d.addCallback(lambda _: self.perspective.callRemote('getState'))
+
+        def add_listener_and_haggis(state):
+            d.state = state # monkeypatch
+            self.listen(state)
+            return self.perspective.callRemote('haggis')
+
+        def check_set_results_and_emigrate(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('setitem', d.state, 'nationalities',
+                                     'mary queen of scots', 'scotland'))
+            return self.perspective.callRemote('emigrate')
+
+        def check_set_results_and_coup_de_etat(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('setitem', d.state, 'nationalities',
+                                     'mary queen of scots', 'norway'))
+            return self.perspective.callRemote('coup')
+
+        def check_remove_results_and_stop(_):
+            c = self.changes.pop()
+            self.failUnlessEqual(c, ('delitem', d.state,
+                                     'nationalities',
+                                     'mary queen of scots', 'norway'))
+            return self.stopClient()
+
+        d.addCallback(add_listener_and_haggis)
+        d.addCallback(check_set_results_and_emigrate)
+        d.addCallback(check_set_results_and_coup_de_etat)
+        d.addCallback(check_remove_results_and_stop)
         if weHaveAnOldTwisted(): #T1.3
             return unittest.deferredResult(d)
         else:
@@ -293,31 +337,19 @@ class TestFullListener(unittest.TestCase):
         d = self.sport.stopListening()
         return d
 
-    # actual tests
-    implements(flavors.IStateListener)
-    
-    def customStateSet(self, state, key, value):
-        self.changes.append(('set', state, key, value))
-
-    def customStateAppend(self, state, key, value):
-        self.changes.append(('append', state, key, value))
-
-    def customStateRemove(self, state, key, value):
-        self.changes.append(('remove', state, key, value))
-
     # listener tests
     def testStateSetListener(self):
         # start everything and get the state
         d = self.runClient()
         d.addCallback(lambda _: self.perspective.callRemote('getState'))
 
+        def customStateSet(state, key, value):
+            self.changes.append(('set', state, key, value))
+
         # ask server to set the name
         def add_listener_and_set_name(state):
             d.state = state # monkeypatch
-            state.addListener(self,
-                              set=self.customStateSet,
-                              append=self.customStateAppend,
-                              remove=self.customStateRemove)
+            state.addListener(self, set=customStateSet)
             return self.perspective.callRemote('setStateName', 'robin')
 
         def check_results(_):
@@ -337,13 +369,17 @@ class TestFullListener(unittest.TestCase):
         d = self.runClient()
         d.addCallback(lambda _: self.perspective.callRemote('getState'))
 
+        def customStateAppend(state, key, value):
+            self.changes.append(('append', state, key, value))
+
+        def customStateRemove(state, key, value):
+            self.changes.append(('remove', state, key, value))
+
         def add_listener_and_bear_child(state):
             d.state = state # monkeypatch
             # here test the positional-arguments code
-            state.addListener(self,
-                              None,
-                              self.customStateAppend,
-                              self.customStateRemove)
+            state.addListener(self, append=customStateAppend,
+                              remove=customStateRemove)
             return self.perspective.callRemote('bearChild', 'robin')
 
         def check_append_results_and_adopt_kid(_):
@@ -414,3 +450,18 @@ class TestState(unittest.TestCase):
         self.assertEquals(c.get('alist'), [])
         self.assertRaises(KeyError, c.remove, 'randomlistkey', 'value')
         self.assertRaises(ValueError, c.remove, 'alist', 'value')
+
+    def testStateDictAppendRemove(self):
+        c = flavors.StateCacheable()
+
+        c.addDictKey('adict')
+
+        c.setitem('adict', 'akey', 'avalue')
+        self.assertEquals(c.get('adict'), {'akey': 'avalue'})
+        c.setitem('adict', 'akey', 'bvalue')
+        self.assertEquals(c.get('adict'), {'akey': 'bvalue'})
+
+        c.delitem('adict', 'akey')
+        self.assertEquals(c.get('adict'), {})
+        self.assertRaises(KeyError, c.delitem, 'randomdictkey', 'value')
+        self.assertRaises(KeyError, c.delitem, 'adict', 'akey')

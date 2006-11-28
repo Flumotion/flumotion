@@ -85,7 +85,7 @@ class FeedAvatar(fpb.Avatar):
     logCategory = "feedavatar"
     remoteLogName = "feedmedium"
 
-    def __init__(self, feedServerParent):
+    def __init__(self, feedServerParent, avatarId):
         """
         @param feedServerParent: the parent of the feed server
         @type  feedServerParent: implementor of
@@ -93,6 +93,7 @@ class FeedAvatar(fpb.Avatar):
         """
         self._transport = None
         self._feedServerParent = feedServerParent
+        self.avatarId = avatarId
 
     def attached(self, mind):
         self.debug("mind %s attached" % mind)
@@ -123,8 +124,10 @@ class FeedAvatar(fpb.Avatar):
         self.debug("Attempting to send FD: %d" % t.fileno())
         
         (flowName, componentName, feedName) = common.parseFullFeedId(fullFeedId)
-        if self._feedServerParent.feedToFD(
-            common.componentId(flowName, componentName), feedName, t.fileno()):
+        componentId = common.componentId(flowName, componentName)
+
+        if self._feedServerParent.feedToFD(componentId, feedName,
+                                           t.fileno(), self.avatarId):
             t.keepSocketAlive = True
 
         # We removed the transport from the reactor before sending the FD; now
@@ -194,7 +197,7 @@ class _WorkerFeedDispatcher(log.Loggable):
     # to the piece that called login(),
     # which in our case is a component or an admin client.
     def requestAvatar(self, avatarId, keycard, mind, *ifaces):
-        avatar = FeedAvatar(self._brain)
+        avatar = FeedAvatar(self._brain, avatarId)
         # schedule a perspective attached for after this function
         # FIXME: there needs to be a way to not have to do a callLater
         # blindly so cleanup can be guaranteed

@@ -36,7 +36,8 @@ class WorkerListStore(gtk.ListStore):
         for x in whs.get('names'):
             i = self.append()
             self.set_value(i, 0, x)
-        whs.addListener(self, set=None)
+        whs.addListener(self, append=self.stateAppend,
+                        remove=self.stateRemove)
 
     def stateAppend(self, state, key, val):
         if key == 'names':

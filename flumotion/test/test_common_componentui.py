@@ -181,24 +181,18 @@ class TestStateSet(unittest.TestCase):
             d.addCallback(workerGetStateCallback)
             return d
 
-    # listener interface
-    implements(flavors.IStateListener)
-    
-    def stateSet(self, state, key, value):
-        self.changes.append(('set', state, key, value))
-
-    def stateAppend(self, state, key, value):
-        self.changes.append(('append', state, key, value))
-
-    def stateRemove(self, state, key, value):
-        self.changes.append(('remove', state, key, value))
+    def listen(self, state):
+        def event(type):
+            return lambda o, k, v: self.changes.append((type, o, k, v))
+        state.addListener(self, event('set'), event('append'),
+                          event('remove'))
 
     # This is a simple test to show that explicitly del'ing the
     # state causes a decache further up and so no changes to be
     # sent from the Cachable object.  This is only for Twisted 2.x
     def testSimpleStateListener(self):
         def getStateCallback(state):
-            state.addListener(self)
+            self.listen(state)
             self._state = state
             return self.admin.remoteRoot.callRemote('workerBearChild',
                                                      'batman')
@@ -229,7 +223,7 @@ class TestStateSet(unittest.TestCase):
             d = self.admin.remoteRoot.callRemote('workerGetState')
             state = unittest.deferredResult(d)
 
-            state.addListener(self)
+            self.listen(state)
 
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
@@ -259,7 +253,7 @@ class TestStateSet(unittest.TestCase):
     else:
         def testStateListener(self):
             def getStateCallback(state):
-                state.addListener(self)
+                self.listen(state)
                 self._state = state
                 self.failUnless(state)
                 self.failUnless(state.hasKey('children'))
@@ -310,7 +304,7 @@ class TestStateSet(unittest.TestCase):
             # get the state
             d = self.admin.remoteRoot.callRemote('workerGetState')
             state = unittest.deferredResult(d)
-            state.addListener(self)
+            self.listen(state)
 
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
@@ -332,7 +326,7 @@ class TestStateSet(unittest.TestCase):
             d = self.admin.remoteRoot.callRemote('workerGetState')
             state = unittest.deferredResult(d)
 
-            state.addListener(self)
+            self.listen(state)
             self.assertEquals(len(state.get('children')), 1)
 
             d = self.admin.remoteRoot.callRemote('workerBearChild', 'robin')
@@ -351,7 +345,7 @@ class TestStateSet(unittest.TestCase):
     else:
         def testStateListenerIntermediate(self):
             def workerGetStateCallback(state):
-                state.addListener(self)
+                self.listen(state)
                 self.failUnless(state)
                 self.failUnless(state.hasKey('children'))
                 self.failIf(self.changes, self.changes)
@@ -374,7 +368,7 @@ class TestStateSet(unittest.TestCase):
                 return self.admin.remoteRoot.callRemote('workerGetState')
             
             def workerGetStateAgainCallback(state):
-                state.addListener(self)
+                self.listen(state)
                 self.assertEquals(len(state.get('children')), 1)
                 self._state = state
                 return self.admin.remoteRoot.callRemote('workerBearChild',
@@ -420,7 +414,7 @@ class TestStateSet(unittest.TestCase):
         if weHaveAnOldTwisted():
             state = unittest.deferredResult(d)
 
-            state.addListener(self)
+            self.listen(state)
 
             self.failUnless(state)
             self.failUnless(state.hasKey('children'))
@@ -433,7 +427,7 @@ class TestStateSet(unittest.TestCase):
             self.failIf(self.changes)
         else:
             def workerGetStateCallback(state):
-                state.addListener(self)
+                self.listen(state)
                 self.failUnless(state)
                 self.failUnless(state.hasKey('children'))
 

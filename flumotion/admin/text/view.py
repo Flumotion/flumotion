@@ -219,10 +219,26 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
                 # do nothing
                 self.debug("silly")
             
+        def compStateSet(state, key, value):
+            self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
+
+            if key == 'mood':
+                # this is needed so UIs load if they change to happy
+                # get bundle for component
+                d = self.admin.getEntry(state, 'admin/text')
+                d.addCallback(self.gotEntryCallback, state.get('name'))
+                d.addErrback(self.gotEntryNoBundleErrback, state.get('name'))
+                d.addErrback(self.gotEntrySleepingComponentErrback)
+     
+                self.show()
+            elif key == 'name':
+                if value:
+                    self.show()
+
         self._components = components
         for name in self._components.keys():
             component = self._components[name]
-            component.addListener(self)
+            component.addListener(self, compStateSet)
             
             # get bundle for component
             d = self.admin.getEntry(component, 'admin/text')
@@ -230,46 +246,72 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
             d.addErrback(self.gotEntryNoBundleErrback, name)
             d.addErrback(self.gotEntrySleepingComponentErrback)
 
-            
         self.show()
         
-
-    
     def setPlanetState(self, planetState):
+        def flowStateAppend(state, key, value):
+            self.debug('flow state append: key %s, value %r' % (key, value))
+            if state.get('name') != 'default':
+                return
+            if key == 'components':
+                self._components[value.get('name')] = value
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components(self._components)
+
+        def flowStateRemove(state, key, value):
+            if state.get('name') != 'default':
+                return
+            if key == 'components':
+                name = value.get('name')
+                self.debug('removing component %s' % name)
+                del self._components[name]
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components(self._components)
+
+        def atmosphereStateAppend(state, key, value):
+            if key == 'components':
+                self._components[value.get('name')] = value
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components(self._components)
+
+        def atmosphereStateRemove(state, key, value):
+            if key == 'components':
+                name = value.get('name')
+                self.debug('removing component %s' % name)
+                del self._components[name]
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components(self._components)
+
+        def planetStateAppend(state, key, value):
+            if key == 'flows':
+                if value.get('name') != 'default':
+                    return
+                #self.debug('default flow started')
+                value.addListener(self, flowStateAppend,
+                                  flowStateRemove)
+                for c in value.get('components'):
+                    flowStateAppend(value, 'components', c)
+
+        def planetStateRemove(state, key, value):
+            self.debug('something got removed from the planet')
+
         self.debug('parsing planetState %r' % planetState)
         self._planetState = planetState
 
         # clear and rebuild list of components that interests us
         self._components = {}
 
-        planetState.addListener(self)
+        planetState.addListener(self, append=planetStateAppend,
+                                remove=planetStateRemove)
 
         a = planetState.get('atmosphere')
-        a.addListener(self)
-
+        a.addListener(self, append=atmosphereStateAppend,
+                      remove=atmosphereStateRemove)
         for c in a.get('components'):
-            name = c.get('name')
-            self.debug('adding atmosphere component "%s"' % name)
-            self._components[name] = c
+            atmosphereStateAppend(a, 'components', c)
             
         for f in planetState.get('flows'):
-            if f.get('name') != 'default':
-                continue
-            f.addListener(self)
-            for c in f.get('components'):
-                name = c.get('name')
-                self.debug('adding default flow component "%s"' % name)
-                self._components[name] = c
-                c.addListener(self)
-                
-                # get bundle for component
-                d = self.admin.getEntry(c, 'admin/text')
-                d.addCallback(self.gotEntryCallback, name)
-                d.addErrback(self.gotEntryNoBundleErrback, name)
-                d.addErrback(self.gotEntrySleepingComponentErrback)
-
-        self.show()
-
+            planetStateAppend(f, 'flows', f)
 
     def _component_stop(self, state):
         return self._component_do(state, 'Stop', 'Stopping', 'Stopped')
@@ -479,84 +521,13 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         # do nothing
         pass
 
-    # listener callbacks
+    def whsStateAppend(self, state, key, value):
+        if key == 'names':
+            self.debug('Worker %s logged in.' % value)
 
-         
-    def stateSet(self, state, key, value):
-        #if not isinstance(state, self._planetState.AdminComponentState):
-        #    self.warning('Got state change for unknown object %r' % state)
-        #    return
-            
-        self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
-
-        if key == 'mood':
-            # this is needed so UIs load if they change to happy
-            # get bundle for component
-            d = self.admin.getEntry(state, 'admin/text')
-            d.addCallback(self.gotEntryCallback, state.get('name'))
-            d.addErrback(self.gotEntryNoBundleErrback, state.get('name'))
-            d.addErrback(self.gotEntrySleepingComponentErrback)
- 
-            self.show()
-        elif key == 'name':
-            if value:
-                self.show()
-
-    def stateAppend(self, state, key, value):
-        if isinstance(state, worker.AdminWorkerHeavenState):
-            if key == 'names':
-                self.debug('Worker %s logged in.' % value)
-        elif isinstance(state, planet.AdminFlowState):
-            self.debug('flow state append: key %s, value %r' % (key, value))
-            if state.get('name') != 'default':
-                return
-            if key == 'components':
-                self._components[value.get('name')] = value
-                # FIXME: would be nicer to do this incrementally instead
-                self.update_components(self._components)
-        elif isinstance(state, planet.AdminAtmosphereState):
-            if key == 'components':
-                self._components[value.get('name')] = value
-                # FIXME: would be nicer to do this incrementally instead
-                self.update_components(self._components)
-        elif isinstance(state, planet.AdminPlanetState):
-            if key == 'flows':
-                if value.get('name') != 'default':
-                    return
-                #self.debug('default flow started')
-                value.addListener(self)
-        else:
-            self.warning('stateAppend on unknown object %r' % state)
-
-    def stateRemove(self, state, key, value):
-        self.debug('stateRemove on %r for key %s and value %r' % (
-            state, key, value))
-        if isinstance(state, worker.AdminWorkerHeavenState):
-            if key == 'names':
-                self.debug('Worker %s logged out.' % value)
-        elif isinstance(state, planet.AdminFlowState):
-            if state.get('name') != 'default':
-                return
-            if key == 'components':
-                name = value.get('name')
-                self.debug('removing component %s' % name)
-                del self._components[name]
-                # FIXME: would be nicer to do this incrementally instead
-                self.update_components(self._components)
-        elif isinstance(state, planet.AdminAtmosphereState):
-            if key == 'components':
-                name = value.get('name')
-                self.debug('removing component %s' % name)
-                del self._components[name]
-                # FIXME: would be nicer to do this incrementally instead
-                self.update_components(self._components)
-        elif isinstance(state, planet.AdminPlanetState):
-            self.debug('something got removed from the planet')
-            pass
-        else:
-            self.warning('stateRemove of key %s and value %r on unknown object %r' % (key, value, state))
-
-
+    def whsStateRemove(self, state, key, value):
+        if key == 'names':
+            self.debug('Worker %s logged out.' % value)
 
     # act as keyboard input
     def doRead(self):

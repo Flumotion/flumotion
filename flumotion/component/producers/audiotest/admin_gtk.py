@@ -84,13 +84,10 @@ class AudioTestAdminGtkNode(admin_gtk.BaseAdminGtkNode):
 
 class AudioTestAdminGtk(admin_gtk.BaseAdminGtk):
     def setup(self):
-        self._nodes = {}
         volume = vadmin_gtk.VolumeAdminGtkNode(self.state, self.admin,
                                                'volume', title=_("Volume"))
-        self._nodes['Volume'] = volume
+        self.nodes['Volume'] = volume
         audiotest = AudioTestAdminGtkNode(self.state, self.admin,
                                           title=_("Audio Test"))
-        self._nodes['Audio Test'] = audiotest
-
-    def getNodes(self):
-        return self._nodes
+        self.nodes['Audio Test'] = audiotest
+        admin_gtk.BaseAdminGtk.setup(self)

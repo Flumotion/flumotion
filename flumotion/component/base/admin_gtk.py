@@ -45,8 +45,6 @@ class BaseAdminGtk(log.Loggable):
     @ivar nodes: an ordered dict of name -> L{BaseAdminGtkNode}
     """
 
-    implements(flavors.IStateListener)
-
     logCategory = "admingtk"
     
     def __init__(self, state, admin):
@@ -68,7 +66,8 @@ class BaseAdminGtk(log.Loggable):
         
     def setUIState(self, state):
         self.debug('starting listening to state %r', state)
-        state.addListener(self)
+        state.addListener(self, self.stateSet, self.stateAppend,
+                          self.stateRemove)
         self.uiState = state
         for node in self.getNodes().values():
             node.gotUIState(state)
@@ -118,6 +117,10 @@ class BaseAdminGtk(log.Loggable):
         Set up the admin view so it can display nodes.
         """
         self.debug('BaseAdminGtk.setup()')
+
+        self.nodes['Plumbing'] = PlumbingAdminGtkNode(self.state,
+                                                      self.admin)
+
         # set up translations
         if not hasattr(self, 'gettext_domain'):
             yield None
@@ -300,7 +303,8 @@ class BaseAdminGtkNode(log.Loggable):
         is ready. Chain up if you provide your own implementation.
         """
         self.uiState = state
-        state.addListener(self)
+        state.addListener(self, self.stateSet, self.stateAppend,
+                          self.stateRemove)
 
     def stateSet(self, state, key, value):
         "Override me"
@@ -348,11 +352,163 @@ class BaseAdminGtkNode(log.Loggable):
         yield self.widget
     render = defer_generator_method(render)
 
+# this class is a bit of an experiment, and is private, dudes and ladies
+class StateWatcher(object):
+    def __init__(self, state, setters, appenders, removers):
+        self.state = state
+        self.setters = setters
+        self.appenders = appenders
+        self.removers = removers
+        self.shown = False
+
+        state.addListener(self, set=self.onSet, append=self.onAppend,
+                          remove=self.onRemove)
+        for k in appenders:
+            for v in state.get(k):
+                self.onAppend(state, k, v)
+
+    def hide(self):
+        if self.shown:
+            for k in self.setters:
+                self.onSet(self.state, k, None)
+            self.shown = False
+
+    def show(self):
+        if not self.shown:
+            self.shown = True
+            for k in self.setters:
+                self.onSet(self.state, k, self.state.get(k))
+
+    def onSet(self, obj, k, v):
+        if self.shown and k in self.setters:
+            self.setters[k](self.state, v)
+
+    def onAppend(self, obj, k, v):
+        if k in self.appenders:
+            self.appenders[k](self.state, v)
+
+    def onRemove(self, obj, k, v):
+        if k in self.removers:
+            self.removers[k](self.state, v)
+
+    def unwatch(self):
+        if self.state:
+            self.hide()
+            for k in self.removers:
+                for v in self.state.get(k):
+                    self.onRemove(self.state, k, v)
+            self.state.removeListener(self)
+            self.state = None
+
+class PlumbingAdminGtkNode(BaseAdminGtkNode):
+    glade_file = os.path.join('flumotion', 'component', 'base',
+                              'plumbing.glade')
+
+    def __init__(self, state, admin):
+        BaseAdminGtkNode.__init__(self, state, admin, 'Plumbing')
+        self.treemodel = None
+        self.treeview = None
+        self.selected = None
+        self.labels = {}
+
+    def select(self, watcher):
+        if self.selected:
+            self.selected.hide()
+        if watcher:
+            self.selected = watcher
+            self.selected.show()
+        else:
+            self.selected = None
+
+    def setFeederName(self, state, value):
+        self.labels['feeder-name'].set_markup('Feeder <b>%s</b>' % value)
+
+    def setFeederClientName(self, state, value):
+        self.labels['feeder-name'].set_markup('Feeding to <b>%s</b>'
+                                              % value)
+    def setFeederClientBytesRead(self, state, value):
+        txt = value and (common.formatStorage(value)+'Byte') or ''
+        self.labels['feeder-client-bytesread'].set_text(txt)
+    def setFeederClientBuffersDropped(self, state, value):
+        self.labels['feeder-client-buffersdropped'].set_text(str(value))
+
+    def addFeeder(self, uiState, state):
+        feederId = state.get('feedId')
+        i = self.treemodel.append(None)
+        self.treemodel.set(i, 0, feederId, 1, state)
+        w = StateWatcher(state,
+                         {'feedId': self.setFeederName},
+                         {'clients': self.addFeederClient},
+                         {'clients': self.removeFeederClient})
+        self.treemodel.set(i, 2, w)
+        self.treeview.expand_all()
+
+    def addFeederClient(self, feederState, state):
+        clientId = state.get('clientId')
+        for row in self.treemodel:
+            if self.treemodel.get_value(row.iter, 1) == feederState:
+                break
+        i = self.treemodel.append(row.iter)
+        self.treemodel.set(i, 0, clientId, 1, state)
+        w = StateWatcher(state,
+                         {'clientId': self.setFeederClientName,
+                          'bytesRead': self.setFeederClientBytesRead,
+                          'buffersDropped':
+                          self.setFeederClientBuffersDropped},
+                         {},
+                         {})
+        self.treemodel.set(i, 2, w)
+        self.treeview.expand_all()
+
+    def removeFeederClient(self, feederState, state):
+        for row in self.treemodel.iter_children(None):
+            if self.treemodel.get_value(row.iter, 1) == feederState:
+                break
+        for row in row.iterchildren():
+            if self.treemodel.get_value(row.iter, 1) == state:
+                break
+        state, watcher = self.treemodel.get(i, 1, 2)
+        if watcher == self.selected:
+            self.select(None)
+        watcher.unwatch()
+        self.treemodel.remove(i)
+
+    def setUIState(self, state):
+        # will only be called when we have a widget tree
+        BaseAdminGtkNode.setUIState(self, state)
+        self.widget.show_all()
+        for feeder in state.get('feeders'):
+            self.addFeeder(state, feeder)
+
+    def haveWidgetTree(self):
+        self.labels = {}
+        self.widget = self.wtree.get_widget('plumbing-widget')
+        self.treeview = self.wtree.get_widget('treeview-feeders')
+        self.treemodel = gtk.TreeStore(str, object, object)
+        self.treeview.set_model(self.treemodel)
+        col = gtk.TreeViewColumn('Feeder', gtk.CellRendererText(),
+                                 text=0)
+        self.treeview.append_column(col)
+        sel = self.treeview.get_selection()
+        sel.set_mode(gtk.SELECTION_SINGLE)
+        def sel_changed(sel):
+            model, i = sel.get_selected()
+            self.select(i and model.get_value(i, 2))
+        sel.connect('changed', sel_changed)
+        def set_label(name):
+            self.labels[name] = self.wtree.get_widget('label-'+name)
+            self.labels[name].set_text('')
+        for type in ('name',):
+            set_label('feeder-' + type)
+        for type in ('bytesread', 'buffersdropped'):
+            set_label('feeder-client-' + type)
+        self.widget.show_all()
+        return self.widget
+
 class EffectAdminGtkNode(BaseAdminGtkNode):
     """
     I am a base class for all GTK+-based component effect Admin UI nodes.
     I am a view on a set of properties for an effect on a component.
-
     """
     def __init__(self, state, admin, effectName, title=None):
         """

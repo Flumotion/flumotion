@@ -96,11 +96,11 @@ class FluTrayIcon(log.Loggable):
         
         # get a dictionary of components
         self._components = components
-        names = components.keys()
-
-        for name in names:
-            component = components[name]
-            component.addListener(self)
+        for component in components.values():
+            try:
+                component.addListener(self, self.stateSet)
+            except KeyError:
+                pass
 
         self._update_mood()
 
@@ -162,12 +162,6 @@ class FluTrayIcon(log.Loggable):
             self.debug("message: %s" % value)
             if self._tray_container:
                 self._tray_container.send_message(1000, value)
-
-    # FIXME: we might want to show messages
-    def stateAppend(self, state, key, value):
-        pass
-    def stateRemove(self, state, key, value):
-        pass
 
     def _show_popup_menu(self):
         self.popupMenu = gtk.Menu()

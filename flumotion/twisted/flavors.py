@@ -98,8 +98,18 @@ class StateCacheable(pb.Cacheable):
         """
         Add a key for a list of objects to the state cache.
         """
-        if not value:
+        if value is None:
             value = []
+        self._dict[key] = value
+
+    # don't use {} as the default value, it creates only one reference and
+    # reuses it
+    def addDictKey(self, key, value=None):
+        """
+        Add a key for a dict value to the state cache.
+        """
+        if value is None:
+            value = {}
         self._dict[key] = value
 
     def hasKey(self, key):
@@ -165,6 +175,38 @@ class StateCacheable(pb.Cacheable):
         dl = defer.DeferredList(list)
         return dl
  
+    def setitem(self, key, subkey, value):
+        """
+        Set a value in the given dict.
+        Notifies observers of this Cacheable through observe_setitem.
+        """
+        if not key in self._dict.keys():
+            raise KeyError('%s in %r' % (key, self))
+
+        self._dict[key][subkey] = value
+        list = [o.callRemote('setitem', key, subkey, value)
+                for o in self._observers]
+        return defer.DeferredList(list)
+ 
+    def delitem(self, key, subkey):
+        """
+        Removes an element from the given dict. Note that the key refers
+        to the dict; it is the subkey (and its value) that will be removed.
+        Notifies observers of this Cacheable through observe_delitem.
+        """
+        if not key in self._dict.keys():
+            raise KeyError('%s in %r' % (key, self))
+
+        try:
+            value = self._dict[key].pop(subkey)
+        except KeyError:
+            raise KeyError('key %r not in dict %r for key %r' % (
+                subkey, self._dict[key], key))
+        list = [o.callRemote('delitem', key, subkey, value) for o in
+                self._observers]
+        dl = defer.DeferredList(list)
+        return dl
+ 
     # pb.Cacheable methods
     def getStateToCacheAndObserveFor(self, perspective, observer):
         self._observers.append(observer)
@@ -211,66 +253,53 @@ class StateRemoteCache(pb.RemoteCache):
         if not hasattr(self, '_listeners'):
             self._listeners = {}
 
-    def addListener(self, listener, *args, **kwargs):
+    def addListener(self, listener, set=None, append=None, remove=None,
+                    setitem=None, delitem=None):
         """
         Adds a listener to the remote cache.
 
-        By default, will call the stateSet, stateAppend, and stateRemove
-        methods on the listener object when changes occur. The caller
-        can specify alternate methods to use via the optional 'set',
-        'append', and 'remove' keyword arguments, which should be
-        callable objects or None to ignore the change notice.
+        The caller will be notified of state events via the functions
+        given as the 'set', 'append', and 'remove', 'setitem', and
+        'delitem' keyword arguments.
+
+        Setting one of the event handlers to None will ignore that
+        event. It is an error for all event handlers to be None.
 
         @param listener: A new listener object that wants to receive
-        cache state change notifications.
+                       cache state change notifications.
         @type listener: object implementing
-        L{flumotion.twisted.flavors.IStateListener}
+                        L{flumotion.twisted.flavors.IStateListener}
+        @param    set: A procedure to call when a value is set
+        @type     set: procedure(object, key, value) -> None
+        @param append: A procedure to call when a value is appended to a
+                       list
+        @type  append: procedure(object, key, value) -> None
+        @param remove: A procedure to call when a value is removed from
+                       a list
+        @type  remove: procedure(object, key, value) -> None
+        @param setitem: A procedure to call when a value is set in a
+                       dict.
+        @type  setitem: procedure(object, key, subkey, value) -> None
+        @param delitem: A procedure to call when a value is removed
+                       from a dict.
+        @type  delitem: procedure(object, key, subkey, value) -> None
         """
-        if not compat.implementsInterface(listener, IStateListener):
-            raise NotImplementedError(
-                '%r instance does not implement IStateListener' % listener)
-
-        # implementation complicated by the desire to allow set=None to
-        # ignore set events (same for append, remove) at the same time
-        # as allowing positional set, append, remove...
-        for k in kwargs:
-            if not k in ('set', 'append', 'remove'):
-                raise TypeError("addListener() got an unexpected keyword"
-                                "argument '%s'" % k)
-        if len(args) > 3:
-            raise TypeError('addListener() takes at most 5 arguments '
-                            '(%d given)' % (len(args) + 2))
-        for i, k in (2, 'remove'), (1, 'append'), (0, 'set'):
-            if k in kwargs:
-                if len(args) > i+1:
-                    raise TypeError("addListener() got multiple values "
-                                    "for keyword argument '%s'" % k)
-            elif len(args) > i:
-                kwargs[k] = args[i]
-
+        if not (set or append or remove or setitem or delitem):
+            print ("Warning: Use of deprecated %r.addListener(%r) without "
+                   "explicit event handlers" % (self, listener))
+            set = listener.stateSet
+            append = listener.stateAppend
+            remove = listener.stateRemove
         self._ensureListeners()
-        procs = []
-        for k, attr in (('set', 'stateSet'), ('append', 'stateAppend'),
-                        ('remove', 'stateRemove')):
-            if k in kwargs:
-                procs.append(kwargs[k])
-            else:
-                if not hasattr(listener, attr):
-                    raise NotImplementedError('%r incorrectly implements '
-                                              'IStateListener, please fix'
-                                              % listener)
-                procs.append(getattr(listener, attr))
-        self._listeners[listener] = procs
+        if listener in self._listeners:
+            raise KeyError, listener
+        self._listeners[listener] = [set, append, remove, setitem,
+                                     delitem]
 
     def removeListener(self, listener):
-        if not compat.implementsInterface(listener, IStateListener):
-            raise NotImplementedError(
-                '%r instance does not implement IStateListener' % listener)
-
         self._ensureListeners()
         if listener not in self._listeners:
-            raise KeyError(
-                '%r instance not registered as a listener' % listener)
+            raise KeyError, listener
         del self._listeners[listener]
 
     # pb.RemoteCache methods
@@ -321,3 +350,35 @@ class StateRemoteCache(pb.RemoteCache):
             stateRemove = self._listeners[l][2]
             if stateRemove: 
                 stateRemove(self, key, value)
+
+    def observe_setitem(self, key, subkey, value):
+        # if we also subclass from Cacheable, then we're a proxy, so proxy
+        if hasattr(self, 'setitem'):
+            StateCacheable.setitem(self, key, subkey, value)
+        else:
+            self._dict[key][subkey] = value
+
+        # notify our local listeners
+        self._ensureListeners()
+        for l in self._listeners:
+            stateSetitem = self._listeners[l][3]
+            if stateSetitem: 
+                stateSetitem(self, key, subkey, value)
+
+    def observe_delitem(self, key, subkey, value):
+        # if we also subclass from Cacheable, then we're a proxy, so proxy
+        if hasattr(self, 'delitem'):
+            StateCacheable.delitem(self, key, subkey)
+        else:
+            try:
+                del self._dict[key][subkey]
+            except KeyError:
+                raise KeyError("key %r not in dict %r for state dict %r",
+                    subkey, self._dict[key], self._dict)
+
+        # notify our local listeners
+        self._ensureListeners()
+        for l in self._listeners:
+            stateDelitem = self._listeners[l][4]
+            if stateDelitem: 
+                stateDelitem(self, key, subkey, value)

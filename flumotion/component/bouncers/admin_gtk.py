@@ -37,8 +37,6 @@ from flumotion.component.base.admin_gtk import BaseAdminGtk, BaseAdminGtkNode
 ) = range(3)
 
 class KeycardsNode(BaseAdminGtkNode):
-    implements(flavors.IStateListener)
-
     def render(self):
         self._iters = {} # iter -> data dict mapping
         self.model = gtk.ListStore(str, str, str)
@@ -86,7 +84,12 @@ class KeycardsNode(BaseAdminGtkNode):
         for data in keycardsData:
             self._append(data)
 
-        self._uiState.addListener(self)
+        def append(object, key, value):
+            self._append(value)
+        def remove(object, key, value):
+            self._remove(value)
+
+        self._uiState.addListener(self, append=append, remove=remove)
 
     def _expire_clicked(self, button, treeselection):
         (model, pathlist) = treeselection.get_selected_rows()
@@ -133,13 +136,6 @@ class KeycardsNode(BaseAdminGtkNode):
             c.handler_block(id)
             c.set_active(value)
             c.handler_unblock(id)
-
-    # IStateListener interface
-    def stateSet(self, object, key, value): pass
-    def stateAppend(self, object, key, value):
-        self._append(value)
-    def stateRemove(self, object, key, value):
-        self._remove(value)
 
     def cleanup(self):
         self._uiState.removeListener(self)

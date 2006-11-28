@@ -29,7 +29,7 @@ from twisted.internet import reactor, defer
 
 from flumotion.component import component as basecomponent
 from flumotion.common import common, errors, pygobject, messages
-from flumotion.common import gstreamer
+from flumotion.common import gstreamer, componentui
 from flumotion.worker import feed
 
 from flumotion.common.planet import moods
@@ -37,6 +37,74 @@ from flumotion.common.pygobject import gsignal
 
 from flumotion.common.messages import N_
 T_ = messages.gettexter('flumotion')
+
+class Feeder:
+    """
+    This class groups feeder-related information as used by a Feed Component.
+
+    @ivar feedId:  id of the feed this is a feeder for
+    @ivar uiState: the serializable UI State for this feeder
+    """
+    def __init__(self, feedId):
+        self.feedId = feedId
+        self.uiState = componentui.WorkerComponentUIState()
+        self.uiState.addKey('feedId')
+        self.uiState.set('feedId', feedId)
+        self.uiState.addListKey('clients')
+        self._clients = {}
+
+    def addClient(self, clientId, fd):
+        """
+        @param clientId: id of the client of the feeder
+        @param fd: file descriptor representing the client
+        """
+        client = FeederClient(clientId, fd)
+        self._clients[fd] = client
+        self.uiState.append('clients', client.uiState)
+        return client
+
+    def removeClient(self, fd):
+        """
+        @type fd: file descriptor
+        """
+        client = self._clients.pop(fd)
+        self.uiState.remove('clients', client.uiState)
+
+    def getClients(self):
+        return self._clients
+
+class FeederClient:
+    """
+    This class groups information related to the client of a feeder.
+
+    @ivar clientId: id of the client of the feeder
+    @ivar fd:       file descriptor representing the client
+    """
+    def __init__(self, clientId, fd):
+        self.fd = fd
+        self.uiState = componentui.WorkerComponentUIState()
+        self.uiState.addKey('clientId', clientId)
+        self.uiState.addKey('fd', fd)
+        self.uiState.addKey('bytesRead')
+        self.uiState.addKey('buffersDropped')
+
+    def setStats(self, stats):
+        """
+        @type stats: list
+        """
+        bytesSent = stats[0]
+        timeAdded = stats[1]
+        timeRemoved = stats[2]
+        timeActive = stats[3]
+        timeLastActivity = stats[4]
+        if len(stats) > 5:
+            # added in gst-plugins-base 0.10.11
+            buffersDropped = stats[5]
+        else:
+            buffersDropped = None
+
+        self.uiState.set('bytesRead', bytesSent)
+        self.uiState.set('buffersDropped', buffersDropped)
 
 
 class FeedComponent(basecomponent.BaseComponent):
@@ -70,6 +138,10 @@ class FeedComponent(basecomponent.BaseComponent):
         self.state.addKey('eaterNames')
         self.state.addKey('feederNames')
 
+        # add keys for uiState
+        self._feeders = {}
+        self.uiState.addListKey('feeders')
+
         self.pipeline = None
         self.pipeline_signals = []
         self.bus_watch_id = None
@@ -83,8 +155,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self._eaterReconnectDC = {} 
 
         self.feedersFeeding = 0
-        self.feed_names = []
-        self.feeder_names = []
+        self.feed_names = []   # list of feedName
+        self.feeder_names = [] # list of feedId
 
         self._unconnectedEaters = [] # list of feedId's
         # feedId -> dict of lastTime, lastConnectTime, lastConnectD,
@@ -128,6 +200,11 @@ class FeedComponent(basecomponent.BaseComponent):
         # this sets self.feeder_names
         self.parseFeederConfig(feeder_config)
         self.feedersWaiting = len(self.feeder_names)
+        for feederName in self.feeder_names:
+            self._feeders[feederName] = Feeder(feederName)
+            self.uiState.append('feeders',
+                                 self._feeders[feederName].uiState)
+
         self.debug('setup() with %d eaters and %d feeders waiting' % (
             len(self._unconnectedEaters), self.feedersWaiting))
 
@@ -360,6 +437,9 @@ class FeedComponent(basecomponent.BaseComponent):
             status['checkEaterDC'] = reactor.callLater(
                 self.BUFFER_CHECK_FREQUENCY, self._checkEater, feedId)
 
+        # start checking feeders
+        reactor.callLater(self.BUFFER_CHECK_FREQUENCY, self._feeder_probe_calllater)
+
     def pipeline_stop(self):
         if not self.pipeline:
             return
@@ -495,6 +575,14 @@ class FeedComponent(basecomponent.BaseComponent):
             self._add_buffer_probe(pad, feedId, firstTime=True)
 
         self.pipeline.set_state(gst.STATE_PLAYING)
+
+    def _feeder_probe_calllater(self):
+        for feedId, feeder in self._feeders.items():
+            feederElement = self.get_element("feeder:%s" % feedId)
+            for client in feeder.getClients().values():
+                array = feederElement.emit('get-stats', client.fd)
+                client.setStats(array)
+        reactor.callLater(self.BUFFER_CHECK_FREQUENCY, self._feeder_probe_calllater)
 
     def _add_buffer_probe(self, pad, feedId, firstTime=False):
         # attached from above, and called again every
@@ -644,7 +732,7 @@ class FeedComponent(basecomponent.BaseComponent):
         pygobject.gobject_set_property(element, property, value)
     
     ### methods to connect component eaters and feeders
-    def feedToFD(self, feedName, fd, cleanup):
+    def feedToFD(self, feedName, fd, cleanup, eaterId=None):
         """
         @param feedName: name of the feed to feed to the given fd.
         @type  feedName: str
@@ -654,7 +742,8 @@ class FeedComponent(basecomponent.BaseComponent):
         @type  cleanup:  callable
         """
         self.debug('FeedToFD(%s, %d)' % (feedName, fd))
-        elementName = "feeder:%s" % common.feedId(self.name, feedName)
+        feedId = common.feedId(self.name, feedName)
+        elementName = "feeder:%s" % feedId
         element = self.get_element(elementName)
         if not element:
             msg = "Cannot find feeder element named '%s'" % elementName
@@ -668,6 +757,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug("fdcleanup registered")
         self._fdCleanup[fd] = cleanup
         element.emit('add', fd)
+        self._feeders[feedId].addClient(eaterId or ('client-%d' % fd), fd)
 
     def removeFDCallback(self, sink, fd):
         """
@@ -675,6 +765,8 @@ class FeedComponent(basecomponent.BaseComponent):
         multifdsink.
         This will call the registered callable on the fd.
         """
+        feedId = ':'.join(sink.get_name().split(':')[1:])
+        self._feeders[feedId].removeClient(fd)
         if fd in self._fdCleanup:
             self.debug("calling cleanup func")
             self._fdCleanup[fd](fd)

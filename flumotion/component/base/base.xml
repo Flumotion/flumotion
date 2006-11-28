@@ -8,6 +8,7 @@
       <directories>
         <directory name="flumotion/component/base">
           <filename location="admin_gtk.py" />
+          <filename location="plumbing.glade" />
         </directory>
       </directories>
     </bundle>

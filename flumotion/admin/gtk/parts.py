@@ -336,7 +336,7 @@ class ComponentsView(log.Loggable, gobject.GObject):
         for name in names:
             component = components[name]
             self.debug('adding component %r to listview' % component)
-            component.addListener(self)
+            component.addListener(self, self.stateSet)
 
             iter = self._model.append()
             self._iters[component] = iter
@@ -396,14 +396,6 @@ class ComponentsView(log.Loggable, gobject.GObject):
         elif key == 'cpu':
             self._model.set(iter, COL_CPU, value)
 
-    # FIXME: proxy messages to message area
-    def stateAppend(self, state, key, value):
-        self.debug('stateAppend: state %r, key %s, value %r' % (
-            state, key, value))
-    def stateRemove(self, state, key, value):
-        self.debug('stateRemove: state %r, key %s, value %r' % (
-            state, key, value))
-    
     def _set_mood_value(self, iter, value):
         """
         Set the mood value on the given component name.

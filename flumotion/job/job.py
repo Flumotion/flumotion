@@ -285,8 +285,11 @@ class JobClientBroker(pb.Broker, log.Loggable):
         # file descriptors get delivered to the component
         self.debug('received fds %r, message %r' % (fds, message))
         if message.startswith('sendFeed '):
-            feedName = message[len('sendFeed '):]
-            self.factory.medium.component.feedToFD(feedName, fds[0], os.close)
+            def parseargs(_, feedName, eaterId=None):
+                return feedName, eaterId
+            feedName, eaterId = parseargs(*message.split(' '))
+            self.factory.medium.component.feedToFD(feedName, fds[0],
+                                                   os.close, eaterId)
         elif message.startswith('receiveFeed '):
             feedId = message[len('receiveFeed '):]
             self.factory.medium.component.eatFromFD(feedId, fds[0])

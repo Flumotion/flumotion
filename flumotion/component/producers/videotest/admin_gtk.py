@@ -82,5 +82,6 @@ class VideoTestAdminGtk(BaseAdminGtk):
         # FIXME: have constructor take self instead ?
         pattern = PatternNode(self.state, self.admin, title=_("Pattern"))
         self.nodes['Pattern'] = pattern
+        BaseAdminGtk.setup(self)
 
 GUIClass = VideoTestAdminGtk

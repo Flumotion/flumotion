@@ -331,6 +331,8 @@ class Window(log.Loggable, gobject.GObject):
         nodeWidgets = {}
         nodes = instance.getNodes()
 
+        print instance, nodes
+
         # F0.2
         for nodeName, node in nodes.items():
             if not node.title:
@@ -444,32 +446,61 @@ class Window(log.Loggable, gobject.GObject):
                                        methodName, *args, **kwargs)
 
     def setPlanetState(self, planetState):
+        def flowStateAppend(state, key, value):
+            self.debug('flow state append: key %s, value %r' % (key, value))
+            if state.get('name') != 'default':
+                return
+            if key == 'components':
+                self._components[value.get('name')] = value
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components()
+
+        def flowStateRemove(state, key, value):
+            if state.get('name') != 'default':
+                return
+            if key == 'components':
+                self._remove_component(value)
+
+        def atmosphereStateAppend(state, key, value):
+            if key == 'components':
+                self._components[value.get('name')] = value
+                # FIXME: would be nicer to do this incrementally instead
+                self.update_components()
+
+        def atmosphereStateRemove(state, key, value):
+            if key == 'components':
+                self._remove_component(value)
+
+        def planetStateAppend(state, key, value):
+            if key == 'flows':
+                if value.get('name') != 'default':
+                    return
+                self.debug('default flow started')
+                value.addListener(self, append=flowStateAppend,
+                                  remove=flowStateRemove)
+                for c in value.get('components'):
+                    flowStateAppend(value, 'components', c)
+
+        def planetStateRemove(state, key, value):
+            self.debug('something got removed from the planet')
+
         self.debug('parsing planetState %r' % planetState)
         self._planetState = planetState
 
         # clear and rebuild list of components that interests us
         self._components = {}
 
-        planetState.addListener(self)
+        planetState.addListener(self, append=planetStateAppend,
+                                remove=planetStateRemove)
 
         a = planetState.get('atmosphere')
-        a.addListener(self)
-
+        a.addListener(self, append=atmosphereStateAppend,
+                      remove=atmosphereStateRemove)
         for c in a.get('components'):
-            name = c.get('name')
-            self.debug('adding atmosphere component "%s"' % name)
-            self._components[name] = c
+            atmosphereStateAppend(a, 'components', c)
             
         for f in planetState.get('flows'):
-            if f.get('name') != 'default':
-                continue
-            f.addListener(self)
-            for c in f.get('components'):
-                name = c.get('name')
-                self.debug('adding default flow component "%s"' % name)
-                self._components[name] = c
-
-        self.update_components()
+            planetStateAppend(f, 'flows', f)
  
     def stateSet(self, state, key, value):
         # called by model when state of something changes
@@ -486,68 +517,13 @@ class Window(log.Loggable, gobject.GObject):
                     self._messages_view.clear()
                     self._component_view_clear()
 
-    def stateAppend(self, state, key, value):
-        if isinstance(state, worker.AdminWorkerHeavenState):
-            if key == 'names':
-                self.statusbar.set('main', 'Worker %s logged in.' % value)
-        elif isinstance(state, planet.AdminFlowState):
-            self.debug('flow state append: key %s, value %r' % (key, value))
-            if state.get('name') != 'default':
-                return
-            if key == 'components':
-                self._components[value.get('name')] = value
-                # FIXME: would be nicer to do this incrementally instead
-                self.update_components()
-        elif isinstance(state, planet.AdminAtmosphereState):
-            if key == 'components':
-                self._components[value.get('name')] = value
-                # FIXME: would be nicer to do this incrementally instead
-                self.update_components()
-        elif isinstance(state, planet.AdminPlanetState):
-            if key == 'flows':
-                if value.get('name') != 'default':
-                    return
-                self.debug('default flow started')
-                value.addListener(self)
-        elif isinstance(state, planet.AdminComponentState):
-            name = state.get('name')
-            self.debug('stateAppend on component state of %s' % name)
-            if key == 'messages':
-                current = self.components_view.get_selected_name()
-                if name == current:
-                    self._messages_view.add_message(value)
-        else:
-            self.warning('stateAppend on unknown object %r' % state)
+    def whsAppend(self, state, key, value):
+        if key == 'names':
+            self.statusbar.set('main', 'Worker %s logged in.' % value)
 
-    def stateRemove(self, state, key, value):
-        self.debug('stateRemove on %r for key %s and value %r' % (
-            state, key, value))
-        if isinstance(state, worker.AdminWorkerHeavenState):
-            if key == 'names':
-                self.statusbar.set('main', 'Worker %s logged out.' % value)
-        elif isinstance(state, planet.AdminFlowState):
-            # the basic admin client only looks at the "default" flow
-            if state.get('name') != 'default':
-                return
-
-            if key == 'components':
-                self._remove_component(value)
-        elif isinstance(state, planet.AdminAtmosphereState):
-            if key == 'components':
-                self._remove_component(value)
-        elif isinstance(state, planet.AdminPlanetState):
-            self.debug('something got removed from the planet')
-            pass
-        elif isinstance(state, planet.AdminComponentState):
-            name = state.get('name')
-            self.debug('stateRemove on component state of %s' % name)
-            if key == 'messages':
-                current = self.components_view.get_selected_name()
-                if name == current:
-                    self._messages_view.clear_message(value.id)
-            self._set_stop_start_component_sensitive()
-        else:
-            self.warning('stateRemove of key %s and value %r on unknown object %r' % (key, value, state))
+    def whsRemove(self, state, key, value):
+        if key == 'names':
+            self.statusbar.set('main', 'Worker %s logged out.' % value)
 
     def _remove_component(self, state):
         name = state.get('name')
@@ -695,11 +671,41 @@ class Window(log.Loggable, gobject.GObject):
 
     ### ui callbacks
     def _components_view_has_selection_cb(self, view, state):
+        def compSet(state, key, value):
+            if key == 'message':
+                self.statusbar.set('main', value)
+            elif key == 'mood':
+                self._set_stop_start_component_sensitive()
+                current = self.components_view.get_selected_name()
+                if value == moods.sleeping.value:
+                    if state.get('name') == current:
+                        self._messages_view.clear()
+                        self._component_view_clear()
+
+        def compAppend(state, key, value):
+            name = state.get('name')
+            self.debug('stateAppend on component state of %s' % name)
+            if key == 'messages':
+                current = self.components_view.get_selected_name()
+                if name == current:
+                    self._messages_view.add_message(value)
+
+        def compRemove(state, key, value):
+            name = state.get('name')
+            self.debug('stateRemove on component state of %s' % name)
+            if key == 'messages':
+                current = self.components_view.get_selected_name()
+                if name == current:
+                    self._messages_view.clear_message(value.id)
+            self._set_stop_start_component_sensitive()
+
         if self.current_component_state:
             self.current_component_state.removeListener(self)
         self.current_component_state = state
         if self.current_component_state:
-            self.current_component_state.addListener(self)
+            self.current_component_state.addListener(self, compSet,
+                                                     compAppend,
+                                                     compRemove)
 
         self._set_stop_start_component_sensitive()
 
@@ -746,9 +752,17 @@ class Window(log.Loggable, gobject.GObject):
 
         def gotEntryNoBundleErrback(failure):
             failure.trap(errors.NoBundleError)
+            self.debug("Making generic UI for component %s" % name)
 
-            self.debug("No UI for component %s" % name)
-            self.statusbar.set('main', _("No UI for component %s") % name)
+            # make a generic ui
+            from flumotion.component.base import admin_gtk
+            instance = admin_gtk.BaseAdminGtk(state, self.admin)
+            d = instance.setup()
+            # F0.2: setup should return a deferred
+            if not d:
+                d = defer.succeed(None)
+            d.addCallback(self._setupCallback, state.get('name'),
+                          instance)
 
         def gotEntrySleepingComponentErrback(failure):
             failure.trap(errors.SleepingComponentError)
