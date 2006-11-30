@@ -7,7 +7,8 @@ flumotion_PYTHON = \
 	fgtk.py \
 	glade.py \
 	icons.py \
-	trayicon.py
+	trayicon.py \
+	url.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 
