@@ -140,6 +140,7 @@ class GladeWindow(gobject.GObject):
     glade_dir = configure.gladedir
     glade_file = None
     glade_typedict = None
+    interesting_signals = ()
 
     window = None
 
@@ -164,7 +165,6 @@ class GladeWindow(gobject.GObject):
             if isinstance(widget, gtk.Window):
                 assert self.window == None
                 self.window = widget
-                continue
             
             if wname in self.widgets:
                 raise AssertionError("Two objects with same name (%s): %r %r"
@@ -175,10 +175,43 @@ class GladeWindow(gobject.GObject):
             self.window.set_transient_for(parent)
 
         wtree.signal_autoconnect(self)
+        self.__connect_interesting_signals()
 
         self.show = self.window.show
         self.hide = self.window.hide
         self.present = self.window.present
+
+    def connect_signal(self, widget_name, signal):
+        """Connect a conventionally-named signal handler.
+
+        For example:
+          connect_signal('window-foo', 'delete-event')
+        is equivalent to:
+          proc = self.on_window_foo_delete_event
+          self.widgets['window-foo'].connect('delete-event', proc)
+
+        @param widget_name: the name of the widget
+        @type  widget_name: str
+        @param signal: which gobject signal to connect to
+        @type  signal: str
+        """
+        attr = '_'.join(('on-%s-%s' % (widget_name, signal)).split('-'))
+        self.log('trying to connect self.%s for widget %s::%s',
+                 attr, widget_name, signal)
+        proc = lambda *x: getattr(self, attr)()
+        self.widgets[widget_name].connect(signal, proc)
+        
+    def __connect_interesting_signals(self):
+        def name_to_proc(n, prefix, signal):
+            attr = '_'.join(('on-%s-%s' % (n, signal)).split('-'))
+            self.log('trying to connect self.%s for widget %s::%s',
+                     attr, n, signal)
+            return lambda *x: getattr(self, attr)()
+
+        for name, widget in self.widgets.iteritems():
+            for prefix, signal in self.interesting_signals:
+                if name.startswith(prefix):
+                    self.connect_signal(name, signal)
 
     def destroy(self):
         self.window.destroy()

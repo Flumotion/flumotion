@@ -1,3 +1,13 @@
+2006-11-30  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/ui/glade.py (GladeWindow.__init__): Put the window in
+	the widgets dict also.
+	(GladeWindow.__connect_interesting_signals): Add a delicious hack
+	whereby if the object has set self.interesting_signals, we
+	autoconnect some signal handlers.
+	(GladeWindow.connect_signal): New proc, connects a widget to a
+	conventionally-named signal handler.
+
 2006-11-28  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/component/base/admin_gtk.py (StateWatcher)
