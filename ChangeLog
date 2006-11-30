@@ -1,5 +1,7 @@
 2006-11-30  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/ui/glade.py (GladeWindow): Clean up a bit.
+	
 	* flumotion/ui/glade.py (GladeWindow.__init__): Put the window in
 	the widgets dict also.
 	(GladeWindow.__connect_interesting_signals): Add a delicious hack

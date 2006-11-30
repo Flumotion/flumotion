@@ -175,7 +175,11 @@ class GladeWindow(gobject.GObject):
             self.window.set_transient_for(parent)
 
         wtree.signal_autoconnect(self)
-        self.__connect_interesting_signals()
+
+        for name, widget in self.widgets.iteritems():
+            for prefix, signal in self.interesting_signals:
+                if name.startswith(prefix):
+                    self.connect_signal(name, signal)
 
         self.show = self.window.show
         self.hide = self.window.hide
@@ -201,18 +205,6 @@ class GladeWindow(gobject.GObject):
         proc = lambda *x: getattr(self, attr)()
         self.widgets[widget_name].connect(signal, proc)
         
-    def __connect_interesting_signals(self):
-        def name_to_proc(n, prefix, signal):
-            attr = '_'.join(('on-%s-%s' % (n, signal)).split('-'))
-            self.log('trying to connect self.%s for widget %s::%s',
-                     attr, n, signal)
-            return lambda *x: getattr(self, attr)()
-
-        for name, widget in self.widgets.iteritems():
-            for prefix, signal in self.interesting_signals:
-                if name.startswith(prefix):
-                    self.connect_signal(name, signal)
-
     def destroy(self):
         self.window.destroy()
         del self.window
