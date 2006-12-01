@@ -118,8 +118,10 @@ class BaseAdminGtk(log.Loggable):
         """
         self.debug('BaseAdminGtk.setup()')
 
-        self.nodes['Plumbing'] = PlumbingAdminGtkNode(self.state,
-                                                      self.admin)
+        config = self.state.get('config') 
+        if len(config['feed']) > 0 or len(config['source']) > 0:
+            self.nodes['Plumbing'] = PlumbingAdminGtkNode(self.state,
+                                                          self.admin)
 
         # set up translations
         if not hasattr(self, 'gettext_domain'):
