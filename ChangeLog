@@ -1,5 +1,11 @@
 2006-12-04  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/feedcomponent010.py:
+	  Comment out some unused variables (not removing them; these might be
+	  useful later). Helps pychecker.
+
+2006-12-04  Michael Smith  <msmith@fluendo.com>
+
 	* data/upgrade-to-0.3.2.xsl:
 	  When upgrading configs to 0.3.2, set version to 0.3.2
 

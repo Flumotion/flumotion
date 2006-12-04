@@ -93,10 +93,10 @@ class FeederClient:
         @type stats: list
         """
         bytesSent = stats[0]
-        timeAdded = stats[1]
-        timeRemoved = stats[2]
-        timeActive = stats[3]
-        timeLastActivity = stats[4]
+        #timeAdded = stats[1]
+        #timeRemoved = stats[2]
+        #timeActive = stats[3]
+        #timeLastActivity = stats[4]
         if len(stats) > 5:
             # added in gst-plugins-base 0.10.11
             buffersDropped = stats[5]

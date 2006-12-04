@@ -68,7 +68,9 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
 
     def openForReading(self):
         """Open a file and return it."""
-        return self.open()
+        f = self.open()
+        self.debug("Reading file from FD: %d", f.fileno())
+        return f
 
     def getFileSize(self):
         """Return file size."""
