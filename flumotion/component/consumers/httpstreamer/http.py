@@ -288,14 +288,28 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def do_check(self):
         props = self.config['properties']
+
+        # F0.6: remove backwards-compatible properties
+        self.fixRenamedProperties(props, [
+            ('issuer',             'issuer-class'),
+            ('mount_point',        'mount-point'),
+            ('porter_socket_path', 'porter-socket-path'),
+            ('porter_username',    'porter-username'),
+            ('porter_password',    'porter-password'),
+            ('user_limit',         'client-limit'),
+            ('bandwidth_limit',    'bandwidth-limit'),
+            ('burst_on_connect',   'burst-on-connect'),
+            ('burst_size',         'burst-size'),
+            ])
+
         if props.get('type', 'master') == 'slave':
-            for k in 'socket_path', 'username', 'password':
-                if not 'porter_' + k in props:
-                    msg = "slave mode, missing required property 'socket_%s'" % k
+            for k in 'socket-path', 'username', 'password':
+                if not 'porter-' + k in props:
+                    msg = "slave mode, missing required property 'porter-%s'" % k
                     return defer.fail(errors.ConfigError(msg))
 
-        if 'burst_size' in props and 'burst_time' in props:
-            msg = 'both burst_size and burst_time set, cannot satisfy'
+        if 'burst-size' in props and 'burst-time' in props:
+            msg = 'both burst-size and burst-time set, cannot satisfy'
             return defer.fail(errors.ConfigError(msg))
 
         # tcp is where multifdsink is
@@ -390,19 +404,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self._updateCallLaterId = reactor.callLater(1, self._checkUpdate)
         self._queueCallLaterId = reactor.callLater(0.1, self._handleQueue)
-
-        # F0.6: remove backwards-compatible properties
-        self.fixRenamedProperties(properties, [
-            ('issuer',             'issuer-class'),
-            ('mount_point',        'mount-point'),
-            ('porter_socket_path', 'porter-socket-path'),
-            ('porter_username',    'porter-username'),
-            ('porter_password',    'porter-password'),
-            ('user_limit',         'client-limit'),
-            ('bandwidth_limit',    'bandwidth-limit'),
-            ('burst_on_connect',   'burst-on-connect'),
-            ('burst_size',         'burst-size'),
-            ])
 
         mountPoint = properties.get('mount-point', '')
         if not mountPoint.startswith('/'):

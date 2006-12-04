@@ -1,5 +1,11 @@
 2006-12-04  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/consumers/httpstreamer/http.py:
+	  Change properties to new-style in do_check(), which runs earlier
+	  than configure_pipeline(), so that the checks don't spuriously fail.
+
+2006-12-04  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/configure/configure.py:
 	  Provide versionNum as a conveniently pre-parsed version number in
 	  addition to the (string) version.
