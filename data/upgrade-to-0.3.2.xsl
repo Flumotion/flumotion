@@ -9,6 +9,11 @@
 <!-- this stylesheet upgrades configuration files from Flumotion < 0.3.2 -->
 <xsl:output method="xml" indent="yes" />
 
+  <!-- fix up component version -->
+  <xsl:template match="//planet/*/component/@version">
+    <xsl:attribute name="version">0.3.2</xsl:attribute>
+  </xsl:template>
+
   <!-- fix up component type strings -->
   <xsl:template match="//planet/*/component/@type">
     <xsl:attribute name="type">

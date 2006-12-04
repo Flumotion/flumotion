@@ -402,6 +402,23 @@ class FlumotionConfigXML(BaseConfigParser):
                 # new since 0.3, give it a different error
                 raise ComponentWorkerConfigError("<component> must have a"
                                                  " worker attribute")
+        version = None
+        if node.hasAttribute('version'):
+            versionString = node.getAttribute("version")
+            try:
+                versionList = map(int, versionString.split('.'))
+                if len(versionList) == 3:
+                    version = tuple(versionList) + (0,)
+                elif len(versionList) == 4:
+                    version = tuple(versionList)
+            except:
+                raise ComponentWorkerConfigError("<component> version not"
+                                                 " parseable")
+
+        # version was introduced in 0.2.0, default to this if we couldn't find 
+        # or version had the wrong length
+        if not version:
+            version = (0,2,0,0)
 
         type = str(node.getAttribute('type'))
         name = str(node.getAttribute('name'))
@@ -417,7 +434,8 @@ class FlumotionConfigXML(BaseConfigParser):
         config = { 'name': name,
                    'parent': parent,
                    'type': type,
-                   'avatarId': common.componentId(parent, name)
+                   'avatarId': common.componentId(parent, name),
+                   'version': version
                  }
 
         try:
