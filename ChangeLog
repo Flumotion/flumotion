@@ -1,5 +1,9 @@
 2006-12-04  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/ui/glade.py (GladeWindow.with_blocked_signal)
+	(GladeWindow.__init__): Add a new decorator to call a function
+	with a blocked signal.
+
 	* flumotion/component/base/admin_gtk.py
 	(PlumbingAdminGtkNode.removeFeederClient): Thank you distributed
 	pychecker.
