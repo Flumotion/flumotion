@@ -65,6 +65,9 @@ and then access the variables from the configure module.  For example:
 
 @var  version:     Flumotion version number
 @type version:     string
+
+@var  versionNum:  Flumotion version number
+@type versionNum:     4-tuple of integers
 '''
 
 # Note: This module is loaded very early on, so
@@ -98,6 +101,13 @@ config_dict['processKillWait'] = 5
 
 # default value for component heartbeat interval, in seconds
 config_dict['heartbeatInterval'] = 5
+
+def parseVersion(num):
+    version = tuple(map(int, num.split('.')))
+    if len (version) < 4:
+        version = version + (0,)
+    return version
+config_dict['versionNum'] = parseVersion(config_dict['version'])
 
 for key, value in config_dict.items():
     dictionary = locals()
