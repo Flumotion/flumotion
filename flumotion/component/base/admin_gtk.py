@@ -478,11 +478,11 @@ class PlumbingAdminGtkNode(BaseAdminGtkNode):
         for row in row.iterchildren():
             if self.treemodel.get_value(row.iter, 1) == state:
                 break
-        state, watcher = self.treemodel.get(i, 1, 2)
+        state, watcher = self.treemodel.get(row.iter, 1, 2)
         if watcher == self.selected:
             self.select(None)
         watcher.unwatch()
-        self.treemodel.remove(i)
+        self.treemodel.remove(row.iter)
 
     def setUIState(self, state):
         # will only be called when we have a widget tree

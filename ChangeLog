@@ -1,3 +1,9 @@
+2006-12-04  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/admin_gtk.py
+	(PlumbingAdminGtkNode.removeFeederClient): Thank you distributed
+	pychecker.
+
 2006-12-04  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/feedcomponent010.py:
