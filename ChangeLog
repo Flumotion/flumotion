@@ -1,5 +1,9 @@
 2006-12-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/worker/worker.py
+	(WorkerClientFactory.clientConnectionFailed): Log at level 4 when
+	we can't connect.
+
 	* flumotion/common/log.py (stderrHandler): Die if we get an EPIPE,
 	so that closing stderr will make the process stop.
 

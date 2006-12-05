@@ -66,6 +66,16 @@ class WorkerClientFactory(factoryClass):
         # maximum 10 second delay for workers to attempt to log in again
         self.maxDelay = 10
         
+    def clientConnectionFailed(self, connector, reason):
+        """
+        @param reason: L{twisted.spread.pb.failure.Failure}
+        """
+        # this method exists so that we log the failure
+        fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self, 
+            connector, reason)
+        # delay is now updated
+        self.debug("failed to connect, will try to reconnect in %f seconds" % self.delay)
+
     ### ReconnectingPBClientFactory methods
     def gotDeferredLogin(self, d):
         # the deferred from the login is now available
