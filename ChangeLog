@@ -1,5 +1,11 @@
 2006-12-05  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/admin.py
+	(AdminClientFactory.clientConnectionFailed)
+	(AdminClientFactory.__init__): Configurable tenacity level.
+	(AdminModel.connectToHost): Take another argument, whether to keep
+	trying in the face of errors.
+
 	* flumotion/worker/worker.py
 	(WorkerClientFactory.clientConnectionFailed): Log at level 4 when
 	we can't connect.

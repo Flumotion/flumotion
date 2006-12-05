@@ -51,7 +51,7 @@ T_ = messages.gettexter('flumotion')
 class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
     perspectiveInterface = interfaces.IAdminMedium
 
-    def __init__(self, medium):
+    def __init__(self, medium, extraTenacious=False):
         """
         @type medium:   AdminModel
         """
@@ -59,6 +59,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         self.medium = medium
         self.maxDelay = 20
 
+        self.extraTenacious = extraTenacious
         self.hasBeenConnected = 0
 
     def clientConnectionMade(self, broker):
@@ -72,7 +73,8 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         """
         if reason.check(error.DNSLookupError):
             self.debug('DNS lookup error')
-            self.medium.connectionFailed(reason)
+            if not self.extraTenacious:
+                self.medium.connectionFailed(reason)
             return
         elif (reason.check(error.ConnectionRefusedError)
               or reason.check(error.ConnectError)):
@@ -82,7 +84,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             # hasn't yet been restarted), we want to keep trying to reconnect,
             # so we just log a message.
             self.debug("Error connecting: %s", log.getFailureMessage(reason))
-            if not self.hasBeenConnected:
+            if not self.hasBeenConnected and not self.extraTenacious:
                 self.medium.connectionFailed(reason)
                 return
 
@@ -189,7 +191,8 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         factory.startLogin(authenticator)
         return factory
 
-    def connectToHost(self, host, port, use_insecure=False):
+    def connectToHost(self, host, port, use_insecure=False,
+                      keep_trying=False):
         'Connect to a host.'
         self.host = host
         self.port = port
@@ -204,6 +207,9 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
 
         self.info('Connecting to manager %s with %s',
                   self.managerId, use_insecure and 'TCP' or 'SSL')
+        if keep_trying:
+            self.info('AdminClientFactory, now with extra tenacity')
+            self.clientFactory.extraTenacious = True
 
         if use_insecure:
             reactor.connectTCP(host, port, self.clientFactory)
