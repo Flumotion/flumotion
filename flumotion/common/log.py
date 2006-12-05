@@ -30,6 +30,7 @@ API Stability: stabilizing
 Maintainer: U{Thomas Vander Stichele <thomas at apestaart dot org>}
 """
 
+import errno
 import sys
 import os
 import fnmatch
@@ -526,9 +527,12 @@ def stderrHandler(level, object, category, file, line, message):
         #    level, o, category, where, os.getpid(),
         #    "", time.strftime("%b %d %H:%M:%S"), message))
         sys.stderr.flush()
-    except IOError:
-        # happens in SIGCHLDHandler for example
-        pass
+    except IOError, e:
+        if e.errno == errno.EPIPE:
+            # if our output is closed, exit; e.g. when logging over an
+            # ssh connection and the ssh connection is closed
+            os._exit(os.EX_OSERR)
+        # otherwise ignore it, there's nothing you can do
 
 def addLogHandler(func, limited=True):
     """
