@@ -60,13 +60,13 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         os.close(fd)
 
         text = None
-        if properties.get('show_text', False):
+        if properties.get('show-text', False):
             text = properties.get('text', 'set the "text" property')
         genimg.generate_overlay(self._filename,
                                 text,
-                                properties.get('fluendo_logo', False),
-                                properties.get('cc_logo', False),
-                                properties.get('xiph_logo', False),
+                                properties.get('fluendo-logo', False),
+                                properties.get('cc-logo', False),
+                                properties.get('xiph-logo', False),
                                 properties['width'],
                                 properties['height'])
         

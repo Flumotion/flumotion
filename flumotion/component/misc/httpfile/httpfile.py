@@ -151,9 +151,6 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
     def do_setup(self):
         props = self.config['properties']
-        self.fixRenamedProperties(props, [
-            ('issuer',             'issuer-class'),
-            ])
 
         mountPoint = props.get('mount-point', '')
         if not mountPoint.startswith('/'):
@@ -176,8 +173,8 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
         if 'bouncer' in props:
             self.setBouncerName(props['bouncer'])
-        if 'issuer' in props:
-            self.setIssuerClass(props['issuer'])
+        if 'issuer-class' in props:
+            self.setIssuerClass(props['issuer-class'])
         if 'ip-filter' in props:
             filter = http.LogFilter()
             for f in props['ip-filter']:
@@ -280,10 +277,18 @@ class HTTPFileStreamer(component.BaseComponent, httpbase.HTTPAuthentication,
 
     def do_check(self):
         props = self.config['properties']
+        self.fixRenamedProperties(props, [
+            ('issuer',             'issuer-class'),
+            ('porter_socket_path', 'porter-socket-path'),
+            ('porter_username',    'porter-username'),
+            ('porter_password',    'porter-password'),
+            ('mount_point',        'mount-point')
+            ])
+
         if props.get('type', 'master') == 'slave':
             for k in 'socket-path', 'username', 'password':
                 if not 'porter-' + k in props:
-                    msg = ' slave mod, missing required property %s' % k
+                    msg = 'slave mode, missing required property porter-%s' % k
                     return defer.fail(errors.ConfigError(msg))
         else:
             if not 'port' in props:

@@ -71,7 +71,7 @@ class Theora(feedcomponent.ParseLaunchComponent):
         # FIXME: GStreamer 0.10 has bitrate in kbps, inconsistent
         # with all other elements, so fix it up
         if 'bitrate' in properties:
-                properties['bitrate'] = int(properties['bitrate'] / 10000)
+            properties['bitrate'] = int(properties['bitrate'] / 1000)
 
         for p in props:
             pproperty = isinstance(p, tuple) and p[0] or p
@@ -81,3 +81,4 @@ class Theora(feedcomponent.ParseLaunchComponent):
                 self.debug('Setting GStreamer property %s to %r' % (
                     eproperty, properties[pproperty]))
                 element.set_property(eproperty, properties[pproperty])
+

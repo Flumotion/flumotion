@@ -1039,7 +1039,7 @@ class HTTP(WizardStep):
         options = WizardStep.get_state(self)
 
         options['bandwidth-limit'] = int(options['bandwidth-limit'])
-        options['user-limit'] = int(options['user-limit'])
+        options['client-limit'] = int(options['client-limit'])
         options['port'] = int(options['port'])
  
         return options

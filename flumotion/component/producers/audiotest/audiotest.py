@@ -64,10 +64,15 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
                 % (source, is_live, rate, volume))
 
     def configure_pipeline(self, pipeline, properties):
+
+        self.fixRenamedProperties(properties, [ 
+             ('freq', 'frequency'), 
+             ]) 
+
         element = self.get_element('source')
-        if properties.has_key('freq'):
-            element.set_property('freq', properties['freq'])
-            self.uiState.set('frequency', properties['freq'])
+        if properties.has_key('frequency'):
+            element.set_property('freq', properties['frequency'])
+            self.uiState.set('frequency', properties['frequency'])
 
         self.uiState.set('rate', self.rate)
         self.uiState.set('wave', int(element.get_property('wave')))
