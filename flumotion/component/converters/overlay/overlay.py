@@ -55,6 +55,13 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         return pipeline
 
     def configure_pipeline(self, pipeline, properties):
+        self.fixRenamedProperties(properties, [ 
+                ('show_text',    'show-text'), 
+                ('fluendo_logo', 'fluendo-logo'), 
+                ('cc_logo',      'cc-logo'), 
+                ('xiph_logo',    'xiph-logo')
+            ]) 
+
         # create temp file
         (fd, self._filename) = tempfile.mkstemp('flumotion.png')
         os.close(fd)
