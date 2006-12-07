@@ -27,7 +27,7 @@ import gettext
 import gtk.glade
 
 from twisted.internet import reactor
-
+from flumotion.admin import connections
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.gtk import dialogs
 from flumotion.admin.gtk.client import Window
@@ -40,36 +40,51 @@ def _runInterface(conf_file, options, thegreeter=None):
         # load the conf file here
         raise NotImplementedError()
 
-    # We do the import here so gettext has been set up and class strings
-    # from greeter are translated
-    from flumotion.admin.gtk import greeter
-    g = thegreeter or greeter.Greeter()
-    state = g.run()
-    if not state:
-        reactor.callLater(0, reactor.stop)
-        return
-    g.set_sensitive(False)
+    d = None
+    g = None
+    if not options.manager:
+        # We do the import here so gettext has been set up and class strings
+        # from greeter are translated
+        from flumotion.admin.gtk import greeter
+        g = thegreeter or greeter.Greeter()
+        state = g.run()
+        if not state:
+            reactor.callLater(0, reactor.stop)
+            return
+        g.set_sensitive(False)
 
-    authenticator = fpb.Authenticator(username=state['user'],
-                                      password=state['passwd'])
-    model = AdminModel(authenticator)
-    d = model.connectToHost(state['host'], state['port'], state['use_insecure'])
+        authenticator = fpb.Authenticator(username=state['user'],
+                                          password=state['passwd'])
+        model = AdminModel(authenticator)
+        d = model.connectToHost(state['host'], state['port'], state['use_insecure'])
+    else:
+        info = connections.parsePBConnectionInfo(options.manager,
+                                                 not options.no_ssl)
+        model = AdminModel(info.authenticator)
+        d = model.connectToHost(info.host, info.port, not info.use_ssl)
 
     def connected(model, greeter):
-        greeter.destroy()
+        if greeter:
+            greeter.destroy()
         Window(model).show()
 
     def refused(failure, greeter):
         failure.trap(errors.ConnectionRefusedError)
-        dialogs.connection_refused_modal_message(state['host'],
+        if greeter:
+            dialogs.connection_refused_modal_message(state['host'],
                                                  greeter.window)
-        _runInterface(None, None, greeter)
+            _runInterface(None, None, greeter)
+        else:
+            log.error("Manager refused connection.")
 
     def failed(failure, greeter):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
-        dialogs.connection_failed_modal_message(message, greeter.window)
-        _runInterface(None, None, greeter)
+        if greeter:
+            dialogs.connection_failed_modal_message(message, greeter.window)
+            _runInterface(None, None, greeter)
+        else:
+            log.error("Connection to manager failed: %s", message)
 
     d.addCallback(connected, g)
     d.addErrback(refused, g)
@@ -87,7 +102,13 @@ def main(args):
                       action="store_true", dest="version",
                       default=False,
                       help="show version information")
-    
+    parser.add_option('-m', '--manager',
+                      action="store", type="string", dest="manager",
+                      help="the manager to connect to, e.g. localhost:7531")
+    parser.add_option('', '--no-ssl',
+                      action="store_true", dest="no_ssl",
+                      help="disable encryption when connecting to the manager")
+ 
     options, args = parser.parse_args(args)
 
     if options.version:
