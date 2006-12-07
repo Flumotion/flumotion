@@ -20,6 +20,7 @@ SUBDIRS = \
 	videotest \
 	webcam \
 	looper \
-	unixdomain
+	unixdomain \
+	gdp
 
 EXTRA_DIST = $(consumers_DATA)
