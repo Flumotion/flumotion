@@ -155,7 +155,7 @@ class BaseComponentMedium(medium.PingingMedium):
     def setup(self, config):
         pass
 
-    def getIP(self):
+    def getManagerIP(self):
         """
         Return the manager IP as seen by us.
         """
@@ -167,7 +167,7 @@ class BaseComponentMedium(medium.PingingMedium):
             host = peer[1]
 
         res = socket.gethostbyname(host)
-        self.debug("getIP(): we think the manager's IP is %r" % res)
+        self.debug("getManagerIP(): we think the manager's IP is %r" % res)
         return res
 
     def setAuthenticator(self, authenticator):
@@ -193,7 +193,7 @@ class BaseComponentMedium(medium.PingingMedium):
         """
         # we can only get the IP after we have a remote reference, so add it
         # here
-        self.comp.state.set('ip', self.getIP())
+        self.comp.state.set('manager-ip', self.getManagerIP())
         return self.comp.state
         
     def remote_getConfig(self):

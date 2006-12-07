@@ -509,7 +509,7 @@ class FeedComponent(basecomponent.BaseComponent):
                        % (clock, gst.TIME_ARGS(base_time)))
 
             # FIXME: this is always localhost, no ? Not sure if this is useful
-            ip = self.state.get('ip')
+            ip = self.state.get('manager-ip')
 
             return (ip, port, base_time)
 
@@ -535,7 +535,7 @@ class FeedComponent(basecomponent.BaseComponent):
         else:
             self.info ("Pipeline already started, retrieving clocking")
             # Just return the already set up info, as a fired deferred
-            ip = self.state.get('ip')
+            ip = self.state.get('manager-ip')
             base_time = self.pipeline.get_base_time()
             d = defer.Deferred()
             d.callback((ip, port, base_time))

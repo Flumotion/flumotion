@@ -326,7 +326,7 @@ class FakeComponentMind(FakeMind):
             'pid': 1,
             'cpu': 0.1,
             'mood': moods.waking.value,
-            'ip': '0.0.0.0',
+            'manager-ip': '0.0.0.0',
             'workerName': workerName,
             'feederNames': [],
             'eaterNames': [] }

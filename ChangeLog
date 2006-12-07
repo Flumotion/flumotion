@@ -1,5 +1,17 @@
 2006-12-07  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/common/planet.py:
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/manager/component.py:
+	* flumotion/test/test_manager_manager.py:
+	  Rename 'ip' in component state to 'manager-ip'.
+	  Rename getIP() to getManagerIP().
+	  This will be followed up by changes to do something useful with the
+	  component's IP.
+
+2006-12-07  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/launch/inspect.py:
 	  Print out clocking info in inspect.
 

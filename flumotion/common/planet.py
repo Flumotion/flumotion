@@ -176,7 +176,7 @@ moods = enum.EnumClass(
 moods.can_stop = staticmethod(lambda m: m != moods.sleeping and m != moods.lost)
 moods.can_start = staticmethod(lambda m: m == moods.sleeping)
 
-_jobStateKeys = ['mood', 'ip', 'pid', 'workerName', 'cpu']
+_jobStateKeys = ['mood', 'manager-ip', 'pid', 'workerName', 'cpu']
 _jobStateListKeys = ['messages', ]
 
 # FIXME: maybe make Atmosphere and Flow subclass from a ComponentGroup class ?

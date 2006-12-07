@@ -282,7 +282,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
         @rtype: str
         """
-        return self.jobState.get('ip')
+        return self.jobState.get('manager-ip')
 
     def getWorkerName(self):
         """
