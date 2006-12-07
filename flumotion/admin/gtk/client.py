@@ -865,7 +865,7 @@ class Window(log.Loggable, gobject.GObject):
 
         dialog = dialogs.ProgressDialog("Reloading",
             _("Reloading component code for %s") % name, self.window)
-        d = self.admin.reloadComponent(name)
+        d = self.admin.reloadComponent(state)
         d.addCallback(lambda result, d: d.destroy(), dialog)
         # add error
         d.addErrback(lambda failure, d: d.destroy(), dialog)
