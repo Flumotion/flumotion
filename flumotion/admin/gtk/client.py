@@ -1083,7 +1083,7 @@ class Window(log.Loggable, gobject.GObject):
         version.show()
 
         text = _('Flumotion is a streaming media server.\n\n'
-            '(C) 2004, 2005, 2006 Fluendo S.L.')
+            '© 2004, 2005, 2006 Fluendo S.L.')
         authors = ('Andy Wingo',
                    'Johan Dahlin',
                    'Mike Smith',
