@@ -269,6 +269,7 @@ do_showworkers = defer_generator(do_showworkers)
 
 class MoodListener(defer.Deferred):
     def __init__(self, moods, state):
+        defer.Deferred.__init__(self)
         self._moodsFinal = moods
         state.addListener(self, self.stateSet)
 
