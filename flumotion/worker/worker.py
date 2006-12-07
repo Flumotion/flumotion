@@ -777,6 +777,10 @@ class WorkerBrain(log.Loggable):
 
         @returns: whether the fd was successfully handed off to the component.
         """
+        if componentId not in self.jobHeaven.avatars:
+            self.warning("No such component %s running", componentId)
+            return False
+
         avatar = self.jobHeaven.avatars[componentId]
         return avatar.sendFeed(feedName, fd, eaterId)
 
@@ -787,6 +791,10 @@ class WorkerBrain(log.Loggable):
 
         @returns: whether the fd was successfully handed off to the component.
         """
+        if componentId not in self.jobHeaven.avatars:
+            self.warning("No such component %s running", componentId)
+            return False
+
         avatar = self.jobHeaven.avatars[componentId]
         return avatar.receiveFeed(feedId, fd)
    
