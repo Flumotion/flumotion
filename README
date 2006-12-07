@@ -23,16 +23,12 @@ REQUIREMENTS
 
 You need:
 
-Gstreamer: you can use either the 0.8 series, or the 0.10 series.
-We recommend you use GStreamer 0.10 if you can.
+Gstreamer: you need GStreamer version 0.10.10 or higher. 0.10.11 or higher is
+strongly recommended.
 
-For 0.8.x:
-  GStreamer - 0.8.7 or higher, or 0.10.1 or higher.
-  GStreamer plugins - 0.8.5 or higher
-  GStreamer python bindings - 0.7.93 or higher
 For 0.10.x:
-  GStreamer: 0.10.1 or higher
-  GStreamer plugins base 0.10.1 or higher
+  GStreamer: 0.10.10 or higher
+  GStreamer plugins base 0.10.10 or higher
   GStreamer plugins good 0.10.1 or higher
   GStreamer python bindings 0.10.1 or higher
 
