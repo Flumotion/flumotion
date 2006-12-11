@@ -144,11 +144,8 @@ class HTPasswdCryptAdminGtk(BaseAdminGtk):
     def setup(self):
         # FIXME: have constructor take self instead ?
         keycards = KeycardsNode(self.state, self.admin)
-        self._nodes = {'Keycards': keycards}
-
-    # FIXME: move to base class, make _nodes a public member
-    def getNodes(self):
-        return self._nodes
+        self.nodes['Keycards'] = keycards
+        return BaseAdminGtk.setup(self)
 
     def cleanup(self):
         self._nodes['Keycards'].cleanup()

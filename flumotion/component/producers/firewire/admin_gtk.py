@@ -30,7 +30,7 @@ class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
         return admin_gtk.BaseAdminGtk.setup(self)
 
     def component_volumeChanged(self, channel, rms, peak, decay):
-        volume = self._nodes['Volume']
+        volume = self.nodes['Volume']
         volume.volumeChanged(channel, rms, peak, decay)
 
     def component_effectVolumeSet(self, effect, volume):
@@ -41,7 +41,7 @@ class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
         if effect != 'inputVolume':
             self.warning('Unknown effect %s in %r' % (effect, self))
             return
-        v = self._nodes['Volume']
+        v = self.nodes['Volume']
         v.volumeSet(volume)
 
 GUIClass = FirewireAdminGtk

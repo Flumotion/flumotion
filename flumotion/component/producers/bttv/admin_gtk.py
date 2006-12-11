@@ -24,20 +24,17 @@ from flumotion.component.effects.colorbalance.admin_gtk import ColorbalanceAdmin
 
 class BTTVAdminGtk(admin_gtk.BaseAdminGtk):
     def setup(self):
-        self._nodes = {}
         colorbalance = ColorbalanceAdminGtkNode(self.state, self.admin,
-                                                'outputColorbalance')
-        self._nodes['Colorbalance'] = colorbalance
-
-    def getNodes(self):
-        return self._nodes
+                                                'outputColorbalance',
+                                                'Output Colorbalance')
+        self.nodes['Colorbalance'] = colorbalance
 
     def component_effectPropertyChanged(self, effectName, propertyName, value):
         if not effectName == "outputColorbalance":
             self.warning("Unknown effect '%s'" % effectName)
             return
 
-        cb = self._nodes['Colorbalance']
+        cb = self.nodes['Colorbalance']
         cb.propertyChanged(propertyName, value)
 
 GUIClass = BTTVAdminGtk
