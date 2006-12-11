@@ -172,9 +172,12 @@ class BaseConfigParser(fxml.Parser):
     def get_fraction_values(self, nodes):
         def fraction_from_string(string):
             parts = string.split('/')
-            if not len(parts) == 2:
+            if len(parts) == 2:
+                return (int(parts[0]), int(parts[1]))
+            elif len(parts) == 1:
+                return (int(parts[0]), 1)
+            else:
                 raise ConfigError("Invalid fraction: %s", string)
-            return (int(parts[0]), int(parts[1]))
         return [fraction_from_string(subnode.childNodes[0].data)
                 for subnode in nodes]
 

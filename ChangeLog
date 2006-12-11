@@ -1,5 +1,13 @@
 2006-12-11  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/common/config.py:
+	  5 is a perfectly cromulent fraction.
+
+	* flumotion/ui/url.py:
+	  Allow right-click menu (open/copy link) to work again
+
+2006-12-11  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/component.py:
 	  Add a debug line.
 

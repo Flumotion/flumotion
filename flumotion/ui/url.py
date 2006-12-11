@@ -85,13 +85,11 @@ class ClickyURL(gtk.EventBox):
                                             event.button, event.time) 
         
     # signal handler for open link menu item activation
-    # eventbox is the eventbox that contains the label the url is in
-    def _streamurl_openlink(self, widget, eventbox):
+    def _streamurl_openlink(self, widget):
         self.open_url()
 
     # signal handler for copy link menu item activation
-    # eventbox is the eventbox that contains the label the url is in
-    def _streamurl_copylink(self, widget, eventbox):
+    def _streamurl_copylink(self, widget):
         gtk.Clipboard().set_text(self.url)
 
     # motion event handles
