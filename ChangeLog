@@ -1,5 +1,11 @@
 2006-12-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/producers/firewire/admin_gtk.py:
+	Supply an apt named title for the Volume Effect gtk admin
+	node for firewire.
+
+2006-12-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/component/base/admin_gtk.py:
 	Add debugging on the plumbing node creation decision.
 	* flumotion/component/producers/firewire/admin_gtk.py:
