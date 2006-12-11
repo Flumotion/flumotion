@@ -24,13 +24,10 @@ from flumotion.component.effects.volume.admin_gtk import VolumeAdminGtkNode
 
 class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
     def setup(self):
-        self._nodes = {}
         volume = VolumeAdminGtkNode(self.state, self.admin,
                                     'inputVolume')
-        self._nodes['Volume'] = volume
-
-    def getNodes(self):
-        return self._nodes
+        self.nodes['Volume'] = volume
+        return admin_gtk.BaseAdminGtk.setup(self)
 
     def component_volumeChanged(self, channel, rms, peak, decay):
         volume = self._nodes['Volume']
