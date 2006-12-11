@@ -811,7 +811,7 @@ class Theora(VideoEncoder):
     def get_state(self):
         options = {}
         if self.radiobutton_bitrate:
-            options['bitrate'] = int(self.spinbutton_bitrate.get_value())
+            options['bitrate'] = int(self.spinbutton_bitrate.get_value()) * 1000
         elif self.radiobutton_quality:
             options['quality'] = int(self.spinbutton_quality.get_value())
 

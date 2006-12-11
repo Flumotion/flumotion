@@ -179,6 +179,7 @@ class BaseComponentMedium(medium.PingingMedium):
         """
         assert self.remote
         host = self.remote.broker.transport.getHost()
+        self.debug("getIP(): using %r as our IP", host.host)
         return host.host
 
     def setAuthenticator(self, authenticator):
