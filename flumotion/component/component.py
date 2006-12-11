@@ -170,6 +170,17 @@ class BaseComponentMedium(medium.PingingMedium):
         self.debug("getManagerIP(): we think the manager's IP is %r" % res)
         return res
 
+    def getIP(self):
+        """
+        Return the IP of this component based on connection to the manager.
+
+        Note: this is insufficient in general, and should be replaced by 
+        network mapping stuff later.
+        """
+        assert self.remote
+        host = self.remote.broker.transport.getHost()
+        return host.host
+
     def setAuthenticator(self, authenticator):
         """
         Set the authenticator the client factory has used to log in to the

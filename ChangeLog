@@ -1,3 +1,10 @@
+2006-12-11  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/component.py:
+	* flumotion/component/feedcomponent010.py:
+	  Fix network clocking for the case of the clock master not being on
+	  the same machine as the manager.
+
 2006-12-11  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/base/admin_gtk.py: 

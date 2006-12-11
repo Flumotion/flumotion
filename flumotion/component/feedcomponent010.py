@@ -508,8 +508,13 @@ class FeedComponent(basecomponent.BaseComponent):
             self.debug('provided master clock from %r, base time %s'
                        % (clock, gst.TIME_ARGS(base_time)))
 
-            # FIXME: this is always localhost, no ? Not sure if this is useful
-            ip = self.state.get('manager-ip')
+            if self.medium:
+                # FIXME: This isn't always correct. We need a more flexible API,
+                # and a proper network map, to do this. Even then, it's not 
+                # always going to be possible.
+                ip = self.medium.getIP()
+            else:
+                ip = "127.0.0.1"
 
             return (ip, port, base_time)
 
