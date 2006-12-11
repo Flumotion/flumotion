@@ -306,8 +306,8 @@ class BaseAdminGtkNode(log.Loggable):
         """
         self.uiState = state
         state.addListener(self, self.stateSet, self.stateAppend,
-                          self.stateRemove, self.stateSetItem,
-                          self.stateDelItem)
+                          self.stateRemove, self.stateSetitem,
+                          self.stateDelitem)
 
     def stateSet(self, state, key, value):
         "Override me"
@@ -321,11 +321,11 @@ class BaseAdminGtkNode(log.Loggable):
         "Override me"
         pass
     
-    def stateSetItem(self, state, key, subkey, value):
+    def stateSetitem(self, state, key, subkey, value):
         "Override me"
         pass
     
-    def stateDelItem(self, state, key, subkey, value):
+    def stateDelitem(self, state, key, subkey, value):
         "Override me"
         pass
 
