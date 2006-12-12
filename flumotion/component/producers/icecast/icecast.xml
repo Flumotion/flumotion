@@ -1,6 +1,6 @@
 <registry>
   <components>
-    <component type="icecast"
+    <component type="icecast-producer"
                base="flumotion/component/producers/icecast">
       <source location="flumotion.component.producers.icecast.icecast"/>
 
