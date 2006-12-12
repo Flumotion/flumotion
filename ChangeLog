@@ -1,5 +1,10 @@
 2006-12-12  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/wizard/save.py:
+	  worker is no longer optional. Always specify it. Fixes mulaw.
+
+2006-12-12  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/component/producers/icecast/icecast.xml:
 	  Rename to match the Grand New Naming Scheme.
 
