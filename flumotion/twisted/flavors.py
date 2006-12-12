@@ -341,8 +341,8 @@ class StateRemoteCache(pb.RemoteCache):
             try:
                 self._dict[key].remove(value)
             except ValueError:
-                raise ValueError("value %r not under key %r with values %r",
-                    value, key, self._dict[key])
+                raise ValueError("value %r not under key %r with values %r" %
+                    (value, key, self._dict[key]))
 
         # notify our local listeners
         self._ensureListeners()
@@ -373,8 +373,8 @@ class StateRemoteCache(pb.RemoteCache):
             try:
                 del self._dict[key][subkey]
             except KeyError:
-                raise KeyError("key %r not in dict %r for state dict %r",
-                    subkey, self._dict[key], self._dict)
+                raise KeyError("key %r not in dict %r for state dict %r" %
+                    (subkey, self._dict[key], self._dict))
 
         # notify our local listeners
         self._ensureListeners()
