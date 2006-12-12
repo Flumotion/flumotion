@@ -80,10 +80,10 @@
         </directories>
     </bundle>
 
-    <bundle name="httpfile-admin-gtk">
+    <bundle name="http-server-admin-gtk">
         <dependencies>
             <dependency name="base-admin-gtk" />
-            <dependency name="httpfile-base" />
+            <dependency name="http-server-base" />
         </dependencies>
         <directories>
             <directory name="flumotion/component/misc/httpfile">
