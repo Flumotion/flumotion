@@ -1,3 +1,9 @@
+2006-12-12  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/component/base/admin_gtk.py (BaseAdminGtk.setup): Fix
+	the check to see if we should add plumbing nodes or not. Fixes
+	#518.
+
 2006-12-12  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/wizard/save.py:
