@@ -1,5 +1,8 @@
 2006-12-12  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/component/misc/httpfile/httpfile.xml: Fix the bundle
+	names for the admin, another fallout of cleanup-1.
+
 	* data/glade/admin.glade: Set the right pane to shrink=False,
 	preventing clipping of the component UI.
 
