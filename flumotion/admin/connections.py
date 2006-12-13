@@ -24,7 +24,7 @@ import os
 from xml.dom import minidom, Node
 
 from flumotion.configure import configure
-from flumotion.common import connection, errors
+from flumotion.common import connection, errors, log
 from flumotion.twisted import pb as fpb
 
 def get_recent_connections():
@@ -60,11 +60,10 @@ def get_recent_connections():
                             'file': f,
                             'info': state})
             except Exception, e:
-                print 'Error parsing %s: %r' % (f, e)
-                raise
+                log.warning('connections', 'Error parsing %s: %r', f, e)
         return ret
     except OSError, e:
-        print 'Error: %s: %s' % (e.strerror, e.filename)
+        log.warning('connections', 'Error: %s: %s', e.strerror, e.filename)
         return []
 
 def parsePBConnectionInfo(managerString, use_ssl=True,

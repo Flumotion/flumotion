@@ -1,5 +1,8 @@
 2006-12-13  Andy Wingo  <wingo@pobox.com>
 
+	* flumotion/admin/connections.py (get_recent_connections): Handle
+	bad connection files gracefully. Fixes #471.
+
 	* flumotion/test/test_dialogs.py (TestErrorDialog.testDialogRun):
 	Deal with the errordialog returning a deferred. Unfortunately we
 	still need the gtk main loop, for some reason.
