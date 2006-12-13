@@ -84,8 +84,17 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             # hasn't yet been restarted), we want to keep trying to reconnect,
             # so we just log a message.
             self.debug("Error connecting: %s", log.getFailureMessage(reason))
-            if not self.hasBeenConnected and not self.extraTenacious:
+            if self.hasBeenConnected:
+                self.log("we've been connected before though, so going "
+                         "to retry")
+                # fall through
+            elif self.extraTenacious:
+                self.log("trying again due to +100 tenacity")
+                # fall through
+            else:
+                self.log("telling medium about connection failure")
                 self.medium.connectionFailed(reason)
+                # return
                 return
 
         fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self, 

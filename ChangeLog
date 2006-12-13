@@ -1,3 +1,28 @@
+2006-12-13  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_dialogs.py (TestErrorDialog.testDialogRun):
+	Deal with the errordialog returning a deferred. Unfortunately we
+	still need the gtk main loop, for some reason.
+
+	* flumotion/admin/gtk/client.py
+	(Window.on_open_connection.refused): Catch all connection errors,
+	not just ConnectionFailed. Fixes #298.
+
+	* flumotion/admin/gtk/main.py (_runInterface): Reworked to not run
+	the error dialogs in recursive main loops, and to fix
+	re-presentation of the greeter if the connection fails.
+	Fixes #531.
+
+	* flumotion/admin/gtk/dialogs.py (ErrorDialog.run): Return a
+	deferred instead of running a recursive main loop, prevents
+	reactor-related errors.
+	(connection_refused_message, connection_failed_message): Retooled
+	to return deferreds instead of running modally.
+
+	* flumotion/admin/admin.py
+	(AdminClientFactory.clientConnectionFailed): Less reliance on
+	operator precedence, better debug messages.
+
 2006-12-13  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/admin/gtk/client.py: 

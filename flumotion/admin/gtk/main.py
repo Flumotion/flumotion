@@ -42,7 +42,12 @@ def _runInterface(conf_file, options, thegreeter=None):
 
     d = None
     g = None
-    if not options.manager:
+    if options and options.manager:
+        info = connections.parsePBConnectionInfo(options.manager,
+                                                 not options.no_ssl)
+        model = AdminModel(info.authenticator)
+        d = model.connectToHost(info.host, info.port, not info.use_ssl)
+    else:
         # We do the import here so gettext has been set up and class strings
         # from greeter are translated
         from flumotion.admin.gtk import greeter
@@ -57,11 +62,6 @@ def _runInterface(conf_file, options, thegreeter=None):
                                           password=state['passwd'])
         model = AdminModel(authenticator)
         d = model.connectToHost(state['host'], state['port'], state['use_insecure'])
-    else:
-        info = connections.parsePBConnectionInfo(options.manager,
-                                                 not options.no_ssl)
-        model = AdminModel(info.authenticator)
-        d = model.connectToHost(info.host, info.port, not info.use_ssl)
 
     def connected(model, greeter):
         if greeter:
@@ -71,9 +71,9 @@ def _runInterface(conf_file, options, thegreeter=None):
     def refused(failure, greeter):
         failure.trap(errors.ConnectionRefusedError)
         if greeter:
-            dialogs.connection_refused_modal_message(state['host'],
-                                                 greeter.window)
-            _runInterface(None, None, greeter)
+            dret = dialogs.connection_refused_message(state['host'],
+                                                      greeter.window)
+            dret.addCallback(lambda _: _runInterface(None, None, greeter))
         else:
             log.error("Manager refused connection.")
 
@@ -81,8 +81,8 @@ def _runInterface(conf_file, options, thegreeter=None):
         failure.trap(errors.ConnectionFailedError)
         message = "".join(failure.value.args)
         if greeter:
-            dialogs.connection_failed_modal_message(message, greeter.window)
-            _runInterface(None, None, greeter)
+            dret = dialogs.connection_failed_message(message, greeter.window)
+            dret.addCallback(lambda _: _runInterface(None, None, greeter))
         else:
             log.error("Connection to manager failed: %s", message)
 

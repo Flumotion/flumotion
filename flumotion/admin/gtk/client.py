@@ -198,12 +198,15 @@ class Window(log.Loggable, gobject.GObject):
             self._append_recent_connections()
 
         def refused(failure):
-            failure.trap(errors.ConnectionRefusedError)
-            dialogs.connection_refused_modal_message(i.host,
-                                                     self.window)
-            self.window.set_sensitive(True)
+            if failure.check(errors.ConnectionRefusedError):
+                d = dialogs.connection_refused_message(i.host,
+                                                       self.window)
+            else:
+                d = dialogs.connection_failed_message(i.host,
+                                                      self.window)
+            d.addCallback(lambda _: self.window.set_sensitive(True))
 
-        d.addCallback(connected).addErrback(refused)
+        d.addCallbacks(connected, refused)
         self.window.set_sensitive(False)
 
     def on_recent_activate(self, widget, connectionInfo):

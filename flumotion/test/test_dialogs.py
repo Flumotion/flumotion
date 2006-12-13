@@ -134,7 +134,13 @@ class TestErrorDialog(unittest.TestCase):
         self.failUnless(isinstance(button, gtk.Button))
         
         gobject.timeout_add(1 * INTERVAL, lambda b: b.emit('clicked'), button)
-        dialog.run()
-        
-        self.failUnlessEqual(dialog.get_property('visible'), False)
-   
+        d = dialog.run()
+        def check_visibility():
+            self.failUnlessEqual(dialog.get_property('visible'), False)
+            gtk.main_quit()
+        d.addCallback(lambda _: check_visibility())
+        # have to explicitly use the gtk main loop here for some most
+        # terrible reason
+        gtk.main()
+        return d
+    testDialogRun = common.deferred_result(testDialogRun)

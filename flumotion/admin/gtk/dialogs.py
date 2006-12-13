@@ -91,19 +91,28 @@ class ErrorDialog(gtk.MessageDialog):
         self.set_markup('<span weight="bold" size="larger">%s</span>'
                         '\n\n%s' % (self.message, secondary_text))
 
-def connection_refused_modal_message(host, parent=None):
+    def run(self):
+        # can't run a recursive mainloop, because that mucks with
+        # twisted's reactor.
+        from twisted.internet import defer
+        deferred = defer.Deferred()
+        def callback(_, response, deferred):
+            self.destroy()
+            deferred.callback(None)
+        self.connect('response', callback, deferred)
+        self.show()
+        return deferred
+
+def connection_refused_message(host, parent=None):
     d = ErrorDialog('Connection refused', parent, True,
                     '"%s" refused your connection.\n'
                     'Check your user name and password and try again.'
                     % host)
-    d.run()
-    d.destroy()
+    return d.run()
 
-def connection_failed_modal_message(message, parent=None):
+def connection_failed_message(message, parent=None):
     d = ErrorDialog('Connection failed', parent, True, message)
-    d.run()
-    d.destroy()
-
+    return d.run()
 
 class PropertyChangeDialog(gtk.Dialog):
     """
