@@ -777,7 +777,7 @@ class FeedComponent(basecomponent.BaseComponent):
             self._fdCleanup[fd](fd)
             del self._fdCleanup[fd]
         else:
-            self.debug("No  cleanup func!")
+            self.debug("No cleanup func!")
 
     def eatFromFD(self, feedId, fd):
         """

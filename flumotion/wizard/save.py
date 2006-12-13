@@ -142,7 +142,12 @@ class WizardSaver(log.Loggable):
             if (license_options['set-license']
                 and license_options['license'] == enums.LicenseType.CC):
                 properties['cc-logo'] = True
-            
+
+        # These were just used to pass capabilities; they shouldn't go into the
+        # XML.
+        del properties['show-logo']
+        del properties['can-overlay']    
+
         return Component('overlay-video', 'overlay-converter',
                          step.worker, properties)
         

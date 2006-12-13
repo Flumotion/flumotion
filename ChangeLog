@@ -1,3 +1,15 @@
+2006-12-13  Michael Smith  <msmith@fluendo.com>
+
+	* data/glade/wizard_overlay.glade:
+	  Improve phrasing.
+
+	* flumotion/component/feedcomponent010.py:
+	  Improved use of spacebar in debug message
+
+	* flumotion/wizard/save.py:
+	* flumotion/wizard/steps.py:
+	  Clean up warnings from admin using wizard
+
 2006-12-12  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/twisted/flavors.py:

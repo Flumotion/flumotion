@@ -524,7 +524,7 @@ class Overlay(WizardStep):
     def get_state(self):
         options = WizardStep.get_state(self)
         if self.checkbutton_show_logo:
-            options['logo'] = True
+            options['show-logo'] = True
             
         if self.checkbutton_show_text:
             options['text'] = self.entry_text.get_text()
