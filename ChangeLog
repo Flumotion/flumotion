@@ -1,3 +1,9 @@
+2006-12-14  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/consumers/disker/admin_gtk.py: 
+	Removed duplicated call to node's setUIState method.
+	Fixes #524
+
 2006-12-14  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/component/base/http.py:
