@@ -1,3 +1,9 @@
+2006-12-14  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/test/test_http.py:
+	  Use the correct method (startAuthentication) to begin
+	  authentication, so that the errors get set correctly.
+
 2006-12-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/test/test_http.py

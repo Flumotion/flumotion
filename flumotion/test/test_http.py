@@ -146,8 +146,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
                 'error': http.RESPONSES[error_code]}
             self.assertEquals(request.data, expected)
 
-        d = resource.authenticate(request)
-        d.addCallback(resource._authenticatedCallback, request)
+        d = resource.startAuthentication(request)
         d.addCallbacks(checkResult, checkResult)
         return d
  
@@ -157,8 +156,7 @@ class TestHTTPStreamingResource(unittest.TestCase):
         def checkResult(res):
             self.failIfEquals(request.response, http.UNAUTHORIZED)
 
-        d = resource.authenticate(request)
-        d.addCallback(resource._authenticatedCallback, request)
+        d = resource.startAuthentication(request)
         d.addCallbacks(checkResult, checkResult)
         return d
 
