@@ -25,6 +25,7 @@ the job-side half of the worker-job connection
 
 import os
 import resource
+import sys
 
 # I've read somewhere that importing the traceback module messes up the
 # exception state, so it's better to import it globally instead of in the
@@ -293,6 +294,16 @@ class JobClientBroker(pb.Broker, log.Loggable):
         elif message.startswith('receiveFeed '):
             feedId = message[len('receiveFeed '):]
             self.factory.medium.component.eatFromFD(feedId, fds[0])
+        elif message == 'redirectStdout':
+            self.debug('told to rotate stdout to fd %d', fds[0])
+            os.dup2(fds[0], sys.stdout.fileno())
+            os.close(fds[0])
+            self.debug('rotated stdout')
+        elif message == 'redirectStderr':
+            self.debug('told to rotate stderr to fd %d', fds[0])
+            os.dup2(fds[0], sys.stderr.fileno())
+            os.close(fds[0])
+            self.info('rotated stderr')
         else:
             self.warning('Unknown message received: %r' % message)
 

@@ -907,6 +907,24 @@ class JobAvatar(pb.Avatar, log.Loggable):
     def remote_ready(self):
         pass
 
+    def logTo(self, stdout, stderr):
+        """
+        Tell the feeder to log to the given file descriptors.
+        """
+        self.debug('Giving job new stdout and stderr')
+        if self._mind:
+            try:
+                self._mind.broker.transport.sendFileDescriptor(
+                    stdout, "redirectStdout")
+                self._mind.broker.transport.sendFileDescriptor(
+                    stderr, "redirectStderr")
+            except exceptions.RuntimeError, e:
+                # RuntimeError is what is thrown by the C code doing this
+                # when there are issues
+                self.debug("We got a Runtime Error %s sending file descriptors.",
+                    log.getExceptionMessage(e))
+                return False
+
     def sendFeed(self, feedName, fd, eaterId):
         """
         Tell the feeder to send the given feed to the given fd.
@@ -982,7 +1000,22 @@ class JobHeaven(pb.Root, log.Loggable):
         """
         self.avatars = {} # componentId -> avatar
         self.brain = brain
+
+        handler = signal.signal(signal.SIGHUP, self._HUPHandler)
+        if handler == signal.SIG_DFL or handler == signal.SIG_IGN:
+            self._oldHUPHandler = None
+        else:
+            self._oldHUPHandler = handler
         
+    def _HUPHandler(self, signum, frame):
+        if self._oldHUPHandler:
+            self.log('got SIGHUP, calling previous handler %r',
+                     self._oldHUPHandler)
+            self._oldHUPHandler(signum, frame)
+        self.debug('telling kids about new log file descriptors')
+        for avatar in self.avatars.values():
+            avatar.logTo(sys.stdout.fileno(), sys.stderr.fileno())
+
     def createAvatar(self, avatarId):
         avatar = JobAvatar(self, avatarId)
         self.avatars[avatarId] = avatar
