@@ -1,3 +1,14 @@
+2006-12-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/test/test_http.py
+	(TestHTTPStreamingResource.testRenderHTTPAuthUnauthorized)
+	(TestHTTPStreamingResource.testRenderHTTPTokenUnauthorized)
+	(TestHTTPStreamingResource.testRenderHTTPTokenAuthorized)
+	(TestHTTPStreamingResource.deferAssertUnauthorized)
+	(TestHTTPStreamingResource.deferAssertAuthorized): Fix bogus
+	clusterfuck of deferred generators, weHaveAnOldTwisted,
+	unittest.deferredResult, and unit tests returning deferreds.
+
 2006-12-14  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/consumers/disker/admin_gtk.py: 

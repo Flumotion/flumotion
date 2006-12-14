@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import common
+deferred_result = common.deferred_result
 
 from twisted.internet import defer
 from twisted.trial import unittest
@@ -38,11 +39,6 @@ try:
 except ImportError:
     #T1.3
     from twisted.protocols import http
-
-import twisted.copyright #T1.3
-#T1.3
-def weHaveAnOldTwisted():
-    return twisted.copyright.version[0] < '2'
 
 class PipeTransport:
     def __init__(self):
@@ -135,40 +131,36 @@ class FakeStreamer:
 
 class TestHTTPStreamingResource(unittest.TestCase):
     # helpers
-    def assertUnauthorized(self, resource, request):
+    def deferAssertUnauthorized(self, resource, request):
         # make the resource authenticate the request, and verify
         # the request is not authorized
+        def checkResult(res):
+            error_code = http.UNAUTHORIZED
+            self.assertEquals(request.headers.get('content-type', ''), 'text/html')
+            self.assertEquals(request.headers.get('server', ''),
+                resources.HTTP_VERSION)
+            self.assertEquals(request.response, error_code)
+            
+            expected = resources.ERROR_TEMPLATE % {
+                'code': error_code,
+                'error': http.RESPONSES[error_code]}
+            self.assertEquals(request.data, expected)
+
         d = resource.authenticate(request)
         d.addCallback(resource._authenticatedCallback, request)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
-
-        error_code = http.UNAUTHORIZED
-        self.assertEquals(request.headers.get('content-type', ''), 'text/html')
-        self.assertEquals(request.headers.get('server', ''),
-            resources.HTTP_VERSION)
-        self.assertEquals(request.response, error_code)
-        
-        expected = resources.ERROR_TEMPLATE % {
-            'code': error_code,
-            'error': http.RESPONSES[error_code]}
-        self.assertEquals(request.data, expected)
-    assertUnauthorized = defer_generator_method(assertUnauthorized)
+        d.addCallbacks(checkResult, checkResult)
+        return d
  
-    def assertAuthorized(self, resource, request):
+    def deferAssertAuthorized(self, resource, request):
         # make the resource authenticate the request, and verify
         # the request is authorized
+        def checkResult(res):
+            self.failIfEquals(request.response, http.UNAUTHORIZED)
+
         d = resource.authenticate(request)
         d.addCallback(resource._authenticatedCallback, request)
-        if weHaveAnOldTwisted():
-            unittest.deferredResult(d)
-        else:
-            yield d
-
-        self.failIfEquals(request.response, http.UNAUTHORIZED)
-    assertAuthorized = defer_generator_method(assertAuthorized)
+        d.addCallbacks(checkResult, checkResult)
+        return d
 
     def testRenderNotReady(self):
         streamer = FakeStreamer()
@@ -212,7 +204,8 @@ class TestHTTPStreamingResource(unittest.TestCase):
         self.failUnless(resource.isReady())
         
         request = FakeRequest(ip='127.0.0.1', user='wronguser')
-        self.assertUnauthorized(resource, request)
+        return self.deferAssertUnauthorized(resource, request)
+    testRenderHTTPAuthUnauthorized = deferred_result(testRenderHTTPAuthUnauthorized)
 
     def testRenderHTTPTokenUnauthorized(self):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
@@ -227,16 +220,20 @@ class TestHTTPStreamingResource(unittest.TestCase):
         
         # wrong token
         request = FakeRequest(ip='127.0.0.1', args={'token': 'WRONG'})
-        self.assertUnauthorized(resource, request)
+        yield self.deferAssertUnauthorized(resource, request)
 
         # no token
         request = FakeRequest(ip='127.0.0.1', args={'notoken': 'LETMEIN'})
-        self.assertUnauthorized(resource, request)
+        yield self.deferAssertUnauthorized(resource, request)
 
         # doublewrong token
         request = FakeRequest(ip='127.0.0.1',
             args={'token': ['WRONG', 'AGAIN']})
-        self.assertUnauthorized(resource, request)
+        yield self.deferAssertUnauthorized(resource, request)
+    testRenderHTTPTokenUnauthorized = \
+        defer_generator_method(testRenderHTTPTokenUnauthorized)
+    testRenderHTTPTokenUnauthorized = \
+        deferred_result(testRenderHTTPTokenUnauthorized)
 
     def testRenderHTTPTokenAuthorized(self):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
@@ -251,13 +248,17 @@ class TestHTTPStreamingResource(unittest.TestCase):
         
         # right token
         request = FakeRequest(ip='127.0.0.1', args={'token': 'LETMEIN'})
-        self.assertAuthorized(resource, request)
+        yield self.deferAssertAuthorized(resource, request)
 
         # right token, twice
         request = FakeRequest(ip='127.0.0.1',
             args={'token': ['LETMEIN', 'LETMEIN']})
-        self.assertAuthorized(resource, request)
-
+        yield self.deferAssertAuthorized(resource, request)
+    testRenderHTTPTokenAuthorized = \
+        defer_generator_method(testRenderHTTPTokenAuthorized)
+    testRenderHTTPTokenAuthorized = \
+        deferred_result(testRenderHTTPTokenAuthorized)
+        
     def testRenderNew(self):
         streamer = FakeStreamer()
         resource = resources.HTTPStreamingResource(streamer)
