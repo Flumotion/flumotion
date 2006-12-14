@@ -1,3 +1,9 @@
+2006-12-14  Michael Smith  <msmith@fluendo.com>
+
+	* data/glade/admin.glade:
+	  Change menu names, add appropriate icons, for Open/Quit/About.
+	  Fixes #530.
+
 2006-12-14  Andy Wingo  <wingo@pobox.com>
 
 	* flumotion/job/job.py (JobClientBroker.fileDescriptorsReceived):
