@@ -7,6 +7,10 @@
 
 2006-12-14  Sebastien Merle  <sebastien@fluendo.com>
 
+	* flumotion/component/producers/audiotest/audiotest.glade.py:
+	Set the spine button value to the same value as the scale.
+	Fixes #525
+	
 	* flumotion/common/boot.py.in: 
 	Changed from PYGTK_BASE_REQ to PYGTK_010_REQ to reflect configure.ac
 
