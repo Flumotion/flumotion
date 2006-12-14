@@ -1,3 +1,14 @@
+2006-12-14  Andy Wingo  <wingo@pobox.com>
+
+	* flumotion/common/componentui.py
+	(ManagerComponentUIState.processUniqueID): Make sure that caches
+	of the same object are seen as the same by the jellier.
+	Fixes #519.
+
+	* flumotion/component/base/admin_gtk.py
+	(PlumbingAdminGtkNode.removeFeederClient): Fix a buglet with our
+	use of the treemodel API.
+
 2006-12-14  Michael Smith  <msmith@fluendo.com>
 
 	* flumotion/admin/admin.py:

@@ -473,7 +473,7 @@ class PlumbingAdminGtkNode(BaseAdminGtkNode):
         self.treeview.expand_all()
 
     def removeFeederClient(self, feederState, state):
-        for row in self.treemodel.iter_children(None):
+        for row in self.treemodel:
             if self.treemodel.get_value(row.iter, 1) == feederState:
                 break
         for row in row.iterchildren():

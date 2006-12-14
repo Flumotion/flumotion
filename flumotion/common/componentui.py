@@ -30,7 +30,10 @@ class WorkerComponentUIState(flavors.StateCacheable):
     pass
 
 class ManagerComponentUIState(flavors.StateCacheable, flavors.StateRemoteCache):
-    pass
+    def processUniqueID(self):
+        # Make sure proxies for the same object are the same, if we are
+        # later cached by someone else. See bug #519.
+        return id(self.__dict__)
 
 class AdminComponentUIState(flavors.StateRemoteCache):
     pass
