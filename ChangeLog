@@ -1,3 +1,10 @@
+2006-12-14  Michael Smith  <msmith@fluendo.com>
+
+	* flumotion/component/converters/overlay/overlay.py:
+	  Chain to parent do_stop() method, so we shut down the pipeline and
+	  avoid nasty racy GIL-related failures on shutdown of overlays.
+	  Fixes #438.
+
 2006-12-14  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/common/boot.py.in: 
