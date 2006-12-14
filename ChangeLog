@@ -1,5 +1,10 @@
 2006-12-14  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/feedcomponent010.py:
+	  Cancel callLater on shutdown, to satisfy some versions of trial.
+
+2006-12-14  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/test/test_http.py:
 	  Use the correct method (startAuthentication) to begin
 	  authentication, so that the errors get set correctly.

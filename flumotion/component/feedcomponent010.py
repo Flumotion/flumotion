@@ -148,6 +148,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.files = []
         self.effects = {}
         self._probe_ids = {} # eater name -> probe handler id
+        self._feeder_probe_cl = None
 
         self.clock_provider = None
 
@@ -438,7 +439,8 @@ class FeedComponent(basecomponent.BaseComponent):
                 self.BUFFER_CHECK_FREQUENCY, self._checkEater, feedId)
 
         # start checking feeders
-        reactor.callLater(self.BUFFER_CHECK_FREQUENCY, self._feeder_probe_calllater)
+        self._feeder_probe_cl = reactor.callLater(self.BUFFER_CHECK_FREQUENCY, 
+            self._feeder_probe_calllater)
 
     def pipeline_stop(self):
         if not self.pipeline:
@@ -464,6 +466,10 @@ class FeedComponent(basecomponent.BaseComponent):
         self.pipeline = None
         self.pipeline_signals = []
         self.bus_watch_id = None
+
+        if self._feeder_probe_cl:
+            self._feeder_probe_cl.cancel()
+            self._feeder_probe_cl = None
 
         # clean up checkEater callLaters
         for feedId in self.eater_names:
@@ -587,7 +593,8 @@ class FeedComponent(basecomponent.BaseComponent):
             for client in feeder.getClients().values():
                 array = feederElement.emit('get-stats', client.fd)
                 client.setStats(array)
-        reactor.callLater(self.BUFFER_CHECK_FREQUENCY, self._feeder_probe_calllater)
+        self._feeder_probe_cl = reactor.callLater(self.BUFFER_CHECK_FREQUENCY, 
+            self._feeder_probe_calllater)
 
     def _add_buffer_probe(self, pad, feedId, firstTime=False):
         # attached from above, and called again every
