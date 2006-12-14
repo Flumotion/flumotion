@@ -189,8 +189,6 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         self.planet = None
         self._workerHeavenState = None
         
-        self._views = [] # all UI views I am serving
-
     # a method so mock testing frameworks can override it
     def _makeFactory(self, authenticator):
         # FIXME: this needs further refactoring, so we only ever pass
@@ -342,7 +340,6 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         # monkey, Monkey, MONKEYPATCH!!!!!
         self.planet.admin = self
         self.debug('got planet state')
-        self.callViews('setPlanetState', self.planet)
 
         d = self.callRemote('getWorkerHeavenState')
         yield d
@@ -355,18 +352,6 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
         self.state = 'connected'
         self.emit('connected')
     setRemoteReference = defer_generator_method(setRemoteReference)
-
-    def callViews(self, methodName, *args, **kwargs):
-        """
-        Call a method on all views.
-        """
-        for view in self._views:
-            if not hasattr(view, methodName):
-                msg = 'view %r does not implement %s' % (view, methodName)
-                self.warning(msg)
-                raise errors.NoMethodError(msg)
-            m = getattr(view, methodName)
-            m(*args, **kwargs)
 
     ### pb.Referenceable methods
     def remote_log(self, category, type, message):
@@ -397,22 +382,6 @@ class AdminModel(medium.PingingMedium, gobject.GObject):
             self.clientFactory.disconnect()
         self.clientFactory.stopTrying()
 
-    def addView(self, view):
-        # FIXME: implement an IAdminView interface
-        """
-        Add a view as a client to the model.
-        """
-        if not view in self._views:
-            self._views.append(view)
-
-    def removeView(self, view):
-        # FIXME: implement an IAdminView interface
-        """
-        Remove a view as a client to the model.
-        """
-        if view in self._views:
-            self._views.remove(view)
-        
     ## generic remote call methods
     def componentCallRemote(self, componentState, methodName, *args, **kwargs):
         """

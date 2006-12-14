@@ -1,5 +1,18 @@
 2006-12-14  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/admin/admin.py:
+	  The call to setPlanetState on all views was wrong, and caused
+	  tracebacks on reconnects due to the planet state being listened to
+	  twice.
+	  Removing it meant that the views were totally unused in all ways,
+	  so deleted that code.
+
+	* flumotion/admin/gtk/client.py:
+	* flumotion/admin/text/view.py:
+	  Stop registering views, now that we no longer have that code.
+
+2006-12-14  Michael Smith  <msmith@fluendo.com>
+
 	* data/glade/admin.glade:
 	  Change menu names, add appropriate icons, for Open/Quit/About.
 	  Fixes #530.

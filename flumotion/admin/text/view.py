@@ -82,9 +82,6 @@ class AdminTextView(log.Loggable, gobject.GObject, misc_curses.CursesStdIO):
         #    self.property_changed_cb)
         self.admin.connect('update', self.admin_update_cb)
 
-        # set ourselves as a view for the admin model
-        self.admin.addView(self)
-
     # show the whole text admin screen
     def show(self):
         self.initialised = True

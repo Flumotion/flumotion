@@ -115,9 +115,6 @@ class Window(log.Loggable, gobject.GObject):
             self.property_changed_cb)
         self.admin.connect('update', self.admin_update_cb)
 
-        # set ourselves as a view for the admin model
-        self.admin.addView(self)
-
     # default Errback
     def _defaultErrback(self, failure):
         self.warning('Errback: unhandled failure: %s' %
@@ -548,6 +545,10 @@ class Window(log.Loggable, gobject.GObject):
 
     ### admin model callbacks
     def admin_connected_cb(self, admin):
+        if self._planetState:
+            self._planetState.removeListener(self)
+            self._planetState = None
+        
         self.info('Connected to manager')
         if self._disconnected_dialog:
             self._disconnected_dialog.destroy()
