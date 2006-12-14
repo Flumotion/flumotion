@@ -252,8 +252,6 @@ class HTTPAuthentication(log.Loggable):
         self.debug('_authenticatedCallback: keycard %r' % keycard)
         if not keycard:
             raise errors.NotAuthenticatedError() 
-            self._handleUnauthorized(request)
-            return
 
         # properly authenticated
         if request.method == 'GET':

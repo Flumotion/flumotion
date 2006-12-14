@@ -1,5 +1,10 @@
 2006-12-14  Michael Smith  <msmith@fluendo.com>
 
+	* flumotion/component/base/http.py:
+	  Delete unreachable code.
+
+2006-12-14  Michael Smith  <msmith@fluendo.com>
+
 	* flumotion/admin/gtk/client.py:
 	  Make this file compliant with PEP-263.
 	  Fixes distcheck.
